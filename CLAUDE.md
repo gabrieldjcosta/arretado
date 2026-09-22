@@ -21,8 +21,8 @@ Especificação concluída; **nenhum código ainda**. Antes de qualquer implemen
 - Escolhas técnicas ainda em aberto (linguagem, framework de UI, biblioteca de IndexedDB, formato do pacote): decidir com o Gabriel, obedecendo D1–D24.
 
 ## Git
-Sem identidade global configurada. Usar: `git -c user.name="Gabriel Costa" -c user.email=gabrieldjcosta@gmail.com commit ...` ou configurar globalmente antes.
-Sem remoto ainda.
+Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto privado: https://github.com/gabrieldjcosta/arretado (origin, branch main). GitHub CLI autenticado como gabrieldjcosta.
+Commits só quando o Gabriel pedir; push para origin/main após cada commit aprovado.
 
 ## Relacionado
 Skill `acumen-extrair-normas` (extração de leis do Planalto/ALESP): base conceitual do estruturador da F2.
