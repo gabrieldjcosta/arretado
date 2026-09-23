@@ -49,6 +49,14 @@ export default tseslint.config(
     },
   },
   {
+    // E2E roda no Playwright: fixtures usam `use` (não é hook do React) e testes de CSP tocam HTML bruto.
+    files: ['e2e/**'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
     files: ['**/*.{js,mjs}'],
     extends: [js.configs.recommended],
     languageOptions: { globals: { ...globals.node } },

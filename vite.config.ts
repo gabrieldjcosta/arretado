@@ -1,9 +1,43 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
+/**
+ * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
+ * injeta estilos em linha. O E2E roda sobre a versão construída e verifica violações.
+ */
+export const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  "require-trusted-types-for 'script'",
+  'trusted-types dompurify',
+].join('; ');
+
+function csp(): Plugin {
+  return {
+    name: 'arretado-csp',
+    apply: 'build',
+    transformIndexHtml: () => [
+      {
+        tag: 'meta',
+        attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP },
+        injectTo: 'head-prepend',
+      },
+    ],
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), csp()],
   base: './',
   build: {
     target: 'es2022',
