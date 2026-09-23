@@ -34,7 +34,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** gerar o escape por script Node a partir do código do caractere (`String.fromCharCode(92)` para a barra) ou copiá-lo de outro arquivo por script; depois, conferir que a barra invertida literal está no arquivo. **Prevenção:** varredura de caracteres invisíveis em `src/`:
   `node -e 'const fs=require("fs"),p=require("path");const r=/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u00a0\u200b\ufeff\uffff\u0300-\u036f]/;(function a(d){for(const n of fs.readdirSync(d)){const f=p.join(d,n);fs.statSync(f).isDirectory()?a(f):/\.(ts|tsx|css)$/.test(n)&&r.test(fs.readFileSync(f,"utf8"))&&console.log(f)}})("src")'`
   (este documento é Markdown e não passa pelo Prettier; o comando acima foi copiado por script, com os escapes literais; rodar no Git Bash — ver o item seguinte).
-- **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11; o caso da quebra de linha entrou no merge 9b71b2f e o exemplo foi corrigido em 6db6ede; de novo na 7.2, com o escape de U+FFFD gravado pelo Write como o caractere real em `scripts/corpus/derivados.mjs`, trocado por script antes do commit). Conferir com `grep -c` o byte `EF BF BD` depois de gravar arquivo com esse escape.
+- **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11; o caso da quebra de linha entrou no merge 9b71b2f e o exemplo foi corrigido em 6db6ede; de novo na 7.2, com o escape de U+FFFD gravado pelo Write como o caractere real em `scripts/corpus/derivados.mjs`, trocado por script antes do commit; e na 7.3, com U+00AD, U+00A0 e U+0300–U+036F em `scripts/corpus/gabarito.mjs`, trocados por script; nos testes, usar `String.fromCharCode`). Conferir com `grep -c` o byte `EF BF BD` depois de gravar arquivo com esse escape.
 
 ### Comando "passa" mas falhou, ou script quebra no Windows
 - **Sintoma:** a saída mostra falha e o código de saída é 0; script em Python não roda; comando Bash colado no PowerShell é recusado por sintaxe; `node -e '…require("fs")…'` dá `ReferenceError` no PowerShell. **Causa:** em `comando | head`, o código de saída é o do `head` e a falha do comando some; Python não é confiável na máquina do Gabriel; PowerShell e Bash têm sintaxes próprias; o Windows PowerShell 5.1 descarta as aspas duplas internas ao chamar programa externo.
@@ -358,8 +358,33 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Gabarito que só repete o estruturador
 - **Sintoma:** a regressão da 8.9 passa, mas a lei sai errada no leitor. **Causa:** gabarito gerado pela mesma lógica (ou pelas mesmas suposições) que o estruturador vai usar: os dois erram juntos.
-- **Solução:** contagens do gabarito cruzadas com fonte independente (âncoras `name="art…"` do Planalto, página compilada × todas as redações, texto puro colado, último artigo conhecido; sem o `extrair_lei.js`, decisão de 23/09/2026: nenhum código anterior) e amostra de ~50 dispositivos conferida pelo Gabriel contra a página no navegador. **Prevenção:** nota de conferência no gabarito; `origemSha256Conteudo` amarra o gabarito à página (`verificarDerivados`).
-- **Origem:** previsto — atividade 7.3.
+- **Solução:** o gabarito sai de `scripts/corpus/gabarito.mjs` (jsdom sobre o colado, linha a linha; sem o `extrair_lei.js`, decisão de 23/09/2026), cruzado com a página compilada, as âncoras `name="art…"`, o texto puro colado e o último artigo conhecido. Divergência sem regra vira pendência e só sai com decisão e motivo em `DECISOES`. A amostra de 50 por lei é conferida pelo Gabriel (`docs/conferencias/gabarito-<id>.md`). **O estruturador (etapa 8) não importa nem copia esse arquivo**: se os dois divergirem, examinar o caso, sem igualar um ao outro. **Prevenção:** `scripts/corpus-gabarito.test.ts` (gabarito reproduzível e sem pendência); `conferencia` no JSON; `origemSha256Conteudo` amarra o gabarito à página (`verificarDerivados`).
+- **Origem:** previsto na 7.3; prevenido em 23/09/2026 (branch `claude/proxima-atividade-f2-2il48c`).
+
+### `npm test` acusa "gabarito desatualizado" ou `npm run corpus:gabarito` sai com pendência
+- **Sintoma:** o teste de `scripts/corpus-gabarito.test.ts` falha em "gabarito desatualizado — rode npm run corpus:gabarito"; ou o comando lista "✗ cp: N pendência(s) — explicar em DECISOES". **Causa:** mudou a regra do gabarito, o colado ou a página; ou um sinal novo discorda do inventário.
+- **Solução:** rodar `npm run corpus:gabarito` e revisar o diff do `*.gabarito.json`. Se houver pendência, olhar o caso na página, corrigir a regra ou registrar a decisão em `DECISOES` com o motivo (a de um endereço vale para os descendentes). Se o conteúdo mudar, a `conferencia` volta a "pendente" e a folha de conferência é regravada: o Gabriel confere de novo. **Prevenção:** o próprio teste; o comando não grava gabarito com pendência.
+- **Origem:** ocorrido em 23/09/2026, durante a geração (15 pendências no CP, todas erros da fonte, hoje em `DECISOES`).
+
+### Contagem do gabarito errada por detalhe da página
+- **Sintoma:** artigo revogado sumido e a rubrica dele no artigo seguinte; "(revogado)" contado como nota; "§ 2º (Revogado) . (Redação dada…)." tratado como vigente; linha quase toda tachada, com o "§" fora do tachado, virando dispositivo vazio. **Causa:** na página, a revogação às vezes está só na linha "Pena" (CP, arts. 185 e 279); o "(Revogado)" sozinho é texto, não nota; sobra pontuação depois de tirar a nota; o tachado não cobre o rótulo inteiro.
+- **Solução:** regras do inventário em `scripts/corpus/gabarito.mjs` (artigo só tachado vira revogado e leva a rubrica pendente; "(Revogado)" sem "pela" fica no texto; `vazio` aceita "§", parêntese e pontuação). **Prevenção:** testes de inventário em `scripts/corpus-gabarito.test.ts`; os mesmos casos entram nos testes da 8.3–8.6.
+- **Origem:** ocorrido em 23/09/2026 (7.3, antes do commit).
+
+### A página compilada diz uma coisa e a página com todas as redações, outra
+- **Sintoma:** dispositivo presente numa e ausente na outra, ou rotulado diferente. Exemplos: LEP, art. 9º-A, § 1º só na página; CP, art. 234, "§ 1º." na página e "Parágrafo único" na compilada; CP, art. 92, parágrafo único antigo sem tachado. **Causa:** as duas páginas do Planalto são editadas à mão, em momentos diferentes.
+- **Solução:** o app recebe a página com todas as redações, e o gabarito a segue. As divergências ficam registradas em `DECISOES` e entram na amostra conferida. A 8.7 acusa `paragrafo-unico-com-numerado` como conflito e `paragrafo-1-sem-2` como aviso (o CP, art. 168, tem § 1º sozinho de verdade). **Prevenção:** cruzamento com a compilada em todo gabarito.
+- **Origem:** ocorrido em 23/09/2026 (7.3).
+
+### Estrutura antiga sem tachado ou redação sem dispositivo de mesmo endereço
+- **Sintoma:** dois "TÍTULO VI" no CP; centenas de tachados da Parte Geral de 1940 sem artigo correspondente (incisos e alíneas que não existem mais); parágrafo único que virou § 1º. **Causa:** o Planalto nem sempre tacha o título antigo, e a estrutura antiga não tem o mesmo endereço da nova.
+- **Solução:** nó repetido sem artigo no meio é substituído pelo último (`estrutural-substituido`); redação sem dispositivo de mesmo endereço vai para o ancestral mais próximo, com `enderecoLido` (331 no CP). **Prevenção:** casos e `redacoesNoAncestral` no gabarito; testes da 8.2 e da 8.6 contra ele.
+- **Origem:** ocorrido em 23/09/2026 (7.3); previsto para o estruturador nas atividades 8.2 e 8.6.
+
+### Mesmo endereço duas vezes na página
+- **Sintoma:** endereço duplicado na validação. **Causa:** a página traz a revogação ("I - ~~texto~~ (Revogado pela…)") e, logo depois, a nova redação "I - (revogado); (Redação dada…)"; ou o "(VETADO)" seguido do texto incluído com a derrubada do veto (CP, art. 141, § 2º).
+- **Solução:** vale a última linha e a anterior vira redação anterior (casos `revogacao-reescrita` e `duplicata` no gabarito). **Prevenção:** "0 duplicados" na 8.4 e na 8.9, com esses endereços na amostra.
+- **Origem:** ocorrido em 23/09/2026 (7.3); previsto para o estruturador na atividade 8.6.
 
 ### Tachado decorativo tratado como redação anterior (ou o contrário)
 - **Sintoma:** "Art. 1º" vira redação anterior; ou revogação da ALESP aparece como vigente. **Causa:** o `<s>` é decorativo no Planalto (só em `º`/`ª`; 56 na LC 80) e é a marca real de revogação na ALESP (172 na LC-SP 988); o `line-through` por estilo também é redação anterior.

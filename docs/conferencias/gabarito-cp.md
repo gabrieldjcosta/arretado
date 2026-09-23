@@ -1,0 +1,267 @@
+# Conferência do gabarito — Decreto-Lei nº 2.848/1940 — Código Penal
+
+Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/cp.gabarito.json` › `conferencia`.
+
+## Como conferir (~30 min)
+
+1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
+2. Marcar `[x]` no que bate. No que não bate, escrever ao lado o que a página mostra.
+3. Conferir também as contagens gerais abaixo pelo que se vê na página (último artigo, artigos com letra).
+
+## Contagens
+
+- Dispositivos: 1403 (artigo 434, paragrafo 491, inciso 400, alinea 78)
+- Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
+- Redações anteriores: 881 em 429 dispositivos
+- Notas de vigência no texto vigente: 1134
+- Estrutura: parte 2, titulo 20, capitulo 59, secao 7
+
+## Amostra (50 dispositivos)
+
+- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art1)
+  - Nome: Anterioridade da Lei
+  - Art. 1º - Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 1° Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.~~
+- [ ] **art7.par3.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7)
+  - b) houve requisição do Ministro da Justiça.
+  - Nota: (Incluído pela Lei nº 7.209, de 1984)
+- [ ] **art33.par2.alC** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33)
+  - c) o condenado não reincidente, cuja pena seja igual ou inferior a 4 (quatro) anos, poderá, desde o início, cumpri-la em regime aberto.
+- [ ] **art44** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44)
+  - Art. 44. As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:
+  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
+  - Redação anterior (tachado): ~~Art. 44. São circunstâncias que sempre agravam a pena, quando não constituem ou qualificam o crime:~~
+  - Redação anterior (tachado): ~~Art. 44 - As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando: (Redação dada pela Lei nº 7.209, de 1984)~~
+  - Redação anterior (tachado) [lida como art44.parUnico]: ~~Parágrafo único - Nos crimes culposos, a pena privativa de liberdade aplicada, igual ou superior a um ano, pode ser substituída por uma pena restritiva de direitos e multa ou por duas penas restritivas de direitos, exeqüíveis simultaneamente. (Incluído pela Lei nº 7.209, de 1984)~~
+- [ ] **art46** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art46)
+  - Nome: Prestação de serviços à comunidade ou a entidades públicas
+  - Art. 46. A prestação de serviços à comunidade ou a entidades públicas é aplicável às condenações superiores a seis meses de privação da liberdade.
+  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
+  - Redação anterior (tachado): ~~Art. 46. Verifica-se a reincidência quando o agente comete novo crime, depois de transitar em julgado a sentença que, no país ou no estrangeiro, o tenha condenado por crime anterior.~~
+  - Redação anterior (tachado): ~~Art. 46 - A prestação de serviços a comunidade consiste na atribuição ao condenado de tarefas gratuitas junto a entidades assistências, hospitais, escolas, orfanatos e outros estabelecimentos congêneres, em programas comunitários ou estatais. (Redação dada pela Lei nº 7.209, de 1984)~~
+  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único. Para efeito de reincidência, não prevalece a condenação anterior, se entre a data do cumprimento ou extinção da pena e a infração posterior tiver decorrido período de tempo superior a cinco anos. (Redação dada pela Lei nº 6.416, de 1977)~~
+  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único - As tarefas serão atribuídas conforme as aptidões do condenado, devendo ser cumpridas, durante oito horas semanais, aos sábados, domingos e feriados ou em dias úteis, de modo a não prejudicar a jornada normal de trabalho. (Redação dada pela Lei nº 7.209, de 1984)~~
+- [ ] **art47.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47)
+  - III - suspensão de autorização ou de habilitação para dirigir veículo. >
+  - Nota: (Incluído pela Lei nº 7.209, de 11.7.1984)
+- [ ] **art61.incII.alM** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art61)
+  - m) nas dependências de instituição de ensino.
+  - Nota: (Incluído pela Lei nº 15.159, de 2025)
+- [ ] **art72** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art72)
+  - Nome: Multas no concurso de crimes
+  - Art. 72 - No concurso de crimes, as penas de multa são aplicadas distinta e integralmente.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 72. As interdições, permanentes ou temporárias, tornam-se efetivas logo que passa em julgado a sentença, mas o prazo das interdições temporárias começa a correr do dia em que:~~
+  - Redação anterior (tachado) [lida como art72.alA]: ~~a) termina a execução da pena privativa de liberdade ou esta se extingue pela prescrição;~~
+  - Redação anterior (tachado) [lida como art72.alB]: ~~b) finda a execução da medida de segurança detentiva.~~
+  - Redação anterior (tachado) [lida como art72.parUnico]: ~~Parágrafo único. Computam-se no prazo:~~
+  - Redação anterior (tachado) [lida como art72.parUnico.incI]: ~~I - o tempo da suspensão provisória;~~
+  - Redação anterior (tachado) [lida como art72.parUnico.incII]: ~~II - o tempo de liberdade resultante da suspensão condicional da pena ou do livramento condicional, se não sobrevem revogação.~~
+- [ ] **art92.parUnico** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
+  - Parágrafo único - Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conven~~
+- [ ] **art92.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
+  - § 3º Em caso de reincidência da conduta prevista no inciso IV do caput deste artigo, a empresa será considerada inidônea e terá sua inscrição no CNPJ considerada inapta, com os efeitos previstos na Lei nº 9.430, de 27 de dezembro de 1996.
+  - Nota: (Incluído pela Lei nº 15.358, de 2026)
+- [ ] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
+  - § 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .
+  - Nota: (Redação dada pela Lei nº 12.234, de 2010)
+  - Redação anterior (tachado): ~~§ 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, regula-se, também, pela pena aplicada e verifica-se nos mesmos prazos. (Renumerado do parágrafo único pela Lei nº 6.416, de 1977)~~
+  - Redação anterior (tachado): ~~§ 1º - A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, ou depois de improvido seu recurso, regula-se pela pena aplicada. (Redação dada pela Lei nº 7.209, de 11.7.1984)~~
+- [ ] **art112** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112)
+  - Nome: Termo inicial da prescrição após a sentença condenatória irrecorrível
+  - Art. 112 - No caso do art. 110 deste Código, a prescrição começa a correr:
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 112. No caso do art. 110, a prescrição começa a correr:~~
+  - Redação anterior (tachado) [lida como art112.alA]: ~~a) do dia em que passa em julgado a sentença condenatória ou a que revoga a suspensão condicional da pena ou o livramento condicional;~~
+  - Redação anterior (tachado) [lida como art112.alB]: ~~b) do dia em que se interrompe a execução, salvo quando o tempo da interrupção deva computar-se na pena.~~
+- [ ] **art121.par7.incIV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art121)
+  - IV - (revogado)
+  - Nota: (Revogado pela Lei nº 14.994, de 2024)
+  - Redação anterior (revogacao): ~~IV - em descumprimento das medidas protetivas de urgência previstas nos incisos I , II e III do caput do art. 22 da Lei nº 11.340, de 7 de agosto de 2006 . (Incluído pela Lei nº 13.771, de 2018) (Revogado pela Lei nº 14.994, de 2024)~~
+- [ ] **art129.par2.incIII** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129)
+  - III - perda ou inutilização do membro, sentido ou função;
+- [ ] **art129.par3A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129)
+  - § 3º-A. No crime previsto no § 3º deste artigo, se cometido no contexto da atuação ou para a consecução das condutas previstas no art. 2º da lei que institui o marco legal do combate ao crime organizado no Brasil: ⏎ Pena - reclusão, de 20 (vinte) a 40 (quarenta) anos.
+  - Nota: (Incluído pela Lei nº 15.358, de 2026)
+  - Nota: (Incluído pela Lei nº 15.358, de 2026)
+- [ ] **art130.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130)
+  - § 2º - Somente se procede mediante representação.
+- [ ] **art132.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132)
+  - Parágrafo único. A pena é aumentada de um sexto a um terço se a exposição da vida ou da saúde de outrem a perigo decorre do transporte de pessoas para a prestação de serviços em estabelecimentos de qualquer natureza, em desacordo com as normas legais.
+  - Nota: (Incluído pela Lei nº 9.777, de 1998)
+- [ ] **art138.par3.incII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138)
+  - II - se o fato é imputado a qualquer das pessoas indicadas no nº I do art. 141;
+- [ ] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
+  - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
+  - Nota: (Incluído pela Lei nº 13.964, de 2019)
+  - Nota: (Vigência)
+  - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
+- [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
+  - III - se a privação da liberdade dura mais de 15 (quinze) dias.
+- [ ] **art158.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
+  - § 2º - Aplica-se à extorsão praticada mediante violência o disposto no § 3º do artigo anterior. Vide Lei nº 8.072, de 25.7.90
+- [ ] **art159.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159)
+  - § 3º - Se resulta a morte: ⏎ Pena - reclusão, de vinte e quatro a trinta anos.
+  - Nota: (Vide Lei nº 8.072, de 25.7.90)
+  - Nota: (Redação dada pela Lei nº 8.072, de 25.7.1990)
+  - Redação anterior (tachado): ~~Pena - reclusão, de vinte a trinta anos, e multa, de vinte contos a cinqüenta contos de réis.~~
+- [ ] **art169** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169)
+  - Nome: Apropriação de coisa havida por erro, caso fortuito ou força da natureza
+  - Art. 169 - Apropriar-se alguém de coisa alheia vinda ao seu poder por erro, caso fortuito ou força da natureza: ⏎ Pena - detenção, de um mês a um ano, ou multa.
+- [ ] **art169.parUnico.incII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169)
+  - Nome: Apropriação de coisa achada
+  - II - quem acha coisa alheia perdida e dela se apropria, total ou parcialmente, deixando de restituí-la ao dono ou legítimo possuidor ou de entregá-la à autoridade competente, dentro no prazo de 15 (quinze) dias.
+- [ ] **art171.par2B** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - § 2º-B. A pena prevista no § 2º-A deste artigo, considerada a relevância do resultado gravoso, aumenta-se de 1/3 (um terço) a 2/3 (dois terços), se o crime é praticado mediante a utilização de servidor mantido fora do território nacional.
+  - Nota: (Incluído pela Lei nº 14.155, de 2021)
+- [ ] **art171.par5** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - § 5º (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~§ 5º Somente se procede mediante representação, salvo se a vítima for: (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+- [ ] **art171.par5.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - I – (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~I - a Administração Pública, direta ou indireta; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+- [ ] **art171.par5.incII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - II – (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~II - criança ou adolescente; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+- [ ] **art171.par5.incIII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - III – (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~III – pessoa com deficiência; ou (Redação dada pela Lei nº 15.229, de 2025) (Revogado pela Lei nº 15.397, de 2026)~~
+  - Redação anterior (tachado): ~~III - pessoa com deficiência mental; ou (Incluído pela Lei nº 13.964, de 2019)~~
+- [ ] **art171.par5.incIV** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - IV – (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~IV - maior de 70 (setenta) anos de idade ou incapaz. (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+- [ ] **art171A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171a)
+  - Nome: Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros Vigência
+  - Art. 171-A. Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento. Vigência ⏎ Pena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa. Vigência
+  - Nota: (Incluído pela Lei nº 14.478, de 2022)
+  - Nota: (Incluído pela Lei nº 14.478, de 2022)
+- [ ] **art180A** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art180a)
+  - Nome: Receptação de animal
+  - Art. 180-A. Adquirir, receber, transportar, conduzir, ocultar, ter em depósito ou vender, com a finalidade de produção ou de comercialização, semovente domesticável de produção, ainda que abatido ou dividido em partes, ou animal doméstico, que sabe ou deve saber ser produto de crime: ⏎ Pena – reclusão, de 3 (três) a 8 (oito) anos, e multa.
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (tachado): ~~Art. 180-A. Adquirir, receber, transportar, conduzir, ocultar, ter em depósito ou vender, com a finalidade de produção ou de comercialização, semovente domesticável de produção, ainda que abatido ou dividido em partes, que deve saber ser produto de crime: (Incluído pela Lei nº 13.330, de 2016) ⏎ Pen~~
+- [ ] **art192** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art192)
+  - Art. 192. (revogado)
+  - Nota: (Revogado pela Lei nº 9.279, de 14.5.1996)
+  - Redação anterior (revogacao): ~~Art. 192. Violar direito de marca de indústria ou de comércio: (Revogado pela Lei nº 9.279, de 14.5.1996)~~
+  - Redação anterior (tachado) [lida como art192.incI]: ~~I - reproduzindo, indevidamente, no todo, ou em parte, marca de outrem registrada, ou imitando-a, de modo que possa induzir em erro ou confusão:~~
+  - Redação anterior (tachado) [lida como art192.incII]: ~~II - usando marca reproduzida ou imitada nos termos do nº I;~~
+  - Redação anterior (tachado) [lida como art192.incIII]: ~~III - usando marca legítima de outrem em produto ou artigo que não é de sua fabricação;~~
+  - Redação anterior (tachado) [lida como art192.incIV]: ~~IV - vendendo, expondo à venda ou tendo em depósito:~~
+  - Redação anterior (tachado) [lida como art192.incIV.alA]: ~~a) artigo ou produto revestido de marca abusivamente imitada ou reproduzida no todo ou em parte;~~
+  - Redação anterior (tachado) [lida como art192.incIV.alB]: ~~b) artigo ou produto que tem marca de outrem e não é de fabricação deste: ⏎ Pena - detenção, de três meses a um ano, e multa, de um a quinze contos de réis.~~
+- [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a)
+  - Parágrafo único. (vetado)
+  - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
+- [ ] **art222** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art222)
+  - Art. 222 - (revogado)
+  - Nota: (Revogado pela Lei nº 11.106, de 2005)
+  - Redação anterior (revogacao): ~~Art. 222 - Se o agente, ao efetuar o rapto, ou em seguida a este, pratica outro crime contra a raptada, aplicam-se cumulativamente a pena correspondente ao rapto e a cominada ao outro crime. (Revogado pela Lei nº 11.106, de 2005)~~
+- [ ] **art224.alC** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art224)
+  - c) (revogado)
+  - Nota: (Revogado pela Lei nº 12.015, de 2009)
+  - Redação anterior (revogacao): ~~c) não pode, por qualquer outra causa, oferecer resistência. (Revogado pela Lei nº 12.015, de 2009)~~
+- [ ] **art231** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231)
+  - Art. 231. (revogado)
+  - Nota: (Revogado pela Lei nº 13.344, de 2016)
+  - Nota: (Vigência)
+  - Redação anterior (revogacao): ~~Art. 231. Promover ou facilitar a entrada, no território nacional, de alguém que nele venha a exercer a prostituição ou outra forma de exploração sexual, ou a saída de alguém que vá exercê-la no estrangeiro. (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)~~
+  - Redação anterior (revogacao): ~~Pena - reclusão, de 3 (três) a 8 (oito) anos. (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)~~
+  - Redação anterior (tachado): ~~Art. 231 - Promover ou facilitar a entrada, no território nacional, de mulher que nele venha exercer a prostituição, ou a saída de mulher que vá exercê-la no estrangeiro: ⏎ Pena - reclusão, de três a oito anos.~~
+  - Redação anterior (tachado): ~~Art. 231. Promover, intermediar ou facilitar a entrada, no território nacional, de pessoa que venha exercer a prostituição ou a saída de pessoa para exercê-la no estrangeiro: (Redação dada pela Lei nº 11.106, de 2005) ⏎ Pena - reclusão, de 3 (três) a 8 (oito) anos, e multa. (Redação dada pela Lei nº~~
+- [ ] **art231.par2** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231)
+  - § 2 o (revogado)
+  - Nota: (Revogado pela Lei nº 13.344, de 2016)
+  - Nota: (Vigência)
+  - Redação anterior (revogacao): ~~§ 2 o A pena é aumentada da metade se: (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)~~
+  - Redação anterior (tachado): ~~§ 2º - Se há emprego de violência, grave ameaça ou fraude, a pena é de reclusão, de 5 (cinco) a 12 (doze) anos, além da pena correspondente à violência~~
+  - Redação anterior (tachado): ~~§ 2 o Se há emprego de violência, grave ameaça ou fraude, a pena é de reclusão, de 5 (cinco) a 12 (doze) anos, e multa, além da pena correspondente à violência. (Redação dada pela Lei nº 11.106, de 2005)~~
+- [ ] **art231A.par1** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231a)
+  - § 1 o (revogado)
+  - Nota: (Revogado pela Lei nº 13.344, de 2016)
+  - Nota: (Vigência)
+  - Redação anterior (revogacao): ~~§ 1 o Incorre na mesma pena aquele que agenciar, aliciar, vender ou comprar a pessoa traficada, assim como, tendo conhecimento dessa condição, transportá-la, transferi-la ou alojá-la (Incluído pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)~~
+- [ ] **art234.par1.incII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234)
+  - II - realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetáculo, que tenha o mesmo caráter;
+- [ ] **art281.par3.incI** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
+  - I - (revogado)
+  - Nota: (Revogado pela Lei nº 6.368, 1976)
+  - Redação anterior (revogacao): ~~I - instiga ou induz alguém a usar entorpecente ou substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)~~
+  - Redação anterior (tachado): ~~I - Instiga ou induz alguem a usar entorpecente;~~
+  - Redação anterior (tachado): ~~I - Instiga ou induz alguém a usar entorpecente; (Redação dada pela Lei nº 4.451, de 1964)~~
+- [ ] **art281.par3.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
+  - II - (revogado)
+  - Nota: (Revogado pela Lei nº 6.368, 1976)
+  - Redação anterior (revogacao): ~~II - utiliza o local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito para uso ilegal de entorpecente ou de substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado p~~
+  - Redação anterior (tachado): ~~II - utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dele se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente;~~
+  - Redação anterior (tachado): ~~II - Utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente; (Redação dada pela Lei nº 4.451, de 1964)~~
+- [ ] **art299.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art299)
+  - Parágrafo único - Se o agente é funcionário público, e comete o crime prevalecendo-se do cargo, ou se a falsificação ou alteração é de assentamento de registro civil, aumenta-se a pena de sexta parte.
+- [ ] **art318** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art318)
+  - Nome: Facilitação de contrabando ou descaminho
+  - Art. 318 - Facilitar, com infração de dever funcional, a prática de contrabando ou descaminho (art. 334): ⏎ Pena - reclusão, de 3 (três) a 8 (oito) anos, e multa.
+  - Nota: (Redação dada pela Lei nº 8.137, de 27.12.1990)
+  - Redação anterior (tachado): ~~Pena - reclusão, de dois a cinco anos, e multa, de um conto a dez contos de réis.~~
+- [ ] **art320** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art320)
+  - Nome: Condescendência criminosa
+  - Art. 320 - Deixar o funcionário, por indulgência, de responsabilizar subordinado que cometeu infração no exercício do cargo ou, quando lhe falte competência, não levar o fato ao conhecimento da autoridade competente: ⏎ Pena - detenção, de quinze dias a um mês, ou multa.
+- [ ] **art337A.par2.incI** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337a)
+  - I - (vetado)
+  - Nota: (Incluído pela Lei nº 9.983, de 2000)
+- [ ] **art337D** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337d)
+  - Nome: Funcionário público estrangeiro
+  - Art. 337-D. Considera-se funcionário público estrangeiro, para os efeitos penais, quem, ainda que transitoriamente ou sem remuneração, exerce cargo, emprego ou função pública em entidades estatais ou em representações diplomáticas de país estrangeiro.
+  - Nota: (Incluído pela Lei nº 10.467, de 11.6.2002)
+- [ ] **art337H** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h)
+  - Nome: Modificação ou pagamento irregular em contrato administrativo
+  - Art. 337-H. Admitir, possibilitar ou dar causa a qualquer modificação ou vantagem, inclusive prorrogação contratual, em favor do contratado, durante a execução dos contratos celebrados com a Administração Pública, sem autorização em lei, no edital da licitação ou nos respectivos instrumentos contratuais, ou, ainda, pagar fatura com preterição da ordem cronológica de sua exigibilidade: ⏎ Pena - reclusão, de 4 (quatro) anos a 8 (oito) anos, e multa.
+  - Nota: (Incluído pela Lei nº 14.133, de 2021)
+  - Nota: (Incluído pela Lei nº 14.133, de 2021)
+- [ ] **art359J** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359j)
+  - Nome: Atentado à integridade nacional
+  - Art. 359-J. Praticar violência ou grave ameaça com a finalidade de desmembrar parte do território nacional para constituir país independente: ⏎ Pena - reclusão, de 2 (dois) a 6 (seis) anos, além da pena correspondente à violência.
+  - Nota: (Incluído pela Lei nº 14.197, de 2021)
+  - Nota: (Vigência)
+  - Nota: (Incluído pela Lei nº 14.197, de 2021)
+  - Nota: (Vigência)
+- [ ] **art361** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art361)
+  - Art. 361 - Este Código entrará em vigor no dia 1º de janeiro de 1942.
+
+## Divergências entre os sinais (explicadas)
+
+- `texto` **art47.incIII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…ação para dirigir veículo. >…" | compilada: "…ação para dirigir veículo…"
+- `texto` **art148.par1.incIII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…a liberdade dura mais de 15 (quinze) dias…" | compilada: "…a liberdade dura mais de quinze dias…"
+- `texto` **art159.par3**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…Se resulta a morte: Pena - reclusão, de vinte e quatro a trinta a…" | compilada: "…Se resulta a morte: Vide Lei nº 8.072, de 25.7.90 Pena - reclusão…"
+- `texto` **art169.parUnico.incII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…ente, dentro no prazo de 15 (quinze) dias…" | compilada: "…ente, dentro no prazo de quinze dias…"
+- `texto` **art216A**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…emprego, cargo ou função." Pena - detenção, de 1 (um) a 2 (dois) anos…" | compilada: "…emprego, cargo ou função. Pena - detenção, de 1 (um) a 2 (dois) anos…"
+- `texto` **art250.par2**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…, é pena de detenção, de 6 (seis) meses a 2 (dois) anos…" | compilada: "…, é pena de detenção, de seis meses a dois anos…"
+- `texto` **art251.par3**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…a pena é de detenção, de 6 (seis) meses a 2 (dois) anos; nos demais ca…" | compilada: "…a pena é de detenção, de seis meses a dois anos; nos demais casos, é d…"
+- `texto` **art264.parUnico**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…a pena é de detenção, de 6 (seis) meses a 2 (dois) anos; se resulta mo…" | compilada: "…a pena é de detenção, de seis meses a dois anos; se resulta morte, a p…"
+- `texto` **art269**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…ria: Pena - detenção, de 6 (seis) meses a 2 (dois) anos, e multa…" | compilada: "…ria: Pena - detenção, de seis meses a dois anos, e multa…"
+- `texto` **art273.par1B.incIV**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…utico ou de sua atividade…" | compilada: "…utico ou de sua atividade; (…"
+- `texto` **art293.par4**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "… na pena de detenção, de 6 (seis) meses a 2 (dois) anos, ou multa…" | compilada: "… na pena de detenção, de seis meses a dois anos, ou multa…"
+- `texto` **art316.par1**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…iza: Pena - reclusão, de três a oito anos, e multa…" | compilada: "…iza: Pena - reclusão, de 3 (três) a 8 (oito) anos, e multa…"
+- `texto` **art351.par1**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…a pena é de reclusão, de 2 (dois) a 6 (seis) anos…" | compilada: "…a pena é de reclusão, de dois a seis anos…"
+- `texto` **art351.par4**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…e a pena de detenção, de 3 (três) meses a 1 (um) ano, ou multa…" | compilada: "…e a pena de detenção, de três meses a um ano, ou multa…"
+- `texto` **art359G**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…andato ou da legislatura: Pena - reclusão, de 1 (um) a 4 (quatro) anos…" | compilada: "…andato ou da legislatura:) Pena - reclusão, de 1 (um) a 4 (quatro) ano…"
+- `so-na-compilada` **art51.par1**: revogado na compilada; na página, só tachado (redação anterior do ancestral) — revogado: § 1º - 
+- `so-na-compilada` **art51.par2**: revogado na compilada; na página, só tachado (redação anterior do ancestral) — revogado: § 2º - 
+- `so-na-compilada` **art234.parUnico**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: Parágrafo único - Incorre na mesma pena quem:
+- `so-na-compilada` **art234.parUnico.incI**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: I - vende, distribui ou expõe à venda ou ao público qualquer dos objetos referidos neste artigo;
+- `so-na-compilada` **art234.parUnico.incII**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: II - realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetá
+- `so-na-compilada` **art234.parUnico.incIII**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: III - realiza, em lugar público ou acessível ao público, ou pelo rádio, audição ou recitação de caráter obsceno.
+- `ancora` **art2248**: decisão: erro de digitação na fonte: name="art2248" no art. 248 — âncora sem artigo na página
+- `ancora` **art2253**: decisão: erro de digitação na fonte: name="art2253" no art. 253 — âncora sem artigo na página
+- `artigo-sem-ancora` **art248**: decisão: a âncora saiu como "art2248" (erro da fonte)
+- `artigo-sem-ancora` **art253**: decisão: a âncora saiu como "art2253" (erro da fonte)
+- `artigo-sem-ancora` **art287**: decisão: a âncora saiu como name="287", sem "art" (erro da fonte)
+- `so-na-pagina`: 63 detalhes de dispositivos revogados ou vetados que a compilada resume.
