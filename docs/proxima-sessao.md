@@ -47,18 +47,18 @@ Migrações aplicadas pelo conector, idênticas ao repositório (MD5 conferido; 
 
 ## Pendências, em ordem
 
-### 1. Publicar no Cloudflare Pages — precisa da conta do Gabriel
+### 1. Publicar no Cloudflare (Worker `arretado`, T18) — precisa da conta do Gabriel
 
-O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc., a partir de `config/seguranca.ts`) e há `.node-version` = 22. No painel do Cloudflare:
+O Worker `arretado` já existe e está ligado ao repositório (criado em 23/09/2026). O `wrangler.jsonc` na raiz diz ao Cloudflare que o site é a pasta `dist/`, com os cabeçalhos de segurança do `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc., a partir de `config/seguranca.ts`), e que a URL `workers.dev` fica ligada. O `.node-version` = 22 vale também no build do Cloudflare. No painel (Workers & Pages › `arretado`):
 
-1. Workers & Pages › Create › Pages › **Connect to Git** › repositório `gabrieldjcosta/arretado` (autorizar o app do Cloudflare no GitHub, com acesso ao repositório privado).
-2. Production branch: `main`.
-3. Framework preset: **None**. Build command: `npm run build`. Build output directory: `dist`.
-4. Deploy. Conferir no celular: abrir a URL, registrar um erro, revisar; em Conta › Dados, exportar.
-5. Conferir os cabeçalhos (no Git Bash): `curl -sI https://<projeto>.pages.dev | grep -i content-security`. No PowerShell, usar `curl.exe` e `findstr /i`.
-6. A importação por URL da F2 (T17, atividades 12.1–12.2) roda como Cloudflare Pages Function neste mesmo projeto. Quando `functions/api/buscar-norma.ts` existir, ela sobe junto com o site, sem configuração extra no painel. Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
+1. **Settings › Build**: Build command `npm run build`; Deploy command `npx wrangler deploy` (o padrão); Root directory vazio; branch de produção `main`. Salvar.
+2. **Deployments**: o merge do PR que trouxe o `wrangler.jsonc` dispara um build. Se ele falhou por ter rodado antes do passo 1, usar "Retry build".
+3. **Domains**: a linha Production (`arretado.gabrieldjcosta.workers.dev`) liga sozinha no deploy; se continuar desligada, ligar a chave. A linha Preview pode ficar desligada.
+4. Abrir https://arretado.gabrieldjcosta.workers.dev no celular e no computador: registrar um erro, revisar; em Conta › Dados, exportar.
+5. Conferir os cabeçalhos (no Git Bash): `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security`. No PowerShell, usar `curl.exe` e `findstr /i`.
+6. A importação por URL da F2 (T17, atividades 12.1–12.2) entra neste mesmo Worker como rota `/api/buscar-norma` (`main` + `assets.run_worker_first` no `wrangler.jsonc`). Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
 
-Os dados ficam no navegador de cada endereço. Usar sempre a mesma URL publicada; trocar de endereço ou de navegador pede exportar e importar em Conta › Dados.
+Os dados ficam no navegador de cada endereço. Usar sempre https://arretado.gabrieldjcosta.workers.dev; trocar de endereço ou de navegador pede exportar e importar em Conta › Dados.
 
 ### 2. Uso real da F1 (portão)
 

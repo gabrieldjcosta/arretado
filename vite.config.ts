@@ -7,7 +7,7 @@ import { CSP, cabecalhosHospedagem } from './config/seguranca';
 /**
  * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
  * injeta estilos em linha. O E2E roda sobre a versão construída e verifica violações.
- * A versão construída também leva o `_headers` da hospedagem (Cloudflare Pages).
+ * A versão construída também leva o `_headers` da hospedagem (Cloudflare Workers, T18).
  */
 function csp(): Plugin {
   return {
