@@ -160,7 +160,7 @@ Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`
 | Integrações | `src/integracoes/pontos/`; `src/integracoes/normas/` (planejado, 12.1–12.3) | `src/core`, `src/integracoes` e qualquer domínio |
 | Apresentação | `src/apresentacao/`: `App.tsx`, `Shell.tsx`, `Aparencia.tsx`, `componentes/`, `conta/` (+ `dados/`), `dados/`, `orientacoes/`, `plano/`, `recall/`, `suporte/`, `telas/`; `biblioteca/` (planejado, F2) | tudo |
 | Utilitários de teste | `src/testes/` (`repositorioDeTeste`, `gerarCarga`, `setup`) | tudo; core, domínios, suporte e integrações só os importam em `*.test.ts(x)` (a regra não impede a apresentação de importá-los fora de teste) |
-| Fora de `src/` | `eslint/`, `supabase/`, `scripts/`, `corpus/`, `e2e/`, `config/`; `functions/` (planejado, 12.1) | não verificado pela regra |
+| Fora de `src/` | `eslint/`, `supabase/`, `scripts/`, `corpus/`, `e2e/`, `config/`; `worker/` (planejado, 12.1) | não verificado pela regra |
 
 - Pacotes restritos (mesma regra; testes isentos): `dexie` e `dexie-react-hooks` só em `src/core/persistencia` (T4); `dompurify` só em `src/core/seguranca` (T9).
 - `no-restricted-syntax` proíbe `dangerouslySetInnerHTML`, `innerHTML` e `outerHTML` (T9; isentos testes, `src/testes/` e `e2e/`).
@@ -270,7 +270,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Marcação, reancoragem | grifo (3 cores) ou nota; reancoragem exata → aproximada → pendente | `Marcacao` (`tipo`: `grifo`, `nota`; `cor` 1–3; `ancora`; `versaoId`; `status`: `valida`, `reancorada`, `pendente`); `reancorar` (proposto); evento `marcacao.pendenteReancoragem` (plano) | existe / proposto | 11.4, 11.7 |
 | Ações por dispositivo | referência, busca por endereço | `referenciaDe(dispositivo, norma)` ("art. 9º-A, LEP"); `analisarEndereco(texto)` ("§ 2º do 112") | proposto | 11.5, 11.6 |
 | Editor | converter, juntar, dividir; correção por bloco e integral | `converterLinha`, `juntarComAnterior`, `dividirAqui` | proposto | 10.2–10.4 |
-| Importação por URL | função no mesmo endereço do app (T17) | `functions/api/buscar-norma.ts` (`onRequestGet`) em `/api/buscar-norma`; cliente em `src/integracoes/normas/`; regras puras fora de `functions/` | plano | 12.1–12.3 |
+| Importação por URL | função no mesmo endereço do app (T17) | `worker/index.ts` (`fetch` do Worker; regras em `worker/regras.ts`) em `/api/buscar-norma`; cliente em `src/integracoes/normas/`; regras puras fora de `functions/` | plano | 12.1–12.3 |
 
 ## 13. Divergências conhecidas (entre o glossário antigo, a documentação e o código)
 

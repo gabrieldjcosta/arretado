@@ -272,21 +272,31 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** reativar no painel ou com `restore_project`; Settings › API › Exposed schemas. **Prevenção:** lembretes da F4 em `proxima-sessao.md`; a pausa é o motivo de a T17 ter ido para o Cloudflare.
 - **Origem:** previsto — F4.
 
-## Cloudflare Pages e Functions
+## Cloudflare Workers (hospedagem e rota /api)
 
-### Publicação sem cabeçalhos ou com build quebrado
-- **Sintoma:** o site sobe sem CSP ou o build falha no Cloudflare. **Causa:** projeto configurado com framework, comando ou pasta errados.
-- **Solução:** Framework preset None, build `npm run build`, saída `dist` (o `_headers` sai no build; `.node-version` = 22). Conferir com `curl -sI https://<projeto>.pages.dev | grep -i content-security` no Git Bash (no Windows PowerShell 5.1, `curl` é apelido do `Invoke-WebRequest` e não há `grep`: usar `curl.exe -sI … | findstr /i content-security`). **Prevenção:** passo a passo em `proxima-sessao.md`.
+### Worker criado, mas "No URLs enabled" e nada no ar
+- **Sintoma:** o painel mostra o Worker `arretado` ligado ao GitHub, com "No URLs enabled" e a chave da URL `workers.dev` desligada. **Causa:** o painel de hoje cria Worker, não projeto Pages, e o repositório ainda não tinha `wrangler.jsonc`: o Workers Builds não sabia que o site é a pasta `dist/` nem que a URL deve ficar ligada.
+- **Solução:** `wrangler.jsonc` na raiz (`assets.directory` = `./dist`, `workers_dev: true`) e, no painel, Settings › Build com build command `npm run build` e deploy command `npx wrangler deploy`. O próximo push no `main` publica e liga https://arretado.gabrieldjcosta.workers.dev. **Prevenção:** T18 e passo a passo em `proxima-sessao.md`.
+- **Origem:** ocorrido em 23/09/2026 (primeira publicação).
+
+### Build do Worker falha: a pasta `dist` não existe
+- **Sintoma:** o deploy acusa que o diretório de assets não existe. **Causa:** build command vazio no painel; o `npx wrangler deploy` roda sem o `npm run build` antes.
+- **Solução:** Settings › Build › Build command = `npm run build`; depois "Retry build" em Deployments. **Prevenção:** conferir a configuração de build ao criar ou recriar o Worker.
+- **Origem:** previsto — pendência 1 (publicação).
+
+### Publicação sem cabeçalhos de segurança
+- **Sintoma:** o site sobe sem CSP. **Causa:** `dist/_headers` ausente (publicação sem o `npm run build`).
+- **Solução:** o `_headers` sai do `npm run build` (plugin do `vite.config.ts`, a partir de `config/seguranca.ts`), e o Worker o aplica aos arquivos estáticos sem servi-lo. Conferir com `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security` no Git Bash (no Windows PowerShell 5.1, `curl` é apelido do `Invoke-WebRequest` e não há `grep`: usar `curl.exe -sI … | findstr /i content-security`). **Prevenção:** conferir a cada mudança em `config/seguranca.ts`.
 - **Origem:** previsto — pendência 1 (publicação).
 
 ### `/api/buscar-norma` não responde ou responde sem cabeçalhos
-- **Sintoma:** 404 na rota em desenvolvimento ou no site publicado; resposta sem `nosniff` nem `Content-Type` fixo. **Causa:** o Cloudflare procura `functions/` na raiz do repositório (não em `dist/`), o Vite não roda funções, e o `_headers` não vale para respostas de funções.
-- **Solução:** `functions/api/buscar-norma.ts` na raiz, definindo `nosniff`, `Content-Type` e `Cache-Control` na resposta; em desenvolvimento, proxy do Vite para `wrangler pages dev` ou para o site publicado; no E2E, rota interceptada pelo Playwright. **Prevenção:** regras puras fora de `functions/`, testadas no Vitest, inclusive os cabeçalhos.
+- **Sintoma:** 404 na rota em desenvolvimento ou no site publicado; resposta sem `nosniff` nem `Content-Type` fixo. **Causa:** falta `main` e `assets.run_worker_first: ["/api/*"]` no `wrangler.jsonc` (sem isso tudo é servido como arquivo estático); o Vite não roda o Worker; o `_headers` não vale para respostas geradas pelo código do Worker.
+- **Solução:** `worker/index.ts` como `main`, com `run_worker_first` só para `/api/*`, definindo `nosniff`, `Content-Type` e `Cache-Control` na resposta; em desenvolvimento, proxy do Vite para `wrangler dev` ou para o site publicado; no E2E, rota interceptada pelo Playwright. **Prevenção:** regras puras em `worker/regras.ts`, testadas no Vitest, inclusive os cabeçalhos.
 - **Origem:** previsto — atividades 12.1 e 12.3.
 
-### Função estoura o limite de processamento
-- **Sintoma:** a busca de uma lei grande falha no Cloudflare. **Causa:** o plano gratuito dá 10 ms de CPU por chamada (esperar o Planalto não conta; processar conta).
-- **Solução:** a função só repassa os bytes (sem decodificar nem montar JSON); se ainda estourar, plano B da T17 (Edge Function no Supabase, aceitando a pausa). **Prevenção:** chamada real com LEP, CF/88 (1,8 MB) e Código Civil, conferida no painel.
+### A rota estoura o limite de processamento
+- **Sintoma:** a busca de uma lei grande falha no Cloudflare. **Causa:** o plano gratuito dá 10 ms de CPU por execução do Worker (esperar o Planalto não conta; processar conta).
+- **Solução:** a rota só repassa os bytes (sem decodificar nem montar JSON); se ainda estourar, plano B da T17 (Edge Function no Supabase, aceitando a pausa). **Prevenção:** chamada real com LEP, CF/88 (1,8 MB) e Código Civil, conferida no painel.
 - **Origem:** previsto — atividade 12.2.
 
 ## Legislação (F2): fontes, colar, estruturador, leitor
@@ -383,7 +393,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ## Uso do app
 
-Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1); o app ainda não foi publicado (pendência 1 do `proxima-sessao.md`).
+Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (depois da pendência 1 do `proxima-sessao.md`).
 
 ### Abri em outro navegador ou no celular e está tudo vazio
 - **Sintoma:** nenhum erro, cartão ou ponto aparece. **Causa:** os dados ficam guardados só no navegador daquele aparelho e daquele endereço. Outro navegador, outro aparelho, janela anônima ou o link de pré-visualização do Cloudflare são "outro lugar". Até a F4 não há sincronização.

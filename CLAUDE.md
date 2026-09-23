@@ -5,7 +5,7 @@ Plataforma pessoal de preparação para concursos jurídicos (usuário principal
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore). Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado; conteúdo recomeça do zero.
 
 ## Estado
-Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T17); **F0 e F1 implementadas** (portões em `docs/portoes/`); **F2 em execução** (plano e andamento em `docs/planos/F2.md`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, próxima atividade e pendências).
+Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T18); **F0 e F1 implementadas** (portões em `docs/portoes/`); **F2 em execução** (plano e andamento em `docs/planos/F2.md`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, próxima atividade e pendências).
 
 Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Leitura sob demanda, só a seção que a tarefa pede:
 1. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel); §5 e §15 — modelo de dados e fases.
@@ -27,7 +27,7 @@ Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Leitura so
 - Nada obrigatório além do mínimo nos formulários; captura de erro tem exatamente 2 campos obrigatórios.
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
-- Escolhas técnicas: seguir T1–T17 (`docs/decisoes-tecnicas.md`); nova escolha técnica relevante é decidida com o Gabriel e registrada lá.
+- Escolhas técnicas: seguir T1–T18 (`docs/decisoes-tecnicas.md`); nova escolha técnica relevante é decidida com o Gabriel e registrada lá.
 - Definição de pronto: `npm run check` verde (lint, tipos, testes, auditoria); E2E verde quando houver tela; problemas encontrados (e os previsíveis da próxima etapa) registrados em `docs/solucao-de-problemas.md`; termo ou identificador novo registrado em `docs/glossario.md`.
 
 ## Git

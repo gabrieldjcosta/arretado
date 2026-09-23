@@ -17,7 +17,7 @@ export const CSP = [
   'trusted-types dompurify',
 ].join('; ');
 
-/** Arquivo `_headers` do Cloudflare Pages (também aceito pelo Netlify). */
+/** Arquivo `_headers` da hospedagem (Cloudflare Workers, T18; mesmo formato do Pages e do Netlify). */
 export function cabecalhosHospedagem(): string {
   return [
     '/*',
