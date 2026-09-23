@@ -240,7 +240,8 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Termo | O que é | Identificador | Situação | Ativ. |
 |---|---|---|---|---|
 | Corpus | páginas oficiais byte a byte, para teste | `corpus/normas/<id>.html` + `manifesto.json` (`id`, `papel`: `portao`, `apoio`, `estresse`; `variante`: `todas-as-redacoes`, `compilado`; `charset`, `sha256`, `sha256Conteudo`, `obtidoEm`); `npm run corpus` (`scripts/corpus-normas.mjs`, lista em `scripts/corpus/normas.mjs`) | existe | 7.1 |
-| Página colada, gabarito | HTML da área de transferência do Chromium; contagens, revogados, redações e amostra conferida | `corpus/normas/<id>.colado.html`; `corpus/normas/<id>.gabarito.json` | plano | 7.2, 7.3 |
+| Colado (página colada) | `text/html` e `text/plain` do evento `paste` no Chromium, capturados dos bytes do corpus | `corpus/normas/<id>.colado.html` e `<id>.colado.txt` + `colados.json` (`EntradaColado { id, origemSha256Conteudo, html, texto, navegador, plataforma, capturadoEm }`); `npm run corpus:colar` (`scripts/corpus-colar.mjs`); `verificarDerivados`, `conferirCaptura`, `ehDerivado` (`scripts/corpus/derivados.mjs`, `scripts/corpus/normas.mjs`) | existe | 7.2 |
+| Gabarito | contagens, revogados, redações e amostra conferida | `corpus/normas/<id>.gabarito.json` com `origemSha256Conteudo` (amarração conferida por `verificarDerivados`) | plano | 7.3 |
 | Entrada sanitizada | saída do sanitizador | `sanitizarHtml` → `ResultadoSanitizacao { blocos, linksDescartados }`; `textoParaBlocos`; `Bloco { trechos }`; `LIMITE_PADRAO` | existe | 8.x |
 | Normalização | regra 1 (º/o/°/ª, aspas, travessões, U+00AD, entidades, fim de linha) | `normalizar(texto)` | proposto | 8.1 |
 | Estruturador | blocos → árvore (`fatiarLei` na Parte 2) | `estruturar(blocos)` em `src/dominios/legislacao/` | proposto | 8.1–8.8 |

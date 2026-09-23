@@ -14,6 +14,18 @@ export const USER_AGENT = 'Mozilla/5.0 (compatible; arretado-corpus/1.0; estudo 
 
 export const NOME_MANIFESTO = 'manifesto.json';
 
+/**
+ * Arquivos derivados das páginas, que moram na mesma pasta mas não entram no manifesto:
+ * a captura do colar (7.2, índice próprio em `colados.json`) e o gabarito (7.3). As funções
+ * de página (`verificarCorpus`, `baixarCorpus`) os ignoram; `verificarDerivados` os confere.
+ */
+export const SUFIXOS_DERIVADOS = ['.colado.html', '.colado.txt', '.gabarito.json'];
+
+/** @param {string} nome */
+export function ehDerivado(nome) {
+  return SUFIXOS_DERIVADOS.some((sufixo) => nome.endsWith(sufixo));
+}
+
 /** Abaixo disso a resposta é página de erro, não norma. */
 const TAMANHO_MINIMO = 20_000;
 
@@ -417,7 +429,7 @@ export async function verificarCorpus(diretorio) {
   }
   const referenciados = new Set(manifesto.normas.map((e) => e.arquivo));
   for (const nome of await readdir(diretorio)) {
-    if (nome.endsWith('.html') && !referenciados.has(nome)) {
+    if (nome.endsWith('.html') && !ehDerivado(nome) && !referenciados.has(nome)) {
       problemas.push(`${nome}: arquivo fora do manifesto — rode npm run corpus`);
     }
   }

@@ -1,0 +1,125 @@
+{
+  "versao": 1,
+  "descricao": "Captura do \"colar da página\" no Chromium (selecionar tudo, copiar, colar), a partir dos bytes do corpus, sem rede. Gerado por scripts/corpus-colar.mjs; não editar à mão.",
+  "colados": [
+    {
+      "id": "lep",
+      "origemSha256Conteudo": "8b95cead39cedad87abfe1d7314e2ddfef82125d22229a3b7a6ed5aba5c273d6",
+      "html": {
+        "arquivo": "lep.colado.html",
+        "bytes": 409820,
+        "sha256": "86a61501460ea9b55159fe0e17303dacecbfbc84eec6e20f896fd6049dbb7026"
+      },
+      "texto": {
+        "arquivo": "lep.colado.txt",
+        "bytes": 133014,
+        "sha256": "cd8a9ea837b96d2752398dfc8b7a73792daea22a2d593a97a124265eaebf78a2"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:42.505Z"
+    },
+    {
+      "id": "lep-compilado",
+      "origemSha256Conteudo": "bfc52bc4f160c068c9504266105df6ce052a7b79d5cecda0fa99367629f9a45f",
+      "html": {
+        "arquivo": "lep-compilado.colado.html",
+        "bytes": 295699,
+        "sha256": "5d6d1bd723e0354ddafb7b9aa8280ff341b4d3e824f39c08eb2bd328a849e892"
+      },
+      "texto": {
+        "arquivo": "lep-compilado.colado.txt",
+        "bytes": 114033,
+        "sha256": "cf3c8e237474ea548a9aa4670437b3e2727e1dafffaa86375c7c50895a37da1b"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:42.926Z"
+    },
+    {
+      "id": "cp",
+      "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+      "html": {
+        "arquivo": "cp.colado.html",
+        "bytes": 954805,
+        "sha256": "44eeae97cb49568ce593d9300c6869c01e86b7f4c40fdc4be765fd8b431b008b"
+      },
+      "texto": {
+        "arquivo": "cp.colado.txt",
+        "bytes": 442192,
+        "sha256": "3639654e9dbec7e5f1f4e26ab959254d7b41dbcf824f1554d8dc997131891b61"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:43.719Z"
+    },
+    {
+      "id": "cp-compilado",
+      "origemSha256Conteudo": "467c4523455f85a27d4b430d9d5a4bdba7f4cd401d6f86d82e016be63e2b6ead",
+      "html": {
+        "arquivo": "cp-compilado.colado.html",
+        "bytes": 1265938,
+        "sha256": "6abf492f907a309c462af6bbf3aed08fd7c58f80fbcc483e578113b312d8fcd1"
+      },
+      "texto": {
+        "arquivo": "cp-compilado.colado.txt",
+        "bytes": 296513,
+        "sha256": "c886239209a2193234e25cced0218a262ed23503958c52e2b3cbefa803395984"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:44.373Z"
+    },
+    {
+      "id": "lc80",
+      "origemSha256Conteudo": "ce5094c7b34e713d909ae18762a917446b2e4d50801f2c61e6abc7c5bdfa68e4",
+      "html": {
+        "arquivo": "lc80.colado.html",
+        "bytes": 711609,
+        "sha256": "1798c435b3687149e72e878bd2a6f36079f93e46a49c40531dd60f341f96752c"
+      },
+      "texto": {
+        "arquivo": "lc80.colado.txt",
+        "bytes": 131683,
+        "sha256": "b8012b4a8c70d1a2684e47767ef1cc7419d462522a3dd34eacae6fe36539fcee"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:44.832Z"
+    },
+    {
+      "id": "lc-sp-988",
+      "origemSha256Conteudo": "3cccf3f957bbbf4e02bd7ea4de802ca7d25b1ea92589421473310d0e5d7de9f2",
+      "html": {
+        "arquivo": "lc-sp-988.colado.html",
+        "bytes": 570733,
+        "sha256": "e66bbee940fed955020c797555fec71661d4c8524dd52157d4bbf48b172b9fb4"
+      },
+      "texto": {
+        "arquivo": "lc-sp-988.colado.txt",
+        "bytes": 195386,
+        "sha256": "bdd586811759923cbb4bad7dc160740f5b82b4145aa8a74075dbf6227c5952f7"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:45.299Z"
+    },
+    {
+      "id": "cf",
+      "origemSha256Conteudo": "a4ad6b4ae5bd0ce14e110440addeb5956b05ce2487a780fcfe9934a1f2c03b37",
+      "html": {
+        "arquivo": "cf.colado.html",
+        "bytes": 1983427,
+        "sha256": "03b11041d47865310614bb36f2caae2176d29dbbff7dad453081e2f352069c71"
+      },
+      "texto": {
+        "arquivo": "cf.colado.txt",
+        "bytes": 919689,
+        "sha256": "ed120cb007973dd299c6ea32310a0d44bae848bc86ac861a41b289d1e6f77f87"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-23T15:06:46.331Z"
+    }
+  ]
+}

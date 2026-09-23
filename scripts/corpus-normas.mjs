@@ -3,7 +3,11 @@
 //   npm run corpus                  baixa tudo; só regrava o que mudou na fonte, repara arquivo
 //                                   danificado e tira do manifesto o que saiu do catálogo
 //   npm run corpus -- --so lep,cp   só as normas indicadas (também --so=lep,cp)
-//   npm run corpus -- --verificar   sem rede: confere arquivos × manifesto (o npm test também faz)
+//   npm run corpus -- --verificar   sem rede: confere arquivos × manifesto e os derivados (colados
+//                                   e gabaritos); o npm test também faz
+//
+// Página que mudou na fonte deixa o colado e o gabarito desatualizados: depois, rodar
+// `npm run corpus:colar` (7.2) e refazer a conferência do gabarito (7.3).
 //
 // Uma requisição por vez, com pausa entre elas: são poucas páginas, baixadas raramente.
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
@@ -17,12 +21,14 @@ import {
   atualizarEntrada,
   conferirConteudo,
   detectarCharset,
+  ehDerivado,
   lerManifesto,
   serializarManifesto,
   sha256Conteudo,
   sha256Hex,
   verificarCorpus,
 } from './corpus/normas.mjs';
+import { verificarDerivados } from './corpus/derivados.mjs';
 
 const DIRETORIO = fileURLToPath(new URL('../corpus/normas/', import.meta.url));
 const TEMPO_MAXIMO_MS = 60_000;
@@ -81,10 +87,13 @@ async function baixar(url) {
 }
 
 async function verificar() {
-  const problemas = await verificarCorpus(DIRETORIO);
+  const problemas = [
+    ...(await verificarCorpus(DIRETORIO)),
+    ...(await verificarDerivados(DIRETORIO)),
+  ];
   for (const p of problemas) console.error(`✗ ${p}`);
   if (problemas.length > 0) process.exit(1);
-  console.log(`✓ corpus íntegro (${String(NORMAS.length)} páginas)`);
+  console.log(`✓ corpus íntegro (${String(NORMAS.length)} páginas, colados e gabaritos)`);
 }
 
 /** @param {string[] | null} so */
@@ -95,6 +104,7 @@ async function baixarCorpus(so) {
   const alvo = NORMAS.filter((n) => !so || so.includes(n.id));
   let falhas = 0;
   let alteracoes = 0;
+  let paginasMudaram = false;
   for (const [i, norma] of alvo.entries()) {
     if (i > 0) await new Promise((r) => setTimeout(r, PAUSA_MS));
     try {
@@ -127,6 +137,7 @@ async function baixarCorpus(so) {
         await writeFile(join(DIRETORIO, entrada.arquivo), bytes);
         porId.set(norma.id, entrada);
         alteracoes += 1;
+        paginasMudaram ||= mudou;
       }
       const kb = Math.round(bytes.length / 1024);
       const sinal = mudou ? '↻' : reparo ? '⚒' : '=';
@@ -150,7 +161,7 @@ async function baixarCorpus(so) {
     }
     const referenciados = new Set([...porId.values()].map((e) => e.arquivo));
     for (const nome of await readdir(DIRETORIO)) {
-      if (nome.endsWith('.html') && !referenciados.has(nome)) {
+      if (nome.endsWith('.html') && !ehDerivado(nome) && !referenciados.has(nome)) {
         await rm(join(DIRETORIO, nome));
         console.log(`− ${nome}: arquivo sem entrada no manifesto, apagado`);
       }
@@ -161,6 +172,9 @@ async function baixarCorpus(so) {
     await writeFile(join(DIRETORIO, NOME_MANIFESTO), serializarManifesto(manifesto));
   }
   console.log(`${String(alteracoes)} alteração(ões) no manifesto, ${String(falhas)} falha(s).`);
+  if (paginasMudaram) {
+    console.log('Páginas mudaram: rode npm run corpus:colar e refaça o gabarito das normas com ↻.');
+  }
   if (falhas > 0) process.exit(1);
 }
 
