@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import pacote from './package.json' with { type: 'json' };
 
 /**
  * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
@@ -38,6 +39,9 @@ function csp(): Plugin {
 
 export default defineConfig({
   plugins: [react(), csp()],
+  define: {
+    __VERSAO_APP__: JSON.stringify(pacote.version),
+  },
   base: './',
   build: {
     target: 'es2022',
