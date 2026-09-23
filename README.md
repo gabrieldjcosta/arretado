@@ -6,7 +6,7 @@ Plataforma pessoal de preparação para concursos jurídicos de alta complexidad
 
 ## Estado atual
 
-**F0 (Fundamentos) e F1 (Recall + pontos) implementadas.** Portões: [`docs/portoes/F0.md`](docs/portoes/F0.md) e [`docs/portoes/F1.md`](docs/portoes/F1.md). Pendentes: projeto Supabase real, publicação no Cloudflare Pages e o uso real de 14 dias — ver [`docs/proxima-sessao.md`](docs/proxima-sessao.md). **F2 (Legislação) planejada e em execução em paralelo** (decisão de 23/09/2026): [`docs/planos/F2.md`](docs/planos/F2.md).
+**F0 (Fundamentos) e F1 (Recall + pontos) implementadas.** Portões: [`docs/portoes/F0.md`](docs/portoes/F0.md) e [`docs/portoes/F1.md`](docs/portoes/F1.md). Projeto Supabase real criado e com RLS conferida (portão da F0 fechado). Pendentes: publicação no Cloudflare Pages e o uso real de 14 dias — ver [`docs/proxima-sessao.md`](docs/proxima-sessao.md). **F2 (Legislação) planejada e em execução em paralelo** (decisão de 23/09/2026): [`docs/planos/F2.md`](docs/planos/F2.md).
 
 - [`docs/especificacao-parte1.md`](docs/especificacao-parte1.md) — diagnóstico dos artefatos existentes, produto unificado, modelo conceitual de dados, arquitetura modular, core, plano de fases, MVP e as decisões arquiteturais **D1–D24** (seções 1–7, 15, 16, 19).
 - [`docs/especificacao-parte2.md`](docs/especificacao-parte2.md) — integração entre módulos, interface, detalhamento de cada módulo (com destaque para Legislação), acessibilidade, backup/importação, fontes oficiais, backend e sincronização, critérios de validação, riscos e backlog (seções 8–14, 17, 18, 20).
