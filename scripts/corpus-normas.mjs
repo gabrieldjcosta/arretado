@@ -1,7 +1,8 @@
 // Baixa o corpus de normas para os testes do estruturador (F2, atividade 7.1).
 //
 //   npm run corpus                  baixa tudo; só regrava o que mudou na fonte, repara arquivo
-//                                   danificado e tira do manifesto o que saiu do catálogo
+//                                   danificado e tira do manifesto (e dos derivados: colados e
+//                                   gabaritos) o que saiu do catálogo
 //   npm run corpus -- --so lep,cp   só as normas indicadas (também --so=lep,cp)
 //   npm run corpus -- --verificar   sem rede: confere arquivos × manifesto (o npm test também faz)
 //
@@ -15,9 +16,11 @@ import {
   USER_AGENT,
   arquivoConfere,
   atualizarEntrada,
+  classificarArquivo,
   conferirConteudo,
   detectarCharset,
   lerManifesto,
+  podarDerivados,
   serializarManifesto,
   sha256Conteudo,
   sha256Hex,
@@ -84,7 +87,7 @@ async function verificar() {
   const problemas = await verificarCorpus(DIRETORIO);
   for (const p of problemas) console.error(`✗ ${p}`);
   if (problemas.length > 0) process.exit(1);
-  console.log(`✓ corpus íntegro (${String(NORMAS.length)} páginas)`);
+  console.log(`✓ corpus íntegro (${String(NORMAS.length)} páginas e seus colados)`);
 }
 
 /** @param {string[] | null} so */
@@ -131,6 +134,9 @@ async function baixarCorpus(so) {
       const kb = Math.round(bytes.length / 1024);
       const sinal = mudou ? '↻' : reparo ? '⚒' : '=';
       console.log(`${sinal} ${norma.id}: ${String(kb)} KB, ${charset} (${origem})`);
+      if (mudou && anterior) {
+        console.log('  derivados desatualizados: rode npm run corpus:colar e reconfira o gabarito');
+      }
     } catch (excecao) {
       falhas += 1;
       console.error(
@@ -150,10 +156,13 @@ async function baixarCorpus(so) {
     }
     const referenciados = new Set([...porId.values()].map((e) => e.arquivo));
     for (const nome of await readdir(DIRETORIO)) {
-      if (nome.endsWith('.html') && !referenciados.has(nome)) {
+      if (classificarArquivo(nome).tipo === 'pagina' && !referenciados.has(nome)) {
         await rm(join(DIRETORIO, nome));
         console.log(`− ${nome}: arquivo sem entrada no manifesto, apagado`);
       }
+    }
+    for (const nome of await podarDerivados(DIRETORIO)) {
+      console.log(`− ${nome}: derivado de norma fora do catálogo, apagado`);
     }
   }
   if (alteracoes > 0) {

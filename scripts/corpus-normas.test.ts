@@ -1,17 +1,25 @@
 // @vitest-environment node
 import path from 'node:path';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import {
   LIMIAR_TACHADOS,
   NORMAS,
+  atualizarColado,
   atualizarEntrada,
+  classificarArquivo,
+  coladosVazio,
+  conferirColado,
   conferirConteudo,
   contarTachados,
   detectarCharset,
+  lerColados,
   manifestoVazio,
+  podarDerivados,
+  serializarColados,
   serializarManifesto,
   sha256Conteudo,
+  sha256Hex,
   textoParaConferencia,
   verificarCorpus,
 } from './corpus/normas.mjs';
@@ -22,8 +30,8 @@ const utf8 = (s: string) => new TextEncoder().encode(s);
 const latin1 = (s: string) => Uint8Array.from(s, (c) => c.charCodeAt(0));
 
 describe('corpus de normas: integridade (sem rede)', () => {
-  it('toda norma do catálogo está no disco com o tamanho, o hash e o conteúdo do manifesto', async () => {
-    // Pega também conversão de fim de linha pelo git (ver .gitattributes).
+  it('toda norma do catálogo está no disco, com o colado da versão atual e os mesmos tachados', async () => {
+    // Pega também conversão de fim de linha pelo git (ver .gitattributes) e colado desatualizado.
     expect(await verificarCorpus(DIRETORIO)).toEqual([]);
   });
 
@@ -236,6 +244,165 @@ describe('robustez', () => {
       const problemas = await verificarCorpus(pasta);
       expect(problemas).toContain('sobra.html: arquivo fora do manifesto — rode npm run corpus');
       expect(problemas).toContain('lep: ausente do manifesto');
+    } finally {
+      await rm(pasta, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('derivados: colados (7.2) e gabaritos (7.3)', () => {
+  const entradaColado = (id: string, sha256: string, origem = 'b'.repeat(64)) => ({
+    id,
+    arquivo: `${id}.colado.html`,
+    origemSha256Conteudo: origem,
+    navegador: 'Chromium 141.0.7390.37',
+    bytes: 1,
+    sha256,
+    capturadoEm: '2026-09-23T00:00:00.000Z',
+  });
+
+  /** Pasta temporária com o manifesto real (sem as páginas) e os arquivos dados. */
+  async function pastaCom(arquivos: Record<string, string>) {
+    const pasta = await mkdtemp(path.join(tmpdir(), 'arretado-corpus-'));
+    await copyFile(path.join(DIRETORIO, 'manifesto.json'), path.join(pasta, 'manifesto.json'));
+    for (const [nome, conteudo] of Object.entries(arquivos)) {
+      await writeFile(path.join(pasta, nome), conteudo);
+    }
+    return pasta;
+  }
+
+  it('classificarArquivo separa página, colado, gabarito e registros pelo nome', () => {
+    expect(classificarArquivo('lep.html')).toEqual({ tipo: 'pagina', id: 'lep' });
+    expect(classificarArquivo('lc-sp-988.html')).toEqual({ tipo: 'pagina', id: 'lc-sp-988' });
+    expect(classificarArquivo('lep-compilado.colado.html')).toEqual({
+      tipo: 'colado',
+      id: 'lep-compilado',
+    });
+    expect(classificarArquivo('cp.gabarito.json')).toEqual({ tipo: 'gabarito', id: 'cp' });
+    expect(classificarArquivo('manifesto.json')).toEqual({ tipo: 'manifesto' });
+    expect(classificarArquivo('colados.json')).toEqual({ tipo: 'colados' });
+    expect(classificarArquivo('LEIA-ME.md')).toEqual({ tipo: 'desconhecido' });
+  });
+
+  it('atualizarColado: mesma captura da mesma página não gera diff, nem com outro navegador', () => {
+    const anterior = entradaColado('lep', 'a'.repeat(64));
+    const { id, arquivo, origemSha256Conteudo, bytes, sha256 } = anterior;
+    const nova = { id, arquivo, origemSha256Conteudo, bytes, sha256, navegador: 'Chromium 999' };
+    expect(atualizarColado(anterior, nova, 'agora')).toEqual({ entrada: anterior, mudou: false });
+    const outraPagina = { ...nova, origemSha256Conteudo: 'c'.repeat(64) };
+    expect(atualizarColado(anterior, outraPagina, 'agora')).toEqual({
+      entrada: { ...outraPagina, capturadoEm: 'agora' },
+      mudou: true,
+    });
+    expect(atualizarColado(undefined, nova, 'agora').mudou).toBe(true);
+  });
+
+  it('colado desatualizado, ausente ou solto e gabarito de norma fora do catálogo são acusados', async () => {
+    const colado = '<p>x</p>';
+    const pasta = await pastaCom({
+      'lep.colado.html': colado,
+      'cp.colado.html': colado,
+      'cp.gabarito.json': '{}',
+      'revogada.gabarito.json': '{}',
+    });
+    try {
+      const sha = sha256Hex(new TextEncoder().encode(colado));
+      await writeFile(
+        path.join(pasta, 'colados.json'),
+        serializarColados({ ...coladosVazio(), colados: [entradaColado('lep', sha)] }),
+      );
+      const problemas = await verificarCorpus(pasta);
+      expect(problemas).toContain(
+        'lep.colado.html: capturado de outra versão da página — rode npm run corpus:colar',
+      );
+      expect(problemas).toContain(
+        'lep-compilado.colado.html: ausente de colados.json — rode npm run corpus:colar',
+      );
+      expect(problemas).toContain(
+        'cp.colado.html: arquivo fora de colados.json — rode npm run corpus:colar',
+      );
+      expect(problemas).toContain(
+        'revogada.gabarito.json: gabarito de norma fora do catálogo — rode npm run corpus',
+      );
+      expect(problemas.some((p) => p.startsWith('cp.gabarito.json'))).toBe(false);
+      expect(problemas.some((p) => p.includes('fora do manifesto'))).toBe(false);
+    } finally {
+      await rm(pasta, { recursive: true, force: true });
+    }
+  });
+
+  it('colado com um tachado a menos que a página é acusado', async () => {
+    const pagina = await readFile(path.join(DIRETORIO, 'lep.html'));
+    const html = new TextDecoder('windows-1252').decode(pagina);
+    const colado = html.replace(/<strike>([\s\S]*?)<\/strike>/i, '<span>$1</span>');
+    const pasta = await pastaCom({ 'lep.colado.html': colado });
+    try {
+      await copyFile(path.join(DIRETORIO, 'lep.html'), path.join(pasta, 'lep.html'));
+      const bytes = utf8(colado);
+      const manifesto = JSON.parse(await readFile(path.join(pasta, 'manifesto.json'), 'utf8')) as {
+        normas: { id: string; sha256Conteudo: string }[];
+      };
+      const origem = manifesto.normas.find((n) => n.id === 'lep')?.sha256Conteudo;
+      await writeFile(
+        path.join(pasta, 'colados.json'),
+        serializarColados({
+          ...coladosVazio(),
+          colados: [{ ...entradaColado('lep', sha256Hex(bytes), origem), bytes: bytes.length }],
+        }),
+      );
+      const doLep = (await verificarCorpus(pasta)).filter((p) => p.startsWith('lep.colado.html'));
+      expect(doLep).toEqual([
+        'lep.colado.html: 88 tachados, a página tem 89 — a cópia perdeu formatação',
+      ]);
+    } finally {
+      await rm(pasta, { recursive: true, force: true });
+    }
+  });
+
+  it('colado que perdeu o tachado é acusado pelo nome do arquivo', () => {
+    const lep = NORMAS.find((n) => n.id === 'lep');
+    if (!lep) throw new Error('LEP fora do catálogo');
+    const colado = utf8('<p>Lei de Execução Penal</p><p>Art. 1º</p>' + ' '.repeat(20_000));
+    expect(conferirColado(lep, colado, 89)).toEqual([
+      'lep.colado.html: só 0 tachados — não parece a página com todas as redações',
+      'lep.colado.html: 0 tachados, a página tem 89 — a cópia perdeu formatação',
+    ]);
+    expect(conferirColado(lep, colado, undefined)).toHaveLength(1);
+  });
+
+  it('podarDerivados apaga só os derivados de norma fora do catálogo', async () => {
+    const pasta = await pastaCom({
+      'lep.colado.html': '<p>x</p>',
+      'lep.gabarito.json': '{}',
+      'revogada.colado.html': '<p>x</p>',
+      'revogada.gabarito.json': '{}',
+      'revogada.html': '<p>página: é do npm run corpus, não daqui</p>',
+    });
+    try {
+      await writeFile(
+        path.join(pasta, 'colados.json'),
+        serializarColados({
+          ...coladosVazio(),
+          colados: [
+            entradaColado('revogada', '0'.repeat(64)),
+            entradaColado('lep', '0'.repeat(64)),
+          ],
+        }),
+      );
+      expect((await podarDerivados(pasta)).sort()).toEqual([
+        'colados.json › revogada',
+        'revogada.colado.html',
+        'revogada.gabarito.json',
+      ]);
+      expect((await readdir(pasta)).sort()).toEqual([
+        'colados.json',
+        'lep.colado.html',
+        'lep.gabarito.json',
+        'manifesto.json',
+        'revogada.html',
+      ]);
+      expect((await lerColados(pasta)).colados.map((e) => e.id)).toEqual(['lep']);
+      expect(await podarDerivados(pasta)).toEqual([]);
     } finally {
       await rm(pasta, { recursive: true, force: true });
     }

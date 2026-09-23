@@ -73,6 +73,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** correções num commit `fix(...)` próprio. **Prevenção:** manter o hábito ao fim de cada bloco (rotina do plano, passo 6) e registrar aqui cada classe de defeito.
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
+### `'window' is not defined` no lint de script `.mjs`
+- **Sintoma:** `no-undef` no `npm run check` apontando `window` dentro de `page.evaluate(() => …)` num script de `scripts/`. **Causa:** o ESLint dá aos `.mjs` só os globais do Node; o corpo do `evaluate` roda no navegador, mas o lint não sabe.
+- **Solução:** usar `globalThis` (no navegador, é o `window`). **Prevenção:** padrão de `scripts/corpus-colar.mjs`.
+- **Origem:** ocorrido em 23/09/2026 (commit da 7.2, `feat(legislacao): captura do colar da página (F2, atividade 7.2)`).
+
 ### E2E testa uma versão velha do app
 - **Sintoma:** o E2E não enxerga a mudança recém-feita. **Causa:** fora do CI, `playwright.config.ts` reaproveita servidor já aberto (`reuseExistingServer`); um `vite preview` antigo na porta 4173 é usado sem novo build.
 - **Solução:** encerrar o servidor antigo e rodar `npm run test:e2e` de novo. **Prevenção:** não deixar `preview` aberto entre rodadas; o CI sempre sobe o seu.
@@ -312,14 +317,14 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (commit 13355bc).
 
 ### `npm test` acusa o corpus
-- **Sintoma:** "bytes no disco … (fim de linha convertido pelo git?)"; ou "arquivo fora do manifesto — rode npm run corpus"; ou o `npm run corpus` completo apaga arquivos da pasta. **Causa:** o git converteria o fim de linha misto das páginas; `verificarCorpus` e `baixarCorpus` tratam todo `.html` de `corpus/normas/` sem entrada no manifesto como sobra, e os `*.colado.html` da 7.2 cairão nessa regra.
-- **Solução:** `corpus/normas/*.html -text` no `.gitattributes` (já feito); na 7.2, registrar os colados no manifesto ou ensinar as duas funções a reconhecê-los (amarrados ao `sha256Conteudo` da origem). **Prevenção:** conferência de integridade no `npm test`, sem rede, cobrindo os colados.
-- **Origem:** previsto — atividades 7.1 (prevenido em 13355bc) e 7.2.
+- **Sintoma:** "bytes no disco … (fim de linha convertido pelo git?)"; "arquivo fora do manifesto — rode npm run corpus"; "`lep.colado.html`: capturado de outra versão da página", "ausente de colados.json" ou "… tachados, a página tem … — a cópia perdeu formatação". **Causa:** fim de linha convertido pelo git; página nova baixada sem capturar de novo o colado; colado feito à mão ou por outro navegador.
+- **Solução:** `corpus/normas/*.html -text` no `.gitattributes` (já feito); depois de `npm run corpus` que mude uma página, rodar `npm run corpus:colar` (sem rede) e reconferir o gabarito. Os derivados (`*.colado.html`, `*.gabarito.json`) são reconhecidos pelo nome (`classificarArquivo`); `npm run corpus` só apaga os de norma que saiu do catálogo (`podarDerivados`). **Prevenção:** `verificarCorpus` no `npm test`, sem rede, confere páginas e colados (hash, `origemSha256Conteudo`, tachados iguais aos da página).
+- **Origem:** ocorrido em 23/09/2026: prevenido na 7.1 (13355bc) e resolvido na 7.2 (commit da 7.2, `feat(legislacao): captura do colar da página (F2, atividade 7.2)`).
 
 ### Acentos trocados ou "�" no texto da lei
 - **Sintoma:** aparece U+FFFD (windows-1252 lido como UTF-8) ou "Seção" vira "SeÃ§Ã£o" (UTF-8 lido como windows-1252). **Causa:** o Planalto grava em windows-1252 e não declara charset (nem cabeçalho nem `<meta>`); a ALESP declara UTF-8 na `<meta>`.
-- **Solução:** charset da `<meta>` quando houver, senão windows-1252 (cliente da 12.3); na 7.2, servir com `Content-Type: text/html; charset=<do manifesto>`. **Prevenção:** conferência de U+FFFD como em `conferirConteudo`; testes da 12.1 com páginas do corpus.
-- **Origem:** previsto — atividades 7.2 e 12.3.
+- **Solução:** charset da `<meta>` quando houver, senão windows-1252 (cliente da 12.3). Na captura do colar (7.2), a página é servida com `Content-Type: text/html; charset=<do manifesto>`; nenhum dos 7 colados tem "�". **Prevenção:** conferência de U+FFFD em `conferirConteudo` (páginas e colados); testes da 12.1 com páginas do corpus.
+- **Origem:** prevenido na 7.2 (commit da 7.2, `feat(legislacao): captura do colar da página (F2, atividade 7.2)`); previsto — atividade 12.3.
 
 ### Nenhuma redação anterior depois de colar
 - **Sintoma:** a lei entra sem nenhum texto tachado. **Causa:** a página "compilado" do Planalto traz só o texto vigente; a simples (`l7210.htm`, `del2848.htm`) traz todas as redações.
@@ -328,8 +333,28 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### O HTML colado muda conforme o navegador
 - **Sintoma:** a mesma lei estrutura bem no Chromium e mal em outro navegador ou no celular. **Causa:** cada navegador serializa a seleção de um jeito (tags, estilos em linha), e no celular a seleção de uma lei inteira é difícil e o colar pode trazer só texto puro.
-- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). **Prevenção:** a 7.2 captura só o Chromium; guardar amostras de outros navegadores no corpus quando aparecerem.
-- **Origem:** previsto — atividades 7.2 e 9.5.
+- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). **Prevenção:** a 7.2 captura só o Chromium 141 no Linux (sem `<!--StartFragment-->`, estilo em linha em todo bloco); no Windows o colar pode vir embrulhado em `<html><body><!--StartFragment-->…` (a confirmar no Aparelho, na 9.5). Guardar amostras de outros navegadores no corpus quando aparecerem. Outro Chromium pode gerar outros bytes: `npm run corpus:colar` regrava e a verificação compara os tachados, não os bytes.
+- **Origem:** previsto — atividades 7.2 (Chromium coberto) e 9.5.
+
+### `npm run corpus` dá HTTP 403 em todas as normas
+- **Sintoma:** `✗ lep: HTTP 403` (e as outras) numa sessão do Claude na nuvem. **Causa:** a política de rede da sessão não libera `planalto.gov.br` nem `al.sp.gov.br` (o proxy recusa a conexão); não é o Planalto.
+- **Solução:** baixar o corpus no Aparelho do Gabriel. `npm run corpus -- --verificar` e `npm run corpus:colar` não usam rede e rodam em qualquer lugar. **Prevenção:** atividades que precisem da fonte ao vivo (12.2) ficam para o Aparelho ou para o site publicado.
+- **Origem:** ocorrido em 23/09/2026 (sessão da 7.2).
+
+### O colar chega numa linha só
+- **Sintoma:** segmentar por `\n` não acha nenhum dispositivo no HTML colado. **Causa:** ao copiar, o Chromium troca a quebra de linha do texto por espaço; os 7 colados do corpus não têm nenhum `\n`. "Art" e número quebrados em duas linhas chegam separados por espaço.
+- **Solução:** segmentar pelos blocos do sanitizador (`<p>`, `<br>`, célula), nunca pelo texto bruto. **Prevenção:** testes da 8.1 a 8.3 com os `*.colado.html`, além das páginas.
+- **Origem:** fato da 7.2; previsto — atividades 8.1 a 8.3.
+
+### Gabarito conferido não bate com o estruturador por espaço ou entidade
+- **Sintoma:** a regressão acusa diferença num dispositivo que "está certo" (espaço duplo, `&nbsp;`, hífen suave, "º" × "o"). **Causa:** o texto exato da amostra foi copiado da página bruta, antes da normalização (regra 1).
+- **Solução:** a amostra da 7.3 guarda o texto já normalizado, com a regra escrita no próprio gabarito. **Prevenção:** o gabarito amarrado ao `sha256Conteudo` da página, como o colado, para ficar velho junto com ela.
+- **Origem:** previsto — atividades 7.3 e 8.9.
+
+### Gabarito editado à mão não abre
+- **Sintoma:** `Unexpected token` ao ler `*.gabarito.json`. **Causa:** o Bloco de Notas ou o `Set-Content` do PowerShell 5 gravam com BOM ou em UTF-16.
+- **Solução:** editar no VS Code (UTF-8 sem BOM). **Prevenção:** o gabarito é gerado por script; a conferência do Gabriel vai na nota de conferência, e a leitura acusa BOM com mensagem clara.
+- **Origem:** previsto — atividade 7.3.
 
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.

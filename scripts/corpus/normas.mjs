@@ -2,7 +2,7 @@
 // Texto de lei é domínio público (Lei 9.610/98, art. 8º, IV): as páginas ficam no repositório,
 // byte a byte como a fonte as entregou, com charset, data e hash no manifesto.
 import { createHash } from 'node:crypto';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { TextDecoder } from 'node:util';
 
@@ -13,6 +13,39 @@ import { TextDecoder } from 'node:util';
 export const USER_AGENT = 'Mozilla/5.0 (compatible; arretado-corpus/1.0; estudo pessoal)';
 
 export const NOME_MANIFESTO = 'manifesto.json';
+
+/** Registro dos colados (7.2): cada um amarrado ao `sha256Conteudo` da página de origem. */
+export const NOME_COLADOS = 'colados.json';
+
+/**
+ * Derivados de cada página, gerados a partir dela: o "colar da página" do Chromium (7.2) e o
+ * gabarito conferido pelo Gabriel (7.3). Não são páginas: `npm run corpus` não os apaga.
+ */
+export const SUFIXO_COLADO = '.colado.html';
+export const SUFIXO_GABARITO = '.gabarito.json';
+
+/**
+ * @typedef {{ tipo: 'manifesto' | 'colados' | 'desconhecido' }
+ *   | { tipo: 'pagina' | 'colado' | 'gabarito', id: string }} ClasseDeArquivo
+ */
+
+/**
+ * O que é cada arquivo de `corpus/normas/`, pelo nome.
+ * @param {string} nome
+ * @returns {ClasseDeArquivo}
+ */
+export function classificarArquivo(nome) {
+  if (nome === NOME_MANIFESTO) return { tipo: 'manifesto' };
+  if (nome === NOME_COLADOS) return { tipo: 'colados' };
+  if (nome.endsWith(SUFIXO_COLADO)) {
+    return { tipo: 'colado', id: nome.slice(0, -SUFIXO_COLADO.length) };
+  }
+  if (nome.endsWith(SUFIXO_GABARITO)) {
+    return { tipo: 'gabarito', id: nome.slice(0, -SUFIXO_GABARITO.length) };
+  }
+  if (nome.endsWith('.html')) return { tipo: 'pagina', id: nome.slice(0, -'.html'.length) };
+  return { tipo: 'desconhecido' };
+}
 
 /** Abaixo disso a resposta é página de erro, não norma. */
 const TAMANHO_MINIMO = 20_000;
@@ -251,32 +284,33 @@ export function contarTachados(html) {
  * @param {NormaDoCorpus} norma
  * @param {Uint8Array} bytes
  * @param {string} charset
+ * @param {string} [rotulo] Como o arquivo aparece nas mensagens (padrão: o id da norma).
  * @returns {string[]} problemas encontrados (vazio = ok)
  */
-export function conferirConteudo(norma, bytes, charset) {
+export function conferirConteudo(norma, bytes, charset, rotulo = norma.id) {
   /** @type {string[]} */
   const problemas = [];
   if (bytes.length < TAMANHO_MINIMO) {
-    problemas.push(`${norma.id}: só ${String(bytes.length)} bytes — provável página de erro`);
+    problemas.push(`${rotulo}: só ${String(bytes.length)} bytes — provável página de erro`);
   }
   const html = decodificar(bytes, charset);
   if (html.includes('\uFFFD')) {
-    problemas.push(`${norma.id}: caractere de substituição (U+FFFD) — charset ${charset} errado?`);
+    problemas.push(`${rotulo}: caractere de substituição (U+FFFD) — charset ${charset} errado?`);
   }
   const texto = textoParaConferencia(html);
   for (const marcador of norma.marcadores) {
     if (!texto.includes(marcador)) {
-      problemas.push(`${norma.id}: marcador "${marcador}" ausente — página ou charset errados`);
+      problemas.push(`${rotulo}: marcador "${marcador}" ausente — página ou charset errados`);
     }
   }
   const tachados = contarTachados(html);
   if (norma.variante === 'todas-as-redacoes' && tachados < LIMIAR_TACHADOS) {
     problemas.push(
-      `${norma.id}: só ${String(tachados)} tachados — não parece a página com todas as redações`,
+      `${rotulo}: só ${String(tachados)} tachados — não parece a página com todas as redações`,
     );
   }
   if (norma.variante === 'compilado' && tachados >= LIMIAR_TACHADOS) {
-    problemas.push(`${norma.id}: ${String(tachados)} tachados — não parece a página compilada`);
+    problemas.push(`${rotulo}: ${String(tachados)} tachados — não parece a página compilada`);
   }
   return problemas;
 }
@@ -339,16 +373,40 @@ export function atualizarEntrada(anterior, nova, agora) {
 }
 
 /**
+ * Na ordem do catálogo (o que saiu dele vai para o fim).
+ * @template {{ id: string }} T
+ * @param {readonly T[]} itens
+ * @returns {T[]}
+ */
+function naOrdemDoCatalogo(itens) {
+  const ordem = new Map(NORMAS.map((n, i) => [n.id, i]));
+  return [...itens].sort((a, b) => (ordem.get(a.id) ?? Infinity) - (ordem.get(b.id) ?? Infinity));
+}
+
+/**
  * Manifesto em JSON estável (ordem do catálogo; LF no fim).
  * @param {Manifesto} manifesto
  * @returns {string}
  */
 export function serializarManifesto(manifesto) {
-  const ordem = new Map(NORMAS.map((n, i) => [n.id, i]));
-  const normas = [...manifesto.normas].sort(
-    (a, b) => (ordem.get(a.id) ?? Infinity) - (ordem.get(b.id) ?? Infinity),
-  );
+  const normas = naOrdemDoCatalogo(manifesto.normas);
   return `${JSON.stringify({ ...manifesto, normas }, null, 2)}\n`;
+}
+
+/**
+ * JSON do arquivo; ausente → `vazio`.
+ * @template T
+ * @param {string} caminho
+ * @param {() => T} vazio
+ * @returns {Promise<T>}
+ */
+async function lerJson(caminho, vazio) {
+  try {
+    return /** @type {T} */ (JSON.parse(await readFile(caminho, 'utf8')));
+  } catch (excecao) {
+    if (/** @type {NodeJS.ErrnoException} */ (excecao).code === 'ENOENT') return vazio();
+    throw excecao;
+  }
 }
 
 /**
@@ -356,28 +414,93 @@ export function serializarManifesto(manifesto) {
  * @param {string} diretorio
  * @returns {Promise<Manifesto>}
  */
-export async function lerManifesto(diretorio) {
-  try {
-    return /** @type {Manifesto} */ (
-      JSON.parse(await readFile(join(diretorio, NOME_MANIFESTO), 'utf8'))
-    );
-  } catch (excecao) {
-    if (/** @type {NodeJS.ErrnoException} */ (excecao).code === 'ENOENT') return manifestoVazio();
-    throw excecao;
-  }
+export function lerManifesto(diretorio) {
+  return lerJson(join(diretorio, NOME_MANIFESTO), manifestoVazio);
+}
+
+/**
+ * @typedef {object} EntradaColado
+ * @property {string} id Da norma de origem.
+ * @property {string} arquivo `<id>.colado.html`: o `text/html` da área de transferência, em UTF-8.
+ * @property {string} origemSha256Conteudo `sha256Conteudo` da página quando foi capturado. Amarra
+ *   o colado à versão da página: se ela mudar, o colado fica desatualizado.
+ * @property {string} navegador Quem serializou a seleção (ex.: "Chromium 141.0.7390.37").
+ * @property {number} bytes
+ * @property {string} sha256
+ * @property {string} capturadoEm Instante ISO 8601 UTC da última mudança do colado.
+ */
+
+/**
+ * @typedef {object} RegistroColados
+ * @property {1} versao
+ * @property {string} descricao
+ * @property {EntradaColado[]} colados
+ */
+
+/** @returns {RegistroColados} */
+export function coladosVazio() {
+  return {
+    versao: 1,
+    descricao:
+      'HTML que o Chromium põe na área de transferência ao selecionar tudo e copiar cada página ' +
+      'do corpus, sem rede (F2, 7.2). Gerado por scripts/corpus-colar.mjs; não editar à mão.',
+    colados: [],
+  };
+}
+
+/**
+ * Lê o registro dos colados; ausente → vazio.
+ * @param {string} diretorio
+ * @returns {Promise<RegistroColados>}
+ */
+export function lerColados(diretorio) {
+  return lerJson(join(diretorio, NOME_COLADOS), coladosVazio);
+}
+
+/**
+ * Registro dos colados em JSON estável (ordem do catálogo; LF no fim).
+ * @param {RegistroColados} registro
+ * @returns {string}
+ */
+export function serializarColados(registro) {
+  const colados = naOrdemDoCatalogo(registro.colados);
+  return `${JSON.stringify({ ...registro, colados }, null, 2)}\n`;
+}
+
+/**
+ * Nova entrada, ou a anterior intacta se a captura deu os mesmos bytes a partir da mesma versão
+ * da página (capturar de novo não gera diff, mesmo com outro navegador).
+ * @param {EntradaColado | undefined} anterior
+ * @param {Omit<EntradaColado, 'capturadoEm'>} nova
+ * @param {string} agora
+ * @returns {{ entrada: EntradaColado, mudou: boolean }}
+ */
+export function atualizarColado(anterior, nova, agora) {
+  const mesmo =
+    anterior !== undefined &&
+    anterior.arquivo === nova.arquivo &&
+    anterior.sha256 === nova.sha256 &&
+    anterior.origemSha256Conteudo === nova.origemSha256Conteudo;
+  if (mesmo) return { entrada: anterior, mudou: false };
+  return { entrada: { ...nova, capturadoEm: agora }, mudou: true };
 }
 
 /**
  * Verificação sem rede: toda norma do catálogo tem entrada e arquivo; tamanho, hash e
- * conteúdo batem com o manifesto. Usada pelo `npm test` e por `--verificar`.
+ * conteúdo batem com o manifesto; o mesmo para os colados, que ainda têm de ter sido
+ * capturados da versão atual da página. Usada pelo `npm test` e por `--verificar`.
  * @param {string} diretorio
  * @returns {Promise<string[]>} problemas (vazio = corpus íntegro)
  */
 export async function verificarCorpus(diretorio) {
   const manifesto = await lerManifesto(diretorio);
+  const registro = await lerColados(diretorio);
   /** @type {string[]} */
   const problemas = [];
   const porId = new Map(manifesto.normas.map((e) => [e.id, e]));
+  /** Tachados de cada página: o colado tem de ter os mesmos. */
+  /** @type {Map<string, number>} */
+  const tachados = new Map();
   for (const norma of NORMAS) {
     const entrada = porId.get(norma.id);
     if (!entrada) {
@@ -387,11 +510,8 @@ export async function verificarCorpus(diretorio) {
     if (entrada.url !== norma.url) {
       problemas.push(`${norma.id}: URL do manifesto difere do catálogo — rode o script de novo`);
     }
-    /** @type {Uint8Array} */
-    let bytes;
-    try {
-      bytes = await readFile(join(diretorio, entrada.arquivo));
-    } catch {
+    const bytes = await lerBytes(diretorio, entrada.arquivo);
+    if (!bytes) {
       problemas.push(`${norma.id}: arquivo ${entrada.arquivo} não encontrado`);
       continue;
     }
@@ -408,6 +528,7 @@ export async function verificarCorpus(diretorio) {
       problemas.push(`${norma.id}: hash do conteúdo difere do manifesto`);
     }
     problemas.push(...conferirConteudo(norma, bytes, entrada.charset));
+    tachados.set(norma.id, contarTachados(decodificar(bytes, entrada.charset)));
   }
   const conhecidos = new Set(NORMAS.map((n) => n.id));
   for (const entrada of manifesto.normas) {
@@ -415,25 +536,138 @@ export async function verificarCorpus(diretorio) {
       problemas.push(`${entrada.id}: está no manifesto mas saiu do catálogo — rode npm run corpus`);
     }
   }
-  const referenciados = new Set(manifesto.normas.map((e) => e.arquivo));
+  problemas.push(...(await verificarColados(diretorio, registro, porId, tachados)));
+  const paginas = new Set(manifesto.normas.map((e) => e.arquivo));
+  const colados = new Set(registro.colados.map((e) => e.arquivo));
   for (const nome of await readdir(diretorio)) {
-    if (nome.endsWith('.html') && !referenciados.has(nome)) {
+    const classe = classificarArquivo(nome);
+    if (classe.tipo === 'pagina' && !paginas.has(nome)) {
       problemas.push(`${nome}: arquivo fora do manifesto — rode npm run corpus`);
+    } else if (classe.tipo === 'colado' && !colados.has(nome)) {
+      problemas.push(`${nome}: arquivo fora de ${NOME_COLADOS} — rode npm run corpus:colar`);
+    } else if (classe.tipo === 'gabarito' && !conhecidos.has(classe.id)) {
+      problemas.push(`${nome}: gabarito de norma fora do catálogo — rode npm run corpus`);
     }
   }
   return problemas;
 }
 
 /**
+ * Cada norma do catálogo tem um colado íntegro, capturado da versão atual da página, com a
+ * norma certa, sem "�" e com os mesmos tachados da página (a cópia não pode perder o tachado).
+ * @param {string} diretorio
+ * @param {RegistroColados} registro
+ * @param {Map<string, EntradaManifesto>} paginas
+ * @param {Map<string, number>} tachadosDasPaginas
+ * @returns {Promise<string[]>}
+ */
+async function verificarColados(diretorio, registro, paginas, tachadosDasPaginas) {
+  /** @type {string[]} */
+  const problemas = [];
+  const porId = new Map(registro.colados.map((e) => [e.id, e]));
+  for (const norma of NORMAS) {
+    const rotulo = `${norma.id}${SUFIXO_COLADO}`;
+    const entrada = porId.get(norma.id);
+    if (!entrada) {
+      problemas.push(`${rotulo}: ausente de ${NOME_COLADOS} — rode npm run corpus:colar`);
+      continue;
+    }
+    if (entrada.arquivo !== rotulo) {
+      problemas.push(`${rotulo}: ${NOME_COLADOS} aponta para ${entrada.arquivo}`);
+      continue;
+    }
+    const bytes = await lerBytes(diretorio, entrada.arquivo);
+    if (!bytes) {
+      problemas.push(`${rotulo}: arquivo não encontrado — rode npm run corpus:colar`);
+      continue;
+    }
+    if (bytes.length !== entrada.bytes || sha256Hex(bytes) !== entrada.sha256) {
+      problemas.push(`${rotulo}: tamanho ou hash difere de ${NOME_COLADOS}`);
+    }
+    const pagina = paginas.get(norma.id);
+    if (pagina && entrada.origemSha256Conteudo !== pagina.sha256Conteudo) {
+      problemas.push(`${rotulo}: capturado de outra versão da página — rode npm run corpus:colar`);
+    }
+    problemas.push(...conferirColado(norma, bytes, tachadosDasPaginas.get(norma.id)));
+  }
+  const conhecidos = new Set(NORMAS.map((n) => n.id));
+  for (const entrada of registro.colados) {
+    if (!conhecidos.has(entrada.id)) {
+      problemas.push(
+        `${entrada.id}: está em ${NOME_COLADOS} mas saiu do catálogo — rode npm run corpus`,
+      );
+    }
+  }
+  return problemas;
+}
+
+/**
+ * O colado é a norma certa, sem "�", na variante declarada e com os mesmos tachados da página
+ * de origem (a cópia não pode perder o tachado). Vale na captura e na verificação.
+ * @param {NormaDoCorpus} norma
+ * @param {Uint8Array} colado Em UTF-8.
+ * @param {number | undefined} tachadosDaPagina `contarTachados` da página; sem ela, não compara.
+ * @returns {string[]}
+ */
+export function conferirColado(norma, colado, tachadosDaPagina) {
+  const rotulo = `${norma.id}${SUFIXO_COLADO}`;
+  const problemas = conferirConteudo(norma, colado, 'utf-8', rotulo);
+  const doColado = contarTachados(decodificar(colado, 'utf-8'));
+  if (tachadosDaPagina !== undefined && doColado !== tachadosDaPagina) {
+    problemas.push(
+      `${rotulo}: ${String(doColado)} tachados, a página tem ${String(tachadosDaPagina)} — a cópia perdeu formatação`,
+    );
+  }
+  return problemas;
+}
+
+/**
+ * @param {string} diretorio
+ * @param {string} arquivo
+ * @returns {Promise<Uint8Array | undefined>} `undefined` se não existe
+ */
+async function lerBytes(diretorio, arquivo) {
+  try {
+    return await readFile(join(diretorio, arquivo));
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Tira do corpus os derivados das normas que saíram do catálogo: colados, gabaritos e entradas
+ * de `colados.json`. Os derivados das normas que continuam no catálogo nunca são apagados aqui.
+ * @param {string} diretorio
+ * @returns {Promise<string[]>} o que foi removido (arquivos e entradas)
+ */
+export async function podarDerivados(diretorio) {
+  const conhecidos = new Set(NORMAS.map((n) => n.id));
+  /** @type {string[]} */
+  const removidos = [];
+  for (const nome of await readdir(diretorio)) {
+    const classe = classificarArquivo(nome);
+    if ((classe.tipo === 'colado' || classe.tipo === 'gabarito') && !conhecidos.has(classe.id)) {
+      await rm(join(diretorio, nome));
+      removidos.push(nome);
+    }
+  }
+  const registro = await lerColados(diretorio);
+  const fora = registro.colados.filter((e) => !conhecidos.has(e.id));
+  if (fora.length > 0) {
+    const colados = registro.colados.filter((e) => conhecidos.has(e.id));
+    await writeFile(join(diretorio, NOME_COLADOS), serializarColados({ ...registro, colados }));
+    removidos.push(...fora.map((e) => `${NOME_COLADOS} › ${e.id}`));
+  }
+  return removidos;
+}
+
+/**
  * O arquivo da entrada existe no disco e tem os bytes registrados?
  * @param {string} diretorio
- * @param {EntradaManifesto} entrada
+ * @param {{ arquivo: string, sha256: string }} entrada
  * @returns {Promise<boolean>}
  */
 export async function arquivoConfere(diretorio, entrada) {
-  try {
-    return sha256Hex(await readFile(join(diretorio, entrada.arquivo))) === entrada.sha256;
-  } catch {
-    return false;
-  }
+  const bytes = await lerBytes(diretorio, entrada.arquivo);
+  return bytes !== undefined && sha256Hex(bytes) === entrada.sha256;
 }

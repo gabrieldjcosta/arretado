@@ -240,7 +240,9 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Termo | O que é | Identificador | Situação | Ativ. |
 |---|---|---|---|---|
 | Corpus | páginas oficiais byte a byte, para teste | `corpus/normas/<id>.html` + `manifesto.json` (`id`, `papel`: `portao`, `apoio`, `estresse`; `variante`: `todas-as-redacoes`, `compilado`; `charset`, `sha256`, `sha256Conteudo`, `obtidoEm`); `npm run corpus` (`scripts/corpus-normas.mjs`, lista em `scripts/corpus/normas.mjs`) | existe | 7.1 |
-| Página colada, gabarito | HTML da área de transferência do Chromium; contagens, revogados, redações e amostra conferida | `corpus/normas/<id>.colado.html`; `corpus/normas/<id>.gabarito.json` | plano | 7.2, 7.3 |
+| Colado (página colada) | `text/html` que o Chromium põe na área de transferência ao selecionar tudo e copiar a página, capturado sem rede | `corpus/normas/<id>.colado.html` (UTF-8) + `colados.json` (`id`, `arquivo`, `origemSha256Conteudo`, `navegador`, `bytes`, `sha256`, `capturadoEm`); `npm run corpus:colar` (`scripts/corpus-colar.mjs`); `conferirColado`, `atualizarColado`, `lerColados` em `scripts/corpus/normas.mjs` | existe | 7.2 |
+| Derivado (do corpus) | arquivo gerado a partir de uma página e amarrado a ela: colado e gabarito | sufixos `SUFIXO_COLADO` (`.colado.html`) e `SUFIXO_GABARITO` (`.gabarito.json`); `classificarArquivo(nome)` → `pagina`, `colado`, `gabarito`, `manifesto`, `colados`, `desconhecido`; `podarDerivados` (tira os de norma fora do catálogo) | existe | 7.2 |
+| Gabarito | contagens por tipo, revogados, redações anteriores e amostra conferida pelo Gabriel | `corpus/normas/<id>.gabarito.json` | plano | 7.3 |
 | Entrada sanitizada | saída do sanitizador | `sanitizarHtml` → `ResultadoSanitizacao { blocos, linksDescartados }`; `textoParaBlocos`; `Bloco { trechos }`; `LIMITE_PADRAO` | existe | 8.x |
 | Normalização | regra 1 (º/o/°/ª, aspas, travessões, U+00AD, entidades, fim de linha) | `normalizar(texto)` | proposto | 8.1 |
 | Estruturador | blocos → árvore (`fatiarLei` na Parte 2) | `estruturar(blocos)` em `src/dominios/legislacao/` | proposto | 8.1–8.8 |

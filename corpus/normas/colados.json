@@ -1,0 +1,69 @@
+{
+  "versao": 1,
+  "descricao": "HTML que o Chromium põe na área de transferência ao selecionar tudo e copiar cada página do corpus, sem rede (F2, 7.2). Gerado por scripts/corpus-colar.mjs; não editar à mão.",
+  "colados": [
+    {
+      "id": "lep",
+      "arquivo": "lep.colado.html",
+      "origemSha256Conteudo": "8b95cead39cedad87abfe1d7314e2ddfef82125d22229a3b7a6ed5aba5c273d6",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 409820,
+      "sha256": "86a61501460ea9b55159fe0e17303dacecbfbc84eec6e20f896fd6049dbb7026",
+      "capturadoEm": "2026-09-23T17:14:55.174Z"
+    },
+    {
+      "id": "lep-compilado",
+      "arquivo": "lep-compilado.colado.html",
+      "origemSha256Conteudo": "bfc52bc4f160c068c9504266105df6ce052a7b79d5cecda0fa99367629f9a45f",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 295699,
+      "sha256": "5d6d1bd723e0354ddafb7b9aa8280ff341b4d3e824f39c08eb2bd328a849e892",
+      "capturadoEm": "2026-09-23T17:14:55.574Z"
+    },
+    {
+      "id": "cp",
+      "arquivo": "cp.colado.html",
+      "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 954805,
+      "sha256": "44eeae97cb49568ce593d9300c6869c01e86b7f4c40fdc4be765fd8b431b008b",
+      "capturadoEm": "2026-09-23T17:14:56.638Z"
+    },
+    {
+      "id": "cp-compilado",
+      "arquivo": "cp-compilado.colado.html",
+      "origemSha256Conteudo": "467c4523455f85a27d4b430d9d5a4bdba7f4cd401d6f86d82e016be63e2b6ead",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 1265938,
+      "sha256": "6abf492f907a309c462af6bbf3aed08fd7c58f80fbcc483e578113b312d8fcd1",
+      "capturadoEm": "2026-09-23T17:14:57.289Z"
+    },
+    {
+      "id": "lc80",
+      "arquivo": "lc80.colado.html",
+      "origemSha256Conteudo": "ce5094c7b34e713d909ae18762a917446b2e4d50801f2c61e6abc7c5bdfa68e4",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 711609,
+      "sha256": "1798c435b3687149e72e878bd2a6f36079f93e46a49c40531dd60f341f96752c",
+      "capturadoEm": "2026-09-23T17:14:57.902Z"
+    },
+    {
+      "id": "lc-sp-988",
+      "arquivo": "lc-sp-988.colado.html",
+      "origemSha256Conteudo": "3cccf3f957bbbf4e02bd7ea4de802ca7d25b1ea92589421473310d0e5d7de9f2",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 570733,
+      "sha256": "e66bbee940fed955020c797555fec71661d4c8524dd52157d4bbf48b172b9fb4",
+      "capturadoEm": "2026-09-23T17:14:58.297Z"
+    },
+    {
+      "id": "cf",
+      "arquivo": "cf.colado.html",
+      "origemSha256Conteudo": "a4ad6b4ae5bd0ce14e110440addeb5956b05ce2487a780fcfe9934a1f2c03b37",
+      "navegador": "Chromium 141.0.7390.37",
+      "bytes": 1983427,
+      "sha256": "03b11041d47865310614bb36f2caae2176d29dbbff7dad453081e2f352069c71",
+      "capturadoEm": "2026-09-23T17:14:59.635Z"
+    }
+  ]
+}
