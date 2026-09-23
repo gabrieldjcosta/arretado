@@ -33,7 +33,6 @@ Ferramentas do conector Supabase (MCP). Organização: **GJC's Org** (`phapzxwur
    (Se `auth.users` exigir mais colunas, usar o mínimo que o Supabase aceitar; tudo é desfeito no `rollback`.)
 6. Anotar em `portoes/F0.md` a linha "RLS … projeto real" como ✅ e registrar a referência do projeto (URL pública; **nenhuma chave no repositório** — a chave anônima só entra na F4).
 7. Lembrete para a F4: expor o esquema `arretado` na API (Settings › API › Exposed schemas).
-8. Com o projeto ativo, a F2 usa o mesmo projeto para a Edge Function `buscar-norma` (importação por URL, T17; atividades 12.1–12.2 do plano da F2): `verify_jwt = false`, sem chave no app, e `connect-src` da CSP passa a incluir `https://<ref>.supabase.co`. Publicar a função exige confirmação do Gabriel na hora.
 
 ### 2. Publicar no Cloudflare Pages — precisa da conta do Gabriel
 
@@ -44,6 +43,7 @@ O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc.,
 3. Framework preset: **None**. Build command: `npm run build`. Build output directory: `dist`.
 4. Deploy. Conferir no celular: abrir a URL, registrar um erro, revisar; em Conta › Dados, exportar.
 5. Conferir os cabeçalhos: `curl -sI https://<projeto>.pages.dev | grep -i content-security`.
+6. A importação por URL da F2 (T17, atividades 12.1–12.2) roda como Cloudflare Pages Function neste mesmo projeto. Quando `functions/api/buscar-norma.ts` existir, ela sobe junto com o site, sem configuração extra no painel. Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
 
 ### 3. Uso real da F1 (portão)
 
