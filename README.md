@@ -49,6 +49,8 @@ Lista completa com motivo, alternativa descartada e consequência: Parte 1, §19
 
 Linguagem, framework, banco local, formato do pacote e ferramentas: [`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md) (T1–T17). Obedecem a D1–D24.
 
+Apoio ao desenvolvimento: [`docs/glossario.md`](docs/glossario.md) (vocabulário → identificadores de código) e [`docs/solucao-de-problemas.md`](docs/solucao-de-problemas.md) (sintomas, causas e soluções conhecidas; complementado a cada atividade).
+
 ## Como rodar
 
 Requer Node 22 LTS.
