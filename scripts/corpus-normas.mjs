@@ -131,9 +131,11 @@ async function baixarCorpus(so) {
       const kb = Math.round(bytes.length / 1024);
       const sinal = mudou ? '↻' : reparo ? '⚒' : '=';
       console.log(`${sinal} ${norma.id}: ${String(kb)} KB, ${charset} (${origem})`);
-    } catch (erro) {
+    } catch (excecao) {
       falhas += 1;
-      console.error(`✗ ${norma.id}: ${erro instanceof Error ? erro.message : String(erro)}`);
+      console.error(
+        `✗ ${norma.id}: ${excecao instanceof Error ? excecao.message : String(excecao)}`,
+      );
     }
   }
   // Execução completa: o manifesto e a pasta passam a ter só o que está no catálogo.

@@ -8,3 +8,4 @@ docs/**/*.md
 README.md
 CLAUDE.md
 /corpus
+.claude

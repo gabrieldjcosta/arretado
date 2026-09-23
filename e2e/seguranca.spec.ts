@@ -1,7 +1,7 @@
 import { expect, test, violacoesDaPagina } from './apoio';
 
 test.describe('CSP (D18)', () => {
-  test('está presente e o app carrega sem violação nem erro', async ({ page }) => {
+  test('está presente e o app carrega sem violação nem falha no console', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
     const csp = await page
@@ -13,7 +13,7 @@ test.describe('CSP (D18)', () => {
   });
 
   test.describe('violação provocada', () => {
-    test.use({ permitirViolacoes: true, permitirErrosConsole: true });
+    test.use({ permitirViolacoes: true, permitirFalhasConsole: true });
 
     test('bloqueia script em linha e atribuição de HTML bruto', async ({ page }) => {
       await page.goto('/');

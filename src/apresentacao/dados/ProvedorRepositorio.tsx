@@ -4,7 +4,9 @@ import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
 
 type Estado =
-  { tipo: 'carregando' } | { tipo: 'pronto'; repo: Repositorio } | { tipo: 'falha'; erro: unknown };
+  | { tipo: 'carregando' }
+  | { tipo: 'pronto'; repo: Repositorio }
+  | { tipo: 'falha'; excecao: unknown };
 
 const abrirPadrao = () => Repositorio.abrir();
 
@@ -24,8 +26,8 @@ export function ProvedorRepositorio({
       (repo) => {
         if (ativo) setEstado({ tipo: 'pronto', repo });
       },
-      (erro: unknown) => {
-        if (ativo) setEstado({ tipo: 'falha', erro });
+      (excecao: unknown) => {
+        if (ativo) setEstado({ tipo: 'falha', excecao });
       },
     );
     return () => {

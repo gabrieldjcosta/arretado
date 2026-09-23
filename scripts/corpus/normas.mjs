@@ -361,9 +361,9 @@ export async function lerManifesto(diretorio) {
     return /** @type {Manifesto} */ (
       JSON.parse(await readFile(join(diretorio, NOME_MANIFESTO), 'utf8'))
     );
-  } catch (erro) {
-    if (/** @type {NodeJS.ErrnoException} */ (erro).code === 'ENOENT') return manifestoVazio();
-    throw erro;
+  } catch (excecao) {
+    if (/** @type {NodeJS.ErrnoException} */ (excecao).code === 'ENOENT') return manifestoVazio();
+    throw excecao;
   }
 }
 

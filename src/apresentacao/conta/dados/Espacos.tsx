@@ -43,12 +43,12 @@ export function Espacos() {
     setMensagem(null);
     try {
       await fn();
-    } catch (erro) {
+    } catch (excecao) {
       setMensagem({
         tipo: 'falha',
         texto:
-          erro instanceof ImportacaoInvalida
-            ? erro.message
+          excecao instanceof ImportacaoInvalida
+            ? excecao.message
             : 'Não foi possível concluir. Nada foi alterado.',
       });
     } finally {

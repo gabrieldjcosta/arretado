@@ -24,7 +24,7 @@ export interface ResultadoSanitizacao {
   linksDescartados: number;
 }
 
-export class ErroEntradaGrande extends Error {
+export class EntradaGrandeDemais extends Error {
   constructor(
     readonly tamanho: number,
     readonly limite: number,
@@ -32,7 +32,7 @@ export class ErroEntradaGrande extends Error {
     super(
       `O conteúdo tem ${String(Math.ceil(tamanho / 1_000_000))} MB; o limite é ${String(limite / 1_000_000)} MB.`,
     );
-    this.name = 'ErroEntradaGrande';
+    this.name = 'EntradaGrandeDemais';
   }
 }
 
@@ -169,7 +169,7 @@ export function sanitizarHtml(
   opcoes: { base?: string; limite?: number } = {},
 ): ResultadoSanitizacao {
   const limite = opcoes.limite ?? LIMITE_PADRAO;
-  if (html.length > limite) throw new ErroEntradaGrande(html.length, limite);
+  if (html.length > limite) throw new EntradaGrandeDemais(html.length, limite);
   const fragmento = obterPurificador().sanitize(html, CONFIG);
   const conversor = new Conversor(opcoes.base);
   conversor.percorrer(fragmento, { tachado: false, enfase: false, link: undefined });
@@ -179,7 +179,7 @@ export function sanitizarHtml(
 /** Texto puro (fallback, D13): uma linha por bloco, sem formatação. */
 export function textoParaBlocos(texto: string, opcoes: { limite?: number } = {}): Bloco[] {
   const limite = opcoes.limite ?? LIMITE_PADRAO;
-  if (texto.length > limite) throw new ErroEntradaGrande(texto.length, limite);
+  if (texto.length > limite) throw new EntradaGrandeDemais(texto.length, limite);
   return texto
     .split(/\r\n|\r|\n/)
     .map((l) => normalizarEspacos(l).trim())

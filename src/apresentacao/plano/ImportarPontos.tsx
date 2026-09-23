@@ -22,10 +22,10 @@ export function ImportarPontos({ aoImportar }: { aoImportar?: (mensagem: string)
       const texto = decodificarCsv(new Uint8Array(await arquivo.arrayBuffer()));
       const { linhas, avisos } = lerCsvPontos(texto);
       setPreparado({ ...(await prepararPontos(repo, linhas, texto)), avisos });
-    } catch (erro) {
+    } catch (excecao) {
       setMensagem({
         tipo: 'falha',
-        texto: erro instanceof CsvInvalido ? erro.message : 'Não foi possível ler o arquivo.',
+        texto: excecao instanceof CsvInvalido ? excecao.message : 'Não foi possível ler o arquivo.',
       });
     } finally {
       setOcupado(false);

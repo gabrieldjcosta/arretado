@@ -16,8 +16,8 @@ export class Barramento {
   private entregando = false;
 
   constructor(
-    private readonly aoFalhar: (erro: unknown, evento: Evento) => void = (erro, evento) => {
-      console.error(`Assinante falhou ao tratar ${evento.nome}`, erro);
+    private readonly aoFalhar: (excecao: unknown, evento: Evento) => void = (excecao, evento) => {
+      console.error(`Assinante falhou ao tratar ${evento.nome}`, excecao);
     },
   ) {}
 

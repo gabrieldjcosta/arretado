@@ -22,8 +22,9 @@ type Etapa =
   | { tipo: 'previa'; pacote: PacoteLido; nome: string; previa: Previa }
   | { tipo: 'feito'; texto: string };
 
-function mensagemDe(erro: unknown): string {
-  if (erro instanceof PacoteRecusado || erro instanceof ImportacaoInvalida) return erro.message;
+function mensagemDe(excecao: unknown): string {
+  if (excecao instanceof PacoteRecusado || excecao instanceof ImportacaoInvalida)
+    return excecao.message;
   return 'Não foi possível importar. Nada foi alterado.';
 }
 
@@ -42,8 +43,8 @@ export function Importar() {
     setOcupado(true);
     try {
       await fn();
-    } catch (erro) {
-      setFalha(mensagemDe(erro));
+    } catch (excecao) {
+      setFalha(mensagemDe(excecao));
     } finally {
       setOcupado(false);
     }
@@ -63,13 +64,13 @@ export function Importar() {
       const bytes = new Uint8Array(await arquivo.arrayBuffer());
       try {
         aoLer(await lerPacote(bytes), arquivo.name);
-      } catch (erro) {
-        if (erro instanceof PacoteRecusado && erro.motivo === 'senha_necessaria') {
+      } catch (excecao) {
+        if (excecao instanceof PacoteRecusado && excecao.motivo === 'senha_necessaria') {
           setSenha('');
           setEtapa({ tipo: 'senha', bytes, nome: arquivo.name });
           return;
         }
-        throw erro;
+        throw excecao;
       }
     });
   };
