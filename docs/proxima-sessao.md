@@ -9,7 +9,7 @@ Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md
 - Verificação: 329 testes unitários/integração, 82 E2E (Playwright + axe, desktop e celular), carga de 10 mil registros, CI verde.
 - Portões: [`portoes/F0.md`](portoes/F0.md) e [`portoes/F1.md`](portoes/F1.md).
 - **Decisão de escopo (23/09/2026):** nada do Acervo antigo nem do Acumen v2 é importado; o conteúdo recomeça do zero (nota no topo das Partes 1 e 2).
-- **F2 (Legislação) planejada e liberada para execução já (23/09/2026)**, em paralelo ao uso real da F1: plano em [`planos/F2.md`](planos/F2.md). **Próxima atividade: 7.1** (corpus de normas).
+- **F2 (Legislação) planejada e liberada para execução já (23/09/2026)**, em paralelo ao uso real da F1: plano em [`planos/F2.md`](planos/F2.md). **7.1 concluída (corpus de 5 normas em 7 páginas, em `corpus/normas/`); próxima atividade: 7.2** (captura do colar).
 
 ## Pendências, em ordem
 
@@ -53,13 +53,15 @@ O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc.,
 
 **Exceção à regra de fases (Gabriel, 23/09/2026):** a F2 roda já, em paralelo ao uso real da F1. O portão da F1 (item 3) continua sendo medido; a F3 só começa depois do portão da F2. O app publicado só recebe F2 ao fim de cada etapa revisada, e a subida de esquema (atividade 9.1) exige backup manual antes da publicação.
 
-Seguir as etapas 7–13 do plano, na ordem do caminho crítico (7 → 8 → 9 → 10/11 → 13; a 12 corre por fora). Começar por **7.1 → 7.2 → 7.3** (corpus e gabarito); a conferência da amostra do gabarito pede ~30 min do Gabriel por lei. Ler antes a Parte 2 §10.6 e a skill `acumen-extrair-normas` (armadilhas do Planalto listadas no plano). Sem importador do Acervo (decisão de escopo). O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
+Seguir as etapas 7–13 do plano, na ordem do caminho crítico (7 → 8 → 9 → 10/11 → 13; a 12 corre por fora). Agora: **7.2 → 7.3** (captura do colar e gabarito; a 7.1 está feita — ver "Andamento" e "Fatos das fontes" no plano); a conferência da amostra do gabarito pede ~30 min do Gabriel por lei. Ler antes a Parte 2 §10.6 e a skill `acumen-extrair-normas` (armadilhas do Planalto listadas no plano). Sem importador do Acervo (decisão de escopo). O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 
 ## Armadilhas aprendidas nesta implementação
 
 - **Escapes no texto das ferramentas:** sequências `\uXXXX` escritas no conteúdo de um comando ou arquivo chegam decodificadas (viram o caractere real). Para gravar o escape num arquivo, gerar via script a partir do código do caractere. Varredura de caracteres invisíveis em `src/`:
   `node -e 'const fs=require("fs"),p=require("path");const r=/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u00a0\u200b\ufeff\uffff\u0300-\u036f]/;(function a(d){for(const n of fs.readdirSync(d)){const f=p.join(d,n);fs.statSync(f).isDirectory()?a(f):/\.(ts|tsx|css)$/.test(n)&&r.test(fs.readFileSync(f,"utf8"))&&console.log(f)}})("src")'`
   (este documento é Markdown e não passa pelo Prettier; o comando acima foi escrito com os escapes literais).
+- **Fontes de normas (7.1):** o Planalto derruba a conexão com o User-Agent padrão do Node (usar `Mozilla/5.0 (compatible; …)`); Planalto e ALESP injetam um `<script>` diferente a cada requisição, então hash de norma é sempre sobre o conteúdo sem scripts (ou sanitizado), nunca sobre os bytes. Detalhes em `planos/F2.md` › "Fatos das fontes".
+- **Teste que lê arquivo do repositório:** o ambiente padrão do Vitest é jsdom, onde `import.meta.url` não é `file:`. Usar `// @vitest-environment node` e `import.meta.dirname` (como em `supabase/rls.test.ts`).
 - **Transações do IndexedDB:** nada além de IndexedDB pode ser aguardado dentro de `repo.transacao` (WebCrypto, `fetch`, timers) — a transação fecha antes (`PrematureCommitError`). Calcular hashes antes.
 - **Códigos de saída:** `comando | head` esconde falha. Encadear com `&&`, gravar saída em arquivo e depois filtrar.
 - **Playwright fixado em 1.56.1** (o Chromium do contêiner é o `chromium-1194`); `playwright-core` fixado junto para o `@axe-core/playwright` não puxar outra versão. No Windows, rodar `npx playwright install chromium` uma vez.
@@ -73,7 +75,7 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico (7 → 8 → 9 �
 ## Como validar tudo
 
 ```
-npm run check      # formato, lint, tipos, 329 testes, auditoria
+npm run check      # formato, lint, tipos, 346 testes (inclui integridade do corpus), auditoria
 npm run carga      # 10 mil registros dentro dos limiares
 npm run test:e2e   # 82 cenários (Playwright + axe)
 npm run build      # dist/ com _headers
@@ -95,5 +97,7 @@ src/suporte/relatos.ts        "!" Relatar problema
 src/apresentacao/             shell, Conta › Dados/Aparência/Privacidade, Orientações,
                               Recall (captura, completar, abas, drill), Plano
 supabase/migrations/          esquema remoto com RLS; teste em supabase/rls.test.ts
+scripts/corpus-normas.mjs     npm run corpus: baixa o corpus de normas (F2, 7.1)
+corpus/normas/                páginas oficiais byte a byte + manifesto.json (hashes, charset)
 e2e/                          Playwright + axe; vigilância automática de CSP e console
 ```
