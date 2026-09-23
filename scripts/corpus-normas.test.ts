@@ -9,6 +9,7 @@ import {
   conferirConteudo,
   contarTachados,
   detectarCharset,
+  lerOpcoes,
   manifestoVazio,
   serializarManifesto,
   sha256Conteudo,
@@ -156,13 +157,13 @@ describe('textoParaConferencia e conferirConteudo', () => {
     expect(problemas.some((p) => p.includes('lei de execução penal'))).toBe(true);
   });
 
-  it('marcador só dentro de script não conta; página curta é tratada como erro', () => {
+  it('marcador só dentro de script não conta; página curta é tratada como falha do site', () => {
     const problemas = conferirConteudo(
       lep,
       latin1('<script>lei de execução penal</script>'),
       'utf-8',
     );
-    expect(problemas.some((p) => p.includes('página de erro'))).toBe(true);
+    expect(problemas.some((p) => p.includes('página de falha do site'))).toBe(true);
     expect(problemas.some((p) => p.includes('marcador'))).toBe(true);
   });
 });
@@ -239,5 +240,26 @@ describe('robustez', () => {
     } finally {
       await rm(pasta, { recursive: true, force: true });
     }
+  });
+});
+
+describe('lerOpcoes (linha de comando dos scripts do corpus)', () => {
+  const ids = ['lep', 'cp'];
+  it('--so aceita as duas formas, tira repetidos e vazios; chaves conhecidas ligam', () => {
+    expect(lerOpcoes(['--so', 'lep,cp,'], { ids })).toEqual({
+      so: ['lep', 'cp'],
+      chaves: new Set(),
+    });
+    expect(lerOpcoes(['--so=lep,lep'], { ids }).so).toEqual(['lep']);
+    expect(lerOpcoes(['--verificar'], { ids, chaves: ['--verificar'] })).toEqual({
+      so: null,
+      chaves: new Set(['--verificar']),
+    });
+  });
+
+  it('argumento desconhecido, --so vazio e id fora da lista são recusados com o motivo', () => {
+    expect(lerOpcoes(['--so', 'lep', '--x'], { ids }).problema).toBe('Argumento desconhecido: --x');
+    expect(lerOpcoes(['--so'], { ids }).problema).toBe('--so precisa de ao menos um id.');
+    expect(lerOpcoes(['--so', 'lep,cf'], { ids }).problema).toBe('Normas desconhecidas: cf');
   });
 });

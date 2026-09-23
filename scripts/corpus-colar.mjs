@@ -14,7 +14,13 @@ import { rm, readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
-import { NORMAS, lerManifesto, sha256Hex, verificarCorpus } from './corpus/normas.mjs';
+import {
+  NORMAS,
+  arquivoConfere,
+  lerManifesto,
+  lerOpcoes,
+  verificarCorpus,
+} from './corpus/normas.mjs';
 import {
   NOME_INDICE_COLADOS,
   SUFIXO_COLADO_HTML,
@@ -55,21 +61,8 @@ function recusar(mensagem) {
 
 /** @returns {string[] | null} */
 function argumentos() {
-  /** @type {string[] | null} */
-  let so = null;
-  const args = process.argv.slice(2);
-  for (let i = 0; i < args.length; i += 1) {
-    const arg = args[i] ?? '';
-    if (arg === '--so' || arg.startsWith('--so=')) {
-      const valor = arg === '--so' ? args[(i += 1)] : arg.slice('--so='.length);
-      so = (valor ?? '').split(',').filter(Boolean);
-      if (so.length === 0) recusar('--so precisa de ao menos um id.');
-    } else {
-      recusar(`Argumento desconhecido: ${arg}`);
-    }
-  }
-  const desconhecidos = (so ?? []).filter((id) => !NORMAS.some((n) => n.id === id));
-  if (desconhecidos.length > 0) recusar(`Normas desconhecidas: ${desconhecidos.join(', ')}`);
+  const { so, problema } = lerOpcoes(process.argv.slice(2), { ids: NORMAS.map((n) => n.id) });
+  if (problema) recusar(problema);
   return so;
 }
 
@@ -125,15 +118,6 @@ async function capturar(pagina, bytes) {
   }
 }
 
-/** @param {{ arquivo: string, sha256: string }} descrito */
-async function arquivoConfere(descrito) {
-  try {
-    return sha256Hex(await readFile(join(DIRETORIO, descrito.arquivo))) === descrito.sha256;
-  } catch {
-    return false;
-  }
-}
-
 async function colar() {
   const so = argumentos();
   const problemasCorpus = await verificarCorpus(DIRETORIO);
@@ -177,7 +161,11 @@ async function colar() {
       );
       // Captura igual, mas o arquivo local sumiu ou foi alterado: regrava sem mexer no índice.
       const reparo =
-        !mudou && !((await arquivoConfere(entrada.html)) && (await arquivoConfere(entrada.texto)));
+        !mudou &&
+        !(
+          (await arquivoConfere(DIRETORIO, entrada.html)) &&
+          (await arquivoConfere(DIRETORIO, entrada.texto))
+        );
       if (mudou || reparo) {
         await writeFile(join(DIRETORIO, entrada.html.arquivo), html);
         await writeFile(join(DIRETORIO, entrada.texto.arquivo), texto);

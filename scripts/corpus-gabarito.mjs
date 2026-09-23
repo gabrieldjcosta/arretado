@@ -4,13 +4,14 @@
 //                                            docs/conferencias/gabarito-<id>.md)
 //   npm run corpus:gabarito -- --so lep      só as normas indicadas (também --so=lep,cp)
 //
-// Sem rede: lê o colado (7.2), o texto puro, a página bruta (âncoras) e a compilada. Mantém a
-// "conferencia" do gabarito anterior se nada mais mudou; se mudou, ela volta a "pendente" e o
-// Gabriel confere de novo. Pendência (divergência sem explicação) impede a gravação.
+// Sem rede: lê o colado (7.2), o texto puro, a página bruta (âncoras) e a compilada (se a norma
+// tiver uma no corpus). Mantém a "conferencia" do gabarito anterior se nada mais mudou; se mudou,
+// ela volta a "pendente" (com as observações) e o Gabriel confere de novo. Pendência (divergência
+// sem explicação) impede a gravação, e a folha com marcas nunca é regravada por cima.
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { NORMAS, decodificar, lerManifesto } from './corpus/normas.mjs';
+import { NORMAS, decodificar, lerManifesto, lerOpcoes, sha256Hex } from './corpus/normas.mjs';
 import { SUFIXO_GABARITO } from './corpus/derivados.mjs';
 import {
   GABARITOS,
@@ -24,19 +25,10 @@ const DIRETORIO = fileURLToPath(new URL('../corpus/normas/', import.meta.url));
 const CONFERENCIAS = fileURLToPath(new URL('../docs/conferencias/', import.meta.url));
 const USO = 'Uso: npm run corpus:gabarito [-- --so id,id]';
 
-/**
- * @param {string[]} args
- * @returns {string[] | null} ids pedidos, ou null = todos
- */
-function lerArgumentos(args) {
-  const i = args.findIndex((a) => a === '--so' || a.startsWith('--so='));
-  if (i === -1) {
-    if (args.length > 0) throw new Error(USO);
-    return null;
-  }
-  const valor = args[i].startsWith('--so=') ? args[i].slice(5) : args[i + 1];
-  if (!valor) throw new Error(USO);
-  return valor.split(',').map((s) => s.trim());
+/** @param {string} mensagem */
+function recusar(mensagem) {
+  console.error(`${mensagem}\n${USO}`);
+  process.exit(2);
 }
 
 /**
@@ -48,13 +40,20 @@ export async function gerarGabarito(diretorio, alvo) {
   const manifesto = await lerManifesto(diretorio);
   const pagina = manifesto.normas.find((n) => n.id === alvo.id);
   if (!pagina) throw new Error(`${alvo.id}: fora do manifesto`);
-  const ler = (/** @type {string} */ nome) => readFile(join(diretorio, nome), 'utf8');
+  /** Hash dos bytes de cada colado lido: amarra o gabarito a eles (`verificarDerivados`). */
+  /** @type {Record<string, string>} */
+  const sha256 = {};
+  const ler = async (/** @type {string} */ nome) => {
+    const bytes = await readFile(join(diretorio, nome));
+    sha256[nome] = sha256Hex(bytes);
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  };
   return montarGabarito(alvo, pagina, {
     paginaBruta: decodificar(await readFile(join(diretorio, pagina.arquivo)), pagina.charset),
     coladoHtml: await ler(`${alvo.id}.colado.html`),
     coladoTexto: await ler(`${alvo.id}.colado.txt`),
-    compiladoHtml: await ler(`${alvo.compilado}.colado.html`),
-    compilado: alvo.compilado,
+    ...(alvo.compilado ? { compiladoHtml: await ler(`${alvo.compilado}.colado.html`) } : {}),
+    sha256,
   });
 }
 
@@ -69,10 +68,11 @@ async function existe(caminho) {
 }
 
 async function principal() {
-  const pedidos = lerArgumentos(process.argv.slice(2));
+  const { so: pedidos, problema } = lerOpcoes(process.argv.slice(2), {
+    ids: GABARITOS.map((g) => g.id),
+  });
+  if (problema) recusar(problema);
   const alvos = GABARITOS.filter((g) => !pedidos || pedidos.includes(g.id));
-  if (pedidos && alvos.length !== pedidos.length)
-    throw new Error(`Sem gabarito: ${pedidos.join(', ')}`);
   await mkdir(CONFERENCIAS, { recursive: true });
   let falhou = false;
   for (const alvo of alvos) {
@@ -97,10 +97,26 @@ async function principal() {
       anterior = null;
     }
     const { gabarito, mudou } = preservarConferencia(anterior, novo);
-    await writeFile(arquivo, serializarGabarito(gabarito));
     const titulo = NORMAS.find((n) => n.id === alvo.id)?.titulo ?? alvo.id;
     const folha = join(CONFERENCIAS, `gabarito-${alvo.id}.md`);
-    // A folha pode ter as marcas do Gabriel: só é regravada quando o gabarito muda.
+    // A folha pode ter as marcas do Gabriel: só é regravada quando o gabarito muda, e nunca por
+    // cima de marcas que ainda não foram passadas para o JSON.
+    if (mudou && (await existe(folha))) {
+      const atual = await readFile(folha, 'utf8');
+      const intocada = anterior
+        ? atual ===
+          folhaDeConferencia(/** @type {ReturnType<typeof montarGabarito>} */ (anterior), titulo)
+        : !/^- \[x\]/im.test(atual);
+      if (!intocada) {
+        falhou = true;
+        console.error(
+          `✗ ${alvo.id}: o gabarito mudou e ${folha} tem marcas ou notas. Passe o resultado para ` +
+            `a "conferencia" do JSON, guarde a folha com outro nome (ou apague-a) e rode de novo.`,
+        );
+        continue;
+      }
+    }
+    await writeFile(arquivo, serializarGabarito(gabarito));
     if (mudou || !(await existe(folha)))
       await writeFile(folha, folhaDeConferencia(gabarito, titulo));
     const c = gabarito.contagens;

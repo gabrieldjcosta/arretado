@@ -69,7 +69,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
 ### A revisão da etapa acha o que os testes não pegaram
-- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
+- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc; no fim da etapa 7, 10 achados, 6 deles confirmados no corpus, corrigidos no commit `fix(legislacao)` depois do da 7.3). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
 - **Solução:** correções num commit `fix(...)` próprio. **Prevenção:** manter o hábito ao fim de cada bloco (rotina do plano, passo 6) e registrar aqui cada classe de defeito.
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
@@ -359,7 +359,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Gabarito que só repete o estruturador
 - **Sintoma:** a regressão da 8.9 passa, mas a lei sai errada no leitor. **Causa:** gabarito gerado pela mesma lógica (ou pelas mesmas suposições) que o estruturador vai usar: os dois erram juntos.
 - **Solução:** o gabarito sai de `scripts/corpus/gabarito.mjs` (jsdom sobre o colado, linha a linha; sem o `extrair_lei.js`, decisão de 23/09/2026), cruzado com a página compilada, as âncoras `name="art…"`, o texto puro colado e o último artigo conhecido. Divergência sem regra vira pendência e só sai com decisão e motivo em `DECISOES`. A amostra de 50 por lei é conferida pelo Gabriel (`docs/conferencias/gabarito-<id>.md`). **O estruturador (etapa 8) não importa nem copia esse arquivo**: se os dois divergirem, examinar o caso, sem igualar um ao outro. **Prevenção:** `scripts/corpus-gabarito.test.ts` (gabarito reproduzível e sem pendência); `conferencia` no JSON; `origemSha256Conteudo` amarra o gabarito à página (`verificarDerivados`).
-- **Origem:** previsto na 7.3; prevenido em 23/09/2026 (branch `claude/proxima-atividade-f2-2il48c`).
+- **Origem:** previsto na 7.3; prevenido em 23/09/2026 (branch `claude/proxima-atividade-f2-2il48c`; as outras 3 normas no branch `claude/proxima-atividade-f2-ezll0b`).
 
 ### `npm test` acusa "gabarito desatualizado" ou `npm run corpus:gabarito` sai com pendência
 - **Sintoma:** o teste de `scripts/corpus-gabarito.test.ts` falha em "gabarito desatualizado — rode npm run corpus:gabarito"; ou o comando lista "✗ cp: N pendência(s) — explicar em DECISOES". **Causa:** mudou a regra do gabarito, o colado ou a página; ou um sinal novo discorda do inventário.
@@ -407,9 +407,49 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** previsto — atividade 8.3.
 
 ### Anexo ou ADCT viram artigos duplicados
-- **Sintoma:** validação acusa `art1` duplicado; linhas de tabela estruturadas como incisos. **Causa:** o ADCT recomeça a numeração no art. 1º dentro da mesma página da CF/88; bloco depois de "ANEXO" tratado como texto normativo.
-- **Solução:** ADCT como nó próprio que prefixa o endereço; anexo como dispositivo `anexo` com texto bruto, sem estruturar (regra 11). **Prevenção:** "endereços únicos" (8.4) e validação estrutural (8.7) com a CF do corpus; teste de anexo na 8.7.
-- **Origem:** previsto — atividades 8.4 e 8.7.
+- **Sintoma:** validação acusa `art1` duplicado; linhas de tabela estruturadas como incisos. No gabarito, antes do prefixo: 236 "duplicatas" na CF e 35 na LC-SP 988, e a sequência de artigos "voltava" do 250 ao 1. **Causa:** o ADCT recomeça a numeração no art. 1º dentro da mesma página da CF/88; a LC-SP 988 faz o mesmo nas disposições transitórias (Título VIII, "Artigo 1°" a "21"); bloco depois de "ANEXO" tratado como texto normativo.
+- **Solução:** bloco com numeração própria que prefixa o endereço (`adct.art1`, `dt.art1`; o gabarito usa `Bloco` em `GABARITOS`); anexo como dispositivo `anexo` com texto bruto, sem estruturar (regra 11). **Prevenção:** `conferirSequencia` por bloco e testes em `scripts/corpus-gabarito.test.ts`; no estruturador, "endereços únicos" (8.4) e validação estrutural (8.7) com a CF e a LC-SP 988 do corpus; a `ordem` também precisa distinguir os blocos (8.3–8.4).
+- **Origem:** ocorrido no gabarito em 23/09/2026 (7.3, 2ª sessão, branch `claude/proxima-atividade-f2-ezll0b`); previsto para o estruturador nas atividades 8.4 e 8.7.
+
+### Nota da ALESP vira rubrica, ou "(NR)" fica no texto
+- **Sintoma:** dezenas de dispositivos com um "nome" que é nota ("Inciso IX com redação dada pela…"); texto terminando em "(NR)"; "1 - Defensor…" sem virar item. **Causa:** a ALESP põe a nota em linha própria, depois do que anota, começando por "- " (171 linhas; tachada quando é de uma redação antiga), marca o texto alterado com "(NR)" (139) e escreve o item com hífen (45). Nada disso existe no Planalto.
+- **Solução:** linha de nota vai para o último dispositivo ou nó (`NoEstrutural.notas`); tachada, continua a redação anterior; "(NR)" é nota; item aceita "1 -". **Prevenção:** teste "nota em linha própria da ALESP…" em `scripts/corpus-gabarito.test.ts`; os mesmos casos entram nos testes da 8.5 e 8.6 (regra 7).
+- **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão, gabarito da LC-SP 988: 93 falsos nomes antes da regra).
+
+### Rótulo novo ao lado do antigo tachado, ou pedaço do rótulo fora do tachado
+- **Sintoma:** "XI - outras previstas em lei." vira rubrica; "Parágrafo único" fica com o texto do § 1º; "III (Revogado pela…)" sai como inciso vigente e vazio. **Causa:** a ALESP renumera tachando só o rótulo antigo ("~~X~~ XI -", "~~Parágrafo único~~ § 1° -"); na CF, o tachado às vezes começa depois do numeral ("III ~~- classistas…~~", "c~~) os nascidos…~~", "A~~rt. 76.~~").
+- **Solução:** vale o rótulo de fora do tachado (caso `rotulo-renumerado`); o que sobra fora do tachado e cabe no rótulo conta como rótulo. **Prevenção:** teste "pedaço do rótulo fora do tachado, rótulo renumerado e anexo"; na 8.6, a regra 10 (renumeração) com esses casos.
+- **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão).
+
+### Inciso sem hífen vira rubrica, ou rubrica com capitular vira inciso
+- **Sintoma:** na CF, "I receber as reclamações…" e "IV as ilhas fluviais…" viravam o nome do dispositivo seguinte (17 falsos nomes); ao aceitar o inciso sem hífen, "I ncidência em interdição de direito" (rubrica tachada do CP de 1940) virou inciso. **Causa:** a CF escreve 49 incisos sem o hífen da regra 6; a capitular separa a primeira letra da palavra.
+- **Solução:** inciso sem hífen só antes de texto em minúscula e se a linha termina como inciso (";", ":" ou "."); com sufixo, o separador pode faltar ("I-A o Conselho"). **Prevenção:** casos em `rotulo` no `scripts/corpus-gabarito.test.ts`; os mesmos na 8.3 (regra 6).
+- **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão).
+
+### "Vigência" no fim do texto, ou nome de capítulo como rubrica do artigo
+- **Sintoma:** texto vigente ou rubrica terminando em "Vigência" (LEP, art. 9º-A, § 5º; CP, rubrica do art. 171-A); "CAPÍTULO II-B" com nome "B" e o nome verdadeiro na rubrica do art. 337-E; "Incluído pela Lei nº 13.445, de 2017 Vigência" no texto do art. 232-A do CP. **Causa:** o Planalto põe "Vigência" como link sem parênteses depois da nota (21 na CF, 7 na LEP, 18 no CP); numeral estrutural com sufixo ("I-A", "V-A"); nota sem parênteses no CP.
+- **Solução:** "Vigência" logo depois de outra nota é nota; numeral estrutural aceita "-A"; nota sem parênteses só no fim, com a chave em maiúscula, "pela Lei…" e o ano. Os gabaritos da LEP e do CP foram corrigidos (32 dispositivos; amostras regeradas, ainda sem conferência). **Prevenção:** testes de `separarNotas` e `rotulo`; varredura de sobras (texto com "Vigência", "(NR)" ou nota) antes de gravar gabarito novo.
+- **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão; os três já estavam no gabarito da 1ª sessão).
+
+### Texto cortado, nome do nó pela metade ou rubrica perdida no gabarito
+- **Sintoma:** o fim de uma frase some (LC-SP 988, art. 159: "…bem como os concedidos" sem "aos advogados em geral."); nome do Título XII do CP salvo como "DOS CRIMES CONTRA O ESTADO"; rubrica antes de um parágrafo tachado não chega ao vigente seguinte; inciso revogado sob um parágrafo que só existe tachado vira dispositivo (CP, art. 187; CF, art. 115). **Causa:** a fonte quebra um parágrafo ou um nome em duas linhas; a linha tachada "capturava" a rubrica; o endereço do filho segue o pai tachado.
+- **Solução:** linha em minúscula depois de texto sem ponto final continua o dispositivo (`linha-continuada`); caixa alta logo depois do nome em caixa alta continua o nome; só artigo tachado captura rubrica; revogado sem pai vai para o ancestral (`revogado-sem-pai`) e vigente sem pai é pendência (`sem-pai`). **Prevenção:** testes "correções da revisão da etapa 7" em `scripts/corpus-gabarito.test.ts`; o estruturador precisa dos mesmos casos (8.3–8.6).
+- **Origem:** ocorrido em 23/09/2026 (`/code-review` do fim da etapa 7).
+
+### Folha de conferência regravada por cima das marcas, ou gabarito "íntegro" sobre colado velho
+- **Sintoma:** marcas `[x]` da folha somem depois de `npm run corpus:gabarito`; `npm run corpus -- --verificar` diz "corpus íntegro" com um gabarito feito sobre um colado anterior; o link da folha abre o começo da página. **Causa:** a folha era regravada sempre que o gabarito mudava; o gabarito só guardava o hash da página; o link usava a âncora em minúsculas (`#art216a`), e o fragmento diferencia maiúsculas (`name="art216A"`).
+- **Solução:** o comando não regrava folha que difere da gerada pelo gabarito anterior (sai com ✗: passar as marcas para a `conferencia`, guardar a folha com outro nome e rodar de novo); conferência desfeita guarda as observações; `origemSha256Colados` amarra o gabarito aos bytes dos colados (`verificarDerivados`); o link usa o nome como está na página. **Prevenção:** testes de `verificarDerivados` e de `preservarConferencia`.
+- **Origem:** ocorrido em 23/09/2026 (`/code-review` do fim da etapa 7).
+
+### Regressão da 8.9 reprova por forma, não por conteúdo
+- **Sintoma:** a comparação estruturador × gabarito acusa diferença em dispositivos certos. **Causa:** o endereço do gabarito é proposto (`parUnico`, `alB`, `adct.`, `dt.`), e a 8.4 pode decidir outro; o texto do gabarito guarda o que a página mostra fora do tachado (CF, art. 100, § 11: ", ,"; ordinais "1o" × "1º").
+- **Solução:** `compararComGabarito` traduz o endereço, se a 8.4 escolher outro, e compara o texto com `paraComparar` (tolerante a ordinal, aspas, travessão e pontuação). **Prevenção:** teste da 8.9 com um dispositivo de cada forma (bloco, parágrafo único, alínea, sufixo).
+- **Origem:** previsto — atividades 8.4 e 8.9.
+
+### Gabarito cheio de pendências numa página sem âncoras, ou decisão que não explica mais nada
+- **Sintoma:** `npm run corpus:gabarito` lista 249 `artigo-sem-ancora` na LC-SP 988; ou lista `decisao-sem-uso`. **Causa:** a ALESP não tem âncoras nem compilada; uma regra nova passou a cobrir o caso que a decisão explicava (CP, art. 129, § 2º, III: a compilada sem hífen virou inciso).
+- **Solução:** página sem nenhuma âncora `art…` não entra no cruzamento, e `sinais` registra o que foi cruzado (a folha avisa); apagar a decisão velha de `DECISOES`. **Prevenção:** `montarGabarito` acusa `decisao-sem-uso`; teste "âncoras por bloco…".
+- **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão).
 
 ### Renumerado perde o vínculo, ou VETADO vira texto normal
 - **Sintoma:** marcação ou erro de estudo ligados ao endereço antigo ficam soltos; "(VETADO)" aparece como texto vigente, ou a numeração salta sem explicação. **Causa:** notas "Renumerado…" ("do parágrafo único", "do inciso VI" ou só "pela Lei/Emenda…"; 19 na CF, 3 no CP, 3 na LEP, 1 na LC 80); dispositivos vetados só com a palavra (18 no CP, 22 na LEP, 28 na LC 80).

@@ -8,6 +8,7 @@ import {
   decodificar,
   ehDerivado,
   lerManifesto,
+  sha256Hex,
   verificarCorpus,
 } from './corpus/normas.mjs';
 import {
@@ -224,14 +225,47 @@ describe('verificarDerivados: amarração à página de origem', () => {
     }
   });
 
-  it('gabarito da versão atual passa', async () => {
+  it('gabarito da versão atual e dos colados atuais passa', async () => {
     const pasta = await pastaComColado(await origemAtual());
     try {
       await writeFile(
         path.join(pasta, 'lep.gabarito.json'),
-        JSON.stringify({ origemSha256Conteudo: await origemAtual() }),
+        JSON.stringify({
+          origemSha256Conteudo: await origemAtual(),
+          origemSha256Colados: { 'lep.colado.html': sha256Hex(html) },
+        }),
       );
       expect(daLep(await verificarDerivados(pasta))).toEqual([]);
+    } finally {
+      await rm(pasta, { recursive: true, force: true });
+    }
+  });
+
+  it('gabarito feito sobre outro colado, ou sem o hash dos colados, é acusado', async () => {
+    const pasta = await pastaComColado(await origemAtual());
+    try {
+      const origem = await origemAtual();
+      await writeFile(
+        path.join(pasta, 'lep.gabarito.json'),
+        JSON.stringify({
+          origemSha256Conteudo: origem,
+          origemSha256Colados: {
+            'lep.colado.html': '0'.repeat(64),
+            'lep-compilado.colado.html': sha256Hex(html),
+          },
+        }),
+      );
+      expect(daLep(await verificarDerivados(pasta))).toEqual([
+        'lep.gabarito.json: feito sobre outro lep.colado.html — rode npm run corpus:gabarito',
+        'lep.gabarito.json: feito sobre outro lep-compilado.colado.html — rode npm run corpus:gabarito',
+      ]);
+      await writeFile(
+        path.join(pasta, 'lep.gabarito.json'),
+        JSON.stringify({ origemSha256Conteudo: origem }),
+      );
+      expect(daLep(await verificarDerivados(pasta))).toEqual([
+        'lep.gabarito.json: sem origemSha256Colados — rode npm run corpus:gabarito',
+      ]);
     } finally {
       await rm(pasta, { recursive: true, force: true });
     }
