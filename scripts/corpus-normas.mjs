@@ -1,10 +1,12 @@
 // Baixa o corpus de normas para os testes do estruturador (F2, atividade 7.1).
 //
 //   npm run corpus                  baixa tudo; só regrava o que mudou na fonte, repara arquivo
-//                                   danificado e tira do manifesto o que saiu do catálogo
+//                                   danificado e tira do manifesto o que saiu do catálogo (com
+//                                   o colado); colados e gabaritos registrados ficam
 //   npm run corpus -- --so lep,cp   só as normas indicadas (também --so=lep,cp)
 //   npm run corpus -- --verificar   sem rede: confere arquivos × manifesto (o npm test também faz)
 //
+// Página que mudou deixa o colado dela desatualizado: recapturar com npm run corpus:colar.
 // Uma requisição por vez, com pausa entre elas: são poucas páginas, baixadas raramente.
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -14,6 +16,7 @@ import {
   NOME_MANIFESTO,
   USER_AGENT,
   arquivoConfere,
+  arquivosParaApagar,
   atualizarEntrada,
   conferirConteudo,
   detectarCharset,
@@ -131,6 +134,12 @@ async function baixarCorpus(so) {
       const kb = Math.round(bytes.length / 1024);
       const sinal = mudou ? '↻' : reparo ? '⚒' : '=';
       console.log(`${sinal} ${norma.id}: ${String(kb)} KB, ${charset} (${origem})`);
+      const colado = manifesto.colados?.find((c) => c.id === norma.id);
+      if (colado && colado.sha256ConteudoOrigem !== entrada.sha256Conteudo) {
+        console.log(
+          `  colado de ${norma.id} desatualizado: rode npm run corpus:colar -- --so ${norma.id}`,
+        );
+      }
     } catch (excecao) {
       falhas += 1;
       console.error(
@@ -148,12 +157,15 @@ async function baixarCorpus(so) {
         console.log(`− ${id}: saiu do catálogo`);
       }
     }
-    const referenciados = new Set([...porId.values()].map((e) => e.arquivo));
-    for (const nome of await readdir(DIRETORIO)) {
-      if (nome.endsWith('.html') && !referenciados.has(nome)) {
-        await rm(join(DIRETORIO, nome));
-        console.log(`− ${nome}: arquivo sem entrada no manifesto, apagado`);
-      }
+    const colados = (manifesto.colados ?? []).filter((c) => conhecidos.has(c.id));
+    if (colados.length !== (manifesto.colados ?? []).length) {
+      manifesto.colados = colados;
+      alteracoes += 1;
+    }
+    const restante = { ...manifesto, normas: [...porId.values()] };
+    for (const nome of arquivosParaApagar(await readdir(DIRETORIO), restante)) {
+      await rm(join(DIRETORIO, nome));
+      console.log(`− ${nome}: arquivo sem entrada no manifesto, apagado`);
     }
   }
   if (alteracoes > 0) {

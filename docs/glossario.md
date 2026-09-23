@@ -240,7 +240,8 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Termo | O que é | Identificador | Situação | Ativ. |
 |---|---|---|---|---|
 | Corpus | páginas oficiais byte a byte, para teste | `corpus/normas/<id>.html` + `manifesto.json` (`id`, `papel`: `portao`, `apoio`, `estresse`; `variante`: `todas-as-redacoes`, `compilado`; `charset`, `sha256`, `sha256Conteudo`, `obtidoEm`); `npm run corpus` (`scripts/corpus-normas.mjs`, lista em `scripts/corpus/normas.mjs`) | existe | 7.1 |
-| Página colada, gabarito | HTML da área de transferência do Chromium; contagens, revogados, redações e amostra conferida | `corpus/normas/<id>.colado.html`; `corpus/normas/<id>.gabarito.json` | plano | 7.2, 7.3 |
+| Colado (página colada) | o que o evento `paste` entrega depois de selecionar tudo e copiar a página no Chromium: `text/html` e `text/plain`, em UTF-8 | `corpus/normas/<id>.colado.html` e `<id>.colado.txt`; no manifesto, `colados[]` (`EntradaColado`: `id`, `sha256ConteudoOrigem`, `navegador`, `plataforma`, `capturadoEm`, `html`/`texto` com `arquivo`, `bytes`, `sha256`); `npm run corpus:colar` (`scripts/corpus-colar.mjs`); `conferirColado`, `atualizarColado`, `LIMIAR_COMPLETUDE`, `arquivosForaDoManifesto`, `arquivosParaApagar` | existe | 7.2 |
+| Gabarito | contagens, revogados, redações e amostra conferida | `corpus/normas/<id>.gabarito.json` (`nomeGabarito`; o nome já é reconhecido pela verificação) | plano | 7.3 |
 | Entrada sanitizada | saída do sanitizador | `sanitizarHtml` → `ResultadoSanitizacao { blocos, linksDescartados }`; `textoParaBlocos`; `Bloco { trechos }`; `LIMITE_PADRAO` | existe | 8.x |
 | Normalização | regra 1 (º/o/°/ª, aspas, travessões, U+00AD, entidades, fim de linha) | `normalizar(texto)` | proposto | 8.1 |
 | Estruturador | blocos → árvore (`fatiarLei` na Parte 2) | `estruturar(blocos)` em `src/dominios/legislacao/` | proposto | 8.1–8.8 |

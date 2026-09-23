@@ -1,14 +1,19 @@
 // @vitest-environment node
 import path from 'node:path';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import {
   LIMIAR_TACHADOS,
   NORMAS,
+  arquivosForaDoManifesto,
+  arquivosParaApagar,
+  atualizarColado,
   atualizarEntrada,
+  conferirColado,
   conferirConteudo,
   contarTachados,
   detectarCharset,
+  lerManifesto,
   manifestoVazio,
   serializarManifesto,
   sha256Conteudo,
@@ -25,6 +30,20 @@ describe('corpus de normas: integridade (sem rede)', () => {
   it('toda norma do catálogo está no disco com o tamanho, o hash e o conteúdo do manifesto', async () => {
     // Pega também conversão de fim de linha pelo git (ver .gitattributes).
     expect(await verificarCorpus(DIRETORIO)).toEqual([]);
+  });
+
+  it('cada página tem o seu colar no Chromium, amarrado à versão atual dela (7.2)', async () => {
+    const manifesto = await lerManifesto(DIRETORIO);
+    const pagina = new Map(manifesto.normas.map((e) => [e.id, e.sha256Conteudo]));
+    const colados = manifesto.colados ?? [];
+    expect(colados.map((c) => c.id)).toEqual(NORMAS.map((n) => n.id));
+    for (const c of colados) {
+      expect(c.sha256ConteudoOrigem).toBe(pagina.get(c.id));
+      expect([c.html.arquivo, c.texto.arquivo]).toEqual([
+        `${c.id}.colado.html`,
+        `${c.id}.colado.txt`,
+      ]);
+    }
   });
 
   it('o catálogo tem as duas normas do portão da F2, com as redações anteriores', () => {
@@ -186,11 +205,195 @@ describe('serializarManifesto', () => {
     });
     const texto = serializarManifesto({
       ...manifestoVazio(),
+      descricao: 'antiga',
       normas: [entrada('cf'), entrada('lep')],
+      colados: [colado('cf'), colado('lep')],
     });
     expect(texto.endsWith('}\n')).toBe(true);
-    const ids = (JSON.parse(texto) as { normas: { id: string }[] }).normas.map((n) => n.id);
-    expect(ids).toEqual(['lep', 'cf']);
+    const lido = JSON.parse(texto) as {
+      descricao: string;
+      normas: { id: string }[];
+      colados: { id: string }[];
+    };
+    expect(lido.normas.map((n) => n.id)).toEqual(['lep', 'cf']);
+    expect(lido.colados.map((n) => n.id)).toEqual(['lep', 'cf']);
+    expect(lido.descricao).toBe(manifestoVazio().descricao);
+  });
+});
+
+/** Entrada de colado mínima para os testes, sem e com a data da captura. */
+function capturaDe(id: string, sha = '0') {
+  return {
+    id,
+    sha256ConteudoOrigem: sha.repeat(64),
+    navegador: 'chromium 141.0.7390.37',
+    plataforma: 'linux',
+    html: { arquivo: `${id}.colado.html`, bytes: 1, sha256: 'a'.repeat(64) },
+    texto: { arquivo: `${id}.colado.txt`, bytes: 1, sha256: 'b'.repeat(64) },
+  };
+}
+const colado = (id: string, sha = '0') => ({
+  ...capturaDe(id, sha),
+  capturadoEm: '2026-09-23T00:00:00.000Z',
+});
+
+describe('colar da página (7.2): conferirColado', () => {
+  const lep = NORMAS.find((n) => n.id === 'lep');
+  if (!lep) throw new Error('LEP fora do catálogo');
+  const corpo =
+    '<p>Institui a Lei de Execução Penal.</p><p>Art. 1º - A execução penal tem por objetivo</p>' +
+    '<p><strike>Art. 2º redação antiga</strike></p><p>Art. 2º redação nova</p>' +
+    '<p><span style="text-decoration: line-through">Art. 3º revogado</span></p>';
+  const pagina = `<html><head><script>var x = 1;</script></head><body>${corpo}</body></html>`;
+  const texto =
+    'Institui a Lei de Execução Penal.\nArt. 1º - A execução penal tem por objetivo\n' +
+    'Art. 2º redação antiga\nArt. 2º redação nova\nArt. 3º revogado';
+
+  it('colado inteiro, com os tachados e no charset certo: sem problemas', () => {
+    expect(conferirColado(lep, { html: corpo, texto }, pagina)).toEqual([]);
+  });
+
+  it('acusa tachado perdido no colar (o estruturador não acharia a redação anterior)', () => {
+    const semTachado = corpo.replace('<strike>', '<span>').replace('</strike>', '</span>');
+    expect(conferirColado(lep, { html: semTachado, texto }, pagina)).toEqual([
+      'lep (colado): 1 tachados, a página tem 2 — o colar perdeu redações anteriores',
+    ]);
+  });
+
+  it('acusa U+FFFD (página servida com o charset errado) e formato vazio', () => {
+    const problemas = conferirColado(
+      lep,
+      { html: corpo, texto: texto + ' Execu\uFFFD\uFFFDo' },
+      pagina,
+    );
+    expect(problemas).toEqual([
+      'lep (colado): caractere de substituição (U+FFFD) no texto — charset errado ao servir?',
+    ]);
+    expect(conferirColado(lep, { html: corpo, texto: '  ' }, pagina)).toEqual([
+      'lep (colado): texto vazio',
+    ]);
+  });
+
+  it('acusa seleção cortada: falta texto da página ou marcador', () => {
+    const metade = corpo.slice(0, corpo.indexOf('<p><strike>'));
+    const problemas = conferirColado(lep, { html: corpo, texto: 'Lei de Execução Penal' }, pagina);
+    expect(problemas).toContain('lep (colado): marcador "art. 1º" ausente do texto');
+    expect(problemas.some((p) => p.includes('do texto da página — seleção cortada?'))).toBe(true);
+    expect(
+      conferirColado(lep, { html: metade, texto }, pagina).some((p) =>
+        p.startsWith('lep (colado): o html tem só'),
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('colar da página (7.2): atualizarColado', () => {
+  const anterior = colado('lep', 'c');
+  const base = capturaDe('lep', 'c');
+
+  it('mesma origem e mesmos bytes: mantém a entrada (rodar de novo não gera diff)', () => {
+    expect(atualizarColado(anterior, { ...base, navegador: 'chromium 999' }, 'agora')).toEqual({
+      entrada: anterior,
+      mudou: false,
+    });
+  });
+
+  it('página nova ou captura diferente: nova entrada com a data de agora', () => {
+    const origemNova = atualizarColado(
+      anterior,
+      { ...base, sha256ConteudoOrigem: 'd'.repeat(64) },
+      'agora',
+    );
+    expect(origemNova.mudou).toBe(true);
+    expect(origemNova.entrada.capturadoEm).toBe('agora');
+    const htmlNovo = { ...base, html: { ...base.html, sha256: 'e'.repeat(64) } };
+    expect(atualizarColado(anterior, htmlNovo, 'agora').mudou).toBe(true);
+    expect(atualizarColado(undefined, base, 'agora').mudou).toBe(true);
+  });
+});
+
+describe('derivados na pasta do corpus (7.2)', () => {
+  const manifesto = {
+    ...manifestoVazio(),
+    normas: [
+      {
+        id: 'lep',
+        titulo: 'LEP',
+        papel: 'portao' as const,
+        variante: 'todas-as-redacoes' as const,
+        url: 'https://www.planalto.gov.br/ccivil_03/leis/l7210.htm',
+        urlFinal: 'https://www.planalto.gov.br/ccivil_03/leis/l7210.htm',
+        arquivo: 'lep.html',
+        charset: 'windows-1252',
+        origemCharset: 'padrao-windows-1252' as const,
+        bytes: 1,
+        sha256: '0'.repeat(64),
+        sha256Conteudo: '0'.repeat(64),
+        obtidoEm: '2026-09-23T00:00:00.000Z',
+      },
+    ],
+    colados: [colado('lep')],
+  };
+  const nomes = [
+    'manifesto.json',
+    'lep.html',
+    'lep.colado.html',
+    'lep.colado.txt',
+    'lep.gabarito.json',
+    'cp.gabarito.json',
+    'cp.colado.html',
+    'inventada.gabarito.json',
+    'sobra.html',
+    'notas.md',
+  ];
+
+  it('página, colado registrado e gabarito de norma do catálogo são reconhecidos', () => {
+    expect(arquivosForaDoManifesto(nomes, manifesto)).toEqual([
+      'cp.colado.html',
+      'inventada.gabarito.json',
+      'sobra.html',
+      'notas.md',
+    ]);
+  });
+
+  it('npm run corpus só apaga sobras .html/.txt: colados registrados e gabaritos ficam', () => {
+    expect(arquivosParaApagar(nomes, manifesto)).toEqual(['cp.colado.html', 'sobra.html']);
+  });
+
+  it('colado ausente ou de outra versão da página é acusado', async () => {
+    const pasta = await mkdtemp(path.join(tmpdir(), 'arretado-corpus-'));
+    try {
+      const real = await lerManifesto(DIRETORIO);
+      const pagina = real.normas.find((e) => e.id === 'lep');
+      const coladoReal = real.colados?.find((c) => c.id === 'lep');
+      if (!pagina || !coladoReal) throw new Error('LEP fora do manifesto');
+      for (const nome of [pagina.arquivo, coladoReal.html.arquivo, coladoReal.texto.arquivo]) {
+        await copyFile(path.join(DIRETORIO, nome), path.join(pasta, nome));
+      }
+      const gravar = (colados: (typeof coladoReal)[]) =>
+        writeFile(
+          path.join(pasta, 'manifesto.json'),
+          serializarManifesto({ ...manifestoVazio(), normas: [pagina], colados }),
+        );
+      const daLep = async () => (await verificarCorpus(pasta)).filter((p) => /^lep[ .:]/.test(p));
+
+      await gravar([coladoReal]);
+      expect(await daLep()).toEqual([]);
+
+      await gravar([{ ...coladoReal, sha256ConteudoOrigem: 'f'.repeat(64) }]);
+      expect(await daLep()).toEqual([
+        'lep: colado capturado de outra versão da página — rode npm run corpus:colar',
+      ]);
+
+      await gravar([]);
+      expect(await daLep()).toEqual([
+        'lep: sem colado — rode npm run corpus:colar',
+        'lep.colado.html: arquivo fora do manifesto — rode npm run corpus',
+        'lep.colado.txt: arquivo fora do manifesto — rode npm run corpus',
+      ]);
+    } finally {
+      await rm(pasta, { recursive: true, force: true });
+    }
   });
 });
 
