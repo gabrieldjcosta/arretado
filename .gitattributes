@@ -1,5 +1,7 @@
 * text=auto eol=lf
 
 # Corpus de normas: bytes exatos da fonte (fim de linha misto CRLF/LF; windows-1252 no Planalto);
-# o manifesto guarda o hash dos bytes.
+# o manifesto guarda o hash dos bytes. Os colados (*.colado.html, *.colado.txt) também têm o hash
+# no índice (colados.json) e ficam como a área de transferência os entregou.
 corpus/normas/*.html -text
+corpus/normas/*.colado.txt -text
