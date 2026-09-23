@@ -4,7 +4,8 @@
 //                                            docs/conferencias/gabarito-<id>.md)
 //   npm run corpus:gabarito -- --so lep      só as normas indicadas (também --so=lep,cp)
 //
-// Sem rede: lê o colado (7.2), o texto puro, a página bruta (âncoras) e a compilada. Mantém a
+// Sem rede: lê o colado (7.2), o texto puro, a página bruta (âncoras) e a compilada (se a norma
+// tiver uma no corpus). Mantém a
 // "conferencia" do gabarito anterior se nada mais mudou; se mudou, ela volta a "pendente" e o
 // Gabriel confere de novo. Pendência (divergência sem explicação) impede a gravação.
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -53,8 +54,7 @@ export async function gerarGabarito(diretorio, alvo) {
     paginaBruta: decodificar(await readFile(join(diretorio, pagina.arquivo)), pagina.charset),
     coladoHtml: await ler(`${alvo.id}.colado.html`),
     coladoTexto: await ler(`${alvo.id}.colado.txt`),
-    compiladoHtml: await ler(`${alvo.compilado}.colado.html`),
-    compilado: alvo.compilado,
+    ...(alvo.compilado ? { compiladoHtml: await ler(`${alvo.compilado}.colado.html`) } : {}),
   });
 }
 

@@ -13,7 +13,7 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 - Dispositivos: 736 (artigo 219, paragrafo 202, inciso 253, alinea 62)
 - Artigos: vigente 216, revogado 2, vetado 1; com letra (9º-A…): 15; último: art204
 - Redações anteriores: 86 em 75 dispositivos
-- Notas de vigência no texto vigente: 260
+- Notas de vigência no texto vigente: 267
 - Estrutura: titulo 9, capitulo 29, secao 27, subsecao 7
 
 ## Amostra (50 dispositivos)
@@ -31,8 +31,9 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - § 2o A autoridade policial, federal ou estadual, poderá requerer ao juiz competente, no caso de inquérito instaurado, o acesso ao banco de dados de identificação de perfil genético.
   - Nota: (Incluído pela Lei nº 12.654, de 2012)
 - [ ] **art9A.par5** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art9a)
-  - § 5º A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética. Vigência
+  - § 5º A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética.
   - Nota: (Redação dada pela Lei nº 15.295, de 2025)
+  - Nota: Vigência
   - Redação anterior (tachado): ~~§ 5º (VETADO).~~
   - Redação anterior (tachado): ~~§ 5º A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética ou de busca familiar. (Incluído pela Lei nº 13.964, de 2019) (Vigência)~~
 - [ ] **art18A.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art18a)

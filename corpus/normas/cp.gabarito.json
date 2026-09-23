@@ -9,6 +9,12 @@
     "pagina": "cp.html",
     "compilada": "cp-compilado.colado.html"
   },
+  "sinais": [
+    "compilada",
+    "ancoras",
+    "texto-puro",
+    "sequencia"
+  ],
   "conferencia": {
     "estado": "pendente",
     "por": null,
@@ -35,14 +41,14 @@
       "vetado": 3
     },
     "comSufixo": 73,
-    "notasVigencia": 1134,
-    "redacoesAnteriores": 881,
+    "notasVigencia": 1167,
+    "redacoesAnteriores": 882,
     "redacoesPorOrigem": {
-      "tachado": 765,
+      "tachado": 766,
       "revogacao": 115,
       "duplicata": 1
     },
-    "redacoesNoAncestral": 331,
+    "redacoesNoAncestral": 332,
     "dispositivosComRedacaoAnterior": 429,
     "nomes": 448,
     "estrutura": {
@@ -95,11 +101,6 @@
       "tipo": "so-na-pagina",
       "chave": "art121.par7.incIV",
       "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
-    },
-    {
-      "tipo": "so-na-pagina",
-      "chave": "art129.par2.incIII",
-      "explicacao": "decisão: a compilada escreve \"III perda…\" sem hífen (erro de digitação dela); a página tem o hífen"
     },
     {
       "tipo": "texto",
@@ -910,8 +911,8 @@
     },
     {
       "tipo": "capitulo",
-      "rotulo": "CAPÍTULO I-",
-      "nome": "A",
+      "rotulo": "CAPÍTULO I-A",
+      "nome": "DA EXPOSIÇÃO DA INTIMIDADE SEXUAL",
       "primeiroArtigo": "art216B"
     },
     {
@@ -1066,14 +1067,14 @@
     },
     {
       "tipo": "capitulo",
-      "rotulo": "CAPÍTULO II-",
-      "nome": "A",
+      "rotulo": "CAPÍTULO II-A",
+      "nome": "DOS CRIMES PRATICADOS POR PARTICULAR CONTRA A ADMINISTRAÇÃO PÚBLICA ESTRANGEIRA",
       "primeiroArtigo": "art337B"
     },
     {
       "tipo": "capitulo",
-      "rotulo": "CAPÍTULO II-",
-      "nome": "B",
+      "rotulo": "CAPÍTULO II-B",
+      "nome": "DOS CRIMES EM LICITAÇÕES E CONTRATOS ADMINISTRATIVOS",
       "primeiroArtigo": "art337E"
     },
     {
@@ -1393,16 +1394,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art121"
     },
     {
-      "endereco": "art129.par2.incIII",
-      "motivo": "divergência decidida",
-      "status": "vigente",
-      "rotulo": "III -",
-      "texto": "perda ou inutilização do membro, sentido ou função;",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129"
-    },
-    {
       "endereco": "art129.par3A",
       "motivo": "parágrafo com sufixo",
       "status": "vigente",
@@ -1416,11 +1407,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129"
     },
     {
-      "endereco": "art130.par2",
+      "endereco": "art130.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 2º -",
-      "texto": "Somente se procede mediante representação.",
+      "rotulo": "§ 1º -",
+      "texto": "Se é intenção do agente transmitir a moléstia:\nPena - reclusão, de um a quatro anos, e multa.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130"
@@ -1476,11 +1467,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148"
     },
     {
-      "endereco": "art158.par2",
+      "endereco": "art158.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 2º -",
-      "texto": "Aplica-se à extorsão praticada mediante violência o disposto no § 3º do artigo anterior. Vide Lei nº 8.072, de 25.7.90",
+      "rotulo": "§ 1º -",
+      "texto": "Se o crime é cometido por duas ou mais pessoas, ou com emprego de arma, aumenta-se a pena de um terço até metade.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158"
@@ -1504,15 +1495,18 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159"
     },
     {
-      "endereco": "art169",
+      "endereco": "art168A",
       "motivo": "com \"Pena\"",
       "status": "vigente",
-      "rotulo": "Art. 169 -",
-      "nome": "Apropriação de coisa havida por erro, caso fortuito ou força da natureza",
-      "texto": "Apropriar-se alguém de coisa alheia vinda ao seu poder por erro, caso fortuito ou força da natureza:\nPena - detenção, de um mês a um ano, ou multa.",
-      "notas": [],
+      "rotulo": "Art. 168-A.",
+      "nome": "Apropriação indébita previdenciária",
+      "texto": "Deixar de repassar à previdência social as contribuições recolhidas dos contribuintes, no prazo e forma legal ou convencional:\nPena - reclusão, de 2 (dois) a 5 (cinco) anos, e multa.",
+      "notas": [
+        "(Incluído pela Lei nº 9.983, de 2000)",
+        "(Incluído pela Lei nº 9.983, de 2000)"
+      ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168a"
     },
     {
       "endereco": "art169.parUnico.incII",
@@ -1631,11 +1625,13 @@
       "motivo": "artigo com sufixo",
       "status": "vigente",
       "rotulo": "Art. 171-A.",
-      "nome": "Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros Vigência",
-      "texto": "Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento. Vigência\nPena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa. Vigência",
+      "nome": "Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros",
+      "texto": "Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento.\nPena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa.",
       "notas": [
         "(Incluído pela Lei nº 14.478, de 2022)",
-        "(Incluído pela Lei nº 14.478, de 2022)"
+        "Vigência",
+        "(Incluído pela Lei nº 14.478, de 2022)",
+        "Vigência"
       ],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171a"
@@ -1705,6 +1701,20 @@
         }
       ],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art192"
+    },
+    {
+      "endereco": "art216A",
+      "motivo": "texto diferente na compilada",
+      "status": "vigente",
+      "rotulo": "Art. 216-A .",
+      "nome": "Assédio sexual",
+      "texto": "Constranger alguém com o intuito de obter vantagem ou favorecimento sexual, prevalecendo-se o agente da sua condição de superior hierárquico ou ascendência inerentes ao exercício de emprego, cargo ou função.\"\nPena - detenção, de 1 (um) a 2 (dois) anos.",
+      "notas": [
+        "(Incluído pela Lei nº 10.224, de 15 de 2001)",
+        "(Incluído pela Lei nº 10.224, de 15 de 2001)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a"
     },
     {
       "endereco": "art216A.parUnico",
@@ -1897,22 +1907,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art299"
     },
     {
-      "endereco": "art318",
+      "endereco": "art317.par2",
       "motivo": "com \"Pena\"",
       "status": "vigente",
-      "rotulo": "Art. 318 -",
-      "nome": "Facilitação de contrabando ou descaminho",
-      "texto": "Facilitar, com infração de dever funcional, a prática de contrabando ou descaminho (art. 334):\nPena - reclusão, de 3 (três) a 8 (oito) anos, e multa.",
-      "notas": [
-        "(Redação dada pela Lei nº 8.137, de 27.12.1990)"
-      ],
-      "redacoes": [
-        {
-          "texto": "Pena - reclusão, de dois a cinco anos, e multa, de um conto a dez contos de réis.",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art318"
+      "rotulo": "§ 2º -",
+      "texto": "Se o funcionário pratica, deixa de praticar ou retarda ato de ofício, com infração de dever funcional, cedendo a pedido ou influência de outrem:\nPena - detenção, de três meses a um ano, ou multa.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art317"
     },
     {
       "endereco": "art320",
@@ -1938,17 +1940,18 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337a"
     },
     {
-      "endereco": "art337D",
+      "endereco": "art337E",
       "motivo": "artigo com sufixo",
       "status": "vigente",
-      "rotulo": "Art. 337-D.",
-      "nome": "Funcionário público estrangeiro",
-      "texto": "Considera-se funcionário público estrangeiro, para os efeitos penais, quem, ainda que transitoriamente ou sem remuneração, exerce cargo, emprego ou função pública em entidades estatais ou em representações diplomáticas de país estrangeiro.",
+      "rotulo": "Art. 337-E.",
+      "nome": "Contratação direta ilegal",
+      "texto": "Admitir, possibilitar ou dar causa à contratação direta fora das hipóteses previstas em lei:\nPena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa.",
       "notas": [
-        "(Incluído pela Lei nº 10.467, de 11.6.2002)"
+        "(Incluído pela Lei nº 14.133, de 2021)",
+        "(Incluído pela Lei nº 14.133, de 2021)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337d"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337e"
     },
     {
       "endereco": "art337H",
@@ -1965,12 +1968,12 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h"
     },
     {
-      "endereco": "art359J",
+      "endereco": "art359K",
       "motivo": "artigo com sufixo",
       "status": "vigente",
-      "rotulo": "Art. 359-J.",
-      "nome": "Atentado à integridade nacional",
-      "texto": "Praticar violência ou grave ameaça com a finalidade de desmembrar parte do território nacional para constituir país independente:\nPena - reclusão, de 2 (dois) a 6 (seis) anos, além da pena correspondente à violência.",
+      "rotulo": "Art. 359-K.",
+      "nome": "Espionagem",
+      "texto": "Entregar a governo estrangeiro, a seus agentes, ou a organização criminosa estrangeira, em desacordo com determinação legal ou regulamentar, documento ou informação classificados como secretos ou ultrassecretos nos termos da lei, cuja revelação possa colocar em perigo a preservação da ordem constitucional ou a soberania nacional:\nPena - reclusão, de 3 (três) a 12 (doze) anos.",
       "notas": [
         "(Incluído pela Lei nº 14.197, de 2021)",
         "(Vigência)",
@@ -1978,7 +1981,7 @@
         "(Vigência)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359j"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359k"
     },
     {
       "endereco": "art361",
@@ -2227,7 +2230,7 @@
     {"endereco":"art77.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art77.par1","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art77.par2","status":"vigente","notas":1,"redacoes":2},
-    {"endereco":"art78","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art78","status":"vigente","notas":1,"redacoes":7},
     {"endereco":"art78.par1","status":"vigente","notas":1,"redacoes":2},
     {"endereco":"art78.par2","status":"vigente","notas":1,"redacoes":2},
     {"endereco":"art78.par2.alA","status":"vigente","notas":1,"redacoes":0},
@@ -2357,7 +2360,7 @@
     {"endereco":"art111.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art111.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art111.incIV","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art111.incV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art111.incV","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art112","status":"vigente","notas":1,"redacoes":3,"nome":true},
     {"endereco":"art112.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art112.incII","status":"vigente","notas":1,"redacoes":0},
@@ -2397,14 +2400,14 @@
     {"endereco":"art121.par2.incVII.alA","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art121.par2.incVII.alB","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art121.par2.incVIII","status":"vigente","notas":2,"redacoes":1},
-    {"endereco":"art121.par2.incIX","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art121.par2.incIX","status":"vigente","notas":2,"redacoes":0,"nome":true},
     {"endereco":"art121.par2.incX","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art121.par2A","status":"revogado","notas":1,"redacoes":1},
     {"endereco":"art121.par2A.incI","status":"revogado","notas":1,"redacoes":1},
     {"endereco":"art121.par2A.incII","status":"revogado","notas":1,"redacoes":1},
-    {"endereco":"art121.par2B","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art121.par2B.incI","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art121.par2B.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2B","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art121.par2B.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art121.par2B.incII","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art121.par2B.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art121.par2C","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art121.par2C.incI","status":"vigente","notas":1,"redacoes":0},
@@ -2533,7 +2536,7 @@
     {"endereco":"art141.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art141.incII","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art141.incIII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art141.incIV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art141.incIV","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art141.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art141.par2","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art141.par3","status":"vigente","notas":1,"redacoes":0},
@@ -2627,16 +2630,16 @@
     {"endereco":"art154","status":"vigente","notas":1,"redacoes":0,"nome":true},
     {"endereco":"art154.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art154A","status":"vigente","notas":2,"redacoes":1,"nome":true},
-    {"endereco":"art154A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par1","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art154A.par2","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art154A.par3","status":"vigente","notas":2,"redacoes":1},
-    {"endereco":"art154A.par4","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154A.par5","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154A.par5.incI","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154A.par5.incII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154A.par5.incIII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154A.par5.incIV","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art154B","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art154A.par3","status":"vigente","notas":3,"redacoes":1},
+    {"endereco":"art154A.par4","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154A.par5","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154A.par5.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154A.par5.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154A.par5.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154A.par5.incIV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art154B","status":"vigente","notas":2,"redacoes":0,"nome":true},
     {"endereco":"art155","status":"vigente","notas":1,"redacoes":1,"nome":true},
     {"endereco":"art155.par1","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art155.par2","status":"vigente","notas":0,"redacoes":0},
@@ -2757,7 +2760,7 @@
     {"endereco":"art171.par5.incII","status":"revogado","notas":1,"redacoes":1},
     {"endereco":"art171.par5.incIII","status":"revogado","notas":1,"redacoes":2},
     {"endereco":"art171.par5.incIV","status":"revogado","notas":1,"redacoes":1},
-    {"endereco":"art171A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art171A","status":"vigente","notas":4,"redacoes":0,"nome":true},
     {"endereco":"art172","status":"vigente","notas":2,"redacoes":2,"nome":true},
     {"endereco":"art172.parUnico","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art173","status":"vigente","notas":0,"redacoes":0,"nome":true},
@@ -2941,12 +2944,12 @@
     {"endereco":"art231A.par2.incIV","status":"revogado","notas":2,"redacoes":1},
     {"endereco":"art231A.par3","status":"revogado","notas":2,"redacoes":1},
     {"endereco":"art232","status":"revogado","notas":1,"redacoes":1},
-    {"endereco":"art232A","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art232A.par1","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art232A.par2","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art232A.par2.incI","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art232A.par2.incII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art232A.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art232A","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art232A.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art232A.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art232A.par2.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art232A.par2.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art232A.par3","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art233","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art234","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art234.par1","status":"vigente","notas":0,"redacoes":0},
@@ -3048,7 +3051,7 @@
     {"endereco":"art265","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art265.parUnico","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art266","status":"vigente","notas":1,"redacoes":2,"nome":true},
-    {"endereco":"art266.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art266.par1","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art266.par2","status":"vigente","notas":1,"redacoes":2},
     {"endereco":"art266.par2.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art266.par2.incII","status":"vigente","notas":1,"redacoes":0},
@@ -3170,7 +3173,7 @@
     {"endereco":"art297.par3.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art297.par4","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art298","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art298.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art298.parUnico","status":"vigente","notas":2,"redacoes":0,"nome":true},
     {"endereco":"art299","status":"vigente","notas":1,"redacoes":0,"nome":true},
     {"endereco":"art299.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art300","status":"vigente","notas":0,"redacoes":0,"nome":true},

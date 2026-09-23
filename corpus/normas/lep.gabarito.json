@@ -9,6 +9,12 @@
     "pagina": "lep.html",
     "compilada": "lep-compilado.colado.html"
   },
+  "sinais": [
+    "compilada",
+    "ancoras",
+    "texto-puro",
+    "sequencia"
+  ],
   "conferencia": {
     "estado": "pendente",
     "por": null,
@@ -35,7 +41,7 @@
       "vetado": 1
     },
     "comSufixo": 15,
-    "notasVigencia": 260,
+    "notasVigencia": 267,
     "redacoesAnteriores": 86,
     "redacoesPorOrigem": {
       "tachado": 73,
@@ -610,9 +616,10 @@
       "motivo": "várias redações anteriores",
       "status": "vigente",
       "rotulo": "§ 5º",
-      "texto": "A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética. Vigência",
+      "texto": "A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética.",
       "notas": [
-        "(Redação dada pela Lei nº 15.295, de 2025)"
+        "(Redação dada pela Lei nº 15.295, de 2025)",
+        "Vigência"
       ],
       "redacoes": [
         {
@@ -1203,18 +1210,18 @@
     {"endereco":"art9.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art9.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art9.incIII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art9A","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art9A","status":"vigente","notas":2,"redacoes":2},
     {"endereco":"art9A.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art9A.par1A","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art9A.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art9A.par3","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art9A.par4","status":"vigente","notas":2,"redacoes":0},
-    {"endereco":"art9A.par5","status":"vigente","notas":1,"redacoes":2},
-    {"endereco":"art9A.par6","status":"vigente","notas":1,"redacoes":2},
-    {"endereco":"art9A.par7","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art9A.par5","status":"vigente","notas":2,"redacoes":2},
+    {"endereco":"art9A.par6","status":"vigente","notas":2,"redacoes":2},
+    {"endereco":"art9A.par7","status":"vigente","notas":2,"redacoes":2},
     {"endereco":"art9A.par8","status":"vigente","notas":2,"redacoes":0},
-    {"endereco":"art9A.par9","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art9A.par10","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art9A.par9","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art9A.par10","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art10","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art10.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art11","status":"vigente","notas":1,"redacoes":0},
@@ -1812,7 +1819,7 @@
     {"endereco":"art151","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art151.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art152","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art152.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art152.parUnico","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art153","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art154","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art154.par1","status":"vigente","notas":0,"redacoes":0},

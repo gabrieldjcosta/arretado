@@ -12,8 +12,8 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 
 - Dispositivos: 1403 (artigo 434, paragrafo 491, inciso 400, alinea 78)
 - Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
-- Redações anteriores: 881 em 429 dispositivos
-- Notas de vigência no texto vigente: 1134
+- Redações anteriores: 882 em 429 dispositivos
+- Notas de vigência no texto vigente: 1167
 - Estrutura: parte 2, titulo 20, capitulo 59, secao 7
 
 ## Amostra (50 dispositivos)
@@ -81,14 +81,12 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - IV - (revogado)
   - Nota: (Revogado pela Lei nº 14.994, de 2024)
   - Redação anterior (revogacao): ~~IV - em descumprimento das medidas protetivas de urgência previstas nos incisos I , II e III do caput do art. 22 da Lei nº 11.340, de 7 de agosto de 2006 . (Incluído pela Lei nº 13.771, de 2018) (Revogado pela Lei nº 14.994, de 2024)~~
-- [ ] **art129.par2.incIII** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129)
-  - III - perda ou inutilização do membro, sentido ou função;
 - [ ] **art129.par3A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129)
   - § 3º-A. No crime previsto no § 3º deste artigo, se cometido no contexto da atuação ou para a consecução das condutas previstas no art. 2º da lei que institui o marco legal do combate ao crime organizado no Brasil: ⏎ Pena - reclusão, de 20 (vinte) a 40 (quarenta) anos.
   - Nota: (Incluído pela Lei nº 15.358, de 2026)
   - Nota: (Incluído pela Lei nº 15.358, de 2026)
-- [ ] **art130.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130)
-  - § 2º - Somente se procede mediante representação.
+- [ ] **art130.par1** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130)
+  - § 1º - Se é intenção do agente transmitir a moléstia: ⏎ Pena - reclusão, de um a quatro anos, e multa.
 - [ ] **art132.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132)
   - Parágrafo único. A pena é aumentada de um sexto a um terço se a exposição da vida ou da saúde de outrem a perigo decorre do transporte de pessoas para a prestação de serviços em estabelecimentos de qualquer natureza, em desacordo com as normas legais.
   - Nota: (Incluído pela Lei nº 9.777, de 1998)
@@ -101,16 +99,18 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
 - [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
   - III - se a privação da liberdade dura mais de 15 (quinze) dias.
-- [ ] **art158.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
-  - § 2º - Aplica-se à extorsão praticada mediante violência o disposto no § 3º do artigo anterior. Vide Lei nº 8.072, de 25.7.90
+- [ ] **art158.par1** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
+  - § 1º - Se o crime é cometido por duas ou mais pessoas, ou com emprego de arma, aumenta-se a pena de um terço até metade.
 - [ ] **art159.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159)
   - § 3º - Se resulta a morte: ⏎ Pena - reclusão, de vinte e quatro a trinta anos.
   - Nota: (Vide Lei nº 8.072, de 25.7.90)
   - Nota: (Redação dada pela Lei nº 8.072, de 25.7.1990)
   - Redação anterior (tachado): ~~Pena - reclusão, de vinte a trinta anos, e multa, de vinte contos a cinqüenta contos de réis.~~
-- [ ] **art169** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169)
-  - Nome: Apropriação de coisa havida por erro, caso fortuito ou força da natureza
-  - Art. 169 - Apropriar-se alguém de coisa alheia vinda ao seu poder por erro, caso fortuito ou força da natureza: ⏎ Pena - detenção, de um mês a um ano, ou multa.
+- [ ] **art168A** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168a)
+  - Nome: Apropriação indébita previdenciária
+  - Art. 168-A. Deixar de repassar à previdência social as contribuições recolhidas dos contribuintes, no prazo e forma legal ou convencional: ⏎ Pena - reclusão, de 2 (dois) a 5 (cinco) anos, e multa.
+  - Nota: (Incluído pela Lei nº 9.983, de 2000)
+  - Nota: (Incluído pela Lei nº 9.983, de 2000)
 - [ ] **art169.parUnico.incII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169)
   - Nome: Apropriação de coisa achada
   - II - quem acha coisa alheia perdida e dela se apropria, total ou parcialmente, deixando de restituí-la ao dono ou legítimo possuidor ou de entregá-la à autoridade competente, dentro no prazo de 15 (quinze) dias.
@@ -139,10 +139,12 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Nota: (Redação dada pela Lei nº 15.397, de 2026)
   - Redação anterior (revogacao): ~~IV - maior de 70 (setenta) anos de idade ou incapaz. (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
 - [ ] **art171A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171a)
-  - Nome: Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros Vigência
-  - Art. 171-A. Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento. Vigência ⏎ Pena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa. Vigência
+  - Nome: Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros
+  - Art. 171-A. Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento. ⏎ Pena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa.
   - Nota: (Incluído pela Lei nº 14.478, de 2022)
+  - Nota: Vigência
   - Nota: (Incluído pela Lei nº 14.478, de 2022)
+  - Nota: Vigência
 - [ ] **art180A** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art180a)
   - Nome: Receptação de animal
   - Art. 180-A. Adquirir, receber, transportar, conduzir, ocultar, ter em depósito ou vender, com a finalidade de produção ou de comercialização, semovente domesticável de produção, ainda que abatido ou dividido em partes, ou animal doméstico, que sabe ou deve saber ser produto de crime: ⏎ Pena – reclusão, de 3 (três) a 8 (oito) anos, e multa.
@@ -159,6 +161,11 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Redação anterior (tachado) [lida como art192.incIV]: ~~IV - vendendo, expondo à venda ou tendo em depósito:~~
   - Redação anterior (tachado) [lida como art192.incIV.alA]: ~~a) artigo ou produto revestido de marca abusivamente imitada ou reproduzida no todo ou em parte;~~
   - Redação anterior (tachado) [lida como art192.incIV.alB]: ~~b) artigo ou produto que tem marca de outrem e não é de fabricação deste: ⏎ Pena - detenção, de três meses a um ano, e multa, de um a quinze contos de réis.~~
+- [ ] **art216A** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a)
+  - Nome: Assédio sexual
+  - Art. 216-A . Constranger alguém com o intuito de obter vantagem ou favorecimento sexual, prevalecendo-se o agente da sua condição de superior hierárquico ou ascendência inerentes ao exercício de emprego, cargo ou função." ⏎ Pena - detenção, de 1 (um) a 2 (dois) anos.
+  - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
+  - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
 - [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a)
   - Parágrafo único. (vetado)
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
@@ -206,29 +213,27 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Redação anterior (tachado): ~~II - Utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente; (Redação dada pela Lei nº 4.451, de 1964)~~
 - [ ] **art299.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art299)
   - Parágrafo único - Se o agente é funcionário público, e comete o crime prevalecendo-se do cargo, ou se a falsificação ou alteração é de assentamento de registro civil, aumenta-se a pena de sexta parte.
-- [ ] **art318** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art318)
-  - Nome: Facilitação de contrabando ou descaminho
-  - Art. 318 - Facilitar, com infração de dever funcional, a prática de contrabando ou descaminho (art. 334): ⏎ Pena - reclusão, de 3 (três) a 8 (oito) anos, e multa.
-  - Nota: (Redação dada pela Lei nº 8.137, de 27.12.1990)
-  - Redação anterior (tachado): ~~Pena - reclusão, de dois a cinco anos, e multa, de um conto a dez contos de réis.~~
+- [ ] **art317.par2** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art317)
+  - § 2º - Se o funcionário pratica, deixa de praticar ou retarda ato de ofício, com infração de dever funcional, cedendo a pedido ou influência de outrem: ⏎ Pena - detenção, de três meses a um ano, ou multa.
 - [ ] **art320** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art320)
   - Nome: Condescendência criminosa
   - Art. 320 - Deixar o funcionário, por indulgência, de responsabilizar subordinado que cometeu infração no exercício do cargo ou, quando lhe falte competência, não levar o fato ao conhecimento da autoridade competente: ⏎ Pena - detenção, de quinze dias a um mês, ou multa.
 - [ ] **art337A.par2.incI** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337a)
   - I - (vetado)
   - Nota: (Incluído pela Lei nº 9.983, de 2000)
-- [ ] **art337D** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337d)
-  - Nome: Funcionário público estrangeiro
-  - Art. 337-D. Considera-se funcionário público estrangeiro, para os efeitos penais, quem, ainda que transitoriamente ou sem remuneração, exerce cargo, emprego ou função pública em entidades estatais ou em representações diplomáticas de país estrangeiro.
-  - Nota: (Incluído pela Lei nº 10.467, de 11.6.2002)
+- [ ] **art337E** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337e)
+  - Nome: Contratação direta ilegal
+  - Art. 337-E. Admitir, possibilitar ou dar causa à contratação direta fora das hipóteses previstas em lei: ⏎ Pena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa.
+  - Nota: (Incluído pela Lei nº 14.133, de 2021)
+  - Nota: (Incluído pela Lei nº 14.133, de 2021)
 - [ ] **art337H** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h)
   - Nome: Modificação ou pagamento irregular em contrato administrativo
   - Art. 337-H. Admitir, possibilitar ou dar causa a qualquer modificação ou vantagem, inclusive prorrogação contratual, em favor do contratado, durante a execução dos contratos celebrados com a Administração Pública, sem autorização em lei, no edital da licitação ou nos respectivos instrumentos contratuais, ou, ainda, pagar fatura com preterição da ordem cronológica de sua exigibilidade: ⏎ Pena - reclusão, de 4 (quatro) anos a 8 (oito) anos, e multa.
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
-- [ ] **art359J** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359j)
-  - Nome: Atentado à integridade nacional
-  - Art. 359-J. Praticar violência ou grave ameaça com a finalidade de desmembrar parte do território nacional para constituir país independente: ⏎ Pena - reclusão, de 2 (dois) a 6 (seis) anos, além da pena correspondente à violência.
+- [ ] **art359K** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359k)
+  - Nome: Espionagem
+  - Art. 359-K. Entregar a governo estrangeiro, a seus agentes, ou a organização criminosa estrangeira, em desacordo com determinação legal ou regulamentar, documento ou informação classificados como secretos ou ultrassecretos nos termos da lei, cuja revelação possa colocar em perigo a preservação da ordem constitucional ou a soberania nacional: ⏎ Pena - reclusão, de 3 (três) a 12 (doze) anos.
   - Nota: (Incluído pela Lei nº 14.197, de 2021)
   - Nota: (Vigência)
   - Nota: (Incluído pela Lei nº 14.197, de 2021)
@@ -264,4 +269,4 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 - `artigo-sem-ancora` **art248**: decisão: a âncora saiu como "art2248" (erro da fonte)
 - `artigo-sem-ancora` **art253**: decisão: a âncora saiu como "art2253" (erro da fonte)
 - `artigo-sem-ancora` **art287**: decisão: a âncora saiu como name="287", sem "art" (erro da fonte)
-- `so-na-pagina`: 63 detalhes de dispositivos revogados ou vetados que a compilada resume.
+- `so-na-pagina`: 62 detalhes de dispositivos revogados ou vetados que a compilada resume.
