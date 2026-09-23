@@ -1,4 +1,4 @@
-import Dexie, { cmp, type Collection, type IndexableType } from 'dexie';
+import Dexie, { cmp, type IndexableType } from 'dexie';
 import {
   eAppendOnly,
   ENTIDADES,
@@ -8,6 +8,7 @@ import {
   type OrigemRegistro,
   type RegistroDe,
 } from '../modelo';
+import { iguais } from '../util/json-canonico';
 import type { Alteracao, BancoArretado } from './banco';
 import type { Contexto } from './contexto';
 
@@ -194,6 +195,46 @@ export class Colecao<N extends NomeColecao> {
     });
   }
 
+  /**
+   * Grava registros completos como vieram (importação, restauração, carga sintética):
+   * valida cada um, exige que sejam do usuário atual, registra no log e emite um
+   * único `registro.lote` após a confirmação. Uso exclusivo do core.
+   */
+  async gravarLote(registros: readonly unknown[]): Promise<number> {
+    const validos = registros.map((r) => this.validar(r));
+    for (const r of validos) {
+      if (r.usuarioId !== this.ctx.usuarioId) {
+        throw new Error(`Registro de outro usuário em ${this.nome}: ${r.id}`);
+      }
+      this.ctx.relogio.observar(r.tsLogico);
+    }
+    if (validos.length === 0) return 0;
+    return this.escrever(async () => {
+      if (eAppendOnly(this.nome)) {
+        const existentes = await this.tabela.bulkGet(validos.map((r) => r.id));
+        existentes.forEach((e, i) => {
+          if (e && !iguais(e, validos[i])) {
+            throw new Error(`${this.nome} é append-only; registro ${e.id} não pode mudar.`);
+          }
+        });
+      }
+      await this.tabela.bulkPut(validos);
+      await this.db.alteracoes.bulkAdd(
+        validos.map((r) => ({
+          ts: this.ctx.relogio.tick(),
+          aparelhoId: this.ctx.aparelhoId,
+          usuarioId: this.ctx.usuarioId,
+          colecao: this.nome,
+          registroId: r.id,
+          operacao: 'gravar' as const,
+          dados: { ...r },
+        })),
+      );
+      this.aposConfirmar('registro.lote', { colecao: this.nome, quantidade: validos.length });
+      return validos.length;
+    });
+  }
+
   async obter(
     id: string,
     opcoes: { incluirExcluidos?: boolean } = {},
@@ -209,33 +250,17 @@ export class Colecao<N extends NomeColecao> {
     const limite = Math.min(Math.max(1, Math.floor(consulta.limite)), LIMITE_MAXIMO_PAGINA);
     const indice = consulta.indice ?? 'id';
     this.verificarIndice(indice);
-    const desc = consulta.ordem === 'desc';
     const cursor = consulta.cursor ? (JSON.parse(consulta.cursor) as Cursor) : null;
-
-    let de = consulta.de ?? Dexie.minKey;
-    let ate = consulta.ate ?? Dexie.maxKey;
-    if (cursor) {
-      if (desc) ate = cursor.k;
-      else de = cursor.k;
-    }
-    let colecao: Collection<RegistroDe<N>, string> = indice === 'id'
-      ? this.tabela.where(':id').between(de, ate, true, true)
-      : this.tabela.where(indice).between(de, ate, true, true);
-    if (desc) colecao = colecao.reverse();
-
     const usuarioId = this.ctx.usuarioId;
-    const chaveDe = (r: RegistroDe<N>): IndexableType => chaveNoIndice(r, indice);
-    colecao = colecao.filter((r) => {
-      if (cursor) {
-        const c = cmp(chaveDe(r), cursor.k);
-        if (c === 0 && (desc ? r.id >= cursor.id : r.id <= cursor.id)) return false;
-      }
-      if (r.usuarioId !== usuarioId) return false;
-      if (r.excluidoEm !== null && !consulta.incluirExcluidos) return false;
-      return consulta.filtro ? consulta.filtro(r) : true;
-    });
+    const aceitar = (r: RegistroDe<N>) =>
+      r.usuarioId === usuarioId &&
+      (r.excluidoEm === null || consulta.incluirExcluidos === true) &&
+      (consulta.filtro ? consulta.filtro(r) : true);
 
-    const itens = await colecao.limit(limite + 1).toArray();
+    const itens =
+      consulta.ordem === 'desc'
+        ? await this.lerDecrescente(indice, consulta, cursor, limite, aceitar)
+        : await this.lerCrescente(indice, consulta, cursor, limite, aceitar);
     const temMais = itens.length > limite;
     if (temMais) itens.pop();
     const ultimo = itens.at(-1);
@@ -243,32 +268,103 @@ export class Colecao<N extends NomeColecao> {
       itens,
       proximoCursor:
         temMais && ultimo
-          ? JSON.stringify({ k: chaveDe(ultimo), id: ultimo.id } satisfies Cursor)
+          ? JSON.stringify({ k: chaveNoIndice(ultimo, indice), id: ultimo.id } satisfies Cursor)
           : null,
     };
+  }
+
+  private onde(indice: string) {
+    return this.tabela.where(indice === 'id' ? ':id' : indice);
+  }
+
+  /**
+   * Ordem crescente em lotes (`getAll`, rápido em qualquer IndexedDB). Registros com a
+   * mesma chave de índice ficam em ordem de id; o resto de um grupo de mesma chave é
+   * lido pelas chaves primárias, o que garante avanço mesmo quando todas as chaves são iguais.
+   */
+  private async lerCrescente(
+    indice: string,
+    consulta: ConsultaPagina<N>,
+    cursor: Cursor | null,
+    limite: number,
+    aceitar: (r: RegistroDe<N>) => boolean,
+  ): Promise<RegistroDe<N>[]> {
+    const itens: RegistroDe<N>[] = [];
+    const cheio = () => itens.length > limite;
+    const lote = Math.max(limite + 1, 50);
+    let posicao = cursor;
+    let de: IndexableType = consulta.de ?? Dexie.minKey;
+    let incluirDe = true;
+    const ate: IndexableType = consulta.ate ?? Dexie.maxKey;
+
+    for (;;) {
+      if (posicao) {
+        const { k, id } = posicao;
+        const ids = (await this.onde(indice).equals(k).primaryKeys()).filter((x) => x > id);
+        for (let i = 0; i < ids.length && !cheio(); i += lote) {
+          const regs = await this.tabela.bulkGet(ids.slice(i, i + lote));
+          for (const r of regs) {
+            if (r && aceitar(r)) itens.push(r);
+            if (cheio()) break;
+          }
+        }
+        if (cheio()) break;
+        if (cmp(k, ate) >= 0) break;
+        de = k;
+        incluirDe = false;
+      }
+      const regs = await this.onde(indice).between(de, ate, incluirDe, true).limit(lote).toArray();
+      for (const r of regs) {
+        if (aceitar(r)) itens.push(r);
+        if (cheio()) break;
+      }
+      const ultimo = regs.at(-1);
+      if (cheio() || !ultimo || regs.length < lote) break;
+      posicao = { k: chaveNoIndice(ultimo, indice), id: ultimo.id };
+    }
+    return itens;
+  }
+
+  /** Ordem decrescente por cursor reverso do IndexedDB. */
+  private async lerDecrescente(
+    indice: string,
+    consulta: ConsultaPagina<N>,
+    cursor: Cursor | null,
+    limite: number,
+    aceitar: (r: RegistroDe<N>) => boolean,
+  ): Promise<RegistroDe<N>[]> {
+    const de = consulta.de ?? Dexie.minKey;
+    const ate = cursor ? cursor.k : (consulta.ate ?? Dexie.maxKey);
+    return this.onde(indice)
+      .between(de, ate, true, true)
+      .reverse()
+      .filter((r) => {
+        if (cursor && cmp(chaveNoIndice(r, indice), cursor.k) === 0 && r.id >= cursor.id) {
+          return false;
+        }
+        return aceitar(r);
+      })
+      .limit(limite + 1)
+      .toArray();
   }
 
   /** Contagem de registros ativos numa faixa de índice (para contadores discretos). */
   async contar(
     consulta: Pick<ConsultaPagina<N>, 'indice' | 'de' | 'ate' | 'filtro'> = {},
   ): Promise<number> {
-    const indice = consulta.indice ?? 'id';
-    this.verificarIndice(indice);
-    const de = consulta.de ?? Dexie.minKey;
-    const ate = consulta.ate ?? Dexie.maxKey;
-    const base =
-      indice === 'id'
-        ? this.tabela.where(':id').between(de, ate, true, true)
-        : this.tabela.where(indice).between(de, ate, true, true);
-    const usuarioId = this.ctx.usuarioId;
-    return base
-      .filter(
-        (r) =>
-          r.usuarioId === usuarioId &&
-          r.excluidoEm === null &&
-          (consulta.filtro ? consulta.filtro(r) : true),
-      )
-      .count();
+    // Percorre em páginas (leitura em lote), mais rápido que cursor com filtro.
+    let total = 0;
+    let cursor: string | null = null;
+    do {
+      const p: Pagina<RegistroDe<N>> = await this.listarPagina({
+        ...consulta,
+        limite: LIMITE_MAXIMO_PAGINA,
+        cursor,
+      });
+      total += p.itens.length;
+      cursor = p.proximoCursor;
+    } while (cursor);
+    return total;
   }
 
   private verificarIndice(indice: string) {

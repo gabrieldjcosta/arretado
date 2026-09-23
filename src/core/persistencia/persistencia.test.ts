@@ -311,3 +311,98 @@ describe('BancoArretado', () => {
     expect(new BancoArretado().name).toBe('arretado');
   });
 });
+
+describe('paginação em lotes', () => {
+  async function todas(
+    listar: (
+      cursor: string | null,
+    ) => Promise<{ itens: { id: string }[]; proximoCursor: string | null }>,
+  ) {
+    const vistos: string[] = [];
+    let cursor: string | null = null;
+    let paginas = 0;
+    do {
+      const p = await listar(cursor);
+      vistos.push(...p.itens.map((e) => e.id));
+      cursor = p.proximoCursor;
+      paginas += 1;
+      if (paginas > 1000) throw new Error('paginação não avança');
+    } while (cursor);
+    return vistos;
+  }
+
+  it('avança quando todas as chaves do índice são iguais e pula excluídos', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erros = repo.colecao('erros');
+    const ativos: string[] = [];
+    for (let i = 0; i < 130; i++) {
+      const e = await erros.criar({ ...ERRO, oQueFoi: `e${String(i)}` });
+      if (i % 3 === 0) await erros.excluir(e.id);
+      else ativos.push(e.id);
+    }
+    const u = repo.ctx.usuarioId;
+    for (const ordem of ['asc', 'desc'] as const) {
+      for (const limite of [1, 7, 60, 200]) {
+        const vistos = await todas((cursor) =>
+          erros.listarPagina({ indice: 'usuarioId', de: u, ate: u, ordem, limite, cursor }),
+        );
+        expect(vistos).toHaveLength(ativos.length);
+        expect(new Set(vistos)).toEqual(new Set(ativos));
+        expect(vistos).toEqual(ordem === 'asc' ? [...ativos].sort() : [...ativos].sort().reverse());
+      }
+    }
+  });
+
+  it('respeita a faixa e o filtro ao cruzar lotes', async () => {
+    const { repo } = await repositorioDeTeste();
+    const cartoes = repo.colecao('cartoes');
+    const base = {
+      frente: 'f',
+      verso: null,
+      origemTipo: 'manual' as const,
+      estado: 'ativo' as const,
+    };
+    for (let i = 0; i < 120; i++) {
+      await cartoes.criar({
+        ...base,
+        caixa: (i % 6) + 1,
+        proximaRevisao: `2026-10-${String((i % 28) + 1).padStart(2, '0')}`,
+      });
+    }
+    const u = repo.ctx.usuarioId;
+    const vistos: { proximaRevisao: string; caixa: number }[] = [];
+    let cursor: string | null = null;
+    do {
+      const p = await cartoes.listarPagina({
+        indice: '[usuarioId+estado+proximaRevisao]',
+        de: [u, 'ativo', '2026-10-05'],
+        ate: [u, 'ativo', '2026-10-20'],
+        filtro: (c) => c.caixa === 2,
+        limite: 3,
+        cursor,
+      });
+      vistos.push(...p.itens);
+      cursor = p.proximoCursor;
+    } while (cursor);
+    const esperado = Array.from({ length: 120 }, (_, i) => i).filter(
+      (i) => (i % 6) + 1 === 2 && (i % 28) + 1 >= 5 && (i % 28) + 1 <= 20,
+    );
+    expect(vistos).toHaveLength(esperado.length);
+    expect(vistos.every((c) => c.caixa === 2)).toBe(true);
+    const datas = vistos.map((c) => c.proximaRevisao);
+    expect(datas).toEqual([...datas].sort());
+  });
+});
+
+describe('contar', () => {
+  it('conta só ativos do usuário na faixa, com filtro', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erros = repo.colecao('erros');
+    for (let i = 0; i < 450; i++) {
+      const e = await erros.criar({ ...ERRO, causa: i % 2 === 0 ? 'lacuna' : 'leitura' });
+      if (i % 5 === 0) await erros.excluir(e.id);
+    }
+    expect(await erros.contar()).toBe(360);
+    expect(await erros.contar({ filtro: (e) => e.causa === 'lacuna' })).toBe(180);
+  });
+});

@@ -13,7 +13,23 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/testes/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'eslint/**/*.test.ts'],
     restoreMocks: true,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unidade',
+          include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'eslint/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'carga',
+          include: ['scripts/**/*.carga.ts'],
+          testTimeout: 300_000,
+        },
+      },
+    ],
   },
 });
