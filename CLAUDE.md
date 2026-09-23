@@ -35,4 +35,4 @@ Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto
 Commits só quando o Gabriel pedir; push logo após cada commit aprovado. O trabalho de cada etapa vai num branch com PR para o `main`, e o merge é do Gabriel. Enquanto houver PR empilhado sobre outro, o merge é por "Create a merge commit", nunca squash.
 
 ## Relacionado
-Skill `acumen-extrair-normas` (extração de leis do Planalto/ALESP): base conceitual do estruturador da F2.
+Skill `acumen-extrair-normas` (extração de leis do Planalto/ALESP): base conceitual do estruturador da F2, só como lições (armadilhas já registradas em `docs/planos/F2.md`). O código dela (`extrair_lei.js`) não é usado nem copiado (Gabriel, 23/09/2026).

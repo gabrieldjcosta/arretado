@@ -47,16 +47,17 @@ Migrações aplicadas pelo conector, idênticas ao repositório (MD5 conferido; 
 
 ## Pendências, em ordem
 
-### 1. Publicar no Cloudflare (Worker `arretado`, T18) — precisa da conta do Gabriel
+### 1. Publicação no Cloudflare (Worker `arretado`, T18) — no ar desde 23/09/2026
 
-O Worker `arretado` já existe e está ligado ao repositório (criado em 23/09/2026). O `wrangler.jsonc` na raiz diz ao Cloudflare que o site é a pasta `dist/`, com os cabeçalhos de segurança do `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc., a partir de `config/seguranca.ts`), e que a URL `workers.dev` fica ligada. O `.node-version` = 22 vale também no build do Cloudflare. No painel (Workers & Pages › `arretado`):
+O Gabriel conferiu em 23/09/2026: builds do `main` verdes no painel (o último, `5d70c13`) e o app abrindo no celular em https://arretado.gabrieldjcosta.workers.dev. O `wrangler.jsonc` na raiz diz ao Cloudflare que o site é a pasta `dist/`, com os cabeçalhos do `dist/_headers` (a partir de `config/seguranca.ts`); o `.node-version` = 22 vale também no build.
 
-1. **Settings › Build**: Build command `npm run build`; Deploy command `npx wrangler deploy` (o padrão); Root directory vazio; branch de produção `main`. Salvar.
-2. **Deployments**: o merge do PR que trouxe o `wrangler.jsonc` dispara um build. Se ele falhou por ter rodado antes do passo 1, usar "Retry build".
-3. **Domains**: a linha Production (`arretado.gabrieldjcosta.workers.dev`) liga sozinha no deploy; se continuar desligada, ligar a chave. A linha Preview pode ficar desligada.
-4. Abrir https://arretado.gabrieldjcosta.workers.dev no celular e no computador: registrar um erro, revisar; em Conta › Dados, exportar.
-5. Conferir os cabeçalhos (no Git Bash): `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security`. No PowerShell, usar `curl.exe` e `findstr /i`.
-6. A importação por URL da F2 (T17, atividades 12.1–12.2) entra neste mesmo Worker como rota `/api/buscar-norma` (`main` + `assets.run_worker_first` no `wrangler.jsonc`). Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
+- **Daqui em diante não há passo manual:** cada merge no `main` dispara build e publicação sozinho (Workers Builds). Exceções:
+  - a subida de esquema da F2 (9.1) pede backup manual (Conta › Dados › Exportar) **antes** do merge que a publica;
+  - se o celular mostrar a versão antiga, fechar a aba e abrir de novo.
+- **Falta (Gabriel, sem pressa):**
+  - conferir os cabeçalhos no computador (a sessão na nuvem não alcança o `workers.dev`): no Git Bash, `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security`; no PowerShell, `curl.exe -sI … | findstr /i content-security`;
+  - opcional: desligar os builds de branches que não são o `main`, que marcam todo PR com um check vermelho sem efeito (ver `solucao-de-problemas.md` › "Check `Workers Builds` vermelho em todo PR").
+- A importação por URL da F2 (T17, atividades 12.1–12.2) entra neste mesmo Worker como rota `/api/buscar-norma` (`main` + `assets.run_worker_first` no `wrangler.jsonc`). Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
 
 Os dados ficam no navegador de cada endereço. Usar sempre https://arretado.gabrieldjcosta.workers.dev; trocar de endereço ou de navegador pede exportar e importar em Conta › Dados.
 
@@ -74,11 +75,11 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 �
 - **Como começar a 7.3:**
   - o gabarito é `corpus/normas/<id>.gabarito.json` e **precisa** do campo `origemSha256Conteudo` (o `sha256Conteudo` da página no manifesto): o `npm test` já recusa gabarito sem ele ou de outra versão (`verificarDerivados`);
   - trabalhar sobre o colado (`*.colado.html`, o que o app vai receber), não sobre a página bruta; o `*.colado.txt` serve para contagens rápidas;
-  - não gerar o gabarito com a mesma lógica que o estruturador vai usar: cruzar com fonte independente (página compilada, `extrair_lei.js` só para a segmentação) e a amostra conferida (ver "Gabarito que só repete o estruturador" em `solucao-de-problemas.md`);
-  - a skill `acumen-extrair-normas` (`extrair_lei.js`) **não está disponível** no contêiner da nuvem: ou o Gabriel roda no Windows e traz a saída, ou copia o script para `scripts/` numa sessão local.
+  - não gerar o gabarito com a mesma lógica que o estruturador vai usar: cruzar sinais independentes (âncoras `name="art…"` do Planalto, página compilada × todas as redações, texto puro colado, último artigo conhecido) e a amostra conferida (ver "Gabarito que só repete o estruturador" em `solucao-de-problemas.md`);
+  - **sem código anterior (Gabriel, 23/09/2026):** o `extrair_lei.js` da skill `acumen-extrair-normas` não é usado nem copiado; ficam só as lições, já no plano. A 7.3 pode rodar na nuvem.
 - **Tempo do Gabriel:** a conferência da amostra do gabarito pede ~30 min por lei (LEP e CP são as do portão).
 - **Rede no contêiner da nuvem:** o `npm run corpus` recebe HTTP 403 (política de rede do ambiente). O `npm run corpus:colar` e o `npm test` funcionam sem rede.
-- **Ler antes:** a Parte 2 §10.6 e a skill `acumen-extrair-normas`. As armadilhas do Planalto estão no plano e em `solucao-de-problemas.md`, seção Legislação.
+- **Ler antes:** a Parte 2 §10.6. As armadilhas do Planalto (lições da skill `acumen-extrair-normas`) estão no plano e em `solucao-de-problemas.md`, seção Legislação.
 - Sem importador do Acervo (decisão de escopo).
 - O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 

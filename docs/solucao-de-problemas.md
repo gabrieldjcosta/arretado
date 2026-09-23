@@ -282,12 +282,17 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Build do Worker falha: a pasta `dist` não existe
 - **Sintoma:** o deploy acusa que o diretório de assets não existe. **Causa:** build command vazio no painel; o `npx wrangler deploy` roda sem o `npm run build` antes.
 - **Solução:** Settings › Build › Build command = `npm run build`; depois "Retry build" em Deployments. **Prevenção:** conferir a configuração de build ao criar ou recriar o Worker.
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — ao recriar o Worker ou mudar a configuração de build (a primeira publicação, em 23/09/2026, passou).
+
+### Check `Workers Builds` vermelho em todo PR
+- **Sintoma:** o check `Workers Builds: arretado` falha em 0 s, sem log no GitHub, em todo PR (#3, #4, #5), enquanto o `verificar` fica verde e os builds do `main` passam no painel. **Causa:** o Workers Builds também tenta construir os branches que não são o `main` (versões de prévia), e essa parte não está configurada; o site publicado não depende dela.
+- **Solução:** ignorar no PR (o que vale é o `verificar`); ou, no painel, Settings › Build › Branch control, desligar os builds de branches que não são o de produção. O log fica no painel (Deployments › Go to build history). **Prevenção:** não usar prévia por branch enquanto o app for de um usuário só.
+- **Origem:** ocorrido em 23/09/2026 (PRs #3–#5; builds do `main` verdes, conferidos pelo Gabriel).
 
 ### Publicação sem cabeçalhos de segurança
 - **Sintoma:** o site sobe sem CSP. **Causa:** `dist/_headers` ausente (publicação sem o `npm run build`).
 - **Solução:** o `_headers` sai do `npm run build` (plugin do `vite.config.ts`, a partir de `config/seguranca.ts`), e o Worker o aplica aos arquivos estáticos sem servi-lo. Conferir com `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security` no Git Bash (no Windows PowerShell 5.1, `curl` é apelido do `Invoke-WebRequest` e não há `grep`: usar `curl.exe -sI … | findstr /i content-security`). **Prevenção:** conferir a cada mudança em `config/seguranca.ts`.
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — conferência dos cabeçalhos no site publicado pendente (Gabriel, no computador; a sessão na nuvem não alcança o `workers.dev`).
 
 ### `/api/buscar-norma` não responde ou responde sem cabeçalhos
 - **Sintoma:** 404 na rota em desenvolvimento ou no site publicado; resposta sem `nosniff` nem `Content-Type` fixo. **Causa:** falta `main` e `assets.run_worker_first: ["/api/*"]` no `wrangler.jsonc` (sem isso tudo é servido como arquivo estático); o Vite não roda o Worker; o `_headers` não vale para respostas geradas pelo código do Worker.
@@ -353,12 +358,12 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Gabarito que só repete o estruturador
 - **Sintoma:** a regressão da 8.9 passa, mas a lei sai errada no leitor. **Causa:** gabarito gerado pela mesma lógica (ou pelas mesmas suposições) que o estruturador vai usar: os dois erram juntos.
-- **Solução:** contagens do gabarito cruzadas com fonte independente (página compilada × todas as redações, `extrair_lei.js` só para a segmentação) e amostra de ~50 dispositivos conferida pelo Gabriel contra a página no navegador. **Prevenção:** nota de conferência no gabarito; `origemSha256Conteudo` amarra o gabarito à página (`verificarDerivados`).
+- **Solução:** contagens do gabarito cruzadas com fonte independente (âncoras `name="art…"` do Planalto, página compilada × todas as redações, texto puro colado, último artigo conhecido; sem o `extrair_lei.js`, decisão de 23/09/2026: nenhum código anterior) e amostra de ~50 dispositivos conferida pelo Gabriel contra a página no navegador. **Prevenção:** nota de conferência no gabarito; `origemSha256Conteudo` amarra o gabarito à página (`verificarDerivados`).
 - **Origem:** previsto — atividade 7.3.
 
 ### Tachado decorativo tratado como redação anterior (ou o contrário)
 - **Sintoma:** "Art. 1º" vira redação anterior; ou revogação da ALESP aparece como vigente. **Causa:** o `<s>` é decorativo no Planalto (só em `º`/`ª`; 56 na LC 80) e é a marca real de revogação na ALESP (172 na LC-SP 988); o `line-through` por estilo também é redação anterior.
-- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. **Prevenção:** gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores); o `extrair_lei.js` não serve para essa classificação.
+- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. **Prevenção:** gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores).
 - **Origem:** previsto — atividade 8.6.
 
 ### Fim de linha misto quebra a segmentação
@@ -373,7 +378,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### "Art" quebrado, capitular ou sangria entre artigos
 - **Sintoma:** artigo ausente, dois artigos fundidos, ou rubrica colada no artigo anterior. **Causa:** "Art" e número em linhas ou tags diferentes; capitular `<strong>A</strong>rt.`; rubrica em negrito antes do "Art." (é o `nome` do seguinte); citação "art." em minúscula no meio do texto.
-- **Solução:** regras 4 e 5 tolerantes, com os casos da skill `acumen-extrair-normas`. **Prevenção:** "todos os artigos do corpus, em ordem, sem sangria" (8.3) e regressão da 8.9.
+- **Solução:** regras 4 e 5 tolerantes, com os casos listados no plano (lições da skill `acumen-extrair-normas`). **Prevenção:** "todos os artigos do corpus, em ordem, sem sangria" (8.3) e regressão da 8.9.
 - **Origem:** previsto — atividade 8.3.
 
 ### Anexo ou ADCT viram artigos duplicados
@@ -413,7 +418,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ## Uso do app
 
-Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (depois da pendência 1 do `proxima-sessao.md`).
+Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
 
 ### Abri em outro navegador ou no celular e está tudo vazio
 - **Sintoma:** nenhum erro, cartão ou ponto aparece. **Causa:** os dados ficam guardados só no navegador daquele aparelho e daquele endereço. Outro navegador, outro aparelho, janela anônima ou o link de pré-visualização do Cloudflare são "outro lugar". Até a F4 não há sincronização.
@@ -448,4 +453,4 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 ### Publiquei uma versão nova e o celular mostra a antiga
 - **Sintoma:** a novidade não aparece. **Causa:** a página antiga continua aberta ou guardada pelo navegador.
 - **Solução:** fechar a aba e abrir de novo, ou recarregar. **Prevenção:** conferir o `Cache-Control` da página inicial depois da primeira publicação (o `_headers` define `no-cache` para `/index.html`).
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — a cada publicação (no ar desde 23/09/2026).
