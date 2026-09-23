@@ -282,12 +282,17 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Build do Worker falha: a pasta `dist` não existe
 - **Sintoma:** o deploy acusa que o diretório de assets não existe. **Causa:** build command vazio no painel; o `npx wrangler deploy` roda sem o `npm run build` antes.
 - **Solução:** Settings › Build › Build command = `npm run build`; depois "Retry build" em Deployments. **Prevenção:** conferir a configuração de build ao criar ou recriar o Worker.
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — ao recriar o Worker ou mudar a configuração de build (a primeira publicação, em 23/09/2026, passou).
+
+### Check `Workers Builds` vermelho em todo PR
+- **Sintoma:** o check `Workers Builds: arretado` falha em 0 s, sem log no GitHub, em todo PR (#3, #4, #5), enquanto o `verificar` fica verde e os builds do `main` passam no painel. **Causa:** o Workers Builds também tenta construir os branches que não são o `main` (versões de prévia), e essa parte não está configurada; o site publicado não depende dela.
+- **Solução:** ignorar no PR (o que vale é o `verificar`); ou, no painel, Settings › Build › Branch control, desligar os builds de branches que não são o de produção. O log fica no painel (Deployments › Go to build history). **Prevenção:** não usar prévia por branch enquanto o app for de um usuário só.
+- **Origem:** ocorrido em 23/09/2026 (PRs #3–#5; builds do `main` verdes, conferidos pelo Gabriel).
 
 ### Publicação sem cabeçalhos de segurança
 - **Sintoma:** o site sobe sem CSP. **Causa:** `dist/_headers` ausente (publicação sem o `npm run build`).
 - **Solução:** o `_headers` sai do `npm run build` (plugin do `vite.config.ts`, a partir de `config/seguranca.ts`), e o Worker o aplica aos arquivos estáticos sem servi-lo. Conferir com `curl -sI https://arretado.gabrieldjcosta.workers.dev | grep -i content-security` no Git Bash (no Windows PowerShell 5.1, `curl` é apelido do `Invoke-WebRequest` e não há `grep`: usar `curl.exe -sI … | findstr /i content-security`). **Prevenção:** conferir a cada mudança em `config/seguranca.ts`.
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — conferência dos cabeçalhos no site publicado pendente (Gabriel, no computador; a sessão na nuvem não alcança o `workers.dev`).
 
 ### `/api/buscar-norma` não responde ou responde sem cabeçalhos
 - **Sintoma:** 404 na rota em desenvolvimento ou no site publicado; resposta sem `nosniff` nem `Content-Type` fixo. **Causa:** falta `main` e `assets.run_worker_first: ["/api/*"]` no `wrangler.jsonc` (sem isso tudo é servido como arquivo estático); o Vite não roda o Worker; o `_headers` não vale para respostas geradas pelo código do Worker.
@@ -413,7 +418,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ## Uso do app
 
-Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (depois da pendência 1 do `proxima-sessao.md`).
+Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
 
 ### Abri em outro navegador ou no celular e está tudo vazio
 - **Sintoma:** nenhum erro, cartão ou ponto aparece. **Causa:** os dados ficam guardados só no navegador daquele aparelho e daquele endereço. Outro navegador, outro aparelho, janela anônima ou o link de pré-visualização do Cloudflare são "outro lugar". Até a F4 não há sincronização.
@@ -448,4 +453,4 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 ### Publiquei uma versão nova e o celular mostra a antiga
 - **Sintoma:** a novidade não aparece. **Causa:** a página antiga continua aberta ou guardada pelo navegador.
 - **Solução:** fechar a aba e abrir de novo, ou recarregar. **Prevenção:** conferir o `Cache-Control` da página inicial depois da primeira publicação (o `_headers` define `no-cache` para `/index.html`).
-- **Origem:** previsto — pendência 1 (publicação).
+- **Origem:** previsto — a cada publicação (no ar desde 23/09/2026).
