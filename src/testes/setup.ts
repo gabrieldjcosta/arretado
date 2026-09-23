@@ -7,3 +7,10 @@ const atual = globalThis.crypto as { subtle?: unknown } | undefined;
 if (!atual?.subtle) {
   Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true });
 }
+
+// O jsdom não implementa rolagem nem <dialog> modal; no navegador real são nativos.
+const prototipo = (globalThis as unknown as { Element?: { prototype: Record<string, unknown> } })
+  .Element?.prototype;
+if (prototipo && typeof prototipo.scrollIntoView !== 'function') {
+  prototipo.scrollIntoView = () => undefined;
+}

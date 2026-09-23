@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+// Sem compilação em tempo de execução (eval): a CSP proíbe e o zod passaria a sondar com Function().
+z.config({ jitless: true });
+
 /** Identificador estável gerado no cliente (UUIDv7, T6). */
 export const Id = z.uuid();
 export type Id = z.infer<typeof Id>;

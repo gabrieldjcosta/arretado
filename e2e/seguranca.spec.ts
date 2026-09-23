@@ -3,7 +3,7 @@ import { expect, test, violacoesDaPagina } from './apoio';
 test.describe('CSP (D18)', () => {
   test('está presente e o app carrega sem violação nem erro', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Arretado' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
     const csp = await page
       .locator('meta[http-equiv="Content-Security-Policy"]')
       .getAttribute('content');

@@ -1,9 +1,204 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { exportarPacote } from '../core/pacote';
+import type { Repositorio } from '../core/persistencia';
+import { repositorioDeTeste } from '../testes/repositorio';
 import { App } from './App';
+import { SECOES, secaoDeAjuda } from './orientacoes/conteudo';
+import { RODAPE } from './Shell';
 
-describe('App', () => {
-  it('renderiza o nome do produto', () => {
-    render(<App />);
-    expect(screen.getByRole('heading', { name: 'Arretado' })).toBeInTheDocument();
+async function abrirApp(rota = '/', repo?: Repositorio) {
+  const r = repo ?? (await repositorioDeTeste()).repo;
+  window.location.hash = `#${rota}`;
+  const usuario = userEvent.setup();
+  render(<App abrir={() => Promise.resolve(r)} />);
+  await screen.findByRole('navigation', { name: 'Áreas' });
+  return { repo: r, usuario };
+}
+
+afterEach(() => {
+  document.documentElement.removeAttribute('data-tema');
+});
+
+describe('shell (5.1, 5.5)', () => {
+  it('mostra as 4 áreas, ?, !, Conta e o rodapé', async () => {
+    await abrirApp();
+    const areas = screen.getByRole('navigation', { name: 'Áreas' });
+    expect(
+      within(areas)
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Hoje', 'Plano', 'Recall', 'Biblioteca']);
+    expect(screen.getByRole('link', { name: 'Ajuda sobre esta tela' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Relatar problema' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
+    expect(screen.getByText(RODAPE)).toBeInTheDocument();
+  });
+
+  it('navega entre as áreas e marca a atual', async () => {
+    const { usuario } = await abrirApp();
+    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Biblioteca' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Biblioteca' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('rota desconhecida mostra saída para o Hoje', async () => {
+    await abrirApp('/nao-existe');
+    expect(screen.getByRole('heading', { name: 'Tela não encontrada' })).toBeInTheDocument();
+  });
+});
+
+describe('"?" e Orientações (5.3)', () => {
+  it('toda tela aponta para uma seção existente', () => {
+    const ids = new Set(SECOES.map((s) => s.id));
+    for (const rota of [
+      '/',
+      '/plano',
+      '/recall',
+      '/biblioteca',
+      '/conta',
+      '/conta/dados',
+      '/conta/privacidade',
+      '/conta/aparencia',
+      '/orientacoes',
+    ]) {
+      expect(ids.has(secaoDeAjuda(rota)), rota).toBe(true);
+    }
+  });
+
+  it('"?" em Dados abre a seção de backup', async () => {
+    const { usuario } = await abrirApp('/conta/dados');
+    await usuario.click(screen.getByRole('link', { name: 'Ajuda sobre esta tela' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Orientações' }),
+    ).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/orientacoes/backup');
+    expect(screen.getByRole('heading', { name: 'Backup e restauração' })).toBeInTheDocument();
+  });
+});
+
+describe('"!" Relatar problema (5.4)', () => {
+  it('exige descrição, guarda na fila local e limita a 1 por dia', async () => {
+    const { repo, usuario } = await abrirApp('/recall');
+    await usuario.click(screen.getByRole('button', { name: 'Relatar problema' }));
+    const guardar = screen.getByRole('button', { name: 'Guardar relato' });
+    expect(guardar).toBeDisabled();
+    await usuario.type(screen.getByLabelText('O que aconteceu?'), 'A lista não carrega');
+    await usuario.click(guardar);
+    expect(await screen.findByText(/aguardando envio/)).toBeInTheDocument();
+    const relatos = await repo.colecao('relatos').todosDoUsuario();
+    expect(relatos).toMatchObject([{ descricao: 'A lista não carrega', tela: '/recall' }]);
+
+    await usuario.click(screen.getByRole('button', { name: 'Fechar' }));
+    await usuario.click(screen.getByRole('button', { name: 'Relatar problema' }));
+    expect(await screen.findByText(/já relatou um problema hoje/)).toBeInTheDocument();
+  });
+});
+
+describe('Conta › Aparência (5.2)', () => {
+  it('muda o tema e o aplica ao documento', async () => {
+    const { usuario } = await abrirApp('/conta/aparencia');
+    await usuario.click(await screen.findByLabelText('Escuro'));
+    await waitFor(() => {
+      expect(document.documentElement.dataset.tema).toBe('escuro');
+    });
+    await usuario.click(screen.getByLabelText('Igual ao aparelho'));
+    await waitFor(() => {
+      expect(document.documentElement.dataset.tema).toBeUndefined();
+    });
+  });
+});
+
+describe('Conta › Dados (5.2)', () => {
+  it('exporta gerando um arquivo .arretado', async () => {
+    const criar = vi.fn(() => 'blob:x');
+    Object.assign(URL, { createObjectURL: criar, revokeObjectURL: vi.fn() });
+    const clicar = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+    const { usuario } = await abrirApp('/conta/dados');
+    await usuario.click(screen.getByRole('button', { name: 'Exportar' }));
+    expect(await screen.findByText(/Pacote gerado: arretado-.*\.arretado/)).toBeInTheDocument();
+    expect(criar).toHaveBeenCalledTimes(1);
+    expect(clicar).toHaveBeenCalledTimes(1);
+  });
+
+  it('senha exige 8 caracteres e confirmação igual', async () => {
+    const { usuario } = await abrirApp('/conta/dados');
+    await usuario.click(screen.getByLabelText(/Proteger com senha/));
+    const exportar = screen.getByRole('button', { name: 'Exportar' });
+    await usuario.type(screen.getByLabelText(/Senha \(mínimo/), 'curta');
+    expect(exportar).toBeDisabled();
+    await usuario.clear(screen.getByLabelText(/Senha \(mínimo/));
+    await usuario.type(screen.getByLabelText(/Senha \(mínimo/), 'senha-longa');
+    await usuario.type(screen.getByLabelText('Repita a senha'), 'senha-longa');
+    expect(exportar).toBeEnabled();
+  });
+
+  it('importa com prévia obrigatória e permite desfazer', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { bytes, nomeArquivo } = await exportarPacote(repo);
+    const extra = await repo.colecao('erros').criar({
+      resultado: 'errou',
+      oQueFoi: 'Depois do backup',
+      status: 'aberto',
+    });
+    const { usuario } = await abrirApp('/conta/dados', repo);
+
+    await usuario.upload(
+      screen.getByLabelText('Pacote do Arretado (.arretado)'),
+      new File([bytes as Uint8Array<ArrayBuffer>], nomeArquivo),
+    );
+    await usuario.click(await screen.findByLabelText(/Restaurar integral/));
+    await usuario.click(screen.getByRole('button', { name: 'Ver prévia' }));
+    expect(await screen.findByRole('heading', { name: 'Prévia' })).toBeInTheDocument();
+    expect(screen.getByText('1 item deste aparelho será excluído.')).toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Confirmar importação' }));
+    expect(await screen.findByText(/Importação concluída/)).toBeInTheDocument();
+    expect(await repo.colecao('erros').obter(extra.id)).toBeUndefined();
+
+    await usuario.click(await screen.findByRole('button', { name: 'Desfazer' }));
+    await usuario.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Restaurar' }),
+    );
+    expect(await screen.findByText('Dados restaurados ao ponto escolhido.')).toBeInTheDocument();
+    expect(await repo.colecao('erros').obter(extra.id)).toBeDefined();
+  });
+
+  it('recusa arquivo que não é pacote com mensagem clara', async () => {
+    const { usuario } = await abrirApp('/conta/dados');
+    await usuario.upload(
+      screen.getByLabelText('Pacote do Arretado (.arretado)'),
+      new File(['texto qualquer'], 'x.arretado'),
+    );
+    expect(
+      await screen.findByText('Este arquivo não é um pacote do Arretado.'),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('estados universais (5.6)', () => {
+  it('faixa offline aparece sem conexão', async () => {
+    await abrirApp();
+    const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    act(() => {
+      window.dispatchEvent(new Event('offline'));
+    });
+    expect(screen.getByText('Sem conexão — tudo continua funcionando.')).toBeInTheDocument();
+    online.mockReturnValue(true);
+    act(() => {
+      window.dispatchEvent(new Event('online'));
+    });
+    expect(screen.queryByText('Sem conexão — tudo continua funcionando.')).not.toBeInTheDocument();
+  });
+
+  it('falha ao abrir o banco explica o que fazer e que nada foi perdido', async () => {
+    render(<App abrir={() => Promise.reject(new Error('bloqueado'))} />);
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Nada foi perdido/);
   });
 });

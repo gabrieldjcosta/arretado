@@ -1,0 +1,89 @@
+// Orientações v1 (D23): conteúdo estático, versionado com o app, em linguagem simples e
+// com o vocabulário canônico. O "?" de cada tela aponta para uma seção daqui.
+
+export const VERSAO_ORIENTACOES = '1';
+
+export interface Secao {
+  id: string;
+  titulo: string;
+  paragrafos: string[];
+}
+
+export const SECOES: Secao[] = [
+  {
+    id: 'como-funciona',
+    titulo: 'Como o Arretado funciona',
+    paragrafos: [
+      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Plano (onde você está no edital), Recall (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
+      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos a base de dados, o backup e a restauração, as Orientações e o relato de problemas.',
+      'Nada é obrigatório além do mínimo: você completa os detalhes quando quiser.',
+    ],
+  },
+  {
+    id: 'seus-dados',
+    titulo: 'Onde ficam os seus dados',
+    paragrafos: [
+      'Tudo o que você registra fica guardado neste aparelho, no banco de dados do navegador. Nada é enviado para servidor algum nesta versão, e não há rastreadores nem estatísticas de uso.',
+      'O Arretado funciona sem internet. Se a conexão cair, uma faixa discreta avisa, e tudo continua funcionando.',
+      'Limpar os dados do navegador, desinstalar o navegador ou usar janela anônima apaga os dados deste aparelho. Por isso, faça backups.',
+    ],
+  },
+  {
+    id: 'backup',
+    titulo: 'Backup e restauração',
+    paragrafos: [
+      'Em Conta › Dados, "Exportar" gera um arquivo .arretado com os seus dados. Guarde-o fora do aparelho (pen drive, e-mail para você mesmo, nuvem de sua confiança).',
+      'Se for guardar o backup em nuvem de terceiros, marque "Proteger com senha". O Arretado não guarda a senha: sem ela, não há como abrir o arquivo.',
+      'Para trazer dados de volta, use "Importar". Antes de qualquer alteração você vê uma prévia do que vai mudar, e o Arretado cria um ponto de restauração: se algo não sair como esperado, "Desfazer" volta ao estado anterior.',
+      'Em aparelho novo ou depois de apagar tudo, escolha "Restaurar integral". Para dados de ferramentas antigas, prefira "Importar para espaço separado": você confere antes de misturar.',
+      'Arquivos alterados fora do aplicativo não passam na validação e não podem ser importados. Use sempre o arquivo original.',
+    ],
+  },
+  {
+    id: 'privacidade',
+    titulo: 'Privacidade e segurança (política v1)',
+    paragrafos: [
+      'Guardamos só o que você registra para estudar e as suas preferências. O relato de problema leva apenas a sua descrição, a tela, a versão do app e o aparelho — nunca conteúdo de estudo.',
+      'Texto colado de páginas externas é limpo antes de ser usado: nenhum script ou formatação escondida é executado.',
+      'Você pode exportar tudo e apagar tudo a qualquer momento em Conta › Dados.',
+      'Quando existir login e sincronização (fase futura), esta política será atualizada e você será avisado antes de qualquer dado sair do aparelho.',
+    ],
+  },
+  {
+    id: 'seguranca-pessoal',
+    titulo: 'Cuidados com seus dados',
+    paragrafos: [
+      'Faça backup com frequência, por exemplo uma vez por semana.',
+      'Em computador compartilhado, use um perfil de navegador só seu.',
+      'Guarde a senha do backup num lugar seguro. Sem ela o arquivo protegido não abre — nem por nós.',
+    ],
+  },
+  {
+    id: 'relatar-problema',
+    titulo: 'Relatar um problema',
+    paragrafos: [
+      'O botão "!" abre o relato de problema: descreva em poucas palavras o que aconteceu. Um relato por dia.',
+      'Nesta versão o relato fica guardado neste aparelho, aguardando envio. Ele será enviado quando a sincronização existir.',
+    ],
+  },
+  {
+    id: 'vocabulario',
+    titulo: 'Palavras que o Arretado usa',
+    paragrafos: [
+      'Erro: um erro ou acerto inseguro seu, numa questão de estudo.',
+      'Problema: uma falha do próprio Arretado (use o "!").',
+      'Aparelho: o computador, tablet ou celular onde você usa o Arretado.',
+      'Dispositivo: uma unidade da lei (artigo, parágrafo, inciso, alínea…).',
+      'Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta: aparecem nas áreas à medida que as funções chegam.',
+    ],
+  },
+];
+
+/** Seção de ajuda contextual para cada tela (o "?"). */
+export function secaoDeAjuda(caminho: string): string {
+  if (caminho.startsWith('/conta/dados')) return 'backup';
+  if (caminho.startsWith('/conta/privacidade')) return 'privacidade';
+  if (caminho.startsWith('/conta')) return 'seus-dados';
+  if (caminho.startsWith('/orientacoes')) return 'como-funciona';
+  return 'como-funciona';
+}

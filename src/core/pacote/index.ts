@@ -20,3 +20,4 @@ export {
 } from './importar';
 export { criarSnapshot, desfazerImportacao, podarSnapshots, restaurarSnapshot } from './snapshots';
 export { importarParaEspaco, mesclarEspaco, planejarMesclagem, removerEspaco } from './espacos';
+export { apagarTudo } from './apagar';

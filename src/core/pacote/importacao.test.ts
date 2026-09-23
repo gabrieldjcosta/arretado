@@ -442,3 +442,22 @@ describe('zip bomb', () => {
     });
   });
 });
+
+describe('apagar tudo', () => {
+  it('apaga o banco e os espaços; reabrir cria identidade nova', async () => {
+    const { apagarTudo } = await import('./apagar');
+    const a = await comDados();
+    const outro = await comDados();
+    const { espaco } = await importarParaEspaco(
+      a.repo,
+      await lerPacote((await exportarPacote(outro.repo)).bytes),
+      'x',
+    );
+    await apagarTudo(a.repo);
+    const reaberto = await abrir(relogio(), a.nome);
+    expect(reaberto.repo.ctx.usuarioId).not.toBe(a.repo.ctx.usuarioId);
+    expect(await reaberto.repo.colecao('erros').contar()).toBe(0);
+    const espacoReaberto = await Repositorio.abrir({ nomeBanco: espaco.nomeBanco });
+    expect(await espacoReaberto.colecao('erros').contar()).toBe(0);
+  });
+});

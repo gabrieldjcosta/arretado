@@ -46,6 +46,8 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    // App local-first baixado uma vez (~160 KB gzip); divisão por rota junto com o PWA (F4).
+    chunkSizeWarningLimit: 700,
   },
   test: {
     globals: true,

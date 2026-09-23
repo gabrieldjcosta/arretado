@@ -20,7 +20,9 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
         const w = window as unknown as { __violacoes: string[] };
         w.__violacoes = [];
         document.addEventListener('securitypolicyviolation', (e) => {
-          w.__violacoes.push(`${e.violatedDirective}: ${e.blockedURI}`);
+          w.__violacoes.push(
+            `${e.violatedDirective}: ${e.blockedURI} ${e.sample} @ ${e.sourceFile}:${String(e.lineNumber)}:${String(e.columnNumber)}`,
+          );
         });
       });
       const erros: string[] = [];
