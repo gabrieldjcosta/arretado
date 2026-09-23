@@ -9,6 +9,7 @@ Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md
 - Verificação: 329 testes unitários/integração, 82 E2E (Playwright + axe, desktop e celular), carga de 10 mil registros, CI verde.
 - Portões: [`portoes/F0.md`](portoes/F0.md) e [`portoes/F1.md`](portoes/F1.md).
 - **Decisão de escopo (23/09/2026):** nada do Acervo antigo nem do Acumen v2 é importado; o conteúdo recomeça do zero (nota no topo das Partes 1 e 2).
+- **F2 (Legislação) planejada e liberada para execução já (23/09/2026)**, em paralelo ao uso real da F1: plano em [`planos/F2.md`](planos/F2.md). **Próxima atividade: 7.1** (corpus de normas).
 
 ## Pendências, em ordem
 
@@ -32,6 +33,7 @@ Ferramentas do conector Supabase (MCP). Organização: **GJC's Org** (`phapzxwur
    (Se `auth.users` exigir mais colunas, usar o mínimo que o Supabase aceitar; tudo é desfeito no `rollback`.)
 6. Anotar em `portoes/F0.md` a linha "RLS … projeto real" como ✅ e registrar a referência do projeto (URL pública; **nenhuma chave no repositório** — a chave anônima só entra na F4).
 7. Lembrete para a F4: expor o esquema `arretado` na API (Settings › API › Exposed schemas).
+8. Com o projeto ativo, a F2 usa o mesmo projeto para a Edge Function `buscar-norma` (importação por URL, T17; atividades 12.1–12.2 do plano da F2): `verify_jwt = false`, sem chave no app, e `connect-src` da CSP passa a incluir `https://<ref>.supabase.co`. Publicar a função exige confirmação do Gabriel na hora.
 
 ### 2. Publicar no Cloudflare Pages — precisa da conta do Gabriel
 
@@ -47,9 +49,11 @@ O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc.,
 
 14 dias com revisão feita em pelo menos 10; metas em [`portoes/F1.md`](portoes/F1.md). Backup semanal em Conta › Dados › Exportar. Relatar problemas pelo "!".
 
-### 4. Planejar a F2 (Legislação) — só depois do portão da F1
+### 4. Executar a F2 (Legislação) — plano em [`planos/F2.md`](planos/F2.md)
 
-Ler Parte 2 §10.6 (estruturador, editor, leitor) e a skill `acumen-extrair-normas`. Sem importador do Acervo (decisão de escopo). O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
+**Exceção à regra de fases (Gabriel, 23/09/2026):** a F2 roda já, em paralelo ao uso real da F1. O portão da F1 (item 3) continua sendo medido; a F3 só começa depois do portão da F2. O app publicado só recebe F2 ao fim de cada etapa revisada, e a subida de esquema (atividade 9.1) exige backup manual antes da publicação.
+
+Seguir as etapas 7–13 do plano, na ordem do caminho crítico (7 → 8 → 9 → 10/11 → 13; a 12 corre por fora). Começar por **7.1 → 7.2 → 7.3** (corpus e gabarito); a conferência da amostra do gabarito pede ~30 min do Gabriel por lei. Ler antes a Parte 2 §10.6 e a skill `acumen-extrair-normas` (armadilhas do Planalto listadas no plano). Sem importador do Acervo (decisão de escopo). O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 
 ## Armadilhas aprendidas nesta implementação
 
