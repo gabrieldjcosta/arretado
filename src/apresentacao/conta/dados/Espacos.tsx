@@ -56,7 +56,8 @@ export function Espacos() {
     }
   };
 
-  if (!dados || dados.length === 0) return null;
+  // Some quando não há espaço, mas não antes de mostrar a confirmação da última remoção.
+  if (!dados || (dados.length === 0 && !mensagem)) return null;
 
   return (
     <section className="cartao-bloco" aria-labelledby="t-espacos">

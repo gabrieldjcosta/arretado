@@ -5,7 +5,7 @@ Plataforma pessoal de preparação para concursos jurídicos (usuário principal
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore, a ser importado).
 
 ## Estado
-Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T15); **F0 em implementação**. Antes de qualquer implementação, ler:
+Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T15); **F0 implementada** (portão em `docs/portoes/F0.md`; pendente só o projeto Supabase real). Antes de qualquer implementação, ler:
 1. `README.md` — contexto em uma página.
 2. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel).
 3. `docs/especificacao-parte1.md` §5 e §15 — modelo de dados e fases.

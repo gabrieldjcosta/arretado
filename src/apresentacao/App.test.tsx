@@ -202,3 +202,31 @@ describe('estados universais (5.6)', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/Nada foi perdido/);
   });
 });
+
+describe('correções da revisão da etapa 5', () => {
+  it('trocar para "Restaurar integral" libera a prévia mesmo sem módulos marcados antes', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { bytes, nomeArquivo } = await exportarPacote(repo);
+    const { usuario } = await abrirApp('/conta/dados', repo);
+    await usuario.upload(
+      screen.getByLabelText('Pacote do Arretado (.arretado)'),
+      new File([bytes as Uint8Array<ArrayBuffer>], nomeArquivo),
+    );
+    await usuario.click(await screen.findByLabelText(/Substituir módulos/));
+    const modulos = within(screen.getByRole('group', { name: 'Módulos' }));
+    for (const caixa of modulos.getAllByRole('checkbox')) await usuario.click(caixa);
+    expect(screen.getByRole('button', { name: 'Ver prévia' })).toBeDisabled();
+    await usuario.click(screen.getByLabelText(/Restaurar integral/));
+    expect(screen.getByRole('button', { name: 'Ver prévia' })).toBeEnabled();
+  });
+
+  it('falha ao gravar a aparência volta ao valor salvo e avisa', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { usuario } = await abrirApp('/conta/aparencia', repo);
+    const prefs = await import('../core/preferencias');
+    vi.spyOn(prefs, 'alterarPreferencias').mockRejectedValueOnce(new Error('cota'));
+    await usuario.click(await screen.findByLabelText('Escuro'));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Não foi possível guardar/);
+    expect(screen.getByLabelText('Igual ao aparelho')).toBeChecked();
+  });
+});

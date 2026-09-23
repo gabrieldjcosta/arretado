@@ -6,7 +6,7 @@ Plataforma pessoal de preparação para concursos jurídicos de alta complexidad
 
 ## Estado atual
 
-**Especificação concluída; decisões técnicas tomadas; F0 (Fundamentos) em implementação.**
+**F0 (Fundamentos) implementada** — portão em [`docs/portoes/F0.md`](docs/portoes/F0.md); falta só criar o projeto Supabase real. Próximo: F1 (Recall).
 
 - [`docs/especificacao-parte1.md`](docs/especificacao-parte1.md) — diagnóstico dos artefatos existentes, produto unificado, modelo conceitual de dados, arquitetura modular, core, plano de fases, MVP e as decisões arquiteturais **D1–D24** (seções 1–7, 15, 16, 19).
 - [`docs/especificacao-parte2.md`](docs/especificacao-parte2.md) — integração entre módulos, interface, detalhamento de cada módulo (com destaque para Legislação), acessibilidade, backup/importação, fontes oficiais, backend e sincronização, critérios de validação, riscos e backlog (seções 8–14, 17, 18, 20).

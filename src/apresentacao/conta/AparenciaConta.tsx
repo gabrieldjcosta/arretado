@@ -15,19 +15,30 @@ export function AparenciaConta() {
   const { dados: salvas } = useDados(useCallback((r) => obterPreferencias(r), []));
   // Resposta imediata ao toque; a gravação confirma logo depois.
   const [pendentes, setPendentes] = useState<Partial<Preferencias>>({});
+  const [falhou, setFalhou] = useState(false);
   if (!salvas) return <Esqueleto />;
   const dados = { ...salvas, ...pendentes };
 
   const alterar = (
     mudanca: Partial<Pick<Preferencias, 'tema' | 'fonteLeitura' | 'tamanhoFonte'>>,
   ) => {
+    setFalhou(false);
     setPendentes((p) => ({ ...p, ...mudanca }));
-    void alterarPreferencias(repo, mudanca);
+    alterarPreferencias(repo, mudanca).catch(() => {
+      // Volta ao que está gravado e avisa.
+      setPendentes({});
+      setFalhou(true);
+    });
   };
 
   return (
     <>
       <h1>Aparência</h1>
+      {falhou && (
+        <p role="alert" className="aviso falha">
+          Não foi possível guardar a mudança. A aparência continua como estava; tente de novo.
+        </p>
+      )}
       <fieldset>
         <legend>Tema</legend>
         {TEMAS.map((t) => (

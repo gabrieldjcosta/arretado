@@ -249,7 +249,7 @@ export function Importar() {
               <button
                 type="button"
                 className="principal"
-                disabled={ocupado || modulos?.length === 0}
+                disabled={ocupado || (modo >= 2 && modo <= 5 && modulos?.length === 0)}
                 onClick={verPrevia}
               >
                 {ocupado ? 'Calculando…' : 'Ver prévia'}
