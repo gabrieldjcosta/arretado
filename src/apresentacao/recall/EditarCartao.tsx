@@ -13,7 +13,9 @@ export function EditarCartao() {
     async (repo: Repositorio) => {
       if (id === 'novo') return { cartao: null, erro: undefined };
       const cartao = (await repo.colecao('cartoes').obter(id)) ?? null;
-      const erro = cartao?.erroId ? await repo.colecao('erros').obter(cartao.erroId) : undefined;
+      const erro = cartao?.erroId
+        ? await repo.colecao('erros').obter(cartao.erroId, { incluirExcluidos: true })
+        : undefined;
       return { cartao, erro };
     },
     [id],

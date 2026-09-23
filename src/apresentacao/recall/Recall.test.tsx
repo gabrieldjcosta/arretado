@@ -163,3 +163,60 @@ describe('cartões (6.7)', () => {
     expect(await screen.findByText('Frente X')).toBeInTheDocument();
   });
 });
+
+describe('correções da revisão da etapa 6', () => {
+  it('edição feita logo antes de sair da tela é gravada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Sursis' });
+    const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
+    await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
+    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Recall' }));
+    await waitFor(async () => {
+      expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe(
+        'Suspensão condicional.',
+      );
+    });
+  });
+
+  it('ano incompleto não impede gravar os outros campos', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Sursis' });
+    const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
+    await usuario.type(await screen.findByLabelText('Ano'), '26');
+    expect(screen.getByText('Use 4 dígitos, de 1900 a 2100.')).toBeInTheDocument();
+    await usuario.type(screen.getByLabelText('Frase correta'), 'F.');
+    await waitFor(
+      async () => {
+        expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe('F.');
+      },
+      { timeout: 3000 },
+    );
+    await usuario.clear(screen.getByLabelText('Ano'));
+    await usuario.type(screen.getByLabelText('Ano'), '2024');
+    await waitFor(
+      async () => {
+        expect((await repo.colecao('erros').obter(erro.id))?.fonte?.ano).toBe(2024);
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('no drill, Enter num link do menu segue o link em vez de virar o cartão', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const erro = await registrarErro(repo, {
+      resultado: 'errou',
+      oQueFoi: 'Frente',
+      fraseCorreta: 'Verso',
+    });
+    await criarCartaoDeErro(repo, erro.id);
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    await screen.findByText('Frente');
+    await usuario.click(screen.getByText('Mais opções'));
+    screen.getByRole('link', { name: 'Editar' }).focus();
+    await usuario.keyboard('{Enter}');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Editar cartão' }),
+    ).toBeInTheDocument();
+  });
+});

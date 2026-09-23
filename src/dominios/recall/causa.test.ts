@@ -28,3 +28,16 @@ describe('causa sugerida (6.1)', () => {
     expect(completude({ fraseCorreta: 'x', causa: 'lacuna' })).toBe('completo');
   });
 });
+
+describe('correções da revisão da etapa 6', () => {
+  it('"inciso X" não é confusão e "Enunciado da Súmula" não é leitura', () => {
+    expect(
+      sugerirCausa({ oQueFoi: 'Não sabia o inciso X do art. 5º', resultado: 'errou' }),
+    ).toBeUndefined();
+    expect(
+      sugerirCausa({ oQueFoi: 'Enunciado 7 da Súmula do STJ', resultado: 'errou' }),
+    ).toBeUndefined();
+    expect(sugerirCausa({ oQueFoi: 'Li o enunciado errado', resultado: 'errou' })).toBe('leitura');
+    expect(sugerirCausa({ oQueFoi: 'Furto vs. roubo', resultado: 'errou' })).toBe('confusao');
+  });
+});

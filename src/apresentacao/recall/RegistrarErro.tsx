@@ -51,12 +51,16 @@ export function RegistrarErro() {
   };
 
   const criarCartao = async (erro: Erro) => {
+    if (salvando) return;
+    setSalvando(true);
     try {
       await criarCartaoDeErro(repo, erro.id);
       const maior = await maiorFilaProjetada(repo);
       setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
     } catch {
       setFalha('Não foi possível criar o cartão. O erro já está salvo.');
+    } finally {
+      setSalvando(false);
     }
   };
 
@@ -82,6 +86,7 @@ export function RegistrarErro() {
             <button
               type="button"
               className="principal"
+              disabled={salvando}
               onClick={() => void criarCartao(depois.erro)}
             >
               Sim
@@ -132,6 +137,7 @@ export function RegistrarErro() {
         oQueFoi,
         resultado: resultado ?? 'errou',
         ...(complemento.conviccao ? { conviccao: complemento.conviccao } : {}),
+        ...(complemento.justificativa ? { justificativa: complemento.justificativa } : {}),
       })
     : undefined;
 

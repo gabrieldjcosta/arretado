@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { Erro } from '../../core/modelo';
 import type { Alteracoes, Repositorio } from '../../core/persistencia';
@@ -83,6 +83,22 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
   const pendente = Object.keys(diferencas(salvo, rascunho)).length > 0;
   const [excluindo, setExcluindo] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [criandoCartao, setCriandoCartao] = useState(false);
+  const pendenteAoSair = useRef<Alteracoes<'erros'> | null>(null);
+
+  // O que ainda não foi gravado quando a tela fecha é gravado na saída (nada se perde).
+  useEffect(() => {
+    const mudanca = diferencas(salvo, rascunho);
+    pendenteAoSair.current =
+      Object.keys(mudanca).length > 0 && rascunho.oQueFoi.trim() ? mudanca : null;
+  }, [salvo, rascunho]);
+  useEffect(
+    () => () => {
+      const mudanca = pendenteAoSair.current;
+      if (mudanca) completarErro(repo, erro.id, mudanca).catch(() => undefined);
+    },
+    [repo, erro.id],
+  );
 
   // Salvamento automático 600 ms depois da última mudança.
   useEffect(() => {
@@ -181,10 +197,18 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
           <button
             type="button"
             className="principal"
+            disabled={criandoCartao}
             onClick={() => {
-              void criarCartaoDeErro(repo, erro.id).then(() => {
-                setMensagem('Cartão criado. Primeira revisão amanhã.');
-              });
+              setCriandoCartao(true);
+              criarCartaoDeErro(repo, erro.id).then(
+                () => {
+                  setMensagem('Cartão criado. Primeira revisão amanhã.');
+                },
+                () => {
+                  setCriandoCartao(false);
+                  setMensagem('Não foi possível criar o cartão. Tente de novo.');
+                },
+              );
             }}
           >
             Criar cartão

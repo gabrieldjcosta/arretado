@@ -16,16 +16,24 @@ export function hoje(repo: Repositorio): string {
 export type EntradaErro = Pick<Erro, 'resultado' | 'oQueFoi'> &
   Partial<Omit<Dados<'erros'>, 'resultado' | 'oQueFoi' | 'status' | 'causaSugerida'>>;
 
-function comSugestao<T extends Partial<Erro>>(erro: T, base: Partial<Erro> = {}): T {
+const CAMPOS_DA_SUGESTAO = ['oQueFoi', 'resultado', 'justificativa', 'conviccao'] as const;
+
+/**
+ * Recalcula a causa sugerida quando mudam os campos que a determinam. Numa edição
+ * (`base` presente), sugestão que deixou de valer é apagada.
+ */
+function comSugestao<T extends Partial<Erro>>(erro: T, base?: Partial<Erro>): T {
+  if (base && !CAMPOS_DA_SUGESTAO.some((c) => c in erro)) return erro;
   const junto = { ...base, ...erro };
-  if (junto.causa || !junto.oQueFoi || !junto.resultado) return erro;
+  if (!junto.oQueFoi || !junto.resultado) return erro;
   const sugerida = sugerirCausa({
     oQueFoi: junto.oQueFoi,
     resultado: junto.resultado,
     ...(junto.justificativa ? { justificativa: junto.justificativa } : {}),
     ...(junto.conviccao ? { conviccao: junto.conviccao } : {}),
   });
-  return sugerida ? { ...erro, causaSugerida: sugerida } : erro;
+  if (sugerida) return { ...erro, causaSugerida: sugerida };
+  return base?.causaSugerida ? { ...erro, causaSugerida: undefined } : erro;
 }
 
 export async function registrarErro(repo: Repositorio, entrada: EntradaErro): Promise<Erro> {
@@ -135,10 +143,17 @@ export function listarFrases(
 
 // ── Cartões ───────────────────────────────────────────────────────────────
 
+/** Cria o cartão do erro; se já existe um (duplo clique, outra aba), devolve o existente. */
 export async function criarCartaoDeErro(repo: Repositorio, erroId: string): Promise<Cartao> {
-  const cartao = await repo.transacao(async () => {
+  const { cartao, novo } = await repo.transacao(async () => {
     const erro = await repo.colecao('erros').obter(erroId);
     if (!erro) throw new Error('Este erro não existe mais.');
+    const existente = (
+      await repo
+        .colecao('cartoes')
+        .listarPagina({ indice: 'erroId', de: erroId, ate: erroId, limite: 1 })
+    ).itens[0];
+    if (existente) return { cartao: existente, novo: false };
     const c = await repo.colecao('cartoes').criar({
       frente: erro.oQueFoi,
       // Verso nulo = frase correta do erro, até ser editado à parte (suposição 3).
@@ -153,9 +168,9 @@ export async function criarCartaoDeErro(repo: Repositorio, erroId: string): Prom
     });
     if (erro.status === 'aberto')
       await repo.colecao('erros').atualizar(erroId, { status: 'com_cartao' });
-    return c;
+    return { cartao: c, novo: true };
   });
-  repo.eventos.emitir('cartao.criado', { cartaoId: cartao.id, erroId });
+  if (novo) repo.eventos.emitir('cartao.criado', { cartaoId: cartao.id, erroId });
   return cartao;
 }
 

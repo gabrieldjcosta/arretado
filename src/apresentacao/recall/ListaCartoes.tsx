@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import type { EstadoCartao } from '../../core/modelo';
+import type { Cartao, EstadoCartao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import {
   arquivarCartao,
@@ -22,9 +22,21 @@ export function ListaCartoes() {
   const estado: EstadoCartao = (ESTADOS as string[]).includes(pedido)
     ? (pedido as EstadoCartao)
     : 'ativo';
+  const [paginas, setPaginas] = useState({ estado, quantas: 1 });
+  const quantas = paginas.estado === estado ? paginas.quantas : 1;
   const carregar = useCallback(
-    async (r: Repositorio) => (await listarCartoes(r, estado, null, 200)).itens,
-    [estado],
+    async (r: Repositorio) => {
+      const itens: Cartao[] = [];
+      let cursor: string | null = null;
+      for (let i = 0; i < quantas; i++) {
+        const p = await listarCartoes(r, estado, cursor, 100);
+        itens.push(...p.itens);
+        cursor = p.proximoCursor;
+        if (!cursor) break;
+      }
+      return { itens, haMais: cursor !== null };
+    },
+    [estado, quantas],
   );
   const { dados } = useDados(carregar);
 
@@ -50,44 +62,58 @@ export function ListaCartoes() {
       </div>
       {!dados ? (
         <Esqueleto />
-      ) : dados.length === 0 ? (
+      ) : dados.itens.length === 0 ? (
         <Vazio titulo={`Nenhum cartão ${ROTULO_ESTADO[estado].toLowerCase().replace(/s$/, '')}`}>
           {estado === 'ativo' && (
             <p>Cartões nascem de erros (ou em "Novo cartão"), nunca sozinhos.</p>
           )}
         </Vazio>
       ) : (
-        <ul className="lista-simples">
-          {dados.map((c) => (
-            <li key={c.id}>
-              <span>
-                <Link to={`/recall/cartoes/${c.id}`}>{c.frente || '(sem frente)'}</Link>
-                <br />
-                <span className="dica">
-                  {c.estado === 'ativo'
-                    ? `Próxima revisão: ${formatarData(c.proximaRevisao)}`
-                    : (c.motivoSuspensao ?? '')}
+        <>
+          <ul className="lista-simples">
+            {dados.itens.map((c) => (
+              <li key={c.id}>
+                <span>
+                  <Link to={`/recall/cartoes/${c.id}`}>{c.frente || '(sem frente)'}</Link>
+                  <br />
+                  <span className="dica">
+                    {c.estado === 'ativo'
+                      ? `Próxima revisão: ${formatarData(c.proximaRevisao)}`
+                      : (c.motivoSuspensao ?? '')}
+                  </span>
                 </span>
-              </span>
-              <span className="linha-acoes">
-                {c.estado === 'ativo' ? (
-                  <button type="button" onClick={() => void suspenderCartao(repo, c.id)}>
-                    Suspender
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => void reativarCartao(repo, c.id)}>
-                    Reativar
-                  </button>
-                )}
-                {c.estado !== 'arquivado' && (
-                  <button type="button" onClick={() => void arquivarCartao(repo, c.id)}>
-                    Arquivar
-                  </button>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
+                <span className="linha-acoes">
+                  {c.estado === 'ativo' ? (
+                    <button type="button" onClick={() => void suspenderCartao(repo, c.id)}>
+                      Suspender
+                    </button>
+                  ) : (
+                    <button type="button" onClick={() => void reativarCartao(repo, c.id)}>
+                      Reativar
+                    </button>
+                  )}
+                  {c.estado !== 'arquivado' && (
+                    <button type="button" onClick={() => void arquivarCartao(repo, c.id)}>
+                      Arquivar
+                    </button>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {dados.haMais && (
+            <div className="linha-acoes">
+              <button
+                type="button"
+                onClick={() => {
+                  setPaginas({ estado, quantas: quantas + 1 });
+                }}
+              >
+                Carregar mais
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

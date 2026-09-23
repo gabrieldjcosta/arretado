@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import type { CausaErro, Disciplina, Erro, Ponto } from '../../core/modelo';
 import { NOME_CAUSA } from '../../dominios/recall/causa';
 import { CAUSAS } from './rotulos';
@@ -51,6 +51,7 @@ export function CamposErro({
         <textarea
           id={`${id}-frase`}
           rows={2}
+          maxLength={2_000}
           value={valor.fraseCorreta ?? ''}
           onChange={texto('fraseCorreta')}
           aria-describedby={`${id}-frase-dica`}
@@ -165,6 +166,7 @@ export function CamposErro({
           <input
             id={`${id}-banca`}
             type="text"
+            maxLength={500}
             value={fonte.banca ?? ''}
             onChange={(e) => {
               mudarFonte('banca', e.target.value);
@@ -176,30 +178,26 @@ export function CamposErro({
           <input
             id={`${id}-prova`}
             type="text"
+            maxLength={500}
             value={fonte.prova ?? ''}
             onChange={(e) => {
               mudarFonte('prova', e.target.value);
             }}
           />
         </div>
-        <div className="campo">
-          <label htmlFor={`${id}-ano`}>Ano</label>
-          <input
-            id={`${id}-ano`}
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{4}"
-            value={fonte.ano !== undefined ? String(fonte.ano) : ''}
-            onChange={(e) => {
-              mudarFonte('ano', e.target.value.replace(/\D/g, '').slice(0, 4));
-            }}
-          />
-        </div>
+        <CampoAno
+          id={`${id}-ano`}
+          ano={fonte.ano}
+          aoMudar={(ano) => {
+            mudarFonte('ano', ano === undefined ? '' : String(ano));
+          }}
+        />
         <div className="campo">
           <label htmlFor={`${id}-numero`}>Nº da questão</label>
           <input
             id={`${id}-numero`}
             type="text"
+            maxLength={20}
             value={fonte.numero ?? ''}
             onChange={(e) => {
               mudarFonte('numero', e.target.value);
@@ -236,5 +234,46 @@ export function CamposErro({
         />
       </div>
     </>
+  );
+}
+
+/** Ano: aceita digitação parcial; só grava quando é um ano válido (1900–2100). */
+function CampoAno({
+  id,
+  ano,
+  aoMudar,
+}: {
+  id: string;
+  ano: number | undefined;
+  aoMudar: (ano: number | undefined) => void;
+}) {
+  const [texto, setTexto] = useState(ano !== undefined ? String(ano) : '');
+  const numero = Number(texto);
+  const valido = texto === '' || (/^\d{4}$/.test(texto) && numero >= 1900 && numero <= 2100);
+  return (
+    <div className="campo">
+      <label htmlFor={id}>Ano</label>
+      <input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        maxLength={4}
+        aria-invalid={!valido}
+        aria-describedby={valido ? undefined : `${id}-dica`}
+        value={texto}
+        onChange={(e) => {
+          const t = e.target.value.replace(/\D/g, '').slice(0, 4);
+          setTexto(t);
+          const n = Number(t);
+          if (t === '') aoMudar(undefined);
+          else if (t.length === 4 && n >= 1900 && n <= 2100) aoMudar(n);
+        }}
+      />
+      {!valido && (
+        <p id={`${id}-dica`} className="dica">
+          Use 4 dígitos, de 1900 a 2100.
+        </p>
+      )}
+    </div>
   );
 }

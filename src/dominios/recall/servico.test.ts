@@ -242,3 +242,26 @@ describe('fila projetada (6.9)', () => {
     expect(await maiorFilaProjetada(repo)).toBe(45);
   });
 });
+
+describe('correções da revisão da etapa 6', () => {
+  it('criar cartão duas vezes para o mesmo erro devolve o mesmo cartão', async () => {
+    const { repo } = await preparar();
+    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'x' });
+    const [a, b] = await Promise.all([
+      criarCartaoDeErro(repo, e.id),
+      criarCartaoDeErro(repo, e.id),
+    ]);
+    expect(a.id).toBe(b.id);
+    expect(await repo.colecao('cartoes').contar()).toBe(1);
+  });
+
+  it('sugestão que deixou de valer é apagada ao editar o texto', async () => {
+    const { repo } = await preparar();
+    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'prazo de 15 dias' });
+    expect(e.causaSugerida).toBe('literalidade');
+    const e2 = await completarErro(repo, e.id, { oQueFoi: 'não conhecia o instituto' });
+    expect(e2.causaSugerida).toBeUndefined();
+    const e3 = await completarErro(repo, e.id, { fraseCorreta: 'F.' });
+    expect(e3.causaSugerida).toBeUndefined();
+  });
+});

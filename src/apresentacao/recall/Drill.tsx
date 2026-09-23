@@ -9,7 +9,7 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
-import { Esqueleto, Vazio } from '../componentes/estados';
+import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESPOSTA } from './rotulos';
 
@@ -21,7 +21,8 @@ type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'escolher'; fila: Cartao[] }
   | { tipo: 'revisando'; fila: Cartao[]; indice: number; virado: boolean }
-  | { tipo: 'fim'; amanha: number };
+  | { tipo: 'fim'; amanha: number }
+  | { tipo: 'falha' };
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
   if (cartao.verso !== null) return cartao.verso;
@@ -43,17 +44,26 @@ export function Drill() {
   const botaoVirar = useRef<HTMLButtonElement>(null);
 
   const terminar = useCallback(async () => {
-    setEstado({ tipo: 'fim', amanha: await vencemAmanha(repo) });
+    try {
+      setEstado({ tipo: 'fim', amanha: await vencemAmanha(repo) });
+    } catch {
+      setEstado({ tipo: 'falha' });
+    }
   }, [repo]);
 
   useEffect(() => {
     let ativo = true;
-    void filaDoDia(repo).then((fila) => {
-      if (!ativo) return;
-      if (fila.length === 0) void terminar();
-      else if (fila.length > FILA_GRANDE) setEstado({ tipo: 'escolher', fila });
-      else setEstado({ tipo: 'revisando', fila, indice: 0, virado: false });
-    });
+    filaDoDia(repo).then(
+      (fila) => {
+        if (!ativo) return;
+        if (fila.length === 0) void terminar();
+        else if (fila.length > FILA_GRANDE) setEstado({ tipo: 'escolher', fila });
+        else setEstado({ tipo: 'revisando', fila, indice: 0, virado: false });
+      },
+      () => {
+        if (ativo) setEstado({ tipo: 'falha' });
+      },
+    );
     return () => {
       ativo = false;
     };
@@ -66,9 +76,14 @@ export function Drill() {
     inicio.current = performance.now();
     botaoVirar.current?.focus();
     let ativo = true;
-    void carregarVerso(repo, atual).then((v) => {
-      if (ativo) setVerso({ id: atual.id, texto: v });
-    });
+    carregarVerso(repo, atual).then(
+      (v) => {
+        if (ativo) setVerso({ id: atual.id, texto: v });
+      },
+      () => {
+        if (ativo) setVerso({ id: atual.id, texto: '' });
+      },
+    );
     return () => {
       ativo = false;
     };
@@ -106,6 +121,10 @@ export function Drill() {
     if (estado.tipo !== 'revisando') return;
     const tecla = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
+      // Com o foco em outro controle (menu, editar, suspender), a tecla é dele.
+      const alvo = e.target as HTMLElement | null;
+      const controle = alvo?.closest('a, button, summary, input, textarea, select');
+      if (controle && controle !== botaoVirar.current) return;
       if (!estado.virado && (e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
         virar();
@@ -122,6 +141,18 @@ export function Drill() {
   }, [estado, virar, responder]);
 
   if (estado.tipo === 'carregando') return <Esqueleto linhas={4} />;
+
+  if (estado.tipo === 'falha') {
+    return (
+      <>
+        <h1>Revisar</h1>
+        <Falha
+          oQue="Não foi possível carregar a fila de revisão."
+          oQueFazer="Recarregue a página. Se continuar, use o ! para relatar o problema."
+        />
+      </>
+    );
+  }
 
   if (estado.tipo === 'escolher') {
     return (
@@ -231,7 +262,9 @@ export function Drill() {
           <button
             type="button"
             onClick={() => {
-              void suspenderCartao(repo, atual.id).then(avancar);
+              suspenderCartao(repo, atual.id).then(avancar, () => {
+                setFalha('Não foi possível suspender o cartão. Nada foi alterado.');
+              });
             }}
           >
             Suspender este cartão

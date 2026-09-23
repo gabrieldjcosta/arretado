@@ -4,9 +4,9 @@ import type { CausaErro, Erro } from '../../core/modelo';
 
 const LITERALIDADE =
   /\b(prazos?|dias?|meses|anos|horas|salvo|exceto|excetuad\w*|ressalvad\w*|somente|apenas|no m[aá]ximo|no m[ií]nimo|at[eé] \d|qu[oó]rum|maioria|unanimidade|vedad\w*|facultad\w*|obrigat[oó]ri\w*)\b/i;
-const CONFUSAO = /(confundi|achei que era|pensei que era|troquei|misturei|vs\.?|\bx\b)/i;
+const CONFUSAO = /(confundi|achei que era|pensei que era|troquei|misturei|\bvs\.?\b)/i;
 const LEITURA =
-  /(li errado|n[aã]o li|li r[aá]pido|pulei|desaten\w*|n[aã]o vi|marquei (a )?errad\w*|li mal|enunciado)/i;
+  /(li errado|n[aã]o li|li r[aá]pido|pulei|desaten\w*|n[aã]o vi|marquei (a )?errad\w*|li mal|\b(li|ler) (o )?enunciado|enunciado (errado|mal lido))/i;
 
 export function sugerirCausa(
   erro: Pick<Erro, 'oQueFoi' | 'resultado'> &
