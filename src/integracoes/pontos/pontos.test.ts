@@ -91,3 +91,39 @@ describe('importação dos pontos (6.10)', () => {
     expect(await repo.colecao('pontos').contar()).toBe(0);
   });
 });
+
+describe('correções da revisão (pontos por CSV)', () => {
+  it('lê CSV do Excel em Windows-1252', async () => {
+    const { decodificarCsv } = await import('./csv');
+    // "Matéria;Tópico;Faixa\nPenal;Furto;Média" em Windows-1252.
+    const bytes = Uint8Array.from([
+      0x4d, 0x61, 0x74, 0xe9, 0x72, 0x69, 0x61, 0x3b, 0x54, 0xf3, 0x70, 0x69, 0x63, 0x6f, 0x3b,
+      0x46, 0x61, 0x69, 0x78, 0x61, 0x0a, 0x50, 0x65, 0x6e, 0x61, 0x6c, 0x3b, 0x46, 0x75, 0x72,
+      0x74, 0x6f, 0x3b, 0x4d, 0xe9, 0x64, 0x69, 0x61,
+    ]);
+    expect(lerCsvPontos(decodificarCsv(bytes)).linhas).toEqual([
+      { disciplina: 'Penal', titulo: 'Furto', faixa: 'media' },
+    ]);
+    expect(decodificarCsv(new TextEncoder().encode('Ação'))).toBe('Ação');
+  });
+
+  it('espaços internos contam como o mesmo ponto', () => {
+    const { linhas, avisos } = lerCsvPontos(
+      'Disciplina;Ponto\nPenal;Furto  simples\nPenal;Furto simples\n',
+    );
+    expect(linhas).toHaveLength(1);
+    expect(avisos[0]).toMatch(/Linha 3 ignorada: ponto repetido/);
+  });
+
+  it('número de linha considera linhas em branco e células com quebra', () => {
+    const { avisos } = lerCsvPontos(
+      'Disciplina;Ponto\n\nPenal;"Furto\nqualificado"\n;sem disciplina\n',
+    );
+    expect(avisos).toEqual(['Linha 5 ignorada: falta disciplina ou ponto.']);
+  });
+
+  it('separador pelo cabeçalho mesmo com ";" no título e fim de linha só \\r', () => {
+    const { linhas } = lerCsvPontos('Disciplina,Ponto\rPenal,"Furto; simples"\rPenal,Roubo\r');
+    expect(linhas.map((l) => l.titulo)).toEqual(['Furto; simples', 'Roubo']);
+  });
+});

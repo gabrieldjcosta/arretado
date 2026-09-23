@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Disciplina, Faixa, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
@@ -24,18 +25,24 @@ function porDisciplina(disciplinas: Disciplina[], pontos: Ponto[]) {
 /** Plano na F1: pontos importados, só para vincular erros. Edição e sugestão chegam na F3. */
 export function Plano() {
   const { dados } = useDados(pontosEDisciplinas);
+  const [confirmacao, setConfirmacao] = useState<string | null>(null);
   if (!dados) return <Esqueleto />;
   const grupos = porDisciplina(dados.disciplinas, dados.pontos);
 
   return (
     <>
       <h1>Plano</h1>
+      {confirmacao && (
+        <p role="status" className="sucesso">
+          {confirmacao}
+        </p>
+      )}
       {dados.pontos.length === 0 ? (
         <>
           <Vazio titulo="Nenhum ponto do edital ainda">
             <p>Importe seus pontos para poder vincular erros a eles.</p>
           </Vazio>
-          <ImportarPontos />
+          <ImportarPontos aoImportar={setConfirmacao} />
         </>
       ) : (
         <>
@@ -61,7 +68,7 @@ export function Plano() {
           ))}
           <details>
             <summary className="botao discreto">Importar outra planilha</summary>
-            <ImportarPontos />
+            <ImportarPontos aoImportar={setConfirmacao} />
           </details>
         </>
       )}

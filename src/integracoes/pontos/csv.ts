@@ -23,6 +23,23 @@ export class CsvInvalido extends Error {
 
 export const LIMITE_CSV = 2_000_000;
 
+/**
+ * Texto do arquivo: UTF-8 quando válido; senão Windows-1252, o padrão do Excel em
+ * português ao salvar CSV (sem isso, todo acento viraria "�").
+ */
+export function decodificarCsv(bytes: Uint8Array): string {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return new TextDecoder('windows-1252').decode(bytes);
+  }
+}
+
+/** Chave de comparação: sem acento, minúsculas, espaços colapsados (também usada nos ids). */
+export function chave(s: string): string {
+  return semAcento(s).replace(/\s+/g, ' ');
+}
+
 function semAcento(s: string): string {
   return s
     .normalize('NFD')
@@ -46,15 +63,34 @@ const FAIXAS: Record<string, Faixa> = {
   extra: 'extra',
 };
 
-/** Divide o CSV em linhas e células (aspas duplas, separador detectado no cabeçalho). */
-export function celulas(texto: string): string[][] {
+/** Separador do cabeçalho: o mais frequente fora de aspas entre ";", tab e ",". */
+function separador(texto: string): string {
+  let aspas = false;
+  const contagem: Record<string, number> = { ';': 0, '\t': 0, ',': 0 };
+  for (const c of texto) {
+    if (c === '"') aspas = !aspas;
+    else if (!aspas && (c === '\n' || c === '\r')) break;
+    else if (!aspas && c in contagem) contagem[c] = (contagem[c] ?? 0) + 1;
+  }
+  const [melhor] = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
+  return melhor && melhor[1] > 0 ? melhor[0] : ';';
+}
+
+interface LinhaCsv {
+  valores: string[];
+  /** Linha física (1 = primeira) onde o registro começa. */
+  numero: number;
+}
+
+function registros(texto: string): LinhaCsv[] {
   const semBom = texto.replace(/^\ufeff/, '');
-  const primeira = semBom.split(/\r?\n/, 1)[0] ?? '';
-  const sep = primeira.includes(';') ? ';' : primeira.includes('\t') ? '\t' : ',';
-  const linhas: string[][] = [];
+  const sep = separador(semBom);
+  const saida: LinhaCsv[] = [];
   let linha: string[] = [];
   let atual = '';
   let aspas = false;
+  let fisica = 1;
+  let inicio = 1;
   for (let i = 0; i < semBom.length; i++) {
     const c = semBom.charAt(i);
     if (aspas) {
@@ -62,7 +98,10 @@ export function celulas(texto: string): string[][] {
         atual += '"';
         i++;
       } else if (c === '"') aspas = false;
-      else atual += c;
+      else {
+        if (c === '\n' || (c === '\r' && semBom[i + 1] !== '\n')) fisica++;
+        atual += c;
+      }
     } else if (c === '"') aspas = true;
     else if (c === sep) {
       linha.push(atual);
@@ -70,23 +109,31 @@ export function celulas(texto: string): string[][] {
     } else if (c === '\n' || c === '\r') {
       if (c === '\r' && semBom[i + 1] === '\n') i++;
       linha.push(atual);
-      linhas.push(linha);
+      saida.push({ valores: linha, numero: inicio });
+      fisica++;
+      inicio = fisica;
       linha = [];
       atual = '';
     } else atual += c;
   }
   if (atual !== '' || linha.length > 0) {
     linha.push(atual);
-    linhas.push(linha);
+    saida.push({ valores: linha, numero: inicio });
   }
-  return linhas.filter((l) => l.some((c) => c.trim() !== ''));
+  return saida.filter((l) => l.valores.some((c) => c.trim() !== ''));
+}
+
+/** Divide o CSV em linhas e células (aspas duplas, separador detectado no cabeçalho). */
+export function celulas(texto: string): string[][] {
+  return registros(texto).map((l) => l.valores);
 }
 
 export function lerCsvPontos(texto: string): LeituraCsv {
   if (texto.length > LIMITE_CSV)
     throw new CsvInvalido('O arquivo é grande demais (limite de 2 MB).');
-  const [cabecalho, ...dados] = celulas(texto);
-  if (!cabecalho) throw new CsvInvalido('O arquivo está vazio.');
+  const [primeira, ...dados] = registros(texto);
+  if (!primeira) throw new CsvInvalido('O arquivo está vazio.');
+  const cabecalho = primeira.valores;
   const indice = (campo: keyof LinhaPonto) =>
     cabecalho.findIndex((c) =>
       COLUNAS[campo].includes(
@@ -109,19 +156,19 @@ export function lerCsvPontos(texto: string): LeituraCsv {
   const avisos: string[] = [];
   let semFaixa = 0;
   const vistos = new Set<string>();
-  dados.forEach((l, n) => {
+  dados.forEach(({ valores: l, numero }) => {
     const disciplina = (l[iDisciplina] ?? '').trim();
     const titulo = (l[iTitulo] ?? '').trim();
     if (!disciplina || !titulo) {
-      avisos.push(`Linha ${String(n + 2)} ignorada: falta disciplina ou ponto.`);
+      avisos.push(`Linha ${String(numero)} ignorada: falta disciplina ou ponto.`);
       return;
     }
-    const chave = `${semAcento(disciplina)}|${semAcento(titulo)}`;
-    if (vistos.has(chave)) {
-      avisos.push(`Linha ${String(n + 2)} ignorada: ponto repetido na mesma disciplina.`);
+    const k = `${chave(disciplina)}|${chave(titulo)}`;
+    if (vistos.has(k)) {
+      avisos.push(`Linha ${String(numero)} ignorada: ponto repetido na mesma disciplina.`);
       return;
     }
-    vistos.add(chave);
+    vistos.add(k);
     const textoFaixa = iFaixa >= 0 ? semAcento(l[iFaixa] ?? '') : '';
     const faixa = FAIXAS[textoFaixa];
     if (textoFaixa && !faixa) semFaixa += 1;

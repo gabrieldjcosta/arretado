@@ -3,7 +3,7 @@ import type { Disciplina, NomeColecao, Ponto } from '../../core/modelo';
 import { planejar, type PacoteLido, type Previa } from '../../core/pacote';
 import { VERSAO_ESQUEMA, type Repositorio } from '../../core/persistencia';
 import { VERSAO_APP } from '../../core/versao';
-import type { LinhaPonto } from './csv';
+import { chave, type LinhaPonto } from './csv';
 
 async function sha256(texto: string): Promise<Uint8Array> {
   return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto)));
@@ -19,15 +19,6 @@ export async function idDeterministico(...partes: string[]): Promise<string> {
   b[8] = ((b[8] ?? 0) & 0x3f) | 0x80;
   const hex = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
-
-function chave(s: string): string {
-  return s
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim();
 }
 
 export interface PontosPreparados {

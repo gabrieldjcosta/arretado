@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { aplicar } from '../../core/pacote';
-import { CsvInvalido, lerCsvPontos } from '../../integracoes/pontos/csv';
+import { CsvInvalido, decodificarCsv, lerCsvPontos } from '../../integracoes/pontos/csv';
 import { prepararPontos, type PontosPreparados } from '../../integracoes/pontos/importar';
 import { PreviaImportacao } from '../conta/dados/PreviaImportacao';
 import { useRepositorio } from '../dados/contexto';
 
 /** Importa os pontos do edital de um CSV (planilha do Ciclo Obrigatório exportada). */
-export function ImportarPontos() {
+export function ImportarPontos({ aoImportar }: { aoImportar?: (mensagem: string) => void }) {
   const repo = useRepositorio();
   const [preparado, setPreparado] = useState<(PontosPreparados & { avisos: string[] }) | null>(
     null,
@@ -19,7 +19,7 @@ export function ImportarPontos() {
     setOcupado(true);
     setMensagem(null);
     try {
-      const texto = await arquivo.text();
+      const texto = decodificarCsv(new Uint8Array(await arquivo.arrayBuffer()));
       const { linhas, avisos } = lerCsvPontos(texto);
       setPreparado({ ...(await prepararPontos(repo, linhas, texto)), avisos });
     } catch (erro) {
@@ -40,10 +40,10 @@ export function ImportarPontos() {
         descricao: 'Pontos do edital (CSV)',
       });
       setPreparado(null);
-      setMensagem({
-        tipo: 'ok',
-        texto: 'Pontos importados. Se precisar, desfaça em Conta › Dados › Importações.',
-      });
+      const texto = 'Pontos importados. Se precisar, desfaça em Conta › Dados › Importações.';
+      // A tela do Plano troca de estado ao importar: quem mostra a confirmação é ela.
+      if (aoImportar) aoImportar(texto);
+      else setMensagem({ tipo: 'ok', texto });
     } catch {
       setMensagem({ tipo: 'falha', texto: 'Não foi possível importar. Nada foi alterado.' });
     } finally {
