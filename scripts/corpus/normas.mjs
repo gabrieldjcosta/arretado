@@ -1,8 +1,6 @@
-// Corpus de normas reais para testar o estruturador da F2 (atividades 7.1 e 7.2).
+// Corpus de normas reais para testar o estruturador da F2 (atividade 7.1).
 // Texto de lei é domínio público (Lei 9.610/98, art. 8º, IV): as páginas ficam no repositório,
-// byte a byte como a fonte as entregou, com charset, data e hash no manifesto. Ao lado de cada
-// página ficam os derivados: o colar dela no Chromium (`*.colado.html` e `*.colado.txt`, 7.2) e o
-// gabarito (`*.gabarito.json`, 7.3).
+// byte a byte como a fonte as entregou, com charset, data e hash no manifesto.
 import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -16,17 +14,17 @@ export const USER_AGENT = 'Mozilla/5.0 (compatible; arretado-corpus/1.0; estudo 
 
 export const NOME_MANIFESTO = 'manifesto.json';
 
-const DESCRICAO =
-  'Páginas oficiais, byte a byte como a fonte as entregou, e o colar de cada uma no Chromium, ' +
-  'para os testes do estruturador (F2). Gerado por scripts/corpus-normas.mjs e ' +
-  'scripts/corpus-colar.mjs; não editar à mão.';
+/**
+ * Arquivos derivados das páginas, que moram na mesma pasta mas não entram no manifesto:
+ * a captura do colar (7.2, índice próprio em `colados.json`) e o gabarito (7.3). As funções
+ * de página (`verificarCorpus`, `baixarCorpus`) os ignoram; `verificarDerivados` os confere.
+ */
+export const SUFIXOS_DERIVADOS = ['.colado.html', '.colado.txt', '.gabarito.json'];
 
-/** @param {string} id */
-export const nomeColadoHtml = (id) => `${id}.colado.html`;
-/** @param {string} id */
-export const nomeColadoTexto = (id) => `${id}.colado.txt`;
-/** @param {string} id */
-export const nomeGabarito = (id) => `${id}.gabarito.json`;
+/** @param {string} nome */
+export function ehDerivado(nome) {
+  return SUFIXOS_DERIVADOS.some((sufixo) => nome.endsWith(sufixo));
+}
 
 /** Abaixo disso a resposta é página de erro, não norma. */
 const TAMANHO_MINIMO = 20_000;
@@ -313,37 +311,21 @@ export function conferirConteudo(norma, bytes, charset) {
  */
 
 /**
- * @typedef {object} ArquivoDerivado
- * @property {string} arquivo
- * @property {number} bytes
- * @property {string} sha256
- */
-
-/**
- * Colar da página no Chromium (7.2): o `text/html` e o `text/plain` que o evento `paste` entrega,
- * gravados em UTF-8. Amarrado à versão da página pelo `sha256Conteudo` dela: se a fonte mudar,
- * o colado fica desatualizado e a verificação pede nova captura.
- * @typedef {object} EntradaColado
- * @property {string} id O da norma de origem.
- * @property {string} sha256ConteudoOrigem `sha256Conteudo` da página no momento da captura.
- * @property {string} navegador Ex.: `chromium 141.0.7390.37`.
- * @property {string} plataforma `process.platform` da captura (a serialização pode variar).
- * @property {string} capturadoEm Instante ISO 8601 UTC da última mudança da captura.
- * @property {ArquivoDerivado} html
- * @property {ArquivoDerivado} texto
- */
-
-/**
  * @typedef {object} Manifesto
  * @property {1} versao
  * @property {string} descricao
  * @property {EntradaManifesto[]} normas
- * @property {EntradaColado[]} [colados]
  */
 
 /** @returns {Manifesto} */
 export function manifestoVazio() {
-  return { versao: 1, descricao: DESCRICAO, normas: [], colados: [] };
+  return {
+    versao: 1,
+    descricao:
+      'Páginas oficiais, byte a byte como a fonte as entregou, para os testes do estruturador ' +
+      '(F2). Gerado por scripts/corpus-normas.mjs; não editar à mão.',
+    normas: [],
+  };
 }
 
 /**
@@ -369,124 +351,16 @@ export function atualizarEntrada(anterior, nova, agora) {
 }
 
 /**
- * Nova captura, ou a anterior intacta se a origem e os bytes capturados não mudaram.
- * @param {EntradaColado | undefined} anterior
- * @param {Omit<EntradaColado, 'capturadoEm'>} nova
- * @param {string} agora
- * @returns {{ entrada: EntradaColado, mudou: boolean }}
- */
-export function atualizarColado(anterior, nova, agora) {
-  const mesma =
-    anterior !== undefined &&
-    anterior.sha256ConteudoOrigem === nova.sha256ConteudoOrigem &&
-    anterior.html.arquivo === nova.html.arquivo &&
-    anterior.html.sha256 === nova.html.sha256 &&
-    anterior.texto.arquivo === nova.texto.arquivo &&
-    anterior.texto.sha256 === nova.texto.sha256;
-  if (mesma) return { entrada: anterior, mudou: false };
-  return { entrada: { ...nova, capturadoEm: agora }, mudou: true };
-}
-
-/**
  * Manifesto em JSON estável (ordem do catálogo; LF no fim).
  * @param {Manifesto} manifesto
  * @returns {string}
  */
 export function serializarManifesto(manifesto) {
   const ordem = new Map(NORMAS.map((n, i) => [n.id, i]));
-  /** @param {{ id: string }} a @param {{ id: string }} b */
-  const peloCatalogo = (a, b) => (ordem.get(a.id) ?? Infinity) - (ordem.get(b.id) ?? Infinity);
-  const normas = [...manifesto.normas].sort(peloCatalogo);
-  const colados = [...(manifesto.colados ?? [])].sort(peloCatalogo);
-  return `${JSON.stringify({ versao: 1, descricao: DESCRICAO, normas, colados }, null, 2)}\n`;
-}
-
-/**
- * Arquivos da pasta que o manifesto não explica: nem página, nem colado registrado, nem
- * gabarito de norma do catálogo.
- * @param {readonly string[]} nomes
- * @param {Manifesto} manifesto
- * @returns {string[]}
- */
-export function arquivosForaDoManifesto(nomes, manifesto) {
-  const conhecidos = new Set([
-    NOME_MANIFESTO,
-    ...manifesto.normas.map((e) => e.arquivo),
-    ...(manifesto.colados ?? []).flatMap((c) => [c.html.arquivo, c.texto.arquivo]),
-    ...NORMAS.map((n) => nomeGabarito(n.id)),
-  ]);
-  return nomes.filter((nome) => !conhecidos.has(nome));
-}
-
-/**
- * O que o `npm run corpus` completo apaga: só sobras dos formatos que os scripts gravam
- * (`.html`, `.txt`). Colados registrados e gabaritos ficam.
- * @param {readonly string[]} nomes
- * @param {Manifesto} manifesto
- * @returns {string[]}
- */
-export function arquivosParaApagar(nomes, manifesto) {
-  return arquivosForaDoManifesto(nomes, manifesto).filter((nome) => /\.(html|txt)$/.test(nome));
-}
-
-/**
- * Fração mínima do texto visível da página que o colado precisa ter. No corpus de 23/09/2026 o
- * colado tem de 99,8% a 100%; bem menos que isso é seleção cortada (p. ex. no `</html>` que o
- * CP e a CF trazem logo no início, com a lei inteira depois).
- */
-export const LIMIAR_COMPLETUDE = 0.98;
-
-/**
- * Confere a captura do colar: norma certa e inteira nos dois formatos, sem caractere de
- * substituição (página servida com o charset errado) e sem tachado perdido — cada `<strike>`,
- * `<del>`, `line-through` e `<s>` com texto da página precisa chegar ao `text/html` colado,
- * senão o estruturador não acha as redações anteriores.
- * @param {NormaDoCorpus} norma
- * @param {{ html: string, texto: string }} colado
- * @param {string} htmlFonte A página de origem, já decodificada.
- * @returns {string[]} problemas (vazio = ok)
- */
-export function conferirColado(norma, colado, htmlFonte) {
-  /** @type {string[]} */
-  const problemas = [];
-  const rotulo = `${norma.id} (colado)`;
-  const tamanhoDaPagina = textoParaConferencia(htmlFonte).trim().length;
-  const textos = {
-    html: textoParaConferencia(colado.html),
-    texto: colado.texto.replace(/[\s\u00a0]+/g, ' ').toLocaleLowerCase('pt-BR'),
-  };
-  for (const [formato, texto] of Object.entries(textos)) {
-    if (texto.trim() === '') {
-      problemas.push(`${rotulo}: ${formato} vazio`);
-      continue;
-    }
-    if (texto.includes('\uFFFD')) {
-      problemas.push(
-        `${rotulo}: caractere de substituição (U+FFFD) no ${formato} — charset errado ao servir?`,
-      );
-    }
-    for (const marcador of norma.marcadores) {
-      if (!texto.includes(marcador)) {
-        problemas.push(`${rotulo}: marcador "${marcador}" ausente do ${formato}`);
-      }
-    }
-    const fracao = texto.trim().length / tamanhoDaPagina;
-    if (fracao < LIMIAR_COMPLETUDE) {
-      problemas.push(
-        `${rotulo}: o ${formato} tem só ${(fracao * 100).toFixed(1)}% do texto da página — ` +
-          'seleção cortada?',
-      );
-    }
-  }
-  const naPagina = contarTachados(htmlFonte);
-  const noColado = contarTachados(colado.html);
-  if (noColado < naPagina) {
-    problemas.push(
-      `${rotulo}: ${String(noColado)} tachados, a página tem ${String(naPagina)} — ` +
-        'o colar perdeu redações anteriores',
-    );
-  }
-  return problemas;
+  const normas = [...manifesto.normas].sort(
+    (a, b) => (ordem.get(a.id) ?? Infinity) - (ordem.get(b.id) ?? Infinity),
+  );
+  return `${JSON.stringify({ ...manifesto, normas }, null, 2)}\n`;
 }
 
 /**
@@ -506,9 +380,8 @@ export async function lerManifesto(diretorio) {
 }
 
 /**
- * Verificação sem rede: toda norma do catálogo tem entrada, arquivo e colado; tamanho, hash e
- * conteúdo batem com o manifesto; o colado é da versão atual da página. Usada pelo `npm test`
- * e por `--verificar`.
+ * Verificação sem rede: toda norma do catálogo tem entrada e arquivo; tamanho, hash e
+ * conteúdo batem com o manifesto. Usada pelo `npm test` e por `--verificar`.
  * @param {string} diretorio
  * @returns {Promise<string[]>} problemas (vazio = corpus íntegro)
  */
@@ -517,7 +390,6 @@ export async function verificarCorpus(diretorio) {
   /** @type {string[]} */
   const problemas = [];
   const porId = new Map(manifesto.normas.map((e) => [e.id, e]));
-  const coladoPorId = new Map((manifesto.colados ?? []).map((c) => [c.id, c]));
   for (const norma of NORMAS) {
     const entrada = porId.get(norma.id);
     if (!entrada) {
@@ -548,21 +420,6 @@ export async function verificarCorpus(diretorio) {
       problemas.push(`${norma.id}: hash do conteúdo difere do manifesto`);
     }
     problemas.push(...conferirConteudo(norma, bytes, entrada.charset));
-    const colado = coladoPorId.get(norma.id);
-    if (!colado) {
-      problemas.push(`${norma.id}: sem colado — rode npm run corpus:colar`);
-      continue;
-    }
-    if (colado.sha256ConteudoOrigem !== entrada.sha256Conteudo) {
-      problemas.push(
-        `${norma.id}: colado capturado de outra versão da página — rode npm run corpus:colar`,
-      );
-      continue;
-    }
-    const conteudos = await lerColado(diretorio, colado, problemas);
-    if (conteudos) {
-      problemas.push(...conferirColado(norma, conteudos, decodificar(bytes, entrada.charset)));
-    }
   }
   const conhecidos = new Set(NORMAS.map((n) => n.id));
   for (const entrada of manifesto.normas) {
@@ -570,59 +427,19 @@ export async function verificarCorpus(diretorio) {
       problemas.push(`${entrada.id}: está no manifesto mas saiu do catálogo — rode npm run corpus`);
     }
   }
-  for (const colado of manifesto.colados ?? []) {
-    if (!conhecidos.has(colado.id)) {
-      problemas.push(`${colado.id}: colado de norma fora do catálogo — rode npm run corpus`);
+  const referenciados = new Set(manifesto.normas.map((e) => e.arquivo));
+  for (const nome of await readdir(diretorio)) {
+    if (nome.endsWith('.html') && !ehDerivado(nome) && !referenciados.has(nome)) {
+      problemas.push(`${nome}: arquivo fora do manifesto — rode npm run corpus`);
     }
-  }
-  for (const nome of arquivosForaDoManifesto(await readdir(diretorio), manifesto)) {
-    problemas.push(`${nome}: arquivo fora do manifesto — rode npm run corpus`);
   }
   return problemas;
 }
 
 /**
- * Lê os dois arquivos do colado conferindo tamanho, hash e UTF-8; acrescenta os problemas.
+ * O arquivo da entrada existe no disco e tem os bytes registrados?
  * @param {string} diretorio
- * @param {EntradaColado} colado
- * @param {string[]} problemas
- * @returns {Promise<{ html: string, texto: string } | undefined>} os textos, se ambos legíveis
- */
-async function lerColado(diretorio, colado, problemas) {
-  const utf8 = new TextDecoder('utf-8', { fatal: true });
-  /** @type {Partial<Record<'html' | 'texto', string>>} */
-  const conteudos = {};
-  for (const formato of /** @type {const} */ (['html', 'texto'])) {
-    const { arquivo, bytes: esperado, sha256 } = colado[formato];
-    /** @type {Uint8Array} */
-    let bytes;
-    try {
-      bytes = await readFile(join(diretorio, arquivo));
-    } catch {
-      problemas.push(`${colado.id}: arquivo ${arquivo} não encontrado`);
-      continue;
-    }
-    if (bytes.length !== esperado) {
-      problemas.push(
-        `${arquivo}: ${String(bytes.length)} bytes no disco, ${String(esperado)} no manifesto ` +
-          '(fim de linha convertido pelo git?)',
-      );
-    }
-    if (sha256Hex(bytes) !== sha256) problemas.push(`${arquivo}: hash difere do manifesto`);
-    try {
-      conteudos[formato] = utf8.decode(bytes);
-    } catch {
-      problemas.push(`${arquivo}: não é UTF-8 válido`);
-    }
-  }
-  const { html, texto } = conteudos;
-  return html !== undefined && texto !== undefined ? { html, texto } : undefined;
-}
-
-/**
- * O arquivo da entrada (página ou arquivo de colado) existe no disco e tem os bytes registrados?
- * @param {string} diretorio
- * @param {{ arquivo: string, sha256: string }} entrada
+ * @param {EntradaManifesto} entrada
  * @returns {Promise<boolean>}
  */
 export async function arquivoConfere(diretorio, entrada) {
