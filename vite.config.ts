@@ -57,7 +57,12 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'unidade',
-          include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'eslint/**/*.test.ts'],
+          include: [
+            'src/**/*.test.{ts,tsx}',
+            'scripts/**/*.test.ts',
+            'eslint/**/*.test.ts',
+            'supabase/**/*.test.ts',
+          ],
         },
       },
       {
