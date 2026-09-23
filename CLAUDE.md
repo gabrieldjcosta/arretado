@@ -2,10 +2,10 @@
 
 ## O que é este repositório
 Plataforma pessoal de preparação para concursos jurídicos (usuário principal: Gabriel, TDAH, banca FCC, Defensoria/SP).
-Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore, a ser importado).
+Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore). Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado; conteúdo recomeça do zero.
 
 ## Estado
-Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T15); **F0 e F1 implementadas** (portões em `docs/portoes/`; pendentes: projeto Supabase real, importadores Acervo/Acumen v2, hospedagem, uso real de 14 dias). Antes de qualquer implementação, ler:
+Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T15); **F0 e F1 implementadas** (portões em `docs/portoes/`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, pendências e armadilhas).. Antes de qualquer implementação, ler:
 1. `README.md` — contexto em uma página.
 2. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel).
 3. `docs/especificacao-parte1.md` §5 e §15 — modelo de dados e fases.

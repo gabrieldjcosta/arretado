@@ -2,27 +2,13 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import pacote from './package.json' with { type: 'json' };
+import { CSP, cabecalhosHospedagem } from './config/seguranca';
 
 /**
  * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
  * injeta estilos em linha. O E2E roda sobre a versão construída e verifica violações.
+ * A versão construída também leva o `_headers` da hospedagem (Cloudflare Pages).
  */
-export const CSP = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self'",
-  "worker-src 'self'",
-  "manifest-src 'self'",
-  "object-src 'none'",
-  "base-uri 'none'",
-  "form-action 'none'",
-  "require-trusted-types-for 'script'",
-  'trusted-types dompurify',
-].join('; ');
-
 function csp(): Plugin {
   return {
     name: 'arretado-csp',
@@ -34,6 +20,9 @@ function csp(): Plugin {
         injectTo: 'head-prepend',
       },
     ],
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: '_headers', source: cabecalhosHospedagem() });
+    },
   };
 }
 
@@ -64,6 +53,7 @@ export default defineConfig({
             'scripts/**/*.test.ts',
             'eslint/**/*.test.ts',
             'supabase/**/*.test.ts',
+            'config/**/*.test.ts',
           ],
         },
       },
