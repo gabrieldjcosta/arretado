@@ -6,34 +6,34 @@ Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md
 
 - **F0 (Fundamentos) e F1 (Recall + pontos do edital) implementadas**, revisadas e testadas.
 - Código no branch `claude/awesome-ride-cb1sfz`, no PR [gabrieldjcosta/arretado#1](https://github.com/gabrieldjcosta/arretado/pull/1) para o `main` (revisão do Gabriel).
-- Verificação: 329 testes unitários/integração, 82 E2E (Playwright + axe, desktop e celular), carga de 10 mil registros, CI verde.
-- Portões: [`portoes/F0.md`](portoes/F0.md) e [`portoes/F1.md`](portoes/F1.md).
+- Verificação: 331 testes unitários/integração, 82 E2E (Playwright + axe, desktop e celular), carga de 10 mil registros, CI verde.
+- Portões: [`portoes/F0.md`](portoes/F0.md) (**fechado em 23/09/2026**) e [`portoes/F1.md`](portoes/F1.md).
 - **Decisão de escopo (23/09/2026):** nada do Acervo antigo nem do Acumen v2 é importado; o conteúdo recomeça do zero (nota no topo das Partes 1 e 2).
+
+## Projeto Supabase (atividade 4.3, concluída em 23/09/2026)
+
+| | |
+|---|---|
+| Nome · referência | `arretado` · `dgwoemewvpabbppascuw` |
+| URL pública | https://dgwoemewvpabbppascuw.supabase.co |
+| Região · banco | `sa-east-1` (São Paulo) · Postgres 17 |
+| Organização · plano | GJC's Org (`phapzxwurkbwklanvxdy`) · free, US$ 0 (pausa após 7 dias sem uso; reativar no painel ou com `restore_project`) |
+
+Migrações aplicadas pelo conector, idênticas ao repositório (MD5 conferido). O `apply_migration` registra a versão com o horário UTC da aplicação, não com o prefixo do arquivo:
+
+| Arquivo no repositório | Versão no remoto |
+|---|---|
+| `20260923000000_esquema_inicial.sql` | `20260923030320` |
+| `20260923000100_ajustes_advisors.sql` | `20260923030802` |
+
+- **Advisors:** segurança sem alertas. Desempenho: a migração `ajustes_advisors` corrigiu o aviso de duas políticas permissivas de leitura em `catalogo` e a chave estrangeira `catalogo.curador_id` sem índice. Fica só o aviso informativo "índice não usado", esperado até haver tráfego. `rls.test.ts` ganhou guardas para esses dois lints.
+- **RLS no projeto real:** `supabase/verificacao-rls-remota.sql`, com 15 verificações numa transação desfeita. B não lê, não altera, não apaga e não grava em nome de A. Ninguém altera nem apaga o log, nem o próprio dono. O anônimo não lê dado pessoal. Repetir depois de toda migração nova.
+- **Chaves:** nenhuma no repositório. A chave anônima só entra na F4.
+- **Lembretes para a F4:** expor o esquema `arretado` na API (Settings › API › Exposed schemas). Se o projeto estiver pausado, reativá-lo antes. Se um dia adotar o Supabase CLI, alinhar as versões da tabela acima com `supabase migration repair`.
 
 ## Pendências, em ordem
 
-### 1. Criar o projeto Supabase real (atividade 4.3) — Gabriel já autorizou
-
-Ferramentas do conector Supabase (MCP). Organização: **GJC's Org** (`phapzxwurkbwklanvxdy`, plano free, sem projetos em 23/09/2026).
-
-1. `create_project`: nome `arretado`, região `sa-east-1`, organização acima. Se a ferramenta pedir confirmação de custo, o plano free custa US$ 0 (projeto pausa após 7 dias sem uso).
-2. Aguardar `get_project` com status `ACTIVE_HEALTHY`.
-3. `apply_migration`: nome `esquema_inicial`, conteúdo de `supabase/migrations/20260923000000_esquema_inicial.sql` (inteiro, sem editar).
-4. `get_advisors` (`security` e `performance`): nenhum alerta crítico. Corrigir na migração do repositório (nova migração numerada), nunca direto no painel.
-5. Conferir RLS com `execute_sql`, **sempre em transação desfeita**:
-   ```sql
-   begin;
-   insert into auth.users (id) values ('0199a6c4-0000-7000-8000-00000000000a'), ('0199a6c4-0000-7000-8000-00000000000b');
-   set local role authenticated;
-   set local request.jwt.claim.sub = '0199a6c4-0000-7000-8000-00000000000a';
-   -- inserir um registro de A, trocar o claim para B, conferir que B não vê/altera/apaga
-   rollback;
-   ```
-   (Se `auth.users` exigir mais colunas, usar o mínimo que o Supabase aceitar; tudo é desfeito no `rollback`.)
-6. Anotar em `portoes/F0.md` a linha "RLS … projeto real" como ✅ e registrar a referência do projeto (URL pública; **nenhuma chave no repositório** — a chave anônima só entra na F4).
-7. Lembrete para a F4: expor o esquema `arretado` na API (Settings › API › Exposed schemas).
-
-### 2. Publicar no Cloudflare Pages — precisa da conta do Gabriel
+### 1. Publicar no Cloudflare Pages — precisa da conta do Gabriel
 
 O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc., a partir de `config/seguranca.ts`) e há `.node-version` = 22. No painel do Cloudflare:
 
@@ -43,11 +43,11 @@ O build já gera `dist/_headers` (CSP com `frame-ancestors`, HSTS, nosniff etc.,
 4. Deploy. Conferir no celular: abrir a URL, registrar um erro, revisar; em Conta › Dados, exportar.
 5. Conferir os cabeçalhos: `curl -sI https://<projeto>.pages.dev | grep -i content-security`.
 
-### 3. Uso real da F1 (portão)
+### 2. Uso real da F1 (portão)
 
 14 dias com revisão feita em pelo menos 10; metas em [`portoes/F1.md`](portoes/F1.md). Backup semanal em Conta › Dados › Exportar. Relatar problemas pelo "!".
 
-### 4. Planejar a F2 (Legislação) — só depois do portão da F1
+### 3. Planejar a F2 (Legislação) — só depois do portão da F1
 
 Ler Parte 2 §10.6 (estruturador, editor, leitor) e a skill `acumen-extrair-normas`. Sem importador do Acervo (decisão de escopo). O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 
@@ -65,11 +65,14 @@ Ler Parte 2 §10.6 (estruturador, editor, leitor) e a skill `acumen-extrair-norm
 - **Camadas** impostas pelo lint (`eslint/regra-camadas.js`): Dexie só em `src/core/persistencia`, DOMPurify só em `src/core/seguranca`, domínio não importa outro domínio.
 - **TypeScript fixado em ~6.0** porque o `typescript-eslint` ainda não aceita o 7.
 - **Revisão por etapa:** o `/code-review` achou problemas reais em todas as etapas; manter o hábito ao fim de cada bloco.
+- **`execute_sql` do conector Supabase** devolve só o resultado do último comando que retorna linhas (o `rollback` final não conta). Para várias verificações num lote, gravar numa tabela temporária e ler no fim; recusas esperadas vão dentro de `do $$ … exception when others … $$` (ver `supabase/verificacao-rls-remota.sql`).
+- **`npm run check` instável no Windows sob carga:** em 23/09/2026, duas de quatro rodadas falharam sem relação com o código. Numa, o sistema de arquivos devolveu `UNKNOWN: lstat 'C:\'` e falhou ao abrir arquivos do `node_modules`. Na outra, o boot do PGlite estourou os 10 s do `beforeAll` do `rls.test.ts`. Rodar de novo; se o timeout do PGlite se repetir, dar um limite maior só a esse `beforeAll`.
+- **Migração nova no Supabase:** primeiro no repositório, com `npm run check` verde (o `rls.test.ts` aplica todas em PGlite); depois `apply_migration` com o conteúdo do arquivo sem editar; depois advisors e `verificacao-rls-remota.sql`. Nunca direto no painel.
 
 ## Como validar tudo
 
 ```
-npm run check      # formato, lint, tipos, 329 testes, auditoria
+npm run check      # formato, lint, tipos, 331 testes, auditoria
 npm run carga      # 10 mil registros dentro dos limiares
 npm run test:e2e   # 82 cenários (Playwright + axe)
 npm run build      # dist/ com _headers
@@ -91,5 +94,6 @@ src/suporte/relatos.ts        "!" Relatar problema
 src/apresentacao/             shell, Conta › Dados/Aparência/Privacidade, Orientações,
                               Recall (captura, completar, abas, drill), Plano
 supabase/migrations/          esquema remoto com RLS; teste em supabase/rls.test.ts
+supabase/verificacao-rls-remota.sql   conferência da RLS no projeto real (não é migração)
 e2e/                          Playwright + axe; vigilância automática de CSP e console
 ```
