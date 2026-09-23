@@ -31,6 +31,16 @@ export const SECOES: Secao[] = [
     ],
   },
   {
+    id: 'pontos',
+    titulo: 'Importar os pontos do edital',
+    paragrafos: [
+      'Em Plano, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
+      'A primeira linha precisa ter as colunas Disciplina e Ponto. Opcionais: Faixa (Altíssima, Alta, Média ou Extra) e Código. Exemplo de linha: Execução Penal; 3; Progressão de regime; Alta.',
+      'Importar a mesma planilha de novo não duplica nada: só entram os pontos novos. Como toda importação, dá para desfazer em Conta › Dados.',
+      'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com o Plano completo.',
+    ],
+  },
+  {
     id: 'seus-dados',
     titulo: 'Onde ficam os seus dados',
     paragrafos: [
@@ -97,5 +107,6 @@ export function secaoDeAjuda(caminho: string): string {
   if (caminho.startsWith('/conta')) return 'seus-dados';
   if (caminho.startsWith('/orientacoes')) return 'como-funciona';
   if (caminho.startsWith('/recall')) return 'recall';
+  if (caminho.startsWith('/plano')) return 'pontos';
   return 'como-funciona';
 }

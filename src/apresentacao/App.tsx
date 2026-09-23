@@ -16,7 +16,8 @@ import { ListaErros } from './recall/ListaErros';
 import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
-import { Biblioteca, Hoje, NaoEncontrada, Plano } from './telas/Areas';
+import { Plano } from './plano/Plano';
+import { Biblioteca, Hoje, NaoEncontrada } from './telas/Areas';
 import './estilos.css';
 
 export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {

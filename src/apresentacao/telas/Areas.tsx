@@ -28,17 +28,6 @@ export function Hoje() {
   );
 }
 
-export function Plano() {
-  return (
-    <>
-      <h1>Plano</h1>
-      <Vazio titulo="Nenhum ponto do edital ainda">
-        <p>Os pontos do edital poderão ser importados em breve.</p>
-      </Vazio>
-    </>
-  );
-}
-
 export function Biblioteca() {
   return (
     <>

@@ -82,3 +82,25 @@ test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page })
   expect(JSON.stringify(relatos)).not.toContain('sigiloso');
   expect(relatos).toHaveLength(1);
 });
+
+test('importar pontos do edital por CSV e vincular um erro', async ({ page }) => {
+  await page.goto('/#/plano');
+  await page.getByLabel('Arquivo CSV').setInputFiles({
+    name: 'ciclo.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(
+      'Disciplina;Código;Ponto;Faixa\nExecução Penal;1;Progressão de regime;Altíssima\nDireito Penal;1;Furto;Alta\n',
+      'utf8',
+    ),
+  });
+  await page.getByRole('button', { name: 'Importar pontos' }).click();
+  await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Registrar erro' }).click();
+  await page.getByRole('button', { name: 'Errei' }).click();
+  await page.getByLabel('O que foi').fill('Fração da progressão');
+  await page.getByText('Mais detalhes (opcional)').click();
+  await page.getByLabel('Ponto do edital').selectOption({ label: '1 Progressão de regime' });
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Erro registrado.')).toBeVisible();
+});
