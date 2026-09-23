@@ -5,7 +5,7 @@ Plataforma pessoal de preparação para concursos jurídicos (usuário principal
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore, a ser importado).
 
 ## Estado
-Especificação concluída; **nenhum código ainda**. Antes de qualquer implementação, ler:
+Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T15); **F0 em implementação**. Antes de qualquer implementação, ler:
 1. `README.md` — contexto em uma página.
 2. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel).
 3. `docs/especificacao-parte1.md` §5 e §15 — modelo de dados e fases.
@@ -18,7 +18,8 @@ Especificação concluída; **nenhum código ainda**. Antes de qualquer implemen
 - Nada obrigatório além do mínimo nos formulários; captura de erro tem exatamente 2 campos obrigatórios.
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
-- Escolhas técnicas ainda em aberto (linguagem, framework de UI, biblioteca de IndexedDB, formato do pacote): decidir com o Gabriel, obedecendo D1–D24.
+- Escolhas técnicas: seguir T1–T15 (`docs/decisoes-tecnicas.md`); nova escolha técnica relevante é decidida com o Gabriel e registrada lá.
+- Definição de pronto: `npm run check` verde (lint, tipos, testes, auditoria); E2E verde quando houver tela.
 
 ## Git
 Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto privado: https://github.com/gabrieldjcosta/arretado (origin, branch main). GitHub CLI autenticado como gabrieldjcosta.
