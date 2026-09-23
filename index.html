@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <!--
+      CSP (T8, D18). O que importa contra XSS é `script-src 'self'`: nenhum script inline, nenhuma
+      origem externa. Em desenvolvimento o Vite injeta um nonce para o seu próprio preâmbulo.
+
+      `style-src` precisa de 'unsafe-inline' porque atributos `style` aplicados por JavaScript não
+      são autorizados por nonce — e toda biblioteca de interface os usa (aqui, o Radix escreve
+      `pointer-events` no body ao abrir um diálogo). O risco residual é pequeno neste app: entrada
+      hostil nunca vira marcação nem estilo, só texto dentro de estrutura (D13).
+
+      `frame-ancestors` não vale em <meta> (o navegador ignora); entra como cabeçalho do host na F4.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <title>Arretado</title>
+  </head>
+  <body>
+    <div id="raiz"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
