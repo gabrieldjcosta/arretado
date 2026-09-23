@@ -2,11 +2,11 @@
 
 Plataforma pessoal de preparação para concursos jurídicos de alta complexidade, projetada para converter erros, questões e leitura de legislação em uma **próxima ação de estudo** — com o mínimo de cadastro e sem depender de fornecedor.
 
-> Nome provisório. Até 22/09/2026 o projeto se chamava "Acumen"; "Acumen v2" nos documentos designa o protótipo anterior (Firestore), que será importado, não mantido.
+> Nome provisório. Até 22/09/2026 o projeto se chamava "Acumen"; "Acumen v2" nos documentos designa o protótipo anterior (Firestore), não mantido. Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado — o conteúdo recomeça do zero.
 
 ## Estado atual
 
-**Fase de especificação concluída; nenhuma linha de código ainda.**
+**F0 (Fundamentos) e F1 (Recall + pontos) implementadas.** Portões: [`docs/portoes/F0.md`](docs/portoes/F0.md) e [`docs/portoes/F1.md`](docs/portoes/F1.md). Pendentes: projeto Supabase real, publicação no Cloudflare Pages e o uso real de 14 dias — ver [`docs/proxima-sessao.md`](docs/proxima-sessao.md).
 
 - [`docs/especificacao-parte1.md`](docs/especificacao-parte1.md) — diagnóstico dos artefatos existentes, produto unificado, modelo conceitual de dados, arquitetura modular, core, plano de fases, MVP e as decisões arquiteturais **D1–D24** (seções 1–7, 15, 16, 19).
 - [`docs/especificacao-parte2.md`](docs/especificacao-parte2.md) — integração entre módulos, interface, detalhamento de cada módulo (com destaque para Legislação), acessibilidade, backup/importação, fontes oficiais, backend e sincronização, critérios de validação, riscos e backlog (seções 8–14, 17, 18, 20).
@@ -45,9 +45,21 @@ Lista completa com motivo, alternativa descartada e consequência: Parte 1, §19
 | F7 | Catálogo compartilhado, pacotes de incidência, inteligência de prova | — |
 | F8 | Analítica acionável, revisão adaptativa (opcional) | ≥ 3 meses de revisões |
 
-## O que ainda falta decidir antes de código
+## Decisões técnicas
 
-Apenas escolhas técnicas de implementação — linguagem, framework de interface, biblioteca de acesso ao IndexedDB, formato exato do pacote de backup. Elas devem obedecer às decisões D1–D24, não o contrário.
+Linguagem, framework, banco local, formato do pacote e ferramentas: [`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md) (T1–T15). Obedecem a D1–D24.
+
+## Como rodar
+
+Requer Node 22 LTS.
+
+```
+npm install
+npm run dev        # servidor de desenvolvimento
+npm run check      # lint + tipos + testes + auditoria
+npm run test:e2e   # testes ponta a ponta (Playwright)
+npm run build      # versão estática em dist/
+```
 
 ## Relacionados
 

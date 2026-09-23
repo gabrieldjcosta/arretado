@@ -1,6 +1,8 @@
 # Arretado — Especificação de Produto e Arquitetura (Parte 2)
 
-> **Nome:** o produto chama-se **Arretado** (nome provisório; até 22/09/2026 os documentos usavam "Acumen"). "Acumen v2" designa o protótipo anterior, que será importado, não mantido.
+> **Nome:** o produto chama-se **Arretado** (nome provisório; até 22/09/2026 os documentos usavam "Acumen"). "Acumen v2" designa o protótipo anterior (não mantido).
+
+> **Decisão de escopo — 23/09/2026 (Gabriel):** nenhum dado do Acervo antigo nem do Acumen v2 será importado; o conteúdo recomeça do zero no Arretado. Saem do escopo: importadores de erros/cartões do Acervo e do v2 (F1), importador de leis e marcações do Acervo e o critério "todas as leis do Acervo com marcações preservadas" (F2), importadores restantes do Acervo (F5) e o importador do Firestore do v2 (D3). Continuam: o importador de pontos do edital (planilha do Ciclo, via CSV) e o modo 7 "espaço separado" como função geral de backup.
 
 **Escopo:** seções 8–14, 17, 18 e 20. Depende das decisões D1–D24 e do modelo de dados da Parte 1 (revisão 2). Vocabulário canônico da Parte 1 vale integralmente.
 
