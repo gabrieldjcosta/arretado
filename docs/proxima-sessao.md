@@ -73,8 +73,8 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 �
 - **Agora: 7.3** (gabarito). 7.1 e 7.2 feitas; ver "Andamento", "Fatos das fontes" e "Fatos do colar" no plano.
 - **Primeiro passo da 7.3:** decidir o formato do `<id>.gabarito.json` com amarra à página (`sha256ConteudoOrigem`, como o colado) e ensinar `verificarCorpus` a conferi-lo. O nome já é reconhecido (`nomeGabarito`): não é acusado nem apagado.
 - **Tempo do Gabriel:** a conferência da amostra do gabarito pede ~30 min por lei.
-- **Ler antes:** a Parte 2 §10.6 e a skill `acumen-extrair-normas`. As armadilhas do Planalto estão no plano e em `solucao-de-problemas.md`, seção Legislação.
-- **A skill `acumen-extrair-normas` não existe nas sessões na nuvem** (conferido em 23/09/2026): lá não há `extrair_lei.js`. Para a conferência de segmentação da 7.3, rodar a sessão no computador do Gabriel ou copiar o script para o repositório (decisão do Gabriel).
+- **Ler antes:** a Parte 2 §10.6. As armadilhas do Planalto (lições da skill `acumen-extrair-normas`) estão no plano e em `solucao-de-problemas.md`, seção Legislação.
+- **Sem código anterior (Gabriel, 23/09/2026):** o `extrair_lei.js` não é usado nem copiado. O gabarito sai de sinais independentes do estruturador (âncoras `name="art…"` do Planalto, compilada × todas as redações, texto puro, último artigo conhecido) e da conferência da amostra pelo Gabriel. Detalhes no plano, linha da 7.3. A sessão pode rodar na nuvem.
 - Sem importador do Acervo (decisão de escopo).
 - O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 

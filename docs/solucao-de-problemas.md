@@ -336,10 +336,10 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `npx playwright install chromium`; a captura foca o alvo antes do Ctrl+V e espera o evento `paste` com tempo máximo próprio (`Promise.race`, 60 s). **Prevenção:** `conferirColado` roda antes de gravar; nada é gravado se a captura falhar.
 - **Origem:** ocorrido em 23/09/2026 ("Too many arguments", commit e5af052).
 
-### Skill `acumen-extrair-normas` (`extrair_lei.js`) não encontrada
-- **Sintoma:** a sessão do Claude na nuvem não lista a skill nem acha o `extrair_lei.js`. **Causa:** a skill está só no Claude Code do computador do Gabriel; as sessões na nuvem recebem outro conjunto de skills.
-- **Solução:** rodar a atividade que precisa dela (conferência de segmentação da 7.3) no computador do Gabriel, ou copiar o script para o repositório (decisão do Gabriel). **Prevenção:** aviso em `proxima-sessao.md`.
-- **Origem:** ocorrido em 23/09/2026 (sessão da 7.2).
+### Gabarito e estruturador erram juntos
+- **Sintoma:** a regressão (8.9) passa, mas o leitor mostra artigo fundido, ausente ou fora do lugar. **Causa:** gabarito gerado pela mesma lógica (ou pelo mesmo autor, com os mesmos pontos cegos) que o estruturador: o erro de um se repete no outro. Sem o `extrair_lei.js` (decisão de 23/09/2026: nenhum código anterior), não há uma segunda implementação para comparar.
+- **Solução:** gabarito a partir de sinais da própria fonte, com script simples e separado do estruturador: âncoras `name="art…"` do Planalto, página compilada × todas as redações, texto puro colado, último artigo conhecido. Divergência entre esses sinais vira item da amostra do Gabriel. **Prevenção:** conferência da amostra pelo Gabriel (a única verdade externa) e nota de conferência no gabarito.
+- **Origem:** previsto — atividade 7.3.
 
 ### Recapturar o colado gera diff sem a página mudar
 - **Sintoma:** `npm run corpus:colar` regrava colados (↻) com a página igual. **Causa:** outra versão do Chromium ou outro sistema (o manifesto guarda `navegador` e `plataforma`): estilos em linha, fim de linha do `text/plain` e, no Windows, o formato da área de transferência podem mudar.
@@ -358,7 +358,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Tachado decorativo tratado como redação anterior (ou o contrário)
 - **Sintoma:** "Art. 1º" vira redação anterior; ou revogação da ALESP aparece como vigente. **Causa:** o `<s>` é decorativo no Planalto (só em `º`/`ª`; 56 na LC 80) e é a marca real de revogação na ALESP (172 na LC-SP 988); o `line-through` por estilo também é redação anterior.
-- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. **Prevenção:** gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores); o `extrair_lei.js` não serve para essa classificação.
+- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. **Prevenção:** gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores).
 - **Origem:** previsto — atividade 8.6.
 
 ### Fim de linha misto quebra a segmentação
@@ -373,7 +373,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### "Art" quebrado, capitular ou sangria entre artigos
 - **Sintoma:** artigo ausente, dois artigos fundidos, ou rubrica colada no artigo anterior. **Causa:** "Art" e número em linhas ou tags diferentes; capitular `<strong>A</strong>rt.`; rubrica em negrito antes do "Art." (é o `nome` do seguinte); citação "art." em minúscula no meio do texto.
-- **Solução:** regras 4 e 5 tolerantes, com os casos da skill `acumen-extrair-normas`. **Prevenção:** "todos os artigos do corpus, em ordem, sem sangria" (8.3) e regressão da 8.9.
+- **Solução:** regras 4 e 5 tolerantes, com os casos listados no plano (lições da skill `acumen-extrair-normas`). **Prevenção:** "todos os artigos do corpus, em ordem, sem sangria" (8.3) e regressão da 8.9.
 - **Origem:** previsto — atividade 8.3.
 
 ### Anexo ou ADCT viram artigos duplicados
