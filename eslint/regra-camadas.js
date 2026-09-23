@@ -62,12 +62,15 @@ const regra = {
     const arquivo = context.filename;
     const origem = camadaDe(arquivo);
     if (!origem) return {};
+    const eTeste = /\.test\.tsx?$/.test(arquivo);
 
     function verificar(no) {
       const fonte = no.source?.value;
       if (typeof fonte !== 'string') return;
       if (fonte.startsWith('.')) {
         const destino = camadaDe(path.resolve(path.dirname(arquivo), fonte));
+        // Utilitários de teste só podem ser usados por testes.
+        if (destino?.camada === 'testes' && eTeste) return;
         if (!permitido(origem, destino)) {
           context.report({
             node: no.source,
@@ -82,7 +85,6 @@ const regra = {
         : fonte.split('/')[0];
       const modulo = PACOTES_RESTRITOS[pacote];
       if (modulo && !(origem.camada === 'core' && origem.modulo === modulo)) {
-        const eTeste = /\.test\.tsx?$/.test(arquivo);
         if (!eTeste)
           context.report({ node: no.source, messageId: 'pacote', data: { pacote, modulo } });
       }

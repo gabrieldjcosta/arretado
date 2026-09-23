@@ -96,3 +96,11 @@ describe('regra de camadas (Parte 1 §6)', () => {
     expect(m).toHaveLength(1);
   });
 });
+
+describe('utilitários de teste', () => {
+  it('só testes importam src/testes', async () => {
+    const codigo = "import { r } from '../../testes/repositorio';\nexport const y = r;\n";
+    expect(await mensagens('src/core/persistencia/x.test.ts', codigo)).toHaveLength(0);
+    expect(await mensagens('src/core/persistencia/x.ts', codigo)).toHaveLength(1);
+  });
+});
