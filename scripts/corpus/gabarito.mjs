@@ -98,19 +98,19 @@ export const DECISOES = {
     'estruturador deve acusar o caso paragrafo-1-sem-2',
   'cp:so-na-compilada:art234.parUnico':
     'o mesmo dispositivo que a página rotula "§ 1º." (art234.par1)',
-  'cp:ancora:art2248': 'erro de digitação na fonte: name="art2248" no art. 248',
-  'cp:ancora:art2253': 'erro de digitação na fonte: name="art2253" no art. 253',
-  'cp:artigo-sem-ancora:art248': 'a âncora saiu como "art2248" (erro da fonte)',
-  'cp:artigo-sem-ancora:art253': 'a âncora saiu como "art2253" (erro da fonte)',
-  'cp:artigo-sem-ancora:art287': 'a âncora saiu como name="287", sem "art" (erro da fonte)',
+  'cp:ancora:art2248': 'falha de digitação da fonte: name="art2248" no art. 248',
+  'cp:ancora:art2253': 'falha de digitação da fonte: name="art2253" no art. 253',
+  'cp:artigo-sem-ancora:art248': 'a âncora saiu como "art2248" (falha da fonte)',
+  'cp:artigo-sem-ancora:art253': 'a âncora saiu como "art2253" (falha da fonte)',
+  'cp:artigo-sem-ancora:art287': 'a âncora saiu como name="287", sem "art" (falha da fonte)',
   'cf:ancora:art326':
-    'erro de digitação na fonte: name="art326§3" no § 3º do art. 226 (ao lado de name="226§3")',
+    'falha de digitação da fonte: name="art326§3" no § 3º do art. 226 (ao lado de name="226§3")',
   'cf:ancora:adct.art760':
-    'erro de digitação na fonte: name="adctart760" numa redação tachada do art. 76 do ADCT ' +
+    'falha de digitação da fonte: name="adctart760" numa redação tachada do art. 76 do ADCT ' +
     '(as outras redações são "adctart76.0", "adctart76.1"…)',
   'cf:artigo-sem-ancora:art32':
     'o caput só tem name="32" e name="art32.0" (forma das redações), sem "art32" (falha da fonte)',
-  'cf:artigo-sem-ancora:art164': 'a âncora saiu como name="164", sem "art" (erro da fonte)',
+  'cf:artigo-sem-ancora:art164': 'a âncora saiu como name="164", sem "art" (falha da fonte)',
 };
 
 /**
@@ -382,6 +382,9 @@ export function separarNotas(texto) {
   };
 }
 
+/** Tem letra e nenhuma minúscula. @param {string} s */
+const caixaAlta = (s) => /[A-ZÀ-Ú]/.test(s) && !/[a-zà-ú]/.test(s);
+
 /** Endereço de artigo, com o prefixo do bloco se houver: `art9A`, `adct.art76B`. */
 const RE_ENDERECO_ARTIGO = /^(?:([a-z]+)\.)?art(\d+)([A-Z]*)$/;
 /** @param {string} e */
@@ -494,6 +497,8 @@ export function inventariar(linhas, opcoes = {}) {
   let ultimoFoiNo = false;
   let prefixo = '';
   let emAnexo = false;
+  /** O nome do último nó está em caixa alta e pode continuar na linha seguinte. */
+  let nomeDoNoContinua = false;
 
   /** @param {Rotulo} r */
   const endereco = (r) => {
@@ -598,7 +603,10 @@ export function inventariar(linhas, opcoes = {}) {
       }
       // Mesmo nó de novo sem artigo no meio (CP: "TÍTULO VI — DOS CRIMES CONTRA OS COSTUMES" sem
       // tachado antes do novo Título VI): vale o último; o antigo e o que veio abaixo dele saem.
-      const rotuloNo = separarNotas(l.vigente.slice(0, l.vigente.length - r.resto.length)).texto;
+      // Rótulo e nome saem do texto fora do tachado quando ele mesmo começa pelo rótulo (nome
+      // antigo tachado na mesma linha); senão, da linha inteira.
+      const [linhaNo, rNo] = rv.tipo === r.tipo ? [l.vigente, rv] : [l.texto, r];
+      const rotuloNo = separarNotas(linhaNo.slice(0, linhaNo.length - rNo.resto.length)).texto;
       const repetido = estrutura.findLastIndex(
         (n) => n.primeiroArtigo === null && n.tipo === r.tipo && n.rotulo === rotuloNo,
       );
@@ -614,11 +622,12 @@ export function inventariar(linhas, opcoes = {}) {
       no = {
         tipo: /** @type {TipoEstrutural} */ (r.tipo),
         rotulo: rotuloNo,
-        nome: separarNotas(r.resto).texto,
+        nome: separarNotas(rNo.resto).texto,
         primeiroArtigo: null,
       };
       estrutura.push(no);
       aguardandoNomeDoNo = no.nome === '';
+      nomeDoNoContinua = caixaAlta(no.nome);
       ultimoFoiNo = true;
       rubricas = [];
       captura = null;
@@ -643,20 +652,45 @@ export function inventariar(linhas, opcoes = {}) {
         return;
       }
       if (tachada || vazio(foraDoTachado.texto)) return; // rubrica antiga ou só nota
+      const anterior =
+        ultimo && 'vigente' in ultimo && !ultimoFoiNo ? disp.get(ultimo.vigente) : undefined;
       if (aguardandoNomeDoNo && no) {
         no.nome = foraDoTachado.texto;
         aguardandoNomeDoNo = false;
+        nomeDoNoContinua = caixaAlta(no.nome);
+      } else if (nomeDoNoContinua && no && r.tipo === 'outro' && caixaAlta(foraDoTachado.texto)) {
+        // Nome do nó quebrado em duas linhas (CP: "DOS CRIMES CONTRA O ESTADO / DEMOCRÁTICO DE
+        // DIREITO").
+        no.nome += ` ${foraDoTachado.texto}`;
+      } else if (
+        r.tipo === 'outro' &&
+        anterior?.status === 'vigente' &&
+        /^[a-zà-ú]/.test(foraDoTachado.texto) &&
+        !/[.;:]$/.test(anterior.texto)
+      ) {
+        // Parágrafo da fonte quebrado em duas linhas (ALESP, art. 159: "…bem como os concedidos"
+        // / "aos advogados em geral."): continua o texto do dispositivo.
+        anterior.texto += ` ${foraDoTachado.texto}`;
+        anterior.notas.push(...foraDoTachado.notas);
+        casos.push({
+          tipo: 'linha-continuada',
+          linha: i,
+          endereco: anterior.endereco,
+          texto: l.texto,
+        });
       } else if (r.tipo === 'outro' && /[;,]$/.test(foraDoTachado.texto)) {
         // Rubrica não termina como inciso; é sobra da fonte (ALESP: "bracionalização na
         // execução das funções;" antes do "IV - racionalização…").
         casos.push({ tipo: 'linha-solta', linha: i, texto: l.texto });
       } else if (r.tipo === 'outro') {
         rubricas.push(foraDoTachado.texto);
+        nomeDoNoContinua = false;
       }
       return;
     }
 
     aguardandoNomeDoNo = false;
+    nomeDoNoContinua = false;
     const e = endereco(r);
     if (!e) {
       casos.push({ tipo: 'fora-de-artigo', linha: i, texto: l.texto });
@@ -672,15 +706,17 @@ export function inventariar(linhas, opcoes = {}) {
     }
     if (tachada) {
       // As rubricas seguem pendentes: são do vigente de mesmo endereço, se vier; senão, deste
-      // artigo só tachado (CP, art. 185: "Usurpação de nome ou pseudônimo alheio").
+      // artigo só tachado (CP, art. 185: "Usurpação de nome ou pseudônimo alheio"). Parágrafo ou
+      // inciso tachado não as captura: elas esperam o próximo vigente.
+      const capturar = !captura && rubricas.length > 0 && ehArtigo(e);
       const t = {
         endereco: e,
         linha: i,
         texto: l.texto,
         revogadoPor: [],
-        rubricas: captura ? [] : [...rubricas],
+        rubricas: capturar ? [...rubricas] : [],
       };
-      if (!captura && rubricas.length > 0) captura = t;
+      if (capturar) captura = t;
       tachadas.push(t);
       ultimo = { tachada: t };
       return;
@@ -787,6 +823,31 @@ export function inventariar(linhas, opcoes = {}) {
     });
   }
 
+  // Revogado sob um pai que só existe tachado (CP, art. 187, parágrafo único, II; CF, art. 115,
+  // parágrafo único, III) é detalhe da redação antiga: vai para o ancestral mais próximo. Vigente
+  // sem pai é endereço errado (caso sem-pai, pendência no gabarito).
+  // Do raso ao fundo: o filho de um revogado que saiu também fica sem pai e sai atrás dele.
+  const porProfundidade = [...disp.values()].sort(
+    (a, b) => a.endereco.split('.').length - b.endereco.split('.').length,
+  );
+  for (const d of porProfundidade) {
+    if (ehArtigo(d.endereco) || d.tipo === 'anexo') continue;
+    let alvo = d.endereco.slice(0, d.endereco.lastIndexOf('.'));
+    if (disp.has(alvo)) continue;
+    while (!disp.has(alvo) && !ehArtigo(alvo) && alvo.includes('.'))
+      alvo = alvo.slice(0, alvo.lastIndexOf('.'));
+    const ancestral = disp.get(alvo);
+    if (d.status === 'vigente' || !ancestral) {
+      casos.push({ tipo: 'sem-pai', linha: d.linha, endereco: d.endereco, texto: d.rotulo });
+      continue;
+    }
+    disp.delete(d.endereco);
+    casos.push({ tipo: 'revogado-sem-pai', linha: d.linha, endereco: d.endereco, texto: d.rotulo });
+    ancestral.redacoes.push(
+      ...d.redacoes.map((r) => ({ ...r, enderecoLido: r.enderecoLido ?? d.endereco })),
+    );
+  }
+
   const dispositivos = [...disp.values()].sort((a, b) => a.linha - b.linha);
   for (const d of dispositivos) {
     if (!d.endereco.endsWith('.parUnico') || d.status !== 'vigente') continue;
@@ -839,7 +900,7 @@ export function paraComparar(s) {
 /**
  * @typedef {object} Divergencia
  * @property {string} tipo `so-na-pagina`, `so-na-compilada`, `status`, `texto`, `ancora`,
- *   `artigo-sem-ancora`, `texto-puro`, `sequencia`, `bloco`, `ultimo-artigo`; e
+ *   `artigo-sem-ancora`, `texto-puro`, `sequencia`, `bloco`, `ultimo-artigo`, `sem-pai`; e
  *   `decisao-sem-uso` (entrada de `DECISOES` que não explica nenhuma divergência).
  * @property {string} chave Endereço (ou âncora).
  * @property {string} [explicacao] Regra que explica a divergência; sem ela, é pendência.
@@ -1202,7 +1263,8 @@ export function escolherAmostra(inv, divergencias) {
  * tem nenhuma).
  * @param {Alvo} alvo
  * @param {{ sha256Conteudo: string, url: string, arquivo: string }} pagina Entrada do manifesto.
- * @param {{ paginaBruta: string, coladoHtml: string, coladoTexto: string, compiladoHtml?: string }} entradas
+ * @param {{ paginaBruta: string, coladoHtml: string, coladoTexto: string, compiladoHtml?: string, sha256?: Record<string, string> }} entradas
+ *   `sha256`: hash dos bytes de cada colado lido, por nome de arquivo.
  */
 export function montarGabarito(alvo, pagina, entradas) {
   const blocos = alvo.blocos ?? [];
@@ -1230,6 +1292,13 @@ export function montarGabarito(alvo, pagina, entradas) {
     ...(temAncoras ? cruzarComAncoras(ancoras, inv) : []),
     ...cruzarComTextoPuro(entradas.coladoTexto, linhas),
     ...conferirSequencia(inv, alvo.ultimoArtigo, blocos),
+    ...inv.casos
+      .filter((c) => c.tipo === 'sem-pai')
+      .map((c) => ({
+        tipo: 'sem-pai',
+        chave: c.endereco ?? '',
+        detalhe: 'dispositivo vigente sob pai que não existe',
+      })),
   ].map((d) => {
     const achada = d.explicacao ? undefined : decisao(alvo.id, d);
     if (!achada) return d;
@@ -1241,13 +1310,21 @@ export function montarGabarito(alvo, pagina, entradas) {
     if (!usadas.has(chave))
       divergencias.push({ tipo: 'decisao-sem-uso', chave, detalhe: 'apagar de DECISOES' });
   }
+  // O fragmento do link diferencia maiúsculas (CP: name="art216A"): guarda o nome como na página.
+  /** @type {Map<string, string>} */
+  const nomeOriginal = new Map();
+  for (const m of entradas.paginaBruta.matchAll(/<a\s[^>]*?\bname\s*=\s*["']?([^"'\s>]+)/gi)) {
+    if (!nomeOriginal.has(m[1].toLowerCase())) nomeOriginal.set(m[1].toLowerCase(), m[1]);
+  }
   /** @param {string} endereco */
   const link = (endereco) => {
     const art = /^(?:([a-z]+)\.)?art(\d+)([A-Z]*)/.exec(endereco);
-    const nome = art ? `art${art[2]}${art[3].toLowerCase()}` : '';
-    if (!art || !ancoras.get(art[1] ?? '')?.includes(nome)) return pagina.url;
-    // No ADCT, a âncora do caput é "adctart1" (o prefixo sai só na comparação).
-    return `${pagina.url}#${art[1] ? `${art[1]}${nome}` : nome}`;
+    if (!art) return pagina.url;
+    const nome = `art${art[2]}${art[3].toLowerCase()}`;
+    // No ADCT, a âncora do caput leva o prefixo ("adctart1", às vezes só "sadctart1").
+    const candidatos = art[1] ? [`${art[1]}${nome}`, `s${art[1]}${nome}`] : [nome];
+    const achado = candidatos.map((c) => nomeOriginal.get(c)).find(Boolean);
+    return achado ? `${pagina.url}#${achado}` : pagina.url;
   };
   const amostra = escolherAmostra(inv, divergencias).map(({ dispositivo: d, motivo }) => ({
     endereco: d.endereco,
@@ -1264,6 +1341,7 @@ export function montarGabarito(alvo, pagina, entradas) {
     versao: 1,
     id: alvo.id,
     origemSha256Conteudo: pagina.sha256Conteudo,
+    origemSha256Colados: entradas.sha256 ?? {},
     descricao:
       'Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por ' +
       'scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; ' +
@@ -1317,7 +1395,8 @@ export function serializarGabarito(gabarito) {
 }
 
 /**
- * Mantém a conferência do gabarito anterior se nada mais mudou; senão volta a "pendente".
+ * Mantém a conferência do gabarito anterior se nada mais mudou; senão volta a "pendente", com as
+ * observações de antes (e a data da conferência desfeita) para não perder o que foi achado.
  * @param {{ conferencia?: Conferencia } | null} anterior
  * @param {ReturnType<typeof montarGabarito>} novo
  * @returns {{ gabarito: ReturnType<typeof montarGabarito>, mudou: boolean }}
@@ -1328,7 +1407,20 @@ export function preservarConferencia(anterior, novo) {
   const igual =
     serializarGabarito(/** @type {ReturnType<typeof montarGabarito>} */ (anterior)) ===
     serializarGabarito(comConferencia);
-  return igual ? { gabarito: comConferencia, mudou: false } : { gabarito: novo, mudou: true };
+  if (igual) return { gabarito: comConferencia, mudou: false };
+  const antes = anterior.conferencia;
+  const desfeita =
+    antes.estado === 'conferida'
+      ? [
+          `Conferida em ${antes.em ?? '?'} por ${antes.por ?? '?'} sobre um gabarito anterior; o ` +
+            'gabarito mudou: conferir de novo.',
+        ]
+      : [];
+  const observacoes = [...desfeita, ...antes.observacoes];
+  return {
+    gabarito: { ...novo, conferencia: { ...novo.conferencia, observacoes } },
+    mudou: true,
+  };
 }
 
 /**
@@ -1339,6 +1431,8 @@ export function preservarConferencia(anterior, novo) {
  */
 export function folhaDeConferencia(g, titulo) {
   const c = g.contagens;
+  // Gabarito gravado antes de existir o campo cruzava os quatro sinais.
+  const sinais = g.sinais ?? ['compilada', 'ancoras', 'texto-puro', 'sequencia'];
   const linhas = [
     `# Conferência do gabarito — ${titulo}`,
     '',
@@ -1349,16 +1443,16 @@ export function folhaDeConferencia(g, titulo) {
     '1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).',
     '2. Marcar `[x]` no que bate. No que não bate, escrever ao lado o que a página mostra.',
     '3. Conferir também as contagens gerais abaixo pelo que se vê na página (último artigo, artigos com letra).',
-    ...(g.sinais.includes('ancoras')
+    ...(sinais.includes('ancoras')
       ? []
       : [
           '4. Esta página não tem âncoras por artigo: o link abre o começo da página; achar o item com Ctrl+F pelo rótulo.',
         ]),
     '',
-    ...(g.sinais.includes('compilada')
+    ...(sinais.includes('compilada')
       ? []
       : [
-          `Sem página compilada no corpus: o gabarito foi cruzado só com ${g.sinais.includes('ancoras') ? 'as âncoras da página, ' : ''}o texto puro colado e a sequência de artigos. Conferir com mais atenção o status (vigente, revogado, vetado) e as redações anteriores.`,
+          `Sem página compilada no corpus: o gabarito foi cruzado só com ${sinais.includes('ancoras') ? 'as âncoras da página, ' : ''}o texto puro colado e a sequência de artigos. Conferir com mais atenção o status (vigente, revogado, vetado) e as redações anteriores.`,
           '',
         ]),
     '## Contagens',

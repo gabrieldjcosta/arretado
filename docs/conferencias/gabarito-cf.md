@@ -12,11 +12,11 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 
 ## Contagens
 
-- Dispositivos: 3375 (artigo 424, inciso 1506, paragrafo 1084, alinea 361)
+- Dispositivos: 3374 (artigo 424, inciso 1505, paragrafo 1084, alinea 361)
 - Artigos: vigente 411, revogado 13; com letra (9º-A…): 36; último: adct.art138
 - Bloco com numeração própria `adct`: começa em adct.art1, depois de art250
-- Redações anteriores: 751 em 486 dispositivos
-- Notas de vigência no texto vigente: 1926
+- Redações anteriores: 751 em 485 dispositivos
+- Notas de vigência no texto vigente: 1925
 - Estrutura: titulo 9, capitulo 33, secao 51, subsecao 5, bloco 1
 
 ## Amostra (50 dispositivos)
@@ -46,9 +46,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 - [ ] **art62.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art62)
   - § 3º As medidas provisórias, ressalvado o disposto nos §§ 11 e 12 perderão eficácia, desde a edição, se não forem convertidas em lei no prazo de sessenta dias, prorrogável, nos termos do § 7º, uma vez por igual período, devendo o Congresso Nacional disciplinar, por decreto legislativo, as relações jurídicas delas decorrentes.
   - Nota: (Incluído pela Emenda Constitucional nº 32, de 2001)
-- [ ] **art96.parUnico** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art96)
-  - Parágrafo único. Nos Tribunais de Justiça compostos de mais de 170 (cento e setenta) desembargadores em efetivo exercício, a eleição para os cargos diretivos, de que trata a alínea "a" do inciso I docaputdeste artigo, será realizada entre os membros do tribunal pleno, por maioria absoluta e por voto direto e secreto, para um mandato de 2 (dois) anos, vedada mais de 1 (uma) recondução sucessiva.
-  - Nota: (Incluído pela Emenda Constitucional nº 134, de 2024)
+- [ ] **art96.incIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art96)
+  - III - aos Tribunais de Justiça julgar os juízes estaduais e do Distrito Federal e Territórios, bem como os membros do Ministério Público, nos crimes comuns e de responsabilidade, ressalvada a competência da Justiça Eleitoral.
 - [ ] **art98** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art98)
   - Art. 98. A União, no Distrito Federal e nos Territórios, e os Estados criarão:
   - Redação anterior (tachado) [lida como art98.parUnico]: ~~Parágrafo único. Lei federal disporá sobre a criação de juizados especiais no âmbito da Justiça Federal. (Incluído pela Emenda Constitucional nº 22, de 1999)~~
@@ -91,8 +90,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
   - Art. 149-A. Os Municípios e o Distrito Federal poderão instituir contribuição, na forma das respectivas leis, para o custeio, a expansão e a melhoria do serviço de iluminação pública e de sistemas de monitoramento para segurança e preservação de logradouros públicos, observado o disposto no art. 150, I e III.
   - Nota: (Redação dada pela Emenda Constitucional nº 132, de 2023)
   - Redação anterior (tachado): ~~Art. 149-A Os Municípios e o Distrito Federal poderão instituir contribuição, na forma das respectivas leis, para o custeio do serviço de iluminação pública, observado o disposto no art. 150, I e III. (Incluído pela Emenda Constitucional nº 39, de 2002)~~
-- [ ] **art156A.par6.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art156a)
-  - II - serviços financeiros, operações com bens imóveis, planos de assistência à saúde e concursos de prognósticos, podendo prever:
+- [ ] **art156A.par6.incII.alA** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art156a)
+  - a) alterações nas alíquotas, nas regras de creditamento e na base de cálculo, admitida, em relação aos adquirentes dos bens e serviços de que trata este inciso, a não aplicação do disposto no § 1º, VIII;
   - Nota: (Incluído pela Emenda Constitucional nº 132, de 2023)
 - [ ] **art164** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
   - Art. 164. A competência da União para emitir moeda será exercida exclusivamente pelo banco central.
@@ -118,10 +117,9 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
   - IV - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 86, de 2015)
   - Redação anterior (tachado): ~~IV - as normas de cálculo do montante a ser aplicado pela União; (Incluído pela Emenda Constitucional nº 29, de 2000)~~
-- [ ] **art198.par5** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
-  - § 5º Lei federal disporá sobre o regime jurídico, o piso salarial profissional nacional, as diretrizes para os Planos de Carreira e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias, competindo à União, nos termos da lei, prestar assistência financeira complementar aos Estados, ao Distrito Federal e aos Municípios, para o cumprimento do referido piso salarial. Regulamento
-  - Nota: (Redação dada pela Emenda Constitucional nº 63, de 2010)
-  - Redação anterior (tachado): ~~§ 5º Lei federal disporá sobre o regime jurídico e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias. (Incluído pela Emenda Constitucional nº 51, de 2006) (Vide Medida provisória nº 297. de 2006)~~
+- [ ] **art198.par6** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
+  - § 6º Além das hipóteses previstas no § 1º do art. 41 e no § 4º do art. 169 da Constituição Federal, o servidor que exerça funções equivalentes às de agente comunitário de saúde ou de agente de combate às endemias poderá perder o cargo em caso de descumprimento dos requisitos específicos, fixados em lei, para o seu exercício.
+  - Nota: (Incluído pela Emenda Constitucional nº 51, de 2006)
 - [ ] **art212A.incX.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art212a)
   - a) a organização dos fundos referidos no inciso I do caput deste artigo e a distribuição proporcional de seus recursos, as diferenças e as ponderações quanto ao valor anual por aluno entre etapas, modalidades, duração da jornada e tipos de estabelecimento de ensino, observados as respectivas especificidades e os insumos necessários para a garantia de sua qualidade;
   - Nota: (Incluído pela Emenda Constitucional nº 108, de 2020)
@@ -203,7 +201,7 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 
 ## Divergências entre os sinais (explicadas)
 
-- `ancora` **art326**: decisão: erro de digitação na fonte: name="art326§3" no § 3º do art. 226 (ao lado de name="226§3") — âncora sem artigo na página
+- `ancora` **art326**: decisão: falha de digitação da fonte: name="art326§3" no § 3º do art. 226 (ao lado de name="226§3") — âncora sem artigo na página
 - `artigo-sem-ancora` **art32**: decisão: o caput só tem name="32" e name="art32.0" (forma das redações), sem "art32" (falha da fonte)
-- `artigo-sem-ancora` **art164**: decisão: a âncora saiu como name="164", sem "art" (erro da fonte)
-- `ancora` **adct.art760**: decisão: erro de digitação na fonte: name="adctart760" numa redação tachada do art. 76 do ADCT (as outras redações são "adctart76.0", "adctart76.1"…) — âncora sem artigo na página
+- `artigo-sem-ancora` **art164**: decisão: a âncora saiu como name="164", sem "art" (falha da fonte)
+- `ancora` **adct.art760**: decisão: falha de digitação da fonte: name="adctart760" numa redação tachada do art. 76 do ADCT (as outras redações são "adctart76.0", "adctart76.1"…) — âncora sem artigo na página

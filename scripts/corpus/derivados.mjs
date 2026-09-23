@@ -3,7 +3,14 @@
 // se a fonte mudar (`npm run corpus`), o `npm test` acusa o derivado desatualizado.
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { NORMAS, ehDerivado, lerManifesto, sha256Hex, textoParaConferencia } from './normas.mjs';
+import {
+  NORMAS,
+  arquivoConfere,
+  ehDerivado,
+  lerManifesto,
+  sha256Hex,
+  textoParaConferencia,
+} from './normas.mjs';
 
 export const NOME_INDICE_COLADOS = 'colados.json';
 export const SUFIXO_COLADO_HTML = '.colado.html';
@@ -226,8 +233,9 @@ export async function verificarDerivados(diretorio) {
 }
 
 /**
- * Amarração do gabarito (7.3) à página: o conteúdo em si é conferido pelo Gabriel e usado
- * pela regressão da 8.9. Gabarito nunca é apagado por script.
+ * Amarração do gabarito (7.3) à página e aos colados de onde ele saiu (o da norma e o da
+ * compilada): o conteúdo em si é conferido pelo Gabriel e usado pela regressão da 8.9. Gabarito
+ * nunca é apagado por script.
  * @param {string} diretorio
  * @param {string} nome
  * @param {Map<string, { sha256Conteudo: string }>} paginas
@@ -253,5 +261,19 @@ async function conferirGabarito(diretorio, nome, paginas) {
   if (origem !== pagina.sha256Conteudo) {
     return [`${nome}: feito sobre outra versão da página — refazer a conferência (7.3)`];
   }
-  return [];
+  const colados =
+    typeof gabarito === 'object' && gabarito !== null && 'origemSha256Colados' in gabarito
+      ? /** @type {Record<string, unknown>} */ (gabarito.origemSha256Colados)
+      : undefined;
+  if (!colados || Object.keys(colados).length === 0) {
+    return [`${nome}: sem origemSha256Colados — rode npm run corpus:gabarito`];
+  }
+  /** @type {string[]} */
+  const problemas = [];
+  for (const [arquivo, sha256] of Object.entries(colados)) {
+    if (typeof sha256 !== 'string' || !(await arquivoConfere(diretorio, { arquivo, sha256 }))) {
+      problemas.push(`${nome}: feito sobre outro ${arquivo} — rode npm run corpus:gabarito`);
+    }
+  }
+  return problemas;
 }

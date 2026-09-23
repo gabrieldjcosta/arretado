@@ -2,6 +2,10 @@
   "versao": 1,
   "id": "lc-sp-988",
   "origemSha256Conteudo": "3cccf3f957bbbf4e02bd7ea4de802ca7d25b1ea92589421473310d0e5d7de9f2",
+  "origemSha256Colados": {
+    "lc-sp-988.colado.html": "e66bbee940fed955020c797555fec71661d4c8524dd52157d4bbf48b172b9fb4",
+    "lc-sp-988.colado.txt": "bdd586811759923cbb4bad7dc160740f5b82b4145aa8a74075dbf6227c5952f7"
+  },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
     "colado": "lc-sp-988.colado.html",
@@ -102,6 +106,11 @@
       "tipo": "tachado-parcial",
       "endereco": "art134.par1",
       "texto": "Parágrafo único § 1° - O Defensor Público não perderá o direito às vantagens pecuniárias quando se afastar em virtude de férias, tratamento de saúde, casamento, luto, licença-prêmio e outros afastamen"
+    },
+    {
+      "tipo": "linha-continuada",
+      "endereco": "art159",
+      "texto": "aos advogados em geral."
     }
   ],
   "estrutura": [
@@ -626,11 +635,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art5.incXIII",
+      "endereco": "art6.incI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "XIII -",
-      "texto": "receber, analisar, avaliar e encaminhar consultas, denúncias ou sugestões apresentadas por entidades representativas da sociedade civil, no âmbito de suas funções.",
+      "rotulo": "I -",
+      "texto": "a informação;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -656,41 +665,41 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art11.incIV",
+      "endereco": "art12.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "IV -",
-      "texto": "Terceira Subdefensoria Pública-Geral;",
+      "rotulo": "§ 1° -",
+      "texto": "O Defensor Público-Geral do Estado será auxiliado, no exercício de suas funções, por Gabinete composto de Defensor Público do Estado Chefe de Gabinete, Defensores Públicos do Estado Assessores e pessoal administrativo.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art22",
+      "endereco": "art26.incIII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Artigo 22 -",
-      "texto": "O Segundo Subdefensor Público-Geral do Estado será nomeado pelo Defensor Público-Geral do Estado, dentre os integrantes do quadro ativo da carreira, competindo-lhe auxiliá-lo nos assuntos de interesse da instituição.",
+      "rotulo": "III -",
+      "texto": "o Terceiro Subdefensor Público-Geral do Estado;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art31.incXV",
+      "endereco": "art31.incXXV",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "XV -",
-      "texto": "decidir, por voto de 2/3 (dois terços) de seus membros, sobre a representação ao Governador do Estado visando à destituição do Defensor Público-Geral do Estado, nos termos do disposto no parágrafo único do artigo 14 desta lei complementar;",
+      "rotulo": "XXV -",
+      "texto": "opinar sobre atos de disponibilidade de membros e servidores da Defensoria Pública do Estado;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art39.par3",
+      "endereco": "art42.incVII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3° -",
-      "texto": "As funções de membro do Conselho Consultivo não serão remuneradas e seu exercício será considerado serviço público de natureza relevante.",
+      "rotulo": "VII -",
+      "texto": "manter contato permanente com os vários órgãos da Defensoria Pública do Estado, estimulandoos a atuar em permanente sintonia com os direitos dos usuários;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -701,16 +710,6 @@
       "status": "vigente",
       "rotulo": "4 -",
       "texto": "consumidor e meio ambiente;",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
-    },
-    {
-      "endereco": "art53.incVII",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "VII -",
-      "texto": "coordenar o acionamento de Cortes Internacionais.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -733,6 +732,16 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
+      "endereco": "art58.incIII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "editar revistas e boletins periódicos de conteúdo multidisciplinar visando à divulgação de estudos, artigos e pesquisas de interesse institucional;",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
+    },
+    {
       "endereco": "art59A",
       "motivo": "artigo com sufixo",
       "status": "vigente",
@@ -746,12 +755,15 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art68.incII",
+      "endereco": "art71A.incVI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "II -",
-      "texto": "criar, desenvolver e implantar programas de informática e comunicação para uso dos Defensores Públicos e servidores;",
-      "notas": [],
+      "rotulo": "VI -",
+      "texto": "um representante dos órgãos de atuação junto à área Cível ou da Fazenda Pública;",
+      "notas": [
+        "(NR)",
+        "Inciso VI acrescentado pela Lei Complementar n° 1.434, de 11/09/2025, com efeitos a partir de 01/07/2025."
+      ],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
@@ -779,21 +791,21 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art78.incII.alA",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "a)",
-      "texto": "quando da conclusão do curso de graduação;",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
-    },
-    {
       "endereco": "art79.parUnico",
       "motivo": "parágrafo único",
       "status": "vigente",
       "rotulo": "Parágrafo único -",
       "texto": "O disposto neste artigo aplica-se, no que couber, aos estagiários das demais disciplinas.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
+    },
+    {
+      "endereco": "art83.incI",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "I -",
+      "texto": "atender à orientação que lhe for dada pelo Defensor Público a que estiver subordinado;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -816,21 +828,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art89.incIII",
+      "endereco": "art91.incII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "III -",
-      "texto": "Coordenador da Coordenadoria Geral da Administração;",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
-    },
-    {
-      "endereco": "art101",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Artigo 101 -",
-      "texto": "Durante o período de 3 (três) anos, contados do dia em que o Defensor Público houver entrado em exercício, será apurado o preenchimento dos requisitos necessários à confirmação na carreira.",
+      "rotulo": "II -",
+      "texto": "ser bacharel em direito;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -859,6 +861,16 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
+      "endereco": "art111",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "Artigo 111 -",
+      "texto": "A remoção qualificada destina-se à escolha dos Defensores Públicos que integrarão os Núcleos Especializados.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
+    },
+    {
       "endereco": "art115.par1",
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
@@ -883,11 +895,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art123",
+      "endereco": "art134",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Artigo 123 -",
-      "texto": "Reintegração é o reingresso do Defensor Público no cargo anteriormente ocupado, em decorrência de decisão judicial ou revisão do processo administrativo disciplinar.",
+      "rotulo": "Artigo 134 -",
+      "texto": "São asseguradas aos membros da Defensoria Pública do Estado as seguintes vantagens não-pecuniárias:",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -927,49 +939,41 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art139.incI",
+      "endereco": "art150.incVI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "com retribuição pecuniária total, no período de até 1 (um) mês;",
+      "rotulo": "VI -",
+      "texto": "participação em congressos e outros certames científicos de interesse da instituição;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art155.incI",
-      "motivo": "espaçado",
+      "endereco": "art159",
+      "motivo": "caso: linha-continuada",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "por Defensor Público do Estado Nível I, conforme o caso, designado pelo Defensor Público-Geral do Estado;",
-      "notas": [
-        "(NR)",
-        "Inciso I com redação dada pela Lei Complementar n° 1.098, de 04/11/2009."
-      ],
-      "redacoes": [
-        {
-          "texto": "I - por Defensor Público do Estado Substituto, conforme o caso, designado pelo Defensor Público-Geral do Estado;",
-          "origem": "tachado"
-        }
-      ],
+      "rotulo": "Artigo 159 -",
+      "texto": "No exercício das atribuições próprias do cargo, os membros da Defensoria Pública do Estado são invioláveis por seus atos e manifestações, sendo-lhes assegurados os direitos, garantias e prerrogativas previstos nesta lei complementar, bem como os concedidos aos advogados em geral.",
+      "notas": [],
+      "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art164.incX",
+      "endereco": "art162.incX",
       "motivo": "espaçado",
       "status": "vigente",
       "rotulo": "X -",
-      "texto": "declarar-se suspeito ou impedido, nos termos da lei;",
+      "texto": "dispor, em tribunais, fóruns e demais locais de funcionamento de órgãos judiciários, em estabelecimentos penais, nos destinados à internação de adolescentes e em delegacias de polícia, de instalações condignas e compatíveis com o exercício de suas funções, especialmente no que respeita ao atendimento público;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art177.incII",
+      "endereco": "art172",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "II -",
-      "texto": "censura;",
+      "rotulo": "Artigo 172 -",
+      "texto": "A correição extraordinária será realizada pelo Corregedor-Geral, de ofício, podendo ainda ser determinada pelo Defensor Público-Geral do Estado ou pelo Conselho Superior, para a apuração de:",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -985,11 +989,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art195",
+      "endereco": "art190",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Artigo 195 -",
-      "texto": "Colhidos os elementos necessários à comprovação do fato e da autoria, será imediatamente ouvido o sindicado, que deverá ser pessoalmente intimado e cientificado do quanto apurado, com antecedência mínima de 2 (dois) dias.",
+      "rotulo": "Artigo 190 -",
+      "texto": "No processo administrativo e na sindicância, fica assegurado aos membros da Defensoria Pública do Estado o exercício de ampla defesa, pessoalmente, ou por advogado, mediante intimação pessoal de todos os atos do procedimento.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -1005,11 +1009,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art223",
+      "endereco": "art219.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Artigo 223 -",
-      "texto": "O indiciado, em qualquer caso, será intimado da decisão na forma prevista no artigo 211 desta lei complementar.",
+      "rotulo": "§ 1° -",
+      "texto": "As testemunhas são obrigadas a comparecer às audiências quando regularmente intimadas e, se injustificadamente não o fizerem, poderão ser conduzidas pela autoridade policial, mediante requisição do Corregedor-Geral.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -1072,11 +1076,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "art239.incII.alE",
+      "endereco": "art239.incII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "e)",
-      "texto": "9 (nove) cargos de Diretor de Divisão, referência 18;",
+      "rotulo": "II -",
+      "texto": "no Subquadro de Cargos de Apoio da Defensoria Pública - Tabela I - SQCA-I, enquadrados na Escala de Vencimentos-Comissão, instituída pelo artigo 9°, inciso IV, da Lei Complementar n° 712, de 12 de abril de 1993:",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
@@ -1233,11 +1237,11 @@
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"
     },
     {
-      "endereco": "dt.art11.incIV",
+      "endereco": "dt.art11.incII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "IV -",
-      "texto": "diárias;",
+      "rotulo": "II -",
+      "texto": "sexta-parte;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html"

@@ -2,6 +2,10 @@
   "versao": 1,
   "id": "cf",
   "origemSha256Conteudo": "a4ad6b4ae5bd0ce14e110440addeb5956b05ce2487a780fcfe9934a1f2c03b37",
+  "origemSha256Colados": {
+    "cf.colado.html": "03b11041d47865310614bb36f2caae2176d29dbbff7dad453081e2f352069c71",
+    "cf.colado.txt": "ed120cb007973dd299c6ea32310a0d44bae848bc86ac861a41b289d1e6f77f87"
+  },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
     "colado": "cf.colado.html",
@@ -29,30 +33,30 @@
     }
   ],
   "contagens": {
-    "dispositivos": 3375,
+    "dispositivos": 3374,
     "porTipo": {
       "artigo": 424,
-      "inciso": 1506,
+      "inciso": 1505,
       "paragrafo": 1084,
       "alinea": 361
     },
     "porStatus": {
       "vigente": 3298,
-      "revogado": 77
+      "revogado": 76
     },
     "artigos": {
       "vigente": 411,
       "revogado": 13
     },
     "comSufixo": 36,
-    "notasVigencia": 1926,
+    "notasVigencia": 1925,
     "redacoesAnteriores": 751,
     "redacoesPorOrigem": {
       "tachado": 699,
       "revogacao": 52
     },
-    "redacoesNoAncestral": 175,
-    "dispositivosComRedacaoAnterior": 486,
+    "redacoesNoAncestral": 176,
+    "dispositivosComRedacaoAnterior": 485,
     "nomes": 0,
     "estrutura": {
       "titulo": 9,
@@ -69,7 +73,7 @@
       "tipo": "ancora",
       "chave": "art326",
       "detalhe": "âncora sem artigo na página",
-      "explicacao": "decisão: erro de digitação na fonte: name=\"art326§3\" no § 3º do art. 226 (ao lado de name=\"226§3\")"
+      "explicacao": "decisão: falha de digitação da fonte: name=\"art326§3\" no § 3º do art. 226 (ao lado de name=\"226§3\")"
     },
     {
       "tipo": "artigo-sem-ancora",
@@ -79,13 +83,13 @@
     {
       "tipo": "artigo-sem-ancora",
       "chave": "art164",
-      "explicacao": "decisão: a âncora saiu como name=\"164\", sem \"art\" (erro da fonte)"
+      "explicacao": "decisão: a âncora saiu como name=\"164\", sem \"art\" (falha da fonte)"
     },
     {
       "tipo": "ancora",
       "chave": "adct.art760",
       "detalhe": "âncora sem artigo na página",
-      "explicacao": "decisão: erro de digitação na fonte: name=\"adctart760\" numa redação tachada do art. 76 do ADCT (as outras redações são \"adctart76.0\", \"adctart76.1\"…)"
+      "explicacao": "decisão: falha de digitação da fonte: name=\"adctart760\" numa redação tachada do art. 76 do ADCT (as outras redações são \"adctart76.0\", \"adctart76.1\"…)"
     }
   ],
   "casos": [
@@ -123,6 +127,11 @@
       "tipo": "revogacao-reescrita",
       "endereco": "adct.art101.par4.incIV",
       "texto": "IV - (revogado). (Redação dada pela Emenda Constitucional nº 109, de 2021)"
+    },
+    {
+      "tipo": "revogado-sem-pai",
+      "endereco": "art115.parUnico.incIII",
+      "texto": "III -"
     }
   ],
   "estrutura": [
@@ -833,14 +842,12 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art62"
     },
     {
-      "endereco": "art96.parUnico",
+      "endereco": "art96.incIII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Parágrafo único.",
-      "texto": "Nos Tribunais de Justiça compostos de mais de 170 (cento e setenta) desembargadores em efetivo exercício, a eleição para os cargos diretivos, de que trata a alínea \"a\" do inciso I docaputdeste artigo, será realizada entre os membros do tribunal pleno, por maioria absoluta e por voto direto e secreto, para um mandato de 2 (dois) anos, vedada mais de 1 (uma) recondução sucessiva.",
-      "notas": [
-        "(Incluído pela Emenda Constitucional nº 134, de 2024)"
-      ],
+      "rotulo": "III -",
+      "texto": "aos Tribunais de Justiça julgar os juízes estaduais e do Distrito Federal e Territórios, bem como os membros do Ministério Público, nos crimes comuns e de responsabilidade, ressalvada a competência da Justiça Eleitoral.",
+      "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art96"
     },
@@ -1017,11 +1024,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art149a"
     },
     {
-      "endereco": "art156A.par6.incII",
+      "endereco": "art156A.par6.incII.alA",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "II -",
-      "texto": "serviços financeiros, operações com bens imóveis, planos de assistência à saúde e concursos de prognósticos, podendo prever:",
+      "rotulo": "a)",
+      "texto": "alterações nas alíquotas, nas regras de creditamento e na base de cálculo, admitida, em relação aos adquirentes dos bens e serviços de que trata este inciso, a não aplicação do disposto no § 1º, VIII;",
       "notas": [
         "(Incluído pela Emenda Constitucional nº 132, de 2023)"
       ],
@@ -1127,20 +1134,15 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198"
     },
     {
-      "endereco": "art198.par5",
+      "endereco": "art198.par6",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 5º",
-      "texto": "Lei federal disporá sobre o regime jurídico, o piso salarial profissional nacional, as diretrizes para os Planos de Carreira e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias, competindo à União, nos termos da lei, prestar assistência financeira complementar aos Estados, ao Distrito Federal e aos Municípios, para o cumprimento do referido piso salarial. Regulamento",
+      "rotulo": "§ 6º",
+      "texto": "Além das hipóteses previstas no § 1º do art. 41 e no § 4º do art. 169 da Constituição Federal, o servidor que exerça funções equivalentes às de agente comunitário de saúde ou de agente de combate às endemias poderá perder o cargo em caso de descumprimento dos requisitos específicos, fixados em lei, para o seu exercício.",
       "notas": [
-        "(Redação dada pela Emenda Constitucional nº 63, de 2010)"
+        "(Incluído pela Emenda Constitucional nº 51, de 2006)"
       ],
-      "redacoes": [
-        {
-          "texto": "§ 5º Lei federal disporá sobre o regime jurídico e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias. (Incluído pela Emenda Constitucional nº 51, de 2006) (Vide Medida provisória nº 297. de 2006)",
-          "origem": "tachado"
-        }
-      ],
+      "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198"
     },
     {
@@ -2810,8 +2812,7 @@
     {"endereco":"art114.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art114.par2","status":"vigente","notas":7,"redacoes":1},
     {"endereco":"art114.par3","status":"vigente","notas":6,"redacoes":1},
-    {"endereco":"art115.parUnico.incIII","status":"revogado","notas":1,"redacoes":1},
-    {"endereco":"art115","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art115","status":"vigente","notas":1,"redacoes":7},
     {"endereco":"art115.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art115.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art115.par1","status":"vigente","notas":1,"redacoes":0},

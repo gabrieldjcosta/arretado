@@ -19,6 +19,7 @@ import {
   USER_AGENT,
   arquivoConfere,
   atualizarEntrada,
+  lerOpcoes,
   conferirConteudo,
   detectarCharset,
   ehDerivado,
@@ -44,25 +45,13 @@ function recusar(mensagem) {
 
 /** @returns {{ verificar: boolean, so: string[] | null }} */
 function argumentos() {
-  let verificar = false;
-  /** @type {string[] | null} */
-  let so = null;
-  const args = process.argv.slice(2);
-  for (let i = 0; i < args.length; i += 1) {
-    const arg = args[i] ?? '';
-    if (arg === '--verificar') {
-      verificar = true;
-    } else if (arg === '--so' || arg.startsWith('--so=')) {
-      const valor = arg === '--so' ? args[(i += 1)] : arg.slice('--so='.length);
-      so = (valor ?? '').split(',').filter(Boolean);
-      if (so.length === 0) recusar('--so precisa de ao menos um id.');
-    } else {
-      recusar(`Argumento desconhecido: ${arg}`);
-    }
-  }
+  const { so, chaves, problema } = lerOpcoes(process.argv.slice(2), {
+    ids: NORMAS.map((n) => n.id),
+    chaves: ['--verificar'],
+  });
+  if (problema) recusar(problema);
+  const verificar = chaves.has('--verificar');
   if (verificar && so) recusar('--verificar confere o corpus inteiro; não combina com --so.');
-  const desconhecidos = (so ?? []).filter((id) => !NORMAS.some((n) => n.id === id));
-  if (desconhecidos.length > 0) recusar(`Normas desconhecidas: ${desconhecidos.join(', ')}`);
   return { verificar, so };
 }
 

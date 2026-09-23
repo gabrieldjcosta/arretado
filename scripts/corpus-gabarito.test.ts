@@ -9,6 +9,7 @@ import {
   cruzarComAncoras,
   inventariar,
   linhasDoHtml,
+  montarGabarito,
   preservarConferencia,
   rotulo,
   separarNotas,
@@ -333,6 +334,127 @@ describe('fontes sem compilada (LC 80, ALESP, CF)', () => {
       'tachado-parcial',
       'paragrafo-1-sem-2',
     ]);
+  });
+});
+
+describe('correções da revisão da etapa 7', () => {
+  it('linha que continua o parágrafo, nome do nó em duas linhas e rubrica antes de tachado', () => {
+    const inv = inventario(
+      'TÍTULO XII',
+      '(Incluído pela Lei nº 14.197, de 2021)',
+      'DOS CRIMES CONTRA O ESTADO',
+      'DEMOCRÁTICO DE DIREITO',
+      'Artigo 159 - São invioláveis, bem como os concedidos',
+      'aos advogados em geral.',
+      'Aumento de pena',
+      '<strike>§ 1º - antigo.</strike>',
+      '§ 1º-A Novo.',
+    );
+    expect(inv.estrutura[0]?.nome).toBe('DOS CRIMES CONTRA O ESTADO DEMOCRÁTICO DE DIREITO');
+    expect(inv.dispositivos[0]?.texto).toBe(
+      'São invioláveis, bem como os concedidos aos advogados em geral.',
+    );
+    // A rubrica espera o próximo vigente: o parágrafo tachado não a captura.
+    expect(inv.dispositivos[1]).toMatchObject({
+      endereco: 'art159.par1A',
+      nome: 'Aumento de pena',
+    });
+    expect(inv.casos.map((c) => c.tipo)).toEqual(['linha-continuada']);
+  });
+
+  it('revogado sob pai só tachado vai para o ancestral; vigente sem pai é acusado', () => {
+    const inv = inventario(
+      '<strike>Art. 187. Violar privilégio:</strike> (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      '<strike>Parágrafo único. A pena é aumentada:</strike>',
+      '<strike>II - se o agente entrou em conluio.</strike> (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      '<strike>a) alínea do inciso revogado.</strike> (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      'Art. 188. Vigente:',
+      '<strike>Parágrafo único. Antigo:</strike>',
+      'I - vigente sob parágrafo tachado.',
+    );
+    expect(enderecos(inv)).toEqual([
+      'art187:revogado:4',
+      'art188:vigente:1',
+      'art188.parUnico.incI:vigente:0',
+    ]);
+    expect(inv.dispositivos[0]?.redacoes.map((r) => r.enderecoLido)).toEqual([
+      undefined,
+      'art187.parUnico',
+      'art187.parUnico.incII',
+      'art187.parUnico.incII.alA',
+    ]);
+    expect(inv.casos.map((c) => `${c.tipo}:${c.endereco ?? ''}`)).toEqual([
+      // Do raso ao fundo.
+      'revogado-sem-pai:art187.parUnico.incII',
+      'sem-pai:art188.parUnico.incI',
+      'revogado-sem-pai:art187.parUnico.incII.alA',
+    ]);
+  });
+
+  it('nó com o nome antigo tachado na mesma linha fica com o rótulo e o nome novo', () => {
+    const inv = inventario(
+      'TÍTULO VI <strike>DOS CRIMES CONTRA OS COSTUMES</strike> DOS CRIMES CONTRA A DIGNIDADE SEXUAL',
+      'Art. 213. Constranger.',
+    );
+    expect(inv.estrutura[0]).toMatchObject({
+      rotulo: 'TÍTULO VI',
+      nome: 'DOS CRIMES CONTRA A DIGNIDADE SEXUAL',
+    });
+  });
+
+  it('sem compilada: sinais, link com a âncora como na página e sem-pai como pendência', () => {
+    const pagina = '<a name="art216A"></a><p>Art. 216-A. Constranger.</p>';
+    const gabarito = montarGabarito(
+      { id: 'teste', compilado: null, ultimoArtigo: 'art216A' },
+      { sha256Conteudo: '0'.repeat(64), url: 'https://exemplo.gov.br/lei.htm', arquivo: 'lei.htm' },
+      {
+        paginaBruta: pagina,
+        coladoHtml:
+          '<p>Art. 216-A. Constranger.</p><p><strike>Parágrafo único. Antigo:</strike></p><p>I - órfão.</p>',
+        coladoTexto: 'Art. 216-A. Constranger.',
+        sha256: { 'teste.colado.html': '1'.repeat(64) },
+      },
+    );
+    expect(gabarito.sinais).toEqual(['ancoras', 'texto-puro', 'sequencia']);
+    expect(gabarito.entradas.compilada).toBeNull();
+    expect(gabarito.origemSha256Colados).toEqual({ 'teste.colado.html': '1'.repeat(64) });
+    expect(gabarito.amostra[0]?.link).toBe('https://exemplo.gov.br/lei.htm#art216A');
+    expect(gabarito.pendencias).toEqual([
+      {
+        tipo: 'sem-pai',
+        chave: 'art216A.parUnico.incI',
+        detalhe: 'dispositivo vigente sob pai que não existe',
+      },
+    ]);
+  });
+
+  it('conferência desfeita guarda as observações e a data da conferência anterior', () => {
+    const novo = montarGabarito(
+      { id: 'teste', compilado: null, ultimoArtigo: 'art1' },
+      { sha256Conteudo: '0'.repeat(64), url: 'https://exemplo.gov.br/lei.htm', arquivo: 'lei.htm' },
+      { paginaBruta: '', coladoHtml: '<p>Art. 1º Um.</p>', coladoTexto: 'Art. 1º Um.' },
+    );
+    const anterior = {
+      ...novo,
+      contagens: { ...novo.contagens, dispositivos: 99 },
+      conferencia: {
+        estado: 'conferida' as const,
+        por: 'Gabriel',
+        em: '2026-09-24',
+        observacoes: ['art. 1º bate'],
+      },
+    };
+    const { gabarito, mudou } = preservarConferencia(anterior, novo);
+    expect(mudou).toBe(true);
+    expect(gabarito.conferencia).toEqual({
+      estado: 'pendente',
+      por: null,
+      em: null,
+      observacoes: [
+        'Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.',
+        'art. 1º bate',
+      ],
+    });
   });
 });
 

@@ -2,6 +2,10 @@
   "versao": 1,
   "id": "lc80",
   "origemSha256Conteudo": "ce5094c7b34e713d909ae18762a917446b2e4d50801f2c61e6abc7c5bdfa68e4",
+  "origemSha256Colados": {
+    "lc80.colado.html": "1798c435b3687149e72e878bd2a6f36079f93e46a49c40531dd60f341f96752c",
+    "lc80.colado.txt": "b8012b4a8c70d1a2684e47767ef1cc7419d462522a3dd34eacae6fe36539fcee"
+  },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
     "colado": "lc80.colado.html",

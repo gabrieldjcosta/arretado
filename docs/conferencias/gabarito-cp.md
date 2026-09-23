@@ -10,10 +10,10 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 
 ## Contagens
 
-- Dispositivos: 1403 (artigo 434, paragrafo 491, inciso 400, alinea 78)
+- Dispositivos: 1402 (artigo 434, paragrafo 491, inciso 399, alinea 78)
 - Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
-- Redações anteriores: 882 em 429 dispositivos
-- Notas de vigência no texto vigente: 1167
+- Redações anteriores: 882 em 428 dispositivos
+- Notas de vigência no texto vigente: 1166
 - Estrutura: parte 2, titulo 20, capitulo 59, secao 7
 
 ## Amostra (50 dispositivos)
@@ -90,8 +90,8 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 - [ ] **art132.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132)
   - Parágrafo único. A pena é aumentada de um sexto a um terço se a exposição da vida ou da saúde de outrem a perigo decorre do transporte de pessoas para a prestação de serviços em estabelecimentos de qualquer natureza, em desacordo com as normas legais.
   - Nota: (Incluído pela Lei nº 9.777, de 1998)
-- [ ] **art138.par3.incII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138)
-  - II - se o fato é imputado a qualquer das pessoas indicadas no nº I do art. 141;
+- [ ] **art138.par3.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138)
+  - I - se, constituindo o fato imputado crime de ação privada, o ofendido não foi condenado por sentença irrecorrível;
 - [ ] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
   - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
   - Nota: (Incluído pela Lei nº 13.964, de 2019)
@@ -99,8 +99,9 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
 - [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
   - III - se a privação da liberdade dura mais de 15 (quinze) dias.
-- [ ] **art158.par1** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
-  - § 1º - Se o crime é cometido por duas ou mais pessoas, ou com emprego de arma, aumenta-se a pena de um terço até metade.
+- [ ] **art158** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
+  - Nome: Extorsão
+  - Art. 158 - Constranger alguém, mediante violência ou grave ameaça, e com o intuito de obter para si ou para outrem indevida vantagem econômica, a fazer, tolerar que se faça ou deixar de fazer alguma coisa: ⏎ Pena - reclusão, de quatro a dez anos, e multa.
 - [ ] **art159.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159)
   - § 3º - Se resulta a morte: ⏎ Pena - reclusão, de vinte e quatro a trinta anos.
   - Nota: (Vide Lei nº 8.072, de 25.7.90)
@@ -161,12 +162,12 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
   - Redação anterior (tachado) [lida como art192.incIV]: ~~IV - vendendo, expondo à venda ou tendo em depósito:~~
   - Redação anterior (tachado) [lida como art192.incIV.alA]: ~~a) artigo ou produto revestido de marca abusivamente imitada ou reproduzida no todo ou em parte;~~
   - Redação anterior (tachado) [lida como art192.incIV.alB]: ~~b) artigo ou produto que tem marca de outrem e não é de fabricação deste: ⏎ Pena - detenção, de três meses a um ano, e multa, de um a quinze contos de réis.~~
-- [ ] **art216A** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a)
+- [ ] **art216A** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A)
   - Nome: Assédio sexual
   - Art. 216-A . Constranger alguém com o intuito de obter vantagem ou favorecimento sexual, prevalecendo-se o agente da sua condição de superior hierárquico ou ascendência inerentes ao exercício de emprego, cargo ou função." ⏎ Pena - detenção, de 1 (um) a 2 (dois) anos.
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
-- [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a)
+- [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A)
   - Parágrafo único. (vetado)
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
 - [ ] **art222** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art222)
@@ -264,9 +265,9 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 - `so-na-compilada` **art234.parUnico.incI**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: I - vende, distribui ou expõe à venda ou ao público qualquer dos objetos referidos neste artigo;
 - `so-na-compilada` **art234.parUnico.incII**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: II - realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetá
 - `so-na-compilada` **art234.parUnico.incIII**: decisão: o mesmo dispositivo que a página rotula "§ 1º." (art234.par1) — vigente: III - realiza, em lugar público ou acessível ao público, ou pelo rádio, audição ou recitação de caráter obsceno.
-- `ancora` **art2248**: decisão: erro de digitação na fonte: name="art2248" no art. 248 — âncora sem artigo na página
-- `ancora` **art2253**: decisão: erro de digitação na fonte: name="art2253" no art. 253 — âncora sem artigo na página
-- `artigo-sem-ancora` **art248**: decisão: a âncora saiu como "art2248" (erro da fonte)
-- `artigo-sem-ancora` **art253**: decisão: a âncora saiu como "art2253" (erro da fonte)
-- `artigo-sem-ancora` **art287**: decisão: a âncora saiu como name="287", sem "art" (erro da fonte)
-- `so-na-pagina`: 62 detalhes de dispositivos revogados ou vetados que a compilada resume.
+- `ancora` **art2248**: decisão: falha de digitação da fonte: name="art2248" no art. 248 — âncora sem artigo na página
+- `ancora` **art2253**: decisão: falha de digitação da fonte: name="art2253" no art. 253 — âncora sem artigo na página
+- `artigo-sem-ancora` **art248**: decisão: a âncora saiu como "art2248" (falha da fonte)
+- `artigo-sem-ancora` **art253**: decisão: a âncora saiu como "art2253" (falha da fonte)
+- `artigo-sem-ancora` **art287**: decisão: a âncora saiu como name="287", sem "art" (falha da fonte)
+- `so-na-pagina`: 61 detalhes de dispositivos revogados ou vetados que a compilada resume.

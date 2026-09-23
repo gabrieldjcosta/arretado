@@ -26,7 +26,7 @@ export function ehDerivado(nome) {
   return SUFIXOS_DERIVADOS.some((sufixo) => nome.endsWith(sufixo));
 }
 
-/** Abaixo disso a resposta é página de erro, não norma. */
+/** Abaixo disso a resposta é página de falha do site, não norma. */
 const TAMANHO_MINIMO = 20_000;
 
 /**
@@ -269,7 +269,9 @@ export function conferirConteudo(norma, bytes, charset) {
   /** @type {string[]} */
   const problemas = [];
   if (bytes.length < TAMANHO_MINIMO) {
-    problemas.push(`${norma.id}: só ${String(bytes.length)} bytes — provável página de erro`);
+    problemas.push(
+      `${norma.id}: só ${String(bytes.length)} bytes — provável página de falha do site`,
+    );
   }
   const html = decodificar(bytes, charset);
   if (html.includes('\uFFFD')) {
@@ -437,9 +439,10 @@ export async function verificarCorpus(diretorio) {
 }
 
 /**
- * O arquivo da entrada existe no disco e tem os bytes registrados?
+ * O arquivo da entrada existe no disco e tem os bytes registrados? Vale para a página do
+ * manifesto e para os arquivos de um colado.
  * @param {string} diretorio
- * @param {EntradaManifesto} entrada
+ * @param {{ arquivo: string, sha256: string }} entrada
  * @returns {Promise<boolean>}
  */
 export async function arquivoConfere(diretorio, entrada) {
@@ -448,4 +451,41 @@ export async function arquivoConfere(diretorio, entrada) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Opções de linha de comando dos scripts do corpus: `--so id,id` (ou `--so=id,id`) e as chaves
+ * sem valor aceitas pelo script. Devolve o problema em vez de sair, para o script decidir.
+ * @param {readonly string[]} args
+ * @param {{ ids: readonly string[], chaves?: readonly string[] }} opcoes `ids`: os aceitos em --so.
+ * @returns {{ so: string[] | null, chaves: Set<string>, problema?: string }}
+ */
+export function lerOpcoes(args, { ids, chaves = [] }) {
+  /** @type {string[] | null} */
+  let so = null;
+  const ligadas = new Set(/** @type {string[]} */ ([]));
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i] ?? '';
+    if (arg === '--so' || arg.startsWith('--so=')) {
+      const valor = arg === '--so' ? args[(i += 1)] : arg.slice('--so='.length);
+      so = [
+        ...new Set(
+          (valor ?? '')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ),
+      ];
+      if (so.length === 0)
+        return { so, chaves: ligadas, problema: '--so precisa de ao menos um id.' };
+    } else if (chaves.includes(arg)) {
+      ligadas.add(arg);
+    } else {
+      return { so, chaves: ligadas, problema: `Argumento desconhecido: ${arg}` };
+    }
+  }
+  const desconhecidos = (so ?? []).filter((id) => !ids.includes(id));
+  if (desconhecidos.length > 0)
+    return { so, chaves: ligadas, problema: `Normas desconhecidas: ${desconhecidos.join(', ')}` };
+  return { so, chaves: ligadas };
 }

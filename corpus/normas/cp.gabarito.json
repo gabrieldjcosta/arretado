@@ -2,6 +2,11 @@
   "versao": 1,
   "id": "cp",
   "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+  "origemSha256Colados": {
+    "cp.colado.html": "44eeae97cb49568ce593d9300c6869c01e86b7f4c40fdc4be765fd8b431b008b",
+    "cp.colado.txt": "3639654e9dbec7e5f1f4e26ab959254d7b41dbcf824f1554d8dc997131891b61",
+    "cp-compilado.colado.html": "6abf492f907a309c462af6bbf3aed08fd7c58f80fbcc483e578113b312d8fcd1"
+  },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
     "colado": "cp.colado.html",
@@ -23,17 +28,17 @@
   },
   "ultimoArtigo": "art361",
   "contagens": {
-    "dispositivos": 1403,
+    "dispositivos": 1402,
     "porTipo": {
       "artigo": 434,
       "paragrafo": 491,
-      "inciso": 400,
+      "inciso": 399,
       "alinea": 78
     },
     "porStatus": {
       "vigente": 1291,
       "vetado": 11,
-      "revogado": 101
+      "revogado": 100
     },
     "artigos": {
       "vigente": 404,
@@ -41,15 +46,15 @@
       "vetado": 3
     },
     "comSufixo": 73,
-    "notasVigencia": 1167,
+    "notasVigencia": 1166,
     "redacoesAnteriores": 882,
     "redacoesPorOrigem": {
       "tachado": 766,
       "revogacao": 115,
       "duplicata": 1
     },
-    "redacoesNoAncestral": 332,
-    "dispositivosComRedacaoAnterior": 429,
+    "redacoesNoAncestral": 333,
+    "dispositivosComRedacaoAnterior": 428,
     "nomes": 448,
     "estrutura": {
       "parte": 2,
@@ -119,11 +124,6 @@
       "chave": "art169.parUnico.incII",
       "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
       "detalhe": "página: \"…ente, dentro no prazo de 15 (quinze) dias…\" | compilada: \"…ente, dentro no prazo de quinze dias…\""
-    },
-    {
-      "tipo": "so-na-pagina",
-      "chave": "art187.parUnico.incII",
-      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
     },
     {
       "tipo": "so-na-pagina",
@@ -501,28 +501,28 @@
       "tipo": "ancora",
       "chave": "art2248",
       "detalhe": "âncora sem artigo na página",
-      "explicacao": "decisão: erro de digitação na fonte: name=\"art2248\" no art. 248"
+      "explicacao": "decisão: falha de digitação da fonte: name=\"art2248\" no art. 248"
     },
     {
       "tipo": "ancora",
       "chave": "art2253",
       "detalhe": "âncora sem artigo na página",
-      "explicacao": "decisão: erro de digitação na fonte: name=\"art2253\" no art. 253"
+      "explicacao": "decisão: falha de digitação da fonte: name=\"art2253\" no art. 253"
     },
     {
       "tipo": "artigo-sem-ancora",
       "chave": "art248",
-      "explicacao": "decisão: a âncora saiu como \"art2248\" (erro da fonte)"
+      "explicacao": "decisão: a âncora saiu como \"art2248\" (falha da fonte)"
     },
     {
       "tipo": "artigo-sem-ancora",
       "chave": "art253",
-      "explicacao": "decisão: a âncora saiu como \"art2253\" (erro da fonte)"
+      "explicacao": "decisão: a âncora saiu como \"art2253\" (falha da fonte)"
     },
     {
       "tipo": "artigo-sem-ancora",
       "chave": "art287",
-      "explicacao": "decisão: a âncora saiu como name=\"287\", sem \"art\" (erro da fonte)"
+      "explicacao": "decisão: a âncora saiu como name=\"287\", sem \"art\" (falha da fonte)"
     }
   ],
   "casos": [
@@ -585,6 +585,11 @@
       "tipo": "artigo-so-tachado",
       "endereco": "art279",
       "texto": "Art. 279 - Vender, ter em depósito para vender ou expor à venda ou, de qualquer forma, entregar a consumo substância alimentícia ou medicinal avariada:\nPena - detenção, de um a três anos, ou multa, de"
+    },
+    {
+      "tipo": "revogado-sem-pai",
+      "endereco": "art187.parUnico.incII",
+      "texto": "II -"
     },
     {
       "tipo": "paragrafo-unico-com-numerado",
@@ -1092,7 +1097,7 @@
     {
       "tipo": "titulo",
       "rotulo": "TÍTULO XII",
-      "nome": "DOS CRIMES CONTRA O ESTADO",
+      "nome": "DOS CRIMES CONTRA O ESTADO DEMOCRÁTICO DE DIREITO",
       "primeiroArtigo": "art359I"
     },
     {
@@ -1116,7 +1121,7 @@
     {
       "tipo": "capitulo",
       "rotulo": "CAPÍTULO IV",
-      "nome": "DOS CRIMES CONTRA O FUNCIONAMENTO",
+      "nome": "DOS CRIMES CONTRA O FUNCIONAMENTO DOS SERVIÇOS ESSENCIAIS",
       "primeiroArtigo": "art359R"
     },
     {
@@ -1429,11 +1434,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132"
     },
     {
-      "endereco": "art138.par3.incII",
+      "endereco": "art138.par3.incI",
       "motivo": "inciso de parágrafo",
       "status": "vigente",
-      "rotulo": "II -",
-      "texto": "se o fato é imputado a qualquer das pessoas indicadas no nº I do art. 141;",
+      "rotulo": "I -",
+      "texto": "se, constituindo o fato imputado crime de ação privada, o ofendido não foi condenado por sentença irrecorrível;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138"
@@ -1467,11 +1472,12 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148"
     },
     {
-      "endereco": "art158.par1",
+      "endereco": "art158",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 1º -",
-      "texto": "Se o crime é cometido por duas ou mais pessoas, ou com emprego de arma, aumenta-se a pena de um terço até metade.",
+      "rotulo": "Art. 158 -",
+      "nome": "Extorsão",
+      "texto": "Constranger alguém, mediante violência ou grave ameaça, e com o intuito de obter para si ou para outrem indevida vantagem econômica, a fazer, tolerar que se faça ou deixar de fazer alguma coisa:\nPena - reclusão, de quatro a dez anos, e multa.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158"
@@ -1714,7 +1720,7 @@
         "(Incluído pela Lei nº 10.224, de 15 de 2001)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A"
     },
     {
       "endereco": "art216A.parUnico",
@@ -1726,7 +1732,7 @@
         "(Incluído pela Lei nº 10.224, de 15 de 2001)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A"
     },
     {
       "endereco": "art222",
@@ -2820,8 +2826,7 @@
     {"endereco":"art186.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art186.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art186.incIV","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art187","status":"revogado","notas":1,"redacoes":6},
-    {"endereco":"art187.parUnico.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art187","status":"revogado","notas":1,"redacoes":7},
     {"endereco":"art188","status":"revogado","notas":1,"redacoes":2},
     {"endereco":"art188.parUnico","status":"revogado","notas":1,"redacoes":1},
     {"endereco":"art189","status":"revogado","notas":1,"redacoes":2},

@@ -2,6 +2,11 @@
   "versao": 1,
   "id": "lep",
   "origemSha256Conteudo": "8b95cead39cedad87abfe1d7314e2ddfef82125d22229a3b7a6ed5aba5c273d6",
+  "origemSha256Colados": {
+    "lep.colado.html": "86a61501460ea9b55159fe0e17303dacecbfbc84eec6e20f896fd6049dbb7026",
+    "lep.colado.txt": "cd8a9ea837b96d2752398dfc8b7a73792daea22a2d593a97a124265eaebf78a2",
+    "lep-compilado.colado.html": "5d6d1bd723e0354ddafb7b9aa8280ff341b4d3e824f39c08eb2bd328a849e892"
+  },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
     "colado": "lep.colado.html",

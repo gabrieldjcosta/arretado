@@ -69,7 +69,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
 ### A revisão da etapa acha o que os testes não pegaram
-- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
+- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc; no fim da etapa 7, 10 achados, 6 deles confirmados no corpus, corrigidos no commit `fix(legislacao)` depois do da 7.3). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
 - **Solução:** correções num commit `fix(...)` próprio. **Prevenção:** manter o hábito ao fim de cada bloco (rotina do plano, passo 6) e registrar aqui cada classe de defeito.
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
@@ -430,6 +430,21 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** texto vigente ou rubrica terminando em "Vigência" (LEP, art. 9º-A, § 5º; CP, rubrica do art. 171-A); "CAPÍTULO II-B" com nome "B" e o nome verdadeiro na rubrica do art. 337-E; "Incluído pela Lei nº 13.445, de 2017 Vigência" no texto do art. 232-A do CP. **Causa:** o Planalto põe "Vigência" como link sem parênteses depois da nota (21 na CF, 7 na LEP, 18 no CP); numeral estrutural com sufixo ("I-A", "V-A"); nota sem parênteses no CP.
 - **Solução:** "Vigência" logo depois de outra nota é nota; numeral estrutural aceita "-A"; nota sem parênteses só no fim, com a chave em maiúscula, "pela Lei…" e o ano. Os gabaritos da LEP e do CP foram corrigidos (32 dispositivos; amostras regeradas, ainda sem conferência). **Prevenção:** testes de `separarNotas` e `rotulo`; varredura de sobras (texto com "Vigência", "(NR)" ou nota) antes de gravar gabarito novo.
 - **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão; os três já estavam no gabarito da 1ª sessão).
+
+### Texto cortado, nome do nó pela metade ou rubrica perdida no gabarito
+- **Sintoma:** o fim de uma frase some (LC-SP 988, art. 159: "…bem como os concedidos" sem "aos advogados em geral."); nome do Título XII do CP salvo como "DOS CRIMES CONTRA O ESTADO"; rubrica antes de um parágrafo tachado não chega ao vigente seguinte; inciso revogado sob um parágrafo que só existe tachado vira dispositivo (CP, art. 187; CF, art. 115). **Causa:** a fonte quebra um parágrafo ou um nome em duas linhas; a linha tachada "capturava" a rubrica; o endereço do filho segue o pai tachado.
+- **Solução:** linha em minúscula depois de texto sem ponto final continua o dispositivo (`linha-continuada`); caixa alta logo depois do nome em caixa alta continua o nome; só artigo tachado captura rubrica; revogado sem pai vai para o ancestral (`revogado-sem-pai`) e vigente sem pai é pendência (`sem-pai`). **Prevenção:** testes "correções da revisão da etapa 7" em `scripts/corpus-gabarito.test.ts`; o estruturador precisa dos mesmos casos (8.3–8.6).
+- **Origem:** ocorrido em 23/09/2026 (`/code-review` do fim da etapa 7).
+
+### Folha de conferência regravada por cima das marcas, ou gabarito "íntegro" sobre colado velho
+- **Sintoma:** marcas `[x]` da folha somem depois de `npm run corpus:gabarito`; `npm run corpus -- --verificar` diz "corpus íntegro" com um gabarito feito sobre um colado anterior; o link da folha abre o começo da página. **Causa:** a folha era regravada sempre que o gabarito mudava; o gabarito só guardava o hash da página; o link usava a âncora em minúsculas (`#art216a`), e o fragmento diferencia maiúsculas (`name="art216A"`).
+- **Solução:** o comando não regrava folha que difere da gerada pelo gabarito anterior (sai com ✗: passar as marcas para a `conferencia`, guardar a folha com outro nome e rodar de novo); conferência desfeita guarda as observações; `origemSha256Colados` amarra o gabarito aos bytes dos colados (`verificarDerivados`); o link usa o nome como está na página. **Prevenção:** testes de `verificarDerivados` e de `preservarConferencia`.
+- **Origem:** ocorrido em 23/09/2026 (`/code-review` do fim da etapa 7).
+
+### Regressão da 8.9 reprova por forma, não por conteúdo
+- **Sintoma:** a comparação estruturador × gabarito acusa diferença em dispositivos certos. **Causa:** o endereço do gabarito é proposto (`parUnico`, `alB`, `adct.`, `dt.`), e a 8.4 pode decidir outro; o texto do gabarito guarda o que a página mostra fora do tachado (CF, art. 100, § 11: ", ,"; ordinais "1o" × "1º").
+- **Solução:** `compararComGabarito` traduz o endereço, se a 8.4 escolher outro, e compara o texto com `paraComparar` (tolerante a ordinal, aspas, travessão e pontuação). **Prevenção:** teste da 8.9 com um dispositivo de cada forma (bloco, parágrafo único, alínea, sufixo).
+- **Origem:** previsto — atividades 8.4 e 8.9.
 
 ### Gabarito cheio de pendências numa página sem âncoras, ou decisão que não explica mais nada
 - **Sintoma:** `npm run corpus:gabarito` lista 249 `artigo-sem-ancora` na LC-SP 988; ou lista `decisao-sem-uso`. **Causa:** a ALESP não tem âncoras nem compilada; uma regra nova passou a cobrir o caso que a decisão explicava (CP, art. 129, § 2º, III: a compilada sem hífen virou inciso).

@@ -26,52 +26,52 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - Artigo 1° - Esta lei complementar dispõe sobre a organização da Defensoria Pública do Estado, nos termos dos artigos 1°, 3°, 5°, inciso LXXIV, e 134 da Constituição da República e artigos 103 e 104 da Constituição do Estado de São Paulo, define suas atribuições e institui o regime jurídico dos integrantes da carreira de Defensor Público.
 - [ ] **art5.incVI.alL** (alínea) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - l) a tutela das pessoas necessitadas, vítimas de discriminação em razão de origem, raça, etnia, sexo, orientação sexual, identidade de gênero, cor, idade, estado civil, condição econômica, filosofia ou convicção política, religião, deficiência física, imunológica, sensorial ou mental, cumprimento de pena, ou em razão de qualquer outra particularidade ou condição;
-- [ ] **art5.incXIII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - XIII - receber, analisar, avaliar e encaminhar consultas, denúncias ou sugestões apresentadas por entidades representativas da sociedade civil, no âmbito de suas funções.
+- [ ] **art6.incI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - I - a informação;
 - [ ] **art6.par1.incV** (inciso de parágrafo) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - V - as decisões proferidas e a respectiva motivação, inclusive opiniões divergentes, constantes dos procedimentos administrativos e dos processos judiciais em que figure como interessado;
 - [ ] **art6.par2.incVII** (inciso de parágrafo) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - VII - fixação e observância de horário e normas compatíveis com o bom atendimento das pessoas que buscam a Defensoria Pública;
-- [ ] **art11.incIV** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - IV - Terceira Subdefensoria Pública-Geral;
-- [ ] **art22** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - Artigo 22 - O Segundo Subdefensor Público-Geral do Estado será nomeado pelo Defensor Público-Geral do Estado, dentre os integrantes do quadro ativo da carreira, competindo-lhe auxiliá-lo nos assuntos de interesse da instituição.
-- [ ] **art31.incXV** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - XV - decidir, por voto de 2/3 (dois terços) de seus membros, sobre a representação ao Governador do Estado visando à destituição do Defensor Público-Geral do Estado, nos termos do disposto no parágrafo único do artigo 14 desta lei complementar;
-- [ ] **art39.par3** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - § 3° - As funções de membro do Conselho Consultivo não serão remuneradas e seu exercício será considerado serviço público de natureza relevante.
+- [ ] **art12.par1** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - § 1° - O Defensor Público-Geral do Estado será auxiliado, no exercício de suas funções, por Gabinete composto de Defensor Público do Estado Chefe de Gabinete, Defensores Públicos do Estado Assessores e pessoal administrativo.
+- [ ] **art26.incIII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - III - o Terceiro Subdefensor Público-Geral do Estado;
+- [ ] **art31.incXXV** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - XXV - opinar sobre atos de disponibilidade de membros e servidores da Defensoria Pública do Estado;
+- [ ] **art42.incVII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - VII - manter contato permanente com os vários órgãos da Defensoria Pública do Estado, estimulandoos a atuar em permanente sintonia com os direitos dos usuários;
 - [ ] **art52.parUnico.it4** (item) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - 4 - consumidor e meio ambiente;
-- [ ] **art53.incVII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - VII - coordenar o acionamento de Cortes Internacionais.
 - [ ] **art54** (artigo revogado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 54 - (revogado)
   - Nota: Artigo 54 revogado pela Lei Complementar n° 1.315, de 11/01/2018, com efeitos a partir de 01/10/2017.
   - Redação anterior (tachado): ~~Artigo 54 - Os Núcleos Especializados serão integrados por Defensores Públicos que contem ao menos 5 (cinco) anos de efetivo exercício no cargo de Defensor Público.~~
+- [ ] **art58.incIII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - III - editar revistas e boletins periódicos de conteúdo multidisciplinar visando à divulgação de estudos, artigos e pesquisas de interesse institucional;
 - [ ] **art59A** (artigo com sufixo) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 59-A - O Defensor Público designado para o exercício de atividades de natureza pedagógica na Escola da Defensoria Pública do Estado, ou em entidades conveniadas, fará jus à gratificação de magistério, desde que a entidade não o remunere diretamente.
   - Nota: (NR)
   - Nota: "Caput" acrescentado pela Lei Complementar n° 1.434, de 11/09/2025, com efeitos a partir de 01/07/2025.
-- [ ] **art68.incII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - II - criar, desenvolver e implantar programas de informática e comunicação para uso dos Defensores Públicos e servidores;
+- [ ] **art71A.incVI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - VI - um representante dos órgãos de atuação junto à área Cível ou da Fazenda Pública;
+  - Nota: (NR)
+  - Nota: Inciso VI acrescentado pela Lei Complementar n° 1.434, de 11/09/2025, com efeitos a partir de 01/07/2025.
 - [ ] **art71B** (artigo com sufixo) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 71-B - O Grupo de Assessoramento de Demandas Estruturais zelará pela promoção prioritária das soluções consensuais, incumbindo-lhe:
   - Nota: (NR)
   - Nota: "Caput" acrescentado pela Lei Complementar n° 1.434, de 11/09/2025, com efeitos a partir de 01/07/2025.
 - [ ] **art75.par1.alB** (vetado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - b) (vetado)
-- [ ] **art78.incII.alA** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - a) quando da conclusão do curso de graduação;
 - [ ] **art79.parUnico** (parágrafo único) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Parágrafo único - O disposto neste artigo aplica-se, no que couber, aos estagiários das demais disciplinas.
+- [ ] **art83.incI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - I - atender à orientação que lhe for dada pelo Defensor Público a que estiver subordinado;
 - [ ] **art87.incVI** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - VI - (revogado)
   - Nota: Inciso VI revogado pela Lei Complementar n° 1.098, de 04/11/2009.
   - Redação anterior (tachado): ~~VI - Defensor Público do Estado Nível V.~~
-- [ ] **art89.incIII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - III - Coordenador da Coordenadoria Geral da Administração;
-- [ ] **art101** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - Artigo 101 - Durante o período de 3 (três) anos, contados do dia em que o Defensor Público houver entrado em exercício, será apurado o preenchimento dos requisitos necessários à confirmação na carreira.
+- [ ] **art91.incII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - II - ser bacharel em direito;
 - [ ] **art109.parUnico** (caso: tachado-parcial) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Parágrafo único - Findo o prazo a que se refere o "caput" deste artigo e havendo mais de um candidato à remoção, será removido, sucessivamente, o mais antigo na carreira, o mais idoso e o melhor classificado no concurso para ingresso na Defensoria Pública do Estado.
   - Nota: (NR)
@@ -79,6 +79,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - Nota: Expressão "o mais antigo no serviço público", anteriormente constante deste dispositivo, declarada inconstitucional, em controle concentrado, pelo Supremo Tribunal Federal nos autos da ADI n° 7314, com eficácia ex nunc, a contar da publicação da ata de julgamento (21/11/2023).
   - Redação anterior (revogacao): ~~Parágrafo único - Findo o prazo a que se refere o "caput" deste artigo e havendo mais de um candidato à remoção, será removido, sucessivamente, o mais antigo na carreira, o mais antigo no serviço público, o mais idoso e o melhor classificado no concurso para ingresso na Defensoria Pública do Estado.~~
   - Redação anterior (tachado): ~~Parágrafo único - Findo o prazo a que se refere o "caput" deste artigo e havendo mais de um candidato à remoção, será removido o mais antigo na classe e, ocorrendo empate, sucessivamente, o mais antigo na carreira, no serviço público do Estado, no serviço público em geral, o mais idoso e o melhor cl~~
+- [ ] **art111** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - Artigo 111 - A remoção qualificada destina-se à escolha dos Defensores Públicos que integrarão os Núcleos Especializados.
 - [ ] **art115.par1** (caso: tachado-parcial) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - § 1° - Em janeiro de cada ano, o Defensor Público-Geral do Estado mandará publicar, na imprensa oficial, a lista de antiguidade dos membros da Defensoria Pública do Estado, em cada classe, contendo, em anos, meses e dias, o tempo de serviço na classe, na carreira.
   - Nota: (NR)
@@ -87,8 +89,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - Nota: Expressão "bem como aquele computado para efeito de aposentadoria e disponibilidade", anteriormente constante deste dispositivo, declarada inconstitucional, em controle concentrado, por arrastamento, pelo Supremo Tribunal Federal nos autos da ADI n° 7314.
   - Redação anterior (revogacao): ~~§ 1° - Em janeiro de cada ano, o Defensor Público-Geral do Estado mandará publicar, na imprensa oficial, a lista de antiguidade dos membros da Defensoria Pública do Estado, em cada classe, contendo, em anos, meses e dias, o tempo de serviço na classe, na carreira, no serviço público, bem como aquele~~
   - Redação anterior (tachado): ~~§ 1° - Em janeiro de cada ano, o Defensor Público-Geral do Estado mandará publicar, na imprensa oficial, a lista de antiguidade dos membros da Defensoria Pública do Estado, em cada classe, contendo, em anos, meses e dias, o tempo de serviço na classe, na carreira, no serviço público estadual e no se~~
-- [ ] **art123** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - Artigo 123 - Reintegração é o reingresso do Defensor Público no cargo anteriormente ocupado, em decorrência de decisão judicial ou revisão do processo administrativo disciplinar.
+- [ ] **art134** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - Artigo 134 - São asseguradas aos membros da Defensoria Pública do Estado as seguintes vantagens não-pecuniárias:
 - [ ] **art134.incXI** (caso: tachado-parcial) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - XI - outras previstas em lei.
   - Nota: Inciso X renumerado para inciso XI pela Lei Complementar n° 1.295, de 02/01/2017, com efeitos a partir de 01/06/2016.
@@ -97,25 +99,22 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - § 1° - O Defensor Público não perderá o direito às vantagens pecuniárias quando se afastar em virtude de férias, tratamento de saúde, casamento, luto, licença-prêmio e outros afastamentos que a legislação considerar como de efetivo exercício para todos os efeitos legais.
   - Nota: Parágrafo único transformado em § 1° pela Lei Complementar n° 1.295, de 02/01/2017, com efeitos a partir de 01/06/2016.
   - Redação anterior (revogacao): ~~Parágrafo único § 1° - O Defensor Público não perderá o direito às vantagens pecuniárias quando se afastar em virtude de férias, tratamento de saúde, casamento, luto, licença-prêmio e outros afastamentos que a legislação considerar como de efetivo exercício para todos os efeitos legais.~~
-- [ ] **art139.incI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - I - com retribuição pecuniária total, no período de até 1 (um) mês;
-- [ ] **art155.incI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - I - por Defensor Público do Estado Nível I, conforme o caso, designado pelo Defensor Público-Geral do Estado;
-  - Nota: (NR)
-  - Nota: Inciso I com redação dada pela Lei Complementar n° 1.098, de 04/11/2009.
-  - Redação anterior (tachado): ~~I - por Defensor Público do Estado Substituto, conforme o caso, designado pelo Defensor Público-Geral do Estado;~~
-- [ ] **art164.incX** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - X - declarar-se suspeito ou impedido, nos termos da lei;
-- [ ] **art177.incII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - II - censura;
+- [ ] **art150.incVI** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - VI - participação em congressos e outros certames científicos de interesse da instituição;
+- [ ] **art159** (caso: linha-continuada) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - Artigo 159 - No exercício das atribuições próprias do cargo, os membros da Defensoria Pública do Estado são invioláveis por seus atos e manifestações, sendo-lhes assegurados os direitos, garantias e prerrogativas previstos nesta lei complementar, bem como os concedidos aos advogados em geral.
+- [ ] **art162.incX** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - X - dispor, em tribunais, fóruns e demais locais de funcionamento de órgãos judiciários, em estabelecimentos penais, nos destinados à internação de adolescentes e em delegacias de polícia, de instalações condignas e compatíveis com o exercício de suas funções, especialmente no que respeita ao atendimento público;
+- [ ] **art172** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - Artigo 172 - A correição extraordinária será realizada pelo Corregedor-Geral, de ofício, podendo ainda ser determinada pelo Defensor Público-Geral do Estado ou pelo Conselho Superior, para a apuração de:
 - [ ] **art188.incI.alA** (alínea) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - a) de ofício;
-- [ ] **art195** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - Artigo 195 - Colhidos os elementos necessários à comprovação do fato e da autoria, será imediatamente ouvido o sindicado, que deverá ser pessoalmente intimado e cientificado do quanto apurado, com antecedência mínima de 2 (dois) dias.
+- [ ] **art190** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - Artigo 190 - No processo administrativo e na sindicância, fica assegurado aos membros da Defensoria Pública do Estado o exercício de ampla defesa, pessoalmente, ou por advogado, mediante intimação pessoal de todos os atos do procedimento.
 - [ ] **art206.parUnico** (parágrafo único) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Parágrafo único - Na hipótese do disposto no "caput" deste artigo, deverão constar do termo a ocorrência e os motivos que a determinaram.
-- [ ] **art223** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - Artigo 223 - O indiciado, em qualquer caso, será intimado da decisão na forma prevista no artigo 211 desta lei complementar.
+- [ ] **art219.par1** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - § 1° - As testemunhas são obrigadas a comparecer às audiências quando regularmente intimadas e, se injustificadamente não o fizerem, poderão ser conduzidas pela autoridade policial, mediante requisição do Corregedor-Geral.
 - [ ] **art234** (redação anterior no ancestral) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 234 - Declarado inconstitucional, em controle concentrado, pelo Supremo Tribunal Federal.
   - Nota: Artigo 234 declarado inconstitucional, em controle concentrado, pelo Supremo Tribunal Federal nos autos da ADI n° 4163.
@@ -128,8 +127,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - Redação anterior (tachado) [lida como art234.par3]: ~~§ 3° - A Defensoria Pública do Estado promoverá o ressarcimento à Seccional Paulista da Ordem dos Advogados do Brasil das despesas e dos investimentos necessários à efetivação de sua atuação no convênio, mediante prestação de contas apresentada trimestralmente.~~
 - [ ] **art238.par1.it2** (item) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - 2. Tabela III (SQCD-III) - constituída de cargos de provimento efetivo.
-- [ ] **art239.incII.alE** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - e) 9 (nove) cargos de Diretor de Divisão, referência 18;
+- [ ] **art239.incII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - II - no Subquadro de Cargos de Apoio da Defensoria Pública - Tabela I - SQCA-I, enquadrados na Escala de Vencimentos-Comissão, instituída pelo artigo 9°, inciso IV, da Lei Complementar n° 712, de 12 de abril de 1993:
 - [ ] **art239.incII.alI** (alínea) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - i) 1 (um) cargo de Diretor de Departamento, referência 20;
 - [ ] **dt.art4** (artigo de bloco com numeração própria) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
@@ -168,8 +167,8 @@ Sem página compilada no corpus: o gabarito foi cruzado só com o texto puro col
   - Redação anterior (tachado): ~~3 - Defensor Público do Estado Corregedor-Assistente - Referência 5: 97% (noventa e sete por cento). (NR) ⏎ - Item 3 com redação dada pela Lei Complementar n° 1.376, de 30/03/2022, com efeitos a partir de 01/03/2022.~~
 - [ ] **dt.art11** (artigo de bloco com numeração própria) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 11 - São asseguradas aos membros da Defensoria Pública do Estado as seguintes vantagens pecuniárias:
-- [ ] **dt.art11.incIV** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
-  - IV - diárias;
+- [ ] **dt.art11.incII** (espaçado) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
+  - II - sexta-parte;
 - [ ] **dt.art17** (artigo de bloco com numeração própria) — [abrir](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html)
   - Artigo 17 - O Defensor Público que estiver no exercício de atividades próprias do cargo, em condições de especial dificuldade decorrente da localização ou da natureza do serviço, assim definidas em deliberação do Conselho Superior, fará jus a uma gratificação pecuniária que corresponderá a 15% (quinze por cento), 10% (dez por cento) ou 5% (cinco por cento) dos vencimentos de Defensor Público Nível V, de acordo com os critérios a serem fixados por Ato do Defensor Público-Geral, ouvido o Conselho Superior.
   - Nota: (NR)
