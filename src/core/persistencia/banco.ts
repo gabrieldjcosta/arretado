@@ -59,3 +59,8 @@ export class BancoArretado extends Dexie {
     return this.table(nome);
   }
 }
+
+/** Apaga um banco local inteiro (apagar tudo; remover espaço separado). */
+export function apagarBanco(nome: string): Promise<void> {
+  return Dexie.delete(nome);
+}

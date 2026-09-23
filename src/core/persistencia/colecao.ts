@@ -237,6 +237,39 @@ export class Colecao<N extends NomeColecao> {
     });
   }
 
+  /**
+   * Apagamento físico com registro no log (restauração integral, retenção de snapshots,
+   * apagar dados). Uso exclusivo do core; o domínio usa exclusão lógica.
+   */
+  async removerFisico(ids: readonly string[]): Promise<number> {
+    if (ids.length === 0) return 0;
+    return this.escrever(async () => {
+      const existentes = (await this.tabela.bulkGet([...ids])).filter(
+        (r): r is RegistroDe<N> => r !== undefined && r.usuarioId === this.ctx.usuarioId,
+      );
+      await this.tabela.bulkDelete(existentes.map((r) => r.id));
+      await this.db.alteracoes.bulkAdd(
+        existentes.map((r) => ({
+          ts: this.ctx.relogio.tick(),
+          aparelhoId: this.ctx.aparelhoId,
+          usuarioId: this.ctx.usuarioId,
+          colecao: this.nome,
+          registroId: r.id,
+          operacao: 'remover' as const,
+        })),
+      );
+      if (existentes.length > 0) {
+        this.aposConfirmar('registro.lote', { colecao: this.nome, quantidade: existentes.length });
+      }
+      return existentes.length;
+    });
+  }
+
+  /** Todos os registros do usuário, inclusive excluídos. Só para o core (backup, importação). */
+  async todosDoUsuario(): Promise<RegistroDe<N>[]> {
+    return this.tabela.where('usuarioId').equals(this.ctx.usuarioId).toArray();
+  }
+
   async obter(
     id: string,
     opcoes: { incluirExcluidos?: boolean } = {},

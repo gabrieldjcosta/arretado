@@ -1,4 +1,10 @@
-export { BancoArretado, NOME_BANCO_PRINCIPAL, VERSAO_ESQUEMA, type Alteracao } from './banco';
+export {
+  apagarBanco,
+  BancoArretado,
+  NOME_BANCO_PRINCIPAL,
+  VERSAO_ESQUEMA,
+  type Alteracao,
+} from './banco';
 export {
   Colecao,
   ErroDeValidacao,

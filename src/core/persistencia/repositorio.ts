@@ -55,6 +55,22 @@ export class Repositorio {
     return this.db.transaction('rw', this.db.tables, fn);
   }
 
+  /**
+   * Mesmo banco, outro usuário (restauração integral de pacote de outra identidade).
+   * Não grava nada; quem troca a identidade salva é `adotarIdentidade`.
+   */
+  comUsuario(usuarioId: string): Repositorio {
+    return new Repositorio({ ...this.ctx, usuarioId });
+  }
+
+  /** Grava a identidade local; chamar dentro da transação que troca os dados. */
+  async adotarIdentidade(usuarioId: string): Promise<void> {
+    await this.db.meta.put({
+      chave: 'identidade',
+      valor: { usuarioId, aparelhoId: this.ctx.aparelhoId } satisfies Identidade,
+    });
+  }
+
   fechar(): void {
     this.db.close();
   }
