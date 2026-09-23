@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
 import { secaoDeAjuda } from './orientacoes/conteudo';
@@ -18,7 +18,23 @@ const AREAS = [
 /** Moldura de todas as telas: 4 áreas, ? e !, Conta fora da navegação, rodapé (D6). */
 export function Shell() {
   const { pathname } = useLocation();
+  const navegar = useNavigate();
   const [relatando, setRelatando] = useState(false);
+
+  // Atalho global "E": registrar erro (fora de campos de texto).
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.key.toLowerCase() !== 'e') return;
+      const alvo = e.target as HTMLElement | null;
+      if (alvo?.closest('input, textarea, select, [contenteditable="true"], dialog[open]')) return;
+      e.preventDefault();
+      void navegar('/recall/registrar');
+    };
+    window.addEventListener('keydown', tecla);
+    return () => {
+      window.removeEventListener('keydown', tecla);
+    };
+  }, [navegar]);
 
   return (
     <div className="shell">
@@ -46,6 +62,18 @@ export function Shell() {
           ))}
         </nav>
         <div className="acoes-globais">
+          <Link
+            to="/recall/registrar"
+            className="botao principal"
+            aria-keyshortcuts="E"
+            title="Registrar erro (atalho: E)"
+            aria-label="Registrar erro"
+          >
+            <span className="rotulo-longo">Registrar erro</span>
+            <span className="rotulo-curto" aria-hidden="true">
+              + Erro
+            </span>
+          </Link>
           <Link
             to={`/orientacoes/${secaoDeAjuda(pathname)}`}
             className="botao discreto icone"

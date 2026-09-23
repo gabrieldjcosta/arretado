@@ -1,13 +1,29 @@
 import { Link } from 'react-router';
 import { Vazio } from '../componentes/estados';
+import { useDados } from '../dados/contexto';
+import { vencidosHoje } from '../recall/carregadores';
 
 export function Hoje() {
+  const { dados: vencidos } = useDados(vencidosHoje);
   return (
     <>
       <h1>Hoje</h1>
-      <Vazio titulo="Nada para hoje ainda">
-        <p>O Hoje vai reunir revisões, ponto do dia e fechamento. Ele chega depois do Recall.</p>
-      </Vazio>
+      {vencidos !== undefined && vencidos > 0 ? (
+        <section className="cartao-bloco" aria-label="Revisões">
+          <p>
+            {vencidos === 1
+              ? '1 cartão para revisar.'
+              : `${String(vencidos)} cartões para revisar.`}
+          </p>
+          <Link to="/recall/revisar" className="botao principal">
+            Revisar
+          </Link>
+        </section>
+      ) : (
+        <Vazio titulo="Nenhuma revisão hoje">
+          <p>O Hoje completo (ponto do dia e fechamento) chega numa próxima fase.</p>
+        </Vazio>
+      )}
     </>
   );
 }
@@ -18,17 +34,6 @@ export function Plano() {
       <h1>Plano</h1>
       <Vazio titulo="Nenhum ponto do edital ainda">
         <p>Os pontos do edital poderão ser importados em breve.</p>
-      </Vazio>
-    </>
-  );
-}
-
-export function Recall() {
-  return (
-    <>
-      <h1>Recall</h1>
-      <Vazio titulo="Nenhum erro registrado">
-        <p>O registro de erros e as revisões chegam na próxima etapa.</p>
       </Vazio>
     </>
   );
