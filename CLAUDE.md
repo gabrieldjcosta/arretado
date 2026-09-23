@@ -5,11 +5,12 @@ Plataforma pessoal de preparação para concursos jurídicos (usuário principal
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore, a ser importado).
 
 ## Estado
-Especificação concluída; **nenhum código ainda**. Antes de qualquer implementação, ler:
+Especificação concluída; decisões técnicas fechadas; **F0 em construção** (modelo completo, backup/importação, sanitizador, shell e Conta prontos; falta exportação legível e carga sintética). Nenhuma funcionalidade de F1 ainda. Antes de qualquer implementação, ler:
 1. `README.md` — contexto em uma página.
 2. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel).
 3. `docs/especificacao-parte1.md` §5 e §15 — modelo de dados e fases.
 4. `docs/especificacao-parte2.md` §10.6 — Legislação (regras do estruturador, leitor, editor) quando for tocar nesse módulo.
+5. `docs/decisoes-tecnicas.md` — decisões T1–T14 (stack, formato do pacote, regras de dependência) e `docs/glossario.md` (nomes no código).
 
 ## Regras de trabalho neste projeto
 - Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior.
@@ -18,7 +19,9 @@ Especificação concluída; **nenhum código ainda**. Antes de qualquer implemen
 - Nada obrigatório além do mínimo nos formulários; captura de erro tem exatamente 2 campos obrigatórios.
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
-- Escolhas técnicas ainda em aberto (linguagem, framework de UI, biblioteca de IndexedDB, formato do pacote): decidir com o Gabriel, obedecendo D1–D24.
+- Obedecer T1–T15 (`docs/decisoes-tecnicas.md`); não reabrir sem motivo explícito do Gabriel. Em resumo: TypeScript strict, Vite + React 19, Dexie atrás de `core/persistencia` (domínios nunca importam `dexie`), UUIDv7, toda escrita via repositório grava a `Alteracao` na mesma transação, Zod nos modelos, Tailwind v4 + Radix, Vitest, Biome, npm.
+- Identificadores em PT-BR sem acento conforme `docs/glossario.md`. Sem `dangerouslySetInnerHTML`.
+- `npm run check` e `npm test` devem passar antes de qualquer commit.
 
 ## Git
 Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto privado: https://github.com/gabrieldjcosta/arretado (origin, branch main). GitHub CLI autenticado como gabrieldjcosta.

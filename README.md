@@ -6,9 +6,13 @@ Plataforma pessoal de preparação para concursos jurídicos de alta complexidad
 
 ## Estado atual
 
-**Fase de especificação concluída; nenhuma linha de código ainda.**
+**Especificação concluída; decisões técnicas fechadas (T1–T15); F0 (fundamentos) em construção.**
+
+Já existe: modelo de dados completo (29 entidades), banco local com log de alterações atômico, sanitizador de HTML, pacote de backup `.arretado` com manifesto e cifra opcional, importação com os 7 modos (prévia, snapshot, rollback), shell com as 4 áreas, Conta e Ajustes (aparência, dados, orientações), "?" contextual, "!" de relato de Problema e o esquema remoto com RLS. Falta da F0: exportação legível (Markdown/CSV) e a carga sintética de 10 mil registros.
 
 - [`docs/especificacao-parte1.md`](docs/especificacao-parte1.md) — diagnóstico dos artefatos existentes, produto unificado, modelo conceitual de dados, arquitetura modular, core, plano de fases, MVP e as decisões arquiteturais **D1–D24** (seções 1–7, 15, 16, 19).
+- [`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md) — decisões técnicas de implementação **T1–T15** (TypeScript, Vite + React, Dexie, UUIDv7, pacote ZIP/NDJSON, Zod, DOMPurify, Tailwind + Radix, Vitest, Biome, Supabase, CSP) e regras de dependência entre camadas.
+- [`docs/glossario.md`](docs/glossario.md) — vocabulário canônico → identificadores de código.
 - [`docs/especificacao-parte2.md`](docs/especificacao-parte2.md) — integração entre módulos, interface, detalhamento de cada módulo (com destaque para Legislação), acessibilidade, backup/importação, fontes oficiais, backend e sincronização, critérios de validação, riscos e backlog (seções 8–14, 17, 18, 20).
 
 ## Contexto em um parágrafo
@@ -45,9 +49,20 @@ Lista completa com motivo, alternativa descartada e consequência: Parte 1, §19
 | F7 | Catálogo compartilhado, pacotes de incidência, inteligência de prova | — |
 | F8 | Analítica acionável, revisão adaptativa (opcional) | ≥ 3 meses de revisões |
 
-## O que ainda falta decidir antes de código
+## Decisões técnicas
 
-Apenas escolhas técnicas de implementação — linguagem, framework de interface, biblioteca de acesso ao IndexedDB, formato exato do pacote de backup. Elas devem obedecer às decisões D1–D24, não o contrário.
+As escolhas de implementação (linguagem, framework de interface, acesso ao IndexedDB, formato do pacote) estão fechadas em [`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md) (T1–T15). Elas obedecem a D1–D24, não o contrário.
+
+## Desenvolvimento
+
+Requer Node ≥ 24.
+
+```bash
+npm install
+npm run dev     # app local
+npm test        # unitários (Vitest + fake-indexeddb)
+npm run check   # biome + tsc + regras de dependência
+```
 
 ## Relacionados
 
