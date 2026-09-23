@@ -5,7 +5,7 @@ Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md
 ## Estado
 
 - **F0 (Fundamentos) e F1 (Recall + pontos do edital) implementadas**, revisadas e testadas. **Portões:** [`portoes/F0.md`](portoes/F0.md), **fechado em 23/09/2026**, e [`portoes/F1.md`](portoes/F1.md), aguardando o uso real.
-- **No `main` desde 23/09/2026:** merge dos PRs [#1](https://github.com/gabrieldjcosta/arretado/pull/1) (F0/F1), [#2](https://github.com/gabrieldjcosta/arretado/pull/2) (plano da F2, 7.1, Supabase 4.3, glossário, solução de problemas) e [#3](https://github.com/gabrieldjcosta/arretado/pull/3) (Worker, T18). **A 7.2 está no PR do branch `claude/proxima-atividade-f2-wegu83`**, aguardando o merge do Gabriel; a sessão da 7.3 parte do `main` depois desse merge.
+- **No `main` desde 23/09/2026:** merge dos PRs [#1](https://github.com/gabrieldjcosta/arretado/pull/1) (F0/F1), [#2](https://github.com/gabrieldjcosta/arretado/pull/2) (plano da F2, 7.1, Supabase 4.3, glossário, solução de problemas) e [#3](https://github.com/gabrieldjcosta/arretado/pull/3) (Worker, T18). **A 7.2 está no PR [#4](https://github.com/gabrieldjcosta/arretado/pull/4)** (branch `claude/proxima-atividade-f2-wegu83`), aguardando o merge do Gabriel; a sessão da 7.3 parte do `main` depois desse merge.
 - **Verificação:**
   - 367 testes unitários e de integração, incluindo a integridade do corpus da F2 e dos colados;
   - 82 E2E (Playwright + axe, desktop e celular);
