@@ -1,0 +1,3399 @@
+{
+  "versao": 1,
+  "id": "cp",
+  "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+  "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
+  "entradas": {
+    "colado": "cp.colado.html",
+    "textoPuro": "cp.colado.txt",
+    "pagina": "cp.html",
+    "compilada": "cp-compilado.colado.html"
+  },
+  "conferencia": {
+    "estado": "pendente",
+    "por": null,
+    "em": null,
+    "observacoes": []
+  },
+  "ultimoArtigo": "art361",
+  "contagens": {
+    "dispositivos": 1403,
+    "porTipo": {
+      "artigo": 434,
+      "paragrafo": 491,
+      "inciso": 400,
+      "alinea": 78
+    },
+    "porStatus": {
+      "vigente": 1291,
+      "vetado": 11,
+      "revogado": 101
+    },
+    "artigos": {
+      "vigente": 404,
+      "revogado": 27,
+      "vetado": 3
+    },
+    "comSufixo": 73,
+    "notasVigencia": 1134,
+    "redacoesAnteriores": 881,
+    "redacoesPorOrigem": {
+      "tachado": 765,
+      "revogacao": 115,
+      "duplicata": 1
+    },
+    "redacoesNoAncestral": 331,
+    "dispositivosComRedacaoAnterior": 429,
+    "nomes": 448,
+    "estrutura": {
+      "parte": 2,
+      "titulo": 20,
+      "capitulo": 59,
+      "secao": 7
+    },
+    "estruturaisTachados": 20
+  },
+  "pendencias": [],
+  "divergencias": [
+    {
+      "tipo": "texto",
+      "chave": "art47.incIII",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…ação para dirigir veículo. >…\" | compilada: \"…ação para dirigir veículo…\""
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art92.parUnico",
+      "explicacao": "decisão: a página traz o antigo \"Parágrafo único\" sem tachado antes do § 1º que o substituiu (a compilada não o tem); o estruturador deve acusar o caso paragrafo-unico-com-numerado"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par2A.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par2A.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par7.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par7.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par7.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art121.par7.incIV",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art129.par2.incIII",
+      "explicacao": "decisão: a compilada escreve \"III perda…\" sem hífen (erro de digitação dela); a página tem o hífen"
+    },
+    {
+      "tipo": "texto",
+      "chave": "art148.par1.incIII",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…a liberdade dura mais de 15 (quinze) dias…\" | compilada: \"…a liberdade dura mais de quinze dias…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art159.par3",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…Se resulta a morte: Pena - reclusão, de vinte e quatro a trinta a…\" | compilada: \"…Se resulta a morte: Vide Lei nº 8.072, de 25.7.90 Pena - reclusão…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art169.parUnico.incII",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…ente, dentro no prazo de 15 (quinze) dias…\" | compilada: \"…ente, dentro no prazo de quinze dias…\""
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art187.parUnico.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art188.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art193.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art196.par2",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art214.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art216.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "texto",
+      "chave": "art216A",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…emprego, cargo ou função.\" Pena - detenção, de 1 (um) a 2 (dois) anos…\" | compilada: \"…emprego, cargo ou função. Pena - detenção, de 1 (um) a 2 (dois) anos…\""
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art223.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art224.alA",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art224.alB",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art224.alC",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par1",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par2",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par2.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par2.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par2.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par2.incIV",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231.par3",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par1",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par2",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par2.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par2.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par2.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par2.incIV",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art231A.par3",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art234.par1",
+      "explicacao": "decisão: a página rotula \"§ 1º.\" o que a compilada (e o texto original) chama \"Parágrafo único\"; o estruturador deve acusar o caso paragrafo-1-sem-2"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art234.par1.incI",
+      "explicacao": "decisão: a página rotula \"§ 1º.\" o que a compilada (e o texto original) chama \"Parágrafo único\"; o estruturador deve acusar o caso paragrafo-1-sem-2"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art234.par1.incII",
+      "explicacao": "decisão: a página rotula \"§ 1º.\" o que a compilada (e o texto original) chama \"Parágrafo único\"; o estruturador deve acusar o caso paragrafo-1-sem-2"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art234.par1.incIII",
+      "explicacao": "decisão: a página rotula \"§ 1º.\" o que a compilada (e o texto original) chama \"Parágrafo único\"; o estruturador deve acusar o caso paragrafo-1-sem-2"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par1",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par2",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par3",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par3.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par3.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par4",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par4.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art240.par4.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "texto",
+      "chave": "art250.par2",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…, é pena de detenção, de 6 (seis) meses a 2 (dois) anos…\" | compilada: \"…, é pena de detenção, de seis meses a dois anos…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art251.par3",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…a pena é de detenção, de 6 (seis) meses a 2 (dois) anos; nos demais ca…\" | compilada: \"…a pena é de detenção, de seis meses a dois anos; nos demais casos, é d…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art264.parUnico",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…a pena é de detenção, de 6 (seis) meses a 2 (dois) anos; se resulta mo…\" | compilada: \"…a pena é de detenção, de seis meses a dois anos; se resulta morte, a p…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art269",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…ria: Pena - detenção, de 6 (seis) meses a 2 (dois) anos, e multa…\" | compilada: \"…ria: Pena - detenção, de seis meses a dois anos, e multa…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art273.par1B.incIV",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…utico ou de sua atividade…\" | compilada: \"…utico ou de sua atividade; (…\""
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par1",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par1.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par1.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par1.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par1.incIV",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par2",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par3",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par3.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par3.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par3.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par4",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par5",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par6",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art281.par7",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "texto",
+      "chave": "art293.par4",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"… na pena de detenção, de 6 (seis) meses a 2 (dois) anos, ou multa…\" | compilada: \"… na pena de detenção, de seis meses a dois anos, ou multa…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art316.par1",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…iza: Pena - reclusão, de três a oito anos, e multa…\" | compilada: \"…iza: Pena - reclusão, de 3 (três) a 8 (oito) anos, e multa…\""
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art350.parUnico",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art350.parUnico.incI",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art350.parUnico.incII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art350.parUnico.incIII",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "so-na-pagina",
+      "chave": "art350.parUnico.incIV",
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
+    },
+    {
+      "tipo": "texto",
+      "chave": "art351.par1",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…a pena é de reclusão, de 2 (dois) a 6 (seis) anos…\" | compilada: \"…a pena é de reclusão, de dois a seis anos…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art351.par4",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…e a pena de detenção, de 3 (três) meses a 1 (um) ano, ou multa…\" | compilada: \"…e a pena de detenção, de três meses a um ano, ou multa…\""
+    },
+    {
+      "tipo": "texto",
+      "chave": "art359G",
+      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
+      "detalhe": "página: \"…andato ou da legislatura: Pena - reclusão, de 1 (um) a 4 (quatro) anos…\" | compilada: \"…andato ou da legislatura:) Pena - reclusão, de 1 (um) a 4 (quatro) ano…\""
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art51.par1",
+      "explicacao": "revogado na compilada; na página, só tachado (redação anterior do ancestral)",
+      "detalhe": "revogado: § 1º - "
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art51.par2",
+      "explicacao": "revogado na compilada; na página, só tachado (redação anterior do ancestral)",
+      "detalhe": "revogado: § 2º - "
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art234.parUnico",
+      "detalhe": "vigente: Parágrafo único - Incorre na mesma pena quem:",
+      "explicacao": "decisão: o mesmo dispositivo que a página rotula \"§ 1º.\" (art234.par1)"
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art234.parUnico.incI",
+      "detalhe": "vigente: I - vende, distribui ou expõe à venda ou ao público qualquer dos objetos referidos neste artigo;",
+      "explicacao": "decisão: o mesmo dispositivo que a página rotula \"§ 1º.\" (art234.par1)"
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art234.parUnico.incII",
+      "detalhe": "vigente: II - realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetá",
+      "explicacao": "decisão: o mesmo dispositivo que a página rotula \"§ 1º.\" (art234.par1)"
+    },
+    {
+      "tipo": "so-na-compilada",
+      "chave": "art234.parUnico.incIII",
+      "detalhe": "vigente: III - realiza, em lugar público ou acessível ao público, ou pelo rádio, audição ou recitação de caráter obsceno.",
+      "explicacao": "decisão: o mesmo dispositivo que a página rotula \"§ 1º.\" (art234.par1)"
+    },
+    {
+      "tipo": "ancora",
+      "chave": "art2248",
+      "detalhe": "âncora sem artigo na página",
+      "explicacao": "decisão: erro de digitação na fonte: name=\"art2248\" no art. 248"
+    },
+    {
+      "tipo": "ancora",
+      "chave": "art2253",
+      "detalhe": "âncora sem artigo na página",
+      "explicacao": "decisão: erro de digitação na fonte: name=\"art2253\" no art. 253"
+    },
+    {
+      "tipo": "artigo-sem-ancora",
+      "chave": "art248",
+      "explicacao": "decisão: a âncora saiu como \"art2248\" (erro da fonte)"
+    },
+    {
+      "tipo": "artigo-sem-ancora",
+      "chave": "art253",
+      "explicacao": "decisão: a âncora saiu como \"art2253\" (erro da fonte)"
+    },
+    {
+      "tipo": "artigo-sem-ancora",
+      "chave": "art287",
+      "explicacao": "decisão: a âncora saiu como name=\"287\", sem \"art\" (erro da fonte)"
+    }
+  ],
+  "casos": [
+    {
+      "tipo": "duplicata",
+      "endereco": "art141.par2",
+      "texto": "§ 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena. (Incluído pela Lei nº 13.964, de 2019) (Vigência)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art171.par5",
+      "texto": "§ 5º (Revogado). (Redação dada pela Lei nº 15.397, de 2026)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art171.par5.incI",
+      "texto": "I – (Revogado); (Redação dada pela Lei nº 15.397, de 2026)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art171.par5.incII",
+      "texto": "II – (Revogado); (Redação dada pela Lei nº 15.397, de 2026)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art171.par5.incIII",
+      "texto": "III – (Revogado); (Redação dada pela Lei nº 15.397, de 2026)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art171.par5.incIV",
+      "texto": "IV – (Revogado). (Redação dada pela Lei nº 15.397, de 2026)"
+    },
+    {
+      "tipo": "estrutural-substituido",
+      "endereco": null,
+      "texto": "TÍTULO VI DOS CRIMES CONTRA OS COSTUMES"
+    },
+    {
+      "tipo": "estrutural-substituido",
+      "endereco": null,
+      "texto": "CAPÍTULO I DOS CRIMES CONTRA A LIBERDADE SEXUAL"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art216.parUnico",
+      "texto": "Parágrafo único. Se a vítima é menor de 18 (dezoito) e maior de 14 (quatorze) anos: (Redação dada pela Lei nº 11.106, de 2005) (Revogado pela Lei nº 12.015, de 2009)"
+    },
+    {
+      "tipo": "revogacao-reescrita",
+      "endereco": "art218B.par1",
+      "texto": "§ 1º (Revogado). (Redação dada pela Lei nº 15.280, de 2025)"
+    },
+    {
+      "tipo": "artigo-so-tachado",
+      "endereco": "art185",
+      "texto": "Art. 185 - Atribuir falsamente a alguém, mediante o uso de nome, pseudônimo ou sinal por ele adotado para designar seus trabalhos, a autoria de obra literária, científica ou artística:\nPena - detenção"
+    },
+    {
+      "tipo": "artigo-so-tachado",
+      "endereco": "art279",
+      "texto": "Art. 279 - Vender, ter em depósito para vender ou expor à venda ou, de qualquer forma, entregar a consumo substância alimentícia ou medicinal avariada:\nPena - detenção, de um a três anos, ou multa, de"
+    },
+    {
+      "tipo": "paragrafo-unico-com-numerado",
+      "endereco": "art92.parUnico",
+      "texto": "Parágrafo único -"
+    },
+    {
+      "tipo": "paragrafo-1-sem-2",
+      "endereco": "art168.par1",
+      "texto": "§ 1º -"
+    },
+    {
+      "tipo": "paragrafo-1-sem-2",
+      "endereco": "art234.par1",
+      "texto": "§ 1º."
+    }
+  ],
+  "estrutura": [
+    {
+      "tipo": "parte",
+      "rotulo": "PARTE GERAL",
+      "nome": "",
+      "primeiroArtigo": "art1"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO I",
+      "nome": "DA APLICAÇÃO DA LEI PENAL",
+      "primeiroArtigo": "art1"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO II",
+      "nome": "DO CRIME",
+      "primeiroArtigo": "art13"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO III",
+      "nome": "DA IMPUTABILIDADE PENAL",
+      "primeiroArtigo": "art26"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO IV",
+      "nome": "DO CONCURSO DE PESSOAS",
+      "primeiroArtigo": "art29"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO V",
+      "nome": "DAS PENAS",
+      "primeiroArtigo": "art32"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DAS ESPÉCIES DE PENA",
+      "primeiroArtigo": "art32"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO I",
+      "nome": "DAS PENAS PRIVATIVAS DE LIBERDADE",
+      "primeiroArtigo": "art33"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO II",
+      "nome": "DAS PENAS RESTRITIVAS DE DIREITOS",
+      "primeiroArtigo": "art43"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO III",
+      "nome": "DA PENA DE MULTA",
+      "primeiroArtigo": "art49"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DA COMINAÇÃO DAS PENAS",
+      "primeiroArtigo": "art53"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DA APLICAÇÃO DA PENA",
+      "primeiroArtigo": "art59"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DA SUSPENSÃO CONDICIONAL DA PENA",
+      "primeiroArtigo": "art77"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "DO LIVRAMENTO CONDICIONAL",
+      "primeiroArtigo": "art83"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VI",
+      "nome": "DOS EFEITOS DA CONDENAÇÃO",
+      "primeiroArtigo": "art91"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VII",
+      "nome": "DA REABILITAÇÃO",
+      "primeiroArtigo": "art93"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VI",
+      "nome": "DAS MEDIDAS DE SEGURANÇA",
+      "primeiroArtigo": "art96"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VII",
+      "nome": "DA AÇÃO PENAL",
+      "primeiroArtigo": "art100"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VIII",
+      "nome": "DA EXTINÇÃO DA PUNIBILIDADE",
+      "primeiroArtigo": "art107"
+    },
+    {
+      "tipo": "parte",
+      "rotulo": "PARTE ESPECIAL",
+      "nome": "",
+      "primeiroArtigo": "art121"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO I",
+      "nome": "DOS CRIMES CONTRA A PESSOA",
+      "primeiroArtigo": "art121"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA A VIDA",
+      "primeiroArtigo": "art121"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DAS LESÕES CORPORAIS",
+      "primeiroArtigo": "art129"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DA PERICLITAÇÃO DA VIDA E DA SAÚDE",
+      "primeiroArtigo": "art130"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DA RIXA",
+      "primeiroArtigo": "art137"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "DOS CRIMES CONTRA A HONRA",
+      "primeiroArtigo": "art138"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VI",
+      "nome": "DOS CRIMES CONTRA A LIBERDADE INDIVIDUAL",
+      "primeiroArtigo": "art146"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO I",
+      "nome": "DOS CRIMES CONTRA A LIBERDADE PESSOAL",
+      "primeiroArtigo": "art146"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO II",
+      "nome": "DOS CRIMES CONTRA A INVIOLABILIDADE DO DOMICÍLIO",
+      "primeiroArtigo": "art150"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO III",
+      "nome": "DOS CRIMES CONTRA A INVIOLABILIDADE DE CORRESPONDÊNCIA",
+      "primeiroArtigo": "art151"
+    },
+    {
+      "tipo": "secao",
+      "rotulo": "SEÇÃO IV",
+      "nome": "DOS CRIMES CONTRA A INVIOLABILIDADE DOS SEGREDOS",
+      "primeiroArtigo": "art153"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO II",
+      "nome": "DOS CRIMES CONTRA O PATRIMÔNIO",
+      "primeiroArtigo": "art155"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DO FURTO",
+      "primeiroArtigo": "art155"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DO ROUBO E DA EXTORSÃO",
+      "primeiroArtigo": "art157"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DA USURPAÇÃO",
+      "primeiroArtigo": "art161"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DO DANO",
+      "primeiroArtigo": "art163"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "DA APROPRIAÇÃO INDÉBITA",
+      "primeiroArtigo": "art168"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VI",
+      "nome": "DO ESTELIONATO E OUTRAS FRAUDES",
+      "primeiroArtigo": "art171"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VII",
+      "nome": "DA RECEPTAÇÃO",
+      "primeiroArtigo": "art180"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VIII",
+      "nome": "DISPOSIÇÕES GERAIS",
+      "primeiroArtigo": "art181"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO III",
+      "nome": "DOS CRIMES CONTRA A PROPRIEDADE IMATERIAL",
+      "primeiroArtigo": "art184"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA A PROPRIEDADE INTELECTUAL",
+      "primeiroArtigo": "art184"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES CONTRA O PRIVILÉGIO DE INVENÇÃO",
+      "primeiroArtigo": "art187"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DOS CRIMES CONTRA AS MARCAS DE INDÚSTRIA E COMÉRCIO",
+      "primeiroArtigo": "art192"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DOS CRIMES DE CONCORRÊNCIA DESLEAL",
+      "primeiroArtigo": "art196"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO IV",
+      "nome": "DOS CRIMES CONTRA A ORGANIZAÇÃO DO TRABALHO",
+      "primeiroArtigo": "art197"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO V",
+      "nome": "DOS CRIMES CONTRA O SENTIMENTO RELIGIOSO E CONTRA O RESPEITO AOS MORTOS",
+      "primeiroArtigo": "art208"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA O SENTIMENTO RELIGIOSO",
+      "primeiroArtigo": "art208"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES CONTRA O RESPEITO AOS MORTOS",
+      "primeiroArtigo": "art209"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VI",
+      "nome": "DOS CRIMES CONTRA A DIGNIDADE SEXUAL",
+      "primeiroArtigo": "art213"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA A LIBERDADE SEXUAL",
+      "primeiroArtigo": "art213"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I-",
+      "nome": "A",
+      "primeiroArtigo": "art216B"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES SEXUAIS CONTRA VULNERÁVEL",
+      "primeiroArtigo": "art217"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DO RAPTO",
+      "primeiroArtigo": "art219"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DISPOSIÇÕES GERAIS",
+      "primeiroArtigo": "art223"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "DO LENOCÍNIO E DO TRÁFICO DE PESSOA PARA FIM DE PROSTITUIÇÃO OU OUTRA FORMA DE EXPLORAÇÃO SEXUAL",
+      "primeiroArtigo": "art227"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VI",
+      "nome": "DO ULTRAJE PÚBLICO AO PUDOR",
+      "primeiroArtigo": "art233"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VII",
+      "nome": "DISPOSIÇÕES GERAIS",
+      "primeiroArtigo": "art234A"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VII",
+      "nome": "DOS CRIMES CONTRA A FAMÍLIA",
+      "primeiroArtigo": "art235"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA O CASAMENTO",
+      "primeiroArtigo": "art235"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES CONTRA O ESTADO DE FILIAÇÃO",
+      "primeiroArtigo": "art241"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DOS CRIMES CONTRA A ASSISTÊNCIA FAMILIAR",
+      "primeiroArtigo": "art244"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DOS CRIMES CONTRA O PÁTRIO PODER, TUTELA CURATELA",
+      "primeiroArtigo": "art248"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO VIII",
+      "nome": "DOS CRIMES CONTRA A INCOLUMIDADE PÚBLICA",
+      "primeiroArtigo": "art250"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES DE PERIGO COMUM",
+      "primeiroArtigo": "art250"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES CONTRA A SEGURANÇA DOS MEIOS DE COMUNICAÇÃO E TRANSPORTE E OUTROS SERVIÇOS PÚBLICOS",
+      "primeiroArtigo": "art260"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DOS CRIMES CONTRA A SAÚDE PÚBLICA",
+      "primeiroArtigo": "art267"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO IX",
+      "nome": "DOS CRIMES CONTRA A PAZ PÚBLICA",
+      "primeiroArtigo": "art286"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO X",
+      "nome": "DOS CRIMES CONTRA A FÉ PÚBLICA",
+      "primeiroArtigo": "art289"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DA MOEDA FALSA",
+      "primeiroArtigo": "art289"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DA FALSIDADE DE TÍTULOS E OUTROS PAPÉIS PÚBLICOS",
+      "primeiroArtigo": "art293"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DA FALSIDADE DOCUMENTAL",
+      "primeiroArtigo": "art296"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DE OUTRAS FALSIDADES",
+      "primeiroArtigo": "art306"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "das fraudes em certames de interesse público",
+      "primeiroArtigo": "art311A"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO XI",
+      "nome": "DOS CRIMES CONTRA A ADMINISTRAÇÃO PÚBLICA",
+      "primeiroArtigo": "art312"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES PRATICADOS POR FUNCIONÁRIO PÚBLICO CONTRA A ADMINISTRAÇÃO EM GERAL",
+      "primeiroArtigo": "art312"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES PRATICADOS POR PARTICULAR CONTRA A ADMINISTRAÇÃO EM GERAL",
+      "primeiroArtigo": "art328"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II-",
+      "nome": "A",
+      "primeiroArtigo": "art337B"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II-",
+      "nome": "B",
+      "primeiroArtigo": "art337E"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DOS CRIMES CONTRA A ADMINISTRAÇÃO DA JUSTIÇA",
+      "primeiroArtigo": "art338"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DOS CRIMES CONTRA AS FINANÇAS PÚBLICAS",
+      "primeiroArtigo": "art359A"
+    },
+    {
+      "tipo": "titulo",
+      "rotulo": "TÍTULO XII",
+      "nome": "DOS CRIMES CONTRA O ESTADO",
+      "primeiroArtigo": "art359I"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO I",
+      "nome": "DOS CRIMES CONTRA A SOBERANIA NACIONAL",
+      "primeiroArtigo": "art359I"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO II",
+      "nome": "DOS CRIMES CONTRA AS INSTITUIÇÕES DEMOCRÁTICAS",
+      "primeiroArtigo": "art359L"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO III",
+      "nome": "DOS CRIMES CONTRA O FUNCIONAMENTO DAS INSTITUIÇÕES DEMOCRÁTICAS NO PROCESSO ELEITORAL",
+      "primeiroArtigo": "art359N"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO IV",
+      "nome": "DOS CRIMES CONTRA O FUNCIONAMENTO",
+      "primeiroArtigo": "art359R"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO V",
+      "nome": "(VETADO)",
+      "primeiroArtigo": "art359T"
+    },
+    {
+      "tipo": "capitulo",
+      "rotulo": "CAPÍTULO VI",
+      "nome": "DISPOSIÇÕES COMUNS",
+      "primeiroArtigo": "art359T"
+    }
+  ],
+  "amostra": [
+    {
+      "endereco": "art1",
+      "motivo": "primeiro e último artigo",
+      "status": "vigente",
+      "rotulo": "Art. 1º -",
+      "nome": "Anterioridade da Lei",
+      "texto": "Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.",
+      "notas": [
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 1° Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art1"
+    },
+    {
+      "endereco": "art7.par3.alB",
+      "motivo": "alínea",
+      "status": "vigente",
+      "rotulo": "b)",
+      "texto": "houve requisição do Ministro da Justiça.",
+      "notas": [
+        "(Incluído pela Lei nº 7.209, de 1984)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7"
+    },
+    {
+      "endereco": "art33.par2.alC",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "c)",
+      "texto": "o condenado não reincidente, cuja pena seja igual ou inferior a 4 (quatro) anos, poderá, desde o início, cumpri-la em regime aberto.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33"
+    },
+    {
+      "endereco": "art44",
+      "motivo": "redação anterior no ancestral",
+      "status": "vigente",
+      "rotulo": "Art. 44.",
+      "texto": "As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:",
+      "notas": [
+        "(Redação dada pela Lei nº 9.714, de 1998)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 44. São circunstâncias que sempre agravam a pena, quando não constituem ou qualificam o crime:",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Art. 44 - As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando: (Redação dada pela Lei nº 7.209, de 1984)",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Parágrafo único - Nos crimes culposos, a pena privativa de liberdade aplicada, igual ou superior a um ano, pode ser substituída por uma pena restritiva de direitos e multa ou por duas penas restritivas de direitos, exeqüíveis simultaneamente. (Incluído pela Lei nº 7.209, de 1984)",
+          "origem": "tachado",
+          "enderecoLido": "art44.parUnico"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44"
+    },
+    {
+      "endereco": "art46",
+      "motivo": "várias redações anteriores",
+      "status": "vigente",
+      "rotulo": "Art. 46.",
+      "nome": "Prestação de serviços à comunidade ou a entidades públicas",
+      "texto": "A prestação de serviços à comunidade ou a entidades públicas é aplicável às condenações superiores a seis meses de privação da liberdade.",
+      "notas": [
+        "(Redação dada pela Lei nº 9.714, de 1998)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 46. Verifica-se a reincidência quando o agente comete novo crime, depois de transitar em julgado a sentença que, no país ou no estrangeiro, o tenha condenado por crime anterior.",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Art. 46 - A prestação de serviços a comunidade consiste na atribuição ao condenado de tarefas gratuitas junto a entidades assistências, hospitais, escolas, orfanatos e outros estabelecimentos congêneres, em programas comunitários ou estatais. (Redação dada pela Lei nº 7.209, de 1984)",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Parágrafo único. Para efeito de reincidência, não prevalece a condenação anterior, se entre a data do cumprimento ou extinção da pena e a infração posterior tiver decorrido período de tempo superior a cinco anos. (Redação dada pela Lei nº 6.416, de 1977)",
+          "origem": "tachado",
+          "enderecoLido": "art46.parUnico"
+        },
+        {
+          "texto": "Parágrafo único - As tarefas serão atribuídas conforme as aptidões do condenado, devendo ser cumpridas, durante oito horas semanais, aos sábados, domingos e feriados ou em dias úteis, de modo a não prejudicar a jornada normal de trabalho. (Redação dada pela Lei nº 7.209, de 1984)",
+          "origem": "tachado",
+          "enderecoLido": "art46.parUnico"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art46"
+    },
+    {
+      "endereco": "art47.incIII",
+      "motivo": "texto diferente na compilada",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "suspensão de autorização ou de habilitação para dirigir veículo. >",
+      "notas": [
+        "(Incluído pela Lei nº 7.209, de 11.7.1984)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47"
+    },
+    {
+      "endereco": "art61.incII.alM",
+      "motivo": "alínea",
+      "status": "vigente",
+      "rotulo": "m)",
+      "texto": "nas dependências de instituição de ensino.",
+      "notas": [
+        "(Incluído pela Lei nº 15.159, de 2025)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art61"
+    },
+    {
+      "endereco": "art72",
+      "motivo": "com nome (rubrica)",
+      "status": "vigente",
+      "rotulo": "Art. 72 -",
+      "nome": "Multas no concurso de crimes",
+      "texto": "No concurso de crimes, as penas de multa são aplicadas distinta e integralmente.",
+      "notas": [
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 72. As interdições, permanentes ou temporárias, tornam-se efetivas logo que passa em julgado a sentença, mas o prazo das interdições temporárias começa a correr do dia em que:",
+          "origem": "tachado"
+        },
+        {
+          "texto": "a) termina a execução da pena privativa de liberdade ou esta se extingue pela prescrição;",
+          "origem": "tachado",
+          "enderecoLido": "art72.alA"
+        },
+        {
+          "texto": "b) finda a execução da medida de segurança detentiva.",
+          "origem": "tachado",
+          "enderecoLido": "art72.alB"
+        },
+        {
+          "texto": "Parágrafo único. Computam-se no prazo:",
+          "origem": "tachado",
+          "enderecoLido": "art72.parUnico"
+        },
+        {
+          "texto": "I - o tempo da suspensão provisória;",
+          "origem": "tachado",
+          "enderecoLido": "art72.parUnico.incI"
+        },
+        {
+          "texto": "II - o tempo de liberdade resultante da suspensão condicional da pena ou do livramento condicional, se não sobrevem revogação.",
+          "origem": "tachado",
+          "enderecoLido": "art72.parUnico.incII"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art72"
+    },
+    {
+      "endereco": "art92.parUnico",
+      "motivo": "divergência decidida",
+      "status": "vigente",
+      "rotulo": "Parágrafo único -",
+      "texto": "Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.",
+      "notas": [
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conveniente, submetido, por igual prazo, a liberdade vigiada.",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92"
+    },
+    {
+      "endereco": "art92.par3",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 3º",
+      "texto": "Em caso de reincidência da conduta prevista no inciso IV do caput deste artigo, a empresa será considerada inidônea e terá sua inscrição no CNPJ considerada inapta, com os efeitos previstos na Lei nº 9.430, de 27 de dezembro de 1996.",
+      "notas": [
+        "(Incluído pela Lei nº 15.358, de 2026)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92"
+    },
+    {
+      "endereco": "art110.par1",
+      "motivo": "várias redações anteriores",
+      "status": "vigente",
+      "rotulo": "§ 1º",
+      "texto": "A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .",
+      "notas": [
+        "(Redação dada pela Lei nº 12.234, de 2010)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, regula-se, também, pela pena aplicada e verifica-se nos mesmos prazos. (Renumerado do parágrafo único pela Lei nº 6.416, de 1977)",
+          "origem": "tachado"
+        },
+        {
+          "texto": "§ 1º - A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, ou depois de improvido seu recurso, regula-se pela pena aplicada. (Redação dada pela Lei nº 7.209, de 11.7.1984)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110"
+    },
+    {
+      "endereco": "art112",
+      "motivo": "redação anterior no ancestral",
+      "status": "vigente",
+      "rotulo": "Art. 112 -",
+      "nome": "Termo inicial da prescrição após a sentença condenatória irrecorrível",
+      "texto": "No caso do art. 110 deste Código, a prescrição começa a correr:",
+      "notas": [
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 112. No caso do art. 110, a prescrição começa a correr:",
+          "origem": "tachado"
+        },
+        {
+          "texto": "a) do dia em que passa em julgado a sentença condenatória ou a que revoga a suspensão condicional da pena ou o livramento condicional;",
+          "origem": "tachado",
+          "enderecoLido": "art112.alA"
+        },
+        {
+          "texto": "b) do dia em que se interrompe a execução, salvo quando o tempo da interrupção deva computar-se na pena.",
+          "origem": "tachado",
+          "enderecoLido": "art112.alB"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112"
+    },
+    {
+      "endereco": "art121.par7.incIV",
+      "motivo": "parágrafo, inciso ou alínea revogado",
+      "status": "revogado",
+      "rotulo": "IV -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 14.994, de 2024)"
+      ],
+      "redacoes": [
+        {
+          "texto": "IV - em descumprimento das medidas protetivas de urgência previstas nos incisos I , II e III do caput do art. 22 da Lei nº 11.340, de 7 de agosto de 2006 . (Incluído pela Lei nº 13.771, de 2018) (Revogado pela Lei nº 14.994, de 2024)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art121"
+    },
+    {
+      "endereco": "art129.par2.incIII",
+      "motivo": "divergência decidida",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "perda ou inutilização do membro, sentido ou função;",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129"
+    },
+    {
+      "endereco": "art129.par3A",
+      "motivo": "parágrafo com sufixo",
+      "status": "vigente",
+      "rotulo": "§ 3º-A.",
+      "texto": "No crime previsto no § 3º deste artigo, se cometido no contexto da atuação ou para a consecução das condutas previstas no art. 2º da lei que institui o marco legal do combate ao crime organizado no Brasil:\nPena - reclusão, de 20 (vinte) a 40 (quarenta) anos.",
+      "notas": [
+        "(Incluído pela Lei nº 15.358, de 2026)",
+        "(Incluído pela Lei nº 15.358, de 2026)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129"
+    },
+    {
+      "endereco": "art130.par2",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 2º -",
+      "texto": "Somente se procede mediante representação.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130"
+    },
+    {
+      "endereco": "art132.parUnico",
+      "motivo": "parágrafo único",
+      "status": "vigente",
+      "rotulo": "Parágrafo único.",
+      "texto": "A pena é aumentada de um sexto a um terço se a exposição da vida ou da saúde de outrem a perigo decorre do transporte de pessoas para a prestação de serviços em estabelecimentos de qualquer natureza, em desacordo com as normas legais.",
+      "notas": [
+        "(Incluído pela Lei nº 9.777, de 1998)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132"
+    },
+    {
+      "endereco": "art138.par3.incII",
+      "motivo": "inciso de parágrafo",
+      "status": "vigente",
+      "rotulo": "II -",
+      "texto": "se o fato é imputado a qualquer das pessoas indicadas no nº I do art. 141;",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138"
+    },
+    {
+      "endereco": "art141.par2",
+      "motivo": "caso: duplicata",
+      "status": "vigente",
+      "rotulo": "§ 2º",
+      "texto": "Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.",
+      "notas": [
+        "(Incluído pela Lei nº 13.964, de 2019)",
+        "(Vigência)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 2º - (vetado)",
+          "origem": "duplicata"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141"
+    },
+    {
+      "endereco": "art148.par1.incIII",
+      "motivo": "texto diferente na compilada",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "se a privação da liberdade dura mais de 15 (quinze) dias.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148"
+    },
+    {
+      "endereco": "art158.par2",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 2º -",
+      "texto": "Aplica-se à extorsão praticada mediante violência o disposto no § 3º do artigo anterior. Vide Lei nº 8.072, de 25.7.90",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158"
+    },
+    {
+      "endereco": "art159.par3",
+      "motivo": "texto diferente na compilada",
+      "status": "vigente",
+      "rotulo": "§ 3º -",
+      "texto": "Se resulta a morte:\nPena - reclusão, de vinte e quatro a trinta anos.",
+      "notas": [
+        "(Vide Lei nº 8.072, de 25.7.90)",
+        "(Redação dada pela Lei nº 8.072, de 25.7.1990)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Pena - reclusão, de vinte a trinta anos, e multa, de vinte contos a cinqüenta contos de réis.",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159"
+    },
+    {
+      "endereco": "art169",
+      "motivo": "com \"Pena\"",
+      "status": "vigente",
+      "rotulo": "Art. 169 -",
+      "nome": "Apropriação de coisa havida por erro, caso fortuito ou força da natureza",
+      "texto": "Apropriar-se alguém de coisa alheia vinda ao seu poder por erro, caso fortuito ou força da natureza:\nPena - detenção, de um mês a um ano, ou multa.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169"
+    },
+    {
+      "endereco": "art169.parUnico.incII",
+      "motivo": "texto diferente na compilada",
+      "status": "vigente",
+      "rotulo": "II -",
+      "nome": "Apropriação de coisa achada",
+      "texto": "quem acha coisa alheia perdida e dela se apropria, total ou parcialmente, deixando de restituí-la ao dono ou legítimo possuidor ou de entregá-la à autoridade competente, dentro no prazo de 15 (quinze) dias.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169"
+    },
+    {
+      "endereco": "art171.par2B",
+      "motivo": "parágrafo com sufixo",
+      "status": "vigente",
+      "rotulo": "§ 2º-B.",
+      "texto": "A pena prevista no § 2º-A deste artigo, considerada a relevância do resultado gravoso, aumenta-se de 1/3 (um terço) a 2/3 (dois terços), se o crime é praticado mediante a utilização de servidor mantido fora do território nacional.",
+      "notas": [
+        "(Incluído pela Lei nº 14.155, de 2021)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171.par5",
+      "motivo": "caso: revogacao-reescrita",
+      "status": "revogado",
+      "rotulo": "§ 5º",
+      "texto": "",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 5º Somente se procede mediante representação, salvo se a vítima for: (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171.par5.incI",
+      "motivo": "caso: revogacao-reescrita",
+      "status": "revogado",
+      "rotulo": "I –",
+      "texto": "",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "I - a Administração Pública, direta ou indireta; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171.par5.incII",
+      "motivo": "caso: revogacao-reescrita",
+      "status": "revogado",
+      "rotulo": "II –",
+      "texto": "",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "II - criança ou adolescente; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171.par5.incIII",
+      "motivo": "caso: revogacao-reescrita",
+      "status": "revogado",
+      "rotulo": "III –",
+      "texto": "",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "III – pessoa com deficiência; ou (Redação dada pela Lei nº 15.229, de 2025) (Revogado pela Lei nº 15.397, de 2026)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "III - pessoa com deficiência mental; ou (Incluído pela Lei nº 13.964, de 2019)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171.par5.incIV",
+      "motivo": "caso: revogacao-reescrita",
+      "status": "revogado",
+      "rotulo": "IV –",
+      "texto": "",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "IV - maior de 70 (setenta) anos de idade ou incapaz. (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171"
+    },
+    {
+      "endereco": "art171A",
+      "motivo": "artigo com sufixo",
+      "status": "vigente",
+      "rotulo": "Art. 171-A.",
+      "nome": "Fraude com a utilização de ativos virtuais, valores mobiliários ou ativos financeiros Vigência",
+      "texto": "Organizar, gerir, ofertar ou distribuir carteiras ou intermediar operações que envolvam ativos virtuais, valores mobiliários ou quaisquer ativos financeiros com o fim de obter vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil ou qualquer outro meio fraudulento. Vigência\nPena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa. Vigência",
+      "notas": [
+        "(Incluído pela Lei nº 14.478, de 2022)",
+        "(Incluído pela Lei nº 14.478, de 2022)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171a"
+    },
+    {
+      "endereco": "art180A",
+      "motivo": "com nome (rubrica)",
+      "status": "vigente",
+      "rotulo": "Art. 180-A.",
+      "nome": "Receptação de animal",
+      "texto": "Adquirir, receber, transportar, conduzir, ocultar, ter em depósito ou vender, com a finalidade de produção ou de comercialização, semovente domesticável de produção, ainda que abatido ou dividido em partes, ou animal doméstico, que sabe ou deve saber ser produto de crime:\nPena – reclusão, de 3 (três) a 8 (oito) anos, e multa.",
+      "notas": [
+        "(Redação dada pela Lei nº 15.397, de 2026)",
+        "(Redação dada pela Lei nº 15.397, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 180-A. Adquirir, receber, transportar, conduzir, ocultar, ter em depósito ou vender, com a finalidade de produção ou de comercialização, semovente domesticável de produção, ainda que abatido ou dividido em partes, que deve saber ser produto de crime: (Incluído pela Lei nº 13.330, de 2016)\nPena - reclusão, de 2 (dois) a 5 (cinco) anos, e multa. (Incluído pela Lei nº 13.330, de 2016)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art180a"
+    },
+    {
+      "endereco": "art192",
+      "motivo": "artigo revogado",
+      "status": "revogado",
+      "rotulo": "Art. 192.",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 9.279, de 14.5.1996)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 192. Violar direito de marca de indústria ou de comércio: (Revogado pela Lei nº 9.279, de 14.5.1996)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "I - reproduzindo, indevidamente, no todo, ou em parte, marca de outrem registrada, ou imitando-a, de modo que possa induzir em erro ou confusão:",
+          "origem": "tachado",
+          "enderecoLido": "art192.incI"
+        },
+        {
+          "texto": "II - usando marca reproduzida ou imitada nos termos do nº I;",
+          "origem": "tachado",
+          "enderecoLido": "art192.incII"
+        },
+        {
+          "texto": "III - usando marca legítima de outrem em produto ou artigo que não é de sua fabricação;",
+          "origem": "tachado",
+          "enderecoLido": "art192.incIII"
+        },
+        {
+          "texto": "IV - vendendo, expondo à venda ou tendo em depósito:",
+          "origem": "tachado",
+          "enderecoLido": "art192.incIV"
+        },
+        {
+          "texto": "a) artigo ou produto revestido de marca abusivamente imitada ou reproduzida no todo ou em parte;",
+          "origem": "tachado",
+          "enderecoLido": "art192.incIV.alA"
+        },
+        {
+          "texto": "b) artigo ou produto que tem marca de outrem e não é de fabricação deste:\nPena - detenção, de três meses a um ano, e multa, de um a quinze contos de réis.",
+          "origem": "tachado",
+          "enderecoLido": "art192.incIV.alB"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art192"
+    },
+    {
+      "endereco": "art216A.parUnico",
+      "motivo": "vetado",
+      "status": "vetado",
+      "rotulo": "Parágrafo único.",
+      "texto": "",
+      "notas": [
+        "(Incluído pela Lei nº 10.224, de 15 de 2001)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216a"
+    },
+    {
+      "endereco": "art222",
+      "motivo": "espaçado",
+      "status": "revogado",
+      "rotulo": "Art. 222 -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 11.106, de 2005)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 222 - Se o agente, ao efetuar o rapto, ou em seguida a este, pratica outro crime contra a raptada, aplicam-se cumulativamente a pena correspondente ao rapto e a cominada ao outro crime. (Revogado pela Lei nº 11.106, de 2005)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art222"
+    },
+    {
+      "endereco": "art224.alC",
+      "motivo": "alínea",
+      "status": "revogado",
+      "rotulo": "c)",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 12.015, de 2009)"
+      ],
+      "redacoes": [
+        {
+          "texto": "c) não pode, por qualquer outra causa, oferecer resistência. (Revogado pela Lei nº 12.015, de 2009)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art224"
+    },
+    {
+      "endereco": "art231",
+      "motivo": "artigo revogado",
+      "status": "revogado",
+      "rotulo": "Art. 231.",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 13.344, de 2016)",
+        "(Vigência)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 231. Promover ou facilitar a entrada, no território nacional, de alguém que nele venha a exercer a prostituição ou outra forma de exploração sexual, ou a saída de alguém que vá exercê-la no estrangeiro. (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "Pena - reclusão, de 3 (três) a 8 (oito) anos. (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "Art. 231 - Promover ou facilitar a entrada, no território nacional, de mulher que nele venha exercer a prostituição, ou a saída de mulher que vá exercê-la no estrangeiro:\nPena - reclusão, de três a oito anos.",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Art. 231. Promover, intermediar ou facilitar a entrada, no território nacional, de pessoa que venha exercer a prostituição ou a saída de pessoa para exercê-la no estrangeiro: (Redação dada pela Lei nº 11.106, de 2005)\nPena - reclusão, de 3 (três) a 8 (oito) anos, e multa. (Redação dada pela Lei nº 11.106, de 2005)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231"
+    },
+    {
+      "endereco": "art231.par2",
+      "motivo": "várias redações anteriores",
+      "status": "revogado",
+      "rotulo": "§ 2 o",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 13.344, de 2016)",
+        "(Vigência)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 2 o A pena é aumentada da metade se: (Redação dada pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "§ 2º - Se há emprego de violência, grave ameaça ou fraude, a pena é de reclusão, de 5 (cinco) a 12 (doze) anos, além da pena correspondente à violência",
+          "origem": "tachado"
+        },
+        {
+          "texto": "§ 2 o Se há emprego de violência, grave ameaça ou fraude, a pena é de reclusão, de 5 (cinco) a 12 (doze) anos, e multa, além da pena correspondente à violência. (Redação dada pela Lei nº 11.106, de 2005)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231"
+    },
+    {
+      "endereco": "art231A.par1",
+      "motivo": "parágrafo, inciso ou alínea revogado",
+      "status": "revogado",
+      "rotulo": "§ 1 o",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 13.344, de 2016)",
+        "(Vigência)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 1 o Incorre na mesma pena aquele que agenciar, aliciar, vender ou comprar a pessoa traficada, assim como, tendo conhecimento dessa condição, transportá-la, transferi-la ou alojá-la (Incluído pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231a"
+    },
+    {
+      "endereco": "art234.par1.incII",
+      "motivo": "inciso de parágrafo",
+      "status": "vigente",
+      "rotulo": "II -",
+      "texto": "realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetáculo, que tenha o mesmo caráter;",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234"
+    },
+    {
+      "endereco": "art281.par3.incI",
+      "motivo": "parágrafo, inciso ou alínea revogado",
+      "status": "revogado",
+      "rotulo": "I -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 6.368, 1976)"
+      ],
+      "redacoes": [
+        {
+          "texto": "I - instiga ou induz alguém a usar entorpecente ou substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "I - Instiga ou induz alguem a usar entorpecente;",
+          "origem": "tachado"
+        },
+        {
+          "texto": "I - Instiga ou induz alguém a usar entorpecente; (Redação dada pela Lei nº 4.451, de 1964)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281"
+    },
+    {
+      "endereco": "art281.par3.incII",
+      "motivo": "espaçado",
+      "status": "revogado",
+      "rotulo": "II -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 6.368, 1976)"
+      ],
+      "redacoes": [
+        {
+          "texto": "II - utiliza o local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito para uso ilegal de entorpecente ou de substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "II - utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dele se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente;",
+          "origem": "tachado"
+        },
+        {
+          "texto": "II - Utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente; (Redação dada pela Lei nº 4.451, de 1964)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281"
+    },
+    {
+      "endereco": "art299.parUnico",
+      "motivo": "parágrafo único",
+      "status": "vigente",
+      "rotulo": "Parágrafo único -",
+      "texto": "Se o agente é funcionário público, e comete o crime prevalecendo-se do cargo, ou se a falsificação ou alteração é de assentamento de registro civil, aumenta-se a pena de sexta parte.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art299"
+    },
+    {
+      "endereco": "art318",
+      "motivo": "com \"Pena\"",
+      "status": "vigente",
+      "rotulo": "Art. 318 -",
+      "nome": "Facilitação de contrabando ou descaminho",
+      "texto": "Facilitar, com infração de dever funcional, a prática de contrabando ou descaminho (art. 334):\nPena - reclusão, de 3 (três) a 8 (oito) anos, e multa.",
+      "notas": [
+        "(Redação dada pela Lei nº 8.137, de 27.12.1990)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Pena - reclusão, de dois a cinco anos, e multa, de um conto a dez contos de réis.",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art318"
+    },
+    {
+      "endereco": "art320",
+      "motivo": "com nome (rubrica)",
+      "status": "vigente",
+      "rotulo": "Art. 320 -",
+      "nome": "Condescendência criminosa",
+      "texto": "Deixar o funcionário, por indulgência, de responsabilizar subordinado que cometeu infração no exercício do cargo ou, quando lhe falte competência, não levar o fato ao conhecimento da autoridade competente:\nPena - detenção, de quinze dias a um mês, ou multa.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art320"
+    },
+    {
+      "endereco": "art337A.par2.incI",
+      "motivo": "vetado",
+      "status": "vetado",
+      "rotulo": "I -",
+      "texto": "",
+      "notas": [
+        "(Incluído pela Lei nº 9.983, de 2000)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337a"
+    },
+    {
+      "endereco": "art337D",
+      "motivo": "artigo com sufixo",
+      "status": "vigente",
+      "rotulo": "Art. 337-D.",
+      "nome": "Funcionário público estrangeiro",
+      "texto": "Considera-se funcionário público estrangeiro, para os efeitos penais, quem, ainda que transitoriamente ou sem remuneração, exerce cargo, emprego ou função pública em entidades estatais ou em representações diplomáticas de país estrangeiro.",
+      "notas": [
+        "(Incluído pela Lei nº 10.467, de 11.6.2002)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337d"
+    },
+    {
+      "endereco": "art337H",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "Art. 337-H.",
+      "nome": "Modificação ou pagamento irregular em contrato administrativo",
+      "texto": "Admitir, possibilitar ou dar causa a qualquer modificação ou vantagem, inclusive prorrogação contratual, em favor do contratado, durante a execução dos contratos celebrados com a Administração Pública, sem autorização em lei, no edital da licitação ou nos respectivos instrumentos contratuais, ou, ainda, pagar fatura com preterição da ordem cronológica de sua exigibilidade:\nPena - reclusão, de 4 (quatro) anos a 8 (oito) anos, e multa.",
+      "notas": [
+        "(Incluído pela Lei nº 14.133, de 2021)",
+        "(Incluído pela Lei nº 14.133, de 2021)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h"
+    },
+    {
+      "endereco": "art359J",
+      "motivo": "artigo com sufixo",
+      "status": "vigente",
+      "rotulo": "Art. 359-J.",
+      "nome": "Atentado à integridade nacional",
+      "texto": "Praticar violência ou grave ameaça com a finalidade de desmembrar parte do território nacional para constituir país independente:\nPena - reclusão, de 2 (dois) a 6 (seis) anos, além da pena correspondente à violência.",
+      "notas": [
+        "(Incluído pela Lei nº 14.197, de 2021)",
+        "(Vigência)",
+        "(Incluído pela Lei nº 14.197, de 2021)",
+        "(Vigência)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359j"
+    },
+    {
+      "endereco": "art361",
+      "motivo": "primeiro e último artigo",
+      "status": "vigente",
+      "rotulo": "Art. 361 -",
+      "texto": "Este Código entrará em vigor no dia 1º de janeiro de 1942.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art361"
+    }
+  ],
+  "dispositivos": [
+    {"endereco":"art1","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art2","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art2.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art3","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art4","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art5","status":"vigente","notas":1,"redacoes":12,"nome":true},
+    {"endereco":"art5.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art5.par2","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art6","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art7","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art7.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art7.incI.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incI.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incI.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incI.alD","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art7.incII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.incII.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2.alD","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par2.alE","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par3.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art7.par3.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art8","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art9","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art9.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art9.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art9.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art9.parUnico.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art9.parUnico.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art10","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art11","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art12","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art13","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art13.par1","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art13.par2","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art13.par2.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art13.par2.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art13.par2.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art14","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art14.incI","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art14.incII","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art14.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art15","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art16","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art17","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art18","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art18.incI","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art18.incII","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art18.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art19","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art20","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art20.par1","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art20.par2","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art20.par3","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art21","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art21.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art22","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art23","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art23.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art23.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art23.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art23.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art24","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art24.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art24.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art25","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art25.parUnico","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art26","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art26.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art27","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art28","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art28.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art28.incII","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art28.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art28.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art29","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art29.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art29.par2","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art30","status":"vigente","notas":1,"redacoes":35,"nome":true},
+    {"endereco":"art31","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art32","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art32.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art32.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art32.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art33.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art33.par1.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par1.alB","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par1.alC","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art33.par2.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par2.alB","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par2.alC","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art33.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art33.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art34","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art34.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art34.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art34.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art35","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art35.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art35.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art36","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art36.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art36.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art37","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art38","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art39","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art40","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art41","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art42","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art43","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art43.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art43.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art43.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art43.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art43.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art43.incVI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art44","status":"vigente","notas":1,"redacoes":3},
+    {"endereco":"art44.incI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art44.incII","status":"vigente","notas":1,"redacoes":13},
+    {"endereco":"art44.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art44.par1","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art44.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art44.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art44.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art44.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art45","status":"vigente","notas":1,"redacoes":7,"nome":true},
+    {"endereco":"art45.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art45.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art45.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art45.par4","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art46","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art46.par1","status":"vigente","notas":1,"redacoes":3},
+    {"endereco":"art46.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art46.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art46.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art47","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art47.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art47.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art47.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art47.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art47.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art48","status":"vigente","notas":1,"redacoes":10,"nome":true},
+    {"endereco":"art48.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art49","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art49.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art49.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art50","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art50.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art50.par1.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art50.par1.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art50.par1.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art50.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art51","status":"vigente","notas":2,"redacoes":7,"nome":true},
+    {"endereco":"art52","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art53","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art54","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art55","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art56","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art57","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art58","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art58.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art59","status":"vigente","notas":2,"redacoes":6,"nome":true},
+    {"endereco":"art59.incI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art59.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art59.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art59.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art60","status":"vigente","notas":1,"redacoes":8,"nome":true},
+    {"endereco":"art60.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art60.par2","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art61","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art61.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art61.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art61.incII.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alB","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alC","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alD","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alE","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alF","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art61.incII.alG","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alH","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art61.incII.alI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alJ","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alL","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art61.incII.alM","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art62","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art62.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art62.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art62.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art62.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art63","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art64","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art64.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art64.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art65","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art65.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art65.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art65.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art65.incIII.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art65.incIII.alB","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art65.incIII.alC","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art65.incIII.alD","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art65.incIII.alE","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art66","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art67","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art68","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art68.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art69","status":"vigente","notas":1,"redacoes":21,"nome":true},
+    {"endereco":"art69.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art69.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art70","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art70.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art71","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art71.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art72","status":"vigente","notas":1,"redacoes":6,"nome":true},
+    {"endereco":"art73","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art74","status":"vigente","notas":1,"redacoes":5,"nome":true},
+    {"endereco":"art75","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art75.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art75.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art76","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art77","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art77.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art77.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art77.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art77.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art77.par2","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art78","status":"vigente","notas":1,"redacoes":6},
+    {"endereco":"art78.par1","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art78.par2","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art78.par2.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art78.par2.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art78.par2.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art79","status":"vigente","notas":1,"redacoes":5},
+    {"endereco":"art80","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art81","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art81.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art81.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art81.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art81.par1","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art81.par2","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art81.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art82","status":"vigente","notas":1,"redacoes":5,"nome":true},
+    {"endereco":"art83","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art83.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art83.incIII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incIII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incIII.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incIII.alD","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art83.incV","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art83.parUnico","status":"vigente","notas":1,"redacoes":4},
+    {"endereco":"art84","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art85","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art86","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art86.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art86.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art87","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art88","status":"vigente","notas":1,"redacoes":9,"nome":true},
+    {"endereco":"art89","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art90","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art91","status":"vigente","notas":1,"redacoes":4,"nome":true},
+    {"endereco":"art91.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91.incII.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art91.incII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91.par1","status":"vigente","notas":1,"redacoes":5},
+    {"endereco":"art91.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art91A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art91A.par5","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92.incI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art92.incI.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.incI.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.incII","status":"vigente","notas":1,"redacoes":3},
+    {"endereco":"art92.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92.incIV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art92.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.par2.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art92.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art93","status":"vigente","notas":1,"redacoes":5,"nome":true},
+    {"endereco":"art93.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art94","status":"vigente","notas":1,"redacoes":4},
+    {"endereco":"art94.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art94.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art94.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art94.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art95","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art96","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art96.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art96.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art96.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art97","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art97.par1","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art97.par2","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art97.par3","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art97.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art98","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art99","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art100","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art100.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art100.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art100.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art100.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art101","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art102","status":"vigente","notas":1,"redacoes":5,"nome":true},
+    {"endereco":"art103","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art103.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art104","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art104.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art105","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art106","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art106.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art106.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art106.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art106.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art106.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art107","status":"vigente","notas":1,"redacoes":7,"nome":true},
+    {"endereco":"art107.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incVI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art107.incVII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art107.incVIII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art107.incIX","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art108","status":"vigente","notas":1,"redacoes":13},
+    {"endereco":"art109","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art109.incI","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art109.incII","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art109.incIII","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art109.incIV","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art109.incV","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art109.incVI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art109.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art110","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art110.par1","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art110.par2","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art111","status":"vigente","notas":1,"redacoes":5,"nome":true},
+    {"endereco":"art111.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art111.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art111.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art111.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art111.incV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art112","status":"vigente","notas":1,"redacoes":3,"nome":true},
+    {"endereco":"art112.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art112.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art113","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art114","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art114.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art114.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art115","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art116","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art116.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art116.incII","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art116.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art116.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art116.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art117","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art117.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art117.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art117.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art117.incIV","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art117.incV","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art117.incVI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art117.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art117.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art118","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art119","status":"vigente","notas":1,"redacoes":15},
+    {"endereco":"art120","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art121","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art121.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art121.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art121.par2.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par2.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par2.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par2.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par2.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par2.incVI","status":"revogado","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art121.par2.incVII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art121.par2.incVII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2.incVII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2.incVIII","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art121.par2.incIX","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art121.par2.incX","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2A","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121.par2A.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121.par2A.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121.par2B","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2B.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2B.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2B.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2C","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2C.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2C.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par2D","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art121.par3","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art121.par4","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art121.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121.par6","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art121.par7","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121.par7.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121.par7.incII","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art121.par7.incIII","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art121.par7.incIV","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art121A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art121A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par2.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121A.par3","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art121B","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art121B.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121B.parUnico.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121B.parUnico.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art121B.parUnico.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122","status":"vigente","notas":2,"redacoes":4,"nome":true},
+    {"endereco":"art122.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art122.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art122.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122.par3.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122.par3.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122.par5","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art122.par6","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art122.par7","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art123","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art124","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art125","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art126","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art126.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art127","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art128","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art128.incI","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art128.incII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par1.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par2.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par3","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129.par3A","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art129.par4","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129.par5","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art129.par5.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par5.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art129.par6","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art129.par7","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art129.par8","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art129.par8A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par9","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art129.par10","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par11","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par12","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art129.par12.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art129.par12.incI.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par12.incI.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par12.incI.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par12.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art129.par12.incII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par12.incII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art129.par13","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art130","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art130.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art130.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art131","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art132","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art132.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art133","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art133.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art133.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art133.par3","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art133.par3.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art133.par3.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art133.par3.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art134","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art134.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art134.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art135","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art135.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art135A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art135A.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art136","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art136.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art136.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art136.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art137","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art137.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art138","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art138.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art138.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art138.par3","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art138.par3.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art138.par3.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art138.par3.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art139","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art139.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art140","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art140.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art140.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art140.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art140.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art140.par3","status":"vigente","notas":2,"redacoes":2},
+    {"endereco":"art141","status":"vigente","notas":0,"redacoes":1,"nome":true},
+    {"endereco":"art141.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art141.incII","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art141.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art141.incIV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art141.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art141.par2","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art141.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art142","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art142.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art142.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art142.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art142.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art143","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art143.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art144","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art145","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art145.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art146","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art146.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art146.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art146.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art146.par3.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art146.par3.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art146A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art146A.parUnico","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art147","status":"vigente","notas":0,"redacoes":1,"nome":true},
+    {"endereco":"art147.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art147A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147B","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art147B.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art147C","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art148","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art148.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art148.par1.incI","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art148.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art148.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art148.par1.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art148.par1.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art148.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art148.par3","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art149.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art149A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art149A.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.incIV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.incV","status":"vigente","notas":4,"redacoes":0},
+    {"endereco":"art149A.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.par1.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.par1.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.par1.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.par1.incIV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art149A.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art150","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art150.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par2","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art150.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par3.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par3.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par4","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par4.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par4.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par4.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par5","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par5.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art150.par5.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art151.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art151.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151.par1.incII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art151.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151.par1.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art151.par4","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art152","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art152.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art153","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art153.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art153.par1A","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art153.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art154.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art154A","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art154A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art154A.par3","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art154A.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par5.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par5.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par5.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154A.par5.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art154B","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art155","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art155.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par4","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art155.par4.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par4.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par4.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par4.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art155.par4.incV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par4A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par4B","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par4C","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par4C.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par4C.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par5","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par6","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par6.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par6.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par7","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par7.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par7.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par8","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art155.par9","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art156","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art156.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art156.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art157","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art157.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art157.par1A","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art157.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art157.par2.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art157.par2.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art157.par2.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art157.par2.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incVI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incVII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incVIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incIX","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incX","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2B","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par3","status":"vigente","notas":1,"redacoes":3},
+    {"endereco":"art157.par3.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par3.incII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art157.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par5","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art158","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art158.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art158.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art158.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art158.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art159","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art159.par1","status":"vigente","notas":2,"redacoes":2},
+    {"endereco":"art159.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art159.par3","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art159.par4","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art159.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art160","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art161","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art161.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art161.par1.incI","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art161.par1.incII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art161.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art161.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art162","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art163","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art163.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art163.parUnico.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art163.parUnico.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art163.parUnico.incIII","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art163.parUnico.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art164","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art165","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art166","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art167","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art168","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art168.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art168.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art168.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art168.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art168A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art168A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par3.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par3.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art168A.par6","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art169","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art169.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art169.parUnico.incI","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art169.parUnico.incII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art170","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art171","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art171.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art171.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art171.par2.incI","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incIII","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incIV","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incV","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incVI","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2.incVII","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art171.par2A","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art171.par2B","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art171.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art171.par4","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art171.par5","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art171.par5.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art171.par5.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art171.par5.incIII","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art171.par5.incIV","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art171A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art172","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art172.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art173","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art174","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art175","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art175.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art175.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art175.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art175.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art176","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art176.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art177.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art177.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incVI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incVII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incVIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par1.incIX","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art177.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art178","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art179","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art179.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art180","status":"vigente","notas":2,"redacoes":3,"nome":true},
+    {"endereco":"art180.par1","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art180.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art180.par3","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art180.par4","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art180.par5","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art180.par6","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art180.par7","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art180.par8","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art180A","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art181","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art181.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art181.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art182","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art182.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art182.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art182.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art183","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art183.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art183.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art183.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art183A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art184","status":"vigente","notas":2,"redacoes":3,"nome":true},
+    {"endereco":"art184.par1","status":"vigente","notas":2,"redacoes":2},
+    {"endereco":"art184.par2","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art184.par3","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art184.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art185","status":"revogado","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art186","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art186.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art186.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art186.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art186.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art187","status":"revogado","notas":1,"redacoes":6},
+    {"endereco":"art187.parUnico.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art188","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art188.parUnico","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art189","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art190","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art191","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art192","status":"revogado","notas":1,"redacoes":7},
+    {"endereco":"art193","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art193.parUnico","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art194","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art195","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art196","status":"revogado","notas":1,"redacoes":15},
+    {"endereco":"art196.par2","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art197","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art197.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art197.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art198","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art199","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art200","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art200.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art201","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art202","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art203","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art203.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art203.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art203.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art203.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art204","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art205","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art206","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art207","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art207.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art207.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art208","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art208.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art209","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art209.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art210","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art211","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art212","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art213","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art213.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art213.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art214","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art214.parUnico","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art215","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art215.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art215A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art216","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art216.parUnico","status":"revogado","notas":1,"redacoes":4},
+    {"endereco":"art216A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art216A.parUnico","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art216A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art216B","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art216B.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art217","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art217A","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art217A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art217A.par2","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art217A.par3","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art217A.par4","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art217A.par4A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art217A.par5","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art218","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art218.parUnico","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art218A","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art218B","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art218B.par1","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art218B.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art218B.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art218B.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art218B.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art218C","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art218C.par1","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art218C.par2","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art219","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art220","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art221","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art222","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art223","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art223.parUnico","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art224","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art224.alA","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art224.alB","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art224.alC","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art225","status":"vigente","notas":1,"redacoes":6,"nome":true},
+    {"endereco":"art225.parUnico","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art226","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art226.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art226.incII","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art226.incIII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art226.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art226.incIV.alA","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art226.incIV.alB","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art227","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art227.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art227.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art227.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art228","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art228.par1","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art228.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art228.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art229","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art230","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art230.par1","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art230.par2","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art231","status":"revogado","notas":2,"redacoes":4},
+    {"endereco":"art231.par1","status":"revogado","notas":2,"redacoes":2},
+    {"endereco":"art231.par2","status":"revogado","notas":2,"redacoes":3},
+    {"endereco":"art231.par2.incI","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231.par2.incII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231.par2.incIII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231.par2.incIV","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231.par3","status":"revogado","notas":2,"redacoes":2},
+    {"endereco":"art231A","status":"revogado","notas":2,"redacoes":4},
+    {"endereco":"art231A.par1","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par2","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par2.incI","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par2.incII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par2.incIII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par2.incIV","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art231A.par3","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art232","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art232A","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art232A.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art232A.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art232A.par2.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art232A.par2.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art232A.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art233","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art234","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art234.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art234.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art234.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art234.par1.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art234A","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art234A.incI","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art234A.incII","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art234A.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art234A.incIV","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art234B","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art234B.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art234B.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art234B.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art234C","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art235","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art235.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art235.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art236","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art236.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art237","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art238","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art239","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art240","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art240.par1","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par2","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par3","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par3.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par3.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par4","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par4.incI","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art240.par4.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art241","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art242","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art242.parUnico","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art243","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art244","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art244.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art245","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art245.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art245.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art246","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art247","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art247.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art247.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art247.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art247.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art248","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art249","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art249.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art249.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art250.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art250.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alA","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alB","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alC","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alD","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alE","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alF","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alG","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par1.incII.alH","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art250.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art251","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art251.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art251.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art251.par3","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art252","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art252.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art253","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art254","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art255","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art256","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art256.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art257","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art258","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art259","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art259.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art260","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art260.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art260.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art260.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art260.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art260.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art260.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art260.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art261","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art261.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art261.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art261.par3","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art262","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art262.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art262.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art263","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art264","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art264.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art265","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art265.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art266","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art266.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art266.par2","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art266.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art266.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art267","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art267.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art267.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art268","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art268.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art269","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art270","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art270.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art270.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art271","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art271.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art272","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art272.par1A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art272.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art272.par2","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art273","status":"vigente","notas":2,"redacoes":3,"nome":true},
+    {"endereco":"art273.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art273.par1A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par1B.incVI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art273.par2","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art274","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art275","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art276","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art277","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art278","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art278.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art279","status":"revogado","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art280","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art280.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art281","status":"revogado","notas":1,"redacoes":5},
+    {"endereco":"art281.par1","status":"revogado","notas":1,"redacoes":4},
+    {"endereco":"art281.par1.incI","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art281.par1.incII","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art281.par1.incIII","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art281.par1.incIV","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art281.par2","status":"revogado","notas":1,"redacoes":5},
+    {"endereco":"art281.par3","status":"revogado","notas":1,"redacoes":4},
+    {"endereco":"art281.par3.incI","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art281.par3.incII","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art281.par3.incIII","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art281.par4","status":"revogado","notas":1,"redacoes":7},
+    {"endereco":"art281.par5","status":"revogado","notas":1,"redacoes":3},
+    {"endereco":"art281.par6","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art281.par7","status":"revogado","notas":1,"redacoes":1},
+    {"endereco":"art282","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art282.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art282.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art282.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art282.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art282.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art283","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art284","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art284.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art284.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art284.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art284.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art285","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art286","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art286.parUnico","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art287","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art288","status":"vigente","notas":4,"redacoes":3,"nome":true},
+    {"endereco":"art288.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art288.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art288A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art289","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art289.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art289.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art289.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art289.par3.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art289.par3.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art289.par4","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art290","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art290.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art291","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art292","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art292.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art293.incI","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art293.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.incIII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.incIV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.incVI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art293.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art293.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art293.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art293.par1.incIII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art293.par1.incIII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art293.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.par4","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art293.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art294","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art295","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art296.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296.par1.incI","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296.par1.incII","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art296.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art296.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art297","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art297.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art297.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art297.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art297.par3.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art297.par3.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art297.par3.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art297.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art298","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art298.parUnico","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art299","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art299.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art300","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art301","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art301.par1","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art301.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art302","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art302.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art303","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art303.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art304","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art305","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art306","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art306.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art307","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art308","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art309","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art309.parUnico","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art310","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art311","status":"vigente","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art311.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art311.par2.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311.par2.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311.par3","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art311.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311A","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art311A.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311A.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311A.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311A.incIV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art311A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art311A.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art311A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art312","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art312.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art312.par2","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art312.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art313","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art313A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art313B","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art313B.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art314","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art315","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art316","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art316.par1","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art316.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art317","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art317.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art317.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art318","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art319","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art319A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art320","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art321","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art321.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art322","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art323","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art323.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art323.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art324","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art325","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art325.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art325.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art325.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art325.par2","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art326","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art327","status":"vigente","notas":0,"redacoes":1,"nome":true},
+    {"endereco":"art327.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art327.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art328","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art328.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art329","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art329.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art329.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art330","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art331","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art332","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art332.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art333","status":"vigente","notas":1,"redacoes":10,"nome":true},
+    {"endereco":"art333.parUnico","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art334","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art334.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par1.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par3","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art334A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art334A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par1.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par1.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par1.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par1.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par1.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art335","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art335.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art336","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art337","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art337A","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art337A.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art337A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par2.incI","status":"vetado","notas":1,"redacoes":0},
+    {"endereco":"art337A.par2.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par4","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par5","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337A.par6","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337B","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337B.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337C","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337C.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337D","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art337D.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337E","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337F","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337G","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337H","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337I","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337J","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337K","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337K.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337L","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art337L.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337L.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337L.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337L.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337L.incV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art337M","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337M.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art337M.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337N","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337O","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art337O.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337O.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art337P","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art338","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art338A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art338A.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art338A.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art338A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art339","status":"vigente","notas":1,"redacoes":2,"nome":true},
+    {"endereco":"art339.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art339.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art340","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art341","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art342","status":"vigente","notas":3,"redacoes":2,"nome":true},
+    {"endereco":"art342.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art342.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art343","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art343.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art344","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art344.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art345","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art345.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art346","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art347","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art347.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art348","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art348.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art348.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art349","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art349A","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art350","status":"revogado","notas":2,"redacoes":2,"nome":true},
+    {"endereco":"art350.parUnico","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art350.parUnico.incI","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art350.parUnico.incII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art350.parUnico.incIII","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art350.parUnico.incIV","status":"revogado","notas":2,"redacoes":1},
+    {"endereco":"art351","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art351.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art351.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art351.par3","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art351.par4","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art352","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art353","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art354","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art355","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art355.parUnico","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art356","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art357","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art357.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art358","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art359","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art359A","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359A.parUnico","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art359A.parUnico.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art359A.parUnico.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art359B","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359C","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359D","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359E","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359F","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359G","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359H","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359I","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359I.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art359I.par2","status":"vigente","notas":4,"redacoes":0},
+    {"endereco":"art359J","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359K","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359K.par1","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art359K.par2","status":"vigente","notas":4,"redacoes":0},
+    {"endereco":"art359K.par3","status":"vigente","notas":4,"redacoes":0},
+    {"endereco":"art359K.par4","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art359L","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359M","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359MA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art359MB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art359N","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359O","status":"vetado","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359P","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359Q","status":"vetado","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art359R","status":"vigente","notas":4,"redacoes":0,"nome":true},
+    {"endereco":"art359T","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art359U","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art360","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art361","status":"vigente","notas":0,"redacoes":0}
+  ]
+}

@@ -22,7 +22,8 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run audit",
     "carga": "vitest run --project carga",
     "corpus": "node scripts/corpus-normas.mjs",
-    "corpus:colar": "node scripts/corpus-colar.mjs"
+    "corpus:colar": "node scripts/corpus-colar.mjs",
+    "corpus:gabarito": "node scripts/corpus-gabarito.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.6",
