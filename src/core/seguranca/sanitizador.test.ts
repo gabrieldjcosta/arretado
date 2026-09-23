@@ -1,4 +1,4 @@
-import { ErroEntradaGrande, sanitizarHtml, textoParaBlocos, type Bloco } from './sanitizador';
+import { EntradaGrandeDemais, sanitizarHtml, textoParaBlocos, type Bloco } from './sanitizador';
 
 /** Conjunto de HTML malicioso (XSS clássico, mXSS, esquemas perigosos, CSS, SVG/MathML). */
 const MALICIOSOS: string[] = [
@@ -132,8 +132,8 @@ describe('sanitizador: fragmentos do Planalto', () => {
 
 describe('limites e texto puro', () => {
   it('recusa entrada acima do limite', () => {
-    expect(() => sanitizarHtml('x'.repeat(11), { limite: 10 })).toThrow(ErroEntradaGrande);
-    expect(() => textoParaBlocos('x'.repeat(11), { limite: 10 })).toThrow(ErroEntradaGrande);
+    expect(() => sanitizarHtml('x'.repeat(11), { limite: 10 })).toThrow(EntradaGrandeDemais);
+    expect(() => textoParaBlocos('x'.repeat(11), { limite: 10 })).toThrow(EntradaGrandeDemais);
   });
 
   it('texto puro vira uma linha por bloco, sem formatação', () => {

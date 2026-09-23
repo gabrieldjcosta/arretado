@@ -35,10 +35,13 @@ export function RelatarProblema({ aberto, aoFechar }: { aberto: boolean; aoFecha
         texto:
           'Relato guardado neste aparelho, aguardando envio. Ele será enviado quando a sincronização existir.',
       });
-    } catch (erro) {
+    } catch (excecao) {
       setMensagem({
         tipo: 'falha',
-        texto: erro instanceof RelatoRecusado ? erro.message : 'Não foi possível guardar o relato.',
+        texto:
+          excecao instanceof RelatoRecusado
+            ? excecao.message
+            : 'Não foi possível guardar o relato.',
       });
     } finally {
       setSalvando(false);

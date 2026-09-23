@@ -207,6 +207,32 @@ describe('RLS do esquema remoto', () => {
   });
 });
 
+describe('lints dos advisors do Supabase (atividade 4.3)', () => {
+  it('nenhuma tabela tem duas políticas permissivas para o mesmo papel e ação', async () => {
+    const r = await db.query(`
+      select p.tablename, r.papel, a.acao
+      from pg_policies p
+      cross join unnest(p.roles) as r(papel)
+      cross join unnest(case when p.cmd = 'ALL'
+        then array['SELECT', 'INSERT', 'UPDATE', 'DELETE'] else array[p.cmd] end) as a(acao)
+      where p.schemaname = 'arretado' and p.permissive = 'PERMISSIVE'
+      group by 1, 2, 3 having count(*) > 1`);
+    expect(r.rows).toEqual([]);
+  });
+
+  it('toda chave estrangeira tem índice que começa pelas suas colunas', async () => {
+    const r = await db.query(`
+      select c.conrelid::regclass::text as tabela, c.conname
+      from pg_constraint c
+      where c.contype = 'f' and c.connamespace = 'arretado'::regnamespace
+        and not exists (
+          select 1 from pg_index i
+          where i.indrelid = c.conrelid
+            and (i.indkey::int2[])[0:cardinality(c.conkey) - 1] = c.conkey)`);
+    expect(r.rows).toEqual([]);
+  });
+});
+
 describe('deriva entre modelo local e esquema remoto', () => {
   it('a lista de coleções do remoto é exatamente a das coleções exportáveis', () => {
     const sql = MIGRACOES.join('\n');

@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "audit": "npm audit --audit-level=high",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run audit",
-    "carga": "vitest run --project carga"
+    "carga": "vitest run --project carga",
+    "corpus": "node scripts/corpus-normas.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.6",
@@ -50,7 +51,7 @@
     "fake-indexeddb": "^6.2.5",
     "globals": "^17.12.0",
     "jsdom": "^30.1.1",
-    "playwright-core": "^1.56.1",
+    "playwright-core": "1.56.1",
     "prettier": "^3.9.8",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.70.1",

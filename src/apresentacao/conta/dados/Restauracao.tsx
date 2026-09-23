@@ -64,12 +64,12 @@ export function Restauracao() {
       }
       setMensagem({ tipo: 'ok', texto: 'Dados restaurados ao ponto escolhido.' });
       setAcao(null);
-    } catch (erro) {
+    } catch (excecao) {
       setMensagem({
         tipo: 'falha',
         texto:
-          erro instanceof ImportacaoInvalida
-            ? erro.message
+          excecao instanceof ImportacaoInvalida
+            ? excecao.message
             : 'Não foi possível restaurar. Nada foi alterado.',
       });
       setAcao(null);
