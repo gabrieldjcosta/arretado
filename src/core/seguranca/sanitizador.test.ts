@@ -143,3 +143,34 @@ describe('limites e texto puro', () => {
     ]);
   });
 });
+
+describe('correções da revisão da etapa 2', () => {
+  it('seções, artigos e outros blocos separam dispositivos', () => {
+    const { blocos } = sanitizarHtml(
+      '<section>Art. 1º Texto.</section><section>Art. 2º Outro.</section><dl><dt>a</dt><dd>b</dd></dl>x<hr>y',
+    );
+    expect(blocos.map((b) => b.trechos.map((t) => t.texto).join(''))).toEqual([
+      'Art. 1º Texto.',
+      'Art. 2º Outro.',
+      'a',
+      'b',
+      'x',
+      'y',
+    ]);
+  });
+
+  it('pre separa linhas', () => {
+    const { blocos } = sanitizarHtml('<pre>Art. 1º\nArt. 2º</pre>');
+    expect(blocos.map((b) => b.trechos[0]?.texto)).toEqual(['Art. 1º', 'Art. 2º']);
+  });
+
+  it('tachado por estilo em elemento fora da lista é preservado', () => {
+    const { blocos } = sanitizarHtml(
+      '<p><abbr style="text-decoration: line-through">revogado</abbr> vigente</p>',
+    );
+    expect(blocos[0]?.trechos).toEqual([
+      { texto: 'revogado', tachado: true },
+      { texto: ' vigente' },
+    ]);
+  });
+});

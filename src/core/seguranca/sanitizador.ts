@@ -59,6 +59,22 @@ const TAGS_BLOCO = new Set([
   'TABLE',
   'UL',
   'OL',
+  'SECTION',
+  'ARTICLE',
+  'HEADER',
+  'FOOTER',
+  'MAIN',
+  'ASIDE',
+  'NAV',
+  'PRE',
+  'DL',
+  'DT',
+  'DD',
+  'CAPTION',
+  'ADDRESS',
+  'FIGURE',
+  'FIGCAPTION',
+  'TFOOT',
 ]);
 const TAGS_TACHADO = new Set(['S', 'STRIKE', 'DEL']);
 const TAGS_ENFASE = new Set(['B', 'STRONG', 'I', 'EM', 'U']);
@@ -98,6 +114,23 @@ const CONFIG: Config & { RETURN_DOM_FRAGMENT: true } = {
     'h6',
     'blockquote',
     'center',
+    'section',
+    'article',
+    'header',
+    'footer',
+    'main',
+    'aside',
+    'nav',
+    'pre',
+    'dl',
+    'dt',
+    'dd',
+    'hr',
+    'caption',
+    'address',
+    'figure',
+    'figcaption',
+    'tfoot',
   ],
   ALLOWED_ATTR: ['href', MARCA_TACHADO],
   ALLOWED_URI_REGEXP: /^(?:https?:|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
@@ -112,11 +145,18 @@ function obterPurificador() {
   if (purificador) return purificador;
   const p = DOMPurify(window);
   // Tachado por estilo (comum no Planalto) vira marca semântica antes de o estilo ser removido.
-  p.addHook('uponSanitizeElement', (no) => {
-    if (no instanceof Element) {
-      const estilo = no.getAttribute('style') ?? '';
-      no.removeAttribute(MARCA_TACHADO);
-      if (/text-decoration[^;]*line-through/i.test(estilo)) no.setAttribute(MARCA_TACHADO, '1');
+  p.addHook('uponSanitizeElement', (no, dados) => {
+    if (!(no instanceof Element)) return;
+    const estilo = no.getAttribute('style') ?? '';
+    no.removeAttribute(MARCA_TACHADO);
+    if (!/text-decoration[^;]*line-through/i.test(estilo)) return;
+    if (dados.allowedTags[dados.tagName]) {
+      no.setAttribute(MARCA_TACHADO, '1');
+    } else {
+      // Elemento fora da lista será removido mantendo o conteúdo: o tachado passa a um <s>.
+      const s = no.ownerDocument.createElement('s');
+      while (no.firstChild) s.appendChild(no.firstChild);
+      no.appendChild(s);
     }
   });
   purificador = p;
@@ -151,6 +191,8 @@ interface Estado {
   tachado: boolean;
   enfase: boolean;
   link: string | undefined;
+  /** Dentro de <pre>: quebras de linha do texto separam blocos. */
+  pre?: boolean;
 }
 
 class Conversor {
@@ -163,12 +205,20 @@ class Conversor {
   percorrer(no: Node, estado: Estado): void {
     for (const filho of Array.from(no.childNodes)) {
       if (filho.nodeType === Node.TEXT_NODE) {
-        this.acrescentar(filho.textContent ?? '', estado);
+        const texto = filho.textContent ?? '';
+        if (estado.pre) {
+          texto.split(/\r\n|\r|\n/).forEach((linha, i) => {
+            if (i > 0) this.quebrar();
+            this.acrescentar(linha, estado);
+          });
+        } else {
+          this.acrescentar(texto, estado);
+        }
         continue;
       }
       if (!(filho instanceof Element)) continue;
       const tag = filho.tagName.toUpperCase();
-      if (tag === 'BR') {
+      if (tag === 'BR' || tag === 'HR') {
         this.quebrar();
         continue;
       }
@@ -178,6 +228,7 @@ class Conversor {
         tachado: estado.tachado || TAGS_TACHADO.has(tag) || filho.hasAttribute(MARCA_TACHADO),
         enfase: estado.enfase || TAGS_ENFASE.has(tag),
         link: tag === 'A' ? this.resolverLink(filho.getAttribute('href')) : estado.link,
+        pre: estado.pre === true || tag === 'PRE',
       });
       if (bloco) this.quebrar();
     }
