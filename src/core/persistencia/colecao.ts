@@ -182,7 +182,9 @@ export class Colecao<N extends NomeColecao> {
       const registro = this.validar(mesclado);
       await this.tabela.put(registro);
       const dados: Record<string, unknown> = { ...carimbos };
-      for (const [k, v] of Object.entries(alteracoes)) if (v !== undefined) dados[k] = v;
+      // Valores já validados (ex.: texto aparado), para o log reproduzir o registro gravado.
+      const gravado = registro as Record<string, unknown>;
+      for (const k of Object.keys(alteracoes)) if (k in gravado) dados[k] = gravado[k];
       await this.registrarNoLog({
         ts: carimbos.tsLogico,
         registroId: id,

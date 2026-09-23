@@ -66,30 +66,42 @@ export class Repositorio {
     const agora = opcoes.agora ?? (() => new Date());
     const eventos = opcoes.eventos ?? new Barramento();
 
-    const salva = (await db.meta.get('identidade'))?.valor as Identidade | undefined;
-    const identidade: Identidade = salva ?? { usuarioId: novoId(), aparelhoId: novoId() };
+    const base = { db, eventos, agora, novoId };
+    const identidade =
+      ((await db.meta.get('identidade'))?.valor as Identidade | undefined) ??
+      (await Repositorio.criarIdentidade(base, opcoes.nomeAparelho));
     const relogio = new RelogioLogico(identidade.aparelhoId, () => agora().getTime());
     const ultima = await db.alteracoes.orderBy('ts').last();
     if (ultima) relogio.observar(ultima.ts);
-
-    const repo = new Repositorio({ db, ...identidade, relogio, eventos, agora, novoId });
-    if (!salva) await repo.criarIdentidade(identidade, opcoes.nomeAparelho);
-    return repo;
+    return new Repositorio({ ...base, ...identidade, relogio });
   }
 
-  /** Primeira abertura: Usuário local, este Aparelho e Preferências padrão (Parte 1 §7.2). */
-  private async criarIdentidade(identidade: Identidade, nomeAparelho = 'Este aparelho') {
-    await this.transacao(async () => {
-      await this.colecao('usuarios').criar(
-        { consentimentos: [] },
-        { id: identidade.usuarioId, origem: 'sistema' },
-      );
-      await this.colecao('aparelhos').criar(
-        { nome: nomeAparelho, plataforma: plataformaAtual() },
-        { id: identidade.aparelhoId, origem: 'sistema' },
-      );
-      await this.colecao('preferencias').criar(PREFERENCIAS_PADRAO, { origem: 'sistema' });
-      await this.db.meta.put({ chave: 'identidade', valor: identidade });
+  /**
+   * Primeira abertura: Usuário local, este Aparelho e Preferências padrão (Parte 1 §7.2).
+   * Relê a identidade dentro da transação: se outra aba acabou de criá-la, usa a dela.
+   */
+  private static async criarIdentidade(
+    base: Pick<Contexto, 'db' | 'eventos' | 'agora' | 'novoId'>,
+    nomeAparelho = 'Este aparelho',
+  ): Promise<Identidade> {
+    const candidata: Identidade = { usuarioId: base.novoId(), aparelhoId: base.novoId() };
+    const relogio = new RelogioLogico(candidata.aparelhoId, () => base.agora().getTime());
+    const repo = new Repositorio({ ...base, ...candidata, relogio });
+    return repo.transacao(async () => {
+      const existente = (await repo.db.meta.get('identidade'))?.valor as Identidade | undefined;
+      if (existente) return existente;
+      await repo
+        .colecao('usuarios')
+        .criar({ consentimentos: [] }, { id: candidata.usuarioId, origem: 'sistema' });
+      await repo
+        .colecao('aparelhos')
+        .criar(
+          { nome: nomeAparelho, plataforma: plataformaAtual() },
+          { id: candidata.aparelhoId, origem: 'sistema' },
+        );
+      await repo.colecao('preferencias').criar(PREFERENCIAS_PADRAO, { origem: 'sistema' });
+      await repo.db.meta.put({ chave: 'identidade', valor: candidata });
+      return candidata;
     });
   }
 }

@@ -406,3 +406,27 @@ describe('contar', () => {
     expect(await erros.contar({ filtro: (e) => e.causa === 'lacuna' })).toBe(180);
   });
 });
+
+describe('correções da revisão da etapa 1', () => {
+  it('o log guarda o valor validado da atualização', async () => {
+    const { repo } = await repositorioDeTeste();
+    const e = await repo.colecao('erros').criar(ERRO);
+    await repo.colecao('erros').atualizar(e.id, { oQueFoi: '  prazo  ' });
+    const log = await repo.db.alteracoes.orderBy('seq').toArray();
+    expect(log.at(-1)?.dados?.oQueFoi).toBe('prazo');
+    const doLog = reconstruirDoLog(log).get('erros')?.get(e.id);
+    expect(doLog).toEqual(await repo.colecao('erros').obter(e.id));
+  });
+
+  it('duas aberturas simultâneas de banco vazio ficam com a mesma identidade', async () => {
+    const nomeBanco = `corrida-${Math.random()}`;
+    const [a, b] = await Promise.all([
+      Repositorio.abrir({ nomeBanco }),
+      Repositorio.abrir({ nomeBanco }),
+    ]);
+    expect(a.ctx.usuarioId).toBe(b.ctx.usuarioId);
+    expect(a.ctx.aparelhoId).toBe(b.ctx.aparelhoId);
+    expect(await a.db.tabela('usuarios').count()).toBe(1);
+    expect(await a.db.tabela('preferencias').count()).toBe(1);
+  });
+});
