@@ -312,14 +312,14 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (commit 13355bc).
 
 ### `npm test` acusa o corpus
-- **Sintoma:** "bytes no disco … (fim de linha convertido pelo git?)"; ou "arquivo fora do manifesto — rode npm run corpus"; ou o `npm run corpus` completo apaga arquivos da pasta. **Causa:** o git converteria o fim de linha misto das páginas; `verificarCorpus` e `baixarCorpus` tratam todo `.html` de `corpus/normas/` sem entrada no manifesto como sobra, e os `*.colado.html` da 7.2 cairão nessa regra.
-- **Solução:** `corpus/normas/*.html -text` no `.gitattributes` (já feito); na 7.2, registrar os colados no manifesto ou ensinar as duas funções a reconhecê-los (amarrados ao `sha256Conteudo` da origem). **Prevenção:** conferência de integridade no `npm test`, sem rede, cobrindo os colados.
-- **Origem:** previsto — atividades 7.1 (prevenido em 13355bc) e 7.2.
+- **Sintoma:** "bytes no disco … (fim de linha convertido pelo git?)"; "arquivo fora do manifesto — rode npm run corpus"; "sem colado — rode npm run corpus:colar"; "colado capturado de outra versão da página". **Causa:** o git converteria o fim de linha misto das páginas e dos colados; arquivo na pasta que o manifesto não explica; página baixada de novo (`npm run corpus`) sem recapturar o colado dela.
+- **Solução:** `corpus/normas/*.html -text` e `*.txt -text` no `.gitattributes`; apagar a sobra ou rodar `npm run corpus`; depois de uma página mudar, `npm run corpus:colar -- --so <id>` (o `npm run corpus` avisa). Colados registrados em `colados[]` e `<id>.gabarito.json` de norma do catálogo não são sobra e não são apagados. **Prevenção:** `verificarCorpus` no `npm test`, sem rede, cobrindo páginas e colados; testes "derivados na pasta do corpus (7.2)".
+- **Origem:** ocorrido em 23/09/2026 — 7.1 (prevenido em 13355bc) e 7.2 (commit e5af052).
 
 ### Acentos trocados ou "�" no texto da lei
 - **Sintoma:** aparece U+FFFD (windows-1252 lido como UTF-8) ou "Seção" vira "SeÃ§Ã£o" (UTF-8 lido como windows-1252). **Causa:** o Planalto grava em windows-1252 e não declara charset (nem cabeçalho nem `<meta>`); a ALESP declara UTF-8 na `<meta>`.
-- **Solução:** charset da `<meta>` quando houver, senão windows-1252 (cliente da 12.3); na 7.2, servir com `Content-Type: text/html; charset=<do manifesto>`. **Prevenção:** conferência de U+FFFD como em `conferirConteudo`; testes da 12.1 com páginas do corpus.
-- **Origem:** previsto — atividades 7.2 e 12.3.
+- **Solução:** charset da `<meta>` quando houver, senão windows-1252 (cliente da 12.3); a captura da 7.2 serve cada página com `Content-Type: text/html; charset=<do manifesto>`. **Prevenção:** conferência de U+FFFD em `conferirConteudo` (página) e `conferirColado` (colado, os dois formatos); testes da 12.1 com páginas do corpus.
+- **Origem:** previsto — atividade 12.3; na 7.2 prevenido na captura (commit e5af052).
 
 ### Nenhuma redação anterior depois de colar
 - **Sintoma:** a lei entra sem nenhum texto tachado. **Causa:** a página "compilado" do Planalto traz só o texto vigente; a simples (`l7210.htm`, `del2848.htm`) traz todas as redações.
@@ -328,8 +328,28 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### O HTML colado muda conforme o navegador
 - **Sintoma:** a mesma lei estrutura bem no Chromium e mal em outro navegador ou no celular. **Causa:** cada navegador serializa a seleção de um jeito (tags, estilos em linha), e no celular a seleção de uma lei inteira é difícil e o colar pode trazer só texto puro.
-- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). **Prevenção:** a 7.2 captura só o Chromium; guardar amostras de outros navegadores no corpus quando aparecerem.
-- **Origem:** previsto — atividades 7.2 e 9.5.
+- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). **Prevenção:** a 7.2 capturou só o Chromium (`*.colado.html` e `*.colado.txt`; o que ele entrega está em `planos/F2.md` › "Fatos do colar"); guardar amostras de outros navegadores no corpus quando aparecerem.
+- **Origem:** previsto — atividade 9.5.
+
+### `npm run corpus:colar` falha ou trava
+- **Sintoma:** "Chromium do Playwright indisponível"; "o colar não chegou à página de captura"; ou "Too many arguments" ao ler o resultado. **Causa:** navegador do Playwright não instalado; colar sem foco na página de captura; `page.evaluate` não aceita opções (o tempo máximo não vai nele).
+- **Solução:** `npx playwright install chromium`; a captura foca o alvo antes do Ctrl+V e espera o evento `paste` com tempo máximo próprio (`Promise.race`, 60 s). **Prevenção:** `conferirColado` roda antes de gravar; nada é gravado se a captura falhar.
+- **Origem:** ocorrido em 23/09/2026 ("Too many arguments", commit e5af052).
+
+### Skill `acumen-extrair-normas` (`extrair_lei.js`) não encontrada
+- **Sintoma:** a sessão do Claude na nuvem não lista a skill nem acha o `extrair_lei.js`. **Causa:** a skill está só no Claude Code do computador do Gabriel; as sessões na nuvem recebem outro conjunto de skills.
+- **Solução:** rodar a atividade que precisa dela (conferência de segmentação da 7.3) no computador do Gabriel, ou copiar o script para o repositório (decisão do Gabriel). **Prevenção:** aviso em `proxima-sessao.md`.
+- **Origem:** ocorrido em 23/09/2026 (sessão da 7.2).
+
+### Recapturar o colado gera diff sem a página mudar
+- **Sintoma:** `npm run corpus:colar` regrava colados (↻) com a página igual. **Causa:** outra versão do Chromium ou outro sistema (o manifesto guarda `navegador` e `plataforma`): estilos em linha, fim de linha do `text/plain` e, no Windows, o formato da área de transferência podem mudar.
+- **Solução:** só recapturar quando a página mudar (`--so <id>`); se regravar, conferir que os testes do estruturador continuam verdes antes do commit. **Prevenção:** a captura é idempotente no mesmo Chromium e sistema (rodar de novo dá "="); a verificação confere completude e tachados, não os bytes de uma captura ideal.
+- **Origem:** previsto — atividades 7.2 em diante (manutenção do corpus).
+
+### Gabarito desatualizado ou texto da amostra que não bate
+- **Sintoma:** a regressão (8.9) acusa divergência depois de `npm run corpus`; ou o texto de um dispositivo da amostra difere só por espaço, ordinal (`º`/`o`/`°`) ou hífen invisível (U+00AD). **Causa:** gabarito sem amarra à versão da página; texto guardado cru e comparado cru.
+- **Solução:** o gabarito leva o `sha256ConteudoOrigem` da página, como o colado, e a verificação acusa a diferença; texto da amostra guardado como aparece na página e comparado, dos dois lados, depois da normalização da regra 1 (8.1). **Prevenção:** conferência do gabarito em `verificarCorpus`; o nome `<id>.gabarito.json` já é reconhecido pela verificação.
+- **Origem:** previsto — atividade 7.3.
 
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.

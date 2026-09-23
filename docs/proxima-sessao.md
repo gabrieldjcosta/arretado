@@ -7,14 +7,14 @@ Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md
 - **F0 (Fundamentos) e F1 (Recall + pontos do edital) implementadas**, revisadas e testadas. **Portões:** [`portoes/F0.md`](portoes/F0.md), **fechado em 23/09/2026**, e [`portoes/F1.md`](portoes/F1.md), aguardando o uso real.
 - **Tudo no `main` desde 23/09/2026:** merge dos PRs [#1](https://github.com/gabrieldjcosta/arretado/pull/1) (F0/F1) e [#2](https://github.com/gabrieldjcosta/arretado/pull/2). O #2 trouxe o plano da F2, a 7.1, o projeto Supabase (4.3), a T17 no Cloudflare, o glossário e o arquivo de solução de problemas. Toda sessão nova já parte do código atual.
 - **Verificação:**
-  - 353 testes unitários e de integração, incluindo a integridade do corpus da F2;
+  - 363 testes unitários e de integração, incluindo a integridade do corpus da F2 (páginas e colados);
   - 82 E2E (Playwright + axe, desktop e celular);
   - carga de 10 mil registros;
   - CI verde.
 - **Decisão de escopo (23/09/2026):** nada do Acervo antigo nem do Acumen v2 é importado; o conteúdo recomeça do zero (nota no topo das Partes 1 e 2).
 - **F2 (Legislação) em execução**, em paralelo ao uso real da F1. Plano em [`planos/F2.md`](planos/F2.md).
-  - Feito: 7.1, o corpus de 5 normas em 7 páginas, em `corpus/normas/`.
-  - **Próxima atividade: 7.2** (captura do colar), depois 7.3 (gabarito) e 8.1 (tipos do rascunho e normalização).
+  - Feito: 7.1, o corpus de 5 normas em 7 páginas, em `corpus/normas/`; 7.2, o colar de cada página no Chromium (`*.colado.html` e `*.colado.txt`), commit e5af052 no branch `claude/proxima-atividade-f2-0jdjb9`, com PR para o `main` (merge do Gabriel).
+  - **Próxima atividade: 7.3** (gabarito), depois 8.1 (tipos do rascunho e normalização).
 
 ## Como abrir a próxima sessão (meta: até ~200 mil tokens por sessão)
 
@@ -22,7 +22,7 @@ Abrir uma sessão nova do Claude Code no repositório. Ela parte do `main` atual
 
 > Leia `docs/proxima-sessao.md` e execute a próxima atividade da F2 seguindo a rotina de pronto do plano. Ao terminar, atualize este arquivo e `docs/solucao-de-problemas.md`, faça o commit num branch com PR para o `main` e me avise.
 
-Uma sessão por atividade ou por par de atividades pequenas (7.2 + 7.3 cabem juntas; da etapa 8 em diante, uma por atividade). Regras de economia de contexto no `CLAUDE.md`.
+Uma sessão por atividade (a 7.3 é M: pode pedir mais de uma sessão, e a conferência da amostra é do Gabriel). Regras de economia de contexto no `CLAUDE.md`. Se o PR da 7.2 ainda não tiver merge, a sessão da 7.3 parte do branch dele.
 
 ## Projeto Supabase (atividade 4.3, concluída em 23/09/2026)
 
@@ -70,10 +70,11 @@ Os dados ficam no navegador de cada endereço. Usar sempre https://arretado.gabr
 
 Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 → 10/11 → 13, com a 12 correndo por fora.
 
-- **Agora: 7.2 → 7.3** (captura do colar e gabarito). A 7.1 está feita; ver "Andamento" e "Fatos das fontes" no plano.
-- **Primeiro passo da 7.2:** ensinar `verificarCorpus` e `baixarCorpus` a reconhecer os derivados (`*.colado.html`, `*.gabarito.json`). Hoje todo `.html` fora do manifesto quebra o `npm test` e é apagado pelo `npm run corpus`.
+- **Agora: 7.3** (gabarito). 7.1 e 7.2 feitas; ver "Andamento", "Fatos das fontes" e "Fatos do colar" no plano.
+- **Primeiro passo da 7.3:** decidir o formato do `<id>.gabarito.json` com amarra à página (`sha256ConteudoOrigem`, como o colado) e ensinar `verificarCorpus` a conferi-lo. O nome já é reconhecido (`nomeGabarito`): não é acusado nem apagado.
 - **Tempo do Gabriel:** a conferência da amostra do gabarito pede ~30 min por lei.
 - **Ler antes:** a Parte 2 §10.6 e a skill `acumen-extrair-normas`. As armadilhas do Planalto estão no plano e em `solucao-de-problemas.md`, seção Legislação.
+- **A skill `acumen-extrair-normas` não existe nas sessões na nuvem** (conferido em 23/09/2026): lá não há `extrair_lei.js`. Para a conferência de segmentação da 7.3, rodar a sessão no computador do Gabriel ou copiar o script para o repositório (decisão do Gabriel).
 - Sem importador do Acervo (decisão de escopo).
 - O sanitizador (`src/core/seguranca/sanitizador.ts`) já entrega blocos com tachado, ênfase e link: é a entrada do estruturador.
 
@@ -86,7 +87,7 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 �
 ## Como validar tudo
 
 ```
-npm run check      # formato, lint, tipos, 353 testes (inclui integridade do corpus), auditoria
+npm run check      # formato, lint, tipos, 363 testes (inclui integridade do corpus), auditoria
 npm run carga      # 10 mil registros dentro dos limiares
 npm run test:e2e   # 82 cenários (Playwright + axe)
 npm run build      # dist/ com _headers
@@ -112,6 +113,8 @@ src/apresentacao/             shell, Conta › Dados/Aparência/Privacidade, Ori
 supabase/migrations/          esquema remoto com RLS; teste em supabase/rls.test.ts
 supabase/verificacao-rls-remota.sql   conferência da RLS no projeto real (não é migração)
 scripts/corpus-normas.mjs     npm run corpus: baixa o corpus de normas (F2, 7.1)
-corpus/normas/                páginas oficiais byte a byte + manifesto.json (hashes, charset)
+scripts/corpus-colar.mjs      npm run corpus:colar: colar de cada página no Chromium, sem rede (7.2)
+corpus/normas/                páginas oficiais byte a byte, colados (*.colado.html/.txt)
+                              e manifesto.json (hashes, charset, amarra colado → página)
 e2e/                          Playwright + axe; vigilância automática de CSP e console
 ```
