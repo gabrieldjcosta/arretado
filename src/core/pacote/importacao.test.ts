@@ -117,13 +117,27 @@ describe('restauração integral (3.6)', () => {
     expect(previa.substituiIdentidade).toBe(true);
     expect(identidadeMudou).toBe(true);
     expect(repo.ctx.usuarioId).toBe(a.repo.ctx.usuarioId);
-    expect(await hashDe(repo)).toBe(original.manifesto.hashConjunto);
+
+    // Todo arquivo de dados idêntico; aparelhos = os do pacote + este Aparelho, preservado.
+    const conferir = async (alvo: Repositorio) => {
+      const { manifesto } = await exportarPacote(alvo);
+      for (const [caminho, info] of Object.entries(original.manifesto.arquivos)) {
+        if (caminho === 'dados/aparelhos.json') continue;
+        expect(manifesto.arquivos[caminho], caminho).toEqual(info);
+      }
+      const aparelhos = await alvo.colecao('aparelhos').todosDoUsuario();
+      expect(aparelhos.map((x) => x.id).sort()).toEqual(
+        [a.repo.ctx.aparelhoId, reaberto.repo.ctx.aparelhoId].sort(),
+      );
+      expect(alvo.ctx.aparelhoId).toBe(reaberto.repo.ctx.aparelhoId);
+    };
+    await conferir(repo);
 
     // A identidade adotada persiste ao reabrir.
     repo.fechar();
     const depois = await abrir(r, a.nome);
     expect(depois.repo.ctx.usuarioId).toBe(a.repo.ctx.usuarioId);
-    expect(await hashDe(depois.repo)).toBe(original.manifesto.hashConjunto);
+    await conferir(depois.repo);
   });
 
   it('volta exatamente ao pacote, apagando o que surgiu depois', async () => {
@@ -314,5 +328,117 @@ describe('espaço separado (3.7)', () => {
     await removerEspaco(eu.repo, espaco.id);
     expect(await eu.repo.colecao('espacos').obter(espaco.id)).toBeUndefined();
     await expect(planejarMesclagem(eu.repo, espaco.id)).rejects.toBeInstanceOf(ImportacaoInvalida);
+  });
+});
+
+describe('correções da revisão da etapa 3', () => {
+  it('prévia defasada é recusada ao aplicar', async () => {
+    const a = await comDados();
+    const { bytes } = await exportarPacote(a.repo);
+    const pacote = await lerPacote(bytes);
+    const previa = await planejar(a.repo, pacote, { modo: 6 });
+    await a.repo.colecao('erros').atualizar(a.e1.id, { causa: 'lacuna' });
+    await expect(aplicar(a.repo, pacote, previa)).rejects.toThrow(/prévia de novo/);
+    expect((await a.repo.colecao('erros').obter(a.e1.id))?.causa).toBe('lacuna');
+  });
+
+  it('modo 5 em "sistema" não exclui o Aparelho atual', async () => {
+    const r = relogio();
+    const a = await comDados(r);
+    const b = await segundoAparelho((await exportarPacote(a.repo)).bytes, r);
+    const pacote = await lerPacote((await exportarPacote(a.repo)).bytes);
+    await aplicar(b, pacote, await planejar(b, pacote, { modo: 5, modulos: ['sistema'] }));
+    expect(await b.colecao('aparelhos').obter(b.ctx.aparelhoId)).toBeDefined();
+  });
+
+  it('rollback guarda o estado anterior e pode ser desfeito', async () => {
+    const r = relogio();
+    const a = await comDados(r);
+    const b = await segundoAparelho((await exportarPacote(a.repo)).bytes, r);
+    await a.repo.colecao('erros').criar({ ...ERRO, oQueFoi: 'de A' });
+    const { log } = await importar(b, (await exportarPacote(a.repo)).bytes, 2);
+    const depoisDaImportacao = await hashDe(b);
+    const { log: logRollback, repo } = await desfazerImportacao(b, log.id);
+    expect(logRollback.snapshotId).toBeDefined();
+    const snap = await repo.colecao('snapshots').obter(logRollback.snapshotId ?? '');
+    expect(snap?.motivo).toBe('rollback');
+    const refeito = await desfazerImportacao(repo, logRollback.id);
+    expect(await hashDe(refeito.repo)).toBe(depoisDaImportacao);
+  });
+
+  it('espaço separado aceita pacote parcial', async () => {
+    const outro = await comDados();
+    const parcial = await exportarPacote(outro.repo, {
+      escopo: { tipo: 'modulos', modulos: ['recall'] },
+    });
+    const eu = await comDados();
+    const { espaco } = await importarParaEspaco(eu.repo, await lerPacote(parcial.bytes), 'Parcial');
+    const { previa } = await planejarMesclagem(eu.repo, espaco.id);
+    expect(previa.porColecao.erros?.criar).toBe(2);
+  });
+});
+
+describe('anexos no pacote', () => {
+  async function comAnexo(r = relogio()) {
+    const a = await comDados(r);
+    const bytes = new TextEncoder().encode('imagem da questão');
+    const hash = await (await import('./bytes')).sha256(bytes);
+    const anexo = await a.repo.colecao('anexos').criar({
+      nomeArquivo: 'q.png',
+      tipoMime: 'image/png',
+      tamanho: bytes.length,
+      hash,
+    });
+    await a.repo.db.anexosConteudo.put({ id: anexo.id, bytes });
+    return { ...a, anexo, conteudoAnexo: bytes };
+  }
+
+  it('viaja com o pacote e é restaurado', async () => {
+    const a = await comAnexo();
+    const { bytes } = await exportarPacote(a.repo, { incluirAnexos: true });
+    const b = await abrir();
+    const { repo } = await importar(b.repo, bytes, 6);
+    expect((await repo.db.anexosConteudo.get(a.anexo.id))?.bytes).toEqual(a.conteudoAnexo);
+  });
+
+  it('não grava binário de anexo fora dos módulos escolhidos', async () => {
+    const r = relogio();
+    const a = await comAnexo(r);
+    const b = await segundoAparelho((await exportarPacote(a.repo)).bytes, r);
+    await b.db.anexosConteudo.clear();
+    const pacote = await lerPacote((await exportarPacote(a.repo, { incluirAnexos: true })).bytes);
+    await aplicar(b, pacote, await planejar(b, pacote, { modo: 5, modulos: ['recall'] }));
+    expect(await b.db.anexosConteudo.count()).toBe(0);
+  });
+
+  it('recusa anexo sem registro ou com conteúdo trocado', async () => {
+    const { unzipSync, zipSync, strToU8 } = await import('fflate');
+    const { hashDoConjunto } = await import('./exportar');
+    const { sha256, deBytes } = await import('./bytes');
+    const a = await comAnexo();
+    const { bytes } = await exportarPacote(a.repo, { incluirAnexos: true });
+    const arquivos: Record<string, Uint8Array> = unzipSync(bytes);
+    const m = JSON.parse(deBytes(arquivos['manifesto.json']!)) as {
+      arquivos: Record<string, { sha256: string; bytes: number }>;
+      hashConjunto: string;
+    };
+    const trocado = strToU8('outra imagem');
+    arquivos[`anexos/${a.anexo.id}`] = trocado;
+    m.arquivos[`anexos/${a.anexo.id}`] = { sha256: await sha256(trocado), bytes: trocado.length };
+    m.hashConjunto = await hashDoConjunto(m.arquivos);
+    arquivos['manifesto.json'] = strToU8(JSON.stringify(m));
+    await expect(lerPacote(zipSync(arquivos))).rejects.toMatchObject({
+      motivo: 'arquivo_alterado',
+    });
+  });
+});
+
+describe('zip bomb', () => {
+  it('recusa conteúdo descompactado acima do limite antes de descompactar', async () => {
+    const a = await comDados();
+    const { bytes } = await exportarPacote(a.repo);
+    await expect(lerPacote(bytes, { limiteDescompactado: 1_000 })).rejects.toMatchObject({
+      motivo: 'arquivo_alterado',
+    });
   });
 });

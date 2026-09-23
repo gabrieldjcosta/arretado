@@ -24,14 +24,23 @@ export async function importarParaEspaco(
   const nomeBanco = `${PREFIXO}${id}`;
   const isolado = await Repositorio.abrir({ nomeBanco, agora: repo.ctx.agora });
   try {
-    const previa = await planejar(isolado, pacote, { modo: 6 });
+    const previa = await planejar(isolado, pacote, { modo: 6, exigirIntegral: false });
     await aplicar(isolado, pacote, previa, new Map(), { snapshot: false });
+    isolado.fechar();
+    return await registrarEspaco(repo, pacote, { id, nome, nomeBanco });
   } catch (e) {
+    // Nada de banco órfão: se qualquer passo falhar, o espaço some.
     isolado.fechar();
     await apagarBanco(nomeBanco);
     throw e;
   }
-  isolado.fechar();
+}
+
+function registrarEspaco(
+  repo: Repositorio,
+  pacote: PacoteLido,
+  { id, nome, nomeBanco }: { id: string; nome: string; nomeBanco: string },
+): Promise<{ espaco: Espaco; log: LogDeImportacao }> {
   return repo.transacao(async () => {
     const espaco = await repo
       .colecao('espacos')

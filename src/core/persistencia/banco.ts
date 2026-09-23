@@ -36,7 +36,7 @@ function esquemaV1(): Record<string, string> {
   for (const nome of NOMES_COLECOES) {
     stores[nome] = ['id', ...ENTIDADES[nome].indices].join(', ');
   }
-  stores.alteracoes = '++seq, ts, [colecao+registroId]';
+  stores.alteracoes = '++seq, ts, usuarioId, [colecao+registroId]';
   stores.meta = 'chave';
   stores.anexosConteudo = 'id';
   stores.snapshotsConteudo = 'id';

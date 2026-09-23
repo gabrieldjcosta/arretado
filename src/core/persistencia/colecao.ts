@@ -36,7 +36,7 @@ export interface Pagina<T> {
   proximoCursor: string | null;
 }
 
-export class ErroDeValidacao extends Error {
+export class RegistroInvalido extends Error {
   constructor(
     readonly colecao: NomeColecao,
     readonly problemas: readonly { path: readonly PropertyKey[]; message: string }[],
@@ -44,7 +44,7 @@ export class ErroDeValidacao extends Error {
     super(
       `Registro inválido em ${colecao}: ${problemas.map((p) => `${p.path.join('.')}: ${p.message}`).join('; ')}`,
     );
-    this.name = 'ErroDeValidacao';
+    this.name = 'RegistroInvalido';
   }
 }
 
@@ -73,7 +73,7 @@ export class Colecao<N extends NomeColecao> {
 
   private validar(registro: unknown): RegistroDe<N> {
     const res = ENTIDADES[this.nome].esquema.safeParse(registro);
-    if (!res.success) throw new ErroDeValidacao(this.nome, res.error.issues);
+    if (!res.success) throw new RegistroInvalido(this.nome, res.error.issues);
     return res.data as RegistroDe<N>;
   }
 

@@ -53,7 +53,8 @@ export async function hashDoConjunto(arquivos: Manifesto['arquivos']): Promise<s
 
 /** Registros do usuário numa coleção (inclusive excluídos logicamente), ordenados por id. */
 async function registrosDe(repo: Repositorio, nome: NomeColecao) {
-  const itens = await repo.db.tabela(nome).where('usuarioId').equals(repo.ctx.usuarioId).toArray();
+  const itens = await repo.colecao(nome).todosDoUsuario();
+  // A ordem por id garante o hash determinístico; não depender da ordem do índice.
   return itens.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
@@ -66,28 +67,30 @@ export async function exportarPacote(
   const conteudo: Record<string, Uint8Array> = {};
   const contagens: Record<string, number> = {};
 
+  const incluiAnexos = opcoes.incluirAnexos === true && modulos.includes('sistema');
   await repo.db.transaction('r', repo.db.tables, async () => {
+    const idsAnexos: string[] = [];
     for (const modulo of modulos) {
       for (const nome of colecoesDoModulo(modulo)) {
         const registros = await registrosDe(repo, nome);
         contagens[nome] = registros.length;
         conteudo[`${PASTA_DADOS}${nome}.json`] = serializarLista(registros);
+        if (nome === 'anexos') idsAnexos.push(...registros.map((a) => a.id));
       }
     }
     if (opcoes.incluirLog) {
-      const log = await repo.db.alteracoes.where('ts').above('').toArray();
-      const doUsuario = log
-        .filter((a) => a.usuarioId === repo.ctx.usuarioId)
-        .map((a) => {
+      // Mesma chave de índice → ordem da chave primária (seq): o log sai em ordem.
+      const log = await repo.db.alteracoes.where('usuarioId').equals(repo.ctx.usuarioId).toArray();
+      conteudo[ARQUIVO_LOG] = serializarLista(
+        log.map((a) => {
           const semSeq = { ...a };
           delete semSeq.seq;
           return semSeq;
-        });
-      conteudo[ARQUIVO_LOG] = serializarLista(doUsuario);
+        }),
+      );
     }
-    if (opcoes.incluirAnexos && modulos.includes('sistema')) {
-      const anexos = await registrosDe(repo, 'anexos');
-      const binarios = await repo.db.anexosConteudo.bulkGet(anexos.map((a) => a.id));
+    if (incluiAnexos) {
+      const binarios = await repo.db.anexosConteudo.bulkGet(idsAnexos);
       binarios.forEach((b) => {
         if (b) conteudo[`${PASTA_ANEXOS}${b.id}`] = b.bytes;
       });
@@ -110,7 +113,7 @@ export async function exportarPacote(
     escopo,
     modulos,
     incluiLog: opcoes.incluirLog === true,
-    incluiAnexos: opcoes.incluirAnexos === true && modulos.includes('sistema'),
+    incluiAnexos,
     contagens,
     arquivos,
     hashConjunto: await hashDoConjunto(arquivos),

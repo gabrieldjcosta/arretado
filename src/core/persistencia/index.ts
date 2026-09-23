@@ -7,7 +7,7 @@ export {
 } from './banco';
 export {
   Colecao,
-  ErroDeValidacao,
+  RegistroInvalido,
   LIMITE_MAXIMO_PAGINA,
   type Alteracoes,
   type ConsultaPagina,

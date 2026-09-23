@@ -52,10 +52,10 @@ export async function restaurarSnapshot(
     throw new ImportacaoInvalida('Este ponto de restauração não existe mais.');
   }
   const pacote = await lerPacote(conteudo.bytes);
-  await criarSnapshot(repo, 'rollback');
   const previa = await planejar(repo, pacote, { modo: 6 });
+  // O estado atual é guardado antes (motivo "rollback"), para o desfazer também ser desfeito.
   return aplicar(repo, pacote, previa, new Map(), {
-    snapshot: false,
+    snapshot: 'rollback',
     descricao: 'Desfazer importação',
   });
 }

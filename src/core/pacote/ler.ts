@@ -29,12 +29,31 @@ export interface PacoteLido {
   cifrado: boolean;
 }
 
-function descompactar(bytes: Uint8Array): Record<string, Uint8Array> {
+/** Teto do conteúdo descompactado (proteção contra "zip bomb"). */
+export const LIMITE_DESCOMPACTADO = 512 * 1024 * 1024;
+
+function descompactar(bytes: Uint8Array, limite: number): Record<string, Uint8Array> {
+  const leitura = { total: 0, excedeu: false };
+  let arquivos: Record<string, Uint8Array>;
   try {
-    return unzipSync(bytes);
+    arquivos = unzipSync(bytes, {
+      // Tamanhos declarados conferidos antes de descompactar qualquer entrada.
+      filter: (f) => {
+        leitura.total += f.originalSize;
+        if (f.originalSize > limite || leitura.total > limite) leitura.excedeu = true;
+        return !leitura.excedeu;
+      },
+    });
   } catch {
     throw new PacoteRecusado('nao_e_pacote');
   }
+  if (leitura.excedeu)
+    throw new PacoteRecusado('arquivo_alterado', 'conteúdo descompactado grande demais');
+  // O tamanho declarado pode mentir: confere o real.
+  const real = Object.values(arquivos).reduce((s, a) => s + a.length, 0);
+  if (real > limite)
+    throw new PacoteRecusado('arquivo_alterado', 'conteúdo descompactado grande demais');
+  return arquivos;
 }
 
 function lerJson(bytes: Uint8Array | undefined, motivo: 'nao_e_pacote' | 'arquivo_alterado') {
@@ -56,10 +75,11 @@ function verificarCabecalho(obj: unknown): void {
 
 export async function lerPacote(
   bytes: Uint8Array,
-  opcoes: { senha?: string } = {},
+  opcoes: { senha?: string; limiteDescompactado?: number } = {},
 ): Promise<PacoteLido> {
+  const limite = opcoes.limiteDescompactado ?? LIMITE_DESCOMPACTADO;
   const hashArquivo = await sha256(bytes);
-  let arquivos = descompactar(bytes);
+  let arquivos = descompactar(bytes, limite);
   let cabecalho = lerJson(arquivos[ARQUIVO_MANIFESTO], 'nao_e_pacote');
   verificarCabecalho(cabecalho);
 
@@ -75,7 +95,7 @@ export async function lerPacote(
     } catch {
       throw new PacoteRecusado('senha_ou_arquivo_invalido');
     }
-    arquivos = descompactar(interno);
+    arquivos = descompactar(interno, limite);
     cabecalho = lerJson(arquivos[ARQUIVO_MANIFESTO], 'arquivo_alterado');
     verificarCabecalho(cabecalho);
     cifrado = true;
@@ -138,10 +158,19 @@ export async function lerPacote(
     if (!Array.isArray(l)) throw new PacoteRecusado('arquivo_alterado', 'log');
     log = l;
   }
+  // Anexos: só com incluiAnexos, cada um com registro no pacote e hash igual ao do registro.
   const anexos = new Map<string, Uint8Array>();
+  const registrosAnexos = new Map(
+    (registros.get('anexos') ?? []).map((r) => [r.id as string, r.hash as string]),
+  );
   for (const caminho of declarados.filter((c) => c.startsWith(PASTA_ANEXOS))) {
+    const id = caminho.slice(PASTA_ANEXOS.length);
     const conteudo = arquivos[caminho];
-    if (conteudo) anexos.set(caminho.slice(PASTA_ANEXOS.length), conteudo);
+    const hashEsperado = registrosAnexos.get(id);
+    if (!manifesto.incluiAnexos || !conteudo || hashEsperado !== (await sha256(conteudo))) {
+      throw new PacoteRecusado('arquivo_alterado', `anexo ${id}`);
+    }
+    anexos.set(id, conteudo);
   }
 
   return { manifesto, registros, log, anexos, hashArquivo, cifrado };

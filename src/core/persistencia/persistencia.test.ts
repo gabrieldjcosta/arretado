@@ -2,7 +2,7 @@ import { Barramento, type Evento } from '../eventos/barramento';
 import { ENTIDADES } from '../modelo';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { BancoArretado, VERSAO_ESQUEMA } from './banco';
-import { ErroDeValidacao } from './colecao';
+import { RegistroInvalido } from './colecao';
 import { reconstruirDoLog } from './log';
 import { Repositorio } from './repositorio';
 
@@ -70,7 +70,7 @@ describe('coleções (1.4)', () => {
     const { repo } = await repositorioDeTeste();
     const antes = await repo.db.alteracoes.count();
     await expect(repo.colecao('erros').criar({ ...ERRO, oQueFoi: '' })).rejects.toBeInstanceOf(
-      ErroDeValidacao,
+      RegistroInvalido,
     );
     expect(await repo.db.tabela('erros').count()).toBe(0);
     expect(await repo.db.alteracoes.count()).toBe(antes);

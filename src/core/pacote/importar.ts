@@ -2,6 +2,7 @@
 import { lerCarimbo } from '../ids';
 import {
   colecoesDoModulo,
+  type Snapshot,
   eAppendOnly,
   ENTIDADES,
   NOMES_CAMPOS_COMUNS,
@@ -40,7 +41,9 @@ export interface Conflito {
 type Operacao =
   | { tipo: 'gravar'; colecao: NomeColecao; registro: Registro; efeito: 'criar' | 'atualizar' }
   | { tipo: 'excluirLogico'; colecao: NomeColecao; registro: Registro }
-  | { tipo: 'remover'; colecao: NomeColecao; id: string };
+  | { tipo: 'remover'; colecao: NomeColecao; id: string }
+  /** Registro deste Aparelho passa para a identidade do pacote (modo 6 de outra identidade). */
+  | { tipo: 'rehospedar'; colecao: NomeColecao; registro: Registro };
 
 export interface Previa {
   modo: ModoEscrita;
@@ -56,6 +59,9 @@ export interface Previa {
   hashArquivo: string;
   /** Operações calculadas; `aplicar` executa exatamente estas. */
   operacoes: Operacao[];
+  /** Último item do log visto no planejamento; alteração posterior invalida a prévia. */
+  seqBase: number;
+  colecoesAfetadas: NomeColecao[];
 }
 
 export class ImportacaoInvalida extends Error {
@@ -71,6 +77,8 @@ export interface OpcoesPlanejamento {
   modulos?: Modulo[];
   /** Coleções fora da importação (ex.: identidade do espaço ao mesclar). */
   ignorarColecoes?: NomeColecao[];
+  /** Modo 6 exige pacote integral; o espaço separado (modo 7) aceita parcial. */
+  exigirIntegral?: boolean;
 }
 
 const COLECOES_IDENTIDADE: NomeColecao[] = ['usuarios', 'aparelhos', 'preferencias'];
@@ -103,7 +111,7 @@ export async function planejar(
       'Este pacote é de outra identidade. Use "Restaurar integral" ou "Importar para espaço separado".',
     );
   }
-  if (modo === 6 && m.escopo.tipo !== 'integral') {
+  if (modo === 6 && opcoes.exigirIntegral !== false && m.escopo.tipo !== 'integral') {
     throw new ImportacaoInvalida('"Restaurar integral" exige um pacote integral.');
   }
   const modulos = modo === 6 ? m.modulos : (opcoes.modulos ?? m.modulos);
@@ -114,6 +122,8 @@ export async function planejar(
   const ignoradas = new Set(opcoes.ignorarColecoes ?? []);
   const colecoes = modulos.flatMap((mod) => colecoesDoModulo(mod)).filter((c) => !ignoradas.has(c));
 
+  // Lido antes dos registros: qualquer escrita depois disto é detectada ao aplicar.
+  const seqBase = (await repo.db.alteracoes.orderBy('seq').last())?.seq ?? 0;
   const operacoes: Operacao[] = [];
   const conflitos: Conflito[] = [];
   const porColecao: Previa['porColecao'] = {};
@@ -188,6 +198,12 @@ export async function planejar(
     if (modo === 5 || modo === 6) {
       for (const l of locais) {
         if (idsPacote.has(l.id)) continue;
+        // O registro deste Aparelho nunca é apagado nem excluído pela importação.
+        if (nome === 'aparelhos' && l.id === repo.ctx.aparelhoId) {
+          if (outroUsuario) operacoes.push({ tipo: 'rehospedar', colecao: nome, registro: l });
+          resumo.ignorar += 1;
+          continue;
+        }
         if (modo === 6) {
           operacoes.push({ tipo: 'remover', colecao: nome, id: l.id });
           resumo.excluir += 1;
@@ -231,6 +247,8 @@ export async function planejar(
     substituiIdentidade: outroUsuario,
     hashArquivo: pacote.hashArquivo,
     operacoes,
+    seqBase,
+    colecoesAfetadas: colecoes,
   };
 }
 
@@ -250,13 +268,14 @@ export async function aplicar(
   pacote: PacoteLido,
   previa: Previa,
   resolucoes: ReadonlyMap<string, 'local' | 'pacote'> = new Map(),
-  opcoes: { snapshot?: boolean; descricao?: string } = {},
+  opcoes: { snapshot?: false | Snapshot['motivo']; descricao?: string } = {},
 ): Promise<ResultadoImportacao> {
   if (previa.hashArquivo !== pacote.hashArquivo) {
     throw new ImportacaoInvalida('A prévia não corresponde a este pacote.');
   }
+  const motivoSnapshot = opcoes.snapshot ?? 'importacao';
   const snapshot =
-    previa.escreve && opcoes.snapshot !== false ? await criarSnapshot(repo, 'importacao') : null;
+    previa.escreve && motivoSnapshot !== false ? await criarSnapshot(repo, motivoSnapshot) : null;
   const alvo = previa.substituiIdentidade ? repo.comUsuario(pacote.manifesto.usuarioId) : repo;
 
   const contagens: LogDeImportacao['contagens'] = {};
@@ -271,6 +290,15 @@ export async function aplicar(
   }
 
   const log = await repo.transacao(async () => {
+    const afetadas = new Set<string>(previa.colecoesAfetadas);
+    const posteriores = await repo.db.alteracoes
+      .where('seq')
+      .above(previa.seqBase)
+      .filter((a) => afetadas.has(a.colecao))
+      .count();
+    if (posteriores > 0) {
+      throw new ImportacaoInvalida('Os dados mudaram depois da prévia. Gere a prévia de novo.');
+    }
     const agora = repo.ctx.agora().toISOString();
     const gravacoes = new Map<NomeColecao, Registro[]>();
     const remocoes = new Map<NomeColecao, string[]>();
@@ -281,15 +309,30 @@ export async function aplicar(
     };
 
     for (const op of previa.operacoes) {
-      if (op.tipo === 'gravar') acumular(gravacoes, op.colecao, op.registro);
-      else if (op.tipo === 'remover') acumular(remocoes, op.colecao, op.id);
-      else {
-        acumular(gravacoes, op.colecao, {
-          ...op.registro,
-          excluidoEm: agora,
-          atualizadoEm: agora,
-          tsLogico: repo.ctx.relogio.tick(),
-        });
+      switch (op.tipo) {
+        case 'gravar':
+          acumular(gravacoes, op.colecao, op.registro);
+          break;
+        case 'remover':
+          acumular(remocoes, op.colecao, op.id);
+          break;
+        case 'excluirLogico':
+          acumular(gravacoes, op.colecao, {
+            ...op.registro,
+            excluidoEm: agora,
+            atualizadoEm: agora,
+            tsLogico: repo.ctx.relogio.tick(),
+          });
+          break;
+        case 'rehospedar':
+          acumular(remocoes, op.colecao, op.registro.id);
+          acumular(gravacoes, op.colecao, {
+            ...op.registro,
+            usuarioId: alvo.ctx.usuarioId,
+            atualizadoEm: agora,
+            tsLogico: repo.ctx.relogio.tick(),
+          });
+          break;
       }
     }
     for (const c of previa.conflitos) {
@@ -302,7 +345,11 @@ export async function aplicar(
       if (nome === 'anexos') await repo.db.anexosConteudo.bulkDelete(ids);
     }
     for (const [nome, registros] of gravacoes) await alvo.colecao(nome).gravarLote(registros);
-    for (const [id, bytes] of pacote.anexos) await repo.db.anexosConteudo.put({ id, bytes });
+    // Conteúdo binário só dos anexos cujo registro veio do pacote nesta importação.
+    const anexosGravados = new Set((gravacoes.get('anexos') ?? []).map((r) => r.id));
+    for (const [id, bytes] of pacote.anexos) {
+      if (anexosGravados.has(id)) await repo.db.anexosConteudo.put({ id, bytes });
+    }
 
     if (previa.substituiIdentidade) {
       await migrarRegistrosLocais(repo, alvo);
