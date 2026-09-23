@@ -58,8 +58,7 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico (7 → 8 → 9 �
 
 ## Armadilhas aprendidas nesta implementação
 
-- **Escapes no texto das ferramentas:** sequências `\uXXXX` escritas no conteúdo de um comando ou arquivo chegam decodificadas (viram o caractere real); em 23/09/2026 aconteceu também com `
-` dentro de texto JSON/Markdown gerado por script. Para gravar o escape num arquivo, gerar via script a partir do código do caractere. Varredura de caracteres invisíveis em `src/`:
+- **Escapes no texto das ferramentas:** sequências `\uXXXX` escritas no conteúdo de um comando ou arquivo chegam decodificadas (viram o caractere real); em 23/09/2026 aconteceu também com `\r\n` dentro de texto JSON/Markdown gerado por script. Para gravar o escape num arquivo, gerar via script a partir do código do caractere. Varredura de caracteres invisíveis em `src/`:
   `node -e 'const fs=require("fs"),p=require("path");const r=/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u00a0\u200b\ufeff\uffff\u0300-\u036f]/;(function a(d){for(const n of fs.readdirSync(d)){const f=p.join(d,n);fs.statSync(f).isDirectory()?a(f):/\.(ts|tsx|css)$/.test(n)&&r.test(fs.readFileSync(f,"utf8"))&&console.log(f)}})("src")'`
   (este documento é Markdown e não passa pelo Prettier; o comando acima foi escrito com os escapes literais).
 - **Fontes de normas (7.1):** o Planalto derruba a conexão com o User-Agent padrão do Node (usar `Mozilla/5.0 (compatible; …)`); Planalto e ALESP injetam um `<script>` diferente a cada requisição, então hash de norma é sempre sobre o conteúdo sem scripts (ou sanitizado), nunca sobre os bytes. Detalhes em `planos/F2.md` › "Fatos das fontes".
