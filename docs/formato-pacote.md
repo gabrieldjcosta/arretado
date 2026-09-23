@@ -44,7 +44,7 @@ conteudo.cifrado        o ZIP "sem cifra" acima, cifrado
 | `arquivos` | por caminho: `sha256` (hex), `bytes` |
 | `hashConjunto` | SHA-256 das linhas `caminho<TAB>sha256\n` de todos os arquivos, em ordem de caminho |
 
-Cada arquivo de dados é JSON canônico (chaves ordenadas), então o mesmo conteúdo gera sempre o mesmo hash: exportar → apagar → restaurar → exportar produz `hashConjunto` idêntico.
+Cada arquivo de dados é JSON canônico (chaves ordenadas), então o mesmo conteúdo gera sempre o mesmo hash: exportar → apagar → restaurar → exportar produz arquivos de dados idênticos, byte a byte (só `dados/aparelhos.json` ganha o registro do Aparelho que restaurou, que nunca é apagado). No mesmo aparelho, sem apagar, o `hashConjunto` é idêntico.
 
 ## Validação na importação
 
