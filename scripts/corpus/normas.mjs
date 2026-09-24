@@ -39,6 +39,7 @@ const TAMANHO_MINIMO = 20_000;
  * @property {string} url
  * @property {string[]} marcadores Trechos (minúsculas, espaço simples) que só aparecem se a
  *   página for a norma certa **e** estiver decodificada com o charset certo.
+ * @property {number} [limiarTachados] Troca o `LIMIAR_TACHADOS` para lei pouco alterada.
  */
 
 /** @type {readonly NormaDoCorpus[]} */
@@ -91,6 +92,41 @@ export const NORMAS = [
     url: 'https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2006/lei.complementar-988-09.01.2006.html',
     // A ALESP escreve o ordinal com sinal de grau ("Artigo 1°", "N° 988").
     marcadores: ['organiza a defensoria pública do estado', 'artigo 1°'],
+  },
+  {
+    id: 'eca',
+    titulo: 'Lei nº 8.069/1990 — Estatuto da Criança e do Adolescente',
+    papel: 'apoio',
+    variante: 'todas-as-redacoes',
+    url: 'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm',
+    marcadores: ['estatuto da criança e do adolescente', 'art. 1º'],
+  },
+  {
+    id: 'eca-compilado',
+    titulo: 'Lei nº 8.069/1990 — Estatuto da Criança e do Adolescente (compilado)',
+    papel: 'apoio',
+    variante: 'compilado',
+    url: 'https://www.planalto.gov.br/ccivil_03/leis/l8069compilado.htm',
+    marcadores: ['estatuto da criança e do adolescente', 'art. 1º'],
+  },
+  {
+    id: 'cdc',
+    titulo: 'Lei nº 8.078/1990 — Código de Defesa do Consumidor',
+    papel: 'apoio',
+    variante: 'todas-as-redacoes',
+    url: 'https://www.planalto.gov.br/ccivil_03/leis/l8078.htm',
+    // O CDC escreve "Art. 1°" (sinal de grau) e tem poucas redações tachadas: 14 em 24/09/2026.
+    marcadores: ['proteção do consumidor', 'art. 1°'],
+    limiarTachados: 10,
+  },
+  {
+    id: 'cdc-compilado',
+    titulo: 'Lei nº 8.078/1990 — Código de Defesa do Consumidor (compilado)',
+    papel: 'apoio',
+    variante: 'compilado',
+    url: 'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm',
+    marcadores: ['proteção do consumidor', 'art. 1°'],
+    limiarTachados: 10,
   },
   {
     id: 'cf',
@@ -284,12 +320,13 @@ export function conferirConteudo(norma, bytes, charset) {
     }
   }
   const tachados = contarTachados(html);
-  if (norma.variante === 'todas-as-redacoes' && tachados < LIMIAR_TACHADOS) {
+  const limiar = norma.limiarTachados ?? LIMIAR_TACHADOS;
+  if (norma.variante === 'todas-as-redacoes' && tachados < limiar) {
     problemas.push(
       `${norma.id}: só ${String(tachados)} tachados — não parece a página com todas as redações`,
     );
   }
-  if (norma.variante === 'compilado' && tachados >= LIMIAR_TACHADOS) {
+  if (norma.variante === 'compilado' && tachados >= limiar) {
     problemas.push(`${norma.id}: ${String(tachados)} tachados — não parece a página compilada`);
   }
   return problemas;

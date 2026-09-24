@@ -2,6 +2,42 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/lc80.gabarito.json` › `conferencia`.
 
+## Conferência reduzida (24/09/2026) — conferir só esta seção
+
+Depois da CF sem divergência, bastam estes 8 itens de risco (tachado, revogado, vetado, artigo com letra). Marque `[x]` aqui mesmo; o resto da folha (a amostra completa, mais abaixo) pode ser ignorado.
+
+- [ ] **art15A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art15a)
+  - Art. 15-A. A organização da Defensoria Pública da União deve primar pela descentralização, e sua atuação deve incluir atendimento interdisciplinar, bem como a tutela dos interesses individuais, difusos, coletivos e individuais homogêneos. .
+  - Nota: (Incluído pela Lei Complementar nº 132, de 2009)
+- [ ] **art22.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art22)
+  - Parágrafo único. (vetado)
+- [ ] **art39.par2.incV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art39)
+  - V - (revogado)
+  - Nota: (Redação dada pela Lei Complementar nº 98, de 1999)
+  - Redação anterior (tachado): ~~V - representação;~~
+- [ ] **art40** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art40)
+  - Art. 40. (revogado)
+  - Nota: (Revogado pela Lei Complementar nº 98, de 1999)
+  - Redação anterior (revogacao): ~~Art. 40. Os membros da Defensoria Pública da União terão direito a férias anuais de sessenta dias, individual ou coletivamente. (Revogado pela Lei Complementar nº 98, de 1999).~~
+- [ ] **art84.par2.incV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art84)
+  - V - (revogado)
+  - Nota: (Redação dada pela Lei Complementar nº 98, de 1999)
+  - Redação anterior (tachado): ~~V - representação;~~
+- [ ] **art85** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art85)
+  - Art. 85. (revogado)
+  - Nota: (Revogado pela Lei Complementar nº 98, de 1999)
+  - Redação anterior (revogacao): ~~Art. 85. Os membros da Defensoria Pública do Distrito Federal e dos Territórios terão direito a férias anuais de sessenta dias, individual ou coletivamente. (Revogado pela Lei Complementar nº 98, de 1999).~~
+- [ ] **art97B** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art97b)
+  - Art. 97-B. A Defensoria Pública do Estado elaborará sua proposta orçamentária atendendo aos seus princípios, às diretrizes e aos limites definidos na lei de diretrizes orçamentárias, encaminhando-a ao Chefe do Poder Executivo para consolidação e encaminhamento ao Poder Legislativo. .
+  - Nota: (Incluído pela Lei Complementar nº 132, de 2009)
+- [ ] **art101** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp80.htm#art101)
+  - Art. 101. A composição do Conselho Superior da Defensoria Pública do Estado deve incluir obrigatoriamente o Defensor Público-Geral, o Subdefensor Público-Geral, o Corregedor-Geral e o Ouvidor-Geral, como membros natos, e, em sua maioria, representantes estáveis da Carreira, eleitos pelo voto direto, plurinominal, obrigatório e secreto de seus membros, em número e forma a serem fixados em lei estadual. .
+  - Nota: (Redação dada pela Lei Complementar nº 132, de 2009)
+  - Redação anterior (tachado): ~~Art. 101. O Conselho Superior da Defensoria Pública do Estado é composto pelo Defensor Publico-Geral, pelo Subdefensor Publico-Geral e pelo Corregedor-Geral, como membros natos, e por representantes da categoria mais elevada da carreira, em número e forma a serem fixados em lei estadual.~~
+  - Redação anterior (tachado) [lida como art101.parUnico]: ~~Parágrafo único. O Conselho Superior será presidido pelo Defensor Publico-Geral.~~
+
+---
+
 ## Como conferir (~30 min)
 
 1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
