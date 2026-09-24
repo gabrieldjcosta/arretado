@@ -16,7 +16,7 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 - Artigos: vigente 411, revogado 13; com letra (9º-A…): 36; último: adct.art138
 - Bloco com numeração própria `adct`: começa em adct.art1, depois de art250
 - Redações anteriores: 751 em 485 dispositivos
-- Notas de vigência no texto vigente: 1925
+- Notas de vigência no texto vigente: 1946
 - Estrutura: titulo 9, capitulo 33, secao 51, subsecao 5, bloco 1
 
 ## Amostra (50 dispositivos)
@@ -105,28 +105,31 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 - [x] **art167D** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167d)
   - Art. 167-D. As proposições legislativas e os atos do Poder Executivo com propósito exclusivo de enfrentar a calamidade e suas consequências sociais e econômicas, com vigência e efeitos restritos à sua duração, desde que não impliquem despesa obrigatória de caráter continuado, ficam dispensados da observância das limitações legais quanto à criação, à expansão ou ao aperfeiçoamento de ação governamental que acarrete aumento de despesa e à concessão ou à ampliação de incentivo ou benefício de natureza tributária da qual decorra renúncia de receita.
   - Nota: (Incluído pela Emenda Constitucional nº 109, de 2021)
-- [x] **art171.par1** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art171)
-  - § 1º - (revogado)
+- [ ] **art171.par1.incI** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art171)
+  - I - (revogado)
   - Nota: (Revogado pela Emenda Constitucional nº 6, de 1995)
-  - Redação anterior (revogacao): ~~§ 1º - A lei poderá, em relação à empresa brasileira de capital nacional: (Revogado pela Emenda Constitucional nº 6, de 1995)~~
+  - Redação anterior (revogacao): ~~I - conceder proteção e benefícios especiais temporários para desenvolver atividades consideradas estratégicas para a defesa nacional ou imprescindíveis ao desenvolvimento do País; (Revogado pela Emenda Constitucional nº 6, de 1995)~~
 - [x] **art195.par13** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art195)
   - § 13. (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 103, de 2019)
   - Redação anterior (revogacao): ~~§ 13. Aplica-se o disposto no § 12 inclusive na hipótese de substituição gradual, total ou parcial, da contribuição incidente na forma do inciso I, a, pela incidente sobre a receita ou o faturamento. (Incluído pela Emenda Constitucional nº 42, de 19.12.2003) (Revogado pela Emenda Constitucional nº 1~~
-- [x] **art198.par3.incIV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
-  - IV - (revogado)
-  - Nota: (Redação dada pela Emenda Constitucional nº 86, de 2015)
-  - Redação anterior (tachado): ~~IV - as normas de cálculo do montante a ser aplicado pela União; (Incluído pela Emenda Constitucional nº 29, de 2000)~~
-- [x] **art198.par6** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
-  - § 6º Além das hipóteses previstas no § 1º do art. 41 e no § 4º do art. 169 da Constituição Federal, o servidor que exerça funções equivalentes às de agente comunitário de saúde ou de agente de combate às endemias poderá perder o cargo em caso de descumprimento dos requisitos específicos, fixados em lei, para o seu exercício.
-  - Nota: (Incluído pela Emenda Constitucional nº 51, de 2006)
+- [ ] **art198.par5** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
+  - § 5º Lei federal disporá sobre o regime jurídico, o piso salarial profissional nacional, as diretrizes para os Planos de Carreira e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias, competindo à União, nos termos da lei, prestar assistência financeira complementar aos Estados, ao Distrito Federal e aos Municípios, para o cumprimento do referido piso salarial.
+  - Nota: (Redação dada pela Emenda Constitucional nº 63, de 2010)
+  - Nota: Regulamento
+  - Redação anterior (tachado): ~~§ 5º Lei federal disporá sobre o regime jurídico e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias. (Incluído pela Emenda Constitucional nº 51, de 2006) (Vide Medida provisória nº 297. de 2006)~~
 - [x] **art212A.incX.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art212a)
   - a) a organização dos fundos referidos no inciso I do caput deste artigo e a distribuição proporcional de seus recursos, as diferenças e as ponderações quanto ao valor anual por aluno entre etapas, modalidades, duração da jornada e tipos de estabelecimento de ensino, observados as respectivas especificidades e os insumos necessários para a garantia de sua qualidade;
   - Nota: (Incluído pela Emenda Constitucional nº 108, de 2020)
-- [x] **art220** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art220)
-  - Art. 220. A manifestação do pensamento, a criação, a expressão e a informação, sob qualquer forma, processo ou veículo não sofrerão qualquer restrição, observado o disposto nesta Constituição.
+- [ ] **art219B.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art219b)
+  - § 2º Os Estados, o Distrito Federal e os Municípios legislarão concorrentemente sobre suas peculiaridades.
+  - Nota: (Incluído pela Emenda Constitucional nº 85, de 2015)
 - [x] **art227.par3.incIV** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art227)
   - IV - garantia de pleno e formal conhecimento da atribuição de ato infracional, igualdade na relação processual e defesa técnica por profissional habilitado, segundo dispuser a legislação tutelar específica;
+- [ ] **art233.par2** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art233)
+  - § 2º (revogado)
+  - Nota: (Revogado pela Emenda Constitucional nº 28, de 25/05/2000)
+  - Redação anterior (revogacao): ~~§ 2º Fica ressalvado ao empregado, em qualquer hipótese, o direito de postular, judicialmente, os créditos que entender existir, relativamente aos últimos cinco anos. (Revogado pela Emenda Constitucional nº 28, de 25/05/2000)~~
 - [x] **adct.art24** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart24)
   - Art. 24. A União, os Estados, o Distrito Federal e os Municípios editarão leis que estabeleçam critérios para a compatibilização de seus quadros de pessoal ao disposto no art. 39 da Constituição e à reforma administrativa dela decorrente, no prazo de dezoito meses, contados da sua promulgação.
 - [x] **adct.art27.par10** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart27)

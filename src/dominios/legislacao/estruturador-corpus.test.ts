@@ -1,7 +1,8 @@
 // Estruturador sobre o corpus, contra o gabarito da 7.3, que não sai do estruturador: a árvore
 // estrutural (tipo, rótulo, nome e primeiro artigo de cada nó; 8.2), os blocos pré-normativos
 // (regra 2) das 11 páginas, os artigos, em ordem, sem sangria e com a rubrica (regras 4 e 5; 8.3),
-// e os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4).
+// os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4) e as
+// notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito.
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import {
@@ -62,7 +63,7 @@ describe('estruturador (8.2) no corpus', () => {
     'árvore estrutural × gabarito: %s',
     async (id) => {
       const gabarito = await gabaritoDe(id);
-      expect(estruturaDe((await rascunho(id)).nos)).toEqual(estruturaEsperada(id, gabarito));
+      expect(estruturaDe((await rascunho(id)).nos)).toEqual(estruturaEsperada(gabarito));
     },
     60_000,
   );
@@ -167,13 +168,16 @@ describe('estruturador (8.2) no corpus: blocos pré-normativos (regra 2)', () =>
   );
 });
 
-/** Até a 8.6: artigos revogados todo tachados, fora da árvore (medido em 24/09/2026). */
+/**
+ * Até a 8.6: artigos revogados todo tachados, fora da árvore (medido em 24/09/2026; no ECA, o art.
+ * 233 desde a 8.5, que leu a nota sem o parêntese de fecho).
+ */
 const REVOGADOS_FORA: Record<string, number> = {
   lep: 1,
   cp: 27,
   lc80: 2,
   'lc-sp-988': 0,
-  eca: 1,
+  eca: 2,
   cdc: 0,
   cf: 13,
 };
@@ -193,7 +197,7 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
     async (id) => {
       const achados = artigosDe((await rascunho(id)).nos);
       const enderecos = achados.map((a) => a.endereco);
-      const todos = artigosEsperados(id, await gabaritoDe(id));
+      const todos = artigosEsperados(await gabaritoDe(id));
       const esperados = semRevogadosAusentes(todos, enderecos);
       expect(enderecos).toEqual(esperados.map((e) => e.endereco));
       expect(todos.length - esperados.length).toBe(REVOGADOS_FORA[id]);
@@ -250,7 +254,7 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
       const achados = artigosDe((await rascunho(id)).nos);
       const gabarito = await gabaritoDe(id.replace('-compilado', ''));
       expect(achados.map((a) => a.endereco)).toEqual(
-        artigosEsperados(id, gabarito).map((e) => e.endereco),
+        artigosEsperados(gabarito).map((e) => e.endereco),
       );
       expect(sangrias(achados)).toEqual([]);
     },
@@ -258,13 +262,16 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
   );
 });
 
-/** Até a 8.6: artigos e dispositivos revogados todo tachados, fora da árvore (medido em 24/09/2026). */
+/**
+ * Até a 8.6: artigos e dispositivos revogados todo tachados, fora da árvore (medido em 24/09/2026;
+ * no ECA, o art. 233 e os §§ 1º a 3º desde a 8.5).
+ */
 const DISPOSITIVOS_REVOGADOS_FORA: Record<string, number> = {
   lep: 10,
   cp: 90,
   lc80: 4,
   'lc-sp-988': 0,
-  eca: 6,
+  eca: 10,
   cdc: 0,
   cf: 44,
 };
@@ -292,8 +299,8 @@ const DIFERENCA_DA_COMPILADA: Record<string, { aMais: string[]; aMenos: string[]
       ...['I', 'II', 'III'].map((n) => `art234.par1.inc${n}`),
     ],
   },
-  // A compilada resume o art. 233 (revogado) numa linha.
-  'eca-compilado': { aMais: [], aMenos: ['art233.par1', 'art233.par2', 'art233.par3'] },
+  // A compilada resume o art. 233 (revogado) numa linha; os §§ 1º a 3º são filhos do revogado.
+  'eca-compilado': { aMais: [], aMenos: [] },
   'cdc-compilado': { aMais: [], aMenos: [] },
 };
 
@@ -326,7 +333,7 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
     async (id) => {
       const achados = dispositivosDe((await rascunho(id)).nos);
       const enderecos = achados.map((d) => d.endereco);
-      const todos = dispositivosEsperados(id, await gabaritoDe(id));
+      const todos = dispositivosEsperados(await gabaritoDe(id));
       const esperados = semRevogadosAusentes(todos, enderecos);
       expect(enderecos).toEqual(esperados.map((e) => e.endereco));
       expect(todos.length - esperados.length).toBe(DISPOSITIVOS_REVOGADOS_FORA[id]);
@@ -342,12 +349,10 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
           e.textoDoNome === undefined ? [] : [[e.endereco, e.textoDoNome]],
         ),
       );
-      // Texto da amostra (sem as notas, 8.5; sem o tachado parcial, 8.6), com "Pena -" depois de
-      // uma quebra de linha: cada dispositivo com o seu texto, sem sangria.
+      // Texto da amostra (sem o tachado parcial, 8.6), com "Pena -" depois de uma quebra de linha:
+      // cada dispositivo com o seu texto, sem sangria e sem as notas (8.5).
       const textos = esperados.flatMap((e, k) =>
-        e.texto === undefined
-          ? []
-          : [[e.endereco, paraComparar(achados[k]?.texto ?? '', e.texto.notas)]],
+        e.texto === undefined ? [] : [[e.endereco, paraComparar(achados[k]?.texto ?? '')]],
       );
       expect(textos).toEqual(
         esperados.flatMap((e) =>
@@ -362,7 +367,7 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
     '%s: endereços × gabarito da página (sem os filhos do revogado)',
     async (id) => {
       const achados = dispositivosDe((await rascunho(id)).nos).map((d) => d.endereco);
-      const esperados = dispositivosEsperados(id, await gabaritoDe(id.replace('-compilado', '')));
+      const esperados = dispositivosEsperados(await gabaritoDe(id.replace('-compilado', '')));
       const status = new Map(esperados.map((e) => [e.endereco, e.status]));
       const filhoDeRevogado = (e: string) =>
         e
@@ -444,4 +449,53 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
     expect(artigos[artigos.length - 1]).toBe('dt.art21');
     expect(lcsp.nos.some((n) => n.tipo === 'bloco')).toBe(false);
   }, 60_000);
+});
+
+/** Regra 7 no texto: parêntese com a chave de nota, ou "Vigência"/"Regulamento"/"Produção de efeitos" no fim. */
+const NOTA_NO_TEXTO =
+  /\((?:Reda[cç][aã]o dada|Inclu[ií]d[oa]|Revogad[oa] pel|Vide|Renumerad|Acrescid|Express[aã]o |NR\))|(?:Vig[eê]ncia|Regulamento|Produ[cç][aã]o de efeitos?)$/u;
+
+/**
+ * A nota com lei e ano mais recente de cada norma (8.5), só entre as que alteram o texto: sem o
+ * "Vide", a da CF seria a "(Vide Lei Complementar nº 230, de 2026)" e a do CDC, o decreto que o
+ * regulamenta (Decreto 11.034/2022).
+ */
+const MAIS_RECENTE: Record<string, { lei: string; ano: number }> = {
+  lep: { lei: 'Lei nº 15.410', ano: 2026 },
+  cp: { lei: 'Lei nº 15.517', ano: 2026 },
+  lc80: { lei: 'Lei Complementar nº 132', ano: 2009 },
+  'lc-sp-988': { lei: 'Lei Complementar nº 1.434', ano: 2025 },
+  eca: { lei: 'Lei nº 15.512', ano: 2026 },
+  cdc: { lei: 'Lei nº 14.181', ano: 2021 },
+  cf: { lei: 'Emenda Constitucional nº 139', ano: 2026 },
+};
+
+describe('estruturador (8.5) no corpus: notas de vigência (regra 7)', () => {
+  it.each(COM_GABARITO)(
+    '%s: notas fora do texto, na contagem do gabarito e com o texto da amostra',
+    async (id) => {
+      const r = await rascunho(id);
+      const achados = dispositivosDe(r.nos);
+      const esperados = semRevogadosAusentes(
+        dispositivosEsperados(await gabaritoDe(id)),
+        achados.map((d) => d.endereco),
+      );
+      // A mesma lista da 8.4, com a contagem de notas de cada dispositivo.
+      expect(achados.map((d) => [d.endereco, d.notas.length])).toEqual(
+        esperados.map((e) => [e.endereco, e.notas]),
+      );
+      const notas = esperados.flatMap((e, k) =>
+        e.texto === undefined ? [] : [[e.endereco, (achados[k]?.notas ?? []).map(paraComparar)]],
+      );
+      expect(notas).toEqual(
+        esperados.flatMap((e) =>
+          e.texto === undefined ? [] : [[e.endereco, e.texto.notas.map(paraComparar)]],
+        ),
+      );
+      // Nenhuma nota no texto ("(Revogado)" sozinho é texto).
+      expect(achados.filter((d) => NOTA_NO_TEXTO.test(d.texto)).map((d) => d.endereco)).toEqual([]);
+      expect(r.notaVigenciaMaisRecente).toEqual(MAIS_RECENTE[id]);
+    },
+    60_000,
+  );
 });

@@ -63,6 +63,8 @@ describe('estruturador: blocos pré-normativos (regra 2)', () => {
         texto: '(Vide Lei nº 1.521, de 1951)',
         tipo: 'vide',
         linha: 6,
+        lei: 'Lei nº 1.521',
+        ano: 1951,
         link: 'https://www.planalto.gov.br/l1521',
       },
     ]);
@@ -312,6 +314,8 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
         texto: 'Subseção VII acrescentada pela Lei Complementar nº 1.434, de 11/09/2025.',
         tipo: 'incluido',
         linha: 2,
+        lei: 'Lei Complementar nº 1.434',
+        ano: 2025,
       },
     ]);
     expect(porEndereco(r, 'art71A')).toBeDefined();
@@ -1042,9 +1046,14 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
         '(Incluído pela Lei nº 12.313, de 2010).',
       ),
     );
+    // O "(NR)" do fim do texto (8.5) e depois a nota em linha própria.
     expect(porEndereco(r, 'art97.incX')?.notas.map((n) => n.texto)).toEqual([
+      '(NR)',
       'Inciso X acrescentado pela Lei Complementar nº 1.295, de 02/01/2017.',
     ]);
+    expect(textoDe(porEndereco(r, 'art97.incX')?.trechos ?? [])).toBe(
+      'compensação em razão de atividades;',
+    );
     expect(porEndereco(r, 'art97.incI')?.notas.map((n) => n.tipo)).toEqual(['incluido']);
     expect(porEndereco(r, 'art97')?.linhas.fim).toBe(4);
   });
@@ -1096,11 +1105,9 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
     expect(par2?.filhos.map((f) => f.endereco)).toEqual(['art141.par2.incI', 'art141.par2.incII']);
     expect(par2?.redacoesAnteriores).toEqual([
       {
-        trechos: [
-          { texto: '§ 2º' },
-          { texto: ' ' },
-          { texto: '(VETADO). (Incluído pela Lei nº 13.964, de 2019)' },
-        ],
+        // Desde a 8.5, a nota sai do texto e vai para a `nota` da redação.
+        trechos: [{ texto: '§ 2º' }, { texto: ' ' }, { texto: '(VETADO).' }],
+        nota: '(Incluído pela Lei nº 13.964, de 2019)',
         origemDeteccao: 'heuristica',
         confirmada: false,
         linhas: { inicio: 2, fim: 3 },
@@ -1255,5 +1262,185 @@ describe('ordem de leitura (Dispositivo.ordem, 8.4)', () => {
       ['adct', undefined, 8],
       ['adct.art1', 'adct', 9],
     ]);
+  });
+});
+
+describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
+  const notasDe = (no: NoRascunho | undefined) => no?.notas.map((n) => n.texto) ?? [];
+  const texto = (r: Rascunho, endereco: string) => textoDe(porEndereco(r, endereco)?.trechos ?? []);
+
+  it('as notas do fim da linha saem do texto, com espécie, lei, ano e link; as da pena vão para o mesmo dispositivo (CP, art. 159, § 3º)', () => {
+    const r = estruturar(
+      blocos(
+        b(
+          'Art. 159 - Seqüestrar pessoa com o fim de obter vantagem: ',
+          { texto: '(Vide Lei nº 8.072, de 25.7.90)', link: 'https://www.planalto.gov.br/l8072' },
+          ' ',
+          { texto: 'Vigência', link: 'https://www.planalto.gov.br/v' },
+        ),
+        '§ 3º - Se resulta a morte: (Vide Lei nº 8.072, de 25.7.90)',
+        'Pena - reclusão, de vinte e quatro a trinta anos. (Redação dada pela Lei nº 8.072, de 25.7.1990)',
+      ),
+    );
+    expect(texto(r, 'art159')).toBe('Seqüestrar pessoa com o fim de obter vantagem:');
+    expect(porEndereco(r, 'art159')?.notas).toEqual([
+      {
+        texto: '(Vide Lei nº 8.072, de 25.7.90)',
+        tipo: 'vide',
+        linha: 0,
+        lei: 'Lei nº 8.072',
+        ano: 1990,
+        link: 'https://www.planalto.gov.br/l8072',
+      },
+      { texto: 'Vigência', tipo: 'vigencia', linha: 0, link: 'https://www.planalto.gov.br/v' },
+    ]);
+    // A nota no meio (antes da pena) também sai: cada linha perde as suas antes de emendar.
+    expect(texto(r, 'art159.par3')).toBe(
+      'Se resulta a morte:\nPena - reclusão, de vinte e quatro a trinta anos.',
+    );
+    expect(notasDe(porEndereco(r, 'art159.par3'))).toEqual([
+      '(Vide Lei nº 8.072, de 25.7.90)',
+      '(Redação dada pela Lei nº 8.072, de 25.7.1990)',
+    ]);
+    // Só as que alteram o texto contam para a mais recente ("Vide" não).
+    expect(r.notaVigenciaMaisRecente).toEqual({ lei: 'Lei nº 8.072', ano: 1990 });
+  });
+
+  it('dispositivo só com nota: texto vazio ou "(Revogado)"; "(VETADO)" e "(Revogado)" sozinhos são texto', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto:',
+        'I - (revogado); (Redação dada pela Lei nº 14.843, de 2024)',
+        'II - (VETADO) (Incluído pela Lei nº 14.197, de 2021) (Vigência)',
+        'Art. 2º (Revogado pela Lei nº 10.713, de 13.8.2003)',
+      ),
+    );
+    expect(texto(r, 'art1.incI')).toBe('(revogado);');
+    expect(texto(r, 'art1.incII')).toBe('(VETADO)');
+    expect(notasDe(porEndereco(r, 'art1.incII'))).toEqual([
+      '(Incluído pela Lei nº 14.197, de 2021)',
+      '(Vigência)',
+    ]);
+    expect(texto(r, 'art2')).toBe('');
+    expect(porEndereco(r, 'art2')?.notas.map((n) => [n.tipo, n.lei, n.ano])).toEqual([
+      ['revogado', 'Lei nº 10.713', 2003],
+    ]);
+  });
+
+  it('formas sem parênteses: "Vigência" e "Regulamento" soltos, nota sem parênteses (CP, art. 232-A), "Vide" solto, número solto (LEP, art. 18-A)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 17. É livre a criação de partidos, observados os seguintes preceitos: Regulamento',
+        'I - o crime é cometido com violência; ou Incluído pela Lei nº 13.445, de 2017 Vigência',
+        '§ 2º - Aplica-se o disposto no § 3º do artigo anterior. Vide Lei nº 8.072, de 25.7.90',
+        '§ 3º As ações atenderão aos presos e às presas. 7.627 (Incluído pela Lei nº 13.163, de 2015)',
+        '§ 4º O regulamento disporá na forma do Regulamento.',
+        'Art. 18. Texto. (Redação dada pela Emenda Constitucional nº 15, de 1996) Vide art. 96 - ADCT (Vide Lei Complementar nº 230, de 2026)',
+      ),
+    );
+    expect(texto(r, 'art17')).toBe(
+      'É livre a criação de partidos, observados os seguintes preceitos:',
+    );
+    expect(porEndereco(r, 'art17')?.notas.map((n) => n.tipo)).toEqual(['regulamento']);
+    expect(texto(r, 'art17.incI')).toBe('o crime é cometido com violência; ou');
+    expect(notasDe(porEndereco(r, 'art17.incI'))).toEqual([
+      'Incluído pela Lei nº 13.445, de 2017',
+      'Vigência',
+    ]);
+    expect(texto(r, 'art17.par2')).toBe('Aplica-se o disposto no § 3º do artigo anterior.');
+    expect(notasDe(porEndereco(r, 'art17.par2'))).toEqual(['Vide Lei nº 8.072, de 25.7.90']);
+    expect(texto(r, 'art17.par3')).toBe('As ações atenderão aos presos e às presas.');
+    expect(porEndereco(r, 'art17.par3')?.notas.map((n) => [n.texto, n.tipo])).toEqual([
+      ['7.627', 'outra'],
+      ['(Incluído pela Lei nº 13.163, de 2015)', 'incluido'],
+    ]);
+    // "Regulamento" depois de palavra em minúscula é texto.
+    expect(texto(r, 'art17.par4')).toBe('O regulamento disporá na forma do Regulamento.');
+    expect(notasDe(porEndereco(r, 'art18'))).toEqual([
+      '(Redação dada pela Emenda Constitucional nº 15, de 1996)',
+      'Vide art. 96 - ADCT',
+      '(Vide Lei Complementar nº 230, de 2026)',
+    ]);
+  });
+
+  it('nota sem o parêntese de fecho (ECA, art. 233), "(NR)" da ALESP, ")" sobrando (CP, art. 313-A) e a pontuação depois da nota', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 233. (Revogado pela Lei nº 9.455, de 7.4.1997 :',
+        'Art. 313-A. Inserir dados falsos com o fim de causar dano: (Incluído pela Lei nº 9.983, de 2000) )',
+        'Art. 135-A. Exigir garantia como condição para o atendimento emergencial (Incluído pela Lei nº 12.653, de 2012).',
+        'Artigo 97 - Compensação em razão de atividades. (NR)',
+      ),
+    );
+    expect(texto(r, 'art233')).toBe('');
+    expect(notasDe(porEndereco(r, 'art233'))).toEqual(['(Revogado pela Lei nº 9.455, de 7.4.1997']);
+    expect(porEndereco(r, 'art233')?.notas[0]).toMatchObject({ lei: 'Lei nº 9.455', ano: 1997 });
+    expect(texto(r, 'art313A')).toBe('Inserir dados falsos com o fim de causar dano:');
+    expect(notasDe(porEndereco(r, 'art313A'))).toEqual(['(Incluído pela Lei nº 9.983, de 2000)']);
+    expect(texto(r, 'art135A')).toBe(
+      'Exigir garantia como condição para o atendimento emergencial.',
+    );
+    expect(porEndereco(r, 'art97')?.notas.map((n) => n.tipo)).toEqual(['nr']);
+    expect(texto(r, 'art97')).toBe('Compensação em razão de atividades.');
+  });
+
+  it('nota sem o parêntese de fecho ao lado do tachado faz a linha tachada (ECA, art. 233, todo tachado)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 232. Texto.',
+        b(
+          tachado('Art. 233. Submeter criança a tortura:'),
+          ' (Revogado pela Lei nº 9.455, de 7.4.1997',
+        ),
+        b(
+          tachado('Pena - reclusão de um a cinco anos.'),
+          ' (Revogado pela Lei nº 9.455, de 7.4.1997 :',
+        ),
+        'Art. 234. Texto.',
+      ),
+    );
+    expect(todos(r.nos).map((n) => n.endereco)).toEqual(['art232', 'art234']);
+    expect(r.descartes).toContainEqual({
+      motivo: 'redacao_anterior',
+      linhas: { inicio: 1, fim: 2 },
+    });
+  });
+
+  it('linha só de notas logo depois de uma linha tachada vai com ela para o descarte (CP, art. 214)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 213. Texto. (Redação dada pela Lei nº 12.015, de 2009)',
+        b(tachado('Art. 214 - Constranger alguém a praticar ato libidinoso:')),
+        '(Revogado pela Lei nº 12.015, de 2009)',
+        b(tachado('Pena - reclusão de dois a sete anos.')),
+        'Art. 215. Texto.',
+      ),
+    );
+    expect(notasDe(porEndereco(r, 'art213'))).toEqual([
+      '(Redação dada pela Lei nº 12.015, de 2009)',
+    ]);
+    expect(r.descartes).toContainEqual({
+      motivo: 'redacao_anterior',
+      linhas: { inicio: 1, fim: 3 },
+    });
+  });
+
+  it('notas do nó, da rubrica e da norma continuam fora do texto e entram na mais recente', () => {
+    const r = estruturar(
+      blocos(
+        'LEI Nº 1, DE 1º DE JANEIRO DE 2000',
+        '(Vide Lei nº 9.999, de 2025)',
+        'Dispõe sobre algo.',
+        'O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta e eu sanciono a seguinte Lei:',
+        'CAPÍTULO I',
+        'DAS DISPOSIÇÕES GERAIS (Redação dada pela Lei nº 10.000, de 26.6.2014)',
+        'Aumento de pena (Incluído pela Lei nº 10.001, de 2014)',
+        'Art. 1º Texto. (Redação dada pela Lei nº 9.000, de 2019)',
+      ),
+    );
+    expect(nomeDe(porEndereco(r, 'cap1'))).toBe('DAS DISPOSIÇÕES GERAIS');
+    expect(nomeDe(porEndereco(r, 'art1'))).toBe('Aumento de pena');
+    // 2019 é o maior ano; a "Vide" (2025) não conta.
+    expect(r.notaVigenciaMaisRecente).toEqual({ lei: 'Lei nº 9.000', ano: 2019 });
   });
 });

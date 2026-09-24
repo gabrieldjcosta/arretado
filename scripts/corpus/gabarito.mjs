@@ -116,9 +116,6 @@ export const DECISOES = {
   'cp:artigo-sem-ancora:art248': 'a âncora saiu como "art2248" (falha da fonte)',
   'cp:artigo-sem-ancora:art253': 'a âncora saiu como "art2253" (falha da fonte)',
   'cp:artigo-sem-ancora:art287': 'a âncora saiu como name="287", sem "art" (falha da fonte)',
-  'eca:so-na-pagina:art233':
-    'o art. 233 foi revogado inteiro (Lei 9.455/1997); a página traz caput, penas e §§ 1º a 3º ' +
-    'tachados, e a compilada só "Art. 233. (Revogado…)"; os parágrafos são redação anterior',
   'eca:ancora:art469':
     'falha de digitação da fonte: name="art469" na redação tachada do art. 46 (a vigente é "art46.")',
   'eca:artigo-sem-ancora:art46':
@@ -291,7 +288,8 @@ const RE_ALINEA = new RegExp(String.raw`^([a-z])${SUFIXO}\s*\)\s*`);
 const RE_ITEM = /^(\d+)\s*(?:[.)]\s*[-–]?|[-–])\s*(?=\S)/;
 /** "ANEXO", "ANEXO I", "ANEXO - Revogado." (ALESP); só em maiúsculas (regra 11). */
 const RE_ANEXO = /^ANEXO(?:\s+([IVXLC]+|[ÚU]NICO))?(?![A-Za-zÀ-ú])\s*[-–—.:]?\s*/;
-const RE_PENA = /^Pena\s*[-–:]/;
+/** "Pena - …", "Pena: …" e "Pena Detenção…" (CDC, sem hífen); "Pena de multa" é rubrica (CP). */
+const RE_PENA = /^Pena\s*[-–:]|^Pena\s+(?:[Rr]eclus|[Dd]eten|[Pp]ris|[Mm]ulta)/;
 const TIPO_ESTRUTURAL = /** @type {Record<string, TipoEstrutural>} */ ({
   PARTE: 'parte',
   LIVRO: 'livro',
@@ -366,15 +364,40 @@ export function rotulo(t) {
  */
 const CHAVES_NOTA =
   '(?:Reda[çc][ãa]o dada|Inclu[íi]d[oa]|Revogad[oa]|Vide|Vig[êe]ncia|Renumerad[oa]|Regulamento|' +
-  'Promulga[çc][ãa]o|Produ[çc][ãa]o de efeito|Acrescid[oa]|Suprimid[oa]|NR(?=\\s*\\)))';
+  'Promulga[çc][ãa]o|Produ[çc][ãa]o de efeito|Acrescid[oa]|Suprimid[oa]|' +
+  'Express[ãa]o (?:substitu[íi]d|declarad|suprimid|acrescid|inclu[íi]d|revogad)[oa]|NR(?=\\s*\\)))';
 /**
- * Parênteses com uma chave de nota (admite um nível de parênteses dentro); ou "Vigência" sem
- * parênteses logo depois de outra nota (link da CF: "(Vide Emenda Constitucional nº 132…) Vigência").
+ * Parênteses com uma chave de nota (admite um nível de parênteses dentro); ou candidata a nota
+ * solta, sem parênteses (link do Planalto), que `ehNotaSolta` confirma.
  */
 const RE_NOTA = new RegExp(
-  String.raw`\(\s*${CHAVES_NOTA}[^()]*(?:\([^()]*\)[^()]*)*\)|(?<=\)\s*)Vig[êe]ncia(?=\s*(?:\(|$))`,
+  String.raw`\(\s*${CHAVES_NOTA}[^()]*(?:\([^()]*\)[^()]*)*\)` +
+    String.raw`|(?<=\s|\))(?:Vig[êe]ncia|Regulamento|Produ[çc][ãa]o de efeitos?)(?=\s*(?:\(|$))` +
+    String.raw`|(?<=\s|\))Vide [^()]*?(?=\s*(?:\(|$))`,
   'gi',
 );
+
+/**
+ * Nota solta, sem parênteses, só com a chave em maiúscula:
+ * - "Vigência", "Regulamento", "Produção de efeitos" e "Vide …" logo depois de outra nota ("(Vide
+ *   Emenda Constitucional nº 132…) Vigência", CF; "…) Produção de efeitos", ADCT; "…) Vide art. 96
+ *   - ADCT", CF, art. 18, § 4º);
+ * - "Vide …" depois do fim da frase ("…do artigo anterior. Vide Lei nº 8.072, de 25.7.90", CP, art.
+ *   158, § 2º);
+ * - "Regulamento" e "Vigência" no fim da linha, depois do fim da frase ou do nome em caixa alta
+ *   ("…os seguintes preceitos: Regulamento", CF, art. 17; "…DA REFORMA AGRÁRIA Regulamento").
+ * @param {string} nota @param {string} linha @param {number} inicio
+ */
+function ehNotaSolta(nota, linha, inicio) {
+  if (!/^(?:Vig[êe]ncia|Regulamento|Produ[çc][ãa]o de efeitos?|Vide )/.test(nota)) return false;
+  const antes = linha.slice(0, inicio).trimEnd();
+  if (antes.endsWith(')')) return true;
+  if (nota.startsWith('Vide')) return /[.;:]$/.test(antes);
+  const noFim = linha.slice(inicio + nota.length).trim() === '';
+  return noFim && /^(?:Regulamento|Vig)/.test(nota) && /(?:[.;:]|[A-ZÀ-Ú]{2})$/.test(antes);
+}
+/** Nota sem o parêntese de fecho no fim da linha (ECA, art. 233: "(Revogado pela Lei nº 9.455, de 7.4.1997"). */
+const RE_NOTA_SEM_FECHO = new RegExp(String.raw`\(\s*${CHAVES_NOTA}[^()]*$`, 'i');
 
 /**
  * Número solto depois do fim da frase: link da fonte para outro ato, fora do texto (LEP, art. 18-A,
@@ -394,12 +417,19 @@ const RE_NOTA_SEM_PARENTESES =
 export function separarNotas(texto) {
   /** @type {string[]} */
   const notas = [];
-  const sem = texto.replace(RE_NOTA, (nota) => {
+  let sem = texto.replace(RE_NOTA, (nota, inicio, linha) => {
     // "(Revogado)" sozinho é o texto do dispositivo revogado, não nota (a nota diz por qual lei).
     if (/^\(\s*revogad[oa]\s*\)$/i.test(nota)) return nota;
+    if (!nota.startsWith('(') && !ehNotaSolta(nota, linha, inicio)) return nota;
     notas.push(limpar(nota));
     return ' ';
   });
+  // Nota sem o parêntese de fecho, no fim (a sobra " :" depois dela sai junto).
+  const aberta = RE_NOTA_SEM_FECHO.exec(sem);
+  if (aberta) {
+    notas.push(limpar(aberta[0]).replace(/[\s.,;:]+$/, ''));
+    sem = sem.slice(0, aberta.index);
+  }
   // Nota sem parênteses no fim (CP, art. 232-A: "…com violência; ou Incluído pela Lei nº 13.445,
   // de 2017 Vigência"): só com a chave em maiúscula, "pela Lei…" e o ano fechando a linha.
   const numero = RE_NUMERO_SOLTO.exec(sem);
@@ -521,6 +551,9 @@ export function inventariar(linhas, opcoes = {}) {
   let aguardandoNomeDoNo = false;
   /** @type {string[]} */
   let rubricas = [];
+  /** As notas de cada rubrica pendente (mesma ordem de `rubricas`). */
+  /** @type {string[][]} */
+  let notasDasRubricas = [];
   /** Primeira linha tachada depois das rubricas pendentes (a dona delas, se não houver vigente). */
   /** @type {(typeof tachadas)[number] | null} */
   let captura = null;
@@ -532,6 +565,8 @@ export function inventariar(linhas, opcoes = {}) {
   let emAnexo = false;
   /** O nome do último nó está em caixa alta e pode continuar na linha seguinte. */
   let nomeDoNoContinua = false;
+  /** Dentro de uma citação entre aspas em várias linhas (CDC, art. 113). */
+  let citacao = false;
 
   /** @param {Rotulo} r */
   const endereco = (r) => {
@@ -572,6 +607,19 @@ export function inventariar(linhas, opcoes = {}) {
     if (!rotuloVigente && l.anterior !== '' && NORMATIVOS.includes(/** @type {never} */ (r.tipo))) {
       const doRotulo = l.texto.slice(0, l.texto.length - r.resto.length).replace(/\s/g, '');
       if (doRotulo.startsWith(foraDoTachado.texto.replace(/\s/g, ''))) foraDoTachado.texto = '';
+    } else if (
+      !rotuloVigente &&
+      l.anterior !== '' &&
+      /^(?:[IVXLC]+|A)$/.test(foraDoTachado.texto)
+    ) {
+      // O pedaço do rótulo fora do tachado separado do resto por um espaço (ECA, art. 90: "I
+      // ~~V - abrigo;~~"; CP, art. 45: "I ~~I - ocorrer…~~"; CP, art. 334: "A ~~rt. 334…~~",
+      // capitular): o rótulo é o pedaço junto com o começo do tachado.
+      const junto = rotulo(`${foraDoTachado.texto}${l.anterior}`);
+      if (NORMATIVOS.includes(/** @type {never} */ (junto.tipo))) {
+        r = junto;
+        foraDoTachado.texto = '';
+      }
     }
     const semTexto = l.anterior !== '' && vazio(foraDoTachado.texto);
     const revogadaInteira = semTexto && revoga(foraDoTachado.notas);
@@ -615,6 +663,27 @@ export function inventariar(linhas, opcoes = {}) {
       return;
     }
 
+    // Citação da lei alterada, entre aspas (CDC, arts. 110 a 117; ECA, art. 264): continua o
+    // último dispositivo, depois de uma quebra de linha; sem as aspas de fecho, as linhas seguintes
+    // também, até a que as fecha (artigo e rótulo estrutural fecham antes, se faltar o par).
+    const abreCitacao = !tachada && /^["“”«]/.test(l.vigente);
+    if (
+      citacao &&
+      !abreCitacao &&
+      (r.tipo === 'artigo' || ESTRUTURAIS.includes(/** @type {never} */ (r.tipo)))
+    )
+      citacao = false;
+    if ((citacao || abreCitacao) && !tachada && ultimo && 'vigente' in ultimo && !ultimoFoiNo) {
+      const d = /** @type {Dispositivo} */ (disp.get(ultimo.vigente));
+      const partes = separarNotas(l.vigente);
+      if (d.status === 'vigente') {
+        d.texto += `\n${partes.texto}`;
+        d.notas.push(...partes.notas);
+      }
+      citacao = !/["”»][\s.,;:)]*$/.test(partes.texto);
+      return;
+    }
+
     const bloco = tachada ? undefined : blocos.find((b) => b.inicio.test(l.vigente));
     if (bloco) {
       prefixo = bloco.prefixo;
@@ -624,6 +693,7 @@ export function inventariar(linhas, opcoes = {}) {
         estrutura.push(no);
         ultimoFoiNo = true;
         rubricas = [];
+        notasDasRubricas = [];
         captura = null;
         return;
       }
@@ -663,6 +733,7 @@ export function inventariar(linhas, opcoes = {}) {
       nomeDoNoContinua = caixaAlta(no.nome);
       ultimoFoiNo = true;
       rubricas = [];
+      notasDasRubricas = [];
       captura = null;
       return;
     }
@@ -717,6 +788,7 @@ export function inventariar(linhas, opcoes = {}) {
         casos.push({ tipo: 'linha-solta', linha: i, texto: l.texto });
       } else if (r.tipo === 'outro') {
         rubricas.push(foraDoTachado.texto);
+        notasDasRubricas.push(foraDoTachado.notas);
         nomeDoNoContinua = false;
       }
       return;
@@ -735,6 +807,7 @@ export function inventariar(linhas, opcoes = {}) {
       // O anexo vem depois da assinatura: as linhas soltas antes dele não são rubrica.
       emAnexo = true;
       rubricas = [];
+      notasDasRubricas = [];
       captura = null;
     }
     if (tachada) {
@@ -755,9 +828,25 @@ export function inventariar(linhas, opcoes = {}) {
       return;
     }
 
-    if (captura && captura.endereco !== e) rubricas = rubricas.slice(captura.rubricas.length);
-    else if (captura) captura.rubricas = [];
+    const capturou = captura !== null;
+    if (captura && captura.endereco !== e) {
+      rubricas = rubricas.slice(captura.rubricas.length);
+      notasDasRubricas = notasDasRubricas.slice(captura.rubricas.length);
+    } else if (captura) captura.rubricas = [];
     captura = null;
+    // Rubricas seguidas: a do dispositivo é a última; as de antes não chegaram a dispositivo e são
+    // as últimas linhas do anterior (ECA, art. 258-C: "Medida Administrativa - …" antes de
+    // "Disposições Finais e Transitórias", a rubrica do art. 259).
+    const doAnterior =
+      ultimo && 'vigente' in ultimo && !ultimoFoiNo ? disp.get(ultimo.vigente) : undefined;
+    if (rubricas.length > 1 && !capturou && doAnterior?.status === 'vigente') {
+      rubricas.slice(0, -1).forEach((texto, k) => {
+        doAnterior.texto += `\n${texto}`;
+        doAnterior.notas.push(...(notasDasRubricas[k] ?? []));
+      });
+      rubricas = rubricas.slice(-1);
+      notasDasRubricas = notasDasRubricas.slice(-1);
+    }
     const partes = revogadaInteira
       ? foraDoTachado
       : separarNotas(rv.tipo === r.tipo ? rv.resto : '');
@@ -787,6 +876,7 @@ export function inventariar(linhas, opcoes = {}) {
       linha: i,
     };
     rubricas = [];
+    notasDasRubricas = [];
     const antigo = disp.get(e);
     if (antigo) {
       const reescrita =

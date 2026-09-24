@@ -42,7 +42,13 @@ export interface FaixaDeLinhas {
 type NotaDoModelo = NonNullable<TextoDeDispositivo['notasVigencia']>[number];
 type RedacaoDoModelo = NonNullable<TextoDeDispositivo['redacoesAnteriores']>[number];
 
-/** Espécie da nota (regra 7): decide as regras 9 e 10 e alimenta a F6. A 8.5 fecha a lista. */
+/**
+ * Espécie da nota (regra 7; lista fechada na 8.5): decide as regras 9 e 10 e alimenta a F6.
+ * `vigencia` inclui "Produção de efeito(s)" (CF); `expressao`, "Expressão substituída (declarada,
+ * suprimida…) pela Lei…" (ECA); `revogado` inclui "Suprimido"; `nr`, o "(NR)" da ALESP; `outra`:
+ * promulgação, conversão, declaração de inconstitucionalidade, suspensão, "Última atualização"
+ * (ALESP), o número solto que é link para outro ato (LEP, art. 18-A, § 3º: "7.627").
+ */
 export type TipoNotaDeVigencia =
   | 'redacao_dada'
   | 'incluido'
@@ -51,13 +57,18 @@ export type TipoNotaDeVigencia =
   | 'vide'
   | 'vigencia'
   | 'regulamento'
+  | 'expressao'
   | 'nr'
   | 'outra';
 
 /**
  * Nota de vigência (regra 7): `texto` como aparece, com os parênteses quando há ("(Incluído pela
  * Lei nº 12.654, de 2012)", "Vigência" solto) e sem o "- " da linha própria da ALESP; até 2.000
- * caracteres. `lei` é TextoCurto; `ano`, de 1800 a 2100; `link`, o http(s) do sanitizador.
+ * caracteres. `lei` (8.5): o primeiro ato normativo citado, na forma canônica ("Lei nº 13.964",
+ * "Lei Complementar nº 132", "Emenda Constitucional nº 132", "Decreto-Lei nº 2.848", "Medida
+ * Provisória nº 2.180-35"; ADI, ADPF e MI não são ato); `ano`, o do ato ("de 2019", "de
+ * 11.7.1984", "de 25.7.90", "de 25 de setembro de 2009"), de 1800 a 2100; `link`, o http(s) do
+ * sanitizador.
  */
 export interface NotaDeVigencia extends NotaDoModelo {
   tipo: TipoNotaDeVigencia;
@@ -100,13 +111,17 @@ export interface NoRascunho {
   /** Rótulo como veio, já normalizado, com o separador ("Art. 1º -", "Artigo 4º -"): para a 8.9 e o editor. */
   rotuloLido?: string;
   /**
-   * Texto vigente, normalizado, sem rótulo e sem notas (até a 8.5, as notas do fim da linha ficam
-   * aqui). No artigo, é o caput. Vazio no nó estrutural (o nome é um filho `nome`) e no revogado.
-   * Continuação em outra linha (8.4): "Pena - …", citação entre aspas e rubrica que não chegou a
-   * dispositivo entram depois de um trecho `{ texto: '\n' }` (quebra de linha); a linha partida
-   * pela fonte (minúscula depois de texto sem ponto final), depois de um espaço.
+   * Texto vigente, normalizado, sem rótulo e sem notas. No artigo, é o caput. Vazio no nó
+   * estrutural (o nome é um filho `nome`) e no revogado. Continuação em outra linha (8.4): "Pena -
+   * …", citação entre aspas e rubrica que não chegou a dispositivo entram depois de um trecho `{
+   * texto: '\n' }` (quebra de linha); a linha partida pela fonte (minúscula depois de texto sem
+   * ponto final), depois de um espaço.
    */
   trechos: Trecho[];
+  /**
+   * Regra 7 (8.5): as notas do fim de cada linha do texto (a do rótulo e as emendadas, na ordem) e
+   * as das linhas só de notas logo depois dele. No `nome`, as da rubrica.
+   */
   notas: NotaDeVigencia[];
   redacoesAnteriores: RedacaoAnterior[];
   status: StatusDispositivo;
@@ -199,7 +214,10 @@ export interface Rascunho {
   metadados: MetadadosNorma;
   /** Notas da norma inteira, entre a epígrafe e a ementa ("(Vide Decreto nº 6.049, de 2007)"; "(Última atualização: …)" da ALESP). */
   notasDaNorma: NotaDeVigencia[];
-  /** Nota com lei e ano mais recente (8.5), para a pré-checagem da F6 (D16). */
+  /**
+   * Nota com lei e ano mais recente (8.5; `notaVigenciaMaisRecente` em `notas.ts`), entre as da
+   * norma, dos nós e dos dispositivos, para a pré-checagem da F6 (D16).
+   */
   notaVigenciaMaisRecente?: VersaoDeNorma['notaVigenciaMaisRecente'];
   /** Raízes, na ordem do texto: preâmbulo, estrutura (ou artigos, se não houver), anexo. */
   nos: NoRascunho[];

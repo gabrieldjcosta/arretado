@@ -20,9 +20,9 @@ describe('normalização (8.1): desempenho', () => {
   );
 });
 
-// Estruturador (8.2–8.4): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
+// Estruturador (8.2–8.5): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
 // nenhuma lista enorme passa por `push(...itens)`, que estoura a pilha.
-describe('estruturador (8.2–8.4): desempenho', () => {
+describe('estruturador (8.2–8.5): desempenho', () => {
   const linhas = (n: number, texto: (k: number) => string) =>
     Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
   it.each([
@@ -67,6 +67,32 @@ describe('estruturador (8.2–8.4): desempenho', () => {
         // 200 mil notas: `push(...notas)` estourava a pilha a partir de uns 150 mil itens.
         { trechos: [{ texto: '(Vide) '.repeat(200_000) }] },
       ],
+    ],
+    // 8.5: as notas do fim de cada linha do texto, com as formas sem parênteses (lidas do fim
+    // para o começo, uma a uma).
+    ...(
+      [
+        ['notas no fim do texto', '(Vide) '],
+        ['notas soltas', 'Vigência '],
+        ['"Vide" sem parênteses', '. Vide art. 1 '],
+        ['nota sem parênteses', '; Incluído pela Lei nº 1, de 2000 '],
+        ['parênteses sem fecho', '(Vide '],
+        ['")" sobrando', ') '],
+        ['números soltos', '. 1.000 '],
+      ] as const
+    ).map(([nome, pedaco]): [string, { trechos: { texto: string }[] }[]] => [
+      nome,
+      [
+        {
+          trechos: [
+            { texto: `Art. 1º Texto ${pedaco.repeat(Math.floor(2_000_000 / pedaco.length))}` },
+          ],
+        },
+      ],
+    ]),
+    [
+      'notas em linhas emendadas',
+      linhas(100_000, (k) => (k ? 'Pena - multa. (Vide) Vigência' : 'Art. 1º A:')),
     ],
   ])(
     '%s',

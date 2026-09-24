@@ -19,11 +19,13 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "conferida",
-    "por": "Gabriel",
-    "em": "2026-09-24",
+    "estado": "pendente",
+    "por": null,
+    "em": null,
     "observacoes": [
-      "Amostra inteira (50 itens) conferida na folha docs/conferencias/gabarito-cf.md (commit 7a3ec73): nenhuma divergência."
+      "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
+      "Amostra inteira (50 itens) conferida na folha docs/conferencias/gabarito-cf.md (commit 7a3ec73): nenhuma divergência.",
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: \"Regulamento\" solto virou nota (nome do Capítulo III do Título VII; arts. 14, § 3º, V, 17, 198, §§ 3º e 5º, 212-A, 215, § 1º, 226, § 7º, e 231); \"Produção de efeitos\" solto virou nota (ADCT, arts. 76, 76-A e 76-B; os §§ 1º e 3º do art. 76 do ADCT passam a revogados); \"Vide art. 96 - ADCT\" virou nota (art. 18, § 4º); art. 159, I, \"f\". As 46 marcas dos itens que não mudaram foram repostas na folha nova. Novos na amostra, a conferir: art171.par1.incI, art198.par5, art219B.par2, art233.par2."
     ]
   },
   "ultimoArtigo": "adct.art138",
@@ -43,15 +45,15 @@
       "alinea": 361
     },
     "porStatus": {
-      "vigente": 3298,
-      "revogado": 76
+      "vigente": 3296,
+      "revogado": 78
     },
     "artigos": {
       "vigente": 411,
       "revogado": 13
     },
     "comSufixo": 36,
-    "notasVigencia": 1925,
+    "notasVigencia": 1946,
     "redacoesAnteriores": 751,
     "redacoesPorOrigem": {
       "tachado": 699,
@@ -614,7 +616,7 @@
     {
       "tipo": "capitulo",
       "rotulo": "CAPÍTULO III",
-      "nome": "DA POLÍTICA AGRÍCOLA E FUNDIÁRIA E DA REFORMA AGRÁRIA Regulamento",
+      "nome": "DA POLÍTICA AGRÍCOLA E FUNDIÁRIA E DA REFORMA AGRÁRIA",
       "primeiroArtigo": "art184"
     },
     {
@@ -1085,17 +1087,17 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167d"
     },
     {
-      "endereco": "art171.par1",
+      "endereco": "art171.par1.incI",
       "motivo": "parágrafo, inciso ou alínea revogado",
       "status": "revogado",
-      "rotulo": "§ 1º -",
+      "rotulo": "I -",
       "texto": "",
       "notas": [
         "(Revogado pela Emenda Constitucional nº 6, de 1995)"
       ],
       "redacoes": [
         {
-          "texto": "§ 1º - A lei poderá, em relação à empresa brasileira de capital nacional: (Revogado pela Emenda Constitucional nº 6, de 1995)",
+          "texto": "I - conceder proteção e benefícios especiais temporários para desenvolver atividades consideradas estratégicas para a defesa nacional ou imprescindíveis ao desenvolvimento do País; (Revogado pela Emenda Constitucional nº 6, de 1995)",
           "origem": "revogacao"
         }
       ],
@@ -1119,32 +1121,21 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art195"
     },
     {
-      "endereco": "art198.par3.incIV",
-      "motivo": "parágrafo, inciso ou alínea revogado",
-      "status": "revogado",
-      "rotulo": "IV -",
-      "texto": "",
+      "endereco": "art198.par5",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 5º",
+      "texto": "Lei federal disporá sobre o regime jurídico, o piso salarial profissional nacional, as diretrizes para os Planos de Carreira e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias, competindo à União, nos termos da lei, prestar assistência financeira complementar aos Estados, ao Distrito Federal e aos Municípios, para o cumprimento do referido piso salarial.",
       "notas": [
-        "(Redação dada pela Emenda Constitucional nº 86, de 2015)"
+        "(Redação dada pela Emenda Constitucional nº 63, de 2010)",
+        "Regulamento"
       ],
       "redacoes": [
         {
-          "texto": "IV - as normas de cálculo do montante a ser aplicado pela União; (Incluído pela Emenda Constitucional nº 29, de 2000)",
+          "texto": "§ 5º Lei federal disporá sobre o regime jurídico e a regulamentação das atividades de agente comunitário de saúde e agente de combate às endemias. (Incluído pela Emenda Constitucional nº 51, de 2006) (Vide Medida provisória nº 297. de 2006)",
           "origem": "tachado"
         }
       ],
-      "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198"
-    },
-    {
-      "endereco": "art198.par6",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "§ 6º",
-      "texto": "Além das hipóteses previstas no § 1º do art. 41 e no § 4º do art. 169 da Constituição Federal, o servidor que exerça funções equivalentes às de agente comunitário de saúde ou de agente de combate às endemias poderá perder o cargo em caso de descumprimento dos requisitos específicos, fixados em lei, para o seu exercício.",
-      "notas": [
-        "(Incluído pela Emenda Constitucional nº 51, de 2006)"
-      ],
-      "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198"
     },
     {
@@ -1160,14 +1151,16 @@
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art212a"
     },
     {
-      "endereco": "art220",
+      "endereco": "art219B.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 220.",
-      "texto": "A manifestação do pensamento, a criação, a expressão e a informação, sob qualquer forma, processo ou veículo não sofrerão qualquer restrição, observado o disposto nesta Constituição.",
-      "notas": [],
+      "rotulo": "§ 2º",
+      "texto": "Os Estados, o Distrito Federal e os Municípios legislarão concorrentemente sobre suas peculiaridades.",
+      "notas": [
+        "(Incluído pela Emenda Constitucional nº 85, de 2015)"
+      ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art220"
+      "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art219b"
     },
     {
       "endereco": "art227.par3.incIV",
@@ -1178,6 +1171,23 @@
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art227"
+    },
+    {
+      "endereco": "art233.par2",
+      "motivo": "parágrafo, inciso ou alínea revogado",
+      "status": "revogado",
+      "rotulo": "§ 2º",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Emenda Constitucional nº 28, de 25/05/2000)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 2º Fica ressalvado ao empregado, em qualquer hipótese, o direito de postular, judicialmente, os créditos que entender existir, relativamente aos últimos cinco anos. (Revogado pela Emenda Constitucional nº 28, de 25/05/2000)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art233"
     },
     {
       "endereco": "adct.art24",
@@ -1711,7 +1721,7 @@
     {"endereco":"art14.par3.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art14.par3.incIII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art14.par3.incIV","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art14.par3.incV","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art14.par3.incV","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art14.par3.incVI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art14.par3.incVI.alA","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art14.par3.incVI.alB","status":"vigente","notas":0,"redacoes":0},
@@ -1736,7 +1746,7 @@
     {"endereco":"art15.incIV","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art15.incV","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art16","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art17","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art17","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art17.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art17.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art17.incIII","status":"vigente","notas":0,"redacoes":0},
@@ -1756,7 +1766,7 @@
     {"endereco":"art18.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art18.par2","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art18.par3","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art18.par4","status":"vigente","notas":2,"redacoes":1},
+    {"endereco":"art18.par4","status":"vigente","notas":3,"redacoes":1},
     {"endereco":"art19","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art19.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art19.incII","status":"vigente","notas":0,"redacoes":0},
@@ -3352,7 +3362,7 @@
     {"endereco":"art159.incI.alC","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art159.incI.alD","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art159.incI.alE","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art159.incI.alF","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art159.incI.alF","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art159.incII","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art159.incIII","status":"vigente","notas":1,"redacoes":2},
     {"endereco":"art159.par1","status":"vigente","notas":0,"redacoes":0},
@@ -3757,13 +3767,13 @@
     {"endereco":"art198.par2.incI","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art198.par2.incII","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art198.par2.incIII","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art198.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art198.par3","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art198.par3.incI","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art198.par3.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par3.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par3.incIV","status":"revogado","notas":1,"redacoes":1},
     {"endereco":"art198.par4","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art198.par5","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art198.par5","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art198.par6","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par7","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par8","status":"vigente","notas":1,"redacoes":0},
@@ -3886,7 +3896,7 @@
     {"endereco":"art212.par7","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art212.par8","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art212.par9","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art212A","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art212A","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art212A.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art212A.incII","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art212A.incII.alA","status":"vigente","notas":1,"redacoes":0},
@@ -3932,7 +3942,7 @@
     {"endereco":"art214.incV","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art214.incVI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art215","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art215.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art215.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art215.par2","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art215.par3","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art215.par3.incI","status":"vigente","notas":1,"redacoes":0},
@@ -4053,7 +4063,7 @@
     {"endereco":"art226.par4","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art226.par5","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art226.par6","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art226.par7","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art226.par7","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art226.par8","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art227","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art227.par1","status":"vigente","notas":1,"redacoes":1},
@@ -4080,7 +4090,7 @@
     {"endereco":"art230","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art230.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art230.par2","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art231","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art231","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art231.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art231.par2","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art231.par3","status":"vigente","notas":0,"redacoes":0},
@@ -4433,27 +4443,27 @@
     {"endereco":"adct.art75.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art75.par3","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"adct.art76","status":"vigente","notas":1,"redacoes":6},
-    {"endereco":"adct.art76.par1","status":"vigente","notas":1,"redacoes":3},
+    {"endereco":"adct.art76.par1","status":"revogado","notas":2,"redacoes":3},
     {"endereco":"adct.art76.par2","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"adct.art76.par3","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"adct.art76.par3","status":"revogado","notas":2,"redacoes":2},
     {"endereco":"adct.art76.par4","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76.par5","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76.par6","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76A","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"adct.art76A.parUnico","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76A.parUnico.incI","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76A.parUnico.incII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76A.parUnico.incIII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76A.parUnico.incIV","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76A.parUnico.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico.incI","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico.incIV","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76A.parUnico.incV","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"adct.art76B","status":"vigente","notas":1,"redacoes":3},
     {"endereco":"adct.art76B.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76B.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76B.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art76B.par1.incI","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"adct.art76B.par1.incII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76B.par1.incIII","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"adct.art76B.par1.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"adct.art76B.par1.incII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76B.par1.incIII","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"adct.art76B.par1.incIV","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"adct.art76B.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art77","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"adct.art77.incI","status":"vigente","notas":1,"redacoes":0},
