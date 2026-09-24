@@ -85,7 +85,9 @@ export interface NoRascunho {
   tipo: TipoDispositivo;
   /**
    * Endereço canônico no formato de `Dispositivo.endereco` (segmentos [a-zA-Z0-9] separados por
-   * ponto). Segmentos decididos na 8.2 (estrutura) e na 8.4. Repetido = anomalia.
+   * ponto). Estrutura (8.2): o caminho dos nós (`parteEspecial.tit6.cap1`; `parte`, `liv`, `tit`,
+   * `cap`, `sec`, `subsec` + número, com sufixo: `cap2A`); nome: `<endereço do pai>.nome`;
+   * `preambulo`; `anexo`. Dispositivos: 8.4. Repetido = anomalia.
    */
   endereco: string;
   /** Rótulo de exibição ("Art. 9º-A", "§ 1º", "Parágrafo único", "VI-A", "a)", "TÍTULO II"); TextoCurto. */
@@ -111,13 +113,20 @@ export interface NoRascunho {
   linhas: FaixaDeLinhas;
 }
 
-/** Regra 2 (epígrafe, ementa, preâmbulo) e o que se deduz da epígrafe; mesmos limites de Norma. */
+/**
+ * Regra 2 (epígrafe, ementa, preâmbulo) e o que se deduz da epígrafe; mesmos limites de Norma.
+ * `tituloOficial`: linha em caixa alta entre o preâmbulo e o corpo ("CÓDIGO PENAL").
+ */
 export type MetadadosNorma = Partial<
-  Pick<Norma, 'epigrafe' | 'ementa' | 'preambulo' | 'tipo' | 'referencia'>
+  Pick<Norma, 'epigrafe' | 'ementa' | 'preambulo' | 'tipo' | 'referencia' | 'tituloOficial'>
 >;
 
-/** Linha que não entra na norma: cabeçalho do portal; fecho (local, data, assinaturas, aviso do DOU); sobra da fonte. */
-export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra';
+/**
+ * Linha que não entra na norma: cabeçalho do portal; fecho (local, data, assinaturas, aviso do DOU);
+ * sobra da fonte; `redacao_anterior`: linha tachada que a 8.6 ainda vai anexar ao dispositivo
+ * (salvaguarda da leitura antecipada: tachado nunca vira texto vigente).
+ */
+export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra' | 'redacao_anterior';
 
 export interface Descarte {
   motivo: MotivoDescarte;
@@ -151,7 +160,9 @@ export type TipoAnomalia =
   | 'estrutural_substituido'
   | 'tachado_parcial'
   | 'tachado_sem_dispositivo'
-  | 'nota_sem_dispositivo';
+  | 'nota_sem_dispositivo'
+  // Até a 8.6: linhas tachadas fora da norma (descarte `redacao_anterior`), uma por norma
+  | 'redacao_anterior_nao_tratada';
 
 export interface Anomalia {
   tipo: TipoAnomalia;
