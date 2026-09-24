@@ -9,7 +9,7 @@ import { lerNotasDaLinha, separarNotasFinais } from './notas';
 import type { NotaDeVigencia } from './rascunho';
 
 export interface InicioDeArtigo {
-  /** `art9A`, `art1000`, `artUnico` (o prefixo do bloco, `adct.`/`dt.`, é da 8.4). */
+  /** `art9A`, `art1000`, `artUnico` (o estruturador acrescenta o prefixo do bloco: `adct.art1`). */
   endereco: string;
   /** Rótulo de exibição: "Art. 1º", "Art. 10", "Art. 1.000", "Art. 9º-A", "Art. único". */
   rotulo: string;

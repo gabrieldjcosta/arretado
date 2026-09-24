@@ -2,6 +2,7 @@ import type { Bloco, Trecho } from '../../core/seguranca/sanitizador';
 import { lerRotuloEstrutural } from './estrutura';
 import { estruturar, VERSAO_ESTRUTURADOR } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
+import { emOrdemDeLeitura } from './ordem';
 import type { NoRascunho, Rascunho } from './rascunho';
 
 // Casos tirados do corpus (colados de corpus/normas/, 24/09/2026), reduzidos ao que a regra pede.
@@ -535,18 +536,26 @@ describe('estruturador: artigo tolerante (regra 5)', () => {
         'Art. 2º A execução.',
       ),
     );
+    // As linhas que não abrem artigo continuam o art. 1º (8.4), menos a minúscula depois de ponto
+    // final, que é sobra.
     expect(artigos(r)).toEqual([
-      ['art1', 'Art. 1º', 'Art. 1º', 'Um.'],
+      [
+        'art1',
+        'Art. 1º',
+        'Art. 1º',
+        'Um.\nArtes e ofícios.\nArtigos 5º e 6º desta Lei.\n"Art. 102. Citação da lei alterada."',
+      ],
       ['art2', 'Art. 2º', 'Art. 2º', 'A execução.'],
     ]);
     expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 0, fim: 4 });
+    expect(r.descartes).toEqual([{ motivo: 'sobra', linhas: { inicio: 3, fim: 3 } }]);
   });
 
   it('"Art" quebrado: a palavra numa linha e o número na seguinte', () => {
     const r = estruturar(blocos('Art. 1º Um.', 'Art.', '2º Dois.', 'Art.', 'Texto sem número.'));
     expect(artigos(r)).toEqual([
       ['art1', 'Art. 1º', 'Art. 1º', 'Um.'],
-      ['art2', 'Art. 2º', 'Art. 2º', 'Dois.'],
+      ['art2', 'Art. 2º', 'Art. 2º', 'Dois.\nArt.\nTexto sem número.'],
     ]);
     expect(porEndereco(r, 'art2')?.linhas).toEqual({ inicio: 1, fim: 4 });
     // Tachado nas duas linhas: redação anterior numa faixa só; no fim da entrada, a linha fica.
@@ -610,16 +619,28 @@ describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
         'Art. 69. Sete.',
       ),
     );
+    // Nenhuma rubrica: a pena e a citação continuam o artigo; o inciso e o parágrafo são filhos
+    // dele (8.4); a linha em minúscula continua a frase sem ponto final.
     const arts = todos(r.nos).filter((n) => n.tipo === 'artigo');
-    expect(arts.map((a) => [a.endereco, a.filhos.length, a.linhas.inicio, a.linhas.fim])).toEqual([
-      ['art63', 0, 0, 1],
-      ['art64', 0, 2, 3],
-      ['art65', 0, 4, 5],
-      ['art66', 0, 6, 7],
-      ['art67', 0, 8, 9],
-      ['art68', 0, 10, 11],
-      ['art69', 0, 12, 12],
+    expect(
+      arts.map((a) => [
+        a.endereco,
+        a.filhos.map((f) => f.endereco),
+        textoDe(a.trechos),
+        a.linhas.inicio,
+        a.linhas.fim,
+      ]),
+    ).toEqual([
+      ['art63', [], 'Omitir dizeres.\nPena Detenção de um a seis meses ou multa.', 0, 1],
+      ['art64', ['art64.incIV'], 'Deixar de comunicar.', 2, 3],
+      ['art65', ['art65.parUnico'], 'Três.', 4, 5],
+      ['art66', [], 'Quatro.\n6º) a perda e a suspensão do pátrio poder. "', 6, 7],
+      ['art67', [], 'Cinco.', 8, 8],
+      ['art68', [], 'Seis.\nNa forma do regulamento:', 10, 11],
+      ['art69', [], 'Sete.', 12, 12],
     ]);
+    // Depois de ponto final, a linha em minúscula é sobra (a fonte a partiu: LC-SP 988, art. 159).
+    expect(r.descartes).toEqual([{ motivo: 'sobra', linhas: { inicio: 9, fim: 9 } }]);
   });
 
   it('rubrica que começa com letra de numeral romano não é inciso ("Dano", "Mil…", "Civil…")', () => {
@@ -640,7 +661,7 @@ describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
     ]);
   });
 
-  it('rubrica que não chega a artigo volta para o artigo anterior (sem sangria)', () => {
+  it('rubrica que não chega a artigo nem a dispositivo é a última linha do anterior (sem sangria)', () => {
     const r = estruturar(
       blocos(
         'Art. 1º Um.',
@@ -655,7 +676,16 @@ describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
     );
     expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 0, fim: 3 });
     expect(porEndereco(r, 'art2')?.linhas).toEqual({ inicio: 6, fim: 7 });
-    expect(todos(r.nos).some((n) => n.tipo === 'nome' && n.endereco.startsWith('art'))).toBe(false);
+    // "Aumento de pena" é o nome do parágrafo (8.4); as outras duas continuam o último dispositivo.
+    expect(
+      todos(r.nos)
+        .filter((n) => n.tipo === 'nome' && n.endereco.startsWith('art'))
+        .map((n) => [n.endereco, textoDe(n.trechos)]),
+    ).toEqual([['art1.par1.nome', 'Aumento de pena']]);
+    expect(textoDe(porEndereco(r, 'art1.par1')?.trechos ?? [])).toBe(
+      'A pena aumenta.\nRubrica antes do capítulo',
+    );
+    expect(textoDe(porEndereco(r, 'art2')?.trechos ?? [])).toBe('Dois.\nRubrica no fim');
     expect(r.descartes).toEqual([]);
   });
 
@@ -775,5 +805,455 @@ describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
   it('texto puro: a rubrica também fica "a confirmar"', () => {
     const r = estruturar(blocos('Objeto', 'Art. 1º A.'), { formato: 'texto' });
     expect(nome(r, 'art1')?.confianca).toBe('a_confirmar');
+  });
+});
+
+describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', () => {
+  /** [endereço, rótulo, rótulo lido, texto] de todos os dispositivos, em ordem. */
+  const dispositivos = (r: Rascunho) =>
+    todos(r.nos)
+      .filter((n) => ['artigo', 'paragrafo', 'inciso', 'alinea', 'item'].includes(n.tipo))
+      .map((n) => [n.endereco, n.rotulo, n.rotuloLido, textoDe(n.trechos)]);
+
+  it('formas do rótulo no corpus e o endereço canônico (glossário §12)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 5º Todos são iguais:',
+        'I - homens e mulheres;', // inciso do caput, sem segmento `caput`
+        'III -jurídica;', // LEP, sem espaço depois do hífen
+        'IV as ilhas fluviais e lacustres;', // CF, sem hífen antes de minúscula
+        'I-A o Conselho Nacional de Justiça;', // CF, sufixo sem separador
+        'VI-A - (revogado);', // LEP
+        '§ 1º - O produto da remuneração:',
+        'a) à indenização dos danos;',
+        'c ) os nascidos no estrangeiro;', // CF, espaço antes do parêntese
+        'b)houve requisição.', // CP, sem espaço depois
+        '§ 2º -A Considera-se que há razões:', // CP e ECA: espaço antes do hífen do sufixo
+        '§ 2º-B. A pena é aumentada.',
+        '§ 5.º Admitir-se-á o litisconsórcio.', // CDC
+        '§ 10. Nos casos dos crimes hediondos.',
+        '§ 2 As eleições serão realizadas.', // LC 80, sem ordinal
+        'Parágrafo único. Texto.',
+      ),
+    );
+    expect(dispositivos(r)).toEqual([
+      ['art5', 'Art. 5º', 'Art. 5º', 'Todos são iguais:'],
+      ['art5.incI', 'I', 'I -', 'homens e mulheres;'],
+      ['art5.incIII', 'III', 'III -', 'jurídica;'],
+      ['art5.incIV', 'IV', 'IV', 'as ilhas fluviais e lacustres;'],
+      ['art5.incIA', 'I-A', 'I-A', 'o Conselho Nacional de Justiça;'],
+      ['art5.incVIA', 'VI-A', 'VI-A -', '(revogado);'],
+      ['art5.par1', '§ 1º', '§ 1º -', 'O produto da remuneração:'],
+      ['art5.par1.alA', 'a)', 'a)', 'à indenização dos danos;'],
+      ['art5.par1.alC', 'c)', 'c )', 'os nascidos no estrangeiro;'],
+      ['art5.par1.alB', 'b)', 'b)', 'houve requisição.'],
+      ['art5.par2A', '§ 2º-A', '§ 2º -A', 'Considera-se que há razões:'],
+      ['art5.par2B', '§ 2º-B', '§ 2º-B.', 'A pena é aumentada.'],
+      ['art5.par5', '§ 5º', '§ 5.º', 'Admitir-se-á o litisconsórcio.'],
+      ['art5.par10', '§ 10', '§ 10.', 'Nos casos dos crimes hediondos.'],
+      ['art5.par2', '§ 2º', '§ 2', 'As eleições serão realizadas.'],
+      ['art5.parUnico', 'Parágrafo único', 'Parágrafo único.', 'Texto.'],
+    ]);
+    expect(r.anomalias).toEqual([]);
+  });
+
+  it('item: "1." e "1)" (Planalto), "1 -" (ALESP); milhar, ordinal e porcentagem não são item', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 83. Texto:',
+        'b) com autorização:',
+        '1) de ascendente;',
+        '2. de colateral;',
+        '3 - de tutor;',
+        '1.000 (mil) reais por dia.',
+        '6º) a perda do pátrio poder.',
+        '10% (dez por cento) do total.',
+      ),
+    );
+    expect(dispositivos(r).map(([e]) => e)).toEqual([
+      'art83',
+      'art83.alB',
+      'art83.alB.it1',
+      'art83.alB.it2',
+      'art83.alB.it3',
+    ]);
+    expect(textoDe(porEndereco(r, 'art83.alB.it3')?.trechos ?? [])).toBe(
+      'de tutor;\n1.000 (mil) reais por dia.\n6º) a perda do pátrio poder.\n10% (dez por cento) do total.',
+    );
+  });
+
+  it('hierarquia por sequência: inciso sob o caput ou o último parágrafo, alínea sob o último inciso, item sob a última alínea; nível ausente é permitido', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Caput:',
+        'I - um:',
+        'a) alínea do inciso;',
+        '1. item da alínea;',
+        'II - dois;',
+        '§ 1º Parágrafo:',
+        'a) alínea direto no parágrafo (lei anterior à LC 95/1998: LEP, art. 29, § 1º);',
+        '§ 2º Outro:',
+        'I - inciso do parágrafo:',
+        'a) alínea;',
+        'II - volta ao inciso;',
+        'Parágrafo único. Com item:',
+        '1 - item direto no parágrafo (ALESP, art. 14).',
+      ),
+    );
+    const pais = emOrdemDeLeitura(r.nos).flatMap(({ no, pai }) =>
+      pai ? [[no.endereco, pai.endereco]] : [],
+    );
+    expect(pais).toEqual([
+      ['art1.incI', 'art1'],
+      ['art1.incI.alA', 'art1.incI'],
+      ['art1.incI.alA.it1', 'art1.incI.alA'],
+      ['art1.incII', 'art1'],
+      ['art1.par1', 'art1'],
+      ['art1.par1.alA', 'art1.par1'],
+      ['art1.par2', 'art1'],
+      ['art1.par2.incI', 'art1.par2'],
+      ['art1.par2.incI.alA', 'art1.par2.incI'],
+      ['art1.par2.incII', 'art1.par2'],
+      ['art1.parUnico', 'art1'],
+      ['art1.parUnico.it1', 'art1.parUnico'],
+    ]);
+    // A faixa do artigo e de cada dispositivo cobre as linhas dos filhos.
+    expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 0, fim: 12 });
+    expect(porEndereco(r, 'art1.incI')?.linhas).toEqual({ inicio: 1, fim: 3 });
+    expect(porEndereco(r, 'art1.par2')?.linhas).toEqual({ inicio: 7, fim: 10 });
+  });
+
+  it('"Pena -" e "Pena Detenção…" (CDC) continuam o último dispositivo depois de uma quebra de linha; "Pena de multa" é rubrica', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 129. Ofender a integridade corporal:',
+        'Pena - detenção, de três meses a um ano.',
+        '§ 1º Se resulta:',
+        'IV - aceleração de parto:',
+        'Pena - reclusão, de um a cinco anos.', // continua o inciso IV (ordem de leitura)
+        'Art. 63. Omitir dizeres:',
+        'Pena Detenção de seis meses a dois anos e multa.',
+        'Pena de multa',
+        'Art. 49. A pena de multa consiste no pagamento.',
+      ),
+    );
+    expect(textoDe(porEndereco(r, 'art129')?.trechos ?? [])).toBe(
+      'Ofender a integridade corporal:\nPena - detenção, de três meses a um ano.',
+    );
+    expect(textoDe(porEndereco(r, 'art129.par1.incIV')?.trechos ?? [])).toBe(
+      'aceleração de parto:\nPena - reclusão, de um a cinco anos.',
+    );
+    expect(textoDe(porEndereco(r, 'art63')?.trechos ?? [])).toBe(
+      'Omitir dizeres:\nPena Detenção de seis meses a dois anos e multa.',
+    );
+    expect(nomeDe(porEndereco(r, 'art49'))).toBe('Pena de multa');
+  });
+
+  it('rubrica antes de parágrafo, inciso e alínea vira o nome dele (CP: "Aumento de pena", "Crime consumado")', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 14. Diz-se o crime:',
+        'Crime consumado',
+        'I - consumado, quando nele se reúnem todos os elementos;',
+        'Art. 133. Abandonar pessoa:',
+        'Aumento de pena (Incluído pela Lei nº 1, de 2000)',
+        '§ 3º As penas aumentam-se de um terço.',
+      ),
+    );
+    expect(nomeDe(porEndereco(r, 'art14.incI'))).toBe('Crime consumado');
+    expect(porEndereco(r, 'art14.incI.nome')?.linhas).toEqual({ inicio: 1, fim: 1 });
+    expect(porEndereco(r, 'art14.incI')?.linhas).toEqual({ inicio: 1, fim: 2 });
+    const nome = porEndereco(r, 'art133.par3.nome');
+    expect(textoDe(nome?.trechos ?? [])).toBe('Aumento de pena');
+    expect(nome?.notas.map((n) => n.tipo)).toEqual(['incluido']);
+  });
+
+  it('rubrica seguida de dispositivo tachado de outro endereço é dele (CP, art. 121, § 2º, VI, "Feminicídio", revogado)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 121. Matar alguém:',
+        '§ 2º Se o homicídio é cometido:',
+        'V - para assegurar a execução:',
+        'Feminicídio',
+        b(tachado('VI - contra a mulher: '), { texto: '(Revogado pela Lei nº 14.994, de 2024)' }),
+        'VII – contra autoridade;',
+        'Aumento de pena',
+        b(tachado('§ 7º A pena é aumentada de 1/3.')),
+        '§ 7º A pena do feminicídio é aumentada.',
+      ),
+    );
+    expect(nomeDe(porEndereco(r, 'art121.par2.incVII'))).toBe('');
+    // A rubrica do § 7º passa pela redação antiga tachada de mesmo endereço.
+    expect(nomeDe(porEndereco(r, 'art121.par7'))).toBe('Aumento de pena');
+    // A rubrica fica com o inciso VI, fora da árvore até a 8.6.
+    expect(r.descartes).toEqual([
+      { motivo: 'redacao_anterior', linhas: { inicio: 3, fim: 3 } },
+      { motivo: 'redacao_anterior', linhas: { inicio: 4, fim: 4 } },
+      { motivo: 'redacao_anterior', linhas: { inicio: 7, fim: 7 } },
+    ]);
+  });
+
+  it('citação da lei alterada entre aspas continua o dispositivo, também em várias linhas (CDC, art. 113)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 110. Acrescente-se o seguinte inciso:',
+        '"IV - a qualquer outro interesse difuso ou coletivo".',
+        'Art. 113. Acrescente-se os seguintes §§ 4º, 5º e 6º:',
+        '"§ 4.º O requisito da pré-constituição poderá ser dispensado.',
+        '§ 5.º Admitir-se-á o litisconsórcio.',
+        '§ 6º Os órgãos públicos legitimados poderão tomar compromisso".',
+        '§ 1º Este sim é parágrafo do art. 113.',
+      ),
+    );
+    expect(dispositivos(r).map(([e]) => e)).toEqual(['art110', 'art113', 'art113.par1']);
+    expect(textoDe(porEndereco(r, 'art113')?.trechos ?? []).split('\n')).toHaveLength(4);
+  });
+
+  it('linha em minúscula: continua a frase sem ponto final (aviso) ou é sobra da fonte', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 159. Aplicam-se aos membros os benefícios concedidos',
+        'aos advogados em geral.', // LC-SP 988: a fonte quebrou o parágrafo
+        'III - estímulo à participação;',
+        'bracionalização na execução das funções;', // LC-SP 988, art. 6º: sobra
+        'IV - racionalização na execução das funções;',
+      ),
+    );
+    expect(textoDe(porEndereco(r, 'art159')?.trechos ?? [])).toBe(
+      'Aplicam-se aos membros os benefícios concedidos aos advogados em geral.',
+    );
+    expect(textoDe(porEndereco(r, 'art159.incIII')?.trechos ?? [])).toBe(
+      'estímulo à participação;',
+    );
+    expect(r.anomalias.map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
+      ['linha_continuada', 'art159', 1],
+      ['linha_solta', undefined, 3],
+    ]);
+    expect(r.descartes).toEqual([{ motivo: 'sobra', linhas: { inicio: 3, fim: 3 } }]);
+  });
+
+  it('linha só de notas vai para o último dispositivo (ALESP e Planalto)', () => {
+    const r = estruturar(
+      blocos(
+        'Artigo 97 - Texto:',
+        'X - compensação em razão de atividades; (NR)',
+        '- Inciso X acrescentado pela Lei Complementar nº 1.295, de 02/01/2017.',
+        'I - outro;',
+        '(Incluído pela Lei nº 12.313, de 2010).',
+      ),
+    );
+    expect(porEndereco(r, 'art97.incX')?.notas.map((n) => n.texto)).toEqual([
+      'Inciso X acrescentado pela Lei Complementar nº 1.295, de 02/01/2017.',
+    ]);
+    expect(porEndereco(r, 'art97.incI')?.notas.map((n) => n.tipo)).toEqual(['incluido']);
+    expect(porEndereco(r, 'art97')?.linhas.fim).toBe(4);
+  });
+
+  it('rótulo antigo tachado ao lado do novo: vale o de fora do tachado (ALESP)', () => {
+    const r = estruturar(
+      blocos(
+        'Artigo 104 - Texto:',
+        'X - compensação;',
+        b(tachado('X'), ' ', 'XI -', ' outras previstas em lei.'),
+        b(tachado('Parágrafo único'), ' ', '§ 1º -', ' O Defensor não perderá o direito.'),
+      ),
+    );
+    expect(dispositivos(r)).toEqual([
+      ['art104', 'Art. 104', 'Artigo 104 -', 'Texto:'],
+      ['art104.incX', 'X', 'X -', 'compensação;'],
+      ['art104.incXI', 'XI', 'X XI -', 'outras previstas em lei.'],
+      ['art104.par1', '§ 1º', 'Parágrafo único § 1º -', 'O Defensor não perderá o direito.'],
+    ]);
+  });
+
+  it('não é dispositivo: numeral romano inválido, capitular separada sem fim de inciso, maiúscula depois do inciso sem hífen', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto.',
+        'CIVIL - não é inciso', // numeral inválido
+        'I ncidência em interdição de direito', // capitular separada (CP de 1940)
+        'IV As ilhas', // sem hífen, só antes de minúscula
+      ),
+    );
+    expect(dispositivos(r).map(([e]) => e)).toEqual(['art1']);
+  });
+
+  it('mesmo endereço duas vezes sem tachado: vale o último, e o anterior vira redação anterior (CP, art. 141, § 2º)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 141. As penas aumentam-se:',
+        '§ 1º Se o crime é cometido mediante paga.',
+        '§ 2º (VETADO). (Incluído pela Lei nº 13.964, de 2019)',
+        'I - inciso do vetado;',
+        '§ 2º Se o crime é cometido nas redes sociais, aplica-se em triplo a pena.',
+        'II - inciso do novo;',
+      ),
+    );
+    const par2 = porEndereco(r, 'art141.par2');
+    expect(textoDe(par2?.trechos ?? [])).toBe(
+      'Se o crime é cometido nas redes sociais, aplica-se em triplo a pena.',
+    );
+    expect(par2?.filhos.map((f) => f.endereco)).toEqual(['art141.par2.incI', 'art141.par2.incII']);
+    expect(par2?.redacoesAnteriores).toEqual([
+      {
+        trechos: [
+          { texto: '§ 2º' },
+          { texto: ' ' },
+          { texto: '(VETADO). (Incluído pela Lei nº 13.964, de 2019)' },
+        ],
+        origemDeteccao: 'heuristica',
+        confirmada: false,
+        linhas: { inicio: 2, fim: 3 },
+      },
+    ]);
+    expect(todos(r.nos).filter((n) => n.endereco === 'art141.par2')).toHaveLength(1);
+    expect(r.anomalias.map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
+      ['duplicata', 'art141.par2', 2],
+    ]);
+  });
+
+  it('texto puro: os dispositivos também ficam "a confirmar"', () => {
+    const r = estruturar(blocos('Art. 1º A:', 'I - b;', 'a) c;'), { formato: 'texto' });
+    expect(todos(r.nos).map((n) => [n.endereco, n.confianca])).toEqual([
+      ['art1', 'a_confirmar'],
+      ['art1.incI', 'a_confirmar'],
+      ['art1.incI.alA', 'a_confirmar'],
+    ]);
+  });
+});
+
+describe('estruturador: bloco com numeração própria (8.4)', () => {
+  const artigos = (r: Rascunho) =>
+    todos(r.nos)
+      .filter((n) => n.tipo === 'artigo')
+      .map((n) => n.endereco);
+
+  it('ADCT: título solto depois do fecho abre o bloco (nó na raiz, acima da estrutura) e prefixa os artigos', () => {
+    const r = estruturar(
+      blocos(
+        'TÍTULO IX',
+        'Das Disposições Constitucionais Gerais',
+        'Art. 249. Texto.',
+        'Art. 250. Texto:',
+        'I - inciso.',
+        'Brasília, 5 de outubro de 1988.',
+        'ULYSSES GUIMARÃES',
+        'Este texto não substitui o publicado no D.O.U.',
+        'ATO DAS DISPOSIÇÕES CONSTITUCIONAIS TRANSITÓRIAS',
+        '(Vide Emenda Constitucional nº 132, de 2023) Vigência',
+        'Art. 1º. O Presidente prestará o compromisso.',
+        'Art. 2º. No dia 7 de setembro de 1993:',
+        '§ 1º Será assegurada a gratuidade.',
+        'CAPÍTULO I',
+        'DE UM CAPÍTULO NO BLOCO',
+        'Art. 3º. Texto.',
+        'Brasília, 5 de outubro de 1988.',
+      ),
+    );
+    expect(artigos(r)).toEqual(['art249', 'art250', 'adct.art1', 'adct.art2', 'adct.art3']);
+    const [titulo, bloco] = r.nos;
+    expect(titulo?.endereco).toBe('tit9');
+    expect(bloco).toMatchObject({
+      tipo: 'bloco',
+      endereco: 'adct',
+      rotulo: 'ATO DAS DISPOSIÇÕES CONSTITUCIONAIS TRANSITÓRIAS',
+      linhas: { inicio: 8, fim: 9 },
+    });
+    expect(bloco?.notas.map((n) => n.tipo)).toEqual(['vide', 'vigencia']);
+    expect(bloco?.filhos.map((f) => f.endereco)).toEqual(['adct.art1', 'adct.art2', 'adct.cap1']);
+    expect(porEndereco(r, 'adct.art2.par1')).toBeDefined();
+    expect(porEndereco(r, 'adct.cap1.nome')).toBeDefined();
+    expect(r.descartes).toEqual([
+      { motivo: 'fecho', linhas: { inicio: 5, fim: 7 } },
+      { motivo: 'fecho', linhas: { inicio: 16, fim: 16 } },
+    ]);
+  });
+
+  it('disposições transitórias da LC-SP 988: o nome do nó que abre dá o prefixo, sem nó de bloco', () => {
+    const r = estruturar(
+      blocos(
+        'TÍTULO VII',
+        'Das Disposições Finais',
+        'Artigo 243 - Texto.',
+        'Artigo 244 - Esta lei complementar entra em vigor.',
+        'TÍTULO VIII',
+        'Das Disposições Transitórias',
+        'Artigo 1º - Enquanto não for eleito:',
+        '§ 1º - Competirá ao interino.',
+        'Artigo 2º - Texto.',
+      ),
+    );
+    expect(artigos(r)).toEqual(['art243', 'art244', 'dt.art1', 'dt.art2']);
+    expect(porEndereco(r, 'dt.art1.par1')).toBeDefined();
+    expect(todos(r.nos).some((n) => n.tipo === 'bloco')).toBe(false);
+    expect(porEndereco(r, 'tit8')?.filhos.map((f) => f.endereco)).toEqual([
+      'tit8.nome',
+      'dt.art1',
+      'dt.art2',
+    ]);
+  });
+
+  it('sem título nem nome que diga o bloco: `bloco2`; prefixo repetido ganha número', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Um.',
+        'Art. 2º Dois.',
+        'Art. 1º De novo.',
+        'Art. 2º Dois.',
+        'CAPÍTULO I',
+        'DISPOSIÇÕES TRANSITÓRIAS',
+        'Art. 1º Três.',
+        'Art. 2º Três.',
+        'CAPÍTULO II',
+        'OUTRAS DISPOSIÇÕES TRANSITÓRIAS',
+        'Art. 1º Quatro.',
+      ),
+    );
+    expect(artigos(r)).toEqual([
+      'art1',
+      'art2',
+      'bloco2.art1',
+      'bloco2.art2',
+      'dt.art1',
+      'dt.art2',
+      'dt2.art1',
+    ]);
+  });
+
+  it('art. 1º repetido sem numeração antes (maior que 1) não abre bloco: funde (vale o último)', () => {
+    const r = estruturar(blocos('Art. 1º (VETADO).', 'Art. 1º Texto.', 'Art. 2º Dois.'));
+    expect(artigos(r)).toEqual(['art1', 'art2']);
+    expect(tipos(r)).toEqual(['duplicata']);
+  });
+});
+
+describe('ordem de leitura (Dispositivo.ordem, 8.4)', () => {
+  it('pré-ordem de 1 em diante: 9 < 9-A < 10, nome antes dos filhos, ADCT depois do corpo', () => {
+    const r = estruturar(
+      blocos(
+        'TÍTULO I',
+        'DO TÍTULO',
+        'Art. 9º Nove:',
+        'I - inciso;',
+        'Art. 9º-A. Nove-A.',
+        'Rubrica do dez',
+        'Art. 10. Dez.',
+        'Brasília, 5 de outubro de 1988.',
+        'ATO DAS DISPOSIÇÕES CONSTITUCIONAIS TRANSITÓRIAS',
+        'Art. 1º Um.',
+      ),
+    );
+    const ordem = emOrdemDeLeitura(r.nos);
+    expect(ordem.map((o) => [o.no.endereco, o.pai?.endereco, o.ordem])).toEqual([
+      ['tit1', undefined, 1],
+      ['tit1.nome', 'tit1', 2],
+      ['art9', 'tit1', 3],
+      ['art9.incI', 'art9', 4],
+      ['art9A', 'tit1', 5],
+      ['art10', 'tit1', 6],
+      ['art10.nome', 'art10', 7],
+      ['adct', undefined, 8],
+      ['adct.art1', 'adct', 9],
+    ]);
   });
 });

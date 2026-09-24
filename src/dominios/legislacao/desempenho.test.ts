@@ -20,9 +20,9 @@ describe('normalização (8.1): desempenho', () => {
   );
 });
 
-// Estruturador (8.2–8.3): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
+// Estruturador (8.2–8.4): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
 // nenhuma lista enorme passa por `push(...itens)`, que estoura a pilha.
-describe('estruturador (8.2–8.3): desempenho', () => {
+describe('estruturador (8.2–8.4): desempenho', () => {
   const linhas = (n: number, texto: (k: number) => string) =>
     Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
   it.each([
@@ -41,6 +41,25 @@ describe('estruturador (8.2–8.3): desempenho', () => {
       linhas(100_000, (k) => (k ? '(Vide Lei nº 1, de 2000)' : 'Rubrica')),
     ],
     ['"Art." quebrado sem fim', linhas(100_000, () => 'Art.')],
+    // 8.4: a fusão de endereço repetido (`indexOf` + `splice` e cópia das redações ficavam
+    // quadráticos), a linha continuada (relia o texto inteiro), a citação e o bloco sem fim.
+    ['mesmo artigo repetido', linhas(100_000, () => 'Art. 1º Texto.')],
+    [
+      'artigo e parágrafo repetidos',
+      linhas(100_000, (k) => (k % 2 ? '§ 1º Texto.' : 'Art. 1º Texto.')),
+    ],
+    ['incisos sem fim', linhas(100_000, (k) => (k ? 'I - texto;' : 'Art. 1º Texto:'))],
+    ['linha continuada sem fim', linhas(100_000, (k) => (k ? 'e continua' : 'Art. 1º Texto'))],
+    [
+      'citação sem fim',
+      linhas(100_000, (k) => (k === 1 ? '"Começa' : k ? '§ 1º dentro' : 'Art. 1º A:')),
+    ],
+    [
+      'blocos sem fim',
+      linhas(100_000, (k) =>
+        k % 3 === 2 ? 'Das Disposições Transitórias' : `Art. ${String((k % 3) + 1)}º Texto.`,
+      ),
+    ],
     [
       'notas numa linha só',
       [

@@ -61,6 +61,8 @@ export const TipoDispositivo = z.enum([
   'alinea',
   'item',
   'anexo',
+  // Trecho com numeração própria aberto por título solto (ADCT da CF); estrutural (8.4).
+  'bloco',
 ]);
 export type TipoDispositivo = z.infer<typeof TipoDispositivo>;
 
