@@ -30,12 +30,13 @@ const TS = '1790000000000-000000-0000000a';
 
 let db: PGlite;
 
+// O boot do PGlite passa dos 10 s padrão no Windows sob carga (solucao-de-problemas.md).
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(PRELUDIO);
   for (const sql of MIGRACOES) await db.exec(sql);
   await db.exec(`insert into auth.users values ('${A}'), ('${B}');`);
-});
+}, 60_000);
 
 afterAll(async () => {
   await db.close();

@@ -34,7 +34,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** gerar o escape por script Node a partir do código do caractere (`String.fromCharCode(92)` para a barra) ou copiá-lo de outro arquivo por script; depois, conferir que a barra invertida literal está no arquivo. **Prevenção:** varredura de caracteres invisíveis em `src/`:
   `node -e 'const fs=require("fs"),p=require("path");const r=/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u00a0\u200b\ufeff\uffff\u0300-\u036f]/;(function a(d){for(const n of fs.readdirSync(d)){const f=p.join(d,n);fs.statSync(f).isDirectory()?a(f):/\.(ts|tsx|css)$/.test(n)&&r.test(fs.readFileSync(f,"utf8"))&&console.log(f)}})("src")'`
   (este documento é Markdown e não passa pelo Prettier; o comando acima foi copiado por script, com os escapes literais; rodar no Git Bash — ver o item seguinte).
-- **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11; o caso da quebra de linha entrou no merge 9b71b2f e o exemplo foi corrigido em 6db6ede; de novo na 7.2, com o escape de U+FFFD gravado pelo Write como o caractere real em `scripts/corpus/derivados.mjs`, trocado por script antes do commit; e na 7.3, com U+00AD, U+00A0 e U+0300–U+036F em `scripts/corpus/gabarito.mjs`, trocados por script; nos testes, usar `String.fromCharCode`). Conferir com `grep -c` o byte `EF BF BD` depois de gravar arquivo com esse escape.
+- **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11; o caso da quebra de linha entrou no merge 9b71b2f e o exemplo foi corrigido em 6db6ede; de novo na 7.2, com o escape de U+FFFD gravado pelo Write como o caractere real em `scripts/corpus/derivados.mjs`, trocado por script antes do commit; e na 7.3, com U+00AD, U+00A0 e U+0300–U+036F em `scripts/corpus/gabarito.mjs`, trocados por script; nos testes, usar `String.fromCharCode`; de novo na 8.1, com U+00AD, invisíveis, U+FFFD e marcas combinantes em `normalizacao.ts` e nos testes: o Write gravou os escapes como caracteres, e um script os reescreveu como escape, gerando a barra com `String.fromCharCode(92)` e trocando só o que é invisível, espaço especial, combinante ou confundível; os de controle, U+0000 a U+009F, chegaram intactos). Conferir com `grep -c` o byte `EF BF BD` depois de gravar arquivo com esse escape.
 
 ### Comando "passa" mas falhou, ou script quebra no Windows
 - **Sintoma:** a saída mostra falha e o código de saída é 0; script em Python não roda; comando Bash colado no PowerShell é recusado por sintaxe; `node -e '…require("fs")…'` dá `ReferenceError` no PowerShell. **Causa:** em `comando | head`, o código de saída é o do `head` e a falha do comando some; Python não é confiável na máquina do Gabriel; PowerShell e Bash têm sintaxes próprias; o Windows PowerShell 5.1 descarta as aspas duplas internas ao chamar programa externo.
@@ -44,9 +44,9 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ## Verificação (check, lint, tipos, testes, E2E, CI)
 
 ### `npm run check` falha no Windows sem mudança no código
-- **Sintoma:** `UNKNOWN: lstat 'C:\'` e falha ao abrir arquivos do `node_modules`; ou o boot do PGlite estoura os 10 s do `beforeAll` do `supabase/rls.test.ts`. Em 23/09/2026, duas de quatro rodadas falharam assim. **Causa:** sistema de arquivos e CPU do Windows sob carga, sem relação com o código.
-- **Solução:** rodar de novo. **Prevenção:** se o timeout do PGlite se repetir, dar um limite maior só a esse `beforeAll`.
-- **Origem:** ocorrido em 23/09/2026 (registrado em d87ddca).
+- **Sintoma:** `UNKNOWN: lstat 'C:\'` e falha ao abrir arquivos do `node_modules`; `Cannot find module '…node_modules…'` de um arquivo que existe (`uuid`, `@testing-library/user-event`, `dom-accessibility-api`), logo depois de um `npm ci` num worktree novo; teste de tela do `App.test.tsx` que não acha um texto ("Importação concluída", "Sem conexão") e passa sozinho; ou o boot do PGlite estoura o `beforeAll` do `supabase/rls.test.ts`. Em 23/09/2026, duas de quatro rodadas falharam assim; na 8.1, quatro rodadas seguidas, cada uma num teste diferente. **Causa:** sistema de arquivos e CPU do Windows sob carga (antivírus lendo o `node_modules` recém-instalado, agentes rodando em paralelo), sem relação com o código.
+- **Solução:** rodar de novo, sem outra carga na máquina; para confirmar o código, `npx vitest run --project unidade --maxWorkers=4` (486 testes verdes na 8.1) e o CI do PR, que roda no Linux. **Prevenção:** o `beforeAll` do PGlite tem 60 s desde a 8.1 (o timeout se repetiu).
+- **Origem:** ocorrido em 23/09/2026 (registrado em d87ddca; de novo na 8.1).
 
 ### `format:check` reprova `.claude/settings.local.json`
 - **Sintoma:** `npm run check` para no Prettier apontando `.claude/settings.local.json`, sem mudança no código. **Causa:** o Claude Code grava as permissões da sessão nesse arquivo dentro do worktree; o git o ignora (ignore global do usuário), mas o Prettier o verificava.
@@ -57,6 +57,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** caminho inválido ao ler arquivo no teste. **Causa:** o ambiente padrão do Vitest é jsdom, onde `import.meta.url` não é `file:`.
 - **Solução:** `// @vitest-environment node` no topo e `import.meta.dirname` (como em `supabase/rls.test.ts`). **Prevenção:** esse cabeçalho em todo teste que lê o disco (corpus, migrações).
 - **Origem:** ocorrido em 23/09/2026 (registrado em 13355bc).
+
+### Teste em `src/` que lê o corpus não compila
+- **Sintoma:** `Cannot find name 'node:fs'` ou `'process'` no `tsc -b`, e o lint acusa chamada insegura. **Causa:** o `tsconfig.app.json` (que cobre `src/`) não tem os tipos do Node; e o teste que usa o sanitizador precisa do jsdom, então o `@vitest-environment node` não serve.
+- **Solução:** ler os arquivos pelo Vite, sem Node: `import.meta.glob<string>('../../../corpus/normas/*.colado.txt', { query: '?raw', import: 'default', eager: true })` (como em `src/dominios/legislacao/normalizacao-corpus.test.ts`). **Prevenção:** o próprio `tsc -b` do check.
+- **Origem:** ocorrido em 23/09/2026 (8.1, antes do commit).
 
 ### Playwright ou TypeScript "desatualizados" de propósito
 - **Sintoma:** E2E não abre o Chromium, ou o `@axe-core/playwright` puxa outra versão; lint quebra depois de atualizar o TypeScript. **Causa:** Playwright fixado em 1.56.1 (o Chromium do contêiner é o `chromium-1194`), com `playwright-core` fixado junto, também em `1.56.1` exato no `package.json` (desde 23/09/2026; antes era `^1.56.1`), para o axe não puxar outra versão; TypeScript fixado em `~6.0` porque o `typescript-eslint` ainda não aceita o 7.
@@ -69,7 +74,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
 ### A revisão da etapa acha o que os testes não pegaram
-- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc; no fim da etapa 7, 10 achados, 6 deles confirmados no corpus, corrigidos no commit `fix(legislacao)` depois do da 7.3). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
+- **Sintoma:** o `/code-review` achou problemas reais em todas as etapas (commits 0719706, 83b0d18, bb696e0, a3ce9f4, 3c07cbf, ed0a209; na 7.1, 15 achados de uma revisão adversarial, corrigidos no próprio 13355bc; no fim da etapa 7, 10 achados, 6 deles confirmados no corpus, corrigidos no commit `fix(legislacao)` depois do da 7.3; na 8.1, revisão adversarial com três lentes e um verificador por achado: 10 confirmados e 8 refutados, corrigidos antes do commit, com um teste cada em "correções da revisão da 8.1"). **Causa:** testes cobrem o caminho previsto; a revisão procura bordas (corrida entre abas, clique duplo, prévia defasada, entrada adulterada).
 - **Solução:** correções num commit `fix(...)` próprio. **Prevenção:** manter o hábito ao fim de cada bloco (rotina do plano, passo 6) e registrar aqui cada classe de defeito.
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
@@ -388,18 +393,38 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Tachado decorativo tratado como redação anterior (ou o contrário)
 - **Sintoma:** "Art. 1º" vira redação anterior; ou revogação da ALESP aparece como vigente. **Causa:** o `<s>` é decorativo no Planalto (só em `º`/`ª`; 56 na LC 80) e é a marca real de revogação na ALESP (172 na LC-SP 988); o `line-through` por estilo também é redação anterior.
-- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. **Prevenção:** gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores).
-- **Origem:** previsto — atividade 8.6.
+- **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. O decorativo já sai na normalização (8.1): a marca do ordinal herda a formatação do número, e no parágrafo tachado de verdade continua tachada. **Prevenção:** `normalizacao-corpus.test.ts` (o tachado se preserva caractere a caractere, menos os 56 decorativos da LC 80); gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores).
+- **Origem:** previsto na 8.6; a parte do ordinal prevenida em 23/09/2026 (8.1). O `<s>X</s> XI -` da ALESP (art. 134) é renumeração, não decorativo: continua com a 8.6.
 
 ### Fim de linha misto quebra a segmentação
 - **Sintoma:** linhas grudadas ou vazias no meio do texto. **Causa:** LEP, LC 80 e CF em CRLF; o CP com maioria de LF (11.953 LF e 5.694 CRLF, inclusive dentro do texto); a ALESP em LF.
-- **Solução:** a normalização trata CRLF, CR e LF do mesmo jeito. **Prevenção:** testes de normalização da 8.1.
-- **Origem:** previsto — atividade 8.1.
+- **Solução:** o sanitizador e o `textoParaBlocos` tratam CRLF, CR e LF do mesmo jeito (o texto puro também quebra em U+2028 e U+2029, a quebra de linha do Word), e a normalização troca por espaço a quebra que sobrar dentro de um bloco. **Prevenção:** teste "CRLF, CR e LF dão os mesmos blocos, no texto puro e no HTML" (`normalizacao.test.ts`) e o do `textoParaBlocos` em `sanitizador.test.ts`.
+- **Origem:** previsto na 8.1; prevenido em 23/09/2026 (atividade 8.1).
 
 ### Palavra partida, busca que falha ou ordinal não reconhecido
-- **Sintoma:** palavra com hífen invisível e busca sem resultado; "Art. 1o", "Artigo 1°" ou "N° 988" sem virar artigo. **Causa:** hífen suave (U+00AD) no lugar de hífen verdadeiro (79 na LC 80); o Planalto alterna `º` e "o", e a ALESP usa o sinal de grau (`°`).
-- **Solução:** normalizar (regra 1: U+00AD, º/o/°/ª) e aceitar "Artigo" (regra 5). **Prevenção:** testes da 8.1 e da 8.3 com casos do corpus; a varredura de caracteres invisíveis de `src/` não cobre U+00AD.
-- **Origem:** previsto — atividades 8.1 e 8.3.
+- **Sintoma:** palavra com hífen invisível e busca sem resultado, ou palavras coladas ("incumbindolhe", "farseá"), ou hífens no meio das sílabas ("De-fen-so-ria"); "Art. 1o", "Artigo 1°", "§ 3 o" ou "N° 988" sem virar artigo. **Causa:** no Planalto o hífen suave (U+00AD) está no lugar do hífen verdadeiro (79 na LC 80, em ênclise, mesóclise e compostos): removê-lo cola as palavras; no Word e no PDF ele marca sílaba. O Planalto alterna `º` e "o" (o `<sup>o</sup>` perde o sup), às vezes com espaço, e a ALESP usa o sinal de grau (`°`).
+- **Solução:** `normalizarBlocos` (regra 1): U+00AD vira "-" quando a norma inteira tem cara de hífen e some quando tem cara de sílaba (`relatorio.hifenSuave`); ordinais viram º/ª com a formatação do número (ver os fatos da normalização no plano). Na 8.3, aceitar "Artigo" (regra 5). **Prevenção:** `normalizacao.test.ts` (casos do corpus) e `normalizacao-corpus.test.ts` (nenhum U+00AD nem ordinal solto sobra nos 7 colados); a 8.3 repete com rótulos. A varredura de caracteres invisíveis de `src/` não cobre U+00AD.
+- **Origem:** previsto nas 8.1 e 8.3; a normalização prevenida em 23/09/2026 (8.1), onde a medição mostrou que remover o U+00AD, como dizia o plano, estragaria 79 palavras da LC 80.
+
+### Regex de rótulo ou nota falha por espaço, travessão ou aspas
+- **Sintoma:** "§ 1º" não casa por causa de um espaço duplo ou de um trecho só de espaço com ênfase entre o rótulo e o traço; "I – a primazia" (LC 80) ou "Pena – reclusão" (CP) não vira inciso ou pena; `"Caput" acrescentado` (ALESP) não vira nota. **Causa:** o sanitizador não recolapsa o espaço entre nós de texto vizinhos (milhares de blocos); a fonte usa "-" e "–"; o texto exibido mantém aspas e travessões como vieram.
+- **Solução:** sempre `normalizarBlocos` antes de qualquer regra, e casar na `chaveDeCasamento` (travessões e aspas unificados, mesmo comprimento: o índice do casamento vale no texto). Nunca tirar o espaço em volta do traço (é o que separa "Art. 1º - A" de "Art. 9º-A"). **Prevenção:** invariantes de `normalizacao-corpus.test.ts` (sem espaço sobrando, trechos fundidos); testes da 8.3–8.6 com os casos do corpus.
+- **Origem:** ocorrido na medição da 8.1 (23/09/2026); previsto para o estruturador nas atividades 8.3–8.6.
+
+### A normalização muda a letra da lei (grau, contração, composto)
+- **Sintoma:** "declividade superior a 45°" exibido como "45º"; "nesta Lei nos 2 (dois) anos" como "nºs 2"; numa norma com muitos compostos em minúscula ("auxílio-doença", "salário-família") os hífens suaves somem e as palavras colam. **Causa:** regra de ordinal larga demais (grau depois de qualquer número; "no" + número depois de "Lei" tomado sempre por "nº") e a decisão do hífen suave contando só ênclise e maiúscula como hífen.
+- **Solução:** ° vira º só depois de um algarismo de 1 a 9 (no corpus, todo ° ordinal tem um algarismo); "no"/"nos" só vira "nº" quando o número não vem seguido de ordinal nem de extenso entre parênteses; composto conta como hífen quando a palavra da direita aparece solta na norma. **Prevenção:** "correções da revisão da 8.1" em `normalizacao.test.ts` (Código Florestal, ECA, Lei 10.261/68 da ALESP); regra nova de ordinal entra com casos que **não** devem mudar.
+- **Origem:** ocorrido em 24/09/2026 (revisão adversarial da 8.1, antes do commit).
+
+### Grifo, busca ou rótulo no lugar errado depois de normalizar
+- **Sintoma:** o casamento acha o rótulo, mas o corte do texto sai deslocado; grifo ou resultado de busca uns caracteres adiante. **Causa:** usar como base de índice um texto de comparação que muda o comprimento (tirar o ponto de "N.º", colapsar espaço antes de pontuação, tirar acento).
+- **Solução:** a `chaveDeCasamento` troca caractere por caractere, sem mudar o comprimento; comparação que muda o comprimento (a da 8.9 e a da F6) fica separada e nunca dá índice. **Prevenção:** teste "unifica travessões e aspas sem mudar o comprimento" (`normalizacao.test.ts`).
+- **Origem:** previsto — atividades 8.3–8.6, 8.9, 11.4, 11.6 e F6.
+
+### Colar enorme trava a normalização
+- **Sintoma:** a tela congela ao colar um texto grande numa linha só. **Causa:** regra quadrática: lookbehind `\d,\d*` que volta a sequência inteira de algarismos em cada posição, ou checagem da ponta do bloco que fatiava o texto a cada hífen suave.
+- **Solução:** lookbehind limitado (`\d{0,9}`) e pontas do bloco calculadas uma vez. **Prevenção:** `desempenho.test.ts` (2 milhões de caracteres hostis por regra, abaixo de 5 s); toda regra nova de normalização ou do estruturador entra nesse teste.
+- **Origem:** ocorrido em 23/09/2026 (8.1, achado na releitura, antes do commit).
 
 ### "Art" quebrado, capitular ou sangria entre artigos
 - **Sintoma:** artigo ausente, dois artigos fundidos, ou rubrica colada no artigo anterior. **Causa:** "Art" e número em linhas ou tags diferentes; capitular `<strong>A</strong>rt.`; rubrica em negrito antes do "Art." (é o `nome` do seguinte); citação "art." em minúscula no meio do texto.
@@ -480,6 +505,26 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** estrelar a Seção I não propaga, ou desmarcar um artigo apaga a estrela do nó; grifo some ou cai no trecho errado depois de corrigir o texto. **Causa:** herança gravada em vez de calculada, ou exceção fora do caminho mais próximo; âncora por offsets que não batem com o texto novo.
 - **Solução:** gravar só `direta` e `excecao` e calcular a herança na leitura; reancoragem exata → aproximada → pendente, com evento `marcacao.pendenteReancoragem`. **Prevenção:** tabela-verdade de cenários (11.2) e teste "um grifo sobrevive à correção de texto" (11.7).
 - **Origem:** previsto — atividades 11.2 e 11.7.
+
+### Destaque automático acende demais, ou é confundido com grifo
+- **Sintoma:** linhas inteiras acesas; "desde a data" destacado como condição; o destaque se confunde com um grifo. **Causa:** termo genérico no dicionário (na LEP, "é" 183 vezes, "pode" 99, "não" 65, "deve" 61 em 973 linhas); palavra ambígua ("desde" temporal × "desde que"); estilo parecido com o dos grifos.
+- **Solução:** dicionário por categoria com as expressões compostas primeiro; genéricos fora; estilo sem as cores dos grifos e que não depende só de cor. **Prevenção:** métrica de ruído por norma com limite no teste e casos que **não** devem acender (9.8).
+- **Origem:** previsto — atividade 9.8.
+
+### Preferência nova quebra o aparelho ou um backup antigo
+- **Sintoma:** `RegistroInvalido` ao abrir o app ou ao restaurar um pacote depois da 9.8. **Causa:** campo obrigatório novo em `Preferencias` (esquema estrito), ausente no registro que já existe no aparelho e nos pacotes antigos.
+- **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado), sem migração. **Prevenção:** teste com preferência sem o campo e restauração de pacote v1 (9.8).
+- **Origem:** previsto — atividade 9.8.
+
+### Artigo por artigo perde a posição, rouba tecla ou apaga demais
+- **Sintoma:** ao sair do cartão, o leitor abre noutro artigo; a seta troca de artigo enquanto se digita uma anotação; deslizar troca de artigo ao selecionar texto para grifar; o texto esmaecido fica ilegível. **Causa:** posição guardada em pixels; atalho sem checar o foco; gesto horizontal disputando a seleção; esmaecido abaixo do contraste mínimo.
+- **Solução:** a posição é o artigo do cartão (`posicaoId`); setas só fora de campo (ver "Atalho de teclado rouba a tecla de outro controle"); deslizar só se não brigar com a seleção, senão só os botões; esmaecido com contraste AA para texto grande. **Prevenção:** E2E nos 3 tamanhos e axe (11.8).
+- **Origem:** previsto — atividade 11.8.
+
+### Remissão abre o dispositivo errado, ou "voltar" não volta
+- **Sintoma:** "art. 76 do ADCT" abre o art. 76 do corpo da CF; "art. 121 do Código Penal", lido na LEP, abre o art. 121 da própria LEP; "arts. 260 a 262" abre só o 260; prévia de artigo revogado sem aviso; "voltar" abre noutro ponto. **Causa:** remissão resolvida sem o prefixo do bloco, sem ver a norma citada depois do número ou sem tratar o intervalo; posição não empilhada ao "ir para".
+- **Solução:** citação seguida de outra norma ("do Código…", "da Lei nº…") fica `externa` e sem resolução, e "desta Lei"/"desta Constituição" são internas; prefixo de bloco da 8.4; intervalo vira lista; o que não resolve fica como texto comum; aviso de revogado e endereço novo do renumerado; pilha de posições. **Prevenção:** testes com casos da CF e da LEP e métrica conferida contra as âncoras da própria CF (11.9).
+- **Origem:** previsto — atividade 11.9.
 
 ## Uso do app
 

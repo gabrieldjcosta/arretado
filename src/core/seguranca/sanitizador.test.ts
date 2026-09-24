@@ -142,6 +142,12 @@ describe('limites e texto puro', () => {
       { trechos: [{ texto: '§ 1º Outro' }] },
     ]);
   });
+
+  it('CR sozinho, U+2028 e U+2029 (quebra de linha do Word) também separam linhas (8.1)', () => {
+    expect(
+      textoParaBlocos('Art. 1º A lei.\rArt. 2º\u2028Art. 3º\u2029').map((b) => b.trechos[0]?.texto),
+    ).toEqual(['Art. 1º A lei.', 'Art. 2º', 'Art. 3º']);
+  });
 });
 
 describe('correções da revisão da etapa 2', () => {
