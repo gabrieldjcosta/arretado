@@ -78,9 +78,14 @@ export function juntarTrechos(partes: readonly Trecho[][]): Trecho[] {
   const saida: Trecho[] = [];
   partes.forEach((trechos, n) => {
     if (n > 0 && trechos.length > 0) saida.push({ texto: ' ' });
-    saida.push(...trechos);
+    acrescentar(saida, trechos);
   });
   return aparar(saida);
+}
+
+/** `push(...itens)` estoura a pilha com centenas de milhares de itens (página hostil). */
+export function acrescentar<T>(destino: T[], itens: readonly T[]): void {
+  for (const x of itens) destino.push(x);
 }
 
 /** Tira os espaços das pontas (o recorte antes de uma nota deixa o espaço no fim). */

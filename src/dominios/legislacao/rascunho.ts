@@ -87,7 +87,8 @@ export interface NoRascunho {
    * Endereço canônico no formato de `Dispositivo.endereco` (segmentos [a-zA-Z0-9] separados por
    * ponto). Estrutura (8.2): o caminho dos nós (`parteEspecial.tit6.cap1`; `parte`, `liv`, `tit`,
    * `cap`, `sec`, `subsec` + número, com sufixo: `cap2A`); nome: `<endereço do pai>.nome`;
-   * `preambulo`; `anexo`. Dispositivos: 8.4. Repetido = anomalia.
+   * `preambulo`; `anexo`. Artigo (8.3): `art9A`, `art1000`, `artUnico`. Demais dispositivos:
+   * 8.4. Repetido = anomalia.
    */
   endereco: string;
   /** Rótulo de exibição ("Art. 9º-A", "§ 1º", "Parágrafo único", "VI-A", "a)", "TÍTULO II"); TextoCurto. */
@@ -124,7 +125,8 @@ export type MetadadosNorma = Partial<
 /**
  * Linha que não entra na norma: cabeçalho do portal; fecho (local, data, assinaturas, aviso do DOU);
  * sobra da fonte; `redacao_anterior`: linha tachada que a 8.6 ainda vai anexar ao dispositivo
- * (salvaguarda da leitura antecipada: tachado nunca vira texto vigente).
+ * (salvaguarda da leitura antecipada: tachado nunca vira texto vigente) e, junto, a rubrica do
+ * artigo todo tachado (CP, arts. 185, 279 e 350), que a 8.6 faz nome do revogado.
  */
 export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra' | 'redacao_anterior';
 

@@ -20,8 +20,9 @@ describe('normalização (8.1): desempenho', () => {
   );
 });
 
-// Estruturador (8.2): página hostil com muitas linhas; nenhuma regra pode ser quadrática.
-describe('estruturador (8.2): desempenho', () => {
+// Estruturador (8.2–8.3): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
+// nenhuma lista enorme passa por `push(...itens)`, que estoura a pilha.
+describe('estruturador (8.2–8.3): desempenho', () => {
   const linhas = (n: number, texto: (k: number) => string) =>
     Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
   it.each([
@@ -34,6 +35,20 @@ describe('estruturador (8.2): desempenho', () => {
     ['linha solta sem fim', linhas(100_000, (k) => (k ? 'Rubrica' : 'TÍTULO I'))],
     ['parênteses numa linha', [{ trechos: [{ texto: 'TÍTULO I ' + '(a'.repeat(500_000) + ')' }] }]],
     ['artigos', linhas(100_000, (k) => `Art. ${String(k + 1)}. Texto.`)],
+    ['rubricas sem fim', linhas(100_000, (k) => (k ? 'Rubrica candidata' : 'Art. 1º Texto.'))],
+    [
+      'rubrica e notas sem fim',
+      linhas(100_000, (k) => (k ? '(Vide Lei nº 1, de 2000)' : 'Rubrica')),
+    ],
+    ['"Art." quebrado sem fim', linhas(100_000, () => 'Art.')],
+    [
+      'notas numa linha só',
+      [
+        { trechos: [{ texto: 'TÍTULO I' }] },
+        // 200 mil notas: `push(...notas)` estourava a pilha a partir de uns 150 mil itens.
+        { trechos: [{ texto: '(Vide) '.repeat(200_000) }] },
+      ],
+    ],
   ])(
     '%s',
     (_nome, blocos) => {

@@ -9,11 +9,18 @@ import { readFile } from 'node:fs/promises';
 import { TextDecoder } from 'node:util';
 import { sanitizarHtml } from '../src/core/seguranca/sanitizador';
 import { estruturar } from '../src/dominios/legislacao/estruturador';
-import { estruturaDe, estruturaEsperada, type Gabarito } from '../src/testes/gabarito';
+import {
+  artigosDe,
+  artigosEsperados,
+  estruturaDe,
+  estruturaEsperada,
+  semRevogadosAusentes,
+  type Gabarito,
+} from '../src/testes/gabarito';
 
 const DIRETORIO = path.join(import.meta.dirname, '..', 'corpus', 'normas');
 
-describe('página oficial inteira → sanitizador → estruturador (8.2)', () => {
+describe('página oficial inteira → sanitizador → estruturador (8.2–8.3)', () => {
   it.each([
     ['cp', 4_613],
     ['cf', 133_966],
@@ -31,6 +38,15 @@ describe('página oficial inteira → sanitizador → estruturador (8.2)', () =>
         await readFile(path.join(DIRETORIO, `${id}.gabarito.json`), 'utf8'),
       ) as Gabarito;
       expect(estruturaDe(rascunho.nos)).toEqual(estruturaEsperada(id, gabarito));
+      // Os artigos e as rubricas também (8.3; o revogado todo tachado fica de fora até a 8.6).
+      const artigos = artigosDe(rascunho.nos);
+      const esperados = semRevogadosAusentes(
+        artigosEsperados(id, gabarito),
+        artigos.map((a) => a.endereco),
+      );
+      expect(artigos.map((a) => [a.endereco, a.nome !== undefined])).toEqual(
+        esperados.map((e) => [e.endereco, e.nome]),
+      );
       expect(rascunho.metadados.preambulo).toMatch(/^(?:O PRESIDENTE|Nós, representantes)/);
     },
     60_000,

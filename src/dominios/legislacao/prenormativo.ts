@@ -3,8 +3,9 @@
 // GOVERNADOR…", "Nós, representantes…") e o título em caixa alta que o CP traz depois dele
 // ("CÓDIGO PENAL"). Para no primeiro rótulo estrutural, artigo ou linha tachada: dali em diante é
 // o corpo. Casos do corpus: começo das 11 páginas (Planalto, ALESP, CF com "PREÂMBULO").
+import { ARTIGO_QUEBRADO, lerInicioDeArtigo, lerRubrica } from './artigo';
 import { lerRotuloEstrutural } from './estrutura';
-import { ehCaixaAlta, juntarTrechos, textoDe, type Linha } from './linhas';
+import { acrescentar, ehCaixaAlta, juntarTrechos, textoDe, type Linha } from './linhas';
 import { lerNotasDaLinha } from './notas';
 import type {
   Confianca,
@@ -24,13 +25,6 @@ export interface PreNormativo {
   proxima: number;
 }
 
-/**
- * Artigo no começo da linha, com o separador ("Art. 1º -", "Art 67.", "Artigo 1º -", "Art. 9º-A.");
- * sufixo só com o hífen colado ("Art. 1º - A execução" é separador). A 8.3 o torna tolerante.
- */
-export const INICIO_DE_ARTIGO =
-  /^(?:Art\.?|Artigo) ?(\d{1,4}(?:\.\d{3})?)º?((?:-[A-Z](?!\p{L}))*)(?: *\.)? *(?:- *)?/u;
-
 const EPIGRAFE =
   /^(LEI COMPLEMENTAR|LEI DELEGADA|LEI|DECRETO-LEI|DECRETO LEGISLATIVO|DECRETO|MEDIDA PROVIS[ÓO]RIA|EMENDA CONSTITUCIONAL|CONSTITUI[ÇC][ÃA]O|RESOLU[ÇC][ÃA]O|PORTARIA|INSTRU[ÇC][ÃA]O NORMATIVA)(?![\p{L}])/u;
 const NUMERO = /N[º°] ?(\d[\d.]*\d|\d)/u;
@@ -46,7 +40,10 @@ const PREAMBULO =
 
 /** Onde o corpo começa: rótulo estrutural, artigo ou linha tachada (a Parte Geral de 1940 do CP). */
 export const abreCorpo = (l: Linha) =>
-  l.tachada || INICIO_DE_ARTIGO.test(l.chave) || lerRotuloEstrutural(l) !== undefined;
+  l.tachada ||
+  lerInicioDeArtigo(l.chave) !== undefined ||
+  ARTIGO_QUEBRADO.test(l.chave) ||
+  lerRotuloEstrutural(l) !== undefined;
 
 export function lerPreNormativo(linhas: readonly Linha[], confianca: Confianca): PreNormativo {
   const metadados: MetadadosNorma = {};
@@ -54,6 +51,13 @@ export function lerPreNormativo(linhas: readonly Linha[], confianca: Confianca):
   const descartes: Descarte[] = [];
   let limite = linhas.findIndex(abreCorpo);
   if (limite < 0) limite = linhas.length;
+  // Rubrica do 1º artigo, sem nó estrutural antes (regra 4): já é do corpo. Só depois do
+  // preâmbulo ou sem epígrafe (artigos colados soltos): logo depois da epígrafe, é a ementa.
+  const antes = linhas[limite - 1];
+  if (antes && lerInicioDeArtigo(linhas[limite]?.chave ?? '') && ehRubricaDoCorpo(antes)) {
+    const anteriores = linhas.slice(0, limite - 1);
+    if (!anteriores.some(ehEpigrafe) || anteriores.some((l) => PREAMBULO.test(l.chave))) limite--;
+  }
   // Descartes seguidos do mesmo motivo viram uma faixa só (`k`: posição em `linhas`).
   const descartar = (motivo: Descarte['motivo'], k: number) => {
     const l = linhas[k] as Linha;
@@ -80,7 +84,7 @@ export function lerPreNormativo(linhas: readonly Linha[], confianca: Confianca):
     const l = linhas[k] as Linha;
     if (ROTULO_PREAMBULO.test(l.chave) || PREAMBULO.test(l.chave)) break;
     const notas = lerNotasDaLinha(l);
-    if (notas) notasDaNorma.push(...notas);
+    if (notas) acrescentar(notasDaNorma, notas);
     else if (PORTAL.test(l.chave) || e < 0) descartar('cabecalho', k);
     else ementa.push(l);
   }
@@ -128,6 +132,19 @@ export function lerPreNormativo(linhas: readonly Linha[], confianca: Confianca):
     descartes,
     proxima: k,
   };
+}
+
+/** Rubrica sem dúvida (confiança alta), que não é link do portal, epígrafe nem preâmbulo. */
+function ehRubricaDoCorpo(l: Linha): boolean {
+  const rubrica = lerRubrica(l);
+  return (
+    rubrica !== undefined &&
+    !rubrica.duvidosa &&
+    !PORTAL.test(l.chave) &&
+    !PREAMBULO.test(l.chave) &&
+    !ROTULO_PREAMBULO.test(l.chave) &&
+    !ehEpigrafe(l)
+  );
 }
 
 function ehEpigrafe(l: Linha): boolean {

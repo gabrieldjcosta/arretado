@@ -6,7 +6,7 @@ import { linkEntre, type Linha } from './linhas';
 import type { NotaDeVigencia, TipoNotaDeVigencia } from './rascunho';
 
 const CHAVE_NOTA =
-  /^(?:Reda[cç][aã]o|Inclu[ií]d[oa]s?|Acrescid[oa]s?|Acrescentad[oa]s?|Revogad[oa]s?|Renumerad[oa]s?|Vide|Vig[eê]ncia|Regulament[oa]|Regulamenta[cç][aã]o|Promulga[cç][aã]o|Produ[cç][aã]o de efeitos?|Convers[aã]o|Convertid[oa]|Declarad[oa]|Suspens[oa]|Execu[cç][aã]o suspensa|[UÚ]ltima atualiza[cç][aã]o|NR)(?!\p{L})/iu;
+  /^(?:Reda[cç][aã]o|Inclu[ií]d[oa]s?|Acrescid[oa]s?|Acrescentad[oa]s?|Revogad[oa]s?|Renumerad[oa]s?|Vide|Vig[eê]ncia|Regulament[oa]|Regulamenta[cç][aã]o|Promulga[cç][aã]o|Produ[cç][aã]o de efeitos?|Convers[aã]o|Convertid[oa]|Declarad[oa]|Express[aã]o (?:substitu[ií]d|declarad|suprimid|acrescid|inclu[ií]d|revogad)[oa]|Suspens[oa]|Execu[cç][aã]o suspensa|[UÚ]ltima atualiza[cç][aã]o|NR)(?!\p{L})/iu;
 
 /** Conteúdo de um parêntese que é nota. "(Revogado)" sozinho é texto do dispositivo, não nota. */
 function ehConteudoDeNota(conteudo: string): boolean {
