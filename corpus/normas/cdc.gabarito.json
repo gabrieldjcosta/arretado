@@ -21,10 +21,12 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "pendente",
-    "por": null,
-    "em": null,
-    "observacoes": []
+    "estado": "conferida",
+    "por": "Gabriel",
+    "em": "2026-09-24",
+    "observacoes": [
+      "Conferência parcial: 7 dos 50 itens sem divergência (commit d5e084b); o Gabriel dispensou o resto em 24/09/2026 e aponta erros na leitura no Arretado."
+    ]
   },
   "ultimoArtigo": "art119",
   "contagens": {

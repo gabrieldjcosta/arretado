@@ -21,11 +21,12 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "pendente",
-    "por": null,
-    "em": null,
+    "estado": "conferida",
+    "por": "Gabriel",
+    "em": "2026-09-24",
     "observacoes": [
-      "24/09/2026 (commit d5e084b): Gabriel conferiu 8 dos 10 itens reduzidos sem divergência; no art18A.par3 apontou que \"7.627\" no fim do texto é link para o Decreto 7.627/2011 — corrigido (número solto depois do fim da frase vira nota), o que mudou a amostra. Falta o art122."
+      "24/09/2026 (commit d5e084b): Gabriel conferiu 8 dos 10 itens reduzidos sem divergência; no art18A.par3 apontou que \"7.627\" no fim do texto é link para o Decreto 7.627/2011 — corrigido (número solto depois do fim da frase vira nota), o que mudou a amostra. Falta o art122.",
+      "24/09/2026: o art122 também bate (o Gabriel só esqueceu de marcar); conferência reduzida completa."
     ]
   },
   "ultimoArtigo": "art204",

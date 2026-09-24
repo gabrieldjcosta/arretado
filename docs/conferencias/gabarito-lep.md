@@ -31,7 +31,7 @@ Conferência do Gabriel (commit d5e084b): marcas mantidas. O **art18A.par3** sai
 - [x] **art83A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art83a)
   - Art. 83-A. Poderão ser objeto de execução indireta as atividades materiais acessórias, instrumentais ou complementares desenvolvidas em estabelecimentos penais, e notadamente: .
   - Nota: (Incluído pela Lei nº 13.190, de 2015)
-- [ ] **art122** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
+- [x] **art122** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
   - Art. 122. Os condenados que cumprem pena em regime semi-aberto poderão obter autorização para saída temporária do estabelecimento, sem vigilância direta, nos seguintes casos:
   - Redação anterior (tachado) [lida como art122.parUnico]: ~~Parágrafo único. A ausência de vigilância direta não impede a utilização de equipamento de monitoração eletrônica pelo condenado, quando assim determinar o juiz da execução. (Incluído pela Lei nº 12.258, de 2010)~~
 - [x] **art122.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
