@@ -2,6 +2,19 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/lc80.gabarito.json` › `conferencia`.
 
+## Conferência reduzida (24/09/2026)
+
+Depois da CF sem divergência, basta conferir estes 8 itens de risco (tachado, revogado, vetado, artigo com letra). Achar cada um na amostra abaixo pelo endereço em negrito; os demais podem ficar sem marca.
+
+- **art15A** (artigo com sufixo)
+- **art22.parUnico** (vetado)
+- **art39.par2.incV** (parágrafo, inciso ou alínea revogado)
+- **art40** (artigo revogado)
+- **art84.par2.incV** (parágrafo, inciso ou alínea revogado)
+- **art85** (artigo revogado)
+- **art97B** (artigo com sufixo)
+- **art101** (várias redações anteriores)
+
 ## Como conferir (~30 min)
 
 1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).

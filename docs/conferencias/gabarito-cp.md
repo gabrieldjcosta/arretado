@@ -2,6 +2,21 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/cp.gabarito.json` › `conferencia`.
 
+## Conferência reduzida (24/09/2026)
+
+Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Achar cada um na amostra abaixo pelo endereço em negrito; os demais podem ficar sem marca.
+
+- **art44** (redação anterior no ancestral)
+- **art46** (várias redações anteriores)
+- **art47.incIII** (texto diferente na compilada)
+- **art92.parUnico** (divergência decidida)
+- **art110.par1** (várias redações anteriores)
+- **art112** (redação anterior no ancestral)
+- **art141.par2** (caso: duplicata)
+- **art148.par1.incIII** (texto diferente na compilada)
+- **art171.par5** (caso: revogacao-reescrita)
+- **art171.par5.incI** (caso: revogacao-reescrita)
+
 ## Como conferir (~30 min)
 
 1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).

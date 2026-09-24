@@ -2,6 +2,23 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/lc-sp-988.gabarito.json` › `conferencia`.
 
+## Conferência reduzida (24/09/2026)
+
+Depois da CF sem divergência, basta conferir estes 12 itens de risco (tachado, revogado, vetado, artigo com letra). Achar cada um na amostra abaixo pelo endereço em negrito; os demais podem ficar sem marca.
+
+- **art54** (artigo revogado)
+- **art59A** (artigo com sufixo)
+- **art71B** (artigo com sufixo)
+- **art87.incVI** (parágrafo, inciso ou alínea revogado)
+- **art109.parUnico** (caso: tachado-parcial)
+- **art115.par1** (caso: tachado-parcial)
+- **art159** (caso: linha-continuada)
+- **art234** (redação anterior no ancestral)
+- **dt.art4** (artigo de bloco com numeração própria)
+- **dt.art9** (várias redações anteriores)
+- **dt.art10.par1.it4** (várias redações anteriores)
+- **dt.art11** (artigo de bloco com numeração própria)
+
 ## Como conferir (~30 min)
 
 1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
