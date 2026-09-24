@@ -506,6 +506,26 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** gravar só `direta` e `excecao` e calcular a herança na leitura; reancoragem exata → aproximada → pendente, com evento `marcacao.pendenteReancoragem`. **Prevenção:** tabela-verdade de cenários (11.2) e teste "um grifo sobrevive à correção de texto" (11.7).
 - **Origem:** previsto — atividades 11.2 e 11.7.
 
+### Destaque automático acende demais, ou é confundido com grifo
+- **Sintoma:** linhas inteiras acesas; "desde a data" destacado como condição; o destaque se confunde com um grifo. **Causa:** termo genérico no dicionário (na LEP, "é" 183 vezes, "pode" 99, "não" 65, "deve" 61 em 973 linhas); palavra ambígua ("desde" temporal × "desde que"); estilo parecido com o dos grifos.
+- **Solução:** dicionário por categoria com as expressões compostas primeiro; genéricos fora; estilo sem as cores dos grifos e que não depende só de cor. **Prevenção:** métrica de ruído por norma com limite no teste e casos que **não** devem acender (9.8).
+- **Origem:** previsto — atividade 9.8.
+
+### Preferência nova quebra o aparelho ou um backup antigo
+- **Sintoma:** `RegistroInvalido` ao abrir o app ou ao restaurar um pacote depois da 9.8. **Causa:** campo obrigatório novo em `Preferencias` (esquema estrito), ausente no registro que já existe no aparelho e nos pacotes antigos.
+- **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado), sem migração. **Prevenção:** teste com preferência sem o campo e restauração de pacote v1 (9.8).
+- **Origem:** previsto — atividade 9.8.
+
+### Artigo por artigo perde a posição, rouba tecla ou apaga demais
+- **Sintoma:** ao sair do cartão, o leitor abre noutro artigo; a seta troca de artigo enquanto se digita uma anotação; deslizar troca de artigo ao selecionar texto para grifar; o texto esmaecido fica ilegível. **Causa:** posição guardada em pixels; atalho sem checar o foco; gesto horizontal disputando a seleção; esmaecido abaixo do contraste mínimo.
+- **Solução:** a posição é o artigo do cartão (`posicaoId`); setas só fora de campo (ver "Atalho de teclado rouba a tecla de outro controle"); deslizar só se não brigar com a seleção, senão só os botões; esmaecido com contraste AA para texto grande. **Prevenção:** E2E nos 3 tamanhos e axe (11.8).
+- **Origem:** previsto — atividade 11.8.
+
+### Remissão abre o dispositivo errado, ou "voltar" não volta
+- **Sintoma:** "art. 76 do ADCT" abre o art. 76 do corpo da CF; "art. 121 do Código Penal", lido na LEP, abre o art. 121 da própria LEP; "arts. 260 a 262" abre só o 260; prévia de artigo revogado sem aviso; "voltar" abre noutro ponto. **Causa:** remissão resolvida sem o prefixo do bloco, sem ver a norma citada depois do número ou sem tratar o intervalo; posição não empilhada ao "ir para".
+- **Solução:** citação seguida de outra norma ("do Código…", "da Lei nº…") fica `externa` e sem resolução, e "desta Lei"/"desta Constituição" são internas; prefixo de bloco da 8.4; intervalo vira lista; o que não resolve fica como texto comum; aviso de revogado e endereço novo do renumerado; pilha de posições. **Prevenção:** testes com casos da CF e da LEP e métrica conferida contra as âncoras da própria CF (11.9).
+- **Origem:** previsto — atividade 11.9.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).

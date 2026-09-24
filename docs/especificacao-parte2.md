@@ -249,13 +249,15 @@ Título curto (obrigatório) · título oficial · referência (nº/ano) · tipo
 
 #### Leitor
 - Hierarquia com recuo/tipografia por nível; nome do artigo acima, discreto; notas de vigência atenuadas ao fim; redações anteriores ocultas com indicador; revogado exibe "Art. X — (revogado)" em uma linha atenuada, expansível.
-- **Modo foco**: só texto; botão de retorno fixo e semitransparente que acompanha a rolagem; atalho de teclado; sai na mesma posição.
+- **Modo foco**: só texto; botão de retorno fixo e semitransparente que acompanha a rolagem; atalho de teclado; sai na mesma posição. **Leitura artigo por artigo** (decisão de 24/09/2026): um artigo inteiro por vez num cartão iluminado, o resto esmaecido e ainda legível; "anterior"/"próximo" por botão e teclado; o "lido até" avança ao passar ao próximo.
 - **Filtros**: tudo · só estrelados · só selecionados · só com marcações · só com erros. Filtros mantêm os nós estruturais dos itens exibidos como contexto.
 - **Estrela**: no dispositivo ou no nó; herança e exceção conforme Parte 1; "ver só estrelados" é o modo de leitura para véspera de prova.
 - **Grifos**: seleção de trecho → cor (3 cores, sem nomes) ou nota; ancorados por texto + offsets; reancoragem por busca do trecho na nova versão (exata → aproximada → pendente).
 - **Lido até**: marcador por norma; "continuar leitura" abre nele; retrocede só por ação do usuário.
 - **Ações por dispositivo**: estrela · grifar · anotar · vincular a ponto · registrar erro sobre este dispositivo (pré-preenche "o que foi" com a referência) · criar cartão deste trecho · ver precedentes/erros/notas vinculados · corrigir texto · copiar referência ("art. 9º-A, LEP").
 - **Busca dentro da norma**: por texto e por endereço ("112", "§ 2º do 112").
+- **Destaques automáticos** (opcional, decisão de 24/09/2026): com a preferência ligada, o leitor destaca prazos e tempo, exceções e condições, termos absolutos e penas, quóruns e frações ("prazo de até 30 (trinta) dias", "salvo", "desde que", "qualquer", "reclusão, de 2 (dois) a 8 (oito) anos"). Calculado na leitura, nunca gravado como grifo; estilo distinto dos grifos, que não depende só de cor.
+- **Remissões** (decisão de 24/09/2026): a citação de outro dispositivo da mesma norma ("nos termos do art. 84, XIX", "§ 2º deste artigo") abre uma prévia do texto citado sem perder a posição, com "ir para" e "voltar" e aviso quando o citado foi revogado ou renumerado. Remissão para outra norma, "citado por" e "expandir no lugar" ficam no backlog.
 - **Desempenho**: renderização por janela (só o visível + margem); norma de 2 mil dispositivos abre em < 1 s.
 
 #### Atualização legislativa (F6)
