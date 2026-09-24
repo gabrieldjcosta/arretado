@@ -355,6 +355,17 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** "✗ lep: HTTP 403" em todas, só nas sessões do Claude Code na nuvem. **Causa:** a política de rede do contêiner bloqueia o Planalto e a ALESP (o proxy responde 403).
 - **Solução:** rodar o `npm run corpus` no Windows do Gabriel, ou liberar os hosts na configuração de rede do ambiente. Nada é apagado: a limpeza só tira o que saiu do catálogo. `npm run corpus:colar` e `npm test` não usam rede e funcionam no contêiner. **Prevenção:** nenhuma; é do ambiente.
 - **Origem:** ocorrido em 23/09/2026 (sessão da 7.2).
+- **Atualização (24/09/2026):** o Gabriel liberou `www.planalto.gov.br`, `planalto.gov.br`, `www.al.sp.gov.br` e `al.sp.gov.br` na rede do ambiente. O `curl` passa a alcançar o Planalto, mas o `fetch` do Node não lê o `HTTPS_PROXY` e continua com 403: rodar `NODE_USE_ENV_PROXY=1 npm run corpus -- --so <ids>` (Node ≥ 22.21).
+
+### `npm run corpus` sem `--so` baixa de novo páginas já conferidas
+- **Sintoma:** "↻ cp" e "↻ cp-compilado" num `npm run corpus` feito só para acrescentar normas. **Causa:** o Planalto atualiza as páginas (o CP mudou entre 23 e 24/09/2026, cerca de 130 linhas a mais); baixar de novo troca os bytes, invalida o colado e o gabarito e pede nova conferência.
+- **Solução:** `git checkout` das páginas e do `manifesto.json`, e rodar só `--so` com as normas novas. **Prevenção:** acrescentar norma sempre com `--so`; atualizar uma página do corpus é decisão à parte (refazer colado, gabarito e conferência).
+- **Origem:** ocorrido em 24/09/2026 (ECA e CDC no corpus).
+
+### Norma do Planalto recusada: marcador ausente ou poucos tachados
+- **Sintoma:** "✗ cdc: marcador \"art. 1º\" ausente" e "só 14 tachados — não parece a página com todas as redações". **Causa:** o CDC escreve "Art. 1°" com sinal de grau (como a ALESP), e é pouco alterado: 14 tachados, abaixo do `LIMIAR_TACHADOS` (20).
+- **Solução:** marcador com "°" e `limiarTachados: 10` na entrada do catálogo (`scripts/corpus/normas.mjs`); a compilada tem 0. **Prevenção:** ao acrescentar norma, conferir o ordinal do "Art. 1" e contar os tachados das duas variantes antes de fixar o limiar.
+- **Origem:** ocorrido em 24/09/2026.
 
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.

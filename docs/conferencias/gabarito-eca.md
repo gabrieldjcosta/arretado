@@ -1,0 +1,213 @@
+# Conferência do gabarito — Lei nº 8.069/1990 — Estatuto da Criança e do Adolescente
+
+Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/eca.gabarito.json` › `conferencia`.
+
+## Como conferir (~30 min)
+
+1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
+2. Marcar `[x]` no que bate. No que não bate, escrever ao lado o que a página mostra.
+3. Conferir também as contagens gerais abaixo pelo que se vê na página (último artigo, artigos com letra).
+
+## Contagens
+
+- Dispositivos: 1265 (artigo 329, paragrafo 435, alinea 71, inciso 423, item 7)
+- Artigos: vigente 328, revogado 1; com letra (9º-A…): 62; último: art267
+- Redações anteriores: 213 em 174 dispositivos
+- Notas de vigência no texto vigente: 994
+- Estrutura: titulo 10, capitulo 30, secao 29, subsecao 4, parte 1
+
+## Amostra (50 dispositivos)
+
+- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art1)
+  - Art. 1º Esta Lei dispõe sobre a proteção integral à criança e ao adolescente.
+- [ ] **art10.par1.incII.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art10)
+  - a) galactosemias;
+  - Nota: (Incluída pela Lei nº 14.154, de 2021)
+  - Nota: Vigência
+- [ ] **art18A.parUnico.incII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art18a)
+  - b) ameace gravemente; ou
+  - Nota: (Incluído pela Lei nº 13.010, de 2014)
+- [ ] **art21** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art21)
+  - Art. 21. O poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência. (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~Art. 21. O pátrio poder poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência. (Expressão ~~
+- [ ] **art23** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art23)
+  - Art. 23. A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~Art. 23. A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do pátrio poder poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
+  - Redação anterior (tachado) [lida como art23.parUnico]: ~~Parágrafo único. Não existindo outro motivo que por si só autorize a decretação da medida, a criança ou o adolescente será mantido em sua família de origem, a qual deverá obrigatoriamente ser incluída em programas oficiais de auxílio.~~
+- [ ] **art24** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art24)
+  - Art. 24. A perda e a suspensão do poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22. (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~Art. 24. A perda e a suspensão do pátrio poder poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22. (Expressão substituída pela Lei n~~
+- [ ] **art36.parUnico** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art36)
+  - Parágrafo único. O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do poder familiar e implica necessariamente o dever de guarda. (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~Parágrafo único. O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do pátrio poder poder familiar e implica necessariamente o dever de guarda. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
+- [ ] **art45.par1** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art45)
+  - § 1º. O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~§ 1º. O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do pátrio poder poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
+- [ ] **art46** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm)
+  - Art. 46. A adoção será precedida de estágio de convivência com a criança ou adolescente, pelo prazo máximo de 90 (noventa) dias, observadas a idade da criança ou adolescente e as peculiaridades do caso.
+  - Nota: (Redação dada pela Lei nº 13.509, de 2017)
+  - Redação anterior (tachado): ~~Art. 46. A adoção será precedida de estágio de convivência com a criança ou adolescente, pelo prazo que a autoridade judiciária fixar, observadas as peculiaridades do caso.~~
+- [ ] **art46.par3A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm)
+  - § 3 o -A. Ao final do prazo previsto no § 3 o deste artigo, deverá ser apresentado laudo fundamentado pela equipe mencionada no § 4 o deste artigo, que recomendará ou não o deferimento da adoção à autoridade judiciária.
+  - Nota: (Incluído pela Lei nº 13.509, de 2017)
+- [ ] **art49** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art49)
+  - Art. 49. A morte dos adotantes não restabelece o poder familiar dos pais naturais. (Expressão substituída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~Art. 49. A morte dos adotantes não restabelece o pátrio poder poder familiar dos pais naturais. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
+- [ ] **art51** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art51)
+  - Art. 51. Considera-se adoção internacional aquela na qual o pretendente possui residência habitual em país-parte da Convenção de Haia, de 29 de maio de 1993, Relativa à Proteção das Crianças e à Cooperação em Matéria de Adoção Internacional, promulgada pelo Decreto n o 3.087, de 21 junho de 1999 , e deseja adotar criança em outro país-parte da Convenção.
+  - Nota: (Redação dada pela Lei nº 13.509, de 2017)
+  - Redação anterior (tachado): ~~Art. 51 Cuidando-se de pedido de adoção formulado por estrangeiro residente ou domiciliado fora do País, observar-se-á o disposto no art. 31.~~
+  - Redação anterior (tachado): ~~Art. 51. Considera-se adoção internacional aquela na qual a pessoa ou casal postulante é residente ou domiciliado fora do Brasil, conforme previsto no Artigo 2 da Convenção de Haia, de 29 de maio de 1993, Relativa à Proteção das Crianças e à Cooperação em Matéria de Adoção Internacional, aprovada pe~~
+- [ ] **art52** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art52)
+  - Art. 52. A adoção internacional observará o procedimento previsto nos arts. 165 a 170 desta Lei, com as seguintes adaptações:
+  - Nota: (Redação dada pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (tachado): ~~Art. 52. A adoção internacional poderá ser condicionada a estudo prévio e análise de uma comissão estadual judiciária de adoção, que fornecerá o respectivo laudo de habilitação para instruir o processo competente.~~
+  - Redação anterior (tachado) [lida como art52.parUnico]: ~~Parágrafo único. Competirá à comissão manter registro centralizado de interessados estrangeiros em adoção.~~
+- [ ] **art52.par3.incIV** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art52)
+  - IV - cumprirem os requisitos exigidos pelo ordenamento jurídico brasileiro e pelas normas estabelecidas pela Autoridade Central Federal Brasileira.
+  - Nota: (Incluída pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+- [ ] **art52D** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm)
+  - Art. 52-D. Nas adoções internacionais, quando o Brasil for o país de acolhida e a adoção não tenha sido deferida no país de origem porque a sua legislação a delega ao país de acolhida, ou, ainda, na hipótese de, mesmo com decisão, a criança ou o adolescente ser oriundo de país que não tenha aderido à Convenção referida, o processo de adoção seguirá as regras da adoção nacional.
+  - Nota: (Incluído pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+- [ ] **art53A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art53a)
+  - Art. 53-A. É dever da instituição de ensino, clubes e agremiações recreativas e de estabelecimentos congêneres assegurar medidas de conscientização, prevenção e enfrentamento ao uso ou dependência de drogas ilícitas.
+  - Nota: (Incluído pela Lei nº 13.840, de 2019)
+- [ ] **art59** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art59)
+  - Art. 59. Os municípios, com apoio dos estados e da União, estimularão e facilitarão a destinação de recursos e espaços para programações culturais, esportivas e de lazer voltadas para a infância e a juventude.
+- [ ] **art78.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art78)
+  - Parágrafo único. As editoras cuidarão para que as capas que contenham mensagens pornográficas ou obscenas sejam protegidas com embalagem opaca.
+- [ ] **art83.par1.alB.it2** (item) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art83)
+  - 2) de pessoa maior, expressamente autorizada pelo pai, mãe ou responsável.
+- [ ] **art89A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art89a)
+  - Parágrafo único. (vetado)
+  - Nota: (Incluído pela Lei nº 15.426, de 2026)
+- [ ] **art90.incIV** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art90)
+  - Nome: I
+  - IV - acolhimento institucional;
+  - Nota: (Redação dada pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+- [ ] **art100.parUnico.incX** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art100)
+  - X - prevalência da família: na promoção de direitos e na proteção da criança e do adolescente deve ser dada prevalência às medidas que os mantenham ou reintegrem na sua família natural ou extensa ou, se isso não for possível, que promovam a sua integração em família adotiva;
+  - Nota: (Redação dada pela Lei nº 13.509, de 2017)
+  - Redação anterior (tachado): ~~X - prevalência da família: na promoção de direitos e na proteção da criança e do adolescente deve ser dada prevalência às medidas que os mantenham ou reintegrem na sua família natural ou extensa ou, se isto não for possível, que promovam a sua integração em família substituta; (Incluído pela Lei nº~~
+- [ ] **art136.incIII.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art136)
+  - a) requisitar serviços públicos nas áreas de saúde, educação, assistência social, previdência, trabalho e segurança;
+  - Nota: (Redação dada pela Lei nº 15.268, de 2025)
+  - Redação anterior (tachado): ~~a) requisitar serviços públicos nas áreas de saúde, educação, serviço social, previdência, trabalho e segurança;~~
+- [ ] **art148.incI** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art148)
+  - I - conhecer de representações promovidas pelo Ministério Público, para apuração de ato infracional atribuído a adolescente, aplicando as medidas cabíveis;
+- [ ] **art161.par2** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art161)
+  - § 2 o (revogado)
+  - Nota: (Redação dada pela Lei nº 13.509, de 2017)
+  - Redação anterior (tachado): ~~§ 2º Se o pedido importar em modificação de guarda, será obrigatória, desde que possível e razoável, a oitiva da criança ou adolescente.~~
+  - Redação anterior (tachado): ~~§ 2 o Em sendo os pais oriundos de comunidades indígenas, é ainda obrigatória a intervenção, junto à equipe profissional ou multidisciplinar referida no § 1 o deste artigo, de representantes do órgão federal responsável pela política indigenista, observado o disposto no § 6 o do art. 28 desta Lei. (~~
+- [ ] **art163** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art163)
+  - Art. 163. O prazo máximo para conclusão do procedimento será de 120 (cento e vinte) dias, e caberá ao juiz, no caso de notória inviabilidade de manutenção do poder familiar, dirigir esforços para preparar a criança ou o adolescente com vistas à colocação em família substituta.
+  - Nota: (Redação dada pela Lei nº 13.509, de 2017)
+  - Redação anterior (tachado): ~~Art. 163. A sentença que decretar a perda ou a suspensão do pátrio poder poder familiar será averbada à margem do registro de nascimento da criança ou adolescente. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
+  - Redação anterior (tachado): ~~Art. 163. O prazo máximo para conclusão do procedimento será de 120 (cento e vinte) dias. (Redação dada pela Lei nº 12.010, de 2009) Vigência~~
+- [ ] **art166** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art166)
+  - Art. 166. Se os pais forem falecidos, tiverem sido destituídos ou suspensos do poder familiar, ou houverem aderido expressamente ao pedido de colocação em família substituta, este poderá ser formulado diretamente em cartório, em petição assinada pelos próprios requerentes, dispensada a assistência de advogado.
+  - Nota: (Redação dada pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (tachado): ~~Art. 166. Se os pais forem falecidos, tiverem sido destituídos ou suspensos do pátrio poder poder familiar , ou houverem aderido expressamente ao pedido de colocação em família substituta, este poderá ser formulado diretamente em cartório, em petição assinada pelos próprios requerentes. (Expressão s~~
+  - Redação anterior (tachado) [lida como art166.parUnico]: ~~Parágrafo único. Na hipótese de concordância dos pais, eles serão ouvidos pela autoridade judiciária e pelo representante do Ministério Público, tomando-se por termo as declarações.~~
+- [ ] **art197B.incI** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art197b)
+  - I - apresentar quesitos a serem respondidos pela equipe interprofissional encarregada de elaborar o estudo técnico a que se refere o art. 197-C desta Lei;
+  - Nota: (Incluído pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+- [ ] **art198.incIV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art198)
+  - IV - (revogado)
+  - Nota: (Revogado pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~IV - o agravado será intimado para, no prazo de cinco dias, oferecer resposta e indicar as peças a serem trasladadas; (Revogado pela Lei nº 12.010, de 2009) Vigência~~
+- [ ] **art198.incVI** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art198)
+  - VI - (revogado)
+  - Nota: (Revogado pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+  - Redação anterior (revogacao): ~~VI - a apelação será recebida em seu efeito devolutivo. Será também conferido efeito suspensivo quando interposta contra sentença que deferir a adoção por estrangeiro e, a juízo da autoridade judiciária, sempre que houver perigo de dano irreparável ou de difícil reparação; (Revogado pela Lei nº 12.0~~
+- [ ] **art199C** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art199c)
+  - Art. 199-C. Os recursos nos procedimentos de adoção e de destituição de poder familiar, em face da relevância das questões, serão processados com prioridade absoluta, devendo ser imediatamente distribuídos, ficando vedado que aguardem, em qualquer situação, oportuna distribuição, e serão colocados em mesa para julgamento sem revisão e com parecer urgente do Ministério Público.
+  - Nota: (Incluído pela Lei nº 12.010, de 2009)
+  - Nota: Vigência
+- [ ] **art201.incVI.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art201)
+  - b) requisitar informações, exames, perícias e documentos de autoridades municipais, estaduais e federais, da administração direta ou indireta, bem como promover inspeções e diligências investigatórias;
+- [ ] **art226A.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art226a)
+  - Parágrafo único. O disposto neste artigo não se aplica ao uso legítimo de tecnologias de privacidade e segurança digital quando empregadas para fins lícitos, como a proteção de dados pessoais ou comerciais, a garantia da privacidade e a segurança cibernética.
+  - Nota: (Incluído pela Lei nº 15.487, de 2026)
+- [ ] **art233** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233)
+  -  
+  - Redação anterior (revogacao): ~~Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura: (Revogado pela Lei nº 9.455, de 7.4.1997~~
+  - Redação anterior (revogacao): ~~Pena - reclusão de um a cinco anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+- [ ] **art233.par1** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233)
+  -  
+  - Redação anterior (revogacao): ~~§ 1º Se resultar lesão corporal grave: (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+  - Redação anterior (revogacao): ~~Pena - reclusão de dois a oito anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+- [ ] **art233.par2** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233)
+  -  
+  - Redação anterior (revogacao): ~~§ 2º Se resultar lesão corporal gravíssima: (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+  - Redação anterior (revogacao): ~~Pena - reclusão de quatro a doze anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+- [ ] **art233.par3** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233)
+  -  
+  - Redação anterior (revogacao): ~~§ 3º Se resultar morte: (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+  - Redação anterior (revogacao): ~~Pena - reclusão de quinze a trinta anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :~~
+- [ ] **art237** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art237)
+  - Art. 237. Subtrair criança ou adolescente ao poder de quem o tem sob sua guarda em virtude de lei ou ordem judicial, com o fim de colocação em lar substituto: ⏎ Pena - reclusão de dois a seis anos, e multa.
+- [ ] **art241D** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art241d)
+  - Art. 241-D. Aliciar, assediar, convidar, instigar ou constranger, por qualquer meio, menor de 14 (quatorze) anos, com o fim de praticar ato libidinoso: ⏎ Pena - reclusão, de 3 (três) a 5 (cinco) anos, e multa, se o fato não constituir crime mais grave.
+  - Nota: (Redação dada pela Lei nº 15.487, de 2026)
+  - Nota: (Redação dada pela Lei nº 15.487, de 2026)
+  - Redação anterior (tachado): ~~Art. 241-D. Aliciar, assediar, instigar ou constranger, por qualquer meio de comunicação, criança, com o fim de com ela praticar ato libidinoso: (Incluído pela Lei nº 11.829, de 2008) ⏎ Pena – reclusão, de 1 (um) a 3 (três) anos, e multa. (Incluído pela Lei nº 11.829, de 2008)~~
+  - Redação anterior (tachado) [lida como art241D.parUnico]: ~~Parágrafo único. Nas mesmas penas incorre quem: (Incluído pela Lei nº 11.829, de 2008)~~
+- [ ] **art241D.par1.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art241d)
+  - I - permite, facilita ou induz o acesso de menor de 14 (quatorze) anos a material que contenha cena de sexo explícito ou nudez com o fim de com ele praticar ato libidinoso;
+  - Nota: (Redação dada pela Lei nº 15.487, de 2026)
+  - Redação anterior (tachado): ~~I – facilita ou induz o acesso à criança de material contendo cena de sexo explícito ou pornográfica com o fim de com ela praticar ato libidinoso; (Incluído pela Lei nº 11.829, de 2008)~~
+- [ ] **art248** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art248)
+  - Art. 248. (revogado)
+  - Nota: (Revogado pela Lei nº 13.431, de 2017)
+  - Nota: (Vigência)
+  - Redação anterior (revogacao): ~~Art. 248. Deixar de apresentar à autoridade judiciária de seu domicílio, no prazo de cinco dias, com o fim de regularizar a guarda, adolescente trazido de outra comarca para a prestação de serviço doméstico, mesmo que autorizado pelos pais ou responsável: (Vide Lei nº 13.431, de 2017) (Vigência) (Re~~
+  - Redação anterior (revogacao): ~~Pena - multa de três a vinte salários de referência, aplicando-se o dobro em caso de reincidência, independentemente das despesas de retorno do adolescente, se for o caso. (Revogado pela Lei nº 13.431, de 2017) (Vigência)~~
+- [ ] **art252** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art252)
+  - Art. 252. Deixar o responsável por diversão ou espetáculo público de afixar, em lugar visível e de fácil acesso, à entrada do local de exibição, informação destacada sobre a natureza da diversão ou espetáculo e a faixa etária especificada no certificado de classificação: ⏎ Pena - multa de três a vinte salários de referência, aplicando-se o dobro em caso de reincidência.
+- [ ] **art255** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art255)
+  - Art. 255. Exibir filme, trailer, peça, amostra ou congênere classificado pelo órgão competente como inadequado às crianças ou adolescentes admitidos ao espetáculo: ⏎ Pena - multa de vinte a cem salários de referência; na reincidência, a autoridade poderá determinar a suspensão do espetáculo ou o fechamento do estabelecimento por até quinze dias.
+- [ ] **art259** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art259)
+  - Nome: Medida Administrativa - interdição do estabelecimento comercial até o recolhimento da multa aplicada. / Disposições Finais e Transitórias
+  - Art. 259. A União, no prazo de noventa dias contados da publicação deste Estatuto, elaborará projeto de lei dispondo sobre a criação ou adaptação de seus órgãos às diretrizes da política de atendimento fixadas no art. 88 e ao que estabelece o Título V do Livro II.
+- [ ] **art260.par2A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art260)
+  - § 2º-A. O contribuinte poderá indicar o projeto que receberá a destinação de recursos, entre os projetos aprovados por conselho dos direitos da criança e do adolescente.
+  - Nota: (Incluído pela Lei nº 14.692, de 2023)
+- [ ] **art260A.par1.incII** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art260a)
+  - II - (vetado)
+  - Nota: (Incluído pela Lei nº 12.594, de 2012)
+  - Nota: (Vide)
+- [ ] **art260C** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art260c)
+  - Art. 260-C. As doações de que trata o art. 260 desta Lei podem ser efetuadas em espécie ou em bens.
+  - Nota: (Incluído pela Lei nº 12.594, de 2012)
+  - Nota: (Vide)
+- [ ] **art263.par3.it4** (item) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art263)
+  - 4) Art. 213 ..................................................................
+- [ ] **art265** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art265)
+  - Nome: "Art. 102 .................................................................... / 6º) a perda e a suspensão do pátrio poder. "
+  - Art. 265. A Imprensa Nacional e demais gráficas da União, da administração direta ou indireta, inclusive fundações instituídas e mantidas pelo poder público federal promoverão edição popular do texto integral deste Estatuto, que será posto à disposição das escolas e das entidades de atendimento e de defesa dos direitos da criança e do adolescente.
+- [ ] **art267** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art267)
+  - Art. 267. Revogam-se as Leis n.º 4.513, de 1964 , e 6.697, de 10 de outubro de 1979 (Código de Menores), e as demais disposições em contrário.
+
+## Divergências entre os sinais (explicadas)
+
+- `texto` **art233**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "……" | compilada: "…(Revogado pela Lei nº 9.455, de 7.4.1997…"
+- `ancora` **art469**: decisão: falha de digitação da fonte: name="art469" na redação tachada do art. 46 (a vigente é "art46.") — âncora sem artigo na página
+- `artigo-sem-ancora` **art46**: decisão: o caput vigente só tem name="art46." (forma das redações), sem "art46" (falha da fonte)
+- `artigo-sem-ancora` **art52D**: decisão: a âncora saiu como name="art5d" (falha da fonte)
+- `so-na-pagina`: 3 detalhes de dispositivos revogados ou vetados que a compilada resume.

@@ -105,6 +105,74 @@
       "capturadoEm": "2026-09-23T15:06:45.299Z"
     },
     {
+      "id": "eca",
+      "origemSha256Conteudo": "784766ddd986e094c2e8e9f38f1f42d7e2b1898f932107bda59c15d085df862d",
+      "html": {
+        "arquivo": "eca.colado.html",
+        "bytes": 1247503,
+        "sha256": "cc245ef73092356f27175cb0d9b26d1a3dc3cfdab2cf440d7f6c6dc7f4f4ed03"
+      },
+      "texto": {
+        "arquivo": "eca.colado.txt",
+        "bytes": 301867,
+        "sha256": "38c0c7d584fd682cef42bec80a2491fd63027b6cf3b5b964ff97b72e743c80d5"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-24T13:00:45.740Z"
+    },
+    {
+      "id": "eca-compilado",
+      "origemSha256Conteudo": "fb4d9eb4cdd763f9412f54a155f8d1677e414b8a49c4681f94360b26df06cc6c",
+      "html": {
+        "arquivo": "eca-compilado.colado.html",
+        "bytes": 1039131,
+        "sha256": "fb54ce0594ba7b3b238da765fe4767b385e57f7b106e58e969f34729a6d9fd7e"
+      },
+      "texto": {
+        "arquivo": "eca-compilado.colado.txt",
+        "bytes": 261442,
+        "sha256": "139502c2978ddc9ec61419704e1feeef2f35388862d00bc542144b2fdea48bf9"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-24T13:00:46.507Z"
+    },
+    {
+      "id": "cdc",
+      "origemSha256Conteudo": "84092f97ddd4c87f8490bac2f059f09cd445dac97854c75aaecacf995a911bac",
+      "html": {
+        "arquivo": "cdc.colado.html",
+        "bytes": 250080,
+        "sha256": "1152c510c9022f781581ccf8acb227e4ef5dd047771c2ad0b026a08c391e9cc9"
+      },
+      "texto": {
+        "arquivo": "cdc.colado.txt",
+        "bytes": 93273,
+        "sha256": "8e93fa0d0ac0bd3c7fdc88ee698f10da2bcc23e11d08f88554e5241905f5c058"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-24T13:00:47.002Z"
+    },
+    {
+      "id": "cdc-compilado",
+      "origemSha256Conteudo": "22f10febcf442bf256db8af0935b660f9bc99c8436032b671efc69e500c25261",
+      "html": {
+        "arquivo": "cdc-compilado.colado.html",
+        "bytes": 162053,
+        "sha256": "db0acbd6e57dc194c8b0cfc5a81fbe59612b266968e4ab4253f3fe74d5ac6d9c"
+      },
+      "texto": {
+        "arquivo": "cdc-compilado.colado.txt",
+        "bytes": 90284,
+        "sha256": "bb98b0ea8b8331f64e5a0d3d4afeff818c2cf034a93474d969008132c82f9b41"
+      },
+      "navegador": "chromium 141.0.7390.37",
+      "plataforma": "linux",
+      "capturadoEm": "2026-09-24T13:00:47.462Z"
+    },
+    {
       "id": "cf",
       "origemSha256Conteudo": "a4ad6b4ae5bd0ce14e110440addeb5956b05ce2487a780fcfe9934a1f2c03b37",
       "html": {

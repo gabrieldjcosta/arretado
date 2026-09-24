@@ -64,6 +64,19 @@ export const GABARITOS = [
     blocos: [{ prefixo: 'dt', inicio: /^Das Disposições Transitórias$/i, ultimoAntes: 'art244' }],
   },
   {
+    id: 'eca',
+    compilado: 'eca-compilado',
+    // Lei 8.069/1990: "Art. 267. Revogam-se as Leis n.º 4.513, de 1964, e 6.697, de 10 de outubro
+    // de 1979 (Código de Menores), e as demais disposições em contrário."
+    ultimoArtigo: 'art267',
+  },
+  {
+    id: 'cdc',
+    compilado: 'cdc-compilado',
+    // Lei 8.078/1990: "Art. 119. Revogam-se as disposições em contrário."
+    ultimoArtigo: 'art119',
+  },
+  {
     id: 'cf',
     compilado: null,
     // CF/1988: o corpo permanente termina no art. 250 (EC 20/1998); o ADCT recomeça no art. 1º e
@@ -103,6 +116,14 @@ export const DECISOES = {
   'cp:artigo-sem-ancora:art248': 'a âncora saiu como "art2248" (falha da fonte)',
   'cp:artigo-sem-ancora:art253': 'a âncora saiu como "art2253" (falha da fonte)',
   'cp:artigo-sem-ancora:art287': 'a âncora saiu como name="287", sem "art" (falha da fonte)',
+  'eca:so-na-pagina:art233':
+    'o art. 233 foi revogado inteiro (Lei 9.455/1997); a página traz caput, penas e §§ 1º a 3º ' +
+    'tachados, e a compilada só "Art. 233. (Revogado…)"; os parágrafos são redação anterior',
+  'eca:ancora:art469':
+    'falha de digitação da fonte: name="art469" na redação tachada do art. 46 (a vigente é "art46.")',
+  'eca:artigo-sem-ancora:art46':
+    'o caput vigente só tem name="art46." (forma das redações), sem "art46" (falha da fonte)',
+  'eca:artigo-sem-ancora:art52D': 'a âncora saiu como name="art5d" (falha da fonte)',
   'cf:ancora:art326':
     'falha de digitação da fonte: name="art326§3" no § 3º do art. 226 (ao lado de name="226§3")',
   'cf:ancora:adct.art760':
