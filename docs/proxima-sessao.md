@@ -1,21 +1,21 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 23/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
+Atualizado em 24/09/2026. Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
 
 ## Estado
 
 - **F0 (Fundamentos) e F1 (Recall + pontos do edital) implementadas**, revisadas e testadas. **Portões:** [`portoes/F0.md`](portoes/F0.md), **fechado em 23/09/2026**, e [`portoes/F1.md`](portoes/F1.md), aguardando o uso real.
-- **No `main` desde 23/09/2026:** merge dos PRs [#1](https://github.com/gabrieldjcosta/arretado/pull/1) (F0/F1), [#2](https://github.com/gabrieldjcosta/arretado/pull/2) (plano da F2, 7.1, Supabase 4.3, glossário, solução de problemas), [#3](https://github.com/gabrieldjcosta/arretado/pull/3) (Worker, T18), [#4](https://github.com/gabrieldjcosta/arretado/pull/4) (7.2), [#5](https://github.com/gabrieldjcosta/arretado/pull/5) (nenhum código anterior; Cloudflare no ar) e [#7](https://github.com/gabrieldjcosta/arretado/pull/7) (7.3, 1ª sessão). **A 2ª sessão da 7.3 e o `/code-review` da etapa 7 estão no PR [#8](https://github.com/gabrieldjcosta/arretado/pull/8)** (branch `claude/proxima-atividade-f2-ezll0b`), aguardando o merge do Gabriel; a 8.1 parte do `main` depois desse merge.
+- **No `main` desde 23/09/2026:** merge dos PRs [#1](https://github.com/gabrieldjcosta/arretado/pull/1) (F0/F1), [#2](https://github.com/gabrieldjcosta/arretado/pull/2) (plano da F2, 7.1, Supabase 4.3, glossário, solução de problemas), [#3](https://github.com/gabrieldjcosta/arretado/pull/3) (Worker, T18), [#4](https://github.com/gabrieldjcosta/arretado/pull/4) (7.2), [#5](https://github.com/gabrieldjcosta/arretado/pull/5) (nenhum código anterior; Cloudflare no ar), [#7](https://github.com/gabrieldjcosta/arretado/pull/7) (7.3, 1ª sessão) e [#8](https://github.com/gabrieldjcosta/arretado/pull/8) (7.3, 2ª sessão, e `/code-review` da etapa 7). **A 8.1 está no PR [#9](https://github.com/gabrieldjcosta/arretado/pull/9)** (branch `claude/proxima-atividade-f2-409e8c`), aguardando o merge do Gabriel; a 8.2 parte do `main` depois desse merge.
 - **Verificação:**
-  - 413 testes unitários e de integração, incluindo a integridade do corpus da F2, dos colados e dos gabaritos das 5 normas;
+  - 506 testes unitários e de integração, incluindo a integridade do corpus da F2, dos colados e dos gabaritos das 5 normas e a normalização (8.1) sobre os 7 colados;
   - 82 E2E (Playwright + axe, desktop e celular);
   - carga de 10 mil registros;
   - CI verde.
 - **Decisão de escopo (23/09/2026):** nada do Acervo antigo nem do Acumen v2 é importado; o conteúdo recomeça do zero (nota no topo das Partes 1 e 2).
 - **F2 (Legislação) em execução**, em paralelo ao uso real da F1. Plano em [`planos/F2.md`](planos/F2.md).
-  - Feito: 7.1, o corpus de 5 normas em 7 páginas; 7.2, o colar de cada página capturado no Chromium (`*.colado.html` e `*.colado.txt`); 7.3, os gabaritos das 5 normas (`*.gabarito.json`), tudo em `corpus/normas/`, com as folhas de conferência em `docs/conferencias/`; e o `/code-review` da etapa 7 (10 achados, corrigidos).
-  - **Etapa 7 fechada, menos a conferência do Gabriel** (as 5 folhas; nenhuma marcada até agora). Ela não bloqueia o começo da etapa 8, mas precisa estar feita antes da 8.9 (regressão contra o gabarito).
-  - **Próxima atividade: 8.1** (tipos do rascunho e normalização, regra 1).
+  - Feito: 7.1, o corpus de 5 normas em 7 páginas; 7.2, o colar de cada página capturado no Chromium (`*.colado.html` e `*.colado.txt`); 7.3, os gabaritos das 5 normas (`*.gabarito.json`), tudo em `corpus/normas/`, com as folhas de conferência em `docs/conferencias/`; o `/code-review` da etapa 7 (10 achados, corrigidos); e a 8.1, os tipos do rascunho e a normalização (regra 1), em `src/dominios/legislacao/`, medida no corpus inteiro (ver "Fatos da normalização" no plano).
+  - **Etapa 7 fechada, menos a conferência do Gabriel** (as 5 folhas; nenhuma marcada até agora). Ela não bloqueia a etapa 8, mas precisa estar feita antes da 8.9 (regressão contra o gabarito).
+  - **Próxima atividade: 8.2** (blocos pré-normativos e hierarquia estrutural, regras 2 e 3).
 
 ## Como abrir a próxima sessão (meta: até ~200 mil tokens por sessão)
 
@@ -23,7 +23,7 @@ Abrir uma sessão nova do Claude Code no repositório. Ela parte do `main` atual
 
 > Leia `docs/proxima-sessao.md` e execute a próxima atividade da F2 seguindo a rotina de pronto do plano. Ao terminar, atualize este arquivo e `docs/solucao-de-problemas.md`, faça o commit num branch com PR para o `main` e me avise.
 
-Uma sessão por atividade (a 8.1 é pequena; se sobrar fôlego, a mesma sessão pode começar a 8.2). Regras de economia de contexto no `CLAUDE.md`.
+Uma sessão por atividade (a 8.2 é média, de 2 a 3 sessões: fechar cada sessão com o check verde e o `proxima-sessao.md` dizendo onde parou). Regras de economia de contexto no `CLAUDE.md`.
 
 ## Projeto Supabase (atividade 4.3, concluída em 23/09/2026)
 
@@ -72,7 +72,9 @@ Os dados ficam no navegador de cada endereço. Usar sempre https://arretado.gabr
 
 Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 → 10/11 → 13, com a 12 correndo por fora.
 
-- **Agora: 8.1** (tipos do rascunho + normalização). Ler antes a Parte 2 §10.6 (regras 1 a 13), a etapa 8 do plano e os "Fatos do gabarito" (valem para o estruturador), e em `solucao-de-problemas.md` a seção Legislação (entradas "previsto — 8.x").
+- **Agora: 8.2** (blocos pré-normativos e hierarquia estrutural, com nome do nó e nível ausente; regras 2 e 3). Ler antes a Parte 2 §10.6 (regras 2 e 3), a etapa 8 do plano, os "Fatos do gabarito" e os "Fatos da normalização" (valem para o estruturador), e em `solucao-de-problemas.md` a seção Legislação (entradas "previsto — 8.2" e as da 8.1).
+  - Ponto de partida pronto na 8.1: `normalizarBlocos` (primeiro passo, sempre) e `chaveDeCasamento` (onde as regex casam), em `src/dominios/legislacao/normalizacao.ts`; os tipos da saída (`Rascunho`, `NoRascunho`, `Descarte`, `Anomalia`) em `rascunho.ts`. A 8.2 cria o `estruturar` e a constante da versão do estruturador.
+  - Entrega da 8.2 inclui o teste do sanitizador com o `cp.html` inteiro (a lei vem depois do `</html>`). A `normalizacao-corpus.test.ts` confere o HTML só da LEP, da LC 80 e da LC-SP 988 (cada página grande custa de 2 a 3 s de sanitizador): se a 8.2 sanitizar o CP e a CF uma vez para os seus testes, vale reaproveitar e conferir a normalização delas também.
 - **Gabriel, quando puder (~30 min por lei, antes da 8.9):** abrir as folhas `docs/conferencias/gabarito-<id>.md` (LEP, CP, LC 80, LC-SP 988, CF; no GitHub ou no editor). Cada item tem link para o artigo na página oficial (na ALESP, que não tem âncoras, o link abre o começo da página: Ctrl+F pelo rótulo). Conferir rótulo, texto, notas e redações anteriores (o texto tachado); marcar `[x]` no que bate e anotar ao lado o que não bate. Vale commitar as marcas no próprio arquivo ou mandar as divergências na mensagem da sessão. **As folhas da LEP e do CP mudaram nesta sessão** (itens trocados; nada estava marcado).
 - **Quando a conferência chegar:** passar o resultado para `conferencia` no `*.gabarito.json` (`estado: "conferida"`, `por`, `em`, `observacoes`); se houver divergência, corrigir a regra em `scripts/corpus/gabarito.mjs` ou registrar a decisão em `DECISOES` e rodar `npm run corpus:gabarito`. O comando se recusa a regravar uma folha com marcas que ainda não foram para o JSON.
 - **Regras que continuam valendo na etapa 8:**
@@ -93,7 +95,7 @@ Seguir as etapas 7–13 do plano, na ordem do caminho crítico: 7 → 8 → 9 �
 ## Como validar tudo
 
 ```
-npm run check      # formato, lint, tipos, 413 testes (inclui corpus, colados e gabaritos), auditoria
+npm run check      # formato, lint, tipos, 506 testes (inclui corpus, colados, gabaritos e normalização), auditoria
 npm run carga      # 10 mil registros dentro dos limiares
 npm run test:e2e   # 82 cenários (Playwright + axe)
 npm run build      # dist/ com _headers
@@ -114,6 +116,8 @@ src/core/eventos/             barramento em processo
 src/core/pacote/              .arretado: exportar, ler, cifra, 7 modos, snapshot, espaços
 src/core/seguranca/           sanitizador de HTML → estrutura
 src/dominios/recall/          agendamento (6 caixas), causa sugerida, serviço do Recall
+src/dominios/legislacao/      estruturador da F2: tipos do rascunho (rascunho.ts) e normalização,
+                              regra 1 (normalizacao.ts); testes com o corpus (normalizacao-corpus.test.ts)
 src/integracoes/pontos/       CSV da planilha do Ciclo → Disciplinas e Pontos
 src/suporte/relatos.ts        "!" Relatar problema
 src/apresentacao/             shell, Conta › Dados/Aparência/Privacidade, Orientações,
