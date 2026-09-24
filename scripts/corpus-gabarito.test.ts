@@ -350,6 +350,117 @@ describe('fontes sem compilada (LC 80, ALESP, CF)', () => {
   });
 });
 
+describe('acertos da 8.5 (o gabarito regerado uma vez só; examinados na página)', () => {
+  it('pena sem hífen (CDC) é pena; "Pena de multa" continua rubrica (CP)', () => {
+    expect(rotulo('Pena Detenção de seis meses a dois anos e multa.').tipo).toBe('pena');
+    expect(rotulo('Pena de multa').tipo).toBe('outro');
+    const inv = inventario(
+      'Art. 64. Deixar de comunicar:',
+      'Pena Detenção de seis meses a dois anos e multa.',
+      'Art. 65. Executar serviço:',
+    );
+    expect(inv.dispositivos.map((d) => [d.endereco, d.nome ?? null, d.texto])).toEqual([
+      ['art64', null, 'Deixar de comunicar:\nPena Detenção de seis meses a dois anos e multa.'],
+      ['art65', null, 'Executar serviço:'],
+    ]);
+  });
+
+  it('notas soltas, sem fecho e "Expressão substituída" saem do texto; "…do Regulamento." fica', () => {
+    expect(separarNotas('Art. 17. Observados os seguintes preceitos: Regulamento')).toEqual({
+      texto: 'Art. 17. Observados os seguintes preceitos:',
+      notas: ['Regulamento'],
+    });
+    expect(
+      separarNotas('DA POLÍTICA AGRÍCOLA E FUNDIÁRIA E DA REFORMA AGRÁRIA Regulamento'),
+    ).toEqual({
+      texto: 'DA POLÍTICA AGRÍCOLA E FUNDIÁRIA E DA REFORMA AGRÁRIA',
+      notas: ['Regulamento'],
+    });
+    expect(separarNotas('Art. 1º Na forma do Regulamento').notas).toEqual([]);
+    expect(
+      separarNotas(
+        'I - texto; (Incluído pela Emenda Constitucional nº 112, de 2021) Produção de efeitos',
+      ),
+    ).toEqual({
+      texto: 'I - texto;',
+      notas: ['(Incluído pela Emenda Constitucional nº 112, de 2021)', 'Produção de efeitos'],
+    });
+    expect(separarNotas('§ 2º - Aplica-se o disposto. Vide Lei nº 8.072, de 25.7.90')).toEqual({
+      texto: '§ 2º - Aplica-se o disposto.',
+      notas: ['Vide Lei nº 8.072, de 25.7.90'],
+    });
+    expect(separarNotas('(Revogado pela Lei nº 9.455, de 7.4.1997 :')).toEqual({
+      texto: '',
+      notas: ['(Revogado pela Lei nº 9.455, de 7.4.1997'],
+    });
+    expect(
+      separarNotas(
+        'Art. 21. O poder familiar. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência',
+      ),
+    ).toEqual({
+      texto: 'Art. 21. O poder familiar.',
+      notas: ['(Expressão substituída pela Lei nº 12.010, de 2009)', 'Vigência'],
+    });
+  });
+
+  it('citação entre aspas, também em várias linhas, continua o dispositivo (CDC, art. 113; ECA, art. 264)', () => {
+    const inv = inventario(
+      'Art. 113. Acrescente-se os §§ 4°, 5° e 6° ao art. 5º da Lei n.° 7.347:',
+      '"§ 4.° O requisito da pré-constituição poderá ser dispensado.',
+      '§ 5.° Admitir-se-á o litisconsórcio facultativo.',
+      '§ 6° Os órgãos públicos poderão tomar compromisso".',
+      'Art. 264. O art. 102 da Lei n.º 6.015 fica acrescido do seguinte item:',
+      '"Art. 102 ....................',
+      '6º) a perda e a suspensão do pátrio poder. "',
+      'Art. 265. A Imprensa Nacional promoverá edição popular.',
+    );
+    expect(inv.dispositivos.map((d) => [d.endereco, d.nome ?? null])).toEqual([
+      ['art113', null],
+      ['art264', null],
+      ['art265', null],
+    ]);
+    expect(inv.dispositivos[0]?.texto.split('\n')).toHaveLength(4);
+  });
+
+  it('pedaço do rótulo separado do tachado por um espaço (ECA, art. 90, IV; CP, art. 334, capitular)', () => {
+    const inv = inventario(
+      'Art. 90. As entidades:',
+      'III - colocação familiar;',
+      'I <strike>V - abrigo;</strike>',
+      'IV - acolhimento institucional; (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+      'Descaminho',
+      'A <strike>rt. 334 Importar mercadoria proibida:</strike>',
+      'Art. 334. Iludir o pagamento de imposto.',
+    );
+    expect(inv.dispositivos.map((d) => [d.endereco, d.nome ?? null, d.redacoes.length])).toEqual([
+      ['art90', null, 0],
+      ['art90.incIII', null, 0],
+      ['art90.incIV', null, 1],
+      ['art334', 'Descaminho', 1],
+    ]);
+  });
+
+  it('rubricas seguidas: a primeira é a última linha do dispositivo anterior (ECA, art. 258-C); o fecho não', () => {
+    const inv = inventario(
+      'Art. 258-C. Descumprir a proibição:',
+      'Pena - multa de R$ 3.000,00.',
+      'Medida Administrativa - interdição do estabelecimento. (Redação dada pela Lei nº 13.106, de 2015)',
+      'Disposições Finais e Transitórias',
+      'Art. 259. A União elaborará projeto de lei.',
+      'Art. 260. Os contribuintes poderão deduzir.',
+      'Brasília, 13 de julho de 1990; 169º da Independência e 102º da República.',
+      'FERNANDO COLLOR',
+    );
+    const [a258C, a259, a260] = inv.dispositivos;
+    expect(a258C?.texto).toBe(
+      'Descumprir a proibição:\nPena - multa de R$ 3.000,00.\nMedida Administrativa - interdição do estabelecimento.',
+    );
+    expect(a258C?.notas).toEqual(['(Redação dada pela Lei nº 13.106, de 2015)']);
+    expect(a259?.nome).toBe('Disposições Finais e Transitórias');
+    expect(a260?.texto).toBe('Os contribuintes poderão deduzir.');
+  });
+});
+
 describe('correções da revisão da etapa 7', () => {
   it('linha que continua o parágrafo, nome do nó em duas linhas e rubrica antes de tachado', () => {
     const inv = inventario(

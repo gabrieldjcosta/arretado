@@ -21,24 +21,26 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "conferida",
-    "por": "Gabriel",
-    "em": "2026-09-24",
+    "estado": "pendente",
+    "por": null,
+    "em": null,
     "observacoes": [
-      "Conferência parcial: 7 dos 50 itens sem divergência (commit d5e084b); o Gabriel dispensou o resto em 24/09/2026 e aponta erros na leitura no Arretado."
+      "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
+      "Conferência parcial: 7 dos 50 itens sem divergência (commit d5e084b); o Gabriel dispensou o resto em 24/09/2026 e aponta erros na leitura no Arretado.",
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: a pena sem hífen (\"Pena Detenção…\") e as citações entre aspas (arts. 110 a 117) deixaram de ser rubrica do dispositivo seguinte e ficam no texto do anterior (18 rubricas a menos); os §§ 5º e 6º do art. 113 (citação da Lei 7.347/1985) saíram (471 dispositivos). Marcas repostas nos 4 itens conferidos que não mudaram. Mudaram, a conferir: art65, art67, art112 (texto com a pena ou a citação). A amostra \"espaçada\" deslizou com a contagem: 29 itens novos, dispensáveis como o resto da amostra parcial."
     ]
   },
   "ultimoArtigo": "art119",
   "contagens": {
-    "dispositivos": 473,
+    "dispositivos": 471,
     "porTipo": {
       "artigo": 130,
-      "paragrafo": 156,
+      "paragrafo": 154,
       "inciso": 179,
       "alinea": 8
     },
     "porStatus": {
-      "vigente": 431,
+      "vigente": 429,
       "vetado": 42
     },
     "artigos": {
@@ -53,7 +55,7 @@
     },
     "redacoesNoAncestral": 2,
     "dispositivosComRedacaoAnterior": 14,
-    "nomes": 18,
+    "nomes": 0,
     "estrutura": {
       "titulo": 6,
       "capitulo": 13,
@@ -296,21 +298,21 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art4"
     },
     {
-      "endereco": "art5.incIV",
+      "endereco": "art5.incII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "IV -",
-      "texto": "criação de Juizados Especiais de Pequenas Causas e Varas Especializadas para a solução de litígios de consumo;",
+      "rotulo": "II -",
+      "texto": "instituição de Promotorias de Justiça de Defesa do Consumidor, no âmbito do Ministério Público;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art5"
     },
     {
-      "endereco": "art6.incIX",
+      "endereco": "art6.incVI",
       "motivo": "espaçado",
-      "status": "vetado",
-      "rotulo": "IX -",
-      "texto": "",
+      "status": "vigente",
+      "rotulo": "VI -",
+      "texto": "a efetiva prevenção e reparação de danos patrimoniais e morais, individuais, coletivos e difusos;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art6"
@@ -332,24 +334,24 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art8"
     },
     {
-      "endereco": "art12",
+      "endereco": "art10",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 12.",
-      "texto": "O fabricante, o produtor, o construtor, nacional ou estrangeiro, e o importador respondem, independentemente da existência de culpa, pela reparação dos danos causados aos consumidores por defeitos decorrentes de projeto, fabricação, construção, montagem, fórmulas, manipulação, apresentação ou acondicionamento de seus produtos, bem como por informações insuficientes ou inadequadas sobre sua utilização e riscos.",
+      "rotulo": "Art. 10.",
+      "texto": "O fornecedor não poderá colocar no mercado de consumo produto ou serviço que sabe ou deveria saber apresentar alto grau de nocividade ou periculosidade à saúde ou segurança.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art10"
+    },
+    {
+      "endereco": "art12.par3.incIII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "a culpa exclusiva do consumidor ou de terceiro.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art12"
-    },
-    {
-      "endereco": "art14.par1",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "§ 1°",
-      "texto": "O serviço é defeituoso quando não fornece a segurança que o consumidor dele pode esperar, levando-se em consideração as circunstâncias relevantes, entre as quais:",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art14"
     },
     {
       "endereco": "art14.par1.incIII",
@@ -362,44 +364,54 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art14"
     },
     {
-      "endereco": "art18.par1.incIII",
+      "endereco": "art14.par4",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "III -",
-      "texto": "o abatimento proporcional do preço.",
+      "rotulo": "§ 4°",
+      "texto": "A responsabilidade pessoal dos profissionais liberais será apurada mediante a verificação de culpa.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art14"
+    },
+    {
+      "endereco": "art18.par6.incII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "II -",
+      "texto": "os produtos deteriorados, alterados, adulterados, avariados, falsificados, corrompidos, fraudados, nocivos à vida ou à saúde, perigosos ou, ainda, aqueles em desacordo com as normas regulamentares de fabricação, distribuição ou apresentação;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art18"
     },
     {
-      "endereco": "art20",
+      "endereco": "art20.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 20.",
-      "texto": "O fornecedor de serviços responde pelos vícios de qualidade que os tornem impróprios ao consumo ou lhes diminuam o valor, assim como por aqueles decorrentes da disparidade com as indicações constantes da oferta ou mensagem publicitária, podendo o consumidor exigir, alternativamente e à sua escolha:",
+      "rotulo": "§ 2°",
+      "texto": "São impróprios os serviços que se mostrem inadequados para os fins que razoavelmente deles se esperam, bem como aqueles que não atendam as normas regulamentares de prestabilidade.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art20"
     },
     {
-      "endereco": "art26.incI",
+      "endereco": "art26.par2.incI",
       "motivo": "espaçado",
       "status": "vigente",
       "rotulo": "I -",
-      "texto": "trinta dias, tratando-se de fornecimento de serviço e de produtos não duráveis;",
+      "texto": "a reclamação comprovadamente formulada pelo consumidor perante o fornecedor de produtos e serviços até a resposta negativa correspondente, que deve ser transmitida de forma inequívoca;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art26"
     },
     {
-      "endereco": "art29",
+      "endereco": "art31",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 29.",
-      "texto": "Para os fins deste Capítulo e do seguinte, equiparam-se aos consumidores todas as pessoas determináveis ou não, expostas às práticas nele previstas.",
+      "rotulo": "Art. 31.",
+      "texto": "A oferta e apresentação de produtos ou serviços devem assegurar informações corretas, claras, precisas, ostensivas e em língua portuguesa sobre suas características, qualidades, quantidade, composição, preço, garantia, prazos de validade e origem, entre outros dados, bem como sobre os riscos que apresentam à saúde e segurança dos consumidores.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art29"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art31"
     },
     {
       "endereco": "art32.parUnico",
@@ -422,21 +434,28 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art37"
     },
     {
-      "endereco": "art39.incXI",
+      "endereco": "art39.incX",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "XI -",
-      "texto": "Dispositivo incluído pela MPV nº 1.890-67, de 22.10.1999, transformado em inciso XIII, quando da conversão na Lei nº 9.870, de 23.11.1999",
-      "notas": [],
-      "redacoes": [],
+      "rotulo": "X -",
+      "texto": "elevar sem justa causa o preço de produtos ou serviços.",
+      "notas": [
+        "(Incluído pela Lei nº 8.884, de 11.6.1994)"
+      ],
+      "redacoes": [
+        {
+          "texto": "X - (Vetado).",
+          "origem": "tachado"
+        }
+      ],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art39"
     },
     {
-      "endereco": "art43.par3",
+      "endereco": "art43",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3°",
-      "texto": "O consumidor, sempre que encontrar inexatidão nos seus dados e cadastros, poderá exigir sua imediata correção, devendo o arquivista, no prazo de cinco dias úteis, comunicar a alteração aos eventuais destinatários das informações incorretas.",
+      "rotulo": "Art. 43.",
+      "texto": "O consumidor, sem prejuízo do disposto no art. 86, terá acesso às informações existentes em cadastros, fichas, registros e dados pessoais e de consumo arquivados sobre ele, bem como sobre as suas respectivas fontes.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art43"
@@ -452,43 +471,44 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art45"
     },
     {
-      "endereco": "art51.incI",
+      "endereco": "art50",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "impossibilitem, exonerem ou atenuem a responsabilidade do fornecedor por vícios de qualquer natureza dos produtos e serviços ou impliquem renúncia ou disposição de direitos. Nas relações de consumo entre o fornecedor e o consumidor pessoa jurídica, a indenização poderá ser limitada, em situações justificáveis;",
+      "rotulo": "Art. 50.",
+      "texto": "A garantia contratual é complementar à legal e será conferida mediante termo escrito.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art50"
+    },
+    {
+      "endereco": "art51.incXII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "XII -",
+      "texto": "obriguem o consumidor a ressarcir os custos de cobrança de sua obrigação, sem que igual direito lhe seja conferido contra o fornecedor;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art51"
     },
     {
-      "endereco": "art51.incXVII",
+      "endereco": "art51.par4",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "XVII -",
-      "texto": "condicionem ou limitem de qualquer forma o acesso aos órgãos do Poder Judiciário;",
-      "notas": [
-        "(Incluído pela Lei nº 14.181, de 2021)"
-      ],
+      "rotulo": "§ 4°",
+      "texto": "É facultado a qualquer consumidor ou entidade que o represente requerer ao Ministério Público que ajuíze a competente ação para ser declarada a nulidade de cláusula contratual que contrarie o disposto neste código ou de qualquer forma não assegure o justo equilíbrio entre direitos e obrigações das partes.",
+      "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art51"
     },
     {
-      "endereco": "art52.par1",
+      "endereco": "art54",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 1°",
-      "texto": "As multas de mora decorrentes do inadimplemento de obrigações no seu termo não poderão ser superiores a dois por cento do valor da prestação.",
-      "notas": [
-        "(Redação dada pela Lei nº 9.298, de 1º.8.1996)"
-      ],
-      "redacoes": [
-        {
-          "texto": "§ 1° As multas de mora decorrentes do inadimplemento de obrigação no seu termo não poderão ser superiores a dez por cento do valor da prestação.",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art52"
+      "rotulo": "Art. 54.",
+      "texto": "Contrato de adesão é aquele cujas cláusulas tenham sido aprovadas pela autoridade competente ou estabelecidas unilateralmente pelo fornecedor de produtos ou serviços, sem que o consumidor possa discutir ou modificar substancialmente seu conteúdo.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54"
     },
     {
       "endereco": "art54A",
@@ -503,28 +523,28 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54a"
     },
     {
-      "endereco": "art54A.par3",
+      "endereco": "art54B.incV",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3º",
-      "texto": "O disposto neste Capítulo não se aplica ao consumidor cujas dívidas tenham sido contraídas mediante fraude ou má-fé, sejam oriundas de contratos celebrados dolosamente com o propósito de não realizar o pagamento ou decorram da aquisição ou contratação de produtos e serviços de luxo de alto valor.",
+      "rotulo": "V -",
+      "texto": "o direito do consumidor à liquidação antecipada e não onerosa do débito, nos termos do § 2º do art. 52 deste Código e da regulamentação em vigor.",
       "notas": [
         "(Incluído pela Lei nº 14.181, de 2021)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54a"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54b"
     },
     {
-      "endereco": "art54C.parUnico",
+      "endereco": "art54D.incIII",
       "motivo": "espaçado",
-      "status": "vetado",
-      "rotulo": "Parágrafo único.",
-      "texto": "",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "informar a identidade do agente financiador e entregar ao consumidor, ao garante e a outros coobrigados cópia do contrato de crédito.",
       "notas": [
         "(Incluído pela Lei nº 14.181, de 2021)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54c"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54d"
     },
     {
       "endereco": "art54E",
@@ -539,11 +559,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54e"
     },
     {
-      "endereco": "art54G",
+      "endereco": "art54G.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 54-G.",
-      "texto": "Sem prejuízo do disposto no art. 39 deste Código e na legislação aplicável à matéria, é vedado ao fornecedor de produto ou serviço que envolva crédito, entre outras condutas:",
+      "rotulo": "§ 1º",
+      "texto": "Sem prejuízo do dever de informação e esclarecimento do consumidor e de entrega da minuta do contrato, no empréstimo cuja liquidação seja feita mediante consignação em folha de pagamento, a formalização e a entrega da cópia do contrato ou do instrumento de contratação ocorrerão após o fornecedor do crédito obter da fonte pagadora a indicação sobre a existência de margem consignável.",
       "notas": [
         "(Incluído pela Lei nº 14.181, de 2021)"
       ],
@@ -551,42 +571,31 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art54g"
     },
     {
-      "endereco": "art56.incV",
+      "endereco": "art56.incVII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "V -",
-      "texto": "proibição de fabricação do produto;",
+      "rotulo": "VII -",
+      "texto": "suspensão temporária de atividade;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art56"
     },
     {
-      "endereco": "art59.par3",
+      "endereco": "art60",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3°",
-      "texto": "Pendendo ação judicial na qual se discuta a imposição de penalidade administrativa, não haverá reincidência até o trânsito em julgado da sentença.",
+      "rotulo": "Art. 60.",
+      "texto": "A imposição de contrapropaganda será cominada quando o fornecedor incorrer na prática de publicidade enganosa ou abusiva, nos termos do art. 36 e seus parágrafos, sempre às expensas do infrator.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art59"
-    },
-    {
-      "endereco": "art64",
-      "motivo": "com \"Pena\"",
-      "status": "vigente",
-      "rotulo": "Art. 64.",
-      "nome": "Pena Detenção de um a seis meses ou multa.",
-      "texto": "Deixar de comunicar à autoridade competente e aos consumidores a nocividade ou periculosidade de produtos cujo conhecimento seja posterior à sua colocação no mercado:\nPena - Detenção de seis meses a dois anos e multa.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art64"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art60"
     },
     {
       "endereco": "art65",
       "motivo": "redação anterior no ancestral",
       "status": "vigente",
       "rotulo": "Art. 65.",
-      "texto": "Executar serviço de alto grau de periculosidade, contrariando determinação de autoridade competente:",
+      "texto": "Executar serviço de alto grau de periculosidade, contrariando determinação de autoridade competente:\nPena Detenção de seis meses a dois anos e multa.",
       "notas": [],
       "redacoes": [
         {
@@ -598,47 +607,34 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art65"
     },
     {
-      "endereco": "art67",
+      "endereco": "art66.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 67.",
-      "nome": "Pena Detenção de um a seis meses ou multa.",
-      "texto": "Fazer ou promover publicidade que sabe ou deveria saber ser enganosa ou abusiva:",
+      "rotulo": "§ 1º",
+      "texto": "Incorrerá nas mesmas penas quem patrocinar a oferta.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art67"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art66"
     },
     {
-      "endereco": "art67.parUnico",
-      "motivo": "com nome (rubrica)",
-      "status": "vetado",
-      "rotulo": "Parágrafo único.",
-      "nome": "Pena Detenção de três meses a um ano e multa.",
-      "texto": "",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art67"
-    },
-    {
-      "endereco": "art68",
+      "endereco": "art67",
       "motivo": "com \"Pena\"",
       "status": "vigente",
-      "rotulo": "Art. 68.",
-      "texto": "Fazer ou promover publicidade que sabe ou deveria saber ser capaz de induzir o consumidor a se comportar de forma prejudicial ou perigosa a sua saúde ou segurança:\nPena - Detenção de seis meses a dois anos e multa:",
+      "rotulo": "Art. 67.",
+      "texto": "Fazer ou promover publicidade que sabe ou deveria saber ser enganosa ou abusiva:\nPena Detenção de três meses a um ano e multa.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art68"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art67"
     },
     {
-      "endereco": "art75",
-      "motivo": "com nome (rubrica)",
+      "endereco": "art76.incII",
+      "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 75.",
-      "nome": "Pena Detenção de um a seis meses ou multa.",
-      "texto": "Quem, de qualquer forma, concorrer para os crimes referidos neste código, incide as penas a esses cominadas na medida de sua culpabilidade, bem como o diretor, administrador ou gerente da pessoa jurídica que promover, permitir ou por qualquer modo aprovar o fornecimento, oferta, exposição à venda ou manutenção em depósito de produtos ou a oferta e prestação de serviços nas condições por ele proibidas.",
+      "rotulo": "II -",
+      "texto": "ocasionarem grave dano individual ou coletivo;",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art75"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art76"
     },
     {
       "endereco": "art76.incIV.alA",
@@ -651,16 +647,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art76"
     },
     {
-      "endereco": "art78",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 78.",
-      "texto": "Além das penas privativas de liberdade e de multa, podem ser impostas, cumulativa ou alternadamente, observado odisposto nos arts. 44 a 47, do Código Penal:",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art78"
-    },
-    {
       "endereco": "art79.parUnico.alA",
       "motivo": "alínea",
       "status": "vigente",
@@ -669,6 +655,16 @@
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art79"
+    },
+    {
+      "endereco": "art81",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "Art. 81.",
+      "texto": "A defesa dos interesses e direitos dos consumidores e das vítimas poderá ser exercida em juízo individualmente, ou a título coletivo.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art81"
     },
     {
       "endereco": "art81.parUnico",
@@ -691,24 +687,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art81"
     },
     {
-      "endereco": "art82.incIV",
+      "endereco": "art84.par1",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "IV -",
-      "texto": "as associações legalmente constituídas há pelo menos um ano e que incluam entre seus fins institucionais a defesa dos interesses e direitos protegidos por este código, dispensada a autorização assemblear.",
+      "rotulo": "§ 1°",
+      "texto": "A conversão da obrigação em perdas e danos somente será admissível se por elas optar o autor ou se impossível a tutela específica ou a obtenção do resultado prático correspondente.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art82"
-    },
-    {
-      "endereco": "art88",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 88.",
-      "texto": "Na hipótese do art. 13, parágrafo único deste código, a ação de regresso poderá ser ajuizada em processo autônomo, facultada a possibilidade de prosseguir-se nos mesmos autos, vedada a denunciação da lide.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art88"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art84"
     },
     {
       "endereco": "art89",
@@ -721,21 +707,33 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art89"
     },
     {
-      "endereco": "art98.par2",
+      "endereco": "art93.incI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 2°",
-      "texto": "É competente para a execução o juízo:",
+      "rotulo": "I -",
+      "texto": "no foro do lugar onde ocorreu ou deva ocorrer o dano, quando de âmbito local;",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art98"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art93"
     },
     {
-      "endereco": "art103.incIII",
+      "endereco": "art100",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "III -",
-      "texto": "erga omnes, apenas no caso de procedência do pedido, para beneficiar todas as vítimas e seus sucessores, na hipótese do inciso III do parágrafo único do art. 81.",
+      "rotulo": "Art. 100.",
+      "texto": "Decorrido o prazo de um ano sem habilitação de interessados em número compatível com a gravidade do dano, poderão os legitimados do art. 82 promover a liquidação e execução da indenização devida.",
+      "notas": [
+        "(Vide Decreto nº 407, de 1991)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art100"
+    },
+    {
+      "endereco": "art103.par3",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 3°",
+      "texto": "Os efeitos da coisa julgada de que cuida o art. 16, combinado com o art. 13 da Lei n° 7.347, de 24 de julho de 1985, não prejudicarão as ações de indenização por danos pessoalmente sofridos, propostas individualmente ou na forma prevista neste código, mas, se procedente o pedido, beneficiarão as vítimas e seus sucessores, que poderão proceder à liquidação e à execução, nos termos dos arts. 96 a 99.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art103"
@@ -753,11 +751,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art104b"
     },
     {
-      "endereco": "art104B.par1",
+      "endereco": "art104B.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 1º",
-      "texto": "Serão considerados no processo por superendividamento, se for o caso, os documentos e as informações prestadas em audiência.",
+      "rotulo": "§ 2º",
+      "texto": "No prazo de 15 (quinze) dias, os credores citados juntarão documentos e as razões da negativa de aceder ao plano voluntário ou de renegociar.",
       "notas": [
         "(Incluído pela Lei nº 14.181, de 2021)"
       ],
@@ -775,26 +773,24 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art106"
     },
     {
-      "endereco": "art112",
+      "endereco": "art110",
       "motivo": "espaçado",
       "status": "vigente",
+      "rotulo": "Art. 110.",
+      "texto": "Acrescente-se o seguinte inciso IV ao art. 1° da Lei n° 7.347, de 24 de julho de 1985:\n\"IV - a qualquer outro interesse difuso ou coletivo\".",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art110"
+    },
+    {
+      "endereco": "art112",
+      "motivo": "com \"Pena\"",
+      "status": "vigente",
       "rotulo": "Art. 112.",
-      "nome": "\"II - inclua, entre suas finalidades institucionais, a proteção ao meio ambiente, ao consumidor, ao patrimônio artístico, estético, histórico, turístico e paisagístico, ou a qualquer outro interesse difuso ou coletivo\".",
-      "texto": "O § 3° do art. 5° da Lei n° 7.347, de 24 de julho de 1985, passa a ter a seguinte redação:",
+      "texto": "O § 3° do art. 5° da Lei n° 7.347, de 24 de julho de 1985, passa a ter a seguinte redação:\n\"§ 3° Em caso de desistência infundada ou abandono da ação por associação legitimada, o Ministério Público ou outro legitimado assumirá a titularidade ativa\".",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art112"
-    },
-    {
-      "endereco": "art116",
-      "motivo": "com nome (rubrica)",
-      "status": "vigente",
-      "rotulo": "Art. 116.",
-      "nome": "“Art. 17. Em caso de litigância de má-fé, a associação autora e os diretores responsáveis pela propositura da ação serão solidariamente condenados em honorários advocatícios e ao décuplo das custas, sem prejuízo da responsabilidade por perdas e danos”.",
-      "texto": "Dê-se a seguinte redação ao art. 18 da Lei n° 7.347, de 24 de julho de 1985:",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art116"
     },
     {
       "endereco": "art119",
@@ -1129,25 +1125,25 @@
     {"endereco":"art63","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art63.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art63.par2","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art64","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art64","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art64.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art65","status":"vigente","notas":0,"redacoes":1},
-    {"endereco":"art65.par1","status":"vigente","notas":1,"redacoes":0,"nome":true},
+    {"endereco":"art65.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art65.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art66","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art66.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art66.par2","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art67","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art67.parUnico","status":"vetado","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art67","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art67.parUnico","status":"vetado","notas":0,"redacoes":0},
     {"endereco":"art68","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art68.parUnico","status":"vetado","notas":0,"redacoes":0},
     {"endereco":"art69","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art70","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art71","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art72","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art73","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art74","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art75","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art70","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art71","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art72","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art73","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art74","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art75","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art76","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art76.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art76.incII","status":"vigente","notas":0,"redacoes":0},
@@ -1270,16 +1266,14 @@
     {"endereco":"art108","status":"vetado","notas":0,"redacoes":0},
     {"endereco":"art109","status":"vetado","notas":0,"redacoes":0},
     {"endereco":"art110","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art111","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art112","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art113","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art113.par5","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art113.par6","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art111","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art112","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art113","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art114","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art115","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art116","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art117","status":"vigente","notas":0,"redacoes":0,"nome":true},
-    {"endereco":"art118","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art115","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art116","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art117","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art118","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art119","status":"vigente","notas":0,"redacoes":0}
   ]
 }

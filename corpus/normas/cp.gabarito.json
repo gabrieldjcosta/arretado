@@ -21,11 +21,13 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "conferida",
-    "por": "Gabriel",
-    "em": "2026-09-24",
+    "estado": "pendente",
+    "por": null,
+    "em": null,
     "observacoes": [
-      "Conferência reduzida: os 10 itens de risco do topo da folha docs/conferencias/gabarito-cp.md (commit d5e084b), todos sem divergência; o resto da amostra dispensado depois da CF sem divergência."
+      "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
+      "Conferência reduzida: os 10 itens de risco do topo da folha docs/conferencias/gabarito-cp.md (commit d5e084b), todos sem divergência; o resto da amostra dispensado depois da CF sem divergência.",
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: arts. 45 e 334 (pedaço do rótulo fora do tachado, separado por espaço: \"I ~~I - ocorrer…~~\" e a capitular \"A ~~rt. 334…~~\" viram redação anterior; as redações de 1940 do art. 334 saem do art. 333 e do parágrafo único dele e vão para o art. 334 e os §§ 1º e 2º); arts. 158, § 2º, e 159, caput e §§ 1º e 2º (\"Vide Lei nº 8.072, de 25.7.90\", sem parênteses, vira nota). Os 10 itens da conferência reduzida não mudaram e ficaram marcados na folha nova. Novos na amostra, a conferir: art168, art218B.par2.incII, art234.par1."
     ]
   },
   "ultimoArtigo": "art361",
@@ -48,15 +50,15 @@
       "vetado": 3
     },
     "comSufixo": 73,
-    "notasVigencia": 1186,
-    "redacoesAnteriores": 882,
+    "notasVigencia": 1190,
+    "redacoesAnteriores": 883,
     "redacoesPorOrigem": {
-      "tachado": 766,
+      "tachado": 767,
       "revogacao": 115,
       "duplicata": 1
     },
-    "redacoesNoAncestral": 333,
-    "dispositivosComRedacaoAnterior": 428,
+    "redacoesNoAncestral": 331,
+    "dispositivosComRedacaoAnterior": 430,
     "nomes": 448,
     "estrutura": {
       "parte": 2,
@@ -114,12 +116,6 @@
       "chave": "art148.par1.incIII",
       "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
       "detalhe": "página: \"…a liberdade dura mais de 15 (quinze) dias…\" | compilada: \"…a liberdade dura mais de quinze dias…\""
-    },
-    {
-      "tipo": "texto",
-      "chave": "art159.par3",
-      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
-      "detalhe": "página: \"…Se resulta a morte: Pena - reclusão, de vinte e quatro a trinta a…\" | compilada: \"…Se resulta a morte: Vide Lei nº 8.072, de 25.7.90 Pena - reclusão…\""
     },
     {
       "tipo": "texto",
@@ -1507,36 +1503,15 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art157"
     },
     {
-      "endereco": "art159.par3",
-      "motivo": "texto diferente na compilada",
-      "status": "vigente",
-      "rotulo": "§ 3º -",
-      "texto": "Se resulta a morte:\nPena - reclusão, de vinte e quatro a trinta anos.",
-      "notas": [
-        "(Vide Lei nº 8.072, de 25.7.90)",
-        "(Redação dada pela Lei nº 8.072, de 25.7.1990)"
-      ],
-      "redacoes": [
-        {
-          "texto": "Pena - reclusão, de vinte a trinta anos, e multa, de vinte contos a cinqüenta contos de réis.",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159"
-    },
-    {
-      "endereco": "art168A",
+      "endereco": "art168",
       "motivo": "com \"Pena\"",
       "status": "vigente",
-      "rotulo": "Art. 168-A.",
-      "nome": "Apropriação indébita previdenciária",
-      "texto": "Deixar de repassar à previdência social as contribuições recolhidas dos contribuintes, no prazo e forma legal ou convencional:\nPena - reclusão, de 2 (dois) a 5 (cinco) anos, e multa.",
-      "notas": [
-        "(Incluído pela Lei nº 9.983, de 2000)",
-        "(Incluído pela Lei nº 9.983, de 2000)"
-      ],
+      "rotulo": "Art. 168 -",
+      "nome": "Apropriação indébita",
+      "texto": "Apropriar-se de coisa alheia móvel, de que tem a posse ou a detenção:\nPena - reclusão, de um a quatro anos, e multa.",
+      "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168a"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168"
     },
     {
       "endereco": "art169.parUnico.incII",
@@ -1759,11 +1734,11 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A"
     },
     {
-      "endereco": "art218B.par3",
+      "endereco": "art218B.par2.incII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3 o",
-      "texto": "Na hipótese do inciso II do § 2 o , constitui efeito obrigatório da condenação a cassação da licença de localização e de funcionamento do estabelecimento.",
+      "rotulo": "II -",
+      "texto": "o proprietário, o gerente ou o responsável pelo local em que se verifiquem as práticas referidas no caput deste artigo.",
       "notas": [
         "(Incluído pela Lei nº 12.015, de 2009)"
       ],
@@ -1873,6 +1848,16 @@
       ],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art232a"
+    },
+    {
+      "endereco": "art234.par1",
+      "motivo": "divergência decidida",
+      "status": "vigente",
+      "rotulo": "§ 1º.",
+      "texto": "Incorre na mesma pena quem:",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234"
     },
     {
       "endereco": "art281.par1.incIII",
@@ -2153,7 +2138,7 @@
     {"endereco":"art44.par3","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art44.par4","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art44.par5","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art45","status":"vigente","notas":1,"redacoes":7,"nome":true},
+    {"endereco":"art45","status":"vigente","notas":1,"redacoes":8,"nome":true},
     {"endereco":"art45.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art45.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art45.par3","status":"vigente","notas":1,"redacoes":0},
@@ -2736,12 +2721,12 @@
     {"endereco":"art157.par5","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art158","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art158.par1","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art158.par2","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art158.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art158.par3","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art158.par4","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art159","status":"vigente","notas":2,"redacoes":1,"nome":true},
-    {"endereco":"art159.par1","status":"vigente","notas":2,"redacoes":2},
-    {"endereco":"art159.par2","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art159","status":"vigente","notas":3,"redacoes":1,"nome":true},
+    {"endereco":"art159.par1","status":"vigente","notas":3,"redacoes":2},
+    {"endereco":"art159.par2","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art159.par3","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art159.par4","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art159.par5","status":"vigente","notas":1,"redacoes":0},
@@ -3297,15 +3282,15 @@
     {"endereco":"art331","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art332","status":"vigente","notas":2,"redacoes":1,"nome":true},
     {"endereco":"art332.parUnico","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art333","status":"vigente","notas":1,"redacoes":10,"nome":true},
-    {"endereco":"art333.parUnico","status":"vigente","notas":0,"redacoes":1},
-    {"endereco":"art334","status":"vigente","notas":2,"redacoes":0,"nome":true},
-    {"endereco":"art334.par1","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art333","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art333.parUnico","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art334","status":"vigente","notas":2,"redacoes":1,"nome":true},
+    {"endereco":"art334.par1","status":"vigente","notas":1,"redacoes":8},
     {"endereco":"art334.par1.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art334.par1.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art334.par1.incIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art334.par1.incIV","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art334.par2","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art334.par2","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art334.par3","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art334A","status":"vigente","notas":2,"redacoes":0,"nome":true},
     {"endereco":"art334A.par1","status":"vigente","notas":1,"redacoes":0},

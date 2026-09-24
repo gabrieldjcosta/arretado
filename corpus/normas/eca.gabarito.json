@@ -21,11 +21,13 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "conferida",
-    "por": "Gabriel",
-    "em": "2026-09-24",
+    "estado": "pendente",
+    "por": null,
+    "em": null,
     "observacoes": [
-      "Conferência parcial: 8 dos 50 itens sem divergência (commit d5e084b); o Gabriel dispensou o resto em 24/09/2026 e aponta erros na leitura no Arretado."
+      "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
+      "Conferência parcial: 8 dos 50 itens sem divergência (commit d5e084b); o Gabriel dispensou o resto em 24/09/2026 e aponta erros na leitura no Arretado.",
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: \"(Expressão substituída/declarada…)\" virou nota (sai do texto de 16 dispositivos); art. 233 e §§ 1º a 3º passam a revogados (nota sem o parêntese de fecho); art. 90, IV, sem a rubrica \"I\" (pedaço do rótulo) e com a redação anterior \"IV - abrigo;\"; art. 258-C ganha a linha \"Medida Administrativa - …\" e a nota dela, que saem da rubrica do art. 259; art. 265 sem a rubrica (era a citação do art. 264). Marcas repostas nos 2 itens conferidos que não mudaram. Conferidos que mudaram, a reconferir: art21, art23, art24, art36.parUnico, art45.par1. Mudaram ou entraram na amostra (dispensáveis, como o resto da amostra parcial): art49, art233, art233.par3, art14, art50.par13.incIII, art87.incII, art97.incII.alD, art101.par8, art129.incX, art137, art148.parUnico.alB, art148.parUnico.alD, art155, art185, art209, art253, art260.par5."
     ]
   },
   "ultimoArtigo": "art267",
@@ -39,25 +41,25 @@
       "item": 7
     },
     "porStatus": {
-      "vigente": 1253,
-      "revogado": 8,
+      "vigente": 1249,
+      "revogado": 12,
       "vetado": 4
     },
     "artigos": {
-      "vigente": 328,
-      "revogado": 1
+      "vigente": 327,
+      "revogado": 2
     },
     "comSufixo": 62,
-    "notasVigencia": 994,
-    "redacoesAnteriores": 213,
+    "notasVigencia": 1015,
+    "redacoesAnteriores": 214,
     "redacoesPorOrigem": {
-      "tachado": 181,
+      "tachado": 182,
       "revogacao": 31,
       "duplicata": 1
     },
     "redacoesNoAncestral": 29,
-    "dispositivosComRedacaoAnterior": 174,
-    "nomes": 4,
+    "dispositivosComRedacaoAnterior": 175,
+    "nomes": 1,
     "estrutura": {
       "titulo": 10,
       "capitulo": 30,
@@ -70,25 +72,19 @@
   "pendencias": [],
   "divergencias": [
     {
-      "tipo": "texto",
-      "chave": "art233",
-      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
-      "detalhe": "página: \"……\" | compilada: \"…(Revogado pela Lei nº 9.455, de 7.4.1997…\""
-    },
-    {
       "tipo": "so-na-pagina",
       "chave": "art233.par1",
-      "explicacao": "decisão: o art. 233 foi revogado inteiro (Lei 9.455/1997); a página traz caput, penas e §§ 1º a 3º tachados, e a compilada só \"Art. 233. (Revogado…)\"; os parágrafos são redação anterior"
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
     },
     {
       "tipo": "so-na-pagina",
       "chave": "art233.par2",
-      "explicacao": "decisão: o art. 233 foi revogado inteiro (Lei 9.455/1997); a página traz caput, penas e §§ 1º a 3º tachados, e a compilada só \"Art. 233. (Revogado…)\"; os parágrafos são redação anterior"
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
     },
     {
       "tipo": "so-na-pagina",
       "chave": "art233.par3",
-      "explicacao": "decisão: o art. 233 foi revogado inteiro (Lei 9.455/1997); a página traz caput, penas e §§ 1º a 3º tachados, e a compilada só \"Art. 233. (Revogado…)\"; os parágrafos são redação anterior"
+      "explicacao": "detalhe de dispositivo revogado ou vetado; a compilada o resume"
     },
     {
       "tipo": "ancora",
@@ -172,46 +168,6 @@
       "tipo": "tachado-parcial",
       "endereco": "art201.incIII",
       "texto": "III - promover e acompanhar as ações de alimentos e os procedimentos de suspensão e destituição do pátrio poder poder familiar , nomeação e remoção de tutores, curadores e guardiães, bem como oficiar "
-    },
-    {
-      "tipo": "sem-texto",
-      "endereco": "art233",
-      "texto": "Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura: (Revogado pela Lei nº 9.455, de 7.4.1997"
-    },
-    {
-      "tipo": "tachado-parcial",
-      "endereco": "art233",
-      "texto": "Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura: (Revogado pela Lei nº 9.455, de 7.4.1997"
-    },
-    {
-      "tipo": "sem-texto",
-      "endereco": "art233.par1",
-      "texto": "§ 1º Se resultar lesão corporal grave: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
-    },
-    {
-      "tipo": "tachado-parcial",
-      "endereco": "art233.par1",
-      "texto": "§ 1º Se resultar lesão corporal grave: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
-    },
-    {
-      "tipo": "sem-texto",
-      "endereco": "art233.par2",
-      "texto": "§ 2º Se resultar lesão corporal gravíssima: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
-    },
-    {
-      "tipo": "tachado-parcial",
-      "endereco": "art233.par2",
-      "texto": "§ 2º Se resultar lesão corporal gravíssima: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
-    },
-    {
-      "tipo": "sem-texto",
-      "endereco": "art233.par3",
-      "texto": "§ 3º Se resultar morte: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
-    },
-    {
-      "tipo": "tachado-parcial",
-      "endereco": "art233.par3",
-      "texto": "§ 3º Se resultar morte: (Revogado pela Lei nº 9.455, de 7.4.1997 :"
     },
     {
       "tipo": "tachado-parcial",
@@ -705,24 +661,29 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art10"
     },
     {
-      "endereco": "art18A.parUnico.incII.alB",
+      "endereco": "art14",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "b)",
-      "texto": "ameace gravemente; ou",
-      "notas": [
-        "(Incluído pela Lei nº 13.010, de 2014)"
+      "rotulo": "Art. 14.",
+      "texto": "O Sistema Único de Saúde promoverá programas de assistência médica e odontológica para a prevenção das enfermidades que ordinariamente afetam a população infantil, e campanhas de educação sanitária para pais, educadores e alunos.",
+      "notas": [],
+      "redacoes": [
+        {
+          "texto": "Parágrafo único. É obrigatória a vacinação das crianças nos casos recomendados pelas autoridades sanitárias.",
+          "origem": "tachado",
+          "enderecoLido": "art14.parUnico"
+        }
       ],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art18a"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art14"
     },
     {
       "endereco": "art21",
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "Art. 21.",
-      "texto": "O poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência. (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "O poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência.",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -738,8 +699,9 @@
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "Art. 23.",
-      "texto": "A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do poder familiar .",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -760,8 +722,9 @@
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "Art. 24.",
-      "texto": "A perda e a suspensão do poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22. (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "A perda e a suspensão do poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22.",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -777,8 +740,9 @@
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "Parágrafo único.",
-      "texto": "O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do poder familiar e implica necessariamente o dever de guarda. (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do poder familiar e implica necessariamente o dever de guarda.",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -794,8 +758,9 @@
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "§ 1º.",
-      "texto": "O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do poder familiar .",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -840,8 +805,9 @@
       "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "Art. 49.",
-      "texto": "A morte dos adotantes não restabelece o poder familiar dos pais naturais. (Expressão substituída pela Lei nº 12.010, de 2009)",
+      "texto": "A morte dos adotantes não restabelece o poder familiar dos pais naturais.",
       "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [
@@ -851,6 +817,19 @@
         }
       ],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art49"
+    },
+    {
+      "endereco": "art50.par13.incIII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "III -",
+      "texto": "oriundo o pedido de quem detém a tutela ou guarda legal de criança maior de 3 (três) anos ou adolescente, desde que o lapso de tempo de convivência comprove a fixação de laços de afinidade e afetividade, e não seja constatada a ocorrência de má-fé ou qualquer das situações previstas nos arts. 237 ou 238 desta Lei.",
+      "notas": [
+        "(Incluído pela Lei nº 12.010, de 2009)",
+        "Vigência"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art50"
     },
     {
       "endereco": "art51",
@@ -935,16 +914,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art53a"
     },
     {
-      "endereco": "art59",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 59.",
-      "texto": "Os municípios, com apoio dos estados e da União, estimularão e facilitarão a destinação de recursos e espaços para programações culturais, esportivas e de lazer voltadas para a infância e a juventude.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art59"
-    },
-    {
       "endereco": "art78.parUnico",
       "motivo": "parágrafo único",
       "status": "vigente",
@@ -965,6 +934,23 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art83"
     },
     {
+      "endereco": "art87.incII",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "II -",
+      "texto": "serviços, programas, projetos e benefícios de assistência social de garantia de proteção social e de prevenção e redução de violações de direitos, seus agravamentos ou reincidências;",
+      "notas": [
+        "(Redação dada pela Lei nº 13.257, de 2016)"
+      ],
+      "redacoes": [
+        {
+          "texto": "II - políticas e programas de assistência social, em caráter supletivo, para aqueles que deles necessitem",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art87"
+    },
+    {
       "endereco": "art89A.parUnico",
       "motivo": "vetado",
       "status": "vetado",
@@ -977,62 +963,109 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art89a"
     },
     {
-      "endereco": "art90.incIV",
-      "motivo": "com nome (rubrica)",
+      "endereco": "art97.incII.alD",
+      "motivo": "alínea",
       "status": "vigente",
-      "rotulo": "IV -",
-      "nome": "I",
-      "texto": "acolhimento institucional;",
+      "rotulo": "d)",
+      "texto": "cassação do registro.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art97"
+    },
+    {
+      "endereco": "art101.par8",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 8 o",
+      "texto": "Verificada a possibilidade de reintegração familiar, o responsável pelo programa de acolhimento familiar ou institucional fará imediata comunicação à autoridade judiciária, que dará vista ao Ministério Público, pelo prazo de 5 (cinco) dias, decidindo em igual prazo.",
       "notas": [
-        "(Redação dada pela Lei nº 12.010, de 2009)",
+        "(Incluído pela Lei nº 12.010, de 2009)",
         "Vigência"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art90"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art101"
     },
     {
-      "endereco": "art100.parUnico.incX",
-      "motivo": "espaçado",
+      "endereco": "art129.incX",
+      "motivo": "caso: tachado-parcial",
       "status": "vigente",
       "rotulo": "X -",
-      "texto": "prevalência da família: na promoção de direitos e na proteção da criança e do adolescente deve ser dada prevalência às medidas que os mantenham ou reintegrem na sua família natural ou extensa ou, se isso não for possível, que promovam a sua integração em família adotiva;",
+      "texto": "suspensão ou destituição do poder familiar .",
       "notas": [
-        "(Redação dada pela Lei nº 13.509, de 2017)"
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
+        "Vigência"
       ],
       "redacoes": [
         {
-          "texto": "X - prevalência da família: na promoção de direitos e na proteção da criança e do adolescente deve ser dada prevalência às medidas que os mantenham ou reintegrem na sua família natural ou extensa ou, se isto não for possível, que promovam a sua integração em família substituta; (Incluído pela Lei nº 12.010, de 2009) Vigência",
-          "origem": "tachado"
+          "texto": "X - suspensão ou destituição do pátrio poder poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009) Vigência",
+          "origem": "revogacao"
         }
       ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art100"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art129"
     },
     {
-      "endereco": "art136.incIII.alA",
-      "motivo": "alínea",
-      "status": "vigente",
-      "rotulo": "a)",
-      "texto": "requisitar serviços públicos nas áreas de saúde, educação, assistência social, previdência, trabalho e segurança;",
-      "notas": [
-        "(Redação dada pela Lei nº 15.268, de 2025)"
-      ],
-      "redacoes": [
-        {
-          "texto": "a) requisitar serviços públicos nas áreas de saúde, educação, serviço social, previdência, trabalho e segurança;",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art136"
-    },
-    {
-      "endereco": "art148.incI",
+      "endereco": "art137",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "conhecer de representações promovidas pelo Ministério Público, para apuração de ato infracional atribuído a adolescente, aplicando as medidas cabíveis;",
+      "rotulo": "Art. 137.",
+      "texto": "As decisões do Conselho Tutelar somente poderão ser revistas pela autoridade judiciária a pedido de quem tenha legítimo interesse.",
       "notas": [],
       "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art137"
+    },
+    {
+      "endereco": "art148.parUnico.alB",
+      "motivo": "caso: tachado-parcial",
+      "status": "vigente",
+      "rotulo": "b)",
+      "texto": "conhecer de ações de destituição do poder familiar , perda ou modificação da tutela ou guarda;",
+      "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
+        "Vigência"
+      ],
+      "redacoes": [
+        {
+          "texto": "b) conhecer de ações de destituição do pátrio poder poder familiar , perda ou modificação da tutela ou guarda; (Expressão substituída pela Lei nº 12.010, de 2009) Vigência",
+          "origem": "revogacao"
+        }
+      ],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art148"
+    },
+    {
+      "endereco": "art148.parUnico.alD",
+      "motivo": "caso: tachado-parcial",
+      "status": "vigente",
+      "rotulo": "d)",
+      "texto": "conhecer de pedidos baseados em discordância paterna ou materna, em relação ao exercício do poder familiar ;",
+      "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
+        "Vigência"
+      ],
+      "redacoes": [
+        {
+          "texto": "d) conhecer de pedidos baseados em discordância paterna ou materna, em relação ao exercício do pátrio poder poder familiar ; (Expressão substituída pela Lei nº 12.010, de 2009) Vigência",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art148"
+    },
+    {
+      "endereco": "art155",
+      "motivo": "caso: tachado-parcial",
+      "status": "vigente",
+      "rotulo": "Art. 155.",
+      "texto": "O procedimento para a perda ou a suspensão do poder familiar terá início por provocação do Ministério Público ou de quem tenha legítimo interesse.",
+      "notas": [
+        "(Expressão substituída pela Lei nº 12.010, de 2009)",
+        "Vigência"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 155. O procedimento para a perda ou a suspensão do pátrio poder poder familiar terá início por provocação do Ministério Público ou de quem tenha legítimo interesse. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art155"
     },
     {
       "endereco": "art161.par2",
@@ -1054,27 +1087,6 @@
         }
       ],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art161"
-    },
-    {
-      "endereco": "art163",
-      "motivo": "várias redações anteriores",
-      "status": "vigente",
-      "rotulo": "Art. 163.",
-      "texto": "O prazo máximo para conclusão do procedimento será de 120 (cento e vinte) dias, e caberá ao juiz, no caso de notória inviabilidade de manutenção do poder familiar, dirigir esforços para preparar a criança ou o adolescente com vistas à colocação em família substituta.",
-      "notas": [
-        "(Redação dada pela Lei nº 13.509, de 2017)"
-      ],
-      "redacoes": [
-        {
-          "texto": "Art. 163. A sentença que decretar a perda ou a suspensão do pátrio poder poder familiar será averbada à margem do registro de nascimento da criança ou adolescente. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência",
-          "origem": "tachado"
-        },
-        {
-          "texto": "Art. 163. O prazo máximo para conclusão do procedimento será de 120 (cento e vinte) dias. (Redação dada pela Lei nº 12.010, de 2009) Vigência",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art163"
     },
     {
       "endereco": "art166",
@@ -1100,35 +1112,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art166"
     },
     {
-      "endereco": "art197B.incI",
+      "endereco": "art185",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "apresentar quesitos a serem respondidos pela equipe interprofissional encarregada de elaborar o estudo técnico a que se refere o art. 197-C desta Lei;",
-      "notas": [
-        "(Incluído pela Lei nº 12.010, de 2009)",
-        "Vigência"
-      ],
+      "rotulo": "Art. 185.",
+      "texto": "A internação, decretada ou mantida pela autoridade judiciária, não poderá ser cumprida em estabelecimento prisional.",
+      "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art197b"
-    },
-    {
-      "endereco": "art198.incIV",
-      "motivo": "parágrafo, inciso ou alínea revogado",
-      "status": "revogado",
-      "rotulo": "IV -",
-      "texto": "",
-      "notas": [
-        "(Revogado pela Lei nº 12.010, de 2009)",
-        "Vigência"
-      ],
-      "redacoes": [
-        {
-          "texto": "IV - o agravado será intimado para, no prazo de cinco dias, oferecer resposta e indicar as peças a serem trasladadas; (Revogado pela Lei nº 12.010, de 2009) Vigência",
-          "origem": "revogacao"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art198"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art185"
     },
     {
       "endereco": "art198.incVI",
@@ -1172,6 +1163,16 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art201"
     },
     {
+      "endereco": "art209",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "Art. 209.",
+      "texto": "As ações previstas neste Capítulo serão propostas no foro do local onde ocorreu ou deva ocorrer a ação ou omissão, cujo juízo terá competência absoluta para processar a causa, ressalvadas a competência da Justiça Federal e a competência originária dos tribunais superiores.",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art209"
+    },
+    {
       "endereco": "art226A.parUnico",
       "motivo": "parágrafo único",
       "status": "vigente",
@@ -1185,11 +1186,13 @@
     },
     {
       "endereco": "art233",
-      "motivo": "texto diferente na compilada",
-      "status": "vigente",
-      "rotulo": "",
+      "motivo": "várias redações anteriores",
+      "status": "revogado",
+      "rotulo": "Art. 233.",
       "texto": "",
-      "notas": [],
+      "notas": [
+        "(Revogado pela Lei nº 9.455, de 7.4.1997"
+      ],
       "redacoes": [
         {
           "texto": "Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura: (Revogado pela Lei nº 9.455, de 7.4.1997",
@@ -1203,50 +1206,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233"
     },
     {
-      "endereco": "art233.par1",
-      "motivo": "divergência decidida",
-      "status": "vigente",
-      "rotulo": "",
-      "texto": "",
-      "notas": [],
-      "redacoes": [
-        {
-          "texto": "§ 1º Se resultar lesão corporal grave: (Revogado pela Lei nº 9.455, de 7.4.1997 :",
-          "origem": "revogacao"
-        },
-        {
-          "texto": "Pena - reclusão de dois a oito anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :",
-          "origem": "revogacao"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233"
-    },
-    {
-      "endereco": "art233.par2",
-      "motivo": "divergência decidida",
-      "status": "vigente",
-      "rotulo": "",
-      "texto": "",
-      "notas": [],
-      "redacoes": [
-        {
-          "texto": "§ 2º Se resultar lesão corporal gravíssima: (Revogado pela Lei nº 9.455, de 7.4.1997 :",
-          "origem": "revogacao"
-        },
-        {
-          "texto": "Pena - reclusão de quatro a doze anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :",
-          "origem": "revogacao"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art233"
-    },
-    {
       "endereco": "art233.par3",
-      "motivo": "divergência decidida",
-      "status": "vigente",
-      "rotulo": "",
+      "motivo": "parágrafo, inciso ou alínea revogado",
+      "status": "revogado",
+      "rotulo": "§ 3º",
       "texto": "",
-      "notas": [],
+      "notas": [
+        "(Revogado pela Lei nº 9.455, de 7.4.1997"
+      ],
       "redacoes": [
         {
           "texto": "§ 3º Se resultar morte: (Revogado pela Lei nº 9.455, de 7.4.1997 :",
@@ -1332,31 +1299,21 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art248"
     },
     {
-      "endereco": "art252",
+      "endereco": "art253",
       "motivo": "com \"Pena\"",
       "status": "vigente",
-      "rotulo": "Art. 252.",
-      "texto": "Deixar o responsável por diversão ou espetáculo público de afixar, em lugar visível e de fácil acesso, à entrada do local de exibição, informação destacada sobre a natureza da diversão ou espetáculo e a faixa etária especificada no certificado de classificação:\nPena - multa de três a vinte salários de referência, aplicando-se o dobro em caso de reincidência.",
+      "rotulo": "Art. 253.",
+      "texto": "Anunciar peças teatrais, filmes ou quaisquer representações ou espetáculos, sem indicar os limites de idade a que não se recomendem:\nPena - multa de três a vinte salários de referência, duplicada em caso de reincidência, aplicável, separadamente, à casa de espetáculo e aos órgãos de divulgação ou publicidade.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art252"
-    },
-    {
-      "endereco": "art255",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 255.",
-      "texto": "Exibir filme, trailer, peça, amostra ou congênere classificado pelo órgão competente como inadequado às crianças ou adolescentes admitidos ao espetáculo:\nPena - multa de vinte a cem salários de referência; na reincidência, a autoridade poderá determinar a suspensão do espetáculo ou o fechamento do estabelecimento por até quinze dias.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art255"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art253"
     },
     {
       "endereco": "art259",
       "motivo": "com nome (rubrica)",
       "status": "vigente",
       "rotulo": "Art. 259.",
-      "nome": "Medida Administrativa - interdição do estabelecimento comercial até o recolhimento da multa aplicada. / Disposições Finais e Transitórias",
+      "nome": "Disposições Finais e Transitórias",
       "texto": "A União, no prazo de noventa dias contados da publicação deste Estatuto, elaborará projeto de lei dispondo sobre a criação ou adaptação de seus órgãos às diretrizes da política de atendimento fixadas no art. 88 e ao que estabelece o Título V do Livro II.",
       "notas": [],
       "redacoes": [],
@@ -1372,6 +1329,24 @@
         "(Incluído pela Lei nº 14.692, de 2023)"
       ],
       "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art260"
+    },
+    {
+      "endereco": "art260.par5",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 5 o",
+      "texto": "Observado o disposto no § 4 o do art. 3 o da Lei n o 9.249, de 26 de dezembro de 1995 , a dedução de que trata o inciso I do caput :",
+      "notas": [
+        "(Redação dada pela Lei nº 12.594, de 2012)",
+        "(Vide)"
+      ],
+      "redacoes": [
+        {
+          "texto": "§ 5 o A destinação de recursos provenientes dos fundos mencionados neste artigo não desobriga os Entes Federados à previsão, no orçamento dos respectivos órgãos encarregados da execução das políticas públicas de assistência social, educação e saúde, dos recursos necessários à implementação das ações, serviços e programas de atendimento a crianças, adolescentes e famílias, em respeito ao princípio da prioridade absoluta estabelecido pelo caput do art. 227 da Constituição Federal e pelo caput e parágrafo único do art. 4 o desta Lei. (Incluído pela Lei nº 12.010, de 2009) Vigência",
+          "origem": "tachado"
+        }
+      ],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art260"
     },
     {
@@ -1409,17 +1384,6 @@
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art263"
-    },
-    {
-      "endereco": "art265",
-      "motivo": "com nome (rubrica)",
-      "status": "vigente",
-      "rotulo": "Art. 265.",
-      "nome": "\"Art. 102 .................................................................... / 6º) a perda e a suspensão do pátrio poder. \"",
-      "texto": "A Imprensa Nacional e demais gráficas da União, da administração direta ou indireta, inclusive fundações instituídas e mantidas pelo poder público federal promoverão edição popular do texto integral deste Estatuto, que será posto à disposição das escolas e das entidades de atendimento e de defesa dos direitos da criança e do adolescente.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art265"
     },
     {
       "endereco": "art267",
@@ -1572,13 +1536,13 @@
     {"endereco":"art19B.par5","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art19B.par6","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art20","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art21","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art21","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art22","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art22.parUnico","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art23","status":"vigente","notas":1,"redacoes":2},
+    {"endereco":"art23","status":"vigente","notas":2,"redacoes":2},
     {"endereco":"art23.par1","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art23.par2","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art24","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art24","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art25","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art25.parUnico","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art26","status":"vigente","notas":0,"redacoes":0},
@@ -1610,7 +1574,7 @@
     {"endereco":"art34.par4","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art35","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art36","status":"vigente","notas":2,"redacoes":1},
-    {"endereco":"art36.parUnico","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art36.parUnico","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art37","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art37.parUnico","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art38","status":"vigente","notas":0,"redacoes":0},
@@ -1632,7 +1596,7 @@
     {"endereco":"art43","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art44","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art45","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art45.par1","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art45.par1","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art45.par2","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art46","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art46.par1","status":"vigente","notas":2,"redacoes":1},
@@ -1655,7 +1619,7 @@
     {"endereco":"art47.par10","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art48","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art48.parUnico","status":"vigente","notas":2,"redacoes":0},
-    {"endereco":"art49","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art49","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art50","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art50.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art50.par2","status":"vigente","notas":0,"redacoes":0},
@@ -1867,7 +1831,7 @@
     {"endereco":"art90.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art90.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art90.incIII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art90.incIV","status":"vigente","notas":2,"redacoes":0,"nome":true},
+    {"endereco":"art90.incIV","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art90.incV","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art90.incVI","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art90.incVII","status":"vigente","notas":2,"redacoes":1},
@@ -2098,7 +2062,7 @@
     {"endereco":"art129.incVII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art129.incVIII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art129.incIX","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art129.incX","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art129.incX","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art129.parUnico","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art130","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art130.parUnico","status":"vigente","notas":1,"redacoes":0},
@@ -2174,9 +2138,9 @@
     {"endereco":"art148.incVII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art148.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art148.parUnico.alA","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art148.parUnico.alB","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art148.parUnico.alB","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art148.parUnico.alC","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art148.parUnico.alD","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art148.parUnico.alD","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art148.parUnico.alE","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art148.parUnico.alF","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art148.parUnico.alG","status":"vigente","notas":0,"redacoes":0},
@@ -2208,13 +2172,13 @@
     {"endereco":"art153","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art153.parUnico","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art154","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art155","status":"vigente","notas":1,"redacoes":1,"nome":true},
+    {"endereco":"art155","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art156","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art156.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art156.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art156.incIII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art156.incIV","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art157","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art157","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art157.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par3","status":"vigente","notas":1,"redacoes":0},
@@ -2261,7 +2225,7 @@
     {"endereco":"art167","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art167.parUnico","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art168","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art169","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art169","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art169.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art170","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art170.parUnico","status":"vigente","notas":2,"redacoes":0},
@@ -2407,7 +2371,7 @@
     {"endereco":"art201","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art201.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art201.incII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art201.incIII","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art201.incIII","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art201.incIV","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art201.incV","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art201.incVI","status":"vigente","notas":0,"redacoes":0},
@@ -2510,10 +2474,10 @@
     {"endereco":"art230.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art231","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art232","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art233","status":"vigente","notas":0,"redacoes":2},
-    {"endereco":"art233.par1","status":"vigente","notas":0,"redacoes":2},
-    {"endereco":"art233.par2","status":"vigente","notas":0,"redacoes":2},
-    {"endereco":"art233.par3","status":"vigente","notas":0,"redacoes":2},
+    {"endereco":"art233","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art233.par1","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art233.par2","status":"revogado","notas":1,"redacoes":2},
+    {"endereco":"art233.par3","status":"revogado","notas":1,"redacoes":2},
     {"endereco":"art234","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art235","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art236","status":"vigente","notas":0,"redacoes":0},
@@ -2579,16 +2543,16 @@
     {"endereco":"art246","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art247","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art247.par1","status":"vigente","notas":1,"redacoes":1},
-    {"endereco":"art247.par2","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art247.par2","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art248","status":"revogado","notas":2,"redacoes":2},
-    {"endereco":"art249","status":"vigente","notas":1,"redacoes":1},
+    {"endereco":"art249","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art250","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art250.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art250.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art251","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art252","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art253","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art254","status":"vigente","notas":0,"redacoes":1},
+    {"endereco":"art254","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art255","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art256","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art257","status":"vigente","notas":0,"redacoes":0},
@@ -2597,7 +2561,7 @@
     {"endereco":"art258A.parUnico","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art258B","status":"vigente","notas":4,"redacoes":0},
     {"endereco":"art258B.parUnico","status":"vigente","notas":2,"redacoes":0},
-    {"endereco":"art258C","status":"vigente","notas":2,"redacoes":0},
+    {"endereco":"art258C","status":"vigente","notas":3,"redacoes":0},
     {"endereco":"art259","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art259.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art260","status":"vigente","notas":2,"redacoes":2},
@@ -2692,7 +2656,7 @@
     {"endereco":"art263.parUnico","status":"vigente","notas":0,"redacoes":1},
     {"endereco":"art263.parUnico.it5","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art264","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art265","status":"vigente","notas":0,"redacoes":0,"nome":true},
+    {"endereco":"art265","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art265A","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art265A.parUnico","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art266","status":"vigente","notas":0,"redacoes":0},

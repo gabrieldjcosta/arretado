@@ -1,10 +1,10 @@
 // Estruturador (F2; Parte 2 §10.6, "fatiarLei"): blocos do sanitizador ou de `textoParaBlocos` →
 // Rascunho. Domínio puro, sem tela nem banco. Ordem das regras: normalização (1, 8.1), blocos
-// pré-normativos (2) e hierarquia estrutural (3, 8.2), rubrica (4) e artigo (5) (8.3); o resto vem
-// nas seguintes:
-// - 8.4: caput, parágrafo, inciso, alínea e item (as demais linhas do artigo ficam na faixa; o
-//   texto do artigo é o da linha do rótulo);
-// - 8.6: redação anterior. Até lá, linha tachada vira descarte `redacao_anterior`, nunca texto.
+// pré-normativos (2) e hierarquia estrutural (3, 8.2), rubrica (4) e artigo (5) (8.3), caput,
+// parágrafo, inciso, alínea e item (6, 8.4) e notas de vigência (7, 8.5: fora do texto, com lei e
+// ano); o resto vem nas seguintes:
+// - 8.6: redação anterior. Até lá, linha tachada vira descarte `redacao_anterior`, nunca texto, e a
+//   linha só de notas logo depois dela vai junto.
 // Toda linha cai num nó (pela faixa), nota, metadado ou descarte.
 import type { Bloco, Trecho } from '../../core/seguranca/sanitizador';
 import { ARTIGO_QUEBRADO, lerInicioDeArtigo, lerRubrica, type InicioDeArtigo } from './artigo';
@@ -31,7 +31,7 @@ import {
   prepararLinhas,
 } from './linhas';
 import { chaveDeCasamento, normalizarBlocos } from './normalizacao';
-import { lerNotasDaLinha, separarNotasFinais } from './notas';
+import { lerNotasDaLinha, notaVigenciaMaisRecente, separarNotasFinais } from './notas';
 import { lerPreNormativo } from './prenormativo';
 import type {
   Anomalia,
@@ -46,10 +46,10 @@ import type {
 } from './rascunho';
 
 /**
- * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.4 na 8.4…),
+ * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.5 na 8.5…),
  * para a fonte guardada ser reprocessada quando o estruturador melhorar.
  */
-export const VERSAO_ESTRUTURADOR = '0.4';
+export const VERSAO_ESTRUTURADOR = '0.5';
 
 export interface OpcoesEstruturar {
   /** `texto` (texto puro): tudo "a confirmar" (regra 12). Padrão: `html`. */
@@ -71,6 +71,8 @@ export function estruturar(blocos: readonly Bloco[], opcoes: OpcoesEstruturar = 
       gravidade: 'aviso',
       mensagem: `${String(relatorio.perdidos)} caractere(s) chegaram ilegíveis (�); confira acentos no texto.`,
     });
+  const raizes = pre.preambulo ? [pre.preambulo, ...nos] : nos;
+  const maisRecente = notaVigenciaMaisRecente(todasAsNotas(pre.notasDaNorma, raizes));
   return {
     versaoEstruturador: VERSAO_ESTRUTURADOR,
     formatoEntrada: formato,
@@ -78,10 +80,25 @@ export function estruturar(blocos: readonly Bloco[], opcoes: OpcoesEstruturar = 
     normalizacao: relatorio,
     metadados: pre.metadados,
     notasDaNorma: pre.notasDaNorma,
-    nos: pre.preambulo ? [pre.preambulo, ...nos] : nos,
+    ...(maisRecente ? { notaVigenciaMaisRecente: maisRecente } : {}),
+    nos: raizes,
     descartes: [...pre.descartes, ...descartes].sort((a, b) => a.linhas.inicio - b.linhas.inicio),
     anomalias,
   };
+}
+
+/** As notas da norma e as de todos os nós (sem recursão: a árvore pode ser funda numa página hostil). */
+function* todasAsNotas(
+  daNorma: readonly NotaDeVigencia[],
+  nos: readonly NoRascunho[],
+): Generator<NotaDeVigencia> {
+  yield* daNorma;
+  const pilha: NoRascunho[] = [];
+  acrescentar(pilha, nos);
+  for (let no = pilha.pop(); no; no = pilha.pop()) {
+    yield* no.notas;
+    acrescentar(pilha, no.filhos);
+  }
 }
 
 /** Local e data que abrem o fecho ("Brasília, 11 de julho de 1984;", "Palácio dos Bandeirantes, 9 de…"). */
@@ -237,7 +254,9 @@ class Corpo {
     const artigo = lerInicioDeArtigo(l.chave);
     if (rotulo || artigo) this.citacao = false;
     if (l.tachada) this.tachada(l, anterior, inicio, artigo);
-    else if (this.artigos > 0 && FECHO.test(l.chave)) this.abrirFecho(l);
+    else if (anterior && this.notaDaTachada(l, anterior)) {
+      // nota da redação anterior logo acima: vai com ela
+    } else if (this.artigos > 0 && FECHO.test(l.chave)) this.abrirFecho(l);
     else if (rotulo) this.abrirNo(rotulo, l);
     else if (this.cabecalho && this.lerCabecalho(this.cabecalho, l, artigo)) {
       // nome ou nota do nó recém-aberto
@@ -409,16 +428,18 @@ class Corpo {
     } else if (r) this.devolverRubrica(r);
     this.fecharArtigo();
     this.soltarPendentes();
+    const texto = textoENotas(l, fim);
     const artigo = this.novoNo('artigo', l, {
       endereco,
       rotulo,
       rotuloLido: l.texto.slice(0, fim).trim(),
-      trechos: aparar(recortar(l.trechos, fim, l.texto.length)),
+      trechos: texto.trechos,
+      notas: texto.notas,
       filhos: nome ? [nome] : [],
       linhas: { inicio: nome?.linhas.inicio ?? inicio, fim: l.i },
     });
     this.anexar(artigo);
-    this.fechaFrase.set(artigo, terminaFrase(l, fim));
+    this.fechaFrase.set(artigo, texto.fechaFrase);
     this.caminho = [artigo];
     this.artigos += 1;
   }
@@ -547,16 +568,18 @@ class Corpo {
       nome = this.nomeDe(r);
       this.rubricas += 1;
     } else if (r) this.devolverRubrica(r);
+    const texto = textoENotas(l, rotulo.fim);
     const no = this.novoNo(rotulo.tipo, l, {
       endereco,
       rotulo: rotulo.rotulo,
       rotuloLido: l.texto.slice(0, rotulo.fim).trim(),
-      trechos: aparar(recortar(l.trechos, rotulo.fim, l.texto.length)),
+      trechos: texto.trechos,
+      notas: texto.notas,
       filhos: nome ? [nome] : [],
       linhas: { inicio: nome?.linhas.inicio ?? l.i, fim: l.i },
     });
     pai.filhos.push(no);
-    this.fechaFrase.set(no, terminaFrase(l, rotulo.fim));
+    this.fechaFrase.set(no, texto.fechaFrase);
     this.caminho.push(no);
     this.estender(l.i);
   }
@@ -576,14 +599,15 @@ class Corpo {
     for (const no of this.caminho) no.linhas.fim = i;
   }
 
-  /** Emenda a linha no texto do último dispositivo. */
+  /** Emenda a linha no texto do último dispositivo; as notas do fim dela vão para as dele. */
   private continuar(l: Linha, separador: '\n' | ' '): void {
     const ultimo = this.ultimo;
     if (!ultimo) return;
-    const trechos = aparar(l.trechos);
+    const { trechos, notas, fechaFrase } = textoENotas(l, 0);
     if (ultimo.trechos.length > 0 && trechos.length > 0) ultimo.trechos.push({ texto: separador });
     acrescentar(ultimo.trechos, trechos);
-    if (trechos.length > 0) this.fechaFrase.set(ultimo, terminaFrase(l, 0));
+    acrescentar(ultimo.notas, notas);
+    if (trechos.length > 0) this.fechaFrase.set(ultimo, fechaFrase);
     this.estender(l.i);
   }
 
@@ -605,7 +629,7 @@ class Corpo {
       // Rubrica de artigo ou dispositivo todo tachado: fica com ele, fora da árvore, até a 8.6.
       this.descartes.push({ motivo: 'redacao_anterior', linhas: { inicio: r.linha.i, fim: ate } });
     } else if (ultimo) {
-      // As notas do fim da linha ficam no texto (até a 8.5); as das linhas só de notas, no dispositivo.
+      // As notas do fim da linha saem com o texto (`continuar`); depois, as das linhas só de notas.
       this.continuar(r.linha, '\n');
       acrescentar(
         ultimo.notas,
@@ -646,11 +670,30 @@ class Corpo {
     const ultimo = this.descartes[this.descartes.length - 1];
     if (
       ultimo?.motivo === 'redacao_anterior' &&
-      anterior?.tachada &&
+      anterior &&
+      (anterior.tachada || anterior === this.notaDeTachada) &&
       ultimo.linhas.fim === anterior.i
     )
       ultimo.linhas.fim = l.i;
     else this.descartes.push({ motivo: 'redacao_anterior', linhas: { inicio, fim: l.i } });
+  }
+
+  /** A última linha só de notas que foi com a redação anterior de cima. */
+  private notaDeTachada: Linha | undefined;
+
+  /**
+   * Linha só de notas logo depois de uma linha tachada: é da redação anterior ("(Revogado pela Lei
+   * nº 12.015, de 2009)" depois do art. 214 do CP, todo tachado; a nota da ALESP tachada ou não
+   * logo depois do inciso tachado) e vai com ela para o descarte, até a 8.6.
+   */
+  private notaDaTachada(l: Linha, anterior: Linha): boolean {
+    if (!anterior.tachada && anterior !== this.notaDeTachada) return false;
+    const ultimo = this.descartes[this.descartes.length - 1];
+    if (ultimo?.motivo !== 'redacao_anterior' || ultimo.linhas.fim !== anterior.i) return false;
+    if (!lerNotasDaLinha(l)) return false;
+    ultimo.linhas.fim = l.i;
+    this.notaDeTachada = l;
+    return true;
   }
 
   private abrirFecho(l: Linha): void {
@@ -945,10 +988,23 @@ function fechaCitacao(l: Linha): boolean {
   return FECHA_CITACAO.test(l.chave.slice(0, fim).trimEnd());
 }
 
-/** O texto da linha, de `inicio` ao fim e sem as notas do fim, termina em ".", ";" ou ":". */
-function terminaFrase(l: Linha, inicio: number): boolean {
-  const { fim } = separarNotasFinais(l, inicio);
-  return /[.;:]$/.test(l.chave.slice(inicio, fim).trimEnd());
+/**
+ * Regra 7: o texto da linha de `inicio` ao fim, sem as notas do fim (a pontuação que vinha depois
+ * delas volta para o texto), as notas e se o texto termina a frase (".", ";" ou ":").
+ */
+function textoENotas(
+  l: Linha,
+  inicio: number,
+): { trechos: Trecho[]; notas: NotaDeVigencia[]; fechaFrase: boolean } {
+  const { fim, notas, pontuacao } = separarNotasFinais(l, inicio);
+  const trechos = aparar(recortar(l.trechos, inicio, fim));
+  const ultimo = trechos[trechos.length - 1];
+  if (pontuacao !== undefined && ultimo) {
+    if (ultimo.tachado) trechos.push({ texto: pontuacao });
+    else ultimo.texto += pontuacao;
+  }
+  const texto = l.chave.slice(inicio, fim).trimEnd() + (pontuacao ?? '');
+  return { trechos, notas, fechaFrase: /[.;:]$/.test(texto) };
 }
 
 /** `texto[0, fim)` da linha sem o tachado; o pedaço tachado, como redação anterior. */

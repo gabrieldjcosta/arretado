@@ -37,6 +37,8 @@ export function prepararLinhas(blocos: readonly Bloco[]): Linha[] {
 }
 
 const GRUPO_ENTRE_PARENTESES = /\((?:[^()]|\([^()]*\))*\)/g;
+/** Nota sem o parêntese de fecho no fim da linha (ECA, art. 233: "(Revogado pela Lei nº 9.455, de 7.4.1997"). */
+const NOTA_SEM_FECHO = /\(\s*(?:Reda[cç][aã]o|Inclu[ií]d|Acrescid|Revogad|Renumerad|Vide)[^()]*$/iu;
 const ROMANO_SOLTO = /(?<!\p{L})[IVXLCDM]+(?!\p{L})/gu;
 
 function ehTachada(trechos: readonly Trecho[]): boolean {
@@ -46,7 +48,8 @@ function ehTachada(trechos: readonly Trecho[]): boolean {
     .map((t) => t.texto)
     .join(' ')
     .replace(GRUPO_ENTRE_PARENTESES, ' ')
-    .replace(/\b(?:Vigência|Regulamento)\b/gu, ' ')
+    .replace(NOTA_SEM_FECHO, ' ')
+    .replace(/(?<!\p{L})(?:Vigência|Regulamento|Produção de efeitos?)(?!\p{L})/gu, ' ')
     .replace(ROMANO_SOLTO, ' ');
   return !/\p{L}{2,}/u.test(fora);
 }
@@ -64,13 +67,41 @@ export function recortar(trechos: readonly Trecho[], inicio: number, fim: number
   return saida;
 }
 
-/** Primeiro link entre dois índices do texto da linha. */
+/** Onde começa cada trecho no texto da linha (calculado uma vez por lista de trechos). */
+const inicios = new WeakMap<readonly Trecho[], number[]>();
+
+/**
+ * Primeiro link entre dois índices do texto da linha. Busca binária pelo primeiro trecho: a linha
+ * com centenas de milhares de notas, cada uma com o seu link, não fica quadrática.
+ */
 export function linkEntre(
   trechos: readonly Trecho[],
   inicio: number,
   fim: number,
 ): string | undefined {
-  return recortar(trechos, inicio, fim).find((t) => t.link)?.link;
+  let posicoes = inicios.get(trechos);
+  if (!posicoes) {
+    posicoes = [];
+    let pos = 0;
+    for (const t of trechos) {
+      posicoes.push(pos);
+      pos += t.texto.length;
+    }
+    inicios.set(trechos, posicoes);
+  }
+  // Último trecho que começa em `inicio` ou antes.
+  let baixo = 0;
+  let alto = posicoes.length - 1;
+  while (baixo < alto) {
+    const meio = (baixo + alto + 1) >> 1;
+    if ((posicoes[meio] ?? 0) <= inicio) baixo = meio;
+    else alto = meio - 1;
+  }
+  for (let k = baixo; k < trechos.length && (posicoes[k] ?? fim) < fim; k++) {
+    const t = trechos[k];
+    if (t?.link && (posicoes[k] ?? 0) + t.texto.length > inicio) return t.link;
+  }
+  return undefined;
 }
 
 /** Junta linhas num texto só (nome do nó em duas linhas, preâmbulo da ALESP), com um espaço entre elas. */

@@ -2,10 +2,33 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/cp.gabarito.json` › `conferencia`.
 
-## Conferência reduzida (24/09/2026) — conferir só esta seção
+## Como conferir (~30 min)
 
-Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Marque `[x]` aqui mesmo; o resto da folha (a amostra completa, mais abaixo) pode ser ignorado.
+1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
+2. Marcar `[x]` no que bate. No que não bate, escrever ao lado o que a página mostra.
+3. Conferir também as contagens gerais abaixo pelo que se vê na página (último artigo, artigos com letra).
 
+## Contagens
+
+- Dispositivos: 1422 (artigo 434, paragrafo 494, inciso 411, alinea 83)
+- Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
+- Redações anteriores: 883 em 430 dispositivos
+- Notas de vigência no texto vigente: 1190
+- Estrutura: parte 2, titulo 20, capitulo 59, secao 7
+
+## Amostra (50 dispositivos)
+
+- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art1)
+  - Nome: Anterioridade da Lei
+  - Art. 1º - Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 1° Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.~~
+- [ ] **art7.par3.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7)
+  - b) houve requisição do Ministro da Justiça.
+  - Nota: (Incluído pela Lei nº 7.209, de 1984)
+- [ ] **art33.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33)
+  - § 3º - A determinação do regime inicial de cumprimento da pena far-se-á com observância dos critérios previstos no art. 59 deste Código.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
 - [x] **art44** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44)
   - Art. 44. As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:
   - Nota: (Redação dada pela Lei nº 9.714, de 1998)
@@ -23,84 +46,6 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
 - [x] **art47.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47)
   - III - suspensão de autorização ou de habilitação para dirigir veículo. >
   - Nota: (Incluído pela Lei nº 7.209, de 11.7.1984)
-- [x] **art92.parUnico** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
-  - Parágrafo único - Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.
-  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
-  - Redação anterior (tachado): ~~Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conven~~
-- [x] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
-  - § 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .
-  - Nota: (Redação dada pela Lei nº 12.234, de 2010)
-  - Redação anterior (tachado): ~~§ 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, regula-se, também, pela pena aplicada e verifica-se nos mesmos prazos. (Renumerado do parágrafo único pela Lei nº 6.416, de 1977)~~
-  - Redação anterior (tachado): ~~§ 1º - A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, ou depois de improvido seu recurso, regula-se pela pena aplicada. (Redação dada pela Lei nº 7.209, de 11.7.1984)~~
-- [x] **art112** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112)
-  - Nome: Termo inicial da prescrição após a sentença condenatória irrecorrível
-  - Art. 112 - No caso do art. 110 deste Código, a prescrição começa a correr:
-  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
-  - Redação anterior (tachado): ~~Art. 112. No caso do art. 110, a prescrição começa a correr:~~
-  - Redação anterior (tachado) [lida como art112.alA]: ~~a) do dia em que passa em julgado a sentença condenatória ou a que revoga a suspensão condicional da pena ou o livramento condicional;~~
-  - Redação anterior (tachado) [lida como art112.alB]: ~~b) do dia em que se interrompe a execução, salvo quando o tempo da interrupção deva computar-se na pena.~~
-- [x] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
-  - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
-  - Nota: (Incluído pela Lei nº 13.964, de 2019)
-  - Nota: (Vigência)
-  - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
-- [x] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
-  - III - se a privação da liberdade dura mais de 15 (quinze) dias.
-- [x] **art171.par5** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
-  - § 5º (revogado)
-  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
-  - Redação anterior (revogacao): ~~§ 5º Somente se procede mediante representação, salvo se a vítima for: (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
-- [x] **art171.par5.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
-  - I – (revogado)
-  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
-  - Redação anterior (revogacao): ~~I - a Administração Pública, direta ou indireta; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
-
----
-
-## Como conferir (~30 min)
-
-1. Abrir cada link (vai direto ao artigo na página oficial) e comparar com o item: rótulo, texto, notas e redações anteriores (o texto tachado da página).
-2. Marcar `[x]` no que bate. No que não bate, escrever ao lado o que a página mostra.
-3. Conferir também as contagens gerais abaixo pelo que se vê na página (último artigo, artigos com letra).
-
-## Contagens
-
-- Dispositivos: 1422 (artigo 434, paragrafo 494, inciso 411, alinea 83)
-- Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
-- Redações anteriores: 882 em 428 dispositivos
-- Notas de vigência no texto vigente: 1186
-- Estrutura: parte 2, titulo 20, capitulo 59, secao 7
-
-## Amostra (50 dispositivos)
-
-- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art1)
-  - Nome: Anterioridade da Lei
-  - Art. 1º - Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.
-  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
-  - Redação anterior (tachado): ~~Art. 1° Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.~~
-- [ ] **art7.par3.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7)
-  - b) houve requisição do Ministro da Justiça.
-  - Nota: (Incluído pela Lei nº 7.209, de 1984)
-- [ ] **art33.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33)
-  - § 3º - A determinação do regime inicial de cumprimento da pena far-se-á com observância dos critérios previstos no art. 59 deste Código.
-  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
-- [ ] **art44** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44)
-  - Art. 44. As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:
-  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
-  - Redação anterior (tachado): ~~Art. 44. São circunstâncias que sempre agravam a pena, quando não constituem ou qualificam o crime:~~
-  - Redação anterior (tachado): ~~Art. 44 - As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando: (Redação dada pela Lei nº 7.209, de 1984)~~
-  - Redação anterior (tachado) [lida como art44.parUnico]: ~~Parágrafo único - Nos crimes culposos, a pena privativa de liberdade aplicada, igual ou superior a um ano, pode ser substituída por uma pena restritiva de direitos e multa ou por duas penas restritivas de direitos, exeqüíveis simultaneamente. (Incluído pela Lei nº 7.209, de 1984)~~
-- [ ] **art46** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art46)
-  - Nome: Prestação de serviços à comunidade ou a entidades públicas
-  - Art. 46. A prestação de serviços à comunidade ou a entidades públicas é aplicável às condenações superiores a seis meses de privação da liberdade.
-  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
-  - Redação anterior (tachado): ~~Art. 46. Verifica-se a reincidência quando o agente comete novo crime, depois de transitar em julgado a sentença que, no país ou no estrangeiro, o tenha condenado por crime anterior.~~
-  - Redação anterior (tachado): ~~Art. 46 - A prestação de serviços a comunidade consiste na atribuição ao condenado de tarefas gratuitas junto a entidades assistências, hospitais, escolas, orfanatos e outros estabelecimentos congêneres, em programas comunitários ou estatais. (Redação dada pela Lei nº 7.209, de 1984)~~
-  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único. Para efeito de reincidência, não prevalece a condenação anterior, se entre a data do cumprimento ou extinção da pena e a infração posterior tiver decorrido período de tempo superior a cinco anos. (Redação dada pela Lei nº 6.416, de 1977)~~
-  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único - As tarefas serão atribuídas conforme as aptidões do condenado, devendo ser cumpridas, durante oito horas semanais, aos sábados, domingos e feriados ou em dias úteis, de modo a não prejudicar a jornada normal de trabalho. (Redação dada pela Lei nº 7.209, de 1984)~~
-- [ ] **art47.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47)
-  - III - suspensão de autorização ou de habilitação para dirigir veículo. >
-  - Nota: (Incluído pela Lei nº 7.209, de 11.7.1984)
 - [ ] **art65.incIII.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art65)
   - b) procurado, por sua espontânea vontade e com eficiência, logo após o crime, evitar-lhe ou minorar-lhe as conseqüências, ou ter, antes do julgamento, reparado o dano;
 - [ ] **art72** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art72)
@@ -113,7 +58,7 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
   - Redação anterior (tachado) [lida como art72.parUnico]: ~~Parágrafo único. Computam-se no prazo:~~
   - Redação anterior (tachado) [lida como art72.parUnico.incI]: ~~I - o tempo da suspensão provisória;~~
   - Redação anterior (tachado) [lida como art72.parUnico.incII]: ~~II - o tempo de liberdade resultante da suspensão condicional da pena ou do livramento condicional, se não sobrevem revogação.~~
-- [ ] **art92.parUnico** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
+- [x] **art92.parUnico** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
   - Parágrafo único - Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.
   - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
   - Redação anterior (tachado): ~~Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conven~~
@@ -124,12 +69,12 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
   - Redação anterior (tachado) [lida como art94.incIV]: ~~IV - ao transgressor da proibição resultante do exílio local;~~
   - Redação anterior (tachado) [lida como art94.incV]: ~~V - ao transgressor da proibição de frequentar determinados lugares;~~
   - Redação anterior (tachado) [lida como art94.incVI]: ~~VI - se a lei não especifica a medida de segurança aplicavel.~~
-- [ ] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
+- [x] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
   - § 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .
   - Nota: (Redação dada pela Lei nº 12.234, de 2010)
   - Redação anterior (tachado): ~~§ 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, regula-se, também, pela pena aplicada e verifica-se nos mesmos prazos. (Renumerado do parágrafo único pela Lei nº 6.416, de 1977)~~
   - Redação anterior (tachado): ~~§ 1º - A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, ou depois de improvido seu recurso, regula-se pela pena aplicada. (Redação dada pela Lei nº 7.209, de 11.7.1984)~~
-- [ ] **art112** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112)
+- [x] **art112** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112)
   - Nome: Termo inicial da prescrição após a sentença condenatória irrecorrível
   - Art. 112 - No caso do art. 110 deste Código, a prescrição começa a correr:
   - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
@@ -152,37 +97,30 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
   - § 3º - As penas cominadas neste artigo aumentam-se de um terço:
 - [ ] **art140.par1.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art140)
   - I - quando o ofendido, de forma reprovável, provocou diretamente a injúria;
-- [ ] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
+- [x] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
   - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
   - Nota: (Incluído pela Lei nº 13.964, de 2019)
   - Nota: (Vigência)
   - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
-- [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
+- [x] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
   - III - se a privação da liberdade dura mais de 15 (quinze) dias.
 - [ ] **art157.par2A.incIII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art157)
   - b) desabastecimento;
   - Nota: (Incluído pela Lei nº 15.517, de 2026)
-- [ ] **art159.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159)
-  - § 3º - Se resulta a morte: ⏎ Pena - reclusão, de vinte e quatro a trinta anos.
-  - Nota: (Vide Lei nº 8.072, de 25.7.90)
-  - Nota: (Redação dada pela Lei nº 8.072, de 25.7.1990)
-  - Redação anterior (tachado): ~~Pena - reclusão, de vinte a trinta anos, e multa, de vinte contos a cinqüenta contos de réis.~~
-- [ ] **art168A** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168a)
-  - Nome: Apropriação indébita previdenciária
-  - Art. 168-A. Deixar de repassar à previdência social as contribuições recolhidas dos contribuintes, no prazo e forma legal ou convencional: ⏎ Pena - reclusão, de 2 (dois) a 5 (cinco) anos, e multa.
-  - Nota: (Incluído pela Lei nº 9.983, de 2000)
-  - Nota: (Incluído pela Lei nº 9.983, de 2000)
+- [ ] **art168** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art168)
+  - Nome: Apropriação indébita
+  - Art. 168 - Apropriar-se de coisa alheia móvel, de que tem a posse ou a detenção: ⏎ Pena - reclusão, de um a quatro anos, e multa.
 - [ ] **art169.parUnico.incII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art169)
   - Nome: Apropriação de coisa achada
   - II - quem acha coisa alheia perdida e dela se apropria, total ou parcialmente, deixando de restituí-la ao dono ou legítimo possuidor ou de entregá-la à autoridade competente, dentro no prazo de 15 (quinze) dias.
 - [ ] **art171.par2B** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
   - § 2º-B. A pena prevista no § 2º-A deste artigo, considerada a relevância do resultado gravoso, aumenta-se de 1/3 (um terço) a 2/3 (dois terços), se o crime é praticado mediante a utilização de servidor mantido fora do território nacional.
   - Nota: (Incluído pela Lei nº 14.155, de 2021)
-- [ ] **art171.par5** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+- [x] **art171.par5** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
   - § 5º (revogado)
   - Nota: (Redação dada pela Lei nº 15.397, de 2026)
   - Redação anterior (revogacao): ~~§ 5º Somente se procede mediante representação, salvo se a vítima for: (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
-- [ ] **art171.par5.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+- [x] **art171.par5.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
   - I – (revogado)
   - Nota: (Redação dada pela Lei nº 15.397, de 2026)
   - Redação anterior (revogacao): ~~I - a Administração Pública, direta ou indireta; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
@@ -230,8 +168,8 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
 - [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A)
   - Parágrafo único. (vetado)
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
-- [ ] **art218B.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art218b)
-  - § 3 o Na hipótese do inciso II do § 2 o , constitui efeito obrigatório da condenação a cassação da licença de localização e de funcionamento do estabelecimento.
+- [ ] **art218B.par2.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art218b)
+  - II - o proprietário, o gerente ou o responsável pelo local em que se verifiquem as práticas referidas no caput deste artigo.
   - Nota: (Incluído pela Lei nº 12.015, de 2009)
 - [ ] **art224.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art224)
   - b) (revogado)
@@ -261,6 +199,8 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
   - I - o crime é cometido com violência; ou
   - Nota: Incluído pela Lei nº 13.445, de 2017
   - Nota: Vigência
+- [ ] **art234.par1** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234)
+  - § 1º. Incorre na mesma pena quem:
 - [ ] **art281.par1.incIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
   - III - (revogado)
   - Nota: (Revogado pela Lei nº 6.368, 1976)
@@ -306,7 +246,6 @@ Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado
 
 - `texto` **art47.incIII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…ação para dirigir veículo. >…" | compilada: "…ação para dirigir veículo…"
 - `texto` **art148.par1.incIII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…a liberdade dura mais de 15 (quinze) dias…" | compilada: "…a liberdade dura mais de quinze dias…"
-- `texto` **art159.par3**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…Se resulta a morte: Pena - reclusão, de vinte e quatro a trinta a…" | compilada: "…Se resulta a morte: Vide Lei nº 8.072, de 25.7.90 Pena - reclusão…"
 - `texto` **art169.parUnico.incII**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…ente, dentro no prazo de 15 (quinze) dias…" | compilada: "…ente, dentro no prazo de quinze dias…"
 - `texto` **art216A**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…emprego, cargo ou função." Pena - detenção, de 1 (um) a 2 (dois) anos…" | compilada: "…emprego, cargo ou função. Pena - detenção, de 1 (um) a 2 (dois) anos…"
 - `texto` **art250.par2**: redação editorial diferente entre as duas páginas; o gabarito segue a página — página: "…, é pena de detenção, de 6 (seis) meses a 2 (dois) anos…" | compilada: "…, é pena de detenção, de seis meses a dois anos…"
