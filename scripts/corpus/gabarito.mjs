@@ -376,6 +376,13 @@ const RE_NOTA = new RegExp(
   'gi',
 );
 
+/**
+ * Número solto depois do fim da frase: link da fonte para outro ato, fora do texto (LEP, art. 18-A,
+ * § 3º: "…aos presos e às presas. 7.627 (Incluído…)", link para o Decreto 7.627/2011; apontado pelo
+ * Gabriel na conferência de 24/09/2026). Vira nota; a compilada não o traz.
+ */
+const RE_NUMERO_SOLTO = /(?<=[.;:])\s+(\d{1,3}(?:\.\d{3})+)\s*$/;
+
 const RE_NOTA_SEM_PARENTESES =
   /\s((?:Inclu[íi]d[oa]|Reda[çc][ãa]o dada|Acrescid[oa]|Revogad[oa]|Renumerad[oa]) pel[oa] (?:Lei|Emenda|Medida|Decreto)[^()]*?, de \d{4})(?:\s+(Vig[êe]ncia))?\s*$/;
 
@@ -395,6 +402,11 @@ export function separarNotas(texto) {
   });
   // Nota sem parênteses no fim (CP, art. 232-A: "…com violência; ou Incluído pela Lei nº 13.445,
   // de 2017 Vigência"): só com a chave em maiúscula, "pela Lei…" e o ano fechando a linha.
+  const numero = RE_NUMERO_SOLTO.exec(sem);
+  if (numero) {
+    notas.push(/** @type {string} */ (numero[1]));
+    return { texto: limpar(sem.slice(0, numero.index)), notas };
+  }
   const solta = RE_NOTA_SEM_PARENTESES.exec(sem);
   if (!solta) return { texto: limpar(sem), notas };
   return {

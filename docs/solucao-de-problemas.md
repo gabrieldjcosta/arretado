@@ -368,6 +368,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** marcador com "°" e `limiarTachados: 10` na entrada do catálogo (`scripts/corpus/normas.mjs`); a compilada tem 0. **Prevenção:** ao acrescentar norma, conferir o ordinal do "Art. 1" e contar os tachados das duas variantes antes de fixar o limiar.
 - **Origem:** ocorrido em 24/09/2026.
 
+### Número solto no fim do texto do dispositivo
+- **Sintoma:** texto que termina em "… às presas. 7.627" (LEP, art. 18-A, § 3º), apontado pelo Gabriel na conferência. **Causa:** a fonte põe, logo depois da frase, um link cujo texto é só o número de outro ato (`<a href="…/D7627.htm">7.627</a>`, o Decreto 7.627/2011); a compilada não o traz.
+- **Solução:** no gabarito, número com ponto de milhar depois de ".", ";" ou ":" e no fim do texto vira nota (`RE_NUMERO_SOLTO` em `scripts/corpus/gabarito.mjs`). **Prevenção:** o estruturador (8.5) trata o mesmo caso ao separar as notas; o sinal mais forte é o link para outro ato.
+- **Origem:** ocorrido em 24/09/2026 (conferência da LEP).
+
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.
 - **Solução:** nunca cortar em `</body>`/`</html>` nem extrair o corpo por regex; o parser HTML5 (DOMPurify/DOMParser) devolve o conteúdo ao `body`. **Prevenção:** teste do sanitizador com o `cp.html` inteiro.

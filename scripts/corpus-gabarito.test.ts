@@ -87,6 +87,19 @@ describe('notas de vigência', () => {
     });
   });
 
+  it('número solto depois do fim da frase é link da fonte, não texto (LEP, art. 18-A, § 3º)', () => {
+    expect(
+      separarNotas('§ 3º O atendimento aos presos. 7.627 (Incluído pela Lei nº 13.163, de 2015)'),
+    ).toEqual({
+      texto: '§ 3º O atendimento aos presos.',
+      notas: ['(Incluído pela Lei nº 13.163, de 2015)', '7.627'],
+    });
+    // Número que faz parte da frase fica.
+    expect(separarNotas('Art. 1º Aplica-se a Lei nº 7.627.').texto).toBe(
+      'Art. 1º Aplica-se a Lei nº 7.627.',
+    );
+  });
+
   it('"(NR)" da ALESP, "Vigência" solto depois de nota e nota sem parênteses no fim', () => {
     expect(separarNotas('IX - um representante de cada classe da carreira; (NR)')).toEqual({
       texto: 'IX - um representante de cada classe da carreira;',

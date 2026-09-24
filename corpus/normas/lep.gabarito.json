@@ -24,7 +24,9 @@
     "estado": "pendente",
     "por": null,
     "em": null,
-    "observacoes": []
+    "observacoes": [
+      "24/09/2026 (commit d5e084b): Gabriel conferiu 8 dos 10 itens reduzidos sem divergência; no art18A.par3 apontou que \"7.627\" no fim do texto é link para o Decreto 7.627/2011 — corrigido (número solto depois do fim da frase vira nota), o que mudou a amostra. Falta o art122."
+    ]
   },
   "ultimoArtigo": "art204",
   "contagens": {
@@ -46,7 +48,7 @@
       "vetado": 1
     },
     "comSufixo": 15,
-    "notasVigencia": 267,
+    "notasVigencia": 268,
     "redacoesAnteriores": 86,
     "redacoesPorOrigem": {
       "tachado": 73,
@@ -69,12 +71,6 @@
       "tipo": "so-na-pagina",
       "chave": "art9A.par1",
       "explicacao": "decisão: a compilada omite o § 1º do art. 9º-A; a página o traz sem tachado e sem nota de revogação"
-    },
-    {
-      "tipo": "texto",
-      "chave": "art18A.par3",
-      "explicacao": "redação editorial diferente entre as duas páginas; o gabarito segue a página",
-      "detalhe": "página: \"…to aos presos e às presas. 7.627…\" | compilada: \"…to aos presos e às presas…\""
     },
     {
       "tipo": "so-na-pagina",
@@ -639,26 +635,16 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art9a"
     },
     {
-      "endereco": "art18A.par3",
-      "motivo": "texto diferente na compilada",
+      "endereco": "art18A.par1",
+      "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3o",
-      "texto": "A União, os Estados, os Municípios e o Distrito Federal incluirão em seus programas de educação à distância e de utilização de novas tecnologias de ensino, o atendimento aos presos e às presas. 7.627",
+      "rotulo": "§ 1o",
+      "texto": "O ensino ministrado aos presos e presas integrar-se-á ao sistema estadual e municipal de ensino e será mantido, administrativa e financeiramente, com o apoio da União, não só com os recursos destinados à educação, mas pelo sistema estadual de justiça ou administração penitenciária.",
       "notas": [
         "(Incluído pela Lei nº 13.163, de 2015)"
       ],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art18a"
-    },
-    {
-      "endereco": "art19",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 19 -",
-      "texto": "O ensino profissional será ministrado em nível de iniciação ou de aperfeiçoamento técnico.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art19"
     },
     {
       "endereco": "art21A",
@@ -673,21 +659,21 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art21a"
     },
     {
-      "endereco": "art29.par1.alA",
+      "endereco": "art28",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "a)",
-      "texto": "à indenização dos danos causados pelo crime, desde que determinados judicialmente e não reparados por outros meios;",
+      "rotulo": "Art. 28 -",
+      "texto": "O trabalho do condenado, como dever social e condição de dignidade humana, terá finalidade educativa e produtiva.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art29"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art28"
     },
     {
-      "endereco": "art39.incVII",
+      "endereco": "art39.incI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "VII -",
-      "texto": "indenização à vitima ou aos seus sucessores;",
+      "rotulo": "I -",
+      "texto": "comportamento disciplinado e cumprimento fiel da sentença;",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art39"
@@ -709,6 +695,18 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art41"
     },
     {
+      "endereco": "art41A.par2",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 2º",
+      "texto": "A visitação e o monitoramento nos estabelecimentos penais federais de segurança máxima ficam sujeitos às regras especiais previstas na Lei nº 11.671, de 8 de maio de 2008.",
+      "notas": [
+        "(Incluído pela Lei nº 15.358, de 2026)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art41a"
+    },
+    {
       "endereco": "art43.parUnico",
       "motivo": "parágrafo único",
       "status": "vigente",
@@ -719,14 +717,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art43"
     },
     {
-      "endereco": "art44.parUnico",
+      "endereco": "art51.incIII",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Parágrafo único.",
-      "texto": "Estão sujeitos à disciplina o condenado à pena privativa de liberdade ou restritiva de direitos e o preso provisório.",
+      "rotulo": "III -",
+      "texto": "inobservar os deveres previstos nos incisos II e V do artigo 39 desta lei.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art44"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art51"
     },
     {
       "endereco": "art52",
@@ -750,36 +748,31 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art52"
     },
     {
-      "endereco": "art52.par1.incI",
+      "endereco": "art54.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "I -",
-      "texto": "que apresentem alto risco para a ordem e a segurança do estabelecimento penal ou da sociedade;",
+      "rotulo": "§ 2º",
+      "texto": "O juiz decidirá liminarmente sobre o pedido de inclusão de preso em regime disciplinar diferenciado e prolatará decisão final no prazo máximo de 15 (quinze) dias, após manifestação do Ministério Público e da defesa.",
       "notas": [
-        "(Incluído pela Lei nº 13.964, de 2019)"
+        "(Redação dada pela Lei nº 15.407, de 2026)"
       ],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art52"
+      "redacoes": [
+        {
+          "texto": "§ 2o A decisão judicial sobre inclusão de preso em regime disciplinar será precedida de manifestação do Ministério Público e da defesa e prolatada no prazo máximo de quinze dias. (Incluído pela Lei nº 10.792, de 2003)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art54"
     },
     {
-      "endereco": "art58.parUnico",
+      "endereco": "art64.incV",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Parágrafo único.",
-      "texto": "O isolamento será sempre comunicado ao Juiz da execução.",
+      "rotulo": "V -",
+      "texto": "elaborar programa nacional penitenciário de formação e aperfeiçoamento do servidor;",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art58"
-    },
-    {
-      "endereco": "art66.incIII.alB",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "b)",
-      "texto": "progressão ou regressão nos regimes;",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art66"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art64"
     },
     {
       "endereco": "art66.incV.alA",
@@ -804,24 +797,24 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art66"
     },
     {
-      "endereco": "art69.par2",
+      "endereco": "art67",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 2º",
-      "texto": "O mandato dos membros do Conselho Penitenciário terá a duração de 4 (quatro) anos.",
+      "rotulo": "Art. 67.",
+      "texto": "O Ministério Público fiscalizará a execução da pena e da medida de segurança, oficiando no processo executivo e nos incidentes da execução.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art69"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art67"
     },
     {
-      "endereco": "art79.incIII",
+      "endereco": "art74",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "III -",
-      "texto": "colaborar na fiscalização do cumprimento das condições da suspensão e do livramento condicional.",
+      "rotulo": "Art. 74.",
+      "texto": "O Departamento Penitenciário local, ou órgão similar, tem por finalidade supervisionar e coordenar os estabelecimentos penais da Unidade da Federação a que pertencer.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art79"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art74"
     },
     {
       "endereco": "art81B.incI.alF",
@@ -836,16 +829,16 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art81b"
     },
     {
-      "endereco": "art83.par3",
+      "endereco": "art81B.incI.alH",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3o",
-      "texto": "Os estabelecimentos de que trata o § 2o deste artigo deverão possuir, exclusivamente, agentes do sexo feminino na segurança de suas dependências internas. .",
+      "rotulo": "h)",
+      "texto": "a conversão de penas, a progressão nos regimes, a suspensão condicional da pena, o livramento condicional, a comutação de pena e o indulto; .",
       "notas": [
-        "(Incluído pela Lei nº 12.121, de 2009)"
+        "(Incluído pela Lei nº 12.313, de 2010)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art83"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art81b"
     },
     {
       "endereco": "art83A",
@@ -872,24 +865,24 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art84"
     },
     {
-      "endereco": "art88.parUnico",
+      "endereco": "art84.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Parágrafo único.",
-      "texto": "São requisitos básicos da unidade celular:",
+      "rotulo": "§ 2°",
+      "texto": "O preso que, ao tempo do fato, era funcionário da Administração da Justiça Criminal ficará em dependência separada.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art88"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art84"
     },
     {
-      "endereco": "art106.incIV",
+      "endereco": "art94",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "IV -",
-      "texto": "a informação sobre os antecedentes e o grau de instrução;",
+      "rotulo": "Art. 94.",
+      "texto": "O prédio deverá situar-se em centro urbano, separado dos demais estabelecimentos, e caracterizar-se pela ausência de obstáculos físicos contra a fuga.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art106"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art94"
     },
     {
       "endereco": "art111.parUnico",
@@ -900,6 +893,36 @@
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art111"
+    },
+    {
+      "endereco": "art112",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "Art. 112.",
+      "texto": "A pena privativa de liberdade será executada de forma progressiva com a transferência para regime menos rigoroso, a ser determinada pelo juiz, quando o preso tiver cumprido ao menos 1/6 (um sexto) da pena no regime anterior e seu mérito indicar a progressão, observadas as seguintes exceções:",
+      "notas": [
+        "(Redação dada pela Lei nº 15.402, de 2026)"
+      ],
+      "redacoes": [
+        {
+          "texto": "Art. 112. A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo Juiz, quando o preso tiver cumprido ao menos 1/6 (um sexto) da pena no regime anterior e seu mérito indicar a progressão.",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Art. 112. A pena privativa de liberdade será executada em forma progressiva com a transferência para regime menos rigoroso, a ser determinada pelo juiz, quando o preso tiver cumprido ao menos um sexto da pena no regime anterior e ostentar bom comportamento carcerário, comprovado pelo diretor do estabelecimento, respeitadas as normas que vedam a progressão. (Redação dada pela Lei nº 10.792, de 2003)",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Art. 112. A pena privativa de liberdade será executada em forma progressiva com a transferência para regime menos rigoroso, a ser determinada pelo juiz, quando o preso tiver cumprido ao menos: (Redação dada pela Lei nº 13.964, de 2019) (Vigência)",
+          "origem": "tachado"
+        },
+        {
+          "texto": "Parágrafo único. A decisão será motivada e precedida de parecer da Comissão Técnica de Classificação e do exame criminológico, quando necessário.",
+          "origem": "tachado",
+          "enderecoLido": "art112.parUnico"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art112"
     },
     {
       "endereco": "art112.incVIA",
@@ -940,16 +963,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art112"
     },
     {
-      "endereco": "art112.par3.incV",
+      "endereco": "art115.incI",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "V -",
-      "texto": "não ter integrado organização criminosa.",
-      "notas": [
-        "(Incluído pela Lei nº 13.769, de 2018)"
-      ],
+      "rotulo": "I -",
+      "texto": "permanecer no local que for designado, durante o repouso e nos dias de folga;",
+      "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art112"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art115"
     },
     {
       "endereco": "art122",
@@ -1002,18 +1023,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122"
     },
     {
-      "endereco": "art122.par1",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "§ 1º",
-      "texto": "A ausência de vigilância direta não impede a utilização de equipamento de monitoração eletrônica pelo condenado, quando assim determinar o juiz da execução.",
-      "notas": [
-        "(Redação dada pela Lei nº 13.964, de 2019)"
-      ],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122"
-    },
-    {
       "endereco": "art124",
       "motivo": "artigo revogado",
       "status": "revogado",
@@ -1025,6 +1034,23 @@
       "redacoes": [
         {
           "texto": "Art. 124. A autorização será concedida por prazo não superior a 7 (sete) dias, podendo ser renovada por mais 4 (quatro) vezes durante o ano. (Revogado pela Lei nº 14.843, de 2024)",
+          "origem": "revogacao"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art124"
+    },
+    {
+      "endereco": "art124.par1.incI",
+      "motivo": "espaçado",
+      "status": "revogado",
+      "rotulo": "I -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 14.843, de 2024)"
+      ],
+      "redacoes": [
+        {
+          "texto": "I - fornecimento do endereço onde reside a família a ser visitada ou onde poderá ser encontrado durante o gozo do benefício; (Incluído pela Lei nº 12.258, de 2010) (Revogado pela Lei nº 14.843, de 2024)",
           "origem": "revogacao"
         }
       ],
@@ -1048,16 +1074,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art124"
     },
     {
-      "endereco": "art131",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "Art. 131.",
-      "texto": "O livramento condicional poderá ser concedido pelo Juiz da execução, presentes os requisitos do artigo 83, incisos e parágrafo único, do Código Penal, ouvidos o Ministério Público e Conselho Penitenciário.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art131"
-    },
-    {
       "endereco": "art132.par2.alC",
       "motivo": "alínea",
       "status": "vigente",
@@ -1068,14 +1084,28 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art132"
     },
     {
-      "endereco": "art141",
+      "endereco": "art132.par2.alD",
+      "motivo": "espaçado",
+      "status": "vetado",
+      "rotulo": "d)",
+      "texto": "",
+      "notas": [
+        "(Incluído pela Lei nº 12.258, de 2010)"
+      ],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art132"
+    },
+    {
+      "endereco": "art146B",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 141.",
-      "texto": "Se a revogação for motivada por infração penal anterior à vigência do livramento, computar-se-á como tempo de cumprimento da pena o período de prova, sendo permitida, para a concessão de novo livramento, a soma do tempo das 2 (duas) penas.",
-      "notas": [],
+      "rotulo": "Art. 146-B.",
+      "texto": "O juiz poderá definir a fiscalização por meio da monitoração eletrônica quando:",
+      "notas": [
+        "(Incluído pela Lei nº 12.258, de 2010)"
+      ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art141"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art146b"
     },
     {
       "endereco": "art146B.parUnico",
@@ -1114,34 +1144,34 @@
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art146c"
     },
     {
-      "endereco": "art149",
+      "endereco": "art149.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 149.",
-      "texto": "Caberá ao Juiz da execução:",
+      "rotulo": "§ 2º",
+      "texto": "A execução terá início a partir da data do primeiro comparecimento.",
       "notas": [],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art149"
     },
     {
-      "endereco": "art163.par1",
+      "endereco": "art164.par2",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 1º",
-      "texto": "Revogada a suspensão ou extinta a pena, será o fato averbado à margem do registro.",
+      "rotulo": "§ 2º",
+      "texto": "A nomeação de bens à penhora e a posterior execução seguirão o que dispuser a lei processual civil.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art163"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art164"
     },
     {
-      "endereco": "art175.incVI",
+      "endereco": "art177",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "VI -",
-      "texto": "ouvidas as partes ou realizadas as diligências a que se refere o inciso anterior, o Juiz proferirá a sua decisão, no prazo de 5 (cinco) dias.",
+      "rotulo": "Art. 177.",
+      "texto": "Nos exames sucessivos para verificar-se a cessação da periculosidade, observar-se-á, no que lhes for aplicável, o disposto no artigo anterior.",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art175"
+      "link": "https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art177"
     },
     {
       "endereco": "art182",
@@ -1253,7 +1283,7 @@
     {"endereco":"art18A","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art18A.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art18A.par2","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art18A.par3","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art18A.par3","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art19","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art19.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art20","status":"vigente","notas":0,"redacoes":0},
