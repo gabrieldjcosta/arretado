@@ -25,10 +25,10 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
 
 ## Contagens
 
-- Dispositivos: 1402 (artigo 434, paragrafo 491, inciso 399, alinea 78)
+- Dispositivos: 1422 (artigo 434, paragrafo 494, inciso 411, alinea 83)
 - Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
 - Redações anteriores: 882 em 428 dispositivos
-- Notas de vigência no texto vigente: 1166
+- Notas de vigência no texto vigente: 1186
 - Estrutura: parte 2, titulo 20, capitulo 59, secao 7
 
 ## Amostra (50 dispositivos)
@@ -41,8 +41,9 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
 - [ ] **art7.par3.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7)
   - b) houve requisição do Ministro da Justiça.
   - Nota: (Incluído pela Lei nº 7.209, de 1984)
-- [ ] **art33.par2.alC** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33)
-  - c) o condenado não reincidente, cuja pena seja igual ou inferior a 4 (quatro) anos, poderá, desde o início, cumpri-la em regime aberto.
+- [ ] **art33.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33)
+  - § 3º - A determinação do regime inicial de cumprimento da pena far-se-á com observância dos critérios previstos no art. 59 deste Código.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
 - [ ] **art44** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44)
   - Art. 44. As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:
   - Nota: (Redação dada pela Lei nº 9.714, de 1998)
@@ -60,9 +61,8 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
 - [ ] **art47.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47)
   - III - suspensão de autorização ou de habilitação para dirigir veículo. >
   - Nota: (Incluído pela Lei nº 7.209, de 11.7.1984)
-- [ ] **art61.incII.alM** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art61)
-  - m) nas dependências de instituição de ensino.
-  - Nota: (Incluído pela Lei nº 15.159, de 2025)
+- [ ] **art65.incIII.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art65)
+  - b) procurado, por sua espontânea vontade e com eficiência, logo após o crime, evitar-lhe ou minorar-lhe as conseqüências, ou ter, antes do julgamento, reparado o dano;
 - [ ] **art72** (com nome (rubrica)) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art72)
   - Nome: Multas no concurso de crimes
   - Art. 72 - No concurso de crimes, as penas de multa são aplicadas distinta e integralmente.
@@ -77,9 +77,13 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
   - Parágrafo único - Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.
   - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
   - Redação anterior (tachado): ~~Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conven~~
-- [ ] **art92.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
-  - § 3º Em caso de reincidência da conduta prevista no inciso IV do caput deste artigo, a empresa será considerada inidônea e terá sua inscrição no CNPJ considerada inapta, com os efeitos previstos na Lei nº 9.430, de 27 de dezembro de 1996.
-  - Nota: (Incluído pela Lei nº 15.358, de 2026)
+- [ ] **art94** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art94)
+  - Art. 94 - A reabilitação poderá ser requerida, decorridos 2 (dois) anos do dia em que for extinta, de qualquer modo, a pena ou terminar sua execução, computando-se o período de prova da suspensão e o do livramento condicional, se não sobrevier revogação, desde que o condenado:
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 94. Fora dos casos já previstos, aplica-se a liberdade vigiada durante um ano, pelo menos:~~
+  - Redação anterior (tachado) [lida como art94.incIV]: ~~IV - ao transgressor da proibição resultante do exílio local;~~
+  - Redação anterior (tachado) [lida como art94.incV]: ~~V - ao transgressor da proibição de frequentar determinados lugares;~~
+  - Redação anterior (tachado) [lida como art94.incVI]: ~~VI - se a lei não especifica a medida de segurança aplicavel.~~
 - [ ] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
   - § 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .
   - Nota: (Redação dada pela Lei nº 12.234, de 2010)
@@ -100,13 +104,14 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
   - § 3º-A. No crime previsto no § 3º deste artigo, se cometido no contexto da atuação ou para a consecução das condutas previstas no art. 2º da lei que institui o marco legal do combate ao crime organizado no Brasil: ⏎ Pena - reclusão, de 20 (vinte) a 40 (quarenta) anos.
   - Nota: (Incluído pela Lei nº 15.358, de 2026)
   - Nota: (Incluído pela Lei nº 15.358, de 2026)
-- [ ] **art130.par1** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130)
-  - § 1º - Se é intenção do agente transmitir a moléstia: ⏎ Pena - reclusão, de um a quatro anos, e multa.
 - [ ] **art132.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132)
   - Parágrafo único. A pena é aumentada de um sexto a um terço se a exposição da vida ou da saúde de outrem a perigo decorre do transporte de pessoas para a prestação de serviços em estabelecimentos de qualquer natureza, em desacordo com as normas legais.
   - Nota: (Incluído pela Lei nº 9.777, de 1998)
-- [ ] **art138.par3.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138)
-  - I - se, constituindo o fato imputado crime de ação privada, o ofendido não foi condenado por sentença irrecorrível;
+- [ ] **art133.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art133)
+  - Nome: Aumento de pena
+  - § 3º - As penas cominadas neste artigo aumentam-se de um terço:
+- [ ] **art140.par1.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art140)
+  - I - quando o ofendido, de forma reprovável, provocou diretamente a injúria;
 - [ ] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
   - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
   - Nota: (Incluído pela Lei nº 13.964, de 2019)
@@ -114,9 +119,9 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
   - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
 - [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
   - III - se a privação da liberdade dura mais de 15 (quinze) dias.
-- [ ] **art158** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158)
-  - Nome: Extorsão
-  - Art. 158 - Constranger alguém, mediante violência ou grave ameaça, e com o intuito de obter para si ou para outrem indevida vantagem econômica, a fazer, tolerar que se faça ou deixar de fazer alguma coisa: ⏎ Pena - reclusão, de quatro a dez anos, e multa.
+- [ ] **art157.par2A.incIII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art157)
+  - b) desabastecimento;
+  - Nota: (Incluído pela Lei nº 15.517, de 2026)
 - [ ] **art159.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art159)
   - § 3º - Se resulta a morte: ⏎ Pena - reclusão, de vinte e quatro a trinta anos.
   - Nota: (Vide Lei nº 8.072, de 25.7.90)
@@ -185,14 +190,13 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
 - [ ] **art216A.parUnico** (vetado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A)
   - Parágrafo único. (vetado)
   - Nota: (Incluído pela Lei nº 10.224, de 15 de 2001)
-- [ ] **art222** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art222)
-  - Art. 222 - (revogado)
-  - Nota: (Revogado pela Lei nº 11.106, de 2005)
-  - Redação anterior (revogacao): ~~Art. 222 - Se o agente, ao efetuar o rapto, ou em seguida a este, pratica outro crime contra a raptada, aplicam-se cumulativamente a pena correspondente ao rapto e a cominada ao outro crime. (Revogado pela Lei nº 11.106, de 2005)~~
-- [ ] **art224.alC** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art224)
-  - c) (revogado)
+- [ ] **art218B.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art218b)
+  - § 3 o Na hipótese do inciso II do § 2 o , constitui efeito obrigatório da condenação a cassação da licença de localização e de funcionamento do estabelecimento.
+  - Nota: (Incluído pela Lei nº 12.015, de 2009)
+- [ ] **art224.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art224)
+  - b) (revogado)
   - Nota: (Revogado pela Lei nº 12.015, de 2009)
-  - Redação anterior (revogacao): ~~c) não pode, por qualquer outra causa, oferecer resistência. (Revogado pela Lei nº 12.015, de 2009)~~
+  - Redação anterior (revogacao): ~~b) é alienada ou débil mental, e o agente conhecia esta circunstância; (Revogado pela Lei nº 12.015, de 2009)~~
 - [ ] **art231** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231)
   - Art. 231. (revogado)
   - Nota: (Revogado pela Lei nº 13.344, de 2016)
@@ -213,20 +217,21 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
   - Nota: (Revogado pela Lei nº 13.344, de 2016)
   - Nota: (Vigência)
   - Redação anterior (revogacao): ~~§ 1 o Incorre na mesma pena aquele que agenciar, aliciar, vender ou comprar a pessoa traficada, assim como, tendo conhecimento dessa condição, transportá-la, transferi-la ou alojá-la (Incluído pela Lei nº 12.015, de 2009) (Revogado pela Lei nº 13.344, de 2016) (Vigência)~~
-- [ ] **art234.par1.incII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234)
-  - II - realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetáculo, que tenha o mesmo caráter;
+- [ ] **art232A.par2.incI** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art232a)
+  - I - o crime é cometido com violência; ou
+  - Nota: Incluído pela Lei nº 13.445, de 2017
+  - Nota: Vigência
+- [ ] **art281.par1.incIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
+  - III - (revogado)
+  - Nota: (Revogado pela Lei nº 6.368, 1976)
+  - Redação anterior (revogacao): ~~III - traz consigo, para uso próprio, substância entorpecente ou que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)~~
+  - Redação anterior (tachado): ~~III - traz consigo, para uso próprio, substância entorpecente ou que determine dependência física ou psíquica. (Matérias-primas ou plantas destinadas à preparação de entorpecentes ou de substâncias que determine dependência física ou psíquica.) (Incluído pelo Decreto-Lei nº 385, de 1968)~~
 - [ ] **art281.par3.incI** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
   - I - (revogado)
   - Nota: (Revogado pela Lei nº 6.368, 1976)
   - Redação anterior (revogacao): ~~I - instiga ou induz alguém a usar entorpecente ou substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)~~
   - Redação anterior (tachado): ~~I - Instiga ou induz alguem a usar entorpecente;~~
   - Redação anterior (tachado): ~~I - Instiga ou induz alguém a usar entorpecente; (Redação dada pela Lei nº 4.451, de 1964)~~
-- [ ] **art281.par3.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281)
-  - II - (revogado)
-  - Nota: (Revogado pela Lei nº 6.368, 1976)
-  - Redação anterior (revogacao): ~~II - utiliza o local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito para uso ilegal de entorpecente ou de substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado p~~
-  - Redação anterior (tachado): ~~II - utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dele se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente;~~
-  - Redação anterior (tachado): ~~II - Utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente; (Redação dada pela Lei nº 4.451, de 1964)~~
 - [ ] **art299.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art299)
   - Parágrafo único - Se o agente é funcionário público, e comete o crime prevalecendo-se do cargo, ou se a falsificação ou alteração é de assentamento de registro civil, aumenta-se a pena de sexta parte.
 - [ ] **art317.par2** (com "Pena") — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art317)
@@ -242,9 +247,9 @@ Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, 
   - Art. 337-E. Admitir, possibilitar ou dar causa à contratação direta fora das hipóteses previstas em lei: ⏎ Pena - reclusão, de 4 (quatro) a 8 (oito) anos, e multa.
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
-- [ ] **art337H** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h)
-  - Nome: Modificação ou pagamento irregular em contrato administrativo
-  - Art. 337-H. Admitir, possibilitar ou dar causa a qualquer modificação ou vantagem, inclusive prorrogação contratual, em favor do contratado, durante a execução dos contratos celebrados com a Administração Pública, sem autorização em lei, no edital da licitação ou nos respectivos instrumentos contratuais, ou, ainda, pagar fatura com preterição da ordem cronológica de sua exigibilidade: ⏎ Pena - reclusão, de 4 (quatro) anos a 8 (oito) anos, e multa.
+- [ ] **art337G** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337g)
+  - Nome: Patrocínio de contratação indevida
+  - Art. 337-G. Patrocinar, direta ou indiretamente, interesse privado perante a Administração Pública, dando causa à instauração de licitação ou à celebração de contrato cuja invalidação vier a ser decretada pelo Poder Judiciário: ⏎ Pena - reclusão, de 6 (seis) meses a 3 (três) anos, e multa.
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
   - Nota: (Incluído pela Lei nº 14.133, de 2021)
 - [ ] **art359K** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art359k)

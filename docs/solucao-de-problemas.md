@@ -361,6 +361,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** "↻ cp" e "↻ cp-compilado" num `npm run corpus` feito só para acrescentar normas. **Causa:** o Planalto atualiza as páginas (o CP mudou entre 23 e 24/09/2026, cerca de 130 linhas a mais); baixar de novo troca os bytes, invalida o colado e o gabarito e pede nova conferência.
 - **Solução:** `git checkout` das páginas e do `manifesto.json`, e rodar só `--so` com as normas novas. **Prevenção:** acrescentar norma sempre com `--so`; atualizar uma página do corpus é decisão à parte (refazer colado, gabarito e conferência).
 - **Origem:** ocorrido em 24/09/2026 (ECA e CDC no corpus).
+- **Atualização do CP (Gabriel, 24/09/2026):** a mudança era a Lei 15.517/2026 (furto e roubo de combustíveis: §§ 10 a 12 do art. 155 e acréscimos no art. 157). CP e CP compilado baixados de novo, colados e gabarito refeitos (1.402 → 1.422 dispositivos, sem pendência); a folha do CP foi regerada antes de qualquer marca, com a mesma conferência reduzida.
 
 ### Norma do Planalto recusada: marcador ausente ou poucos tachados
 - **Sintoma:** "✗ cdc: marcador \"art. 1º\" ausente" e "só 14 tachados — não parece a página com todas as redações". **Causa:** o CDC escreve "Art. 1°" com sinal de grau (como a ALESP), e é pouco alterado: 14 tachados, abaixo do `LIMIAR_TACHADOS` (20).

@@ -1,11 +1,11 @@
 {
   "versao": 1,
   "id": "cp",
-  "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+  "origemSha256Conteudo": "18e5d419d3854ba6b813127bb8d6122de46d2dbc7b0445b35233fa254ec150f2",
   "origemSha256Colados": {
-    "cp.colado.html": "44eeae97cb49568ce593d9300c6869c01e86b7f4c40fdc4be765fd8b431b008b",
-    "cp.colado.txt": "3639654e9dbec7e5f1f4e26ab959254d7b41dbcf824f1554d8dc997131891b61",
-    "cp-compilado.colado.html": "6abf492f907a309c462af6bbf3aed08fd7c58f80fbcc483e578113b312d8fcd1"
+    "cp.colado.html": "c2cb8a72afdfe0752ba36d012b91dfd9f89d603fb7e075077555f22cb1ac7052",
+    "cp.colado.txt": "b91cd06a6f37360591c5d7110d5adbfdc0e6196c775e99cca8c25322db54296e",
+    "cp-compilado.colado.html": "707f3391892b32c0a34d3a1e1312e7c1129a47bf8a365c07ce42fcfa517c7641"
   },
   "descricao": "Gabarito da 7.3: o que o estruturador deve achar no colado desta página. Gerado por scripts/corpus-gabarito.mjs (npm run corpus:gabarito) a partir de sinais independentes; só a \"conferencia\" é editada à mão. Endereços e regras em scripts/corpus/gabarito.mjs.",
   "entradas": {
@@ -28,16 +28,16 @@
   },
   "ultimoArtigo": "art361",
   "contagens": {
-    "dispositivos": 1402,
+    "dispositivos": 1422,
     "porTipo": {
       "artigo": 434,
-      "paragrafo": 491,
-      "inciso": 399,
-      "alinea": 78
+      "paragrafo": 494,
+      "inciso": 411,
+      "alinea": 83
     },
     "porStatus": {
-      "vigente": 1291,
-      "vetado": 11,
+      "vigente": 1310,
+      "vetado": 12,
       "revogado": 100
     },
     "artigos": {
@@ -46,7 +46,7 @@
       "vetado": 3
     },
     "comSufixo": 73,
-    "notasVigencia": 1166,
+    "notasVigencia": 1186,
     "redacoesAnteriores": 882,
     "redacoesPorOrigem": {
       "tachado": 766,
@@ -1169,12 +1169,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art7"
     },
     {
-      "endereco": "art33.par2.alC",
+      "endereco": "art33.par3",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "c)",
-      "texto": "o condenado não reincidente, cuja pena seja igual ou inferior a 4 (quatro) anos, poderá, desde o início, cumpri-la em regime aberto.",
-      "notas": [],
+      "rotulo": "§ 3º -",
+      "texto": "A determinação do regime inicial de cumprimento da pena far-se-á com observância dos critérios previstos no art. 59 deste Código.",
+      "notas": [
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
+      ],
       "redacoes": [],
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art33"
     },
@@ -1249,16 +1251,14 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47"
     },
     {
-      "endereco": "art61.incII.alM",
+      "endereco": "art65.incIII.alB",
       "motivo": "alínea",
       "status": "vigente",
-      "rotulo": "m)",
-      "texto": "nas dependências de instituição de ensino.",
-      "notas": [
-        "(Incluído pela Lei nº 15.159, de 2025)"
-      ],
+      "rotulo": "b)",
+      "texto": "procurado, por sua espontânea vontade e com eficiência, logo após o crime, evitar-lhe ou minorar-lhe as conseqüências, ou ter, antes do julgamento, reparado o dano;",
+      "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art61"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art65"
     },
     {
       "endereco": "art72",
@@ -1321,16 +1321,36 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92"
     },
     {
-      "endereco": "art92.par3",
+      "endereco": "art94",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "§ 3º",
-      "texto": "Em caso de reincidência da conduta prevista no inciso IV do caput deste artigo, a empresa será considerada inidônea e terá sua inscrição no CNPJ considerada inapta, com os efeitos previstos na Lei nº 9.430, de 27 de dezembro de 1996.",
+      "rotulo": "Art. 94 -",
+      "texto": "A reabilitação poderá ser requerida, decorridos 2 (dois) anos do dia em que for extinta, de qualquer modo, a pena ou terminar sua execução, computando-se o período de prova da suspensão e o do livramento condicional, se não sobrevier revogação, desde que o condenado:",
       "notas": [
-        "(Incluído pela Lei nº 15.358, de 2026)"
+        "(Redação dada pela Lei nº 7.209, de 11.7.1984)"
       ],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92"
+      "redacoes": [
+        {
+          "texto": "Art. 94. Fora dos casos já previstos, aplica-se a liberdade vigiada durante um ano, pelo menos:",
+          "origem": "tachado"
+        },
+        {
+          "texto": "IV - ao transgressor da proibição resultante do exílio local;",
+          "origem": "tachado",
+          "enderecoLido": "art94.incIV"
+        },
+        {
+          "texto": "V - ao transgressor da proibição de frequentar determinados lugares;",
+          "origem": "tachado",
+          "enderecoLido": "art94.incV"
+        },
+        {
+          "texto": "VI - se a lei não especifica a medida de segurança aplicavel.",
+          "origem": "tachado",
+          "enderecoLido": "art94.incVI"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art94"
     },
     {
       "endereco": "art110.par1",
@@ -1412,16 +1432,6 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art129"
     },
     {
-      "endereco": "art130.par1",
-      "motivo": "espaçado",
-      "status": "vigente",
-      "rotulo": "§ 1º -",
-      "texto": "Se é intenção do agente transmitir a moléstia:\nPena - reclusão, de um a quatro anos, e multa.",
-      "notas": [],
-      "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art130"
-    },
-    {
       "endereco": "art132.parUnico",
       "motivo": "parágrafo único",
       "status": "vigente",
@@ -1434,14 +1444,25 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art132"
     },
     {
-      "endereco": "art138.par3.incI",
+      "endereco": "art133.par3",
+      "motivo": "espaçado",
+      "status": "vigente",
+      "rotulo": "§ 3º -",
+      "nome": "Aumento de pena",
+      "texto": "As penas cominadas neste artigo aumentam-se de um terço:",
+      "notas": [],
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art133"
+    },
+    {
+      "endereco": "art140.par1.incI",
       "motivo": "inciso de parágrafo",
       "status": "vigente",
       "rotulo": "I -",
-      "texto": "se, constituindo o fato imputado crime de ação privada, o ofendido não foi condenado por sentença irrecorrível;",
+      "texto": "quando o ofendido, de forma reprovável, provocou diretamente a injúria;",
       "notas": [],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art138"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art140"
     },
     {
       "endereco": "art141.par2",
@@ -1472,15 +1493,16 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148"
     },
     {
-      "endereco": "art158",
+      "endereco": "art157.par2A.incIII.alB",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 158 -",
-      "nome": "Extorsão",
-      "texto": "Constranger alguém, mediante violência ou grave ameaça, e com o intuito de obter para si ou para outrem indevida vantagem econômica, a fazer, tolerar que se faça ou deixar de fazer alguma coisa:\nPena - reclusão, de quatro a dez anos, e multa.",
-      "notas": [],
+      "rotulo": "b)",
+      "texto": "desabastecimento;",
+      "notas": [
+        "(Incluído pela Lei nº 15.517, de 2026)"
+      ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art158"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art157"
     },
     {
       "endereco": "art159.par3",
@@ -1735,34 +1757,29 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art216A"
     },
     {
-      "endereco": "art222",
+      "endereco": "art218B.par3",
       "motivo": "espaçado",
-      "status": "revogado",
-      "rotulo": "Art. 222 -",
-      "texto": "",
+      "status": "vigente",
+      "rotulo": "§ 3 o",
+      "texto": "Na hipótese do inciso II do § 2 o , constitui efeito obrigatório da condenação a cassação da licença de localização e de funcionamento do estabelecimento.",
       "notas": [
-        "(Revogado pela Lei nº 11.106, de 2005)"
+        "(Incluído pela Lei nº 12.015, de 2009)"
       ],
-      "redacoes": [
-        {
-          "texto": "Art. 222 - Se o agente, ao efetuar o rapto, ou em seguida a este, pratica outro crime contra a raptada, aplicam-se cumulativamente a pena correspondente ao rapto e a cominada ao outro crime. (Revogado pela Lei nº 11.106, de 2005)",
-          "origem": "revogacao"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art222"
+      "redacoes": [],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art218b"
     },
     {
-      "endereco": "art224.alC",
+      "endereco": "art224.alB",
       "motivo": "alínea",
       "status": "revogado",
-      "rotulo": "c)",
+      "rotulo": "b)",
       "texto": "",
       "notas": [
         "(Revogado pela Lei nº 12.015, de 2009)"
       ],
       "redacoes": [
         {
-          "texto": "c) não pode, por qualquer outra causa, oferecer resistência. (Revogado pela Lei nº 12.015, de 2009)",
+          "texto": "b) é alienada ou débil mental, e o agente conhecia esta circunstância; (Revogado pela Lei nº 12.015, de 2009)",
           "origem": "revogacao"
         }
       ],
@@ -1843,14 +1860,38 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art231a"
     },
     {
-      "endereco": "art234.par1.incII",
+      "endereco": "art232A.par2.incI",
       "motivo": "inciso de parágrafo",
       "status": "vigente",
-      "rotulo": "II -",
-      "texto": "realiza, em lugar público ou acessível ao público, representação teatral, ou exibição cinematográfica de caráter obsceno, ou qualquer outro espetáculo, que tenha o mesmo caráter;",
-      "notas": [],
+      "rotulo": "I -",
+      "texto": "o crime é cometido com violência; ou",
+      "notas": [
+        "Incluído pela Lei nº 13.445, de 2017",
+        "Vigência"
+      ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art234"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art232a"
+    },
+    {
+      "endereco": "art281.par1.incIII",
+      "motivo": "espaçado",
+      "status": "revogado",
+      "rotulo": "III -",
+      "texto": "",
+      "notas": [
+        "(Revogado pela Lei nº 6.368, 1976)"
+      ],
+      "redacoes": [
+        {
+          "texto": "III - traz consigo, para uso próprio, substância entorpecente ou que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)",
+          "origem": "revogacao"
+        },
+        {
+          "texto": "III - traz consigo, para uso próprio, substância entorpecente ou que determine dependência física ou psíquica. (Matérias-primas ou plantas destinadas à preparação de entorpecentes ou de substâncias que determine dependência física ou psíquica.) (Incluído pelo Decreto-Lei nº 385, de 1968)",
+          "origem": "tachado"
+        }
+      ],
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281"
     },
     {
       "endereco": "art281.par3.incI",
@@ -1872,31 +1913,6 @@
         },
         {
           "texto": "I - Instiga ou induz alguém a usar entorpecente; (Redação dada pela Lei nº 4.451, de 1964)",
-          "origem": "tachado"
-        }
-      ],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art281"
-    },
-    {
-      "endereco": "art281.par3.incII",
-      "motivo": "espaçado",
-      "status": "revogado",
-      "rotulo": "II -",
-      "texto": "",
-      "notas": [
-        "(Revogado pela Lei nº 6.368, 1976)"
-      ],
-      "redacoes": [
-        {
-          "texto": "II - utiliza o local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito para uso ilegal de entorpecente ou de substância que determine dependência física ou psíquica; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)",
-          "origem": "revogacao"
-        },
-        {
-          "texto": "II - utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dele se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente;",
-          "origem": "tachado"
-        },
-        {
-          "texto": "II - Utilizar local, de que tem a propriedade, posse, administração ou vigilância, ou consente que outrem dêle se utilize, ainda que a título gratuito, para uso ou guarda ilegal de entorpecente; (Redação dada pela Lei nº 4.451, de 1964)",
           "origem": "tachado"
         }
       ],
@@ -1960,18 +1976,18 @@
       "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337e"
     },
     {
-      "endereco": "art337H",
+      "endereco": "art337G",
       "motivo": "espaçado",
       "status": "vigente",
-      "rotulo": "Art. 337-H.",
-      "nome": "Modificação ou pagamento irregular em contrato administrativo",
-      "texto": "Admitir, possibilitar ou dar causa a qualquer modificação ou vantagem, inclusive prorrogação contratual, em favor do contratado, durante a execução dos contratos celebrados com a Administração Pública, sem autorização em lei, no edital da licitação ou nos respectivos instrumentos contratuais, ou, ainda, pagar fatura com preterição da ordem cronológica de sua exigibilidade:\nPena - reclusão, de 4 (quatro) anos a 8 (oito) anos, e multa.",
+      "rotulo": "Art. 337-G.",
+      "nome": "Patrocínio de contratação indevida",
+      "texto": "Patrocinar, direta ou indiretamente, interesse privado perante a Administração Pública, dando causa à instauração de licitação ou à celebração de contrato cuja invalidação vier a ser decretada pelo Poder Judiciário:\nPena - reclusão, de 6 (seis) meses a 3 (três) anos, e multa.",
       "notas": [
         "(Incluído pela Lei nº 14.133, de 2021)",
         "(Incluído pela Lei nº 14.133, de 2021)"
       ],
       "redacoes": [],
-      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337h"
+      "link": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art337g"
     },
     {
       "endereco": "art359K",
@@ -2670,6 +2686,19 @@
     {"endereco":"art155.par7.incII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art155.par8","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art155.par9","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par10","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par11","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par11.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par11.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par11.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par11.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incI","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incIV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incV","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art155.par12.incVI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art156","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art156.par1","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art156.par2","status":"vigente","notas":0,"redacoes":0},
@@ -2687,9 +2716,16 @@
     {"endereco":"art157.par2.incVIII","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2.incIX","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2.incX","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2.incXI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2A","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2A.incI","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par2A.incII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII.alA","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII.alB","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII.alC","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII.alD","status":"vigente","notas":1,"redacoes":0},
+    {"endereco":"art157.par2A.incIII.alE","status":"vetado","notas":1,"redacoes":0},
     {"endereco":"art157.par2B","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art157.par3","status":"vigente","notas":1,"redacoes":3},
     {"endereco":"art157.par3.incI","status":"vigente","notas":1,"redacoes":0},

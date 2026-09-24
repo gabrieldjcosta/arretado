@@ -42,10 +42,10 @@
       "arquivo": "cp.html",
       "charset": "windows-1252",
       "origemCharset": "padrao-windows-1252",
-      "bytes": 930127,
-      "sha256": "2ad873aaf620b31ab59f793913d609b0600530d8625b3d65930f4802dad372ec",
-      "sha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
-      "obtidoEm": "2026-09-23T03:25:06.197Z"
+      "bytes": 940144,
+      "sha256": "90ccaab9321d73dde66d01c007aaf406e222fb7f858205a2138d74d36d519e48",
+      "sha256Conteudo": "18e5d419d3854ba6b813127bb8d6122de46d2dbc7b0445b35233fa254ec150f2",
+      "obtidoEm": "2026-09-24T13:09:01.535Z"
     },
     {
       "id": "cp-compilado",
@@ -57,10 +57,10 @@
       "arquivo": "cp-compilado.html",
       "charset": "windows-1252",
       "origemCharset": "padrao-windows-1252",
-      "bytes": 673409,
-      "sha256": "23cae0bbe774541288b4b97eaed2e0f4a5f71e35e2bd81d3837c1e9fff1bf295",
-      "sha256Conteudo": "467c4523455f85a27d4b430d9d5a4bdba7f4cd401d6f86d82e016be63e2b6ead",
-      "obtidoEm": "2026-09-23T03:25:08.574Z"
+      "bytes": 683279,
+      "sha256": "11009dfc9c69b1ffb7a50efc3aec01acfbac911d55c82dd490e929783a1b866c",
+      "sha256Conteudo": "3c1a07871087de45d1972cd9a7b6d207fc6545639da42dae0f71b18acb9cb7ab",
+      "obtidoEm": "2026-09-24T13:09:04.460Z"
     },
     {
       "id": "lc80",

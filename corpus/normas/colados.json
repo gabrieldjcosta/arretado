@@ -38,37 +38,37 @@
     },
     {
       "id": "cp",
-      "origemSha256Conteudo": "50ca2c2eaa2ffa4639d0f5e65a15741a428164b2fe8fe3fe71593e1ff97a1129",
+      "origemSha256Conteudo": "18e5d419d3854ba6b813127bb8d6122de46d2dbc7b0445b35233fa254ec150f2",
       "html": {
         "arquivo": "cp.colado.html",
-        "bytes": 954805,
-        "sha256": "44eeae97cb49568ce593d9300c6869c01e86b7f4c40fdc4be765fd8b431b008b"
+        "bytes": 964843,
+        "sha256": "c2cb8a72afdfe0752ba36d012b91dfd9f89d603fb7e075077555f22cb1ac7052"
       },
       "texto": {
         "arquivo": "cp.colado.txt",
-        "bytes": 442192,
-        "sha256": "3639654e9dbec7e5f1f4e26ab959254d7b41dbcf824f1554d8dc997131891b61"
+        "bytes": 444972,
+        "sha256": "b91cd06a6f37360591c5d7110d5adbfdc0e6196c775e99cca8c25322db54296e"
       },
       "navegador": "chromium 141.0.7390.37",
       "plataforma": "linux",
-      "capturadoEm": "2026-09-23T15:06:43.719Z"
+      "capturadoEm": "2026-09-24T13:09:06.614Z"
     },
     {
       "id": "cp-compilado",
-      "origemSha256Conteudo": "467c4523455f85a27d4b430d9d5a4bdba7f4cd401d6f86d82e016be63e2b6ead",
+      "origemSha256Conteudo": "3c1a07871087de45d1972cd9a7b6d207fc6545639da42dae0f71b18acb9cb7ab",
       "html": {
         "arquivo": "cp-compilado.colado.html",
-        "bytes": 1265938,
-        "sha256": "6abf492f907a309c462af6bbf3aed08fd7c58f80fbcc483e578113b312d8fcd1"
+        "bytes": 1284227,
+        "sha256": "707f3391892b32c0a34d3a1e1312e7c1129a47bf8a365c07ce42fcfa517c7641"
       },
       "texto": {
         "arquivo": "cp-compilado.colado.txt",
-        "bytes": 296513,
-        "sha256": "c886239209a2193234e25cced0218a262ed23503958c52e2b3cbefa803395984"
+        "bytes": 299293,
+        "sha256": "cdcbc584feb7a696177524ee9724d1535db00b4b4b1f5a828d995945958adc03"
       },
       "navegador": "chromium 141.0.7390.37",
       "plataforma": "linux",
-      "capturadoEm": "2026-09-23T15:06:44.373Z"
+      "capturadoEm": "2026-09-24T13:09:07.454Z"
     },
     {
       "id": "lc80",
