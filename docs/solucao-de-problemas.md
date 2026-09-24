@@ -162,7 +162,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Sanitizador fundia dispositivos ou perdia tachado
 - **Sintoma:** dois dispositivos no mesmo bloco; redação anterior aparecendo como texto vigente. **Causa:** `section`, `article`, `pre`, `dl`, `hr` e afins não separavam blocos; o tachado por estilo em elemento removido sumia com o estilo.
-- **Solução:** esses elementos separam blocos; o tachado por estilo em elemento fora da lista vira `<s>`. **Prevenção:** `sanitizador.test.ts` (34 payloads + fragmentos do Planalto); a 8.2 acrescenta o `cp.html` inteiro.
+- **Solução:** esses elementos separam blocos; o tachado por estilo em elemento fora da lista vira `<s>`. **Prevenção:** `sanitizador.test.ts` (34 payloads + fragmentos do Planalto); o `cp.html` e o `cf.html` inteiros em `scripts/corpus-estruturador.test.ts` (8.2).
 - **Origem:** ocorrido em 23/09/2026 (commit 83b0d18).
 
 ### Nome de classe com "Erro" para falha de software
@@ -376,8 +376,28 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.
-- **Solução:** nunca cortar em `</body>`/`</html>` nem extrair o corpo por regex; o parser HTML5 (DOMPurify/DOMParser) devolve o conteúdo ao `body`. **Prevenção:** teste do sanitizador com o `cp.html` inteiro.
-- **Origem:** previsto — atividade 8.2.
+- **Solução:** nunca cortar em `</body>`/`</html>` nem extrair o corpo por regex; o parser HTML5 (DOMPurify/DOMParser) devolve o conteúdo ao `body`. **Prevenção:** `scripts/corpus-estruturador.test.ts`: o `cp.html` e o `cf.html` inteiros (bytes em windows-1252) passam pelo sanitizador e pelo estruturador e dão a mesma árvore estrutural do colado.
+- **Origem:** previsto na 8.2; prevenido em 24/09/2026 (atividade 8.2; nada se perdeu).
+
+### Teste em `scripts/` que usa o sanitizador não compila
+- **Sintoma:** `tsc -b` acusa `Cannot find name 'window'`, `Element`, `Node` em `src/core/seguranca/sanitizador.ts`. **Causa:** o `tsconfig.node` (que cobre `scripts/`) não tem os tipos do DOM, e o teste importa o sanitizador de `src/`.
+- **Solução:** `/// <reference lib="dom" />` no topo do teste, com o motivo; não mudar o `tsconfig.node`. **Prevenção:** `scripts/corpus-estruturador.test.ts` como modelo.
+- **Origem:** ocorrido em 24/09/2026 (atividade 8.2, antes do commit).
+
+### Árvore estrutural diverge do gabarito só no "primeiro artigo", no bloco ou num nome
+- **Sintoma:** o teste da árvore contra o gabarito acusa `primeiroArtigo` diferente num nó que começa por artigo revogado; `adct.art1`/`dt.art1` × `art1`; o nome do Capítulo III do Título VII da CF com "Regulamento" no gabarito. **Causa:** até a 8.6, o artigo revogado todo tachado é descarte, não nó; o prefixo do bloco é da 8.4; e o gabarito deixou no nome um link de nota que o estruturador separa (regra 7).
+- **Solução:** tolerâncias explícitas em `estruturaEsperada` (`src/testes/gabarito.ts`), cada uma com a atividade que a remove, e `NOME_CORRIGIDO` para o erro do gabarito (examinado na página, sem igualar um ao outro). **Prevenção:** a 8.4, a 8.5 e a 8.6 apagam a sua tolerância; a 8.5 corrige a regra do gabarito ("Regulamento" solto no fim do nome) e roda `npm run corpus:gabarito`.
+- **Origem:** ocorrido em 24/09/2026 (atividade 8.2).
+
+### Mesclar nós repetidos ou juntar nome em caixa alta fica quadrático
+- **Sintoma:** página hostil com o mesmo rótulo repetido ou milhares de linhas em caixa alta depois de um rótulo trava o estruturador. **Causa:** cada nó substituído copiava os filhos e as redações acumulados; o nome era remontado a cada linha de continuação.
+- **Solução:** a mesclagem monta cadeias de nós de mesmo segmento e remonta cada sobrevivente uma vez; o nome tem no máximo 4 linhas (no corpus, 2). **Prevenção:** "estruturador (8.2): desempenho" em `desempenho.test.ts` (100 mil linhas, menos de 5 s).
+- **Origem:** ocorrido em 24/09/2026 (releitura da 8.2, antes do commit).
+
+### Rubrica tomada como nome do nó, ou fecho aberto no meio do texto
+- **Sintoma:** nó sem nome que recebe a rubrica do 1º artigo como nome; linhas de um artigo descartadas como fecho. **Causa:** a regra 3 toma como nome a 1ª linha depois do rótulo (no corpus, todo nó com linha depois do rótulo tem nome); o fecho começa em qualquer linha "Local, dia de mês de ano" depois do 1º artigo, e uma citação assim no começo de uma linha do texto o abriria cedo (depois dele, só artigo ou rótulo reabre o corpo).
+- **Solução (a fazer):** na 8.3, conferir a rubrica (linha curta antes de "Art.") contra o nome do nó sem nome; na 8.7, a validação acusa artigo depois do fecho e nó sem nome seguido de uma única linha antes do artigo. **Prevenção:** regressão da 8.9.
+- **Origem:** previsto — atividades 8.3 e 8.7.
 
 ### Gabarito que só repete o estruturador
 - **Sintoma:** a regressão da 8.9 passa, mas a lei sai errada no leitor. **Causa:** gabarito gerado pela mesma lógica (ou pelas mesmas suposições) que o estruturador vai usar: os dois erram juntos.
@@ -402,7 +422,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Estrutura antiga sem tachado ou redação sem dispositivo de mesmo endereço
 - **Sintoma:** dois "TÍTULO VI" no CP; centenas de tachados da Parte Geral de 1940 sem artigo correspondente (incisos e alíneas que não existem mais); parágrafo único que virou § 1º. **Causa:** o Planalto nem sempre tacha o título antigo, e a estrutura antiga não tem o mesmo endereço da nova.
 - **Solução:** nó repetido sem artigo no meio é substituído pelo último (`estrutural-substituido`); redação sem dispositivo de mesmo endereço vai para o ancestral mais próximo, com `enderecoLido` (331 no CP). **Prevenção:** casos e `redacoesNoAncestral` no gabarito; testes da 8.2 e da 8.6 contra ele.
-- **Origem:** ocorrido em 23/09/2026 (7.3); previsto para o estruturador nas atividades 8.2 e 8.6.
+- **Origem:** ocorrido em 23/09/2026 (7.3); no estruturador, o nó substituído prevenido em 24/09/2026 (8.2: vale o último, o anterior vira redação anterior `heuristica`, aviso `estrutural_substituido`; teste "nó repetido sem artigo no meio"); a redação no ancestral fica para a 8.6.
 
 ### Mesmo endereço duas vezes na página
 - **Sintoma:** endereço duplicado na validação. **Causa:** a página traz a revogação ("I - ~~texto~~ (Revogado pela…)") e, logo depois, a nova redação "I - (revogado); (Redação dada…)"; ou o "(VETADO)" seguido do texto incluído com a derrubada do veto (CP, art. 141, § 2º).

@@ -1,3 +1,4 @@
+import { estruturar } from './estruturador';
 import { normalizarBlocos } from './normalizacao';
 
 // Entrada hostil numa linha só (o sanitizador aceita até 10 milhões de caracteres, LIMITE_PADRAO):
@@ -13,6 +14,31 @@ describe('normalização (8.1): desempenho', () => {
     (_nome, texto) => {
       const inicio = performance.now();
       normalizarBlocos([{ trechos: [{ texto }] }]);
+      expect(performance.now() - inicio).toBeLessThan(5_000);
+    },
+    20_000,
+  );
+});
+
+// Estruturador (8.2): página hostil com muitas linhas; nenhuma regra pode ser quadrática.
+describe('estruturador (8.2): desempenho', () => {
+  const linhas = (n: number, texto: (k: number) => string) =>
+    Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
+  it.each([
+    [
+      'mesmo rótulo repetido sem artigo',
+      linhas(100_000, (k) => (k % 2 ? 'CAPÍTULO I' : 'TÍTULO I')),
+    ],
+    ['nome em caixa alta sem fim', linhas(100_000, (k) => (k ? 'NOME EM CAIXA ALTA' : 'TÍTULO I'))],
+    ['notas sem fim', linhas(100_000, () => '(Vide Lei nº 1, de 2000) Vigência')],
+    ['linha solta sem fim', linhas(100_000, (k) => (k ? 'Rubrica' : 'TÍTULO I'))],
+    ['parênteses numa linha', [{ trechos: [{ texto: 'TÍTULO I ' + '(a'.repeat(500_000) + ')' }] }]],
+    ['artigos', linhas(100_000, (k) => `Art. ${String(k + 1)}. Texto.`)],
+  ])(
+    '%s',
+    (_nome, blocos) => {
+      const inicio = performance.now();
+      estruturar(blocos);
       expect(performance.now() - inicio).toBeLessThan(5_000);
     },
     20_000,
