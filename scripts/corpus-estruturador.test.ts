@@ -12,6 +12,8 @@ import { estruturar } from '../src/dominios/legislacao/estruturador';
 import {
   artigosDe,
   artigosEsperados,
+  dispositivosDe,
+  dispositivosEsperados,
   estruturaDe,
   estruturaEsperada,
   semRevogadosAusentes,
@@ -20,7 +22,7 @@ import {
 
 const DIRETORIO = path.join(import.meta.dirname, '..', 'corpus', 'normas');
 
-describe('página oficial inteira → sanitizador → estruturador (8.2–8.3)', () => {
+describe('página oficial inteira → sanitizador → estruturador (8.2–8.4)', () => {
   it.each([
     ['cp', 4_613],
     ['cf', 133_966],
@@ -46,6 +48,13 @@ describe('página oficial inteira → sanitizador → estruturador (8.2–8.3)',
       );
       expect(artigos.map((a) => [a.endereco, a.nome !== undefined])).toEqual(
         esperados.map((e) => [e.endereco, e.nome]),
+      );
+      // E os dispositivos da regra 6, com o endereço canônico (8.4; na CF, o ADCT com `adct.`).
+      const dispositivos = dispositivosDe(rascunho.nos).map((d) => d.endereco);
+      expect(dispositivos).toEqual(
+        semRevogadosAusentes(dispositivosEsperados(id, gabarito), dispositivos).map(
+          (e) => e.endereco,
+        ),
       );
       expect(rascunho.metadados.preambulo).toMatch(/^(?:O PRESIDENTE|Nós, representantes)/);
     },

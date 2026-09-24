@@ -87,8 +87,12 @@ export interface NoRascunho {
    * Endereço canônico no formato de `Dispositivo.endereco` (segmentos [a-zA-Z0-9] separados por
    * ponto). Estrutura (8.2): o caminho dos nós (`parteEspecial.tit6.cap1`; `parte`, `liv`, `tit`,
    * `cap`, `sec`, `subsec` + número, com sufixo: `cap2A`); nome: `<endereço do pai>.nome`;
-   * `preambulo`; `anexo`. Artigo (8.3): `art9A`, `art1000`, `artUnico`. Demais dispositivos:
-   * 8.4. Repetido = anomalia.
+   * `preambulo`; `anexo`. Artigo (8.3): `art9A`, `art1000`, `artUnico`; no bloco com numeração
+   * própria (8.4), com o prefixo dele (`adct.art1`, `dt.art21`); o nó do bloco é o prefixo
+   * (`adct`). Regra 6 (8.4): o do pai + segmento, `par2`, `par2A`, `parUnico`, `incIII`,
+   * `incVIA`, `alB`, `it1`; o inciso do caput fica direto no artigo (`art5.incIII`, sem
+   * `caput`). Artigo ou dispositivo repetido funde (vale o último); nó estrutural repetido com
+   * artigo no meio fica, e a 8.7 o acusa.
    */
   endereco: string;
   /** Rótulo de exibição ("Art. 9º-A", "§ 1º", "Parágrafo único", "VI-A", "a)", "TÍTULO II"); TextoCurto. */
@@ -96,8 +100,11 @@ export interface NoRascunho {
   /** Rótulo como veio, já normalizado, com o separador ("Art. 1º -", "Artigo 4º -"): para a 8.9 e o editor. */
   rotuloLido?: string;
   /**
-   * Texto vigente, normalizado, sem rótulo e sem notas. Vazio no nó estrutural (o nome é um filho
-   * `nome`) e no revogado. A forma da continuação em outra linha ("Pena - …") é da 8.4.
+   * Texto vigente, normalizado, sem rótulo e sem notas (até a 8.5, as notas do fim da linha ficam
+   * aqui). No artigo, é o caput. Vazio no nó estrutural (o nome é um filho `nome`) e no revogado.
+   * Continuação em outra linha (8.4): "Pena - …", citação entre aspas e rubrica que não chegou a
+   * dispositivo entram depois de um trecho `{ texto: '\n' }` (quebra de linha); a linha partida
+   * pela fonte (minúscula depois de texto sem ponto final), depois de um espaço.
    */
   trechos: Trecho[];
   notas: NotaDeVigencia[];
@@ -109,7 +116,10 @@ export interface NoRascunho {
    */
   renumeradoDe?: string;
   confianca: Confianca;
-  /** Na ordem do texto; o `nome` (rubrica) vem primeiro. A posição dá `paiId` e `ordem` na 9.2. */
+  /**
+   * Na ordem do texto; o `nome` (rubrica) vem primeiro. A posição dá `paiId` e `ordem` na 9.2
+   * (`emOrdemDeLeitura`, em `ordem.ts`).
+   */
   filhos: NoRascunho[];
   linhas: FaixaDeLinhas;
 }
@@ -126,7 +136,8 @@ export type MetadadosNorma = Partial<
  * Linha que não entra na norma: cabeçalho do portal; fecho (local, data, assinaturas, aviso do DOU);
  * sobra da fonte; `redacao_anterior`: linha tachada que a 8.6 ainda vai anexar ao dispositivo
  * (salvaguarda da leitura antecipada: tachado nunca vira texto vigente) e, junto, a rubrica do
- * artigo todo tachado (CP, arts. 185, 279 e 350), que a 8.6 faz nome do revogado.
+ * artigo ou dispositivo todo tachado (CP, arts. 185, 279 e 350; art. 121, § 2º, VI), que a 8.6 faz
+ * nome do revogado.
  */
 export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra' | 'redacao_anterior';
 
