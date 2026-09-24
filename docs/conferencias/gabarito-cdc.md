@@ -18,20 +18,20 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 
 ## Amostra (50 dispositivos)
 
-- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art1)
+- [x] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art1)
   - Art. 1° O presente código estabelece normas de proteção e defesa do consumidor, de ordem pública e interesse social, nos termos dos arts. 5°, inciso XXXII, 170, inciso V, da Constituição Federal e art. 48 de suas Disposições Transitórias.
-- [ ] **art4.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art4)
+- [x] **art4.incII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art4)
   - II - ação governamental no sentido de proteger efetivamente o consumidor:
-- [ ] **art4.incII.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art4)
+- [x] **art4.incII.alB** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art4)
   - b) por incentivos à criação e desenvolvimento de associações representativas;
-- [ ] **art5.incIV** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art5)
+- [x] **art5.incIV** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art5)
   - IV - criação de Juizados Especiais de Pequenas Causas e Varas Especializadas para a solução de litígios de consumo;
-- [ ] **art6.incIX** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art6)
+- [x] **art6.incIX** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art6)
   - IX - (vetado)
-- [ ] **art8** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art8)
+- [x] **art8** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art8)
   - Art. 8° Os produtos e serviços colocados no mercado de consumo não acarretarão riscos à saúde ou segurança dos consumidores, exceto os considerados normais e previsíveis em decorrência de sua natureza e fruição, obrigando-se os fornecedores, em qualquer hipótese, a dar as informações necessárias e adequadas a seu respeito.
   - Redação anterior (tachado) [lida como art8.parUnico]: ~~Parágrafo único. Em se tratando de produto industrial, ao fabricante cabe prestar as informações a que se refere este artigo, através de impressos apropriados que devam acompanhar o produto.~~
-- [ ] **art12** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art12)
+- [x] **art12** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art12)
   - Art. 12. O fabricante, o produtor, o construtor, nacional ou estrangeiro, e o importador respondem, independentemente da existência de culpa, pela reparação dos danos causados aos consumidores por defeitos decorrentes de projeto, fabricação, construção, montagem, fórmulas, manipulação, apresentação ou acondicionamento de seus produtos, bem como por informações insuficientes ou inadequadas sobre sua utilização e riscos.
 - [ ] **art14.par1** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8078.htm#art14)
   - § 1° O serviço é defeituoso quando não fornece a segurança que o consumidor dele pode esperar, levando-se em consideração as circunstâncias relevantes, entre as quais:

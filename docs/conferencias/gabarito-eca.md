@@ -18,33 +18,33 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 
 ## Amostra (50 dispositivos)
 
-- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art1)
+- [x] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art1)
   - Art. 1º Esta Lei dispõe sobre a proteção integral à criança e ao adolescente.
-- [ ] **art10.par1.incII.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art10)
+- [x] **art10.par1.incII.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art10)
   - a) galactosemias;
   - Nota: (Incluída pela Lei nº 14.154, de 2021)
   - Nota: Vigência
-- [ ] **art18A.parUnico.incII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art18a)
+- [x] **art18A.parUnico.incII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art18a)
   - b) ameace gravemente; ou
   - Nota: (Incluído pela Lei nº 13.010, de 2014)
-- [ ] **art21** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art21)
+- [x] **art21** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art21)
   - Art. 21. O poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência. (Expressão substituída pela Lei nº 12.010, de 2009)
   - Nota: Vigência
   - Redação anterior (revogacao): ~~Art. 21. O pátrio poder poder familiar será exercido, em igualdade de condições, pelo pai e pela mãe, na forma do que dispuser a legislação civil, assegurado a qualquer deles o direito de, em caso de discordância, recorrer à autoridade judiciária competente para a solução da divergência. (Expressão ~~
-- [ ] **art23** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art23)
+- [x] **art23** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art23)
   - Art. 23. A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)
   - Nota: Vigência
   - Redação anterior (revogacao): ~~Art. 23. A falta ou a carência de recursos materiais não constitui motivo suficiente para a perda ou a suspensão do pátrio poder poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
   - Redação anterior (tachado) [lida como art23.parUnico]: ~~Parágrafo único. Não existindo outro motivo que por si só autorize a decretação da medida, a criança ou o adolescente será mantido em sua família de origem, a qual deverá obrigatoriamente ser incluída em programas oficiais de auxílio.~~
-- [ ] **art24** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art24)
+- [x] **art24** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art24)
   - Art. 24. A perda e a suspensão do poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22. (Expressão substituída pela Lei nº 12.010, de 2009)
   - Nota: Vigência
   - Redação anterior (revogacao): ~~Art. 24. A perda e a suspensão do pátrio poder poder familiar serão decretadas judicialmente, em procedimento contraditório, nos casos previstos na legislação civil, bem como na hipótese de descumprimento injustificado dos deveres e obrigações a que alude o art. 22. (Expressão substituída pela Lei n~~
-- [ ] **art36.parUnico** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art36)
+- [x] **art36.parUnico** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art36)
   - Parágrafo único. O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do poder familiar e implica necessariamente o dever de guarda. (Expressão substituída pela Lei nº 12.010, de 2009)
   - Nota: Vigência
   - Redação anterior (revogacao): ~~Parágrafo único. O deferimento da tutela pressupõe a prévia decretação da perda ou suspensão do pátrio poder poder familiar e implica necessariamente o dever de guarda. (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
-- [ ] **art45.par1** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art45)
+- [x] **art45.par1** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l8069.htm#art45)
   - § 1º. O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009)
   - Nota: Vigência
   - Redação anterior (revogacao): ~~§ 1º. O consentimento será dispensado em relação à criança ou adolescente cujos pais sejam desconhecidos ou tenham sido destituídos do pátrio poder poder familiar . (Expressão substituída pela Lei nº 12.010, de 2009) Vigência~~
