@@ -396,8 +396,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rubrica tomada como nome do nó, ou fecho aberto no meio do texto
 - **Sintoma:** nó sem nome que recebe a rubrica do 1º artigo como nome; linhas de um artigo descartadas como fecho. **Causa:** a regra 3 toma como nome a 1ª linha depois do rótulo (no corpus, todo nó com linha depois do rótulo tem nome); o fecho começa em qualquer linha "Local, dia de mês de ano" depois do 1º artigo, e uma citação assim no começo de uma linha do texto o abriria cedo (depois dele, só artigo ou rótulo reabre o corpo).
-- **Solução (a fazer):** na 8.3, conferir a rubrica (linha curta antes de "Art.") contra o nome do nó sem nome; na 8.7, a validação acusa artigo depois do fecho e nó sem nome seguido de uma única linha antes do artigo. **Prevenção:** regressão da 8.9.
-- **Origem:** previsto — atividades 8.3 e 8.7.
+- **Solução:** na 8.3, `rubricaNoNomeDoNo` (`estruturador.ts`): numa norma com rubricas e com 90% ou mais dos nomes de nó em caixa alta (o CP), o "nome" de uma linha em caixa mista, fora da linha do rótulo, que não começa por "Do/Da/Dos/Das" e vem logo antes de um artigo sem rubrica passa a ser a rubrica dele, com confiança média. **A fazer (8.7):** a validação acusa artigo depois do fecho e nó sem nome seguido de uma única linha antes do artigo. **Prevenção:** teste "rubrica tomada como nome do nó sem nome…" (`estruturador.test.ts`); regressão da 8.9.
+- **Origem:** previsto — atividades 8.3 e 8.7; a rubrica prevenida em 24/09/2026 (8.3; não acontece no corpus).
 
 ### Gabarito que só repete o estruturador
 - **Sintoma:** a regressão da 8.9 passa, mas a lei sai errada no leitor. **Causa:** gabarito gerado pela mesma lógica (ou pelas mesmas suposições) que o estruturador vai usar: os dois erram juntos.
@@ -441,7 +441,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Palavra partida, busca que falha ou ordinal não reconhecido
 - **Sintoma:** palavra com hífen invisível e busca sem resultado, ou palavras coladas ("incumbindolhe", "farseá"), ou hífens no meio das sílabas ("De-fen-so-ria"); "Art. 1o", "Artigo 1°", "§ 3 o" ou "N° 988" sem virar artigo. **Causa:** no Planalto o hífen suave (U+00AD) está no lugar do hífen verdadeiro (79 na LC 80, em ênclise, mesóclise e compostos): removê-lo cola as palavras; no Word e no PDF ele marca sílaba. O Planalto alterna `º` e "o" (o `<sup>o</sup>` perde o sup), às vezes com espaço, e a ALESP usa o sinal de grau (`°`).
-- **Solução:** `normalizarBlocos` (regra 1): U+00AD vira "-" quando a norma inteira tem cara de hífen e some quando tem cara de sílaba (`relatorio.hifenSuave`); ordinais viram º/ª com a formatação do número (ver os fatos da normalização no plano). Na 8.3, aceitar "Artigo" (regra 5). **Prevenção:** `normalizacao.test.ts` (casos do corpus) e `normalizacao-corpus.test.ts` (nenhum U+00AD nem ordinal solto sobra nos 7 colados); a 8.3 repete com rótulos. A varredura de caracteres invisíveis de `src/` não cobre U+00AD.
+- **Solução:** `normalizarBlocos` (regra 1): U+00AD vira "-" quando a norma inteira tem cara de hífen e some quando tem cara de sílaba (`relatorio.hifenSuave`); ordinais viram º/ª com a formatação do número (ver os fatos da normalização no plano); a regra 5 aceita "Artigo" e "ARTIGO" (`lerInicioDeArtigo`, 8.3). **Prevenção:** `normalizacao.test.ts` (casos do corpus) e `normalizacao-corpus.test.ts` (nenhum U+00AD nem ordinal solto sobra nos 7 colados); a 8.3 repete com rótulos. A varredura de caracteres invisíveis de `src/` não cobre U+00AD.
 - **Origem:** previsto nas 8.1 e 8.3; a normalização prevenida em 23/09/2026 (8.1), onde a medição mostrou que remover o U+00AD, como dizia o plano, estragaria 79 palavras da LC 80.
 
 ### Regex de rótulo ou nota falha por espaço, travessão ou aspas
@@ -465,9 +465,34 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 23/09/2026 (8.1, achado na releitura, antes do commit).
 
 ### "Art" quebrado, capitular ou sangria entre artigos
-- **Sintoma:** artigo ausente, dois artigos fundidos, ou rubrica colada no artigo anterior. **Causa:** "Art" e número em linhas ou tags diferentes; capitular `<strong>A</strong>rt.`; rubrica em negrito antes do "Art." (é o `nome` do seguinte); citação "art." em minúscula no meio do texto.
-- **Solução:** regras 4 e 5 tolerantes, com os casos listados no plano (lições da skill `acumen-extrair-normas`). **Prevenção:** "todos os artigos do corpus, em ordem, sem sangria" (8.3) e regressão da 8.9.
-- **Origem:** previsto — atividade 8.3.
+- **Sintoma:** artigo ausente, dois artigos fundidos, ou rubrica colada no artigo anterior. **Causa:** "Art" e número em linhas ou tags diferentes; capitular `<strong>A</strong>rt.` ou "A rt. 334" (CP, com espaço); rubrica em negrito antes do "Art." (é o `nome` do seguinte); citação "art." em minúscula no meio do texto.
+- **Solução:** regras 4 e 5 em `artigo.ts` (8.3): `lerInicioDeArtigo` aceita "Art.", "Art", "Artigo", maiúsculas, a capitular com espaço, milhar e "único", sufixo com hífen colado ou letra colada seguida de separador; "Art." sozinho na linha espera o número na seguinte (`ARTIGO_QUEBRADO`); "art." minúsculo e "\"Art." entre aspas nunca abrem artigo. A rubrica candidata (`lerRubrica`) fica pendente e vira o `nome` do artigo seguinte ou volta para o anterior. **Prevenção:** "artigo tolerante (regra 5)" e "rubrica, o nome do artigo (regra 4)" em `estruturador.test.ts`; no corpus, "artigos em ordem, sem sangria, com a rubrica" (faixas sem sobreposição; as 4 compiladas com todos os artigos do gabarito) e a página inteira do CP e da CF (`scripts/corpus-estruturador.test.ts`); regressão da 8.9.
+- **Origem:** previsto na 8.3; prevenido em 24/09/2026 (atividade 8.3). No corpus, a regex provisória da 8.2 já achava todos os artigos: nenhum "Art" quebrado, nenhum sufixo sem hífen; a tolerância nova é defensiva, fora a capitular do CP (tachada) e a rubrica.
+
+### Rubrica do artigo revogado vai para o artigo seguinte
+- **Sintoma:** o art. 186 do CP com a rubrica "Usurpação de nome ou pseudônimo alheio", que é do 185 (revogado). **Causa:** entre a rubrica e o artigo vigente há linhas tachadas; quando são a redação antiga do mesmo artigo (o padrão do CP: rubrica, artigo de 1940 tachado, artigo novo), a rubrica é do vigente; quando são um artigo todo tachado de outro número, é do revogado.
+- **Solução:** a rubrica guarda o endereço do primeiro artigo tachado depois dela; se não é o do artigo vigente, ela vai para o descarte `redacao_anterior`, junto com o revogado, até a 8.6 fazê-la nome dele (CP: arts. 185, 279 e 350). **Prevenção:** teste "redação antiga tachada entre a rubrica e o artigo…" e, no corpus, "linha vigente só vai para o descarte como rubrica de artigo revogado" (só essas 3 no CP; nenhuma nas outras 10 páginas).
+- **Origem:** ocorrido em 24/09/2026 (atividade 8.3, antes do commit).
+
+### Rubrica errada no gabarito (CDC, ECA)
+- **Sintoma:** o teste da 8.3 acusa 15 artigos do CDC e 3 do ECA com rubrica no gabarito e sem rubrica no estruturador. **Causa:** a regra de rubrica do gabarito (linha curta antes do artigo) não conhece a pena sem hífen ("Pena Detenção de um a seis meses ou multa.", CDC, 8), a citação entre aspas das leis alteradas (CDC, arts. 110 a 117, 7; ECA, art. 264), a nota "(Expressão substituída pela Lei…)" depois do nome da Seção II (ECA, art. 155), e juntou duas linhas (ECA, art. 259: "Medida Administrativa…", do art. 258-C, com "Disposições Finais e Transitórias").
+- **Solução:** examinado na página: o estruturador está certo. `RUBRICA_CORRIGIDA` em `src/testes/gabarito.ts`, com o motivo de cada um. **A fazer (8.5):** acertar as mesmas regras em `scripts/corpus/gabarito.mjs` junto com o "Regulamento" da CF (`NOME_CORRIGIDO`), rodar `npm run corpus:gabarito` uma vez só e esvaziar as duas listas; ECA, CDC e CF voltam a "pendente" e pedem nova conferência (só os itens que mudaram). **Prevenção:** o teste de artigos e rubricas contra o gabarito (`estruturador-corpus.test.ts`).
+- **Origem:** ocorrido em 24/09/2026 (atividade 8.3; conferência parcial do ECA e do CDC).
+
+### Linha entre o nome do nó e o 1º artigo vira linha solta
+- **Sintoma:** aviso `linha_solta` onde antes não havia (ECA: "(Expressão substituída pela Lei nº 12.010, de 2009) Vigência"; ECA compilado: "eção I"). **Causa:** até a 8.2, as linhas entre o nome do nó e o artigo entravam caladas na faixa do artigo; na 8.3 só a rubrica entra, e o resto é sobra. A primeira era uma nota que `CHAVE_NOTA` não conhecia; a segunda é falha da fonte (a compilada do ECA perdeu o "S" da Seção I do Capítulo II do Título I do Livro II).
+- **Solução:** "Expressão substituída/declarada…" virou chave de nota (`notas.ts`; ECA, 17 e 2); "eção I" continua solta, de propósito (a 9.5 mostra o aviso). **Prevenção:** `estruturador-corpus.test.ts` exige zero `linha_solta` nas 11 páginas, menos essa da compilada do ECA.
+- **Origem:** ocorrido em 24/09/2026 (atividade 8.3, antes do commit).
+
+### Página hostil derruba o estruturador com `RangeError: Maximum call stack size exceeded`
+- **Sintoma:** colar uma linha com 200 mil notas ("(Vide) (Vide) …") trava a importação com `RangeError`. **Causa:** `lista.push(...itens)` passa cada item como argumento, e o V8 estoura a pilha a partir de uns 150 mil (notas do nó, notas da norma, trechos juntados, filhos herdados).
+- **Solução:** `acrescentar(destino, itens)` (`linhas.ts`), um laço; nada de `push(...)` nem `concat` repetido (este fica quadrático) com lista que a entrada controla. **Prevenção:** "notas numa linha só" e "rubrica e notas sem fim" em `desempenho.test.ts` (o primeiro reproduz o `RangeError` com o `push(...)`).
+- **Origem:** ocorrido em 24/09/2026 (releitura da 8.3, antes do commit; o `push(...)` vinha da 8.2).
+
+### Parágrafo com sufixo separado, rubrica de parágrafo ou pena sem hífen
+- **Sintoma:** "§ 2º -A Considera-se…" (CP, art. 121, numa redação tachada) lido como § 2º; a rubrica "Aumento de pena" antes do § 7º fica no texto; "Pena Detenção de…" (CDC) vira texto solto. **Causa:** a fonte põe espaço antes do hífen do sufixo do parágrafo; a rubrica também vem antes de parágrafo (o gabarito conta 448 nomes no CP, 362 deles de artigo); o CDC escreve a pena sem hífen.
+- **Solução (a fazer):** na regra 6, sufixo de parágrafo tolerante ao espaço antes do hífen quando a letra vem colada ao texto seguinte; `lerRubrica` também antes de "§"/"Parágrafo único"; "Pena" + tipo de pena (reclusão, detenção, prisão, multa) continua o dispositivo anterior, como "Pena -". **Prevenção:** testes da 8.4 com esses casos; "endereços únicos" e contagem de parágrafos contra o gabarito.
+- **Origem:** previsto — atividade 8.4 (casos vistos no corpus durante a 8.3).
 
 ### Anexo ou ADCT viram artigos duplicados
 - **Sintoma:** validação acusa `art1` duplicado; linhas de tabela estruturadas como incisos. No gabarito, antes do prefixo: 236 "duplicatas" na CF e 35 na LC-SP 988, e a sequência de artigos "voltava" do 250 ao 1. **Causa:** o ADCT recomeça a numeração no art. 1º dentro da mesma página da CF/88; a LC-SP 988 faz o mesmo nas disposições transitórias (Título VIII, "Artigo 1°" a "21"); bloco depois de "ANEXO" tratado como texto normativo.

@@ -1,12 +1,13 @@
 // Estruturador (F2; Parte 2 §10.6, "fatiarLei"): blocos do sanitizador ou de `textoParaBlocos` →
 // Rascunho. Domínio puro, sem tela nem banco. Ordem das regras: normalização (1, 8.1), blocos
-// pré-normativos (2) e hierarquia estrutural (3) nesta atividade (8.2); o resto vem nas seguintes:
-// - 8.3: artigo tolerante e rubrica (hoje `INICIO_DE_ARTIGO` só delimita o artigo, com as linhas
-//   pendentes antes dele — a rubrica — dentro da faixa; o texto é o da linha do rótulo);
-// - 8.4: caput, parágrafo, inciso, alínea e item (as demais linhas do artigo ficam na faixa);
+// pré-normativos (2) e hierarquia estrutural (3, 8.2), rubrica (4) e artigo (5) (8.3); o resto vem
+// nas seguintes:
+// - 8.4: caput, parágrafo, inciso, alínea e item (as demais linhas do artigo ficam na faixa; o
+//   texto do artigo é o da linha do rótulo);
 // - 8.6: redação anterior. Até lá, linha tachada vira descarte `redacao_anterior`, nunca texto.
 // Toda linha cai num nó (pela faixa), nota, metadado ou descarte.
 import type { Bloco, Trecho } from '../../core/seguranca/sanitizador';
+import { ARTIGO_QUEBRADO, lerInicioDeArtigo, lerRubrica, type InicioDeArtigo } from './artigo';
 import {
   lerRotuloEstrutural,
   NIVEL,
@@ -14,6 +15,7 @@ import {
   type TipoEstrutural,
 } from './estrutura';
 import {
+  acrescentar,
   aparar,
   ehCaixaAlta,
   juntarTrechos,
@@ -22,9 +24,9 @@ import {
   type Linha,
   prepararLinhas,
 } from './linhas';
-import { normalizarBlocos } from './normalizacao';
+import { chaveDeCasamento, normalizarBlocos } from './normalizacao';
 import { lerNotasDaLinha, separarNotasFinais } from './notas';
-import { INICIO_DE_ARTIGO, lerPreNormativo } from './prenormativo';
+import { lerPreNormativo } from './prenormativo';
 import type {
   Anomalia,
   Confianca,
@@ -32,6 +34,7 @@ import type {
   FaixaDeLinhas,
   FormatoEntrada,
   NoRascunho,
+  NotaDeVigencia,
   Rascunho,
   RedacaoAnterior,
 } from './rascunho';
@@ -40,7 +43,7 @@ import type {
  * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.3 na 8.3…),
  * para a fonte guardada ser reprocessada quando o estruturador melhorar.
  */
-export const VERSAO_ESTRUTURADOR = '0.2';
+export const VERSAO_ESTRUTURADOR = '0.3';
 
 export interface OpcoesEstruturar {
   /** `texto` (texto puro): tudo "a confirmar" (regra 12). Padrão: `html`. */
@@ -85,6 +88,23 @@ const ESTRUTURAIS = new Set<string>(Object.keys(NIVEL));
 const ehEstrutural = (no: NoRascunho): no is NoRascunho & { tipo: TipoEstrutural } =>
   ESTRUTURAIS.has(no.tipo);
 
+/**
+ * Rubrica candidata (regra 4): vira o nome do artigo que vier logo depois (só com notas e tachado no
+ * meio) ou volta para o artigo anterior. Artigo tachado de outro número entre ela e o artigo
+ * vigente (CP, art. 185, revogado, antes do 186) diz que a rubrica é dele: fica com o tachado até
+ * a 8.6 (caso `artigo-so-tachado`).
+ */
+interface RubricaPendente {
+  linha: Linha;
+  fim: number;
+  notas: NotaDeVigencia[];
+  duvidosa: boolean;
+  /** As linhas só de notas logo depois dela (são dela, se ela se confirmar). */
+  linhasDeNota: Linha[];
+  /** Endereço do primeiro artigo tachado depois dela. */
+  tachado?: string;
+}
+
 /** Nó estrutural recém-aberto: as linhas seguintes podem ser nota ou nome dele. */
 interface Cabecalho {
   no: NoRascunho;
@@ -102,16 +122,36 @@ class Corpo {
   private cabecalho: Cabecalho | undefined;
   private artigo: NoRascunho | undefined;
   private pendentes: Linha[] = [];
+  private rubrica: RubricaPendente | undefined;
+  /** Linha só com "Art." (ou "Artigo"), à espera do número na linha seguinte. */
+  private quebrado: Linha | undefined;
   private zona: 'corpo' | 'fecho' | 'anexo' = 'corpo';
   private fecho: Descarte | undefined;
   private anexo: NoRascunho | undefined;
   private artigos = 0;
+  private rubricas = 0;
   private tachadas = 0;
   private ultima: Linha | undefined;
 
   constructor(private readonly confianca: Confianca) {}
 
   ler(l: Linha): void {
+    const quebrado = this.quebrado;
+    if (quebrado) {
+      this.quebrado = undefined;
+      const junta = juntarLinhas(quebrado, l);
+      if (lerInicioDeArtigo(junta.chave)) {
+        this.lerLinha(junta, quebrado.i);
+        return;
+      }
+      this.lerLinha(quebrado);
+    }
+    if (ARTIGO_QUEBRADO.test(l.chave)) this.quebrado = l;
+    else this.lerLinha(l);
+  }
+
+  /** `inicio`: primeira linha da entrada (a do "Art." quebrado, quando houver). */
+  private lerLinha(l: Linha, inicio = l.i): void {
     const anterior = this.ultima;
     this.ultima = l;
     if (this.zona === 'anexo' && this.anexo) {
@@ -124,25 +164,29 @@ class Corpo {
         return;
       }
       // Depois do fecho, só artigo ou rótulo reabre o corpo (o ADCT da CF; o bloco é da 8.4).
-      if (l.tachada || !(INICIO_DE_ARTIGO.test(l.chave) || lerRotuloEstrutural(l))) {
+      if (l.tachada || !(lerInicioDeArtigo(l.chave) || lerRotuloEstrutural(l))) {
         this.fecho.linhas.fim = l.i;
         return;
       }
       this.zona = 'corpo';
     }
     const rotulo = l.tachada ? undefined : lerRotuloEstrutural(l);
-    if (l.tachada) this.tachada(l, anterior);
+    const artigo = lerInicioDeArtigo(l.chave);
+    if (l.tachada) this.tachada(l, anterior, inicio, artigo);
     else if (this.artigos > 0 && FECHO.test(l.chave)) this.abrirFecho(l);
     else if (rotulo) this.abrirNo(rotulo, l);
-    else if (this.cabecalho && this.lerCabecalho(this.cabecalho, l)) return;
-    else if (INICIO_DE_ARTIGO.test(l.chave)) this.abrirArtigo(l);
-    else if (this.artigo) this.artigo.linhas.fim = l.i;
-    else this.pendentes.push(l);
+    else if (this.cabecalho && this.lerCabecalho(this.cabecalho, l, artigo)) return;
+    else if (artigo) this.abrirArtigo(artigo, l, inicio);
+    else this.lerOutra(l);
   }
 
   concluir(): { nos: NoRascunho[]; descartes: Descarte[]; anomalias: Anomalia[] } {
+    if (this.quebrado) this.lerLinha(this.quebrado);
+    this.quebrado = undefined;
+    this.resolverRubrica();
     this.soltarPendentes();
     this.mesclarSubstituidos(this.raizes);
+    if (this.rubricas > 0) this.rubricaNoNomeDoNo();
     this.enderecar(this.raizes, '');
     if (this.artigos === 0)
       this.anomalias.push({
@@ -184,6 +228,7 @@ class Corpo {
   }
 
   private abrirNo(rotulo: RotuloEstrutural, l: Linha): void {
+    this.resolverRubrica();
     this.artigo = undefined;
     this.soltarPendentes();
     const no = this.novoNo(rotulo.tipo, l, { rotulo: rotulo.rotulo });
@@ -211,15 +256,15 @@ class Corpo {
   }
 
   /** Nota ou nome do nó recém-aberto; `false` quando a linha já não é dele. */
-  private lerCabecalho(c: Cabecalho, l: Linha): boolean {
+  private lerCabecalho(c: Cabecalho, l: Linha, artigo = lerInicioDeArtigo(l.chave)): boolean {
     const notas = lerNotasDaLinha(l);
     if (notas) {
-      c.no.notas.push(...notas);
+      acrescentar(c.no.notas, notas);
       c.no.linhas.fim = l.i;
       if (c.estado === 'nome') c.estado = 'fim';
       return true;
     }
-    if (INICIO_DE_ARTIGO.test(l.chave)) return this.fecharCabecalho();
+    if (artigo) return this.fecharCabecalho();
     const primeiro = c.nome[0];
     const continua =
       c.estado === 'nome' &&
@@ -231,16 +276,10 @@ class Corpo {
     // Nome (a 1ª linha, em qualquer caixa; a seguinte, só se as duas estão em caixa alta). O
     // pedaço tachado ("do ~~Pátrio Poder~~ Poder Familiar", ECA) fica na redação anterior.
     const { fim, notas: finais } = separarNotasFinais(l);
-    const trechosDoNome = recortar(l.trechos, 0, fim);
-    if (trechosDoNome.some((t) => t.tachado))
-      c.no.redacoesAnteriores.push({
-        trechos: aparar(trechosDoNome),
-        origemDeteccao: 'tachado',
-        confirmada: true,
-        linhas: { inicio: l.i, fim: l.i },
-      });
-    c.nome.push({ ...l, trechos: semTachado(trechosDoNome) });
-    c.no.notas.push(...finais);
+    const { trechos: trechosDoNome, redacao } = tirarTachado(l, fim);
+    if (redacao) c.no.redacoesAnteriores.push(redacao);
+    c.nome.push({ ...l, trechos: trechosDoNome });
+    acrescentar(c.no.notas, finais);
     c.no.linhas.fim = l.i;
     c.estado = finais.length > 0 ? 'fim' : 'nome';
     const trechos = juntarTrechos(c.nome.map((n) => aparar(n.trechos)));
@@ -257,28 +296,88 @@ class Corpo {
     return false;
   }
 
-  private abrirArtigo(l: Linha): void {
+  private abrirArtigo(inicioDeArtigo: InicioDeArtigo, l: Linha, inicio: number): void {
     this.cabecalho = undefined;
-    const m = INICIO_DE_ARTIGO.exec(l.chave);
-    const numero = (m?.[1] ?? '').replace(/\./g, '');
-    const sufixo = (m?.[2] ?? '').replace(/-/g, '');
-    const primeira = this.pendentes[0] ?? l;
-    this.pendentes = [];
-    const fimRotulo = m?.[0].length ?? 0;
+    const { endereco, rotulo, fim } = inicioDeArtigo;
+    const r = this.rubrica;
+    this.rubrica = undefined;
+    let nome: NoRascunho | undefined;
+    if (r && (r.tachado === undefined || r.tachado === endereco)) {
+      nome = this.nomeDoArtigo(r);
+      this.rubricas += 1;
+    } else if (r) this.devolverRubrica(r);
+    this.soltarPendentes();
     const artigo = this.novoNo('artigo', l, {
-      endereco: `art${numero}${sufixo}`,
-      rotulo: `Art. ${numero}${Number(numero) < 10 ? 'º' : ''}${sufixo ? '-' + sufixo.split('').join('-') : ''}`,
-      rotuloLido: l.texto.slice(0, fimRotulo).trim(),
-      trechos: aparar(recortar(l.trechos, fimRotulo, l.texto.length)),
-      linhas: { inicio: primeira.i, fim: l.i },
+      endereco,
+      rotulo,
+      rotuloLido: l.texto.slice(0, fim).trim(),
+      trechos: aparar(recortar(l.trechos, fim, l.texto.length)),
+      filhos: nome ? [nome] : [],
+      linhas: { inicio: nome?.linhas.inicio ?? inicio, fim: l.i },
     });
     this.anexar(artigo);
     this.artigo = artigo;
     this.artigos += 1;
   }
 
-  private tachada(l: Linha, anterior: Linha | undefined): void {
+  /** Linha que não é rótulo, artigo, fecho nem tachada: rubrica candidata ou texto do artigo. */
+  private lerOutra(l: Linha): void {
+    const r = this.rubrica;
+    if (r) {
+      // Nota em linha própria logo depois da rubrica é dela (se ela se confirmar).
+      const notas = lerNotasDaLinha(l);
+      if (notas) {
+        acrescentar(r.notas, notas);
+        r.linhasDeNota.push(l);
+        return;
+      }
+      this.resolverRubrica();
+    }
+    const rubrica = lerRubrica(l);
+    if (rubrica) this.rubrica = { linha: l, ...rubrica, linhasDeNota: [] };
+    else if (this.artigo) this.artigo.linhas.fim = l.i;
+    else this.pendentes.push(l);
+  }
+
+  /** Rubrica que não chegou a um artigo: volta para o artigo anterior (ou fica solta). */
+  private resolverRubrica(): void {
+    const r = this.rubrica;
+    this.rubrica = undefined;
+    if (r) this.devolverRubrica(r);
+  }
+
+  private devolverRubrica(r: RubricaPendente): void {
+    const ate = ultimaLinha(r);
+    if (r.tachado !== undefined) {
+      // Rubrica de artigo todo tachado: fica com ele, fora da árvore, até a 8.6.
+      this.descartes.push({ motivo: 'redacao_anterior', linhas: { inicio: r.linha.i, fim: ate } });
+    } else if (this.artigo) this.artigo.linhas.fim = ate;
+    else {
+      this.pendentes.push(r.linha);
+      acrescentar(this.pendentes, r.linhasDeNota);
+    }
+  }
+
+  /** Regra 4: a rubrica vira o filho `nome` do artigo; o pedaço tachado, redação anterior dele. */
+  private nomeDoArtigo(r: RubricaPendente): NoRascunho {
+    const { trechos, redacao } = tirarTachado(r.linha, r.fim);
+    return this.novoNo('nome', r.linha, {
+      trechos,
+      notas: r.notas,
+      redacoesAnteriores: redacao ? [redacao] : [],
+      confianca: r.duvidosa && this.confianca === 'alta' ? 'media' : this.confianca,
+      linhas: { inicio: r.linha.i, fim: ultimaLinha(r) },
+    });
+  }
+
+  private tachada(
+    l: Linha,
+    anterior: Linha | undefined,
+    inicio: number,
+    artigo: InicioDeArtigo | undefined,
+  ): void {
     this.tachadas += 1;
+    if (this.rubrica && artigo) this.rubrica.tachado ??= artigo.endereco;
     const ultimo = this.descartes[this.descartes.length - 1];
     if (
       ultimo?.motivo === 'redacao_anterior' &&
@@ -286,10 +385,11 @@ class Corpo {
       ultimo.linhas.fim === anterior.i
     )
       ultimo.linhas.fim = l.i;
-    else this.descartes.push({ motivo: 'redacao_anterior', linhas: { inicio: l.i, fim: l.i } });
+    else this.descartes.push({ motivo: 'redacao_anterior', linhas: { inicio, fim: l.i } });
   }
 
   private abrirFecho(l: Linha): void {
+    this.resolverRubrica();
     this.artigo = undefined;
     this.cabecalho = undefined;
     this.soltarPendentes();
@@ -358,13 +458,17 @@ class Corpo {
           [{ texto: anterior.rotulo ?? '' }],
           anterior.filhos.find((f) => f.tipo === 'nome')?.trechos ?? [],
         ]);
-        redacoes.push(...anterior.redacoesAnteriores, {
+        acrescentar(redacoes, anterior.redacoesAnteriores);
+        redacoes.push({
           trechos: rotuloENome,
           origemDeteccao: 'heuristica',
           confirmada: false,
           linhas: anterior.linhas,
         });
-        herdados.push(...anterior.filhos.filter((f) => f.tipo !== 'nome'));
+        acrescentar(
+          herdados,
+          anterior.filhos.filter((f) => f.tipo !== 'nome'),
+        );
         this.anomalias.push({
           tipo: 'estrutural_substituido',
           gravidade: 'aviso',
@@ -381,6 +485,54 @@ class Corpo {
       filhos.splice(0, filhos.length, ...saida);
     }
     for (const no of filhos) if (ehEstrutural(no)) this.mesclarSubstituidos(no.filhos);
+  }
+
+  /**
+   * Nó sem nome seguido da rubrica do 1º artigo: a regra 3 toma a rubrica por nome do nó. Numa
+   * norma com rubricas e com os nomes dos nós em caixa alta (o CP: todos menos "das fraudes em
+   * certames…"), o "nome" de uma linha em caixa mista logo antes de um artigo sem rubrica é a
+   * rubrica dele (confiança média), salvo se começa como nome de nó ("Do", "Da", "Dos", "Das"; no
+   * CP, nenhuma rubrica começa assim). No corpus não acontece: todo nó com linha depois do rótulo
+   * tem nome.
+   */
+  private rubricaNoNomeDoNo(): void {
+    const estruturais: NoRascunho[] = [];
+    const visitar = (nos: readonly NoRascunho[]) => {
+      for (const no of nos)
+        if (ehEstrutural(no)) {
+          estruturais.push(no);
+          visitar(no.filhos);
+        }
+    };
+    visitar(this.raizes);
+    const nomes = estruturais.flatMap((no) => no.filhos.filter((f) => f.tipo === 'nome'));
+    const emCaixaAlta = nomes.filter((n) => ehCaixaAlta(textoDe(n.trechos))).length;
+    if (emCaixaAlta < 0.9 * nomes.length) return;
+    for (const no of estruturais) {
+      const [nome, artigo] = no.filhos;
+      if (nome?.tipo !== 'nome' || artigo?.tipo !== 'artigo') continue;
+      const texto = textoDe(nome.trechos);
+      if (
+        artigo.filhos[0]?.tipo === 'nome' ||
+        nome.linhas.inicio !== nome.linhas.fim ||
+        nome.linhas.inicio === no.linhas.inicio || // na linha do rótulo, é nome mesmo
+        nome.redacoesAnteriores.length > 0 ||
+        ehCaixaAlta(texto) ||
+        !/^\p{Lu}/u.test(texto) ||
+        /^D[oa]s? /u.test(texto) ||
+        /[;:,]$/.test(texto)
+      )
+        continue;
+      const [daRubrica, doNo] = particionar(no.notas, (n) => n.linha === nome.linhas.inicio);
+      no.notas = doNo;
+      no.filhos.shift();
+      artigo.filhos.unshift({
+        ...nome,
+        notas: daRubrica,
+        confianca: this.confianca === 'alta' ? 'media' : this.confianca,
+      });
+      artigo.linhas.inicio = nome.linhas.inicio;
+    }
   }
 
   /** Há artigo na subárvore? (memorizado: cada nó é consultado no máximo uma vez por nível). */
@@ -406,6 +558,37 @@ class Corpo {
       );
     }
   }
+}
+
+const ultimaLinha = (r: RubricaPendente) =>
+  (r.linhasDeNota[r.linhasDeNota.length - 1] ?? r.linha).i;
+
+/** `texto[0, fim)` da linha sem o tachado; o pedaço tachado, como redação anterior. */
+function tirarTachado(l: Linha, fim: number): { trechos: Trecho[]; redacao?: RedacaoAnterior } {
+  const trechos = recortar(l.trechos, 0, fim);
+  if (!trechos.some((t) => t.tachado)) return { trechos: aparar(trechos) };
+  return {
+    trechos: semTachado(trechos),
+    redacao: {
+      trechos: aparar(trechos),
+      origemDeteccao: 'tachado',
+      confirmada: true,
+      linhas: { inicio: l.i, fim: l.i },
+    },
+  };
+}
+
+/** "Art." numa linha e o número na seguinte: uma linha só, com um espaço entre as duas. */
+function juntarLinhas(a: Linha, b: Linha): Linha {
+  const trechos = juntarTrechos([a.trechos, b.trechos]);
+  const texto = textoDe(trechos);
+  return {
+    i: b.i,
+    trechos,
+    texto,
+    chave: chaveDeCasamento(texto),
+    tachada: a.tachada && b.tachada,
+  };
 }
 
 /** Os trechos fora do tachado, sem o espaço duplo que a retirada deixa. */

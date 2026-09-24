@@ -211,6 +211,7 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
       'parteEspecial.tit1.cap1',
       'parteEspecial.tit1.cap1.nome',
       'art121',
+      'art121.nome',
       'parteEspecial.tit1.cap1.sec1',
       'parteEspecial.tit1.cap1.sec1.nome',
       'art122',
@@ -223,7 +224,8 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
     const parte = porEndereco(r, 'parteEspecial');
     expect(nomeDe(parte)).toBe('');
     expect(parte?.notas.map((n) => n.tipo)).toEqual(['vide']);
-    // A rubrica e a continuação ("Pena - …") ficam na faixa do artigo, para a 8.3 e a 8.4.
+    // A rubrica (8.3) e a continuação ("Pena - …", 8.4) ficam na faixa do artigo.
+    expect(nomeDe(porEndereco(r, 'art121'))).toBe('Homicídio simples');
     expect(porEndereco(r, 'art121')?.linhas).toEqual({ inicio: 9, fim: 11 });
     expect(porEndereco(r, 'parteEspecial.tit1.cap1')?.linhas).toEqual({ inicio: 7, fim: 8 });
   });
@@ -287,7 +289,11 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
     );
     expect(nomeDe(porEndereco(r, 'tit1'))).toBe('Das Disposições Preliminares');
     expect(porEndereco(r, 'tit1')?.notas).toEqual([]);
-    expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 2, fim: 4 });
+    // A 3ª linha é a rubrica do art. 1º (8.3), com a nota em linha própria.
+    const artigo = porEndereco(r, 'art1');
+    expect(nomeDe(artigo)).toBe('Disposições Gerais');
+    expect(artigo?.filhos[0]?.notas.map((n) => n.linha)).toEqual([3]);
+    expect(artigo?.linhas).toEqual({ inicio: 2, fim: 4 });
   });
 
   it('nota da ALESP em linha própria vai para o nó', () => {
@@ -390,7 +396,10 @@ describe('estruturador: tachado até a 8.6 (salvaguarda da leitura antecipada)',
       'parteGeral.tit1',
       'parteGeral.tit1.nome',
       'art1',
+      'art1.nome',
     ]);
+    // A redação antiga (tachada) entre a rubrica e o artigo vigente não a separa dele.
+    expect(nomeDe(porEndereco(r, 'art1'))).toBe('Anterioridade da Lei');
     expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 6, fim: 8 });
     expect(r.anomalias).toEqual([
       expect.objectContaining({ tipo: 'redacao_anterior_nao_tratada', gravidade: 'aviso' }),
@@ -472,9 +481,299 @@ describe('estruturador: fecho, anexo e o que falta', () => {
   });
 
   it('texto puro: confiança "a confirmar" (regra 12)', () => {
-    const r = estruturar(blocos('TÍTULO I', 'Nome', 'Art. 1º A.'), { formato: 'texto' });
+    const r = estruturar(blocos('TÍTULO I', 'Nome', 'Rubrica', 'Art. 1º A.'), { formato: 'texto' });
+    expect(nomeDe(porEndereco(r, 'art1'))).toBe('Rubrica');
     expect(r.formatoEntrada).toBe('texto');
     expect(todos(r.nos).every((n) => n.confianca === 'a_confirmar')).toBe(true);
     expect(estruturar(blocos('Art. 1º A.')).nos[0]?.confianca).toBe('alta');
+  });
+});
+
+describe('estruturador: artigo tolerante (regra 5)', () => {
+  const artigos = (r: Rascunho) =>
+    todos(r.nos)
+      .filter((n) => n.tipo === 'artigo')
+      .map((n) => [n.endereco, n.rotulo, n.rotuloLido, textoDe(n.trechos)]);
+
+  it('formas do corpus (CF, CP, ALESP) e de fora dele', () => {
+    const r = estruturar(
+      blocos(
+        'Art.246. Sem espaço.',
+        'Art. 60.Nos dez primeiros anos.',
+        'Art. 216-A . Espaço antes do ponto.',
+        'Artigo 12 - Da ALESP.',
+        'ARTIGO 13 - Em maiúsculas.',
+        'A rt. 14 Capitular separada.',
+        'Art. 15ºA. Sufixo sem hífen.',
+        'Art. 16A - Sufixo sem hífen nem ordinal.',
+        'Art. 1.000. Milhar.',
+        'Artigo único. Único.',
+      ),
+    );
+    expect(artigos(r)).toEqual([
+      ['art246', 'Art. 246', 'Art.246.', 'Sem espaço.'],
+      ['art60', 'Art. 60', 'Art. 60.', 'Nos dez primeiros anos.'],
+      ['art216A', 'Art. 216-A', 'Art. 216-A .', 'Espaço antes do ponto.'],
+      ['art12', 'Art. 12', 'Artigo 12 -', 'Da ALESP.'],
+      ['art13', 'Art. 13', 'ARTIGO 13 -', 'Em maiúsculas.'],
+      ['art14', 'Art. 14', 'A rt. 14', 'Capitular separada.'],
+      ['art15A', 'Art. 15-A', 'Art. 15ºA.', 'Sufixo sem hífen.'],
+      ['art16A', 'Art. 16-A', 'Art. 16A -', 'Sufixo sem hífen nem ordinal.'],
+      ['art1000', 'Art. 1.000', 'Art. 1.000.', 'Milhar.'],
+      ['artUnico', 'Art. único', 'Artigo único.', 'Único.'],
+    ]);
+  });
+
+  it('não abre artigo: citação em minúscula ou entre aspas, "Artigos", "Arte"; letra solta não é sufixo', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Um.',
+        'Artes e ofícios.',
+        'Artigos 5º e 6º desta Lei.',
+        'art. 5º da Lei nº 7.210, de 1984.',
+        '"Art. 102. Citação da lei alterada."',
+        'Art. 2º A execução.',
+      ),
+    );
+    expect(artigos(r)).toEqual([
+      ['art1', 'Art. 1º', 'Art. 1º', 'Um.'],
+      ['art2', 'Art. 2º', 'Art. 2º', 'A execução.'],
+    ]);
+    expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 0, fim: 4 });
+  });
+
+  it('"Art" quebrado: a palavra numa linha e o número na seguinte', () => {
+    const r = estruturar(blocos('Art. 1º Um.', 'Art.', '2º Dois.', 'Art.', 'Texto sem número.'));
+    expect(artigos(r)).toEqual([
+      ['art1', 'Art. 1º', 'Art. 1º', 'Um.'],
+      ['art2', 'Art. 2º', 'Art. 2º', 'Dois.'],
+    ]);
+    expect(porEndereco(r, 'art2')?.linhas).toEqual({ inicio: 1, fim: 4 });
+    // Tachado nas duas linhas: redação anterior numa faixa só; no fim da entrada, a linha fica.
+    const t = estruturar(
+      blocos('Art. 1º Um.', b(tachado('Art.')), b(tachado('1º Antigo.')), 'Art.'),
+    );
+    expect(t.descartes).toEqual([{ motivo: 'redacao_anterior', linhas: { inicio: 1, fim: 2 } }]);
+    expect(porEndereco(t, 'art1')?.linhas).toEqual({ inicio: 0, fim: 3 });
+  });
+});
+
+describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
+  const nome = (r: Rascunho, endereco: string) =>
+    porEndereco(r, endereco)?.filhos.find((f) => f.tipo === 'nome');
+
+  it('linha curta antes do artigo vira o filho `nome`, com as notas dela (CP)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 5º - Aplica-se a lei brasileira.',
+        '§ 2º - É também aplicável.',
+        'Lugar do crime (Redação dada pela Lei nº 7.209, de 1984)',
+        'Art. 6º - Considera-se praticado o crime.',
+        'Pena de multa',
+        '(Incluído pela Lei nº 9.714, de 1998)',
+        'Art. 49 - A pena de multa.',
+      ),
+    );
+    expect(porEndereco(r, 'art5')?.linhas).toEqual({ inicio: 0, fim: 1 });
+    const lugar = nome(r, 'art6');
+    expect(lugar).toMatchObject({
+      endereco: 'art6.nome',
+      confianca: 'alta',
+      linhas: { inicio: 2, fim: 2 },
+    });
+    expect(textoDe(lugar?.trechos ?? [])).toBe('Lugar do crime');
+    expect(lugar?.notas.map((n) => n.texto)).toEqual(['(Redação dada pela Lei nº 7.209, de 1984)']);
+    expect(porEndereco(r, 'art6')?.linhas).toEqual({ inicio: 2, fim: 3 });
+    // "Pena de multa" é rubrica; a nota em linha própria logo depois é dela.
+    const multa = nome(r, 'art49');
+    expect(textoDe(multa?.trechos ?? [])).toBe('Pena de multa');
+    expect(multa?.notas.map((n) => n.linha)).toEqual([5]);
+    expect(multa?.linhas).toEqual({ inicio: 4, fim: 5 });
+    expect(porEndereco(r, 'art49')?.linhas).toEqual({ inicio: 4, fim: 6 });
+  });
+
+  it('texto do artigo anterior não é rubrica: pena sem hífen, inciso, parágrafo, citação, minúscula, frase que continua', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 63. Omitir dizeres.',
+        'Pena Detenção de um a seis meses ou multa.', // CDC, sem hífen
+        'Art. 64. Deixar de comunicar.',
+        'IV as ilhas fluviais e lacustres.', // CF, inciso sem hífen
+        'Art. 65. Três.',
+        'Parágrafo único. Texto.',
+        'Art. 66. Quatro.',
+        '6º) a perda e a suspensão do pátrio poder. "', // ECA, citação da lei alterada
+        'Art. 67. Cinco.',
+        'e continua na linha seguinte', // linha continuada (LC-SP 988)
+        'Art. 68. Seis.',
+        'Na forma do regulamento:',
+        'Art. 69. Sete.',
+      ),
+    );
+    const arts = todos(r.nos).filter((n) => n.tipo === 'artigo');
+    expect(arts.map((a) => [a.endereco, a.filhos.length, a.linhas.inicio, a.linhas.fim])).toEqual([
+      ['art63', 0, 0, 1],
+      ['art64', 0, 2, 3],
+      ['art65', 0, 4, 5],
+      ['art66', 0, 6, 7],
+      ['art67', 0, 8, 9],
+      ['art68', 0, 10, 11],
+      ['art69', 0, 12, 12],
+    ]);
+  });
+
+  it('rubrica que começa com letra de numeral romano não é inciso ("Dano", "Mil…", "Civil…")', () => {
+    const r = estruturar(
+      blocos(
+        'Dano',
+        'Art. 163. Um.',
+        'Mil vezes',
+        'Art. 164. Dois.',
+        'Civil e penal',
+        'Art. 165. Três.',
+      ),
+    );
+    expect(['art163', 'art164', 'art165'].map((e) => textoDe(nome(r, e)?.trechos ?? []))).toEqual([
+      'Dano',
+      'Mil vezes',
+      'Civil e penal',
+    ]);
+  });
+
+  it('rubrica que não chega a artigo volta para o artigo anterior (sem sangria)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Um.',
+        'Aumento de pena', // rubrica do parágrafo (8.4)
+        '§ 1º A pena aumenta.',
+        'Rubrica antes do capítulo',
+        'CAPÍTULO II',
+        'DOS OUTROS',
+        'Art. 2º Dois.',
+        'Rubrica no fim',
+      ),
+    );
+    expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 0, fim: 3 });
+    expect(porEndereco(r, 'art2')?.linhas).toEqual({ inicio: 6, fim: 7 });
+    expect(todos(r.nos).some((n) => n.tipo === 'nome' && n.endereco.startsWith('art'))).toBe(false);
+    expect(r.descartes).toEqual([]);
+  });
+
+  it('redação antiga tachada entre a rubrica e o artigo; artigo tachado de outro número leva a rubrica (CP, art. 185)', () => {
+    const r = estruturar(
+      blocos(
+        'Casa de prostituição',
+        b(tachado('Art. 229 - Manter casa de prostituição.')),
+        'Art. 229. Manter estabelecimento.',
+        'Usurpação de nome ou pseudônimo alheio',
+        b(tachado('Art. 185 - Atribuir falsamente.')),
+        b(tachado('Pena - detenção.'), { texto: ' (Revogado pela Lei nº 10.695, de 2003)' }),
+        'Art. 186. Procede-se mediante queixa.',
+      ),
+    );
+    expect(textoDe(nome(r, 'art229')?.trechos ?? [])).toBe('Casa de prostituição');
+    expect(porEndereco(r, 'art229')?.linhas).toEqual({ inicio: 0, fim: 2 });
+    // Até a 8.6, a rubrica do revogado fica com ele, fora da árvore; o 186 não a recebe.
+    expect(nome(r, 'art186')).toBeUndefined();
+    expect(porEndereco(r, 'art229')?.linhas.fim).toBe(2);
+    expect(porEndereco(r, 'art186')?.linhas).toEqual({ inicio: 6, fim: 6 });
+    expect(r.descartes).toEqual([
+      { motivo: 'redacao_anterior', linhas: { inicio: 1, fim: 1 } },
+      { motivo: 'redacao_anterior', linhas: { inicio: 3, fim: 3 } },
+      { motivo: 'redacao_anterior', linhas: { inicio: 4, fim: 5 } },
+    ]);
+  });
+
+  it('"(VETADO)" no lugar da rubrica; título sem rótulo e rubrica terminada em ponto têm confiança média', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 359-N. Impedir a eleição.',
+        '(VETADO) (Incluído pela Lei nº 14.197, de 2021) (Vigência)',
+        'Art. 359-O. (VETADO).',
+        'Favorecimento da prostituição ou de outra forma de exploração sexual de vulnerável. (Redação dada pela Lei nº 12.978, de 2014)',
+        'Art. 218-B. Submeter.',
+        'DISPOSIÇÕES FINAIS',
+        'Art. 360 - Ressalvada a legislação especial.',
+      ),
+    );
+    const vetado = nome(r, 'art359O');
+    expect([textoDe(vetado?.trechos ?? []), vetado?.confianca, vetado?.notas.length]).toEqual([
+      '(VETADO)',
+      'alta',
+      2,
+    ]);
+    expect(nome(r, 'art218B')?.confianca).toBe('media');
+    expect(textoDe(nome(r, 'art360')?.trechos ?? [])).toBe('DISPOSIÇÕES FINAIS');
+    expect(nome(r, 'art360')?.confianca).toBe('media');
+  });
+
+  it('pedaço tachado da rubrica fica na redação anterior do nome', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Um.',
+        b({ texto: 'Violação de ' }, tachado('privilégio de invenção'), {
+          texto: ' direito autoral',
+        }),
+        'Art. 184. Violar direitos de autor.',
+      ),
+    );
+    const rubrica = nome(r, 'art184');
+    expect(textoDe(rubrica?.trechos ?? [])).toBe('Violação de direito autoral');
+    expect(rubrica?.redacoesAnteriores).toEqual([
+      expect.objectContaining({ origemDeteccao: 'tachado', linhas: { inicio: 1, fim: 1 } }),
+    ]);
+  });
+
+  it('rubrica do 1º artigo sem nó estrutural antes: é do corpo, não do preâmbulo', () => {
+    const r = estruturar(
+      blocos(
+        'LEI Nº 1, DE 2 DE JANEIRO DE 2000.',
+        'Dispõe sobre algo.',
+        'O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta a seguinte Lei:',
+        'Objeto',
+        'Art. 1º Esta Lei dispõe sobre algo.',
+      ),
+    );
+    expect(r.metadados.preambulo).toMatch(/^O PRESIDENTE .* Lei:$/);
+    expect(textoDe(nome(r, 'art1')?.trechos ?? [])).toBe('Objeto');
+    expect(r.descartes.filter((d) => d.motivo === 'sobra')).toEqual([]);
+    // Logo depois da epígrafe, sem preâmbulo, a linha é a ementa (mesmo sem ponto final).
+    const e = estruturar(
+      blocos(
+        'LEI Nº 1, DE 2 DE JANEIRO DE 2000.',
+        'Institui o Dia Nacional',
+        'Art. 1º Fica instituído.',
+      ),
+    );
+    expect(e.metadados.ementa).toBe('Institui o Dia Nacional');
+    expect(nome(e, 'art1')).toBeUndefined();
+  });
+
+  it('rubrica tomada como nome do nó sem nome, numa norma com rubricas e nós em caixa alta', () => {
+    const titulos = Array.from({ length: 9 }, (_, k) => [
+      `TÍTULO ${'I'.repeat((k % 3) + 1)}`,
+      `DOS CRIMES DO GRUPO ${String(k + 1)}`,
+      `Rubrica ${String(k + 1)}`,
+      `Art. ${String(k + 1)}. Texto.`,
+    ]).flat();
+    const r = estruturar(
+      blocos(...titulos, 'CAPÍTULO I', 'Reclusão e detenção', 'Art. 33. Texto.'),
+    );
+    const capitulo = todos(r.nos).find((n) => n.tipo === 'capitulo');
+    expect(nomeDe(capitulo)).toBe('');
+    const rubrica = nome(r, 'art33');
+    expect([textoDe(rubrica?.trechos ?? []), rubrica?.confianca]).toEqual([
+      'Reclusão e detenção',
+      'media',
+    ]);
+    expect(porEndereco(r, 'art33')?.linhas.inicio).toBe(37);
+    // Nome que começa como nome de nó ("Das penas") fica no nó.
+    const d = estruturar(blocos(...titulos, 'CAPÍTULO I', 'Das penas', 'Art. 32. Texto.'));
+    expect(nomeDe(todos(d.nos).find((n) => n.tipo === 'capitulo'))).toBe('Das penas');
+  });
+
+  it('texto puro: a rubrica também fica "a confirmar"', () => {
+    const r = estruturar(blocos('Objeto', 'Art. 1º A.'), { formato: 'texto' });
+    expect(nome(r, 'art1')?.confianca).toBe('a_confirmar');
   });
 });
