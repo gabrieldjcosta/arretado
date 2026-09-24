@@ -176,12 +176,12 @@ export function sanitizarHtml(
   return { blocos: conversor.finalizar(), linksDescartados: conversor.linksDescartados };
 }
 
-/** Texto puro (fallback, D13): uma linha por bloco, sem formatação. */
+/** Texto puro (fallback, D13): uma linha por bloco (CRLF, CR, LF, U+2028 e U+2029), sem formatação. */
 export function textoParaBlocos(texto: string, opcoes: { limite?: number } = {}): Bloco[] {
   const limite = opcoes.limite ?? LIMITE_PADRAO;
   if (texto.length > limite) throw new EntradaGrandeDemais(texto.length, limite);
   return texto
-    .split(/\r\n|\r|\n/)
+    .split(/\r\n|[\r\n\u2028\u2029]/)
     .map((l) => normalizarEspacos(l).trim())
     .filter((l) => l.length > 0)
     .map((l) => ({ trechos: [{ texto: l }] }));
