@@ -2,20 +2,49 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/lep.gabarito.json` › `conferencia`.
 
-## Conferência reduzida (24/09/2026)
+## Conferência reduzida (24/09/2026) — conferir só esta seção
 
-Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Achar cada um na amostra abaixo pelo endereço em negrito; os demais podem ficar sem marca.
+Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Marque `[x]` aqui mesmo; o resto da folha (a amostra completa, mais abaixo) pode ser ignorado.
 
-- **art9A.par1** (divergência decidida)
-- **art9A.par5** (várias redações anteriores)
-- **art18A.par3** (texto diferente na compilada)
-- **art21A** (artigo com sufixo)
-- **art41** (redação anterior no ancestral)
-- **art52** (várias redações anteriores)
-- **art83A** (artigo com sufixo)
-- **art122** (redação anterior no ancestral)
-- **art122.incI** (caso: revogacao-reescrita)
-- **art122.incIII** (caso: revogacao-reescrita)
+- [ ] **art9A.par1** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art9a)
+  - § 1o A identificação do perfil genético será armazenada em banco de dados sigiloso, conforme regulamento a ser expedido pelo Poder Executivo.
+  - Nota: (Incluído pela Lei nº 12.654, de 2012)
+- [ ] **art9A.par5** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art9a)
+  - § 5º A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética.
+  - Nota: (Redação dada pela Lei nº 15.295, de 2025)
+  - Nota: Vigência
+  - Redação anterior (tachado): ~~§ 5º (VETADO).~~
+  - Redação anterior (tachado): ~~§ 5º A amostra biológica coletada só poderá ser utilizada para o único e exclusivo fim de permitir a identificação pelo perfil genético, não estando autorizadas as práticas de fenotipagem genética ou de busca familiar. (Incluído pela Lei nº 13.964, de 2019) (Vigência)~~
+- [ ] **art18A.par3** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art18a)
+  - § 3o A União, os Estados, os Municípios e o Distrito Federal incluirão em seus programas de educação à distância e de utilização de novas tecnologias de ensino, o atendimento aos presos e às presas. 7.627
+  - Nota: (Incluído pela Lei nº 13.163, de 2015)
+- [ ] **art21A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art21a)
+  - Art. 21-A. O censo penitenciário deverá apurar:
+  - Nota: (Incluído pela Lei nº 13.163, de 2015)
+- [ ] **art41** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art41)
+  - Art. 41 - Constituem direitos do preso:
+  - Redação anterior (tachado) [lida como art41.parUnico]: ~~Parágrafo único. Os direitos previstos nos incisos V, X e XV poderão ser suspensos ou restringidos mediante ato motivado do diretor do estabelecimento.~~
+- [ ] **art52** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art52)
+  - Art. 52. A prática de fato previsto como crime doloso constitui falta grave e, quando ocasionar subversão da ordem ou disciplina internas, sujeitará o preso provisório, ou condenado, nacional ou estrangeiro, sem prejuízo da sanção penal, ao regime disciplinar diferenciado, com as seguintes características:
+  - Nota: (Redação dada pela Lei nº 13.964, de 2019)
+  - Redação anterior (tachado): ~~Art. 52. A prática de fato previsto como crime doloso constitui falta grave e sujeita o preso, ou condenado, à sanção disciplinar, sem prejuízo da sanção penal.~~
+  - Redação anterior (tachado): ~~Art. 52. A prática de fato previsto como crime doloso constitui falta grave e, quando ocasione subversão da ordem ou disciplina internas, sujeita o preso provisório, ou condenado, sem prejuízo da sanção penal, ao regime disciplinar diferenciado, com as seguintes características: (Redação dada pela L~~
+- [ ] **art83A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art83a)
+  - Art. 83-A. Poderão ser objeto de execução indireta as atividades materiais acessórias, instrumentais ou complementares desenvolvidas em estabelecimentos penais, e notadamente: .
+  - Nota: (Incluído pela Lei nº 13.190, de 2015)
+- [ ] **art122** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
+  - Art. 122. Os condenados que cumprem pena em regime semi-aberto poderão obter autorização para saída temporária do estabelecimento, sem vigilância direta, nos seguintes casos:
+  - Redação anterior (tachado) [lida como art122.parUnico]: ~~Parágrafo único. A ausência de vigilância direta não impede a utilização de equipamento de monitoração eletrônica pelo condenado, quando assim determinar o juiz da execução. (Incluído pela Lei nº 12.258, de 2010)~~
+- [ ] **art122.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
+  - I - (revogado)
+  - Nota: (Redação dada pela Lei nº 14.843, de 2024)
+  - Redação anterior (revogacao): ~~I - visita à família; (Revogado pela Lei nº 14.843, de 2024)~~
+- [ ] **art122.incIII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/leis/l7210.htm#art122)
+  - III - (revogado)
+  - Nota: (Redação dada pela Lei nº 14.843, de 2024)
+  - Redação anterior (revogacao): ~~III - participação em atividades que concorram para o retorno ao convívio social. (Revogado pela Lei nº 14.843, de 2024)~~
+
+---
 
 ## Como conferir (~30 min)
 

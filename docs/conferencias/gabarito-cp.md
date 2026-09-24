@@ -2,20 +2,60 @@
 
 Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta folha quando o gabarito muda. Marque e anote aqui; a sessão seguinte passa o resultado para `corpus/normas/cp.gabarito.json` › `conferencia`.
 
-## Conferência reduzida (24/09/2026)
+## Conferência reduzida (24/09/2026) — conferir só esta seção
 
-Depois da CF sem divergência, basta conferir estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Achar cada um na amostra abaixo pelo endereço em negrito; os demais podem ficar sem marca.
+Depois da CF sem divergência, bastam estes 10 itens de risco (tachado, revogado, vetado, artigo com letra). Marque `[x]` aqui mesmo; o resto da folha (a amostra completa, mais abaixo) pode ser ignorado.
 
-- **art44** (redação anterior no ancestral)
-- **art46** (várias redações anteriores)
-- **art47.incIII** (texto diferente na compilada)
-- **art92.parUnico** (divergência decidida)
-- **art110.par1** (várias redações anteriores)
-- **art112** (redação anterior no ancestral)
-- **art141.par2** (caso: duplicata)
-- **art148.par1.incIII** (texto diferente na compilada)
-- **art171.par5** (caso: revogacao-reescrita)
-- **art171.par5.incI** (caso: revogacao-reescrita)
+- [ ] **art44** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art44)
+  - Art. 44. As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando:
+  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
+  - Redação anterior (tachado): ~~Art. 44. São circunstâncias que sempre agravam a pena, quando não constituem ou qualificam o crime:~~
+  - Redação anterior (tachado): ~~Art. 44 - As penas restritivas de direitos são autônomas e substituem as privativas de liberdade, quando: (Redação dada pela Lei nº 7.209, de 1984)~~
+  - Redação anterior (tachado) [lida como art44.parUnico]: ~~Parágrafo único - Nos crimes culposos, a pena privativa de liberdade aplicada, igual ou superior a um ano, pode ser substituída por uma pena restritiva de direitos e multa ou por duas penas restritivas de direitos, exeqüíveis simultaneamente. (Incluído pela Lei nº 7.209, de 1984)~~
+- [ ] **art46** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art46)
+  - Nome: Prestação de serviços à comunidade ou a entidades públicas
+  - Art. 46. A prestação de serviços à comunidade ou a entidades públicas é aplicável às condenações superiores a seis meses de privação da liberdade.
+  - Nota: (Redação dada pela Lei nº 9.714, de 1998)
+  - Redação anterior (tachado): ~~Art. 46. Verifica-se a reincidência quando o agente comete novo crime, depois de transitar em julgado a sentença que, no país ou no estrangeiro, o tenha condenado por crime anterior.~~
+  - Redação anterior (tachado): ~~Art. 46 - A prestação de serviços a comunidade consiste na atribuição ao condenado de tarefas gratuitas junto a entidades assistências, hospitais, escolas, orfanatos e outros estabelecimentos congêneres, em programas comunitários ou estatais. (Redação dada pela Lei nº 7.209, de 1984)~~
+  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único. Para efeito de reincidência, não prevalece a condenação anterior, se entre a data do cumprimento ou extinção da pena e a infração posterior tiver decorrido período de tempo superior a cinco anos. (Redação dada pela Lei nº 6.416, de 1977)~~
+  - Redação anterior (tachado) [lida como art46.parUnico]: ~~Parágrafo único - As tarefas serão atribuídas conforme as aptidões do condenado, devendo ser cumpridas, durante oito horas semanais, aos sábados, domingos e feriados ou em dias úteis, de modo a não prejudicar a jornada normal de trabalho. (Redação dada pela Lei nº 7.209, de 1984)~~
+- [ ] **art47.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art47)
+  - III - suspensão de autorização ou de habilitação para dirigir veículo. >
+  - Nota: (Incluído pela Lei nº 7.209, de 11.7.1984)
+- [ ] **art92.parUnico** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art92)
+  - Parágrafo único - Os efeitos de que trata este artigo não são automáticos, devendo ser motivadamente declarados na sentença.
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Parágrafo único. O condenado por crime a que a lei comina pena privativa de liberdade por tempo inferior, no mínimo, a um ano, se na sentença foram reconhecidas as condições do parágrafo único do art. 22, é internado em casa de custódia e tratamento durante seis meses, pelo menos, ou, se mais conven~~
+- [ ] **art110.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art110)
+  - § 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação ou depois de improvido seu recurso, regula-se pela pena aplicada, não podendo, em nenhuma hipótese, ter por termo inicial data anterior à da denúncia ou queixa. .
+  - Nota: (Redação dada pela Lei nº 12.234, de 2010)
+  - Redação anterior (tachado): ~~§ 1º A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, regula-se, também, pela pena aplicada e verifica-se nos mesmos prazos. (Renumerado do parágrafo único pela Lei nº 6.416, de 1977)~~
+  - Redação anterior (tachado): ~~§ 1º - A prescrição, depois da sentença condenatória com trânsito em julgado para a acusação, ou depois de improvido seu recurso, regula-se pela pena aplicada. (Redação dada pela Lei nº 7.209, de 11.7.1984)~~
+- [ ] **art112** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art112)
+  - Nome: Termo inicial da prescrição após a sentença condenatória irrecorrível
+  - Art. 112 - No caso do art. 110 deste Código, a prescrição começa a correr:
+  - Nota: (Redação dada pela Lei nº 7.209, de 11.7.1984)
+  - Redação anterior (tachado): ~~Art. 112. No caso do art. 110, a prescrição começa a correr:~~
+  - Redação anterior (tachado) [lida como art112.alA]: ~~a) do dia em que passa em julgado a sentença condenatória ou a que revoga a suspensão condicional da pena ou o livramento condicional;~~
+  - Redação anterior (tachado) [lida como art112.alB]: ~~b) do dia em que se interrompe a execução, salvo quando o tempo da interrupção deva computar-se na pena.~~
+- [ ] **art141.par2** (caso: duplicata) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art141)
+  - § 2º Se o crime é cometido ou divulgado em quaisquer modalidades das redes sociais da rede mundial de computadores, aplica-se em triplo a pena.
+  - Nota: (Incluído pela Lei nº 13.964, de 2019)
+  - Nota: (Vigência)
+  - Redação anterior (duplicata): ~~§ 2º - (vetado)~~
+- [ ] **art148.par1.incIII** (texto diferente na compilada) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art148)
+  - III - se a privação da liberdade dura mais de 15 (quinze) dias.
+- [ ] **art171.par5** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - § 5º (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~§ 5º Somente se procede mediante representação, salvo se a vítima for: (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+- [ ] **art171.par5.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm#art171)
+  - I – (revogado)
+  - Nota: (Redação dada pela Lei nº 15.397, de 2026)
+  - Redação anterior (revogacao): ~~I - a Administração Pública, direta ou indireta; (Incluído pela Lei nº 13.964, de 2019) (Revogado pela Lei nº 15.397, de 2026)~~
+
+---
 
 ## Como conferir (~30 min)
 
