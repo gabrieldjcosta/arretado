@@ -21,181 +21,181 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 
 ## Amostra (50 dispositivos)
 
-- [ ] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art1)
+- [x] **art1** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art1)
   - Art. 1º A República Federativa do Brasil, formada pela união indissolúvel dos Estados e Municípios e do Distrito Federal, constitui-se em Estado Democrático de Direito e tem como fundamentos:
-- [ ] **art5.incLXXIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art5)
+- [x] **art5.incLXXIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art5)
   - LXXIII - qualquer cidadão é parte legítima para propor ação popular que vise a anular ato lesivo ao patrimônio público ou de entidade de que o Estado participe, à moralidade administrativa, ao meio ambiente e ao patrimônio histórico e cultural, ficando o autor, salvo comprovada má-fé, isento de custas judiciais e do ônus da sucumbência;
-- [ ] **art22.incXXVI** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art22)
+- [x] **art22.incXXVI** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art22)
   - XXVI - atividades nucleares de qualquer natureza;
-- [ ] **art29.incIV.alK** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art29)
+- [x] **art29.incIV.alK** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art29)
   - k) 29 (vinte e nove) Vereadores, nos Municípios de mais de 750.000 (setecentos e cinquenta mil) habitantes e de até 900.000 (novecentos mil) habitantes;
   - Nota: (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)
-- [ ] **art32** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+- [x] **art32** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
   - Art. 32. O Distrito Federal, vedada sua divisão em Municípios, reger- se-á por lei orgânica, votada em dois turnos com interstício mínimo de dez dias, e aprovada por dois terços da Câmara Legislativa, que a promulgará, atendidos os princípios estabelecidos nesta Constituição.
-- [ ] **art40.par1.incI** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art40)
+- [x] **art40.par1.incI** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art40)
   - I - por incapacidade permanente para o trabalho, no cargo em que estiver investido, quando insuscetível de readaptação, hipótese em que será obrigatória a realização de avaliações periódicas para verificação da continuidade das condições que ensejaram a concessão da aposentadoria, na forma de lei do respectivo ente federativo;
   - Nota: (Redação dada pela Emenda Constitucional nº 103, de 2019)
   - Redação anterior (tachado): ~~I - por invalidez permanente, sendo os proventos proporcionais ao tempo de contribuição, exceto se decorrente de acidente em serviço, moléstia profissional ou doença grave, contagiosa ou incurável, especificadas em lei; (Redação dada pela Emenda Constitucional nº 20, de 1998)~~
   - Redação anterior (tachado): ~~I - por invalidez permanente, sendo os proventos proporcionais ao tempo de contribuição, exceto se decorrente de acidente em serviço, moléstia profissional ou doença grave, contagiosa ou incurável, na forma da lei; (Redação dada pela Emenda Constitucional nº 41, 19.12.2003)~~
-- [ ] **art40.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art40)
+- [x] **art40.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art40)
   - § 3º As regras para cálculo de proventos de aposentadoria serão disciplinadas em lei do respectivo ente federativo.
   - Nota: (Redação dada pela Emenda Constitucional nº 103, de 2019)
   - Redação anterior (tachado): ~~§ 3º - O tempo de serviço público federal, estadual ou municipal será computado integralmente para os efeitos de aposentadoria e de disponibilidade.~~
   - Redação anterior (tachado): ~~§ 3º Os proventos de aposentadoria, por ocasião da sua concessão, serão calculados com base na remuneração do servidor no cargo efetivo em que se der a aposentadoria e, na forma da lei, corresponderão à totalidade da remuneração. (Redação dada pela Emenda Constitucional nº 20, de 15/12/98)~~
   - Redação anterior (tachado): ~~§ 3º Para o cálculo dos proventos de aposentadoria, por ocasião da sua concessão, serão consideradas as remunerações utilizadas como base para as contribuições do servidor aos regimes de previdência de que tratam este artigo e o art. 201, na forma da lei. (Redação dada pela Emenda Constitucional nº ~~
-- [ ] **art62.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art62)
+- [x] **art62.par3** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art62)
   - § 3º As medidas provisórias, ressalvado o disposto nos §§ 11 e 12 perderão eficácia, desde a edição, se não forem convertidas em lei no prazo de sessenta dias, prorrogável, nos termos do § 7º, uma vez por igual período, devendo o Congresso Nacional disciplinar, por decreto legislativo, as relações jurídicas delas decorrentes.
   - Nota: (Incluído pela Emenda Constitucional nº 32, de 2001)
-- [ ] **art96.incIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art96)
+- [x] **art96.incIII** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art96)
   - III - aos Tribunais de Justiça julgar os juízes estaduais e do Distrito Federal e Territórios, bem como os membros do Ministério Público, nos crimes comuns e de responsabilidade, ressalvada a competência da Justiça Eleitoral.
-- [ ] **art98** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art98)
+- [x] **art98** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art98)
   - Art. 98. A União, no Distrito Federal e nos Territórios, e os Estados criarão:
   - Redação anterior (tachado) [lida como art98.parUnico]: ~~Parágrafo único. Lei federal disporá sobre a criação de juizados especiais no âmbito da Justiça Federal. (Incluído pela Emenda Constitucional nº 22, de 1999)~~
-- [ ] **art100.par11** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art100)
+- [x] **art100.par11** (caso: tachado-parcial) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art100)
   - § 11. É facultada ao credor, conforme estabelecido em lei do ente federativo devedor, , a oferta de créditos líquidos e certos que originalmente lhe são próprios ou adquiridos de terceiros reconhecidos pelo ente federativo ou por decisão judicial transitada em julgado para:
   - Nota: (Redação dada pela Emenda Constitucional nº 113, de 2021)
   - Nota: (Vide ADI 7047)
   - Nota: (Vide ADI 7064)
   - Redação anterior (revogacao): ~~§ 11. É facultada ao credor, conforme estabelecido em lei do ente federativo devedor, com auto aplicabilidade para a União, a oferta de créditos líquidos e certos que originalmente lhe são próprios ou adquiridos de terceiros reconhecidos pelo ente federativo ou por decisão judicial transitada em jul~~
   - Redação anterior (tachado): ~~§ 11. É facultada ao credor, conforme estabelecido em lei da entidade federativa devedora, a entrega de créditos em precatórios para compra de imóveis públicos do respectivo ente federado. (Incluído pela Emenda Constitucional nº 62, de 2009).~~
-- [ ] **art100.par19A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art100)
+- [x] **art100.par19A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art100)
   - § 19-A. A União fica autorizada a instituir linha de crédito especial, por intermédio de instituições financeiras estatais federais, destinada exclusivamente à quitação dos precatórios referidos no § 19 deste artigo, nos termos de lei complementar.
   - Nota: (Incluído pela Emenda Constitucional nº 136, de 2025)
-- [ ] **art101.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art101)
+- [x] **art101.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art101)
   - Parágrafo único. Os Ministros do Supremo Tribunal Federal serão nomeados pelo Presidente da República, depois de aprovada a escolha pela maioria absoluta do Senado Federal.
-- [ ] **art105.par3.incIII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art105)
+- [x] **art105.par3.incIII** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art105)
   - III - ações cujo valor da causa ultrapasse 500 (quinhentos) salários mínimos;
   - Nota: (Incluído pela Emenda Constitucional nº 125, de 2022)
-- [ ] **art111.par2** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art111)
+- [x] **art111.par2** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art111)
   - § 2º. (revogado)
   - Nota: (Revogado pela Emenda Constitucional nº 45, de 2004)
   - Redação anterior (revogacao): ~~§ 2º. O Tribunal encaminhará ao Presidente da República listas tríplices, observando-se, quanto às vagas destinadas aos advogados e aos membros do Ministério Público, o disposto no art. 94; as listas tríplices para o provimento de cargos destinados aos juízes da magistratura trabalhista de carreira ~~
   - Redação anterior (tachado): ~~§ 2º O Tribunal encaminhará ao Presidente da República listas tríplices, observando-se, quanto às vagas destinadas aos advogados e aos membros do Ministério Público, o disposto no art. 94, e, para as de classistas, o resultado de indicação de colégio eleitoral integrado pelas diretorias das confeder~~
-- [ ] **art114** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art114)
+- [x] **art114** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art114)
   - Art. 114. Compete à Justiça do Trabalho processar e julgar:
   - Nota: (Redação dada pela Emenda Constitucional nº 45, de 2004)
   - Nota: (Vide ADIN 3392)
   - Nota: (Vide ADIN 3432)
   - Redação anterior (tachado): ~~Art. 114. Compete à Justiça do Trabalho conciliar e julgar os dissídios individuais e coletivos entre trabalhadores e empregadores, abrangidos os entes de direito público externo e da administração pública direta e indireta dos Municípios, do Distrito Federal, dos Estados e da União, e, na forma da ~~
-- [ ] **art128.incI.alD** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art128)
+- [x] **art128.incI.alD** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art128)
   - d) o Ministério Público do Distrito Federal e Territórios;
-- [ ] **art134** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art134)
+- [x] **art134** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art134)
   - Art. 134. A Defensoria Pública é instituição permanente, essencial à função jurisdicional do Estado, incumbindo-lhe, como expressão e instrumento do regime democrático, fundamentalmente, a orientação jurídica, a promoção dos direitos humanos e a defesa, em todos os graus, judicial e extrajudicial, dos direitos individuais e coletivos, de forma integral e gratuita, aos necessitados, na forma do inciso LXXIV do art. 5º desta Constituição Federal .
   - Nota: (Redação dada pela Emenda Constitucional nº 80, de 2014)
   - Redação anterior (tachado): ~~Art. 134. A Defensoria Pública é instituição essencial à função jurisdicional do Estado, incumbindo-lhe a orientação jurídica e a defesa, em todos os graus, dos necessitados, na forma do art. 5º, LXXIV.)~~
   - Redação anterior (tachado) [lida como art134.parUnico]: ~~Parágrafo único. Lei complementar organizará a Defensoria Pública da União e do Distrito Federal e dos Territórios e prescreverá normas gerais para sua organização nos Estados, em cargos de carreira, providos, na classe inicial, mediante concurso público de provas e títulos, assegurada a seus integr~~
-- [ ] **art146.incIII.alA** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art146)
+- [x] **art146.incIII.alA** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art146)
   - a) definição de tributos e de suas espécies, bem como, em relação aos impostos discriminados nesta Constituição, a dos respectivos fatos geradores, bases de cálculo e contribuintes;
-- [ ] **art149A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art149a)
+- [x] **art149A** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art149a)
   - Art. 149-A. Os Municípios e o Distrito Federal poderão instituir contribuição, na forma das respectivas leis, para o custeio, a expansão e a melhoria do serviço de iluminação pública e de sistemas de monitoramento para segurança e preservação de logradouros públicos, observado o disposto no art. 150, I e III.
   - Nota: (Redação dada pela Emenda Constitucional nº 132, de 2023)
   - Redação anterior (tachado): ~~Art. 149-A Os Municípios e o Distrito Federal poderão instituir contribuição, na forma das respectivas leis, para o custeio do serviço de iluminação pública, observado o disposto no art. 150, I e III. (Incluído pela Emenda Constitucional nº 39, de 2002)~~
-- [ ] **art156A.par6.incII.alA** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art156a)
+- [x] **art156A.par6.incII.alA** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art156a)
   - a) alterações nas alíquotas, nas regras de creditamento e na base de cálculo, admitida, em relação aos adquirentes dos bens e serviços de que trata este inciso, a não aplicação do disposto no § 1º, VIII;
   - Nota: (Incluído pela Emenda Constitucional nº 132, de 2023)
-- [ ] **art164** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+- [x] **art164** (divergência decidida) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
   - Art. 164. A competência da União para emitir moeda será exercida exclusivamente pelo banco central.
-- [ ] **art166.par9A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art166)
+- [x] **art166.par9A** (parágrafo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art166)
   - § 9º-A Do limite a que se refere o § 9º deste artigo, 1,55% (um inteiro e cinquenta e cinco centésimos por cento) caberá às emendas de Deputados e 0,45% (quarenta e cinco centésimos por cento) às de Senadores.
   - Nota: (Incluído pela Emenda Constitucional nº 126, de 2022)
   - Nota: (Vide ADI 7697)
-- [ ] **art167A.incIV.alD** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167a)
+- [x] **art167A.incIV.alD** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167a)
   - d) as reposições de temporários para prestação de serviço militar e de alunos de órgãos de formação de militares;
   - Nota: (Incluído pela Emenda Constitucional nº 109, de 2021)
-- [ ] **art167D** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167d)
+- [x] **art167D** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art167d)
   - Art. 167-D. As proposições legislativas e os atos do Poder Executivo com propósito exclusivo de enfrentar a calamidade e suas consequências sociais e econômicas, com vigência e efeitos restritos à sua duração, desde que não impliquem despesa obrigatória de caráter continuado, ficam dispensados da observância das limitações legais quanto à criação, à expansão ou ao aperfeiçoamento de ação governamental que acarrete aumento de despesa e à concessão ou à ampliação de incentivo ou benefício de natureza tributária da qual decorra renúncia de receita.
   - Nota: (Incluído pela Emenda Constitucional nº 109, de 2021)
-- [ ] **art171.par1** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art171)
+- [x] **art171.par1** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art171)
   - § 1º - (revogado)
   - Nota: (Revogado pela Emenda Constitucional nº 6, de 1995)
   - Redação anterior (revogacao): ~~§ 1º - A lei poderá, em relação à empresa brasileira de capital nacional: (Revogado pela Emenda Constitucional nº 6, de 1995)~~
-- [ ] **art195.par13** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art195)
+- [x] **art195.par13** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art195)
   - § 13. (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 103, de 2019)
   - Redação anterior (revogacao): ~~§ 13. Aplica-se o disposto no § 12 inclusive na hipótese de substituição gradual, total ou parcial, da contribuição incidente na forma do inciso I, a, pela incidente sobre a receita ou o faturamento. (Incluído pela Emenda Constitucional nº 42, de 19.12.2003) (Revogado pela Emenda Constitucional nº 1~~
-- [ ] **art198.par3.incIV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
+- [x] **art198.par3.incIV** (parágrafo, inciso ou alínea revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
   - IV - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 86, de 2015)
   - Redação anterior (tachado): ~~IV - as normas de cálculo do montante a ser aplicado pela União; (Incluído pela Emenda Constitucional nº 29, de 2000)~~
-- [ ] **art198.par6** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
+- [x] **art198.par6** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art198)
   - § 6º Além das hipóteses previstas no § 1º do art. 41 e no § 4º do art. 169 da Constituição Federal, o servidor que exerça funções equivalentes às de agente comunitário de saúde ou de agente de combate às endemias poderá perder o cargo em caso de descumprimento dos requisitos específicos, fixados em lei, para o seu exercício.
   - Nota: (Incluído pela Emenda Constitucional nº 51, de 2006)
-- [ ] **art212A.incX.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art212a)
+- [x] **art212A.incX.alA** (alínea) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art212a)
   - a) a organização dos fundos referidos no inciso I do caput deste artigo e a distribuição proporcional de seus recursos, as diferenças e as ponderações quanto ao valor anual por aluno entre etapas, modalidades, duração da jornada e tipos de estabelecimento de ensino, observados as respectivas especificidades e os insumos necessários para a garantia de sua qualidade;
   - Nota: (Incluído pela Emenda Constitucional nº 108, de 2020)
-- [ ] **art220** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art220)
+- [x] **art220** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art220)
   - Art. 220. A manifestação do pensamento, a criação, a expressão e a informação, sob qualquer forma, processo ou veículo não sofrerão qualquer restrição, observado o disposto nesta Constituição.
-- [ ] **art227.par3.incIV** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art227)
+- [x] **art227.par3.incIV** (inciso de parágrafo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art227)
   - IV - garantia de pleno e formal conhecimento da atribuição de ato infracional, igualdade na relação processual e defesa técnica por profissional habilitado, segundo dispuser a legislação tutelar específica;
-- [ ] **adct.art24** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart24)
+- [x] **adct.art24** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart24)
   - Art. 24. A União, os Estados, o Distrito Federal e os Municípios editarão leis que estabeleçam critérios para a compatibilização de seus quadros de pessoal ao disposto no art. 39 da Constituição e à reforma administrativa dela decorrente, no prazo de dezoito meses, contados da sua promulgação.
-- [ ] **adct.art27.par10** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart27)
+- [x] **adct.art27.par10** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart27)
   - § 10. Compete à Justiça Federal julgar as ações nela propostas até a data da promulgação da Constituição, e aos Tribunais Regionais Federais bem como ao Superior Tribunal de Justiça julgar as ações rescisórias das decisões até então proferidas pela Justiça Federal, inclusive daquelas cuja matéria tenha passado à competência de outro ramo do Judiciário.
-- [ ] **adct.art42.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart42)
+- [x] **adct.art42.parUnico** (parágrafo único) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart42)
   - Parágrafo único. Dos percentuais previstos nos incisos I e II do caput, no mínimo 50% (cinquenta por cento) serão destinados a projetos de irrigação que beneficiem agricultores familiares que atendam aos requisitos previstos em legislação específica.
   - Nota: (Incluído pela Emenda Constitucional nº 89, de 2015)
-- [ ] **adct.art60.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart60)
+- [x] **adct.art60.par1** (várias redações anteriores) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart60)
   - § 1º A parcela da complementação de que trata a alínea "b" do inciso V do caput do art. 212-A da Constituição Federal observará, no mínimo, os seguintes valores:
   - Nota: (Redação dada pela Emenda Constitucional nº 108, de 2020)
   - Redação anterior (tachado): ~~§ 1º A distribuição de responsabilidades e recursos entre os Estados e seus Municípios a ser concretizada com parte dos recursos definidos neste artigo, na forma do disposto no art. 211 da Constituição Federal, é assegurada mediante a criação, no âmbito de cada Estado e do Distrito Federal, de um Fu~~
   - Redação anterior (tachado): ~~§ 1º A União, os Estados, o Distrito Federal e os Municípios deverão assegurar, no financiamento da educação básica, a melhoria da qualidade de ensino, de forma a garantir padrão mínimo definido nacionalmente. (Redação dada pela Emenda Constitucional nº 53, de 2006).~~
-- [ ] **adct.art70** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart70)
+- [x] **adct.art70** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart70)
   - Art. 70. Fica mantida atual competência dos tribunais estaduais até que a mesma seja definida na Constituição do Estado, nos termos do art. 125, § 1º, da Constituição.
-- [ ] **adct.art72.par5** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart72)
+- [x] **adct.art72.par5** (redação anterior no ancestral) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart72)
   - § 5º A parcela dos recursos provenientes do imposto sobre renda e proventos de qualquer natureza, destinada ao Fundo Social de Emergência, nos termos do inciso II deste artigo, não poderá exceder a cinco inteiros e seis décimos por cento do total do produto da sua arrecadação.
   - Nota: (Redação dada pela Emenda Constitucional nº 10, de 1996)
   - Redação anterior (tachado): ~~§ 5.º A parcela dos recursos provenientes do imposto sobre propriedade territorial rural e do imposto sobre renda e proventos de qualquer natureza, destinada ao Fundo Social de Emergência, nos termos do inciso II deste artigo, não poderá exceder: (Incluído pela Emenda Constitucional de Revisão nº 1,~~
   - Redação anterior (tachado) [lida como adct.art72.par5.incI]: ~~I - no caso do imposto sobre propriedade territorial rural, a oitenta e seis inteiros e dois décimos por cento do total do produto da sua arrecadação; (Incluído pela Emenda Constitucional de Revisão nº 1, de 1994)~~
   - Redação anterior (tachado) [lida como adct.art72.par5.incII]: ~~II - no caso do imposto sobre renda e proventos de qualquer natureza, a cinco inteiros e seis décimos por cento do total do produto da sua arrecadação. (Incluído pela Emenda Constitucional de Revisão nº 1, de 1994)~~
-- [ ] **adct.art76B** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart76b)
+- [x] **adct.art76B** (artigo com sufixo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart76b)
   - Art. 76-B. São desvinculadas de órgão, fundo ou despesa, até 31 de dezembro de 2032, as receitas dos Municípios relativas a impostos, contribuições, taxas e multas, já instituídos ou que vierem a ser criados até a referida data, seus adicionais e respectivos acréscimos legais, e outras receitas correntes, de acordo com os seguintes percentuais:
   - Nota: (Redação dada pela Emenda Constitucional nº 136, de 2025)
   - Redação anterior (tachado): ~~Art. 76-B. São desvinculados de órgão, fundo ou despesa, até 31 de dezembro de 2023, 30% (trinta por cento) das receitas dos Municípios relativas a impostos, taxas e multas, já instituídos ou que vierem a ser criados até a referida data, seus adicionais e respectivos acréscimos legais, e outras rece~~
   - Redação anterior (tachado): ~~Art. 76-B. São desvinculados de órgão, fundo ou despesa, até 31 de dezembro de 2032, 30% (trinta por cento) das receitas dos Municípios relativas a impostos, taxas e multas, já instituídos ou que vierem a ser criados até a referida data, seus adicionais e respectivos acréscimos legais, e outras rece~~
   - Redação anterior (tachado) [lida como adct.art76B.parUnico]: ~~Parágrafo único. Excetuam-se da desvinculação de que trata o caput: (Incluído dada pela Emenda constitucional nº 93, de 2016) Produção de efeitos~~
-- [ ] **adct.art82.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart82)
+- [x] **adct.art82.par2** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart82)
   - § 2º Para o financiamento dos Fundos Municipais, poderá ser criado adicional de até meio ponto percentual na alíquota do Imposto sobre serviços ou do imposto que vier a substituí-lo, sobre serviços supérfluos.
   - Nota: (Incluído pela Emenda Constitucional nº 31, de 2000)
   - Nota: (Vide Emenda Constitucional nº 132, de 2023)
   - Nota: Vigência
-- [ ] **adct.art91** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart91)
+- [x] **adct.art91** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart91)
   - Art. 91. (revogado)
   - Nota: (Revogado pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~Art. 91. A União entregará aos Estados e ao Distrito Federal o montante definido em lei complementar, de acordo com critérios, prazos e condições nela determinados, podendo considerar as exportações para o exterior de produtos primários e semi-elaborados, a relação entre as exportações e as importaç~~
-- [ ] **adct.art101.par4** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
+- [x] **adct.art101.par4** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
   - § 4º (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~§ 4º No prazo de até seis meses contados da entrada em vigor do regime especial a que se refere este artigo, a União, diretamente, ou por intermédio das instituições financeiras oficiais sob seu controle, disponibilizará aos Estados, ao Distrito Federal e aos Municípios, bem como às respectivas auta~~
-- [ ] **adct.art101.par4.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
+- [x] **adct.art101.par4.incI** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
   - I - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~I - no financiamento dos saldos remanescentes de precatórios a pagar a que se refere este parágrafo serão adotados os índices e critérios de atualização que incidem sobre o pagamento de precatórios, nos termos do § 12 do art. 100 da Constituição Federal; (Incluído pela Emenda constitucional nº 99, d~~
-- [ ] **adct.art101.par4.incII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
+- [x] **adct.art101.par4.incII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
   - II - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~II - o financiamento dos saldos remanescentes de precatórios a pagar a que se refere este parágrafo será feito em parcelas mensais suficientes à satisfação da dívida assim constituída; (Incluído pela Emenda constitucional nº 99, de 2017) (Revogado pela Emenda Constitucional nº 109, de 2021)~~
-- [ ] **adct.art101.par4.incIII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
+- [x] **adct.art101.par4.incIII** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
   - III - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~III - o valor de cada parcela a que se refere o inciso II deste parágrafo será calculado percentualmente sobre a receita corrente líquida, respectivamente, do Estado, do Distrito Federal e do Município, no segundo mês anterior ao pagamento, em percentual equivalente à média do comprometimento percen~~
-- [ ] **adct.art101.par4.incIV** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
+- [x] **adct.art101.par4.incIV** (caso: revogacao-reescrita) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart101)
   - IV - (revogado)
   - Nota: (Redação dada pela Emenda Constitucional nº 109, de 2021)
   - Redação anterior (revogacao): ~~IV - nos empréstimos a que se refere este parágrafo não se aplicam os limites de endividamento de que tratam os incisos VI e VII do caput do art. 52 da Constituição Federal e quaisquer outros limites de endividamento previstos em lei. (Incluído pela Emenda constitucional nº 99, de 2017) (Revogado pe~~
-- [ ] **adct.art111** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart111)
+- [x] **adct.art111** (artigo revogado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart111)
   - Art. 111. (revogado)
   - Nota: (Revogado pela Emenda Constitucional nº 126, de 2022)
   - Redação anterior (revogacao): ~~Art. 111. A partir do exercício financeiro de 2018, até o exercício financeiro de 2022, a aprovação e a execução previstas nos §§ 9º e 11 do art. 166 da Constituição Federal corresponderão ao montante de execução obrigatória para o exercício de 2017, corrigido na forma estabelecida no inciso II do §~~
   - Redação anterior (tachado): ~~Art. 111. A partir do exercício financeiro de 2018, até o último exercício de vigência do Novo Regime Fiscal, a aprovação e a execução previstas nos §§ 9º e 11 do art. 166 da Constituição Federal corresponderão ao montante de execução obrigatória para o exercício de 2017, corrigido na forma estabele~~
-- [ ] **adct.art115** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart115)
+- [x] **adct.art115** (artigo de bloco com numeração própria) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart115)
   - Art. 115. Fica excepcionalmente autorizado o parcelamento das contribuições previdenciárias e dos demais débitos dos Estados, do Distrito Federal e dos Municípios, incluídas suas autarquias e fundações, com os respectivos regimes próprios de previdência social, com vencimento até 31 de agosto de 2025, inclusive os parcelados anteriormente, no prazo máximo de 300 (trezentas) prestações mensais, mediante autorização em lei específica do ente federativo, desde que comprovem, em até 15 (quinze) meses após a data da promulgação da alteração deste caput, ter aderido ao Programa de Regularidade Previdenciária junto ao Ministério da Previdência Social e alterado a respectiva legislação do regime próprio de previdência social para atendimento das seguintes condições, cumulativamente:
   - Nota: (Redação dada pela Emenda Constitucional nº 136, de 2025)
   - Redação anterior (tachado): ~~Art. 115. Fica excepcionalmente autorizado o parcelamento das contribuições previdenciárias e dos demais débitos dos Municípios, incluídas suas autarquias e fundações, com os respectivos regimes próprios de previdência social, com vencimento até 31 de outubro de 2021, inclusive os parcelados anterio~~
   - Redação anterior (tachado) [lida como adct.art115.parUnico]: ~~Parágrafo único. Ato do Ministério do Trabalho e Previdência, no âmbito de suas competências, definirá os critérios para o parcelamento previsto neste artigo, inclusive quanto ao cumprimento do disposto nos incisos I, II, III e IV do caput deste artigo, bem como disponibilizará as informações aos Mu~~
-- [ ] **adct.art120.parUnico.incIII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart120)
+- [x] **adct.art120.parUnico.incIII.alB** (espaçado) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart120)
   - b) à renúncia de receita que possa ocorrer.
   - Nota: (Incluída pela Emenda Constitucional nº 123, de 2022)
-- [ ] **adct.art138** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart138)
+- [x] **adct.art138** (primeiro e último artigo) — [abrir](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#adctart138)
   - Art. 138. Até 2032, qualquer criação, alteração ou prorrogação de vinculação legal ou constitucional de receitas a despesas, inclusive na hipótese de aplicação mínima de montante de recursos, não poderá resultar em crescimento anual da respectiva despesa primária superior à variação do limite de despesas primárias, na forma prevista na lei complementar de que trata o art. 6º da Emenda Constitucional nº 126, de 21 de dezembro de 2022.
   - Nota: (Incluído pela Emenda Constitucional nº 135, de 2024)
 
