@@ -47,6 +47,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** `UNKNOWN: lstat 'C:\'` e falha ao abrir arquivos do `node_modules`; `Cannot find module '…node_modules…'` de um arquivo que existe (`uuid`, `@testing-library/user-event`, `dom-accessibility-api`), logo depois de um `npm ci` num worktree novo; teste de tela do `App.test.tsx` que não acha um texto ("Importação concluída", "Sem conexão") e passa sozinho; ou o boot do PGlite estoura o `beforeAll` do `supabase/rls.test.ts`. Em 23/09/2026, duas de quatro rodadas falharam assim; na 8.1, quatro rodadas seguidas, cada uma num teste diferente. **Causa:** sistema de arquivos e CPU do Windows sob carga (antivírus lendo o `node_modules` recém-instalado, agentes rodando em paralelo), sem relação com o código.
 - **Solução:** rodar de novo, sem outra carga na máquina; para confirmar o código, `npx vitest run --project unidade --maxWorkers=4` (486 testes verdes na 8.1) e o CI do PR, que roda no Linux. **Prevenção:** o `beforeAll` do PGlite tem 60 s desde a 8.1 (o timeout se repetiu).
 - **Origem:** ocorrido em 23/09/2026 (registrado em d87ddca; de novo na 8.1).
+- **Atualização (24/09/2026):** o "Sem conexão" falhou também no CI (Linux), no PR #11. Causa no teste: ele conferia o texto logo depois do evento `offline`, e a assinatura do `useSyncExternalStore` é um efeito que, sob carga, pode chegar depois. O teste passou a esperar (`findByText` e `waitFor`). Ao ver de novo "não acha um texto" em teste de tela, procurar a mesma causa (conferência síncrona logo depois de um evento) antes de rodar de novo.
 
 ### `format:check` reprova `.claude/settings.local.json`
 - **Sintoma:** `npm run check` para no Prettier apontando `.claude/settings.local.json`, sem mudança no código. **Causa:** o Claude Code grava as permissões da sessão nesse arquivo dentro do worktree; o git o ignora (ignore global do usuário), mas o Prettier o verificava.
@@ -367,6 +368,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** "✗ cdc: marcador \"art. 1º\" ausente" e "só 14 tachados — não parece a página com todas as redações". **Causa:** o CDC escreve "Art. 1°" com sinal de grau (como a ALESP), e é pouco alterado: 14 tachados, abaixo do `LIMIAR_TACHADOS` (20).
 - **Solução:** marcador com "°" e `limiarTachados: 10` na entrada do catálogo (`scripts/corpus/normas.mjs`); a compilada tem 0. **Prevenção:** ao acrescentar norma, conferir o ordinal do "Art. 1" e contar os tachados das duas variantes antes de fixar o limiar.
 - **Origem:** ocorrido em 24/09/2026.
+
+### Número solto no fim do texto do dispositivo
+- **Sintoma:** texto que termina em "… às presas. 7.627" (LEP, art. 18-A, § 3º), apontado pelo Gabriel na conferência. **Causa:** a fonte põe, logo depois da frase, um link cujo texto é só o número de outro ato (`<a href="…/D7627.htm">7.627</a>`, o Decreto 7.627/2011); a compilada não o traz.
+- **Solução:** no gabarito, número com ponto de milhar depois de ".", ";" ou ":" e no fim do texto vira nota (`RE_NUMERO_SOLTO` em `scripts/corpus/gabarito.mjs`). **Prevenção:** o estruturador (8.5) trata o mesmo caso ao separar as notas; o sinal mais forte é o link para outro ato.
+- **Origem:** ocorrido em 24/09/2026 (conferência da LEP).
 
 ### A lei some depois do começo da página
 - **Sintoma:** CP ou CF estruturados só com o cabeçalho. **Causa:** `</body></html>` logo no início do arquivo (o `</html>` no byte 4.613 do CP e 133.966 da CF), com a lei inteira depois.

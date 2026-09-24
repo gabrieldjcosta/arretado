@@ -21,10 +21,12 @@
     "sequencia"
   ],
   "conferencia": {
-    "estado": "pendente",
-    "por": null,
-    "em": null,
-    "observacoes": []
+    "estado": "conferida",
+    "por": "Gabriel",
+    "em": "2026-09-24",
+    "observacoes": [
+      "Conferência reduzida: os 10 itens de risco do topo da folha docs/conferencias/gabarito-cp.md (commit d5e084b), todos sem divergência; o resto da amostra dispensado depois da CF sem divergência."
+    ]
   },
   "ultimoArtigo": "art361",
   "contagens": {

@@ -189,12 +189,17 @@ describe('estados universais (5.6)', () => {
     act(() => {
       window.dispatchEvent(new Event('offline'));
     });
-    expect(screen.getByText('Sem conexão — tudo continua funcionando.')).toBeInTheDocument();
+    // Espera: sob carga, a assinatura do useSyncExternalStore (efeito) pode chegar depois do evento.
+    expect(await screen.findByText('Sem conexão — tudo continua funcionando.')).toBeInTheDocument();
     online.mockReturnValue(true);
     act(() => {
       window.dispatchEvent(new Event('online'));
     });
-    expect(screen.queryByText('Sem conexão — tudo continua funcionando.')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Sem conexão — tudo continua funcionando.'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('falha ao abrir o banco explica o que fazer e que nada foi perdido', async () => {
