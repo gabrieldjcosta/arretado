@@ -139,6 +139,21 @@ export const Marcacao = z.strictObject({
 });
 export type Marcacao = z.infer<typeof Marcacao>;
 
+/**
+ * Onde o usuário parou numa norma (F2, 9.1). Pessoal, por isso fora de Norma, que é conteúdo (D12).
+ * Um registro por norma; "lido até" só avança por ação do usuário ou do modo foco (11.8).
+ */
+export const Leitura = z.strictObject({
+  ...camposComuns,
+  normaId: Id,
+  /** Último dispositivo lido. */
+  lidoAteId: Id.optional(),
+  /** Dispositivo no topo da tela ao sair (retomar a leitura). */
+  posicaoId: Id.optional(),
+  ultimaLeituraEm: Instante.optional(),
+});
+export type Leitura = z.infer<typeof Leitura>;
+
 /** Estrela com origem (D15): direta, herdada de nó, de pacote ou exceção negativa. */
 export const Estrela = z.strictObject({
   ...camposComuns,

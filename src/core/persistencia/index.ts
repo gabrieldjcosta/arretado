@@ -2,8 +2,10 @@ export {
   apagarBanco,
   BancoArretado,
   NOME_BANCO_PRINCIPAL,
+  esquemaDaVersao,
   VERSAO_ESQUEMA,
   type Alteracao,
+  type MotivoFechamento,
 } from './banco';
 export {
   Colecao,

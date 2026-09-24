@@ -1,6 +1,12 @@
 // Leitura e validação do pacote (docs/formato-pacote.md, "Validação na importação").
 import { unzipSync } from 'fflate';
-import { ENTIDADES, NOMES_COLECOES, colecoesDoModulo, type NomeColecao } from '../modelo';
+import {
+  ENTIDADES,
+  NOMES_COLECOES,
+  colecoesDoModulo,
+  versaoDeOrigem,
+  type NomeColecao,
+} from '../modelo';
 import { VERSAO_ESQUEMA } from '../persistencia';
 import { deBytes, sha256 } from './bytes';
 import { decifrar } from './cifra';
@@ -126,8 +132,11 @@ export async function lerPacote(
   }
 
   // Registros: toda coleção dos módulos presente, todo registro válido e do usuário do pacote.
+  // Pacote de esquema anterior não traz as coleções nascidas depois: entram vazias (migração).
   const registros = new Map<NomeColecao, Record<string, unknown>[]>();
-  const esperadas = new Set(manifesto.modulos.flatMap((mod) => colecoesDoModulo(mod)));
+  const doModulo = manifesto.modulos.flatMap((mod) => colecoesDoModulo(mod));
+  const esperadas = new Set(doModulo.filter((n) => versaoDeOrigem(n) <= manifesto.versaoEsquema));
+  for (const nome of doModulo) if (!esperadas.has(nome)) registros.set(nome, []);
   for (const caminho of declarados.filter((c) => c.startsWith(PASTA_DADOS))) {
     const nome = caminho.slice(PASTA_DADOS.length).replace(/\.json$/, '') as NomeColecao;
     if (!NOMES_COLECOES.includes(nome) || !esperadas.has(nome)) {

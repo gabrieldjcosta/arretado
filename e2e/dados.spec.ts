@@ -71,3 +71,35 @@ test('funciona sem rede depois de carregado', async ({ page, context }) => {
   await expect(page.getByText(/aguardando envio/)).toBeVisible();
   await context.setOffline(false);
 });
+
+test('aba aberta avisa quando outra aba sobe o esquema do banco (9.1)', async ({ page }) => {
+  await page.goto('/#/conta/dados');
+  await expect(page.getByRole('button', { name: 'Exportar' })).toBeVisible();
+
+  // Outra conexão abre o banco numa versão maior, como fará a próxima versão do app em outra aba.
+  await page.evaluate(async () => {
+    const atual = await new Promise<number>((ok, falha) => {
+      const r = indexedDB.open('arretado');
+      r.onsuccess = () => {
+        ok(r.result.version);
+        r.result.close();
+      };
+      r.onerror = () => {
+        falha(new Error(String(r.error)));
+      };
+    });
+    await new Promise<void>((ok, falha) => {
+      const r = indexedDB.open('arretado', atual + 10);
+      r.onsuccess = () => {
+        r.result.close();
+        ok();
+      };
+      r.onerror = () => {
+        falha(new Error(String(r.error)));
+      };
+    });
+  });
+
+  await expect(page.getByRole('alert')).toContainText('O Arretado foi atualizado em outra aba.');
+  await expect(page.getByRole('alert')).toContainText('Recarregue esta página');
+});
