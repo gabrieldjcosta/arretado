@@ -1,12 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Repositorio } from '../../core/persistencia';
+import { Repositorio, type MotivoFechamento } from '../../core/persistencia';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
 
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'pronto'; repo: Repositorio }
-  | { tipo: 'falha'; excecao: unknown };
+  | { tipo: 'falha'; excecao: unknown }
+  /** Outra aba subiu o esquema (versão nova do app) ou apagou os dados. */
+  | { tipo: 'fechadoPorOutraAba'; motivo: MotivoFechamento };
 
 const abrirPadrao = () => Repositorio.abrir();
 
@@ -22,9 +24,14 @@ export function ProvedorRepositorio({
 
   useEffect(() => {
     let ativo = true;
+    let desinscrever = () => {};
     abrir().then(
       (repo) => {
-        if (ativo) setEstado({ tipo: 'pronto', repo });
+        if (!ativo) return;
+        desinscrever = repo.db.aoFecharPorOutraAba((motivo) => {
+          setEstado({ tipo: 'fechadoPorOutraAba', motivo });
+        });
+        setEstado({ tipo: 'pronto', repo });
       },
       (excecao: unknown) => {
         if (ativo) setEstado({ tipo: 'falha', excecao });
@@ -32,6 +39,7 @@ export function ProvedorRepositorio({
     );
     return () => {
       ativo = false;
+      desinscrever();
     };
   }, [abrir]);
 
@@ -49,6 +57,25 @@ export function ProvedorRepositorio({
           oQue="Não foi possível abrir os dados deste aparelho."
           oQueFazer="Feche as outras abas do Arretado e recarregue a página. Se o navegador estiver em modo privado, use uma janela normal."
         />
+      </main>
+    );
+  }
+  if (estado.tipo === 'fechadoPorOutraAba') {
+    return (
+      <main className="conteudo">
+        {estado.motivo === 'versao' ? (
+          <Falha
+            oQue="O Arretado foi atualizado em outra aba."
+            oQueFazer="Recarregue esta página para usar a versão nova."
+          />
+        ) : (
+          <div className="aviso falha" role="alert">
+            <p>
+              <strong>Os dados deste aparelho foram apagados em outra aba.</strong>
+            </p>
+            <p>Recarregue esta página para começar de novo.</p>
+          </div>
+        )}
       </main>
     );
   }

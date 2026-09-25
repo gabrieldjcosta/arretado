@@ -55,7 +55,7 @@ Esquemas em `src/core/modelo/`: **S** `sistema.ts`, **P** `plano.ts`, **R** `rec
 | Texto de dispositivo | `TextoDeDispositivo` (L) | `textosDispositivo` | registros, catalogo | só esquema (F2) |
 | Marcação | `Marcacao` (L) | `marcacoes` | registros | só esquema (F2, 11.4) |
 | Estrela | `Estrela` (L) | `estrelas` | registros | só esquema (F2, 11.2) |
-| Leitura ("lido até", posição) | `Leitura` (proposto) | `leituras` (planejado, 9.1) | registros (exige migração) | planejado (F2, 9.1) |
+| Leitura ("lido até", posição) | `Leitura` (L) | `leituras` (desde o esquema v2; índice `[usuarioId+normaId]`) | registros (migração `20260924000000_colecao_leituras`) | só esquema (F2, 9.1; uso na 9.7) |
 | Pacote de incidência | `PacoteDeIncidencia` (L) | `pacotesIncidencia` | registros, catalogo | só esquema (F7) |
 | Adesão | `Adesao` (L) | `adesoes` | registros | só esquema (F7) |
 | Precedente | `Precedente` (B) | `precedentes` | registros | só esquema (F5) |
@@ -67,9 +67,9 @@ Esquemas em `src/core/modelo/`: **S** `sistema.ts`, **P** `plano.ts`, **R** `rec
 | Snapshot ("Ponto de restauração" na interface) | `Snapshot` (S) | `snapshots` + bytes em `snapshotsConteudo` | — | em uso |
 | Espaço separado | `Espaco` (S) | `espacos` | — | em uso |
 
-- **Tabelas Dexie fora de `ENTIDADES`** (`src/core/persistencia/banco.ts`, `BancoArretado`, `VERSAO_ESQUEMA = 1`, banco `arretado`): `alteracoes` (log), `meta` (chave `identidade` = `{ usuarioId, aparelhoId }`), `anexosConteudo`, `snapshotsConteudo` (`Conteudo { id, bytes }`).
-- **Demais tabelas remotas** (`arretado.*`, além de `registros`): `alteracoes` (espelho do log local), `posse_aparelho`, `curadores`, `catalogo`. O teste de deriva (`supabase/rls.test.ts`) exige que a lista `colecao in (...)` do `create table arretado.registros` seja igual às coleções com módulo.
-- **Leitura (9.1):** como `esquemaV1()` é derivado de `ENTIDADES`, convém congelar a lista da v1 antes de declarar `version(2)` com `leituras`. No remoto, o teste de deriva falha assim que `leituras` entrar em `ENTIDADES` com módulo: é preciso migração nova alterando o `check` de `arretado.registros` e ajustar o teste, que hoje só lê o `create table`.
+- **Tabelas Dexie fora de `ENTIDADES`** (`src/core/persistencia/banco.ts`, `BancoArretado`, `VERSAO_ESQUEMA = 2`, banco `arretado`): `alteracoes` (log), `meta` (chave `identidade` = `{ usuarioId, aparelhoId }`), `anexosConteudo`, `snapshotsConteudo` (`Conteudo { id, bytes }`).
+- **Demais tabelas remotas** (`arretado.*`, além de `registros`): `alteracoes` (espelho do log local), `posse_aparelho`, `curadores`, `catalogo`. O teste de deriva (`supabase/rls.test.ts`) exige que a lista `colecao in (...)` da definição mais recente do check `registros_colecao_check` (o `create table` ou a última migração que o recria) seja igual às coleções com módulo; outro teste confere o check no banco migrado.
+- **Versões do esquema local (9.1):** `DefinicaoEntidade.desdeVersao` (padrão 1) diz em que versão a coleção nasceu; `versaoDeOrigem(nome)` e `colecoesNaVersao(v)` (`src/core/modelo/index.ts`); `esquemaDaVersao(v)` (`banco.ts`) monta o `stores` de cada versão, e o `BancoArretado` declara todas, de 1 a `VERSAO_ESQUEMA`. O esquema v1 está congelado por hash em `migracao.test.ts` (`HASH_ESQUEMA_V1`): mudar índice de coleção antiga pede versão nova. `BancoArretado.aoFecharPorOutraAba(aviso)` avisa, com `MotivoFechamento` (`versao` ou `apagado`), quando outra aba sobe o esquema ou apaga o banco; o `ProvedorRepositorio` troca a tela pelo aviso de recarregar (estado `fechadoPorOutraAba`).
 
 ## 3. Campos comuns a toda entidade
 
@@ -270,7 +270,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Norma | identidade e metadados | `Norma` (obrigatórios `tituloCurto` e `escopo`: `pessoal` ou `catalogo`; na tela, só o título curto; `urlOficial`, `fonteConsultadaEm`, `versaoVigenteId`) | existe | 9.2, 9.5 |
 | Versão de norma | texto capturado numa data | `VersaoDeNorma` (`status`: `rascunho`, `vigente`, `arquivada`; `origemEntrada`: `html`, `url`, `arquivo`, `texto`, `edicao_manual`; `hash` sobre o conteúdo sanitizado; `capturadaEm`, `versaoAdaptador`; fonte guardada para reprocessar: `anexoFonteId` → `Anexo`) | existe | 9.2, 11.7 |
 | Descartar, retomar, publicar | ciclo do rascunho | `descartarRascunho`, `retomarRascunho`, `publicarVersao` (proposto); evento `versao.publicada` (plano) | proposto / plano | 9.2, 9.3 |
-| Lido até, posição | por usuário × norma | coleção `leituras` (`lidoAteId`, `posicaoId`, `ultimaLeituraEm`) (plano); tipo `Leitura` (proposto) | plano | 9.1, 9.7 |
+| Lido até, posição | por usuário × norma | coleção `leituras`, tipo `Leitura` (`normaId`, `lidoAteId`, `posicaoId`, `ultimaLeituraEm`, todos opcionais menos `normaId`); rótulo em Conta › Dados: "Posições de leitura" | existe (esquema, 9.1); uso na 9.7 | 9.1, 9.7 |
 | Colar, leitor | evento `paste` (`text/html`, `text/plain` de reserva) na tela "Importar norma"; leitor virtualizado (T16, `@tanstack/react-virtual`) | telas em `src/apresentacao/biblioteca/` (plano); `LeitorNorma.tsx` (proposto) | plano | 9.5, 9.6 |
 | Modo foco, filtros | leitura limpa; tudo, estrelados, selecionados, com marcações, com erros | `modoFoco`; `FiltroLeitor`: `tudo`, `estrelados`, `selecionados`, `com_marcacoes`, `com_erros` | proposto | 11.1, 11.3 |
 | Leitura artigo por artigo | modo foco com um artigo inteiro por vez num cartão iluminado, o resto esmaecido (decisão de 24/09/2026) | `modoFoco: 'texto' \| 'artigo'`; cartão = artigo com descendentes e rubrica; a posição continua em `leituras.posicaoId` (sem entidade nova) | proposto | 11.8 |

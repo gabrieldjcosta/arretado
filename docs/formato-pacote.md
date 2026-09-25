@@ -33,7 +33,7 @@ conteudo.cifrado        o ZIP "sem cifra" acima, cifrado
 |---|---|
 | `formato` | `"arretado-pacote"` |
 | `versaoFormato` | `1` |
-| `versaoEsquema` | versão do esquema local que gerou o pacote |
+| `versaoEsquema` | versão do esquema local que gerou o pacote (2 desde a F2, 9.1; ver "Compatibilidade entre versões do esquema") |
 | `versaoApp` | versão do app que gerou o pacote |
 | `criadoEm` | instante ISO 8601 UTC |
 | `usuarioId` / `aparelhoId` | origem do pacote |
@@ -84,3 +84,18 @@ Regras comuns:
 - **Snapshot** automático antes de qualquer modo que escreva; **LogDeImportação** com hash do pacote, modo, contagens e snapshot; **rollback** de um clique enquanto o snapshot existir (retenção mínima de 5). O rollback também guarda o estado anterior e pode ser desfeito.
 - Coleções só locais (log de importações, snapshots, espaços) nunca entram no pacote.
 - O `log.json`, quando presente, é guardado para auditoria e não é reaplicado: os registros são a verdade.
+
+## Compatibilidade entre versões do esquema
+
+| `versaoEsquema` | App | Mudança |
+|---|---|---|
+| 1 | F0 e F1 | esquema inicial |
+| 2 | F2 (9.1) | coleção nova `leituras` (módulo `legislacao`): "lido até" e posição de cada norma |
+
+- **Pacote mais novo que o app** → recusado ("atualize o app"), antes de qualquer outra validação do conteúdo.
+- **Pacote mais antigo que o app** → aceito. Cada coleção declara em que versão nasceu (`desdeVersao` em `ENTIDADES`); o pacote anterior não traz as coleções nascidas depois, que entram **vazias** na importação. Um pacote v1 equivale, portanto, a um v2 sem `leituras`:
+  - modos 2, 3 e 4: as leituras locais ficam como estão;
+  - modo 5 com o módulo `legislacao` e modo 6: o local passa a ser o pacote, então as leituras locais são excluídas (logicamente no 5, fisicamente no 6), como qualquer registro ausente do pacote.
+- Pacote que traga uma coleção posterior à sua `versaoEsquema` (ex.: v1 com `dados/leituras.json`) → **arquivo alterado fora do aplicativo**.
+- Os pontos de restauração (snapshots) são pacotes: os gravados pela v1 continuam restauráveis pelas mesmas regras.
+- Registro de coleção antiga não muda de forma entre v1 e v2 (campo novo sempre opcional ou com padrão na leitura); se um dia mudar, a migração dos registros entra aqui e em `ler.ts`.

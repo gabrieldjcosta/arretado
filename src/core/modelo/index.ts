@@ -37,6 +37,8 @@ interface DefinicaoEntidade {
   indices: string[];
   /** Registros nunca atualizados nem excluídos (D10). */
   appendOnly?: boolean;
+  /** Versão do esquema local em que a coleção nasceu (padrão 1); pacote anterior não a traz. */
+  desdeVersao?: number;
 }
 
 export const ENTIDADES = {
@@ -124,6 +126,12 @@ export const ENTIDADES = {
     modulo: 'legislacao',
     indices: ['usuarioId', 'normaId', 'alvoId', 'pacoteId'],
   },
+  leituras: {
+    esquema: L.Leitura,
+    modulo: 'legislacao',
+    indices: ['usuarioId', '[usuarioId+normaId]'],
+    desdeVersao: 2,
+  },
   // catálogo
   pacotesIncidencia: { esquema: L.PacoteDeIncidencia, modulo: 'catalogo', indices: ['usuarioId'] },
   adesoes: { esquema: L.Adesao, modulo: 'catalogo', indices: ['usuarioId', 'pacoteId'] },
@@ -160,6 +168,17 @@ export type RegistroDe<N extends NomeColecao> = z.infer<(typeof ENTIDADES)[N]['e
 
 export function colecoesDoModulo(modulo: Modulo): NomeColecao[] {
   return NOMES_COLECOES.filter((n) => ENTIDADES[n].modulo === modulo);
+}
+
+/** Versão do esquema local em que a coleção nasceu. */
+export function versaoDeOrigem(nome: NomeColecao): number {
+  const def: DefinicaoEntidade = ENTIDADES[nome];
+  return def.desdeVersao ?? 1;
+}
+
+/** Coleções que existiam na versão do esquema indicada. */
+export function colecoesNaVersao(versao: number): NomeColecao[] {
+  return NOMES_COLECOES.filter((n) => versaoDeOrigem(n) <= versao);
 }
 
 export function eAppendOnly(nome: NomeColecao): boolean {

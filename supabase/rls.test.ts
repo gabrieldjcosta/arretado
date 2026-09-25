@@ -236,13 +236,30 @@ describe('lints dos advisors do Supabase (atividade 4.3)', () => {
 
 describe('deriva entre modelo local e esquema remoto', () => {
   it('a lista de coleções do remoto é exatamente a das coleções exportáveis', () => {
-    const sql = MIGRACOES.join('\n');
-    const bloco =
-      /create table arretado\.registros \([\s\S]*?check \(colecao in \(([\s\S]*?)\)\)/.exec(
-        sql,
-      )?.[1] ?? '';
-    const noSql = [...bloco.matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
+    // Vale a definição mais recente: a do create table ou a da última migração que recria o check.
+    const definicoes = [
+      /create table arretado\.registros \([\s\S]*?check \(colecao in \(([\s\S]*?)\)\)/g,
+      /alter table arretado\.registros add constraint registros_colecao_check check \(colecao in \(([\s\S]*?)\)\)/g,
+    ];
+    const ultima = MIGRACOES.flatMap((sql, arquivo) =>
+      definicoes.flatMap((re) =>
+        [...sql.matchAll(re)].map((m) => ({ arquivo, pos: m.index, lista: m[1] ?? '' })),
+      ),
+    )
+      .sort((a, b) => a.arquivo - b.arquivo || a.pos - b.pos)
+      .at(-1);
+    const noSql = [...(ultima?.lista ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
     const exportaveis = NOMES_COLECOES.filter((n) => ENTIDADES[n].modulo !== null).sort();
     expect(noSql).toEqual(exportaveis);
+  });
+
+  it('o banco migrado tem no check exatamente as coleções exportáveis', async () => {
+    const exportaveis = NOMES_COLECOES.filter((n) => ENTIDADES[n].modulo !== null);
+    const def = await db.query<{ def: string }>(
+      `select pg_get_constraintdef(oid) as def from pg_constraint
+       where conname = 'registros_colecao_check'`,
+    );
+    const noBanco = [...(def.rows[0]?.def ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
+    expect(noBanco).toEqual([...exportaveis].sort());
   });
 });

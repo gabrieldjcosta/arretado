@@ -1,8 +1,11 @@
 import Dexie, { type Table } from 'dexie';
-import { ENTIDADES, NOMES_COLECOES, type NomeColecao, type RegistroDe } from '../modelo';
+import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '../modelo';
 
-/** Versão do esquema local; sobe a cada migração (Parte 1 §7.2). */
-export const VERSAO_ESQUEMA = 1;
+/**
+ * Versão do esquema local; sobe a cada migração (Parte 1 §7.2).
+ * v1: F0/F1. v2: `leituras` (F2, 9.1), só coleção nova, sem transformar registro.
+ */
+export const VERSAO_ESQUEMA = 2;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 
@@ -31,9 +34,10 @@ export interface Conteudo {
   bytes: Uint8Array;
 }
 
-function esquemaV1(): Record<string, string> {
+/** Esquema completo de uma versão: as coleções que já existiam nela, mais as tabelas internas. */
+export function esquemaDaVersao(versao: number): Record<string, string> {
   const stores: Record<string, string> = {};
-  for (const nome of NOMES_COLECOES) {
+  for (const nome of colecoesNaVersao(versao)) {
     stores[nome] = ['id', ...ENTIDADES[nome].indices].join(', ');
   }
   stores.alteracoes = '++seq, ts, usuarioId, [colecao+registroId]';
@@ -42,6 +46,9 @@ function esquemaV1(): Record<string, string> {
   stores.snapshotsConteudo = 'id';
   return stores;
 }
+
+/** Por que outra aba fechou esta conexão: esquema novo ou banco apagado. */
+export type MotivoFechamento = 'versao' | 'apagado';
 
 export class BancoArretado extends Dexie {
   alteracoes!: Table<Alteracao, number>;
@@ -52,7 +59,23 @@ export class BancoArretado extends Dexie {
   constructor(nome: string = NOME_BANCO_PRINCIPAL) {
     super(nome);
     // Migrações idempotentes: cada versão declara o esquema completo e, se preciso, um upgrade.
-    this.version(VERSAO_ESQUEMA).stores(esquemaV1());
+    // Coleção nova não pede upgrade: o IndexedDB cria a tabela vazia e mantém as outras.
+    for (let v = 1; v <= VERSAO_ESQUEMA; v++) this.version(v).stores(esquemaDaVersao(v));
+    // Outra aba subiu o esquema ou apagou o banco: esta conexão fecha para não travar a outra.
+    this.on('versionchange', (ev: IDBVersionChangeEvent) => {
+      this.close();
+      const motivo = ev.newVersion === null ? 'apagado' : 'versao';
+      for (const aviso of this.avisosDeTroca) aviso(motivo);
+      return false;
+    });
+  }
+
+  private readonly avisosDeTroca = new Set<(motivo: MotivoFechamento) => void>();
+
+  /** Avisa quando outra aba sobe o esquema ou apaga o banco (esta aba precisa recarregar). */
+  aoFecharPorOutraAba(aviso: (motivo: MotivoFechamento) => void): () => void {
+    this.avisosDeTroca.add(aviso);
+    return () => this.avisosDeTroca.delete(aviso);
   }
 
   tabela<N extends NomeColecao>(nome: N): Table<RegistroDe<N>, string> {

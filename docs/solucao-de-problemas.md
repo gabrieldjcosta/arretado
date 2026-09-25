@@ -108,8 +108,13 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Subida de esquema com aba antiga aberta
 - **Sintoma:** depois de publicar o Dexie v2, o app não abre ou a aba antiga perde o banco no meio do uso. **Causa:** a subida de versão do IndexedDB (9.1, entidade `leituras`) disputa o banco com a conexão aberta pela versão anterior.
-- **Solução:** fechar as outras abas e recarregar. **Prevenção:** na 9.1, tratar a troca de versão com aviso "feche as outras abas e recarregue" (como em Apagar tudo), teste de migração v1 → v2 sem perda e backup manual antes da publicação.
-- **Origem:** previsto — atividade 9.1.
+- **Solução:** recarregar a aba antiga. Desde a 9.1, a conexão que recebe o `versionchange` fecha sozinha (não trava a aba nova) e o `ProvedorRepositorio` troca a tela por "O Arretado foi atualizado em outra aba. Recarregue esta página." (ou "…foram apagados em outra aba", com Apagar tudo). **Limite:** a aba aberta com o app v1 não tem esse aviso (o código é o antigo): na subida v1 → v2 ela só falha na próxima gravação, com a mensagem genérica; por isso o backup manual antes da publicação. **Prevenção:** `migracao.test.ts` (v1 → v2 sem perda; aviso por `versao` e por `apagado`) e o E2E "aba aberta avisa quando outra aba sobe o esquema do banco".
+- **Origem:** previsto na 9.1 e tratado nela (24/09/2026).
+
+### Mudei os índices de uma coleção e o banco de quem já usa quebrou
+- **Sintoma:** `migracao.test.ts` › "o esquema v1 não muda" falha; ou, se publicado, falha ao abrir o banco (ou índice ausente) nos aparelhos com banco antigo. **Causa:** `esquemaDaVersao(v)` é derivado de `ENTIDADES` para todas as versões; mudar `indices` de coleção existente muda também a declaração das versões antigas.
+- **Solução:** não editar os índices em lugar: subir `VERSAO_ESQUEMA` e fazer `esquemaDaVersao` devolver os índices antigos para as versões anteriores (ou congelar a lista antiga como literal). Coleção nova só pede `desdeVersao` e a versão nova. **Prevenção:** o hash `HASH_ESQUEMA_V1` no teste; repetir o congelamento a cada versão publicada.
+- **Origem:** previsto — toda subida de esquema depois da 9.1.
 
 ### Espaço de armazenamento esgotado
 - **Sintoma:** falha de cota ao importar ou gravar. **Causa:** cada importação guarda um snapshot integral com anexos (retenção mínima de 5), e a F2 soma a fonte sanitizada de cada norma como Anexo; só a página da CF tem 1,8 MB.
@@ -140,8 +145,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Pacote de uma versão do app aberto em outra
 - **Sintoma:** "Este pacote foi gerado por uma versão mais nova do Arretado" ao importar num app antigo um backup feito depois da 9.1; ou pacote v1 recusado no app v2. **Causa:** `ler.ts` recusa `versaoEsquema` maior que a atual, e os registros são `strictObject` (campo desconhecido é recusado).
-- **Solução:** usar o app mais novo; campo novo sempre opcional ou com padrão na leitura. **Prevenção:** na 9.1, teste de restauração de pacote v1 no app v2 e `formato-pacote.md` atualizado.
-- **Origem:** previsto — atividade 9.1.
+- **Solução:** usar o app mais novo; campo novo sempre opcional ou com padrão na leitura. O pacote v1 no app v2 é aceito: `ler.ts` espera só as coleções que existiam na `versaoEsquema` do pacote (`desdeVersao`) e dá lista vazia às posteriores (sem isso, "falta leituras" recusaria todo backup antigo). **Prevenção:** `pacote-v1.test.ts` (leitura simples e cifrada; modos 2, 5 e 6; v1 com `leituras` recusado) e `formato-pacote.md` › "Compatibilidade entre versões do esquema".
+- **Origem:** previsto na 9.1 e tratado nela (24/09/2026).
 
 ## Segurança (CSP, sanitizador)
 
@@ -270,8 +275,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Coleção nova quebra o teste de deriva
 - **Sintoma:** `rls.test.ts` › "a lista de coleções do remoto é exatamente a das coleções exportáveis" falha. **Causa:** `arretado.registros` tem `check (colecao in (…))`; a entidade `leituras` (9.1), se entrar no pacote, não está na lista.
-- **Solução:** migração nova acrescentando a coleção, seguindo "Migração nova no Supabase". O teste lê a lista só do `create table arretado.registros`, então uma migração que altere o `check` também exige ensinar o teste a ler a definição mais recente (9.1 do plano). **Prevenção:** o próprio teste de deriva.
-- **Origem:** previsto — atividade 9.1.
+- **Solução:** migração nova que recria o check com a lista inteira (`alter table arretado.registros drop constraint registros_colecao_check` e `add constraint registros_colecao_check check (colecao in (…))`, modelo em `20260924000000_colecao_leituras.sql`), seguindo "Migração nova no Supabase". O teste lê a definição mais recente (do `create table` ou do último `add constraint registros_colecao_check`, nessa grafia) e outro confere o check no banco migrado (`pg_get_constraintdef`). **Prevenção:** os dois testes de deriva.
+- **Origem:** previsto na 9.1 e tratado nela (24/09/2026). Aplicada no projeto real em 25/09/2026 (versão em `proxima-sessao.md`).
 
 ### Projeto pausado ou esquema `arretado` invisível
 - **Sintoma:** o projeto não responde; na F4, o cliente não acessa as tabelas. **Causa:** o plano free pausa depois de cerca de 7 dias sem uso do banco (e nada usa o banco antes da F4); o esquema `arretado` ainda não está exposto na API.

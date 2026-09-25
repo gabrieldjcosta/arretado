@@ -4,6 +4,7 @@
 -- Rodado em 23/09/2026 no projeto dgwoemewvpabbppascuw, com o resultado esperado:
 --   01, 02, 13, 14 → 1        03, 04, 05, 06 → 0
 --   07, 12 → recusado 42501 (row-level security)   08–11, 15 → recusado 42501 (permission denied)
+-- Rodado de novo em 25/09/2026, depois da migração colecao_leituras (9.1), com o 16 → aceitou.
 
 begin;
 insert into auth.users (id) values
@@ -84,6 +85,15 @@ insert into resultado select '13 A: registro intacto (não excluído, oQueFoi=x)
   from arretado.registros where excluido_em is null and dados->>'oQueFoi' = 'x';
 insert into resultado select '14 A: log intacto (1 linha, gravar)', count(*)::text
   from arretado.alteracoes where operacao = 'gravar';
+do $$ begin
+  insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
+  values ('leituras', '0199a6c4-0000-7000-8000-0000000000a3', '0199a6c4-0000-7000-8000-00000000000a',
+    '1790000000000-000000-0000000a', now(),
+    '{"id":"0199a6c4-0000-7000-8000-0000000000a3","usuarioId":"0199a6c4-0000-7000-8000-00000000000a"}');
+  insert into resultado values ('16 A grava na coleção leituras (9.1)', 'aceitou');
+exception when others then
+  insert into resultado values ('16 A grava na coleção leituras (9.1)', 'recusado ' || sqlstate || ': ' || sqlerrm);
+end $$;
 
 -- Anônimo, mesmo com o claim de A presente
 set local role anon;
