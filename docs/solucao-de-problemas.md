@@ -276,7 +276,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Coleção nova quebra o teste de deriva
 - **Sintoma:** `rls.test.ts` › "a lista de coleções do remoto é exatamente a das coleções exportáveis" falha. **Causa:** `arretado.registros` tem `check (colecao in (…))`; a entidade `leituras` (9.1), se entrar no pacote, não está na lista.
 - **Solução:** migração nova que recria o check com a lista inteira (`alter table arretado.registros drop constraint registros_colecao_check` e `add constraint registros_colecao_check check (colecao in (…))`, modelo em `20260924000000_colecao_leituras.sql`), seguindo "Migração nova no Supabase". O teste lê a definição mais recente (do `create table` ou do último `add constraint registros_colecao_check`, nessa grafia) e outro confere o check no banco migrado (`pg_get_constraintdef`). **Prevenção:** os dois testes de deriva.
-- **Origem:** previsto na 9.1 e tratado nela (24/09/2026). A migração vai ao projeto real depois do merge (ver `proxima-sessao.md`).
+- **Origem:** previsto na 9.1 e tratado nela (24/09/2026). Aplicada no projeto real em 25/09/2026 (versão em `proxima-sessao.md`).
 
 ### Projeto pausado ou esquema `arretado` invisível
 - **Sintoma:** o projeto não responde; na F4, o cliente não acessa as tabelas. **Causa:** o plano free pausa depois de cerca de 7 dias sem uso do banco (e nada usa o banco antes da F4); o esquema `arretado` ainda não está exposto na API.
