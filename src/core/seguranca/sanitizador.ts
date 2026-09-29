@@ -40,6 +40,8 @@ export class EntradaGrandeDemais extends Error {
 export const LIMITE_PADRAO = 10_000_000;
 
 const MARCA_TACHADO = 'data-arretado-tachado';
+/** O atributo `style` renomeado antes do parser (ver `semEstiloEmLinha`). */
+const ESTILO = 'data-arretado-estilo';
 
 const TAGS_BLOCO = new Set([
   'P',
@@ -147,7 +149,7 @@ function obterPurificador() {
   // Tachado por estilo (comum no Planalto) vira marca semântica antes de o estilo ser removido.
   p.addHook('uponSanitizeElement', (no, dados) => {
     if (!(no instanceof Element)) return;
-    const estilo = no.getAttribute('style') ?? '';
+    const estilo = no.getAttribute(ESTILO) ?? no.getAttribute('style') ?? '';
     no.removeAttribute(MARCA_TACHADO);
     if (!/text-decoration[^;]*line-through/i.test(estilo)) return;
     if (dados.allowedTags[dados.tagName]) {
@@ -163,6 +165,20 @@ function obterPurificador() {
   return p;
 }
 
+/**
+ * O parser do DOMPurify (DOMParser) cria o documento com a CSP da página: cada atributo `style` e
+ * cada `<style>` do HTML colado viram uma violação de `style-src` (milhares numa lei do
+ * Planalto; E2E da 9.5), mesmo sem nada ser aplicado. Antes do parser, o `<style>` sai e o
+ * atributo `style` das tags vira `data-arretado-estilo`, que o gancho lê (tachado por estilo) e
+ * o DOMPurify remove. Texto nunca traz `<` seguido de letra (vem como `&lt;`); um valor de
+ * atributo com `>` só faz a troca parar naquela tag.
+ */
+function semEstiloEmLinha(html: string): string {
+  return html
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
+    .replace(/<[a-z][^>]*>/gi, (tag) => tag.replace(/(\s)style(\s*=)/gi, `$1${ESTILO}$2`));
+}
+
 /** Sanitiza HTML e o converte em blocos. `base` resolve links relativos (importação por URL). */
 export function sanitizarHtml(
   html: string,
@@ -170,7 +186,7 @@ export function sanitizarHtml(
 ): ResultadoSanitizacao {
   const limite = opcoes.limite ?? LIMITE_PADRAO;
   if (html.length > limite) throw new EntradaGrandeDemais(html.length, limite);
-  const fragmento = obterPurificador().sanitize(html, CONFIG);
+  const fragmento = obterPurificador().sanitize(semEstiloEmLinha(html), CONFIG);
   const conversor = new Conversor(opcoes.base);
   conversor.percorrer(fragmento, { tachado: false, enfase: false, link: undefined });
   return { blocos: conversor.finalizar(), linksDescartados: conversor.linksDescartados };

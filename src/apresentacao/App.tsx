@@ -41,8 +41,8 @@ export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {
             <Route path="recall/erros/:id" element={<DetalheErro />} />
             <Route path="recall/cartoes/:id" element={<EditarCartao />} />
             <Route path="biblioteca" element={<Normas />} />
-            <Route path="biblioteca/importar" element={<Importar />} />
-            <Route path="biblioteca/importar/:versaoId" element={<Importar />} />
+            {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
+            <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
             <Route path="conta" element={<Conta />} />
             <Route path="conta/aparencia" element={<AparenciaConta />} />
             <Route path="conta/dados" element={<Dados />} />

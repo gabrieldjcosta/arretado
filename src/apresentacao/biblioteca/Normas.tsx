@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import type { Norma, VersaoDeNorma } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { normasPublicadas } from '../../dominios/legislacao/leitor';
@@ -38,6 +38,12 @@ function descricaoDe(norma: Norma): string {
   return partes.filter((p) => p !== undefined && p !== '').join(' · ');
 }
 
+/** Aviso deixado pela tela Importar ao publicar ou descartar (estado da navegação). */
+function avisoDaNavegacao(estado: unknown): string | null {
+  if (typeof estado !== 'object' || estado === null || !('aviso' in estado)) return null;
+  return typeof estado.aviso === 'string' ? estado.aviso : null;
+}
+
 const IMPORTAR = (
   <Link to="/biblioteca/importar" className="botao principal">
     Importar norma
@@ -51,7 +57,16 @@ export function Normas() {
   const [descartando, setDescartando] = useState<Pendente | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [falhaDescarte, setFalhaDescarte] = useState<string | null>(null);
-  const [aviso, setAviso] = useState<string | null>(null);
+  const estadoNavegacao: unknown = useLocation().state;
+  const navegar = useNavigate();
+  const [aviso, setAviso] = useState(() => avisoDaNavegacao(estadoNavegacao));
+
+  useEffect(() => {
+    // Lido uma vez: recarregar a página ou voltar a ela não repete o aviso.
+    if (avisoDaNavegacao(estadoNavegacao) !== null) {
+      void navegar('/biblioteca', { replace: true, state: null });
+    }
+  }, [estadoNavegacao, navegar]);
 
   function fecharDescarte() {
     setDescartando(null);
