@@ -71,6 +71,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** ler os arquivos pelo Vite, sem Node: `import.meta.glob<string>('../../../corpus/normas/*.colado.txt', { query: '?raw', import: 'default', eager: true })` (como em `src/dominios/legislacao/normalizacao-corpus.test.ts`). **Prevenção:** o próprio `tsc -b` do check.
 - **Origem:** ocorrido em 23/09/2026 (8.1, antes do commit).
 
+### `RegistroInvalido: usuarioId: Invalid UUID` num teste com outro usuário
+- **Sintoma:** o teste que grava em nome de outro usuário (`repo.comUsuario('outro-usuario').colecao(…).criar(…)`) falha com `RegistroInvalido`. **Causa:** `usuarioId` é `Id` (UUID) no modelo; ler com um usuário qualquer passa (nada é validado), gravar não.
+- **Solução:** `repo.comUsuario(repo.ctx.novoId())` quando o teste grava. **Prevenção:** o próprio erro, que diz o campo.
+- **Origem:** ocorrido em 29/09/2026 (9.5, 1ª parte, antes do commit).
+
+### E2E não consegue colar a lei
+- **Sintoma:** o E2E da tela Importar não recebe o conteúdo: `Control+V` no headless não traz nada, ou a área de transferência pede permissão. **Causa:** a área de transferência do sistema não é controlável no Chromium headless, e o `navigator.clipboard` pede `clipboard-read`/`clipboard-write`.
+- **Solução:** evento sintético: ler o `*.colado.html` no Node e, no `page.evaluate`, `new DataTransfer()` com `setData('text/html', …)` e `setData('text/plain', …)`, e `dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))` no alvo da colagem. Conferido em 29/09/2026 no Chromium 141 (`chromium-1194`): o `paste` recebe os dois tipos inteiros (LEP compilada, 289 mil caracteres, em cerca de 30 ms). **Prevenção:** o E2E da 2ª parte da 9.5; o colar real (Windows, celular) continua conferido à mão ("Colar real diferente do colado do corpus").
+- **Origem:** previsto — atividade 9.5 (2ª parte); o evento sintético conferido na 1ª parte.
+
 ### Playwright ou TypeScript "desatualizados" de propósito
 - **Sintoma:** E2E não abre o Chromium, ou o `@axe-core/playwright` puxa outra versão; lint quebra depois de atualizar o TypeScript. **Causa:** Playwright fixado em 1.56.1 (o Chromium do contêiner é o `chromium-1194`), com `playwright-core` fixado junto, também em `1.56.1` exato no `package.json` (desde 23/09/2026; antes era `^1.56.1`), para o axe não puxar outra versão; TypeScript fixado em `~6.0` porque o `typescript-eslint` ainda não aceita o 7.
 - **Solução:** no Windows, rodar `npx playwright install chromium` uma vez (baixa o navegador: só com o OK do Gabriel); não subir essas versões. **Sem baixar nada** (9.3, 29/09/2026: o Windows do Gabriel nunca teve o Chromium do Playwright, e o E2E falhou com "Executable doesn't exist … chromium_headless_shell-1194"): um config temporário que estende o `playwright.config.ts` com `channel: 'chrome'` (usa o Chrome instalado) e um `favicon.ico` vazio no `dist/` (o app não declara `<link rel="icon">`; o Chrome de marca pede `/favicon.ico`, e o 404 ou o `ERR_INTERNET_DISCONNECTED` do teste offline reprova o vigia de console, o que o Chromium headless não faz). Com o Chrome 154, passaram 82 dos 84; os 2 que sobram são o teste "funciona sem rede depois de carregado" (favicon offline), nos dois projetos. O CI (Linux, Chromium fixado) é o E2E de referência. **Prevenção:** `@playwright/test` e `playwright-core` sempre juntos e na mesma versão (nada de `npm update` solto); TypeScript 7 só quando o typescript-eslint suportar (T1).
@@ -110,7 +120,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Lista mostra só os primeiros 200 itens
 - **Sintoma:** pontos, vínculos ou cartões faltando na tela. **Causa:** a consulta paginada tem `LIMITE_MAXIMO_PAGINA = 200` (`colecao.ts`) e a tela lia só a primeira página.
-- **Solução:** percorrer as páginas (`todas` em `src/apresentacao/recall/carregadores.ts`, para o Plano e os vínculos; `todos` em `src/dominios/legislacao/servico.ts`, para apagar a árvore e listar rascunhos) ou oferecer "Carregar mais" (listas de cartões e de erros). **Prevenção:** teste com mais de 200 registros em toda lista nova (normas, dispositivos, "a confirmar"); na 9.2, `servico-corpus.test.ts` descarta o CP inteiro (cerca de 2 mil dispositivos) e confere que não sobra nada.
+- **Solução:** percorrer as páginas (`todas` em `src/apresentacao/recall/carregadores.ts`, para o Plano e os vínculos; `todos` em `src/dominios/legislacao/consultas.ts`, para apagar a árvore, listar rascunhos e as normas publicadas da Biblioteca) ou oferecer "Carregar mais" (listas de cartões e de erros). **Prevenção:** teste com mais de 200 registros em toda lista nova (normas, dispositivos, "a confirmar"); na 9.2, `servico-corpus.test.ts` descarta o CP inteiro (cerca de 2 mil dispositivos) e confere que não sobra nada; na 9.5, "lista só as publicadas, de todas as páginas…" (`leitor.test.ts`, 207 normas).
 - **Origem:** ocorrido em 23/09/2026 (commits ed0a209 e 3c07cbf).
 
 ### `offset`, `keys()` ou `anyOf` do Dexie lentos no teste
@@ -228,6 +238,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** "Ver prévia" travada por módulos desmarcados em outro modo; confirmação do último espaço que não aparecia; confirmação da primeira importação de pontos que sumia. **Causa:** condição de habilitação que ignorava o modo escolhido; mensagem guardada num componente que deixa de ser renderizado quando os dados mudam.
 - **Solução:** condição por modo; a confirmação é mostrada por quem continua na tela (o componente pai). **Prevenção:** teste do "Ver prévia" em `App.test.tsx`; as duas confirmações foram corrigidas sem teste próprio (acrescentar quando a tela for tocada de novo).
 - **Origem:** ocorrido em 23/09/2026 (commits a3ce9f4 e ed0a209).
+
+### O aviso diz "descartada", mas a lista ainda mostra o item
+- **Sintoma:** logo depois de descartar um rascunho na Biblioteca, o aviso "Importação de X descartada." aparece e a faixa ainda mostra X por um instante; o teste que confere a faixa logo depois do aviso falha. **Causa:** o aviso é estado local, imediato; a lista vem do `useDados`, que só recarrega com o evento `registro.*` emitido depois do `complete` da transação, e a leitura nova é assíncrona.
+- **Solução:** no teste, `waitFor` na lista (não no aviso). Na tela, fica assim: é um instante, e descartar de novo o item que já saiu mostra "Este rascunho não existe mais." no diálogo e recarrega. **Prevenção:** "descartar pede confirmação, apaga o rascunho e avisa" (`Biblioteca.test.tsx`); vale para o "Publicar" (2ª parte da 9.5) e toda ação que muda uma lista vinda do `useDados`.
+- **Origem:** ocorrido em 29/09/2026 (9.5, 1ª parte, no teste, antes do commit).
 
 ### Celular: seleção, toque longo e navegador não testado
 - **Sintoma:** grifo impossível no celular; comportamento diferente no iPhone. **Causa:** ação que depende de hover ou de seleção de desktop; o E2E só roda Chromium (desktop e Pixel 7), sem Safari.
@@ -668,8 +683,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Publicar e descartar o mesmo rascunho ao mesmo tempo (duas abas)
 - **Sintoma:** norma publicada sem dispositivos, ou rascunho descartado que volta. **Causa:** uma aba lê a versão como rascunho e a outra a publica ou descarta antes de a primeira gravar.
-- **Solução:** reler a versão dentro da transação que escreve e recusar se ela não for mais rascunho, como já fazem `descartarRascunho` e `retomarRascunho` (`RascunhoIndisponivel`, motivo `publicada` ou `inexistente`): `publicarVersao` faz a checagem (`prepararPublicacao`) e a escrita na mesma `repo.transacao`. **Prevenção:** "publicar depois de descartar, e descartar depois de publicar…" e "duas abas ao mesmo tempo…" (`servico.test.ts`; dois `Repositorio` sobre o mesmo banco, nas duas ordens e com publicar × publicar). O teste foi conferido por mutação: ler o estado fora da transação faz as duas operações terem êxito e o teste falhar. Ao mexer em `publicarVersao`, manter a leitura dentro da transação.
-- **Origem:** previsto na 9.3 e tratado nela (29/09/2026).
+- **Solução:** reler a versão dentro da transação que escreve e recusar se ela não for mais rascunho, como já fazem `descartarRascunho` e `retomarRascunho` (`RascunhoIndisponivel`, motivo `publicada` ou `inexistente`): `publicarVersao` faz a checagem (`prepararPublicacao`) e a escrita na mesma `repo.transacao`. **Prevenção:** "publicar depois de descartar, e descartar depois de publicar…" e "duas abas ao mesmo tempo…" (`servico.test.ts`; dois `Repositorio` sobre o mesmo banco, nas duas ordens e com publicar × publicar). O teste foi conferido por mutação: ler o estado fora da transação faz as duas operações terem êxito e o teste falhar. Ao mexer em `publicarVersao`, manter a leitura dentro da transação. Na tela (9.5, Biblioteca › Normas): descartar o rascunho que outra aba já publicou ou descartou mostra, no diálogo, a mensagem do `RascunhoIndisponivel` ("Esta versão já foi publicada; não é mais rascunho.") e recarrega a lista ("descartar o que outra aba já publicou…", `Biblioteca.test.tsx`); o "Publicar" da 2ª parte faz o mesmo com o `PublicacaoBloqueada` e o `RascunhoIndisponivel`.
+- **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (1ª parte, 29/09/2026).
 
 ### Leitor lento em norma grande
 - **Sintoma:** abrir a CF ou o CP leva segundos. **Causa:** árvore inteira renderizada ou todos os textos carregados de uma vez.

@@ -28,17 +28,6 @@ export function Hoje() {
   );
 }
 
-export function Biblioteca() {
-  return (
-    <>
-      <h1>Biblioteca</h1>
-      <Vazio titulo="Nenhuma norma ainda">
-        <p>A leitura de legislação chega na fase 2.</p>
-      </Vazio>
-    </>
-  );
-}
-
 export function NaoEncontrada() {
   return (
     <Vazio titulo="Tela não encontrada" acao={<Link to="/">Ir para o Hoje</Link>}>

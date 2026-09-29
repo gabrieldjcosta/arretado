@@ -12,6 +12,7 @@ const ROTAS = [
   '/recall/revisar',
   '/recall/cartoes/novo',
   '/biblioteca',
+  '/biblioteca/importar',
   '/conta',
   '/conta/aparencia',
   '/conta/dados',

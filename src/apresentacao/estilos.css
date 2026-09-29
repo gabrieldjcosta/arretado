@@ -591,3 +591,45 @@ details > summary::-webkit-details-marker {
     display: inline;
   }
 }
+
+/* Biblioteca › Normas (F2, 9.5) */
+.cabecalho-secao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cabecalho-secao h2 {
+  margin: 0;
+}
+
+.item-norma {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.item-norma .dica {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.faixa-rascunho p {
+  margin: 0;
+}
+
+.faixa-rascunho .lista-simples > li:last-child {
+  border-bottom: 0;
+}
+
+.acoes-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

@@ -1,5 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router';
 import type { Repositorio } from '../core/persistencia';
+import { Importar } from './biblioteca/Importar';
+import { Normas } from './biblioteca/Normas';
 import { AparenciaConta } from './conta/AparenciaConta';
 import { Conta } from './conta/Conta';
 import { Dados } from './conta/dados/Dados';
@@ -17,7 +19,7 @@ import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
 import { Plano } from './plano/Plano';
-import { Biblioteca, Hoje, NaoEncontrada } from './telas/Areas';
+import { Hoje, NaoEncontrada } from './telas/Areas';
 import './estilos.css';
 
 export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {
@@ -38,7 +40,9 @@ export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {
             <Route path="recall/revisar" element={<Drill />} />
             <Route path="recall/erros/:id" element={<DetalheErro />} />
             <Route path="recall/cartoes/:id" element={<EditarCartao />} />
-            <Route path="biblioteca" element={<Biblioteca />} />
+            <Route path="biblioteca" element={<Normas />} />
+            <Route path="biblioteca/importar" element={<Importar />} />
+            <Route path="biblioteca/importar/:versaoId" element={<Importar />} />
             <Route path="conta" element={<Conta />} />
             <Route path="conta/aparencia" element={<AparenciaConta />} />
             <Route path="conta/dados" element={<Dados />} />

@@ -5,7 +5,7 @@
 // texto por `[versaoId+dispositivoId]`, nunca por `normaId`, que misturaria versões.
 import type { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
 import { LIMITE_MAXIMO_PAGINA, type Repositorio } from '../../core/persistencia';
-import { dispositivosDaNorma } from './consultas';
+import { dispositivosDaNorma, todos } from './consultas';
 
 export type MotivoNormaIndisponivel = 'inexistente' | 'sem_versao_vigente';
 
@@ -49,6 +49,26 @@ export interface ItemDaJanela extends NoDaLeitura {
    * decide como os dispositivos só dela ficam fora da árvore da vigente.
    */
   texto: TextoDeDispositivo | undefined;
+}
+
+/** Ordem da Biblioteca: título curto, sem caixa nem acento, com os números em ordem numérica. */
+const ORDEM_DO_TITULO = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+
+/**
+ * As normas publicadas (com `versaoVigenteId`), para a lista da Biblioteca (9.5), pelo título
+ * curto. A norma só com rascunho fica de fora: aparece na faixa de rascunho pendente
+ * (`rascunhosPendentes`). O ponteiro não é conferido aqui; `abrirNorma` o confere ao abrir.
+ */
+export async function normasPublicadas(repo: Repositorio): Promise<Norma[]> {
+  const normas = await todos(repo.colecao('normas'), {
+    indice: 'usuarioId',
+    de: repo.ctx.usuarioId,
+    ate: repo.ctx.usuarioId,
+    filtro: (n) => n.versaoVigenteId !== undefined,
+  });
+  return normas.sort(
+    (a, b) => ORDEM_DO_TITULO.compare(a.tituloCurto, b.tituloCurto) || (a.id < b.id ? -1 : 1),
+  );
 }
 
 /**
