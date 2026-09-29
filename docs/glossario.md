@@ -49,7 +49,7 @@ Esquemas em `src/core/modelo/`: **S** `sistema.ts`, **P** `plano.ts`, **R** `rec
 | Erro | `Erro` (R) | `erros` | registros | em uso |
 | Cartão | `Cartao` (R) | `cartoes` | registros | em uso |
 | Revisão | `Revisao` (R) | `revisoes` (append-only) | registros | em uso |
-| Norma | `Norma` (L) | `normas` | registros, catalogo | em uso (serviço da 9.2; tela na 9.5) |
+| Norma | `Norma` (L) | `normas` | registros, catalogo | em uso (serviço da 9.2; lista da Biblioteca na 9.5) |
 | Versão de norma | `VersaoDeNorma` (L) | `versoesNorma` | registros, catalogo | em uso (serviço da 9.2 e 9.3: `rascunho` e `vigente`; `arquivada` na 11.7 e na F6) |
 | Dispositivo | `Dispositivo` (L) | `dispositivos` | registros, catalogo | em uso (serviço da 9.2; leitura por janela na 9.4) |
 | Texto de dispositivo | `TextoDeDispositivo` (L) | `textosDispositivo` | registros, catalogo | em uso (serviço da 9.2; leitura por janela na 9.4) |
@@ -101,7 +101,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Âncora, pausa, consentimento, histórico de datas | `Marcacao.ancora { texto, inicio, fim }`, `Sessao.pausas[]`, `Usuario.consentimentos[]`, `FasePrazo.historicoDatas[]` |
 | Alteração (entrada do log) | `Alteracao` na tabela Dexie `alteracoes`; não está em `ENTIDADES` |
 | Módulo | `Modulo` / `MODULOS`: unidade do pacote e de `Preferencias.modulosDesabilitados` |
-| Hoje, Biblioteca, Calendário, Pendência, Backup | telas provisórias `Hoje` e `Biblioteca` (`src/apresentacao/telas/Areas.tsx`); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
+| Hoje, Biblioteca, Calendário, Pendência, Backup | tela provisória `Hoje` (`src/apresentacao/telas/Areas.tsx`); a Biblioteca é `Normas` (`src/apresentacao/biblioteca/Normas.tsx`, 9.5); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
 
 ## 5. Palavras reservadas (D24 e CLAUDE.md)
 
@@ -158,7 +158,7 @@ Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`
 | Domínios | `src/dominios/recall/`; `src/dominios/legislacao/` (F2: estruturador desde a 8.1; `registros.ts` e `servico.ts` desde a 9.2) | `src/core` e o próprio módulo; nunca outro domínio |
 | Suporte | `src/suporte/relatos.ts` | `src/core` e `src/suporte` |
 | Integrações | `src/integracoes/pontos/`; `src/integracoes/normas/` (planejado, 12.1–12.3) | `src/core`, `src/integracoes` e qualquer domínio |
-| Apresentação | `src/apresentacao/`: `App.tsx`, `Shell.tsx`, `Aparencia.tsx`, `componentes/`, `conta/` (+ `dados/`), `dados/`, `orientacoes/`, `plano/`, `recall/`, `suporte/`, `telas/`; `biblioteca/` (planejado, F2) | tudo |
+| Apresentação | `src/apresentacao/`: `App.tsx`, `Shell.tsx`, `Aparencia.tsx`, `componentes/`, `conta/` (+ `dados/`), `dados/`, `orientacoes/`, `plano/`, `recall/`, `suporte/`, `telas/`, `biblioteca/` (F2, desde a 9.5) | tudo |
 | Utilitários de teste | `src/testes/` (`repositorioDeTeste`, `gerarCarga`, `blocosDeNormaSintetica` (9.4: norma de N dispositivos para a carga da leitura), `setup`) | tudo; core, domínios, suporte e integrações só os importam em `*.test.ts(x)` (a regra não impede a apresentação de importá-los fora de teste) |
 | Fora de `src/` | `eslint/`, `supabase/`, `scripts/`, `corpus/`, `e2e/`, `config/`; `worker/` (planejado, 12.1) | não verificado pela regra |
 
@@ -277,7 +277,8 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Fonte guardada | os blocos sanitizados da versão (Parte 2 §13.1, item 8), para reprocessar | Anexo `fonte-sanitizada.json` (`NOME_FONTE`, `TIPO_FONTE` = `application/json`): `serializarFonte(blocos)` = JSON canônico (mesmo conteúdo, mesmos bytes); `VersaoDeNorma.hash` = `Anexo.hash` = SHA-256 desses bytes; `lerFonte(bytes)` confere o formato (dado de backup é externo; link só http(s)) e lança `FonteIlegivel`; `VersaoDeNorma.anexoFonteId` | existe | 9.2 |
 | Lido até, posição | por usuário × norma | coleção `leituras`, tipo `Leitura` (`normaId`, `lidoAteId`, `posicaoId`, `ultimaLeituraEm`, todos opcionais menos `normaId`); rótulo em Conta › Dados: "Posições de leitura" | existe (esquema, 9.1); uso na 9.7 | 9.1, 9.7 |
 | Leitura da norma | a versão vigente aberta para ler: a árvore inteira sem textos, e os textos por janela (9.4) | `abrirNorma(repo, normaId)` → `NormaAberta { norma, versao, nos: NoDaLeitura[], indiceDe }` (em `leitor.ts`); `NoDaLeitura { dispositivo, nivel }` (`nivel`: profundidade, 0 no nó sem pai); `indiceDe`: dispositivo → índice em `nos`; `lerJanela(repo, aberta, { inicio, quantidade })` → `ItemDaJanela { dispositivo, nivel, indice, texto }` (até 200; `texto` da versão aberta, por `[versaoId+dispositivoId]`); `NormaIndisponivel` (motivo `inexistente` ou `sem_versao_vigente`). Consultas do módulo em `consultas.ts` (`todos`, `dispositivosDaNorma`). "Índice" aqui é a posição na lista de leitura, não o índice do banco; "posição" continua sendo o `Leitura.posicaoId` | existe | 9.4 |
-| Colar, leitor | evento `paste` (`text/html`, `text/plain` de reserva) na tela "Importar norma"; leitor virtualizado (T16, `@tanstack/react-virtual`) | telas em `src/apresentacao/biblioteca/` (plano); `LeitorNorma.tsx` (proposto) | plano | 9.5, 9.6 |
+| Biblioteca › Normas | a lista das normas publicadas, pelo título curto, com a faixa de rascunho pendente e o estado vazio com "Importar norma" (Parte 2 §9.2) | tela `Normas` (`src/apresentacao/biblioteca/Normas.tsx`), rota `/biblioteca`; a lista vem de `normasPublicadas(repo)` (`leitor.ts`: só as com `versaoVigenteId`, todas as páginas, ordem natural pt-BR pelo `tituloCurto`); a faixa, região "Importações pendentes" (`rascunhosPendentes`), com "Retomar" e "Descartar" (diálogo; `descartarRascunho`) | existe | 9.5 |
+| Colar, leitor | evento `paste` (`text/html`, `text/plain` de reserva) na tela "Importar norma"; leitor virtualizado (T16, `@tanstack/react-virtual`) | tela `Importar` (`src/apresentacao/biblioteca/Importar.tsx`), rotas `/biblioteca/importar` e, para retomar o rascunho, `/biblioteca/importar/:versaoId`: provisória na 1ª parte da 9.5, a colagem entra na 2ª; `LeitorNorma.tsx` (proposto) | existe (rotas) / plano | 9.5, 9.6 |
 | Modo foco, filtros | leitura limpa; tudo, estrelados, selecionados, com marcações, com erros | `modoFoco`; `FiltroLeitor`: `tudo`, `estrelados`, `selecionados`, `com_marcacoes`, `com_erros` | proposto | 11.1, 11.3 |
 | Leitura artigo por artigo | modo foco com um artigo inteiro por vez num cartão iluminado, o resto esmaecido (decisão de 24/09/2026) | `modoFoco: 'texto' \| 'artigo'`; cartão = artigo com descendentes e rubrica; a posição continua em `leituras.posicaoId` (sem entidade nova) | proposto | 11.8 |
 | Destaque automático | prazos e condicionantes acesos na leitura, com a preferência ligada (decisão de 24/09/2026); **não é** Marcação (grifo) nem Estrela: é calculado, nunca gravado | `Destaque { inicio, fim, categoria }`; `CategoriaDestaque`: `prazo`, `condicao`, `absoluto`, `pena`; `detectarDestaques(texto)` em `src/dominios/legislacao/destaques.ts`; `Preferencias.destacarCondicionantesEPrazos` (opcional; ausente = desligado). O vocabulário se sobrepõe ao `LITERALIDADE` do Recall (`src/dominios/recall/causa.ts`), que fica separado: domínio não importa domínio | proposto | 9.8 |

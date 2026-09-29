@@ -2,7 +2,13 @@ import { LIMITE_MAXIMO_PAGINA, type Repositorio } from '../../core/persistencia'
 import type { Bloco } from '../../core/seguranca/sanitizador';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { abrirNorma, lerJanela, NormaIndisponivel, type MotivoNormaIndisponivel } from './leitor';
+import {
+  abrirNorma,
+  lerJanela,
+  NormaIndisponivel,
+  normasPublicadas,
+  type MotivoNormaIndisponivel,
+} from './leitor';
 import { criarRascunho, publicarVersao } from './servico';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
@@ -209,5 +215,44 @@ describe('ler os textos por janela (9.4)', () => {
     expect(
       (await lerJanela(outro, aberta, { inicio: 1, quantidade: 2 })).map((i) => i.texto),
     ).toEqual([undefined, undefined]);
+  });
+});
+
+describe('normas publicadas, para a Biblioteca (9.5)', () => {
+  it('lista só as publicadas, de todas as páginas, pelo título curto em ordem natural', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma: publicadaDeVerdade } = await publicada(repo);
+    await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html', tituloCurto: 'Só rascunho' });
+    // Mais de uma página (200): o ponteiro não é conferido na lista, só ao abrir.
+    const normas = Array.from({ length: 205 }, (_, i) => ({
+      dados: {
+        tituloCurto: `Lei ${String(205 - i)}`,
+        escopo: 'pessoal' as const,
+        versaoVigenteId: repo.ctx.novoId(),
+      },
+    }));
+    normas.push(
+      { dados: { tituloCurto: 'árvore', escopo: 'pessoal', versaoVigenteId: repo.ctx.novoId() } },
+      { dados: { tituloCurto: 'Excluída', escopo: 'pessoal', versaoVigenteId: repo.ctx.novoId() } },
+    );
+    const criadas = await repo.colecao('normas').criarLote(normas);
+    await repo.colecao('normas').excluir(criadas.at(-1)?.id ?? '');
+    await repo
+      .comUsuario(repo.ctx.novoId())
+      .colecao('normas')
+      .criar({ tituloCurto: 'De outro', escopo: 'pessoal', versaoVigenteId: repo.ctx.novoId() });
+
+    const lista = await normasPublicadas(repo);
+    expect(lista).toHaveLength(207);
+    expect(lista.slice(0, 5).map((n) => n.tituloCurto)).toEqual([
+      'árvore',
+      'Lei 1',
+      'Lei 2',
+      'Lei 3',
+      'Lei 4',
+    ]);
+    expect(lista.at(-2)?.tituloCurto).toBe('Lei 205');
+    expect(lista.at(-1)?.id).toBe(publicadaDeVerdade.id);
+    expect(lista.map((n) => n.tituloCurto)).not.toContain('Só rascunho');
   });
 });
