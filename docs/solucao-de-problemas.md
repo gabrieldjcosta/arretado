@@ -229,6 +229,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** gravar o pendente ao sair da tela; aceitar digitação parcial e gravar só quando válido, com os limites do modelo nos campos. **Prevenção:** testes em `Recall.test.tsx`; vale para o editor de rascunho (10.2) e para o "lido até" (9.7).
 - **Origem:** ocorrido em 23/09/2026 (commit 3c07cbf).
 
+### Diálogo continua aberto depois de confirmar (teste que falha às vezes)
+- **Sintoma:** no CI, `Biblioteca.test.tsx` › "descartar pede confirmação…" falha de vez em quando: o aviso "Importação de ECA descartada." já está na tela, mas `queryByRole('dialog')` ainda acha o `<dialog open>`, com o título vazio ("Descartar a importação de ?"). **Causa:** o `Dialogo` chamava `showModal()`/`close()` num `useEffect`, que roda depois da pintura; entre o commit que troca `aberto` e o efeito, o diálogo fica aberto sem conteúdo (também visível ao usuário por um quadro). Qualquer leitura a mais na tela (a 9.7 pôs as leituras na Biblioteca) muda o tempo e expõe a corrida: 2 em 12 execuções locais.
+- **Solução:** `useLayoutEffect` no `Dialogo` (abre e fecha no mesmo commit, antes da pintura): 25 em 25. **Prevenção:** estado de elemento imperativo (`<dialog>`, foco, rolagem) que tem de acompanhar o render vai em `useLayoutEffect`; teste de tela que falha "às vezes" é corrida, não instabilidade do CI: repetir o arquivo em laço (`for i in …; npx vitest run <arquivo>`) antes e depois da correção.
+- **Origem:** ocorrido em 29/09/2026 (PR #24, atividade 9.7).
+
 ### Clique duplo cria registro duplicado
 - **Sintoma:** dois cartões para o mesmo erro (duplo clique ou outra aba). **Causa:** criação sem guarda de idempotência.
 - **Solução:** cartão de erro idempotente no serviço e botões com guarda contra clique duplo. **Prevenção:** "criar cartão duas vezes para o mesmo erro devolve o mesmo cartão"; vale para "Publicar" (9.3) e "Criar cartão deste trecho" (11.5). Na tela Importar (9.5), uma trava por `useRef` (o estado só muda no próximo render) vale para colar, publicar e descartar, e o botão vira "Publicando…", desabilitado, já no primeiro clique ("pela rota do rascunho…", `Importar.test.tsx`).
