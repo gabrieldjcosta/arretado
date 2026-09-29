@@ -1,10 +1,11 @@
-// Serviço da Legislação (F2, 9.2; Parte 2 §10.6 e §13.1, item 8): do Bloco[] sanitizado ao
+// Serviço da Legislação (F2, 9.2 e 9.3; Parte 2 §10.6 e §13.1, item 8): do Bloco[] sanitizado ao
 // rascunho gravado (Norma, VersaoDeNorma com status 'rascunho', um Dispositivo e um
 // TextoDeDispositivo por nó e a fonte como Anexo), numa transação só; descartar e retomar o
-// rascunho. O hash (da versão e do anexo, sobre os blocos sanitizados) é calculado antes da
-// transação: WebCrypto aguardado dentro dela a fecha (`PrematureCommitError`).
+// rascunho; publicá-lo (a versão vira vigente). O hash (da versão e do anexo, sobre os blocos
+// sanitizados) é calculado antes da transação: WebCrypto aguardado dentro dela a fecha
+// (`PrematureCommitError`).
 import { dataCivil } from '../../core/datas';
-import type { NomeColecao, Norma, RegistroDe, VersaoDeNorma } from '../../core/modelo';
+import type { Dispositivo, NomeColecao, Norma, RegistroDe, VersaoDeNorma } from '../../core/modelo';
 import {
   AnexoAlterado,
   gravarAnexo,
@@ -19,7 +20,7 @@ import {
 } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
 import { estruturar } from './estruturador';
-import type { Rascunho } from './rascunho';
+import type { Anomalia, Rascunho } from './rascunho';
 import {
   dadosDaNorma,
   FonteIlegivel,
@@ -214,6 +215,151 @@ export async function descartarRascunho(repo: Repositorio, versaoId: string): Pr
   });
 }
 
+/** Resultado da checagem que antecede a publicação (a mesma que `publicarVersao` refaz). */
+export interface RelatorioDePublicacao {
+  /** Bloqueiam a publicação (regra 12: "publicar exige zero conflito"). */
+  conflitos: Anomalia[];
+  /** Só informam; a publicação segue. */
+  avisos: Anomalia[];
+  /** Dispositivos "a confirmar" (regra 12): a publicação pede o aceite em lote. */
+  aConfirmar: number;
+  totalDispositivos: number;
+}
+
+export interface OpcoesPublicacao {
+  /** Aceita em lote os dispositivos "a confirmar" (regra 12); sem isso, eles bloqueiam. */
+  aceitarAConfirmar?: boolean;
+}
+
+export interface NormaPublicada {
+  norma: Norma;
+  versao: VersaoDeNorma;
+  relatorio: RelatorioDePublicacao;
+}
+
+export type MotivoPublicacaoBloqueada = 'conflitos' | 'a_confirmar';
+
+export class PublicacaoBloqueada extends Error {
+  constructor(
+    readonly versaoId: string,
+    readonly motivo: MotivoPublicacaoBloqueada,
+    readonly relatorio: RelatorioDePublicacao,
+  ) {
+    super(
+      motivo === 'conflitos'
+        ? `Há ${String(relatorio.conflitos.length)} conflito(s) a resolver antes de publicar.`
+        : `${String(relatorio.aConfirmar)} dispositivo(s) a confirmar: aceite-os em lote para publicar.`,
+    );
+    this.name = 'PublicacaoBloqueada';
+  }
+}
+
+/**
+ * Confere a árvore GRAVADA (não a da fonte): o que se publica é o que está nos registros, e o
+ * editor (etapa 10) muda os registros, não a fonte. As anomalias do estruturador não são
+ * gravadas (9.2); aqui saem os dois conflitos que já existem: norma sem artigo (`sem_artigos`) e
+ * endereço repetido (`endereco_duplicado`). A 8.7 acrescenta os outros da regra 13.
+ *
+ * Endereço repetido: se todos os repetidos são nós estruturais (LC 80: duas "SEÇÃO IV" no mesmo
+ * capítulo), só avisa, porque o leitor lê a norma e a revisão (etapa 10) corrige o rótulo; se
+ * algum é dispositivo (artigo a item, nome, preâmbulo, anexo), bloqueia. Decisão da 9.3, até a
+ * 8.7 (ver "Fatos da publicação (9.3)" no plano): a 8.7 reexamina o estrutural repetido.
+ */
+function relatorioDaArvore(dispositivos: readonly Dispositivo[]): RelatorioDePublicacao {
+  const conflitos: Anomalia[] = [];
+  const avisos: Anomalia[] = [];
+  const porEndereco = new Map<string, Dispositivo[]>();
+  let artigos = 0;
+  let aConfirmar = 0;
+  for (const d of dispositivos) {
+    if (d.tipo === 'artigo') artigos += 1;
+    if (d.confianca === 'a_confirmar') aConfirmar += 1;
+    const lista = porEndereco.get(d.endereco);
+    if (lista) lista.push(d);
+    else porEndereco.set(d.endereco, [d]);
+  }
+  if (artigos === 0) {
+    conflitos.push({
+      tipo: 'sem_artigos',
+      gravidade: 'conflito',
+      mensagem: 'Não consegui identificar artigos.',
+    });
+  }
+  for (const [endereco, lista] of porEndereco) {
+    if (lista.length < 2) continue;
+    const rotulos = [...new Set(lista.map((d) => d.rotulo ?? endereco))].join(', ');
+    const onde = `O endereço ${endereco} aparece ${String(lista.length)} vezes (${rotulos})`;
+    if (lista.every((d) => d.categoria === 'estrutural')) {
+      avisos.push({
+        tipo: 'endereco_duplicado',
+        gravidade: 'aviso',
+        endereco,
+        mensagem: `${onde}: a fonte repete a numeração. Dá para publicar; corrija o rótulo na revisão.`,
+      });
+    } else {
+      conflitos.push({
+        tipo: 'endereco_duplicado',
+        gravidade: 'conflito',
+        endereco,
+        mensagem: `${onde}. Corrija antes de publicar.`,
+      });
+    }
+  }
+  return { conflitos, avisos, aConfirmar, totalDispositivos: dispositivos.length };
+}
+
+/**
+ * O que a publicação de um rascunho encontraria agora, para a tela habilitar ou não o "Publicar"
+ * (9.5). Recusa, como `publicarVersao`, o que não é rascunho de norma única.
+ */
+export async function verificarPublicacao(
+  repo: Repositorio,
+  versaoId: string,
+): Promise<RelatorioDePublicacao> {
+  return repo.transacao(async () => (await prepararPublicacao(repo, versaoId)).relatorio);
+}
+
+/**
+ * Publica o rascunho: a versão vira vigente e a norma passa a apontar para ela
+ * (`versaoVigenteId`); o evento `versao.publicada` sai depois da confirmação. Recusa com
+ * `PublicacaoBloqueada` se houver conflito, ou dispositivo "a confirmar" sem `aceitarAConfirmar`.
+ * Dispositivos e textos não mudam: o "a confirmar" aceito continua "a confirmar" (a 10.1 os
+ * confirma), e norma publicada só muda com nova versão. O estado é relido na mesma transação que
+ * escreve: publicar e descartar o mesmo rascunho em duas abas termina em `RascunhoIndisponivel`
+ * para uma delas. Só publica a primeira versão de uma norma; arquivar a anterior é da versão nova
+ * (11.7 e F6).
+ */
+export async function publicarVersao(
+  repo: Repositorio,
+  versaoId: string,
+  opcoes: OpcoesPublicacao = {},
+): Promise<NormaPublicada> {
+  const publicada = await repo.transacao(async () => {
+    const { norma, versao, relatorio } = await prepararPublicacao(repo, versaoId);
+    if (relatorio.conflitos.length > 0) {
+      throw new PublicacaoBloqueada(versaoId, 'conflitos', relatorio);
+    }
+    if (relatorio.aConfirmar > 0 && opcoes.aceitarAConfirmar !== true) {
+      throw new PublicacaoBloqueada(versaoId, 'a_confirmar', relatorio);
+    }
+    const vigente = await repo.colecao('versoesNorma').atualizar(versao.id, { status: 'vigente' });
+    const normaAtual = await repo
+      .colecao('normas')
+      .atualizar(norma.id, { versaoVigenteId: versao.id });
+    return { norma: normaAtual, versao: vigente, relatorio };
+  });
+  repo.eventos.emitir('versao.publicada', { normaId: publicada.norma.id, versaoId });
+  return publicada;
+}
+
+/** Só dentro de uma transação: o estado lido é o que a escrita seguinte vê. */
+async function prepararPublicacao(repo: Repositorio, versaoId: string) {
+  const { norma, versao } = await rascunhoGravado(repo, versaoId);
+  await exigirVersaoUnica(repo, norma.id, versao.id);
+  const relatorio = relatorioDaArvore(await dispositivosDaNorma(repo, norma.id, false));
+  return { norma, versao, relatorio };
+}
+
 async function rascunhoGravado(
   repo: Repositorio,
   versaoId: string,
@@ -261,13 +407,17 @@ async function arvoreGravada(repo: Repositorio, normaId: string, versaoId: strin
     ate: versaoId,
     incluirExcluidos: true,
   });
-  const dispositivos = await todos(repo.colecao('dispositivos'), {
+  return { dispositivos: await dispositivosDaNorma(repo, normaId, true), textos };
+}
+
+/** Dispositivos da norma, na ordem de leitura. */
+function dispositivosDaNorma(repo: Repositorio, normaId: string, incluirExcluidos: boolean) {
+  return todos(repo.colecao('dispositivos'), {
     indice: '[normaId+ordem]',
     de: [normaId, -Infinity],
     ate: [normaId, Infinity],
-    incluirExcluidos: true,
+    incluirExcluidos,
   });
-  return { dispositivos, textos };
 }
 
 async function apagarArvore(

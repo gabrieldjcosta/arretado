@@ -1,6 +1,6 @@
 import { Barramento, type Evento } from '../../core/eventos/barramento';
 import { aplicar, exportarPacote, lerPacote, planejar } from '../../core/pacote';
-import { lerAnexo, RegistroInvalido, type Repositorio } from '../../core/persistencia';
+import { lerAnexo, RegistroInvalido, Repositorio } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
 import { sha256 } from '../../core/util/sha256';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -9,9 +9,12 @@ import { lerFonte, serializarFonte } from './registros';
 import {
   criarRascunho,
   descartarRascunho,
+  PublicacaoBloqueada,
+  publicarVersao,
   RascunhoIndisponivel,
   rascunhosPendentes,
   retomarRascunho,
+  verificarPublicacao,
 } from './servico';
 
 const LINK = 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14000.htm';
@@ -421,5 +424,369 @@ describe('rascunhos pendentes, retomar e descartar (9.2)', () => {
       'norma_com_outras_versoes',
     );
     expect(await contagem(repo)).toEqual(antes);
+  });
+});
+
+// Duas "SEÇÃO IV" no mesmo capítulo, como na LC 80: o estrutural repete, o artigo não.
+const DUAS_SECOES: Bloco[] = [
+  linha('LEI COMPLEMENTAR Nº 1, DE 1º DE JANEIRO DE 2000.'),
+  linha('Dispõe sobre o teste.'),
+  linha('TÍTULO I'),
+  linha('DO TESTE'),
+  linha('CAPÍTULO I'),
+  linha('DO CAPÍTULO'),
+  linha('SEÇÃO IV'),
+  linha('DA PRIMEIRA'),
+  linha('Art. 1º Um.'),
+  linha('SEÇÃO IV'),
+  linha('DA SEGUNDA'),
+  linha('Art. 2º Dois.'),
+];
+
+async function bloqueioDa(promessa: Promise<unknown>) {
+  try {
+    await promessa;
+  } catch (excecao) {
+    if (excecao instanceof PublicacaoBloqueada) return excecao;
+    throw excecao;
+  }
+  return undefined;
+}
+
+/** O que a publicação não pode mudar: a árvore da norma. */
+async function estado(repo: Repositorio, normaId: string) {
+  const lida = await arvore(repo, normaId);
+  return { dispositivos: lida.dispositivos, textos: lida.textos };
+}
+
+describe('publicar (9.3)', () => {
+  it('a versão vira vigente, a norma aponta para ela e a árvore fica como estava', async () => {
+    const eventos = new Barramento();
+    const { repo, relogio } = await repositorioDeTeste({ eventos });
+    const criado = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    const antes = await estado(repo, criado.norma.id);
+    const log = await repo.db.alteracoes.count();
+    const recebidos: Evento[] = [];
+    eventos.assinar('*', (e) => {
+      recebidos.push(e);
+    });
+    relogio.avancar(60_000);
+
+    const publicada = await publicarVersao(repo, criado.versao.id);
+
+    expect(publicada.versao).toMatchObject({ id: criado.versao.id, status: 'vigente' });
+    expect(publicada.norma).toMatchObject({
+      id: criado.norma.id,
+      versaoVigenteId: criado.versao.id,
+    });
+    expect(publicada.relatorio).toEqual({
+      conflitos: [],
+      avisos: [],
+      aConfirmar: 0,
+      totalDispositivos: 9,
+    });
+    expect(await repo.colecao('versoesNorma').obter(criado.versao.id)).toEqual(publicada.versao);
+    expect(await repo.colecao('normas').obter(criado.norma.id)).toEqual(publicada.norma);
+    // Só a versão e a norma mudam: dispositivos e textos iguais, byte a byte.
+    expect(await estado(repo, criado.norma.id)).toEqual(antes);
+    expect(await rascunhosPendentes(repo)).toEqual([]);
+    // Duas atualizações no log, e nenhuma outra escrita.
+    const novas = await repo.db.alteracoes.where('seq').above(log).toArray();
+    expect(novas.map((l) => [l.colecao, l.operacao])).toEqual([
+      ['versoesNorma', 'atualizar'],
+      ['normas', 'atualizar'],
+    ]);
+    // O evento sai depois da confirmação, com só os ids.
+    expect(recebidos.map((e) => e.nome)).toEqual([
+      'registro.atualizado',
+      'registro.atualizado',
+      'versao.publicada',
+    ]);
+    expect(recebidos.at(-1)?.payload).toEqual({
+      normaId: criado.norma.id,
+      versaoId: criado.versao.id,
+    });
+  });
+
+  it('norma publicada nunca muda sem nova versão: publicar, descartar e retomar recusam', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    await publicarVersao(repo, versao.id);
+    // Como se o estruturador tivesse mudado depois: retomar refaria a árvore de um rascunho.
+    await repo.colecao('versoesNorma').atualizar(versao.id, { versaoAdaptador: '0.4' });
+    const antes = await estado(repo, norma.id);
+    const log = await repo.db.alteracoes.count();
+
+    expect(await motivoDa(publicarVersao(repo, versao.id))).toBe('publicada');
+    expect(await motivoDa(descartarRascunho(repo, versao.id))).toBe('publicada');
+    expect(await motivoDa(retomarRascunho(repo, versao.id))).toBe('publicada');
+    expect(await motivoDa(verificarPublicacao(repo, versao.id))).toBe('publicada');
+
+    expect(await estado(repo, norma.id)).toEqual(antes);
+    expect(await repo.db.alteracoes.count()).toBe(log);
+    expect(await contagem(repo)).toMatchObject({ normas: 1, versoesNorma: 1, dispositivos: 9 });
+  });
+
+  it('endereço de dispositivo duplicado bloqueia, sem mudar nada, e publica quando é corrigido', async () => {
+    const eventos = new Barramento();
+    const { repo } = await repositorioDeTeste({ eventos });
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    const repetido = await repo.colecao('dispositivos').criar({
+      normaId: norma.id,
+      endereco: 'art1',
+      categoria: 'normativo',
+      tipo: 'artigo',
+      ordem: 10,
+      rotulo: 'Art. 1º-A',
+      status: 'vigente',
+      confianca: 'alta',
+    });
+    const recebidos: string[] = [];
+    eventos.assinar('versao.publicada', (e) => {
+      recebidos.push(e.nome);
+    });
+    const log = await repo.db.alteracoes.count();
+
+    const relatorio = await verificarPublicacao(repo, versao.id);
+    expect(relatorio.conflitos).toEqual([
+      {
+        tipo: 'endereco_duplicado',
+        gravidade: 'conflito',
+        endereco: 'art1',
+        mensagem:
+          'O endereço art1 aparece 2 vezes (Art. 1º, Art. 1º-A). Corrija antes de publicar.',
+      },
+    ]);
+    expect(relatorio.avisos).toEqual([]);
+
+    // O aceite em lote é dos "a confirmar"; não passa por cima de conflito.
+    const bloqueio = await bloqueioDa(publicarVersao(repo, versao.id, { aceitarAConfirmar: true }));
+    expect(bloqueio).toMatchObject({ motivo: 'conflitos', versaoId: versao.id });
+    expect(bloqueio?.relatorio.conflitos).toHaveLength(1);
+    expect(bloqueio?.message).toBe('Há 1 conflito(s) a resolver antes de publicar.');
+    expect(await repo.colecao('versoesNorma').obter(versao.id)).toMatchObject({
+      status: 'rascunho',
+    });
+    expect(await repo.colecao('normas').obter(norma.id)).not.toHaveProperty('versaoVigenteId');
+    expect(await repo.db.alteracoes.count()).toBe(log);
+    expect(recebidos).toEqual([]);
+
+    // Dispositivo excluído (logicamente) não conta.
+    await repo.colecao('dispositivos').excluir(repetido.id);
+    const publicada = await publicarVersao(repo, versao.id);
+    expect(publicada.versao.status).toBe('vigente');
+    expect(recebidos).toEqual(['versao.publicada']);
+  });
+
+  it('nó estrutural repetido só avisa (LC 80: duas "SEÇÃO IV") e a norma é publicada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao, rascunho } = await criarRascunho(repo, {
+      blocos: DUAS_SECOES,
+      origemEntrada: 'html',
+    });
+    // A árvore gravada mesmo tem o endereço duas vezes (o estruturador não funde o estrutural).
+    const gravada = await arvore(repo, norma.id);
+    expect(gravada.dispositivos.filter((d) => d.endereco === 'tit1.cap1.sec4')).toHaveLength(2);
+    expect(rascunho.anomalias.filter((a) => a.gravidade === 'conflito')).toEqual([]);
+
+    const publicada = await publicarVersao(repo, versao.id);
+    expect(publicada.relatorio.conflitos).toEqual([]);
+    expect(publicada.relatorio.avisos.map((a) => [a.tipo, a.gravidade, a.endereco])).toEqual([
+      ['endereco_duplicado', 'aviso', 'tit1.cap1.sec4'],
+      ['endereco_duplicado', 'aviso', 'tit1.cap1.sec4.nome'],
+    ]);
+    expect(publicada.relatorio.avisos[0]?.mensagem).toBe(
+      'O endereço tit1.cap1.sec4 aparece 2 vezes (SEÇÃO IV): a fonte repete a numeração. Dá para publicar; corrija o rótulo na revisão.',
+    );
+    expect(publicada.versao.status).toBe('vigente');
+  });
+
+  it('estrutural e dispositivo no mesmo endereço é conflito; o aviso é só de estrutural com estrutural', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, {
+      blocos: DUAS_SECOES,
+      origemEntrada: 'html',
+    });
+    await repo.colecao('dispositivos').criar({
+      normaId: norma.id,
+      endereco: 'tit1.cap1.sec4',
+      categoria: 'normativo',
+      tipo: 'artigo',
+      ordem: 20,
+      status: 'vigente',
+      confianca: 'alta',
+    });
+    const relatorio = await verificarPublicacao(repo, versao.id);
+    expect(relatorio.conflitos.map((c) => c.endereco)).toEqual(['tit1.cap1.sec4']);
+    expect(relatorio.avisos.map((a) => a.endereco)).toEqual(['tit1.cap1.sec4.nome']);
+  });
+
+  it('norma sem artigo bloqueia (é o conflito que o estruturador já acusa)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { versao } = await criarRascunho(repo, {
+      blocos: [linha('Um texto qualquer que não é lei.')],
+      origemEntrada: 'html',
+    });
+    const bloqueio = await bloqueioDa(publicarVersao(repo, versao.id, { aceitarAConfirmar: true }));
+    expect(bloqueio?.motivo).toBe('conflitos');
+    expect(bloqueio?.relatorio.conflitos.map((c) => c.tipo)).toEqual(['sem_artigos']);
+  });
+
+  it('"a confirmar" bloqueia até ser aceito em lote, e o aceite não muda a confiança', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'texto' });
+    const total = (await arvore(repo, norma.id)).dispositivos.length;
+    const relatorio = await verificarPublicacao(repo, versao.id);
+    expect(relatorio).toMatchObject({ conflitos: [], aConfirmar: total, totalDispositivos: total });
+
+    const bloqueio = await bloqueioDa(publicarVersao(repo, versao.id));
+    expect(bloqueio).toMatchObject({ motivo: 'a_confirmar' });
+    expect(bloqueio?.relatorio.aConfirmar).toBe(total);
+    expect(bloqueio?.message).toBe(
+      `${String(total)} dispositivo(s) a confirmar: aceite-os em lote para publicar.`,
+    );
+    expect(
+      await bloqueioDa(publicarVersao(repo, versao.id, { aceitarAConfirmar: false })),
+    ).toMatchObject({ motivo: 'a_confirmar' });
+    expect(await repo.colecao('versoesNorma').obter(versao.id)).toMatchObject({
+      status: 'rascunho',
+    });
+
+    const antes = await estado(repo, norma.id);
+    const publicada = await publicarVersao(repo, versao.id, { aceitarAConfirmar: true });
+    expect(publicada.versao.status).toBe('vigente');
+    expect(publicada.relatorio.aConfirmar).toBe(total);
+    expect(await estado(repo, norma.id)).toEqual(antes);
+    expect(
+      (await arvore(repo, norma.id)).dispositivos.every((d) => d.confianca === 'a_confirmar'),
+    ).toBe(true);
+  });
+
+  it('conflito vem antes do "a confirmar": corrigir primeiro, e o aceite em lote não o dispensa', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'texto' });
+    await repo.colecao('dispositivos').criar({
+      normaId: norma.id,
+      endereco: 'art1',
+      categoria: 'normativo',
+      tipo: 'artigo',
+      ordem: 20,
+      status: 'vigente',
+      confianca: 'a_confirmar',
+    });
+    const relatorio = await verificarPublicacao(repo, versao.id);
+    expect(relatorio.conflitos.map((c) => c.endereco)).toEqual(['art1']);
+    expect(relatorio.aConfirmar).toBeGreaterThan(1);
+    for (const opcoes of [{}, { aceitarAConfirmar: true }]) {
+      expect((await bloqueioDa(publicarVersao(repo, versao.id, opcoes)))?.motivo).toBe('conflitos');
+    }
+    expect(await repo.colecao('versoesNorma').obter(versao.id)).toMatchObject({
+      status: 'rascunho',
+    });
+  });
+
+  it('só os dispositivos "a confirmar" contam, e sem eles o aceite é dispensável', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    const art2 = (await arvore(repo, norma.id)).dispositivos.find((d) => d.endereco === 'art2');
+    await repo.colecao('dispositivos').atualizar(art2?.id ?? '', { confianca: 'a_confirmar' });
+    expect((await verificarPublicacao(repo, versao.id)).aConfirmar).toBe(1);
+    expect((await bloqueioDa(publicarVersao(repo, versao.id)))?.motivo).toBe('a_confirmar');
+    await repo.colecao('dispositivos').atualizar(art2?.id ?? '', { confianca: 'media' });
+    expect((await publicarVersao(repo, versao.id)).versao.status).toBe('vigente');
+  });
+
+  it('a verificação não grava nada e recusa o que não é rascunho de norma única', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    const log = await repo.db.alteracoes.count();
+    await verificarPublicacao(repo, versao.id);
+    expect(await repo.db.alteracoes.count()).toBe(log);
+    expect(await motivoDa(verificarPublicacao(repo, repo.ctx.novoId()))).toBe('inexistente');
+
+    await repo.colecao('versoesNorma').criar({
+      normaId: norma.id,
+      status: 'arquivada',
+      capturadaEm: '2026-09-01T12:00:00.000Z',
+      origemEntrada: 'html',
+      hash: '0'.repeat(64),
+    });
+    expect(await motivoDa(verificarPublicacao(repo, versao.id))).toBe('norma_com_outras_versoes');
+    const antes = await estado(repo, norma.id);
+    expect(await motivoDa(publicarVersao(repo, versao.id))).toBe('norma_com_outras_versoes');
+    expect(await repo.colecao('versoesNorma').obter(versao.id)).toMatchObject({
+      status: 'rascunho',
+    });
+    expect(await estado(repo, norma.id)).toEqual(antes);
+  });
+
+  it('publicar depois de descartar, e descartar depois de publicar: a segunda recusa', async () => {
+    const { repo } = await repositorioDeTeste();
+    const a = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    await descartarRascunho(repo, a.versao.id);
+    expect(await motivoDa(publicarVersao(repo, a.versao.id))).toBe('inexistente');
+    expect(await contagem(repo)).toMatchObject({ normas: 0, dispositivos: 0 });
+
+    const b = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    await publicarVersao(repo, b.versao.id);
+    expect(await motivoDa(descartarRascunho(repo, b.versao.id))).toBe('publicada');
+    expect(await contagem(repo)).toMatchObject({
+      normas: 1,
+      dispositivos: 9,
+      textosDispositivo: 9,
+    });
+  });
+
+  it('duas abas ao mesmo tempo: uma publica ou descarta, a outra recusa, e nada fica pela metade', async () => {
+    const { repo: aba1 } = await repositorioDeTeste();
+    const aba2 = await Repositorio.abrir({ nomeBanco: aba1.db.name });
+    try {
+      for (const ordem of ['publicar-primeiro', 'descartar-primeiro'] as const) {
+        const { norma, versao } = await criarRascunho(aba1, { blocos: LEI, origemEntrada: 'html' });
+        const publicar = () => publicarVersao(aba1, versao.id);
+        const descartar = () => descartarRascunho(aba2, versao.id);
+        const [publicou, descartou] =
+          ordem === 'publicar-primeiro'
+            ? await Promise.allSettled([publicar(), descartar()])
+            : (await Promise.allSettled([descartar(), publicar()])).reverse();
+        // Exatamente uma das duas tem êxito; a outra é RascunhoIndisponivel.
+        expect([publicou?.status, descartou?.status].sort()).toEqual(['fulfilled', 'rejected']);
+        const recusada = publicou?.status === 'rejected' ? publicou : descartou;
+        expect(recusada?.status === 'rejected' && recusada.reason).toBeInstanceOf(
+          RascunhoIndisponivel,
+        );
+        const versaoLida = await aba1.colecao('versoesNorma').obter(versao.id);
+        if (publicou?.status === 'fulfilled') {
+          expect(versaoLida?.status).toBe('vigente');
+          expect((await arvore(aba1, norma.id)).dispositivos).toHaveLength(9);
+        } else {
+          expect(versaoLida).toBeUndefined();
+          expect((await arvore(aba1, norma.id)).dispositivos).toHaveLength(0);
+          expect(await aba1.colecao('normas').obter(norma.id)).toBeUndefined();
+        }
+      }
+      // Publicar duas vezes ao mesmo tempo: uma só publica.
+      const { versao } = await criarRascunho(aba1, { blocos: LEI, origemEntrada: 'html' });
+      const dupla = await Promise.allSettled([
+        publicarVersao(aba1, versao.id),
+        publicarVersao(aba2, versao.id),
+      ]);
+      expect(dupla.map((r) => r.status).sort()).toEqual(['fulfilled', 'rejected']);
+    } finally {
+      aba2.fechar();
+    }
+  });
+
+  it('o evento não sai quando a publicação falha', async () => {
+    const eventos = new Barramento();
+    const { repo } = await repositorioDeTeste({ eventos });
+    const { versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'texto' });
+    const nomes: string[] = [];
+    eventos.assinar('*', (e) => {
+      nomes.push(e.nome);
+    });
+    await bloqueioDa(publicarVersao(repo, versao.id));
+    await motivoDa(publicarVersao(repo, repo.ctx.novoId()));
+    expect(nomes).toEqual([]);
   });
 });
