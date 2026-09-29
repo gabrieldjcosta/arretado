@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import type { Norma, VersaoDeNorma } from '../../core/modelo';
+import type { Leitura, Norma, VersaoDeNorma } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { normasPublicadas } from '../../dominios/legislacao/leitor';
+import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
 import {
   descartarRascunho,
   RascunhoIndisponivel,
@@ -19,8 +20,24 @@ interface Pendente {
 }
 
 async function carregarBiblioteca(repo: Repositorio) {
-  const [normas, pendentes] = await Promise.all([normasPublicadas(repo), rascunhosPendentes(repo)]);
-  return { normas, pendentes };
+  const [normas, pendentes, leituras] = await Promise.all([
+    normasPublicadas(repo),
+    rascunhosPendentes(repo),
+    leiturasPorNorma(repo),
+  ]);
+  return { normas, pendentes, leituras, continuar: ultimaLida(normas, leituras) };
+}
+
+/** A norma publicada lida por último: a do "Continuar leitura" (Parte 2 §9.2). */
+function ultimaLida(normas: readonly Norma[], leituras: ReadonlyMap<string, Leitura>) {
+  let ultima: { norma: Norma; leitura: Leitura } | undefined;
+  for (const norma of normas) {
+    const leitura = leituras.get(norma.id);
+    if (leitura && (!ultima || lidaEm(leitura) > lidaEm(ultima.leitura))) {
+      ultima = { norma, leitura };
+    }
+  }
+  return ultima?.norma;
 }
 
 /** "Lei nº 7.210/1984 · Institui a Lei de Execução Penal.": o que o título curto não diz. */
@@ -44,8 +61,9 @@ function avisoDaNavegacao(estado: unknown): string | null {
   return typeof estado.aviso === 'string' ? estado.aviso : null;
 }
 
-const IMPORTAR = (
-  <Link to="/biblioteca/importar" className="botao principal">
+/** "Importar norma" é a ação principal enquanto não há leitura para continuar. */
+const importar = (principal: boolean) => (
+  <Link to="/biblioteca/importar" className={principal ? 'botao principal' : 'botao'}>
     Importar norma
   </Link>
 );
@@ -149,32 +167,47 @@ export function Normas() {
             </section>
           )}
           {dados.normas.length === 0 ? (
-            <Vazio titulo="Nenhuma norma ainda" acao={IMPORTAR}>
+            <Vazio titulo="Nenhuma norma ainda" acao={importar(true)}>
               <p>
                 Cole a lei da página do Planalto ou da ALESP: o Arretado separa artigos, parágrafos
                 e incisos para você ler e marcar.
               </p>
             </Vazio>
           ) : (
-            <section aria-labelledby="titulo-normas">
-              <div className="cabecalho-secao">
-                <h2 id="titulo-normas">Normas</h2>
-                {IMPORTAR}
-              </div>
-              <ul className="lista-simples">
-                {dados.normas.map((n) => {
-                  const descricao = descricaoDe(n);
-                  return (
-                    <li key={n.id}>
-                      <Link className="item-norma" to={`/biblioteca/normas/${n.id}`}>
-                        <strong>{n.tituloCurto}</strong>
-                        {descricao && <span className="dica">{descricao}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
+            <>
+              {dados.continuar && (
+                <p className="continuar-leitura">
+                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao principal">
+                    Continuar leitura: {dados.continuar.tituloCurto}
+                  </Link>
+                </p>
+              )}
+              <section aria-labelledby="titulo-normas">
+                <div className="cabecalho-secao">
+                  <h2 id="titulo-normas">Normas</h2>
+                  {importar(!dados.continuar)}
+                </div>
+                <ul className="lista-simples">
+                  {dados.normas.map((n) => {
+                    const descricao = descricaoDe(n);
+                    const leitura = dados.leituras.get(n.id);
+                    return (
+                      <li key={n.id}>
+                        <Link className="item-norma" to={`/biblioteca/normas/${n.id}`}>
+                          <strong>{n.tituloCurto}</strong>
+                          {descricao && <span className="dica">{descricao}</span>}
+                          {leitura && (
+                            <span className="dica ultima-leitura">
+                              Última leitura: {formatarQuando(lidaEm(leitura))}
+                            </span>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            </>
           )}
         </>
       )}

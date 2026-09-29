@@ -84,3 +84,45 @@ const LINHAS_ESTIMADAS: Partial<Record<TipoDispositivo, number>> = {
 export function estimarAltura(tipo: TipoDispositivo, tamanhoDoTexto: number): number {
   return Math.round((LINHAS_ESTIMADAS[tipo] ?? 3) * tamanhoDoTexto * 1.6 + 16);
 }
+
+/**
+ * A linha que mostra o nó `indice` de `NormaAberta.nos` (9.7: abrir na posição guardada). As
+ * linhas estão em ordem de `indice`; o `nome` dobrado no pai não tem linha e vale a do pai, que é
+ * a última com `indice` menor. `undefined` se não há linha (norma vazia ou índice antes da 1ª).
+ */
+export function linhaDoNo(linhas: readonly LinhaDoLeitor[], indice: number): number | undefined {
+  let baixo = 0;
+  let alto = linhas.length - 1;
+  let achada: number | undefined;
+  while (baixo <= alto) {
+    const meio = (baixo + alto) >> 1;
+    if ((linhas[meio]?.indice ?? Infinity) <= indice) {
+      achada = meio;
+      baixo = meio + 1;
+    } else {
+      alto = meio - 1;
+    }
+  }
+  return achada;
+}
+
+/**
+ * "Art. 41, I", "Art. 1º, § 1º", "TÍTULO I": como o "lido até" é mostrado. Do artigo até o nó, os
+ * rótulos da cadeia; fora de artigo, o rótulo do próprio nó.
+ */
+export function referenciaDoNo(
+  nos: readonly NoDaLeitura[],
+  indiceDe: ReadonlyMap<string, number>,
+  indice: number,
+): string {
+  const rotulos: string[] = [];
+  let atual: number | undefined = indice;
+  while (atual !== undefined) {
+    const dispositivo: NoDaLeitura['dispositivo'] | undefined = nos[atual]?.dispositivo;
+    if (!dispositivo) break;
+    if (dispositivo.rotulo) rotulos.unshift(dispositivo.rotulo);
+    if (dispositivo.tipo === 'artigo') return rotulos.join(', ');
+    atual = dispositivo.paiId === undefined ? undefined : indiceDe.get(dispositivo.paiId);
+  }
+  return nos[indice]?.dispositivo.rotulo ?? '';
+}

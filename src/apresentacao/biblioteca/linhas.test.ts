@@ -2,7 +2,14 @@ import type { Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma } from '../../dominios/legislacao/leitor';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { estimarAltura, janelasQueCobrem, montarLinhas, TEXTOS_POR_PEDIDO } from './linhas';
+import {
+  estimarAltura,
+  janelasQueCobrem,
+  linhaDoNo,
+  montarLinhas,
+  referenciaDoNo,
+  TEXTOS_POR_PEDIDO,
+} from './linhas';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
 const LEI: Bloco[] = [
@@ -72,6 +79,46 @@ describe('linhas do leitor (9.6)', () => {
     const linhas = montarLinhas(nos);
     expect(linhas.length).toBe(nos.length - 1);
     expect(linhas.some((l) => nos[l.indice]?.dispositivo.tipo === 'nome')).toBe(true);
+  });
+});
+
+describe('posição no leitor (9.7)', () => {
+  it('cada nó tem a sua linha; a rubrica e o nome dobrados valem a linha do pai', async () => {
+    const aberta = await abrir(LEI);
+    const linhas = montarLinhas(aberta.nos);
+    const linhaDe = (endereco: string) => {
+      const indice = aberta.nos.findIndex((n) => n.dispositivo.endereco === endereco);
+      const linha = linhaDoNo(linhas, indice);
+      return linha === undefined
+        ? undefined
+        : aberta.nos[linhas[linha]!.indice]!.dispositivo.endereco;
+    };
+    for (const endereco of ['preambulo', 'tit1', 'art1', 'art1.incII.alA', 'art2.parUnico']) {
+      expect(linhaDe(endereco)).toBe(endereco);
+    }
+    expect(linhaDe('art1.nome')).toBe('art1');
+    expect(linhaDe('tit1.nome')).toBe('tit1');
+    // Toda linha é achada pelo próprio nó.
+    linhas.forEach((l, i) => {
+      expect(linhaDoNo(linhas, l.indice)).toBe(i);
+    });
+    expect(linhaDoNo([], 0)).toBeUndefined();
+    expect(linhaDoNo(linhas.slice(1), 0)).toBeUndefined();
+  });
+
+  it('a referência do "lido até" vai do artigo ao nó', async () => {
+    const aberta = await abrir(LEI);
+    const referencia = (endereco: string) =>
+      referenciaDoNo(
+        aberta.nos,
+        aberta.indiceDe,
+        aberta.nos.findIndex((n) => n.dispositivo.endereco === endereco),
+      );
+    expect(referencia('art1')).toBe('Art. 1º');
+    expect(referencia('art1.incII.alA')).toBe('Art. 1º, II, a)');
+    expect(referencia('art1.par1.incI')).toBe('Art. 1º, § 1º, I');
+    expect(referencia('art2.parUnico')).toBe('Art. 2º, Parágrafo único');
+    expect(referencia('tit1')).toBe('TÍTULO I');
   });
 });
 

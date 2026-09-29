@@ -190,3 +190,161 @@ test('ler o CP compilado: a rubrica fica acima do artigo (9.6)', async ({ page }
   expect(caixaRubrica?.y ?? Infinity).toBeLessThan(caixaRotulo?.y ?? 0);
   await semViolacoes(page);
 });
+
+/** Da linha do dispositivo até o fim da barra fixa (`.topo`): 0 quando ele está no alto da tela. */
+function distanciaDoAlto(alvo: Locator) {
+  return alvo.first().evaluate((el) => {
+    const linha = el.closest('.linha-leitor') ?? el;
+    const barra = document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0;
+    return linha.getBoundingClientRect().top - barra;
+  });
+}
+
+/** Rola até o dispositivo ficar logo abaixo da barra fixa (repete: os textos chegam e remedem). */
+async function alinharNoAlto(page: Page, alvo: Locator) {
+  for (let i = 0; i < 20; i++) {
+    const distancia = await distanciaDoAlto(alvo);
+    if (Math.abs(distancia) < 1) return;
+    await page.evaluate((dy) => {
+      window.scrollBy(0, dy);
+    }, distancia);
+    await page.waitForTimeout(150);
+  }
+  expect(Math.abs(await distanciaDoAlto(alvo))).toBeLessThan(1);
+}
+
+/**
+ * Toca no link e mede até a lista do leitor aparecer no lugar (sem a classe `voltando`). O leitor
+ * desiste de voltar em 2 s: passar disso é não ter chegado à posição guardada.
+ */
+async function voltarMedindo(page: Page, link: Locator) {
+  await page.evaluate(() => {
+    const w = window as unknown as { __volta: Promise<number> };
+    w.__volta = new Promise<number>((resolver) => {
+      document.addEventListener(
+        'click',
+        () => {
+          const inicio = performance.now();
+          const conferir = () => {
+            const lista = document.querySelector('.lista-leitor');
+            if (lista && !lista.classList.contains('voltando')) {
+              resolver(performance.now() - inicio);
+              return;
+            }
+            requestAnimationFrame(conferir);
+          };
+          requestAnimationFrame(conferir);
+        },
+        { capture: true, once: true },
+      );
+    });
+  });
+  await link.click();
+  return page.evaluate(() => (window as unknown as { __volta: Promise<number> }).__volta);
+}
+
+/** A leitura gravada no IndexedDB, com o endereço da posição e do "lido até". */
+function leituraGravada(page: Page) {
+  return page.evaluate(async () => {
+    const pedir = <T>(pedido: IDBRequest<T>) =>
+      new Promise<T>((resolver, rejeitar) => {
+        pedido.onsuccess = () => {
+          resolver(pedido.result);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+    const banco = await pedir(indexedDB.open('arretado'));
+    try {
+      const ler = async <T>(colecao: string, id?: string) =>
+        (await pedir(
+          id === undefined
+            ? banco.transaction(colecao).objectStore(colecao).getAll()
+            : banco.transaction(colecao).objectStore(colecao).get(id),
+        )) as T;
+      const leituras = await ler<{ posicaoId?: string; lidoAteId?: string }[]>('leituras');
+      const endereco = async (id?: string) =>
+        id === undefined
+          ? undefined
+          : (await ler<{ endereco: string }>('dispositivos', id)).endereco;
+      return {
+        quantas: leituras.length,
+        posicao: await endereco(leituras[0]?.posicaoId),
+        lidoAte: await endereco(leituras[0]?.lidoAteId),
+      };
+    } finally {
+      banco.close();
+    }
+  });
+}
+
+test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": LEP compilada (9.7)', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  const normas = page.getByRole('region', { name: 'Normas' });
+  const continuar = page.getByRole('link', { name: 'Continuar leitura: LEP' });
+  await expect(continuar).toHaveCount(0);
+  await normas.getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  // Sai pela navegação das áreas (sempre à vista) com o art. 41 no alto da tela.
+  const art41 = page.locator('[data-endereco="art41"]');
+  await rolarAte(page, art41);
+  await alinharNoAlto(page, art41);
+  await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await expect(continuar).toBeVisible();
+  await expect(normas.getByRole('link', { name: /LEP/ })).toContainText('Última leitura:');
+  expect(await leituraGravada(page)).toEqual({ quantas: 1, posicao: 'art41', lidoAte: undefined });
+  await semViolacoes(page);
+
+  // "Continuar leitura" abre no art. 41, logo abaixo da barra fixa.
+  const volta = await voltarMedindo(page, continuar);
+  test.info().annotations.push({ type: 'volta', description: `${volta.toFixed(0)} ms` });
+  expect(volta, 'do toque à lista no lugar, em ms').toBeLessThan(1500);
+  await expect(art41).toContainText('Constituem direitos do preso');
+  await expect.poll(() => distanciaDoAlto(art41)).toBeLessThan(2);
+  expect(await distanciaDoAlto(art41)).toBeGreaterThan(-2);
+  await expect(page.locator('.lista-leitor')).not.toHaveClass(/voltando/);
+  await semViolacoes(page);
+
+  // Voltar e avançar no histórico do navegador também volta ao art. 41.
+  await page.goBack();
+  await expect(continuar).toBeVisible();
+  await page.goForward();
+  await expect(art41).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art41))).toBeLessThan(2);
+
+  // Parar de rolar grava a posição; recarregar a página volta a ela.
+  const art105 = page.locator('[data-endereco="art105"]');
+  await rolarAte(page, art105);
+  await alinharNoAlto(page, art105);
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art105');
+  await page.reload();
+  await expect(art105).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+
+  // "Lido até aqui" marca o dispositivo no alto da tela; rolar não o move.
+  await page.getByRole('button', { name: 'Lido até aqui' }).click();
+  const linha105 = page.locator('.linha-leitor').filter({ has: art105 });
+  await expect(linha105.locator('.marca-lido-ate')).toHaveText('Lido até aqui');
+  await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art105');
+  const art150 = page.locator('[data-endereco="art150"]');
+  await rolarAte(page, art150);
+  await alinharNoAlto(page, art150);
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art150');
+  expect(await leituraGravada(page)).toEqual({ quantas: 1, posicao: 'art150', lidoAte: 'art105' });
+
+  // No começo da norma, "Ir ao lido até" leva de volta ao art. 105.
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+  });
+  await expect(page.locator('.lido-ate')).toContainText('Lido até Art. 105');
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Ir ao lido até' }).click();
+  await expect(art105).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  await expect(linha105.locator('.marca-lido-ate')).toBeVisible();
+});
