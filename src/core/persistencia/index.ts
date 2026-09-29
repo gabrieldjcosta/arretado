@@ -1,4 +1,12 @@
 export {
+  AnexoAlterado,
+  gravarAnexo,
+  lerAnexo,
+  prepararAnexo,
+  removerAnexos,
+  type ConteudoDeAnexo,
+} from './anexos';
+export {
   apagarBanco,
   BancoArretado,
   NOME_BANCO_PRINCIPAL,

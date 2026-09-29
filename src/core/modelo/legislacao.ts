@@ -27,6 +27,14 @@ export const Norma = z.strictObject({
 });
 export type Norma = z.infer<typeof Norma>;
 
+/** Nota de vigência ("(Redação dada pela Lei nº …, de 2019)"), fora do texto; lei e ano quando há. */
+const NotaVigencia = z.strictObject({
+  texto: z.string().max(2_000),
+  lei: TextoCurto.optional(),
+  ano: z.int().min(1800).max(2100).optional(),
+  link: z.url({ protocol: /^https?$/ }).optional(),
+});
+
 export const VersaoDeNorma = z.strictObject({
   ...camposComuns,
   normaId: Id,
@@ -39,6 +47,8 @@ export const VersaoDeNorma = z.strictObject({
   notaVigenciaMaisRecente: z
     .strictObject({ lei: TextoCurto, ano: z.int().min(1800).max(2100) })
     .optional(),
+  /** Notas da norma inteira, entre a epígrafe e a ementa ("(Vide Decreto nº 6.049, de 2007)"; F2, 9.2). */
+  notasDaNorma: z.array(NotaVigencia).optional(),
   versaoAdaptador: z.string().max(50).optional(),
   anexoFonteId: Id.optional(),
 });
@@ -66,7 +76,11 @@ export const TipoDispositivo = z.enum([
 ]);
 export type TipoDispositivo = z.infer<typeof TipoDispositivo>;
 
-/** Nó único da árvore da norma (D11). Nunca excluído: recebe status. */
+/**
+ * Nó único da árvore da norma (D11). Nunca excluído: recebe status. Exceção (F2, 9.2): o de um
+ * rascunho nunca publicado, que nada referencia, é apagado ao descartar o rascunho ou ao refazer a
+ * árvore pela fonte.
+ */
 export const Dispositivo = z.strictObject({
   ...camposComuns,
   normaId: Id,
@@ -97,16 +111,7 @@ export const TextoDeDispositivo = z.strictObject({
   dispositivoId: Id,
   normaId: Id,
   trechos: z.array(Trecho),
-  notasVigencia: z
-    .array(
-      z.strictObject({
-        texto: z.string().max(2_000),
-        lei: TextoCurto.optional(),
-        ano: z.int().min(1800).max(2100).optional(),
-        link: z.url({ protocol: /^https?$/ }).optional(),
-      }),
-    )
-    .optional(),
+  notasVigencia: z.array(NotaVigencia).optional(),
   redacoesAnteriores: z
     .array(
       z.strictObject({
