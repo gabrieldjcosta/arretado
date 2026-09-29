@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router';
 import type { Repositorio } from '../core/persistencia';
 import { Importar } from './biblioteca/Importar';
+import { Leitor } from './biblioteca/Leitor';
 import { Normas } from './biblioteca/Normas';
 import { AparenciaConta } from './conta/AparenciaConta';
 import { Conta } from './conta/Conta';
@@ -43,6 +44,7 @@ export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {
             <Route path="biblioteca" element={<Normas />} />
             {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
             <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
+            <Route path="biblioteca/normas/:normaId" element={<Leitor />} />
             <Route path="conta" element={<Conta />} />
             <Route path="conta/aparencia" element={<AparenciaConta />} />
             <Route path="conta/dados" element={<Dados />} />

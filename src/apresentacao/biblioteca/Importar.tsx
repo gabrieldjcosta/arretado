@@ -391,9 +391,19 @@ export function Importar() {
           </div>
           <div className="linha-acoes">
             {publicada ? (
-              <Link to="/biblioteca" className="botao principal">
-                Ver na Biblioteca
-              </Link>
+              <>
+                {fase.versao.status === 'vigente' && (
+                  <Link to={`/biblioteca/normas/${fase.norma.id}`} className="botao principal">
+                    Ler a norma
+                  </Link>
+                )}
+                <Link
+                  to="/biblioteca"
+                  className={fase.versao.status === 'vigente' ? 'botao' : 'botao principal'}
+                >
+                  Ver na Biblioteca
+                </Link>
+              </>
             ) : (
               <button
                 type="button"

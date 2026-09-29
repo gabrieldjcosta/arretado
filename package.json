@@ -26,6 +26,7 @@
     "corpus:gabarito": "node scripts/corpus-gabarito.mjs"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.14.13",
     "dexie": "^4.4.6",
     "dompurify": "^3.4.15",
     "fflate": "^0.8.3",

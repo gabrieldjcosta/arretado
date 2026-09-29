@@ -612,6 +612,18 @@ details > summary::-webkit-details-marker {
   min-width: 0;
 }
 
+a.item-norma {
+  min-height: var(--alvo);
+  padding: 0.25rem 0;
+  color: var(--texto);
+  text-decoration: none;
+}
+
+a.item-norma strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .item-norma .dica {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -660,4 +672,239 @@ details > summary::-webkit-details-marker {
 .andamento progress {
   width: 100%;
   max-width: 24rem;
+}
+
+/* Leitor da norma (F2, 9.6): coluna de leitura, lista virtualizada, recuo e tipografia por nível */
+.leitor {
+  max-width: var(--largura-texto);
+  margin: 0 auto;
+}
+
+.barra-leitor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.barra-leitor h1 {
+  flex: 1 1 8rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.tamanho-texto {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tamanho-texto output {
+  min-width: 3.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-atenuado);
+}
+
+.tamanho-texto button {
+  min-width: var(--alvo);
+}
+
+.lista-leitor {
+  position: relative;
+  width: 100%;
+}
+
+.linha-leitor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.dispositivo {
+  padding: 0.35rem 0;
+  font-family: var(--fonte-leitura);
+  font-size: var(--tamanho-leitura);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.dispositivo p {
+  margin: 0;
+}
+
+.dispositivo[data-recuo='1'] {
+  padding-inline-start: 1.25rem;
+}
+
+.dispositivo[data-recuo='2'] {
+  padding-inline-start: 2.5rem;
+}
+
+.dispositivo[data-recuo='3'] {
+  padding-inline-start: 3.75rem;
+}
+
+.dispositivo[data-recuo='4'] {
+  padding-inline-start: 5rem;
+}
+
+@media (max-width: 699px) {
+  .dispositivo[data-recuo='1'] {
+    padding-inline-start: 0.9rem;
+  }
+
+  .dispositivo[data-recuo='2'] {
+    padding-inline-start: 1.8rem;
+  }
+
+  .dispositivo[data-recuo='3'] {
+    padding-inline-start: 2.7rem;
+  }
+
+  .dispositivo[data-recuo='4'] {
+    padding-inline-start: 3.6rem;
+  }
+}
+
+.texto-dispositivo {
+  white-space: pre-line;
+}
+
+.rotulo-dispositivo {
+  font-weight: 700;
+}
+
+.dispositivo.tipo-artigo {
+  padding-top: 0.9rem;
+}
+
+.rubrica {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--texto-atenuado);
+}
+
+/* Nós da estrutura: o rótulo pequeno sobre o nome, do maior nível ao menor */
+.dispositivo.estrutura {
+  padding-top: 1.25rem;
+  font-weight: 700;
+}
+
+.rotulo-estrutura,
+.nome-estrutura {
+  display: block;
+}
+
+.rotulo-estrutura {
+  font-size: 0.8em;
+  letter-spacing: 0.04em;
+  color: var(--texto-atenuado);
+}
+
+.rotulo-estrutura:only-child {
+  font-size: 1em;
+  letter-spacing: 0;
+  color: var(--texto);
+}
+
+.tipo-parte,
+.tipo-livro {
+  font-size: calc(var(--tamanho-leitura) * 1.35);
+  padding-top: 2rem;
+}
+
+.tipo-titulo {
+  font-size: calc(var(--tamanho-leitura) * 1.2);
+  padding-top: 1.75rem;
+}
+
+.tipo-capitulo,
+.tipo-bloco,
+.tipo-anexo {
+  font-size: calc(var(--tamanho-leitura) * 1.1);
+}
+
+.tipo-subsecao {
+  font-style: italic;
+}
+
+.tipo-preambulo {
+  font-style: italic;
+}
+
+.notas-vigencia {
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--fonte-interface);
+  font-size: 0.8em;
+  line-height: 1.4;
+  color: var(--texto-atenuado);
+}
+
+.notas-vigencia a {
+  color: inherit;
+}
+
+.alternar-linha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: var(--alvo);
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  font-family: var(--fonte-interface);
+  font-size: 0.8em;
+  color: var(--texto-atenuado);
+  text-align: left;
+  cursor: pointer;
+}
+
+.linha-revogada {
+  color: var(--texto-atenuado);
+  font-size: 0.95em;
+  min-height: var(--alvo);
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+p.linha-revogada {
+  margin: 0;
+}
+
+.redacoes-lista {
+  margin: 0 0 0.25rem;
+  padding: 0 0 0 1rem;
+  border-left: 3px solid var(--borda);
+  list-style: none;
+  font-size: 0.9em;
+  color: var(--texto-atenuado);
+  white-space: pre-line;
+}
+
+.redacoes-lista li + li {
+  margin-top: 0.5rem;
+}
+
+.nota-da-redacao {
+  font-family: var(--fonte-interface);
+  font-size: 0.85em;
+}
+
+.texto-carregando {
+  display: inline-block;
+  width: min(24rem, 80%);
+  height: 1em;
+  vertical-align: middle;
+  border-radius: 4px;
+  background: var(--superficie-2);
+}
+
+.dispositivo del {
+  text-decoration-thickness: 1px;
 }
