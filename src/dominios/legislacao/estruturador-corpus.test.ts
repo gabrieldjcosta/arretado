@@ -2,7 +2,8 @@
 // estrutural (tipo, rótulo, nome e primeiro artigo de cada nó; 8.2), os blocos pré-normativos
 // (regra 2) das 11 páginas, os artigos, em ordem, sem sangria e com a rubrica (regras 4 e 5; 8.3),
 // os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4) e as
-// notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito.
+// notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito, e o status e as
+// redações anteriores de cada dispositivo (regras 8 a 10 e VETADO; 8.6), sem tolerância.
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
 import { novoId } from '../../core/ids';
 import { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
@@ -15,7 +16,6 @@ import {
   estruturaDe,
   estruturaEsperada,
   paraComparar,
-  semRevogadosAusentes,
   type ArtigoLido,
   type Gabarito,
 } from '../../testes/gabarito';
@@ -158,11 +158,15 @@ describe('estruturador (8.2) no corpus: blocos pré-normativos (regra 2)', () =>
       expect(primeiro?.rotulo).toBe(id === 'cf' ? 'PREÂMBULO' : undefined);
       expect(r.descartes[0]?.motivo).toBe('cabecalho');
       expect(r.descartes.some((d) => d.motivo === 'fecho')).toBe(true);
-      // Até a 8.6: tachado só na página com todas as redações. Soltas, só as falhas da fonte: na
-      // compilada do ECA, "eção I" (a Seção I do Capítulo II do Título I do Livro II sem o "S"); na
-      // LC-SP 988, a sobra antes do art. 6º, IV (caso `linha-solta` do gabarito).
+      // Tachado só na página com todas as redações. Soltas, só as falhas da fonte: na compilada do
+      // ECA, "eção I" (a Seção I do Capítulo II do Título I do Livro II sem o "S"); na LC-SP 988, a
+      // sobra antes do art. 6º, IV (caso `linha-solta` do gabarito). Tachado sem lugar, só o título
+      // de 1940 do CP ("CÓDIGO PENAL", entre o preâmbulo e a Parte Geral de 1940, toda tachada).
       const tipos = new Set(r.anomalias.map((a) => a.tipo));
-      expect(tipos.has('redacao_anterior_nao_tratada')).toBe(!id.endsWith('-compilado'));
+      expect(r.linhasTachadas > 0).toBe(!id.endsWith('-compilado'));
+      expect(
+        r.anomalias.filter((a) => a.tipo === 'tachado_sem_dispositivo').map((a) => a.mensagem),
+      ).toEqual(id === 'cp' ? ['Linha tachada sem dispositivo: "CÓDIGO PENAL".'] : []);
       expect(r.anomalias.filter((a) => a.tipo === 'linha_solta').map((a) => a.mensagem)).toEqual(
         LINHAS_SOLTAS[id] ?? [],
       );
@@ -177,18 +181,11 @@ describe('estruturador (8.2) no corpus: blocos pré-normativos (regra 2)', () =>
   );
 });
 
-/**
- * Até a 8.6: artigos revogados todo tachados, fora da árvore (medido em 24/09/2026; no ECA, o art.
- * 233 desde a 8.5, que leu a nota sem o parêntese de fecho).
- */
-const REVOGADOS_FORA: Record<string, number> = {
-  lep: 1,
-  cp: 27,
-  lc80: 2,
-  'lc-sp-988': 0,
-  eca: 2,
-  cdc: 0,
-  cf: 13,
+/** Sobras da fonte (linha solta) e o título tachado de 1940 do CP. */
+const SOBRAS: Record<string, string[]> = {
+  cp: ['CÓDIGO PENAL'],
+  'lc-sp-988': ['bracionalização na execução das funções;'],
+  'eca-compilado': ['eção I'],
 };
 
 /** Faixas que se sobrepõem (sangria: rubrica ou texto de um artigo na faixa do outro). */
@@ -206,10 +203,9 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
     async (id) => {
       const achados = artigosDe((await rascunho(id)).nos);
       const enderecos = achados.map((a) => a.endereco);
-      const todos = artigosEsperados(await gabaritoDe(id));
-      const esperados = semRevogadosAusentes(todos, enderecos);
+      // Todos os artigos do gabarito, os revogados todo tachados também (8.6), sem tolerância.
+      const esperados = artigosEsperados(await gabaritoDe(id));
       expect(enderecos).toEqual(esperados.map((e) => e.endereco));
-      expect(todos.length - esperados.length).toBe(REVOGADOS_FORA[id]);
       expect(sangrias(achados)).toEqual([]);
       // Rubrica: os mesmos artigos com nome; o texto, igual ao da amostra conferida.
       expect(achados.filter((a) => a.nome !== undefined).map((a) => a.endereco)).toEqual(
@@ -227,31 +223,35 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
     60_000,
   );
 
-  // Salvaguarda da leitura antecipada: linha vigente nunca some da norma. A única que vai para o
-  // descarte `redacao_anterior` é a rubrica de artigo ou dispositivo revogado todo tachado (até a
-  // 8.6).
+  // Salvaguarda da leitura antecipada, agora pela regra 8: nenhuma linha tachada vira texto
+  // vigente, e nenhuma some. Cada uma fica numa redação anterior, no fecho, no anexo ou, só o título de 1940 do CP
+  // ("CÓDIGO PENAL", antes da Parte Geral de 1940), numa sobra com aviso. Linha vigente só é
+  // descarte no cabeçalho, no fecho e nas sobras já conhecidas.
   it.each([...COM_GABARITO, ...COMPILADAS])(
-    '%s: linha vigente só vai para o descarte como rubrica de artigo ou dispositivo revogado',
+    '%s: linha tachada nunca vira texto vigente nem some, e linha vigente não vai para o descarte',
     async (id) => {
       const { blocos, rascunho: r } = await entrada(id);
-      const tachadas = new Set(
-        prepararLinhas(normalizarBlocos(blocos).blocos)
-          .filter((l) => l.tachada)
-          .map((l) => l.i),
+      const linhas = prepararLinhas(normalizarBlocos(blocos).blocos);
+      const cobertas = new Set<number>();
+      const cobrir = ({ inicio, fim }: { inicio: number; fim: number }) => {
+        for (let i = inicio; i <= fim; i++) cobertas.add(i);
+      };
+      for (const d of r.descartes) cobrir(d.linhas);
+      const pilha = [...r.nos];
+      for (let no = pilha.pop(); no; no = pilha.pop()) {
+        for (const red of no.redacoesAnteriores) cobrir(red.linhas);
+        if (no.tipo === 'anexo') cobrir(no.linhas);
+        pilha.push(...no.filhos);
+      }
+      const tachadas = linhas.filter((l) => l.tachada);
+      expect(tachadas.length > 0).toBe(!id.endsWith('-compilado'));
+      expect(tachadas.filter((l) => !cobertas.has(l.i)).map((l) => l.texto.slice(0, 60))).toEqual(
+        [],
       );
-      const vigentes = r.descartes
-        .filter((d) => d.motivo === 'redacao_anterior' && !tachadas.has(d.linhas.inicio))
+      const sobras = r.descartes
+        .filter((d) => d.motivo === 'sobra')
         .map((d) => textoDe(blocos[d.linhas.inicio]?.trechos ?? []));
-      expect(vigentes).toEqual(
-        id === 'cp'
-          ? [
-              'Feminicídio  (Incluído pela Lei nº 13.104, de 2015)', // art. 121, § 2º, VI (8.4)
-              'Usurpação de nome ou pseudônimo alheio', // art. 185
-              'Substância avariada', // art. 279
-              'Exercício arbitrário ou abuso de poder', // art. 350
-            ]
-          : [],
-      );
+      expect(sobras).toEqual(SOBRAS[id] ?? []);
     },
     60_000,
   );
@@ -270,20 +270,6 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
     60_000,
   );
 });
-
-/**
- * Até a 8.6: artigos e dispositivos revogados todo tachados, fora da árvore (medido em 24/09/2026;
- * no ECA, o art. 233 e os §§ 1º a 3º desde a 8.5).
- */
-const DISPOSITIVOS_REVOGADOS_FORA: Record<string, number> = {
-  lep: 10,
-  cp: 90,
-  lc80: 4,
-  'lc-sp-988': 0,
-  eca: 10,
-  cdc: 0,
-  cf: 44,
-};
 
 /**
  * A compilada × o gabarito da página com todas as redações (fatos da 7.3): a compilada resume numa
@@ -342,10 +328,8 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
     async (id) => {
       const achados = dispositivosDe((await rascunho(id)).nos);
       const enderecos = achados.map((d) => d.endereco);
-      const todos = dispositivosEsperados(await gabaritoDe(id));
-      const esperados = semRevogadosAusentes(todos, enderecos);
+      const esperados = dispositivosEsperados(await gabaritoDe(id));
       expect(enderecos).toEqual(esperados.map((e) => e.endereco));
-      expect(todos.length - esperados.length).toBe(DISPOSITIVOS_REVOGADOS_FORA[id]);
       // Rubrica de artigo e de dispositivo (CP: "Aumento de pena" antes do § 7º).
       expect(achados.filter((d) => d.nome !== undefined).map((d) => d.endereco)).toEqual(
         esperados.filter((e) => e.nome).map((e) => e.endereco),
@@ -358,7 +342,7 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
           e.textoDoNome === undefined ? [] : [[e.endereco, e.textoDoNome]],
         ),
       );
-      // Texto da amostra (sem o tachado parcial, 8.6), com "Pena -" depois de uma quebra de linha:
+      // Texto da amostra (sem o tachado parcial), com "Pena -" depois de uma quebra de linha:
       // cada dispositivo com o seu texto, sem sangria e sem as notas (8.5).
       const textos = esperados.flatMap((e, k) =>
         e.texto === undefined ? [] : [[e.endereco, paraComparar(achados[k]?.texto ?? '')]],
@@ -485,10 +469,7 @@ describe('estruturador (8.5) no corpus: notas de vigência (regra 7)', () => {
     async (id) => {
       const r = await rascunho(id);
       const achados = dispositivosDe(r.nos);
-      const esperados = semRevogadosAusentes(
-        dispositivosEsperados(await gabaritoDe(id)),
-        achados.map((d) => d.endereco),
-      );
+      const esperados = dispositivosEsperados(await gabaritoDe(id));
       // A mesma lista da 8.4, com a contagem de notas de cada dispositivo.
       expect(achados.map((d) => [d.endereco, d.notas.length])).toEqual(
         esperados.map((e) => [e.endereco, e.notas]),
@@ -504,6 +485,51 @@ describe('estruturador (8.5) no corpus: notas de vigência (regra 7)', () => {
       // Nenhuma nota no texto ("(Revogado)" sozinho é texto).
       expect(achados.filter((d) => NOTA_NO_TEXTO.test(d.texto)).map((d) => d.endereco)).toEqual([]);
       expect(r.notaVigenciaMaisRecente).toEqual(MAIS_RECENTE[id]);
+    },
+    60_000,
+  );
+});
+
+/**
+ * Redação anterior que o gabarito não tem, examinada na página: a CF escreve o VIII-A antigo do art.
+ * 93 sem hífen ("~~VIIIA a remoção a pedido…~~"); o gabarito não o lê como inciso e perde a
+ * linha, e o estruturador a anexa ao VIII-A.
+ */
+const REDACAO_QUE_O_GABARITO_PERDEU: Record<string, Record<string, number>> = {
+  cf: { 'art93.incVIIIA': 1 },
+};
+
+describe('estruturador (8.6) no corpus: redação anterior, revogado, renumerado e vetado', () => {
+  it.each(COM_GABARITO)(
+    '%s: status e redações anteriores de cada dispositivo × gabarito (100%, no endereço certo)',
+    async (id) => {
+      const gabarito = await gabaritoDe(id);
+      const achados = dispositivosDe((await rascunho(id)).nos);
+      const perdidas = REDACAO_QUE_O_GABARITO_PERDEU[id] ?? {};
+      expect(achados.map((d) => [d.endereco, d.status, d.redacoes])).toEqual(
+        dispositivosEsperados(gabarito).map((e) => [
+          e.endereco,
+          e.status,
+          e.redacoes + (perdidas[e.endereco] ?? 0),
+        ]),
+      );
+      // As que foram para o ancestral (`enderecoLido`): a Parte Geral de 1940 do CP e as outras.
+      expect(achados.reduce((n, d) => n + d.noAncestral, 0)).toBe(
+        gabarito.contagens.redacoesNoAncestral,
+      );
+    },
+    60_000,
+  );
+
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s: redação por tachado nasce confirmada; a heurística (duplicata), a confirmar',
+    async (id) => {
+      const r = await rascunho(id);
+      const redacoes = comPai(r.nos).flatMap(({ no }) => no.redacoesAnteriores);
+      expect(redacoes.filter((x) => (x.origemDeteccao === 'tachado') !== x.confirmada)).toEqual([]);
+      // Nas compiladas, nenhuma redação por linha tachada: só o nome com pedaço tachado (ECA, Seção
+      // II) e a duplicata do art. 263 do ECA.
+      if (id.endsWith('-compilado')) expect(redacoes.length).toBe(id === 'eca-compilado' ? 2 : 0);
     },
     60_000,
   );

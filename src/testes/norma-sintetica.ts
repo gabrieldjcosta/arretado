@@ -1,7 +1,7 @@
 // Norma sintética para a carga da leitura (F2, 9.4), do jeito que o sanitizador entrega a página:
 // títulos e capítulos (com o nome), e artigos de 7 nós (artigo, rubrica, 3 incisos e 2 parágrafos),
-// com notas de vigência e a redação anterior tachada (até a 8.6, a linha tachada vai para o
-// descarte, com o aviso `redacao_anterior_nao_tratada`; depois, para as redações anteriores).
+// com notas de vigência e a redação anterior tachada (desde a 8.6, uma redação anterior do artigo
+// de mesmo endereço).
 import type { Bloco } from '../core/seguranca/sanitizador';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });

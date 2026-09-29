@@ -7,9 +7,11 @@ type Redacao = NonNullable<TextoDeDispositivo['redacoesAnteriores']>[number];
 // Só tipos (conferidos pelo `tsc`): o que a 9.2 copia do rascunho cabe no modelo, campo a campo.
 describe('rascunho do estruturador (8.1) × modelo', () => {
   it('o nó vira Dispositivo e TextoDeDispositivo', () => {
-    expectTypeOf<Pick<NoRascunho, 'tipo' | 'endereco' | 'status' | 'confianca'>>().toExtend<
-      Pick<Dispositivo, 'tipo' | 'endereco' | 'status' | 'confianca'>
+    expectTypeOf<Pick<NoRascunho, 'tipo' | 'endereco' | 'confianca'>>().toExtend<
+      Pick<Dispositivo, 'tipo' | 'endereco' | 'confianca'>
     >();
+    // `vetado` (8.6) ainda não está no modelo: `registros.ts` o grava `vigente`.
+    expectTypeOf<Exclude<NoRascunho['status'], 'vetado'>>().toExtend<Dispositivo['status']>();
     expectTypeOf<NoRascunho['rotulo']>().toExtend<Dispositivo['rotulo']>();
     expectTypeOf<NoRascunho['renumeradoDe']>().toExtend<Dispositivo['renumeradoDe']>();
     expectTypeOf<NoRascunho['trechos']>().toExtend<TextoDeDispositivo['trechos']>();

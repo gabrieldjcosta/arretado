@@ -26,30 +26,30 @@ const ORDEM_TIPOS: readonly TipoDispositivo[] = [
   'anexo',
 ];
 
-const ORDEM_DESCARTES: readonly MotivoDescarte[] = [
-  'cabecalho',
-  'fecho',
-  'sobra',
-  'redacao_anterior',
-];
+const ORDEM_DESCARTES: readonly MotivoDescarte[] = ['cabecalho', 'fecho', 'sobra'];
 
 export interface SumarioDoRascunho {
   /** Nós da árvore por tipo, só os presentes, na ordem de `ORDEM_TIPOS`. */
   porTipo: { tipo: TipoDispositivo; quantidade: number }[];
   /** Linhas da entrada que ficaram fora da norma, por motivo, só os presentes. */
   descartes: { motivo: MotivoDescarte; linhas: number }[];
+  /** Redações anteriores na árvore inteira (regras 8 e 9, 8.6; a heurística também). */
+  redacoesAnteriores: number;
   /**
-   * HTML sem nenhuma linha tachada (descarte `redacao_anterior`): a página parece a compilada, só
-   * com o texto vigente ("Nenhuma redação anterior depois de colar"). No corpus, verdadeiro nas 4
-   * compiladas e falso nas 7 páginas com todas as redações; texto puro não diz (sem formatação).
+   * HTML sem nenhuma linha tachada inteira (`Rascunho.linhasTachadas`): a página parece a
+   * compilada, só com o texto vigente ("Nenhuma redação anterior depois de colar"). No corpus,
+   * verdadeiro nas 4 compiladas e falso nas 7 páginas com todas as redações; texto puro não diz
+   * (sem formatação).
    */
   pareceCompilada: boolean;
 }
 
 export function sumarioDoRascunho(rascunho: Rascunho): SumarioDoRascunho {
   const tipos = new Map<TipoDispositivo, number>();
+  let redacoesAnteriores = 0;
   for (const { no } of emOrdemDeLeitura(rascunho.nos)) {
     tipos.set(no.tipo, (tipos.get(no.tipo) ?? 0) + 1);
+    redacoesAnteriores += no.redacoesAnteriores.length;
   }
   const linhas = new Map<MotivoDescarte, number>();
   for (const d of rascunho.descartes) {
@@ -64,6 +64,7 @@ export function sumarioDoRascunho(rascunho: Rascunho): SumarioDoRascunho {
       const n = linhas.get(motivo);
       return n ? [{ motivo, linhas: n }] : [];
     }),
-    pareceCompilada: rascunho.formatoEntrada === 'html' && !linhas.has('redacao_anterior'),
+    redacoesAnteriores,
+    pareceCompilada: rascunho.formatoEntrada === 'html' && rascunho.linhasTachadas === 0,
   };
 }

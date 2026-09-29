@@ -663,7 +663,11 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
   const carregando = item === undefined || (linha.indiceNome !== undefined && nome === undefined);
   const nomeDoNo = textoDe(nome);
   const recuo = Math.min(linha.recuo, MAXIMO_DE_RECUO);
-  const redacoes = texto?.redacoesAnteriores ?? [];
+  // As da rubrica (o nome antigo, tachado: CP, art. 218-B) vêm antes das do texto (8.6).
+  const redacoes = [
+    ...(nome?.texto?.redacoesAnteriores ?? []),
+    ...(texto?.redacoesAnteriores ?? []),
+  ];
   const notas = texto?.notasVigencia ?? [];
   const alternarEste = () => {
     alternar(dispositivo.id);
@@ -708,7 +712,11 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
   ) : null;
 
   if (dispositivo.status === 'revogado') {
-    const temMais = notas.length > 0 || redacoes.length > 0 || (texto?.trechos.length ?? 0) > 0;
+    const temMais =
+      nomeDoNo !== '' ||
+      notas.length > 0 ||
+      redacoes.length > 0 ||
+      (texto?.trechos.length ?? 0) > 0;
     const legenda = `${rotulo || 'Dispositivo'} — (revogado)`;
     return (
       <div
@@ -731,6 +739,7 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
         )}
         {expandido && (
           <div className="revogado-aberto">
+            {nomeDoNo && <p className="rubrica">{nomeDoNo}</p>}
             {texto && texto.trechos.length > 0 && (
               <p className="texto-dispositivo">
                 <TrechosDoTexto trechos={texto.trechos} />

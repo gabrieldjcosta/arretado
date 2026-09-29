@@ -143,36 +143,101 @@ test('o ajuste de tamanho é global: muda o texto da norma e continua depois de 
   await expect(page.getByText('Tamanho do texto de leitura: 20 px')).toBeVisible();
 });
 
-test('ler o ECA compilado: redação anterior oculta, com indicador e expansão (9.6)', async ({
+test('ler o ECA com todas as redações: revogado em uma linha, redação anterior oculta, com indicador (8.6)', async ({
   page,
 }) => {
-  test.setTimeout(120_000);
-  await importarEPublicar(page, 'eca-compilado', 'ECA');
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'eca', 'ECA');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /ECA/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'ECA' })).toBeVisible();
 
-  // O parágrafo único do art. 263 tem uma redação anterior (detectada por heurística): fica no fim.
-  const paragrafo = page.locator('[data-endereco="art263.parUnico"]');
-  await irAoFim(page, paragrafo);
-  const indicador = paragrafo.getByRole('button', {
+  // Redação anterior por tachado (regra 8): o inciso IV do art. 90 ("I ~~V - abrigo;~~").
+  const inciso = page.locator('[data-endereco="art90.incIV"]');
+  await rolarAte(page, inciso);
+  const indicador = inciso.getByRole('button', {
     name: 'Mostrar 1 redação anterior (texto anterior, oculto)',
   });
   await expect(indicador).toHaveAttribute('aria-expanded', 'false');
-  await expect(paragrafo.getByText('Se o ofendido é menor de catorze anos')).toBeVisible();
-  await expect(paragrafo.getByText('Se a ofendida é menor de catorze anos')).toHaveCount(0);
-  await semViolacoes(page);
-
+  await expect(inciso.getByText('abrigo;')).toHaveCount(0);
   await indicador.click();
-  const anterior = paragrafo.getByRole('list', { name: 'Texto anterior' });
-  await expect(anterior).toContainText('Se a ofendida é menor de catorze anos');
-  await expect(anterior).toContainText('(a confirmar)');
-  await expect(
-    paragrafo.getByRole('button', { name: 'Ocultar 1 redação anterior' }),
-  ).toHaveAttribute('aria-expanded', 'true');
+  await expect(inciso.getByRole('list', { name: 'Texto anterior' })).toContainText('V - abrigo;');
+  await semViolacoes(page);
+  await inciso.getByRole('button', { name: 'Ocultar 1 redação anterior' }).click();
+
+  // Revogação total (regra 9): o art. 233, todo tachado, numa linha só; o resto ao expandir.
+  const artigo = page.locator('[data-endereco="art233"]');
+  await rolarAte(page, artigo);
+  const revogado = artigo.getByRole('button', { name: /Art\. 233 — \(revogado\)/ });
+  await expect(revogado).toHaveAttribute('aria-expanded', 'false');
+  await expect(artigo.getByText(/vigilância a tortura/)).toHaveCount(0);
+  await semViolacoes(page);
+  await revogado.click();
+  await expect(artigo.getByRole('list', { name: 'Texto anterior' })).toContainText(
+    'vigilância a tortura',
+  );
+  await expect(artigo.getByRole('list', { name: 'Notas de vigência' })).toContainText(
+    'Revogado pela Lei nº 9.455',
+  );
+  await semViolacoes(page);
+  await revogado.click();
+  await expect(artigo.getByText(/vigilância a tortura/)).toHaveCount(0);
+
+  // A duplicata do parágrafo único do art. 263 continua heurística, a confirmar.
+  const paragrafo = page.locator('[data-endereco="art263.parUnico"]');
+  await irAoFim(page, paragrafo);
+  await paragrafo.getByRole('button', { name: /^Mostrar \d+ redaç/ }).click();
+  await expect(paragrafo.getByRole('list', { name: 'Texto anterior' })).toContainText(
+    '(a confirmar)',
+  );
+});
+
+test('ler a LEP com todas as redações: 100% das redações anteriores ocultas, cada uma num indicador (8.6)', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await semViolacoes(page);
 
-  await paragrafo.getByRole('button', { name: 'Ocultar 1 redação anterior' }).click();
-  await expect(anterior).toHaveCount(0);
+  // Do começo ao fim da lei: cada dispositivo com redação anterior mostra só o indicador, e nenhum
+  // texto anterior aparece sem o toque.
+  const indicadores = new Map<string, number>();
+  const revogados = new Set<string>();
+  let noFim = 0;
+  for (let passo = 0; passo < 400 && noFim < 3; passo++) {
+    const vistos = await page.evaluate(() => {
+      const linhas = [...document.querySelectorAll<HTMLElement>('[data-endereco]')];
+      return {
+        abertos: document.querySelectorAll('[aria-label="Texto anterior"]').length,
+        indicadores: linhas.flatMap((l) => {
+          const rotulo = l
+            .querySelector('button[aria-label^="Mostrar "]')
+            ?.getAttribute('aria-label');
+          const n = rotulo ? /^Mostrar (\d+) redaç/.exec(rotulo)?.[1] : undefined;
+          return n ? [[l.dataset.endereco ?? '', Number(n)] as const] : [];
+        }),
+        revogados: linhas
+          .filter((l) => l.classList.contains('revogado'))
+          .map((l) => l.dataset.endereco ?? ''),
+        fim: window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2,
+      };
+    });
+    expect(vistos.abertos).toBe(0);
+    for (const [endereco, n] of vistos.indicadores) indicadores.set(endereco, n);
+    for (const endereco of vistos.revogados) revogados.add(endereco);
+    noFim = vistos.fim ? noFim + 1 : 0;
+    await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight * 0.9);
+    });
+    await page.waitForTimeout(60);
+  }
+  // 86 redações anteriores: 71 em 60 dispositivos vigentes, 15 nos 15 revogados (cada um guarda a
+  // sua na linha fechada; o art. 182, "Art. 182. ~~…~~ (Revogado…)", entre eles).
+  expect(indicadores.size).toBe(60);
+  expect([...indicadores.values()].reduce((a, b) => a + b, 0)).toBe(71);
+  expect(revogados.size).toBe(15);
+  expect(revogados.has('art182')).toBe(true);
 });
 
 test('ler o CP compilado: a rubrica fica acima do artigo (9.6)', async ({ page }) => {

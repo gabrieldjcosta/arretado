@@ -376,8 +376,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Nenhuma redação anterior depois de colar
 - **Sintoma:** a lei entra sem nenhum texto tachado. **Causa:** a página "compilado" do Planalto traz só o texto vigente; a simples (`l7210.htm`, `del2848.htm`) traz todas as redações.
-- **Solução:** para ter as redações anteriores (a partir da 8.6), colar da página simples; até lá, e na leitura antecipada, a compilada é a preferida (as linhas tachadas ficam de fora). **Prevenção:** a tela Importar avisa "Nenhuma linha tachada: a página parece a compilada, só com o texto vigente…" quando o HTML não tem nenhum descarte `redacao_anterior` (`sumarioDoRascunho(...).pareceCompilada`); no corpus, verdadeiro só nas 4 compiladas (`estruturador-corpus.test.ts`, "sumário (9.5) no corpus"); a página simples mostra o aviso do estruturador ("N linha(s) tachada(s)…"), no E2E com a LEP. Na 12.3, também pela URL `…compilado.htm`; o corpus confere a variante pela contagem de tachados (limiar 20).
-- **Origem:** previsto na 9.5 e tratado nela (29/09/2026).
+- **Solução:** para ter as redações anteriores, colar da página simples: desde a 8.6 cada linha tachada vira redação anterior do dispositivo (a tela diz "com N redações anteriores (ocultas na leitura)" em "Estrutura encontrada"; LEP: 86). **Prevenção:** a tela Importar avisa "Nenhuma linha tachada: a página parece a compilada, só com o texto vigente…" quando o HTML não tem linha tachada inteira (`Rascunho.linhasTachadas` zero; `sumarioDoRascunho(...).pareceCompilada`); no corpus, verdadeiro só nas 4 compiladas (`estruturador-corpus.test.ts`, "sumário (9.5) no corpus"); E2E "colar a LEP com todas as redações…" (`biblioteca.spec.ts`). Na 12.3, também pela URL `…compilado.htm`; o corpus confere a variante pela contagem de tachados (limiar 20).
+- **Origem:** previsto na 9.5 e tratado nela (29/09/2026); na 8.6 (29/09/2026) o critério passou do descarte `redacao_anterior` (que acabou) para `linhasTachadas`.
 
 ### O HTML colado muda conforme o navegador
 - **Sintoma:** a mesma lei estrutura bem no Chromium e mal em outro navegador, no Windows ou no celular; ou `npm run corpus:colar` no Windows regrava todos os colados. **Causa:** cada navegador e cada sistema serializa a seleção de um jeito: estilo computado em linha; no Windows, envelope do CF_HTML (`<html><body><!--StartFragment-->`) e texto puro em CRLF (previsto). No celular a seleção de uma lei inteira é difícil e o colar pode trazer só texto puro.
@@ -475,7 +475,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Tachado decorativo tratado como redação anterior (ou o contrário)
 - **Sintoma:** "Art. 1º" vira redação anterior; ou revogação da ALESP aparece como vigente. **Causa:** o `<s>` é decorativo no Planalto (só em `º`/`ª`; 56 na LC 80) e é a marca real de revogação na ALESP (172 na LC-SP 988); o `line-through` por estilo também é redação anterior.
 - **Solução:** decidir pelo conteúdo: `<s>` só com ordinal é decorativo, `<s>` com texto é redação anterior. O decorativo já sai na normalização (8.1): a marca do ordinal herda a formatação do número, e no parágrafo tachado de verdade continua tachada. **Prevenção:** `normalizacao-corpus.test.ts` (o tachado se preserva caractere a caractere, menos os 56 decorativos da LC 80); gabarito da 7.3 e regressão da 8.9 (100% das redações anteriores).
-- **Origem:** previsto na 8.6; a parte do ordinal prevenida em 23/09/2026 (8.1). O `<s>X</s> XI -` da ALESP (art. 134) é renumeração, não decorativo: continua com a 8.6.
+- **Origem:** previsto na 8.6; a parte do ordinal prevenida em 23/09/2026 (8.1); o resto tratado na 8.6 (29/09/2026): o `<s>` com texto da ALESP é redação anterior (109 na LC-SP 988, com as 51 notas tachadas da ALESP na `nota` delas), o `<s>X</s> XI -` do art. 134 é renumeração (`renumeradoDe: art134.incX`), e o tachado parcial (arts. 109 e 115) fica marcado no texto. **Prevenção (8.6):** "status e redações anteriores de cada dispositivo × gabarito" no corpus (`estruturador-corpus.test.ts`).
 
 ### Fim de linha misto quebra a segmentação
 - **Sintoma:** linhas grudadas ou vazias no meio do texto. **Causa:** LEP, LC 80 e CF em CRLF; o CP com maioria de LF (11.953 LF e 5.694 CRLF, inclusive dentro do texto); a ALESP em LF.
@@ -514,7 +514,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rubrica do artigo revogado vai para o artigo seguinte
 - **Sintoma:** o art. 186 do CP com a rubrica "Usurpação de nome ou pseudônimo alheio", que é do 185 (revogado). **Causa:** entre a rubrica e o artigo vigente há linhas tachadas; quando são a redação antiga do mesmo artigo (o padrão do CP: rubrica, artigo de 1940 tachado, artigo novo), a rubrica é do vigente; quando são um artigo todo tachado de outro número, é do revogado.
-- **Solução:** a rubrica guarda o endereço do primeiro artigo tachado depois dela; se não é o do artigo vigente, ela vai para o descarte `redacao_anterior`, junto com o revogado, até a 8.6 fazê-la nome dele (CP: arts. 185, 279 e 350). Na 8.4, o mesmo com parágrafo, inciso e alínea: "Feminicídio" ia para o art. 121, § 2º, VII, e é do VI, revogado e tachado. **Prevenção:** testes "redação antiga tachada entre a rubrica e o artigo…" e "rubrica seguida de dispositivo tachado de outro endereço…" e, no corpus, "linha vigente só vai para o descarte como rubrica de artigo ou dispositivo revogado" (só essas 4 no CP; nenhuma nas outras 10 páginas).
+- **Solução:** a rubrica guarda o endereço do primeiro artigo tachado depois dela (e o nó provisório dele, `RubricaPendente.no`, 8.6); se não é o do artigo vigente, ela é o nome do revogado (8.6; CP: arts. 185, 279 e 350). Na 8.4, o mesmo com parágrafo, inciso e alínea: "Feminicídio" ia para o art. 121, § 2º, VII, e é do VI, revogado e tachado. **Prevenção:** testes "redação antiga tachada entre a rubrica e o artigo…" e "rubrica seguida de dispositivo tachado de outro endereço…" e, no corpus, o nome dos revogados × gabarito ("endereços, rubricas e texto da amostra") e "linha tachada nunca vira texto vigente nem some…" (8.6).
 - **Origem:** ocorrido em 24/09/2026 (atividade 8.3, antes do commit; o do inciso, na 8.4, também antes do commit).
 
 ### Rubrica errada no gabarito (CDC, ECA)
@@ -579,7 +579,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Nota da redação anterior vai para o dispositivo vigente de cima
 - **Sintoma:** o art. 213 do CP com a nota "(Revogado pela Lei nº 12.015, de 2009)", que é do art. 214 (todo tachado, logo abaixo). **Causa:** a linha só de notas ia para o último dispositivo vigente lido, mesmo com uma linha tachada entre eles.
-- **Solução:** linha só de notas logo depois de uma linha tachada vai com ela para o descarte `redacao_anterior` (`notaDaTachada`); a 8.6 a anexa à redação anterior. **Prevenção:** "linha só de notas logo depois de uma linha tachada…" em `estruturador.test.ts`; a contagem de notas contra o gabarito no corpus.
+- **Solução:** linha só de notas logo depois de uma linha tachada é da redação anterior (`notaDaTachada`): desde a 8.6, vai para o nó que a linha tachada abriu (o provisório, que vira o artigo revogado se não houver o de mesmo endereço, ou o revogado pela nota de fora do tachado) ou para a `nota` da redação. **Prevenção:** "linha só de notas logo depois de uma linha tachada é do artigo tachado…" em `estruturador.test.ts`; a contagem de notas contra o gabarito no corpus.
 - **Origem:** ocorrido em 24/09/2026 (atividade 8.5, antes do commit).
 
 ### Nota mais recente aponta um "Vide" (falso indício na F6)
@@ -614,7 +614,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rótulo novo ao lado do antigo tachado, ou pedaço do rótulo fora do tachado
 - **Sintoma:** "XI - outras previstas em lei." vira rubrica; "Parágrafo único" fica com o texto do § 1º; "III (Revogado pela…)" sai como inciso vigente e vazio. **Causa:** a ALESP renumera tachando só o rótulo antigo ("~~X~~ XI -", "~~Parágrafo único~~ § 1° -"); na CF, o tachado às vezes começa depois do numeral ("III ~~- classistas…~~", "c~~) os nascidos…~~", "A~~rt. 76.~~").
-- **Solução:** vale o rótulo de fora do tachado (caso `rotulo-renumerado`); o que sobra fora do tachado e cabe no rótulo conta como rótulo. **Prevenção:** teste "pedaço do rótulo fora do tachado, rótulo renumerado e anexo"; na 8.6, a regra 10 (renumeração) com esses casos.
+- **Solução:** vale o rótulo de fora do tachado (caso `rotulo-renumerado`); o que sobra fora do tachado e cabe no rótulo conta como rótulo. **Prevenção:** teste "pedaço do rótulo fora do tachado, rótulo renumerado e anexo"; na 8.6, a regra 10 lê o rótulo antigo como renumeração (`rotuloAntigoTachado`, teste "rótulo antigo tachado ao lado do novo…"), e o pedaço do rótulo separado por espaço ("I ~~V - abrigo;~~") ou o sufixo sem hífen ("~~VIIIA a remoção…~~", CF) se lê inteiro na linha tachada (`redacoes.ts`).
 - **Origem:** ocorrido em 23/09/2026 (7.3, 2ª sessão).
 
 ### Inciso sem hífen vira rubrica, ou rubrica com capitular vira inciso
@@ -649,8 +649,44 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Renumerado perde o vínculo, ou VETADO vira texto normal
 - **Sintoma:** marcação ou erro de estudo ligados ao endereço antigo ficam soltos; "(VETADO)" aparece como texto vigente, ou a numeração salta sem explicação. **Causa:** notas "Renumerado…" ("do parágrafo único", "do inciso VI" ou só "pela Lei/Emenda…"; 19 na CF, 3 no CP, 3 na LEP, 1 na LC 80); dispositivos vetados só com a palavra (18 no CP, 22 na LEP, 28 na LC 80).
-- **Solução:** status renumerado com referência ao endereço antigo (regra 10); tratamento próprio do VETADO, mantendo o endereço. **Prevenção:** contagens no gabarito da 7.3 e testes da 8.6.
-- **Origem:** previsto — atividade 8.6.
+- **Solução (8.6):** regra 10 em `aplicarStatus` e `renumeracao.ts`: nota "Renumerado…" ou "…transformado em…" (ALESP) dá `status: renumerado` ao vigente e `renumeradoDe` quando a nota traz a origem (CF, art. 29, VIII a XIV; art. 177, § 3º; ECA, arts. 14 e 208; LC-SP 988, art. 134 e a Subseção VIII); sem origem ("(Renumerado pela Lei nº 10.792, de 2003)"), só o status; o revogado continua revogado. VETADO: "(VETADO)" sozinho dá `status: vetado` no rascunho, com o endereço e o texto (121 no corpus, iguais ao gabarito); o modelo ainda não tem o valor, e `registros.ts` grava `vigente` com o texto "(VETADO)" até a subida do esquema (pede o backup do Gabriel). **Prevenção:** testes de renumeração e de "dispositivo só com nota…" em `estruturador.test.ts`; status × gabarito no corpus (`renumerado` conta como `vigente`, que é o que o gabarito lê).
+- **Origem:** previsto — atividade 8.6; tratado nela (29/09/2026), menos a gravação do vetado no modelo.
+
+### Artigo com o rótulo inteiro fora do tachado fica vigente (LEP, art. 182)
+- **Sintoma:** "Art. 182. ~~A pena de multa será convertida…~~. (Revogado pela Lei nº 9.268, de 1996)" sai como artigo vigente, com o texto tachado. **Causa:** a linha só contava como tachada com sobra de rótulo curta fora do tachado ("A~~rt.~~", "III ~~-~~", "§ 1º"); "Art. 182." inteiro tem letras e fazia a linha vigente.
+- **Solução:** o rótulo do artigo e o "Parágrafo único" no começo da linha, fora do tachado, contam como rótulo (`ROTULO_FORA` em `linhas.ts`): a linha é tachada, e a nota de revogação fora do tachado faz o revogado (regra 9). **Prevenção:** teste "revogação total (regra 9)…" em `estruturador.test.ts`; status × gabarito no corpus.
+- **Origem:** ocorrido em 29/09/2026 (atividade 8.6, antes do commit).
+
+### Rubrica tachada antes da rubrica nova vai para o artigo anterior (CP, arts. 218-B e 266)
+- **Sintoma:** o art. 218-A com uma redação anterior a mais ("~~Favorecimento da prostituição ou outra forma de exploração sexual de vulnerável~~"), que é a rubrica antiga do 218-B. **Causa:** a rubrica tachada fica à espera do artigo tachado seguinte; quando vem uma rubrica nova (vigente), ela era devolvida ao último dispositivo.
+- **Solução:** rubrica tachada logo antes de uma rubrica nova é a redação anterior do `nome` novo (`RubricaPendente.antigas`); o leitor mostra as redações do nome junto com as do dispositivo, no mesmo indicador. **Prevenção:** teste "rubrica tachada: abre a redação do artigo tachado seguinte… ou é a antiga do nome novo" e as redações × gabarito no corpus.
+- **Origem:** ocorrido em 29/09/2026 (atividade 8.6, antes do commit).
+
+### Juntar o tachado ao de mesmo endereço fica quadrático
+- **Sintoma:** `desempenho.test.ts` com mais de 2 minutos em "artigo e parágrafo tachados repetidos" (100 mil linhas). **Causa:** cada nó provisório que se juntava ao de mesmo endereço refazia a lista de filhos dele (com os que vinham), e o mesmo artigo recebia 50 mil junções.
+- **Solução:** os filhos que mudam de nó ficam em listas por destino e entram uma vez só, no fim (`vindosAntes`, `vindosDepois` em `resolverTachados`); as listas de onde saem nós são refeitas uma vez cada. **Prevenção:** 12 casos de tachado em `desempenho.test.ts` (8.6), todos abaixo de 3 s.
+- **Origem:** ocorrido em 29/09/2026 (atividade 8.6, antes do commit).
+
+### Redações do estruturador × gabarito: tachado parcial e linha que o gabarito perde
+- **Sintoma:** o teste de redações no corpus acusa 1 a menos em 21 dispositivos (ECA 16, LC-SP 988 4, CF 1) e 1 a mais no art. 93, VIII-A, da CF. **Causa:** o gabarito conta como redação a linha com tachado parcial (caso `tachado-parcial`: expressão tachada no meio do texto vigente; o rótulo antigo tachado da ALESP); a 8.6 a deixa marcada no texto, sem duplicar. E o gabarito não lê "~~VIIIA a remoção…~~" (sufixo sem hífen) como inciso e perde a linha.
+- **Solução:** examinado na página: o estruturador está certo nos dois. `dispositivosEsperados` tira 1 dos casos `tachado-parcial` do gabarito (regra, sem lista); `REDACAO_QUE_O_GABARITO_PERDEU` (só o VIII-A da CF) no teste do corpus. **Prevenção:** as duas contas no teste "status e redações anteriores de cada dispositivo × gabarito"; se o gabarito for regerado por outro motivo, acertar nele o sufixo sem hífen e apagar a exceção.
+- **Origem:** ocorrido em 29/09/2026 (atividade 8.6).
+
+### Nota de renumeração que começa pelo dispositivo fica no texto (CP, CF)
+- **Sintoma:** o texto vigente termina em "(Parágrafo único renumerado pela Lei nº 9.983, de 2000)" (CP, art. 153, § 1º), "(Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)" (CF, art. 198, § 1º) ou "(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)" (CF, art. 102, § 1º); o dispositivo não fica `renumerado`. **Causa:** a regra 7 só reconhece a nota pela palavra do começo ("Renumerado…"); o gabarito faz o mesmo, e as contagens batem.
+- **Solução:** pendente (não é da 8.6): aceitar "(Parágrafo … renumerado…)" e "(Transformado em…)" como nota de espécie `renumerado` no estruturador e no gabarito, e regerar o gabarito do CP e da CF (os dois estão com a conferência pendente). **Prevenção:** o teste "Nenhuma nota no texto" do corpus ganha essas formas.
+- **Origem:** achado em 29/09/2026 (atividade 8.6); fica para a 8.7 ou a 8.9.
+
+### Reimportar a LEP ou o ECA já publicados cria outra norma
+- **Sintoma:** depois da 8.6, colar a página com todas as redações da LEP (ou do ECA) já lida pela compilada dá uma segunda "LEP" na Biblioteca, sem a posição nem o "lido até". **Causa:** `criarRascunho` cria sempre norma, versão e dispositivos novos (ids aleatórios; o endereço é o mesmo); a tela só reconhece o mesmo texto (mesmo hash), e a compilada e a página inteira são textos diferentes. A `Leitura` é por norma e aponta para ids de dispositivo (`posicaoId`, `lidoAteId`) da antiga. Norma publicada não se refaz pela fonte (`retomarRascunho` só vale para o rascunho), e ainda não há nova versão da mesma norma (11.7, F6) nem exclusão de norma.
+- **Solução:** nada se perde: a norma antiga e a leitura dela ficam como estão. Caminho seguro em `proxima-sessao.md` (backup antes; a nova com outro título curto; o "lido até" refeito à mão pelo endereço). **Prevenção:** a nova versão da mesma norma (11.7 e F6) leva a leitura pelo endereço (o id do dispositivo de mesmo endereço é mantido ou mapeado, como no `retomarRascunho`).
+- **Origem:** previsto na 8.6 (29/09/2026), a pedido do Gabriel.
+
+### Previsível na 8.7 (anexos, confiança e validação)
+- **Anexo com tachado:** o "ANEXO - Revogado." da LC-SP 988 tem os subanexos antigos tachados; hoje a zona do anexo (e a do fecho) toma tudo pela faixa, sem redação (10 das 165 linhas tachadas da LC-SP 988 ficam aí; `linhasTachadas` não as conta). A 8.7 separa os anexos (`anexoII`) e decide se o tachado do anexo vira redação anterior dele (regra 8) ou fica no texto bruto (regra 11).
+- **Confiança:** o artigo só tachado sem nota de revogação sai revogado com confiança `media` (heurística); o estrutural substituído e a duplicata, redação `heuristica` a confirmar. O aviso dos 20% conta só `a_confirmar`: não confundir.
+- **Validação (regra 13):** "sem endereço duplicado após fusão de redações" já vale depois de `resolverTachados` (nenhum provisório sobra); `sem_pai` e `tachado_sem_dispositivo` nascem como aviso: a 8.7 fecha a gravidade. A LC 80 (duas "SEÇÃO IV") continua só aviso.
+- **VETADO no modelo:** a subida do `Dispositivo.status` com `vetado` pede o backup do Gabriel antes (ver `proxima-sessao.md`); depois dela, `registros.ts` deixa de trocar por `vigente`, e o leitor ganha o tratamento próprio (linha atenuada, como o revogado).
 
 ### "A fonte pode ter mudado de formato"
 - **Sintoma:** mais de 20% dos dispositivos "a confirmar". **Causa:** o Planalto mudou o HTML, ou o colar veio sem formatação.
@@ -732,7 +768,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Redação anterior e revogado sem norma real para ver
 - **Sintoma:** o indicador de redação anterior e a linha "(revogado)" do leitor não aparecem em nenhuma norma importada de verdade, e um erro neles passaria no E2E. **Causa:** até a 8.6, o estruturador manda o revogado inteiro tachado e a redação anterior tachada para o descarte (ver "Nenhuma redação anterior depois de colar"): nas 11 páginas do corpus, só o ECA compilado tem redação anterior (2: a "Seção II" do título VI, com o nome tachado, e o parágrafo único do art. 263, por heurística e não confirmada), e nenhuma página tem dispositivo revogado na árvore.
 - **Solução:** a redação anterior é vista no E2E pelo art. 263 do ECA compilado; o revogado e a expansão, no teste de componente, que grava `status: 'revogado'` e uma redação anterior nos registros da norma publicada (`Leitor.test.tsx` › "revogado em uma linha…"). **Prevenção:** ao chegar a 8.6, trocar o teste de componente por um caso real do corpus (LEP com todas as redações, o art. 233 do ECA) e conferir "100% das redações anteriores ocultas" (critério do portão) contando os indicadores na tela contra `redacoesAnteriores` da norma.
-- **Origem:** previsto na 9.6 (29/09/2026); vale até a 8.6.
+- **Origem:** previsto na 9.6 (29/09/2026); resolvido na 8.6 (29/09/2026): `Leitor.test.tsx` › "revogado em uma linha, expansível… (ECA, art. 233, do corpus)" e "100% das redações anteriores ocultas: os indicadores da LEP…" (86 = 71 em 60 indicadores + 15 nos revogados); E2E `leitor.spec.ts` com o ECA e a LEP com todas as redações, com axe, desktop e celular.
 
 ### Posição de leitura perdida
 - **Sintoma:** ao voltar, ao entrar ou sair do modo foco, ou ao trocar de filtro, o leitor abre noutro ponto. **Causa:** alturas variáveis na lista virtualizada; posição guardada em pixels muda com fonte, tamanho de tela e filtro.

@@ -26,7 +26,7 @@ export function rotuloTipo(tipo: TipoDispositivo, quantidade: number): string {
   return TIPO[tipo][quantidade === 1 ? 0 : 1];
 }
 
-/** "4 linhas do cabeçalho do portal", "85 linhas tachadas (redação anterior)". */
+/** "4 linhas do cabeçalho do portal", "6 linhas do fecho (local, data e assinaturas)". */
 export function fraseDescarte(motivo: MotivoDescarte, linhas: number): string {
   const n = `${linhas.toLocaleString('pt-BR')} ${linhas === 1 ? 'linha' : 'linhas'}`;
   switch (motivo) {
@@ -36,7 +36,5 @@ export function fraseDescarte(motivo: MotivoDescarte, linhas: number): string {
       return `${n} do fecho (local, data e assinaturas)`;
     case 'sobra':
       return `${n} sem lugar na norma`;
-    case 'redacao_anterior':
-      return `${n} ${linhas === 1 ? 'tachada' : 'tachadas'} (redação anterior)`;
   }
 }

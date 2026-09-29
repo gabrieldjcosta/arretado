@@ -74,22 +74,19 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   await expect(normas.locator('li')).toHaveCount(2);
 });
 
-test('colar a LEP com todas as redações mostra o aviso de tachado (9.5)', async ({ page }) => {
+test('colar a LEP com todas as redações: as linhas tachadas viram redações anteriores (9.5, 8.6)', async ({
+  page,
+}) => {
   test.setTimeout(60_000);
   await page.goto('/#/biblioteca/importar');
   await colar(page, 'lep');
 
-  const avisos = page.getByRole('region', { name: 'Avisos' });
-  await expect(avisos).toContainText(
-    '85 linha(s) tachada(s), de redação anterior, ficaram de fora.',
-    {
-      timeout: 30_000,
-    },
+  await expect(page.getByRole('region', { name: 'Estrutura encontrada' })).toContainText(
+    'com 86 redações anteriores (ocultas na leitura).',
+    { timeout: 30_000 },
   );
-  await expect(avisos).not.toContainText('parece a compilada');
-  await expect(page.getByRole('region', { name: 'Ficou de fora' })).toContainText(
-    '85 linhas tachadas (redação anterior)',
-  );
+  await expect(page.getByText(/parece a compilada/)).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Ficou de fora' })).not.toContainText('tachada');
 
   await page.getByRole('button', { name: 'Descartar rascunho' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Descartar' }).click();
