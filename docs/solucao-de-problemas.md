@@ -47,12 +47,18 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** `UNKNOWN: lstat 'C:\'` e falha ao abrir arquivos do `node_modules`; `Cannot find module '…node_modules…'` de um arquivo que existe (`uuid`, `@testing-library/user-event`, `dom-accessibility-api`), logo depois de um `npm ci` num worktree novo; teste de tela do `App.test.tsx` que não acha um texto ("Importação concluída", "Sem conexão") e passa sozinho; ou o boot do PGlite estoura o `beforeAll` do `supabase/rls.test.ts`. Em 23/09/2026, duas de quatro rodadas falharam assim; na 8.1, quatro rodadas seguidas, cada uma num teste diferente. **Causa:** sistema de arquivos e CPU do Windows sob carga (antivírus lendo o `node_modules` recém-instalado, agentes rodando em paralelo), sem relação com o código.
 - **Solução:** rodar de novo, sem outra carga na máquina; para confirmar o código, `npx vitest run --project unidade --maxWorkers=4` (486 testes verdes na 8.1) e o CI do PR, que roda no Linux. **Prevenção:** o `beforeAll` do PGlite tem 60 s desde a 8.1 (o timeout se repetiu).
 - **Origem:** ocorrido em 23/09/2026 (registrado em d87ddca; de novo na 8.1).
+- **Atualização (29/09/2026, 9.2):** no check inteiro, 6 testes de tempo do `desempenho.test.ts` (estruturador, sem mudança) passaram de 5 s, e o do CP inteiro (`servico-corpus.test.ts`) passou de 7 s e estourou os 60 s; com `--maxWorkers=4`, os 794 passaram (o CP grava em cerca de 2 s sozinho). O teste do CP ganhou 120 s de tempo máximo. Teste de tempo novo: medir só a operação (não a sanitização) e rodar sozinho para saber a margem.
 - **Atualização (24/09/2026):** o "Sem conexão" falhou também no CI (Linux), no PR #11. Causa no teste: ele conferia o texto logo depois do evento `offline`, e a assinatura do `useSyncExternalStore` é um efeito que, sob carga, pode chegar depois. O teste passou a esperar (`findByText` e `waitFor`). Ao ver de novo "não acha um texto" em teste de tela, procurar a mesma causa (conferência síncrona logo depois de um evento) antes de rodar de novo.
 
 ### `format:check` reprova `.claude/settings.local.json`
 - **Sintoma:** `npm run check` para no Prettier apontando `.claude/settings.local.json`, sem mudança no código. **Causa:** o Claude Code grava as permissões da sessão nesse arquivo dentro do worktree; o git o ignora (ignore global do usuário), mas o Prettier o verificava.
 - **Solução:** `.claude` no `.prettierignore`. **Prevenção:** arquivo gerado por ferramenta e fora do git entra no `.prettierignore` junto com o `.gitignore`.
 - **Origem:** ocorrido em 23/09/2026 (consolidação pós-7.1).
+
+### `format:check` reprova um arquivo logo depois do `prettier --write`
+- **Sintoma:** `npx prettier --write` formata um arquivo novo e o `npm run check` ainda para nele ("Code style issues found"). **Causa:** a primeira passada muda a quebra de uma expressão longa (cadeia de ternários, chamada com objeto) e só a segunda chega à forma estável.
+- **Solução:** rodar `npx prettier --write <arquivo>` de novo e conferir com `npx prettier --check src`. **Prevenção:** antes do check, `--write` seguido de `--check` nos arquivos da atividade.
+- **Origem:** ocorrido em 25/09/2026 (9.2, `servico.test.ts`).
 
 ### Teste que lê arquivo do repositório não acha o caminho
 - **Sintoma:** caminho inválido ao ler arquivo no teste. **Causa:** o ambiente padrão do Vitest é jsdom, onde `import.meta.url` não é `file:`.
@@ -88,7 +94,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### `PrematureCommitError` numa transação
 - **Sintoma:** a transação fecha antes de terminar. **Causa:** algo além de IndexedDB foi aguardado dentro de `repo.transacao` (WebCrypto, `fetch`, timers).
-- **Solução:** calcular hashes e buscar dados antes de abrir a transação (como `criarSnapshot`). **Prevenção:** revisão; vale em dobro para a 9.2 (hashes da versão calculados antes, sobre o conteúdo sanitizado).
+- **Solução:** calcular hashes e buscar dados antes de abrir a transação (como `criarSnapshot`). **Prevenção:** revisão; na 9.2, `prepararAnexo` calcula o hash antes e `gravarAnexo` só grava, e `criarRascunho` estrutura, serializa a fonte e calcula tudo antes de abrir a transação (`lerAnexo`, que confere o hash, é só fora dela).
 - **Origem:** ocorrido em 23/09/2026 (regra aplicada em a0271eb; registrada em 8ed7e11).
 
 ### O log de alterações não reproduz o registro gravado
@@ -103,7 +109,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Lista mostra só os primeiros 200 itens
 - **Sintoma:** pontos, vínculos ou cartões faltando na tela. **Causa:** a consulta paginada tem `LIMITE_MAXIMO_PAGINA = 200` (`colecao.ts`) e a tela lia só a primeira página.
-- **Solução:** percorrer as páginas (`todas` em `src/apresentacao/recall/carregadores.ts`, para o Plano e os vínculos) ou oferecer "Carregar mais" (listas de cartões e de erros). **Prevenção:** teste com mais de 200 registros em toda lista nova (normas, dispositivos, "a confirmar").
+- **Solução:** percorrer as páginas (`todas` em `src/apresentacao/recall/carregadores.ts`, para o Plano e os vínculos; `todos` em `src/dominios/legislacao/servico.ts`, para apagar a árvore e listar rascunhos) ou oferecer "Carregar mais" (listas de cartões e de erros). **Prevenção:** teste com mais de 200 registros em toda lista nova (normas, dispositivos, "a confirmar"); na 9.2, `servico-corpus.test.ts` descarta o CP inteiro (cerca de 2 mil dispositivos) e confere que não sobra nada.
 - **Origem:** ocorrido em 23/09/2026 (commits ed0a209 e 3c07cbf).
 
 ### Subida de esquema com aba antiga aberta
@@ -117,9 +123,9 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** previsto — toda subida de esquema depois da 9.1.
 
 ### Espaço de armazenamento esgotado
-- **Sintoma:** falha de cota ao importar ou gravar. **Causa:** cada importação guarda um snapshot integral com anexos (retenção mínima de 5), e a F2 soma a fonte sanitizada de cada norma como Anexo; só a página da CF tem 1,8 MB.
-- **Solução:** exportar o backup antes de tudo. Não há poda manual dos pontos de restauração hoje: os que passam da retenção (mínimo 5) são podados a cada importação. **Prevenção:** medir o pacote com o CP inteiro (13.3); avaliar `navigator.storage.estimate()` e `navigator.storage.persist()` em Conta › Dados.
-- **Origem:** previsto — atividades 9.2 e 13.3.
+- **Sintoma:** falha de cota ao importar ou gravar. **Causa:** cada importação guarda um snapshot integral com anexos (retenção mínima de 5), e a F2 soma a fonte sanitizada de cada versão de norma como Anexo (medido na 9.2: LEP compilada 0,17 MB, ECA compilado 0,42 MB, CP 0,48 a 0,73 MB, CF 1,3 MB). Cada registro gravado também vai inteiro para o log de alterações (base da sincronização), e o rascunho descartado deixa lá os `gravar` antigos, além dos `remover`.
+- **Solução:** exportar o backup antes de tudo. Não há poda manual dos pontos de restauração hoje: os que passam da retenção (mínimo 5) são podados a cada importação. **Prevenção:** medir o pacote com o CP inteiro (13.3); avaliar `navigator.storage.estimate()` e `navigator.storage.persist()` em Conta › Dados; compactação do log antes da sincronização (F4).
+- **Origem:** previsto — atividades 9.2 (fonte medida) e 13.3.
 
 ## Backup e pacote `.arretado`
 
@@ -611,8 +617,43 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Importar o CP trava a tela
 - **Sintoma:** a tela congela ao colar ou publicar uma lei grande. **Causa:** o sanitizador roda na thread principal (precisa do DOM) e o CP tem cerca de 930 mil caracteres; a gravação cria milhares de dispositivos e textos.
-- **Solução:** indicador de progresso; gravação em lote numa única transação, com hashes calculados antes. **Prevenção:** teste de serviço "o CP inteiro é gravado em < 5 s" (9.2).
-- **Origem:** previsto — atividades 9.2 e 9.5.
+- **Solução:** indicador de progresso; gravação em lote numa única transação, com hashes calculados antes (`criarLote`, 9.2). **Prevenção:** `servico-corpus.test.ts`: o CP inteiro (as duas páginas, cerca de 2 mil dispositivos) gravado em < 5 s, do estruturador ao fim da transação; medido em 25/09/2026 no Windows: cerca de 2 s. Falta a tela (9.5): o sanitizador e o estruturador ainda rodam na thread principal.
+- **Origem:** previsto — atividades 9.2 (serviço, tratado em 25/09/2026) e 9.5 (tela).
+
+### Norma inteira recusada ao gravar o rascunho (`RegistroInvalido`)
+- **Sintoma:** colar uma lei e nada ser gravado, com `RegistroInvalido` em `dispositivos`, `textosDispositivo` ou `normas`. **Causa:** a gravação passa cada registro pelo esquema do modelo, numa transação só: um rótulo acima de 500 caracteres, uma nota acima de 2.000, um ano fora de 1800–2100 ou um link que o zod recusa derruba a norma inteira (página hostil ou falha da fonte).
+- **Solução:** `registros.ts` corta no limite do modelo, com "…", o que pode passar dele (rótulo, `renumeradoDe`, notas, lei, metadados e a `notaVigenciaMaisRecente` da versão), sem partir um par substituto (emoji na fronteira: a metade solta vira "�" e o Postgres do espelho a recusa), descarta o ano impossível e omite o campo vazio, inclusive a URL em branco. **Prevenção:** "página hostil…", "o corte não parte um par substituto" e "nota mais recente nos limites do modelo" (`registros.test.ts`) e "todo rascunho vira registros válidos do modelo" nas 11 páginas do corpus, com a `VersaoDeNorma` (`estruturador-corpus.test.ts`); campo novo no modelo pede o corte correspondente.
+- **Origem:** previsto na 9.2 e tratado nela (25/09/2026); a nota mais recente, o par substituto e a URL em branco vieram da revisão adversarial.
+
+### Rascunho retomado depois de atualizar o app: relatório e árvore não batem
+- **Sintoma:** o sumário do rascunho (anomalias, descartes) fala de dispositivos que a árvore gravada não tem, ou o contrário. **Causa:** o relatório não é gravado: sai de novo da fonte ao retomar, e o estruturador pode ter mudado desde a gravação (cada merge publica).
+- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: a partir do editor (etapa 10), refazer apagaria o que ele corrigiu; a 10.4 passa a preservar o confirmado. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`).
+- **Origem:** previsto na 9.2 e tratado nela (25/09/2026; a guarda de outra versão veio da revisão adversarial); a parte do editor, previsto — atividade 10.4.
+
+### Backup anterior importado por mesclagem cria uma segunda árvore do rascunho
+- **Sintoma:** depois de retomar um rascunho com o app atualizado e importar um backup de antes (modos 2 ou 4), a mesma versão fica com dois dispositivos por endereço e o dobro de textos. **Causa:** refazer a árvore com ids novos: a mesclagem não achava no aparelho os ids do backup e os criava de novo.
+- **Solução:** refazer reaproveita os ids por endereço (`IdsDaArvore.anteriores` em `registrosDaArvore`). Resta o nó cujo endereço mudou entre duas versões do estruturador: a mesclagem o recria ao lado do novo, como faz com todo registro apagado fisicamente. **Prevenção:** "backup anterior ao refazer, importado por mesclagem (modos 2 e 4)…" (`servico.test.ts`).
+- **Origem:** ocorrido em 25/09/2026, na revisão adversarial da 9.2, antes do commit.
+
+### Notas da norma inteira perdidas ao gravar
+- **Sintoma:** "(Vide Decreto nº 6.049, de 2007)", "Regulamento" e as outras notas entre a epígrafe e a ementa (LEP 2, CP 11, CDC 14, CF 7) somem depois de gravar o rascunho. **Causa:** `Rascunho.notasDaNorma` não ia para registro nenhum: só a árvore e os metadados eram gravados.
+- **Solução:** campo opcional `VersaoDeNorma.notasDaNorma` (mesmo esquema das notas do texto), gravado ao criar e ao refazer. **Prevenção:** o teste do serviço confere a nota da norma, e o do CP confere as 11 (`servico-corpus.test.ts`); saída nova do estruturador pede um lugar no modelo ou a decisão registrada de não gravar.
+- **Origem:** ocorrido em 25/09/2026, na revisão adversarial da 9.2, antes do commit.
+
+### "A fonte guardada deste rascunho não pôde ser lida"
+- **Sintoma:** ao retomar um rascunho, `RascunhoIndisponivel` com motivo `fonte_ilegivel`. **Causa:** o Anexo da fonte falta (backup restaurado sem anexos, ou só com o módulo `legislacao`), foi alterado (hash diferente do da versão) ou não está no formato dos blocos (`FonteIlegivel`).
+- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); a 13.3 decide se o pacote só de `legislacao` passa a levar a fonte das versões.
+- **Origem:** previsto na 9.2 e tratado nela (25/09/2026); o backup por módulo, previsto — atividade 13.3.
+
+### A mesma norma colada duas vezes vira dois rascunhos
+- **Sintoma:** dois rascunhos (ou duas normas) iguais na Biblioteca. **Causa:** `criarRascunho` sempre cria uma norma nova; nada compara com o que já existe.
+- **Solução:** a tela de importação (9.5) procura, antes de gravar, versão com o mesmo `hash` (a fonte é JSON canônico: mesmo conteúdo, mesmo hash) e oferece retomar o rascunho ou abrir a norma. **Prevenção:** E2E da 9.5 colando a LEP duas vezes.
+- **Origem:** previsto — atividade 9.5.
+
+### Publicar e descartar o mesmo rascunho ao mesmo tempo (duas abas)
+- **Sintoma:** norma publicada sem dispositivos, ou rascunho descartado que volta. **Causa:** uma aba lê a versão como rascunho e a outra a publica ou descarta antes de a primeira gravar.
+- **Solução:** reler a versão dentro da transação que escreve e recusar se ela não for mais rascunho, como já fazem `descartarRascunho` e `retomarRascunho` (`RascunhoIndisponivel`, motivo `publicada` ou `inexistente`). **Prevenção:** teste da 9.3 com publicar depois de descartar e o contrário.
+- **Origem:** previsto — atividade 9.3.
 
 ### Leitor lento em norma grande
 - **Sintoma:** abrir a CF ou o CP leva segundos. **Causa:** árvore inteira renderizada ou todos os textos carregados de uma vez.

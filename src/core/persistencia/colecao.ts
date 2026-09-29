@@ -129,6 +129,48 @@ export class Colecao<N extends NomeColecao> {
     });
   }
 
+  /**
+   * Cria vários registros numa escrita só (F2, 9.2: a árvore de uma norma, milhares de
+   * dispositivos e textos): os campos comuns são preenchidos aqui, como em `criar`; o log e um
+   * único `registro.lote` saem como em `gravarLote`. Id já existente (ou repetido no lote) faz
+   * o `bulkAdd` falhar e desfaz a transação.
+   */
+  async criarLote(
+    itens: readonly { id?: string; dados: Dados<N> }[],
+    opcoes: { origem?: OrigemRegistro } = {},
+  ): Promise<RegistroDe<N>[]> {
+    const instante = this.ctx.agora().toISOString();
+    const registros = itens.map(({ id, dados }) =>
+      this.validar({
+        ...dados,
+        id: id ?? this.ctx.novoId(),
+        usuarioId: this.ctx.usuarioId,
+        criadoEm: instante,
+        atualizadoEm: instante,
+        tsLogico: this.ctx.relogio.tick(),
+        origem: opcoes.origem ?? 'manual',
+        excluidoEm: null,
+      }),
+    );
+    if (registros.length === 0) return [];
+    return this.escrever(async () => {
+      await this.tabela.bulkAdd(registros);
+      await this.db.alteracoes.bulkAdd(
+        registros.map((r) => ({
+          ts: r.tsLogico,
+          aparelhoId: this.ctx.aparelhoId,
+          usuarioId: this.ctx.usuarioId,
+          colecao: this.nome,
+          registroId: r.id,
+          operacao: 'gravar' as const,
+          dados: { ...r },
+        })),
+      );
+      this.aposConfirmar('registro.lote', { colecao: this.nome, quantidade: registros.length });
+      return registros;
+    });
+  }
+
   async atualizar(id: string, alteracoes: Alteracoes<N>): Promise<RegistroDe<N>> {
     this.proibirSeAppendOnly('atualizar');
     for (const campo of NOMES_CAMPOS_COMUNS) {
@@ -239,7 +281,9 @@ export class Colecao<N extends NomeColecao> {
 
   /**
    * Apagamento físico com registro no log (restauração integral, retenção de snapshots,
-   * apagar dados). Uso exclusivo do core; o domínio usa exclusão lógica.
+   * apagar dados). O domínio usa exclusão lógica; a única exceção é o rascunho de norma nunca
+   * publicado, apagado ao descartá-lo e, em parte, ao refazer a árvore dele pela fonte (F2, 9.2:
+   * nada o referencia, e milhares de registros excluídos só ocupariam o aparelho e o backup).
    */
   async removerFisico(ids: readonly string[]): Promise<number> {
     if (ids.length === 0) return 0;

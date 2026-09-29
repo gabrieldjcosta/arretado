@@ -4,6 +4,8 @@
 // os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4) e as
 // notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito.
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
+import { novoId } from '../../core/ids';
+import { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import {
   artigosDe,
@@ -22,6 +24,12 @@ import { estruturar } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
 import { normalizarBlocos } from './normalizacao';
 import type { NoRascunho, Rascunho } from './rascunho';
+import {
+  dadosDaNorma,
+  notaMaisRecenteDoModelo,
+  notasDaNormaDoModelo,
+  registrosDaArvore,
+} from './registros';
 
 const HTML = import.meta.glob<string>('../../../corpus/normas/*.colado.html', {
   query: '?raw',
@@ -495,6 +503,52 @@ describe('estruturador (8.5) no corpus: notas de vigência (regra 7)', () => {
       // Nenhuma nota no texto ("(Revogado)" sozinho é texto).
       expect(achados.filter((d) => NOTA_NO_TEXTO.test(d.texto)).map((d) => d.endereco)).toEqual([]);
       expect(r.notaVigenciaMaisRecente).toEqual(MAIS_RECENTE[id]);
+    },
+    60_000,
+  );
+});
+
+// A 9.2 grava o rascunho passando cada registro pelo esquema do modelo: um só inválido (link que o
+// zod recusa, rótulo acima do limite) recusaria a norma inteira. Conferido sem banco, nas 11 páginas.
+describe('registros (9.2) no corpus: todo rascunho vira registros válidos do modelo', () => {
+  const COMUNS = {
+    usuarioId: novoId(),
+    criadoEm: '2026-09-23T12:00:00.000Z',
+    atualizadoEm: '2026-09-23T12:00:00.000Z',
+    tsLogico: '1758628800000-000000-0000abcd',
+    origem: 'importacao' as const,
+    excluidoEm: null,
+  };
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s',
+    async (id) => {
+      const r = await rascunho(id);
+      const normaId = novoId();
+      const versaoId = novoId();
+      Norma.parse({ ...COMUNS, id: normaId, ...dadosDaNorma(r.metadados, {}) });
+      VersaoDeNorma.parse({
+        ...COMUNS,
+        id: versaoId,
+        normaId,
+        status: 'rascunho',
+        capturadaEm: COMUNS.criadoEm,
+        origemEntrada: 'html',
+        hash: '0'.repeat(64),
+        versaoAdaptador: r.versaoEstruturador,
+        notaVigenciaMaisRecente: notaMaisRecenteDoModelo(r.notaVigenciaMaisRecente),
+        notasDaNorma: notasDaNormaDoModelo(r.notasDaNorma),
+      });
+      const { dispositivos, textos } = registrosDaArvore(r.nos, { normaId, versaoId, novoId });
+      const vistos = new Set<string>();
+      dispositivos.forEach(({ id: dispositivoId, dados }, k) => {
+        Dispositivo.parse({ ...COMUNS, id: dispositivoId, ...dados });
+        expect(dados.ordem).toBe(k + 1);
+        if (dados.paiId !== undefined) expect(vistos.has(dados.paiId)).toBe(true);
+        vistos.add(dispositivoId);
+      });
+      expect(textos.map((t) => t.dados.dispositivoId)).toEqual(dispositivos.map((d) => d.id));
+      for (const { dados } of textos)
+        TextoDeDispositivo.parse({ ...COMUNS, id: novoId(), ...dados });
     },
     60_000,
   );

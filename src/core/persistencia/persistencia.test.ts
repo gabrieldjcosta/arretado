@@ -430,3 +430,74 @@ describe('correções da revisão da etapa 1', () => {
     expect(await a.db.tabela('preferencias').count()).toBe(1);
   });
 });
+
+describe('criarLote (F2, 9.2)', () => {
+  it('preenche os campos comuns, registra no log e emite um só registro.lote após a confirmação', async () => {
+    const eventos = new Barramento();
+    const { repo } = await repositorioDeTeste({ eventos });
+    const recebidos: Evento[] = [];
+    eventos.assinar('*', (e) => {
+      recebidos.push(e);
+    });
+    const antes = await repo.db.alteracoes.count();
+    const id = repo.ctx.novoId();
+    let duranteTransacao = -1;
+    const criados = await repo.transacao(async () => {
+      const r = await repo
+        .colecao('erros')
+        .criarLote([{ id, dados: ERRO }, { dados: { ...ERRO, oQueFoi: '  outro  ' } }], {
+          origem: 'importacao',
+        });
+      duranteTransacao = recebidos.length;
+      return r;
+    });
+    expect(duranteTransacao).toBe(0);
+    expect(criados.map((e) => e.id)[0]).toBe(id);
+    expect(criados[1]).toMatchObject({
+      oQueFoi: 'outro',
+      usuarioId: repo.ctx.usuarioId,
+      origem: 'importacao',
+      excluidoEm: null,
+      criadoEm: '2026-09-23T12:00:00.000Z',
+    });
+    expect((criados[0]?.tsLogico ?? '') < (criados[1]?.tsLogico ?? '')).toBe(true);
+    for (const e of criados) expect(await repo.colecao('erros').obter(e.id)).toEqual(e);
+    const log = await repo.db.alteracoes.orderBy('seq').toArray();
+    expect(log).toHaveLength(antes + 2);
+    expect(reconstruirDoLog(log).get('erros')?.get(id)).toEqual(criados[0]);
+    expect(recebidos.map((e) => [e.nome, e.payload])).toEqual([
+      ['registro.lote', { colecao: 'erros', quantidade: 2 }],
+    ]);
+  });
+
+  it('registro inválido ou id repetido: nada é gravado nem registrado no log', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erros = repo.colecao('erros');
+    const antes = await repo.db.alteracoes.count();
+    await expect(
+      erros.criarLote([{ dados: ERRO }, { dados: { ...ERRO, oQueFoi: '' } }]),
+    ).rejects.toBeInstanceOf(RegistroInvalido);
+    const existente = await erros.criar(ERRO);
+    await expect(
+      erros.criarLote([{ dados: ERRO }, { id: existente.id, dados: ERRO }]),
+    ).rejects.toThrow();
+    const id = repo.ctx.novoId();
+    await expect(
+      erros.criarLote([
+        { id, dados: ERRO },
+        { id, dados: ERRO },
+      ]),
+    ).rejects.toThrow();
+    expect(await repo.db.tabela('erros').count()).toBe(1);
+    expect(await repo.db.alteracoes.count()).toBe(antes + 1);
+  });
+
+  it('lote vazio não escreve nem emite', async () => {
+    const eventos = new Barramento();
+    const { repo } = await repositorioDeTeste({ eventos });
+    const emitir = vi.spyOn(eventos, 'emitir');
+    expect(await repo.colecao('erros').criarLote([])).toEqual([]);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(emitir).not.toHaveBeenCalled();
+  });
+});
