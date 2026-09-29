@@ -78,8 +78,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### E2E não consegue colar a lei
 - **Sintoma:** o E2E da tela Importar não recebe o conteúdo: `Control+V` no headless não traz nada, ou a área de transferência pede permissão. **Causa:** a área de transferência do sistema não é controlável no Chromium headless, e o `navigator.clipboard` pede `clipboard-read`/`clipboard-write`.
-- **Solução:** evento sintético: ler o `*.colado.html` no Node e, no `page.evaluate`, `new DataTransfer()` com `setData('text/html', …)` e `setData('text/plain', …)`, e `dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))` no alvo da colagem. Conferido em 29/09/2026 no Chromium 141 (`chromium-1194`): o `paste` recebe os dois tipos inteiros (LEP compilada, 289 mil caracteres, em cerca de 30 ms). **Prevenção:** o E2E da 2ª parte da 9.5; o colar real (Windows, celular) continua conferido à mão ("Colar real diferente do colado do corpus").
-- **Origem:** previsto — atividade 9.5 (2ª parte); o evento sintético conferido na 1ª parte.
+- **Solução:** evento sintético: ler o `*.colado.html` no Node e, no `page.evaluate`, `new DataTransfer()` com `setData('text/html', …)` e `setData('text/plain', …)`, e `dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))` no alvo da colagem. Conferido em 29/09/2026 no Chromium 141 (`chromium-1194`): o `paste` recebe os dois tipos inteiros (LEP compilada, 289 mil caracteres, em cerca de 30 ms). Em uso no `e2e/biblioteca.spec.ts` (`colar(page, id)`: o colado lido com `readFile`, o evento no campo "Cole aqui a lei"). Não conferir no E2E o texto passageiro do andamento ("Limpando a página colada…"): o sanitizador prende a thread principal, e a página só responde ao Playwright quando o passo já mudou. **Prevenção:** o E2E da 9.5 (LEP e ECA compilados publicados; LEP com todas as redações); o colar real (Windows, celular) continua conferido à mão ("Colar real diferente do colado do corpus").
+- **Origem:** previsto na 9.5 (1ª parte, evento conferido); em uso desde a 2ª parte (29/09/2026).
 
 ### Playwright ou TypeScript "desatualizados" de propósito
 - **Sintoma:** E2E não abre o Chromium, ou o `@axe-core/playwright` puxa outra versão; lint quebra depois de atualizar o TypeScript. **Causa:** Playwright fixado em 1.56.1 (o Chromium do contêiner é o `chromium-1194`), com `playwright-core` fixado junto, também em `1.56.1` exato no `package.json` (desde 23/09/2026; antes era `^1.56.1`), para o axe não puxar outra versão; TypeScript fixado em `~6.0` porque o `typescript-eslint` ainda não aceita o 7.
@@ -177,6 +177,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** zod em modo `jitless` (`src/core/modelo/comum.ts`); no leitor virtualizado (T16, 9.6), posicionar pela propriedade `style` do React (CSSOM) ou por classe, conferindo no E2E. Nunca afrouxar a CSP. **Prevenção:** vigilância automática de CSP em todo E2E; a cada dependência nova, procurar `eval`, `Function`, `innerHTML` e `<style>` injetado.
 - **Origem:** ocorrido em 23/09/2026 (commit 495de6d; registrado em 8ed7e11).
 
+### Colar a lei enche o console de violações de `style-src`
+- **Sintoma:** o E2E da tela Importar reprova na vigilância de CSP com milhares de `style-src-attr: inline` (mais de 5 mil no E2E que cola a LEP e o ECA compilados; 1,5 mil só com a LEP com todas as redações), apontando o código do DOMPurify; no console, "Refused to apply inline style…" repetido. **Causa:** o documento que o parser cria (DOMParser, que o DOMPurify usa; também `document.implementation.createHTMLDocument` e `<template>`, conferidos no Chromium 141) herda a CSP da página, e cada atributo `style` e cada `<style>` do HTML colado viram uma violação, mesmo sem nada ser aplicado. As páginas do Planalto têm estilo em quase toda linha.
+- **Solução:** `semEstiloEmLinha` no `sanitizarHtml`: antes do parser, o `<style>` sai e o atributo `style` das tags vira `data-arretado-estilo`, que o gancho do tachado lê e o DOMPurify remove. Nunca afrouxar a CSP. Os resultados do corpus (gabaritos, colados) não mudaram. **Prevenção:** "nenhum atributo style nem <style> chega ao DOMParser…" (`sanitizador.test.ts`, espiando o `parseFromString`); a vigilância de CSP do E2E, que agora cola as leis inteiras.
+- **Origem:** ocorrido em 29/09/2026 (9.5, 2ª parte, no E2E, antes do commit).
+
 ### Funciona no `npm run dev` e falha no publicado
 - **Sintoma:** tela quebra só no build, no `preview` ou no Cloudflare. **Causa:** a CSP só entra na versão construída (o servidor de desenvolvimento do Vite injeta estilos em linha; ver `vite.config.ts`).
 - **Solução:** reproduzir com `npm run build` e depois `npm run preview` (encerrar o `preview` ao terminar, senão o E2E o reaproveita). **Prevenção:** o E2E roda sobre a versão construída; tela nova só fica pronta com E2E verde.
@@ -226,8 +231,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Clique duplo cria registro duplicado
 - **Sintoma:** dois cartões para o mesmo erro (duplo clique ou outra aba). **Causa:** criação sem guarda de idempotência.
-- **Solução:** cartão de erro idempotente no serviço e botões com guarda contra clique duplo. **Prevenção:** "criar cartão duas vezes para o mesmo erro devolve o mesmo cartão"; vale para "Publicar" (9.3) e "Criar cartão deste trecho" (11.5).
-- **Origem:** ocorrido em 23/09/2026 (commit 3c07cbf).
+- **Solução:** cartão de erro idempotente no serviço e botões com guarda contra clique duplo. **Prevenção:** "criar cartão duas vezes para o mesmo erro devolve o mesmo cartão"; vale para "Publicar" (9.3) e "Criar cartão deste trecho" (11.5). Na tela Importar (9.5), uma trava por `useRef` (o estado só muda no próximo render) vale para colar, publicar e descartar, e o botão vira "Publicando…", desabilitado, já no primeiro clique ("pela rota do rascunho…", `Importar.test.tsx`).
+- **Origem:** ocorrido em 23/09/2026 (commit 3c07cbf); a tela Importar, 29/09/2026.
 
 ### Atalho de teclado rouba a tecla de outro controle
 - **Sintoma:** espaço, Enter ou 1–3 acionavam o drill com o foco num link ou botão. **Causa:** ouvinte de teclado da tela sem olhar o alvo do evento.
@@ -241,8 +246,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### O aviso diz "descartada", mas a lista ainda mostra o item
 - **Sintoma:** logo depois de descartar um rascunho na Biblioteca, o aviso "Importação de X descartada." aparece e a faixa ainda mostra X por um instante; o teste que confere a faixa logo depois do aviso falha. **Causa:** o aviso é estado local, imediato; a lista vem do `useDados`, que só recarrega com o evento `registro.*` emitido depois do `complete` da transação, e a leitura nova é assíncrona.
-- **Solução:** no teste, `waitFor` na lista (não no aviso). Na tela, fica assim: é um instante, e descartar de novo o item que já saiu mostra "Este rascunho não existe mais." no diálogo e recarrega. **Prevenção:** "descartar pede confirmação, apaga o rascunho e avisa" (`Biblioteca.test.tsx`); vale para o "Publicar" (2ª parte da 9.5) e toda ação que muda uma lista vinda do `useDados`.
-- **Origem:** ocorrido em 29/09/2026 (9.5, 1ª parte, no teste, antes do commit).
+- **Solução:** no teste, `waitFor` na lista (não no aviso). Na tela, fica assim: é um instante, e descartar de novo o item que já saiu mostra "Este rascunho não existe mais." no diálogo e recarrega. **Prevenção:** "descartar pede confirmação, apaga o rascunho e avisa" (`Biblioteca.test.tsx`); vale para o "Publicar" (2ª parte da 9.5) e toda ação que muda uma lista vinda do `useDados`. Na 2ª parte, dois tropeços do mesmo tipo nos testes: ao chegar à Biblioteca pela tela Importar, a lista ainda carrega (`findByRole`, nunca `getByRole`, para a região "Normas" e o "Importar norma"), e há mais de um `role="status"` na tela (o esqueleto "Carregando" e o aviso): procurar o aviso pelo texto e conferir o papel (`findByText(...)` + `toHaveAttribute('role', 'status')`).
+- **Origem:** ocorrido em 29/09/2026 (9.5, 1ª parte, no teste, antes do commit); os da 2ª parte, no mesmo dia.
 
 ### Celular: seleção, toque longo e navegador não testado
 - **Sintoma:** grifo impossível no celular; comportamento diferente no iPhone. **Causa:** ação que depende de hover ou de seleção de desktop; o E2E só roda Chromium (desktop e Pixel 7), sem Safari.
@@ -366,13 +371,13 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Nenhuma redação anterior depois de colar
 - **Sintoma:** a lei entra sem nenhum texto tachado. **Causa:** a página "compilado" do Planalto traz só o texto vigente; a simples (`l7210.htm`, `del2848.htm`) traz todas as redações.
-- **Solução:** colar da página simples. **Prevenção:** na 9.5, avisar quando o conteúdo indicar a compilada (na 12.3, também pela URL `…compilado.htm`); o corpus confere a variante pela contagem de tachados (limiar 20).
-- **Origem:** previsto — atividade 9.5.
+- **Solução:** para ter as redações anteriores (a partir da 8.6), colar da página simples; até lá, e na leitura antecipada, a compilada é a preferida (as linhas tachadas ficam de fora). **Prevenção:** a tela Importar avisa "Nenhuma linha tachada: a página parece a compilada, só com o texto vigente…" quando o HTML não tem nenhum descarte `redacao_anterior` (`sumarioDoRascunho(...).pareceCompilada`); no corpus, verdadeiro só nas 4 compiladas (`estruturador-corpus.test.ts`, "sumário (9.5) no corpus"); a página simples mostra o aviso do estruturador ("N linha(s) tachada(s)…"), no E2E com a LEP. Na 12.3, também pela URL `…compilado.htm`; o corpus confere a variante pela contagem de tachados (limiar 20).
+- **Origem:** previsto na 9.5 e tratado nela (29/09/2026).
 
 ### O HTML colado muda conforme o navegador
 - **Sintoma:** a mesma lei estrutura bem no Chromium e mal em outro navegador, no Windows ou no celular; ou `npm run corpus:colar` no Windows regrava todos os colados. **Causa:** cada navegador e cada sistema serializa a seleção de um jeito: estilo computado em linha; no Windows, envelope do CF_HTML (`<html><body><!--StartFragment-->`) e texto puro em CRLF (previsto). No celular a seleção de uma lei inteira é difícil e o colar pode trazer só texto puro.
-- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). Os colados do corpus são do Chromium 141 no Linux (`navegador` e `plataforma` no `colados.json`); não recapturar no Windows sem motivo. **Prevenção:** na 9.5, um teste com colar real do Windows (guardar como amostra, fora do `colados.json`); amostras de outros navegadores quando aparecerem.
-- **Origem:** previsto — atividades 7.2 (Linux capturado em 23/09/2026) e 9.5.
+- **Solução:** reserva em `text/plain` (tudo "a confirmar", 8.8) e busca por URL (12.3). Os colados do corpus são do Chromium 141 no Linux (`navegador` e `plataforma` no `colados.json`); não recapturar no Windows sem motivo. No celular, o teclado pode inserir o texto sem o evento `paste` (a área de transferência do Gboard): a tela mostra "Importar o texto" para o que entrou no campo (texto puro, tudo a confirmar). **Prevenção:** um teste com colar real do Windows (guardar como amostra, fora do `colados.json`); amostras de outros navegadores quando aparecerem. Caminho sem ferramenta nova: o Gabriel cola no app, exporta o backup (Conta › Dados), e a sessão compara os blocos da fonte guardada (anexo `fonte-sanitizada.json`) com os do colado do corpus.
+- **Origem:** previsto — atividades 7.2 (Linux capturado em 23/09/2026) e 9.5 (a tela tratou o texto sem evento; a amostra do Windows espera o colar real do Gabriel).
 
 ### Captura do colar vazia ou de outra página
 - **Sintoma:** `npm run corpus:colar` falha com "colado sem html" ou marcador ausente; a lista de bloqueados mostra a raiz do site. **Causa:** clicar na página para dar foco antes do Ctrl+A: o canto superior esquerdo da página da ALESP é um link, e o clique navegou para `https://www.al.sp.gov.br/`.
@@ -381,8 +386,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Colar real diferente do colado do corpus
 - **Sintoma:** o estruturador acerta o colado do corpus e erra o colar feito no navegador. **Causa:** a captura bloqueia o CSS e o JS da fonte (`del.css`, `alvorada.css`, `c927.js`, `stf.js` do Planalto; CSS da ALESP); no navegador do Gabriel eles rodam, mudam o estilo computado e, em tese, poderiam esconder ou reformatar trechos.
-- **Solução:** comparar a contagem de tachados e de artigos do colar real com a do colado (`contarTachados`). **Prevenção:** na 9.5, colar real da LEP e do CP no Windows como amostra de teste.
-- **Origem:** previsto — atividade 9.5.
+- **Solução:** comparar a contagem de tachados e de artigos do colar real com a do colado (`contarTachados`); a tela já mostra as duas ("Estrutura encontrada" e "Ficou de fora"): LEP compilada, 219 artigos e nenhuma linha tachada; LEP com todas as redações, 218 artigos e 85 linhas tachadas. **Prevenção:** colar real da LEP e do CP no Windows como amostra de teste (pelo backup, ver "O HTML colado muda conforme o navegador").
+- **Origem:** previsto — atividade 9.5 (fica para a 3ª parte, com o colar real do Gabriel).
 
 ### `npm run corpus` responde HTTP 403 em todas as normas
 - **Sintoma:** "✗ lep: HTTP 403" em todas, só nas sessões do Claude Code na nuvem. **Causa:** a política de rede do contêiner bloqueia o Planalto e a ALESP (o proxy responde 403).
@@ -548,8 +553,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Publicação recusada: "dispositivo(s) a confirmar" ou "norma sem artigo"
 - **Sintoma:** `publicarVersao` lança `PublicacaoBloqueada` com motivo `a_confirmar` (texto puro: todo dispositivo fica "a confirmar") ou `conflitos` com `sem_artigos` ("Não consegui identificar artigos."). **Causa:** regra 12: publicar exige zero conflito, e o "a confirmar" pede o aceite em lote; uma norma sem nenhum artigo não tem o que ler (o estruturador já acusa o conflito, e a 9.3 o repete sobre a árvore gravada).
-- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; a inserção manual de norma sem artigo (súmula) é da 10.4. **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`).
-- **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a decisão de o aceite não mudar a confiança e a de bloquear norma sem artigo são suposições a confirmar (`proxima-sessao.md`).
+- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; a inserção manual de norma sem artigo (súmula) é da 10.4. Na tela (9.5): "Não consegui identificar artigos neste texto." com "Colar novamente da página" (descarta o rascunho e volta à colagem) e "Guardar para editar depois" (o rascunho fica em Importações pendentes até o editor integral, 10.4); o "a confirmar" vira o botão "Aceitar N e publicar". **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`); "sem artigos…" e "só texto puro…" (`Importar.test.tsx`).
+- **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (2ª parte); a decisão de o aceite não mudar a confiança e a de bloquear norma sem artigo são suposições a confirmar (`proxima-sessao.md`).
 
 ### Leitor mostra o texto de outra versão, ou de um rascunho
 - **Sintoma:** a leitura (9.4 e 9.6) mostra o texto de uma versão que não é a vigente, um rascunho não publicado, ou dois textos para o mesmo dispositivo. **Causa:** o `Dispositivo` é da norma (vale para todas as versões) e o `TextoDeDispositivo` é da versão (`versaoId`); ler os textos por `normaId` mistura versões, e a norma com rascunho pendente tem dispositivos que ainda não foram publicados.
@@ -648,8 +653,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Importar o CP trava a tela
 - **Sintoma:** a tela congela ao colar ou publicar uma lei grande. **Causa:** o sanitizador roda na thread principal (precisa do DOM) e o CP tem cerca de 930 mil caracteres; a gravação cria milhares de dispositivos e textos.
-- **Solução:** indicador de progresso; gravação em lote numa única transação, com hashes calculados antes (`criarLote`, 9.2). **Prevenção:** `servico-corpus.test.ts`: o CP inteiro (as duas páginas, cerca de 2 mil dispositivos) gravado em < 5 s, do estruturador ao fim da transação; medido em 25/09/2026 no Windows: cerca de 2 s. Falta a tela (9.5): o sanitizador e o estruturador ainda rodam na thread principal.
-- **Origem:** previsto — atividades 9.2 (serviço, tratado em 25/09/2026) e 9.5 (tela).
+- **Solução:** indicador de progresso; gravação em lote numa única transação, com hashes calculados antes (`criarLote`, 9.2). Na tela (9.5): quatro passos com texto e barra (`role="status"`: "Limpando a página colada", "Procurando a mesma norma", "Separando artigos, parágrafos e incisos", "Guardando o rascunho"), com uma pausa de 50 ms antes de cada passo pesado para o navegador pintar (`respirar`) e o `antesDeGravar` do `criarRascunho` para o último. Medido em 29/09/2026 no Chromium do contêiner (headless, desktop), do colar ao sumário: ECA compilado cerca de 2 s, CP (todas as redações) de 4 a 6 s, CF cerca de 15 s; a sanitização leva de 0,2 a 0,5 s. Perfil do CP: a thread principal fica ociosa em cerca de 75% do tempo, esperando o IndexedDB gravar os cerca de 4 mil registros; a tela não congela, só espera. **Prevenção:** `servico-corpus.test.ts`: o CP inteiro (as duas páginas, cerca de 2 mil dispositivos) gravado em < 5 s, do estruturador ao fim da transação (fake-indexeddb; medido em 25/09/2026 no Windows: cerca de 2 s). Se o celular do Gabriel passar de uns 10 s no CP, examinar a durabilidade da transação do Dexie (`relaxed`) e o custo do log de alterações por registro, antes de pensar em Worker (o sanitizador precisa do DOM).
+- **Origem:** previsto — atividades 9.2 (serviço, tratado em 25/09/2026) e 9.5 (tela, tratado em 29/09/2026; falta a medida no celular real).
 
 ### Norma inteira recusada ao gravar o rascunho (`RegistroInvalido`)
 - **Sintoma:** colar uma lei e nada ser gravado, com `RegistroInvalido` em `dispositivos`, `textosDispositivo` ou `normas`. **Causa:** a gravação passa cada registro pelo esquema do modelo, numa transação só: um rótulo acima de 500 caracteres, uma nota acima de 2.000, um ano fora de 1800–2100 ou um link que o zod recusa derruba a norma inteira (página hostil ou falha da fonte).
@@ -678,13 +683,13 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### A mesma norma colada duas vezes vira dois rascunhos
 - **Sintoma:** dois rascunhos (ou duas normas) iguais na Biblioteca. **Causa:** `criarRascunho` sempre cria uma norma nova; nada compara com o que já existe.
-- **Solução:** a tela de importação (9.5) procura, antes de gravar, versão com o mesmo `hash` (a fonte é JSON canônico: mesmo conteúdo, mesmo hash) e oferece retomar o rascunho ou abrir a norma. **Prevenção:** E2E da 9.5 colando a LEP duas vezes.
-- **Origem:** previsto — atividade 9.5.
+- **Solução:** a tela de importação (9.5) procura, antes de gravar, versão com o mesmo `hash` (`versaoComMesmaFonte`: a fonte é JSON canônico, mesmo conteúdo, mesmo hash; a vigente vence o rascunho) e oferece "Retomar a importação" (rascunho) ou "Ver na Biblioteca" (publicada), mais "Colar outra norma". A mesma lei colada de outra página (compilada × todas as redações) ou de outro navegador tem outro hash e vira outra norma: é o caso da versão nova (11.7, F6), ainda sem aviso. **Prevenção:** "a mesma fonte acha a versão já gravada…" (`servico.test.ts`), "a mesma norma colada duas vezes…" (`Importar.test.tsx`) e o E2E da 9.5, que cola a LEP compilada de novo depois de publicada.
+- **Origem:** previsto e tratado na 9.5 (29/09/2026).
 
 ### Publicar e descartar o mesmo rascunho ao mesmo tempo (duas abas)
 - **Sintoma:** norma publicada sem dispositivos, ou rascunho descartado que volta. **Causa:** uma aba lê a versão como rascunho e a outra a publica ou descarta antes de a primeira gravar.
-- **Solução:** reler a versão dentro da transação que escreve e recusar se ela não for mais rascunho, como já fazem `descartarRascunho` e `retomarRascunho` (`RascunhoIndisponivel`, motivo `publicada` ou `inexistente`): `publicarVersao` faz a checagem (`prepararPublicacao`) e a escrita na mesma `repo.transacao`. **Prevenção:** "publicar depois de descartar, e descartar depois de publicar…" e "duas abas ao mesmo tempo…" (`servico.test.ts`; dois `Repositorio` sobre o mesmo banco, nas duas ordens e com publicar × publicar). O teste foi conferido por mutação: ler o estado fora da transação faz as duas operações terem êxito e o teste falhar. Ao mexer em `publicarVersao`, manter a leitura dentro da transação. Na tela (9.5, Biblioteca › Normas): descartar o rascunho que outra aba já publicou ou descartou mostra, no diálogo, a mensagem do `RascunhoIndisponivel` ("Esta versão já foi publicada; não é mais rascunho.") e recarrega a lista ("descartar o que outra aba já publicou…", `Biblioteca.test.tsx`); o "Publicar" da 2ª parte faz o mesmo com o `PublicacaoBloqueada` e o `RascunhoIndisponivel`.
-- **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (1ª parte, 29/09/2026).
+- **Solução:** reler a versão dentro da transação que escreve e recusar se ela não for mais rascunho, como já fazem `descartarRascunho` e `retomarRascunho` (`RascunhoIndisponivel`, motivo `publicada` ou `inexistente`): `publicarVersao` faz a checagem (`prepararPublicacao`) e a escrita na mesma `repo.transacao`. **Prevenção:** "publicar depois de descartar, e descartar depois de publicar…" e "duas abas ao mesmo tempo…" (`servico.test.ts`; dois `Repositorio` sobre o mesmo banco, nas duas ordens e com publicar × publicar). O teste foi conferido por mutação: ler o estado fora da transação faz as duas operações terem êxito e o teste falhar. Ao mexer em `publicarVersao`, manter a leitura dentro da transação. Na tela (9.5, Biblioteca › Normas): descartar o rascunho que outra aba já publicou ou descartou mostra, no diálogo, a mensagem do `RascunhoIndisponivel` ("Esta versão já foi publicada; não é mais rascunho.") e recarrega a lista ("descartar o que outra aba já publicou…", `Biblioteca.test.tsx`); na tela Importar (2ª parte), "Publicar" com o rascunho que outra aba já publicou mostra a mensagem do `RascunhoIndisponivel` com "Voltar à Biblioteca", e o `PublicacaoBloqueada` atualiza o sumário com o relatório novo ("outra aba publicou antes…", `Importar.test.tsx`).
+- **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (1ª e 2ª partes, 29/09/2026).
 
 ### Leitor lento em norma grande
 - **Sintoma:** abrir a CF ou o CP leva segundos. **Causa:** árvore inteira renderizada ou todos os textos carregados de uma vez.
@@ -759,6 +764,11 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Sintoma:** dados misturados ou sumidos depois de uma importação. **Causa:** modo de importação diferente do pretendido.
 - **Solução:** Conta › Dados › "Importações e pontos de restauração": "Desfazer" na importação, ou restaurar um ponto (pelo menos os 5 mais recentes ficam guardados). **Prevenção:** ler a prévia antes de confirmar; na dúvida, "Importar para espaço separado".
 - **Origem:** previsto — uso real da F1.
+
+### Colei a lei e deu "Não consegui identificar artigos", ou nada aconteceu
+- **Sintoma:** depois de colar, a tela diz "Não consegui identificar artigos neste texto"; ou, no celular, o texto aparece no campo e nada acontece. **Causa:** a seleção pegou só um pedaço da página (sem os "Art. 1º…"), ou o teclado do celular colou sem avisar o app.
+- **Solução:** "Colar novamente da página": na página da lei, Ctrl+A, Ctrl+C e colar de novo. No celular, com o texto no campo, tocar em "Importar o texto" (vira texto puro: tudo "a confirmar", publicado com "Aceitar N e publicar"). Se a mesma lei já tinha sido colada, a tela oferece retomar o rascunho ou ver a norma na Biblioteca. **Prevenção:** preferir o computador para importar (Parte 2: o desktop é o aparelho da importação).
+- **Origem:** previsto — uso real da F2 (9.5).
 
 ### Publiquei uma versão nova e o celular mostra a antiga
 - **Sintoma:** a novidade não aparece. **Causa:** a página antiga continua aberta ou guardada pelo navegador.

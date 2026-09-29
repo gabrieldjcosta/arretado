@@ -15,6 +15,7 @@ import {
   type Repositorio,
 } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
+import { sha256 } from '../../core/util/sha256';
 import { dispositivosDaNorma, todos } from './consultas';
 import { estruturar } from './estruturador';
 import type { Anomalia, Rascunho } from './rascunho';
@@ -71,6 +72,14 @@ export class RascunhoIndisponivel extends Error {
   }
 }
 
+export interface OpcoesCriarRascunho {
+  /**
+   * Chamado depois de estruturar e antes de gravar, fora da transação (pode aguardar): a tela
+   * (9.5) mostra "Guardando o rascunho", a parte longa numa lei grande (espera do IndexedDB).
+   */
+  antesDeGravar?: () => Promise<void>;
+}
+
 /**
  * Estrutura os blocos e grava o rascunho de uma norma nova. Nada é gravado se qualquer registro
  * falhar na validação do modelo.
@@ -78,8 +87,10 @@ export class RascunhoIndisponivel extends Error {
 export async function criarRascunho(
   repo: Repositorio,
   entrada: EntradaRascunho,
+  opcoes: OpcoesCriarRascunho = {},
 ): Promise<RascunhoDeNorma> {
   const rascunho = estruturar(entrada.blocos, { formato: formatoDaOrigem(entrada.origemEntrada) });
+  await opcoes.antesDeGravar?.();
   const fonte = await prepararAnexo(NOME_FONTE, TIPO_FONTE, serializarFonte(entrada.blocos));
   const agora = repo.ctx.agora();
   const normaId = repo.ctx.novoId();
@@ -197,6 +208,30 @@ export async function retomarRascunho(
 }
 
 /**
+ * A versão cuja fonte são exatamente estes blocos (mesmo hash: a fonte é JSON canônico), para a
+ * tela (9.5) oferecer retomar o rascunho ou abrir a norma, em vez de criar outra igual. Prefere a
+ * vigente ao rascunho. Lê as versões do usuário inteiras: são poucas (uma ou duas por norma).
+ */
+export async function versaoComMesmaFonte(
+  repo: Repositorio,
+  blocos: readonly Bloco[],
+): Promise<{ norma: Norma; versao: VersaoDeNorma } | undefined> {
+  const hash = await sha256(serializarFonte(blocos));
+  const versoes = await todos(repo.colecao('versoesNorma'), {
+    indice: 'usuarioId',
+    de: repo.ctx.usuarioId,
+    ate: repo.ctx.usuarioId,
+    filtro: (v) => v.hash === hash,
+  });
+  versoes.sort((a, b) => Number(b.status === 'vigente') - Number(a.status === 'vigente'));
+  for (const versao of versoes) {
+    const norma = await repo.colecao('normas').obter(versao.normaId);
+    if (norma) return { norma, versao };
+  }
+  return undefined;
+}
+
+/**
  * Apaga o rascunho de uma norma nova: norma, versão, dispositivos, textos e a fonte. Apagamento
  * físico, com registro no log: nada referencia um rascunho nunca publicado, e milhares de
  * registros excluídos só ocupariam o aparelho e o backup.
@@ -226,6 +261,11 @@ export interface RelatorioDePublicacao {
 export interface OpcoesPublicacao {
   /** Aceita em lote os dispositivos "a confirmar" (regra 12); sem isso, eles bloqueiam. */
   aceitarAConfirmar?: boolean;
+  /**
+   * O título curto confirmado na tela (9.5), gravado na mesma transação que publica. Ausente ou
+   * em branco, fica o da gravação do rascunho (como em `criarRascunho`).
+   */
+  tituloCurto?: string;
 }
 
 export interface NormaPublicada {
@@ -340,9 +380,11 @@ export async function publicarVersao(
       throw new PublicacaoBloqueada(versaoId, 'a_confirmar', relatorio);
     }
     const vigente = await repo.colecao('versoesNorma').atualizar(versao.id, { status: 'vigente' });
-    const normaAtual = await repo
-      .colecao('normas')
-      .atualizar(norma.id, { versaoVigenteId: versao.id });
+    const tituloCurto = opcoes.tituloCurto?.trim();
+    const normaAtual = await repo.colecao('normas').atualizar(norma.id, {
+      versaoVigenteId: versao.id,
+      ...(tituloCurto ? { tituloCurto } : {}),
+    });
     return { norma: normaAtual, versao: vigente, relatorio };
   });
   repo.eventos.emitir('versao.publicada', { normaId: publicada.norma.id, versaoId });

@@ -15,6 +15,7 @@ import {
   rascunhosPendentes,
   retomarRascunho,
   verificarPublicacao,
+  versaoComMesmaFonte,
 } from './servico';
 
 const LINK = 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14000.htm';
@@ -788,5 +789,86 @@ describe('publicar (9.3)', () => {
     await bloqueioDa(publicarVersao(repo, versao.id));
     await motivoDa(publicarVersao(repo, repo.ctx.novoId()));
     expect(nomes).toEqual([]);
+  });
+});
+
+describe('importação pela tela (9.5)', () => {
+  it('o título curto confirmado entra junto com a publicação; em branco, fica o do rascunho', async () => {
+    const { repo } = await repositorioDeTeste();
+    const primeira = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    expect(primeira.norma.tituloCurto).toBe('Lei nº 1.234/2020');
+    const log = await repo.db.alteracoes.count();
+
+    const publicada = await publicarVersao(repo, primeira.versao.id, { tituloCurto: '  Teste  ' });
+
+    expect(publicada.norma.tituloCurto).toBe('Teste');
+    expect(await repo.colecao('normas').obter(primeira.norma.id)).toEqual(publicada.norma);
+    // Na mesma atualização da norma: nenhuma escrita a mais no log.
+    expect(await repo.db.alteracoes.count()).toBe(log + 2);
+
+    const segunda = await criarRascunho(repo, { blocos: LEI.slice(0, -1), origemEntrada: 'html' });
+    const semTroca = await publicarVersao(repo, segunda.versao.id, { tituloCurto: '   ' });
+    expect(semTroca.norma.tituloCurto).toBe('Lei nº 1.234/2020');
+  });
+
+  it('publicação recusada não grava o título', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma, versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'texto' });
+    await expect(publicarVersao(repo, versao.id, { tituloCurto: 'Outro' })).rejects.toBeInstanceOf(
+      PublicacaoBloqueada,
+    );
+    expect((await repo.colecao('normas').obter(norma.id))?.tituloCurto).toBe(norma.tituloCurto);
+  });
+
+  it('a mesma fonte acha a versão já gravada, a vigente antes do rascunho; outra fonte, nada', async () => {
+    const { repo } = await repositorioDeTeste();
+    expect(await versaoComMesmaFonte(repo, LEI)).toBeUndefined();
+
+    const rascunho = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    expect(await versaoComMesmaFonte(repo, LEI)).toEqual({
+      norma: rascunho.norma,
+      versao: rascunho.versao,
+    });
+    // Mesmo conteúdo em outro objeto: a fonte é JSON canônico.
+    expect((await versaoComMesmaFonte(repo, structuredClone(LEI)))?.versao.id).toBe(
+      rascunho.versao.id,
+    );
+    expect(await versaoComMesmaFonte(repo, LEI.slice(1))).toBeUndefined();
+
+    // Duas normas com a mesma fonte (antes da 9.5, nada impedia): a publicada vence.
+    const outra = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+    await publicarVersao(repo, outra.versao.id);
+    const achada = await versaoComMesmaFonte(repo, LEI);
+    expect(achada?.versao).toMatchObject({ id: outra.versao.id, status: 'vigente' });
+
+    await descartarRascunho(repo, rascunho.versao.id);
+    expect((await versaoComMesmaFonte(repo, LEI))?.versao.id).toBe(outra.versao.id);
+  });
+});
+
+describe('andamento ao criar o rascunho (9.5)', () => {
+  it('antesDeGravar vem depois de estruturar e antes de gravar qualquer registro', async () => {
+    const { repo } = await repositorioDeTeste();
+    const chamadas: Awaited<ReturnType<typeof contagem>>[] = [];
+    await criarRascunho(
+      repo,
+      { blocos: LEI, origemEntrada: 'html' },
+      {
+        antesDeGravar: async () => {
+          chamadas.push(await contagem(repo));
+        },
+      },
+    );
+    expect(chamadas).toEqual([
+      {
+        normas: 0,
+        versoesNorma: 0,
+        dispositivos: 0,
+        textosDispositivo: 0,
+        anexos: 0,
+        anexosConteudo: 0,
+      },
+    ]);
+    expect(await contagem(repo)).toMatchObject({ normas: 1, dispositivos: 9 });
   });
 });

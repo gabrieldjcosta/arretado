@@ -30,6 +30,7 @@ import {
   notasDaNormaDoModelo,
   registrosDaArvore,
 } from './registros';
+import { sumarioDoRascunho } from './sumario';
 
 const HTML = import.meta.glob<string>('../../../corpus/normas/*.colado.html', {
   query: '?raw',
@@ -549,6 +550,20 @@ describe('registros (9.2) no corpus: todo rascunho vira registros válidos do mo
       expect(textos.map((t) => t.dados.dispositivoId)).toEqual(dispositivos.map((d) => d.id));
       for (const { dados } of textos)
         TextoDeDispositivo.parse({ ...COMUNS, id: novoId(), ...dados });
+    },
+    60_000,
+  );
+});
+
+describe('sumário (9.5) no corpus: a página compilada se reconhece pela falta de tachado', () => {
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s',
+    async (id) => {
+      const sumario = sumarioDoRascunho(await rascunho(id));
+      // Aviso "Nenhuma redação anterior depois de colar": só nas compiladas.
+      expect(sumario.pareceCompilada).toBe(id.endsWith('-compilado'));
+      const artigos = sumario.porTipo.find((t) => t.tipo === 'artigo')?.quantidade ?? 0;
+      expect(artigos).toBeGreaterThan(100);
     },
     60_000,
   );

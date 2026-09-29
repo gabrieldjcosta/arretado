@@ -180,3 +180,31 @@ describe('correções da revisão da etapa 2', () => {
     ]);
   });
 });
+
+describe('estilo em linha fora do parser (CSP, 9.5)', () => {
+  it('nenhum atributo style nem <style> chega ao DOMParser, e o tachado por estilo continua', () => {
+    const espiao = vi.spyOn(DOMParser.prototype, 'parseFromString');
+    try {
+      const { blocos } = sanitizarHtml(
+        [
+          '<style>p { color: red }</style>',
+          '<p STYLE = "text-decoration: line-through">Art. 1º Antigo.</p>',
+          '<p><span class="x" style=\'color:red\'>Art. 1º Novo, com style="a" no texto.</span></p>',
+        ].join(''),
+      );
+      expect(blocos).toEqual([
+        { trechos: [{ texto: 'Art. 1º Antigo.', tachado: true }] },
+        { trechos: [{ texto: 'Art. 1º Novo, com style="a" no texto.' }] },
+      ]);
+      const entradas = espiao.mock.calls.map(([html]) => html);
+      expect(entradas.length).toBeGreaterThan(0);
+      for (const html of entradas) {
+        expect(html).not.toMatch(/<style/i);
+        const tags = html.match(/<[a-z][^>]*>/gi) ?? [];
+        expect(tags.filter((t) => /\sstyle\s*=/i.test(t))).toEqual([]);
+      }
+    } finally {
+      espiao.mockRestore();
+    }
+  });
+});
