@@ -2,10 +2,12 @@
 // é gravado em < 5 s", medida do estruturador ao fim da transação (a sanitização, de 1 a 4 s, é da
 // tela e fica fora). As duas páginas: a do portão, com todas as redações, e a compilada, que tem
 // mais dispositivos vigentes. E a publicação (9.3) do CP, das compiladas da LEP e do ECA (o marco
-// da leitura antecipada) e da LC 80 (as duas "SEÇÃO IV").
+// da leitura antecipada) e da LC 80 (as duas "SEÇÃO IV"), lida depois por janela (9.4).
 import { sanitizarHtml } from '../../core/seguranca/sanitizador';
 import { repositorioDeTeste } from '../../testes/repositorio';
+import { abrirNorma, lerJanela } from './leitor';
 import { emOrdemDeLeitura } from './ordem';
+import type { NoRascunho } from './rascunho';
 import {
   criarRascunho,
   descartarRascunho,
@@ -107,6 +109,22 @@ describe('publicação (9.3) com o corpus', () => {
       expect(publicada.norma.versaoVigenteId).toBe(versao.id);
       expect(await repo.db.tabela('dispositivos').count()).toBe(nos);
       expect(await repo.db.tabela('textosDispositivo').count()).toBe(nos);
+
+      // Leitura (9.4): a árvore aberta e os textos lidos em janelas de 200 reproduzem o rascunho.
+      const aberta = await abrirNorma(repo, norma.id);
+      const naOrdem = emOrdemDeLeitura(rascunho.nos);
+      const nivelDe = new Map<NoRascunho, number>();
+      for (const { no, pai } of naOrdem) nivelDe.set(no, pai ? (nivelDe.get(pai) ?? 0) + 1 : 0);
+      expect(aberta.nos.map((n) => [n.dispositivo.endereco, n.nivel])).toEqual(
+        naOrdem.map(({ no }) => [no.endereco, nivelDe.get(no)]),
+      );
+      const lidos: string[] = [];
+      for (let inicio = 0; inicio < aberta.nos.length; inicio += 200) {
+        for (const item of await lerJanela(repo, aberta, { inicio, quantidade: 200 })) {
+          lidos.push(item.texto ? item.texto.trechos.map((t) => t.texto).join('') : '(sem texto)');
+        }
+      }
+      expect(lidos).toEqual(naOrdem.map(({ no }) => no.trechos.map((t) => t.texto).join('')));
 
       // Publicada, a árvore não se refaz nem se apaga, mesmo com o estruturador mais novo.
       await repo.colecao('versoesNorma').atualizar(versao.id, { versaoAdaptador: '0.4' });

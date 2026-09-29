@@ -501,3 +501,53 @@ describe('criarLote (F2, 9.2)', () => {
     expect(emitir).not.toHaveBeenCalled();
   });
 });
+
+describe('obterPorChaves (F2, 9.4)', () => {
+  it('um registro ativo do usuário por chave, na ordem das chaves', async () => {
+    const { repo } = await repositorioDeTeste();
+    const cartoes = repo.colecao('cartoes');
+    const base = { frente: 'f', verso: null, origemTipo: 'manual' as const, caixa: 1 };
+    const u = repo.ctx.usuarioId;
+    const a = await cartoes.criar({ ...base, estado: 'ativo', proximaRevisao: '2026-09-20' });
+    const b = await cartoes.criar({ ...base, estado: 'ativo', proximaRevisao: '2026-09-30' });
+    const excluido = await cartoes.criar({
+      ...base,
+      estado: 'suspenso',
+      proximaRevisao: '2026-09-20',
+    });
+    await cartoes.excluir(excluido.id);
+    const alheio = await cartoes.criar({
+      ...base,
+      estado: 'suspenso',
+      proximaRevisao: '2026-10-01',
+    });
+    const outroUsuario = repo.ctx.novoId();
+    await repo.db.tabela('cartoes').update(alheio.id, { usuarioId: outroUsuario });
+    const chave = (estado: string, data: string) => [u, estado, data];
+    const indice = '[usuarioId+estado+proximaRevisao]';
+
+    const lidos = await cartoes.obterPorChaves(indice, [
+      chave('ativo', '2026-09-30'),
+      chave('suspenso', '2026-09-20'),
+      chave('ativo', '2026-09-20'),
+      chave('ativo', '2026-12-31'),
+      [outroUsuario, 'suspenso', '2026-10-01'],
+    ]);
+    expect(lidos.map((c) => c?.id)).toEqual([b.id, undefined, a.id, undefined, undefined]);
+    // O excluído não esconde o ativo de mesma chave; dentro de uma transação de escrita também lê.
+    const c = await cartoes.criar({ ...base, estado: 'suspenso', proximaRevisao: '2026-09-20' });
+    const naTransacao = await repo.transacao(() =>
+      cartoes.obterPorChaves(indice, [chave('suspenso', '2026-09-20')]),
+    );
+    expect(naTransacao.map((r) => r?.id)).toEqual([c.id]);
+  });
+
+  it('lista vazia, mais de 200 chaves ou índice não declarado', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erros = repo.colecao('erros');
+    expect(await erros.obterPorChaves('usuarioId', [])).toEqual([]);
+    const chaves = Array.from({ length: 201 }, () => repo.ctx.usuarioId);
+    await expect(erros.obterPorChaves('usuarioId', chaves)).rejects.toThrow(/200 chaves/);
+    await expect(erros.obterPorChaves('oQueFoi', ['x'])).rejects.toThrow(/não declarado/);
+  });
+});

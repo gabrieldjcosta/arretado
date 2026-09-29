@@ -5,20 +5,17 @@
 // sanitizados) é calculado antes da transação: WebCrypto aguardado dentro dela a fecha
 // (`PrematureCommitError`).
 import { dataCivil } from '../../core/datas';
-import type { Dispositivo, NomeColecao, Norma, RegistroDe, VersaoDeNorma } from '../../core/modelo';
+import type { Dispositivo, Norma, VersaoDeNorma } from '../../core/modelo';
 import {
   AnexoAlterado,
   gravarAnexo,
   lerAnexo,
-  LIMITE_MAXIMO_PAGINA,
   prepararAnexo,
   removerAnexos,
-  type Colecao,
-  type ConsultaPagina,
-  type Pagina,
   type Repositorio,
 } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
+import { dispositivosDaNorma, todos } from './consultas';
 import { estruturar } from './estruturador';
 import type { Anomalia, Rascunho } from './rascunho';
 import {
@@ -356,7 +353,9 @@ export async function publicarVersao(
 async function prepararPublicacao(repo: Repositorio, versaoId: string) {
   const { norma, versao } = await rascunhoGravado(repo, versaoId);
   await exigirVersaoUnica(repo, norma.id, versao.id);
-  const relatorio = relatorioDaArvore(await dispositivosDaNorma(repo, norma.id, false));
+  const relatorio = relatorioDaArvore(
+    await dispositivosDaNorma(repo.colecao('dispositivos'), norma.id, false),
+  );
   return { norma, versao, relatorio };
 }
 
@@ -407,17 +406,10 @@ async function arvoreGravada(repo: Repositorio, normaId: string, versaoId: strin
     ate: versaoId,
     incluirExcluidos: true,
   });
-  return { dispositivos: await dispositivosDaNorma(repo, normaId, true), textos };
-}
-
-/** Dispositivos da norma, na ordem de leitura. */
-function dispositivosDaNorma(repo: Repositorio, normaId: string, incluirExcluidos: boolean) {
-  return todos(repo.colecao('dispositivos'), {
-    indice: '[normaId+ordem]',
-    de: [normaId, -Infinity],
-    ate: [normaId, Infinity],
-    incluirExcluidos,
-  });
+  return {
+    dispositivos: await dispositivosDaNorma(repo.colecao('dispositivos'), normaId, true),
+    textos,
+  };
 }
 
 async function apagarArvore(
@@ -426,23 +418,4 @@ async function apagarArvore(
 ): Promise<void> {
   await repo.colecao('textosDispositivo').removerFisico(arvore.textos.map((t) => t.id));
   await repo.colecao('dispositivos').removerFisico(arvore.dispositivos.map((d) => d.id));
-}
-
-/** Todas as páginas de uma consulta (a listagem é sempre paginada: 200 por página). */
-async function todos<N extends NomeColecao>(
-  colecao: Colecao<N>,
-  consulta: Omit<ConsultaPagina<N>, 'limite' | 'cursor'>,
-): Promise<RegistroDe<N>[]> {
-  const itens: RegistroDe<N>[] = [];
-  let cursor: string | null = null;
-  do {
-    const pagina: Pagina<RegistroDe<N>> = await colecao.listarPagina({
-      ...consulta,
-      limite: LIMITE_MAXIMO_PAGINA,
-      cursor,
-    });
-    for (const item of pagina.itens) itens.push(item);
-    cursor = pagina.proximoCursor;
-  } while (cursor);
-  return itens;
 }
