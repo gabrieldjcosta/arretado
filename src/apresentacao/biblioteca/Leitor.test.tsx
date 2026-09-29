@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
-import type { Bloco } from '../../core/seguranca/sanitizador';
+import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, obterLeitura } from '../../dominios/legislacao/leituras';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
@@ -29,6 +29,20 @@ const LEI: Bloco[] = [
   linha('Art. 2º A jurisdição penal será exercida.'),
   linha('Art. 3º Ao condenado serão assegurados os direitos.'),
 ];
+
+const COLADOS = import.meta.glob<string>('../../../corpus/normas/*.colado.html', {
+  query: '?raw',
+  import: 'default',
+  eager: false,
+});
+
+/** Os blocos do colado do corpus (a página com todas as redações), como a tela Importar recebe. */
+async function colado(id: string): Promise<Bloco[]> {
+  const carregar = COLADOS[`../../../corpus/normas/${id}.colado.html`];
+  if (!carregar) throw new Error(`sem colado: ${id}`);
+  return sanitizarHtml(await carregar()).blocos;
+}
+const textoDoBloco = (b: Bloco) => b.trechos.map((t) => t.texto).join('');
 
 async function publicar(repo: Repositorio, blocos: Bloco[], tituloCurto = 'LEP') {
   const { versao, norma } = await criarRascunho(repo, {
@@ -129,63 +143,71 @@ describe('leitor da norma (9.6)', () => {
     expect(document.querySelectorAll('.texto-carregando').length).toBe(0);
   });
 
-  it('revogado em uma linha, expansível; redação anterior oculta, com indicador', async () => {
+  it('revogado em uma linha, expansível, com as notas e as redações (ECA, art. 233, do corpus)', async () => {
     const { repo } = await repositorioDeTeste();
-    const norma = await publicar(repo, LEI);
-    const aberta = await abrirNorma(repo, norma.id);
-    const janela = await lerJanela(repo, aberta, { inicio: 0, quantidade: 50 });
-    const de = (endereco: string) => {
-      const item = janela.find((i) => i.dispositivo.endereco === endereco);
-      if (!item?.texto) throw new Error(`sem ${endereco}`);
-      return item;
-    };
-    // Art. 2º revogado, sem texto; Art. 3º vigente com uma redação anterior.
-    const art2 = de('art2');
-    await repo.colecao('dispositivos').atualizar(art2.dispositivo.id, { status: 'revogado' });
-    await repo.colecao('textosDispositivo').atualizar(art2.texto!.id, {
-      trechos: [],
-      notasVigencia: [{ texto: '(Revogado pela Lei nº 10.792, de 2003)' }],
-    });
-    const art3 = de('art3');
-    await repo.colecao('textosDispositivo').atualizar(art3.texto!.id, {
-      redacoesAnteriores: [
-        {
-          trechos: [{ texto: 'Ao condenado serão assegurados alguns direitos.', tachado: true }],
-          nota: '(Redação anterior)',
-          origemDeteccao: 'tachado',
-          confirmada: true,
-        },
-      ],
-    });
+    const eca = await colado('eca');
+    // Do art. 232 ao art. 234: o art. 233 é todo tachado, com "(Revogado pela Lei…" sem fecho.
+    const inicio = eca.findIndex((b) => textoDoBloco(b).startsWith('Art. 232.'));
+    const fim = eca.findIndex((b) => textoDoBloco(b).startsWith('Art. 234.'));
+    const norma = await publicar(repo, eca.slice(inicio, fim + 1), 'ECA');
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
-    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await screen.findByRole('heading', { level: 1, name: 'ECA' });
 
     // Revogado: uma linha atenuada; o resto só ao expandir.
-    const revogado = await screen.findByRole('button', { name: /Art\. 2º — \(revogado\)/ });
+    const revogado = await screen.findByRole('button', { name: /Art\. 233 — \(revogado\)/ });
     expect(revogado).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByText('(Revogado pela Lei nº 10.792, de 2003)')).not.toBeInTheDocument();
+    expect(screen.queryByText(/vigilância a tortura/)).not.toBeInTheDocument();
     await usuario.click(revogado);
     expect(revogado).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('(Revogado pela Lei nº 10.792, de 2003)')).toBeInTheDocument();
+    const aberto = dispositivo('art233');
+    const notas = within(aberto).getByRole('list', { name: 'Notas de vigência' });
+    expect(within(notas).getByText(/Revogado pela Lei nº 9\.455/)).toBeInTheDocument();
+    const anteriores = within(aberto).getByRole('list', { name: 'Texto anterior' });
+    expect(within(anteriores).getByText(/vigilância a tortura/)).toBeInTheDocument();
+    // Os §§ 1º a 3º, revogados do mesmo jeito, também numa linha só.
+    expect(screen.getByRole('button', { name: /§ 1º — \(revogado\)/ })).toBeInTheDocument();
     await usuario.click(revogado);
-    expect(screen.queryByText('(Revogado pela Lei nº 10.792, de 2003)')).not.toBeInTheDocument();
+    expect(screen.queryByText(/vigilância a tortura/)).not.toBeInTheDocument();
+  }, 30_000);
 
-    // Redação anterior: oculta, com o indicador; a expansão mostra o texto anterior.
-    const indicador = screen.getByRole('button', {
-      name: 'Mostrar 1 redação anterior (texto anterior, oculto)',
-    });
-    expect(indicador).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByText(/alguns direitos/)).not.toBeInTheDocument();
-    await usuario.click(indicador);
-    const anterior = screen.getByRole('list', { name: 'Texto anterior' });
-    expect(within(anterior).getByText(/alguns direitos/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Ocultar 1 redação anterior' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    await usuario.click(screen.getByRole('button', { name: 'Ocultar 1 redação anterior' }));
-    expect(screen.queryByText(/alguns direitos/)).not.toBeInTheDocument();
-  });
+  it('100% das redações anteriores ocultas: os indicadores da LEP com todas as redações somam as da norma', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, await colado('lep'), 'LEP');
+    const aberta = await abrirNorma(repo, norma.id);
+    const janela = [];
+    for (let inicio = 0; inicio < aberta.nos.length; inicio += 200)
+      janela.push(...(await lerJanela(repo, aberta, { inicio, quantidade: 200 })));
+    const total = janela.reduce((n, i) => n + (i.texto?.redacoesAnteriores?.length ?? 0), 0);
+    const revogadas = janela
+      .filter((i) => i.dispositivo.status === 'revogado')
+      .reduce((n, i) => n + (i.texto?.redacoesAnteriores?.length ?? 0), 0);
+    expect(total).toBe(86);
+    // A janela da tela cobre a norma inteira (o jsdom não tem layout: 60 px por linha).
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 100_000 });
+    try {
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await screen.findByRole('heading', { level: 1, name: 'LEP' });
+      await waitFor(() => {
+        expect(document.querySelectorAll('.texto-carregando')).toHaveLength(0);
+        expect(dispositivo('art204')).toBeInTheDocument();
+      });
+      // Nenhum texto anterior à mostra; cada indicador diz quantas esconde.
+      expect(screen.queryAllByRole('list', { name: 'Texto anterior' })).toHaveLength(0);
+      const indicadores = screen.getAllByRole('button', { name: /^Mostrar \d+ redaç/ });
+      const escondidas = indicadores.reduce(
+        (n, b) => n + Number(/^Mostrar (\d+)/.exec(b.getAttribute('aria-label') ?? '')?.[1] ?? 0),
+        0,
+      );
+      expect(escondidas + revogadas).toBe(total);
+      // O revogado guarda as dele na linha fechada (art. 182: "Art. 182. ~~…~~ (Revogado…)").
+      expect(screen.getByRole('button', { name: /Art\. 182 — \(revogado\)/ })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    } finally {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 768 });
+    }
+  }, 60_000);
 
   it('o ajuste de tamanho é o global: muda a preferência e o texto de leitura', async () => {
     const { repo } = await repositorioDeTeste();

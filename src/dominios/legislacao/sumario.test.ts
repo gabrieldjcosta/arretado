@@ -33,13 +33,18 @@ describe('sumário da importação (9.5)', () => {
       { motivo: 'cabecalho', linhas: 1 },
       { motivo: 'fecho', linhas: 1 },
     ]);
+    expect(sumario.redacoesAnteriores).toBe(0);
     expect(sumario.pareceCompilada).toBe(true);
   });
 
-  it('linha tachada: não parece a compilada; texto puro nunca parece', () => {
+  it('linha tachada: vira redação anterior (8.6), não descarte, e não parece a compilada; texto puro nunca parece', () => {
     const comTachado = [...LEI.slice(0, 5), tachada('Art. 1º Redação antiga.'), ...LEI.slice(5)];
     const sumario = sumarioDoRascunho(estruturar(comTachado));
-    expect(sumario.descartes).toContainEqual({ motivo: 'redacao_anterior', linhas: 1 });
+    expect(sumario.descartes).toEqual([
+      { motivo: 'cabecalho', linhas: 1 },
+      { motivo: 'fecho', linhas: 1 },
+    ]);
+    expect(sumario.redacoesAnteriores).toBe(1);
     expect(sumario.pareceCompilada).toBe(false);
 
     expect(sumarioDoRascunho(estruturar(LEI, { formato: 'texto' })).pareceCompilada).toBe(false);

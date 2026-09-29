@@ -16,13 +16,12 @@ import {
   dispositivosEsperados,
   estruturaDe,
   estruturaEsperada,
-  semRevogadosAusentes,
   type Gabarito,
 } from '../src/testes/gabarito';
 
 const DIRETORIO = path.join(import.meta.dirname, '..', 'corpus', 'normas');
 
-describe('página oficial inteira → sanitizador → estruturador (8.2–8.4)', () => {
+describe('página oficial inteira → sanitizador → estruturador (8.2–8.6)', () => {
   it.each([
     ['cp', 4_613],
     ['cf', 133_966],
@@ -40,19 +39,15 @@ describe('página oficial inteira → sanitizador → estruturador (8.2–8.4)',
         await readFile(path.join(DIRETORIO, `${id}.gabarito.json`), 'utf8'),
       ) as Gabarito;
       expect(estruturaDe(rascunho.nos)).toEqual(estruturaEsperada(gabarito));
-      // Os artigos e as rubricas também (8.3; o revogado todo tachado fica de fora até a 8.6).
+      // Os artigos e as rubricas também (8.3; o revogado todo tachado, desde a 8.6).
       const artigos = artigosDe(rascunho.nos);
-      const esperados = semRevogadosAusentes(
-        artigosEsperados(gabarito),
-        artigos.map((a) => a.endereco),
-      );
       expect(artigos.map((a) => [a.endereco, a.nome !== undefined])).toEqual(
-        esperados.map((e) => [e.endereco, e.nome]),
+        artigosEsperados(gabarito).map((e) => [e.endereco, e.nome]),
       );
-      // E os dispositivos da regra 6, com o endereço canônico (8.4; na CF, o ADCT com `adct.`).
-      const dispositivos = dispositivosDe(rascunho.nos).map((d) => d.endereco);
-      expect(dispositivos).toEqual(
-        semRevogadosAusentes(dispositivosEsperados(gabarito), dispositivos).map((e) => e.endereco),
+      // E os dispositivos da regra 6, com o endereço canônico (8.4; na CF, o ADCT com `adct.`),
+      // e o status (8.6).
+      expect(dispositivosDe(rascunho.nos).map((d) => [d.endereco, d.status])).toEqual(
+        dispositivosEsperados(gabarito).map((e) => [e.endereco, e.status]),
       );
       expect(rascunho.metadados.preambulo).toMatch(/^(?:O PRESIDENTE|Nós, representantes)/);
     },

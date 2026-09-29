@@ -147,7 +147,7 @@ describe('Importar por colagem (9.5)', () => {
     expect(window.location.hash).toBe('#/biblioteca/importar');
   });
 
-  it('linha tachada: aviso da redação anterior, e a linha conta no que ficou de fora', async () => {
+  it('linha tachada: vira redação anterior (8.6), contada na estrutura, sem aviso de compilada', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir(repo);
 
@@ -159,14 +159,11 @@ describe('Importar por colagem (9.5)', () => {
     });
 
     await sumario();
-    const avisos = screen.getByRole('region', { name: 'Avisos' });
-    expect(avisos).toHaveTextContent(
-      '1 linha(s) tachada(s), de redação anterior, ficaram de fora.',
+    expect(screen.queryByText(/parece a compilada/)).toBeNull();
+    expect(screen.getByRole('region', { name: 'Estrutura encontrada' })).toHaveTextContent(
+      'com 1 redação anterior (oculta na leitura).',
     );
-    expect(avisos).not.toHaveTextContent('parece a compilada');
-    expect(screen.getByRole('region', { name: 'Ficou de fora' })).toHaveTextContent(
-      '1 linha tachada (redação anterior)',
-    );
+    expect(screen.getByRole('region', { name: 'Ficou de fora' })).not.toHaveTextContent('tachada');
   });
 
   it('a mesma norma colada duas vezes: retomar o rascunho ou ver a publicada, sem criar outra', async () => {

@@ -14,7 +14,8 @@ export interface Linha {
   chave: string;
   /**
    * Redação anterior: há tachado e, fora dele, só sobra de rótulo ("A~~rt. 76.~~", "III ~~- …~~",
-   * "c~~) …~~"), numeral romano ou nota ("(Revogado pela…)", "Vigência"). A 8.6 refina.
+   * "c~~) …~~"), o rótulo inteiro do artigo ou do parágrafo único ("Art. 182. ~~…~~ (Revogado
+   * pela…)", LEP), numeral romano ou nota ("(Revogado pela…)", "Vigência").
    */
   tachada: boolean;
 }
@@ -40,6 +41,9 @@ const GRUPO_ENTRE_PARENTESES = /\((?:[^()]|\([^()]*\))*\)/g;
 /** Nota sem o parêntese de fecho no fim da linha (ECA, art. 233: "(Revogado pela Lei nº 9.455, de 7.4.1997"). */
 const NOTA_SEM_FECHO = /\(\s*(?:Reda[cç][aã]o|Inclu[ií]d|Acrescid|Revogad|Renumerad|Vide)[^()]*$/iu;
 const ROMANO_SOLTO = /(?<!\p{L})[IVXLCDM]+(?!\p{L})/gu;
+/** Rótulo do artigo ou do parágrafo único fora do tachado, no começo da linha. */
+const ROTULO_FORA =
+  /^\s*(?:A ?rt(?:igo)?\.? *\d[\d.]*(?: ?[º°o])?(?: ?-[A-Z])*\s*[.:-]?|Par[áa]grafo [úu]nico\.?\s*[-:]?)/iu;
 
 function ehTachada(trechos: readonly Trecho[]): boolean {
   if (!trechos.some((t) => t.tachado && /\S/.test(t.texto))) return false;
@@ -47,6 +51,7 @@ function ehTachada(trechos: readonly Trecho[]): boolean {
     .filter((t) => !t.tachado)
     .map((t) => t.texto)
     .join(' ')
+    .replace(ROTULO_FORA, ' ')
     .replace(GRUPO_ENTRE_PARENTESES, ' ')
     .replace(NOTA_SEM_FECHO, ' ')
     .replace(/(?<!\p{L})(?:Vigência|Regulamento|Produção de efeitos?)(?!\p{L})/gu, ' ')

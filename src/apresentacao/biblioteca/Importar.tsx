@@ -515,7 +515,10 @@ export function Importar() {
               ))}
             </dl>
             <p className="dica">
-              {plural(relatorio.totalDispositivos, 'dispositivo', 'dispositivos')} no total.
+              {plural(relatorio.totalDispositivos, 'dispositivo', 'dispositivos')} no total
+              {sumario.redacoesAnteriores > 0 &&
+                `, com ${plural(sumario.redacoesAnteriores, 'redação anterior', 'redações anteriores')} (${sumario.redacoesAnteriores === 1 ? 'oculta' : 'ocultas'} na leitura)`}
+              .
             </p>
           </section>
           {avisos.length > 0 && (

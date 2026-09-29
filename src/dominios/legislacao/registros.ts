@@ -233,7 +233,8 @@ export function registrosDaArvore(nos: readonly NoRascunho[], ids: IdsDaArvore):
         ordem,
         paiId: pai && idDe.get(pai),
         rotulo: cortar(no.rotulo, MAX_CURTO),
-        status: no.status,
+        // `vetado` (8.6) ainda não está no modelo: grava vigente, com o texto "(VETADO)".
+        status: no.status === 'vetado' ? 'vigente' : no.status,
         renumeradoDe: cortar(no.renumeradoDe, MAX_RENUMERADO),
         confianca: no.confianca,
       }),

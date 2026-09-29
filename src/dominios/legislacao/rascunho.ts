@@ -16,11 +16,12 @@ import type { RelatorioNormalizacao } from './normalizacao';
 export type FormatoEntrada = 'html' | 'texto';
 
 /**
- * Do modelo. O estruturador não produz 'novo' (diferença entre versões, 11.7 e F6) nem
- * 'eficacia_cessada'. 'vetado' (74 dispositivos no gabarito do corpus) ainda não existe: a 8.6
- * decide como gravá-lo (glossário §12).
+ * Do modelo, mais `vetado` (8.6: "(VETADO)" sozinho no texto; 121 no gabarito do corpus), que o
+ * modelo ainda não tem: até a subida do esquema, a gravação (`registros.ts`) o grava `vigente`,
+ * com o texto "(VETADO)" (glossário §12). O estruturador não produz 'novo' (diferença entre
+ * versões, 11.7 e F6) nem 'eficacia_cessada'.
  */
-export type StatusDispositivo = Dispositivo['status'];
+export type StatusDispositivo = Dispositivo['status'] | 'vetado';
 
 /**
  * Regra 12: `alta` = HTML e regra única; `media` = ambiguidade resolvida por heurística;
@@ -124,10 +125,15 @@ export interface NoRascunho {
    */
   notas: NotaDeVigencia[];
   redacoesAnteriores: RedacaoAnterior[];
+  /**
+   * Regra 9 (8.6): `revogado` com texto vazio ("(Revogado)" sozinho, ou rótulo, texto tachado e nota
+   * de revogação fora do tachado); o artigo só tachado também. Regra 10: `renumerado` (o vigente
+   * com nota "Renumerado…" ou rótulo antigo tachado; o revogado continua revogado).
+   */
   status: StatusDispositivo;
   /**
-   * Endereço antigo (regra 10), até 200 caracteres. O status que o acompanha é da 8.6: a regra 10
-   * fala em `renumerado`, mas no gabarito o renumerado segue vigente (ou revogado: LEP, art. 124, § 2º).
+   * Endereço antigo (regra 10), até 200 caracteres, quando a nota o traz ("Renumerado do parágrafo
+   * único…" → `art9.parUnico`; "Inciso X renumerado para inciso XI" → `art134.incX`).
    */
   renumeradoDe?: string;
   confianca: Confianca;
@@ -149,12 +155,9 @@ export type MetadadosNorma = Partial<
 
 /**
  * Linha que não entra na norma: cabeçalho do portal; fecho (local, data, assinaturas, aviso do DOU);
- * sobra da fonte; `redacao_anterior`: linha tachada que a 8.6 ainda vai anexar ao dispositivo
- * (salvaguarda da leitura antecipada: tachado nunca vira texto vigente) e, junto, a rubrica do
- * artigo ou dispositivo todo tachado (CP, arts. 185, 279 e 350; art. 121, § 2º, VI), que a 8.6 faz
- * nome do revogado.
+ * sobra da fonte. Desde a 8.6 a linha tachada não é descarte: é redação anterior (ou nó revogado).
  */
-export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra' | 'redacao_anterior';
+export type MotivoDescarte = 'cabecalho' | 'fecho' | 'sobra';
 
 export interface Descarte {
   motivo: MotivoDescarte;
@@ -188,9 +191,7 @@ export type TipoAnomalia =
   | 'estrutural_substituido'
   | 'tachado_parcial'
   | 'tachado_sem_dispositivo'
-  | 'nota_sem_dispositivo'
-  // Até a 8.6: linhas tachadas fora da norma (descarte `redacao_anterior`), uma por norma
-  | 'redacao_anterior_nao_tratada';
+  | 'nota_sem_dispositivo';
 
 export interface Anomalia {
   tipo: TipoAnomalia;
@@ -223,4 +224,9 @@ export interface Rascunho {
   nos: NoRascunho[];
   descartes: Descarte[];
   anomalias: Anomalia[];
+  /**
+   * Linhas tachadas inteiras (redação anterior, 8.6), fora o cabeçalho, o fecho e o anexo. Zero
+   * numa página HTML: parece a compilada (sumário da 9.5).
+   */
+  linhasTachadas: number;
 }

@@ -373,12 +373,22 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
   });
 });
 
-describe('estruturador: tachado até a 8.6 (salvaguarda da leitura antecipada)', () => {
-  it('linha tachada vira descarte `redacao_anterior`, nunca nó nem texto, com um aviso só', () => {
+describe('estruturador: redação anterior por tachado (regra 8, 8.6)', () => {
+  const redacoes = (no: NoRascunho | undefined) =>
+    (no?.redacoesAnteriores ?? []).map((x) => ({
+      texto: textoDe(x.trechos),
+      linhas: x.linhas,
+      ...(x.enderecoLido ? { lido: x.enderecoLido } : {}),
+      ...(x.nota ? { nota: x.nota } : {}),
+    }));
+  const notasDo = (no: NoRascunho | undefined) => no?.notas.map((n) => n.texto) ?? [];
+
+  it('a Parte Geral de 1940, toda tachada, se junta à de 1984 (CP): nó e artigo de mesmo endereço, nada fora', () => {
     const r = estruturar(
       blocos(
         b(tachado('Parte Geral')),
         b(tachado('TÍTULO I')),
+        b(tachado('Da aplicação da lei penal')),
         b(tachado('Art. 1º Texto de 1940.')),
         'PARTE GERAL',
         'TÍTULO I',
@@ -391,25 +401,343 @@ describe('estruturador: tachado até a 8.6 (salvaguarda da leitura antecipada)',
         b({ texto: 'A' }, tachado('rt. 2º Capitular tachada.')),
       ),
     );
-    expect(r.descartes).toEqual([
-      { motivo: 'redacao_anterior', linhas: { inicio: 0, fim: 2 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 7, fim: 7 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 9, fim: 9 } },
-    ]);
+    expect(r.descartes).toEqual([]);
+    expect(r.anomalias).toEqual([]);
+    expect(r.linhasTachadas).toBe(6);
     expect(todos(r.nos).map((n) => n.endereco)).toEqual([
       'parteGeral',
       'parteGeral.tit1',
       'parteGeral.tit1.nome',
       'art1',
       'art1.nome',
+      'art2',
     ]);
-    // A redação antiga (tachada) entre a rubrica e o artigo vigente não a separa dele.
-    expect(nomeDe(porEndereco(r, 'art1'))).toBe('Anterioridade da Lei');
-    expect(porEndereco(r, 'art1')?.linhas).toEqual({ inicio: 6, fim: 8 });
-    expect(r.anomalias).toEqual([
-      expect.objectContaining({ tipo: 'redacao_anterior_nao_tratada', gravidade: 'aviso' }),
+    // O rótulo e o nome tachados são a redação anterior do nó de mesmo endereço.
+    expect(redacoes(porEndereco(r, 'parteGeral'))).toEqual([
+      { texto: 'Parte Geral', linhas: { inicio: 0, fim: 0 } },
     ]);
-    expect(r.anomalias[0]?.mensagem).toMatch(/^5 linha\(s\) tachada\(s\)/);
+    expect(redacoes(porEndereco(r, 'parteGeral.tit1'))).toEqual([
+      { texto: 'TÍTULO I Da aplicação da lei penal', linhas: { inicio: 1, fim: 2 } },
+    ]);
+    // O artigo de 1940 e o antigo tachado entre a rubrica e o vigente: as duas redações dele, com
+    // a nota de fora do tachado; a rubrica continua do vigente.
+    const art1 = porEndereco(r, 'art1');
+    expect(redacoes(art1)).toEqual([
+      { texto: 'Art. 1º Texto de 1940.', linhas: { inicio: 3, fim: 3 } },
+      {
+        texto: 'Art. 1º - Texto antigo.',
+        linhas: { inicio: 8, fim: 8 },
+        nota: '(Redação dada pela Lei nº 7.209, de 1984)',
+      },
+    ]);
+    expect(
+      art1?.redacoesAnteriores.every((x) => x.origemDeteccao === 'tachado' && x.confirmada),
+    ).toBe(true);
+    expect(nomeDe(art1)).toBe('Anterioridade da Lei');
+    expect(art1?.linhas).toEqual({ inicio: 7, fim: 9 });
+    // Artigo só tachado, sem nota de revogação: revogado por heurística (confiança média).
+    expect(porEndereco(r, 'art2')).toMatchObject({
+      status: 'revogado',
+      trechos: [],
+      confianca: 'media',
+    });
+  });
+
+  it('o tachado depois do vigente de mesmo endereço também é redação dele (ECA, art. 92, II)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 92. As entidades adotarão os seguintes princípios:',
+        'II - integração em família substituta, quando esgotados os recursos de manutenção na família natural ou extensa; (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+        b(
+          tachado(
+            'II - integração em família substituta, quando esgotados os recursos de manutenção na família de origem;',
+          ),
+        ),
+        'III - atendimento personalizado e em pequenos grupos;',
+      ),
+    );
+    expect(todos(r.nos).map((n) => n.endereco)).toEqual(['art92', 'art92.incII', 'art92.incIII']);
+    expect(redacoes(porEndereco(r, 'art92.incII'))).toEqual([
+      {
+        texto:
+          'II - integração em família substituta, quando esgotados os recursos de manutenção na família de origem;',
+        linhas: { inicio: 2, fim: 2 },
+      },
+    ]);
+    expect(porEndereco(r, 'art92.incII')?.status).toBe('vigente');
+  });
+
+  it('dispositivo tachado sem o de mesmo endereço vai para o ancestral, com o endereço lido (LEP, o parágrafo único que virou § 1º)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 146-C. O condenado será instruído acerca dos cuidados:',
+        b(tachado('Parágrafo único. A violação comprovada dos deveres poderá acarretar:')),
+        b(tachado('I - a regressão do regime;')),
+        '§ 1º A violação comprovada dos deveres poderá acarretar: (Renumerado do parágrafo único pela Lei nº 15.100, de 2025)',
+        'I - a regressão do regime;',
+      ),
+    );
+    expect(todos(r.nos).map((n) => n.endereco)).toEqual([
+      'art146C',
+      'art146C.par1',
+      'art146C.par1.incI',
+    ]);
+    expect(redacoes(porEndereco(r, 'art146C'))).toEqual([
+      {
+        texto: 'Parágrafo único. A violação comprovada dos deveres poderá acarretar:',
+        linhas: { inicio: 1, fim: 1 },
+        lido: 'art146C.parUnico',
+      },
+      {
+        texto: 'I - a regressão do regime;',
+        linhas: { inicio: 2, fim: 2 },
+        lido: 'art146C.parUnico.incI',
+      },
+    ]);
+    // Regra 10: o § 1º é o antigo parágrafo único.
+    expect(porEndereco(r, 'art146C.par1')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'art146C.parUnico',
+    });
+  });
+
+  it('rubrica tachada: abre a redação do artigo tachado seguinte (CP de 1940) ou é a antiga do nome novo (CP, art. 218-B)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 218-A. Praticar, na presença de alguém menor de 14 anos, conjunção carnal: (Incluído pela Lei nº 12.015, de 2009)',
+        b(
+          tachado('Pena - reclusão, de 2 (dois) a 4 (quatro) anos. '),
+          tachado('(Incluído pela Lei nº 12.015, de 2009)'),
+        ),
+        'Pena – reclusão, de 5 (cinco) a 12 (doze) anos, e multa. (Redação dada pela Lei nº 15.280, de 2025)',
+        b(
+          tachado(
+            'Favorecimento da prostituição ou outra forma de exploração sexual de vulnerável',
+          ),
+          tachado(' (Incluído pela Lei nº 12.015, de 2009)'),
+        ),
+        'Favorecimento da prostituição ou de outra forma de exploração sexual de criança ou adolescente ou de vulnerável. (Redação dada pela Lei nº 12.978, de 2014)',
+        'Art. 218-B. Submeter, induzir ou atrair à prostituição alguém menor de 18 anos: (Incluído pela Lei nº 12.015, de 2009)',
+        b(tachado('Lei penal no tempo')),
+        b(tachado('Art. 300 - Ninguém pode ser punido.')),
+      ),
+    );
+    // A pena tachada depois do caput vigente é uma redação anterior dele (a nova continua o texto).
+    expect(redacoes(porEndereco(r, 'art218A')).map((x) => x.texto)).toEqual([
+      'Pena - reclusão, de 2 (dois) a 4 (quatro) anos. (Incluído pela Lei nº 12.015, de 2009)',
+    ]);
+    const nome = porEndereco(r, 'art218B')?.filhos[0];
+    expect(nome?.tipo).toBe('nome');
+    expect(redacoes(nome).map((x) => x.texto)).toEqual([
+      'Favorecimento da prostituição ou outra forma de exploração sexual de vulnerável (Incluído pela Lei nº 12.015, de 2009)',
+    ]);
+    expect(redacoes(porEndereco(r, 'art300'))).toEqual([
+      {
+        texto: 'Lei penal no tempo\nArt. 300 - Ninguém pode ser punido.',
+        linhas: { inicio: 6, fim: 7 },
+      },
+    ]);
+  });
+
+  it('nome antigo tachado do nó e nó estrutural todo tachado antes do vigente (LC 80, Título I; CF, Título IV)', () => {
+    const r = estruturar(
+      blocos(
+        'TÍTULO I',
+        b(tachado('Das Disposições Preliminares')),
+        'Disposições Gerais',
+        'Art. 1º A Defensoria Pública é instituição permanente.',
+        b(tachado('TÍTULO IV')),
+        b(tachado('Da Organização dos Poderes')),
+        'TÍTULO IV',
+        'DA ORGANIZAÇÃO DOS PODERES',
+        'Art. 44. O Poder Legislativo é exercido pelo Congresso Nacional.',
+      ),
+    );
+    expect(nomeDe(porEndereco(r, 'tit1'))).toBe('Disposições Gerais');
+    expect(redacoes(porEndereco(r, 'tit1'))).toEqual([
+      { texto: 'Das Disposições Preliminares', linhas: { inicio: 1, fim: 1 } },
+    ]);
+    expect(
+      todos(r.nos)
+        .filter((n) => n.tipo === 'titulo')
+        .map((n) => n.endereco),
+    ).toEqual(['tit1', 'tit4']);
+    expect(redacoes(porEndereco(r, 'tit4'))).toEqual([
+      { texto: 'TÍTULO IV Da Organização dos Poderes', linhas: { inicio: 4, fim: 5 } },
+    ]);
+    expect(r.anomalias).toEqual([]);
+  });
+
+  it('pedaço do rótulo fora do tachado ou sufixo sem hífen: o rótulo se lê inteiro (ECA, art. 90, IV; CF, art. 93, VIII-A)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 90. As entidades são responsáveis pelos programas de:',
+        'III - colocação familiar;',
+        b({ texto: 'I ' }, tachado('V - abrigo;')),
+        'IV - acolhimento institucional; (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+        'Art. 93. Lei complementar disporá sobre o Estatuto da Magistratura:',
+        'VIII - o ato de remoção do magistrado;',
+        b(
+          tachado(
+            'VIIIA a remoção a pedido ou a permuta de magistrados de comarca de igual entrância;',
+          ),
+        ),
+        'VIII-A - a remoção a pedido de magistrados de comarca de igual entrância; (Incluído pela Emenda Constitucional nº 45, de 2004)',
+      ),
+    );
+    expect(redacoes(porEndereco(r, 'art90.incIV')).map((x) => x.texto)).toEqual(['I V - abrigo;']);
+    expect(redacoes(porEndereco(r, 'art90.incIII'))).toEqual([]);
+    expect(redacoes(porEndereco(r, 'art93.incVIIIA')).map((x) => x.texto)).toEqual([
+      'VIIIA a remoção a pedido ou a permuta de magistrados de comarca de igual entrância;',
+    ]);
+    expect(redacoes(porEndereco(r, 'art93.incVIII'))).toEqual([]);
+  });
+
+  it('nota da ALESP tachada descreve a redação de cima; linha tachada antes de qualquer artigo é sobra (CP, "CÓDIGO PENAL")', () => {
+    const r = estruturar(
+      blocos(
+        b(tachado('CÓDIGO PENAL')),
+        'Artigo 9º - O valor dos vencimentos fica fixado em R$ 1,00.',
+        b(tachado('§ 1º - para os cargos de provimento efetivo: (NR)')),
+        b(
+          tachado('- § 1º com redação dada pela '),
+          tachado('Lei Complementar nº 1.112, de 25/05/2010'),
+          tachado(', com efeitos a partir de 01/04/2010.'),
+        ),
+        '§ 1º - para os cargos de provimento efetivo: (NR)',
+        '- § 1º com redação dada pela Lei Complementar nº 1.376, de 30/03/2022.',
+      ),
+    );
+    const par1 = porEndereco(r, 'art9.par1');
+    expect(redacoes(par1)).toEqual([
+      {
+        texto: '§ 1º - para os cargos de provimento efetivo: (NR)',
+        linhas: { inicio: 2, fim: 3 },
+        nota: '§ 1º com redação dada pela Lei Complementar nº 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+      },
+    ]);
+    expect(notasDo(par1)).toEqual([
+      '(NR)',
+      '§ 1º com redação dada pela Lei Complementar nº 1.376, de 30/03/2022.',
+    ]);
+    expect(r.descartes).toContainEqual({ motivo: 'sobra', linhas: { inicio: 0, fim: 0 } });
+    expect(tipos(r)).toEqual(['tachado_sem_dispositivo']);
+  });
+
+  it('revogação total (regra 9): nota de revogação fora do tachado dá o revogado, com a rubrica, os filhos e cada pena tachada (CP, art. 350; LEP, art. 182; CF)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 349. Texto.',
+        'Exercício arbitrário ou abuso de poder',
+        b(tachado('Art. 350 - Ordenar medida privativa de liberdade:'), {
+          texto: ' (Revogado pela Lei nº 13.869, de 2019) (Vigência)',
+        }),
+        b(tachado('Pena - detenção, de um mês a um ano.'), {
+          texto: ' (Revogado pela Lei nº 13.869, de 2019) (Vigência)',
+        }),
+        b(tachado('Parágrafo único - Na mesma pena incorre o funcionário que:'), {
+          texto: ' (Revogado pela Lei nº 13.869, de 2019)',
+        }),
+        b(tachado('I - ilegalmente recebe e recolhe alguém a prisão;'), {
+          texto: ' (Revogado pela Lei nº 13.869, de 2019)',
+        }),
+        b('Art. 182. ', tachado('A pena de multa será convertida em detenção.'), {
+          texto: ' (Revogado pela Lei nº 9.268, de 1996)',
+        }),
+        b('§ 1º ', tachado('Na conversão, a cada dia-multa corresponderá 1 dia.'), {
+          texto: ' (Revogado pela Lei nº 9.268, de 1996)',
+        }),
+        'Art. 183. Texto.',
+        b('III ', tachado('- classistas temporários.'), {
+          texto: ' (Revogado pela Emenda Constitucional nº 24, de 1999)',
+        }),
+      ),
+    );
+    const art350 = porEndereco(r, 'art350');
+    expect(art350).toMatchObject({ status: 'revogado', trechos: [], rotulo: 'Art. 350' });
+    expect(nomeDe(art350)).toBe('Exercício arbitrário ou abuso de poder');
+    expect(notasDo(art350)).toEqual(['(Revogado pela Lei nº 13.869, de 2019)', '(Vigência)']);
+    expect(redacoes(art350)).toEqual([
+      { texto: 'Art. 350 - Ordenar medida privativa de liberdade:', linhas: { inicio: 2, fim: 2 } },
+      {
+        texto: 'Pena - detenção, de um mês a um ano.',
+        linhas: { inicio: 3, fim: 3 },
+        nota: '(Revogado pela Lei nº 13.869, de 2019) (Vigência)',
+      },
+    ]);
+    expect(porEndereco(r, 'art350.parUnico.incI')).toMatchObject({
+      status: 'revogado',
+      trechos: [],
+    });
+    // Rótulo fora do tachado: a redação anterior leva o rótulo e o texto tachado.
+    expect(redacoes(porEndereco(r, 'art182'))).toEqual([
+      {
+        texto: 'Art. 182. A pena de multa será convertida em detenção.',
+        linhas: { inicio: 6, fim: 6 },
+      },
+    ]);
+    expect(porEndereco(r, 'art182.par1')?.status).toBe('revogado');
+    expect(porEndereco(r, 'art183.incIII')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(r.descartes).toEqual([]);
+  });
+
+  it('revogação reescrita: o "(Revogado)" que vem depois fica com a redação do tachado, sem duplicata (CP, art. 171, § 5º)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 171. Obter vantagem ilícita:',
+        b('§ 5º ', tachado('Somente se procede mediante representação.'), {
+          texto: ' (Revogado pela Lei nº 15.397, de 2026)',
+        }),
+        '§ 5º (Revogado). (Redação dada pela Lei nº 15.397, de 2026)',
+      ),
+    );
+    const par5 = porEndereco(r, 'art171.par5');
+    expect(todos(r.nos).map((n) => n.endereco)).toEqual(['art171', 'art171.par5']);
+    expect(par5).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(notasDo(par5)).toEqual(['(Redação dada pela Lei nº 15.397, de 2026)']);
+    expect(redacoes(par5)).toEqual([
+      {
+        texto: '§ 5º Somente se procede mediante representação.',
+        linhas: { inicio: 1, fim: 1 },
+        nota: '(Revogado pela Lei nº 15.397, de 2026)',
+      },
+    ]);
+    expect(tipos(r)).toEqual([]);
+  });
+
+  it('texto puro: sem tachado, nada disso; a duplicata continua heurística, a confirmar (a 8.8 faz o resto)', () => {
+    const r = estruturar(
+      blocos('Art. 1º Texto antigo.', 'Art. 1º Texto novo. (Redação dada pela Lei nº 1, de 2020)'),
+      { formato: 'texto' },
+    );
+    expect(r.linhasTachadas).toBe(0);
+    expect(porEndereco(r, 'art1')?.redacoesAnteriores).toEqual([
+      expect.objectContaining({ origemDeteccao: 'heuristica', confirmada: false }),
+    ]);
+  });
+
+  it('nota logo depois do nó tachado não vai para a redação de cima', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto:',
+        b(tachado('§ 1º Antigo.')),
+        b(tachado('TÍTULO II')),
+        '(Redação dada pela Lei nº 1, de 2000)',
+        'TÍTULO II',
+        'DO RESTO',
+        'Art. 2º Texto.',
+      ),
+    );
+    expect(redacoes(porEndereco(r, 'art1'))).toEqual([
+      { texto: '§ 1º Antigo.', linhas: { inicio: 1, fim: 1 }, lido: 'art1.par1' },
+    ]);
+    expect(redacoes(porEndereco(r, 'tit2'))).toEqual([
+      {
+        texto: 'TÍTULO II',
+        linhas: { inicio: 2, fim: 3 },
+        nota: '(Redação dada pela Lei nº 1, de 2000)',
+      },
+    ]);
   });
 
   it('pedaço tachado no nome do nó fica na redação anterior (ECA)', () => {
@@ -562,12 +890,18 @@ describe('estruturador: artigo tolerante (regra 5)', () => {
       ['art2', 'Art. 2º', 'Art. 2º', 'Dois.\nArt.\nTexto sem número.'],
     ]);
     expect(porEndereco(r, 'art2')?.linhas).toEqual({ inicio: 1, fim: 4 });
-    // Tachado nas duas linhas: redação anterior numa faixa só; no fim da entrada, a linha fica.
+    // Tachado nas duas linhas: uma redação anterior, numa faixa só; no fim da entrada, a linha
+    // fica no texto do artigo (lida depois do tachado, passa com ele para o de mesmo endereço).
     const t = estruturar(
       blocos('Art. 1º Um.', b(tachado('Art.')), b(tachado('1º Antigo.')), 'Art.'),
     );
-    expect(t.descartes).toEqual([{ motivo: 'redacao_anterior', linhas: { inicio: 1, fim: 2 } }]);
-    expect(porEndereco(t, 'art1')?.linhas).toEqual({ inicio: 0, fim: 3 });
+    expect(t.descartes).toEqual([]);
+    const art1 = porEndereco(t, 'art1');
+    expect(art1?.redacoesAnteriores.map((x) => [textoDe(x.trechos), x.linhas])).toEqual([
+      ['Art. 1º Antigo.', { inicio: 1, fim: 2 }],
+    ]);
+    expect(textoDe(art1?.trechos ?? [])).toBe('Um.\nArt.');
+    expect(art1?.linhas).toEqual({ inicio: 0, fim: 3 });
   });
 });
 
@@ -707,15 +1041,14 @@ describe('estruturador: rubrica, o nome do artigo (regra 4)', () => {
     );
     expect(textoDe(nome(r, 'art229')?.trechos ?? [])).toBe('Casa de prostituição');
     expect(porEndereco(r, 'art229')?.linhas).toEqual({ inicio: 0, fim: 2 });
-    // Até a 8.6, a rubrica do revogado fica com ele, fora da árvore; o 186 não a recebe.
+    // A rubrica é do 185, que fica revogado (regra 9); o 186 não a recebe.
     expect(nome(r, 'art186')).toBeUndefined();
-    expect(porEndereco(r, 'art229')?.linhas.fim).toBe(2);
+    expect(textoDe(nome(r, 'art185')?.trechos ?? [])).toBe(
+      'Usurpação de nome ou pseudônimo alheio',
+    );
+    expect(porEndereco(r, 'art185')?.linhas).toEqual({ inicio: 3, fim: 5 });
     expect(porEndereco(r, 'art186')?.linhas).toEqual({ inicio: 6, fim: 6 });
-    expect(r.descartes).toEqual([
-      { motivo: 'redacao_anterior', linhas: { inicio: 1, fim: 1 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 3, fim: 3 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 4, fim: 5 } },
-    ]);
+    expect(r.descartes).toEqual([]);
   });
 
   it('"(VETADO)" no lugar da rubrica; título sem rótulo e rubrica terminada em ponto têm confiança média', () => {
@@ -846,7 +1179,7 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
       ['art5.incIII', 'III', 'III -', 'jurídica;'],
       ['art5.incIV', 'IV', 'IV', 'as ilhas fluviais e lacustres;'],
       ['art5.incIA', 'I-A', 'I-A', 'o Conselho Nacional de Justiça;'],
-      ['art5.incVIA', 'VI-A', 'VI-A -', '(revogado);'],
+      ['art5.incVIA', 'VI-A', 'VI-A -', ''], // "(revogado);" sozinho: revogado, texto vazio (8.6)
       ['art5.par1', '§ 1º', '§ 1º -', 'O produto da remuneração:'],
       ['art5.par1.alA', 'a)', 'a)', 'à indenização dos danos;'],
       ['art5.par1.alC', 'c)', 'c )', 'os nascidos no estrangeiro;'],
@@ -989,12 +1322,11 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
     expect(nomeDe(porEndereco(r, 'art121.par2.incVII'))).toBe('');
     // A rubrica do § 7º passa pela redação antiga tachada de mesmo endereço.
     expect(nomeDe(porEndereco(r, 'art121.par7'))).toBe('Aumento de pena');
-    // A rubrica fica com o inciso VI, fora da árvore até a 8.6.
-    expect(r.descartes).toEqual([
-      { motivo: 'redacao_anterior', linhas: { inicio: 3, fim: 3 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 4, fim: 4 } },
-      { motivo: 'redacao_anterior', linhas: { inicio: 7, fim: 7 } },
-    ]);
+    expect(porEndereco(r, 'art121.par7')?.redacoesAnteriores).toHaveLength(1);
+    // A rubrica é o nome do inciso VI, revogado (regra 9).
+    expect(nomeDe(porEndereco(r, 'art121.par2.incVI'))).toBe('Feminicídio');
+    expect(porEndereco(r, 'art121.par2.incVI')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(r.descartes).toEqual([]);
   });
 
   it('citação da lei alterada entre aspas continua o dispositivo, também em várias linhas (CDC, art. 113)', () => {
@@ -1073,6 +1405,66 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
       ['art104.incXI', 'XI', 'X XI -', 'outras previstas em lei.'],
       ['art104.par1', '§ 1º', 'Parágrafo único § 1º -', 'O Defensor não perderá o direito.'],
     ]);
+    // Regra 10 (8.6): o rótulo antigo tachado é a renumeração (ALESP, art. 134), não decorativo;
+    // o tachado fica só no rótulo lido, sem virar redação anterior.
+    expect(porEndereco(r, 'art104.incXI')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'art104.incX',
+      redacoesAnteriores: [],
+    });
+    expect(porEndereco(r, 'art104.par1')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'art104.parUnico',
+    });
+    expect(porEndereco(r, 'art104.incX')?.status).toBe('vigente');
+  });
+
+  it('renumeração pela nota (regra 10): de onde veio, quando ela diz; o revogado continua revogado', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 29. O Município reger-se-á por lei orgânica:',
+        'VIII - organização das funções legislativas; (Renumerado do inciso VI, pela Emenda Constitucional nº 1, de 1992)',
+        'Art. 177. Constituem monopólio da União:',
+        '§ 3º A lei disporá sobre o transporte. (Renumerado de § 2º para 3º pela Emenda Constitucional nº 9, de 1995)',
+        'Art. 208. Regem-se pelas disposições desta Lei:',
+        '§ 1º As hipóteses previstas neste artigo não excluem outras. (Renumerado do Parágrafo único pela Lei nº 11.259, de 2005)',
+        'Art. 34. O trabalho do preso tem finalidade educativa.',
+        '§ 1º A gerência poderá ser confiada a empresa pública. (Renumerado pela Lei nº 10.792, de 2003)',
+        'Artigo 134 - São atribuições:',
+        'XI - outras previstas em lei.',
+        '- Inciso X renumerado para inciso XI pela Lei Complementar n° 1.295, de 02/01/2017.',
+        'Art. 9º Texto.',
+        '§ 2º (Revogado). (Renumerado do parágrafo único pela Lei nº 12.258, de 2010)',
+      ),
+    );
+    const renumerados = todos(r.nos)
+      .filter((n) => n.status === 'renumerado' || n.renumeradoDe)
+      .map((n) => [n.endereco, n.status, n.renumeradoDe]);
+    expect(renumerados).toEqual([
+      ['art29.incVIII', 'renumerado', 'art29.incVI'],
+      ['art177.par3', 'renumerado', 'art177.par2'],
+      ['art208.par1', 'renumerado', 'art208.parUnico'],
+      ['art34.par1', 'renumerado', undefined],
+      ['art134.incXI', 'renumerado', 'art134.incX'],
+      ['art9.par2', 'revogado', 'art9.parUnico'],
+    ]);
+  });
+
+  it('nó estrutural renumerado pela nota da ALESP ("Subseção VII renumerada para VIII")', () => {
+    const r = estruturar(
+      blocos(
+        'SEÇÃO IV',
+        'Dos Órgãos',
+        'SUBSEÇÃO VIII',
+        '- Subseção VII renumerada para VIII pela Lei Complementar n° 1.434, de 11/09/2025.',
+        'Dos Estagiários',
+        'Artigo 71 - Texto.',
+      ),
+    );
+    expect(porEndereco(r, 'sec4.subsec8')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'sec4.subsec7',
+    });
   });
 
   it('não é dispositivo: numeral romano inválido, capitular separada sem fim de inciso, maiúscula depois do inciso sem hífen', () => {
@@ -1306,17 +1698,27 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
     expect(r.notaVigenciaMaisRecente).toEqual({ lei: 'Lei nº 8.072', ano: 1990 });
   });
 
-  it('dispositivo só com nota: texto vazio ou "(Revogado)"; "(VETADO)" e "(Revogado)" sozinhos são texto', () => {
+  it('dispositivo só com nota: "(Revogado)" sozinho e a nota de revogação sem texto dão o revogado (regra 9); "(VETADO)", o vetado, com o texto', () => {
     const r = estruturar(
       blocos(
         'Art. 1º Texto:',
         'I - (revogado); (Redação dada pela Lei nº 14.843, de 2024)',
         'II - (VETADO) (Incluído pela Lei nº 14.197, de 2021) (Vigência)',
         'Art. 2º (Revogado pela Lei nº 10.713, de 13.8.2003)',
+        'Artigo 54 - Revogado.', // ALESP
+        'Artigo 6º - vetado.', // ALESP
       ),
     );
-    expect(texto(r, 'art1.incI')).toBe('(revogado);');
+    expect(texto(r, 'art1.incI')).toBe('');
+    expect(porEndereco(r, 'art1.incI')?.status).toBe('revogado');
     expect(texto(r, 'art1.incII')).toBe('(VETADO)');
+    expect(porEndereco(r, 'art1.incII')?.status).toBe('vetado');
+    expect(porEndereco(r, 'art2')?.status).toBe('revogado');
+    expect(porEndereco(r, 'art54')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(porEndereco(r, 'art6')).toMatchObject({
+      status: 'vetado',
+      trechos: [{ texto: 'vetado.' }],
+    });
     expect(notasDe(porEndereco(r, 'art1.incII'))).toEqual([
       '(Incluído pela Lei nº 14.197, de 2021)',
       '(Vigência)',
@@ -1384,7 +1786,7 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
     expect(texto(r, 'art97')).toBe('Compensação em razão de atividades.');
   });
 
-  it('nota sem o parêntese de fecho ao lado do tachado faz a linha tachada (ECA, art. 233, todo tachado)', () => {
+  it('nota sem o parêntese de fecho ao lado do tachado faz a linha tachada e revoga (ECA, art. 233)', () => {
     const r = estruturar(
       blocos(
         'Art. 232. Texto.',
@@ -1399,14 +1801,20 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
         'Art. 234. Texto.',
       ),
     );
-    expect(todos(r.nos).map((n) => n.endereco)).toEqual(['art232', 'art234']);
-    expect(r.descartes).toContainEqual({
-      motivo: 'redacao_anterior',
-      linhas: { inicio: 1, fim: 2 },
-    });
+    expect(todos(r.nos).map((n) => n.endereco)).toEqual(['art232', 'art233', 'art234']);
+    // Regra 9: revogado, de texto vazio; a nota de fora do tachado é dele, e cada linha tachada é
+    // uma redação anterior (a pena também).
+    const art233 = porEndereco(r, 'art233');
+    expect(art233).toMatchObject({ status: 'revogado', trechos: [], confianca: 'alta' });
+    expect(notasDe(art233)).toEqual(['(Revogado pela Lei nº 9.455, de 7.4.1997']);
+    expect(art233?.redacoesAnteriores.map((x) => [textoDe(x.trechos), x.nota])).toEqual([
+      ['Art. 233. Submeter criança a tortura:', undefined],
+      ['Pena - reclusão de um a cinco anos.', '(Revogado pela Lei nº 9.455, de 7.4.1997'],
+    ]);
+    expect(r.descartes).toEqual([]);
   });
 
-  it('linha só de notas logo depois de uma linha tachada vai com ela para o descarte (CP, art. 214)', () => {
+  it('linha só de notas logo depois de uma linha tachada é do artigo tachado, não do vigente de cima (CP, art. 214)', () => {
     const r = estruturar(
       blocos(
         'Art. 213. Texto. (Redação dada pela Lei nº 12.015, de 2009)',
@@ -1419,10 +1827,18 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
     expect(notasDe(porEndereco(r, 'art213'))).toEqual([
       '(Redação dada pela Lei nº 12.015, de 2009)',
     ]);
-    expect(r.descartes).toContainEqual({
-      motivo: 'redacao_anterior',
-      linhas: { inicio: 1, fim: 3 },
-    });
+    // Artigo só tachado (regra 8, sem o de mesmo endereço): revogado, com a nota e a pena na
+    // mesma redação.
+    const art214 = porEndereco(r, 'art214');
+    expect(art214).toMatchObject({ status: 'revogado', trechos: [], confianca: 'alta' });
+    expect(notasDe(art214)).toEqual(['(Revogado pela Lei nº 12.015, de 2009)']);
+    expect(art214?.redacoesAnteriores.map((x) => [textoDe(x.trechos), x.linhas])).toEqual([
+      [
+        'Art. 214 - Constranger alguém a praticar ato libidinoso:\nPena - reclusão de dois a sete anos.',
+        { inicio: 1, fim: 3 },
+      ],
+    ]);
+    expect(r.descartes).toEqual([]);
   });
 
   it('notas do nó, da rubrica e da norma continuam fora do texto e entram na mais recente', () => {

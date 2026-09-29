@@ -1,3 +1,4 @@
+import type { Bloco } from '../../core/seguranca/sanitizador';
 import { estruturar } from './estruturador';
 import { normalizarBlocos } from './normalizacao';
 
@@ -20,11 +21,22 @@ describe('normalização (8.1): desempenho', () => {
   );
 });
 
-// Estruturador (8.2–8.5): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
+// Estruturador (8.2–8.6): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
 // nenhuma lista enorme passa por `push(...itens)`, que estoura a pilha.
-describe('estruturador (8.2–8.5): desempenho', () => {
+describe('estruturador (8.2–8.6): desempenho', () => {
   const linhas = (n: number, texto: (k: number) => string) =>
     Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
+  /** Linhas tachadas (todas, ou as que `tachada` diz; o resto sem tachado). */
+  const tachadas = (
+    n: number,
+    texto: (k: number) => string,
+    tachada: (k: number) => boolean = () => true,
+  ): Bloco[] =>
+    Array.from({ length: n }, (_, k) => ({
+      trechos: [{ texto: texto(k), ...(tachada(k) ? { tachado: true as const } : {}) }],
+    }));
+  const par = (k: number) => k % 2 === 0;
+  const impar = (k: number) => k % 2 === 1;
   it.each([
     [
       'mesmo rótulo repetido sem artigo',
@@ -93,6 +105,57 @@ describe('estruturador (8.2–8.5): desempenho', () => {
     [
       'notas em linhas emendadas',
       linhas(100_000, (k) => (k ? 'Pena - multa. (Vide) Vigência' : 'Art. 1º A:')),
+    ],
+    // 8.6: o nó provisório (tachado) juntado ao de mesmo endereço, antes e depois dele; a redação
+    // que vai para o ancestral; a pena e a nota que continuam a redação; o nó estrutural tachado.
+    ['mesmo artigo tachado e vigente', tachadas(100_000, () => 'Art. 1º Texto.', par)],
+    [
+      'artigos tachados, cada um com o vigente',
+      tachadas(100_000, (k) => `Art. ${String((k >> 1) + 1)}. Texto.`, par),
+    ],
+    [
+      'parágrafos tachados sem o vigente',
+      tachadas(
+        100_000,
+        (k) => (k ? '§ 1º Antigo.' : 'Art. 1º A:'),
+        (k) => k > 0,
+      ),
+    ],
+    [
+      'incisos tachados em cadeia sem o vigente',
+      tachadas(100_000, (k) => `${k % 2 ? 'I' : 'a)'} - antigo;`),
+    ],
+    [
+      'artigo e parágrafo tachados repetidos',
+      tachadas(100_000, (k) => (k % 2 ? '§ 1º Antigo.' : 'Art. 1º Antigo.')),
+    ],
+    [
+      'artigo vigente e parágrafos tachados, alternados',
+      tachadas(100_000, (k) => (k % 2 ? '§ 1º Antigo.' : 'Art. 1º Texto.'), impar),
+    ],
+    ['penas tachadas sem fim', tachadas(100_000, (k) => (k ? 'Pena - multa.' : 'Art. 1º Antigo.'))],
+    [
+      'notas depois do tachado',
+      tachadas(
+        100_000,
+        (k) => (k ? '(Revogado pela Lei nº 1, de 2000)' : 'Art. 1º Antigo.'),
+        (k) => k === 0,
+      ),
+    ],
+    [
+      'notas tachadas da ALESP',
+      tachadas(100_000, (k) =>
+        k ? '- Artigo 1º com redação dada pela Lei nº 1.' : 'Artigo 1º - Antigo.',
+      ),
+    ],
+    [
+      'rubricas tachadas sem fim',
+      tachadas(100_000, (k) => (k ? 'Rubrica antiga' : 'Art. 1º Texto.')),
+    ],
+    ['títulos tachados sem o vigente', tachadas(100_000, (k) => `TÍTULO ${k % 2 ? 'I' : 'II'}`)],
+    [
+      'revogados pela nota',
+      linhas(100_000, (k) => (k ? '§ 1º (Revogado pela Lei nº 1, de 2000)' : 'Art. 1º A:')),
     ],
   ])(
     '%s',
