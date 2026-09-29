@@ -14,3 +14,6 @@ const prototipo = (globalThis as unknown as { Element?: { prototype: Record<stri
 if (prototipo && typeof prototipo.scrollIntoView !== 'function') {
   prototipo.scrollIntoView = () => undefined;
 }
+
+// O jsdom não implementa a rolagem da janela (o leitor abre no começo): sem isto, avisa "Not implemented".
+if (typeof window !== 'undefined') window.scrollTo = () => undefined;

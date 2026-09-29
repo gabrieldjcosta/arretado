@@ -199,6 +199,12 @@ describe('Importar por colagem (9.5)', () => {
       'href',
       '#/biblioteca',
     );
+    // A norma já publicada abre para leitura (9.6).
+    const [norma] = await repo.colecao('normas').todosDoUsuario();
+    expect(screen.getByRole('link', { name: 'Ler a norma' })).toHaveAttribute(
+      'href',
+      `#/biblioteca/normas/${norma?.id ?? ''}`,
+    );
     await usuario.click(screen.getByRole('button', { name: 'Colar outra norma' }));
     expect(screen.getByLabelText('Cole aqui a lei')).toBeInTheDocument();
     expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(1);

@@ -166,10 +166,10 @@ export function Normas() {
                   const descricao = descricaoDe(n);
                   return (
                     <li key={n.id}>
-                      <div className="item-norma">
+                      <Link className="item-norma" to={`/biblioteca/normas/${n.id}`}>
                         <strong>{n.tituloCurto}</strong>
                         {descricao && <span className="dica">{descricao}</span>}
-                      </div>
+                      </Link>
                     </li>
                   );
                 })}

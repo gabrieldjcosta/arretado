@@ -1,7 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import AxeBuilder from '@axe-core/playwright';
-import type { Page } from '@playwright/test';
-import { expect, test } from './apoio';
+import { colar, expect, publicar, semViolacoes, test } from './apoio';
 
 test('Biblioteca vazia: "Importar norma" leva à importação e volta (9.5)', async ({ page }) => {
   await page.goto('/#/biblioteca');
@@ -20,57 +17,6 @@ test('Biblioteca vazia: "Importar norma" leva à importação e volta (9.5)', as
   await page.getByRole('link', { name: 'Voltar à Biblioteca' }).click();
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();
 });
-
-/** O colado do corpus (Chromium 141, Linux), lido no Node: não abrir inteiro, tem centenas de KB. */
-async function colado(id: string) {
-  const pasta = new URL('../corpus/normas/', import.meta.url);
-  const [html, texto] = await Promise.all([
-    readFile(new URL(`${id}.colado.html`, pasta), 'utf8'),
-    readFile(new URL(`${id}.colado.txt`, pasta), 'utf8'),
-  ]);
-  return { html, texto };
-}
-
-/**
- * Colar no headless: `ClipboardEvent` sintético com `DataTransfer` (a área de transferência do
- * sistema não é controlável; ver solucao-de-problemas.md › "E2E não consegue colar a lei").
- */
-async function colar(page: Page, id: string) {
-  const dados = await colado(id);
-  const campo = page.getByLabel('Cole aqui a lei');
-  await campo.focus();
-  await campo.evaluate((alvo, { html, texto }) => {
-    const clipboardData = new DataTransfer();
-    clipboardData.setData('text/html', html);
-    clipboardData.setData('text/plain', texto);
-    alvo.dispatchEvent(
-      new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
-    );
-  }, dados);
-}
-
-/** axe (WCAG AA) nos dois temas, na tela como está. */
-async function semViolacoes(page: Page) {
-  for (const colorScheme of ['light', 'dark'] as const) {
-    await page.emulateMedia({ colorScheme });
-    const r = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
-    expect(
-      r.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
-      colorScheme,
-    ).toEqual([]);
-  }
-  await page.emulateMedia({ colorScheme: null });
-}
-
-async function publicar(page: Page, titulo: string) {
-  const campo = page.getByRole('textbox', { name: 'Título curto' });
-  await campo.fill(titulo);
-  await page.getByRole('button', { name: 'Publicar', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Biblioteca' })).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: `${titulo} publicada.` })).toBeVisible();
-}
 
 test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Biblioteca (9.5)', async ({
   page,
