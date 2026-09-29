@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
+import { gravarPosicao, obterLeitura } from '../../dominios/legislacao/leituras';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -218,5 +219,101 @@ describe('leitor da norma (9.6)', () => {
       window.location.hash = '#/biblioteca/normas/nao-existe';
     });
     expect(await screen.findByText('Esta norma não existe mais.')).toBeInTheDocument();
+  });
+});
+
+/** Rola a janela no jsdom (que não rola): a posição e o evento, como o navegador faria. */
+function rolarPara(y: number) {
+  act(() => {
+    Object.defineProperty(window, 'scrollY', { value: y, configurable: true });
+    window.dispatchEvent(new Event('scroll'));
+  });
+}
+
+describe('posição lembrada e "lido até" (9.7)', () => {
+  afterEach(() => {
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  it('sair da norma grava a posição, e a Biblioteca oferece "Continuar leitura"', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    const usuario = abrirLeitor(repo, '#/biblioteca');
+    await usuario.click(await screen.findByRole('link', { name: /LEP/ }));
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    // Abrir sem rolar não grava nada ainda.
+    expect(await obterLeitura(repo, norma.id)).toBeUndefined();
+
+    await usuario.click(screen.getByRole('link', { name: '← Biblioteca' }));
+    const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
+    expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${norma.id}`);
+    expect(screen.getByRole('region', { name: 'Normas' })).toHaveTextContent('Última leitura:');
+    // No alto da tela estava a primeira linha.
+    expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
+  });
+
+  it('"Lido até aqui" marca o dispositivo no alto da tela; rolar não mexe nele', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    const idDe = (endereco: string) =>
+      aberta.nos.find((n) => n.dispositivo.endereco === endereco)!.dispositivo.id;
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art2')).toBeInTheDocument();
+    });
+
+    // Cada linha mede 60 px: a 5ª (índice 4) é o inciso I do art. 1º.
+    rolarPara(4 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+    expect(screen.getByText('Lido até Art. 1º, I.')).toHaveAttribute('role', 'status');
+    expect(dispositivo('art1.incI').parentElement).toHaveTextContent(/Lido até aqui$/);
+    expect(document.querySelectorAll('.marca-lido-ate')).toHaveLength(1);
+    expect(screen.getByText('Art. 1º, I', { selector: 'strong' })).toBeInTheDocument();
+    await waitFor(async () => {
+      expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(idDe('art1.incI'));
+    });
+
+    // Rolar e esconder a página grava a posição na hora (sem esperar a rolagem parar), e o
+    // "lido até" fica onde o usuário o pôs.
+    rolarPara(8 * 60);
+    act(() => {
+      window.dispatchEvent(new Event('pagehide'));
+    });
+    await waitFor(
+      async () => {
+        expect(await obterLeitura(repo, norma.id)).toMatchObject({
+          posicaoId: idDe('art2'),
+          lidoAteId: idDe('art1.incI'),
+        });
+      },
+      { timeout: 400 },
+    );
+
+    // Parar de rolar também grava.
+    rolarPara(3 * 60);
+    await waitFor(
+      async () => {
+        expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(idDe('art1'));
+      },
+      { timeout: 2000 },
+    );
+    expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(idDe('art1.incI'));
+  });
+
+  it('posição num dispositivo que a versão não tem: abre no começo, sem erro', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, crypto.randomUUID());
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'LEP' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(dispositivo('art1')).toBeInTheDocument();
+    });
+    expect(document.querySelector('.lista-leitor')).not.toHaveClass('voltando');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

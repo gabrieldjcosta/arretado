@@ -2,6 +2,8 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
+import { abrirNorma } from '../../dominios/legislacao/leitor';
+import { gravarPosicao } from '../../dominios/legislacao/leituras';
 import {
   criarRascunho,
   publicarVersao,
@@ -135,5 +137,46 @@ describe('Biblioteca › Normas (9.5)', () => {
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }),
     );
     expect(screen.queryByRole('region', { name: 'Importações pendentes' })).not.toBeInTheDocument();
+  });
+
+  it('"Continuar leitura" abre a norma lida por último; cada norma mostra a última leitura (9.7)', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const { norma: lep } = await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    const { norma: eca } = await publicarVersao(repo, (await rascunho(repo, 'ECA')).id);
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    const primeiro = async (normaId: string) =>
+      (await abrirNorma(repo, normaId)).nos[0]!.dispositivo.id;
+    await gravarPosicao(repo, eca.id, await primeiro(eca.id));
+    relogio.avancar(60 * 60_000);
+    await gravarPosicao(repo, lep.id, await primeiro(lep.id));
+    await abrirBiblioteca(repo);
+
+    const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
+    expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
+    expect(continuar).toHaveClass('principal');
+    const lista = screen.getByRole('region', { name: 'Normas' });
+    // "Importar norma" deixa de ser a ação principal.
+    expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
+      'principal',
+    );
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toHaveTextContent(
+      'Última leitura: 23/09/2026, 10:00',
+    );
+    expect(within(lista).getByRole('link', { name: /^ECA/ })).toHaveTextContent(
+      'Última leitura: 23/09/2026, 09:00',
+    );
+    expect(within(lista).getByRole('link', { name: /^CP/ })).not.toHaveTextContent(
+      'Última leitura',
+    );
+  });
+
+  it('sem leitura, não há "Continuar leitura" e "Importar norma" é a ação principal (9.7)', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(within(lista).getByRole('link', { name: 'Importar norma' })).toHaveClass('principal');
+    expect(screen.queryByRole('link', { name: /Continuar leitura/ })).not.toBeInTheDocument();
   });
 });

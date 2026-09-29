@@ -678,6 +678,8 @@ a.item-norma strong {
 .leitor {
   max-width: var(--largura-texto);
   margin: 0 auto;
+  /* O fim da norma sobe acima do botão "Lido até aqui". */
+  padding-bottom: calc(var(--alvo) + 2rem);
 }
 
 .barra-leitor {
@@ -714,6 +716,50 @@ a.item-norma strong {
 .lista-leitor {
   position: relative;
   width: 100%;
+}
+
+/* Voltando à posição guardada (9.7): a lista só aparece no lugar, sem o salto do começo até ela. */
+.lista-leitor.voltando {
+  visibility: hidden;
+}
+
+/* "Lido até" (9.7): a referência sob a barra, a marca na linha e o botão que acompanha a rolagem */
+.lido-ate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.5rem;
+  margin: -0.5rem 0 0.5rem;
+  color: var(--texto-atenuado);
+}
+
+.marca-lido-ate {
+  margin: 0.25rem 0 0;
+  padding-top: 0.15rem;
+  border-top: 2px solid var(--primaria);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--primaria);
+}
+
+.acao-lido-ate {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 4;
+}
+
+.acao-lido-ate button {
+  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+}
+
+@media (max-width: 699px) {
+  /* Acima da navegação das áreas, que no celular fica no rodapé. */
+  .acao-lido-ate {
+    right: 0.75rem;
+    bottom: calc(var(--alvo) + 1.25rem);
+  }
 }
 
 .linha-leitor {

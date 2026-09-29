@@ -1,7 +1,7 @@
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import type { TextoDeDispositivo } from '../../core/modelo';
+import type { Leitura, TextoDeDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import {
@@ -11,12 +11,15 @@ import {
   type ItemDaJanela,
   type NormaAberta,
 } from '../../dominios/legislacao/leitor';
+import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import {
   estimarAltura,
   janelasQueCobrem,
+  linhaDoNo,
   montarLinhas,
+  referenciaDoNo,
   TEXTOS_POR_PEDIDO,
   type LinhaDoLeitor,
 } from './linhas';
@@ -30,12 +33,30 @@ const TAMANHO_MAXIMO = 32;
 const PASSO_DO_TAMANHO = 2;
 const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
+/**
+ * O quanto da linha precisa aparecer abaixo da barra fixa para ela ser a "do alto da tela": a que
+ * só mostra o fim (menos que isso) já foi lida. Também absorve a rolagem arredondada ao voltar.
+ */
+const FOLGA_DO_ALTO = 8;
+/** Rolagem parada por este tempo grava a posição (gravar a cada evento escreveria sem parar). */
+const ESPERA_PARA_GRAVAR = 800;
+/** Quadros seguidos com a linha no lugar para dar a volta à posição por concluída. */
+const QUADROS_NO_LUGAR = 3;
+/** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
+const LIMITE_PARA_VOLTAR = 2000;
 
 type Trechos = TextoDeDispositivo['trechos'];
 
 interface Aberta {
   aberta: NormaAberta;
+  /** Os textos em volta da posição (ou do começo), lidos junto com a abertura. */
   primeira: ItemDaJanela[];
+  /** As janelas de `primeira`: não são pedidas de novo. */
+  janelas: number[];
+  /** Índice, em `aberta.nos`, do dispositivo da posição guardada; sem ela (ou sem o nó), o começo. */
+  alvo: number | undefined;
+  /** O "lido até" guardado, se o dispositivo existe na versão aberta. */
+  lidoAteId: string | undefined;
 }
 
 type Carga =
@@ -54,11 +75,35 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
 
   useEffect(() => {
     let ativo = true;
-    (async () => {
-      const aberta = await abrirNorma(repo, normaId);
-      // A primeira janela vem junto: a norma abre já com texto, sem esqueleto.
-      const primeira = await lerJanela(repo, aberta, { inicio: 0, quantidade: TEXTOS_POR_PEDIDO });
-      return { aberta, primeira };
+    (async (): Promise<Aberta> => {
+      const [aberta, leitura] = await Promise.all([
+        abrirNorma(repo, normaId),
+        // A posição é conveniência: se não puder ser lida, a norma abre no começo.
+        obterLeitura(repo, normaId).catch((): Leitura | undefined => undefined),
+      ]);
+      // Dispositivo que esta versão não tem (versão nova, F6): começo, sem erro.
+      const alvo =
+        leitura?.posicaoId === undefined ? undefined : aberta.indiceDe.get(leitura.posicaoId);
+      const lidoAteId =
+        leitura?.lidoAteId !== undefined && aberta.indiceDe.has(leitura.lidoAteId)
+          ? leitura.lidoAteId
+          : undefined;
+      // Os textos em volta da posição vêm junto: a norma abre já com texto, sem esqueleto.
+      const inicio = alvo ?? 0;
+      const janelas = janelasQueCobrem(
+        inicio - 2 * LINHAS_DE_MARGEM,
+        inicio + TEXTOS_POR_PEDIDO - 1,
+        aberta.nos.length,
+      );
+      const lidas = await Promise.all(
+        janelas.map((janela) =>
+          lerJanela(repo, aberta, {
+            inicio: janela * TEXTOS_POR_PEDIDO,
+            quantidade: TEXTOS_POR_PEDIDO,
+          }),
+        ),
+      );
+      return { aberta, primeira: lidas.flat(), janelas, alvo, lidoAteId };
     })().then(
       (lida) => {
         if (ativo) setCarga({ tipo: 'pronta', ...lida });
@@ -101,11 +146,16 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
  * de volta não relê, e a resposta que chega depois de o trecho sair da tela só enche o cache (o
  * índice manda, então nenhuma resposta atrasada desenha no lugar errado).
  */
-function useTextos(repo: Repositorio, aberta: NormaAberta, primeira: ItemDaJanela[]) {
+function useTextos(
+  repo: Repositorio,
+  aberta: NormaAberta,
+  primeira: ItemDaJanela[],
+  janelas: number[],
+) {
   const [textos, setTextos] = useState<ReadonlyMap<number, ItemDaJanela>>(
     () => new Map(primeira.map((item) => [item.indice, item])),
   );
-  const [pedidas] = useState(() => new Set<number>([0]));
+  const [pedidas] = useState(() => new Set<number>(janelas));
   const [falhou, setFalhou] = useState(false);
   const [tentativa, setTentativa] = useState(0);
   const vivo = useRef(true);
@@ -153,10 +203,28 @@ function useTextos(repo: Repositorio, aberta: NormaAberta, primeira: ItemDaJanel
   return { textos, pedir, falhou, tentarDeNovo, tentativa };
 }
 
-function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta) {
+/** Onde termina a barra fixa do Shell (`.topo`, sticky): o que fica abaixo dela é o alto da tela. */
+function fimDaBarraFixa(): number {
+  const barra = document.querySelector('.topo');
+  return barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
+}
+
+function LeitorAberto({
+  repo,
+  aberta,
+  primeira,
+  janelas,
+  alvo,
+  lidoAteId,
+}: { repo: Repositorio } & Aberta) {
   const { norma, nos } = aberta;
   const linhas = useMemo(() => montarLinhas(nos), [nos]);
-  const { textos, pedir, falhou, tentarDeNovo, tentativa } = useTextos(repo, aberta, primeira);
+  const { textos, pedir, falhou, tentarDeNovo, tentativa } = useTextos(
+    repo,
+    aberta,
+    primeira,
+    janelas,
+  );
   const { dados: preferencias } = useDados(useCallback((r) => obterPreferencias(r), []));
   // Resposta imediata ao toque: o último valor pedido vale até a gravação confirmar. Dois toques
   // seguidos partem do valor pedido, não do gravado (que ainda pode ser o antigo).
@@ -164,18 +232,36 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
   const tamanho = pedido ?? preferencias?.tamanhoFonte ?? TAMANHO_PADRAO;
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   const [margem, setMargem] = useState(0);
+  const [barraFixa, setBarraFixa] = useState(0);
+  // A mesma medida, para quem lê a cada rolagem sem forçar o navegador a recalcular o layout.
+  const barraFixaMedida = useRef(0);
+
+  // A linha da posição guardada. A primeira linha é o começo: abre no alto da página, com a barra.
+  const [linhaInicial] = useState(() => {
+    const linha = alvo === undefined ? undefined : linhaDoNo(linhas, alvo);
+    return linha === 0 ? undefined : linha;
+  });
+  const [voltando, setVoltando] = useState(linhaInicial !== undefined);
+  const voltandoAgora = useRef(voltando);
 
   // A lista começa abaixo da barra: o virtualizador precisa do deslocamento para achar o que
   // está na tela. Medido quando a lista entra, quando a janela muda de largura e quando a página
-  // muda de altura (a barra quebra em duas linhas no celular).
+  // muda de altura (a barra quebra em duas linhas no celular). A barra fixa do Shell cobre o
+  // alto da tela: a posição e o "ir até" descontam a altura dela.
   const lista = useRef<HTMLDivElement | null>(null);
   const definirLista = useCallback((elemento: HTMLDivElement | null) => {
     lista.current = elemento;
-    if (elemento) setMargem(elemento.offsetTop);
+    if (elemento) {
+      setMargem(elemento.offsetTop);
+      barraFixaMedida.current = fimDaBarraFixa();
+      setBarraFixa(barraFixaMedida.current);
+    }
   }, []);
   useEffect(() => {
     const medir = () => {
       setMargem(lista.current?.offsetTop ?? 0);
+      barraFixaMedida.current = fimDaBarraFixa();
+      setBarraFixa(barraFixaMedida.current);
     };
     const observador = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(medir);
     observador?.observe(document.body);
@@ -186,16 +272,12 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
     };
   }, []);
 
-  // Abre no começo: a posição lembrada é da 9.7.
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const virtualizador = useWindowVirtualizer({
     count: linhas.length,
     estimateSize: (i) => estimarAltura(tipoDaLinha(nos, linhas, i), tamanho),
     overscan: LINHAS_DE_MARGEM,
     scrollMargin: margem,
+    scrollPaddingStart: barraFixa,
     getItemKey: (i) => nos[linhas[i]?.indice ?? 0]?.dispositivo.id ?? i,
   });
   const { measure } = virtualizador;
@@ -204,6 +286,49 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
   useEffect(() => {
     measure();
   }, [tamanho, measure]);
+
+  // A rolagem desta tela é do leitor: a restauração do navegador disputaria com a posição guardada.
+  useEffect(() => {
+    const antes = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    return () => {
+      window.history.scrollRestoration = antes;
+    };
+  }, []);
+
+  // Volta à posição guardada. As linhas de cima ainda não foram medidas (só há estimativa), então
+  // o destino muda à medida que elas aparecem: rola, espera o quadro seguinte e confere de novo,
+  // até a linha ficar no alto por alguns quadros. Sem posição, abre no começo (a rolagem da
+  // Biblioteca viria junto).
+  useEffect(() => {
+    if (linhaInicial === undefined) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const inicio = performance.now();
+    let noLugar = 0;
+    let quadro = 0;
+    const conferir = () => {
+      const destino = virtualizador.getOffsetForIndex(linhaInicial, 'start')?.[0];
+      const desenhada = lista.current?.querySelector(`[data-index="${String(linhaInicial)}"]`);
+      if (destino !== undefined && desenhada && Math.abs(window.scrollY - destino) <= 1) {
+        noLugar += 1;
+      } else {
+        noLugar = 0;
+        virtualizador.scrollToIndex(linhaInicial, { align: 'start' });
+      }
+      if (noLugar >= QUADROS_NO_LUGAR || performance.now() - inicio > LIMITE_PARA_VOLTAR) {
+        voltandoAgora.current = false;
+        setVoltando(false);
+        return;
+      }
+      quadro = requestAnimationFrame(conferir);
+    };
+    quadro = requestAnimationFrame(conferir);
+    return () => {
+      cancelAnimationFrame(quadro);
+    };
+  }, [virtualizador, linhaInicial]);
 
   const visiveis = virtualizador.getVirtualItems();
   const primeiraVisivel = visiveis[0]?.index;
@@ -215,6 +340,102 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
     const fim = ultima?.indiceNome ?? ultima?.indice ?? inicio;
     pedir(inicio - MARGEM_DE_TEXTOS, fim + MARGEM_DE_TEXTOS);
   }, [primeiraVisivel, ultimaVisivel, linhas, pedir, tentativa]);
+
+  /** O dispositivo da linha no alto da tela, logo abaixo da barra fixa. */
+  const noDoAlto = useCallback((): string | undefined => {
+    const item = virtualizador.getVirtualItemForOffset(
+      window.scrollY + barraFixaMedida.current + FOLGA_DO_ALTO,
+    );
+    const linha = item === undefined ? undefined : linhas[item.index];
+    return linha === undefined ? undefined : nos[linha.indice]?.dispositivo.id;
+  }, [virtualizador, linhas, nos]);
+
+  // A posição (o dispositivo no alto da tela) é gravada ao parar de rolar, ao sair da norma e
+  // quando a página some (`pagehide`, ou a aba vai para o fundo no celular), nunca a cada
+  // evento. Enquanto volta à posição guardada, a posição é ela, e não o que passa pela tela. A
+  // primeira gravação da visita sempre acontece: é ela que marca a última leitura.
+  const posicao = useRef(nos[linhas[linhaInicial ?? 0]?.indice ?? 0]?.dispositivo.id);
+  const gravada = useRef<string | undefined>(undefined);
+  const vivo = useRef(true);
+  const [falhaAoGravar, setFalhaAoGravar] = useState(false);
+
+  useEffect(() => {
+    vivo.current = true;
+    let espera: ReturnType<typeof setTimeout> | undefined;
+    const acompanhar = () => {
+      if (!voltandoAgora.current) posicao.current = noDoAlto() ?? posicao.current;
+    };
+    const gravar = () => {
+      const id = posicao.current;
+      if (id === undefined || id === gravada.current) return;
+      gravada.current = id;
+      gravarPosicao(repo, norma.id, id).then(
+        () => {
+          if (vivo.current) setFalhaAoGravar(false);
+        },
+        () => {
+          gravada.current = undefined;
+          if (vivo.current) setFalhaAoGravar(true);
+        },
+      );
+    };
+    const aoRolar = () => {
+      acompanhar();
+      clearTimeout(espera);
+      espera = setTimeout(() => {
+        acompanhar();
+        gravar();
+      }, ESPERA_PARA_GRAVAR);
+    };
+    const aoEsconder = () => {
+      acompanhar();
+      gravar();
+    };
+    const aoMudarVisibilidade = () => {
+      if (document.visibilityState === 'hidden') aoEsconder();
+    };
+    window.addEventListener('scroll', aoRolar, { passive: true });
+    window.addEventListener('pagehide', aoEsconder);
+    document.addEventListener('visibilitychange', aoMudarVisibilidade);
+    return () => {
+      clearTimeout(espera);
+      window.removeEventListener('scroll', aoRolar);
+      window.removeEventListener('pagehide', aoEsconder);
+      document.removeEventListener('visibilitychange', aoMudarVisibilidade);
+      vivo.current = false;
+      // Saindo da norma: a tela já pode ser a seguinte, então vale a última posição acompanhada.
+      gravar();
+    };
+  }, [repo, norma.id, noDoAlto]);
+
+  // "Lido até": só muda por ação do usuário (o botão marca o dispositivo no alto da tela).
+  const [lidoAte, setLidoAte] = useState(lidoAteId);
+  const [anuncio, setAnuncio] = useState('');
+  const [falhaAoMarcar, setFalhaAoMarcar] = useState(false);
+  const indiceLidoAte = lidoAte === undefined ? undefined : aberta.indiceDe.get(lidoAte);
+  const referenciaLidoAte =
+    indiceLidoAte === undefined ? '' : referenciaDoNo(nos, aberta.indiceDe, indiceLidoAte);
+
+  function marcarAqui() {
+    const id = noDoAlto();
+    const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
+    if (id === undefined || indice === undefined) return;
+    const antes = lidoAte;
+    setLidoAte(id);
+    setFalhaAoMarcar(false);
+    setAnuncio(`Lido até ${referenciaDoNo(nos, aberta.indiceDe, indice)}.`);
+    marcarLidoAte(repo, norma.id, id).catch(() => {
+      if (!vivo.current) return;
+      setLidoAte(antes);
+      setAnuncio('');
+      setFalhaAoMarcar(true);
+    });
+  }
+
+  function irAoLidoAte() {
+    const linha = indiceLidoAte === undefined ? undefined : linhaDoNo(linhas, indiceLidoAte);
+    if (linha !== undefined) virtualizador.scrollToIndex(linha, { align: 'start' });
+  }
 
   const alternar = useCallback((id: string) => {
     setAbertos((antes) => {
@@ -265,6 +486,16 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
           </button>
         </div>
       </div>
+      {referenciaLidoAte && (
+        <p className="lido-ate">
+          <span>
+            Lido até <strong>{referenciaLidoAte}</strong>
+          </span>
+          <button type="button" className="discreto" onClick={irAoLidoAte}>
+            Ir ao lido até
+          </button>
+        </p>
+      )}
       {falhou && (
         <div role="alert" className="aviso falha">
           <p>Não foi possível carregar parte do texto.</p>
@@ -273,14 +504,24 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
           </button>
         </div>
       )}
+      {(falhaAoGravar || falhaAoMarcar) && (
+        <p role="alert" className="aviso falha">
+          {falhaAoMarcar
+            ? 'Não foi possível marcar o "lido até".'
+            : 'Não foi possível guardar onde você parou.'}{' '}
+          Se continuar, feche as outras abas do Arretado.
+        </p>
+      )}
       <div
         ref={definirLista}
-        className="lista-leitor"
+        className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
+        aria-busy={voltando}
         style={{ height: virtualizador.getTotalSize() }}
       >
         {visiveis.map((virtual) => {
           const linha = linhas[virtual.index];
           if (!linha) return null;
+          const id = nos[linha.indice]?.dispositivo.id ?? '';
           return (
             <div
               key={virtual.key}
@@ -294,12 +535,21 @@ function LeitorAberto({ repo, aberta, primeira }: { repo: Repositorio } & Aberta
                 linha={linha}
                 item={textos.get(linha.indice)}
                 nome={linha.indiceNome === undefined ? undefined : textos.get(linha.indiceNome)}
-                expandido={abertos.has(aberta.nos[linha.indice]?.dispositivo.id ?? '')}
+                expandido={abertos.has(id)}
                 alternar={alternar}
               />
+              {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
             </div>
           );
         })}
+      </div>
+      <div className="acao-lido-ate">
+        <button type="button" onClick={marcarAqui}>
+          Lido até aqui
+        </button>
+        <p role="status" className="visualmente-oculto">
+          {anuncio}
+        </p>
       </div>
     </div>
   );

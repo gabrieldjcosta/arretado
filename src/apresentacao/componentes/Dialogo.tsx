@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 
 /**
  * Diálogo modal nativo (<dialog>): foco preso, Esc fecha, fundo inerte.
@@ -18,7 +18,9 @@ export function Dialogo({
   const ref = useRef<HTMLDialogElement>(null);
   const idTitulo = useId();
 
-  useEffect(() => {
+  // Abre e fecha no mesmo commit que muda `aberto` (antes da pintura): com `useEffect`, havia um
+  // quadro com o diálogo aberto e já sem conteúdo, e o teste que conferia logo depois o via aberto.
+  useLayoutEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (aberto && !d.open) {
