@@ -324,6 +324,34 @@ export class Colecao<N extends NomeColecao> {
     return r;
   }
 
+  /**
+   * O registro ativo de cada chave de um índice, na ordem das chaves (`undefined` onde não há; o
+   * primeiro, se a chave se repete). Até `LIMITE_MAXIMO_PAGINA` chaves: é leitura por janela (F2,
+   * 9.4: o texto de cada dispositivo visível, por `[versaoId+dispositivoId]`). Uma consulta por
+   * chave, na mesma transação: o `anyOf` do Dexie leva 5 vezes mais no fake-indexeddb.
+   */
+  async obterPorChaves(
+    indice: string,
+    chaves: readonly IndexableType[],
+  ): Promise<(RegistroDe<N> | undefined)[]> {
+    this.verificarIndice(indice);
+    if (chaves.length > LIMITE_MAXIMO_PAGINA) {
+      throw new Error(`No máximo ${String(LIMITE_MAXIMO_PAGINA)} chaves por leitura.`);
+    }
+    if (chaves.length === 0) return [];
+    const usuarioId = this.ctx.usuarioId;
+    return this.db.transaction('r', this.tabela, () =>
+      Promise.all(
+        chaves.map((chave) =>
+          this.onde(indice)
+            .equals(chave)
+            .filter((r) => r.usuarioId === usuarioId && r.excluidoEm === null)
+            .first(),
+        ),
+      ),
+    );
+  }
+
   /** Única forma de listar: sempre paginada, estável e retomável por cursor. */
   async listarPagina(consulta: ConsultaPagina<N>): Promise<Pagina<RegistroDe<N>>> {
     const limite = Math.min(Math.max(1, Math.floor(consulta.limite)), LIMITE_MAXIMO_PAGINA);

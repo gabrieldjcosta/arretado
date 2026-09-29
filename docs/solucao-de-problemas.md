@@ -113,6 +113,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** percorrer as páginas (`todas` em `src/apresentacao/recall/carregadores.ts`, para o Plano e os vínculos; `todos` em `src/dominios/legislacao/servico.ts`, para apagar a árvore e listar rascunhos) ou oferecer "Carregar mais" (listas de cartões e de erros). **Prevenção:** teste com mais de 200 registros em toda lista nova (normas, dispositivos, "a confirmar"); na 9.2, `servico-corpus.test.ts` descarta o CP inteiro (cerca de 2 mil dispositivos) e confere que não sobra nada.
 - **Origem:** ocorrido em 23/09/2026 (commits ed0a209 e 3c07cbf).
 
+### `offset`, `keys()` ou `anyOf` do Dexie lentos no teste
+- **Sintoma:** teste ou carga que não termina (`offset(4000)` num índice composto com 5 mil registros passou de 2 minutos) ou que leva segundos (`keys()` num índice composto: 1,9 s para 500 chaves; `anyOf` com 100 chaves compostas: 70 ms). **Causa:** o fake-indexeddb, que o Vitest e o `npm run carga` usam, percorre o índice devagar nessas operações de cursor; no Chromium elas são rápidas, então só o teste denuncia.
+- **Solução:** paginar pela faixa do índice com cursor (`listarPagina`, que retoma pela última chave, nunca por `offset`); ler por chave com `obterPorChaves` (uma consulta por chave, na mesma transação: 14 ms para 100); `primaryKeys()` quando só os ids bastam. **Prevenção:** a leitura da norma no `npm run carga` (9.4) e o comentário de `obterPorChaves` no core.
+- **Origem:** ocorrido em 29/09/2026 (medições da 9.4).
+
 ### Subida de esquema com aba antiga aberta
 - **Sintoma:** depois de publicar o Dexie v2, o app não abre ou a aba antiga perde o banco no meio do uso. **Causa:** a subida de versão do IndexedDB (9.1, entidade `leituras`) disputa o banco com a conexão aberta pela versão anterior.
 - **Solução:** recarregar a aba antiga. Desde a 9.1, a conexão que recebe o `versionchange` fecha sozinha (não trava a aba nova) e o `ProvedorRepositorio` troca a tela por "O Arretado foi atualizado em outra aba. Recarregue esta página." (ou "…foram apagados em outra aba", com Apagar tudo). **Limite:** a aba aberta com o app v1 não tem esse aviso (o código é o antigo): na subida v1 → v2 ela só falha na próxima gravação, com a mensagem genérica; por isso o backup manual antes da publicação. **Prevenção:** `migracao.test.ts` (v1 → v2 sem perda; aviso por `versao` e por `apagado`) e o E2E "aba aberta avisa quando outra aba sobe o esquema do banco".
@@ -533,8 +538,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Leitor mostra o texto de outra versão, ou de um rascunho
 - **Sintoma:** a leitura (9.4 e 9.6) mostra o texto de uma versão que não é a vigente, um rascunho não publicado, ou dois textos para o mesmo dispositivo. **Causa:** o `Dispositivo` é da norma (vale para todas as versões) e o `TextoDeDispositivo` é da versão (`versaoId`); ler os textos por `normaId` mistura versões, e a norma com rascunho pendente tem dispositivos que ainda não foram publicados.
-- **Solução:** abrir a norma pela `Norma.versaoVigenteId` (definida por `publicarVersao`) e ler os textos pelo índice `[versaoId+dispositivoId]`; norma sem `versaoVigenteId` é rascunho e só aparece na faixa "rascunho pendente" e na revisão (etapa 10). **Prevenção:** teste da 9.4 com uma norma de duas versões (uma `arquivada`) e outra só com rascunho.
-- **Origem:** previsto — atividades 9.4 e 9.6.
+- **Solução:** abrir com `abrirNorma` (9.4), que só aceita a versão de `Norma.versaoVigenteId` com `status: 'vigente'` e da mesma norma, e ler os textos com `lerJanela`, pelo índice `[versaoId+dispositivoId]`; norma sem versão vigente (`NormaIndisponivel`, motivo `sem_versao_vigente`) é rascunho e só aparece na faixa "rascunho pendente" e na revisão (etapa 10). A tela (9.6) nunca lê texto por `normaId`. **Prevenção:** "norma de duas versões e rascunho de outra…", "norma só com rascunho, inexistente ou excluída não abre" e "versão vigente que não é vigente, ou de outra norma, não abre" (`leitor.test.ts`); o corpus publicado e lido por janela igual ao rascunho (`servico-corpus.test.ts`).
+- **Origem:** previsto nas atividades 9.4 e 9.6; prevenido na 9.4 (29/09/2026). Dispositivo sem texto na versão (só possível com a versão nova, F6) vem com `texto` ausente: a F6 decide como tirá-lo da árvore.
 
 ### Nota no meio do texto do dispositivo, ou nota sem parêntese de fecho
 - **Sintoma:** depois da 8.4, o texto tem notas no fim da linha do rótulo e também no meio, antes da quebra de linha da pena ("Se resulta a morte: (Vide Lei nº 8.072, de 25.7.90)\nPena - …", CP, art. 159, § 3º); no ECA, art. 233 e parágrafos, "(Revogado pela Lei nº 9.455, de 7.4.1997" sem o ")". **Causa:** até a 8.5 as notas ficam no texto; a continuação emenda a linha inteira; a fonte do ECA perdeu o parêntese.
@@ -668,8 +673,13 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Leitor lento em norma grande
 - **Sintoma:** abrir a CF ou o CP leva segundos. **Causa:** árvore inteira renderizada ou todos os textos carregados de uma vez.
-- **Solução:** leitura paginada por janela (9.4) e leitor virtualizado (T16), só o visível + margem. **Prevenção:** `npm run carga` com norma de 5 mil dispositivos (< 1 s) e medição de abertura no E2E (9.6).
-- **Origem:** previsto — atividades 9.4 e 9.6.
+- **Solução:** a leitura por janela (9.4: `abrirNorma` traz a árvore sem textos; `lerJanela`, os textos de até 200 nós) e o leitor virtualizado (T16, 9.6), que só desenha o visível mais a margem e só pede a janela dele. **Prevenção:** `npm run carga` com norma de 5 mil dispositivos (abrir com a primeira janela < 1 s, cerca de 120 ms; janela de 100 < 200 ms, cerca de 20 ms) e a medição da abertura no E2E (9.6).
+- **Origem:** previsto nas atividades 9.4 e 9.6; a parte da 9.4 feita em 29/09/2026 (ver "Fatos da leitura (9.4)" no plano).
+
+### Leitor pisca, pula ou relê a mesma janela ao rolar
+- **Sintoma:** ao rolar, o texto some e volta, a lista salta, ou a mesma janela é pedida de novo a cada movimento. **Causa:** janela pedida a cada evento de rolagem sem guardar as já lidas; resposta de uma janela antiga chegando depois da nova; altura estimada muito diferente da real (artigo com dezenas de incisos).
+- **Solução:** guardar as janelas lidas por índice (a `NormaAberta` não muda durante a leitura), descartar a resposta de janela que já saiu da tela e estimar a altura pelo tipo e pelo tamanho do texto, medindo depois. **Prevenção:** E2E da 9.6 (rolar a LEP inteira e voltar) e a abertura medida nele.
+- **Origem:** previsto — atividade 9.6.
 
 ### Posição de leitura perdida
 - **Sintoma:** ao voltar, ao entrar ou sair do modo foco, ou ao trocar de filtro, o leitor abre noutro ponto. **Causa:** alturas variáveis na lista virtualizada; posição guardada em pixels muda com fonte, tamanho de tela e filtro.
