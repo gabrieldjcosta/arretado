@@ -2,8 +2,9 @@
 // é gravado em < 5 s", medida do estruturador ao fim da transação (a sanitização, de 1 a 4 s, é da
 // tela e fica fora). As duas páginas: a do portão, com todas as redações, e a compilada, que tem
 // mais dispositivos vigentes. E a publicação (9.3) do CP, das compiladas da LEP e do ECA (o marco
-// da leitura antecipada) e da LC 80 (as duas "SEÇÃO IV"), lida depois por janela (9.4).
-import { sanitizarHtml } from '../../core/seguranca/sanitizador';
+// da leitura antecipada) e da LC 80 (as duas "SEÇÃO IV"), lida depois por janela (9.4). E o CP
+// colado como texto puro (8.8): tudo "a confirmar", publicado só com o aceite.
+import { sanitizarHtml, textoParaBlocos } from '../../core/seguranca/sanitizador';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { abrirNorma, lerJanela } from './leitor';
 import { emOrdemDeLeitura } from './ordem';
@@ -32,6 +33,12 @@ async function blocosDe(id: string) {
   if (!carregar) throw new Error(`sem colado: ${id}`);
   return sanitizarHtml(await carregar()).blocos;
 }
+
+const CP_TEXTO = import.meta.glob<string>('../../../corpus/normas/cp.colado.txt', {
+  query: '?raw',
+  import: 'default',
+  eager: false,
+});
 
 describe('serviço (9.2) com o CP inteiro', () => {
   it.each(['cp', 'cp-compilado'])(
@@ -151,4 +158,35 @@ describe('publicação (9.3) com o corpus', () => {
     },
     120_000,
   );
+});
+
+describe('texto puro (8.8) com o CP inteiro', () => {
+  it('cp: sem conflito e todo "a confirmar"; retomado igual; publica só com o aceite', async () => {
+    const carregar = CP_TEXTO['../../../corpus/normas/cp.colado.txt'];
+    if (!carregar) throw new Error('sem o colado do CP');
+    const blocos = textoParaBlocos(await carregar());
+    const { repo } = await repositorioDeTeste();
+
+    const { versao, rascunho } = await criarRascunho(repo, { blocos, origemEntrada: 'texto' });
+    // O tempo de gravar o CP fica com o caso do HTML acima (o estruturador do texto puro custa o
+    // mesmo; sozinho, cerca de 2,3 s do colar à publicação).
+    expect(versao.versaoAdaptador).toBe(rascunho.versaoEstruturador);
+
+    const nos = emOrdemDeLeitura(rascunho.nos).length;
+    const previa = await verificarPublicacao(repo, versao.id);
+    expect(previa).toMatchObject({ conflitos: [], aConfirmar: nos, totalDispositivos: nos });
+    // Os avisos dos registros gravados são os da validação do rascunho, com o do texto puro.
+    expect(previa.avisos).toEqual(
+      validarEstrutura(rascunho).map((a) => ({ ...a, linha: undefined })),
+    );
+    expect(previa.avisos.at(-1)?.mensagem).toMatch(/^O texto chegou sem formatação: /);
+    expect((await retomarRascunho(repo, versao.id)).rascunho).toEqual(rascunho);
+
+    await expect(publicarVersao(repo, versao.id)).rejects.toMatchObject({
+      motivo: 'a_confirmar',
+    });
+    const publicada = await publicarVersao(repo, versao.id, { aceitarAConfirmar: true });
+    expect(publicada.versao.status).toBe('vigente');
+    expect(await repo.db.tabela('dispositivos').count()).toBe(nos);
+  }, 120_000);
 });

@@ -2542,3 +2542,859 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
     expect(r.notaVigenciaMaisRecente).toEqual({ lei: 'Lei nº 9.000', ano: 2019 });
   });
 });
+
+// Reserva em texto puro (8.8): a página com todas as redações colada sem formatação. Sem tachado,
+// a linha antiga sai das notas e da repetição do endereço, como redação `heuristica` a confirmar,
+// no mesmo endereço ou no ancestral (`enderecoLido`), como o HTML faria; nunca texto vigente.
+describe('estruturador: reserva em texto puro (regras 8, 9, 10 e 12, 8.8)', () => {
+  const puro = (...linhas: string[]) => estruturar(blocos(...linhas), { formato: 'texto' });
+  const redacoes = (no: NoRascunho | undefined) =>
+    (no?.redacoesAnteriores ?? []).map((x) => ({
+      texto: textoDe(x.trechos),
+      linhas: x.linhas,
+      ...(x.enderecoLido ? { lido: x.enderecoLido } : {}),
+      ...(x.nota ? { nota: x.nota } : {}),
+    }));
+  const notasDo = (no: NoRascunho | undefined) => no?.notas.map((n) => n.texto) ?? [];
+  const enderecos = (r: Rascunho) => todos(r.nos).map((n) => n.endereco);
+  /** Regra 12: todo nó "a confirmar", e toda redação heurística, a confirmar. */
+  const tudoAConfirmar = (r: Rascunho) => {
+    const nos = todos(r.nos);
+    expect(nos.filter((n) => n.confianca !== 'a_confirmar').map((n) => n.endereco)).toEqual([]);
+    expect(
+      nos
+        .flatMap((n) => n.redacoesAnteriores)
+        .filter((x) => x.origemDeteccao !== 'heuristica' || x.confirmada),
+    ).toEqual([]);
+  };
+  /** A árvore sem a confiança: o texto puro dá o mesmo que o HTML sem tachado. */
+  const semConfianca = (r: Rascunho) =>
+    todos(r.nos).map((n) => [
+      n.endereco,
+      n.status,
+      textoDe(n.trechos),
+      n.redacoesAnteriores.map((x) => textoDe(x.trechos)),
+    ]);
+
+  it('endereço repetido com "Redação dada": cada cópia antiga vira redação do mesmo endereço, e o filho dela sem gêmeo vai para o artigo, com o endereço lido (LEP, art. 112)', () => {
+    const r = puro(
+      'Art. 112. A pena privativa de liberdade será executada em forma progressiva… e seu mérito indicar a progressão.',
+      'Parágrafo único. A decisão será motivada e precedida de parecer da Comissão Técnica de Classificação e do exame criminológico, quando necessário.',
+      'Art. 112. A pena privativa de liberdade será executada… respeitadas as normas que vedam a progressão. (Redação dada pela Lei nº 10.792, de 2003)',
+      'Art. 112. A pena privativa de liberdade será executada… quando o preso tiver cumprido ao menos: (Redação dada pela Lei nº 13.964, de 2019) (Vigência)',
+      'Art. 112. A pena privativa de liberdade será executada de forma progressiva… observadas as seguintes exceções: (Redação dada pela Lei nº 15.402, de 2026)',
+      'I - 16% (dezesseis por cento) da pena, se o apenado for primário e o crime tiver sido cometido sem violência à pessoa ou grave ameaça; (Incluído pela Lei nº 13.964, de 2019) (Vigência)',
+    );
+    expect(enderecos(r)).toEqual(['art112', 'art112.incI']);
+    const art112 = porEndereco(r, 'art112');
+    expect(art112).toMatchObject({ status: 'vigente', confianca: 'a_confirmar' });
+    expect(textoDe(art112?.trechos ?? [])).toBe(
+      'A pena privativa de liberdade será executada de forma progressiva… observadas as seguintes exceções:',
+    );
+    expect(redacoes(art112)).toEqual([
+      {
+        texto:
+          'Art. 112. A pena privativa de liberdade será executada em forma progressiva… e seu mérito indicar a progressão.',
+        linhas: { inicio: 0, fim: 0 },
+      },
+      {
+        texto:
+          'Parágrafo único. A decisão será motivada e precedida de parecer da Comissão Técnica de Classificação e do exame criminológico, quando necessário.',
+        linhas: { inicio: 1, fim: 1 },
+        lido: 'art112.parUnico',
+      },
+      {
+        texto:
+          'Art. 112. A pena privativa de liberdade será executada… respeitadas as normas que vedam a progressão.',
+        linhas: { inicio: 2, fim: 2 },
+        nota: '(Redação dada pela Lei nº 10.792, de 2003)',
+      },
+      {
+        texto:
+          'Art. 112. A pena privativa de liberdade será executada… quando o preso tiver cumprido ao menos:',
+        linhas: { inicio: 3, fim: 3 },
+        nota: '(Redação dada pela Lei nº 13.964, de 2019) (Vigência)',
+      },
+    ]);
+    expect(tipos(r)).toEqual(['duplicata', 'duplicata', 'duplicata']);
+    tudoAConfirmar(r);
+  });
+
+  it('a vigente sai das notas, não da ordem: a redação nova antes da original (ECA, art. 92, II)', () => {
+    const r = puro(
+      'Art. 92. As entidades que desenvolvam programas de acolhimento familiar ou institucional deverão adotar os seguintes princípios: (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+      'II - integração em família substituta, quando esgotados os recursos de manutenção na família natural ou extensa; (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+      'II - integração em família substituta, quando esgotados os recursos de manutenção na família de origem;',
+      'III - atendimento personalizado e em pequenos grupos;',
+    );
+    expect(enderecos(r)).toEqual(['art92', 'art92.incII', 'art92.incIII']);
+    const inciso = porEndereco(r, 'art92.incII');
+    expect(textoDe(inciso?.trechos ?? [])).toBe(
+      'integração em família substituta, quando esgotados os recursos de manutenção na família natural ou extensa;',
+    );
+    expect(notasDo(inciso)).toEqual(['(Redação dada pela Lei nº 12.010, de 2009)', 'Vigência']);
+    expect(redacoes(inciso)).toEqual([
+      {
+        texto:
+          'II - integração em família substituta, quando esgotados os recursos de manutenção na família de origem;',
+        linhas: { inicio: 2, fim: 2 },
+      },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('sem nota de alteração na última cópia, como no HTML: vale a última, e os filhos ficam (ECA, art. 263, a citação do CP)', () => {
+    const linhas = [
+      'Art. 263. O Decreto-Lei n.º 2.848, de 7 de dezembro de 1940 (Código Penal), passa a vigorar com as seguintes alterações:',
+      '4) Art. 213 ..................................................................',
+      'Parágrafo único. Se a ofendida é menor de catorze anos:',
+      'Pena - reclusão de quatro a dez anos.',
+      '5) Art. 214...................................................................',
+      'Parágrafo único. Se o ofendido é menor de catorze anos:',
+      'Pena - reclusão de três a nove anos.»',
+    ];
+    const r = puro(...linhas);
+    expect(semConfianca(r)).toEqual(semConfianca(estruturar(blocos(...linhas))));
+    expect(tipos(r)).toEqual(['duplicata']);
+    // A redação da cópia antiga cobre só as linhas dela, sem o item "5)" que vinha sob ela.
+    expect(redacoes(porEndereco(r, 'art263.parUnico')).map((x) => x.linhas)).toEqual([
+      { inicio: 2, fim: 3 },
+    ]);
+  });
+
+  it('revogado com o texto: revogado, com a rubrica e o texto na redação, e a pena emendada numa redação própria (CP, art. 185; ECA, art. 233)', () => {
+    const r = puro(
+      'Usurpação de nome ou pseudônimo alheio',
+      'Art. 185 - Atribuir falsamente a alguém, mediante o uso de nome, pseudônimo ou sinal por ele adotado para designar seus trabalhos, a autoria de obra literária, científica ou artística:',
+      'Pena - detenção, de 6 (seis) meses a 2 (dois) anos, e multa. (Revogado pela Lei nº 10.695, de 1º.7.2003)',
+      'Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura: (Revogado pela Lei nº 9.455, de 7.4.1997',
+      'Pena - reclusão de um a cinco anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :',
+      '§ 1º Se resultar lesão corporal grave: (Revogado pela Lei nº 9.455, de 7.4.1997 :',
+      'Pena - reclusão de dois a oito anos. (Revogado pela Lei nº 9.455, de 7.4.1997 :',
+    );
+    expect(enderecos(r)).toEqual(['art185', 'art233', 'art233.par1']);
+    const art185 = porEndereco(r, 'art185');
+    expect(art185).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(notasDo(art185)).toEqual(['(Revogado pela Lei nº 10.695, de 1º.7.2003)']);
+    expect(redacoes(art185)).toEqual([
+      {
+        texto:
+          'Usurpação de nome ou pseudônimo alheio\nArt. 185 - Atribuir falsamente a alguém, mediante o uso de nome, pseudônimo ou sinal por ele adotado para designar seus trabalhos, a autoria de obra literária, científica ou artística:\nPena - detenção, de 6 (seis) meses a 2 (dois) anos, e multa.',
+        linhas: { inicio: 0, fim: 2 },
+      },
+    ]);
+    // A nota de revogação da linha do rótulo fica no nó; a da pena vai para a redação dela.
+    const art233 = porEndereco(r, 'art233');
+    expect(art233).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(notasDo(art233)).toEqual(['(Revogado pela Lei nº 9.455, de 7.4.1997']);
+    expect(redacoes(art233)).toEqual([
+      {
+        texto:
+          'Art. 233. Submeter criança ou adolescente sob sua autoridade, guarda ou vigilância a tortura:',
+        linhas: { inicio: 3, fim: 3 },
+      },
+      {
+        texto: 'Pena - reclusão de um a cinco anos.',
+        linhas: { inicio: 4, fim: 4 },
+        nota: '(Revogado pela Lei nº 9.455, de 7.4.1997',
+      },
+    ]);
+    expect(porEndereco(r, 'art233.par1')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(porEndereco(r, 'art233.par1'))).toHaveLength(2);
+    tudoAConfirmar(r);
+  });
+
+  it('os filhos do revogado com texto: sem nota de revogação, ou com a de outro ato, vão para ele com o endereço lido; com a do mesmo ato, ficam revogados (CP, art. 187; CF, arts. 111 e 117)', () => {
+    const r = puro(
+      'Violação de privilégio de invenção',
+      'Art 187. Violar direito de privilégio de invenção ou de descoberta: (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      'I - fabricando, sem autorização do concessionário ou cessionário, produto que é objeto de privilégio;',
+      'Pena - detenção de seis meses a um ano, e multa, de um conto a quinze contos de réis.',
+      'Aumento de pena',
+      'Parágrafo único. A pena é aumentada de um terço:',
+      'II - se o agente entrou em conluio com representante, mandatário, preposto ou empregado do concessionário ou do cessionário, para conhecer a invenção ou o modo de seu emprego. (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      'Art. 188. Texto.',
+      'Art. 111. São órgãos da Justiça do Trabalho:',
+      '§ 1º - O Tribunal Superior do Trabalho compor-se-á de vinte e sete Ministros… sendo:',
+      '§ 1º. O Tribunal Superior do Trabalho compor-se-á de dezessete Ministros, togados e vitalícios… (Redação dada pela Emenda Constitucional nº 24, de 1999) (Revogado pela Emenda Constitucional nº 45, de 2004)',
+      'I - dezessete togados e vitalícios, dos quais onze escolhidos dentre juízes de carreira da magistratura trabalhista, três dentre advogados e três dentre membros do Ministério Público do Trabalho;',
+      'II - dez classistas temporários, com representação paritária dos trabalhadores e empregadores. (Revogado pela Emenda Constitucional nº 24, de 1999)',
+      'Art. 117. O mandato dos representantes classistas, em todas as instâncias, é de três anos . (Revogado pela Emenda Constitucional nº 24, de 1999)',
+      'Parágrafo único. Os representantes classistas terão suplentes. (Revogado pela Emenda Constitucional nº 24, de 1999)',
+    );
+    expect(enderecos(r)).toEqual([
+      'art187',
+      'art188',
+      'art111',
+      'art111.par1',
+      'art117',
+      'art117.parUnico',
+    ]);
+    // O inciso, a pena dele, o parágrafo único com a rubrica e o inciso dele (revogado pelo mesmo
+    // ato do artigo, mas sob o parágrafo único que sai): como no HTML, que os traz tachados.
+    expect(redacoes(porEndereco(r, 'art187'))).toEqual([
+      {
+        texto:
+          'Violação de privilégio de invenção\nArt 187. Violar direito de privilégio de invenção ou de descoberta:',
+        linhas: { inicio: 0, fim: 1 },
+      },
+      {
+        texto:
+          'I - fabricando, sem autorização do concessionário ou cessionário, produto que é objeto de privilégio;\nPena - detenção de seis meses a um ano, e multa, de um conto a quinze contos de réis.',
+        linhas: { inicio: 2, fim: 3 },
+        lido: 'art187.incI',
+      },
+      {
+        texto: 'Aumento de pena\nParágrafo único. A pena é aumentada de um terço:',
+        linhas: { inicio: 4, fim: 5 },
+        lido: 'art187.parUnico',
+      },
+      {
+        texto:
+          'II - se o agente entrou em conluio com representante, mandatário, preposto ou empregado do concessionário ou do cessionário, para conhecer a invenção ou o modo de seu emprego.',
+        linhas: { inicio: 6, fim: 6 },
+        lido: 'art187.parUnico.incII',
+        nota: '(Revogado pela Lei nº 9.279, de 14.5.1996)',
+      },
+    ]);
+    // O § 1º revogado pela EC 45: a cópia de 1988, a dele e os dois incisos (o II, pela EC 24).
+    const par1 = porEndereco(r, 'art111.par1');
+    expect(par1).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(par1).map((x) => [x.linhas.inicio, x.lido])).toEqual([
+      [9, undefined],
+      [10, undefined],
+      [11, 'art111.par1.incI'],
+      [12, 'art111.par1.incII'],
+    ]);
+    for (const e of ['art117', 'art117.parUnico'])
+      expect(porEndereco(r, e)).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(porEndereco(r, 'art117.parUnico'))).toEqual([
+      {
+        texto: 'Parágrafo único. Os representantes classistas terão suplentes.',
+        linhas: { inicio: 14, fim: 14 },
+      },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('vale a última nota de mudança: "Redação dada" depois da revogação não revoga (CP, art. 213, parágrafo único); "Vigência" depois dela não conta (ECA, art. 51, § 4º)', () => {
+    const r = puro(
+      'Art. 213 - Constranger mulher à conjunção carnal, mediante violência ou grave ameaça:',
+      'Parágrafo único. Se a ofendida é menor de catorze anos: (Incluído pela Lei nº 8.069, de 1990)',
+      'Pena - reclusão de quatro a dez anos. (Redação dada pela Lei nº 8.069, de 1990) (Revogado pela Lei n.º 9.281, de 4.6.1996 )',
+      'Pena - reclusão, de seis a dez anos. (Redação dada pela Lei nº 8.072, de 25.7.1990)',
+      'Art. 51. Cuidando-se de pedido de adoção formulado por estrangeiro residente ou domiciliado fora do País, observar-se-á o disposto no art. 31.',
+      '§ 4º Antes de consumada a adoção não será permitida a saída do adotando do território nacional. (Revogado pela Lei nº 12.010, de 2009) Vigência',
+    );
+    const unico = porEndereco(r, 'art213.parUnico');
+    expect(unico?.status).toBe('vigente');
+    // A pena antiga, com as notas dela, é redação do parágrafo único (a nova tem "Redação dada").
+    expect(textoDe(unico?.trechos ?? [])).toBe(
+      'Se a ofendida é menor de catorze anos:\nPena - reclusão, de seis a dez anos.',
+    );
+    expect(redacoes(unico)).toEqual([
+      {
+        texto: 'Pena - reclusão de quatro a dez anos.',
+        linhas: { inicio: 2, fim: 2 },
+        nota: '(Redação dada pela Lei nº 8.069, de 1990) (Revogado pela Lei n.º 9.281, de 4.6.1996 )',
+      },
+    ]);
+    const par4 = porEndereco(r, 'art51.par4');
+    expect(par4).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(notasDo(par4)).toEqual(['(Revogado pela Lei nº 12.010, de 2009)', 'Vigência']);
+    tudoAConfirmar(r);
+  });
+
+  it('parágrafo único seguido do § 1º no mesmo pai: o parágrafo único é o antigo e vai para o pai, com a subárvore e o endereço lido (CDC, art. 8º; ECA, art. 4º)', () => {
+    const r = puro(
+      'Art. 8° Os produtos e serviços colocados no mercado de consumo não acarretarão riscos à saúde ou segurança dos consumidores…',
+      'Parágrafo único. Em se tratando de produto industrial, ao fabricante cabe prestar as informações a que se refere este artigo, através de impressos apropriados que devam acompanhar o produto.',
+      '§ 1º Em se tratando de produto industrial, ao fabricante cabe prestar as informações a que se refere este artigo, através de impressos apropriados que devam acompanhar o produto. (Redação dada pela Lei nº 13.486, de 2017)',
+      '§ 2º O fornecedor deverá higienizar os equipamentos e utensílios utilizados no fornecimento de produtos ou serviços… (Incluído pela Lei nº 13.486, de 2017)',
+      'Art. 4º É dever da família, da comunidade, da sociedade em geral e do poder público assegurar… (Redação dada pela Lei nº 15.512, de 2026)',
+      'Parágrafo único. A garantia de prioridade compreende:',
+      'a) primazia de receber proteção e socorro em quaisquer circunstâncias;',
+      'b) precedência de atendimento nos serviços públicos ou de relevância pública;',
+      '§1º A garantia de prioridade compreende: (Incluído pela Lei nº 15.240, de 2025)',
+      'a) primazia de receber proteção e socorro em quaisquer circunstâncias;',
+    );
+    expect(enderecos(r)).toEqual([
+      'art8',
+      'art8.par1',
+      'art8.par2',
+      'art4',
+      'art4.par1',
+      'art4.par1.alA',
+    ]);
+    expect(redacoes(porEndereco(r, 'art8'))).toEqual([
+      {
+        texto:
+          'Parágrafo único. Em se tratando de produto industrial, ao fabricante cabe prestar as informações a que se refere este artigo, através de impressos apropriados que devam acompanhar o produto.',
+        linhas: { inicio: 1, fim: 1 },
+        lido: 'art8.parUnico',
+      },
+    ]);
+    expect(redacoes(porEndereco(r, 'art4')).map((x) => [x.linhas.inicio, x.lido])).toEqual([
+      [5, 'art4.parUnico'],
+      [6, 'art4.parUnico.alA'],
+      [7, 'art4.parUnico.alB'],
+    ]);
+    // A validação deixa de acusar o parágrafo único ao lado do § 1º (regra 13).
+    expect(r.anomalias.filter((a) => a.tipo === 'paragrafo_unico_com_numerado')).toEqual([]);
+    tudoAConfirmar(r);
+  });
+
+  it('o parágrafo único fica: revogado, vetado, depois do § 1º (ECA, art. 241) e no HTML', () => {
+    const r = puro(
+      'Art. 124. A autorização será concedida por prazo não superior a 7 (sete) dias. (Revogado pela Lei nº 14.843, de 2024)',
+      'Parágrafo único. Quando se tratar de freqüência a curso profissionalizante, o tempo de saída será o necessário. (Revogado pela Lei nº 14.843, de 2024)',
+      '§ 1o Ao conceder a saída temporária, o juiz imporá ao beneficiário as seguintes condições. (Incluído pela Lei nº 12.258, de 2010) (Revogado pela Lei nº 14.843, de 2024)',
+      'Art. 54. Texto.',
+      'Parágrafo único. (VETADO)',
+      '§ 1º Texto.',
+      'Art. 241. Vender ou expor à venda fotografia, vídeo ou outro registro que contenha cena de sexo explícito: (Redação dada pela Lei nº 11.829, de 2008)',
+      '§ 1º Texto do primeiro.',
+      'Parágrafo único. Texto do único.',
+    );
+    expect(enderecos(r)).toEqual([
+      'art124',
+      'art124.parUnico',
+      'art124.par1',
+      'art54',
+      'art54.parUnico',
+      'art54.par1',
+      'art241',
+      'art241.par1',
+      'art241.parUnico',
+    ]);
+    // No HTML, o parágrafo único sem tachado ao lado do § 1º continua vigente (CP, art. 92).
+    expect(
+      enderecos(estruturar(blocos('Art. 8° Texto.', 'Parágrafo único. Antigo.', '§ 1º Novo.'))),
+    ).toEqual(['art8', 'art8.parUnico', 'art8.par1']);
+  });
+
+  it('a pena antiga antes da nova com "Redação dada": redação do mesmo dispositivo, fora do texto vigente (CP, art. 133)', () => {
+    const r = puro(
+      'Abandono de incapaz',
+      'Art. 133 - Abandonar pessoa que está sob seu cuidado, guarda, vigilância ou autoridade, e, por qualquer motivo, incapaz de defender-se dos riscos resultantes do abandono:',
+      'Pena - detenção, de seis meses a três anos.',
+      'Pena - reclusão, de 2 (dois) a 5 (cinco) anos. (Redação dada pela Lei nº 15.163, de 2025)',
+      '§ 1º - Se do abandono resulta lesão corporal de natureza grave:',
+    );
+    const art133 = porEndereco(r, 'art133');
+    expect(textoDe(art133?.trechos ?? [])).toBe(
+      'Abandonar pessoa que está sob seu cuidado, guarda, vigilância ou autoridade, e, por qualquer motivo, incapaz de defender-se dos riscos resultantes do abandono:\nPena - reclusão, de 2 (dois) a 5 (cinco) anos.',
+    );
+    expect(notasDo(art133)).toEqual(['(Redação dada pela Lei nº 15.163, de 2025)']);
+    expect(redacoes(art133)).toEqual([
+      { texto: 'Pena - detenção, de seis meses a três anos.', linhas: { inicio: 2, fim: 2 } },
+    ]);
+    expect(nomeDe(art133)).toBe('Abandono de incapaz');
+    tudoAConfirmar(r);
+  });
+
+  it('a rubrica da cópia antiga entra na redação dela quando a vigente tem a sua, e o parágrafo único das duas vai para o artigo (CP, art. 288)', () => {
+    const r = puro(
+      'Quadrilha ou bando',
+      'Art. 288 - Associarem-se mais de três pessoas, em quadrilha ou bando, para o fim de cometer crimes: (Vide Lei nº 12.850, de 2.013) (Vigência)',
+      'Pena - reclusão, de um a três anos. (Vide Lei 8.072, de 25.7.1990)',
+      'Parágrafo único - A pena aplica-se em dobro, se a quadrilha ou bando é armado.',
+      'Associação Criminosa',
+      'Art. 288. Associarem-se 3 (três) ou mais pessoas, para o fim específico de cometer crimes: (Redação dada pela Lei nº 12.850, de 2013) (Vigência)',
+      'Pena - reclusão, de 1 (um) a 3 (três) anos. (Redação dada pela Lei nº 12.850, de 2013) (Vigência)',
+      'Parágrafo único. A pena aumenta-se até a metade se a associação é armada ou se houver a participação de criança ou adolescente. (Redação dada pela Lei nº 12.850, de 2013) (Vigência)',
+      '§ 1º A pena aumenta-se até a metade se a associação é armada ou se houver a participação de criança ou adolescente. (Incluído pela Lei nº 15.245, de 2025)',
+    );
+    expect(enderecos(r)).toEqual(['art288', 'art288.nome', 'art288.par1']);
+    const art288 = porEndereco(r, 'art288');
+    expect(nomeDe(art288)).toBe('Associação Criminosa');
+    expect(redacoes(art288)).toEqual([
+      {
+        texto:
+          'Quadrilha ou bando\nArt. 288 - Associarem-se mais de três pessoas, em quadrilha ou bando, para o fim de cometer crimes:\nPena - reclusão, de um a três anos.',
+        linhas: { inicio: 0, fim: 2 },
+        nota: '(Vide Lei nº 12.850, de 2.013) (Vigência) (Vide Lei 8.072, de 25.7.1990)',
+      },
+      {
+        texto: 'Parágrafo único - A pena aplica-se em dobro, se a quadrilha ou bando é armado.',
+        linhas: { inicio: 3, fim: 3 },
+        lido: 'art288.parUnico',
+      },
+      {
+        texto:
+          'Parágrafo único. A pena aumenta-se até a metade se a associação é armada ou se houver a participação de criança ou adolescente.',
+        linhas: { inicio: 7, fim: 7 },
+        lido: 'art288.parUnico',
+        nota: '(Redação dada pela Lei nº 12.850, de 2013) (Vigência)',
+      },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('a rubrica antiga e a nova seguidas: a antiga é redação do nome, não texto do dispositivo de cima (CP, art. 266)', () => {
+    const r = puro(
+      'Art. 265 - Atentar contra a segurança ou o funcionamento de serviço de água, luz, força ou calor, ou qualquer outro de utilidade pública:',
+      'Parágrafo único - Aumentar-se-á a pena de 1/3 (um terço) até a metade, se o dano ocorrer em virtude de subtração de material essencial ao funcionamento dos serviços. (Incluído pela Lei nº 5.346, de 3.11.1967)',
+      'Interrupção ou perturbação de serviço telegráfico ou telefônico',
+      'Interrupção ou perturbação de serviço telegráfico, telefônico, informático, telemático ou de informação de utilidade pública (Redação dada pela Lei nº 12.737, de 2012) Vigência',
+      'Art. 266 - Interromper ou perturbar serviço telegráfico, radiotelegráfico ou telefônico, impedir ou dificultar-lhe o restabelecimento:',
+    );
+    expect(textoDe(porEndereco(r, 'art265.parUnico')?.trechos ?? [])).toBe(
+      'Aumentar-se-á a pena de 1/3 (um terço) até a metade, se o dano ocorrer em virtude de subtração de material essencial ao funcionamento dos serviços.',
+    );
+    const nome = porEndereco(r, 'art266.nome');
+    expect(textoDe(nome?.trechos ?? [])).toBe(
+      'Interrupção ou perturbação de serviço telegráfico, telefônico, informático, telemático ou de informação de utilidade pública',
+    );
+    expect(notasDo(nome)).toEqual(['(Redação dada pela Lei nº 12.737, de 2012)', 'Vigência']);
+    expect(redacoes(nome)).toEqual([
+      {
+        texto: 'Interrupção ou perturbação de serviço telegráfico ou telefônico',
+        linhas: { inicio: 2, fim: 2 },
+      },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('nome de nó substituído: a linha nova é o nome, e a antiga, redação do nó (LC 80, Título I; CF, Seção II do Capítulo VII do Título III)', () => {
+    const r = puro(
+      'TÍTULO I',
+      'Das Disposições Preliminares',
+      'Disposições Gerais',
+      '(Redação dada pela Lei Complementar nº 132, de 2009).',
+      'Art. 1º A Defensoria Pública é instituição essencial à função jurisdicional do Estado.',
+      'TÍTULO II',
+      'Seção II',
+      'DOS SERVIDORES PÚBLICOS CIVIS',
+      'DOS SERVIDORES PÚBLICOS',
+      '(Redação dada pela Emenda Constitucional nº 18, de 1998)',
+      'Art. 39. A União, os Estados, o Distrito Federal e os Municípios instituirão…',
+    );
+    expect(enderecos(r)).toEqual([
+      'tit1',
+      'tit1.nome',
+      'art1',
+      'tit2',
+      'tit2.sec2',
+      'tit2.sec2.nome',
+      'art39',
+    ]);
+    const tit1 = porEndereco(r, 'tit1');
+    expect(nomeDe(tit1)).toBe('Disposições Gerais');
+    expect(notasDo(tit1)).toEqual(['(Redação dada pela Lei Complementar nº 132, de 2009)']);
+    expect(redacoes(tit1)).toEqual([
+      { texto: 'Das Disposições Preliminares', linhas: { inicio: 1, fim: 1 } },
+    ]);
+    const secao = porEndereco(r, 'tit2.sec2');
+    expect(nomeDe(secao)).toBe('DOS SERVIDORES PÚBLICOS');
+    expect(redacoes(secao)).toEqual([
+      { texto: 'DOS SERVIDORES PÚBLICOS CIVIS', linhas: { inicio: 7, fim: 7 } },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('o nome em várias linhas continua inteiro (CP compilado, Capítulo V do Título VI)', () => {
+    const r = puro(
+      'CAPÍTULO V',
+      'DO LENOCÍNIO E DO TRÁFICO DE PESSOA PARA FIM DE',
+      'PROSTITUIÇÃO OU OUTRA FORMA DE',
+      'EXPLORAÇÃO SEXUAL',
+      '(Redação dada pela Lei nº 12.015, de 2009)',
+      'Mediação para servir a lascívia de outrem',
+      'Art. 227 - Induzir alguém a satisfazer a lascívia de outrem:',
+    );
+    const cap5 = porEndereco(r, 'cap5');
+    expect(nomeDe(cap5)).toBe(
+      'DO LENOCÍNIO E DO TRÁFICO DE PESSOA PARA FIM DE PROSTITUIÇÃO OU OUTRA FORMA DE EXPLORAÇÃO SEXUAL',
+    );
+    expect(cap5?.redacoesAnteriores).toEqual([]);
+    expect(nomeDe(porEndereco(r, 'art227'))).toBe('Mediação para servir a lascívia de outrem');
+  });
+
+  it('rótulos que só o tachado separa: o antigo ao lado do novo (LC-SP 988, art. 134), o partido pela fonte (CP, art. 45; ECA, art. 90) e o sufixo sem hífen (CF, art. 93)', () => {
+    const r = puro(
+      'Artigo 134 - Será considerado como de efetivo exercício o afastamento em virtude de:',
+      'IX - licença para assistência ao filho portador de deficiência física, sensorial ou mental;',
+      'X - compensação em razão de atividades realizadas nos finais de semana, feriados ou recessos; (NR)',
+      '- Inciso X acrescentado pela Lei Complementar n° 1.295, de 02/01/2017, com efeitos a partir de 01/06/2016.',
+      'X XI - outras previstas em lei.',
+      '- Inciso X renumerado para inciso XI pela Lei Complementar n° 1.295, de 02/01/2017, com efeitos a partir de 01/06/2016.',
+      'Parágrafo único § 1° - O Defensor Público não perderá o direito às vantagens pecuniárias.',
+      '- Parágrafo único transformado em § 1° pela Lei Complementar n° 1.295, de 02/01/2017, com efeitos a partir de 01/06/2016.',
+      'Art. 45 - A pena restritiva de direitos converte-se em privativa de liberdade, pelo tempo da pena aplicada, quando: (Redação dada pela Lei nº 7.209, de 1984)',
+      'I - sobrevier condenação, por outro crime, a pena privativa de liberdade cuja execução não tenha sido suspensa; (Redação dada pela Lei nº 7.209, de 1984)',
+      'I I - ocorrer o descumprimento injustificado da restrição imposta. (Redação dada pela Lei nº 7.209, de 1984)',
+      'Art. 45. Na aplicação da substituição prevista no artigo anterior, proceder-se-á na forma deste e dos arts. 46, 47 e 48. (Redação dada pela Lei nº 9.714, de 1998)',
+      'Art. 90. As entidades de atendimento são responsáveis pela manutenção das próprias unidades:',
+      'III - colocação familiar;',
+      'I V - abrigo;',
+      'IV - acolhimento institucional; (Redação dada pela Lei nº 12.010, de 2009) Vigência',
+      'Art. 93. Lei complementar disporá sobre o Estatuto da Magistratura, observados os seguintes princípios:',
+      'VIII - o ato de remoção ou de disponibilidade do magistrado, por interesse público, fundar-se-á em decisão por voto da maioria absoluta; (Redação dada pela Emenda Constitucional nº 103, de 2019)',
+      'VIIIA a remoção a pedido ou a permuta de magistrados de comarca de igual entrância atenderá, no que couber, ao disposto nas alíneas a , b , c e e do inciso II; (Incluído pela Emenda Constitucional nº 45, de 2004)',
+      'VIII-A - a remoção a pedido de magistrados de comarca de igual entrância atenderá, no que couber, ao disposto nas alíneas "a", "b", "c" e "e" do inciso II do caput deste artigo; (Redação dada pela Emenda Constitucional nº 130, de 2023)',
+    );
+    expect(enderecos(r)).toEqual([
+      'art134',
+      'art134.incIX',
+      'art134.incX',
+      'art134.incXI',
+      'art134.par1',
+      'art45',
+      'art90',
+      'art90.incIII',
+      'art90.incIV',
+      'art93',
+      'art93.incVIII',
+      'art93.incVIIIA',
+    ]);
+    // Regra 10: o rótulo antigo dá a origem da renumeração.
+    expect(porEndereco(r, 'art134.incXI')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'art134.incX',
+    });
+    expect(porEndereco(r, 'art134.par1')).toMatchObject({
+      status: 'renumerado',
+      renumeradoDe: 'art134.parUnico',
+    });
+    expect(textoDe(porEndereco(r, 'art134.par1')?.trechos ?? [])).toBe(
+      'O Defensor Público não perderá o direito às vantagens pecuniárias.',
+    );
+    // "I I -" é o II da cópia de 1984, que a de 1998 não tem: vai para o artigo, com o endereço lido.
+    expect(redacoes(porEndereco(r, 'art45')).map((x) => [x.linhas.inicio, x.lido])).toEqual([
+      [8, undefined],
+      [9, 'art45.incI'],
+      [10, 'art45.incII'],
+    ]);
+    // "I V -" é o IV antigo, e não continua o III.
+    expect(textoDe(porEndereco(r, 'art90.incIII')?.trechos ?? [])).toBe('colocação familiar;');
+    expect(redacoes(porEndereco(r, 'art90.incIV'))).toEqual([
+      { texto: 'IV - abrigo;', linhas: { inicio: 14, fim: 14 } },
+    ]);
+    // "VIIIA" é o VIII-A antigo: redação dele, e o VIII fica só com o seu texto e a sua nota.
+    expect(notasDo(porEndereco(r, 'art93.incVIII'))).toEqual([
+      '(Redação dada pela Emenda Constitucional nº 103, de 2019)',
+    ]);
+    expect(redacoes(porEndereco(r, 'art93.incVIIIA')).map((x) => [x.linhas, x.nota])).toEqual([
+      [{ inicio: 18, fim: 18 }, '(Incluído pela Emenda Constitucional nº 45, de 2004)'],
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('o art. 1º que recomeça a mesma parte em redação nova não abre bloco: a cópia antiga inteira vira redação, no gêmeo ou no ancestral (CP, Parte Geral de 1940 e de 1984)', () => {
+    const r = puro(
+      'Parte Geral',
+      'TÍTULO I',
+      'Da aplicação da lei penal',
+      'Anterioridade da Lei',
+      'Art. 1° Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.',
+      'Art. 2º Ninguém pode ser punido por fato que lei posterior deixa de considerar crime.',
+      'Parágrafo único. A lei posterior, que de outro modo favorece o agente, aplica-se ao fato não definitivamente julgado.',
+      'Art 120. A rehabilitação é revogada e não pode mais ser concedida.',
+      'PARTE GERAL',
+      'TÍTULO I',
+      'DA APLICAÇÃO DA LEI PENAL',
+      '(Redação dada pela Lei nº 7.209, de 11.7.1984)',
+      'Anterioridade da Lei',
+      'Art. 1º - Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal. (Redação dada pela Lei nº 7.209, de 11.7.1984)',
+      'Lei penal no tempo',
+      'Art. 2º - Ninguém pode ser punido por fato que lei posterior deixa de considerar crime. (Redação dada pela Lei nº 7.209, de 11.7.1984)',
+    );
+    // O artigo de 1940 sem gêmeo (no CP, todos têm) fica onde foi lido, antes dos de 1984, como o
+    // só tachado do HTML.
+    expect(enderecos(r)).toEqual([
+      'parteGeral',
+      'parteGeral.tit1',
+      'parteGeral.tit1.nome',
+      'art120',
+      'art1',
+      'art1.nome',
+      'art2',
+      'art2.nome',
+    ]);
+    expect(redacoes(porEndereco(r, 'parteGeral')).map((x) => x.texto)).toEqual(['Parte Geral']);
+    expect(redacoes(porEndereco(r, 'parteGeral.tit1')).map((x) => x.texto)).toEqual([
+      'TÍTULO I Da aplicação da lei penal',
+    ]);
+    // A rubrica de 1940 entra na redação e não vira o nome do de 1984.
+    expect(redacoes(porEndereco(r, 'art1'))).toEqual([
+      {
+        texto:
+          'Anterioridade da Lei\nArt. 1º Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.',
+        linhas: { inicio: 3, fim: 4 },
+      },
+    ]);
+    expect(nomeDe(porEndereco(r, 'art2'))).toBe('Lei penal no tempo');
+    expect(redacoes(porEndereco(r, 'art2')).map((x) => [x.linhas.inicio, x.lido])).toEqual([
+      [5, undefined],
+      [6, 'art2.parUnico'],
+    ]);
+    // Revogado, com o texto de 1940 na redação.
+    expect(porEndereco(r, 'art120')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(porEndereco(r, 'art120')).map((x) => x.texto)).toEqual([
+      'Art 120. A rehabilitação é revogada e não pode mais ser concedida.',
+    ]);
+    expect(todos(r.nos).some((n) => n.endereco.startsWith('bloco'))).toBe(false);
+    tudoAConfirmar(r);
+  });
+
+  it('sem a nota de redação, ou com o título solto do ADCT, o art. 1º repetido continua abrindo bloco', () => {
+    const semNota = puro(
+      'PARTE GERAL',
+      'Art. 1º Um.',
+      'Art. 2º Dois.',
+      'PARTE GERAL',
+      'Art. 1º Outro.',
+    );
+    expect(
+      todos(semNota.nos)
+        .filter((n) => n.tipo === 'artigo')
+        .map((n) => n.endereco),
+    ).toEqual(['art1', 'art2', 'bloco2.art1']);
+    const adct = puro(
+      'Art. 250. Texto.',
+      'Brasília, 5 de outubro de 1988.',
+      'ATO DAS DISPOSIÇÕES CONSTITUCIONAIS TRANSITÓRIAS',
+      'Art. 1º. O Presidente prestará o compromisso. (Redação dada pela Emenda Constitucional nº 1, de 1992)',
+    );
+    expect(enderecos(adct)).toEqual(['art250', 'adct', 'adct.art1']);
+  });
+
+  it('o anexo da LC-SP 988: o "ANEXO" repetido sem número funde, e o revogado fica com as duas antigas como redações heurísticas', () => {
+    const r = puro(
+      'Artigo 21 - Fica o Poder Executivo autorizado a providenciar os atos necessários.',
+      'Palácio dos Bandeirantes, 9 de janeiro de 2006',
+      'GERALDO ALCKMIN',
+      'ANEXO',
+      'a que se refere o artigo 239, I, da Lei Complementar n° 988, de 9 de janeiro de 2006',
+      '- Subanexo 1 do Anexo substituído pela Lei Complementar n° 1.033, de 28/12/2007, produzindo efeitos a partir de 01/10/2007.',
+      'ANEXO',
+      'a que se refere o artigo 240 da Lei Complementar n° 988, de 9 de janeiro de 2006',
+      '- Subanexo 2 do Anexo substituído pela Lei Complementar n° 1.033, de 28/12/2007, produzindo efeitos a partir de 01/10/2007.',
+      'ANEXO - Revogado.',
+      '- Anexo revogado pela Lei Complementar n° 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+    );
+    const anexo = r.nos.find((n) => n.tipo === 'anexo');
+    expect(anexo).toMatchObject({ endereco: 'anexo', status: 'revogado', trechos: [] });
+    // Cada uma com o cabeçalho e o texto bruto (a nota da ALESP sobre o subanexo, também).
+    expect(redacoes(anexo).map((x) => [x.texto.split('\n')[0], x.linhas])).toEqual([
+      [
+        'ANEXO a que se refere o artigo 239, I, da Lei Complementar nº 988, de 9 de janeiro de 2006',
+        { inicio: 3, fim: 5 },
+      ],
+      [
+        'ANEXO a que se refere o artigo 240 da Lei Complementar nº 988, de 9 de janeiro de 2006',
+        { inicio: 6, fim: 8 },
+      ],
+    ]);
+    expect(notasDo(anexo)).toEqual([
+      'Anexo revogado pela Lei Complementar nº 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+    ]);
+    expect(tipos(r)).toEqual(['duplicata', 'duplicata']);
+    tudoAConfirmar(r);
+  });
+
+  // Achados na revisão da 8.8 (01/10/2026): casos que o corpus não tem, mas o Planalto e a ALESP
+  // podem trazer; cada um daria texto antigo como vigente, ou o vigente como redação.
+  it('a cópia antiga só é a vigente quando a última não traz nota nenhuma: "(Revogado)", "(VETADO)", "Vide" ou "(NR)" na última a mantêm, como no HTML', () => {
+    const linhas = [
+      'Art. 1º Texto do artigo.',
+      '§ 1º Texto do primeiro.',
+      '§ 2º Texto incluído. (Incluído pela Lei nº 1.000, de 2000)',
+      '§ 2º (Revogado).',
+      '§ 3º Texto incluído. (Incluído pela Lei nº 1.000, de 2000)',
+      '§ 3º (VETADO)',
+      'Art. 2º Texto original.',
+      'Art. 2º Texto de 2000. (Redação dada pela Lei nº 2.000, de 2000)',
+      'Art. 2º Texto de 2026. (Vide Lei nº 3.000, de 2026)',
+    ];
+    const r = puro(...linhas);
+    expect(semConfianca(r)).toEqual(semConfianca(estruturar(blocos(...linhas))));
+    const par2 = porEndereco(r, 'art1.par2');
+    expect(par2).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(par2)).toEqual([
+      {
+        texto: '§ 2º Texto incluído.',
+        linhas: { inicio: 2, fim: 2 },
+        nota: '(Incluído pela Lei nº 1.000, de 2000)',
+      },
+    ]);
+    expect(porEndereco(r, 'art1.par3')?.status).toBe('vetado');
+    expect(redacoes(porEndereco(r, 'art1.par3')).map((x) => x.texto)).toEqual([
+      '§ 3º Texto incluído.',
+    ]);
+    const art2 = porEndereco(r, 'art2');
+    expect(textoDe(art2?.trechos ?? [])).toBe('Texto de 2026.');
+    expect(redacoes(art2).map((x) => x.texto)).toEqual([
+      'Art. 2º Texto original.',
+      'Art. 2º Texto de 2000.',
+    ]);
+    // ALESP: "(NR)" é a nova redação; a nota de inclusão da cópia antiga não a faz vigente.
+    const alesp = puro(
+      'Artigo 3º - Texto do artigo:',
+      'I - texto antigo;',
+      '- Inciso I acrescentado pela Lei Complementar nº 1.000, de 10/10/2000.',
+      'I - texto novo; (NR)',
+    );
+    const inciso = porEndereco(alesp, 'art3.incI');
+    expect(textoDe(inciso?.trechos ?? [])).toBe('texto novo;');
+    expect(redacoes(inciso).map((x) => x.texto)).toEqual(['I - texto antigo;']);
+    tudoAConfirmar(r);
+    // O esqueleto "(Revogado)" vale como a nota de alteração: os filhos da cópia antiga são antigos
+    // (no HTML, tachados) e vão para ele, com o endereço lido, fora do texto vigente.
+    const comFilho = puro(
+      'Art. 4º Texto do artigo.',
+      '§ 2º Texto incluído: (Incluído pela Lei nº 1.000, de 2000)',
+      'I - inciso antigo;',
+      '§ 2º (Revogado).',
+    );
+    expect(enderecos(comFilho)).toEqual(['art4', 'art4.par2']);
+    expect(porEndereco(comFilho, 'art4.par2')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(porEndereco(comFilho, 'art4.par2'))).toEqual([
+      {
+        texto: '§ 2º Texto incluído:',
+        linhas: { inicio: 1, fim: 1 },
+        nota: '(Incluído pela Lei nº 1.000, de 2000)',
+      },
+      { texto: 'I - inciso antigo;', linhas: { inicio: 2, fim: 2 }, lido: 'art4.par2.incI' },
+    ]);
+  });
+
+  it('a revogação que não tira o texto não revoga: "Revogado parcialmente", a da medida provisória com "Vigência encerrada" ou revogada por outra; sozinha, revoga', () => {
+    const linhas = [
+      'Art. 5º Texto em vigor. (Revogado parcialmente pela Lei nº 1.000, de 2000)',
+      'Art. 6º Texto em vigor. (Revogado pela Medida Provisória nº 905, de 2019) (Vigência encerrada)',
+      'Art. 7º Texto em vigor. (Revogado pela Medida Provisória nº 905, de 2019) (Revogado pela Medida Provisória nº 955, de 2020)',
+      'Art. 8º Texto revogado. (Revogado pela Medida Provisória nº 2.180-35, de 2001)',
+    ];
+    const r = puro(...linhas);
+    const html = estruturar(blocos(...linhas));
+    for (const e of ['art5', 'art6', 'art7']) {
+      expect(porEndereco(r, e)).toMatchObject({ status: 'vigente', redacoesAnteriores: [] });
+      expect(textoDe(porEndereco(r, e)?.trechos ?? [])).toBe('Texto em vigor.');
+      expect(semConfianca({ ...r, nos: [porEndereco(r, e) as NoRascunho] })).toEqual(
+        semConfianca({ ...html, nos: [porEndereco(html, e) as NoRascunho] }),
+      );
+    }
+    expect(porEndereco(r, 'art8')).toMatchObject({ status: 'revogado', trechos: [] });
+    expect(redacoes(porEndereco(r, 'art8')).map((x) => x.texto)).toEqual([
+      'Art. 8º Texto revogado.',
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('as notas da rubrica do revogado com texto, e do filho dele que vai para ele, ficam na redação (CP, arts. 240 e 281)', () => {
+    const r = puro(
+      'Adultério (Revogado pela Lei nº 11.106, de 2005)',
+      'Art. 240 - Cometer adultério: (Revogado pela Lei nº 11.106, de 2005)',
+      'Pena - detenção, de quinze dias a seis meses. (Revogado pela Lei nº 11.106, de 2005)',
+      'COMÉRCIO, POSSE OU USO DE ENTORPECENTE. (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)',
+      'Art. 281. Importar ou exportar entorpecente: (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)',
+      '§ 1º Nas mesmas penas incorre quem, indevidamente: (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)',
+      'MATÉRIAS-PRIMAS DESTINADAS À PREPARAÇÃO DE ENTORPECENTES. (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)',
+      'I - importa ou exporta matérias-primas; (Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976)',
+      'Violação de privilégio de invenção',
+      'Art 187. Violar direito de privilégio de invenção ou de descoberta: (Revogado pela Lei nº 9.279, de 14.5.1996)',
+      'Aumento de pena (Incluído pela Lei nº 1.000, de 1990)',
+      'Parágrafo único. A pena é aumentada de um terço.',
+    );
+    // Como no HTML, em que a rubrica vem tachada e a nota dela fica na redação.
+    expect(redacoes(porEndereco(r, 'art240'))).toEqual([
+      {
+        texto: 'Adultério\nArt. 240 - Cometer adultério:',
+        linhas: { inicio: 0, fim: 1 },
+        nota: '(Revogado pela Lei nº 11.106, de 2005)',
+      },
+      {
+        texto: 'Pena - detenção, de quinze dias a seis meses.',
+        linhas: { inicio: 2, fim: 2 },
+        nota: '(Revogado pela Lei nº 11.106, de 2005)',
+      },
+    ]);
+    expect(redacoes(porEndereco(r, 'art281'))[0]).toEqual({
+      texto:
+        'COMÉRCIO, POSSE OU USO DE ENTORPECENTE.\nArt. 281. Importar ou exportar entorpecente:',
+      linhas: { inicio: 3, fim: 4 },
+      nota: '(Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976) (Redação dada pela Lei nº 5.726, de 1971)',
+    });
+    expect(redacoes(porEndereco(r, 'art281.par1.incI'))[0]).toMatchObject({
+      texto:
+        'MATÉRIAS-PRIMAS DESTINADAS À PREPARAÇÃO DE ENTORPECENTES.\nI - importa ou exporta matérias-primas;',
+      nota: '(Redação dada pela Lei nº 5.726, de 1971) (Revogado pela Lei nº 6.368, 1976) (Redação dada pela Lei nº 5.726, de 1971)',
+    });
+    // O parágrafo único sem nota própria de revogação vai para o artigo, com a nota da rubrica.
+    expect(redacoes(porEndereco(r, 'art187'))[1]).toEqual({
+      texto: 'Aumento de pena\nParágrafo único. A pena é aumentada de um terço.',
+      linhas: { inicio: 10, fim: 11 },
+      lido: 'art187.parUnico',
+      nota: '(Incluído pela Lei nº 1.000, de 1990)',
+    });
+    tudoAConfirmar(r);
+  });
+
+  it('as notas do nó estrutural substituído (sem artigo antes do novo) ficam na redação dele, como no HTML (CP, Capítulo V do Título VI)', () => {
+    const r = puro(
+      'TÍTULO VI',
+      'DOS CRIMES CONTRA A DIGNIDADE SEXUAL',
+      'CAPÍTULO V',
+      'DO LENOCÍNIO E DO TRÁFICO DE MULHERES',
+      'CAPÍTULO V',
+      'DO LENOCÍNIO E DO TRÁFICO DE PESSOAS',
+      '(Redação dada pela Lei nº 11.106, de 2005)',
+      'CAPÍTULO V',
+      'DO LENOCÍNIO E DO TRÁFICO DE PESSOA PARA FIM DE PROSTITUIÇÃO OU OUTRA FORMA DE EXPLORAÇÃO SEXUAL',
+      '(Redação dada pela Lei nº 12.015, de 2009)',
+      'Mediação para servir a lascívia de outrem',
+      'Art. 227 - Induzir alguém a satisfazer a lascívia de outrem:',
+    );
+    const cap5 = porEndereco(r, 'tit6.cap5');
+    expect(notasDo(cap5)).toEqual(['(Redação dada pela Lei nº 12.015, de 2009)']);
+    expect(redacoes(cap5)).toEqual([
+      { texto: 'CAPÍTULO V DO LENOCÍNIO E DO TRÁFICO DE MULHERES', linhas: { inicio: 2, fim: 3 } },
+      {
+        texto: 'CAPÍTULO V DO LENOCÍNIO E DO TRÁFICO DE PESSOAS',
+        linhas: { inicio: 4, fim: 6 },
+        nota: '(Redação dada pela Lei nº 11.106, de 2005)',
+      },
+    ]);
+    tudoAConfirmar(r);
+  });
+
+  it('o parágrafo único de um artigo citado, seguido do § 1º de outro, fica vigente, com o aviso do HTML (ECA, art. 263)', () => {
+    const linhas = [
+      'Art. 263. O Decreto-Lei n.º 2.848, de 7 de dezembro de 1940 (Código Penal), passa a vigorar com as seguintes alterações:',
+      '1) Art. 121 ............................................................',
+      'Parágrafo único. Se o crime é culposo, a pena é aumentada de um terço.',
+      '2) Art. 129 ............................................................',
+      '§ 1º Se resulta incapacidade para as ocupações habituais, por mais de trinta dias:',
+    ];
+    const r = puro(...linhas);
+    const html = estruturar(blocos(...linhas));
+    expect(semConfianca(r)).toEqual(semConfianca(html));
+    expect(porEndereco(r, 'art263')?.redacoesAnteriores).toEqual([]);
+    expect(r.anomalias.filter((a) => a.tipo === 'paragrafo_unico_com_numerado')).toHaveLength(1);
+  });
+
+  it('a parte recomeçada depois do mesmo nome repetido sem artigo: a antiga é a que tem os artigos, e o nome vazio, redação da nova', () => {
+    const r = puro(
+      'PARTE GERAL',
+      'Art. 1º Texto antigo.',
+      'Art. 2º Texto antigo.',
+      'PARTE GERAL',
+      'PARTE GERAL',
+      '(Redação dada pela Lei nº 1.000, de 2000)',
+      'Art. 1º Texto novo.',
+      'Art. 2º Texto novo.',
+    );
+    expect(enderecos(r)).toEqual(['parteGeral', 'art1', 'art2']);
+    expect(redacoes(porEndereco(r, 'parteGeral')).map((x) => [x.texto, x.linhas.inicio])).toEqual([
+      ['PARTE GERAL', 0],
+      ['PARTE GERAL', 3],
+    ]);
+    expect(redacoes(porEndereco(r, 'parteGeral')).filter((x) => x.lido !== undefined)).toEqual([]);
+    expect(redacoes(porEndereco(r, 'art1')).map((x) => x.texto)).toEqual(['Art. 1º Texto antigo.']);
+    expect(redacoes(porEndereco(r, 'art2')).map((x) => x.texto)).toEqual(['Art. 2º Texto antigo.']);
+    expect(r.anomalias.filter((a) => a.tipo === 'estrutural_repetido')).toEqual([]);
+    tudoAConfirmar(r);
+  });
+});

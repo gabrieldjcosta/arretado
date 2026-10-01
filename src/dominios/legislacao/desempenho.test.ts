@@ -1,4 +1,4 @@
-import type { Bloco } from '../../core/seguranca/sanitizador';
+import { textoParaBlocos, type Bloco } from '../../core/seguranca/sanitizador';
 import { estruturar } from './estruturador';
 import { normalizarBlocos } from './normalizacao';
 import type { TipoAnomalia } from './rascunho';
@@ -25,17 +25,18 @@ describe('normalização (8.1): desempenho', () => {
 // Estruturador (8.2–8.7): página hostil com muitas linhas; nenhuma regra pode ser quadrática, e
 // nenhuma lista enorme passa por `push(...itens)`, que estoura a pilha.
 describe('estruturador (8.2–8.7): desempenho', () => {
-  const linhas = (n: number, texto: (k: number) => string) =>
+  // A entrada de cada caso é montada dentro dele: montadas na tabela do `it.each`, as de 100 mil
+  // linhas ficavam todas vivas ao mesmo tempo e pesavam no coletor de lixo (casos perto dos 5 s
+  // com a máquina carregada; achado na revisão da 8.8).
+  const linhas = (n: number, texto: (k: number) => string) => (): Bloco[] =>
     Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
   /** Linhas tachadas (todas, ou as que `tachada` diz; o resto sem tachado). */
-  const tachadas = (
-    n: number,
-    texto: (k: number) => string,
-    tachada: (k: number) => boolean = () => true,
-  ): Bloco[] =>
-    Array.from({ length: n }, (_, k) => ({
-      trechos: [{ texto: texto(k), ...(tachada(k) ? { tachado: true as const } : {}) }],
-    }));
+  const tachadas =
+    (n: number, texto: (k: number) => string, tachada: (k: number) => boolean = () => true) =>
+    (): Bloco[] =>
+      Array.from({ length: n }, (_, k) => ({
+        trechos: [{ texto: texto(k), ...(tachada(k) ? { tachado: true as const } : {}) }],
+      }));
   const par = (k: number) => k % 2 === 0;
   const impar = (k: number) => k % 2 === 1;
   it.each([
@@ -154,9 +155,11 @@ describe('estruturador (8.2–8.7): desempenho', () => {
       tachadas(100_000, (k) => (k ? 'Rubrica antiga' : 'Art. 1º Texto.')),
     ],
     ['títulos tachados sem o vigente', tachadas(100_000, (k) => `TÍTULO ${k % 2 ? 'I' : 'II'}`)],
+    // 50 mil, como os do texto puro: com uma nota e uma fusão por linha, as 100 mil levavam de 3,5
+    // a 4,1 s sozinhas e passavam de 5 s com a máquina carregada (linear; revisão da 8.8).
     [
       'revogados pela nota',
-      linhas(100_000, (k) => (k ? '§ 1º (Revogado pela Lei nº 1, de 2000)' : 'Art. 1º A:')),
+      linhas(50_000, (k) => (k ? '§ 1º (Revogado pela Lei nº 1, de 2000)' : 'Art. 1º A:')),
     ],
     // 8.7: o texto bruto do anexo (linha a linha, e as notas logo depois do cabeçalho), a redação
     // do anexo tachado e 50 mil cabeçalhos de anexo, metade tachados, com o mesmo endereço: os
@@ -213,7 +216,8 @@ describe('estruturador (8.2–8.7): desempenho', () => {
     ],
   ])(
     '%s',
-    (_nome, blocos) => {
+    (_nome, entrada: Bloco[] | (() => Bloco[])) => {
+      const blocos = typeof entrada === 'function' ? entrada() : entrada;
       const inicio = performance.now();
       estruturar(blocos);
       expect(performance.now() - inicio).toBeLessThan(5_000);
@@ -281,4 +285,120 @@ describe('validação (8.7): desempenho', () => {
     },
     20_000,
   );
+});
+
+// Reserva em texto puro (8.8, `formato: 'texto'`): o endereço repetido milhares de vezes com
+// "Redação dada" (a cópia antiga inteira fica provisória, e os filhos sem gêmeo vão para o
+// ancestral), o art. 1º que recomeça a mesma parte, o revogado com texto e os filhos dele, o
+// parágrafo único antes do § 1º, a pena e a rubrica antigas em cadeia, o rótulo antigo ao lado do
+// novo. 50 mil linhas, quase todas com nota: ler a nota custa o mesmo no HTML, e o tempo dobra com
+// o dobro de linhas (medido em 25, 50 e 100 mil, nos dois formatos). E o CP inteiro colado como
+// texto, repetido: o tempo acompanha o tamanho.
+const CP_TEXTO = import.meta.glob<string>('../../../corpus/normas/cp.colado.txt', {
+  query: '?raw',
+  import: 'default',
+  eager: false,
+});
+
+describe('reserva em texto puro (8.8): desempenho', () => {
+  const linhas = (n: number, texto: (k: number) => string): Bloco[] =>
+    Array.from({ length: n }, (_, k) => ({ trechos: [{ texto: texto(k) }] }));
+  const REDACAO = '(Redação dada pela Lei nº 1, de 2000)';
+  const REVOGADO = '(Revogado pela Lei nº 1, de 2000)';
+  const N = 50_000;
+  it.each([
+    [
+      'mesmo artigo repetido com "Redação dada"',
+      () => linhas(N, () => `Art. 1º Texto. ${REDACAO}`),
+    ],
+    [
+      'artigo com "Redação dada" e parágrafo antigo de mesmo endereço, repetidos',
+      () => linhas(N, (k) => (k % 2 ? '§ 1º Antigo.' : `Art. 1º Texto. ${REDACAO}`)),
+    ],
+    [
+      'artigo com "Redação dada" e parágrafos antigos sem gêmeo',
+      () =>
+        linhas(N, (k) =>
+          k % 2 ? `§ ${String((k >> 1) + 1)}º Antigo.` : `Art. 1º Texto. ${REDACAO}`,
+        ),
+    ],
+    [
+      'art. 1º recomeçando a mesma parte',
+      () =>
+        linhas(
+          N,
+          (k) => ['PARTE GERAL', `Art. 1º Texto. ${REDACAO}`, 'Art. 2º Texto.'][k % 3] ?? '',
+        ),
+    ],
+    [
+      'revogados com texto e incisos sem nota',
+      () =>
+        linhas(N, (k) =>
+          k % 4
+            ? `${['I', 'II', 'III'][(k % 4) - 1] ?? ''} - inciso;`
+            : `Art. ${String(k / 4 + 1)}. Texto: ${REVOGADO}`,
+        ),
+    ],
+    [
+      'revogado com texto e penas sem fim',
+      () => linhas(N, (k) => (k ? `Pena - multa. ${REVOGADO}` : `Art. 1º Texto: ${REVOGADO}`)),
+    ],
+    [
+      'parágrafo único antes do § 1º',
+      () =>
+        linhas(
+          N,
+          (k) =>
+            [
+              `Art. ${String(Math.floor(k / 3) + 1)}. Texto.`,
+              'Parágrafo único. Antigo.',
+              '§ 1º Novo.',
+            ][k % 3] ?? '',
+        ),
+    ],
+    [
+      'penas antigas em cadeia',
+      () => linhas(N, (k) => (k ? `Pena - multa. ${REDACAO}` : 'Art. 1º A:')),
+    ],
+    [
+      // Copiar a lista das rubricas substituídas a cada rubrica nova ficava quadrático.
+      'rubricas que se substituem sem fim',
+      () => linhas(N, (k) => (k ? `Rubrica nova ${REDACAO}` : 'Art. 1º Texto.')),
+    ],
+    [
+      'rótulos antigos ao lado dos novos',
+      () =>
+        linhas(N, (k) =>
+          k ? `${k % 2 ? 'I' : 'II'} ${k % 2 ? 'II' : 'I'} - texto;` : 'Art. 1º A:',
+        ),
+    ],
+  ])(
+    '%s',
+    (_nome, gerar) => {
+      // A entrada nasce aqui, e não na tabela: cinquenta mil linhas por caso, todas vivas ao mesmo
+      // tempo, pesavam no coletor de lixo dos casos seguintes.
+      const blocos = gerar();
+      const inicio = performance.now();
+      estruturar(blocos, { formato: 'texto' });
+      expect(performance.now() - inicio).toBeLessThan(5_000);
+    },
+    20_000,
+  );
+
+  it('o CP colado como texto, repetido 8 vezes (28 mil linhas): o tempo acompanha o tamanho', async () => {
+    const carregar = CP_TEXTO['../../../corpus/normas/cp.colado.txt'];
+    if (!carregar) throw new Error('sem o colado do CP');
+    const uma = textoParaBlocos(await carregar());
+    const medir = (blocos: readonly Bloco[]) => {
+      const inicio = performance.now();
+      estruturar(blocos, { formato: 'texto' });
+      return performance.now() - inicio;
+    };
+    medir(uma);
+    const umaVez = medir(uma);
+    const oito = medir(Array.from({ length: 8 }, () => uma).flat());
+    expect(oito).toBeLessThan(5_000);
+    // Linear, com folga para a carga da máquina (quadrático daria 64 vezes).
+    expect(oito).toBeLessThan(16 * Math.max(umaVez, 50));
+  }, 60_000);
 });

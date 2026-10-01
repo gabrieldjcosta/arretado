@@ -119,6 +119,24 @@ export function juntarTrechos(partes: readonly Trecho[][]): Trecho[] {
   return aparar(saida);
 }
 
+/** Linhas de uma redação anterior (rubricas, texto), separadas por quebra de linha. */
+export function juntarLinhasDaRedacao(partes: readonly Trecho[][]): Trecho[] {
+  const saida: Trecho[] = [];
+  for (const p of partes) emendar(saida, p, '\n');
+  return saida;
+}
+
+/** Emenda os trechos no fim dos de destino, com o separador entre os dois (sem cópia: linear). */
+export function emendar(
+  destino: Trecho[],
+  trechos: readonly Trecho[],
+  separador: '\n' | ' ',
+): void {
+  if (trechos.length === 0) return;
+  if (destino.length > 0) destino.push({ texto: separador });
+  acrescentar(destino, trechos);
+}
+
 /** `push(...itens)` estoura a pilha com centenas de milhares de itens (página hostil). */
 export function acrescentar<T>(destino: T[], itens: readonly T[]): void {
   for (const x of itens) destino.push(x);
