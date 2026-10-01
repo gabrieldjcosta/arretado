@@ -13,7 +13,7 @@ Gerado por `npm run corpus:gabarito` (F2, atividade 7.3), que só regrava esta f
 - Dispositivos: 1422 (artigo 434, paragrafo 494, inciso 411, alinea 83)
 - Artigos: vigente 404, revogado 27, vetado 3; com letra (9º-A…): 73; último: art361
 - Redações anteriores: 883 em 430 dispositivos
-- Notas de vigência no texto vigente: 1190
+- Notas de vigência no texto vigente: 1191
 - Estrutura: parte 2, titulo 20, capitulo 59, secao 7
 
 ## Amostra (50 dispositivos)

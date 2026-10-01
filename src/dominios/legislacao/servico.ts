@@ -18,7 +18,7 @@ import type { Bloco } from '../../core/seguranca/sanitizador';
 import { sha256 } from '../../core/util/sha256';
 import { dispositivosDaNorma, todos } from './consultas';
 import { estruturar } from './estruturador';
-import type { Anomalia, Rascunho } from './rascunho';
+import type { Anomalia, FormatoEntrada, Rascunho } from './rascunho';
 import {
   dadosDaNorma,
   FonteIlegivel,
@@ -33,6 +33,7 @@ import {
   TIPO_FONTE,
   type OrigemImportacao,
 } from './registros';
+import { validarNos, type NoValidado } from './validacao';
 
 export interface EntradaRascunho {
   /** Saída do sanitizador (colar, URL, arquivo) ou de `textoParaBlocos` (texto puro). */
@@ -294,54 +295,36 @@ export class PublicacaoBloqueada extends Error {
 /**
  * Confere a árvore GRAVADA (não a da fonte): o que se publica é o que está nos registros, e o
  * editor (etapa 10) muda os registros, não a fonte. As anomalias do estruturador não são
- * gravadas (9.2); aqui saem os dois conflitos que já existem: norma sem artigo (`sem_artigos`) e
- * endereço repetido (`endereco_duplicado`). A 8.7 acrescenta os outros da regra 13.
- *
- * Endereço repetido: se todos os repetidos são nós estruturais (LC 80: duas "SEÇÃO IV" no mesmo
- * capítulo), só avisa, porque o leitor lê a norma e a revisão (etapa 10) corrige o rótulo; se
- * algum é dispositivo (artigo a item, nome, preâmbulo, anexo), bloqueia. Decisão da 9.3, até a
- * 8.7 (ver "Fatos da publicação (9.3)" no plano): a 8.7 reexamina o estrutural repetido.
+ * gravadas (9.2); aqui sai a validação estrutural inteira (regra 13, `validarNos`, a mesma que o
+ * estruturador roda sobre o rascunho, com as mesmas frases) sobre os registros lidos, separada
+ * pela gravidade: conflitos (norma sem artigo, endereço repetido com algum dispositivo) bloqueiam;
+ * avisos só informam. O endereço repetido só de nós estruturais (LC 80: duas "SEÇÃO IV" no mesmo
+ * capítulo) é aviso (`estrutural_repetido`): decidido na 9.3 e confirmado na 8.7, porque o artigo é
+ * único, o leitor lê a norma e a revisão (etapa 10) corrige o rótulo. `aConfirmar` é a contagem
+ * gravada (o nó em conflito já foi gravado "a confirmar" pelo estruturador).
  */
-function relatorioDaArvore(dispositivos: readonly Dispositivo[]): RelatorioDePublicacao {
+function relatorioDaArvore(
+  dispositivos: readonly Dispositivo[],
+  formato: FormatoEntrada,
+): RelatorioDePublicacao {
+  const indice = new Map(dispositivos.map((d, k) => [d.id, k]));
+  const nos = dispositivos.map((d): NoValidado => {
+    const pai = d.paiId === undefined ? undefined : indice.get(d.paiId);
+    return {
+      tipo: d.tipo,
+      endereco: d.endereco,
+      ...(d.rotulo === undefined ? {} : { rotulo: d.rotulo }),
+      status: d.status,
+      confianca: d.confianca,
+      estrutural: d.categoria === 'estrutural',
+      ...(pai === undefined ? {} : { pai }),
+    };
+  });
   const conflitos: Anomalia[] = [];
   const avisos: Anomalia[] = [];
-  const porEndereco = new Map<string, Dispositivo[]>();
-  let artigos = 0;
-  let aConfirmar = 0;
-  for (const d of dispositivos) {
-    if (d.tipo === 'artigo') artigos += 1;
-    if (d.confianca === 'a_confirmar') aConfirmar += 1;
-    const lista = porEndereco.get(d.endereco);
-    if (lista) lista.push(d);
-    else porEndereco.set(d.endereco, [d]);
-  }
-  if (artigos === 0) {
-    conflitos.push({
-      tipo: 'sem_artigos',
-      gravidade: 'conflito',
-      mensagem: 'Não consegui identificar artigos.',
-    });
-  }
-  for (const [endereco, lista] of porEndereco) {
-    if (lista.length < 2) continue;
-    const rotulos = [...new Set(lista.map((d) => d.rotulo ?? endereco))].join(', ');
-    const onde = `O endereço ${endereco} aparece ${String(lista.length)} vezes (${rotulos})`;
-    if (lista.every((d) => d.categoria === 'estrutural')) {
-      avisos.push({
-        tipo: 'endereco_duplicado',
-        gravidade: 'aviso',
-        endereco,
-        mensagem: `${onde}: a fonte repete a numeração. Dá para publicar; corrija o rótulo na revisão.`,
-      });
-    } else {
-      conflitos.push({
-        tipo: 'endereco_duplicado',
-        gravidade: 'conflito',
-        endereco,
-        mensagem: `${onde}. Corrija antes de publicar.`,
-      });
-    }
-  }
+  for (const a of validarNos(nos, formato))
+    (a.gravidade === 'conflito' ? conflitos : avisos).push(a);
+  const aConfirmar = dispositivos.filter((d) => d.confianca === 'a_confirmar').length;
   return { conflitos, avisos, aConfirmar, totalDispositivos: dispositivos.length };
 }
 
@@ -397,6 +380,7 @@ async function prepararPublicacao(repo: Repositorio, versaoId: string) {
   await exigirVersaoUnica(repo, norma.id, versao.id);
   const relatorio = relatorioDaArvore(
     await dispositivosDaNorma(repo.colecao('dispositivos'), norma.id, false),
+    formatoDaOrigem(versao.origemEntrada),
   );
   return { norma, versao, relatorio };
 }

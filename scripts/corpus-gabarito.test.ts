@@ -461,6 +461,45 @@ describe('acertos da 8.5 (o gabarito regerado uma vez só; examinados na página
   });
 });
 
+describe('acerto da 8.7 (nota de renumeração que começa pelo dispositivo; examinada na página)', () => {
+  it('"(Parágrafo único renumerado…)" e "(Transformado em § 1º…)" saem do texto (CP, art. 153; CF, arts. 102 e 198)', () => {
+    expect(
+      separarNotas(
+        '§ 1º Somente se procede mediante representação. (Parágrafo único renumerado pela Lei nº 9.983, de 2000)',
+      ),
+    ).toEqual({
+      texto: '§ 1º Somente se procede mediante representação.',
+      notas: ['(Parágrafo único renumerado pela Lei nº 9.983, de 2000)'],
+    });
+    expect(
+      separarNotas(
+        '§ 1º. O sistema único de saúde será financiado. (Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)',
+      ).notas,
+    ).toEqual(['(Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)']);
+    expect(
+      separarNotas(
+        '§ 1º A argüição será apreciada pelo Supremo Tribunal Federal, na forma da lei. (Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)',
+      ),
+    ).toEqual({
+      texto: '§ 1º A argüição será apreciada pelo Supremo Tribunal Federal, na forma da lei.',
+      notas: ['(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)'],
+    });
+    // As outras formas da mesma regra; o parêntese do texto da lei fica (LEP, art. 120, II).
+    for (const nota of [
+      '(Parágrafo Renumerado pela Emenda Constitucional nº 33, de 2001)',
+      '(Inciso VI renumerado pela Lei nº 1, de 2000)',
+      '(Alínea b transformada em alínea a pela Lei nº 2, de 2001)',
+      '(Item 2 renumerado pela Lei nº 3, de 2002)',
+      '(§ 2º renumerado para § 3º pela Lei nº 4, de 2003)',
+    ])
+      expect(separarNotas(`I - texto; ${nota}`)).toEqual({ texto: 'I - texto;', notas: [nota] });
+    expect(
+      separarNotas('II - necessidade de tratamento médico (parágrafo único do artigo 14).').notas,
+    ).toEqual([]);
+    expect(separarNotas('III - cargos (Transformação prevista em lei).').notas).toEqual([]);
+  });
+});
+
 describe('correções da revisão da etapa 7', () => {
   it('linha que continua o parágrafo, nome do nó em duas linhas e rubrica antes de tachado', () => {
     const inv = inventario(

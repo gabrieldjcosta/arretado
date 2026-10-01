@@ -2,8 +2,9 @@
 // estrutural (tipo, rótulo, nome e primeiro artigo de cada nó; 8.2), os blocos pré-normativos
 // (regra 2) das 11 páginas, os artigos, em ordem, sem sangria e com a rubrica (regras 4 e 5; 8.3),
 // os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4) e as
-// notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito, e o status e as
-// redações anteriores de cada dispositivo (regras 8 a 10 e VETADO; 8.6), sem tolerância.
+// notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito, o status e as
+// redações anteriores de cada dispositivo (regras 8 a 10 e VETADO; 8.6), sem tolerância, e o
+// anexo (regra 11), a confiança (regra 12) e o relatório de anomalias (regra 13; 8.7).
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
 import { novoId } from '../../core/ids';
 import { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
@@ -23,7 +24,7 @@ import { PROFUNDIDADE, type TipoDeDispositivo } from './dispositivo';
 import { estruturar } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
 import { normalizarBlocos } from './normalizacao';
-import type { NoRascunho, Rascunho } from './rascunho';
+import type { NoRascunho, Rascunho, TipoAnomalia } from './rascunho';
 import {
   dadosDaNorma,
   notaMaisRecenteDoModelo,
@@ -31,6 +32,7 @@ import {
   registrosDaArvore,
 } from './registros';
 import { sumarioDoRascunho } from './sumario';
+import { GRAVIDADE, validarEstrutura } from './validacao';
 
 const HTML = import.meta.glob<string>('../../../corpus/normas/*.colado.html', {
   query: '?raw',
@@ -174,8 +176,207 @@ describe('estruturador (8.2) no corpus: blocos pré-normativos (regra 2)', () =>
       expect(r.anomalias.filter((a) => a.tipo === 'estrutural_substituido')).toHaveLength(
         id === 'cp' ? 2 : 0,
       );
-      // Anexo depois da assinatura (regra 11, a 8.7 completa): só na LC-SP 988.
+      // Anexo depois da assinatura (regra 11): só na LC-SP 988.
+      expect(r.nos.filter((n) => n.tipo === 'anexo').map((n) => n.endereco)).toEqual(
+        id === 'lc-sp-988' ? ['anexo'] : [],
+      );
       expect(r.nos[r.nos.length - 1]?.tipo === 'anexo').toBe(id === 'lc-sp-988');
+    },
+    60_000,
+  );
+
+  // Regra 11 e a regra 8 no anexo (8.7): os dois anexos antigos, todo tachados ("~~ANEXO~~ / ~~a
+  // que se refere o artigo 239, I…~~" e "…artigo 240…"), são as redações anteriores do "ANEXO -
+  // Revogado.", com a nota da ALESP logo depois dele; como no gabarito.
+  it('o anexo da LC-SP 988: revogado, com a nota e as duas redações tachadas', async () => {
+    const r = await rascunho('lc-sp-988');
+    const anexo = r.nos[r.nos.length - 1];
+    expect(anexo).toMatchObject({
+      tipo: 'anexo',
+      endereco: 'anexo',
+      rotulo: 'ANEXO',
+      rotuloLido: 'ANEXO -',
+      status: 'revogado',
+      trechos: [],
+      confianca: 'alta',
+      notas: [expect.objectContaining({ lei: 'Lei Complementar nº 1.112', ano: 2010 })],
+    });
+    expect(
+      anexo?.redacoesAnteriores.map((x) => [
+        x.origemDeteccao,
+        x.confirmada,
+        textoDe(x.trechos).split('\n').slice(0, 2),
+        x.linhas.fim - x.linhas.inicio + 1,
+      ]),
+    ).toEqual([
+      [
+        'tachado',
+        true,
+        [
+          'ANEXO',
+          'a que se refere o artigo 239, I, da Lei Complementar nº 988, de 9 de janeiro de 2006',
+        ],
+        5,
+      ],
+      [
+        'tachado',
+        true,
+        [
+          'ANEXO',
+          'a que se refere o artigo 240 da Lei Complementar nº 988, de 9 de janeiro de 2006',
+        ],
+        4,
+      ],
+    ]);
+  }, 60_000);
+});
+
+/**
+ * `Rascunho.linhasTachadas` (sumário da 9.5): LC-SP 988 164 desde a 8.7 (155 e as 9 linhas dos
+ * dois anexos tachados; a linha tachada antes do primeiro "ANEXO" fica no fecho).
+ */
+const LINHAS_TACHADAS: Record<string, number> = {
+  lep: 86,
+  cp: 1_210,
+  lc80: 87,
+  'lc-sp-988': 164,
+  eca: 209,
+  cdc: 14,
+  cf: 765,
+};
+
+/**
+ * Regra 12 (8.7): os nós com confiança média, todos por heurística. No CP, as rubricas duvidosas
+ * (art. 218-B, terminada em ponto; art. 360, "DISPOSIÇÕES FINAIS", título sem rótulo; o 281, só na
+ * compilada), a duplicata do art. 141, § 2º, e o Título VI e o Capítulo I dele, substituídos; no
+ * ECA, a duplicata do art. 263; na LC-SP 988, o art. 159, que recebe a linha continuada. Nenhum "a
+ * confirmar" no HTML.
+ */
+const CONFIANCA_MEDIA: Record<string, string[]> = {
+  cp: [
+    'art141.par2',
+    'art218B.nome',
+    'art360.nome',
+    'parteEspecial.tit6',
+    'parteEspecial.tit6.cap1',
+  ],
+  'cp-compilado': ['art218B.nome', 'art281.nome', 'art360.nome'],
+  eca: ['art263.parUnico'],
+  'eca-compilado': ['art263.parUnico'],
+  'lc-sp-988': ['art159'],
+};
+
+describe('estruturador (8.7) no corpus: linhas tachadas e confiança (regras 11 e 12)', () => {
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s',
+    async (id) => {
+      const r = await rascunho(id);
+      expect(r.linhasTachadas).toBe(LINHAS_TACHADAS[id] ?? 0);
+      const naoAlta: [string, string][] = [];
+      const pilha = [...r.nos];
+      for (let no = pilha.pop(); no; no = pilha.pop()) {
+        if (no.confianca !== 'alta') naoAlta.push([no.endereco, no.confianca]);
+        pilha.push(...no.filhos);
+      }
+      naoAlta.sort(([a], [b]) => (a < b ? -1 : 1));
+      expect(naoAlta).toEqual((CONFIANCA_MEDIA[id] ?? []).map((e) => [e, 'media']));
+    },
+    60_000,
+  );
+});
+
+/**
+ * Relatório de anomalias (regras 12 e 13, 8.7), medido em 30/09/2026: nenhum conflito nas 11
+ * páginas. Alínea sem inciso (lei anterior à LC 95/1998; no CP, 24 vigentes e as 3 revogadas do
+ * art. 224, que a compilada não tem) e item sem alínea (LC-SP 988; no ECA, o art. 263, que cita o
+ * CP) só avisam. O resto, pelo endereço em `AVISOS_DA_VALIDACAO`.
+ */
+const ANOMALIAS: Record<string, Partial<Record<TipoAnomalia, number>>> = {
+  lep: { alinea_sem_inciso: 24 },
+  'lep-compilado': { alinea_sem_inciso: 24 },
+  cp: {
+    duplicata: 1,
+    estrutural_substituido: 2,
+    tachado_sem_dispositivo: 1,
+    artigo_ausente: 1,
+    alinea_sem_inciso: 27,
+    paragrafo_unico_com_numerado: 2,
+    paragrafo_1_sem_2: 2,
+  },
+  'cp-compilado': {
+    artigo_ausente: 1,
+    alinea_sem_inciso: 24,
+    paragrafo_unico_com_numerado: 1,
+    paragrafo_1_sem_2: 1,
+  },
+  lc80: { estrutural_repetido: 2, alinea_sem_inciso: 10, paragrafo_unico_com_numerado: 1 },
+  'lc-sp-988': { linha_solta: 1, linha_continuada: 1, alinea_sem_inciso: 8, item_sem_alinea: 36 },
+  eca: { duplicata: 1, alinea_sem_inciso: 28, item_sem_alinea: 5, paragrafo_unico_com_numerado: 1 },
+  'eca-compilado': {
+    linha_solta: 1,
+    duplicata: 1,
+    alinea_sem_inciso: 28,
+    item_sem_alinea: 5,
+    paragrafo_unico_com_numerado: 1,
+  },
+  cdc: { alinea_sem_inciso: 2 },
+  'cdc-compilado': { alinea_sem_inciso: 2 },
+  cf: {},
+};
+
+/**
+ * Os avisos da regra 13 que não são alínea nem item, na ordem do relatório. CP: o art. 359-S some
+ * com o Capítulo V, vetado (a página só traz "(VETADO)" sob ele); o art. 92 tem sem tachado o
+ * antigo parágrafo único ao lado do § 1º (falha da fonte), e o 216-A, o parágrafo único vetado e o
+ * § 2º; o art. 168 tem só o § 1º (lei válida), e no 234 a fonte rotula "§ 1º." o parágrafo único.
+ * LC 80: as duas "SEÇÃO IV" e o art. 54 (parágrafo único e § 2º vetados). ECA: o art. 263 lê a
+ * alteração do CP (§ 4º do art. 121 e parágrafo único do art. 213) como dispositivos.
+ */
+const AVISOS_DA_VALIDACAO: Record<string, [TipoAnomalia, string][]> = {
+  cp: [
+    ['artigo_ausente', 'art359T'],
+    ['paragrafo_unico_com_numerado', 'art92'],
+    ['paragrafo_unico_com_numerado', 'art216A'],
+    ['paragrafo_1_sem_2', 'art168'],
+    ['paragrafo_1_sem_2', 'art234'],
+  ],
+  'cp-compilado': [
+    ['artigo_ausente', 'art359T'],
+    ['paragrafo_unico_com_numerado', 'art216A'],
+    ['paragrafo_1_sem_2', 'art168'],
+  ],
+  lc80: [
+    ['estrutural_repetido', 'tit3.cap1.sec4'],
+    ['estrutural_repetido', 'tit3.cap1.sec4.nome'],
+    ['paragrafo_unico_com_numerado', 'art54'],
+  ],
+  eca: [['paragrafo_unico_com_numerado', 'art263']],
+  'eca-compilado': [['paragrafo_unico_com_numerado', 'art263']],
+};
+
+describe('validação (8.7) no corpus: relatório de anomalias (regras 12 e 13)', () => {
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s',
+    async (id) => {
+      const r = await rascunho(id);
+      const porTipo: Partial<Record<TipoAnomalia, number>> = {};
+      for (const a of r.anomalias) porTipo[a.tipo] = (porTipo[a.tipo] ?? 0) + 1;
+      expect(porTipo).toEqual(ANOMALIAS[id]);
+      expect(r.anomalias.filter((a) => a.gravidade === 'conflito')).toEqual([]);
+      // Toda anomalia, da leitura ou da validação, tem a gravidade do mapa.
+      expect(r.anomalias.filter((a) => a.gravidade !== GRAVIDADE[a.tipo])).toEqual([]);
+      const validacao = validarEstrutura(r);
+      expect(r.anomalias.slice(r.anomalias.length - validacao.length)).toEqual(validacao);
+      expect(
+        validacao
+          .filter((a) => a.tipo !== 'alinea_sem_inciso' && a.tipo !== 'item_sem_alinea')
+          .map((a) => [a.tipo, a.endereco]),
+      ).toEqual(AVISOS_DA_VALIDACAO[id] ?? []);
+      // A tela mostra uma linha por frase: uma só para todas as alíneas, uma para os itens.
+      for (const tipo of ['alinea_sem_inciso', 'item_sem_alinea'] as const) {
+        const frases = new Set(r.anomalias.filter((a) => a.tipo === tipo).map((a) => a.mensagem));
+        expect(frases.size).toBe(porTipo[tipo] ? 1 : 0);
+      }
     },
     60_000,
   );
@@ -224,9 +425,11 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
   );
 
   // Salvaguarda da leitura antecipada, agora pela regra 8: nenhuma linha tachada vira texto
-  // vigente, e nenhuma some. Cada uma fica numa redação anterior, no fecho, no anexo ou, só o título de 1940 do CP
-  // ("CÓDIGO PENAL", antes da Parte Geral de 1940), numa sobra com aviso. Linha vigente só é
-  // descarte no cabeçalho, no fecho e nas sobras já conhecidas.
+  // vigente, e nenhuma some. Cada uma fica numa redação anterior (também a do anexo tachado, 8.7),
+  // no fecho ou, só o título de 1940 do CP ("CÓDIGO PENAL", antes da Parte Geral de 1940), numa
+  // sobra com aviso; e `linhasTachadas` conta exatamente as de fora do cabeçalho e do fecho (no
+  // corpus, nenhuma no texto bruto de um anexo vigente, onde ficaria com a marca e só contaria com
+  // o anexo revogado). Linha vigente só é descarte no cabeçalho, no fecho e nas sobras conhecidas.
   it.each([...COM_GABARITO, ...COMPILADAS])(
     '%s: linha tachada nunca vira texto vigente nem some, e linha vigente não vai para o descarte',
     async (id) => {
@@ -236,11 +439,15 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
       const cobrir = ({ inicio, fim }: { inicio: number; fim: number }) => {
         for (let i = inicio; i <= fim; i++) cobertas.add(i);
       };
-      for (const d of r.descartes) cobrir(d.linhas);
+      const foraDaNorma = new Set<number>();
+      for (const d of r.descartes) {
+        cobrir(d.linhas);
+        if (d.motivo !== 'sobra')
+          for (let i = d.linhas.inicio; i <= d.linhas.fim; i++) foraDaNorma.add(i);
+      }
       const pilha = [...r.nos];
       for (let no = pilha.pop(); no; no = pilha.pop()) {
         for (const red of no.redacoesAnteriores) cobrir(red.linhas);
-        if (no.tipo === 'anexo') cobrir(no.linhas);
         pilha.push(...no.filhos);
       }
       const tachadas = linhas.filter((l) => l.tachada);
@@ -248,6 +455,7 @@ describe('estruturador (8.3) no corpus: artigos em ordem, sem sangria, com a rub
       expect(tachadas.filter((l) => !cobertas.has(l.i)).map((l) => l.texto.slice(0, 60))).toEqual(
         [],
       );
+      expect(r.linhasTachadas).toBe(tachadas.filter((l) => !foraDaNorma.has(l.i)).length);
       const sobras = r.descartes
         .filter((d) => d.motivo === 'sobra')
         .map((d) => textoDe(blocos[d.linhas.inicio]?.trechos ?? []));
@@ -301,7 +509,7 @@ const DIFERENCA_DA_COMPILADA: Record<string, { aMais: string[]; aMenos: string[]
 
 /**
  * Nó estrutural repetido com artigo no meio (falha da fonte, também no gabarito): a LC 80 tem duas
- * "SEÇÃO IV" no Capítulo I do Título III (a segunda seria a V). A 8.7 acusa `endereco_duplicado`.
+ * "SEÇÃO IV" no Capítulo I do Título III (a segunda seria a V). A 8.7 avisa (`estrutural_repetido`).
  */
 const ESTRUTURAL_REPETIDO: Record<string, string[]> = {
   lc80: ['tit3.cap1.sec4', 'tit3.cap1.sec4.nome'],
@@ -444,9 +652,13 @@ describe('estruturador (8.4) no corpus: caput, parágrafo, inciso, alínea e ite
   }, 60_000);
 });
 
-/** Regra 7 no texto: parêntese com a chave de nota, ou "Vigência"/"Regulamento"/"Produção de efeitos" no fim. */
+/**
+ * Regra 7 no texto: parêntese com a chave de nota ou com a renumeração dita a partir do
+ * dispositivo ("(Parágrafo único renumerado…)", "(Transformado em § 1º…)", 8.7), ou
+ * "Vigência"/"Regulamento"/"Produção de efeitos" no fim.
+ */
 const NOTA_NO_TEXTO =
-  /\((?:Reda[cç][aã]o dada|Inclu[ií]d[oa]|Revogad[oa] pel|Vide|Renumerad|Acrescid|Express[aã]o |NR\))|(?:Vig[eê]ncia|Regulamento|Produ[cç][aã]o de efeitos?)$/u;
+  /\((?:Reda[cç][aã]o dada|Inclu[ií]d[oa]|Revogad[oa] pel|Vide|Renumerad|Acrescid|Express[aã]o |NR\)|(?:Par[áa]grafo(?: [úu]nico)?|§ ?\d+ ?[ºo°]?|Inciso [IVXLCDM]+|Al[íi]nea \S+|Item \d+) (?:[Rr]enumerad|[Tt]ransformad)|Transformad[oa]s? em)|(?:Vig[eê]ncia|Regulamento|Produ[cç][aã]o de efeitos?)$/u;
 
 /**
  * A nota com lei e ano mais recente de cada norma (8.5), só entre as que alteram o texto: sem o
@@ -533,6 +745,60 @@ describe('estruturador (8.6) no corpus: redação anterior, revogado, renumerado
     },
     60_000,
   );
+
+  it('nota de renumeração que começa pelo dispositivo (8.7): fora do texto, com o status e a origem', async () => {
+    const lidos: unknown[][] = [];
+    for (const [id, endereco] of [
+      ['cp', 'art153.par1'],
+      ['cp-compilado', 'art153.par1'],
+      ['cf', 'art102.par1'],
+      ['cf', 'art198.par1'],
+    ] as const) {
+      const no = comPai((await rascunho(id)).nos).find((x) => x.no.endereco === endereco)?.no;
+      lidos.push([
+        id,
+        endereco,
+        no?.status,
+        no?.renumeradoDe,
+        textoDe(no?.trechos ?? []).slice(-24),
+        no?.notas.map((n) => n.texto),
+      ]);
+    }
+    expect(lidos).toEqual([
+      [
+        'cp',
+        'art153.par1',
+        'renumerado',
+        'art153.parUnico',
+        ' mediante representação.',
+        ['(Parágrafo único renumerado pela Lei nº 9.983, de 2000)'],
+      ],
+      [
+        'cp-compilado',
+        'art153.par1',
+        'renumerado',
+        'art153.parUnico',
+        ' mediante representação.',
+        ['(Parágrafo único renumerado pela Lei nº 9.983, de 2000)'],
+      ],
+      [
+        'cf',
+        'art102.par1',
+        'renumerado',
+        undefined,
+        'ederal, na forma da lei.',
+        ['(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)'],
+      ],
+      [
+        'cf',
+        'art198.par1',
+        'renumerado',
+        'art198.parUnico',
+        ', além de outras fontes.',
+        ['(Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)'],
+      ],
+    ]);
+  }, 60_000);
 });
 
 // A 9.2 grava o rascunho passando cada registro pelo esquema do modelo: um só inválido (link que o

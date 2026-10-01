@@ -91,6 +91,9 @@ describe('notas de vigência (regra 7, 8.5): espécie', () => {
       'Parágrafo único transformado em § 1º pela Lei Complementar nº 1.295, de 02/01/2017.',
       'renumerado',
     ],
+    // Nota que começa pelo dispositivo (8.7; CP, art. 153, § 1º; CF, art. 102, § 1º).
+    ['(Parágrafo único renumerado pela Lei nº 9.983, de 2000)', 'renumerado'],
+    ['(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)', 'renumerado'],
     ['"Caput" acrescentado pela Lei Complementar nº 1.434, de 11/09/2025.', 'incluido'],
     ['Artigo 234 declarado inconstitucional, em controle concentrado, pelo STF.', 'outra'],
     ['7.627', 'outra'],

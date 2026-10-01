@@ -153,6 +153,10 @@ export function categoriaDe(no: NoRascunho, pai?: NoRascunho): 'estrutural' | 'n
   return ESTRUTURAIS.has(tipo) ? 'estrutural' : 'normativo';
 }
 
+/** O rótulo como a gravação o guarda (TextoCurto): a validação do rascunho usa o mesmo, para as frases baterem. */
+export const rotuloDoModelo = (rotulo: string | undefined): string | undefined =>
+  cortar(rotulo, MAX_CURTO);
+
 type TrechoDoModelo = TextoDeDispositivo['trechos'][number];
 type NotaDoModelo = NonNullable<TextoDeDispositivo['notasVigencia']>[number];
 type RedacaoDoModelo = NonNullable<TextoDeDispositivo['redacoesAnteriores']>[number];
@@ -232,7 +236,7 @@ export function registrosDaArvore(nos: readonly NoRascunho[], ids: IdsDaArvore):
         tipo: no.tipo,
         ordem,
         paiId: pai && idDe.get(pai),
-        rotulo: cortar(no.rotulo, MAX_CURTO),
+        rotulo: rotuloDoModelo(no.rotulo),
         // `vetado` (8.6) ainda não está no modelo: grava vigente, com o texto "(VETADO)".
         status: no.status === 'vetado' ? 'vigente' : no.status,
         renumeradoDe: cortar(no.renumeradoDe, MAX_RENUMERADO),

@@ -27,7 +27,8 @@
     "observacoes": [
       "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
       "Conferência reduzida: os 10 itens de risco do topo da folha docs/conferencias/gabarito-cp.md (commit d5e084b), todos sem divergência; o resto da amostra dispensado depois da CF sem divergência.",
-      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: arts. 45 e 334 (pedaço do rótulo fora do tachado, separado por espaço: \"I ~~I - ocorrer…~~\" e a capitular \"A ~~rt. 334…~~\" viram redação anterior; as redações de 1940 do art. 334 saem do art. 333 e do parágrafo único dele e vão para o art. 334 e os §§ 1º e 2º); arts. 158, § 2º, e 159, caput e §§ 1º e 2º (\"Vide Lei nº 8.072, de 25.7.90\", sem parênteses, vira nota). Os 10 itens da conferência reduzida não mudaram e ficaram marcados na folha nova. Novos na amostra, a conferir: art168, art218B.par2.incII, art234.par1."
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: arts. 45 e 334 (pedaço do rótulo fora do tachado, separado por espaço: \"I ~~I - ocorrer…~~\" e a capitular \"A ~~rt. 334…~~\" viram redação anterior; as redações de 1940 do art. 334 saem do art. 333 e do parágrafo único dele e vão para o art. 334 e os §§ 1º e 2º); arts. 158, § 2º, e 159, caput e §§ 1º e 2º (\"Vide Lei nº 8.072, de 25.7.90\", sem parênteses, vira nota). Os 10 itens da conferência reduzida não mudaram e ficaram marcados na folha nova. Novos na amostra, a conferir: art168, art218B.par2.incII, art234.par1.",
+      "8.7 (30/09/2026): mudou só o art. 153, § 1º: \"(Parágrafo único renumerado pela Lei nº 9.983, de 2000)\" saiu do texto e virou nota (1.191 notas). Nenhum item da folha nem da amostra é o art. 153; as 10 marcas foram repostas na folha nova (a folha anterior, com as marcas, está em docs/conferencias/gabarito-cp.antes-8.7.md)."
     ]
   },
   "ultimoArtigo": "art361",
@@ -50,7 +51,7 @@
       "vetado": 3
     },
     "comSufixo": 73,
-    "notasVigencia": 1190,
+    "notasVigencia": 1191,
     "redacoesAnteriores": 883,
     "redacoesPorOrigem": {
       "tachado": 767,
@@ -2633,7 +2634,7 @@
     {"endereco":"art152","status":"vigente","notas":0,"redacoes":0,"nome":true},
     {"endereco":"art152.parUnico","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art153","status":"vigente","notas":1,"redacoes":1,"nome":true},
-    {"endereco":"art153.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art153.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art153.par1A","status":"vigente","notas":2,"redacoes":0},
     {"endereco":"art153.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art154","status":"vigente","notas":1,"redacoes":0,"nome":true},

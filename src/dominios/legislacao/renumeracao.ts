@@ -5,8 +5,10 @@
 // de § 2º para 3º pela…)", "(Parágrafo único renumerado pela Lei…)", "(Parágrafo único
 // renumerado para § 1º pela…)"; ALESP em linha própria: "Inciso X renumerado para inciso XI
 // pela…", "Parágrafo único transformado em § 1° pela…", "Subseção VII renumerada para VIII
-// pela…". Sem a origem ("(Renumerado pela Lei nº 10.792, de 2003)", "(Parágrafo Renumerado
-// pela…)"), só o status. O rótulo antigo tachado ao lado do novo (ALESP: "~~X~~ XI -") é lido em
+// pela…". A nota que começa pelo dispositivo ("(Parágrafo único renumerado…)", CP, art. 153, § 1º)
+// é nota desde a 8.7 (`notas.ts`). Sem a origem ("(Renumerado pela Lei nº 10.792, de 2003)",
+// "(Parágrafo Renumerado pela…)", "(Transformado em § 1º pela…)", CF, art. 102, § 1º), só o
+// status. O rótulo antigo tachado ao lado do novo (ALESP: "~~X~~ XI -") é lido em
 // `rotuloAntigoTachado`.
 import { romano } from './estrutura';
 import type { Linha } from './linhas';
@@ -21,7 +23,7 @@ export interface Origem {
 const ORDINAL = String.raw`(\d{1,3})\s?[ºo°]?(?:\s?-\s?([A-Z]))?`;
 const ROMANO = String.raw`([IVXLCDM]+)(?:\s?-\s?([A-Z]))?`;
 
-/** "parágrafo único", "§ 2º", "inciso VI", "alínea b", "art. 9º-A", "Subseção VII" → origem. */
+/** "parágrafo único", "§ 2º", "inciso VI", "alínea b", "item 2", "art. 9º-A", "Subseção VII" → origem. */
 function origemDe(frase: string): Origem | undefined {
   const f = frase.trim();
   if (/^par[áa]grafo [úu]nico(?!\p{L})/iu.test(f))
@@ -32,6 +34,8 @@ function origemDe(frase: string): Origem | undefined {
   if (m) return { relativo: 'pai', segmento: `inc${m[1] ?? ''}${m[2] ?? ''}` };
   m = /^al[íi]nea\s+["“]?([a-z])["”]?(?!\p{L})/iu.exec(f);
   if (m) return { relativo: 'pai', segmento: `al${(m[1] ?? '').toUpperCase()}` };
+  m = /^item\s+(\d{1,3})(?!\d)/iu.exec(f);
+  if (m) return { relativo: 'pai', segmento: `it${String(Number(m[1]))}` };
   m = new RegExp(String.raw`^art(?:igo|\.)?\s*${ORDINAL}`, 'iu').exec(f);
   if (m) return { relativo: 'norma', segmento: `art${String(Number(m[1]))}${m[2] ?? ''}` };
   m = /^(subse[cç][aã]o|se[cç][aã]o|cap[íi]tulo|t[íi]tulo)\s+([IVXLCDM]+)(?!\p{L})/iu.exec(f);

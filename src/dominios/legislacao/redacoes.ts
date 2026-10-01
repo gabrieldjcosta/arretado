@@ -90,14 +90,25 @@ function comHifenNoSufixo(l: Linha): Linha | undefined {
   return { ...l, trechos, texto, chave: chaveDeCasamento(texto) };
 }
 
+/**
+ * A redação de uma linha tachada (a linha até o fim do tachado) e as notas de fora do tachado,
+ * sem ler o que ela é (o texto bruto do anexo tachado, regra 11, não se estrutura).
+ */
+export function tachadoENotasFora(l: Linha): Pick<LinhaTachada, 'trechos' | 'notasFora'> {
+  const fim = fimDoTachado(l);
+  return {
+    trechos: aparar(recortar(l.trechos, 0, fim)),
+    notasFora: fim < l.texto.length ? separarNotasFinais(l, fim).notas : [],
+  };
+}
+
 /** Lê a linha tachada (`linha.tachada`); `artigo` é o que `lerInicioDeArtigo` já achou na chave. */
 export function lerLinhaTachada(l: Linha, artigo = lerInicioDeArtigo(l.chave)): LinhaTachada {
-  const fim = fimDoTachado(l);
-  const notasFora = fim < l.texto.length ? separarNotasFinais(l, fim).notas : [];
+  const { trechos, notasFora } = tachadoENotasFora(l);
   const base = {
     notasFora,
     revoga: notasFora.some((n) => n.tipo === 'revogado'),
-    trechos: aparar(recortar(l.trechos, 0, fim)),
+    trechos,
     rubrica: false,
   };
   const estrutural = lerRotuloEstrutural({ ...l, tachada: false });
