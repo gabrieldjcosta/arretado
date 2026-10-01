@@ -1,7 +1,8 @@
 // Comparação do rascunho do estruturador com o gabarito da 7.3 (`corpus/normas/*.gabarito.json`),
 // para os testes de src/ e de scripts/: a árvore estrutural (8.2), os artigos com a rubrica (8.3),
 // os dispositivos da regra 6 com endereço, rubrica e texto (8.4), as notas de vigência (8.5) e o
-// status e as redações anteriores (8.6), com o anexo (8.7). A 8.9 traz a métrica completa.
+// status e as redações anteriores (8.6), com o anexo (8.7). A métrica da regressão do corpus
+// (8.9), que junta tudo por página, fica em `metrica.ts`.
 import { textoDe } from '../dominios/legislacao/linhas';
 import type { FaixaDeLinhas, NoRascunho } from '../dominios/legislacao/rascunho';
 
@@ -28,6 +29,11 @@ export interface Gabarito {
   contagens: { redacoesAnteriores: number; redacoesNoAncestral: number };
   /** Situações da página (7.3); `tachado-parcial` traz o endereço. */
   casos: { tipo: string; endereco?: string }[];
+  /**
+   * Conferência da amostra pelo Gabriel (7.3): o portão da F2 (13.4) só se declara medido com os 7
+   * gabaritos `conferida` (decisão de 01/10/2026).
+   */
+  conferencia: { estado: 'conferida' | 'pendente'; por: string | null; em: string | null };
   amostra: {
     endereco: string;
     status: string;
@@ -104,12 +110,19 @@ export interface DispositivoLido extends ArtigoLido {
    * gabarito não lê a renumeração).
    */
   status: string;
+  /**
+   * O status do rascunho era `renumerado` (regra 10). Como o gabarito não o lê, a métrica (8.9) não
+   * o compara com ele: a linha de base do teste do corpus fixa a lista.
+   */
+  renumerado: boolean;
   /** Texto sem o tachado (o tachado parcial fica marcado no texto, 8.6). */
   texto: string;
   /** Texto das notas de vigência, na ordem (sem as da rubrica). */
   notas: string[];
   /** Quantas redações anteriores. */
   redacoes: number;
+  /** O texto de cada redação anterior, com o rótulo lido (para a regra (b) da métrica, 8.9). */
+  textosDasRedacoes: string[];
   /** Quantas foram para ele como ancestral (`enderecoLido`). */
   noAncestral: number;
 }
@@ -125,9 +138,11 @@ export function dispositivosDe(nos: readonly NoRascunho[]): DispositivoLido[] {
         tipo: no.tipo,
         ...(nome ? { nome: textoDe(nome.trechos) } : {}),
         status: no.status === 'renumerado' ? 'vigente' : no.status,
+        renumerado: no.status === 'renumerado',
         texto: textoDe(no.trechos.filter((t) => !t.tachado)),
         notas: no.notas.map((n) => n.texto),
         redacoes: no.redacoesAnteriores.length,
+        textosDasRedacoes: no.redacoesAnteriores.map((r) => textoDe(r.trechos)),
         noAncestral: no.redacoesAnteriores.filter((r) => r.enderecoLido !== undefined).length,
         linhas: no.linhas,
       });
@@ -148,7 +163,8 @@ export interface DispositivoEsperado {
   /**
    * Quantas redações anteriores. O gabarito conta como redação a linha com tachado parcial (caso
    * `tachado-parcial`: a expressão tachada no meio do texto vigente, o rótulo antigo ao lado do
-   * novo); a 8.6 a deixa marcada no texto, sem duplicar: aqui ela sai da conta.
+   * novo); a 8.6 a deixa marcada no texto, sem duplicar: aqui ela sai da conta (regra (a) da
+   * métrica, `enderecosComTachadoParcial`).
    */
   redacoes: number;
   /** Texto da rubrica, quando o dispositivo está na amostra (conferida pelo Gabriel). */
@@ -158,17 +174,33 @@ export interface DispositivoEsperado {
 }
 
 /**
+ * Regra (a) da métrica (8.9), o tachado parcial: os endereços dos casos `tachado-parcial` do
+ * gabarito. Casos da página: o ECA tacha "pátrio poder" no meio do texto vigente, com "poder
+ * familiar" ao lado (16 dispositivos, com as expressões das ADIN); a LC-SP 988, a expressão
+ * declarada inconstitucional (arts. 109, parágrafo único, e 115, § 1º) e o rótulo antigo ao lado do
+ * novo (art. 134, XI e § 1º); a CF, o art. 100, § 11. O gabarito conta a linha como redação
+ * anterior; o estruturador (8.6) a deixa marcada no texto, sem duplicar: `dispositivosEsperados`
+ * tira 1 da conta desses endereços (só de quem tem redação no gabarito). Pelo caso que o gabarito
+ * registra, nunca por lista de endereços.
+ */
+export function enderecosComTachadoParcial(gabarito: Pick<Gabarito, 'casos'>): Set<string> {
+  return new Set(
+    gabarito.casos.flatMap((c) => (c.tipo === 'tachado-parcial' && c.endereco ? [c.endereco] : [])),
+  );
+}
+
+/**
  * Os dispositivos (artigo a item) e os anexos do gabarito (desde a 8.7). Desde a 8.6 sem tolerância
  * para o revogado todo tachado (é nó, com a redação anterior). Desde a 8.5 não há tolerância para o
  * gabarito errado: o que o estruturador achou certo e o gabarito não foi acertado em
  * `scripts/corpus/gabarito.mjs` (pena sem hífen, citação entre aspas, pedaço de rótulo fora do
  * tachado, notas soltas e sem fecho). `id` pode ser o de uma compilada: vale o gabarito da página.
  */
-export function dispositivosEsperados(gabarito: Gabarito): DispositivoEsperado[] {
+export function dispositivosEsperados(
+  gabarito: Pick<Gabarito, 'dispositivos' | 'casos' | 'amostra'>,
+): DispositivoEsperado[] {
   const amostra = new Map(gabarito.amostra.map((a) => [a.endereco, a]));
-  const parciais = new Set(
-    gabarito.casos.flatMap((c) => (c.tipo === 'tachado-parcial' && c.endereco ? [c.endereco] : [])),
-  );
+  const parciais = enderecosComTachadoParcial(gabarito);
   return gabarito.dispositivos.map((d) => {
     const daAmostra = amostra.get(d.endereco);
     return {
@@ -176,7 +208,7 @@ export function dispositivosEsperados(gabarito: Gabarito): DispositivoEsperado[]
       status: d.status,
       nome: d.nome === true,
       notas: d.notas,
-      redacoes: d.redacoes - (parciais.has(d.endereco) ? 1 : 0),
+      redacoes: d.redacoes - (parciais.has(d.endereco) && d.redacoes > 0 ? 1 : 0),
       ...(daAmostra?.nome === undefined ? {} : { textoDoNome: daAmostra.nome }),
       ...(daAmostra?.status === 'vigente'
         ? { texto: { texto: daAmostra.texto, notas: daAmostra.notas } }
