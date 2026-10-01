@@ -4,7 +4,9 @@
 // os dispositivos da regra 6 com o endereço canônico, a rubrica e o texto da amostra (8.4) e as
 // notas de vigência (regra 7; 8.5), fora do texto, na contagem do gabarito, o status e as
 // redações anteriores de cada dispositivo (regras 8 a 10 e VETADO; 8.6), sem tolerância, e o
-// anexo (regra 11), a confiança (regra 12) e o relatório de anomalias (regra 13; 8.7).
+// anexo (regra 11), a confiança (regra 12) e o relatório de anomalias (regra 13; 8.7). E a métrica
+// da regressão do corpus (8.9, `src/testes/metrica.ts`), por página, com a linha de base e o
+// relatório, sobre o mesmo rascunho (cada página é sanitizada uma vez no arquivo).
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
 import { novoId } from '../../core/ids';
 import { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
@@ -20,6 +22,18 @@ import {
   type ArtigoLido,
   type Gabarito,
 } from '../../testes/gabarito';
+import {
+  compararComGabarito,
+  compararComLinhaDeBase,
+  gabaritosPendentes,
+  linhaDoPortao,
+  linhaDoRelatorio,
+  PISO,
+  PISO_DA_COMPILADA,
+  redacoesEsperadas,
+  resumoDasDivergencias,
+  type LinhaDeBase,
+} from '../../testes/metrica';
 import { PROFUNDIDADE, type TipoDeDispositivo } from './dispositivo';
 import { estruturar } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
@@ -702,27 +716,21 @@ describe('estruturador (8.5) no corpus: notas de vigência (regra 7)', () => {
   );
 });
 
-/**
- * Redação anterior que o gabarito não tem, examinada na página: a CF escreve o VIII-A antigo do art.
- * 93 sem hífen ("~~VIIIA a remoção a pedido…~~"); o gabarito não o lê como inciso e perde a
- * linha, e o estruturador a anexa ao VIII-A.
- */
-const REDACAO_QUE_O_GABARITO_PERDEU: Record<string, Record<string, number>> = {
-  cf: { 'art93.incVIIIA': 1 },
-};
-
 describe('estruturador (8.6) no corpus: redação anterior, revogado, renumerado e vetado', () => {
   it.each(COM_GABARITO)(
     '%s: status e redações anteriores de cada dispositivo × gabarito (100%, no endereço certo)',
     async (id) => {
       const gabarito = await gabaritoDe(id);
       const achados = dispositivosDe((await rascunho(id)).nos);
-      const perdidas = REDACAO_QUE_O_GABARITO_PERDEU[id] ?? {};
+      const porEndereco = new Map(achados.map((d) => [d.endereco, d]));
+      // As duas exceções são as regras da métrica (8.9): o tachado parcial sai da conta do gabarito
+      // (regra (a), em `dispositivosEsperados`), e a redação de inciso com sufixo sem hífen, que o
+      // gabarito não lê, entra (regra (b), `redacoesEsperadas`: CF, art. 93, "~~VIIIA a remoção…~~").
       expect(achados.map((d) => [d.endereco, d.status, d.redacoes])).toEqual(
         dispositivosEsperados(gabarito).map((e) => [
           e.endereco,
           e.status,
-          e.redacoes + (perdidas[e.endereco] ?? 0),
+          redacoesEsperadas(e, porEndereco.get(e.endereco)),
         ]),
       );
       // As que foram para o ancestral (`enderecoLido`): a Parte Geral de 1940 do CP e as outras.
@@ -799,6 +807,166 @@ describe('estruturador (8.6) no corpus: redação anterior, revogado, renumerado
       ],
     ]);
   }, 60_000);
+});
+
+/** Os renumerados (regra 10) das páginas, iguais na compilada. */
+const RENUMERADOS = {
+  lep: ['art34.par1', 'art83.par1'],
+  cp: ['art153.par1'],
+  eca: ['art14.par1', 'art208.par1'],
+};
+
+/**
+ * Linha de base da métrica (8.9), medida em 01/10/2026 (estruturador 0.8), por página: os corretos,
+ * o denominador (`total + aMais`), cada divergência (endereço e motivo) e os renumerados, que o
+ * gabarito não lê (o renumerado é `vigente` nele). As 7 páginas com todas as redações estão em 100%,
+ * sem divergência. As das compiladas são da fonte, não do estruturador (cada uma com o porquê).
+ * `compararComLinhaDeBase` diz "caiu" ou "mudou" e lista cada diferença; a causa pode ser o
+ * estruturador ou o gabarito (a reconferência do Gabriel o muda): examinar antes de gravar o número
+ * novo aqui, no mesmo commit.
+ */
+const LINHA_DE_BASE: Record<string, LinhaDeBase> = {
+  lep: { corretos: 736, de: 736, renumerados: RENUMERADOS.lep },
+  cp: { corretos: 1_422, de: 1_422, renumerados: RENUMERADOS.cp },
+  lc80: { corretos: 719, de: 719, renumerados: ['art104.par1'] },
+  'lc-sp-988': { corretos: 1_053, de: 1_053, renumerados: ['art134.incXI', 'art134.par1'] },
+  eca: { corretos: 1_265, de: 1_265, renumerados: RENUMERADOS.eca },
+  cdc: { corretos: 471, de: 471 },
+  cf: {
+    corretos: 3_374,
+    de: 3_374,
+    renumerados: [
+      'art28.par1',
+      ...['VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV'].map((n) => `art29.inc${n}`),
+      ...['art98', 'art102', 'art107', 'art134', 'art160', 'art169'].map((a) => `${a}.par1`),
+      'art177.par3',
+      'art198.par1',
+      'adct.art71.par1',
+    ],
+  },
+  'lep-compilado': {
+    corretos: 723,
+    de: 727,
+    renumerados: RENUMERADOS.lep,
+    divergencias: [
+      'art9A.par1: ausente', // omitido na compilada
+      'art18A.par3: notas', // "7.627"
+      'art112.par5: notas', // "(Vigência)"
+      'art112.par6: notas', // "(Vigência)"
+    ],
+  },
+  'cp-compilado': {
+    corretos: 1_357,
+    de: 1_372,
+    renumerados: RENUMERADOS.cp,
+    divergencias: [
+      'art47.incIII: notas', // "Redação dada" × "Incluído"
+      'art92.parUnico: ausente', // o antigo, sem tachado na página
+      'art121.par6: notas', // nota só na compilada
+      'art148.par1.incIII: texto', // "quinze" × "15 (quinze)"
+      'art169.parUnico.incII: texto', // idem
+      // A compilada rotula "Parágrafo único" o que a página rotula "§ 1º." (4 a menos, 4 a mais).
+      ...['', '.incI', '.incII', '.incIII'].map((s) => `art234.par1${s}: ausente`),
+      // Revogados que a página só tem tachados (o gabarito os leva para a redação do art. 51).
+      'art51.par1: a_mais',
+      'art51.par2: a_mais',
+      ...['', '.incI', '.incII', '.incIII'].map((s) => `art234.parUnico${s}: a_mais`),
+    ],
+  },
+  'eca-compilado': { corretos: 1_262, de: 1_262, renumerados: RENUMERADOS.eca },
+  'cdc-compilado': {
+    corretos: 467,
+    de: 471,
+    // "Vide" e "(Vigência)" que a compilada omite ou acrescenta.
+    divergencias: ['art82: notas', 'art99: notas', 'art100: notas', 'art100.parUnico: notas'],
+  },
+};
+
+/**
+ * Onde as regras de exceção da métrica valem no corpus, para nenhuma passar a cobrir outro caso sem
+ * ser vista: (a) tachado parcial (ECA 16, LC-SP 988 4, CF 1), (b) sufixo sem hífen (CF, art. 93,
+ * VIII-A) e (c) filhos do revogado que a compilada resume (LEP: arts. 124 e 182; CP: 56, dos arts.
+ * 121, §§ 2º-A e 7º, 188, 214, 231, 281, 350…; ECA: art. 233). As outras páginas, zero.
+ */
+const EXCECOES: Record<
+  string,
+  { tachadoParcial?: number; sufixoSemHifen?: number; resumidos?: number }
+> = {
+  'lc-sp-988': { tachadoParcial: 4 },
+  eca: { tachadoParcial: 16 },
+  cf: { tachadoParcial: 1, sufixoSemHifen: 1 },
+  'lep-compilado': { resumidos: 9 },
+  'cp-compilado': { resumidos: 56 },
+  'eca-compilado': { resumidos: 3 },
+};
+
+/**
+ * Gabaritos ainda `pendente` (7.3), na ordem de `COM_GABARITO`. A métrica roda com eles; o portão
+ * da F2 (13.4) só se declara medido com a lista vazia (decisão de 01/10/2026).
+ */
+const GABARITOS_PENDENTES = ['cp', 'eca', 'cdc', 'cf'];
+
+describe('regressão do corpus (8.9): métrica estruturador × gabarito', () => {
+  const relatorio = new Map<string, string>();
+  const pendentes = async () =>
+    gabaritosPendentes(
+      await Promise.all(COM_GABARITO.map(async (id) => [id, await gabaritoDe(id)] as const)),
+    );
+
+  // Uma linha por página e, à parte, os gabaritos não conferidos (o portão não está medido).
+  afterAll(async () => {
+    console.info(
+      [
+        'Métrica do corpus (8.9): corretos/total (%), duplicados, redações no endereço certo, conferência do gabarito',
+        ...[...COM_GABARITO, ...COMPILADAS].flatMap((id) => relatorio.get(id) ?? []),
+        linhaDoPortao(await pendentes()),
+      ].join('\n'),
+    );
+  });
+
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s: ≥ piso, 0 duplicados, 100% das redações (fora a compilada) e a linha de base',
+    async (id) => {
+      const r = await rascunho(id);
+      const compilada = id.endsWith('-compilado');
+      const gabarito = await gabaritoDe(id.replace('-compilado', ''));
+      const m = compararComGabarito(
+        { dispositivos: dispositivosDe(r.nos), anomalias: r.anomalias },
+        gabarito,
+        { compilada },
+      );
+      relatorio.set(id, linhaDoRelatorio(id, m, gabarito.conferencia.estado));
+      const divergencias = resumoDasDivergencias(m);
+      expect(m.percentual, divergencias).toBeGreaterThanOrEqual(
+        compilada ? PISO_DA_COMPILADA : PISO,
+      );
+      expect(m.duplicados).toEqual([]);
+      // A compilada não tem tachado: as redações do gabarito são da página com todas as redações.
+      if (compilada) expect(m.redacoes).toBeUndefined();
+      else expect(m.redacoes?.completas, divergencias).toBe(true);
+      expect({
+        tachadoParcial: m.redacoes?.tachadoParcial ?? 0,
+        sufixoSemHifen: m.redacoes?.sufixoSemHifen ?? 0,
+        resumidos: m.resumidos,
+      }).toEqual({ tachadoParcial: 0, sufixoSemHifen: 0, resumidos: 0, ...EXCECOES[id] });
+      const base = LINHA_DE_BASE[id];
+      if (!base) throw new Error(`sem linha de base: ${id}`);
+      expect(compararComLinhaDeBase(m, base), divergencias).toBeUndefined();
+    },
+    60_000,
+  );
+
+  it('gabaritos ainda não conferidos pelo Gabriel: o portão (13.4) não está medido', async () => {
+    expect(
+      await pendentes(),
+      'A conferência dos gabaritos mudou. A sessão que registrar a conferência do Gabriel no ' +
+        'gabarito atualiza GABARITOS_PENDENTES e, em docs/planos/F2.md, os "Fatos da regressão do ' +
+        'corpus (8.9)" (a tabela e "Portão não medido"), a linha 8.9 do Andamento e a do critério ' +
+        'do portão ("LEP e CP do Planalto…"), que listam os pendentes. Se o gabarito mudou, a ' +
+        'LINHA_DE_BASE muda junto: examinar cada diferença (gabarito corrigido × estruturador) ' +
+        'antes de gravar. O portão da F2 (13.4) só se declara medido com a lista vazia.',
+    ).toEqual(GABARITOS_PENDENTES);
+  });
 });
 
 // A 9.2 grava o rascunho passando cada registro pelo esquema do modelo: um só inválido (link que o

@@ -363,7 +363,7 @@ export function lerAto(texto: string): Ato | undefined {
 }
 
 /** Espécies que não dizem que o texto mudou: remetem a outro ato ("Vide Lei Complementar nº 230, de 2026" na CF), ao decreto que regulamenta ou à vigência. */
-const SEM_ALTERACAO = new Set<TipoNotaDeVigencia>(['vide', 'regulamento', 'vigencia', 'nr']);
+export const SEM_ALTERACAO = new Set<TipoNotaDeVigencia>(['vide', 'regulamento', 'vigencia', 'nr']);
 
 /**
  * A nota com lei e ano mais recente (D16; `VersaoDeNorma.notaVigenciaMaisRecente`), para a F6

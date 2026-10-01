@@ -4,8 +4,10 @@
 // parágrafo, inciso, alínea e item (6, 8.4) e notas de vigência (7, 8.5: fora do texto, com lei e
 // ano), redação anterior por tachado (8), revogação total (9), renumeração (10) e VETADO (8.6):
 // a linha tachada nunca vira texto vigente. Anexos com texto bruto (11), confiança por heurística
-// (12) e validação estrutural (13) (8.7). Toda linha cai num nó (pela faixa), nota, redação
-// anterior, metadado ou descarte.
+// (12) e validação estrutural (13) (8.7). Reserva em texto puro (8.8, só com `formato: 'texto'`;
+// peças puras em `textopuro.ts`): sem tachado, a linha antiga vira redação heurística pelas notas
+// e pela repetição do endereço, e o que o tachado faria provisório vira provisório também. Toda
+// linha cai num nó (pela faixa), nota, redação anterior, metadado ou descarte.
 import type { Bloco, Trecho } from '../../core/seguranca/sanitizador';
 import { ARTIGO_QUEBRADO, lerInicioDeArtigo, lerRubrica, type InicioDeArtigo } from './artigo';
 import {
@@ -17,6 +19,7 @@ import {
 import {
   lerRotuloEstrutural,
   NIVEL,
+  romano,
   type RotuloEstrutural,
   type TipoEstrutural,
 } from './estrutura';
@@ -24,6 +27,8 @@ import {
   acrescentar,
   aparar,
   ehCaixaAlta,
+  emendar,
+  juntarLinhasDaRedacao,
   juntarTrechos,
   recortar,
   textoDe,
@@ -55,13 +60,31 @@ import type {
   Rascunho,
   RedacaoAnterior,
 } from './rascunho';
+import {
+  aPartirDe,
+  atoDaRevogacao,
+  citaArtigo,
+  comHifen,
+  estaVivo,
+  faixaPropria,
+  indiceDaVigente,
+  NOME_DE_NO,
+  nomeInteiro,
+  redacaoHeuristica,
+  revogarComTexto,
+  segmentoDe,
+  separarPenasAntigas,
+  semCaractere,
+  soEsqueleto,
+  temNotaDeAlteracao,
+} from './textopuro';
 import { anomalia, marcarConflitos, validarEstrutura } from './validacao';
 
 /**
  * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.5 na 8.5…),
  * para a fonte guardada ser reprocessada quando o estruturador melhorar.
  */
-export const VERSAO_ESTRUTURADOR = '0.7';
+export const VERSAO_ESTRUTURADOR = '0.8';
 
 export interface OpcoesEstruturar {
   /** `texto` (texto puro): tudo "a confirmar" (regra 12). Padrão: `html`. */
@@ -74,7 +97,7 @@ export function estruturar(blocos: readonly Bloco[], opcoes: OpcoesEstruturar = 
   const { blocos: normalizados, relatorio } = normalizarBlocos(blocos);
   const linhas = prepararLinhas(normalizados);
   const pre = lerPreNormativo(linhas, confianca);
-  const corpo = new Corpo(confianca);
+  const corpo = new Corpo(confianca, formato === 'texto');
   for (let k = pre.proxima; k < linhas.length; k++) corpo.ler(linhas[k] as Linha);
   const { nos, descartes, anomalias: daLeitura, linhasTachadas } = corpo.concluir();
   const anomalias =
@@ -173,6 +196,12 @@ interface RubricaPendente {
   no?: NoRascunho;
   /** Rubricas antigas, tachadas, logo antes dela (CP, art. 218-B): redações anteriores do nome. */
   antigas?: LinhaTachada[];
+  /**
+   * Texto puro (8.8): rubricas antigas logo antes dela, que ela substitui ("Redação dada" na linha
+   * dela; CP, arts. 218-B, 231 e 266): redações heurísticas do nome, nunca texto do dispositivo de
+   * cima. Se ela não chega a um artigo, voltam como antes.
+   */
+  substituidas?: RubricaPendente[];
 }
 
 /**
@@ -285,8 +314,24 @@ class Corpo {
   private redacaoAberta: RedacaoAberta | undefined;
   /** Linhas tachadas que parecem rubrica: são da redação do artigo ou dispositivo tachado seguinte. */
   private rubricasTachadas: LinhaTachada[] = [];
+  /**
+   * Texto puro (8.8): a linha de cada quebra (`\n`) emendada no texto do nó, para dividir o texto
+   * nas linhas da fonte (`revogarComTexto`, `separarPenasAntigas`).
+   */
+  private readonly quebras = new WeakMap<NoRascunho, number[]>();
+  /** Texto puro (8.8): a raiz anterior de mesmo segmento de cada raiz estrutural, e a última por segmento. */
+  private readonly raizAnterior = new Map<NoRascunho, NoRascunho>();
+  private readonly ultimaRaiz = new Map<string, NoRascunho>();
+  /** Texto puro (8.8): raízes da cópia antiga que o art. 1º repetido substitui (Parte Geral de 1940, CP). */
+  private readonly partesAntigas: NoRascunho[] = [];
+  /** Texto puro (8.8): o último cabeçalho fechado pela linha seguinte (o nome novo em caixa mista). */
+  private cabecalhoFechado: Cabecalho | undefined;
 
-  constructor(private readonly confianca: Confianca) {}
+  /** `texto`: entrada em texto puro (8.8), com as heurísticas da reserva; no HTML, nada muda. */
+  constructor(
+    private readonly confianca: Confianca,
+    private readonly texto = false,
+  ) {}
 
   /** O último dispositivo lido (o artigo, se nenhum outro abriu depois dele). */
   private get ultimo(): NoRascunho | undefined {
@@ -419,7 +464,10 @@ class Corpo {
     this.mesclarSubstituidos(this.raizes);
     if (this.rubricas > 0) this.rubricaNoNomeDoNo();
     this.enderecar(this.raizes, '');
+    // Texto puro (8.8): a cópia antiga inteira (Parte Geral de 1940) é provisória, como a tachada.
+    for (const raiz of this.partesAntigas) this.provisorioComSubarvore(raiz);
     this.fundirRepetidos();
+    if (this.texto) this.antigasDoTextoPuro();
     this.resolverTachados();
     this.aplicarStatus();
     return {
@@ -475,6 +523,12 @@ class Corpo {
         break;
       this.pilha.pop();
     }
+    if (this.texto && this.pilha.length === 0) {
+      // A raiz de mesmo segmento lida antes (o art. 1º repetido pode recomeçar a mesma parte).
+      const antes = this.ultimaRaiz.get(rotulo.segmento);
+      if (antes) this.raizAnterior.set(no, antes);
+      this.ultimaRaiz.set(rotulo.segmento, no);
+    }
     this.anexar(no);
     this.pilha.push(no);
     const cabecalho: Cabecalho = { no, estado: 'rotulo', nome: [] };
@@ -498,6 +552,19 @@ class Corpo {
     if (notas) {
       acrescentar(c.no.notas, notas);
       c.no.linhas.fim = l.i;
+      // Texto puro (8.8): o nome antigo e o novo em caixa alta, com a nota de redação depois (CF,
+      // Seção II do Capítulo VII do Título III: "DOS SERVIDORES PÚBLICOS CIVIS" / "DOS SERVIDORES
+      // PÚBLICOS" / "(Redação dada…)").
+      const [antigo, novo] = c.nome;
+      if (
+        this.texto &&
+        c.estado === 'nome' &&
+        c.nome.length === 2 &&
+        antigo &&
+        novo &&
+        notas.some((n) => n.tipo === 'redacao_dada')
+      )
+        this.trocarNome(c, antigo, novo);
       if (c.estado === 'nome') c.estado = 'fim';
       return true;
     }
@@ -529,8 +596,56 @@ class Corpo {
   }
 
   private fecharCabecalho(): false {
+    if (this.texto) this.cabecalhoFechado = this.cabecalho;
     this.cabecalho = undefined;
     return false;
+  }
+
+  /**
+   * Texto puro (8.8): nome de nó substituído, sem o tachado que separa o antigo do novo (regra 8).
+   * Quando a linha nova começa como nome de nó ("Dos…", "DA…", "Disposições") e a antiga está
+   * inteira, a nova é o nome e a antiga, redação heurística do nó (LC 80, Título I: "Das
+   * Disposições Preliminares" / "Disposições Gerais"; CF, Seção II do Capítulo VII do Título III).
+   */
+  private trocarNome(c: Cabecalho, antigo: Linha, novo: Linha): boolean {
+    if (!NOME_DE_NO.test(novo.chave) || !nomeInteiro(antigo)) return false;
+    const nome = c.no.filhos.find((f) => f.tipo === 'nome');
+    if (!nome) return false;
+    c.nome = [novo];
+    nome.trechos = aparar(novo.trechos);
+    nome.linhas = { inicio: novo.i, fim: Math.max(novo.i, nome.linhas.fim) };
+    c.no.redacoesAnteriores.push(
+      redacaoHeuristica(aparar(antigo.trechos), { inicio: antigo.i, fim: antigo.i }),
+    );
+    return true;
+  }
+
+  /**
+   * Texto puro (8.8): o nome novo do nó em caixa mista, depois do antigo, vira rubrica candidata do
+   * 1º artigo (só a caixa alta continua o nome) e leva a nota "Redação dada" logo depois dele. Ele é
+   * o nome do nó, não a rubrica (LC 80, Título I e Seções I e VI do Capítulo I do Título II; CF,
+   * Capítulo VII do Título VIII: "Da Família, da Criança, do Adolescente, do Jovem e do Idoso").
+   */
+  private nomeNovoDoNo(r: RubricaPendente): boolean {
+    const c = this.cabecalhoFechado;
+    const antigo = c?.nome[0];
+    if (
+      !c ||
+      !antigo ||
+      c.nome.length !== 1 ||
+      antigo.i !== r.linha.i - 1 ||
+      r.tachado !== undefined ||
+      r.substituidas ||
+      this.artigosAoAbrir.get(c.no) !== this.artigos ||
+      !r.notas.some((n) => n.tipo === 'redacao_dada')
+    )
+      return false;
+    const novo = { ...r.linha, trechos: recortar(r.linha.trechos, 0, r.fim) };
+    if (!this.trocarNome(c, antigo, novo)) return false;
+    acrescentar(c.no.notas, r.notas);
+    c.no.linhas.fim = Math.max(c.no.linhas.fim, ultimaLinha(r));
+    this.cabecalhoFechado = undefined;
+    return true;
   }
 
   private abrirArtigo(inicioDeArtigo: InicioDeArtigo, l: Linha, inicio: number): void {
@@ -548,12 +663,13 @@ class Corpo {
           ? { linha: r.linha, fim: r.fim, notas: r.notas, linhasDeNota: r.linhasDeNota }
           : undefined);
       if (titulo && !this.tituloSolto) r = undefined;
-      this.abrirBloco(titulo);
+      if (titulo || !this.recomecoDaMesmaParte(l, fim)) this.abrirBloco(titulo);
     }
     if (numero > this.bloco.maior) this.bloco.maior = numero;
     const endereco = this.bloco.prefixo
       ? `${this.bloco.prefixo}.${inicioDeArtigo.endereco}`
       : inicioDeArtigo.endereco;
+    if (r && this.texto && this.nomeNovoDoNo(r)) r = undefined;
     let nome: NoRascunho | undefined;
     if (r && (r.tachado === undefined || r.tachado === inicioDeArtigo.endereco)) {
       nome = this.nomeDe(r);
@@ -609,6 +725,36 @@ class Corpo {
     this.pilha.push(no);
   }
 
+  /**
+   * Texto puro (8.8): o art. 1º repetido que recomeça a mesma parte da lei, em redação nova, não
+   * abre bloco (CP: a Parte Geral de 1940 inteira antes da de 1984, que no HTML vem tachada). Sinal:
+   * sem título que dê o prefixo (seria `blocoN`; o ADCT da CF e as disposições transitórias da
+   * LC-SP 988 continuam blocos); o nó da raiz reaberto logo antes repete o rótulo e o nome de uma
+   * raiz já lida ("Parte Geral" / "PARTE GERAL", sem caixa nem acento); e o art. 1º ou os nós
+   * reabertos trazem "Redação dada" ou "Incluído" ("TÍTULO I / DA APLICAÇÃO DA LEI PENAL /
+   * (Redação dada pela Lei nº 7.209, de 11.7.1984)"). A raiz antiga inteira fica provisória, como
+   * a tachada (`concluir`): cada nó dela se junta ao de mesmo endereço ou vai para o ancestral.
+   */
+  private recomecoDaMesmaParte(l: Linha, fim: number): boolean {
+    const raiz = this.pilha[0];
+    if (!this.texto || !raiz || this.artigosAoAbrir.get(raiz) !== this.artigos) return false;
+    // A raiz de mesmo segmento lida antes, pulando as sem artigo, que `mesclarSubstituidos` funde
+    // na nova ("PARTE GERAL" repetido logo antes dela; achado na revisão da 8.8). Cada raiz é
+    // pulada uma vez só: o art. 1º abre logo depois, e a contagem de artigos muda.
+    let antiga = this.raizAnterior.get(raiz);
+    while (antiga && this.artigosAoAbrir.get(antiga) === this.artigos)
+      antiga = this.raizAnterior.get(antiga);
+    if (!antiga || chaveDoNo(antiga) !== chaveDoNo(raiz)) return false;
+    const abridores = this.pilha.filter((no) => this.artigosAoAbrir.get(no) === this.artigos);
+    const nome = raiz.filhos.find((f) => f.tipo === 'nome');
+    if (prefixoDoBloco(nome ? textoDe(nome.trechos) : '') !== undefined) return false;
+    const notas = [...textoENotas(l, fim).notas, ...abridores.flatMap((no) => no.notas)];
+    if (!notas.some((n) => n.tipo === 'redacao_dada' || n.tipo === 'incluido')) return false;
+    this.partesAntigas.push(antiga);
+    this.raizAnterior.delete(raiz);
+    return true;
+  }
+
   /** Fecha o artigo corrente (nó estrutural, fecho, outro artigo). */
   private fecharArtigo(): void {
     this.caminho = [];
@@ -632,11 +778,23 @@ class Corpo {
     }
     const ultimo = this.ultimo;
     const rotulo = ultimo ? lerRotuloDeDispositivo(l) : undefined;
+    const doTexto = ultimo && this.texto ? this.rotuloDoTextoPuro(l, rotulo) : undefined;
+    if (doTexto) {
+      this.abrirDispositivo(doTexto.rotulo, doTexto.linha, doTexto.antigo);
+      return;
+    }
     if (ultimo && rotulo) {
       this.abrirDispositivo(rotulo, l);
       return;
     }
-    if (r) this.resolverRubrica();
+    if (r) {
+      const nova = this.texto ? this.rubricaQueSubstitui(r, l) : undefined;
+      if (nova) {
+        this.rubrica = nova;
+        return;
+      }
+      this.resolverRubrica();
+    }
     if (!ultimo) {
       const rubrica = lerRubrica(l);
       if (rubrica) this.rubrica = { linha: l, ...rubrica, linhasDeNota: [] };
@@ -655,6 +813,84 @@ class Corpo {
       if (rubrica) this.rubrica = { linha: l, ...rubrica, linhasDeNota: [] };
       else this.semRotulo(l);
     }
+  }
+
+  /**
+   * Texto puro (8.8): a rubrica antiga e a nova seguidas, a nova com "Redação dada" na linha, antes
+   * do artigo ("Interrupção ou perturbação de serviço telegráfico ou telefônico" / "Interrupção ou
+   * perturbação de serviço telegráfico, telefônico, informático… (Redação dada pela Lei nº 12.737,
+   * de 2012)", CP, art. 266; arts. 218-B e 231): a antiga não continua o dispositivo de cima; fica
+   * com a nova, e vira redação heurística do nome. Só em caixa mista (o nome do nó em caixa alta,
+   * "DO CRIME", seguido de rubrica nova não dispara) e com o dispositivo de cima fechado em frase.
+   */
+  private rubricaQueSubstitui(r: RubricaPendente, l: Linha): RubricaPendente | undefined {
+    if (r.tachado !== undefined || r.antigas || ehCaixaAlta(r.linha.texto.slice(0, r.fim)))
+      return undefined;
+    const ultimo = this.ultimo;
+    if (ultimo && this.fechaFrase.get(ultimo) !== true) return undefined;
+    const rubrica = lerRubrica(l);
+    if (!rubrica?.notas.some((n) => n.tipo === 'redacao_dada')) return undefined;
+    // A lista passa de uma para a outra (copiá-la a cada rubrica nova ficava quadrático).
+    const { substituidas = [], ...antiga } = r;
+    substituidas.push(antiga);
+    return { linha: l, ...rubrica, linhasDeNota: [], substituidas };
+  }
+
+  /**
+   * Texto puro (8.8): rótulos que só o tachado do HTML separa. O rótulo antigo ao lado do novo, que
+   * a ALESP tacha ("X XI - outras previstas em lei.", "Parágrafo único § 1° - O Defensor…", LC-SP
+   * 988, art. 134): vale o novo, e o antigo dá a origem da renumeração (regra 10). O rótulo partido
+   * pela fonte ("I I - ocorrer…", CP, art. 45; "I V - abrigo;", ECA, art. 90) se junta quando dá o
+   * inciso seguinte ao último. O inciso com sufixo sem hífen ("VIIIA a remoção…", CF, art. 93), logo
+   * depois do inciso de mesmo número, é o VIII-A (antigo: o de mesmo endereço vem depois e funde).
+   */
+  private rotuloDoTextoPuro(
+    l: Linha,
+    rotulo: RotuloDeDispositivo | undefined,
+  ): { rotulo: RotuloDeDispositivo; linha: Linha; antigo?: Origem } | undefined {
+    if (rotulo) {
+      if (rotulo.segmento !== 'parUnico' || !/^§/u.test(l.chave.slice(rotulo.fim)))
+        return undefined;
+      const novo = lerRotuloDeDispositivo(aPartirDe(l, rotulo.fim));
+      if (novo?.tipo !== 'paragrafo') return undefined;
+      return {
+        rotulo: { ...novo, fim: rotulo.fim + novo.fim },
+        linha: l,
+        antigo: { relativo: 'artigo', segmento: 'parUnico' },
+      };
+    }
+    const anterior = this.ultimoInciso();
+    if (anterior === undefined) return undefined;
+    const duplo = /^([IVXLC]+) ([IVXLC]+) ?-/u.exec(l.chave);
+    if (duplo) {
+      const [, a = '', b = ''] = duplo;
+      if (romano(a + b) === anterior.numero + 1) {
+        const junta = semCaractere(l, a.length);
+        const lido = lerRotuloDeDispositivo(junta);
+        return lido?.tipo === 'inciso' ? { rotulo: lido, linha: junta } : undefined;
+      }
+      if (romano(b) !== anterior.numero + 1) return undefined;
+      const novo = lerRotuloDeDispositivo(aPartirDe(l, a.length + 1));
+      const antigo = origemDoRotulo(a);
+      if (novo?.tipo !== 'inciso' || !antigo) return undefined;
+      return { rotulo: { ...novo, fim: a.length + 1 + novo.fim }, linha: l, antigo };
+    }
+    const sufixo = /^([IVXLC]+)[ABEFGHJKNOPQRSTUWYZ] (?=\p{Ll})/u.exec(l.chave);
+    if (sufixo?.[1] !== anterior.numeral) return undefined;
+    const junta = comHifen(l, anterior.numeral.length);
+    const lido = lerRotuloDeDispositivo(junta);
+    return lido?.tipo === 'inciso' ? { rotulo: lido, linha: junta } : undefined;
+  }
+
+  /** O último filho do pai que um inciso teria agora, se for inciso sem sufixo (o numeral e o número). */
+  private ultimoInciso(): { numeral: string; numero: number } | undefined {
+    const pai = this.paiDe('inciso');
+    const ultimo = pai?.filhos[pai.filhos.length - 1];
+    const numeral =
+      ultimo?.tipo === 'inciso'
+        ? /^inc([IVXLC]+)$/.exec(segmentoDe(ultimo.endereco))?.[1]
+        : undefined;
+    return numeral === undefined ? undefined : { numeral, numero: romano(numeral) };
   }
 
   /** Linha de uma citação em várias linhas: continua o último dispositivo, até fechar as aspas. */
@@ -689,8 +925,11 @@ class Corpo {
     this.continuar(l, '\n');
   }
 
-  /** Regra 6: o dispositivo fica sob o último de nível menor (hierarquia por sequência). */
-  private abrirDispositivo(rotulo: RotuloDeDispositivo, l: Linha): void {
+  /**
+   * Regra 6: o dispositivo fica sob o último de nível menor (hierarquia por sequência). `antigo`
+   * (texto puro, 8.8): o rótulo antigo lido ao lado do novo, origem da renumeração.
+   */
+  private abrirDispositivo(rotulo: RotuloDeDispositivo, l: Linha, antigo?: Origem): void {
     const pai = this.paiDe(rotulo.tipo);
     if (!pai) return;
     this.caminho.length = this.caminho.indexOf(pai) + 1;
@@ -717,8 +956,8 @@ class Corpo {
     this.caminho.push(no);
     this.estender(l.i);
     // Regra 10: rótulo antigo tachado ao lado do novo, do mesmo tipo (ALESP: "~~X~~ XI -").
-    const antigo = rotuloAntigoTachado(l);
-    const origem = antigo === undefined ? undefined : origemDoRotulo(antigo);
+    const tachado = rotuloAntigoTachado(l);
+    const origem = antigo ?? (tachado === undefined ? undefined : origemDoRotulo(tachado));
     if (origem && origem.segmento.slice(0, 2) === rotulo.segmento.slice(0, 2))
       this.rotulosAntigos.set(no, origem);
   }
@@ -743,11 +982,23 @@ class Corpo {
     const ultimo = this.ultimo;
     if (!ultimo) return;
     const { trechos, notas, fechaFrase } = textoENotas(l, 0);
-    if (ultimo.trechos.length > 0 && trechos.length > 0) ultimo.trechos.push({ texto: separador });
+    if (ultimo.trechos.length > 0 && trechos.length > 0) {
+      ultimo.trechos.push({ texto: separador });
+      if (this.texto && separador === '\n') this.quebrasDe(ultimo).push(l.i);
+    }
     acrescentar(ultimo.trechos, trechos);
     acrescentar(ultimo.notas, notas);
     if (trechos.length > 0) this.fechaFrase.set(ultimo, fechaFrase);
     this.estender(l.i);
+  }
+
+  private quebrasDe(no: NoRascunho): number[] {
+    let q = this.quebras.get(no);
+    if (!q) {
+      q = [];
+      this.quebras.set(no, q);
+    }
+    return q;
   }
 
   /** Rubrica que não chegou a um artigo ou dispositivo: volta para o anterior (ou fica solta). */
@@ -763,6 +1014,7 @@ class Corpo {
    */
   private devolverRubrica(r: RubricaPendente): void {
     if (r.antigas) this.soltarTachadas(r.antigas);
+    for (const antiga of r.substituidas ?? []) this.devolverRubrica(antiga);
     const ate = ultimaLinha(r);
     const ultimo = this.ultimo;
     if (r.no) {
@@ -792,6 +1044,14 @@ class Corpo {
       anotar(antiga, t.notasFora);
       return antiga;
     });
+    for (const s of r.substituidas ?? [])
+      redacoes.push(
+        redacaoHeuristica(
+          aparar(recortar(s.linha.trechos, 0, s.fim)),
+          { inicio: s.linha.i, fim: ultimaLinha(s) },
+          s.notas,
+        ),
+      );
     if (redacao) redacoes.push(redacao);
     return this.novoNo('nome', r.linha, {
       trechos,
@@ -1213,12 +1473,17 @@ class Corpo {
           anterior.filhos.find((f) => f.tipo === 'nome')?.trechos ?? [],
         ]);
         acrescentar(redacoes, anterior.redacoesAnteriores);
-        redacoes.push({
+        const redacao: RedacaoAnterior = {
           trechos: rotuloENome,
           origemDeteccao: 'heuristica',
           confirmada: false,
           linhas: anterior.linhas,
-        });
+        };
+        // Texto puro (8.8, achado na revisão): as notas do nó substituído ficam na redação dele,
+        // como na do tachado (`redacaoDoNo`; CP, Capítulo V do Título VI, "DO LENOCÍNIO E DO
+        // TRÁFICO DE PESSOAS (Redação dada pela Lei nº 11.106, de 2005)").
+        if (this.texto) anotar(redacao, anterior.notas);
+        redacoes.push(redacao);
         acrescentar(
           herdados,
           anterior.filhos.filter((f) => f.tipo !== 'nome'),
@@ -1332,9 +1597,11 @@ class Corpo {
       const listas = new Set<NoRascunho[]>();
       for (const grupo of repetidos) {
         if (nivel(grupo) !== raso) continue;
-        const ultimo = grupo[grupo.length - 1];
+        // Texto puro (8.8): a vigente sai das notas, não só da ordem (`indiceDaVigente`).
+        const k = this.texto ? indiceDaVigente(grupo.map((g) => g.no)) : grupo.length - 1;
+        const ultimo = grupo[k];
         if (!ultimo) continue;
-        const anteriores = grupo.slice(0, -1);
+        const anteriores = grupo.filter((_, j) => j !== k);
         this.fundir(
           anteriores.map((g) => g.no),
           ultimo.no,
@@ -1353,36 +1620,67 @@ class Corpo {
     }
   }
 
+  /**
+   * Texto puro (8.8): quando a vigente traz nota de alteração ("Redação dada", "Incluído",
+   * "Revogado pela…", a nota da ALESP) ou é só "(Revogado)" ou "(VETADO)" (`soEsqueleto`), os
+   * filhos das cópias antigas são antigos também (no HTML, tachados): ficam provisórios e, no fim, se juntam ao de mesmo endereço ou vão para o ancestral
+   * com o endereço lido (CF, art. 42, §§ 4º a 11 de 1988; LEP, art. 112, parágrafo único; LC-SP
+   * 988, art. 234, §§ e itens). Sem a nota, continuam como estão (ECA, art. 263: a citação do CP
+   * com dois parágrafos únicos). A redação da cópia antiga cobre só as linhas dela.
+   */
   private fundir(anteriores: readonly NoRascunho[], no: NoRascunho): void {
     let nome = no.filhos[0]?.tipo === 'nome' ? no.filhos[0] : undefined;
     const filhos: NoRascunho[] = [];
     const redacoes: RedacaoAnterior[] = [];
+    const antigos = this.texto && (temNotaDeAlteracao(no) || soEsqueleto(no));
     for (const antigo of anteriores) {
+      let linhas = this.texto ? faixaPropria(antigo) : antigo.linhas;
+      // Texto puro (8.8): a rubrica da cópia antiga, quando a vigente já tem a sua, entra na
+      // redação dela, depois das rubricas que ela substituiu (no HTML, tachadas: CP, art. 288,
+      // "Quadrilha ou bando"; art. 231, "Tráfico de mulheres" / "Tráfico internacional de
+      // pessoas"); no HTML, sem tachado, ela some, como antes.
+      let rubrica: NoRascunho | undefined;
       for (const f of antigo.filhos)
-        if (f.tipo === 'nome') nome ??= f;
-        else filhos.push(f);
+        if (f.tipo !== 'nome') {
+          filhos.push(f);
+          if (antigos) this.provisorioComSubarvore(f);
+        } else if (nome === undefined) nome = f;
+        else if (this.texto) rubrica = f;
       antigo.filhos = [];
       acrescentar(redacoes, antigo.redacoesAnteriores);
+      const rubricas = rubrica
+        ? [...rubrica.redacoesAnteriores.map((r) => r.trechos), rubrica.trechos]
+        : [];
+      if (rubrica)
+        linhas = {
+          inicio: Math.min(linhas.inicio, rubrica.redacoesAnteriores[0]?.linhas.inicio ?? Infinity),
+          fim: linhas.fim,
+        };
       // Revogação reescrita (CP, art. 171, § 5º: "§ 5º ~~…~~ (Revogado pela…)" e depois "§ 5º
       // (Revogado). (Redação dada…)"): o revogado de texto vazio só passa as redações dele.
       const ultima = antigo.redacoesAnteriores[antigo.redacoesAnteriores.length - 1];
       if (antigo.status === 'revogado' && antigo.trechos.length === 0 && ultima) {
+        if (rubrica) {
+          ultima.trechos = juntarLinhasDaRedacao([...rubricas, ultima.trechos]);
+          anotar(ultima, rubrica.notas);
+        }
         anotar(ultima, antigo.notas);
         continue;
       }
-      const nota = antigo.notas
+      const nota = [...(rubrica?.notas ?? []), ...antigo.notas]
         .map((n) => n.texto)
         .join(' ')
         .slice(0, 2_000);
+      const rotuloETexto = juntarTrechos([
+        [{ texto: antigo.rotuloLido ?? antigo.rotulo ?? '' }],
+        antigo.trechos,
+      ]);
       redacoes.push({
-        trechos: juntarTrechos([
-          [{ texto: antigo.rotuloLido ?? antigo.rotulo ?? '' }],
-          antigo.trechos,
-        ]),
+        trechos: rubrica ? juntarLinhasDaRedacao([...rubricas, rotuloETexto]) : rotuloETexto,
         ...(nota ? { nota } : {}),
         origemDeteccao: 'heuristica',
         confirmada: false,
-        linhas: antigo.linhas,
+        linhas,
       });
       this.porHeuristica(no);
       this.anomalias.push(
@@ -1609,15 +1907,112 @@ class Corpo {
     no.filhos = [];
   }
 
-  /** A redação anterior de um nó estrutural tachado: o rótulo e o nome, como vieram. */
+  /**
+   * A redação anterior de um nó estrutural tachado: o rótulo e o nome, como vieram. No texto puro
+   * (8.8), a do nó da cópia antiga: heurística, sem a marca de tachado.
+   */
   private redacaoDoNo(no: NoRascunho, nome: NoRascunho | undefined): RedacaoAnterior {
-    const redacao = redacaoDe(
-      juntarTrechos([[{ texto: no.rotulo ?? '', tachado: true }], nome?.trechos ?? []]),
-      no.linhas.inicio,
-      no.linhas.fim,
-    );
+    const redacao = this.texto
+      ? redacaoHeuristica(juntarTrechos([[{ texto: no.rotulo ?? '' }], nome?.trechos ?? []]), {
+          inicio: no.linhas.inicio,
+          fim: no.linhas.fim,
+        })
+      : redacaoDe(
+          juntarTrechos([[{ texto: no.rotulo ?? '', tachado: true }], nome?.trechos ?? []]),
+          no.linhas.inicio,
+          no.linhas.fim,
+        );
     anotar(redacao, no.notas);
     return redacao;
+  }
+
+  /**
+   * Texto puro (8.8): o nó (e toda a subárvore) que o HTML traria tachado vira provisório, como o
+   * da linha tachada (regra 8), e `resolverTachados` o junta ao de mesmo endereço ou o leva ao
+   * ancestral, com o endereço lido. O artigo ou dispositivo fica sem texto: a rubrica, o rótulo e
+   * o texto viram a redação dele (heurística, a primeira, com as notas da rubrica; as do nó ficam
+   * nele e vão para ela na junção); o nó estrutural fica como está (`redacaoDoNo`). Cada nó, uma
+   * vez só.
+   */
+  private provisorioComSubarvore(raiz: NoRascunho): void {
+    const pilha = [raiz];
+    for (let no = pilha.pop(); no; no = pilha.pop()) {
+      if (no.tipo === 'nome' || this.provisorios.has(no)) continue;
+      this.provisorios.add(no);
+      for (const f of no.filhos) pilha.push(f);
+      if (!NORMATIVOS.has(no.tipo)) continue;
+      const nome = no.filhos.find((f) => f.tipo === 'nome');
+      if (no.trechos.length > 0 || nome || no.redacoesAnteriores.length === 0) {
+        const propria = redacaoHeuristica(
+          juntarLinhasDaRedacao([
+            nome?.trechos ?? [],
+            juntarTrechos([[{ texto: no.rotuloLido ?? no.rotulo ?? '' }], no.trechos]),
+          ]),
+          faixaPropria(no),
+          nome?.notas,
+        );
+        no.redacoesAnteriores = [
+          propria,
+          ...(nome?.redacoesAnteriores ?? []),
+          ...no.redacoesAnteriores,
+        ];
+      }
+      if (nome) no.filhos = no.filhos.filter((f) => f !== nome);
+      no.trechos = [];
+      no.status = 'revogado';
+    }
+  }
+
+  /**
+   * Texto puro (8.8), depois da fusão dos repetidos: o revogado com texto (`revogarComTexto`) e o
+   * que o HTML traria tachado sem nota de fora. (1) Os filhos do revogado com texto sem nota própria
+   * de revogação do mesmo ato (no HTML, tachados) ficam provisórios e vão para ele (CP, art. 187,
+   * parágrafo único e incisos; CF, ADCT, arts. 107 e 109; CF, art. 111, § 1º, II, revogado pela EC
+   * 24, sob o § 1º revogado pela EC 45); com a nota do mesmo ato, ficam revogados (CF, art. 117,
+   * parágrafo único). (2) O parágrafo único seguido do § 1º no mesmo pai é o antigo (no HTML,
+   * tachado): fica provisório, com a subárvore, e vai para o pai (CDC, arts. 8º e 65; LEP, arts.
+   * 34, 41 e 72; CF, art. 160). O revogado e o vetado não contam, e a ordem inversa (CP, art. 46,
+   * com o § 1º antes) também não; nem o artigo citado no meio ou sob o parágrafo único ("2) Art.
+   * 129 ....", na alteração de outra lei, como a do CP pelo ECA, art. 263): são de artigos
+   * diferentes, e fica o aviso do HTML (achado na revisão da 8.8).
+   */
+  private antigasDoTextoPuro(): void {
+    const revogados: NoRascunho[] = [];
+    const nos: NoRascunho[] = [];
+    const pilha = [...this.raizes];
+    for (let no = pilha.pop(); no; no = pilha.pop()) {
+      if (this.provisorios.has(no)) continue;
+      nos.push(no);
+      if (revogarComTexto(no, this.quebras.get(no))) revogados.push(no);
+      for (const f of no.filhos) pilha.push(f);
+    }
+    for (const no of revogados) {
+      if (this.provisorios.has(no)) continue;
+      const ato = atoDaRevogacao(no);
+      for (const f of no.filhos)
+        if (f.tipo !== 'nome' && (atoDaRevogacao(f) === undefined || atoDaRevogacao(f) !== ato))
+          this.provisorioComSubarvore(f);
+    }
+    for (const no of nos) {
+      if (this.provisorios.has(no)) continue;
+      let unico: NoRascunho | undefined;
+      for (const f of no.filhos) {
+        if (f.tipo !== 'paragrafo') {
+          // O artigo citado no meio (a alteração de outra lei): são de artigos diferentes.
+          if (unico && citaArtigo(f)) unico = undefined;
+          continue;
+        }
+        if (this.provisorios.has(f)) continue;
+        const segmento = segmentoDe(f.endereco);
+        if (unico && segmento === 'par1' && estaVivo(f) && !citaArtigo(unico))
+          this.provisorioComSubarvore(unico);
+        unico = segmento === 'parUnico' && estaVivo(f) ? f : undefined;
+      }
+    }
+    // (3) A pena antiga antes da nova, só no que ficou vigente.
+    for (const no of nos)
+      if (!this.provisorios.has(no) && no.status === 'vigente')
+        separarPenasAntigas(no, this.quebras.get(no));
   }
 
   /** Redação sem nó que a receba (nó estrutural tachado antes de qualquer outro): sobra, com aviso. */
@@ -1712,20 +2107,6 @@ class Corpo {
   }
 }
 
-/** Linhas de uma redação anterior (rubricas, texto), separadas por quebra de linha. */
-function juntarLinhasDaRedacao(partes: readonly Trecho[][]): Trecho[] {
-  const saida: Trecho[] = [];
-  for (const p of partes) emendar(saida, p, '\n');
-  return saida;
-}
-
-/** Emenda os trechos no fim dos de destino, com o separador entre os dois (sem cópia: linear). */
-function emendar(destino: Trecho[], trechos: readonly Trecho[], separador: '\n' | ' '): void {
-  if (trechos.length === 0) return;
-  if (destino.length > 0) destino.push({ texto: separador });
-  acrescentar(destino, trechos);
-}
-
 /**
  * Os trechos tachados do texto bruto do anexo, linha a linha (as linhas vêm separadas por
  * `{ texto: '\n' }`, de `emendar`, e a quebra entre elas fica); o resto da linha ("Revogado.") sai.
@@ -1762,6 +2143,17 @@ function prefixoDoBloco(titulo: string): string | undefined {
   if (/DISPOSICOES CONSTITUCIONAIS TRANSITORIAS/.test(t)) return 'adct';
   if (/TRANSITORIAS/.test(t)) return 'dt';
   return undefined;
+}
+
+/** Rótulo e nome do nó, sem caixa nem acento ("Parte Geral" = "PARTE GERAL"; texto puro, 8.8). */
+function chaveDoNo(no: NoRascunho): string {
+  const nome = no.filhos.find((f) => f.tipo === 'nome');
+  return `${no.rotulo ?? ''} ${nome ? textoDe(nome.trechos) : ''}`
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /** Regra 11: o cabeçalho de anexo no começo da linha (na chave, tachada ou não). */
