@@ -4,6 +4,7 @@ import { estruturar, VERSAO_ESTRUTURADOR } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
 import { emOrdemDeLeitura } from './ordem';
 import type { NoRascunho, Rascunho } from './rascunho';
+import { TIPOS_DE_ANOMALIA } from './validacao';
 
 // Casos tirados do corpus (colados de corpus/normas/, 24/09/2026), reduzidos ao que a regra pede.
 const b = (...trechos: (string | Trecho)[]): Bloco => ({
@@ -21,7 +22,14 @@ const porEndereco = (r: Rascunho, endereco: string) =>
   todos(r.nos).find((no) => no.endereco === endereco);
 const nomeDe = (no: NoRascunho | undefined) =>
   textoDe(no?.filhos.find((f) => f.tipo === 'nome')?.trechos ?? []);
-const tipos = (r: Rascunho) => r.anomalias.map((a) => a.tipo);
+/**
+ * As anomalias da leitura (regras 1–12). Os trechos do corpus começam no meio da lei, e a
+ * validação (regra 13, `validacao.test.ts`) acusaria os artigos de antes deles e as alíneas sem
+ * inciso; a lei inteira de exemplo continua conferida com `r.anomalias`.
+ */
+const DA_VALIDACAO = new Set(TIPOS_DE_ANOMALIA.slice(TIPOS_DE_ANOMALIA.indexOf('sem_artigos')));
+const daLeitura = (r: Rascunho) => r.anomalias.filter((a) => !DA_VALIDACAO.has(a.tipo));
+const tipos = (r: Rascunho) => daLeitura(r).map((a) => a.tipo);
 
 describe('estruturador: blocos pré-normativos (regra 2)', () => {
   it('Planalto: cabeçalho, epígrafe, notas da norma, ementa, preâmbulo e o título em caixa alta', () => {
@@ -364,12 +372,16 @@ describe('estruturador: hierarquia, nome e endereço (regra 3)', () => {
     expect(tipos(r)).toEqual(['estrutural_substituido', 'estrutural_substituido']);
   });
 
-  it('nó repetido com artigo no meio continua (a 8.7 acusa o endereço duplicado)', () => {
+  it('nó repetido com artigo no meio continua, e a validação avisa (8.7: estrutural_repetido)', () => {
     const r = estruturar(
       blocos('CAPÍTULO I', 'Um', 'Art. 1º A.', 'CAPÍTULO I', 'Dois', 'Art. 2º B.'),
     );
     expect(todos(r.nos).filter((n) => n.tipo === 'capitulo')).toHaveLength(2);
-    expect(tipos(r)).toEqual([]);
+    expect(r.anomalias.map((a) => [a.tipo, a.gravidade, a.endereco, a.linha])).toEqual([
+      ['estrutural_repetido', 'aviso', 'cap1', 0],
+      ['estrutural_repetido', 'aviso', 'cap1.nome', 1],
+    ]);
+    expect(todos(r.nos).every((n) => n.confianca === 'alta')).toBe(true);
   });
 });
 
@@ -565,7 +577,7 @@ describe('estruturador: redação anterior por tachado (regra 8, 8.6)', () => {
     expect(redacoes(porEndereco(r, 'tit4'))).toEqual([
       { texto: 'TÍTULO IV Da Organização dos Poderes', linhas: { inicio: 4, fim: 5 } },
     ]);
-    expect(r.anomalias).toEqual([]);
+    expect(daLeitura(r)).toEqual([]);
   });
 
   it('pedaço do rótulo fora do tachado ou sufixo sem hífen: o rótulo se lê inteiro (ECA, art. 90, IV; CF, art. 93, VIII-A)', () => {
@@ -819,6 +831,581 @@ describe('estruturador: fecho, anexo e o que falta', () => {
     expect(r.formatoEntrada).toBe('texto');
     expect(todos(r.nos).every((n) => n.confianca === 'a_confirmar')).toBe(true);
     expect(estruturar(blocos('Art. 1º A.')).nos[0]?.confianca).toBe('alta');
+  });
+});
+
+describe('estruturador: anexos (regra 11, 8.7)', () => {
+  const anexos = (r: Rascunho) => r.nos.filter((n) => n.tipo === 'anexo');
+  const redacoes = (no: NoRascunho | undefined) =>
+    (no?.redacoesAnteriores ?? []).map((x) => ({
+      texto: textoDe(x.trechos),
+      linhas: x.linhas,
+      origem: x.origemDeteccao,
+      confirmada: x.confirmada,
+      ...(x.nota ? { nota: x.nota } : {}),
+    }));
+
+  it('LC-SP 988: os anexos antigos, todo tachados, são as redações anteriores do "ANEXO - Revogado."', () => {
+    const r = estruturar(
+      blocos(
+        'Artigo 244 - Esta lei complementar entra em vigor na data de sua publicação.',
+        'Palácio dos Bandeirantes, 9 de janeiro de 2006',
+        'GERALDO ALCKMIN',
+        b(
+          tachado(
+            '- Clique aqui para consultar a redação original do Subanexo 1 do Anexo, conforme a Lei Complementar nº 988, de 09/01/2006.',
+          ),
+        ),
+        b(tachado('ANEXO')),
+        b(
+          tachado(
+            'a que se refere o artigo 239, I, da Lei Complementar nº 988, de 9 de janeiro de 2006',
+          ),
+        ),
+        b(
+          tachado('- Subanexo 1 do Anexo substituído pela '),
+          tachado('Lei Complementar nº 1.033, de 28/12/2007'),
+          tachado(', produzindo efeitos a partir de 01/10/2007.'),
+        ),
+        b(tachado('ANEXO')),
+        b(
+          tachado(
+            'a que se refere o artigo 240 da Lei Complementar nº 988, de 9 de janeiro de 2006',
+          ),
+        ),
+        'ANEXO - Revogado.',
+        '- Anexo revogado pela Lei Complementar nº 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+      ),
+    );
+    // A linha tachada antes do primeiro "ANEXO" fica no fecho; as dos anexos contam.
+    expect(r.descartes).toEqual([{ motivo: 'fecho', linhas: { inicio: 1, fim: 3 } }]);
+    expect(r.linhasTachadas).toBe(5);
+    expect(daLeitura(r)).toEqual([]);
+    expect(r.nos.map((n) => n.endereco)).toEqual(['art244', 'anexo']);
+    const [anexo] = anexos(r);
+    expect(anexo).toMatchObject({
+      rotulo: 'ANEXO',
+      rotuloLido: 'ANEXO -',
+      status: 'revogado',
+      trechos: [],
+      confianca: 'alta',
+      linhas: { inicio: 9, fim: 10 },
+    });
+    expect(anexo?.notas.map((n) => [n.texto, n.lei, n.ano])).toEqual([
+      [
+        'Anexo revogado pela Lei Complementar nº 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+        'Lei Complementar nº 1.112',
+        2010,
+      ],
+    ]);
+    expect(redacoes(anexo)).toEqual([
+      {
+        texto:
+          'ANEXO\na que se refere o artigo 239, I, da Lei Complementar nº 988, de 9 de janeiro de 2006\n- Subanexo 1 do Anexo substituído pela Lei Complementar nº 1.033, de 28/12/2007, produzindo efeitos a partir de 01/10/2007.',
+        linhas: { inicio: 4, fim: 6 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+      {
+        texto:
+          'ANEXO\na que se refere o artigo 240 da Lei Complementar nº 988, de 9 de janeiro de 2006',
+        linhas: { inicio: 7, fim: 8 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+  });
+
+  it('cada cabeçalho abre um anexo: endereço pelo número, rótulo como aparece e texto bruto, sem estruturar', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Ficam criados os cargos dos anexos.',
+        'Brasília, 10 de março de 2020; 199º da Independência e 132º da República.',
+        'ANEXO I - QUADRO DE CARGOS',
+        'TÍTULO I',
+        'Art. 2º Não é artigo.',
+        b(
+          { texto: 'I - ' },
+          { texto: 'Defensor', enfase: true },
+          { texto: ' ' },
+          { texto: '(Vide Lei nº 1, de 2000)', link: 'https://www.planalto.gov.br/l1' },
+        ),
+        'ANEXO II',
+        'Tabela',
+        'ANEXO ÚNICO',
+        '(VETADO)',
+        'ANEXO 3: Mapa',
+        'Anexo IV em minúscula não é cabeçalho.',
+      ),
+    );
+    expect(r.descartes).toEqual([{ motivo: 'fecho', linhas: { inicio: 1, fim: 1 } }]);
+    expect(r.anomalias).toEqual([]);
+    expect(
+      anexos(r).map((n) => [
+        n.endereco,
+        n.rotulo,
+        n.rotuloLido,
+        textoDe(n.trechos),
+        n.status,
+        n.linhas,
+      ]),
+    ).toEqual([
+      [
+        'anexoI',
+        'ANEXO I',
+        'ANEXO I -',
+        'QUADRO DE CARGOS\nTÍTULO I\nArt. 2º Não é artigo.\nI - Defensor (Vide Lei nº 1, de 2000)',
+        'vigente',
+        { inicio: 2, fim: 5 },
+      ],
+      ['anexoII', 'ANEXO II', 'ANEXO II', 'Tabela', 'vigente', { inicio: 6, fim: 7 }],
+      ['anexoUnico', 'ANEXO ÚNICO', 'ANEXO ÚNICO', '(VETADO)', 'vetado', { inicio: 8, fim: 9 }],
+      [
+        'anexo3',
+        'ANEXO 3',
+        'ANEXO 3:',
+        'Mapa\nAnexo IV em minúscula não é cabeçalho.',
+        'vigente',
+        { inicio: 10, fim: 11 },
+      ],
+    ]);
+    // Os trechos ficam como vieram (ênfase, link), e a nota no meio do texto fica nele.
+    expect(anexos(r)[0]?.trechos.slice(-4)).toEqual([
+      { texto: 'I - ' },
+      { texto: 'Defensor', enfase: true },
+      { texto: ' ' },
+      { texto: '(Vide Lei nº 1, de 2000)', link: 'https://www.planalto.gov.br/l1' },
+    ]);
+    expect(anexos(r)[0]?.notas).toEqual([]);
+    expect(todos(r.nos).filter((n) => n.tipo === 'artigo' || n.tipo === 'titulo')).toHaveLength(1);
+  });
+
+  it('notas do fim do cabeçalho e das linhas logo depois dele são do anexo; a do meio fica no texto', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto.',
+        'Brasília, 10 de março de 2020.',
+        'ANEXO (Incluído pela Lei nº 2, de 2001)',
+        '(Redação dada pela Lei nº 3, de 2002)',
+        '- Anexo com redação dada pela Lei Complementar nº 4, de 2003.',
+        'Tabela de cargos',
+        '(Vide Lei nº 5, de 2004)',
+      ),
+    );
+    const [anexo] = anexos(r);
+    expect(anexo?.notas.map((n) => [n.texto, n.linha])).toEqual([
+      ['(Incluído pela Lei nº 2, de 2001)', 2],
+      ['(Redação dada pela Lei nº 3, de 2002)', 3],
+      ['Anexo com redação dada pela Lei Complementar nº 4, de 2003.', 4],
+    ]);
+    expect(anexo?.rotuloLido).toBe('ANEXO');
+    expect(textoDe(anexo?.trechos ?? [])).toBe('Tabela de cargos\n(Vide Lei nº 5, de 2004)');
+    expect(anexo?.status).toBe('vigente');
+    expect(anexo?.linhas).toEqual({ inicio: 2, fim: 6 });
+  });
+
+  it('linha toda tachada dentro de um anexo vigente fica no texto bruto, com a marca, e não conta', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto.',
+        'Brasília, 10 de março de 2020.',
+        'ANEXO',
+        'Cargo | Quantidade',
+        b(tachado('Defensor | 10')),
+        b({ texto: 'Defensor | ' }, tachado('20'), { texto: ' 30' }),
+      ),
+    );
+    const [anexo] = anexos(r);
+    expect(anexo?.trechos).toEqual([
+      { texto: 'Cargo | Quantidade' },
+      { texto: '\n' },
+      { texto: 'Defensor | 10', tachado: true },
+      { texto: '\n' },
+      { texto: 'Defensor | ' },
+      { texto: '20', tachado: true },
+      { texto: ' 30' },
+    ]);
+    expect(anexo?.redacoesAnteriores).toEqual([]);
+    expect(r.linhasTachadas).toBe(0);
+  });
+
+  it('sem fecho reconhecido: o cabeçalho no corpo abre o anexo depois de algum artigo, fora de citação', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 113. O art. 82 passa a vigorar com a seguinte redação:',
+        '"Art. 82. Texto alterado.',
+        'ANEXO',
+        'Tabela."',
+        'Art. 114. Esta Lei entra em vigor.',
+        'Rubrica sem artigo',
+        'ANEXO II',
+        'Art. 1º Texto do anexo.',
+        '§ 1º Também.',
+      ),
+    );
+    expect(r.nos.map((n) => [n.tipo, n.endereco, n.linhas])).toEqual([
+      ['artigo', 'art113', { inicio: 0, fim: 3 }],
+      ['artigo', 'art114', { inicio: 4, fim: 5 }],
+      ['anexo', 'anexoII', { inicio: 6, fim: 8 }],
+    ]);
+    // Dentro da citação, "ANEXO" continua o artigo; a rubrica pendente volta para o anterior.
+    expect(textoDe(porEndereco(r, 'art113')?.trechos ?? []).split('\n')).toHaveLength(4);
+    expect(textoDe(porEndereco(r, 'art114')?.trechos ?? [])).toBe(
+      'Esta Lei entra em vigor.\nRubrica sem artigo',
+    );
+    expect(textoDe(anexos(r)[0]?.trechos ?? [])).toBe('Art. 1º Texto do anexo.\n§ 1º Também.');
+    // Antes de qualquer artigo, não é anexo.
+    expect(anexos(estruturar(blocos('ANEXO', 'Tabela')))).toEqual([]);
+  });
+
+  it('anexo todo tachado sem o vigente de mesmo endereço: revogado, com a redação; sem nota de revogação, confiança média', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto.',
+        'Brasília, 10 de março de 2020.',
+        b(tachado('ANEXO I')),
+        b(tachado('Tabela antiga')),
+        b(tachado('ANEXO II')),
+        '(Revogado pela Lei nº 2, de 2021)',
+        b(tachado('Outra tabela')),
+        'ANEXO III',
+        'Tabela vigente',
+      ),
+    );
+    expect(r.anomalias).toEqual([]);
+    expect(r.linhasTachadas).toBe(4);
+    expect(
+      anexos(r).map((n) => [
+        n.endereco,
+        n.status,
+        n.confianca,
+        textoDe(n.trechos),
+        n.notas.map((x) => x.texto),
+      ]),
+    ).toEqual([
+      ['anexoI', 'revogado', 'media', '', []],
+      ['anexoII', 'revogado', 'alta', '', ['(Revogado pela Lei nº 2, de 2021)']],
+      ['anexoIII', 'vigente', 'alta', 'Tabela vigente', []],
+    ]);
+    expect(redacoes(anexos(r)[0])).toEqual([
+      {
+        texto: 'ANEXO I\nTabela antiga',
+        linhas: { inicio: 2, fim: 3 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+    expect(redacoes(anexos(r)[1])).toEqual([
+      {
+        texto: 'ANEXO II\nOutra tabela',
+        linhas: { inicio: 4, fim: 6 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+  });
+
+  it('anexo tachado com texto sem tachado: tudo na redação anterior, com aviso e confiança média; o de mesmo endereço sem tachado repetido funde (vale o último)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 1º Texto.',
+        'Brasília, 10 de março de 2020.',
+        b(tachado('ANEXO I')),
+        '(Revogado pela Lei nº 2, de 2021)',
+        b(tachado('Tabela antiga')),
+        'Linha sem tachado',
+        'ANEXO II',
+        'Tabela 1',
+        'ANEXO II',
+        'Tabela 2',
+      ),
+    );
+    expect(r.anomalias.map((a) => [a.tipo, a.endereco, a.mensagem])).toEqual([
+      [
+        'duplicata',
+        'anexoII',
+        'ANEXO II (anexoII) aparece mais de uma vez sem tachado; ficou o último, e o anterior virou redação anterior.',
+      ],
+      [
+        'artigo_so_tachado',
+        'anexoI',
+        'ANEXO I está tachado, mas tem texto sem tachado depois do cabeçalho; ficou tudo na redação anterior.',
+      ],
+    ]);
+    expect(r.linhasTachadas).toBe(2);
+    const [primeiro, segundo] = anexos(r);
+    // Sem o de mesmo endereço, fica revogado e médio, mesmo com a nota de revogação.
+    expect([primeiro?.status, primeiro?.trechos, primeiro?.confianca]).toEqual([
+      'revogado',
+      [],
+      'media',
+    ]);
+    expect(primeiro?.notas.map((n) => n.texto)).toEqual(['(Revogado pela Lei nº 2, de 2021)']);
+    expect(redacoes(primeiro)).toEqual([
+      {
+        texto: 'ANEXO I\nTabela antiga\nLinha sem tachado',
+        linhas: { inicio: 2, fim: 5 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+    expect([segundo?.endereco, textoDe(segundo?.trechos ?? []), segundo?.confianca]).toEqual([
+      'anexoII',
+      'Tabela 2',
+      'media',
+    ]);
+    expect(redacoes(segundo)).toEqual([
+      {
+        texto: 'ANEXO II Tabela 1',
+        linhas: { inicio: 6, fim: 7 },
+        origem: 'heuristica',
+        confirmada: false,
+      },
+    ]);
+  });
+
+  it('texto sem tachado sob o cabeçalho tachado (LC-SP 988): fica na redação, com as marcas, e não vai para o "ANEXO - Revogado."', () => {
+    const estruturarCom = (linha: string | Bloco) =>
+      estruturar(
+        blocos(
+          'Artigo 244 - Esta lei complementar entra em vigor na data de sua publicação.',
+          'Palácio dos Bandeirantes, 9 de janeiro de 2006',
+          b(tachado('ANEXO')),
+          b(tachado('a que se refere o artigo 239')),
+          linha,
+          'ANEXO - Revogado.',
+          '- Anexo revogado pela Lei Complementar nº 1.112, de 25/05/2010, com efeitos a partir de 01/04/2010.',
+        ),
+      );
+    const r = estruturarCom('Tabela sem tachado');
+    expect(r.nos.map((n) => n.endereco)).toEqual(['art244', 'anexo']);
+    expect(daLeitura(r).map((a) => [a.tipo, a.endereco, a.mensagem])).toEqual([
+      [
+        'artigo_so_tachado',
+        'anexo',
+        'ANEXO está tachado, mas tem texto sem tachado depois do cabeçalho; ficou tudo na redação anterior.',
+      ],
+    ]);
+    expect(r.linhasTachadas).toBe(2);
+    const [anexo] = anexos(r);
+    expect(anexo).toMatchObject({
+      status: 'revogado',
+      trechos: [],
+      confianca: 'media',
+      linhas: { inicio: 5, fim: 6 },
+    });
+    expect(anexo?.notas.map((n) => n.lei)).toEqual(['Lei Complementar nº 1.112']);
+    expect(redacoes(anexo)).toEqual([
+      {
+        texto: 'ANEXO\na que se refere o artigo 239\nTabela sem tachado',
+        linhas: { inicio: 2, fim: 4 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+    // A tabela com tachado parcial também fica na redação, com as marcas como vieram.
+    const parcial = anexos(estruturarCom(b({ texto: 'Defensor | ' }, tachado('10'))))[0];
+    expect([parcial?.status, parcial?.trechos, parcial?.confianca]).toEqual([
+      'revogado',
+      [],
+      'media',
+    ]);
+    expect(parcial?.redacoesAnteriores[0]?.trechos.slice(-3)).toEqual([
+      { texto: '\n' },
+      { texto: 'Defensor | ' },
+      { texto: '10', tachado: true },
+    ]);
+  });
+
+  it('nota de revogação em linha própria depois do conteúdo tachado: é do anexo; com o de mesmo endereço, da redação', () => {
+    const antigo = [
+      'Art. 1º Texto.',
+      'Brasília, 10 de março de 2020.',
+      b(tachado('ANEXO I')),
+      b(tachado('Tabela antiga')),
+      '(Redação dada pela Lei nº 1, de 2019)',
+      '(Revogado pela Lei nº 2, de 2021)',
+    ];
+    const r = estruturar(blocos(...antigo));
+    expect(r.anomalias).toEqual([]);
+    const [anexo] = anexos(r);
+    expect([anexo?.status, anexo?.confianca, anexo?.linhas]).toEqual([
+      'revogado',
+      'alta',
+      { inicio: 2, fim: 5 },
+    ]);
+    expect(anexo?.notas.map((n) => [n.texto, n.tipo])).toEqual([
+      ['(Revogado pela Lei nº 2, de 2021)', 'revogado'],
+    ]);
+    // A outra nota continua na redação.
+    expect(redacoes(anexo)).toEqual([
+      {
+        texto: 'ANEXO I\nTabela antiga',
+        linhas: { inicio: 2, fim: 4 },
+        origem: 'tachado',
+        confirmada: true,
+        nota: '(Redação dada pela Lei nº 1, de 2019)',
+      },
+    ]);
+    // Com o vigente de mesmo endereço, a nota vai para a nota da redação (a regra de antes).
+    const comGemeo = anexos(estruturar(blocos(...antigo, 'ANEXO I', 'Tabela nova')));
+    expect(
+      comGemeo.map((n) => [n.endereco, n.status, n.confianca, textoDe(n.trechos), n.notas]),
+    ).toEqual([['anexoI', 'vigente', 'alta', 'Tabela nova', []]]);
+    expect(redacoes(comGemeo[0]).map((x) => x.nota)).toEqual([
+      '(Redação dada pela Lei nº 1, de 2019) (Revogado pela Lei nº 2, de 2021)',
+    ]);
+  });
+
+  it('anexo vigente revogado guarda as linhas tachadas numa redação anterior, e elas contam', () => {
+    const fim = ['Art. 1º Texto.', 'Brasília, 10 de março de 2020.'];
+    // (A) nota de revogação no cabeçalho; (B) "Revogado." no texto; (C) o A com duas linhas tachadas.
+    const a = estruturar(
+      blocos(...fim, 'ANEXO (Revogado pela Lei nº 2, de 2021)', b(tachado('Tabela antiga'))),
+    );
+    const bb = estruturar(blocos(...fim, 'ANEXO - Revogado.', b(tachado('linha antiga'))));
+    const c = estruturar(
+      blocos(...fim, 'ANEXO (Revogado pela Lei nº 2, de 2021)', b(tachado('A')), b(tachado('B'))),
+    );
+    for (const r of [a, bb, c]) expect(r.anomalias).toEqual([]);
+    expect(
+      [a, bb, c].map((r) => {
+        const [anexo] = anexos(r);
+        return [
+          anexo?.status,
+          anexo?.trechos,
+          anexo?.confianca,
+          anexo?.notas.map((n) => n.tipo),
+          r.linhasTachadas,
+        ];
+      }),
+    ).toEqual([
+      ['revogado', [], 'alta', ['revogado'], 1],
+      ['revogado', [], 'alta', [], 1],
+      ['revogado', [], 'alta', ['revogado'], 2],
+    ]);
+    expect(redacoes(anexos(a)[0])).toEqual([
+      {
+        texto: 'Tabela antiga',
+        linhas: { inicio: 2, fim: 3 },
+        origem: 'tachado',
+        confirmada: true,
+      },
+    ]);
+    expect(redacoes(anexos(bb)[0])).toEqual([
+      { texto: 'linha antiga', linhas: { inicio: 2, fim: 3 }, origem: 'tachado', confirmada: true },
+    ]);
+    expect(anexos(c)[0]?.redacoesAnteriores).toEqual([
+      {
+        trechos: [{ texto: 'A', tachado: true }, { texto: '\n' }, { texto: 'B', tachado: true }],
+        origemDeteccao: 'tachado',
+        confirmada: true,
+        linhas: { inicio: 2, fim: 4 },
+      },
+    ]);
+    // O vetado mantém o texto bruto, com a marca, e a linha tachada não conta.
+    const vetado = estruturar(blocos(...fim, 'ANEXO ÚNICO', '(VETADO)', b(tachado('antiga'))));
+    expect([anexos(vetado)[0]?.status, vetado.linhasTachadas]).toEqual(['vetado', 0]);
+    expect(textoDe(anexos(vetado)[0]?.trechos ?? [])).toBe('(VETADO)\nantiga');
+  });
+});
+
+describe('estruturador: confiança por heurística (regra 12, 8.7)', () => {
+  const naoAltas = (r: Rascunho) =>
+    todos(r.nos)
+      .filter((n) => n.confianca !== 'alta')
+      .map((n) => [n.endereco, n.confianca]);
+
+  it('duplicata: o que fica é médio (CP, art. 141, § 2º)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 141. As penas aumentam-se:',
+        '§ 2º (VETADO). (Incluído pela Lei nº 13.964, de 2019)',
+        '§ 2º Se o crime é cometido nas redes sociais, aplica-se em triplo a pena.',
+      ),
+    );
+    expect(tipos(r)).toEqual(['duplicata']);
+    expect(naoAltas(r)).toEqual([['art141.par2', 'media']]);
+  });
+
+  it('nó estrutural substituído: o que fica é médio (CP, Título VI)', () => {
+    const r = estruturar(
+      blocos(
+        'TÍTULO VI',
+        'DOS CRIMES CONTRA OS COSTUMES',
+        'TÍTULO VI',
+        'DOS CRIMES CONTRA A DIGNIDADE SEXUAL',
+        '(Redação dada pela Lei nº 12.015, de 2009)',
+        'Art. 213. Constranger alguém.',
+      ),
+    );
+    expect(tipos(r)).toEqual(['estrutural_substituido']);
+    expect(naoAltas(r)).toEqual([['tit6', 'media']]);
+  });
+
+  it('dispositivo vigente sob um tachado sem o de mesmo endereço: muda de pai e fica médio', () => {
+    const r = estruturar(
+      blocos('Art. 1º Texto:', b(tachado('§ 1º Antigo:')), 'I - inciso vigente;'),
+    );
+    expect(tipos(r)).toEqual(['sem_pai']);
+    expect(porEndereco(r, 'art1')?.filhos.map((f) => f.endereco)).toEqual(['art1.par1.incI']);
+    expect(naoAltas(r)).toEqual([['art1.par1.incI', 'media']]);
+  });
+
+  it('linha continuada: o dispositivo que a recebe é médio (LC-SP 988, art. 159)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 159. Aplicam-se aos membros os benefícios concedidos',
+        'aos advogados em geral.',
+        'Art. 160. Texto.',
+      ),
+    );
+    expect(tipos(r)).toEqual(['linha_continuada']);
+    expect(naoAltas(r)).toEqual([['art159', 'media']]);
+  });
+
+  it('artigo e anexo só tachados: médios sem nota de revogação, altos com ela (CP, arts. 185 e 186)', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 184. Violar direito autoral.',
+        b(tachado('Art. 185 - Suprimir ou alterar marca.')),
+        b(tachado('Art. 186 - Antigo.')),
+        '(Revogado pela Lei nº 10.695, de 2003)',
+        b(tachado('ANEXO')),
+        b(tachado('Tabela antiga')),
+      ),
+    );
+    expect(tipos(r)).toEqual([]);
+    expect(todos(r.nos).map((n) => [n.endereco, n.status, n.confianca])).toEqual([
+      ['art184', 'vigente', 'alta'],
+      ['art185', 'revogado', 'media'],
+      ['art186', 'revogado', 'alta'],
+      ['anexo', 'revogado', 'media'],
+    ]);
+  });
+
+  it('texto puro: tudo continua "a confirmar", também o que a heurística resolveu', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 159. Aplicam-se aos membros os benefícios concedidos',
+        'aos advogados em geral.',
+        'Art. 159. De novo.',
+        'ANEXO',
+        'Tabela',
+      ),
+      { formato: 'texto' },
+    );
+    expect(tipos(r)).toEqual(['linha_continuada', 'duplicata']);
+    expect(todos(r.nos).map((n) => [n.endereco, n.confianca])).toEqual([
+      ['art159', 'a_confirmar'],
+      ['anexo', 'a_confirmar'],
+    ]);
+    // Regra 12: o aviso dos 20% vem por último, com a frase do texto puro.
+    expect(r.anomalias.at(-1)).toEqual({
+      tipo: 'a_confirmar_acima_do_limite',
+      gravidade: 'aviso',
+      mensagem: 'O texto chegou sem formatação: 2 de 2 dispositivos (100%) ficaram a confirmar.',
+    });
   });
 });
 
@@ -1191,7 +1778,7 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
       ['art5.par2', '§ 2º', '§ 2', 'As eleições serão realizadas.'],
       ['art5.parUnico', 'Parágrafo único', 'Parágrafo único.', 'Texto.'],
     ]);
-    expect(r.anomalias).toEqual([]);
+    expect(daLeitura(r)).toEqual([]);
   });
 
   it('item: "1." e "1)" (Planalto), "1 -" (ALESP); milhar, ordinal e porcentagem não são item', () => {
@@ -1361,7 +1948,7 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
     expect(textoDe(porEndereco(r, 'art159.incIII')?.trechos ?? [])).toBe(
       'estímulo à participação;',
     );
-    expect(r.anomalias.map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
+    expect(daLeitura(r).map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
       ['linha_continuada', 'art159', 1],
       ['linha_solta', undefined, 3],
     ]);
@@ -1450,6 +2037,101 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
     ]);
   });
 
+  it('nota de renumeração que começa pelo dispositivo (regra 7, 8.7): fora do texto, com o status e a origem quando ela diz', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 102. Compete ao Supremo Tribunal Federal:',
+        '§ 1º A argüição de descumprimento de preceito fundamental será apreciada pelo Supremo Tribunal Federal, na forma da lei. (Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)',
+        'Art. 153 - Divulgar alguém, sem justa causa, conteúdo de documento particular:',
+        b(tachado('Parágrafo único - Somente se procede mediante representação.')),
+        '§ 1º Somente se procede mediante representação. (Parágrafo único renumerado pela Lei nº 9.983, de 2000)',
+        'Art. 198. As ações e serviços públicos de saúde integram uma rede regionalizada:',
+        'III - participação da comunidade.',
+        '§ 1º. O sistema único de saúde será financiado, além de outras fontes. (Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)',
+      ),
+    );
+    const renumerados = todos(r.nos)
+      .filter((n) => n.status === 'renumerado' || n.renumeradoDe)
+      .map((n) => [n.endereco, n.status, n.renumeradoDe, textoDe(n.trechos), n.notas]);
+    expect(renumerados).toEqual([
+      [
+        'art102.par1',
+        'renumerado',
+        undefined,
+        'A argüição de descumprimento de preceito fundamental será apreciada pelo Supremo Tribunal Federal, na forma da lei.',
+        [
+          expect.objectContaining({
+            texto: '(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)',
+            tipo: 'renumerado',
+            lei: 'Emenda Constitucional nº 3',
+            ano: 1993,
+          }),
+        ],
+      ],
+      [
+        'art153.par1',
+        'renumerado',
+        'art153.parUnico',
+        'Somente se procede mediante representação.',
+        [
+          expect.objectContaining({
+            texto: '(Parágrafo único renumerado pela Lei nº 9.983, de 2000)',
+            tipo: 'renumerado',
+          }),
+        ],
+      ],
+      [
+        'art198.par1',
+        'renumerado',
+        'art198.parUnico',
+        'O sistema único de saúde será financiado, além de outras fontes.',
+        [
+          expect.objectContaining({
+            texto:
+              '(Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)',
+            tipo: 'renumerado',
+          }),
+        ],
+      ],
+    ]);
+    // O parágrafo único tachado não tem vigente de mesmo endereço: a redação continua no artigo.
+    expect(porEndereco(r, 'art153')?.redacoesAnteriores).toHaveLength(1);
+    expect(porEndereco(r, 'art153.par1')?.redacoesAnteriores).toEqual([]);
+  });
+
+  it('nota que começa pelo dispositivo: inciso, alínea, item e parágrafo; o parêntese do texto da lei fica no texto', () => {
+    const r = estruturar(
+      blocos(
+        'Art. 5º Texto:',
+        'VII - sétimo; (Inciso VI renumerado pela Lei nº 1, de 2000)',
+        'a) primeira; (Alínea b transformada em alínea a pela Lei nº 2, de 2001)',
+        '1. primeiro; (Item 2 renumerado pela Lei nº 3, de 2002)',
+        '§ 2º Segundo. (Parágrafo Renumerado pela Emenda Constitucional nº 33, de 2001)',
+        '§ 3º Terceiro. (§ 2º renumerado para § 3º pela Lei nº 4, de 2003)',
+        'Art. 120. A permissão de saída será concedida:',
+        'II - necessidade de tratamento médico (parágrafo único do artigo 14).',
+        'III - os cargos, que serão transformados em cargos da carreira (Transformação prevista em lei).',
+      ),
+    );
+    expect(
+      todos(r.nos)
+        .filter((n) => n.tipo !== 'artigo')
+        .map((n) => [n.endereco, n.status, n.renumeradoDe, n.notas.map((x) => x.tipo)]),
+    ).toEqual([
+      ['art5.incVII', 'renumerado', 'art5.incVI', ['renumerado']],
+      ['art5.incVII.alA', 'renumerado', 'art5.incVII.alB', ['renumerado']],
+      ['art5.incVII.alA.it1', 'renumerado', 'art5.incVII.alA.it2', ['renumerado']],
+      ['art5.par2', 'renumerado', undefined, ['renumerado']],
+      ['art5.par3', 'renumerado', 'art5.par2', ['renumerado']],
+      ['art120.incII', 'vigente', undefined, []],
+      ['art120.incIII', 'vigente', undefined, []],
+    ]);
+    expect(textoDe(porEndereco(r, 'art5.incVII.alA.it1')?.trechos ?? [])).toBe('primeiro;');
+    expect(textoDe(porEndereco(r, 'art120.incII')?.trechos ?? [])).toBe(
+      'necessidade de tratamento médico (parágrafo único do artigo 14).',
+    );
+  });
+
   it('nó estrutural renumerado pela nota da ALESP ("Subseção VII renumerada para VIII")', () => {
     const r = estruturar(
       blocos(
@@ -1506,7 +2188,7 @@ describe('estruturador: caput, parágrafo, inciso, alínea e item (regra 6)', ()
       },
     ]);
     expect(todos(r.nos).filter((n) => n.endereco === 'art141.par2')).toHaveLength(1);
-    expect(r.anomalias.map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
+    expect(daLeitura(r).map((a) => [a.tipo, a.endereco, a.linha])).toEqual([
       ['duplicata', 'art141.par2', 2],
     ]);
   });

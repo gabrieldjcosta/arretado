@@ -359,13 +359,24 @@ export function rotulo(t) {
 }
 
 /**
+ * Renumeração dita a partir do dispositivo (acerto da 8.7): "(Parágrafo único renumerado pela Lei
+ * nº 9.983, de 2000)" (CP, art. 153, § 1º), "(Parágrafo único renumerado para § 1º pela Emenda…)"
+ * (CF, art. 198, § 1º) e "(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)"
+ * (CF, art. 102, § 1º). A palavra vem logo depois do rótulo: "(parágrafo único do artigo 14)"
+ * (LEP, art. 120, II) é texto.
+ */
+const RENUMERADO_PELO_DISPOSITIVO =
+  '(?:Par[áa]grafo(?:\\s+[úu]nico)?|§\\s*\\d+\\s*[ºo°]?(?:-[A-Z])?|Inciso\\s+[IVXLCDM]+(?:-[A-Z])?|' +
+  'Al[íi]nea\\s+"?[a-z]"?|Item\\s+\\d+)\\s+(?:renumerad|transformad)[oa]s?|Transformad[oa]s?\\s+em';
+/**
  * Palavras que abrem nota de vigência (Parte 2 §10.6, regra 7, e as variantes do corpus). "(NR)"
  * ("nova redação") é o marcador da ALESP no fim do texto alterado.
  */
 const CHAVES_NOTA =
   '(?:Reda[çc][ãa]o dada|Inclu[íi]d[oa]|Revogad[oa]|Vide|Vig[êe]ncia|Renumerad[oa]|Regulamento|' +
   'Promulga[çc][ãa]o|Produ[çc][ãa]o de efeito|Acrescid[oa]|Suprimid[oa]|' +
-  'Express[ãa]o (?:substitu[íi]d|declarad|suprimid|acrescid|inclu[íi]d|revogad)[oa]|NR(?=\\s*\\)))';
+  'Express[ãa]o (?:substitu[íi]d|declarad|suprimid|acrescid|inclu[íi]d|revogad)[oa]|' +
+  `${RENUMERADO_PELO_DISPOSITIVO}|NR(?=\\s*\\)))`;
 /**
  * Parênteses com uma chave de nota (admite um nível de parênteses dentro); ou candidata a nota
  * solta, sem parênteses (link do Planalto), que `ehNotaSolta` confirma.

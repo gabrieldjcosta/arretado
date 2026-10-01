@@ -79,7 +79,8 @@ export interface NotaDeVigencia extends NotaDoModelo {
 /**
  * Redação anterior (regras 8 e 9): a linha substituída como veio (rótulo, texto e notas em
  * linha), com o tachado. `tachado` nasce confirmada; `heuristica` (texto puro, duplicata sem
- * tachado) nasce não confirmada. `nota` (até 2.000): nota em linha própria que descreve esta
+ * tachado, nó estrutural substituído) nasce não confirmada, e o nó dela, no HTML, fica com
+ * confiança média (regra 12, 8.7). `nota` (até 2.000): nota em linha própria que descreve esta
  * redação (ALESP, tachada).
  */
 export interface RedacaoAnterior extends Pick<
@@ -99,12 +100,13 @@ export interface NoRascunho {
    * Endereço canônico no formato de `Dispositivo.endereco` (segmentos [a-zA-Z0-9] separados por
    * ponto). Estrutura (8.2): o caminho dos nós (`parteEspecial.tit6.cap1`; `parte`, `liv`, `tit`,
    * `cap`, `sec`, `subsec` + número, com sufixo: `cap2A`); nome: `<endereço do pai>.nome`;
-   * `preambulo`; `anexo`. Artigo (8.3): `art9A`, `art1000`, `artUnico`; no bloco com numeração
+   * `preambulo`; anexo (8.7): `anexo` + número, romano como na lei (`anexo`, `anexoII`,
+   * `anexo1`, `anexoUnico`). Artigo (8.3): `art9A`, `art1000`, `artUnico`; no bloco com numeração
    * própria (8.4), com o prefixo dele (`adct.art1`, `dt.art21`); o nó do bloco é o prefixo
    * (`adct`). Regra 6 (8.4): o do pai + segmento, `par2`, `par2A`, `parUnico`, `incIII`,
    * `incVIA`, `alB`, `it1`; o inciso do caput fica direto no artigo (`art5.incIII`, sem
-   * `caput`). Artigo ou dispositivo repetido funde (vale o último); nó estrutural repetido com
-   * artigo no meio fica, e a 8.7 o acusa.
+   * `caput`). Artigo, dispositivo ou anexo repetido funde (vale o último); nó estrutural repetido
+   * com artigo no meio fica, e a 8.7 o acusa.
    */
   endereco: string;
   /** Rótulo de exibição ("Art. 9º-A", "§ 1º", "Parágrafo único", "VI-A", "a)", "TÍTULO II"); TextoCurto. */
@@ -116,7 +118,8 @@ export interface NoRascunho {
    * estrutural (o nome é um filho `nome`) e no revogado. Continuação em outra linha (8.4): "Pena -
    * …", citação entre aspas e rubrica que não chegou a dispositivo entram depois de um trecho `{
    * texto: '\n' }` (quebra de linha); a linha partida pela fonte (minúscula depois de texto sem
-   * ponto final), depois de um espaço.
+   * ponto final), depois de um espaço. No anexo (regra 11, 8.7), o texto bruto: o resto da linha
+   * do cabeçalho e as linhas seguintes, cada uma depois de uma quebra de linha, sem estruturar.
    */
   trechos: Trecho[];
   /**
@@ -164,35 +167,42 @@ export interface Descarte {
   linhas: FaixaDeLinhas;
 }
 
-/** Conflito bloqueia a publicação (9.3) e deixa o nó "a confirmar"; aviso só informa. */
+/**
+ * Conflito bloqueia a publicação (9.3) e deixa o nó "a confirmar" (regra 12); aviso só informa.
+ * Cada tipo tem uma gravidade só (`GRAVIDADE`, em `validacao.ts`).
+ */
 export type GravidadeAnomalia = 'conflito' | 'aviso';
 
-/** Tipos previstos (regras 12–13 e casos do gabarito da 7.3); a 8.7 fecha a lista e a gravidade de cada um. */
+/**
+ * Lista fechada na 8.7, nesta ordem (a do relatório de anomalias do sumário, 9.5). Leitura
+ * (regras 1–12, no estruturador), todos avisos: a ambiguidade já baixou a confiança do nó.
+ * Validação (regra 13, `validarNos`, sobre o rascunho e sobre os registros gravados): conflito
+ * só `sem_artigos` e `endereco_duplicado` (repetido com ao menos um nó não estrutural);
+ * `estrutural_repetido` (todos estruturais: LC 80, duas "SEÇÃO IV") só avisa.
+ */
 export type TipoAnomalia =
-  // Validação estrutural (regra 13)
-  | 'sem_artigos'
-  | 'artigo_fora_de_ordem'
-  | 'artigo_ausente'
-  | 'endereco_duplicado'
-  | 'alinea_sem_inciso'
-  | 'item_sem_alinea'
-  | 'sem_pai'
-  | 'paragrafo_unico_com_numerado'
-  | 'paragrafo_1_sem_2'
-  | 'a_confirmar_acima_do_limite'
-  // Leitura (regras 1–10)
+  // Leitura (regras 1–12)
   | 'caractere_perdido'
-  | 'fora_de_artigo'
   | 'linha_solta'
   | 'linha_continuada'
-  | 'sem_texto'
   | 'duplicata'
   | 'artigo_so_tachado'
   | 'estrutural_substituido'
-  | 'tachado_parcial'
   | 'tachado_sem_dispositivo'
-  | 'nota_sem_dispositivo';
+  | 'sem_pai'
+  // Validação estrutural (regra 13)
+  | 'sem_artigos'
+  | 'endereco_duplicado'
+  | 'estrutural_repetido'
+  | 'artigo_fora_de_ordem'
+  | 'artigo_ausente'
+  | 'alinea_sem_inciso'
+  | 'item_sem_alinea'
+  | 'paragrafo_unico_com_numerado'
+  | 'paragrafo_1_sem_2'
+  | 'a_confirmar_acima_do_limite';
 
+/** Criada por `anomalia` (`validacao.ts`), que tira a gravidade de `GRAVIDADE`. */
 export interface Anomalia {
   tipo: TipoAnomalia;
   gravidade: GravidadeAnomalia;
@@ -220,13 +230,16 @@ export interface Rascunho {
    * norma, dos nós e dos dispositivos, para a pré-checagem da F6 (D16).
    */
   notaVigenciaMaisRecente?: VersaoDeNorma['notaVigenciaMaisRecente'];
-  /** Raízes, na ordem do texto: preâmbulo, estrutura (ou artigos, se não houver), anexo. */
+  /** Raízes, na ordem do texto: preâmbulo, estrutura (ou artigos, se não houver), anexos. */
   nos: NoRascunho[];
   descartes: Descarte[];
   anomalias: Anomalia[];
   /**
-   * Linhas tachadas inteiras (redação anterior, 8.6), fora o cabeçalho, o fecho e o anexo. Zero
-   * numa página HTML: parece a compilada (sumário da 9.5).
+   * Linhas tachadas inteiras (redação anterior ou nó revogado, 8.6; a sobra "CÓDIGO PENAL" do CP
+   * também), fora o cabeçalho e o fecho; desde a 8.7, também as do anexo tachado, que viram a
+   * redação anterior dele (a linha tachada no texto bruto de um anexo vigente fica com a marca e
+   * só conta se o anexo for revogado, quando vira a redação anterior dele). Zero numa página HTML:
+   * parece a compilada (sumário da 9.5).
    */
   linhasTachadas: number;
 }

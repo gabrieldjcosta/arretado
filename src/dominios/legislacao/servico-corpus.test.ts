@@ -15,6 +15,7 @@ import {
   retomarRascunho,
   verificarPublicacao,
 } from './servico';
+import { validarEstrutura } from './validacao';
 
 const HTML = import.meta.glob<string>(
   [
@@ -77,13 +78,15 @@ describe('serviço (9.2) com o CP inteiro', () => {
 });
 
 describe('publicação (9.3) com o corpus', () => {
-  // As 11 páginas do corpus, medidas em 29/09/2026: nenhum conflito e nenhum "a confirmar"; só a
-  // LC 80 tem aviso (a segunda "SEÇÃO IV" do Capítulo I do Título III e o nome dela).
+  // As 11 páginas do corpus, medidas em 29/09/2026: nenhum conflito e nenhum "a confirmar". Os
+  // avisos são os da regra 13 (8.7; contagem por página no `estruturador-corpus.test.ts`); aqui, os
+  // que não são alínea sem inciso nem item sem alínea. Só a LC 80 tem o estrutural repetido (a
+  // segunda "SEÇÃO IV" do Capítulo I do Título III e o nome dela).
   it.each([
-    ['cp', []],
+    ['cp', ['art359T', 'art92', 'art216A', 'art168', 'art234']],
     ['lep-compilado', []],
-    ['eca-compilado', []],
-    ['lc80', ['tit3.cap1.sec4', 'tit3.cap1.sec4.nome']],
+    ['eca-compilado', ['art263']],
+    ['lc80', ['tit3.cap1.sec4', 'tit3.cap1.sec4.nome', 'art54']],
   ])(
     '%s: sem conflito, publicada e imutável',
     async (id, avisos) => {
@@ -98,7 +101,16 @@ describe('publicação (9.3) com o corpus', () => {
       const inicio = performance.now();
       const previa = await verificarPublicacao(repo, versao.id);
       expect(previa.conflitos).toEqual([]);
-      expect(previa.avisos.map((a) => a.endereco)).toEqual(avisos);
+      expect(
+        previa.avisos
+          .filter((a) => a.tipo !== 'alinea_sem_inciso' && a.tipo !== 'item_sem_alinea')
+          .map((a) => a.endereco),
+      ).toEqual(avisos);
+      // Sobre os registros gravados, as mesmas anomalias da validação do rascunho, frase a frase (a
+      // tela junta as duas listas pela mensagem), sem a linha, que os registros não guardam.
+      expect(previa.avisos).toEqual(
+        validarEstrutura(rascunho).map((a) => ({ ...a, linha: undefined })),
+      );
       expect(previa).toMatchObject({ aConfirmar: 0, totalDispositivos: nos });
 
       const publicada = await publicarVersao(repo, versao.id);

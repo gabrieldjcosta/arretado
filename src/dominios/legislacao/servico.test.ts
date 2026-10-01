@@ -558,7 +558,14 @@ describe('publicar (9.3)', () => {
           'O endereço art1 aparece 2 vezes (Art. 1º, Art. 1º-A). Corrija antes de publicar.',
       },
     ]);
-    expect(relatorio.avisos).toEqual([]);
+    // A regra 13 inteira roda sobre os registros: o repetido, gravado depois do art. 2º, também
+    // volta a numeração (aviso, não bloqueia). Dois de dez em conflito: 20% não avisa.
+    expect(relatorio.avisos.map((a) => [a.tipo, a.mensagem])).toEqual([
+      [
+        'artigo_fora_de_ordem',
+        'O art. 1º-A vem depois do art. 2º: a numeração volta; confira se não é citação de outra lei.',
+      ],
+    ]);
 
     // O aceite em lote é dos "a confirmar"; não passa por cima de conflito.
     const bloqueio = await bloqueioDa(publicarVersao(repo, versao.id, { aceitarAConfirmar: true }));
@@ -579,7 +586,7 @@ describe('publicar (9.3)', () => {
     expect(recebidos).toEqual(['versao.publicada']);
   });
 
-  it('nó estrutural repetido só avisa (LC 80: duas "SEÇÃO IV") e a norma é publicada', async () => {
+  it('nó estrutural repetido só avisa (LC 80: duas "SEÇÃO IV"; confirmado na 8.7) e a norma é publicada', async () => {
     const { repo } = await repositorioDeTeste();
     const { norma, versao, rascunho } = await criarRascunho(repo, {
       blocos: DUAS_SECOES,
@@ -593,9 +600,13 @@ describe('publicar (9.3)', () => {
     const publicada = await publicarVersao(repo, versao.id);
     expect(publicada.relatorio.conflitos).toEqual([]);
     expect(publicada.relatorio.avisos.map((a) => [a.tipo, a.gravidade, a.endereco])).toEqual([
-      ['endereco_duplicado', 'aviso', 'tit1.cap1.sec4'],
-      ['endereco_duplicado', 'aviso', 'tit1.cap1.sec4.nome'],
+      ['estrutural_repetido', 'aviso', 'tit1.cap1.sec4'],
+      ['estrutural_repetido', 'aviso', 'tit1.cap1.sec4.nome'],
     ]);
+    // A mesma frase do relatório do estruturador (a tela junta as duas listas pela mensagem).
+    expect(rascunho.anomalias.map((a) => a.mensagem)).toEqual(
+      publicada.relatorio.avisos.map((a) => a.mensagem),
+    );
     expect(publicada.relatorio.avisos[0]?.mensagem).toBe(
       'O endereço tit1.cap1.sec4 aparece 2 vezes (SEÇÃO IV): a fonte repete a numeração. Dá para publicar; corrija o rótulo na revisão.',
     );
@@ -619,7 +630,70 @@ describe('publicar (9.3)', () => {
     });
     const relatorio = await verificarPublicacao(repo, versao.id);
     expect(relatorio.conflitos.map((c) => c.endereco)).toEqual(['tit1.cap1.sec4']);
-    expect(relatorio.avisos.map((a) => a.endereco)).toEqual(['tit1.cap1.sec4.nome']);
+    // Os três nós do endereço em conflito contam como "a confirmar" no aviso dos 20% (regra 12),
+    // mas não na contagem gravada, que é a do aceite em lote.
+    expect(relatorio.avisos.map((a) => [a.tipo, a.endereco])).toEqual([
+      ['estrutural_repetido', 'tit1.cap1.sec4.nome'],
+      ['a_confirmar_acima_do_limite', undefined],
+    ]);
+    expect(relatorio.avisos[1]?.mensagem).toBe(
+      'A fonte pode ter mudado de formato: 3 de 11 dispositivos (27%) ficaram a confirmar. Cole de novo pela página da norma; se continuar, avise.',
+    );
+    expect(relatorio.aConfirmar).toBe(0);
+  });
+
+  it('a validação estrutural inteira (regra 13) vai para o relatório, com as frases do rascunho', async () => {
+    const { repo } = await repositorioDeTeste();
+    // LEP, art. 29, § 1º (alíneas sem inciso), CP, art. 168 (§ 1º sem § 2º) e um salto de artigos.
+    const { norma, versao, rascunho } = await criarRascunho(repo, {
+      blocos: [
+        linha('LEI Nº 1, DE 1º DE JANEIRO DE 2000.'),
+        linha('Art. 1º O trabalho do preso será remunerado.'),
+        linha('§ 1º O produto da remuneração pelo trabalho deverá atender:'),
+        linha('a) à indenização dos danos causados pelo crime;'),
+        linha('b) à assistência à família;'),
+        linha('Art. 3º Apropriar-se de coisa alheia móvel.'),
+      ],
+      origemEntrada: 'html',
+    });
+    const relatorio = await verificarPublicacao(repo, versao.id);
+    expect(relatorio.conflitos).toEqual([]);
+    expect(relatorio.avisos.map((a) => [a.tipo, a.endereco])).toEqual([
+      ['artigo_ausente', 'art3'],
+      ['alinea_sem_inciso', 'art1.par1.alA'],
+      ['alinea_sem_inciso', 'art1.par1.alB'],
+      ['paragrafo_1_sem_2', 'art1'],
+    ]);
+    // As mesmas anomalias do rascunho, sem a linha (os registros não a guardam).
+    expect(relatorio.avisos).toEqual(rascunho.anomalias.map((a) => ({ ...a, linha: undefined })));
+    expect((await publicarVersao(repo, versao.id)).versao.status).toBe('vigente');
+
+    // Um conflito da validação sobre os registros (o editor da etapa 10 grava um nome repetido)
+    // bloqueia a publicação.
+    const { versao: outra } = await criarRascunho(repo, {
+      blocos: [linha('LEI Nº 2, DE 1º DE JANEIRO DE 2000.'), linha('Art. 1º Texto.')],
+      origemEntrada: 'html',
+    });
+    const art1 = (await arvore(repo, outra.normaId)).dispositivos.find(
+      (d) => d.endereco === 'art1',
+    );
+    for (const ordem of [3, 4])
+      await repo.colecao('dispositivos').criar({
+        normaId: outra.normaId,
+        endereco: 'art1.nome',
+        categoria: 'normativo',
+        tipo: 'nome',
+        ordem,
+        paiId: art1?.id,
+        status: 'vigente',
+        confianca: 'alta',
+      });
+    const bloqueio = await bloqueioDa(publicarVersao(repo, outra.id, { aceitarAConfirmar: true }));
+    expect(bloqueio?.motivo).toBe('conflitos');
+    expect(bloqueio?.relatorio.conflitos.map((c) => [c.tipo, c.endereco])).toEqual([
+      ['endereco_duplicado', 'art1.nome'],
+    ]);
+    expect(norma.id).not.toBe(outra.normaId);
   });
 
   it('norma sem artigo bloqueia (é o conflito que o estruturador já acusa)', async () => {
@@ -639,6 +713,10 @@ describe('publicar (9.3)', () => {
     const total = (await arvore(repo, norma.id)).dispositivos.length;
     const relatorio = await verificarPublicacao(repo, versao.id);
     expect(relatorio).toMatchObject({ conflitos: [], aConfirmar: total, totalDispositivos: total });
+    // Regra 12: texto puro passa dos 20% com a frase própria.
+    expect(relatorio.avisos.map((a) => a.mensagem)).toEqual([
+      `O texto chegou sem formatação: ${String(total)} de ${String(total)} dispositivos (100%) ficaram a confirmar.`,
+    ]);
 
     const bloqueio = await bloqueioDa(publicarVersao(repo, versao.id));
     expect(bloqueio).toMatchObject({ motivo: 'a_confirmar' });

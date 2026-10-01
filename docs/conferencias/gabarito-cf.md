@@ -16,7 +16,7 @@ Sem página compilada no corpus: o gabarito foi cruzado só com as âncoras da p
 - Artigos: vigente 411, revogado 13; com letra (9º-A…): 36; último: adct.art138
 - Bloco com numeração própria `adct`: começa em adct.art1, depois de art250
 - Redações anteriores: 751 em 485 dispositivos
-- Notas de vigência no texto vigente: 1946
+- Notas de vigência no texto vigente: 1948
 - Estrutura: titulo 9, capitulo 33, secao 51, subsecao 5, bloco 1
 
 ## Amostra (50 dispositivos)

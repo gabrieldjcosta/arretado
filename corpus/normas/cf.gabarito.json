@@ -25,7 +25,8 @@
     "observacoes": [
       "Conferida em 2026-09-24 por Gabriel sobre um gabarito anterior; o gabarito mudou: conferir de novo.",
       "Amostra inteira (50 itens) conferida na folha docs/conferencias/gabarito-cf.md (commit 7a3ec73): nenhuma divergência.",
-      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: \"Regulamento\" solto virou nota (nome do Capítulo III do Título VII; arts. 14, § 3º, V, 17, 198, §§ 3º e 5º, 212-A, 215, § 1º, 226, § 7º, e 231); \"Produção de efeitos\" solto virou nota (ADCT, arts. 76, 76-A e 76-B; os §§ 1º e 3º do art. 76 do ADCT passam a revogados); \"Vide art. 96 - ADCT\" virou nota (art. 18, § 4º); art. 159, I, \"f\". As 46 marcas dos itens que não mudaram foram repostas na folha nova. Novos na amostra, a conferir: art171.par1.incI, art198.par5, art219B.par2, art233.par2."
+      "8.5 (24/09/2026): gabarito acertado uma vez só. Mudou: \"Regulamento\" solto virou nota (nome do Capítulo III do Título VII; arts. 14, § 3º, V, 17, 198, §§ 3º e 5º, 212-A, 215, § 1º, 226, § 7º, e 231); \"Produção de efeitos\" solto virou nota (ADCT, arts. 76, 76-A e 76-B; os §§ 1º e 3º do art. 76 do ADCT passam a revogados); \"Vide art. 96 - ADCT\" virou nota (art. 18, § 4º); art. 159, I, \"f\". As 46 marcas dos itens que não mudaram foram repostas na folha nova. Novos na amostra, a conferir: art171.par1.incI, art198.par5, art219B.par2, art233.par2.",
+      "8.7 (30/09/2026): mudaram só o art. 102, § 1º (\"(Transformado em § 1º pela Emenda Constitucional nº 3, de 17/03/93)\") e o art. 198, § 1º (\"(Parágrafo único renumerado para § 1º pela Emenda Constitucional nº 29, de 2000)\"): a nota saiu do texto (1.948 notas). Nenhum item da folha nem da amostra é um desses dois parágrafos (o art198.par5 da amostra não mudou); as 46 marcas foram repostas na folha nova (a folha anterior, com as marcas, está em docs/conferencias/gabarito-cf.antes-8.7.md)."
     ]
   },
   "ultimoArtigo": "adct.art138",
@@ -53,7 +54,7 @@
       "revogado": 13
     },
     "comSufixo": 36,
-    "notasVigencia": 1946,
+    "notasVigencia": 1948,
     "redacoesAnteriores": 751,
     "redacoesPorOrigem": {
       "tachado": 699,
@@ -2670,7 +2671,7 @@
     {"endereco":"art102.incIII.alB","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art102.incIII.alC","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art102.incIII.alD","status":"vigente","notas":1,"redacoes":0},
-    {"endereco":"art102.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art102.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art102.par2","status":"vigente","notas":2,"redacoes":1},
     {"endereco":"art102.par3","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art103","status":"vigente","notas":3,"redacoes":1},
@@ -3762,7 +3763,7 @@
     {"endereco":"art198.incI","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art198.incII","status":"vigente","notas":0,"redacoes":0},
     {"endereco":"art198.incIII","status":"vigente","notas":0,"redacoes":0},
-    {"endereco":"art198.par1","status":"vigente","notas":0,"redacoes":0},
+    {"endereco":"art198.par1","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par2","status":"vigente","notas":1,"redacoes":0},
     {"endereco":"art198.par2.incI","status":"vigente","notas":1,"redacoes":1},
     {"endereco":"art198.par2.incII","status":"vigente","notas":1,"redacoes":1},

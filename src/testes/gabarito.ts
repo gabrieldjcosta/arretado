@@ -1,7 +1,7 @@
 // Comparação do rascunho do estruturador com o gabarito da 7.3 (`corpus/normas/*.gabarito.json`),
 // para os testes de src/ e de scripts/: a árvore estrutural (8.2), os artigos com a rubrica (8.3),
 // os dispositivos da regra 6 com endereço, rubrica e texto (8.4), as notas de vigência (8.5) e o
-// status e as redações anteriores (8.6). A 8.9 traz a métrica completa.
+// status e as redações anteriores (8.6), com o anexo (8.7). A 8.9 traz a métrica completa.
 import { textoDe } from '../dominios/legislacao/linhas';
 import type { FaixaDeLinhas, NoRascunho } from '../dominios/legislacao/rascunho';
 
@@ -38,7 +38,8 @@ export interface Gabarito {
 }
 
 const ESTRUTURAIS = new Set(['parte', 'livro', 'titulo', 'capitulo', 'secao', 'subsecao', 'bloco']);
-const NORMATIVOS = new Set(['artigo', 'paragrafo', 'inciso', 'alinea', 'item']);
+/** Artigo a item e o anexo (regra 11, 8.7: status, notas e redações, como os dispositivos). */
+const NORMATIVOS = new Set(['artigo', 'paragrafo', 'inciso', 'alinea', 'item', 'anexo']);
 
 /** Nós estruturais em ordem, com o primeiro artigo que aparece depois de cada um. */
 export function estruturaDe(nos: readonly NoRascunho[]): NoDoGabarito[] {
@@ -113,7 +114,7 @@ export interface DispositivoLido extends ArtigoLido {
   noAncestral: number;
 }
 
-/** Artigos, parágrafos, incisos, alíneas e itens do rascunho, em ordem (pré-ordem). */
+/** Artigos, parágrafos, incisos, alíneas, itens e anexos do rascunho, em ordem (pré-ordem). */
 export function dispositivosDe(nos: readonly NoRascunho[]): DispositivoLido[] {
   const saida: DispositivoLido[] = [];
   const visitar = (no: NoRascunho) => {
@@ -157,33 +158,31 @@ export interface DispositivoEsperado {
 }
 
 /**
- * Os dispositivos (artigo a item) do gabarito, sem o anexo (8.7). Desde a 8.6 sem tolerância para o
- * revogado todo tachado (é nó, com a redação anterior). Desde a 8.5 não há tolerância para o gabarito errado: o que o estruturador achou certo e o
- * gabarito não foi acertado em `scripts/corpus/gabarito.mjs` (pena sem hífen, citação entre aspas,
- * pedaço de rótulo fora do tachado, notas soltas e sem fecho). `id` pode ser o de uma compilada:
- * vale o gabarito da página.
+ * Os dispositivos (artigo a item) e os anexos do gabarito (desde a 8.7). Desde a 8.6 sem tolerância
+ * para o revogado todo tachado (é nó, com a redação anterior). Desde a 8.5 não há tolerância para o
+ * gabarito errado: o que o estruturador achou certo e o gabarito não foi acertado em
+ * `scripts/corpus/gabarito.mjs` (pena sem hífen, citação entre aspas, pedaço de rótulo fora do
+ * tachado, notas soltas e sem fecho). `id` pode ser o de uma compilada: vale o gabarito da página.
  */
 export function dispositivosEsperados(gabarito: Gabarito): DispositivoEsperado[] {
   const amostra = new Map(gabarito.amostra.map((a) => [a.endereco, a]));
   const parciais = new Set(
     gabarito.casos.flatMap((c) => (c.tipo === 'tachado-parcial' && c.endereco ? [c.endereco] : [])),
   );
-  return gabarito.dispositivos
-    .filter((d) => !d.endereco.startsWith('anexo'))
-    .map((d) => {
-      const daAmostra = amostra.get(d.endereco);
-      return {
-        endereco: d.endereco,
-        status: d.status,
-        nome: d.nome === true,
-        notas: d.notas,
-        redacoes: d.redacoes - (parciais.has(d.endereco) ? 1 : 0),
-        ...(daAmostra?.nome === undefined ? {} : { textoDoNome: daAmostra.nome }),
-        ...(daAmostra?.status === 'vigente'
-          ? { texto: { texto: daAmostra.texto, notas: daAmostra.notas } }
-          : {}),
-      };
-    });
+  return gabarito.dispositivos.map((d) => {
+    const daAmostra = amostra.get(d.endereco);
+    return {
+      endereco: d.endereco,
+      status: d.status,
+      nome: d.nome === true,
+      notas: d.notas,
+      redacoes: d.redacoes - (parciais.has(d.endereco) ? 1 : 0),
+      ...(daAmostra?.nome === undefined ? {} : { textoDoNome: daAmostra.nome }),
+      ...(daAmostra?.status === 'vigente'
+        ? { texto: { texto: daAmostra.texto, notas: daAmostra.notas } }
+        : {}),
+    };
+  });
 }
 
 /** Os artigos de `dispositivosEsperados`. */

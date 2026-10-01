@@ -8,9 +8,24 @@ import type { NotaDeVigencia, TipoNotaDeVigencia } from './rascunho';
 const CHAVE_NOTA =
   /^(?:Reda[cç][aã]o|Inclu[ií]d[oa]s?|Acrescid[oa]s?|Acrescentad[oa]s?|Revogad[oa]s?|Renumerad[oa]s?|Suprimid[oa]s?|Vide|Vig[eê]ncia|Regulament[oa]|Regulamenta[cç][aã]o|Promulga[cç][aã]o|Produ[cç][aã]o de efeitos?|Convers[aã]o|Convertid[oa]|Declarad[oa]|Express[aã]o (?:substitu[ií]d|declarad|suprimid|acrescid|inclu[ií]d|revogad)[oa]|Suspens[oa]|Execu[cç][aã]o suspensa|[UÚ]ltima atualiza[cç][aã]o|NR)(?!\p{L})/iu;
 
+/**
+ * Nota de renumeração que começa pelo dispositivo (8.7): "(Parágrafo único renumerado pela Lei nº
+ * 9.983, de 2000)" (CP, art. 153, § 1º), "(Parágrafo único renumerado para § 1º pela Emenda…)"
+ * (CF, art. 198, § 1º), "(Parágrafo Renumerado pela Emenda…)" (CF, art. 149, § 1º, redação
+ * anterior) e "(Transformado em § 1º pela Emenda…)" (CF, art. 102, § 1º). Só com a maiúscula do
+ * começo e a palavra logo depois do rótulo: "(parágrafo único do artigo 14)" (LEP, art. 120) é
+ * texto da lei.
+ */
+const ROTULO_DA_NOTA = String.raw`Par[áa]grafo(?: [úu]nico)?|§ ?\d{1,3} ?[ºo°]?(?:-[A-Z])?|Inciso [IVXLCDM]+(?:-[A-Z])?|Al[íi]nea "?[a-z]"?|Item \d{1,3}`;
+const NOTA_PELO_DISPOSITIVO = new RegExp(
+  String.raw`^(?:(?:${ROTULO_DA_NOTA})\s+(?:[Rr]enumerad|[Tt]ransformad)[oa]s?|Transformad[oa]s? em)(?!\p{L})`,
+  'u',
+);
+
 /** Conteúdo de um parêntese que é nota. "(Revogado)" sozinho é texto do dispositivo, não nota. */
 function ehConteudoDeNota(conteudo: string): boolean {
   const c = conteudo.trim();
+  if (NOTA_PELO_DISPOSITIVO.test(c)) return true;
   if (!CHAVE_NOTA.test(c)) return false;
   return !/^Revogad[oa]s?\.?$/iu.test(c);
 }
