@@ -38,6 +38,7 @@ import { PROFUNDIDADE, type TipoDeDispositivo } from './dispositivo';
 import { estruturar } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
 import { normalizarBlocos } from './normalizacao';
+import { emOrdemDeLeitura } from './ordem';
 import type { NoRascunho, Rascunho, TipoAnomalia } from './rascunho';
 import {
   dadosDaNorma,
@@ -971,6 +972,22 @@ describe('regressão do corpus (8.9): métrica estruturador × gabarito', () => 
 
 // A 9.2 grava o rascunho passando cada registro pelo esquema do modelo: um só inválido (link que o
 // zod recusa, rótulo acima do limite) recusaria a norma inteira. Conferido sem banco, nas 11 páginas.
+// Desde a 8.10 o vetado grava `vetado` (antes, `vigente` com "(VETADO)"): o status de cada registro
+// é o do nó, e os vetados das 7 páginas com todas as redações são os do gabarito (121); as
+// compiladas têm os mesmos.
+const VETADOS: Record<string, number> = {
+  lep: 17,
+  cp: 12,
+  lc80: 28,
+  'lc-sp-988': 18,
+  eca: 4,
+  cdc: 42,
+  cf: 0,
+  'lep-compilado': 17,
+  'cp-compilado': 12,
+  'eca-compilado': 4,
+  'cdc-compilado': 42,
+};
 describe('registros (9.2) no corpus: todo rascunho vira registros válidos do modelo', () => {
   const COMUNS = {
     usuarioId: novoId(),
@@ -1010,6 +1027,14 @@ describe('registros (9.2) no corpus: todo rascunho vira registros válidos do mo
       expect(textos.map((t) => t.dados.dispositivoId)).toEqual(dispositivos.map((d) => d.id));
       for (const { dados } of textos)
         TextoDeDispositivo.parse({ ...COMUNS, id: novoId(), ...dados });
+      const status = emOrdemDeLeitura(r.nos).map(({ no }) => no.status);
+      expect(dispositivos.map((d) => d.dados.status)).toEqual(status);
+      const vetados = status.filter((s) => s === 'vetado').length;
+      expect(vetados).toBe(VETADOS[id]);
+      if ((COM_GABARITO as readonly string[]).includes(id)) {
+        const gabarito = await gabaritoDe(id);
+        expect(vetados).toBe(gabarito.dispositivos.filter((d) => d.status === 'vetado').length);
+      }
     },
     60_000,
   );

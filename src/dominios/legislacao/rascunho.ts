@@ -16,12 +16,12 @@ import type { RelatorioNormalizacao } from './normalizacao';
 export type FormatoEntrada = 'html' | 'texto';
 
 /**
- * Do modelo, mais `vetado` (8.6: "(VETADO)" sozinho no texto; 121 no gabarito do corpus), que o
- * modelo ainda não tem: até a subida do esquema, a gravação (`registros.ts`) o grava `vigente`,
- * com o texto "(VETADO)" (glossário §12). O estruturador não produz 'novo' (diferença entre
- * versões, 11.7 e F6) nem 'eficacia_cessada'.
+ * O do modelo. `vetado` (8.6: "(VETADO)" sozinho no texto; 121 no gabarito do corpus) entrou no
+ * modelo na 8.10 (esquema v3); antes, a gravação (`registros.ts`) o gravava `vigente`, com o texto
+ * "(VETADO)" (glossário §12). O estruturador não produz 'novo' (diferença entre versões, 11.7 e
+ * F6) nem 'eficacia_cessada'.
  */
-export type StatusDispositivo = Dispositivo['status'] | 'vetado';
+export type StatusDispositivo = Dispositivo['status'];
 
 /**
  * Regra 12: `alta` = HTML e regra única; `media` = ambiguidade resolvida por heurística;

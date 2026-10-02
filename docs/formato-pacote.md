@@ -33,7 +33,7 @@ conteudo.cifrado        o ZIP "sem cifra" acima, cifrado
 |---|---|
 | `formato` | `"arretado-pacote"` |
 | `versaoFormato` | `1` |
-| `versaoEsquema` | versão do esquema local que gerou o pacote (2 desde a F2, 9.1; ver "Compatibilidade entre versões do esquema") |
+| `versaoEsquema` | versão do esquema local que gerou o pacote (2 desde a F2, 9.1; 3 desde a 8.10; ver "Compatibilidade entre versões do esquema") |
 | `versaoApp` | versão do app que gerou o pacote |
 | `criadoEm` | instante ISO 8601 UTC |
 | `usuarioId` / `aparelhoId` | origem do pacote |
@@ -93,12 +93,14 @@ Regras comuns:
 |---|---|---|
 | 1 | F0 e F1 | esquema inicial |
 | 2 | F2 (9.1) | coleção nova `leituras` (módulo `legislacao`): "lido até" e posição de cada norma |
+| 3 | F2 (8.10) | valor novo `vetado` em `Dispositivo.status`; nenhuma coleção nem índice novo, nenhum registro migrado |
 
 - **Pacote mais novo que o app** → recusado ("atualize o app"), antes de qualquer outra validação do conteúdo.
 - **Pacote mais antigo que o app** → aceito. Cada coleção declara em que versão nasceu (`desdeVersao` em `ENTIDADES`); o pacote anterior não traz as coleções nascidas depois, que entram **vazias** na importação. Um pacote v1 equivale, portanto, a um v2 sem `leituras`:
   - modos 2, 3 e 4: as leituras locais ficam como estão;
   - modo 5 com o módulo `legislacao` e modo 6: o local passa a ser o pacote, então as leituras locais são excluídas (logicamente no 5, fisicamente no 6), como qualquer registro ausente do pacote.
 - Pacote que traga uma coleção posterior à sua `versaoEsquema` (ex.: v1 com `dados/leituras.json`) → **arquivo alterado fora do aplicativo**.
+- **v2 → v3 (8.10):** o pacote v2 (sem `vetado`) entra como está: o dispositivo vetado gravado antes continua `vigente`, com o texto "(VETADO)". O app v2 recusa o pacote v3 pela versão ("atualize o app"), não pelo primeiro `vetado` (que daria "arquivo alterado"): é por isso que a versão subiu sem mudar índice. Um pacote v2 com `vetado` (que o app v2 não gera) é aceito, sem checagem do valor por versão. Teste: `pacote-v2.test.ts`.
 - Os pontos de restauração (snapshots) são pacotes: os gravados pela v1 continuam restauráveis pelas mesmas regras.
 - Registro de coleção antiga não muda de forma entre v1 e v2 (campo novo sempre opcional ou com padrão na leitura); se um dia mudar, a migração dos registros entra aqui e em `ler.ts`.
 - Campos opcionais novos sem subir a versão: `VersaoDeNorma.notasDaNorma` (F2, 9.2). O app atual lê pacote com ou sem ele; um app anterior à 9.2 recusaria o pacote que o traz (os registros são estritos), por isso vale usar sempre o app mais novo para restaurar.

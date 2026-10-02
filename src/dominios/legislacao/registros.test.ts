@@ -187,6 +187,35 @@ describe('registros da árvore (9.2)', () => {
     expect('notasVigencia' in (textos[0]?.dados ?? {})).toBe(false);
   });
 
+  it('o vetado grava `vetado`, com o texto "(VETADO)", e passa pelo modelo (8.10)', () => {
+    const arvore = [
+      no({
+        tipo: 'artigo',
+        endereco: 'art1',
+        rotulo: 'Art. 1º',
+        trechos: [{ texto: 'Texto.' }],
+        filhos: [
+          no({
+            tipo: 'paragrafo',
+            endereco: 'art1.parUnico',
+            rotulo: 'Parágrafo único',
+            status: 'vetado',
+            trechos: [{ texto: '(VETADO)' }],
+          }),
+        ],
+      }),
+    ];
+    const normaId = novoId();
+    const versaoId = novoId();
+    const { dispositivos, textos } = registrosDaArvore(arvore, { normaId, versaoId, novoId });
+    expect(dispositivos.map((d) => [d.dados.endereco, d.dados.status])).toEqual([
+      ['art1', 'vigente'],
+      ['art1.parUnico', 'vetado'],
+    ]);
+    expect(textos[1]?.dados.trechos).toEqual([{ texto: '(VETADO)' }]);
+    for (const { id, dados } of dispositivos) Dispositivo.parse({ ...COMUNS, id, ...dados });
+  });
+
   it('página hostil: o excedente é cortado nos limites do modelo, não recusa a norma', () => {
     const normaId = novoId();
     const versaoId = novoId();

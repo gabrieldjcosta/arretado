@@ -143,13 +143,30 @@ test('o ajuste de tamanho é global: muda o texto da norma e continua depois de 
   await expect(page.getByText('Tamanho do texto de leitura: 20 px')).toBeVisible();
 });
 
-test('ler o ECA com todas as redações: revogado em uma linha, redação anterior oculta, com indicador (8.6)', async ({
+test('ler o ECA com todas as redações: revogado e vetado em uma linha, redação anterior oculta, com indicador (8.6, 8.10)', async ({
   page,
 }) => {
   test.setTimeout(180_000);
   await importarEPublicar(page, 'eca', 'ECA');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /ECA/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'ECA' })).toBeVisible();
+
+  // VETADO (8.10): o parágrafo único do art. 89-A numa linha atenuada, sem o "(VETADO)" no texto;
+  // a nota da inclusão ao expandir.
+  const vetado = page.locator('[data-endereco="art89A.parUnico"]');
+  await rolarAte(page, vetado);
+  await expect(vetado).toHaveClass(/\bvetado\b/);
+  const linhaVetada = vetado.getByRole('button', { name: /Parágrafo único — \(vetado\)/ });
+  await expect(linhaVetada).toHaveAttribute('aria-expanded', 'false');
+  await expect(vetado.getByText(/VETADO/)).toHaveCount(0);
+  await semViolacoes(page);
+  await linhaVetada.click();
+  await expect(vetado.getByRole('list', { name: 'Notas de vigência' })).toContainText(
+    'Incluído pela Lei nº 15.426',
+  );
+  await expect(vetado.getByText(/VETADO/)).toHaveCount(0);
+  await semViolacoes(page);
+  await linhaVetada.click();
 
   // Redação anterior por tachado (regra 8): o inciso IV do art. 90 ("I ~~V - abrigo;~~").
   const inciso = page.locator('[data-endereco="art90.incIV"]');
@@ -191,7 +208,7 @@ test('ler o ECA com todas as redações: revogado em uma linha, redação anteri
   );
 });
 
-test('ler a LEP com todas as redações: 100% das redações anteriores ocultas, cada uma num indicador (8.6)', async ({
+test('ler a LEP com todas as redações: 100% das redações anteriores ocultas, cada uma num indicador, e os vetados atenuados (8.6, 8.10)', async ({
   page,
 }) => {
   test.setTimeout(180_000);
@@ -204,6 +221,7 @@ test('ler a LEP com todas as redações: 100% das redações anteriores ocultas,
   // texto anterior aparece sem o toque.
   const indicadores = new Map<string, number>();
   const revogados = new Set<string>();
+  const vetados = new Set<string>();
   let noFim = 0;
   for (let passo = 0; passo < 400 && noFim < 3; passo++) {
     const vistos = await page.evaluate(() => {
@@ -220,12 +238,16 @@ test('ler a LEP com todas as redações: 100% das redações anteriores ocultas,
         revogados: linhas
           .filter((l) => l.classList.contains('revogado'))
           .map((l) => l.dataset.endereco ?? ''),
+        vetados: linhas
+          .filter((l) => l.classList.contains('vetado'))
+          .map((l) => l.dataset.endereco ?? ''),
         fim: window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2,
       };
     });
     expect(vistos.abertos).toBe(0);
     for (const [endereco, n] of vistos.indicadores) indicadores.set(endereco, n);
     for (const endereco of vistos.revogados) revogados.add(endereco);
+    for (const endereco of vistos.vetados) vetados.add(endereco);
     noFim = vistos.fim ? noFim + 1 : 0;
     await page.evaluate(() => {
       window.scrollBy(0, window.innerHeight * 0.9);
@@ -238,6 +260,8 @@ test('ler a LEP com todas as redações: 100% das redações anteriores ocultas,
   expect([...indicadores.values()].reduce((a, b) => a + b, 0)).toBe(71);
   expect(revogados.size).toBe(15);
   expect(revogados.has('art182')).toBe(true);
+  // Os 17 vetados do gabarito, cada um numa linha atenuada (8.10).
+  expect(vetados.size).toBe(17);
 });
 
 test('ler o CP compilado: a rubrica fica acima do artigo (9.6)', async ({ page }) => {

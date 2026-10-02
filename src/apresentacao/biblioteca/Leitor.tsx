@@ -12,6 +12,7 @@ import {
   type NormaAberta,
 } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
+import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import {
@@ -579,6 +580,10 @@ function TrechosDoTexto({ trechos }: { trechos: Trechos }) {
 const textoDe = (texto: ItemDaJanela | undefined) =>
   texto?.texto?.trechos.map((t) => t.texto).join('') ?? '';
 
+/** O texto é só "(VETADO)", sem tachado (o tachado fica à mostra, como a redação antiga do anexo). */
+const soEsqueletoDoVeto = (trechos: Trechos) =>
+  trechos.every((t) => !t.tachado) && SO_VETADO.test(trechos.map((t) => t.texto).join(''));
+
 function Notas({ notas }: { notas: NonNullable<TextoDeDispositivo['notasVigencia']> }) {
   return (
     <ul className="notas-vigencia" aria-label="Notas de vigência">
@@ -711,23 +716,26 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
     )
   ) : null;
 
-  if (dispositivo.status === 'revogado') {
+  if (dispositivo.status === 'revogado' || dispositivo.status === 'vetado') {
+    // O vetado guarda "(VETADO)" no texto (e, no CP, arts. 359-O…, na rubrica): é o esqueleto que a
+    // legenda já diz, não conta como "mais" nem se repete ao abrir (8.10).
+    const vetado = dispositivo.status === 'vetado';
+    const nomeVisivel = vetado && soEsqueletoDoVeto(nome?.texto?.trechos ?? []) ? '' : nomeDoNo;
+    const trechos = texto && !(vetado && soEsqueletoDoVeto(texto.trechos)) ? texto.trechos : [];
     const temMais =
-      nomeDoNo !== '' ||
-      notas.length > 0 ||
-      redacoes.length > 0 ||
-      (texto?.trechos.length ?? 0) > 0;
-    const legenda = `${rotulo || 'Dispositivo'} — (revogado)`;
+      nomeVisivel !== '' || notas.length > 0 || redacoes.length > 0 || trechos.length > 0;
+    const legenda = `${rotulo || 'Dispositivo'} — (${dispositivo.status})`;
     return (
       <div
-        className={`dispositivo revogado tipo-${dispositivo.tipo}`}
+        className={`dispositivo ${dispositivo.status} tipo-${dispositivo.tipo}`}
         data-recuo={recuo}
         data-endereco={dispositivo.endereco}
+        aria-busy={carregando}
       >
         {temMais ? (
           <button
             type="button"
-            className="alternar-linha linha-revogada"
+            className="alternar-linha linha-atenuada"
             aria-expanded={expandido}
             onClick={alternarEste}
           >
@@ -735,14 +743,14 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
             <span aria-hidden="true">{expandido ? ' ▾' : ' ▸'}</span>
           </button>
         ) : (
-          <p className="linha-revogada">{legenda}</p>
+          <p className="linha-atenuada">{legenda}</p>
         )}
         {expandido && (
-          <div className="revogado-aberto">
-            {nomeDoNo && <p className="rubrica">{nomeDoNo}</p>}
-            {texto && texto.trechos.length > 0 && (
+          <div className="linha-atenuada-aberta">
+            {nomeVisivel && <p className="rubrica">{nomeVisivel}</p>}
+            {trechos.length > 0 && (
               <p className="texto-dispositivo">
-                <TrechosDoTexto trechos={texto.trechos} />
+                <TrechosDoTexto trechos={trechos} />
               </p>
             )}
             {notas.length > 0 && <Notas notas={notas} />}

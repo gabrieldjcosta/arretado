@@ -170,6 +170,55 @@ describe('leitor da norma (9.6)', () => {
     expect(screen.queryByText(/vigilância a tortura/)).not.toBeInTheDocument();
   }, 30_000);
 
+  it('vetado em uma linha atenuada, como o revogado: a nota ao expandir, sem repetir o "(VETADO)" (ECA, art. 89-A, do corpus; 8.10)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const eca = await colado('eca');
+    // O art. 89-A tem o inciso IX e o parágrafo único vetados, cada um com a nota da inclusão.
+    const inicio = eca.findIndex((b) => textoDoBloco(b).startsWith('Art. 89-A.'));
+    const fim = eca.findIndex((b) => textoDoBloco(b).startsWith('Art. 90.'));
+    const norma = await publicar(repo, eca.slice(inicio, fim + 1), 'ECA');
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'ECA' });
+
+    const vetado = await screen.findByRole('button', { name: /Parágrafo único — \(vetado\)/ });
+    expect(dispositivo('art89A.parUnico')).toHaveClass('vetado');
+    expect(vetado).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /IX — \(vetado\)/ })).toBeInTheDocument();
+    expect(screen.queryByText(/VETADO/)).not.toBeInTheDocument();
+    await usuario.click(vetado);
+    expect(vetado).toHaveAttribute('aria-expanded', 'true');
+    const aberto = dispositivo('art89A.parUnico');
+    const notas = within(aberto).getByRole('list', { name: 'Notas de vigência' });
+    expect(within(notas).getByText(/Incluído pela Lei nº 15\.426, de 2026/)).toBeInTheDocument();
+    // O "(VETADO)" é o esqueleto que a legenda já diz: não vira texto ao abrir.
+    expect(within(aberto).queryByText(/VETADO/)).not.toBeInTheDocument();
+    // O inciso vigente ao lado continua com o texto.
+    expect(within(dispositivo('art89A.incI')).getByText(/promover a defesa/)).toBeInTheDocument();
+  }, 30_000);
+
+  it('vetado só com o esqueleto (rubrica e texto "(VETADO)"): linha sem expansão; a redação anterior fica na linha fechada (8.10)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, [
+      ...LEI,
+      linha('(VETADO)'),
+      linha('Art. 4º (VETADO).'),
+      { trechos: [{ texto: 'Art. 5º Texto antigo.', tachado: true }] },
+      linha('Art. 5º (VETADO).'),
+    ]);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(within(dispositivo('art4')).getByText('Art. 4º — (vetado)')).toBeInTheDocument();
+    });
+    expect(within(dispositivo('art4')).queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByText(/VETADO/)).not.toBeInTheDocument();
+    const quinto = screen.getByRole('button', { name: /Art\. 5º — \(vetado\)/ });
+    expect(screen.queryByText(/Texto antigo/)).not.toBeInTheDocument();
+    await usuario.click(quinto);
+    const anteriores = within(dispositivo('art5')).getByRole('list', { name: 'Texto anterior' });
+    expect(within(anteriores).getByText(/Texto antigo/)).toBeInTheDocument();
+  }, 30_000);
+
   it('100% das redações anteriores ocultas: os indicadores da LEP com todas as redações somam as da norma', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, await colado('lep'), 'LEP');

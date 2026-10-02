@@ -910,7 +910,8 @@ a.item-norma strong {
   cursor: pointer;
 }
 
-.linha-revogada {
+/* Revogado e vetado (8.10): uma linha atenuada, que abre o resto. */
+.linha-atenuada {
   color: var(--texto-atenuado);
   font-size: 0.95em;
   min-height: var(--alvo);
@@ -919,7 +920,7 @@ a.item-norma strong {
   width: 100%;
 }
 
-p.linha-revogada {
+p.linha-atenuada {
   margin: 0;
 }
 
