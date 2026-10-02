@@ -23,7 +23,24 @@ Atualizado em 02/10/2026 (8.10 concluída, a subida do esquema `vetado`, no PR d
 
 Abrir uma sessão nova do Claude Code no repositório. Ela parte do `main` atualizado. Pedido sugerido:
 
-> Leia `docs/proxima-sessao.md` e execute a próxima atividade da F2 seguindo a rotina de pronto do plano. Ao terminar, atualize este arquivo e `docs/solucao-de-problemas.md`, faça o commit num branch com PR para o `main` e me avise. Atualize também a lista de PRs no main (o PR da conclusão da 9.6, se já mergeado, com a hora). Uma atividade por sessão: abra uma sessão nova para cada atividade.
+> Leia `docs/proxima-sessao.md` e execute a 9.8 (destaque automático de condicionantes e prazos), seguindo a rotina de pronto do plano.
+>
+> Contexto (decisões de 01/10/2026, no plano em "Decisões de 01/10/2026"): o Gabriel sai de férias em cerca de uma semana e quer estudar no Arretado. Ordem: 9.8 → etapa 11 (11.1, 11.6, 11.4, 11.2, 11.3, 11.5, 11.8, 11.9) → uso das férias → reconferência dos gabaritos → etapa 10 → 11.7 → `/code-review` das etapas 8, 9 e 11 → 13. A 8.10 (subida do esquema `vetado`) está no PR #30.
+>
+> Antes de começar, leia só:
+> - no `proxima-sessao.md`: "Ordem das férias", "Feita: 8.10" e a seção 4;
+> - no plano (`docs/planos/F2.md`): a linha da 9.8; "Decisões de 24/09/2026" (o item do destaque automático); "Fatos do leitor descobertos na 9.6"; "Fatos da posição descobertos na 9.7" (só o que toca o desenho da linha); "Fatos da subida de esquema descobertos na 8.10" (o esqueleto do vetado na linha atenuada); "Rotina de cada atividade";
+> - na Parte 2 (`docs/especificacao-parte2.md`): só o item "Destaques automáticos" do Leitor (§10.6);
+> - em `solucao-de-problemas.md`: "Destaque automático acende demais, ou é confundido com grifo", "Preferência nova quebra o aparelho ou um backup antigo" e "`npm run check` falha no Windows…";
+> - no glossário: a linha "Destaque automático".
+>
+> Não abra inteiros `*.html`, `*.colado.html`, `*.colado.txt`, `*.gabarito.json` nem o `package-lock`. Use `git grep`, faixas de linhas ou um script Node que imprima o mínimo.
+>
+> 9.8: o detector puro `detectarDestaques(texto)` em `src/dominios/legislacao/destaques.ts`, como descreve a linha do plano (sobre a `chaveDeCasamento`, por categoria, compostas primeiro, sem sobreposição), testado com casos tirados do corpus (LEP, CP, ECA) e com medida de quantos acendem por norma (não pode acender demais); no leitor, o destaque só no texto vigente e só com a preferência ligada, calculado por dispositivo visível e memorizado, com estilo distinto dos 3 grifos e que não depende só de cor (sublinhado com traço por categoria, contraste AA, axe nos dois temas); a preferência `destacarCondicionantesEPrazos` opcional (ausente = desligado), com interruptor em Conta › Aparência e atalho no leitor, **sem subir o esquema** (sem backup), com teste de preferência sem o campo e de restauração de backup antigo; casos no `desempenho.test.ts`. E2E ligando a opção e vendo o destaque na LEP, com axe.
+>
+> Critérios: `npm run check` verde (no Windows, se falhar só por tempo, `--maxWorkers=3` e o `desempenho.test.ts` sozinho; o CI do PR é a referência); E2E verde (com o Chrome instalado, ver `solucao-de-problemas.md`); a métrica da 8.9 sem queda; termo novo no glossário; problemas em `solucao-de-problemas.md`; `proxima-sessao.md` atualizado (próxima: 11.1; hora do merge do #30, se já mergeado) e o plano (9.8 com ✅); commit num branch com PR para o `main`, merge por "Create a merge commit". Se o #30 ainda não estiver mergeado, crie o branch a partir dele (PR empilhado).
+>
+> Esforço M (pode pedir 2 sessões; sugestão: 1ª o detector com a métrica de ruído, 2ª a preferência, o leitor e o E2E). Se passar de ~200 mil tokens, pare no que estiver verde, atualize o `proxima-sessao.md` dizendo onde parou e me avise.
 
 Uma sessão por atividade (a 8.2 a 9.4 couberam numa cada, a 9.2 com uma retomada depois de a sessão cair). A 9.5 é M, dividida em sessões, cada uma fechando com o check verde e o `proxima-sessao.md` dizendo onde parou: 1ª, Biblioteca › Normas (feita); 2ª, a tela Importar e o E2E da LEP e do ECA, com o aviso de tachado e de compilada, a norma colada duas vezes, o "Não consegui identificar artigos" e o andamento (feita); 3ª, a amostra do colar real (só parcial: a LEP no celular bate com o corpus; o resto ficou para o marco antecipado). A 9.5 está concluída. Regras de economia de contexto no `CLAUDE.md`.
 
