@@ -4,8 +4,12 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
 /**
  * Versão do esquema local; sobe a cada migração (Parte 1 §7.2).
  * v1: F0/F1. v2: `leituras` (F2, 9.1), só coleção nova, sem transformar registro.
+ * v3: `vetado` em `Dispositivo.status` (F2, 8.10), sem índice nem coleção nova e sem transformar
+ * registro (o gravado antes continua `vigente` com "(VETADO)"). Sobe para o app anterior recusar o
+ * pacote novo com "atualize o app" (em vez de "arquivo alterado" no primeiro vetado) e para a aba
+ * aberta com ele recarregar antes de ler um status que não conhece.
  */
-export const VERSAO_ESQUEMA = 2;
+export const VERSAO_ESQUEMA = 3;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 

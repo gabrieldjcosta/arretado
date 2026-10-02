@@ -270,7 +270,7 @@ export function validarNos(nos: readonly NoValidado[], formato: FormatoEntrada):
         paragrafos.set(no.pai, p);
       }
       const segmento = no.endereco.slice(no.endereco.lastIndexOf('.') + 1);
-      // O vetado conta (o veto mantém o número); a gravação ainda o grava vigente.
+      // O vetado conta (o veto mantém o número), no rascunho e nos registros (8.10).
       const vivo = no.status !== 'revogado';
       if (segmento === 'parUnico') p.unico ||= vivo;
       else if (vivo && !p.numerado && /^par\d/.test(segmento)) p.numerado = no;

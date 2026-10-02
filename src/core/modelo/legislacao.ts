@@ -91,7 +91,11 @@ export const Dispositivo = z.strictObject({
   ordem: z.number(),
   paiId: Id.optional(),
   rotulo: TextoCurto.optional(),
-  status: z.enum(['vigente', 'revogado', 'eficacia_cessada', 'renumerado', 'novo']),
+  /**
+   * `vetado` (F2, 8.10, esquema v3): "(VETADO)" sozinho no texto; mantém o endereço e o texto.
+   * Antes da v3 ia gravado `vigente`, com o texto "(VETADO)" (a norma gravada antes fica assim).
+   */
+  status: z.enum(['vigente', 'revogado', 'eficacia_cessada', 'renumerado', 'novo', 'vetado']),
   renumeradoDe: z.string().max(200).optional(),
   confianca: z.enum(['alta', 'media', 'a_confirmar']),
 });

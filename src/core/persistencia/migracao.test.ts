@@ -1,4 +1,5 @@
-// Subida de esquema do banco local (F2, 9.1): v1 (F0/F1) → v2 (`leituras`), sem perda.
+// Subidas de esquema do banco local, sem perda: v1 (F0/F1) → v2 (`leituras`, F2, 9.1) → v3
+// (`vetado` em `Dispositivo.status`, F2, 8.10).
 import Dexie from 'dexie';
 import { camposMinimos } from '../modelo/fabrica';
 import { colecoesNaVersao, NOMES_COLECOES, versaoDeOrigem } from '../modelo';
@@ -9,13 +10,18 @@ import { Repositorio } from './repositorio';
 
 /** Esquema v1 publicado (F0/F1, até a 8.5): SHA-256 do JSON canônico de `esquemaDaVersao(1)`. */
 const HASH_ESQUEMA_V1 = 'b6084efc768d6a4212bae4015560771e726373a9721a408232ebda34d55de0b9';
+/** Esquema v2 publicado (F2, da 9.1 à 8.9): SHA-256 do JSON canônico de `esquemaDaVersao(2)`. */
+const HASH_ESQUEMA_V2 = 'a503315efcd469f4d9db7ef0e6e0a35bf87d8d4db072f96cc5b7668be368b9a6';
+
+const hashDoEsquema = async (versao: number) =>
+  sha256(new TextEncoder().encode(jsonCanonico(esquemaDaVersao(versao))));
 
 const nomeBanco = () => `migracao-${Math.random().toString(36).slice(2)}`;
 
-/** Banco como o app v1 o deixou: identidade, um registro por coleção, log e anexo. */
-async function bancoV1(nome: string) {
+/** Banco como o app da versão indicada o deixou: identidade, um registro por coleção, log e anexo. */
+async function bancoAntigo(nome: string, versao: number) {
   const v1 = new Dexie(nome);
-  v1.version(1).stores(esquemaDaVersao(1));
+  for (let v = 1; v <= versao; v++) v1.version(v).stores(esquemaDaVersao(v));
   await v1.open();
   const usuarioId = '0199a6c4-0000-7000-8000-0000000000a1';
   const aparelhoId = '0199a6c4-0000-7000-8000-0000000000a2';
@@ -28,7 +34,7 @@ async function bancoV1(nome: string) {
     excluidoEm: null,
   };
   let n = 0;
-  for (const nome of colecoesNaVersao(1)) {
+  for (const nome of colecoesNaVersao(versao)) {
     n += 1;
     const id =
       nome === 'usuarios'
@@ -58,22 +64,19 @@ async function bancoV1(nome: string) {
 describe('subida de esquema v1 → v2 (9.1)', () => {
   it('o esquema v1 não muda: alterar coleção antiga pede versão nova', async () => {
     // Hash do esquema v1 publicado (F0/F1). Se mudou, não edite a v1: declare a versão seguinte.
-    expect(await sha256(new TextEncoder().encode(jsonCanonico(esquemaDaVersao(1))))).toBe(
-      HASH_ESQUEMA_V1,
-    );
+    expect(await hashDoEsquema(1)).toBe(HASH_ESQUEMA_V1);
   });
 
   it('só `leituras` nasce na v2', () => {
-    expect(VERSAO_ESQUEMA).toBe(2);
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 2)).toEqual(['leituras']);
     expect(colecoesNaVersao(1)).not.toContain('leituras');
   });
 
-  it('abre o banco v1 como v2 sem perder registro, log, anexo nem identidade', async () => {
+  it('abre o banco v1 na versão atual sem perder registro, log, anexo nem identidade', async () => {
     const nome = nomeBanco();
-    const { antes, usuarioId, aparelhoId } = await bancoV1(nome);
+    const { antes, usuarioId, aparelhoId } = await bancoAntigo(nome, 1);
     const repo = await Repositorio.abrir({ nomeBanco: nome });
-    expect(repo.db.verno).toBe(2);
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     expect(repo.ctx.usuarioId).toBe(usuarioId);
     expect(repo.ctx.aparelhoId).toBe(aparelhoId);
     for (const [tabela, registros] of Object.entries(antes)) {
@@ -113,5 +116,55 @@ describe('subida de esquema v1 → v2 (9.1)', () => {
     outra.db.aoFecharPorOutraAba((m) => motivos.push(m));
     await apagarBanco(outra.db.name);
     expect(motivos).toEqual(['versao', 'apagado']);
+  });
+});
+
+describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice nem coleção nova', () => {
+  it('o esquema v2 não muda, e o v3 declara os mesmos índices', async () => {
+    // Se mudou, não edite a v2 publicada: declare a versão seguinte.
+    expect(await hashDoEsquema(2)).toBe(HASH_ESQUEMA_V2);
+    expect(VERSAO_ESQUEMA).toBe(3);
+    expect(esquemaDaVersao(3)).toEqual(esquemaDaVersao(2));
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 3)).toEqual([]);
+  });
+
+  it('abre o banco v2 como v3 sem perder nada; o vetado gravado antes continua vigente com "(VETADO)"', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId, aparelhoId } = await bancoAntigo(nome, 2);
+    // Como a gravação anterior à 8.10 deixava o dispositivo vetado.
+    const dispositivo = antes.dispositivos?.[0] as { id: string; status: string };
+    const texto = antes.textosDispositivo?.[0] as { id: string };
+    const v2 = new Dexie(nome);
+    v2.version(2).stores(esquemaDaVersao(2));
+    await v2.table('textosDispositivo').update(texto.id, {
+      dispositivoId: dispositivo.id,
+      trechos: [{ texto: '(VETADO)' }],
+    });
+    for (const t of v2.tables) antes[t.name] = await t.toArray();
+    v2.close();
+
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(3);
+    expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
+    // Nenhum registro transformado: a subida não migra o vetado gravado antes.
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+    }
+    expect((await repo.colecao('dispositivos').obter(dispositivo.id))?.status).toBe('vigente');
+    expect((await repo.colecao('leituras').todosDoUsuario()).length).toBe(1);
+    // O status novo grava e relê.
+    const normaId = (antes.normas?.[0] as { id: string }).id;
+    const vetado = await repo.colecao('dispositivos').criar({
+      normaId,
+      endereco: 'art2',
+      categoria: 'normativo',
+      tipo: 'artigo',
+      ordem: 2,
+      status: 'vetado',
+      confianca: 'alta',
+    });
+    expect((await repo.colecao('dispositivos').obter(vetado.id))?.status).toBe('vetado');
+    repo.fechar();
+    await apagarBanco(nome);
   });
 });

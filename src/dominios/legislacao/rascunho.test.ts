@@ -10,8 +10,9 @@ describe('rascunho do estruturador (8.1) × modelo', () => {
     expectTypeOf<Pick<NoRascunho, 'tipo' | 'endereco' | 'confianca'>>().toExtend<
       Pick<Dispositivo, 'tipo' | 'endereco' | 'confianca'>
     >();
-    // `vetado` (8.6) ainda não está no modelo: `registros.ts` o grava `vigente`.
-    expectTypeOf<Exclude<NoRascunho['status'], 'vetado'>>().toExtend<Dispositivo['status']>();
+    // `vetado` (8.6) está no modelo desde a 8.10: `registros.ts` grava o status do nó como veio.
+    expectTypeOf<NoRascunho['status']>().toExtend<Dispositivo['status']>();
+    expectTypeOf<'vetado'>().toExtend<Dispositivo['status']>();
     expectTypeOf<NoRascunho['rotulo']>().toExtend<Dispositivo['rotulo']>();
     expectTypeOf<NoRascunho['renumeradoDe']>().toExtend<Dispositivo['renumeradoDe']>();
     expectTypeOf<NoRascunho['trechos']>().toExtend<TextoDeDispositivo['trechos']>();
