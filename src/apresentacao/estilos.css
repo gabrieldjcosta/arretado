@@ -20,6 +20,9 @@
   --destaque-absoluto: #7a3db8;
   --destaque-pena: #b0283a;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
+  /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 85%, o rótulo
+     atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
+  --superficie-translucida: rgb(255 255 255 / 85%);
 
   --fonte-interface: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fonte-leitura: Georgia, 'Times New Roman', serif;
@@ -52,6 +55,7 @@
     --destaque-absoluto: #c9a0ff;
     --destaque-pena: #ff8a9a;
     --sombra: none;
+    --superficie-translucida: rgb(30 30 30 / 85%);
     color-scheme: dark;
   }
 }
@@ -76,6 +80,7 @@
   --destaque-absoluto: #c9a0ff;
   --destaque-pena: #ff8a9a;
   --sombra: none;
+  --superficie-translucida: rgb(30 30 30 / 85%);
   color-scheme: dark;
 }
 
@@ -166,6 +171,9 @@ p {
   top: 0;
   z-index: 5;
   display: flex;
+  /* Nunca mais larga que a tela: com fonte mais larga (Linux, fonte do sistema maior), quebra em
+     duas linhas em vez de alargar a página (no tablet, a página larga desalinha os botões fixos). */
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
@@ -591,7 +599,10 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-@media (max-width: 699px) {
+/* Até 899 px (celular, tablet em retrato, janela estreita): "+ Erro" e áreas mais justas. Com o
+   rótulo longo, a barra de cima ocupava os 712 px do tablet inteiros com a fonte do Windows e
+   transbordava com a do Linux (11.1). */
+@media (max-width: 899px) {
   .acoes-globais .principal {
     padding: 0 0.6rem;
   }
@@ -602,6 +613,12 @@ details > summary::-webkit-details-marker {
 
   .rotulo-curto {
     display: inline;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 899px) {
+  .areas a {
+    padding: 0 0.5rem;
   }
 }
 
@@ -756,22 +773,69 @@ a.item-norma strong {
   color: var(--primaria);
 }
 
-.acao-lido-ate {
+.acoes-leitor {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
   z-index: 4;
+  display: flex;
+  gap: 0.5rem;
 }
 
-.acao-lido-ate button {
+.acoes-leitor button {
   box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
 }
 
 @media (max-width: 699px) {
   /* Acima da navegação das áreas, que no celular fica no rodapé. */
-  .acao-lido-ate {
+  .acoes-leitor {
     right: 0.75rem;
     bottom: calc(var(--alvo) + 1.25rem);
+  }
+}
+
+/* Modo foco (11.1): só o texto. A moldura do Shell some (o leitor põe o atributo na raiz e o tira
+   ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
+   da folga dela, e o grupo fixo desce ao canto. */
+:root[data-modo-foco] .topo,
+:root[data-modo-foco] .faixa-offline,
+:root[data-modo-foco] .rodape {
+  display: none;
+}
+
+:root[data-modo-foco] .shell {
+  padding-bottom: 0;
+}
+
+.em-foco .acoes-leitor {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Perto do fim da norma, a moldura que saiu encurtaria a página e cortaria a rolagem da troca: o
+   leitor põe a diferença em --folga-do-foco (só enquanto está no modo foco). */
+.leitor.em-foco {
+  padding-bottom: calc(var(--alvo) + 2rem + var(--folga-do-foco, 0px));
+}
+
+/* Semitransparente e sem sombra: o texto de trás aparece; o rótulo continua legível (AA também
+   sobre a letra do texto que passa atrás, ver --superficie-translucida). Com o foco do teclado, ou
+   com o mouse em cima (só onde há mouse: no toque, o :hover fica preso no botão tocado e o
+   deixaria opaco), volta a ser opaco. */
+.em-foco .acoes-leitor button {
+  background: var(--superficie-translucida);
+  color: var(--texto-atenuado);
+  box-shadow: none;
+}
+
+.em-foco .acoes-leitor button:focus-visible {
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+@media (hover: hover) {
+  .em-foco .acoes-leitor button:hover {
+    background: var(--superficie);
+    color: var(--texto);
   }
 }
 

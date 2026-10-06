@@ -17,6 +17,9 @@ export default defineConfig({
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'celular', use: { ...devices['Pixel 7'] } },
+    // Tablet Android em retrato (712 × 1138, Chromium como os outros): logo acima do corte de
+    // 700 px, com a barra de cima do desktop e a coluna de leitura quase da largura da tela (11.1).
+    { name: 'tablet', use: { ...devices['Galaxy Tab S4'] } },
   ],
   webServer: {
     command: `npm run build && npx vite preview --port ${PORTA} --strictPort`,

@@ -4,7 +4,7 @@ import type { Repositorio } from '../../core/persistencia';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
-import { gravarPosicao, obterLeitura } from '../../dominios/legislacao/leituras';
+import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -468,5 +468,164 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     });
     expect(document.querySelector('.lista-leitor')).not.toHaveClass('voltando');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
+describe('modo foco (11.1)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+  });
+
+  const barraDoLeitor = () => screen.queryByRole('group', { name: 'Tamanho do texto' });
+
+  it('"Modo foco" deixa só o texto (rota ?foco=texto, moldura escondida) e "Sair do foco" desfaz a entrada do histórico', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    // Com a legenda dos destaques e a linha do "lido até" à vista fora do modo foco.
+    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: true });
+    const art1 = aberta.nos.find((n) => n.dispositivo.endereco === 'art1')!.dispositivo.id;
+    await marcarLidoAte(repo, norma.id, art1);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art2')).toBeInTheDocument();
+    });
+    expect(barraDoLeitor()).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Legenda dos destaques' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ir ao lido até' })).toBeInTheDocument();
+    const entrada = (window.history.state as { idx?: number } | null)?.idx;
+    const entrar = screen.getByRole('button', { name: 'Modo foco' });
+    expect(entrar).toHaveAttribute('aria-keyshortcuts', 'F');
+
+    await usuario.click(entrar);
+    const sair = await screen.findByRole('button', { name: 'Sair do foco' });
+    // O mesmo botão: o foco do teclado continua nele.
+    expect(sair).toBe(entrar);
+    expect(sair).toHaveFocus();
+    expect(sair).toHaveAttribute('aria-keyshortcuts', 'F Escape');
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+    expect(barraDoLeitor()).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Destaques' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '← Biblioteca' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Ir ao lido até' })).not.toBeInTheDocument();
+    // A marca do "lido até" é do texto: continua na linha.
+    expect(dispositivo('art1').parentElement).toHaveTextContent(/Lido até aqui$/);
+    // O título fica para o leitor de tela; o texto e o "Lido até aqui" continuam.
+    expect(screen.getByRole('heading', { level: 1, name: 'LEP' })).toHaveClass(
+      'visualmente-oculto',
+    );
+    expect(dispositivo('art1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lido até aqui' })).toBeInTheDocument();
+    expect(screen.getByText('Modo foco: só o texto.')).toHaveAttribute('role', 'status');
+
+    await usuario.click(sair);
+    await waitFor(() => {
+      expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
+    });
+    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
+    expect(screen.getByRole('button', { name: 'Modo foco' })).toHaveFocus();
+    // Voltou à entrada de antes (navigate(-1)), sem empilhar nem trocar uma nova.
+    expect((window.history.state as { idx?: number } | null)?.idx).toBe(entrada);
+  });
+
+  it('atalho: F entra e sai, Esc sai; nunca em campo de texto, em diálogo aberto, com Ctrl ou com a tecla presa', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    const emFoco = () => document.documentElement.hasAttribute('data-modo-foco');
+
+    await usuario.keyboard('f');
+    await waitFor(() => {
+      expect(emFoco()).toBe(true);
+    });
+    await usuario.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(emFoco()).toBe(false);
+    });
+    await usuario.keyboard('F');
+    await waitFor(() => {
+      expect(emFoco()).toBe(true);
+    });
+    await usuario.keyboard('f');
+    await waitFor(() => {
+      expect(emFoco()).toBe(false);
+    });
+    // Esc fora do modo foco não faz nada.
+    await usuario.keyboard('{Escape}');
+    expect(emFoco()).toBe(false);
+
+    // Com o foco num controle da barra do leitor, que sai: o foco vai para o botão do canto.
+    act(() => {
+      screen.getByRole('button', { name: 'Destaques' }).focus();
+    });
+    await usuario.keyboard('f');
+    expect(await screen.findByRole('button', { name: 'Sair do foco' })).toHaveFocus();
+    await usuario.keyboard('f');
+    expect(await screen.findByRole('button', { name: 'Modo foco' })).toHaveFocus();
+    act(() => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    });
+
+    // Ctrl+F é a busca do navegador; a tecla presa não alterna sem parar.
+    await usuario.keyboard('{Control>}f{/Control}');
+    expect(emFoco()).toBe(false);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f', repeat: true }));
+    });
+    expect(emFoco()).toBe(false);
+
+    // Num campo de texto (e num diálogo aberto), a tecla é do campo.
+    const campo = document.createElement('input');
+    document.body.append(campo);
+    await usuario.click(campo);
+    await usuario.keyboard('f');
+    expect(campo).toHaveValue('f');
+    expect(emFoco()).toBe(false);
+    campo.remove();
+    const dialogo = document.createElement('dialog');
+    dialogo.setAttribute('open', '');
+    const botao = document.createElement('button');
+    dialogo.append(botao);
+    document.body.append(dialogo);
+    botao.focus();
+    await usuario.keyboard('f');
+    expect(emFoco()).toBe(false);
+    dialogo.remove();
+  });
+
+  it('aberto pela rota com ?foco=texto (recarregar, endereço salvo): já no modo foco, e sair troca a rota no lugar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    const sair = await screen.findByRole('button', { name: 'Sair do foco' });
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+    expect(barraDoLeitor()).not.toBeInTheDocument();
+    const entradas = window.history.length;
+
+    await usuario.click(sair);
+    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
+    expect(window.history.length).toBe(entradas);
+    expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
+  });
+
+  it('sair da norma no modo foco devolve a moldura e grava a posição', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByRole('button', { name: 'Sair do foco' });
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+
+    // O atalho "E" do Shell (registrar erro) continua valendo e leva para fora do leitor.
+    await usuario.keyboard('e');
+    expect(await screen.findByRole('heading', { level: 1, name: /Registrar erro/ })).toBeVisible();
+    expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
+    expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
   });
 });
