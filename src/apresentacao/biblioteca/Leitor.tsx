@@ -1,6 +1,14 @@
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type { Leitura, TextoDeDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
@@ -14,6 +22,7 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
+import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { pedacosDestacados, type PedacoDoTrecho } from './destacar';
 import { LegendaDestaques } from './LegendaDestaques';
@@ -47,6 +56,16 @@ const ESPERA_PARA_GRAVAR = 800;
 const QUADROS_NO_LUGAR = 3;
 /** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
 const LIMITE_PARA_VOLTAR = 2000;
+/**
+ * Modo foco (11.1) na rota (`?foco=texto`; a 11.8 acrescenta o artigo por artigo): recarregar, ou
+ * o celular reabrir a aba que matou no fundo, volta ao modo foco, e o "voltar" do navegador sai dele.
+ */
+const PARAMETRO_DO_FOCO = 'foco';
+
+/** Estado da navegação que entrou no modo foco: sair volta uma entrada no histórico. */
+interface EstadoDoFoco {
+  entrouNoFoco?: boolean;
+}
 
 type Trechos = TextoDeDispositivo['trechos'];
 
@@ -237,10 +256,22 @@ function LeitorAberto({
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
   const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
+  // O que o leitor de tela ouve (role=status): o "lido até" marcado e a troca do modo foco.
+  const [anuncio, setAnuncio] = useState('');
   const [margem, setMargem] = useState(0);
   const [barraFixa, setBarraFixa] = useState(0);
-  // A mesma medida, para quem lê a cada rolagem sem forçar o navegador a recalcular o layout.
+  // As mesmas medidas, para quem lê a cada rolagem sem forçar o navegador a recalcular o layout.
+  const margemMedida = useRef(0);
   const barraFixaMedida = useRef(0);
+  // O `scrollY` do último evento de rolagem: o de antes de uma troca de layout (modo foco), que o
+  // navegador pode já ter corrigido sozinho quando o efeito da troca roda.
+  const rolagem = useRef(0);
+  const [busca, setBusca] = useSearchParams();
+  const rota = useLocation();
+  const estadoDaRota: unknown = rota.state;
+  const chaveDaRota = rota.key;
+  const navegar = useNavigate();
+  const modoFoco = busca.has(PARAMETRO_DO_FOCO);
 
   // A linha da posição guardada. A primeira linha é o começo: abre no alto da página, com a barra.
   const [linhaInicial] = useState(() => {
@@ -255,20 +286,20 @@ function LeitorAberto({
   // muda de altura (a barra quebra em duas linhas no celular). A barra fixa do Shell cobre o
   // alto da tela: a posição e o "ir até" descontam a altura dela.
   const lista = useRef<HTMLDivElement | null>(null);
-  const definirLista = useCallback((elemento: HTMLDivElement | null) => {
-    lista.current = elemento;
-    if (elemento) {
-      setMargem(elemento.offsetTop);
-      barraFixaMedida.current = fimDaBarraFixa();
-      setBarraFixa(barraFixaMedida.current);
-    }
+  const medir = useCallback(() => {
+    margemMedida.current = lista.current?.offsetTop ?? 0;
+    barraFixaMedida.current = fimDaBarraFixa();
+    setMargem(margemMedida.current);
+    setBarraFixa(barraFixaMedida.current);
   }, []);
+  const definirLista = useCallback(
+    (elemento: HTMLDivElement | null) => {
+      lista.current = elemento;
+      if (elemento) medir();
+    },
+    [medir],
+  );
   useEffect(() => {
-    const medir = () => {
-      setMargem(lista.current?.offsetTop ?? 0);
-      barraFixaMedida.current = fimDaBarraFixa();
-      setBarraFixa(barraFixaMedida.current);
-    };
     const observador = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(medir);
     observador?.observe(document.body);
     window.addEventListener('resize', medir);
@@ -276,7 +307,7 @@ function LeitorAberto({
       observador?.disconnect();
       window.removeEventListener('resize', medir);
     };
-  }, []);
+  }, [medir]);
 
   const virtualizador = useWindowVirtualizer({
     count: linhas.length,
@@ -336,6 +367,110 @@ function LeitorAberto({
     };
   }, [virtualizador, linhaInicial]);
 
+  // Modo foco (11.1): a moldura do Shell some (atributo na raiz; ver estilos.css) e o leitor tira a
+  // barra dele. A troca muda só o que fica acima da lista, não as linhas (a coluna tem a mesma
+  // largura): o mesmo dispositivo continua no alto da tela, na mesma altura dentro da linha. A
+  // conta parte da rolagem de antes da troca (o navegador pode já tê-la ajustado ao tirar a
+  // moldura), é feita antes da pintura e conferida no quadro seguinte. Durante a volta à posição
+  // guardada (9.7), quem acerta a rolagem é a volta, que já confere a cada quadro.
+  const focoAntes = useRef(modoFoco);
+  // O controle com o foco do teclado saiu da tela na troca (a barra do leitor, a do Shell): o foco
+  // vai para o botão do canto, em vez de cair no corpo da página.
+  const devolverFoco = useRef(false);
+  const botaoDoFoco = useRef<HTMLButtonElement | null>(null);
+  const caixaDoLeitor = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const raiz = document.documentElement;
+    // `data-modo-foco` na raiz esconde a moldura do Shell (barra fixa, navegação, rodapé).
+    if (modoFoco) raiz.dataset.modoFoco = 'texto';
+    const trocou = focoAntes.current !== modoFoco;
+    focoAntes.current = modoFoco;
+    if (devolverFoco.current) {
+      devolverFoco.current = false;
+      botaoDoFoco.current?.focus({ preventScroll: true });
+    }
+    // Ainda nas medidas de antes da troca: o virtualizador só as refaz depois de `medir`.
+    const margemAntes = margemMedida.current;
+    const alto = rolagem.current + barraFixaMedida.current;
+    const item = virtualizador.getVirtualItemForOffset(alto + FOLGA_DO_ALTO);
+    caixaDoLeitor.current?.style.removeProperty('--folga-do-foco');
+    medir();
+    let quadro = 0;
+    if (trocou && !voltandoAgora.current && item !== undefined) {
+      const dentro = alto - item.start;
+      if (item.index === 0 && dentro <= 0) {
+        // No começo da norma, o começo da página, com a barra do leitor (como a volta da 9.7).
+        window.scrollTo(0, 0);
+      } else {
+        const destino = Math.max(
+          0,
+          alto - barraFixaMedida.current + margemMedida.current - margemAntes,
+        );
+        // Perto do fim, a moldura que saiu encurta a página e a rolagem seria cortada (o texto
+        // desceria e o dispositivo do alto mudaria): a folga do modo foco repõe o que faltou.
+        const maximo = document.documentElement.scrollHeight - window.innerHeight;
+        if (modoFoco && destino > maximo) {
+          caixaDoLeitor.current?.style.setProperty(
+            '--folga-do-foco',
+            `${String(Math.ceil(destino - maximo))}px`,
+          );
+        }
+        window.scrollTo(0, destino);
+        quadro = requestAnimationFrame(() => {
+          const desenhada = lista.current?.querySelector(`[data-index="${String(item.index)}"]`);
+          if (!desenhada) return;
+          const erro = desenhada.getBoundingClientRect().top - (barraFixaMedida.current - dentro);
+          if (Math.abs(erro) > 1) window.scrollBy(0, erro);
+        });
+      }
+      rolagem.current = window.scrollY;
+    }
+    return () => {
+      cancelAnimationFrame(quadro);
+      delete raiz.dataset.modoFoco;
+    };
+  }, [modoFoco, medir, virtualizador]);
+
+  // Entrar empilha uma entrada no histórico (o "voltar" do celular sai do modo foco); sair desfaz
+  // a entrada que o leitor empilhou ou, se o modo foco veio de fora (recarregar, endereço salvo),
+  // troca a rota sem mexer no histórico. Uma troca por rota: o segundo toque antes de a rota
+  // mudar (toque duplo, Esc e F seguidos num aparelho lento) não pede outra, porque sair duas
+  // vezes por `navigate(-1)` sairia do leitor.
+  const pedidaNaRota = useRef<string | undefined>(undefined);
+  const alternarFoco = useCallback(() => {
+    if (pedidaNaRota.current === chaveDaRota) return;
+    pedidaNaRota.current = chaveDaRota;
+    const ativo = document.activeElement;
+    devolverFoco.current =
+      ativo instanceof HTMLElement &&
+      ativo !== document.body &&
+      !ativo.closest('.lista-leitor, .acoes-leitor');
+    setAnuncio(modoFoco ? 'Fora do modo foco.' : 'Modo foco: só o texto.');
+    if (!modoFoco) {
+      const estado: EstadoDoFoco = { entrouNoFoco: true };
+      setBusca({ [PARAMETRO_DO_FOCO]: 'texto' }, { state: estado });
+    } else if ((estadoDaRota as EstadoDoFoco | null)?.entrouNoFoco) {
+      void navegar(-1);
+    } else {
+      setBusca({}, { replace: true });
+    }
+  }, [modoFoco, chaveDaRota, estadoDaRota, setBusca, navegar]);
+
+  // Atalho: F entra e sai; Esc também sai. Fora de campo de texto e de diálogo aberto (a tecla é
+  // deles), sem Ctrl/Alt/Cmd (Ctrl+F é a busca do navegador) e sem repetir com a tecla presa.
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.repeat || teclaForaDosAtalhos(e)) return;
+      if (e.key.toLowerCase() !== 'f' && !(modoFoco && e.key === 'Escape')) return;
+      e.preventDefault();
+      alternarFoco();
+    };
+    window.addEventListener('keydown', tecla);
+    return () => {
+      window.removeEventListener('keydown', tecla);
+    };
+  }, [modoFoco, alternarFoco]);
+
   const visiveis = virtualizador.getVirtualItems();
   const primeiraVisivel = visiveis[0]?.index;
   const ultimaVisivel = visiveis.at(-1)?.index;
@@ -367,8 +502,13 @@ function LeitorAberto({
 
   useEffect(() => {
     vivo.current = true;
+    rolagem.current = window.scrollY;
     let espera: ReturnType<typeof setTimeout> | undefined;
     const acompanhar = () => {
+      // Saindo da norma, a lista sai da página antes desta limpeza rodar, e a rolagem cortada da
+      // tela seguinte ainda chega aqui: a posição seria a primeira linha.
+      if (!lista.current) return;
+      rolagem.current = window.scrollY;
       if (!voltandoAgora.current) posicao.current = noDoAlto() ?? posicao.current;
     };
     const gravar = () => {
@@ -416,7 +556,6 @@ function LeitorAberto({
 
   // "Lido até": só muda por ação do usuário (o botão marca o dispositivo no alto da tela).
   const [lidoAte, setLidoAte] = useState(lidoAteId);
-  const [anuncio, setAnuncio] = useState('');
   const [falhaAoMarcar, setFalhaAoMarcar] = useState(false);
   const indiceLidoAte = lidoAte === undefined ? undefined : aberta.indiceDe.get(lidoAte);
   const referenciaLidoAte =
@@ -470,47 +609,24 @@ function LeitorAberto({
     });
   }
 
+  // No modo foco, só o texto e o grupo fixo do canto ("Sair do foco" e "Lido até aqui"); a barra
+  // do leitor (tamanho do texto, destaques), a legenda e a referência do "lido até" ficam fora.
+  // O título continua como cabeçalho da página, só para o leitor de tela.
   return (
-    <div className="leitor">
-      <div className="barra-leitor">
-        <Link to="/biblioteca" className="botao discreto">
-          ← Biblioteca
-        </Link>
-        <h1>{norma.tituloCurto}</h1>
-        <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
-          <button
-            type="button"
-            aria-label="A−, diminuir o texto"
-            disabled={tamanho <= TAMANHO_MINIMO}
-            onClick={() => {
-              mudarTamanho(-PASSO_DO_TAMANHO);
-            }}
-          >
-            A−
-          </button>
-          <output aria-label="Tamanho atual do texto">{tamanho} px</output>
-          <button
-            type="button"
-            aria-label="A+, aumentar o texto"
-            disabled={tamanho >= TAMANHO_MAXIMO}
-            onClick={() => {
-              mudarTamanho(PASSO_DO_TAMANHO);
-            }}
-          >
-            A+
-          </button>
-        </div>
-        <button
-          type="button"
-          className="alternar-destaques"
-          aria-pressed={destacar}
-          onClick={alternarDestaques}
-        >
-          Destaques
-        </button>
-      </div>
-      {destacar && <LegendaDestaques />}
-      {referenciaLidoAte && (
+    <div ref={caixaDoLeitor} className={modoFoco ? 'leitor em-foco' : 'leitor'}>
+      {modoFoco ? (
+        <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
+      ) : (
+        <BarraDoLeitor
+          titulo={norma.tituloCurto}
+          tamanho={tamanho}
+          mudarTamanho={mudarTamanho}
+          destacar={destacar}
+          alternarDestaques={alternarDestaques}
+        />
+      )}
+      {!modoFoco && destacar && <LegendaDestaques />}
+      {!modoFoco && referenciaLidoAte && (
         <p className="lido-ate">
           <span>
             Lido até <strong>{referenciaLidoAte}</strong>
@@ -568,7 +684,20 @@ function LeitorAberto({
           );
         })}
       </div>
-      <div className="acao-lido-ate">
+      {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
+          sai (o foco do teclado fica nele). */}
+      <div className="acoes-leitor">
+        <button
+          ref={botaoDoFoco}
+          type="button"
+          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+          title={
+            modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco: só o texto (atalho: F)'
+          }
+          onClick={alternarFoco}
+        >
+          {modoFoco ? 'Sair do foco' : 'Modo foco'}
+        </button>
         <button type="button" onClick={marcarAqui}>
           Lido até aqui
         </button>
@@ -576,6 +705,61 @@ function LeitorAberto({
           {anuncio}
         </p>
       </div>
+    </div>
+  );
+}
+
+/** A barra do leitor (fora do modo foco): voltar, título, tamanho do texto e destaques. */
+function BarraDoLeitor({
+  titulo,
+  tamanho,
+  mudarTamanho,
+  destacar,
+  alternarDestaques,
+}: {
+  titulo: string;
+  tamanho: number;
+  mudarTamanho: (passo: number) => void;
+  destacar: boolean;
+  alternarDestaques: () => void;
+}) {
+  return (
+    <div className="barra-leitor">
+      <Link to="/biblioteca" className="botao discreto">
+        ← Biblioteca
+      </Link>
+      <h1>{titulo}</h1>
+      <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
+        <button
+          type="button"
+          aria-label="A−, diminuir o texto"
+          disabled={tamanho <= TAMANHO_MINIMO}
+          onClick={() => {
+            mudarTamanho(-PASSO_DO_TAMANHO);
+          }}
+        >
+          A−
+        </button>
+        <output aria-label="Tamanho atual do texto">{tamanho} px</output>
+        <button
+          type="button"
+          aria-label="A+, aumentar o texto"
+          disabled={tamanho >= TAMANHO_MAXIMO}
+          onClick={() => {
+            mudarTamanho(PASSO_DO_TAMANHO);
+          }}
+        >
+          A+
+        </button>
+      </div>
+      <button
+        type="button"
+        className="alternar-destaques"
+        aria-pressed={destacar}
+        onClick={alternarDestaques}
+      >
+        Destaques
+      </button>
     </div>
   );
 }

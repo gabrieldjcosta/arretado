@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
+import { teclaForaDosAtalhos } from './componentes/teclado';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
 
@@ -24,9 +25,7 @@ export function Shell() {
   // Atalho global "E": registrar erro (fora de campos de texto).
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
-      if (e.altKey || e.ctrlKey || e.metaKey || e.key.toLowerCase() !== 'e') return;
-      const alvo = e.target as HTMLElement | null;
-      if (alvo?.closest('input, textarea, select, [contenteditable="true"], dialog[open]')) return;
+      if (e.key.toLowerCase() !== 'e' || teclaForaDosAtalhos(e)) return;
       e.preventDefault();
       void navegar('/recall/registrar');
     };

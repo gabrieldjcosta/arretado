@@ -509,3 +509,182 @@ test('destaque automático: ligar a opção e ver prazos, condições, termos ab
   );
   await expect(page.locator('.destaque')).toHaveCount(0);
 });
+
+/** O dispositivo da linha no alto da tela (logo abaixo da barra fixa) e quanto dela ficou acima. */
+function linhaDoAlto(page: Page) {
+  return page.evaluate(() => {
+    const barra = document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0;
+    const linhas = [...document.querySelectorAll('.linha-leitor')];
+    const linha = linhas.find((l) => {
+      const { top, bottom } = l.getBoundingClientRect();
+      return top <= barra + 8 && bottom > barra + 8;
+    });
+    if (!linha) return undefined;
+    return {
+      endereco: linha.querySelector('[data-endereco]')?.getAttribute('data-endereco'),
+      acima: Math.round(barra - linha.getBoundingClientRect().top),
+    };
+  });
+}
+
+/** A mesma linha no alto, com a mesma parte dela acima da barra (1 px de tolerância). */
+async function mesmaLinha(page: Page, antes: Awaited<ReturnType<typeof linhaDoAlto>>) {
+  const agora = await linhaDoAlto(page);
+  return (
+    agora !== undefined &&
+    antes !== undefined &&
+    agora.endereco === antes.endereco &&
+    Math.abs(agora.acima - antes.acima) <= 1
+  );
+}
+
+/** O grupo fixo do canto: no modo foco, semitransparente (fundo com alfa abaixo de 1). */
+function fundoDoBotao(botao: Locator) {
+  return botao.evaluate((el) => {
+    const fundo = getComputedStyle(el).backgroundColor;
+    const alfa = /rgba?\([^)]*[,/]\s*([\d.]+)\)/.exec(fundo)?.[1];
+    return { posicao: getComputedStyle(el.parentElement ?? el).position, alfa: Number(alfa ?? 1) };
+  });
+}
+
+test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "voltar" sai, e o mesmo dispositivo no alto ao entrar e sair: LEP compilada (11.1)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  const entrar = page.getByRole('button', { name: 'Modo foco' });
+  const sair = page.getByRole('button', { name: 'Sair do foco' });
+  const areas = page.getByRole('navigation', { name: 'Áreas' });
+  const tamanho = page.getByRole('group', { name: 'Tamanho do texto' });
+  const destaques = page.getByRole('button', { name: 'Destaques' });
+  const lidoAteAqui = page.getByRole('button', { name: 'Lido até aqui' });
+
+  // No começo da norma, entrar e sair volta ao começo da página, com a barra do leitor à vista.
+  await entrar.click();
+  await expect(sair).toBeVisible();
+  await sair.click();
+  await expect(entrar).toBeVisible();
+  await expect(tamanho).toBeInViewport();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+  // Entra com o art. 41 no alto: a moldura e a barra do leitor somem, o art. 41 continua no alto.
+  const art41 = page.locator('[data-endereco="art41"]');
+  await rolarAte(page, art41);
+  await alinharNoAlto(page, art41);
+  await entrar.click();
+  await expect(sair).toBeVisible();
+  await expect(sair).toBeFocused();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  await expect(areas).toBeHidden();
+  await expect(page.locator('.topo')).toBeHidden();
+  await expect(page.locator('.rodape')).toBeHidden();
+  await expect(tamanho).toBeHidden();
+  await expect(destaques).toBeHidden();
+  // O título continua como cabeçalho da página, só para o leitor de tela.
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toHaveClass(
+    'visualmente-oculto',
+  );
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art41))).toBeLessThan(2);
+  // Fixo e semitransparente, junto do "Lido até aqui" (o único outro controle no modo foco); com
+  // o mouse fora dele (em cima, ele fica opaco).
+  await page.mouse.move(5, 300);
+  expect(await fundoDoBotao(sair)).toEqual({ posicao: 'fixed', alfa: 0.85 });
+  await expect(lidoAteAqui).toBeVisible();
+  // O botão acompanha a rolagem.
+  const art60 = page.locator('[data-endereco="art60"]');
+  await rolarAte(page, art60);
+  await expect(sair).toBeInViewport();
+  await semViolacoes(page);
+
+  // Sai com o art. 60 no alto: a moldura volta e o art. 60 fica logo abaixo da barra fixa.
+  await alinharNoAlto(page, art60);
+  await sair.click();
+  await expect(entrar).toBeFocused();
+  await expect(areas).toBeVisible();
+  await expect(page).not.toHaveURL(/foco=/);
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art60');
+
+  // O "voltar" do navegador (o gesto do celular) também sai, na mesma posição; "avançar" volta.
+  await entrar.click();
+  await expect(areas).toBeHidden();
+  await page.goBack();
+  await expect(areas).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
+  await page.goForward();
+  await expect(sair).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
+
+  // Recarregar no modo foco volta a ele, na posição; "Lido até aqui" marca o dispositivo do alto.
+  const art105 = page.locator('[data-endereco="art105"]');
+  await rolarAte(page, art105);
+  await alinharNoAlto(page, art105);
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art105');
+  await page.reload();
+  await expect(sair).toBeVisible();
+  await expect(areas).toBeHidden();
+  await expect(art105).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  await lidoAteAqui.click();
+  await expect(
+    page.locator('.linha-leitor').filter({ has: art105 }).locator('.marca-lido-ate'),
+  ).toHaveText('Lido até aqui');
+  await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art105');
+  // Recarregar não perde a entrada do histórico: sair volta a ela, na mesma posição.
+  await sair.click();
+  await expect(areas).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  await expect(page.locator('.lido-ate')).toContainText('Lido até Art. 105');
+
+  // Atalho de teclado: F entra, Esc sai, F de novo entra e sai; o mesmo dispositivo no alto.
+  // Fora de campo de texto: com o foco no corpo da página.
+  // (Sem clicar no corpo: o clique do Playwright rolaria até ele.)
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+  });
+  await page.keyboard.press('f');
+  await expect(sair).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  // A linha "Lido até Art. 105 · Ir ao lido até" fica fora do modo foco; a marca na linha, não.
+  await expect(page.locator('.lido-ate')).toHaveCount(0);
+  await expect(
+    page.locator('.linha-leitor').filter({ has: art105 }).locator('.marca-lido-ate'),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(entrar).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  await page.keyboard.press('Shift+F');
+  await expect(sair).toBeVisible();
+  await page.keyboard.press('f');
+  await expect(entrar).toBeVisible();
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
+  // Ctrl+F é do navegador (busca), não do modo foco.
+  await page.keyboard.press('Control+f');
+  await page.evaluate(() => new Promise((resolver) => requestAnimationFrame(resolver)));
+  expect(page.url()).not.toMatch(/foco=/);
+  await expect(areas).toBeVisible();
+
+  // No fim da norma, a página encurta sem a moldura: o mesmo dispositivo continua no alto, no
+  // mesmo ponto, ao entrar e ao sair.
+  await irAoFim(page, page.locator('[data-endereco="art204"]'));
+  // Até o fim de verdade: as linhas medidas no caminho corrigem a altura estimada da página.
+  let fim = -1;
+  while (fim !== (await page.evaluate(() => window.scrollY))) {
+    fim = await page.evaluate(() => window.scrollY);
+    await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    await page.waitForTimeout(150);
+  }
+  const antes = await linhaDoAlto(page);
+  await entrar.click();
+  await expect(sair).toBeVisible();
+  await expect.poll(() => mesmaLinha(page, antes)).toBe(true);
+  await sair.click();
+  await expect(entrar).toBeVisible();
+  await expect.poll(() => mesmaLinha(page, antes)).toBe(true);
+  info.annotations.push({ type: 'aparelho', description: info.project.name });
+});
