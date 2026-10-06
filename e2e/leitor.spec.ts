@@ -561,6 +561,14 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   const destaques = page.getByRole('button', { name: 'Destaques' });
   const lidoAteAqui = page.getByRole('button', { name: 'Lido até aqui' });
 
+  // A página nunca é mais larga que a tela: no tablet, a barra de cima transbordava com a fonte do
+  // Linux, e a página larga desalinhava os botões fixos (o clique caía no texto).
+  const sobra = () =>
+    page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+  expect(await sobra()).toBe(0);
+
   // No começo da norma, entrar e sair volta ao começo da página, com a barra do leitor à vista.
   await entrar.click();
   await expect(sair).toBeVisible();
@@ -587,6 +595,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
     'visualmente-oculto',
   );
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art41))).toBeLessThan(2);
+  expect(await sobra()).toBe(0);
   // Fixo e semitransparente, junto do "Lido até aqui" (o único outro controle no modo foco); com
   // o mouse fora dele (em cima, ele fica opaco).
   await page.mouse.move(5, 300);

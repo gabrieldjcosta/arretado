@@ -171,6 +171,9 @@ p {
   top: 0;
   z-index: 5;
   display: flex;
+  /* Nunca mais larga que a tela: com fonte mais larga (Linux, fonte do sistema maior), quebra em
+     duas linhas em vez de alargar a página (no tablet, a página larga desalinha os botões fixos). */
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
@@ -596,7 +599,10 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-@media (max-width: 699px) {
+/* Até 899 px (celular, tablet em retrato, janela estreita): "+ Erro" e áreas mais justas. Com o
+   rótulo longo, a barra de cima ocupava os 712 px do tablet inteiros com a fonte do Windows e
+   transbordava com a do Linux (11.1). */
+@media (max-width: 899px) {
   .acoes-globais .principal {
     padding: 0 0.6rem;
   }
@@ -607,6 +613,12 @@ details > summary::-webkit-details-marker {
 
   .rotulo-curto {
     display: inline;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 899px) {
+  .areas a {
+    padding: 0 0.5rem;
   }
 }
 
