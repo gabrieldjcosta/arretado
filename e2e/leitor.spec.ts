@@ -437,3 +437,75 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
   await expect(linha105.locator('.marca-lido-ate')).toBeVisible();
 });
+
+test('destaque automático: ligar a opção e ver prazos, condições, termos absolutos e penas na LEP compilada (9.8)', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  // Desligado por padrão: nada aceso, sem legenda.
+  const botao = page.getByRole('button', { name: 'Destaques' });
+  await expect(botao).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('[data-endereco="art3.parUnico"]')).toContainText('qualquer distinção');
+  await expect(page.locator('.destaque')).toHaveCount(0);
+
+  await botao.click();
+  await expect(botao).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('list', { name: 'Legenda dos destaques' })).toBeVisible();
+
+  /** O trecho aceso de cada categoria e o traço dele (o destaque não depende só da cor). */
+  const aceso = (endereco: string, categoria: string) =>
+    page.locator(`[data-endereco="${endereco}"] .destaque-${categoria}`).first();
+  const traco = (alvo: ReturnType<typeof aceso>) =>
+    alvo.evaluate((el) => {
+      const estilo = getComputedStyle(el);
+      return { linha: estilo.textDecorationLine, estilo: estilo.textDecorationStyle };
+    });
+  const absoluto = aceso('art3.parUnico', 'absoluto');
+  await expect(absoluto).toHaveText('qualquer');
+  expect(await traco(absoluto)).toEqual({ linha: 'underline', estilo: 'wavy' });
+  // Sem fundo: o fundo é dos grifos (11.4).
+  expect(await absoluto.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
+    'rgba(0, 0, 0, 0)',
+  );
+  await semViolacoes(page);
+
+  const condicao = aceso('art14.par2', 'condicao');
+  await rolarAte(page, condicao);
+  await expect(condicao).toHaveText('mediante autorização');
+  expect(await traco(condicao)).toEqual({ linha: 'underline', estilo: 'dashed' });
+
+  const prazo = aceso('art25.incII', 'prazo');
+  await rolarAte(page, prazo);
+  await expect(prazo).toHaveText('prazo de dois meses');
+  expect(await traco(prazo)).toEqual({ linha: 'underline', estilo: 'double' });
+
+  const pena = aceso('art112.incIV', 'pena');
+  await rolarAte(page, pena);
+  await expect(pena).toHaveText('30% (trinta por cento)');
+  expect(await traco(pena)).toEqual({ linha: 'underline', estilo: 'dotted' });
+  await semViolacoes(page);
+
+  // A preferência é global: continua depois de recarregar e aparece em Conta › Aparência.
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.goto('/#/conta/aparencia');
+  const caixa = page.getByRole('checkbox', {
+    name: 'Destacar prazos, condições, termos absolutos e penas',
+  });
+  await expect(caixa).toBeChecked();
+  await semViolacoes(page);
+  await caixa.uncheck();
+  await page.goBack();
+  await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await expect(page.locator('.destaque')).toHaveCount(0);
+});

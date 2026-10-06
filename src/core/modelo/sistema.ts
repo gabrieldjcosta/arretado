@@ -139,6 +139,11 @@ export const Preferencias = z.strictObject({
   fonteLeitura: z.enum(['serifa', 'sem_serifa']),
   tamanhoFonte: z.int().min(12).max(32),
   mostrarRedacoesAnteriores: z.boolean(),
+  /**
+   * Destaque automático de condicionantes e prazos no leitor (F2, 9.8). Opcional: ausente é
+   * desligado, e o registro e o pacote anteriores à 9.8 continuam válidos (sem migração).
+   */
+  destacarCondicionantesEPrazos: z.boolean().optional(),
   horaFechamento: z
     .string()
     .regex(/^\d{2}:\d{2}$/)

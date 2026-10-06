@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { Preferencias, Tema } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
+import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 
@@ -20,7 +21,9 @@ export function AparenciaConta() {
   const dados = { ...salvas, ...pendentes };
 
   const alterar = (
-    mudanca: Partial<Pick<Preferencias, 'tema' | 'fonteLeitura' | 'tamanhoFonte'>>,
+    mudanca: Partial<
+      Pick<Preferencias, 'tema' | 'fonteLeitura' | 'tamanhoFonte' | 'destacarCondicionantesEPrazos'>
+    >,
   ) => {
     setFalhou(false);
     setPendentes((p) => ({ ...p, ...mudanca }));
@@ -99,6 +102,25 @@ export function AparenciaConta() {
           Art. 1º A execução penal tem por objetivo efetivar as disposições de sentença ou decisão
           criminal.
         </p>
+      </fieldset>
+      <fieldset>
+        <legend>Leitura de normas</legend>
+        <label className="opcao">
+          <input
+            type="checkbox"
+            checked={dados.destacarCondicionantesEPrazos ?? false}
+            aria-describedby="destaques-dica"
+            onChange={(e) => {
+              alterar({ destacarCondicionantesEPrazos: e.target.checked });
+            }}
+          />
+          Destacar prazos, condições, termos absolutos e penas
+        </label>
+        <p id="destaques-dica" className="dica">
+          Calculado na leitura, nunca gravado como grifo. Também liga e desliga no botão "Destaques"
+          do leitor.
+        </p>
+        <LegendaDestaques comTraco />
       </fieldset>
     </>
   );
