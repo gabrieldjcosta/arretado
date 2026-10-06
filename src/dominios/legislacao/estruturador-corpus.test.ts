@@ -6,7 +6,8 @@
 // redações anteriores de cada dispositivo (regras 8 a 10 e VETADO; 8.6), sem tolerância, e o
 // anexo (regra 11), a confiança (regra 12) e o relatório de anomalias (regra 13; 8.7). E a métrica
 // da regressão do corpus (8.9, `src/testes/metrica.ts`), por página, com a linha de base e o
-// relatório, sobre o mesmo rascunho (cada página é sanitizada uma vez no arquivo).
+// relatório, sobre o mesmo rascunho (cada página é sanitizada uma vez no arquivo). E o ruído do
+// destaque automático (9.8) por página, com teto e linha de base.
 // Colados como texto pelo `?raw` do Vite: src/ não tem os tipos do Node.
 import { novoId } from '../../core/ids';
 import { Dispositivo, Norma, TextoDeDispositivo, VersaoDeNorma } from '../../core/modelo';
@@ -34,6 +35,7 @@ import {
   resumoDasDivergencias,
   type LinhaDeBase,
 } from '../../testes/metrica';
+import { CATEGORIAS_DESTAQUE, detectarDestaques, type CategoriaDestaque } from './destaques';
 import { PROFUNDIDADE, type TipoDeDispositivo } from './dispositivo';
 import { estruturar } from './estruturador';
 import { prepararLinhas, textoDe } from './linhas';
@@ -41,6 +43,7 @@ import { normalizarBlocos } from './normalizacao';
 import { emOrdemDeLeitura } from './ordem';
 import type { NoRascunho, Rascunho, TipoAnomalia } from './rascunho';
 import {
+  categoriaDe,
   dadosDaNorma,
   notaMaisRecenteDoModelo,
   notasDaNormaDoModelo,
@@ -1049,6 +1052,132 @@ describe('sumário (9.5) no corpus: a página compilada se reconhece pela falta 
       expect(sumario.pareceCompilada).toBe(id.endsWith('-compilado'));
       const artigos = sumario.porTipo.find((t) => t.tipo === 'artigo')?.quantidade ?? 0;
       expect(artigos).toBeGreaterThan(100);
+    },
+    60_000,
+  );
+});
+
+/** Status com texto vigente: o destaque (9.8) só acende neles (nem revogado, vetado ou eficácia cessada). */
+const COM_TEXTO_VIGENTE = new Set(['vigente', 'renumerado', 'novo']);
+/** Palavras que nunca acendem sozinhas (decisões de 24/09/2026; Parte 2 §10.6). */
+const GENERICOS = new Set(['é', 'pode', 'não', 'deve', 'ainda', 'desde', 'quando', 'se']);
+
+interface RuidoDosDestaques {
+  /** Dispositivos normativos com texto vigente (o que o leitor desenha com destaque). */
+  linhas: number;
+  acesas: number;
+  /** Caracteres sem espaço: os do texto e os dentro de um destaque. */
+  caracteres: number;
+  acesos: number;
+  porCategoria: Record<CategoriaDestaque, number>;
+  genericos: string[];
+  sobrepostos: number;
+}
+
+/** Ruído do destaque numa página: o texto como o leitor o vê, com o tachado trocado por espaços. */
+function ruidoDosDestaques(r: Rascunho): RuidoDosDestaques {
+  const ruido: RuidoDosDestaques = {
+    linhas: 0,
+    acesas: 0,
+    caracteres: 0,
+    acesos: 0,
+    porCategoria: { prazo: 0, condicao: 0, absoluto: 0, pena: 0 },
+    genericos: [],
+    sobrepostos: 0,
+  };
+  const semEspaco = (s: string) => s.replace(/\s/g, '').length;
+  for (const { no, pai } of emOrdemDeLeitura(r.nos)) {
+    if (no.tipo === 'nome' || categoriaDe(no, pai) === 'estrutural') continue;
+    if (!COM_TEXTO_VIGENTE.has(no.status)) continue;
+    const texto = no.trechos
+      .map((t) => (t.tachado ? ' '.repeat(t.texto.length) : t.texto))
+      .join('');
+    const caracteres = semEspaco(texto);
+    if (caracteres === 0) continue;
+    const destaques = detectarDestaques(texto);
+    ruido.linhas += 1;
+    ruido.caracteres += caracteres;
+    if (destaques.length > 0) ruido.acesas += 1;
+    let fim = 0;
+    for (const d of destaques) {
+      if (d.inicio < fim) ruido.sobrepostos += 1;
+      fim = d.fim;
+      const aceso = texto.slice(d.inicio, d.fim);
+      ruido.acesos += semEspaco(aceso);
+      ruido.porCategoria[d.categoria] += 1;
+      if (GENERICOS.has(aceso.toLocaleLowerCase('pt-BR'))) ruido.genericos.push(aceso);
+    }
+  }
+  return ruido;
+}
+
+const pct = (parte: number, total: number) => Math.round((1000 * parte) / total) / 10;
+
+/** Teto de toda página: nenhuma acende mais que isto (o CP, com uma pena por artigo, é o maior). */
+const TETO_DE_LINHAS = 60;
+const TETO_DE_CARACTERES = 15;
+/**
+ * Linha de base do ruído (9.8), em % das linhas e dos caracteres sem espaço: o ruído não sobe mais
+ * que 1 ponto (um genérico novo no dicionário acende centenas de linhas) e não cai mais que 3 (o
+ * detector parou de achar). Mudou o dicionário de propósito: medir e trocar aqui.
+ */
+const BASE_DOS_DESTAQUES: Record<string, { linhas: number; caracteres: number }> = {
+  lep: { linhas: 25.1, caracteres: 3 },
+  cp: { linhas: 57.7, caracteres: 11.9 },
+  lc80: { linhas: 29.9, caracteres: 3.4 },
+  'lc-sp-988': { linhas: 27.2, caracteres: 3.7 },
+  eca: { linhas: 37, caracteres: 4.5 },
+  cdc: { linhas: 38.4, caracteres: 4 },
+  cf: { linhas: 33.8, caracteres: 4 },
+  'lep-compilado': { linhas: 25.1, caracteres: 3 },
+  'cp-compilado': { linhas: 57.7, caracteres: 11.9 },
+  'eca-compilado': { linhas: 37, caracteres: 4.5 },
+  'cdc-compilado': { linhas: 38.4, caracteres: 4 },
+};
+
+describe('destaque automático (9.8) no corpus: ruído por norma', () => {
+  const relatorio = new Map<string, string>();
+  afterAll(() => {
+    console.info(
+      [
+        'Destaque automático (9.8): linhas acesas, caracteres acesos e destaques por categoria',
+        ...[...COM_GABARITO, ...COMPILADAS].flatMap((id) => relatorio.get(id) ?? []),
+      ].join('\n'),
+    );
+  });
+
+  it.each([...COM_GABARITO, ...COMPILADAS])(
+    '%s: abaixo do teto e na linha de base, sem genérico e sem sobreposição',
+    async (id) => {
+      const r = await rascunho(id);
+      const inicio = performance.now();
+      const ruido = ruidoDosDestaques(r);
+      const ms = performance.now() - inicio;
+      const linhas = pct(ruido.acesas, ruido.linhas);
+      const caracteres = pct(ruido.acesos, ruido.caracteres);
+      const c = ruido.porCategoria;
+      relatorio.set(
+        id,
+        `${id.padEnd(14)} linhas ${String(linhas).padStart(4)}% de ${String(ruido.linhas).padStart(4)} · caracteres ${String(caracteres).padStart(4)}% · prazo ${String(c.prazo)}, condição ${String(c.condicao)}, absoluto ${String(c.absoluto)}, pena ${String(c.pena)} · ${ms.toFixed(0)} ms`,
+      );
+      expect(ruido.genericos).toEqual([]);
+      expect(ruido.sobrepostos).toBe(0);
+      expect(linhas).toBeLessThanOrEqual(TETO_DE_LINHAS);
+      expect(caracteres).toBeLessThanOrEqual(TETO_DE_CARACTERES);
+      // Toda categoria acende em toda norma do corpus.
+      for (const categoria of CATEGORIAS_DESTAQUE) expect(c[categoria]).toBeGreaterThan(0);
+      const base = BASE_DOS_DESTAQUES[id];
+      expect(
+        base,
+        `linha de base ausente: ${JSON.stringify({ linhas, caracteres })}`,
+      ).toBeDefined();
+      if (!base) return;
+      expect(linhas).toBeLessThanOrEqual(base.linhas + 1);
+      expect(linhas).toBeGreaterThanOrEqual(base.linhas - 3);
+      expect(caracteres).toBeLessThanOrEqual(base.caracteres + 1);
+      expect(caracteres).toBeGreaterThanOrEqual(base.caracteres - 3);
+      // Calculado na leitura: a página inteira, bem abaixo de uma abertura do leitor.
+      expect(ms).toBeLessThan(2_000);
     },
     60_000,
   );

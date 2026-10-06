@@ -53,6 +53,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Atualização (02/10/2026, 8.10):** num worktree recém-instalado, o check inteiro falhou em 25 testes de tempo e de tela (sem relação com a mudança); com `--maxWorkers=3` e o `desempenho.test.ts` sozinho (60 de 60), duas rodadas deram 2 e 1 falhas diferentes (`Leitor.test.tsx`, `App.test.tsx` e `Cannot find module …fake-indexeddb…` no `Biblioteca.test.tsx`), e cada arquivo passou sozinho. O CI do PR é a referência.
 - **Atualização (24/09/2026):** o "Sem conexão" falhou também no CI (Linux), no PR #11. Causa no teste: ele conferia o texto logo depois do evento `offline`, e a assinatura do `useSyncExternalStore` é um efeito que, sob carga, pode chegar depois. O teste passou a esperar (`findByText` e `waitFor`). Ao ver de novo "não acha um texto" em teste de tela, procurar a mesma causa (conferência síncrona logo depois de um evento) antes de rodar de novo.
 
+### `npm audit` reprova o check sem mudança de dependência
+- **Sintoma:** `npm run check` (e o CI) vermelho só na etapa `audit`, com um aviso novo de pacote que ninguém mexeu. **Causa:** o aviso é publicado depois da última sessão verde; o `--audit-level=high` reprova a partir de "alto", mesmo em dependência indireta de desenvolvimento.
+- **Solução:** `npm audit fix --dry-run` para ver o que muda; se só sobe a versão de correção (patch) dentro da faixa do `package.json`, `npm audit fix` num commit separado (`chore(deps)`) e a suíte inteira de novo (o corpus confere a saída do sanitizador byte a byte). Subida de versão maior ou troca de pacote é escolha técnica: decidir com o Gabriel (T1–T18).
+- **Origem:** ocorrido na 9.8 (06/10/2026): `source-map-js` 1.2.1 (alto; vem do Vite e do jsdom) e `dompurify` 3.4.15 (baixo; avisos do modo `IN_PLACE`, que o sanitizador não usa) → 1.2.2 e 3.4.16.
+
 ### `format:check` reprova `.claude/settings.local.json`
 - **Sintoma:** `npm run check` para no Prettier apontando `.claude/settings.local.json`, sem mudança no código. **Causa:** o Claude Code grava as permissões da sessão nesse arquivo dentro do worktree; o git o ignora (ignore global do usuário), mas o Prettier o verificava.
 - **Solução:** `.claude` no `.prettierignore`. **Prevenção:** arquivo gerado por ferramenta e fora do git entra no `.prettierignore` junto com o `.gitignore`.
@@ -874,13 +879,28 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Destaque automático acende demais, ou é confundido com grifo
 - **Sintoma:** linhas inteiras acesas; "desde a data" destacado como condição; o destaque se confunde com um grifo. **Causa:** termo genérico no dicionário (na LEP, "é" 183 vezes, "pode" 99, "não" 65, "deve" 61 em 973 linhas); palavra ambígua ("desde" temporal × "desde que"); estilo parecido com o dos grifos.
-- **Solução:** dicionário por categoria com as expressões compostas primeiro; genéricos fora; estilo sem as cores dos grifos e que não depende só de cor. **Prevenção:** métrica de ruído por norma com limite no teste e casos que **não** devem acender (9.8).
-- **Origem:** previsto — atividade 9.8.
+- **Solução (9.8, `destaques.ts`):** dicionário por categoria em `REGRAS`, por prioridade (as locuções antes das palavras soltas: "sempre que" é condição antes de "sempre" ser absoluto; "reclusão, de 2 (dois) a 8 (oito) anos" é uma pena antes de "8 (oito) anos" ser prazo) e sem sobreposição; fora: "é", "pode", "não", "deve", "ainda" e "desde" sozinhos, "quando", "se", "prazo" e "mediante" sozinhos (no CP, "mediante fraude" é o modo do crime, 85 linhas), "nos casos previstos", "facultado", "pena privativa de liberdade", "a salvo de", "no todo ou em parte", "caso em que" e "horas-aula". O "se" depois de "somente" não acende ("Somente se procede…": é pronome). Estilo: sublinhado com traço por categoria (duplo, tracejado, ondulado, pontilhado), sem fundo (o fundo fica para os grifos, 11.4) e sem mudar a cor do texto; a legenda diz o traço por extenso em Conta › Aparência.
+- **Prevenção:** `destaques.test.ts` (casos literais do corpus, inclusive os que não acendem); ruído por norma no `estruturador-corpus.test.ts` (teto de 60% das linhas e 15% dos caracteres em toda página e a linha de base `BASE_DOS_DESTAQUES`, que reprova se o ruído subir mais de 1 ponto ou cair mais de 3; nenhum genérico aceso; sem sobreposição). Hoje: LEP 25,1% das linhas e 3% dos caracteres; CP 57,7% e 11,9% (quase todo artigo traz a pena, que é o que deve acender); CF 33,8% e 4%. Dicionário mudado de propósito: medir e trocar a linha de base.
+- **Origem:** previsto na 9.8; tratado em 06/10/2026 (9.8).
 
 ### Preferência nova quebra o aparelho ou um backup antigo
 - **Sintoma:** `RegistroInvalido` ao abrir o app ou ao restaurar um pacote depois da 9.8. **Causa:** campo obrigatório novo em `Preferencias` (esquema estrito), ausente no registro que já existe no aparelho e nos pacotes antigos.
-- **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado), sem migração. **Prevenção:** teste com preferência sem o campo e restauração de pacote v1 (9.8).
-- **Origem:** previsto — atividade 9.8.
+- **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado; o leitor e Conta › Aparência leem `?? false`), sem migração e sem subir a versão do esquema; `PREFERENCIAS_PADRAO` não o grava.
+- **Prevenção:** `preferencias.test.ts` (o registro sem o campo valida e muda) e `pacote-v1.test.ts` (pacote v1 sem o campo restaura integral, com os destaques desligados).
+- **No sentido contrário (app anterior à 9.8 diante do campo novo):** a leitura não valida o esquema (só a escrita), então a aba aberta antes do merge continua lendo; mas, depois de o destaque ser ligado noutra aba, ela recusa gravar qualquer preferência ("Não foi possível guardar a mudança", ao mudar o tema ou o A−/A+), e um app anterior recusa o pacote novo com o campo como "arquivo alterado fora do aplicativo". Nada se perde: recarregar a aba (ou atualizar o app no celular) resolve. Por isso, ao publicar a 9.8, recarregar as abas abertas do Arretado.
+- **Origem:** previsto na 9.8; tratado em 06/10/2026 (9.8).
+
+### Regra de destaque quadrática ou cega a acento
+- **Sintoma:** a tela trava ao abrir um dispositivo de texto enorme (anexo, colagem estranha); ou "só" nunca acende, ou "todos" acende dentro de "métodos". **Causa:** `` do JavaScript só conhece `[A-Za-z0-9_]` (`só` não casa nunca, e depois de "é" já há borda); olhar para trás de tamanho variável **antes** da palavra (`(?<!as+)salvo`) é tentado em cada posição, e num texto de 2 milhões de espaços volta a sequência inteira a cada uma; a cadeia do extenso sem limite ("um e um e um…") é relida a cada começo.
+- **Solução (9.8):** borda por `(?<![p{L}p{N}])` e `(?![p{L}p{N}])` com a flag `u` (e `i`, nunca `toLowerCase`); o olhar para trás vem **depois** da palavra e tem tamanho limitado (`salvo(?<!…a[^S
+]{1,3}salvo)`, o "caso" com `{0,3}`); o extenso tem no máximo 5 "e"; a sobreposição é uma máscara de ocupação (`Uint8Array`), linear por regra.
+- **Prevenção:** `desempenho.test.ts` › "destaque automático (9.8)": 10 entradas hostis de cerca de 2 milhões de caracteres, cada uma abaixo de 5 s (hoje de 0,1 a 0,5 s); toda regra nova do dicionário entra nele.
+- **Origem:** achado na 9.8 (06/10/2026): a borda com `p{L}` desde o começo; o olhar para trás e a cadeia do extenso, na revisão para o `desempenho.test.ts`.
+
+### Grifo, destaque e remissão no mesmo trecho (previsível na 11.4, na 11.8 e na 11.9)
+- **Sintoma previsível:** o grifo some onde há destaque (ou o contrário); a remissão vira botão só num pedaço; o texto aparece duplicado ou com o índice deslocado. **Causa:** cada camada parte os trechos por conta própria; hoje só o destaque parte (`partirTrechos`, em `destacar.ts`), e o grifo (11.4) ancora por offsets sobre o mesmo texto concatenado dos trechos.
+- **Solução prevista:** uma partição só, sobre os limites de todas as camadas (destaque, grifo, remissão), com o texto do `textoParaDestacar` (o tachado vira espaços do mesmo comprimento: os índices são os do texto gravado); aninhar sempre na mesma ordem (link e remissão por fora, grifo, destaque por dentro); o destaque sem fundo, o grifo com fundo. O cartão da 11.8 usa o mesmo `TrechosDoTexto`. **Prevenção:** teste da partição com as três camadas cruzadas e o texto inteiro igual ao original.
+- **Origem:** previsto na 9.8 para a 11.4, a 11.8 e a 11.9.
 
 ### Artigo por artigo perde a posição, rouba tecla ou apaga demais
 - **Sintoma:** ao sair do cartão, o leitor abre noutro artigo; a seta troca de artigo enquanto se digita uma anotação; deslizar troca de artigo ao selecionar texto para grifar; o texto esmaecido fica ilegível. **Causa:** posição guardada em pixels; atalho sem checar o foco; gesto horizontal disputando a seleção; esmaecido abaixo do contraste mínimo.

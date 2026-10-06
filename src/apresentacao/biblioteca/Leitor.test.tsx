@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
+import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, obterLeitura } from '../../dominios/legislacao/leituras';
@@ -290,6 +291,87 @@ describe('leitor da norma (9.6)', () => {
       window.location.hash = '#/biblioteca/normas/nao-existe';
     });
     expect(await screen.findByText('Esta norma não existe mais.')).toBeInTheDocument();
+  });
+});
+
+/** Prazo, condição, termo absoluto e pena; o art. 5º com a redação anterior tachada (8.6). */
+const LEI_COM_DESTAQUES: Bloco[] = [
+  ...LEI.slice(0, 3),
+  linha('Art. 1º O juiz decidirá no prazo de 5 (cinco) dias, salvo motivo justificado.'),
+  linha('Art. 2º Qualquer condenado poderá requerer.'),
+  linha('Pena - reclusão, de 2 (dois) a 8 (oito) anos, e multa.'),
+  { trechos: [{ texto: 'Art. 3º O recurso será julgado em 30 (trinta) dias.', tachado: true }] },
+  linha(
+    'Art. 3º O recurso será julgado em 60 (sessenta) dias. (Redação dada pela Lei nº 13.000, de 2015)',
+  ),
+];
+
+describe('destaque automático (9.8)', () => {
+  const destaques = (endereco: string) =>
+    [...dispositivo(endereco).querySelectorAll('.destaque')].map((el) => [
+      el.textContent,
+      el.className,
+    ]);
+
+  it('desligado por padrão; o botão "Destaques" liga, grava a preferência global e mostra a legenda', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
+    });
+    const botao = screen.getByRole('button', { name: 'Destaques' });
+    expect(botao).toHaveAttribute('aria-pressed', 'false');
+    expect(document.querySelector('.destaque')).toBeNull();
+    expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
+    const textoAntes = dispositivo('art1').textContent;
+
+    await usuario.click(botao);
+    expect(botao).toHaveAttribute('aria-pressed', 'true');
+    expect(destaques('art1')).toEqual([
+      ['prazo de 5 (cinco) dias', 'destaque destaque-prazo'],
+      ['salvo', 'destaque destaque-condicao'],
+    ]);
+    expect(destaques('art2')).toEqual([
+      ['Qualquer', 'destaque destaque-absoluto'],
+      ['reclusão, de 2 (dois) a 8 (oito) anos', 'destaque destaque-pena'],
+      ['e multa', 'destaque destaque-pena'],
+    ]);
+    // O texto não muda: o destaque só parte os trechos.
+    expect(dispositivo('art1').textContent).toBe(textoAntes);
+    expect(screen.getByRole('list', { name: 'Legenda dos destaques' })).toBeInTheDocument();
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
+    });
+
+    await usuario.click(botao);
+    expect(botao).toHaveAttribute('aria-pressed', 'false');
+    expect(document.querySelector('.destaque')).toBeNull();
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
+    });
+  });
+
+  it('com a preferência ligada, abre aceso; só o texto vigente acende (a redação anterior não)', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: true });
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(destaques('art3')).toEqual([['60 (sessenta) dias', 'destaque destaque-prazo']]);
+    });
+    expect(screen.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await usuario.click(
+      within(dispositivo('art3')).getByRole('button', { name: /Mostrar 1 redação/ }),
+    );
+    const anterior = within(dispositivo('art3')).getByRole('list', { name: 'Texto anterior' });
+    expect(anterior).toHaveTextContent('30 (trinta) dias');
+    expect(anterior.querySelector('.destaque')).toBeNull();
   });
 });
 

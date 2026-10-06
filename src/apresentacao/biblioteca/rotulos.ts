@@ -1,4 +1,5 @@
 import type { TipoDispositivo } from '../../core/modelo';
+import type { CategoriaDestaque } from '../../dominios/legislacao/destaques';
 import type { MotivoDescarte } from '../../dominios/legislacao/rascunho';
 
 /** Singular e plural de cada tipo de nó, para o sumário da importação (9.5). */
@@ -38,3 +39,19 @@ export function fraseDescarte(motivo: MotivoDescarte, linhas: number): string {
       return `${n} sem lugar na norma`;
   }
 }
+
+/** Nome de cada categoria do destaque automático (9.8), na legenda do leitor e de Conta › Aparência. */
+export const NOME_DESTAQUE: Record<CategoriaDestaque, string> = {
+  prazo: 'Prazos e tempo',
+  condicao: 'Exceções e condições',
+  absoluto: 'Termos absolutos',
+  pena: 'Penas, quóruns e frações',
+};
+
+/** O traço de cada categoria, dito por extenso: o destaque não depende só da cor. */
+export const TRACO_DESTAQUE: Record<CategoriaDestaque, string> = {
+  prazo: 'sublinhado duplo',
+  condicao: 'sublinhado tracejado',
+  absoluto: 'sublinhado ondulado',
+  pena: 'sublinhado pontilhado',
+};

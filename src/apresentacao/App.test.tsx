@@ -111,6 +111,37 @@ describe('Conta › Aparência (5.2)', () => {
       expect(document.documentElement.dataset.tema).toBeUndefined();
     });
   });
+
+  it('liga e desliga o destaque automático, com a legenda dos traços (9.8)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { usuario } = await abrirApp('/conta/aparencia', repo);
+    const { obterPreferencias } = await import('../core/preferencias');
+    const caixa = await screen.findByRole('checkbox', {
+      name: 'Destacar prazos, condições, termos absolutos e penas',
+    });
+    // Sem o campo (preferência anterior à 9.8): desligado.
+    expect(caixa).not.toBeChecked();
+    const legenda = screen.getByRole('list', { name: 'Legenda dos destaques' });
+    expect(
+      within(legenda)
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual([
+      'Prazos e tempo (sublinhado duplo)',
+      'Exceções e condições (sublinhado tracejado)',
+      'Termos absolutos (sublinhado ondulado)',
+      'Penas, quóruns e frações (sublinhado pontilhado)',
+    ]);
+    await usuario.click(caixa);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
+    });
+    expect(caixa).toBeChecked();
+    await usuario.click(caixa);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
+    });
+  });
 });
 
 describe('Conta › Dados (5.2)', () => {

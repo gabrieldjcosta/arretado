@@ -1,6 +1,7 @@
 // Pacote v1 (gerado pelo app F0/F1) aberto no app v2 (F2, 9.1): `leituras` entra vazia.
 import { strToU8, unzipSync, zipSync } from 'fflate';
 import { Repositorio, apagarBanco } from '../persistencia';
+import { alterarPreferencias, obterPreferencias } from '../preferencias';
 import { deBytes } from './bytes';
 import { cifrar } from './cifra';
 import { exportarPacote, hashDoConjunto } from './exportar';
@@ -90,6 +91,23 @@ describe('pacote v1 no app v2 (9.1)', () => {
     expect((await d.colecao('normas').todosDoUsuario()).map((n) => n.id)).toEqual([
       origem.norma.id,
     ]);
+    origem.repo.fechar();
+    destino.repo.fechar();
+  });
+
+  it('preferências sem `destacarCondicionantesEPrazos` (anteriores à 9.8) restauram, com os destaques desligados', async () => {
+    const origem = await comLeitura();
+    await alterarPreferencias(origem.repo, { tamanhoFonte: 22 });
+    const { bytes } = await exportarPacote(origem.repo);
+    const destino = await comLeitura();
+    await alterarPreferencias(destino.repo, { destacarCondicionantesEPrazos: true });
+    await importar(destino.repo, await comoPacoteV1(bytes), 6);
+    const preferencias = await obterPreferencias(
+      destino.repo.comUsuario(origem.repo.ctx.usuarioId),
+    );
+    expect(preferencias.tamanhoFonte).toBe(22);
+    // Ausente é desligado (o leitor lê `?? false`), sem migração.
+    expect(preferencias).not.toHaveProperty('destacarCondicionantesEPrazos');
     origem.repo.fechar();
     destino.repo.fechar();
   });

@@ -1,4 +1,5 @@
 import { textoParaBlocos, type Bloco } from '../../core/seguranca/sanitizador';
+import { detectarDestaques } from './destaques';
 import { estruturar } from './estruturador';
 import { normalizarBlocos } from './normalizacao';
 import type { TipoAnomalia } from './rascunho';
@@ -401,4 +402,31 @@ describe('reserva em texto puro (8.8): desempenho', () => {
     // Linear, com folga para a carga da máquina (quadrático daria 64 vezes).
     expect(oito).toBeLessThan(16 * Math.max(umaVez, 50));
   }, 60_000);
+});
+
+// Destaque automático (9.8): calculado na leitura, por dispositivo, mas o texto de um anexo ou de
+// uma colagem estranha pode ter milhões de caracteres numa linha. Nenhuma regra pode ser
+// quadrática: o olhar para trás é limitado, e a cadeia do extenso também.
+describe('destaque automático (9.8): desempenho', () => {
+  it.each([
+    ['algarismos', () => '9'.repeat(2_000_000)],
+    ['espaços depois do prazo', () => 'no prazo de' + ' '.repeat(2_000_000) + 'x'],
+    ['espaços antes da exceção', () => ' '.repeat(2_000_000) + 'salvo'],
+    ['extenso em cadeia', () => 'um e '.repeat(400_000) + 'dias'],
+    ['quantidades sem unidade', () => '1 (um) '.repeat(300_000)],
+    ['parêntese sem fim', () => '1 (' + 'a'.repeat(2_000_000)],
+    ['exceções sem fim', () => 'salvo '.repeat(330_000)],
+    ['"a salvo" sem fim', () => 'a salvo '.repeat(250_000)],
+    ['"caso" sem fim', () => ', caso '.repeat(280_000)],
+    ['penas sem fim', () => 'reclusão, de um a dois anos, e multa; '.repeat(50_000)],
+  ])(
+    '%s',
+    (_nome, montar) => {
+      const texto = montar();
+      const inicio = performance.now();
+      detectarDestaques(texto);
+      expect(performance.now() - inicio).toBeLessThan(5_000);
+    },
+    20_000,
+  );
 });

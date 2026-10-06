@@ -15,6 +15,8 @@ import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legis
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { pedacosDestacados, type PedacoDoTrecho } from './destacar';
+import { LegendaDestaques } from './LegendaDestaques';
 import {
   estimarAltura,
   janelasQueCobrem,
@@ -231,6 +233,9 @@ function LeitorAberto({
   // seguidos partem do valor pedido, não do gravado (que ainda pode ser o antigo).
   const [pedido, setPedido] = useState<number | null>(null);
   const tamanho = pedido ?? preferencias?.tamanhoFonte ?? TAMANHO_PADRAO;
+  // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é desligado.
+  const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
+  const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   const [margem, setMargem] = useState(0);
   const [barraFixa, setBarraFixa] = useState(0);
@@ -456,6 +461,15 @@ function LeitorAberto({
     });
   }
 
+  function alternarDestaques() {
+    const novo = !destacar;
+    setDestaquePedido(novo);
+    // Se não gravar, volta ao que está gravado.
+    alterarPreferencias(repo, { destacarCondicionantesEPrazos: novo }).catch(() => {
+      setDestaquePedido(null);
+    });
+  }
+
   return (
     <div className="leitor">
       <div className="barra-leitor">
@@ -486,7 +500,16 @@ function LeitorAberto({
             A+
           </button>
         </div>
+        <button
+          type="button"
+          className="alternar-destaques"
+          aria-pressed={destacar}
+          onClick={alternarDestaques}
+        >
+          Destaques
+        </button>
       </div>
+      {destacar && <LegendaDestaques />}
       {referenciaLidoAte && (
         <p className="lido-ate">
           <span>
@@ -538,6 +561,7 @@ function LeitorAberto({
                 nome={linha.indiceNome === undefined ? undefined : textos.get(linha.indiceNome)}
                 expandido={abertos.has(id)}
                 alternar={alternar}
+                destacar={destacar}
               />
               {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
             </div>
@@ -560,10 +584,17 @@ function tipoDaLinha(nos: NormaAberta['nos'], linhas: LinhaDoLeitor[], i: number
   return nos[linhas[i]?.indice ?? 0]?.dispositivo.tipo ?? 'paragrafo';
 }
 
-/** Os trechos do texto: ênfase, tachado parcial (redação anterior no meio do texto) e link. */
-function TrechosDoTexto({ trechos }: { trechos: Trechos }) {
-  return trechos.map((trecho, i) => {
+/**
+ * Os trechos do texto: ênfase, tachado parcial (redação anterior no meio do texto) e link; com
+ * `destacar`, também o destaque automático (9.8), dentro da formatação do trecho.
+ */
+function TrechosDoTexto({ trechos, destacar = false }: { trechos: Trechos; destacar?: boolean }) {
+  const pedacos: PedacoDoTrecho[] = destacar
+    ? pedacosDestacados(trechos)
+    : trechos.map((trecho) => ({ trecho }));
+  return pedacos.map(({ trecho, categoria }, i) => {
     let conteudo = <>{trecho.texto}</>;
+    if (categoria) conteudo = <span className={`destaque destaque-${categoria}`}>{conteudo}</span>;
     if (trecho.enfase) conteudo = <em>{conteudo}</em>;
     if (trecho.tachado) conteudo = <del>{conteudo}</del>;
     if (trecho.link) {
@@ -657,10 +688,20 @@ interface PropsDoDispositivo {
   nome: ItemDaJanela | undefined;
   expandido: boolean;
   alternar: (id: string) => void;
+  /** Destaque automático (9.8): só no texto vigente (nem rubrica, nem notas, nem redações). */
+  destacar: boolean;
 }
 
 /** Um dispositivo: estrutural como cabeçalho aninhado, normativo com recuo pelo nível. */
-function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDoDispositivo) {
+function Dispositivo({
+  aberta,
+  linha,
+  item,
+  nome,
+  expandido,
+  alternar,
+  destacar,
+}: PropsDoDispositivo) {
   const no = aberta.nos[linha.indice];
   if (!no) return null;
   const { dispositivo } = no;
@@ -773,7 +814,11 @@ function Dispositivo({ aberta, linha, item, nome, expandido, alternar }: PropsDo
         {rotuloEmDestaque}
         {rotuloEmDestaque && ' '}
         {texto ? (
-          <TrechosDoTexto trechos={texto.trechos} />
+          <TrechosDoTexto
+            trechos={texto.trechos}
+            // A eficácia cessada não é texto vigente; o revogado e o vetado nem chegam aqui.
+            destacar={destacar && dispositivo.status !== 'eficacia_cessada'}
+          />
         ) : (
           <span className="texto-carregando" aria-hidden="true" />
         )}
