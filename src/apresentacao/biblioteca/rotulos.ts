@@ -1,5 +1,6 @@
 import type { TipoDispositivo } from '../../core/modelo';
 import type { CategoriaDestaque } from '../../dominios/legislacao/destaques';
+import type { EstadoDaEstrela } from '../../dominios/legislacao/estrelas';
 import type { MotivoDescarte } from '../../dominios/legislacao/rascunho';
 
 /** Singular e plural de cada tipo de nó, para o sumário da importação (9.5). */
@@ -55,3 +56,37 @@ export const TRACO_DESTAQUE: Record<CategoriaDestaque, string> = {
   absoluto: 'sublinhado ondulado',
   pena: 'sublinhado pontilhado',
 };
+
+// ── Estrela (11.2) ──
+
+/** "direta", "herdada de Seção I", "exceção: fora da estrela de Seção I" (ou nada, sem estrela). */
+export function origemPorExtenso(estado: EstadoDaEstrela, nomeDaOrigem: string): string {
+  switch (estado.origem) {
+    case 'direta':
+      return 'direta';
+    case 'herdada':
+      return `herdada de ${nomeDaOrigem}`;
+    case 'excecao':
+      return `exceção: fora da estrela de ${nomeDaOrigem}`;
+    default:
+      return '';
+  }
+}
+
+/** O nome acessível: o alvo e a origem; o "pressionado" (`aria-pressed`) diz se acende. */
+export function nomeDaEstrela(alvo: string, estado: EstadoDaEstrela, nomeDaOrigem: string): string {
+  const origem = origemPorExtenso(estado, nomeDaOrigem);
+  return `Estrela: ${alvo || 'dispositivo'}${origem ? ` (${origem})` : ''}`;
+}
+
+/** "Art. 5º: estrela herdada de Seção I.", "Art. 5º: sem estrela." (o aviso e o anúncio). */
+export function fraseDaEstrela(
+  alvo: string,
+  estado: EstadoDaEstrela,
+  referencia: (id: string) => string,
+): string {
+  const origem = origemPorExtenso(estado, estado.deId ? referencia(estado.deId) : '');
+  const onde = alvo || 'Dispositivo';
+  if (estado.origem === 'excecao') return `${onde}: ${origem}.`;
+  return `${onde}: ${origem ? `estrela ${origem}` : 'sem estrela'}.`;
+}

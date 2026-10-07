@@ -23,6 +23,9 @@
   --grifo-1: #fff0a0;
   --grifo-2: #c8eccb;
   --grifo-3: #fad2e1;
+  /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
+  --estrela: #9a6200;
+  --calha-estrela: 2rem;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 85%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
@@ -61,6 +64,7 @@
     --grifo-1: #463b0c;
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
+    --estrela: #f0b429;
     --sombra: none;
     --superficie-translucida: rgb(30 30 30 / 85%);
     color-scheme: dark;
@@ -89,6 +93,7 @@
   --grifo-1: #463b0c;
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
+  --estrela: #f0b429;
   --sombra: none;
   --superficie-translucida: rgb(30 30 30 / 85%);
   color-scheme: dark;
@@ -914,6 +919,123 @@ dialog.dialogo-busca {
   top: 0;
   left: 0;
   width: 100%;
+  /* A calha da estrela (11.2), em toda linha: pôr ou tirar a estrela não muda a largura do texto. */
+  padding-inline-start: var(--calha-estrela);
+}
+
+/* Estrela (11.2). O botão fica na calha, posto fora do fluxo (`position: absolute` sem `top`: a
+   altura é a do lugar dele na linha, logo antes do texto ou do cabeçalho), então não muda a altura
+   da linha. A faixa desce pela calha das linhas estreladas: começa no nó estrelado e corta na
+   exceção. A origem não depende só da cor: cheia grande (direta), cheia pequena sobre a faixa
+   (herdada), vazia cortada (exceção), vazia fina (sem estrela). */
+.linha-leitor[data-estrelada]::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--calha-estrela) / 2 - 1.5px);
+  width: 3px;
+  background: var(--estrela);
+}
+
+button.estrela {
+  position: absolute;
+  inset-inline-start: 0;
+  width: var(--calha-estrela);
+  height: 1.6em;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--texto-atenuado);
+  font-family: var(--fonte-interface);
+  font-weight: 400;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.estrela svg {
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+}
+
+button.estrela path {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+button.estrela[data-origem='direta'] {
+  color: var(--estrela);
+}
+
+button.estrela[data-origem='direta'] svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+button.estrela[data-origem='direta'] path {
+  fill: currentcolor;
+}
+
+/* Sobre a faixa: o contorno da cor do fundo separa a estrela dela. */
+button.estrela[data-origem='herdada'] path {
+  fill: var(--estrela);
+  stroke: var(--fundo);
+  stroke-width: 4;
+  paint-order: stroke;
+}
+
+button.estrela[data-origem='herdada'] svg {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+button.estrela[data-origem='excecao'] path.corte {
+  stroke: var(--texto);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+button.estrela:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  button.estrela[data-origem='nenhuma']:hover {
+    color: var(--estrela);
+  }
+}
+
+@media (max-width: 699px) {
+  :root {
+    --calha-estrela: 1.75rem;
+  }
+}
+
+/* A origem por extenso, por um instante, logo acima do grupo fixo (11.2). */
+.aviso-da-estrela {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  margin: 0 0 0.5rem;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.aviso-da-estrela span {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
 }
 
 .dispositivo {

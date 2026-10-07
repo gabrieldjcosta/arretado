@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
   type RefObject,
 } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
@@ -14,6 +15,7 @@ import type { Leitura, Marcacao, TextoDeDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import { prepararBusca } from '../../dominios/legislacao/busca';
+import { arvoreDaEstrela, estrelavel } from '../../dominios/legislacao/estrelas';
 import {
   abrirNorma,
   lerJanela,
@@ -27,7 +29,9 @@ import { Esqueleto, Falha } from '../componentes/estados';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
+import { BotaoDaEstrela } from './Estrela';
 import { pedacosDoTexto, type MarcasDoTexto } from './destacar';
+import { fraseDaEstrela, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
 import {
@@ -36,6 +40,7 @@ import {
   lerSelecao,
   type SelecaoNoTexto,
 } from './selecao';
+import { useEstrelas } from './usarEstrelas';
 import { marcasDoTexto, useMarcacoes } from './usarMarcacoes';
 import {
   estimarAltura,
@@ -56,6 +61,9 @@ const TAMANHO_MAXIMO = 32;
 const PASSO_DO_TAMANHO = 2;
 const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
+/** Quanto tempo a origem da estrela fica por extenso acima do grupo fixo, depois do toque. */
+const AVISO_DA_ESTRELA = 4_000;
+
 /**
  * O quanto da linha precisa aparecer abaixo da barra fixa para ela ser a "do alto da tela": a que
  * só mostra o fim (menos que isso) já foi lida. Também absorve a rolagem arredondada ao voltar.
@@ -755,7 +763,10 @@ function LeitorAberto({
   }, []);
   const referenciaDoDispositivo = (dispositivoId: string) => {
     const indice = aberta.indiceDe.get(dispositivoId);
-    return indice === undefined ? '' : referenciaDoNo(nos, aberta.indiceDe, indice);
+    if (indice === undefined) return '';
+    // Sem rótulo (o preâmbulo), o tipo: "Preâmbulo".
+    const tipo = nos[indice]?.dispositivo.tipo;
+    return referenciaDoNo(nos, aberta.indiceDe, indice) || (tipo ? rotuloTipo(tipo, 1) : '');
   };
   const trechoDe = (s: SelecaoNoTexto) => ({
     normaId: norma.id,
@@ -830,6 +841,32 @@ function LeitorAberto({
   const notaDoDialogo =
     notaAberta && 'id' in notaAberta ? marcacoes.porId.get(notaAberta.id) : undefined;
 
+  // Estrela (11.2): o controle fica na calha de cada linha que pode ter estrela (nunca no grupo
+  // fixo: agiria sobre qual dispositivo?). Tocar põe ou tira; a origem nova aparece por extenso,
+  // por um instante, acima do grupo fixo (e é anunciada), e fica no nome acessível do botão.
+  const arvore = useMemo(() => arvoreDaEstrela(norma.id, nos), [norma.id, nos]);
+  const estrelas = useEstrelas(repo, arvore, vivo);
+  const [avisoDaEstrela, setAvisoDaEstrela] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (avisoDaEstrela === undefined) return;
+    const tempo = window.setTimeout(() => {
+      setAvisoDaEstrela(undefined);
+    }, AVISO_DA_ESTRELA);
+    return () => {
+      window.clearTimeout(tempo);
+    };
+  }, [avisoDaEstrela]);
+  function alternarEstrelaDe(alvoId: string) {
+    void estrelas.alternar(alvoId).then((estado) => {
+      if (!estado) return;
+      const frase = fraseDaEstrela(referenciaDoDispositivo(alvoId), estado, (id) =>
+        referenciaDoDispositivo(id),
+      );
+      setAvisoDaEstrela(frase);
+      setAnuncio(frase);
+    });
+  }
+
   const alternar = useCallback((id: string) => {
     setAbertos((antes) => {
       const depois = new Set(antes);
@@ -892,6 +929,11 @@ function LeitorAberto({
           </button>
         </div>
       )}
+      {estrelas.falha && (
+        <p role="alert" className="aviso falha">
+          {estrelas.falha} Se continuar, feche as outras abas do Arretado.
+        </p>
+      )}
       {marcacoes.falha && (
         <p role="alert" className="aviso falha">
           {marcacoes.falha} Se continuar, feche as outras abas do Arretado.
@@ -911,6 +953,12 @@ function LeitorAberto({
         aria-busy={voltando}
         style={{ height: virtualizador.getTotalSize() }}
         onClick={(e) => {
+          const estrela =
+            e.target instanceof Element ? e.target.closest<HTMLElement>('[data-estrela-de]') : null;
+          if (estrela?.dataset.estrelaDe) {
+            alternarEstrelaDe(estrela.dataset.estrelaDe);
+            return;
+          }
           if (!escolherNoTexto(e.target, false) && escolhidaId !== undefined) {
             setEscolhidaId(undefined);
           }
@@ -924,13 +972,17 @@ function LeitorAberto({
         {visiveis.map((virtual) => {
           const linha = linhas[virtual.index];
           if (!linha) return null;
-          const id = nos[linha.indice]?.dispositivo.id ?? '';
+          const dispositivo = nos[linha.indice]?.dispositivo;
+          const id = dispositivo?.id ?? '';
+          const estado =
+            dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
           return (
             <div
               key={virtual.key}
               data-index={virtual.index}
               ref={virtualizador.measureElement}
               className={id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor'}
+              data-estrelada={estado?.estrelado ? '' : undefined}
               style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
             >
               <Dispositivo
@@ -943,6 +995,16 @@ function LeitorAberto({
                 destacar={destacar}
                 marcacoes={marcacoes.porDispositivo.get(id)}
                 escolhidaId={escolhidaId}
+                estrela={
+                  estado && (
+                    <BotaoDaEstrela
+                      alvoId={id}
+                      alvo={referenciaDoDispositivo(id)}
+                      estado={estado}
+                      nomeDaOrigem={estado.deId ? referenciaDoDispositivo(estado.deId) : ''}
+                    />
+                  )
+                }
               />
               {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
             </div>
@@ -995,13 +1057,21 @@ function LeitorAberto({
             }}
           />
         ) : (
-          <AcoesDaLeitura
-            modoFoco={modoFoco}
-            botaoDoFoco={botaoDoFoco}
-            abrirBusca={abrirBusca}
-            alternarFoco={alternarFoco}
-            marcarAqui={marcarAqui}
-          />
+          <>
+            {avisoDaEstrela && (
+              // Visível por um instante; quem anuncia é o `role="status"` abaixo.
+              <p className="aviso-da-estrela" aria-hidden="true">
+                <span>{avisoDaEstrela}</span>
+              </p>
+            )}
+            <AcoesDaLeitura
+              modoFoco={modoFoco}
+              botaoDoFoco={botaoDoFoco}
+              abrirBusca={abrirBusca}
+              alternarFoco={alternarFoco}
+              marcarAqui={marcarAqui}
+            />
+          </>
         )}
         <p role="status" className="visualmente-oculto">
           {anuncio}
@@ -1303,6 +1373,8 @@ interface PropsDoDispositivo {
   /** Grifos e notas (11.4) do dispositivo, também só no texto vigente. */
   marcacoes: readonly Marcacao[] | undefined;
   escolhidaId: string | undefined;
+  /** O controle da estrela (11.2); ausente no que não leva estrela (revogado, vetado). */
+  estrela: ReactNode;
 }
 
 /** Um dispositivo: estrutural como cabeçalho aninhado, normativo com recuo pelo nível. */
@@ -1316,6 +1388,7 @@ function Dispositivo({
   destacar,
   marcacoes,
   escolhidaId,
+  estrela,
 }: PropsDoDispositivo) {
   const no = aberta.nos[linha.indice];
   if (!no) return null;
@@ -1345,6 +1418,7 @@ function Dispositivo({
         aria-busy={carregando}
         data-endereco={dispositivo.endereco}
       >
+        {estrela}
         <div role="heading" aria-level={nivelDoCabecalho}>
           {dispositivo.rotulo && <span className="rotulo-estrutura">{dispositivo.rotulo}</span>}
           {titulo ? (
@@ -1425,6 +1499,7 @@ function Dispositivo({
       aria-busy={carregando}
     >
       {nomeDoNo && <p className="rubrica">{nomeDoNo}</p>}
+      {estrela}
       <p className="texto-dispositivo">
         {rotuloEmDestaque}
         {rotuloEmDestaque && ' '}

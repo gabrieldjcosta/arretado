@@ -163,12 +163,15 @@ export const Leitura = z.strictObject({
 });
 export type Leitura = z.infer<typeof Leitura>;
 
-/** Estrela com origem (D15): direta, herdada de nó, de pacote ou exceção negativa. */
+/**
+ * Estrela com origem (D15): direta, herdada de nó, de pacote ou exceção negativa. Só a direta e a
+ * exceção são gravadas (11.2; a de pacote, na F7): a herdada é calculada (`estrelaEfetiva`).
+ */
 export const Estrela = z.strictObject({
   ...camposComuns,
   normaId: Id,
   alvoId: Id,
-  tipoOrigem: z.enum(['direta', 'herdada', 'pacote', 'excecao']),
+  origemTipo: z.enum(['direta', 'herdada', 'pacote', 'excecao']),
   herdadaDeId: Id.optional(),
   pacoteId: Id.optional(),
 });

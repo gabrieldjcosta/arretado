@@ -955,3 +955,122 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
     .poll(async () => (await marcacoesGravadas(page)).map((m) => m.tipo))
     .toEqual(['nota']);
 });
+
+/** As origens das estrelas gravadas no IndexedDB (as não excluídas), em ordem. */
+function estrelasGravadas(page: Page) {
+  return page.evaluate(async () => {
+    const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
+      const pedido = indexedDB.open('arretado');
+      pedido.onsuccess = () => {
+        resolver(pedido.result);
+      };
+      pedido.onerror = () => {
+        rejeitar(new Error(String(pedido.error)));
+      };
+    });
+    try {
+      const todas = await new Promise<{ origemTipo: string; excluidoEm: string | null }[]>(
+        (resolver, rejeitar) => {
+          const pedido = banco.transaction('estrelas').objectStore('estrelas').getAll();
+          pedido.onsuccess = () => {
+            resolver(pedido.result as never);
+          };
+          pedido.onerror = () => {
+            rejeitar(new Error(String(pedido.error)));
+          };
+        },
+      );
+      return todas
+        .filter((e) => e.excluidoEm === null)
+        .map((e) => e.origemTipo)
+        .sort();
+    } finally {
+      banco.close();
+    }
+  });
+}
+
+/**
+ * Rola meia tela por vez, esperando as linhas da tela terem texto, até o alvo existir na lista; depois
+ * o põe à vista. Sob carga, a rolagem de 0,9 tela com pausa fixa (`rolarAte`) passa por cima de um nó
+ * que a lista virtualizada não desenhou a tempo (no tablet, de tela alta, chegou ao fim da LEP).
+ */
+async function rolarAteExistir(page: Page, alvo: Locator, tentativas = 120) {
+  for (let i = 0; i < tentativas; i++) {
+    if ((await alvo.count()) > 0) break;
+    await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight * 0.5);
+    });
+    await page.waitForFunction(() => !document.querySelector('.texto-carregando'));
+  }
+  await alvo.first().scrollIntoViewIfNeeded();
+  await expect(alvo.first()).toBeVisible();
+}
+
+test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção; estrelar de novo desfaz, sem mexer na linha nem na posição, também no modo foco: LEP compilada (11.2)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  // Título II › Capítulo II (Da Assistência) › Seção I (Disposições Gerais): arts. 10 e 11.
+  const secao = page.locator('[data-endereco="tit2.cap2.sec1"]');
+  await rolarAteExistir(page, secao);
+  await expect(secao.getByRole('heading')).toContainText('Seção I');
+  await alinharNoAlto(page, secao);
+  const estrela = (nome: string) => page.getByRole('button', { name: nome, exact: true });
+  const art10 = page.locator('[data-endereco="art10"]');
+  await expect(art10).toBeVisible();
+  const alturaAntes = await art10.evaluate((el) => el.getBoundingClientRect().height);
+  const alto = await distanciaDoAlto(secao);
+
+  await apertar(estrela('Estrela: Seção I'), toque);
+  await expect(estrela('Estrela: Seção I (direta)')).toHaveAttribute('aria-pressed', 'true');
+  await expect(estrela('Estrela: Art. 10 (herdada de Seção I)')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  // O Capítulo (acima) e a Seção II (ao lado) não acendem.
+  await expect(estrela('Estrela: CAPÍTULO II')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.aviso-da-estrela')).toHaveText('Seção I: estrela direta.');
+  // A linha não mudou de altura, nem a leitura de lugar.
+  expect(await art10.evaluate((el) => el.getBoundingClientRect().height)).toBe(alturaAntes);
+  expect(Math.abs((await distanciaDoAlto(secao)) - alto)).toBeLessThan(1);
+  expect(await estrelasGravadas(page)).toEqual(['direta']);
+  await semViolacoes(page);
+
+  // Desmarcar o art. 11 vira exceção (só a direta e a exceção são gravadas).
+  await apertar(estrela('Estrela: Art. 11 (herdada de Seção I)'), toque);
+  const excecao = estrela('Estrela: Art. 11 (exceção: fora da estrela de Seção I)');
+  await expect(excecao).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.aviso-da-estrela')).toHaveText(
+    'Art. 11: exceção: fora da estrela de Seção I.',
+  );
+  expect(await estrelasGravadas(page)).toEqual(['direta', 'excecao']);
+
+  // No modo foco, o mesmo controle; estrelar de novo o art. 11 desfaz a exceção.
+  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await expect(excecao).toBeVisible();
+  await semViolacoes(page);
+  await apertar(excecao, toque);
+  await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toBeVisible();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  await expect.poll(() => estrelasGravadas(page)).toEqual(['direta']);
+  const sobra = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(sobra).toBe(0);
+
+  // Recarregar: a herança é recalculada da direta gravada.
+  await page.reload();
+  await expect(estrela('Estrela: Art. 10 (herdada de Seção I)')).toBeVisible();
+  await expect(estrela('Estrela: Seção I (direta)')).toHaveAttribute('aria-pressed', 'true');
+});
