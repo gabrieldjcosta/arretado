@@ -8,11 +8,14 @@ export function Dialogo({
   aberto,
   aoFechar,
   titulo,
+  classe,
   children,
 }: {
   aberto: boolean;
   aoFechar: () => void;
   titulo: string;
+  /** Classe do `<dialog>` (posição e largura próprias, como a busca na norma). */
+  classe?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -36,6 +39,7 @@ export function Dialogo({
   return (
     <dialog
       ref={ref}
+      className={classe}
       aria-labelledby={idTitulo}
       onCancel={(e) => {
         e.preventDefault();

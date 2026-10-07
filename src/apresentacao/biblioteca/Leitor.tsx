@@ -12,6 +12,7 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'reac
 import type { Leitura, TextoDeDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
+import { prepararBusca } from '../../dominios/legislacao/busca';
 import {
   abrirNorma,
   lerJanela,
@@ -24,6 +25,7 @@ import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { pedacosDestacados, type PedacoDoTrecho } from './destacar';
 import { LegendaDestaques } from './LegendaDestaques';
 import {
@@ -56,6 +58,8 @@ const ESPERA_PARA_GRAVAR = 800;
 const QUADROS_NO_LUGAR = 3;
 /** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
 const LIMITE_PARA_VOLTAR = 2000;
+/** Atalho da busca na norma (11.6): não é F (modo foco) nem E (registrar erro). */
+const TECLA_DA_BUSCA = '/';
 /**
  * Modo foco (11.1) na rota (`?foco=texto`; a 11.8 acrescenta o artigo por artigo): recarregar, ou
  * o celular reabrir a aba que matou no fundo, volta ao modo foco, e o "voltar" do navegador sai dele.
@@ -437,6 +441,8 @@ function LeitorAberto({
   // mudar (toque duplo, Esc e F seguidos num aparelho lento) não pede outra, porque sair duas
   // vezes por `navigate(-1)` sairia do leitor.
   const pedidaNaRota = useRef<string | undefined>(undefined);
+  // O atalho da busca (11.6, definida mais abaixo), sem refazer o ouvinte a cada mudança dela.
+  const abrirBuscaAgora = useRef<() => void>(() => undefined);
   const alternarFoco = useCallback(() => {
     if (pedidaNaRota.current === chaveDaRota) return;
     pedidaNaRota.current = chaveDaRota;
@@ -461,6 +467,12 @@ function LeitorAberto({
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.repeat || teclaForaDosAtalhos(e)) return;
+      if (e.key === TECLA_DA_BUSCA) {
+        // Sem o `preventDefault`, a barra iria parar no campo da busca.
+        e.preventDefault();
+        abrirBuscaAgora.current();
+        return;
+      }
       if (e.key.toLowerCase() !== 'f' && !(modoFoco && e.key === 'Escape')) return;
       e.preventDefault();
       alternarFoco();
@@ -577,9 +589,103 @@ function LeitorAberto({
     });
   }
 
+  // "Ir ao lido até" e "ir para" da busca (11.6): a linha vai ao alto da tela, logo abaixo da barra
+  // fixa. Como na volta à posição (9.7), as linhas do caminho ainda não foram medidas e o destino
+  // muda à medida que elas aparecem: rola e confere a cada quadro, até a linha ficar no lugar por
+  // alguns quadros (ou o fim da página não deixar subir mais). Diferente da volta, os textos do
+  // destino não vêm antes: só conta como no lugar quando as linhas desenhadas já têm texto (o
+  // texto que chega muda a altura delas). A lista continua à vista.
+  const indo = useRef(0);
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(indo.current);
+    },
+    [],
+  );
+  const irParaLinha = useCallback(
+    (linha: number) => {
+      cancelAnimationFrame(indo.current);
+      const inicio = performance.now();
+      let noLugar = 0;
+      virtualizador.scrollToIndex(linha, { align: 'start' });
+      const conferir = () => {
+        const destino = virtualizador.getOffsetForIndex(linha, 'start')?.[0];
+        const maximo = document.documentElement.scrollHeight - window.innerHeight;
+        const desenhada = lista.current?.querySelector(`[data-index="${String(linha)}"]`);
+        const comTexto = !lista.current?.querySelector('.texto-carregando');
+        if (
+          destino !== undefined &&
+          desenhada &&
+          comTexto &&
+          Math.abs(window.scrollY - Math.min(destino, maximo)) <= 1
+        ) {
+          noLugar += 1;
+        } else {
+          noLugar = 0;
+          virtualizador.scrollToIndex(linha, { align: 'start' });
+        }
+        if (noLugar >= QUADROS_NO_LUGAR || performance.now() - inicio > LIMITE_PARA_VOLTAR) return;
+        indo.current = requestAnimationFrame(conferir);
+      };
+      indo.current = requestAnimationFrame(conferir);
+    },
+    [virtualizador],
+  );
+
   function irAoLidoAte() {
     const linha = indiceLidoAte === undefined ? undefined : linhaDoNo(linhas, indiceLidoAte);
-    if (linha !== undefined) virtualizador.scrollToIndex(linha, { align: 'start' });
+    if (linha !== undefined) irParaLinha(linha);
+  }
+
+  // Busca dentro da norma (11.6). O leitor só tem os textos perto da tela: na primeira busca, lê
+  // todos os da versão (uma vez por visita). A consulta fica guardada enquanto a norma está aberta.
+  const [buscaAberta, setBuscaAberta] = useState(false);
+  const [consulta, setConsulta] = useState('');
+  const [textosDaBusca, setTextosDaBusca] = useState<TextosDaBusca | undefined>(undefined);
+  const [achadoId, setAchadoId] = useState<string | undefined>(undefined);
+  const lerTextosDaBusca = useCallback(() => {
+    setTextosDaBusca({ estado: 'carregando' });
+    prepararBusca(repo, aberta).then(
+      (buscaveis) => {
+        if (vivo.current) setTextosDaBusca({ estado: 'pronto', buscaveis });
+      },
+      () => {
+        if (vivo.current) setTextosDaBusca({ estado: 'falha' });
+      },
+    );
+  }, [repo, aberta]);
+  function abrirBusca() {
+    setBuscaAberta(true);
+    if (textosDaBusca === undefined || textosDaBusca.estado === 'falha') lerTextosDaBusca();
+  }
+  useEffect(() => {
+    abrirBuscaAgora.current = abrirBusca;
+  });
+  const enderecos = useMemo(() => {
+    const mapa = new Map<string, number>();
+    nos.forEach((no, i) => {
+      if (!mapa.has(no.dispositivo.endereco)) mapa.set(no.dispositivo.endereco, i);
+    });
+    return mapa;
+  }, [nos]);
+  const indiceDoEndereco = useCallback((endereco: string) => enderecos.get(endereco), [enderecos]);
+  // A referência da linha que mostra o nó (a rubrica é mostrada na linha do artigo).
+  const referenciaDaBusca = useCallback(
+    (indice: number) => {
+      const linha = linhaDoNo(linhas, indice);
+      const doNo = linha === undefined ? indice : (linhas[linha]?.indice ?? indice);
+      return referenciaDoNo(nos, aberta.indiceDe, doNo) || 'Início da norma';
+    },
+    [linhas, nos, aberta.indiceDe],
+  );
+  // O "lido até" não muda: ir a um achado é só rolar (a posição segue a rolagem, como sempre).
+  function irParaAchado(indice: number) {
+    const linha = linhaDoNo(linhas, indice);
+    setBuscaAberta(false);
+    if (linha === undefined) return;
+    setAchadoId(nos[linhas[linha]?.indice ?? 0]?.dispositivo.id);
+    setAnuncio(`Na busca: ${referenciaDaBusca(indice)}.`);
+    irParaLinha(linha);
   }
 
   const alternar = useCallback((id: string) => {
@@ -667,7 +773,7 @@ function LeitorAberto({
               key={virtual.key}
               data-index={virtual.index}
               ref={virtualizador.measureElement}
-              className="linha-leitor"
+              className={id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor'}
               style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
             >
               <Dispositivo
@@ -688,6 +794,15 @@ function LeitorAberto({
           sai (o foco do teclado fica nele). */}
       <div className="acoes-leitor">
         <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-keyshortcuts={TECLA_DA_BUSCA}
+          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+          onClick={abrirBusca}
+        >
+          Buscar
+        </button>
+        <button
           ref={botaoDoFoco}
           type="button"
           aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
@@ -705,6 +820,19 @@ function LeitorAberto({
           {anuncio}
         </p>
       </div>
+      <BuscaNaNorma
+        aberto={buscaAberta}
+        aoFechar={() => {
+          setBuscaAberta(false);
+        }}
+        consulta={consulta}
+        mudarConsulta={setConsulta}
+        textos={textosDaBusca ?? { estado: 'carregando' }}
+        tentarDeNovo={lerTextosDaBusca}
+        indiceDoEndereco={indiceDoEndereco}
+        referencia={referenciaDaBusca}
+        irPara={irParaAchado}
+      />
     </div>
   );
 }

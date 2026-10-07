@@ -629,3 +629,96 @@ describe('modo foco (11.1)', () => {
     expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
   });
 });
+
+describe('busca dentro da norma (11.6)', () => {
+  afterEach(() => {
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  it('por texto, sem acento e sem caixa: o achado vai ao alto da tela, marcado, sem mexer no "lido até"', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Buscar na norma' });
+    const campo = within(dialogo).getByRole('searchbox', { name: 'Texto ou endereço' });
+    expect(campo).toHaveFocus();
+    // F e E no campo são letras, não atalhos (modo foco, registrar erro).
+    await usuario.type(campo, 'FE');
+    expect(window.location.hash).not.toContain('foco=');
+    await usuario.clear(campo);
+    await usuario.type(campo, 'HARMONICA');
+    expect(await within(dialogo).findByText('1 achado no texto.')).toBeInTheDocument();
+    const achado = within(dialogo).getByRole('button', { name: /^Art\. 1º, II, a\)/ });
+    expect(within(achado).getByText('harmônica', { selector: 'mark' })).toBeInTheDocument();
+
+    await usuario.click(achado);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Na busca: Art. 1º, II, a).')).toHaveAttribute('role', 'status');
+    await waitFor(() => {
+      expect(dispositivo('art1.incII.alA').closest('.linha-leitor')).toHaveClass('achado-da-busca');
+    });
+    expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBeUndefined();
+
+    // Reabrir mostra a mesma consulta e os mesmos achados (o Esc do diálogo nativo não roda no jsdom).
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    expect(await screen.findByRole('searchbox')).toHaveValue('HARMONICA');
+    expect(screen.getByText('1 achado no texto.')).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Fechar' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('por endereço ("art. 2", "§ 1º do 1"); o que a norma não tem leva ao mais próximo; Enter vai', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+
+    // O atalho "/" abre a busca (e não vai parar no campo).
+    await usuario.keyboard('/');
+    const campo = await screen.findByRole('searchbox', { name: 'Texto ou endereço' });
+    expect(campo).toHaveValue('');
+    await usuario.type(campo, '§ 1º do 1');
+    expect(
+      await screen.findByRole('button', { name: 'Ir para Art. 1º, § 1º' }),
+    ).toBeInTheDocument();
+
+    await usuario.clear(campo);
+    await usuario.type(campo, '§ 9º do 1');
+    expect(
+      await screen.findByText('Esse dispositivo não existe nesta norma. O mais próximo:'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ir para Art. 1º' })).toBeInTheDocument();
+
+    await usuario.clear(campo);
+    await usuario.type(campo, 'art. 99');
+    expect(
+      await screen.findByText('Nenhum dispositivo com esse endereço nesta norma.'),
+    ).toBeInTheDocument();
+
+    await usuario.clear(campo);
+    await usuario.type(campo, 'art. 3{Enter}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Na busca: Art. 3º.')).toHaveAttribute('role', 'status');
+    await waitFor(() => {
+      expect(dispositivo('art3').closest('.linha-leitor')).toHaveClass('achado-da-busca');
+    });
+  });
+
+  it('no modo foco, a busca fica no grupo fixo e não sai do modo foco', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByRole('button', { name: 'Sair do foco' });
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    await usuario.type(await screen.findByRole('searchbox'), 'jurisdicao{Enter}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(window.location.hash).toContain('foco=texto');
+    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(dispositivo('art2').closest('.linha-leitor')).toHaveClass('achado-da-busca');
+    });
+  });
+});

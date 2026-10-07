@@ -839,6 +839,66 @@ a.item-norma strong {
   }
 }
 
+/* Busca dentro da norma (11.6): o diálogo fica no alto da tela (no celular, o teclado ocupa a
+   metade de baixo), e o dispositivo achado ganha um contorno, sem mudar a altura da linha. */
+dialog.dialogo-busca {
+  margin: max(1rem, env(safe-area-inset-top)) auto auto;
+  max-height: calc(100dvh - 2rem);
+}
+
+.busca-campo {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.busca-campo input {
+  width: 100%;
+  min-height: var(--alvo);
+}
+
+.busca-endereco {
+  margin-top: 0.75rem;
+}
+
+.busca-endereco p {
+  margin: 0 0 0.25rem;
+}
+
+.busca-resumo {
+  margin: 0.75rem 0 0.5rem;
+  color: var(--texto-atenuado);
+}
+
+.busca-achados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.busca-achados button {
+  display: block;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.busca-achados mark {
+  background: var(--aviso-fundo);
+  color: var(--aviso-texto);
+  font-weight: 600;
+}
+
+.linha-leitor.achado-da-busca .dispositivo {
+  outline: 2px solid var(--primaria);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .linha-leitor {
   position: absolute;
   top: 0;

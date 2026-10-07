@@ -596,7 +596,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   );
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art41))).toBeLessThan(2);
   expect(await sobra()).toBe(0);
-  // Fixo e semitransparente, junto do "Lido até aqui" (o único outro controle no modo foco); com
+  // Fixo e semitransparente, junto do "Lido até aqui" e do "Buscar" (11.6); com
   // o mouse fora dele (em cima, ele fica opaco).
   await page.mouse.move(5, 300);
   expect(await fundoDoBotao(sair)).toEqual({ posicao: 'fixed', alfa: 0.85 });
@@ -696,4 +696,73 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect(entrar).toBeVisible();
   await expect.poll(() => mesmaLinha(page, antes)).toBe(true);
   info.annotations.push({ type: 'aparelho', description: info.project.name });
+});
+
+test('busca dentro da norma: por texto, sem acento e sem caixa, e por endereço; "ir para" leva ao alto da tela, também no modo foco: LEP compilada (11.6)', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  const buscar = page.getByRole('button', { name: 'Buscar', exact: true });
+  const dialogo = page.getByRole('dialog', { name: 'Buscar na norma' });
+  const campo = dialogo.getByRole('searchbox', { name: 'Texto ou endereço' });
+
+  // Texto que está longe da tela (a lista é virtualizada: o Ctrl+F do navegador não o acharia).
+  await expect(page.locator('[data-endereco="art146B"]')).toHaveCount(0);
+  await buscar.click();
+  await expect(campo).toBeFocused();
+  await campo.fill('MONITORACAO ELETRONICA');
+  await expect(dialogo.getByText(/^\d+ achados no texto\.$/)).toBeVisible();
+  const achado = dialogo.getByRole('button', { name: /^Art\. 146-B\b/ });
+  await expect(achado.locator('mark')).toHaveText('monitoração eletrônica');
+  await semViolacoes(page);
+  await achado.click();
+  await expect(dialogo).toBeHidden();
+  const art146B = page.locator('[data-endereco="art146B"]');
+  await expect(art146B.locator('xpath=ancestor::*[contains(@class,"linha-leitor")]')).toHaveClass(
+    /achado-da-busca/,
+  );
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(art146B))).toBeLessThan(2);
+  await semViolacoes(page);
+
+  // Por endereço, pelo atalho "/"; o que a norma não tem leva ao mais próximo.
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+  });
+  await page.keyboard.press('/');
+  await expect(campo).toBeFocused();
+  await expect(campo).toHaveValue('MONITORACAO ELETRONICA');
+  await campo.fill('§ 2º do 112');
+  await dialogo.getByRole('button', { name: 'Ir para Art. 112, § 2º' }).click();
+  const par2 = page.locator('[data-endereco="art112.par2"]');
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(par2))).toBeLessThan(2);
+  // Ir para um achado não mexe no "lido até" (só a posição segue a rolagem).
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art112.par2');
+  expect((await leituraGravada(page)).lidoAte).toBeUndefined();
+
+  // No modo foco, a busca fica no grupo fixo e não sai dele; Enter vai ao endereço.
+  await page.getByRole('button', { name: 'Modo foco' }).click();
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await buscar.click();
+  await campo.fill('art. 9-A');
+  await campo.press('Enter');
+  await expect(dialogo).toBeHidden();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  const art9A = page.locator('[data-endereco="art9A"]');
+  // No modo foco a barra fixa some: o alto da tela é o alto da janela.
+  await expect
+    .poll(async () =>
+      Math.abs(
+        await art9A.evaluate(
+          (el) => (el.closest('.linha-leitor') ?? el).getBoundingClientRect().top,
+        ),
+      ),
+    )
+    .toBeLessThan(2);
+  const sobra = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(sobra).toBe(0);
 });
