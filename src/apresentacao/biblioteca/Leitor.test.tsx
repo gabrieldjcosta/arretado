@@ -904,3 +904,83 @@ describe('grifos e notas (11.4)', () => {
     expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
   });
 });
+
+describe('estrela (11.2)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+  });
+
+  const estrelasGravadas = (repo: Repositorio) =>
+    repo
+      .colecao('estrelas')
+      .listarPagina({ limite: 50 })
+      .then((p) => p.itens.map((e) => e.origemTipo).sort());
+  const linhaDe = (endereco: string) => dispositivo(endereco).closest('.linha-leitor');
+
+  it('estrelar o Capítulo propaga; desmarcar um artigo vira exceção; estrelar de novo desfaz', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const capitulo = screen.getByRole('button', { name: 'Estrela: CAPÍTULO I' });
+    expect(capitulo).toHaveAttribute('aria-pressed', 'false');
+    await usuario.click(capitulo);
+    expect(
+      await screen.findByRole('button', { name: 'Estrela: CAPÍTULO I (direta)' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    // Tudo dentro herda, com a origem no nome; o Título (acima) não.
+    expect(
+      screen.getByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Estrela: Art. 1º, II, a) (herdada de CAPÍTULO I)' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Estrela: TÍTULO I' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(linhaDe('art2')).toHaveAttribute('data-estrelada');
+    expect(linhaDe('tit1')).not.toHaveAttribute('data-estrelada');
+    // A origem por extenso, visível por um instante, e anunciada.
+    expect(document.querySelector('.aviso-da-estrela')).toHaveTextContent(
+      'CAPÍTULO I: estrela direta.',
+    );
+    expect(document.querySelector('.acoes-leitor [role="status"]')).toHaveTextContent(
+      'CAPÍTULO I: estrela direta.',
+    );
+    expect(await estrelasGravadas(repo)).toEqual(['direta']);
+
+    // Desmarcar o art. 2 grava a exceção.
+    await usuario.click(
+      screen.getByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' }),
+    );
+    const excecao = await screen.findByRole('button', {
+      name: 'Estrela: Art. 2º (exceção: fora da estrela de CAPÍTULO I)',
+    });
+    expect(excecao).toHaveAttribute('aria-pressed', 'false');
+    expect(excecao).toHaveAttribute('data-origem', 'excecao');
+    expect(linhaDe('art2')).not.toHaveAttribute('data-estrelada');
+    expect(await estrelasGravadas(repo)).toEqual(['direta', 'excecao']);
+
+    // Estrelar de novo o art. 2 apaga a exceção: volta a herdar.
+    await usuario.click(excecao);
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' });
+    expect(await estrelasGravadas(repo)).toEqual(['direta']);
+  });
+
+  it('fora do texto vigente (a seleção não conta o botão), também no modo foco e depois de recarregar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const botao = screen.getByRole('button', { name: 'Estrela: Art. 3º' });
+    expect(botao.closest('.texto-vigente')).toBeNull();
+    expect(botao).toHaveAttribute('data-fora-do-texto');
+    await usuario.click(botao);
+    await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
+    expect(window.location.hash).toContain('foco=texto');
+    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+  });
+});

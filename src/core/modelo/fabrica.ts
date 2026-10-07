@@ -92,7 +92,7 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
       ancora: { texto: 'Texto', inicio: 0, fim: 5 },
       status: 'valida',
     },
-    estrelas: { normaId: ref, alvoId: ref, tipoOrigem: 'direta' },
+    estrelas: { normaId: ref, alvoId: ref, origemTipo: 'direta' },
     leituras: { normaId: ref },
     pacotesIncidencia: { titulo: 'Defensoria', versao: 1 },
     adesoes: { tipo: 'total', versaoAderida: 1, receberAtualizacoes: true },
