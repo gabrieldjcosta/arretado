@@ -58,6 +58,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `npm audit fix --dry-run` para ver o que muda; se só sobe a versão de correção (patch) dentro da faixa do `package.json`, `npm audit fix` num commit separado (`chore(deps)`) e a suíte inteira de novo (o corpus confere a saída do sanitizador byte a byte). Subida de versão maior ou troca de pacote é escolha técnica: decidir com o Gabriel (T1–T18).
 - **Origem:** ocorrido na 9.8 (06/10/2026): `source-map-js` 1.2.1 (alto; vem do Vite e do jsdom) e `dompurify` 3.4.15 (baixo; avisos do modo `IN_PLACE`, que o sanitizador não usa) → 1.2.2 e 3.4.16.
 
+### Comando bloqueado: "Bloqueado pela trava do Arretado"
+- **Sintoma:** o Bash recusa um comando com "Bloqueado pela trava do Arretado: …". **Causa:** o hook `scripts/agentes/guarda-bash.mjs` (T19) reconheceu push no `main`, push forçado, merge de PR, Supabase remoto ou `rm -r` em alvo protegido. A análise é por palavras, não um shell completo: `echo "git push origin main"` passa, mas um alias ou script que faz o push por dentro não é visto.
+- **Solução:** seguir o motivo (ramo `claude/*` + PR; `--force-with-lease` no lugar de `--force`; merge pelo Gabriel). Falso positivo: acertar a regra em `guarda.mjs` com caso em `agentes.test.ts`, nunca desligar o hook. **Prevenção:** os casos de `agentes.test.ts` (bloqueia e libera).
+- **Origem:** previsto — swarm, etapa 1 (07/10/2026).
+
+### Backup de documento não aparece em `docs/_backups/`
+- **Sintoma:** editou `docs/…md` e não há cópia nova. **Causa:** uma cópia por documento por sessão (a segunda edição da mesma sessão pula); o documento não está na lista de `documentoProtegido`; o hook não carregou (o `.claude/settings.json` é lido no início da sessão; no Windows o `$CLAUDE_PROJECT_DIR` entre aspas exige o Git Bash como shell dos hooks).
+- **Solução:** conferir a lista em `guarda.mjs`; abrir sessão nova depois de mudar o settings; à mão: `node scripts/agentes/backup-doc.mjs` com o JSON `{"tool_input":{"file_path":"docs/x.md"}}` na entrada. Restaurar: `node -e "process.stdout.write(require('zlib').gunzipSync(require('fs').readFileSync(process.argv[1])))" <arquivo.gz> > docs/x.md`. **Prevenção:** `agentes.test.ts` roda o hook pela linha de comando.
+- **Origem:** previsto — swarm, etapa 1 (07/10/2026).
+
 ### `format:check` reprova `.claude/settings.local.json`
 - **Sintoma:** `npm run check` para no Prettier apontando `.claude/settings.local.json`, sem mudança no código. **Causa:** o Claude Code grava as permissões da sessão nesse arquivo dentro do worktree; o git o ignora (ignore global do usuário), mas o Prettier o verificava.
 - **Solução:** `.claude` no `.prettierignore`. **Prevenção:** arquivo gerado por ferramenta e fora do git entra no `.prettierignore` junto com o `.gitignore`.

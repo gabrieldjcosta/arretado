@@ -5,3 +5,6 @@
 # no índice (colados.json) e ficam como a área de transferência os entregou.
 corpus/normas/*.html -text
 corpus/normas/*.colado.txt -text
+
+# Backups dos documentos (T19): gzip, binário.
+docs/_backups/** binary

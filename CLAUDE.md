@@ -12,7 +12,8 @@ Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Leitura so
 2. `docs/especificacao-parte2.md` §10.6 — Legislação (regras do estruturador, leitor, editor), ao tocar nesse módulo.
 3. `docs/planos/F2.md` — só a etapa em execução, os "Fatos das fontes" e a rotina de pronto, ao trabalhar na F2.
 4. `docs/glossario.md` — vocabulário → identificadores de código, ao criar ou renomear entidade, evento, pasta ou termo.
-5. `docs/solucao-de-problemas.md` — sintomas, causas e soluções conhecidas; consultar ao topar com falha, antes de investigar do zero.
+5. `docs/planos/swarm.md` — swarm de agentes (T19): travas, hooks, etapas; ao mexer em `.claude/` ou `scripts/agentes/`.
+6. `docs/solucao-de-problemas.md` — sintomas, causas e soluções conhecidas; consultar ao topar com falha, antes de investigar do zero.
 
 ## Economia de contexto (meta: cada sessão em até ~200 mil tokens)
 - Uma sessão por atividade ou por pequeno grupo de atividades do plano. Ao fechar o bloco: atualizar `docs/proxima-sessao.md`, fazer o commit (se autorizado) e avisar o Gabriel para abrir sessão nova, em vez de seguir numa conversa longa.
@@ -31,6 +32,7 @@ Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Leitura so
 - Definição de pronto: `npm run check` verde (lint, tipos, testes, auditoria); E2E verde quando houver tela; problemas encontrados (e os previsíveis da próxima etapa) registrados em `docs/solucao-de-problemas.md`; termo ou identificador novo registrado em `docs/glossario.md`.
 
 ## Git
+Travas técnicas (T19, `.claude/settings.json`): o hook bloqueia push no `main`, push forçado, merge e Supabase remoto, e guarda backup em `docs/_backups/` antes de editar documento protegido. Não contornar; falso positivo se corrige em `scripts/agentes/guarda.mjs` com teste.
 Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto privado: https://github.com/gabrieldjcosta/arretado (origin, branch main). GitHub CLI autenticado como gabrieldjcosta.
 Commits só quando o Gabriel pedir; push logo após cada commit aprovado. O trabalho de cada etapa vai num branch com PR para o `main`, e o merge é do Gabriel. Enquanto houver PR empilhado sobre outro, o merge é por "Create a merge commit", nunca squash.
 

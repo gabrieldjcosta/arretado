@@ -102,6 +102,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Alteração (entrada do log) | `Alteracao` na tabela Dexie `alteracoes`; não está em `ENTIDADES` |
 | Módulo | `Modulo` / `MODULOS`: unidade do pacote e de `Preferencias.modulosDesabilitados` |
 | Hoje, Biblioteca, Calendário, Pendência, Backup | tela provisória `Hoje` (`src/apresentacao/telas/Areas.tsx`); a Biblioteca é `Normas` (`src/apresentacao/biblioteca/Normas.tsx`, 9.5); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
+| Trava, backup de documento (swarm, T19) | ferramental, não produto: `avaliarComando` e `fazerBackup` em `scripts/agentes/guarda.mjs`; hooks `guarda-bash.mjs`, `backup-doc.mjs`, `inicio-sessao.mjs`; cópias em `docs/_backups/<caminho com __>/<AAAAMMDD-HHMMSS>--<sessão>.md.gz`. "Backup" do produto continua sendo o pacote `.arretado` |
 
 ## 5. Palavras reservadas (D24 e CLAUDE.md)
 
