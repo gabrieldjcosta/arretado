@@ -7,9 +7,10 @@ import {
   useMemo,
   useRef,
   useState,
+  type RefObject,
 } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import type { Leitura, TextoDeDispositivo } from '../../core/modelo';
+import type { Leitura, Marcacao, TextoDeDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import { prepararBusca } from '../../dominios/legislacao/busca';
@@ -26,8 +27,16 @@ import { Esqueleto, Falha } from '../componentes/estados';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
-import { pedacosDestacados, type PedacoDoTrecho } from './destacar';
+import { pedacosDoTexto, type MarcasDoTexto } from './destacar';
 import { LegendaDestaques } from './LegendaDestaques';
+import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
+import {
+  ATRIBUTO_FORA_DO_TEXTO,
+  CLASSE_DO_TEXTO,
+  lerSelecao,
+  type SelecaoNoTexto,
+} from './selecao';
+import { marcasDoTexto, useMarcacoes } from './usarMarcacoes';
 import {
   estimarAltura,
   janelasQueCobrem,
@@ -60,6 +69,11 @@ const QUADROS_NO_LUGAR = 3;
 const LIMITE_PARA_VOLTAR = 2000;
 /** Atalho da busca na norma (11.6): não é F (modo foco) nem E (registrar erro). */
 const TECLA_DA_BUSCA = '/';
+/**
+ * Depois de um toque no grupo fixo, a seleção que some (o toque no botão a desfaz no celular) não
+ * desfaz as ações da marcação: o botão tocado ainda age sobre o trecho escolhido.
+ */
+const TOQUE_NAS_ACOES = 1500;
 /**
  * Modo foco (11.1) na rota (`?foco=texto`; a 11.8 acrescenta o artigo por artigo): recarregar, ou
  * o celular reabrir a aba que matou no fundo, volta ao modo foco, e o "voltar" do navegador sai dele.
@@ -443,6 +457,8 @@ function LeitorAberto({
   const pedidaNaRota = useRef<string | undefined>(undefined);
   // O atalho da busca (11.6, definida mais abaixo), sem refazer o ouvinte a cada mudança dela.
   const abrirBuscaAgora = useRef<() => void>(() => undefined);
+  // O Esc com trecho selecionado ou grifo escolhido (11.4) desfaz a marcação, não o modo foco.
+  const cancelarMarcacaoAgora = useRef<() => boolean>(() => false);
   const alternarFoco = useCallback(() => {
     if (pedidaNaRota.current === chaveDaRota) return;
     pedidaNaRota.current = chaveDaRota;
@@ -471,6 +487,10 @@ function LeitorAberto({
         // Sem o `preventDefault`, a barra iria parar no campo da busca.
         e.preventDefault();
         abrirBuscaAgora.current();
+        return;
+      }
+      if (e.key === 'Escape' && cancelarMarcacaoAgora.current()) {
+        e.preventDefault();
         return;
       }
       if (e.key.toLowerCase() !== 'f' && !(modoFoco && e.key === 'Escape')) return;
@@ -688,6 +708,128 @@ function LeitorAberto({
     irParaLinha(linha);
   }
 
+  // Grifos e notas (11.4). Selecionar um trecho do texto vigente (o mouse, o toque longo do
+  // celular, o teclado) troca o grupo fixo pelas ações da marcação: as 3 cores e "Nota". Tocar num
+  // grifo o escolhe (trocar a cor, anotar, tirar); tocar no marcador da nota abre a nota. Nada
+  // depende de hover. O que muda a posição de leitura: nada (a nota abre num diálogo).
+  const marcacoes = useMarcacoes(repo, norma.id, aberta.versao.id, vivo);
+  const [selecao, setSelecao] = useState<SelecaoNoTexto | undefined>(undefined);
+  const [escolhidaId, setEscolhidaId] = useState<string | undefined>(undefined);
+  const [notaAberta, setNotaAberta] = useState<
+    { trecho: SelecaoNoTexto; texto: string } | { id: string } | undefined
+  >(undefined);
+  const tocouNasAcoes = useRef(-Infinity);
+  const temSelecao = useRef(false);
+  const escolhida = escolhidaId === undefined ? undefined : marcacoes.porId.get(escolhidaId);
+  useEffect(() => {
+    const aoMudar = () => {
+      const lida = lerSelecao(document.getSelection(), lista.current);
+      if (lida) {
+        setSelecao((antes) =>
+          antes?.dispositivoId === lida.dispositivoId &&
+          antes.inicio === lida.inicio &&
+          antes.fim === lida.fim &&
+          antes.cortada === lida.cortada
+            ? antes
+            : lida,
+        );
+        setEscolhidaId(undefined);
+        // Anunciado uma vez, quando a seleção começa (não a cada letra que a alça percorre).
+        if (!temSelecao.current) setAnuncio('Trecho selecionado: grife numa das 3 cores ou anote.');
+        temSelecao.current = true;
+        return;
+      }
+      if (performance.now() - tocouNasAcoes.current < TOQUE_NAS_ACOES) return;
+      temSelecao.current = false;
+      setSelecao(undefined);
+    };
+    document.addEventListener('selectionchange', aoMudar);
+    return () => {
+      document.removeEventListener('selectionchange', aoMudar);
+    };
+  }, []);
+  const limparSelecao = useCallback(() => {
+    temSelecao.current = false;
+    setSelecao(undefined);
+    document.getSelection()?.removeAllRanges();
+  }, []);
+  const referenciaDoDispositivo = (dispositivoId: string) => {
+    const indice = aberta.indiceDe.get(dispositivoId);
+    return indice === undefined ? '' : referenciaDoNo(nos, aberta.indiceDe, indice);
+  };
+  const trechoDe = (s: SelecaoNoTexto) => ({
+    normaId: norma.id,
+    versaoId: aberta.versao.id,
+    dispositivoId: s.dispositivoId,
+    inicio: s.inicio,
+    fim: s.fim,
+  });
+  /** O texto gravado da seleção (para citar na nota nova): o que está na tela agora. */
+  const textoDaSelecao = (s: SelecaoNoTexto) => {
+    const indice = aberta.indiceDe.get(s.dispositivoId);
+    const trechos = indice === undefined ? undefined : textos.get(indice)?.texto?.trechos;
+    return (trechos ?? [])
+      .map((t) => t.texto)
+      .join('')
+      .slice(s.inicio, s.fim)
+      .trim();
+  };
+  function grifarSelecao(cor: 1 | 2 | 3) {
+    const s = selecao;
+    if (!s) return;
+    limparSelecao();
+    const onde = referenciaDoDispositivo(s.dispositivoId);
+    void marcacoes.grifar(trechoDe(s), cor).then((deu) => {
+      if (deu) setAnuncio(`Grifado${onde ? ` no ${onde}` : ''}, cor ${String(cor)}.`);
+    });
+  }
+  function anotarSelecao() {
+    const s = selecao;
+    if (!s) return;
+    setNotaAberta({ trecho: s, texto: textoDaSelecao(s) });
+    limparSelecao();
+  }
+  function anotarGrifo(grifo: Marcacao) {
+    setEscolhidaId(undefined);
+    setNotaAberta({
+      trecho: {
+        dispositivoId: grifo.dispositivoId,
+        inicio: grifo.ancora.inicio,
+        fim: grifo.ancora.fim,
+        cortada: false,
+      },
+      texto: grifo.ancora.texto,
+    });
+  }
+  useEffect(() => {
+    cancelarMarcacaoAgora.current = () => {
+      if (selecao === undefined && escolhidaId === undefined) return false;
+      limparSelecao();
+      setEscolhidaId(undefined);
+      return true;
+    };
+  });
+  // Os grifos e os marcadores de nota respondem ao toque e ao teclado, pela lista (um ouvinte só).
+  function escolherNoTexto(alvo: EventTarget, porTeclado: boolean) {
+    if (!(alvo instanceof Element)) return false;
+    const marcador = alvo.closest<HTMLElement>('[data-nota]');
+    if (marcador?.dataset.nota) {
+      setNotaAberta({ id: marcador.dataset.nota });
+      return true;
+    }
+    const grifo = alvo.closest<HTMLElement>('mark[data-marcacao]');
+    // O clique que termina uma seleção (arrastar dentro do grifo) é da seleção.
+    if (grifo?.dataset.marcacao && (porTeclado || document.getSelection()?.isCollapsed !== false)) {
+      setSelecao(undefined);
+      setEscolhidaId(grifo.dataset.marcacao);
+      setAnuncio('Grifo escolhido: troque a cor, anote ou tire.');
+      return true;
+    }
+    return false;
+  }
+  const notaDoDialogo =
+    notaAberta && 'id' in notaAberta ? marcacoes.porId.get(notaAberta.id) : undefined;
+
   const alternar = useCallback((id: string) => {
     setAbertos((antes) => {
       const depois = new Set(antes);
@@ -750,6 +892,11 @@ function LeitorAberto({
           </button>
         </div>
       )}
+      {marcacoes.falha && (
+        <p role="alert" className="aviso falha">
+          {marcacoes.falha} Se continuar, feche as outras abas do Arretado.
+        </p>
+      )}
       {(falhaAoGravar || falhaAoMarcar) && (
         <p role="alert" className="aviso falha">
           {falhaAoMarcar
@@ -763,6 +910,16 @@ function LeitorAberto({
         className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
         aria-busy={voltando}
         style={{ height: virtualizador.getTotalSize() }}
+        onClick={(e) => {
+          if (!escolherNoTexto(e.target, false) && escolhidaId !== undefined) {
+            setEscolhidaId(undefined);
+          }
+        }}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && escolherNoTexto(e.target, true)) {
+            e.preventDefault();
+          }
+        }}
       >
         {visiveis.map((virtual) => {
           const linha = linhas[virtual.index];
@@ -784,6 +941,8 @@ function LeitorAberto({
                 expandido={abertos.has(id)}
                 alternar={alternar}
                 destacar={destacar}
+                marcacoes={marcacoes.porDispositivo.get(id)}
+                escolhidaId={escolhidaId}
               />
               {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
             </div>
@@ -792,34 +951,91 @@ function LeitorAberto({
       </div>
       {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
           sai (o foco do teclado fica nele). */}
-      <div className="acoes-leitor">
-        <button
-          type="button"
-          aria-haspopup="dialog"
-          aria-keyshortcuts={TECLA_DA_BUSCA}
-          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
-          onClick={abrirBusca}
-        >
-          Buscar
-        </button>
-        <button
-          ref={botaoDoFoco}
-          type="button"
-          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-          title={
-            modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco: só o texto (atalho: F)'
+      <div
+        className="acoes-leitor"
+        onPointerDownCapture={() => {
+          tocouNasAcoes.current = performance.now();
+        }}
+        // No desktop, o clique no botão não tira a seleção nem o foco do texto.
+        onMouseDown={(e) => {
+          if (selecao && e.target instanceof Element && e.target.closest('button')) {
+            e.preventDefault();
           }
-          onClick={alternarFoco}
-        >
-          {modoFoco ? 'Sair do foco' : 'Modo foco'}
-        </button>
-        <button type="button" onClick={marcarAqui}>
-          Lido até aqui
-        </button>
+        }}
+      >
+        {selecao ? (
+          <AcoesDaSelecao
+            cortadaEm={selecao.cortada ? referenciaDoDispositivo(selecao.dispositivoId) : undefined}
+            grifar={grifarSelecao}
+            anotar={anotarSelecao}
+            cancelar={() => {
+              limparSelecao();
+              setAnuncio('');
+            }}
+          />
+        ) : escolhida?.tipo === 'grifo' ? (
+          <AcoesDoGrifo
+            cor={escolhida.cor ?? 1}
+            mudar={(cor) => {
+              void marcacoes.mudarCor(escolhida.id, cor).then((deu) => {
+                if (deu) setAnuncio(`Grifo na cor ${String(cor)}.`);
+              });
+            }}
+            anotar={() => {
+              anotarGrifo(escolhida);
+            }}
+            tirar={() => {
+              setEscolhidaId(undefined);
+              void marcacoes.remover(escolhida.id).then((deu) => {
+                if (deu) setAnuncio('Grifo tirado.');
+              });
+            }}
+            fechar={() => {
+              setEscolhidaId(undefined);
+            }}
+          />
+        ) : (
+          <AcoesDaLeitura
+            modoFoco={modoFoco}
+            botaoDoFoco={botaoDoFoco}
+            abrirBusca={abrirBusca}
+            alternarFoco={alternarFoco}
+            marcarAqui={marcarAqui}
+          />
+        )}
         <p role="status" className="visualmente-oculto">
           {anuncio}
         </p>
       </div>
+      <DialogoDaNota
+        aberto={notaAberta !== undefined && ('trecho' in notaAberta || notaDoDialogo !== undefined)}
+        trecho={
+          notaAberta && 'trecho' in notaAberta
+            ? notaAberta.texto
+            : (notaDoDialogo?.ancora.texto ?? '')
+        }
+        nota={notaDoDialogo?.nota}
+        guardar={async (texto) => {
+          if (!notaAberta) return false;
+          if ('trecho' in notaAberta) {
+            const deu = await marcacoes.anotar(trechoDe(notaAberta.trecho), texto);
+            if (deu) setAnuncio('Nota guardada.');
+            return deu;
+          }
+          const deu = await marcacoes.editarNota(notaAberta.id, texto);
+          if (deu) setAnuncio('Nota guardada.');
+          return deu;
+        }}
+        tirar={async () => {
+          if (!notaAberta || !('id' in notaAberta)) return false;
+          const deu = await marcacoes.remover(notaAberta.id);
+          if (deu) setAnuncio('Nota tirada.');
+          return deu;
+        }}
+        fechar={() => {
+          setNotaAberta(undefined);
+        }}
+      />
       <BuscaNaNorma
         aberto={buscaAberta}
         aoFechar={() => {
@@ -834,6 +1050,49 @@ function LeitorAberto({
         irPara={irParaAchado}
       />
     </div>
+  );
+}
+
+/** O grupo fixo sem marcação em curso: buscar, modo foco e "lido até". */
+function AcoesDaLeitura({
+  modoFoco,
+  botaoDoFoco,
+  abrirBusca,
+  alternarFoco,
+  marcarAqui,
+}: {
+  modoFoco: boolean;
+  botaoDoFoco: RefObject<HTMLButtonElement | null>;
+  abrirBusca: () => void;
+  alternarFoco: () => void;
+  marcarAqui: () => void;
+}) {
+  return (
+    <>
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        aria-keyshortcuts={TECLA_DA_BUSCA}
+        title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+        onClick={abrirBusca}
+      >
+        Buscar
+      </button>
+      <button
+        ref={botaoDoFoco}
+        type="button"
+        aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+        title={
+          modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco: só o texto (atalho: F)'
+        }
+        onClick={alternarFoco}
+      >
+        {modoFoco ? 'Sair do foco' : 'Modo foco'}
+      </button>
+      <button type="button" onClick={marcarAqui}>
+        Lido até aqui
+      </button>
+    </>
   );
 }
 
@@ -898,15 +1157,38 @@ function tipoDaLinha(nos: NormaAberta['nos'], linhas: LinhaDoLeitor[], i: number
 
 /**
  * Os trechos do texto: ênfase, tachado parcial (redação anterior no meio do texto) e link; com
- * `destacar`, também o destaque automático (9.8), dentro da formatação do trecho.
+ * `destacar`, também o destaque automático (9.8); com `marcas`, os grifos e os marcadores das
+ * notas (11.4). Uma partição só, aninhada sempre na mesma ordem: link, tachado, ênfase, grifo e
+ * destaque (por dentro); o marcador da nota vem depois do pedaço onde a nota termina.
  */
-function TrechosDoTexto({ trechos, destacar = false }: { trechos: Trechos; destacar?: boolean }) {
-  const pedacos: PedacoDoTrecho[] = destacar
-    ? pedacosDestacados(trechos)
-    : trechos.map((trecho) => ({ trecho }));
-  return pedacos.map(({ trecho, categoria }, i) => {
+function TrechosDoTexto({
+  trechos,
+  destacar = false,
+  marcas,
+  escolhidaId,
+}: {
+  trechos: Trechos;
+  destacar?: boolean;
+  marcas?: MarcasDoTexto;
+  escolhidaId?: string;
+}) {
+  const pedacos = pedacosDoTexto(trechos, destacar, marcas);
+  return pedacos.map(({ trecho, categoria, grifo, notas }, i) => {
     let conteudo = <>{trecho.texto}</>;
     if (categoria) conteudo = <span className={`destaque destaque-${categoria}`}>{conteudo}</span>;
+    if (grifo) {
+      conteudo = (
+        <mark
+          className={`grifo grifo-${String(grifo.cor)}${grifo.id === escolhidaId ? ' grifo-escolhido' : ''}`}
+          data-marcacao={grifo.id}
+          // Um ponto de parada do teclado por grifo, no primeiro pedaço dele.
+          tabIndex={grifo.primeiro ? 0 : undefined}
+          title="Grifo: toque para trocar a cor, anotar ou tirar"
+        >
+          {conteudo}
+        </mark>
+      );
+    }
     if (trecho.enfase) conteudo = <em>{conteudo}</em>;
     if (trecho.tachado) conteudo = <del>{conteudo}</del>;
     if (trecho.link) {
@@ -916,7 +1198,23 @@ function TrechosDoTexto({ trechos, destacar = false }: { trechos: Trechos; desta
         </a>
       );
     }
-    return <Fragment key={i}>{conteudo}</Fragment>;
+    return (
+      <Fragment key={i}>
+        {conteudo}
+        {notas?.map((id) => (
+          <button
+            key={id}
+            type="button"
+            className="marcador-nota"
+            data-nota={id}
+            {...{ [ATRIBUTO_FORA_DO_TEXTO]: '' }}
+            aria-label={`Nota: ${marcas?.notas.find((n) => n.id === id)?.rotulo ?? ''}`}
+          >
+            <span aria-hidden="true">✎</span>
+          </button>
+        ))}
+      </Fragment>
+    );
   });
 }
 
@@ -1002,6 +1300,9 @@ interface PropsDoDispositivo {
   alternar: (id: string) => void;
   /** Destaque automático (9.8): só no texto vigente (nem rubrica, nem notas, nem redações). */
   destacar: boolean;
+  /** Grifos e notas (11.4) do dispositivo, também só no texto vigente. */
+  marcacoes: readonly Marcacao[] | undefined;
+  escolhidaId: string | undefined;
 }
 
 /** Um dispositivo: estrutural como cabeçalho aninhado, normativo com recuo pelo nível. */
@@ -1013,6 +1314,8 @@ function Dispositivo({
   expandido,
   alternar,
   destacar,
+  marcacoes,
+  escolhidaId,
 }: PropsDoDispositivo) {
   const no = aberta.nos[linha.indice];
   if (!no) return null;
@@ -1126,11 +1429,16 @@ function Dispositivo({
         {rotuloEmDestaque}
         {rotuloEmDestaque && ' '}
         {texto ? (
-          <TrechosDoTexto
-            trechos={texto.trechos}
-            // A eficácia cessada não é texto vigente; o revogado e o vetado nem chegam aqui.
-            destacar={destacar && dispositivo.status !== 'eficacia_cessada'}
-          />
+          // O texto vigente, onde a seleção vira grifo ou nota (`lerSelecao`).
+          <span className={CLASSE_DO_TEXTO} data-dispositivo={dispositivo.id}>
+            <TrechosDoTexto
+              trechos={texto.trechos}
+              // A eficácia cessada não é texto vigente; o revogado e o vetado nem chegam aqui.
+              destacar={destacar && dispositivo.status !== 'eficacia_cessada'}
+              marcas={marcasDoTexto(marcacoes)}
+              escolhidaId={escolhidaId}
+            />
+          </span>
         ) : (
           <span className="texto-carregando" aria-hidden="true" />
         )}
