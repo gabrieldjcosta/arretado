@@ -722,3 +722,185 @@ describe('busca dentro da norma (11.6)', () => {
     });
   });
 });
+
+describe('grifos e notas (11.4)', () => {
+  afterEach(() => {
+    document.getSelection()?.removeAllRanges();
+    delete document.documentElement.dataset.modoFoco;
+  });
+
+  /** O nó de texto do dispositivo que contém o texto dado. */
+  function noDe(endereco: string, texto: string): Text {
+    const andar = document.createTreeWalker(dispositivo(endereco), NodeFilter.SHOW_TEXT);
+    for (let no = andar.nextNode(); no; no = andar.nextNode()) {
+      if (no.textContent?.includes(texto)) return no as Text;
+    }
+    throw new Error(`sem "${texto}" em ${endereco}`);
+  }
+
+  /** Seleciona do texto `de` (no endereço) até o fim do texto `ate`, como o mouse ou o toque. */
+  function selecionar(endereco: string, de: string, ate = de, enderecoFim = endereco) {
+    const a = noDe(endereco, de);
+    const b = noDe(enderecoFim, ate);
+    act(() => {
+      document
+        .getSelection()
+        ?.setBaseAndExtent(a, a.data.indexOf(de), b, b.data.indexOf(ate) + ate.length);
+      document.dispatchEvent(new Event('selectionchange'));
+    });
+  }
+
+  const anuncio = () => document.querySelector('.acoes-leitor [role="status"]');
+
+  const marcacoesGravadas = (repo: Repositorio) =>
+    repo
+      .colecao('marcacoes')
+      .listarPagina({ limite: 50 })
+      .then((p) => p.itens);
+
+  it('selecionar troca o grupo fixo pelas cores; grifar, escolher o grifo, trocar a cor e tirar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A execução penal tem por objetivo/);
+
+    selecionar('art1', 'execução penal');
+    const acoes = await screen.findByRole('group', { name: 'Marcar o trecho selecionado' });
+    expect(screen.queryByRole('button', { name: 'Buscar' })).not.toBeInTheDocument();
+    expect(anuncio()).toHaveTextContent('Trecho selecionado');
+    await usuario.click(within(acoes).getByRole('button', { name: 'Grifar com a cor 2' }));
+
+    const grifo = await waitFor(() => {
+      const el = dispositivo('art1').querySelector('mark.grifo');
+      expect(el).not.toBeNull();
+      return el as HTMLElement;
+    });
+    expect(grifo).toHaveTextContent('execução penal');
+    expect(grifo).toHaveClass('grifo-2');
+    // O grupo fixo volta, e o grifo está gravado com a âncora no texto gravado.
+    expect(screen.getByRole('button', { name: 'Buscar' })).toBeInTheDocument();
+    const [gravada] = await marcacoesGravadas(repo);
+    expect(gravada).toMatchObject({
+      tipo: 'grifo',
+      cor: 2,
+      status: 'valida',
+      ancora: { texto: 'execução penal', inicio: 2, fim: 16 },
+    });
+
+    // Tocar no grifo o escolhe: trocar a cor e tirar.
+    await usuario.click(grifo);
+    const doGrifo = await screen.findByRole('group', { name: 'Grifo escolhido' });
+    expect(within(doGrifo).getByRole('button', { name: 'Cor 2' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(grifo).toHaveClass('grifo-escolhido');
+    await usuario.click(within(doGrifo).getByRole('button', { name: 'Cor 3' }));
+    await waitFor(() => {
+      expect(dispositivo('art1').querySelector('mark.grifo')).toHaveClass('grifo-3');
+    });
+    expect((await marcacoesGravadas(repo))[0]?.cor).toBe(3);
+    await usuario.click(
+      within(screen.getByRole('group', { name: 'Grifo escolhido' })).getByRole('button', {
+        name: 'Tirar o grifo',
+      }),
+    );
+    await waitFor(() => {
+      expect(dispositivo('art1').querySelector('mark.grifo')).toBeNull();
+    });
+    expect(await marcacoesGravadas(repo)).toEqual([]);
+    expect(anuncio()).toHaveTextContent('Grifo tirado.');
+  });
+
+  it('a seleção que passa do dispositivo fica só no primeiro; fora do texto vigente não marca', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    // A rubrica não é texto vigente.
+    selecionar('art1', 'Objeto da execução');
+    expect(screen.queryByRole('group', { name: 'Marcar o trecho selecionado' })).toBeNull();
+
+    selecionar('art2', 'penal será', 'condenado', 'art3');
+    const acoes = await screen.findByRole('group', { name: 'Marcar o trecho selecionado' });
+    expect(acoes).toHaveTextContent('Só no Art. 2º');
+    await usuario.click(within(acoes).getByRole('button', { name: 'Grifar com a cor 1' }));
+    await waitFor(() => {
+      expect(dispositivo('art2').querySelector('mark.grifo-1')).toHaveTextContent(
+        'penal será exercida.',
+      );
+    });
+    expect(dispositivo('art3').querySelector('mark')).toBeNull();
+  });
+
+  it('nota: anotar o trecho, abrir pelo marcador, editar e tirar, sem mexer na rolagem', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const rolagem = window.scrollY;
+
+    selecionar('art2', 'jurisdição penal');
+    await usuario.click(await screen.findByRole('button', { name: 'Nota' }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Nota' });
+    expect(within(dialogo).getByText('jurisdição penal')).toBeInTheDocument();
+    const campo = within(dialogo).getByRole('textbox', { name: 'Texto da nota' });
+    expect(campo).toHaveFocus();
+    await usuario.type(campo, 'Juiz da execução: art. 65.');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    const marcador = await screen.findByRole('button', { name: 'Nota: jurisdição penal' });
+    // O marcador vem logo depois do trecho anotado e não conta no texto (nem no offset).
+    expect(dispositivo('art2')).toHaveTextContent('A jurisdição penal✎ será exercida.');
+    expect(await marcacoesGravadas(repo)).toEqual([
+      expect.objectContaining({
+        tipo: 'nota',
+        nota: 'Juiz da execução: art. 65.',
+        ancora: { texto: 'jurisdição penal', inicio: 2, fim: 18 },
+      }),
+    ]);
+
+    await usuario.click(marcador);
+    let aberta = await screen.findByRole('dialog', { name: 'Nota' });
+    expect(within(aberta).getByText('Juiz da execução: art. 65.')).toBeInTheDocument();
+    await usuario.click(within(aberta).getByRole('button', { name: 'Editar' }));
+    const edicao = within(aberta).getByRole('textbox', { name: 'Texto da nota' });
+    await usuario.clear(edicao);
+    await usuario.type(edicao, 'Competência: art. 65 da LEP.');
+    await usuario.click(within(aberta).getByRole('button', { name: 'Guardar' }));
+    await waitFor(async () => {
+      expect((await marcacoesGravadas(repo))[0]?.nota).toBe('Competência: art. 65 da LEP.');
+    });
+
+    await usuario.click(screen.getByRole('button', { name: 'Nota: jurisdição penal' }));
+    aberta = await screen.findByRole('dialog', { name: 'Nota' });
+    await usuario.click(within(aberta).getByRole('button', { name: 'Tirar a nota' }));
+    await usuario.click(within(aberta).getByRole('button', { name: 'Tirar mesmo' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /^Nota:/ })).not.toBeInTheDocument();
+    });
+    expect(await marcacoesGravadas(repo)).toEqual([]);
+    expect(window.scrollY).toBe(rolagem);
+  });
+
+  it('no modo foco, as ações ficam no mesmo grupo; Esc desfaz a seleção sem sair do modo foco', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByRole('button', { name: 'Sair do foco' });
+    await screen.findByText(/A jurisdição penal/);
+
+    selecionar('art2', 'exercida');
+    expect(
+      await screen.findByRole('group', { name: 'Marcar o trecho selecionado' }),
+    ).toBeInTheDocument();
+    await usuario.keyboard('{Escape}');
+    expect(screen.queryByRole('group', { name: 'Marcar o trecho selecionado' })).toBeNull();
+    expect(window.location.hash).toContain('foco=texto');
+    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+  });
+});

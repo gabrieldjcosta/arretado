@@ -766,3 +766,192 @@ test('busca dentro da norma: por texto, sem acento e sem caixa, e por endereço;
   );
   expect(sobra).toBe(0);
 });
+
+/**
+ * Seleciona a palavra dentro do alvo como o usuário: no desktop, o clique duplo; no celular e no
+ * tablet, o toque longo sobre ela. O Chromium headless do Linux não seleciona no toque longo (no
+ * Android, sim): depois do gesto, o teste seleciona a palavra sob o dedo, como o Android faria.
+ */
+async function selecionarPalavra(page: Page, alvo: Locator, palavra: string, toque: boolean) {
+  const ponto = await alvo.first().evaluate((el, procurada) => {
+    const andar = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let no = andar.nextNode(); no; no = andar.nextNode()) {
+      const i = no.textContent?.indexOf(procurada) ?? -1;
+      if (i < 0) continue;
+      const faixa = document.createRange();
+      faixa.setStart(no, i);
+      faixa.setEnd(no, i + procurada.length);
+      const caixa = faixa.getClientRects()[0];
+      if (caixa) return { x: caixa.x + caixa.width / 2, y: caixa.y + caixa.height / 2 };
+    }
+    throw new Error(`sem "${procurada}"`);
+  }, palavra);
+  if (!toque) {
+    await page.mouse.dblclick(ponto.x, ponto.y);
+    return;
+  }
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: ponto.x, y: ponto.y }],
+  });
+  await page.waitForTimeout(700);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+  await page.evaluate(({ x, y }) => {
+    const selecao = document.getSelection();
+    if (!selecao || !selecao.isCollapsed) return;
+    const caret = document.caretPositionFromPoint(x, y);
+    if (!caret) return;
+    selecao.collapse(caret.offsetNode, caret.offset);
+    selecao.modify('move', 'backward', 'word');
+    selecao.modify('extend', 'forward', 'word');
+  }, ponto);
+}
+
+/** Toca (celular e tablet) ou clica (desktop). */
+const apertar = (alvo: Locator, toque: boolean) => (toque ? alvo.tap() : alvo.click());
+
+/** As marcações gravadas no IndexedDB (as não excluídas). */
+function marcacoesGravadas(page: Page) {
+  return page.evaluate(async () => {
+    const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
+      const pedido = indexedDB.open('arretado');
+      pedido.onsuccess = () => {
+        resolver(pedido.result);
+      };
+      pedido.onerror = () => {
+        rejeitar(new Error(String(pedido.error)));
+      };
+    });
+    try {
+      const todas = await new Promise<
+        {
+          tipo: string;
+          cor?: number;
+          nota?: string;
+          status: string;
+          excluidoEm: string | null;
+          ancora: { texto: string };
+        }[]
+      >((resolver, rejeitar) => {
+        const pedido = banco.transaction('marcacoes').objectStore('marcacoes').getAll();
+        pedido.onsuccess = () => {
+          resolver(pedido.result as never);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+      return todas.filter((m) => m.excluidoEm === null);
+    } finally {
+      banco.close();
+    }
+  });
+}
+
+test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, nota sem tirar a posição, também no modo foco: LEP compilada (11.4)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await page.getByRole('button', { name: 'Destaques' }).click();
+
+  // Um termo aceso pelo destaque automático: o grifo convive com ele, por fora.
+  const destaque = page.locator('.texto-vigente .destaque');
+  await rolarAte(page, destaque);
+  const endereco = await destaque
+    .first()
+    .evaluate((el) => el.closest('[data-endereco]')?.getAttribute('data-endereco') ?? '');
+  const texto = page.locator(`[data-endereco="${endereco}"] .texto-vigente`);
+  const termo = (await destaque.first().innerText()).split(/\s+/).find((p) => p.length >= 3) ?? '';
+  expect(termo).not.toBe('');
+  await alinharNoAlto(page, texto);
+
+  await selecionarPalavra(page, destaque, termo, toque);
+  const acoes = page.getByRole('group', { name: 'Marcar o trecho selecionado' });
+  await expect(acoes).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Buscar', exact: true })).toBeHidden();
+  await semViolacoes(page);
+  await apertar(acoes.getByRole('button', { name: 'Grifar com a cor 1' }), toque);
+  const grifo = texto.locator('mark.grifo');
+  await expect(grifo).toHaveText(termo);
+  await expect(grifo).toHaveClass(/grifo-1/);
+  // Uma partição só: o destaque (o traço) fica dentro do grifo (o fundo), sem duplicar o texto.
+  await expect(grifo.locator('.destaque')).toHaveText(termo);
+  expect(await grifo.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(
+    'rgba(0, 0, 0, 0)',
+  );
+  await expect(page.getByRole('button', { name: 'Buscar', exact: true })).toBeVisible();
+  await expect
+    .poll(() => marcacoesGravadas(page))
+    .toEqual([
+      expect.objectContaining({
+        tipo: 'grifo',
+        cor: 1,
+        status: 'valida',
+        ancora: expect.objectContaining({ texto: termo }),
+      }),
+    ]);
+
+  // Tocar no grifo o escolhe: trocar a cor.
+  await apertar(grifo, toque);
+  const doGrifo = page.getByRole('group', { name: 'Grifo escolhido' });
+  await expect(doGrifo).toBeVisible();
+  await apertar(doGrifo.getByRole('button', { name: 'Cor 3' }), toque);
+  await expect(grifo).toHaveClass(/grifo-3/);
+  await semViolacoes(page);
+  await apertar(doGrifo.getByRole('button', { name: 'Fechar as ações do grifo' }), toque);
+  await expect(doGrifo).toBeHidden();
+
+  // Nota em outra palavra do mesmo dispositivo: o diálogo abre e fecha sem mexer na rolagem.
+  const palavras = (await texto.innerText()).match(/\p{L}{5,}/gu) ?? [];
+  const outra = palavras.find((p) => !p.includes(termo) && !termo.includes(p)) ?? '';
+  expect(outra).not.toBe('');
+  const rolagem = await page.evaluate(() => window.scrollY);
+  await selecionarPalavra(page, texto, outra, toque);
+  await apertar(acoes.getByRole('button', { name: 'Nota' }), toque);
+  const dialogo = page.getByRole('dialog', { name: 'Nota' });
+  await expect(dialogo).toBeVisible();
+  await dialogo.getByRole('textbox', { name: 'Texto da nota' }).fill('Cai na prova.');
+  await apertar(dialogo.getByRole('button', { name: 'Guardar' }), toque);
+  await expect(dialogo).toBeHidden();
+  const marcador = texto.getByRole('button', { name: `Nota: ${outra}` });
+  await expect(marcador).toBeVisible();
+  await apertar(marcador, toque);
+  await expect(dialogo.getByText('Cai na prova.')).toBeVisible();
+  await semViolacoes(page);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+  await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
+  await expect(dialogo).toBeHidden();
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+
+  // No modo foco, as ações tomam o lugar do grupo fixo, sem alargar a página.
+  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await selecionarPalavra(page, texto, outra, toque);
+  await expect(acoes).toBeVisible();
+  const sobra = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(sobra).toBe(0);
+  await semViolacoes(page);
+  if (toque) await apertar(acoes.getByRole('button', { name: 'Cancelar a marcação' }), toque);
+  else await page.keyboard.press('Escape');
+  await expect(acoes).toBeHidden();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+
+  // Recarregar: o grifo e a nota continuam; tirar o grifo.
+  await page.reload();
+  await expect(grifo).toHaveClass(/grifo-3/);
+  await expect(marcador).toBeVisible();
+  await apertar(grifo, toque);
+  await apertar(doGrifo.getByRole('button', { name: 'Tirar o grifo' }), toque);
+  await expect(grifo).toHaveCount(0);
+  await expect
+    .poll(async () => (await marcacoesGravadas(page)).map((m) => m.tipo))
+    .toEqual(['nota']);
+});

@@ -19,6 +19,10 @@
   --destaque-condicao: #a54b00;
   --destaque-absoluto: #7a3db8;
   --destaque-pena: #b0283a;
+  /* Grifos (11.4): 3 cores de fundo, sem nomes; o texto (e o atenuado do tachado) continua AA. */
+  --grifo-1: #fff0a0;
+  --grifo-2: #c8eccb;
+  --grifo-3: #fad2e1;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 85%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
@@ -54,6 +58,9 @@
     --destaque-condicao: #ffad5c;
     --destaque-absoluto: #c9a0ff;
     --destaque-pena: #ff8a9a;
+    --grifo-1: #463b0c;
+    --grifo-2: #183d29;
+    --grifo-3: #4a1c34;
     --sombra: none;
     --superficie-translucida: rgb(30 30 30 / 85%);
     color-scheme: dark;
@@ -79,6 +86,9 @@
   --destaque-condicao: #ffad5c;
   --destaque-absoluto: #c9a0ff;
   --destaque-pena: #ff8a9a;
+  --grifo-1: #463b0c;
+  --grifo-2: #183d29;
+  --grifo-3: #4a1c34;
   --sombra: none;
   --superficie-translucida: rgb(30 30 30 / 85%);
   color-scheme: dark;
@@ -1140,4 +1150,123 @@ p.linha-atenuada {
   border-color: var(--primaria);
   color: var(--primaria-texto);
   font-weight: 600;
+}
+
+/* Grifos e notas (11.4): o grifo é o fundo (o destaque automático é o traço, sem fundo), com o
+   texto na cor de sempre; o escolhido ganha contorno. O marcador da nota é discreto, no fio do
+   texto, sem mudar a altura da linha. */
+mark.grifo {
+  color: inherit;
+  border-radius: 2px;
+  cursor: pointer;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.grifo-1 {
+  background: var(--grifo-1);
+}
+
+.grifo-2 {
+  background: var(--grifo-2);
+}
+
+.grifo-3 {
+  background: var(--grifo-3);
+}
+
+mark.grifo-escolhido,
+mark.grifo:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 1px;
+}
+
+button.marcador-nota {
+  display: inline;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 0.2em;
+  margin: 0 0.1em;
+  border: 1px solid var(--borda);
+  border-radius: 4px;
+  background: var(--superficie-2);
+  color: var(--texto-atenuado);
+  font-family: var(--fonte-interface);
+  font-size: 0.75em;
+  line-height: 1.2;
+  vertical-align: 0.15em;
+}
+
+/* As ações da marcação no lugar do grupo fixo: as 3 cores, Nota e fechar; quebram em duas linhas
+   numa tela estreita em vez de alargar a página. */
+.acoes-marcacao {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100vw - 1.5rem);
+}
+
+.acoes-leitor .acoes-marcacao button.grifo-1 {
+  background: var(--grifo-1);
+}
+
+.acoes-leitor .acoes-marcacao button.grifo-2 {
+  background: var(--grifo-2);
+}
+
+.acoes-leitor .acoes-marcacao button.grifo-3 {
+  background: var(--grifo-3);
+}
+
+.acoes-leitor .acoes-marcacao button {
+  color: var(--texto);
+}
+
+.acoes-leitor .acoes-marcacao button.cor-do-grifo {
+  font-weight: 700;
+}
+
+.acoes-leitor .acoes-marcacao button[aria-pressed='true'] {
+  border: 3px solid var(--texto);
+}
+
+.aviso-da-selecao {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.aviso-da-selecao span {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+}
+
+.trecho-da-nota {
+  margin: 0 0 0.75rem;
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  border-left: 3px solid var(--borda);
+  color: var(--texto-atenuado);
+  font-family: var(--fonte-leitura);
+  overflow-wrap: anywhere;
+}
+
+.texto-da-nota {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.campo-da-nota {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.campo-da-nota textarea {
+  width: 100%;
+  font: inherit;
 }
