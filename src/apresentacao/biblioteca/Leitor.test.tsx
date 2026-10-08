@@ -5,6 +5,7 @@ import { alterarPreferencias, obterPreferencias } from '../../core/preferencias'
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
+import { criarGrifo } from '../../dominios/legislacao/marcacoes';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -982,5 +983,205 @@ describe('estrela (11.2)', () => {
     await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
     expect(window.location.hash).toContain('foco=texto');
     expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+  });
+});
+
+describe('filtros (11.3)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  const linhaDe = (endereco: string) => dispositivo(endereco).closest('.linha-leitor');
+  const naTela = (endereco: string) =>
+    document.querySelector(`[data-endereco="${endereco}"]`) !== null;
+
+  /** Abre o diálogo, escolhe o filtro pelo nome e aplica. */
+  async function filtrar(usuario: ReturnType<typeof userEvent.setup>, escolha: RegExp) {
+    await usuario.click(screen.getByRole('button', { name: /^(Filtrar|Filtrado)/ }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+    await usuario.click(within(dialogo).getByRole('radio', { name: escolha }));
+    return dialogo;
+  }
+
+  it('estrelados: só o que tem estrela e o contexto atenuado; estrelar de novo não faz a linha sumir; "Mostrar tudo" volta', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 2º' }));
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
+
+    const dialogo = await filtrar(usuario, /Só os estrelados/);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // O art. 2 casa; o capítulo e o título acima dele ficam como contexto; os outros artigos saem.
+    expect(naTela('art2')).toBe(true);
+    expect(linhaDe('art2')).not.toHaveAttribute('data-contexto');
+    expect(linhaDe('tit1')).toHaveAttribute('data-contexto');
+    expect(linhaDe('tit1.cap1')).toHaveAttribute('data-contexto');
+    expect(naTela('art1')).toBe(false);
+    expect(naTela('art3')).toBe(false);
+    expect(document.querySelector('.filtro-ativo')).toHaveTextContent(
+      'Mostrando só: estrelados (1 dispositivo)',
+    );
+    expect(document.querySelector('.acoes-leitor [role="status"]')).toHaveTextContent(
+      'Mostrando só: estrelados, 1 dispositivo.',
+    );
+    // O botão do grupo fixo diz que o filtro está ligado.
+    const botao = screen.getByRole('button', { name: 'Filtrado: estrelados. Mudar o filtro' });
+    expect(botao).toHaveClass('filtro-ligado');
+
+    // Tirar a estrela de um artigo à vista não o tira da tela: a linha fica até "Atualizar".
+    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 2º (direta)' }));
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º' });
+    expect(naTela('art2')).toBe(true);
+    await usuario.click(screen.getByRole('button', { name: 'Atualizar' }));
+    expect(await screen.findByText(/Nenhum dispositivo estrelado nesta norma/)).toBeInTheDocument();
+    expect(naTela('art2')).toBe(false);
+
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar tudo' }));
+    expect(naTela('art1')).toBe(true);
+    expect(naTela('art3')).toBe(true);
+    expect(linhaDe('tit1')).not.toHaveAttribute('data-contexto');
+    expect(screen.getByRole('button', { name: 'Filtrar' })).not.toHaveClass('filtro-ligado');
+  });
+
+  it('com grifo ou nota: o dispositivo marcado e o que está acima dele', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    const art3 = aberta.nos.find((n) => n.dispositivo.endereco === 'art3')?.dispositivo.id ?? '';
+    await criarGrifo(
+      repo,
+      { normaId: norma.id, versaoId: aberta.versao.id, dispositivoId: art3, inicio: 3, fim: 12 },
+      1,
+    );
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const dialogo = await filtrar(usuario, /Só com grifo ou nota/);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+
+    expect(naTela('art3')).toBe(true);
+    expect(linhaDe('art3')).not.toHaveAttribute('data-contexto');
+    expect(linhaDe('tit1.cap1')).toHaveAttribute('data-contexto');
+    expect(naTela('art1')).toBe(false);
+    expect(naTela('art2')).toBe(false);
+    // O grifo continua desenhado no texto filtrado.
+    expect(within(dispositivo('art3')).getByText('condenado', { selector: 'mark' })).toBeTruthy();
+  });
+
+  it('com erro vinculado: o erro que aponta o dispositivo (o descartado não conta)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const aberta = await abrirNorma(repo, norma.id);
+    const idDe = (e: string) =>
+      aberta.nos.find((n) => n.dispositivo.endereco === e)?.dispositivo.id;
+    await repo.colecao('erros').criar({
+      resultado: 'errou',
+      oQueFoi: 'Confundi o art. 2',
+      status: 'aberto',
+      dispositivoId: idDe('art2'),
+    });
+    await repo.colecao('erros').criar({
+      resultado: 'errou',
+      oQueFoi: 'Erro já descartado no art. 3',
+      status: 'descartado',
+      dispositivoId: idDe('art3'),
+    });
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const dialogo = await filtrar(usuario, /Só com erro vinculado/);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+
+    await waitFor(() => {
+      expect(naTela('art1')).toBe(false);
+    });
+    expect(naTela('art2')).toBe(true);
+    expect(naTela('art3')).toBe(false);
+    expect(document.querySelector('.filtro-ativo')).toHaveTextContent(
+      'com erro vinculado (1 dispositivo)',
+    );
+  });
+
+  it('um trecho: de um artigo a outro, por bloco, e o que a norma não tem não aplica', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const dialogo = await filtrar(usuario, /Só um trecho/);
+    await usuario.type(within(dialogo).getByLabelText('De'), '2');
+    await usuario.type(within(dialogo).getByLabelText('até'), '99');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+    expect(await within(dialogo).findByRole('alert')).toHaveTextContent('Não encontrei “99”');
+    expect(naTela('art1')).toBe(true);
+
+    await usuario.clear(within(dialogo).getByLabelText('até'));
+    await usuario.type(within(dialogo).getByLabelText('até'), '3');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(naTela('art1')).toBe(false);
+    expect(naTela('art2')).toBe(true);
+    expect(naTela('art3')).toBe(true);
+    expect(linhaDe('tit1.cap1')).toHaveAttribute('data-contexto');
+    expect(document.querySelector('.filtro-ativo')).toHaveTextContent(
+      'Mostrando só: Art. 2º a Art. 3º (2 dispositivos)',
+    );
+
+    // Por bloco: o capítulo e tudo o que está dentro dele.
+    await usuario.click(screen.getByRole('button', { name: /^Filtrado/ }));
+    const outro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+    await usuario.selectOptions(within(outro).getByLabelText('Ou um bloco da norma'), [
+      'TÍTULO I › CAPÍTULO I',
+    ]);
+    await usuario.click(within(outro).getByRole('button', { name: 'Mostrar' }));
+    expect(naTela('art1')).toBe(true);
+    expect(naTela('art3')).toBe(true);
+    expect(linhaDe('tit1.cap1')).not.toHaveAttribute('data-contexto');
+    expect(linhaDe('tit1')).toHaveAttribute('data-contexto');
+  });
+
+  it('no modo foco o botão fica no grupo; o filtro vazio avisa e "Mostrar tudo" desfaz', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const dialogo = await filtrar(usuario, /Só os estrelados/);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+
+    // Sem a barra do leitor, a frase do filtro some, mas o vazio explica e oferece a saída.
+    expect(document.querySelector('.barra-leitor')).toBeNull();
+    expect(await screen.findByText(/Nenhum dispositivo estrelado nesta norma/)).toBeInTheDocument();
+    expect(window.location.hash).toContain('foco=texto');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar tudo' }));
+    expect(await screen.findByText(/A jurisdição penal/)).toBeInTheDocument();
+    expect(window.location.hash).toContain('foco=texto');
+  });
+
+  it('ir a um achado da busca que o filtro escondeu desliga o filtro', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 2º' }));
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
+    const dialogo = await filtrar(usuario, /Só os estrelados/);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+    expect(naTela('art3')).toBe(false);
+
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    const busca = await screen.findByRole('dialog', { name: 'Buscar na norma' });
+    await usuario.type(within(busca).getByRole('searchbox'), 'Ao condenado');
+    await usuario.click(await within(busca).findByRole('button', { name: /^Art\. 3º/ }));
+
+    expect(await screen.findByText(/Filtro desligado para mostrar o achado/)).toBeInTheDocument();
+    expect(naTela('art3')).toBe(true);
+    expect(naTela('art1')).toBe(true);
+    expect(screen.getByRole('button', { name: 'Filtrar' })).toBeInTheDocument();
   });
 });

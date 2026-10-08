@@ -1074,3 +1074,104 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   await expect(estrela('Estrela: Art. 10 (herdada de Seção I)')).toBeVisible();
   await expect(estrela('Estrela: Seção I (direta)')).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto, a posição mantida e o grupo fixo sem alargar a página, também no modo foco: LEP compilada (11.3)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  const estrela = (nome: string) => page.getByRole('button', { name: nome, exact: true });
+  const naoTemLargura = async () => {
+    const sobra = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(sobra).toBe(0);
+  };
+  const filtrar = async (escolha: string) => {
+    await apertar(page.getByRole('button', { name: /^(Filtrar|Filtrado)/ }), toque);
+    const dialogo = page.getByRole('dialog', { name: 'Filtrar a norma' });
+    await expect(dialogo).toBeVisible();
+    await dialogo.getByRole('radio', { name: escolha }).check();
+    return dialogo;
+  };
+
+  // Estrela a Seção I (Título II › Capítulo II): os arts. 10 e 11 herdam.
+  const secao = page.locator('[data-endereco="tit2.cap2.sec1"]');
+  await rolarAteExistir(page, secao);
+  await alinharNoAlto(page, secao);
+  await apertar(estrela('Estrela: Seção I'), toque);
+  await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toBeVisible();
+
+  // O grupo fixo ganhou um botão: com quatro, cabe na tela (quebra em duas linhas, se preciso).
+  const grupo = page.locator('.acoes-leitor');
+  await expect(page.getByRole('button', { name: 'Filtrar', exact: true })).toBeVisible();
+  const caixa = await grupo.boundingBox();
+  const largura = page.viewportSize()?.width ?? 0;
+  expect(caixa).not.toBeNull();
+  expect((caixa?.x ?? -1) >= 0 && (caixa?.x ?? 0) + (caixa?.width ?? 0) <= largura).toBe(true);
+  await naoTemLargura();
+
+  // Só os estrelados: a Seção I, os artigos dela e o contexto (Título II e Capítulo II) atenuado.
+  const antes = await distanciaDoAlto(secao);
+  const dialogo = await filtrar('Só os estrelados');
+  await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Mostrar', exact: true }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.locator('.filtro-ativo')).toContainText(
+    /Mostrando só: estrelados \(\d+ dispositivos\)/,
+  );
+  await expect(page.locator('[data-endereco="art10"]')).toBeVisible();
+  await expect(page.locator('[data-endereco="art11"]')).toBeVisible();
+  await expect(page.locator('[data-endereco="art1"]')).toHaveCount(0);
+  await expect(page.locator('[data-endereco="tit2.cap2.sec2"]')).toHaveCount(0);
+  await expect(
+    page.locator('.linha-leitor[data-contexto] [data-endereco="tit2.cap2"]'),
+  ).toBeVisible();
+  await expect(page.locator('.linha-leitor[data-contexto] [data-endereco="tit2"]')).toBeVisible();
+  // A leitura continua na Seção I, no mesmo ponto da tela. Numa tela alta, a lista filtrada é curta
+  // e não há rolagem para pôr a Seção I no alto: vale a rolagem no fim da página.
+  await expect(secao).toBeVisible();
+  await expect
+    .poll(async () => {
+      const noFim = await page.evaluate(
+        () => window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 1,
+      );
+      return noFim || Math.abs((await distanciaDoAlto(secao)) - antes) < 2;
+    })
+    .toBe(true);
+  await expect(page.getByRole('button', { name: /^Filtrado: estrelados/ })).toBeVisible();
+  await semViolacoes(page);
+  await naoTemLargura();
+
+  // Um trecho: do art. 1 ao art. 3 (e o que está dentro do último).
+  const outro = await filtrar('Só um trecho');
+  await outro.getByLabel('De', { exact: true }).fill('1');
+  await outro.getByLabel('até', { exact: true }).fill('3');
+  await apertar(outro.getByRole('button', { name: 'Mostrar', exact: true }), toque);
+  await expect(page.locator('.filtro-ativo')).toContainText('Mostrando só: Art. 1º a Art. 3º');
+  await expect(page.locator('[data-endereco="art1"]')).toBeVisible();
+  await expect(page.locator('[data-endereco="art3"]')).toBeVisible();
+  await expect(page.locator('[data-endereco="art10"]')).toHaveCount(0);
+
+  // No modo foco, o botão fica no grupo; o filtro vale lá, e a página não alarga.
+  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await expect(page.locator('.filtro-ativo p')).toHaveCount(0);
+  await expect(page.locator('[data-endereco="art1"]')).toBeVisible();
+  await semViolacoes(page);
+  await naoTemLargura();
+  const emFoco = await filtrar('Tudo');
+  await apertar(emFoco.getByRole('button', { name: 'Mostrar tudo' }), toque);
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  await expect(page.getByRole('button', { name: 'Filtrar', exact: true })).toBeVisible();
+  await expect(page.locator('[data-endereco="art1"]')).toBeVisible();
+  await naoTemLargura();
+
+  // Sem filtro, a linha de estado some e o resto da norma volta.
+  await apertar(page.getByRole('button', { name: 'Sair do foco' }), toque);
+  await expect(page.locator('.filtro-ativo')).toHaveCount(0);
+});

@@ -11,11 +11,16 @@ import {
   type RefObject,
 } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import type { Leitura, Marcacao, TextoDeDispositivo } from '../../core/modelo';
+import type { Leitura, Marcacao, TextoDeDispositivo, TipoDispositivo } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import { prepararBusca } from '../../dominios/legislacao/busca';
 import { arvoreDaEstrela, estrelavel } from '../../dominios/legislacao/estrelas';
+import {
+  aplicarFiltro,
+  nomeDoCriterio,
+  type CriterioDoFiltro,
+} from '../../dominios/legislacao/filtros';
 import {
   abrirNorma,
   lerJanela,
@@ -30,6 +35,8 @@ import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
+import { dispositivosComErro } from './errosVinculados';
+import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto } from './destacar';
 import { fraseDaEstrela, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
@@ -105,6 +112,20 @@ interface Aberta {
   alvo: number | undefined;
   /** O "lido até" guardado, se o dispositivo existe na versão aberta. */
   lidoAteId: string | undefined;
+}
+
+/** O filtro do leitor (11.3) aplicado: o critério, a frase da tela e os nós, guardados na hora. */
+interface FiltroAplicado {
+  criterio: CriterioDoFiltro;
+  /** "estrelados", "Art. 5º a Art. 20": a frase "Mostrando só: …". */
+  descricao: string;
+  /** Os nós que casam e os que casam mais o contexto (índices em `NormaAberta.nos`). */
+  casados: ReadonlySet<number>;
+  visiveis: ReadonlySet<number>;
+  /** Quantos dispositivos casam (a rubrica não conta: é da linha do pai). */
+  quantos: number;
+  /** O bloco escolhido, para o diálogo abrir nele. */
+  blocoIndice?: number;
 }
 
 type Carga =
@@ -266,7 +287,14 @@ function LeitorAberto({
   lidoAteId,
 }: { repo: Repositorio } & Aberta) {
   const { norma, nos } = aberta;
-  const linhas = useMemo(() => montarLinhas(nos), [nos]);
+  const linhasTodas = useMemo(() => montarLinhas(nos), [nos]);
+  // Filtro do leitor (11.3): o que foi aplicado e o resultado, guardado na hora de aplicar (um
+  // artigo que perde a estrela com o filtro ligado continua à vista, para poder estrelar de novo).
+  const [filtro, setFiltro] = useState<FiltroAplicado | undefined>(undefined);
+  const linhas = useMemo(
+    () => (filtro ? linhasTodas.filter((l) => filtro.visiveis.has(l.indice)) : linhasTodas),
+    [linhasTodas, filtro],
+  );
   const { textos, pedir, falhou, tentarDeNovo, tentativa } = useTextos(
     repo,
     aberta,
@@ -301,7 +329,7 @@ function LeitorAberto({
 
   // A linha da posição guardada. A primeira linha é o começo: abre no alto da página, com a barra.
   const [linhaInicial] = useState(() => {
-    const linha = alvo === undefined ? undefined : linhaDoNo(linhas, alvo);
+    const linha = alvo === undefined ? undefined : linhaDoNo(linhasTodas, alvo);
     return linha === 0 ? undefined : linha;
   });
   const [voltando, setVoltando] = useState(linhaInicial !== undefined);
@@ -516,11 +544,20 @@ function LeitorAberto({
   const ultimaVisivel = visiveis.at(-1)?.index;
   useEffect(() => {
     if (primeiraVisivel === undefined || ultimaVisivel === undefined) return;
+    if (filtro) {
+      // Com filtro, as linhas vizinhas na tela podem estar longe na norma: cada uma pede o seu texto
+      // (o intervalo entre a primeira e a última leria a norma toda).
+      for (let k = primeiraVisivel; k <= ultimaVisivel; k++) {
+        const linha = linhas[k];
+        if (linha) pedir(linha.indice, linha.indiceNome ?? linha.indice);
+      }
+      return;
+    }
     const inicio = linhas[primeiraVisivel]?.indice ?? 0;
     const ultima = linhas[ultimaVisivel];
     const fim = ultima?.indiceNome ?? ultima?.indice ?? inicio;
     pedir(inicio - MARGEM_DE_TEXTOS, fim + MARGEM_DE_TEXTOS);
-  }, [primeiraVisivel, ultimaVisivel, linhas, pedir, tentativa]);
+  }, [primeiraVisivel, ultimaVisivel, linhas, filtro, pedir, tentativa]);
 
   /** O dispositivo da linha no alto da tela, logo abaixo da barra fixa. */
   const noDoAlto = useCallback((): string | undefined => {
@@ -660,9 +697,42 @@ function LeitorAberto({
     [virtualizador],
   );
 
-  function irAoLidoAte() {
-    const linha = indiceLidoAte === undefined ? undefined : linhaDoNo(linhas, indiceLidoAte);
+  // Filtro (11.3). Depois de trocar o filtro, a lista é outra: o leitor volta ao dispositivo que
+  // estava no alto da tela (ou ao mais próximo acima dele que ficou) quando as linhas novas já
+  // estão desenhadas. `irDepois` guarda o dispositivo (índice do nó) até lá.
+  const irDepois = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    const indice = irDepois.current;
+    if (indice === undefined) return;
+    irDepois.current = undefined;
+    const linha = linhaDoNo(linhas, indice);
+    if (linha === undefined || linha === 0) window.scrollTo(0, 0);
+    else irParaLinha(linha);
+  }, [linhas, irParaLinha]);
+  /** O nó tem linha na lista de agora (o filtro não o escondeu; a rubrica vale a linha do pai). */
+  const visivelNoFiltro = (indice: number) => {
+    if (!filtro) return true;
+    const linha = linhas[linhaDoNo(linhas, indice) ?? -1];
+    return linha !== undefined && (linha.indice === indice || linha.indiceNome === indice);
+  };
+  /**
+   * Leva o nó ao alto da tela. Se o filtro o escondeu, o filtro é desligado (avisando): ir até um
+   * dispositivo e não achá-lo seria pior do que perder o filtro.
+   */
+  function irAoNo(indice: number): boolean {
+    if (!visivelNoFiltro(indice)) {
+      irDepois.current = indice;
+      setFiltro(undefined);
+      return true;
+    }
+    const linha = linhaDoNo(linhas, indice);
     if (linha !== undefined) irParaLinha(linha);
+    return false;
+  }
+
+  function irAoLidoAte() {
+    if (indiceLidoAte === undefined) return;
+    if (irAoNo(indiceLidoAte)) setAnuncio('Filtro desligado para mostrar onde você parou.');
   }
 
   // Busca dentro da norma (11.6). O leitor só tem os textos perto da tela: na primeira busca, lê
@@ -700,20 +770,22 @@ function LeitorAberto({
   // A referência da linha que mostra o nó (a rubrica é mostrada na linha do artigo).
   const referenciaDaBusca = useCallback(
     (indice: number) => {
-      const linha = linhaDoNo(linhas, indice);
-      const doNo = linha === undefined ? indice : (linhas[linha]?.indice ?? indice);
+      const linha = linhaDoNo(linhasTodas, indice);
+      const doNo = linha === undefined ? indice : (linhasTodas[linha]?.indice ?? indice);
       return referenciaDoNo(nos, aberta.indiceDe, doNo) || 'Início da norma';
     },
-    [linhas, nos, aberta.indiceDe],
+    [linhasTodas, nos, aberta.indiceDe],
   );
   // O "lido até" não muda: ir a um achado é só rolar (a posição segue a rolagem, como sempre).
   function irParaAchado(indice: number) {
-    const linha = linhaDoNo(linhas, indice);
+    const linha = linhaDoNo(linhasTodas, indice);
     setBuscaAberta(false);
     if (linha === undefined) return;
-    setAchadoId(nos[linhas[linha]?.indice ?? 0]?.dispositivo.id);
-    setAnuncio(`Na busca: ${referenciaDaBusca(indice)}.`);
-    irParaLinha(linha);
+    setAchadoId(nos[linhasTodas[linha]?.indice ?? 0]?.dispositivo.id);
+    const desligou = irAoNo(indice);
+    setAnuncio(
+      `Na busca: ${referenciaDaBusca(indice)}.${desligou ? ' Filtro desligado para mostrar o achado.' : ''}`,
+    );
   }
 
   // Grifos e notas (11.4). Selecionar um trecho do texto vigente (o mouse, o toque longo do
@@ -867,6 +939,67 @@ function LeitorAberto({
     });
   }
 
+  // Filtros (11.3): a lista mostra só o que casa e o contexto. Aplicar guarda o resultado (não
+  // recalcula a cada estrela, para o artigo não sumir sob o dedo); "Atualizar" refaz a conta.
+  const [filtroAberto, setFiltroAberto] = useState(false);
+  const [falhaDoFiltro, setFalhaDoFiltro] = useState<string | undefined>(undefined);
+  const blocos = useMemo(() => blocosDaNorma(nos), [nos]);
+  function trocarFiltro(novo: FiltroAplicado | undefined) {
+    if (novo === undefined && filtro === undefined) return;
+    const id = noDoAlto();
+    irDepois.current = (id === undefined ? undefined : aberta.indiceDe.get(id)) ?? 0;
+    setFiltro(novo);
+  }
+  async function aplicarCriterio(
+    criterio: CriterioDoFiltro,
+    descricaoDoTrecho?: string,
+    blocoIndice?: number,
+  ): Promise<string | undefined> {
+    let comErros: ReadonlySet<string> = new Set();
+    if (criterio.tipo === 'com_erros') {
+      try {
+        comErros = await dispositivosComErro(repo, aberta.indiceDe);
+      } catch {
+        return 'Não foi possível ler os erros. Tente de novo.';
+      }
+      if (!vivo.current) return undefined;
+    }
+    const resultado = aplicarFiltro(nos, aberta.indiceDe, criterio, {
+      estrelas: estrelas.estados,
+      marcados: new Set(marcacoes.porDispositivo.keys()),
+      comErros,
+    });
+    let quantos = 0;
+    for (const i of resultado.casados) if (nos[i]?.dispositivo.tipo !== 'nome') quantos++;
+    const descricao = nomeDoCriterio(criterio, descricaoDoTrecho);
+    trocarFiltro({ criterio, descricao, ...resultado, quantos, blocoIndice });
+    setFalhaDoFiltro(undefined);
+    setFiltroAberto(false);
+    setAnuncio(
+      quantos === 0
+        ? `Nenhum dispositivo ${descricao}.`
+        : `Mostrando só: ${descricao}, ${String(quantos)} ${quantos === 1 ? 'dispositivo' : 'dispositivos'}.`,
+    );
+    return undefined;
+  }
+  function mostrarTudo() {
+    trocarFiltro(undefined);
+    setFalhaDoFiltro(undefined);
+    setFiltroAberto(false);
+    setAnuncio('Mostrando a norma toda.');
+  }
+  function atualizarFiltro() {
+    if (!filtro) return;
+    const { criterio, descricao, blocoIndice } = filtro;
+    void aplicarCriterio(
+      criterio,
+      criterio.tipo === 'trecho' ? descricao : undefined,
+      blocoIndice,
+    ).then((falha) => {
+      if (falha) setFalhaDoFiltro(falha);
+    });
+  }
+
   const alternar = useCallback((id: string) => {
     setAbertos((antes) => {
       const depois = new Set(antes);
@@ -919,6 +1052,47 @@ function LeitorAberto({
           <button type="button" className="discreto" onClick={irAoLidoAte}>
             Ir ao lido até
           </button>
+        </p>
+      )}
+      {filtro && (
+        <div className="filtro-ativo">
+          {linhas.length > 0 ? (
+            !modoFoco && (
+              <p>
+                <span>
+                  Mostrando só: <strong>{filtro.descricao}</strong> (
+                  {filtro.quantos.toLocaleString('pt-BR')}{' '}
+                  {filtro.quantos === 1 ? 'dispositivo' : 'dispositivos'}), com o que está acima
+                  deles.
+                </span>
+                {filtro.criterio.tipo !== 'trecho' && (
+                  <button type="button" className="discreto" onClick={atualizarFiltro}>
+                    Atualizar
+                  </button>
+                )}
+                <button type="button" className="discreto" onClick={mostrarTudo}>
+                  Mostrar tudo
+                </button>
+              </p>
+            )
+          ) : (
+            <div role="status" className="aviso">
+              <p>{semResultado(filtro.criterio)}</p>
+              <div className="linha-acoes">
+                <button type="button" onClick={mostrarTudo}>
+                  Mostrar tudo
+                </button>
+                <button type="button" onClick={atualizarFiltro}>
+                  Atualizar
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      {falhaDoFiltro && (
+        <p role="alert" className="aviso falha">
+          {falhaDoFiltro}
         </p>
       )}
       {falhou && (
@@ -983,6 +1157,7 @@ function LeitorAberto({
               ref={virtualizador.measureElement}
               className={id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor'}
               data-estrelada={estado?.estrelado ? '' : undefined}
+              data-contexto={filtro && !filtro.casados.has(linha.indice) ? '' : undefined}
               style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
             >
               <Dispositivo
@@ -1068,6 +1243,10 @@ function LeitorAberto({
               modoFoco={modoFoco}
               botaoDoFoco={botaoDoFoco}
               abrirBusca={abrirBusca}
+              abrirFiltro={() => {
+                setFiltroAberto(true);
+              }}
+              filtro={filtro?.descricao}
               alternarFoco={alternarFoco}
               marcarAqui={marcarAqui}
             />
@@ -1106,6 +1285,18 @@ function LeitorAberto({
           setNotaAberta(undefined);
         }}
       />
+      <FiltroDaNorma
+        aberto={filtroAberto}
+        aoFechar={() => {
+          setFiltroAberto(false);
+        }}
+        atual={filtro && { criterio: filtro.criterio, blocoIndice: filtro.blocoIndice }}
+        blocos={blocos}
+        indiceDoEndereco={indiceDoEndereco}
+        referencia={referenciaDaBusca}
+        aplicar={aplicarCriterio}
+        mostrarTudo={mostrarTudo}
+      />
       <BuscaNaNorma
         aberto={buscaAberta}
         aoFechar={() => {
@@ -1128,12 +1319,17 @@ function AcoesDaLeitura({
   modoFoco,
   botaoDoFoco,
   abrirBusca,
+  abrirFiltro,
+  filtro,
   alternarFoco,
   marcarAqui,
 }: {
   modoFoco: boolean;
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
   abrirBusca: () => void;
+  abrirFiltro: () => void;
+  /** A frase do filtro ligado ("estrelados"), se há um. */
+  filtro: string | undefined;
   alternarFoco: () => void;
   marcarAqui: () => void;
 }) {
@@ -1147,6 +1343,20 @@ function AcoesDaLeitura({
         onClick={abrirBusca}
       >
         Buscar
+      </button>
+      <button
+        type="button"
+        className={filtro === undefined ? undefined : 'filtro-ligado'}
+        aria-haspopup="dialog"
+        aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
+        title={
+          filtro === undefined
+            ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
+            : `Mostrando só: ${filtro}. Toque para mudar o filtro`
+        }
+        onClick={abrirFiltro}
+      >
+        {filtro === undefined ? 'Filtrar' : 'Filtrado'}
       </button>
       <button
         ref={botaoDoFoco}
@@ -1219,6 +1429,44 @@ function BarraDoLeitor({
       </button>
     </div>
   );
+}
+
+/** Os tipos que são blocos da norma (o filtro por bloco da 11.3 lista estes). */
+const TIPOS_DE_BLOCO: ReadonlySet<TipoDispositivo> = new Set([
+  'parte',
+  'livro',
+  'titulo',
+  'capitulo',
+  'secao',
+  'subsecao',
+  'bloco',
+]);
+
+/** Os blocos com rótulo, com o caminho até eles ("TÍTULO II › CAPÍTULO I"): o capítulo se repete. */
+function blocosDaNorma(nos: NormaAberta['nos']): OpcaoDeBloco[] {
+  const caminho: string[] = [];
+  const blocos: OpcaoDeBloco[] = [];
+  nos.forEach(({ dispositivo, nivel }, indice) => {
+    caminho.length = Math.min(caminho.length, nivel);
+    if (!TIPOS_DE_BLOCO.has(dispositivo.tipo) || !dispositivo.rotulo) return;
+    caminho[nivel] = dispositivo.rotulo;
+    blocos.push({ indice, nivel, rotulo: caminho.filter(Boolean).join(' › ') });
+  });
+  return blocos;
+}
+
+/** O que a tela diz quando o filtro não acha nada, e o que fazer. */
+function semResultado(criterio: CriterioDoFiltro): string {
+  switch (criterio.tipo) {
+    case 'estrelados':
+      return 'Nenhum dispositivo estrelado nesta norma. Estrele um artigo ou um bloco inteiro pela estrela ao lado dele.';
+    case 'marcados':
+      return 'Nenhum grifo nem nota nesta norma. Selecione um trecho do texto para grifar ou anotar.';
+    case 'com_erros':
+      return 'Nenhum erro vinculado a dispositivos desta norma.';
+    case 'trecho':
+      return 'Nenhum dispositivo neste trecho.';
+  }
 }
 
 function tipoDaLinha(nos: NormaAberta['nos'], linhas: LinhaDoLeitor[], i: number) {
