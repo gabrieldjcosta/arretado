@@ -1392,3 +1392,98 @@ button.marcador-nota {
   width: 100%;
   font: inherit;
 }
+
+/* Filtros do leitor (11.3). O grupo fixo ganhou um botão: nos celulares estreitos quebra em duas
+   linhas em vez de alargar a página. Filtro ligado: o botão fica em destaque (contorno e traço, não
+   só a cor). A linha de contexto (o que está acima do achado) é atenuada. */
+.acoes-leitor {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: calc(100vw - 1.5rem);
+}
+
+.acoes-leitor button.filtro-ligado {
+  border: 2px solid var(--primaria);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.filtro-ativo {
+  margin: 0 0 0.75rem;
+}
+
+.filtro-ativo p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.5rem;
+  margin: 0;
+  color: var(--texto-atenuado);
+}
+
+.linha-leitor[data-contexto] .dispositivo {
+  color: var(--texto-atenuado);
+}
+
+dialog.dialogo-filtro {
+  max-width: min(32rem, calc(100vw - 2rem));
+}
+
+.filtro-escolhas {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: 0;
+}
+
+.filtro-escolhas legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.filtro-escolha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--alvo);
+}
+
+.filtro-escolha small {
+  color: var(--texto-atenuado);
+}
+
+.filtro-trecho {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.filtro-intervalo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filtro-intervalo input {
+  flex: 1 1 6rem;
+  min-width: 0;
+  min-height: var(--alvo);
+}
+
+.filtro-ajuda {
+  margin: 0;
+  color: var(--texto-atenuado);
+}
+
+.filtro-bloco {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.filtro-bloco select {
+  width: 100%;
+  min-height: var(--alvo);
+}
