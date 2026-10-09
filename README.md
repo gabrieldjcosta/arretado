@@ -1,6 +1,6 @@
 # Arretado
 
-Plataforma pessoal de preparação para concursos jurídicos de alta complexidade, projetada para converter erros, questões e leitura de legislação em uma **próxima ação de estudo** — com o mínimo de cadastro e sem depender de fornecedor.
+Plataforma de estudo para concursos jurídicos de alta complexidade, feita para quem tem dificuldade de concentração (começar sem decidir, voltar sem culpa, ler sem se perder), usada hoje pelo autor e pensada para, no futuro, ser cobrada e crescer. Converte erros, questões e leitura de legislação em uma **próxima ação de estudo** — com o mínimo de cadastro e sem depender de fornecedor.
 
 > Nome provisório. Até 22/09/2026 o projeto se chamava "Acumen"; "Acumen v2" nos documentos designa o protótipo anterior (Firestore), não mantido. Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado — o conteúdo recomeça do zero.
 
