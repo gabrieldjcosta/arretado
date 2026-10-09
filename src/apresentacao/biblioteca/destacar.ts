@@ -28,6 +28,14 @@ export interface NotaNoTexto {
   rotulo?: string;
 }
 
+/** Uma remissão que a norma resolve (11.9): o trecho citado e o nó que ela aponta. */
+export interface RemissaoNoTexto {
+  inicio: number;
+  fim: number;
+  /** O índice, em `NormaAberta.nos`, do dispositivo citado. */
+  alvo: number;
+}
+
 /** As marcações do usuário num texto, na ordem de criação (a mais nova por cima). */
 export interface MarcasDoTexto {
   grifos: readonly GrifoNoTexto[];
@@ -43,6 +51,8 @@ export interface PedacoDoTrecho {
   categoria?: CategoriaDestaque;
   grifo?: { id: string; cor: number; primeiro: boolean };
   notas?: string[];
+  /** Pedaço de uma remissão: o nó citado; só o primeiro pedaço é ponto de parada do teclado. */
+  remissao?: { alvo: number; primeiro: boolean };
 }
 
 /**
@@ -63,6 +73,7 @@ export function partirTrechos(
   trechos: Trechos,
   destaques: readonly Destaque[],
   marcas: MarcasDoTexto = { grifos: [], notas: [] },
+  remissoes: readonly RemissaoNoTexto[] = [],
 ): PedacoDoTrecho[] {
   const total = trechos.reduce((soma, t) => soma + t.texto.length, 0);
   const limitar = (n: number) => Math.max(0, Math.min(n, total));
@@ -71,6 +82,15 @@ export function partirTrechos(
     .filter((g) => g.fim > g.inicio);
   // Nota com o fim no zero (âncora vazia) iria antes do texto: vai ao primeiro pedaço.
   const notas = marcas.notas.map((n) => ({ ...n, fim: Math.max(1, limitar(n.fim)) }));
+  // Em ordem e sem sobreposição: a que começa dentro da anterior fica de fora.
+  const citacoes: RemissaoNoTexto[] = [];
+  for (const r of [...remissoes].sort((a, b) => a.inicio - b.inicio)) {
+    const ultima = citacoes[citacoes.length - 1];
+    if (r.fim > r.inicio && (!ultima || r.inicio >= ultima.fim)) {
+      citacoes.push({ ...r, inicio: limitar(r.inicio), fim: limitar(r.fim) });
+    }
+  }
+  const remissaoVista = new Set<RemissaoNoTexto>();
   const grifoVisto = new Set<string>();
   const pedacos: PedacoDoTrecho[] = [];
   let base = 0;
@@ -92,6 +112,10 @@ export function partirTrechos(
       dentro(g.inicio);
       dentro(g.fim);
     }
+    for (const r of citacoes) {
+      dentro(r.inicio);
+      dentro(r.fim);
+    }
     for (const n of notas) dentro(n.fim);
     const pontos = [...cortes].sort((a, b) => a - b);
     for (let i = 0; i + 1 < pontos.length; i++) {
@@ -106,6 +130,11 @@ export function partirTrechos(
       if (grifo) {
         novo.grifo = { id: grifo.id, cor: grifo.cor, primeiro: !grifoVisto.has(grifo.id) };
         grifoVisto.add(grifo.id);
+      }
+      const citacao = citacoes.find((r) => r.inicio <= de && r.fim >= ate);
+      if (citacao) {
+        novo.remissao = { alvo: citacao.alvo, primeiro: !remissaoVista.has(citacao) };
+        remissaoVista.add(citacao);
       }
       const aqui = notas.filter((n) => n.fim === ate).map((n) => n.id);
       if (aqui.length > 0) novo.notas = aqui;
@@ -143,27 +172,48 @@ export function pedacosDestacados(trechos: Trechos): PedacoDoTrecho[] {
   return pedacos;
 }
 
-const comMarcas = new WeakMap<
-  MarcasDoTexto,
-  { trechos: Trechos; destacar: boolean; pedacos: PedacoDoTrecho[] }
+const comCamadas = new WeakMap<
+  object,
+  {
+    trechos: Trechos;
+    destacar: boolean;
+    remissoes?: readonly RemissaoNoTexto[];
+    pedacos: PedacoDoTrecho[];
+  }
 >();
+const SEM_MARCAS: MarcasDoTexto = { grifos: [], notas: [] };
 
 /**
- * Os pedaços do texto vigente com as camadas pedidas: o destaque (se ligado) e as marcações. Sem
- * marcação, os do destaque guardados por texto; com elas, guardados pelas camadas (o mesmo objeto
- * enquanto as marcações do dispositivo não mudam), para o mesmo texto e o mesmo destaque.
+ * Os pedaços do texto vigente com as camadas pedidas: o destaque (se ligado), as marcações e as
+ * remissões (11.9). Sem marcação nem remissão, os do destaque guardados por texto; com elas,
+ * guardados pelas camadas (o mesmo objeto enquanto as marcações e as remissões do dispositivo não
+ * mudam), para o mesmo texto e o mesmo destaque.
  */
 export function pedacosDoTexto(
   trechos: Trechos,
   destacar: boolean,
   marcas: MarcasDoTexto | undefined,
+  remissoes?: readonly RemissaoNoTexto[],
 ): PedacoDoTrecho[] {
   const semMarcas = !marcas || (marcas.grifos.length === 0 && marcas.notas.length === 0);
-  if (semMarcas)
+  const semRemissoes = !remissoes || remissoes.length === 0;
+  if (semMarcas && semRemissoes)
     return destacar ? pedacosDestacados(trechos) : trechos.map((trecho) => ({ trecho }));
-  const guardado = comMarcas.get(marcas);
-  if (guardado?.trechos === trechos && guardado.destacar === destacar) return guardado.pedacos;
-  const pedacos = partirTrechos(trechos, destacar ? destaquesDe(trechos) : [], marcas);
-  comMarcas.set(marcas, { trechos, destacar, pedacos });
+  // A chave é a camada que muda mais de uma vez por texto: as marcações; sem elas, as remissões.
+  const chave = (semMarcas ? remissoes : marcas) as object;
+  const guardado = comCamadas.get(chave);
+  if (
+    guardado?.trechos === trechos &&
+    guardado.destacar === destacar &&
+    guardado.remissoes === remissoes
+  )
+    return guardado.pedacos;
+  const pedacos = partirTrechos(
+    trechos,
+    destacar ? destaquesDe(trechos) : [],
+    marcas ?? SEM_MARCAS,
+    remissoes,
+  );
+  comCamadas.set(chave, { trechos, destacar, remissoes, pedacos });
   return pedacos;
 }
