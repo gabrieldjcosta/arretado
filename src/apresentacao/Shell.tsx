@@ -102,6 +102,14 @@ export function Shell() {
         <Outlet />
       </main>
       <footer className="rodape">{RODAPE}</footer>
+      <Link
+        to="/recall/registrar"
+        className="botao principal flutuante"
+        aria-label="Novo registro de erro"
+        title="Registrar erro (atalho: E)"
+      >
+        <span aria-hidden="true">+</span>
+      </Link>
       <RelatarProblema
         aberto={relatando}
         aoFechar={() => {

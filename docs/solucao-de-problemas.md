@@ -956,6 +956,14 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** texto em Arial/Georgia/system-ui; console com violação de `font-src`; `document.fonts.check` falso. **Causa:** `@font-face` apontando fora do pacote (caminho relativo a `src/apresentacao/`: `../../node_modules/...`) ou arquivo inlinado como `data:` (a CSP só aceita `'self'`; o Vite só inlina abaixo de 4 KB, os `.woff2` têm mais). **Solução:** conferir que `dist/assets/*.woff2` existem após `npm run build`. O E2E "as fontes embutidas carregam" cobre. Subconjunto: só `latin`; se aparecer caractere fora (raro em português), acrescentar `latin-ext`.
 - **Origem:** previsto — fatia 1 do redesign.
 
+### Dois "Registrar erro" na tela (cabeçalho e +)
+- **Sintoma:** teste (jsdom ou E2E) com `getByRole('link', { name: 'Registrar erro' })` falha por ter 0 ou 2 resultados. **Causa:** a casca tem o botão do cabeçalho (oculto por CSS no celular, ≤ 699 px) e o **+** flutuante (oculto a partir de 700 px). No jsdom não há CSS, então os dois existem; o **+** tem outro nome acessível ("Novo registro de erro") para não duplicar. No celular, o botão do cabeçalho some e o E2E precisa clicar no **+**. **Solução:** nos E2E que clicam nele, usar `/^(Registrar erro|Novo registro de erro)$/`: só o visível entra no `getByRole`.
+- **Origem:** encontrado na fatia 2 do redesign (09/10/2026).
+
+### Barra inferior até 899 px, + só até 699 px
+- **Sintoma:** controle fixo colado à barra de baixo no tablet, ou sobre o grupo fixo do leitor. **Causa:** três cortes na folha: 899 px (barra inferior, `.acoes-leitor` acima dela), 699 px (+ flutuante, recuos). **Solução:** o grupo fixo do leitor usa o canto do **+**, então `.shell:has(.leitor) .flutuante` o esconde ali (o atalho E e o botão do cabeçalho seguem no tablet; no celular, o registro no leitor vem das ações por dispositivo). No modo foco a barra e o **+** somem.
+- **Origem:** previsto/encontrado na fatia 2 do redesign.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
