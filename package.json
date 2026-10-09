@@ -26,6 +26,8 @@
     "corpus:gabarito": "node scripts/corpus-gabarito.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource/atkinson-hyperlegible-next": "^5.3.0",
     "@tanstack/react-virtual": "^3.14.13",
     "dexie": "^4.4.6",
     "dompurify": "^3.4.15",

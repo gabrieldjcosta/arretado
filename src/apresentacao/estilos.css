@@ -1,12 +1,49 @@
+/* Fontes embutidas (T19): só o subconjunto latino, servidas do próprio site (font-src 'self'). */
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-400-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-500-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-700-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource-variable/literata/files/literata-latin-wght-normal.woff2')
+    format('woff2-variations');
+}
+
 /* Tokens de tema (T10). Contraste AA nos dois temas; alvos de toque ≥ 44 px (Parte 2 §11). */
 :root {
-  --fundo: #fbfaf7;
-  --superficie: #ffffff;
-  --superficie-2: #f2f0ea;
-  --texto: #1c1b19;
-  --texto-atenuado: #57544d;
-  --borda: #cfcac0;
-  --primaria: #1f5f8b;
+  --fundo: #f1f3ee;
+  --superficie: #fbfcfa;
+  --superficie-2: #e6eae3;
+  --texto: #1f2a24;
+  --texto-atenuado: #5c6860;
+  --borda: #c5ccc4;
+  --primaria: #3f6b4c;
   --primaria-texto: #ffffff;
   --foco: #b35900;
   --perigo: #a4262c;
@@ -22,17 +59,24 @@
   /* Grifos (11.4): 3 cores de fundo, sem nomes; o texto (e o atenuado do tachado) continua AA. */
   --grifo-1: #fff0a0;
   --grifo-2: #c8eccb;
-  --grifo-3: #fad2e1;
+  --grifo-3: #fcdde8;
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
   --calha-estrela: 2rem;
+  /* Identidade nova (redesign, fatia 1): Papel, tinta e sálvia. O marca-texto só marca o que é
+     agora, sempre como fundo com a tinta por cima (texto/agora 8,1:1); "depois" é o recuado. */
+  --agora: #e9b949;
+  --agora-texto: #1f2a24;
+  --depois: #5c6860;
+  --progresso: #4f7a64;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
-  /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 85%, o rótulo
+  /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 90%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
-  --superficie-translucida: rgb(255 255 255 / 85%);
+  --superficie-translucida: rgb(251 252 250 / 90%);
 
-  --fonte-interface: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --fonte-leitura: Georgia, 'Times New Roman', serif;
+  --fonte-interface:
+    'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fonte-leitura: 'Literata', Georgia, 'Times New Roman', serif;
   --tamanho-leitura: 18px;
   --alvo: 44px;
   --raio: 8px;
@@ -43,14 +87,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #141414;
-    --superficie: #1e1e1e;
-    --superficie-2: #262626;
-    --texto: #ecebe8;
-    --texto-atenuado: #b3b0a9;
-    --borda: #4a4a4a;
-    --primaria: #7cb8e6;
-    --primaria-texto: #0d1b26;
+    --fundo: #151a1f;
+    --superficie: #1d242a;
+    --superficie-2: #252d34;
+    --texto: #e8ecea;
+    --texto-atenuado: #a3aea8;
+    --borda: #46505a;
+    --primaria: #8fbf9f;
+    --primaria-texto: #0f1a14;
     --foco: #ffb454;
     --perigo: #ff8a8a;
     --perigo-texto: #2a0000;
@@ -65,21 +109,25 @@
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
+    --agora: #f0c75e;
+    --agora-texto: #151a1f;
+    --depois: #8a958f;
+    --progresso: #8fbf9f;
     --sombra: none;
-    --superficie-translucida: rgb(30 30 30 / 85%);
+    --superficie-translucida: rgb(29 36 42 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #141414;
-  --superficie: #1e1e1e;
-  --superficie-2: #262626;
-  --texto: #ecebe8;
-  --texto-atenuado: #b3b0a9;
-  --borda: #4a4a4a;
-  --primaria: #7cb8e6;
-  --primaria-texto: #0d1b26;
+  --fundo: #151a1f;
+  --superficie: #1d242a;
+  --superficie-2: #252d34;
+  --texto: #e8ecea;
+  --texto-atenuado: #a3aea8;
+  --borda: #46505a;
+  --primaria: #8fbf9f;
+  --primaria-texto: #0f1a14;
   --foco: #ffb454;
   --perigo: #ff8a8a;
   --perigo-texto: #2a0000;
@@ -94,8 +142,12 @@
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
+  --agora: #f0c75e;
+  --agora-texto: #151a1f;
+  --depois: #8a958f;
+  --progresso: #8fbf9f;
   --sombra: none;
-  --superficie-translucida: rgb(30 30 30 / 85%);
+  --superficie-translucida: rgb(29 36 42 / 90%);
   color-scheme: dark;
 }
 
