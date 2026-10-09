@@ -14,7 +14,13 @@ import {
   type TouchEvent as ReactTouchEvent,
 } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import type { Leitura, Marcacao, TextoDeDispositivo, TipoDispositivo } from '../../core/modelo';
+import type {
+  Dispositivo as DispositivoDoModelo,
+  Leitura,
+  Marcacao,
+  TextoDeDispositivo,
+  TipoDispositivo,
+} from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import { prepararBusca } from '../../dominios/legislacao/busca';
@@ -41,7 +47,9 @@ import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
 import { dispositivosComErro } from './errosVinculados';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
-import { pedacosDoTexto, type MarcasDoTexto } from './destacar';
+import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
+import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
+import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
 import { fraseDaEstrela, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
@@ -961,6 +969,10 @@ function LeitorAberto({
     return mapa;
   }, [nos]);
   const indiceDoEndereco = useCallback((endereco: string) => enderecos.get(endereco), [enderecos]);
+  const resolverRemissoes = useMemo(
+    () => criarResolvedorDeRemissoes(indiceDoEndereco),
+    [indiceDoEndereco],
+  );
   // A referência da linha que mostra o nó (a rubrica é mostrada na linha do artigo).
   const referenciaDaBusca = useCallback(
     (indice: number) => {
@@ -970,6 +982,64 @@ function LeitorAberto({
     },
     [linhasTodas, nos, aberta.indiceDe],
   );
+  // Prévia de remissões (11.9). Tocar numa citação ("art. 84, XIX") abre o dispositivo citado num
+  // balão (desktop) ou folha inferior (celular), sem sair do lugar. "Ir para" empilha de onde se
+  // veio; "Voltar" desempilha. O "lido até" não muda (segue a rolagem, como sempre).
+  const [previa, setPrevia] = useState<{ origem: number | undefined; alvo: number } | undefined>(
+    undefined,
+  );
+  const [dadosDaPrevia, setDadosDaPrevia] = useState<EstadoDaPrevia | undefined>(undefined);
+  const [pilhaDeRemissoes, setPilhaDeRemissoes] = useState<number[]>([]);
+  const alvoDaPrevia = previa?.alvo;
+  useEffect(() => {
+    if (alvoDaPrevia === undefined) return;
+    let ativo = true;
+    lerJanela(repo, aberta, { inicio: alvoDaPrevia, quantidade: 2 }).then(
+      ([item, seguinte]) => {
+        if (!ativo) return;
+        const dispositivo = item?.dispositivo;
+        if (!item || !dispositivo) {
+          setDadosDaPrevia({ estado: 'falha' });
+          return;
+        }
+        const rubrica =
+          seguinte?.dispositivo.tipo === 'nome' && seguinte.dispositivo.paiId === dispositivo.id
+            ? textoDe(seguinte)
+            : '';
+        setDadosDaPrevia({
+          rubrica,
+          texto: item.texto ? <TrechosDoTexto trechos={item.texto.trechos} /> : null,
+          aviso: AVISO_DE_STATUS[dispositivo.status],
+          notas: item.texto?.notasVigencia?.map((n) => n.texto) ?? [],
+        });
+      },
+      () => {
+        if (ativo) setDadosDaPrevia({ estado: 'falha' });
+      },
+    );
+    return () => {
+      ativo = false;
+    };
+  }, [repo, aberta, alvoDaPrevia]);
+  function irParaRemissao() {
+    if (!previa) return;
+    const { origem, alvo } = previa;
+    setPrevia(undefined);
+    if (origem !== undefined) setPilhaDeRemissoes((p) => [...p, origem]);
+    const desligou = irAoNo(alvo);
+    setAnuncio(
+      `Aberto: ${referenciaDaBusca(alvo)}.${desligou ? ' Filtro desligado para mostrar o dispositivo.' : ''}`,
+    );
+  }
+  const origemDoVoltar = pilhaDeRemissoes.at(-1);
+  function voltarDaRemissao() {
+    if (origemDoVoltar === undefined) return;
+    setPilhaDeRemissoes((p) => p.slice(0, -1));
+    const desligou = irAoNo(origemDoVoltar);
+    setAnuncio(
+      `De volta a ${referenciaDaBusca(origemDoVoltar)}.${desligou ? ' Filtro desligado para mostrar o dispositivo.' : ''}`,
+    );
+  }
   // O "lido até" não muda: ir a um achado é só rolar (a posição segue a rolagem, como sempre).
   function irParaAchado(indice: number) {
     const linha = linhaDoNo(linhasTodas, indice);
@@ -1089,6 +1159,20 @@ function LeitorAberto({
   // Os grifos e os marcadores de nota respondem ao toque e ao teclado, pela lista (um ouvinte só).
   function escolherNoTexto(alvo: EventTarget, porTeclado: boolean) {
     if (!(alvo instanceof Element)) return false;
+    const citacao = alvo.closest<HTMLElement>('[data-remissao]');
+    if (citacao?.dataset.remissao) {
+      // O clique que termina uma seleção (arrastar por cima da citação) é da seleção.
+      if (!porTeclado && document.getSelection()?.isCollapsed === false) return false;
+      const id = citacao.closest<HTMLElement>('[data-dispositivo]')?.dataset.dispositivo;
+      setSelecao(undefined);
+      setEscolhidaId(undefined);
+      setDadosDaPrevia(undefined);
+      setPrevia({
+        origem: id === undefined ? undefined : aberta.indiceDe.get(id),
+        alvo: Number(citacao.dataset.remissao),
+      });
+      return true;
+    }
     const marcador = alvo.closest<HTMLElement>('[data-nota]');
     if (marcador?.dataset.nota) {
       setNotaAberta({ id: marcador.dataset.nota });
@@ -1284,6 +1368,7 @@ function LeitorAberto({
           destacar={destacar}
           marcacoes={marcacoes.porDispositivo.get(id)}
           escolhidaId={escolhidaId}
+          resolverRemissoes={resolverRemissoes}
           estrela={
             estado && (
               <BotaoDaEstrela
@@ -1333,6 +1418,24 @@ function LeitorAberto({
       .filter(Boolean)
       .join(' › ');
   }, [ordem, linhas, unidades, nos, aberta.indiceDe, textos]);
+  // Rodapé do cartão (11.9): os dispositivos que o artigo cita, sem repetir, na ordem do texto.
+  const remissoesDoCartao = useMemo(() => {
+    if (ordem === undefined) return [];
+    const vistos = new Set<number>();
+    const lista: { alvo: number; origem: number }[] = [];
+    for (const linha of linhas.slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))) {
+      const dispositivo = nos[linha.indice]?.dispositivo;
+      const trechos = textos.get(linha.indice)?.texto?.trechos;
+      if (!dispositivo || !trechos || dispositivo.status === 'eficacia_cessada') continue;
+      if (dispositivo.status === 'revogado' || dispositivo.status === 'vetado') continue;
+      for (const r of resolverRemissoes(trechos, dispositivo.endereco)) {
+        if (vistos.has(r.alvo)) continue;
+        vistos.add(r.alvo);
+        lista.push({ alvo: r.alvo, origem: linha.indice });
+      }
+    }
+    return lista;
+  }, [ordem, linhas, unidades, nos, textos, resolverRemissoes]);
   function vizinho(o: number, lado: 'anterior' | 'seguinte') {
     const inicio = unidades[o];
     if (inicio === undefined) return null;
@@ -1518,6 +1621,26 @@ function LeitorAberto({
                       {conteudoDaLinha(linha)}
                     </div>
                   ))}
+                {remissoesDoCartao.length > 0 && (
+                  <div className="remissoes-do-artigo">
+                    <h3>Remissões deste artigo</h3>
+                    <ul>
+                      {remissoesDoCartao.map(({ alvo, origem }) => (
+                        <li key={alvo}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDadosDaPrevia(undefined);
+                              setPrevia({ origem, alvo });
+                            }}
+                          >
+                            {referenciaDaBusca(alvo)}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </section>
               {vizinho(ordem + 1, 'seguinte')}
             </>
@@ -1616,6 +1739,11 @@ function LeitorAberto({
               porArtigo={porArtigo}
               alternarArtigo={alternarArtigo}
               marcarAqui={marcarAqui}
+              voltarDaRemissao={
+                origemDoVoltar === undefined
+                  ? undefined
+                  : { para: referenciaDaBusca(origemDoVoltar), voltar: voltarDaRemissao }
+              }
             />
           </>
         )}
@@ -1670,6 +1798,15 @@ function LeitorAberto({
         aplicar={aplicarCriterio}
         mostrarTudo={mostrarTudo}
       />
+      <PreviaDaRemissao
+        aberta={previa !== undefined}
+        titulo={previa === undefined ? '' : referenciaDaBusca(previa.alvo)}
+        dados={dadosDaPrevia}
+        irPara={irParaRemissao}
+        aoFechar={() => {
+          setPrevia(undefined);
+        }}
+      />
       <BuscaNaNorma
         aberto={buscaAberta}
         aoFechar={() => {
@@ -1699,6 +1836,7 @@ function AcoesDaLeitura({
   porArtigo,
   alternarArtigo,
   marcarAqui,
+  voltarDaRemissao,
 }: {
   modoFoco: boolean;
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
@@ -1712,9 +1850,21 @@ function AcoesDaLeitura({
   porArtigo: boolean;
   alternarArtigo: () => void;
   marcarAqui: () => void;
+  /** Depois de "ir para" uma remissão (11.9): de onde se veio, e a volta. */
+  voltarDaRemissao: { para: string; voltar: () => void } | undefined;
 }) {
   return (
     <>
+      {voltarDaRemissao && (
+        <button
+          type="button"
+          className="voltar-da-remissao"
+          title={`Voltar a ${voltarDaRemissao.para}`}
+          onClick={voltarDaRemissao.voltar}
+        >
+          ← Voltar a {voltarDaRemissao.para}
+        </button>
+      )}
       <button
         type="button"
         aria-haspopup="dialog"
@@ -1917,6 +2067,14 @@ function tipoDaLinha(nos: NormaAberta['nos'], linhas: LinhaDoLeitor[], i: number
   return nos[linhas[i]?.indice ?? 0]?.dispositivo.tipo ?? 'paragrafo';
 }
 
+/** O aviso da prévia de uma remissão para o dispositivo que não vale como o texto corrido. */
+const AVISO_DE_STATUS: Partial<Record<DispositivoDoModelo['status'], string>> = {
+  revogado: 'Este dispositivo foi revogado.',
+  vetado: 'Este dispositivo foi vetado.',
+  eficacia_cessada: 'A eficácia deste dispositivo cessou.',
+  renumerado: 'Este dispositivo foi renumerado.',
+};
+
 /**
  * Os trechos do texto: ênfase, tachado parcial (redação anterior no meio do texto) e link; com
  * `destacar`, também o destaque automático (9.8); com `marcas`, os grifos e os marcadores das
@@ -1928,16 +2086,32 @@ function TrechosDoTexto({
   destacar = false,
   marcas,
   escolhidaId,
+  remissoes,
 }: {
   trechos: Trechos;
   destacar?: boolean;
   marcas?: MarcasDoTexto;
   escolhidaId?: string;
+  remissoes?: readonly RemissaoNoTexto[];
 }) {
-  const pedacos = pedacosDoTexto(trechos, destacar, marcas);
-  return pedacos.map(({ trecho, categoria, grifo, notas }, i) => {
+  const pedacos = pedacosDoTexto(trechos, destacar, marcas, remissoes);
+  return pedacos.map(({ trecho, categoria, grifo, notas, remissao }, i) => {
     let conteudo = <>{trecho.texto}</>;
     if (categoria) conteudo = <span className={`destaque destaque-${categoria}`}>{conteudo}</span>;
+    if (remissao) {
+      conteudo = (
+        <span
+          className="remissao"
+          role="button"
+          data-remissao={remissao.alvo}
+          // Um ponto de parada do teclado por citação, no primeiro pedaço dela.
+          tabIndex={remissao.primeiro ? 0 : undefined}
+          title="Citação: toque para ler o dispositivo citado"
+        >
+          {conteudo}
+        </span>
+      );
+    }
     if (grifo) {
       conteudo = (
         <mark
@@ -2065,6 +2239,8 @@ interface PropsDoDispositivo {
   /** Grifos e notas (11.4) do dispositivo, também só no texto vigente. */
   marcacoes: readonly Marcacao[] | undefined;
   escolhidaId: string | undefined;
+  /** As remissões do texto vigente (11.9); ausente nos vizinhos esmaecidos. */
+  resolverRemissoes?: ResolvedorDeRemissoes;
   /** O controle da estrela (11.2); ausente no que não leva estrela (revogado, vetado). */
   estrela: ReactNode;
 }
@@ -2080,6 +2256,7 @@ function Dispositivo({
   destacar,
   marcacoes,
   escolhidaId,
+  resolverRemissoes,
   estrela,
 }: PropsDoDispositivo) {
   const no = aberta.nos[linha.indice];
@@ -2204,6 +2381,11 @@ function Dispositivo({
               destacar={destacar && dispositivo.status !== 'eficacia_cessada'}
               marcas={marcasDoTexto(marcacoes)}
               escolhidaId={escolhidaId}
+              remissoes={
+                dispositivo.status === 'eficacia_cessada'
+                  ? undefined
+                  : resolverRemissoes?.(texto.trechos, dispositivo.endereco)
+              }
             />
           </span>
         ) : (

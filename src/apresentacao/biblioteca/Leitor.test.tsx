@@ -1532,3 +1532,78 @@ describe('leitura artigo por artigo (11.8)', () => {
     expect(await screen.findByRole('dialog', { name: 'Ações de Art. 3º' })).toBeInTheDocument();
   });
 });
+
+describe('prévia de remissões (11.9)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  const LEI_COM_REMISSOES: Bloco[] = [
+    linha('LEI Nº 7.210, DE 11 DE JULHO DE 1984.'),
+    linha('Institui a Lei de Execução Penal.'),
+    linha('Art. 1º A execução penal tem por objetivo efetivar a sentença.'),
+    linha('Art. 2º Aplica-se o disposto no art. 3º, salvo o art. 99.'),
+    linha('Art. 3º Ao condenado serão assegurados os direitos.'),
+  ];
+
+  it('a citação que a norma resolve vira botão; a que não existe fica texto comum', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_REMISSOES);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/Ao condenado/);
+    const citacoes = document.querySelectorAll('[data-remissao]');
+    expect(citacoes).toHaveLength(1);
+    expect(citacoes[0]).toHaveTextContent('art. 3º');
+    expect(citacoes[0]).toHaveAttribute('role', 'button');
+    expect(screen.queryByRole('button', { name: /art\. 99/ })).not.toBeInTheDocument();
+  });
+
+  it('tocar abre a prévia com o texto; "Ir para" fecha e oferece "Voltar", que desfaz', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_REMISSOES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/Ao condenado/);
+
+    await usuario.click(screen.getByRole('button', { name: /art\. 3º/ }));
+    const previa = await screen.findByRole('dialog', { name: 'Art. 3º' });
+    expect(await within(previa).findByText(/Ao condenado/)).toBeInTheDocument();
+
+    await usuario.click(within(previa).getByRole('button', { name: 'Ir para Art. 3º' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Art. 3º' })).not.toBeInTheDocument();
+    });
+    const voltar = await screen.findByRole('button', { name: /Voltar a Art\. 2º/ });
+    await usuario.click(voltar);
+    expect(screen.queryByRole('button', { name: /Voltar a/ })).not.toBeInTheDocument();
+  });
+
+  it('Fechar não empilha nada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_REMISSOES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/Ao condenado/);
+    await usuario.click(screen.getByRole('button', { name: /art\. 3º/ }));
+    const previa = await screen.findByRole('dialog', { name: 'Art. 3º' });
+    await usuario.click(within(previa).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Art. 3º' })).not.toBeInTheDocument();
+    });
+    expect(screen.queryByRole('button', { name: /Voltar a/ })).not.toBeInTheDocument();
+  });
+
+  it('o cartão do artigo por artigo lista as remissões do artigo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_REMISSOES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    const secao = await screen.findByRole('region', { name: /^Art\. \dº, \d+ de \d+$/ });
+    expect(secao).toBeInTheDocument();
+    // Vai ao Art. 2º, que cita o 3º.
+    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    const cartao2 = await screen.findByRole('region', { name: /^Art\. 2º, / });
+    const rodape = await within(cartao2).findByRole('heading', { name: 'Remissões deste artigo' });
+    const botao = within(rodape.parentElement!).getByRole('button', { name: 'Art. 3º' });
+    await usuario.click(botao);
+    expect(await screen.findByRole('dialog', { name: 'Art. 3º' })).toBeInTheDocument();
+  });
+});
