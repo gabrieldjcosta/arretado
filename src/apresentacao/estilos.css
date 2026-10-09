@@ -1487,3 +1487,22 @@ dialog.dialogo-filtro {
   width: 100%;
   min-height: var(--alvo);
 }
+
+/* Ações por dispositivo (11.5): botões grandes, um por linha no celular. */
+dialog.dialogo-acoes {
+  max-width: min(32rem, calc(100vw - 2rem));
+}
+
+.acoes-do-dispositivo {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.acoes-do-dispositivo button {
+  min-height: var(--alvo);
+}
+
+.erros-vinculados {
+  margin: 0;
+  padding-left: 1.25rem;
+}

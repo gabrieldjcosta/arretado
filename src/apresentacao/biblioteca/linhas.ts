@@ -126,3 +126,21 @@ export function referenciaDoNo(
   }
   return nos[indice]?.dispositivo.rotulo ?? '';
 }
+
+/**
+ * "art. 9º-A, LEP", "art. 5º, LXXIV, CF": a referência de citar ("art." em minúsculas, com o título curto
+ * da norma), a que vai para a área de transferência e para o erro e o cartão. Sem rótulo na cadeia
+ * (o preâmbulo), só o título curto.
+ */
+export function referenciaDe(
+  nos: readonly NoDaLeitura[],
+  indiceDe: ReadonlyMap<string, number>,
+  indice: number,
+  tituloCurto: string,
+): string {
+  const rotulo = referenciaDoNo(nos, indiceDe, indice);
+  if (!rotulo) return tituloCurto;
+  // "Art. 9º-A" vira "art. 9º-A"; "TÍTULO I" (fora de artigo) fica como está.
+  const citacao = rotulo.startsWith('Art.') ? 'art.' + rotulo.slice(4) : rotulo;
+  return `${citacao}, ${tituloCurto}`;
+}

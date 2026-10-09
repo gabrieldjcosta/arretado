@@ -1175,3 +1175,87 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   await apertar(page.getByRole('button', { name: 'Sair do foco' }), toque);
   await expect(page.locator('.filtro-ativo')).toHaveCount(0);
 });
+
+test('ações por dispositivo: registrar erro já vinculado, cartão deste trecho, copiar a referência e o filtro "com erro", também no modo foco: LEP compilada (11.5)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  const naoTemLargura = async () => {
+    const sobra = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(sobra).toBe(0);
+  };
+
+  // O art. 9º-A no alto da tela: as ações agem nele.
+  const artigo = page.locator('[data-endereco="art9A"]');
+  await rolarAteExistir(page, artigo);
+  await alinharNoAlto(page, artigo);
+  const alturaAntes = await distanciaDoAlto(artigo);
+  await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+  const dialogo = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
+  await expect(dialogo).toBeVisible();
+  await expect(dialogo.getByText('art. 9º-A, LEP', { exact: true })).toBeVisible();
+  await expect(dialogo.getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
+  await semViolacoes(page);
+
+  // Registrar erro: a referência já no campo, só o resultado e o que foi.
+  await apertar(dialogo.getByRole('button', { name: 'Registrar erro' }), toque);
+  const campo = dialogo.getByLabel('O que foi');
+  await expect(campo).toHaveValue('art. 9º-A, LEP: ');
+  await apertar(dialogo.getByRole('button', { name: 'Errei' }), toque);
+  await campo.pressSequentially('confundi o prazo da identificação');
+  await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Salvar' }), toque);
+  await expect(dialogo.getByText(/Erro registrado e vinculado/)).toBeVisible();
+  await expect(
+    dialogo.getByRole('link', { name: /confundi o prazo da identificação/ }),
+  ).toBeVisible();
+
+  // Cartão deste trecho (uma vez só) e copiar a referência.
+  const cartao = dialogo.getByRole('button', { name: 'Criar cartão deste trecho' });
+  await apertar(cartao, toque);
+  await expect(dialogo.getByText(/Cartão criado/)).toBeVisible();
+  await expect(cartao).toBeDisabled();
+  await apertar(dialogo.getByRole('button', { name: 'Copiar referência' }), toque);
+  await expect(dialogo.getByText('Copiado: art. 9º-A, LEP.')).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('art. 9º-A, LEP');
+  await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
+
+  // A posição não mexeu, e o grupo com 5 botões cabe na tela.
+  expect(Math.abs((await distanciaDoAlto(artigo)) - alturaAntes)).toBeLessThan(2);
+  const caixa = await page.locator('.acoes-leitor').boundingBox();
+  const largura = page.viewportSize()?.width ?? 0;
+  expect((caixa?.x ?? -1) >= 0 && (caixa?.x ?? 0) + (caixa?.width ?? 0) <= largura).toBe(true);
+  await naoTemLargura();
+
+  // O filtro "com erro vinculado" acha o artigo.
+  await apertar(page.getByRole('button', { name: /^(Filtrar|Filtrado)/ }), toque);
+  const filtro = page.getByRole('dialog', { name: 'Filtrar a norma' });
+  await filtro.getByRole('radio', { name: 'Só com erro vinculado' }).check();
+  await apertar(filtro.getByRole('button', { name: 'Mostrar', exact: true }), toque);
+  await expect(page.locator('.filtro-ativo')).toContainText('com erro vinculado (1 dispositivo)');
+  await expect(artigo).toBeVisible();
+
+  // No modo foco, o botão está no grupo e abre as mesmas ações, sem alargar a página.
+  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+  const emFoco = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
+  await expect(emFoco).toBeVisible();
+  await expect(
+    emFoco.getByRole('link', { name: /confundi o prazo da identificação/ }),
+  ).toBeVisible();
+  await semViolacoes(page);
+  await apertar(emFoco.getByRole('button', { name: 'Fechar' }), toque);
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  await naoTemLargura();
+});

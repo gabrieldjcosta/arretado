@@ -4,6 +4,7 @@ import {
   arquivarCartao,
   completarErro,
   contarVencidos,
+  criarCartaoDeDispositivo,
   criarCartaoDeErro,
   criarCartaoManual,
   editarCartao,
@@ -133,6 +134,24 @@ describe('cartões (6.4, 6.7)', () => {
     const c2 = await editarCartao(repo, c.id, { verso: 'Verso próprio' });
     const e3 = await completarErro(repo, e.id, { fraseCorreta: '15 dias.' });
     expect(versoEfetivo(c2, e3)).toBe('Verso próprio');
+  });
+
+  it('cartão de dispositivo: origem no dispositivo, caixa 1, primeira revisão amanhã, evento', async () => {
+    const { repo, eventos } = await preparar();
+    const c = await criarCartaoDeDispositivo(repo, {
+      dispositivoId: 'b2f3c1a0-5d4e-4c3b-8a9f-0123456789ab',
+      frente: 'O que diz o art. 9º-A, LEP?',
+      verso: 'Texto do artigo.',
+    });
+    expect(c).toMatchObject({
+      origemTipo: 'dispositivo',
+      origemId: 'b2f3c1a0-5d4e-4c3b-8a9f-0123456789ab',
+      verso: 'Texto do artigo.',
+      estado: 'ativo',
+      caixa: 1,
+      proximaRevisao: '2026-09-24',
+    });
+    expect(eventos.map((e) => e.nome)).toContain('cartao.criado');
   });
 
   it('suspenso e arquivado saem da fila e voltam sem perder a caixa', async () => {
