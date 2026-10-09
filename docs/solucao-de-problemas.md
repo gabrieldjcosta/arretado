@@ -1023,3 +1023,10 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Armadilha (testes):** `diasComRevisao` usa a data civil local gravada em `Revisao.data` (fuso de São Paulo); para simular, passar `inicio` em UTC a `preparar({ inicio })` (antes `preparar()` ignorava argumentos). E2E que muda o relógio com `page.clock.setFixedTime` precisa de `page.reload()` depois de `page.goto('/#/...')`: navegação só de hash não recarrega o app e o dia fica velho.
 - **Linha de base (CLAUDE.md/curso de ação):** a fatia 3 mudou o Recall em 09/10/2026, durante a medição do portão da F1; registrar o dia ao medir.
 - **Previsível na fatia 4/5:** `AcaoAgora`, `LinhaDepois`, `DiasDaSemana` e `BarraFina` já têm uso real só no Recall; ao levá-los ao leitor e à Biblioteca, o `LinhaDepois` aceita link como filho.
+
+## Remissões: lista de artigos, vírgula e parte sem artigo (11.9)
+
+- **Sintoma:** "arts. 37, XI, 39, § 4º, 150, II" resolvia para `art39.par150.incII`, e "§ 2º, I" no fim da lista caía no artigo do próprio dispositivo.
+- **Causa:** a vírgula fazia lista também com a palavra no singular ("§ 4º, 150"), e o número solto depois de uma citação não era lido como outro artigo.
+- **Solução:** lista com vírgula só com a palavra no plural ("§§", "arts.", "incisos"); no singular, só " e ". Depois de uma cadeia que começa em "arts.", o número solto é artigo implícito; a parte sem artigo colada à citação anterior (" e § 4º") herda o artigo dela. Inciso solto só vale em maiúsculas ("c" é alínea, não o romano 100).
+- **Previsível na UI da 11.9:** o texto que o detector lê é o `chaveDeBusca` do texto exibido (mesmo comprimento), então os índices valem direto na partição do `destacar.ts`; o tachado deve ser trocado por espaços antes (como em `textoParaDestacar`) para não citar redação revogada.
