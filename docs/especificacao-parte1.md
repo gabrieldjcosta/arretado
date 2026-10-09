@@ -489,6 +489,7 @@ Métricas acionáveis; intervalos configuráveis; avaliação de adaptativo sobr
 | D22 | Sem banco de questões; Precedente único com formulário por escopo; Resumo = tipo de Nota | Cadastro menor que estudo | Registrar toda questão; módulos separados | Estatísticas derivam de sessões + erros | Se importar cadernos |
 | D23 | Conta e Ajustes com **Orientações**, "?" contextual e "!" (1 relato/dia, descrição obrigatória, sem dados de estudo) | Reduz medo e bloqueio; canal único | Ajuda externa; formulário livre | Conteúdo estático versionado; fila local até F4 | Não |
 | D24 | Vocabulário: **Aparelho** para equipamento; **Problema** para falha da plataforma; **Erro** só para estudo | Evita colisão com Dispositivo (lei) e com Erro (Recall) | "Dispositivo" e "erro" ambíguos | Glossário obrigatório na interface | Não |
+| D25 | **Acervo e edital** (09/10/2026): colar o edital extrai Pontos e normas citadas; o Acervo semente é estático e versionado, com selo (`conferida` ou `importada`) e origem; curadoria do Gabriel, aberta a colaboradores e IA; qualquer carreira | Reduz a barreira de entrada de outros usuários sem esperar a F4; o edital vira demanda real | Esperar o catálogo remoto da F7; extração por IA no caminho crítico | A1/A2 antes da F3, sem backend; `docs/planos/acervo.md` | F7 (catálogo remoto e contador de pedidos) |
 
 ---
 

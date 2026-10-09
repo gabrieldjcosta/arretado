@@ -28,17 +28,20 @@ Depois da C: Fatia 3 (Recall em 1 toque, cota de 10, dias dos últimos 7).
 | 2 | **Fatia 2** — componentes e casca | Barra inferior, **+**, "Agora/Depois", voz nova | 1 | 1–2 |
 | 3 | **11.8** — artigo por artigo | Leitura de um artigo por vez | 2 | 1–2 |
 | 4 | **Fatia 3** — Recall: começar em 1 toque, cota, dias | Revisão em até 2 toques; fila sem culpa | 1, 2 | 1–2 |
-| 5 | **11.9** + **Fatia 4** — remissões e leitor/Biblioteca | Prévia de "art. X"; "Continuar leitura" como ação principal; régua opcional | 3 (11.8), 4 (11.8 e 11.9) | 2–3 |
-| 6 | **Fatia 5** — Conta e acabamento | Primeira experiência, voz revisada, roteiro da validação pronto | 1–5 | 1–2 |
-| 7 | **Reconferência dos gabaritos** (CP, ECA, CDC, CF), amostra do colar real, tempo do CP no celular | Fecha pendências de dado | Você | ~1 h por norma |
-| 8 | **Etapa 10** (revisão do rascunho e editor) e **11.7** (corrigir texto publicado) | Corrigir lei importada sem recolar | 7 | 4–6 |
-| 9 | `/code-review` das etapas 8, 9 e 11 | Achados corrigidos | 8 | 1–2 |
-| 10 | **Etapa 12** (importar por URL) | Colar vira "digitar o endereço" | Corre por fora; 12.3 depende da 9.5 (feita) | 3 |
-| 11 | **Etapa 13** e **portão da F2** | 2 semanas lendo lei no Arretado | 8–10, gabaritos `conferida` | 2 + uso |
-| 12 | **F3** — Hoje, Dia, Sessão, Plano, com as 3 alavancas adiadas (estacionamento de distração, fechar o dia, temporizador) | A tela Hoje com um "agora" só | Portão da F2 (regra do `CLAUDE.md`) | a planejar |
-| 13 | **Validação** com 3 a 5 pessoas, 1 semana | Evidência de fora | 12 | — |
-| 14 | **F4** — login, sync, PWA, exclusão de conta | Dados fora do aparelho, com segurança | 13 | a planejar |
-| 15 | **Decisão de cobrar** | Sim, não ou ajustar | 13, 14 e os pré-requisitos abaixo | — |
+| 5 | **11.9** (feita em 09/10/2026) + **Fatia 4** — remissões e leitor/Biblioteca | Prévia de "art. X"; "Continuar leitura" como ação principal; régua opcional | 3 (11.8), 4 (11.8 e 11.9) | 1–2 (resta a fatia 4) |
+| 6 | **A1** — edital → Pontos e normas citadas; Plano "só as leis do edital" ([`acervo.md`](acervo.md)) | Colar o edital e ver só as leis dele, com o que já está no aparelho | 5 (11.9), sem backend | 3–4 |
+| 7 | **Fatia 5** — Conta e acabamento | Primeira experiência (já com o Acervo à vista), voz revisada, roteiro da validação pronto | 1–6 | 1–2 |
+| 8 | **Reconferência dos gabaritos** (CP, ECA, CDC, CF), amostra do colar real, tempo do CP no celular | Fecha pendências de dado; vira também o 1º lote `conferida` do Acervo | Você | ~1 h por norma |
+| 9 | **Etapa 10** (revisão do rascunho e editor) e **11.7** (corrigir texto publicado) | Corrigir lei importada sem recolar | 8 | 4–6 |
+| 10 | **Etapa 12** (importar por URL), **subiu na ordem** | Colar vira "digitar o endereço"; base da curadoria em lote | 9 (12.3 depende da 9.5, feita) | 3 |
+| 11 | **A2** — Acervo semente estático ("Importar do Acervo") e curadoria em lotes | A pessoa abre a Biblioteca e importa a lei com um toque; selo e data em cada norma | 6, 10 | 2 + curadoria contínua |
+| 12 | **A3** — pedido de norma e roteiro de curadoria com colaborador ou IA | Norma que falta vira pedido; outra pessoa ou IA ajuda sem tirar o seu controle | 11 | 1–2 |
+| 13 | `/code-review` das etapas 8, 9 e 11 | Achados corrigidos | 9 | 1–2 |
+| 14 | **Etapa 13** e **portão da F2** | 2 semanas lendo lei no Arretado | 9–12, gabaritos `conferida` | 2 + uso |
+| 15 | **F3** — Hoje, Dia, Sessão, Plano, com as 3 alavancas adiadas (estacionamento de distração, fechar o dia, temporizador) | A tela Hoje com um "agora" só | Portão da F2 (regra do `CLAUDE.md`) | a planejar |
+| 16 | **Validação** com 3 a 5 pessoas, 1 semana | Evidência de fora | 15 | — |
+| 17 | **F4** — login, sync, PWA, exclusão de conta | Dados fora do aparelho, com segurança | 16 | a planejar |
+| 18 | **Decisão de cobrar** | Sim, não ou ajustar | 16, 17 e os pré-requisitos abaixo | — |
 
 O portão da F1 (14 dias com revisão em pelo menos 10) segue sendo medido durante tudo isso. A fatia 3 muda o Recall no meio da medição: a linha de base da 1.1 registra o dia da mudança.
 
@@ -70,6 +73,7 @@ O portão da F1 (14 dias com revisão em pelo menos 10) segue sendo medido duran
 | 4 | Validação com outras pessoas | **Só depois da F3** (não depois da fatia 5) |
 | 5 | Documentos | Direção de produto no `CLAUDE.md` e no `README.md` neste PR; T19 registrada na fatia 1 (1.8), depois de conferir pacote e licença |
 | 6 | Antes de cobrar | Os quatro itens abaixo, e a regra de comunicação |
+| 7 | Acervo e edital (09/10/2026) | Qualquer carreira; curadoria só do Gabriel, aberta a colaboradores e IA; passos A1 e A2 antes da F3, sem backend; detalhes em [`acervo.md`](acervo.md) (D25) |
 
 **Consequência da decisão 4:** o redesign e a F3 ficam meses sem evidência externa. Risco aceito. Mitigação: o roteiro de validação (5.5) fica pronto antes, e a linha de base de uso do próprio Gabriel (1.1) é a única medida até lá. Se a F3 demorar mais que o esperado, rever esta decisão.
 
@@ -96,6 +100,9 @@ Nunca: "para quem tem TDAH", "trata", "melhora o diagnóstico". As quatro pergun
 | Documento | O que muda | Quando |
 |---|---|---|
 | `redesign.md` | Cabeçalho: ajustes aprovados em 09/10/2026. "Ordem" passa a: 1, 2, 11.8, 3, (11.9 + 4), 5. Em 5.4, tirar `CLAUDE.md`/`README.md` (feitos); em 1.8, T19 fica aqui. "Depois da fatia 5": validação só após a F3 | Neste PR |
+| `acervo.md` | Novo: plano do Acervo e do edital (A1 a A5) | Neste PR |
+| `especificacao-parte1.md` §19 | D25 (Acervo e edital); nota na F7 de que o Acervo semente estático vem antes do catálogo no Supabase | Neste PR |
+| `glossario.md` | Acervo, Norma canônica, Norma citada, Pedido de norma, Selo | A1.1 e A2.1 |
 | `F2.md` | Em "Ordem e paralelismo": uma linha apontando para este documento; a 11.8 passa a vir depois das fatias 1 e 2 | Neste PR (uma linha) |
 | `CLAUDE.md` | "O que é este repositório" com a direção de produto; regra de dados sensíveis; este plano na leitura sob demanda | Neste PR |
 | `README.md` | Parágrafo de abertura com a direção de produto | Neste PR |
@@ -103,6 +110,14 @@ Nunca: "para quem tem TDAH", "trata", "melhora o diagnóstico". As quatro pergun
 | `decisoes-tecnicas.md` | T19 (fontes embutidas) | Fatia 1, atividade 1.8 |
 | `glossario.md` | `AcaoAgora`, `LinhaDepois`, `DiasDaSemana`, `BarraFina`, cota | Fatias 2 e 3 |
 | Parte 1 §15 (F3) | Nada agora. Ao planejar a F3, incluir estacionamento de distração, fechar o dia e temporizador | Planejamento da F3 |
+
+## Acervo: o que muda no caminho (09/10/2026)
+
+- **Etapa 12 sobe** (de "por fora" para a etapa 10): vira a base da curadoria em lote.
+- **Fatia 5** passa a depender da A1: a primeira experiência já mostra o edital e o Acervo.
+- **Reconferência dos gabaritos** (etapa 8) serve ao portão da F2 e ao primeiro lote `conferida` do Acervo.
+- **A1 e A2 são exceção à regra de fases** (como a F2 em paralelo à F1): só usam o que já existe local; nada de login, sincronização ou catálogo remoto (A4, na F4/F7).
+- **Validação externa** (etapa 16) passa a medir também: a pessoa chega ao primeiro artigo da lei do próprio edital sem colar nada?
 
 ## Riscos do conjunto
 
@@ -113,3 +128,4 @@ Nunca: "para quem tem TDAH", "trata", "melhora o diagnóstico". As quatro pergun
 | Meses sem teste externo | Roteiro pronto antes; rever a decisão 4 se a F3 atrasar |
 | Fontes e cores quebram o leitor (posição, desempenho, contraste) | 1.2, 1.6 e 1.7 com o E2E do leitor repetido |
 | Comunicação resvalar para diagnóstico | Regra de comunicação acima, no `CLAUDE.md` |
+| Curadoria do Acervo sobrecarregar o Gabriel | Selos `conferida` e `importada`; IA faz a primeira passada; A2.2 corre em paralelo e não bloqueia o portão |

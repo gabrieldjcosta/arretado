@@ -24,7 +24,7 @@ Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Ordem das 
 - Ao fechar uma atividade, avisar o Gabriel se a próxima exigir modelo acima do Sonnet 5.5 em esforço médio. Exigem: 11.7, 10.4, planejamento e execução da F3/F4, `/code-review` das etapas 8, 9 e 11. Esforço alto no mesmo modelo: 11.9, 13.1, 12.2 se estourar. As demais cabem em Sonnet 5.5 médio.
 
 ## Regras de trabalho neste projeto
-- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); a F3 só começa depois do portão da F2.
+- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); a F3 só começa depois do portão da F2. Exceção decidida em 09/10/2026 (D25): A1 e A2 do Acervo (edital → normas; Acervo semente estático, sem backend) vêm antes da F3; plano em `docs/planos/acervo.md`.
 - Toda entrega de fase inclui o item de segurança/LGPD descrito na Parte 1 §15.
 - Vocabulário obrigatório na interface e no código: Aparelho (equipamento), Problema (falha da plataforma), Erro (só estudo), Dispositivo (só unidade da lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta.
 - Nada obrigatório além do mínimo nos formulários; captura de erro tem exatamente 2 campos obrigatórios.
