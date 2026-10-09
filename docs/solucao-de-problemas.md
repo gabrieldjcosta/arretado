@@ -946,6 +946,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** citação seguida de outra norma ("do Código…", "da Lei nº…") fica `externa` e sem resolução, e "desta Lei"/"desta Constituição" são internas; prefixo de bloco da 8.4; intervalo vira lista; o que não resolve fica como texto comum; aviso de revogado e endereço novo do renumerado; pilha de posições. **Prevenção:** testes com casos da CF e da LEP e métrica conferida contra as âncoras da própria CF (11.9).
 - **Origem:** previsto — atividade 11.9.
 
+## Redesign: contraste e fontes
+
+### Cor nova reprova no contraste
+- **Sintoma:** `npm test` falha em `scripts/contraste.test.ts` ou `node scripts/contraste.mjs` lista pares reprovados. **Causa:** token trocado em `estilos.css` sem medir; o valor da spec (recuado `#6B776F` e sálvia `#4F7A64` como texto) não chega a 4,5:1 sobre o Papel. **Solução:** ajustar o hex e rodar `node scripts/contraste.mjs --tudo`. O marca-texto (`--agora`) só vale como fundo, com `--agora-texto` por cima; nunca como texto nem traço isolado (1,7:1 sobre o Papel). O escuro por sistema e o manual precisam ter os mesmos valores (o teste compara).
+- **Origem:** encontrado na fatia 1 do redesign (09/10/2026).
+
+### Fonte não carrega (cai na do sistema)
+- **Sintoma:** texto em Arial/Georgia/system-ui; console com violação de `font-src`; `document.fonts.check` falso. **Causa:** `@font-face` apontando fora do pacote (caminho relativo a `src/apresentacao/`: `../../node_modules/...`) ou arquivo inlinado como `data:` (a CSP só aceita `'self'`; o Vite só inlina abaixo de 4 KB, os `.woff2` têm mais). **Solução:** conferir que `dist/assets/*.woff2` existem após `npm run build`. O E2E "as fontes embutidas carregam" cobre. Subconjunto: só `latin`; se aparecer caractere fora (raro em português), acrescentar `latin-ext`.
+- **Origem:** previsto — fatia 1 do redesign.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).

@@ -62,3 +62,22 @@ test('navegação por teclado: foco visível e pular para o conteúdo', async ({
   expect(page.url()).not.toContain('conteudo');
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
 });
+
+test('as fontes embutidas carregam (T19)', async ({ page }) => {
+  await page.goto('/#/recall');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  // `document.fonts.check` só vale depois de a fonte ter sido pedida: força o pedido das duas.
+  const carregadas = await page.evaluate(async () => {
+    await Promise.all([
+      document.fonts.load("400 16px 'Atkinson Hyperlegible Next'"),
+      document.fonts.load("700 16px 'Atkinson Hyperlegible Next'"),
+      document.fonts.load("400 16px 'Literata'"),
+    ]);
+    return [
+      document.fonts.check("400 16px 'Atkinson Hyperlegible Next'"),
+      document.fonts.check("700 16px 'Atkinson Hyperlegible Next'"),
+      document.fonts.check("400 16px 'Literata'"),
+    ];
+  });
+  expect(carregadas).toEqual([true, true, true]);
+});

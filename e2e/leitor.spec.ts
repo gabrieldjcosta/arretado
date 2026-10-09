@@ -599,7 +599,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   // Fixo e semitransparente, junto do "Lido até aqui" e do "Buscar" (11.6); com
   // o mouse fora dele (em cima, ele fica opaco).
   await page.mouse.move(5, 300);
-  expect(await fundoDoBotao(sair)).toEqual({ posicao: 'fixed', alfa: 0.85 });
+  expect(await fundoDoBotao(sair)).toEqual({ posicao: 'fixed', alfa: 0.9 });
   await expect(lidoAteAqui).toBeVisible();
   // O botão acompanha a rolagem.
   const art60 = page.locator('[data-endereco="art60"]');

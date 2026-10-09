@@ -2,6 +2,10 @@
 
 Atualizado em 09/10/2026 (nova ordem: ver "Nova ordem" abaixo) e 08/10/2026 (11.5 concluída, ações por dispositivo, no PR da 11.5, **sem subida de esquema**; o PR [#36](https://github.com/gabrieldjcosta/arretado/pull/36) da 11.3 foi mergeado; próxima: 11.8, leitura artigo por artigo; ordem para o uso nas férias do Gabriel: ver "Ordem das férias" abaixo). Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
 
+## Fatia 1 do redesign — feita em 09/10/2026 (sem commit; aguarda o Gabriel)
+
+Tokens novos (Papel, tinta, sálvia; escuro grafite-noite), `scripts/contraste.mjs` + `scripts/contraste.test.ts` (todos os pares AA nos dois temas), fontes embutidas (Atkinson Hyperlegible Next 400/500/700 e Literata variável, latim; +~90 KB no `dist/`), E2E "as fontes embutidas carregam". `check` verde (1256 testes); E2E 183 de 183 nos 3 aparelhos (o alfa do modo foco passou de 85% para 90% para manter o AA). **Pendências:** 1.1 (linha de base, com o Gabriel), capturas antes/depois, OK da T19 (gravada como proposta em `decisoes-tecnicas.md`) e das 2 dependências novas. Decisão minha: um só `--primaria` (#3F6B4C) para botão e link. Próxima: **fatia 2** (componentes e casca). Sem subida de esquema, sem backup.
+
 ## Nova ordem (09/10/2026) — vale no lugar de "próxima: 11.8"
 
 Curso de ação único em [`planos/curso-de-acao.md`](planos/curso-de-acao.md). **Próxima atividade: fatia 1 do redesign** (tokens, temas e fontes; [`planos/redesign.md`](planos/redesign.md)), depois fatia 2, **11.8**, fatia 3, 11.9 + fatia 4, fatia 5; então reconferência dos gabaritos, etapa 10, 11.7, 13 e portão da F2; só então F3, validação com 3 a 5 pessoas, F4 e a decisão de cobrar. Relato de problema do uso das férias fura a fila. A 11.5 segue a última concluída da F2 (o PR do redesign/planejamento não toca código). Pedido sugerido para a sessão da fatia 1: "Leia `docs/proxima-sessao.md` e `docs/planos/redesign.md` e execute a fatia 1 pela rotina de pronto."
