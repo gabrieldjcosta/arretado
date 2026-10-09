@@ -4,7 +4,7 @@ Atualizado em 09/10/2026 (nova ordem: ver "Nova ordem" abaixo) e 08/10/2026 (11.
 
 ## Fatia 1 do redesign — feita em 09/10/2026 (sem commit; aguarda o Gabriel)
 
-Tokens novos (Papel, tinta, sálvia; escuro grafite-noite), `scripts/contraste.mjs` + `scripts/contraste.test.ts` (todos os pares AA nos dois temas), fontes embutidas (Atkinson Hyperlegible Next 400/500/700 e Literata variável, latim; +~90 KB no `dist/`), E2E "as fontes embutidas carregam". `check` verde (1256 testes); E2E 183 de 183 nos 3 aparelhos (o alfa do modo foco passou de 85% para 90% para manter o AA). **Pendências:** 1.1 (linha de base, com o Gabriel), capturas antes/depois, OK da T19 (gravada como proposta em `decisoes-tecnicas.md`) e das 2 dependências novas. Decisão minha: um só `--primaria` (#3F6B4C) para botão e link. Próxima: **fatia 2** (componentes e casca). Sem subida de esquema, sem backup.
+Tokens novos (Papel, tinta, sálvia; escuro grafite-noite), `scripts/contraste.mjs` + `scripts/contraste.test.ts` (todos os pares AA nos dois temas), fontes embutidas (Atkinson Hyperlegible Next 400/500/700 e Literata variável, latim; +~90 KB no `dist/`), E2E "as fontes embutidas carregam". `check` verde (1256 testes); E2E 183 de 183 nos 3 aparelhos (o alfa do modo foco passou de 85% para 90% para manter o AA). **Resolvido em 09/10/2026:** T19 e as 2 dependências aprovadas; capturas "depois" dadas pelos prints do Gabriel (as "antes" não foram guardadas); 1.1 (linha de base) adiada para os testes externos. PR [#40](https://github.com/gabrieldjcosta/arretado/pull/40) mergeado. Decisão minha: um só `--primaria` (#3F6B4C) para botão e link. Próxima: **fatia 2** (componentes e casca). Sem subida de esquema, sem backup.
 
 ## Nova ordem (09/10/2026) — vale no lugar de "próxima: 11.8"
 

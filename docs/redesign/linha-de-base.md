@@ -1,6 +1,6 @@
 # Linha de base do redesign (atividade 1.1)
 
-**Pendente (depende do Gabriel e do app com dados reais; não dá para medir na sessão em nuvem):**
+**Adiada (Gabriel, 09/10/2026):** ele está desenvolvendo mais do que usando; estes números entram quando abrirem os testes externos. As capturas "depois" da fatia 1 (Recall, Biblioteca e leitor, claro e escuro) são os prints enviados por ele em 09/10/2026; as "antes" não foram guardadas (o estado anterior se regenera pelo Playwright a partir do commit anterior ao PR #40, se for preciso).
 
 - [ ] Toques da abertura do app até o primeiro cartão, hoje: ___
 - [ ] Dias com revisão nos últimos 14 (contar em `revisoes`): ___
