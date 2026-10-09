@@ -2,12 +2,13 @@
 
 ## O que é este repositório
 Plataforma pessoal de preparação para concursos jurídicos (usuário principal: Gabriel, TDAH, banca FCC, Defensoria/SP).
+**Direção de produto (09/10/2026):** o Arretado é a plataforma de estudo para quem tem dificuldade de concentração, pensada para, no futuro, ser cobrada e crescer; é um produto só, não dois. Regra de dados e de comunicação: diagnóstico (TDAH, autismo etc.) nunca é perguntado nem guardado e é orientação interna; a fala pública parte do comportamento ("dificuldade de concentração", "não sei por onde começar"), sem rótulo clínico nem promessa de tratamento. Curso de ação único: `docs/planos/curso-de-acao.md`; guia simples de sessões e uso de outras IAs: `docs/planos/guia-pratico.md`.
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore). Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado; conteúdo recomeça do zero.
 
 ## Estado
 Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T18); **F0 e F1 implementadas** (portões em `docs/portoes/`); **F2 em execução** (plano e andamento em `docs/planos/F2.md`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, próxima atividade e pendências).
 
-Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Leitura sob demanda, só a seção que a tarefa pede:
+Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Ordem das etapas: `docs/planos/curso-de-acao.md` (só a tabela da linha do tempo). Leitura sob demanda, só a seção que a tarefa pede:
 1. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel); §5 e §15 — modelo de dados e fases.
 2. `docs/especificacao-parte2.md` §10.6 — Legislação (regras do estruturador, leitor, editor), ao tocar nesse módulo.
 3. `docs/planos/F2.md` — só a etapa em execução, os "Fatos das fontes" e a rotina de pronto, ao trabalhar na F2.
