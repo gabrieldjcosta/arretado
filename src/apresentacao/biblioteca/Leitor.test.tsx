@@ -1185,3 +1185,97 @@ describe('filtros (11.3)', () => {
     expect(screen.getByRole('button', { name: 'Filtrar' })).toBeInTheDocument();
   });
 });
+
+describe('ações por dispositivo (11.5)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  /** Abre as ações do dispositivo no alto da tela. */
+  async function abrirAcoes(usuario: ReturnType<typeof userEvent.setup>) {
+    // Alto da tela num artigo (no jsdom, 60 px por linha).
+    rolarPara(60 * 8);
+    await usuario.click(screen.getByRole('button', { name: 'Ações' }));
+    const dialogo = await screen.findByRole('dialog', { name: /^Ações de / });
+    // A referência de citar, no alto do diálogo: "art. 1º, LEP".
+    const referencia = dialogo.querySelector('p.dica')?.textContent ?? '';
+    expect(referencia).toMatch(/^art\. \d+º, LEP$/);
+    return { dialogo, referencia };
+  }
+
+  it('registrar erro: já com a referência, dois campos, vinculado ao dispositivo; depois aparece nos vinculados', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const { dialogo, referencia } = await abrirAcoes(usuario);
+    expect(within(dialogo).getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Registrar erro' }));
+    const campo = within(dialogo).getByLabelText('O que foi');
+    expect(campo).toHaveValue(`${referencia}: `);
+    // Só a referência não basta; falta também o resultado.
+    const salvar = within(dialogo).getByRole('button', { name: 'Salvar' });
+    expect(salvar).toBeDisabled();
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Errei' }));
+    expect(salvar).toBeDisabled();
+    await usuario.type(campo, 'troquei o prazo');
+    await usuario.click(salvar);
+
+    expect(await within(dialogo).findByText(/Erro registrado e vinculado/)).toBeInTheDocument();
+    const erros = (await repo.colecao('erros').listarPagina({ limite: 10 })).itens;
+    expect(erros).toHaveLength(1);
+    expect(erros[0]).toMatchObject({
+      resultado: 'errou',
+      oQueFoi: `${referencia}: troquei o prazo`,
+      status: 'aberto',
+    });
+    expect(erros[0]?.dispositivoId).toBeDefined();
+    // A lista dos vinculados recarrega com o erro novo, com o link para o erro.
+    const link = await within(dialogo).findByRole('link', { name: /troquei o prazo/ });
+    expect(link).toHaveAttribute('href', `#/recall/erros/${erros[0]?.id ?? ''}`);
+  });
+
+  it('cartão deste trecho: frente com a referência, verso com o texto vigente, uma vez só', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const { dialogo, referencia } = await abrirAcoes(usuario);
+    const criar = within(dialogo).getByRole('button', { name: 'Criar cartão deste trecho' });
+    await usuario.dblClick(criar);
+
+    expect(await within(dialogo).findByText(/Cartão criado/)).toBeInTheDocument();
+    expect(criar).toBeDisabled();
+    const cartoes = (await repo.colecao('cartoes').listarPagina({ limite: 10 })).itens;
+    expect(cartoes).toHaveLength(1);
+    expect(cartoes[0]).toMatchObject({
+      frente: `O que diz o ${referencia}?`,
+      origemTipo: 'dispositivo',
+      estado: 'ativo',
+      caixa: 1,
+    });
+    expect(cartoes[0]?.origemId).toBeDefined();
+    expect(cartoes[0]?.verso?.length).toBeGreaterThan(0);
+  });
+
+  it('copiar a referência e fechar, também no modo foco', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const { dialogo, referencia } = await abrirAcoes(usuario);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Copiar referência' }));
+    expect(await within(dialogo).findByText(`Copiado: ${referencia}.`)).toBeInTheDocument();
+    expect(await navigator.clipboard.readText()).toBe(referencia);
+
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /^Ações de / })).toBeNull();
+    });
+    expect(window.location.hash).toContain('foco=texto');
+  });
+});

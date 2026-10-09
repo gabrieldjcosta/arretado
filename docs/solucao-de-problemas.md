@@ -989,3 +989,10 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Sintoma:** a novidade não aparece. **Causa:** a página antiga continua aberta ou guardada pelo navegador.
 - **Solução:** fechar a aba e abrir de novo, ou recarregar. **Prevenção:** conferir o `Cache-Control` da página inicial depois da primeira publicação (o `_headers` define `no-cache` para `/index.html`).
 - **Origem:** previsto — a cada publicação (no ar desde 23/09/2026).
+
+### "Ações" age no dispositivo errado quando há filtro ou modo foco
+- **Sintoma:** o diálogo "Ações de Art. 5º" abre com o filtro ligado, mas o artigo à vista era o 9º-A. **Causa:** o alto da tela era um nó estrutural (contexto do filtro) e a busca do "próximo com texto" andava pela árvore inteira (`nos`), pulando para um artigo que o filtro esconde. **Solução:** andar pelas `linhas` à vista (`linhaDoNo(linhas, indice)` em diante). **Prevenção:** o E2E das ações (11.5) aplica "Só com erro vinculado" e abre as ações no modo foco; toda ação "sobre o que está na tela" (11.8, 11.9) deve andar pelas `linhas`, nunca por `nos`.
+- **Origem:** achado na 11.5 (08/10/2026).
+
+### Previsível na 11.8: o "cartão" do artigo e as ações
+- **Sintoma esperado:** no modo "artigo por artigo", o alto da tela deixa de ser o dispositivo certo (o cartão ocupa a tela). **Solução prevista:** as ações da 11.5 agem no artigo do cartão ativo, não no `noDoAlto`. **Origem:** previsto na 11.5.

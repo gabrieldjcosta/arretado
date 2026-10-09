@@ -7,6 +7,7 @@ import {
   janelasQueCobrem,
   linhaDoNo,
   montarLinhas,
+  referenciaDe,
   referenciaDoNo,
   TEXTOS_POR_PEDIDO,
 } from './linhas';
@@ -119,6 +120,24 @@ describe('posição no leitor (9.7)', () => {
     expect(referencia('art1.par1.incI')).toBe('Art. 1º, § 1º, I');
     expect(referencia('art2.parUnico')).toBe('Art. 2º, Parágrafo único');
     expect(referencia('tit1')).toBe('TÍTULO I');
+  });
+});
+
+describe('referência para citar (11.5)', () => {
+  it('em minúsculas, com o título curto: "art. 1º, II, a), LEP"', async () => {
+    const aberta = await abrir(LEI);
+    const referencia = (endereco: string) =>
+      referenciaDe(
+        aberta.nos,
+        aberta.indiceDe,
+        aberta.nos.findIndex((n) => n.dispositivo.endereco === endereco),
+        'LEP',
+      );
+    expect(referencia('art1')).toBe('art. 1º, LEP');
+    expect(referencia('art1.incII.alA')).toBe('art. 1º, II, a), LEP');
+    expect(referencia('art1.par1.incI')).toBe('art. 1º, § 1º, I, LEP');
+    expect(referencia('art2.parUnico')).toBe('art. 2º, Parágrafo único, LEP');
+    expect(referencia('tit1')).toBe('TÍTULO I, LEP');
   });
 });
 

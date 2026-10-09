@@ -191,6 +191,27 @@ export async function criarCartaoManual(
   return cartao;
 }
 
+/**
+ * Cartão de um trecho da lei (11.5): frente e verso escritos pela tela, com a origem no dispositivo.
+ * O Recall não conhece a Legislação: recebe o id do dispositivo e os textos prontos.
+ */
+export async function criarCartaoDeDispositivo(
+  repo: Repositorio,
+  entrada: { dispositivoId: string; frente: string; verso: string },
+): Promise<Cartao> {
+  const cartao = await repo.colecao('cartoes').criar({
+    frente: entrada.frente,
+    verso: entrada.verso,
+    origemTipo: 'dispositivo',
+    origemId: entrada.dispositivoId,
+    estado: 'ativo',
+    caixa: 1,
+    proximaRevisao: somarDias(hoje(repo), 1),
+  });
+  repo.eventos.emitir('cartao.criado', { cartaoId: cartao.id });
+  return cartao;
+}
+
 export async function editarCartao(
   repo: Repositorio,
   id: string,

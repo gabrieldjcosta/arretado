@@ -33,6 +33,7 @@ import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
 import { dispositivosComErro } from './errosVinculados';
@@ -54,6 +55,7 @@ import {
   janelasQueCobrem,
   linhaDoNo,
   montarLinhas,
+  referenciaDe,
   referenciaDoNo,
   TEXTOS_POR_PEDIDO,
   type LinhaDoLeitor,
@@ -942,6 +944,42 @@ function LeitorAberto({
   // Filtros (11.3): a lista mostra só o que casa e o contexto. Aplicar guarda o resultado (não
   // recalcula a cada estrela, para o artigo não sumir sob o dedo); "Atualizar" refaz a conta.
   const [filtroAberto, setFiltroAberto] = useState(false);
+  // Ações por dispositivo (11.5): agem no dispositivo do alto da tela, ou, sem texto nele (um
+  // título, um capítulo), no primeiro com texto logo abaixo, que é o que está à vista.
+  const [alvoDasAcoes, setAlvoDasAcoes] = useState<AlvoDasAcoes | undefined>(undefined);
+  function abrirAcoes() {
+    const id = noDoAlto() ?? posicao.current;
+    const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
+    if (indice === undefined) return;
+    // As linhas à vista (com o filtro, só as que ficaram), não todos os nós: o de baixo é o de baixo na tela.
+    let alvo = indice;
+    for (let i = linhaDoNo(linhas, indice) ?? linhas.length; i < linhas.length; i++) {
+      const proximo = linhas[i]?.indice;
+      if (proximo !== undefined && nos[proximo]?.dispositivo.categoria !== 'estrutural') {
+        alvo = proximo;
+        break;
+      }
+    }
+    const no = nos[alvo];
+    if (!no) return;
+    const trechos = textos.get(alvo)?.texto?.trechos;
+    const texto =
+      no.dispositivo.categoria === 'estrutural' || trechos === undefined
+        ? undefined
+        : trechos
+            .filter((t) => t.tachado !== true)
+            .map((t) => t.texto)
+            .join('')
+            .trim() || undefined;
+    const referencia = referenciaDe(nos, aberta.indiceDe, alvo, norma.tituloCurto);
+    const rotulo = referenciaDoNo(nos, aberta.indiceDe, alvo);
+    setAlvoDasAcoes({
+      dispositivoId: no.dispositivo.id,
+      nome: rotulo || rotuloTipo(no.dispositivo.tipo, 1),
+      referencia,
+      texto,
+    });
+  }
   const [falhaDoFiltro, setFalhaDoFiltro] = useState<string | undefined>(undefined);
   const blocos = useMemo(() => blocosDaNorma(nos), [nos]);
   function trocarFiltro(novo: FiltroAplicado | undefined) {
@@ -1246,6 +1284,7 @@ function LeitorAberto({
               abrirFiltro={() => {
                 setFiltroAberto(true);
               }}
+              abrirAcoes={abrirAcoes}
               filtro={filtro?.descricao}
               alternarFoco={alternarFoco}
               marcarAqui={marcarAqui}
@@ -1285,6 +1324,12 @@ function LeitorAberto({
           setNotaAberta(undefined);
         }}
       />
+      <AcoesDoDispositivo
+        alvo={alvoDasAcoes}
+        aoFechar={() => {
+          setAlvoDasAcoes(undefined);
+        }}
+      />
       <FiltroDaNorma
         aberto={filtroAberto}
         aoFechar={() => {
@@ -1320,6 +1365,7 @@ function AcoesDaLeitura({
   botaoDoFoco,
   abrirBusca,
   abrirFiltro,
+  abrirAcoes,
   filtro,
   alternarFoco,
   marcarAqui,
@@ -1328,6 +1374,7 @@ function AcoesDaLeitura({
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
   abrirBusca: () => void;
   abrirFiltro: () => void;
+  abrirAcoes: () => void;
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   alternarFoco: () => void;
@@ -1357,6 +1404,14 @@ function AcoesDaLeitura({
         onClick={abrirFiltro}
       >
         {filtro === undefined ? 'Filtrar' : 'Filtrado'}
+      </button>
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
+        onClick={abrirAcoes}
+      >
+        Ações
       </button>
       <button
         ref={botaoDoFoco}
