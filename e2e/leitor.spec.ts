@@ -1364,3 +1364,49 @@ test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, an
   await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
   info.annotations.push({ type: 'aparelho', description: info.project.name });
 });
+
+test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "ir para" e "voltar" mantêm a posição, com axe (11.9)', async ({
+  page,
+}, info) => {
+  test.setTimeout(240_000);
+  await importarEPublicar(page, 'cf', 'CF');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /CF/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'CF' })).toBeVisible();
+
+  // Vai ao art. 5º, XLVII, a, pela busca por endereço (a lista é virtualizada).
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Texto ou endereço' }).fill('art. 5º, XLVII, a');
+  await page.keyboard.press('Enter');
+  const origem = page.locator('[data-endereco="art5.incXLVII.alA"]');
+  await expect(origem).toBeVisible();
+  const citacao = origem.locator('[data-remissao]').first();
+  await expect(citacao).toHaveText(/art\. 84, XIX/);
+  await expect(citacao).toHaveAttribute('role', 'button');
+
+  // A prévia: o dispositivo citado, com a posição de leitura intacta.
+  const antes = await page.evaluate(() => window.scrollY);
+  await citacao.click();
+  const previa = page.getByRole('dialog', { name: 'Art. 84, XIX' });
+  await expect(previa).toBeVisible();
+  await expect(previa).toContainText(/declarar guerra/i);
+  expect(await page.evaluate(() => window.scrollY)).toBe(antes);
+  await semViolacoes(page);
+
+  // Esc fecha e devolve o foco à citação.
+  await page.keyboard.press('Escape');
+  await expect(previa).toBeHidden();
+  await expect(citacao).toBeFocused();
+
+  // "Ir para" leva o artigo ao alto e oferece o "voltar", que traz a origem de volta.
+  await citacao.click();
+  await previa.getByRole('button', { name: 'Ir para Art. 84, XIX' }).click();
+  const alvo = page.locator('[data-endereco="art84.incXIX"]');
+  await expect(alvo).toBeInViewport();
+  const voltar = page.getByRole('button', { name: /^← Voltar a Art\. 5º, XLVII/ });
+  await expect(voltar).toBeVisible();
+  await semViolacoes(page);
+  await voltar.click();
+  await expect(origem).toBeInViewport();
+  await expect(voltar).toBeHidden();
+  info.annotations.push({ type: 'aparelho', description: info.project.name });
+});

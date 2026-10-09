@@ -1748,3 +1748,71 @@ dialog.dialogo-acoes {
 .vizinho .linha-leitor {
   position: relative;
 }
+
+/* ── Prévia de remissões (11.9) ───────────────────────────────────────────── */
+
+/* A citação é texto com sublinhado pontilhado discreto (sem fundo, sem mudar a cor). */
+.remissao {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--primaria);
+}
+
+.remissao:focus-visible {
+  outline: 2px solid var(--primaria);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Celular: folha inferior. Computador: balão no canto de baixo, perto de onde se lê. */
+dialog.dialogo-previa {
+  margin: auto 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 70dvh;
+  overflow-y: auto;
+  border-radius: var(--raio) var(--raio) 0 0;
+}
+
+@media (min-width: 700px) {
+  dialog.dialogo-previa {
+    margin: auto 1.5rem 1.5rem auto;
+    width: min(32rem, calc(100vw - 3rem));
+    border-radius: var(--raio);
+  }
+}
+
+.previa-remissao .aviso-previa {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+dialog.dialogo-previa .linha-acoes button {
+  min-height: var(--alvo);
+}
+
+.remissoes-do-artigo {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--borda);
+}
+
+.remissoes-do-artigo h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.remissoes-do-artigo ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.remissoes-do-artigo button {
+  min-height: var(--alvo);
+}

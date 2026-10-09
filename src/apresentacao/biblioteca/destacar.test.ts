@@ -122,3 +122,39 @@ describe('grifos e notas no leitor (11.4): uma partição só com o destaque', (
     expect(pedacosDoTexto(trechos, false, undefined).map((p) => p.trecho)).toEqual(trechos);
   });
 });
+
+describe('remissões no leitor (11.9): mais uma camada na mesma partição', () => {
+  const trechos = [
+    { texto: 'nos termos do art. 84, XIX; ' },
+    { texto: 'veja o art. 5º', enfase: true },
+  ];
+
+  it('parte o texto nos limites da citação sem mudar o texto, e só o primeiro pedaço é parada do teclado', () => {
+    const pedacos = partirTrechos(trechos, [], undefined, [{ inicio: 19, fim: 34, alvo: 7 }]);
+    expect(pedacos.map((p) => p.trecho.texto).join('')).toBe(textoParaDestacar(trechos));
+    const citados = pedacos.filter((p) => p.remissao);
+    expect(citados.map((p) => p.trecho.texto).join('')).toBe('84, XIX; veja o');
+    expect(citados.map((p) => p.remissao?.primeiro)).toEqual([true, false]);
+    expect(citados.every((p) => p.remissao?.alvo === 7)).toBe(true);
+  });
+
+  it('a citação que começa dentro da anterior fica de fora; fim fora do texto é aparado', () => {
+    const pedacos = partirTrechos(trechos, [], undefined, [
+      { inicio: 4, fim: 10, alvo: 1 },
+      { inicio: 8, fim: 12, alvo: 2 },
+      { inicio: 40, fim: 9999, alvo: 3 },
+    ]);
+    expect(new Set(pedacos.flatMap((p) => (p.remissao ? [p.remissao.alvo] : [])))).toEqual(
+      new Set([1, 3]),
+    );
+  });
+
+  it('pedacosDoTexto guarda o resultado enquanto o texto e as remissões são os mesmos', () => {
+    const remissoes = [{ inicio: 4, fim: 10, alvo: 1 }];
+    const a = pedacosDoTexto(trechos, false, undefined, remissoes);
+    expect(pedacosDoTexto(trechos, false, undefined, remissoes)).toBe(a);
+    expect(a.some((p) => p.remissao)).toBe(true);
+    // Sem remissão nem marcação, nada de camada nova.
+    expect(pedacosDoTexto(trechos, false, undefined, []).some((p) => p.remissao)).toBe(false);
+  });
+});
