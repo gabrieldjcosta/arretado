@@ -7,6 +7,7 @@ import {
   criarCartaoDeDispositivo,
   criarCartaoDeErro,
   criarCartaoManual,
+  diasComRevisao,
   editarCartao,
   excluirErro,
   filaDoDia,
@@ -25,8 +26,8 @@ import {
 
 const DIA = 86_400_000;
 
-async function preparar() {
-  const ctx = await repositorioDeTeste();
+async function preparar(opcoes: Parameters<typeof repositorioDeTeste>[0] = {}) {
+  const ctx = await repositorioDeTeste(opcoes);
   const eventos: Evento[] = [];
   ctx.repo.eventos.assinar('*', (e) => {
     if (!e.nome.startsWith('registro.')) eventos.push(e);
@@ -282,5 +283,51 @@ describe('correções da revisão da etapa 6', () => {
     expect(e2.causaSugerida).toBeUndefined();
     const e3 = await completarErro(repo, e.id, { fraseCorreta: 'F.' });
     expect(e3.causaSugerida).toBeUndefined();
+  });
+});
+
+describe('dias com revisão nos últimos 7 (fatia 3)', () => {
+  async function cartaoVencido(repo: Awaited<ReturnType<typeof preparar>>['repo']) {
+    const c = await criarCartaoManual(repo, { frente: 'f', verso: 'v' });
+    return c;
+  }
+
+  it('nenhum dia sem revisões', async () => {
+    const { repo } = await preparar();
+    expect(await diasComRevisao(repo)).toEqual(Array(7).fill(false));
+  });
+
+  it('um dia: hoje é a última marca; revisões do mesmo dia contam uma vez', async () => {
+    const { repo } = await preparar();
+    const a = await cartaoVencido(repo);
+    const b = await cartaoVencido(repo);
+    await revisar(repo, a.id, 'errei');
+    await revisar(repo, b.id, 'errei');
+    expect(await diasComRevisao(repo)).toEqual([false, false, false, false, false, false, true]);
+  });
+
+  it('sete dias seguidos; o oitavo empurra o mais antigo para fora da janela', async () => {
+    const { repo, relogio } = await preparar();
+    const c = await cartaoVencido(repo);
+    for (let i = 0; i < 8; i += 1) {
+      // 'errei' mantém o cartão vencendo no dia seguinte.
+      await revisar(repo, c.id, 'errei');
+      if (i < 7) relogio.avancar(DIA);
+    }
+    expect(await diasComRevisao(repo)).toEqual(Array(7).fill(true));
+    relogio.avancar(2 * DIA);
+    expect(await diasComRevisao(repo)).toEqual([true, true, true, true, true, false, false]);
+  });
+
+  it('usa a data civil local: 23h em São Paulo conta no próprio dia, não no seguinte (UTC)', async () => {
+    const { repo } = await preparar({ inicio: '2026-09-24T02:30:00.000Z' }); // 23h30 de 23/09 em SP
+    const c = await cartaoVencido(repo);
+    await revisar(repo, c.id, 'errei');
+    expect(await diasComRevisao(repo)).toEqual([false, false, false, false, false, false, true]);
+    const { repo: outro, relogio } = await preparar({ inicio: '2026-09-24T02:30:00.000Z' });
+    const d = await cartaoVencido(outro);
+    await revisar(outro, d.id, 'errei');
+    relogio.avancar(2 * 3_600_000); // 01h30 de 24/09 em SP: o dia 23 é a penúltima marca
+    expect(await diasComRevisao(outro)).toEqual([false, false, false, false, false, true, false]);
   });
 });

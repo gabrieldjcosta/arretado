@@ -104,6 +104,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Hoje, Biblioteca, Calendário, Pendência, Backup | tela provisória `Hoje` (`src/apresentacao/telas/Areas.tsx`); a Biblioteca é `Normas` (`src/apresentacao/biblioteca/Normas.tsx`, 9.5); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
 | Tokens da identidade nova (redesign, fatia 1) | variáveis CSS em `estilos.css`: `--agora` (marca-texto, só o que é agora) com `--agora-texto`, `--depois` (recuado) e `--progresso`; `--primaria` é a sálvia (botão e link); `--fonte-interface` = Atkinson Hyperlegible Next, `--fonte-leitura` = Literata. Conferidos por `scripts/contraste.mjs` |
 | Componentes da fatia 2 (redesign) | `AcaoAgora` (o que fazer agora), `LinhaDepois` ("Depois: …"), `BarraFina` (progresso com texto "3 de 10"), `DiasDaSemana` (janela móvel dos últimos 7 dias), em `src/apresentacao/componentes/`; classe `.flutuante` = botão **+** (celular) |
+| Cota (fatia 3) | `cotaDiaria` (preferência opcional, padrão `COTA_DIARIA_PADRAO` = 10, 5 a 100), `cotaDiaria(preferencias)` em `core/preferencias`; `diasComRevisao(repo, janela = 7)` em `dominios/recall/servico.ts`; "Revisar mais N" no fim do Drill; `SEGUNDOS_POR_CARTAO` (30) na estimativa do início do Recall |
 
 ## 5. Palavras reservadas (D24 e CLAUDE.md)
 

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import type { Preferencias, Tema } from '../../core/modelo';
-import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
+import { COTA_DIARIA_MAX, COTA_DIARIA_MIN, type Preferencias, type Tema } from '../../core/modelo';
+import { alterarPreferencias, cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
@@ -17,12 +17,17 @@ export function AparenciaConta() {
   // Resposta imediata ao toque; a gravação confirma logo depois.
   const [pendentes, setPendentes] = useState<Partial<Preferencias>>({});
   const [falhou, setFalhou] = useState(false);
+  // Texto do campo "Cartões por vez": só grava quando vale (inteiro de 5 a 100).
+  const [cotaTexto, setCotaTexto] = useState<string | null>(null);
   if (!salvas) return <Esqueleto />;
   const dados = { ...salvas, ...pendentes };
 
   const alterar = (
     mudanca: Partial<
-      Pick<Preferencias, 'tema' | 'fonteLeitura' | 'tamanhoFonte' | 'destacarCondicionantesEPrazos'>
+      Pick<
+        Preferencias,
+        'tema' | 'fonteLeitura' | 'tamanhoFonte' | 'destacarCondicionantesEPrazos' | 'cotaDiaria'
+      >
     >,
   ) => {
     setFalhou(false);
@@ -121,6 +126,33 @@ export function AparenciaConta() {
           do leitor.
         </p>
         <LegendaDestaques comTraco />
+      </fieldset>
+      <fieldset>
+        <legend>Recall</legend>
+        <label htmlFor="cota-diaria">Cartões por vez</label>{' '}
+        <input
+          id="cota-diaria"
+          type="number"
+          inputMode="numeric"
+          min={COTA_DIARIA_MIN}
+          max={COTA_DIARIA_MAX}
+          step={1}
+          aria-describedby="cota-dica"
+          value={cotaTexto ?? String(cotaDiaria(dados))}
+          onChange={(e) => {
+            setCotaTexto(e.target.value);
+            const n = Number(e.target.value);
+            if (Number.isInteger(n) && n >= COTA_DIARIA_MIN && n <= COTA_DIARIA_MAX) {
+              alterar({ cotaDiaria: n });
+            }
+          }}
+          onBlur={() => {
+            setCotaTexto(null);
+          }}
+        />
+        <p id="cota-dica" className="dica">
+          De {COTA_DIARIA_MIN} a {COTA_DIARIA_MAX}. Os outros esperam; nada é apagado.
+        </p>
       </fieldset>
     </>
   );

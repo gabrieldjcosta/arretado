@@ -1,7 +1,7 @@
 import { Preferencias } from '../modelo';
 import { Repositorio } from '../persistencia';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { alterarPreferencias, obterPreferencias } from './index';
+import { alterarPreferencias, cotaDiaria, obterPreferencias } from './index';
 
 describe('preferências (1.7)', () => {
   it('nascem com o padrão', async () => {
@@ -41,5 +41,18 @@ describe('preferências (1.7)', () => {
     expect(
       Preferencias.safeParse({ ...ligada, destacarCondicionantesEPrazos: 'sim' }).success,
     ).toBe(false);
+  });
+
+  it('cota diária: ausente é 10, muda sem migração e só aceita inteiros de 5 a 100 (fatia 3)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const antiga = await obterPreferencias(repo);
+    expect(antiga).not.toHaveProperty('cotaDiaria');
+    expect(cotaDiaria(antiga)).toBe(10);
+    const nova = await alterarPreferencias(repo, { cotaDiaria: 25 });
+    expect(cotaDiaria(nova)).toBe(25);
+    for (const ruim of [4, 101, 7.5, '10'])
+      expect(Preferencias.safeParse({ ...nova, cotaDiaria: ruim }).success).toBe(false);
+    expect(Preferencias.safeParse({ ...nova, cotaDiaria: 5 }).success).toBe(true);
+    expect(Preferencias.safeParse({ ...nova, cotaDiaria: 100 }).success).toBe(true);
   });
 });

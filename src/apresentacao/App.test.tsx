@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { obterPreferencias } from '../core/preferencias';
 import { exportarPacote } from '../core/pacote';
 import type { Repositorio } from '../core/persistencia';
 import { repositorioDeTeste } from '../testes/repositorio';
@@ -115,7 +116,6 @@ describe('Conta › Aparência (5.2)', () => {
   it('liga e desliga o destaque automático, com a legenda dos traços (9.8)', async () => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = await abrirApp('/conta/aparencia', repo);
-    const { obterPreferencias } = await import('../core/preferencias');
     const caixa = await screen.findByRole('checkbox', {
       name: 'Destacar prazos, condições, termos absolutos e penas',
     });
@@ -262,5 +262,24 @@ describe('correções da revisão da etapa 5', () => {
     await usuario.click(await screen.findByLabelText('Escuro'));
     expect(await screen.findByRole('alert')).toHaveTextContent(/Não foi possível guardar/);
     expect(screen.getByLabelText('Igual ao aparelho')).toBeChecked();
+  });
+
+  it('Conta › Aparência: "Cartões por vez" grava só valores válidos (fatia 3)', async () => {
+    const { repo } = await repositorioDeTeste();
+    window.location.hash = '#/conta/aparencia';
+    const usuario = userEvent.setup();
+    render(<App abrir={() => Promise.resolve(repo)} />);
+    const campo = await screen.findByLabelText('Cartões por vez');
+    expect(campo).toHaveValue(10);
+    await usuario.clear(campo);
+    await usuario.type(campo, '25');
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).cotaDiaria).toBe(25);
+    });
+    await usuario.clear(campo);
+    await usuario.type(campo, '3');
+    await usuario.tab();
+    expect((await obterPreferencias(repo)).cotaDiaria).toBe(25);
+    expect(campo).toHaveValue(25);
   });
 });

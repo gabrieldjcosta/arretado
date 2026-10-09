@@ -1,27 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
+import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import {
+  contarVencidos,
   filaDoDia,
   revisar,
   suspenderCartao,
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
+import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESPOSTA } from './rotulos';
 
-/** Acima disso, oferece "revisar 20 agora" para a fila não assustar (Parte 2 §10.1). */
-const FILA_GRANDE = 40;
-const LOTE_CURTO = 20;
-
 type Estado =
   | { tipo: 'carregando' }
-  | { tipo: 'escolher'; fila: Cartao[] }
   | { tipo: 'revisando'; fila: Cartao[]; indice: number; virado: boolean }
-  | { tipo: 'fim'; amanha: number }
+  | { tipo: 'fim'; amanha: number; restantes: number; proximoLote: number }
   | { tipo: 'falha' };
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
@@ -32,7 +30,11 @@ async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string>
   return versoEfetivo(cartao, erro);
 }
 
-/** Drill: frente, virar, Errei / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2). */
+/**
+ * Drill: frente, virar, Errei / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2).
+ * Revisa até a cota por vez (fatia 3); o resto da fila espera, sem ser cortado nem reordenado, e o
+ * fim oferece "Revisar mais N".
+ */
 export function Drill() {
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
@@ -43,31 +45,54 @@ export function Drill() {
   const inicio = useRef(0);
   const botaoVirar = useRef<HTMLButtonElement>(null);
 
+  const cota = useRef(0);
+
   const terminar = useCallback(async () => {
     try {
-      setEstado({ tipo: 'fim', amanha: await vencemAmanha(repo) });
+      const [amanha, restantes] = await Promise.all([vencemAmanha(repo), contarVencidos(repo)]);
+      setEstado({
+        tipo: 'fim',
+        amanha,
+        restantes,
+        proximoLote: Math.min(cota.current, restantes),
+      });
     } catch {
       setEstado({ tipo: 'falha' });
     }
   }, [repo]);
 
+  /** Carrega o próximo lote: os mais atrasados primeiro, até a cota. */
+  const iniciarLote = useCallback(
+    (ativo: () => boolean = () => true) => {
+      Promise.all([filaDoDia(repo), obterPreferencias(repo)]).then(
+        ([fila, preferencias]) => {
+          if (!ativo()) return;
+          cota.current = cotaDiaria(preferencias);
+          if (fila.length === 0) void terminar();
+          else {
+            setEstado({
+              tipo: 'revisando',
+              fila: fila.slice(0, cota.current),
+              indice: 0,
+              virado: false,
+            });
+          }
+        },
+        () => {
+          if (ativo()) setEstado({ tipo: 'falha' });
+        },
+      );
+    },
+    [repo, terminar],
+  );
+
   useEffect(() => {
-    let ativo = true;
-    filaDoDia(repo).then(
-      (fila) => {
-        if (!ativo) return;
-        if (fila.length === 0) void terminar();
-        else if (fila.length > FILA_GRANDE) setEstado({ tipo: 'escolher', fila });
-        else setEstado({ tipo: 'revisando', fila, indice: 0, virado: false });
-      },
-      () => {
-        if (ativo) setEstado({ tipo: 'falha' });
-      },
-    );
+    let vivo = true;
+    iniciarLote(() => vivo);
     return () => {
-      ativo = false;
+      vivo = false;
     };
-  }, [repo, terminar]);
+  }, [iniciarLote]);
 
   const atual = estado.tipo === 'revisando' ? estado.fila[estado.indice] : undefined;
 
@@ -154,39 +179,6 @@ export function Drill() {
     );
   }
 
-  if (estado.tipo === 'escolher') {
-    return (
-      <>
-        <h1>Revisar</h1>
-        <p>Há {estado.fila.length} cartões vencidos.</p>
-        <div className="linha-acoes">
-          <button
-            type="button"
-            className="principal"
-            onClick={() => {
-              setEstado({
-                tipo: 'revisando',
-                fila: estado.fila.slice(0, LOTE_CURTO),
-                indice: 0,
-                virado: false,
-              });
-            }}
-          >
-            Revisar {LOTE_CURTO} agora
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setEstado({ tipo: 'revisando', fila: estado.fila, indice: 0, virado: false });
-            }}
-          >
-            Revisar todos
-          </button>
-        </div>
-      </>
-    );
-  }
-
   if (estado.tipo === 'fim') {
     return (
       <>
@@ -199,6 +191,25 @@ export function Drill() {
             </Link>
           }
         >
+          {estado.restantes > 0 && (
+            <>
+              <p>
+                {estado.restantes === 1
+                  ? 'Resta 1 cartão'
+                  : `Restam ${String(estado.restantes)} cartões`}{' '}
+                para hoje. Os outros esperam; nada é apagado.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setEstado({ tipo: 'carregando' });
+                  iniciarLote();
+                }}
+              >
+                Revisar mais {estado.proximoLote}
+              </button>
+            </>
+          )}
           <p>Amanhã: {estado.amanha === 1 ? '1 cartão' : `${String(estado.amanha)} cartões`}.</p>
         </Vazio>
       </>
@@ -209,9 +220,7 @@ export function Drill() {
   return (
     <>
       <h1 className="visualmente-oculto">Revisar</h1>
-      <p className="dica" aria-live="polite">
-        {estado.indice + 1} de {estado.fila.length}
-      </p>
+      <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Cartão" />
       <article className="cartao-bloco cartao-drill" aria-label="Cartão">
         <p className="texto-leitura">{atual.frente}</p>
         {estado.virado && (

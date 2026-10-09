@@ -295,6 +295,35 @@ export async function filaDoDia(repo: Repositorio, maximo = 1_000): Promise<Cart
     );
 }
 
+/**
+ * Os últimos `janela` dias (padrão 7; do mais antigo ao de hoje) em que houve Revisão, pela data
+ * civil local gravada na revisão. Janela móvel: nunca zera na virada da semana. Consulta, não entidade.
+ */
+export async function diasComRevisao(repo: Repositorio, janela = 7): Promise<boolean[]> {
+  const u = repo.ctx.usuarioId;
+  const fim = hoje(repo);
+  const inicio = somarDias(fim, -(janela - 1));
+  const com = new Set<string>();
+  let cursor: string | null = null;
+  scan: do {
+    const p: Pagina<Revisao> = await repo.colecao('revisoes').listarPagina({
+      indice: '[usuarioId+em]',
+      de: [u, ''],
+      ate: [u, '\uffff'],
+      ordem: 'desc',
+      limite: 200,
+      cursor,
+    });
+    for (const r of p.itens) {
+      // Mais recentes primeiro: ao passar do início da janela, nada mais conta.
+      if (r.em < inicio) break scan;
+      if (r.data >= inicio && r.data <= fim) com.add(r.data);
+    }
+    cursor = p.proximoCursor;
+  } while (cursor);
+  return Array.from({ length: janela }, (_, i) => com.has(somarDias(inicio, i)));
+}
+
 export async function contarVencidos(repo: Repositorio): Promise<number> {
   const u = repo.ctx.usuarioId;
   return repo.colecao('cartoes').contar({
