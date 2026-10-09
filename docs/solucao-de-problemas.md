@@ -1030,3 +1030,9 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Causa:** a vírgula fazia lista também com a palavra no singular ("§ 4º, 150"), e o número solto depois de uma citação não era lido como outro artigo.
 - **Solução:** lista com vírgula só com a palavra no plural ("§§", "arts.", "incisos"); no singular, só " e ". Depois de uma cadeia que começa em "arts.", o número solto é artigo implícito; a parte sem artigo colada à citação anterior (" e § 4º") herda o artigo dela. Inciso solto só vale em maiúsculas ("c" é alínea, não o romano 100).
 - **Previsível na UI da 11.9:** o texto que o detector lê é o `chaveDeBusca` do texto exibido (mesmo comprimento), então os índices valem direto na partição do `destacar.ts`; o tachado deve ser trocado por espaços antes (como em `textoParaDestacar`) para não citar redação revogada.
+
+## E2E do tablet estoura 180 s na "estrela" (11.2) só no CI (09/10/2026)
+
+- **Sintoma:** no CI do push (run 221, PR #46), `[tablet] › e2e/leitor.spec.ts:1010 › estrela: estrelar a Seção I propaga…` falhou com `Test timeout of 180000ms exceeded` em `rolarAteExistir` (`scrollIntoViewIfNeeded` esperando `[data-endereco="tit2.cap2.sec1"]`); 191 passaram. O run do PR, no mesmo commit (`de44785`), passou.
+- **Causa:** oscilação sob carga do runner (3 aparelhos, a suíte inteira; o job levou 19 min). O PR só acrescentava um módulo puro, sem tela. Sozinho, o teste passa em 11,5 s no tablet (Chromium do contêiner, 09/10/2026).
+- **Solução:** reexecutar o job; se o mesmo teste falhar de novo no mesmo ponto, tratar como real e investigar `rolarAteExistir` (a Seção I da LEP não chegou ao DOM virtualizado).
