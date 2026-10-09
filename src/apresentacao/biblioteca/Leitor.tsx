@@ -7,8 +7,11 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
   type RefObject,
+  type TouchEvent as ReactTouchEvent,
 } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type { Leitura, Marcacao, TextoDeDispositivo, TipoDispositivo } from '../../core/modelo';
@@ -51,13 +54,17 @@ import {
 import { useEstrelas } from './usarEstrelas';
 import { marcasDoTexto, useMarcacoes } from './usarMarcacoes';
 import {
+  blocosAcima,
   estimarAltura,
+  fimDaUnidade,
   janelasQueCobrem,
   linhaDoNo,
   montarLinhas,
   referenciaDe,
   referenciaDoNo,
   TEXTOS_POR_PEDIDO,
+  unidadeDaLinha,
+  unidadesDeLeitura,
   type LinhaDoLeitor,
 } from './linhas';
 
@@ -96,6 +103,12 @@ const TOQUE_NAS_ACOES = 1500;
  * o celular reabrir a aba que matou no fundo, volta ao modo foco, e o "voltar" do navegador sai dele.
  */
 const PARAMETRO_DO_FOCO = 'foco';
+/** `?foco=artigo` (11.8): o modo foco com um artigo por vez. */
+const VALOR_DO_ARTIGO = 'artigo';
+/** Quanto o dedo precisa andar de lado para virar o artigo, e quanto mais de lado que de cima. */
+const DESLIZE_MINIMO = 70;
+/** Linhas do vizinho que aparecem esmaecidas acima e abaixo do cartão. */
+const LINHAS_DO_VIZINHO = 5;
 
 /** Estado da navegação que entrou no modo foco: sair volta uma entrada no histórico. */
 interface EstadoDoFoco {
@@ -328,13 +341,18 @@ function LeitorAberto({
   const chaveDaRota = rota.key;
   const navegar = useNavigate();
   const modoFoco = busca.has(PARAMETRO_DO_FOCO);
+  // Artigo por artigo (11.8): o modo foco com o cartão de um artigo no lugar da lista.
+  const porArtigo = busca.get(PARAMETRO_DO_FOCO) === VALOR_DO_ARTIGO;
+  const porArtigoAgora = useRef(porArtigo);
 
   // A linha da posição guardada. A primeira linha é o começo: abre no alto da página, com a barra.
-  const [linhaInicial] = useState(() => {
+  // Sair do artigo por artigo volta a lista à posição do artigo (`vez` refaz a volta).
+  const [retorno, setRetorno] = useState<{ linha: number | undefined; vez: number }>(() => {
     const linha = alvo === undefined ? undefined : linhaDoNo(linhasTodas, alvo);
-    return linha === 0 ? undefined : linha;
+    return { linha: linha === 0 ? undefined : linha, vez: 0 };
   });
-  const [voltando, setVoltando] = useState(linhaInicial !== undefined);
+  const linhaInicial = retorno.linha;
+  const [voltando, setVoltando] = useState(linhaInicial !== undefined && !porArtigo);
   const voltandoAgora = useRef(voltando);
 
   // A lista começa abaixo da barra: o virtualizador precisa do deslocamento para achar o que
@@ -394,7 +412,13 @@ function LeitorAberto({
   // até a linha ficar no alto por alguns quadros. Sem posição, abre no começo (a rolagem da
   // Biblioteca viria junto).
   useEffect(() => {
+    if (porArtigo) {
+      // O cartão não tem a lista para voltar: a volta é de quando ela reaparecer.
+      voltandoAgora.current = false;
+      return;
+    }
     if (linhaInicial === undefined) {
+      voltandoAgora.current = false;
       window.scrollTo(0, 0);
       return;
     }
@@ -421,7 +445,45 @@ function LeitorAberto({
     return () => {
       cancelAnimationFrame(quadro);
     };
-  }, [virtualizador, linhaInicial]);
+  }, [virtualizador, linhaInicial, retorno.vez, porArtigo]);
+
+  // Artigo por artigo (11.8). `artigoAtual` é um nó (índice em `nos`); o artigo mostrado é a unidade
+  // que o contém (o título e o capítulo valem o primeiro artigo abaixo deles). Derivado das linhas de
+  // agora, então o filtro (11.3) vale sem conta a mais: o artigo que o filtro escondeu vira o mais
+  // próximo que ficou.
+  const [artigoAtual, setArtigoAtual] = useState(alvo ?? 0);
+  const unidades = useMemo(() => unidadesDeLeitura(linhas, nos), [linhas, nos]);
+  const ordem = useMemo(
+    () => unidadeDaLinha(linhas, unidades, linhaDoNo(linhas, artigoAtual) ?? 0),
+    [linhas, unidades, artigoAtual],
+  );
+  const cartao = useRef<HTMLElement | null>(null);
+  // O dispositivo do artigo mostrado: o "alto da tela" do cartão.
+  const artigoNoAlto = useRef<string | undefined>(undefined);
+  useLayoutEffect(() => {
+    porArtigoAgora.current = porArtigo;
+    const inicio = ordem === undefined ? undefined : unidades[ordem];
+    const no = inicio === undefined ? undefined : linhas[inicio]?.indice;
+    artigoNoAlto.current = no === undefined ? undefined : nos[no]?.dispositivo.id;
+  });
+  // Entrar tira a rolagem da página (o cartão é o que se lê); sair devolve a lista ao artigo que
+  // estava no cartão, com a mesma volta da posição guardada (9.7). Vale também para o "voltar" do
+  // navegador, que muda só a rota. Antes do efeito do modo foco, que respeita a volta em curso.
+  const porArtigoAntes = useRef(porArtigo);
+  useLayoutEffect(() => {
+    const antes = porArtigoAntes.current;
+    porArtigoAntes.current = porArtigo;
+    if (antes && !porArtigo) {
+      const inicio = ordem === undefined ? undefined : unidades[ordem];
+      const linha = inicio ?? linhaDoNo(linhas, artigoAtual);
+      const volta = linha === 0 ? undefined : linha;
+      voltandoAgora.current = volta !== undefined;
+      setVoltando(volta !== undefined);
+      setRetorno((r) => ({ linha: volta, vez: r.vez + 1 }));
+    } else if (!antes && porArtigo) {
+      window.scrollTo(0, 0);
+    }
+  }, [porArtigo, ordem, unidades, linhas, artigoAtual]);
 
   // Modo foco (11.1): a moldura do Shell some (atributo na raiz; ver estilos.css) e o leitor tira a
   // barra dele. A troca muda só o que fica acima da lista, não as linhas (a coluna tem a mesma
@@ -452,7 +514,7 @@ function LeitorAberto({
     caixaDoLeitor.current?.style.removeProperty('--folga-do-foco');
     medir();
     let quadro = 0;
-    if (trocou && !voltandoAgora.current && item !== undefined) {
+    if (trocou && !voltandoAgora.current && item !== undefined && !porArtigoAgora.current) {
       const dentro = alto - item.start;
       if (item.index === 0 && dentro <= 0) {
         // No começo da norma, o começo da página, com a barra do leitor (como a volta da 9.7).
@@ -516,11 +578,25 @@ function LeitorAberto({
     }
   }, [modoFoco, chaveDaRota, estadoDaRota, setBusca, navegar]);
 
+  // Navegação do artigo por artigo (11.8); as funções ficam em refs para o ouvinte de teclado não
+  // ser refeito a cada artigo.
+  const irAoProximo = useRef<() => void>(() => undefined);
+  const irAoAnterior = useRef<() => void>(() => undefined);
   // Atalho: F entra e sai; Esc também sai. Fora de campo de texto e de diálogo aberto (a tecla é
   // deles), sem Ctrl/Alt/Cmd (Ctrl+F é a busca do navegador) e sem repetir com a tecla presa.
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.repeat || teclaForaDosAtalhos(e)) return;
+      if (
+        porArtigo &&
+        (e.key === 'ArrowRight' || e.key === 'ArrowLeft') &&
+        !e.shiftKey &&
+        document.getSelection()?.isCollapsed !== false
+      ) {
+        e.preventDefault();
+        (e.key === 'ArrowRight' ? irAoProximo : irAoAnterior).current();
+        return;
+      }
       if (e.key === TECLA_DA_BUSCA) {
         // Sem o `preventDefault`, a barra iria parar no campo da busca.
         e.preventDefault();
@@ -539,13 +615,13 @@ function LeitorAberto({
     return () => {
       window.removeEventListener('keydown', tecla);
     };
-  }, [modoFoco, alternarFoco]);
+  }, [modoFoco, porArtigo, alternarFoco]);
 
   const visiveis = virtualizador.getVirtualItems();
   const primeiraVisivel = visiveis[0]?.index;
   const ultimaVisivel = visiveis.at(-1)?.index;
   useEffect(() => {
-    if (primeiraVisivel === undefined || ultimaVisivel === undefined) return;
+    if (porArtigo || primeiraVisivel === undefined || ultimaVisivel === undefined) return;
     if (filtro) {
       // Com filtro, as linhas vizinhas na tela podem estar longe na norma: cada uma pede o seu texto
       // (o intervalo entre a primeira e a última leria a norma toda).
@@ -559,10 +635,29 @@ function LeitorAberto({
     const ultima = linhas[ultimaVisivel];
     const fim = ultima?.indiceNome ?? ultima?.indice ?? inicio;
     pedir(inicio - MARGEM_DE_TEXTOS, fim + MARGEM_DE_TEXTOS);
-  }, [primeiraVisivel, ultimaVisivel, linhas, filtro, pedir, tentativa]);
+  }, [porArtigo, primeiraVisivel, ultimaVisivel, linhas, filtro, pedir, tentativa]);
+
+  // Artigo por artigo (11.8): os textos do artigo, dos vizinhos que aparecem esmaecidos e dos blocos
+  // acima dele (o contexto do alto do cartão). Um pedido por unidade: com o filtro, os vizinhos
+  // podem estar longe, e o intervalo entre eles leria a norma toda.
+  useEffect(() => {
+    if (!porArtigo || ordem === undefined) return;
+    for (const o of [ordem - 1, ordem, ordem + 1]) {
+      const inicio = linhas[unidades[o] ?? -1];
+      const ultima = linhas[fimDaUnidade(linhas, unidades, o) - 1];
+      if (inicio && ultima) pedir(inicio.indice, ultima.indiceNome ?? ultima.indice);
+    }
+    const primeira = linhas[unidades[ordem] ?? -1];
+    if (primeira) {
+      for (const bloco of blocosAcima(nos, aberta.indiceDe, primeira.indice))
+        pedir(bloco, bloco + 1);
+    }
+  }, [porArtigo, ordem, unidades, linhas, nos, aberta.indiceDe, pedir, tentativa]);
 
   /** O dispositivo da linha no alto da tela, logo abaixo da barra fixa. */
   const noDoAlto = useCallback((): string | undefined => {
+    // No cartão, o "alto da tela" é o artigo mostrado.
+    if (porArtigoAgora.current) return artigoNoAlto.current;
     const item = virtualizador.getVirtualItemForOffset(
       window.scrollY + barraFixaMedida.current + FOLGA_DO_ALTO,
     );
@@ -578,12 +673,21 @@ function LeitorAberto({
   const gravada = useRef<string | undefined>(undefined);
   const vivo = useRef(true);
   const [falhaAoGravar, setFalhaAoGravar] = useState(false);
+  const agendarGravacao = useRef<() => void>(() => undefined);
+  // Artigo por artigo: a posição é o artigo mostrado, gravada ao parar nele (como a rolagem parada).
+  useEffect(() => {
+    if (!porArtigo || artigoNoAlto.current === undefined) return;
+    posicao.current = artigoNoAlto.current;
+    agendarGravacao.current();
+  }, [porArtigo, ordem, unidades]);
 
   useEffect(() => {
     vivo.current = true;
     rolagem.current = window.scrollY;
     let espera: ReturnType<typeof setTimeout> | undefined;
     const acompanhar = () => {
+      // No cartão a posição é o artigo, e muda quando ele muda (não pela rolagem da página).
+      if (porArtigoAgora.current) return;
       // Saindo da norma, a lista sai da página antes desta limpeza rodar, e a rolagem cortada da
       // tela seguinte ainda chega aqui: a posição seria a primeira linha.
       if (!lista.current) return;
@@ -619,11 +723,16 @@ function LeitorAberto({
     const aoMudarVisibilidade = () => {
       if (document.visibilityState === 'hidden') aoEsconder();
     };
+    agendarGravacao.current = () => {
+      clearTimeout(espera);
+      espera = setTimeout(gravar, ESPERA_PARA_GRAVAR);
+    };
     window.addEventListener('scroll', aoRolar, { passive: true });
     window.addEventListener('pagehide', aoEsconder);
     document.addEventListener('visibilitychange', aoMudarVisibilidade);
     return () => {
       clearTimeout(espera);
+      agendarGravacao.current = () => undefined;
       window.removeEventListener('scroll', aoRolar);
       window.removeEventListener('pagehide', aoEsconder);
       document.removeEventListener('visibilitychange', aoMudarVisibilidade);
@@ -640,20 +749,23 @@ function LeitorAberto({
   const referenciaLidoAte =
     indiceLidoAte === undefined ? '' : referenciaDoNo(nos, aberta.indiceDe, indiceLidoAte);
 
-  function marcarAqui() {
-    const id = noDoAlto();
-    const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
-    if (id === undefined || indice === undefined) return;
+  function marcarLidoAteNo(id: string, indice: number, anunciar: boolean) {
     const antes = lidoAte;
     setLidoAte(id);
     setFalhaAoMarcar(false);
-    setAnuncio(`Lido até ${referenciaDoNo(nos, aberta.indiceDe, indice)}.`);
+    if (anunciar) setAnuncio(`Lido até ${referenciaDoNo(nos, aberta.indiceDe, indice)}.`);
     marcarLidoAte(repo, norma.id, id).catch(() => {
       if (!vivo.current) return;
       setLidoAte(antes);
       setAnuncio('');
       setFalhaAoMarcar(true);
     });
+  }
+  function marcarAqui() {
+    const id = noDoAlto();
+    const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
+    if (id === undefined || indice === undefined) return;
+    marcarLidoAteNo(id, indice, true);
   }
 
   // "Ir ao lido até" e "ir para" da busca (11.6): a linha vai ao alto da tela, logo abaixo da barra
@@ -707,6 +819,8 @@ function LeitorAberto({
     const indice = irDepois.current;
     if (indice === undefined) return;
     irDepois.current = undefined;
+    // No cartão não há rolagem da lista: o artigo é o que a conta das linhas de agora dá.
+    if (porArtigoAgora.current) return;
     const linha = linhaDoNo(linhas, indice);
     if (linha === undefined || linha === 0) window.scrollTo(0, 0);
     else irParaLinha(linha);
@@ -722,11 +836,13 @@ function LeitorAberto({
    * dispositivo e não achá-lo seria pior do que perder o filtro.
    */
   function irAoNo(indice: number): boolean {
+    if (porArtigo) setArtigoAtual(indice);
     if (!visivelNoFiltro(indice)) {
       irDepois.current = indice;
       setFiltro(undefined);
       return true;
     }
+    if (porArtigo) return false;
     const linha = linhaDoNo(linhas, indice);
     if (linha !== undefined) irParaLinha(linha);
     return false;
@@ -737,12 +853,88 @@ function LeitorAberto({
     if (irAoNo(indiceLidoAte)) setAnuncio('Filtro desligado para mostrar onde você parou.');
   }
 
+  // Artigo por artigo (11.8): a frase do artigo para o leitor de tela, e a navegação.
+  const nomeDaUnidade = (o: number) => {
+    const linha = linhas[unidades[o] ?? 0];
+    const no = linha === undefined ? undefined : nos[linha.indice];
+    if (!linha || !no) return '';
+    return referenciaDoNo(nos, aberta.indiceDe, linha.indice) || rotuloTipo(no.dispositivo.tipo, 1);
+  };
+  const fraseDaUnidade = (o: number) =>
+    `${nomeDaUnidade(o)}, ${String(o + 1)} de ${String(unidades.length)}.`;
+  const fraseDoArtigo = (indice: number) => {
+    const o = unidadeDaLinha(linhas, unidades, linhaDoNo(linhas, indice) ?? 0);
+    return o === undefined ? 'Nenhum artigo para ler aqui.' : fraseDaUnidade(o);
+  };
+  const definirArtigoDoAlto = () => {
+    const id = noDoAlto();
+    const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
+    if (indice !== undefined) setArtigoAtual(indice);
+    return indice ?? artigoAtual;
+  };
+  // O botão "Por artigo" / "Texto corrido": de fora do modo foco, entra direto no artigo (uma
+  // entrada no histórico, como o modo foco); dentro dele, troca a rota no lugar, sem empilhar nada.
+  function alternarArtigo() {
+    if (!modoFoco) {
+      if (pedidaNaRota.current === chaveDaRota) return;
+      pedidaNaRota.current = chaveDaRota;
+      const estado: EstadoDoFoco = { entrouNoFoco: true };
+      const indice = definirArtigoDoAlto();
+      setAnuncio(`Artigo por artigo. ${fraseDoArtigo(indice)}`);
+      setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { state: estado });
+    } else if (!porArtigo) {
+      const indice = definirArtigoDoAlto();
+      setAnuncio(`Artigo por artigo. ${fraseDoArtigo(indice)}`);
+      setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { replace: true, state: estadoDaRota });
+    } else {
+      setAnuncio('Modo foco: só o texto.');
+      setBusca({ [PARAMETRO_DO_FOCO]: 'texto' }, { replace: true, state: estadoDaRota });
+    }
+  }
+
+  function irParaUnidade(nova: number) {
+    const linha = linhas[unidades[nova] ?? -1];
+    if (!linha || ordem === undefined || nova === ordem) return;
+    if (nova > ordem) {
+      // Passar ao próximo é ter lido o que ficou para trás: o "lido até" avança sozinho, e só
+      // avança (voltar, ou ir a um artigo já lido, nunca o recua).
+      const saindo = linhas[unidades[ordem] ?? -1]?.indice;
+      const saindoId = saindo === undefined ? undefined : nos[saindo]?.dispositivo.id;
+      if (saindo !== undefined && saindoId !== undefined) {
+        if (indiceLidoAte === undefined || saindo > indiceLidoAte) {
+          marcarLidoAteNo(saindoId, saindo, false);
+        }
+      }
+    }
+    setArtigoAtual(linha.indice);
+    setAnuncio(fraseDaUnidade(nova));
+  }
+  useEffect(() => {
+    irAoProximo.current = () => {
+      if (ordem !== undefined && ordem + 1 < unidades.length) irParaUnidade(ordem + 1);
+    };
+    irAoAnterior.current = () => {
+      if (ordem !== undefined && ordem > 0) irParaUnidade(ordem - 1);
+    };
+  });
+  // Cada artigo novo abre no alto: o cartão e a página voltam ao começo.
+  useEffect(() => {
+    if (!porArtigo) return;
+    if (cartao.current) cartao.current.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }, [porArtigo, ordem]);
+
   // Busca dentro da norma (11.6). O leitor só tem os textos perto da tela: na primeira busca, lê
   // todos os da versão (uma vez por visita). A consulta fica guardada enquanto a norma está aberta.
   const [buscaAberta, setBuscaAberta] = useState(false);
   const [consulta, setConsulta] = useState('');
   const [textosDaBusca, setTextosDaBusca] = useState<TextosDaBusca | undefined>(undefined);
   const [achadoId, setAchadoId] = useState<string | undefined>(undefined);
+  // O achado da busca num artigo longo: o cartão rola até ele.
+  useEffect(() => {
+    if (!porArtigo || achadoId === undefined) return;
+    cartao.current?.querySelector('.achado-da-busca')?.scrollIntoView({ block: 'nearest' });
+  }, [porArtigo, achadoId, ordem]);
   const lerTextosDaBusca = useCallback(() => {
     setTextosDaBusca({ estado: 'carregando' });
     prepararBusca(repo, aberta).then(
@@ -1065,6 +1257,126 @@ function LeitorAberto({
     });
   }
 
+  // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até".
+  function propriedadesDaLinha(linha: LinhaDoLeitor) {
+    const dispositivo = nos[linha.indice]?.dispositivo;
+    const id = dispositivo?.id ?? '';
+    const estado = dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
+    return {
+      className: id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor',
+      'data-estrelada': estado?.estrelado ? '' : undefined,
+      'data-contexto': filtro && !filtro.casados.has(linha.indice) ? '' : undefined,
+    };
+  }
+  function conteudoDaLinha(linha: LinhaDoLeitor) {
+    const dispositivo = nos[linha.indice]?.dispositivo;
+    const id = dispositivo?.id ?? '';
+    const estado = dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
+    return (
+      <>
+        <Dispositivo
+          aberta={aberta}
+          linha={linha}
+          item={textos.get(linha.indice)}
+          nome={linha.indiceNome === undefined ? undefined : textos.get(linha.indiceNome)}
+          expandido={abertos.has(id)}
+          alternar={alternar}
+          destacar={destacar}
+          marcacoes={marcacoes.porDispositivo.get(id)}
+          escolhidaId={escolhidaId}
+          estrela={
+            estado && (
+              <BotaoDaEstrela
+                alvoId={id}
+                alvo={referenciaDoDispositivo(id)}
+                estado={estado}
+                nomeDaOrigem={estado.deId ? referenciaDoDispositivo(estado.deId) : ''}
+              />
+            )
+          }
+        />
+        {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
+      </>
+    );
+  }
+  // O toque no texto (estrela, grifo, marcador de nota) e o teclado nos grifos: um ouvinte só, na
+  // lista ou no cartão.
+  function aoClicarNaLista(e: ReactMouseEvent) {
+    const estrela =
+      e.target instanceof Element ? e.target.closest<HTMLElement>('[data-estrela-de]') : null;
+    if (estrela?.dataset.estrelaDe) {
+      alternarEstrelaDe(estrela.dataset.estrelaDe);
+      return;
+    }
+    if (!escolherNoTexto(e.target, false) && escolhidaId !== undefined) {
+      setEscolhidaId(undefined);
+    }
+  }
+  function aoTeclarNaLista(e: ReactKeyboardEvent) {
+    if ((e.key === 'Enter' || e.key === ' ') && escolherNoTexto(e.target, true)) {
+      e.preventDefault();
+    }
+  }
+
+  // Artigo por artigo (11.8). O vizinho é só uma espiada: as primeiras linhas, esmaecidas e sem
+  // interação (`inert`: nem foco, nem seleção, nem leitor de tela), no tom atenuado das cores.
+  const rotuloDoCartao = ordem === undefined ? '' : nomeDaUnidade(ordem);
+  const contextoDoCartao = useMemo(() => {
+    const primeira = ordem === undefined ? undefined : linhas[unidades[ordem] ?? -1];
+    if (!primeira) return '';
+    return blocosAcima(nos, aberta.indiceDe, primeira.indice)
+      .map((i) => {
+        const rotulo = nos[i]?.dispositivo.rotulo ?? '';
+        const nome = nos[i + 1]?.dispositivo.tipo === 'nome' ? textoDe(textos.get(i + 1)) : '';
+        return [rotulo, nome].filter(Boolean).join(' ');
+      })
+      .filter(Boolean)
+      .join(' › ');
+  }, [ordem, linhas, unidades, nos, aberta.indiceDe, textos]);
+  function vizinho(o: number, lado: 'anterior' | 'seguinte') {
+    const inicio = unidades[o];
+    if (inicio === undefined) return null;
+    const fim = Math.min(fimDaUnidade(linhas, unidades, o), inicio + LINHAS_DO_VIZINHO);
+    return (
+      <div className={`vizinho vizinho-${lado}`} inert>
+        {linhas.slice(inicio, fim).map((linha) => (
+          <div key={linha.indice} className="linha-leitor">
+            <Dispositivo
+              aberta={aberta}
+              linha={linha}
+              item={textos.get(linha.indice)}
+              nome={linha.indiceNome === undefined ? undefined : textos.get(linha.indiceNome)}
+              expandido={false}
+              alternar={alternar}
+              destacar={false}
+              marcacoes={undefined}
+              escolhidaId={undefined}
+              estrela={undefined}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  // Deslizar de lado vira o artigo (celular), mas nunca com um trecho selecionado: o toque que
+  // arrasta a alça da seleção do grifo é da seleção.
+  const toqueInicial = useRef<{ x: number; y: number } | null>(null);
+  function comecouODeslize(e: ReactTouchEvent) {
+    const toque = e.touches[0];
+    toqueInicial.current =
+      toque && e.touches.length === 1 ? { x: toque.clientX, y: toque.clientY } : null;
+  }
+  function terminouODeslize(e: ReactTouchEvent) {
+    const inicio = toqueInicial.current;
+    toqueInicial.current = null;
+    const toque = e.changedTouches[0];
+    if (!inicio || !toque || document.getSelection()?.isCollapsed === false) return;
+    const dx = toque.clientX - inicio.x;
+    const dy = toque.clientY - inicio.y;
+    if (Math.abs(dx) < DESLIZE_MINIMO || Math.abs(dx) < 2 * Math.abs(dy)) return;
+    (dx < 0 ? irAoProximo : irAoAnterior).current();
+  }
+
   // No modo foco, só o texto e o grupo fixo do canto ("Sair do foco" e "Lido até aqui"); a barra
   // do leitor (tamanho do texto, destaques), a legenda e a referência do "lido até" ficam fora.
   // O título continua como cabeçalho da página, só para o leitor de tela.
@@ -1159,71 +1471,85 @@ function LeitorAberto({
           Se continuar, feche as outras abas do Arretado.
         </p>
       )}
-      <div
-        ref={definirLista}
-        className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
-        aria-busy={voltando}
-        style={{ height: virtualizador.getTotalSize() }}
-        onClick={(e) => {
-          const estrela =
-            e.target instanceof Element ? e.target.closest<HTMLElement>('[data-estrela-de]') : null;
-          if (estrela?.dataset.estrelaDe) {
-            alternarEstrelaDe(estrela.dataset.estrelaDe);
-            return;
-          }
-          if (!escolherNoTexto(e.target, false) && escolhidaId !== undefined) {
-            setEscolhidaId(undefined);
-          }
-        }}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && escolherNoTexto(e.target, true)) {
-            e.preventDefault();
-          }
-        }}
-      >
-        {visiveis.map((virtual) => {
-          const linha = linhas[virtual.index];
-          if (!linha) return null;
-          const dispositivo = nos[linha.indice]?.dispositivo;
-          const id = dispositivo?.id ?? '';
-          const estado =
-            dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
-          return (
-            <div
-              key={virtual.key}
-              data-index={virtual.index}
-              ref={virtualizador.measureElement}
-              className={id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor'}
-              data-estrelada={estado?.estrelado ? '' : undefined}
-              data-contexto={filtro && !filtro.casados.has(linha.indice) ? '' : undefined}
-              style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
-            >
-              <Dispositivo
-                aberta={aberta}
-                linha={linha}
-                item={textos.get(linha.indice)}
-                nome={linha.indiceNome === undefined ? undefined : textos.get(linha.indiceNome)}
-                expandido={abertos.has(id)}
-                alternar={alternar}
-                destacar={destacar}
-                marcacoes={marcacoes.porDispositivo.get(id)}
-                escolhidaId={escolhidaId}
-                estrela={
-                  estado && (
-                    <BotaoDaEstrela
-                      alvoId={id}
-                      alvo={referenciaDoDispositivo(id)}
-                      estado={estado}
-                      nomeDaOrigem={estado.deId ? referenciaDoDispositivo(estado.deId) : ''}
-                    />
-                  )
-                }
-              />
-              {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
+      {porArtigo ? (
+        <div
+          key="artigo"
+          ref={definirLista}
+          className="area-artigo"
+          onClick={aoClicarNaLista}
+          onKeyDown={aoTeclarNaLista}
+          onTouchStart={comecouODeslize}
+          onTouchEnd={terminouODeslize}
+        >
+          {ordem === undefined ? (
+            <div role="status" className="aviso">
+              <p>Nenhum artigo para ler por aqui.</p>
+              <p className="dica">
+                {filtro
+                  ? 'O filtro deixou só títulos e capítulos. Mude o filtro ou volte ao texto corrido.'
+                  : 'Esta norma não tem artigos. Volte ao texto corrido.'}
+              </p>
             </div>
-          );
-        })}
-      </div>
+          ) : (
+            <>
+              <NavegacaoDoArtigo
+                rotulo={rotuloDoCartao}
+                posicao={ordem + 1}
+                total={unidades.length}
+                anterior={() => {
+                  irAoAnterior.current();
+                }}
+                proximo={() => {
+                  irAoProximo.current();
+                }}
+              />
+              {vizinho(ordem - 1, 'anterior')}
+              <section
+                ref={cartao}
+                className="cartao-artigo"
+                aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
+                tabIndex={0}
+              >
+                {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
+                {linhas
+                  .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
+                  .map((linha) => (
+                    <div key={linha.indice} {...propriedadesDaLinha(linha)}>
+                      {conteudoDaLinha(linha)}
+                    </div>
+                  ))}
+              </section>
+              {vizinho(ordem + 1, 'seguinte')}
+            </>
+          )}
+        </div>
+      ) : (
+        <div
+          key="lista"
+          ref={definirLista}
+          className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
+          aria-busy={voltando}
+          style={{ height: virtualizador.getTotalSize() }}
+          onClick={aoClicarNaLista}
+          onKeyDown={aoTeclarNaLista}
+        >
+          {visiveis.map((virtual) => {
+            const linha = linhas[virtual.index];
+            if (!linha) return null;
+            return (
+              <div
+                key={virtual.key}
+                data-index={virtual.index}
+                ref={virtualizador.measureElement}
+                {...propriedadesDaLinha(linha)}
+                style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
+              >
+                {conteudoDaLinha(linha)}
+              </div>
+            );
+          })}
+        </div>
+      )}
       {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
           sai (o foco do teclado fica nele). */}
       <div
@@ -1287,6 +1613,8 @@ function LeitorAberto({
               abrirAcoes={abrirAcoes}
               filtro={filtro?.descricao}
               alternarFoco={alternarFoco}
+              porArtigo={porArtigo}
+              alternarArtigo={alternarArtigo}
               marcarAqui={marcarAqui}
             />
           </>
@@ -1368,6 +1696,8 @@ function AcoesDaLeitura({
   abrirAcoes,
   filtro,
   alternarFoco,
+  porArtigo,
+  alternarArtigo,
   marcarAqui,
 }: {
   modoFoco: boolean;
@@ -1378,6 +1708,9 @@ function AcoesDaLeitura({
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   alternarFoco: () => void;
+  /** Artigo por artigo (11.8): o botão troca entre o cartão de um artigo e o texto corrido. */
+  porArtigo: boolean;
+  alternarArtigo: () => void;
   marcarAqui: () => void;
 }) {
   return (
@@ -1414,6 +1747,18 @@ function AcoesDaLeitura({
         Ações
       </button>
       <button
+        type="button"
+        aria-pressed={porArtigo}
+        title={
+          porArtigo
+            ? 'Voltar ao texto corrido, no modo foco'
+            : 'Ler um artigo por vez, com os vizinhos esmaecidos (setas ← e →)'
+        }
+        onClick={alternarArtigo}
+      >
+        Por artigo
+      </button>
+      <button
         ref={botaoDoFoco}
         type="button"
         aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
@@ -1428,6 +1773,50 @@ function AcoesDaLeitura({
         Lido até aqui
       </button>
     </>
+  );
+}
+
+/** Anterior, posição e próximo do artigo por artigo (11.8). Desabilitado só no papel (`aria-disabled`): o foco não some. */
+function NavegacaoDoArtigo({
+  rotulo,
+  posicao,
+  total,
+  anterior,
+  proximo,
+}: {
+  rotulo: string;
+  posicao: number;
+  total: number;
+  anterior: () => void;
+  proximo: () => void;
+}) {
+  return (
+    <nav className="navegacao-artigo" aria-label="Artigo por artigo">
+      <button
+        type="button"
+        aria-disabled={posicao <= 1}
+        aria-keyshortcuts="ArrowLeft"
+        title="Artigo anterior (seta ←)"
+        onClick={anterior}
+      >
+        ← Anterior
+      </button>
+      <p className="posicao-artigo">
+        <strong>{rotulo}</strong>
+        <span>
+          {posicao.toLocaleString('pt-BR')} de {total.toLocaleString('pt-BR')}
+        </span>
+      </p>
+      <button
+        type="button"
+        aria-disabled={posicao >= total}
+        aria-keyshortcuts="ArrowRight"
+        title="Próximo artigo (seta →)"
+        onClick={proximo}
+      >
+        Próximo →
+      </button>
+    </nav>
   );
 }
 

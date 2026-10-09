@@ -3,13 +3,17 @@ import { abrirNorma } from '../../dominios/legislacao/leitor';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
+  blocosAcima,
   estimarAltura,
+  fimDaUnidade,
   janelasQueCobrem,
   linhaDoNo,
   montarLinhas,
   referenciaDe,
   referenciaDoNo,
   TEXTOS_POR_PEDIDO,
+  unidadeDaLinha,
+  unidadesDeLeitura,
 } from './linhas';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
@@ -155,5 +159,44 @@ describe('janelas do leitor (9.6)', () => {
   it('estima a altura pelo tipo e pelo tamanho do texto', () => {
     expect(estimarAltura('artigo', 18)).toBeGreaterThan(estimarAltura('inciso', 18));
     expect(estimarAltura('artigo', 24)).toBeGreaterThan(estimarAltura('artigo', 18));
+  });
+});
+
+describe('unidades do artigo por artigo (11.8)', () => {
+  it('uma unidade por artigo, com o que há abaixo dele; o título não é unidade', async () => {
+    const aberta = await abrir(LEI);
+    const linhas = montarLinhas(aberta.nos);
+    const unidades = unidadesDeLeitura(linhas, aberta.nos);
+    const rotulo = (i: number) => aberta.nos[linhas[i]!.indice]!.dispositivo.rotulo;
+    // O preâmbulo (sem rótulo) é a primeira unidade; o título não é.
+    expect(unidades.map(rotulo)).toEqual([undefined, 'Art. 1º', 'Art. 2º']);
+    expect(fimDaUnidade(linhas, unidades, 1)).toBe(unidades[2]);
+    expect(fimDaUnidade(linhas, unidades, 2)).toBe(linhas.length);
+    // O art. 1º leva o caput, os incisos, a alínea e o § 1º com o inciso dele.
+    expect(unidades[2]! - unidades[1]!).toBe(6);
+  });
+
+  it('acha a unidade de qualquer linha; o título vale o artigo que vem abaixo dele', async () => {
+    const aberta = await abrir(LEI);
+    const linhas = montarLinhas(aberta.nos);
+    const unidades = unidadesDeLeitura(linhas, aberta.nos);
+    const tituloI = linhas.findIndex(
+      (l) => aberta.nos[l.indice]!.dispositivo.rotulo === 'TÍTULO I',
+    );
+    expect(unidadeDaLinha(linhas, unidades, tituloI)).toBe(1);
+    expect(unidadeDaLinha(linhas, unidades, unidades[1]! + 3)).toBe(1);
+    expect(unidadeDaLinha(linhas, unidades, unidades[2]!)).toBe(2);
+    expect(unidadeDaLinha(linhas, unidades, linhas.length - 1)).toBe(2);
+    expect(unidadeDaLinha(linhas, [], 0)).toBeUndefined();
+  });
+
+  it('os blocos acima do artigo, do mais alto ao mais baixo', async () => {
+    const aberta = await abrir(LEI);
+    const art1 = aberta.nos.findIndex((n) => n.dispositivo.rotulo === 'Art. 1º');
+    const acima = blocosAcima(aberta.nos, aberta.indiceDe, art1);
+    expect(acima.map((i) => aberta.nos[i]!.dispositivo.rotulo)).toEqual(['TÍTULO I']);
+    // O parágrafo também enxerga o título, pelo artigo.
+    const par = aberta.nos.findIndex((n) => n.dispositivo.rotulo === '§ 1º');
+    expect(blocosAcima(aberta.nos, aberta.indiceDe, par)).toEqual(acima);
   });
 });

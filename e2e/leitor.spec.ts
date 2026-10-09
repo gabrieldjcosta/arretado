@@ -1259,3 +1259,108 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await expect(page).toHaveURL(/[?&]foco=texto/);
   await naoTemLargura();
 });
+
+test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, anterior e próximo, "lido até" que só avança, e a mesma posição ao sair: LEP compilada (11.8)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  const porArtigo = page.getByRole('button', { name: 'Por artigo' });
+  const areas = page.getByRole('navigation', { name: 'Áreas' });
+  const cartao = (artigo: string) =>
+    page.getByRole('region', { name: new RegExp(`^Art\\. ${artigo}, \\d+ de \\d+$`) });
+  const proximo = page.getByRole('button', { name: /^Próximo/ });
+  const anterior = page.getByRole('button', { name: /^← Anterior/ });
+  const sobra = () =>
+    page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+
+  // Entra com o art. 41 no alto: o cartão é o art. 41 inteiro, sem a moldura e sem a barra.
+  const art41 = page.locator('[data-endereco="art41"]');
+  await rolarAte(page, art41);
+  await alinharNoAlto(page, art41);
+  await porArtigo.click();
+  await expect(page).toHaveURL(/[?&]foco=artigo/);
+  await expect(cartao('41')).toBeVisible();
+  await expect(areas).toBeHidden();
+  await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeHidden();
+  expect(await sobra()).toBe(0);
+  await expect(porArtigo).toHaveAttribute('aria-pressed', 'true');
+  // Os incisos do art. 41 estão no mesmo cartão; o texto dos vizinhos fica fora dele.
+  await expect(cartao('41').locator('[data-endereco="art41.incI"]')).toBeVisible();
+  await expect(cartao('41').locator('[data-endereco="art42"]')).toHaveCount(0);
+
+  // Os vizinhos: o de antes e o de depois, esmaecidos e sem interação.
+  const vizinhos = page.locator('.vizinho');
+  await expect(vizinhos).toHaveCount(2);
+  for (const vizinho of await vizinhos.all()) {
+    await expect(vizinho).toHaveAttribute('inert', '');
+    await expect(vizinho).toBeVisible();
+  }
+  await expect(vizinhos.nth(1)).toContainText('Art. 41-A');
+  await expect(vizinhos.nth(0)).toContainText('Art. 40');
+
+  // O cartão cabe na tela (o artigo longo rola dentro dele), e os botões têm o tamanho do dedo.
+  const caixa = await cartao('41').boundingBox();
+  const janela = page.viewportSize();
+  expect((caixa?.y ?? 0) + (caixa?.height ?? 0)).toBeLessThanOrEqual(janela?.height ?? 0);
+  for (const botao of [anterior, proximo]) {
+    const medidas = await botao.boundingBox();
+    expect(medidas?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect(medidas?.width ?? 0).toBeGreaterThanOrEqual(44);
+  }
+  // O grupo fixo dentro da tela, também no artigo por artigo.
+  await expect(page.getByRole('button', { name: 'Lido até aqui' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeInViewport();
+  await semViolacoes(page);
+
+  // Próximo e anterior por botão e por seta; o "lido até" avança ao passar e nunca recua sozinho.
+  const enderecoDoCartao = () =>
+    page.locator('.cartao-artigo .dispositivo').first().getAttribute('data-endereco');
+  await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBeUndefined();
+  await proximo.click();
+  await expect(cartao('41-A')).toBeVisible();
+  const segundo = (await enderecoDoCartao()) ?? '';
+  expect(segundo).toBe('art41A');
+  await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art41');
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(enderecoDoCartao).not.toBe(segundo);
+  await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe(segundo);
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(enderecoDoCartao).toBe(segundo);
+  await anterior.click();
+  await expect(cartao('41')).toBeVisible();
+  expect((await leituraGravada(page)).lidoAte).toBe(segundo);
+  await expect(
+    page.getByRole('status').filter({ hasText: /^Art\. 41, \d+ de \d+\.$/ }),
+  ).toBeAttached();
+  expect(await sobra()).toBe(0);
+
+  // A posição guardada é o artigo do cartão; recarregar volta a ele.
+  await proximo.click();
+  await expect.poll(enderecoDoCartao).toBe(segundo);
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe(segundo);
+  await page.reload();
+  await expect.poll(enderecoDoCartao).toBe(segundo);
+  await expect(areas).toBeHidden();
+
+  // Sair do foco: o texto corrido volta com o artigo do cartão no alto, e a moldura volta.
+  const noTexto = page.locator(`[data-endereco="${segundo}"]`);
+  await page.getByRole('button', { name: 'Sair do foco' }).click();
+  await expect(areas).toBeVisible();
+  await expect(page).not.toHaveURL(/foco=/);
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
+
+  // "Texto corrido" dentro do modo foco troca no lugar e leva o texto ao artigo do cartão.
+  await page.getByRole('button', { name: 'Modo foco' }).click();
+  await porArtigo.click();
+  await expect.poll(enderecoDoCartao).toBe(segundo);
+  await porArtigo.click();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  await expect(page.getByRole('region', { name: /^Art\./ })).toHaveCount(0);
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
+  info.annotations.push({ type: 'aparelho', description: info.project.name });
+});
