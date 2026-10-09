@@ -1,7 +1,7 @@
 // Pacote v1 (gerado pelo app F0/F1) aberto no app v2 (F2, 9.1): `leituras` entra vazia.
 import { strToU8, unzipSync, zipSync } from 'fflate';
 import { Repositorio, apagarBanco } from '../persistencia';
-import { alterarPreferencias, obterPreferencias } from '../preferencias';
+import { alterarPreferencias, cotaDiaria, obterPreferencias } from '../preferencias';
 import { deBytes } from './bytes';
 import { cifrar } from './cifra';
 import { exportarPacote, hashDoConjunto } from './exportar';
@@ -108,6 +108,21 @@ describe('pacote v1 no app v2 (9.1)', () => {
     expect(preferencias.tamanhoFonte).toBe(22);
     // Ausente é desligado (o leitor lê `?? false`), sem migração.
     expect(preferencias).not.toHaveProperty('destacarCondicionantesEPrazos');
+    origem.repo.fechar();
+    destino.repo.fechar();
+  });
+
+  it('preferências sem `cotaDiaria` (anteriores à fatia 3) restauram, com a cota padrão', async () => {
+    const origem = await comLeitura();
+    const { bytes } = await exportarPacote(origem.repo);
+    const destino = await comLeitura();
+    await alterarPreferencias(destino.repo, { cotaDiaria: 30 });
+    await importar(destino.repo, await comoPacoteV1(bytes), 6);
+    const preferencias = await obterPreferencias(
+      destino.repo.comUsuario(origem.repo.ctx.usuarioId),
+    );
+    expect(preferencias).not.toHaveProperty('cotaDiaria');
+    expect(cotaDiaria(preferencias)).toBe(10);
     origem.repo.fechar();
     destino.repo.fechar();
   });

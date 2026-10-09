@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
-import { criarCartaoDeErro, registrarErro } from '../../dominios/recall/servico';
+import { criarCartaoDeErro, criarCartaoManual, registrarErro } from '../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
@@ -218,5 +218,63 @@ describe('correções da revisão da etapa 6', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Editar cartão' }),
     ).toBeInTheDocument();
+  });
+});
+
+describe('cota e início do Recall (fatia 3)', () => {
+  async function comVencidos(n: number) {
+    const { repo, relogio } = await repositorioDeTeste();
+    for (let i = 1; i <= n; i += 1) {
+      await criarCartaoManual(repo, { frente: `Frente ${String(i)}`, verso: 'v' });
+    }
+    relogio.avancar(86_400_000);
+    return repo;
+  }
+
+  it('início: ação única com a cota, a estimativa, "Hoje: N de V" e o próximo passo', async () => {
+    const repo = await comVencidos(25);
+    const { usuario } = await abrir('/recall', repo);
+    expect(await screen.findByRole('heading', { name: 'Revisar 10 cartões' })).toBeInTheDocument();
+    expect(screen.getByText('cerca de 5 min')).toBeInTheDocument();
+    expect(screen.getByText(/Hoje: 10 de 25/)).toBeInTheDocument();
+    expect(screen.getByText('Nenhum dia nos últimos 7')).toBeInTheDocument();
+    expect(screen.getByText(/Depois:/)).toHaveTextContent('registrar um erro');
+    // Da abertura ao primeiro cartão: 1 toque.
+    await usuario.click(screen.getByRole('link', { name: 'Começar' }));
+    expect(await screen.findByText('1 de 10')).toBeInTheDocument();
+  });
+
+  it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
+    const { repo } = await repositorioDeTeste();
+    await abrir('/recall', repo);
+    expect(await screen.findByRole('heading', { name: 'Registrar um erro' })).toBeInTheDocument();
+    expect(screen.queryByText(/Depois:/)).not.toBeInTheDocument();
+  });
+
+  it('drill: 25 vencidos = 10 + "Revisar mais 10" + 5; nada é cortado nem perdido', async () => {
+    const repo = await comVencidos(25);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    const rodada = async (n: number) => {
+      for (let i = 0; i < n; i += 1) {
+        await screen.findByRole('button', { name: 'Mostrar resposta' });
+        await usuario.keyboard(' ');
+        await screen.findByRole('group', { name: 'Como foi?' });
+        await usuario.keyboard('3');
+      }
+    };
+    expect(await screen.findByText('1 de 10')).toBeInTheDocument();
+    await rodada(10);
+    expect(
+      await screen.findByText('Restam 15 cartões para hoje. Os outros esperam; nada é apagado.'),
+    ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Revisar mais 10' }));
+    expect(await screen.findByText('1 de 10')).toBeInTheDocument();
+    await rodada(10);
+    await usuario.click(await screen.findByRole('button', { name: 'Revisar mais 5' }));
+    expect(await screen.findByText('1 de 5')).toBeInTheDocument();
+    await rodada(5);
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Revisar mais/ })).not.toBeInTheDocument();
+    expect(await repo.colecao('revisoes').contar()).toBe(25);
   });
 });

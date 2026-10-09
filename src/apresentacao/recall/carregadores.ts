@@ -1,11 +1,23 @@
 // Carregadores estáveis (fora dos componentes) para useDados.
 import type { RegistroDe } from '../../core/modelo';
 import type { Pagina, Repositorio } from '../../core/persistencia';
-import { contarVencidos, maiorFilaProjetada, vencemAmanha } from '../../dominios/recall/servico';
+import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
+import {
+  contarVencidos,
+  diasComRevisao,
+  maiorFilaProjetada,
+  vencemAmanha,
+} from '../../dominios/recall/servico';
 
 export async function resumoDoRecall(repo: Repositorio) {
-  const [vencidos, maiorFila] = await Promise.all([contarVencidos(repo), maiorFilaProjetada(repo)]);
-  return { vencidos, maiorFila };
+  const [vencidos, maiorFila, dias, amanha, preferencias] = await Promise.all([
+    contarVencidos(repo),
+    maiorFilaProjetada(repo),
+    diasComRevisao(repo),
+    vencemAmanha(repo),
+    obterPreferencias(repo),
+  ]);
+  return { vencidos, maiorFila, dias, amanha, cota: cotaDiaria(preferencias) };
 }
 
 export const vencidosHoje = (repo: Repositorio) => contarVencidos(repo);

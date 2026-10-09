@@ -1,4 +1,4 @@
-import { expect, test } from './apoio';
+import { expect, semViolacoes, test } from './apoio';
 
 const DIA = 86_400_000;
 
@@ -103,4 +103,54 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await page.getByLabel('Ponto do edital').selectOption({ label: '1 Progressão de regime' });
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Erro registrado.')).toBeVisible();
+});
+
+test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisar mais 10" + 5 (fatia 3)', async ({
+  page,
+}) => {
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  for (let i = 1; i <= 25; i += 1) {
+    await page.goto('/#/recall/cartoes/novo');
+    await page.getByLabel('Frente (pergunta)').fill(`Pergunta ${String(i)}`);
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page).toHaveURL(/#\/recall\/cartoes$/);
+  }
+
+  // Retorno depois de dias sem abrir: a fila acumulada não assusta nem zera nada.
+  await page.clock.setFixedTime(new Date(inicio.getTime() + 5 * DIA));
+  await page.goto('/#/recall');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Revisar 10 cartões' })).toBeVisible();
+  await expect(page.getByText('cerca de 5 min')).toBeVisible();
+  await expect(page.getByText(/Hoje: 10 de 25/)).toBeVisible();
+  await expect(page.getByText('Nenhum dia nos últimos 7')).toBeVisible();
+
+  await semViolacoes(page);
+
+  // Meta da fatia 3: no máximo 2 toques até o primeiro cartão (aqui, 1).
+  await page.getByRole('link', { name: 'Começar' }).click();
+  await expect(page.getByText('1 de 10')).toBeVisible();
+
+  const rodada = async (n: number) => {
+    for (let i = 0; i < n; i += 1) {
+      await page.getByRole('button', { name: 'Mostrar resposta' }).click();
+      await page.getByRole('button', { name: 'Fácil' }).click();
+    }
+  };
+  await rodada(10);
+  await expect(page.getByText(/Restam 15 cartões para hoje/)).toBeVisible();
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Revisar mais 10' }).click();
+  await expect(page.getByText('1 de 10')).toBeVisible();
+  await rodada(10);
+  await page.getByRole('button', { name: 'Revisar mais 5' }).click();
+  await expect(page.getByText('1 de 5')).toBeVisible();
+  await rodada(5);
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Revisar mais/ })).toHaveCount(0);
+
+  await page.goto('/#/recall');
+  await page.reload();
+  await expect(page.getByText('1 dos últimos 7 dias')).toBeVisible();
 });

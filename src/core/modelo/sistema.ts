@@ -133,6 +133,10 @@ export type RelatoDeProblema = z.infer<typeof RelatoDeProblema>;
 export const Tema = z.enum(['sistema', 'claro', 'escuro']);
 export type Tema = z.infer<typeof Tema>;
 
+export const COTA_DIARIA_PADRAO = 10;
+export const COTA_DIARIA_MIN = 5;
+export const COTA_DIARIA_MAX = 100;
+
 export const Preferencias = z.strictObject({
   ...camposComuns,
   tema: Tema,
@@ -144,6 +148,11 @@ export const Preferencias = z.strictObject({
    * desligado, e o registro e o pacote anteriores à 9.8 continuam válidos (sem migração).
    */
   destacarCondicionantesEPrazos: z.boolean().optional(),
+  /**
+   * Cartões por vez no Recall (redesign, fatia 3). Opcional: ausente é 10 (`COTA_DIARIA_PADRAO`); o
+   * registro e o pacote anteriores continuam válidos (sem migração). A fila nunca é cortada.
+   */
+  cotaDiaria: z.int().min(COTA_DIARIA_MIN).max(COTA_DIARIA_MAX).optional(),
   horaFechamento: z
     .string()
     .regex(/^\d{2}:\d{2}$/)
