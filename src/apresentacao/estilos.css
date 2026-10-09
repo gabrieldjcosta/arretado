@@ -1671,3 +1671,80 @@ dialog.dialogo-acoes {
 .shell:has(.leitor) .flutuante {
   display: none;
 }
+
+/* Artigo por artigo (11.8): um cartão iluminado com o artigo inteiro e, acima e abaixo, a espiada
+   esmaecida dos vizinhos. O cartão rola por dentro quando o artigo é longo (a página fica no lugar);
+   sem animação nenhuma, então nada a desligar com prefers-reduced-motion. */
+.area-artigo {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.navegacao-artigo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navegacao-artigo button {
+  min-width: var(--alvo);
+  min-height: var(--alvo);
+}
+
+/* Sem anterior no primeiro e sem próximo no último, mas o foco do teclado não some. */
+.navegacao-artigo button[aria-disabled='true'] {
+  border-style: dashed;
+  color: var(--texto-atenuado);
+  cursor: default;
+}
+
+.posicao-artigo {
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  text-align: center;
+}
+
+.posicao-artigo span {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-atenuado);
+}
+
+.cartao-artigo {
+  max-height: max(16rem, calc(100dvh - 22rem));
+  padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
+}
+
+.contexto-artigo {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--texto-atenuado);
+}
+
+/* A espiada do vizinho: só as primeiras linhas, apagando para o lado de fora do cartão. Todo texto
+   no tom atenuado (AA nos dois temas; o !important vence as cores próprias de rótulo e rubrica). */
+.vizinho {
+  max-height: 6.5rem;
+  padding: 0 1rem;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+}
+
+.vizinho * {
+  color: var(--texto-atenuado) !important;
+}
+
+/* Fora da lista virtualizada, a linha corre no fluxo (na lista ela é posicionada pela rolagem). */
+.cartao-artigo .linha-leitor,
+.vizinho .linha-leitor {
+  position: relative;
+}

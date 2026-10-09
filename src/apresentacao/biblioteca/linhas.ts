@@ -144,3 +144,76 @@ export function referenciaDe(
   const citacao = rotulo.startsWith('Art.') ? 'art.' + rotulo.slice(4) : rotulo;
   return `${citacao}, ${tituloCurto}`;
 }
+
+/**
+ * As unidades do artigo por artigo (11.8): cada uma começa numa linha normativa fora de qualquer
+ * artigo (o artigo, o preâmbulo, a ementa) e vai até a próxima linha de recuo 0 (o próximo artigo ou
+ * um título, capítulo…). Os números são linhas de `linhas`, ou seja, já valem com o filtro.
+ */
+export function unidadesDeLeitura(
+  linhas: readonly LinhaDoLeitor[],
+  nos: readonly NoDaLeitura[],
+): number[] {
+  const inicios: number[] = [];
+  linhas.forEach((linha, i) => {
+    if (linha.recuo === 0 && nos[linha.indice]?.dispositivo.categoria !== 'estrutural') {
+      inicios.push(i);
+    }
+  });
+  return inicios;
+}
+
+/** Onde a unidade `ordem` termina (exclusive): a próxima linha de recuo 0, ou o fim das linhas. */
+export function fimDaUnidade(
+  linhas: readonly LinhaDoLeitor[],
+  unidades: readonly number[],
+  ordem: number,
+): number {
+  const inicio = unidades[ordem];
+  if (inicio === undefined) return 0;
+  for (let i = inicio + 1; i < linhas.length; i++) {
+    if (linhas[i]?.recuo === 0) return i;
+  }
+  return linhas.length;
+}
+
+/**
+ * A unidade que mostra a linha `linha`: a que a contém; um título ou capítulo (que não está em
+ * unidade nenhuma) vale o primeiro artigo abaixo dele, ou o último se não há mais nenhum.
+ * `undefined` se não há unidade (norma sem artigo, ou o filtro só deixou títulos).
+ */
+export function unidadeDaLinha(
+  linhas: readonly LinhaDoLeitor[],
+  unidades: readonly number[],
+  linha: number,
+): number | undefined {
+  if (unidades.length === 0) return undefined;
+  let ordem = -1;
+  for (let i = 0; i < unidades.length; i++) {
+    if ((unidades[i] ?? Infinity) <= linha) ordem = i;
+    else break;
+  }
+  if (ordem >= 0 && linha < fimDaUnidade(linhas, unidades, ordem)) return ordem;
+  return Math.min(ordem + 1, unidades.length - 1);
+}
+
+/**
+ * Os blocos (título, capítulo, seção…) que contêm o nó, do mais alto ao mais baixo: o contexto
+ * discreto do cartão. Índices em `NormaAberta.nos`.
+ */
+export function blocosAcima(
+  nos: readonly NoDaLeitura[],
+  indiceDe: ReadonlyMap<string, number>,
+  indice: number,
+): number[] {
+  const acima: number[] = [];
+  let atual = nos[indice]?.dispositivo.paiId;
+  while (atual !== undefined) {
+    const i = indiceDe.get(atual);
+    const dispositivo = i === undefined ? undefined : nos[i]?.dispositivo;
+    if (i === undefined || !dispositivo) break;
+    if (dispositivo.categoria === 'estrutural') acima.unshift(i);
+    atual = dispositivo.paiId;
+  }
+  return acima;
+}

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
@@ -1277,5 +1277,258 @@ describe('ações por dispositivo (11.5)', () => {
       expect(screen.queryByRole('dialog', { name: /^Ações de / })).toBeNull();
     });
     expect(window.location.hash).toContain('foco=texto');
+  });
+});
+
+describe('leitura artigo por artigo (11.8)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  /** O cartão do artigo mostrado (a região rotulada). */
+  const cartao = (nome: RegExp | string) => screen.findByRole('region', { name: nome });
+  const idDe = async (repo: Repositorio, normaId: string, endereco: string) =>
+    (await abrirNorma(repo, normaId)).nos.find((n) => n.dispositivo.endereco === endereco)!
+      .dispositivo.id;
+
+  it('"Por artigo" mostra o artigo inteiro no cartão e os vizinhos esmaecidos, sem interação', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    expect(screen.queryByRole('region', { name: /^Art\./ })).not.toBeInTheDocument();
+
+    rolarPara(3 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    const secao = await cartao(/^Art\. 1º, \d+ de \d+$/);
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=artigo`);
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+    // O artigo inteiro: caput, incisos, alínea e parágrafo; o contexto discreto no alto.
+    for (const endereco of ['art1', 'art1.incI', 'art1.incII.alA', 'art1.par1']) {
+      expect(
+        within(secao).getByText((_, el) => el?.getAttribute('data-endereco') === endereco),
+      ).toBeTruthy();
+    }
+    expect(within(secao).queryByText(/A jurisdição penal/)).not.toBeInTheDocument();
+    expect(secao.querySelector('.contexto-artigo')).toHaveTextContent(
+      'TÍTULO I DO OBJETO › CAPÍTULO I DA EXECUÇÃO',
+    );
+    // Os vizinhos: o artigo de antes e o de depois, fora do cartão e sem interação.
+    const vizinhos = document.querySelectorAll('.vizinho');
+    expect(vizinhos).toHaveLength(2);
+    for (const v of vizinhos) expect(v).toHaveAttribute('inert');
+    expect(vizinhos[1]).toHaveTextContent(/Art\. 2º\s*A jurisdição penal/);
+    expect(screen.getByRole('button', { name: 'Por artigo' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Tamanho do texto' })).not.toBeInTheDocument();
+  });
+
+  it('anterior e próximo por botão e por seta; o "lido até" avança ao passar e nunca recua sozinho', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const art1 = await idDe(repo, norma.id, 'art1');
+    const art2 = await idDe(repo, norma.id, 'art2');
+    await gravarPosicao(repo, norma.id, art1);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    rolarPara(3 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await cartao(/^Art\. 1º, /);
+    expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBeUndefined();
+
+    const proximo = screen.getByRole('button', { name: /Próximo/ });
+    await usuario.click(proximo);
+    const dois = await cartao(/^Art\. 2º, /);
+    expect(within(dois).getByText(/A jurisdição penal/)).toBeInTheDocument();
+    // Passar ao próximo é ter lido o art. 1º.
+    await waitFor(async () => {
+      expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(art1);
+    });
+    // O foco fica no botão tocado (repetir Enter funciona); o leitor de tela ouve o artigo.
+    expect(proximo).toHaveFocus();
+    expect(document.querySelector('.acoes-leitor [role="status"]')).toHaveTextContent(
+      /^Art\. 2º, \d+ de \d+\.$/,
+    );
+
+    await usuario.keyboard('{ArrowRight}');
+    await cartao(/^Art\. 3º, /);
+    await waitFor(async () => {
+      expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(art2);
+    });
+    // Voltar nunca recua o "lido até".
+    await usuario.keyboard('{ArrowLeft}');
+    await cartao(/^Art\. 2º, /);
+    await usuario.keyboard('{ArrowLeft}');
+    await cartao(/^Art\. 1º, /);
+    expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(art2);
+    // A marca "Lido até aqui" aparece no art. 2º, e o botão do grupo continua marcando o artigo mostrado.
+    await usuario.keyboard('{ArrowRight}');
+    const marcado = await cartao(/^Art\. 2º, /);
+    expect(within(marcado).getByText('Lido até aqui', { selector: 'p' })).toBeInTheDocument();
+    await usuario.keyboard('{ArrowLeft}');
+    await cartao(/^Art\. 1º, /);
+    await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+    await waitFor(async () => {
+      expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(art1);
+    });
+  });
+
+  it('o primeiro e o último têm o botão só no papel; as setas não passam do fim', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art3'));
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    const ultimo = await cartao(/^Art\. 3º, /);
+    expect(screen.getByRole('button', { name: /Próximo/ })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /Anterior/ })).toHaveAttribute(
+      'aria-disabled',
+      'false',
+    );
+    const usuario = userEvent.setup();
+    await usuario.keyboard('{ArrowRight}');
+    expect(await cartao(/^Art\. 3º, /)).toBe(ultimo);
+  });
+
+  it('as setas são do campo de texto e do diálogo; com trecho selecionado, não viram o artigo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    await cartao(/^Art\. 1º, /);
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    const busca = await screen.findByRole('dialog', { name: /Buscar/ });
+    await usuario.type(within(busca).getByRole('searchbox'), 'ab{ArrowRight}{ArrowLeft}');
+    await cartao(/^Art\. 1º, /);
+    await usuario.keyboard('{Escape}');
+    // Com Shift a seta é da seleção; com Ctrl é do navegador.
+    await usuario.keyboard('{Shift>}{ArrowRight}{/Shift}');
+    await cartao(/^Art\. 1º, /);
+    await usuario.keyboard('{Control>}{ArrowRight}{/Control}');
+    await cartao(/^Art\. 1º, /);
+  });
+
+  it('deslizar de lado vira o artigo; para cima e para baixo, ou com trecho selecionado, não', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    await cartao(/^Art\. 1º, /);
+    const area = document.querySelector('.area-artigo')!;
+    const deslizar = (de: [number, number], para: [number, number]) => {
+      fireEvent.touchStart(area, { touches: [{ clientX: de[0], clientY: de[1] }] });
+      fireEvent.touchEnd(area, { changedTouches: [{ clientX: para[0], clientY: para[1] }] });
+    };
+    // Rolar o cartão (mais para cima que de lado) e um toque curto não viram.
+    deslizar([200, 300], [190, 100]);
+    deslizar([200, 300], [160, 300]);
+    expect(screen.getByRole('region', { name: /^Art\. 1º, / })).toBeInTheDocument();
+    // Com o trecho selecionado, o gesto é da seleção.
+    const selecao = document.getSelection()!;
+    selecao.selectAllChildren(screen.getByRole('region', { name: /^Art\. 1º, / }));
+    deslizar([300, 300], [100, 300]);
+    expect(screen.getByRole('region', { name: /^Art\. 1º, / })).toBeInTheDocument();
+    selecao.removeAllRanges();
+    // Da direita para a esquerda é o próximo; da esquerda para a direita, o anterior.
+    deslizar([300, 300], [100, 310]);
+    await cartao(/^Art\. 2º, /);
+    deslizar([100, 300], [300, 290]);
+    await cartao(/^Art\. 1º, /);
+  });
+
+  it('"Texto corrido" troca no lugar e a lista volta ao artigo do cartão; "Sair do foco" também', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const entrada = (window.history.state as { idx?: number } | null)?.idx;
+    rolarPara(3 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await cartao(/^Art\. 1º, /);
+    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    await cartao(/^Art\. 2º, /);
+
+    // Do artigo para o texto corrido: continua no modo foco, rota trocada no lugar.
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
+    });
+    expect(screen.queryByRole('region', { name: /^Art\./ })).not.toBeInTheDocument();
+    expect(await screen.findByText(/A jurisdição penal/)).toBeInTheDocument();
+    expect(document.querySelectorAll('.lista-leitor')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Por artigo' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    // De novo no artigo (o do alto da tela) e fora do modo foco com "Sair do foco".
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await cartao(/^Art\. \d+º, /);
+    await usuario.click(screen.getByRole('button', { name: 'Sair do foco' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
+    });
+    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
+    // Uma entrada só no histórico para o modo foco inteiro (do artigo ao texto e de volta).
+    expect((window.history.state as { idx?: number } | null)?.idx).toBe(entrada);
+  });
+
+  it('a posição guardada é o artigo mostrado, e recarregar no cartão volta a ele', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const art2 = await idDe(repo, norma.id, 'art2');
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    await cartao(/^Art\. 1º, /);
+    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    await cartao(/^Art\. 2º, /);
+    await waitFor(
+      async () => {
+        expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(art2);
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('segue o filtro: só os artigos que ficaram; "Ações" age sobre o artigo do cartão', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 3º' }));
+    await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
+    rolarPara(3 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await cartao(/^Art\. 1º, /);
+
+    // O filtro do leitor vale no cartão: o artigo 1 saiu, o 3 é o único que ficou.
+    await usuario.click(screen.getByRole('button', { name: 'Filtrar' }));
+    const filtro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+    await usuario.click(within(filtro).getByRole('radio', { name: /Só os estrelados/ }));
+    await usuario.click(within(filtro).getByRole('button', { name: 'Mostrar' }));
+    const unico = await cartao(/^Art\. 3º, 1 de 1$/);
+    expect(screen.getByRole('button', { name: /Próximo/ })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /Anterior/ })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(document.querySelectorAll('.vizinho')).toHaveLength(0);
+    expect(within(unico).getByText(/Ao condenado/)).toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Ações' }));
+    expect(await screen.findByRole('dialog', { name: 'Ações de Art. 3º' })).toBeInTheDocument();
   });
 });
