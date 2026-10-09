@@ -62,7 +62,7 @@ test('funciona sem rede depois de carregado', async ({ page, context }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   await context.setOffline(true);
-  await expect(page.getByText('Sem conexão — tudo continua funcionando.')).toBeVisible();
+  await expect(page.getByText('Sem conexão. Tudo continua funcionando.')).toBeVisible();
   await page.getByRole('link', { name: 'Recall' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Recall' })).toBeVisible();
   await page.getByRole('button', { name: 'Relatar problema' }).click();

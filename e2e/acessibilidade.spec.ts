@@ -81,3 +81,39 @@ test('as fontes embutidas carregam (T19)', async ({ page }) => {
   });
   expect(carregadas).toEqual([true, true, true]);
 });
+
+test('casca: barra de áreas por teclado, + flutuante só no celular e atalho E (fatia 2)', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  const largura = page.viewportSize()?.width ?? 1280;
+  const areas = page.getByRole('navigation', { name: 'Áreas' });
+  await expect(areas.getByRole('link')).toHaveText(['Hoje', 'Plano', 'Recall', 'Biblioteca']);
+
+  const caixa = await areas.boundingBox();
+  const altura = page.viewportSize()?.height ?? 0;
+  if (largura < 900) {
+    // Barra inferior (celular e tablet).
+    expect(caixa?.y ?? 0).toBeGreaterThan(altura / 2);
+  } else {
+    expect(caixa?.y ?? 0).toBeLessThan(altura / 2);
+  }
+
+  const mais = page.getByRole('link', { name: 'Novo registro de erro' });
+  if (largura < 700) {
+    await expect(mais).toBeVisible();
+    const m = await mais.boundingBox();
+    // Sem colidir com a barra de baixo.
+    expect((m?.y ?? 0) + (m?.height ?? 0)).toBeLessThanOrEqual(caixa?.y ?? 0);
+  } else {
+    await expect(mais).toBeHidden();
+  }
+
+  // Foco visível na barra: Tab até o primeiro link das áreas.
+  await areas.getByRole('link', { name: 'Recall' }).focus();
+  await expect(areas.getByRole('link', { name: 'Recall' })).toBeFocused();
+
+  await page.keyboard.press('e');
+  await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
+});

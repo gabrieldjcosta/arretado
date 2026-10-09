@@ -302,7 +302,8 @@ p {
   color: var(--texto-atenuado);
 }
 
-@media (max-width: 699px) {
+/* Barra inferior até 899 px (celular e tablet em retrato); o + flutuante só no celular (699 px). */
+@media (max-width: 899px) {
   .areas {
     position: fixed;
     bottom: 0;
@@ -853,8 +854,8 @@ a.item-norma strong {
   box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
 }
 
-@media (max-width: 699px) {
-  /* Acima da navegação das áreas, que no celular fica no rodapé. */
+@media (max-width: 899px) {
+  /* Acima da navegação das áreas, que no celular e no tablet fica no rodapé. */
   .acoes-leitor {
     right: 0.75rem;
     bottom: calc(var(--alvo) + 1.25rem);
@@ -865,6 +866,8 @@ a.item-norma strong {
    ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
    da folga dela, e o grupo fixo desce ao canto. */
 :root[data-modo-foco] .topo,
+:root[data-modo-foco] .areas,
+:root[data-modo-foco] .flutuante,
 :root[data-modo-foco] .faixa-offline,
 :root[data-modo-foco] .rodape {
   display: none;
@@ -1557,4 +1560,114 @@ dialog.dialogo-acoes {
 .erros-vinculados {
   margin: 0;
   padding-left: 1.25rem;
+}
+
+/* ── Redesign, fatia 2: agora / depois, barra fina, dias, + flutuante ──────── */
+
+.acao-agora {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.agora-titulo {
+  margin: 0 0 0.25rem;
+  font-size: 1.3rem;
+}
+
+.agora-marca {
+  background: linear-gradient(transparent 60%, var(--agora) 60%);
+  padding: 0 0.15rem;
+}
+
+.agora-estimativa {
+  margin: 0 0 0.75rem;
+  color: var(--texto-atenuado);
+}
+
+.linha-depois {
+  color: var(--depois);
+  margin: 0 0 1rem;
+}
+
+.barra-fina {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.barra-fina-trilho {
+  flex: 1;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+
+.barra-fina-cheia {
+  display: block;
+  height: 100%;
+  background: var(--progresso);
+}
+
+.barra-fina-texto {
+  color: var(--texto-atenuado);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.dias-da-semana {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--texto-atenuado);
+}
+
+.dias-marcas {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.dia-marca {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  border: 2px solid var(--borda);
+}
+
+.dia-marca.feito {
+  background: var(--progresso);
+  border-color: var(--progresso);
+}
+
+.flutuante {
+  display: none;
+}
+
+@media (max-width: 699px) {
+  .flutuante {
+    display: inline-flex;
+    position: fixed;
+    right: 0.75rem;
+    bottom: calc(var(--alvo) + 1.25rem);
+    z-index: 5;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    font-size: 1.75rem;
+    box-shadow: var(--sombra);
+  }
+
+  /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
+  .acoes-globais .principal {
+    display: none;
+  }
+}
+
+/* O grupo fixo do leitor ocupa o canto do +; o registro continua pelo atalho e pelo cabeçalho. */
+.shell:has(.leitor) .flutuante {
+  display: none;
 }

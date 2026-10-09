@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useConectado } from './conexao';
 
-/** Estado vazio: uma frase e a ação que preenche (Parte 2 §9.1). */
+/** Estado vazio: um convite (o que é este espaço) e a ação que o preenche (Parte 2 §9.1). */
 export function Vazio({
   titulo,
   children,
@@ -50,7 +50,7 @@ export function FaixaOffline() {
   if (conectado) return null;
   return (
     <div className="faixa-offline" role="status">
-      Sem conexão — tudo continua funcionando.
+      Sem conexão. Tudo continua funcionando.
     </div>
   );
 }

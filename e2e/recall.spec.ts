@@ -19,7 +19,7 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
   // Captura em menos de 30 s (Parte 2 §17), pelo botão global.
   const t0 = Date.now();
-  await page.getByRole('link', { name: 'Registrar erro' }).click();
+  await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
   await page.getByRole('button', { name: 'Errei' }).click();
   await page.getByRole('button', { name: 'Salvar' }).click();
@@ -96,7 +96,7 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
 
-  await page.getByRole('link', { name: 'Registrar erro' }).click();
+  await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
   await page.getByRole('button', { name: 'Errei' }).click();
   await page.getByLabel('O que foi').fill('Fração da progressão');
   await page.getByText('Mais detalhes (opcional)').click();

@@ -221,15 +221,13 @@ describe('estados universais (5.6)', () => {
       window.dispatchEvent(new Event('offline'));
     });
     // Espera: sob carga, a assinatura do useSyncExternalStore (efeito) pode chegar depois do evento.
-    expect(await screen.findByText('Sem conexão — tudo continua funcionando.')).toBeInTheDocument();
+    expect(await screen.findByText('Sem conexão. Tudo continua funcionando.')).toBeInTheDocument();
     online.mockReturnValue(true);
     act(() => {
       window.dispatchEvent(new Event('online'));
     });
     await waitFor(() => {
-      expect(
-        screen.queryByText('Sem conexão — tudo continua funcionando.'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Sem conexão. Tudo continua funcionando.')).not.toBeInTheDocument();
     });
   });
 
