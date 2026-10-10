@@ -146,7 +146,13 @@ Entradas e condições que a spec implica e que nenhum teste de tarefa cobriria 
 - [ ] **Passo 1:** reescrever os cenários da 11.1 e da 11.8 para o palco, nos 3 aparelhos: F abre o cartão com a penumbra; só o `⋯` e o fio de progresso na tela; a bandeja abre e fecha; Corrido/Cartão persiste ao recarregar; Esc em duas etapas; axe nos dois temas; abertura do leitor abaixo de 1 s.
 - [ ] **Passo 2:** `npm run check` verde e o E2E dos dois arquivos de leitor nos 3 aparelhos verde.
 - [ ] **Passo 3:** glossário (palco, penumbra, bandeja, linha ativa, lente), `proxima-sessao.md` e `curso-de-acao.md` com a nova ordem (spec §3); registrar T da porta `FonteDoAcervo` em `decisoes-tecnicas.md` só na Peça 3.
-- [ ] **Passo 4:** commit "feat(leitor): palco do modo foco" (com o OK do Gabriel) e PR.
+- [ ] **Passo 4:** commit "feat(leitor): palco do modo foco", push, PR para a `integracao` e merge (fluxo diário, `docs/planos/fluxo-diario.md`).
+
+**Pronto quando (Peça 2):**
+
+- `npm run check` verde.
+- `npx playwright test e2e/leitor.spec.ts` verde em desktop, celular e tablet.
+- No app: `F` abre o cartão em penumbra; só o `⋯` e o fio de progresso ficam na tela; a bandeja abre e fecha; Corrido/Cartão persiste ao recarregar.
 
 ---
 
