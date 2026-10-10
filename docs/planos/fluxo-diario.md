@@ -14,6 +14,11 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 4. Push, PR para a `integracao`, CI verde (`verificar` e os três `e2e`), merge com "Create a merge commit". Cada atividade vira **um** merge commit na `integracao`.
 5. Atualizar `docs/proxima-sessao.md` no próprio branch da atividade.
 
+## Interrupção por limite de uso e retomada
+- O contêiner some junto com o trabalho não enviado: ao perceber que o limite de uso se aproxima, ou a cada bloco de trabalho concluído, o Claude faz `git commit -m "wip: <atividade>"` e push no branch da atividade (o commit `wip:` pula o check; o merge na `integracao` continua exigindo check verde e CI verde).
+- Rotina "Retomar Arretado" (a cada hora, das 7h às 22h de Brasília, sessão nova): se nenhuma sessão de atividade estiver ativa, lê `docs/proxima-sessao.md` e os branches `claude/*` com commit `wip:` ou PR aberto, e continua a atividade parada; se não houver, começa a próxima do plano. Para quando a próxima exige modelo acima do Sonnet médio (tabela do `CLAUDE.md`) e avisa.
+- Sessões de atividade levam a tag `arretado-atividade` (evita duas sessões na mesma atividade).
+
 ## Fim do dia (Gabriel)
 1. `npm run fim-do-dia`: lista os merges da `integracao` ainda fora do `main`.
 2. Validar no app (checklist de cada atividade em "Pronto quando").

@@ -6,6 +6,8 @@ import { mkdirSync } from 'node:fs'
 const entrada = JSON.parse(readFileSync(0, 'utf8'))
 const cmd = String(entrada.tool_input?.command ?? '')
 if (!/\bgit\s+commit\b/.test(cmd)) process.exit(0)
+// Commit de trabalho em andamento ("wip:") salva o progresso sem o check; só vai para a integracao com check verde.
+if (/-m\s+["']wip:/.test(cmd)) process.exit(0)
 
 mkdirSync('.claude/tmp', { recursive: true })
 const r = spawnSync('npm run check > .claude/tmp/check.txt 2>&1', { shell: true })
