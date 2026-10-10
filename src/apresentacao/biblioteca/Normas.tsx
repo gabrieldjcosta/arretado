@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import type { Leitura, Norma, VersaoDeNorma } from '../../core/modelo';
+import type { Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
 import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
@@ -10,12 +10,59 @@ import {
   RascunhoIndisponivel,
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
+import { SEM_DISCIPLINA } from '../../dominios/acervo/agrupar';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { formatarQuando } from '../recall/rotulos';
+import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { referenciaDoNo } from './linhas';
+
+interface ItemDaDisciplina {
+  norma: Norma;
+  subtitulo?: string;
+  /** Endereço do começo do trecho vinculado: a norma abre nele. */
+  trecho?: string;
+}
+
+/** Normas por disciplina (vínculos do acervo); o que não tem vínculo fica em "Sem disciplina". */
+function agruparPorDisciplina(
+  normas: readonly Norma[],
+  vinculos: readonly VinculoDeDisciplina[],
+  nomeDe: ReadonlyMap<string, string>,
+): { titulo: string; itens: ItemDaDisciplina[] }[] {
+  const mapa = new Map<string, ItemDaDisciplina[]>();
+  const pôr = (titulo: string, item: ItemDaDisciplina) => {
+    const lista = mapa.get(titulo);
+    if (lista) lista.push(item);
+    else mapa.set(titulo, [item]);
+  };
+  for (const n of normas) {
+    const seus = vinculos.filter((v) => v.normaId === n.id);
+    if (seus.length === 0) pôr(SEM_DISCIPLINA, { norma: n });
+    for (const v of seus) {
+      const titulo =
+        (v.disciplinaId === undefined ? undefined : nomeDe.get(v.disciplinaId)) ??
+        v.sugestao ??
+        SEM_DISCIPLINA;
+      pôr(titulo, {
+        norma: n,
+        ...(v.subtitulo === undefined ? {} : { subtitulo: v.subtitulo }),
+        ...(v.trecho === undefined ? {} : { trecho: v.trecho.inicioEndereco }),
+      });
+    }
+  }
+  return [...mapa.entries()]
+    .map(([titulo, itens]) => ({ titulo, itens }))
+    .sort((a, b) =>
+      a.titulo === SEM_DISCIPLINA
+        ? 1
+        : b.titulo === SEM_DISCIPLINA
+          ? -1
+          : a.titulo.localeCompare(b.titulo, 'pt-BR'),
+    );
+}
 
 interface Pendente {
   norma: Norma;
@@ -23,16 +70,21 @@ interface Pendente {
 }
 
 async function carregarBiblioteca(repo: Repositorio) {
-  const [normas, pendentes, leituras] = await Promise.all([
+  const [normas, pendentes, leituras, vinculos, disciplinas] = await Promise.all([
     normasPublicadas(repo),
     rascunhosPendentes(repo),
     leiturasPorNorma(repo),
+    repo.colecao('vinculosDisciplina').todosDoUsuario(),
+    repo.colecao('disciplinas').todosDoUsuario(),
   ]);
+  const nomeDe = new Map(disciplinas.map((d) => [d.id, d.nome]));
+  const porDisciplina = agruparPorDisciplina(normas, vinculos, nomeDe);
   const continuar = ultimaLida(normas, leituras);
   return {
     normas,
     pendentes,
     leituras,
+    porDisciplina,
     continuar,
     ponto: continuar && (await pontoDaLeitura(repo, continuar.id, leituras)),
   };
@@ -152,6 +204,7 @@ export function Normas() {
   return (
     <>
       <h1>Biblioteca</h1>
+      <AbasDaBiblioteca atual="norma" />
       {aviso && (
         <p role="status" className="sucesso">
           {aviso}
@@ -202,10 +255,20 @@ export function Normas() {
             </section>
           )}
           {dados.normas.length === 0 ? (
-            <Vazio titulo="Nenhuma norma ainda" acao={importar(true)}>
+            <Vazio
+              titulo="Nenhuma norma ainda"
+              acao={
+                <>
+                  <Link to="/biblioteca/acervo?tudo=1" className="botao principal">
+                    Tudo do edital da DPE-SP
+                  </Link>
+                  {importar(false)}
+                </>
+              }
+            >
               <p>
-                Cole a lei da página do Planalto ou da ALESP: o Arretado separa artigos, parágrafos
-                e incisos para você ler e marcar.
+                Adicione as normas do edital de uma vez, ou cole a lei da página do Planalto ou da
+                ALESP: o Arretado separa artigos, parágrafos e incisos para você ler e marcar.
               </p>
             </Vazio>
           ) : (
@@ -227,25 +290,35 @@ export function Normas() {
                   <h2 id="titulo-normas">Normas</h2>
                   {importar(!dados.continuar)}
                 </div>
-                <ul className="lista-simples">
-                  {dados.normas.map((n) => {
-                    const descricao = descricaoDe(n);
-                    const leitura = dados.leituras.get(n.id);
-                    return (
-                      <li key={n.id}>
-                        <Link className="item-norma" to={`/biblioteca/normas/${n.id}`}>
-                          <strong>{n.tituloCurto}</strong>
-                          {descricao && <span className="dica">{descricao}</span>}
-                          {leitura && (
-                            <span className="dica ultima-leitura">
-                              Última leitura: {formatarQuando(lidaEm(leitura))}
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
+                {dados.porDisciplina.map((g) => (
+                  <section key={g.titulo} aria-label={g.titulo}>
+                    {(g.titulo !== SEM_DISCIPLINA || dados.porDisciplina.length > 1) && (
+                      <h3>{g.titulo}</h3>
+                    )}
+                    <ul className="lista-simples">
+                      {g.itens.map(({ norma: n, subtitulo, trecho }) => {
+                        const descricao = [subtitulo, descricaoDe(n)].filter(Boolean).join(' · ');
+                        const leitura = dados.leituras.get(n.id);
+                        const para = `/biblioteca/normas/${n.id}${
+                          trecho === undefined ? '' : `?ir=${encodeURIComponent(trecho)}`
+                        }`;
+                        return (
+                          <li key={`${n.id}-${trecho ?? ''}`}>
+                            <Link className="item-norma" to={para}>
+                              <strong>{n.tituloCurto}</strong>
+                              {descricao && <span className="dica">{descricao}</span>}
+                              {leitura && (
+                                <span className="dica ultima-leitura">
+                                  Última leitura: {formatarQuando(lidaEm(leitura))}
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ))}
               </section>
             </>
           )}

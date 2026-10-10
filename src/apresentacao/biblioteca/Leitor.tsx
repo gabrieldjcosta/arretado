@@ -167,6 +167,10 @@ export function Leitor() {
 function LeitorDaNorma({ normaId }: { normaId: string }) {
   const repo = useRepositorio();
   const [carga, setCarga] = useState<Carga>({ tipo: 'carregando' });
+  // `?ir=<endereço>` (vínculo do acervo): abre no trecho, sobre a posição guardada. Lido só na entrada.
+  const [irPara] = useState(() =>
+    new URLSearchParams(window.location.hash.split('?')[1]).get('ir'),
+  );
 
   useEffect(() => {
     let ativo = true;
@@ -177,8 +181,14 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
         obterLeitura(repo, normaId).catch((): Leitura | undefined => undefined),
       ]);
       // Dispositivo que esta versão não tem (versão nova, F6): começo, sem erro.
+      const indiceDoTrecho =
+        irPara === null ? -1 : aberta.nos.findIndex((n) => n.dispositivo.endereco === irPara);
       const alvo =
-        leitura?.posicaoId === undefined ? undefined : aberta.indiceDe.get(leitura.posicaoId);
+        indiceDoTrecho >= 0
+          ? indiceDoTrecho
+          : leitura?.posicaoId === undefined
+            ? undefined
+            : aberta.indiceDe.get(leitura.posicaoId);
       const lidoAteId =
         leitura?.lidoAteId !== undefined && aberta.indiceDe.has(leitura.lidoAteId)
           ? leitura.lidoAteId
@@ -210,7 +220,7 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
     return () => {
       ativo = false;
     };
-  }, [repo, normaId]);
+  }, [repo, normaId, irPara]);
 
   if (carga.tipo === 'pronta') return <LeitorAberto repo={repo} {...carga} />;
   return (
