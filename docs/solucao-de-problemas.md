@@ -1052,3 +1052,9 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Sintoma 3 (lint):** `react-hooks/set-state-in-effect` ao pôr "carregando" dentro do `useEffect` que lê o alvo da prévia. **Solução:** quem abre a prévia zera os dados (`setDadosDaPrevia(undefined)`) e `undefined` já é "Carregando…"; o efeito só grava o resultado, num `then`.
 - **Sintoma 4 (sessão na nuvem):** `npx vitest` tenta instalar o `vitest@5` e falha com "Cannot find package 'vite'". **Causa:** `node_modules` ausente no contêiner novo. **Solução:** `npm ci` antes de qualquer comando (sem rodar `npx` solto, que baixa versão errada).
 - **Previsível na fatia 4:** (1) a citação é `span role="button"` dentro de `<p>`: se a régua ou o "Continuar leitura" mexerem na largura, a folha inferior não depende disso, mas o balão do desktop é fixo no canto (não ancorado); ancorar à citação exige posição medida e o `Dialogo` nativo não tem âncora. (2) Remissão a outra norma (CP, CPP na LEP) e "citado por" ficam para depois do portão.
+
+### Push de tag falha nas sessões remotas
+- **Sintoma:** `send-pack: unexpected disconnect while reading sideband packet` ao dar `git push origin <tag>`; o hook `backup-diario` dizia "criada só localmente".
+- **Causa:** o proxy das sessões remotas derruba o push de tag; push de branch funciona.
+- **Solução:** o backup diário é o branch `backup/AAAA-MM-DD` (`git push origin origin/main:refs/heads/backup/AAAA-MM-DD`), não tag.
+- **Origem:** encontrado em 10/10/2026, no primeiro dia do fluxo diário.
