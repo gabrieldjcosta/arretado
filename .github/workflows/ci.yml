@@ -3,7 +3,7 @@ name: CI
 # Push só no main: nos demais branches o evento do PR já cobre, e rodar os dois dobrava o tempo.
 on:
   push:
-    branches: [main]
+    branches: [main, integracao]
   pull_request:
 
 permissions:

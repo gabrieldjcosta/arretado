@@ -23,7 +23,8 @@
     "carga": "vitest run --project carga",
     "corpus": "node scripts/corpus-normas.mjs",
     "corpus:colar": "node scripts/corpus-colar.mjs",
-    "corpus:gabarito": "node scripts/corpus-gabarito.mjs"
+    "corpus:gabarito": "node scripts/corpus-gabarito.mjs",
+    "fim-do-dia": "node scripts/fim-do-dia.mjs"
   },
   "dependencies": {
     "@fontsource-variable/literata": "^5.3.0",
