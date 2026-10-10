@@ -1,5 +1,8 @@
 import { HashRouter, Route, Routes } from 'react-router';
 import type { Repositorio } from '../core/persistencia';
+import type { FonteDoAcervo } from '../dominios/acervo/fonte';
+import { Acervo } from './biblioteca/Acervo';
+import { ProvedorFonteAcervo } from './dados/fonteAcervo';
 import { Importar } from './biblioteca/Importar';
 import { Leitor } from './biblioteca/Leitor';
 import { Normas } from './biblioteca/Normas';
@@ -23,38 +26,47 @@ import { Plano } from './plano/Plano';
 import { Hoje, NaoEncontrada } from './telas/Areas';
 import './estilos.css';
 
-export function App({ abrir }: { abrir?: () => Promise<Repositorio> }) {
+export function App({
+  abrir,
+  fonteAcervo,
+}: {
+  abrir?: () => Promise<Repositorio>;
+  fonteAcervo?: FonteDoAcervo;
+}) {
   return (
     <ProvedorRepositorio {...(abrir ? { abrir } : {})}>
-      <HashRouter>
-        <Routes>
-          <Route element={<Shell />}>
-            <Route index element={<Hoje />} />
-            <Route path="plano" element={<Plano />} />
-            <Route path="recall" element={<RecallInicio />}>
-              <Route index element={<ListaErros />} />
-              <Route path="frases" element={<ListaFrases />} />
-              <Route path="cartoes" element={<ListaCartoes />} />
-              <Route path="historico" element={<Historico />} />
+      <ProvedorFonteAcervo fonte={fonteAcervo}>
+        <HashRouter>
+          <Routes>
+            <Route element={<Shell />}>
+              <Route index element={<Hoje />} />
+              <Route path="plano" element={<Plano />} />
+              <Route path="recall" element={<RecallInicio />}>
+                <Route index element={<ListaErros />} />
+                <Route path="frases" element={<ListaFrases />} />
+                <Route path="cartoes" element={<ListaCartoes />} />
+                <Route path="historico" element={<Historico />} />
+              </Route>
+              <Route path="recall/registrar" element={<RegistrarErro />} />
+              <Route path="recall/revisar" element={<Drill />} />
+              <Route path="recall/erros/:id" element={<DetalheErro />} />
+              <Route path="recall/cartoes/:id" element={<EditarCartao />} />
+              <Route path="biblioteca" element={<Normas />} />
+              <Route path="biblioteca/acervo" element={<Acervo />} />
+              {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
+              <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
+              <Route path="biblioteca/normas/:normaId" element={<Leitor />} />
+              <Route path="conta" element={<Conta />} />
+              <Route path="conta/aparencia" element={<AparenciaConta />} />
+              <Route path="conta/dados" element={<Dados />} />
+              <Route path="conta/privacidade" element={<Privacidade />} />
+              <Route path="orientacoes" element={<Orientacoes />} />
+              <Route path="orientacoes/:secao" element={<Orientacoes />} />
+              <Route path="*" element={<NaoEncontrada />} />
             </Route>
-            <Route path="recall/registrar" element={<RegistrarErro />} />
-            <Route path="recall/revisar" element={<Drill />} />
-            <Route path="recall/erros/:id" element={<DetalheErro />} />
-            <Route path="recall/cartoes/:id" element={<EditarCartao />} />
-            <Route path="biblioteca" element={<Normas />} />
-            {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
-            <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
-            <Route path="biblioteca/normas/:normaId" element={<Leitor />} />
-            <Route path="conta" element={<Conta />} />
-            <Route path="conta/aparencia" element={<AparenciaConta />} />
-            <Route path="conta/dados" element={<Dados />} />
-            <Route path="conta/privacidade" element={<Privacidade />} />
-            <Route path="orientacoes" element={<Orientacoes />} />
-            <Route path="orientacoes/:secao" element={<Orientacoes />} />
-            <Route path="*" element={<NaoEncontrada />} />
-          </Route>
-        </Routes>
-      </HashRouter>
+          </Routes>
+        </HashRouter>
+      </ProvedorFonteAcervo>
     </ProvedorRepositorio>
   );
 }
