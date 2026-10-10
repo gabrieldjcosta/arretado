@@ -3,7 +3,7 @@ import { strToU8, unzipSync, zipSync } from 'fflate';
 import { camposMinimos } from '../modelo/fabrica';
 import { Repositorio, VERSAO_ESQUEMA } from '../persistencia';
 import { deBytes } from './bytes';
-import { exportarPacote } from './exportar';
+import { exportarPacote, hashDoConjunto } from './exportar';
 import { PacoteRecusado, type Manifesto } from './formato';
 import { aplicar, planejar, type ModoEscrita } from './importar';
 import { lerPacote } from './ler';
@@ -11,10 +11,15 @@ import { lerPacote } from './ler';
 const nomeBanco = () => `v2-${Math.random().toString(36).slice(2)}`;
 
 /** Troca a `versaoEsquema` do manifesto (o resto do formato é o mesmo entre a v2 e a v3). */
-function comVersao(bytes: Uint8Array, versaoEsquema: number): Uint8Array {
+async function comVersao(bytes: Uint8Array, versaoEsquema: number): Promise<Uint8Array> {
   const a = unzipSync(bytes);
   const m = JSON.parse(deBytes(a['manifesto.json']!)) as Manifesto;
   m.versaoEsquema = versaoEsquema;
+  // Coleção nascida depois (v4) não existia no pacote v2.
+  delete a['dados/vinculosDisciplina.json'];
+  Reflect.deleteProperty(m.arquivos, 'dados/vinculosDisciplina.json');
+  Reflect.deleteProperty(m.contagens, 'vinculosDisciplina');
+  m.hashConjunto = await hashDoConjunto(m.arquivos);
   a['manifesto.json'] = strToU8(JSON.stringify(m));
   return zipSync(a);
 }
@@ -62,8 +67,7 @@ describe('pacote v2 no app v3 (8.10)', () => {
     const { repo, novo } = await comVetados();
     const { bytes } = await exportarPacote(repo);
     const lido = await lerPacote(bytes);
-    expect(VERSAO_ESQUEMA).toBe(3);
-    expect(lido.manifesto.versaoEsquema).toBe(3);
+    expect(lido.manifesto.versaoEsquema).toBe(VERSAO_ESQUEMA);
     const status = lido.registros.get('dispositivos')?.find((d) => d.id === novo?.id)?.status;
     expect(status).toBe('vetado');
     repo.fechar();
@@ -73,7 +77,7 @@ describe('pacote v2 no app v3 (8.10)', () => {
     // O app v2 não tinha o valor: o pacote dele só traz o vetado gravado como vigente.
     const origem = await comVetados({ comVetado: false });
     const { bytes } = await exportarPacote(origem.repo);
-    const v2 = comVersao(bytes, 2);
+    const v2 = await comVersao(bytes, 2);
     expect((await lerPacote(v2)).manifesto.versaoEsquema).toBe(2);
     const destino = await comVetados();
     await importar(destino.repo, v2, 6);
@@ -101,7 +105,7 @@ describe('pacote v2 no app v3 (8.10)', () => {
       status: 'vetado',
       confianca: 'alta',
     });
-    await importar(repo, comVersao(bytes, 2), 2);
+    await importar(repo, await comVersao(bytes, 2), 2);
     expect((await repo.colecao('dispositivos').obter(novo.id))?.status).toBe('vetado');
     expect((await repo.colecao('dispositivos').obter(antigo.id))?.status).toBe('vigente');
     repo.fechar();
@@ -111,7 +115,7 @@ describe('pacote v2 no app v3 (8.10)', () => {
     // Assim o app v2 recusa o pacote v3: pela versão, não pelo primeiro `vetado` (arquivo alterado).
     const { repo } = await comVetados();
     const { bytes } = await exportarPacote(repo);
-    const erro = await lerPacote(comVersao(bytes, VERSAO_ESQUEMA + 1)).catch((e: unknown) => e);
+    const erro = await lerPacote(await comVersao(bytes, VERSAO_ESQUEMA + 1)).catch((e: unknown) => e);
     expect(erro).toBeInstanceOf(PacoteRecusado);
     expect((erro as PacoteRecusado).motivo).toBe('versao_posterior');
     repo.fechar();
