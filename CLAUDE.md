@@ -11,9 +11,10 @@ Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (
 Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Ordem das etapas: `docs/planos/curso-de-acao.md` (só a tabela da linha do tempo). Leitura sob demanda, só a seção que a tarefa pede:
 1. `docs/especificacao-parte1.md` §19 — decisões D1–D24 (não reabrir sem motivo explícito do Gabriel); §5 e §15 — modelo de dados e fases.
 2. `docs/especificacao-parte2.md` §10.6 — Legislação (regras do estruturador, leitor, editor), ao tocar nesse módulo.
-3. `docs/planos/F2.md` — só a etapa em execução, os "Fatos das fontes" e a rotina de pronto, ao trabalhar na F2.
-4. `docs/glossario.md` — vocabulário → identificadores de código, ao criar ou renomear entidade, evento, pasta ou termo.
-5. `docs/solucao-de-problemas.md` — sintomas, causas e soluções conhecidas; consultar ao topar com falha, antes de investigar do zero.
+3. `docs/superpowers/specs/2026-10-10-acervo-sumulas-teses-design.md` e o plano ao lado (`plans/`) — só ao trabalhar no programa do acervo, das súmulas e das teses, ou na estrela discreta e no palco do foco.
+4. `docs/planos/F2.md` — só a etapa em execução, os "Fatos das fontes" e a rotina de pronto, ao trabalhar na F2.
+5. `docs/glossario.md` — vocabulário → identificadores de código, ao criar ou renomear entidade, evento, pasta ou termo.
+6. `docs/solucao-de-problemas.md` — sintomas, causas e soluções conhecidas; consultar ao topar com falha, antes de investigar do zero.
 
 ## Economia de contexto (meta: cada sessão em até ~200 mil tokens)
 - Uma sessão por atividade ou por pequeno grupo de atividades do plano. Ao fechar o bloco: atualizar `docs/proxima-sessao.md`, fazer o commit (se autorizado) e avisar o Gabriel para abrir sessão nova, em vez de seguir numa conversa longa.
