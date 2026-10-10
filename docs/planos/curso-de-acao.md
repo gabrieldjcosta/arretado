@@ -6,6 +6,12 @@ Decidido com o Gabriel em 09/10/2026. Junta a F2 em execução, o redesign ([`re
 
 Primeiro a cara nova (cores, fontes, casca), depois a leitura artigo por artigo, depois o Recall em 1 toque; o resto da F2 e a F3 vêm em seguida; só depois da F3 outras pessoas testam, e só depois disso se decide cobrar.
 
+## Atualização de 10/10/2026 — programa do acervo (vale no lugar das linhas 7, 10 e 12 da linha do tempo)
+
+Decidido com o Gabriel em 10/10/2026. Desenho: [`superpowers/specs/2026-10-10-acervo-sumulas-teses-design.md`](../superpowers/specs/2026-10-10-acervo-sumulas-teses-design.md). Plano: [`superpowers/plans/2026-10-10-acervo-sumulas-teses-plano.md`](../superpowers/plans/2026-10-10-acervo-sumulas-teses-plano.md). A reconferência dos gabaritos deixa de ser etapa e vira **rotina de estudo** (o Gabriel lê e registra erro pelo registro de erro da plataforma). A etapa 12 (importar por URL) e a atualização pelo aparelho (6b) ficam depois.
+
+Ordem, cada item um branch e um PR: **1** estrela discreta; **2** palco do modo foco; **3** acervo de normas com disciplinas (sobe o esquema v3 para v4: backup antes do merge); **fatia 5 do redesign** (Conta e acabamento; a primeira experiência usa o acervo); **4** súmulas; **5** teses; **6** atualização 6a (versão nova vinda do acervo). Depois, como já estava: etapa 12 e 6b, etapa 10 e 11.7, `/code-review` das etapas 8, 9 e 11, etapa 13 e portão da F2, F3, validação, F4 e decisão de cobrar.
+
 ## As próximas 3 etapas (em linguagem simples)
 
 **Em destaque: Etapa A — cores e fontes novas.**

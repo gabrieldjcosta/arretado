@@ -25,6 +25,7 @@ import { alterarPreferencias, obterPreferencias } from '../../core/preferencias'
 import type { Repositorio } from '../../core/persistencia';
 import { prepararBusca } from '../../dominios/legislacao/busca';
 import { arvoreDaEstrela, estrelavel } from '../../dominios/legislacao/estrelas';
+import { mostrarBotaoDaEstrela } from './botaoDaEstrela';
 import {
   aplicarFiltro,
   nomeDoCriterio,
@@ -332,9 +333,10 @@ function LeitorAberto({
   // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é desligado.
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
   const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
-  // Régua de leitura (fatia 4): a linha sob o dedo, o cursor ou o foco recebe o realce.
+  // Linha ativa (peça 1): a que está sob o dedo, o cursor ou o foco. Mostra o botão da estrela e,
+  // com a régua de leitura ligada (fatia 4), recebe o realce.
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;
-  const [reguaId, setReguaId] = useState<string | null>(null);
+  const [linhaAtivaId, setLinhaAtivaId] = useState<string | null>(null);
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   // O que o leitor de tela ouve (role=status): o "lido até" marcado e a troca do modo foco.
   const [anuncio, setAnuncio] = useState('');
@@ -593,6 +595,8 @@ function LeitorAberto({
   // ser refeito a cada artigo.
   const irAoProximo = useRef<() => void>(() => undefined);
   const irAoAnterior = useRef<() => void>(() => undefined);
+  // S estrela a linha ativa (peça 1); devolve se agiu.
+  const estrelarAtivaAgora = useRef<() => boolean>(() => false);
   // Atalho: F entra e sai; Esc também sai. Fora de campo de texto e de diálogo aberto (a tecla é
   // deles), sem Ctrl/Alt/Cmd (Ctrl+F é a busca do navegador) e sem repetir com a tecla presa.
   useEffect(() => {
@@ -612,6 +616,10 @@ function LeitorAberto({
         // Sem o `preventDefault`, a barra iria parar no campo da busca.
         e.preventDefault();
         abrirBuscaAgora.current();
+        return;
+      }
+      if (e.key.toLowerCase() === 's') {
+        if (estrelarAtivaAgora.current()) e.preventDefault();
         return;
       }
       if (e.key === 'Escape' && cancelarMarcacaoAgora.current()) {
@@ -1220,12 +1228,34 @@ function LeitorAberto({
     });
   }
 
+  useEffect(() => {
+    estrelarAtivaAgora.current = () => {
+      if (linhaAtivaId === null) return false;
+      const indice = aberta.indiceDe.get(linhaAtivaId);
+      const no = indice === undefined ? undefined : nos[indice];
+      if (!no || !estrelavel(no.dispositivo)) return false;
+      alternarEstrelaDe(linhaAtivaId);
+      return true;
+    };
+  });
+
   // Filtros (11.3): a lista mostra só o que casa e o contexto. Aplicar guarda o resultado (não
   // recalcula a cada estrela, para o artigo não sumir sob o dedo); "Atualizar" refaz a conta.
   const [filtroAberto, setFiltroAberto] = useState(false);
   // Ações por dispositivo (11.5): agem no dispositivo do alto da tela, ou, sem texto nele (um
   // título, um capítulo), no primeiro com texto logo abaixo, que é o que está à vista.
   const [alvoDasAcoes, setAlvoDasAcoes] = useState<AlvoDasAcoes | undefined>(undefined);
+  const noDasAcoes = alvoDasAcoes && aberta.indiceDe.get(alvoDasAcoes.dispositivoId);
+  const dispositivoDasAcoes = noDasAcoes === undefined ? undefined : nos[noDasAcoes]?.dispositivo;
+  const estrelaDasAcoes =
+    alvoDasAcoes && dispositivoDasAcoes && estrelavel(dispositivoDasAcoes)
+      ? {
+          estrelado: estrelas.estados.get(alvoDasAcoes.dispositivoId)?.estrelado ?? false,
+          alternar: () => {
+            alternarEstrelaDe(alvoDasAcoes.dispositivoId);
+          },
+        }
+      : undefined;
   function abrirAcoes() {
     const id = noDoAlto() ?? posicao.current;
     const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
@@ -1353,8 +1383,9 @@ function LeitorAberto({
       className: id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor',
       'data-estrelada': estado?.estrelado ? '' : undefined,
       'data-contexto': filtro && !filtro.casados.has(linha.indice) ? '' : undefined,
-      'data-linha-id': reguaLigada && id !== '' ? id : undefined,
-      'data-regua': reguaLigada && id !== '' && id === reguaId ? '' : undefined,
+      'data-linha-id': id === '' ? undefined : id,
+      'data-estrela-origem': estado?.origem,
+      'data-regua': reguaLigada && id !== '' && id === linhaAtivaId ? '' : undefined,
     };
   }
   function conteudoDaLinha(linha: LinhaDoLeitor) {
@@ -1375,7 +1406,8 @@ function LeitorAberto({
           escolhidaId={escolhidaId}
           resolverRemissoes={resolverRemissoes}
           estrela={
-            estado && (
+            estado &&
+            mostrarBotaoDaEstrela(estado, id === linhaAtivaId) && (
               <BotaoDaEstrela
                 alvoId={id}
                 alvo={referenciaDoDispositivo(id)}
@@ -1391,10 +1423,10 @@ function LeitorAberto({
   }
   // O toque no texto (estrela, grifo, marcador de nota) e o teclado nos grifos: um ouvinte só, na
   // lista ou no cartão.
-  function moverRegua(e: { target: EventTarget }) {
-    if (!reguaLigada || !(e.target instanceof Element)) return;
+  function ativarLinha(e: { target: EventTarget }) {
+    if (!(e.target instanceof Element)) return;
     const id = e.target.closest<HTMLElement>('.linha-leitor')?.dataset.linhaId;
-    if (id) setReguaId(id);
+    if (id) setLinhaAtivaId(id);
   }
 
   function aoClicarNaLista(e: ReactMouseEvent) {
@@ -1592,8 +1624,8 @@ function LeitorAberto({
           className="area-artigo"
           onClick={aoClicarNaLista}
           onKeyDown={aoTeclarNaLista}
-          onPointerOver={moverRegua}
-          onFocus={moverRegua}
+          onPointerOver={ativarLinha}
+          onFocus={ativarLinha}
           onTouchStart={comecouODeslize}
           onTouchEnd={terminouODeslize}
         >
@@ -1668,8 +1700,8 @@ function LeitorAberto({
           style={{ height: virtualizador.getTotalSize() }}
           onClick={aoClicarNaLista}
           onKeyDown={aoTeclarNaLista}
-          onPointerOver={moverRegua}
-          onFocus={moverRegua}
+          onPointerOver={ativarLinha}
+          onFocus={ativarLinha}
         >
           {visiveis.map((virtual) => {
             const linha = linhas[virtual.index];
@@ -1797,6 +1829,7 @@ function LeitorAberto({
       />
       <AcoesDoDispositivo
         alvo={alvoDasAcoes}
+        estrela={estrelaDasAcoes}
         aoFechar={() => {
           setAlvoDasAcoes(undefined);
         }}
