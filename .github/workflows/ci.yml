@@ -1,7 +1,9 @@
 name: CI
 
+# Push só no main: nos demais branches o evento do PR já cobre, e rodar os dois dobrava o tempo.
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -25,11 +27,27 @@ jobs:
       - run: npm run check
       - run: npm run carga
       - run: npm run build
+
+  # Um job por aparelho, em paralelo: a suíte inteira numa fila só passou de 20 minutos.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        aparelho: [desktop, celular, tablet]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npx playwright test --project=${{ matrix.aparelho }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.aparelho }}
           path: test-results/
           retention-days: 7
