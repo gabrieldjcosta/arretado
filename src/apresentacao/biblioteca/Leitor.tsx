@@ -41,7 +41,9 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
+import { BarraFina } from '../componentes/BarraFina';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
+import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
@@ -513,7 +515,7 @@ function LeitorAberto({
   useLayoutEffect(() => {
     const raiz = document.documentElement;
     // `data-modo-foco` na raiz esconde a moldura do Shell (barra fixa, navegação, rodapé).
-    if (modoFoco) raiz.dataset.modoFoco = 'texto';
+    if (modoFoco) raiz.dataset.modoFoco = porArtigo ? 'artigo' : 'texto';
     const trocou = focoAntes.current !== modoFoco;
     focoAntes.current = modoFoco;
     if (devolverFoco.current) {
@@ -560,7 +562,7 @@ function LeitorAberto({
       cancelAnimationFrame(quadro);
       delete raiz.dataset.modoFoco;
     };
-  }, [modoFoco, medir, virtualizador]);
+  }, [modoFoco, porArtigo, medir, virtualizador]);
 
   // Entrar empilha uma entrada no histórico (o "voltar" do celular sai do modo foco); sair desfaz
   // a entrada que o leitor empilhou ou, se o modo foco veio de fora (recarregar, endereço salvo),
@@ -572,24 +574,31 @@ function LeitorAberto({
   const abrirBuscaAgora = useRef<() => void>(() => undefined);
   // O Esc com trecho selecionado ou grifo escolhido (11.4) desfaz a marcação, não o modo foco.
   const cancelarMarcacaoAgora = useRef<() => boolean>(() => false);
+  // Fixa o artigo do alto como o do cartão ao entrar (definida mais abaixo, com o resto do cartão).
+  const prepararCartao = useRef<() => void>(() => undefined);
+  const lenteDoFoco = preferencias?.lenteDoFoco ?? 'cartao';
+  // F entra no cartão quando a lente é o cartão e a norma tem artigos; senão, no texto corrido.
+  const entraNoCartao = lenteDoFoco === 'cartao' && unidades.length > 0;
   const alternarFoco = useCallback(() => {
     if (pedidaNaRota.current === chaveDaRota) return;
     pedidaNaRota.current = chaveDaRota;
     const ativo = document.activeElement;
     devolverFoco.current =
-      ativo instanceof HTMLElement &&
-      ativo !== document.body &&
-      !ativo.closest('.lista-leitor, .acoes-leitor');
-    setAnuncio(modoFoco ? 'Fora do modo foco.' : 'Modo foco: só o texto.');
+      ativo instanceof HTMLElement && ativo !== document.body && !ativo.closest('.lista-leitor');
+    setAnuncio(modoFoco ? 'Fora do modo foco.' : 'Modo foco.');
     if (!modoFoco) {
       const estado: EstadoDoFoco = { entrouNoFoco: true };
-      setBusca({ [PARAMETRO_DO_FOCO]: 'texto' }, { state: estado });
+      if (entraNoCartao) prepararCartao.current();
+      setBusca(
+        { [PARAMETRO_DO_FOCO]: entraNoCartao ? VALOR_DO_ARTIGO : 'texto' },
+        { state: estado },
+      );
     } else if ((estadoDaRota as EstadoDoFoco | null)?.entrouNoFoco) {
       void navegar(-1);
     } else {
       setBusca({}, { replace: true });
     }
-  }, [modoFoco, chaveDaRota, estadoDaRota, setBusca, navegar]);
+  }, [modoFoco, entraNoCartao, chaveDaRota, estadoDaRota, setBusca, navegar]);
 
   // Navegação do artigo por artigo (11.8); as funções ficam em refs para o ouvinte de teclado não
   // ser refeito a cada artigo.
@@ -891,22 +900,25 @@ function LeitorAberto({
     if (indice !== undefined) setArtigoAtual(indice);
     return indice ?? artigoAtual;
   };
-  // O botão "Por artigo" / "Texto corrido": de fora do modo foco, entra direto no artigo (uma
-  // entrada no histórico, como o modo foco); dentro dele, troca a rota no lugar, sem empilhar nada.
-  function alternarArtigo() {
-    if (!modoFoco) {
-      if (pedidaNaRota.current === chaveDaRota) return;
-      pedidaNaRota.current = chaveDaRota;
-      const estado: EstadoDoFoco = { entrouNoFoco: true };
+  useEffect(() => {
+    prepararCartao.current = () => {
+      definirArtigoDoAlto();
+    };
+  });
+  // A troca de lente dentro do foco (a bandeja): troca a rota no lugar, sem empilhar nada, e grava
+  // a lente escolhida para a próxima entrada.
+  function trocarLente(nova: LenteDoFoco) {
+    if (!modoFoco) return;
+    alterarPreferencias(repo, { lenteDoFoco: nova }).catch(() => {
+      // Sem gravar, a lente vale só para esta leitura.
+    });
+    if (nova === 'cartao') {
+      if (porArtigo || unidades.length === 0) return;
       const indice = definirArtigoDoAlto();
-      setAnuncio(`Artigo por artigo. ${fraseDoArtigo(indice)}`);
-      setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { state: estado });
-    } else if (!porArtigo) {
-      const indice = definirArtigoDoAlto();
-      setAnuncio(`Artigo por artigo. ${fraseDoArtigo(indice)}`);
+      setAnuncio(`Um artigo por vez. ${fraseDoArtigo(indice)}`);
       setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { replace: true, state: estadoDaRota });
-    } else {
-      setAnuncio('Modo foco: só o texto.');
+    } else if (porArtigo) {
+      setAnuncio('Texto corrido.');
       setBusca({ [PARAMETRO_DO_FOCO]: 'texto' }, { replace: true, state: estadoDaRota });
     }
   }
@@ -1621,7 +1633,7 @@ function LeitorAberto({
         <div
           key="artigo"
           ref={definirLista}
-          className="area-artigo"
+          className={preferencias?.espiadaDosVizinhos ? 'area-artigo com-espiada' : 'area-artigo'}
           onClick={aoClicarNaLista}
           onKeyDown={aoTeclarNaLista}
           onPointerOver={ativarLinha}
@@ -1640,17 +1652,6 @@ function LeitorAberto({
             </div>
           ) : (
             <>
-              <NavegacaoDoArtigo
-                rotulo={rotuloDoCartao}
-                posicao={ordem + 1}
-                total={unidades.length}
-                anterior={() => {
-                  irAoAnterior.current();
-                }}
-                proximo={() => {
-                  irAoProximo.current();
-                }}
-              />
               {vizinho(ordem - 1, 'anterior')}
               <section
                 ref={cartao}
@@ -1687,6 +1688,18 @@ function LeitorAberto({
                   </div>
                 )}
               </section>
+              <SetasDoCartao
+                anterior={() => {
+                  irAoAnterior.current();
+                }}
+                proximo={() => {
+                  irAoProximo.current();
+                }}
+                noPrimeiro={ordem <= 0}
+                noUltimo={ordem + 1 >= unidades.length}
+              >
+                <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
+              </SetasDoCartao>
               {vizinho(ordem + 1, 'seguinte')}
             </>
           )}
@@ -1773,25 +1786,67 @@ function LeitorAberto({
                 <span>{avisoDaEstrela}</span>
               </p>
             )}
-            <AcoesDaLeitura
-              modoFoco={modoFoco}
-              botaoDoFoco={botaoDoFoco}
-              abrirBusca={abrirBusca}
-              abrirFiltro={() => {
-                setFiltroAberto(true);
-              }}
-              abrirAcoes={abrirAcoes}
-              filtro={filtro?.descricao}
-              alternarFoco={alternarFoco}
-              porArtigo={porArtigo}
-              alternarArtigo={alternarArtigo}
-              marcarAqui={marcarAqui}
-              voltarDaRemissao={
-                origemDoVoltar === undefined
-                  ? undefined
-                  : { para: referenciaDaBusca(origemDoVoltar), voltar: voltarDaRemissao }
-              }
-            />
+            {modoFoco ? (
+              <>
+                {origemDoVoltar !== undefined && (
+                  <button type="button" className="voltar-da-remissao" onClick={voltarDaRemissao}>
+                    ← Voltar a {referenciaDaBusca(origemDoVoltar)}
+                  </button>
+                )}
+                <BandejaDoFoco
+                  lente={porArtigo ? 'cartao' : 'corrido'}
+                  trocarLente={trocarLente}
+                  podeCartao={unidades.length > 0}
+                  anterior={() => {
+                    irAoAnterior.current();
+                  }}
+                  proximo={() => {
+                    irAoProximo.current();
+                  }}
+                  noPrimeiro={ordem === undefined || ordem <= 0}
+                  noUltimo={ordem === undefined || ordem + 1 >= unidades.length}
+                  buscar={abrirBusca}
+                  filtrar={() => {
+                    setFiltroAberto(true);
+                  }}
+                  filtro={filtro?.descricao}
+                  acoes={abrirAcoes}
+                  estrelar={() => {
+                    if (!estrelarAtivaAgora.current()) {
+                      setAnuncio('Toque num dispositivo para estrelar.');
+                    }
+                  }}
+                  lidoAteAqui={marcarAqui}
+                  sair={alternarFoco}
+                  ocupada={
+                    buscaAberta ||
+                    filtroAberto ||
+                    alvoDasAcoes !== undefined ||
+                    notaAberta !== undefined ||
+                    previa !== undefined
+                  }
+                  botaoRef={botaoDoFoco}
+                />
+              </>
+            ) : (
+              <AcoesDaLeitura
+                modoFoco={modoFoco}
+                botaoDoFoco={botaoDoFoco}
+                abrirBusca={abrirBusca}
+                abrirFiltro={() => {
+                  setFiltroAberto(true);
+                }}
+                abrirAcoes={abrirAcoes}
+                filtro={filtro?.descricao}
+                alternarFoco={alternarFoco}
+                marcarAqui={marcarAqui}
+                voltarDaRemissao={
+                  origemDoVoltar === undefined
+                    ? undefined
+                    : { para: referenciaDaBusca(origemDoVoltar), voltar: voltarDaRemissao }
+                }
+              />
+            )}
           </>
         )}
         <p role="status" className="visualmente-oculto">
@@ -1881,8 +1936,6 @@ function AcoesDaLeitura({
   abrirAcoes,
   filtro,
   alternarFoco,
-  porArtigo,
-  alternarArtigo,
   marcarAqui,
   voltarDaRemissao,
 }: {
@@ -1895,8 +1948,6 @@ function AcoesDaLeitura({
   filtro: string | undefined;
   alternarFoco: () => void;
   /** Artigo por artigo (11.8): o botão troca entre o cartão de um artigo e o texto corrido. */
-  porArtigo: boolean;
-  alternarArtigo: () => void;
   marcarAqui: () => void;
   /** Depois de "ir para" uma remissão (11.9): de onde se veio, e a volta. */
   voltarDaRemissao: { para: string; voltar: () => void } | undefined;
@@ -1945,24 +1996,10 @@ function AcoesDaLeitura({
         Ações
       </button>
       <button
-        type="button"
-        aria-pressed={porArtigo}
-        title={
-          porArtigo
-            ? 'Voltar ao texto corrido, no modo foco'
-            : 'Ler um artigo por vez, com os vizinhos esmaecidos (setas ← e →)'
-        }
-        onClick={alternarArtigo}
-      >
-        Por artigo
-      </button>
-      <button
         ref={botaoDoFoco}
         type="button"
         aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-        title={
-          modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco: só o texto (atalho: F)'
-        }
+        title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
         onClick={alternarFoco}
       >
         {modoFoco ? 'Sair do foco' : 'Modo foco'}
@@ -1971,50 +2008,6 @@ function AcoesDaLeitura({
         Lido até aqui
       </button>
     </>
-  );
-}
-
-/** Anterior, posição e próximo do artigo por artigo (11.8). Desabilitado só no papel (`aria-disabled`): o foco não some. */
-function NavegacaoDoArtigo({
-  rotulo,
-  posicao,
-  total,
-  anterior,
-  proximo,
-}: {
-  rotulo: string;
-  posicao: number;
-  total: number;
-  anterior: () => void;
-  proximo: () => void;
-}) {
-  return (
-    <nav className="navegacao-artigo" aria-label="Artigo por artigo">
-      <button
-        type="button"
-        aria-disabled={posicao <= 1}
-        aria-keyshortcuts="ArrowLeft"
-        title="Artigo anterior (seta ←)"
-        onClick={anterior}
-      >
-        ← Anterior
-      </button>
-      <p className="posicao-artigo">
-        <strong>{rotulo}</strong>
-        <span>
-          {posicao.toLocaleString('pt-BR')} de {total.toLocaleString('pt-BR')}
-        </span>
-      </p>
-      <button
-        type="button"
-        aria-disabled={posicao >= total}
-        aria-keyshortcuts="ArrowRight"
-        title="Próximo artigo (seta →)"
-        onClick={proximo}
-      >
-        Próximo →
-      </button>
-    </nav>
   );
 }
 

@@ -1,5 +1,5 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
@@ -61,6 +61,19 @@ function abrirLeitor(repo: Repositorio, caminho: string) {
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
   return usuario;
+}
+
+/** Um controle da bandeja do modo foco: abre a bandeja (o ⋯) se ele ainda não está à vista. */
+async function naBandeja(usuario: UserEvent, nome: string | RegExp) {
+  if (!screen.queryByRole('button', { name: nome })) {
+    await usuario.click(screen.getByRole('button', { name: 'Mais ações do foco' }));
+  }
+  return screen.findByRole('button', { name: nome });
+}
+
+/** Sai do modo foco pela bandeja. */
+async function sairDoFoco(usuario: UserEvent) {
+  await usuario.click(await naBandeja(usuario, 'Sair do foco'));
 }
 
 /** O dispositivo (por endereço) na tela. */
@@ -528,7 +541,10 @@ describe('modo foco (11.1)', () => {
     const norma = await publicar(repo, LEI);
     const aberta = await abrirNorma(repo, norma.id);
     // Com a legenda dos destaques e a linha do "lido até" à vista fora do modo foco.
-    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: true });
+    await alterarPreferencias(repo, {
+      destacarCondicionantesEPrazos: true,
+      lenteDoFoco: 'corrido',
+    });
     const art1 = aberta.nos.find((n) => n.dispositivo.endereco === 'art1')!.dispositivo.id;
     await marcarLidoAte(repo, norma.id, art1);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -544,11 +560,8 @@ describe('modo foco (11.1)', () => {
     expect(entrar).toHaveAttribute('aria-keyshortcuts', 'F');
 
     await usuario.click(entrar);
-    const sair = await screen.findByRole('button', { name: 'Sair do foco' });
-    // O mesmo botão: o foco do teclado continua nele.
-    expect(sair).toBe(entrar);
-    expect(sair).toHaveFocus();
-    expect(sair).toHaveAttribute('aria-keyshortcuts', 'F Escape');
+    // Entrou no corrido (a lente escolhida): o foco do teclado vai para o ⋯.
+    expect(await screen.findByRole('button', { name: 'Mais ações do foco' })).toHaveFocus();
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
     expect(barraDoLeitor()).not.toBeInTheDocument();
@@ -563,10 +576,10 @@ describe('modo foco (11.1)', () => {
       'visualmente-oculto',
     );
     expect(dispositivo('art1')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Lido até aqui' })).toBeInTheDocument();
-    expect(screen.getByText('Modo foco: só o texto.')).toHaveAttribute('role', 'status');
+    expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
+    expect(screen.getByText('Modo foco.')).toHaveAttribute('role', 'status');
 
-    await usuario.click(sair);
+    await sairDoFoco(usuario);
     await waitFor(() => {
       expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     });
@@ -609,7 +622,7 @@ describe('modo foco (11.1)', () => {
       screen.getByRole('button', { name: 'Destaques' }).focus();
     });
     await usuario.keyboard('f');
-    expect(await screen.findByRole('button', { name: 'Sair do foco' })).toHaveFocus();
+    expect(await screen.findByRole('button', { name: 'Mais ações do foco' })).toHaveFocus();
     await usuario.keyboard('f');
     expect(await screen.findByRole('button', { name: 'Modo foco' })).toHaveFocus();
     act(() => {
@@ -647,12 +660,12 @@ describe('modo foco (11.1)', () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
-    const sair = await screen.findByRole('button', { name: 'Sair do foco' });
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
     expect(barraDoLeitor()).not.toBeInTheDocument();
     const entradas = window.history.length;
 
-    await usuario.click(sair);
+    await sairDoFoco(usuario);
     expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     expect(window.history.length).toBe(entradas);
@@ -664,7 +677,7 @@ describe('modo foco (11.1)', () => {
     const norma = await publicar(repo, LEI);
     const aberta = await abrirNorma(repo, norma.id);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
-    await screen.findByRole('button', { name: 'Sair do foco' });
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
 
     // O atalho "E" do Shell (registrar erro) continua valendo e leva para fora do leitor.
@@ -756,12 +769,12 @@ describe('busca dentro da norma (11.6)', () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
-    await screen.findByRole('button', { name: 'Sair do foco' });
-    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
+    await usuario.click(await naBandeja(usuario, 'Buscar'));
     await usuario.type(await screen.findByRole('searchbox'), 'jurisdicao{Enter}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(window.location.hash).toContain('foco=texto');
-    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
     await waitFor(() => {
       expect(dispositivo('art2').closest('.linha-leitor')).toHaveClass('achado-da-busca');
     });
@@ -936,7 +949,7 @@ describe('grifos e notas (11.4)', () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
-    await screen.findByRole('button', { name: 'Sair do foco' });
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
     await screen.findByText(/A jurisdição penal/);
 
     selecionar('art2', 'exercida');
@@ -946,7 +959,7 @@ describe('grifos e notas (11.4)', () => {
     await usuario.keyboard('{Escape}');
     expect(screen.queryByRole('group', { name: 'Marcar o trecho selecionado' })).toBeNull();
     expect(window.location.hash).toContain('foco=texto');
-    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
   });
 });
 
@@ -1085,7 +1098,7 @@ describe('estrela (11.2)', () => {
     await usuario.click(botao);
     await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
     expect(window.location.hash).toContain('foco=texto');
-    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
   });
 });
 
@@ -1101,7 +1114,7 @@ describe('filtros (11.3)', () => {
 
   /** Abre o diálogo, escolhe o filtro pelo nome e aplica. */
   async function filtrar(usuario: ReturnType<typeof userEvent.setup>, escolha: RegExp) {
-    await usuario.click(screen.getByRole('button', { name: /^(Filtrar|Filtrado)/ }));
+    await usuario.click(await naBandeja(usuario, /^(Filtrar|Filtrado)/));
     const dialogo = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
     await usuario.click(within(dialogo).getByRole('radio', { name: escolha }));
     return dialogo;
@@ -1299,7 +1312,7 @@ describe('ações por dispositivo (11.5)', () => {
   async function abrirAcoes(usuario: ReturnType<typeof userEvent.setup>) {
     // Alto da tela num artigo (no jsdom, 60 px por linha).
     rolarPara(60 * 8);
-    await usuario.click(screen.getByRole('button', { name: 'Ações' }));
+    await usuario.click(await naBandeja(usuario, 'Ações'));
     const dialogo = await screen.findByRole('dialog', { name: /^Ações de / });
     // A referência de citar, no alto do diálogo: "art. 1º, LEP".
     const referencia = dialogo.querySelector('p.dica')?.textContent ?? '';
@@ -1417,10 +1430,10 @@ describe('leitura artigo por artigo (11.8)', () => {
     expect(screen.queryByRole('region', { name: /^Art\./ })).not.toBeInTheDocument();
 
     rolarPara(3 * 60);
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
     const secao = await cartao(/^Art\. 1º, \d+ de \d+$/);
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=artigo`);
-    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'artigo');
     // O artigo inteiro: caput, incisos, alínea e parágrafo; o contexto discreto no alto.
     for (const endereco of ['art1', 'art1.incI', 'art1.incII.alA', 'art1.par1']) {
       expect(
@@ -1436,11 +1449,10 @@ describe('leitura artigo por artigo (11.8)', () => {
     expect(vizinhos).toHaveLength(2);
     for (const v of vizinhos) expect(v).toHaveAttribute('inert');
     expect(vizinhos[1]).toHaveTextContent(/Art\. 2º\s*A jurisdição penal/);
-    expect(screen.getByRole('button', { name: 'Por artigo' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: 'Sair do foco' })).toBeInTheDocument();
+    // Sem a espiada (o padrão), os vizinhos são só a borda; o botão "Por artigo" não existe mais.
+    expect(document.querySelector('.area-artigo')).not.toHaveClass('com-espiada');
+    expect(screen.queryByRole('button', { name: 'Por artigo' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Tamanho do texto' })).not.toBeInTheDocument();
   });
 
@@ -1453,11 +1465,11 @@ describe('leitura artigo por artigo (11.8)', () => {
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
     rolarPara(3 * 60);
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
     await cartao(/^Art\. 1º, /);
     expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBeUndefined();
 
-    const proximo = screen.getByRole('button', { name: /Próximo/ });
+    const proximo = screen.getByRole('button', { name: 'Próximo artigo' });
     await usuario.click(proximo);
     const dois = await cartao(/^Art\. 2º, /);
     expect(within(dois).getByText(/A jurisdição penal/)).toBeInTheDocument();
@@ -1488,7 +1500,7 @@ describe('leitura artigo por artigo (11.8)', () => {
     expect(within(marcado).getByText('Lido até aqui', { selector: 'p' })).toBeInTheDocument();
     await usuario.keyboard('{ArrowLeft}');
     await cartao(/^Art\. 1º, /);
-    await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+    await usuario.click(await naBandeja(usuario, 'Lido até aqui'));
     await waitFor(async () => {
       expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(art1);
     });
@@ -1500,11 +1512,11 @@ describe('leitura artigo por artigo (11.8)', () => {
     await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art3'));
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
     const ultimo = await cartao(/^Art\. 3º, /);
-    expect(screen.getByRole('button', { name: /Próximo/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Próximo artigo' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
-    expect(screen.getByRole('button', { name: /Anterior/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Artigo anterior' })).toHaveAttribute(
       'aria-disabled',
       'false',
     );
@@ -1519,7 +1531,7 @@ describe('leitura artigo por artigo (11.8)', () => {
     await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
     await cartao(/^Art\. 1º, /);
-    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    await usuario.click(await naBandeja(usuario, 'Buscar'));
     const busca = await screen.findByRole('dialog', { name: /Buscar/ });
     await usuario.type(within(busca).getByRole('searchbox'), 'ab{ArrowRight}{ArrowLeft}');
     await cartao(/^Art\. 1º, /);
@@ -1567,28 +1579,26 @@ describe('leitura artigo por artigo (11.8)', () => {
     await screen.findByText(/A jurisdição penal/);
     const entrada = (window.history.state as { idx?: number } | null)?.idx;
     rolarPara(3 * 60);
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
     await cartao(/^Art\. 1º, /);
-    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Próximo artigo' }));
     await cartao(/^Art\. 2º, /);
 
-    // Do artigo para o texto corrido: continua no modo foco, rota trocada no lugar.
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    // Do artigo para o texto corrido: continua no modo foco, rota trocada no lugar, e a lente fica.
+    await usuario.click(await naBandeja(usuario, 'Texto corrido'));
+    expect((await obterPreferencias(repo)).lenteDoFoco).toBe('corrido');
     await waitFor(() => {
       expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
     });
     expect(screen.queryByRole('region', { name: /^Art\./ })).not.toBeInTheDocument();
     expect(await screen.findByText(/A jurisdição penal/)).toBeInTheDocument();
     expect(document.querySelectorAll('.lista-leitor')).toHaveLength(1);
-    expect(screen.getByRole('button', { name: 'Por artigo' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
 
     // De novo no artigo (o do alto da tela) e fora do modo foco com "Sair do foco".
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
-    await cartao(/^Art\. \d+º, /);
-    await usuario.click(screen.getByRole('button', { name: 'Sair do foco' }));
+    await usuario.click(await naBandeja(usuario, 'Um artigo por vez'));
+    await cartao(/, \d+ de \d+$/);
+    expect((await obterPreferencias(repo)).lenteDoFoco).toBe('cartao');
+    await sairDoFoco(usuario);
     await waitFor(() => {
       expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     });
@@ -1605,7 +1615,7 @@ describe('leitura artigo por artigo (11.8)', () => {
     await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
     await cartao(/^Art\. 1º, /);
-    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Próximo artigo' }));
     await cartao(/^Art\. 2º, /);
     await waitFor(
       async () => {
@@ -1624,28 +1634,107 @@ describe('leitura artigo por artigo (11.8)', () => {
     await usuario.click(await estrelaDe(usuario, 'art3', 'Estrela: Art. 3º'));
     await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
     rolarPara(3 * 60);
-    await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
     await cartao(/^Art\. 1º, /);
 
     // O filtro do leitor vale no cartão: o artigo 1 saiu, o 3 é o único que ficou.
-    await usuario.click(screen.getByRole('button', { name: 'Filtrar' }));
+    await usuario.click(await naBandeja(usuario, 'Filtrar'));
     const filtro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
     await usuario.click(within(filtro).getByRole('radio', { name: /Só os estrelados/ }));
     await usuario.click(within(filtro).getByRole('button', { name: 'Mostrar' }));
     const unico = await cartao(/^Art\. 3º, 1 de 1$/);
-    expect(screen.getByRole('button', { name: /Próximo/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Próximo artigo' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
-    expect(screen.getByRole('button', { name: /Anterior/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Artigo anterior' })).toHaveAttribute(
       'aria-disabled',
       'true',
     );
     expect(document.querySelectorAll('.vizinho')).toHaveLength(0);
     expect(within(unico).getByText(/Ao condenado/)).toBeInTheDocument();
 
-    await usuario.click(screen.getByRole('button', { name: 'Ações' }));
+    await usuario.click(await naBandeja(usuario, 'Ações'));
     expect(await screen.findByRole('dialog', { name: 'Ações de Art. 3º' })).toBeInTheDocument();
+  });
+});
+
+describe('palco do modo foco (F entra no cartão)', () => {
+  afterEach(() => {
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  const cartao = (nome: RegExp | string) => screen.findByRole('region', { name: nome });
+
+  it('F entra no cartão; fora do modo foco não há botão "Por artigo"', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    expect(screen.queryByRole('button', { name: 'Por artigo' })).not.toBeInTheDocument();
+    await usuario.keyboard('f');
+    await waitFor(() => {
+      expect(document.querySelector('.cartao-artigo')).not.toBeNull();
+    });
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=artigo`);
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'artigo');
+    expect(screen.getByText('Modo foco.')).toHaveAttribute('role', 'status');
+    // Só o ⋯ e o fio de progresso: nenhum controle da bandeja à vista.
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Buscar' })).not.toBeInTheDocument();
+  });
+
+  it('com a lente corrido gravada, F entra no texto corrido, sem cartão', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { lenteDoFoco: 'corrido' });
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.keyboard('f');
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
+    expect(document.querySelector('.cartao-artigo')).toBeNull();
+  });
+
+  it('sem artigos à vista (o filtro deixou só títulos), F entra no corrido, não num cartão vazio', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.click(screen.getByRole('button', { name: /^(Filtrar|Filtrado)/ }));
+    const filtro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+    await usuario.click(within(filtro).getByRole('radio', { name: /Só os estrelados/ }));
+    await usuario.click(within(filtro).getByRole('button', { name: 'Mostrar' }));
+    await screen.findByText(/Nenhum dispositivo estrelado nesta norma/);
+    await usuario.keyboard('f');
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
+    expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
+    expect(document.querySelector('.cartao-artigo')).toBeNull();
+    expect(screen.queryByText(/Nenhum artigo para ler por aqui/)).not.toBeInTheDocument();
+  });
+
+  it('os endereços antigos continuam válidos: ?foco=texto abre o corrido e ?foco=artigo, o cartão', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
+    expect(document.querySelector('.cartao-artigo')).toBeNull();
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+    cleanup();
+    delete document.documentElement.dataset.modoFoco;
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    expect(await cartao(/, \d+ de \d+$/)).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'artigo');
+  });
+
+  it('a espiada dos vizinhos é opcional e vem desligada', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { espiadaDosVizinhos: true });
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
+    await cartao(/, \d+ de \d+$/);
+    expect(document.querySelector('.area-artigo')).toHaveClass('com-espiada');
   });
 });
 
@@ -1715,7 +1804,7 @@ describe('prévia de remissões (11.9)', () => {
     const secao = await screen.findByRole('region', { name: /^Art\. \dº, \d+ de \d+$/ });
     expect(secao).toBeInTheDocument();
     // Vai ao Art. 2º, que cita o 3º.
-    await usuario.click(screen.getByRole('button', { name: /Próximo/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Próximo artigo' }));
     const cartao2 = await screen.findByRole('region', { name: /^Art\. 2º, / });
     const rodape = await within(cartao2).findByRole('heading', { name: 'Remissões deste artigo' });
     const botao = within(rodape.parentElement!).getByRole('button', { name: 'Art. 3º' });

@@ -149,6 +149,15 @@ describe('Conta › Aparência (5.2)', () => {
       expect((await obterPreferencias(repo)).reguaDeLeitura).toBe(true);
     });
     expect(regua).toBeChecked();
+    // Espiada dos vizinhos (palco do foco): desligada por padrão, grava ao ligar.
+    const espiada = screen.getByRole('checkbox', {
+      name: 'Mostrar a espiada dos vizinhos no foco',
+    });
+    expect(espiada).not.toBeChecked();
+    await usuario.click(espiada);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).espiadaDosVizinhos).toBe(true);
+    });
   });
 });
 

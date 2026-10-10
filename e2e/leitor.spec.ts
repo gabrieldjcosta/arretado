@@ -27,6 +27,44 @@ async function irAoFim(page: Page, alvo: Locator, tentativas = 30) {
 
 const linhasNaTela = (page: Page) => page.locator('.dispositivo');
 
+/** O ⋯ do modo foco: a única coisa à vista além do texto. */
+const maisDoFoco = (page: Page) => page.getByRole('button', { name: 'Mais ações do foco' });
+
+/** Um controle da bandeja do foco; abre a bandeja (o ⋯) se ele ainda não está à vista. */
+async function naBandejaDoFoco(page: Page, nome: string | RegExp) {
+  const botao = page.getByRole('button', { name: nome, exact: typeof nome === 'string' });
+  if (!(await botao.isVisible()) && (await maisDoFoco(page).isVisible())) {
+    await maisDoFoco(page).click();
+  }
+  return botao;
+}
+
+async function sairDoFocoPelaBandeja(page: Page, toque = false) {
+  const botao = await naBandejaDoFoco(page, 'Sair do foco');
+  await (toque ? botao.tap() : botao.click());
+}
+
+/**
+ * Entra no modo foco com a lente do texto corrido: a primeira entrada abre o cartão, e "Texto
+ * corrido" na bandeja grava a lente para as seguintes.
+ */
+async function fixarLenteCorrida(page: Page, toque = false) {
+  await entrarNoFocoCorrido(page, toque);
+  await sairDoFocoPelaBandeja(page, toque);
+  await expect(page.getByRole('button', { name: 'Modo foco' })).toBeVisible();
+}
+
+async function entrarNoFocoCorrido(page: Page, toque = false) {
+  const entrar = page.getByRole('button', { name: 'Modo foco' });
+  await (toque ? entrar.tap() : entrar.click());
+  await expect(maisDoFoco(page)).toBeVisible();
+  if (/[?&]foco=artigo/.test(page.url())) {
+    const corrido = await naBandejaDoFoco(page, 'Texto corrido');
+    await (toque ? corrido.tap() : corrido.click());
+  }
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+}
+
 /** Mede da toque no link até o primeiro texto de dispositivo estar na página (não do polling do teste). */
 async function abrirMedindo(page: Page, link: Locator) {
   await page.evaluate(() => {
@@ -584,7 +622,10 @@ function fundoDoBotao(botao: Locator) {
   return botao.evaluate((el) => {
     const fundo = getComputedStyle(el).backgroundColor;
     const alfa = /rgba?\([^)]*[,/]\s*([\d.]+)\)/.exec(fundo)?.[1];
-    return { posicao: getComputedStyle(el.parentElement ?? el).position, alfa: Number(alfa ?? 1) };
+    return {
+      posicao: getComputedStyle(el.closest('.acoes-leitor') ?? el).position,
+      alfa: Number(alfa ?? 1),
+    };
   });
 }
 
@@ -596,11 +637,10 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   const entrar = page.getByRole('button', { name: 'Modo foco' });
-  const sair = page.getByRole('button', { name: 'Sair do foco' });
+  const sair = maisDoFoco(page);
   const areas = page.getByRole('navigation', { name: 'Áreas' });
   const tamanho = page.getByRole('group', { name: 'Tamanho do texto' });
   const destaques = page.getByRole('button', { name: 'Destaques' });
-  const lidoAteAqui = page.getByRole('button', { name: 'Lido até aqui' });
 
   // A página nunca é mais larga que a tela: no tablet, a barra de cima transbordava com a fonte do
   // Linux, e a página larga desalinhava os botões fixos (o clique caía no texto).
@@ -611,9 +651,9 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   expect(await sobra()).toBe(0);
 
   // No começo da norma, entrar e sair volta ao começo da página, com a barra do leitor à vista.
-  await entrar.click();
+  await entrarNoFocoCorrido(page);
   await expect(sair).toBeVisible();
-  await sair.click();
+  await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeVisible();
   await expect(tamanho).toBeInViewport();
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
@@ -622,7 +662,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   const art41 = page.locator('[data-endereco="art41"]');
   await rolarAte(page, art41);
   await alinharNoAlto(page, art41);
-  await entrar.click();
+  await entrarNoFocoCorrido(page);
   await expect(sair).toBeVisible();
   await expect(sair).toBeFocused();
   await expect(page).toHaveURL(/[?&]foco=texto/);
@@ -637,11 +677,11 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   );
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art41))).toBeLessThan(2);
   expect(await sobra()).toBe(0);
-  // Fixo e semitransparente, junto do "Lido até aqui" e do "Buscar" (11.6); com
-  // o mouse fora dele (em cima, ele fica opaco).
+  // Fixo e semitransparente, com o resto dos controles na bandeja; com o mouse fora dele (em
+  // cima, ele fica opaco).
   await page.mouse.move(5, 300);
   expect(await fundoDoBotao(sair)).toEqual({ posicao: 'fixed', alfa: 0.9 });
-  await expect(lidoAteAqui).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Lido até aqui' })).toBeHidden();
   // O botão acompanha a rolagem.
   const art60 = page.locator('[data-endereco="art60"]');
   await rolarAte(page, art60);
@@ -650,7 +690,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
 
   // Sai com o art. 60 no alto: a moldura volta e o art. 60 fica logo abaixo da barra fixa.
   await alinharNoAlto(page, art60);
-  await sair.click();
+  await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeFocused();
   await expect(areas).toBeVisible();
   await expect(page).not.toHaveURL(/foco=/);
@@ -658,7 +698,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art60');
 
   // O "voltar" do navegador (o gesto do celular) também sai, na mesma posição; "avançar" volta.
-  await entrar.click();
+  await entrarNoFocoCorrido(page);
   await expect(areas).toBeHidden();
   await page.goBack();
   await expect(areas).toBeVisible();
@@ -678,13 +718,13 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect(areas).toBeHidden();
   await expect(art105).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
-  await lidoAteAqui.click();
+  await (await naBandejaDoFoco(page, 'Lido até aqui')).click();
   await expect(
     page.locator('.linha-leitor').filter({ has: art105 }).locator('.marca-lido-ate'),
   ).toHaveText('Lido até aqui');
   await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art105');
   // Recarregar não perde a entrada do histórico: sair volta a ela, na mesma posição.
-  await sair.click();
+  await sairDoFocoPelaBandeja(page);
   await expect(areas).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
   await expect(page.locator('.lido-ate')).toContainText('Lido até Art. 105');
@@ -730,10 +770,10 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
     await page.waitForTimeout(150);
   }
   const antes = await linhaDoAlto(page);
-  await entrar.click();
+  await entrarNoFocoCorrido(page);
   await expect(sair).toBeVisible();
   await expect.poll(() => mesmaLinha(page, antes)).toBe(true);
-  await sair.click();
+  await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeVisible();
   await expect.poll(() => mesmaLinha(page, antes)).toBe(true);
   info.annotations.push({ type: 'aparelho', description: info.project.name });
@@ -746,6 +786,7 @@ test('busca dentro da norma: por texto, sem acento e sem caixa, e por endereço;
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
   const buscar = page.getByRole('button', { name: 'Buscar', exact: true });
   const dialogo = page.getByRole('dialog', { name: 'Buscar na norma' });
   const campo = dialogo.getByRole('searchbox', { name: 'Texto ou endereço' });
@@ -784,9 +825,8 @@ test('busca dentro da norma: por texto, sem acento e sem caixa, e por endereço;
   expect((await leituraGravada(page)).lidoAte).toBeUndefined();
 
   // No modo foco, a busca fica no grupo fixo e não sai dele; Enter vai ao endereço.
-  await page.getByRole('button', { name: 'Modo foco' }).click();
-  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
-  await buscar.click();
+  await entrarNoFocoCorrido(page);
+  await (await naBandejaDoFoco(page, 'Buscar')).click();
   await campo.fill('art. 9-A');
   await campo.press('Enter');
   await expect(dialogo).toBeHidden();
@@ -899,6 +939,7 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
   await page.getByRole('button', { name: 'Destaques' }).click();
 
   // Um termo aceso pelo destaque automático: o grifo convive com ele, por fora.
@@ -971,8 +1012,7 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
 
   // No modo foco, as ações tomam o lugar do grupo fixo, sem alargar a página.
-  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
-  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await entrarNoFocoCorrido(page, toque);
   await selecionarPalavra(page, texto, outra, toque);
   await expect(acoes).toBeVisible();
   const sobra = await page.evaluate(
@@ -1064,6 +1104,7 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
 
   // Título II › Capítulo II (Da Assistência) › Seção I (Disposições Gerais): arts. 10 e 11.
   const secao = page.locator('[data-endereco="tit2.cap2.sec1"]');
@@ -1118,8 +1159,7 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   expect(await estrelasGravadas(page)).toEqual(['direta', 'excecao']);
 
   // No modo foco, o mesmo controle; estrelar de novo o art. 11 desfaz a exceção.
-  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
-  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await entrarNoFocoCorrido(page, toque);
   // A linha ativa pode ter mudado com a moldura que saiu: o ponteiro a reativa.
   await estrelaDe(page, 'art11', 'Estrela: Art. 11 (exceção: fora da estrela de Seção I)');
   await semViolacoes(page);
@@ -1146,6 +1186,7 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
 
   const naoTemLargura = async () => {
     const sobra = await page.evaluate(
@@ -1154,7 +1195,7 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
     expect(sobra).toBe(0);
   };
   const filtrar = async (escolha: string) => {
-    await apertar(page.getByRole('button', { name: /^(Filtrar|Filtrado)/ }), toque);
+    await apertar(await naBandejaDoFoco(page, /^(Filtrar|Filtrado)/), toque);
     const dialogo = page.getByRole('dialog', { name: 'Filtrar a norma' });
     await expect(dialogo).toBeVisible();
     await dialogo.getByRole('radio', { name: escolha }).check();
@@ -1220,8 +1261,7 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   await expect(page.locator('[data-endereco="art10"]')).toHaveCount(0);
 
   // No modo foco, o botão fica no grupo; o filtro vale lá, e a página não alarga.
-  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
-  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await entrarNoFocoCorrido(page, toque);
   await expect(page.locator('.filtro-ativo p')).toHaveCount(0);
   await expect(page.locator('[data-endereco="art1"]')).toBeVisible();
   await semViolacoes(page);
@@ -1229,12 +1269,12 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   const emFoco = await filtrar('Tudo');
   await apertar(emFoco.getByRole('button', { name: 'Mostrar tudo' }), toque);
   await expect(page).toHaveURL(/[?&]foco=texto/);
-  await expect(page.getByRole('button', { name: 'Filtrar', exact: true })).toBeVisible();
+  await expect(maisDoFoco(page)).toBeVisible();
   await expect(page.locator('[data-endereco="art1"]')).toBeVisible();
   await naoTemLargura();
 
   // Sem filtro, a linha de estado some e o resto da norma volta.
-  await apertar(page.getByRole('button', { name: 'Sair do foco' }), toque);
+  await sairDoFocoPelaBandeja(page, toque);
   await expect(page.locator('.filtro-ativo')).toHaveCount(0);
 });
 
@@ -1247,6 +1287,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
 
   const naoTemLargura = async () => {
     const sobra = await page.evaluate(
@@ -1308,9 +1349,8 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await expect(artigo).toBeVisible();
 
   // No modo foco, o botão está no grupo e abre as mesmas ações, sem alargar a página.
-  await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
-  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
-  await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+  await entrarNoFocoCorrido(page, toque);
+  await apertar(await naBandejaDoFoco(page, 'Ações'), toque);
   const emFoco = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(emFoco).toBeVisible();
   await expect(
@@ -1322,19 +1362,19 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await naoTemLargura();
 });
 
-test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, anterior e próximo, "lido até" que só avança, e a mesma posição ao sair: LEP compilada (11.8)', async ({
+test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progresso, setas no cartão, bandeja, Esc em duas etapas e a lente que fica; "lido até" que só avança e a mesma posição ao sair: LEP compilada (11.8, palco)', async ({
   page,
 }, info) => {
   test.setTimeout(180_000);
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
-  const porArtigo = page.getByRole('button', { name: 'Por artigo' });
+  const entrar = page.getByRole('button', { name: 'Modo foco' });
   const areas = page.getByRole('navigation', { name: 'Áreas' });
   const cartao = (artigo: string) =>
     page.getByRole('region', { name: new RegExp(`^Art\\. ${artigo}, \\d+ de \\d+$`) });
-  const proximo = page.getByRole('button', { name: /^Próximo/ });
-  const anterior = page.getByRole('button', { name: /^← Anterior/ });
+  const proximo = page.getByRole('button', { name: 'Próximo artigo' });
+  const anterior = page.getByRole('button', { name: 'Artigo anterior' });
   const sobra = () =>
     page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -1344,26 +1384,41 @@ test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, an
   const art41 = page.locator('[data-endereco="art41"]');
   await rolarAte(page, art41);
   await alinharNoAlto(page, art41);
-  await porArtigo.click();
+  const fundoDaPagina = () =>
+    page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor);
+  const fundoAntes = await fundoDaPagina();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await entrar.click();
   await expect(page).toHaveURL(/[?&]foco=artigo/);
   await expect(cartao('41')).toBeVisible();
   await expect(areas).toBeHidden();
   await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeHidden();
   expect(await sobra()).toBe(0);
-  await expect(porArtigo).toHaveAttribute('aria-pressed', 'true');
+  // O palco: a página na penumbra (mais escura que o fundo de antes) e o cartão aceso. A entrada
+  // leva 200 ms, e prefers-reduced-motion a desliga.
+  await expect.poll(fundoDaPagina).not.toBe(fundoAntes);
+  const duracaoDoCartao = () =>
+    cartao('41').evaluate((el) => getComputedStyle(el).animationDuration);
+  expect(await duracaoDoCartao()).toBe('0.2s');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await duracaoDoCartao()).toBe('0s');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  // Só o ⋯ e o fio de progresso na tela: nenhum controle da bandeja à vista.
+  await expect(maisDoFoco(page)).toBeVisible();
+  await expect(page.getByRole('progressbar')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Buscar', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Por artigo' })).toHaveCount(0);
   // Os incisos do art. 41 estão no mesmo cartão; o texto dos vizinhos fica fora dele.
   await expect(cartao('41').locator('[data-endereco="art41.incI"]')).toBeVisible();
   await expect(cartao('41').locator('[data-endereco="art42"]')).toHaveCount(0);
 
-  // Os vizinhos: o de antes e o de depois, esmaecidos e sem interação.
+  // Os vizinhos: o de antes e o de depois, sem interação e, por padrão, sem texto (só a borda).
   const vizinhos = page.locator('.vizinho');
   await expect(vizinhos).toHaveCount(2);
   for (const vizinho of await vizinhos.all()) {
     await expect(vizinho).toHaveAttribute('inert', '');
-    await expect(vizinho).toBeVisible();
+    expect(await vizinho.innerText()).toBe('');
   }
-  await expect(vizinhos.nth(1)).toContainText('Art. 41-A');
-  await expect(vizinhos.nth(0)).toContainText('Art. 40');
 
   // O cartão cabe na tela (o artigo longo rola dentro dele), e os botões têm o tamanho do dedo.
   const caixa = await cartao('41').boundingBox();
@@ -1374,10 +1429,16 @@ test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, an
     expect(medidas?.height ?? 0).toBeGreaterThanOrEqual(44);
     expect(medidas?.width ?? 0).toBeGreaterThanOrEqual(44);
   }
-  // O grupo fixo dentro da tela, também no artigo por artigo.
+  // O ⋯ e as setas dentro da tela; a bandeja abre e fecha (o ⋯ e o Esc).
+  await expect(maisDoFoco(page)).toBeInViewport();
+  await expect(proximo).toBeInViewport();
+  await maisDoFoco(page).click();
   await expect(page.getByRole('button', { name: 'Lido até aqui' })).toBeInViewport();
   await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeInViewport();
   await semViolacoes(page);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeHidden();
+  await expect(page).toHaveURL(/[?&]foco=artigo/);
 
   // Próximo e anterior por botão e por seta; o "lido até" avança ao passar e nunca recua sozinho.
   const enderecoDoCartao = () =>
@@ -1411,19 +1472,33 @@ test('artigo por artigo: o cartão com o artigo inteiro, vizinhos esmaecidos, an
 
   // Sair do foco: o texto corrido volta com o artigo do cartão no alto, e a moldura volta.
   const noTexto = page.locator(`[data-endereco="${segundo}"]`);
-  await page.getByRole('button', { name: 'Sair do foco' }).click();
+  // Esc em duas etapas: o primeiro fecha a bandeja, o segundo sai do foco.
+  await maisDoFoco(page).click();
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeHidden();
+  await expect(areas).toBeHidden();
+  await page.keyboard.press('Escape');
   await expect(areas).toBeVisible();
   await expect(page).not.toHaveURL(/foco=/);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
 
-  // "Texto corrido" dentro do modo foco troca no lugar e leva o texto ao artigo do cartão.
-  await page.getByRole('button', { name: 'Modo foco' }).click();
-  await porArtigo.click();
+  // "Texto corrido" dentro do modo foco troca no lugar e leva o texto ao artigo do cartão; a
+  // lente escolhida fica: depois de recarregar, o F entra no texto corrido.
+  await entrar.click();
   await expect.poll(enderecoDoCartao).toBe(segundo);
-  await porArtigo.click();
+  await (await naBandejaDoFoco(page, 'Texto corrido')).click();
   await expect(page).toHaveURL(/[?&]foco=texto/);
   await expect(page.getByRole('region', { name: /^Art\./ })).toHaveCount(0);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
+  await sairDoFocoPelaBandeja(page);
+  await page.reload();
+  await entrar.click();
+  await expect(page).toHaveURL(/[?&]foco=texto/);
+  // De volta ao cartão pela bandeja; a lente passa a ser o cartão de novo.
+  await (await naBandejaDoFoco(page, 'Um artigo por vez')).click();
+  await expect(page).toHaveURL(/[?&]foco=artigo/);
+  await expect(page.locator('.cartao-artigo')).toBeVisible();
   info.annotations.push({ type: 'aparelho', description: info.project.name });
 });
 

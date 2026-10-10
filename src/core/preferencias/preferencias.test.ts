@@ -64,4 +64,19 @@ describe('preferências (1.7)', () => {
     expect(ligada.reguaDeLeitura).toBe(true);
     expect(Preferencias.safeParse({ ...ligada, reguaDeLeitura: 'sim' }).success).toBe(false);
   });
+
+  it('lente do foco e espiada dos vizinhos: ausentes são os padrões, mudam sem migração e validam (palco)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const antiga = await obterPreferencias(repo);
+    expect(antiga).not.toHaveProperty('lenteDoFoco');
+    expect(antiga).not.toHaveProperty('espiadaDosVizinhos');
+    const nova = await alterarPreferencias(repo, {
+      lenteDoFoco: 'corrido',
+      espiadaDosVizinhos: true,
+    });
+    expect(nova.lenteDoFoco).toBe('corrido');
+    expect(nova.espiadaDosVizinhos).toBe(true);
+    expect(Preferencias.safeParse({ ...nova, lenteDoFoco: 'janela' }).success).toBe(false);
+    expect(Preferencias.safeParse({ ...nova, espiadaDosVizinhos: 'sim' }).success).toBe(false);
+  });
 });
