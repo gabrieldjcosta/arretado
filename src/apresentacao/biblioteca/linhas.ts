@@ -74,6 +74,7 @@ const LINHAS_ESTIMADAS: Partial<Record<TipoDispositivo, number>> = {
   inciso: 2,
   alinea: 2,
   item: 2,
+  sumula: 4,
   nome: 1,
 };
 

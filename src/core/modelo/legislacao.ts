@@ -80,6 +80,8 @@ export const TipoDispositivo = z.enum([
   'inciso',
   'alinea',
   'item',
+  // Súmula (esquema v4, Peça 4 do acervo): um enunciado numerado; normativo, filho direto da coleção.
+  'sumula',
   'anexo',
   // Trecho com numeração própria aberto por título solto (ADCT da CF); estrutural (8.4).
   'bloco',

@@ -14,6 +14,12 @@ export const FonteDaCuradoria = z.discriminatedUnion('adaptador', [
     arquivo: z.string().regex(/^[A-Za-z0-9._-]{1,120}$/),
     urlOficial: z.url({ protocol: /^https?$/ }).optional(),
   }),
+  /** Coleção de súmulas curada em JSON (`scripts/acervo/sumulas.ts`); `arquivo` é relativo a `acervo/fontes/`. */
+  z.strictObject({
+    adaptador: z.literal('sumulas'),
+    arquivo: z.string().regex(/^[A-Za-z0-9._-]{1,120}$/),
+    urlOficial: z.url({ protocol: /^https?$/ }).optional(),
+  }),
 ]);
 export type FonteDaCuradoria = z.infer<typeof FonteDaCuradoria>;
 
