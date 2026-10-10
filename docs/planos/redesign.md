@@ -74,12 +74,12 @@ Arquivos: `src/apresentacao/recall/RecallInicio.tsx`, `Drill.tsx`, `RegistrarErr
 
 Arquivos: `src/apresentacao/biblioteca/Leitor.tsx`, `Normas.tsx`, `FiltroDaNorma.tsx` e o CSS do modo foco.
 
-- [ ] **4.1 Ler a 11.8 e a 11.9 prontas** e listar o que já fazem (esmaecer fora do artigo, "lido até", remissões). Só implementar o que falta; registrar no PR o que foi reaproveitado.
-- [ ] **4.2 Literata na lei.** Confirmar que `--fonte-leitura` já aplica a Literata ao texto da norma e que a opção `sem_serifa` continua valendo; reconferir quebra de linha, `--largura-texto: 70ch` e tamanho no celular.
-- [ ] **4.3 Régua de leitura opcional.** Preferência `reguaDeLeitura` (opcional, padrão desligada): destaca a linha ou o bloco sob o dedo ou o cursor sem mover o texto. Testes de preferência como em 3.2; teste de componente do estado ligado/desligado; sem animação contínua (respeitar `prefers-reduced-motion`).
-- [ ] **4.4 "Depois" no leitor.** `LinhaDepois` no fim do artigo com o próximo (artigo seguinte ou "fim da seção"); some no modo foco se a 11.8 já tiver sua própria navegação.
-- [ ] **4.5 Biblioteca.** Aplicar `AcaoAgora` à "Continuar leitura" (norma, ponto onde parou, tempo estimado a partir do tamanho da seção) e a nova voz às listas e estados vazios.
-- [ ] **4.6 E2E e axe** no leitor (LEP compilada) com os destaques da 9.8, grifos e estrela, nos dois temas e 3 aparelhos; conferir que a abertura medida do leitor (limiar de 1 s) não piora.
+- [x] **4.1 Ler a 11.8 e a 11.9 prontas** e listar o que já fazem (esmaecer fora do artigo, "lido até", remissões). Só implementar o que falta; registrar no PR o que foi reaproveitado.
+- [x] **4.2 Literata na lei.** Confirmar que `--fonte-leitura` já aplica a Literata ao texto da norma e que a opção `sem_serifa` continua valendo; reconferir quebra de linha, `--largura-texto: 70ch` e tamanho no celular.
+- [x] **4.3 Régua de leitura opcional.** Preferência `reguaDeLeitura` (opcional, padrão desligada): destaca a linha ou o bloco sob o dedo ou o cursor sem mover o texto. Testes de preferência como em 3.2; teste de componente do estado ligado/desligado; sem animação contínua (respeitar `prefers-reduced-motion`).
+- [x] **4.4 (dispensada: a 11.8 tem o próprio "Próximo →" e, no texto corrido, o próximo já está logo abaixo) "Depois" no leitor.** `LinhaDepois` no fim do artigo com o próximo (artigo seguinte ou "fim da seção"); some no modo foco se a 11.8 já tiver sua própria navegação.
+- [x] **4.5 Biblioteca.** Aplicar `AcaoAgora` à "Continuar leitura" (norma, ponto onde parou, tempo estimado a partir do tamanho da seção) e a nova voz às listas e estados vazios.
+- [x] **4.6 E2E e axe** no leitor (LEP compilada) com os destaques da 9.8, grifos e estrela, nos dois temas e 3 aparelhos; conferir que a abertura medida do leitor (limiar de 1 s) não piora.
 - **Pronto quando:** leitor e Biblioteca na identidade nova, sem regressão de desempenho nem de acessibilidade.
 
 ## Fatia 5 — Conta e acabamento

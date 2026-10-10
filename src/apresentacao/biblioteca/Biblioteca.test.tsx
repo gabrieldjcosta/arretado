@@ -144,8 +144,10 @@ describe('Biblioteca › Normas (9.5)', () => {
     const { norma: lep } = await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     const { norma: eca } = await publicarVersao(repo, (await rascunho(repo, 'ECA')).id);
     await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
-    const primeiro = async (normaId: string) =>
-      (await abrirNorma(repo, normaId)).nos[0]!.dispositivo.id;
+    const primeiro = async (normaId: string) => {
+      const { nos } = await abrirNorma(repo, normaId);
+      return (nos.find((n) => n.dispositivo.tipo === 'artigo') ?? nos[0]!).dispositivo.id;
+    };
     await gravarPosicao(repo, eca.id, await primeiro(eca.id));
     relogio.avancar(60 * 60_000);
     await gravarPosicao(repo, lep.id, await primeiro(lep.id));
@@ -154,6 +156,10 @@ describe('Biblioteca › Normas (9.5)', () => {
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
     expect(continuar).toHaveClass('principal');
+    // O "agora" diz onde parou e quanto falta da seção (fatia 4).
+    const agora = screen.getByRole('region', { name: 'Agora' });
+    expect(within(agora).getByRole('heading')).toHaveTextContent(/^Você parou no .+ da LEP$/);
+    expect(agora).toHaveTextContent(/cerca de \d+ min/);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(

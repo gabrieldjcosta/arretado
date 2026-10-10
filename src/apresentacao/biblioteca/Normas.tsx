@@ -2,17 +2,20 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import type { Leitura, Norma, VersaoDeNorma } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
-import { normasPublicadas } from '../../dominios/legislacao/leitor';
+import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
+import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
 import {
   descartarRascunho,
   RascunhoIndisponivel,
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
+import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { formatarQuando } from '../recall/rotulos';
+import { referenciaDoNo } from './linhas';
 
 interface Pendente {
   norma: Norma;
@@ -25,7 +28,39 @@ async function carregarBiblioteca(repo: Repositorio) {
     rascunhosPendentes(repo),
     leiturasPorNorma(repo),
   ]);
-  return { normas, pendentes, leituras, continuar: ultimaLida(normas, leituras) };
+  const continuar = ultimaLida(normas, leituras);
+  return {
+    normas,
+    pendentes,
+    leituras,
+    continuar,
+    ponto: continuar && (await pontoDaLeitura(repo, continuar.id, leituras)),
+  };
+}
+
+/**
+ * Onde a leitura parou e quanto falta da seção: "Art. 41" e os minutos. Sem o ponto (norma sem
+ * posição guardada, ou que não abre), o "Continuar leitura" aparece sem eles.
+ */
+async function pontoDaLeitura(
+  repo: Repositorio,
+  normaId: string,
+  leituras: ReadonlyMap<string, Leitura>,
+): Promise<{ referencia: string; minutos: number } | undefined> {
+  const leitura = leituras.get(normaId);
+  const alvo = leitura?.posicaoId ?? leitura?.lidoAteId;
+  if (alvo === undefined) return undefined;
+  try {
+    const { nos, indiceDe } = await abrirNorma(repo, normaId);
+    const indice = indiceDe.get(alvo);
+    if (indice === undefined) return undefined;
+    const referencia = referenciaDoNo(nos, indiceDe, indice);
+    return referencia === ''
+      ? undefined
+      : { referencia, minutos: minutosAteOFimDaSecao(nos, indice) };
+  } catch {
+    return undefined;
+  }
 }
 
 /** A norma publicada lida por último: a do "Continuar leitura" (Parte 2 §9.2). */
@@ -176,11 +211,16 @@ export function Normas() {
           ) : (
             <>
               {dados.continuar && (
-                <p className="continuar-leitura">
-                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao principal">
-                    Continuar leitura: {dados.continuar.tituloCurto}
-                  </Link>
-                </p>
+                <AcaoAgora
+                  titulo={
+                    dados.ponto
+                      ? `Você parou no ${dados.ponto.referencia} da ${dados.continuar.tituloCurto}`
+                      : `Você estava lendo a ${dados.continuar.tituloCurto}`
+                  }
+                  estimativa={dados.ponto?.minutos}
+                  rotuloBotao={`Continuar leitura: ${dados.continuar.tituloCurto}`}
+                  para={`/biblioteca/normas/${dados.continuar.id}`}
+                />
               )}
               <section aria-labelledby="titulo-normas">
                 <div className="cabecalho-secao">

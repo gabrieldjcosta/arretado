@@ -55,4 +55,13 @@ describe('preferências (1.7)', () => {
     expect(Preferencias.safeParse({ ...nova, cotaDiaria: 5 }).success).toBe(true);
     expect(Preferencias.safeParse({ ...nova, cotaDiaria: 100 }).success).toBe(true);
   });
+
+  it('régua de leitura: ausente é desligada, muda sem migração e só aceita booleano (fatia 4)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const antiga = await obterPreferencias(repo);
+    expect(antiga).not.toHaveProperty('reguaDeLeitura');
+    const ligada = await alterarPreferencias(repo, { reguaDeLeitura: true });
+    expect(ligada.reguaDeLeitura).toBe(true);
+    expect(Preferencias.safeParse({ ...ligada, reguaDeLeitura: 'sim' }).success).toBe(false);
+  });
 });
