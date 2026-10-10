@@ -132,6 +132,12 @@ export const ENTIDADES = {
     indices: ['usuarioId', '[usuarioId+normaId]'],
     desdeVersao: 2,
   },
+  vinculosDisciplina: {
+    esquema: L.VinculoDeDisciplina,
+    modulo: 'legislacao',
+    indices: ['usuarioId', 'normaId', 'disciplinaId'],
+    desdeVersao: 4,
+  },
   // catálogo
   pacotesIncidencia: { esquema: L.PacoteDeIncidencia, modulo: 'catalogo', indices: ['usuarioId'] },
   adesoes: { esquema: L.Adesao, modulo: 'catalogo', indices: ['usuarioId', 'pacoteId'] },

@@ -164,6 +164,20 @@ Entradas e condições que a spec implica e que nenhum teste de tarefa cobriria 
 - 3c: abas Normas/Súmulas/Teses, tela `/biblioteca/acervo` (agrupamento por disciplina e por tipo, avisos, progresso, retomada), Biblioteca vazia com "Tudo do edital da DPE-SP", vínculos de disciplina e abertura no trecho.
 - 3d: lotes restantes (ALESP, CNJ e conselhos, portal da Defensoria, Câmara com recorte dos anexos da OIT, esaj com Chrome).
 
+### Peça 3 detalhada (10/10/2026)
+
+**3a — feita:** `src/dominios/acervo/` (`esquemas.ts`, `hash.ts`, `fonte.ts`, `fonte-estatica.ts`, `fonte-em-memoria.ts`, `adesao.ts`, `acervo.test.ts`), `vinculosDisciplina` e esquema v4, migração Supabase, T20.
+
+**3b — pipeline** (Node, fora do app e do CI, exceto a verificação):
+- [ ] Tarefa 11: `acervo/curadoria.json` (id estável, grupo, vínculos, avisos, fonte) e esquema zod da curadoria; `scripts/acervo-gerar.mjs [id]` escreve `public/acervo/indice.json` e um arquivo por item reusando o estruturador da F2 (`estruturar`); cache bruto fora do git, User-Agent identificado, 1 requisição por segundo por servidor.
+- [ ] Tarefa 12: adaptadores Planalto e Markdown (`~~tachado~~` → trecho tachado) com amostras pequenas versionadas; hash reprodutível (teste: gerar duas vezes, mesmo hash).
+- [ ] Tarefa 13: `npm run acervo:verificar` (esquema, hash do índice, validação estrutural, tamanho) no CI; `acervo/relatorio.md` por rodada; item com anomalia não vai para o site.
+- [ ] Tarefa 14: regra para documentos sem artigos (Anexo e blocos pelos títulos) e amostra ao Gabriel antes do lote; lote das leis federais.
+
+**3c — tela:** abas Normas/Súmulas/Teses; `/biblioteca/acervo` (agrupar por disciplina ou tipo, caixas de seleção, busca, tamanho, avisos, progresso "23 de 177" com "Parar", "Tentar de novo" só nos que falharam); Biblioteca vazia com "Tudo do edital da DPE-SP"; lista por disciplina com subtítulo, abrindo no trecho; E2E com índice de teste de 3 itens, offline depois de adicionar; axe nos 2 temas.
+
+**3d — lotes restantes:** ALESP, CNJ e conselhos, portal da Defensoria, Câmara (recorte dos anexos da OIT), esaj com Chrome.
+
 **Peça 4 — Súmulas:** levantamento da fonte oficial de STF, STF vinculantes, STJ, TJSP e TNU; adaptadores; `TipoDispositivo` `sumula`; endereço `s593`/`sv11`; situação (vigente, cancelada, superada); busca por número; aba e adesão por tribunal.
 
 **Peça 5 — Teses:** adaptador da página da Defensoria (34 páginas, `_cur=1..34`, 169 teses, PDF por tese); `TipoDispositivo` `tese`; nós de área; `TextoDeDispositivo.origem`.

@@ -14,6 +14,16 @@ export const Norma = z.strictObject({
   referencia: TextoCurto.optional(),
   tipo: TextoCurto.optional(),
   esfera: z.enum(['federal', 'estadual', 'municipal', 'internacional']).optional(),
+  /** Espécie (esquema v4): ausente = norma; `sumulas` e `teses` são coleções (Peças 4 e 5 do acervo). */
+  especie: z.enum(['norma', 'sumulas', 'teses']).optional(),
+  /** Item do acervo de que a norma veio (esquema v4): id estável, versão e hash aderidos. */
+  origemAcervo: z
+    .strictObject({
+      id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,127}$/),
+      versao: z.int().min(1),
+      hash: z.string().regex(/^[0-9a-f]{64}$/),
+    })
+    .optional(),
   epigrafe: TextoLongo.optional(),
   ementa: TextoLongo.optional(),
   preambulo: TextoLongo.optional(),
@@ -176,6 +186,26 @@ export const Estrela = z.strictObject({
   pacoteId: Id.optional(),
 });
 export type Estrela = z.infer<typeof Estrela>;
+
+/**
+ * Vínculo de uma norma a uma disciplina (esquema v4, D7): uma norma pode ter vários, cada um com
+ * subtítulo e trecho opcionais ("CDC — Crimes das relações de consumo", arts. 61 a 80). Sem
+ * `disciplinaId` é "sem disciplina"; `sugestao` guarda o nome que o acervo sugeriu.
+ */
+export const VinculoDeDisciplina = z.strictObject({
+  ...camposComuns,
+  normaId: Id,
+  disciplinaId: Id.optional(),
+  sugestao: TextoCurto.optional(),
+  subtitulo: TextoCurto.optional(),
+  trecho: z
+    .strictObject({
+      inicioEndereco: z.string().max(200),
+      fimEndereco: z.string().max(200),
+    })
+    .optional(),
+});
+export type VinculoDeDisciplina = z.infer<typeof VinculoDeDisciplina>;
 
 // ── Curadoria (F7) ──────────────────────────────────────────────────────────
 
