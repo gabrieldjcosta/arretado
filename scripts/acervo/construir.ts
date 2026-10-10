@@ -112,7 +112,7 @@ function contar(anomalias: readonly { tipo: string }[]): Record<string, number> 
   return por;
 }
 
-function montar(
+export function montar(
   cur: ItemDaCuradoria,
   nos: NoDoItem[],
   norma: Partial<ItemDoAcervo['norma']>,

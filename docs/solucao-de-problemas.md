@@ -1069,3 +1069,7 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **`Node is not defined` ao gerar:** o sanitizador precisa do DOM; `scripts/acervo/cli.ts` expõe o do jsdom como globais antes de gerar.
 - **Item "bloqueado" no relatório:** conflito, aviso não aceito ou árvore inválida. Ver `acervo/relatorio.md`; se o aviso é esperado, listar o tipo em `anomaliasAceitas` do item na curadoria.
 - **Regra de camadas:** `dominios/acervo` não importa de `dominios/legislacao`; o pipeline (que usa o estruturador) mora em `scripts/acervo/`.
+
+## Súmulas: sem rede, sem o levantamento das fontes (Peça 4, 10/10/2026)
+
+Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devolve 000), então o levantamento da fonte oficial de cada tribunal não foi feito. Causa: proxy sem esses hosts. Solução: o curador (ou uma sessão com rede) prepara `acervo/fontes/<tribunal>.json` no formato de `FonteDeSumulas` (`tribunal`, `vinculante`, `sumulas[] { numero, enunciado, situacao, origem?, link? }`), confere o texto na fonte oficial e acrescenta o item em `acervo/curadoria.json` (`especie: "sumulas"`, `fonte: { adaptador: "sumulas", arquivo }`); depois `npm run acervo:gerar <id>`. Sessão sem `node_modules`: `npx vitest` e `npx tsc` baixam outra versão e falham; rodar `npm ci` antes.
