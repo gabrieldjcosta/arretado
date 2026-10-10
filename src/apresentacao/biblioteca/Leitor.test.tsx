@@ -70,6 +70,16 @@ const dispositivo = (endereco: string) => {
   return el;
 };
 
+/** A estrela só aparece na linha ativa (peça 1): passa o ponteiro no dispositivo e devolve o botão. */
+const estrelaDe = async (
+  usuario: ReturnType<typeof userEvent.setup>,
+  endereco: string,
+  nome: string,
+) => {
+  await usuario.hover(dispositivo(endereco));
+  return screen.findByRole('button', { name: nome });
+};
+
 /** O jsdom não tem layout: cada linha mede 60 px, como se o navegador as medisse. */
 let alturaOriginal: PropertyDescriptor | undefined;
 beforeAll(() => {
@@ -958,7 +968,7 @@ describe('estrela (11.2)', () => {
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
 
-    const capitulo = screen.getByRole('button', { name: 'Estrela: CAPÍTULO I' });
+    const capitulo = await estrelaDe(usuario, 'tit1.cap1', 'Estrela: CAPÍTULO I');
     expect(capitulo).toHaveAttribute('aria-pressed', 'false');
     await usuario.click(capitulo);
     expect(
@@ -966,12 +976,16 @@ describe('estrela (11.2)', () => {
     ).toHaveAttribute('aria-pressed', 'true');
     // Tudo dentro herda, com a origem no nome; o Título (acima) não.
     expect(
-      screen.getByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' }),
+      await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º (herdada de CAPÍTULO I)'),
     ).toHaveAttribute('aria-pressed', 'true');
     expect(
-      screen.getByRole('button', { name: 'Estrela: Art. 1º, II, a) (herdada de CAPÍTULO I)' }),
+      await estrelaDe(
+        usuario,
+        'art1.incII.alA',
+        'Estrela: Art. 1º, II, a) (herdada de CAPÍTULO I)',
+      ),
     ).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Estrela: TÍTULO I' })).toHaveAttribute(
+    expect(await estrelaDe(usuario, 'tit1', 'Estrela: TÍTULO I')).toHaveAttribute(
       'aria-pressed',
       'false',
     );
@@ -988,7 +1002,7 @@ describe('estrela (11.2)', () => {
 
     // Desmarcar o art. 2 grava a exceção.
     await usuario.click(
-      screen.getByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' }),
+      await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º (herdada de CAPÍTULO I)'),
     );
     const excecao = await screen.findByRole('button', {
       name: 'Estrela: Art. 2º (exceção: fora da estrela de CAPÍTULO I)',
@@ -1004,13 +1018,68 @@ describe('estrela (11.2)', () => {
     expect(await estrelasGravadas(repo)).toEqual(['direta']);
   });
 
+  it('estrela discreta: só a direta mostra o botão; o da linha ativa aparece e passa para a próxima (peça 1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    // Nenhuma estrela: nenhum botão em repouso.
+    expect(document.querySelectorAll('button.estrela')).toHaveLength(0);
+
+    await usuario.click(await estrelaDe(usuario, 'tit1.cap1', 'Estrela: CAPÍTULO I'));
+    await screen.findByRole('button', { name: 'Estrela: CAPÍTULO I (direta)' });
+    // Fora da linha ativa, só a direta mantém o botão; a herdada fica só na barra (tracejada).
+    await usuario.hover(dispositivo('art3'));
+    await waitFor(() => {
+      expect(document.querySelectorAll('button.estrela')).toHaveLength(2);
+    });
+    expect(
+      screen.getByRole('button', { name: 'Estrela: CAPÍTULO I (direta)' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Estrela: Art. 3º (herdada de CAPÍTULO I)' }),
+    ).toBeInTheDocument();
+    expect(linhaDe('art2')).toHaveAttribute('data-estrela-origem', 'herdada');
+    expect(linhaDe('art2')?.querySelector('button.estrela')).toBeNull();
+
+    // A linha ativa muda com o ponteiro.
+    await usuario.hover(dispositivo('art2'));
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (herdada de CAPÍTULO I)' });
+    expect(
+      screen.queryByRole('button', { name: 'Estrela: Art. 3º (herdada de CAPÍTULO I)' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('a tecla S estrela a linha ativa e anuncia; sem linha ativa, com Ctrl ou com campo de texto, não faz nada (peça 1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    // Sem linha ativa, nada acontece.
+    await usuario.keyboard('s');
+    expect(await estrelasGravadas(repo)).toEqual([]);
+    await usuario.hover(dispositivo('art2'));
+    await usuario.keyboard('{Control>}s{/Control}');
+    expect(await estrelasGravadas(repo)).toEqual([]);
+
+    await usuario.keyboard('s');
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
+    expect(document.querySelector('.acoes-leitor [role="status"]')).toHaveTextContent(
+      'Art. 2º: estrela direta.',
+    );
+    await usuario.keyboard('s');
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º' });
+    expect(await estrelasGravadas(repo)).toEqual([]);
+  });
+
   it('fora do texto vigente (a seleção não conta o botão), também no modo foco e depois de recarregar', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
     await screen.findByText(/A jurisdição penal/);
 
-    const botao = screen.getByRole('button', { name: 'Estrela: Art. 3º' });
+    const botao = await estrelaDe(usuario, 'art3', 'Estrela: Art. 3º');
     expect(botao.closest('.texto-vigente')).toBeNull();
     expect(botao).toHaveAttribute('data-fora-do-texto');
     await usuario.click(botao);
@@ -1043,7 +1112,7 @@ describe('filtros (11.3)', () => {
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
-    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 2º' }));
+    await usuario.click(await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º'));
     await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
 
     const dialogo = await filtrar(usuario, /Só os estrelados/);
@@ -1202,7 +1271,7 @@ describe('filtros (11.3)', () => {
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
-    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 2º' }));
+    await usuario.click(await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º'));
     await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
     const dialogo = await filtrar(usuario, /Só os estrelados/);
     await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
@@ -1237,6 +1306,19 @@ describe('ações por dispositivo (11.5)', () => {
     expect(referencia).toMatch(/^art\. \d+º, LEP$/);
     return { dialogo, referencia };
   }
+
+  it('estrelar pelas Ações: "Estrelar" e depois "Tirar a estrela" (peça 1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    const { dialogo } = await abrirAcoes(usuario);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Estrelar' }));
+    expect(await within(dialogo).findByRole('button', { name: 'Tirar a estrela' })).toBeVisible();
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Tirar a estrela' }));
+    expect(await within(dialogo).findByRole('button', { name: 'Estrelar' })).toBeVisible();
+  });
 
   it('registrar erro: já com a referência, dois campos, vinculado ao dispositivo; depois aparece nos vinculados', async () => {
     const { repo } = await repositorioDeTeste();
@@ -1539,7 +1621,7 @@ describe('leitura artigo por artigo (11.8)', () => {
     await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
-    await usuario.click(screen.getByRole('button', { name: 'Estrela: Art. 3º' }));
+    await usuario.click(await estrelaDe(usuario, 'art3', 'Estrela: Art. 3º'));
     await screen.findByRole('button', { name: 'Estrela: Art. 3º (direta)' });
     rolarPara(3 * 60);
     await usuario.click(screen.getByRole('button', { name: 'Por artigo' }));

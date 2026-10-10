@@ -36,16 +36,16 @@ Entradas e condições que a spec implica e que nenhum teste de tarefa cobriria 
 ### Tarefa 1: marcador da estrela só onde há estrela
 
 **Arquivos:**
-- Criar: `src/apresentacao/biblioteca/estrela.ts`, `src/apresentacao/biblioteca/estrela.test.ts`
+- Criar: `src/apresentacao/biblioteca/botaoDaEstrela.ts`, `src/apresentacao/biblioteca/botaoDaEstrela.test.ts`
 - Modificar: `src/apresentacao/biblioteca/Leitor.tsx` (`conteudoDaLinha`, `propriedadesDaLinha`), `src/apresentacao/biblioteca/Estrela.tsx`
 
 **Interfaces:**
 - Produz: `mostrarBotaoDaEstrela(estado: EstadoDaEstrela, linhaAtiva: boolean): boolean` — `true` se `estado.origem === 'direta'` ou `linhaAtiva`; `false` caso contrário.
 - Consome: `EstadoDaEstrela` de `dominios/legislacao/estrelas.ts`.
 
-- [ ] **Passo 1: teste falhando** em `estrela.test.ts`: `mostrarBotaoDaEstrela({estrelado:true, origem:'direta'}, false)` é `true`; herdada (`{estrelado:true, origem:'herdada', deId:'x'}`), exceção (`{estrelado:false, origem:'excecao', deId:'x'}`) e sem estrela (`{estrelado:false}`) são `false` com a linha inativa e `true` com a linha ativa.
+- [ ] **Passo 1: teste falhando** em `botaoDaEstrela.test.ts`: `mostrarBotaoDaEstrela({estrelado:true, origem:'direta'}, false)` é `true`; herdada (`{estrelado:true, origem:'herdada', deId:'x'}`), exceção (`{estrelado:false, origem:'excecao', deId:'x'}`) e sem estrela (`{estrelado:false}`) são `false` com a linha inativa e `true` com a linha ativa.
 - [ ] **Passo 2:** `npx vitest run src/apresentacao/biblioteca/estrela.test.ts` — falha por função inexistente.
-- [ ] **Passo 3:** implementar `mostrarBotaoDaEstrela` em `estrela.ts`.
+- [ ] **Passo 3:** implementar `mostrarBotaoDaEstrela` em `botaoDaEstrela.ts`.
 - [ ] **Passo 4:** em `conteudoDaLinha` passar `estrela` ao `Dispositivo` só quando `mostrarBotaoDaEstrela(estado, id === linhaAtivaId)`. Acrescentar a `propriedadesDaLinha` o atributo `data-estrela-origem` (`'direta' | 'herdada' | 'excecao'`, ausente sem estrela) para o CSS. A estrela de um nó sai do dado (`estrelas.estados`), não da posição no DOM (foco da revisão 1).
 - [ ] **Passo 5: teste de componente** em `Leitor.test.tsx`, no `describe('estrela (11.2)')`: com um artigo estrelado e outro não, só o estrelado tem `button.estrela` no DOM antes de qualquer toque; passar o ponteiro sobre o outro faz o botão dele aparecer. Rodar: `npx vitest run src/apresentacao/biblioteca --maxWorkers=4` — passa; ajustar os testes existentes que esperavam um botão por linha.
 

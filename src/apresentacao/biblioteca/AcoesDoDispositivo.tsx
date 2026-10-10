@@ -26,11 +26,19 @@ const VERSO_MAXIMO = 20_000;
 /** O resumo de cada erro na lista. */
 const RESUMO_DO_ERRO = 140;
 
+/** A estrela do dispositivo do alvo (peça 1): ausente no que não leva estrela (revogado, vetado). */
+export interface EstrelaDasAcoes {
+  estrelado: boolean;
+  alternar: () => void;
+}
+
 export function AcoesDoDispositivo({
   alvo,
+  estrela,
   aoFechar,
 }: {
   alvo: AlvoDasAcoes | undefined;
+  estrela?: EstrelaDasAcoes;
   aoFechar: () => void;
 }) {
   return (
@@ -40,12 +48,20 @@ export function AcoesDoDispositivo({
       titulo={alvo ? `Ações de ${alvo.nome}` : 'Ações'}
       classe="dialogo-acoes"
     >
-      {alvo && <Conteudo alvo={alvo} aoFechar={aoFechar} />}
+      {alvo && <Conteudo alvo={alvo} estrela={estrela} aoFechar={aoFechar} />}
     </Dialogo>
   );
 }
 
-function Conteudo({ alvo, aoFechar }: { alvo: AlvoDasAcoes; aoFechar: () => void }) {
+function Conteudo({
+  alvo,
+  estrela,
+  aoFechar,
+}: {
+  alvo: AlvoDasAcoes;
+  estrela: EstrelaDasAcoes | undefined;
+  aoFechar: () => void;
+}) {
   const repo = useRepositorio();
   const [registrando, setRegistrando] = useState(false);
   const [aviso, setAviso] = useState('');
@@ -143,6 +159,11 @@ function Conteudo({ alvo, aoFechar }: { alvo: AlvoDasAcoes; aoFechar: () => void
           >
             Criar cartão deste trecho
           </button>
+          {estrela && (
+            <button type="button" onClick={estrela.alternar}>
+              {estrela.estrelado ? 'Tirar a estrela' : 'Estrelar'}
+            </button>
+          )}
           <button type="button" onClick={() => void copiar()}>
             Copiar referência
           </button>

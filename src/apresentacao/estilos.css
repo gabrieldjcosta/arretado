@@ -62,7 +62,7 @@
   --grifo-3: #fcdde8;
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
-  --calha-estrela: 2rem;
+  --calha-estrela: 1.5rem;
   /* Identidade nova (redesign, fatia 1): Papel, tinta e sálvia. O marca-texto só marca o que é
      agora, sempre como fundo com a tinta por cima (texto/agora 8,1:1); "depois" é o recuado. */
   --agora: #e9b949;
@@ -999,6 +999,11 @@ dialog.dialogo-busca {
   background: var(--estrela);
 }
 
+/* A herdada é só a barra, em traço tracejado: sem ícone, a origem não depende da cor (peça 1). */
+.linha-leitor[data-estrela-origem='herdada']::before {
+  background: repeating-linear-gradient(to bottom, var(--estrela) 0 6px, transparent 6px 10px);
+}
+
 button.estrela {
   position: absolute;
   inset-inline-start: 0;
@@ -1071,12 +1076,6 @@ button.estrela:focus-visible {
 @media (hover: hover) {
   button.estrela[data-origem='nenhuma']:hover {
     color: var(--estrela);
-  }
-}
-
-@media (max-width: 699px) {
-  :root {
-    --calha-estrela: 1.75rem;
   }
 }
 

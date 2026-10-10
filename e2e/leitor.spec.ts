@@ -527,6 +527,7 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await page.goBack();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await expect(art3).toContainText('qualquer distinção');
+  await art3.scrollIntoViewIfNeeded();
   const antes = await art3.boundingBox();
   await art3.hover();
   const linha = page.locator('.linha-leitor[data-regua]');
@@ -996,6 +997,14 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
     .toEqual(['nota']);
 });
 
+/** A estrela só aparece na linha ativa (peça 1): passa o ponteiro no dispositivo e devolve o botão. */
+async function estrelaDe(page: Page, endereco: string, nome: string) {
+  await page.locator(`[data-endereco="${endereco}"]`).hover();
+  const botao = page.getByRole('button', { name: nome, exact: true });
+  await expect(botao).toBeVisible();
+  return botao;
+}
+
 /** As origens das estrelas gravadas no IndexedDB (as não excluídas), em ordem. */
 function estrelasGravadas(page: Page) {
   return page.evaluate(async () => {
@@ -1064,30 +1073,43 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   const estrela = (nome: string) => page.getByRole('button', { name: nome, exact: true });
   const art10 = page.locator('[data-endereco="art10"]');
   await expect(art10).toBeVisible();
+
+  // Em repouso, só a linha ativa (a última tocada) tem botão: a estrela é marca, não botão (peça 1).
+  expect(await page.locator('button.estrela').count()).toBeLessThanOrEqual(1);
+  // O ponteiro rola o que ainda não está à vista; a medida parte daqui, com a Seção I já ativa.
+  const botaoDaSecao = await estrelaDe(page, 'tit2.cap2.sec1', 'Estrela: Seção I');
+  await expect(art10).toBeVisible();
   const alturaAntes = await art10.evaluate((el) => el.getBoundingClientRect().height);
   const alto = await distanciaDoAlto(secao);
-
-  await apertar(estrela('Estrela: Seção I'), toque);
+  await apertar(botaoDaSecao, toque);
   await expect(estrela('Estrela: Seção I (direta)')).toHaveAttribute('aria-pressed', 'true');
-  await expect(estrela('Estrela: Art. 10 (herdada de Seção I)')).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  // O Capítulo (acima) e a Seção II (ao lado) não acendem.
-  await expect(estrela('Estrela: CAPÍTULO II')).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('.aviso-da-estrela')).toHaveText('Seção I: estrela direta.');
   // A linha não mudou de altura, nem a leitura de lugar.
   expect(await art10.evaluate((el) => el.getBoundingClientRect().height)).toBe(alturaAntes);
   expect(Math.abs((await distanciaDoAlto(secao)) - alto)).toBeLessThan(1);
+  // A herdada é só a barra tracejada; o botão aparece na linha ativa.
+  await expect(
+    await estrelaDe(page, 'art10', 'Estrela: Art. 10 (herdada de Seção I)'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  const barra = page.locator('.linha-leitor[data-estrela-origem="herdada"]').first();
+  expect(await barra.evaluate((el) => getComputedStyle(el, '::before').backgroundImage)).toContain(
+    'repeating-linear-gradient',
+  );
+  await expect(
+    await estrelaDe(page, 'art11', 'Estrela: Art. 11 (herdada de Seção I)'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  // Só a direta e a linha ativa têm botão.
+  await expect(page.locator('button.estrela')).toHaveCount(2);
+  // O Capítulo (acima) e a Seção II (ao lado) não acendem.
+  await expect(await estrelaDe(page, 'tit2.cap2', 'Estrela: CAPÍTULO II')).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await expect(page.locator('.aviso-da-estrela')).toHaveText('Seção I: estrela direta.');
   expect(await estrelasGravadas(page)).toEqual(['direta']);
   await semViolacoes(page);
 
   // Desmarcar o art. 11 vira exceção (só a direta e a exceção são gravadas).
-  await apertar(estrela('Estrela: Art. 11 (herdada de Seção I)'), toque);
+  await apertar(await estrelaDe(page, 'art11', 'Estrela: Art. 11 (herdada de Seção I)'), toque);
   const excecao = estrela('Estrela: Art. 11 (exceção: fora da estrela de Seção I)');
   await expect(excecao).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('.aviso-da-estrela')).toHaveText(
@@ -1098,7 +1120,8 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   // No modo foco, o mesmo controle; estrelar de novo o art. 11 desfaz a exceção.
   await apertar(page.getByRole('button', { name: 'Modo foco' }), toque);
   await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
-  await expect(excecao).toBeVisible();
+  // A linha ativa pode ter mudado com a moldura que saiu: o ponteiro a reativa.
+  await estrelaDe(page, 'art11', 'Estrela: Art. 11 (exceção: fora da estrela de Seção I)');
   await semViolacoes(page);
   await apertar(excecao, toque);
   await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toBeVisible();
@@ -1111,8 +1134,8 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
 
   // Recarregar: a herança é recalculada da direta gravada.
   await page.reload();
-  await expect(estrela('Estrela: Art. 10 (herdada de Seção I)')).toBeVisible();
   await expect(estrela('Estrela: Seção I (direta)')).toHaveAttribute('aria-pressed', 'true');
+  await estrelaDe(page, 'art10', 'Estrela: Art. 10 (herdada de Seção I)');
 });
 
 test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto, a posição mantida e o grupo fixo sem alargar a página, também no modo foco: LEP compilada (11.3)', async ({
@@ -1124,7 +1147,6 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
 
-  const estrela = (nome: string) => page.getByRole('button', { name: nome, exact: true });
   const naoTemLargura = async () => {
     const sobra = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -1143,8 +1165,8 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   const secao = page.locator('[data-endereco="tit2.cap2.sec1"]');
   await rolarAteExistir(page, secao);
   await alinharNoAlto(page, secao);
-  await apertar(estrela('Estrela: Seção I'), toque);
-  await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toBeVisible();
+  await apertar(await estrelaDe(page, 'tit2.cap2.sec1', 'Estrela: Seção I'), toque);
+  await estrelaDe(page, 'art11', 'Estrela: Art. 11 (herdada de Seção I)');
 
   // O grupo fixo ganhou um botão: com quatro, cabe na tela (quebra em duas linhas, se preciso).
   const grupo = page.locator('.acoes-leitor');
