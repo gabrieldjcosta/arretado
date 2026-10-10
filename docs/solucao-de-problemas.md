@@ -1058,3 +1058,7 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Causa:** o proxy das sessões remotas derruba o push de tag; push de branch funciona.
 - **Solução:** o backup diário é o branch `backup/AAAA-MM-DD` (`git push origin origin/main:refs/heads/backup/AAAA-MM-DD`), não tag.
 - **Origem:** encontrado em 10/10/2026, no primeiro dia do fluxo diário.
+
+## Esquema v4: pacote antigo e testes de pacote (Peça 3, 10/10/2026)
+
+**Sintoma:** teste de pacote v1 ou v2 falha com "coleção inesperada: vinculosDisciplina". **Causa:** o helper que reescreve a `versaoEsquema` do manifesto para uma versão antiga não removia a coleção nascida na v4; o leitor recusa coleção que a versão declarada não tinha. **Solução:** o helper também apaga `dados/vinculosDisciplina.json`, tira do manifesto (`arquivos`, `contagens`) e refaz o `hashConjunto`. **Previsível na próxima subida:** repetir isso nos dois helpers (`comoPacoteV1`, `comVersao`). **Aviso ao Gabriel:** a v4 sobe o esquema do banco; fazer backup antes do merge e recarregar as abas depois.

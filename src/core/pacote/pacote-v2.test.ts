@@ -115,7 +115,9 @@ describe('pacote v2 no app v3 (8.10)', () => {
     // Assim o app v2 recusa o pacote v3: pela versão, não pelo primeiro `vetado` (arquivo alterado).
     const { repo } = await comVetados();
     const { bytes } = await exportarPacote(repo);
-    const erro = await lerPacote(await comVersao(bytes, VERSAO_ESQUEMA + 1)).catch((e: unknown) => e);
+    const erro = await lerPacote(await comVersao(bytes, VERSAO_ESQUEMA + 1)).catch(
+      (e: unknown) => e,
+    );
     expect(erro).toBeInstanceOf(PacoteRecusado);
     expect((erro as PacoteRecusado).motivo).toBe('versao_posterior');
     repo.fechar();

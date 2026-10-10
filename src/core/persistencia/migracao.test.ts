@@ -190,7 +190,9 @@ describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', 
     }
     expect(await repo.db.tabela('vinculosDisciplina').count()).toBe(0);
     const normaId = (antes.normas?.[0] as { id: string }).id;
-    const v = await repo.colecao('vinculosDisciplina').criar({ normaId, sugestao: 'Direito Penal' });
+    const v = await repo
+      .colecao('vinculosDisciplina')
+      .criar({ normaId, sugestao: 'Direito Penal' });
     expect((await repo.colecao('vinculosDisciplina').obter(v.id))?.normaId).toBe(normaId);
     repo.fechar();
     await apagarBanco(nome);
