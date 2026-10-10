@@ -1062,3 +1062,10 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 ## Esquema v4: pacote antigo e testes de pacote (Peça 3, 10/10/2026)
 
 **Sintoma:** teste de pacote v1 ou v2 falha com "coleção inesperada: vinculosDisciplina". **Causa:** o helper que reescreve a `versaoEsquema` do manifesto para uma versão antiga não removia a coleção nascida na v4; o leitor recusa coleção que a versão declarada não tinha. **Solução:** o helper também apaga `dados/vinculosDisciplina.json`, tira do manifesto (`arquivos`, `contagens`) e refaz o `hashConjunto`. **Previsível na próxima subida:** repetir isso nos dois helpers (`comoPacoteV1`, `comVersao`). **Aviso ao Gabriel:** a v4 sobe o esquema do banco; fazer backup antes do merge e recarregar as abas depois.
+
+## Acervo: `acervo:gerar` (Peça 3b)
+
+- **`HTTP 503` ao coletar do Planalto:** o proxy do ambiente na nuvem bloqueia o site. Rodar `npm run acervo:gerar` numa máquina com rede, ou pôr o HTML em `acervo/.cache/<id>.bruto` (o gerador usa o cache antes de baixar).
+- **`Node is not defined` ao gerar:** o sanitizador precisa do DOM; `scripts/acervo/cli.ts` expõe o do jsdom como globais antes de gerar.
+- **Item "bloqueado" no relatório:** conflito, aviso não aceito ou árvore inválida. Ver `acervo/relatorio.md`; se o aviso é esperado, listar o tipo em `anomaliasAceitas` do item na curadoria.
+- **Regra de camadas:** `dominios/acervo` não importa de `dominios/legislacao`; o pipeline (que usa o estruturador) mora em `scripts/acervo/`.

@@ -1,0 +1,19 @@
+{
+  "versao": 1,
+  "itens": [
+    {
+      "id": "lei-federal-7210-1984",
+      "titulo": "Lei de Execução Penal (Lei nº 7.210/1984)",
+      "grupo": "Leis federais",
+      "tituloCurto": "LEP",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [{ "disciplina": "Execução Penal" }],
+      "anomaliasAceitas": ["alinea_sem_inciso"],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l7210compilado.htm"
+      }
+    }
+  ]
+}
