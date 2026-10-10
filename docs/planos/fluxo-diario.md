@@ -11,7 +11,7 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 1. Início da sessão: o hook cria a branch `backup/AAAA-MM-DD` no `origin/main` (uma vez por dia).
 2. Atividade: branch a partir da `integracao`; se depende de outra ainda não mergeada, a partir do branch dela.
 3. Commit só passa se `npm run check` estiver verde (hook `check-antes-do-commit`); o hook de parada barra encerrar com alteração pendente e check vermelho.
-4. Push, PR para a `integracao`, CI verde (`verificar` e os três `e2e`), merge com "Create a merge commit". Cada atividade vira **um** merge commit na `integracao`.
+4. Push, PR para a `integracao` e **auto-merge** ligado no PR (método "Create a merge commit"): a regra de proteção da `integracao` exige `verificar` e os três `e2e` verdes, então o GitHub mergeia sozinho quando passarem. Se o auto-merge for recusado, esperar o CI e mergear à mão. Cada atividade vira **um** merge commit na `integracao`. Auto-merge nunca em PR para o `main`.
 5. Atualizar `docs/proxima-sessao.md` no próprio branch da atividade.
 
 ## Interrupção por limite de uso e retomada
