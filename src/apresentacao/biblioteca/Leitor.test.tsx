@@ -376,6 +376,40 @@ describe('destaque automático (9.8)', () => {
   });
 });
 
+describe('régua de leitura (fatia 4)', () => {
+  const comRegua = () => document.querySelectorAll('[data-regua]');
+
+  it('desligada por padrão: nenhuma linha recebe o realce', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await usuario.hover(within(dispositivo('art1')).getByText(/prazo de 5/));
+    expect(comRegua()).toHaveLength(0);
+  });
+
+  it('ligada: realça só a linha sob o ponteiro, que muda com ele, e o foco também', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { reguaDeLeitura: true });
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art1')).toBeInTheDocument();
+    });
+    await usuario.hover(within(dispositivo('art1')).getByText(/prazo de 5/));
+    await waitFor(() => {
+      expect(comRegua()).toHaveLength(1);
+    });
+    expect(dispositivo('art1').closest('.linha-leitor')).toHaveAttribute('data-regua');
+    await usuario.hover(within(dispositivo('art2')).getByText(/Qualquer condenado/));
+    await waitFor(() => {
+      expect(dispositivo('art2').closest('.linha-leitor')).toHaveAttribute('data-regua');
+    });
+    expect(comRegua()).toHaveLength(1);
+  });
+});
+
 /** Rola a janela no jsdom (que não rola): a posição e o evento, como o navegador faria. */
 function rolarPara(y: number) {
   act(() => {

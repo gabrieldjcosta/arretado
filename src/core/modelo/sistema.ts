@@ -149,6 +149,11 @@ export const Preferencias = z.strictObject({
    */
   destacarCondicionantesEPrazos: z.boolean().optional(),
   /**
+   * Régua de leitura (redesign, fatia 4): realça a linha sob o dedo, o cursor ou o foco, sem mover o
+   * texto. Opcional: ausente é desligada; o registro e o pacote anteriores continuam válidos.
+   */
+  reguaDeLeitura: z.boolean().optional(),
+  /**
    * Cartões por vez no Recall (redesign, fatia 3). Opcional: ausente é 10 (`COTA_DIARIA_PADRAO`); o
    * registro e o pacote anteriores continuam válidos (sem migração). A fila nunca é cortada.
    */

@@ -26,7 +26,12 @@ export function AparenciaConta() {
     mudanca: Partial<
       Pick<
         Preferencias,
-        'tema' | 'fonteLeitura' | 'tamanhoFonte' | 'destacarCondicionantesEPrazos' | 'cotaDiaria'
+        | 'tema'
+        | 'fonteLeitura'
+        | 'tamanhoFonte'
+        | 'destacarCondicionantesEPrazos'
+        | 'reguaDeLeitura'
+        | 'cotaDiaria'
       >
     >,
   ) => {
@@ -126,6 +131,20 @@ export function AparenciaConta() {
           do leitor.
         </p>
         <LegendaDestaques comTraco />
+        <label className="opcao">
+          <input
+            type="checkbox"
+            checked={dados.reguaDeLeitura ?? false}
+            aria-describedby="regua-dica"
+            onChange={(e) => {
+              alterar({ reguaDeLeitura: e.target.checked });
+            }}
+          />
+          Régua de leitura
+        </label>
+        <p id="regua-dica" className="dica">
+          Realça a linha sob o dedo, o cursor ou o foco. O texto não se move.
+        </p>
       </fieldset>
       <fieldset>
         <legend>Recall</legend>

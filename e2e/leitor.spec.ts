@@ -510,6 +510,46 @@ test('destaque automático: ligar a opção e ver prazos, condições, termos ab
   await expect(page.locator('.destaque')).toHaveCount(0);
 });
 
+test('régua de leitura: desligada não realça; ligada em Conta realça a linha sob o ponteiro sem mover o texto, com axe nos dois temas e a Biblioteca com o "Continuar leitura": LEP compilada (fatia 4)', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  const art3 = page.locator('[data-endereco="art3.parUnico"]');
+  await expect(art3).toContainText('qualquer distinção');
+  await art3.hover();
+  await expect(page.locator('[data-regua]')).toHaveCount(0);
+
+  await page.goto('/#/conta/aparencia');
+  await page.getByRole('checkbox', { name: 'Régua de leitura' }).check();
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await expect(art3).toContainText('qualquer distinção');
+  const antes = await art3.boundingBox();
+  await art3.hover();
+  const linha = page.locator('.linha-leitor[data-regua]');
+  await expect(linha).toHaveCount(1);
+  await expect(linha.locator('[data-endereco="art3.parUnico"]')).toHaveCount(1);
+  // O realce não move o texto, nem muda a medida da linha.
+  expect(await art3.boundingBox()).toEqual(antes);
+  await semViolacoes(page);
+
+  // Põe o art. 3º perto do alto, para a posição guardada ser de um artigo em qualquer aparelho.
+  await art3.evaluate((el) => {
+    window.scrollBy(0, el.getBoundingClientRect().top - 140);
+  });
+  await page.waitForTimeout(1200);
+  // Sair grava a posição; a Biblioteca diz onde parou e quanto falta, no mesmo botão de sempre.
+  await page.getByRole('link', { name: 'Biblioteca' }).first().click();
+  const agora = page.getByRole('region', { name: 'Agora' });
+  await expect(agora.getByRole('heading')).toContainText('Você parou no');
+  await expect(agora).toContainText(/cerca de \d+ min/);
+  await expect(agora.getByRole('link', { name: 'Continuar leitura: LEP' })).toBeVisible();
+  await semViolacoes(page);
+});
+
 /** O dispositivo da linha no alto da tela (logo abaixo da barra fixa) e quanto dela ficou acima. */
 function linhaDoAlto(page: Page) {
   return page.evaluate(() => {

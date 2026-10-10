@@ -969,6 +969,13 @@ dialog.dialogo-busca {
   border-radius: 2px;
 }
 
+/* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
+   nem mudança de medida: o texto não se move. */
+.linha-leitor[data-regua] .dispositivo {
+  background: color-mix(in srgb, var(--primaria) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--primaria);
+}
+
 .linha-leitor {
   position: absolute;
   top: 0;

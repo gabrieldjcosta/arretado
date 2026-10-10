@@ -141,6 +141,14 @@ describe('Conta › Aparência (5.2)', () => {
     await waitFor(async () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
     });
+    // Régua de leitura (fatia 4): desligada por padrão, grava ao ligar.
+    const regua = screen.getByRole('checkbox', { name: 'Régua de leitura' });
+    expect(regua).not.toBeChecked();
+    await usuario.click(regua);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).reguaDeLeitura).toBe(true);
+    });
+    expect(regua).toBeChecked();
   });
 });
 

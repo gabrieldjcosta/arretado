@@ -332,6 +332,9 @@ function LeitorAberto({
   // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é desligado.
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
   const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
+  // Régua de leitura (fatia 4): a linha sob o dedo, o cursor ou o foco recebe o realce.
+  const reguaLigada = preferencias?.reguaDeLeitura ?? false;
+  const [reguaId, setReguaId] = useState<string | null>(null);
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   // O que o leitor de tela ouve (role=status): o "lido até" marcado e a troca do modo foco.
   const [anuncio, setAnuncio] = useState('');
@@ -1350,6 +1353,8 @@ function LeitorAberto({
       className: id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor',
       'data-estrelada': estado?.estrelado ? '' : undefined,
       'data-contexto': filtro && !filtro.casados.has(linha.indice) ? '' : undefined,
+      'data-linha-id': reguaLigada && id !== '' ? id : undefined,
+      'data-regua': reguaLigada && id !== '' && id === reguaId ? '' : undefined,
     };
   }
   function conteudoDaLinha(linha: LinhaDoLeitor) {
@@ -1386,6 +1391,12 @@ function LeitorAberto({
   }
   // O toque no texto (estrela, grifo, marcador de nota) e o teclado nos grifos: um ouvinte só, na
   // lista ou no cartão.
+  function moverRegua(e: { target: EventTarget }) {
+    if (!reguaLigada || !(e.target instanceof Element)) return;
+    const id = e.target.closest<HTMLElement>('.linha-leitor')?.dataset.linhaId;
+    if (id) setReguaId(id);
+  }
+
   function aoClicarNaLista(e: ReactMouseEvent) {
     const estrela =
       e.target instanceof Element ? e.target.closest<HTMLElement>('[data-estrela-de]') : null;
@@ -1581,6 +1592,8 @@ function LeitorAberto({
           className="area-artigo"
           onClick={aoClicarNaLista}
           onKeyDown={aoTeclarNaLista}
+          onPointerOver={moverRegua}
+          onFocus={moverRegua}
           onTouchStart={comecouODeslize}
           onTouchEnd={terminouODeslize}
         >
@@ -1655,6 +1668,8 @@ function LeitorAberto({
           style={{ height: virtualizador.getTotalSize() }}
           onClick={aoClicarNaLista}
           onKeyDown={aoTeclarNaLista}
+          onPointerOver={moverRegua}
+          onFocus={moverRegua}
         >
           {visiveis.map((virtual) => {
             const linha = linhas[virtual.index];
