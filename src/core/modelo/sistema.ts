@@ -154,6 +154,15 @@ export const Preferencias = z.strictObject({
    */
   reguaDeLeitura: z.boolean().optional(),
   /**
+   * Lente do modo foco (palco): 'cartao' (um artigo por vez) ou 'corrido'. Opcional: ausente é
+   * 'cartao'; grava ao escolher no foco. Registro e pacote anteriores continuam válidos.
+   */
+  lenteDoFoco: z.enum(['cartao', 'corrido']).optional(),
+  /**
+   * Espiada dos vizinhos no cartão do foco. Opcional: ausente é desligada (vizinhos sem texto).
+   */
+  espiadaDosVizinhos: z.boolean().optional(),
+  /**
    * Cartões por vez no Recall (redesign, fatia 3). Opcional: ausente é 10 (`COTA_DIARIA_PADRAO`); o
    * registro e o pacote anteriores continuam válidos (sem migração). A fila nunca é cortada.
    */

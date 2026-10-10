@@ -127,6 +127,21 @@ describe('pacote v1 no app v2 (9.1)', () => {
     destino.repo.fechar();
   });
 
+  it('preferências sem a lente e a espiada do foco (anteriores ao palco) restauram, com os padrões', async () => {
+    const origem = await comLeitura();
+    const { bytes } = await exportarPacote(origem.repo);
+    const destino = await comLeitura();
+    await alterarPreferencias(destino.repo, { lenteDoFoco: 'corrido', espiadaDosVizinhos: true });
+    await importar(destino.repo, await comoPacoteV1(bytes), 6);
+    const preferencias = await obterPreferencias(
+      destino.repo.comUsuario(origem.repo.ctx.usuarioId),
+    );
+    expect(preferencias).not.toHaveProperty('lenteDoFoco');
+    expect(preferencias).not.toHaveProperty('espiadaDosVizinhos');
+    origem.repo.fechar();
+    destino.repo.fechar();
+  });
+
   it('substituir o módulo legislacao (modo 5) por um pacote v1 exclui as leituras locais', async () => {
     // O pacote v1 vale como um v2 sem leituras: o módulo passa a ser o do pacote.
     const { repo, leitura } = await comLeitura();

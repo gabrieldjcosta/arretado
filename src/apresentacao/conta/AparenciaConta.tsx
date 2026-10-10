@@ -31,6 +31,7 @@ export function AparenciaConta() {
         | 'tamanhoFonte'
         | 'destacarCondicionantesEPrazos'
         | 'reguaDeLeitura'
+        | 'espiadaDosVizinhos'
         | 'cotaDiaria'
       >
     >,
@@ -144,6 +145,20 @@ export function AparenciaConta() {
         </label>
         <p id="regua-dica" className="dica">
           Realça a linha sob o dedo, o cursor ou o foco. O texto não se move.
+        </p>
+        <label className="opcao">
+          <input
+            type="checkbox"
+            checked={dados.espiadaDosVizinhos ?? false}
+            aria-describedby="espiada-dica"
+            onChange={(e) => {
+              alterar({ espiadaDosVizinhos: e.target.checked });
+            }}
+          />
+          Mostrar a espiada dos vizinhos no foco
+        </label>
+        <p id="espiada-dica" className="dica">
+          No cartão do modo foco, duas linhas do artigo anterior e do próximo ficam esmaecidas.
         </p>
       </fieldset>
       <fieldset>

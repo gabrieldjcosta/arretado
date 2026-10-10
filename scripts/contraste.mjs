@@ -88,6 +88,10 @@ export function pares() {
       ...DESTAQUES.map((d) => [d, f, 3]),
     );
   }
+  // Palco do modo foco: a penumbra da página e a luz do cartão.
+  for (const f of ['penumbra', 'luz-do-cartao']) {
+    p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['primaria', f, 4.5]);
+  }
   p.push(
     ['primaria-texto', 'primaria', 4.5],
     ['perigo-texto', 'perigo', 4.5],
