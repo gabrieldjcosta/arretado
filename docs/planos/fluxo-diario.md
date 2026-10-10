@@ -16,8 +16,11 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 
 ## Interrupção por limite de uso e retomada
 - O contêiner some junto com o trabalho não enviado: ao perceber que o limite de uso se aproxima, ou a cada bloco de trabalho concluído, o Claude faz `git commit -m "wip: <atividade>"` e push no branch da atividade (o commit `wip:` pula o check; o merge na `integracao` continua exigindo check verde e CI verde).
-- Rotina "Retomar Arretado" (a cada hora, das 7h às 22h de Brasília, sessão nova): se nenhuma sessão de atividade estiver ativa, lê `docs/proxima-sessao.md` e os branches `claude/*` com commit `wip:` ou PR aberto, e continua a atividade parada; se não houver, começa a próxima do plano. Para quando a próxima exige modelo acima do Sonnet médio (tabela do `CLAUDE.md`) e avisa.
-- Sessões de atividade levam a tag `arretado-atividade` (evita duas sessões na mesma atividade).
+- Rotinas agendadas (todas amarradas à sessão persistente "Despachante Arretado", que já tem o repositório; rotinas de sessão nova não conseguem anexá-lo, testado em 10/10/2026):
+  - **Despacho** (a cada hora, 7h às 22h de Brasília): se há sessão com tag `arretado-atividade` ativa, não faz nada; senão escolhe a atividade parada (commit `wip:` ou PR aberto para a `integracao`) ou a próxima do plano e abre **uma** sessão filha por atividade, com o modelo da tabela do `CLAUDE.md` (Opus 5.5 para as pesadas, Sonnet 5.5 para as demais). O esforço não é configurável por rotina: fica no padrão do modelo.
+  - **Backup** (05:53): cria o branch `backup/AAAA-MM-DD` a partir do `main`.
+- Quando o limite de uso reseta, o próximo despacho da hora retoma a atividade parada.
+- A sessão filha de cada atividade leva a tag `arretado-atividade` (evita duas sessões na mesma atividade).
 
 ## Fim do dia (Gabriel)
 1. `npm run fim-do-dia`: lista os merges da `integracao` ainda fora do `main`.
