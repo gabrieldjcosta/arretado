@@ -1073,3 +1073,12 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 ## Súmulas: sem rede, sem o levantamento das fontes (Peça 4, 10/10/2026)
 
 Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devolve 000), então o levantamento da fonte oficial de cada tribunal não foi feito. Causa: proxy sem esses hosts. Solução: o curador (ou uma sessão com rede) prepara `acervo/fontes/<tribunal>.json` no formato de `FonteDeSumulas` (`tribunal`, `vinculante`, `sumulas[] { numero, enunciado, situacao, origem?, link? }`), confere o texto na fonte oficial e acrescenta o item em `acervo/curadoria.json` (`especie: "sumulas"`, `fonte: { adaptador: "sumulas", arquivo }`); depois `npm run acervo:gerar <id>`. Sessão sem `node_modules`: `npx vitest` e `npx tsc` baixam outra versão e falham; rodar `npm ci` antes.
+
+### Acervo: `fetch failed` em todos os itens, página em UTF-16 e seção repetida (10/10/2026)
+
+- **`coleta falhou: fetch failed` em todas as páginas do Planalto:** o Planalto derruba o User-Agent que não começa com `Mozilla/5.0` (mesma causa do `ECONNRESET`). O pipeline usa `Mozilla/5.0 (compatible; arretado-acervo/1.0; …)` e a mensagem de erro agora traz a causa de rede.
+- **Página salva pelo navegador sai ilegível (Lei 11.340):** o arquivo vem em UTF-16 com BOM; `decodificarPagina` o reconhece. Para uma página que falha na coleta, salvar o HTML como `acervo/.cache/<id>.bruto`.
+- **`árvore inválida: endereço repetido` (LC 80, duas "SEÇÃO IV"):** a segunda seção estrutural repetida ganha o sufixo `x2` no endereço (`tit3.cap1.sec4x2`), só no acervo.
+- **Leis que alteram outras leis** (artigo ausente / fora de ordem por causa do texto entre aspas): falso alarme, aceitos na curadoria.
+- **Aceitos em bloco sem leitura item a item (decisão do Gabriel, 10/10/2026):** `duplicata`, `artigo_so_tachado`, `tachado_sem_dispositivo`, `alinea_sem_inciso`, `item_sem_alinea`, `paragrafo_unico_com_numerado`, `linha_solta`, `linha_continuada`. Revisar pelo `acervo/relatorio.md` se algum item parecer incompleto.
+- **Lote:** 114 itens (Planalto, ALESP; `scripts/acervo-curadoria-do-csv.mjs` gera a curadoria do CSV em `acervo/fontes/`). Faltam 63 (CNJ, Defensoria, gov.br, MDS, Câmara, sem link): lista em `acervo/a-converter.md`, a converter para Markdown pelo Gabriel (adaptador `markdown`).

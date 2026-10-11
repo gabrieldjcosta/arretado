@@ -15,8 +15,9 @@ import { construirItemSumulas } from './sumulas';
 import { verificarAcervo, type ProblemaDoAcervo } from './verificar';
 import type { EntradaDoIndice, IndiceDoAcervo } from '../../src/dominios/acervo/esquemas';
 
+/** O Planalto derruba o User-Agent que não começa com Mozilla/5.0 (solucao-de-problemas.md, ECONNRESET). */
 export const USER_AGENT =
-  'ArretadoAcervo/1.0 (curadoria pessoal; contato: gabrieldjcosta@gmail.com)';
+  'Mozilla/5.0 (compatible; arretado-acervo/1.0; curadoria pessoal; gabrieldjcosta@gmail.com)';
 const INTERVALO_MS = 1_000;
 
 export interface Pastas {
@@ -32,6 +33,8 @@ const arquivoDoCache = (pastas: Pastas, id: string) => join(pastas.cache, `${id}
 
 /** Planalto serve windows-1252; o UTF-8 estrito é tentado primeiro (páginas novas). */
 export function decodificarPagina(bytes: Uint8Array): string {
+  // Página salva pelo navegador pode vir em UTF-16 (com BOM).
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder('utf-16le').decode(bytes);
   try {
     return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   } catch {
@@ -51,7 +54,13 @@ export async function baixar(url: string): Promise<Uint8Array> {
   const espera = (ultimaRequisicao.get(host) ?? 0) + INTERVALO_MS - Date.now();
   if (espera > 0) await new Promise((r) => setTimeout(r, espera));
   ultimaRequisicao.set(host, Date.now());
-  const resposta = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+  const resposta = await fetch(url, {
+    headers: { 'User-Agent': USER_AGENT, Accept: 'text/html,application/xhtml+xml' },
+    signal: AbortSignal.timeout(60_000),
+  }).catch((e: unknown) => {
+    const causa = e instanceof Error && e.cause instanceof Error ? ` (${e.cause.message})` : '';
+    throw new Error(`${url}: ${e instanceof Error ? e.message : String(e)}${causa}`);
+  });
   if (!resposta.ok) throw new Error(`${url}: HTTP ${String(resposta.status)}`);
   return new Uint8Array(await resposta.arrayBuffer());
 }
@@ -118,9 +127,9 @@ export async function gerarItem(pastas: Pastas, cur: ItemDaCuradoria): Promise<I
         ? construirItemSemArtigos(cur, texto, bruto.coletadoEm, bruto.urlOficial)
         : construirItemArticulado(
             cur,
-            cur.fonte.adaptador === 'planalto'
-              ? blocosDoPlanalto(bruto.bytes, cur.fonte.url)
-              : markdownParaBlocos(texto),
+            cur.fonte.adaptador === 'markdown'
+              ? markdownParaBlocos(texto)
+              : blocosDoPlanalto(bruto.bytes, cur.fonte.url),
             bruto.coletadoEm,
             bruto.urlOficial,
           );

@@ -44,12 +44,22 @@ export function arvoreValida(
 
 function nosDoRascunho(rascunho: Rascunho): NoDoItem[] {
   const arvore = registrosDaArvore(rascunho.nos, { normaId: 'n', versaoId: 'v', novoId });
-  const enderecoDe = new Map(arvore.dispositivos.map((d) => [d.id, d.dados.endereco]));
+  // Fonte que repete a numeração estrutural (LC 80: duas "SEÇÃO IV" no mesmo capítulo) só avisa no
+  // estruturador; aqui a segunda ocorrência ganha o sufixo `x2` para o endereço ficar único.
+  const vezes = new Map<string, number>();
+  const finais = arvore.dispositivos.map((d) => {
+    const n = (vezes.get(d.dados.endereco) ?? 0) + 1;
+    vezes.set(d.dados.endereco, n);
+    return n > 1 && d.dados.categoria === 'estrutural'
+      ? `${d.dados.endereco}x${String(n)}`
+      : d.dados.endereco;
+  });
+  const enderecoDe = new Map(arvore.dispositivos.map((d, i) => [d.id, finais[i] as string]));
   return arvore.dispositivos.map((d, i) => {
     const t = (arvore.textos[i] as (typeof arvore.textos)[number]).dados;
     const pai = d.dados.paiId === undefined ? undefined : enderecoDe.get(d.dados.paiId);
     return {
-      endereco: d.dados.endereco,
+      endereco: finais[i] as string,
       categoria: d.dados.categoria,
       tipo: d.dados.tipo,
       ...(d.dados.rotulo === undefined ? {} : { rotulo: d.dados.rotulo }),
