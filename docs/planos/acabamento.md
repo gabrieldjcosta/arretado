@@ -1,6 +1,6 @@
 # Fatia 6 do redesign — acabamento (proposta)
 
-Proposta de 11/10/2026, **aguardando aprovação do Gabriel**. Origem: plano do Perplexity (clareza, acolhimento) mais leitura de capturas do TikoNote, filtrados contra D1–D24 e o `CLAUDE.md`. Prévias: [`../redesign/acabamento-previa-claro.png`](../redesign/acabamento-previa-claro.png) e [`../redesign/acabamento-previa-escuro.png`](../redesign/acabamento-previa-escuro.png) (mockups, não o app). Sem subida de esquema.
+Proposta de 11/10/2026, **aprovada pelo Gabriel em 11/10/2026** (troca do amarelo por sálvia, fatia 6 antes da etapa 12 e menu "Ajuda" juntando "?" e "!"). Origem: plano do Perplexity (clareza, acolhimento) mais leitura de capturas do TikoNote, filtrados contra D1–D24 e o `CLAUDE.md`. Prévias: [`../redesign/acabamento-previa-claro.png`](../redesign/acabamento-previa-claro.png) e [`../redesign/acabamento-previa-escuro.png`](../redesign/acabamento-previa-escuro.png) (mockups, não o app). Sem subida de esquema.
 
 ## Decisão central: o marcador amarelo sai
 
@@ -21,6 +21,8 @@ Valores a **medir** em `scripts/contraste.mjs` antes de gravar (borda do "agora"
 
 ## Componentes e telas
 
+- **Menu "Ajuda" (aprovado; muda o D6).** "?" e "!" viram um menu único "Ajuda" com as duas opções. Entra na 6.3; registrar a mudança do D6 em `docs/especificacao-parte1.md` §19.
+
 - **6.1 Tokens e contraste.** Troca acima; script de contraste; atualizar T19, spec e glossário (`agora` = cartão tingido).
 - **6.2 Componentes.** `AcaoAgora` (cartão tingido, sem traço amarelo); **controle segmentado** (pílula, item ativo preenchido) para as abas de Recall e de Biblioteca; **linha de lista** (ícone em quadrado tingido 44 px, título, uma linha de apoio, seta); **selo** em pílula ("Há versão nova", "vigente"); estado **selecionado** único (tinta + borda sálvia) para filtros, disciplina e Conta › Aparência.
 - **6.3 Casca.** Área ativa preenchida (barra inferior e cabeçalho do desktop). Resolver o **+ sobre a lista**: no celular, reservar margem inferior para o último item não ficar escondido (visto na prévia da Biblioteca).
@@ -33,7 +35,6 @@ Valores a **medir** em `scripts/contraste.mjs` antes de gravar (borda do "agora"
 ## Fora desta fatia (de propósito)
 
 - **Tela Hoje** (F3, depois do portão da F2), renomear Recall, mascote, IA, confete, rótulos em caixa-alta, degradê, fundo pontilhado.
-- **Menu "Ajuda"** juntando "?" e "!" (muda o D6): só com aprovação à parte.
 - **+ fora do leitor:** manter como está até a validação com pessoas.
 
 ## Onde entra no curso de ação
