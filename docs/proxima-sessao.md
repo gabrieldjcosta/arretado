@@ -1,6 +1,10 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 11/10/2026 (etapa 10.2, editor de linhas, feita) e 10/10/2026 (Peça 3a, porta do acervo, adesão e esquema v4, feita) e 10/10/2026 (Peça 2, palco do foco, feita) e 09/10/2026 (nova ordem: ver "Nova ordem" abaixo) e 08/10/2026 (11.5 concluída, ações por dispositivo, no PR da 11.5, **sem subida de esquema**; o PR [#36](https://github.com/gabrieldjcosta/arretado/pull/36) da 11.3 foi mergeado; próxima: 11.8, leitura artigo por artigo; ordem para o uso nas férias do Gabriel: ver "Ordem das férias" abaixo). Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
+Atualizado em 11/10/2026 (etapa 10.3, correção por bloco, feita) e 11/10/2026 (etapa 10.2, editor de linhas, feita) e 10/10/2026 (Peça 3a, porta do acervo, adesão e esquema v4, feita) e 10/10/2026 (Peça 2, palco do foco, feita) e 09/10/2026 (nova ordem: ver "Nova ordem" abaixo) e 08/10/2026 (11.5 concluída, ações por dispositivo, no PR da 11.5, **sem subida de esquema**; o PR [#36](https://github.com/gabrieldjcosta/arretado/pull/36) da 11.3 foi mergeado; próxima: 11.8, leitura artigo por artigo; ordem para o uso nas férias do Gabriel: ver "Ordem das férias" abaixo). Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
+
+## Etapa 10.3 — Correção por bloco (feita em 11/10/2026, **sem subida de esquema**)
+
+`bloco.ts` (domínio): bloco = um nó estrutural com o que há dentro ou um intervalo de artigos; `listarNos`, `resumirBloco`, `listarDoBloco`, `confirmarBloco`, `converterBloco` (todas as linhas de um tipo em outro) e `trocarNoBloco` (texto literal). Tela: "Corrigir por bloco" na revisão (abre só as linhas do bloco com o mesmo editor da 10.2). Testes: `bloco.test.ts` (19), E2E `revisao.spec.ts` (3 aparelhos, axe nos 2 temas). Fatos em `planos/F2.md` › "Fatos da correção por bloco (10.3)". **Próxima: 10.4** (edição integral e inserção manual; **exige Opus**); depois 11.7 (Opus).
 
 ## Etapa 10.2 — Editor de linhas (feita em 11/10/2026, **sem subida de esquema**)
 

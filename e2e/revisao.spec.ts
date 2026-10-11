@@ -123,3 +123,93 @@ test('editor: salva sozinho, divide, converte e junta linhas; a edição sobrevi
   await expect(page.getByRole('region', { name: 'Para confirmar' })).toHaveCount(0);
   await publicar(page, 'Lei editada');
 });
+
+const LEI_COM_CAPITULOS = [
+  'LEI Nº 1.234, DE 5 DE MAIO DE 2020.',
+  'CAPÍTULO I',
+  'Dos deveres',
+  'Art. 1º Esta Lei trata do teste.',
+  'Art. 2º São deveres:',
+  'I - estudar;',
+  'II - revisar.',
+  'CAPÍTULO II',
+  'Dos direitos',
+  'Art. 3º São direitos:',
+  'I - descansar;',
+  'II - estudar com calma.',
+].join('\n');
+
+test('bloco: abrir um capítulo e um intervalo, converter, trocar e confirmar o bloco (10.3)', async ({
+  page,
+}) => {
+  await page.goto('/#/biblioteca/importar');
+  await colarTextoPuro(page, LEI_COM_CAPITULOS);
+  const revisao = page.getByRole('region', { name: 'Para confirmar' });
+  await expect(revisao).toBeVisible({ timeout: 30_000 });
+
+  await revisao.getByText('Corrigir por bloco', { exact: true }).click();
+  await semViolacoes(page);
+
+  // Um capítulo: só as linhas dele aparecem.
+  const escolha = revisao.getByRole('form', { name: 'Escolher o bloco' });
+  await escolha.getByLabel('Trecho').selectOption({ label: 'CAPÍTULO II — Dos direitos' });
+  await escolha.getByRole('button', { name: 'Abrir o bloco' }).click();
+  const acoes = revisao.getByRole('region', { name: 'Ações no bloco' });
+  await expect(acoes.getByText('CAPÍTULO II', { exact: false }).first()).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Corrigir Art. 3º' })).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Corrigir Art. 1º' })).toHaveCount(0);
+  await semViolacoes(page);
+
+  // Trocar uma palavra em todo o bloco.
+  await acoes.getByLabel('Procurar').fill('estudar');
+  await acoes.getByLabel('Trocar por').fill('ler');
+  await acoes.getByRole('button', { name: 'Trocar no bloco' }).click();
+  await expect(revisao.getByText('1 linha mudou.')).toBeVisible();
+  await expect(revisao.getByText('ler com calma.')).toBeVisible();
+
+  // Converter todos os incisos do bloco em parágrafos.
+  await acoes.getByLabel('Converter todos os').selectOption({ label: 'incisos (2)' });
+  await acoes.getByLabel('em', { exact: true }).selectOption({ label: 'Parágrafo' });
+  await acoes.getByRole('button', { name: 'Converter no bloco' }).click();
+  await expect(revisao.getByText('2 linhas convertidas.')).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Corrigir § 2º' })).toBeVisible();
+
+  // Um intervalo de artigos: o capítulo I inteiro (artigos 1 e 2), e a correção por linha segue.
+  await escolha.getByLabel('O bloco é').selectOption('artigos');
+  await escolha.getByLabel('Do artigo').fill('1');
+  await escolha.getByLabel('Até o artigo').fill('2');
+  await escolha.getByRole('button', { name: 'Abrir o bloco' }).click();
+  await expect(revisao.getByRole('button', { name: 'Corrigir Art. 2º' })).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Corrigir Art. 3º' })).toHaveCount(0);
+  await revisao.getByRole('button', { name: 'Corrigir II', exact: true }).click();
+  await revisao
+    .getByRole('form', { name: 'Corrigir II' })
+    .getByLabel('Texto')
+    .fill('revisar sempre.');
+  await expect(revisao.getByRole('status').filter({ hasText: 'Salvo' })).toBeVisible();
+  await revisao.getByRole('button', { name: 'Fechar', exact: true }).click();
+
+  // Número inexistente avisa sem quebrar.
+  await escolha.getByLabel('Até o artigo').fill('99');
+  await escolha.getByRole('button', { name: 'Abrir o bloco' }).click();
+  await expect(revisao.getByRole('alert')).toContainText('Não há o artigo "99"');
+
+  // Confirmar o bloco confirma só as linhas dele.
+  await escolha.getByLabel('Até o artigo').fill('2');
+  await escolha.getByRole('button', { name: 'Abrir o bloco' }).click();
+  await revisao.getByRole('button', { name: /^Confirmar \d+ do bloco$/ }).click();
+  await expect(revisao.getByText(/linhas? confirmadas?\s+no bloco\./)).toBeVisible();
+  await expect(revisao.getByRole('button', { name: /^Confirmar \d+ do bloco$/ })).toBeDisabled();
+
+  // A edição por bloco sobrevive a recarregar, e o rascunho publica.
+  await page.reload();
+  await expect(page.getByRole('region', { name: 'Para confirmar' })).toBeVisible({
+    timeout: 30_000,
+  });
+  await page
+    .getByRole('region', { name: 'Para confirmar' })
+    .getByRole('button', { name: /^Confirmar \d+ dispositivos$/ })
+    .click();
+  await expect(page.getByRole('region', { name: 'Para confirmar' })).toHaveCount(0);
+  await publicar(page, 'Lei por bloco');
+});
