@@ -1120,3 +1120,9 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 ## Menu "Ajuda" (fatia 6, 6.3)
 
 **Sintoma:** teste ou E2E não acha o botão "Relatar problema" nem o link "Ajuda sobre esta tela". **Causa:** os dois só existem com o menu **Ajuda** aberto (juntou o "?" e o "!"). **Solução:** clicar em `getByRole('button', { name: 'Ajuda', exact: true })` antes. **Previsível:** `--raio` subiu de 8 para 12 px em tudo; se uma tela estourar a largura no celular, conferir primeiro o padding dos botões.
+
+## Fatia 6 (6.4 a 6.7): Biblioteca, drill, leitor (11/10/2026)
+- **Selo "Há versão nova" na Biblioteca:** `Normas` chama `fonte.listar()` (índice do acervo) e `itensComVersaoNova`; sem rede ou sem índice o erro é engolido e nenhum selo aparece. Testes com a fonte padrão não acham selo.
+- **Drill:** o botão de virar continua "Mostrar resposta" (testes e E2E usam o nome); "Sair" é link para `/recall`. O verso se chama "Frase correta" só quando o cartão vem de um erro; senão, "Resposta".
+- **Estado por texto:** ícones são `aria-hidden`, então o nome acessível segue sendo só a palavra ("Errei", "Vencido"); `getByText('Errei')` continua achando.
+- **Linha de base do portão da F1:** o drill centrado entrou em 11/10/2026; ver `docs/redesign/linha-de-base.md`.

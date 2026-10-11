@@ -988,8 +988,8 @@ dialog.dialogo-busca {
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
    nem mudança de medida: o texto não se move. */
 .linha-leitor[data-regua] .dispositivo {
-  background: color-mix(in srgb, var(--primaria) 9%, transparent);
-  box-shadow: inset 3px 0 0 var(--primaria);
+  background: color-mix(in srgb, var(--agora-borda) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--agora-borda);
 }
 
 .linha-leitor {
@@ -2043,4 +2043,115 @@ dialog.dialogo-previa .linha-acoes button {
 .menu-ajuda-itens button {
   justify-content: flex-start;
   width: 100%;
+}
+
+/* ── Fatia 6 (6.4 a 6.7): Biblioteca em lista, drill centrado, estado por texto ─ */
+
+.lista-de-linhas {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. */
+.topo-drill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topo-drill .barra-fina {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.cartao-drill {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  min-height: 40dvh;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-radius: var(--raio-cartao);
+}
+
+.drill-frente {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  line-height: 1.4;
+}
+
+.frase-correta {
+  padding: 0.75rem 1rem;
+  background: var(--agora-fundo);
+  border: 1.5px solid var(--agora-borda);
+  border-radius: var(--raio);
+  text-align: left;
+}
+
+.frase-correta p {
+  margin: 0;
+}
+
+.frase-correta-titulo {
+  margin-bottom: 0.25rem !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.acoes-drill {
+  justify-content: center;
+}
+
+.acoes-drill .principal.grande {
+  min-width: min(100%, 16rem);
+  min-height: 50px;
+}
+
+.respostas button {
+  flex: 1;
+  border-width: 2px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.respostas .resposta-errei {
+  border-color: var(--perigo);
+}
+
+.respostas .resposta-dificil {
+  border-color: var(--estrela);
+}
+
+.respostas .resposta-facil {
+  border-color: var(--sucesso);
+}
+
+/* Estado por texto (6.7): palavra e ícone além da cor. */
+.estado-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.estado-texto.estado-errou,
+.estado-texto.estado-vencido {
+  color: var(--perigo);
+}
+
+.estado-texto.estado-vencido {
+  min-width: 0;
+}
+
+/* "Sair do foco": recuado, sem competir com "Próximo artigo". */
+.bandeja-itens .sair-do-foco {
+  background: transparent;
+  border-color: transparent;
+  color: var(--texto-atenuado);
+  font-weight: 400;
 }

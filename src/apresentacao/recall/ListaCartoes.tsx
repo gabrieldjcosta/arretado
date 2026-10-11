@@ -10,6 +10,7 @@ import {
 } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { hoje } from '../../dominios/recall/servico';
 import { formatarData, ROTULO_ESTADO } from './rotulos';
 
 const ESTADOS: EstadoCartao[] = ['ativo', 'suspenso', 'arquivado'];
@@ -39,6 +40,7 @@ export function ListaCartoes() {
     [estado, quantas],
   );
   const { dados } = useDados(carregar);
+  const hojeCivil = hoje(repo);
 
   return (
     <section aria-label="Cartões">
@@ -76,6 +78,12 @@ export function ListaCartoes() {
                 <span>
                   <Link to={`/recall/cartoes/${c.id}`}>{c.frente || '(sem frente)'}</Link>
                   <br />
+                  {c.estado === 'ativo' && c.proximaRevisao <= hojeCivil && (
+                    <span className="estado-texto estado-vencido">
+                      <span aria-hidden="true">! </span>
+                      Vencido
+                    </span>
+                  )}{' '}
                   <span className="dica">
                     {c.estado === 'ativo'
                       ? `Próxima revisão: ${formatarData(c.proximaRevisao)}`
