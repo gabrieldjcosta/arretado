@@ -31,7 +31,7 @@
 | lei-federal-10741-2003 | publicado | 377 | 0 | tachado_sem_dispositivo: 1; linha_solta: 2; duplicata: 2 |
 | lei-federal-6766-1979 | publicado | 293 | 0 | duplicata: 1; alinea_sem_inciso: 5 |
 | lei-federal-10932-2004 | publicado | 5 | 0 | — |
-| lei-federal-11340-2006 | publicado | 241 | 0 | tachado_sem_dispositivo: 1; linha_solta: 2 |
+| lei-federal-11340-2006 | publicado | 241 | 0 | caractere_perdido: 1; tachado_sem_dispositivo: 1; linha_solta: 2 |
 | lei-federal-8069-1990 | publicado | 1414 | 0 | duplicata: 1; alinea_sem_inciso: 28; item_sem_alinea: 5; paragrafo_unico_com_numerado: 1 |
 | lei-federal-9455-1997 | publicado | 21 | 0 | — |
 | lei-federal-12847-2013 | publicado | 110 | 0 | — |
@@ -116,3 +116,8 @@
 | decreto-federal-7962-2013 | publicado | 35 | 0 | — |
 | decreto-estadual-55334-2010 | publicado | 15 | 0 | — |
 | decreto-estadual-55370-2010 | publicado | 7 | 0 | — |
+| sumulas-stf | publicado | 736 | 0 | — |
+| sumulas-stf-vinculantes | publicado | 62 | 0 | — |
+| sumulas-stj | publicado | 676 | 0 | — |
+| sumulas-tjsp | publicado | 165 | 0 | — |
+| sumulas-tnu | publicado | 89 | 0 | — |
