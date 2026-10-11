@@ -9,6 +9,6 @@ const merges = sh(
 );
 console.log(merges || 'Nada novo na integracao.');
 console.log(
-  '\nTag de backup mais recente:',
-  sh('git tag -l "backup/*" --sort=-creatordate').split('\n')[0] || '(nenhuma)',
+  '\nBackup mais recente:',
+  sh('git branch -r --list "origin/backup/*" --sort=-refname').split('\n')[0] || '(nenhuma)',
 );

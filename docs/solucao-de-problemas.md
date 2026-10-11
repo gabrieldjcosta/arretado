@@ -1052,3 +1052,42 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Sintoma 3 (lint):** `react-hooks/set-state-in-effect` ao pôr "carregando" dentro do `useEffect` que lê o alvo da prévia. **Solução:** quem abre a prévia zera os dados (`setDadosDaPrevia(undefined)`) e `undefined` já é "Carregando…"; o efeito só grava o resultado, num `then`.
 - **Sintoma 4 (sessão na nuvem):** `npx vitest` tenta instalar o `vitest@5` e falha com "Cannot find package 'vite'". **Causa:** `node_modules` ausente no contêiner novo. **Solução:** `npm ci` antes de qualquer comando (sem rodar `npx` solto, que baixa versão errada).
 - **Previsível na fatia 4:** (1) a citação é `span role="button"` dentro de `<p>`: se a régua ou o "Continuar leitura" mexerem na largura, a folha inferior não depende disso, mas o balão do desktop é fixo no canto (não ancorado); ancorar à citação exige posição medida e o `Dialogo` nativo não tem âncora. (2) Remissão a outra norma (CP, CPP na LEP) e "citado por" ficam para depois do portão.
+
+### Push de tag falha nas sessões remotas
+- **Sintoma:** `send-pack: unexpected disconnect while reading sideband packet` ao dar `git push origin <tag>`; o hook `backup-diario` dizia "criada só localmente".
+- **Causa:** o proxy das sessões remotas derruba o push de tag; push de branch funciona.
+- **Solução:** o backup diário é o branch `backup/AAAA-MM-DD` (`git push origin origin/main:refs/heads/backup/AAAA-MM-DD`), não tag.
+- **Origem:** encontrado em 10/10/2026, no primeiro dia do fluxo diário.
+
+## Esquema v4: pacote antigo e testes de pacote (Peça 3, 10/10/2026)
+
+**Sintoma:** teste de pacote v1 ou v2 falha com "coleção inesperada: vinculosDisciplina". **Causa:** o helper que reescreve a `versaoEsquema` do manifesto para uma versão antiga não removia a coleção nascida na v4; o leitor recusa coleção que a versão declarada não tinha. **Solução:** o helper também apaga `dados/vinculosDisciplina.json`, tira do manifesto (`arquivos`, `contagens`) e refaz o `hashConjunto`. **Previsível na próxima subida:** repetir isso nos dois helpers (`comoPacoteV1`, `comVersao`). **Aviso ao Gabriel:** a v4 sobe o esquema do banco; fazer backup antes do merge e recarregar as abas depois.
+
+## Acervo: `acervo:gerar` (Peça 3b)
+
+- **`HTTP 503` ao coletar do Planalto:** o proxy do ambiente na nuvem bloqueia o site. Rodar `npm run acervo:gerar` numa máquina com rede, ou pôr o HTML em `acervo/.cache/<id>.bruto` (o gerador usa o cache antes de baixar).
+- **`Node is not defined` ao gerar:** o sanitizador precisa do DOM; `scripts/acervo/cli.ts` expõe o do jsdom como globais antes de gerar.
+- **Item "bloqueado" no relatório:** conflito, aviso não aceito ou árvore inválida. Ver `acervo/relatorio.md`; se o aviso é esperado, listar o tipo em `anomaliasAceitas` do item na curadoria.
+- **Regra de camadas:** `dominios/acervo` não importa de `dominios/legislacao`; o pipeline (que usa o estruturador) mora em `scripts/acervo/`.
+
+## Súmulas: fontes oficiais e como coletar (Peça 4, 11/10/2026)
+
+- **STF:** `curl` sem User-Agent de navegador leva 403; com `Mozilla/5.0 …Chrome` funciona. Índice em `sumariosumulas.asp?base=30` (comuns) e `base=26` (vinculantes); cada súmula em `&sumula=<id interno>`. A SV 30 diz "pendente de publicação" e é pulada. Entidades como `&#8203;` aparecem no rótulo "(cancelada)".
+- **STJ:** o SCON (`scon.stj.jus.br`) dá 403 ao `curl`; o PDF `https://www.stj.jus.br/docs_internet/jurisprudencia/tematica/download/SU/Verbetes/VerbetesSTJ_asc.pdf` abre e traz tudo (`pdftotext -enc UTF-8 -layout`). O rodapé de página precisa ser filtrado e o número da súmula pode vir logo após um ``.
+- **TJSP:** `SumulasTJSP.pdf` (Serviço de Gestão de Legislação). Revogadas aparecem só como "REVOGADA (Sessão …)", sem enunciado.
+- **TNU:** `https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php` (ISO-8859-1); a página "Enunciados TNU" do portal vem vazia.
+- **Reproduzir:** os coletores estão em `scripts/acervo/coletores/` (cabeçalho de cada um com o uso). Depois: `npx prettier --write acervo/fontes/sumulas-*.json`, `npm run acervo:gerar`, `npm run acervo:verificar`.
+- **`npm run check` lento ou com testes estourando 5 s no Windows:** conhecido sob carga; rodar os arquivos que falharam sozinhos (`npx vitest run <arquivo> --maxWorkers=2`).
+
+### Histórico: sem rede (10/10/2026)
+
+Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devolve 000), então o levantamento da fonte oficial de cada tribunal não foi feito. Causa: proxy sem esses hosts. Solução: o curador (ou uma sessão com rede) prepara `acervo/fontes/<tribunal>.json` no formato de `FonteDeSumulas` (`tribunal`, `vinculante`, `sumulas[] { numero, enunciado, situacao, origem?, link? }`), confere o texto na fonte oficial e acrescenta o item em `acervo/curadoria.json` (`especie: "sumulas"`, `fonte: { adaptador: "sumulas", arquivo }`); depois `npm run acervo:gerar <id>`. Sessão sem `node_modules`: `npx vitest` e `npx tsc` baixam outra versão e falham; rodar `npm ci` antes.
+
+### Acervo: `fetch failed` em todos os itens, página em UTF-16 e seção repetida (10/10/2026)
+
+- **`coleta falhou: fetch failed` em todas as páginas do Planalto:** o Planalto derruba o User-Agent que não começa com `Mozilla/5.0` (mesma causa do `ECONNRESET`). O pipeline usa `Mozilla/5.0 (compatible; arretado-acervo/1.0; …)` e a mensagem de erro agora traz a causa de rede.
+- **Página salva pelo navegador sai ilegível (Lei 11.340):** o arquivo vem em UTF-16 com BOM; `decodificarPagina` o reconhece. Para uma página que falha na coleta, salvar o HTML como `acervo/.cache/<id>.bruto`.
+- **`árvore inválida: endereço repetido` (LC 80, duas "SEÇÃO IV"):** a segunda seção estrutural repetida ganha o sufixo `x2` no endereço (`tit3.cap1.sec4x2`), só no acervo.
+- **Leis que alteram outras leis** (artigo ausente / fora de ordem por causa do texto entre aspas): falso alarme, aceitos na curadoria.
+- **Aceitos em bloco sem leitura item a item (decisão do Gabriel, 10/10/2026):** `duplicata`, `artigo_so_tachado`, `tachado_sem_dispositivo`, `alinea_sem_inciso`, `item_sem_alinea`, `paragrafo_unico_com_numerado`, `linha_solta`, `linha_continuada`. Revisar pelo `acervo/relatorio.md` se algum item parecer incompleto.
+- **Lote:** 114 itens (Planalto, ALESP; `scripts/acervo-curadoria-do-csv.mjs` gera a curadoria do CSV em `acervo/fontes/`). Faltam 63 (CNJ, Defensoria, gov.br, MDS, Câmara, sem link): lista em `acervo/a-converter.md`, a converter para Markdown pelo Gabriel (adaptador `markdown`).

@@ -1,0 +1,629 @@
+{
+  "tribunal": "Turma Nacional de Uniformização dos Juizados Especiais Federais",
+  "vinculante": false,
+  "sumulas": [
+    {
+      "numero": 1,
+      "enunciado": "A conversão dos benefícios previdenciários em URV, em março/94, obedece às disposições do art. 20, incisos I e II da Lei 8.880/94 (MP nº 434/94).",
+      "situacao": "vigente",
+      "origem": "DJ DATA:08/10/2002; PG:00292",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 2,
+      "enunciado": "Os benefícios previdenciários, em maio de 1996, deverão ser reajustados na forma da Medida Provisória 1.415, de 29 de abril de 1996, convertida na Lei 9.711, de 20 de novembro de 1998.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:13/03/2003; PG:00457",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 3,
+      "enunciado": "Os benefícios de prestação continuada, no regime geral da Previdência Social, devem ser reajustados com base no IGP-DI nos anos de 1997, 1999, 2000 e 2001.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:09/05/2003; PG:00725; CANCELADA EM:30/09/2003",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 4,
+      "enunciado": "Não há direito adquirido à condição de dependente de pessoa designada, quando o falecimento do segurado deu-se após o advento da Lei 9.032/95.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:23/06/2003; PG:00555",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 5,
+      "enunciado": "A prestação de serviço rural por menor de 12 a 14 anos, até o advento da Lei 8.213, de 24 de julho de 1991, devidamente comprovada, pode ser reconhecida para fins previdenciários.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:25/09/2003; PG:00493",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 6,
+      "enunciado": "A certidão de casamento ou outro documento idôneo que evidencie a condição de trabalhador rural do cônjuge constitui início razoável de prova material da atividade rurícola.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:25/09/2003; PG:00493",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 7,
+      "enunciado": "Descabe incidente de uniformização versando sobre honorários advocatícios por se tratar de questão de direito processual.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:25/09/2003; PG:00493",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 8,
+      "enunciado": "Os benefícios de prestação continuada, no regime geral da Previdência Social, não serão reajustados com base no IGP-DI nos anos de 1997, 1999, 2000 e 2001.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:05/11/2003; PG:00551",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 9,
+      "enunciado": "O uso de Equipamento de Proteção Individual (EPI), ainda que elimine a insalubridade, no caso de exposição a ruído, não descaracteriza o tempo de serviço especial prestado.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:05/11/2003; PG:00551",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 10,
+      "enunciado": "O tempo de serviço rural anterior à vigência da Lei nº. 8.213/91 pode ser utilizado para fins de contagem recíproca, assim entendida aquela que soma tempo de atividade privada, rural ou urbana, ao de serviço público estatutário, desde que sejam recolhidas as respectivas contribuições previdenciárias.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:03/12/2003; PG:00607",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 11,
+      "enunciado": "A renda mensal, per capita, familiar, superior a ¼ (um quarto) do salário mínimo não impede a concessão do benefício assistencial previsto no art. 20, § 3º da Lei nº. 8.742 de 1993, desde que comprovada, por outros meios, a miserabilidade do postulante.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:14/04/2004; PG:00322; CANCELADA EM:24/04/2006; DJ:12/5/2006; PG:00604",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 12,
+      "enunciado": "Os juros moratórios são devidos pelo gestor do FGTS e incidem a partir da citação nas ações em que se reclamam diferenças de correção monetária, tenha havido ou não levantamento do saldo, parcial ou integralmente.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:14/04/2004; PG:00322",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 13,
+      "enunciado": "O reajuste concedido pelas Leis nºs 8.622/93 e 8.627/93 (28,86%) constituiu revisão geral dos vencimentos e, por isso, é devido também aos militares que não o receberam em sua integralidade, compensado o índice então concedido, sendo limite temporal desse reajuste o advento da MP nº 2.131 de 28/12/2000.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:10/05/2004; PG:00626",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 14,
+      "enunciado": "Para a concessão de aposentadoria rural por idade, não se exige que o início de prova material corresponda a todo o período equivalente à carência do benefício.",
+      "situacao": "vigente",
+      "origem": "Súmula 14; DJ DATA:24.05.2004; PG:00459",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 15,
+      "enunciado": "O valor mensal da pensão por morte concedida antes da Lei nº 9.032, de 28 de abril de 1995, deve ser revisado de acordo com a nova redação dada ao art. 75 da Lei nº 8.213, de 24 de julho de 1991.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:24/05/2004; PG:00459; CANCELADA EM:26/03/2007; DJ DATA:08/05/2007; PG:01025",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 16,
+      "enunciado": "A conversão em tempo de serviço comum, do período trabalhado em condições especiais, somente é possível relativamente à atividade exercida até 28 de maio de 1998 (art. 28 da Lei nº 9.711/98).",
+      "situacao": "cancelada",
+      "origem": "DJ DATA:24/05/2004; PG:00459; (CANCELADA EM 27.03.09); DJ DATA:24/04/2009; PG: 00006",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 17,
+      "enunciado": "Não há renúncia tácita no Juizado Especial Federal, para fins de competência.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:24/05/2004; PG:00459",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 18,
+      "enunciado": "Para fins previdenciários, o cômputo do tempo de serviço prestado como aluno-aprendiz exige a comprovação de que, durante o período de aprendizado,houve simultaneamente: (i) retribuição consubstanciada em prestação pecuniária ou em auxílios materiais; (ii) à conta do Orçamento; (iii) a título decontraprestação por labor; (iv) na execução de bens e serviços destinados a terceiros.",
+      "situacao": "vigente",
+      "origem": "DJ DATA 07/10/2004; PG: 00764; (ALTERADA NA SESSÃO DE 14/02/2020); DJe nº 21/2020. DATA: 19/02/2020; PG: 00002",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 19,
+      "enunciado": "Para o cálculo da renda mensal inicial do benefício previdenciário, deve ser considerada, na atualização dos salários de contribuição anteriores a março de 1994, a variação integral do IRSM de fevereiro de 1994, na ordem de 39,67% (art. 21, § 1º, da Lei nº 8.880/94).",
+      "situacao": "vigente",
+      "origem": "DJ DATA:07/10/2004; PG:00764",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 20,
+      "enunciado": "A Lei nº 8.112, de 11 de dezembro de 1990, não modificou a situação do servidor celetista anteriormente aposentado pela Previdência Social Urbana.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:07/10/2004; PG:00764/5",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 21,
+      "enunciado": "Não há direito adquirido a reajuste de benefícios previdenciários com base na variação do IPC (Índice de Preço ao Consumidor), de janeiro de 1989 (42,72%) e abril de 1990 (44,80%).",
+      "situacao": "vigente",
+      "origem": "DJ DATA:07/10/2004; PG:00765",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 22,
+      "enunciado": "Se a prova pericial realizada em juízo dá conta de que a incapacidade já existia na data do requerimento administrativo, esta é o termo inicial do benefício assistencial.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:07/10/2004; PG:00765",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 23,
+      "enunciado": "As substituições de cargos ou funções de direção ou chefia ou de cargo de natureza especial ocorridas a partir da vigência da Medida Provisória nº 1.522, de 11/10/1996, e até o advento da Lei nº 9.527, de 10/12/1997, quando iguais ou inferiores a trinta dias, não geram direito à remuneração correspondente ao cargo ou função substituída.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:10/03/2005; PG:00539",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 24,
+      "enunciado": "O tempo de serviço do segurado trabalhador rural anterior ao advento da Lei nº 8.213/91, sem o recolhimento de contribuições previdenciárias, pode ser considerado para a concessão de benefício previdenciário do Regime Geral de Previdência Social (RGPS), exceto para efeito de carência, conforme a regra do art. 55, §2º, da Lei nº 8.213/91.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:10/03/2005; PG:00539",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 25,
+      "enunciado": "A revisão dos valores dos benefícios previdenciários, prevista no art. 58 do ADCT, deve ser feita com base no número de salários mínimos apurado na data da concessão, e não no mês de recolhimento da última contribuição.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:22/06/2005; PG:00620",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 26,
+      "enunciado": "A atividade de vigilante enquadra-se como especial, equiparando-se à de guarda, elencada no item 2.5.7. do Anexo III do Decreto n. 53.831/64.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:22/06/2005; PG:00620",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 27,
+      "enunciado": "A ausência de registro em órgão do Ministério do Trabalho não impede a comprovação do desemprego por outros meios admitidos em Direito.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:22/06/2005; PG:00620",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 28,
+      "enunciado": "Encontra-se prescrita a pretensão de ressarcimento de perdas sofridas na atualização monetária da conta do Plano de Integração Social - PIS-, em virtude de expurgos ocorridos por ocasião dos Planos Econômicos Verão e Collor I.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:05/01/2006; PG:00054",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 29,
+      "enunciado": "Para os efeitos do art. 20, § 2º, da Lei n. 8.742, de 1993, incapacidade para a vida independente não é só aquela que impede as atividades mais elementares da pessoa, mas também a impossibilita de prover ao próprio sustento.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:13/02/2006; PG:01043",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 30,
+      "enunciado": "Tratando-se de demanda previdenciária, o fato de o imóvel ser superior ao módulo rural não afasta, por si só, a qualificação de seu proprietário como segurado especial, desde que comprovada, nos autos, a sua exploração em regime de economia familiar.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:13/02/2006; PG:01043",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 31,
+      "enunciado": "A anotação na CTPS decorrente de sentença trabalhista homologatória constitui início de prova material para fins previdenciários. (REVOGAÇÃO: A Turma Nacional de Uniformização, na Nova Sessão Ordinária de Julgamento, de 22 de novembro de 2023, decidiu, por maioria, pela revogação do Enunciado da Súmula n. 31, por incompatibilidade com o PUIL STJ n. 293).",
+      "situacao": "cancelada",
+      "origem": "DJ DATA:13/02/2006; PG:01043; (REVOGADA EM 22/11/2023); DJeNacional. Disponibilizada em: 28/11/2023; Publicada em: 29/11/2023",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 32,
+      "enunciado": "O tempo de trabalho laborado com exposição a ruído é considerado especial, para fins de conversão em comum, nos seguintes níveis: superior a 80 decibéis, na vigência do Decreto n. 53.831/64 e, a contar de 5 de março de 1997, superior a 85 decibéis, por força da edição do Decreto n. 4.882, de 18 de novembro de 2003, quando a Administração Pública reconheceu e declarou a nocividade à saúde de tal índice de ruído. CANCELAMENTO: A Turma Nacional de Uniformização, na Oitava sessão ordinária de 9 de outubro de 2013, aprovou, por unanimidade, o cancelamento da súmula nº 32 (PET 9059/STJ).",
+      "situacao": "cancelada",
+      "origem": "(CANCELADA EM 9/10/2013); DOU DATA: 11/10/2013; PG:00104",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 33,
+      "enunciado": "Quando o segurado houver preenchido os requisitos legais para concessão da aposentadoria por tempo de serviço na data do requerimento administrativo, esta data será o termo inicial da concessão do benefício.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:04/08/2006; PG:00750",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 34,
+      "enunciado": "Para fins de comprovação do tempo de labor rural, o início de prova material deve ser contemporâneo à época dos fatos a provar.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:04/08/2006; PG:00750",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 35,
+      "enunciado": "A Taxa Selic, composta por juros de mora e correção monetária, incide nas repetições de indébito tributário.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:09/01/2007; PG:00406",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 36,
+      "enunciado": "Não há vedação legal à cumulação da pensão por morte de trabalhador rural com o benefício da aposentadoria por invalidez, por apresentarem pressupostos fáticos e fatos geradores distintos.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:06/03/2007; PG:00738",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 37,
+      "enunciado": "A pensão por morte, devida ao filho até os 21 anos de idade, não se prorroga pela pendência do curso universitário.",
+      "situacao": "vigente",
+      "origem": "DJ DATA: 20/06/2007; PG:00798",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 38,
+      "enunciado": "Aplica-se subsidiariamente a Tabela de Cálculos de Santa Catarina aos pedidos de revisão de RMI - OTN/ORTN, na atualização dos salários de contribuição.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:20/06/2007; PG:00798",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 39,
+      "enunciado": "Nas ações contra a Fazenda Pública, que versem sobre pagamento de diferenças decorrentes de reajuste nos vencimentos de servidores públicos, ajuizadas após 24/08/2001, os juros de mora devem ser fixados em 6% (seis por cento) ao ano (art. 1º-F da Lei 9.494/97).",
+      "situacao": "vigente",
+      "origem": "DJ DATA:20/06/2007; PG:00798",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 40,
+      "enunciado": "Nenhuma diferença é devida a título de correção monetária dos depósitos do FGTS relativos ao mês de fevereiro de 1989.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:26/09/2007; PG:00704",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 41,
+      "enunciado": "A circunstância de um dos integrantes do núcleo familiar desempenhar atividade urbana não implica, por si só, a descaracterização do trabalhador rural como segurado especial, condição que deve ser analisada no caso concreto.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:03/03/2010; PG:00001",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 42,
+      "enunciado": "Não se conhece de incidente de uniformização que implique reexame de matéria de fato.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:03/11/2011; PG:00128",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 43,
+      "enunciado": "Não cabe incidente de uniformização que verse sobre matéria processual.",
+      "situacao": "vigente",
+      "origem": "DJ DATA:03/11/2011; PG:00128",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 44,
+      "enunciado": "Para efeito de aposentadoria urbana por idade, a tabela progressiva de carência prevista no art. 142 da Lei nº 8.213/91 deve ser aplicada em função do ano em que o segurado completa a idade mínima para concessão do benefício, ainda que o período de carência só seja preenchido posteriormente.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 14/12/2011; PG: 00179",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 45,
+      "enunciado": "Incide correção monetária sobre o salário-maternidade desde a época do parto, independentemente da data do requerimento administrativo.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 14/12/2011; PG: 00179",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 46,
+      "enunciado": "O exercício de atividade urbana intercalada não impede a concessão de benefício previdenciário de trabalhador rural, condição que deve ser analisada no caso concreto.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 15/03/2012; PG: 00119",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 47,
+      "enunciado": "Uma vez reconhecida a incapacidade parcial para o trabalho, o juiz deve analisar as condições pessoais e sociais do segurado para a concessão de aposentadoria por invalidez.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 15/03/2012; PG: 00119",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 48,
+      "enunciado": "Para fins de concessão do benefício assistencial de prestação continuada, o conceito de pessoa com deficiência, que não se confunde necessariamente com situação de incapacidade laborativa, exige a configuração de impedimento de longo prazo com duração mínima de 2 (dois) anos, a ser aferido no caso concreto, desde o início do impedimento até a data prevista para a sua cessação.",
+      "situacao": "vigente",
+      "origem": "ALTERADA NA SESSÃO DE 25.4.2019; DJe nº 40. DATA: 29/04/2019",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 49,
+      "enunciado": "Para reconhecimento de condição especial de trabalho antes de 29/4/1995, a exposição a agentes nocivos à saúde ou à integridade física não precisa ocorrer de forma permanente.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 15/03/2012; PG: 00119",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 50,
+      "enunciado": "É possível a conversão do tempo de serviço especial em comum do trabalho prestado em qualquer período.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 15/03/2012; PG: 00119",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 51,
+      "enunciado": "Os valores recebidos por força de antecipação dos efeitos de tutela, posteriormente revogada em demanda previdenciária, são irrepetíveis em razão da natureza alimentar e da boa-fé no seu recebimento.",
+      "situacao": "cancelada",
+      "origem": "DJ DATA 15/03/2012; PG: 00119; (CANCELADA EM 30.08.2017); DJe DATA:20/09/2017; PG:00002",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 52,
+      "enunciado": "Para fins de concessão de pensão por morte, é incabível a regularização do recolhimento de contribuições de segurado contribuinte individual posteriormente a seu óbito, exceto quando as contribuições devam ser arrecadadas por empresa tomadora de serviços.",
+      "situacao": "vigente",
+      "origem": "DOU DATA 18/04/2012; PG. 00143",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 53,
+      "enunciado": "Não há direito a auxílio-doença ou a aposentadoria por invalidez quando a incapacidade para o trabalho é preexistente ao reingresso do segurado no Regime Geral de Previdência Social.",
+      "situacao": "vigente",
+      "origem": "DOU 07/05/2012; PG. 00112",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 54,
+      "enunciado": "Para a concessão de aposentadoria por idade de trabalhador rural, o tempo de exercício de atividade equivalente à carência deve ser aferido no período imediatamente anterior ao requerimento administrativo ou à data do implemento da idade mínima.",
+      "situacao": "vigente",
+      "origem": "DOU 07/05/2012; PG. 00112",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 55,
+      "enunciado": "A conversão do tempo de atividade especial em comum deve ocorrer com aplicação do fator multiplicativo em vigor na data da concessão da aposentadoria.",
+      "situacao": "vigente",
+      "origem": "DOU 07/05/2012; PG. 00112",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 56,
+      "enunciado": "O prazo de trinta anos para prescrição da pretensão à cobrança de juros progressivos sobre saldo de conta vinculada ao FGTS tem início na data em que deixou de ser feito o crédito e incide sobre cada prestação mensal.",
+      "situacao": "vigente",
+      "origem": "DOU 07/05/2012; PG. 00112",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 57,
+      "enunciado": "O auxílio-doença e a aposentadoria por invalidez não precedida de auxílio-doença, quando concedidos na vigência da Lei n. 9.876/1999, devem ter o salário de benefício apurado com base na média aritmética simples dos maiores salários de contribuição correspondentes a 80% do período contributivo, independentemente da data de filiação do segurado ou do número de contribuições mensais no período contributivo.",
+      "situacao": "vigente",
+      "origem": "DOU 24/05/2012; PG. 00131",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 58,
+      "enunciado": "Não é devido o reajuste na indenização de campo por força da alteração trazida pelo Decreto n. 5.554/2005.",
+      "situacao": "vigente",
+      "origem": "DOU 24/05/2012; PG. 00131/132",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 59,
+      "enunciado": "A ausência de declaração do objeto postado não impede a condenação da ECT a indenizar danos decorrentes do extravio, desde que o conteúdo da postagem seja demonstrado por outros meios de prova admitidos em direito.",
+      "situacao": "vigente",
+      "origem": "DOU 24/05/2012; PG. 00132",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 60,
+      "enunciado": "O décimo terceiro salário não integra o salário de contribuição para fins de cálculo do salário de benefício, independentemente da data da concessão do benefício previdenciário. CANCELAMENTO: Julgando o PEDILEF n. 0055090-29.2013.4.03.6301, na sessão de 16/3/2016, a Turma Nacional de Uniformização, deliberou, por maioria, pelo cancelamento da súmula n. 60, vencidos os Juízes Federais Boaventura João Andrade e Fábio Cesar dos Santos Oliveira.",
+      "situacao": "cancelada",
+      "origem": "(CANCELADA EM 16/03/2016); DOU 21/03/2016; PG. 00080",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 61,
+      "enunciado": "As alterações promovidas pela Lei n. 11.960/2009 têm aplicação imediata na regulação dos juros de mora em condenações contra a Fazenda Pública, inclusive em matéria previdenciária, independentemente da data do ajuizamento da ação ou do trânsito em julgado. CANCELAMENTO: A Turma Nacional de Uniformização, na Oitava sessão ordinária de 9 de outubro de 2013, aprovou, por unanimidade, o cancelamento da súmula nº 61. Precedente: 0003060-22.2006.4.03.6314, de relatoria do Juiz Federal João Batista Lazzari.",
+      "situacao": "cancelada",
+      "origem": "(CANCELADA EM 11/10/2013); DOU 11/10/2013; PG. 00104",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 62,
+      "enunciado": "O segurado contribuinte individual pode obter reconhecimento de atividade especial para fins previdenciários, desde que consiga comprovar exposição a agentes nocivos à saúde ou à integridade física.",
+      "situacao": "vigente",
+      "origem": "DOU 03/07/2012; PG. 00120",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 63,
+      "enunciado": "Para os fatos geradores ocorridos até a entrada em vigor da MP nº 871/2019, a comprovação de união estável para efeito de concessão de pensão por morte prescinde de início de prova material. (A Turma Nacional de Uniformização, na Sessão Ordinária de Julgamento, de 18 de setembro de 2025, decidiu, à unanimidade, pela alteração do Enunciado da Súmula n. 63).",
+      "situacao": "vigente",
+      "origem": "DOU 23/08/2012; PG. 0070; (ALTERADA EM 18/09/2025); DJeN de 24/09/2025",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 64,
+      "enunciado": "O direito à revisão do ato de indeferimento de benefício previdenciário ou assistencial sujeita-se ao prazo decadencial de dez anos. CANCELAMENTO: Julgando os PEDILEFs 0503504-02.2012.4.05.8102 e 0507719-68.2010.4.05.8400, na sessão de 18/6/2015, a Turma Nacional de Uniformização, deliberou, por maioria, pelo cancelamento da súmula n. 64, vencidos os Juízes Boaventura João Andrade e Sérgio Queiroga.",
+      "situacao": "cancelada",
+      "origem": "(CANCELADA EM 18/06/2015); DOU 24/06/2015; PG. 00064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 65,
+      "enunciado": "Os benefícios de auxílio-doença, auxílio-acidente e aposentadoria por invalidez concedidos no período de 28/3/2005 a 20/7/2005 devem ser calculados nos termos da Lei n. 8.213/1991, em sua redação anterior à vigência da Medida Provisória n. 242/2005.",
+      "situacao": "vigente",
+      "origem": "DOU 24/09/2012; PG. 00114",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 66,
+      "enunciado": "O servidor público ex-celetista que trabalhava sob condições especiais antes de migrar para o regime estatutário tem direito adquirido à conversão do tempo de atividade especial em tempo comum com o devido acréscimo legal, para efeito de contagem recíproca no regime previdenciário próprio dos servidores públicos.",
+      "situacao": "vigente",
+      "origem": "DOU 24/09/2012; PG. 00114",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 67,
+      "enunciado": "O auxílio-alimentação recebido em pecúnia por segurado filiado ao Regime Geral da Previdência Social integra o salário de contribuição e sujeita-se à incidência de contribuição previdenciária.",
+      "situacao": "vigente",
+      "origem": "DOU 24/09/2012; PG. 00114",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 68,
+      "enunciado": "O laudo pericial não contemporâneo ao período trabalhado é apto à comprovação da atividade especial do segurado.",
+      "situacao": "vigente",
+      "origem": "DOU 24/09/2012; PG. 00114",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 69,
+      "enunciado": "O tempo de serviço prestado em empresa pública ou em sociedade de economia mista por servidor público federal somente pode ser contado para efeitos de aposentadoria e disponibilidade.",
+      "situacao": "vigente",
+      "origem": "DOU 13/03/2013; PG. 0064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 70,
+      "enunciado": "A atividade de tratorista pode ser equiparada à de motorista de caminhão para fins de reconhecimento de atividade especial mediante enquadramento por categoria profissional.",
+      "situacao": "vigente",
+      "origem": "DOU 13/03/2013; PG. 0064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 71,
+      "enunciado": "O mero contato do pedreiro com o cimento não caracteriza condição especial de trabalho para fins previdenciários.",
+      "situacao": "vigente",
+      "origem": "DOU 13/03/2013; PG. 0064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 72,
+      "enunciado": "É possível o recebimento de benefício por incapacidade durante período em que houve exercício de atividade remunerada quando comprovado que o segurado estava incapaz para as atividades habituais na época em que trabalhou.",
+      "situacao": "vigente",
+      "origem": "DOU 13/03/2013; PG. 0064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 73,
+      "enunciado": "O tempo de gozo de auxílio-doença ou de aposentadoria por invalidez não decorrentes de acidente de trabalho só pode ser computado como tempo de contribuição ou para fins de carência quando intercalado entre períodos nos quais houve recolhimento de contribuições para a previdência social.",
+      "situacao": "vigente",
+      "origem": "DOU 13/03/2013; PG. 0064",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 74,
+      "enunciado": "O prazo de prescrição fica suspenso pela formulação de requerimento administrativo e volta a correr pelo saldo remanescente após a ciência da decisão administrativa final.",
+      "situacao": "vigente",
+      "origem": "DOU 22/05/2013; PG. 0066",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 75,
+      "enunciado": "A Carteira de Trabalho e Previdência Social (CTPS) em relação à qual não se aponta defeito formal que lhe comprometa a fidedignidade goza de presunção relativa de veracidade, formando prova suficiente de tempo de serviço para fins previdenciários, ainda que a anotação de vínculo de emprego não conste no Cadastro Nacional de Informações Sociais (CNIS).",
+      "situacao": "vigente",
+      "origem": "DOU 13/06/2013; PG. 00136",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 76,
+      "enunciado": "A averbação de tempo de serviço rural não contributivo não permite majorar o coeficiente de cálculo da renda mensal inicial de aposentadoria por idade previsto no art. 50 da Lei nº 8.213/91.",
+      "situacao": "vigente",
+      "origem": "DOU 14/08/2013; PG. 00071",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 77,
+      "enunciado": "O julgador não é obrigado a analisar as condições pessoais e sociais quando não reconhecer a incapacidade do requerente para a sua atividade habitual.",
+      "situacao": "vigente",
+      "origem": "DOU 06/09/2013; PG. 00201",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 78,
+      "enunciado": "Comprovado que o requerente de benefício é portador do vírus HIV, cabe ao julgador verificar as condições pessoais, sociais, econômicas e culturais, de forma a analisar a incapacidade em sentido amplo, em face da elevada estigmatização social da doença.",
+      "situacao": "vigente",
+      "origem": "DOU 17/09/2014; PG. 00087",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 79,
+      "enunciado": "Nas ações em que se postula benefício assistencial, é necessária a comprovação das condições socioeconômicas do autor por laudo de assistente social, por auto de constatação lavrado por oficial de justiça ou, sendo inviabilizados os referidos meios, por prova testemunhal.",
+      "situacao": "vigente",
+      "origem": "DOU 24/04/2015; PG. 00162",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 80,
+      "enunciado": "Nos pedidos de benefício de prestação continuada (LOAS), tendo em vista o advento da Lei 12.470/11, para adequada valoração dos fatores ambientais, sociais, econômicos e pessoais que impactam na participação da pessoa com deficiência na sociedade, é necessária a realização de avaliação social por assistente social ou outras providências aptas a revelar a efetiva condição vivida no meio social pelo requerente.",
+      "situacao": "vigente",
+      "origem": "DOU 24/04/2015; PG. 00162",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 81,
+      "enunciado": "A impugnação de ato de indeferimento, cessação ou cancelamento de benefício previdenciário não se submete a qualquer prazo extintivo, seja em relação à revisão desses atos, seja em relação ao fundo de direito.",
+      "situacao": "vigente",
+      "origem": "DOU DATA: 24/06/2015; PG:00064; (ALTERADA EM 09/12/2020); DJe nº 214/2020. DATA: 11/12/2020; PG: 00002",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 82,
+      "enunciado": "O código 1.3.2 do quadro anexo ao Decreto n.º 53.831/64, além dos profissionais da área da saúde, contempla os trabalhadores que exercem atividades de serviços gerais em limpeza e higienização@de ambientes hospitalares.",
+      "situacao": "vigente",
+      "origem": "DOU DATA: 30/11/2015; PG:00145",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 83,
+      "enunciado": "A partir da entrada em vigor da Lei n. 8.870/94, o décimo terceiro salário não integra o salário de contribuição para fins de cálculo do salário de benefício.",
+      "situacao": "vigente",
+      "origem": "DOU DATA: 21/03/2016; PG:00080",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 84,
+      "enunciado": "Comprovada a situação de desemprego por mais de 3 anos, o trabalhador tem direito ao saque dos valores depositados em sua conta individual do PIS.",
+      "situacao": "vigente",
+      "origem": "DOU DATA: 14/06/2017; PG:00111",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 85,
+      "enunciado": "É possível a conversão de tempo comum em especial de período(s) anterior(es) ao advento da Lei nº 9.032/95 (que alterou a redação do §3º do art. 57 da Lei nº 8.213/91), desde que todas as condições legais para a concessão do benefício pleiteado tenham sido atendidas antes da publicação da referida lei, independentemente da data de entrada do requerimento (DER).",
+      "situacao": "vigente",
+      "origem": "DOU DATA: 29/08/2018; PG: 00133",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 86,
+      "enunciado": "Não cabe incidente de uniformização que tenha como objeto principal questão controvertida de natureza constitucional que ainda não tenha sido definida pelo Supremo Tribunal Federal em sua jurisprudência dominante (CANCELAMENTO: Julgando o PEDILEF n. 0521830-35.2020.4.05.8100, a Turma Nacional de Uniformização, na Sexta Sessão Ordinária de Julgamento, de 26 de agosto de 2021, realizada por videoconferência, em questão de ordem, decidiu, à unanimidade, pelo cancelamento do Enunciado da Súmula n. 86).",
+      "situacao": "cancelada",
+      "origem": "DOU nº 242, DATA: 18/12/2018; (CANCELADA EM 26/08/2021); DOU nº 166, DATA: 01/09/2021; SEÇÃO 1. PG. 00330; DJeNacional. Disponibilizada em: 01/09/2021; Publicada em: 02/09/2021",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 87,
+      "enunciado": "A eficácia do EPI não obsta o reconhecimento de atividade especial exercida antes de 03/12/1998, data de início da vigência da MP 1.729/98, convertida na Lei n. 9.732/98.",
+      "situacao": "vigente",
+      "origem": "DOU nº 40, DATA: 26/02/2019.; PG: 00058; DJe nº 15/2019. DATA: 26/02/2019.",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 88,
+      "enunciado": "A existência de limitação, ainda que leve, para o desempenho da atividade para o trabalho habitual enseja a concessão do benefício de auxílio-acidente, em observância a tese fixada sob o Tema 416 do Superior Tribunal de Justiça. (A Turma Nacional de Uniformização, na Sessão Ordinária de Julgamento, de 17 de abril de 2024, decidiu, à unanimidade, pela aprovação do Enunciado da Súmula n. 88).",
+      "situacao": "vigente",
+      "origem": "DJeN Disponibilização em: 24/04/2024; Publicada em: 25/04/2024",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    },
+    {
+      "numero": 89,
+      "enunciado": "Não há direito à concessão de benefício de auxílio-acidente quando, após consolidação das lesões decorrentes de acidente de qualquer natureza, resultarem seqüelas que não reduzem a capacidade laborativa habitual nem sequer demandam dispêndio de maior esforço na execução da atividade habitual. (A Turma Nacional de Uniformização, na Sessão Ordinária de Julgamento, de 17 de abril de 2024, decidiu, à unanimidade, pela aprovação do Enunciado da Súmula n. 89).",
+      "situacao": "vigente",
+      "origem": "DJeN Disponibilização em: 24/04/2024; Publicada em: 25/04/2024",
+      "link": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
+    }
+  ]
+}

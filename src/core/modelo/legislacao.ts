@@ -14,6 +14,16 @@ export const Norma = z.strictObject({
   referencia: TextoCurto.optional(),
   tipo: TextoCurto.optional(),
   esfera: z.enum(['federal', 'estadual', 'municipal', 'internacional']).optional(),
+  /** Espécie (esquema v4): ausente = norma; `sumulas` e `teses` são coleções (Peças 4 e 5 do acervo). */
+  especie: z.enum(['norma', 'sumulas', 'teses']).optional(),
+  /** Item do acervo de que a norma veio (esquema v4): id estável, versão e hash aderidos. */
+  origemAcervo: z
+    .strictObject({
+      id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,127}$/),
+      versao: z.int().min(1),
+      hash: z.string().regex(/^[0-9a-f]{64}$/),
+    })
+    .optional(),
   epigrafe: TextoLongo.optional(),
   ementa: TextoLongo.optional(),
   preambulo: TextoLongo.optional(),
@@ -70,6 +80,10 @@ export const TipoDispositivo = z.enum([
   'inciso',
   'alinea',
   'item',
+  // Súmula (esquema v4, Peça 4 do acervo): um enunciado numerado; normativo, filho direto da coleção.
+  'sumula',
+  // Tese institucional (Peça 5 do acervo): enunciado numerado, filho de um nó de área.
+  'tese',
   'anexo',
   // Trecho com numeração própria aberto por título solto (ADCT da CF); estrutural (8.4).
   'bloco',
@@ -116,6 +130,10 @@ export const TextoDeDispositivo = z.strictObject({
   normaId: Id,
   trechos: z.array(Trecho),
   notasVigencia: z.array(NotaVigencia).optional(),
+  /** De onde veio o texto (tese: encontro e PDF; súmula: DJ e página oficial). */
+  procedencia: z
+    .strictObject({ rotulo: TextoCurto, data: DataCivil.optional(), link: NotaVigencia.shape.link })
+    .optional(),
   redacoesAnteriores: z
     .array(
       z.strictObject({
@@ -177,6 +195,26 @@ export const Estrela = z.strictObject({
 });
 export type Estrela = z.infer<typeof Estrela>;
 
+/**
+ * Vínculo de uma norma a uma disciplina (esquema v4, D7): uma norma pode ter vários, cada um com
+ * subtítulo e trecho opcionais ("CDC — Crimes das relações de consumo", arts. 61 a 80). Sem
+ * `disciplinaId` é "sem disciplina"; `sugestao` guarda o nome que o acervo sugeriu.
+ */
+export const VinculoDeDisciplina = z.strictObject({
+  ...camposComuns,
+  normaId: Id,
+  disciplinaId: Id.optional(),
+  sugestao: TextoCurto.optional(),
+  subtitulo: TextoCurto.optional(),
+  trecho: z
+    .strictObject({
+      inicioEndereco: z.string().max(200),
+      fimEndereco: z.string().max(200),
+    })
+    .optional(),
+});
+export type VinculoDeDisciplina = z.infer<typeof VinculoDeDisciplina>;
+
 // ── Curadoria (F7) ──────────────────────────────────────────────────────────
 
 export const PacoteDeIncidencia = z.strictObject({
@@ -211,3 +249,22 @@ export const Adesao = z.strictObject({
   receberAtualizacoes: z.boolean(),
 });
 export type Adesao = z.infer<typeof Adesao>;
+
+/**
+ * Pendência de releitura (esquema v5, Peça 6a do acervo): o que perdeu o endereço quando uma
+ * versão nova do acervo foi aplicada. Guarda o endereço antigo e o que apontava para ele; a
+ * estrela, o erro, o vínculo, o "lido até" e a posição são resolvidos pelo usuário relendo o trecho.
+ */
+export const PendenciaDeReleitura = z.strictObject({
+  ...camposComuns,
+  normaId: Id,
+  /** A versão que passou a ser a vigente e fez o endereço sumir. */
+  versaoId: Id,
+  tipo: z.enum(['estrela', 'erro', 'vinculo', 'lido_ate', 'posicao']),
+  enderecoAntigo: z.string().max(200),
+  rotulo: TextoCurto.optional(),
+  /** O registro que apontava para o endereço (estrela, erro, vínculo ou leitura). */
+  referenciaId: Id.optional(),
+  resolvidaEm: Instante.optional(),
+});
+export type PendenciaDeReleitura = z.infer<typeof PendenciaDeReleitura>;
