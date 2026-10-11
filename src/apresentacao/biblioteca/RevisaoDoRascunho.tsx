@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
+  converterLinha,
+  dividirAqui,
+  EdicaoInvalida,
+  juntarComAnterior,
+  OPCOES_DE_CONVERSAO,
+  salvarTexto,
+  type ConverterEm,
+} from '../../dominios/legislacao/edicao';
+import {
   confirmarDispositivos,
   corrigirDispositivo,
   ITENS_POR_PAGINA,
@@ -22,10 +31,24 @@ interface Props {
   aoIndisponivel: (mensagem: string) => void;
 }
 
+type Salvamento = 'salvo' | 'digitando' | 'salvando' | 'falhou';
+
+const FRASE_SALVAMENTO: Record<Salvamento, string> = {
+  salvo: 'Salvo',
+  digitando: 'Digitando… salva sozinho',
+  salvando: 'Salvando…',
+  falhou: 'Não foi possível salvar. Tente de novo.',
+};
+
+/** Pausa na digitação antes de salvar sozinho. */
+const PAUSA_DO_SALVAMENTO_MS = 800;
+
 /**
- * Revisão do rascunho (F2, 10.1; Parte 2 §10.6, regra 12): os dispositivos "a confirmar" com
- * prévia, confirmar em lote ou um a um, e corrigir o texto de um. Nada é obrigatório: publicar
- * continua aceitando o que sobrar em lote.
+ * Revisão do rascunho (F2, 10.1 e 10.2; Parte 2 §10.6, regra 12 e editor): os dispositivos "a
+ * confirmar" com prévia, confirmar em lote ou um a um, e corrigir um. Ao corrigir, o texto e o
+ * rótulo se salvam sozinhos (indicador "Salvo"), e a linha pode ser convertida em outro tipo,
+ * juntada à de cima ou dividida no cursor; número e recuo ficam por conta do sistema. Nada é
+ * obrigatório: publicar continua aceitando o que sobrar em lote.
  */
 export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponivel }: Props) {
   const repo = useRepositorio();
@@ -34,6 +57,12 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
   const [corrigindo, setCorrigindo] = useState<ItemAConfirmar | null>(null);
   const [texto, setTexto] = useState('');
   const [rotulo, setRotulo] = useState('');
+  const [salvamento, setSalvamento] = useState<Salvamento>('salvo');
+  const [conversao, setConversao] = useState<ConverterEm | ''>('');
+  const salvo = useRef({ texto: '', rotulo: '' });
+  const gravando = useRef<Promise<void>>(Promise.resolve());
+  const areaDoTexto = useRef<HTMLTextAreaElement>(null);
+  const idConversao = useId();
   const [ocupado, setOcupado] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
   const trava = useRef(false);
@@ -60,6 +89,38 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     void carregar();
   }, [carregar, aConfirmar]);
 
+  /** Grava o que está na tela (se mudou), na ordem dos pedidos anteriores. */
+  const gravarAgora = useCallback(
+    (alvo: ItemAConfirmar, texto1: string, rotulo1: string): Promise<void> => {
+      gravando.current = gravando.current.then(async () => {
+        if (texto1 === salvo.current.texto && rotulo1 === salvo.current.rotulo) return;
+        setSalvamento('salvando');
+        try {
+          await salvarTexto(repo, versaoId, alvo.dispositivoId, { texto: texto1, rotulo: rotulo1 });
+          salvo.current = { texto: texto1, rotulo: rotulo1 };
+          setSalvamento('salvo');
+        } catch (e) {
+          if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);
+          else setSalvamento('falhou');
+        }
+      });
+      return gravando.current;
+    },
+    [repo, versaoId],
+  );
+
+  // Salva sozinho depois de uma pausa na digitação.
+  useEffect(() => {
+    if (!corrigindo) return;
+    if (texto === salvo.current.texto && rotulo === salvo.current.rotulo) return;
+    const espera = setTimeout(() => {
+      void gravarAgora(corrigindo, texto, rotulo);
+    }, PAUSA_DO_SALVAMENTO_MS);
+    return () => {
+      clearTimeout(espera);
+    };
+  }, [corrigindo, texto, rotulo, gravarAgora]);
+
   async function agir(acao: () => Promise<unknown>) {
     if (trava.current) return;
     trava.current = true;
@@ -71,6 +132,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
       await carregar();
     } catch (e) {
       if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);
+      else if (e instanceof EdicaoInvalida) setFalha(e.message);
       else
         setFalha(
           'Não foi possível salvar. Feche as outras abas do Arretado e tente de novo; nada foi perdido.',
@@ -85,7 +147,19 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     setFalha(null);
     setTexto(item.texto);
     setRotulo(item.rotulo ?? '');
+    salvo.current = { texto: item.texto, rotulo: item.rotulo ?? '' };
+    setSalvamento('salvo');
+    setConversao('');
     setCorrigindo(item);
+  }
+
+  /** Muda a estrutura: grava antes o que está na tela e fecha o formulário (a lista é refeita). */
+  function mudarEstrutura(item: ItemAConfirmar, operacao: () => Promise<unknown>) {
+    void agir(async () => {
+      await gravarAgora(item, texto, rotulo);
+      await operacao();
+      setCorrigindo(null);
+    });
   }
 
   if (aConfirmar === 0) return null;
@@ -121,6 +195,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                 onSubmit={(e) => {
                   e.preventDefault();
                   void agir(async () => {
+                    await gravarAgora(item, texto, rotulo);
                     await corrigirDispositivo(repo, versaoId, item.dispositivoId, {
                       texto,
                       rotulo,
@@ -140,6 +215,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                     value={rotulo}
                     onChange={(e) => {
                       setRotulo(e.target.value);
+                      setSalvamento('digitando');
                     }}
                   />
                 </div>
@@ -147,13 +223,80 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                   <label htmlFor={idTexto}>Texto</label>
                   <textarea
                     id={idTexto}
+                    ref={areaDoTexto}
                     rows={4}
                     value={texto}
                     onChange={(e) => {
                       setTexto(e.target.value);
+                      setSalvamento('digitando');
                     }}
                   />
+                  <p role="status" className="dica revisao-salvo">
+                    {FRASE_SALVAMENTO[salvamento]}
+                  </p>
                 </div>
+                <fieldset className="revisao-estrutura">
+                  <legend>Mudar a estrutura</legend>
+                  <div className="campo">
+                    <label htmlFor={idConversao}>Converter esta linha em…</label>
+                    <select
+                      id={idConversao}
+                      value={conversao}
+                      onChange={(e) => {
+                        setConversao(e.target.value as ConverterEm | '');
+                      }}
+                    >
+                      <option value="">Escolha o tipo</option>
+                      {OPCOES_DE_CONVERSAO.map((o) => (
+                        <option key={o.valor} value={o.valor}>
+                          {o.rotulo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="linha-acoes">
+                    <button
+                      type="button"
+                      disabled={ocupado || conversao === ''}
+                      onClick={() => {
+                        if (conversao !== '') {
+                          mudarEstrutura(item, () =>
+                            converterLinha(repo, versaoId, item.dispositivoId, conversao),
+                          );
+                        }
+                      }}
+                    >
+                      Converter
+                    </button>
+                    <button
+                      type="button"
+                      disabled={ocupado}
+                      onClick={() => {
+                        mudarEstrutura(item, () =>
+                          juntarComAnterior(repo, versaoId, item.dispositivoId),
+                        );
+                      }}
+                    >
+                      Juntar com a linha de cima
+                    </button>
+                    <button
+                      type="button"
+                      disabled={ocupado}
+                      onClick={() => {
+                        const corte = areaDoTexto.current?.selectionStart ?? 0;
+                        mudarEstrutura(item, () =>
+                          dividirAqui(repo, versaoId, item.dispositivoId, texto, corte),
+                        );
+                      }}
+                    >
+                      Dividir no cursor
+                    </button>
+                  </div>
+                  <p className="dica">
+                    O número e o recuo são do sistema. Para dividir, ponha o cursor no texto onde a
+                    linha deve partir.
+                  </p>
+                </fieldset>
                 <div className="linha-acoes">
                   <button type="submit" className="principal" disabled={ocupado}>
                     Salvar e confirmar
@@ -162,10 +305,13 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                     type="button"
                     disabled={ocupado}
                     onClick={() => {
-                      setCorrigindo(null);
+                      void gravarAgora(item, texto, rotulo).then(() => {
+                        setCorrigindo(null);
+                        void carregar();
+                      });
                     }}
                   >
-                    Cancelar
+                    Fechar
                   </button>
                 </div>
               </form>

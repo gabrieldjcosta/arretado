@@ -820,7 +820,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rascunho retomado depois de atualizar o app: relatório e árvore não batem
 - **Sintoma:** o sumário do rascunho (anomalias, descartes) fala de dispositivos que a árvore gravada não tem, ou o contrário. **Causa:** o relatório não é gravado: sai de novo da fonte ao retomar, e o estruturador pode ter mudado desde a gravação (cada merge publica).
-- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: a partir do editor (etapa 10), refazer apagaria o que ele corrigiu; a 10.4 passa a preservar o confirmado. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
+- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: com edição à mão (marca `+manual`, 10.2) a árvore não é refeita (ver "Editor de linhas (10.2)"); preservar o confirmado ao refazer pela fonte é da 10.4. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026; a guarda de outra versão veio da revisão adversarial); a parte do editor, previsto — atividade 10.4.
 
 ### Backup anterior importado por mesclagem cria uma segunda árvore do rascunho
@@ -1126,3 +1126,21 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Drill:** o botão de virar continua "Mostrar resposta" (testes e E2E usam o nome); "Sair" é link para `/recall`. O verso se chama "Frase correta" só quando o cartão vem de um erro; senão, "Resposta".
 - **Estado por texto:** ícones são `aria-hidden`, então o nome acessível segue sendo só a palavra ("Errei", "Vencido"); `getByText('Errei')` continua achando.
 - **Linha de base do portão da F1:** o drill centrado entrou em 11/10/2026; ver `docs/redesign/linha-de-base.md`.
+
+## Editor de linhas (10.2, 11/10/2026)
+
+### A correção ou a conversão sumiu depois de atualizar o app
+- **Sintoma:** depois de o estruturador mudar (app atualizado), o rascunho voltava como a fonte o estruturava e perdia confirmações, correções e conversões. **Causa:** `retomarRascunho` refaz a árvore pela fonte quando `versaoAdaptador` ≠ `VERSAO_ESTRUTURADOR`. **Solução:** toda edição à mão (confirmar, corrigir, converter, juntar, dividir, salvar sozinho) grava `+manual` no fim de `versaoAdaptador`, e `retomarRascunho` só refaz o relatório quando há a marca. Rascunho editado antes da 10.2 (só confirmações da 10.1, sem marca) continua sendo refeito ao mudar o estruturador. **Prevenção:** "retomar depois de o estruturador mudar não refaz a árvore editada" e "confirmar e corrigir da 10.1 também ficam" (`edicao.test.ts`).
+- **Limite conhecido:** o sumário "Estrutura encontrada", os avisos do estruturador e o "Ficou de fora" vêm da fonte e não acompanham a edição; conflitos e a contagem "a confirmar" vêm da árvore gravada. Para ver a estrutura nova, abrir a norma depois de publicar. A 10.4 (edição integral) decide se o sumário passa a ser calculado sobre a árvore gravada.
+- **Origem:** previsto na 10.1 (resumo), tratado em 11/10/2026.
+
+### "Dividir no cursor" não faz nada ou recusa
+- **Sintoma:** a tela mostra "Coloque o cursor no meio do texto para dividir." ou "Esta linha não pode ser dividida; converta-a antes.". **Causa:** o cursor está no começo ou no fim do texto (uma das partes ficaria vazia), ou a linha é de um tipo sem número próprio (nome, nó estrutural, anexo, preâmbulo). **Solução:** pôr o cursor no meio; para nome e nó estrutural, converter antes. A segunda parte nasce "a confirmar", do mesmo tipo e com o número do sistema (o primeiro livre depois do anterior): se o número não for o certo, corrigir o rótulo (o endereço acompanha).
+- **Origem:** previsto na 10.2.
+
+### Número repetido depois de converter ou dividir
+- **Sintoma:** aviso "…aparece duas vezes" ou o botão Publicar bloqueado depois de editar. **Causa:** o rótulo corrigido à mão repete o de outra linha (o sistema só escolhe número livre ao converter ou dividir). **Solução:** corrigir o rótulo da linha certa (o endereço acompanha o número e os filhos o seguem); a validação da publicação lê a árvore gravada. **Prevenção:** "rótulo que o sistema reconhece muda o número…" (`edicao.test.ts`).
+- **Origem:** previsto na 10.2.
+
+### Prevista para a 10.3 e a 10.4
+- A 10.3 (correção por bloco) vai usar `reconstruir` sobre um intervalo: se um bloco for corrigido por texto, o texto novo precisa passar pelo estruturador e entrar na lista de linhas no lugar das antigas (ids dos endereços iguais mantidos). A 10.4 (edição integral) precisa preservar o confirmado ao refazer pela fonte: o ponto de partida é a marca `+manual` e o mapa endereço → id de `registrosDaArvore` (`anteriores`).
