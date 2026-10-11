@@ -96,7 +96,6 @@ export function pares() {
     ['primaria-texto', 'primaria', 4.5],
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
-    ['agora-texto', 'agora', 4.5],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;
@@ -122,11 +121,21 @@ export function medir(tema) {
     valor,
     ok: valor >= 4.5,
   });
-  // Marca-texto do Agora: o texto sobre a faixa translúcida, sobre cada fundo.
-  for (const f of FUNDOS) {
-    const faixa = sobre(cor('agora-faixa'), cor(f));
-    const v = razao(cor('texto'), faixa);
-    linhas.push({ fg: 'texto', bg: `agora-faixa/${f}`, minimo: 4.5, valor: v, ok: v >= 4.5 });
+  // Cartão tingido (agora, selo, estado selecionado): tinta, atenuado e primária sobre o tingido
+  // (translúcido no escuro, composto sobre cada fundo) e a borda contra o tingido e o fundo.
+  for (const f of ['fundo', 'superficie']) {
+    const tingido = sobre(cor('agora-fundo'), cor(f));
+    for (const [fg, minimo] of [
+      ['texto', 4.5],
+      ['texto-atenuado', 4.5],
+      ['primaria', 4.5],
+      ['agora-borda', 3],
+    ]) {
+      const v = razao(cor(fg), tingido);
+      linhas.push({ fg, bg: `agora-fundo/${f}`, minimo, valor: v, ok: v >= minimo });
+    }
+    const vb = razao(cor('agora-borda'), cor(f));
+    linhas.push({ fg: 'agora-borda', bg: f, minimo: 3, valor: vb, ok: vb >= 3 });
   }
   return linhas;
 }
