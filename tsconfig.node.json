@@ -11,6 +11,8 @@
     "vite.config.ts",
     "playwright.config.ts",
     "scripts",
+    "worker",
+    "src/integracoes/url",
     "eslint",
     "src/testes/setup.ts",
     "supabase",
