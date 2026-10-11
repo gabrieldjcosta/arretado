@@ -1116,3 +1116,7 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Correção some ao atualizar o app:** `retomarRascunho` refaz a árvore pela fonte quando a versão do estruturador muda, e isso desfaz confirmações e correções do rascunho (mantém só os ids por endereço). Preservar o confirmado é da 10.4; até lá, confirmar e publicar na mesma sessão de uso.
 - **Efeito colateral no lint:** guardar a função da tela numa ref durante o render (`ref.current = fn`) dá "Cannot access refs during render" (react-hooks/refs); atualizar a ref num `useEffect` sem dependências. Sem isso, a função nova a cada render entrava nas dependências do `useCallback` e a lista recarregava sem parar.
 - **Previsível na 10.2:** `corrigirDispositivo` só troca texto e rótulo; o endereço não muda. Converter linha e renumerar (10.2) mexem em endereço e `paiId`: refazer a validação estrutural depois de cada conversão (`verificarPublicacao`).
+
+## Menu "Ajuda" (fatia 6, 6.3)
+
+**Sintoma:** teste ou E2E não acha o botão "Relatar problema" nem o link "Ajuda sobre esta tela". **Causa:** os dois só existem com o menu **Ajuda** aberto (juntou o "?" e o "!"). **Solução:** clicar em `getByRole('button', { name: 'Ajuda', exact: true })` antes. **Previsível:** `--raio` subiu de 8 para 12 px em tudo; se uma tela estourar a largura no celular, conferir primeiro o padding dos botões.

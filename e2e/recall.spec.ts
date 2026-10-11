@@ -58,6 +58,7 @@ test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page })
   await page.getByRole('button', { name: 'Errei' }).click();
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
   await page.getByRole('button', { name: 'Relatar problema' }).click();
   await expect(page.getByText(/nunca conteúdo de estudo/)).toBeVisible();
   await page.getByLabel('O que aconteceu?').fill('Botão demorou');
