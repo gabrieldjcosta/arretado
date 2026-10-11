@@ -15,7 +15,10 @@ const QUE_FICOU: Record<PendenciaDeReleitura['tipo'], string> = {
   posicao: 'Onde você parou',
 };
 
-/** Depois de atualizar a norma: o que perdeu o lugar e os grifos sem texto na versão nova. */
+/**
+ * Depois de atualizar a norma (6a) ou de corrigir o texto (11.7): o que perdeu o lugar e os grifos
+ * e notas sem o trecho no texto de agora.
+ */
 export function PendenciasDaNorma({ normaId }: { normaId: string }) {
   const repo = useRepositorio();
   const carregar = useCallback(
@@ -30,7 +33,7 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
   return (
     <section className="aviso" aria-label="Para reler">
       <h2>Para reler</h2>
-      <p>Esta norma foi atualizada. O que ficou sem lugar na versão nova:</p>
+      <p>O texto desta norma mudou. O que ficou sem lugar no texto de agora:</p>
       {dados.pendencias.length > 0 && (
         <ul className="lista-simples">
           {dados.pendencias.map((p) => (
@@ -50,7 +53,7 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
       )}
       {dados.grifos.length > 0 && (
         <>
-          <p>Grifos e notas sem o trecho na versão nova:</p>
+          <p>Grifos e notas sem o trecho no texto de agora:</p>
           <ul className="lista-simples">
             {dados.grifos.map((m) => (
               <li key={m.id}>“{m.ancora.texto}”</li>

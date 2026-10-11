@@ -1584,6 +1584,22 @@ dialog.dialogo-acoes {
   padding-left: 1.25rem;
 }
 
+/* Correção do texto publicado (11.7): o texto editável e o de antes, na fonte da leitura. */
+.correcao-do-texto textarea,
+.texto-de-antes {
+  font-family: var(--fonte-leitura);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.correcao-do-texto textarea {
+  width: 100%;
+}
+
+.textos-de-antes li + li {
+  margin-top: 0.75rem;
+}
+
 /* ── Redesign, fatia 2: agora / depois, barra fina, dias, + flutuante ──────── */
 
 .acao-agora {

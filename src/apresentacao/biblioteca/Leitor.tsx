@@ -39,6 +39,7 @@ import {
   type NormaAberta,
 } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
+import type { ResultadoDaCorrecao } from '../../dominios/legislacao/correcao';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
@@ -56,6 +57,7 @@ import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remiss
 import { fraseDaEstrela, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
+import { AvisoDaCorrecao } from './CorrecaoDoTexto';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
 import {
   ATRIBUTO_FORA_DO_TEXTO,
@@ -168,10 +170,16 @@ export function Leitor() {
 function LeitorDaNorma({ normaId }: { normaId: string }) {
   const repo = useRepositorio();
   const [carga, setCarga] = useState<Carga>({ tipo: 'carregando' });
-  // `?ir=<endereço>` (vínculo do acervo): abre no trecho, sobre a posição guardada. Lido só na entrada.
-  const [irPara] = useState(() =>
+  // `?ir=<endereço>` (vínculo do acervo): abre no trecho, sobre a posição guardada. Lido só na entrada;
+  // depois da correção do texto (11.7), é o dispositivo corrigido.
+  const [irPara, setIrPara] = useState(() =>
     new URLSearchParams(window.location.hash.split('?')[1]).get('ir'),
   );
+  // Correção do texto (11.7): a versão nova recarrega a norma (`geracao`) e o aviso fica no alto.
+  const [geracao, setGeracao] = useState(0);
+  const [correcao, setCorrecao] = useState<
+    { resultado: ResultadoDaCorrecao; desfeita: boolean } | undefined
+  >(undefined);
 
   useEffect(() => {
     let ativo = true;
@@ -221,9 +229,41 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
     return () => {
       ativo = false;
     };
-  }, [repo, normaId, irPara]);
+  }, [repo, normaId, irPara, geracao]);
 
-  if (carga.tipo === 'pronta') return <LeitorAberto repo={repo} {...carga} />;
+  if (carga.tipo === 'pronta') {
+    const recarregar = (resultado: ResultadoDaCorrecao, desfeita: boolean, endereco?: string) => {
+      setCorrecao({ resultado, desfeita });
+      if (resultado.estado === 'sem_mudanca') return;
+      if (endereco !== undefined) setIrPara(endereco);
+      setGeracao((g) => g + 1);
+    };
+    return (
+      <LeitorAberto
+        key={carga.aberta.versao.id}
+        repo={repo}
+        {...carga}
+        aoCorrigir={(resultado, dispositivoId) => {
+          const no = carga.aberta.nos[carga.aberta.indiceDe.get(dispositivoId) ?? -1];
+          recarregar(resultado, false, no?.dispositivo.endereco);
+        }}
+        avisoDaCorrecao={
+          correcao && (
+            <AvisoDaCorrecao
+              resultado={correcao.resultado}
+              desfeita={correcao.desfeita}
+              aoDesfazer={(r) => {
+                recarregar(r, true);
+              }}
+              aoFechar={() => {
+                setCorrecao(undefined);
+              }}
+            />
+          )
+        }
+      />
+    );
+  }
   return (
     <>
       <p>
@@ -322,7 +362,13 @@ function LeitorAberto({
   janelas,
   alvo,
   lidoAteId,
-}: { repo: Repositorio } & Aberta) {
+  aoCorrigir,
+  avisoDaCorrecao,
+}: {
+  repo: Repositorio;
+  aoCorrigir: (resultado: ResultadoDaCorrecao, dispositivoId: string) => void;
+  avisoDaCorrecao: ReactNode;
+} & Aberta) {
   const { norma, nos } = aberta;
   const linhasTodas = useMemo(() => montarLinhas(nos), [nos]);
   // Filtro do leitor (11.3): o que foi aplicado e o resultado, guardado na hora de aplicar (um
@@ -1310,6 +1356,10 @@ function LeitorAberto({
       nome: rotulo || rotuloTipo(no.dispositivo.tipo, 1),
       referencia,
       texto,
+      textoGravado:
+        texto === undefined || trechos === undefined
+          ? undefined
+          : trechos.map((t) => t.texto).join(''),
     });
   }
   const [falhaDoFiltro, setFalhaDoFiltro] = useState<string | undefined>(undefined);
@@ -1562,6 +1612,7 @@ function LeitorAberto({
           alternarDestaques={alternarDestaques}
         />
       )}
+      {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
       {!modoFoco && destacar && <LegendaDestaques />}
       {!modoFoco && referenciaLidoAte && (
@@ -1897,6 +1948,14 @@ function LeitorAberto({
       <AcoesDoDispositivo
         alvo={alvoDasAcoes}
         estrela={estrelaDasAcoes}
+        correcao={{
+          normaId: norma.id,
+          versaoId: aberta.versao.id,
+          aoCorrigir: (resultado, dispositivoId) => {
+            setAlvoDasAcoes(undefined);
+            aoCorrigir(resultado, dispositivoId);
+          },
+        }}
         aoFechar={() => {
           setAlvoDasAcoes(undefined);
         }}
