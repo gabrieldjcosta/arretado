@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ItemDoAcervo } from '../../dominios/acervo/esquemas';
+import { aderirEmLote } from '../../dominios/acervo/adesao';
 import { FonteEmMemoria } from '../../dominios/acervo/fonte-em-memoria';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -141,5 +142,45 @@ describe('Biblioteca › Acervo (3c)', () => {
     ).toBeInTheDocument();
     await usuario.click(screen.getByRole('link', { name: 'Teses' }));
     expect(await screen.findByRole('heading', { name: 'Nenhuma tese ainda' })).toBeInTheDocument();
+  });
+});
+
+describe('Biblioteca › Acervo › atualização (6a)', () => {
+  it('avisa de versão nova, mostra a prévia, atualiza e lista o que reler', async () => {
+    const v1 = await FonteEmMemoria.criar([{ item: item('lep') }]);
+    const { repo } = await repositorioDeTeste();
+    await aderirEmLote(repo, v1, ['lep']);
+    const normas = await repo.colecao('normas').todosDoUsuario();
+    const norma = normas[0];
+    const dispositivos = await repo.colecao('dispositivos').todosDoUsuario();
+    const art2 = dispositivos.find((d) => d.endereco === 'art2');
+    if (!norma || !art2) throw new Error('adesão sem norma');
+    await repo
+      .colecao('estrelas')
+      .criar({ alvoId: art2.id, normaId: norma.id, origemTipo: 'direta' });
+
+    const velho = item('lep');
+    const v2 = await FonteEmMemoria.criar([
+      { item: { ...velho, versao: 2, nos: velho.nos.slice(0, 1) } },
+    ]);
+    window.location.hash = '#/biblioteca/acervo';
+    const usuario = userEvent.setup();
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={v2} />);
+    expect(await screen.findByText(/Há versão nova/)).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Atualizar' }));
+    const dialogo = await screen.findByRole('dialog');
+    expect(await within(dialogo).findByText(/1 saem da norma/)).toBeInTheDocument();
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Atualizar agora' }));
+    await waitFor(() => {
+      expect(screen.queryByText(/Há versão nova/)).not.toBeInTheDocument();
+    });
+
+    window.location.hash = `#/biblioteca/normas/${norma.id}`;
+    const lista = await screen.findByRole('region', { name: 'Para reler' });
+    expect(lista).toHaveTextContent('Art. 2º saiu da norma');
+    await usuario.click(within(lista).getByRole('button', { name: 'Já reli' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('region', { name: 'Para reler' })).not.toBeInTheDocument();
+    });
   });
 });
