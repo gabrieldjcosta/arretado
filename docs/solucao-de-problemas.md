@@ -1111,3 +1111,8 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Testes:** `DOMException` no jsdom não é `instanceof Error`; o motivo `tempo_esgotado` usa o `name`. `Response` só aceita `Uint8Array<ArrayBuffer>` no TypeScript atual.
 - **windows-1252:** o `TextDecoder('windows-1252')` do Node pode devolver latin1 (C1 como U+0096); o navegador mapeia certo, e a normalização (`normalizacao.ts`) já converte C1 depois. Planalto não declara charset; ALESP declara UTF-8 na `<meta>`.
 - **Previsível na 12.2:** `wrangler` não está instalado no repositório; o dry-run e a publicação exigem rede. O Workers Builds passa a publicar o Worker com `main` quando o `main` receber este merge.
+
+## Revisão do rascunho (10.1, 11/10/2026)
+- **Correção some ao atualizar o app:** `retomarRascunho` refaz a árvore pela fonte quando a versão do estruturador muda, e isso desfaz confirmações e correções do rascunho (mantém só os ids por endereço). Preservar o confirmado é da 10.4; até lá, confirmar e publicar na mesma sessão de uso.
+- **Efeito colateral no lint:** guardar a função da tela numa ref durante o render (`ref.current = fn`) dá "Cannot access refs during render" (react-hooks/refs); atualizar a ref num `useEffect` sem dependências. Sem isso, a função nova a cada render entrava nas dependências do `useCallback` e a lista recarregava sem parar.
+- **Previsível na 10.2:** `corrigirDispositivo` só troca texto e rótulo; o endereço não muda. Converter linha e renumerar (10.2) mexem em endereço e `paiId`: refazer a validação estrutural depois de cada conversão (`verificarPublicacao`).

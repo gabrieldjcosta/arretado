@@ -1915,3 +1915,24 @@ dialog.dialogo-previa .linha-acoes button {
   opacity: 0.55;
   cursor: default;
 }
+
+/* Revisão do rascunho (10.1): dispositivos a confirmar */
+.revisao-lista {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.revisao-lista > li {
+  border-top: 1px solid var(--borda);
+  padding: 0.75rem 0;
+}
+
+.revisao-previa {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.revisao textarea {
+  width: 100%;
+}

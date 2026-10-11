@@ -22,6 +22,7 @@ import {
 import { sumarioDoRascunho, type SumarioDoRascunho } from '../../dominios/legislacao/sumario';
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
+import { RevisaoDoRascunho } from './RevisaoDoRascunho';
 import { fraseDescarte, rotuloTipo } from './rotulos';
 
 interface Importacao {
@@ -229,6 +230,12 @@ export function Importar() {
     setFalha(null);
     setFase({ tipo: 'colar' });
     void navegar('/biblioteca/importar', { replace: true });
+  }
+
+  /** Depois de confirmar ou corrigir: o relatório (contagem, conflitos, avisos) sai de novo. */
+  async function atualizarRelatorio(importacao: Importacao) {
+    const relatorio = await verificarPublicacao(repo, importacao.versao.id);
+    setFase({ tipo: 'sumario', importacao: { ...importacao, relatorio } });
   }
 
   async function publicar(e: SubmitEvent, importacao: Importacao) {
@@ -546,19 +553,14 @@ export function Importar() {
               </ul>
             </section>
           )}
-          {relatorio.aConfirmar > 0 && (
-            <p className="aviso">
-              <strong>
-                {plural(
-                  relatorio.aConfirmar,
-                  'dispositivo a confirmar',
-                  'dispositivos a confirmar',
-                )}
-              </strong>
-              : a leitura não teve certeza deles (texto sem formatação ou ambiguidade). Ao publicar,
-              você os aceita em lote; conferir um a um chega numa próxima atualização.
-            </p>
-          )}
+          <RevisaoDoRascunho
+            versaoId={importacao.versao.id}
+            aConfirmar={relatorio.aConfirmar}
+            aoMudar={() => atualizarRelatorio(importacao)}
+            aoIndisponivel={(mensagem) => {
+              setFase({ tipo: 'indisponivel', mensagem });
+            }}
+          />
           <form onSubmit={(e) => void publicar(e, importacao)}>
             <div className="campo">
               <label htmlFor="importar-titulo">Título curto</label>

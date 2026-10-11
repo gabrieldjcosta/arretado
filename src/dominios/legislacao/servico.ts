@@ -161,8 +161,8 @@ export async function rascunhosPendentes(
 /**
  * Reabre um rascunho: o relatório sai de novo da fonte guardada (o estruturador é determinístico).
  * Se o estruturador mudou desde a gravação (app atualizado), a árvore é refeita pela fonte, com os
- * ids de cada endereço mantidos: até o editor (etapa 10), o rascunho não tem edição do usuário a
- * preservar; a 10.4 passa a preservar o que foi confirmado.
+ * ids de cada endereço mantidos: a confirmação e a correção da 10.1 se perdem aqui; a 10.4 passa a
+ * preservar o que foi confirmado.
  */
 export async function retomarRascunho(
   repo: Repositorio,
@@ -385,7 +385,7 @@ async function prepararPublicacao(repo: Repositorio, versaoId: string) {
   return { norma, versao, relatorio };
 }
 
-async function rascunhoGravado(
+export async function rascunhoGravado(
   repo: Repositorio,
   versaoId: string,
 ): Promise<{ norma: Norma; versao: VersaoDeNorma }> {
