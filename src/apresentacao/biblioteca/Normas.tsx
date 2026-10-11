@@ -156,6 +156,20 @@ const importar = (principal: boolean) => (
   </Link>
 );
 
+/** Sempre visível: leva ao catálogo de normas do acervo, por disciplina. */
+const doAcervo = (
+  <Link to="/biblioteca/acervo?tipo=norma" className="botao">
+    Adicionar do acervo
+  </Link>
+);
+
+/** Atalho: as normas do edital de uma vez. */
+const doEdital = (principal: boolean) => (
+  <Link to="/biblioteca/acervo?tudo=1" className={principal ? 'botao principal' : 'botao'}>
+    Tudo do edital da DPE-SP
+  </Link>
+);
+
 /** Biblioteca › Normas (F2, 9.5; Parte 2 §9.2): as normas publicadas e a retomada da importação. */
 export function Normas() {
   const repo = useRepositorio();
@@ -260,9 +274,8 @@ export function Normas() {
               titulo="Nenhuma norma ainda"
               acao={
                 <>
-                  <Link to="/biblioteca/acervo?tudo=1" className="botao principal">
-                    Tudo do edital da DPE-SP
-                  </Link>
+                  {doEdital(true)}
+                  {doAcervo}
                   {importar(false)}
                 </>
               }
@@ -289,8 +302,14 @@ export function Normas() {
               <section aria-labelledby="titulo-normas">
                 <div className="cabecalho-secao">
                   <h2 id="titulo-normas">Normas</h2>
-                  {importar(!dados.continuar)}
+                  <div className="acoes-item">
+                    {doAcervo}
+                    {importar(!dados.continuar)}
+                  </div>
                 </div>
+                <p>
+                  <Link to="/biblioteca/acervo?tudo=1">Tudo do edital da DPE-SP</Link>
+                </p>
                 {dados.porDisciplina.map((g) => (
                   <section key={g.titulo} aria-label={g.titulo}>
                     {(g.titulo !== SEM_DISCIPLINA || dados.porDisciplina.length > 1) && (

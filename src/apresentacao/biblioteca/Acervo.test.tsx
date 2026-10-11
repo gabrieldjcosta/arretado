@@ -94,6 +94,30 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect(screen.getByRole('region', { name: 'Infância' })).toBeInTheDocument();
   });
 
+  it('avisa, sem bloquear, quando o item é uma norma já colada', async () => {
+    const f = await FonteEmMemoria.criar([
+      {
+        item: {
+          ...item('lep'),
+          norma: { tituloCurto: 'Lei nº 7.210/1984', tipo: 'Lei', esfera: 'federal' },
+        },
+      },
+      { item: item('eca') },
+    ]);
+    const { repo } = await repositorioDeTeste();
+    await repo.colecao('normas').criar({
+      tituloCurto: 'LEP',
+      escopo: 'pessoal',
+      tipo: 'Lei',
+      referencia: '7.210/1984',
+    });
+    window.location.hash = '#/biblioteca/acervo';
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
+    expect(await screen.findByText('Você já tem uma norma parecida: LEP.')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Lei nº 7.210\/1984/ })).toBeEnabled();
+    expect(screen.getAllByText(/norma parecida/)).toHaveLength(1);
+  });
+
   it('falha isolada: "Tentar de novo" só nos que falharam', async () => {
     const f = await fonte();
     f.falhas.add('eca');

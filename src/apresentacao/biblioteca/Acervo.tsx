@@ -4,6 +4,7 @@ import { aderirEmLote, type ResultadoDoLote } from '../../dominios/acervo/adesao
 import {
   agrupar,
   filtrarEntradas,
+  normaParecida,
   tamanhoLegivel,
   type ModoDeAgrupar,
 } from '../../dominios/acervo/agrupar';
@@ -49,16 +50,15 @@ export function Acervo() {
     };
   }, [fonte, tentativa]);
 
-  const carregarAdicionadas = useCallback(
-    async (r: typeof repo) =>
-      new Set(
-        (await r.colecao('normas').todosDoUsuario()).flatMap((n) =>
-          n.origemAcervo ? [n.origemAcervo.id] : [],
-        ),
-      ),
-    [],
-  );
-  const { dados: adicionadas } = useDados(carregarAdicionadas);
+  const carregarNormas = useCallback(async (r: typeof repo) => {
+    const normas = await r.colecao('normas').todosDoUsuario();
+    return {
+      adicionadas: new Set(normas.flatMap((n) => (n.origemAcervo ? [n.origemAcervo.id] : []))),
+      coladas: normas.filter((n) => n.origemAcervo === undefined),
+    };
+  }, []);
+  const { dados: minhas } = useDados(carregarNormas);
+  const adicionadas = minhas?.adicionadas;
 
   const [modo, setModo] = useState<ModoDeAgrupar>('disciplina');
   const [busca, setBusca] = useState('');
@@ -260,6 +260,7 @@ export function Acervo() {
                   <ul className="lista-simples">
                     {g.itens.map((i) => {
                       const jaTem = adicionadas.has(i.id);
+                      const parecida = jaTem ? undefined : normaParecida(i, minhas.coladas);
                       const subtitulos = i.vinculos
                         .filter((v) => modo === 'tipo' || v.disciplina === g.titulo)
                         .flatMap((v) => (v.subtitulo ? [v.subtitulo] : []));
@@ -283,6 +284,11 @@ export function Acervo() {
                               </span>
                             </span>
                           </label>
+                          {parecida && (
+                            <p className="aviso">
+                              Você já tem uma norma parecida: {parecida.tituloCurto}.
+                            </p>
+                          )}
                           {i.avisos.map((a) => (
                             <p key={a} className="aviso">
                               {a}

@@ -1,5 +1,5 @@
 import type { EntradaDoIndice } from './esquemas';
-import { agrupar, filtrarEntradas, SEM_DISCIPLINA, tamanhoLegivel } from './agrupar';
+import { agrupar, filtrarEntradas, normaParecida, SEM_DISCIPLINA, tamanhoLegivel } from './agrupar';
 
 const e = (id: string, grupo: string, disciplinas: string[], tipo = 'norma'): EntradaDoIndice =>
   ({
@@ -41,5 +41,22 @@ describe('agrupar o acervo', () => {
     expect(tamanhoLegivel(500)).toBe('500 B');
     expect(tamanhoLegivel(2048)).toBe('2 KB');
     expect(tamanhoLegivel(1572864)).toBe('1,5 MB');
+  });
+});
+
+describe('normaParecida', () => {
+  const lep = { ...e('lep', 'Leis', []), titulo: 'Lei de Execução Penal (Lei nº 7.210/1984)' };
+  const colada = { tituloCurto: 'LEP', tipo: 'Lei', referencia: '7.210/1984' };
+
+  it('acha a colada com a mesma referência e tipo', () => {
+    expect(
+      normaParecida(lep, [{ tituloCurto: 'Outra', tipo: 'Lei', referencia: '1/2000' }, colada]),
+    ).toBe(colada);
+  });
+
+  it('ignora outro tipo, a que já veio do acervo e título sem número', () => {
+    expect(normaParecida(lep, [{ ...colada, tipo: 'Decreto' }])).toBeUndefined();
+    expect(normaParecida(lep, [{ ...colada, origemAcervo: { id: 'lep' } }])).toBeUndefined();
+    expect(normaParecida({ titulo: 'Constituição de 1988' }, [colada])).toBeUndefined();
   });
 });
