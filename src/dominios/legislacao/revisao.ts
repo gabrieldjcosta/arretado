@@ -25,6 +25,7 @@ export interface ItemAConfirmar {
   texto: string;
   /** O começo do texto, para a lista. */
   previa: string;
+  confianca: Dispositivo['confianca'];
 }
 
 export interface ListaAConfirmar {
@@ -43,27 +44,19 @@ function previaDe(texto: string): string {
   return `${plano.slice(0, MAX_PREVIA - 1).trimEnd()}…`;
 }
 
-/**
- * Os dispositivos "a confirmar" na ordem de leitura, `quantidade` a partir de `desde` (o texto só
- * dos desta página). `total` conta todos.
- */
-export async function listarAConfirmar(
+/** Os itens da lista para os dispositivos pedidos; `todos` dá o caminho até a raiz. */
+export async function itensDe(
   repo: Repositorio,
   versaoId: string,
-  pagina: { desde?: number; quantidade?: number } = {},
-): Promise<ListaAConfirmar> {
-  const { norma } = await rascunhoGravado(repo, versaoId);
-  const dispositivos = await dispositivosDaNorma(repo.colecao('dispositivos'), norma.id, false);
-  const porId = new Map(dispositivos.map((d) => [d.id, d]));
-  const pendentes = dispositivos.filter((d) => d.confianca === 'a_confirmar');
-  const desde = Math.max(0, Math.floor(pagina.desde ?? 0));
-  const quantidade = Math.min(Math.max(1, Math.floor(pagina.quantidade ?? ITENS_POR_PAGINA)), 200);
-  const recorte = pendentes.slice(desde, desde + quantidade);
+  todos: readonly Dispositivo[],
+  recorte: readonly Dispositivo[],
+): Promise<ItemAConfirmar[]> {
+  const porId = new Map(todos.map((d) => [d.id, d]));
   const textos = await repo.colecao('textosDispositivo').obterPorChaves(
     '[versaoId+dispositivoId]',
     recorte.map((d) => [versaoId, d.id]),
   );
-  const itens = recorte.map((d, k): ItemAConfirmar => {
+  return recorte.map((d, k): ItemAConfirmar => {
     const caminho: string[] = [];
     for (let pai = d.paiId ? porId.get(d.paiId) : undefined; pai;) {
       if (pai.categoria === 'normativo' && pai.rotulo) caminho.unshift(pai.rotulo);
@@ -78,8 +71,31 @@ export async function listarAConfirmar(
       contexto: caminho.join(' › '),
       texto,
       previa: previaDe(texto),
+      confianca: d.confianca,
     };
   });
+}
+
+/**
+ * Os dispositivos "a confirmar" na ordem de leitura, `quantidade` a partir de `desde` (o texto só
+ * dos desta página). `total` conta todos.
+ */
+export async function listarAConfirmar(
+  repo: Repositorio,
+  versaoId: string,
+  pagina: { desde?: number; quantidade?: number } = {},
+): Promise<ListaAConfirmar> {
+  const { norma } = await rascunhoGravado(repo, versaoId);
+  const dispositivos = await dispositivosDaNorma(repo.colecao('dispositivos'), norma.id, false);
+  const pendentes = dispositivos.filter((d) => d.confianca === 'a_confirmar');
+  const desde = Math.max(0, Math.floor(pagina.desde ?? 0));
+  const quantidade = Math.min(Math.max(1, Math.floor(pagina.quantidade ?? ITENS_POR_PAGINA)), 200);
+  const itens = await itensDe(
+    repo,
+    versaoId,
+    dispositivos,
+    pendentes.slice(desde, desde + quantidade),
+  );
   return { total: pendentes.length, itens };
 }
 
