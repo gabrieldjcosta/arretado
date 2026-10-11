@@ -124,7 +124,7 @@ async function gravarDiferenca(
  * Lê, opera, reconstrói e grava, numa transação. `operar` recebe as linhas (na ordem do texto) e
  * devolve as novas. Marca o rascunho como editado à mão.
  */
-async function aplicar(
+export async function aplicar(
   repo: Repositorio,
   versaoId: string,
   operar: (linhas: LinhaDeEdicao[]) => LinhaDeEdicao[],

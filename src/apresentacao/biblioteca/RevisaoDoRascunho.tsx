@@ -1,5 +1,16 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
+  confirmarBloco,
+  converterBloco,
+  listarDoBloco,
+  listarNos,
+  resumirBloco,
+  trocarNoBloco,
+  type Bloco,
+  type NoParaEscolher,
+  type ResumoDoBloco,
+} from '../../dominios/legislacao/bloco';
+import {
   converterLinha,
   dividirAqui,
   EdicaoInvalida,
@@ -16,7 +27,16 @@ import {
   type ItemAConfirmar,
 } from '../../dominios/legislacao/revisao';
 import { RascunhoIndisponivel } from '../../dominios/legislacao/servico';
+import type { TipoDispositivo } from '../../core/modelo';
 import { useRepositorio } from '../dados/contexto';
+
+const TIPOS_DO_BLOCO: Partial<Record<string, string>> = {
+  artigo: 'artigos',
+  paragrafo: 'parágrafos',
+  inciso: 'incisos',
+  alinea: 'alíneas',
+  item: 'itens',
+};
 
 const plural = (n: number, um: string, varios: string) =>
   `${n.toLocaleString('pt-BR')} ${n === 1 ? um : varios}`;
@@ -53,6 +73,19 @@ const PAUSA_DO_SALVAMENTO_MS = 800;
 export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponivel }: Props) {
   const repo = useRepositorio();
   const [itens, setItens] = useState<ItemAConfirmar[]>([]);
+  const [totalDaLista, setTotalDaLista] = useState(0);
+  const [bloco, setBloco] = useState<Bloco | null>(null);
+  const [resumo, setResumo] = useState<ResumoDoBloco | null>(null);
+  const [nos, setNos] = useState<NoParaEscolher[]>([]);
+  const [modoDoBloco, setModoDoBloco] = useState<'trecho' | 'artigos'>('trecho');
+  const [noEscolhido, setNoEscolhido] = useState('');
+  const [deArtigo, setDeArtigo] = useState('');
+  const [ateArtigo, setAteArtigo] = useState('');
+  const [tipoDe, setTipoDe] = useState('');
+  const [tipoPara, setTipoPara] = useState<ConverterEm | ''>('');
+  const [procurar, setProcurar] = useState('');
+  const [trocar, setTrocar] = useState('');
+  const [aviso, setAviso] = useState<string | null>(null);
   const aberto = useRef(ITENS_POR_PAGINA);
   const [corrigindo, setCorrigindo] = useState<ItemAConfirmar | null>(null);
   const [texto, setTexto] = useState('');
@@ -71,16 +104,42 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
   useEffect(() => {
     indisponivel.current = aoIndisponivel;
   });
+  const idModo = useId();
+  const idNo = useId();
+  const idDe = useId();
+  const idAte = useId();
+  const idTipoDe = useId();
+  const idTipoPara = useId();
+  const idProcurar = useId();
+  const idTrocar = useId();
   const idTexto = useId();
   const idRotulo = useId();
 
   const carregar = useCallback(async () => {
     try {
-      const lista = await listarAConfirmar(repo, versaoId, { quantidade: aberto.current });
+      const lista = bloco
+        ? await listarDoBloco(repo, versaoId, bloco, { quantidade: aberto.current })
+        : await listarAConfirmar(repo, versaoId, { quantidade: aberto.current });
       setItens(lista.itens);
+      setTotalDaLista(lista.total);
+      setResumo(bloco ? await resumirBloco(repo, versaoId, bloco) : null);
     } catch (e) {
       if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);
-      else setFalha('Não foi possível ler a lista. Recarregue a página.');
+      else if (e instanceof EdicaoInvalida) {
+        setBloco(null);
+        setFalha(e.message);
+      } else setFalha('Não foi possível ler a lista. Recarregue a página.');
+    }
+  }, [repo, versaoId, bloco]);
+
+  // Os trechos para escolher o bloco, lidos ao abrir a seção.
+  const carregarNos = useCallback(async () => {
+    try {
+      const lista = await listarNos(repo, versaoId);
+      setNos(lista);
+      setNoEscolhido((atual) => atual || (lista[0]?.id ?? ''));
+    } catch {
+      setNos([]);
     }
   }, [repo, versaoId]);
 
@@ -143,6 +202,36 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     }
   }
 
+  function abrirBloco() {
+    setFalha(null);
+    setAviso(null);
+    aberto.current = ITENS_POR_PAGINA;
+    setTipoDe('');
+    setTipoPara('');
+    setBloco(
+      modoDoBloco === 'trecho'
+        ? { noId: noEscolhido }
+        : { de: deArtigo, ate: ateArtigo || deArtigo },
+    );
+  }
+
+  function fecharBloco() {
+    setBloco(null);
+    setAviso(null);
+    aberto.current = ITENS_POR_PAGINA;
+  }
+
+  /** Operação em lote sobre o bloco aberto; a frase do resultado vem de `frase`. */
+  function noBloco(operacao: (b: Bloco) => Promise<number>, frase: (n: number) => string) {
+    if (!bloco) return;
+    setAviso(null);
+    void agir(async () => {
+      if (corrigindo) await gravarAgora(corrigindo, texto, rotulo);
+      setCorrigindo(null);
+      setAviso(frase(await operacao(bloco)));
+    });
+  }
+
   function corrigir(item: ItemAConfirmar) {
     setFalha(null);
     setTexto(item.texto);
@@ -162,7 +251,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     });
   }
 
-  if (aConfirmar === 0) return null;
+  if (aConfirmar === 0 && !bloco) return null;
   return (
     <section aria-labelledby="revisao-titulo" className="revisao">
       <h2 id="revisao-titulo">Para confirmar</h2>
@@ -181,6 +270,232 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
           {`Confirmar ${aConfirmar.toLocaleString('pt-BR')} ${aConfirmar === 1 ? 'dispositivo' : 'dispositivos'}`}
         </button>
       </div>
+      <details
+        className="revisao-bloco"
+        onToggle={(e) => {
+          if (e.currentTarget.open) void carregarNos();
+        }}
+      >
+        <summary>Corrigir por bloco</summary>
+        <p className="dica">
+          Um bloco é um capítulo (ou outro trecho) ou um intervalo de artigos. Abra o bloco para ver
+          só as linhas dele, confirmar tudo, converter um tipo de linha em outro ou trocar uma
+          palavra em todas.
+        </p>
+        <form
+          aria-label="Escolher o bloco"
+          onSubmit={(e) => {
+            e.preventDefault();
+            abrirBloco();
+          }}
+        >
+          <div className="campo">
+            <label htmlFor={idModo}>O bloco é</label>
+            <select
+              id={idModo}
+              value={modoDoBloco}
+              onChange={(e) => {
+                setModoDoBloco(e.target.value === 'artigos' ? 'artigos' : 'trecho');
+              }}
+            >
+              <option value="trecho">Um trecho da lei (capítulo, seção…)</option>
+              <option value="artigos">Um intervalo de artigos</option>
+            </select>
+          </div>
+          {modoDoBloco === 'trecho' ? (
+            <div className="campo">
+              <label htmlFor={idNo}>Trecho</label>
+              <select
+                id={idNo}
+                value={noEscolhido}
+                onChange={(e) => {
+                  setNoEscolhido(e.target.value);
+                }}
+              >
+                {nos.length === 0 && <option value="">Esta lei não tem capítulos</option>}
+                {nos.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.rotulo}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="linha-acoes">
+              <div className="campo">
+                <label htmlFor={idDe}>Do artigo</label>
+                <input
+                  id={idDe}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={12}
+                  value={deArtigo}
+                  onChange={(e) => {
+                    setDeArtigo(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="campo">
+                <label htmlFor={idAte}>Até o artigo</label>
+                <input
+                  id={idAte}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={12}
+                  value={ateArtigo}
+                  onChange={(e) => {
+                    setAteArtigo(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <div className="linha-acoes">
+            <button
+              type="submit"
+              disabled={
+                ocupado || (modoDoBloco === 'trecho' ? noEscolhido === '' : deArtigo.trim() === '')
+              }
+            >
+              Abrir o bloco
+            </button>
+            {bloco && (
+              <button type="button" onClick={fecharBloco}>
+                Voltar a todas as linhas
+              </button>
+            )}
+          </div>
+        </form>
+        {bloco && resumo && (
+          <section aria-label="Ações no bloco" className="revisao-bloco-acoes">
+            <p>
+              <strong>{resumo.descricao}</strong>: {plural(resumo.total, 'linha', 'linhas')},{' '}
+              {resumo.aConfirmar.toLocaleString('pt-BR')} a confirmar.
+            </p>
+            <div className="linha-acoes">
+              <button
+                type="button"
+                className="principal"
+                disabled={ocupado || resumo.aConfirmar === 0}
+                onClick={() => {
+                  noBloco(
+                    (b) => confirmarBloco(repo, versaoId, b),
+                    (n) => `${plural(n, 'linha confirmada', 'linhas confirmadas')} no bloco.`,
+                  );
+                }}
+              >
+                {`Confirmar ${resumo.aConfirmar.toLocaleString('pt-BR')} do bloco`}
+              </button>
+            </div>
+            <fieldset className="revisao-estrutura">
+              <legend>Converter as linhas de um tipo</legend>
+              <div className="linha-acoes">
+                <div className="campo">
+                  <label htmlFor={idTipoDe}>Converter todos os</label>
+                  <select
+                    id={idTipoDe}
+                    value={tipoDe}
+                    onChange={(e) => {
+                      setTipoDe(e.target.value);
+                    }}
+                  >
+                    <option value="">Escolha o tipo</option>
+                    {Object.entries(resumo.porTipo)
+                      .filter(([tipo]) => TIPOS_DO_BLOCO[tipo] !== undefined)
+                      .map(([tipo, n]) => (
+                        <option key={tipo} value={tipo}>
+                          {`${TIPOS_DO_BLOCO[tipo] ?? tipo} (${String(n)})`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="campo">
+                  <label htmlFor={idTipoPara}>em</label>
+                  <select
+                    id={idTipoPara}
+                    value={tipoPara}
+                    onChange={(e) => {
+                      setTipoPara(e.target.value as ConverterEm | '');
+                    }}
+                  >
+                    <option value="">Escolha o tipo</option>
+                    {OPCOES_DE_CONVERSAO.map((o) => (
+                      <option key={o.valor} value={o.valor}>
+                        {o.rotulo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={ocupado || tipoDe === '' || tipoPara === ''}
+                onClick={() => {
+                  if (tipoPara === '') return;
+                  noBloco(
+                    (b) => converterBloco(repo, versaoId, b, tipoDe as TipoDispositivo, tipoPara),
+                    (n) => `${plural(n, 'linha convertida', 'linhas convertidas')}.`,
+                  );
+                  setTipoDe('');
+                }}
+              >
+                Converter no bloco
+              </button>
+              <p className="dica">O número e o recuo são do sistema.</p>
+            </fieldset>
+            <fieldset className="revisao-estrutura">
+              <legend>Trocar um texto em todo o bloco</legend>
+              <div className="campo">
+                <label htmlFor={idProcurar}>Procurar</label>
+                <input
+                  id={idProcurar}
+                  type="text"
+                  autoComplete="off"
+                  maxLength={500}
+                  value={procurar}
+                  onChange={(e) => {
+                    setProcurar(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="campo">
+                <label htmlFor={idTrocar}>Trocar por</label>
+                <input
+                  id={idTrocar}
+                  type="text"
+                  autoComplete="off"
+                  maxLength={500}
+                  value={trocar}
+                  onChange={(e) => {
+                    setTrocar(e.target.value);
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                disabled={ocupado || procurar === ''}
+                onClick={() => {
+                  noBloco(
+                    (b) => trocarNoBloco(repo, versaoId, b, procurar, trocar),
+                    (n) => `${plural(n, 'linha mudou', 'linhas mudaram')}.`,
+                  );
+                }}
+              >
+                Trocar no bloco
+              </button>
+              <p className="dica">Não diferencia maiúscula de minúscula; o rótulo não muda.</p>
+            </fieldset>
+          </section>
+        )}
+        {aviso && (
+          <p role="status" className="dica">
+            {aviso}
+          </p>
+        )}
+      </details>
+      {bloco && resumo && <h3>{`Linhas: ${resumo.descricao}`}</h3>}
       {falha && (
         <p role="alert" className="aviso falha">
           {falha}
@@ -323,16 +638,18 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                 </p>
                 <p className="revisao-previa">{item.previa || '(sem texto)'}</p>
                 <div className="linha-acoes">
-                  <button
-                    type="button"
-                    disabled={ocupado}
-                    aria-label={`Confirmar ${item.rotulo ?? item.endereco}`}
-                    onClick={() =>
-                      void agir(() => confirmarDispositivos(repo, versaoId, [item.dispositivoId]))
-                    }
-                  >
-                    Confirmar
-                  </button>
+                  {item.confianca === 'a_confirmar' && (
+                    <button
+                      type="button"
+                      disabled={ocupado}
+                      aria-label={`Confirmar ${item.rotulo ?? item.endereco}`}
+                      onClick={() =>
+                        void agir(() => confirmarDispositivos(repo, versaoId, [item.dispositivoId]))
+                      }
+                    >
+                      Confirmar
+                    </button>
+                  )}
                   <button
                     type="button"
                     disabled={ocupado}
@@ -349,7 +666,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
           </li>
         ))}
       </ul>
-      {aConfirmar > itens.length && (
+      {(bloco ? totalDaLista : aConfirmar) > itens.length && (
         <button
           type="button"
           disabled={ocupado}
@@ -358,7 +675,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
             void carregar();
           }}
         >
-          {`Mostrar mais ${Math.min(ITENS_POR_PAGINA, aConfirmar - itens.length).toLocaleString('pt-BR')}`}
+          {`Mostrar mais ${Math.min(ITENS_POR_PAGINA, (bloco ? totalDaLista : aConfirmar) - itens.length).toLocaleString('pt-BR')}`}
         </button>
       )}
     </section>

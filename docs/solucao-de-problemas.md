@@ -1142,5 +1142,10 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Sintoma:** aviso "…aparece duas vezes" ou o botão Publicar bloqueado depois de editar. **Causa:** o rótulo corrigido à mão repete o de outra linha (o sistema só escolhe número livre ao converter ou dividir). **Solução:** corrigir o rótulo da linha certa (o endereço acompanha o número e os filhos o seguem); a validação da publicação lê a árvore gravada. **Prevenção:** "rótulo que o sistema reconhece muda o número…" (`edicao.test.ts`).
 - **Origem:** previsto na 10.2.
 
-### Prevista para a 10.3 e a 10.4
-- A 10.3 (correção por bloco) vai usar `reconstruir` sobre um intervalo: se um bloco for corrigido por texto, o texto novo precisa passar pelo estruturador e entrar na lista de linhas no lugar das antigas (ids dos endereços iguais mantidos). A 10.4 (edição integral) precisa preservar o confirmado ao refazer pela fonte: o ponto de partida é a marca `+manual` e o mapa endereço → id de `registrosDaArvore` (`anteriores`).
+### Prevista para a 10.4
+- A 10.3 (correção por bloco) não passa texto pelo estruturador: troca texto literal e converte tipos linha a linha. Corrigir um bloco **colando texto novo** (re-estruturar um intervalo) ficou para a 10.4. A 10.4 (edição integral) precisa preservar o confirmado ao refazer pela fonte: o ponto de partida é a marca `+manual` e o mapa endereço → id de `registrosDaArvore` (`anteriores`).
+
+## Correção por bloco (10.3, 11/10/2026)
+
+- **Sintoma:** o teste E2E não achava `selectOption({ label })` no seletor de trecho. **Causa:** o recuo do rótulo era feito com espaços sem quebra (U+00A0), que o Playwright não casa com o rótulo escrito. **Solução:** sem recuo no seletor (o nome já diz o nível: CAPÍTULO, SEÇÃO).
+- **Atenção:** converter todas as linhas de um tipo pode mudar o pai das seguintes (ex.: incisos viram parágrafos e saem do caput); o `reconstruir` refaz endereço e recuo, e quem estiver com o bloco aberto por intervalo de artigos vê a lista refeita. Se o intervalo deixar de existir (artigo convertido em outro tipo), a tela volta à lista inteira com o aviso.
