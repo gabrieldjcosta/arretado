@@ -247,8 +247,10 @@ describe('cota e início do Recall (fatia 3)', () => {
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir('/recall', repo);
-    expect(await screen.findByRole('heading', { name: 'Registrar um erro' })).toBeInTheDocument();
-    expect(screen.queryByText(/Depois:/)).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Registre seu primeiro erro' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Depois:/)).toHaveTextContent('seu primeiro cartão aparece amanhã');
   });
 
   it('drill: 25 vencidos = 10 + "Revisar mais 10" + 5; nada é cortado nem perdido', async () => {
