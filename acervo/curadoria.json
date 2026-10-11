@@ -437,7 +437,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm"
       },
-      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta"]
+      "anomaliasAceitas": ["caractere_perdido", "tachado_sem_dispositivo", "linha_solta"]
     },
     {
       "id": "lei-federal-8069-1990",
@@ -1600,6 +1600,90 @@
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/decreto/2010/decreto-55370-27.01.2010.html"
+      }
+    },
+    {
+      "id": "sumulas-stf",
+      "titulo": "Súmulas do Supremo Tribunal Federal",
+      "grupo": "Súmulas",
+      "tituloCurto": "Súmulas do STF",
+      "tipo": "Súmulas",
+      "esfera": "federal",
+      "especie": "sumulas",
+      "vinculos": [],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "sumulas",
+        "arquivo": "sumulas-stf.json",
+        "urlOficial": "https://portal.stf.jus.br/jurisprudencia/sumariosumulas.asp?base=30"
+      }
+    },
+    {
+      "id": "sumulas-stf-vinculantes",
+      "titulo": "Súmulas Vinculantes do Supremo Tribunal Federal",
+      "grupo": "Súmulas",
+      "tituloCurto": "Súmulas Vinculantes",
+      "tipo": "Súmulas",
+      "esfera": "federal",
+      "especie": "sumulas",
+      "vinculos": [],
+      "avisos": [
+        "A Súmula Vinculante 30 está pendente de publicação no portal do STF e não consta da coleção."
+      ],
+      "fonte": {
+        "adaptador": "sumulas",
+        "arquivo": "sumulas-stf-vinculantes.json",
+        "urlOficial": "https://portal.stf.jus.br/jurisprudencia/sumariosumulas.asp?base=26"
+      }
+    },
+    {
+      "id": "sumulas-stj",
+      "titulo": "Súmulas do Superior Tribunal de Justiça",
+      "grupo": "Súmulas",
+      "tituloCurto": "Súmulas do STJ",
+      "tipo": "Súmulas",
+      "esfera": "federal",
+      "especie": "sumulas",
+      "vinculos": [],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "sumulas",
+        "arquivo": "sumulas-stj.json",
+        "urlOficial": "https://scon.stj.jus.br/SCON/sumstj/"
+      }
+    },
+    {
+      "id": "sumulas-tjsp",
+      "titulo": "Súmulas do Tribunal de Justiça de São Paulo",
+      "grupo": "Súmulas",
+      "tituloCurto": "Súmulas do TJSP",
+      "tipo": "Súmulas",
+      "esfera": "estadual",
+      "especie": "sumulas",
+      "vinculos": [],
+      "avisos": [
+        "Lista oficial atualizada em 16/09/2025. Das súmulas revogadas (17, 67, 100 e 102) a lista oficial já não traz o enunciado."
+      ],
+      "fonte": {
+        "adaptador": "sumulas",
+        "arquivo": "sumulas-tjsp.json",
+        "urlOficial": "https://www.tjsp.jus.br/Download/Portal/Biblioteca/Biblioteca/Legislacao/SumulasTJSP.pdf"
+      }
+    },
+    {
+      "id": "sumulas-tnu",
+      "titulo": "Súmulas da Turma Nacional de Uniformização",
+      "grupo": "Súmulas",
+      "tituloCurto": "Súmulas da TNU",
+      "tipo": "Súmulas",
+      "esfera": "federal",
+      "especie": "sumulas",
+      "vinculos": [],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "sumulas",
+        "arquivo": "sumulas-tnu.json",
+        "urlOficial": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
       }
     }
   ]

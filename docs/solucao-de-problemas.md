@@ -1070,7 +1070,16 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Item "bloqueado" no relatório:** conflito, aviso não aceito ou árvore inválida. Ver `acervo/relatorio.md`; se o aviso é esperado, listar o tipo em `anomaliasAceitas` do item na curadoria.
 - **Regra de camadas:** `dominios/acervo` não importa de `dominios/legislacao`; o pipeline (que usa o estruturador) mora em `scripts/acervo/`.
 
-## Súmulas: sem rede, sem o levantamento das fontes (Peça 4, 10/10/2026)
+## Súmulas: fontes oficiais e como coletar (Peça 4, 11/10/2026)
+
+- **STF:** `curl` sem User-Agent de navegador leva 403; com `Mozilla/5.0 …Chrome` funciona. Índice em `sumariosumulas.asp?base=30` (comuns) e `base=26` (vinculantes); cada súmula em `&sumula=<id interno>`. A SV 30 diz "pendente de publicação" e é pulada. Entidades como `&#8203;` aparecem no rótulo "(cancelada)".
+- **STJ:** o SCON (`scon.stj.jus.br`) dá 403 ao `curl`; o PDF `https://www.stj.jus.br/docs_internet/jurisprudencia/tematica/download/SU/Verbetes/VerbetesSTJ_asc.pdf` abre e traz tudo (`pdftotext -enc UTF-8 -layout`). O rodapé de página precisa ser filtrado e o número da súmula pode vir logo após um ``.
+- **TJSP:** `SumulasTJSP.pdf` (Serviço de Gestão de Legislação). Revogadas aparecem só como "REVOGADA (Sessão …)", sem enunciado.
+- **TNU:** `https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php` (ISO-8859-1); a página "Enunciados TNU" do portal vem vazia.
+- **Reproduzir:** os coletores estão em `scripts/acervo/coletores/` (cabeçalho de cada um com o uso). Depois: `npx prettier --write acervo/fontes/sumulas-*.json`, `npm run acervo:gerar`, `npm run acervo:verificar`.
+- **`npm run check` lento ou com testes estourando 5 s no Windows:** conhecido sob carga; rodar os arquivos que falharam sozinhos (`npx vitest run <arquivo> --maxWorkers=2`).
+
+### Histórico: sem rede (10/10/2026)
 
 Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devolve 000), então o levantamento da fonte oficial de cada tribunal não foi feito. Causa: proxy sem esses hosts. Solução: o curador (ou uma sessão com rede) prepara `acervo/fontes/<tribunal>.json` no formato de `FonteDeSumulas` (`tribunal`, `vinculante`, `sumulas[] { numero, enunciado, situacao, origem?, link? }`), confere o texto na fonte oficial e acrescenta o item em `acervo/curadoria.json` (`especie: "sumulas"`, `fonte: { adaptador: "sumulas", arquivo }`); depois `npm run acervo:gerar <id>`. Sessão sem `node_modules`: `npx vitest` e `npx tsc` baixam outra versão e falham; rodar `npm ci` antes.
 
