@@ -12,3 +12,6 @@ CLAUDE.md
 /public/acervo
 acervo/relatorio.md
 acervo/fontes
+
+# Dados brutos gerados pelas coletas (saída de script, não editada à mão)
+acervo/brutos/
