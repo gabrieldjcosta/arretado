@@ -118,28 +118,5 @@ export function resumoDaComparacao(c: ComparacaoDeVersoes) {
   };
 }
 
-/**
- * Reancoragem por texto (spec §9): o trecho grifado volta, na versão nova, onde o mesmo texto
- * estiver (a ocorrência mais perto do início de antes); sem o texto, fica pendente.
- */
-export function reancorar(
-  ancora: { texto: string; inicio: number; fim: number },
-  textoNovo: string,
-): { status: 'valida' | 'reancorada'; inicio: number; fim: number } | { status: 'pendente' } {
-  if (textoNovo.slice(ancora.inicio, ancora.fim) === ancora.texto) {
-    return { status: 'valida', inicio: ancora.inicio, fim: ancora.fim };
-  }
-  if (ancora.texto === '') return { status: 'pendente' };
-  let melhor: number | undefined;
-  for (
-    let k = textoNovo.indexOf(ancora.texto);
-    k >= 0;
-    k = textoNovo.indexOf(ancora.texto, k + 1)
-  ) {
-    if (melhor === undefined || Math.abs(k - ancora.inicio) < Math.abs(melhor - ancora.inicio)) {
-      melhor = k;
-    }
-  }
-  if (melhor === undefined) return { status: 'pendente' };
-  return { status: 'reancorada', inicio: melhor, fim: melhor + ancora.texto.length };
-}
+/** Reancoragem por texto (exata → aproximada → pendente): fica no core, para a 11.7 usar também. */
+export { reancorar } from '../../core/util/reancoragem';

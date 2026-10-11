@@ -1172,3 +1172,23 @@ Regra de preservação: topo de `src/dominios/legislacao/edicao-integral.ts` e `
 
 - **Sintoma:** o teste E2E não achava `selectOption({ label })` no seletor de trecho. **Causa:** o recuo do rótulo era feito com espaços sem quebra (U+00A0), que o Playwright não casa com o rótulo escrito. **Solução:** sem recuo no seletor (o nome já diz o nível: CAPÍTULO, SEÇÃO).
 - **Atenção:** converter todas as linhas de um tipo pode mudar o pai das seguintes (ex.: incisos viram parágrafos e saem do caput); o `reconstruir` refaz endereço e recuo, e quem estiver com o bloco aberto por intervalo de artigos vê a lista refeita. Se o intervalo deixar de existir (artigo convertido em outro tipo), a tela volta à lista inteira com o aviso.
+
+## Correção do texto publicado (11.7, 11/10/2026)
+
+Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
+
+### "O texto desta norma mudou em outra aba"
+- **Sintoma:** ao salvar a correção, a mensagem e nada gravado. **Causa:** a correção confere a versão que a tela mostra; outra aba (ou um "Atualizar" do acervo) já gravou outra. **Solução:** recarregar e corrigir de novo.
+- **Origem:** previsto na 11.7.
+
+### Grifo some do texto depois de corrigir
+- **Sintoma:** o grifo ou a nota não aparece mais no artigo corrigido. **Causa:** o trecho marcado saiu do texto e nem o parecido foi achado; a marcação fica `pendente`, com a âncora e a versão de antes. **Solução:** ela aparece em "Para reler"; "Desfazer a correção" (ou "Voltar a este texto") a traz de volta.
+- **Atenção:** trecho com menos de 20 letras só volta se o mesmo texto (sem caixa, acento e espaços repetidos) estiver lá; abaixo disso a aproximação casaria com qualquer coisa.
+- **Origem:** previsto na 11.7.
+
+### Formatação (link, tachado) sumiu de um pedaço do texto corrigido
+- **Causa:** o meio trocado herda a forma só quando cai inteiro dentro de um trecho; se pega mais de um (ex.: apagar do meio de um link até o fim), vira texto sem forma. Quem corrige escolhe palavras, não formatação. **Solução:** "Voltar a este texto" devolve os trechos de antes com a forma.
+- **Origem:** previsto na 11.7.
+
+### Atualizar do acervo depois de corrigir
+- **Previsível:** a correção vale para a versão vigente; "Atualizar" do acervo (6a) grava a versão do acervo por cima (a corrigida fica arquivada e consultável em "Texto de antes"). Corrigir de novo, se o acervo ainda tiver o erro.
