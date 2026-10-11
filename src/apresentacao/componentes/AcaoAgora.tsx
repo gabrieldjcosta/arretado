@@ -18,9 +18,7 @@ export function AcaoAgora({
 }) {
   return (
     <section className="acao-agora" aria-label="Agora">
-      <h2 className="agora-titulo">
-        <span className="agora-marca">{titulo}</span>
-      </h2>
+      <h2 className="agora-titulo">{titulo}</h2>
       {estimativa !== undefined && <p className="agora-estimativa">cerca de {estimativa} min</p>}
       {para !== undefined ? (
         <Link to={para} className="botao principal">

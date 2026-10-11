@@ -99,7 +99,9 @@ describe('Importar por colagem (9.5)', () => {
 
     await sumario();
     expect(screen.queryByText(/parece a compilada/)).not.toBeInTheDocument();
-    expect(screen.getByText('6 dispositivos a confirmar')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Para confirmar' })).toHaveTextContent(
+      '6 dispositivos',
+    );
     await usuario.click(screen.getByRole('button', { name: 'Aceitar 6 e publicar' }));
 
     expect(await screen.findByText('Lei nº 7.210/1984 publicada.')).toHaveAttribute(
@@ -205,6 +207,64 @@ describe('Importar por colagem (9.5)', () => {
     await usuario.click(screen.getByRole('button', { name: 'Colar outra norma' }));
     expect(screen.getByLabelText('Cole aqui a lei')).toBeInTheDocument();
     expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(1);
+  });
+});
+
+describe('Importar: edição integral e escrever do zero (10.4)', () => {
+  it('sem artigos: escrever os artigos no texto inteiro leva ao sumário normal', async () => {
+    const { repo } = await repositorioDeTeste();
+    const usuario = await abrir(repo);
+    colar({ html: '<p>Um texto qualquer que não é lei.</p>' });
+    await screen.findByText('Não consegui identificar artigos neste texto.');
+
+    await usuario.click(screen.getByText('Editar o texto inteiro'));
+    const campo = await screen.findByRole('textbox', { name: 'Texto da norma' });
+    expect(campo).toHaveValue('');
+    fireEvent.change(campo, { target: { value: 'Art. 1º Um texto qualquer que agora é lei.' } });
+    await usuario.click(screen.getByRole('button', { name: 'Salvar e reorganizar' }));
+
+    expect(await sumario()).toHaveTextContent('1 dispositivo no total.');
+    expect(screen.getByRole('button', { name: 'Aceitar 1 e publicar' })).toBeEnabled();
+  });
+
+  it('escrever do zero: título, artigo vazio, texto; apagar linha conferida pergunta antes', async () => {
+    const { repo } = await repositorioDeTeste();
+    const usuario = await abrir(repo);
+
+    await usuario.type(screen.getByRole('textbox', { name: 'Título curto' }), 'Súmula 1');
+    await usuario.click(screen.getByRole('button', { name: 'Começar a escrever' }));
+
+    const campo = await screen.findByRole('textbox', { name: 'Texto da norma' });
+    await waitFor(() => {
+      expect(campo).toHaveValue('Art. 1º');
+    });
+    expect(screen.getByRole('textbox', { name: 'Título curto' })).toHaveValue('Súmula 1');
+    fireEvent.change(campo, {
+      target: { value: 'Art. 1º A súmula vale para todos.\nArt. 2º Outro artigo.' },
+    });
+    await usuario.click(screen.getByRole('button', { name: 'Salvar e reorganizar' }));
+    expect(await screen.findByText(/^Salvo\./)).toHaveTextContent('1 nova');
+    await usuario.click(await screen.findByRole('button', { name: 'Confirmar 2 dispositivos' }));
+    await screen.findByRole('button', { name: 'Publicar' });
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Texto da norma' }), {
+      target: { value: 'Art. 1º A súmula vale para todos.' },
+    });
+    await usuario.click(screen.getByRole('button', { name: 'Salvar e reorganizar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '1 linha sai do rascunho (1 já conferida).',
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Voltar ao texto' }));
+    expect(screen.getByRole('textbox', { name: 'Texto da norma' })).toHaveValue(
+      'Art. 1º A súmula vale para todos.',
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Salvar e reorganizar' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Salvar mesmo assim' }));
+    expect(await screen.findByText(/^Salvo\./)).toHaveTextContent('1 saiu');
+    const estrutura = await sumario();
+    await waitFor(() => {
+      expect(estrutura).toHaveTextContent('1 dispositivo no total.');
+    });
   });
 });
 

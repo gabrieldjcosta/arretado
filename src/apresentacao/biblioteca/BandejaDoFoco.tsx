@@ -167,6 +167,7 @@ export function BandejaDoFoco({
               </button>
               <button
                 type="button"
+                className="principal"
                 aria-disabled={noUltimo}
                 aria-keyshortcuts="ArrowRight J"
                 onClick={agir(proximo, false)}
@@ -185,7 +186,12 @@ export function BandejaDoFoco({
           >
             {lente === 'cartao' ? 'Texto corrido' : 'Um artigo por vez'}
           </button>
-          <button type="button" aria-keyshortcuts="F Escape" onClick={agir(sair)}>
+          <button
+            type="button"
+            className="sair-do-foco"
+            aria-keyshortcuts="F Escape"
+            onClick={agir(sair)}
+          >
             Sair do foco
           </button>
         </div>

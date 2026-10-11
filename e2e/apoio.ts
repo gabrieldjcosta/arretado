@@ -112,3 +112,16 @@ export async function importarEPublicar(page: Page, id: string, titulo: string) 
   });
   await publicar(page, titulo);
 }
+
+/** Colar só texto puro (sem `text/html`): o fallback que deixa os dispositivos "a confirmar". */
+export async function colarTextoPuro(page: Page, texto: string) {
+  const campo = page.getByLabel('Cole aqui a lei');
+  await campo.focus();
+  await campo.evaluate((alvo, conteudo) => {
+    const clipboardData = new DataTransfer();
+    clipboardData.setData('text/plain', conteudo);
+    alvo.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
+    );
+  }, texto);
+}

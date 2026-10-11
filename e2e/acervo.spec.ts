@@ -78,7 +78,11 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   // Depois de adicionadas, o acervo não faz falta: tudo funciona sem rede.
   // O acervo some: nada do que já foi adicionado depende dele.
   await page.unroute('**/acervo/*.json');
-  await page.route('**/acervo/*.json', (rota) => rota.abort());
+  // Resposta vazia (e não abortada): a Biblioteca consulta o índice para o selo "Há versão nova" e
+  // ignora o que não é um índice; um aborto viraria falha no console.
+  await page.route('**/acervo/*.json', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
+  );
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   const execPenal = page.getByRole('region', { name: 'Execução Penal' });
   await expect(execPenal.getByText('LEP')).toBeVisible();

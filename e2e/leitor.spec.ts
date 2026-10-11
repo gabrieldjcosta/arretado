@@ -1547,3 +1547,89 @@ test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "
   await expect(voltar).toBeHidden();
   info.annotations.push({ type: 'aparelho', description: info.project.name });
 });
+
+test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela segue, o grifo sem trecho vai para "Para reler" e desfazer traz de volta: LEP compilada (11.7)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await fixarLenteCorrida(page);
+
+  const artigo = page.locator('[data-endereco="art9A"]');
+  await rolarAteExistir(page, artigo);
+  await alinharNoAlto(page, artigo);
+  const texto = artigo.locator('.texto-vigente').first();
+  // Uma palavra longa que aparece uma vez só no artigo: o grifo.
+  const palavras = (await texto.innerText()).split(/[^\p{L}]+/u);
+  const termo = palavras.find((p) => p.length >= 9 && palavras.filter((q) => q === p).length === 1);
+  if (!termo) throw new Error('sem palavra para grifar');
+  await selecionarPalavra(page, texto, termo, toque);
+  await apertar(
+    page
+      .getByRole('group', { name: 'Marcar o trecho selecionado' })
+      .getByRole('button', { name: 'Grifar com a cor 1' }),
+    toque,
+  );
+  await expect(artigo.locator('mark.grifo')).toHaveText(termo);
+  await alinharNoAlto(page, artigo);
+
+  // Estrelar e corrigir pelas ações do dispositivo.
+  const abrirAcoes = async () => {
+    await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+    const dialogo = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
+    await expect(dialogo).toBeVisible();
+    return dialogo;
+  };
+  let dialogo = await abrirAcoes();
+  await apertar(dialogo.getByRole('button', { name: 'Estrelar' }), toque);
+  await apertar(dialogo.getByRole('button', { name: 'Corrigir o texto' }), toque);
+  const campo = dialogo.getByLabel('Texto do dispositivo');
+  const original = await campo.inputValue();
+  expect(original).toContain(termo);
+  await campo.fill(`(Corrigido.) ${original}`);
+  await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Salvar correção' }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
+
+  const aviso = page.getByRole('region', { name: 'Correção do texto' });
+  await expect(aviso).toContainText('Texto corrigido.');
+  await expect(aviso).toContainText('1 grifo ou nota mudou de lugar');
+  await expect(artigo.locator('.texto-vigente').first()).toContainText('(Corrigido.)');
+  await expect(artigo.locator('mark.grifo')).toHaveText(termo);
+  await semViolacoes(page);
+
+  // A estrela seguiu; o texto de antes fica consultável. Corrigir de novo, tirando o trecho grifado.
+  await alinharNoAlto(page, artigo);
+  dialogo = await abrirAcoes();
+  await expect(dialogo.getByRole('button', { name: 'Tirar a estrela' })).toBeVisible();
+  await expect(dialogo.getByRole('heading', { name: 'Texto de antes' })).toBeVisible();
+  await expect(dialogo.getByText(original, { exact: true })).toBeVisible();
+  await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Corrigir o texto' }), toque);
+  await dialogo
+    .getByLabel('Texto do dispositivo')
+    .fill(`(Corrigido.) ${original}`.replace(termo, 'trecho trocado'));
+  await apertar(dialogo.getByRole('button', { name: 'Salvar correção' }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
+
+  await expect(aviso).toContainText('1 grifo ou nota ficou em “Para reler”');
+  const reler = page.getByRole('region', { name: 'Para reler' });
+  await expect(reler).toContainText(`“${termo}”`);
+  await expect(artigo.locator('mark.grifo')).toHaveCount(0);
+  await semViolacoes(page);
+
+  // Desfazer: o texto e o grifo voltam; "Para reler" some.
+  await apertar(aviso.getByRole('button', { name: 'Desfazer a correção' }), toque);
+  await expect(aviso).toContainText('Correção desfeita.');
+  await expect(aviso).toContainText('1 grifo ou nota voltou ao texto');
+  await expect(reler).toBeHidden();
+  await rolarAteExistir(page, artigo);
+  await expect(artigo.locator('mark.grifo')).toHaveText(termo);
+  const sobra = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(sobra).toBe(0);
+});

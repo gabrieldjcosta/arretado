@@ -8,18 +8,21 @@ import {
   type EspecieDeColecao,
 } from '../../dominios/legislacao/colecoes';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { LinhaLista } from '../componentes/LinhaLista';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 
 const TEXTOS = {
   sumulas: {
     titulo: 'Súmulas',
+    icone: 'S',
     vazio: 'Nenhuma súmula ainda',
     exemplo: 'súmula 593, SV 11',
     explica: 'Adicione as coleções de súmulas do acervo para lê-las e achá-las pelo número.',
   },
   teses: {
     titulo: 'Teses',
+    icone: 'T',
     vazio: 'Nenhuma tese ainda',
     exemplo: 'tese 12',
     explica: 'Adicione as teses do acervo para lê-las e achá-las pelo número.',
@@ -114,13 +117,15 @@ export function Colecoes({ especie }: { especie: EspecieDeColecao }) {
             </p>
           )}
           {achados && achados.length > 1 && (
-            <ul className="lista-simples" aria-label="Resultados">
+            <ul className="lista-simples lista-de-linhas" aria-label="Resultados">
               {achados.map((a) => (
                 <li key={a.norma.id}>
-                  <Link className="item-norma" to={paraLeitor(a)}>
-                    <strong>{a.norma.tituloCurto}</strong>
-                    <span className="dica">{a.norma.ementa}</span>
-                  </Link>
+                  <LinhaLista
+                    para={paraLeitor(a)}
+                    icone={t.icone}
+                    titulo={a.norma.tituloCurto}
+                    {...(a.norma.ementa ? { apoio: a.norma.ementa } : {})}
+                  />
                 </li>
               ))}
             </ul>
@@ -130,13 +135,15 @@ export function Colecoes({ especie }: { especie: EspecieDeColecao }) {
               <h2 id="titulo-colecoes">{t.titulo}</h2>
               {catalogo}
             </div>
-            <ul className="lista-simples">
+            <ul className="lista-simples lista-de-linhas">
               {dados.map((n: Norma) => (
                 <li key={n.id}>
-                  <Link className="item-norma" to={`/biblioteca/normas/${n.id}`}>
-                    <strong>{n.tituloCurto}</strong>
-                    <span className="dica">{n.ementa}</span>
-                  </Link>
+                  <LinhaLista
+                    para={`/biblioteca/normas/${n.id}`}
+                    icone={t.icone}
+                    titulo={n.tituloCurto}
+                    {...(n.ementa ? { apoio: n.ementa } : {})}
+                  />
                 </li>
               ))}
             </ul>

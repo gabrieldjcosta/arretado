@@ -4,6 +4,8 @@ import { AcaoAgora } from './AcaoAgora';
 import { BarraFina } from './BarraFina';
 import { DiasDaSemana } from './DiasDaSemana';
 import { LinhaDepois } from './LinhaDepois';
+import { LinhaLista } from './LinhaLista';
+import { Selo } from './Selo';
 
 describe('AcaoAgora', () => {
   it('mostra título, estimativa e botão', () => {
@@ -83,5 +85,26 @@ describe('DiasDaSemana', () => {
     );
     const marcas = container.querySelector('[aria-hidden="true"]');
     expect(marcas?.children).toHaveLength(7);
+  });
+});
+
+describe('LinhaLista e Selo (fatia 6)', () => {
+  it('a linha é um link com título, apoio e selo; o ícone é decorativo', () => {
+    render(
+      <MemoryRouter>
+        <LinhaLista
+          para="/biblioteca/lep"
+          icone="§"
+          titulo="LEP"
+          apoio="Lei de Execução Penal"
+          selo={<Selo>Há versão nova</Selo>}
+        />
+      </MemoryRouter>,
+    );
+    const link = screen.getByRole('link', { name: /LEP/ });
+    expect(link).toHaveAttribute('href', '/biblioteca/lep');
+    expect(screen.getByText('Lei de Execução Penal')).toBeInTheDocument();
+    expect(screen.getByText('Há versão nova')).toHaveClass('selo');
+    expect(screen.getByText('§')).toHaveAttribute('aria-hidden', 'true');
   });
 });

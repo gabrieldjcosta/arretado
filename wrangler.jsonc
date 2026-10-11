@@ -1,12 +1,14 @@
 // Hospedagem no Cloudflare Workers só com arquivos estáticos (T18): o site é a pasta dist/ do
 // `npm run build`, e o dist/_headers (gerado a partir de config/seguranca.ts) aplica a CSP e os
 // demais cabeçalhos. Publicado pelo Workers Builds a cada push no main.
-// A rota /api/buscar-norma (T17, atividade 12.1) entra aqui como "main" + assets.run_worker_first.
+// A rota /api/buscar-norma (T17, atividade 12.1) é o "main" (worker/index.ts); só /api/* executa código.
 {
   "name": "arretado",
   "compatibility_date": "2026-09-23",
+  "main": "worker/index.ts",
   "workers_dev": true,
   "assets": {
     "directory": "./dist",
+    "run_worker_first": ["/api/*"],
   },
 }
