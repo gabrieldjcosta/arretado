@@ -1,5 +1,6 @@
 import { useId, useState, type SyntheticEvent } from 'react';
-import { analisarEndereco, resolverEndereco } from '../../dominios/legislacao/busca';
+import { resolverEndereco } from '../../dominios/legislacao/busca';
+import { possiveisEnderecos } from '../../dominios/legislacao/sumulas';
 import type { CriterioDoFiltro } from '../../dominios/legislacao/filtros';
 import { Dialogo } from '../componentes/Dialogo';
 
@@ -77,7 +78,7 @@ export function FiltroDaNorma({
 
   /** O índice do dispositivo que o texto digitado nomeia; só o exato vale (não o mais próximo). */
   function indiceDe(texto: string): number | undefined {
-    const possiveis = analisarEndereco(texto);
+    const possiveis = possiveisEnderecos(texto);
     if (possiveis.length === 0) return undefined;
     const resolvido = resolverEndereco(possiveis, (e) => indiceDoEndereco(e) !== undefined);
     return resolvido === undefined || resolvido.faltou !== undefined

@@ -94,6 +94,13 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
     },
     estrelas: { normaId: ref, alvoId: ref, origemTipo: 'direta' },
     leituras: { normaId: ref },
+    vinculosDisciplina: { normaId: ref },
+    pendenciasReleitura: {
+      normaId: ref,
+      versaoId: ref,
+      tipo: 'estrela',
+      enderecoAntigo: 'art1',
+    },
     pacotesIncidencia: { titulo: 'Defensoria', versao: 1 },
     adesoes: { tipo: 'total', versaoAderida: 1, receberAtualizacoes: true },
     precedentes: { tituloTese: 'Tese', escopo: 'nacional' },

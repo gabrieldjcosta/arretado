@@ -1,11 +1,11 @@
 import { useDeferredValue, useId, useMemo } from 'react';
 import {
-  analisarEndereco,
   buscarTexto,
   resolverEndereco,
   type Achado,
   type TextoBuscavel,
 } from '../../dominios/legislacao/busca';
+import { possiveisEnderecos } from '../../dominios/legislacao/sumulas';
 import { Dialogo } from '../componentes/Dialogo';
 
 /** Achados do texto mostrados na lista (o total vem inteiro). */
@@ -53,7 +53,7 @@ export function BuscaNaNorma({
   const adiada = useDeferredValue(consulta);
 
   const endereco = useMemo(() => {
-    const possiveis = analisarEndereco(adiada);
+    const possiveis = possiveisEnderecos(adiada);
     if (possiveis.length === 0) return undefined;
     const resolvido = resolverEndereco(possiveis, (e) => indiceDoEndereco(e) !== undefined);
     const indice = resolvido === undefined ? undefined : indiceDoEndereco(resolvido.endereco);

@@ -34,7 +34,7 @@ export function RecallInicio() {
         />
       ) : (
         <AcaoAgora
-          titulo="Registrar um erro"
+          titulo={dados?.primeiroUso ? 'Registre seu primeiro erro' : 'Registrar um erro'}
           rotuloBotao="Registrar erro"
           para="/recall/registrar"
         />
@@ -47,6 +47,8 @@ export function RecallInicio() {
       <LinhaDepois>
         {vencidos > 0 ? (
           <Link to="/recall/registrar">registrar um erro</Link>
+        ) : dados?.primeiroUso ? (
+          'seu primeiro cartão aparece amanhã'
         ) : dados && dados.amanha > 0 ? (
           `revisar ${cartoes(dados.amanha)} amanhã`
         ) : undefined}

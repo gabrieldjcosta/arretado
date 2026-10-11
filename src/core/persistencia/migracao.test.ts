@@ -1,5 +1,5 @@
 // Subidas de esquema do banco local, sem perda: v1 (F0/F1) → v2 (`leituras`, F2, 9.1) → v3
-// (`vetado` em `Dispositivo.status`, F2, 8.10).
+// (`vetado` em `Dispositivo.status`, F2, 8.10) → v4 (`vinculosDisciplina`, acervo, Peça 3).
 import Dexie from 'dexie';
 import { camposMinimos } from '../modelo/fabrica';
 import { colecoesNaVersao, NOMES_COLECOES, versaoDeOrigem } from '../modelo';
@@ -12,6 +12,9 @@ import { Repositorio } from './repositorio';
 const HASH_ESQUEMA_V1 = 'b6084efc768d6a4212bae4015560771e726373a9721a408232ebda34d55de0b9';
 /** Esquema v2 publicado (F2, da 9.1 à 8.9): SHA-256 do JSON canônico de `esquemaDaVersao(2)`. */
 const HASH_ESQUEMA_V2 = 'a503315efcd469f4d9db7ef0e6e0a35bf87d8d4db072f96cc5b7668be368b9a6';
+
+/** Esquema v3 publicado (F2, 8.10 até a Peça 2 do acervo): igual ao v2. */
+const HASH_ESQUEMA_V3 = HASH_ESQUEMA_V2;
 
 const hashDoEsquema = async (versao: number) =>
   sha256(new TextEncoder().encode(jsonCanonico(esquemaDaVersao(versao))));
@@ -123,7 +126,6 @@ describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice ne
   it('o esquema v2 não muda, e o v3 declara os mesmos índices', async () => {
     // Se mudou, não edite a v2 publicada: declare a versão seguinte.
     expect(await hashDoEsquema(2)).toBe(HASH_ESQUEMA_V2);
-    expect(VERSAO_ESQUEMA).toBe(3);
     expect(esquemaDaVersao(3)).toEqual(esquemaDaVersao(2));
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 3)).toEqual([]);
   });
@@ -144,7 +146,7 @@ describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice ne
     v2.close();
 
     const repo = await Repositorio.abrir({ nomeBanco: nome });
-    expect(repo.db.verno).toBe(3);
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
     // Nenhum registro transformado: a subida não migra o vetado gravado antes.
     for (const [tabela, registros] of Object.entries(antes)) {
@@ -164,6 +166,56 @@ describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice ne
       confianca: 'alta',
     });
     expect((await repo.colecao('dispositivos').obter(vetado.id))?.status).toBe('vetado');
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', () => {
+  it('o esquema v3 não muda; só `vinculosDisciplina` nasce na v4', async () => {
+    expect(await hashDoEsquema(3)).toBe(HASH_ESQUEMA_V3);
+    expect(VERSAO_ESQUEMA).toBeGreaterThanOrEqual(4);
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 4)).toEqual(['vinculosDisciplina']);
+    expect(colecoesNaVersao(3)).not.toContain('vinculosDisciplina');
+  });
+
+  it('abre o banco v3 como v4 sem perder nada e aceita o vínculo novo', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId, aparelhoId } = await bancoAntigo(nome, 3);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
+    expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+    }
+    expect(await repo.db.tabela('vinculosDisciplina').count()).toBe(0);
+    const normaId = (antes.normas?.[0] as { id: string }).id;
+    const v = await repo
+      .colecao('vinculosDisciplina')
+      .criar({ normaId, sugestao: 'Direito Penal' });
+    expect((await repo.colecao('vinculosDisciplina').obter(v.id))?.normaId).toBe(normaId);
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v4 → v5 (acervo, Peça 6a): `pendenciasReleitura`', () => {
+  it('o esquema v4 não muda; só `pendenciasReleitura` nasce na v5', () => {
+    expect(VERSAO_ESQUEMA).toBe(5);
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 5)).toEqual(['pendenciasReleitura']);
+    expect(colecoesNaVersao(4)).not.toContain('pendenciasReleitura');
+    expect(colecoesNaVersao(4)).toContain('vinculosDisciplina');
+  });
+
+  it('abre o banco v4 como v5 sem perder nada e aceita a pendência nova', async () => {
+    const nome = nomeBanco();
+    const { antes } = await bancoAntigo(nome, 4);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(5);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+    }
+    expect(await repo.db.tabela('pendenciasReleitura').count()).toBe(0);
     repo.fechar();
     await apagarBanco(nome);
   });

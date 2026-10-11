@@ -1,0 +1,89 @@
+// Pipeline do acervo em disco: gera duas vezes (mesmo hash) e confere o que está em public/acervo.
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, describe, expect, it } from 'vitest';
+import { gerarAcervo, verificarPasta, type Pastas } from './nucleo';
+
+const pastas: string[] = [];
+afterEach(async () => {
+  await Promise.all(pastas.splice(0).map((p) => rm(p, { recursive: true, force: true })));
+});
+
+async function montar(): Promise<Pastas> {
+  const raiz = await mkdtemp(join(tmpdir(), 'acervo-teste-'));
+  pastas.push(raiz);
+  await mkdir(join(raiz, 'fontes'));
+  await writeFile(
+    join(raiz, 'fontes', 'ok.md'),
+    '# LEI Nº 1\n\nArt. 1º Primeiro.\n\nArt. 2º Segundo.\n',
+  );
+  await writeFile(join(raiz, 'fontes', 'tecnico.md'), '# Política\ntexto\n## Parte\nmais texto\n');
+  await writeFile(join(raiz, 'fontes', 'ruim.md'), 'Sem artigo nenhum.\n');
+  const item = (id: string, arquivo: string, extra = {}) => ({
+    id,
+    titulo: id,
+    grupo: 'Teste',
+    fonte: { adaptador: 'markdown', arquivo },
+    ...extra,
+  });
+  await writeFile(
+    join(raiz, 'curadoria.json'),
+    JSON.stringify({
+      versao: 1,
+      itens: [
+        item('lei-ok', 'ok.md'),
+        item('doc-tecnico', 'tecnico.md', { semArtigos: true }),
+        item('lei-ruim', 'ruim.md'),
+      ],
+    }),
+  );
+  return {
+    curadoria: join(raiz, 'curadoria.json'),
+    fontes: join(raiz, 'fontes'),
+    cache: join(raiz, 'cache'),
+    saida: join(raiz, 'saida'),
+    relatorio: join(raiz, 'relatorio.md'),
+  };
+}
+
+describe('gerarAcervo', () => {
+  it('publica os íntegros, bloqueia o com anomalia e escreve o relatório', async () => {
+    const p = await montar();
+    expect(await gerarAcervo(p)).toEqual({ publicados: 2, bloqueados: 1 });
+    expect(await verificarPasta(p.saida)).toEqual([]);
+    const indice = JSON.parse(await readFile(join(p.saida, 'indice.json'), 'utf-8')) as {
+      itens: { id: string }[];
+    };
+    expect(indice.itens.map((i) => i.id)).toEqual(['lei-ok', 'doc-tecnico']);
+    const relatorio = await readFile(p.relatorio, 'utf-8');
+    expect(relatorio).toMatch(/lei-ruim \| bloqueado/);
+    expect(relatorio).toMatch(/sem_artigos/);
+  });
+
+  it('gerar duas vezes dá o mesmo índice (hash reprodutível) e `id` refaz só um item', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    const primeiro = await readFile(join(p.saida, 'indice.json'), 'utf-8');
+    await gerarAcervo(p);
+    expect(await readFile(join(p.saida, 'indice.json'), 'utf-8')).toBe(primeiro);
+    await gerarAcervo(p, 'lei-ok');
+    expect(await readFile(join(p.saida, 'indice.json'), 'utf-8')).toBe(primeiro);
+    await expect(gerarAcervo(p, 'nao-existe')).rejects.toThrow(/fora da curadoria/);
+  });
+
+  it('verificarPasta acusa o arquivo adulterado', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    const arquivo = join(p.saida, 'lei-ok.json');
+    await writeFile(arquivo, (await readFile(arquivo, 'utf-8')).replace('Primeiro', 'Primeira'));
+    expect((await verificarPasta(p.saida)).map((x) => x.problema).join('|')).toMatch(/hash/);
+  });
+});
+
+describe('acervo versionado', () => {
+  it('public/acervo (se existir) confere com o índice e os hashes', async () => {
+    const problemas = await verificarPasta(join(process.cwd(), 'public', 'acervo'));
+    expect(problemas).toEqual([]);
+  });
+});

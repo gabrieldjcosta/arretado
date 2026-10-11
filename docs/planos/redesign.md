@@ -86,11 +86,11 @@ Arquivos: `src/apresentacao/biblioteca/Leitor.tsx`, `Normas.tsx`, `FiltroDaNorma
 
 Arquivos: `src/apresentacao/conta/*`, `src/apresentacao/Aparencia.tsx`, `src/apresentacao/orientacoes/*`, `src/apresentacao/telas/Areas.tsx`.
 
-- [ ] **5.1 Aparência.** Escolha de tema (igual ao aparelho, claro, escuro), fonte da leitura e tamanho na nova voz; prévia ao vivo curta.
-- [ ] **5.2 Primeira experiência.** Com o banco vazio: Recall abre com `AcaoAgora` "Registre seu primeiro erro" (2 campos), depois "Seu primeiro cartão aparece amanhã"; Biblioteca com convite a importar a primeira norma. Texto curto, sem tutorial obrigatório.
-- [ ] **5.3 Varredura de voz.** Passar por todos os textos fixos: frase curta, verbo no início dos botões, sem "por favor", sem "!" em texto do sistema, sem termos de concurso fixos no código (FCC e Defensoria só em dados). Atualizar testes dependentes de texto.
-- [ ] **5.4 Documentos.** `CLAUDE.md` e `README.md` já atualizados em 09/10/2026 (direção de produto); resta `glossario.md` (`AcaoAgora`, `LinhaDepois`, `DiasDaSemana`, `BarraFina`, cota); `decisoes-tecnicas.md` (T19 se não foi na 1.8). Propor o texto ao Gabriel antes de gravar.
-- [ ] **5.5 Roteiro da validação.** `docs/redesign/validacao.md`: as 4 perguntas da spec §7 mais "pagaria por isso?", instruções de uso de uma semana para 3–5 pessoas e como cada uma exporta o registro (Conta › Dados › Exportar) sem enviar dado pessoal; nada pergunta nem guarda diagnóstico.
+- [x] **5.1 Aparência (já atendida pelas fatias 1 e 3: tema, fonte, tamanho e prévia existiam).** Escolha de tema (igual ao aparelho, claro, escuro), fonte da leitura e tamanho na nova voz; prévia ao vivo curta.
+- [x] **5.2 Primeira experiência.** Com o banco vazio: Recall abre com `AcaoAgora` "Registre seu primeiro erro" (2 campos), depois "Seu primeiro cartão aparece amanhã"; Biblioteca com convite a importar a primeira norma. Texto curto, sem tutorial obrigatório.
+- [x] **5.3 Varredura de voz.** Passar por todos os textos fixos: frase curta, verbo no início dos botões, sem "por favor", sem "!" em texto do sistema, sem termos de concurso fixos no código (FCC e Defensoria só em dados). Atualizar testes dependentes de texto.
+- [x] **5.4 Documentos.** `CLAUDE.md` e `README.md` já atualizados em 09/10/2026 (direção de produto); resta `glossario.md` (`AcaoAgora`, `LinhaDepois`, `DiasDaSemana`, `BarraFina`, cota); `decisoes-tecnicas.md` (T19 se não foi na 1.8). Propor o texto ao Gabriel antes de gravar.
+- [x] **5.5 Roteiro da validação.** `docs/redesign/validacao.md`: as 4 perguntas da spec §7 mais "pagaria por isso?", instruções de uso de uma semana para 3–5 pessoas e como cada uma exporta o registro (Conta › Dados › Exportar) sem enviar dado pessoal; nada pergunta nem guarda diagnóstico.
 - **Pronto quando:** nenhuma tela com a identidade antiga; documentos atualizados; roteiro de validação pronto para uso.
 
 ## Depois da fatia 5

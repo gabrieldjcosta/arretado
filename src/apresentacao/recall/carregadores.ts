@@ -10,14 +10,22 @@ import {
 } from '../../dominios/recall/servico';
 
 export async function resumoDoRecall(repo: Repositorio) {
-  const [vencidos, maiorFila, dias, amanha, preferencias] = await Promise.all([
+  const [vencidos, maiorFila, dias, amanha, preferencias, erros] = await Promise.all([
     contarVencidos(repo),
     maiorFilaProjetada(repo),
     diasComRevisao(repo),
     vencemAmanha(repo),
     obterPreferencias(repo),
+    repo.colecao('erros').contar(),
   ]);
-  return { vencidos, maiorFila, dias, amanha, cota: cotaDiaria(preferencias) };
+  return {
+    vencidos,
+    maiorFila,
+    dias,
+    amanha,
+    cota: cotaDiaria(preferencias),
+    primeiroUso: erros === 0,
+  };
 }
 
 export const vencidosHoje = (repo: Repositorio) => contarVencidos(repo);

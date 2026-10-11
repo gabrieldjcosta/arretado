@@ -8,8 +8,12 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  * registro (o gravado antes continua `vigente` com "(VETADO)"). Sobe para o app anterior recusar o
  * pacote novo com "atualize o app" (em vez de "arquivo alterado" no primeiro vetado) e para a aba
  * aberta com ele recarregar antes de ler um status que não conhece.
+ *
+ * v4: `vinculosDisciplina` (acervo, Peça 3) e `Norma.especie` / `Norma.origemAcervo` opcionais; só
+ * coleção nova, sem transformar registro. Backup do Gabriel antes do merge; recarregar as abas.
+ * v5: `pendenciasReleitura` (acervo, Peça 6a); só coleção nova, sem transformar registro.
  */
-export const VERSAO_ESQUEMA = 3;
+export const VERSAO_ESQUEMA = 5;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 
