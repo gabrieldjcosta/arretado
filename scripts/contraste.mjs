@@ -122,6 +122,12 @@ export function medir(tema) {
     valor,
     ok: valor >= 4.5,
   });
+  // Marca-texto do Agora: o texto sobre a faixa translúcida, sobre cada fundo.
+  for (const f of FUNDOS) {
+    const faixa = sobre(cor('agora-faixa'), cor(f));
+    const v = razao(cor('texto'), faixa);
+    linhas.push({ fg: 'texto', bg: `agora-faixa/${f}`, minimo: 4.5, valor: v, ok: v >= 4.5 });
+  }
   return linhas;
 }
 

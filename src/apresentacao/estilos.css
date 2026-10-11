@@ -69,6 +69,8 @@
      agora, sempre como fundo com a tinta por cima (texto/agora 8,1:1); "depois" é o recuado. */
   --agora: #e9b949;
   --agora-texto: #1f2a24;
+  /* Faixa do marca-texto atrás do título do Agora: translúcida, o texto fica na própria cor. */
+  --agora-faixa: rgb(233 185 73 / 60%);
   --depois: #5c6860;
   --progresso: #4f7a64;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
@@ -115,6 +117,7 @@
     --estrela: #f0b429;
     --agora: #f0c75e;
     --agora-texto: #151a1f;
+    --agora-faixa: rgb(240 199 94 / 30%);
     --depois: #8a958f;
     --progresso: #8fbf9f;
     --sombra: none;
@@ -150,6 +153,7 @@
   --estrela: #f0b429;
   --agora: #f0c75e;
   --agora-texto: #151a1f;
+  --agora-faixa: rgb(240 199 94 / 30%);
   --depois: #8a958f;
   --progresso: #8fbf9f;
   --sombra: none;
@@ -1590,7 +1594,12 @@ dialog.dialogo-acoes {
 }
 
 .agora-marca {
-  background: linear-gradient(transparent 60%, var(--agora) 60%);
+  background: linear-gradient(
+    transparent 65%,
+    var(--agora-faixa) 65%,
+    var(--agora-faixa) 92%,
+    transparent 92%
+  );
   padding: 0 0.15rem;
 }
 

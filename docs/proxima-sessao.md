@@ -2,6 +2,10 @@
 
 Atualizado em 10/10/2026 (Peça 3a, porta do acervo, adesão e esquema v4, feita) e 10/10/2026 (Peça 2, palco do foco, feita) e 09/10/2026 (nova ordem: ver "Nova ordem" abaixo) e 08/10/2026 (11.5 concluída, ações por dispositivo, no PR da 11.5, **sem subida de esquema**; o PR [#36](https://github.com/gabrieldjcosta/arretado/pull/36) da 11.3 foi mergeado; próxima: 11.8, leitura artigo por artigo; ordem para o uso nas férias do Gabriel: ver "Ordem das férias" abaixo). Ler antes de qualquer trabalho (junto com o `CLAUDE.md`). Problemas conhecidos, armadilhas e suas soluções: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário → identificadores: [`glossario.md`](glossario.md).
 
+## Marca-texto do Agora — corrigido em 11/10/2026
+
+`.agora-marca` agora usa `--agora-faixa` translúcido (ver `solucao-de-problemas.md` › "Marca-texto do Agora"); contraste medido nos dois temas; sem subida de esquema. Próxima atividade: a anterior da lista (tela da 6a).
+
 ## Aba Súmulas/Teses e disciplinas do acervo — feito em 11/10/2026
 
 **(A)** `/biblioteca/sumulas` e `/biblioteca/teses` (`Colecoes.tsx`, domínio `legislacao/colecoes.ts`): lista as coleções já adicionadas, abre no leitor e acha por número ("súmula 593", "SV 11", "tese 12"; número solto vale S e SV; mais de um achado vira lista). Vazio convida a adicionar; "Adicionar do acervo" leva ao catálogo (`/biblioteca/acervo?tipo=`). Normas deixou de listar coleções. **(B)** Disciplinas dos 119 itens em `acervo/curadoria.json` (13 matérias do edital + "Outros"; multi-vínculo; a adesão cria um `vinculosDisciplina` por disciplina). Revisão do Gabriel: `acervo/relatorio-disciplinas.md`. **Atenção:** sem rede, `acervo:gerar` bloqueia 3 itens (Decreto 9.847, Decreto 12.710, Lei 14.344); por isso `public/acervo/indice.json` teve só os vínculos atualizados à mão (`acervo:verificar` verde); regenerar com rede. **Próxima atividade:** tela da 6a: aviso "há versão nova", botão Atualizar com a prévia `compararComAtual`, lista de pendências de releitura e grifos pendentes. Seguem pendentes (rede): 169 teses, 3b/3d, 63 normas a converter.
