@@ -11,8 +11,9 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  *
  * v4: `vinculosDisciplina` (acervo, Peça 3) e `Norma.especie` / `Norma.origemAcervo` opcionais; só
  * coleção nova, sem transformar registro. Backup do Gabriel antes do merge; recarregar as abas.
+ * v5: `pendenciasReleitura` (acervo, Peça 6a); só coleção nova, sem transformar registro.
  */
-export const VERSAO_ESQUEMA = 4;
+export const VERSAO_ESQUEMA = 5;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 

@@ -174,7 +174,7 @@ describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice ne
 describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', () => {
   it('o esquema v3 não muda; só `vinculosDisciplina` nasce na v4', async () => {
     expect(await hashDoEsquema(3)).toBe(HASH_ESQUEMA_V3);
-    expect(VERSAO_ESQUEMA).toBe(4);
+    expect(VERSAO_ESQUEMA).toBeGreaterThanOrEqual(4);
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 4)).toEqual(['vinculosDisciplina']);
     expect(colecoesNaVersao(3)).not.toContain('vinculosDisciplina');
   });
@@ -183,7 +183,7 @@ describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', 
     const nome = nomeBanco();
     const { antes, usuarioId, aparelhoId } = await bancoAntigo(nome, 3);
     const repo = await Repositorio.abrir({ nomeBanco: nome });
-    expect(repo.db.verno).toBe(4);
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
     for (const [tabela, registros] of Object.entries(antes)) {
       expect(await repo.db.table(tabela).toArray()).toEqual(registros);
@@ -194,6 +194,28 @@ describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', 
       .colecao('vinculosDisciplina')
       .criar({ normaId, sugestao: 'Direito Penal' });
     expect((await repo.colecao('vinculosDisciplina').obter(v.id))?.normaId).toBe(normaId);
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v4 → v5 (acervo, Peça 6a): `pendenciasReleitura`', () => {
+  it('o esquema v4 não muda; só `pendenciasReleitura` nasce na v5', () => {
+    expect(VERSAO_ESQUEMA).toBe(5);
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 5)).toEqual(['pendenciasReleitura']);
+    expect(colecoesNaVersao(4)).not.toContain('pendenciasReleitura');
+    expect(colecoesNaVersao(4)).toContain('vinculosDisciplina');
+  });
+
+  it('abre o banco v4 como v5 sem perder nada e aceita a pendência nova', async () => {
+    const nome = nomeBanco();
+    const { antes } = await bancoAntigo(nome, 4);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(5);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+    }
+    expect(await repo.db.tabela('pendenciasReleitura').count()).toBe(0);
     repo.fechar();
     await apagarBanco(nome);
   });

@@ -50,7 +50,7 @@ async function normaJaAdicionada(repo: Repositorio, acervoId: string) {
 }
 
 /** Baixa e confere o item (fora de transação: pode demorar). */
-async function baixarConferido(
+export async function baixarConferido(
   fonte: FonteDoAcervo,
   entrada: EntradaDoIndice,
 ): Promise<ItemDoAcervo> {

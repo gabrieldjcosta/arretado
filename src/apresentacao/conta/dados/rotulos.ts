@@ -40,6 +40,7 @@ export const ROTULO_COLECAO: Record<NomeColecao, string> = {
   estrelas: 'Estrelas',
   leituras: 'Posições de leitura',
   vinculosDisciplina: 'Vínculos de disciplina',
+  pendenciasReleitura: 'Pendências de releitura',
   pacotesIncidencia: 'Pacotes de incidência',
   adesoes: 'Adesões',
   precedentes: 'Precedentes',

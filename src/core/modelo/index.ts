@@ -138,6 +138,12 @@ export const ENTIDADES = {
     indices: ['usuarioId', 'normaId', 'disciplinaId'],
     desdeVersao: 4,
   },
+  pendenciasReleitura: {
+    esquema: L.PendenciaDeReleitura,
+    modulo: 'legislacao',
+    indices: ['usuarioId', 'normaId', 'referenciaId'],
+    desdeVersao: 5,
+  },
   // catálogo
   pacotesIncidencia: { esquema: L.PacoteDeIncidencia, modulo: 'catalogo', indices: ['usuarioId'] },
   adesoes: { esquema: L.Adesao, modulo: 'catalogo', indices: ['usuarioId', 'pacoteId'] },

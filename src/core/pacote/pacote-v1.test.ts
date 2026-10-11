@@ -26,6 +26,9 @@ async function comoPacoteV1(
   delete a['dados/vinculosDisciplina.json'];
   Reflect.deleteProperty(m.arquivos, 'dados/vinculosDisciplina.json');
   Reflect.deleteProperty(m.contagens, 'vinculosDisciplina');
+  delete a['dados/pendenciasReleitura.json'];
+  Reflect.deleteProperty(m.arquivos, 'dados/pendenciasReleitura.json');
+  Reflect.deleteProperty(m.contagens, 'pendenciasReleitura');
   if (!opcoes.manterLeituras) {
     delete a['dados/leituras.json'];
     Reflect.deleteProperty(m.arquivos, 'dados/leituras.json');
