@@ -580,9 +580,9 @@ específico a ser publicado no Diário Oficial do Estado de São Paulo e disponi
 - II - Pessoas com deficiência;
 - III - Pessoas negras e indígenas.
 
-5.26.1 Nesta hipótese o(a) candidato(a) cotista preterido será convocado(a) para ocupar a vaga imediatamente subsequente.
+  5.26.1 Nesta hipótese o(a) candidato(a) cotista preterido será convocado(a) para ocupar a vaga imediatamente subsequente.
 
-5.27 A cada etapa o Conselho Superior fará publicar, além da lista geral de aprovados(as), listagens específicas de candidatos(as) com deficiência, negros(as) e indígenas e trans aprovados(as).
+  5.27 A cada etapa o Conselho Superior fará publicar, além da lista geral de aprovados(as), listagens específicas de candidatos(as) com deficiência, negros(as) e indígenas e trans aprovados(as).
 
 **6. ~~DAS INSCRIÇÕES PARA CANDIDATOS(AS) TRANS~~**
 
@@ -664,11 +664,11 @@ c) relato da transição do(a) candidato(a) feito em entrevista pessoal.
 - II - Pessoas com deficiência;
 - III - Pessoas negras e indígenas.
 
-6.13.1 Nesta hipótese o(a) candidato(a) cotista preterido será convocado(a) para ocupar a vaga imediatamente subsequente.
+  6.13.1 Nesta hipótese o(a) candidato(a) cotista preterido será convocado(a) para ocupar a vaga imediatamente subsequente.
 
-6.14 A cada etapa o Conselho Superior fará publicar, além da lista geral de aprovados(as), listagens específicas de candidatos(as) com deficiência, negros(as) e indígenas e trans aprovados(as).
+  6.14 A cada etapa o Conselho Superior fará publicar, além da lista geral de aprovados(as), listagens específicas de candidatos(as) com deficiência, negros(as) e indígenas e trans aprovados(as).
 
-6.15 O não enquadramento do(a) candidato(a) na condição de pessoa trans não se configura em ato discriminatório de qualquer natureza.
+  6.15 O não enquadramento do(a) candidato(a) na condição de pessoa trans não se configura em ato discriminatório de qualquer natureza.
 
 **7. DAS PROVAS DO CONCURSO**
 
@@ -878,22 +878,22 @@ b) em não havendo número suficiente de Cadernos para a devida substituição, 
 - j) Princípios e Atribuições Institucionais da Defensoria Pública do Estado;
 - k) Filosofia do Direito e Sociologia Jurídica.
 
-9.2 A duração da Prova será de 4 (quatro) horas e 30 (trinta) minutos.
+  9.2 A duração da Prova será de 4 (quatro) horas e 30 (trinta) minutos.
 
-9.3 A Prova Escrita – Objetiva será avaliada em escala de 0 (zero) a 10 (dez).
+  9.3 A Prova Escrita – Objetiva será avaliada em escala de 0 (zero) a 10 (dez).
 
-9.4 Na Primeira Prova Escrita – Objetiva não será permitida consulta à legislação, doutrina e jurisprudência.
+  9.4 Na Primeira Prova Escrita – Objetiva não será permitida consulta à legislação, doutrina e jurisprudência.
 
-9.5 Serão considerados(as) habilitados(as) na Primeira Prova Escrita – Objetiva somente os(as) candidatos(as) que obtiverem a seguinte pontuação:
+  9.5 Serão considerados(as) habilitados(as) na Primeira Prova Escrita – Objetiva somente os(as) candidatos(as) que obtiverem a seguinte pontuação:
 
 - a) candidatos(as) da lista geral: Pontuação igual ou superior a 44 (quarenta e quatro) acertos em toda a prova;
 - b) candidatos(as) que concorrem às vagas reservadas para pessoas com deficiência, pessoas negras ou indígenas, ou pessoas trans: pontuação igual ou superior a 35 (trinta e cinco) acertos em toda a prova.
 
-9.6 Serão convocados(as) para a Segunda e Terceira Provas Escritas, somente:
+  9.6 Serão convocados(as) para a Segunda e Terceira Provas Escritas, somente:
 
-9.6.1 os(as) candidatos(as) da lista geral que alcançarem o disposto no item 9.5, “a” e estejam classificados(as) até a 132<sup>a</sup> (centésima trigésima segunda) colocação, considerando-se todos(as) os(as) candidatos(as) empatados(as) nesta posição.
+  9.6.1 os(as) candidatos(as) da lista geral que alcançarem o disposto no item 9.5, “a” e estejam classificados(as) até a 132<sup>a</sup> (centésima trigésima segunda) colocação, considerando-se todos(as) os(as) candidatos(as) empatados(as) nesta posição.
 
-9.6.2 os(as) candidatos(as) que concorrem às vagas reservadas a pessoas com deficiência que alcançarem o disposto no item 9.5 “b” e estejam classificados(as) até a 16<sup>a</sup> (décima sexta) colocação, considerando-se todos(as) os(as) candidatos(as) empatados(as) nesta posição.
+  9.6.2 os(as) candidatos(as) que concorrem às vagas reservadas a pessoas com deficiência que alcançarem o disposto no item 9.5 “b” e estejam classificados(as) até a 16<sup>a</sup> (décima sexta) colocação, considerando-se todos(as) os(as) candidatos(as) empatados(as) nesta posição.
 
 33
 
@@ -1077,7 +1077,7 @@ b) candidatos(as) que concorrem às vagas reservadas para pessoas com deficiênc
 - a) candidatos(as) da lista geral: média igual ou superior a 5 (cinco) na Prova Oral;
 - b) candidatos(as) que concorrem às vagas reservadas para pessoas com deficiência, pessoas negras ou indígenas, ou pessoas trans: média igual ou superior a 3 (três) na Prova Oral.
 
-12.6 Serão considerados(as) aprovados(as) no concurso os(as) candidatos(as) que:
+  12.6 Serão considerados(as) aprovados(as) no concurso os(as) candidatos(as) que:
 
 37
 
