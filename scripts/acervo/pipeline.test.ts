@@ -3,6 +3,7 @@ import { Curadoria, ItemDaCuradoria } from './curadoria';
 import { markdownParaBlocos, markdownParaSecoes, trechosDaLinha } from './markdown';
 import { construirItemArticulado, construirItemSemArtigos, entradaDoIndice } from './construir';
 import { verificarAcervo } from './verificar';
+import { decodificarPagina } from './nucleo';
 import type { IndiceDoAcervo } from '../../src/dominios/acervo/esquemas';
 
 const cur = (extra: Record<string, unknown> = {}) =>
@@ -195,5 +196,41 @@ describe('verificarAcervo', () => {
   it('índice ilegível ou fora do esquema', async () => {
     expect((await verificarAcervo('não é json', new Map()))[0]?.problema).toMatch(/JSON/);
     expect((await verificarAcervo('{"formato":"x"}', new Map()))[0]?.problema).toMatch(/esquema/);
+  });
+});
+
+describe('páginas salvas e numeração repetida', () => {
+  it('lê página em UTF-16 com BOM', () => {
+    const texto = 'Lei nº 11.340';
+    const utf16 = new Uint8Array(2 + texto.length * 2);
+    utf16.set([0xff, 0xfe]);
+    for (let i = 0; i < texto.length; i++) {
+      const c = texto.charCodeAt(i);
+      utf16[2 + i * 2] = c & 0xff;
+      utf16[3 + i * 2] = c >> 8;
+    }
+    expect(decodificarPagina(utf16)).toBe(texto);
+  });
+
+  it('dá endereço único à seção estrutural repetida (LC 80: duas "SEÇÃO IV")', () => {
+    const lei = [
+      '# LEI Nº 1, DE 1 DE JANEIRO DE 2020',
+      '',
+      'CAPÍTULO I',
+      'SEÇÃO IV',
+      '',
+      'Art. 1º Primeiro.',
+      '',
+      'SEÇÃO IV',
+      '',
+      'Art. 2º Segundo.',
+    ].join('\n');
+    const r = construirItemArticulado(
+      cur({ anomaliasAceitas: ['estrutural_repetido'] }),
+      markdownParaBlocos(lei),
+      '2026-10-10',
+      undefined,
+    );
+    expect(r.bloqueios).toEqual([]);
   });
 });

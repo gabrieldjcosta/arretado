@@ -6,8 +6,8 @@ import { IdDoAcervo, VinculoSugerido } from '../../src/dominios/acervo/esquemas'
 import { TIPOS_DE_ANOMALIA } from '../../src/dominios/legislacao/validacao';
 
 export const FonteDaCuradoria = z.discriminatedUnion('adaptador', [
-  /** Página do Planalto (HTML, geralmente windows-1252). */
-  z.strictObject({ adaptador: z.literal('planalto'), url: z.url({ protocol: /^https?$/ }) }),
+  /** Página do Planalto, da ALESP ou da Câmara (HTML; windows-1252 ou UTF-8). */
+  z.strictObject({ adaptador: z.enum(['planalto', 'html']), url: z.url({ protocol: /^https?$/ }) }),
   /** Markdown convertido de PDF: `~~tachado~~` vira texto tachado. `arquivo` é relativo a `acervo/fontes/`. */
   z.strictObject({
     adaptador: z.literal('markdown'),
