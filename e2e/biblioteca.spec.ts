@@ -54,6 +54,14 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   await expect(faixa).toHaveCount(0);
   await semViolacoes(page);
 
+  // Com normas, o caminho até o acervo continua à vista.
+  await expect(normas.getByRole('link', { name: 'Tudo do edital da DPE-SP' })).toBeVisible();
+  await normas.getByRole('link', { name: 'Adicionar do acervo' }).click();
+  await expect(page.getByRole('heading', { name: 'Acervo: normas' })).toBeVisible();
+  await semViolacoes(page);
+  await page.getByRole('link', { name: 'Voltar à Biblioteca' }).click();
+  await expect(normas.getByText('LEP', { exact: true })).toBeVisible();
+
   await normas.getByRole('link', { name: 'Importar norma' }).click();
   await colar(page, 'eca-compilado');
   await expect(estrutura).toBeVisible({ timeout: 30_000 });

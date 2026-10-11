@@ -54,3 +54,28 @@ export function tamanhoLegivel(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
 }
+
+/** "7.210/1984" → "7210/1984"; só números e o ano, para comparar leis escritas de jeitos diferentes. */
+function referenciaComparavel(texto: string): string | undefined {
+  const m = /(\d[\d.]*)\s*\/\s*(\d{4})/.exec(texto);
+  return m?.[1] && m[2] ? `${m[1].replaceAll('.', '')}/${m[2]}` : undefined;
+}
+
+/**
+ * A norma já importada por colagem (sem origem no acervo) que parece ser a mesma lei do item:
+ * mesma referência (número/ano) e, quando as duas dizem o tipo, o mesmo tipo. Só avisa; não bloqueia.
+ */
+export function normaParecida<
+  N extends { tituloCurto: string; tipo?: string; referencia?: string; origemAcervo?: unknown },
+>(entrada: Pick<EntradaDoIndice, 'titulo'>, normas: readonly N[]): N | undefined {
+  const ref = referenciaComparavel(entrada.titulo);
+  if (ref === undefined) return undefined;
+  const titulo = nomeComparavel(entrada.titulo);
+  return normas.find(
+    (n) =>
+      n.origemAcervo === undefined &&
+      n.referencia !== undefined &&
+      referenciaComparavel(n.referencia) === ref &&
+      (n.tipo === undefined || titulo.includes(nomeComparavel(n.tipo))),
+  );
+}

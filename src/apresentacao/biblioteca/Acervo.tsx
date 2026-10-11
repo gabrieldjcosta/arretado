@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import {
+  atualizarItem,
+  compararComAtual,
+  itensComVersaoNova,
+} from '../../dominios/acervo/atualizacao';
+import { resumoDaComparacao } from '../../dominios/acervo/comparacao';
 import { aderirEmLote, type ResultadoDoLote } from '../../dominios/acervo/adesao';
 import {
   agrupar,
   filtrarEntradas,
+  normaParecida,
   tamanhoLegivel,
   type ModoDeAgrupar,
 } from '../../dominios/acervo/agrupar';
-import type { IndiceDoAcervo, TipoDoAcervo } from '../../dominios/acervo/esquemas';
+import type { EntradaDoIndice, IndiceDoAcervo, TipoDoAcervo } from '../../dominios/acervo/esquemas';
+import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
@@ -49,16 +57,49 @@ export function Acervo() {
     };
   }, [fonte, tentativa]);
 
-  const carregarAdicionadas = useCallback(
-    async (r: typeof repo) =>
-      new Set(
-        (await r.colecao('normas').todosDoUsuario()).flatMap((n) =>
-          n.origemAcervo ? [n.origemAcervo.id] : [],
-        ),
-      ),
-    [],
+  const carregarNormas = useCallback(async (r: typeof repo) => {
+    const normas = await r.colecao('normas').todosDoUsuario();
+    return {
+      adicionadas: new Set(normas.flatMap((n) => (n.origemAcervo ? [n.origemAcervo.id] : []))),
+      coladas: normas.filter((n) => n.origemAcervo === undefined),
+    };
+  }, []);
+  const { dados: minhas } = useDados(carregarNormas);
+  const carregarNovas = useCallback(
+    async (r: typeof repo) => (indice ? itensComVersaoNova(r, indice.itens) : []),
+    [indice],
   );
-  const { dados: adicionadas } = useDados(carregarAdicionadas);
+  const { dados: novas } = useDados(carregarNovas);
+  const novaDe = new Map(novas?.map((n) => [n.entrada.id, n.entrada]));
+  const [previa, setPrevia] = useState<{
+    entrada: EntradaDoIndice;
+    resumo?: ReturnType<typeof resumoDaComparacao>;
+    falha?: boolean;
+  } | null>(null);
+  const [atualizando, setAtualizando] = useState(false);
+
+  async function abrirPrevia(entrada: EntradaDoIndice) {
+    setPrevia({ entrada });
+    try {
+      const c = await compararComAtual(repo, fonte, entrada);
+      setPrevia({ entrada, resumo: resumoDaComparacao(c) });
+    } catch {
+      setPrevia({ entrada, falha: true });
+    }
+  }
+
+  async function confirmarAtualizacao(entrada: EntradaDoIndice) {
+    setAtualizando(true);
+    try {
+      await atualizarItem(repo, fonte, entrada);
+      setPrevia(null);
+    } catch {
+      setPrevia({ entrada, falha: true });
+    } finally {
+      setAtualizando(false);
+    }
+  }
+  const adicionadas = minhas?.adicionadas;
 
   const [modo, setModo] = useState<ModoDeAgrupar>('disciplina');
   const [busca, setBusca] = useState('');
@@ -260,6 +301,7 @@ export function Acervo() {
                   <ul className="lista-simples">
                     {g.itens.map((i) => {
                       const jaTem = adicionadas.has(i.id);
+                      const parecida = jaTem ? undefined : normaParecida(i, minhas.coladas);
                       const subtitulos = i.vinculos
                         .filter((v) => modo === 'tipo' || v.disciplina === g.titulo)
                         .flatMap((v) => (v.subtitulo ? [v.subtitulo] : []));
@@ -283,6 +325,25 @@ export function Acervo() {
                               </span>
                             </span>
                           </label>
+                          {parecida && (
+                            <p className="aviso">
+                              Você já tem uma norma parecida: {parecida.tituloCurto}.
+                            </p>
+                          )}
+                          {jaTem && novaDe.has(i.id) && (
+                            <p className="aviso">
+                              Há versão nova.{' '}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const e = novaDe.get(i.id);
+                                  if (e) void abrirPrevia(e);
+                                }}
+                              >
+                                Atualizar
+                              </button>
+                            </p>
+                          )}
                           {i.avisos.map((a) => (
                             <p key={a} className="aviso">
                               {a}
@@ -298,6 +359,56 @@ export function Acervo() {
           )}
         </>
       )}
+      <Dialogo
+        aberto={previa !== null}
+        aoFechar={() => {
+          if (!atualizando) setPrevia(null);
+        }}
+        titulo="Atualizar"
+      >
+        {previa && (
+          <>
+            <p>
+              <strong>{previa.entrada.titulo}</strong>
+            </p>
+            {previa.falha ? (
+              <Falha
+                oQue="Não foi possível atualizar."
+                oQueFazer="Precisa de internet só para atualizar. Seus dados continuam como estavam."
+              />
+            ) : previa.resumo ? (
+              <ul className="lista-simples">
+                <li>{previa.resumo.incluidos} dispositivos novos</li>
+                <li>{previa.resumo.alterados} alterados</li>
+                <li>{previa.resumo.revogados} revogados</li>
+                <li>{previa.resumo.renumerados} renumerados</li>
+                <li>{previa.resumo.removidos} saem da norma e viram itens para reler</li>
+              </ul>
+            ) : (
+              <Esqueleto />
+            )}
+            <div className="linha-acoes">
+              <button
+                type="button"
+                className="principal"
+                disabled={!previa.resumo || atualizando}
+                onClick={() => void confirmarAtualizacao(previa.entrada)}
+              >
+                Atualizar agora
+              </button>
+              <button
+                type="button"
+                disabled={atualizando}
+                onClick={() => {
+                  setPrevia(null);
+                }}
+              >
+                Agora não
+              </button>
+            </div>
+          </>
+        )}
+      </Dialogo>
     </>
   );
 }

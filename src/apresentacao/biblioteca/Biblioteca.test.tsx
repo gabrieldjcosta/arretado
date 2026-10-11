@@ -67,6 +67,15 @@ describe('Biblioteca › Normas (9.5)', () => {
     ).toBeInTheDocument();
     expect(within(lista).queryByText('ECA')).not.toBeInTheDocument();
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).toBeInTheDocument();
+    // Com normas, o caminho até o acervo continua à vista.
+    expect(within(lista).getByRole('link', { name: 'Adicionar do acervo' })).toHaveAttribute(
+      'href',
+      '#/biblioteca/acervo?tipo=norma',
+    );
+    expect(within(lista).getByRole('link', { name: 'Tudo do edital da DPE-SP' })).toHaveAttribute(
+      'href',
+      '#/biblioteca/acervo?tudo=1',
+    );
     expect(screen.queryByRole('heading', { name: 'Nenhuma norma ainda' })).not.toBeInTheDocument();
 
     const faixa = screen.getByRole('region', { name: 'Importações pendentes' });

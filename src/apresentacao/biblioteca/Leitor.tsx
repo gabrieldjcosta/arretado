@@ -55,6 +55,7 @@ import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
 import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
 import { fraseDaEstrela, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
+import { PendenciasDaNorma } from './PendenciasDaNorma';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
 import {
   ATRIBUTO_FORA_DO_TEXTO,
@@ -1561,6 +1562,7 @@ function LeitorAberto({
           alternarDestaques={alternarDestaques}
         />
       )}
+      {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
       {!modoFoco && destacar && <LegendaDestaques />}
       {!modoFoco && referenciaLidoAte && (
         <p className="lido-ate">
