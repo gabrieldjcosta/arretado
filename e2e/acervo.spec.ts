@@ -32,10 +32,11 @@ function item(id: string): ItemDoAcervo {
 }
 
 /** Serve um acervo de 3 itens no lugar de `/acervo/*` (o do site ainda não tem lote). */
-async function servirAcervo(page: Page) {
+async function servirAcervo(page: Page, versaoDaLep = 1) {
+  const lep = item('lep');
   const fonte = await FonteEmMemoria.criar([
     {
-      item: item('lep'),
+      item: versaoDaLep === 1 ? lep : { ...lep, versao: versaoDaLep, nos: lep.nos.slice(0, 1) },
       vinculos: [{ disciplina: 'Execução Penal', subtitulo: 'Lei toda' }],
       avisos: ['Divergente do edital.'],
     },
@@ -85,6 +86,27 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   await semViolacoes(page);
   await execPenal.getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByText('Texto do primeiro artigo.')).toBeVisible();
+});
+
+test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ page }) => {
+  await servirAcervo(page);
+  await page.goto('/#/biblioteca/acervo');
+  await page.getByRole('checkbox', { name: /LEP/ }).check();
+  await page.getByRole('button', { name: /^Adicionar 1 / }).click();
+  await expect(page.getByText(/1 adicionadas/)).toBeVisible();
+  await expect(page.getByText('Há versão nova')).toHaveCount(0);
+
+  await page.unroute('**/acervo/*.json');
+  await servirAcervo(page, 2);
+  await page.reload();
+  await expect(page.getByText(/Há versão nova/)).toBeVisible();
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Atualizar', exact: true }).click();
+  const dialogo = page.getByRole('dialog');
+  await expect(dialogo.getByText(/1 saem da norma/)).toBeVisible();
+  await semViolacoes(page);
+  await dialogo.getByRole('button', { name: 'Atualizar agora' }).click();
+  await expect(page.getByText(/Há versão nova/)).toHaveCount(0);
 });
 
 test.describe('sem rede', () => {
