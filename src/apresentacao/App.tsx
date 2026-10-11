@@ -2,6 +2,7 @@ import { HashRouter, Route, Routes } from 'react-router';
 import type { Repositorio } from '../core/persistencia';
 import type { FonteDoAcervo } from '../dominios/acervo/fonte';
 import { Acervo } from './biblioteca/Acervo';
+import { Colecoes } from './biblioteca/Colecoes';
 import { ProvedorFonteAcervo } from './dados/fonteAcervo';
 import { Importar } from './biblioteca/Importar';
 import { Leitor } from './biblioteca/Leitor';
@@ -53,6 +54,8 @@ export function App({
               <Route path="recall/cartoes/:id" element={<EditarCartao />} />
               <Route path="biblioteca" element={<Normas />} />
               <Route path="biblioteca/acervo" element={<Acervo />} />
+              <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
+              <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
               {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
               <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
               <Route path="biblioteca/normas/:normaId" element={<Leitor />} />

@@ -78,10 +78,11 @@ async function carregarBiblioteca(repo: Repositorio) {
     repo.colecao('disciplinas').todosDoUsuario(),
   ]);
   const nomeDe = new Map(disciplinas.map((d) => [d.id, d.nome]));
-  const porDisciplina = agruparPorDisciplina(normas, vinculos, nomeDe);
+  const soNormas = normas.filter((n) => n.especie !== 'sumulas' && n.especie !== 'teses');
+  const porDisciplina = agruparPorDisciplina(soNormas, vinculos, nomeDe);
   const continuar = ultimaLida(normas, leituras);
   return {
-    normas,
+    normas: soNormas,
     pendentes,
     leituras,
     porDisciplina,
