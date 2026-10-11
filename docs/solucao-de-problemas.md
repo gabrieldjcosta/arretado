@@ -1104,3 +1104,10 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 
 ## Marca-texto do Agora (11/10/2026)
 - **Sintoma:** no tema escuro, o título do `AcaoAgora` ("Revisar 8 cartões", "Você parou no…") ficava quase ilegível: texto claro sobre a faixa amarela cheia (`--agora`), parecendo um risco. **Causa:** `.agora-marca` pintava `--agora` opaco nos 40% de baixo e o texto herdava `--texto` (claro no escuro); o par medido era só `agora-texto/agora`, que não representa essa pilha. **Solução:** token `--agora-faixa` (translúcido: 60% no claro, 30% no escuro), faixa de 65% a 92% da linha, texto na cor normal; sem animação, sem mudar medidas. `scripts/contraste.mjs` mede `texto` sobre `agora-faixa` composto sobre cada fundo (pior caso 5,7:1 no escuro, 9,5:1 no claro). **Prevenção:** par novo em `contraste.mjs` (`contraste.test.ts` o roda). Não voltar a usar `--agora` opaco atrás de texto que herda `--texto`.
+
+## Worker da rota /api/buscar-norma (12.1, 11/10/2026)
+- **Host:** comparação exata com a lista (`HOSTS_PERMITIDOS`), nunca por sufixo; `https://www.planalto.gov.br@exemplo.com` é recusado como `credenciais_na_url`, e porta explícita também.
+- **Redirecionamento:** `redirect: 'manual'` e cada `Location` (relativo ou não) passa por `validarUrl`; o `fetch` automático seguiria para fora da lista.
+- **Testes:** `DOMException` no jsdom não é `instanceof Error`; o motivo `tempo_esgotado` usa o `name`. `Response` só aceita `Uint8Array<ArrayBuffer>` no TypeScript atual.
+- **windows-1252:** o `TextDecoder('windows-1252')` do Node pode devolver latin1 (C1 como U+0096); o navegador mapeia certo, e a normalização (`normalizacao.ts`) já converte C1 depois. Planalto não declara charset; ALESP declara UTF-8 na `<meta>`.
+- **Previsível na 12.2:** `wrangler` não está instalado no repositório; o dry-run e a publicação exigem rede. O Workers Builds passa a publicar o Worker com `main` quando o `main` receber este merge.
