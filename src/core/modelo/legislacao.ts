@@ -82,6 +82,8 @@ export const TipoDispositivo = z.enum([
   'item',
   // Súmula (esquema v4, Peça 4 do acervo): um enunciado numerado; normativo, filho direto da coleção.
   'sumula',
+  // Tese institucional (Peça 5 do acervo): enunciado numerado, filho de um nó de área.
+  'tese',
   'anexo',
   // Trecho com numeração própria aberto por título solto (ADCT da CF); estrutural (8.4).
   'bloco',
@@ -128,6 +130,10 @@ export const TextoDeDispositivo = z.strictObject({
   normaId: Id,
   trechos: z.array(Trecho),
   notasVigencia: z.array(NotaVigencia).optional(),
+  /** De onde veio o texto (tese: encontro e PDF; súmula: DJ e página oficial). */
+  procedencia: z
+    .strictObject({ rotulo: TextoCurto, data: DataCivil.optional(), link: NotaVigencia.shape.link })
+    .optional(),
   redacoesAnteriores: z
     .array(
       z.strictObject({

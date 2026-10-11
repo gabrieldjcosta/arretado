@@ -25,6 +25,7 @@ const ORDEM_TIPOS: readonly TipoDispositivo[] = [
   'alinea',
   'item',
   'sumula',
+  'tese',
   'anexo',
 ];
 
