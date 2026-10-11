@@ -1053,6 +1053,16 @@ Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1)
 - **Sintoma 4 (sessão na nuvem):** `npx vitest` tenta instalar o `vitest@5` e falha com "Cannot find package 'vite'". **Causa:** `node_modules` ausente no contêiner novo. **Solução:** `npm ci` antes de qualquer comando (sem rodar `npx` solto, que baixa versão errada).
 - **Previsível na fatia 4:** (1) a citação é `span role="button"` dentro de `<p>`: se a régua ou o "Continuar leitura" mexerem na largura, a folha inferior não depende disso, mas o balão do desktop é fixo no canto (não ancorado); ancorar à citação exige posição medida e o `Dialogo` nativo não tem âncora. (2) Remissão a outra norma (CP, CPP na LEP) e "citado por" ficam para depois do portão.
 
+## Coleta das teses da DPE-SP (11/10/2026)
+
+Script `scripts/acervo-teses-coletar.mjs` (`node scripts/acervo-teses-coletar.mjs [--sem-pdf]`); saída fora do git em `.claude/tmp/acervo/teses/` (`teses.json`, `relatorio.md`, `pagina.html`, `pdf/`). Fonte: https://www.defensoria.sp.def.br/institucional/edepe/pagina-inicial-edepe/teses-institucionais
+- **Atalho:** o parâmetro `..._delta=200` na URL do portlet traz as 169 teses numa só requisição (não precisa percorrer `_cur=1..34`).
+- **Numeração repete** a partir da Tese 146 (há três "Tese 147", de áreas diferentes): o id é `tese-NNN-área-encontro-ano`, nunca só o número.
+- **7 canceladas** (024, 025, 027, 032, 033, 038 e a 151 de Família, esta com o texto "TESE CANCELADA"): 169 no total, 162 vigentes. A Peça 5 decide se entram.
+- **Links defeituosos no site:** o PDF da Tese 150 (Cível) vem vazio (200, 0 bytes); só há o texto da listagem. O link da 151 (Família) aponta para o PDF da 152. A Tese 146 (Infância e Juventude) não traz o ano no título (XII Encontro = 2024).
+- **LGPD:** os PDFs trazem nome, telefone e e-mail do proponente. Na Peça 5, importar só o texto da listagem e a área.
+- **Windows:** em script `.mjs` escrito por heredoc, as barras invertidas das regex se perdem (`\b` vira backspace); editar com a ferramenta de edição ou usar `[0-9]` e `[ ]`.
+
 ### Push de tag falha nas sessões remotas
 - **Sintoma:** `send-pack: unexpected disconnect while reading sideband packet` ao dar `git push origin <tag>`; o hook `backup-diario` dizia "criada só localmente".
 - **Causa:** o proxy das sessões remotas derruba o push de tag; push de branch funciona.
