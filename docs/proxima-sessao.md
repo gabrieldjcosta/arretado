@@ -4,7 +4,7 @@ Atualizado em 10/10/2026 (Peça 3a, porta do acervo, adesão e esquema v4, feita
 
 ## Marca-texto do Agora — corrigido em 11/10/2026
 
-`.agora-marca` agora usa `--agora-faixa` translúcido (ver `solucao-de-problemas.md` › "Marca-texto do Agora"); contraste medido nos dois temas; sem subida de esquema. Próxima atividade: as 169 teses brutas viram o JSON curado do adaptador `teses` (sem rede); depois etapa 12/6b.
+`.agora-marca` agora usa `--agora-faixa` translúcido (ver `solucao-de-problemas.md` › "Marca-texto do Agora"); contraste medido nos dois temas; sem subida de esquema. Teses: feito em 11/10/2026 (155 de 169 no item `teses-dpesp`; 14 com número repetido entre áreas ficaram fora, ver `acervo/relatorio-teses.md`, decisão do Gabriel pendente). Próxima atividade: etapa 12/6b, importar por URL (6b e 12.2 pedem esforço alto no Sonnet). Pendentes com rede: súmula SV 30, 3b/3d e 63 normas a converter. Nota: `acervo:gerar` sem rede bloqueia 3 normas (HTTP 301); restaurar `public/acervo/indice.json` e `acervo/relatorio.md` dessas 3 antes do commit.
 
 ## Aba Súmulas/Teses e disciplinas do acervo — feito em 11/10/2026
 

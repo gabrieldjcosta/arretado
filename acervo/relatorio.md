@@ -121,3 +121,4 @@
 | sumulas-stj | publicado | 676 | 0 | — |
 | sumulas-tjsp | publicado | 165 | 0 | — |
 | sumulas-tnu | publicado | 89 | 0 | — |
+| teses-dpesp | publicado | 160 | 0 | — |
