@@ -4,8 +4,8 @@ export type AbaDaBiblioteca = 'norma' | 'sumulas' | 'teses';
 
 const ABAS: { chave: AbaDaBiblioteca; rotulo: string; para: string }[] = [
   { chave: 'norma', rotulo: 'Normas', para: '/biblioteca' },
-  { chave: 'sumulas', rotulo: 'Súmulas', para: '/biblioteca/acervo?tipo=sumulas' },
-  { chave: 'teses', rotulo: 'Teses', para: '/biblioteca/acervo?tipo=teses' },
+  { chave: 'sumulas', rotulo: 'Súmulas', para: '/biblioteca/sumulas' },
+  { chave: 'teses', rotulo: 'Teses', para: '/biblioteca/teses' },
 ];
 
 /** Abas da Biblioteca (Peça 3c): Normas, Súmulas e Teses. */

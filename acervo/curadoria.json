@@ -10,7 +10,10 @@
       "esfera": "federal",
       "vinculos": [
         {
-          "disciplina": "Execução Penal"
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
         }
       ],
       "anomaliasAceitas": ["alinea_sem_inciso"],
@@ -25,7 +28,14 @@
       "grupo": "Constituições e emendas",
       "tipo": "Constituição",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -38,7 +48,14 @@
       "grupo": "Constituições e emendas",
       "tipo": "Constituição estadual",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -58,7 +75,14 @@
       "grupo": "Constituições e emendas",
       "tipo": "Emenda constitucional",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -72,7 +96,11 @@
       "grupo": "Leis complementares",
       "tipo": "Lei complementar",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -90,7 +118,11 @@
       "grupo": "Leis complementares",
       "tipo": "Lei complementar",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -109,7 +141,11 @@
       "grupo": "Leis complementares",
       "tipo": "Lei complementar",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA: a LC 207/1979 é a Lei Orgânica da Polícia do Estado de SP (não regime disciplinar da DPE); o rótulo \"\"regime disciplinar\"\" do edital não casa com a ementa. Confirmar no edital o contexto da citação (provável aplicação subsidiária via LC 988/2006)."
       ],
@@ -125,7 +161,14 @@
       "grupo": "Leis complementares",
       "tipo": "Lei complementar",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA: a LC 893/2001 institui o Regulamento Disciplinar da Polícia Militar (não da Defensoria Pública). Norma existe e número/ano conferem; descrição do edital/chunk (\"\"Regime disciplinar da Defensoria Pública SP\"\") parece imprecisa. Última atualização: Lei 18.442/2026."
       ],
@@ -141,7 +184,11 @@
       "grupo": "Leis federais",
       "tipo": "Decreto-lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -155,7 +202,11 @@
       "grupo": "Leis federais",
       "tipo": "Decreto-lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -169,7 +220,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -183,7 +241,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -197,7 +259,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -211,7 +280,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -225,7 +298,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -239,7 +316,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -253,7 +334,17 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -267,7 +358,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -281,7 +376,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -294,7 +396,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -308,7 +414,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -322,7 +432,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        },
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -336,7 +453,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -349,7 +470,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -362,7 +490,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -376,7 +511,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -390,7 +529,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -404,7 +550,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -418,7 +571,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -431,7 +588,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -445,7 +609,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -464,7 +632,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -477,7 +652,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -490,7 +669,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -503,7 +689,17 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -517,7 +713,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -531,7 +734,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -545,7 +752,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -559,7 +770,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -572,7 +787,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -586,7 +808,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -599,7 +825,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -613,7 +846,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -633,7 +873,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -647,7 +894,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -660,7 +911,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -673,7 +931,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -687,7 +952,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -700,7 +969,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -714,7 +990,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -728,7 +1008,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -747,7 +1031,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -761,7 +1052,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -781,7 +1076,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -794,7 +1093,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -808,7 +1111,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -821,7 +1128,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -834,7 +1145,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -847,7 +1165,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -860,7 +1185,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -873,7 +1205,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -886,7 +1225,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -899,7 +1245,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -912,7 +1265,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA: edital cita 13.512/2026, mas a norma é a Lei 15.512, de 22/09/2026 (publ. DOU 23/09/2026), que altera Leis 6.938, 8.069 e 12.187. Página da Câmara aberta e conferida. URL provável no Planalto (não confirmada): https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15512.htm"
       ],
@@ -928,7 +1288,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -947,7 +1311,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -960,7 +1328,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -973,7 +1345,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -986,7 +1362,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -999,7 +1379,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1012,7 +1396,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1025,7 +1413,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1038,7 +1430,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1051,7 +1447,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1065,7 +1465,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1078,7 +1482,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1092,7 +1500,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1105,7 +1517,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1118,7 +1537,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1131,7 +1554,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1144,7 +1571,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1157,7 +1588,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1171,7 +1606,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1185,7 +1624,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1198,7 +1644,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1211,7 +1661,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": ["Conferir a norma indicada com o edital."],
       "fonte": {
         "adaptador": "planalto",
@@ -1224,7 +1678,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1237,7 +1695,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1250,7 +1712,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1263,7 +1729,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1276,7 +1746,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1289,7 +1766,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1302,7 +1786,11 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1315,7 +1803,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1328,7 +1823,14 @@
       "grupo": "Leis federais",
       "tipo": "Lei",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1341,7 +1843,11 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1355,7 +1861,11 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA de descrição: a Lei SP 14.187, de 19/07/2010, trata de penalidades administrativas por atos de discriminação racial (regulamentada pelo Decreto SP 56.153/2010), não de \"\"denúncias administrativas\"\" genéricas. Número/ano casam. Confirmado por resultado de busca (título/ementa/data conferidos no trecho); a abertura direta do domínio foi bloqueada no ambiente (ECONNRESET/403/404 espúrio)."
       ],
@@ -1371,7 +1881,14 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1384,7 +1901,11 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA de descrição: a Lei SP 11.199, de 12/07/2002, proíbe a discriminação de pessoas com HIV/AIDS (não \"\"denúncias administrativas\"\"). Número/ano casam. Possível troca na lista (idx 97 e 99 receberam o mesmo apelido). Confirmado por resultado de busca (título/ementa/data conferidos no trecho); a abertura direta do domínio foi bloqueada no ambiente (ECONNRESET/403/404 espúrio)."
       ],
@@ -1399,7 +1920,11 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1413,7 +1938,14 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1426,7 +1958,11 @@
       "grupo": "Leis estaduais",
       "tipo": "Lei",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1439,7 +1975,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1452,7 +1992,14 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1465,7 +2012,14 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1479,7 +2033,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1493,7 +2051,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1514,7 +2076,14 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1528,7 +2097,14 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1541,7 +2117,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1554,7 +2134,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1567,7 +2151,14 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "federal",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "planalto",
@@ -1580,7 +2171,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Outros"
+        }
+      ],
       "avisos": [
         "DIVERGÊNCIA de descrição: o Decreto SP 55.334, de 11/01/2010, autoriza a Secretaria da Habitação a firmar convênio com a CDHU para gestão de recursos de auxílio-moradia emergencial (famílias desabrigadas por chuvas em municípios em calamidade) - não é o decreto de \"\"locação social\"\" da Lei 10.365/1999. Número/ano casam. Confirmado por abertura direta da página."
       ],
@@ -1595,7 +2190,11 @@
       "grupo": "Decretos",
       "tipo": "Decreto",
       "esfera": "estadual",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Outros"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "html",
@@ -1610,7 +2209,11 @@
       "tipo": "Súmulas",
       "esfera": "federal",
       "especie": "sumulas",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "sumulas",
@@ -1626,7 +2229,11 @@
       "tipo": "Súmulas",
       "esfera": "federal",
       "especie": "sumulas",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
       "avisos": [
         "A Súmula Vinculante 30 está pendente de publicação no portal do STF e não consta da coleção."
       ],
@@ -1644,7 +2251,11 @@
       "tipo": "Súmulas",
       "esfera": "federal",
       "especie": "sumulas",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "sumulas",
@@ -1660,7 +2271,11 @@
       "tipo": "Súmulas",
       "esfera": "estadual",
       "especie": "sumulas",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
       "avisos": [
         "Lista oficial atualizada em 16/09/2025. Das súmulas revogadas (17, 67, 100 e 102) a lista oficial já não traz o enunciado."
       ],
@@ -1678,7 +2293,11 @@
       "tipo": "Súmulas",
       "esfera": "federal",
       "especie": "sumulas",
-      "vinculos": [],
+      "vinculos": [
+        {
+          "disciplina": "Outros"
+        }
+      ],
       "avisos": [],
       "fonte": {
         "adaptador": "sumulas",

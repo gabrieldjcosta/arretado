@@ -116,8 +116,6 @@ describe('Biblioteca › Acervo (3c)', () => {
       await screen.findByRole('heading', { name: 'Ainda não há súmulas no acervo' }),
     ).toBeInTheDocument();
     await usuario.click(screen.getByRole('link', { name: 'Teses' }));
-    expect(
-      await screen.findByRole('heading', { name: 'Ainda não há teses no acervo' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Nenhuma tese ainda' })).toBeInTheDocument();
   });
 });
