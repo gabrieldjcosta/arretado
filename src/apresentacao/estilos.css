@@ -1942,6 +1942,18 @@ dialog.dialogo-previa .linha-acoes button {
   width: 100%;
 }
 
+.revisao-salvo {
+  margin: 0.25rem 0 0;
+}
+
+.revisao-estrutura {
+  margin: 0.75rem 0;
+}
+
+.revisao-estrutura select {
+  max-width: 100%;
+}
+
 /* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
 
 .linha-lista {

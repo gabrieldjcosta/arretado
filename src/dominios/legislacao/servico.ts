@@ -158,11 +158,28 @@ export async function rascunhosPendentes(
   );
 }
 
+/** Marca do rascunho editado à mão, no fim de `VersaoDeNorma.versaoAdaptador` (até 50 caracteres). */
+export const MARCA_MANUAL = '+manual';
+export const editadoAMao = (versao: Pick<VersaoDeNorma, 'versaoAdaptador'>): boolean =>
+  versao.versaoAdaptador?.endsWith(MARCA_MANUAL) === true;
+
+/**
+ * Marca o rascunho como editado à mão (confirmação, correção, conversão, junção, divisão): a partir
+ * daí `retomarRascunho` não refaz a árvore pela fonte. Só dentro de uma transação.
+ */
+export async function marcarEditadoAMao(repo: Repositorio, versao: VersaoDeNorma): Promise<void> {
+  if (editadoAMao(versao)) return;
+  await repo.colecao('versoesNorma').atualizar(versao.id, {
+    versaoAdaptador: `${versao.versaoAdaptador ?? '0'}${MARCA_MANUAL}`.slice(-50),
+  });
+}
+
 /**
  * Reabre um rascunho: o relatório sai de novo da fonte guardada (o estruturador é determinístico).
  * Se o estruturador mudou desde a gravação (app atualizado), a árvore é refeita pela fonte, com os
- * ids de cada endereço mantidos: a confirmação e a correção da 10.1 se perdem aqui; a 10.4 passa a
- * preservar o que foi confirmado.
+ * ids de cada endereço mantidos, a não ser que o rascunho tenha edição à mão (`editadoAMao`:
+ * confirmação, correção, conversão, junção ou divisão): então a árvore gravada fica como está, e a
+ * fonte só refaz o relatório. Refazer a árvore pela fonte com a edição preservada é da 10.4.
  */
 export async function retomarRascunho(
   repo: Repositorio,
@@ -171,7 +188,9 @@ export async function retomarRascunho(
   const { norma, versao } = await rascunhoGravado(repo, versaoId);
   const blocos = await fonteDaVersao(repo, versao);
   const rascunho = estruturar(blocos, { formato: formatoDaOrigem(versao.origemEntrada) });
-  if (versao.versaoAdaptador === rascunho.versaoEstruturador) return { norma, versao, rascunho };
+  if (versao.versaoAdaptador === rascunho.versaoEstruturador || editadoAMao(versao)) {
+    return { norma, versao, rascunho };
+  }
   return repo.transacao(async () => {
     // Relido dentro da transação: outra aba pode ter publicado ou descartado no meio.
     await rascunhoGravado(repo, versaoId);

@@ -62,3 +62,64 @@ test('texto puro: revisar o "a confirmar", corrigir um artigo e confirmar em lot
   await semViolacoes(page);
   await publicar(page, 'Lei do teste');
 });
+
+test('editor: salva sozinho, divide, converte e junta linhas; a edição sobrevive ao recarregar (10.2)', async ({
+  page,
+}) => {
+  await page.goto('/#/biblioteca/importar');
+  await colarTextoPuro(page, LEI);
+  const revisao = page.getByRole('region', { name: 'Para confirmar' });
+  await expect(revisao).toBeVisible({ timeout: 30_000 });
+
+  // Salvamento automático: o indicador passa por "Digitando…" e volta a "Salvo", sem confirmar.
+  await revisao.getByRole('button', { name: 'Corrigir II', exact: true }).click();
+  let formulario = revisao.getByRole('form', { name: 'Corrigir II' });
+  const estado = formulario.getByRole('status');
+  await expect(estado).toHaveText('Salvo');
+  await formulario.getByLabel('Texto').fill('revisar tudo. estudar sempre.');
+  await expect(estado).toContainText('Digitando');
+  await expect(estado).toHaveText('Salvo');
+  await semViolacoes(page);
+
+  // Recarregar: o texto salvo sozinho está lá, e a linha continua "a confirmar".
+  await page.reload();
+  await expect(revisao.getByText('revisar tudo. estudar sempre.')).toBeVisible({ timeout: 30_000 });
+
+  // Dividir no cursor: a segunda parte é um inciso novo, numerado pelo sistema.
+  await revisao.getByRole('button', { name: 'Corrigir II', exact: true }).click();
+  formulario = revisao.getByRole('form', { name: 'Corrigir II' });
+  await formulario.getByLabel('Texto').evaluate((campo: HTMLTextAreaElement) => {
+    campo.focus();
+    campo.setSelectionRange(13, 13);
+  });
+  await formulario.getByRole('button', { name: 'Dividir no cursor' }).click();
+  await expect(revisao.getByRole('form')).toHaveCount(0);
+  await expect(revisao.getByText('estudar sempre.')).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Confirmar III' })).toBeVisible();
+
+  // Converter o inciso III em parágrafo: o número e o recuo são do sistema.
+  await revisao.getByRole('button', { name: 'Corrigir III', exact: true }).click();
+  formulario = revisao.getByRole('form', { name: 'Corrigir III' });
+  await formulario.getByLabel('Converter esta linha em…').selectOption({ label: 'Parágrafo' });
+  await semViolacoes(page);
+  await formulario.getByRole('button', { name: 'Converter', exact: true }).click();
+  await expect(revisao.getByRole('button', { name: 'Confirmar § 1º' })).toBeVisible();
+  await expect(revisao.getByRole('button', { name: 'Confirmar III' })).toHaveCount(0);
+
+  // Juntar o parágrafo com a linha de cima: some da lista, e o texto vai para o inciso II.
+  await revisao.getByRole('button', { name: 'Corrigir § 1º', exact: true }).click();
+  formulario = revisao.getByRole('form', { name: 'Corrigir § 1º' });
+  await formulario.getByRole('button', { name: 'Juntar com a linha de cima' }).click();
+  await expect(revisao.getByRole('button', { name: 'Confirmar § 1º' })).toHaveCount(0);
+  await expect(revisao.getByText(/revisar tudo\.\s*§ 1º estudar sempre\./)).toBeVisible();
+  await semViolacoes(page);
+
+  // A edição à mão sobrevive a recarregar, e o rascunho editado publica.
+  await page.reload();
+  await expect(revisao.getByText(/revisar tudo\.\s*§ 1º estudar sempre\./)).toBeVisible({
+    timeout: 30_000,
+  });
+  await revisao.getByRole('button', { name: /^Confirmar \d+ dispositivos$/ }).click();
+  await expect(page.getByRole('region', { name: 'Para confirmar' })).toHaveCount(0);
+  await publicar(page, 'Lei editada');
+});

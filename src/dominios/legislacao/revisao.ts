@@ -5,7 +5,7 @@
 import type { Dispositivo, TextoDeDispositivo } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { dispositivosDaNorma, todos } from './consultas';
-import { rascunhoGravado } from './servico';
+import { marcarEditadoAMao, rascunhoGravado } from './servico';
 
 /** Cabe no `TextoLongo` do modelo. */
 const MAX_TEXTO = 200_000;
@@ -107,7 +107,7 @@ export async function confirmarDispositivos(
   ids?: readonly string[],
 ): Promise<number> {
   return repo.transacao(async () => {
-    const { norma } = await rascunhoGravado(repo, versaoId);
+    const { norma, versao } = await rascunhoGravado(repo, versaoId);
     const pendentes = (
       await dispositivosDaNorma(repo.colecao('dispositivos'), norma.id, false)
     ).filter((d) => d.confianca === 'a_confirmar');
@@ -120,6 +120,7 @@ export async function confirmarDispositivos(
     });
     const porDispositivo = new Map(textos.map((t) => [t.dispositivoId, t]));
     for (const d of alvo) await confirmarUm(repo, d.id, porDispositivo.get(d.id));
+    if (alvo.length > 0) await marcarEditadoAMao(repo, versao);
     return alvo.length;
   });
 }
@@ -141,7 +142,8 @@ export class CorrecaoInvalida extends Error {
 /**
  * Corrige o texto (e o rótulo) de um dispositivo do rascunho e o confirma. O texto vira trechos
  * simples: quem corrige escolhe palavras, não formatação. Notas de vigência e redações anteriores
- * ficam como estão. O endereço não muda aqui (renumerar é da 10.2).
+ * ficam como estão. O endereço não muda aqui: o rótulo que muda o número é de `salvarTexto`
+ * (10.2), que reconstrói a árvore.
  */
 export async function corrigirDispositivo(
   repo: Repositorio,
@@ -161,7 +163,7 @@ export async function corrigirDispositivo(
     if (linha.trim() !== '') trechos.push({ texto: linha.trim() });
   });
   await repo.transacao(async () => {
-    const { norma } = await rascunhoGravado(repo, versaoId);
+    const { norma, versao } = await rascunhoGravado(repo, versaoId);
     const dispositivo = await repo.colecao('dispositivos').obter(dispositivoId);
     if (dispositivo?.normaId !== norma.id)
       throw new CorrecaoInvalida('Dispositivo não encontrado.');
@@ -172,5 +174,6 @@ export async function corrigirDispositivo(
     await repo.colecao('textosDispositivo').atualizar(atual.id, { trechos });
     if (rotulo) await repo.colecao('dispositivos').atualizar(dispositivoId, { rotulo });
     await confirmarUm(repo, dispositivoId, { ...atual, trechos });
+    await marcarEditadoAMao(repo, versao);
   });
 }
