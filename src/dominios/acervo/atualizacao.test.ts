@@ -75,15 +75,19 @@ describe('reancorar', () => {
   it('mantém quando o texto está onde estava', () => {
     expect(reancorar(ancora, 'Primeiro artigo com texto longo.')).toEqual({
       status: 'valida',
+      modo: 'exata',
       inicio: 20,
       fim: 31,
+      texto: 'texto longo',
     });
   });
   it('acha o trecho deslocado, na ocorrência mais perto', () => {
     expect(reancorar(ancora, 'Aviso. Primeiro artigo com texto longo; texto longo.')).toEqual({
       status: 'reancorada',
+      modo: 'exata',
       inicio: 27,
       fim: 38,
+      texto: 'texto longo',
     });
   });
   it('fica pendente sem o texto', () => {

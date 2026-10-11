@@ -319,7 +319,8 @@ async function aplicar(
     { origem: 'importacao' },
   );
 
-  // Grifos e notas da versão arquivada: voltam ao texto novo por texto; sem texto, pendentes.
+  // Grifos e notas da versão arquivada: voltam ao texto novo por texto (exato ou parecido); sem
+  // texto, pendentes.
   let reancoradas = 0;
   let marcacoesPendentes = 0;
   const marcacoes = await todos(repo.colecao('marcacoes'), {
@@ -344,7 +345,7 @@ async function aplicar(
     await repo.colecao('marcacoes').atualizar(m.id, {
       versaoId,
       status,
-      ancora: { texto: m.ancora.texto, inicio: r.inicio, fim: r.fim },
+      ancora: { texto: r.texto, inicio: r.inicio, fim: r.fim },
     });
   }
 
