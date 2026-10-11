@@ -12,6 +12,7 @@ import {
   type ResultadoDaConstrucao,
 } from './construir';
 import { construirItemSumulas } from './sumulas';
+import { construirItemTeses } from './teses';
 import { verificarAcervo, type ProblemaDoAcervo } from './verificar';
 import type { EntradaDoIndice, IndiceDoAcervo } from '../../src/dominios/acervo/esquemas';
 
@@ -66,7 +67,11 @@ interface Bruto {
 const dataCivil = (d: Date) => d.toISOString().slice(0, 10);
 
 async function lerBruto(pastas: Pastas, cur: ItemDaCuradoria): Promise<Bruto> {
-  if (cur.fonte.adaptador === 'markdown' || cur.fonte.adaptador === 'sumulas') {
+  if (
+    cur.fonte.adaptador === 'markdown' ||
+    cur.fonte.adaptador === 'sumulas' ||
+    cur.fonte.adaptador === 'teses'
+  ) {
     const caminho = join(pastas.fontes, cur.fonte.arquivo);
     return {
       bytes: await readFile(caminho),
@@ -114,16 +119,18 @@ export async function gerarItem(pastas: Pastas, cur: ItemDaCuradoria): Promise<I
   const construcao =
     cur.fonte.adaptador === 'sumulas'
       ? construirItemSumulas(cur, texto, bruto.coletadoEm, bruto.urlOficial)
-      : cur.semArtigos
-        ? construirItemSemArtigos(cur, texto, bruto.coletadoEm, bruto.urlOficial)
-        : construirItemArticulado(
-            cur,
-            cur.fonte.adaptador === 'planalto'
-              ? blocosDoPlanalto(bruto.bytes, cur.fonte.url)
-              : markdownParaBlocos(texto),
-            bruto.coletadoEm,
-            bruto.urlOficial,
-          );
+      : cur.fonte.adaptador === 'teses'
+        ? construirItemTeses(cur, texto, bruto.coletadoEm, bruto.urlOficial)
+        : cur.semArtigos
+          ? construirItemSemArtigos(cur, texto, bruto.coletadoEm, bruto.urlOficial)
+          : construirItemArticulado(
+              cur,
+              cur.fonte.adaptador === 'planalto'
+                ? blocosDoPlanalto(bruto.bytes, cur.fonte.url)
+                : markdownParaBlocos(texto),
+              bruto.coletadoEm,
+              bruto.urlOficial,
+            );
   if (!construcao.item) return { construcao };
   const corpo = JSON.stringify(construcao.item);
   const entrada = await entradaDoIndice(

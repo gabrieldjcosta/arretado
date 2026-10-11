@@ -38,8 +38,27 @@ export function analisarSumula(texto: string): string[] {
   return [];
 }
 
-/** Os endereços de artigo e os de súmula que o texto pode ser; o leitor procura o primeiro que a norma tem. */
+/** `t001`: o número da tese com três dígitos. */
+export const enderecoDeTese = (numero: number): string => `t${String(numero).padStart(3, '0')}`;
+
+/** "Tese 001". */
+export const rotuloDeTese = (numero: number): string => `Tese ${String(numero).padStart(3, '0')}`;
+
+const TESE = /^tese\.?\s*(?:n[o]?\.?\s*)?(\d{1,4})$/u;
+
+/** "tese 12" → `t012`. Vazio se o texto não é um número de tese. */
+export function analisarTese(texto: string): string[] {
+  const dobrado = dobrar(chaveDeCasamento(texto))
+    .replace(/\s+/gu, ' ')
+    .trim()
+    .replace(/[.;:]$/u, '');
+  const achado = TESE.exec(dobrado);
+  return achado ? [enderecoDeTese(Number(achado[1]))] : [];
+}
+
+/** Os endereços de artigo, de súmula e de tese que o texto pode ser; o leitor procura o primeiro que a norma tem. */
 export const possiveisEnderecos = (texto: string): string[] => [
   ...analisarEndereco(texto),
   ...analisarSumula(texto),
+  ...analisarTese(texto),
 ];
