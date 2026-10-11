@@ -249,3 +249,22 @@ export const Adesao = z.strictObject({
   receberAtualizacoes: z.boolean(),
 });
 export type Adesao = z.infer<typeof Adesao>;
+
+/**
+ * Pendência de releitura (esquema v5, Peça 6a do acervo): o que perdeu o endereço quando uma
+ * versão nova do acervo foi aplicada. Guarda o endereço antigo e o que apontava para ele; a
+ * estrela, o erro, o vínculo, o "lido até" e a posição são resolvidos pelo usuário relendo o trecho.
+ */
+export const PendenciaDeReleitura = z.strictObject({
+  ...camposComuns,
+  normaId: Id,
+  /** A versão que passou a ser a vigente e fez o endereço sumir. */
+  versaoId: Id,
+  tipo: z.enum(['estrela', 'erro', 'vinculo', 'lido_ate', 'posicao']),
+  enderecoAntigo: z.string().max(200),
+  rotulo: TextoCurto.optional(),
+  /** O registro que apontava para o endereço (estrela, erro, vínculo ou leitura). */
+  referenciaId: Id.optional(),
+  resolvidaEm: Instante.optional(),
+});
+export type PendenciaDeReleitura = z.infer<typeof PendenciaDeReleitura>;

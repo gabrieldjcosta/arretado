@@ -19,6 +19,9 @@ async function comVersao(bytes: Uint8Array, versaoEsquema: number): Promise<Uint
   delete a['dados/vinculosDisciplina.json'];
   Reflect.deleteProperty(m.arquivos, 'dados/vinculosDisciplina.json');
   Reflect.deleteProperty(m.contagens, 'vinculosDisciplina');
+  delete a['dados/pendenciasReleitura.json'];
+  Reflect.deleteProperty(m.arquivos, 'dados/pendenciasReleitura.json');
+  Reflect.deleteProperty(m.contagens, 'pendenciasReleitura');
   m.hashConjunto = await hashDoConjunto(m.arquivos);
   a['manifesto.json'] = strToU8(JSON.stringify(m));
   return zipSync(a);
