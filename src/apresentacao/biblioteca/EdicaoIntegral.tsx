@@ -12,6 +12,11 @@ interface Props {
   versaoId: string;
   /** Abre já com o texto na tela (norma escrita do zero, norma sem artigos). */
   abrirAoMontar?: boolean;
+  /**
+   * Muda a cada mudança no rascunho feita fora daqui (revisão por linha ou por bloco): sem edição
+   * pendente, o texto é relido; com edição pendente, salvar avisa que o rascunho mudou.
+   */
+  revisao: number;
   /** Depois de salvar: a tela refaz o relatório e a revisão. */
   aoMudar: () => Promise<void>;
   /** O rascunho sumiu (outra aba publicou ou descartou). */
@@ -35,7 +40,13 @@ function fraseDoResumo(r: ResumoIntegral): string {
  * dispositivo com o rótulo na frente. "Salvar e reorganizar" refaz a árvore preservando o que não
  * mudou (regras em `edicao-integral.ts`); se linhas já conferidas forem sair, pergunta antes.
  */
-export function EdicaoIntegral({ versaoId, abrirAoMontar, aoMudar, aoIndisponivel }: Props) {
+export function EdicaoIntegral({
+  versaoId,
+  abrirAoMontar,
+  revisao,
+  aoMudar,
+  aoIndisponivel,
+}: Props) {
   const repo = useRepositorio();
   const [aberto, setAberto] = useState(abrirAoMontar === true);
   const [base, setBase] = useState<string | null>(null);
@@ -45,6 +56,8 @@ export function EdicaoIntegral({ versaoId, abrirAoMontar, aoMudar, aoIndisponive
   const [resultado, setResultado] = useState<string | null>(null);
   const [aConfirmar, setAConfirmar] = useState<ResumoIntegral | null>(null);
   const trava = useRef(false);
+  // A revisão do rascunho cujo texto está na tela (−1: nenhum ainda).
+  const lidaNa = useRef(-1);
   const idTexto = useId();
   const idDica = useId();
   const indisponivel = useRef(aoIndisponivel);
@@ -53,16 +66,25 @@ export function EdicaoIntegral({ versaoId, abrirAoMontar, aoMudar, aoIndisponive
   });
 
   useEffect(() => {
-    if (!aberto || base !== null) return;
+    if (!aberto || lidaNa.current === revisao) return;
+    // Edição pendente não é trocada: o salvar confere a base e avisa.
+    if (base !== null && texto !== base) return;
+    lidaNa.current = revisao;
     let cancelado = false;
     lerTextoIntegral(repo, versaoId).then(
       (lido) => {
-        if (cancelado) return;
+        if (cancelado) {
+          lidaNa.current = -1;
+          return;
+        }
         setBase(lido);
         setTexto(lido);
       },
       (e: unknown) => {
-        if (cancelado) return;
+        if (cancelado) {
+          lidaNa.current = -1;
+          return;
+        }
         if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);
         else setFalha('Não foi possível abrir o texto. Recarregue a página e tente de novo.');
       },
@@ -70,7 +92,7 @@ export function EdicaoIntegral({ versaoId, abrirAoMontar, aoMudar, aoIndisponive
     return () => {
       cancelado = true;
     };
-  }, [aberto, base, repo, versaoId]);
+  }, [aberto, base, texto, revisao, repo, versaoId]);
 
   function falhou(e: unknown) {
     if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);

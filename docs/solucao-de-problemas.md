@@ -595,7 +595,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Publicação recusada: "dispositivo(s) a confirmar" ou "norma sem artigo"
 - **Sintoma:** `publicarVersao` lança `PublicacaoBloqueada` com motivo `a_confirmar` (texto puro: todo dispositivo fica "a confirmar") ou `conflitos` com `sem_artigos` ("Não consegui identificar artigos."). **Causa:** regra 12: publicar exige zero conflito, e o "a confirmar" pede o aceite em lote; uma norma sem nenhum artigo não tem o que ler (o estruturador já acusa o conflito, e a 9.3 o repete sobre a árvore gravada).
-- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; a inserção manual de norma sem artigo (súmula) é da 10.4. Na tela (9.5): "Não consegui identificar artigos neste texto." com "Colar novamente da página" (descarta o rascunho e volta à colagem) e "Guardar para editar depois" (o rascunho fica em Importações pendentes até o editor integral, 10.4); o "a confirmar" vira o botão "Aceitar N e publicar". **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`); "sem artigos…" e "só texto puro…" (`Importar.test.tsx`).
+- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; desde a 10.4, a norma sem artigo se resolve no editor integral ("Editar o texto inteiro") e a súmula se escreve do zero ("Escrever do zero" em Importar). Na tela (9.5): "Não consegui identificar artigos neste texto." com "Colar novamente da página" (descarta o rascunho e volta à colagem) e "Guardar para editar depois" (o rascunho fica em Importações pendentes; desde a 10.4, a mesma tela abre "Editar o texto inteiro"); o "a confirmar" vira o botão "Aceitar N e publicar". **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`); "sem artigos…" e "só texto puro…" (`Importar.test.tsx`).
 - **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (2ª parte); a decisão de o aceite não mudar a confiança e a de bloquear norma sem artigo são suposições a confirmar (`proxima-sessao.md`).
 
 ### Leitor mostra o texto de outra versão, ou de um rascunho
@@ -820,7 +820,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rascunho retomado depois de atualizar o app: relatório e árvore não batem
 - **Sintoma:** o sumário do rascunho (anomalias, descartes) fala de dispositivos que a árvore gravada não tem, ou o contrário. **Causa:** o relatório não é gravado: sai de novo da fonte ao retomar, e o estruturador pode ter mudado desde a gravação (cada merge publica).
-- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: com edição à mão (marca `+manual`, 10.2) a árvore não é refeita (ver "Editor de linhas (10.2)"); preservar o confirmado ao refazer pela fonte é da 10.4. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
+- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: com edição à mão (marca `+manual`, 10.2) a árvore não é refeita (ver "Editor de linhas (10.2)"); a 10.4 decidiu não refazer pela fonte por cima da edição: a reorganização preservando o confirmado é a edição integral, que parte da árvore gravada. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026; a guarda de outra versão veio da revisão adversarial); a parte do editor, previsto — atividade 10.4.
 
 ### Backup anterior importado por mesclagem cria uma segunda árvore do rascunho
@@ -1113,7 +1113,7 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Previsível na 12.2:** `wrangler` não está instalado no repositório; o dry-run e a publicação exigem rede. O Workers Builds passa a publicar o Worker com `main` quando o `main` receber este merge.
 
 ## Revisão do rascunho (10.1, 11/10/2026)
-- **Correção some ao atualizar o app:** `retomarRascunho` refaz a árvore pela fonte quando a versão do estruturador muda, e isso desfaz confirmações e correções do rascunho (mantém só os ids por endereço). Preservar o confirmado é da 10.4; até lá, confirmar e publicar na mesma sessão de uso.
+- **Correção some ao atualizar o app:** `retomarRascunho` refaz a árvore pela fonte quando a versão do estruturador muda, e isso desfaz confirmações e correções do rascunho (mantém só os ids por endereço). Desde a 10.2, rascunho com edição à mão (`+manual`) não é refeito; a 10.4 decidiu que a fonte nunca é reprocessada por cima da edição (ver "Edição integral (10.4)").
 - **Efeito colateral no lint:** guardar a função da tela numa ref durante o render (`ref.current = fn`) dá "Cannot access refs during render" (react-hooks/refs); atualizar a ref num `useEffect` sem dependências. Sem isso, a função nova a cada render entrava nas dependências do `useCallback` e a lista recarregava sem parar.
 - **Previsível na 10.2:** `corrigirDispositivo` só troca texto e rótulo; o endereço não muda. Converter linha e renumerar (10.2) mexem em endereço e `paiId`: refazer a validação estrutural depois de cada conversão (`verificarPublicacao`).
 
@@ -1131,7 +1131,7 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 
 ### A correção ou a conversão sumiu depois de atualizar o app
 - **Sintoma:** depois de o estruturador mudar (app atualizado), o rascunho voltava como a fonte o estruturava e perdia confirmações, correções e conversões. **Causa:** `retomarRascunho` refaz a árvore pela fonte quando `versaoAdaptador` ≠ `VERSAO_ESTRUTURADOR`. **Solução:** toda edição à mão (confirmar, corrigir, converter, juntar, dividir, salvar sozinho) grava `+manual` no fim de `versaoAdaptador`, e `retomarRascunho` só refaz o relatório quando há a marca. Rascunho editado antes da 10.2 (só confirmações da 10.1, sem marca) continua sendo refeito ao mudar o estruturador. **Prevenção:** "retomar depois de o estruturador mudar não refaz a árvore editada" e "confirmar e corrigir da 10.1 também ficam" (`edicao.test.ts`).
-- **Limite conhecido:** o sumário "Estrutura encontrada", os avisos do estruturador e o "Ficou de fora" vêm da fonte e não acompanham a edição; conflitos e a contagem "a confirmar" vêm da árvore gravada. Para ver a estrutura nova, abrir a norma depois de publicar. A 10.4 (edição integral) decide se o sumário passa a ser calculado sobre a árvore gravada.
+- **Limite conhecido:** o sumário "Estrutura encontrada", os avisos do estruturador e o "Ficou de fora" vêm da fonte e não acompanham a edição; conflitos e a contagem "a confirmar" vêm da árvore gravada. Para ver a estrutura nova, abrir a norma depois de publicar. A 10.4 não mudou isso (decisão pendente do Gabriel); na norma escrita do zero o sumário mostra "Artigo 1" (o artigo vazio de partida), e a contagem "N dispositivos no total" é a da árvore gravada.
 - **Origem:** previsto na 10.1 (resumo), tratado em 11/10/2026.
 
 ### "Dividir no cursor" não faz nada ou recusa
@@ -1143,7 +1143,30 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 - **Origem:** previsto na 10.2.
 
 ### Prevista para a 10.4
-- A 10.3 (correção por bloco) não passa texto pelo estruturador: troca texto literal e converte tipos linha a linha. Corrigir um bloco **colando texto novo** (re-estruturar um intervalo) ficou para a 10.4. A 10.4 (edição integral) precisa preservar o confirmado ao refazer pela fonte: o ponto de partida é a marca `+manual` e o mapa endereço → id de `registrosDaArvore` (`anteriores`).
+- A 10.3 (correção por bloco) não passa texto pelo estruturador: troca texto literal e converte tipos linha a linha. Corrigir um bloco **colando texto novo** ficou para a 10.4. **Resolvido na 10.4:** a edição integral aceita colar um trecho novo no texto; ela parte da árvore gravada (com a edição), não da fonte. Ver "Edição integral (10.4)".
+
+## Edição integral (10.4, 11/10/2026)
+
+Regra de preservação: topo de `src/dominios/legislacao/edicao-integral.ts` e `planos/F2.md` › "Fatos da edição integral (10.4)".
+
+### "O rascunho mudou desde que o texto foi aberto"
+- **Sintoma:** ao salvar o texto inteiro, a mensagem e nada gravado. **Causa:** entre abrir o texto e salvar, o rascunho mudou (outra aba, ou a correção por linha na mesma tela); a comparação linha a linha seria feita contra um texto que a pessoa não viu, e uma linha mudada fora sairia como "apagada". **Solução:** copiar o que escreveu, fechar e abrir "Editar o texto inteiro" de novo e refazer a mudança. **Prevenção:** "o rascunho que mudou em outra aba não é sobrescrito" (`edicao-integral.test.ts`).
+- **Origem:** previsto na 10.4.
+
+### A linha mudada voltou a "a confirmar" / o confirmado sumiu
+- **Sintoma:** depois de salvar, uma linha que estava conferida pede conferência de novo, ou some. **Causa:** texto ou tipo mudados voltam a "a confirmar" de propósito (regra 4); só número e lugar mudados mantêm a confiança. Linha apagada do texto tira o dispositivo (a tela avisa antes, com quantos estavam conferidos: "Salvar mesmo assim"). **Solução:** desfazer com "Desfazer o que não salvei" antes de salvar; depois de salvo, reescrever a linha e confirmar. Notas de vigência e redações anteriores não aparecem no texto, mas seguem com a linha (também quando ela muda). **Prevenção:** testes de `edicao-integral.test.ts` e `edicao-integral-corpus.test.ts` (LEP, CP e CF: salvar sem mudar não regrava nenhum registro; uma linha mudada muda um dispositivo só).
+- **Origem:** previsto na 10.4.
+
+### Número repetido depois de salvar o texto inteiro
+- **Sintoma:** "Ainda não dá para publicar" com endereço repetido. **Causa:** o número vem do rótulo escrito, e o sistema não renumera o que ninguém tocou (regra 5); um artigo novo com o número de outro fica repetido em vez de se fundir com ele (fundir apagaria um dos dois). **Solução:** corrigir o rótulo de um deles no texto ou na revisão. **Prevenção:** "número repetido não se funde: vira conflito para corrigir".
+- **Origem:** previsto na 10.4.
+
+### Linha que vira rubrica, continuação ou artigo sem querer
+- **Sintoma:** depois de salvar, uma linha digitada sem rótulo aparece como rubrica (nome do artigo) ou grudada no texto de cima. **Causa:** linha nova sem rótulo é lida como o estruturador lê: logo depois de CAPÍTULO/SEÇÃO, é o nome dele; curta, sem ponto final e antes de "Art."/"§"/inciso, é rubrica; senão, continua o texto de cima ("Pena - …"). Texto antes de qualquer rótulo vira artigo numerado pelo sistema. Dentro de anexo, toda linha é texto do anexo. **Solução:** pôr o rótulo na frente ("Art. 7º", "§ 1º", "I -"), ou usar o editor de linha (converter, juntar, dividir).
+- **Origem:** previsto na 10.4.
+
+### Texto grande demora a salvar
+- **Previsível:** a CF (3,5 mil dispositivos, cerca de 1 MB de texto) passa inteira pela comparação e pela reconstrução; no teste, poucos segundos (`edicao-integral-corpus.test.ts`, limite 60 s). No celular, se ficar lento, editar por bloco ou por linha.
 
 ## Correção por bloco (10.3, 11/10/2026)
 

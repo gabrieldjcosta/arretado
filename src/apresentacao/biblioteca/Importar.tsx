@@ -119,6 +119,8 @@ export function Importar() {
   const [tituloNovo, setTituloNovo] = useState('');
   // Muda depois de salvar o texto inteiro: a revisão é remontada com a árvore nova.
   const [geracao, setGeracao] = useState(0);
+  // Muda a cada mudança no rascunho (revisão ou texto inteiro): o texto inteiro se relê.
+  const [mudancas, setMudancas] = useState(0);
   const [ocupado, setOcupado] = useState(false);
   const [descartando, setDescartando] = useState(false);
   const [falhaDescarte, setFalhaDescarte] = useState<string | null>(null);
@@ -265,6 +267,7 @@ export function Importar() {
   /** Depois de confirmar ou corrigir: o relatório (contagem, conflitos, avisos) sai de novo. */
   async function atualizarRelatorio(importacao: Importacao, escrever?: boolean) {
     const relatorio = await verificarPublicacao(repo, importacao.versao.id);
+    setMudancas((m) => m + 1);
     setFase({ tipo: 'sumario', importacao: { ...importacao, relatorio }, escrever });
   }
 
@@ -549,6 +552,7 @@ export function Importar() {
             </div>
             <EdicaoIntegral
               versaoId={importacao.versao.id}
+              revisao={mudancas}
               aoMudar={() => depoisDoTextoInteiro(importacao)}
               aoIndisponivel={(mensagem) => {
                 setFase({ tipo: 'indisponivel', mensagem });
@@ -633,6 +637,7 @@ export function Importar() {
           />
           <EdicaoIntegral
             versaoId={importacao.versao.id}
+            revisao={mudancas}
             abrirAoMontar={fase.escrever === true}
             aoMudar={() => depoisDoTextoInteiro(importacao)}
             aoIndisponivel={(mensagem) => {
