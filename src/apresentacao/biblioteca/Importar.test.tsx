@@ -99,7 +99,9 @@ describe('Importar por colagem (9.5)', () => {
 
     await sumario();
     expect(screen.queryByText(/parece a compilada/)).not.toBeInTheDocument();
-    expect(screen.getByText('6 dispositivos a confirmar')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Para confirmar' })).toHaveTextContent(
+      '6 dispositivos',
+    );
     await usuario.click(screen.getByRole('button', { name: 'Aceitar 6 e publicar' }));
 
     expect(await screen.findByText('Lei nº 7.210/1984 publicada.')).toHaveAttribute(
