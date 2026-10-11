@@ -60,6 +60,7 @@ export const NoDoItem = z.strictObject({
   pai: Dispositivo.shape.endereco.optional(),
   trechos: TextoDeDispositivo.shape.trechos,
   notasVigencia: TextoDeDispositivo.shape.notasVigencia,
+  procedencia: TextoDeDispositivo.shape.procedencia,
   redacoesAnteriores: TextoDeDispositivo.shape.redacoesAnteriores,
 });
 export type NoDoItem = z.infer<typeof NoDoItem>;

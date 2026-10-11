@@ -2322,7 +2322,18 @@ function Dispositivo({
     ...(nome?.texto?.redacoesAnteriores ?? []),
     ...(texto?.redacoesAnteriores ?? []),
   ];
-  const notas = texto?.notasVigencia ?? [];
+  const origem = texto?.procedencia;
+  const notas = [
+    ...(texto?.notasVigencia ?? []),
+    ...(origem === undefined
+      ? []
+      : [
+          {
+            texto: origem.data ? `${origem.rotulo} · ${origem.data}` : origem.rotulo,
+            ...(origem.link ? { link: origem.link } : {}),
+          },
+        ]),
+  ];
   const alternarEste = () => {
     alternar(dispositivo.id);
   };

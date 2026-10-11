@@ -150,6 +150,7 @@ export async function aderirAoItem(
           normaId,
           trechos: no.trechos,
           ...(no.notasVigencia === undefined ? {} : { notasVigencia: no.notasVigencia }),
+          ...(no.procedencia === undefined ? {} : { procedencia: no.procedencia }),
           ...(no.redacoesAnteriores === undefined
             ? {}
             : { redacoesAnteriores: no.redacoesAnteriores }),

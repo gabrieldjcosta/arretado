@@ -22,6 +22,7 @@ const TIPO: Record<TipoDispositivo, readonly [string, string]> = {
   alinea: ['Alínea', 'Alíneas'],
   item: ['Item', 'Itens'],
   sumula: ['Súmula', 'Súmulas'],
+  tese: ['Tese', 'Teses'],
   anexo: ['Anexo', 'Anexos'],
 };
 
