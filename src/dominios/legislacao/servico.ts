@@ -179,7 +179,9 @@ export async function marcarEditadoAMao(repo: Repositorio, versao: VersaoDeNorma
  * Se o estruturador mudou desde a gravação (app atualizado), a árvore é refeita pela fonte, com os
  * ids de cada endereço mantidos, a não ser que o rascunho tenha edição à mão (`editadoAMao`:
  * confirmação, correção, conversão, junção ou divisão): então a árvore gravada fica como está, e a
- * fonte só refaz o relatório. Refazer a árvore pela fonte com a edição preservada é da 10.4.
+ * fonte só refaz o relatório. A fonte nunca é reprocessada por cima da edição (decidido na 10.4):
+ * quem quer reorganizar o rascunho editado usa a edição integral, que parte da árvore gravada
+ * (`salvarTextoIntegral`, em `edicao.ts`).
  */
 export async function retomarRascunho(
   repo: Repositorio,

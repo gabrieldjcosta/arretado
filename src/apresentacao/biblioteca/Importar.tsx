@@ -7,6 +7,7 @@ import {
   textoParaBlocos,
   type Bloco,
 } from '../../core/seguranca/sanitizador';
+import { EdicaoInvalida, escreverNorma } from '../../dominios/legislacao/edicao';
 import type { Rascunho } from '../../dominios/legislacao/rascunho';
 import {
   criarRascunho,
@@ -22,6 +23,7 @@ import {
 import { sumarioDoRascunho, type SumarioDoRascunho } from '../../dominios/legislacao/sumario';
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
+import { EdicaoIntegral } from './EdicaoIntegral';
 import { RevisaoDoRascunho } from './RevisaoDoRascunho';
 import { fraseDescarte, rotuloTipo } from './rotulos';
 
@@ -37,7 +39,8 @@ type Fase =
   | { tipo: 'colar' }
   | { tipo: 'processando'; etapa: string; passo: number; passos: number }
   | { tipo: 'repetida'; norma: Norma; versao: VersaoDeNorma }
-  | { tipo: 'sumario'; importacao: Importacao }
+  /** `escrever`: norma escrita do zero, com o texto inteiro já aberto. */
+  | { tipo: 'sumario'; importacao: Importacao; escrever?: boolean }
   | { tipo: 'indisponivel'; mensagem: string };
 
 const ABRINDO: Fase = {
@@ -113,6 +116,11 @@ export function Importar() {
   const [falha, setFalha] = useState<string | null>(null);
   const [digitado, setDigitado] = useState('');
   const [titulo, setTitulo] = useState('');
+  const [tituloNovo, setTituloNovo] = useState('');
+  // Muda depois de salvar o texto inteiro: a revisão é remontada com a árvore nova.
+  const [geracao, setGeracao] = useState(0);
+  // Muda a cada mudança no rascunho (revisão ou texto inteiro): o texto inteiro se relê.
+  const [mudancas, setMudancas] = useState(0);
   const [ocupado, setOcupado] = useState(false);
   const [descartando, setDescartando] = useState(false);
   const [falhaDescarte, setFalhaDescarte] = useState<string | null>(null);
@@ -156,11 +164,35 @@ export function Importar() {
     };
   }, [repo, versaoId]);
 
-  function mostrar(importacao: Importacao) {
+  function mostrar(importacao: Importacao, escrever = false) {
     exibida.current = importacao.versao.id;
     setTitulo(importacao.norma.tituloCurto);
     setFalha(null);
-    setFase({ tipo: 'sumario', importacao });
+    setFase({ tipo: 'sumario', importacao, escrever });
+  }
+
+  /** Inserção manual (10.4): súmula, enunciado ou norma pequena, a partir de um artigo vazio. */
+  async function escrever(e: SubmitEvent) {
+    e.preventDefault();
+    if (trava.current || tituloNovo.trim() === '') return;
+    trava.current = true;
+    setFalha(null);
+    try {
+      const { versaoId: novaId } = await escreverNorma(repo, tituloNovo);
+      const retomado = await retomarRascunho(repo, novaId);
+      const relatorio = await verificarPublicacao(repo, novaId);
+      setTituloNovo('');
+      mostrar(importacaoDe(retomado, relatorio), true);
+      void navegar(`/biblioteca/importar/${novaId}`, { replace: true });
+    } catch (excecao) {
+      setFalha(
+        excecao instanceof EdicaoInvalida
+          ? excecao.message
+          : 'Não foi possível começar a norma. Tente de novo; se continuar, relate o problema.',
+      );
+    } finally {
+      trava.current = false;
+    }
   }
 
   async function importar(html: string, texto: string) {
@@ -233,9 +265,16 @@ export function Importar() {
   }
 
   /** Depois de confirmar ou corrigir: o relatório (contagem, conflitos, avisos) sai de novo. */
-  async function atualizarRelatorio(importacao: Importacao) {
+  async function atualizarRelatorio(importacao: Importacao, escrever?: boolean) {
     const relatorio = await verificarPublicacao(repo, importacao.versao.id);
-    setFase({ tipo: 'sumario', importacao: { ...importacao, relatorio } });
+    setMudancas((m) => m + 1);
+    setFase({ tipo: 'sumario', importacao: { ...importacao, relatorio }, escrever });
+  }
+
+  /** Depois de salvar o texto inteiro: relatório novo e revisão remontada. */
+  async function depoisDoTextoInteiro(importacao: Importacao) {
+    setGeracao((g) => g + 1);
+    await atualizarRelatorio(importacao, true);
   }
 
   async function publicar(e: SubmitEvent, importacao: Importacao) {
@@ -362,6 +401,33 @@ export function Importar() {
             )}
             {voltar}
           </div>
+          <section aria-labelledby="importar-escrever">
+            <h2 id="importar-escrever">Escrever do zero</h2>
+            <p className="dica">
+              Para súmula, enunciado ou norma pequena: comece de um artigo vazio e escreva o texto.
+            </p>
+            <form onSubmit={(e) => void escrever(e)}>
+              <div className="campo">
+                <label htmlFor="importar-escrever-titulo">Título curto</label>
+                <input
+                  id="importar-escrever-titulo"
+                  type="text"
+                  required
+                  maxLength={500}
+                  autoComplete="off"
+                  value={tituloNovo}
+                  onChange={(e) => {
+                    setTituloNovo(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="linha-acoes">
+                <button type="submit" disabled={tituloNovo.trim() === ''}>
+                  Começar a escrever
+                </button>
+              </div>
+            </form>
+          </section>
         </>
       );
 
@@ -484,9 +550,16 @@ export function Importar() {
                 Guardar para editar depois
               </Link>
             </div>
+            <EdicaoIntegral
+              versaoId={importacao.versao.id}
+              revisao={mudancas}
+              aoMudar={() => depoisDoTextoInteiro(importacao)}
+              aoIndisponivel={(mensagem) => {
+                setFase({ tipo: 'indisponivel', mensagem });
+              }}
+            />
             <p className="dica">
-              Editar o texto integralmente chega numa próxima atualização; até lá, o rascunho fica
-              em Importações pendentes, na Biblioteca.
+              Guardado, o rascunho fica em Importações pendentes, na Biblioteca.
             </p>
           </>
         );
@@ -554,9 +627,19 @@ export function Importar() {
             </section>
           )}
           <RevisaoDoRascunho
+            key={geracao}
             versaoId={importacao.versao.id}
             aConfirmar={relatorio.aConfirmar}
             aoMudar={() => atualizarRelatorio(importacao)}
+            aoIndisponivel={(mensagem) => {
+              setFase({ tipo: 'indisponivel', mensagem });
+            }}
+          />
+          <EdicaoIntegral
+            versaoId={importacao.versao.id}
+            revisao={mudancas}
+            abrirAoMontar={fase.escrever === true}
+            aoMudar={() => depoisDoTextoInteiro(importacao)}
             aoIndisponivel={(mensagem) => {
               setFase({ tipo: 'indisponivel', mensagem });
             }}

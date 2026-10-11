@@ -6,6 +6,7 @@
 // `versaoAdaptador`) e `retomarRascunho` deixa de refazer a árvore pela fonte: a edição sobrevive.
 import type { Dispositivo, TextoDeDispositivo } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import { textoParaBlocos } from '../../core/seguranca/sanitizador';
 import { dispositivosDaNorma, todos } from './consultas';
 import {
   converterNaLista,
@@ -20,9 +21,11 @@ import {
   type DispositivoDeSaida,
   type LinhaDeEdicao,
 } from './edicao-arvore';
-import { marcarEditadoAMao, rascunhoGravado } from './servico';
+import { juntarTexto, reorganizar, textoIntegral, type ResumoIntegral } from './edicao-integral';
+import { criarRascunho, marcarEditadoAMao, rascunhoGravado } from './servico';
 
 export { EdicaoInvalida, OPCOES_DE_CONVERSAO, type ConverterEm } from './edicao-arvore';
+export type { ResumoIntegral } from './edicao-integral';
 
 type Estado = {
   linhas: LinhaDeEdicao[];
@@ -233,4 +236,87 @@ export async function salvarTexto(
     }
     return linhas;
   });
+}
+
+// ── Edição integral (10.4) ──────────────────────────────────────────────────
+
+/** O texto integral do rascunho (uma linha por dispositivo, com o rótulo na frente). */
+export async function lerTextoIntegral(repo: Repositorio, versaoId: string): Promise<string> {
+  return repo.transacao(async () => {
+    const { norma } = await rascunhoGravado(repo, versaoId);
+    const { linhas } = await lerEstado(repo, norma.id, versaoId);
+    return juntarTexto(textoIntegral(linhas));
+  });
+}
+
+export interface OpcoesTextoIntegral {
+  /**
+   * O texto de partida (o que `lerTextoIntegral` deu quando a edição abriu). Se o rascunho mudou
+   * desde então (outra aba), nada é gravado: a comparação seria com um texto que a pessoa não viu.
+   */
+  base: string;
+  /** Só calcula o resumo, sem gravar (a tela avisa antes de tirar o que já foi conferido). */
+  simular?: boolean;
+}
+
+export const MENSAGEM_TEXTO_MUDOU =
+  'O rascunho mudou desde que o texto foi aberto (outra aba?). Copie o que escreveu, abra o texto de novo e refaça a mudança.';
+
+/**
+ * Salva o texto integral: reorganiza em dispositivos preservando o que não mudou (regras em
+ * `edicao-integral.ts`), reconstrói a árvore e grava só a diferença, numa transação. Devolve o
+ * resumo do que ficou, mudou, entrou e saiu.
+ */
+export async function salvarTextoIntegral(
+  repo: Repositorio,
+  versaoId: string,
+  texto: string,
+  opcoes: OpcoesTextoIntegral,
+): Promise<ResumoIntegral> {
+  let resumo: ResumoIntegral | undefined;
+  const operar = (linhas: LinhaDeEdicao[]) => {
+    if (juntarTexto(textoIntegral(linhas)) !== opcoes.base) {
+      throw new EdicaoInvalida(MENSAGEM_TEXTO_MUDOU);
+    }
+    const reorganizado = reorganizar(linhas, texto, repo.ctx.novoId);
+    resumo = reorganizado.resumo;
+    return reorganizado.linhas;
+  };
+  if (opcoes.simular) {
+    await repo.transacao(async () => {
+      const { norma } = await rascunhoGravado(repo, versaoId);
+      operar((await lerEstado(repo, norma.id, versaoId)).linhas);
+    });
+  } else {
+    await aplicar(repo, versaoId, operar);
+  }
+  if (!resumo) throw new EdicaoInvalida('Nada a salvar.');
+  return resumo;
+}
+
+/** O texto de partida da norma escrita do zero: um artigo vazio. */
+export const TEXTO_DO_ARTIGO_VAZIO = 'Art. 1º';
+
+/**
+ * Inserção manual (Parte 2 §10.6: súmula, enunciado, norma pequena): um rascunho com um artigo
+ * vazio, para ser escrito no editor integral. Entra como texto puro (tudo "a confirmar") e já
+ * marcado como editado à mão, para a árvore nunca ser refeita pela fonte.
+ */
+export async function escreverNorma(
+  repo: Repositorio,
+  tituloCurto: string,
+): Promise<{ normaId: string; versaoId: string }> {
+  const titulo = tituloCurto.trim();
+  if (titulo === '') throw new EdicaoInvalida('Dê um título curto à norma.');
+  if (titulo.length > 500) throw new EdicaoInvalida('O título passou do limite.');
+  const criado = await criarRascunho(repo, {
+    blocos: textoParaBlocos(TEXTO_DO_ARTIGO_VAZIO),
+    origemEntrada: 'texto',
+    tituloCurto: titulo,
+  });
+  await repo.transacao(async () => {
+    const { versao } = await rascunhoGravado(repo, criado.versao.id);
+    await marcarEditadoAMao(repo, versao);
+  });
+  return { normaId: criado.norma.id, versaoId: criado.versao.id };
 }
