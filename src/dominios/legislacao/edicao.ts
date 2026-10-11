@@ -21,12 +21,7 @@ import {
   type DispositivoDeSaida,
   type LinhaDeEdicao,
 } from './edicao-arvore';
-import {
-  juntarTexto,
-  reorganizar,
-  textoIntegral,
-  type ResumoIntegral,
-} from './edicao-integral';
+import { juntarTexto, reorganizar, textoIntegral, type ResumoIntegral } from './edicao-integral';
 import { criarRascunho, marcarEditadoAMao, rascunhoGravado } from './servico';
 
 export { EdicaoInvalida, OPCOES_DE_CONVERSAO, type ConverterEm } from './edicao-arvore';

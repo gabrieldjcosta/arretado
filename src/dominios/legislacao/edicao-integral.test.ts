@@ -216,7 +216,12 @@ describe('texto integral (10.4)', () => {
     await confirmarDispositivos(repo, versaoId);
     const antes = await ler(repo, normaId, versaoId);
     // O art. 1º (com o parágrafo) vai para depois do art. 2º.
-    await editar(repo, versaoId, (l) => [l[0], l[1], ...l.slice(4, 7), l[2], l[3], ...l.slice(7)]);
+    await editar(repo, versaoId, (l) => [
+      ...l.slice(0, 2),
+      ...l.slice(4, 7),
+      ...l.slice(2, 4),
+      ...l.slice(7),
+    ]);
     const depois = await ler(repo, normaId, versaoId);
     expect(depois).toHaveLength(antes.length);
     for (const a of antes) {
