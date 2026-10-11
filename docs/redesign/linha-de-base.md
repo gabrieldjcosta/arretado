@@ -6,3 +6,5 @@
 - [ ] Dias com revisão nos últimos 14 (contar em `revisoes`): ___
 - [ ] Nota 1–5 de concentração da semana: ___
 - [ ] Capturas de Recall, Biblioteca e leitor, claro e escuro (antes: `git stash`/commit anterior à fatia 1; depois: este branch).
+
+**Marco no meio da medição do portão da F1:** em 11/10/2026 o drill do Recall passou a ter a frente centralizada e grande, "Sair" e contador no topo e "Frase correta" em callout (fatia 6, 6.5). Medidas de revisão antes e depois desse dia não são comparáveis sem esta nota.
