@@ -13,6 +13,7 @@ import {
 } from '../../dominios/recall/servico';
 import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESPOSTA } from './rotulos';
 
@@ -217,16 +218,23 @@ export function Drill() {
   }
 
   if (!atual) return null;
+  const restam = estado.fila.length - estado.indice - 1;
+  const ICONE = { errei: '✕', dificil: '~', facil: '✓' } as const;
   return (
     <>
       <h1 className="visualmente-oculto">Revisar</h1>
-      <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Cartão" />
+      <div className="topo-drill">
+        <Link to="/recall" className="botao discreto">
+          Sair
+        </Link>
+        <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Cartão" />
+      </div>
       <article className="cartao-bloco cartao-drill" aria-label="Cartão">
-        <p className="texto-leitura">{atual.frente}</p>
+        <p className="drill-frente texto-leitura">{atual.frente}</p>
         {estado.virado && (
-          <>
-            <hr />
-            <p className="texto-leitura" aria-live="polite">
+          <div className="frase-correta" aria-live="polite">
+            <p className="frase-correta-titulo">{atual.erroId ? 'Frase correta' : 'Resposta'}</p>
+            <p className="texto-leitura">
               {verso?.id !== atual.id ? (
                 <span className="dica">Carregando…</span>
               ) : verso.texto ? (
@@ -235,7 +243,7 @@ export function Drill() {
                 <span className="dica">(sem verso — edite o cartão para completar)</span>
               )}
             </p>
-          </>
+          </div>
         )}
       </article>
       {falha && (
@@ -244,27 +252,35 @@ export function Drill() {
         </p>
       )}
       {!estado.virado ? (
-        <div className="linha-acoes">
+        <div className="linha-acoes acoes-drill">
           <button ref={botaoVirar} type="button" className="principal grande" onClick={virar}>
             Mostrar resposta
           </button>
         </div>
       ) : (
-        <div className="linha-acoes respostas" role="group" aria-label="Como foi?">
+        <div className="linha-acoes acoes-drill respostas" role="group" aria-label="Como foi?">
           {(['errei', 'dificil', 'facil'] as const).map((r, i) => (
             <button
               key={r}
               type="button"
-              className="grande"
+              className={`grande resposta-${r}`}
               disabled={ocupado}
               aria-keyshortcuts={String(i + 1)}
               onClick={() => void responder(r)}
             >
+              <span aria-hidden="true">{ICONE[r]} </span>
               {ROTULO_RESPOSTA[r]}
             </button>
           ))}
         </div>
       )}
+      <LinhaDepois>
+        {!estado.virado
+          ? 'você diz como foi'
+          : restam > 0
+            ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
+            : 'o fim desta rodada'}
+      </LinhaDepois>
       <details className="menu-drill">
         <summary className="botao discreto">Mais opções</summary>
         <div className="linha-acoes">
