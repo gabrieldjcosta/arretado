@@ -381,3 +381,41 @@ describe('Para confirmar: salvamento que falha (revisão das etapas 8, 9 e 11)',
     ).toHaveValue('x'.repeat(501));
   });
 });
+
+describe('Importar por endereço (12.3)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('busca pelo Worker, grava origem url e a URL final; falha mantém o colar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const usuario = await abrir(repo);
+    const corpo = new TextEncoder().encode(LEP_HTML);
+    const respostas = [
+      new Response(JSON.stringify({ erro: 'tempo_esgotado' }), { status: 504 }),
+      new Response(corpo, { headers: { 'X-Url-Final': 'https://www.planalto.gov.br/l7210.htm' } }),
+    ];
+    const buscar = vi.fn((url: string) =>
+      Promise.resolve(url ? (respostas.shift() as Response) : new Response()),
+    );
+    vi.stubGlobal('fetch', buscar);
+
+    await usuario.type(
+      screen.getByLabelText('Ou busque pelo endereço da página'),
+      'https://www.planalto.gov.br/l7210.htm',
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('demorou demais');
+    expect(screen.getByLabelText('Cole aqui a lei')).toBeVisible();
+
+    await usuario.click(screen.getByRole('button', { name: 'Buscar' }));
+    await sumario();
+    expect(buscar).toHaveBeenCalledTimes(2);
+    expect(buscar.mock.calls[0]?.[0]).toBe(
+      '/api/buscar-norma?url=https%3A%2F%2Fwww.planalto.gov.br%2Fl7210.htm',
+    );
+    const [pendente] = await rascunhosPendentes(repo);
+    expect(pendente?.versao.origemEntrada).toBe('url');
+    expect(pendente?.norma.urlOficial).toBe('https://www.planalto.gov.br/l7210.htm');
+  });
+});

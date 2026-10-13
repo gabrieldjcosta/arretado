@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { colar, expect, publicar, semViolacoes, test } from './apoio';
 
 test('Biblioteca vazia: "Importar norma" leva à importação e volta (9.5)', async ({ page }) => {
@@ -100,4 +101,57 @@ test('colar a LEP com todas as redações: as linhas tachadas viram redações a
   await page.getByRole('dialog').getByRole('button', { name: 'Descartar' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'descartada' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();
+});
+
+test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async ({ page }) => {
+  test.setTimeout(120_000);
+  const bytes = readFileSync(new URL('../corpus/normas/lep-compilado.html', import.meta.url));
+  const pedidos: string[] = [];
+  await page.route('**/api/buscar-norma*', async (rota) => {
+    pedidos.push(new URL(rota.request().url()).searchParams.get('url') ?? '');
+    await rota.fulfill({
+      status: 200,
+      body: bytes,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'X-Tipo-Origem': 'text/html',
+        'X-Url-Final': 'https://www.planalto.gov.br/ccivil_03/leis/l7210.htm',
+      },
+    });
+  });
+  await page.goto('/#/biblioteca/importar');
+  const campo = page.getByRole('textbox', { name: 'Ou busque pelo endereço da página' });
+  const buscar = page.getByRole('button', { name: 'Buscar', exact: true });
+  await expect(buscar).toBeDisabled();
+  await semViolacoes(page);
+
+  await campo.fill('https://www.planalto.gov.br/ccivil_03/leis/l7210.htm');
+  await buscar.click();
+  const estrutura = page.getByRole('region', { name: 'Estrutura encontrada' });
+  await expect(estrutura).toBeVisible({ timeout: 30_000 });
+  await expect(estrutura.locator('.contagens > div').filter({ hasText: 'Artigos' })).toHaveText(
+    'Artigos219',
+  );
+  await publicar(page, 'LEP');
+  await expect(page.getByRole('region', { name: 'Normas' }).getByText('LEP')).toBeVisible();
+  expect(pedidos).toEqual(['https://www.planalto.gov.br/ccivil_03/leis/l7210.htm']);
+});
+
+test.describe('busca que falha (12.3)', () => {
+  // A resposta 502 vira uma linha no console do navegador, de propósito.
+  test.use({ permitirFalhasConsole: true });
+
+  test('a tela avisa e deixa colar; a Biblioteca segue vazia', async ({ page }) => {
+    await page.route('**/api/buscar-norma*', (rota) =>
+      rota.fulfill({ status: 502, json: { erro: 'status_erro' } }),
+    );
+    await page.goto('/#/biblioteca/importar');
+    await page
+      .getByRole('textbox', { name: 'Ou busque pelo endereço da página' })
+      .fill('https://www.planalto.gov.br/ccivil_03/leis/l7210.htm');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText('cole abaixo');
+    await expect(page.getByLabel('Cole aqui a lei')).toBeVisible();
+    await semViolacoes(page);
+  });
 });

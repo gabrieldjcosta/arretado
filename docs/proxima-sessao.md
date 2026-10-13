@@ -11,6 +11,8 @@ Atualizado em 13/10/2026 (Frases 1 feita e **revisada em sessão independente**;
 
 ## Próxima atividade
 
+**12.3 feita (13/10/2026), sem subida de esquema (segue v6).** Importar ganhou "Ou busque pelo endereço da página" + "Buscar" (`Importar.tsx`, `src/integracoes/url/buscar.ts`): pede `/api/buscar-norma?url=…` ao Worker, decodifica no aparelho (`decodificarPagina`), passa pelo mesmo sanitizador e `criarRascunho` com `origemEntrada: 'url'`, `urlOficial` = `X-Url-Final` e `fonteConsultadaEm`; o hash é o da fonte sanitizada (igual ao colar, então a mesma lei por URL e por colagem é detectada como repetida). Falha (host fora da lista, tempo, sem rede, 4xx/5xx) mostra aviso em português e o campo de colar continua; colar segue o caminho principal e funciona sem rede. **Verificado (mocks):** `npm run check` verde; unitário de `buscar.ts`; teste de tela com `fetch` simulado (falha, depois sucesso, origem `url`); E2E nos 3 aparelhos com `/api/buscar-norma` interceptada (LEP do corpus busca e publica; falha oferece colar); axe nos 2 temas (`acessibilidade.spec.ts`) verde. **Só com rede, por conta do Gabriel:** buscar de verdade LEP, CF/88 e CC no app publicado (depois do deploy do `main`) e conferir sumário, `urlOficial` e que a página não estoura o limite; o Planalto/ALESP não foram alcançados nesta sessão. Suposição: o campo aceita só endereço; a validação de host é do Worker (a mensagem sai do motivo devolvido). Atividade seguinte: **6b** (verificar atualização pelo aparelho).
+
 **Frases 3 feita (13/10/2026), sem subida de esquema (segue v6).** Selecionar um trecho no leitor troca o grupo fixo por 3 cores, "Nota" e **"Enviar às frases"** (`Marcacoes.tsx`, `DialogoEnviarAsFrases`): o campo abre com o texto selecionado (editável, até 2.000), "Enviar" grava `criarFraseDeTrecho` (`origemTipo: trecho`, vence amanhã, `trecho` = dispositivo + versão + intervalo + texto citado; só o texto é obrigatório, D25). A atualização 6a reancora o link das Frases pelo texto (`atualizacao.ts`); sem o trecho no texto novo, o link fica como estava (o texto da Frase é da pessoa e nunca muda). Suposições (reversíveis): sem escolha de disciplina/ponto no envio (a Frase nasce sem; pode ser ligada depois); a correção do texto publicado (11.7) não reancora Frases (só a atualização 6a, como o plano pedia); o link de volta ainda não aparece na tela de Frases (só gravado). Atividade seguinte: **12.3 Campo URL** (item 6).
 
 **Frases 2 feita (13/10/2026), sem subida de esquema (segue v6).** Revisar frases (`/recall/frases/revisar`): a frase no centro, "Li" (sobe um degrau de 1/3/7/15/30/60 dias) e "De novo" (amanhã), atalhos 1 e 2, cota do dia como nos cartões; `revisoesFrase` append-only. Revisar cartões segue em `/recall/revisar`; o início do Recall oferece os dois. Oclusão: em Frases › "Esconder trecho" (`/recall/frases/:id/cartao`), selecione no texto (campo só de leitura, funciona com toque e teclado), "Esconder seleção", prévia, "Criar cartão" (`criarCartaoDeLacuna`). Suposições (reversíveis): todos os trechos escolhidos somem num só cartão (um por trecho = criar vários); o cartão de lacuna não leva `erroId` (não toma o lugar do cartão do erro); frente guardada já escondida (editar a Frase depois não muda o cartão); intervalo de "Li" deriva da última revisão (sem campo novo). Atividade seguinte: **4d Frases 3**.
@@ -42,7 +44,8 @@ Passagem de bastão (Frases 1): Tarefa 4b · Branch `claude/frases-1` · Último
 | ✔ 4c | Frases 2 feita (13/10/2026, sem subida de esquema) | — | — |
 | ✔ 4d | Frases 3 feita (13/10/2026, sem subida de esquema) | — | — |
 | 5 | ~~12.2 Worker com chamada real~~ (feita e verificada em 13/10/2026; ver `solucao-de-problemas.md`) | — | — |
-| 6 | 12.3 Campo URL; depois 6b | Sonnet 5.5 médio | nuvem, depois da 12.2 |
+| ✔ 6 | 12.3 Campo URL feita (13/10/2026, mocks; teste real com rede é do Gabriel) | — | — |
+| 6b | Verificar atualização pelo aparelho | Sonnet 5.5 médio | nuvem |
 | 7 | 13.4 Portão da F2 (documento) | Sonnet 5.5 médio | nuvem |
 | 8 | Uso real: 2 semanas lendo lei no Arretado | — | **Gabriel** |
 | 9 | Planejamento da F3 | **Opus 5.5** | nuvem, só depois do portão |
@@ -51,7 +54,7 @@ Sem bloquear: lotes com rede (SV 30, 3b/3d; normas a converter: 59 de 63 feitas 
 
 ## Pendências do Gabriel
 
-Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: **backup (Conta › Dados › Exportar) antes do merge da `integracao` no `main` (esquema v6; revisão independente já feita)**; merge da `integracao` no `main`; 12.2 com rede; lotes com rede; capturas "antes/depois" do redesign se quiser.
+Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: **backup (Conta › Dados › Exportar) antes do merge da `integracao` no `main` (esquema v6; revisão independente já feita)**; merge da `integracao` no `main`; 12.2 com rede; 12.3 com rede (buscar LEP, CF e CC pelo campo de endereço no app publicado); lotes com rede; capturas "antes/depois" do redesign se quiser.
 
 ## Como abrir a próxima sessão
 
