@@ -35,6 +35,20 @@ for (const esquema of ['light', 'dark'] as const) {
         ).toEqual([]);
       });
     }
+
+    test('menu Ajuda aberto sem violações do axe e fecha com Esc (fatia 6)', async ({ page }) => {
+      await page.goto('/#/recall');
+      const botao = page.getByRole('button', { name: 'Ajuda', exact: true });
+      await botao.click();
+      await expect(page.getByRole('link', { name: 'Ajuda sobre esta tela' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Relatar problema' })).toBeVisible();
+      const r = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
+      expect(r.violations.map((v) => v.id)).toEqual([]);
+      await page.keyboard.press('Escape');
+      await expect(botao).toHaveAttribute('aria-expanded', 'false');
+    });
   });
 }
 

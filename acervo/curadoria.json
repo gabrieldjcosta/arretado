@@ -2304,6 +2304,48 @@
         "arquivo": "sumulas-tnu.json",
         "urlOficial": "https://www.cjf.jus.br/phpdoc/virtus/listaSumulas.php"
       }
+    },
+    {
+      "id": "teses-dpesp",
+      "titulo": "Teses Institucionais da Defensoria Pública do Estado de São Paulo",
+      "grupo": "Teses",
+      "tituloCurto": "Teses da DPE-SP",
+      "tipo": "Teses",
+      "esfera": "estadual",
+      "especie": "teses",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Penal"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        },
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "14 teses com número repetido entre áreas (146 a 154) ficaram fora; a lista está em acervo/relatorio-teses.md.",
+        "Seis teses de Infância e Juventude (24, 25, 27, 32, 33, 38) constam como canceladas, sem o texto original.",
+        "Os PDFs das teses não foram incluídos."
+      ],
+      "fonte": {
+        "adaptador": "teses",
+        "arquivo": "teses-dpesp.json",
+        "urlOficial": "https://www.defensoria.sp.def.br/web/guest/institucional/edepe/pagina-inicial-edepe/teses-institucionais"
+      }
     }
   ]
 }

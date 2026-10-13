@@ -121,6 +121,16 @@ export async function planejar(
   }
   const ignoradas = new Set(opcoes.ignorarColecoes ?? []);
   const colecoes = modulos.flatMap((mod) => colecoesDoModulo(mod)).filter((c) => !ignoradas.has(c));
+  // Fontes das versões (13.3): com `legislacao` e sem `sistema`, só os anexos que o pacote referencia
+  // entram, e nenhum anexo local é apagado por não estar no pacote.
+  const idsFontes = new Set<string>();
+  const soFontes = (n: string) => n === 'anexos' && !modulos.includes('sistema');
+  if (modulos.includes('legislacao') && !modulos.includes('sistema') && !ignoradas.has('anexos')) {
+    for (const v of pacote.registros.get('versoesNorma') ?? []) {
+      if (typeof v.anexoFonteId === 'string') idsFontes.add(v.anexoFonteId);
+    }
+    if (pacote.registros.has('anexos')) colecoes.push('anexos');
+  }
 
   // Lido antes dos registros: qualquer escrita depois disto é detectada ao aplicar.
   const seqBase = (await repo.db.alteracoes.orderBy('seq').last())?.seq ?? 0;
@@ -134,7 +144,9 @@ export async function planejar(
   for (const nome of colecoes) {
     const resumo = resumoVazio();
     porColecao[nome] = resumo;
-    const doPacote = (pacote.registros.get(nome) ?? []) as Registro[];
+    const doPacote = ((pacote.registros.get(nome) ?? []) as Registro[]).filter(
+      (r) => !soFontes(nome) || idsFontes.has(r.id),
+    );
     const locais = (await repo.colecao(nome).todosDoUsuario()) as unknown as Registro[];
     const porId = new Map(locais.map((r) => [r.id, r]));
     const conteudosLocais = new Map(locais.map((r) => [conteudo(r), r.id]));
@@ -195,7 +207,7 @@ export async function planejar(
       }
     }
 
-    if (modo === 5 || modo === 6) {
+    if ((modo === 5 || modo === 6) && !soFontes(nome)) {
       for (const l of locais) {
         if (idsPacote.has(l.id)) continue;
         // O registro deste Aparelho nunca é apagado nem excluído pela importação.

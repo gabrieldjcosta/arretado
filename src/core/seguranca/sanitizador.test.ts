@@ -182,6 +182,12 @@ describe('correções da revisão da etapa 2', () => {
 });
 
 describe('estilo em linha fora do parser (CSP, 9.5)', () => {
+  it('<base> é removido antes do parser (base-uri da CSP, 13.1)', () => {
+    const { blocos } = sanitizarHtml('<base href="https://exemplo.invalid/"><p>Art. 1º Texto.</p>');
+    expect(JSON.stringify(blocos)).toContain('Art. 1º Texto.');
+    expect(JSON.stringify(blocos)).not.toContain('exemplo.invalid');
+  });
+
   it('nenhum atributo style nem <style> chega ao DOMParser, e o tachado por estilo continua', () => {
     const espiao = vi.spyOn(DOMParser.prototype, 'parseFromString');
     try {

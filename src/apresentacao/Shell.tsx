@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
+import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
@@ -16,7 +17,7 @@ const AREAS = [
   { caminho: '/biblioteca', nome: 'Biblioteca' },
 ] as const;
 
-/** Moldura de todas as telas: 4 áreas, ? e !, Conta fora da navegação, rodapé (D6). */
+/** Moldura de todas as telas: 4 áreas, menu Ajuda, Conta fora da navegação, rodapé (D6). */
 export function Shell() {
   const { pathname } = useLocation();
   const navegar = useNavigate();
@@ -73,25 +74,12 @@ export function Shell() {
               + Erro
             </span>
           </Link>
-          <Link
-            to={`/orientacoes/${secaoDeAjuda(pathname)}`}
-            className="botao discreto icone"
-            aria-label="Ajuda sobre esta tela"
-            title="Ajuda sobre esta tela"
-          >
-            ?
-          </Link>
-          <button
-            type="button"
-            className="discreto icone"
-            aria-label="Relatar problema"
-            title="Relatar problema"
-            onClick={() => {
+          <MenuAjuda
+            paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
+            aoRelatar={() => {
               setRelatando(true);
             }}
-          >
-            !
-          </button>
+          />
           <Link to="/conta" className="botao discreto" aria-label="Conta e ajustes">
             Conta
           </Link>

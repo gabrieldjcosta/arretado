@@ -128,7 +128,10 @@ export function ListaErros() {
             {dados.itens.map((e) => (
               <li key={e.id}>
                 <Link to={`/recall/erros/${e.id}`} className="item-lista">
-                  <span className="rotulo-discreto">{ROTULO_RESULTADO[e.resultado]}</span>
+                  <span className={`estado-texto estado-${e.resultado}`}>
+                    <span aria-hidden="true">{e.resultado === 'errou' ? '✕' : '?'} </span>
+                    {ROTULO_RESULTADO[e.resultado]}
+                  </span>
                   <span>{e.oQueFoi}</span>
                   {completude(e) === 'rapido' && <span className="marcador">completar</span>}
                 </Link>

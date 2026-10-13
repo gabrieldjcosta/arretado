@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arretado — UI Editorial & Baixa Estimulação (v2)</title>
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <style>
+      /* ==========================================================================
+       PALETA TÁTIL: PAPEL, TINTA, SÁLVIA E MARCA-TEXTO (CLARO E NOTURNO)
+       ========================================================================== */
+      .tema-claro {
+        --papel: #f2f4ef;
+        --papel-elevado: #fafbf8;
+        --papel-recuado: #e5e9e1;
+        --tinta: #18221c;
+        --tinta-suave: #56635a;
+        --tinta-fantasma: #7f8c83;
+        --borda-suave: #d5dcd3;
+        --salvia: #2d5a3f;
+        --salvia-hover: #234731;
+        --salvia-texto: #ffffff;
+        --salvia-superficie: #e3eee7;
+        --salvia-borda: #48785b;
+
+        /* Marca-texto amarelo vivo no claro */
+        --grifo-fundo: #ffec85;
+        --grifo-borda: #e0b400;
+        --grifo-texto: #18221c;
+        --selo-amarelo-fundo: #f7df63;
+        --selo-amarelo-texto: #2b2100;
+
+        --sombra-papel:
+          0 12px 32px -12px rgba(24, 34, 28, 0.08), 0 2px 6px -1px rgba(24, 34, 28, 0.04);
+      }
+
+      .tema-noturno {
+        --papel: #121715;
+        --papel-elevado: #1a211e;
+        --papel-recuado: #222b27;
+        --tinta: #edf2ef;
+        --tinta-suave: #9caaa1;
+        --tinta-fantasma: #69786f;
+        --borda-suave: #2c3832;
+        --salvia: #84be9a;
+        --salvia-hover: #9ad0ae;
+        --salvia-texto: #0d1711;
+        --salvia-superficie: rgba(132, 190, 154, 0.11);
+        --salvia-borda: rgba(132, 190, 154, 0.45);
+
+        /* Marca-texto âmbar/ouro luminoso no modo noturno: alto contraste e zero aspecto apagado */
+        --grifo-fundo: rgba(255, 209, 71, 0.25);
+        --grifo-borda: #ffd147;
+        --grifo-texto: #fff9db;
+        --selo-amarelo-fundo: #ffd147;
+        --selo-amarelo-texto: #1a1400;
+
+        --sombra-papel: 0 18px 40px -12px rgba(0, 0, 0, 0.55);
+      }
+
+      .palco {
+        background-color: var(--papel);
+        color: var(--tinta);
+        transition:
+          background-color 200ms ease,
+          color 200ms ease,
+          width 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .fonte-editorial {
+        font-family: 'Georgia', 'Times New Roman', serif;
+      }
+
+      /* Marca-texto com presença física (fita amarela lateral + fundo luminoso) */
+      .marca-texto {
+        background-color: var(--grifo-fundo);
+        color: var(--grifo-texto);
+        border-bottom: 2px solid var(--grifo-borda);
+        padding: 0.08em 0.35em;
+        border-radius: 4px;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+
+      .selo-retomada {
+        background-color: var(--selo-amarelo-fundo);
+        color: var(--selo-amarelo-texto);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .cartao-foco {
+        background-color: var(--papel-elevado);
+        border: 1px solid var(--borda-suave);
+        box-shadow: var(--sombra-papel);
+        border-radius: 22px;
+        position: relative;
+      }
+
+      /* Fita marcadora de página à esquerda do cartão principal */
+      .cartao-foco-retomada {
+        background-color: var(--papel-elevado);
+        border: 1.5px solid var(--salvia-borda);
+        box-shadow: var(--sombra-papel);
+        border-radius: 22px;
+        position: relative;
+        overflow: hidden;
+      }
+      .cartao-foco-retomada::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background-color: var(--grifo-borda);
+      }
+
+      .botao-acao-unica {
+        background-color: var(--salvia);
+        color: var(--salvia-texto);
+        border-radius: 14px;
+        min-height: 48px;
+        font-weight: 700;
+        transition:
+          transform 140ms ease,
+          background-color 140ms ease;
+      }
+      .botao-acao-unica:hover {
+        background-color: var(--salvia-hover);
+        transform: translateY(-1px);
+      }
+
+      .botao-fantasma {
+        color: var(--tinta-suave);
+        border: 1px solid var(--borda-suave);
+        background-color: transparent;
+        border-radius: 12px;
+        min-height: 42px;
+        font-weight: 600;
+        transition:
+          border-color 140ms ease,
+          color 140ms ease;
+      }
+      .botao-fantasma:hover {
+        color: var(--tinta);
+        border-color: var(--tinta-suave);
+      }
+    </style>
+  </head>
+  <body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-3 md:p-5">
+    <!-- Barra Flutuante Mínima do Protótipo (Não compete com o app) -->
+    <div
+      class="max-w-5xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-[var(--card)] border border-[var(--border)] text-xs"
+    >
+      <div class="flex items-center gap-1.5">
+        <button
+          onclick="setScreen('hoje')"
+          id="tab-hoje"
+          class="px-3 py-1.5 rounded-xl font-semibold transition"
+        >
+          1. Hoje
+        </button>
+        <button
+          onclick="setScreen('leitor')"
+          id="tab-leitor"
+          class="px-3 py-1.5 rounded-xl font-semibold transition"
+        >
+          2. Leitor (Art. 37)
+        </button>
+        <button
+          onclick="setScreen('revisao')"
+          id="tab-revisao"
+          class="px-3 py-1.5 rounded-xl font-semibold transition"
+        >
+          3. Revisão
+        </button>
+        <button
+          onclick="setScreen('biblioteca')"
+          id="tab-biblioteca"
+          class="px-3 py-1.5 rounded-xl font-semibold transition"
+        >
+          4. Biblioteca
+        </button>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button
+          onclick="setDevice('desktop')"
+          id="dev-desktop"
+          class="px-2.5 py-1.5 rounded-lg font-medium"
+        >
+          Desktop
+        </button>
+        <button
+          onclick="setDevice('tablet')"
+          id="dev-tablet"
+          class="px-2.5 py-1.5 rounded-lg font-medium"
+        >
+          Tablet
+        </button>
+        <button
+          onclick="setDevice('mobile')"
+          id="dev-mobile"
+          class="px-2.5 py-1.5 rounded-lg font-medium"
+        >
+          Celular
+        </button>
+        <span class="text-[var(--muted-foreground)] mx-1">|</span>
+        <button
+          onclick="toggleTheme()"
+          id="btn-theme"
+          class="px-3 py-1.5 rounded-xl font-bold border border-[var(--border)]"
+        >
+          🌙 Noite Sálvia
+        </button>
+      </div>
+    </div>
+
+    <!-- Moldura do Aparelho -->
+    <div class="flex justify-center">
+      <div
+        id="frame"
+        class="tema-noturno palco rounded-3xl border border-[var(--border)] overflow-hidden w-full max-w-5xl"
+      >
+        <div id="mount"></div>
+      </div>
+    </div>
+
+    <script>
+      const state = {
+        device: 'desktop', // 'desktop' | 'tablet' | 'mobile'
+        screen: 'hoje', // 'hoje' | 'leitor' | 'revisao' | 'biblioteca'
+        dark: true, // Começa no modo noturno para evidenciar o novo marca-texto âmbar/ouro!
+        travado: false,
+        passo1Feito: true,
+        passo2Feito: false,
+        depoisAberto: false,
+        erroAbertoNoLeitor: false,
+        erroSalvo: false,
+        resultadoErro: 'errou',
+        cartaoVirado: false,
+      };
+
+      function setDevice(d) {
+        state.device = d;
+        render();
+      }
+      function setScreen(s) {
+        state.screen = s;
+        state.erroAbertoNoLeitor = false;
+        render();
+      }
+      function toggleTheme() {
+        state.dark = !state.dark;
+        render();
+      }
+
+      function renderHeader() {
+        const isMobile = state.device === 'mobile';
+        return `
+        <header class="px-6 md:px-10 pt-5 pb-3 flex items-center justify-between">
+          <button onclick="setScreen('hoje')" class="flex items-center gap-2.5 text-sm font-bold tracking-tight">
+            <span class="w-2.5 h-2.5 rounded-full bg-[var(--salvia)]"></span>
+            <span>Arretado</span>
+          </button>
+
+          ${
+            !isMobile
+              ? `
+            <nav class="flex items-center gap-6 text-xs font-semibold">
+              ${[
+                { id: 'hoje', label: 'Hoje' },
+                { id: 'biblioteca', label: 'Biblioteca' },
+                { id: 'leitor', label: 'Leitor' },
+                { id: 'revisao', label: 'Recall · 3' },
+              ]
+                .map(
+                  (i) => `
+                <button onclick="setScreen('${i.id}')" class="py-1 transition ${
+                  state.screen === i.id
+                    ? 'text-[var(--tinta)] border-b-2 border-[var(--grifo-borda)] font-bold'
+                    : 'text-[var(--tinta-suave)] hover:text-[var(--tinta)]'
+                }">
+                  ${i.label}
+                </button>
+              `,
+                )
+                .join('')}
+            </nav>
+          `
+              : ''
+          }
+
+          <button onclick="setScreen('leitor'); state.erroAbertoNoLeitor = true; render();" class="text-xs font-semibold px-3 py-1.5 rounded-xl border border-[var(--borda-suave)] text-[var(--tinta-suave)] hover:text-[var(--tinta)]">
+            + Erro
+          </button>
+        </header>
+      `;
+      }
+
+      /* ==========================================================================
+       1. TELA HOJE — UMA ÚNICA COISA NO PALCO, RESPIRO AMPLO, ZERO RUÍDO
+       ========================================================================== */
+      function renderHoje() {
+        const isMobile = state.device === 'mobile';
+        return `
+        <div class="px-5 md:px-12 py-8 md:py-14 max-w-2xl mx-auto">
+
+          <!-- Saudação silenciosa -->
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--tinta-suave)] mb-3">
+            Onde você parou
+          </p>
+
+          <!-- O ÚNICO CARTÃO DOMINANTE -->
+          <section class="cartao-foco-retomada p-6 md:p-9">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <span class="selo-retomada text-xs px-2.5 py-1 rounded-md">
+                CF/88 · Art. 37, § 6º
+              </span>
+              <span class="text-xs font-medium text-[var(--tinta-suave)]">
+                12 de 48 artigos · ~12 min
+              </span>
+            </div>
+
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight leading-snug mb-5">
+              Continuar Responsabilidade Civil do Estado
+            </h1>
+
+            <!-- Trecho exato com o marca-texto amarelo vivo (claro e noturno) -->
+            <blockquote class="fonte-editorial text-base md:text-lg leading-relaxed text-[var(--tinta-suave)] pl-4 border-l-2 border-[var(--borda-suave)] mb-7">
+              "§ 6º As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos
+              <mark class="marca-texto">responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros</mark>..."
+            </blockquote>
+
+            <!-- Ação Principal + Botão "Estou travado" -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button onclick="setScreen('leitor')" class="botao-acao-unica px-7 py-3.5 text-sm flex items-center justify-center gap-2.5 flex-1 sm:flex-initial">
+                <span>Continuar do § 6º</span>
+                <span aria-hidden="true">→</span>
+              </button>
+
+              <button onclick="state.travado = !state.travado; render();" class="botao-fantasma px-4 py-3 text-xs">
+                ${state.travado ? 'Ocultar passos' : 'Estou travado — diminuir o passo'}
+              </button>
+            </div>
+
+            <!-- Decomposição suave (Goblin Tools) — só aparece se pedida -->
+            ${
+              state.travado
+                ? `
+              <div class="mt-6 pt-5 border-t border-[var(--borda-suave)] space-y-2.5">
+                <p class="text-xs font-semibold text-[var(--tinta-suave)]">
+                  Faça só o próximo micro-passo de 2 minutos:
+                </p>
+                <label class="flex items-center gap-3 p-3 rounded-xl bg-[var(--papel)] cursor-pointer text-xs">
+                  <input type="checkbox" ${state.passo1Feito ? 'checked' : ''} onchange="state.passo1Feito = !state.passo1Feito; render();" class="rounded" />
+                  <span class="${state.passo1Feito ? 'line-through text-[var(--tinta-suave)]' : 'font-medium'}">
+                    1. Abrir direto no § 6º (já está marcado em amarelo)
+                  </span>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-xl bg-[var(--papel)] cursor-pointer text-xs">
+                  <input type="checkbox" ${state.passo2Feito ? 'checked' : ''} onchange="state.passo2Feito = !state.passo2Feito; render();" class="rounded" />
+                  <span class="${state.passo2Feito ? 'line-through text-[var(--tinta-suave)]' : 'font-medium'}">
+                    2. Ler apenas os §§ 6º e 7º e fechar se cansar
+                  </span>
+                </label>
+              </div>
+            `
+                : ''
+            }
+          </section>
+
+          <!-- Linha "Depois" recuada e silenciosa (sem caixas competindo) -->
+          <div class="mt-8 px-2 flex flex-wrap items-center justify-between gap-4 text-xs text-[var(--tinta-suave)]">
+            <div class="flex items-center gap-2">
+              <span class="font-bold uppercase tracking-wider text-[var(--tinta-fantasma)]">Depois:</span>
+              <button onclick="setScreen('revisao')" class="hover:text-[var(--tinta)] underline underline-offset-4">
+                Revisar 3 cartões de erro (~4 min)
+              </button>
+            </div>
+
+            <button onclick="state.depoisAberto = !state.depoisAberto; render();" class="hover:text-[var(--tinta)]">
+              ${state.depoisAberto ? 'Fechar captura rápida' : '+ Guardar pensamento rápido'}
+            </button>
+          </div>
+
+          ${
+            state.depoisAberto
+              ? `
+            <div class="mt-3 p-3 rounded-2xl bg-[var(--papel-elevado)] border border-[var(--borda-suave)] flex gap-2">
+              <input type="text" placeholder="Anote e tire da cabeça sem sair do estudo..." class="flex-1 bg-transparent text-xs px-2 focus:outline-none" />
+              <button onclick="state.depoisAberto = false; render();" class="px-3 py-1.5 rounded-xl bg-[var(--papel-recuado)] text-xs font-semibold">
+                Guardar
+              </button>
+            </div>
+          `
+              : ''
+          }
+
+        </div>
+      `;
+      }
+
+      /* ==========================================================================
+       2. LEITOR JURÍDICO — PÁGINA DE LIVRO LIMPA + GAVETA DE ERRO SOB DEMANDA
+       ========================================================================== */
+      function renderLeitor() {
+        const isDesktop = state.device === 'desktop';
+
+        return `
+        <div class="px-5 md:px-12 py-6 md:py-10 max-w-5xl mx-auto">
+
+          <!-- Caminho discreto + progresso concreto -->
+          <div class="max-w-2xl mx-auto mb-6 flex items-center justify-between text-xs text-[var(--tinta-suave)]">
+            <span>Constitucional › CF/88 › <strong class="text-[var(--tinta)]">Art. 37</strong></span>
+            <span>Artigo <strong>12</strong> de 48</span>
+          </div>
+
+          <div class="grid grid-cols-1 ${isDesktop && state.erroAbertoNoLeitor ? 'lg:grid-cols-12 gap-8 items-start' : ''}">
+
+            <!-- Folha de Leitura (Literata, sem poluição de botões) -->
+            <article class="${isDesktop && state.erroAbertoNoLeitor ? 'lg:col-span-7' : 'max-w-2xl mx-auto'} cartao-foco p-6 md:p-10 fonte-editorial text-base md:text-lg leading-loose space-y-6">
+
+              <p class="text-[var(--tinta-suave)] text-sm md:text-base">
+                <strong class="text-[var(--tinta)]">Art. 37.</strong> A administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de legalidade, impessoalidade, moralidade, publicidade e eficiência...
+              </p>
+
+              <p>
+                <strong>§ 5º</strong> A lei estabelecerá os prazos de prescrição para ilícitos praticados por qualquer agente, servidor ou não, que causem prejuízos ao erário, ressalvadas as respectivas ações de ressarcimento.
+              </p>
+
+              <!-- Parágrafo onde parou: fita amarela + marca-texto visível na noite -->
+              <div class="pl-4 border-l-4 border-[var(--grifo-borda)] space-y-3 py-1">
+                <div class="flex items-center justify-between font-sans text-xs">
+                  <span class="selo-retomada px-2 py-0.5 rounded">Onde você parou</span>
+                  <span class="text-[var(--tinta-suave)]">Toque no trecho para anotar erro</span>
+                </div>
+
+                <p>
+                  <strong>§ 6º</strong> As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos
+                  <mark class="marca-texto cursor-pointer" onclick="state.erroAbertoNoLeitor = true; render();">
+                    responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros, assegurado o direito de regresso contra o responsável nos casos de dolo ou culpa.
+                  </mark>
+                </p>
+
+                <!-- Apenas 2 ações calmas ao pé do parágrafo ativo -->
+                <div class="pt-1 font-sans flex items-center gap-3">
+                  <button onclick="state.erroAbertoNoLeitor = !state.erroAbertoNoLeitor; state.erroSalvo = false; render();" class="px-3.5 py-1.5 rounded-xl bg-[var(--salvia)] text-[var(--salvia-texto)] text-xs font-bold">
+                    ${state.erroAbertoNoLeitor ? 'Fechar registro' : '+ Registrar erro neste § 6º'}
+                  </button>
+                  <button class="text-xs font-semibold text-[var(--tinta-suave)] hover:text-[var(--tinta)]">
+                    ★ Marcar estrela
+                  </button>
+                </div>
+              </div>
+
+              <p class="text-[var(--tinta-suave)]">
+                <strong>§ 7º</strong> A lei disporá sobre os requisitos e as restrições ao ocupante de cargo ou emprego da administração direta e indireta que possibilite o acesso a informações privilegiadas.
+              </p>
+            </article>
+
+            <!-- Painel Contextual de Erro (Só aparece quando acionado!) -->
+            ${
+              state.erroAbertoNoLeitor
+                ? `
+              <aside class="${isDesktop ? 'lg:col-span-5' : 'max-w-2xl mx-auto mt-4'} cartao-foco-retomada p-6 space-y-4 font-sans">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold uppercase tracking-wider text-[var(--tinta-suave)]">
+                    CF/88 · Art. 37, § 6º (já vinculado)
+                  </span>
+                  <button onclick="state.erroAbertoNoLeitor = false; render();" class="text-xs text-[var(--tinta-suave)]">
+                    Esc
+                  </button>
+                </div>
+
+                ${
+                  !state.erroSalvo
+                    ? `
+                  <div class="grid grid-cols-2 gap-2">
+                    <button onclick="state.resultadoErro = 'errou'; render();" class="py-2.5 px-3 rounded-xl text-xs font-bold border ${
+                      state.resultadoErro === 'errou'
+                        ? 'border-[var(--grifo-borda)] bg-[var(--grifo-fundo)] text-[var(--grifo-texto)]'
+                        : 'border-[var(--borda-suave)] text-[var(--tinta-suave)]'
+                    }">
+                      Errei
+                    </button>
+                    <button onclick="state.resultadoErro = 'duvida'; render();" class="py-2.5 px-3 rounded-xl text-xs font-bold border ${
+                      state.resultadoErro === 'duvida'
+                        ? 'border-[var(--grifo-borda)] bg-[var(--grifo-fundo)] text-[var(--grifo-texto)]'
+                        : 'border-[var(--borda-suave)] text-[var(--tinta-suave)]'
+                    }">
+                      Acertei sem certeza
+                    </button>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold mb-1.5">
+                      Frase correta (vira o verso do cartão):
+                    </label>
+                    <textarea rows="3" class="w-full p-3 rounded-xl bg-[var(--papel)] border border-[var(--borda-suave)] text-xs leading-relaxed">A responsabilidade civil das concessionárias é objetiva também perante terceiros não usuários do serviço público (STF, Tema 130).</textarea>
+                  </div>
+
+                  <button onclick="state.erroSalvo = true; render();" class="botao-acao-unica w-full py-3 text-xs">
+                    Salvar e seguir no § 7º →
+                  </button>
+                `
+                    : `
+                  <div class="py-4 space-y-3 text-center">
+                    <p class="text-sm font-bold">✓ Salvo no Art. 37, § 6º</p>
+                    <p class="text-xs text-[var(--tinta-suave)]">Você não saiu da página. Continue do § 7º.</p>
+                    <button onclick="state.erroAbertoNoLeitor = false; render();" class="botao-acao-unica w-full py-2.5 text-xs">
+                      Continuar leitura
+                    </button>
+                  </div>
+                `
+                }
+              </aside>
+            `
+                : ''
+            }
+
+          </div>
+        </div>
+      `;
+      }
+
+      /* ==========================================================================
+       3. REVISÃO (DRILL) — UM ÚNICO CARTÃO CENTRAL, ZERO DISTRAÇÃO
+       ========================================================================== */
+      function renderRevisao() {
+        return `
+        <div class="px-5 md:px-12 py-10 md:py-14 max-w-xl mx-auto">
+          <div class="flex items-center justify-between text-xs text-[var(--tinta-suave)] mb-4">
+            <span>Cartão <strong>1 de 3</strong></span>
+            <span>CF/88 · Art. 37, § 6º</span>
+          </div>
+
+          <section class="cartao-foco p-7 md:p-9 space-y-6">
+            <p class="text-base md:text-lg font-semibold leading-relaxed">
+              A responsabilidade objetiva das concessionárias de serviço público (Art. 37, § 6º) alcança terceiros que <mark class="marca-texto">não são usuários</mark> do serviço?
+            </p>
+
+            ${
+              !state.cartaoVirado
+                ? `
+              <button onclick="state.cartaoVirado = true; render();" class="botao-acao-unica w-full py-3.5 text-sm">
+                Mostrar frase correta
+              </button>
+            `
+                : `
+              <div class="pt-5 border-t border-[var(--borda-suave)] space-y-5">
+                <p class="fonte-editorial text-base leading-relaxed">
+                  <mark class="marca-texto">Sim. É objetiva perante usuários e terceiros não usuários</mark> (STF, Tema 130). O regresso contra o agente exige dolo ou culpa.
+                </p>
+
+                <div class="grid grid-cols-3 gap-2.5 pt-2">
+                  <button onclick="state.cartaoVirado = false; render();" class="botao-fantasma py-2.5 text-xs">Não lembrei</button>
+                  <button onclick="state.cartaoVirado = false; render();" class="botao-fantasma py-2.5 text-xs">Quase</button>
+                  <button onclick="state.cartaoVirado = false; render();" class="botao-acao-unica py-2.5 text-xs">Lembrei</button>
+                </div>
+
+                <div class="text-center pt-1">
+                  <button onclick="setScreen('leitor')" class="text-xs text-[var(--tinta-suave)] hover:text-[var(--tinta)] underline">
+                    Abrir no Art. 37, § 6º da CF/88 →
+                  </button>
+                </div>
+              </div>
+            `
+            }
+          </section>
+        </div>
+      `;
+      }
+
+      /* ==========================================================================
+       4. BIBLIOTECA — RETOMADA DOMINANTE, LISTA SILENCIOSA
+       ========================================================================== */
+      function renderBiblioteca() {
+        return `
+        <div class="px-5 md:px-12 py-8 md:py-12 max-w-2xl mx-auto space-y-8">
+          <section class="cartao-foco-retomada p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <span class="selo-retomada text-xs px-2 py-0.5 rounded">Continue de onde parou</span>
+              <h2 class="text-lg font-bold pt-1">Constituição Federal (CF/88)</h2>
+              <p class="text-xs text-[var(--tinta-suave)]">Art. 37, § 6º · 12 de 48 artigos</p>
+            </div>
+            <button onclick="setScreen('leitor')" class="botao-acao-unica px-5 py-2.5 text-xs shrink-0">
+              Abrir no § 6º →
+            </button>
+          </section>
+
+          <div class="space-y-2">
+            <p class="text-xs font-bold uppercase tracking-wider text-[var(--tinta-suave)] px-1">
+              Outras normas
+            </p>
+            <div class="cartao-foco divide-y divide-[var(--borda-suave)]">
+              <button onclick="setScreen('leitor')" class="w-full p-4 flex items-center justify-between text-left hover:opacity-80">
+                <div>
+                  <div class="text-sm font-bold">Lei 9.784/1999 — Processo Administrativo</div>
+                  <div class="text-xs text-[var(--tinta-suave)]">Parou no Art. 53 (28 de 70)</div>
+                </div>
+                <span class="text-xs font-semibold text-[var(--tinta-suave)]">Retomar →</span>
+              </button>
+              <button onclick="setScreen('leitor')" class="w-full p-4 flex items-center justify-between text-left hover:opacity-80">
+                <div>
+                  <div class="text-sm font-bold">LC 80/1994 — Defensoria Pública</div>
+                  <div class="text-xs text-[var(--tinta-suave)]">Parou no Art. 4º, III (9 de 145)</div>
+                </div>
+                <span class="text-xs font-semibold text-[var(--tinta-suave)]">Retomar →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }
+
+      function renderMobileBottomBar() {
+        if (state.device !== 'mobile') return '';
+        return `
+        <nav class="border-t border-[var(--borda-suave)] bg-[var(--papel-elevado)] px-3 py-2.5 grid grid-cols-4 gap-1 text-center text-xs font-semibold">
+          ${[
+            { id: 'hoje', label: 'Hoje' },
+            { id: 'biblioteca', label: 'Leis' },
+            { id: 'leitor', label: 'Art. 37' },
+            { id: 'revisao', label: 'Recall' },
+          ]
+            .map(
+              (i) => `
+            <button onclick="setScreen('${i.id}')" class="py-1.5 rounded-xl ${
+              state.screen === i.id
+                ? 'bg-[var(--salvia)] text-[var(--salvia-texto)] font-bold'
+                : 'text-[var(--tinta-suave)]'
+            }">${i.label}</button>
+          `,
+            )
+            .join('')}
+        </nav>
+      `;
+      }
+
+      function render() {
+        const frame = document.getElementById('frame');
+        frame.className = `${state.dark ? 'tema-noturno' : 'tema-claro'} palco rounded-3xl border border-[var(--border)] overflow-hidden mx-auto`;
+
+        if (state.device === 'desktop') {
+          frame.style.width = '100%';
+          frame.style.maxWidth = '1024px';
+        } else if (state.device === 'tablet') {
+          frame.style.width = '740px';
+        } else {
+          frame.style.width = '375px';
+        }
+
+        ['hoje', 'leitor', 'revisao', 'biblioteca'].forEach((s) => {
+          const el = document.getElementById('tab-' + s);
+          el.className = `px-3 py-1.5 rounded-xl font-semibold transition ${
+            state.screen === s
+              ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+              : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+          }`;
+        });
+
+        ['desktop', 'tablet', 'mobile'].forEach((d) => {
+          const el = document.getElementById('dev-' + d);
+          el.className = `px-2.5 py-1.5 rounded-lg font-medium transition ${
+            state.device === d
+              ? 'bg-[var(--secondary)] text-[var(--secondary-foreground)] font-bold'
+              : 'text-[var(--muted-foreground)]'
+          }`;
+        });
+
+        document.getElementById('btn-theme').textContent = state.dark
+          ? '🌙 Noite Sálvia (Ativo)'
+          : '☀️ Papel Claro (Ativo)';
+
+        let content = '';
+        if (state.screen === 'hoje') content = renderHoje();
+        else if (state.screen === 'leitor') content = renderLeitor();
+        else if (state.screen === 'revisao') content = renderRevisao();
+        else content = renderBiblioteca();
+
+        document.getElementById('mount').innerHTML = `
+        ${renderHeader()}
+        <main class="min-h-[480px]">${content}</main>
+        ${renderMobileBottomBar()}
+      `;
+      }
+
+      render();
+    </script>
+  </body>
+</html>

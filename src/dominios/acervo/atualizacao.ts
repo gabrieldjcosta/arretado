@@ -78,13 +78,16 @@ async function arvoreVigente(repo: Repositorio, normaId: string, versaoId: strin
     ate: versaoId,
   });
   const textoPorId = new Map(textos.map((t) => [t.dispositivoId, t]));
+  const textoAntigoPorId = new Map(
+    textos.map((t) => [t.dispositivoId, textoDosTrechos(t.trechos)]),
+  );
   const antigos: NoAntigo[] = dispositivos.map((d) => ({
     endereco: d.endereco,
     status: d.status,
     rotulo: d.rotulo,
     trechos: textoPorId.get(d.id)?.trechos ?? [],
   }));
-  return { dispositivos, antigos };
+  return { dispositivos, antigos, textoAntigoPorId };
 }
 
 /** Prévia: o que a atualização mudaria, sem gravar nada. */
@@ -144,7 +147,11 @@ async function aplicar(
   versaoAntigaId: string,
 ): Promise<ResultadoDaAtualizacao> {
   const normaId = norma.id;
-  const { dispositivos, antigos } = await arvoreVigente(repo, normaId, versaoAntigaId);
+  const { dispositivos, antigos, textoAntigoPorId } = await arvoreVigente(
+    repo,
+    normaId,
+    versaoAntigaId,
+  );
   const comparacao = compararArvores(antigos, item.nos);
   const agora = repo.ctx.agora().toISOString();
   const versaoId = repo.ctx.novoId();
@@ -319,7 +326,8 @@ async function aplicar(
     { origem: 'importacao' },
   );
 
-  // Grifos e notas da versão arquivada: voltam ao texto novo por texto; sem texto, pendentes.
+  // Grifos e notas da versão arquivada: voltam ao texto novo por texto (exato ou parecido); sem
+  // texto, pendentes. As já pendentes (de qualquer versão) tentam de novo, como na correção.
   let reancoradas = 0;
   let marcacoesPendentes = 0;
   const marcacoes = await todos(repo.colecao('marcacoes'), {
@@ -328,9 +336,16 @@ async function aplicar(
     ate: normaId,
   });
   for (const m of marcacoes) {
-    if (m.versaoId !== versaoAntigaId) continue;
+    if (m.versaoId !== versaoAntigaId && m.status !== 'pendente') continue;
     const textoNovo = textoNovoPorId.get(m.dispositivoId);
-    const r = textoNovo === undefined ? undefined : reancorar(m.ancora, textoNovo);
+    const r =
+      textoNovo === undefined
+        ? undefined
+        : reancorar(
+            m.ancora,
+            textoNovo,
+            m.status === 'pendente' ? undefined : textoAntigoPorId.get(m.dispositivoId),
+          );
     if (r === undefined || r.status === 'pendente') {
       marcacoesPendentes += 1;
       if (m.status !== 'pendente') {
@@ -344,7 +359,7 @@ async function aplicar(
     await repo.colecao('marcacoes').atualizar(m.id, {
       versaoId,
       status,
-      ancora: { texto: m.ancora.texto, inicio: r.inicio, fim: r.fim },
+      ancora: { texto: r.texto, inicio: r.inicio, fim: r.fim },
     });
   }
 

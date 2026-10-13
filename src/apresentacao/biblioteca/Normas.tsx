@@ -11,10 +11,14 @@ import {
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
 import { SEM_DISCIPLINA } from '../../dominios/acervo/agrupar';
+import { itensComVersaoNova } from '../../dominios/acervo/atualizacao';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { LinhaLista } from '../componentes/LinhaLista';
+import { Selo } from '../componentes/Selo';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { formatarQuando } from '../recall/rotulos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { referenciaDoNo } from './linhas';
@@ -143,6 +147,28 @@ function descricaoDe(norma: Norma): string {
   return partes.filter((p) => p !== undefined && p !== '').join(' · ');
 }
 
+/** Minúsculas e sem acento: a busca da lista não diferencia. */
+function semAcento(t: string): string {
+  return t
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLocaleLowerCase('pt-BR');
+}
+
+/** Os grupos só com as normas cujo título ou descrição contém a busca. */
+function filtrarGrupos<G extends { itens: ItemDaDisciplina[] }>(grupos: G[], busca: string): G[] {
+  const q = semAcento(busca.trim());
+  if (q === '') return grupos;
+  return grupos
+    .map((g) => ({
+      ...g,
+      itens: g.itens.filter(({ norma, subtitulo }) =>
+        semAcento([norma.tituloCurto, subtitulo ?? '', descricaoDe(norma)].join(' ')).includes(q),
+      ),
+    }))
+    .filter((g) => g.itens.length > 0);
+}
+
 /** Aviso deixado pela tela Importar ao publicar ou descartar (estado da navegação). */
 function avisoDaNavegacao(estado: unknown): string | null {
   if (typeof estado !== 'object' || estado === null || !('aviso' in estado)) return null;
@@ -180,6 +206,25 @@ export function Normas() {
   const estadoNavegacao: unknown = useLocation().state;
   const navegar = useNavigate();
   const [aviso, setAviso] = useState(() => avisoDaNavegacao(estadoNavegacao));
+  const [busca, setBusca] = useState('');
+  const fonte = useFonteAcervo();
+  // Normas do acervo com versão maior no índice: o selo "Há versão nova" (sem rede, nenhum selo).
+  const [comVersaoNova, setComVersaoNova] = useState<ReadonlySet<string>>(new Set());
+  useEffect(() => {
+    let ativo = true;
+    fonte
+      .listar()
+      .then((indice) => itensComVersaoNova(repo, indice.itens))
+      .then(
+        (novas) => {
+          if (ativo) setComVersaoNova(new Set(novas.map((n) => n.normaId)));
+        },
+        () => undefined,
+      );
+    return () => {
+      ativo = false;
+    };
+  }, [fonte, repo]);
 
   useEffect(() => {
     // Lido uma vez: recarregar a página ou voltar a ela não repete o aviso.
@@ -215,6 +260,8 @@ export function Normas() {
       },
     );
   }
+
+  const grupos = dados ? filtrarGrupos(dados.porDisciplina, busca) : [];
 
   return (
     <>
@@ -310,29 +357,51 @@ export function Normas() {
                 <p>
                   <Link to="/biblioteca/acervo?tudo=1">Tudo do edital da DPE-SP</Link>
                 </p>
-                {dados.porDisciplina.map((g) => (
+                <label className="busca-campo">
+                  <span>Buscar norma</span>
+                  <input
+                    type="search"
+                    value={busca}
+                    placeholder="Título ou assunto"
+                    onChange={(e) => {
+                      setBusca(e.target.value);
+                    }}
+                  />
+                </label>
+                {grupos.length === 0 && (
+                  <p role="status" className="dica">
+                    Nenhuma norma com “{busca}”. Tente outra palavra.
+                  </p>
+                )}
+                {grupos.map((g) => (
                   <section key={g.titulo} aria-label={g.titulo}>
                     {(g.titulo !== SEM_DISCIPLINA || dados.porDisciplina.length > 1) && (
                       <h3>{g.titulo}</h3>
                     )}
-                    <ul className="lista-simples">
+                    <ul className="lista-simples lista-de-linhas">
                       {g.itens.map(({ norma: n, subtitulo, trecho }) => {
-                        const descricao = [subtitulo, descricaoDe(n)].filter(Boolean).join(' · ');
                         const leitura = dados.leituras.get(n.id);
+                        const apoio = [
+                          leitura ? `Última leitura: ${formatarQuando(lidaEm(leitura))}` : '',
+                          subtitulo,
+                          descricaoDe(n),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ');
                         const para = `/biblioteca/normas/${n.id}${
                           trecho === undefined ? '' : `?ir=${encodeURIComponent(trecho)}`
                         }`;
                         return (
                           <li key={`${n.id}-${trecho ?? ''}`}>
-                            <Link className="item-norma" to={para}>
-                              <strong>{n.tituloCurto}</strong>
-                              {descricao && <span className="dica">{descricao}</span>}
-                              {leitura && (
-                                <span className="dica ultima-leitura">
-                                  Última leitura: {formatarQuando(lidaEm(leitura))}
-                                </span>
-                              )}
-                            </Link>
+                            <LinhaLista
+                              para={para}
+                              icone="§"
+                              titulo={n.tituloCurto}
+                              {...(apoio ? { apoio } : {})}
+                              {...(comVersaoNova.has(n.id)
+                                ? { selo: <Selo>Há versão nova</Selo> }
+                                : {})}
+                            />
                           </li>
                         );
                       })}

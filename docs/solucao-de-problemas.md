@@ -595,7 +595,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Publicação recusada: "dispositivo(s) a confirmar" ou "norma sem artigo"
 - **Sintoma:** `publicarVersao` lança `PublicacaoBloqueada` com motivo `a_confirmar` (texto puro: todo dispositivo fica "a confirmar") ou `conflitos` com `sem_artigos` ("Não consegui identificar artigos."). **Causa:** regra 12: publicar exige zero conflito, e o "a confirmar" pede o aceite em lote; uma norma sem nenhum artigo não tem o que ler (o estruturador já acusa o conflito, e a 9.3 o repete sobre a árvore gravada).
-- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; a inserção manual de norma sem artigo (súmula) é da 10.4. Na tela (9.5): "Não consegui identificar artigos neste texto." com "Colar novamente da página" (descarta o rascunho e volta à colagem) e "Guardar para editar depois" (o rascunho fica em Importações pendentes até o editor integral, 10.4); o "a confirmar" vira o botão "Aceitar N e publicar". **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`); "sem artigos…" e "só texto puro…" (`Importar.test.tsx`).
+- **Solução:** `a_confirmar`: publicar com `{ aceitarAConfirmar: true }` (a 9.5 oferece "Aceitar N e publicar"); o aceite é ciência: os dispositivos continuam "a confirmar" na versão publicada, e a 10.1 os confirma. `sem_artigos`: colar de novo pela página (HTML) ou, com texto puro, conferir se o texto tem "Art."; desde a 10.4, a norma sem artigo se resolve no editor integral ("Editar o texto inteiro") e a súmula se escreve do zero ("Escrever do zero" em Importar). Na tela (9.5): "Não consegui identificar artigos neste texto." com "Colar novamente da página" (descarta o rascunho e volta à colagem) e "Guardar para editar depois" (o rascunho fica em Importações pendentes; desde a 10.4, a mesma tela abre "Editar o texto inteiro"); o "a confirmar" vira o botão "Aceitar N e publicar". **Prevenção:** "a confirmar bloqueia até ser aceito em lote…" e "norma sem artigo bloqueia…" (`servico.test.ts`); "sem artigos…" e "só texto puro…" (`Importar.test.tsx`).
 - **Origem:** previsto na 9.3 e tratado nela (29/09/2026); a tela, na 9.5 (2ª parte); a decisão de o aceite não mudar a confiança e a de bloquear norma sem artigo são suposições a confirmar (`proxima-sessao.md`).
 
 ### Leitor mostra o texto de outra versão, ou de um rascunho
@@ -820,7 +820,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Rascunho retomado depois de atualizar o app: relatório e árvore não batem
 - **Sintoma:** o sumário do rascunho (anomalias, descartes) fala de dispositivos que a árvore gravada não tem, ou o contrário. **Causa:** o relatório não é gravado: sai de novo da fonte ao retomar, e o estruturador pode ter mudado desde a gravação (cada merge publica).
-- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: a partir do editor (etapa 10), refazer apagaria o que ele corrigiu; a 10.4 passa a preservar o confirmado. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
+- **Solução:** `retomarRascunho` compara o `versaoAdaptador` da versão com o `VERSAO_ESTRUTURADOR` e, se diferem, refaz a árvore pela fonte numa transação: o mesmo endereço mantém o id do dispositivo e o do texto, o nó que sumiu é apagado, e título, URL e data de consulta ficam. Recusa (`norma_com_outras_versoes`) quando a norma tem outra versão, porque refazer mexe em todos os dispositivos dela. Vale enquanto o rascunho não tem edição do usuário: com edição à mão (marca `+manual`, 10.2) a árvore não é refeita (ver "Editor de linhas (10.2)"); a 10.4 decidiu não refazer pela fonte por cima da edição: a reorganização preservando o confirmado é a edição integral, que parte da árvore gravada. **Prevenção:** "retomar depois de o estruturador mudar…" e "refazer a árvore de norma com outra versão…" (`servico.test.ts`). `publicarVersao` (9.3) publica a árvore gravada, sem conferir o `versaoAdaptador`, e depois de publicada ela não se refaz: a 9.5 abre o rascunho pendente com `retomarRascunho` antes de `verificarPublicacao` e de publicar.
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026; a guarda de outra versão veio da revisão adversarial); a parte do editor, previsto — atividade 10.4.
 
 ### Backup anterior importado por mesclagem cria uma segunda árvore do rascunho
@@ -835,7 +835,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### "A fonte guardada deste rascunho não pôde ser lida"
 - **Sintoma:** ao retomar um rascunho, `RascunhoIndisponivel` com motivo `fonte_ilegivel`. **Causa:** o Anexo da fonte falta (backup restaurado sem anexos, ou só com o módulo `legislacao`), foi alterado (hash diferente do da versão) ou não está no formato dos blocos (`FonteIlegivel`).
-- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); a 13.3 decide se o pacote só de `legislacao` passa a levar a fonte das versões.
+- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); o pacote só de `legislacao` passou a levar a fonte das versões na 13.3 (13/10/2026).
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026); o backup por módulo, previsto — atividade 13.3.
 
 ### A mesma norma colada duas vezes vira dois rascunhos
@@ -1104,3 +1104,119 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 
 ## Marca-texto do Agora (11/10/2026)
 - **Sintoma:** no tema escuro, o título do `AcaoAgora` ("Revisar 8 cartões", "Você parou no…") ficava quase ilegível: texto claro sobre a faixa amarela cheia (`--agora`), parecendo um risco. **Causa:** `.agora-marca` pintava `--agora` opaco nos 40% de baixo e o texto herdava `--texto` (claro no escuro); o par medido era só `agora-texto/agora`, que não representa essa pilha. **Solução:** token `--agora-faixa` (translúcido: 60% no claro, 30% no escuro), faixa de 65% a 92% da linha, texto na cor normal; sem animação, sem mudar medidas. `scripts/contraste.mjs` mede `texto` sobre `agora-faixa` composto sobre cada fundo (pior caso 5,7:1 no escuro, 9,5:1 no claro). **Prevenção:** par novo em `contraste.mjs` (`contraste.test.ts` o roda). Não voltar a usar `--agora` opaco atrás de texto que herda `--texto`.
+
+## Worker da rota /api/buscar-norma (12.1, 11/10/2026)
+- **Host:** comparação exata com a lista (`HOSTS_PERMITIDOS`), nunca por sufixo; `https://www.planalto.gov.br@exemplo.com` é recusado como `credenciais_na_url`, e porta explícita também.
+- **Redirecionamento:** `redirect: 'manual'` e cada `Location` (relativo ou não) passa por `validarUrl`; o `fetch` automático seguiria para fora da lista.
+- **Testes:** `DOMException` no jsdom não é `instanceof Error`; o motivo `tempo_esgotado` usa o `name`. `Response` só aceita `Uint8Array<ArrayBuffer>` no TypeScript atual.
+- **windows-1252:** o `TextDecoder('windows-1252')` do Node pode devolver latin1 (C1 como U+0096); o navegador mapeia certo, e a normalização (`normalizacao.ts`) já converte C1 depois. Planalto não declara charset; ALESP declara UTF-8 na `<meta>`.
+- **Previsível na 12.2:** `wrangler` não está instalado no repositório; o dry-run e a publicação exigem rede. O Workers Builds passa a publicar o Worker com `main` quando o `main` receber este merge.
+
+## Revisão do rascunho (10.1, 11/10/2026)
+- **Correção some ao atualizar o app:** `retomarRascunho` refaz a árvore pela fonte quando a versão do estruturador muda, e isso desfaz confirmações e correções do rascunho (mantém só os ids por endereço). Desde a 10.2, rascunho com edição à mão (`+manual`) não é refeito; a 10.4 decidiu que a fonte nunca é reprocessada por cima da edição (ver "Edição integral (10.4)").
+- **Efeito colateral no lint:** guardar a função da tela numa ref durante o render (`ref.current = fn`) dá "Cannot access refs during render" (react-hooks/refs); atualizar a ref num `useEffect` sem dependências. Sem isso, a função nova a cada render entrava nas dependências do `useCallback` e a lista recarregava sem parar.
+- **Previsível na 10.2:** `corrigirDispositivo` só troca texto e rótulo; o endereço não muda. Converter linha e renumerar (10.2) mexem em endereço e `paiId`: refazer a validação estrutural depois de cada conversão (`verificarPublicacao`).
+
+## Menu "Ajuda" (fatia 6, 6.3)
+
+**Sintoma:** teste ou E2E não acha o botão "Relatar problema" nem o link "Ajuda sobre esta tela". **Causa:** os dois só existem com o menu **Ajuda** aberto (juntou o "?" e o "!"). **Solução:** clicar em `getByRole('button', { name: 'Ajuda', exact: true })` antes. **Previsível:** `--raio` subiu de 8 para 12 px em tudo; se uma tela estourar a largura no celular, conferir primeiro o padding dos botões.
+
+## Fatia 6 (6.4 a 6.7): Biblioteca, drill, leitor (11/10/2026)
+- **Selo "Há versão nova" na Biblioteca:** `Normas` chama `fonte.listar()` (índice do acervo) e `itensComVersaoNova`; sem rede ou sem índice o erro é engolido e nenhum selo aparece. Testes com a fonte padrão não acham selo.
+- **Drill:** o botão de virar continua "Mostrar resposta" (testes e E2E usam o nome); "Sair" é link para `/recall`. O verso se chama "Frase correta" só quando o cartão vem de um erro; senão, "Resposta".
+- **Estado por texto:** ícones são `aria-hidden`, então o nome acessível segue sendo só a palavra ("Errei", "Vencido"); `getByText('Errei')` continua achando.
+- **Linha de base do portão da F1:** o drill centrado entrou em 11/10/2026; ver `docs/redesign/linha-de-base.md`.
+
+## Editor de linhas (10.2, 11/10/2026)
+
+### A correção ou a conversão sumiu depois de atualizar o app
+- **Sintoma:** depois de o estruturador mudar (app atualizado), o rascunho voltava como a fonte o estruturava e perdia confirmações, correções e conversões. **Causa:** `retomarRascunho` refaz a árvore pela fonte quando `versaoAdaptador` ≠ `VERSAO_ESTRUTURADOR`. **Solução:** toda edição à mão (confirmar, corrigir, converter, juntar, dividir, salvar sozinho) grava `+manual` no fim de `versaoAdaptador`, e `retomarRascunho` só refaz o relatório quando há a marca. Rascunho editado antes da 10.2 (só confirmações da 10.1, sem marca) continua sendo refeito ao mudar o estruturador. **Prevenção:** "retomar depois de o estruturador mudar não refaz a árvore editada" e "confirmar e corrigir da 10.1 também ficam" (`edicao.test.ts`).
+- **Limite conhecido:** o sumário "Estrutura encontrada", os avisos do estruturador e o "Ficou de fora" vêm da fonte e não acompanham a edição; conflitos e a contagem "a confirmar" vêm da árvore gravada. Para ver a estrutura nova, abrir a norma depois de publicar. A 10.4 não mudou isso (decisão pendente do Gabriel); na norma escrita do zero o sumário mostra "Artigo 1" (o artigo vazio de partida), e a contagem "N dispositivos no total" é a da árvore gravada.
+- **Origem:** previsto na 10.1 (resumo), tratado em 11/10/2026.
+
+### "Dividir no cursor" não faz nada ou recusa
+- **Sintoma:** a tela mostra "Coloque o cursor no meio do texto para dividir." ou "Esta linha não pode ser dividida; converta-a antes.". **Causa:** o cursor está no começo ou no fim do texto (uma das partes ficaria vazia), ou a linha é de um tipo sem número próprio (nome, nó estrutural, anexo, preâmbulo). **Solução:** pôr o cursor no meio; para nome e nó estrutural, converter antes. A segunda parte nasce "a confirmar", do mesmo tipo e com o número do sistema (o primeiro livre depois do anterior): se o número não for o certo, corrigir o rótulo (o endereço acompanha).
+- **Origem:** previsto na 10.2.
+
+### Número repetido depois de converter ou dividir
+- **Sintoma:** aviso "…aparece duas vezes" ou o botão Publicar bloqueado depois de editar. **Causa:** o rótulo corrigido à mão repete o de outra linha (o sistema só escolhe número livre ao converter ou dividir). **Solução:** corrigir o rótulo da linha certa (o endereço acompanha o número e os filhos o seguem); a validação da publicação lê a árvore gravada. **Prevenção:** "rótulo que o sistema reconhece muda o número…" (`edicao.test.ts`).
+- **Origem:** previsto na 10.2.
+
+### Prevista para a 10.4
+- A 10.3 (correção por bloco) não passa texto pelo estruturador: troca texto literal e converte tipos linha a linha. Corrigir um bloco **colando texto novo** ficou para a 10.4. **Resolvido na 10.4:** a edição integral aceita colar um trecho novo no texto; ela parte da árvore gravada (com a edição), não da fonte. Ver "Edição integral (10.4)".
+
+## Edição integral (10.4, 11/10/2026)
+
+Regra de preservação: topo de `src/dominios/legislacao/edicao-integral.ts` e `planos/F2.md` › "Fatos da edição integral (10.4)".
+
+### "O rascunho mudou desde que o texto foi aberto"
+- **Sintoma:** ao salvar o texto inteiro, a mensagem e nada gravado. **Causa:** entre abrir o texto e salvar, o rascunho mudou (outra aba, ou a correção por linha na mesma tela); a comparação linha a linha seria feita contra um texto que a pessoa não viu, e uma linha mudada fora sairia como "apagada". **Solução:** copiar o que escreveu, fechar e abrir "Editar o texto inteiro" de novo e refazer a mudança. **Prevenção:** "o rascunho que mudou em outra aba não é sobrescrito" (`edicao-integral.test.ts`).
+- **Origem:** previsto na 10.4.
+
+### A linha mudada voltou a "a confirmar" / o confirmado sumiu
+- **Sintoma:** depois de salvar, uma linha que estava conferida pede conferência de novo, ou some. **Causa:** texto ou tipo mudados voltam a "a confirmar" de propósito (regra 4); só número e lugar mudados mantêm a confiança. Linha apagada do texto tira o dispositivo (a tela avisa antes, com quantos estavam conferidos: "Salvar mesmo assim"). **Solução:** desfazer com "Desfazer o que não salvei" antes de salvar; depois de salvo, reescrever a linha e confirmar. Notas de vigência e redações anteriores não aparecem no texto, mas seguem com a linha (também quando ela muda). **Prevenção:** testes de `edicao-integral.test.ts` e `edicao-integral-corpus.test.ts` (LEP, CP e CF: salvar sem mudar não regrava nenhum registro; uma linha mudada muda um dispositivo só).
+- **Origem:** previsto na 10.4.
+
+### Número repetido depois de salvar o texto inteiro
+- **Sintoma:** "Ainda não dá para publicar" com endereço repetido. **Causa:** o número vem do rótulo escrito, e o sistema não renumera o que ninguém tocou (regra 5); um artigo novo com o número de outro fica repetido em vez de se fundir com ele (fundir apagaria um dos dois). **Solução:** corrigir o rótulo de um deles no texto ou na revisão. **Prevenção:** "número repetido não se funde: vira conflito para corrigir".
+- **Origem:** previsto na 10.4.
+
+### Linha que vira rubrica, continuação ou artigo sem querer
+- **Sintoma:** depois de salvar, uma linha digitada sem rótulo aparece como rubrica (nome do artigo) ou grudada no texto de cima. **Causa:** linha nova sem rótulo é lida como o estruturador lê: logo depois de CAPÍTULO/SEÇÃO, é o nome dele; curta, sem ponto final e antes de "Art."/"§"/inciso, é rubrica; senão, continua o texto de cima ("Pena - …"). Texto antes de qualquer rótulo vira artigo numerado pelo sistema. Dentro de anexo, toda linha é texto do anexo. **Solução:** pôr o rótulo na frente ("Art. 7º", "§ 1º", "I -"), ou usar o editor de linha (converter, juntar, dividir).
+- **Origem:** previsto na 10.4.
+
+### Texto grande demora a salvar
+- **Previsível:** a CF (3,5 mil dispositivos, cerca de 1 MB de texto) passa inteira pela comparação e pela reconstrução; no teste, poucos segundos (`edicao-integral-corpus.test.ts`, limite 60 s). No celular, se ficar lento, editar por bloco ou por linha.
+
+## Correção por bloco (10.3, 11/10/2026)
+
+- **Sintoma:** o teste E2E não achava `selectOption({ label })` no seletor de trecho. **Causa:** o recuo do rótulo era feito com espaços sem quebra (U+00A0), que o Playwright não casa com o rótulo escrito. **Solução:** sem recuo no seletor (o nome já diz o nível: CAPÍTULO, SEÇÃO).
+- **Atenção:** converter todas as linhas de um tipo pode mudar o pai das seguintes (ex.: incisos viram parágrafos e saem do caput); o `reconstruir` refaz endereço e recuo, e quem estiver com o bloco aberto por intervalo de artigos vê a lista refeita. Se o intervalo deixar de existir (artigo convertido em outro tipo), a tela volta à lista inteira com o aviso.
+
+## Correção do texto publicado (11.7, 11/10/2026)
+
+Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
+
+### "O texto desta norma mudou em outra aba"
+- **Sintoma:** ao salvar a correção, a mensagem e nada gravado. **Causa:** a correção confere a versão que a tela mostra; outra aba (ou um "Atualizar" do acervo) já gravou outra. **Solução:** recarregar e corrigir de novo.
+- **Origem:** previsto na 11.7.
+
+### Grifo some do texto depois de corrigir
+- **Sintoma:** o grifo ou a nota não aparece mais no artigo corrigido. **Causa:** o trecho marcado saiu do texto e nem o parecido foi achado; a marcação fica `pendente`, com a âncora e a versão de antes. **Solução:** ela aparece em "Para reler"; "Desfazer a correção" (ou "Voltar a este texto") a traz de volta.
+- **Atenção:** trecho com menos de 20 letras só volta se o mesmo texto (sem caixa, acento e espaços repetidos) estiver lá; abaixo disso a aproximação casaria com qualquer coisa.
+- **Origem:** previsto na 11.7.
+
+### Formatação (link, tachado) sumiu de um pedaço do texto corrigido
+- **Causa:** o meio trocado herda a forma só quando cai inteiro dentro de um trecho; se pega mais de um (ex.: apagar do meio de um link até o fim), vira texto sem forma. Quem corrige escolhe palavras, não formatação. **Solução:** "Voltar a este texto" devolve os trechos de antes com a forma.
+- **Origem:** previsto na 11.7.
+
+### Atualizar do acervo depois de corrigir
+- **Previsível:** a correção vale para a versão vigente; "Atualizar" do acervo (6a) grava a versão do acervo por cima (a corrigida fica arquivada e consultável em "Texto de antes"). Corrigir de novo, se o acervo ainda tiver o erro.
+
+## `/code-review` das etapas 8, 9 e 11 (13/10/2026)
+Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md).
+
+### Tela relê o banco sem parar
+- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta.
+- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`).
+- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo.
+
+### Grifo pula para outra palavra igual depois de corrigir o texto
+- **Causa:** a reancoragem só olhava as posições antigas e escolhia a ocorrência mais perto delas.
+- **Solução:** `reancorar(ancora, textoNovo, textoAntigo)`: fora do trecho editado, a âncora segue o deslocamento exato da edição. Quem reancora passa o texto em que a âncora foi medida (não para as já pendentes).
+
+### Texto digitado some ao fechar a correção da linha
+- **Causa:** `gravarAgora` engolia a falha da gravação e quem esperava por ela fechava o formulário.
+- **Solução:** a promessa devolvida rejeita com a exceção; o formulário só fecha (ou muda a estrutura) depois de gravar.
+
+### Ordinal "o" trocado no meio do texto
+- **Causa:** `comOrdinal` da edição integral não se limitava ao rótulo.
+- **Solução:** só no rótulo do começo da linha (`Art.`, `Artigo`, `§`).
+
+### `<base>` colado dispara violação de `base-uri` da CSP
+- **Causa:** o DOMParser do DOMPurify honra `<base href>` e a CSP (`base-uri`) reporta violação, mesmo sem efeito (achado do E2E de segurança, 13.1).
+- **Solução:** `semEstiloEmLinha` remove `<base>` antes do parser. Teste em `sanitizador.test.ts`.
+
+### `Leitor.test.tsx` "espiada dos vizinhos" falha só dentro do `npm run check`
+- **Causa:** flake de tempo sob carga (passa isolado e na segunda rodada).
+- **Solução:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.

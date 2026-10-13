@@ -9,6 +9,7 @@ import { criarCartaoDeDispositivo, registrarErro } from '../../dominios/recall/s
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESULTADO } from '../recall/rotulos';
+import { FormularioDaCorrecao, TextosDeAntes, type CorrecaoNoLeitor } from './CorrecaoDoTexto';
 
 /** O dispositivo sobre o qual as ações agem: o que está no alto da tela quando o botão é tocado. */
 export interface AlvoDasAcoes {
@@ -19,6 +20,8 @@ export interface AlvoDasAcoes {
   referencia: string;
   /** O texto vigente, sem o tachado; ausente no nó estrutural (título, capítulo…) e enquanto carrega. */
   texto: string | undefined;
+  /** O texto gravado inteiro (o tachado inclusive), o que a correção edita (11.7); ausente como `texto`. */
+  textoGravado?: string | undefined;
 }
 
 /** Cabe no verso do cartão (20.000 no modelo). */
@@ -35,10 +38,13 @@ export interface EstrelaDasAcoes {
 export function AcoesDoDispositivo({
   alvo,
   estrela,
+  correcao,
   aoFechar,
 }: {
   alvo: AlvoDasAcoes | undefined;
   estrela?: EstrelaDasAcoes;
+  /** Corrigir o texto publicado (11.7): ausente, o botão não aparece. */
+  correcao?: CorrecaoNoLeitor;
   aoFechar: () => void;
 }) {
   return (
@@ -48,7 +54,7 @@ export function AcoesDoDispositivo({
       titulo={alvo ? `Ações de ${alvo.nome}` : 'Ações'}
       classe="dialogo-acoes"
     >
-      {alvo && <Conteudo alvo={alvo} estrela={estrela} aoFechar={aoFechar} />}
+      {alvo && <Conteudo alvo={alvo} estrela={estrela} correcao={correcao} aoFechar={aoFechar} />}
     </Dialogo>
   );
 }
@@ -56,14 +62,18 @@ export function AcoesDoDispositivo({
 function Conteudo({
   alvo,
   estrela,
+  correcao,
   aoFechar,
 }: {
   alvo: AlvoDasAcoes;
   estrela: EstrelaDasAcoes | undefined;
+  correcao: CorrecaoNoLeitor | undefined;
   aoFechar: () => void;
 }) {
   const repo = useRepositorio();
   const [registrando, setRegistrando] = useState(false);
+  const [corrigindo, setCorrigindo] = useState(false);
+  const textoGravado = alvo.textoGravado;
   const [aviso, setAviso] = useState('');
   const [falha, setFalha] = useState('');
   const [ocupado, setOcupado] = useState(false);
@@ -127,7 +137,16 @@ function Conteudo({
   return (
     <div className="acoes-dispositivo">
       <p className="dica">{alvo.referencia}</p>
-      {registrando ? (
+      {corrigindo && correcao && textoGravado !== undefined ? (
+        <FormularioDaCorrecao
+          correcao={correcao}
+          dispositivoId={alvo.dispositivoId}
+          textoAtual={textoGravado}
+          voltar={() => {
+            setCorrigindo(false);
+          }}
+        />
+      ) : registrando ? (
         <FormularioDoErro
           alvo={alvo}
           cancelar={() => {
@@ -167,9 +186,21 @@ function Conteudo({
           <button type="button" onClick={() => void copiar()}>
             Copiar referência
           </button>
+          {correcao && textoGravado !== undefined && (
+            <button
+              type="button"
+              onClick={() => {
+                setAviso('');
+                setFalha('');
+                setCorrigindo(true);
+              }}
+            >
+              Corrigir o texto
+            </button>
+          )}
         </div>
       )}
-      {alvo.texto === undefined && !registrando && (
+      {alvo.texto === undefined && !registrando && !corrigindo && (
         <p className="dica">Cartão só de dispositivo com texto: role até um artigo.</p>
       )}
       <p role="status" className="sucesso">
@@ -179,6 +210,9 @@ function Conteudo({
         <p role="alert" className="aviso falha">
           {falha}
         </p>
+      )}
+      {correcao && !corrigindo && (
+        <TextosDeAntes correcao={correcao} dispositivoId={alvo.dispositivoId} />
       )}
       <ErrosVinculados
         erros={erros}

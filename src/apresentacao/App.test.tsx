@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 describe('shell (5.1, 5.5)', () => {
-  it('mostra as 4 áreas, ?, !, Conta e o rodapé', async () => {
+  it('mostra as 4 áreas, o menu Ajuda, Conta e o rodapé', async () => {
     await abrirApp();
     const areas = screen.getByRole('navigation', { name: 'Áreas' });
     expect(
@@ -30,8 +30,8 @@ describe('shell (5.1, 5.5)', () => {
         .getAllByRole('link')
         .map((l) => l.textContent),
     ).toEqual(['Hoje', 'Plano', 'Recall', 'Biblioteca']);
-    expect(screen.getByRole('link', { name: 'Ajuda sobre esta tela' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Relatar problema' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ajuda' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('button', { name: 'Relatar problema' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
     expect(screen.getByText(RODAPE)).toBeInTheDocument();
   });
@@ -61,6 +61,8 @@ describe('"?" e Orientações (5.3)', () => {
       '/plano',
       '/recall',
       '/biblioteca',
+      '/biblioteca/normas/abc',
+      '/biblioteca/importar',
       '/conta',
       '/conta/dados',
       '/conta/privacidade',
@@ -71,8 +73,14 @@ describe('"?" e Orientações (5.3)', () => {
     }
   });
 
+  it('leitor e importador têm ajuda própria', () => {
+    expect(secaoDeAjuda('/biblioteca/normas/abc')).toBe('legislacao');
+    expect(secaoDeAjuda('/biblioteca/importar/v1')).toBe('importar-lei');
+  });
+
   it('"?" em Dados abre a seção de backup', async () => {
     const { usuario } = await abrirApp('/conta/dados');
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('link', { name: 'Ajuda sobre esta tela' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Orientações' }),
@@ -82,9 +90,10 @@ describe('"?" e Orientações (5.3)', () => {
   });
 });
 
-describe('"!" Relatar problema (5.4)', () => {
+describe('Ajuda › Relatar problema (5.4)', () => {
   it('exige descrição, guarda na fila local e limita a 1 por dia', async () => {
     const { repo, usuario } = await abrirApp('/recall');
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('button', { name: 'Relatar problema' }));
     const guardar = screen.getByRole('button', { name: 'Guardar relato' });
     expect(guardar).toBeDisabled();
@@ -95,6 +104,7 @@ describe('"!" Relatar problema (5.4)', () => {
     expect(relatos).toMatchObject([{ descricao: 'A lista não carrega', tela: '/recall' }]);
 
     await usuario.click(screen.getByRole('button', { name: 'Fechar' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('button', { name: 'Relatar problema' }));
     expect(await screen.findByText(/já relatou um problema hoje/)).toBeInTheDocument();
   });

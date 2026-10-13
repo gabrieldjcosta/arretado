@@ -26,7 +26,7 @@ Data: 09/10/2026 · Origem: brainstorming com o Gabriel · Estado: aguardando re
 
 Foi revista contra o briefing para fugir do padrão comum (papel creme, título em serifa e acento quente).
 
-**Cores** (contraste AA a conferir na implementação; se o marca-texto não passar como texto, usá-lo só como fundo ou traço):
+**Cores** (contraste AA medido em `scripts/contraste.mjs`). **Revisto em 11/10/2026 (fatia 6, aprovada pelo Gabriel): o marcador amarelo saiu.** O "agora" é um cartão tingido de sálvia com borda sálvia; o acento é a sálvia:
 
 | Nome | Claro | Escuro |
 |---|---|---|
@@ -34,9 +34,9 @@ Foi revista contra o briefing para fugir do padrão comum (papel creme, título 
 | Tinta | `#1F2A24` | `#E8ECEA` |
 | Sálvia (ação) | `#4F7A64` | `#8FBF9F` |
 | Recuado ("depois") | `#6B776F` | `#8A958F` |
-| Marca-texto (só "agora") | `#E9B949` | `#F0C75E` |
+| Cartão tingido ("agora", selo, estado selecionado) | fundo `#E3EDE5`, borda `#4F7A64` | sálvia `#8FBF9F` a 13% sobre a superfície, borda `#8FBF9F` |
 
-O **marca-texto é o único acento** e marca apenas o que é *agora*. Essa é a coisa memorável do visual. A cor saturada do mockup C aparece só na sequência de dias e na conclusão.
+O **cartão tingido de sálvia** marca apenas o que é *agora* (e o estado selecionado). Essa é a coisa memorável do visual. A cor saturada do mockup C aparece só na sequência de dias e na conclusão.
 
 **Tipografia.** Interface em **Atkinson Hyperlegible Next**; texto da lei e títulos de norma em **Literata**. Ambas livres (OFL) e **embutidas no pacote do app**, sem CDN em tempo de execução, por causa do local-first e da CSP. Alinhamento à esquerda, uma coluna, linhas abaixo de 70 caracteres. Sem rótulos em caixa-alta, sem "A · B · C", sem saudação decorativa.
 
@@ -48,7 +48,7 @@ Hoje `componentes/` tem só `Dialogo`, `estados` e `teclado`. Novos, em CSS puro
 
 | Componente | Função | Onde |
 |---|---|---|
-| `AcaoAgora` | Cartão com a ação principal: título, tempo estimado, botão **Começar**, traço de marca-texto | Início do Recall; depois, Hoje (F3) |
+| `AcaoAgora` | Cartão com a ação principal: título, tempo estimado, botão **Começar**, fundo tingido de sálvia com borda sálvia | Início do Recall; depois, Hoje (F3) |
 | `LinhaDepois` | Linha recuada com o próximo passo | Abaixo do `AcaoAgora`, fim do drill, leitor |
 | `DiasDaSemana` | "4 de 7 dias nesta semana" com 7 marcas; não zera | Início do Recall |
 | `BarraFina` | Progresso discreto | Drill, leitor |

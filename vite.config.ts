@@ -51,6 +51,7 @@ export default defineConfig({
           include: [
             'src/**/*.test.{ts,tsx}',
             'scripts/**/*.test.ts',
+            'worker/**/*.test.ts',
             'eslint/**/*.test.ts',
             'supabase/**/*.test.ts',
             'config/**/*.test.ts',

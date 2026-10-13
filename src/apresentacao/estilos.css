@@ -65,12 +65,12 @@
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
   --calha-estrela: 1.5rem;
-  /* Identidade nova (redesign, fatia 1): Papel, tinta e sálvia. O marca-texto só marca o que é
-     agora, sempre como fundo com a tinta por cima (texto/agora 8,1:1); "depois" é o recuado. */
-  --agora: #e9b949;
-  --agora-texto: #1f2a24;
-  /* Faixa do marca-texto atrás do título do Agora: translúcida, o texto fica na própria cor. */
-  --agora-faixa: rgb(233 185 73 / 60%);
+  /* Identidade nova (redesign, fatia 1; acabamento, fatia 6): Papel, tinta e sálvia. O "agora" é um
+     cartão tingido de sálvia com borda sálvia (também o estado selecionado e o selo); o texto fica
+     na tinta. "Depois" é o recuado. Pares medidos em scripts/contraste.mjs. */
+  --agora-fundo: #e3ede5;
+  --agora-borda: #4f7a64;
+  --raio-cartao: 16px;
   --depois: #5c6860;
   --progresso: #4f7a64;
   --sombra: 0 1px 3px rgb(0 0 0 / 12%);
@@ -83,7 +83,7 @@
   --fonte-leitura: 'Literata', Georgia, 'Times New Roman', serif;
   --tamanho-leitura: 18px;
   --alvo: 44px;
-  --raio: 8px;
+  --raio: 12px;
   --largura-texto: 70ch;
 
   color-scheme: light;
@@ -115,9 +115,8 @@
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
-    --agora: #f0c75e;
-    --agora-texto: #151a1f;
-    --agora-faixa: rgb(240 199 94 / 30%);
+    --agora-fundo: rgb(143 191 159 / 13%);
+    --agora-borda: #8fbf9f;
     --depois: #8a958f;
     --progresso: #8fbf9f;
     --sombra: none;
@@ -151,9 +150,8 @@
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
-  --agora: #f0c75e;
-  --agora-texto: #151a1f;
-  --agora-faixa: rgb(240 199 94 / 30%);
+  --agora-fundo: rgb(143 191 159 / 13%);
+  --agora-borda: #8fbf9f;
   --depois: #8a958f;
   --progresso: #8fbf9f;
   --sombra: none;
@@ -287,7 +285,8 @@ p {
 }
 
 .areas a[aria-current='page'] {
-  background: var(--superficie-2);
+  background: var(--agora-fundo);
+  box-shadow: inset 0 0 0 1.5px var(--agora-borda);
   font-weight: 700;
 }
 
@@ -581,26 +580,33 @@ th.numero {
 
 /* ── Recall ────────────────────────────────────────────────────────────── */
 
+/* Controle segmentado (fatia 6): pílula; o item ativo leva o estado selecionado. */
 .abas {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
   margin: 1.25rem 0 1rem;
-  border-bottom: 1px solid var(--borda);
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--superficie-2);
 }
 
 .abas a {
+  flex: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: var(--alvo);
   padding: 0 0.9rem;
   color: var(--texto);
   text-decoration: none;
-  border-bottom: 3px solid transparent;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
 }
 
 .abas a[aria-current='page'] {
-  border-bottom-color: var(--primaria);
+  background: var(--agora-fundo);
+  border-color: var(--agora-borda);
   font-weight: 700;
 }
 
@@ -982,8 +988,8 @@ dialog.dialogo-busca {
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
    nem mudança de medida: o texto não se move. */
 .linha-leitor[data-regua] .dispositivo {
-  background: color-mix(in srgb, var(--primaria) 9%, transparent);
-  box-shadow: inset 3px 0 0 var(--primaria);
+  background: color-mix(in srgb, var(--agora-borda) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--agora-borda);
 }
 
 .linha-leitor {
@@ -1578,29 +1584,39 @@ dialog.dialogo-acoes {
   padding-left: 1.25rem;
 }
 
+/* Correção do texto publicado (11.7): o texto editável e o de antes, na fonte da leitura. */
+.correcao-do-texto textarea,
+.texto-de-antes {
+  font-family: var(--fonte-leitura);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.correcao-do-texto textarea {
+  width: 100%;
+}
+
+.textos-de-antes li + li {
+  margin-top: 0.75rem;
+}
+
 /* ── Redesign, fatia 2: agora / depois, barra fina, dias, + flutuante ──────── */
 
 .acao-agora {
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  background: var(--agora-fundo);
+  border: 1.5px solid var(--agora-borda);
+  border-radius: var(--raio-cartao);
   padding: 1rem;
   margin-bottom: 1rem;
+}
+
+.acao-agora .principal {
+  min-height: 50px;
 }
 
 .agora-titulo {
   margin: 0 0 0.25rem;
   font-size: 1.3rem;
-}
-
-.agora-marca {
-  background: linear-gradient(
-    transparent 65%,
-    var(--agora-faixa) 65%,
-    var(--agora-faixa) 92%,
-    transparent 92%
-  );
-  padding: 0 0.15rem;
 }
 
 .agora-estimativa {
@@ -1668,7 +1684,12 @@ dialog.dialogo-acoes {
   display: none;
 }
 
+/* Celular: a lista não deixa o último item sob o + (3,5 rem + folga acima da barra). */
 @media (max-width: 699px) {
+  .shell:not(:has(.leitor)) .conteudo {
+    padding-bottom: 5.5rem;
+  }
+
   .flutuante {
     display: inline-flex;
     position: fixed;
@@ -1914,4 +1935,251 @@ dialog.dialogo-previa .linha-acoes button {
 .bandeja-itens button[aria-disabled='true'] {
   opacity: 0.55;
   cursor: default;
+}
+
+/* Revisão do rascunho (10.1): dispositivos a confirmar */
+.revisao-lista {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.revisao-lista > li {
+  border-top: 1px solid var(--borda);
+  padding: 0.75rem 0;
+}
+
+.revisao-previa {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.revisao textarea {
+  width: 100%;
+}
+
+.revisao-salvo {
+  margin: 0.25rem 0 0;
+}
+
+.revisao-estrutura {
+  margin: 0.75rem 0;
+}
+
+.revisao-estrutura select {
+  max-width: 100%;
+}
+
+/* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
+
+.linha-lista {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 64px;
+  padding: 0.5rem 0.75rem;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-cartao);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.linha-lista-icone {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo);
+  height: var(--alvo);
+  border-radius: var(--raio);
+  background: var(--agora-fundo);
+  color: var(--primaria);
+  font-weight: 700;
+}
+
+.linha-lista-texto {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.linha-lista-titulo {
+  font-weight: 600;
+}
+
+.linha-lista-apoio {
+  color: var(--texto-atenuado);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linha-lista-seta {
+  flex-shrink: 0;
+  color: var(--texto-atenuado);
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--agora-borda);
+  background: var(--agora-fundo);
+  color: var(--texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Estado selecionado único: tinta e borda sálvia (filtros, disciplina, Conta › Aparência). */
+.opcao:has(input[type='radio']:checked),
+.filtro-escolha:has(input[type='radio']:checked) {
+  background: var(--agora-fundo);
+  border-radius: var(--raio);
+  box-shadow: inset 0 0 0 1.5px var(--agora-borda);
+}
+
+.opcao:has(input[type='radio']),
+.filtro-escolha:has(input[type='radio']) {
+  padding-inline: 0.75rem;
+}
+
+/* Menu "Ajuda": abre para baixo a partir do botão, alinhado à direita. */
+.menu-ajuda {
+  position: relative;
+}
+
+.menu-ajuda-itens {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 10;
+  display: grid;
+  gap: 0.25rem;
+  min-width: 13rem;
+  padding: 0.5rem;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra);
+}
+
+.menu-ajuda-itens .botao,
+.menu-ajuda-itens button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* ── Fatia 6 (6.4 a 6.7): Biblioteca em lista, drill centrado, estado por texto ─ */
+
+.lista-de-linhas {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. */
+.topo-drill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topo-drill .barra-fina {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.cartao-drill {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  min-height: 40dvh;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-radius: var(--raio-cartao);
+}
+
+.drill-frente {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  line-height: 1.4;
+}
+
+.frase-correta {
+  padding: 0.75rem 1rem;
+  background: var(--agora-fundo);
+  border: 1.5px solid var(--agora-borda);
+  border-radius: var(--raio);
+  text-align: left;
+}
+
+.frase-correta p {
+  margin: 0;
+}
+
+.frase-correta-titulo {
+  margin-bottom: 0.25rem !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.acoes-drill {
+  justify-content: center;
+}
+
+.acoes-drill .principal.grande {
+  min-width: min(100%, 16rem);
+  min-height: 50px;
+}
+
+.respostas button {
+  flex: 1;
+  border-width: 2px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.respostas .resposta-errei {
+  border-color: var(--perigo);
+}
+
+.respostas .resposta-dificil {
+  border-color: var(--estrela);
+}
+
+.respostas .resposta-facil {
+  border-color: var(--sucesso);
+}
+
+/* Estado por texto (6.7): palavra e ícone além da cor. */
+.estado-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.estado-texto.estado-errou,
+.estado-texto.estado-vencido {
+  color: var(--perigo);
+}
+
+.estado-texto.estado-vencido {
+  min-width: 0;
+}
+
+/* "Sair do foco": recuado, sem competir com "Próximo artigo". */
+.bandeja-itens .sair-do-foco {
+  background: transparent;
+  border-color: transparent;
+  color: var(--texto-atenuado);
+  font-weight: 400;
 }
