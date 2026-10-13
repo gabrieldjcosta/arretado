@@ -25,7 +25,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | 5 | ~~12.2 Publicar a busca por endereço e testar com leis reais~~ | — | Feita em 13/10/2026: no ar, LEP, CF e CC respondem sem estourar |
 | ✔ 6 | 12.3 Campo de endereço na tela Importar (feita em 13/10/2026, sem mexer no esquema; testada só com mocks, falta o seu teste real com rede) | — | — |
 | ✔ 6b | Verificar atualização pelo aparelho (feita em 13/10/2026, sem mexer no esquema; só lê e avisa, nunca troca o texto; testada só com mocks, falta o seu teste real com rede) | — | — |
-| 7 | 13.4 Documento do portão da F2 | Sonnet médio | Nuvem |
+| ✔ 7 | 13.4 Documento do portão da F2 (feito em 13/10/2026 em `docs/portoes/F2.md`; critérios ligados a teste, pendências suas listadas, o que depende de uso real ou rede está como "não medido") | — | — |
 | 8 | **2 semanas lendo lei no Arretado** | — | **Você** |
 | 9 | Planejar a F3 (tela Hoje, Sessão, Plano) | **Opus** | Nuvem, só depois do portão |
 
