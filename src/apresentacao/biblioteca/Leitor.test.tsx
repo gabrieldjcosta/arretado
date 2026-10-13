@@ -1718,6 +1718,13 @@ describe('palco do modo foco (F entra no cartão)', () => {
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
+    // As preferências carregam depois do texto: sem esperar a lente, o F entraria no cartão.
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Modo foco' })).toHaveAttribute(
+        'data-lente',
+        'corrido',
+      );
+    });
     await usuario.keyboard('f');
     await screen.findByRole('button', { name: 'Mais ações do foco' });
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
@@ -1761,7 +1768,9 @@ describe('palco do modo foco (F entra no cartão)', () => {
     const norma = await publicar(repo, LEI);
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=artigo`);
     await cartao(/, \d+ de \d+$/);
-    expect(document.querySelector('.area-artigo')).toHaveClass('com-espiada');
+    await waitFor(() => {
+      expect(document.querySelector('.area-artigo')).toHaveClass('com-espiada');
+    });
   });
 });
 
