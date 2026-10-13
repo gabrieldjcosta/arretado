@@ -83,7 +83,9 @@ describe('exportação (3.2)', () => {
     expect(nomes).toEqual([
       'dados/cartoes.json',
       'dados/erros.json',
+      'dados/frases.json',
       'dados/revisoes.json',
+      'dados/revisoesFrase.json',
       'log.json',
       'manifesto.json',
     ]);

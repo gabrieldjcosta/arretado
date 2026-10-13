@@ -14,46 +14,87 @@ async function abrir(rota: string, repo?: Repositorio) {
   return { repo: r, usuario };
 }
 
+/** Erro como o app anterior à v6 gravava: sem frase correta. */
+const erroAntigo = (repo: Repositorio, oQueFoi: string) =>
+  repo.colecao('erros').criar({ resultado: 'errou', oQueFoi, status: 'aberto' });
+
 describe('captura de erro (6.2)', () => {
-  it('só salva com resultado e "o que foi"; depois pergunta pelo cartão sem modal', async () => {
+  it('só a frase correta é obrigatória (D25); sem "o que foi" não pergunta pelo cartão', async () => {
     const { repo, usuario } = await abrir('/recall/registrar');
     const salvar = await screen.findByRole('button', { name: 'Salvar' });
-    expect(screen.getByLabelText('O que foi')).toHaveFocus();
+    expect(screen.getByLabelText('Frase correta')).toHaveFocus();
     expect(salvar).toBeDisabled();
-    await usuario.type(screen.getByLabelText('O que foi'), 'Prazo de 5 dias do agravo');
-    expect(salvar).toBeDisabled();
-    await usuario.click(screen.getByRole('button', { name: 'Errei' }));
+    await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo do agravo é de 15 dias.');
     expect(salvar).toBeEnabled();
     await usuario.click(salvar);
 
-    expect(await screen.findByText('Erro registrado.')).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    await usuario.click(screen.getByRole('button', { name: 'Sim' }));
-    expect(await screen.findByText(/Cartão criado/)).toBeInTheDocument();
-
+    expect(await screen.findByText('Frase registrada.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sim' })).not.toBeInTheDocument();
     const [erro] = await repo.colecao('erros').todosDoUsuario();
     expect(erro).toMatchObject({
       resultado: 'errou',
+      fraseCorreta: 'O prazo do agravo é de 15 dias.',
+      status: 'aberto',
+    });
+    expect(erro?.oQueFoi).toBeUndefined();
+    const [frase] = await repo.colecao('frases').todosDoUsuario();
+    expect(frase).toMatchObject({ texto: 'O prazo do agravo é de 15 dias.', erroId: erro?.id });
+
+    await usuario.click(screen.getByRole('button', { name: 'Registrar outra' }));
+    expect(await screen.findByLabelText('Frase correta')).toHaveValue('');
+    expect(screen.getByLabelText('Frase correta')).toHaveFocus();
+  });
+
+  it('com "o que foi" em mais detalhes, pergunta pelo cartão sem modal', async () => {
+    const { repo, usuario } = await abrir('/recall/registrar');
+    await screen.findByRole('button', { name: 'Salvar' });
+    expect(screen.getByLabelText('O que foi')).not.toBeVisible();
+    await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo é de 15 dias.');
+    await usuario.click(screen.getByText('Mais detalhes (opcional)'));
+    await usuario.click(screen.getByRole('button', { name: 'Acertei sem certeza' }));
+    await usuario.type(screen.getByLabelText('O que foi'), 'Prazo de 5 dias do agravo');
+    await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
+    await screen.findByText('Frase registrada.');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Sim' }));
+    expect(await screen.findByText(/Cartão criado/)).toBeInTheDocument();
+    const [erro] = await repo.colecao('erros').todosDoUsuario();
+    expect(erro).toMatchObject({
+      fraseCorreta: 'O prazo é de 15 dias.',
+      resultado: 'acertou_inseguro',
       oQueFoi: 'Prazo de 5 dias do agravo',
       status: 'com_cartao',
       causaSugerida: 'literalidade',
     });
-    expect(await repo.colecao('cartoes').contar()).toBe(1);
+    const [cartao] = await repo.colecao('cartoes').todosDoUsuario();
+    const [frase] = await repo.colecao('frases').todosDoUsuario();
+    expect(cartao?.fraseId).toBe(frase?.id);
   });
 
-  it('"mais detalhes" começa recolhido e grava a frase correta', async () => {
-    const { repo, usuario } = await abrir('/recall/registrar');
-    await screen.findByRole('button', { name: 'Salvar' });
-    expect(screen.getByLabelText('Frase correta')).not.toBeVisible();
-    await usuario.click(screen.getByText('Mais detalhes (opcional)'));
-    await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo é de 15 dias.');
-    await usuario.click(screen.getByRole('button', { name: 'Acertei sem certeza' }));
-    await usuario.type(screen.getByLabelText('O que foi'), 'Agravo');
+  it('disciplina e ponto são opcionais e ficam escolhidos para o registro seguinte', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    await repo.colecao('disciplinas').criar({ nome: 'Civil' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await usuario.selectOptions(
+      await screen.findByLabelText('Ponto do edital (opcional)'),
+      'Furto',
+    );
+    expect(screen.getByLabelText('Disciplina (opcional)')).toHaveValue(penal.id);
+    await usuario.type(screen.getByLabelText('Frase correta'), 'Primeira.');
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
-    await screen.findByText('Erro registrado.');
-    const [erro] = await repo.colecao('erros').todosDoUsuario();
-    expect(erro?.fraseCorreta).toBe('O prazo é de 15 dias.');
-    expect(erro?.resultado).toBe('acertou_inseguro');
+    expect(await screen.findByText('A próxima fica em Penal › Furto.')).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Registrar outra' }));
+    expect(await screen.findByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    await usuario.type(screen.getByLabelText('Frase correta'), 'Segunda.');
+    await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
+    await screen.findByText('Frase registrada.');
+    const frases = await repo.colecao('frases').todosDoUsuario();
+    expect(frases.map((f) => [f.texto, f.disciplinaId, f.pontoId])).toEqual([
+      ['Primeira.', penal.id, furto.id],
+      ['Segunda.', penal.id, furto.id],
+    ]);
   });
 
   it('atalho E abre a captura; dentro de campo de texto não', async () => {
@@ -62,15 +103,15 @@ describe('captura de erro (6.2)', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
     ).toBeInTheDocument();
-    await usuario.type(screen.getByLabelText('O que foi'), 'e');
-    expect(screen.getByLabelText('O que foi')).toHaveValue('e');
+    await usuario.type(screen.getByLabelText('Frase correta'), 'e');
+    expect(screen.getByLabelText('Frase correta')).toHaveValue('e');
   });
 });
 
 describe('completar depois (6.3)', () => {
   it('salva sozinho e mostra "Salvo"', async () => {
     const { repo } = await repositorioDeTeste();
-    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Remição' });
+    const erro = await erroAntigo(repo, 'Remição');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(
       await screen.findByLabelText('Frase correta'),
@@ -93,7 +134,7 @@ describe('completar depois (6.3)', () => {
 
   it('lista marca "completar" e filtra, preservando o filtro no endereço', async () => {
     const { repo } = await repositorioDeTeste();
-    await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Rápido' });
+    await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Rápido', fraseCorreta: 'R.' });
     await registrarErro(repo, {
       resultado: 'errou',
       oQueFoi: 'Completo',
@@ -152,7 +193,7 @@ describe('drill (6.6) e lista passiva (6.8)', () => {
 describe('cartões (6.7)', () => {
   it('suspender tira da lista de ativos e aparece em suspensos', async () => {
     const { repo } = await repositorioDeTeste();
-    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Frente X' });
+    const erro = await registrarErro(repo, { oQueFoi: 'Frente X', fraseCorreta: 'Verso X.' });
     await criarCartaoDeErro(repo, erro.id);
     const { usuario } = await abrir('/recall/cartoes', repo);
     await usuario.click(await screen.findByRole('button', { name: 'Suspender' }));
@@ -167,7 +208,7 @@ describe('cartões (6.7)', () => {
 describe('correções da revisão da etapa 6', () => {
   it('edição feita logo antes de sair da tela é gravada', async () => {
     const { repo } = await repositorioDeTeste();
-    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Sursis' });
+    const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
     await usuario.click(screen.getByRole('link', { name: 'Voltar ao Recall' }));
@@ -180,7 +221,7 @@ describe('correções da revisão da etapa 6', () => {
 
   it('ano incompleto não impede gravar os outros campos', async () => {
     const { repo } = await repositorioDeTeste();
-    const erro = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Sursis' });
+    const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Ano'), '26');
     expect(screen.getByText('Use 4 dígitos, de 1900 a 2100.')).toBeInTheDocument();

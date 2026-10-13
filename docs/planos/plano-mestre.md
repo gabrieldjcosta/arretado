@@ -24,7 +24,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 |---|---|---|
 | R1 | Leitura, captura manual, revisão, planejamento e exportação funcionam sem conta e sem rede; o remoto é espelho | D1, `CLAUDE.md` |
 | R2 | Quatro áreas fixas: **Hoje, Plano, Recall, Biblioteca**; mais captura, busca, menu **Ajuda** e Conta fora da navegação | D6 |
-| R3 | Captura com **um único campo obrigatório: a frase correta**; disciplina e ponto do edital são facultativos e ficam escolhidos em registros em sequência; resultado (errou / acertou inseguro), "o que foi", imagem, fonte, classificação e IA são opcionais e aparecem sob demanda. *Até as Frases 1 serem implementadas, valem os 2 campos de hoje* | D9, **D25** (Gabriel, 13/10/2026) |
+| R3 | Captura com **um único campo obrigatório: a frase correta**; disciplina e ponto do edital são facultativos e ficam escolhidos em registros em sequência; resultado (errou / acertou inseguro), "o que foi", imagem, fonte, classificação e IA são opcionais e aparecem sob demanda. *Implementado nas Frases 1 (13/10/2026)* | D9, **D25** (Gabriel, 13/10/2026) |
 | R4 | IA externa só produz **rascunho** editável, com fonte, "Desfazer" e aprovação; nunca texto jurídico autoritativo nem alteração automática | novo (A2) |
 | R5 | Todo material importado, extraído ou gerado é aprovado pelo usuário antes de virar conteúdo de estudo | D13, R4 |
 | R6 | Fim de assinatura **nunca apaga dado nem bloqueia exportação** ou estudo manual | novo (C1) |
@@ -94,7 +94,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | F0 | Fundamentos | — | ✅ portão fechado |
 | F1 | Recall (MVP) e pontos | F0 | ✅ implementada; portão em medição |
 | **F2** | Legislação: importar, estruturar, revisar, publicar, ler, corrigir; acervo, súmulas, teses | F1 (paralela ao uso) | **Em execução**: falta etapa 12 (12.2, 12.3, 6b), etapa 13 e o uso real |
-| F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; não iniciada |
+| F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; Frases 1 feita (v6, PR aguarda revisão e backup) |
 | F3-A | Hoje, Sessão e retorno após pausa | portão F2 | não iniciada |
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
 | V1 | Validação com 3 a 5 pessoas | F3 | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
@@ -120,7 +120,7 @@ Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12
 | 13.2 ✔ 13/10/2026 | Orientações › Legislação e "Ajuda sobre esta tela" no leitor e no importador (menu Ajuda, D6) | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.3 ✔ 13/10/2026 | Backup com normas: exportar → apagar → restaurar idêntico com o CP inteiro; pacote só de `legislacao` com a fonte das versões | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.5 ✔ 13/10/2026 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
-| 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
+| 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Feita e verificada em 13/10/2026** (sem estouro; plano B dispensado) |
 | 12.3 | Campo URL na tela Importar (decodifica no aparelho, hash do sanitizado, oferece colar se falhar) | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 6b | Verificar atualização no site oficial pelo aparelho (D16), depois da 12.2 | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 13.4 | `portoes/F2.md` com cada critério ligado a um teste; README e `CLAUDE.md` | Sonnet 5.5 médio | nuvem, depois de 13.1–13.3 e 13.5 |
@@ -243,7 +243,7 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 | ~~3~~ | ~~**13.2** Orientações › Legislação e ajuda contextual~~ ✔ 13/10/2026 | — | — |
 | ~~4~~ | ~~**13.5** Verificação de fechamento (§3 B)~~ ✔ 13/10/2026 | — | — |
 | 4a | **Ajustes A**: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
-| 4b | **Frases 1**: modelo e captura (esquema v6; **backup antes do merge**) | **Opus 5.5** | nuvem |
+| ✔ 4b | **Frases 1**: modelo e captura (esquema v6), feita em 13/10/2026; **revisão independente e backup antes do merge** | **Opus 5.5** | nuvem |
 | 4c | **Frases 2**: Revisar frases e Revisar cartões, oclusão | Sonnet 5.5 médio | nuvem |
 | 4d | **Frases 3**: Enviar às frases a partir do leitor | Sonnet 5.5 médio | nuvem |
 | 5 | **12.2** Worker com chamada real | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |

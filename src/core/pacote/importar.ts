@@ -10,8 +10,9 @@ import {
   type LogDeImportacao,
   type Modulo,
   type NomeColecao,
+  versaoDeOrigem,
 } from '../modelo';
-import type { Repositorio } from '../persistencia';
+import { migrarFrasesDosErros, type Repositorio } from '../persistencia';
 import { iguais, jsonCanonico } from '../util/json-canonico';
 import type { PacoteLido } from './ler';
 import { criarSnapshot, podarSnapshots } from './snapshots';
@@ -140,6 +141,8 @@ export async function planejar(
   const avisos: string[] = [];
   let imutaveis = 0;
   let duplicatas = 0;
+  /** Erros que a importação exclui (modo 5): as Frases deles saem junto. */
+  const errosExcluidos = new Set<string>();
 
   for (const nome of colecoes) {
     const resumo = resumoVazio();
@@ -207,9 +210,23 @@ export async function planejar(
       }
     }
 
+    // Pacote anterior à v6 nada diz das Frases (nascem dos erros, T22). Substituir módulos não as
+    // apaga; só sai a Frase do erro que a importação exclui. Restaurar integral apaga tudo, e
+    // `migrarFrasesDosErros` recria as Frases dos erros restaurados.
+    const posteriorAoPacote =
+      (nome === 'frases' || nome === 'revisoesFrase') && versaoDeOrigem(nome) > m.versaoEsquema;
     if ((modo === 5 || modo === 6) && !soFontes(nome)) {
       for (const l of locais) {
         if (idsPacote.has(l.id)) continue;
+        if (modo === 5 && posteriorAoPacote) {
+          const erroId = (l as { erroId?: unknown }).erroId;
+          const erroSai =
+            nome === 'frases' && typeof erroId === 'string' && errosExcluidos.has(erroId);
+          if (!erroSai || l.excluidoEm !== null) {
+            resumo.ignorar += 1;
+            continue;
+          }
+        }
         // O registro deste Aparelho nunca é apagado nem excluído pela importação.
         if (nome === 'aparelhos' && l.id === repo.ctx.aparelhoId) {
           if (outroUsuario) operacoes.push({ tipo: 'rehospedar', colecao: nome, registro: l });
@@ -225,6 +242,7 @@ export async function planejar(
             imutaveis += 1;
           } else {
             operacoes.push({ tipo: 'excluirLogico', colecao: nome, registro: l });
+            if (nome === 'erros') errosExcluidos.add(l.id);
             resumo.excluir += 1;
           }
         }
@@ -367,6 +385,9 @@ export async function aplicar(
       await migrarRegistrosLocais(repo, alvo);
       await alvo.adotarIdentidade(alvo.ctx.usuarioId);
     }
+    // Pacote anterior à v6 traz erros com frase correta e nenhuma Frase: elas nascem aqui (T22).
+    // Pacote v6 em diante já traz as Frases como estavam; restaurar devolve exatamente o pacote.
+    if (pacote.manifesto.versaoEsquema < 6) await migrarFrasesDosErros(alvo);
     return alvo.colecao('logsImportacao').criar(
       {
         em: agora,

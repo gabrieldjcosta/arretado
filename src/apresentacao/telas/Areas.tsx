@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
 import { vencidosHoje } from '../recall/carregadores';
@@ -9,16 +10,13 @@ export function Hoje() {
     <>
       <h1>Hoje</h1>
       {vencidos !== undefined && vencidos > 0 ? (
-        <section className="cartao-bloco" aria-label="Revisões">
-          <p>
-            {vencidos === 1
-              ? '1 cartão para revisar.'
-              : `${String(vencidos)} cartões para revisar.`}
-          </p>
-          <Link to="/recall/revisar" className="botao principal">
-            Revisar
-          </Link>
-        </section>
+        <AcaoAgora
+          titulo={
+            vencidos === 1 ? '1 cartão para revisar.' : `${String(vencidos)} cartões para revisar.`
+          }
+          rotuloBotao="Revisar"
+          para="/recall/revisar"
+        />
       ) : (
         <Vazio titulo="Nenhuma revisão hoje">
           <p>O Hoje completo (ponto do dia e fechamento) chega numa próxima fase.</p>

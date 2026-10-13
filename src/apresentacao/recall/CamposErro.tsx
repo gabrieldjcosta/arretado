@@ -25,12 +25,15 @@ export function CamposErro({
   causaSugerida,
   pontos = [],
   disciplinas = [],
+  semFraseNemVinculos = false,
 }: {
   valor: Complemento;
   aoMudar: (mudanca: Complemento) => void;
   causaSugerida?: CausaErro | undefined;
   pontos?: Ponto[];
   disciplinas?: Disciplina[];
+  /** A captura mostra a frase, a disciplina e o ponto fora de "mais detalhes" (D25). */
+  semFraseNemVinculos?: boolean;
 }) {
   const id = useId();
   const texto = (campo: keyof Complemento) => (e: { target: { value: string } }) => {
@@ -46,20 +49,22 @@ export function CamposErro({
 
   return (
     <>
-      <div className="campo">
-        <label htmlFor={`${id}-frase`}>Frase correta</label>
-        <textarea
-          id={`${id}-frase`}
-          rows={2}
-          maxLength={2_000}
-          value={valor.fraseCorreta ?? ''}
-          onChange={texto('fraseCorreta')}
-          aria-describedby={`${id}-frase-dica`}
-        />
-        <p id={`${id}-frase-dica`} className="dica">
-          A tese certa em uma linha. Vira o verso do cartão e entra na lista de frases.
-        </p>
-      </div>
+      {!semFraseNemVinculos && (
+        <div className="campo">
+          <label htmlFor={`${id}-frase`}>Frase correta</label>
+          <textarea
+            id={`${id}-frase`}
+            rows={2}
+            maxLength={2_000}
+            value={valor.fraseCorreta ?? ''}
+            onChange={texto('fraseCorreta')}
+            aria-describedby={`${id}-frase-dica`}
+          />
+          <p id={`${id}-frase-dica`} className="dica">
+            A tese certa em uma linha. Vira o verso do cartão e entra na lista de frases.
+          </p>
+        </div>
+      )}
 
       <fieldset>
         <legend>Causa</legend>
@@ -125,7 +130,7 @@ export function CamposErro({
         ))}
       </fieldset>
 
-      {disciplinas.length > 0 && (
+      {!semFraseNemVinculos && disciplinas.length > 0 && (
         <div className="campo">
           <label htmlFor={`${id}-disciplina`}>Disciplina</label>
           <select
@@ -142,7 +147,7 @@ export function CamposErro({
           </select>
         </div>
       )}
-      {pontos.length > 0 && (
+      {!semFraseNemVinculos && pontos.length > 0 && (
         <div className="campo">
           <label htmlFor={`${id}-ponto`}>Ponto do edital</label>
           <select id={`${id}-ponto`} value={valor.pontoId ?? ''} onChange={texto('pontoId')}>

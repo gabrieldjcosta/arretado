@@ -384,6 +384,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### A rota estoura o limite de processamento
 - **Sintoma:** a busca de uma lei grande falha no Cloudflare. **Causa:** o plano gratuito dá 10 ms de CPU por execução do Worker (esperar o Planalto não conta; processar conta).
 - **Solução:** a rota só repassa os bytes (sem decodificar nem montar JSON); se ainda estourar, plano B da T17 (Edge Function no Supabase, aceitando a pausa). **Prevenção:** chamada real com LEP, CF/88 (1,8 MB) e Código Civil, conferida no painel.
+- **Verificado em 13/10/2026 (atividade 12.2), sem estouro:** chamadas reais ao Worker publicado, `curl` do computador do Gabriel: LEP (307 KB), CF/88 (1,84 MB, 7 chamadas seguidas, 1,0–2,1 s), CC compilado (924 KB), LC 988/2006 e `/norma/159949` da ALESP; todas 200, nenhum erro 1102/CPU. Recusas conferidas: host fora da lista 403 `host_nao_permitido`, `http://` 400 `protocolo_nao_https`, 404 do Planalto 502 `status_erro`. Plano B da T17 não é necessário. Limite só observável, não medido no painel.
+- **Achado (não é defeito da rota):** a CF/88 muda a cada pedido (1.839.028 ou 1.840.587 bytes; também direto do Planalto): o WAF do Planalto (F5) injeta no fim um `<script>` `f5_cspm` com valor variável. O hash tem de ser do conteúdo **sanitizado** (como já decide a T17); a importação por URL (12.3) precisa remover esse script antes do hash, senão a "atualização" apareceria em toda consulta.
 - **Origem:** previsto — atividade 12.2.
 
 ## Legislação (F2): fontes, colar, estruturador, leitor
@@ -1241,3 +1243,23 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **gov.br participamaisbrasil e BVS/Saúde:** bloqueiam download automático (403 e desafio de navegador); usar cópia do DOU ou do CONASS e dizer isso no aviso do item.
 - **`acervo:gerar` sem argumento** regrava todos os itens e o índice (as datas de coleta mudam e o hash junto): não restaurar arquivos antigos de `public/acervo/`, senão o `verificar` acusa hash diferente.
 - **Pendentes sem fonte:** Prov. CGJ-TJSP 18/2012, 16/2013, 21/2013 e Res. CONDEGE 1/2024.
+
+### Teste de subida de esquema acusa uma linha a mais em `meta` (v6)
+- **Causa:** ao abrir, `Repositorio.abrir` roda `migrarFrasesDosErros` uma vez e grava a marca `CHAVE_MIGRACAO_FRASES` em `meta` (Frases 1).
+- **Solução:** comparar `meta` sem a marca (`tabelaSemMarca` em `migracao.test.ts`). Subida futura (v7) que crie dado depois de abrir: mesma ideia, uma marca por migração.
+
+### Teste de pacote antigo recusa com "arquivo alterado" depois de coleção nova
+- **Causa:** os ajudantes `comoPacoteV1`/`comoPacoteV2` precisam tirar do pacote toda coleção nascida depois daquela versão (na v6: `frases` e `revisoesFrase`).
+- **Solução:** acrescentar a coleção nova à lista dos ajudantes a cada subida de esquema. Previsível na próxima: qualquer coleção com `desdeVersao` nova.
+
+### Restaurar pacote de outra identidade e importar de novo "não apaga" o que devia
+- **Causa:** depois de `aplicar` com `substituiIdentidade`, o `Repositorio` antigo continua com o `usuarioId` velho; a prévia seguinte não enxerga os registros da identidade nova.
+- **Solução:** usar `repo.comUsuario(novoUsuarioId)` (ou reabrir) para as operações seguintes.
+
+### Frase correta não aparece em "Frases" depois do registro (v6)
+- **Causa provável:** registro gravado direto pela coleção `erros` (teste, carga, importação de pacote v6 sem a Frase), sem passar por `registrarErro`; a migração só cria Frase ao abrir pela primeira vez na v6 e ao importar pacote < v6.
+- **Solução:** registrar por `registrarErro`/`completarErro` (criam ou sincronizam a Frase). Para dado antigo, `migrarFrasesDosErros(repo)` é idempotente.
+
+### "Substituir módulos" com backup v5 apagava todas as Frases (v6; corrigido na revisão das Frases 1)
+- **Causa:** a prévia do modo 5 excluía (lógico) toda Frase local fora do pacote, e um pacote v5 não tem `frases`; `migrarFrasesDosErros` pulava o erro que já tinha Frase, mesmo excluída. Resultado: nenhuma Frase ativa.
+- **Solução:** `planejar` (modo 5, pacote < v6) não toca `frases`/`revisoesFrase`, só exclui a Frase do erro que a importação exclui; a migração só pula erro com Frase não excluída. Testes em `pacote-v2.test.ts` ("pacote v5 no app v6"). Previsível: coleção derivada nova (v7) num pacote antigo precisa da mesma regra.

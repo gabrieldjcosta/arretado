@@ -5,6 +5,7 @@ import { FonteEmMemoria } from './fonte-em-memoria';
 import { FonteEstatica } from './fonte-estatica';
 import { FonteIndisponivel } from './fonte';
 import { hashDoItem } from './hash';
+import { disciplinasDaNorma, mudarDisciplinas } from './vinculos';
 
 const nomeBanco = () => `acervo-${Math.random().toString(36).slice(2)}`;
 
@@ -230,5 +231,70 @@ describe('nomeComparavel', () => {
   it('ignora acento, caixa e espaços', () => {
     expect(nomeComparavel('  Direito  Constitucional ')).toBe('direito constitucional');
     expect(nomeComparavel('Execução')).toBe('execucao');
+  });
+});
+
+describe('disciplinas escolhidas (Ajustes A)', () => {
+  const nomesDosVinculos = async (repo: Repositorio) =>
+    (await repo.colecao('vinculosDisciplina').todosDoUsuario())
+      .filter((v) => v.excluidoEm == null)
+      .map((v) => v.sugestao ?? 'Outros')
+      .sort();
+
+  it('sem escolha, valem as disciplinas sugeridas pelo índice', async () => {
+    const { repo, fonte, indice } = await montar();
+    await aderirAoItem(repo, fonte, indice.itens[0]!);
+    expect(await nomesDosVinculos(repo)).toEqual(['Direito  Penal']);
+    repo.fechar();
+  });
+
+  it('a escolha troca as sugeridas; várias e "Outros" valem; subtítulo acompanha o nome que fica', async () => {
+    const { repo, fonte, indice } = await montar();
+    await aderirAoItem(repo, fonte, indice.itens[0]!, {
+      disciplinas: ['Direito Penal', 'Execução Penal'],
+    });
+    expect(await nomesDosVinculos(repo)).toEqual(['Direito Penal', 'Execução Penal']);
+    const vinculos = await repo.colecao('vinculosDisciplina').todosDoUsuario();
+    expect(vinculos.find((v) => v.sugestao === 'Direito Penal')?.subtitulo).toBe('Parte geral');
+    expect(vinculos.find((v) => v.sugestao === 'Execução Penal')?.subtitulo).toBeUndefined();
+    await aderirAoItem(repo, fonte, indice.itens[1]!, { disciplinas: ['Outros'] });
+    const outros = (await repo.colecao('vinculosDisciplina').todosDoUsuario()).filter(
+      (v) => v.sugestao === undefined && v.disciplinaId === undefined,
+    );
+    expect(outros).toHaveLength(1);
+    repo.fechar();
+  });
+
+  it('casa a escolha com a disciplina do usuário', async () => {
+    const { repo, fonte, indice } = await montar();
+    const d = await repo.colecao('disciplinas').criar({ nome: 'Execução Penal' });
+    await aderirAoItem(repo, fonte, indice.itens[2]!, { disciplinas: ['execucao penal'] });
+    const [v] = await repo.colecao('vinculosDisciplina').todosDoUsuario();
+    expect(v?.disciplinaId).toBe(d.id);
+    repo.fechar();
+  });
+
+  it('o lote usa a escolha de cada item e as sugeridas dos demais', async () => {
+    const { repo, fonte, indice } = await montar();
+    await aderirEmLote(repo, fonte, ['lei-a', 'lei-b'], {
+      disciplinasPorItem: new Map([['lei-b', ['Constitucional']]]),
+    });
+    expect(await nomesDosVinculos(repo)).toEqual(['Constitucional', 'Direito  Penal']);
+    expect(indice.itens).toHaveLength(3);
+    repo.fechar();
+  });
+
+  it('"Mudar disciplina" troca os vínculos, mantém subtítulo e some do que saiu', async () => {
+    const { repo, fonte, indice } = await montar();
+    const r = await aderirAoItem(repo, fonte, indice.itens[0]!);
+    if (r.estado !== 'adicionada') throw new Error('esperava adicionada');
+    expect(await disciplinasDaNorma(repo, r.normaId)).toEqual(['Direito  Penal']);
+    await mudarDisciplinas(repo, r.normaId, ['Direito  Penal', 'Processo Penal']);
+    expect(await nomesDosVinculos(repo)).toEqual(['Direito  Penal', 'Processo Penal']);
+    await mudarDisciplinas(repo, r.normaId, ['Processo Penal']);
+    expect(await nomesDosVinculos(repo)).toEqual(['Processo Penal']);
+    await mudarDisciplinas(repo, r.normaId, []);
+    expect(await disciplinasDaNorma(repo, r.normaId)).toEqual([]);
+    repo.fechar();
   });
 });
