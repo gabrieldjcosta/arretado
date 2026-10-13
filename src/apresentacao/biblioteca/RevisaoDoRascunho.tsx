@@ -155,7 +155,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
    */
   const gravarAgora = useCallback(
     (alvo: ItemAConfirmar, texto1: string, rotulo1: string): Promise<void> => {
-      let falha: unknown;
+      let falha: Error | undefined;
       gravando.current = gravando.current.then(async () => {
         if (texto1 === salvo.current.texto && rotulo1 === salvo.current.rotulo) return;
         setSalvamento('salvando');
@@ -164,7 +164,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
           salvo.current = { texto: texto1, rotulo: rotulo1 };
           setSalvamento('salvo');
         } catch (excecao) {
-          falha = excecao ?? new Error('falha ao salvar');
+          falha = excecao instanceof Error ? excecao : new Error('Falha ao salvar.');
           if (excecao instanceof RascunhoIndisponivel) indisponivel.current(excecao.message);
           else setSalvamento('falhou');
         }
