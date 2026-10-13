@@ -66,3 +66,22 @@ Notas da rodada 3, Hoje (1 a 10): 5, 4, 4, 3, 5, 3, 4, 4, 3, 4.
 - **Fim de sessão:** a recompensa é só um ponto a mais na trilha, discreta demais; "85% da subseção" é métrica inventada; "Registro incorporado ao índice do caderno de execução" é enchimento. Cortar os dois.
 
 Nota: 50/50 exige 5 em todos os critérios, ou seja, excepcional em tudo; a meta prática é ≥ 45 sem nota abaixo de 4 em identidade, encantamento e ânimo.
+
+## Rodada 4 — Hoje, nova direção pedida pelo Gabriel (13/10/2026)
+
+Feedback sobre o conceito do fio e da costura: "fraco". Pedido: inspirar-se mais em planejadores visuais para foco (Tiimo), com branco e cinza no estilo do Claude e cinza escuro no modo escuro.
+Projeto Stitch: "Arretado - Hoje rodada 4", id `2968782632555934720`, https://stitch.google.com/projects/2968782632555934720
+
+Princípios tomados (não a identidade): linha do tempo do dia em blocos suaves; ícones grandes em círculos; formas muito arredondadas; uma coisa em destaque agora; uma cor pastel por disciplina. Neutros: branco quente `#faf9f5`, texto `#1f1e1d`; escuro `#1f1e1d` / `#262624`; botão primário em cinza escuro.
+
+| Tela | Screen id |
+|---|---|
+| Hoje, desktop claro | `c96636907d1349429a94175f2b306b99` |
+| Hoje, celular claro | `31514034e67e4682880356b79970e9b9` |
+| Hoje, desktop escuro | `a1e992b0b5a4475c8ac0e4c95a4d66f8` |
+
+Leitura do júri (desktop claro): clareza 5, atenção 5, identidade 3, encantamento 3, confiança 4, ânimo 4, tipografia 3, cor 4, acessibilidade 4, viabilidade 3 = **38**. Mais vivo e mais claro que a rodada 3, porém mais genérico em identidade (parece um planejador pastel qualquer).
+- **Invenções a cortar:** subtítulos "Fixação doutrinária" e "Jurisprudência em teses"; aspas em volta da referência; ícone "99" para frases.
+- **Escuro:** o cartão pêssego vira marrom lamacento; reduzir saturação ou trocar a lógica de cor no escuro.
+- **Mobile:** caixa interna da referência pesa; "Conta" solta no meio da tela.
+- **Decisão pendente (D-D2):** trocar a identidade sálvia/papel esverdeado por neutros do Claude + pastel por disciplina implica novos tokens, risco de colisão com as cores de grifo do leitor (amarelo, verde, rosa) e atualização de `arretado-design-principles`. Só vale se o Gabriel confirmar.
