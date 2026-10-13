@@ -148,9 +148,14 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     void carregar();
   }, [carregar, aConfirmar]);
 
-  /** Grava o que está na tela (se mudou), na ordem dos pedidos anteriores. */
+  /**
+   * Grava o que está na tela (se mudou), na ordem dos pedidos anteriores. Se a gravação falha, a
+   * promessa devolvida rejeita com a exceção: quem fecha o formulário ou muda a estrutura depois
+   * não segue (o texto digitado continua na tela). A fila em si nunca rejeita.
+   */
   const gravarAgora = useCallback(
     (alvo: ItemAConfirmar, texto1: string, rotulo1: string): Promise<void> => {
+      let falha: unknown;
       gravando.current = gravando.current.then(async () => {
         if (texto1 === salvo.current.texto && rotulo1 === salvo.current.rotulo) return;
         setSalvamento('salvando');
@@ -158,12 +163,15 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
           await salvarTexto(repo, versaoId, alvo.dispositivoId, { texto: texto1, rotulo: rotulo1 });
           salvo.current = { texto: texto1, rotulo: rotulo1 };
           setSalvamento('salvo');
-        } catch (e) {
-          if (e instanceof RascunhoIndisponivel) indisponivel.current(e.message);
+        } catch (excecao) {
+          falha = excecao ?? new Error('falha ao salvar');
+          if (excecao instanceof RascunhoIndisponivel) indisponivel.current(excecao.message);
           else setSalvamento('falhou');
         }
       });
-      return gravando.current;
+      return gravando.current.then(() => {
+        if (falha !== undefined) throw falha;
+      });
     },
     [repo, versaoId],
   );
@@ -173,7 +181,8 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
     if (!corrigindo) return;
     if (texto === salvo.current.texto && rotulo === salvo.current.rotulo) return;
     const espera = setTimeout(() => {
-      void gravarAgora(corrigindo, texto, rotulo);
+      // A falha já aparece no estado do salvamento ("falhou").
+      gravarAgora(corrigindo, texto, rotulo).catch(() => undefined);
     }, PAUSA_DO_SALVAMENTO_MS);
     return () => {
       clearTimeout(espera);
@@ -620,10 +629,14 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
                     type="button"
                     disabled={ocupado}
                     onClick={() => {
-                      void gravarAgora(item, texto, rotulo).then(() => {
-                        setCorrigindo(null);
-                        void carregar();
-                      });
+                      // Sem salvar, o formulário fica aberto com o texto (o estado mostra a falha).
+                      gravarAgora(item, texto, rotulo).then(
+                        () => {
+                          setCorrigindo(null);
+                          void carregar();
+                        },
+                        () => undefined,
+                      );
                     }}
                   >
                     Fechar
