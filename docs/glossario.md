@@ -150,6 +150,7 @@ Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`
 | `cartao.criado` | `criarCartaoDeErro`, `criarCartaoManual` | `{ cartaoId, erroId }` (`erroId` só quando vem de erro) |
 | `cartao.atualizado`, `cartao.suspenso`, `cartao.arquivado`, `cartao.reativado` | `editarCartao`, `suspenderCartao`, `arquivarCartao`, `reativarCartao` | `{ cartaoId }` |
 | `cartao.revisado` | `revisar` | `{ cartaoId, revisaoId, pontoId }` |
+| `frase.revisada` | `revisarFrase` | `{ fraseId, revisaoId }` |
 | `versao.publicada` | `publicarVersao` (F2, 9.3), depois de a transação confirmar; não sai em publicação recusada | `{ normaId, versaoId }` |
 
 **Previstos** (sem código; nomes da Parte 1 §6 e da Parte 2 §8.2; a fase vem do plano da F2 ou, fora dele, da fase do módulo na Parte 1 §15):
@@ -244,7 +245,8 @@ Serviço em `src/dominios/recall/` (`servico.ts`, `agendamento.ts`, `causa.ts`);
 | Frase | `Frase` (coleção `frases`, v6): o que a pessoa quer lembrar; `texto`, `disciplinaId?`, `pontoId?`, `OrigemFrase` (`origemTipo`: `erro`, `trecho`, `manual`, `ia` reservada), `erroId?`, `trecho?` (`dispositivoId`, `versaoId?`, `texto`, `inicio`, `fim`), `EstadoFrase` (`ativa`, `arquivada`), `proximaRevisao`, `ultimaRevisao?`. Não usar "nota", "anotação" nem "resumo" (a Biblioteca guarda as fontes dos outros) |
 | Frase do erro | `registrarErro` cria Erro e Frase na mesma transação (evento `frase.criada`); `fraseDoErro(repo, erroId)`; `excluirErro` exclui a Frase junto; frase correta apagada arquiva a Frase |
 | Migração das frases | `migrarFrasesDosErros(repo)` (`src/core/persistencia/migracao-frases.ts`): Frase `origem: sistema` para cada erro com frase correta sem Frase; roda uma vez ao abrir (marca `CHAVE_MIGRACAO_FRASES` em `meta`) e ao importar pacote com `versaoEsquema < 6` |
-| Revisão de frase | `RevisaoDeFrase` (coleção `revisoesFrase`, append-only, v6): `fraseId`, `em`, `data`, `RespostaFrase` (`li`, `de_novo`), `proximaAntes`, `proximaDepois`, `atrasoDias`, `duracaoMs?`; a tela vem nas Frases 2 |
+| Cartão com lacuna (oclusão) | `criarCartaoDeLacuna(repo, fraseId, ocultos)` (tela `CartaoDeLacuna.tsx`, `/recall/frases/:id/cartao`): `Cartao.tipo = lacuna`, `ocultos` (intervalos), `frente` = texto com `[…]` (`textoComLacunas`, `normalizarOcultos`), `verso` = texto inteiro, `origemTipo = frase`, `fraseId`; todos os trechos escolhidos somem num só cartão |
+| Revisão de frase | `RevisaoDeFrase` (coleção `revisoesFrase`, append-only, v6): `fraseId`, `em`, `data`, `RespostaFrase` (`li`, `de_novo`), `proximaAntes`, `proximaDepois`, `atrasoDias`, `duracaoMs?`; tela `RevisarFrases.tsx` (`/recall/frases/revisar`, Frases 2): `filaDeFrases`, `contarFrasesVencidas`, `revisarFrase`; `agendarFrase` (`li` sobe um degrau de `INTERVALOS`, `de_novo` volta em 1 dia) |
 | Disciplina e ponto lembrados | captura (`RegistrarErro.tsx`): campos "Disciplina (opcional)" e "Ponto do edital (opcional)" fora de "Mais detalhes"; a escolha fica em `localStorage` (`arretado.captura.vinculos`, só ids) e só vale se ainda existir; "Registrar outra" |
 | Cartão da frase | `Cartao.fraseId?`, `Cartao.tipo?` (`pergunta` quando ausente, `lacuna`), `Cartao.ocultos?` (`Intervalo[]` `{ inicio, fim }`); `origemTipo` ganhou `frase` e `ia` (v6) |
 | Revisar frases | modo de revisão que lê a frase e marca "li" ou "de novo"; cota e espaçamento próprios |

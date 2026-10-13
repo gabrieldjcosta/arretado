@@ -20,7 +20,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ | 13.5 Verificação de fechamento (feita em 13/10/2026) | — | — |
 | ✔ | 4a Foco com o artigo no centro da tela; escolher a disciplina ao trazer uma lei do acervo (feita em 13/10/2026; a frase no centro entra na 4c) | — | — |
 | ✔ 4b | **Frases 1** (feita em 13/10/2026): registrar erro agora é só digitar a frase certa; disciplina e ponto opcionais e lembrados. **Mexe no esquema (v6): revisão independente feita (13/10/2026, um defeito corrigido); falta o seu backup (Conta › Dados › Exportar) antes do merge no `main`** | — | — |
-| 4c | **Frases 2:** dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | Sonnet médio | Nuvem |
+| ✔ 4c | **Frases 2** (feita em 13/10/2026, sem mexer no esquema): dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | — | — |
 | 4d | **Frases 3:** selecionar um trecho da lei e enviar às frases | Sonnet médio | Nuvem |
 | 5 | ~~12.2 Publicar a busca por endereço e testar com leis reais~~ | — | Feita em 13/10/2026: no ar, LEP, CF e CC respondem sem estourar |
 | 6 | 12.3 Campo de endereço na tela Importar; depois 6b (verificar atualização pelo aparelho) | Sonnet médio | Nuvem, depois da 12.2 |
