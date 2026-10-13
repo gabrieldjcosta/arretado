@@ -1235,6 +1235,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
 - **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.
 
+## Acervo: converter atos em PDF ou HTML para Markdown (13/10/2026)
+
+- **Como:** `node scripts/acervo-lote-md.mjs <manifesto.json>` baixa o PDF (página do CNJ, gov.br, MDS) ou a página HTML (portal da Defensoria), converte com `pdftotext` (`scripts/acervo-pdf-para-md.mjs`) e acrescenta o item em `acervo/curadoria.json`; depois `npm run acervo:gerar` e `acervo:verificar`. O manifesto aceita `cnj` (página do ato), `pdfModo: "original"`, `pdf`, `html`, `cortarEm` (deixa o anexo de fora), `semArtigos`, `manual` (Markdown já transcrito) e `anomaliasAceitas`.
+- **PDF compilado do CNJ:** o último "compilado" costuma ser o texto vigente, mas às vezes é só o anexo (Res. 412, 510, 598, Rec. 128): usar `pdfModo: "original"`. O texto compilado perde o tachado, então o dispositivo alterado aparece duas vezes (vale o último; aviso `duplicata` aceito com aviso ao leitor).
+- **PDF escaneado (sem camada de texto):** Res. CNJ 175/2013, 295/2019 e Prov. CNJ 19/2012, 28/2013, 44/2015 foram transcritos à mão (lendo o PDF) e entram com `manual: true`. Não há OCR na máquina.
+- **gov.br participamaisbrasil e BVS/Saúde:** bloqueiam download automático (403 e desafio de navegador); usar cópia do DOU ou do CONASS e dizer isso no aviso do item.
+- **`acervo:gerar` sem argumento** regrava todos os itens e o índice (as datas de coleta mudam e o hash junto): não restaurar arquivos antigos de `public/acervo/`, senão o `verificar` acusa hash diferente.
+- **Pendentes sem fonte:** Prov. CGJ-TJSP 18/2012, 16/2013, 21/2013 e Res. CONDEGE 1/2024.
+
 ### Teste de subida de esquema acusa uma linha a mais em `meta` (v6)
 - **Causa:** ao abrir, `Repositorio.abrir` roda `migrarFrasesDosErros` uma vez e grava a marca `CHAVE_MIGRACAO_FRASES` em `meta` (Frases 1).
 - **Solução:** comparar `meta` sem a marca (`tabelaSemMarca` em `migracao.test.ts`). Subida futura (v7) que crie dado depois de abrir: mesma ideia, uma marca por migração.

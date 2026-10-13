@@ -145,7 +145,7 @@ Cada item vira teste ou E2E quando ainda não houver; o que já está coberto é
 
 | Item | Modelo | Onde roda |
 |---|---|---|
-| Lotes com rede: Súmula Vinculante 30, lotes 3b/3d, as 63 normas a converter (`acervo/a-converter.md`), fontes complementares do acervo | Sonnet 5.5 médio | **precisa de rede** (Gabriel ou ambiente liberado) |
+| Lotes com rede: Súmula Vinculante 30, lotes 3b/3d, as 4 normas que faltam converter (`acervo/a-converter.md`; 59 de 63 feitas em 13/10/2026), fontes complementares do acervo | Sonnet 5.5 médio | **precisa de rede** (Gabriel ou ambiente liberado) |
 | Busca de súmula por consulta no índice, em vez de abrir a coleção inteira | Sonnet 5.5 médio | nuvem |
 | Correção do texto grava a norma inteira de novo (CF: ~5 mil textos); reduzir pede mudar o modelo, junto da F4 | — | F4 |
 | Capturas "antes/depois" do redesign (6.4–6.7) | Sonnet 5.5 médio | nuvem |
