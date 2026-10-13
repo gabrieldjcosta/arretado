@@ -47,3 +47,22 @@ Nenhuma direção chega a nível de prêmio; nenhuma recebeu nota 5 em encantame
 ## Recomendação
 
 Não aprovar nenhuma como está. Rodada 2: partir da D1 (estrutura e tokens), incorporar da D2 a fita "Você parou aqui" e a frase de segurança do ponto salvo, e da D3 a confiança editorial (titular em Literata, filete lateral no cartão), cortar a saudação de bem-estar, a citação e todo conteúdo inventado, e usar o vocabulário do projeto. Mostrar a recompensa discreta de fim de sessão como segunda tela.
+
+## Rodadas 2 e 3 — Hoje (projeto novo, sem herdar a voz da rodada 1)
+
+Projeto Stitch: "Arretado - Hoje rodada 2", id `8506778262986179771`, https://stitch.google.com/projects/8506778262986179771
+Conceito: o app é o marcador que nunca se perde. "Ponto" é ponto de retomada e ponto de costura: um fio de sálvia marca a linha exata onde a pessoa parou. Voz direta, sem autoajuda, sem saudação com nome.
+
+| Rodada | Tela | Screen id | Nota /50 |
+|---|---|---|---|
+| 2a | Hoje, página aberta | `aea69ee6f96e4224861e757944a22140` | 35 |
+| 2b | Hoje, fio vertical | `2ba56f2e5e0c46b599d488749b470c5c` | 37 |
+| 3 | Hoje, costura (refino da 2b) | `e48f8087a5d94c199e9cf1e8d8720fb0` | 39 |
+| 3 | Fim de sessão (recompensa discreta) | `2384c728ca544b1297bbced68ae1ee69` | 36 |
+
+Notas da rodada 3, Hoje (1 a 10): 5, 4, 4, 3, 5, 3, 4, 4, 3, 4.
+- **Ganhos reais:** hierarquia e clareza; modelo certo (artigo e dispositivo, não página); vocabulário do projeto; uma só ação primária; trecho da lei em Literata como protagonista; fio, fita, borda pontilhada e trilha de pontos como assinatura reconhecível; texto do § 1º conferido.
+- **Ainda fraco:** encantamento (fio e nó quase invisíveis, tela sóbria demais); ânimo (frio); legendas de ~11 px e rótulos de baixo contraste (acessibilidade a verificar no código, não pelo mockup); o nome "Vade Mecum" reaparece na tela de fim de sessão (invenção do Stitch; a marca é "Arretado").
+- **Fim de sessão:** a recompensa é só um ponto a mais na trilha, discreta demais; "85% da subseção" é métrica inventada; "Registro incorporado ao índice do caderno de execução" é enchimento. Cortar os dois.
+
+Nota: 50/50 exige 5 em todos os critérios, ou seja, excepcional em tudo; a meta prática é ≥ 45 sem nota abaixo de 4 em identidade, encantamento e ânimo.
