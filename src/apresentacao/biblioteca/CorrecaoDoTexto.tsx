@@ -64,9 +64,9 @@ export function FormularioDaCorrecao({
         { dispositivoId, texto },
       ]);
       correcao.aoCorrigir(r, dispositivoId);
-    } catch (erro) {
+    } catch (excecao) {
       trava.current = false;
-      setFalha(mensagemDe(erro));
+      setFalha(mensagemDe(excecao));
     } finally {
       setSalvando(false);
     }
@@ -149,8 +149,8 @@ export function TextosDeAntes({
         dispositivoId,
       ]);
       correcao.aoCorrigir(r, dispositivoId);
-    } catch (erro) {
-      setFalha(mensagemDe(erro));
+    } catch (excecao) {
+      setFalha(mensagemDe(excecao));
     } finally {
       setOcupado(false);
     }
@@ -212,8 +212,8 @@ export function AvisoDaCorrecao({
           resultado.alterados,
         ),
       );
-    } catch (erro) {
-      setFalha(mensagemDe(erro));
+    } catch (excecao) {
+      setFalha(mensagemDe(excecao));
       setOcupado(false);
     }
   }

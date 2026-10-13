@@ -29,8 +29,8 @@ export interface MarcacoesDaNorma {
   remover: (id: string) => Promise<boolean>;
 }
 
-const mensagemDe = (erro: unknown, padrao: string) =>
-  erro instanceof MarcacaoInvalida ? erro.message : padrao;
+const mensagemDe = (excecao: unknown, padrao: string) =>
+  excecao instanceof MarcacaoInvalida ? excecao.message : padrao;
 
 /**
  * As marcações da norma aberta: lidas uma vez (todas da versão; são poucas) e mantidas aqui a cada
@@ -93,8 +93,8 @@ export function useMarcacoes(
         aplicar(marcacao, fora);
         setFalha(undefined);
         return true;
-      } catch (erro) {
-        if (vivo.current) setFalha(mensagemDe(erro, padrao));
+      } catch (excecao) {
+        if (vivo.current) setFalha(mensagemDe(excecao, padrao));
         return false;
       }
     },

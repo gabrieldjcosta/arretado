@@ -428,3 +428,38 @@ describe('texto de antes: revisão das etapas 8, 9 e 11', () => {
     expect(lista2.map((t) => t.versaoId)).toEqual([corrigida.versaoId]);
   });
 });
+
+describe('texto corrigido passa pela regra 1 (revisão das etapas 8, 9 e 11)', () => {
+  it('NFD e invisível viram o texto normalizado (a busca acha)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    const nfd = 'Art. 1º A execução​ penal.'.normalize('NFD');
+    await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: nfd },
+    ]);
+    expect((await textoDe(repo, normaId, 'art1')).texto).toBe('Art. 1º A execução penal.');
+  });
+});
+
+describe('aviso da correção conta só o que ela tocou (revisão das etapas 8, 9 e 11)', () => {
+  it('pendente antigo de outro dispositivo não entra em "ficaram em Para reler"', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art2 = await textoDe(repo, normaId, 'art2');
+    await repo.colecao('marcacoes').criar({
+      normaId,
+      dispositivoId: art2.dispositivoId,
+      versaoId,
+      tipo: 'grifo',
+      cor: 1,
+      ancora: { texto: 'trecho que não existe', inicio: 0, fim: 21 },
+      status: 'pendente',
+    });
+    const art1 = await textoDe(repo, normaId, 'art1');
+    const r = await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: 'Art. 1º Outro texto.' },
+    ]);
+    expect(r.pendentes).toBe(0);
+  });
+});

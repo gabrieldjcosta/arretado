@@ -14,6 +14,7 @@ import type { Dados, Repositorio } from '../../core/persistencia';
 import { reancorar } from '../../core/util/reancoragem';
 import { dispositivosDaNorma, todos } from './consultas';
 import { MARCA_MANUAL } from './servico';
+import { normalizar } from './normalizacao';
 
 type Trechos = TextoDeDispositivo['trechos'];
 
@@ -78,8 +79,12 @@ const chaveDosTrechos = (trechos: Trechos): string =>
     trechos.map((t) => [t.texto, t.tachado === true, t.enfase === true, t.link ?? '']),
   );
 
-/** Quebra de linha do Windows vira "\n"; espaços das pontas saem. */
-export const textoLimpo = (texto: string): string => texto.replace(/\r\n?/g, '\n').trim();
+/**
+ * Quebra de linha do Windows vira "\n"; cada linha passa pela regra 1 (NFC, invisíveis, espaços),
+ * como na importação: sem isso, um texto colado em NFD (PDF, macOS) some da busca e das remissões.
+ */
+export const textoLimpo = (texto: string): string =>
+  texto.replace(/\r\n?/g, '\n').split('\n').map(normalizar).join('\n').trim();
 
 const formaDe = (t: Trechos[number]): Omit<Trechos[number], 'texto'> => ({
   ...(t.tachado === undefined ? {} : { tachado: t.tachado }),
@@ -274,10 +279,8 @@ async function gravarVersaoCorrigida(
       const atual = ativos.has(m.dispositivoId)
         ? textoPorDispositivo.get(m.dispositivoId)
         : undefined;
-      if (!atual) {
-        if (m.status === 'pendente') pendentes += 1;
-        continue;
-      }
+      // Dispositivo fora da árvore: nada a reancorar (e não entra na conta do aviso).
+      if (!atual) continue;
       const novos = mudancas.get(m.dispositivoId);
       if (novos === undefined && m.status !== 'pendente') {
         await repo.colecao('marcacoes').atualizar(m.id, { versaoId });
@@ -290,7 +293,7 @@ async function gravarVersaoCorrigida(
         m.status === 'pendente' ? undefined : textoDosTrechos(atual.trechos),
       );
       if (r.status === 'pendente') {
-        pendentes += 1;
+        if (novos !== undefined) pendentes += 1;
         if (m.status !== 'pendente') {
           await repo.colecao('marcacoes').atualizar(m.id, { status: 'pendente' });
           pendentesNovas.push(m);
