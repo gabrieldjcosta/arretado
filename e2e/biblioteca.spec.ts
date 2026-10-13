@@ -135,6 +135,37 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
   await publicar(page, 'LEP');
   await expect(page.getByRole('region', { name: 'Normas' }).getByText('LEP')).toBeVisible();
   expect(pedidos).toEqual(['https://www.planalto.gov.br/ccivil_03/leis/l7210.htm']);
+
+  // 6b: a mesma página não traz alteração; a página com lei nova dá indício e não troca o texto.
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  const verificar = page.getByRole('button', { name: 'Verificar atualização' });
+  await verificar.click();
+  await expect(page.getByText(/Nenhuma alteração detectada: a página oficial é igual/)).toBeVisible(
+    {
+      timeout: 30_000,
+    },
+  );
+  const maisNova = Buffer.from(
+    bytes
+      .toString('latin1')
+      .replace('</body>', '<p>Art. 999. X. (Redação dada pela Lei nº 99.999, de 2099)</p></body>'),
+    'latin1',
+  );
+  await page.unroute('**/api/buscar-norma*');
+  await page.route('**/api/buscar-norma*', (rota) =>
+    rota.fulfill({
+      status: 200,
+      body: maisNova,
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Tipo-Origem': 'text/html' },
+    }),
+  );
+  await verificar.click();
+  await expect(
+    page.getByText(/Há indício de alteração: a página cita Lei nº 99.999, de 2099/),
+  ).toBeVisible({
+    timeout: 30_000,
+  });
+  await semViolacoes(page);
 });
 
 test.describe('busca que falha (12.3)', () => {
