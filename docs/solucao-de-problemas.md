@@ -1250,3 +1250,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Frase correta não aparece em "Frases" depois do registro (v6)
 - **Causa provável:** registro gravado direto pela coleção `erros` (teste, carga, importação de pacote v6 sem a Frase), sem passar por `registrarErro`; a migração só cria Frase ao abrir pela primeira vez na v6 e ao importar pacote < v6.
 - **Solução:** registrar por `registrarErro`/`completarErro` (criam ou sincronizam a Frase). Para dado antigo, `migrarFrasesDosErros(repo)` é idempotente.
+
+### "Substituir módulos" com backup v5 apagava todas as Frases (v6; corrigido na revisão das Frases 1)
+- **Causa:** a prévia do modo 5 excluía (lógico) toda Frase local fora do pacote, e um pacote v5 não tem `frases`; `migrarFrasesDosErros` pulava o erro que já tinha Frase, mesmo excluída. Resultado: nenhuma Frase ativa.
+- **Solução:** `planejar` (modo 5, pacote < v6) não toca `frases`/`revisoesFrase`, só exclui a Frase do erro que a importação exclui; a migração só pula erro com Frase não excluída. Testes em `pacote-v2.test.ts` ("pacote v5 no app v6"). Previsível: coleção derivada nova (v7) num pacote antigo precisa da mesma regra.
