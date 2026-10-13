@@ -20,6 +20,7 @@ import {
   versaoComMesmaFonte,
   type RelatorioDePublicacao,
 } from '../../dominios/legislacao/servico';
+import { buscarPagina, FalhaNaBusca } from '../../integracoes/url/buscar';
 import { sumarioDoRascunho, type SumarioDoRascunho } from '../../dominios/legislacao/sumario';
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
@@ -115,6 +116,8 @@ export function Importar() {
   const [fase, setFase] = useState<Fase>(versaoId ? ABRINDO : { tipo: 'colar' });
   const [falha, setFalha] = useState<string | null>(null);
   const [digitado, setDigitado] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [buscando, setBuscando] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [tituloNovo, setTituloNovo] = useState('');
   // Muda depois de salvar o texto inteiro: a revisão é remontada com a árvore nova.
@@ -195,12 +198,12 @@ export function Importar() {
     }
   }
 
-  async function importar(html: string, texto: string) {
+  async function importar(html: string, texto: string, urlOficial?: string) {
     if (trava.current) return;
     trava.current = true;
     setFalha(null);
     try {
-      setFase(etapa(1, 'Limpando a página colada'));
+      setFase(etapa(1, urlOficial ? 'Limpando a página buscada' : 'Limpando a página colada'));
       await respirar();
       const colado = blocosDoColado(html, texto);
       if (colado.blocos.length === 0) {
@@ -218,7 +221,11 @@ export function Importar() {
       await respirar();
       const criado = await criarRascunho(
         repo,
-        { blocos: colado.blocos, origemEntrada: colado.html ? 'html' : 'texto' },
+        {
+          blocos: colado.blocos,
+          origemEntrada: urlOficial ? 'url' : colado.html ? 'html' : 'texto',
+          ...(urlOficial ? { urlOficial } : {}),
+        },
         {
           antesDeGravar: async () => {
             setFase(etapa(4, 'Guardando o rascunho'));
@@ -240,6 +247,27 @@ export function Importar() {
       );
     } finally {
       trava.current = false;
+    }
+  }
+
+  /** 12.3: busca pelo Worker; qualquer falha deixa colar como caminho (a rede é só atalho). */
+  async function buscar(e: SubmitEvent) {
+    e.preventDefault();
+    if (trava.current || buscando) return;
+    setFalha(null);
+    setBuscando(true);
+    try {
+      const pagina = await buscarPagina(endereco);
+      setBuscando(false);
+      await importar(pagina.html, '', pagina.urlFinal);
+    } catch (excecao) {
+      setFalha(
+        excecao instanceof FalhaNaBusca
+          ? excecao.message
+          : 'Não foi possível buscar a página. Copie a lei na página oficial e cole abaixo.',
+      );
+    } finally {
+      setBuscando(false);
     }
   }
 
@@ -371,6 +399,29 @@ export function Importar() {
             Na página da lei (Planalto ou ALESP), selecione tudo (Ctrl+A), copie (Ctrl+C) e cole
             aqui (Ctrl+V). No celular, toque e segure no campo e escolha Colar.
           </p>
+          <form onSubmit={(e) => void buscar(e)}>
+            <div className="campo">
+              <label htmlFor="importar-endereco">Ou busque pelo endereço da página</label>
+              <input
+                id="importar-endereco"
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                placeholder="https://www.planalto.gov.br/…"
+                aria-describedby="importar-endereco-dica"
+                value={endereco}
+                onChange={(e) => {
+                  setEndereco(e.target.value);
+                }}
+              />
+              <p id="importar-endereco-dica" className="dica">
+                Só Planalto e ALESP, e precisa de internet. Se não der certo, cole a lei abaixo.
+              </p>
+            </div>
+            <button type="submit" disabled={buscando || endereco.trim() === ''}>
+              {buscando ? 'Buscando…' : 'Buscar'}
+            </button>
+          </form>
           <div className="campo">
             <label htmlFor="importar-colar">Cole aqui a lei</label>
             <textarea
