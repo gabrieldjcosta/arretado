@@ -105,7 +105,7 @@ Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
 | 13.1 ✔ 13/10/2026 | Segurança e LGPD da fase: payloads maliciosos no fluxo completo (colar e URL), tamanho máximo, vigilância de CSP; política de privacidade v2 (a busca por URL envia só o endereço da lei ao Cloudflare e ao site de origem) | Sonnet 5.5 **alto** | nuvem, sem rede |
-| 13.2 | Orientações › Legislação e "Ajuda sobre esta tela" no leitor e no importador (menu Ajuda, D6) | Sonnet 5.5 médio | nuvem, sem rede |
+| 13.2 ✔ 13/10/2026 | Orientações › Legislação e "Ajuda sobre esta tela" no leitor e no importador (menu Ajuda, D6) | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.3 ✔ 13/10/2026 | Backup com normas: exportar → apagar → restaurar idêntico com o CP inteiro; pacote só de `legislacao` com a fonte das versões | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.5 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
 | 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
@@ -212,7 +212,7 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 |---|---|---|---|
 | ~~1~~ | ~~**13.1** Segurança e LGPD da F2~~ ✔ 13/10/2026 | — | — |
 | 2 | **13.3** Backup com normas | Sonnet 5.5 médio | nuvem, sem rede |
-| 3 | **13.2** Orientações › Legislação e ajuda contextual | Sonnet 5.5 médio | nuvem, sem rede |
+| ~~3~~ | ~~**13.2** Orientações › Legislação e ajuda contextual~~ ✔ 13/10/2026 | — | — |
 | 4 | **13.5** Verificação de fechamento (§3 B) | Sonnet 5.5 médio | nuvem, sem rede |
 | 5 | **12.2** Worker com chamada real | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
 | 6 | **12.3** Campo URL, depois **6b** | Sonnet 5.5 médio | nuvem, depois da 12.2 |

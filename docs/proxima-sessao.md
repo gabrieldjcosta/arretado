@@ -1,17 +1,19 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 13/10/2026 (13.3 feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
+Atualizado em 13/10/2026 (13.2 feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
 
 ## Estado
 
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
-- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.3; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
+- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.2, 13.3; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
 - **`main`** tem tudo até o PR #81 (merge #82, 11/10/2026). **Só na `integracao`:** PR #83 (`/code-review`) e a consolidação do plano-mestre. Nenhum dos dois sobe o esquema (sem backup).
-- Falta para o portão da F2: 13.2, 13.5 (verificação de fechamento), 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
+- Falta para o portão da F2: 13.5 (verificação de fechamento), 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
 
 ## Próxima atividade
 
-**13.2 — Orientações › Legislação e ajuda contextual** (Sonnet 5.5 médio; nuvem, sem rede). Detalhe em [`planos/F2.md`](planos/F2.md) › "Etapa 13". Pronto quando: `npm run check` verde; teste de rotas; "Ajuda sobre esta tela" no leitor e no importador.
+**13.5 — Verificação de fechamento** (Sonnet 5.5 médio; nuvem, sem rede). Detalhe em [`planos/plano-mestre.md`](planos/plano-mestre.md) §3 B.
+
+**13.2 feita (13/10/2026), sem subida de esquema:** Orientações v1 ganhou as seções `legislacao` (leitor) e `importar-lei` (importador); `secaoDeAjuda` aponta `/biblioteca/importar*` e `/biblioteca*` para elas; teste de rotas em `App.test.tsx`.
 
 **13.3 feita (13/10/2026), sem subida de esquema:** pacote só de `legislacao` leva os anexos das fontes (`exportar.ts`, `ler.ts`, `importar.ts`); `backup-corpus.test.ts` prova ida e volta com o CP inteiro (integral e só `legislacao`, rascunho retomado). Sem tela nova.
 
