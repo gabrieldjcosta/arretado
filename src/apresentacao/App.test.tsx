@@ -61,6 +61,8 @@ describe('"?" e Orientações (5.3)', () => {
       '/plano',
       '/recall',
       '/biblioteca',
+      '/biblioteca/normas/abc',
+      '/biblioteca/importar',
       '/conta',
       '/conta/dados',
       '/conta/privacidade',
@@ -69,6 +71,11 @@ describe('"?" e Orientações (5.3)', () => {
     ]) {
       expect(ids.has(secaoDeAjuda(rota)), rota).toBe(true);
     }
+  });
+
+  it('leitor e importador têm ajuda própria', () => {
+    expect(secaoDeAjuda('/biblioteca/normas/abc')).toBe('legislacao');
+    expect(secaoDeAjuda('/biblioteca/importar/v1')).toBe('importar-lei');
   });
 
   it('"?" em Dados abre a seção de backup', async () => {
