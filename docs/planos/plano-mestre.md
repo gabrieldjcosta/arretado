@@ -197,7 +197,7 @@ Ambiente de demonstração reiniciável; 3 a 5 pessoas; pedir para começar, ret
 
 ## 7. F4 — Conta, sincronização, backup e instalação
 
-Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `proxima-sessao.md` › Referência).
+Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `referencia.md`).
 
 | Bloco | Itens |
 |---|---|
@@ -278,7 +278,7 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 
 | Arquivo | Papel |
 |---|---|
-| `docs/proxima-sessao.md` | Estado atual, próxima atividade, referência operacional (Cloudflare, Supabase, comandos, mapa do código) |
+| `docs/proxima-sessao.md` | Estado atual, próxima atividade e pendências; a referência operacional (Cloudflare, Supabase, comandos, mapa do código) fica em `docs/referencia.md` |
 | `docs/planos/plano-mestre.md` | **Este**: ordem, fases, regras, decisões abertas |
 | `docs/planos/proximos-passos.md` | Resumo em linguagem simples para o Gabriel |
 | `docs/planos/F2.md` | Detalhe técnico da F2: fatos das fontes, atividades, rotina de pronto, critérios do portão |

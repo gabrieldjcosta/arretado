@@ -336,7 +336,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Migração nova no Supabase
 - **Sintoma:** remoto diferente do repositório, RLS quebrada sem ninguém ver, ou `list_migrations` com versão (`20260923030320`) diferente do prefixo do arquivo (`20260923000000_…`). **Causa:** migração aplicada fora de ordem ou editada no painel; o `apply_migration` registra a versão com o horário UTC da aplicação.
-- **Solução:** primeiro no repositório com `npm run check` verde (o `rls.test.ts` aplica todas em PGlite); depois `apply_migration` com o conteúdo do arquivo sem editar; depois advisors e `verificacao-rls-remota.sql`. A correspondência das versões está em `proxima-sessao.md`. **Prevenção:** nunca direto no painel; se um dia adotar o Supabase CLI, alinhar com `supabase migration repair`.
+- **Solução:** primeiro no repositório com `npm run check` verde (o `rls.test.ts` aplica todas em PGlite); depois `apply_migration` com o conteúdo do arquivo sem editar; depois advisors e `verificacao-rls-remota.sql`. A correspondência das versões está em `referencia.md`. **Prevenção:** nunca direto no painel; se um dia adotar o Supabase CLI, alinhar com `supabase migration repair`.
 - **Origem:** ocorrido em 23/09/2026 (registrado em d87ddca).
 
 ### Advisors acusam política duplicada ou chave estrangeira sem índice
@@ -351,7 +351,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Projeto pausado ou esquema `arretado` invisível
 - **Sintoma:** o projeto não responde; na F4, o cliente não acessa as tabelas. **Causa:** o plano free pausa depois de cerca de 7 dias sem uso do banco (e nada usa o banco antes da F4); o esquema `arretado` ainda não está exposto na API.
-- **Solução:** reativar no painel ou com `restore_project`; Settings › API › Exposed schemas. **Prevenção:** lembretes da F4 em `proxima-sessao.md`; a pausa é o motivo de a T17 ter ido para o Cloudflare.
+- **Solução:** reativar no painel ou com `restore_project`; Settings › API › Exposed schemas. **Prevenção:** lembretes da F4 em `referencia.md`; a pausa é o motivo de a T17 ter ido para o Cloudflare.
 - **Origem:** previsto — F4.
 
 ## Cloudflare Workers (hospedagem e rota /api)
