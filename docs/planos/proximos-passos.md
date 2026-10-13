@@ -22,7 +22,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | 4b | **Frases 1:** registrar erro vira digitar a frase certa (disciplina e ponto opcionais e lembrados). **Mexe no esquema: backup antes do merge** | **Opus** | Nuvem |
 | 4c | **Frases 2:** dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | Sonnet médio | Nuvem |
 | 4d | **Frases 3:** selecionar um trecho da lei e enviar às frases | Sonnet médio | Nuvem |
-| 5 | 12.2 Publicar a busca por endereço e testar com leis reais | Sonnet médio | **Espera você, com rede** |
+| 5 | ~~12.2 Publicar a busca por endereço e testar com leis reais~~ | — | Feita em 13/10/2026: no ar, LEP, CF e CC respondem sem estourar |
 | 6 | 12.3 Campo de endereço na tela Importar; depois 6b (verificar atualização pelo aparelho) | Sonnet médio | Nuvem, depois da 12.2 |
 | 7 | 13.4 Documento do portão da F2 | Sonnet médio | Nuvem |
 | 8 | **2 semanas lendo lei no Arretado** | — | **Você** |

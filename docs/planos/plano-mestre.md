@@ -120,7 +120,7 @@ Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12
 | 13.2 ✔ 13/10/2026 | Orientações › Legislação e "Ajuda sobre esta tela" no leitor e no importador (menu Ajuda, D6) | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.3 ✔ 13/10/2026 | Backup com normas: exportar → apagar → restaurar idêntico com o CP inteiro; pacote só de `legislacao` com a fonte das versões | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.5 ✔ 13/10/2026 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
-| 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
+| 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Feita e verificada em 13/10/2026** (sem estouro; plano B dispensado) |
 | 12.3 | Campo URL na tela Importar (decodifica no aparelho, hash do sanitizado, oferece colar se falhar) | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 6b | Verificar atualização no site oficial pelo aparelho (D16), depois da 12.2 | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 13.4 | `portoes/F2.md` com cada critério ligado a um teste; README e `CLAUDE.md` | Sonnet 5.5 médio | nuvem, depois de 13.1–13.3 e 13.5 |

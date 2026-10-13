@@ -384,6 +384,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### A rota estoura o limite de processamento
 - **Sintoma:** a busca de uma lei grande falha no Cloudflare. **Causa:** o plano gratuito dá 10 ms de CPU por execução do Worker (esperar o Planalto não conta; processar conta).
 - **Solução:** a rota só repassa os bytes (sem decodificar nem montar JSON); se ainda estourar, plano B da T17 (Edge Function no Supabase, aceitando a pausa). **Prevenção:** chamada real com LEP, CF/88 (1,8 MB) e Código Civil, conferida no painel.
+- **Verificado em 13/10/2026 (atividade 12.2), sem estouro:** chamadas reais ao Worker publicado, `curl` do computador do Gabriel: LEP (307 KB), CF/88 (1,84 MB, 7 chamadas seguidas, 1,0–2,1 s), CC compilado (924 KB), LC 988/2006 e `/norma/159949` da ALESP; todas 200, nenhum erro 1102/CPU. Recusas conferidas: host fora da lista 403 `host_nao_permitido`, `http://` 400 `protocolo_nao_https`, 404 do Planalto 502 `status_erro`. Plano B da T17 não é necessário. Limite só observável, não medido no painel.
+- **Achado (não é defeito da rota):** a CF/88 muda a cada pedido (1.839.028 ou 1.840.587 bytes; também direto do Planalto): o WAF do Planalto (F5) injeta no fim um `<script>` `f5_cspm` com valor variável. O hash tem de ser do conteúdo **sanitizado** (como já decide a T17); a importação por URL (12.3) precisa remover esse script antes do hash, senão a "atualização" apareceria em toda consulta.
 - **Origem:** previsto — atividade 12.2.
 
 ## Legislação (F2): fontes, colar, estruturador, leitor

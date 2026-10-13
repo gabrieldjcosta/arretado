@@ -7,7 +7,7 @@ Atualizado em 13/10/2026 (Ajustes A feita). Ler antes de qualquer trabalho, junt
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
 - **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.2, 13.3, 13.5; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
 - **`main`** tem tudo até o PR #81 (merge #82, 11/10/2026). **Só na `integracao`:** PR #83 (`/code-review`) e a consolidação do plano-mestre. Nenhum dos dois sobe o esquema (sem backup).
-- Falta para o portão da F2: 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
+- Falta para o portão da F2: 12.3/6b (a 12.2 foi verificada em 13/10/2026: rota no ar, LEP/CF/CC/ALESP respondem 200, sem estouro), 13.4 e 2 semanas de uso real.
 
 ## Próxima atividade
 
@@ -30,7 +30,7 @@ Atualizado em 13/10/2026 (Ajustes A feita). Ler antes de qualquer trabalho, junt
 | 4b | Frases 1: modelo e captura, esquema v6 (**backup antes do merge**) | **Opus 5.5** | nuvem |
 | 4c | Frases 2: Revisar frases e Revisar cartões, com oclusão | Sonnet 5.5 médio | nuvem |
 | 4d | Frases 3: "Enviar às frases" no leitor | Sonnet 5.5 médio | nuvem |
-| 5 | 12.2 Worker com chamada real (LEP, CF, CC) | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
+| 5 | ~~12.2 Worker com chamada real~~ (feita e verificada em 13/10/2026; ver `solucao-de-problemas.md`) | — | — |
 | 6 | 12.3 Campo URL; depois 6b | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 7 | 13.4 Portão da F2 (documento) | Sonnet 5.5 médio | nuvem |
 | 8 | Uso real: 2 semanas lendo lei no Arretado | — | **Gabriel** |
