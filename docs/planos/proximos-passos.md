@@ -17,7 +17,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ | 13.1 Segurança e privacidade da F2 (feita em 13/10/2026) | — | — |
 | ✔ | 13.3 Backup com normas (feita em 13/10/2026) | — | — |
 | ✔ | 13.2 Ajuda e Orientações da Legislação (feita em 13/10/2026) | — | — |
-| 4 | 13.5 Verificação de fechamento (posição, toque, grifos que sobrevivem, voltar ao artigo depois do erro) | Sonnet médio | Nuvem, sem rede |
+| ✔ | 13.5 Verificação de fechamento (feita em 13/10/2026) | — | — |
 | 5 | 12.2 Publicar a busca por endereço e testar com leis reais | Sonnet médio | **Espera você, com rede** |
 | 6 | 12.3 Campo de endereço na tela Importar; depois 6b (verificar atualização pelo aparelho) | Sonnet médio | Nuvem, depois da 12.2 |
 | 7 | 13.4 Documento do portão da F2 | Sonnet médio | Nuvem |

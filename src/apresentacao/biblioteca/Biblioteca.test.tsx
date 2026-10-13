@@ -63,7 +63,9 @@ describe('Biblioteca › Normas (9.5)', () => {
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByText('LEP')).toBeInTheDocument();
     expect(
-      within(lista).getByText('Lei nº 7.210/1984 · Institui a Lei de Execução Penal.'),
+      within(lista).getByText(
+        /^Lei nº 7\.210\/1984 · Institui a Lei de Execução Penal\. · Coletada em \d{2}\/\d{2}\/\d{4}$/,
+      ),
     ).toBeInTheDocument();
     expect(within(lista).queryByText('ECA')).not.toBeInTheDocument();
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).toBeInTheDocument();

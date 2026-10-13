@@ -1220,3 +1220,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### `Leitor.test.tsx` "espiada dos vizinhos" falha só dentro do `npm run check`
 - **Causa:** flake de tempo sob carga (passa isolado e na segunda rodada).
 - **Solução:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.
+
+### `Leitor.test.tsx` "100% das redações anteriores ocultas" falha só com a suíte inteira
+- **Causa:** flake de tempo sob carga (o `waitFor` de 1 s vê 705 `.texto-carregando`); passa isolado, também com a procedência da 13.5.
+- **Solução:** rodar de novo; se persistir, `npx vitest run src/apresentacao/biblioteca/Leitor.test.tsx -t "100% das redações"`.
+
+### E2E do leitor: trocar o tamanho do texto "perde a posição" (falso alarme, 13.5)
+- **Causa:** a barra com A−/A+ não é fixa. O Playwright rola até o topo para clicar, então a posição some no teste, não no app. No uso real, quem troca o tamanho está no alto da norma ou em Conta › Aparência.
+- **Solução:** testar o caminho real: ler até um dispositivo, trocar o tamanho em Conta › Aparência, voltar por "Continuar leitura" e recarregar (E2E 13.5). No celular, a volta pode passar de 5 s com carga: usar `timeout` de 15–20 s no `poll`.
