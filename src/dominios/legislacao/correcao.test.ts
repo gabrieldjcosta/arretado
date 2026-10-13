@@ -109,6 +109,7 @@ describe('correção do texto publicado (11.7)', () => {
       {
         versaoId,
         capturadaEm: expect.any(String) as string,
+        substituidoEm: expect.any(String) as string,
         origemEntrada: 'html',
         texto: art1.texto,
       },
@@ -378,5 +379,87 @@ describe('trechosCorrigidos', () => {
 
   it('texto igual devolve os mesmos trechos', () => {
     expect(trechosCorrigidos(antigos, 'Art. 5º Ver a Lei nº 1 e o texto revogado.')).toBe(antigos);
+  });
+});
+
+describe('correção do texto publicado: revisão das etapas 8, 9 e 11', () => {
+  it('texto inserido antes do grifo curto: o grifo segue a edição, não a ocorrência mais perto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    // O "de" de "decisão" (o último do artigo).
+    const inicio = art1.texto.lastIndexOf('de');
+    const grifo = await criarGrifo(
+      repo,
+      { normaId, versaoId, dispositivoId: art1.dispositivoId, inicio, fim: inicio + 2 },
+      1,
+    );
+    const inserido = ', em todo o território nacional,';
+    const corrigido = art1.texto.replace('A execução penal', `A execução penal${inserido}`);
+
+    await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: corrigido },
+    ]);
+
+    const depois = await repo.colecao('marcacoes').obter(grifo.id);
+    expect(depois?.ancora.inicio).toBe(inicio + inserido.length);
+    expect(corrigido.slice(inicio + inserido.length).startsWith('decisão')).toBe(true);
+  });
+});
+
+describe('texto de antes: revisão das etapas 8, 9 e 11', () => {
+  it('depois de desfazer, o texto igual ao de agora sai da lista; "até" é a data da troca', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    relogio.avancar(60_000);
+    const corrigida = await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: 'Art. 1º Outro.' },
+    ]);
+    const lista1 = await textosAnteriores(repo, normaId, art1.dispositivoId);
+    const versoes = await repo.colecao('versoesNorma').todosDoUsuario();
+    const nova = versoes.find((v) => v.id === corrigida.versaoId);
+    expect(lista1).toMatchObject([{ versaoId, substituidoEm: nova?.capturadaEm }]);
+
+    relogio.avancar(60_000);
+    await voltarParaVersao(repo, normaId, corrigida.versaoId, versaoId);
+    const lista2 = await textosAnteriores(repo, normaId, art1.dispositivoId);
+    // Só o "Outro." (o original é o texto de agora).
+    expect(lista2.map((t) => t.versaoId)).toEqual([corrigida.versaoId]);
+  });
+});
+
+describe('texto corrigido passa pela regra 1 (revisão das etapas 8, 9 e 11)', () => {
+  it('NFD e invisível viram o texto normalizado (a busca acha)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    const nfd = 'Art. 1º A execução​ penal.'.normalize('NFD');
+    await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: nfd },
+    ]);
+    expect((await textoDe(repo, normaId, 'art1')).texto).toBe('Art. 1º A execução penal.');
+  });
+});
+
+describe('aviso da correção conta só o que ela tocou (revisão das etapas 8, 9 e 11)', () => {
+  it('pendente antigo de outro dispositivo não entra em "ficaram em Para reler"', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art2 = await textoDe(repo, normaId, 'art2');
+    await repo.colecao('marcacoes').criar({
+      normaId,
+      dispositivoId: art2.dispositivoId,
+      versaoId,
+      tipo: 'grifo',
+      cor: 1,
+      ancora: { texto: 'trecho que não existe', inicio: 0, fim: 21 },
+      status: 'pendente',
+    });
+    const art1 = await textoDe(repo, normaId, 'art1');
+    const r = await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: 'Art. 1º Outro texto.' },
+    ]);
+    expect(r.pendentes).toBe(0);
   });
 });

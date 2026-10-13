@@ -397,6 +397,17 @@ describe('leitura da linha digitada', () => {
     ['IV - texto', 'inciso', 'incIV', 'texto'],
     ['b) texto', 'alinea', 'alB', 'texto'],
     ['Capítulo III', 'capitulo', 'cap3', ''],
+    ['§ 1o Texto', 'paragrafo', 'par1', 'Texto'],
+    ['Art. 3° Texto', 'artigo', 'art3', 'Texto'],
+    // O ordinal só vale no rótulo: o corpo não muda (revisão das etapas 8, 9 e 11).
+    [
+      'I - nos casos do art. 2 o juiz decide',
+      'inciso',
+      'incI',
+      'nos casos do art. 2 o juiz decide',
+    ],
+    ['Art. 5º Em 10 o máximo.', 'artigo', 'art5', 'Em 10 o máximo.'],
+    ['Art. 6º A 30° de inclinação.', 'artigo', 'art6', 'A 30° de inclinação.'],
   ])('%s', (linha, tipo, segmento, resto) => {
     expect(lerLinhaDigitada(linha)).toMatchObject({ tipo, segmento, resto });
   });

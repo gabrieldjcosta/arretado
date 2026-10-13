@@ -1,4 +1,4 @@
-import { useState, type SyntheticEvent } from 'react';
+import { useCallback, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import type { Norma } from '../../core/modelo';
 import {
@@ -37,7 +37,12 @@ export function Colecoes({ especie }: { especie: EspecieDeColecao }) {
   const repo = useRepositorio();
   const navegar = useNavigate();
   const t = TEXTOS[especie];
-  const { dados, falha } = useDados((r) => colecoesPublicadas(r, especie));
+  const { dados, falha } = useDados(
+    useCallback(
+      (r: Parameters<typeof colecoesPublicadas>[0]) => colecoesPublicadas(r, especie),
+      [especie],
+    ),
+  );
   const [texto, setTexto] = useState('');
   const [achados, setAchados] = useState<AchadoNaColecao[] | null>(null);
   const [falhaBusca, setFalhaBusca] = useState(false);

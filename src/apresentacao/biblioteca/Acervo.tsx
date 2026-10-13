@@ -150,8 +150,10 @@ export function Acervo() {
   }
 
   function alternar(id: string) {
+    // Parte do que a tela mostra: sem escolha ainda, a pré-marcação do `?tudo`.
+    const base = marcados;
     setMarcados((atual) => {
-      const novo = new Set(atual);
+      const novo = new Set(atual ?? base);
       if (!novo.delete(id)) novo.add(id);
       return novo;
     });

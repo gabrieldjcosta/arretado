@@ -123,12 +123,38 @@ function aparar(texto: string, inicio: number, fim: number): [number, number] {
 }
 
 /**
+ * Com o texto de antes: a âncora fora do trecho que mudou segue o deslocamento da edição
+ * (antes do trecho, no mesmo lugar; depois, deslocada pelo que entrou ou saiu). Sem isso, um
+ * texto inserido antes do grifo o levaria à outra ocorrência mais perto das posições antigas.
+ */
+function pelaEdicao(ancora: Ancora, textoNovo: string, textoAntigo: string): number | undefined {
+  if (textoAntigo.slice(ancora.inicio, ancora.fim) !== ancora.texto) return undefined;
+  const limite = Math.min(textoAntigo.length, textoNovo.length);
+  let prefixo = 0;
+  while (prefixo < limite && textoAntigo.charAt(prefixo) === textoNovo.charAt(prefixo)) prefixo++;
+  let sufixo = 0;
+  while (
+    sufixo < limite - prefixo &&
+    textoAntigo.charAt(textoAntigo.length - 1 - sufixo) ===
+      textoNovo.charAt(textoNovo.length - 1 - sufixo)
+  ) {
+    sufixo++;
+  }
+  if (ancora.fim <= prefixo) return ancora.inicio;
+  if (ancora.inicio >= textoAntigo.length - sufixo) {
+    return ancora.inicio + textoNovo.length - textoAntigo.length;
+  }
+  return undefined;
+}
+
+/**
  * Leva a âncora ao texto novo. Exata: o mesmo texto no mesmo lugar (`valida`) ou na ocorrência
  * mais perto (`reancorada`). Aproximada (`reancorada`): o mesmo texto sem olhar caixa, acento e
  * espaços, ou, no trecho de 20 letras ou mais, o trecho com até 1 letra diferente em 5. Sem nada
- * disso, `pendente`: a marcação não se perde, espera a releitura.
+ * disso, `pendente`: a marcação não se perde, espera a releitura. Com `textoAntigo` (o texto em
+ * que a âncora foi medida), a âncora fora do trecho editado segue a edição antes de tudo.
  */
-export function reancorar(ancora: Ancora, textoNovo: string): Reancoragem {
+export function reancorar(ancora: Ancora, textoNovo: string, textoAntigo?: string): Reancoragem {
   const achado = (
     status: 'valida' | 'reancorada',
     modo: 'exata' | 'aproximada',
@@ -137,6 +163,12 @@ export function reancorar(ancora: Ancora, textoNovo: string): Reancoragem {
   ): Reancoragem => ({ status, modo, inicio, fim, texto: textoNovo.slice(inicio, fim) });
 
   if (ancora.texto === '') return { status: 'pendente' };
+  const deslocada =
+    textoAntigo === undefined ? undefined : pelaEdicao(ancora, textoNovo, textoAntigo);
+  if (deslocada !== undefined) {
+    const fim = deslocada + ancora.texto.length;
+    return achado(deslocada === ancora.inicio ? 'valida' : 'reancorada', 'exata', deslocada, fim);
+  }
   if (textoNovo.slice(ancora.inicio, ancora.fim) === ancora.texto) {
     return achado('valida', 'exata', ancora.inicio, ancora.fim);
   }

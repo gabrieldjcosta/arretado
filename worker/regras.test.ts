@@ -147,6 +147,30 @@ describe('buscarPagina', () => {
   });
 });
 
+describe('buscarPagina: corpos não lidos (revisão das etapas 8, 9 e 11)', () => {
+  it('cancela o corpo do redirecionamento e da resposta de erro', async () => {
+    const cancelados: string[] = [];
+    const corpo = (nome: string) =>
+      new ReadableStream<Uint8Array>({
+        cancel() {
+          cancelados.push(nome);
+        },
+      });
+    const respostas = [
+      new Response(corpo('301'), {
+        status: 301,
+        headers: { Location: 'https://www.planalto.gov.br/b' },
+      }),
+      new Response(corpo('500'), { status: 500 }),
+    ];
+    const r = await buscarPagina('https://www.planalto.gov.br/a', () =>
+      Promise.resolve(respostas.shift() ?? new Response(null, { status: 404 })),
+    );
+    expect(r).toEqual({ ok: false, motivo: 'status_erro' });
+    expect(cancelados).toEqual(['301', '500']);
+  });
+});
+
 describe('rota /api/buscar-norma', () => {
   const rota = (caminho: string, init?: RequestInit) =>
     worker.fetch(new Request(`https://arretado.exemplo.workers.dev${caminho}`, init));
