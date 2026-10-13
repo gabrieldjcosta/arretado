@@ -29,7 +29,7 @@ export interface ServicoDeSessao {
     id: string,
     fechamento?: FechamentoDeSessao,
   ) => Promise<Sessao>;
-  /** A Sessão `ativa` ou `pausada` que ficou aberta (volta ao app); `undefined` se não houver. */
+  /** A Sessão `ativa` ou `pausada` que ficou aberta (volta ao app); `undefined` se não houver. O A2 decide se `interrompida` também restaura. */
   restaurarSessao: (repo: Repositorio) => Promise<Sessao | undefined>;
   /** Estaciona uma distração na Sessão, sem sair do estudo. */
   estacionar: (repo: Repositorio, id: string, texto: string) => Promise<Sessao>;

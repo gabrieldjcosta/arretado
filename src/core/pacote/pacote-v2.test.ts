@@ -219,6 +219,20 @@ describe('pacote v6 no app v7 e v7 de ida e volta (F3, P0)', () => {
     destino.fechar();
   });
 
+  it('substituir módulos (modo 5) com pacote v6 mantém as Tarefas de estudo locais', async () => {
+    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const v6 = await comVersao((await exportarPacote(repo)).bytes, 6);
+    const tarefa = await repo
+      .colecao('tarefasDeEstudo')
+      .criar(camposMinimos('tarefasDeEstudo', repo.ctx.usuarioId));
+    const pacote = await lerPacote(v6);
+    const previa = await planejar(repo, pacote, { modo: 5, modulos: ['plano'] });
+    expect(previa.porColecao.tarefasDeEstudo?.excluir ?? 0).toBe(0);
+    await aplicar(repo, pacote, previa);
+    expect((await repo.db.tabela('tarefasDeEstudo').get(tarefa.id))?.excluidoEm).toBeNull();
+    repo.fechar();
+  });
+
   it('pacote v7 vai e volta (modo 6) com tarefas, Sessão e preferências novas', async () => {
     const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
     const mae = await origem

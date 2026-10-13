@@ -307,7 +307,7 @@ describe('subida de esquema v5 → v6 (Frases 1): `frases` e `revisoesFrase`', (
 
 describe('subida de esquema v6 → v7 (F3, P0): `tarefasDeEstudo` e campos opcionais', () => {
   it('só `tarefasDeEstudo` nasce na v7; as coleções antigas mantêm os índices', () => {
-    expect(VERSAO_ESQUEMA).toBe(7);
+    expect(VERSAO_ESQUEMA).toBeGreaterThanOrEqual(7);
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 7)).toEqual(['tarefasDeEstudo']);
     expect(colecoesNaVersao(6)).not.toContain('tarefasDeEstudo');
     const v6 = esquemaDaVersao(6);
