@@ -54,7 +54,7 @@ import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
 import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
-import { fraseDaEstrela, rotuloTipo } from './rotulos';
+import { fraseDaEstrela, procedenciaDaVersao, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
@@ -1611,6 +1611,9 @@ function LeitorAberto({
           destacar={destacar}
           alternarDestaques={alternarDestaques}
         />
+      )}
+      {!modoFoco && (
+        <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}

@@ -6,7 +6,11 @@ import { sanitizarHtml, type Bloco } from '../../core/seguranca/sanitizador';
 import { abrirNorma, lerJanela } from '../../dominios/legislacao/leitor';
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import { criarGrifo } from '../../dominios/legislacao/marcacoes';
-import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
+import {
+  criarRascunho,
+  marcarEditadoAMao,
+  publicarVersao,
+} from '../../dominios/legislacao/servico';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -329,6 +333,29 @@ const LEI_COM_DESTAQUES: Bloco[] = [
     'Art. 3º O recurso será julgado em 60 (sessenta) dias. (Redação dada pela Lei nº 13.000, de 2015)',
   ),
 ];
+
+describe('procedência da versão (13.5)', () => {
+  it('a coleta aparece no leitor e na Biblioteca; "Editado à mão" só depois da edição', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, '#/biblioteca');
+    const link = await screen.findByRole('link', { name: /LEP/ });
+    expect(link).toHaveTextContent(/Coletada em \d{2}\/\d{2}\/\d{4}/);
+    expect(link).not.toHaveTextContent('Editado à mão');
+    cleanup();
+
+    const atual = await repo.colecao('normas').obter(norma.id);
+    const vigente = await repo.colecao('versoesNorma').obter(atual?.versaoVigenteId ?? '');
+    if (!vigente) throw new Error('sem versão vigente');
+    await marcarEditadoAMao(repo, vigente);
+    window.location.hash = `#/biblioteca/normas/${norma.id}`;
+    render(<App abrir={() => Promise.resolve(repo)} />);
+    expect(await screen.findByRole('heading', { level: 1, name: 'LEP' })).toBeInTheDocument();
+    expect(document.querySelector('.procedencia')).toHaveTextContent(
+      /Coletada em \d{2}\/\d{2}\/\d{4}.*Editado à mão/,
+    );
+  });
+});
 
 describe('destaque automático (9.8)', () => {
   const destaques = (endereco: string) =>

@@ -119,7 +119,7 @@ Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12
 | 13.1 ✔ 13/10/2026 | Segurança e LGPD da fase: payloads maliciosos no fluxo completo (colar e URL), tamanho máximo, vigilância de CSP; política de privacidade v2 (a busca por URL envia só o endereço da lei ao Cloudflare e ao site de origem) | Sonnet 5.5 **alto** | nuvem, sem rede |
 | 13.2 ✔ 13/10/2026 | Orientações › Legislação e "Ajuda sobre esta tela" no leitor e no importador (menu Ajuda, D6) | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.3 ✔ 13/10/2026 | Backup com normas: exportar → apagar → restaurar idêntico com o CP inteiro; pacote só de `legislacao` com a fonte das versões | Sonnet 5.5 médio | nuvem, sem rede |
-| 13.5 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
+| 13.5 ✔ 13/10/2026 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
 | 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
 | 12.3 | Campo URL na tela Importar (decodifica no aparelho, hash do sanitizado, oferece colar se falhar) | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 6b | Verificar atualização no site oficial pelo aparelho (D16), depois da 12.2 | Sonnet 5.5 médio | nuvem, depois da 12.2 |
@@ -241,7 +241,7 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 | ~~1~~ | ~~**13.1** Segurança e LGPD da F2~~ ✔ 13/10/2026 | — | — |
 | 2 | **13.3** Backup com normas | Sonnet 5.5 médio | nuvem, sem rede |
 | ~~3~~ | ~~**13.2** Orientações › Legislação e ajuda contextual~~ ✔ 13/10/2026 | — | — |
-| 4 | **13.5** Verificação de fechamento (§3 B) | Sonnet 5.5 médio | nuvem, sem rede |
+| ~~4~~ | ~~**13.5** Verificação de fechamento (§3 B)~~ ✔ 13/10/2026 | — | — |
 | 4a | **Ajustes A**: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
 | 4b | **Frases 1**: modelo e captura (esquema v6; **backup antes do merge**) | **Opus 5.5** | nuvem |
 | 4c | **Frases 2**: Revisar frases e Revisar cartões, oclusão | Sonnet 5.5 médio | nuvem |

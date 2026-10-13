@@ -20,6 +20,7 @@ import { Selo } from '../componentes/Selo';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { formatarQuando } from '../recall/rotulos';
+import { procedenciaDaVersao } from './rotulos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { referenciaDoNo } from './linhas';
 
@@ -85,10 +86,18 @@ async function carregarBiblioteca(repo: Repositorio) {
   const soNormas = normas.filter((n) => n.especie !== 'sumulas' && n.especie !== 'teses');
   const porDisciplina = agruparPorDisciplina(soNormas, vinculos, nomeDe);
   const continuar = ultimaLida(normas, leituras);
+  const procedencias = new Map<string, string>();
+  for (const n of soNormas) {
+    const v = n.versaoVigenteId
+      ? await repo.colecao('versoesNorma').obter(n.versaoVigenteId)
+      : undefined;
+    if (v) procedencias.set(n.id, procedenciaDaVersao(n, v).join(' · '));
+  }
   return {
     normas: soNormas,
     pendentes,
     leituras,
+    procedencias,
     porDisciplina,
     continuar,
     ponto: continuar && (await pontoDaLeitura(repo, continuar.id, leituras)),
@@ -385,6 +394,7 @@ export function Normas() {
                           leitura ? `Última leitura: ${formatarQuando(lidaEm(leitura))}` : '',
                           subtitulo,
                           descricaoDe(n),
+                          dados.procedencias.get(n.id),
                         ]
                           .filter(Boolean)
                           .join(' · ');

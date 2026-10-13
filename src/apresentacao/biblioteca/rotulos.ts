@@ -1,7 +1,8 @@
-import type { TipoDispositivo } from '../../core/modelo';
+import type { Norma, TipoDispositivo, VersaoDeNorma } from '../../core/modelo';
 import type { CategoriaDestaque } from '../../dominios/legislacao/destaques';
 import type { EstadoDaEstrela } from '../../dominios/legislacao/estrelas';
 import type { MotivoDescarte } from '../../dominios/legislacao/rascunho';
+import { editadoAMao } from '../../dominios/legislacao/servico';
 
 /** Singular e plural de cada tipo de nó, para o sumário da importação (9.5). */
 const TIPO: Record<TipoDispositivo, readonly [string, string]> = {
@@ -91,4 +92,23 @@ export function fraseDaEstrela(
   const onde = alvo || 'Dispositivo';
   if (estado.origem === 'excecao') return `${onde}: ${origem}.`;
   return `${onde}: ${origem ? `estrela ${origem}` : 'sem estrela'}.`;
+}
+
+const dataCivilBr = (d: string): string => d.split('-').reverse().join('/');
+
+/**
+ * De onde veio o texto lido (13.5): a fonte, quando foi coletado, a versão (vigência) e se foi
+ * editado à mão. Mostrado no leitor e na Biblioteca; partes ausentes ficam de fora.
+ */
+export function procedenciaDaVersao(
+  norma: Pick<Norma, 'fonteConsultadaEm'>,
+  versao: Pick<VersaoDeNorma, 'fonte' | 'capturadaEm' | 'dataVigencia' | 'versaoAdaptador'>,
+): string[] {
+  const coleta = norma.fonteConsultadaEm ?? versao.capturadaEm.slice(0, 10);
+  return [
+    versao.fonte ? `Fonte: ${versao.fonte}` : '',
+    `Coletada em ${dataCivilBr(coleta)}`,
+    versao.dataVigencia ? `Versão de ${dataCivilBr(versao.dataVigencia)}` : '',
+    editadoAMao(versao) ? 'Editado à mão' : '',
+  ].filter(Boolean);
 }

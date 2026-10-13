@@ -1,19 +1,21 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 13/10/2026 (13.2 feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
+Atualizado em 13/10/2026 (13.5 feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
 
 ## Estado
 
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
-- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.2, 13.3; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
+- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.2, 13.3, 13.5; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
 - **`main`** tem tudo até o PR #81 (merge #82, 11/10/2026). **Só na `integracao`:** PR #83 (`/code-review`) e a consolidação do plano-mestre. Nenhum dos dois sobe o esquema (sem backup).
-- Falta para o portão da F2: 13.5 (verificação de fechamento), 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
+- Falta para o portão da F2: 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
 
 ## Próxima atividade
 
-**Direção nova (13/10/2026, nenhum código mudou ainda):** registrar erro passa a exigir só a **frase correta** (disciplina e ponto facultativos e lembrados); revisão em dois modos (**Revisar frases** e **Revisar cartões**); cartão com oclusão; trecho da lei → "Enviar às frases"; Biblioteca = fontes dos outros, Frases = o que você quer lembrar. Encaixada depois da 13.5 (plano-mestre §1 "Frases" e §3 D; D25; T22).
+**Direção nova (13/10/2026, nenhum código mudou ainda):** registrar erro passa a exigir só a **frase correta** (disciplina e ponto facultativos e lembrados); revisão em dois modos (**Revisar frases** e **Revisar cartões**); cartão com oclusão; trecho da lei → "Enviar às frases"; Biblioteca = fontes dos outros, Frases = o que você quer lembrar. Encaixada logo depois da 13.5, antes da 12.2 e da 13.4 (plano-mestre §1 "Frases" e §3 D; D25; T22).
 
-**13.5 — Verificação de fechamento** (Sonnet 5.5 médio; nuvem, sem rede). Detalhe em [`planos/plano-mestre.md`](planos/plano-mestre.md) §3 B.
+**Ajustes A — foco centralizado; escolher a disciplina ao trazer norma do acervo** (Sonnet 5.5 médio; nuvem, sem rede). Detalhe em [`planos/plano-mestre.md`](planos/plano-mestre.md) §3 D. Depois, Frases 1 (Opus 5.5; esquema v6, **backup antes do merge**).
+
+**13.5 feita (13/10/2026), sem subida de esquema:** itens 2–4 e 6 já tinham teste (axe e alvos de 44 px em `acessibilidade.spec.ts`; grifos que sobrevivem em `atualizacao.test.ts` e no E2E 11.7; erro a partir do leitor e posição intacta no E2E 11.5; ida e volta do backup na 13.3). Item 1: E2E novo (tamanho em Conta › Aparência, "Continuar leitura", recarregar). Item 5 era lacuna: o leitor (`.procedencia`) e a Biblioteca passaram a mostrar fonte, data da coleta, versão (vigência) e "Editado à mão" (`procedenciaDaVersao`, em `rotulos.ts`). Sem defeito de posição de leitura.
 
 **13.2 feita (13/10/2026), sem subida de esquema:** Orientações v1 ganhou as seções `legislacao` (leitor) e `importar-lei` (importador); `secaoDeAjuda` aponta `/biblioteca/importar*` e `/biblioteca*` para elas; teste de rotas em `App.test.tsx`.
 
@@ -23,7 +25,6 @@ Atualizado em 13/10/2026 (13.2 feita). Ler antes de qualquer trabalho, junto com
 
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
-| 4 | 13.5 Verificação de fechamento (plano-mestre §3 B) | Sonnet 5.5 médio | nuvem, sem rede |
 | 4a | Ajustes A: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
 | 4b | Frases 1: modelo e captura, esquema v6 (**backup antes do merge**) | **Opus 5.5** | nuvem |
 | 4c | Frases 2: Revisar frases e Revisar cartões, com oclusão | Sonnet 5.5 médio | nuvem |
