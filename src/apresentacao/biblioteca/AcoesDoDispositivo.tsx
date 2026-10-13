@@ -229,6 +229,12 @@ function Conteudo({
   );
 }
 
+/** A frase correta (D25) ou, em erro antigo, "o que foi", cortados no tamanho do resumo. */
+function resumoDoErro(e: Erro): string {
+  const t = e.fraseCorreta ?? e.oQueFoi ?? '';
+  return t.length > RESUMO_DO_ERRO ? `${t.slice(0, RESUMO_DO_ERRO).trimEnd()}…` : t;
+}
+
 function ErrosVinculados({
   erros,
   tentar,
@@ -255,11 +261,7 @@ function ErrosVinculados({
         <ul className="erros-vinculados">
           {erros.map((e) => (
             <li key={e.id}>
-              <Link to={`/recall/erros/${e.id}`}>
-                {e.oQueFoi.length > RESUMO_DO_ERRO
-                  ? `${e.oQueFoi.slice(0, RESUMO_DO_ERRO).trimEnd()}…`
-                  : e.oQueFoi}
-              </Link>{' '}
+              <Link to={`/recall/erros/${e.id}`}>{resumoDoErro(e)}</Link>{' '}
               <span className="dica">({ROTULO_RESULTADO[e.resultado]})</span>
             </li>
           ))}
@@ -269,7 +271,7 @@ function ErrosVinculados({
   );
 }
 
-/** Os dois campos obrigatórios do erro (D9), "O que foi" já com a referência. */
+/** Só a frase correta é obrigatória (D25); "O que foi" já vem com a referência e é opcional. */
 function FormularioDoErro({
   alvo,
   cancelar,
@@ -286,27 +288,30 @@ function FormularioDoErro({
   const [salvando, setSalvando] = useState(false);
   const [falha, setFalha] = useState('');
   const trava = useRef(false);
+  const [frase, setFrase] = useState('');
   const campo = useRef<HTMLTextAreaElement>(null);
 
-  // O cursor no fim da referência: a pessoa só continua a frase.
   useEffect(() => {
-    const c = campo.current;
-    if (!c) return;
-    c.focus();
-    c.setSelectionRange(c.value.length, c.value.length);
+    campo.current?.focus();
   }, []);
 
+  const pronto = frase.trim() !== '';
   // Só a referência não é "o que foi".
-  const pronto = resultado !== null && oQueFoi.trim() !== '' && oQueFoi.trim() !== prefixo.trim();
+  const temOQueFoi = oQueFoi.trim() !== '' && oQueFoi.trim() !== prefixo.trim();
 
   async function salvar(e: SubmitEvent) {
     e.preventDefault();
-    if (!resultado || !pronto || trava.current) return;
+    if (!pronto || trava.current) return;
     trava.current = true;
     setSalvando(true);
     setFalha('');
     try {
-      await registrarErro(repo, { resultado, oQueFoi, dispositivoId: alvo.dispositivoId });
+      await registrarErro(repo, {
+        fraseCorreta: frase,
+        ...(resultado ? { resultado } : {}),
+        ...(temOQueFoi ? { oQueFoi } : {}),
+        dispositivoId: alvo.dispositivoId,
+      });
       registrado();
     } catch {
       trava.current = false;
@@ -318,7 +323,20 @@ function FormularioDoErro({
 
   return (
     <form onSubmit={(e) => void salvar(e)}>
-      <div role="group" aria-label="Resultado" className="linha-acoes grupo-resultado">
+      <div className="campo">
+        <label htmlFor="frase-do-dispositivo">Frase correta</label>
+        <textarea
+          id="frase-do-dispositivo"
+          ref={campo}
+          rows={2}
+          maxLength={2_000}
+          value={frase}
+          onChange={(e) => {
+            setFrase(e.target.value);
+          }}
+        />
+      </div>
+      <div role="group" aria-label="Resultado (opcional)" className="linha-acoes grupo-resultado">
         {(['errou', 'acertou_inseguro'] as const).map((r) => (
           <button
             key={r}
@@ -326,7 +344,7 @@ function FormularioDoErro({
             className={resultado === r ? 'principal' : undefined}
             aria-pressed={resultado === r}
             onClick={() => {
-              setResultado(r);
+              setResultado(resultado === r ? null : r);
             }}
           >
             {ROTULO_RESULTADO[r]}
@@ -334,10 +352,9 @@ function FormularioDoErro({
         ))}
       </div>
       <div className="campo">
-        <label htmlFor="erro-do-dispositivo">O que foi</label>
+        <label htmlFor="erro-do-dispositivo">O que foi (opcional)</label>
         <textarea
           id="erro-do-dispositivo"
-          ref={campo}
           rows={3}
           maxLength={2_000}
           value={oQueFoi}

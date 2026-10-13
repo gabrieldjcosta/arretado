@@ -11,6 +11,7 @@ import {
   editarCartao,
   excluirErro,
   filaDoDia,
+  fraseDoErro,
   historicoRevisoes,
   listarCartoes,
   listarErros,
@@ -36,25 +37,89 @@ async function preparar(opcoes: Parameters<typeof repositorioDeTeste>[0] = {}) {
 }
 
 describe('registrar e completar erro (6.1)', () => {
-  it('salva com os 2 obrigatórios, aberto, com causa sugerida e evento', async () => {
+  it('salva só com a frase correta (D25): errou, aberto, sem "o que foi", e a Frase junto', async () => {
     const { repo, eventos } = await preparar();
-    const e = await registrarErro(repo, {
+    const e = await registrarErro(repo, { fraseCorreta: '  O prazo é de 10 dias.  ' });
+    expect(e).toMatchObject({
+      status: 'aberto',
       resultado: 'errou',
-      oQueFoi: 'Errei o prazo de 10 dias',
+      fraseCorreta: 'O prazo é de 10 dias.',
     });
-    expect(e).toMatchObject({ status: 'aberto', causaSugerida: 'literalidade' });
-    expect(e.causa).toBeUndefined();
+    expect(e.oQueFoi).toBeUndefined();
+    expect(e.causaSugerida).toBeUndefined();
+    const frase = await fraseDoErro(repo, e.id);
+    expect(frase).toMatchObject({
+      texto: 'O prazo é de 10 dias.',
+      origemTipo: 'erro',
+      erroId: e.id,
+      estado: 'ativa',
+      proximaRevisao: '2026-09-24',
+    });
     expect(eventos).toEqual([
       {
         nome: 'erro.registrado',
         payload: { erroId: e.id, pontoId: undefined, sessaoId: undefined },
       },
+      { nome: 'frase.criada', payload: { fraseId: frase?.id, erroId: e.id } },
     ]);
+  });
+
+  it('recusa frase vazia e não grava nada', async () => {
+    const { repo } = await preparar();
+    await expect(registrarErro(repo, { fraseCorreta: '   ', oQueFoi: 'x' })).rejects.toThrow(
+      /frase correta/,
+    );
+    expect(await repo.colecao('erros').contar()).toBe(0);
+    expect(await repo.colecao('frases').contar()).toBe(0);
+  });
+
+  it('com "o que foi", sugere a causa; disciplina e ponto vão para a Frase', async () => {
+    const { repo } = await preparar();
+    const disciplinaId = (await repo.colecao('disciplinas').criar({ nome: 'Penal' })).id;
+    const pontoId = (await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId })).id;
+    const e = await registrarErro(repo, {
+      fraseCorreta: 'Dez dias.',
+      oQueFoi: 'Errei o prazo de 10 dias',
+      resultado: 'acertou_inseguro',
+      disciplinaId,
+      pontoId,
+    });
+    expect(e).toMatchObject({ resultado: 'acertou_inseguro', causaSugerida: 'literalidade' });
+    expect(await fraseDoErro(repo, e.id)).toMatchObject({ disciplinaId, pontoId });
+  });
+
+  it('completar o erro mantém a Frase igual: texto, disciplina; apagar a frase arquiva', async () => {
+    const { repo } = await preparar();
+    const disciplinaId = (await repo.colecao('disciplinas').criar({ nome: 'Penal' })).id;
+    const e = await registrarErro(repo, { fraseCorreta: 'Antes.' });
+    await completarErro(repo, e.id, { fraseCorreta: 'Depois.', disciplinaId });
+    expect(await fraseDoErro(repo, e.id)).toMatchObject({ texto: 'Depois.', disciplinaId });
+    await completarErro(repo, e.id, { fraseCorreta: '', oQueFoi: 'Pergunta' });
+    expect((await repo.colecao('erros').obter(e.id))?.fraseCorreta).toBeUndefined();
+    expect(await fraseDoErro(repo, e.id)).toMatchObject({ texto: 'Depois.', estado: 'arquivada' });
+    expect((await listarFrases(repo)).itens).toEqual([]);
+    await completarErro(repo, e.id, { fraseCorreta: 'De novo.' });
+    expect(await fraseDoErro(repo, e.id)).toMatchObject({ texto: 'De novo.', estado: 'ativa' });
+    expect(await repo.colecao('frases').contar()).toBe(1);
+  });
+
+  it('erro antigo sem frase ganha a Frase ao recebê-la', async () => {
+    const { repo } = await preparar();
+    const antigo = await repo
+      .colecao('erros')
+      .criar({ resultado: 'errou', oQueFoi: 'Antigo', status: 'aberto' });
+    expect(await fraseDoErro(repo, antigo.id)).toBeUndefined();
+    await completarErro(repo, antigo.id, { fraseCorreta: 'Nova.' });
+    expect(await fraseDoErro(repo, antigo.id)).toMatchObject({ texto: 'Nova.', estado: 'ativa' });
   });
 
   it('causa escolhida entra no histórico com a sugerida e define a ação recomendada', async () => {
     const { repo } = await preparar();
-    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'Confundi furto e roubo' });
+    const e = await registrarErro(repo, {
+      resultado: 'errou',
+      oQueFoi: 'Confundi furto e roubo',
+      fraseCorreta: 'Furto não tem violência.',
+    });
     const c = await completarErro(repo, e.id, {
       causa: 'confusao',
       fraseCorreta: 'Roubo exige violência.',
@@ -65,19 +130,25 @@ describe('registrar e completar erro (6.1)', () => {
     ]);
   });
 
-  it('excluir o erro mantém o cartão', async () => {
+  it('excluir o erro mantém o cartão e exclui a Frase dele', async () => {
     const { repo } = await preparar();
-    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'x' });
+    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'x', fraseCorreta: 'F.' });
     const c = await criarCartaoDeErro(repo, e.id);
     await excluirErro(repo, e.id);
     expect(await repo.colecao('cartoes').obter(c.id)).toBeDefined();
+    expect(await repo.colecao('frases').contar()).toBe(0);
+    expect((await listarFrases(repo)).itens).toEqual([]);
   });
 
   it('lista por recência com filtros e "a completar"', async () => {
     const { repo, relogio } = await preparar();
-    const a = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'a' });
+    const a = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'a', fraseCorreta: 'A.' });
     relogio.avancar(1000);
-    const b = await registrarErro(repo, { resultado: 'acertou_inseguro', oQueFoi: 'b' });
+    const b = await registrarErro(repo, {
+      resultado: 'acertou_inseguro',
+      oQueFoi: 'b',
+      fraseCorreta: 'B.',
+    });
     relogio.avancar(1000);
     const c = await registrarErro(repo, {
       resultado: 'errou',
@@ -96,15 +167,18 @@ describe('registrar e completar erro (6.1)', () => {
     ]);
   });
 
-  it('lista passiva só com frases corretas', async () => {
-    const { repo } = await preparar();
-    await registrarErro(repo, { resultado: 'errou', oQueFoi: 'sem frase' });
-    const f = await registrarErro(repo, {
-      resultado: 'errou',
-      oQueFoi: 'com frase',
-      fraseCorreta: 'Frase.',
-    });
-    expect((await listarFrases(repo)).itens.map((e) => e.id)).toEqual([f.id]);
+  it('lista passiva: Frases ativas por recência, filtráveis por disciplina', async () => {
+    const { repo, relogio } = await preparar();
+    const disciplinaId = (await repo.colecao('disciplinas').criar({ nome: 'Penal' })).id;
+    // Erro antigo sem frase não entra.
+    await repo.colecao('erros').criar({ resultado: 'errou', oQueFoi: 'sem', status: 'aberto' });
+    const a = await registrarErro(repo, { fraseCorreta: 'Primeira.' });
+    relogio.avancar(1000);
+    const b = await registrarErro(repo, { fraseCorreta: 'Segunda.', disciplinaId });
+    expect((await listarFrases(repo)).itens.map((f) => f.erroId)).toEqual([b.id, a.id]);
+    expect((await listarFrases(repo, { disciplinaId })).itens.map((f) => f.texto)).toEqual([
+      'Segunda.',
+    ]);
   });
 });
 
@@ -266,7 +340,7 @@ describe('fila projetada (6.9)', () => {
 describe('correções da revisão da etapa 6', () => {
   it('criar cartão duas vezes para o mesmo erro devolve o mesmo cartão', async () => {
     const { repo } = await preparar();
-    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'x' });
+    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'x', fraseCorreta: 'F.' });
     const [a, b] = await Promise.all([
       criarCartaoDeErro(repo, e.id),
       criarCartaoDeErro(repo, e.id),
@@ -277,7 +351,11 @@ describe('correções da revisão da etapa 6', () => {
 
   it('sugestão que deixou de valer é apagada ao editar o texto', async () => {
     const { repo } = await preparar();
-    const e = await registrarErro(repo, { resultado: 'errou', oQueFoi: 'prazo de 15 dias' });
+    const e = await registrarErro(repo, {
+      resultado: 'errou',
+      oQueFoi: 'prazo de 15 dias',
+      fraseCorreta: 'F.',
+    });
     expect(e.causaSugerida).toBe('literalidade');
     const e2 = await completarErro(repo, e.id, { oQueFoi: 'não conhecia o instituto' });
     expect(e2.causaSugerida).toBeUndefined();

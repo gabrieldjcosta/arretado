@@ -4,6 +4,7 @@ import type { NomeColecao, Preferencias } from '../modelo';
 import { BancoArretado, NOME_BANCO_PRINCIPAL } from './banco';
 import { Colecao, type Dados } from './colecao';
 import type { Contexto } from './contexto';
+import { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 
 interface Identidade {
   usuarioId: string;
@@ -89,7 +90,9 @@ export class Repositorio {
     const relogio = new RelogioLogico(identidade.aparelhoId, () => agora().getTime());
     const ultima = await db.alteracoes.orderBy('ts').last();
     if (ultima) relogio.observar(ultima.ts);
-    return new Repositorio({ ...base, ...identidade, relogio });
+    const repo = new Repositorio({ ...base, ...identidade, relogio });
+    if (!(await db.meta.get(CHAVE_MIGRACAO_FRASES))) await migrarFrasesDosErros(repo);
+    return repo;
   }
 
   /**
