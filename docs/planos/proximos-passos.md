@@ -32,7 +32,7 @@ Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resu
 
 Depois da F3: teste com 3 a 5 pessoas, depois conta e sincronização (F4); a conta entra com Google **e Apple**; só então leitura de imagem (OCR), IA opcional (planos com e sem IA: resumos, questões → frases, busca nas leis), voz, a decisão de cobrar e, depois do básico, os apps de Android e iPhone.
 
-Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d, 63 normas a converter) e a busca de súmula mais leve (Sonnet médio, nuvem).
+Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d; das 63 normas a converter, 59 já estão no acervo e 4 esperam o ato oficial: 3 provimentos da CGJ-TJSP e a Resolução CONDEGE 1/2024) e a busca de súmula mais leve (Sonnet médio, nuvem).
 
 ## 4. Pendências suas
 - Decidir as **14 teses com número repetido**.

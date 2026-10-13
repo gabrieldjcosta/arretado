@@ -3,7 +3,22 @@
 import { JSDOM } from 'jsdom';
 import { normalizar } from './acervo-pdf-para-md.mjs';
 
-const BLOCOS = new Set(['P', 'DIV', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'TR', 'BR', 'UL', 'OL', 'TABLE']);
+const BLOCOS = new Set([
+  'P',
+  'DIV',
+  'LI',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'TR',
+  'BR',
+  'UL',
+  'OL',
+  'TABLE',
+]);
 
 function riscado(el) {
   return (
@@ -45,7 +60,13 @@ export function htmlParaTexto(html, seletor) {
   const saida = [''];
   linhas(alvo, saida, false);
   const texto = saida
-    .map((l) => l.replace(/~~\s*~~/g, '').replace(/~~ ~~/g, ' ').replace(/\s+/g, ' ').trim())
+    .map((l) =>
+      l
+        .replace(/~~\s*~~/g, '')
+        .replace(/~~ ~~/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    )
     .filter(Boolean)
     .join('\n');
   return normalizar(texto);

@@ -178,3 +178,8 @@
 | ato-normativo-dpg-183-2020 | publicado | 3 | 0 | tachado_sem_dispositivo: 4 |
 | ato-normativo-dpg-146-2018 | publicado | 45 | 0 | — |
 | portaria-ms-1130-2015 | publicado | 100 | 0 | — |
+| convencao-oit-182 | publicado | 47 | 0 | alinea_sem_inciso: 11; item_sem_alinea: 16 |
+| convencao-oit-138 | publicado | 74 | 0 | duplicata: 3; alinea_sem_inciso: 18; item_sem_alinea: 33 |
+| recomendacao-oit-190 | publicado | 6 | 0 | — |
+| recomendacao-oit-146 | publicado | 8 | 0 | — |
+| resolucao-conanda-273-2025 | publicado | 70 | 0 | — |

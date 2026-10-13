@@ -35,7 +35,7 @@ Atualizado em 13/10/2026 (13.5 feita). Ler antes de qualquer trabalho, junto com
 | 8 | Uso real: 2 semanas lendo lei no Arretado | — | **Gabriel** |
 | 9 | Planejamento da F3 | **Opus 5.5** | nuvem, só depois do portão |
 
-Sem bloquear: lotes com rede (SV 30, 3b/3d, 63 normas a converter; precisa de rede) e busca de súmula pelo índice (Sonnet 5.5 médio, nuvem). Relato de problema do uso real fura a fila.
+Sem bloquear: lotes com rede (SV 30, 3b/3d; normas a converter: 59 de 63 feitas em 13/10/2026, faltam os provimentos CGJ-TJSP 18/2012, 16/2013 e 21/2013 e a Res. CONDEGE 1/2024, ver `acervo/a-converter.md`) e busca de súmula pelo índice (Sonnet 5.5 médio, nuvem). Relato de problema do uso real fura a fila.
 
 ## Pendências do Gabriel
 

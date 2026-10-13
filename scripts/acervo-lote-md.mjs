@@ -27,9 +27,12 @@ for (const m of manifesto) {
       }
       if (m.semArtigos) texto = comTitulos(texto);
       if (texto.length < 200) throw new Error(`texto curto (${texto.length})`);
-      writeFileSync(`acervo/fontes/${m.arquivo}`, `# ${m.titulo}
+      writeFileSync(
+        `acervo/fontes/${m.arquivo}`,
+        `# ${m.titulo}
 ${texto}
-`);
+`,
+      );
     } else if (m.manual) {
       // PDF escaneado: o Markdown já foi transcrito à mão em `acervo/fontes/`; só entra na curadoria.
       url = m.urlOficial;

@@ -18,7 +18,9 @@ export async function baixar(url) {
 /** Página de ato do CNJ → URL do PDF mais atual (último "compilado"; senão o do ato; `modo` "original" prefere o do ato). */
 export async function pdfDoCnj(pagina, modo = 'compilado') {
   const html = (await baixar(pagina)).toString('utf8');
-  const links = [...new Set([...html.matchAll(/href="([^"]*\/files\/[^"]*\.pdf)"/g)].map((m) => m[1]))]
+  const links = [
+    ...new Set([...html.matchAll(/href="([^"]*\/files\/[^"]*\.pdf)"/g)].map((m) => m[1])),
+  ]
     .filter((l) => !/justica\.pr|regras_das/.test(l))
     .map((l) => new URL(l.replace('/files//', '/files/'), pagina).href);
   const comp = links.filter((l) => /compilado/.test(l));
@@ -44,8 +46,14 @@ export function normalizar(texto) {
     .replace(/[-]/g, '')
     .replace(/⁰/g, 'º')
     .replace(/(\d)o(?![A-Za-zÀ-ú\d])/g, '$1º')
-    .replace(/\b(Lei|Decreto|Resolução|Provimento|Portaria|Recomendação|Deliberação|Convenção|CNJ|CSDP|DPG|CONANDA|CNAS) no (?=\d)/g, '$1 nº ')
-    .replace(/\b(RESOLUÇÃO|PROVIMENTO|DELIBERAÇÃO|PORTARIA|RECOMENDAÇÃO|ATO NORMATIVO) No /g, '$1 Nº ')
+    .replace(
+      /\b(Lei|Decreto|Resolução|Provimento|Portaria|Recomendação|Deliberação|Convenção|CNJ|CSDP|DPG|CONANDA|CNAS) no (?=\d)/g,
+      '$1 nº ',
+    )
+    .replace(
+      /\b(RESOLUÇÃO|PROVIMENTO|DELIBERAÇÃO|PORTARIA|RECOMENDAÇÃO|ATO NORMATIVO) No /g,
+      '$1 Nº ',
+    )
     .replace(/([.;:”"]) (Art\. \d+[ºo°]?[ .-])/g, '$1\n$2')
     .replace(/([.;:”")]) (§ ?\d+[ºo°]?[ .-]|Parágrafo único)/g, '$1\n$2')
     .replace(/([.;:]) ([IVXLC]{1,6} ?[–—-] )/g, '$1\n$2')
@@ -56,7 +64,7 @@ export function limpar(bruto) {
   const linhas = normalizar(bruto.replace(/\f/g, '\n').replace(/­/g, '')).split(/\r?\n/);
   const saida = [];
   for (const l0 of linhas) {
-    const l = l0.replace(/[ \t ]+/g, ' ').trim();
+    const l = l0.replace(/\s+/g, ' ').trim();
     if (!l) {
       saida.push('');
       continue;
@@ -72,7 +80,12 @@ export function limpar(bruto) {
         ant = saida[k];
       }
     }
-    if (ant === undefined || ant === '' || INICIO.test(l) || (CAIXA_ALTA.test(l) && !/[a-z]/.test(l))) {
+    if (
+      ant === undefined ||
+      ant === '' ||
+      INICIO.test(l) ||
+      (CAIXA_ALTA.test(l) && !/[a-z]/.test(l))
+    ) {
       saida.push(l);
     } else if (/[a-zà-ú]-$/.test(ant) && /^[a-zà-ú]/.test(l)) {
       saida[saida.length - 1] = ant.slice(0, -1) + l;
@@ -106,7 +119,10 @@ export function pdfParaTexto(buf) {
   const dir = mkdtempSync(join(tmpdir(), 'pdf-'));
   const f = join(dir, 'a.pdf');
   writeFileSync(f, buf);
-  return execFileSync('pdftotext', ['-enc', 'UTF-8', f, '-'], { encoding: 'utf8', maxBuffer: 1 << 28 });
+  return execFileSync('pdftotext', ['-enc', 'UTF-8', f, '-'], {
+    encoding: 'utf8',
+    maxBuffer: 1 << 28,
+  });
 }
 
 if (process.argv[1]?.endsWith('acervo-pdf-para-md.mjs')) {
