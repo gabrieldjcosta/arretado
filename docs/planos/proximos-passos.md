@@ -26,12 +26,13 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ 6 | 12.3 Campo de endereço na tela Importar (feita em 13/10/2026, sem mexer no esquema; testada só com mocks, falta o seu teste real com rede) | — | — |
 | ✔ 6b | Verificar atualização pelo aparelho (feita em 13/10/2026, sem mexer no esquema; só lê e avisa, nunca troca o texto; testada só com mocks, falta o seu teste real com rede) | — | — |
 | ✔ 7 | 13.4 Documento do portão da F2 (feito em 13/10/2026 em `docs/portoes/F2.md`; critérios ligados a teste, pendências suas listadas, o que depende de uso real ou rede está como "não medido") | — | — |
-| 8 | **2 semanas lendo lei no Arretado** | — | **Você** |
-| 9 | Planejar a F3 (tela Hoje, Sessão, Plano) | **Opus** | Nuvem, só depois do portão |
+| — | ~~2 semanas lendo lei no Arretado~~: passou para o teste com outras pessoas (V1), depois das contas; não bloqueia nada | — | — |
+| 9 | F3-A em pacotes paralelos + preparação da F3-B ([`f3-pacotes.md`](f3-pacotes.md)) | **Opus** | Nuvem, liberado |
+| 10 | Agente de verificação diário (rotina) | — | Nuvem |
 
-Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resumos e jurisprudência); Frases guardam o que você quer lembrar. Nas 2 semanas de uso você já testa esse fluxo.
+Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resumos e jurisprudência); Frases guardam o que você quer lembrar. Você testa esse fluxo no uso do dia a dia.
 
-Depois da F3: teste com 3 a 5 pessoas, depois conta e sincronização (F4); a conta entra com Google **e Apple**; só então leitura de imagem (OCR), IA opcional (planos com e sem IA: resumos, questões → frases, busca nas leis), voz, a decisão de cobrar e, depois do básico, os apps de Android e iPhone.
+Depois da F3: contas (F4-A), teste com 3 a 5 pessoas (todas as validações adiadas, inclusive as 2 semanas de uso e os testes com rede), depois sincronização (F4-B/C); a conta entra com Google **e Apple**; só então leitura de imagem (OCR), IA opcional (planos com e sem IA: resumos, questões → frases, busca nas leis), voz, a decisão de cobrar e, depois do básico, os apps de Android e iPhone.
 
 Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d; das 63 normas a converter, 59 já estão no acervo e 4 esperam o ato oficial: 3 provimentos da CGJ-TJSP e a Resolução CONDEGE 1/2024) e a busca de súmula mais leve (Sonnet médio, nuvem).
 
