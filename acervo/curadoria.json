@@ -16,7 +16,9 @@
           "disciplina": "Direito Processual Penal"
         }
       ],
-      "anomaliasAceitas": ["alinea_sem_inciso"],
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l7210compilado.htm"
@@ -88,7 +90,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc80.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-complementar-federal-80-1994",
@@ -153,7 +159,10 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/1979/lei.complementar-207-05.01.1979.html"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso",
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "lei-complementar-estadual-893-2001",
@@ -176,7 +185,9 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2001/lei.complementar-893-09.03.2001.html"
       },
-      "anomaliasAceitas": ["item_sem_alinea"]
+      "anomaliasAceitas": [
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "decreto-lei-4657-1942",
@@ -194,7 +205,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del4657compilado.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
     },
     {
       "id": "decreto-lei-3688-1941",
@@ -212,7 +225,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3688.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "alinea_sem_inciso"
+      ]
     },
     {
       "id": "lei-federal-12850-2013",
@@ -233,7 +249,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12850.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-9503-1997",
@@ -251,7 +270,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso",
+        "paragrafo_unico_com_numerado"
+      ]
     },
     {
       "id": "lei-federal-9605-1998",
@@ -272,7 +294,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9605.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-10826-2003",
@@ -290,7 +314,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.826.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "tachado_sem_dispositivo"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "tachado_sem_dispositivo"
+      ]
     },
     {
       "id": "lei-federal-8072-1990",
@@ -308,7 +335,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8072.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-11343-2006",
@@ -326,7 +356,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11343.htm"
       },
-      "anomaliasAceitas": ["estrutural_substituido", "paragrafo_1_sem_2"]
+      "anomaliasAceitas": [
+        "estrutural_substituido",
+        "paragrafo_1_sem_2"
+      ]
     },
     {
       "id": "lei-federal-8078-1990",
@@ -350,7 +383,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
     },
     {
       "id": "lei-federal-1521-1951",
@@ -368,7 +403,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l1521.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
     },
     {
       "id": "lei-federal-8137-1990",
@@ -406,7 +443,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9249.htm"
       },
-      "anomaliasAceitas": ["paragrafo_1_sem_2"]
+      "anomaliasAceitas": [
+        "paragrafo_1_sem_2"
+      ]
     },
     {
       "id": "lei-federal-9430-1996",
@@ -424,7 +463,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9430.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-10684-2003",
@@ -445,7 +486,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.684.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-9613-1998",
@@ -503,7 +546,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6001.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso", "duplicata"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso",
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-13869-2019",
@@ -521,7 +567,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm"
       },
-      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "duplicata",
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-10741-2003",
@@ -542,7 +592,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.741.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "tachado_sem_dispositivo", "duplicata"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "tachado_sem_dispositivo",
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-6766-1979",
@@ -563,7 +617,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6766.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso", "duplicata"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso",
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-10932-2004",
@@ -601,7 +658,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm"
       },
-      "anomaliasAceitas": ["caractere_perdido", "tachado_sem_dispositivo", "linha_solta"]
+      "anomaliasAceitas": [
+        "caractere_perdido",
+        "tachado_sem_dispositivo",
+        "linha_solta"
+      ]
     },
     {
       "id": "lei-federal-8069-1990",
@@ -705,7 +766,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-10257-2001",
@@ -726,7 +790,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/leis_2001/l10257.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-6015-1973",
@@ -744,7 +810,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso", "item_sem_alinea"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "alinea_sem_inciso",
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "lei-federal-8245-1991",
@@ -762,7 +832,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8245.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "alinea_sem_inciso"
+      ]
     },
     {
       "id": "lei-federal-8009-1990",
@@ -800,7 +873,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l5478.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-11804-2008",
@@ -838,7 +914,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13465.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "paragrafo_unico_com_numerado", "duplicata"]
+      "anomaliasAceitas": [
+        "linha_solta",
+        "paragrafo_unico_com_numerado",
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-13709-2018",
@@ -886,7 +966,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm"
       },
-      "anomaliasAceitas": ["tachado_sem_dispositivo"]
+      "anomaliasAceitas": [
+        "tachado_sem_dispositivo"
+      ]
     },
     {
       "id": "lei-federal-13105-2015",
@@ -944,7 +1026,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12288.htm"
       },
-      "anomaliasAceitas": ["linha_solta"]
+      "anomaliasAceitas": [
+        "linha_solta"
+      ]
     },
     {
       "id": "lei-federal-9008-1995",
@@ -982,7 +1066,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-8080-1990",
@@ -1000,7 +1086,10 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8080.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-9656-1998",
@@ -1044,7 +1133,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9394.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-11445-2007",
@@ -1103,7 +1194,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12587.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-15432-2026",
@@ -1457,7 +1550,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14119.htm"
       },
-      "anomaliasAceitas": ["artigo_so_tachado"]
+      "anomaliasAceitas": [
+        "artigo_so_tachado"
+      ]
     },
     {
       "id": "lei-federal-12608-2012",
@@ -1492,7 +1587,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14750.htm"
       },
-      "anomaliasAceitas": ["artigo_so_tachado", "artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": [
+        "artigo_so_tachado",
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
     },
     {
       "id": "lei-federal-12334-2010",
@@ -1598,7 +1697,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9433.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-12305-2010",
@@ -1616,7 +1717,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12305.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "lei-federal-14181-2021",
@@ -1666,7 +1769,9 @@
           "disciplina": "Direito Administrativo"
         }
       ],
-      "avisos": ["Conferir a norma indicada com o edital."],
+      "avisos": [
+        "Conferir a norma indicada com o edital."
+      ],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/l15263.htm"
@@ -1853,7 +1958,9 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/1998/lei-10177-30.12.1998.html"
       },
-      "anomaliasAceitas": ["item_sem_alinea"]
+      "anomaliasAceitas": [
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "lei-estadual-14187-2010",
@@ -1873,7 +1980,9 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2010/lei-14187-19.07.2010.html"
       },
-      "anomaliasAceitas": ["item_sem_alinea"]
+      "anomaliasAceitas": [
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "lei-estadual-10948-2001",
@@ -1930,7 +2039,9 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2000/lei-10705-28.12.2000.html"
       },
-      "anomaliasAceitas": ["item_sem_alinea"]
+      "anomaliasAceitas": [
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "lei-estadual-10365-1999",
@@ -2025,7 +2136,11 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/decreto/d5051.htm"
       },
-      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea", "duplicata"]
+      "anomaliasAceitas": [
+        "alinea_sem_inciso",
+        "item_sem_alinea",
+        "duplicata"
+      ]
     },
     {
       "id": "decreto-federal-10088-2019",
@@ -2043,7 +2158,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/decreto/d10088.htm"
       },
-      "anomaliasAceitas": ["duplicata"]
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
     },
     {
       "id": "decreto-federal-4377-2002",
@@ -2089,7 +2206,9 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/decreto/d9073.htm"
       },
-      "anomaliasAceitas": ["item_sem_alinea"]
+      "anomaliasAceitas": [
+        "item_sem_alinea"
+      ]
     },
     {
       "id": "decreto-federal-12710-2025",
@@ -2346,6 +2465,665 @@
         "arquivo": "teses-dpesp.json",
         "urlOficial": "https://www.defensoria.sp.def.br/web/guest/institucional/edepe/pagina-inicial-edepe/teses-institucionais"
       }
+    },
+    {
+      "id": "resolucao-cnj-414-2021",
+      "titulo": "Resolução CNJ 414/2021 (Protocolo de Istambul - exames de corpo de delito em casos de tortura)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-414-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4105"
+      },
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "resolucao-cnj-425-2021",
+      "titulo": "Resolução CNJ 425/2021 (Política Nacional Judicial de Atenção a Pessoas em Situação de Rua - PopRuaJud)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-425-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4169"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-287-2019",
+      "titulo": "Resolução CNJ 287/2019 (procedimentos para o tratamento de pessoas indígenas acusadas, rés, condenadas ou privadas de liberdade)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-287-2019.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2959"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-213-2015",
+      "titulo": "Resolução CNJ 213/2015 (Audiência de custódia)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Só a resolução e o Protocolo I; o Protocolo II (oitiva de denúncias de tortura) ficou de fora.",
+        "Texto compilado do CNJ: dispositivo alterado pode aparecer duas vezes (a redação anterior e a vigente); vale a última."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-213-2015.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2234"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "duplicata",
+        "alinea_sem_inciso",
+        "item_sem_alinea"
+      ]
+    },
+    {
+      "id": "resolucao-cnj-412-2021",
+      "titulo": "Resolução CNJ 412/2021 (monitoração eletrônica de pessoas - diretrizes e procedimentos)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-412-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4071"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-125-2010",
+      "titulo": "Resolução CNJ 125/2010 (Política Judiciária Nacional de Tratamento Adequado dos Conflitos de Interesses)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-125-2010.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/156"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-131-2011",
+      "titulo": "Resolução CNJ 131/2011 - Autorização de viagem ao exterior de crianças e adolescentes brasileiros",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-131-2011.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/116"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-270-2018",
+      "titulo": "Resolução CNJ 270/2018 - Uso do nome social por pessoas trans, travestis e transexuais nos serviços judiciários",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-270-2018.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2779"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-510-2023",
+      "titulo": "Resolução CNJ 510/2023 - Comissão Nacional e Comissões Regionais de Soluções Fundiárias",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-510-2023.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/5172"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-35-2007",
+      "titulo": "Resolução CNJ 35/2007 - Inventário, partilha, separação e divórcio extrajudiciais (Lei 11.441/07)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [
+        "Texto compilado do CNJ: dispositivo alterado pode aparecer duas vezes (a redação anterior e a vigente); vale a última.",
+        "Artigos 33 a 35 ausentes no texto compilado (conferir no site do CNJ)."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-35-2007.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/179"
+      },
+      "anomaliasAceitas": [
+        "duplicata",
+        "artigo_ausente",
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "resolucao-cnj-345-2020",
+      "titulo": "Resolução CNJ 345/2020 - Juízo 100% Digital",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-345-2020.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/3512"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-372-2021",
+      "titulo": "Resolução CNJ 372/2021 - Balcão Virtual (plataforma de videoconferência)",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-372-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/3742"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-385-2021",
+      "titulo": "Resolução CNJ 385/2021 - Núcleos de Justiça 4.0",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-385-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/3843"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-492-2023",
+      "titulo": "Resolução CNJ 492/2023 - Protocolo para julgamento com perspectiva de gênero",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-492-2023.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4986"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-598-2024",
+      "titulo": "Resolução CNJ 598/2024 - Protocolo para julgamento com perspectiva racial",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Só a resolução, sem o Protocolo anexo."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-598-2024.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/5860"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "recomendacao-cnj-128-2022",
+      "titulo": "Recomendação CNJ 128/2022 - Protocolo para Julgamento com Perspectiva de Gênero",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Recomendação",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Só a resolução, sem o Protocolo anexo."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "recomendacao-cnj-128-2022.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4377"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "recomendacao-cnj-163-2025",
+      "titulo": "Recomendação CNJ 163/2025 - Diretrizes para identificação e condução de processos estruturais",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Recomendação",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "recomendacao-cnj-163-2025.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/6200"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-16-2012",
+      "titulo": "Provimento CNJ 16/2012 - Reconhecimento de paternidade (indicação de suposto pai) no Registro Civil",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [
+        "Revogado pelo Provimento CNJ 149/2023 (hoje no Código Nacional de Normas): o texto compilado só traz os dispositivos como revogados."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-16-2012.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1299"
+      },
+      "anomaliasAceitas": [
+        "duplicata",
+        "artigo_ausente"
+      ]
+    },
+    {
+      "id": "provimento-cnj-65-2017",
+      "titulo": "Provimento CNJ 65/2017 - Usucapião extrajudicial",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-65-2017.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2527"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-73-2018",
+      "titulo": "Provimento CNJ 73/2018 - Alteração de prenome e gênero de pessoa transgênero no RCPN",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Texto compilado do CNJ: dispositivo alterado pode aparecer duas vezes (a redação anterior e a vigente); vale a última."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-73-2018.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2623"
+      },
+      "anomaliasAceitas": [
+        "duplicata",
+        "paragrafo_unico_com_numerado"
+      ]
+    },
+    {
+      "id": "provimento-cnj-82-2019",
+      "titulo": "Provimento CNJ 82/2019 - Averbação de alteração do nome do genitor nos registros dos filhos",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-82-2019.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2973"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-104-2020",
+      "titulo": "Provimento CNJ 104/2020 - Envio de dados registrais de pessoas em vulnerabilidade socioeconômica (RCPN)",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-104-2020.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/3340"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-122-2021",
+      "titulo": "Provimento CNJ 122/2021 - Assento de nascimento com campo sexo ignorado na DNV/DO",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Texto compilado do CNJ: dispositivo alterado pode aparecer duas vezes (a redação anterior e a vigente); vale a última."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-122-2021.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4066"
+      },
+      "anomaliasAceitas": [
+        "paragrafo_1_sem_2",
+        "duplicata",
+        "paragrafo_unico_com_numerado"
+      ]
+    },
+    {
+      "id": "provimento-cnj-152-2023",
+      "titulo": "Provimento CNJ 152/2023 - Altera o Código Nacional de Normas (Foro Extrajudicial) - averbação",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-152-2023.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/5283"
+      },
+      "anomaliasAceitas": [
+        "duplicata",
+        "artigo_ausente",
+        "artigo_fora_de_ordem"
+      ]
+    },
+    {
+      "id": "resolucao-cnj-175-2013",
+      "titulo": "Resolução CNJ 175/2013 - Casamento civil e conversão de união estável entre pessoas do mesmo sexo",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Transcrito à mão do PDF escaneado do ato (sem camada de texto).",
+        "Só a resolução; o texto das ementas e dos considerandos segue o PDF original."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-175-2013.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1754"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnj-295-2019",
+      "titulo": "Resolução CNJ 295/2019 - Autorização de viagem nacional para crianças e adolescentes",
+      "grupo": "Resoluções do CNJ",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [
+        "Transcrito à mão do PDF escaneado do ato (sem camada de texto).",
+        "Só a resolução, sem os formulários de autorização anexos."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnj-295-2019.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/3015"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-19-2012",
+      "titulo": "Provimento CNJ 19/2012 - Gratuidade da averbação de reconhecimento de paternidade para pobres",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Transcrito à mão do PDF escaneado do ato (sem camada de texto).",
+        "Revogado (situação no portal do CNJ)."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-19-2012.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1295"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "provimento-cnj-28-2013",
+      "titulo": "Provimento CNJ 28/2013 - Registro tardio de nascimento",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Transcrito à mão do PDF escaneado do ato (sem camada de texto).",
+        "Possivelmente incorporado ao Código Nacional de Normas (Prov. 149/2023); conferir a situação no portal do CNJ."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-28-2013.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1730"
+      },
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "provimento-cnj-44-2015",
+      "titulo": "Provimento CNJ 44/2015 - Registro da regularização fundiária urbana",
+      "grupo": "Provimentos",
+      "tipo": "Provimento",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Transcrito à mão do PDF escaneado do ato (sem camada de texto)."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "provimento-cnj-44-2015.md",
+        "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2507"
+      },
+      "anomaliasAceitas": []
     }
   ]
 }
