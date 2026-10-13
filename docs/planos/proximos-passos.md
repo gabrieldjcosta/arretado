@@ -18,12 +18,13 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ | 13.3 Backup com normas (feita em 13/10/2026) | — | — |
 | ✔ | 13.2 Ajuda e Orientações da Legislação (feita em 13/10/2026) | — | — |
 | ✔ | 13.5 Verificação de fechamento (feita em 13/10/2026) | — | — |
-| 4a | Foco com o artigo ou a frase no centro da tela; escolher a disciplina ao trazer uma lei do acervo | Sonnet médio | Nuvem, sem rede |
-| 4b | **Frases 1:** registrar erro vira digitar a frase certa (disciplina e ponto opcionais e lembrados). **Mexe no esquema: backup antes do merge** | **Opus** | Nuvem |
-| 4c | **Frases 2:** dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | Sonnet médio | Nuvem |
-| 4d | **Frases 3:** selecionar um trecho da lei e enviar às frases | Sonnet médio | Nuvem |
-| 5 | 12.2 Publicar a busca por endereço e testar com leis reais | Sonnet médio | **Espera você, com rede** |
-| 6 | 12.3 Campo de endereço na tela Importar; depois 6b (verificar atualização pelo aparelho) | Sonnet médio | Nuvem, depois da 12.2 |
+| ✔ | 4a Foco com o artigo no centro da tela; escolher a disciplina ao trazer uma lei do acervo (feita em 13/10/2026; a frase no centro entra na 4c) | — | — |
+| ✔ 4b | **Frases 1** (feita em 13/10/2026): registrar erro agora é só digitar a frase certa; disciplina e ponto opcionais e lembrados. **Mexe no esquema (v6): revisão independente feita (13/10/2026, um defeito corrigido); falta o seu backup (Conta › Dados › Exportar) antes do merge no `main`** | — | — |
+| ✔ 4c | **Frases 2** (feita em 13/10/2026, sem mexer no esquema): dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | — | — |
+| ✔ 4d | **Frases 3** (feita em 13/10/2026, sem mexer no esquema): selecionar um trecho da lei e tocar em "Enviar às frases"; a frase guarda o caminho de volta | — | — |
+| 5 | ~~12.2 Publicar a busca por endereço e testar com leis reais~~ | — | Feita em 13/10/2026: no ar, LEP, CF e CC respondem sem estourar |
+| ✔ 6 | 12.3 Campo de endereço na tela Importar (feita em 13/10/2026, sem mexer no esquema; testada só com mocks, falta o seu teste real com rede) | — | — |
+| ✔ 6b | Verificar atualização pelo aparelho (feita em 13/10/2026, sem mexer no esquema; só lê e avisa, nunca troca o texto; testada só com mocks, falta o seu teste real com rede) | — | — |
 | 7 | 13.4 Documento do portão da F2 | Sonnet médio | Nuvem |
 | 8 | **2 semanas lendo lei no Arretado** | — | **Você** |
 | 9 | Planejar a F3 (tela Hoje, Sessão, Plano) | **Opus** | Nuvem, só depois do portão |
@@ -32,15 +33,16 @@ Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resu
 
 Depois da F3: teste com 3 a 5 pessoas, depois conta e sincronização (F4); a conta entra com Google **e Apple**; só então leitura de imagem (OCR), IA opcional (planos com e sem IA: resumos, questões → frases, busca nas leis), voz, a decisão de cobrar e, depois do básico, os apps de Android e iPhone.
 
-Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d, 63 normas a converter) e a busca de súmula mais leve (Sonnet médio, nuvem).
+Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d; das 63 normas a converter, 59 já estão no acervo e 4 esperam o ato oficial: 3 provimentos da CGJ-TJSP e a Resolução CONDEGE 1/2024) e a busca de súmula mais leve (Sonnet médio, nuvem).
 
 ## 4. Pendências suas
 - Decidir as **14 teses com número repetido**.
 - Dizer se o **sumário da importação** deve refletir a edição.
 - Decidir o **critério dos gabaritos** no portão: a reconferência virou rotina de estudo, mas o portão ainda pede os gabaritos conferidos (CP, ECA, CDC e CF estão pendentes).
+- **Frases 1 (esquema v6):** revisão independente feita em 13/10/2026: segura para o `main`. Ela achou e corrigiu um defeito (restaurar um backup antigo por "Substituir módulos" apagava as frases). **Antes do merge da `integracao` no `main`: fazer o backup (Conta › Dados › Exportar)**; depois, recarregar as abas abertas do app.
 - Mergear a `integracao` no `main`; publicar a busca por endereço (12.2) e rodar os lotes com rede.
 - Sem pressa: as suposições reversíveis das atividades 8.7 a 11.6 (lista no histórico arquivado) e as capturas "antes/depois" do redesign.
 
 ## 5. Como integrar no `main` e quando fazer backup
 - O Claude mergeia cada atividade na `integracao` (merge commit). **O merge da `integracao` no `main` é só seu, uma vez por dia**, com o CI verde.
-- **Backup do app (Conta › Dados) antes de mergear no `main` só quando o esquema sobe.** A última subida foi a v5 (acervo e releitura), já no `main`. Nada na `integracao` hoje sobe o esquema.
+- **Backup do app (Conta › Dados) antes de mergear no `main` só quando o esquema sobe.** A última subida no `main` foi a v5 (acervo e releitura). **A Frases 1 sobe para a v6**: backup antes do merge dela.

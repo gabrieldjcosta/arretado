@@ -363,6 +363,31 @@ async function aplicar(
     });
   }
 
+  // Frases enviadas da versão arquivada (Frases 3): o link de volta segue o texto, como o grifo.
+  // O texto da Frase é da pessoa e nunca muda; sem o trecho no texto novo, o link fica como estava.
+  const frases = await todos(repo.colecao('frases'), {});
+  for (const f of frases) {
+    const t = f.trecho;
+    if (t?.versaoId !== versaoAntigaId) continue;
+    const textoNovo = textoNovoPorId.get(t.dispositivoId);
+    if (textoNovo === undefined) continue;
+    const r = reancorar(
+      { texto: t.texto, inicio: t.inicio, fim: t.fim },
+      textoNovo,
+      textoAntigoPorId.get(t.dispositivoId),
+    );
+    if (r.status === 'pendente') continue;
+    await repo.colecao('frases').atualizar(f.id, {
+      trecho: {
+        dispositivoId: t.dispositivoId,
+        versaoId,
+        texto: r.texto,
+        inicio: r.inicio,
+        fim: r.fim,
+      },
+    });
+  }
+
   const novaNorma: Partial<Dados<'normas'>> = {
     versaoVigenteId: versaoId,
     origemAcervo: { id: item.id, versao: item.versao, hash: entrada.hash },

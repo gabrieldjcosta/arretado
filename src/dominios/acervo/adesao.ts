@@ -6,6 +6,7 @@ import type { Repositorio } from '../../core/persistencia';
 import type { EntradaDoIndice, ItemDoAcervo } from './esquemas';
 import type { FonteDoAcervo } from './fonte';
 import { hashDoItem } from './hash';
+import { definirVinculos, disciplinasSugeridas } from './vinculos';
 
 export type MotivoAdesaoRecusada = 'hash' | 'versao' | 'identidade' | 'arvore';
 
@@ -62,11 +63,17 @@ export async function baixarConferido(
   return item;
 }
 
+export interface OpcoesDaAdesao {
+  /** Disciplinas escolhidas (nomes; "Outros" = nenhuma); sem isso valem as sugeridas pelo índice. */
+  disciplinas?: readonly string[];
+}
+
 /** Adiciona um item do acervo à biblioteca. */
 export async function aderirAoItem(
   repo: Repositorio,
   fonte: FonteDoAcervo,
   entrada: EntradaDoIndice,
+  opcoes: OpcoesDaAdesao = {},
 ): Promise<ResultadoDaAdesao> {
   const existente = await normaJaAdicionada(repo, entrada.id);
   if (existente?.origemAcervo) {
@@ -159,7 +166,13 @@ export async function aderirAoItem(
     }
     await repo.colecao('dispositivos').criarLote(dispositivos, { origem: 'importacao' });
     await repo.colecao('textosDispositivo').criarLote(textos, { origem: 'importacao' });
-    await vincularADisciplinas(repo, normaId, entrada);
+    await definirVinculos(
+      repo,
+      normaId,
+      opcoes.disciplinas ?? disciplinasSugeridas(entrada),
+      entrada.vinculos,
+      'importacao',
+    );
     return { estado: 'adicionada', normaId: norma.id, versaoId };
   });
   if (resultado.estado === 'adicionada') {
@@ -169,35 +182,6 @@ export async function aderirAoItem(
     });
   }
   return resultado;
-}
-
-/**
- * Cria os vínculos sugeridos pelo índice, casando o nome com as disciplinas do usuário; o que não
- * casa fica sem `disciplinaId` ("sem disciplina"), com a sugestão guardada.
- */
-async function vincularADisciplinas(
-  repo: Repositorio,
-  normaId: string,
-  entrada: EntradaDoIndice,
-): Promise<void> {
-  if (entrada.vinculos.length === 0) return;
-  const disciplinas = await repo.colecao('disciplinas').todosDoUsuario();
-  const porNome = new Map(disciplinas.map((d) => [nomeComparavel(d.nome), d.id]));
-  await repo.colecao('vinculosDisciplina').criarLote(
-    entrada.vinculos.map((v) => {
-      const disciplinaId = porNome.get(nomeComparavel(v.disciplina));
-      return {
-        dados: {
-          normaId,
-          sugestao: v.disciplina,
-          ...(disciplinaId === undefined ? {} : { disciplinaId }),
-          ...(v.subtitulo === undefined ? {} : { subtitulo: v.subtitulo }),
-          ...(v.trecho === undefined ? {} : { trecho: v.trecho }),
-        },
-      };
-    }),
-    { origem: 'importacao' },
-  );
 }
 
 export interface FalhaDeAdesao {
@@ -218,6 +202,8 @@ export interface OpcoesDoLote {
   aoProgresso?: (feitos: number, total: number) => void;
   /** Consultado antes de cada item; verdadeiro encerra o lote (retomável depois). */
   deveParar?: () => boolean;
+  /** Disciplinas escolhidas por item (id do acervo → nomes); item ausente usa as sugeridas. */
+  disciplinasPorItem?: ReadonlyMap<string, readonly string[]>;
 }
 
 /** Adiciona vários itens, um a um; o índice é lido uma vez. */
@@ -242,7 +228,8 @@ export async function aderirEmLote(
       continue;
     }
     try {
-      const r = await aderirAoItem(repo, fonte, entrada);
+      const escolha = opcoes.disciplinasPorItem?.get(id);
+      const r = await aderirAoItem(repo, fonte, entrada, escolha ? { disciplinas: escolha } : {});
       (r.estado === 'adicionada' ? saida.adicionadas : saida.jaAdicionadas).push(id);
     } catch (excecao) {
       saida.falhas.push({

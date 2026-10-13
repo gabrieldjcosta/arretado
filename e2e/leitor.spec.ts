@@ -936,6 +936,36 @@ async function selecionarPalavra(page: Page, alvo: Locator, palavra: string, toq
 const apertar = (alvo: Locator, toque: boolean) => (toque ? alvo.tap() : alvo.click());
 
 /** As marcações gravadas no IndexedDB (as não excluídas). */
+function frasesGravadas(page: Page) {
+  return page.evaluate(async () => {
+    const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
+      const pedido = indexedDB.open('arretado');
+      pedido.onsuccess = () => {
+        resolver(pedido.result);
+      };
+      pedido.onerror = () => {
+        rejeitar(new Error(String(pedido.error)));
+      };
+    });
+    try {
+      const todas = await new Promise<
+        { texto: string; origemTipo: string; excluidoEm: string | null }[]
+      >((resolver, rejeitar) => {
+        const pedido = banco.transaction('frases').objectStore('frases').getAll();
+        pedido.onsuccess = () => {
+          resolver(pedido.result as never);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+      return todas.filter((f) => f.excluidoEm === null);
+    } finally {
+      banco.close();
+    }
+  });
+}
+
 function marcacoesGravadas(page: Page) {
   return page.evaluate(async () => {
     const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
@@ -1051,6 +1081,20 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
   await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
   await expect(dialogo).toBeHidden();
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+
+  // Enviar às frases (Frases 3): o trecho abre o campo, a Frase guarda o link de volta.
+  await selecionarPalavra(page, texto, outra, toque);
+  await apertar(acoes.getByRole('button', { name: 'Enviar às frases' }), toque);
+  const envio = page.getByRole('dialog', { name: 'Enviar às frases' });
+  await expect(envio).toBeVisible();
+  await expect(envio.getByRole('textbox', { name: 'Frase' })).toHaveValue(outra);
+  await semViolacoes(page);
+  await apertar(envio.getByRole('button', { name: 'Enviar' }), toque);
+  await expect(envio).toBeHidden();
+  await expect
+    .poll(() => frasesGravadas(page))
+    .toEqual([expect.objectContaining({ texto: outra, origemTipo: 'trecho' })]);
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
 
   // No modo foco, as ações tomam o lugar do grupo fixo, sem alargar a página.
@@ -1350,18 +1394,19 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await expect(dialogo.getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
   await semViolacoes(page);
 
-  // Registrar erro: a referência já no campo, só o resultado e o que foi.
+  // Registrar erro: só a frase correta (D25); "o que foi" já com a referência, opcional.
   await apertar(dialogo.getByRole('button', { name: 'Registrar erro' }), toque);
-  const campo = dialogo.getByLabel('O que foi');
+  const campo = dialogo.getByLabel('O que foi (opcional)');
   await expect(campo).toHaveValue('art. 9º-A, LEP: ');
+  await dialogo
+    .getByLabel('Frase correta')
+    .fill('A identificação do perfil genético é obrigatória.');
   await apertar(dialogo.getByRole('button', { name: 'Errei' }), toque);
   await campo.pressSequentially('confundi o prazo da identificação');
   await semViolacoes(page);
   await apertar(dialogo.getByRole('button', { name: 'Salvar' }), toque);
   await expect(dialogo.getByText(/Erro registrado e vinculado/)).toBeVisible();
-  await expect(
-    dialogo.getByRole('link', { name: /confundi o prazo da identificação/ }),
-  ).toBeVisible();
+  await expect(dialogo.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
 
   // Cartão deste trecho (uma vez só) e copiar a referência.
   const cartao = dialogo.getByRole('button', { name: 'Criar cartão deste trecho' });
@@ -1395,9 +1440,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await apertar(await naBandejaDoFoco(page, 'Ações'), toque);
   const emFoco = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(emFoco).toBeVisible();
-  await expect(
-    emFoco.getByRole('link', { name: /confundi o prazo da identificação/ }),
-  ).toBeVisible();
+  await expect(emFoco.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
   await semViolacoes(page);
   await apertar(emFoco.getByRole('button', { name: 'Fechar' }), toque);
   await expect(page).toHaveURL(/[?&]foco=texto/);
@@ -1436,6 +1479,16 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await expect(areas).toBeHidden();
   await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeHidden();
   expect(await sobra()).toBe(0);
+  // O cartão fica no centro da tela, na vertical e na horizontal (rola por dentro só se exceder).
+  const caixaDoCartao = await page.locator('.area-artigo').boundingBox();
+  const tela = page.viewportSize();
+  if (!caixaDoCartao || !tela) throw new Error('sem medidas do cartão ou da tela');
+  expect(Math.abs(caixaDoCartao.x + caixaDoCartao.width / 2 - tela.width / 2)).toBeLessThanOrEqual(
+    8,
+  );
+  expect(
+    Math.abs(caixaDoCartao.y + caixaDoCartao.height / 2 - tela.height / 2),
+  ).toBeLessThanOrEqual(12);
   // O palco: a página na penumbra (mais escura que o fundo de antes) e o cartão aceso. A entrada
   // leva 200 ms, e prefers-reduced-motion a desliga.
   await expect.poll(fundoDaPagina).not.toBe(fundoAntes);

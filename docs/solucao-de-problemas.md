@@ -53,6 +53,9 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Atualização (02/10/2026, 8.10):** num worktree recém-instalado, o check inteiro falhou em 25 testes de tempo e de tela (sem relação com a mudança); com `--maxWorkers=3` e o `desempenho.test.ts` sozinho (60 de 60), duas rodadas deram 2 e 1 falhas diferentes (`Leitor.test.tsx`, `App.test.tsx` e `Cannot find module …fake-indexeddb…` no `Biblioteca.test.tsx`), e cada arquivo passou sozinho. O CI do PR é a referência.
 - **Atualização (24/09/2026):** o "Sem conexão" falhou também no CI (Linux), no PR #11. Causa no teste: ele conferia o texto logo depois do evento `offline`, e a assinatura do `useSyncExternalStore` é um efeito que, sob carga, pode chegar depois. O teste passou a esperar (`findByText` e `waitFor`). Ao ver de novo "não acha um texto" em teste de tela, procurar a mesma causa (conferência síncrona logo depois de um evento) antes de rodar de novo.
 
+### E2E de falha de rede reprova com "falhas no console"
+- **Sintoma:** teste que simula resposta de erro (ex.: 502 em `/api/buscar-norma`) falha em `apoio.ts` com "falhas no console", embora a tela se comporte certo. **Causa:** o Chromium registra "Failed to load resource" no console para toda resposta de erro; o vigia do `apoio.ts` reprova qualquer falha de console. **Solução:** isolar o caso de falha num `test.describe` com `test.use({ permitirFalhasConsole: true })` (como em `biblioteca.spec.ts`, 12.3), mantendo o caminho feliz com o vigia ligado. **Origem:** 12.3, 13/10/2026.
+
 ### `npm audit` reprova o check sem mudança de dependência
 - **Sintoma:** `npm run check` (e o CI) vermelho só na etapa `audit`, com um aviso novo de pacote que ninguém mexeu. **Causa:** o aviso é publicado depois da última sessão verde; o `--audit-level=high` reprova a partir de "alto", mesmo em dependência indireta de desenvolvimento.
 - **Solução:** `npm audit fix --dry-run` para ver o que muda; se só sobe a versão de correção (patch) dentro da faixa do `package.json`, `npm audit fix` num commit separado (`chore(deps)`) e a suíte inteira de novo (o corpus confere a saída do sanitizador byte a byte). Subida de versão maior ou troca de pacote é escolha técnica: decidir com o Gabriel (T1–T18).
@@ -384,6 +387,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### A rota estoura o limite de processamento
 - **Sintoma:** a busca de uma lei grande falha no Cloudflare. **Causa:** o plano gratuito dá 10 ms de CPU por execução do Worker (esperar o Planalto não conta; processar conta).
 - **Solução:** a rota só repassa os bytes (sem decodificar nem montar JSON); se ainda estourar, plano B da T17 (Edge Function no Supabase, aceitando a pausa). **Prevenção:** chamada real com LEP, CF/88 (1,8 MB) e Código Civil, conferida no painel.
+- **Verificado em 13/10/2026 (atividade 12.2), sem estouro:** chamadas reais ao Worker publicado, `curl` do computador do Gabriel: LEP (307 KB), CF/88 (1,84 MB, 7 chamadas seguidas, 1,0–2,1 s), CC compilado (924 KB), LC 988/2006 e `/norma/159949` da ALESP; todas 200, nenhum erro 1102/CPU. Recusas conferidas: host fora da lista 403 `host_nao_permitido`, `http://` 400 `protocolo_nao_https`, 404 do Planalto 502 `status_erro`. Plano B da T17 não é necessário. Limite só observável, não medido no painel.
+- **Achado (não é defeito da rota):** a CF/88 muda a cada pedido (1.839.028 ou 1.840.587 bytes; também direto do Planalto): o WAF do Planalto (F5) injeta no fim um `<script>` `f5_cspm` com valor variável. O hash tem de ser do conteúdo **sanitizado** (como já decide a T17); a importação por URL (12.3) precisa remover esse script antes do hash, senão a "atualização" apareceria em toda consulta.
 - **Origem:** previsto — atividade 12.2.
 
 ## Legislação (F2): fontes, colar, estruturador, leitor
@@ -1232,3 +1237,38 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### `desempenho.test.ts` "mesmo artigo repetido" passa de 5 s só no `npm run check`
 - **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
 - **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.
+
+## Acervo: converter atos em PDF ou HTML para Markdown (13/10/2026)
+
+- **Como:** `node scripts/acervo-lote-md.mjs <manifesto.json>` baixa o PDF (página do CNJ, gov.br, MDS) ou a página HTML (portal da Defensoria), converte com `pdftotext` (`scripts/acervo-pdf-para-md.mjs`) e acrescenta o item em `acervo/curadoria.json`; depois `npm run acervo:gerar` e `acervo:verificar`. O manifesto aceita `cnj` (página do ato), `pdfModo: "original"`, `pdf`, `html`, `cortarEm` (deixa o anexo de fora), `semArtigos`, `manual` (Markdown já transcrito) e `anomaliasAceitas`.
+- **PDF compilado do CNJ:** o último "compilado" costuma ser o texto vigente, mas às vezes é só o anexo (Res. 412, 510, 598, Rec. 128): usar `pdfModo: "original"`. O texto compilado perde o tachado, então o dispositivo alterado aparece duas vezes (vale o último; aviso `duplicata` aceito com aviso ao leitor).
+- **PDF escaneado (sem camada de texto):** Res. CNJ 175/2013, 295/2019 e Prov. CNJ 19/2012, 28/2013, 44/2015 foram transcritos à mão (lendo o PDF) e entram com `manual: true`. Não há OCR na máquina.
+- **gov.br participamaisbrasil e BVS/Saúde:** bloqueiam download automático (403 e desafio de navegador); usar cópia do DOU ou do CONASS e dizer isso no aviso do item.
+- **`acervo:gerar` sem argumento** regrava todos os itens e o índice (as datas de coleta mudam e o hash junto): não restaurar arquivos antigos de `public/acervo/`, senão o `verificar` acusa hash diferente.
+- **Pendentes sem fonte:** Prov. CGJ-TJSP 18/2012, 16/2013, 21/2013 e Res. CONDEGE 1/2024.
+
+### Teste de subida de esquema acusa uma linha a mais em `meta` (v6)
+- **Causa:** ao abrir, `Repositorio.abrir` roda `migrarFrasesDosErros` uma vez e grava a marca `CHAVE_MIGRACAO_FRASES` em `meta` (Frases 1).
+- **Solução:** comparar `meta` sem a marca (`tabelaSemMarca` em `migracao.test.ts`). Subida futura (v7) que crie dado depois de abrir: mesma ideia, uma marca por migração.
+
+### Teste de pacote antigo recusa com "arquivo alterado" depois de coleção nova
+- **Causa:** os ajudantes `comoPacoteV1`/`comoPacoteV2` precisam tirar do pacote toda coleção nascida depois daquela versão (na v6: `frases` e `revisoesFrase`).
+- **Solução:** acrescentar a coleção nova à lista dos ajudantes a cada subida de esquema. Previsível na próxima: qualquer coleção com `desdeVersao` nova.
+
+### Restaurar pacote de outra identidade e importar de novo "não apaga" o que devia
+- **Causa:** depois de `aplicar` com `substituiIdentidade`, o `Repositorio` antigo continua com o `usuarioId` velho; a prévia seguinte não enxerga os registros da identidade nova.
+- **Solução:** usar `repo.comUsuario(novoUsuarioId)` (ou reabrir) para as operações seguintes.
+
+### Frase correta não aparece em "Frases" depois do registro (v6)
+- **Causa provável:** registro gravado direto pela coleção `erros` (teste, carga, importação de pacote v6 sem a Frase), sem passar por `registrarErro`; a migração só cria Frase ao abrir pela primeira vez na v6 e ao importar pacote < v6.
+- **Solução:** registrar por `registrarErro`/`completarErro` (criam ou sincronizam a Frase). Para dado antigo, `migrarFrasesDosErros(repo)` é idempotente.
+
+### "Substituir módulos" com backup v5 apagava todas as Frases (v6; corrigido na revisão das Frases 1)
+- **Causa:** a prévia do modo 5 excluía (lógico) toda Frase local fora do pacote, e um pacote v5 não tem `frases`; `migrarFrasesDosErros` pulava o erro que já tinha Frase, mesmo excluída. Resultado: nenhuma Frase ativa.
+- **Solução:** `planejar` (modo 5, pacote < v6) não toca `frases`/`revisoesFrase`, só exclui a Frase do erro que a importação exclui; a migração só pula erro com Frase não excluída. Testes em `pacote-v2.test.ts` ("pacote v5 no app v6"). Previsível: coleção derivada nova (v7) num pacote antigo precisa da mesma regra.
+
+
+### E2E 13.5 (posição do artigo no celular) falha uma vez sob carga (visto na 6b)
+- **Sintoma:** `leitor.spec.ts` "mudar o tamanho do texto…" estoura 15 s em `distanciaDoAlto` no projeto celular quando a suíte inteira roda; sozinho passa nos 3 aparelhos.
+- **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
+- **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.

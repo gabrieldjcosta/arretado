@@ -16,6 +16,7 @@ import { Orientacoes } from './orientacoes/Orientacoes';
 import { Shell } from './Shell';
 import { DetalheErro } from './recall/DetalheErro';
 import { Drill } from './recall/Drill';
+import { CartaoDeLacuna } from './recall/CartaoDeLacuna';
 import { EditarCartao } from './recall/EditarCartao';
 import { Historico } from './recall/Historico';
 import { ListaCartoes } from './recall/ListaCartoes';
@@ -23,6 +24,7 @@ import { ListaErros } from './recall/ListaErros';
 import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
+import { RevisarFrases } from './recall/RevisarFrases';
 import { Plano } from './plano/Plano';
 import { Hoje, NaoEncontrada } from './telas/Areas';
 import './estilos.css';
@@ -50,6 +52,8 @@ export function App({
               </Route>
               <Route path="recall/registrar" element={<RegistrarErro />} />
               <Route path="recall/revisar" element={<Drill />} />
+              <Route path="recall/frases/revisar" element={<RevisarFrases />} />
+              <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
               <Route path="recall/erros/:id" element={<DetalheErro />} />
               <Route path="recall/cartoes/:id" element={<EditarCartao />} />
               <Route path="biblioteca" element={<Normas />} />

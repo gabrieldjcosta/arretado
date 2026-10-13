@@ -33,7 +33,7 @@ Quem retoma confere branch, commit e alterações locais antes de editar; se nã
 - Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); a F3 só começa depois do portão da F2.
 - Toda entrega de fase inclui o item de segurança/LGPD descrito na Parte 1 §15.
 - Vocabulário obrigatório na interface e no código: Aparelho (equipamento), Problema (falha da plataforma), Erro (só estudo), Dispositivo (só unidade da lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta.
-- Nada obrigatório além do mínimo nos formulários; na captura de erro só a frase correta é obrigatória (D25; até as Frases 1 serem implementadas valem os 2 campos de hoje: resultado e "o que foi").
+- Nada obrigatório além do mínimo nos formulários; na captura de erro só a frase correta é obrigatória (D25; implementado nas Frases 1, esquema v6).
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
 - Escolhas técnicas: seguir T1–T24 (`docs/decisoes-tecnicas.md`); nova escolha técnica relevante é decidida com o Gabriel e registrada lá.

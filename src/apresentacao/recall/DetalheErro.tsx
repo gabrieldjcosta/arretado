@@ -11,7 +11,7 @@ import { pontosEDisciplinas } from './carregadores';
 import { CamposErro } from './CamposErro';
 import { formatarQuando, ROTULO_RESULTADO, ROTULO_STATUS } from './rotulos';
 
-type Editavel = Pick<Erro, 'resultado' | 'oQueFoi'> & Alteracoes<'erros'>;
+type Editavel = Pick<Erro, 'resultado'> & Alteracoes<'erros'>;
 
 const CAMPOS: (keyof Editavel)[] = [
   'resultado',
@@ -79,7 +79,9 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
   const [rascunho, setRascunho] = useState<Editavel>(() => editavelDe(erro));
   const [salvo, setSalvo] = useState<Editavel>(() => editavelDe(erro));
   const [estado, setEstado] = useState<'ocioso' | 'salvando' | 'falha'>('ocioso');
-  const invalido = !rascunho.oQueFoi.trim();
+  // Precisa sobrar algo: a frase correta ou, em erro antigo, "o que foi" (D25).
+  const invalido = !rascunho.fraseCorreta?.trim() && !rascunho.oQueFoi?.trim();
+  const temPergunta = Boolean(rascunho.oQueFoi?.trim());
   const pendente = Object.keys(diferencas(salvo, rascunho)).length > 0;
   const [excluindo, setExcluindo] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
@@ -89,9 +91,8 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
   // O que ainda não foi gravado quando a tela fecha é gravado na saída (nada se perde).
   useEffect(() => {
     const mudanca = diferencas(salvo, rascunho);
-    pendenteAoSair.current =
-      Object.keys(mudanca).length > 0 && rascunho.oQueFoi.trim() ? mudanca : null;
-  }, [salvo, rascunho]);
+    pendenteAoSair.current = Object.keys(mudanca).length > 0 && !invalido ? mudanca : null;
+  }, [salvo, rascunho, invalido]);
   useEffect(
     () => () => {
       const mudanca = pendenteAoSair.current;
@@ -103,7 +104,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
   // Salvamento automático 600 ms depois da última mudança.
   useEffect(() => {
     const mudanca = diferencas(salvo, rascunho);
-    if (Object.keys(mudanca).length === 0 || !rascunho.oQueFoi.trim()) return;
+    if (Object.keys(mudanca).length === 0 || invalido) return;
     const t = setTimeout(() => {
       setEstado('salvando');
       completarErro(repo, erro.id, mudanca).then(
@@ -119,7 +120,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
     return () => {
       clearTimeout(t);
     };
-  }, [rascunho, salvo, repo, erro.id]);
+  }, [rascunho, salvo, repo, erro.id, invalido]);
 
   const mudar = (m: Partial<Editavel>) => {
     setRascunho((r) => ({ ...r, ...m }));
@@ -143,7 +144,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
         {' · '}
         <span role="status" aria-live="polite">
           {invalido
-            ? '"O que foi" não pode ficar vazio'
+            ? 'Escreva a frase correta para salvar'
             : estado === 'falha'
               ? 'Não foi possível salvar'
               : pendente
@@ -172,7 +173,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
         <textarea
           id="detalhe-o-que-foi"
           rows={3}
-          value={rascunho.oQueFoi}
+          value={rascunho.oQueFoi ?? ''}
           onChange={(e) => {
             mudar({ oQueFoi: e.target.value });
           }}
@@ -193,7 +194,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
         </p>
       )}
       <div className="linha-acoes">
-        {!temCartao && (
+        {!temCartao && temPergunta && (
           <button
             type="button"
             className="principal"
@@ -253,6 +254,9 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
           Excluir
         </button>
       </div>
+      {!temCartao && !temPergunta && (
+        <p className="dica">Para criar cartão deste erro, escreva "o que foi" (a pergunta).</p>
+      )}
       <p>
         <Link to="/recall">Voltar ao Recall</Link>
       </p>

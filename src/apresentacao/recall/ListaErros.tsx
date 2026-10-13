@@ -132,7 +132,7 @@ export function ListaErros() {
                     <span aria-hidden="true">{e.resultado === 'errou' ? '✕' : '?'} </span>
                     {ROTULO_RESULTADO[e.resultado]}
                   </span>
-                  <span>{e.oQueFoi}</span>
+                  <span>{e.fraseCorreta ?? e.oQueFoi}</span>
                   {completude(e) === 'rapido' && <span className="marcador">completar</span>}
                 </Link>
               </li>

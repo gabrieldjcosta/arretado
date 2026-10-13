@@ -1,11 +1,13 @@
 // Subidas de esquema do banco local, sem perda: v1 (F0/F1) → v2 (`leituras`, F2, 9.1) → v3
-// (`vetado` em `Dispositivo.status`, F2, 8.10) → v4 (`vinculosDisciplina`, acervo, Peça 3).
+// (`vetado` em `Dispositivo.status`, F2, 8.10) → v4 (`vinculosDisciplina`, acervo, Peça 3) → v5
+// (`pendenciasReleitura`, Peça 6a) → v6 (`frases` e `revisoesFrase`, Frases 1).
 import Dexie from 'dexie';
 import { camposMinimos } from '../modelo/fabrica';
 import { colecoesNaVersao, NOMES_COLECOES, versaoDeOrigem } from '../modelo';
 import { sha256 } from '../pacote/bytes';
 import { jsonCanonico } from '../util/json-canonico';
 import { apagarBanco, esquemaDaVersao, VERSAO_ESQUEMA } from './banco';
+import { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 import { Repositorio } from './repositorio';
 
 /** Esquema v1 publicado (F0/F1, até a 8.5): SHA-256 do JSON canônico de `esquemaDaVersao(1)`. */
@@ -18,6 +20,12 @@ const HASH_ESQUEMA_V3 = HASH_ESQUEMA_V2;
 
 const hashDoEsquema = async (versao: number) =>
   sha256(new TextEncoder().encode(jsonCanonico(esquemaDaVersao(versao))));
+
+/** A tabela como estava, fora a marca de que a migração das Frases (v6) já rodou. */
+async function tabelaSemMarca(repo: Repositorio, tabela: string) {
+  const linhas = (await repo.db.table(tabela).toArray()) as { chave?: string }[];
+  return tabela === 'meta' ? linhas.filter((l) => l.chave !== CHAVE_MIGRACAO_FRASES) : linhas;
+}
 
 const nomeBanco = () => `migracao-${Math.random().toString(36).slice(2)}`;
 
@@ -83,7 +91,7 @@ describe('subida de esquema v1 → v2 (9.1)', () => {
     expect(repo.ctx.usuarioId).toBe(usuarioId);
     expect(repo.ctx.aparelhoId).toBe(aparelhoId);
     for (const [tabela, registros] of Object.entries(antes)) {
-      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
     }
     // A coleção nova existe vazia e aceita gravação.
     expect(await repo.db.tabela('leituras').count()).toBe(0);
@@ -150,7 +158,7 @@ describe('subida de esquema v2 → v3 (8.10): `vetado` no status, sem índice ne
     expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
     // Nenhum registro transformado: a subida não migra o vetado gravado antes.
     for (const [tabela, registros] of Object.entries(antes)) {
-      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
     }
     expect((await repo.colecao('dispositivos').obter(dispositivo.id))?.status).toBe('vigente');
     expect((await repo.colecao('leituras').todosDoUsuario()).length).toBe(1);
@@ -186,7 +194,7 @@ describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', 
     expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
     for (const [tabela, registros] of Object.entries(antes)) {
-      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
     }
     expect(await repo.db.tabela('vinculosDisciplina').count()).toBe(0);
     const normaId = (antes.normas?.[0] as { id: string }).id;
@@ -201,7 +209,7 @@ describe('subida de esquema v3 → v4 (acervo, Peça 3): `vinculosDisciplina`', 
 
 describe('subida de esquema v4 → v5 (acervo, Peça 6a): `pendenciasReleitura`', () => {
   it('o esquema v4 não muda; só `pendenciasReleitura` nasce na v5', () => {
-    expect(VERSAO_ESQUEMA).toBe(5);
+    expect(VERSAO_ESQUEMA).toBeGreaterThanOrEqual(5);
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 5)).toEqual(['pendenciasReleitura']);
     expect(colecoesNaVersao(4)).not.toContain('pendenciasReleitura');
     expect(colecoesNaVersao(4)).toContain('vinculosDisciplina');
@@ -211,12 +219,80 @@ describe('subida de esquema v4 → v5 (acervo, Peça 6a): `pendenciasReleitura`'
     const nome = nomeBanco();
     const { antes } = await bancoAntigo(nome, 4);
     const repo = await Repositorio.abrir({ nomeBanco: nome });
-    expect(repo.db.verno).toBe(5);
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     for (const [tabela, registros] of Object.entries(antes)) {
-      expect(await repo.db.table(tabela).toArray()).toEqual(registros);
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
     }
     expect(await repo.db.tabela('pendenciasReleitura').count()).toBe(0);
     repo.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v5 → v6 (Frases 1): `frases` e `revisoesFrase`', () => {
+  it('só `frases` e `revisoesFrase` nascem na v6; as coleções antigas mantêm os índices', () => {
+    expect(VERSAO_ESQUEMA).toBe(6);
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 6)).toEqual([
+      'frases',
+      'revisoesFrase',
+    ]);
+    const v5 = esquemaDaVersao(5);
+    const v6 = esquemaDaVersao(6);
+    for (const [tabela, indices] of Object.entries(v5)) expect(v6[tabela]).toBe(indices);
+  });
+
+  it('abre o banco v5 como v6: cada erro com frase correta ganha a sua Frase, uma vez só', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId } = await bancoAntigo(nome, 5);
+    // Erros como o app v5 gravava: com frase, sem frase, descartado e excluído.
+    const v5 = new Dexie(nome);
+    for (let v = 1; v <= 5; v++) v5.version(v).stores(esquemaDaVersao(v));
+    const comuns = (antes.erros?.[0] ?? {}) as Record<string, unknown>;
+    const disciplinaId = (antes.disciplinas?.[0] as { id: string }).id;
+    const erro = (n: number, extra: Record<string, unknown>) => ({
+      ...comuns,
+      id: `0199a6c4-0000-7000-8000-0000000009${String(n).padStart(2, '0')}`,
+      criadoEm: `2026-09-2${String(n)}T12:00:00.000Z`,
+      ...extra,
+    });
+    await v5
+      .table('erros')
+      .bulkPut([
+        erro(4, { fraseCorreta: 'Segunda.', disciplinaId }),
+        erro(3, { fraseCorreta: 'Primeira.' }),
+        erro(5, { fraseCorreta: 'Descartada.', status: 'descartado' }),
+        erro(6, { fraseCorreta: 'Excluída.', excluidoEm: '2026-09-27T12:00:00.000Z' }),
+        erro(7, { fraseCorreta: '   ' }),
+      ]);
+    const errosAntes = await v5.table('erros').toArray();
+    const logAntes = await v5.table('alteracoes').count();
+    v5.close();
+
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(6);
+    expect(await repo.db.table('erros').toArray()).toEqual(errosAntes);
+    const frases = await repo.colecao('frases').todosDoUsuario();
+    expect(
+      frases
+        .sort((a, b) => (a.id < b.id ? -1 : 1))
+        .map((f) => [f.texto, f.erroId, f.estado, f.disciplinaId, f.origem, f.origemTipo]),
+    ).toEqual([
+      ['Primeira.', erro(3, {}).id, 'ativa', undefined, 'sistema', 'erro'],
+      ['Segunda.', erro(4, {}).id, 'ativa', disciplinaId, 'sistema', 'erro'],
+      ['Descartada.', erro(5, {}).id, 'arquivada', undefined, 'sistema', 'erro'],
+    ]);
+    expect(frases.every((f) => f.usuarioId === usuarioId)).toBe(true);
+    // Cada Frase criada está no log (base da sincronização e do desfazer).
+    expect(await repo.db.alteracoes.count()).toBe(logAntes + 3);
+    expect((await repo.db.meta.get(CHAVE_MIGRACAO_FRASES))?.valor).toBe(true);
+    repo.fechar();
+
+    // Reabrir não roda de novo; rodar à mão também não duplica.
+    const outra = await Repositorio.abrir({ nomeBanco: nome });
+    expect(await outra.colecao('frases').contar()).toBe(3);
+    expect(await migrarFrasesDosErros(outra)).toBe(0);
+    expect(await outra.colecao('frases').contar()).toBe(3);
+    outra.fechar();
     await apagarBanco(nome);
   });
 });

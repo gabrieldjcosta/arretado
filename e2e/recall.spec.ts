@@ -19,18 +19,19 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
   // Captura em menos de 30 s (Parte 2 §17), pelo botão global.
   const t0 = Date.now();
+  // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
   await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
+  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
+  await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
-  await page.getByRole('button', { name: 'Errei' }).click();
+  await semViolacoes(page);
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
   expect(Date.now() - t0).toBeLessThan(30_000);
 
   await page.getByRole('button', { name: 'Sim' }).click();
   await expect(page.getByText(/Cartão criado/)).toBeVisible();
-  await page.getByRole('link', { name: 'Completar este erro' }).click();
-  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
-  await expect(page.getByText('Salvo', { exact: true })).toBeVisible();
+  await semViolacoes(page);
 
   // Dia seguinte: o cartão está na fila.
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
@@ -43,10 +44,10 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 
-  // Lista passiva.
   await page.goto('/#/recall/frases');
+  // Lista passiva.
   await expect(
-    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.' }),
+    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.', exact: true }),
   ).toBeVisible();
 
   expect(externas).toEqual([]);
@@ -54,10 +55,9 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
 test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page }) => {
   await page.goto('/#/recall/registrar');
-  await page.getByLabel('O que foi').fill('Conteúdo sigiloso de estudo');
-  await page.getByRole('button', { name: 'Errei' }).click();
+  await page.getByLabel('Frase correta').fill('Conteúdo sigiloso de estudo');
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
   await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
   await page.getByRole('button', { name: 'Relatar problema' }).click();
   await expect(page.getByText(/nunca conteúdo de estudo/)).toBeVisible();
@@ -97,13 +97,34 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
 
+  // Disciplina e ponto opcionais, fora de "mais detalhes", lembrados no registro seguinte e
+  // depois de recarregar (D25).
   await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
-  await page.getByRole('button', { name: 'Errei' }).click();
-  await page.getByLabel('O que foi').fill('Fração da progressão');
-  await page.getByText('Mais detalhes (opcional)').click();
-  await page.getByLabel('Ponto do edital').selectOption({ label: '1 Progressão de regime' });
+  await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
+  await page
+    .getByLabel('Ponto do edital (opcional)')
+    .selectOption({ label: '1 Progressão de regime' });
+  await expect(page.getByLabel('Disciplina (opcional)').locator('option:checked')).toHaveText(
+    'Execução Penal',
+  );
+  await semViolacoes(page);
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+  await expect(
+    page.getByText('A próxima fica em Execução Penal › Progressão de regime.'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Registrar outra' }).click();
+  await expect(page.getByLabel('Frase correta')).toBeFocused();
+  await page.reload();
+  await expect(page.getByLabel('Ponto do edital (opcional)')).toHaveValue(/.+/);
+  await page.getByLabel('Frase correta').fill('Furto exige subtração.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+
+  // As duas na lista de frases.
+  await page.goto('/#/recall/frases');
+  await expect(page.getByText('A fração da progressão é de 16%.')).toBeVisible();
+  await expect(page.getByText('Furto exige subtração.')).toBeVisible();
 });
 
 test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisar mais 10" + 5 (fatia 3)', async ({
@@ -154,4 +175,49 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
   await page.goto('/#/recall');
   await page.reload();
   await expect(page.getByText('1 dos últimos 7 dias')).toBeVisible();
+});
+
+test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', async ({ page }) => {
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  await page.goto('/#/recall/registrar');
+  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+
+  // Cartão com lacuna: seleciona "art. 83" e esconde.
+  await page.goto('/#/recall/frases');
+  await page.getByRole('link', { name: /^Esconder trecho:/ }).click();
+  await expect(page.getByRole('heading', { name: 'Esconder trecho' })).toBeVisible();
+  await page.getByLabel('Texto da frase').evaluate((el: HTMLTextAreaElement) => {
+    const i = el.value.indexOf('art. 83');
+    el.focus();
+    el.setSelectionRange(i, i + 'art. 83'.length);
+  });
+  await page.getByRole('button', { name: 'Esconder seleção' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Como vai aparecer' }).getByText(/requisitos do \[…\] do CP/),
+  ).toBeVisible();
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Criar cartão' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Recall' })).toBeVisible();
+
+  // Dia seguinte: a Frase e o cartão vencem; cada modo revisa o seu.
+  await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
+  await page.goto('/#/recall');
+  await page.reload();
+  await expect(page.getByRole('link', { name: /^Revisar frases \(1\)$/ })).toBeVisible();
+  await page.getByRole('link', { name: /^Revisar frases/ }).click();
+  await expect(page.getByText('Livramento exige requisitos do art. 83 do CP.')).toBeVisible();
+  await semViolacoes(page);
+  await page.keyboard.press('1');
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+
+  await page.goto('/#/recall/revisar');
+  await expect(page.getByText('Livramento exige requisitos do […] do CP.')).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(page.getByText('Frase completa')).toBeVisible();
+  await semViolacoes(page);
+  await page.keyboard.press('3');
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 });
