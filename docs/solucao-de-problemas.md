@@ -1212,3 +1212,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Ordinal "o" trocado no meio do texto
 - **Causa:** `comOrdinal` da edição integral não se limitava ao rótulo.
 - **Solução:** só no rótulo do começo da linha (`Art.`, `Artigo`, `§`).
+
+### `<base>` colado dispara violação de `base-uri` da CSP
+- **Causa:** o DOMParser do DOMPurify honra `<base href>` e a CSP (`base-uri`) reporta violação, mesmo sem efeito (achado do E2E de segurança, 13.1).
+- **Solução:** `semEstiloEmLinha` remove `<base>` antes do parser. Teste em `sanitizador.test.ts`.
+
+### `Leitor.test.tsx` "espiada dos vizinhos" falha só dentro do `npm run check`
+- **Causa:** flake de tempo sob carga (passa isolado e na segunda rodada).
+- **Solução:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.

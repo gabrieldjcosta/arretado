@@ -1,13 +1,13 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 13/10/2026 (plano-mestre consolidado). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
+Atualizado em 13/10/2026 (13.1 feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
 
 ## Estado
 
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
-- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
+- **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
 - **`main`** tem tudo até o PR #81 (merge #82, 11/10/2026). **Só na `integracao`:** PR #83 (`/code-review`) e a consolidação do plano-mestre. Nenhum dos dois sobe o esquema (sem backup).
-- Falta para o portão da F2: 13.1, 13.2, 13.3, 13.5 (verificação de fechamento), 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
+- Falta para o portão da F2: 13.2, 13.3, 13.5 (verificação de fechamento), 12.2/12.3/6b (a 12.2 pede o Gabriel com rede), 13.4 e 2 semanas de uso real.
 
 ## Próxima atividade
 
@@ -17,7 +17,6 @@ Atualizado em 13/10/2026 (plano-mestre consolidado). Ler antes de qualquer traba
 
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
-| 2 | 13.3 Backup com normas (CP inteiro, idempotente) | Sonnet 5.5 médio | nuvem, sem rede |
 | 3 | 13.2 Orientações › Legislação e ajuda contextual | Sonnet 5.5 médio | nuvem, sem rede |
 | 4 | 13.5 Verificação de fechamento (plano-mestre §3 B) | Sonnet 5.5 médio | nuvem, sem rede |
 | 5 | 12.2 Worker com chamada real (LEP, CF, CC) | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |

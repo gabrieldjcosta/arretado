@@ -174,9 +174,13 @@ function obterPurificador() {
  * atributo com `>` só faz a troca parar naquela tag.
  */
 function semEstiloEmLinha(html: string): string {
-  return html
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
-    .replace(/<[a-z][^>]*>/gi, (tag) => tag.replace(/(\s)style(\s*=)/gi, `$1${ESTILO}$2`));
+  return (
+    html
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
+      // `<base>` no parser dispara violação de `base-uri` da CSP (13.1); o DOMPurify o removeria de qualquer forma.
+      .replace(/<base\b[^>]*>/gi, '')
+      .replace(/<[a-z][^>]*>/gi, (tag) => tag.replace(/(\s)style(\s*=)/gi, `$1${ESTILO}$2`))
+  );
 }
 
 /** Sanitiza HTML e o converte em blocos. `base` resolve links relativos (importação por URL). */
