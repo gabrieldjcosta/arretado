@@ -183,6 +183,16 @@ describe('registrar e completar erro (6.1)', () => {
 });
 
 describe('cartões (6.4, 6.7)', () => {
+  it('de erro sem "o que foi" não nasce (a lacuna da frase vem nas Frases 2); com ele, aponta a Frase', async () => {
+    const { repo } = await preparar();
+    const so = await registrarErro(repo, { fraseCorreta: 'Só a frase.' });
+    await expect(criarCartaoDeErro(repo, so.id)).rejects.toThrow(/o que foi/);
+    expect(await repo.colecao('cartoes').contar()).toBe(0);
+    const e = await registrarErro(repo, { fraseCorreta: 'F.', oQueFoi: 'P?' });
+    const c = await criarCartaoDeErro(repo, e.id);
+    expect(c.fraseId).toBe((await fraseDoErro(repo, e.id))?.id);
+  });
+
   it('de erro: frente = o que foi; verso = frase correta até ser editado; caixa 1; amanhã', async () => {
     const { repo, eventos } = await preparar();
     const e = await registrarErro(repo, {

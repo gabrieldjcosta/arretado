@@ -46,10 +46,7 @@ function comSugestao<T extends Partial<Erro>>(erro: T, base?: Partial<Erro>): T 
 const preenchido = (t: string | undefined) => (t?.trim() ? t : undefined);
 
 /** Registra o erro e a Frase dele, juntos (D25, T22). */
-export async function registrarErro(
-  repo: Repositorio,
-  entrada: EntradaErro,
-): Promise<Erro> {
+export async function registrarErro(repo: Repositorio, entrada: EntradaErro): Promise<Erro> {
   const fraseCorreta = entrada.fraseCorreta.trim();
   if (!fraseCorreta) throw new Error('Escreva a frase correta.');
   const oQueFoi = preenchido(entrada.oQueFoi);

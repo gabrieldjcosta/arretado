@@ -368,7 +368,8 @@ export async function aplicar(
       await alvo.adotarIdentidade(alvo.ctx.usuarioId);
     }
     // Pacote anterior à v6 traz erros com frase correta e nenhuma Frase: elas nascem aqui (T22).
-    await migrarFrasesDosErros(alvo);
+    // Pacote v6 em diante já traz as Frases como estavam; restaurar devolve exatamente o pacote.
+    if (pacote.manifesto.versaoEsquema < 6) await migrarFrasesDosErros(alvo);
     return alvo.colecao('logsImportacao').criar(
       {
         em: agora,

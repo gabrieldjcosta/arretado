@@ -91,8 +91,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
   // O que ainda não foi gravado quando a tela fecha é gravado na saída (nada se perde).
   useEffect(() => {
     const mudanca = diferencas(salvo, rascunho);
-    pendenteAoSair.current =
-      Object.keys(mudanca).length > 0 && !invalido ? mudanca : null;
+    pendenteAoSair.current = Object.keys(mudanca).length > 0 && !invalido ? mudanca : null;
   }, [salvo, rascunho, invalido]);
   useEffect(
     () => () => {
