@@ -1898,6 +1898,7 @@ function LeitorAberto({
               <AcoesDaLeitura
                 modoFoco={modoFoco}
                 botaoDoFoco={botaoDoFoco}
+                lenteDoFoco={lenteDoFoco}
                 abrirBusca={abrirBusca}
                 abrirFiltro={() => {
                   setFiltroAberto(true);
@@ -2005,6 +2006,7 @@ function LeitorAberto({
 function AcoesDaLeitura({
   modoFoco,
   botaoDoFoco,
+  lenteDoFoco,
   abrirBusca,
   abrirFiltro,
   abrirAcoes,
@@ -2015,6 +2017,7 @@ function AcoesDaLeitura({
 }: {
   modoFoco: boolean;
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
+  lenteDoFoco: string;
   abrirBusca: () => void;
   abrirFiltro: () => void;
   abrirAcoes: () => void;
@@ -2073,6 +2076,7 @@ function AcoesDaLeitura({
         ref={botaoDoFoco}
         type="button"
         aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+        data-lente={lenteDoFoco}
         title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
         onClick={alternarFoco}
       >
