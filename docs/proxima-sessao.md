@@ -11,6 +11,8 @@ Atualizado em 13/10/2026 (13.2 feita). Ler antes de qualquer trabalho, junto com
 
 ## Próxima atividade
 
+**Direção nova (13/10/2026, nenhum código mudou ainda):** registrar erro passa a exigir só a **frase correta** (disciplina e ponto facultativos e lembrados); revisão em dois modos (**Revisar frases** e **Revisar cartões**); cartão com oclusão; trecho da lei → "Enviar às frases"; Biblioteca = fontes dos outros, Frases = o que você quer lembrar. Encaixada depois da 13.5 (plano-mestre §1 "Frases" e §3 D; D25; T22).
+
 **13.5 — Verificação de fechamento** (Sonnet 5.5 médio; nuvem, sem rede). Detalhe em [`planos/plano-mestre.md`](planos/plano-mestre.md) §3 B.
 
 **13.2 feita (13/10/2026), sem subida de esquema:** Orientações v1 ganhou as seções `legislacao` (leitor) e `importar-lei` (importador); `secaoDeAjuda` aponta `/biblioteca/importar*` e `/biblioteca*` para elas; teste de rotas em `App.test.tsx`.
@@ -22,6 +24,10 @@ Atualizado em 13/10/2026 (13.2 feita). Ler antes de qualquer trabalho, junto com
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
 | 4 | 13.5 Verificação de fechamento (plano-mestre §3 B) | Sonnet 5.5 médio | nuvem, sem rede |
+| 4a | Ajustes A: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
+| 4b | Frases 1: modelo e captura, esquema v6 (**backup antes do merge**) | **Opus 5.5** | nuvem |
+| 4c | Frases 2: Revisar frases e Revisar cartões, com oclusão | Sonnet 5.5 médio | nuvem |
+| 4d | Frases 3: "Enviar às frases" no leitor | Sonnet 5.5 médio | nuvem |
 | 5 | 12.2 Worker com chamada real (LEP, CF, CC) | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
 | 6 | 12.3 Campo URL; depois 6b | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 7 | 13.4 Portão da F2 (documento) | Sonnet 5.5 médio | nuvem |
@@ -32,7 +38,7 @@ Sem bloquear: lotes com rede (SV 30, 3b/3d, 63 normas a converter; precisa de re
 
 ## Pendências do Gabriel
 
-Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: merge da `integracao` no `main`; 12.2 com rede; lotes com rede; capturas "antes/depois" do redesign se quiser.
+Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: merge da `integracao` no `main`; **backup antes do merge das Frases 1 (esquema v6)**; 12.2 com rede; lotes com rede; capturas "antes/depois" do redesign se quiser.
 
 ## Como abrir a próxima sessão
 
