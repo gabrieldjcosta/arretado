@@ -1396,9 +1396,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await apertar(await naBandejaDoFoco(page, 'Ações'), toque);
   const emFoco = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(emFoco).toBeVisible();
-  await expect(
-    emFoco.getByRole('link', { name: /confundi o prazo da identificação/ }),
-  ).toBeVisible();
+  await expect(emFoco.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
   await semViolacoes(page);
   await apertar(emFoco.getByRole('button', { name: 'Fechar' }), toque);
   await expect(page).toHaveURL(/[?&]foco=texto/);
