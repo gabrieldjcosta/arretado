@@ -15,7 +15,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
 | ✔ | 13.1 Segurança e privacidade da F2 (feita em 13/10/2026) | — | — |
-| 2 | 13.3 Backup com normas | Sonnet médio | Nuvem, sem rede |
+| ✔ | 13.3 Backup com normas (feita em 13/10/2026) | — | — |
 | 3 | 13.2 Ajuda e Orientações da Legislação | Sonnet médio | Nuvem, sem rede |
 | 4 | 13.5 Verificação de fechamento (posição, toque, grifos que sobrevivem, voltar ao artigo depois do erro) | Sonnet médio | Nuvem, sem rede |
 | 5 | 12.2 Publicar a busca por endereço e testar com leis reais | Sonnet médio | **Espera você, com rede** |

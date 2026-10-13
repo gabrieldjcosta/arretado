@@ -67,7 +67,10 @@ export async function exportarPacote(
   const conteudo: Record<string, Uint8Array> = {};
   const contagens: Record<string, number> = {};
 
-  const incluiAnexos = opcoes.incluirAnexos === true && modulos.includes('sistema');
+  // Sem o módulo `sistema`, o pacote com `legislacao` leva só os anexos que são fonte de versão
+  // (13.3): sem eles, o rascunho restaurado não seria retomado (`fonte_ilegivel`).
+  const soFontes = !modulos.includes('sistema') && modulos.includes('legislacao');
+  const incluiAnexos = opcoes.incluirAnexos === true && (modulos.includes('sistema') || soFontes);
   await repo.db.transaction('r', repo.db.tables, async () => {
     const idsAnexos: string[] = [];
     for (const modulo of modulos) {
@@ -76,6 +79,16 @@ export async function exportarPacote(
         contagens[nome] = registros.length;
         conteudo[`${PASTA_DADOS}${nome}.json`] = serializarLista(registros);
         if (nome === 'anexos') idsAnexos.push(...registros.map((a) => a.id));
+        if (nome === 'versoesNorma' && soFontes && incluiAnexos) {
+          const ids = new Set<string>();
+          for (const v of registros as { anexoFonteId?: string }[]) {
+            if (v.anexoFonteId !== undefined) ids.add(v.anexoFonteId);
+          }
+          const anexos = (await registrosDe(repo, 'anexos')).filter((a) => ids.has(a.id));
+          contagens.anexos = anexos.length;
+          conteudo[`${PASTA_DADOS}anexos.json`] = serializarLista(anexos);
+          idsAnexos.push(...anexos.map((a) => a.id));
+        }
       }
     }
     if (opcoes.incluirLog) {

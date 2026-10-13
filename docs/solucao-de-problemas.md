@@ -835,7 +835,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### "A fonte guardada deste rascunho não pôde ser lida"
 - **Sintoma:** ao retomar um rascunho, `RascunhoIndisponivel` com motivo `fonte_ilegivel`. **Causa:** o Anexo da fonte falta (backup restaurado sem anexos, ou só com o módulo `legislacao`), foi alterado (hash diferente do da versão) ou não está no formato dos blocos (`FonteIlegivel`).
-- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); a 13.3 decide se o pacote só de `legislacao` passa a levar a fonte das versões.
+- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); o pacote só de `legislacao` passou a levar a fonte das versões na 13.3 (13/10/2026).
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026); o backup por módulo, previsto — atividade 13.3.
 
 ### A mesma norma colada duas vezes vira dois rascunhos

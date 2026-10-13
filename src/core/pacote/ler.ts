@@ -136,6 +136,15 @@ export async function lerPacote(
   const registros = new Map<NomeColecao, Record<string, unknown>[]>();
   const doModulo = manifesto.modulos.flatMap((mod) => colecoesDoModulo(mod));
   const esperadas = new Set(doModulo.filter((n) => versaoDeOrigem(n) <= manifesto.versaoEsquema));
+  // Pacote só de `legislacao` pode levar os anexos das fontes (13.3), sem o módulo `sistema`.
+  if (
+    manifesto.incluiAnexos &&
+    manifesto.modulos.includes('legislacao') &&
+    !manifesto.modulos.includes('sistema') &&
+    `${PASTA_DADOS}anexos.json` in manifesto.arquivos
+  ) {
+    esperadas.add('anexos');
+  }
   for (const nome of doModulo) if (!esperadas.has(nome)) registros.set(nome, []);
   for (const caminho of declarados.filter((c) => c.startsWith(PASTA_DADOS))) {
     const nome = caminho.slice(PASTA_DADOS.length).replace(/\.json$/, '') as NomeColecao;
