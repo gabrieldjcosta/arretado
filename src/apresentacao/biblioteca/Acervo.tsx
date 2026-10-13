@@ -19,7 +19,9 @@ import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
+import { disciplinasSugeridas } from '../../dominios/acervo/vinculos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
+import { EscolherDisciplinas } from './EscolherDisciplinas';
 
 const TITULO_DO_TIPO: Record<TipoDoAcervo, string> = {
   norma: 'normas',
@@ -65,6 +67,16 @@ export function Acervo() {
     };
   }, []);
   const { dados: minhas } = useDados(carregarNormas);
+  const carregarDisciplinas = useCallback(
+    async (r: typeof repo) => (await r.colecao('disciplinas').todosDoUsuario()).map((d) => d.nome),
+    [],
+  );
+  const { dados: nomesDasMinhas } = useDados(carregarDisciplinas);
+  // Disciplinas escolhidas por item; sem escolha, valem as sugeridas pelo acervo.
+  const [disciplinasEscolhidas, setDisciplinasEscolhidas] = useState<ReadonlyMap<string, string[]>>(
+    new Map(),
+  );
+  const [escolhendo, setEscolhendo] = useState<EntradaDoIndice | null>(null);
   const carregarNovas = useCallback(
     async (r: typeof repo) => (indice ? itensComVersaoNova(r, indice.itens) : []),
     [indice],
@@ -134,6 +146,7 @@ export function Acervo() {
           setProgresso({ feitos, total });
         },
         deveParar: () => parar.current,
+        disciplinasPorItem: disciplinasEscolhidas,
       });
       setResultado(r);
       setMarcados(new Set([...r.restantes, ...r.falhas.map((f) => f.id)]));
@@ -327,6 +340,24 @@ export function Acervo() {
                               </span>
                             </span>
                           </label>
+                          {!jaTem && (
+                            <p className="dica">
+                              Disciplina:{' '}
+                              {(disciplinasEscolhidas.get(i.id) ?? disciplinasSugeridas(i)).join(
+                                ', ',
+                              ) || 'Outros'}{' '}
+                              <button
+                                type="button"
+                                disabled={ocupado}
+                                aria-label={`Mudar a disciplina de ${i.titulo}`}
+                                onClick={() => {
+                                  setEscolhendo(i);
+                                }}
+                              >
+                                Mudar
+                              </button>
+                            </p>
+                          )}
                           {parecida && (
                             <p className="aviso">
                               Você já tem uma norma parecida: {parecida.tituloCurto}.
@@ -360,6 +391,20 @@ export function Acervo() {
             </>
           )}
         </>
+      )}
+      {escolhendo && (
+        <EscolherDisciplinas
+          titulo={escolhendo.titulo}
+          opcoes={[...(nomesDasMinhas ?? []), ...disciplinasSugeridas(escolhendo)]}
+          escolhidas={disciplinasEscolhidas.get(escolhendo.id) ?? disciplinasSugeridas(escolhendo)}
+          aoFechar={() => {
+            setEscolhendo(null);
+          }}
+          aoConfirmar={(nomes) => {
+            setDisciplinasEscolhidas((atual) => new Map(atual).set(escolhendo.id, nomes));
+            setEscolhendo(null);
+          }}
+        />
       )}
       <Dialogo
         aberto={previa !== null}

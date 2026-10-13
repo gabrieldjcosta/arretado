@@ -18,7 +18,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ | 13.3 Backup com normas (feita em 13/10/2026) | — | — |
 | ✔ | 13.2 Ajuda e Orientações da Legislação (feita em 13/10/2026) | — | — |
 | ✔ | 13.5 Verificação de fechamento (feita em 13/10/2026) | — | — |
-| 4a | Foco com o artigo ou a frase no centro da tela; escolher a disciplina ao trazer uma lei do acervo | Sonnet médio | Nuvem, sem rede |
+| ✔ | 4a Foco com o artigo no centro da tela; escolher a disciplina ao trazer uma lei do acervo (feita em 13/10/2026; a frase no centro entra na 4c) | — | — |
 | 4b | **Frases 1:** registrar erro vira digitar a frase certa (disciplina e ponto opcionais e lembrados). **Mexe no esquema: backup antes do merge** | **Opus** | Nuvem |
 | 4c | **Frases 2:** dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | Sonnet médio | Nuvem |
 | 4d | **Frases 3:** selecionar um trecho da lei e enviar às frases | Sonnet médio | Nuvem |
