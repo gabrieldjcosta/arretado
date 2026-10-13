@@ -77,9 +77,10 @@ Regras comuns:
 - **Pacote de outro usuário** só nos modos 6 e 7. O modo 6 não mistura dados: substitui tudo, inclusive a identidade (caso normal de recuperação num aparelho novo). O modo 7 isola.
 - **O registro deste Aparelho nunca é apagado** por importação (modos 5 e 6); no modo 6 de outra identidade ele passa para a identidade do pacote.
 - **Prévia defasada é recusada**: se os dados afetados mudarem entre a prévia e a confirmação, a importação não roda e pede nova prévia.
+- **Pacote só de `legislacao` (13.3)**: com `incluirAnexos`, leva `dados/anexos.json` e `anexos/` só dos anexos que são `anexoFonteId` de uma versão (manifesto: `incluiAnexos: true`, módulo `sistema` ausente). Ao importar sem `sistema`, só entram esses anexos e nenhum anexo local é apagado (modos 5 e 6).
 - **Anexos**: só o conteúdo dos anexos cujo registro foi gravado nesta importação é escrito.
   - Desde a F2 (9.2), cada versão de norma aponta para a sua fonte (`VersaoDeNorma.anexoFonteId`): um Anexo `application/json` com os blocos sanitizados (de 0,2 MB na LEP a 1,3 MB na CF). O registro do Anexo é do módulo `sistema`, e a norma, do `legislacao`.
-  - O backup de Conta › Dados leva os anexos. Um pacote sem eles (ou só com o módulo `legislacao`) restaura a norma, mas o rascunho dela não pode ser retomado ("fonte ilegível": descartar e importar de novo), e a versão publicada perde só a chance de ser reprocessada por um estruturador melhor.
+  - O backup de Conta › Dados leva os anexos. Um pacote sem eles restaura a norma, mas o rascunho dela não pode ser retomado ("fonte ilegível": descartar e importar de novo), e a versão publicada perde só a chance de ser reprocessada por um estruturador melhor.
 - **Revisões são imutáveis**: mesmo id com conteúdo diferente é ignorado e avisado.
 - **Provável duplicata**: registro novo com conteúdo idêntico a um local de outro id é criado e avisado — nunca fundido.
 - **Idempotência**: repetir o mesmo pacote no mesmo modo não altera nada.
