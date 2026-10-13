@@ -201,3 +201,54 @@ describe('pacote v5 no app v6 (Frases 1, revisão independente)', () => {
     destino.fechar();
   });
 });
+
+describe('pacote v6 no app v7 e v7 de ida e volta (F3, P0)', () => {
+  it('pacote v6 (sem tarefasDeEstudo) restaura no app v7 sem recusa e deixa as tarefas locais vazias', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await origem.colecao('sessoes').criar(camposMinimos('sessoes', origem.ctx.usuarioId));
+    const { bytes } = await exportarPacote(origem);
+    const v6 = await comVersao(bytes, 6);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, v6, 6);
+    const d = destino.comUsuario(origem.ctx.usuarioId);
+    expect(await d.colecao('sessoes').todosDoUsuario()).toEqual(
+      await origem.colecao('sessoes').todosDoUsuario(),
+    );
+    expect(await d.colecao('tarefasDeEstudo').contar()).toBe(0);
+    origem.fechar();
+    destino.fechar();
+  });
+
+  it('pacote v7 vai e volta (modo 6) com tarefas, Sessão e preferências novas', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const mae = await origem
+      .colecao('tarefasDeEstudo')
+      .criar({ ...camposMinimos('tarefasDeEstudo', origem.ctx.usuarioId), estado: 'dividida' });
+    await origem.colecao('tarefasDeEstudo').criar({
+      ...camposMinimos('tarefasDeEstudo', origem.ctx.usuarioId),
+      paiId: mae.id,
+      autoria: 'sugerida',
+      razao: 'Revisão vencida',
+      estimativaMin: 15,
+    });
+    await origem.colecao('sessoes').criar({
+      ...camposMinimos('sessoes', origem.ctx.usuarioId),
+      fronteira: 'até o art. 15',
+      proximoPasso: 'Ler os arts. 16 a 20',
+      estacionamento: [{ texto: 'ver depois', em: '2026-10-13T12:00:00.000Z' }],
+      tarefaId: mae.id,
+    });
+    const { bytes } = await exportarPacote(origem);
+    expect((await lerPacote(bytes)).manifesto.versaoEsquema).toBe(VERSAO_ESQUEMA);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, bytes, 6);
+    const d = destino.comUsuario(origem.ctx.usuarioId);
+    for (const nome of ['tarefasDeEstudo', 'sessoes'] as const) {
+      expect(await d.colecao(nome).todosDoUsuario()).toEqual(
+        await origem.colecao(nome).todosDoUsuario(),
+      );
+    }
+    origem.fechar();
+    destino.fechar();
+  });
+});

@@ -1,9 +1,17 @@
 // Subidas de esquema do banco local, sem perda: v1 (F0/F1) → v2 (`leituras`, F2, 9.1) → v3
 // (`vetado` em `Dispositivo.status`, F2, 8.10) → v4 (`vinculosDisciplina`, acervo, Peça 3) → v5
-// (`pendenciasReleitura`, Peça 6a) → v6 (`frases` e `revisoesFrase`, Frases 1).
+// (`pendenciasReleitura`, Peça 6a) → v6 (`frases` e `revisoesFrase`, Frases 1) → v7 (`tarefasDeEstudo`, campos novos de
+// Sessão e Preferências, F3 P0).
 import Dexie from 'dexie';
 import { camposMinimos } from '../modelo/fabrica';
-import { colecoesNaVersao, NOMES_COLECOES, versaoDeOrigem } from '../modelo';
+import {
+  colecoesNaVersao,
+  NOMES_COLECOES,
+  Preferencias,
+  Sessao,
+  TarefaDeEstudo,
+  versaoDeOrigem,
+} from '../modelo';
 import { sha256 } from '../pacote/bytes';
 import { jsonCanonico } from '../util/json-canonico';
 import { apagarBanco, esquemaDaVersao, VERSAO_ESQUEMA } from './banco';
@@ -231,7 +239,7 @@ describe('subida de esquema v4 → v5 (acervo, Peça 6a): `pendenciasReleitura`'
 
 describe('subida de esquema v5 → v6 (Frases 1): `frases` e `revisoesFrase`', () => {
   it('só `frases` e `revisoesFrase` nascem na v6; as coleções antigas mantêm os índices', () => {
-    expect(VERSAO_ESQUEMA).toBe(6);
+    expect(VERSAO_ESQUEMA).toBeGreaterThanOrEqual(6);
     expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 6)).toEqual([
       'frases',
       'revisoesFrase',
@@ -269,7 +277,7 @@ describe('subida de esquema v5 → v6 (Frases 1): `frases` e `revisoesFrase`', (
     v5.close();
 
     const repo = await Repositorio.abrir({ nomeBanco: nome });
-    expect(repo.db.verno).toBe(6);
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
     expect(await repo.db.table('erros').toArray()).toEqual(errosAntes);
     const frases = await repo.colecao('frases').todosDoUsuario();
     expect(
@@ -293,6 +301,74 @@ describe('subida de esquema v5 → v6 (Frases 1): `frases` e `revisoesFrase`', (
     expect(await migrarFrasesDosErros(outra)).toBe(0);
     expect(await outra.colecao('frases').contar()).toBe(3);
     outra.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v6 → v7 (F3, P0): `tarefasDeEstudo` e campos opcionais', () => {
+  it('só `tarefasDeEstudo` nasce na v7; as coleções antigas mantêm os índices', () => {
+    expect(VERSAO_ESQUEMA).toBe(7);
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 7)).toEqual(['tarefasDeEstudo']);
+    expect(colecoesNaVersao(6)).not.toContain('tarefasDeEstudo');
+    const v6 = esquemaDaVersao(6);
+    const v7 = esquemaDaVersao(7);
+    for (const [tabela, indices] of Object.entries(v6)) expect(v7[tabela]).toBe(indices);
+    expect(Object.keys(v7).filter((t) => !(t in v6))).toEqual(['tarefasDeEstudo']);
+  });
+
+  it('abre o banco v6 como v7 sem perder nada, tabela a tabela; Sessão e Preferências antigas seguem válidas', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId, aparelhoId } = await bancoAntigo(nome, 6);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
+    expect([repo.ctx.usuarioId, repo.ctx.aparelhoId]).toEqual([usuarioId, aparelhoId]);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
+    }
+    // Registros gravados na v6 passam no esquema novo (campos novos são todos opcionais).
+    const sessao = (await repo.colecao('sessoes').todosDoUsuario())[0];
+    const prefs = (await repo.colecao('preferencias').todosDoUsuario())[0];
+    expect(Sessao.safeParse(sessao).success).toBe(true);
+    expect(Preferencias.safeParse(prefs).success).toBe(true);
+    // A coleção nova existe vazia e aceita gravação; o log registra.
+    expect(await repo.db.tabela('tarefasDeEstudo').count()).toBe(0);
+    const logAntes = await repo.db.alteracoes.count();
+    const tarefa = await repo
+      .colecao('tarefasDeEstudo')
+      .criar(camposMinimos('tarefasDeEstudo', usuarioId));
+    expect(TarefaDeEstudo.safeParse(tarefa).success).toBe(true);
+    expect(await repo.db.alteracoes.count()).toBe(logAntes + 1);
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+
+  it('grava Sessão e Preferências com os campos novos da F3', async () => {
+    const nome = nomeBanco();
+    const { usuarioId } = await bancoAntigo(nome, 6);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    const em = '2026-10-13T12:00:00.000Z';
+    const sessao = (await repo.colecao('sessoes').todosDoUsuario())[0];
+    if (!sessao) throw new Error('sessão esperada');
+    const nova = await repo.colecao('sessoes').atualizar(sessao.id, {
+      alvo: { tipo: 'leitura', rotulo: 'LEP' },
+      fronteira: 'até o art. 15',
+      proximoPasso: 'Ler os arts. 16 a 20',
+      estacionamento: [{ texto: 'ver prazo do art. 112', em }],
+      origemDaAcao: { tipo: 'leitura_salva', razao: 'Você parou aqui.' },
+      temporizadorMin: 25,
+    });
+    expect(Sessao.safeParse(nova).success).toBe(true);
+    const prefs = (await repo.colecao('preferencias').todosDoUsuario())[0];
+    if (!prefs) throw new Error('preferências esperadas');
+    const novas = await repo.colecao('preferencias').atualizar(prefs.id, {
+      perfilDeEstudo: 'guiado',
+      perfilAnterior: 'calmo',
+      modoSoEstudo: true,
+      temporizadorPadraoMin: 25,
+    });
+    expect(Preferencias.safeParse(novas).success).toBe(true);
+    expect(usuarioId).toBe(novas.usuarioId);
+    repo.fechar();
     await apagarBanco(nome);
   });
 });

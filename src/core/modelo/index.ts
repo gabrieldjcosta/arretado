@@ -68,6 +68,12 @@ export const ENTIDADES = {
     modulo: 'plano',
     indices: ['usuarioId', 'disciplinaId', 'editalId', '[usuarioId+faixa]'],
   },
+  tarefasDeEstudo: {
+    esquema: P.TarefaDeEstudo,
+    modulo: 'plano',
+    indices: ['usuarioId', 'pontoId', 'paiId', '[usuarioId+estado]'],
+    desdeVersao: 7,
+  },
   // execução
   dias: { esquema: P.Dia, modulo: 'execucao', indices: ['usuarioId', '[usuarioId+data]'] },
   sessoes: {

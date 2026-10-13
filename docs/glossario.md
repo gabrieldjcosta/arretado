@@ -45,7 +45,7 @@ Esquemas em `src/core/modelo/`: **S** `sistema.ts`, **P** `plano.ts`, **R** `rec
 | Disciplina | `Disciplina` (P) | `disciplinas` | registros | em uso (importação de pontos, F1) |
 | Ponto | `Ponto` (P) | `pontos` | registros | em uso (importação CSV; vínculo opcional no Erro) |
 | Dia | `Dia` (P) | `dias` | registros | só esquema (F3) |
-| Sessão | `Sessao` (P) | `sessoes` | registros | só esquema (F3) |
+| Sessão | `Sessao` (P) | `sessoes` | registros | esquema v7 pronto (campos da F3); telas e serviço nos pacotes A2/A3a |
 | Erro | `Erro` (R) | `erros` | registros | em uso |
 | Cartão | `Cartao` (R) | `cartoes` | registros | em uso |
 | Revisão | `Revisao` (R) | `revisoes` (append-only) | registros | em uso |
@@ -352,3 +352,19 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Texto corrigido, Correção desfeita, Desfazer a correção (região "Correção do texto") | `AvisoDaCorrecao`, classe `aviso-da-correcao` | `CorrecaoDoTexto.tsx` |
 | Correção (versão nova `edicao_manual`) | `corrigirTextoPublicado(repo, normaId, versaoBaseId, CorrecaoDeTexto[])`, `voltarParaVersao(repo, normaId, versaoBaseId, versaoAlvoId, dispositivoIds?)` → `ResultadoDaCorrecao` (`estado` `corrigida`/`sem_mudanca`, `alterados`, `reancoradas`, `pendentes`, `recuperadas`); `CorrecaoRecusada` (`motivo`: `inexistente`, `sem_versao_vigente`, `versao_mudou`, `dispositivo_fora`, `texto_vazio`, `texto_longo`, `versao_inexistente`); `trechosCorrigidos`, `textoLimpo`, `MAXIMO_DO_TEXTO` | `src/dominios/legislacao/correcao.ts` |
 | (eventos) | `dispositivo.alterado { normaId, dispositivoId, versaoAnterior, versaoNova }`, `marcacao.pendenteReancoragem { normaId, marcacaoId, dispositivoId }` | emitidos pela correção (11.7); a F6 também |
+
+### F3 — Hoje, Sessão e Plano acionável (P0 Fundação, 13/10/2026 — T25; esquema v7)
+
+| Termo | Identificadores |
+|---|---|
+| Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao`; vazio = `ComecoSugerido` (três). Domínio puro, nada gravado. Não usar "tarefa do dia" |
+| Alvo | `AlvoDeAcao` (`tipo`: `revisao`, `leitura`, `tarefa`, `ponto`, `livre`; `id?`; `rotulo?`): o que se vai estudar; em `Sessao.alvo` |
+| Fronteira | `Sessao.fronteira`: até onde ler nesta Sessão ("até o art. 15"); texto livre e opcional |
+| Próximo passo | `Sessao.proximoPasso`: passo pequeno pedido ao fechar a Sessão, pré-preenchido; nunca obrigatório |
+| Origem da ação | `Sessao.origemDaAcao` (`OrigemDaAcao`): cópia do que o Hoje mostrou ao começar |
+| Estacionamento | `Sessao.estacionamento[]` (`NotaDeEstacionamento`: `texto`, `em`, `resolvidaEm?`); `estacionar` (contrato da Sessão). Não usar "distrações" na interface como rótulo de falha |
+| Temporizador | `Sessao.temporizadorMin` e `Preferencias.temporizadorPadraoMin`: opcional, informativo; nunca bloqueia nem conta como aprendizado |
+| Modo "só estudo" | `Preferencias.modoSoEstudo`: esconde a administração durante a Sessão |
+| Tarefa de estudo | `TarefaDeEstudo` (coleção `tarefasDeEstudo`, v7): passo pequeno e concreto; `estado` `aberta`/`feita`/`adiada`/`dividida` (`EstadoDaTarefa`), `paiId` (dividida em filhas), `ordem`, `autoria` `manual`/`sugerida`, `razao` (por quê). Não concluída fica na fila, sem atraso punitivo. Não usar "meta" nem "atividade" |
+| Perfil de estudo | `PerfilDeEstudo` (`calmo`, `guiado`, `leitura`) em `Preferencias.perfilDeEstudo`, com `perfilAnterior` para voltar atrás; só muda padrões da interface |
+| Encaixes do Hoje | `src/apresentacao/hoje/`: `Hoje` compõe `Retorno`, `Agora`, `RevisoesDoDia`, `Depois`, `Captura`; rotas `/sessao/*` (`RotasDaSessao`) e `/plano/{onboarding,pontos,tarefas}/*` (`RotasDoPlano`) |
