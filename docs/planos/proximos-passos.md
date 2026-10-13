@@ -18,13 +18,19 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ | 13.3 Backup com normas (feita em 13/10/2026) | — | — |
 | ✔ | 13.2 Ajuda e Orientações da Legislação (feita em 13/10/2026) | — | — |
 | ✔ | 13.5 Verificação de fechamento (feita em 13/10/2026) | — | — |
+| 4a | Foco com o artigo ou a frase no centro da tela; escolher a disciplina ao trazer uma lei do acervo | Sonnet médio | Nuvem, sem rede |
+| 4b | **Frases 1:** registrar erro vira digitar a frase certa (disciplina e ponto opcionais e lembrados). **Mexe no esquema: backup antes do merge** | **Opus** | Nuvem |
+| 4c | **Frases 2:** dois modos de revisão (Revisar frases e Revisar cartões) e cartão com lacuna que você esconde selecionando | Sonnet médio | Nuvem |
+| 4d | **Frases 3:** selecionar um trecho da lei e enviar às frases | Sonnet médio | Nuvem |
 | 5 | 12.2 Publicar a busca por endereço e testar com leis reais | Sonnet médio | **Espera você, com rede** |
 | 6 | 12.3 Campo de endereço na tela Importar; depois 6b (verificar atualização pelo aparelho) | Sonnet médio | Nuvem, depois da 12.2 |
 | 7 | 13.4 Documento do portão da F2 | Sonnet médio | Nuvem |
 | 8 | **2 semanas lendo lei no Arretado** | — | **Você** |
 | 9 | Planejar a F3 (tela Hoje, Sessão, Plano) | **Opus** | Nuvem, só depois do portão |
 
-Depois da F3: teste com 3 a 5 pessoas, depois conta e sincronização (F4); só então leitura de imagem (OCR), IA opcional, voz e a decisão de cobrar.
+Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resumos e jurisprudência); Frases guardam o que você quer lembrar. Nas 2 semanas de uso você já testa esse fluxo.
+
+Depois da F3: teste com 3 a 5 pessoas, depois conta e sincronização (F4); a conta entra com Google **e Apple**; só então leitura de imagem (OCR), IA opcional (planos com e sem IA: resumos, questões → frases, busca nas leis), voz, a decisão de cobrar e, depois do básico, os apps de Android e iPhone.
 
 Sem bloquear nada: lotes que precisam de rede (Súmula Vinculante 30, lotes 3b/3d, 63 normas a converter) e a busca de súmula mais leve (Sonnet médio, nuvem).
 

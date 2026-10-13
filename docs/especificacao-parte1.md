@@ -489,6 +489,7 @@ Métricas acionáveis; intervalos configuráveis; avaliação de adaptativo sobr
 | D22 | Sem banco de questões; Precedente único com formulário por escopo; Resumo = tipo de Nota | Cadastro menor que estudo | Registrar toda questão; módulos separados | Estatísticas derivam de sessões + erros | Se importar cadernos |
 | D23 | Conta e Ajustes com **Orientações**, "?" contextual e "!" (1 relato/dia, descrição obrigatória, sem dados de estudo) | Reduz medo e bloqueio; canal único | Ajuda externa; formulário livre | Conteúdo estático versionado; fila local até F4 | Não |
 | D24 | Vocabulário: **Aparelho** para equipamento; **Problema** para falha da plataforma; **Erro** só para estudo | Evita colisão com Dispositivo (lei) e com Erro (Recall) | "Dispositivo" e "erro" ambíguos | Glossário obrigatório na interface | Não |
+| D25 | **Frases no centro do Recall (13/10/2026; reabre D9 e D10):** a frase correta é o único campo obrigatório da captura (disciplina e ponto facultativos e lembrados em sequência; resultado e "o que foi" opcionais); `Frase` é entidade própria; revisão em dois modos separados (**Revisar frases** e **Revisar cartões**), cada um com cota; cartão sempre opcional, pergunta×resposta ou lacuna com oclusão; trecho de qualquer fonte da Biblioteca → "Enviar às frases"; IA como plano à parte, sempre por proposta | Menor barreira de uso; revisar o que a pessoa precisa ler; Biblioteca = fontes dos outros, Frases = o que se quer lembrar | Erro com resultado + descrição obrigatórios; só cartões | Modelo em T22; porta de IA em T23 | Após a validação com pessoas |
 
 ---
 
@@ -496,7 +497,7 @@ Métricas acionáveis; intervalos configuráveis; avaliação de adaptativo sobr
 
 1. Uso pessoal até F7; outros usuários só quando catálogo e login existirem. Nada de multiusuário visível no MVP.
 2. Pacotes de incidência são publicados por curador (você) e aderidos por usuários; não há edição colaborativa.
-3. Frase correta e verso do cartão são o mesmo dado até o usuário editar o verso separadamente.
+3. (Revisada por D25) A frase correta é uma `Frase` própria; o verso do cartão parte dela até o usuário editá-lo separadamente.
 4. FasePrazo substitui Evento para tudo que é do concurso; Evento fica para simulado/marco/outro.
 5. Aparelho não ativo fica em somente leitura, não bloqueado.
 6. Modo foco vale em todas as plataformas.
