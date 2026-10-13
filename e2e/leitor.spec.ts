@@ -476,6 +476,48 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   await expect(linha105.locator('.marca-lido-ate')).toBeVisible();
 });
 
+test('mudar o tamanho do texto fora da norma não perde a posição, e a procedência da versão fica à vista: LEP compilada (13.5)', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  const normas = page.getByRole('region', { name: 'Normas' });
+  await expect(normas.getByRole('link', { name: /LEP/ })).toContainText(
+    /Coletada em \d{2}\/\d{2}\/\d{4}/,
+  );
+  await normas.getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await expect(page.locator('.procedencia')).toContainText(/Coletada em \d{2}\/\d{2}\/\d{4}/);
+
+  const art41 = page.locator('[data-endereco="art41"]');
+  await rolarAte(page, art41);
+  await alinharNoAlto(page, art41);
+  await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art41');
+
+  // O tamanho muda em Conta › Aparência (a barra do leitor não acompanha a rolagem).
+  await page.goto('/#/conta/aparencia');
+  await expect(page.getByText(/Tamanho do texto de leitura: 18 px/)).toBeVisible();
+  await page.getByLabel(/Tamanho do texto de leitura/).fill('20');
+  await expect(page.getByText(/Tamanho do texto de leitura: 20 px/)).toBeVisible();
+
+  await page.goto('/#/biblioteca');
+  await page.getByRole('link', { name: 'Continuar leitura: LEP' }).click();
+  await expect(art41).toContainText('Constituem direitos do preso', { timeout: 20_000 });
+  await expect
+    .poll(async () => Math.abs(await distanciaDoAlto(art41)), { timeout: 15_000 })
+    .toBeLessThan(2);
+  expect(await art41.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize))).toBe(20);
+  await semViolacoes(page);
+
+  // Recarregar a página volta ao mesmo dispositivo.
+  await page.reload();
+  await expect(art41).toContainText('Constituem direitos do preso', { timeout: 20_000 });
+  await expect
+    .poll(async () => Math.abs(await distanciaDoAlto(art41)), { timeout: 15_000 })
+    .toBeLessThan(2);
+});
+
 test('destaque automático: ligar a opção e ver prazos, condições, termos absolutos e penas na LEP compilada (9.8)', async ({
   page,
 }) => {

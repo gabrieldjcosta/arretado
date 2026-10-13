@@ -2183,3 +2183,10 @@ dialog.dialogo-previa .linha-acoes button {
   color: var(--texto-atenuado);
   font-weight: 400;
 }
+
+/* Procedência da versão lida (13.5): fonte, coleta, versão e "editado à mão" sob a barra */
+.procedencia {
+  margin: -0.5rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--texto-atenuado);
+}
