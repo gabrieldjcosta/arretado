@@ -24,7 +24,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 |---|---|---|
 | R1 | Leitura, captura manual, revisão, planejamento e exportação funcionam sem conta e sem rede; o remoto é espelho | D1, `CLAUDE.md` |
 | R2 | Quatro áreas fixas: **Hoje, Plano, Recall, Biblioteca**; mais captura, busca, menu **Ajuda** e Conta fora da navegação | D6 |
-| R3 | Captura de erro com **exatamente 2 campos obrigatórios**; o resto (imagem, fonte, classificação, IA) é opcional e aparece sob demanda | D9 |
+| R3 | Captura com **um único campo obrigatório: a frase correta**; disciplina e ponto do edital são facultativos e ficam escolhidos em registros em sequência; resultado (errou / acertou inseguro), "o que foi", imagem, fonte, classificação e IA são opcionais e aparecem sob demanda. *Até as Frases 1 serem implementadas, valem os 2 campos de hoje* | D9, **D25** (Gabriel, 13/10/2026) |
 | R4 | IA externa só produz **rascunho** editável, com fonte, "Desfazer" e aprovação; nunca texto jurídico autoritativo nem alteração automática | novo (A2) |
 | R5 | Todo material importado, extraído ou gerado é aprovado pelo usuário antes de virar conteúdo de estudo | D13, R4 |
 | R6 | Fim de assinatura **nunca apaga dado nem bloqueia exportação** ou estudo manual | novo (C1) |
@@ -33,8 +33,17 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | R9 | Uma mudança significativa de fluxo por vez | — |
 | R10 | Subida de esquema: backup manual do Gabriel antes do merge no `main`, recarregar as abas depois, instruções de recuperação no PR | F2 (9.1, 8.10) |
 | R11 | Segurança e LGPD como critério de aceite de toda fase; HTML colado nunca renderizado sem sanitizar | D18, `CLAUDE.md` |
-| R12 | Vocabulário obrigatório: Aparelho, Problema, Erro (só estudo), Dispositivo (só lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta | D24, `CLAUDE.md` |
+| R12 | Vocabulário obrigatório: Aparelho, Problema, Erro (só estudo), Dispositivo (só lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta, **Frase** (o que se quer lembrar), **Revisar frases** e **Revisar cartões** (os dois modos da Revisão) | D24, D25, `CLAUDE.md` |
 | R13 | Fases sequenciais; nada de fase posterior é antecipado no código. Exceção vigente: a F2 roda em paralelo ao uso real da F1 | D5, `CLAUDE.md` |
+
+### Frases (decidido pelo Gabriel em 13/10/2026; reabre D9 e D10 — ver D25)
+
+- **Biblioteca × Frases.** *Biblioteca = o que os outros escreveram* (leis, súmulas, teses e, no futuro, resumos e jurisprudência): lida, grifada, anotada. *Frases = o que você quer lembrar*: curtas, suas, revisadas. Ponte única: selecionar um trecho de qualquer fonte → "Enviar às frases"; a frase guarda o link de volta (dispositivo + intervalo).
+- **Entidade `Frase`** (coleção `frases`): texto, `disciplinaId?`, `pontoId?`, origem (`erro`, `trecho`, `manual`, futuro `ia`), `erroId?`, link da fonte, estado, próxima revisão. `Erro.fraseCorreta` permanece por compatibilidade e a migração cria uma Frase dos erros existentes. **Esquema v6** (R10: backup antes do merge, recarregar as abas). `Erro.resultado` e `Erro.oQueFoi` passam a opcionais (padrão `errou`).
+- **Revisão em dois modos separados, cada um com cota própria:** *Revisar frases* (ler a frase; "li" ou "de novo"; espaçamento mais simples) e *Revisar cartões* (o Drill atual: Errei / Difícil / Fácil e as 6 caixas — D10 vale para cartões).
+- **Cartão opcional, nunca automático**, criado a partir da frase: pergunta×resposta ou **lacuna com oclusão** (seleciona-se o termo ou trecho a esconder; um ou vários; `Cartao.tipo`).
+- **Código:** Recall e Legislação não se importam; o botão "Enviar às frases" fica na tela do leitor, que conhece os dois. Modelo e decisões técnicas: T22.
+- **Estética:** as telas novas seguem o sistema visual vigente (abaixo) e chegam com axe nos 2 temas e capturas arquivadas nos 3 aparelhos.
 
 ### Ordem dos portões (não negociável)
 
@@ -53,6 +62,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | "Estou travado" | Botão de IA que decompõe a meta | Versão manual na F3-B ("Dividir esta tarefa"); versão com IA só na A2 |
 | Leitura em voz alta, captura por fala | Segunda/terceira entrega | Depois da F4 (G1), com revisão de privacidade e acessibilidade |
 | OCR | "Núcleo estável" bastava | Depois do portão da F4 (A1), mesmo sendo local, para não abrir frente nova antes da validação |
+| Criar cartão do leitor | "Criar cartão deste trecho" como candidata do fechamento da F2 (§3 B) | Substituída por **"Enviar às frases"** (Frases 3, §3 D); o cartão nasce da frase |
 | Teses curadas | "Próxima tarefa, aguarda decisão" | **Entregues** (155 de 169, PR #72, no `main`); só a decisão das 14 de número repetido segue aberta |
 | Onde está cada entrega | Fatia 6, 10.x e 11.7 "no `main` via #80/#81" e fatia 6 "aguardando merge" | Ver §2: tudo até o PR #81 está no `main` (merge #82, 11/10/2026 17h17); o PR #83 (`/code-review`) está **só na `integracao`** |
 
@@ -84,6 +94,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | F0 | Fundamentos | — | ✅ portão fechado |
 | F1 | Recall (MVP) e pontos | F0 | ✅ implementada; portão em medição |
 | **F2** | Legislação: importar, estruturar, revisar, publicar, ler, corrigir; acervo, súmulas, teses | F1 (paralela ao uso) | **Em execução**: falta etapa 12 (12.2, 12.3, 6b), etapa 13 e o uso real |
+| F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; não iniciada |
 | F3-A | Hoje, Sessão e retorno após pausa | portão F2 | não iniciada |
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
 | V1 | Validação com 3 a 5 pessoas | F3 | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
@@ -92,6 +103,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | A2 | Assistência opcional de IA | F4 (conta, cota, servidor) e A1 para o item 3 | não iniciada |
 | C1 | Piloto pago e cobrança | F4, V1 e prontidão comercial | não iniciada |
 | I1 | Exportações e integrações | esquemas estáveis (depois da F4) | não iniciada |
+| M1 | Apps Android e iPhone (Capacitor) | F4 e V1/C1 | futuro, depois do básico |
 | G1 | Extensões exploratórias | uso sustentado | backlog |
 
 ---
@@ -139,6 +151,17 @@ Cada item vira teste ou E2E quando ainda não houver; o que já está coberto é
 | Capturas "antes/depois" do redesign (6.4–6.7) | Sonnet 5.5 médio | nuvem |
 | Backlog de 24/09/2026 (editar termos do destaque, "ignorar este destaque", remissões para outra norma, "citado por") | — | depois do portão da F2, ver `F2.md` › "Ordem e paralelismo" |
 
+### D. Ajustes e Frases (decidido em 13/10/2026; entram depois da 13.5 e antes da 13.4 e do uso real, para as 2 semanas já testarem o fluxo novo)
+
+| # | Atividade | Modelo | Onde roda |
+|---|---|---|---|
+| A | **Ajustes A**, sem esquema novo: (a) modo foco com a frase ou o artigo **no centro da tela**, vertical e horizontal, rolagem interna só se exceder; vale também para Revisar frases; (b) em Biblioteca › Acervo, seletor de **Disciplina** por item (padrão = curadoria; várias; "Outros") e "Mudar disciplina" em Normas; `aderirAoItem` aceita `disciplinas`; a atualização 6a preserva a escolha | Sonnet 5.5 médio | nuvem, sem rede |
+| B | **Frases 1** — modelo e captura: esquema v6, migração, captura em 1 campo com disciplina e ponto lembrados em sequência; reserva `origem: ia` e a porta nula `ServicoDeIA` (§8, A2) | **Opus 5.5** (desenho do esquema) | nuvem; **backup do Gabriel antes do merge** |
+| C | **Frases 2** — Revisar frases e Revisar cartões, cada um com cota; cartão a partir da frase, com lacuna e oclusão | Sonnet 5.5 médio | nuvem |
+| D | **Frases 3** — "Enviar às frases" na seleção do leitor, ao lado de grifo e nota; reancoragem pela atualização 6a | Sonnet 5.5 médio | nuvem |
+
+Cada pacote inclui o acabamento visual das telas que cria. A estética que sobra tem lugar certo: F3-A (Hoje e Sessão), **ajustes pós-validação** na V1 e F4-C (ícone, splash e manifesto). A 13.4 passa a listar o fluxo de Frases entre os critérios do portão.
+
 ### Portão da F2 (mantido)
 
 Duas semanas lendo legislação no Arretado, não no Acervo antigo; critérios de `F2.md` › "Critérios do portão" ligados a teste; nenhum problema aberto de perda de dado ou de posição de leitura. O portão da F1 continua medido à parte.
@@ -174,11 +197,11 @@ Ambiente de demonstração reiniciável; 3 a 5 pessoas; pedir para começar, ret
 
 ## 7. F4 — Conta, sincronização, backup e instalação
 
-Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `proxima-sessao.md` › Referência).
+Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `referencia.md`).
 
 | Bloco | Itens |
 |---|---|
-| F4-A Conta | Uso local continua sem conta; login Google pelo adaptador (D19); dizer o que sai do aparelho; prévia da migração local → conta; conta com dados na nuvem tratada explicitamente; trocar de conta nunca mistura dados; sair definido; exportar, excluir conta em cascata e estado da exclusão |
+| F4-A Conta | Uso local continua sem conta; login **Google e Apple** pelo adaptador (D19; a Apple exige conta Apple Developer, ~US$ 99/ano, e "Entrar com Apple" é obrigatório na App Store quando há outro login social); contas com **plano** (direito de IA sim/não); dizer o que sai do aparelho; prévia da migração local → conta; conta com dados na nuvem tratada explicitamente; trocar de conta nunca mistura dados; sair definido; exportar, excluir conta em cascata e estado da exclusão |
 | F4-B Sincronização | Um aparelho ativo (D17); offline e reconexão; envio interrompido e repetido; conflito mostrado, nunca sobrescrito em silêncio; "salvo neste aparelho" ≠ "com backup" ≠ "sincronizado"; restaurar de backup verificado; isolamento por RLS testado |
 | F4-C Instalável | O que fica offline; instalar só onde há suporte; atualizar o app sem interromper estudo nem migração; pouco espaço e cache velho |
 
@@ -190,10 +213,15 @@ Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver 
 Colar ou enviar imagem → cortar e girar → extrair texto **no aparelho** (avaliar Tesseract.js, carregado só sob pedido, em Worker, com progresso e cancelamento) → imagem ao lado do texto editável → escolher o trecho → preencher o registro de erro sem campo obrigatório novo → salvar. Validar tipo, tamanho e decodificação; guardar a imagem é opcional; nunca registrar imagem nem texto em log. PDFs depois (texto embutido primeiro; digitalizado com limite de páginas; licença revisada). **Portão:** economiza digitação sem esconder erro de extração ("não", prazo, letra da alternativa fáceis de notar); sem promessa de caligrafia.
 
 ### A2 — IA opcional
+Oferta em **dois planos**: *sem IA* (tudo local, o app de hoje) e *com IA*; o direito é da conta (F4) e, sem ele, os botões de IA nem aparecem (R6: nunca bloqueia dado nem estudo manual). Recursos previstos, por valor: resumos; texto de imagem pelo OCR (A1); **questões → frases** (a IA propõe a frase correta e a disciplina); **busca inteligente nas leis do acervo** (pode pedir índice por similaridade, ex.: pgvector no Supabase, a decidir); plano de estudo pelo edital (sempre com as regras determinísticas da F3-B primeiro); cartão e lacuna sugeridos a partir de uma frase. **Já reservado nas Frases 1:** porta `ServicoDeIA` com implementação nula (IA desligada = app idêntico; sem rede o recurso some), sugestão como **Proposta** que se aceita, edita ou descarta (R4), `origem: ia` em Frase e Cartão, chave do modelo só no Worker (T18). Numeração: **T22** = Frases, **T23** = esta decisão, **T24** = apps.
+
 Antes de qualquer função: decisão técnica nova registrada com o Gabriel (T22+), interface independente de fornecedor, credencial só no servidor, controle de acesso, cota por usuário e teto global de gasto, tempo limite e cancelamento, envio mínimo (nada de histórico não relacionado), retenção do fornecedor conferida, texto da fonte tratado como não confiável, proveniência do rascunho aceito. Ordem: sugerir cartão de um trecho → rascunhar Frase correta → estruturar texto do OCR → sugerir vínculos de programa → explicar distinção entre fontes → sugerir reconferir cartões após atualização. Limites: extração não prova gabarito; citação distinta de paráfrase; nada muda texto legal, agenda de revisão ou registro pessoal sozinho; geração em massa só depois de provar a pequena. Endpoint gratuito de avaliação não é base para prometer IA gratuita. **Portão:** conjunto de avaliação fixo; fidelidade, esforço de correção, aceitação, latência e custo; fica só o que vence o fluxo manual melhorado.
 
 ### C1 — Cobrança
 Pré-requisitos (todos): termos e política revisados por pessoa habilitada; R7; material de terceiros verificado caso a caso; F4 pronta. Oferta inicial em concurso jurídico; página em torno do ciclo; demonstração com conteúdo permitido; coorte fundadora; depoimentos consentidos sem promessa clínica nem de aprovação. Gratuito: estudo local, captura manual, exportação. Pago (hipótese): confiabilidade na nuvem e fluxos avançados; R$ 19 × R$ 29 como hipóteses; medir custos antes da cota de IA; anual/vitalício só depois de entender retenção. Implementação: checkout hospedado, webhook autenticado e idempotente, assinatura e direitos no servidor (`Assinatura`, `Direito`), carência e comportamento offline definidos, expiração testada sem apagar dado (R6). **Portão:** não cobrar até o serviço ser confiável, o cancelamento funcionar e os requisitos comerciais estarem revistos.
+
+### M1 — Apps Android e iPhone (futuro, depois do básico)
+Manter o PWA e empacotar o mesmo código com **Capacitor** (React e Dexie reaproveitados; Play Store e App Store). Atenções: o iPhone pode limpar o armazenamento local (exige o sync da F4), notificações de revisão, login Apple e Google nativos, política de privacidade e exclusão de conta exigidas pelas lojas, contas de desenvolvedor (Apple ~US$ 99/ano; Google ~US$ 25 único). Independente da A2. Decisão **T24**, a confirmar com o Gabriel quando chegar a hora.
 
 ### I1 — Portabilidade (nesta ordem)
 CSV de programa com mapeamento e duplicatas → TSV/CSV de cartões para o Anki (sem prometer agenda) → Markdown de notas com referência → calendário (.ics) com datas de prova → pacote de estudo versionado → integração viva só com demanda repetida. Todo importador/exportador: campos e omissões documentados, identificador estável, prévia, validação, ida e volta testada. Plataformas de questões: link e identificador, nunca raspagem.
@@ -214,10 +242,14 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 | 2 | **13.3** Backup com normas | Sonnet 5.5 médio | nuvem, sem rede |
 | ~~3~~ | ~~**13.2** Orientações › Legislação e ajuda contextual~~ ✔ 13/10/2026 | — | — |
 | ~~4~~ | ~~**13.5** Verificação de fechamento (§3 B)~~ ✔ 13/10/2026 | — | — |
+| 4a | **Ajustes A**: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
+| 4b | **Frases 1**: modelo e captura (esquema v6; **backup antes do merge**) | **Opus 5.5** | nuvem |
+| 4c | **Frases 2**: Revisar frases e Revisar cartões, oclusão | Sonnet 5.5 médio | nuvem |
+| 4d | **Frases 3**: Enviar às frases a partir do leitor | Sonnet 5.5 médio | nuvem |
 | 5 | **12.2** Worker com chamada real | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
 | 6 | **12.3** Campo URL, depois **6b** | Sonnet 5.5 médio | nuvem, depois da 12.2 |
 | 7 | **13.4** Portão da F2 (documento) | Sonnet 5.5 médio | nuvem |
-| 8 | **Uso real: 2 semanas** | — | **Gabriel** |
+| 8 | **Uso real: 2 semanas** (já com o fluxo de Frases) | — | **Gabriel** |
 | 9 | Planejamento da F3 | **Opus 5.5** | nuvem, só depois do portão |
 
 Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) e a busca de súmula pelo índice (Sonnet 5.5 médio). Relato de problema do uso real fura a fila.
@@ -228,7 +260,8 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 2. **Sumário da importação** refletir a edição (hoje mostra a estrutura da fonte; ver `solucao-de-problemas.md`).
 3. **Critério dos gabaritos no portão:** `F2.md` exige os gabaritos `conferida`, mas o programa do acervo (decisão D9 de 10/10/2026) transformou a reconferência em rotina de estudo; CP, ECA, CDC e CF seguem `pendente`. Decidir na 13.4 se o critério vira "medido com os gabaritos conferidos até a data" ou se a reconferência volta a ser etapa.
 4. As suposições reversíveis das atividades 8.7 a 11.6 (lista no histórico: [`arquivo/proxima-sessao-ate-2026-10-13.md`](arquivo/proxima-sessao-ate-2026-10-13.md) › "Decisões pequenas"), sem pressa.
-5. Merge da `integracao` no `main` (contém o PR #83 e este plano; sem backup necessário).
+5. **Nomes e oclusão (Frases):** conferir na V1 se "Frases", "Revisar frases" e "Revisar cartões" ficam claros e se Biblioteca × Frases não confunde; oclusão com um trecho por cartão ou todos de uma vez (decidir nas Frases 2).
+6. Merge da `integracao` no `main` (contém o PR #83 e este plano; sem backup necessário).
 
 ## 11. Dependências críticas
 
@@ -238,13 +271,14 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 | V1 depois da F3; F4 depois da V1 | Nuvem e conta construídas sobre fluxo não validado |
 | A1, A2, C1 e voz depois da F4 | IA e cobrança sem conta, cota nem exclusão; dado preso num navegador (R6) |
 | Subida de esquema com backup e recarregar abas (R10) | Perda de dado ou app quebrado em aba aberta |
+| Esquema v6 (Frases 1) antes das 2 semanas de uso; Frases não antecipam a F3 | Uso real medido sobre o fluxo antigo; dado gravado no formato velho |
 | Relato de uso real fura a fila | Plano à frente de defeito real |
 
 ## 12. Mapa dos documentos
 
 | Arquivo | Papel |
 |---|---|
-| `docs/proxima-sessao.md` | Estado atual, próxima atividade, referência operacional (Cloudflare, Supabase, comandos, mapa do código) |
+| `docs/proxima-sessao.md` | Estado atual, próxima atividade e pendências; a referência operacional (Cloudflare, Supabase, comandos, mapa do código) fica em `docs/referencia.md` |
 | `docs/planos/plano-mestre.md` | **Este**: ordem, fases, regras, decisões abertas |
 | `docs/planos/proximos-passos.md` | Resumo em linguagem simples para o Gabriel |
 | `docs/planos/F2.md` | Detalhe técnico da F2: fatos das fontes, atividades, rotina de pronto, critérios do portão |

@@ -237,6 +237,17 @@ Serviço em `src/dominios/recall/` (`servico.ts`, `agendamento.ts`, `causa.ts`);
 | Fila e contadores | `filaDoDia`, `contarVencidos`, `vencemAmanha`, `maiorFilaProjetada` com `LIMITE_FILA_DIARIA = 40`; `hoje(repo)` |
 | Drill, lista passiva | telas `Drill.tsx` (`/recall/revisar`) e `ListaFrases.tsx` (`/recall/frases`) |
 
+### Frases (decidido em 13/10/2026; ainda não implementado — T22, D25)
+
+| Termo | Identificadores |
+|---|---|
+| Frase | `Frase` (coleção `frases`): o que a pessoa quer lembrar; `origemTipo`: `erro`, `trecho`, `manual`, futuro `ia`. Não usar "nota", "anotação" nem "resumo" (a Biblioteca guarda as fontes dos outros) |
+| Revisar frases | modo de revisão que lê a frase e marca "li" ou "de novo"; cota e espaçamento próprios |
+| Revisar cartões | o Drill atual (`Drill.tsx`); cota própria |
+| Enviar às frases | ação do leitor sobre a seleção de uma fonte da Biblioteca; a Frase guarda o link de volta (dispositivo + intervalo) |
+| Oclusão | `Cartao.tipo = lacuna` com os intervalos ocultos da frase; "lacuna" como `CausaErro` continua sendo outra coisa |
+| Proposta, `ServicoDeIA` | sugestão de IA que a pessoa aceita, edita ou descarta (R4); implementação nula por padrão |
+
 ## 11. Plano, pontos e suporte
 
 | Termo | Identificadores |
