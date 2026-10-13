@@ -62,3 +62,18 @@ describe('Biblioteca › Súmulas', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('Biblioteca › Súmulas (revisão das etapas 8, 9 e 11)', () => {
+  it('lê as coleções uma vez, sem recarregar em laço enquanto a tela está aberta', async () => {
+    const f = await FonteEmMemoria.criar([]);
+    const { repo } = await repositorioDeTeste();
+    const colecao = vi.spyOn(repo, 'colecao');
+    window.location.hash = '#/biblioteca/sumulas';
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
+    await screen.findByRole('heading', { name: 'Nenhuma súmula ainda' });
+    await new Promise((r) => setTimeout(r, 100));
+    const antes = colecao.mock.calls.length;
+    await new Promise((r) => setTimeout(r, 300));
+    expect(colecao.mock.calls.length).toBe(antes);
+  });
+});

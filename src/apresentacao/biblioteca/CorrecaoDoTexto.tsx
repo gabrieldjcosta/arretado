@@ -64,9 +64,9 @@ export function FormularioDaCorrecao({
         { dispositivoId, texto },
       ]);
       correcao.aoCorrigir(r, dispositivoId);
-    } catch (erro) {
+    } catch (excecao) {
       trava.current = false;
-      setFalha(mensagemDe(erro));
+      setFalha(mensagemDe(excecao));
     } finally {
       setSalvando(false);
     }
@@ -149,8 +149,8 @@ export function TextosDeAntes({
         dispositivoId,
       ]);
       correcao.aoCorrigir(r, dispositivoId);
-    } catch (erro) {
-      setFalha(mensagemDe(erro));
+    } catch (excecao) {
+      setFalha(mensagemDe(excecao));
     } finally {
       setOcupado(false);
     }
@@ -162,7 +162,7 @@ export function TextosDeAntes({
       <ul className="lista-simples textos-de-antes">
         {lista.map((t) => (
           <li key={t.versaoId}>
-            <p className="dica">Até {DATA.format(new Date(t.capturadaEm))}</p>
+            <p className="dica">Até {DATA.format(new Date(t.substituidoEm))}</p>
             <p className="texto-de-antes">{t.texto}</p>
             <button type="button" disabled={ocupado} onClick={() => void voltarA(t.versaoId)}>
               Voltar a este texto
@@ -212,8 +212,8 @@ export function AvisoDaCorrecao({
           resultado.alterados,
         ),
       );
-    } catch (erro) {
-      setFalha(mensagemDe(erro));
+    } catch (excecao) {
+      setFalha(mensagemDe(excecao));
       setOcupado(false);
     }
   }
@@ -235,7 +235,11 @@ export function AvisoDaCorrecao({
   return (
     <section className="aviso aviso-da-correcao" aria-label="Correção do texto">
       <p role="status">
-        {desfeita ? 'Correção desfeita.' : 'Texto corrigido. O texto de antes ficou guardado.'}
+        {resultado.estado === 'sem_mudanca'
+          ? 'Nada mudou: o texto já era este.'
+          : desfeita
+            ? 'Correção desfeita.'
+            : 'Texto corrigido. O texto de antes ficou guardado.'}
         {partes.length > 0 && ` ${partes.join(' ')}`}
       </p>
       {falha && (
@@ -244,7 +248,7 @@ export function AvisoDaCorrecao({
         </p>
       )}
       <div className="linha-acoes">
-        {!desfeita && anterior !== undefined && (
+        {!desfeita && resultado.estado !== 'sem_mudanca' && anterior !== undefined && (
           <button type="button" disabled={ocupado} onClick={() => void desfazer()}>
             Desfazer a correção
           </button>

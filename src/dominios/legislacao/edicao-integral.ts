@@ -281,9 +281,12 @@ interface Lido {
   resto: string;
 }
 
-/** "1o" e "1°" como "1º": quem digita não acha o ordinal no teclado. */
+/**
+ * "1o" e "1°" como "1º": quem digita não acha o ordinal no teclado. Só no rótulo do começo da
+ * linha (artigo ou parágrafo): no corpo, "art. 2 o juiz" e "30°" ficam como estão.
+ */
 const comOrdinal = (texto: string) =>
-  texto.replace(/°/g, 'º').replace(/(\d) ?o(?=$|[\s.\-–—:,;)])/u, '$1º');
+  texto.replace(/^(\s*(?:art(?:igo)?\.?|§)\s*\d+(?:\.\d{3})*) ?[o°](?=$|[\s.\-–—:,;)])/iu, '$1º');
 
 /** O rótulo no começo da linha digitada (artigo, nó estrutural, parágrafo a item). */
 export function lerLinhaDigitada(texto: string): Lido | undefined {

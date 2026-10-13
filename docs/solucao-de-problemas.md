@@ -1192,3 +1192,23 @@ Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
 
 ### Atualizar do acervo depois de corrigir
 - **Previsível:** a correção vale para a versão vigente; "Atualizar" do acervo (6a) grava a versão do acervo por cima (a corrigida fica arquivada e consultável em "Texto de antes"). Corrigir de novo, se o acervo ainda tiver o erro.
+
+## `/code-review` das etapas 8, 9 e 11 (13/10/2026)
+Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md).
+
+### Tela relê o banco sem parar
+- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta.
+- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`).
+- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo.
+
+### Grifo pula para outra palavra igual depois de corrigir o texto
+- **Causa:** a reancoragem só olhava as posições antigas e escolhia a ocorrência mais perto delas.
+- **Solução:** `reancorar(ancora, textoNovo, textoAntigo)`: fora do trecho editado, a âncora segue o deslocamento exato da edição. Quem reancora passa o texto em que a âncora foi medida (não para as já pendentes).
+
+### Texto digitado some ao fechar a correção da linha
+- **Causa:** `gravarAgora` engolia a falha da gravação e quem esperava por ela fechava o formulário.
+- **Solução:** a promessa devolvida rejeita com a exceção; o formulário só fecha (ou muda a estrutura) depois de gravar.
+
+### Ordinal "o" trocado no meio do texto
+- **Causa:** `comOrdinal` da edição integral não se limitava ao rótulo.
+- **Solução:** só no rótulo do começo da linha (`Art.`, `Artigo`, `§`).
