@@ -1,5 +1,7 @@
 # Acervo, súmulas, teses, estrela discreta e palco do foco — plano de implementação
 
+> **Ordem e estado vigentes:** [`docs/planos/plano-mestre.md`](../../planos/plano-mestre.md) (13/10/2026). Peças 1 a 6a concluídas; 6b e etapa 12 seguem no plano-mestre.
+
 > **Para quem executa:** use `superpowers:subagent-driven-development` (recomendado) ou `superpowers:executing-plans`, tarefa a tarefa. Os passos usam caixas `- [ ]`.
 
 **Objetivo:** entregar, na ordem da spec, a estrela discreta e o palco do modo foco (detalhados aqui) e, depois, o acervo de normas com disciplinas, as súmulas, as teses e a atualização 6a (em etapas, a detalhar na sessão de cada peça).

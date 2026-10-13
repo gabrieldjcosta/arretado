@@ -1,4 +1,6 @@
 # Direção de UI/UX para o Arretado
+
+> **Insumo arquivado em 13/10/2026.** Consolidado (com correções) no [`plano-mestre.md`](../../plano-mestre.md), que vale em divergência.
 ## Recomendação central
 O Arretado não deve parecer um chatbot cercado de ferramentas de estudo. Deve parecer **um ambiente de continuidade**: ao abrir, a pessoa entende onde parou, qual é a próxima ação e quanto esforço ela exige. Isso responde diretamente ao problema já identificado no projeto — começar, manter o contexto, registrar um erro e retornar sem reconstruir mentalmente a sessão.
 

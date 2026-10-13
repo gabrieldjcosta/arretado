@@ -1,5 +1,7 @@
 # Arretado — Plano Mestre Consolidado
 
+> **Insumo arquivado em 13/10/2026.** Consolidado (com correções) no [`plano-mestre.md`](../../plano-mestre.md), que vale em divergência.
+
 > **Versão:** 1.0 (12/10/2026)  
 > **Objetivo:** Reconciliação única entre o rascunho do Perplexity, `curso-de-acao.md`, `F2.md`, `redesign.md`, `proximos-passos.md`, portões F0/F1, e o estado real do código.  
 > **Princípio:** Continuidade — preservar o que funciona, fechar a fase atual, avançar por entregas pequenas com portões explícitos.  
