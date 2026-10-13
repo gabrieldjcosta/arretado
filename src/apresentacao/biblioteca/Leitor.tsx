@@ -58,6 +58,7 @@ import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remiss
 import { fraseDaEstrela, procedenciaDaVersao, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
+import { VerificarAtualizacao } from './VerificarAtualizacao';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota, DialogoEnviarAsFrases } from './Marcacoes';
 import {
@@ -1626,6 +1627,7 @@ function LeitorAberto({
       {!modoFoco && (
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
+      {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
       {!modoFoco && destacar && <LegendaDestaques />}
