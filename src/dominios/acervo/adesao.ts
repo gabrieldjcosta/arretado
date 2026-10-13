@@ -244,10 +244,10 @@ export async function aderirEmLote(
     try {
       const r = await aderirAoItem(repo, fonte, entrada);
       (r.estado === 'adicionada' ? saida.adicionadas : saida.jaAdicionadas).push(id);
-    } catch (erro) {
+    } catch (excecao) {
       saida.falhas.push({
         id,
-        motivo: erro instanceof Error ? erro.message : 'Falha ao adicionar.',
+        motivo: excecao instanceof Error ? excecao.message : 'Falha ao adicionar.',
       });
     }
   }

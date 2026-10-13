@@ -78,6 +78,15 @@ async function lerLimitado(corpo: ReadableStream<Uint8Array> | null, limite: num
   return bytes;
 }
 
+/** Cancela o corpo não lido (senão a conexão fica presa até o fim do pedido). */
+async function descartar(resposta: Response): Promise<void> {
+  try {
+    await resposta.body?.cancel();
+  } catch {
+    // Corpo já fechado: nada a liberar.
+  }
+}
+
 /** Busca a página seguindo redirecionamentos à mão: cada destino passa pela mesma validação. */
 export async function buscarPagina(entrada: string, buscar: Buscar): Promise<Buscada> {
   const validada = validarUrl(entrada);
@@ -93,6 +102,8 @@ export async function buscarPagina(entrada: string, buscar: Buscar): Promise<Bus
         headers: { 'User-Agent': USER_AGENT, Accept: 'text/html,*/*;q=0.8' },
       });
       if (resposta.status >= 300 && resposta.status < 400) {
+        // O corpo do redirecionamento não serve: liberado antes do próximo salto.
+        await descartar(resposta);
         const destino = validarUrl(resposta.headers.get('Location'), atual.href);
         if (!destino.ok) {
           return {
@@ -106,9 +117,15 @@ export async function buscarPagina(entrada: string, buscar: Buscar): Promise<Bus
         atual = destino.url;
         continue;
       }
-      if (!resposta.ok) return { ok: false, motivo: 'status_erro' };
+      if (!resposta.ok) {
+        await descartar(resposta);
+        return { ok: false, motivo: 'status_erro' };
+      }
       const declarado = Number(resposta.headers.get('Content-Length'));
-      if (declarado > LIMITE_BYTES) return { ok: false, motivo: 'grande_demais' };
+      if (declarado > LIMITE_BYTES) {
+        await descartar(resposta);
+        return { ok: false, motivo: 'grande_demais' };
+      }
       const bytes = await lerLimitado(resposta.body, LIMITE_BYTES);
       if (!bytes) return { ok: false, motivo: 'grande_demais' };
       return {
@@ -119,8 +136,8 @@ export async function buscarPagina(entrada: string, buscar: Buscar): Promise<Bus
       };
     }
     return { ok: false, motivo: 'redirecionamentos_demais' };
-  } catch (erro) {
-    const nome = (erro as { name?: string } | null)?.name ?? '';
+  } catch (excecao) {
+    const nome = (excecao as { name?: string } | null)?.name ?? '';
     return {
       ok: false,
       motivo: nome === 'TimeoutError' || nome === 'AbortError' ? 'tempo_esgotado' : 'falha_de_rede',

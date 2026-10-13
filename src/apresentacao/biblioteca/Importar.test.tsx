@@ -358,3 +358,26 @@ describe('Importar: retomar e publicar o rascunho (9.5)', () => {
     });
   });
 });
+
+describe('Para confirmar: salvamento que falha (revisão das etapas 8, 9 e 11)', () => {
+  it('"Fechar" não descarta o que foi digitado quando a gravação falha', async () => {
+    const { repo } = await repositorioDeTeste();
+    const usuario = await abrir(repo);
+    colar({ texto: LEP_TEXTO });
+    await sumario();
+    await usuario.click(await screen.findByRole('button', { name: 'Corrigir Art. 1º' }));
+    const form = screen.getByRole('form', { name: 'Corrigir Art. 1º' });
+    const rotulo = within(form).getByLabelText('Rótulo');
+    // Rótulo acima do limite: a gravação recusa (EdicaoInvalida).
+    fireEvent.change(rotulo, { target: { value: 'x'.repeat(501) } });
+    await usuario.click(within(form).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => {
+      expect(screen.getByRole('form', { name: 'Corrigir Art. 1º' })).toBeInTheDocument();
+    });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.getByRole('form', { name: 'Corrigir Art. 1º' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('form', { name: 'Corrigir Art. 1º' })).getByLabelText('Rótulo'),
+    ).toHaveValue('x'.repeat(501));
+  });
+});

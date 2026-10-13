@@ -1,5 +1,7 @@
 # Acervo de normas, súmulas e teses; estrela discreta e palco do modo foco — desenho
 
+> **Ordem vigente:** [`docs/planos/plano-mestre.md`](../../planos/plano-mestre.md) (13/10/2026). A ordem do §3 abaixo é histórica; as decisões do §2 continuam valendo.
+
 Data: 10/10/2026. Autor: Gabriel (decisões) e Claude (redação). Estado: **aguarda a leitura do Gabriel** (a implementação só começa depois do plano aprovado).
 
 ## 1. Intenção

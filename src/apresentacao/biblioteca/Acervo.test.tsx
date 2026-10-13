@@ -63,6 +63,13 @@ describe('Biblioteca › Acervo (3c)', () => {
     // Só as com disciplina vêm marcadas: a "SOLTA" não.
     expect(await screen.findByRole('button', { name: /^Adicionar 2 / })).toBeEnabled();
     expect(screen.getByRole('checkbox', { name: /SOLTA/ })).not.toBeChecked();
+    // Desmarcar uma das pré-marcadas mantém as outras (revisão das etapas 8, 9 e 11).
+    const eca = screen.getAllByRole('checkbox', { name: /ECA/ })[0];
+    if (!eca) throw new Error('sem ECA');
+    await usuario.click(eca);
+    expect(await screen.findByRole('button', { name: /^Adicionar 1 / })).toBeEnabled();
+    expect(screen.getAllByRole('checkbox', { name: /LEP/ })[0]).toBeChecked();
+    expect(screen.getAllByRole('checkbox', { name: /ECA/ })[0]).not.toBeChecked();
   });
 
   it('agrupa por disciplina e por tipo, filtra, mostra aviso e subtítulo', async () => {

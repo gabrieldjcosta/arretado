@@ -835,7 +835,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### "A fonte guardada deste rascunho não pôde ser lida"
 - **Sintoma:** ao retomar um rascunho, `RascunhoIndisponivel` com motivo `fonte_ilegivel`. **Causa:** o Anexo da fonte falta (backup restaurado sem anexos, ou só com o módulo `legislacao`), foi alterado (hash diferente do da versão) ou não está no formato dos blocos (`FonteIlegivel`).
-- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); a 13.3 decide se o pacote só de `legislacao` passa a levar a fonte das versões.
+- **Solução:** descartar o rascunho e importar a norma de novo. **Prevenção:** o backup de Conta › Dados leva os anexos (`formato-pacote.md`); testes "fonte alterada ou ausente…" (`servico.test.ts`) e "recusa: …" (`registros.test.ts`); o pacote só de `legislacao` passou a levar a fonte das versões na 13.3 (13/10/2026).
 - **Origem:** previsto na 9.2 e tratado nela (25/09/2026); o backup por módulo, previsto — atividade 13.3.
 
 ### A mesma norma colada duas vezes vira dois rascunhos
@@ -1192,3 +1192,43 @@ Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
 
 ### Atualizar do acervo depois de corrigir
 - **Previsível:** a correção vale para a versão vigente; "Atualizar" do acervo (6a) grava a versão do acervo por cima (a corrigida fica arquivada e consultável em "Texto de antes"). Corrigir de novo, se o acervo ainda tiver o erro.
+
+## `/code-review` das etapas 8, 9 e 11 (13/10/2026)
+Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md).
+
+### Tela relê o banco sem parar
+- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta.
+- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`).
+- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo.
+
+### Grifo pula para outra palavra igual depois de corrigir o texto
+- **Causa:** a reancoragem só olhava as posições antigas e escolhia a ocorrência mais perto delas.
+- **Solução:** `reancorar(ancora, textoNovo, textoAntigo)`: fora do trecho editado, a âncora segue o deslocamento exato da edição. Quem reancora passa o texto em que a âncora foi medida (não para as já pendentes).
+
+### Texto digitado some ao fechar a correção da linha
+- **Causa:** `gravarAgora` engolia a falha da gravação e quem esperava por ela fechava o formulário.
+- **Solução:** a promessa devolvida rejeita com a exceção; o formulário só fecha (ou muda a estrutura) depois de gravar.
+
+### Ordinal "o" trocado no meio do texto
+- **Causa:** `comOrdinal` da edição integral não se limitava ao rótulo.
+- **Solução:** só no rótulo do começo da linha (`Art.`, `Artigo`, `§`).
+
+### `<base>` colado dispara violação de `base-uri` da CSP
+- **Causa:** o DOMParser do DOMPurify honra `<base href>` e a CSP (`base-uri`) reporta violação, mesmo sem efeito (achado do E2E de segurança, 13.1).
+- **Solução:** `semEstiloEmLinha` remove `<base>` antes do parser. Teste em `sanitizador.test.ts`.
+
+### `Leitor.test.tsx` "espiada dos vizinhos" falha só dentro do `npm run check`
+- **Causa:** flake de tempo sob carga (passa isolado e na segunda rodada).
+- **Solução:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.
+
+### `Leitor.test.tsx` "100% das redações anteriores ocultas" falha só com a suíte inteira
+- **Causa:** flake de tempo sob carga (o `waitFor` de 1 s vê 705 `.texto-carregando`); passa isolado, também com a procedência da 13.5.
+- **Solução:** rodar de novo; se persistir, `npx vitest run src/apresentacao/biblioteca/Leitor.test.tsx -t "100% das redações"`.
+
+### E2E do leitor: trocar o tamanho do texto "perde a posição" (falso alarme, 13.5)
+- **Causa:** a barra com A−/A+ não é fixa. O Playwright rola até o topo para clicar, então a posição some no teste, não no app. No uso real, quem troca o tamanho está no alto da norma ou em Conta › Aparência.
+- **Solução:** testar o caminho real: ler até um dispositivo, trocar o tamanho em Conta › Aparência, voltar por "Continuar leitura" e recarregar (E2E 13.5). No celular, a volta pode passar de 5 s com carga: usar `timeout` de 15–20 s no `poll`.
+
+### `desempenho.test.ts` "mesmo artigo repetido" passa de 5 s só no `npm run check`
+- **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
+- **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.

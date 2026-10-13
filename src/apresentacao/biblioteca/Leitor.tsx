@@ -54,7 +54,7 @@ import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
 import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
-import { fraseDaEstrela, rotuloTipo } from './rotulos';
+import { fraseDaEstrela, procedenciaDaVersao, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
@@ -158,7 +158,7 @@ interface FiltroAplicado {
 }
 
 type Carga =
-  { tipo: 'carregando' } | ({ tipo: 'pronta' } & Aberta) | { tipo: 'falha'; erro: unknown };
+  { tipo: 'carregando' } | ({ tipo: 'pronta' } & Aberta) | { tipo: 'falha'; excecao: unknown };
 
 /** Leitor da norma (F2, 9.6; Parte 2 §10.6): a versão vigente, em lista virtualizada (T16). */
 export function Leitor() {
@@ -222,8 +222,8 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
       (lida) => {
         if (ativo) setCarga({ tipo: 'pronta', ...lida });
       },
-      (erro: unknown) => {
-        if (ativo) setCarga({ tipo: 'falha', erro });
+      (excecao: unknown) => {
+        if (ativo) setCarga({ tipo: 'falha', excecao });
       },
     );
     return () => {
@@ -271,10 +271,10 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
       </p>
       {carga.tipo === 'carregando' ? (
         <Esqueleto />
-      ) : carga.erro instanceof NormaIndisponivel ? (
+      ) : carga.excecao instanceof NormaIndisponivel ? (
         <div role="alert" className="aviso">
           <p>
-            <strong>{carga.erro.message}</strong>
+            <strong>{carga.excecao.message}</strong>
           </p>
         </div>
       ) : (
@@ -1611,6 +1611,9 @@ function LeitorAberto({
           destacar={destacar}
           alternarDestaques={alternarDestaques}
         />
+      )}
+      {!modoFoco && (
+        <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
