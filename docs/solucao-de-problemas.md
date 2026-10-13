@@ -1228,3 +1228,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### E2E do leitor: trocar o tamanho do texto "perde a posição" (falso alarme, 13.5)
 - **Causa:** a barra com A−/A+ não é fixa. O Playwright rola até o topo para clicar, então a posição some no teste, não no app. No uso real, quem troca o tamanho está no alto da norma ou em Conta › Aparência.
 - **Solução:** testar o caminho real: ler até um dispositivo, trocar o tamanho em Conta › Aparência, voltar por "Continuar leitura" e recarregar (E2E 13.5). No celular, a volta pode passar de 5 s com carga: usar `timeout` de 15–20 s no `poll`.
+
+### `desempenho.test.ts` "mesmo artigo repetido" passa de 5 s só no `npm run check`
+- **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
+- **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.
