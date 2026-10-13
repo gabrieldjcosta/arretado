@@ -1,5 +1,6 @@
 // Pacote v2 (gerado pelo app da 9.1 à 8.9, sem `vetado` no status) aberto no app v3 (F2, 8.10).
 import { strToU8, unzipSync, zipSync } from 'fflate';
+import { NOMES_COLECOES, versaoDeOrigem } from '../modelo';
 import { camposMinimos } from '../modelo/fabrica';
 import { Repositorio, VERSAO_ESQUEMA } from '../persistencia';
 import { deBytes } from './bytes';
@@ -15,15 +16,8 @@ async function comVersao(bytes: Uint8Array, versaoEsquema: number): Promise<Uint
   const a = unzipSync(bytes);
   const m = JSON.parse(deBytes(a['manifesto.json']!)) as Manifesto;
   m.versaoEsquema = versaoEsquema;
-  // Coleção nascida depois (v4) não existia no pacote v2.
-  delete a['dados/vinculosDisciplina.json'];
-  Reflect.deleteProperty(m.arquivos, 'dados/vinculosDisciplina.json');
-  Reflect.deleteProperty(m.contagens, 'vinculosDisciplina');
-  delete a['dados/pendenciasReleitura.json'];
-  Reflect.deleteProperty(m.arquivos, 'dados/pendenciasReleitura.json');
-  Reflect.deleteProperty(m.contagens, 'pendenciasReleitura');
-  // E as da v6 (Frases 1).
-  for (const nome of ['frases', 'revisoesFrase']) {
+  // Coleções nascidas depois da versão pedida (v4, v5, v6) não existiam no pacote.
+  for (const nome of NOMES_COLECOES.filter((n) => versaoDeOrigem(n) > versaoEsquema)) {
     Reflect.deleteProperty(a, `dados/${nome}.json`);
     Reflect.deleteProperty(m.arquivos, `dados/${nome}.json`);
     Reflect.deleteProperty(m.contagens, nome);
@@ -130,5 +124,80 @@ describe('pacote v2 no app v3 (8.10)', () => {
     expect(erro).toBeInstanceOf(PacoteRecusado);
     expect((erro as PacoteRecusado).motivo).toBe('versao_posterior');
     repo.fechar();
+  });
+});
+
+describe('pacote v5 no app v6 (Frases 1, revisão independente)', () => {
+  /** Erro e a Frase dele, como o `registrarErro` do domínio grava (core não importa domínio). */
+  async function registrarErro(repo: Repositorio, { fraseCorreta }: { fraseCorreta: string }) {
+    const erro = await repo
+      .colecao('erros')
+      .criar({ resultado: 'errou', fraseCorreta, status: 'aberto' });
+    await repo.colecao('frases').criar({
+      texto: fraseCorreta,
+      origemTipo: 'erro',
+      erroId: erro.id,
+      estado: 'ativa',
+      proximaRevisao: '2026-10-14',
+    });
+    return erro;
+  }
+  async function excluirErro(repo: Repositorio, id: string) {
+    await repo.colecao('erros').excluir(id);
+    const f = await repo.db.tabela('frases').where('erroId').equals(id).first();
+    if (f) await repo.colecao('frases').excluir(f.id);
+  }
+  async function comErros() {
+    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const fica = await registrarErro(repo, { fraseCorreta: 'Quinze dias.' });
+    const sai = await registrarErro(repo, { fraseCorreta: 'Cinco dias.' });
+    return { repo, fica, sai };
+  }
+  const ativas = async (repo: Repositorio) =>
+    (await repo.colecao('frases').todosDoUsuario()).filter((f) => f.excluidoEm === null);
+
+  it('substituir módulos (modo 5) com pacote v5 mantém a Frase de cada erro que fica', async () => {
+    const { repo, fica, sai } = await comErros();
+    const ids = async () => (await ativas(repo)).map((f) => [f.erroId, f.id]).sort();
+    const antes = await ids();
+    const v5 = await comVersao((await exportarPacote(repo)).bytes, 5);
+    // Depois do backup: um erro novo, fora do pacote; a restauração o exclui, e a Frase dele também.
+    const novo = await registrarErro(repo, { fraseCorreta: 'Depois do backup.' });
+    await importar(repo, v5, 5);
+    // As Frases de quem fica são as mesmas (id e histórico), não cópias; nenhuma sobra órfã.
+    expect(await ids()).toEqual(antes);
+    expect(antes.map(([e]) => e).sort()).toEqual([fica.id, sai.id].sort());
+    expect((await repo.db.tabela('erros').get(novo.id))?.excluidoEm).toBeTruthy();
+    const daNova = await repo.db.tabela('frases').where('erroId').equals(novo.id).first();
+    expect(daNova?.excluidoEm).toBeTruthy();
+    repo.fechar();
+  });
+
+  it('erro excluído depois do backup v5 volta com Frase ao substituir módulos', async () => {
+    const { repo, sai } = await comErros();
+    const v5 = await comVersao((await exportarPacote(repo)).bytes, 5);
+    await excluirErro(repo, sai.id);
+    await importar(repo, v5, 5);
+    expect((await ativas(repo)).filter((f) => f.erroId === sai.id).map((f) => f.texto)).toEqual([
+      'Cinco dias.',
+    ]);
+    repo.fechar();
+  });
+
+  it('pacote v6 vai e volta (modo 6) sem perder Frase nem revisão de frase', async () => {
+    const { repo } = await comErros();
+    const [frase] = await ativas(repo);
+    await repo.colecao('revisoesFrase').criar(camposMinimos('revisoesFrase', frase?.id ?? ''));
+    const { bytes } = await exportarPacote(repo);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, bytes, 6);
+    const d = destino.comUsuario(repo.ctx.usuarioId);
+    for (const nome of ['erros', 'frases', 'revisoesFrase'] as const) {
+      expect(await d.colecao(nome).todosDoUsuario()).toEqual(
+        await repo.colecao(nome).todosDoUsuario(),
+      );
+    }
+    repo.fechar();
+    destino.fechar();
   });
 });
