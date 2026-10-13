@@ -37,14 +37,14 @@
 
 /* Tokens de tema (T10). Contraste AA nos dois temas; alvos de toque ≥ 44 px (Parte 2 §11). */
 :root {
-  --fundo: #f1f3ee;
-  --superficie: #fbfcfa;
+  --fundo: #f2f4ef;
+  --superficie: #fafbf8;
   --superficie-2: #e6eae3;
   --texto: #1f2a24;
   --texto-atenuado: #5c6860;
   --borda: #c5ccc4;
   --penumbra: #e9ece5;
-  --luz-do-cartao: #fbfcfa;
+  --luz-do-cartao: #fafbf8;
   --primaria: #3f6b4c;
   --primaria-texto: #ffffff;
   --foco: #b35900;
@@ -70,10 +70,10 @@
      na tinta. "Depois" é o recuado. Pares medidos em scripts/contraste.mjs. */
   --agora-fundo: #e3ede5;
   --agora-borda: #4f7a64;
-  --raio-cartao: 16px;
+  --raio-cartao: 20px;
   --depois: #5c6860;
   --progresso: #4f7a64;
-  --sombra: 0 1px 3px rgb(0 0 0 / 12%);
+  --sombra: 0 10px 28px -14px rgb(24 34 28 / 16%), 0 1px 3px rgb(24 34 28 / 8%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 90%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
   --superficie-translucida: rgb(251 252 250 / 90%);
@@ -91,15 +91,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #151a1f;
-    --superficie: #1d242a;
-    --superficie-2: #252d34;
-    --texto: #e8ecea;
-    --texto-atenuado: #a3aea8;
-    --borda: #46505a;
-    --penumbra: #0f1418;
-    --luz-do-cartao: #222a31;
-    --primaria: #8fbf9f;
+    --fundo: #121715;
+    --superficie: #1a211e;
+    --superficie-2: #222b27;
+    --texto: #edf2ef;
+    --texto-atenuado: #9caaa1;
+    --borda: #3d4a43;
+    --penumbra: #0d1210;
+    --luz-do-cartao: #1f2723;
+    --primaria: #84be9a;
     --primaria-texto: #0f1a14;
     --foco: #ffb454;
     --perigo: #ff8a8a;
@@ -115,26 +115,26 @@
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
-    --agora-fundo: rgb(143 191 159 / 13%);
-    --agora-borda: #8fbf9f;
-    --depois: #8a958f;
-    --progresso: #8fbf9f;
-    --sombra: none;
-    --superficie-translucida: rgb(29 36 42 / 90%);
+    --agora-fundo: rgb(132 190 154 / 12%);
+    --agora-borda: #84be9a;
+    --depois: #8a978f;
+    --progresso: #84be9a;
+    --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
+    --superficie-translucida: rgb(26 33 30 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #151a1f;
-  --superficie: #1d242a;
-  --superficie-2: #252d34;
-  --texto: #e8ecea;
-  --texto-atenuado: #a3aea8;
-  --borda: #46505a;
-  --penumbra: #0f1418;
-  --luz-do-cartao: #222a31;
-  --primaria: #8fbf9f;
+  --fundo: #121715;
+  --superficie: #1a211e;
+  --superficie-2: #222b27;
+  --texto: #edf2ef;
+  --texto-atenuado: #9caaa1;
+  --borda: #3d4a43;
+  --penumbra: #0d1210;
+  --luz-do-cartao: #1f2723;
+  --primaria: #84be9a;
   --primaria-texto: #0f1a14;
   --foco: #ffb454;
   --perigo: #ff8a8a;
@@ -150,12 +150,12 @@
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
-  --agora-fundo: rgb(143 191 159 / 13%);
-  --agora-borda: #8fbf9f;
-  --depois: #8a958f;
-  --progresso: #8fbf9f;
-  --sombra: none;
-  --superficie-translucida: rgb(29 36 42 / 90%);
+  --agora-fundo: rgb(132 190 154 / 12%);
+  --agora-borda: #84be9a;
+  --depois: #8a978f;
+  --progresso: #84be9a;
+  --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
+  --superficie-translucida: rgb(26 33 30 / 90%);
   color-scheme: dark;
 }
 
@@ -1608,6 +1608,7 @@ dialog.dialogo-acoes {
   border-radius: var(--raio-cartao);
   padding: 1rem;
   margin-bottom: 1rem;
+  box-shadow: var(--sombra);
 }
 
 .acao-agora .principal {
