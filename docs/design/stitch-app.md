@@ -85,3 +85,28 @@ Leitura do júri (desktop claro): clareza 5, atenção 5, identidade 3, encantam
 - **Escuro:** o cartão pêssego vira marrom lamacento; reduzir saturação ou trocar a lógica de cor no escuro.
 - **Mobile:** caixa interna da referência pesa; "Conta" solta no meio da tela.
 - **Decisão pendente (D-D2):** trocar a identidade sálvia/papel esverdeado por neutros do Claude + pastel por disciplina implica novos tokens, risco de colisão com as cores de grifo do leitor (amarelo, verde, rosa) e atualização de `arretado-design-principles`. Só vale se o Gabriel confirmar.
+
+## Rodada 5 — Hoje, "Sol e anil" (inspirada em Structured, Evolve, Speechify e Tiimo)
+
+Feedback sobre a rodada 4: "avanço, mas com cara de Claude, o que não é bom". Pedido: inspirar-se nos apps Structured, Evolve (ADHD), Speechify e Tiimo.
+O que tomei deles (sem copiar identidade): cor saturada e confiante; esferas de ícone coloridas numa linha do tempo vertical (Structured, Tiimo); cartões muito arredondados e flutuantes; título em serifa de exibição (Tiimo); texto da lei com a linha atual realçada como leitura guiada e controle flutuante em pílula (Speechify); energia otimista e espaço para um companheiro (Evolve; fica para a etapa do avatar).
+Identidade proposta: "Arretado" é expressão nordestina que significa excelente; a paleta nasce do Nordeste (sol, anil, folha, caju, argila, cordel), alegre e adulta: creme `#fff8ec`, tinta marinho `#14213d`, anil `#2b3fd6`, sol `#ffb627`, esferas por disciplina (caju `#f2542d`, folha `#2fa36b`, céu `#3ba7f0`, rosa `#f06292`, argila `#c8763a`).
+
+Projeto Stitch: "Arretado - Hoje rodada 5", id `9953616237194891956`, https://stitch.google.com/projects/9953616237194891956
+
+| Tela | Screen id |
+|---|---|
+| Hoje, celular claro | `e5587e57e910497cb01280e0909c2035` |
+| Hoje, desktop claro | `d14cb62f25ee4cbeade2ed6aabeec59e` |
+| Hoje, celular escuro | `e5e17687ac5f4924baa2a99197ce576b` |
+
+Júri (celular/desktop claro): clareza 5, atenção 4, identidade 4, encantamento 4, confiança 4, ânimo 5, tipografia 4, cor 3, acessibilidade 3, viabilidade 3 = **39**. Melhor resposta ao problema declarado (morto, genérico, não motiva): identidade, encantamento e ânimo passam de 2, 3 e 3 para 4, 4 e 5.
+
+Defeitos a corrigir na rodada 6:
+- **Texto da lei errado:** o Stitch pôs o inciso do caput ("16% da pena…") como se fosse o § 1º. Texto real do § 1º: "Em todos os casos, o apenado terá que ostentar boa conduta carcerária, comprovada pelo diretor do estabelecimento, respeitadas as normas que vedam a progressão." Usar texto conferido no prompt.
+- **Colisão de amarelo:** o botão primário e o realce da linha atual usam o mesmo sol. O amarelo do leitor pertence ao conteúdo marcado (grifo-1). Separar: realce da linha atual em azul claro ou sublinhado, mantendo o sol só para a ação.
+- **Etiqueta Direito Penal em vermelho-caju:** perto do semântico de perigo. Testar rosa ou argila.
+- **Escuro:** "§ 1º" quebra em duas linhas; a pílula flutuante cobre o campo de captura; sobras como "Artigo 112 · Leitura ativa" e "Concursos jurídicos" (não são do produto).
+- **Desktop:** metade inferior vazia; coluna da direita pequena.
+- **Logo:** martelo e balança são clichê jurídico; pensar marca própria (o avatar vem depois).
+- **Viabilidade:** troca de identidade (D-D2) exige novos tokens, serifa de exibição e migração do tema; só apresentação, mas precisa de decisão e plano.
