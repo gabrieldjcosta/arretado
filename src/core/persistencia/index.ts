@@ -26,4 +26,5 @@ export {
 } from './colecao';
 export type { Contexto } from './contexto';
 export { reconstruirDoLog } from './log';
+export { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 export { PREFERENCIAS_PADRAO, Repositorio, type OpcoesRepositorio } from './repositorio';

@@ -12,8 +12,12 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  * v4: `vinculosDisciplina` (acervo, Peça 3) e `Norma.especie` / `Norma.origemAcervo` opcionais; só
  * coleção nova, sem transformar registro. Backup do Gabriel antes do merge; recarregar as abas.
  * v5: `pendenciasReleitura` (acervo, Peça 6a); só coleção nova, sem transformar registro.
+ * v6: `frases` e `revisoesFrase` (Frases 1, D25, T22); `Erro.oQueFoi` opcional; `Cartao.tipo`,
+ * `ocultos`, `fraseId` e origens `frase`/`ia`. Sem índice novo em coleção antiga e sem
+ * transformar registro no upgrade: a Frase de cada erro antigo nasce depois de abrir, pelas
+ * coleções (log e relógio lógico), em `migrarFrasesDosErros`. Backup do Gabriel antes do merge.
  */
-export const VERSAO_ESQUEMA = 5;
+export const VERSAO_ESQUEMA = 6;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 

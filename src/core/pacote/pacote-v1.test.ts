@@ -29,6 +29,12 @@ async function comoPacoteV1(
   delete a['dados/pendenciasReleitura.json'];
   Reflect.deleteProperty(m.arquivos, 'dados/pendenciasReleitura.json');
   Reflect.deleteProperty(m.contagens, 'pendenciasReleitura');
+  // E as da v6 (Frases 1).
+  for (const nome of ['frases', 'revisoesFrase']) {
+    Reflect.deleteProperty(a, `dados/${nome}.json`);
+    Reflect.deleteProperty(m.arquivos, `dados/${nome}.json`);
+    Reflect.deleteProperty(m.contagens, nome);
+  }
   if (!opcoes.manterLeituras) {
     delete a['dados/leituras.json'];
     Reflect.deleteProperty(m.arquivos, 'dados/leituras.json');
@@ -86,6 +92,34 @@ describe('pacote v1 no app v2 (9.1)', () => {
       PacoteRecusado,
     );
     repo.fechar();
+  });
+
+  it('pacote anterior à v6: cada erro com frase correta ganha a sua Frase ao restaurar (T22)', async () => {
+    const origem = await comLeitura();
+    const comFrase = await origem.repo.colecao('erros').criar({
+      resultado: 'errou',
+      oQueFoi: 'Prazo do agravo',
+      fraseCorreta: 'Quinze dias.',
+      status: 'aberto',
+    });
+    const { bytes } = await exportarPacote(origem.repo);
+    const destino = await comLeitura();
+    await importar(destino.repo, await comoPacoteV1(bytes), 6);
+    const d = destino.repo.comUsuario(origem.repo.ctx.usuarioId);
+    const frases = await d.colecao('frases').todosDoUsuario();
+    expect(frases.map((f) => [f.texto, f.erroId, f.origemTipo, f.origem])).toEqual([
+      ['Quinze dias.', comFrase.id, 'erro', 'sistema'],
+    ]);
+    // Pacote atual (v6) restaura exatamente como está: nenhuma Frase a mais.
+    const { bytes: v6 } = await exportarPacote(origem.repo);
+    await importar(d, v6, 6);
+    // A Frase criada na restauração anterior sai (exclusão lógica), como todo registro fora do pacote.
+    const ativas = (await d.colecao('frases').todosDoUsuario()).filter(
+      (f) => f.excluidoEm === null,
+    );
+    expect(ativas).toEqual([]);
+    origem.repo.fechar();
+    destino.repo.fechar();
   });
 
   it('restaurar integral (modo 6) um pacote v1 deixa o local igual ao pacote, sem leituras', async () => {

@@ -99,6 +99,27 @@ export const ENTIDADES = {
     indices: ['usuarioId', 'cartaoId', '[usuarioId+em]'],
     appendOnly: true,
   },
+  frases: {
+    esquema: R.Frase,
+    modulo: 'recall',
+    indices: [
+      'usuarioId',
+      'erroId',
+      'disciplinaId',
+      'pontoId',
+      'trecho.dispositivoId',
+      '[usuarioId+criadoEm]',
+      '[usuarioId+estado+proximaRevisao]',
+    ],
+    desdeVersao: 6,
+  },
+  revisoesFrase: {
+    esquema: R.RevisaoDeFrase,
+    modulo: 'recall',
+    indices: ['usuarioId', 'fraseId', '[usuarioId+em]'],
+    appendOnly: true,
+    desdeVersao: 6,
+  },
   // legislação
   normas: { esquema: L.Norma, modulo: 'legislacao', indices: ['usuarioId', 'escopo'] },
   versoesNorma: {

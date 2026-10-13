@@ -1234,3 +1234,19 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### `desempenho.test.ts` "mesmo artigo repetido" passa de 5 s só no `npm run check`
 - **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
 - **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.
+
+### Teste de subida de esquema acusa uma linha a mais em `meta` (v6)
+- **Causa:** ao abrir, `Repositorio.abrir` roda `migrarFrasesDosErros` uma vez e grava a marca `CHAVE_MIGRACAO_FRASES` em `meta` (Frases 1).
+- **Solução:** comparar `meta` sem a marca (`tabelaSemMarca` em `migracao.test.ts`). Subida futura (v7) que crie dado depois de abrir: mesma ideia, uma marca por migração.
+
+### Teste de pacote antigo recusa com "arquivo alterado" depois de coleção nova
+- **Causa:** os ajudantes `comoPacoteV1`/`comoPacoteV2` precisam tirar do pacote toda coleção nascida depois daquela versão (na v6: `frases` e `revisoesFrase`).
+- **Solução:** acrescentar a coleção nova à lista dos ajudantes a cada subida de esquema. Previsível na próxima: qualquer coleção com `desdeVersao` nova.
+
+### Restaurar pacote de outra identidade e importar de novo "não apaga" o que devia
+- **Causa:** depois de `aplicar` com `substituiIdentidade`, o `Repositorio` antigo continua com o `usuarioId` velho; a prévia seguinte não enxerga os registros da identidade nova.
+- **Solução:** usar `repo.comUsuario(novoUsuarioId)` (ou reabrir) para as operações seguintes.
+
+### Frase correta não aparece em "Frases" depois do registro (v6)
+- **Causa provável:** registro gravado direto pela coleção `erros` (teste, carga, importação de pacote v6 sem a Frase), sem passar por `registrarErro`; a migração só cria Frase ao abrir pela primeira vez na v6 e ao importar pacote < v6.
+- **Solução:** registrar por `registrarErro`/`completarErro` (criam ou sincronizam a Frase). Para dado antigo, `migrarFrasesDosErros(repo)` é idempotente.

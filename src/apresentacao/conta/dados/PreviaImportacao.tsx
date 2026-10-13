@@ -4,7 +4,9 @@ import type { Conflito, Previa } from '../../../core/pacote';
 import { formatarInstante, ROTULO_COLECAO } from './rotulos';
 
 const CAMPOS_RESUMO = [
+  'fraseCorreta',
   'oQueFoi',
+  'texto',
   'frente',
   'titulo',
   'tituloCurto',

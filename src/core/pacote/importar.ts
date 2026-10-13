@@ -11,7 +11,7 @@ import {
   type Modulo,
   type NomeColecao,
 } from '../modelo';
-import type { Repositorio } from '../persistencia';
+import { migrarFrasesDosErros, type Repositorio } from '../persistencia';
 import { iguais, jsonCanonico } from '../util/json-canonico';
 import type { PacoteLido } from './ler';
 import { criarSnapshot, podarSnapshots } from './snapshots';
@@ -367,6 +367,9 @@ export async function aplicar(
       await migrarRegistrosLocais(repo, alvo);
       await alvo.adotarIdentidade(alvo.ctx.usuarioId);
     }
+    // Pacote anterior à v6 traz erros com frase correta e nenhuma Frase: elas nascem aqui (T22).
+    // Pacote v6 em diante já traz as Frases como estavam; restaurar devolve exatamente o pacote.
+    if (pacote.manifesto.versaoEsquema < 6) await migrarFrasesDosErros(alvo);
     return alvo.colecao('logsImportacao').criar(
       {
         em: agora,
