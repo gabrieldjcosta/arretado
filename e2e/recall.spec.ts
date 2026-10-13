@@ -44,10 +44,10 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 
-  // Lista passiva.
   await page.goto('/#/recall/frases');
+  // Lista passiva.
   await expect(
-    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.' }),
+    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.', exact: true }),
   ).toBeVisible();
 
   expect(externas).toEqual([]);
