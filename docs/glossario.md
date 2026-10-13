@@ -92,7 +92,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Termo | O que é no código |
 |---|---|
 | Fila do dia / fila de revisão | consulta `filaDoDia(repo)` sobre `cartoes` (índice `[usuarioId+estado+proximaRevisao]`) |
-| Lista passiva | consulta `listarFrases(repo)`: erros com `fraseCorreta`, exceto descartados |
+| Lista passiva | consulta `listarFrases(repo, FiltroFrases)`: Frases `ativa` por recência (v6) |
 | Completude, diagnóstico | derivada `completude(erro)`: `rapido` ou `completo`; diagnóstico = atributos do Erro (`causa`, `causaSugerida`, `acaoRecomendada`, `historicoCausa`) |
 | Verso efetivo | `versoEfetivo(cartao, erro)`: `Cartao.verso` ou, se `null`, `Erro.fraseCorreta` |
 | Prioridade | campos de `Ponto`: `faixa`, `prioridade` (desempate) e `logPrioridade[]` |
@@ -224,9 +224,9 @@ Serviço em `src/dominios/recall/` (`servico.ts`, `agendamento.ts`, `causa.ts`);
 
 | Termo | Identificadores |
 |---|---|
-| Os 2 obrigatórios (D9) | `Erro.resultado` (`ResultadoErro`: `errou`, `acertou_inseguro`) + `Erro.oQueFoi`; entrada `EntradaErro` |
+| O obrigatório (D25; antes os 2 da D9) | só `EntradaErro.fraseCorreta`; `Erro.resultado` (`ResultadoErro`: `errou`, `acertou_inseguro`) vale `errou` quando não informado; `Erro.oQueFoi` opcional desde a v6 |
 | Registrar, completar depois | `registrarErro`, `completarErro`, `excluirErro`, `listarErros(repo, FiltroErros)`; `StatusErro`: `aberto`, `com_cartao`, `resolvido`, `descartado` |
-| Frase correta | `Erro.fraseCorreta`: verso padrão do cartão e item da lista passiva |
+| Frase correta | `Erro.fraseCorreta`: espelho do texto da Frase do erro (`sincronizarFrase`, em `completarErro`) e verso padrão do cartão |
 | Causa | `CausaErro`: `lacuna`, `leitura`, `confusao`, `literalidade`; rótulos em `NOME_CAUSA`; `ACAO_RECOMENDADA[causa]` → `Erro.acaoRecomendada` |
 | Causa sugerida | `sugerirCausa(erro)` → `Erro.causaSugerida`, recalculada quando mudam `oQueFoi`, `resultado`, `justificativa` ou `conviccao`; escolha em `historicoCausa[] { em, sugerida, confirmada }` |
 | Cartão | `criarCartaoDeErro` (idempotente), `criarCartaoManual`, `editarCartao`, `listarCartoes(repo, estado)`; `origemTipo`: `erro`, `dispositivo`, `nota`, `precedente`, `manual`; `textoBaseAlterado` (F6) |
@@ -237,16 +237,21 @@ Serviço em `src/dominios/recall/` (`servico.ts`, `agendamento.ts`, `causa.ts`);
 | Fila e contadores | `filaDoDia`, `contarVencidos`, `vencemAmanha`, `maiorFilaProjetada` com `LIMITE_FILA_DIARIA = 40`; `hoje(repo)` |
 | Drill, lista passiva | telas `Drill.tsx` (`/recall/revisar`) e `ListaFrases.tsx` (`/recall/frases`) |
 
-### Frases (decidido em 13/10/2026; ainda não implementado — T22, D25)
+### Frases (decidido em 13/10/2026 — T22, D25; modelo e captura nas Frases 1, esquema v6)
 
 | Termo | Identificadores |
 |---|---|
-| Frase | `Frase` (coleção `frases`): o que a pessoa quer lembrar; `origemTipo`: `erro`, `trecho`, `manual`, futuro `ia`. Não usar "nota", "anotação" nem "resumo" (a Biblioteca guarda as fontes dos outros) |
+| Frase | `Frase` (coleção `frases`, v6): o que a pessoa quer lembrar; `texto`, `disciplinaId?`, `pontoId?`, `OrigemFrase` (`origemTipo`: `erro`, `trecho`, `manual`, `ia` reservada), `erroId?`, `trecho?` (`dispositivoId`, `versaoId?`, `texto`, `inicio`, `fim`), `EstadoFrase` (`ativa`, `arquivada`), `proximaRevisao`, `ultimaRevisao?`. Não usar "nota", "anotação" nem "resumo" (a Biblioteca guarda as fontes dos outros) |
+| Frase do erro | `registrarErro` cria Erro e Frase na mesma transação (evento `frase.criada`); `fraseDoErro(repo, erroId)`; `excluirErro` exclui a Frase junto; frase correta apagada arquiva a Frase |
+| Migração das frases | `migrarFrasesDosErros(repo)` (`src/core/persistencia/migracao-frases.ts`): Frase `origem: sistema` para cada erro com frase correta sem Frase; roda uma vez ao abrir (marca `CHAVE_MIGRACAO_FRASES` em `meta`) e ao importar pacote com `versaoEsquema < 6` |
+| Revisão de frase | `RevisaoDeFrase` (coleção `revisoesFrase`, append-only, v6): `fraseId`, `em`, `data`, `RespostaFrase` (`li`, `de_novo`), `proximaAntes`, `proximaDepois`, `atrasoDias`, `duracaoMs?`; a tela vem nas Frases 2 |
+| Disciplina e ponto lembrados | captura (`RegistrarErro.tsx`): campos "Disciplina (opcional)" e "Ponto do edital (opcional)" fora de "Mais detalhes"; a escolha fica em `localStorage` (`arretado.captura.vinculos`, só ids) e só vale se ainda existir; "Registrar outra" |
+| Cartão da frase | `Cartao.fraseId?`, `Cartao.tipo?` (`pergunta` quando ausente, `lacuna`), `Cartao.ocultos?` (`Intervalo[]` `{ inicio, fim }`); `origemTipo` ganhou `frase` e `ia` (v6) |
 | Revisar frases | modo de revisão que lê a frase e marca "li" ou "de novo"; cota e espaçamento próprios |
 | Revisar cartões | o Drill atual (`Drill.tsx`); cota própria |
 | Enviar às frases | ação do leitor sobre a seleção de uma fonte da Biblioteca; a Frase guarda o link de volta (dispositivo + intervalo) |
 | Oclusão | `Cartao.tipo = lacuna` com os intervalos ocultos da frase; "lacuna" como `CausaErro` continua sendo outra coisa |
-| Proposta, `ServicoDeIA` | sugestão de IA que a pessoa aceita, edita ou descarta (R4); implementação nula por padrão |
+| Proposta, `ServicoDeIA` | sugestão de IA que a pessoa aceita, edita ou descarta (R4); `Proposta<T> { valor, fonte? }`, `ServicoDeIA { disponivel, proporFrase }`, implementação nula `SERVICO_DE_IA_NULO` (`src/core/ia`) |
 
 ## 11. Plano, pontos e suporte
 

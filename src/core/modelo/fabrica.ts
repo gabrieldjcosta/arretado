@@ -50,6 +50,21 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
       caixa: 1,
       proximaRevisao: '2026-09-24',
     },
+    frases: {
+      texto: 'Prazo do art. 112 da LEP',
+      origemTipo: 'manual',
+      estado: 'ativa',
+      proximaRevisao: '2026-09-24',
+    },
+    revisoesFrase: {
+      fraseId: ref,
+      em: '2026-09-24T12:00:00.000Z',
+      data: '2026-09-24',
+      resposta: 'li',
+      proximaAntes: '2026-09-24',
+      proximaDepois: '2026-09-27',
+      atrasoDias: 0,
+    },
     revisoes: {
       cartaoId: ref,
       em: '2026-09-24T12:00:00.000Z',

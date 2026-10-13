@@ -1360,7 +1360,7 @@ describe('ações por dispositivo (11.5)', () => {
     expect(await within(dialogo).findByRole('button', { name: 'Estrelar' })).toBeVisible();
   });
 
-  it('registrar erro: já com a referência, dois campos, vinculado ao dispositivo; depois aparece nos vinculados', async () => {
+  it('registrar erro: só a frase correta (D25), "o que foi" já com a referência, vinculado ao dispositivo; depois aparece nos vinculados', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -1369,14 +1369,14 @@ describe('ações por dispositivo (11.5)', () => {
     const { dialogo, referencia } = await abrirAcoes(usuario);
     expect(within(dialogo).getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
     await usuario.click(within(dialogo).getByRole('button', { name: 'Registrar erro' }));
-    const campo = within(dialogo).getByLabelText('O que foi');
-    expect(campo).toHaveValue(`${referencia}: `);
-    // Só a referência não basta; falta também o resultado.
+    const frase = within(dialogo).getByLabelText('Frase correta');
+    expect(frase).toHaveFocus();
+    expect(within(dialogo).getByLabelText('O que foi (opcional)')).toHaveValue(`${referencia}: `);
     const salvar = within(dialogo).getByRole('button', { name: 'Salvar' });
     expect(salvar).toBeDisabled();
+    await usuario.type(frase, 'O prazo é de cinco dias.');
     await usuario.click(within(dialogo).getByRole('button', { name: 'Errei' }));
-    expect(salvar).toBeDisabled();
-    await usuario.type(campo, 'troquei o prazo');
+    await usuario.type(within(dialogo).getByLabelText('O que foi (opcional)'), 'troquei o prazo');
     await usuario.click(salvar);
 
     expect(await within(dialogo).findByText(/Erro registrado e vinculado/)).toBeInTheDocument();
@@ -1384,13 +1384,30 @@ describe('ações por dispositivo (11.5)', () => {
     expect(erros).toHaveLength(1);
     expect(erros[0]).toMatchObject({
       resultado: 'errou',
+      fraseCorreta: 'O prazo é de cinco dias.',
       oQueFoi: `${referencia}: troquei o prazo`,
       status: 'aberto',
     });
     expect(erros[0]?.dispositivoId).toBeDefined();
-    // A lista dos vinculados recarrega com o erro novo, com o link para o erro.
-    const link = await within(dialogo).findByRole('link', { name: /troquei o prazo/ });
+    expect(await repo.colecao('frases').contar()).toBe(1);
+    // A lista dos vinculados recarrega com o erro novo (pela frase), com o link para o erro.
+    const link = await within(dialogo).findByRole('link', { name: /cinco dias/ });
     expect(link).toHaveAttribute('href', `#/recall/erros/${erros[0]?.id ?? ''}`);
+  });
+
+  it('registrar erro do leitor: só a referência em "o que foi" não é gravada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const { dialogo } = await abrirAcoes(usuario);
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Registrar erro' }));
+    await usuario.type(within(dialogo).getByLabelText('Frase correta'), 'Só a frase.');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Salvar' }));
+    await within(dialogo).findByText(/Erro registrado e vinculado/);
+    const [erro] = (await repo.colecao('erros').listarPagina({ limite: 10 })).itens;
+    expect(erro).toMatchObject({ resultado: 'errou', fraseCorreta: 'Só a frase.' });
+    expect(erro?.oQueFoi).toBeUndefined();
   });
 
   it('cartão deste trecho: frente com a referência, verso com o texto vigente, uma vez só', async () => {

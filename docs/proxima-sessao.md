@@ -1,6 +1,6 @@
 # Próxima sessão — ponto de partida
 
-Atualizado em 13/10/2026 (Ajustes A feita). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
+Atualizado em 13/10/2026 (Frases 1 feita; PR aberto, **aguarda revisão independente e backup**). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
 
 > **⚠ Exceção de fase ativa (decisão do Gabriel, 13/10/2026):** design e implementação de **UI de todas as telas** rodam em paralelo à F2 (não libera esquema, sync, sanitização nem domínio de fase posterior). **Conferir conflitos** com o plano da F3, Frases 2/3 e F4 ao planejar cada etapa. Detalhes: [`design/decisoes-design.md`](design/decisoes-design.md).
 
@@ -13,9 +13,13 @@ Atualizado em 13/10/2026 (Ajustes A feita). Ler antes de qualquer trabalho, junt
 
 ## Próxima atividade
 
-**Direção nova (13/10/2026, nenhum código mudou ainda):** registrar erro passa a exigir só a **frase correta** (disciplina e ponto facultativos e lembrados); revisão em dois modos (**Revisar frases** e **Revisar cartões**); cartão com oclusão; trecho da lei → "Enviar às frases"; Biblioteca = fontes dos outros, Frases = o que você quer lembrar. Encaixada logo depois da 13.5, antes da 12.2 e da 13.4 (plano-mestre §1 "Frases" e §3 D; D25; T22).
+**Antes de tudo: Frases 1 sobe o esquema para v6.** O PR `claude/frases-1` → `integracao` **não deve ser mergeado sem**: (1) revisão independente em outra sessão (regra de risco alto do `CLAUDE.md`: migração), (2) backup manual do Gabriel (Conta › Dados › Exportar) antes do merge da `integracao` no `main`, e recarregar as abas depois (R10). Atividade seguinte: **4c Frases 2** (Sonnet 5.5 médio), que pode empilhar sobre o branch `claude/frases-1` enquanto ele não entra na `integracao`.
 
-**Frases 1** (Opus 5.5; esquema v6, **backup do Gabriel antes do merge**), em [`planos/plano-mestre.md`](planos/plano-mestre.md) §3 D.
+**Frases 1 feita (13/10/2026), esquema v6.** Modelo: coleções `frases` (`Frase`: texto, disciplina e ponto opcionais, `origemTipo` `erro`/`trecho`/`manual`/`ia`, `erroId`, `trecho` = dispositivo + intervalo, `estado` `ativa`/`arquivada`, `proximaRevisao`) e `revisoesFrase` (append-only, `li`/`de_novo`; a tela vem na 4c); `Erro.oQueFoi` opcional; `Cartao.fraseId`, `tipo` (`pergunta`/`lacuna`), `ocultos` e origens `frase`/`ia` — o esquema das Frases 2 e 3 já está todo aqui, para não subir de novo. Migração: o upgrade só cria as coleções; `migrarFrasesDosErros` cria a Frase de cada erro antigo com frase correta ao abrir (uma vez, marca em `meta`) e ao importar pacote < v6. Espelho remoto: `supabase/migrations/20261013000000_colecoes_frases.sql` (**não aplicada no Supabase**; só arquivo, como as anteriores até a F4). Captura (`RegistrarErro.tsx`): só "Frase correta" obrigatória; "Disciplina (opcional)" e "Ponto do edital (opcional)" fora de "Mais detalhes", lembrados no aparelho; resultado e "o que foi" em "Mais detalhes"; cartão só é oferecido com "o que foi". O formulário do leitor (Ações › Registrar erro) segue a mesma regra. Porta nula `ServicoDeIA` em `src/core/ia`. Suposições (reversíveis): excluir o erro exclui a Frase dele (o cartão fica); apagar a frase correta arquiva a Frase; Frase nova vence amanhã, a migrada vence hoje; descartado vira Frase `arquivada`; a escolha de disciplina/ponto fica em `localStorage` (só ids).
+
+Passagem de bastão (Frases 1): Tarefa 4b · Branch `claude/frases-1` · Último commit: ver o PR · Alterações não commitadas: nenhuma · Feito: modelo v6, migração, captura, leitor, docs · Verificado: `npm run check` verde (1621 testes); `npx playwright test` nos 3 aparelhos com axe nos 2 temas (ver o PR) · Não verificado: abrir no aparelho real um banco v5 com dados reais (é o que o backup protege) · Falha atual: nenhuma · Próxima ação exata: revisão independente do PR em outra sessão; depois backup do Gabriel; depois merge · Arquivos a ler: `src/core/modelo/recall.ts`, `src/core/persistencia/migracao-frases.ts`, `src/dominios/recall/servico.ts`, `src/apresentacao/recall/RegistrarErro.tsx` · Decisões que não se reabrem: D25, T22.
+
+**Direção nova (13/10/2026):** registrar erro passa a exigir só a **frase correta** (disciplina e ponto facultativos e lembrados); revisão em dois modos (**Revisar frases** e **Revisar cartões**); cartão com oclusão; trecho da lei → "Enviar às frases"; Biblioteca = fontes dos outros, Frases = o que você quer lembrar. Encaixada logo depois da 13.5, antes da 12.2 e da 13.4 (plano-mestre §1 "Frases" e §3 D; D25; T22).
 
 **Ajustes A feita (13/10/2026), sem subida de esquema:** (a) modo foco por artigo centra o cartão na vertical e na horizontal (`estilos.css`, `.leitor.em-foco`; rola por dentro só se exceder; E2E 11.8 mede o centro). Revisar frases ainda não existe: a 4c aplica o mesmo palco. (b) Acervo: cada item não adicionado mostra "Disciplina: …" com "Mudar" (várias; "Outros" = sem disciplina); `aderirAoItem(..., { disciplinas })`, `aderirEmLote(..., { disciplinasPorItem })`; Normas ganhou "Mudar disciplina" (`mudarDisciplinas` em `dominios/acervo/vinculos.ts`). A atualização 6a não reescreve vínculos, então a escolha sobrevive (teste). Suposição: "Outros" grava vínculo sem `disciplinaId` nem sugestão; mostra "Sem disciplina" em Normas.
 
@@ -29,7 +33,7 @@ Atualizado em 13/10/2026 (Ajustes A feita). Ler antes de qualquer trabalho, junt
 
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
-| 4b | Frases 1: modelo e captura, esquema v6 (**backup antes do merge**) | **Opus 5.5** | nuvem |
+| ✔ 4b | Frases 1 feita; PR aberto: **falta revisão independente e backup antes do merge** | — | — |
 | 4c | Frases 2: Revisar frases e Revisar cartões, com oclusão | Sonnet 5.5 médio | nuvem |
 | 4d | Frases 3: "Enviar às frases" no leitor | Sonnet 5.5 médio | nuvem |
 | 5 | ~~12.2 Worker com chamada real~~ (feita e verificada em 13/10/2026; ver `solucao-de-problemas.md`) | — | — |
@@ -42,7 +46,7 @@ Sem bloquear: lotes com rede (SV 30, 3b/3d, 63 normas a converter; precisa de re
 
 ## Pendências do Gabriel
 
-Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: merge da `integracao` no `main`; **backup antes do merge das Frases 1 (esquema v6)**; 12.2 com rede; lotes com rede; capturas "antes/depois" do redesign se quiser.
+Decisões (plano-mestre §10): 14 teses com número repetido; sumário da importação refletir a edição; critério dos gabaritos no portão (reconferência virou rotina de estudo); suposições reversíveis das atividades 8.7 a 11.6 (no histórico). Ações: **revisão independente do PR das Frases 1 (outra sessão) e backup (Conta › Dados › Exportar) antes do merge dele e do merge da `integracao` no `main` (esquema v6)**; merge da `integracao` no `main`; 12.2 com rede; lotes com rede; capturas "antes/depois" do redesign se quiser.
 
 ## Como abrir a próxima sessão
 
