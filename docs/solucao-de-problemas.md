@@ -1266,3 +1266,9 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### "Substituir módulos" com backup v5 apagava todas as Frases (v6; corrigido na revisão das Frases 1)
 - **Causa:** a prévia do modo 5 excluía (lógico) toda Frase local fora do pacote, e um pacote v5 não tem `frases`; `migrarFrasesDosErros` pulava o erro que já tinha Frase, mesmo excluída. Resultado: nenhuma Frase ativa.
 - **Solução:** `planejar` (modo 5, pacote < v6) não toca `frases`/`revisoesFrase`, só exclui a Frase do erro que a importação exclui; a migração só pula erro com Frase não excluída. Testes em `pacote-v2.test.ts` ("pacote v5 no app v6"). Previsível: coleção derivada nova (v7) num pacote antigo precisa da mesma regra.
+
+
+### E2E 13.5 (posição do artigo no celular) falha uma vez sob carga (visto na 6b)
+- **Sintoma:** `leitor.spec.ts` "mudar o tamanho do texto…" estoura 15 s em `distanciaDoAlto` no projeto celular quando a suíte inteira roda; sozinho passa nos 3 aparelhos.
+- **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
+- **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.
