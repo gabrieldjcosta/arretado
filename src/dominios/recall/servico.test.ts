@@ -7,6 +7,7 @@ import {
   contarVencidos,
   criarCartaoDeLacuna,
   criarCartaoDeDispositivo,
+  criarFraseDeTrecho,
   criarCartaoDeErro,
   criarCartaoManual,
   diasComRevisao,
@@ -67,6 +68,44 @@ describe('registrar e completar erro (6.1)', () => {
       },
       { nome: 'frase.criada', payload: { fraseId: frase?.id, erroId: e.id } },
     ]);
+  });
+
+  it('criarFraseDeTrecho: Frase de origem trecho com o link de volta, vence amanhã', async () => {
+    const { repo } = await preparar();
+    const f = await criarFraseDeTrecho(repo, {
+      texto: '  Prazo de 10 dias  ',
+      trecho: {
+        dispositivoId: '11111111-1111-4111-8111-111111111111',
+        versaoId: '22222222-2222-4222-8222-222222222222',
+        texto: 'o prazo é de 10 dias',
+        inicio: 3,
+        fim: 23,
+      },
+    });
+    expect(f).toMatchObject({
+      texto: 'Prazo de 10 dias',
+      origemTipo: 'trecho',
+      estado: 'ativa',
+      proximaRevisao: '2026-09-24',
+      trecho: {
+        dispositivoId: '11111111-1111-4111-8111-111111111111',
+        versaoId: '22222222-2222-4222-8222-222222222222',
+        inicio: 3,
+        fim: 23,
+      },
+    });
+    await expect(
+      criarFraseDeTrecho(repo, {
+        texto: ' ',
+        trecho: {
+          dispositivoId: '11111111-1111-4111-8111-111111111111',
+          texto: 'x',
+          inicio: 0,
+          fim: 1,
+        },
+      }),
+    ).rejects.toThrow(/frase/);
+    expect(await repo.colecao('frases').contar()).toBe(1);
   });
 
   it('recusa frase vazia e não grava nada', async () => {

@@ -972,6 +972,33 @@ describe('grifos e notas (11.4)', () => {
     expect(window.scrollY).toBe(rolagem);
   });
 
+  it('enviar às frases: o trecho vira Frase com o link de volta, editável antes de enviar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    selecionar('art2', 'jurisdição penal');
+    await usuario.click(await screen.findByRole('button', { name: 'Enviar às frases' }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Enviar às frases' });
+    const campo = within(dialogo).getByRole('textbox', { name: 'Frase' });
+    expect(campo).toHaveValue('jurisdição penal');
+    await usuario.type(campo, ' é do juiz');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Enviar' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    const frases = await repo.colecao('frases').todosDoUsuario();
+    expect(frases).toHaveLength(1);
+    expect(frases[0]).toMatchObject({
+      texto: 'jurisdição penal é do juiz',
+      origemTipo: 'trecho',
+      trecho: { texto: 'jurisdição penal', inicio: 2, fim: 18 },
+    });
+    expect(await marcacoesGravadas(repo)).toEqual([]);
+  });
+
   it('no modo foco, as ações ficam no mesmo grupo; Esc desfaz a seleção sem sair do modo foco', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);

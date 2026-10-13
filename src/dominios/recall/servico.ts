@@ -86,6 +86,43 @@ export async function registrarErro(repo: Repositorio, entrada: EntradaErro): Pr
   return r.erro;
 }
 
+/** O link de volta à fonte de uma Frase de trecho (T22): dispositivo, versão e intervalo. */
+export interface TrechoDaFonte {
+  dispositivoId: string;
+  versaoId?: string;
+  /** O texto da fonte no intervalo, como estava ao enviar. */
+  texto: string;
+  inicio: number;
+  fim: number;
+}
+
+/** "Enviar às frases" (Frases 3): a Frase de origem `trecho`, com o link de volta à fonte. */
+export async function criarFraseDeTrecho(
+  repo: Repositorio,
+  entrada: { texto: string; trecho: TrechoDaFonte; disciplinaId?: string; pontoId?: string },
+): Promise<Frase> {
+  const texto = entrada.texto.trim();
+  if (!texto) throw new Error('Escreva a frase.');
+  const t = entrada.trecho;
+  const frase = await repo.colecao('frases').criar({
+    texto,
+    origemTipo: 'trecho',
+    ...(entrada.disciplinaId ? { disciplinaId: entrada.disciplinaId } : {}),
+    ...(entrada.pontoId ? { pontoId: entrada.pontoId } : {}),
+    trecho: {
+      dispositivoId: t.dispositivoId,
+      ...(t.versaoId ? { versaoId: t.versaoId } : {}),
+      texto: t.texto.slice(0, 5_000),
+      inicio: t.inicio,
+      fim: t.fim,
+    },
+    estado: 'ativa',
+    proximaRevisao: somarDias(hoje(repo), 1),
+  });
+  repo.eventos.emitir('frase.criada', { fraseId: frase.id });
+  return frase;
+}
+
 /** A Frase nascida do erro (a primeira, mesmo arquivada); `undefined` em erro antigo sem frase. */
 export async function fraseDoErro(repo: Repositorio, erroId: string): Promise<Frase | undefined> {
   return (

@@ -134,6 +134,16 @@ describe('atualizarItem', () => {
     const grifoDeslocado = await marca(id('art1'), 'texto longo', 20);
     const grifoPerdido = await marca(id('art2'), 'Segundo artigo.', 0);
     const grifoIgual = await marca(id('art4'), 'Quarto', 0);
+    const fraseDeTrecho = (dispositivoId: string, texto: string, inicio: number) =>
+      repo.colecao('frases').criar({
+        texto: 'Minha frase',
+        origemTipo: 'trecho',
+        trecho: { dispositivoId, versaoId, texto, inicio, fim: inicio + texto.length },
+        estado: 'ativa',
+        proximaRevisao: '2026-10-14',
+      });
+    const fraseDeslocada = await fraseDeTrecho(id('art1'), 'texto longo', 20);
+    const frasePerdida = await fraseDeTrecho(id('art2'), 'Segundo artigo.', 0);
     await repo.colecao('leituras').criar({ normaId, lidoAteId: id('art3'), posicaoId: id('art4') });
 
     const antes = await compararComAtual(repo, fonte2, e2);
@@ -161,6 +171,14 @@ describe('atualizarItem', () => {
     expect(g1?.ancora).toMatchObject({ inicio: 27, fim: 38 });
     expect((await repo.colecao('marcacoes').obter(grifoPerdido.id))?.status).toBe('pendente');
     expect((await repo.colecao('marcacoes').obter(grifoIgual.id))?.status).toBe('valida');
+    // A frase enviada (Frases 3) segue o texto; a que perdeu o trecho fica como estava.
+    const f1 = await repo.colecao('frases').obter(fraseDeslocada.id);
+    expect(f1?.texto).toBe('Minha frase');
+    expect(f1?.trecho).toMatchObject({ versaoId: r.versaoId, inicio: 27, fim: 38 });
+    expect((await repo.colecao('frases').obter(frasePerdida.id))?.trecho).toMatchObject({
+      versaoId,
+      inicio: 0,
+    });
     repo.fechar();
   });
 
