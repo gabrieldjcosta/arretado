@@ -19,18 +19,19 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
   // Captura em menos de 30 s (Parte 2 §17), pelo botão global.
   const t0 = Date.now();
+  // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
   await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
+  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
+  await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
-  await page.getByRole('button', { name: 'Errei' }).click();
+  await semViolacoes(page);
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
   expect(Date.now() - t0).toBeLessThan(30_000);
 
   await page.getByRole('button', { name: 'Sim' }).click();
   await expect(page.getByText(/Cartão criado/)).toBeVisible();
-  await page.getByRole('link', { name: 'Completar este erro' }).click();
-  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
-  await expect(page.getByText('Salvo', { exact: true })).toBeVisible();
+  await semViolacoes(page);
 
   // Dia seguinte: o cartão está na fila.
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
@@ -54,10 +55,9 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
 test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page }) => {
   await page.goto('/#/recall/registrar');
-  await page.getByLabel('O que foi').fill('Conteúdo sigiloso de estudo');
-  await page.getByRole('button', { name: 'Errei' }).click();
+  await page.getByLabel('Frase correta').fill('Conteúdo sigiloso de estudo');
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
   await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
   await page.getByRole('button', { name: 'Relatar problema' }).click();
   await expect(page.getByText(/nunca conteúdo de estudo/)).toBeVisible();
@@ -97,13 +97,34 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
 
+  // Disciplina e ponto opcionais, fora de "mais detalhes", lembrados no registro seguinte e
+  // depois de recarregar (D25).
   await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
-  await page.getByRole('button', { name: 'Errei' }).click();
-  await page.getByLabel('O que foi').fill('Fração da progressão');
-  await page.getByText('Mais detalhes (opcional)').click();
-  await page.getByLabel('Ponto do edital').selectOption({ label: '1 Progressão de regime' });
+  await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
+  await page
+    .getByLabel('Ponto do edital (opcional)')
+    .selectOption({ label: '1 Progressão de regime' });
+  await expect(page.getByLabel('Disciplina (opcional)').locator('option:checked')).toHaveText(
+    'Execução Penal',
+  );
+  await semViolacoes(page);
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByText('Erro registrado.')).toBeVisible();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+  await expect(
+    page.getByText('A próxima fica em Execução Penal › Progressão de regime.'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Registrar outra' }).click();
+  await expect(page.getByLabel('Frase correta')).toBeFocused();
+  await page.reload();
+  await expect(page.getByLabel('Ponto do edital (opcional)')).toHaveValue(/.+/);
+  await page.getByLabel('Frase correta').fill('Furto exige subtração.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+
+  // As duas na lista de frases.
+  await page.goto('/#/recall/frases');
+  await expect(page.getByText('A fração da progressão é de 16%.')).toBeVisible();
+  await expect(page.getByText('Furto exige subtração.')).toBeVisible();
 });
 
 test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisar mais 10" + 5 (fatia 3)', async ({

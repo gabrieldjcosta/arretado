@@ -1350,18 +1350,19 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await expect(dialogo.getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
   await semViolacoes(page);
 
-  // Registrar erro: a referência já no campo, só o resultado e o que foi.
+  // Registrar erro: só a frase correta (D25); "o que foi" já com a referência, opcional.
   await apertar(dialogo.getByRole('button', { name: 'Registrar erro' }), toque);
-  const campo = dialogo.getByLabel('O que foi');
+  const campo = dialogo.getByLabel('O que foi (opcional)');
   await expect(campo).toHaveValue('art. 9º-A, LEP: ');
+  await dialogo
+    .getByLabel('Frase correta')
+    .fill('A identificação do perfil genético é obrigatória.');
   await apertar(dialogo.getByRole('button', { name: 'Errei' }), toque);
   await campo.pressSequentially('confundi o prazo da identificação');
   await semViolacoes(page);
   await apertar(dialogo.getByRole('button', { name: 'Salvar' }), toque);
   await expect(dialogo.getByText(/Erro registrado e vinculado/)).toBeVisible();
-  await expect(
-    dialogo.getByRole('link', { name: /confundi o prazo da identificação/ }),
-  ).toBeVisible();
+  await expect(dialogo.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
 
   // Cartão deste trecho (uma vez só) e copiar a referência.
   const cartao = dialogo.getByRole('button', { name: 'Criar cartão deste trecho' });
