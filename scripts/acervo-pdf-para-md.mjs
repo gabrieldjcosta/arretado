@@ -84,6 +84,23 @@ export function limpar(bruto) {
     .trim();
 }
 
+/**
+ * Documentos técnicos sem artigos (PNAS, SINASE, Tipificação): marca com `#` as linhas que parecem título
+ * (numeradas "1.", "1.1", "1.1.1" ou em caixa alta), para o adaptador separar o texto em seções.
+ */
+export function comTitulos(texto) {
+  return texto
+    .split('\n')
+    .map((l) => {
+      if (l.length > 110 || /[.!?;,]$/.test(l)) return l;
+      const n = /^(\d{1,2}(?:\.\d{1,2}){0,3})\.?\s+[A-ZÀ-Ú]/.exec(l);
+      if (n) return `${'#'.repeat(Math.min(n[1].split('.').length, 4))} ${l}`;
+      if (/^[A-ZÀ-Ú][A-ZÀ-Ú0-9 ,\-–/()ªº]{5,}$/.test(l)) return `# ${l}`;
+      return l;
+    })
+    .join('\n');
+}
+
 export function pdfParaTexto(buf) {
   const dir = mkdtempSync(join(tmpdir(), 'pdf-'));
   const f = join(dir, 'a.pdf');

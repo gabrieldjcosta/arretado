@@ -151,3 +151,12 @@
 | provimento-cnj-19-2012 | publicado | 5 | 0 | — |
 | provimento-cnj-28-2013 | publicado | 60 | 0 | alinea_sem_inciso: 15 |
 | provimento-cnj-44-2015 | publicado | 139 | 0 | — |
+| resolucao-conama-511-2025 | publicado | 64 | 0 | linha_solta: 1 |
+| resolucao-conanda-119-2006 | publicado | 6 | 0 | — |
+| resolucao-conanda-113-2006 | publicado | 174 | 0 | — |
+| resolucao-conanda-117-2006 | publicado | 91 | 0 | duplicata: 2; artigo_ausente: 8; artigo_fora_de_ordem: 1; paragrafo_unico_com_numerado: 1; paragrafo_1_sem_2: 1 |
+| resolucao-conanda-169-2014 | publicado | 21 | 0 | — |
+| resolucao-cnas-145-2004 | publicado | 69 | 0 | — |
+| resolucao-cnas-109-2009 | publicado | 13 | 0 | — |
+| resolucao-conjunta-cnas-conanda-1-2009 | publicado | 33 | 0 | — |
+| resolucao-cnpcp-4-2011 | publicado | 11 | 0 | — |

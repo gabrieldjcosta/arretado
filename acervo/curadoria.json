@@ -3124,6 +3124,227 @@
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2507"
       },
       "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-conama-511-2025",
+      "titulo": "Resolução CONAMA 511/2025 - Justiça climática e combate ao racismo ambiental",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conama-511-2025.md",
+        "urlOficial": "https://conama.mma.gov.br/?amp=&amp=&id=846&option=com_sisconama&task=arquivo.download"
+      },
+      "anomaliasAceitas": [
+        "linha_solta"
+      ]
+    },
+    {
+      "id": "resolucao-conanda-119-2006",
+      "titulo": "Resolução CONANDA 119/2006 - SINASE (Sistema Nacional de Atendimento Socioeducativo)",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [
+        "Só a resolução (6 artigos); o documento completo do SINASE é anexo à parte. Lei 12.594/2012 já está no acervo."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conanda-119-2006.md",
+        "urlOficial": "https://www.gov.br/mdh/pt-br/acesso-a-informacao/participacao-social/conselho-nacional-dos-direitos-da-crianca-e-do-adolescente-conanda/resolucoes/resolucao-no-119-_sinase-__de_11_de_dezembro_de_2006.pdf"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-conanda-113-2006",
+      "titulo": "Resolução CONANDA 113/2006 - Parâmetros para institucionalização e fortalecimento do Sistema de Garantia dos Direitos da Criança e do Adolescente (SGDCA)",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Alterada pela Resolução CONANDA 117/2006; ler em conjunto."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conanda-113-2006.md",
+        "urlOficial": "https://www.gov.br/mdh/pt-br/acesso-a-informacao/participacao-social/conselho-nacional-dos-direitos-da-crianca-e-do-adolescente-conanda/resolucoes/resolucao-no-113-de-19-04-06-parametros-do-sgd.pdf"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-conanda-117-2006",
+      "titulo": "Resolução CONANDA 117/2006 - Altera dispositivos da Resolução 113/2006 (SGDCA)",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Altera a Resolução CONANDA 113/2006; ler em conjunto.",
+        "Resolução alteradora: reproduz trechos da Res. 113/2006; a numeração dos artigos citados não é sequencial."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conanda-117-2006.md",
+        "urlOficial": "https://www.gov.br/mdh/pt-br/acesso-a-informacao/participacao-social/conselho-nacional-dos-direitos-da-crianca-e-do-adolescente-conanda/resolucoes/resolucao-no-117-_de_11_julho_de_2006_-_altera_dispositivos_da_resolucao_n-o_1132006.pdf"
+      },
+      "anomaliasAceitas": [
+        "duplicata",
+        "artigo_ausente",
+        "artigo_fora_de_ordem",
+        "paragrafo_unico_com_numerado",
+        "paragrafo_1_sem_2"
+      ]
+    },
+    {
+      "id": "resolucao-conanda-169-2014",
+      "titulo": "Resolução CONANDA 169/2014 - Proteção dos direitos de crianças e adolescentes em atendimento por órgãos e entidades do Sistema de Garantia de Direitos",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conanda-169-2014.md",
+        "urlOficial": "https://www.gov.br/mdh/pt-br/acesso-a-informacao/participacao-social/conselho-nacional-dos-direitos-da-crianca-e-do-adolescente-conanda/resolucoes/resolucao-169-protecao-crianca-e-adolescente.pdf"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnas-145-2004",
+      "titulo": "Resolução CNAS 145/2004 - Política Nacional de Assistência Social (PNAS)",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [
+        "Documento técnico (PNAS/2004 e NOB/SUAS): lido por seções, sem artigos."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnas-145-2004.md",
+        "urlOficial": "https://www.mds.gov.br/webarquivos/legislacao/assistencia_social/resolucoes/2004/Resolucao%20CNAS%20no%20145-%20de%2015%20de%20outubro%20de%202004.pdf"
+      },
+      "semArtigos": true,
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnas-109-2009",
+      "titulo": "Resolução CNAS 109/2009 - Tipificação Nacional de Serviços Socioassistenciais",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [
+        "Documento técnico (Tipificação Nacional): lido por seções, sem artigos. Alterada depois (por exemplo, Res. CNAS 13/2014)."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnas-109-2009.md",
+        "urlOficial": "https://www.mds.gov.br/webarquivos/public/resolucao_cnas_n109_%202009.pdf"
+      },
+      "semArtigos": true,
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-conjunta-cnas-conanda-1-2009",
+      "titulo": "Resolução Conjunta CNAS/CONANDA 1/2009 - Orientações Técnicas: Serviços de Acolhimento para Crianças e Adolescentes",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução conjunta",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [
+        "Documento técnico (Orientações Técnicas): lido por seções, sem artigos."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-conjunta-cnas-conanda-1-2009.md",
+        "urlOficial": "https://www.mds.gov.br/webarquivos/legislacao/assistencia_social/resolucoes/2009/Resolucao%20CNAS%20no%2001-%20de%2018%20de%20junho%20de%202009.pdf"
+      },
+      "semArtigos": true,
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "resolucao-cnpcp-4-2011",
+      "titulo": "Resolução CNPCP 4/2011 - Visita íntima",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Resolução",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [
+        "Revogada pela Resolução CNPCP 23/2021, que trata da visita conjugal/íntima; mantida por constar no edital."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "resolucao-cnpcp-4-2011.md",
+        "urlOficial": "https://www.gov.br/senappen/pt-br/composicao/cnpcp/resolucoes/2011/resolucao-no-4-de-29-de-junho-de-2011.pdf"
+      },
+      "anomaliasAceitas": []
     }
   ]
 }

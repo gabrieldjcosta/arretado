@@ -5,7 +5,7 @@
 //   urlOficial, cnj? (página do ato), pdfModo? ("original"), pdf? (URL direta), manual? (Markdown já transcrito à mão; só registra), cortarEm? (regex: o texto
 //   acaba na primeira linha que casar, para deixar o anexo de fora), semArtigos?, anomaliasAceitas? }.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { baixar, limpar, pdfDoCnj, pdfParaTexto } from './acervo-pdf-para-md.mjs';
+import { baixar, comTitulos, limpar, pdfDoCnj, pdfParaTexto } from './acervo-pdf-para-md.mjs';
 
 const [, , caminho, flag, lista] = process.argv;
 const so = flag === '--so' ? new Set(lista.split(',')) : null;
@@ -28,6 +28,7 @@ for (const m of manifesto) {
         const i = texto.search(new RegExp(m.cortarEm, 'm'));
         if (i > 0) texto = texto.slice(0, i).trim();
       }
+      if (m.semArtigos) texto = comTitulos(texto);
       if (texto.length < 200) throw new Error(`texto curto (${texto.length}); PDF escaneado?`);
       writeFileSync(`acervo/fontes/${m.arquivo}`, `# ${m.titulo}\n${texto}\n`);
     }
