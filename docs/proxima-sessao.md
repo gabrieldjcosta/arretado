@@ -7,11 +7,11 @@ Atualizado em 13/10/2026 (Frases 1 feita e **revisada em sessão independente**;
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
 - **F2 em execução.** Feitas: etapas 7, 8, 9, 10 (10.1–10.4), 11 (11.1–11.9), 12.1, 13.1, 13.2, 13.3, 13.5; programa do acervo (Peças 1–6a, esquema v5), súmulas, teses curadas (155/169); redesign fatias 1–6; `/code-review` das etapas 8, 9 e 11 (relatório em [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md)).
 - **`main`** tem tudo até o PR #81 (merge #82, 11/10/2026). **Só na `integracao`:** PR #83 (`/code-review`) e a consolidação do plano-mestre. Nenhum dos dois sobe o esquema (sem backup).
-- Falta para o portão da F2: 12.3/6b (a 12.2 foi verificada em 13/10/2026: rota no ar, LEP/CF/CC/ALESP respondem 200, sem estouro), 13.4 e 2 semanas de uso real.
+- **Portão da F2 fechado em 13/10/2026 (decisão do Gabriel).** As 2 semanas de uso real, os gabaritos conferidos, os testes com rede (12.3, 6b) e o portão de 14 dias da F1 foram para a V1, depois das contas (plano-mestre §6); nada disso bloqueia a F3.
 
 ## Próxima atividade
 
-**13.4 feita (13/10/2026), só documento:** [`portoes/F2.md`](portoes/F2.md) com entregas, critérios ligados a teste, o que ficou "não medido" (gabaritos CP/ECA/CDC/CF `pendente`, 2 semanas de uso, 12.3 e 6b com rede) e as pendências suas (backup antes do merge do v6, 14 teses). Portão da F2 segue aberto. Atividade seguinte: **8 (uso real, Gabriel)**; depois **9 (planejar a F3, Opus 5.5)**.
+**13.4 feita (13/10/2026), só documento:** [`portoes/F2.md`](portoes/F2.md) com entregas, critérios ligados a teste, o que ficou "não medido" (gabaritos CP/ECA/CDC/CF `pendente`, 2 semanas de uso, 12.3 e 6b com rede) e as pendências suas (backup antes do merge do v6, 14 teses). Portão da F2 segue aberto. Atividade seguinte: **F3-A em pacotes paralelos** ([`planos/f3-pacotes.md`](planos/f3-pacotes.md)); agente de verificação diário: [`planos/agente-verificacao.md`](planos/agente-verificacao.md).
 
 **6b feita (13/10/2026), sem subida de esquema (segue v6).** O leitor ganhou "Verificar atualização" (só em norma com endereço oficial; `VerificarAtualizacao.tsx`, `dominios/legislacao/verificacao.ts`). Busca a página pelo Worker (`buscarPagina`), sanitiza e compara com a versão vigente: (1) hash da fonte igual → "nenhuma alteração detectada"; (2) nota de vigência mais recente (lei + ano, D16) mais nova que a registrada → "há indício: Lei X, de AAAA" com link para importar de novo; (3) página diferente sem nota nova → "nenhuma alteração de vigência detectada" (em geral formatação). **Só lê:** não cria versão, não troca texto, não grava nada (a troca é decisão do Gabriel, pela importação ou pela correção versionada da 11.7). Sem rede ou falha do Worker: aviso em português, a norma segue igual. **Verificado (mocks/fixtures):** `npm run check` verde (1646 testes; unitário do domínio e da tela com `fetch` simulado); E2E nos 3 aparelhos verde (LEP do corpus: página igual e página com lei nova, axe), exceto um teste de posição da 13.5 que falhou uma vez no celular sob carga e passou ao rodar sozinho nos 3. **Só com rede, por conta do Gabriel:** em norma importada por endereço no app publicado (LEP, CF, CC), clicar "Verificar atualização" e conferir "igual"; o Planalto/ALESP não foram alcançados nesta sessão. Suposições (reversíveis): a verificação não é guardada (sem "última verificação" persistida, para não subir esquema); "importar de novo" leva à tela Importar (criar nova versão da mesma norma e o diff completo seguem para a F6); norma sem endereço oficial não mostra o botão. Atividade seguinte: **7 (13.4, portão da F2, documento)**.
 
@@ -51,8 +51,8 @@ Passagem de bastão (Frases 1): Tarefa 4b · Branch `claude/frases-1` · Último
 | ✔ 6 | 12.3 Campo URL feita (13/10/2026, mocks; teste real com rede é do Gabriel) | — | — |
 | ✔ 6b | Verificar atualização pelo aparelho feita (13/10/2026, mocks; teste real com rede é do Gabriel) | — | — |
 | ✔ 7 | 13.4 Portão da F2 feito (13/10/2026), em [`portoes/F2.md`](portoes/F2.md); portão aberto, itens "não medidos" listados | — | — |
-| 8 | Uso real: 2 semanas lendo lei no Arretado | — | **Gabriel** |
-| 9 | Planejamento da F3 | **Opus 5.5** | nuvem, só depois do portão |
+| — | ~~Uso real: 2 semanas~~ → V1 | — | — |
+| 9 | F3-A em pacotes paralelos + F3-B prep (`planos/f3-pacotes.md`) | **Opus 5.5** | nuvem, liberado |
 
 Sem bloquear: lotes com rede (SV 30, 3b/3d; normas a converter: 59 de 63 feitas em 13/10/2026, faltam os provimentos CGJ-TJSP 18/2012, 16/2013 e 21/2013 e a Res. CONDEGE 1/2024, ver `acervo/a-converter.md`) e busca de súmula pelo índice (Sonnet 5.5 médio, nuvem). Relato de problema do uso real fura a fila.
 
