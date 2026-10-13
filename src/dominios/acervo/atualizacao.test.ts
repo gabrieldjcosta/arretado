@@ -221,6 +221,31 @@ describe('atualizarItem', () => {
     repo.fechar();
   });
 
+  it('o grifo já pendente (de versão mais antiga) tenta de novo e volta ao texto', async () => {
+    const { repo, fonte2, e2, normaId, id } = await montar([
+      no('art1', 'Primeiro artigo com texto longo.'),
+      no('art2', 'O segundo artigo voltou.'),
+    ]);
+    const pendente = await repo.colecao('marcacoes').criar({
+      normaId,
+      dispositivoId: id('art2'),
+      versaoId: '00000000-0000-4000-8000-000000000001',
+      tipo: 'grifo',
+      cor: 1,
+      ancora: { texto: 'segundo artigo voltou', inicio: 0, fim: 21 },
+      status: 'pendente',
+    });
+    const r = await atualizarItem(repo, fonte2, e2);
+    if (r.estado !== 'atualizada') throw new Error('não atualizou');
+    expect(r.marcacoesPendentes).toBe(0);
+    expect(await repo.colecao('marcacoes').obter(pendente.id)).toMatchObject({
+      status: 'reancorada',
+      versaoId: r.versaoId,
+      ancora: { inicio: 2, fim: 23 },
+    });
+    repo.fechar();
+  });
+
   it('recusa item que não foi adicionado', async () => {
     const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
     const fonte = await FonteEmMemoria.criar([{ item: item(2, [no('art1', 'x')]) }]);

@@ -60,3 +60,35 @@ describe('reancorar (exata → aproximada → pendente)', () => {
     expect(reancorar({ texto: '', inicio: 0, fim: 0 }, 'abc')).toEqual({ status: 'pendente' });
   });
 });
+
+describe('reancorar com o texto de antes (revisão das etapas 8, 9 e 11)', () => {
+  const antigo = 'A lei diz que a lei vale.';
+  // O grifo é a segunda "lei" (posição 16).
+  const ancora = { texto: 'lei', inicio: 16, fim: 19 };
+
+  it('texto inserido antes do grifo: segue o deslocamento, não a ocorrência mais perto', () => {
+    const novo = 'Primeiro: A lei nova diz que a lei vale.';
+    expect(reancorar(ancora, novo, antigo)).toMatchObject({
+      status: 'reancorada',
+      modo: 'exata',
+      inicio: 31,
+      fim: 34,
+    });
+    // Sem o texto de antes, cai na "lei" errada (a mais perto das posições antigas).
+    expect(reancorar(ancora, novo)).toMatchObject({ inicio: 12 });
+  });
+
+  it('mudança depois do grifo: fica no mesmo lugar', () => {
+    expect(reancorar(ancora, 'A lei diz que a lei vale sempre.', antigo)).toMatchObject({
+      status: 'valida',
+      inicio: 16,
+    });
+  });
+
+  it('mudança dentro do grifo: volta ao caminho de sempre', () => {
+    expect(reancorar(ancora, 'A lei diz que a regra vale.', antigo)).toMatchObject({
+      status: 'reancorada',
+      inicio: 2,
+    });
+  });
+});

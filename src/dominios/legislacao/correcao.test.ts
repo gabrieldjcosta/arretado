@@ -380,3 +380,28 @@ describe('trechosCorrigidos', () => {
     expect(trechosCorrigidos(antigos, 'Art. 5º Ver a Lei nº 1 e o texto revogado.')).toBe(antigos);
   });
 });
+
+describe('correção do texto publicado: revisão das etapas 8, 9 e 11', () => {
+  it('texto inserido antes do grifo curto: o grifo segue a edição, não a ocorrência mais perto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    // O "de" de "decisão" (o último do artigo).
+    const inicio = art1.texto.lastIndexOf('de');
+    const grifo = await criarGrifo(
+      repo,
+      { normaId, versaoId, dispositivoId: art1.dispositivoId, inicio, fim: inicio + 2 },
+      1,
+    );
+    const inserido = ', em todo o território nacional,';
+    const corrigido = art1.texto.replace('A execução penal', `A execução penal${inserido}`);
+
+    await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: corrigido },
+    ]);
+
+    const depois = await repo.colecao('marcacoes').obter(grifo.id);
+    expect(depois?.ancora.inicio).toBe(inicio + inserido.length);
+    expect(corrigido.slice(inicio + inserido.length).startsWith('decisão')).toBe(true);
+  });
+});

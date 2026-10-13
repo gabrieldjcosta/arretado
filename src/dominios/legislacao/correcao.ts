@@ -283,7 +283,12 @@ async function gravarVersaoCorrigida(
         await repo.colecao('marcacoes').atualizar(m.id, { versaoId });
         continue;
       }
-      const r = reancorar(m.ancora, textoDosTrechos(novos ?? atual.trechos));
+      // A âncora da versão de antes foi medida no texto atual: a edição a desloca com exatidão.
+      const r = reancorar(
+        m.ancora,
+        textoDosTrechos(novos ?? atual.trechos),
+        m.status === 'pendente' ? undefined : textoDosTrechos(atual.trechos),
+      );
       if (r.status === 'pendente') {
         pendentes += 1;
         if (m.status !== 'pendente') {
