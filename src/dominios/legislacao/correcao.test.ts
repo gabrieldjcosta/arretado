@@ -109,6 +109,7 @@ describe('correção do texto publicado (11.7)', () => {
       {
         versaoId,
         capturadaEm: expect.any(String) as string,
+        substituidoEm: expect.any(String) as string,
         origemEntrada: 'html',
         texto: art1.texto,
       },
@@ -403,5 +404,27 @@ describe('correção do texto publicado: revisão das etapas 8, 9 e 11', () => {
     const depois = await repo.colecao('marcacoes').obter(grifo.id);
     expect(depois?.ancora.inicio).toBe(inicio + inserido.length);
     expect(corrigido.slice(inicio + inserido.length).startsWith('decisão')).toBe(true);
+  });
+});
+
+describe('texto de antes: revisão das etapas 8, 9 e 11', () => {
+  it('depois de desfazer, o texto igual ao de agora sai da lista; "até" é a data da troca', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const { normaId, versaoId } = await publicada(repo);
+    const art1 = await textoDe(repo, normaId, 'art1');
+    relogio.avancar(60_000);
+    const corrigida = await corrigirTextoPublicado(repo, normaId, versaoId, [
+      { dispositivoId: art1.dispositivoId, texto: 'Art. 1º Outro.' },
+    ]);
+    const lista1 = await textosAnteriores(repo, normaId, art1.dispositivoId);
+    const versoes = await repo.colecao('versoesNorma').todosDoUsuario();
+    const nova = versoes.find((v) => v.id === corrigida.versaoId);
+    expect(lista1).toMatchObject([{ versaoId, substituidoEm: nova?.capturadaEm }]);
+
+    relogio.avancar(60_000);
+    await voltarParaVersao(repo, normaId, corrigida.versaoId, versaoId);
+    const lista2 = await textosAnteriores(repo, normaId, art1.dispositivoId);
+    // Só o "Outro." (o original é o texto de agora).
+    expect(lista2.map((t) => t.versaoId)).toEqual([corrigida.versaoId]);
   });
 });

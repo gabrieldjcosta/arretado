@@ -404,6 +404,8 @@ export interface TextoDeAntes {
   versaoId: string;
   /** Quando a versão de antes foi gravada (ISO). */
   capturadaEm: string;
+  /** Quando esse texto deixou de valer: a gravação da versão seguinte (ISO). */
+  substituidoEm: string;
   origemEntrada: VersaoDeNorma['origemEntrada'];
   texto: string;
 }
@@ -436,18 +438,27 @@ export async function textosAnteriores(
     return t ? [{ t, v }] : [];
   });
   const saida: TextoDeAntes[] = [];
-  let depois: string | undefined;
+  // O texto de agora fica de fora mesmo numa versão antiga (depois de desfazer, ela repete o atual).
+  const vigente = comVersao.find(({ v }) => v.status === 'vigente');
+  const atual = vigente ? textoDosTrechos(vigente.t.trechos) : undefined;
+  let depois: { texto: string; capturadaEm: string } | undefined;
   for (const { t, v } of comVersao) {
     const texto = textoDosTrechos(t.trechos);
-    if (v.status === 'arquivada' && depois !== undefined && texto !== depois) {
+    if (
+      v.status === 'arquivada' &&
+      depois !== undefined &&
+      texto !== depois.texto &&
+      texto !== atual
+    ) {
       saida.push({
         versaoId: v.id,
         capturadaEm: v.capturadaEm,
+        substituidoEm: depois.capturadaEm,
         origemEntrada: v.origemEntrada,
         texto,
       });
     }
-    depois = texto;
+    depois = { texto, capturadaEm: v.capturadaEm };
   }
   return saida;
 }
