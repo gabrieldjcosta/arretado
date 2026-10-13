@@ -1,11 +1,13 @@
 // Grifos e notas no leitor (F2, 11.4): as ações do grupo fixo enquanto há trecho selecionado (ou
 // grifo escolhido) e o diálogo da nota. O estado das marcações fica em `usarMarcacoes.ts`.
-import { useState, type SyntheticEvent } from 'react';
+import { useRef, useState, type SyntheticEvent } from 'react';
 import { CORES_DO_GRIFO, type CorDoGrifo } from '../../dominios/legislacao/marcacoes';
 import { Dialogo } from '../componentes/Dialogo';
 
 /** O texto da âncora no diálogo: até aqui, com reticências. */
 const CITACAO_MAXIMA = 240;
+/** O teto do texto da Frase (modelo). */
+const TEXTO_MAXIMO_DA_FRASE = 2_000;
 
 /**
  * As ações do grupo fixo enquanto há trecho selecionado: as 3 cores do grifo (sem nomes) e a nota.
@@ -15,12 +17,14 @@ export function AcoesDaSelecao({
   cortadaEm,
   grifar,
   anotar,
+  enviarAsFrases,
   cancelar,
 }: {
   /** A seleção passava do dispositivo: a referência dele, onde a marcação fica. */
   cortadaEm: string | undefined;
   grifar: (cor: CorDoGrifo) => void;
   anotar: () => void;
+  enviarAsFrases: () => void;
   cancelar: () => void;
 }) {
   return (
@@ -45,6 +49,9 @@ export function AcoesDaSelecao({
       ))}
       <button type="button" onClick={anotar}>
         Nota
+      </button>
+      <button type="button" onClick={enviarAsFrases}>
+        Enviar às frases
       </button>
       <button type="button" aria-label="Cancelar a marcação" onClick={cancelar}>
         ✕
@@ -256,5 +263,93 @@ function ConteudoDaNota({
         </>
       )}
     </>
+  );
+}
+
+/**
+ * "Enviar às frases" (Frases 3): o trecho selecionado vira o texto de uma Frase, que a pessoa pode
+ * encurtar ou reescrever. O link de volta (dispositivo + intervalo) vai junto; só o texto da frase
+ * é obrigatório (D25).
+ */
+export function DialogoEnviarAsFrases({
+  aberto,
+  trecho,
+  enviar,
+  fechar,
+}: {
+  aberto: boolean;
+  /** O texto selecionado, que abre o campo. */
+  trecho: string;
+  enviar: (texto: string) => Promise<boolean>;
+  fechar: () => void;
+}) {
+  return (
+    <Dialogo aberto={aberto} aoFechar={fechar} titulo="Enviar às frases" classe="dialogo-nota">
+      <ConteudoDoEnvio key={trecho} trecho={trecho} enviar={enviar} fechar={fechar} />
+    </Dialogo>
+  );
+}
+
+function ConteudoDoEnvio({
+  trecho,
+  enviar,
+  fechar,
+}: {
+  trecho: string;
+  enviar: (texto: string) => Promise<boolean>;
+  fechar: () => void;
+}) {
+  const [texto, setTexto] = useState(trecho.slice(0, TEXTO_MAXIMO_DA_FRASE));
+  const [ocupado, setOcupado] = useState(false);
+  const [falha, setFalha] = useState(false);
+  const trava = useRef(false);
+
+  async function aoEnviar(e: SyntheticEvent) {
+    e.preventDefault();
+    if (!texto.trim() || trava.current) return;
+    trava.current = true;
+    setOcupado(true);
+    setFalha(false);
+    const deu = await enviar(texto);
+    setOcupado(false);
+    if (deu) fechar();
+    else {
+      trava.current = false;
+      setFalha(true);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        void aoEnviar(e);
+      }}
+    >
+      <label className="campo-da-nota">
+        Frase
+        <textarea
+          value={texto}
+          rows={4}
+          maxLength={TEXTO_MAXIMO_DA_FRASE}
+          autoFocus
+          onChange={(e) => {
+            setTexto(e.target.value);
+          }}
+        />
+      </label>
+      {falha && (
+        <p role="alert" className="aviso falha">
+          Não foi possível enviar. Tente de novo; nada foi perdido.
+        </p>
+      )}
+      <div className="linha-acoes">
+        <button type="submit" className="principal" disabled={!texto.trim() || ocupado}>
+          Enviar
+        </button>
+        <button type="button" onClick={fechar}>
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 }
