@@ -2206,3 +2206,18 @@ dialog.dialogo-previa .linha-acoes button {
   font-size: 0.85rem;
   color: var(--texto-atenuado);
 }
+
+/* ── Revisão, apresentação (direção do protótipo, adequada ao plano): o cartão é a única coisa
+   no palco, com a frente em fonte de leitura e respiro maior fora do celular. ─────────────── */
+.drill-frente {
+  font-family: var(--fonte-leitura);
+}
+
+@media (min-width: 700px) {
+  .cartao-drill {
+    max-width: 40rem;
+    margin-inline: auto;
+    padding: 2.5rem 2rem;
+    box-shadow: var(--sombra);
+  }
+}
