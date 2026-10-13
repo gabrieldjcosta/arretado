@@ -11,12 +11,14 @@ import { resumoDoRecall } from './carregadores';
 export const SEGUNDOS_POR_CARTAO = 30;
 
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
+const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
 
 /** Recall: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas (Parte 2 §9.2). */
 export function RecallInicio() {
   const { dados } = useDados(resumoDoRecall);
   const [avisoDispensado, setAvisoDispensado] = useState(false);
   const vencidos = dados?.vencidos ?? 0;
+  const frasesVencidas = dados?.frasesVencidas ?? 0;
   const cota = dados?.cota ?? 10;
   const lote = Math.min(cota, vencidos);
   const minutos = Math.max(1, Math.ceil((lote * SEGUNDOS_POR_CARTAO) / 60));
@@ -32,12 +34,25 @@ export function RecallInicio() {
           rotuloBotao="Começar"
           para="/recall/revisar"
         />
+      ) : frasesVencidas > 0 ? (
+        <AcaoAgora
+          titulo={`Revisar ${frases(Math.min(cota, frasesVencidas))}`}
+          rotuloBotao="Começar"
+          para="/recall/frases/revisar"
+        />
       ) : (
         <AcaoAgora
           titulo={dados?.primeiroUso ? 'Registre seu primeiro erro' : 'Registrar um erro'}
           rotuloBotao="Registrar erro"
           para="/recall/registrar"
         />
+      )}
+      {vencidos > 0 && frasesVencidas > 0 && (
+        <p>
+          <Link to="/recall/frases/revisar" className="botao">
+            Revisar frases ({frasesVencidas})
+          </Link>
+        </p>
       )}
       {vencidos > cota && (
         <p className="dica">

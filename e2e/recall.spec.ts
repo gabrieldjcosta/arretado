@@ -44,10 +44,10 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 
-  // Lista passiva.
   await page.goto('/#/recall/frases');
+  // Lista passiva.
   await expect(
-    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.' }),
+    page.getByRole('link', { name: 'Livramento exige requisitos do art. 83 do CP.', exact: true }),
   ).toBeVisible();
 
   expect(externas).toEqual([]);
@@ -175,4 +175,49 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
   await page.goto('/#/recall');
   await page.reload();
   await expect(page.getByText('1 dos últimos 7 dias')).toBeVisible();
+});
+
+test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', async ({ page }) => {
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  await page.goto('/#/recall/registrar');
+  await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+
+  // Cartão com lacuna: seleciona "art. 83" e esconde.
+  await page.goto('/#/recall/frases');
+  await page.getByRole('link', { name: /^Esconder trecho:/ }).click();
+  await expect(page.getByRole('heading', { name: 'Esconder trecho' })).toBeVisible();
+  await page.getByLabel('Texto da frase').evaluate((el: HTMLTextAreaElement) => {
+    const i = el.value.indexOf('art. 83');
+    el.focus();
+    el.setSelectionRange(i, i + 'art. 83'.length);
+  });
+  await page.getByRole('button', { name: 'Esconder seleção' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Como vai aparecer' }).getByText(/requisitos do \[…\] do CP/),
+  ).toBeVisible();
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Criar cartão' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Recall' })).toBeVisible();
+
+  // Dia seguinte: a Frase e o cartão vencem; cada modo revisa o seu.
+  await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
+  await page.goto('/#/recall');
+  await page.reload();
+  await expect(page.getByRole('link', { name: /^Revisar frases \(1\)$/ })).toBeVisible();
+  await page.getByRole('link', { name: /^Revisar frases/ }).click();
+  await expect(page.getByText('Livramento exige requisitos do art. 83 do CP.')).toBeVisible();
+  await semViolacoes(page);
+  await page.keyboard.press('1');
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+
+  await page.goto('/#/recall/revisar');
+  await expect(page.getByText('Livramento exige requisitos do […] do CP.')).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(page.getByText('Frase completa')).toBeVisible();
+  await semViolacoes(page);
+  await page.keyboard.press('3');
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 });

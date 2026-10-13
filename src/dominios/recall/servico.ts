@@ -1,9 +1,17 @@
 // Serviço do Recall (Parte 1 §6; Parte 2 §8.2 e §10.4–10.5). Recall é totalmente isolado:
 // só depende do core. Eventos saem depois da escrita confirmada.
 import { dataCivil, somarDias } from '../../core/datas';
-import type { Cartao, Erro, Frase, RespostaRevisao, Revisao } from '../../core/modelo';
+import type {
+  Cartao,
+  Erro,
+  Frase,
+  Intervalo,
+  RespostaFrase,
+  RespostaRevisao,
+  Revisao,
+} from '../../core/modelo';
 import type { Alteracoes, Dados, Pagina, Repositorio } from '../../core/persistencia';
-import { agendar } from './agendamento';
+import { agendar, agendarFrase } from './agendamento';
 import { ACAO_RECOMENDADA, completude, sugerirCausa } from './causa';
 
 export function hoje(repo: Repositorio): string {
@@ -524,4 +532,127 @@ export async function maiorFilaProjetada(repo: Repositorio): Promise<number> {
     cursor = p.proximoCursor;
   } while (cursor);
   return Math.max(0, ...porDia.values());
+}
+
+// ── Revisar frases e cartão com lacuna (Frases 2) ─────────────────────────
+
+/** Fila de Revisar frases: Frases ativas com revisão até hoje, da mais atrasada para a menos. */
+export async function filaDeFrases(repo: Repositorio, maximo = 1_000): Promise<Frase[]> {
+  const u = repo.ctx.usuarioId;
+  const itens: Frase[] = [];
+  let cursor: string | null = null;
+  do {
+    const p: Pagina<Frase> = await repo.colecao('frases').listarPagina({
+      indice: '[usuarioId+estado+proximaRevisao]',
+      de: [u, 'ativa', ''],
+      ate: [u, 'ativa', hoje(repo)],
+      limite: 200,
+      cursor,
+    });
+    itens.push(...p.itens);
+    cursor = p.proximoCursor;
+  } while (cursor && itens.length < maximo);
+  return itens.slice(0, maximo);
+}
+
+export function contarFrasesVencidas(repo: Repositorio): Promise<number> {
+  const u = repo.ctx.usuarioId;
+  return repo.colecao('frases').contar({
+    indice: '[usuarioId+estado+proximaRevisao]',
+    de: [u, 'ativa', ''],
+    ate: [u, 'ativa', hoje(repo)],
+  });
+}
+
+/** Registra a revisão da Frase (append-only) e a reagenda, atomicamente. */
+export async function revisarFrase(
+  repo: Repositorio,
+  fraseId: string,
+  resposta: RespostaFrase,
+  opcoes: { duracaoMs?: number } = {},
+) {
+  const dia = hoje(repo);
+  const resultado = await repo.transacao(async () => {
+    const frase = await repo.colecao('frases').obter(fraseId);
+    if (!frase) throw new Error('Esta frase não existe mais.');
+    if (frase.estado !== 'ativa') throw new Error('Esta frase não está na fila.');
+    const a = agendarFrase(frase, resposta, dia);
+    const em = repo.ctx.agora().toISOString();
+    const revisao = await repo.colecao('revisoesFrase').criar({
+      fraseId,
+      em,
+      data: dia,
+      resposta,
+      proximaAntes: frase.proximaRevisao,
+      proximaDepois: a.proximaDepois,
+      atrasoDias: a.atrasoDias,
+      ...(opcoes.duracaoMs !== undefined ? { duracaoMs: Math.round(opcoes.duracaoMs) } : {}),
+    });
+    const atualizada = await repo.colecao('frases').atualizar(fraseId, {
+      proximaRevisao: a.proximaDepois,
+      ultimaRevisao: em,
+    });
+    return { frase: atualizada, revisao };
+  });
+  repo.eventos.emitir('frase.revisada', { fraseId, revisaoId: resultado.revisao.id });
+  return resultado;
+}
+
+export const MARCA_DE_LACUNA = '[…]';
+
+/** Une intervalos que se tocam ou se sobrepõem, em ordem, limitados ao texto. */
+export function normalizarOcultos(texto: string, ocultos: readonly Intervalo[]): Intervalo[] {
+  const ordenados = ocultos
+    .map((i) => ({ inicio: Math.max(0, i.inicio), fim: Math.min(texto.length, i.fim) }))
+    .filter((i) => i.fim > i.inicio)
+    .sort((a, b) => a.inicio - b.inicio);
+  const unidos: Intervalo[] = [];
+  for (const i of ordenados) {
+    const ultimo = unidos[unidos.length - 1];
+    if (ultimo && i.inicio <= ultimo.fim) ultimo.fim = Math.max(ultimo.fim, i.fim);
+    else unidos.push({ ...i });
+  }
+  return unidos;
+}
+
+/** O texto com cada trecho oculto trocado por `[…]` (a frente do cartão com lacuna). */
+export function textoComLacunas(texto: string, ocultos: readonly Intervalo[]): string {
+  let saida = '';
+  let pos = 0;
+  for (const i of normalizarOcultos(texto, ocultos)) {
+    saida += texto.slice(pos, i.inicio) + MARCA_DE_LACUNA;
+    pos = i.fim;
+  }
+  return saida + texto.slice(pos);
+}
+
+/**
+ * Cartão com lacuna a partir de uma Frase: a frente é o texto com os trechos escondidos, o verso é
+ * o texto inteiro. Todos os trechos escolhidos somem de uma vez, num só cartão (suposição das
+ * Frases 2); para esconder um de cada vez, crie um cartão por trecho.
+ */
+export async function criarCartaoDeLacuna(
+  repo: Repositorio,
+  fraseId: string,
+  ocultos: readonly Intervalo[],
+): Promise<Cartao> {
+  const frase = await repo.colecao('frases').obter(fraseId);
+  if (!frase) throw new Error('Esta frase não existe mais.');
+  const unidos = normalizarOcultos(frase.texto, ocultos);
+  if (unidos.length === 0) throw new Error('Selecione o trecho que você quer esconder.');
+  const cartao = await repo.colecao('cartoes').criar({
+    frente: textoComLacunas(frase.texto, unidos),
+    verso: frase.texto,
+    origemTipo: 'frase',
+    origemId: frase.id,
+    fraseId: frase.id,
+    tipo: 'lacuna',
+    ocultos: unidos,
+    ...(frase.pontoId ? { pontoId: frase.pontoId } : {}),
+    estado: 'ativo',
+    caixa: 1,
+    proximaRevisao: somarDias(hoje(repo), 1),
+  });
+  repo.eventos.emitir('cartao.criado', { cartaoId: cartao.id });
+  return cartao;
 }

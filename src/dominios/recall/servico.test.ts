@@ -3,13 +3,16 @@ import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   arquivarCartao,
   completarErro,
+  contarFrasesVencidas,
   contarVencidos,
+  criarCartaoDeLacuna,
   criarCartaoDeDispositivo,
   criarCartaoDeErro,
   criarCartaoManual,
   diasComRevisao,
   editarCartao,
   excluirErro,
+  filaDeFrases,
   filaDoDia,
   fraseDoErro,
   historicoRevisoes,
@@ -18,9 +21,11 @@ import {
   listarFrases,
   maiorFilaProjetada,
   reativarCartao,
+  revisarFrase,
   registrarErro,
   revisar,
   suspenderCartao,
+  textoComLacunas,
   vencemAmanha,
   versoEfetivo,
 } from './servico';
@@ -417,5 +422,76 @@ describe('dias com revisão nos últimos 7 (fatia 3)', () => {
     await revisar(outro, d.id, 'errei');
     relogio.avancar(2 * 3_600_000); // 01h30 de 24/09 em SP: o dia 23 é a penúltima marca
     expect(await diasComRevisao(outro)).toEqual([false, false, false, false, false, true, false]);
+  });
+});
+
+describe('Revisar frases e cartão com lacuna (Frases 2)', () => {
+  it('fila: a Frase nova vence amanhã; "li" registra a revisão e reagenda; "de novo" volta amanhã', async () => {
+    const { repo, relogio, eventos } = await preparar();
+    const erro0 = await registrarErro(repo, { fraseCorreta: 'A pena é de 6 meses.' });
+    const frase = (await fraseDoErro(repo, erro0.id))!;
+    expect(await filaDeFrases(repo)).toEqual([]);
+    expect(await contarFrasesVencidas(repo)).toBe(0);
+    relogio.avancar(DIA);
+    expect((await filaDeFrases(repo)).map((f) => f.id)).toEqual([frase.id]);
+
+    const li = await revisarFrase(repo, frase.id, 'li', { duracaoMs: 1234.4 });
+    expect(li.revisao).toMatchObject({ fraseId: frase.id, resposta: 'li', duracaoMs: 1234 });
+    expect(li.frase.proximaRevisao > li.revisao.data).toBe(true);
+    expect(await filaDeFrases(repo)).toEqual([]);
+    expect(eventos.some((e) => e.nome === 'frase.revisada')).toBe(true);
+
+    relogio.avancar(10 * DIA);
+    const denovo = await revisarFrase(repo, frase.id, 'de_novo');
+    expect(denovo.revisao.atrasoDias).toBeGreaterThan(0);
+    expect(await repo.colecao('revisoesFrase').contar()).toBe(2);
+    relogio.avancar(DIA);
+    expect(await contarFrasesVencidas(repo)).toBe(1);
+  });
+
+  it('frase arquivada não entra na fila nem é revisada', async () => {
+    const { repo, relogio } = await preparar();
+    const erro0 = await registrarErro(repo, { fraseCorreta: 'X.' });
+    const frase = (await fraseDoErro(repo, erro0.id))!;
+    await repo.colecao('frases').atualizar(frase.id, { estado: 'arquivada' });
+    relogio.avancar(2 * DIA);
+    expect(await filaDeFrases(repo)).toEqual([]);
+    await expect(revisarFrase(repo, frase.id, 'li')).rejects.toThrow(/não está na fila/);
+  });
+
+  it('textoComLacunas une trechos que se tocam e ignora o que passa do texto', () => {
+    const t = 'abcdefghij';
+    expect(textoComLacunas(t, [{ inicio: 2, fim: 4 }])).toBe('ab[…]efghij');
+    expect(
+      textoComLacunas(t, [
+        { inicio: 6, fim: 8 },
+        { inicio: 2, fim: 5 },
+        { inicio: 4, fim: 6 },
+      ]),
+    ).toBe('ab[…]ij');
+    expect(textoComLacunas(t, [{ inicio: 8, fim: 99 }])).toBe('abcdefgh[…]');
+    expect(textoComLacunas(t, [])).toBe(t);
+  });
+
+  it('cria o cartão com lacuna: frente escondida, verso inteiro, vínculo com a Frase', async () => {
+    const { repo } = await preparar();
+    const erro = await registrarErro(repo, {
+      fraseCorreta: 'A pena é de 6 meses.',
+      oQueFoi: 'pergunta',
+    });
+    const frase = (await fraseDoErro(repo, erro.id))!;
+    const c = await criarCartaoDeLacuna(repo, frase.id, [{ inicio: 10, fim: 18 }]);
+    expect(c).toMatchObject({
+      frente: 'A pena é d[…]s.',
+      verso: 'A pena é de 6 meses.',
+      tipo: 'lacuna',
+      origemTipo: 'frase',
+      fraseId: frase.id,
+      ocultos: [{ inicio: 10, fim: 18 }],
+    });
+    // O cartão da lacuna não toma o lugar do cartão do erro.
+    const doErro = await criarCartaoDeErro(repo, erro.id);
+    expect(doErro.id).not.toBe(c.id);
+    await expect(criarCartaoDeLacuna(repo, frase.id, [])).rejects.toThrow(/Selecione/);
   });
 });
