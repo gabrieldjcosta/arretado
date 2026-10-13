@@ -62,10 +62,12 @@ export const SECOES: Secao[] = [
   },
   {
     id: 'privacidade',
-    titulo: 'Privacidade e segurança (política v1)',
+    titulo: 'Privacidade e segurança (política v2)',
     paragrafos: [
       'Guardamos só o que você registra para estudar e as suas preferências. O relato de problema leva apenas a sua descrição, a tela, a versão do app e o aparelho — nunca conteúdo de estudo.',
       'Texto colado de páginas externas é limpo antes de ser usado: nenhum script ou formatação escondida é executado.',
+      'Importar uma lei por endereço (URL) envia só o endereço da lei, para o servidor do Arretado na Cloudflare, que busca a página no site de origem (Planalto ou ALESP). Esses dois serviços podem registrar a chamada, como qualquer acesso a um site; nenhum dado de estudo sai do aparelho nessa busca. Só endereços do Planalto e da ALESP são aceitos, e o tamanho de cada importação é limitado.',
+      'Colar a lei não envia nada a ninguém: a página é limpa e guardada só neste aparelho.',
       'Você pode exportar tudo e apagar tudo a qualquer momento em Conta › Dados.',
       'Quando existir login e sincronização (fase futura), esta política será atualizada e você será avisado antes de qualquer dado sair do aparelho.',
     ],
