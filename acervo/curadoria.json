@@ -3345,6 +3345,412 @@
         "urlOficial": "https://www.gov.br/senappen/pt-br/composicao/cnpcp/resolucoes/2011/resolucao-no-4-de-29-de-junho-de-2011.pdf"
       },
       "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-63-2008",
+      "titulo": "Deliberação CSDP 63/2008 - Autonomia funcional, independência funcional, parâmetros mínimos de qualidade, teses institucionais, recomendações e rotinas administrativas",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-63-2008.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/644904"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-89-2008",
+      "titulo": "Deliberação CSDP 89/2008 - Hipóteses de denegação de atendimento (hipossuficiência econômica)",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-89-2008.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/6391469"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "estrutural_repetido",
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-120-2009",
+      "titulo": "Deliberação CSDP 120/2009 - Pré-encontros temáticos e Encontro Anual de Defensores Públicos (teses institucionais)",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [
+        "Revogada pela Deliberação CSDP 406/2022; o texto aparece tachado."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-120-2009.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/644277"
+      },
+      "anomaliasAceitas": [
+        "tachado_sem_dispositivo",
+        "linha_solta",
+        "artigo_so_tachado"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-134-2009",
+      "titulo": "Deliberação CSDP 134/2009 - Cobrança de honorários de sucumbência arbitrados pela autoridade judicial",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-134-2009.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/644123"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-187-2010",
+      "titulo": "Deliberação CSDP 187/2010 - Estrutura e funcionamento dos Centros de Atendimento Multidisciplinar (CAM)",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [
+        "A fonte repete o art. 5º (duas redações); vale a última."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-187-2010.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/643540"
+      },
+      "anomaliasAceitas": [
+        "linha_continuada",
+        "duplicata",
+        "paragrafo_1_sem_2"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-219-2011",
+      "titulo": "Deliberação CSDP 219/2011 - Atendimento ao usuário em sofrimento ou com transtorno mental",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-219-2011.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/643181"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-249-2012",
+      "titulo": "Deliberação CSDP 249/2012 - Atendimento diferenciado a pessoas idosas, com deficiência ou TGD",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-249-2012.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642851"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-270-2013",
+      "titulo": "Deliberação CSDP 270/2013 - Comissão de Prerrogativas da Defensoria Pública",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-270-2013.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642620"
+      },
+      "anomaliasAceitas": [
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-291-2014",
+      "titulo": "Deliberação CSDP 291/2014 - Política institucional de atendimento às mulheres presas (gestação segura e maternidade)",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-291-2014.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642389"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-296-2014",
+      "titulo": "Deliberação CSDP 296/2014 - Metodologia institucional de inspeções de monitoramento das condições materiais de aprisionamento",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-296-2014.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642345"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "duplicata"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-297-2014",
+      "titulo": "Deliberação CSDP 297/2014 - Política institucional de atendimento às pessoas presas provisoriamente",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-297-2014.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642323"
+      },
+      "anomaliasAceitas": [
+        "linha_continuada",
+        "alinea_sem_inciso"
+      ]
+    },
+    {
+      "id": "deliberacao-csdp-373-2020",
+      "titulo": "Deliberação CSDP 373/2020 - Lista tríplice e escolha do/a Ouvidor/a-Geral",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-373-2020.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/641487"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "deliberacao-csdp-400-2022",
+      "titulo": "Deliberação CSDP 400/2022 - Reservas de vagas para ações afirmativas em concursos e seleções",
+      "grupo": "Deliberações do CSDP",
+      "tipo": "Deliberação",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "deliberacao-csdp-400-2022.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/4224928"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "ato-normativo-dpg-216-2022",
+      "titulo": "Ato Normativo DPG 216/2022 - Precedentes qualificados e Comitê de Precedentes Qualificados (CPQ)",
+      "grupo": "Atos da DPG",
+      "tipo": "Ato normativo",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "ato-normativo-dpg-216-2022.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/4221663"
+      },
+      "anomaliasAceitas": [
+        "duplicata"
+      ]
+    },
+    {
+      "id": "ato-normativo-dpg-295-2025",
+      "titulo": "Ato Normativo DPG 295/2025 - Política de Comunicação Social da DPESP",
+      "grupo": "Atos da DPG",
+      "tipo": "Ato normativo",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "ato-normativo-dpg-295-2025.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/6339583"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "ato-normativo-dpg-183-2020",
+      "titulo": "Ato Normativo DPG 183/2020 - Encarregado pelo Tratamento de Dados Pessoais (LGPD)",
+      "grupo": "Atos da DPG",
+      "tipo": "Ato normativo",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [
+        "Consta como revogado no portal da Defensoria (o ato revogador não é informado); conferir com o edital."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "ato-normativo-dpg-183-2020.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/646635"
+      },
+      "anomaliasAceitas": [
+        "tachado_sem_dispositivo",
+        "linha_solta",
+        "artigo_so_tachado"
+      ]
+    },
+    {
+      "id": "ato-normativo-dpg-146-2018",
+      "titulo": "Ato Normativo DPG 146/2018 - Política de Prevenção e Enfrentamento do Assédio Moral e Sexual e da Discriminação",
+      "grupo": "Atos da DPG",
+      "tipo": "Ato normativo",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        },
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "ato-normativo-dpg-146-2018.md",
+        "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/647042"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "portaria-ms-1130-2015",
+      "titulo": "Portaria GM/MS 1.130/2015 - PNAISC (Política Nacional de Atenção Integral à Saúde da Criança)",
+      "grupo": "Resoluções dos conselhos",
+      "tipo": "Portaria",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [
+        "Texto reproduzido pelo CONASS: a BVS/Ministério da Saúde bloqueia o download automático; conferir com o DOU de 06/08/2015."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "portaria-ms-1130-2015.md",
+        "urlOficial": "https://bvsms.saude.gov.br/bvs/saudelegis/gm/2017/MatrizesConsolidacao/comum/13148.html"
+      },
+      "anomaliasAceitas": []
     }
   ]
 }

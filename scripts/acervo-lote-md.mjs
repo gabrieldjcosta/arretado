@@ -5,6 +5,7 @@
 //   urlOficial, cnj? (página do ato), pdfModo? ("original"), pdf? (URL direta), manual? (Markdown já transcrito à mão; só registra), cortarEm? (regex: o texto
 //   acaba na primeira linha que casar, para deixar o anexo de fora), semArtigos?, anomaliasAceitas? }.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { htmlParaTexto } from './acervo-html-para-md.mjs';
 import { baixar, comTitulos, limpar, pdfDoCnj, pdfParaTexto } from './acervo-pdf-para-md.mjs';
 
 const [, , caminho, flag, lista] = process.argv;
@@ -17,7 +18,19 @@ for (const m of manifesto) {
   try {
     let texto = '';
     let url = m.pdf ?? (m.cnj ? await pdfDoCnj(m.cnj, m.pdfModo) : null);
-    if (m.manual) {
+    if (m.html) {
+      url = m.html;
+      texto = htmlParaTexto((await baixar(m.html)).toString('utf8'), m.seletor);
+      if (m.cortarEm) {
+        const i = texto.search(new RegExp(m.cortarEm, 'm'));
+        if (i > 0) texto = texto.slice(0, i).trim();
+      }
+      if (m.semArtigos) texto = comTitulos(texto);
+      if (texto.length < 200) throw new Error(`texto curto (${texto.length})`);
+      writeFileSync(`acervo/fontes/${m.arquivo}`, `# ${m.titulo}
+${texto}
+`);
+    } else if (m.manual) {
       // PDF escaneado: o Markdown já foi transcrito à mão em `acervo/fontes/`; só entra na curadoria.
       url = m.urlOficial;
       texto = readFileSync(`acervo/fontes/${m.arquivo}`, 'utf8');

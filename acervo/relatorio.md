@@ -160,3 +160,21 @@
 | resolucao-cnas-109-2009 | publicado | 13 | 0 | — |
 | resolucao-conjunta-cnas-conanda-1-2009 | publicado | 33 | 0 | — |
 | resolucao-cnpcp-4-2011 | publicado | 11 | 0 | — |
+| deliberacao-csdp-63-2008 | publicado | 15 | 0 | — |
+| deliberacao-csdp-89-2008 | publicado | 110 | 0 | linha_solta: 1; estrutural_repetido: 2; alinea_sem_inciso: 3 |
+| deliberacao-csdp-120-2009 | publicado | 18 | 0 | tachado_sem_dispositivo: 7; linha_solta: 1 |
+| deliberacao-csdp-134-2009 | publicado | 12 | 0 | — |
+| deliberacao-csdp-187-2010 | publicado | 94 | 0 | linha_continuada: 3; duplicata: 12; paragrafo_1_sem_2: 1 |
+| deliberacao-csdp-219-2011 | publicado | 31 | 0 | — |
+| deliberacao-csdp-249-2012 | publicado | 23 | 0 | — |
+| deliberacao-csdp-270-2013 | publicado | 98 | 0 | alinea_sem_inciso: 29 |
+| deliberacao-csdp-291-2014 | publicado | 75 | 0 | — |
+| deliberacao-csdp-296-2014 | publicado | 28 | 0 | linha_solta: 3; duplicata: 1 |
+| deliberacao-csdp-297-2014 | publicado | 66 | 0 | linha_continuada: 2; alinea_sem_inciso: 2 |
+| deliberacao-csdp-373-2020 | publicado | 118 | 0 | — |
+| deliberacao-csdp-400-2022 | publicado | 84 | 0 | — |
+| ato-normativo-dpg-216-2022 | publicado | 41 | 0 | duplicata: 1 |
+| ato-normativo-dpg-295-2025 | publicado | 31 | 0 | — |
+| ato-normativo-dpg-183-2020 | publicado | 3 | 0 | tachado_sem_dispositivo: 4 |
+| ato-normativo-dpg-146-2018 | publicado | 45 | 0 | — |
+| portaria-ms-1130-2015 | publicado | 100 | 0 | — |

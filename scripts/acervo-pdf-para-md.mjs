@@ -42,6 +42,7 @@ const RUIDO = [
 export function normalizar(texto) {
   return texto
     .replace(/[-]/g, '')
+    .replace(/⁰/g, 'º')
     .replace(/(\d)o(?![A-Za-zÀ-ú\d])/g, '$1º')
     .replace(/\b(Lei|Decreto|Resolução|Provimento|Portaria|Recomendação|Deliberação|Convenção|CNJ|CSDP|DPG|CONANDA|CNAS) no (?=\d)/g, '$1 nº ')
     .replace(/\b(RESOLUÇÃO|PROVIMENTO|DELIBERAÇÃO|PORTARIA|RECOMENDAÇÃO|ATO NORMATIVO) No /g, '$1 Nº ')
