@@ -21,7 +21,9 @@ import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { formatarQuando } from '../recall/rotulos';
 import { procedenciaDaVersao } from './rotulos';
+import { disciplinasDaNorma, mudarDisciplinas } from '../../dominios/acervo/vinculos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
+import { EscolherDisciplinas } from './EscolherDisciplinas';
 import { referenciaDoNo } from './linhas';
 
 interface ItemDaDisciplina {
@@ -94,6 +96,7 @@ async function carregarBiblioteca(repo: Repositorio) {
     if (v) procedencias.set(n.id, procedenciaDaVersao(n, v).join(' · '));
   }
   return {
+    nomesDeDisciplinas: disciplinas.map((d) => d.nome),
     normas: soNormas,
     pendentes,
     leituras,
@@ -216,14 +219,25 @@ export function Normas() {
   const navegar = useNavigate();
   const [aviso, setAviso] = useState(() => avisoDaNavegacao(estadoNavegacao));
   const [busca, setBusca] = useState('');
+  const [mudando, setMudando] = useState<{ norma: Norma; atuais: string[] } | null>(null);
+  const [falhaAoMudar, setFalhaAoMudar] = useState<string | null>(null);
   const fonte = useFonteAcervo();
+  // Disciplinas que o acervo conhece: opções do "Mudar disciplina" além das do usuário.
+  const [disciplinasDoAcervo, setDisciplinasDoAcervo] = useState<string[]>([]);
   // Normas do acervo com versão maior no índice: o selo "Há versão nova" (sem rede, nenhum selo).
   const [comVersaoNova, setComVersaoNova] = useState<ReadonlySet<string>>(new Set());
   useEffect(() => {
     let ativo = true;
     fonte
       .listar()
-      .then((indice) => itensComVersaoNova(repo, indice.itens))
+      .then((indice) => {
+        if (ativo) {
+          setDisciplinasDoAcervo([
+            ...new Set(indice.itens.flatMap((i) => i.vinculos.map((v) => v.disciplina))),
+          ]);
+        }
+        return itensComVersaoNova(repo, indice.itens);
+      })
       .then(
         (novas) => {
           if (ativo) setComVersaoNova(new Set(novas.map((n) => n.normaId)));
@@ -412,6 +426,18 @@ export function Normas() {
                                 ? { selo: <Selo>Há versão nova</Selo> }
                                 : {})}
                             />
+                            <button
+                              type="button"
+                              aria-label={`Mudar a disciplina de ${n.tituloCurto}`}
+                              onClick={() => {
+                                setFalhaAoMudar(null);
+                                void disciplinasDaNorma(repo, n.id).then((atuais) => {
+                                  setMudando({ norma: n, atuais });
+                                });
+                              }}
+                            >
+                              Mudar disciplina
+                            </button>
                           </li>
                         );
                       })}
@@ -422,6 +448,29 @@ export function Normas() {
             </>
           )}
         </>
+      )}
+      {mudando && dados && (
+        <EscolherDisciplinas
+          titulo={mudando.norma.tituloCurto}
+          opcoes={[...dados.nomesDeDisciplinas, ...disciplinasDoAcervo]}
+          escolhidas={mudando.atuais}
+          falha={falhaAoMudar}
+          aoFechar={() => {
+            setMudando(null);
+          }}
+          aoConfirmar={(nomes) => {
+            mudarDisciplinas(repo, mudando.norma.id, nomes).then(
+              () => {
+                setAviso(`Disciplina de ${mudando.norma.tituloCurto} atualizada.`);
+                setMudando(null);
+                recarregar();
+              },
+              () => {
+                setFalhaAoMudar('Não foi possível mudar a disciplina. Tente de novo.');
+              },
+            );
+          }}
+        />
       )}
       <Dialogo
         aberto={descartando !== null}

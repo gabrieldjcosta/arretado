@@ -5,6 +5,7 @@ import { atualizarItem, compararComAtual, itensComVersaoNova } from './atualizac
 import { compararArvores, reancorar } from './comparacao';
 import type { ItemDoAcervo, NoDoItem } from './esquemas';
 import { FonteEmMemoria } from './fonte-em-memoria';
+import { disciplinasDaNorma, mudarDisciplinas } from './vinculos';
 
 const nomeBanco = () => `atualizacao-${Math.random().toString(36).slice(2)}`;
 
@@ -218,6 +219,15 @@ describe('atualizarItem', () => {
     expect((await atualizarItem(repo, fonte2, e2)).estado).toBe('em_dia');
     expect(await itensComVersaoNova(repo, [e2])).toEqual([]);
     expect(await repo.colecao('versoesNorma').todosDoUsuario()).toHaveLength(2);
+    repo.fechar();
+  });
+
+  it('a disciplina escolhida pelo usuário sobrevive à atualização', async () => {
+    const { repo, fonte2, e2, normaId } = await montar([no('art1', 'Texto novo.')]);
+    await mudarDisciplinas(repo, normaId, ['Processo Penal', 'Outros']);
+    await mudarDisciplinas(repo, normaId, ['Processo Penal']);
+    await atualizarItem(repo, fonte2, e2);
+    expect(await disciplinasDaNorma(repo, normaId)).toEqual(['Processo Penal']);
     repo.fechar();
   });
 
