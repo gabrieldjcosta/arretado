@@ -103,19 +103,12 @@ test('colar a LEP com todas as redações: as linhas tachadas viram redações a
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();
 });
 
-test('buscar a LEP pelo endereço (rota interceptada), publicar e cair no colar se falhar (12.3)', async ({
-  page,
-}) => {
+test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async ({ page }) => {
   test.setTimeout(120_000);
   const bytes = readFileSync(new URL('../corpus/normas/lep-compilado.html', import.meta.url));
   const pedidos: string[] = [];
-  let falhar = true;
   await page.route('**/api/buscar-norma*', async (rota) => {
     pedidos.push(new URL(rota.request().url()).searchParams.get('url') ?? '');
-    if (falhar) {
-      await rota.fulfill({ status: 502, json: { erro: 'status_erro' } });
-      return;
-    }
     await rota.fulfill({
       status: 200,
       body: bytes,
@@ -134,11 +127,6 @@ test('buscar a LEP pelo endereço (rota interceptada), publicar e cair no colar 
 
   await campo.fill('https://www.planalto.gov.br/ccivil_03/leis/l7210.htm');
   await buscar.click();
-  await expect(page.getByRole('alert')).toContainText('cole abaixo');
-  await expect(page.getByLabel('Cole aqui a lei')).toBeVisible();
-
-  falhar = false;
-  await buscar.click();
   const estrutura = page.getByRole('region', { name: 'Estrutura encontrada' });
   await expect(estrutura).toBeVisible({ timeout: 30_000 });
   await expect(estrutura.locator('.contagens > div').filter({ hasText: 'Artigos' })).toHaveText(
@@ -146,5 +134,24 @@ test('buscar a LEP pelo endereço (rota interceptada), publicar e cair no colar 
   );
   await publicar(page, 'LEP');
   await expect(page.getByRole('region', { name: 'Normas' }).getByText('LEP')).toBeVisible();
-  expect(pedidos).toHaveLength(2);
+  expect(pedidos).toEqual(['https://www.planalto.gov.br/ccivil_03/leis/l7210.htm']);
+});
+
+test.describe('busca que falha (12.3)', () => {
+  // A resposta 502 vira uma linha no console do navegador, de propósito.
+  test.use({ permitirFalhasConsole: true });
+
+  test('a tela avisa e deixa colar; a Biblioteca segue vazia', async ({ page }) => {
+    await page.route('**/api/buscar-norma*', (rota) =>
+      rota.fulfill({ status: 502, json: { erro: 'status_erro' } }),
+    );
+    await page.goto('/#/biblioteca/importar');
+    await page
+      .getByRole('textbox', { name: 'Ou busque pelo endereço da página' })
+      .fill('https://www.planalto.gov.br/ccivil_03/leis/l7210.htm');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText('cole abaixo');
+    await expect(page.getByLabel('Cole aqui a lei')).toBeVisible();
+    await semViolacoes(page);
+  });
 });
