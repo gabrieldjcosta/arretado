@@ -37,15 +37,15 @@
 
 /* Tokens de tema (T10). Contraste AA nos dois temas; alvos de toque ≥ 44 px (Parte 2 §11). */
 :root {
-  --fundo: #f4efe0;
-  --superficie: #fbf8ee;
-  --superficie-2: #ebe5d1;
-  --texto: #2d2a14;
-  --texto-atenuado: #5f5a3c;
-  --borda: #d4ccae;
-  --penumbra: #e6dfc8;
-  --luz-do-cartao: #fbf8ee;
-  --primaria: #4a5a1c;
+  --fundo: #f2f4ef;
+  --superficie: #fafbf8;
+  --superficie-2: #e6eae3;
+  --texto: #1f2a24;
+  --texto-atenuado: #5c6860;
+  --borda: #c5ccc4;
+  --penumbra: #e9ece5;
+  --luz-do-cartao: #fafbf8;
+  --primaria: #3f6b4c;
   --primaria-texto: #ffffff;
   --foco: #b35900;
   --perigo: #a4262c;
@@ -65,25 +65,18 @@
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
   --calha-estrela: 1.5rem;
-  /* Identidade nova (redesign, fatia 1; acabamento, fatia 6): Areia, verde-cacto e caramelo (D-D2, 14/10/2026). O "agora" é um
-     cartão tingido de verde-cacto com borda verde-cacto (também o estado selecionado e o selo); o texto fica
+  /* Identidade nova (redesign, fatia 1; acabamento, fatia 6): Papel, tinta e sálvia. O "agora" é um
+     cartão tingido de sálvia com borda sálvia (também o estado selecionado e o selo); o texto fica
      na tinta. "Depois" é o recuado. Pares medidos em scripts/contraste.mjs. */
-  --agora-fundo: #e8ead0;
-  --agora-borda: #6b7a2c;
-  /* Ação principal e cartão do Agora (D-D2): caramelo sobre verde-cacto; o cacto é o verde da marca. */
-  --acao: #e8892b;
-  --acao-texto: #2d2a14;
-  --cartao-agora-fundo: #3f4a1a;
-  --cartao-agora-texto: #fdf1de;
-  --cartao-agora-atenuado: #d9d3b0;
-  --cacto: #5f7a2c;
+  --agora-fundo: #e3ede5;
+  --agora-borda: #4f7a64;
   --raio-cartao: 20px;
-  --depois: #5f5a3c;
-  --progresso: #6b7a2c;
-  --sombra: 0 10px 28px -14px rgb(45 42 20 / 16%), 0 1px 3px rgb(45 42 20 / 8%);
+  --depois: #5c6860;
+  --progresso: #4f7a64;
+  --sombra: 0 10px 28px -14px rgb(24 34 28 / 16%), 0 1px 3px rgb(24 34 28 / 8%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 90%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
-  --superficie-translucida: rgb(251 248 238 / 90%);
+  --superficie-translucida: rgb(251 252 250 / 90%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -98,16 +91,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #1c1410;
-    --superficie: #251a14;
-    --superficie-2: #2b1f17;
-    --texto: #fdf1de;
-    --texto-atenuado: #b9a897;
-    --borda: #4a382b;
-    --penumbra: #120d0a;
-    --luz-do-cartao: #2b1f17;
-    --primaria: #b9c96a;
-    --primaria-texto: #1c1410;
+    --fundo: #121715;
+    --superficie: #1a211e;
+    --superficie-2: #222b27;
+    --texto: #edf2ef;
+    --texto-atenuado: #9caaa1;
+    --borda: #3d4a43;
+    --penumbra: #0d1210;
+    --luz-do-cartao: #1f2723;
+    --primaria: #84be9a;
+    --primaria-texto: #0f1a14;
     --foco: #ffb454;
     --perigo: #ff8a8a;
     --perigo-texto: #2a0000;
@@ -122,33 +115,27 @@
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
-    --agora-fundo: rgb(185 201 106 / 12%);
-    --agora-borda: #b9c96a;
-    --depois: #a69888;
-    --progresso: #b9c96a;
-    --acao: #ffb627;
-    --acao-texto: #1c1410;
-    --cartao-agora-fundo: #2b1f17;
-    --cartao-agora-texto: #fdf1de;
-    --cartao-agora-atenuado: #c9b8a6;
-    --cacto: #9bab4a;
+    --agora-fundo: rgb(132 190 154 / 12%);
+    --agora-borda: #84be9a;
+    --depois: #8a978f;
+    --progresso: #84be9a;
     --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-    --superficie-translucida: rgb(37 26 20 / 90%);
+    --superficie-translucida: rgb(26 33 30 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #1c1410;
-  --superficie: #251a14;
-  --superficie-2: #2b1f17;
-  --texto: #fdf1de;
-  --texto-atenuado: #b9a897;
-  --borda: #4a382b;
-  --penumbra: #120d0a;
-  --luz-do-cartao: #2b1f17;
-  --primaria: #b9c96a;
-  --primaria-texto: #1c1410;
+  --fundo: #121715;
+  --superficie: #1a211e;
+  --superficie-2: #222b27;
+  --texto: #edf2ef;
+  --texto-atenuado: #9caaa1;
+  --borda: #3d4a43;
+  --penumbra: #0d1210;
+  --luz-do-cartao: #1f2723;
+  --primaria: #84be9a;
+  --primaria-texto: #0f1a14;
   --foco: #ffb454;
   --perigo: #ff8a8a;
   --perigo-texto: #2a0000;
@@ -163,18 +150,12 @@
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
-  --agora-fundo: rgb(185 201 106 / 12%);
-  --agora-borda: #b9c96a;
-  --depois: #a69888;
-  --progresso: #b9c96a;
-  --acao: #ffb627;
-  --acao-texto: #1c1410;
-  --cartao-agora-fundo: #2b1f17;
-  --cartao-agora-texto: #fdf1de;
-  --cartao-agora-atenuado: #c9b8a6;
-  --cacto: #9bab4a;
+  --agora-fundo: rgb(132 190 154 / 12%);
+  --agora-borda: #84be9a;
+  --depois: #8a978f;
+  --progresso: #84be9a;
   --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-  --superficie-translucida: rgb(37 26 20 / 90%);
+  --superficie-translucida: rgb(26 33 30 / 90%);
   color-scheme: dark;
 }
 
@@ -2069,7 +2050,7 @@ dialog.dialogo-previa .linha-acoes button {
   white-space: nowrap;
 }
 
-/* Estado selecionado único: tinta e borda verde-cacto (filtros, disciplina, Conta › Aparência). */
+/* Estado selecionado único: tinta e borda sálvia (filtros, disciplina, Conta › Aparência). */
 .opcao:has(input[type='radio']:checked),
 .filtro-escolha:has(input[type='radio']:checked) {
   background: var(--agora-fundo);

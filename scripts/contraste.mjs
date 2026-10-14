@@ -96,14 +96,6 @@ export function pares() {
     ['primaria-texto', 'primaria', 4.5],
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
-    // D-D2: botão de ação e cartão do Agora (a ação sobre o cartão é um objeto gráfico, 3:1).
-    ['acao-texto', 'acao', 4.5],
-    ['cartao-agora-texto', 'cartao-agora-fundo', 4.5],
-    ['cartao-agora-atenuado', 'cartao-agora-fundo', 4.5],
-    ['acao', 'cartao-agora-fundo', 3],
-    // O contorno do cartão do Agora (a borda em --agora-borda) é que o separa do fundo no escuro.
-    ['cacto', 'fundo', 3],
-    ['cacto', 'superficie', 3],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;
