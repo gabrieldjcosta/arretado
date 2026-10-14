@@ -1,12 +1,10 @@
 // Telas do onboarding do plano (pacote B2): cada passo é uma pergunta, sem estado próprio além do que
 // a tela mostra; o estado e a gravação do rascunho ficam em `Onboarding.tsx`.
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   chaveDeNome,
   disciplinasDoEdital,
-  explicarFaixa,
   rotuloDoEdital,
-  type CarreiraDoCatalogo,
   type EditalDoCatalogo,
   type EntradaDaCarreira,
 } from '../../../dominios/catalogo';
@@ -29,11 +27,23 @@ export function Moldura({
   aoVoltar?: () => void;
   aoPular: () => void;
 }) {
+  // Ao trocar de passo o foco vai para a pergunta: o botão que o tinha pode ter sumido.
+  const pergunta = useRef<HTMLHeadingElement>(null);
+  const primeira = useRef(true);
+  useEffect(() => {
+    if (primeira.current) {
+      primeira.current = false;
+      return;
+    }
+    pergunta.current?.focus();
+  }, [passo]);
   return (
     <section className="onboarding" aria-labelledby="onboarding-titulo">
       <h1>Montar o plano</h1>
       <BarraFina valor={passo} max={TOTAL_DE_PASSOS} rotulo="Passo do plano" />
-      <h2 id="onboarding-titulo">{titulo}</h2>
+      <h2 id="onboarding-titulo" ref={pergunta} tabIndex={-1}>
+        {titulo}
+      </h2>
       {children}
       <div className="linha-acoes onboarding-navegacao">
         {aoVoltar && (
@@ -61,8 +71,8 @@ export function PassoCarreira({
   const disponiveis = carreiras.filter((c) => c.disponivel);
   const emBreve = carreiras.filter((c) => !c.disponivel);
   return (
-    <fieldset className="onboarding-opcoes">
-      <legend className="dica">Você pode mudar isso depois.</legend>
+    <fieldset className="onboarding-opcoes" aria-labelledby="onboarding-titulo">
+      <p className="dica">Você pode mudar isso depois.</p>
       {disponiveis.map((c) => (
         <label key={c.slug} className="onboarding-opcao">
           <input
@@ -93,10 +103,10 @@ export function PassoEdital({
   aoEscolher: (id: string) => void;
 }) {
   return (
-    <fieldset className="onboarding-opcoes">
-      <legend className="dica">
+    <fieldset className="onboarding-opcoes" aria-labelledby="onboarding-titulo">
+      <p className="dica">
         Os assuntos vêm de editais recentes. Escolha o que mais se parece com o seu.
-      </legend>
+      </p>
       {editais.map((e) => (
         <label key={e.id} className="onboarding-opcao">
           <input
@@ -118,14 +128,12 @@ export function PassoEdital({
 }
 
 export function PassoDisciplinas({
-  carreira,
   edital,
   desmarcadas,
   dispensados,
   aoAlternarDisciplina,
   aoAlternarAssunto,
 }: {
-  carreira: CarreiraDoCatalogo;
   edital: EditalDoCatalogo;
   desmarcadas: ReadonlySet<string>;
   dispensados: ReadonlySet<string>;
@@ -134,7 +142,6 @@ export function PassoDisciplinas({
 }) {
   // Assuntos recolhidos: a lista de uma disciplina só é montada quando ela é aberta.
   const [abertas, setAbertas] = useState<ReadonlySet<string>>(new Set());
-  const consolidadas = new Map(carreira.disciplinas.map((d) => [chaveDeNome(d.nome), d]));
   return (
     <>
       <p className="dica">
@@ -144,8 +151,6 @@ export function PassoDisciplinas({
         {disciplinasDoEdital(edital).map(({ disciplina, nome }) => {
           const chave = chaveDeNome(nome);
           const marcada = !desmarcadas.has(chave);
-          const base = consolidadas.get(chave);
-          const dica = base ? explicarFaixa(base) : '';
           return (
             <li key={chave}>
               <label className="onboarding-opcao">
@@ -158,7 +163,6 @@ export function PassoDisciplinas({
                 />
                 <span>{nome}</span>
               </label>
-              {dica && <p className="dica">{dica}</p>}
               <details
                 onToggle={(e) => {
                   const aberto = e.currentTarget.open;
@@ -191,9 +195,6 @@ export function PassoDisciplinas({
                               {item.assunto}
                             </span>
                           </label>
-                          {item.faixa && item.obsFaixa && (
-                            <span className="marcador">Sugerida: {item.faixa}</span>
-                          )}
                         </li>
                       );
                     })}

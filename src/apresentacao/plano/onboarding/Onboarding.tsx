@@ -32,6 +32,9 @@ const TITULOS: Record<Passo, string> = {
   revisar: 'Confira antes de criar',
 };
 
+/** Título do ponto para a pergunta da tela: o texto inteiro fica no Plano. */
+const resumir = (t: string) => (t.length > 100 ? `${t.slice(0, 99).trimEnd()}…` : t);
+
 const alternar = (lista: readonly string[], chave: string) =>
   lista.includes(chave) ? lista.filter((c) => c !== chave) : [...lista, chave];
 
@@ -60,12 +63,12 @@ function SemEdital() {
   );
 }
 
-function ComecePorAqui({ ponto }: { ponto?: Ponto }) {
+function ComecePorAqui({ ponto, materia }: { ponto?: Ponto; materia?: string }) {
   return (
     <>
       {ponto ? (
         <AcaoAgora
-          titulo={`Comece por aqui: ${ponto.titulo}`}
+          titulo={`Comece por aqui: ${resumir(ponto.titulo)}`}
           rotuloBotao="Começar"
           para={rotaDeInicio({
             tipo: 'escolha_propria',
@@ -76,6 +79,7 @@ function ComecePorAqui({ ponto }: { ponto?: Ponto }) {
       ) : (
         <Vazio titulo="Plano criado" />
       )}
+      {materia && <p className="dica">Matéria: {materia}</p>}
       <p className="dica">
         Para desfazer, use Conta › Dados › Importações. Em <Link to="/plano">Plano</Link> estão
         todos os pontos.
@@ -94,7 +98,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
   const [semEdital, setSemEdital] = useState(false);
   const [preparado, setPreparado] = useState<PontosPreparados | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const [criado, setCriado] = useState<{ ponto?: Ponto } | null>(null);
+  const [criado, setCriado] = useState<{ ponto?: Ponto; materia?: string } | null>(null);
   const [erroAoCriar, setErroAoCriar] = useState(false);
 
   const mudar = (parte: Partial<Rascunho>) => {
@@ -191,7 +195,12 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
       const primeiro =
         pontos.find((p) => p.faixa === 'altissima' && linhas.some((l) => l.titulo === p.titulo)) ??
         pontos[0];
-      setCriado(primeiro ? { ponto: primeiro } : {});
+      const materia = (preparado.pacote.registros.get('disciplinas') ?? []).find(
+        (d) => d.id === primeiro?.disciplinaId,
+      )?.nome;
+      setCriado(
+        primeiro ? { ponto: primeiro, ...(typeof materia === 'string' ? { materia } : {}) } : {},
+      );
     } catch {
       setErroAoCriar(true);
     } finally {
@@ -200,7 +209,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
   };
 
   if (semEdital) return <SemEdital />;
-  if (criado) return <ComecePorAqui {...(criado.ponto ? { ponto: criado.ponto } : {})} />;
+  if (criado) return <ComecePorAqui {...criado} />;
   if (falhou) {
     return (
       <>
@@ -216,7 +225,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
 
   const numero = ORDEM.indexOf(rascunho.passo) + 1;
   const voltar =
-    numero > 1
+    numero > 1 && rascunho.passo !== 'revisar'
       ? () => {
           mudar({ passo: ORDEM[numero - 2] ?? 'carreira' });
         }
@@ -280,7 +289,6 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
   if (rascunho.passo === 'disciplinas') {
     return moldura(
       <PassoDisciplinas
-        carreira={carreira}
         edital={edital}
         desmarcadas={desmarcadas}
         dispensados={dispensados}
@@ -311,6 +319,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
           {preparado.pontos} pontos em {preparado.disciplinas} matérias, a partir do{' '}
           {edital.rotulo ?? 'catálogo'}.
         </p>
+        <p className="dica">Dá para desfazer depois, em Conta › Dados › Importações.</p>
         <PreviaImportacao
           previa={preparado.previa}
           confirmando={ocupado}
