@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { iniciarSessao } from '../../dominios/sessao/servico';
@@ -97,5 +97,46 @@ describe('Sessão leve (A2)', () => {
   it('sem Sessão aberta, atual e fechar convidam sem erro', async () => {
     await abrir('/sessao/atual');
     expect(await screen.findByText('Nenhuma Sessão aberta')).toBeInTheDocument();
+  });
+
+  it('estaciona uma distração sem sair da Sessão e a mostra ao fechar', async () => {
+    const { repo, usuario } = await abrir('/sessao/iniciar');
+    await usuario.click(await screen.findByRole('button', { name: 'Começar' }));
+    await usuario.type(await screen.findByLabelText('Deixar para depois'), 'ver o preço{Enter}');
+    expect(await screen.findByText('Guardado para depois.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Deixar para depois')).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Pausar' })).toBeInTheDocument();
+    expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estacionamento).toHaveLength(1);
+    await usuario.click(screen.getByRole('link', { name: 'Encerrar' }));
+    await usuario.click(await screen.findByLabelText('ver o preço'));
+    await waitFor(async () => {
+      expect(
+        (await repo.colecao('sessoes').todosDoUsuario())[0]?.estacionamento?.[0]?.resolvidaEm,
+      ).toBeDefined();
+    });
+  });
+
+  it('temporizador é opcional: escolhe e tira, sem bloquear a Sessão', async () => {
+    const { repo, usuario } = await abrir('/sessao/iniciar');
+    await usuario.click(await screen.findByRole('button', { name: 'Começar' }));
+    await usuario.click(await screen.findByRole('button', { name: '25 min' }));
+    expect(await screen.findByText(/Faltam cerca de 25 min dos 25 min/)).toBeInTheDocument();
+    expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.temporizadorMin).toBe(25);
+    await usuario.click(screen.getByRole('button', { name: 'Tirar o temporizador' }));
+    expect(await screen.findByRole('button', { name: '15 min' })).toBeInTheDocument();
+  });
+
+  it('só estudo liga e desliga pelo interruptor da própria Sessão', async () => {
+    const { usuario } = await abrir('/sessao/iniciar');
+    await usuario.click(await screen.findByRole('button', { name: 'Começar' }));
+    const chave = await screen.findByRole('checkbox', { name: 'Só estudo' });
+    await usuario.click(chave);
+    await waitFor(() => {
+      expect(document.body.dataset.soEstudo).toBe('true');
+    });
+    await usuario.click(screen.getByRole('checkbox', { name: 'Só estudo' }));
+    await waitFor(() => {
+      expect(document.body.dataset.soEstudo).toBeUndefined();
+    });
   });
 });

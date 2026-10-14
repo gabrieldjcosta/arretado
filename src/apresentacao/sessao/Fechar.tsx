@@ -5,6 +5,7 @@ import type { Sessao } from '../../core/modelo';
 import { encerrarSessao, sugerirProximoPasso } from '../../dominios/sessao/servico';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { NotasDoEstacionamento } from './alavancas/NotasDoEstacionamento';
 import { sessaoAberta } from './carregadores';
 import './estilos-sessao.css';
 
@@ -79,6 +80,7 @@ function FormularioDeFechamento({
         </div>
         {erro && <Falha oQue="Não foi possível encerrar." oQueFazer="Tente de novo." />}
       </section>
+      <NotasDoEstacionamento sessao={sessao} />
     </>
   );
 }

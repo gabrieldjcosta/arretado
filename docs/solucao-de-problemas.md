@@ -1285,3 +1285,8 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Sessão: aparece "Sessão encerrada" sem duração, ou uma Sessão antiga some do Hoje
 - **Causa:** Sessão que ficou aberta de um dia para o outro vira `interrompida` ao abrir `/sessao/*` (A2); não há como saber quando a pessoa parou, então não tem `fim` nem `duracaoSegundos`. É de propósito; nada é cobrado.
 - **Solução:** nenhuma; começar uma Sessão nova funciona normalmente. Para contar tempo, só `encerrada`.
+
+### Só estudo ligado e a navegação sumiu
+- **Sintoma:** as áreas, Conta e o botão de erro não aparecem.
+- **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
+- **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.

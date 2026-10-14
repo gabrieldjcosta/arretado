@@ -379,3 +379,12 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Interrompida | `Sessao.estado = 'interrompida'`: Sessão que ficou aberta e virou o dia; **não restaura**, sem `fim` nem `duracaoSegundos` (não se inventa tempo de estudo). Nunca mostrada como falha |
 | Rotas da Sessão | `/sessao/iniciar` (aceita `?tipo=&id=&rotulo=&origem=&razao=&tarefa=` vindos da Próxima ação), `/sessao/atual`, `/sessao/fechar` |
 | Eventos da Sessão | `sessao.iniciada`, `sessao.pausada`, `sessao.retomada`, `sessao.encerrada`, `sessao.interrompida` (payload `{ sessaoId }`) |
+
+#### A3a Alavancas na Sessão (14/10/2026; sem subida de esquema)
+
+| Termo | Identificadores |
+|---|---|
+| Estacionar / resolver nota | `estacionar`, `resolverNota(repo, id, indice, resolvida?)`, `notasPendentes` (`src/dominios/sessao/estacionamento.ts`); UI em `src/apresentacao/sessao/alavancas/` (`Estacionamento`, `NotasDoEstacionamento` ao fechar). Texto em branco não grava; Sessão encerrada não aceita nota nova, mas a nota existente pode ser marcada |
+| Temporizador (domínio) | `definirTemporizador`, `segundosRestantes` (conta só o tempo ativo; pausa congela). Padrão: `Preferencias.temporizadorPadraoMin` vale em `iniciarSessao` quando a entrada não escolhe. Passar do tempo só mostra um aviso gentil |
+| Só estudo (UI) | `SoEstudo.tsx`: interruptor na tela da Sessão; liga `document.body.dataset.soEstudo`, e `estilos-alavancas.css` esconde áreas, Conta, botão flutuante de erro e rodapé |
+| Evento | `sessao.estacionada` (payload `{ sessaoId }`) |
