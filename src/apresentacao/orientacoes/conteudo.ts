@@ -26,7 +26,7 @@ export const SECOES: Secao[] = [
       'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. O botão "Registrar erro" está em todas as telas; no teclado, a tecla E também abre o registro.',
       'O resto é opcional, em "Mais detalhes" ou depois: se errou ou acertou sem certeza, o que foi, a causa, a convicção, a fonte da questão. Quando o texto dá pistas, o Arretado sugere uma causa — ela só vale quando você confirma.',
       'Se você escreveu o que foi, o Arretado pergunta se quer um cartão. O cartão nunca é criado sozinho. A frente é o que foi; o verso é a frase correta.',
-      'Os cartões voltam em 1, 3, 7, 15, 30 e 60 dias. Na revisão, mostre a resposta e diga como foi: "Errei" volta ao começo, "Difícil" repete o intervalo, "Fácil" avança. No teclado: espaço mostra a resposta; 1, 2 e 3 respondem.',
+      'Os cartões voltam em 1, 3, 7, 15, 30 e 60 dias. Na revisão, mostre a resposta e diga como foi: "De novo" volta ao começo, "Difícil" repete o intervalo, "Fácil" avança. No teclado: espaço mostra a resposta; 1, 2 e 3 respondem.',
       'Em "Frases" ficam todas as frases corretas, para uma leitura rápida em qualquer momento. Suspender um cartão tira ele da fila sem perder o progresso.',
     ],
   },

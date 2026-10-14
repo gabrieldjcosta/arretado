@@ -32,7 +32,7 @@
 
 **3. Cartão que entra na fila.** A fila é uma consulta: cartões ativos com `proximaRevisao ≤ hoje`, ordenados por atraso e depois por caixa. Não há entidade "fila". Hoje e Recall chamam o mesmo serviço. *Não acontece:* suspensos e arquivados nunca aparecem; não existe fila paralela por origem.
 
-**4. Revisão que altera o agendamento.** "Errei" → caixa 1; "difícil" → mantém caixa, próxima = intervalo atual; "fácil" → caixa + 1. Recall grava uma Revisão (append-only) e atualiza o Cartão; emite `cartao.revisado`. Plano usa o evento para o status do ponto (todas as revisões do ponto em dia e sem erro aberto → "consolidado"). *Não acontece:* o intervalo não muda silenciosamente por estatística; mudança de política de caixas só vale para revisões futuras.
+**4. Revisão que altera o agendamento.** "De novo" (antes "Errei") → caixa 1; "difícil" → mantém caixa, próxima = intervalo atual; "fácil" → caixa + 1. Recall grava uma Revisão (append-only) e atualiza o Cartão; emite `cartao.revisado`. Plano usa o evento para o status do ponto (todas as revisões do ponto em dia e sem erro aberto → "consolidado"). *Não acontece:* o intervalo não muda silenciosamente por estatística; mudança de política de caixas só vale para revisões futuras.
 
 **5. Artigo de lei vinculado a ponto do edital.** No leitor, "vincular a ponto" em um dispositivo ou em um nó (Seção) — o nó propaga o vínculo aos descendentes como herdado, igual à estrela. Legislação grava o vínculo e emite `vinculo.criado`. Plano passa a oferecer "ler o ponto", que abre o leitor filtrado. *Não acontece:* o ponto não muda de status por ter dispositivos vinculados.
 
@@ -97,7 +97,7 @@
 - *Celular:* tela cheia, teclado já aberto no campo de texto.
 
 **Recall — drill**
-- *Exibe:* frente; toque/clique vira; três botões (Errei / Difícil / Fácil); contador discreto "4 de 12".
+- *Exibe:* frente; toque/clique vira; três botões (De novo / Difícil / Fácil); contador discreto "4 de 12".
 - *Não aparece:* caixa, intervalos, estatísticas durante a sessão.
 - *Secundárias (menu):* suspender; editar; abrir erro/dispositivo de origem.
 - *Fim:* "Feito. Amanhã: N." Um botão: voltar ao Hoje.
