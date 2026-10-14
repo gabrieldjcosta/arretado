@@ -36,6 +36,8 @@ Plano de 14/10/2026 para o bloco F4-A do plano-mestre §7. Partição em pacotes
 | Conta ativa | `arretado-c-<uid>` | depois de entrar |
 | Cópia anterior à conta | `arretado` com marca `migradoParaConta` | depois da migração; só leitura/exportação, nunca reaberto como espaço de estudo |
 
+**Pendência herdada da A1 (revisão da Fila de merges):** `abrirRepositorioAtivo` só escolhe o banco; ao criar o banco da conta, `Repositorio.abrir` ainda gera um `usuarioId` local. A regra "`uid` = `usuarioId`" é cumprida na A3 (primeira entrada: banco novo nasce com `adotarIdentidade(uid)`) e na A4 (migração troca o `usuarioId` pelo `uid`); até lá `VITE_CONTA` não pode ser ligada para uso real. Teste exigido: `repo.ctx.usuarioId === uid` depois de entrar.
+
 **Registro de contas** (`arretado-registro`, Dexie minúsculo, sem dado de estudo): lista `{ uid, nomeBanco, email, ultimoUso }` e a conta ativa. A abertura do app lê o registro e abre o banco certo **sem rede e sem esperar a sessão**: sessão expirada não tranca o estudo, só desliga o que precisa de servidor.
 
 **Servidor guarda (e só isto):**
