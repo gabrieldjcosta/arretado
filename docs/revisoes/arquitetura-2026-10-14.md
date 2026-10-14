@@ -68,3 +68,10 @@ Entregues só como dados; texto e lugar na tela são da UI: `lerUltimoBackup` / 
 ## Dívida registrada
 
 Lógica de "próxima ação" duplicada entre `RecallInicio` e `hoje/proxima-acao.ts`; unificar junto da mudança "Começar direto ao alvo" da revisão de design.
+
+## Decisões de dados/infra tomadas (padrão mais seguro; reversíveis até a F4-A)
+
+- **CSP pronta para a F4, sem abrir nada hoje.** `config/seguranca.ts` ganhou `montarCSP(origens)` e `ORIGENS_DE_CONEXAO = []`: só amplia o `connect-src`, aceita apenas origem `https` exata (sem curinga, sem caminho; testado). Conteúdo publicado inalterado. Abrir uma origem (Supabase, login, IA) é uma linha nessa lista, com decisão registrada.
+- **Banco local por conta (um Dexie por `usuarioId`), não um banco com filtro.** Motivo: trocar de conta nunca mistura dado (regra da F4-A), apagar/sair vira `apagarBanco(nome)`, e a RLS remota (`usuario_id = auth.uid()`) espelha o mesmo isolamento. Custo: nome do banco derivado da identidade e migração local → conta como cópia + troca de `usuarioId` em transação. Fica registrada como proposta de T26 **[Gabriel confirma]**; nenhum código muda agora.
+- **Log com checkpoint e poda: não implementado de propósito.** Podar o log sem sync pronto apaga a única trilha de auditoria/desfazer sem benefício. Desenho para a F4-B: checkpoint = (`seq` confirmado pelo servidor, hash do estado); só entradas com `seq` ≤ checkpoint e mais antigas que 30 dias saem; `reconstruirDoLog` passa a partir do checkpoint. Teste de propriedade: estado reconstruído antes × depois da poda é igual.
+- **E2E intermitente do Leitor: causa não reproduzida** (passa isolado; sem log do CI com a falha). Registrar o trace do próximo CI vermelho antes de mexer em `leitor.spec.ts`; trocar comparações por `expect.poll` só com evidência.
