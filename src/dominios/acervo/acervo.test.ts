@@ -200,13 +200,19 @@ describe('adesão em lote', () => {
     const { repo, fonte } = await montar();
     fonte.falhas.add('lei-b');
     const progresso: string[] = [];
+    const itensVistos: string[] = [];
     const r1 = await aderirEmLote(repo, fonte, ['lei-a', 'lei-b', 'lei-c', 'lei-z'], {
-      aoProgresso: (f, t) => progresso.push(`${String(f)}/${String(t)}`),
+      aoProgresso: (f, t, atual) => {
+        progresso.push(`${String(f)}/${String(t)}`);
+        if (atual) itensVistos.push(atual.id);
+      },
     });
     expect(r1.adicionadas).toEqual(['lei-a', 'lei-c']);
     expect(r1.falhas.map((f) => f.id)).toEqual(['lei-b', 'lei-z']);
     expect(progresso[0]).toBe('0/4');
     expect(progresso.at(-1)).toBe('4/4');
+    // O item que vai começar chega junto (a tela mostra título e tamanho); id fora do índice não.
+    expect(itensVistos).toEqual(['lei-a', 'lei-b', 'lei-c']);
     fonte.falhas.clear();
     const r2 = await aderirEmLote(repo, fonte, ['lei-a', 'lei-b', 'lei-c']);
     expect(r2.jaAdicionadas).toEqual(['lei-a', 'lei-c']);

@@ -117,7 +117,11 @@ export function Acervo() {
   const [busca, setBusca] = useState('');
   // `null`: ainda sem escolha do usuário (com `?tudo`, valem todas as normas do edital que faltam).
   const [escolha, setMarcados] = useState<Set<string> | null>(null);
-  const [progresso, setProgresso] = useState<{ feitos: number; total: number } | null>(null);
+  const [progresso, setProgresso] = useState<{
+    feitos: number;
+    total: number;
+    atual?: EntradaDoIndice;
+  } | null>(null);
   const [resultado, setResultado] = useState<ResultadoDoLote | null>(null);
   const parar = useRef(false);
   const [parando, setParando] = useState(false);
@@ -142,8 +146,8 @@ export function Acervo() {
     setProgresso({ feitos: 0, total: ids.length });
     try {
       const r = await aderirEmLote(repo, fonte, ids, {
-        aoProgresso: (feitos, total) => {
-          setProgresso({ feitos, total });
+        aoProgresso: (feitos, total, atual) => {
+          setProgresso({ feitos, total, ...(atual ? { atual } : {}) });
         },
         deveParar: () => parar.current,
         disciplinasPorItem: disciplinasEscolhidas,
@@ -268,7 +272,24 @@ export function Acervo() {
                 <div role="status" className="aviso">
                   <p>
                     {progresso.feitos} de {progresso.total}
+                    {progresso.atual &&
+                      ': ' +
+                        progresso.atual.titulo +
+                        ' (' +
+                        tamanhoLegivel(progresso.atual.tamanho) +
+                        ')'}
                   </p>
+                  <progress
+                    aria-label="Andamento da adição"
+                    value={progresso.feitos}
+                    max={progresso.total}
+                  />
+                  {progresso.atual && progresso.atual.tamanho > 500_000 && (
+                    <p className="dica">
+                      Norma grande: salvar no aparelho leva alguns segundos. Pode continuar; nada
+                      depende da internet.
+                    </p>
+                  )}
                   <button
                     type="button"
                     disabled={parando}
