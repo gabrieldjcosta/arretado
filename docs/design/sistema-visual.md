@@ -1,14 +1,14 @@
-# Sistema visual do Arretado — v2
+# Sistema visual do Arretado — v3
 
-Base: a identidade D-D2 (areia, espresso, verde-cacto, caramelo/sol, mascote, vidro; aprovada em 14/10/2026), os papéis de cor e as plataformas da D-D3 ([`decisoes-design.md`](decisoes-design.md); proposta a vetar) e o protótipo [`prototipo/hoje.html`](prototipo/hoje.html), que é a referência de fidelidade (abrir no navegador; `?tema=claro` ou `?tema=escuro` força o tema). Diagnóstico que originou esta versão: [`auditoria-ui-2026-10-14.md`](auditoria-ui-2026-10-14.md). Execução: [`../planos/redesign-v2.md`](../planos/redesign-v2.md). Só apresentação (D-D1).
+Base: a identidade D-D2 (areia, espresso, cacto, mascote; aprovada em 14/10/2026), os papéis de cor e as plataformas da D-D3 e, por cima, a **D-D4** (paleta, botões, cartões por estado, Leitor e Sessão do Gabriel, 14/10/2026) — tudo em [`decisoes-design.md`](decisoes-design.md); a D-D3 e a D-D4 valem como padrão até o Gabriel vetar. A referência de fidelidade são os mockups do Gabriel em [`referencias/2026-10-14-gemini/`](referencias/2026-10-14-gemini/leia-me.md) (o protótipo [`prototipo/hoje.html`](prototipo/hoje.html) é da D-D2 e está superado nas cores e nos botões). Diagnóstico que originou esta versão: [`auditoria-ui-2026-10-14.md`](auditoria-ui-2026-10-14.md). Execução: [`../planos/redesign-v2.md`](../planos/redesign-v2.md). Só apresentação (D-D1).
 
 **Fonte de verdade dos valores:** `src/apresentacao/estilos.css` (e os CSS dos pacotes). Este texto é o alvo e o mapa; enquanto uma fatia não chegou, o código ainda diverge dele. Contraste de cada par: `scripts/contraste.mjs` (e `npm run check`).
 
 ## Princípios
 
-1. **Uma ação dominante por tela**, no caramelo (claro) ou no sol (escuro).
+1. **Uma ação dominante por tela**, em Terracota (claro) ou Solace (escuro e dentro do bloco de Caatinga).
 2. **Cor tem função** (tabela abaixo). Nada de verde "de enfeite".
-3. **Bloco de cor orienta, não anima:** um bloco-herói por tela de orientação. Leitor e Revisão em curso ficam calmos.
+3. **Bloco de cor orienta, não anima:** um bloco-herói por tela de orientação, e a cor do bloco diz o **estado** da pessoa. Leitor e Revisão em curso ficam calmos.
 4. **O texto da lei é o protagonista**; tudo em volta cede.
 5. **Segurança visível:** "salvo neste aparelho" e o ponto de retomada sempre à vista.
 6. **Mesmo jeito em celular, tablet e desktop;** o que muda é a disposição, não o vocabulário visual.
@@ -18,81 +18,91 @@ Base: a identidade D-D2 (areia, espresso, verde-cacto, caramelo/sol, mascote, vi
 
 | Papel | Pergunta | Claro | Escuro |
 |---|---|---|---|
-| Ação | "O que faço agora?" | caramelo `--acao` | sol `--acao` |
-| Lugar | "Onde estou? O que está salvo?" | verde-cacto `--cacto`, `--bloco-*`, `--selecionado-*` | cacto claro `--cacto`; bloco espresso com borda caramelo; `--selecionado-*` em tinta de cacto |
-| Conteúdo | o que se lê | tinta `--texto` | creme `--texto` |
-| Caminho | "Para onde posso ir?" | argila `--link` | âmbar `--link` |
-| Linha atual | "Em que linha estou?" | azul claro `--realce-*` | azul fundo `--realce-*` |
-| Matéria | "De que matéria é?" | seis tons de disciplina | os mesmos, mais claros |
+| Ação | "O que faço agora?" | Terracota `--acao` | Solace `--acao` |
+| Ação dentro do bloco-herói | idem | Solace `--bloco-acao` | Solace |
+| Lugar e selecionado | "Onde estou? O que guardei?" | Caatinga `--lugar`, `--selecionado-*`, `--bloco-*` | cacto `--lugar`; bloco Noite-cartão com borda Solace; selecionado em Caatinga com anel de cacto |
+| Calma | "O que anda bem?" | Acqua `--acqua` (texto: `--acqua-texto`) | Acqua (texto `#79a79d`) |
+| Superfície quente | quadro de estado | Areia `--quente` | `#2f261d` |
+| Conteúdo | o que se lê | Tinta `--texto` | Palha `--texto` |
+| Caminho | "Para onde posso ir?" | Terracota `--link` | Solace `--link` |
+| Realce de termo | "Que tipo de termo é este?" | `--destaque-*` (sublinhado, ver Leitor) | os mesmos, mais claros |
 | Perigo | "Isto apaga" ou falha técnica | `--perigo` | `--perigo` |
 
-Regras: caramelo/sol só em botão primário e no "+"; verde nunca em botão de ação nem em link; vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada.
+Regras: Terracota/Solace só em botão primário, "+", link e foco; Caatinga nunca em link; Acqua nunca como texto sem o passo `--acqua-texto`; vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada. O **tipo da tarefa** é um ponto de cor ao lado do texto (Frases = Solace, Cartões = Acqua, leitura = lugar); a matéria vai sempre em texto.
 
 ## Tokens
 
-Todos os pares de texto passam em 4,5:1 e os gráficos (contorno, ícone, foco) em 3:1, medidos com `scripts/contraste.mjs`. Colunas: claro · escuro.
+Todos os pares de texto passam em 4,5:1 e os gráficos (contorno, ícone, foco, sublinhado) em 3:1, medidos com `scripts/contraste.mjs`. Colunas: claro · escuro.
+
+### A paleta (valores fixos, iguais nos dois temas)
+
+`--areia #ead2b0` · `--palha #f6f1e6` · `--creme #faf6ee` · `--terracota #963417` · `--caatinga #3b3f21` · `--acqua #628981` · `--solace #cf893a` · `--noite #16130f` · `--noite-cartao #251f19` · `--tinta #2b1b12` · `--sobre-solace #231f1a` (texto sobre Solace) · `--cacto #6f9456` (o verde do cacto desenhado: só traço e anel, nunca texto pequeno).
 
 ### Superfície e texto
 
 | Token | Claro · escuro | Uso | Contraste medido |
 |---|---|---|---|
-| `--fundo` | `#f4efe0` · `#1c1410` | tela | — |
-| `--superficie` | `#fbf8ee` · `#251a14` | campos, cartões | — |
-| `--superficie-2` | `#ebe5d1` · `#2b1f17` | trilho de abas, faixas | — |
-| `--borda` | `#c9c19f` · `#4d3b2d` | filetes decorativos | — |
-| `--borda-campo` | `#8a8266` · `#8a7561` | contorno de campo, caixa, rádio | 3,6:1 sobre `--superficie` · 3,9:1 |
-| `--texto` | `#2d2a14` · `#fdf1de` | texto | 12,6:1 sobre `--fundo` · 14,4:1 sobre `--superficie-2` |
-| `--texto-atenuado` | `#5f5a3c` · `#b9a897` | apoio, rótulo | 5,5:1 sobre `--superficie-2` · 6,9:1 |
+| `--fundo` | Palha · Noite | tela | — |
+| `--superficie` | Creme · `#1e1914` | campos, cartões, linhas | — |
+| `--superficie-2` | `#eae2d3` · `#2a231c` | trilho de abas, barra de paginação, trilho do progresso | — |
+| `--quente` | Areia · `#2f261d` | cartão Distraído, tiles, chip inativo | `--texto` 11,3:1 · 13,2:1 |
+| `--borda` | Caatinga a 16% · Palha a 14% | filetes decorativos | — |
+| `--borda-campo` | `#8c7b68` · `#8a7a6a` | contorno de campo | 3,8:1 sobre `--superficie` · 4,2:1 |
+| `--borda-forte` | Tinta · `#b5a898` | contorno de caixa e rádio | 15,4:1 · 7,5:1 |
+| `--texto` | Tinta · Palha | texto | 14,7:1 sobre `--fundo` · 16,4:1 |
+| `--texto-atenuado` | `#5d4d40` · `#b5a898` | apoio, rótulo | 7,2:1 · 8,0:1 (6,3:1 · 6,7:1 sobre `--superficie-2`) |
+| `--titulo` | Caatinga · Palha | título de página (H1) | 9,7:1 · 16,4:1 |
 
-### Ação, lugar, caminho, linha atual
+### Ação, lugar, calma e bloco
 
 | Token | Claro · escuro | Uso | Contraste medido |
 |---|---|---|---|
-| `--acao` / `--acao-texto` | `#e8892b` / `#2d2a14` · `#ffb627` / `#1c1410` | botão primário e "+" | 5,5:1 · 10,4:1 |
-| `--cacto` | `#5f7a2c` · `#9bab4a` | cacto da marca, ícone de "salvo", progresso | 4,2:1 sobre `--fundo` (gráfico) · 7,2:1 |
-| `--cacto-texto` | `#4f6a1f` · `#9bab4a` | texto verde sobre superfície (raro) | 5,4:1 sobre `--fundo` · 7,2:1 |
-| `--bloco-fundo` | `#3f4a1a` · `#2b1f17` | bloco-herói e item ativo da navegação | — |
-| `--bloco-texto` / `--bloco-atenuado` | `#fdf1de` / `#d9d3b0` · `#fdf1de` / `#b9a897` | texto no bloco | 8,5:1 / 6,3:1 · 14,4:1 / 6,9:1 |
-| `--bloco-borda` | transparente · `rgb(255 182 39 / 35%)` | contorno do bloco no escuro | — |
-| `--selecionado-fundo` / `--selecionado-texto` | `#3f4a1a` / `#fdf1de` · `#38311d` / `#9bab4a` | item ativo da navegação, aba e chip selecionados, caixa marcada | 8,5:1 · 5,1:1 |
-| `--bloco-foco` | `#ffb627` · `#ffb627` | anel de foco **dentro** do bloco | 5,4:1 sobre `#3f4a1a` |
-| `--link` | `#9a4a1c` · `#ffb454` | link de texto | 5,4:1 sobre `--fundo`, 4,9:1 sobre `--superficie-2` · 10,3:1 |
-| `--realce-fundo` / `--realce-texto` | `#bcd9ff` / `#14213d` · `#2c4a68` / `#fdf1de` | linha atual | 11,0:1 · 8,2:1 |
+| `--acao` / `--acao-texto` | Terracota / `#ffffff` · Solace / `--sobre-solace` | botão primário e "+" | 7,5:1 · 5,7:1 |
+| `--link` | Terracota · Solace | link de texto | 6,7:1 sobre `--fundo`, 5,8:1 sobre `--superficie-2` · 6,4:1, 5,4:1 |
+| `--foco` | Terracota · Solace | anel de foco global (3 px) | 6,7:1 · 6,4:1 |
+| `--lugar` | Caatinga · cacto | filete, marca do "Lido até aqui", filtro ligado | 9,7:1 · 5,3:1 |
+| `--acqua` | Acqua | progresso, ponto de Cartões, "salvo", interruptor | 3,4:1 sobre `--fundo` · 4,8:1 (3,0:1 sobre `--superficie-2`) |
+| `--acqua-texto` / `--acqua-fundo` | `#416a63` / `#416a63` · `#79a79d` / `#416a63` | texto em Acqua; selo Acqua com texto branco | 5,4:1 · 6,9:1; branco sobre o selo 6,1:1 |
+| `--bloco-fundo` | Caatinga · Noite-cartão | bloco-herói e cartão Estudando | — |
+| `--bloco-texto` / `--bloco-atenuado` | Palha / `#d6d1b5` · Palha / `#b5a898` | texto no bloco | 9,7:1 / 7,1:1 · 14,5:1 / 7,0:1 |
+| `--bloco-acao` / `--bloco-acao-texto` | Solace / `--sobre-solace` | botão primário **no bloco** | 5,7:1; Solace sobre Caatinga 3,8:1 |
+| `--bloco-borda` | transparente · Solace a 35% | contorno do bloco no escuro | — |
+| `--bloco-foco` | Solace | anel de foco dentro do bloco e do item selecionado | 3,8:1 · 5,7:1 |
+| `--selecionado-fundo` / `-texto` / `-anel` | Caatinga / Palha / transparente · Caatinga / Palha / cacto | item atual, aba, chip, caixa marcada | 9,7:1; anel de cacto 3,2:1 |
+| `--tinta-lugar` | Caatinga a 12% sobre a superfície · a 70% | linha selecionada, "Frase correta", ícone de lista | `--texto` 12,5:1 · 11,4:1 |
+| `--regua-fundo` / `--regua-barra` | Areia a 45% / Caatinga · Solace a 16% / Solace | régua de leitura | `--texto` 13,4:1 · 12,1:1 |
 
-O anel de foco global (`--foco`, 3 px) é `#b35900` no claro: sobre o verde do bloco dá só 2,0:1, por isso dentro do bloco o anel passa a `--bloco-foco`.
+O anel de foco global é Terracota no claro, que some no verde do bloco: dentro do bloco, do item selecionado e das abas ativas o anel passa a `--bloco-foco` (Solace). O bloco também reajusta `--acao`, `--acao-texto` e `--link` para Solace e Palha, então o `.principal` e os links dentro dele funcionam sem regra própria.
 
-### Seis tons de disciplina
+### Destaques do leitor (sublinhado, nunca fundo)
 
-Esfera com ícone branco (claro) ou espresso (escuro); texto do tom sobre o bloco de tinta (`color-mix(in srgb, <esfera> 14% claro | 16% escuro, <superfície>)`).
-
-| Tom | Esfera · texto (claro) | Esfera e texto (escuro) | Contraste do texto sobre a tinta (claro · escuro) |
+| Token | Claro · escuro | O quê | Estilo |
 |---|---|---|---|
-| cacto | `#5f6e22` · `#3f4a1a` | `#9bab4a` | 7,5:1 · 5,1:1 |
-| caramelo | `#a85a0c` · `#7a3f06` | `#e8892b` | 6,5:1 · 5,0:1 |
-| céu | `#1f6f9f` · `#14506f` | `#5cb3e6` | 6,8:1 · 5,6:1 |
-| anil | `#4a54b8` · `#343d8c` | `#9aa4ff` | 7,4:1 · 5,5:1 |
-| ameixa | `#8a3f74` · `#652c54` | `#e08cc8` | 7,9:1 · 5,3:1 |
-| turquesa | `#0e7466` · `#0a5449` | `#4fd1bd` | 6,9:1 · 6,6:1 |
+| `--destaque-prazo` | `#173f52` · `#7fb4cf` | prazos e tempo | duplo, deslocamento de 4 px |
+| `--destaque-condicao` | `#b06f22` · Solace | exceções e condições | tracejado, 4 px |
+| `--destaque-absoluto` | Terracota · `#e07b55` | termos absolutos | ondulado, 3 px |
+| `--destaque-pena` | Terracota · `#e07b55` | penas, quóruns e frações | pontilhado, 4 px |
 
-O ícone sobre a esfera passa de 5:1 no claro e de 6,9:1 no escuro. O tom de cada matéria sai de uma função pura (a mesma matéria, sempre o mesmo tom; nome da matéria no texto, nunca só a cor).
+Contra `--fundo`: 10,0:1 · 8,2:1; 3,6:1 · 6,4:1; 6,7:1 · 6,3:1 (e o mesmo para pena). O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
 
 ### Estado (sem mudança)
 
-`--perigo`, `--sucesso`, `--aviso-fundo/-texto`, `--foco`, grifos, destaques automáticos e `--estrela` ficam como estão. **Sai** (migrar os usos e apagar na F1): `--primaria`, `--primaria-texto`, `--agora-fundo`, `--agora-borda`, `--depois`, `--progresso`, `--cartao-agora-*` (viram `--bloco-*`).
+`--perigo`, `--sucesso`, `--aviso-fundo/-texto`, grifos (`--grifo-1` a `-3`) e `--estrela` ficam como estão. **Saíram** na F1: `--primaria`, `--primaria-texto`, `--agora-fundo`, `--agora-borda`, `--depois`, `--progresso`, `--cartao-agora-*`; o teste de contraste falha se algum CSS voltar a usá-los.
 
 ## Forma, espaço, tipografia
 
 | Item | Valor |
 |---|---|
-| Raios | `--raio-heroi` 28 · `--raio-cartao` 20 · `--raio-campo` 14 · `--raio-pilula` 999 (botão, chip, navegação, aba) |
-| Espaço (base 4 px) | `--e1` 4 · `--e2` 8 · `--e3` 12 · `--e4` 16 · `--e5` 24 · `--e6` 32 · `--e7` 48 |
-| Sombras | `--sombra` (cartão, a atual) · `--sombra-flutuante` (navegação e "+": `0 12px 32px -12px` da tinta a 28% mais `0 2px 6px` a 10%; no escuro, preto a 60%) |
-| Alvo | `--alvo` 44 px: botões, links isolados, linhas de lista, campos (48) |
+| Raios | `--raio-heroi` 24 · `--raio-cartao` 16 · `--raio-botao` 12 · `--raio-campo` 12 · `--raio-pilula` 999 (chip, aba, barra, interruptor) |
+| Espaço | `--espaco-1` 0,25 rem · `-2` 0,5 · `-3` 1 · `-4` 1,5 · `-5` 2 · `-6` 3 |
+| Sombras | `--sombra` (cartão) · `--sombra-botao` (`0 2px 6px`, no primário) · `--sombra-flutuante` (`0 4px 16px`, dock, "+", folha); no escuro, preto |
+| Alvo | `--alvo` 44 px: botões, links isolados, linhas de lista; campos 48 |
 | Gutter | 16 px (celular) · 24 (tablet em pé) · 32 (≥ 900) |
 | Coluna | 40 rem (celular e tablet em pé) · 65 rem (≥ 900) · leitura 70 ch |
-| Título de página (H1) | Literata 700, 2 rem (celular) · 2,25 (tablet) · 2,5 (≥ 900), linha 1,15, linha de apoio em Atkinson 0,9375 rem atenuada |
+| Título de página (H1) | Literata 700, cor `--titulo`, 1,75 rem (celular) · 2 (tablet) · 2,25 (≥ 900), linha 1,15 |
+| Título de cartão e de bloco | Atkinson 700 (sans), 1,0625 a 1,3 rem |
 | Seção (H2) / cartão (H3) | Atkinson 700, 1,25 rem / 1,0625 rem |
-| Corpo · pequeno · rótulo | Atkinson 1 rem · 0,875 · 0,8125 (mínimo; caixa-alta com 0,04 em de espaçamento só em etiqueta) |
+| Corpo · pequeno · rótulo | Atkinson 1 rem · 0,875 · 0,8125 (mínimo; caixa-alta com 0,04 em só em etiqueta) |
 | Cartão de destaque e frase de revisão | Literata 700, 1,5 a 1,75 rem |
 | Lei | Literata, `--tamanho-leitura` (18 px, preferência da pessoa) |
 
@@ -102,31 +112,43 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 
 | Componente | Especificação |
 |---|---|
-| **Botão primário** (`.principal`) | Pílula, altura 52 (celular) ou 48, largura total em formulário e cartão. Fundo `--acao` a 90% com brilho de cima para baixo (`linear-gradient` de branco 22% a 0), borda branca a 38%, sombra curta da própria cor e `inset` de 1 px, `backdrop-filter: blur(8px)`. Texto sólido `--acao-texto`, peso 700. **Um por tela**; o segundo botão do mesmo nível é secundário. Estados: hover claro +4%, pressionado desce 1 px, desabilitado a 50% sem sombra. |
-| **Botão secundário** (`button`, `.botao`) | Pílula, altura 44, fundo da tinta a 6% (escuro: creme a 7%), borda a 16%, `blur(10px)`, texto `--texto`. Dentro de bloco-herói: creme a 12% com borda a 26%. |
-| **Botão de texto** (`.botao-texto`) | Sem fundo, texto `--link`, alvo 44. É o "Voltar ao Plano" e o "Editar pontos": link isolado nunca fica com 19 px de altura. |
-| **Botão de ícone** | Círculo de 44 com o vidro do secundário; `aria-label` sempre. Ajuda, Conta, ferramentas do Leitor. |
-| **Destrutivo** | Secundário com texto e borda `--perigo`; só vira cheio dentro do diálogo de confirmação. |
+| **Botão primário** (`.principal`) | Compacto: altura 44, padding `0 20px`, raio 12, peso 600, `.9375rem`, espaçamento `-0,01em`, `--sombra-botao`; fundo `--acao`, texto `--acao-texto`. Largura total só em cartão e formulário (altura 52 no bloco-herói). **Um por tela.** Hover escurece 12%; pressionado desce 1 px; desabilitado a 50% sem sombra; transição de 140 ms só sem `prefers-reduced-motion`. |
+| **Botão secundário** (`button`, `.botao`) | Mesma forma, fundo `--superficie`, contorno de 1 px `--borda-botao`, texto `--texto`. |
+| **Botão fantasma** (`.botao-texto`) | Sem caixa, sublinhado de 4 px, cor herdada e 82% de opacidade, peso 500, `.875rem`, alvo 44. Vai **ao lado** do primário ("Trocar tarefa", "Pausar") e é o "Voltar ao Plano" e o "Editar pontos": link isolado nunca fica com 19 px de altura. |
+| **Botão de ícone** (`.botao-icone`) | Quadrado de 44 com o contorno do secundário; `aria-label` sempre. |
+| **Linha de ação** (`.linha-acao`) | Linha inteira de toque: altura 52, padding `10px 14px`, raio 12, filete `--borda`, fundo da superfície; texto à esquerda e seta ou duração à direita. Substitui botões empilhados ("Por onde começar?", folhas, modais). |
+| **Destrutivo** (`.perigoso`) | Secundário com texto e borda `--perigo`; só vira cheio dentro do diálogo de confirmação. |
 | **Link em texto** | `--link`, sublinhado fino com `text-underline-offset: 0.2em`, 2 px no hover e no foco. Nunca em verde. |
-| **Campo** | Altura 48, raio 14, fundo `--superficie`, contorno 1,5 px `--borda-campo`, 16 px, rótulo sempre visível acima. Vale para `input` com qualquer `type` (ou sem), `select` (seta própria, `appearance: none`) e `textarea`. Erro: contorno e texto `--perigo` mais ícone e frase; nunca só cor. |
-| **Caixa e rádio** | Marca própria de 24 px dentro de um rótulo de 44 de altura; marcada = `--selecionado-fundo` com marca em `--selecionado-texto`. A linha inteira é o alvo. |
-| **Aba** (`.abas`) | Trilho `--superficie-2` em pílula; aba ativa = `--selecionado-*`; no celular rola na horizontal sem quebrar linha. |
-| **Chip** | Pílula 32 de altura dentro de alvo de 44; selecionado = `--selecionado-*`; de matéria = bloco de tinta com texto do tom. |
-| **Linha de lista** | Altura mínima 56, alvo inteiro, esfera de matéria à esquerda (44), título, apoio em atenuado, sem sublinhado; seta ou duração à direita; filete entre linhas. |
-| **Cartão** | `--superficie`, raio 20, borda `--borda`, `--sombra`; título de cartão = H3. |
-| **Bloco-herói** | `--bloco-fundo`, raio 28, texto `--bloco-texto`, padding 20 a 28; carrega no máximo: etiqueta, título serifado, apoio, trecho em caixa translúcida (com a linha atual em `--realce-*`), um botão. Mascote só aqui (e no estado vazio). |
-| **Callout** | Fundo de tinta da cor do papel, filete de 4 px à esquerda, ícone e texto; "Frase correta" em verde-cacto, aviso em `--aviso-*`, perigo em `--perigo`. |
-| **Esfera** | 44 px, círculo do tom da matéria com ícone de 24; decorativa (`aria-hidden`), a matéria vem em texto. |
-| **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--cacto`; sempre com texto ("3 de 12"). |
+| **Campo** | Altura 48, raio 12, fundo `--superficie`, contorno 1,5 px `--borda-campo`, 16 px, rótulo sempre visível acima. Vale para `input` com qualquer `type` (ou sem), `select` (seta própria feita com gradiente, para caber na CSP) e `textarea`. Erro: contorno e texto `--perigo` mais ícone e frase; nunca só cor. |
+| **Caixa e rádio** | Marca própria de 22 px com contorno de 2 px em `--borda-forte` (Tinta no claro), raio 6 (caixa) ou círculo (rádio), dentro de um rótulo de 44 de altura; marcada = `--selecionado-fundo` com marca em `--selecionado-texto` (e anel de cacto no escuro). A linha inteira é o alvo. |
+| **Aba** (`.abas`) | Trilho `--superficie-2` em pílula; aba atual = `--selecionado-*`; no celular rola na horizontal sem quebrar linha; anel de foco por dentro. |
+| **Chip** | Pílula 32 de altura dentro de alvo de 44; selecionado = `--selecionado-*`; inativo = `--quente`. |
+| **Linha de lista** | Altura mínima 56, alvo inteiro, título, apoio em atenuado, sem sublinhado; ponto de tipo, seta ou duração à direita; filete entre linhas. |
+| **Cartão** | `--superficie`, raio 16, borda `--borda`, `--sombra`; título de cartão em sans bold. |
+| **Bloco-herói** | `--bloco-fundo`, raio 24, texto `--bloco-texto`, padding 20 a 28; carrega no máximo etiqueta, título (sans bold), apoio, um botão primário e um fantasma. A cor do bloco é o estado (ver abaixo). Mascote só aqui (e no estado vazio). |
+| **Callout** | Fundo `--tinta-lugar`, filete de 4 px à esquerda, ícone e texto; "Frase correta" em lugar, aviso em `--aviso-*`, perigo em `--perigo`. |
+| **Ponto de tipo** | 10 a 12 px, decorativo (`aria-hidden`): Frases Solace, Cartões Acqua, leitura `--lugar`; o tipo vem em texto. |
+| **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--acqua`; sempre com texto ("3 de 12"). |
 | **Estado vazio** | Ícone ou mascote pequeno, frase curta, um botão primário. Sem texto longo. |
-| **Navegação** | Pílula de vidro (ver plataformas). Item = ícone 24 + rótulo 0,75 rem; ativo = `--selecionado-*` (bloco sólido); alvo ≥ 56 × 56. |
-| **Cabeçalho** | Marca (Literata 700 + cacto) à esquerda; Ajuda e Conta como botões de ícone; no desktop, a navegação entra no meio e "Registrar erro" (com a tecla E) à direita. |
-| **Rodapé** | Linha legal curta e o link "Backup e dados" (botão de texto, 44). No fim do conteúdo, nunca sob a navegação fixa. |
-| **Diálogo** | `dialog` nativo, raio 20, `--superficie`, fundo `rgb(0 0 0 / 45%)`; no celular, folha presa à borda de baixo. |
+| **Navegação** | Barra reta embaixo no celular e no tablet em pé (ver plataformas): ícone 24 + rótulo 0,75 rem, item atual em `--selecionado-*` ou peso 700 e cor de lugar; alvo ≥ 56 × 56. |
+| **Cabeçalho** | "Arretado." (Literata 700, ponto final em Terracota) com o cacto; "Conta" e "?" como botões de contorno; no desktop, a navegação entra no meio e "Registrar erro" (com a tecla E) à direita. |
+| **Rodapé** | Linha legal curta e o link "Backup e dados" (botão fantasma, 44). No fim do conteúdo, nunca sob a navegação fixa. |
+| **Diálogo** | `dialog` nativo, raio 16, `--superficie`, fundo `rgb(0 0 0 / 45%)`, `--sombra-flutuante`; no celular, folha presa à borda de baixo. |
 
-### Vidro
+### Blocos por estado (F3, Retorno e Fechar o dia)
 
-Primário: 88 a 90% de opacidade, `blur(8px)`. Secundário: tinta a 6%, `blur(10px)`. Navegação: `--superficie` a 78%, `blur(16px)`, borda branca a 40% (claro) ou creme a 10% (escuro), sombra flutuante. Texto sempre sólido; a transparência nunca baixa o contraste do texto abaixo de 4,5:1 sobre o pior fundo possível, e o primário mantém `--acao` como piso. Com `prefers-reduced-transparency: reduce` e em `forced-colors` o vidro vira cor sólida (`--superficie`, `--acao`) sem `backdrop-filter`.
+| Estado | Bloco | Ação | Conteúdo |
+|---|---|---|---|
+| Estudando (retomar: "Você parou no Art. 112, § 1º") | Caatinga (Noite-cartão no escuro) | Solace + fantasma "Escolher outra coisa" | mascote Estudando com a lâmpada |
+| Distraído ("Por onde começar?") | Areia (`--quente`) | linhas de ação | mascote Distraído e os símbolos de distração |
+| Sorrindo (dia fechado) | Palha (cartão claro) | botão de contorno "Ver resumo do dia" | mascote Sorrindo entre os cactos e o andamento do dia em pontos — **andamento das tarefas, nunca sequência de dias** |
+| Determinado (revisões prontas) | cinza-areia (`--superficie-2`) | Terracota "Iniciar N frases →" | mascote Determinado e a lista do que está pronto |
+
+O Agora do Hoje usa o primeiro (Caatinga) por padrão; o mockup do Gabriel o desenha em Areia (veto em aberto, D-D4 a).
+
+### Botões não são vidro
+
+O vidro (transparência com desfoque) saiu dos botões e da navegação. Fica **só** onde algo flutua sobre o texto: o dock do Leitor (fundo da superfície a 92%, `blur(12px)`) e, no modo foco, os botões fixos de `--superficie-translucida` (90%). Com `prefers-reduced-transparency: reduce` e em `forced-colors` vira cor sólida, sem `backdrop-filter`. Texto sempre sólido: a transparência nunca baixa o contraste do texto abaixo de 4,5:1 sobre o pior fundo possível.
 
 ## Plataformas
 
@@ -134,19 +156,45 @@ Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e
 
 | Elemento | Celular | Tablet em pé | Desktop e tablet deitado |
 |---|---|---|---|
-| Cabeçalho | 64 px: marca; Ajuda e Conta em botões de ícone | igual, gutter 24 | 72 px: marca · navegação em pílula · "Registrar erro (E)", Ajuda, Conta |
-| Navegação | pílula flutuante de vidro, 64 px, 12 px da borda e do `env(safe-area-inset-bottom)`; "+" de 64 px ao lado, no caramelo/sol | mesma pílula, centralizada (440 a 560 px), "+" ao lado | no cabeçalho, pegajosa (`sticky`), item ativo em bloco; sem "+" fixo |
-| Conteúdo | 1 coluna, gutter 16, reserva embaixo para a pílula | 1 coluna de 40 rem centralizada | até 65 rem, 2 colunas (7fr · 5fr) no Hoje, no Recall e no Plano |
-| H1 | 2 rem | 2,25 rem | 2,5 rem |
-| Hoje | bloco Agora, segurança, Depois (até 2), captura, revisões do dia | Agora em 2 colunas internas (texto · mascote de 124 px) | à esquerda o Agora; à direita Depois e captura; mascote apoiado na borda do bloco |
+| Cabeçalho | 64 px: "Arretado." à esquerda; "Conta" e "?" à direita | igual, gutter 24 | 72 px: marca · navegação ao centro · "Registrar erro (E)", "Conta", "?" |
+| Navegação | barra reta de baixo, ícone e rótulo nas quatro áreas, `env(safe-area-inset-bottom)`; "+" simples de 56 px acima dela, sobre uma reserva de rolagem (some no Hoje, onde a captura é inline) | a mesma barra, centralizada em até 560 px | no cabeçalho, pegajosa (`sticky`), item atual em bloco; sem "+" fixo |
+| Conteúdo | 1 coluna, gutter 16, reserva embaixo para a barra e o "+" | 1 coluna de 40 rem centralizada | até 65 rem, 2 colunas (7fr · 5fr) no Hoje, no Recall e no Plano |
+| H1 | 1,75 rem | 2 rem | 2,25 rem |
+| Hoje | cartão Agora por estado, Depois (até 2 linhas), captura inline "Anote a frase correta" + Guardar | Agora em 2 colunas internas (texto · mascote) | à esquerda o Agora; à direita Depois e captura; mascote apoiado na borda do bloco |
 | Recall | resumo + abas rolantes + lista | idem, lista em cartões | à esquerda resumo e abas; à direita a lista; revisão em coluna única de 40 rem |
 | Biblioteca | abas rolantes, filtros recolhidos, lista de normas | grade de 2 colunas | grade de 3 colunas, filtros em barra lateral |
 | Plano | matérias recolhidas com andamento; pontos ao abrir | idem | matérias à esquerda, pontos à direita |
-| Leitor | coluna cheia; dock embaixo com **Lido até aqui** (primário) e quatro botões de ícone (Buscar, Filtrar, Ações, Modo foco); reserva de rolagem para o dock nunca cobrir o texto | idem, dock centralizado | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
+| Leitor | ver abaixo | ver abaixo | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
 | Rodapé | fim do conteúdo, acima da reserva | idem | uma linha, centralizada |
 | Formulários | largura total, rótulo acima | coluna de 32 rem | coluna de 32 rem alinhada à esquerda do conteúdo |
 
-Regras de plataforma: o "+" e a pílula nunca cobrem texto (reserva de rolagem = altura da pílula + 12 px + `safe-area` + 16 px); com o teclado aberto a pílula some (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha).
+Regras de plataforma: o "+", o dock e a barra nunca cobrem texto (reserva de rolagem = altura da barra + 12 px + `safe-area` + 16 px); com o teclado aberto o "+" some (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha).
+
+## Leitor e Sessão (D-D4; valores da especificação do Gabriel)
+
+Fonte completa: [`referencias/2026-10-14-gemini/especificacao-leitor-sessao.md`](referencias/2026-10-14-gemini/especificacao-leitor-sessao.md). Aqui, o que o código precisa saber.
+
+**Leitor (F6).**
+
+| Parte | Especificação |
+|---|---|
+| Controles | linha `space-between`, gap 8: seletor de fonte segmentado (pílula de 38, contorno Caatinga a 18%, A- e A+ de 44 × 38, rótulo "18px") e "Destaques" (pílula de 38; ligado = Caatinga com texto Palha e ✓) |
+| Legenda dos destaques | uma linha recolhível sob os controles, só com Destaques ligado: Prazos, Exceções, Absolutos, Penas, cada um com o seu sublinhado |
+| Régua de leitura | Areia a 45%, filete esquerdo de 4 px de Caatinga, raio `0 12px 12px 0`, padding `12px 14px`; no canto de cima à direita, ☆ (alvo 44 × 44) e o chip "Ações" (32 de altura, raio 8, Creme) |
+| Dock (retrato) | fixo, `bottom: 76px` (acima da barra), 16 px dos lados, `z-index: 30`, gap 10: pílula à esquerda (altura 52, Creme a 92%, `blur(12px)`, 3 colunas Buscar, Filtrar, Foco) e "📍 Lido até aqui" à direita (`min-width` 112, altura 52, raio 14, Caatinga e Palha, peso 600); o artigo tem `padding-bottom: 156px` |
+| Modo foco | retrato: coluna centrada, padding 16, gap 12; paisagem (`orientation: landscape` e `max-height: 560px`, ou largura ≥ 768): grade `minmax(0, 1fr) 220px`, gap 16, `100dvh` sem rolagem; vizinhos em `max-height: 2.8em`, opacidade 0,42 e máscara em gradiente; painel: barra de paginação (44, `--superficie-2`, raio 10), grade 2 × 2 de ações (54, Areia, raio 12) e "Sair do foco" (44, Caatinga) |
+| Ações do dispositivo | folha de baixo (celular) ou diálogo de 420 px (desktop): três tiles (Estrelar, Copiar ref., Corrigir texto; 64 de altura, Areia, raio 12), primário Terracota de 48 "Registrar erro neste artigo →", linha de ação "Criar cartão deste trecho" |
+
+O texto da lei nunca é animado e o Leitor nunca é remontado (regras existentes); sem mascote no Leitor.
+
+**Sessão (F9).**
+
+| Parte | Especificação |
+|---|---|
+| Cabeçalho | "Modo Só Estudo" (interruptor em Acqua; ligado, esconde a barra global e os avisos do rodapé) e chips 15, 25, 45 e 60 min (34 de altura; ativo Caatinga, inativo Areia) com "X min passados (só informa)" |
+| Tarefa ativa | bloco de Caatinga, mascote Estudando à esquerda (96 px), primário Solace "Voltar à leitura →" e fantasma "Pausar" |
+| Estacionamento | cartão Areia, mascote Distraído no cabeçalho, campo (Creme, raio 10) e "Estacionar" compacto (40, raio 10, Areia, contorno Caatinga) |
+| Fechar sessão | mascote Sorrindo entre os cactos, selo Acqua "25 min · Art. 112 a 118 lidos", caixas de 22 px para resolver ou descartar o estacionado, primário Terracota "Guardar e fechar sessão →" |
 
 ## Movimento
 
@@ -161,18 +209,19 @@ Movimento só quando explica. Nenhuma informação depende dele; sem movimento a
 
 ## Acessibilidade e robustez
 
-- Contraste: texto 4,5:1, gráficos e contornos 3:1, nos dois temas e em cada fundo possível (inclusive no bloco-herói e sob o vidro).
+- Contraste: texto 4,5:1, gráficos e contornos 3:1, nos dois temas e em cada fundo possível (inclusive no bloco-herói, na régua e sob o dock).
 - Alvos de 44 px em botões, links isolados, linhas de lista, campos e abas (exceção: link dentro de frase corrida). A suíte passa a varrer as rotas principais.
 - Foco visível de 3 px em tudo, com `--bloco-foco` dentro do bloco; link "pular para o conteúdo"; atalhos mantidos.
 - Texto quebra qualquer palavra longa (`overflow-wrap: anywhere` no conteúdo) e nenhuma tela rola na horizontal a 320 px nem a 200% de zoom.
 - Transparência e movimento têm saída (`prefers-reduced-transparency`, `prefers-reduced-motion`, `forced-colors`).
-- Cor nunca sozinha: matéria, andamento, erro e "salvo" têm texto ou ícone.
-- Mascote e esferas decorativos: `alt=""` ou `aria-hidden`; nada depende deles.
+- Cor nunca sozinha: tipo de tarefa, destaque, andamento, erro e "salvo" têm texto, ícone ou estilo de linha.
+- Mascote, cactos, lâmpada e símbolos de distração são decorativos: `alt=""` ou `aria-hidden`; nada depende deles.
 
-## Marca e mascote (sem mudança)
+## Marca e mascote
 
-- **Nome:** "Arretado" em Literata 700 e **um cacto verde** ao lado (SVG de `currentColor` = `--cacto`), na altura da caixa-alta; vale também como favicon (F11). Sem martelo, balança nem outros clichês jurídicos.
-- **Mascote:** vetorial plano (decisão de 14/10/2026), [`mascote/`](mascote/) com `estudando`, `distraido`, `sorrindo` e `determinado`, só o personagem, gerado por `mascote/gerar-mascote.mjs`. **Aparece** no Hoje (apoiado na borda do bloco Agora), na retomada depois de dias (Distraído, acolhedor, sem culpa), no fim de sessão (Sorrindo), no estado vazio e na abertura; 80 a 124 px. **Não aparece** no Leitor, na Revisão em curso, em erro punitivo nem em todas as telas ao mesmo tempo. Nunca com elementos de fundo (cacto, sol, lâmpada, notas, interrogações). Decorativo (`alt=""`).
+- **Nome:** "Arretado." em Literata 700, com o ponto final em Terracota, e **um cacto verde** ao lado (SVG em `--cacto`), na altura da caixa-alta; vale também como favicon (F11). Sem martelo, balança nem outros clichês jurídicos. (Três dos quatro mockups não têm o cacto no cabeçalho: veto em aberto, D-D4 c.)
+- **Mascote:** vetorial plano (decisão de 14/10/2026), [`mascote/`](mascote/) com `estudando`, `distraido`, `sorrindo` e `determinado`, gerado por `mascote/gerar-mascote.mjs`. **Aparece** no Hoje (apoiado na borda do bloco Agora), na retomada depois de dias (Distraído, acolhedor, sem culpa), na Sessão (Estudando, Distraído e Sorrindo), no estado vazio e na abertura; 80 a 124 px. **Não aparece** no Leitor, na Revisão em curso, em erro punitivo nem em todas as telas ao mesmo tempo.
+- **Elementos vetoriais** do Gabriel (`ElementoCactos`, `ElementoLampada`, `ElementoDistracao`, na especificação): componentes decorativos em `src/apresentacao/componentes/` (F3), traço `--tinta`.
 - Próximo: refinar as poses com o Gabriel (proporções, mãos, expressão); origem da arte e uso comercial a confirmar (D-D2, "a conferir").
 
 ## Mapa do código

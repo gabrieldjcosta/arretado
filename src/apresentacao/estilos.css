@@ -1318,7 +1318,7 @@ a.item-norma strong {
 
 /* Flutuam sobre o texto: fundo de superfície, sem transparência no fluxo normal (o modo foco usa a
    translúcida, abaixo), para a letra de trás não passar. */
-.acoes-leitor button {
+.acoes-leitor button:not(.principal) {
   background: var(--superficie);
   box-shadow: var(--sombra-flutuante);
 }
