@@ -9,6 +9,7 @@ import { criarCartaoDeDispositivo, registrarErro } from '../../dominios/recall/s
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESULTADO } from '../recall/rotulos';
+import { PrecedentesDoDispositivo } from './PrecedentesDoDispositivo';
 import { FormularioDaCorrecao, TextosDeAntes, type CorrecaoNoLeitor } from './CorrecaoDoTexto';
 
 /** O dispositivo sobre o qual as ações agem: o que está no alto da tela quando o botão é tocado. */
@@ -220,6 +221,7 @@ function Conteudo({
           setVersao((v) => v + 1);
         }}
       />
+      <PrecedentesDoDispositivo dispositivoId={alvo.dispositivoId} />
       <div className="linha-acoes">
         <button type="button" onClick={aoFechar}>
           Fechar

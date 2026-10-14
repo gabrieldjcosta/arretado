@@ -271,6 +271,19 @@ async function aplicar(
     }
   }
 
+  // Vínculos de precedente (F3-C): o dispositivo perdido deixa o vínculo pendente; a pessoa o relê.
+  for (const d of perdidos) {
+    const vinculos = await todos(repo.colecao('vinculosPrecedenteDispositivo'), {
+      indice: 'dispositivoId',
+      de: d.id,
+      ate: d.id,
+    });
+    for (const v of vinculos) {
+      pendenciaDe('precedente', d, v.id);
+      await repo.colecao('vinculosPrecedenteDispositivo').atualizar(v.id, { status: 'pendente' });
+    }
+  }
+
   // "Lido até" e posição: o dispositivo perdido cede ao anterior que continua na árvore.
   const leituras = await todos(repo.colecao('leituras'), {
     indice: '[usuarioId+normaId]',

@@ -65,7 +65,7 @@ Cadastrar a ADPF 347 (ex.: "estado de coisas inconstitucional"). O usuário:
 ## Acréscimos aprovados (14/10/2026)
 
 ### Vínculo entre precedentes (esquema v8)
-- Entidade própria `VinculoDePrecedente` (de, para, tipo): navegável nos dois sentidos e linha própria no backup. Tipos: `relacionado` (padrão), `aplica`, `confirma`, `distingue`, `supera`. Só o destino é obrigatório.
+- Entidade própria `VinculoDePrecedente` (de, para, tipo): navegável nos dois sentidos e linha própria no backup. Tipos (revisão de design: só três): `relacionado` (padrão), `cita`, `supera`. Só o destino é obrigatório. Tribunal e número do precedente são opcionais (só o texto é obrigatório, D25).
 - Origem e destino podem ser Precedente do usuário **ou** súmula/tese do acervo (sem fundir tese do acervo com trecho-chave).
 - Âncora opcional ao trecho-chave dos dois lados; o v8 já traz os campos para não exigir v9.
 - Na tela do precedente: bloco discreto "Relacionados" por tipo; "superado por" com aviso visível, como o aviso de vigência das normas.

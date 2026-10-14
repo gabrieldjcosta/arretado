@@ -41,6 +41,12 @@ const Resumos = lazy(() =>
 const Resumo = lazy(() =>
   import('./biblioteca/resumos/Resumo').then((m) => ({ default: m.Resumo })),
 );
+const Precedentes = lazy(() =>
+  import('./biblioteca/precedentes/Precedentes').then((m) => ({ default: m.Precedentes })),
+);
+const Precedente = lazy(() =>
+  import('./biblioteca/precedentes/Precedente').then((m) => ({ default: m.Precedente })),
+);
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
 const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
 
@@ -84,6 +90,9 @@ export function App({
                 <Route path="biblioteca/resumos" element={<Resumos />} />
                 <Route path="biblioteca/resumos/novo" element={<Resumos novo />} />
                 <Route path="biblioteca/resumos/:id" element={<Resumo />} />
+                <Route path="biblioteca/precedentes" element={<Precedentes />} />
+                <Route path="biblioteca/precedentes/novo" element={<Precedentes novo />} />
+                <Route path="biblioteca/precedentes/:id" element={<Precedente />} />
                 {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
                 <Route
                   path="biblioteca/importar/:versaoId?"

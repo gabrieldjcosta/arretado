@@ -125,6 +125,20 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
     pacotesIncidencia: { titulo: 'Defensoria', versao: 1 },
     adesoes: { tipo: 'total', versaoAderida: 1, receberAtualizacoes: true },
     precedentes: { tituloTese: 'Tese', escopo: 'nacional' },
+    vinculosPrecedenteDispositivo: {
+      precedenteId: ref,
+      normaId: ref,
+      dispositivoId: ref,
+      endereco: 'art5.incXLIX',
+      status: 'valida',
+    },
+    vinculosEntrePrecedentes: {
+      de: { tipo: 'precedente', id: ref },
+      para: { tipo: 'precedente', id: ref },
+      deId: ref,
+      paraId: ref,
+      tipoDeVinculo: 'relacionado',
+    },
     notas: { titulo: 'Resumo', tipo: 'resumo', conteudo: '' },
     achados: {
       banca: 'FCC',

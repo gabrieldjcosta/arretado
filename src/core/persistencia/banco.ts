@@ -24,7 +24,12 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  * antiga e sem transformar registro. Tudo da F3-A e da F3-B já está aqui, para não subir de novo.
  * Backup do Gabriel antes do merge no `main`; recarregar as abas.
  */
-export const VERSAO_ESQUEMA = 7;
+/**
+ * v8: F3-C (Precedentes): `vinculosPrecedenteDispositivo` e `vinculosEntrePrecedentes`;
+ * `Precedente.trechosChave` e `favorito`. Só coleção nova e campos opcionais: sem índice novo em
+ * coleção antiga e sem transformar registro. Backup do Gabriel antes do merge; recarregar as abas.
+ */
+export const VERSAO_ESQUEMA = 8;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 
