@@ -110,3 +110,25 @@ Defeitos a corrigir na rodada 6:
 - **Desktop:** metade inferior vazia; coluna da direita pequena.
 - **Logo:** martelo e balança são clichê jurídico; pensar marca própria (o avatar vem depois).
 - **Viabilidade:** troca de identidade (D-D2) exige novos tokens, serifa de exibição e migração do tema; só apresentação, mas precisa de decisão e plano.
+
+## Rodada 6 — Hoje, fim de sessão, retomada e revisão com o mascote (14/10/2026)
+
+Entrada do Gabriel: duas imagens de mascote (cachorro caramelo com chapéu de couro marrom e lenço vermelho, folha vetorial com 4 estados: Estudando, Distraído, Sorrindo, Determinado; e um filhote 3D com boné azul bordado, lenço amarelo e caneta-cacto) e uma imagem de tela Hoje com cartão azul-marinho.
+Método: as imagens foram enviadas como telas de referência ao projeto `9953616237194891956` (ids `10328291236108129510`, folha de estados; `17490486993676652548`, filhote 3D) e as telas novas foram geradas com `stitch edit screen --prompt` a partir da folha, o que cria uma tela nova por pedido.
+Paleta nova (do mascote e do Nordeste): creme `#fdf1de`, marrom-tinta `#5a2a17`, azul-marinho `#14213d`, caramelo `#e8892b`, chapéu `#8a4b2a`, lenço `#c23b2b`, cacto `#7c8b3a`, sol `#ffb627` (só ação); etiqueta de disciplina em argila (`#c8763a`), sem vermelho de perigo.
+
+| Tela | Screen id | Nota /50 |
+|---|---|---|
+| Hoje, celular | `da541f21e5bb4d588859643e4b826d94` | 41 |
+| Fim de sessão, celular | `21f7219eeb8547f4aebfb198a4f8fdac` | 33 |
+| Retomada ("voltei e perdi o fio"), celular | `8a239192a1c646c293b00b7737d676e0` | 40 |
+| Revisar frases, celular | `371df1d81eb44418b494956dfc379aa7` | 38 |
+| Hoje, desktop | `7262c4e30da64035bb395dc63c0e4a5b` | 35 |
+
+Ganhos: texto do § 1º agora correto; realce da linha atual em azul claro (sem colisão com o botão sol); mascote integrado como coadjuvante; identidade própria e reconhecível; ânimo alto.
+Defeitos:
+- **Fim de sessão:** o Stitch colou o recorte retangular da folha (com fundo e legenda "Sorrindo!") em vez de integrar o personagem; inventou "Último destaque salvo · Código Penal" com texto falso.
+- **Desktop:** conteúdo sai da largura (coluna direita cortada); frase de efeito inventada ("No sertão, a disciplina é água fresca na caminhada"); "Próximos tópicos da LEP" e "Modo de estudo offline" são invenções.
+- **Revisão:** rótulos inventados ("Leitura atenta", "Literalidade", "Ritmo constante"); mascote pequeno demais.
+- **Mascote:** "Determinado" tem sobrancelhas bravas e "Distraído" tem pontos de interrogação e notas musicais, que podem soar como cobrança; usar versões suaves. O filhote 3D e a folha vetorial são estilos diferentes: definir um canônico (recomendação: vetorial plano, que escala a ícone de 24 px e a SVG).
+- **Reutilização:** o recorte do mascote precisa de arquivo próprio (PNG transparente ou SVG) para não depender do Stitch.
