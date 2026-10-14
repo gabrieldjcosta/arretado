@@ -16,6 +16,10 @@ export function Conta() {
           <span className="dica">Tema e fonte de leitura</span>
         </li>
         <li>
+          <Link to="/conta/perfis">Perfis de estudo</Link>
+          <span className="dica">Calmo, Guiado ou Leitura (opcional)</span>
+        </li>
+        <li>
           <Link to="/conta/dados">Dados</Link>
           <span className="dica">Exportar, importar, restaurar, apagar</span>
         </li>

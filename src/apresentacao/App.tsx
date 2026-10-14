@@ -8,6 +8,7 @@ import { Importar } from './biblioteca/Importar';
 import { Leitor } from './biblioteca/Leitor';
 import { Normas } from './biblioteca/Normas';
 import { AparenciaConta } from './conta/AparenciaConta';
+import { Perfis } from './conta/Perfis';
 import { Conta } from './conta/Conta';
 import { Dados } from './conta/dados/Dados';
 import { Privacidade } from './conta/Privacidade';
@@ -68,6 +69,7 @@ export function App({
               <Route path="biblioteca/normas/:normaId" element={<Leitor />} />
               <Route path="conta" element={<Conta />} />
               <Route path="conta/aparencia" element={<AparenciaConta />} />
+              <Route path="conta/perfis" element={<Perfis />} />
               <Route path="conta/dados" element={<Dados />} />
               <Route path="conta/privacidade" element={<Privacidade />} />
               <Route path="orientacoes" element={<Orientacoes />} />
