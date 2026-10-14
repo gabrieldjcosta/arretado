@@ -38,6 +38,8 @@ Restrições que continuam valendo (de `arretado-design-principles`): sem streak
 ## D-D2 — Identidade visual: areia, verde-cacto, caramelo e mascote (14/10/2026, decisão do Gabriel, confirmada)
 
 Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, para a camada de apresentação. **Confirmada pelo Gabriel em 14/10/2026**: libera trocar os tokens do app (em PR próprio, com contraste e E2E) e atualizar o plano-mestre, o CLAUDE.md e a skill rretado-design-principles. Mascote canônico: **vetorial plano**.
+
+**Implementação no app adiada (Gabriel, 14/10/2026):** não há PR de componentes nem mudança em `estilos.css` por ora; o PR de documentação fica só com docs. Os tokens, a troca de componentes (cartão verde, botões em vidro, cacto na marca, mascote na Hoje) e a atualização de `scripts/contraste.mjs` ficam para quando o Gabriel mandar. Até lá, o app continua na identidade sálvia.
 - Tema claro: fundo areia, **cartão Agora em verde-cacto profundo**, botão primário caramelo. Tema escuro: **espresso**, botão amarelo-sol.
 - Tipografia da marca "Arretado" (serifa de exibição) mantida; interface em Atkinson; texto da lei em Literata.
 - **Cacto verde ao lado do nome** no cabeçalho.

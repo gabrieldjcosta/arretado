@@ -69,7 +69,7 @@ Marca e títulos: Literata (serifa) 700. Texto da lei: Literata. Interface: Atki
 - Navegação inferior flutuante em vidro, com 4 áreas (Hoje, Plano, Recall, Biblioteca); Conta fica no cabeçalho.
 - Alvos de toque ≥ 44 px; foco visível; movimento só de 150–220 ms e respeitando `prefers-reduced-motion`.
 
-## Para implementar (quando o Gabriel liberar)
+## Para implementar (adiado por decisão do Gabriel em 14/10/2026; só quando ele mandar)
 
 1. Trocar os tokens de `src/apresentacao/estilos.css` pelos acima (claro e escuro), mantendo os nomes existentes quando possível; reconferir `scripts/contraste.mjs`.
 2. Atualizar a skill `arretado-design-principles` (paleta e mascote no lugar de sálvia e papel esverdeado).
