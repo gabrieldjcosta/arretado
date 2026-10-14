@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ApagarTudo } from './ApagarTudo';
 import { Espacos } from './Espacos';
 import { Exportar } from './Exportar';
 import { Importar } from './Importar';
-import { lerAvisoDeRecarga } from './recarga';
+import { lerAvisoDeRecarga, limparAvisoDeRecarga } from './recarga';
 import { Restauracao } from './Restauracao';
 
 export function Dados() {
   const [aviso] = useState(lerAvisoDeRecarga);
+  useEffect(limparAvisoDeRecarga, []);
   return (
     <>
       <h1>Dados</h1>
