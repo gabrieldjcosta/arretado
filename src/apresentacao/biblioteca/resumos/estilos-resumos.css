@@ -1,0 +1,31 @@
+.resumo-corpo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  max-inline-size: 70ch;
+  color: var(--texto);
+}
+.resumo-campo {
+  display: grid;
+  gap: 0.25rem;
+  margin-block-end: 0.75rem;
+}
+.resumo-campo textarea,
+.resumo-campo input {
+  inline-size: 100%;
+  max-inline-size: 70ch;
+}
+.resumo-discreto {
+  min-block-size: 1.5rem;
+  color: var(--texto-atenuado);
+  font-size: 0.9rem;
+}
+.resumo-excluir {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--texto-atenuado);
+  text-decoration: underline;
+  cursor: pointer;
+  min-block-size: 44px;
+}

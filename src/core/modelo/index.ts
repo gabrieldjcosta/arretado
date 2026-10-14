@@ -68,6 +68,12 @@ export const ENTIDADES = {
     modulo: 'plano',
     indices: ['usuarioId', 'disciplinaId', 'editalId', '[usuarioId+faixa]'],
   },
+  tarefasDeEstudo: {
+    esquema: P.TarefaDeEstudo,
+    modulo: 'plano',
+    indices: ['usuarioId', 'pontoId', 'paiId', '[usuarioId+estado]'],
+    desdeVersao: 7,
+  },
   // execução
   dias: { esquema: P.Dia, modulo: 'execucao', indices: ['usuarioId', '[usuarioId+data]'] },
   sessoes: {
@@ -173,6 +179,18 @@ export const ENTIDADES = {
     esquema: B.Precedente,
     modulo: 'precedentes',
     indices: ['usuarioId', 'disciplinaId'],
+  },
+  vinculosPrecedenteDispositivo: {
+    esquema: B.VinculoPrecedenteDispositivo,
+    modulo: 'precedentes',
+    indices: ['usuarioId', 'precedenteId', 'dispositivoId', 'normaId'],
+    desdeVersao: 8,
+  },
+  vinculosEntrePrecedentes: {
+    esquema: B.VinculoEntrePrecedentes,
+    modulo: 'precedentes',
+    indices: ['usuarioId', 'deId', 'paraId'],
+    desdeVersao: 8,
   },
   notas: { esquema: B.Nota, modulo: 'notas', indices: ['usuarioId', 'disciplinaId'] },
   achados: { esquema: B.Achado, modulo: 'inteligencia', indices: ['usuarioId', 'status'] },

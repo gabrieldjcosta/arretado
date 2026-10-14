@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import type { Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
@@ -24,6 +24,12 @@ import { procedenciaDaVersao } from './rotulos';
 import { disciplinasDaNorma, mudarDisciplinas } from '../../dominios/acervo/vinculos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { EscolherDisciplinas } from './EscolherDisciplinas';
+import {
+  haCriterio,
+  opcoesDeFiltro,
+  passaNoFiltro,
+  type CriteriosDeNormas,
+} from './filtroDeNormas';
 import { referenciaDoNo } from './linhas';
 
 interface ItemDaDisciplina {
@@ -167,15 +173,23 @@ function semAcento(t: string): string {
     .toLocaleLowerCase('pt-BR');
 }
 
-/** Os grupos só com as normas cujo título ou descrição contém a busca. */
-function filtrarGrupos<G extends { itens: ItemDaDisciplina[] }>(grupos: G[], busca: string): G[] {
-  const q = semAcento(busca.trim());
-  if (q === '') return grupos;
+/** Os grupos só com as normas que passam em disciplina, ano, tipo e busca (título ou descrição). */
+function filtrarGrupos<G extends { titulo: string; itens: ItemDaDisciplina[] }>(
+  grupos: G[],
+  criterios: CriteriosDeNormas,
+): G[] {
+  const q = semAcento(criterios.busca.trim());
   return grupos
+    .filter((g) => criterios.disciplina === '' || g.titulo === criterios.disciplina)
     .map((g) => ({
       ...g,
-      itens: g.itens.filter(({ norma, subtitulo }) =>
-        semAcento([norma.tituloCurto, subtitulo ?? '', descricaoDe(norma)].join(' ')).includes(q),
+      itens: g.itens.filter(
+        ({ norma, subtitulo }) =>
+          passaNoFiltro(norma, criterios) &&
+          (q === '' ||
+            semAcento([norma.tituloCurto, subtitulo ?? '', descricaoDe(norma)].join(' ')).includes(
+              q,
+            )),
       ),
     }))
     .filter((g) => g.itens.length > 0);
@@ -218,7 +232,22 @@ export function Normas() {
   const estadoNavegacao: unknown = useLocation().state;
   const navegar = useNavigate();
   const [aviso, setAviso] = useState(() => avisoDaNavegacao(estadoNavegacao));
-  const [busca, setBusca] = useState('');
+  const [params, setParams] = useSearchParams();
+  const criterios: CriteriosDeNormas = {
+    disciplina: params.get('disciplina') ?? '',
+    ano: params.get('ano') ?? '',
+    tipo: params.get('tipo') ?? '',
+    busca: params.get('q') ?? '',
+  };
+  const busca = criterios.busca;
+  // Os critérios ficam no endereço: voltar do leitor reencontra a lista como estava.
+  const mudarCriterio = (nome: string, valor: string) => {
+    const novo = new URLSearchParams(params);
+    if (valor) novo.set(nome, valor);
+    else novo.delete(nome);
+    setParams(novo, { replace: true });
+  };
+  const [todas, setTodas] = useState(false);
   const [mudando, setMudando] = useState<{ norma: Norma; atuais: string[] } | null>(null);
   const [falhaAoMudar, setFalhaAoMudar] = useState<string | null>(null);
   const fonte = useFonteAcervo();
@@ -284,7 +313,9 @@ export function Normas() {
     );
   }
 
-  const grupos = dados ? filtrarGrupos(dados.porDisciplina, busca) : [];
+  const listar = todas || haCriterio(criterios);
+  const grupos = dados && listar ? filtrarGrupos(dados.porDisciplina, criterios) : [];
+  const opcoes = dados ? opcoesDeFiltro(dados.normas) : { anos: [], tipos: [] };
 
   return (
     <>
@@ -387,13 +418,84 @@ export function Normas() {
                     value={busca}
                     placeholder="Título ou assunto"
                     onChange={(e) => {
-                      setBusca(e.target.value);
+                      mudarCriterio('q', e.target.value);
                     }}
                   />
                 </label>
-                {grupos.length === 0 && (
+                <div className="filtros">
+                  <div className="campo">
+                    <label htmlFor="filtro-ano">Ano</label>
+                    <select
+                      id="filtro-ano"
+                      value={criterios.ano}
+                      onChange={(e) => {
+                        mudarCriterio('ano', e.target.value);
+                      }}
+                    >
+                      <option value="">Todos</option>
+                      {opcoes.anos.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="campo">
+                    <label htmlFor="filtro-tipo">Tipo de norma</label>
+                    <select
+                      id="filtro-tipo"
+                      value={criterios.tipo}
+                      onChange={(e) => {
+                        mudarCriterio('tipo', e.target.value);
+                      }}
+                    >
+                      <option value="">Todos</option>
+                      {opcoes.tipos.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div role="group" aria-label="Disciplinas" className="acoes-item">
+                  {dados.porDisciplina.map((g) => (
+                    <button
+                      key={g.titulo}
+                      type="button"
+                      className={criterios.disciplina === g.titulo ? 'botao principal' : 'botao'}
+                      aria-pressed={criterios.disciplina === g.titulo}
+                      onClick={() => {
+                        setTodas(false);
+                        mudarCriterio(
+                          'disciplina',
+                          criterios.disciplina === g.titulo ? '' : g.titulo,
+                        );
+                      }}
+                    >
+                      {g.titulo} ({g.itens.length})
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className={todas && criterios.disciplina === '' ? 'botao principal' : 'botao'}
+                    aria-pressed={todas && criterios.disciplina === ''}
+                    onClick={() => {
+                      setTodas(!todas);
+                      mudarCriterio('disciplina', '');
+                    }}
+                  >
+                    Todas as normas
+                  </button>
+                </div>
+                {!listar && (
                   <p role="status" className="dica">
-                    Nenhuma norma com “{busca}”. Tente outra palavra.
+                    Escolha uma disciplina para ver as normas, ou busque por título, ano ou tipo.
+                  </p>
+                )}
+                {listar && grupos.length === 0 && (
+                  <p role="status" className="dica">
+                    Nenhuma norma com esses filtros. Tente outra combinação.
                   </p>
                 )}
                 {grupos.map((g) => (

@@ -6,7 +6,7 @@ import type { Repositorio } from '../core/persistencia';
 import { repositorioDeTeste } from '../testes/repositorio';
 import { App } from './App';
 import { SECOES, secaoDeAjuda } from './orientacoes/conteudo';
-import { RODAPE } from './Shell';
+import { RODAPE_CURTO } from './textos';
 
 async function abrirApp(rota = '/', repo?: Repositorio) {
   const r = repo ?? (await repositorioDeTeste()).repo;
@@ -33,7 +33,7 @@ describe('shell (5.1, 5.5)', () => {
     expect(screen.getByRole('button', { name: 'Ajuda' })).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('button', { name: 'Relatar problema' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
-    expect(screen.getByText(RODAPE)).toBeInTheDocument();
+    expect(screen.getByText(RODAPE_CURTO, { exact: false })).toBeInTheDocument();
   });
 
   it('navega entre as áreas e marca a atual', async () => {
@@ -50,6 +50,29 @@ describe('shell (5.1, 5.5)', () => {
   it('rota desconhecida mostra saída para o Hoje', async () => {
     await abrirApp('/nao-existe');
     expect(screen.getByRole('heading', { name: 'Tela não encontrada' })).toBeInTheDocument();
+  });
+});
+
+describe('encaixes da F3 (P0 Fundação)', () => {
+  it('Hoje compõe os blocos e mantém a revisão vencida e o vazio de antes', async () => {
+    await abrirApp('/');
+    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Por onde começar?' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['/sessao/iniciar', 'Começar uma Sessão'],
+    ['/plano/onboarding', 'Para qual carreira você estuda?'],
+    ['/plano/pontos', 'Pontos do programa'],
+    ['/plano/tarefas', 'Tarefas'],
+  ])('rota %s está registrada e mostra o encaixe', async (rota, titulo) => {
+    await abrirApp(rota);
+    expect(await screen.findByRole('heading', { name: titulo })).toBeInTheDocument();
+  });
+
+  it('/plano segue mostrando o Plano', async () => {
+    await abrirApp('/plano');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Plano' })).toBeInTheDocument();
   });
 });
 

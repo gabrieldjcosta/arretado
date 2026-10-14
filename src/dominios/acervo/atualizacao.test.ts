@@ -230,6 +230,44 @@ describe('atualizarItem', () => {
     repo.fechar();
   });
 
+  it('vínculo de precedente com o dispositivo perdido fica pendente; o que segue, válido', async () => {
+    const { repo, fonte2, e2, normaId, id } = await montar([
+      no('art1', 'Primeiro artigo com texto longo.'),
+      no('art2', 'Segundo artigo.'),
+    ]);
+    const precedente = await repo
+      .colecao('precedentes')
+      .criar({ tituloTese: 'STF ADPF 347', escopo: 'nacional' });
+    const perdido = await repo.colecao('vinculosPrecedenteDispositivo').criar({
+      precedenteId: precedente.id,
+      normaId,
+      dispositivoId: id('art4'),
+      endereco: 'art4',
+      status: 'valida',
+    });
+    const mantido = await repo.colecao('vinculosPrecedenteDispositivo').criar({
+      precedenteId: precedente.id,
+      normaId,
+      dispositivoId: id('art2'),
+      endereco: 'art2',
+      status: 'valida',
+    });
+    await atualizarItem(repo, fonte2, e2);
+    expect((await repo.colecao('vinculosPrecedenteDispositivo').obter(perdido.id))?.status).toBe(
+      'pendente',
+    );
+    expect((await repo.colecao('vinculosPrecedenteDispositivo').obter(mantido.id))?.status).toBe(
+      'valida',
+    );
+    const pendencias = await repo.colecao('pendenciasReleitura').todosDoUsuario();
+    expect(
+      pendencias
+        .filter((p) => p.tipo === 'precedente')
+        .map((p) => [p.enderecoAntigo, p.referenciaId]),
+    ).toEqual([['art4', perdido.id]]);
+    repo.fechar();
+  });
+
   it('é idempotente e itensComVersaoNova acusa a versão maior', async () => {
     const { repo, fonte2, e2 } = await montar([no('art1', 'Texto novo.')]);
     expect((await itensComVersaoNova(repo, [e2])).map((x) => x.versaoAderida)).toEqual([1]);

@@ -201,3 +201,123 @@ describe('pacote v5 no app v6 (Frases 1, revisão independente)', () => {
     destino.fechar();
   });
 });
+
+describe('pacote v6 no app v7 e v7 de ida e volta (F3, P0)', () => {
+  it('pacote v6 (sem tarefasDeEstudo) restaura no app v7 sem recusa e deixa as tarefas locais vazias', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await origem.colecao('sessoes').criar(camposMinimos('sessoes', origem.ctx.usuarioId));
+    const { bytes } = await exportarPacote(origem);
+    const v6 = await comVersao(bytes, 6);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, v6, 6);
+    const d = destino.comUsuario(origem.ctx.usuarioId);
+    expect(await d.colecao('sessoes').todosDoUsuario()).toEqual(
+      await origem.colecao('sessoes').todosDoUsuario(),
+    );
+    expect(await d.colecao('tarefasDeEstudo').contar()).toBe(0);
+    origem.fechar();
+    destino.fechar();
+  });
+
+  it('substituir módulos (modo 5) com pacote v6 mantém as Tarefas de estudo locais', async () => {
+    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const v6 = await comVersao((await exportarPacote(repo)).bytes, 6);
+    const tarefa = await repo
+      .colecao('tarefasDeEstudo')
+      .criar(camposMinimos('tarefasDeEstudo', repo.ctx.usuarioId));
+    const pacote = await lerPacote(v6);
+    const previa = await planejar(repo, pacote, { modo: 5, modulos: ['plano'] });
+    expect(previa.porColecao.tarefasDeEstudo?.excluir ?? 0).toBe(0);
+    await aplicar(repo, pacote, previa);
+    expect((await repo.db.tabela('tarefasDeEstudo').get(tarefa.id))?.excluidoEm).toBeNull();
+    repo.fechar();
+  });
+
+  it('pacote v7 vai e volta (modo 6) com tarefas, Sessão e preferências novas', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const mae = await origem
+      .colecao('tarefasDeEstudo')
+      .criar({ ...camposMinimos('tarefasDeEstudo', origem.ctx.usuarioId), estado: 'dividida' });
+    await origem.colecao('tarefasDeEstudo').criar({
+      ...camposMinimos('tarefasDeEstudo', origem.ctx.usuarioId),
+      paiId: mae.id,
+      autoria: 'sugerida',
+      razao: 'Revisão vencida',
+      estimativaMin: 15,
+    });
+    await origem.colecao('sessoes').criar({
+      ...camposMinimos('sessoes', origem.ctx.usuarioId),
+      fronteira: 'até o art. 15',
+      proximoPasso: 'Ler os arts. 16 a 20',
+      estacionamento: [{ texto: 'ver depois', em: '2026-10-13T12:00:00.000Z' }],
+      tarefaId: mae.id,
+    });
+    const { bytes } = await exportarPacote(origem);
+    expect((await lerPacote(bytes)).manifesto.versaoEsquema).toBe(VERSAO_ESQUEMA);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, bytes, 6);
+    const d = destino.comUsuario(origem.ctx.usuarioId);
+    for (const nome of ['tarefasDeEstudo', 'sessoes'] as const) {
+      expect(await d.colecao(nome).todosDoUsuario()).toEqual(
+        await origem.colecao(nome).todosDoUsuario(),
+      );
+    }
+    origem.fechar();
+    destino.fechar();
+  });
+});
+
+describe('pacote v7 no app v8 (F3-C, vínculos de precedentes)', () => {
+  it('pacote v7 restaura sem recusa e deixa os vínculos de precedente locais vazios; v8 vai e volta', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const p = await origem
+      .colecao('precedentes')
+      .criar({ tituloTese: 'STF ADPF 347', escopo: 'nacional' });
+    await origem.colecao('vinculosEntrePrecedentes').criar({
+      de: { tipo: 'precedente', id: p.id },
+      para: { tipo: 'precedente', id: p.id },
+      deId: p.id,
+      paraId: p.id,
+      tipoDeVinculo: 'relacionado',
+    });
+    const { bytes } = await exportarPacote(origem);
+    const v7 = await comVersao(bytes, 7);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, v7, 6);
+    expect(
+      await destino.comUsuario(origem.ctx.usuarioId).colecao('vinculosEntrePrecedentes').contar(),
+    ).toBe(0);
+    const destino2 = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino2, bytes, 6);
+    expect(
+      await destino2.comUsuario(origem.ctx.usuarioId).colecao('vinculosEntrePrecedentes').contar(),
+    ).toBe(1);
+    origem.fechar();
+    destino.fechar();
+    destino2.fechar();
+  });
+
+  it('substituir módulos (modo 5) com pacote v7 mantém os vínculos de precedente locais', async () => {
+    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const v7 = await comVersao((await exportarPacote(repo)).bytes, 7);
+    const p = await repo
+      .colecao('precedentes')
+      .criar({ tituloTese: 'STF ADPF 347', escopo: 'nacional' });
+    const v1 = await repo
+      .colecao('vinculosPrecedenteDispositivo')
+      .criar(camposMinimos('vinculosPrecedenteDispositivo', p.id));
+    const v2 = await repo
+      .colecao('vinculosEntrePrecedentes')
+      .criar(camposMinimos('vinculosEntrePrecedentes', p.id));
+    const pacote = await lerPacote(v7);
+    const previa = await planejar(repo, pacote, { modo: 5, modulos: ['precedentes'] });
+    expect(previa.porColecao.vinculosPrecedenteDispositivo?.excluir ?? 0).toBe(0);
+    expect(previa.porColecao.vinculosEntrePrecedentes?.excluir ?? 0).toBe(0);
+    await aplicar(repo, pacote, previa);
+    expect(
+      (await repo.db.tabela('vinculosPrecedenteDispositivo').get(v1.id))?.excluidoEm,
+    ).toBeNull();
+    expect((await repo.db.tabela('vinculosEntrePrecedentes').get(v2.id))?.excluidoEm).toBeNull();
+    repo.fechar();
+  });
+});

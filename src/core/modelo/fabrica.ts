@@ -33,6 +33,12 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
     editais: { titulo: 'Edital', versao: 1 },
     disciplinas: { nome: 'Direito Penal' },
     pontos: { titulo: 'Execução penal' },
+    tarefasDeEstudo: {
+      titulo: 'Ler arts. 10 a 13 da LEP',
+      estado: 'aberta',
+      ordem: 1,
+      autoria: 'manual',
+    },
     dias: { data: '2026-09-23' },
     sessoes: {
       tipo: 'livre',
@@ -119,6 +125,20 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
     pacotesIncidencia: { titulo: 'Defensoria', versao: 1 },
     adesoes: { tipo: 'total', versaoAderida: 1, receberAtualizacoes: true },
     precedentes: { tituloTese: 'Tese', escopo: 'nacional' },
+    vinculosPrecedenteDispositivo: {
+      precedenteId: ref,
+      normaId: ref,
+      dispositivoId: ref,
+      endereco: 'art5.incXLIX',
+      status: 'valida',
+    },
+    vinculosEntrePrecedentes: {
+      de: { tipo: 'precedente', id: ref },
+      para: { tipo: 'precedente', id: ref },
+      deId: ref,
+      paraId: ref,
+      tipoDeVinculo: 'relacionado',
+    },
     notas: { titulo: 'Resumo', tipo: 'resumo', conteudo: '' },
     achados: {
       banca: 'FCC',

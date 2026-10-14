@@ -30,7 +30,7 @@ Registrar no fim de `docs/proxima-sessao.md` (ou no PR), separando "feito" de "v
 Quem retoma confere branch, commit e alterações locais antes de editar; se não bater com o resumo, para e avisa o Gabriel. Mesma falha duas vezes: parar de editar e diagnosticar. Risco alto (migração, reancoragem, sincronização, sanitização): revisão independente em outra sessão antes do merge.
 
 ## Regras de trabalho neste projeto
-- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); a F3 só começa depois do portão da F2.
+- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); o portão da F2 foi fechado em 13/10/2026 e a F3 está liberada; medições em uso real e testes com outras pessoas ficam na V1 (depois das contas), sem bloquear fase.
 - Toda entrega de fase inclui o item de segurança/LGPD descrito na Parte 1 §15.
 - Vocabulário obrigatório na interface e no código: Aparelho (equipamento), Problema (falha da plataforma), Erro (só estudo), Dispositivo (só unidade da lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta.
 - Nada obrigatório além do mínimo nos formulários; na captura de erro só a frase correta é obrigatória (D25; implementado nas Frases 1, esquema v6).

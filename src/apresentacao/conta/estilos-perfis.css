@@ -1,0 +1,30 @@
+/* Perfis de estudo (A4). Só tokens e classes existentes; sem cor literal. */
+.perfis-lista {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.perfil-opcao .dica {
+  display: block;
+  margin: 0.125rem 0 0 1.75rem;
+}
+
+.perfil-previa {
+  margin-top: 1rem;
+}
+
+.perfil-previa h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.perfil-previa ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.perfil-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

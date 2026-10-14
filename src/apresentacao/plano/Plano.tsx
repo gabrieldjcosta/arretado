@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import type { Disciplina, Faixa, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
@@ -41,14 +42,19 @@ export function Plano() {
         <>
           <Vazio titulo="Nenhum ponto do edital ainda">
             <p>Importe seus pontos para poder vincular erros a eles.</p>
+            <p>
+              <Link to="/plano/onboarding" className="botao principal">
+                Montar pelo catálogo de concursos
+              </Link>
+            </p>
           </Vazio>
           <ImportarPontos aoImportar={setConfirmacao} />
         </>
       ) : (
         <>
           <p className="dica">
-            {dados.pontos.length} pontos importados. Servem para vincular erros; mudar faixas e
-            receber sugestão do próximo ponto chega numa próxima fase.
+            {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.{' '}
+            <Link to="/plano/pontos">Editar pontos e matérias</Link>
           </p>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>

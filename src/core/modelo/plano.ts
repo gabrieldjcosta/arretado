@@ -1,4 +1,5 @@
-// Plano e Execução: Concurso, FasePrazo, Edital, Disciplina, Ponto, Dia, Sessão (Parte 1 §5.3; Parte 2 §10.1–10.3).
+// Plano e Execução: Concurso, FasePrazo, Edital, Disciplina, Ponto, Dia, Sessão, Tarefa de estudo
+// (Parte 1 §5.3; Parte 2 §10.1–10.3; F3, esquema v7).
 import { z } from 'zod';
 import { camposComuns, DataCivil, Id, Instante, TextoCurto, TextoLongo } from './comum';
 
@@ -106,6 +107,37 @@ export const Dia = z.strictObject({
 });
 export type Dia = z.infer<typeof Dia>;
 
+/**
+ * Do que se trata uma ação ou sessão (F3, v7). `revisao` = cartões/frases vencidos; `leitura` = a
+ * leitura salva (norma); `tarefa` = Tarefa de estudo; `ponto` = ponto do programa; `livre` = a pessoa
+ * escolheu sem sugestão. O `id` aponta para o item quando houver; o `rotulo` é o texto mostrado.
+ */
+export const TipoDeAlvo = z.enum(['revisao', 'leitura', 'tarefa', 'ponto', 'livre']);
+export type TipoDeAlvo = z.infer<typeof TipoDeAlvo>;
+
+export const AlvoDeAcao = z.strictObject({
+  tipo: TipoDeAlvo,
+  id: Id.optional(),
+  rotulo: TextoCurto.optional(),
+});
+export type AlvoDeAcao = z.infer<typeof AlvoDeAcao>;
+
+/** De onde veio a Próxima ação que originou a Sessão (cópia do que foi mostrado; não é recalculado). */
+export const OrigemDaAcao = z.strictObject({
+  tipo: z.enum(['revisao_vencida', 'leitura_salva', 'tarefa', 'escolha_propria', 'sessao_curta']),
+  razao: TextoCurto.optional(),
+});
+export type OrigemDaAcao = z.infer<typeof OrigemDaAcao>;
+
+/** Anotação rápida de distração durante a Sessão (Estacionamento); nunca interrompe o estudo. */
+export const NotaDeEstacionamento = z.strictObject({
+  texto: z.string().trim().min(1).max(500),
+  em: Instante,
+  /** Resolvida ou descartada depois da Sessão; ausente = ainda no estacionamento. */
+  resolvidaEm: Instante.optional(),
+});
+export type NotaDeEstacionamento = z.infer<typeof NotaDeEstacionamento>;
+
 export const Sessao = z.strictObject({
   ...camposComuns,
   tipo: z.enum(['estudo', 'livre', 'simulado']),
@@ -119,8 +151,54 @@ export const Sessao = z.strictObject({
   questoesFeitas: z.int().min(0).optional(),
   questoesAcertadas: z.int().min(0).optional(),
   anotacao: TextoCurto.optional(),
+  /** F3 (v7), tudo opcional: Sessão antiga continua válida. O que se vai estudar. */
+  alvo: AlvoDeAcao.optional(),
+  /** Até onde ler nesta Sessão ("até o art. 15"); texto livre, nunca obrigatório. */
+  fronteira: TextoCurto.optional(),
+  /** Próximo passo pequeno, pedido ao fechar (pré-preenchido); alimenta a Próxima ação seguinte. */
+  proximoPasso: TextoCurto.optional(),
+  /** Estacionamento de distração: anotações da Sessão, em ordem de criação. */
+  estacionamento: z.array(NotaDeEstacionamento).max(200).optional(),
+  origemDaAcao: OrigemDaAcao.optional(),
+  /** Tarefa de estudo que a Sessão trabalha (opcional). */
+  tarefaId: Id.optional(),
+  /** Temporizador opcional escolhido para esta Sessão; informativo, nunca bloqueia nem mede aprendizado. */
+  temporizadorMin: z.int().min(1).max(240).optional(),
   conteudosAcessados: z
     .array(z.strictObject({ tipo: z.enum(['norma', 'nota', 'precedente']), id: Id, em: Instante }))
     .optional(),
 });
 export type Sessao = z.infer<typeof Sessao>;
+
+export const EstadoDaTarefa = z.enum(['aberta', 'feita', 'adiada', 'dividida']);
+export type EstadoDaTarefa = z.infer<typeof EstadoDaTarefa>;
+
+/**
+ * Tarefa de estudo (F3-B, esquema v7): passo pequeno e concreto ("ler arts. 10 a 13"), manual ou
+ * sugerida por regra explicável. Não concluída fica na fila, sem atraso punitivo; `dividida` = virou
+ * filhas (`paiId` nelas). Entidade do módulo `plano`.
+ */
+export const TarefaDeEstudo = z.strictObject({
+  ...camposComuns,
+  titulo: TextoCurto,
+  pontoId: Id.optional(),
+  fonte: z
+    .strictObject({
+      tipo: z.enum(['norma', 'dispositivo', 'precedente', 'nota']),
+      id: Id,
+      rotulo: TextoCurto.optional(),
+    })
+    .optional(),
+  estado: EstadoDaTarefa,
+  /** Tarefa de que esta foi dividida. */
+  paiId: Id.optional(),
+  /** Posição na fila (reordenar); menor primeiro. */
+  ordem: z.number(),
+  estimativaMin: z.int().min(1).max(600).optional(),
+  autoria: z.enum(['manual', 'sugerida']),
+  /** Por que foi sugerida (regra explicável); só em `autoria` `sugerida`. */
+  razao: TextoCurto.optional(),
+  adiadaAte: DataCivil.optional(),
+  concluidaEm: Instante.optional(),
+});
+export type TarefaDeEstudo = z.infer<typeof TarefaDeEstudo>;

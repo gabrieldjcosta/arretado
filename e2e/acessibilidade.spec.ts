@@ -16,6 +16,7 @@ const ROTAS = [
   '/biblioteca/importar',
   '/conta',
   '/conta/aparencia',
+  '/conta/perfis',
   '/conta/dados',
   '/conta/privacidade',
   '/orientacoes',

@@ -1,18 +1,16 @@
+import { lazy, Suspense, type ReactNode } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 import type { Repositorio } from '../core/persistencia';
 import type { FonteDoAcervo } from '../dominios/acervo/fonte';
 import { Acervo } from './biblioteca/Acervo';
 import { Colecoes } from './biblioteca/Colecoes';
 import { ProvedorFonteAcervo } from './dados/fonteAcervo';
-import { Importar } from './biblioteca/Importar';
-import { Leitor } from './biblioteca/Leitor';
 import { Normas } from './biblioteca/Normas';
 import { AparenciaConta } from './conta/AparenciaConta';
+import { Perfis } from './conta/Perfis';
 import { Conta } from './conta/Conta';
-import { Dados } from './conta/dados/Dados';
 import { Privacidade } from './conta/Privacidade';
 import { ProvedorRepositorio } from './dados/ProvedorRepositorio';
-import { Orientacoes } from './orientacoes/Orientacoes';
 import { Shell } from './Shell';
 import { DetalheErro } from './recall/DetalheErro';
 import { Drill } from './recall/Drill';
@@ -25,9 +23,36 @@ import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
 import { RevisarFrases } from './recall/RevisarFrases';
-import { Plano } from './plano/Plano';
-import { Hoje, NaoEncontrada } from './telas/Areas';
+import { Hoje } from './hoje/Hoje';
+import { RotasDoPlano } from './plano/Rotas';
+import { RotasDaSessao } from './sessao/Rotas';
+import { NaoEncontrada } from './telas/Areas';
+import { Esqueleto } from './componentes/estados';
+import { LimiteDeErro } from './componentes/LimiteDeErro';
+import { Orientacoes } from './orientacoes/Orientacoes';
 import './estilos.css';
+
+// Telas pesadas (leitor, importador, backup) saem do pacote inicial: o Hoje abre sem
+// baixar o estruturador nem o código de pacote. Offline continua igual (arquivos do mesmo site).
+const Importar = lazy(() => import('./biblioteca/Importar').then((m) => ({ default: m.Importar })));
+const Resumos = lazy(() =>
+  import('./biblioteca/resumos/Resumos').then((m) => ({ default: m.Resumos })),
+);
+const Resumo = lazy(() =>
+  import('./biblioteca/resumos/Resumo').then((m) => ({ default: m.Resumo })),
+);
+const Precedentes = lazy(() =>
+  import('./biblioteca/precedentes/Precedentes').then((m) => ({ default: m.Precedentes })),
+);
+const Precedente = lazy(() =>
+  import('./biblioteca/precedentes/Precedente').then((m) => ({ default: m.Precedente })),
+);
+const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
+const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
+
+function Carregando({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
+}
 
 export function App({
   abrir,
@@ -40,38 +65,69 @@ export function App({
     <ProvedorRepositorio {...(abrir ? { abrir } : {})}>
       <ProvedorFonteAcervo fonte={fonteAcervo}>
         <HashRouter>
-          <Routes>
-            <Route element={<Shell />}>
-              <Route index element={<Hoje />} />
-              <Route path="plano" element={<Plano />} />
-              <Route path="recall" element={<RecallInicio />}>
-                <Route index element={<ListaErros />} />
-                <Route path="frases" element={<ListaFrases />} />
-                <Route path="cartoes" element={<ListaCartoes />} />
-                <Route path="historico" element={<Historico />} />
+          <LimiteDeErro>
+            <Routes>
+              <Route element={<Shell />}>
+                <Route index element={<Hoje />} />
+                <Route path="plano/*" element={<RotasDoPlano />} />
+                <Route path="sessao/*" element={<RotasDaSessao />} />
+                <Route path="recall" element={<RecallInicio />}>
+                  <Route index element={<ListaErros />} />
+                  <Route path="frases" element={<ListaFrases />} />
+                  <Route path="cartoes" element={<ListaCartoes />} />
+                  <Route path="historico" element={<Historico />} />
+                </Route>
+                <Route path="recall/registrar" element={<RegistrarErro />} />
+                <Route path="recall/revisar" element={<Drill />} />
+                <Route path="recall/frases/revisar" element={<RevisarFrases />} />
+                <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
+                <Route path="recall/erros/:id" element={<DetalheErro />} />
+                <Route path="recall/cartoes/:id" element={<EditarCartao />} />
+                <Route path="biblioteca" element={<Normas />} />
+                <Route path="biblioteca/acervo" element={<Acervo />} />
+                <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
+                <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
+                <Route path="biblioteca/resumos" element={<Resumos />} />
+                <Route path="biblioteca/resumos/novo" element={<Resumos novo />} />
+                <Route path="biblioteca/resumos/:id" element={<Resumo />} />
+                <Route path="biblioteca/precedentes" element={<Precedentes />} />
+                <Route path="biblioteca/precedentes/novo" element={<Precedentes novo />} />
+                <Route path="biblioteca/precedentes/:id" element={<Precedente />} />
+                {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
+                <Route
+                  path="biblioteca/importar/:versaoId?"
+                  element={
+                    <Carregando>
+                      <Importar />
+                    </Carregando>
+                  }
+                />
+                <Route
+                  path="biblioteca/normas/:normaId"
+                  element={
+                    <Carregando>
+                      <Leitor />
+                    </Carregando>
+                  }
+                />
+                <Route path="conta" element={<Conta />} />
+                <Route path="conta/aparencia" element={<AparenciaConta />} />
+                <Route path="conta/perfis" element={<Perfis />} />
+                <Route
+                  path="conta/dados"
+                  element={
+                    <Carregando>
+                      <Dados />
+                    </Carregando>
+                  }
+                />
+                <Route path="conta/privacidade" element={<Privacidade />} />
+                <Route path="orientacoes" element={<Orientacoes />} />
+                <Route path="orientacoes/:secao" element={<Orientacoes />} />
+                <Route path="*" element={<NaoEncontrada />} />
               </Route>
-              <Route path="recall/registrar" element={<RegistrarErro />} />
-              <Route path="recall/revisar" element={<Drill />} />
-              <Route path="recall/frases/revisar" element={<RevisarFrases />} />
-              <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
-              <Route path="recall/erros/:id" element={<DetalheErro />} />
-              <Route path="recall/cartoes/:id" element={<EditarCartao />} />
-              <Route path="biblioteca" element={<Normas />} />
-              <Route path="biblioteca/acervo" element={<Acervo />} />
-              <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
-              <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
-              {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
-              <Route path="biblioteca/importar/:versaoId?" element={<Importar />} />
-              <Route path="biblioteca/normas/:normaId" element={<Leitor />} />
-              <Route path="conta" element={<Conta />} />
-              <Route path="conta/aparencia" element={<AparenciaConta />} />
-              <Route path="conta/dados" element={<Dados />} />
-              <Route path="conta/privacidade" element={<Privacidade />} />
-              <Route path="orientacoes" element={<Orientacoes />} />
-              <Route path="orientacoes/:secao" element={<Orientacoes />} />
-              <Route path="*" element={<NaoEncontrada />} />
-            </Route>
-          </Routes>
+            </Routes>
+          </LimiteDeErro>
         </HashRouter>
       </ProvedorFonteAcervo>
     </ProvedorRepositorio>

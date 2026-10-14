@@ -1,0 +1,47 @@
+.precedente-tese {
+  margin: 0 0 1rem;
+  padding-inline-start: 1rem;
+  border-inline-start: 3px solid var(--borda);
+  max-inline-size: 70ch;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.precedente-texto {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  max-inline-size: 70ch;
+}
+.precedente-texto mark {
+  background: var(--penumbra);
+  color: inherit;
+  border-bottom: 2px solid var(--borda);
+}
+.precedente-texto mark[data-rotulo='tese'] {
+  border-bottom-color: var(--primaria);
+}
+.precedente-estrela {
+  background: none;
+  border: 0;
+  color: var(--estrela);
+  font-size: 1.25rem;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  cursor: pointer;
+}
+.precedente-aviso {
+  color: var(--texto-atenuado);
+  font-size: 0.9rem;
+}
+.precedente-discreto {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--texto-atenuado);
+  text-decoration: underline;
+  cursor: pointer;
+  min-block-size: 44px;
+}
+.precedente-estrela svg {
+  display: block;
+}

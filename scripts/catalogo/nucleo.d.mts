@@ -1,0 +1,68 @@
+export type Linha = { l: string[]; n: number };
+export type Achado = { nivel: 'erro' | 'aviso'; linha: number; regra: string; msg: string };
+export type Blocos = {
+  principal: Linha[] | null;
+  consolidadas: Linha[] | null;
+  editais: Linha[] | null;
+  erros: string[];
+};
+export type Item = {
+  numero: string | null;
+  assunto: string;
+  faixa: string | null;
+  obsFaixa: string | null;
+  recorrencia: string | null;
+  fonteUrl: string;
+};
+export type Edital = {
+  id: string;
+  orgao: string;
+  uf: string;
+  banca: string | null;
+  ano: number | null;
+  cargo: string | null;
+  fase: string | null;
+  situacao: string;
+  fonteUrl: string | null;
+  rotulo: string | null;
+  disciplinas: { nome: string; nomeNoEdital: string; ordem: number; itens: Item[] }[];
+};
+export type CatalogoDaCarreira = {
+  versao: 1;
+  carreira: string;
+  slug: string;
+  editais: Edital[];
+  disciplinas: {
+    nome: string;
+    variantes: string[];
+    presenteEm: number;
+    totalEditais: number;
+    faixaSugerida: string | null;
+    faixaOrigem: 'edital' | 'derivada' | null;
+    faixaBase: string | null;
+  }[];
+};
+export const CABECALHO_PRINCIPAL: string[];
+export const CABECALHO_CONSOLIDADAS: string[];
+export const CABECALHO_EDITAIS: string[];
+export const CARREIRAS: [string, string, string[]][];
+export const FAIXAS: string[];
+export const FASES: string[];
+export const SITUACOES: string[];
+export function semAcento(s: string): string;
+export function lerCsv(texto: string): string[][];
+export function escreverCsv(linhas: string[][]): string;
+export function separarBlocos(texto: string): Blocos;
+export function carreiraCanonica(v: string): { nome: string; slug: string } | null;
+export function normalizarLinha(l: string[]): string[];
+export function mapaDisciplinas(consolidadas: Linha[] | null): Map<string, string>;
+export function validarPrincipal(linhas: Linha[]): Achado[];
+export function validarComplementares(b: Blocos): Achado[];
+export function converter(b: Blocos, carreiraNome: string): CatalogoDaCarreira;
+export function csvNormalizado(principal: Linha[]): string;
+export function carreirasDoPrincipal(principal: Linha[]): string[];
+export function faixaDerivada(presente: number, total: number): string | null;
+export function descartar(principal: Linha[]): {
+  mantidas: Linha[];
+  descartadas: (Linha & { motivo: string })[];
+};
