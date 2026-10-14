@@ -48,13 +48,15 @@ Medidas já feitas (WCAG): ver `stitch-app.md`, rodada 7. As correções de argi
 
 ## Mascote
 
-- Arquivos: [`mascote/`](mascote/) com `estudando.png`, `distraido.png`, `sorrindo.png`, `determinado.png`, recortados da folha enviada pelo Gabriel, fundo transparente, **só o personagem**. O recorte é automático: conferir as bordas em fundo claro e escuro e, se preciso, refinar o contorno ou pedir SVG ao autor da arte.
+- **Estilo canônico: vetorial plano** (decisão do Gabriel, 14/10/2026). O filhote 3D não é o mascote do app.
+- Arquivos: [`mascote/`](mascote/) com `estudando.svg`, `distraido.svg`, `sorrindo.svg`, `determinado.svg`: redesenho vetorial próprio a partir da folha enviada pelo Gabriel, fundo transparente, **só o personagem**, 400×450, cores fixas da folha (pelo, chapéu, lenço). Gerados por script (`docs/design/mascote/gerar-mascote.mjs`), então qualquer ajuste de pose é uma edição de código e não de arquivo binário.
+- **Lápis apontando para baixo** na pose Distraído (pedido do Gabriel): ponta para baixo, borracha em cima.
+- Determinado foi reinterpretado: caderno de espiral e punho levantado, sobrancelhas retas e sorriso discreto (a folha original tinha sobrancelhas bravas).
 - **Onde aparece** (estratégico): Hoje (Estudando, apoiado na borda do cartão Agora), retomada depois de dias fora (Distraído acolhedor, sem culpa), fim de sessão (Sorrindo), estado vazio e abertura. Tamanho 80–110 px no app.
 - **Onde não aparece**: durante a leitura, na revisão de frases e cartões (no máximo bem pequeno e só fora do cartão), em erro punitivo, em todas as telas ao mesmo tempo.
 - **Nunca** com elementos de fundo (cacto, sol, lâmpada, notas, interrogações).
-- "Determinado" tem sobrancelhas bravas e "Distraído" tem interrogações: usar só versões suaves; revisar antes de uso.
-- Imagem decorativa: `alt=""`; nenhuma informação depende do mascote.
-- Pendente: escolher o estilo canônico (vetorial plano ou o filhote 3D) e obter SVG por pose.
+- Imagem decorativa: `alt=""`; nenhuma informação depende do mascote. Cada SVG já traz `<title>` e `aria-label` para o caso de uso informativo.
+- Próximo: refinar as poses com o Gabriel (proporções, mãos, expressão) e, se vier a ser necessário, um ilustrador para a versão final.
 
 ## Tipografia
 
