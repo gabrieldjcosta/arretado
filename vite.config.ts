@@ -2,14 +2,15 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import pacote from './package.json' with { type: 'json' };
-import { CSP, cabecalhosHospedagem } from './config/seguranca';
+import { cabecalhosHospedagem, montarCSP, origensDoBuild } from './config/seguranca';
 
 /**
  * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
  * injeta estilos em linha. O E2E roda sobre a versão construída e verifica violações.
  * A versão construída também leva o `_headers` da hospedagem (Cloudflare Workers, T18).
  */
-function csp(): Plugin {
+function csp(contas: boolean): Plugin {
+  const CSP = montarCSP(origensDoBuild(contas));
   return {
     name: 'arretado-csp',
     apply: 'build',
@@ -21,13 +22,16 @@ function csp(): Plugin {
       },
     ],
     generateBundle() {
-      this.emitFile({ type: 'asset', fileName: '_headers', source: cabecalhosHospedagem() });
+      this.emitFile({ type: 'asset', fileName: '_headers', source: cabecalhosHospedagem(CSP) });
     },
   };
 }
 
+// `VITE_CONTA=1` no ambiente do build liga a F4-A (padrão desligado; mesma chave que o app lê).
+const contas = process.env.VITE_CONTA === '1';
+
 export default defineConfig({
-  plugins: [react(), csp()],
+  plugins: [react(), csp(contas)],
   define: {
     __VERSAO_APP__: JSON.stringify(pacote.version),
   },

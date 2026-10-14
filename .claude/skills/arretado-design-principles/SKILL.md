@@ -32,13 +32,18 @@ O sucesso é reduzir tempo até começar, preservar o ponto de retomada e produz
 
 ## Visual vigente
 
-- Identidade (D-D2, 14/10/2026, aplicada nos tokens no #120): areia no claro, espresso no escuro, **verde-cacto** no cartão do Agora, **caramelo** (claro) e **sol** (escuro) no botão primário em vidro sutil, cacto verde ao lado do nome e o mascote vetorial como coadjuvante. A fonte de verdade dos valores é `src/apresentacao/estilos.css`; o racional está em `docs/design/sistema-visual.md`.
-- Amarelo e demais cores de grifo pertencem ao conteúdo marcado no leitor, não ao CTA.
+- Identidade (D-D2 e D-D4, 14/10/2026): a paleta do Gabriel — **Areia** `#ead2b0`, **Palha** `#f6f1e6` (fundo) e Creme `#faf6ee` (superfície), **Terracota** `#963417`, **Caatinga** `#3b3f21`, **Acqua** `#628981`, **Solace** `#cf893a`, **Noite** `#16130f` e Noite-cartão `#251f19` no escuro, tinta `#2b1b12` —, o cacto verde ao lado do nome ("Arretado." com o ponto final em Terracota) e o mascote vetorial como coadjuvante. A fonte de verdade dos valores é `src/apresentacao/estilos.css`; o alvo e o racional estão em `docs/design/sistema-visual.md` (v3) e `docs/design/decisoes-design.md` (D-D2, D-D3 e D-D4); os mockups e as especificações do Gabriel, em `docs/design/referencias/2026-10-14-gemini/`.
+- **Cor tem papel (D-D4, a vetar pelo Gabriel):** Terracota (claro) e Solace (escuro e dentro do bloco de Caatinga) = a ação (botão primário, um por tela, o "+", links, foco); Caatinga = onde estou e o que guardei (bloco-herói, item e aba selecionados, "Guardar", "Lido até aqui", título de página); Acqua = calma (progresso, "salvo", interruptor; como texto, `--acqua-texto`); Areia = superfície quente (estado Distraído, estacionamento, tiles, régua de leitura); tinta = conteúdo; vermelho = só excluir e falha técnica, nunca no estudo. O tipo da tarefa é um ponto de cor (Frases Solace, Cartões Acqua); a matéria vai em texto. **Não há mais seis tons de matéria, vidro nos botões, caramelo nem argila, e o verde-oliva da identidade anterior não é cor de interface.**
+- **Botões:** primário compacto (altura 44, raio 12; largura total só em cartão e formulário), secundário de contorno, fantasma (`.botao-texto`, ao lado do primário) e linha de ação (`.linha-acao`); nada de botão empilhado onde uma linha de ação resolve. Só o dock do Leitor e os botões do modo foco têm transparência.
+- **Blocos por estado:** no máximo um bloco-herói por tela de orientação, e a cor diz o estado (Estudando = Caatinga, Distraído = Areia, Sorrindo = cartão claro, Determinado = cinza-areia); Leitor e Revisão em curso ficam calmos, sem bloco-herói. Raios: 24 (bloco), 16 (cartão), 12 (botão e campo), pílula (chip, aba).
+- **Plataformas:** celular (< 700) e tablet em pé (700 a 899) com barra de navegação reta embaixo (ícone e rótulo) e, nas telas sem captura inline, o "+" simples acima dela, uma coluna; desktop e tablet deitado (≥ 900) com navegação no topo e duas colunas no Hoje, no Recall e no Plano. O "+", o dock e a barra nunca cobrem texto.
+- Amarelo, verde e rosa de grifo pertencem ao conteúdo marcado no leitor, não ao CTA nem à interface. Os destaques de termo (prazos, condições, absolutos, penas) são sublinhados de estilos diferentes, não fundos.
 - Interface: Atkinson Hyperlegible Next. Leitura jurídica: Literata.
 - Reutilize tokens de `src/apresentacao/estilos.css`; não crie uma segunda marca dentro do app.
 - Tema escuro é modo de foco, não uma inversão ornamental.
 - Estado não depende apenas de cor; ações importantes mantêm rótulo.
-- Alvo de toque mínimo: 44 px. Preserve contraste AA e foco visível.
+- Alvo de toque mínimo: 44 px (link no meio de frase é a única exceção). Preserve contraste AA (texto 4,5:1, gráficos 3:1, inclusive o anel de foco dentro do bloco-herói) e foco visível.
+- Título de página em Literata 700 na cor de lugar; título de cartão e de bloco em sans bold; o texto quebra qualquer palavra longa e nenhuma tela rola na horizontal.
 
 ## Linguagem
 
@@ -64,7 +69,7 @@ O sucesso é reduzir tempo até começar, preservar o ponto de retomada e produz
 - Não é professor, terapeuta, chatbot, autoridade jurídica nem representação de “IA”.
 - Não substitui rótulos, mensagens de erro ou navegação.
 - Não aparece em toda tela nem durante leitura profunda.
-- Não culpa, comemora streak, faz cara triste por ausência ou pressiona o usuário.
+- Não culpa, comemora streak, faz cara triste por ausência ou pressiona o usuário. O "andamento do dia" em pontos (cartão Sorrindo) conta as tarefas do dia, nunca uma sequência de dias.
 - Deve ser original; use qualidades abstratas como formas arredondadas, expressão legível e material tátil, sem copiar personagem conhecido.
 
 ## Arquitetura

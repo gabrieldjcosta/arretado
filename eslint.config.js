@@ -6,7 +6,16 @@ import tseslint from 'typescript-eslint';
 import regraCamadas from './eslint/regra-camadas.js';
 
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'playwright-report', 'test-results'] },
+  {
+    ignores: [
+      'dist',
+      'coverage',
+      'playwright-report',
+      'test-results',
+      // Deno: tipos e imports próprios; a lógica testada fica em handler.ts.
+      'supabase/functions/**/index.ts',
+    ],
+  },
   {
     files: ['**/*.{ts,tsx}'],
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],

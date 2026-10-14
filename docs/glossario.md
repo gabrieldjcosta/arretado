@@ -103,6 +103,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Módulo | `Modulo` / `MODULOS`: unidade do pacote e de `Preferencias.modulosDesabilitados` |
 | Hoje, Biblioteca, Calendário, Pendência, Backup | tela provisória `Hoje` (`src/apresentacao/telas/Areas.tsx`); a Biblioteca é `Normas` (`src/apresentacao/biblioteca/Normas.tsx`, 9.5); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
 | Tokens da identidade nova (redesign, fatia 1) | variáveis CSS em `estilos.css`: `--agora-fundo` e `--agora-borda` (o cartão tingido de sálvia: `agora` = cartão tingido, desde a fatia 6; o marca-texto amarelo, `--agora`, `--agora-texto` e `--agora-faixa`, saiu), `--raio-cartao`, `--depois` (recuado) e `--progresso`; `--primaria` é a sálvia (botão e link); `--fonte-interface` = Atkinson Hyperlegible Next, `--fonte-leitura` = Literata. Conferidos por `scripts/contraste.mjs` |
+| Redesenho v2 (D-D3 e D-D4, 14/10/2026) | **Paleta** (`--areia`, `--palha`, `--creme`, `--terracota`, `--caatinga`, `--acqua`, `--solace`, `--noite`, `--noite-cartao`, `--tinta`, `--sobre-solace`, `--cacto`; F1, em uso), **Ação** (`--acao`, `--acao-texto`: Terracota no claro, Solace no escuro e no bloco), **Lugar** (`--lugar`, `--tinta-lugar`, `--titulo`), **Calma** (`--acqua`, `--acqua-texto`, `--acqua-fundo`), **Superfície quente** (`--quente`), **Bloco-herói** (`--bloco-*`, hoje em `.acao-agora`; cor por estado na F3), **Selecionado** (`--selecionado-fundo/-texto/-anel`: item ativo, aba e chip marcados), **Botão primário** (`.principal`, compacto), **Botão fantasma** (`.botao-texto`), **Botão de ícone** (`.botao-icone`), **Linha de ação** (`.linha-acao`), **Destaque de termo** (`--destaque-prazo`, `-condicao`, `-absoluto`, `-pena`; sublinhado), **Régua** (`--regua-fundo`, `--regua-barra`), **Ponto de tipo** (F3), **Barra de navegação reta** (`.areas` embaixo, F2), **"+"** (`.flutuante`, simples, F2), **Linha do tempo do Depois** (`listarAcoes(entrada)` em `src/dominios/hoje/depois.ts`, F3), **Elementos vetoriais** (`ElementoCactos`, `ElementoLampada`, `ElementoDistracao` em `src/apresentacao/componentes/`, F3) | `docs/design/sistema-visual.md`, `docs/design/decisoes-design.md`, `docs/planos/redesign-v2.md` |
 | Componentes da fatia 6 (acabamento) | `Selo` (pílula com palavra), `LinhaLista` (ícone tingido 44 px, título, apoio, seta), `MenuAjuda` (menu "Ajuda": "Ajuda sobre esta tela" e "Relatar problema"; no lugar do "?" e do "!"), controle segmentado = `.abas` (pílula, ativo tingido) e estado selecionado = fundo `--agora-fundo` + borda `--agora-borda` (`aria-current`, rádio marcado) |
 | Telas da fatia 6 (6.4 a 6.7) | Biblioteca em lista (`LinhaLista` por norma, súmula e tese; busca "Buscar norma"; `Selo` "Há versão nova" na própria norma); Drill centrado (`.topo-drill` com Sair e contador, `.drill-frente`, `.frase-correta` = callout tingido "Frase correta"/"Resposta", `.resposta-errei/dificil/facil` com borda e ícone, `LinhaDepois` embaixo); `.estado-texto` = estado sempre com palavra e ícone (`✕ Errei`, `? Acertei sem certeza`, `! Vencido`); no foco, "Próximo artigo" é `.principal` e `.sair-do-foco` é recuado; a régua de leitura usa a barra sálvia |
 | Componentes da fatia 2 (redesign) | `AcaoAgora` (o que fazer agora), `LinhaDepois` ("Depois: …"), `BarraFina` (progresso com texto "3 de 10"), `DiasDaSemana` (janela móvel dos últimos 7 dias), em `src/apresentacao/componentes/`; classe `.flutuante` = botão **+** (celular) |
@@ -361,6 +362,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao` (reúne Recall e Legislação em `apresentacao/hoje/proxima-acao.ts`); decisão pura `decidirProximaAcao` (`dominios/hoje/proxima-acao.ts`); vazio = `ComecoSugerido` (três). Nada gravado. Não usar "tarefa do dia" |
 | Alvo | `AlvoDeAcao` (`tipo`: `revisao`, `leitura`, `tarefa`, `ponto`, `livre`; `id?`; `rotulo?`): o que se vai estudar; em `Sessao.alvo` |
 | Fronteira | `Sessao.fronteira`: até onde ler nesta Sessão ("até o art. 15"); texto livre e opcional |
+| Faixa da Sessão | `FaixaDaSessao` (`sessao/`), classes `.faixa-sessao*`: "Sessão · Pausar · Encerrar" no topo da revisão e do Leitor (fora do foco); só com Sessão aberta | `barra`, `banner` de sessão |
 | Próximo passo | `Sessao.proximoPasso`: passo pequeno pedido ao fechar a Sessão, pré-preenchido; nunca obrigatório |
 | Origem da ação | `Sessao.origemDaAcao` (`OrigemDaAcao`): cópia do que o Hoje mostrou ao começar |
 | Estacionamento | `Sessao.estacionamento[]` (`NotaDeEstacionamento`: `texto`, `em`, `resolvidaEm?`); `estacionar` (contrato da Sessão). Não usar "distrações" na interface como rótulo de falha |
@@ -397,3 +399,47 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Onboarding do plano (B2 da F3-B) | `/plano/onboarding` (`src/apresentacao/plano/onboarding/`): 4 telas (carreira, edital, matérias, conferir) e "Comece por aqui". Rascunho no aparelho a cada tela (`rascunho.ts`, `localStorage` `arretado:onboarding-plano:v1`, só chaves). "Pular, não tenho edital" leva a três começos. Importa pela mesma prévia de `prepararPontos` (desfazer em Conta › Dados › Importações). Ponte: `linhasDoEdital(edital, escolhidas, dispensados)`, `chaveDoItem`, `tituloDoPonto` (assunto longo vira título ≤ 500) |
 | Pontos do programa (B3 da F3-B) | `/plano/pontos` (lista por matéria) e `/plano/pontos/:id` (detalhe); domínio `src/dominios/pontos/`. **Andamento** (status derivado, nunca gravado): `StatusDoPonto` = `nao_iniciado`, `em_andamento`, `primeira_passada`, `precisa_revisar`, `adiado` (único manual, `Ponto.adiadoAte`); rótulos em `ROTULO_STATUS`. **Faixa/Prioridade** é outro campo (`Ponto.faixa`, com `logPrioridade` origem `manual`). **Atividade** (`AtividadeDoPonto`, `descreverAtividade`): contagens de Sessão encerrada, Erro, Cartão e Frase do ponto; nunca "dominado" nem "consolidado" (a regra de `consolidado` da §10.2 não foi implementada de propósito). Edição: `criarDisciplina`, `renomearDisciplina`, `excluirDisciplina` (leva os pontos; exclusão lógica), `criarPonto`, `editarPonto` (tira `somenteLeitura`), `mudarFaixa`, `adiarPonto`, `retomarPonto`, `excluirPonto` |
 | Tarefas e sugestões (B4 da F3-B) | `/plano/tarefas`; domínio `src/dominios/tarefas/`. Fila (`montarFila`, `carregarFila`): abertas e adiadas cuja data chegou, na ordem; `adiadas` (com data futura), `feitas`; **não existe "atrasada"**. Gestos: `criarTarefa`, `concluirTarefa`, `reabrirTarefa`, `adiarTarefa` (até uma data que a pessoa escolhe), `pularTarefa` (vai ao fim da fila, sem registrar falha), `moverTarefa` (subir/descer), `dividirTarefa` (filhas com `paiId`; a original vira `dividida` e sai da fila), `excluirTarefa`. **Sugestão** (`sugerirTarefas`, pura; `sugestoesDoDia` em `apresentacao/plano/tarefas`): regras `revisao_vencida` → `erro_recorrente` (≥ 2 erros abertos) → `prioridade` (faixa Alta/Altíssima sem Sessão encerrada) → `esquecida` (matéria sem Sessão há ≥ 14 dias, `DIAS_ESQUECIDA`), sempre com `razao` ("Por quê: …"); "Não agora" some só hoje (`localStorage` `arretado:sugestoes-dispensadas:v1`). Aceitar grava `TarefaDeEstudo` com `autoria` `sugerida` e `razao`. A primeira tarefa da fila vira Próxima ação `tarefa` no Hoje (depois da revisão vencida, antes da leitura salva) |
+
+#### F4-A: contas (A0/A1, 14/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificadores |
+|---|---|
+| Conta | Identidade de login (`auth.users.id`); no aparelho, `ContaDoAparelho { uid, nomeBanco, email?, ultimoUso }` (`src/core/persistencia/registro-contas.ts`). Sem conta o app é o de sempre |
+| Banco da conta | Um Dexie por conta (T26): `nomeBancoDaConta(uid)` = `arretado-c-<uid>`; o sem conta continua `arretado` |
+| Registro de contas | `RegistroDeContas` (banco `arretado-registro`): `listar`, `contaAtiva`, `ativar`, `desativar`, `esquecer`. Nenhum dado de estudo |
+| Abertura do repositório | `abrirRepositorioAtivo({ contasHabilitadas })` e `nomeDoBancoAtivo`; `ProvedorRepositorio` usa a primeira. Com a chave desligada nem toca no registro |
+| Chave de build | `VITE_CONTA=1` liga a F4-A (`contasHabilitadas()`, `src/integracoes/conta/index.ts`); qualquer outro valor = app de hoje |
+| Serviço de conta | Porta `ServicoDeConta` (`sessao`, `entrarComGoogle`, `pedirCodigoPorEmail`, `confirmarCodigo`, `sair`, `excluirConta`, `aoMudar`); `ServicoDeContaNulo` até o pacote A3; `FalhaDeConta` com `motivo` |
+
+#### F4-A: esquema remoto da conta (A2, 14/10/2026; só arquivo e teste, não aplicado no Supabase real)
+
+| Termo | Identificadores |
+|---|---|
+| Perfil | `arretado.perfis` (`usuario_id`, `termos_versao`, `termos_aceitos_em`, `direito_ia`, `beta`): criado por gatilho ao nascer a conta; o cliente só lê o próprio; escreve só por `arretado.aceitar_termos(versao)` |
+| Convite | `arretado.convites` (e-mail em minúsculas, `usado_em`): V1 só por convite; o cliente nunca toca |
+| Gancho de cadastro | `arretado.hook_antes_de_criar_usuario(event)`: ligar em Auth › Hooks › Before User Created (passo do Gabriel) |
+| Exclusões | `arretado.exclusoes` (só data e `tinha_copia`); preenchida pela função de exclusão (A5) |
+| Cópias na nuvem | bucket privado `backups`, pasta `<uid>/`; política por pasta (A6 usa) |
+| Reversão | `supabase/rollback/20261014020000_f4a_contas.down.sql`; conferência no projeto real: `supabase/verificacao-f4a-remota.sql` |
+
+#### F4-A: login (A3, 14/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificador |
+|---|---|
+| Serviço Supabase (único arquivo que importa `@supabase/supabase-js`) | `ServicoDeContaSupabase`, `src/integracoes/conta/supabase.ts` |
+| Carga sob demanda do serviço | `ServicoDeContaPreguicoso` (`import()` na primeira chamada) |
+| Serviço em memória de teste | `ServicoDeContaFalso` (`falso.ts`; convites, código, sem rede) |
+| Retorno do login pelo Google | `tratarRetornoDoLogin` (`retorno.ts`; roda em `main.tsx` antes do roteador) |
+| Primeira entrada (banco nasce com `usuarioId = uid`) | `entrarNaConta`, opção `OpcoesRepositorio.usuarioId` |
+| Projeto Supabase (URL e chave publicável) | `src/integracoes/conta/projeto.ts` |
+| Origens da CSP por build | `origensDoBuild(contas)`, `config/seguranca.ts` |
+| Tela | `/conta/entrar` (só com `VITE_CONTA=1`), `Entrar`, `VERSAO_TERMOS` |
+
+#### F4-A: sair, trocar e excluir (A5, 14/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificador |
+|---|---|
+| Sair (manter ou apagar daqui) | `sairDaConta(repo, { apagarDados })`, `src/core/pacote/sair-da-conta.ts` |
+| Trocar de conta já conhecida | `trocarDeConta(uid)` |
+| Seção da tela Conta | `ContaDoAparelhoSecao`, `src/apresentacao/conta/sair/` |
+| Exclusão da conta no servidor | Edge Function `excluir-conta`, lógica testável em `supabase/functions/excluir-conta/handler.ts` (`index.ts` é o ajuste Deno) |

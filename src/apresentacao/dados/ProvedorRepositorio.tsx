@@ -1,5 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Repositorio, type MotivoFechamento } from '../../core/persistencia';
+import {
+  abrirRepositorioAtivo,
+  type MotivoFechamento,
+  type Repositorio,
+} from '../../core/persistencia';
+import { contasHabilitadas } from '../../integracoes/conta';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
 
@@ -10,7 +15,7 @@ type Estado =
   /** Outra aba subiu o esquema (versão nova do app) ou apagou os dados. */
   | { tipo: 'fechadoPorOutraAba'; motivo: MotivoFechamento };
 
-const abrirPadrao = () => Repositorio.abrir();
+const abrirPadrao = () => abrirRepositorioAtivo({ contasHabilitadas: contasHabilitadas() });
 
 /** Abre o banco local uma vez e o oferece às telas. */
 export function ProvedorRepositorio({

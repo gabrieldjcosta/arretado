@@ -3,20 +3,27 @@ import { Link } from 'react-router';
 import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Frase, RespostaFrase } from '../../core/modelo';
-import { contarFrasesVencidas, filaDeFrases, revisarFrase } from '../../dominios/recall/servico';
+import {
+  contarFrasesVencidas,
+  contarVencidos,
+  filaDeFrases,
+  revisarFrase,
+} from '../../dominios/recall/servico';
 import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
+import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
+import { useVoz } from '../voz';
 
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'revisando'; fila: Frase[]; indice: number }
-  | { tipo: 'fim'; restantes: number; proximoLote: number }
+  | { tipo: 'fim'; restantes: number; proximoLote: number; cartoes: number }
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
-  { resposta: 'li', rotulo: 'Li', icone: '✓', classe: 'resposta-facil' },
+  { resposta: 'li', rotulo: 'Fácil', icone: '✓', classe: 'resposta-facil' },
   { resposta: 'de_novo', rotulo: 'De novo', icone: '↻', classe: 'resposta-dificil' },
 ] as const satisfies readonly {
   resposta: RespostaFrase;
@@ -26,10 +33,11 @@ const RESPOSTAS = [
 }[];
 
 /**
- * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Li" espaça a próxima
+ * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Fácil" espaça a próxima
  * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências).
  */
 export function RevisarFrases() {
+  const texto = useVoz();
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
   const [ocupado, setOcupado] = useState(false);
@@ -39,8 +47,16 @@ export function RevisarFrases() {
 
   const terminar = useCallback(async () => {
     try {
-      const restantes = await contarFrasesVencidas(repo);
-      setEstado({ tipo: 'fim', restantes, proximoLote: Math.min(cota.current, restantes) });
+      const [restantes, cartoes] = await Promise.all([
+        contarFrasesVencidas(repo),
+        contarVencidos(repo),
+      ]);
+      setEstado({
+        tipo: 'fim',
+        restantes,
+        proximoLote: Math.min(cota.current, restantes),
+        cartoes,
+      });
     } catch {
       setEstado({ tipo: 'falha' });
     }
@@ -96,7 +112,7 @@ export function RevisarFrases() {
     [atual, estado, ocupado, repo, terminar],
   );
 
-  // Atalhos: 1 = Li, 2 = De novo.
+  // Atalhos: 1 = Fácil, 2 = De novo.
   useEffect(() => {
     if (estado.tipo !== 'revisando') return;
     const tecla = (e: KeyboardEvent) => {
@@ -135,11 +151,22 @@ export function RevisarFrases() {
         <h1>Revisar frases</h1>
         <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
-          titulo="Feito."
+          titulo={texto('fimDeRodada')}
           acao={
-            <Link to="/recall/frases" className="botao principal">
-              Voltar às frases
-            </Link>
+            estado.cartoes > 0 ? (
+              <>
+                <Link to="/recall/revisar" className="botao principal">
+                  Seguir para os cartões ({estado.cartoes})
+                </Link>
+                <Link to="/recall/frases" className="botao discreto">
+                  Voltar às frases
+                </Link>
+              </>
+            ) : (
+              <Link to="/recall/frases" className="botao principal">
+                Voltar às frases
+              </Link>
+            )
           }
         >
           {estado.restantes > 0 && (
@@ -171,6 +198,7 @@ export function RevisarFrases() {
   return (
     <>
       <h1 className="visualmente-oculto">Revisar frases</h1>
+      <FaixaDaSessao />
       <div className="topo-drill">
         <Link to="/recall/frases" className="botao discreto">
           Sair

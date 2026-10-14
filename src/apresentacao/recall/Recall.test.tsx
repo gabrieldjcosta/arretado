@@ -1,5 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { alterarPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import { criarCartaoDeErro, criarCartaoManual, registrarErro } from '../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -283,6 +284,39 @@ describe('cota e início do Recall (fatia 3)', () => {
     // Da abertura ao primeiro cartão: 1 toque.
     await usuario.click(screen.getByRole('link', { name: 'Começar' }));
     expect(await screen.findByText('1 de 10')).toBeInTheDocument();
+  });
+
+  it('com cartões e frases vencidos: uma só ação, e o fim dos cartões segue para as frases', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    await registrarErro(repo, { fraseCorreta: 'Frase correta do dia.' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall', repo);
+    expect(
+      await screen.findByRole('heading', { name: 'Revisar 1 cartão e 1 frase' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Revisar frases/ })).not.toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Começar' }));
+    await usuario.keyboard(' ');
+    await usuario.keyboard('3');
+    await usuario.click(await screen.findByRole('link', { name: 'Seguir para as frases (1)' }));
+    expect(await screen.findByText('Frase correta do dia.')).toBeInTheDocument();
+  });
+
+  it('fim da rodada: neutro no perfil Calmo; com sotaque só em outro perfil e no sorteio', async () => {
+    const termina = async (perfil?: 'guiado') => {
+      const repo = await comVencidos(1);
+      if (perfil) await alterarPreferencias(repo, { perfilDeEstudo: perfil });
+      const { usuario } = await abrir('/recall/revisar', repo);
+      expect(await screen.findByText('Frente 1')).toBeInTheDocument();
+      await usuario.keyboard(' ');
+      await usuario.keyboard('3');
+      return screen.findByRole('heading', { name: /Feito|Rodada feita/ });
+    };
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    expect(await termina()).toHaveTextContent('Feito.');
+    cleanup();
+    expect(await termina('guiado')).toHaveTextContent('Danado de bom! Rodada feita.');
   });
 
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {

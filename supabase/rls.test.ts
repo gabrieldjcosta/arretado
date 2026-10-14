@@ -5,24 +5,13 @@ import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { ENTIDADES, NOMES_COLECOES } from '../src/core/modelo';
+import { PRELUDIO } from './prelude-supabase';
 
 const PASTA = path.join(import.meta.dirname, 'migrations');
 const MIGRACOES = readdirSync(PASTA)
   .filter((f) => f.endsWith('.sql'))
   .sort()
   .map((f) => readFileSync(path.join(PASTA, f), 'utf8'));
-
-const PRELUDIO = `
-  create role anon nologin;
-  create role authenticated nologin;
-  create schema auth;
-  create table auth.users (id uuid primary key);
-  create function auth.uid() returns uuid language sql stable as $$
-    select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
-  $$;
-  grant usage on schema auth to anon, authenticated;
-  grant execute on function auth.uid() to anon, authenticated;
-`;
 
 const A = '0199a6c4-0000-7000-8000-00000000000a';
 const B = '0199a6c4-0000-7000-8000-00000000000b';

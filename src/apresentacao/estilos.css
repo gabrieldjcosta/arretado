@@ -35,29 +35,56 @@
     format('woff2-variations');
 }
 
-/* Tokens de tema (T10). Contraste AA nos dois temas; alvos de toque ≥ 44 px (Parte 2 §11). */
+/* Tokens de tema (T10, D-D2, D-D4). Contraste AA nos dois temas (scripts/contraste.mjs); alvos de
+   toque ≥ 44 px (Parte 2 §11). A paleta é do Gabriel (14/10/2026): Areia, Palha, Terracota,
+   Caatinga, Acqua, Solace e Noite. Cada cor tem um papel: ação = Terracota no claro e Solace sobre
+   o bloco escuro e no escuro; lugar e selecionado = Caatinga; calma (progresso, Cartões, "salvo")
+   = Acqua; superfície quente = Areia; conteúdo = tinta. Para texto sobre (ou na cor de) uma cor
+   da paleta que não alcança 4,5:1, o token tem um passo mais escuro (ex.: --acqua-texto). Alvo e
+   racional: docs/design/sistema-visual.md. */
 :root {
-  --fundo: #f4efe0;
-  --superficie: #fbf8ee;
-  --superficie-2: #ebe5d1;
-  --texto: #2d2a14;
-  --texto-atenuado: #5f5a3c;
-  --borda: #c9c19f;
-  --penumbra: #ece6d2;
-  --luz-do-cartao: #fbf8ee;
-  --primaria: #566b1f;
-  --primaria-texto: #ffffff;
-  --foco: #b35900;
+  /* A paleta: valores fixos, iguais nos dois temas (quem muda de tema são os papéis abaixo). */
+  --areia: #ead2b0;
+  --palha: #f6f1e6;
+  --creme: #faf6ee;
+  --terracota: #963417;
+  --caatinga: #3b3f21;
+  --acqua: #628981;
+  --solace: #cf893a;
+  --noite: #16130f;
+  --noite-cartao: #251f19;
+  --tinta: #2b1b12;
+  --sobre-solace: #231f1a;
+  /* O verde do cacto desenhado (marca, anel do item selecionado): só traço, nunca texto pequeno. */
+  --cacto: #6f9456;
+
+  --fundo: var(--palha);
+  --superficie: var(--creme);
+  --superficie-2: #eae2d3;
+  /* Superfície quente: o quadro de Areia (estado "Distraído", estacionamento, tiles, chip inativo). */
+  --quente: var(--areia);
+  --texto: var(--tinta);
+  --texto-atenuado: #5d4d40;
+  --titulo: var(--caatinga);
+  --borda: rgb(59 63 33 / 16%);
+  /* Contorno de campo e de botão: ≥ 3:1 contra a superfície (a borda acima é só filete). */
+  --borda-campo: #8c7b68;
+  --borda-forte: var(--tinta);
+  --borda-botao: rgb(59 63 33 / 32%);
+  --penumbra: #ece5d3;
+  --luz-do-cartao: var(--creme);
+  --foco: var(--terracota);
   --perigo: #a4262c;
   --perigo-texto: #ffffff;
   --sucesso: #2e6b30;
   --aviso-fundo: #fff4d6;
   --aviso-texto: #4d3800;
-  /* Destaque automático (9.8): o traço, ≥ 3:1 contra o fundo; o texto não muda de cor. */
-  --destaque-prazo: #1d5fa8;
-  --destaque-condicao: #a54b00;
-  --destaque-absoluto: #7a3db8;
-  --destaque-pena: #b0283a;
+  /* Destaque automático (9.8): o traço, ≥ 3:1 contra o fundo; o texto não muda de cor. A categoria
+     também vai no estilo do traço (duplo, tracejado, ondulado, pontilhado). */
+  --destaque-prazo: #173f52;
+  --destaque-condicao: #b06f22;
+  --destaque-absoluto: var(--terracota);
+  --destaque-pena: var(--terracota);
   /* Grifos (11.4): 3 cores de fundo, sem nomes; o texto (e o atenuado do tachado) continua AA. */
   --grifo-1: #fff0a0;
   --grifo-2: #c8eccb;
@@ -65,25 +92,47 @@
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
   --calha-estrela: 1.5rem;
-  /* Identidade nova (redesign, fatia 1; acabamento, fatia 6): Papel, tinta e sálvia. O "agora" é um
-     cartão tingido de sálvia com borda sálvia (também o estado selecionado e o selo); o texto fica
-     na tinta. "Depois" é o recuado. Pares medidos em scripts/contraste.mjs. */
-  --agora-fundo: #e9edcf;
-  --agora-borda: #5f7a2c;
-  --raio-cartao: 20px;
-  /* Cartão "Agora" da Hoje (D-D2): verde-cacto profundo, texto creme; ação caramelo. */
-  --cartao-agora-fundo: #3f4a1a;
-  --cartao-agora-texto: #fdf1de;
-  --cartao-agora-atenuado: #d9d3b0;
-  --acao: #e8892b;
-  --acao-texto: #2d2a14;
-  --cacto: #5f7a2c;
-  --depois: #6b6645;
-  --progresso: #5f7a2c;
-  --sombra: 0 10px 28px -14px rgb(45 42 20 / 18%), 0 1px 3px rgb(45 42 20 / 8%);
+
+  /* Ação: Terracota no claro; dentro do bloco-herói e no escuro, Solace. Um botão primário por tela. */
+  --acao: var(--terracota);
+  --acao-texto: #ffffff;
+  --link: var(--terracota);
+  /* Lugar: o traço de "onde estou" (marca do Lido até, filete, filtro ligado). */
+  --lugar: var(--caatinga);
+  /* Calma: Acqua é traço, ponto, barra e interruptor; como texto (ou com texto branco em cima), o
+     passo mais escuro. */
+  --acqua-texto: #416a63;
+  --acqua-fundo: #416a63;
+  /* Bloco-herói (Agora, Retorno, fim de rodada, Sessão): Caatinga com texto Palha e ação Solace. */
+  --bloco-fundo: var(--caatinga);
+  --bloco-texto: var(--palha);
+  --bloco-atenuado: #d6d1b5;
+  --bloco-borda: transparent;
+  --bloco-acao: var(--solace);
+  --bloco-acao-texto: var(--sobre-solace);
+  /* O anel de foco global some no verde do bloco; dentro dele o anel é Solace. */
+  --bloco-foco: var(--solace);
+  /* Item selecionado (navegação, aba, chip, alternância ligada). */
+  --selecionado-fundo: var(--caatinga);
+  --selecionado-texto: var(--palha);
+  /* O filete que mantém a forma do selecionado visível no escuro, onde o Caatinga some no fundo. */
+  --selecionado-anel: transparent;
+  --tinta-lugar: color-mix(in srgb, var(--caatinga) 12%, var(--superficie));
+  /* Régua de leitura: o bloco em foco no Leitor (Areia a 45%, filete de Caatinga). */
+  --regua-fundo: rgb(234 210 176 / 45%);
+  --regua-barra: var(--caatinga);
+
+  --raio-heroi: 24px;
+  --raio-cartao: 16px;
+  --raio-botao: 12px;
+  --raio-campo: 12px;
+  --raio-pilula: 999px;
+  --sombra: 0 6px 20px -10px rgb(22 19 15 / 22%), 0 1px 3px rgb(22 19 15 / 8%);
+  --sombra-botao: 0 2px 6px rgb(22 19 15 / 14%);
+  --sombra-flutuante: 0 4px 16px rgb(22 19 15 / 12%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 90%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
-  --superficie-translucida: rgb(251 248 238 / 90%);
+  --superficie-translucida: rgb(250 246 238 / 90%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -91,6 +140,12 @@
   --tamanho-leitura: 18px;
   --alvo: 44px;
   --raio: 12px;
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 1rem;
+  --espaco-4: 1.5rem;
+  --espaco-5: 2rem;
+  --espaco-6: 3rem;
   --largura-texto: 70ch;
 
   color-scheme: light;
@@ -98,83 +153,99 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #1c1410;
-    --superficie: #251a14;
-    --superficie-2: #2b1f17;
-    --texto: #fdf1de;
-    --texto-atenuado: #b9a897;
-    --borda: #4d3b2d;
-    --penumbra: #130d0a;
-    --luz-do-cartao: #2b1f17;
-    --primaria: #9bab4a;
-    --primaria-texto: #1c1410;
-    --foco: #ffb454;
+    --fundo: var(--noite);
+    --superficie: #1e1914;
+    --superficie-2: #2a231c;
+    --quente: #2f261d;
+    --texto: var(--palha);
+    --texto-atenuado: #b5a898;
+    --titulo: var(--palha);
+    --borda: rgb(246 241 230 / 14%);
+    --borda-campo: #8a7a6a;
+    --borda-forte: #b5a898;
+    --borda-botao: rgb(246 241 230 / 30%);
+    --penumbra: #0e0c09;
+    --luz-do-cartao: var(--noite-cartao);
+    --foco: var(--solace);
     --perigo: #ff8a8a;
     --perigo-texto: #2a0000;
     --sucesso: #8fd18f;
     --aviso-fundo: #3a2f10;
     --aviso-texto: #ffe6a3;
-    --destaque-prazo: #7ab8f5;
-    --destaque-condicao: #ffad5c;
-    --destaque-absoluto: #c9a0ff;
-    --destaque-pena: #ff8a9a;
+    --destaque-prazo: #7fb4cf;
+    --destaque-condicao: var(--solace);
+    --destaque-absoluto: #e07b55;
+    --destaque-pena: #e07b55;
     --grifo-1: #463b0c;
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
-    --agora-fundo: rgb(155 171 74 / 12%);
-    --agora-borda: #9bab4a;
-    --cartao-agora-fundo: #2b1f17;
-    --cartao-agora-texto: #fdf1de;
-    --cartao-agora-atenuado: #b9a897;
-    --acao: #ffb627;
-    --acao-texto: #1c1410;
-    --cacto: #9bab4a;
-    --depois: #a8977f;
-    --progresso: #9bab4a;
-    --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-    --superficie-translucida: rgb(37 26 20 / 90%);
+    --acao: var(--solace);
+    --acao-texto: var(--sobre-solace);
+    --link: var(--solace);
+    --lugar: var(--cacto);
+    --selecionado-anel: var(--cacto);
+    --acqua-texto: #79a79d;
+    --acqua-fundo: #416a63;
+    --bloco-fundo: var(--noite-cartao);
+    --bloco-atenuado: #b5a898;
+    --bloco-borda: rgb(207 137 58 / 35%);
+    --tinta-lugar: color-mix(in srgb, var(--caatinga) 70%, var(--superficie));
+    --regua-fundo: rgb(207 137 58 / 16%);
+    --regua-barra: var(--solace);
+    --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+    --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
+    --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+    --superficie-translucida: rgb(37 31 25 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #1c1410;
-  --superficie: #251a14;
-  --superficie-2: #2b1f17;
-  --texto: #fdf1de;
-  --texto-atenuado: #b9a897;
-  --borda: #4d3b2d;
-  --penumbra: #130d0a;
-  --luz-do-cartao: #2b1f17;
-  --primaria: #9bab4a;
-  --primaria-texto: #1c1410;
-  --foco: #ffb454;
+  --fundo: var(--noite);
+  --superficie: #1e1914;
+  --superficie-2: #2a231c;
+  --quente: #2f261d;
+  --texto: var(--palha);
+  --texto-atenuado: #b5a898;
+  --titulo: var(--palha);
+  --borda: rgb(246 241 230 / 14%);
+  --borda-campo: #8a7a6a;
+  --borda-forte: #b5a898;
+  --borda-botao: rgb(246 241 230 / 30%);
+  --penumbra: #0e0c09;
+  --luz-do-cartao: var(--noite-cartao);
+  --foco: var(--solace);
   --perigo: #ff8a8a;
   --perigo-texto: #2a0000;
   --sucesso: #8fd18f;
   --aviso-fundo: #3a2f10;
   --aviso-texto: #ffe6a3;
-  --destaque-prazo: #7ab8f5;
-  --destaque-condicao: #ffad5c;
-  --destaque-absoluto: #c9a0ff;
-  --destaque-pena: #ff8a9a;
+  --destaque-prazo: #7fb4cf;
+  --destaque-condicao: var(--solace);
+  --destaque-absoluto: #e07b55;
+  --destaque-pena: #e07b55;
   --grifo-1: #463b0c;
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
-  --agora-fundo: rgb(155 171 74 / 12%);
-  --agora-borda: #9bab4a;
-  --cartao-agora-fundo: #2b1f17;
-  --cartao-agora-texto: #fdf1de;
-  --cartao-agora-atenuado: #b9a897;
-  --acao: #ffb627;
-  --acao-texto: #1c1410;
-  --cacto: #9bab4a;
-  --depois: #a8977f;
-  --progresso: #9bab4a;
-  --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-  --superficie-translucida: rgb(37 26 20 / 90%);
+  --acao: var(--solace);
+  --acao-texto: var(--sobre-solace);
+  --link: var(--solace);
+  --lugar: var(--cacto);
+  --selecionado-anel: var(--cacto);
+  --acqua-texto: #79a79d;
+  --acqua-fundo: #416a63;
+  --bloco-fundo: var(--noite-cartao);
+  --bloco-atenuado: #b5a898;
+  --bloco-borda: rgb(207 137 58 / 35%);
+  --tinta-lugar: color-mix(in srgb, var(--caatinga) 70%, var(--superficie));
+  --regua-fundo: rgb(207 137 58 / 16%);
+  --regua-barra: var(--solace);
+  --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+  --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
+  --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+  --superficie-translucida: rgb(37 31 25 / 90%);
   color-scheme: dark;
 }
 
@@ -206,8 +277,17 @@ body {
   outline-offset: 2px;
 }
 
+/* Link de texto: Terracota no claro e Solace no escuro (caminho, D-D3, D-D4); sublinhado fino que
+   engrossa no hover e no foco. Nunca verde: o verde é de lugar e de "salvo". */
 a {
-  color: var(--primaria);
+  color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration-thickness: 2px;
 }
 
 h1,
@@ -216,18 +296,72 @@ h3 {
   line-height: 1.25;
 }
 
+/* Título de página em Literata 700, na cor de lugar (Caatinga; Palha no escuro) — D-D3 c, D-D4. O
+   título de cartão e de bloco é da interface (sem serifa). A preferência de fonte sem serifa
+   também vale aqui. */
 h1 {
-  font-size: 1.5rem;
+  font-family: var(--fonte-leitura);
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1.15;
   margin: 0 0 1rem;
+  color: var(--titulo);
 }
 
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   margin: 1.5rem 0 0.75rem;
+}
+
+h3 {
+  font-size: 1.0625rem;
+}
+
+@media (min-width: 700px) {
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 900px) {
+  h1 {
+    font-size: 2.25rem;
+  }
 }
 
 p {
   margin: 0 0 0.75rem;
+}
+
+/* Nenhuma tela rola na horizontal: o texto quebra qualquer palavra longa (título de ponto com os
+   espaços perdidos, endereço, nome de arquivo). Rótulos de botão, aba e navegação ficam de fora:
+   quebrar no meio da palavra, ali, é pior que ocupar a linha. */
+h1,
+h2,
+h3,
+h4,
+p,
+li,
+a,
+dt,
+dd,
+summary,
+legend,
+label,
+th,
+td,
+code,
+figcaption,
+blockquote {
+  overflow-wrap: anywhere;
+}
+
+button,
+.botao,
+.abas a,
+.areas a,
+.marca {
+  overflow-wrap: normal;
 }
 
 .pular {
@@ -307,7 +441,7 @@ p {
   min-height: var(--alvo);
   min-width: var(--alvo);
   padding: 0 0.75rem;
-  border-radius: var(--raio);
+  border-radius: var(--raio-pilula);
   color: var(--texto);
   text-decoration: none;
 }
@@ -323,9 +457,14 @@ p {
   height: 1.5rem;
 }
 
-.areas a[aria-current='page'] {
-  background: var(--agora-fundo);
-  box-shadow: inset 0 0 0 1.5px var(--agora-borda);
+/* O item selecionado (navegação, aba, alternância ligada) é o mesmo bloco verde: fundo e texto de
+   --selecionado-*, e um filete de cacto que mantém a forma visível também no escuro. */
+.areas a[aria-current='page'],
+.abas a[aria-current='page'],
+.alternar-destaques[aria-pressed='true'] {
+  background: var(--selecionado-fundo);
+  color: var(--selecionado-texto);
+  box-shadow: inset 0 0 0 2px var(--selecionado-anel);
   font-weight: 700;
 }
 
@@ -384,41 +523,89 @@ p {
 
 /* ── Componentes ───────────────────────────────────────────────────────── */
 
+/* Botão secundário: contorno de 1 px, fundo da superfície, compacto (12 px de raio, sem pílula). É o
+   botão de qualquer ação que não seja "a" ação da tela, que é a `.principal`. Quem precisa de outro
+   fundo (transparente, opaco sobre o texto) o declara na própria regra, que vence esta. O hover troca
+   só a variável do fundo, então não mexe em quem tem fundo próprio. */
 button,
 .botao {
   font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   min-height: var(--alvo);
   min-width: var(--alvo);
-  padding: 0 1rem;
-  border-radius: var(--raio);
-  border: 1px solid var(--borda);
-  background: var(--superficie);
+  padding: 0 1.25rem;
+  border-radius: var(--raio-botao);
+  border: 1px solid var(--borda-botao);
+  background: var(--botao-fundo, var(--superficie));
   color: var(--texto);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  text-align: center;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-button:disabled {
+/* Sem transição de cor: ao virar o tema o texto troca na hora, e um fundo que demora 140 ms deixa
+   o texto novo sobre o fundo velho (o axe lê isso como contraste baixo, só em máquina rápida). */
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  .botao {
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease;
+  }
+}
+
+button:disabled,
+.botao[aria-disabled='true'] {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
+  box-shadow: none;
 }
 
+button:not(:disabled):active,
+.botao:active {
+  transform: translateY(1px);
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  .botao:hover {
+    --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--superficie));
+  }
+}
+
+/* Botão primário: compacto (D-D4), Terracota com texto branco no claro e Solace com texto escuro no
+   escuro e dentro do bloco-herói (os tokens --acao mudam, a regra é uma só). Um por tela. */
 .principal {
-  background: var(--primaria);
-  border-color: var(--primaria);
-  color: var(--primaria-texto);
-  font-weight: 600;
+  background: var(--acao);
+  border-color: var(--acao);
+  color: var(--acao-texto);
+  box-shadow: var(--sombra-botao);
 }
 
+@media (hover: hover) {
+  .principal:not(:disabled):hover {
+    background: color-mix(in srgb, var(--acao) 88%, var(--tinta));
+    border-color: color-mix(in srgb, var(--acao) 88%, var(--tinta));
+  }
+}
+
+/* Destrutivo: secundário com texto e borda de perigo; cheio só dentro do diálogo de confirmação. */
 .perigoso {
-  background: var(--perigo);
+  background: transparent;
   border-color: var(--perigo);
+  color: var(--perigo);
+}
+
+dialog .perigoso {
+  background: var(--perigo);
   color: var(--perigo-texto);
-  font-weight: 600;
 }
 
 .discreto {
@@ -426,29 +613,208 @@ button:disabled {
   border-color: transparent;
 }
 
+/* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, 82% de opacidade; herda a cor
+   do lugar onde está (tinta na página, creme no bloco-herói). Alvo de 44 px. */
+.botao-texto {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  border-radius: 10px;
+  padding: 0 0.75rem;
+  color: inherit;
+  opacity: 0.82;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .botao-texto:not(:disabled):hover,
+  .discreto:not(:disabled):hover {
+    opacity: 1;
+    background: color-mix(in srgb, currentcolor 8%, transparent);
+  }
+}
+
+/* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
+.botao-icone {
+  width: var(--alvo);
+  padding: 0;
+}
+
 .icone {
   padding: 0;
   font-weight: 700;
 }
 
-input[type='text'],
-input[type='password'],
-input[type='file'],
-textarea,
-select {
-  font: inherit;
+/* Linha de ação (D-D4): a opção que vira uma linha inteira de toque ("Por onde começar?", folhas e
+   modais), no lugar de botões empilhados. O texto à esquerda, o que vem depois (seta, duração) à
+   direita. */
+.linha-acao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   width: 100%;
-  min-height: var(--alvo);
-  padding: 0.5rem 0.75rem;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: var(--raio-botao);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  background: var(--botao-fundo, var(--superficie));
+  color: var(--texto);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+
+/* Campos: todo input (com ou sem type), select e textarea. Altura 48, contorno de 1,5 px em
+   --borda-campo (≥ 3:1), raio 12 e 16 px (o iOS aproxima a tela abaixo disso). O `:where` deixa a
+   especificidade em zero, então o CSS de cada pacote ajusta largura e flex sem briga. */
+:where(
+  input:not(
+    [type='checkbox'],
+    [type='radio'],
+    [type='range'],
+    [type='hidden'],
+    [type='button'],
+    [type='submit'],
+    [type='reset'],
+    [type='color'],
+    [type='image']
+  ),
+  select,
+  textarea
+) {
+  font: inherit;
+  font-size: max(1rem, 16px);
+  width: 100%;
+  min-height: 48px;
+  padding: 0.625rem 0.875rem;
+  border: 1.5px solid var(--borda-campo);
+  border-radius: var(--raio-campo);
   background: var(--superficie);
   color: var(--texto);
+}
+
+::placeholder {
+  color: var(--texto-atenuado);
+  opacity: 1;
 }
 
 textarea {
   min-height: 6rem;
   resize: vertical;
+}
+
+input[type='search'] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Seta própria (sem imagem externa, então vale a CSP): dois triângulos de gradiente na cor do texto. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 2.75rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--texto) 50%),
+    linear-gradient(135deg, var(--texto) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.45rem) 50%,
+    calc(100% - 1.05rem) 50%;
+  background-size:
+    0.4rem 0.4rem,
+    0.4rem 0.4rem;
+  background-repeat: no-repeat;
+}
+
+input[type='file']::file-selector-button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 32px;
+  margin-inline-end: 0.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-botao);
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+input[type='range'] {
+  width: 100%;
+  min-height: var(--alvo);
+  accent-color: var(--lugar);
+}
+
+[aria-invalid='true'] {
+  border-color: var(--perigo);
+}
+
+/* Caixa e rádio: marca própria de 22 px com contorno de 2 px na tinta (D-D4); marcada = o bloco do
+   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. */
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  display: inline-grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 2px solid var(--borda-forte);
+  background: var(--superficie);
+  color: var(--selecionado-texto);
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  border-radius: 6px;
+}
+
+input[type='radio'] {
+  border-radius: 50%;
+}
+
+input[type='checkbox']:checked,
+input[type='radio']:checked {
+  background: var(--selecionado-fundo);
+  border-color: var(--selecionado-anel, var(--selecionado-fundo));
+}
+
+input[type='checkbox']:checked::after {
+  content: '';
+  width: 0.7rem;
+  height: 0.38rem;
+  margin-top: -0.12rem;
+  border-left: 2.5px solid currentcolor;
+  border-bottom: 2.5px solid currentcolor;
+  transform: rotate(-45deg);
+}
+
+input[type='radio']:checked::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  input[type='checkbox'],
+  input[type='radio'] {
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
 }
 
 label {
@@ -464,7 +830,7 @@ label {
 .opcao {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.75rem;
   min-height: var(--alvo);
   padding: 0.5rem 0;
   font-weight: normal;
@@ -472,10 +838,7 @@ label {
 }
 
 .opcao input {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin: 0.15rem 0 0;
-  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .dica {
@@ -484,8 +847,9 @@ label {
 }
 
 fieldset {
+  min-width: 0;
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-cartao);
   padding: 0.75rem 1rem;
   margin: 0 0 1rem;
 }
@@ -498,8 +862,8 @@ legend {
 .cartao-bloco {
   background: var(--superficie);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  padding: 1rem;
+  border-radius: var(--raio-cartao);
+  padding: 1.25rem;
   margin-bottom: 1rem;
   box-shadow: var(--sombra);
 }
@@ -523,6 +887,7 @@ legend {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  min-height: 3.5rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--borda);
 }
@@ -530,6 +895,8 @@ legend {
 .vazio {
   text-align: center;
   padding: 2rem 1rem;
+  border-radius: var(--raio-cartao);
+  background: color-mix(in srgb, var(--superficie-2) 60%, transparent);
 }
 
 .vazio-mascote {
@@ -539,6 +906,8 @@ legend {
 }
 
 .vazio p {
+  max-width: 36ch;
+  margin-inline: auto;
   color: var(--texto-atenuado);
 }
 
@@ -550,7 +919,7 @@ legend {
 .esqueleto span {
   display: block;
   height: 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   background: var(--superficie-2);
 }
 
@@ -566,10 +935,13 @@ legend {
   }
 }
 
+/* Callout: tinta da cor do papel e filete de 4 px à esquerda. Aviso em --aviso-*; falha técnica com
+   o filete de perigo; a "Frase correta" é o callout do lugar (mais abaixo). */
 .aviso {
   background: var(--aviso-fundo);
   color: var(--aviso-texto);
-  border-radius: var(--raio);
+  border-left: 4px solid currentcolor;
+  border-radius: var(--raio-campo);
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
 }
@@ -595,10 +967,11 @@ dialog {
   width: min(560px, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-cartao);
   background: var(--superficie);
   color: var(--texto);
-  padding: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: var(--sombra-flutuante);
 }
 
 dialog::backdrop {
@@ -630,36 +1003,56 @@ th.numero {
   max-width: var(--largura-texto);
 }
 
+/* Cores forçadas (modo de alto contraste): o primário vira o botão do sistema. */
+@media (forced-colors: active) {
+  .principal {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+    box-shadow: none;
+  }
+}
+
 /* ── Recall ────────────────────────────────────────────────────────────── */
 
-/* Controle segmentado (fatia 6): pílula; o item ativo leva o estado selecionado. */
+/* Abas: trilho em pílula; a aba atual é o item selecionado (bloco verde, ver mais acima). No celular o
+   trilho rola na horizontal em vez de quebrar linha ou alargar a página. */
 .abas {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.25rem;
   margin: 1.25rem 0 1rem;
   padding: 0.25rem;
-  border-radius: 999px;
+  border-radius: var(--raio-pilula);
   background: var(--superficie-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.abas::-webkit-scrollbar {
+  display: none;
 }
 
 .abas a {
-  flex: 1;
+  flex: 1 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: var(--alvo);
-  padding: 0 0.9rem;
+  padding: 0 1rem;
   color: var(--texto);
   text-decoration: none;
-  border: 1.5px solid transparent;
-  border-radius: 999px;
+  white-space: nowrap;
+  border-radius: var(--raio-pilula);
 }
 
-.abas a[aria-current='page'] {
-  background: var(--agora-fundo);
-  border-color: var(--agora-borda);
-  font-weight: 700;
+/* O anel de foco por dentro: o trilho que rola cortaria o de fora. Dentro do item selecionado
+   (verde) o anel é o do bloco. */
+.abas a:focus-visible {
+  outline-offset: -3px;
+}
+
+.abas a[aria-current='page']:focus-visible {
+  outline-color: var(--bloco-foco);
 }
 
 button.grande,
@@ -840,7 +1233,8 @@ a.item-norma strong {
   font-variant-numeric: tabular-nums;
 }
 
-.andamento progress {
+.andamento progress,
+.aviso progress {
   width: 100%;
   max-width: 24rem;
 }
@@ -907,11 +1301,11 @@ a.item-norma strong {
 .marca-lido-ate {
   margin: 0.25rem 0 0;
   padding-top: 0.15rem;
-  border-top: 2px solid var(--primaria);
+  border-top: 2px solid var(--lugar);
   font-size: 0.8rem;
   font-weight: 600;
   text-align: right;
-  color: var(--primaria);
+  color: var(--titulo);
 }
 
 .acoes-leitor {
@@ -923,8 +1317,11 @@ a.item-norma strong {
   gap: 0.5rem;
 }
 
-.acoes-leitor button {
-  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+/* Flutuam sobre o texto: fundo de superfície, sem transparência no fluxo normal (o modo foco usa a
+   translúcida, abaixo), para a letra de trás não passar. */
+.acoes-leitor button:not(.principal) {
+  background: var(--superficie);
+  box-shadow: var(--sombra-flutuante);
 }
 
 @media (max-width: 899px) {
@@ -1027,6 +1424,7 @@ dialog.dialogo-busca {
   padding: 0.5rem 0.75rem;
   text-align: left;
   font-weight: 400;
+  border-radius: var(--raio-campo);
   overflow-wrap: anywhere;
 }
 
@@ -1037,7 +1435,7 @@ dialog.dialogo-busca {
 }
 
 .linha-leitor.achado-da-busca .dispositivo {
-  outline: 2px solid var(--primaria);
+  outline: 2px solid var(--cacto);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -1045,8 +1443,8 @@ dialog.dialogo-busca {
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
    nem mudança de medida: o texto não se move. */
 .linha-leitor[data-regua] .dispositivo {
-  background: color-mix(in srgb, var(--agora-borda) 9%, transparent);
-  box-shadow: inset 3px 0 0 var(--agora-borda);
+  background: color-mix(in srgb, var(--cacto) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--cacto);
 }
 
 .linha-leitor {
@@ -1401,13 +1799,6 @@ p.linha-atenuada {
   color: var(--texto-atenuado);
 }
 
-.alternar-destaques[aria-pressed='true'] {
-  background: var(--primaria);
-  border-color: var(--primaria);
-  color: var(--primaria-texto);
-  font-weight: 600;
-}
-
 /* Grifos e notas (11.4): o grifo é o fundo (o destaque automático é o traço, sem fundo), com o
    texto na cor de sempre; o escolhido ganha contorno. O marcador da nota é discreto, no fio do
    texto, sem mudar a altura da linha. */
@@ -1537,7 +1928,7 @@ button.marcador-nota {
 }
 
 .acoes-leitor button.filtro-ligado {
-  border: 2px solid var(--primaria);
+  border: 2px solid var(--cacto);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -1661,10 +2052,10 @@ dialog.dialogo-acoes {
 
 .acao-agora {
   position: relative;
-  background: var(--cartao-agora-fundo);
-  color: var(--cartao-agora-texto);
-  border: 1px solid transparent;
-  border-radius: var(--raio-cartao);
+  background: var(--bloco-fundo);
+  color: var(--bloco-texto);
+  border: 1px solid var(--bloco-borda);
+  border-radius: var(--raio-heroi);
   padding: 1.25rem;
   margin: 0 0 1rem;
   box-shadow: var(--sombra);
@@ -1684,27 +2075,23 @@ dialog.dialogo-acoes {
   pointer-events: none;
 }
 
-/* Botão em vidro: preenchimento a 88% sobre o cartão, brilho suave e borda translúcida; texto sólido. */
+/* Dentro do bloco de Caatinga a ação é Solace (a Terracota some no verde): o botão primário global
+   só troca o par --acao / --acao-texto. No bloco ocupa a largura e é mais alto. */
+.acao-agora {
+  --acao: var(--bloco-acao);
+  --acao-texto: var(--bloco-acao-texto);
+  --foco: var(--bloco-foco);
+  --link: var(--bloco-texto);
+}
+
 .acao-agora .principal {
   min-height: 52px;
   width: 100%;
   justify-content: center;
-  color: var(--acao-texto);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 0%) 55%),
-    color-mix(in srgb, var(--acao) 88%, transparent);
-  border: 1px solid rgb(255 255 255 / 38%);
-  border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%);
-  backdrop-filter: blur(8px);
-}
-
-.acao-agora :focus-visible {
-  outline-color: var(--acao);
 }
 
 .agora-titulo {
-  font-family: var(--fonte-leitura);
+  font-family: var(--fonte-interface);
   font-weight: 700;
   margin: 0 0 0.25rem;
   font-size: 1.3rem;
@@ -1712,11 +2099,11 @@ dialog.dialogo-acoes {
 
 .agora-estimativa {
   margin: 0 0 0.75rem;
-  color: var(--cartao-agora-atenuado);
+  color: var(--bloco-atenuado);
 }
 
 .linha-depois {
-  color: var(--depois);
+  color: var(--texto-atenuado);
   margin: 0 0 1rem;
 }
 
@@ -1738,7 +2125,7 @@ dialog.dialogo-acoes {
 .barra-fina-cheia {
   display: block;
   height: 100%;
-  background: var(--progresso);
+  background: var(--acqua);
 }
 
 .barra-fina-texto {
@@ -1767,8 +2154,8 @@ dialog.dialogo-acoes {
 }
 
 .dia-marca.feito {
-  background: var(--progresso);
-  border-color: var(--progresso);
+  background: var(--cacto);
+  border-color: var(--cacto);
 }
 
 .flutuante {
@@ -1791,7 +2178,9 @@ dialog.dialogo-acoes {
     height: 3.5rem;
     border-radius: 50%;
     font-size: 1.75rem;
-    box-shadow: var(--sombra);
+    box-shadow:
+      var(--sombra-flutuante),
+      inset 0 1px 0 rgb(255 255 255 / 35%);
   }
 
   /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
@@ -1952,11 +2341,11 @@ dialog.dialogo-acoes {
   text-decoration: underline dotted;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
-  text-decoration-color: var(--primaria);
+  text-decoration-color: var(--link);
 }
 
 .remissao:focus-visible {
-  outline: 2px solid var(--primaria);
+  outline: 2px solid var(--link);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -2098,9 +2487,9 @@ dialog.dialogo-previa .linha-acoes button {
   justify-content: center;
   width: var(--alvo);
   height: var(--alvo);
-  border-radius: var(--raio);
-  background: var(--agora-fundo);
-  color: var(--primaria);
+  border-radius: var(--raio-campo);
+  background: var(--quente);
+  color: var(--texto);
   font-weight: 700;
 }
 
@@ -2132,20 +2521,21 @@ dialog.dialogo-previa .linha-acoes button {
   align-items: center;
   padding: 0.1rem 0.6rem;
   border-radius: 999px;
-  border: 1px solid var(--agora-borda);
-  background: var(--agora-fundo);
+  border: 1px solid var(--borda);
+  background: var(--superficie-2);
   color: var(--texto);
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* Estado selecionado único: tinta e borda sálvia (filtros, disciplina, Conta › Aparência). */
+/* Estado selecionado único: linha com a tinta do lugar e filete do lugar (filtros, disciplina,
+   Conta › Aparência); a marca do rádio carrega o bloco de Caatinga. */
 .opcao:has(input[type='radio']:checked),
 .filtro-escolha:has(input[type='radio']:checked) {
-  background: var(--agora-fundo);
-  border-radius: var(--raio);
-  box-shadow: inset 0 0 0 1.5px var(--agora-borda);
+  background: var(--tinta-lugar);
+  border-radius: var(--raio-campo);
+  box-shadow: inset 0 0 0 2px var(--lugar);
 }
 
 .opcao:has(input[type='radio']),
@@ -2216,9 +2606,9 @@ dialog.dialogo-previa .linha-acoes button {
 
 .frase-correta {
   padding: 0.75rem 1rem;
-  background: var(--agora-fundo);
-  border: 1.5px solid var(--agora-borda);
-  border-radius: var(--raio);
+  background: var(--tinta-lugar);
+  border-left: 4px solid var(--lugar);
+  border-radius: var(--raio-campo);
   text-align: left;
 }
 

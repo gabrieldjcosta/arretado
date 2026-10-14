@@ -1,4 +1,5 @@
 // Fonte única da política de segurança do app publicado (D18, T9).
+import { URL_SUPABASE } from '../src/integracoes/conta/projeto';
 
 /**
  * Origens externas que o app pode chamar (F4: Supabase, provedor de login, Worker de IA).
@@ -6,6 +7,14 @@
  * acrescentar uma é decisão registrada (T-nova), não ajuste solto.
  */
 export const ORIGENS_DE_CONEXAO: readonly string[] = [];
+
+/**
+ * Origens do build: com `VITE_CONTA=1` (F4-A, T27) entra só a do projeto Supabase; com qualquer outro
+ * valor a lista é a de hoje e a CSP não muda.
+ */
+export function origensDoBuild(contas: boolean): readonly string[] {
+  return contas ? [...ORIGENS_DE_CONEXAO, URL_SUPABASE] : ORIGENS_DE_CONEXAO;
+}
 
 /** Monta a CSP estrita; `origens` só amplia o `connect-src` (nada mais). */
 export function montarCSP(origens: readonly string[] = ORIGENS_DE_CONEXAO): string {
@@ -41,10 +50,10 @@ export function montarCSP(origens: readonly string[] = ORIGENS_DE_CONEXAO): stri
 export const CSP = montarCSP();
 
 /** Arquivo `_headers` da hospedagem (Cloudflare Workers, T18; mesmo formato do Pages e do Netlify). */
-export function cabecalhosHospedagem(): string {
+export function cabecalhosHospedagem(csp: string = CSP): string {
   return [
     '/*',
-    `  Content-Security-Policy: ${CSP}; frame-ancestors 'none'`,
+    `  Content-Security-Policy: ${csp}; frame-ancestors 'none'`,
     '  X-Frame-Options: DENY',
     '  X-Content-Type-Options: nosniff',
     '  Referrer-Policy: no-referrer',

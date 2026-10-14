@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
 import { relatosAguardando } from '../../suporte/relatos';
+import { contasHabilitadas } from '../../integracoes/conta';
 import { useDados } from '../dados/contexto';
+import { ContaDoAparelhoSecao } from './sair/ContaDoAparelho';
 
 /** Conta e Ajustes: fora da navegação de estudo (D6, D23). */
 export function Conta() {
@@ -32,6 +34,7 @@ export function Conta() {
           <span className="dica">Como funciona e cuidados com seus dados</span>
         </li>
       </ul>
+      {contasHabilitadas() && <ContaDoAparelhoSecao />}
       {pendentes > 0 && (
         <p className="dica">
           {pendentes === 1

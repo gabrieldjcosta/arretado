@@ -33,6 +33,8 @@ Migrações aplicadas pelo conector, idênticas ao repositório (MD5 conferido; 
 | `20260923000000_esquema_inicial.sql` | `20260923030320` |
 | `20260923000100_ajustes_advisors.sql` | `20260923030802` |
 | `20260924000000_colecao_leituras.sql` (9.1) | `20260925001816` |
+| `20261010000000` … `20261014010000` (quatro migrações de coleções: vínculos de disciplina, pendências de releitura, frases, tarefas de estudo, vínculos de precedente — aplicadas em 14/10/2026) | versões de 14/10/2026 (UTC); nomes iguais aos dos arquivos sem o prefixo de data |
+| `20261014020000_f4a_contas.sql` (F4-A, A2) | aplicada em 14/10/2026 (UTC) como `f4a_contas`; `verificacao-f4a-remota.sql` deu 01→1, 02→0, 03–07 recusado; advisors de segurança só com INFO (RLS sem política em `convites` e `exclusoes`, por desenho) |
 
 - **Advisors:** segurança sem alertas. Desempenho: a migração `ajustes_advisors` corrigiu o aviso de duas políticas permissivas de leitura em `catalogo` e a chave estrangeira `catalogo.curador_id` sem índice. Fica só o aviso informativo "índice não usado", esperado até haver tráfego. `rls.test.ts` ganhou guardas para esses dois lints.
 - **RLS no projeto real:** `supabase/verificacao-rls-remota.sql`, com 15 verificações numa transação desfeita. B não lê, não altera, não apaga e não grava em nome de A. Ninguém altera nem apaga o log, nem o próprio dono. O anônimo não lê dado pessoal. Repetir depois de toda migração nova.
@@ -47,6 +49,7 @@ npx vitest run --project unidade --maxWorkers=4   # no Windows, se o check falha
 npm run carga      # 10 mil registros e a leitura de uma norma de 5 mil dispositivos dentro dos limiares
 npm run test:e2e   # Playwright + axe, desktop, celular e tablet
 npm run build      # dist/ com _headers
+node scripts/capturas-ui.mjs --rotas todas --medir --folhas   # revisão visual: 27 rotas × 3 aparelhos × 2 temas, com medidas (rolagem horizontal, alvos de 44 px, "+" sobre texto); exige dist/ (ver docs/design/sistema-visual.md › Como conferir)
 npm run corpus:colar   # recaptura os colados (sem rede; só depois que uma página mudar)
 npm run corpus:gabarito   # regera os gabaritos e as folhas de conferência (sem rede)
 ```
