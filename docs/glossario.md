@@ -434,3 +434,12 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Projeto Supabase (URL e chave publicável) | `src/integracoes/conta/projeto.ts` |
 | Origens da CSP por build | `origensDoBuild(contas)`, `config/seguranca.ts` |
 | Tela | `/conta/entrar` (só com `VITE_CONTA=1`), `Entrar`, `VERSAO_TERMOS` |
+
+#### F4-A: sair, trocar e excluir (A5, 14/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificador |
+|---|---|
+| Sair (manter ou apagar daqui) | `sairDaConta(repo, { apagarDados })`, `src/core/pacote/sair-da-conta.ts` |
+| Trocar de conta já conhecida | `trocarDeConta(uid)` |
+| Seção da tela Conta | `ContaDoAparelhoSecao`, `src/apresentacao/conta/sair/` |
+| Exclusão da conta no servidor | Edge Function `excluir-conta`, lógica testável em `supabase/functions/excluir-conta/handler.ts` (`index.ts` é o ajuste Deno) |

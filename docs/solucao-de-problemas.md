@@ -1368,3 +1368,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Build com `VITE_CONTA=0` ainda gera o arquivo `supabase-….js`
 - **Causa:** o `import()` do serviço existe no código; o arquivo é emitido, mas nunca é pedido com a chave desligada (a CSP também não libera a origem do Supabase).
 - **Solução:** nenhuma; é esperado. O teto de `npm run tamanho` já conta o arquivo.
+
+### "Excluir minha conta" diz que não foi possível excluir (A5)
+- **Causa provável:** a Edge Function `excluir-conta` ainda não foi implantada no projeto Supabase (o deploy exige o sim do Gabriel), ou o aparelho está sem rede.
+- **Solução:** nada foi apagado em lugar nenhum (o servidor responde antes de o aparelho apagar). Implantar a função (`supabase functions deploy excluir-conta`) e repetir.
+
+### Saí com "Apagar daqui" e a conta ainda aparece em outro lugar
+- **Causa:** o registro de contas é atualizado antes do banco ser apagado; se o apagamento falhar, sobra um banco `arretado-c-…` órfão, sem efeito.
+- **Solução:** nenhuma urgente; "Apagar tudo" em Conta › Dados remove o que sobrar do banco aberto.

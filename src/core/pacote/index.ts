@@ -21,3 +21,4 @@ export {
 export { criarSnapshot, desfazerImportacao, podarSnapshots, restaurarSnapshot } from './snapshots';
 export { importarParaEspaco, mesclarEspaco, planejarMesclagem, removerEspaco } from './espacos';
 export { apagarTudo } from './apagar';
+export { sairDaConta, trocarDeConta, type OpcoesSair } from './sair-da-conta';
