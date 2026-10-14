@@ -308,6 +308,10 @@ async function semear(browser, o, url) {
  */
 function medirTela(larguraDoAparelho) {
   const visivel = (el) => {
+    // O conteúdo de um `<details>` fechado não é desenhado (só o `<summary>`), mas o navegador
+    // ainda devolve uma caixa para ele; não é tela, então não entra nas medidas.
+    const fechado = el.closest('details:not([open])');
+    if (fechado && !el.closest('summary')) return false;
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) return false;
     const s = window.getComputedStyle(el);
