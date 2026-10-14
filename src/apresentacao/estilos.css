@@ -556,7 +556,7 @@ legend {
 
 @media (prefers-reduced-motion: no-preference) {
   .esqueleto span {
-    animation: pulsar 1.6s ease-in-out 2;
+    animation: pulsar 0.6s ease-in-out 2;
   }
 }
 
@@ -2248,14 +2248,6 @@ dialog.dialogo-previa .linha-acoes button {
   background: var(--superficie);
   color: var(--texto);
   font-weight: 600;
-}
-
-.respostas .resposta-dificil {
-  border-color: var(--estrela);
-}
-
-.respostas .resposta-facil {
-  border-color: var(--sucesso);
 }
 
 /* Estado por texto (6.7): palavra e ícone além da cor. */
