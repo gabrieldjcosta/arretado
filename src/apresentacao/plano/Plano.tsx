@@ -53,8 +53,8 @@ export function Plano() {
       ) : (
         <>
           <p className="dica">
-            {dados.pontos.length} pontos importados. Servem para vincular erros; mudar faixas e
-            receber sugestão do próximo ponto chega numa próxima fase.
+            {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.{' '}
+            <Link to="/plano/pontos">Editar pontos e matérias</Link>
           </p>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
