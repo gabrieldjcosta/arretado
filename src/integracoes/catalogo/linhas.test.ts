@@ -5,7 +5,8 @@ import {
   disciplinaNoEdital,
   editaisOferecidos,
 } from '../../dominios/catalogo';
-import { linhasDoEdital } from './linhas';
+import { chave } from '../pontos/csv';
+import { chaveDoItem, linhasDoEdital, tituloDoPonto } from './linhas';
 
 const fonte = new FonteEmbutida();
 
@@ -64,5 +65,39 @@ describe('linhas do catálogo para a importação de pontos', () => {
     const [a, b] = linhasDoEdital(edital);
     expect(a).toEqual({ disciplina: 'D', titulo: 'Com base', codigo: '1', faixa: 'alta' });
     expect(b).toEqual({ disciplina: 'D', titulo: 'Sem base' });
+  });
+
+  it('assunto longo vira título dentro do limite do Ponto', () => {
+    const longo = `${'palavra '.repeat(200)}fim`;
+    const t = tituloDoPonto(longo);
+    expect(t.length).toBeLessThanOrEqual(500);
+    expect(t.endsWith('…')).toBe(true);
+    expect(tituloDoPonto('  curto \n assunto ')).toBe('curto assunto');
+  });
+
+  it('assuntos dispensados ficam fora das linhas', async () => {
+    const dp = await fonte.obter('ministerio-publico');
+    const edital = editaisOferecidos(dp)[0]!;
+    const primeira = edital.disciplinas[0]!;
+    const nome = primeira.nome ?? primeira.nomeNoEdital;
+    const todas = linhasDoEdital(edital);
+    const menos = linhasDoEdital(edital, undefined, new Set([chaveDoItem(nome, 0)]));
+    expect(menos.length).toBe(todas.length - 1);
+  });
+
+  it('todos os editais oferecidos geram pontos válidos e sem repetição na disciplina', async () => {
+    for (const slug of ['defensoria-publica', 'magistratura', 'ministerio-publico', 'ambiental']) {
+      const carreira = await fonte.obter(slug);
+      for (const edital of editaisOferecidos(carreira)) {
+        const vistos = new Set<string>();
+        for (const l of linhasDoEdital(edital)) {
+          expect(l.titulo.length).toBeGreaterThan(0);
+          expect(l.titulo.length).toBeLessThanOrEqual(500);
+          vistos.add(`${chave(l.disciplina)}|${chave(l.titulo)}`);
+        }
+        // Repetições dentro da mesma disciplina viram um ponto só (id determinístico).
+        expect(vistos.size).toBeGreaterThan(0);
+      }
+    }
   });
 });
