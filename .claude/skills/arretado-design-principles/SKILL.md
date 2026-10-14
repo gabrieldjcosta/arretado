@@ -32,13 +32,17 @@ O sucesso é reduzir tempo até começar, preservar o ponto de retomada e produz
 
 ## Visual vigente
 
-- Identidade (D-D2, 14/10/2026, aplicada nos tokens no #120): areia no claro, espresso no escuro, **verde-cacto** no cartão do Agora, **caramelo** (claro) e **sol** (escuro) no botão primário em vidro sutil, cacto verde ao lado do nome e o mascote vetorial como coadjuvante. A fonte de verdade dos valores é `src/apresentacao/estilos.css`; o racional está em `docs/design/sistema-visual.md`.
-- Amarelo e demais cores de grifo pertencem ao conteúdo marcado no leitor, não ao CTA.
+- Identidade (D-D2, 14/10/2026): areia no claro, espresso no escuro, **verde-cacto**, **caramelo** (claro) e **sol** (escuro) em vidro sutil, cacto verde ao lado do nome e o mascote vetorial como coadjuvante. A fonte de verdade dos valores é `src/apresentacao/estilos.css`; o alvo e o racional estão em `docs/design/sistema-visual.md` (v2) e `docs/design/decisoes-design.md` (D-D2 e D-D3).
+- **Cor tem papel (D-D3, 14/10/2026, a vetar pelo Gabriel):** caramelo/sol = a ação (botão primário, um por tela, e o "+"); verde-cacto = onde estou e o que está salvo (bloco-herói, item ativo da navegação, aba e chip selecionados, "✓ salvo"); tinta = conteúdo; argila (claro) e âmbar (escuro) = links; azul claro = só a linha atual; seis tons de disciplina = esfera, etiqueta e filete (nunca em botão); vermelho = só excluir e falha técnica, nunca no estudo. **O verde-oliva da identidade anterior (`--primaria`) não é mais cor de interface.**
+- **Blocos de cor com função:** no máximo um bloco-herói por tela de orientação (Hoje, Retorno, fim de rodada); Leitor e Revisão em curso ficam calmos, sem bloco-herói. Raios: 28 (herói), 20 (cartão), 14 (campo), pílula (botão, chip, navegação). Vidro nos botões e na navegação flutuante, sólido com `prefers-reduced-transparency` e cores forçadas.
+- **Plataformas:** celular (< 700) e tablet em pé (700 a 899) com pílula de navegação flutuante e o "+" ao lado, uma coluna; desktop e tablet deitado (≥ 900) com navegação no topo e duas colunas no Hoje, no Recall e no Plano. O "+" e a pílula nunca cobrem texto.
+- Amarelo, verde e rosa de grifo pertencem ao conteúdo marcado no leitor, não ao CTA nem à interface.
 - Interface: Atkinson Hyperlegible Next. Leitura jurídica: Literata.
 - Reutilize tokens de `src/apresentacao/estilos.css`; não crie uma segunda marca dentro do app.
 - Tema escuro é modo de foco, não uma inversão ornamental.
 - Estado não depende apenas de cor; ações importantes mantêm rótulo.
-- Alvo de toque mínimo: 44 px. Preserve contraste AA e foco visível.
+- Alvo de toque mínimo: 44 px (link no meio de frase é a única exceção). Preserve contraste AA (texto 4,5:1, gráficos 3:1, inclusive o anel de foco dentro do bloco-herói) e foco visível.
+- Título de página em Literata 700; o texto quebra qualquer palavra longa e nenhuma tela rola na horizontal.
 
 ## Linguagem
 

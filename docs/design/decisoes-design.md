@@ -49,3 +49,37 @@ Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, pa
 
 > **A conferir depois:** (1) `CLAUDE.md` e a skill `arretado-design-principles` ainda descrevem a identidade sálvia; atualizar ao implementar. (2) Contraste das combinações reais com axe e `scripts/contraste.mjs`. (3) Colisão com cores de grifo e estrela. (4) SVGs do mascote são redesenho próprio e precisam de revisão de proporções e mãos. (5) A arte do mascote foi gerada por IA a pedido do Gabriel; registrar a origem e confirmar que o uso comercial futuro está coberto antes de cobrar pelo produto.
 
+## D-D3 — Papéis de cor, blocos de cor e plataformas (14/10/2026, proposta da thread "Redesenho de telas e plataformas"; vale como padrão até o Gabriel vetar)
+
+**Motivo.** Pedido do Gabriel em 14/10/2026: adaptar as decisões de design, porque a tentativa anterior manteve o plano original em verde e reduziu a qualidade das interfaces e dos blocos de cor do Stitch. A [auditoria](auditoria-ui-2026-10-14.md) confirma: a D-D2 só chegou ao cartão Agora e ao botão do Hoje. No resto do app o verde-oliva da identidade anterior segue como cor de interface (links, aba ativa, "Mostrar resposta", "Continuar", "Salvar"), os campos são nativos e a navegação é chapada.
+
+**A D-D2 não muda** (areia, espresso, cacto, caramelo/sol, mascote em pontos estratégicos, vidro). **A D-D3 dá a cada cor um papel e diz onde há bloco de cor**, para o app inteiro falar a língua do protótipo:
+
+| Cor | Responde a | Aparece em | Nunca em |
+|---|---|---|---|
+| Caramelo (claro) · sol (escuro) | "O que faço agora?" | botão primário (um por tela, em vidro), "+" da captura | link, aba, ícone decorativo |
+| Verde-cacto | "Onde estou? O que está salvo?" | cartão Agora e outros blocos-herói, item ativo da navegação (bloco sólido), aba e chip selecionados, "✓ salvo", progresso | botão de ação, link |
+| Tinta | o conteúdo | texto, títulos, texto da lei | — |
+| Argila (claro) · âmbar (escuro) | "Para onde posso ir?" | links de texto | botão |
+| Azul claro | "Em que linha estou?" | só a linha atual (Agora, Leitor) | qualquer outro realce |
+| Seis tons de disciplina (cacto, caramelo, céu, anil, ameixa, turquesa) | "De que matéria é?" | esfera, etiqueta, filete do cartão | botão, texto corrido |
+| Vermelho | "Isto apaga" ou falha técnica | excluir, Problema | estudo (nada de "Errei" em vermelho) |
+
+**Blocos de cor com função** (o que o Stitch tinha e o app perdeu):
+1. *Bloco-herói* verde-cacto, raio 28, texto creme: no máximo um por tela de orientação (Hoje, Retorno, fim de rodada, "Comece por aqui" do Plano).
+2. *Esferas de disciplina* de 44 px na linha do tempo e nas listas.
+3. *Bloco de tinta*: o tom da disciplina a 14% sobre a superfície, para linhas e etiquetas.
+4. *Callout* com filete lateral para "Frase correta" e avisos.
+
+**Telas de estudo em curso (Leitor, Revisão) ficam calmas:** superfície, tinta e uma ação; sem bloco-herói.
+
+**Forma, vidro e tipografia.** Raios 28 (herói), 20 (cartão), 14 (campo), pílula (botão, chip, navegação). Vidro (blur 8 a 16) no primário, no secundário e na navegação flutuante; sólido com `prefers-reduced-transparency` e em cores forçadas. Título de página em Literata 700 (2,25 rem no celular, 2,5 rem a partir de 900 px) com linha de apoio; interface em Atkinson; rótulo mínimo de 0,8125 rem.
+
+**Plataformas.** Celular (< 700 px): pílula flutuante de vidro com o "+" ao lado, uma coluna. Tablet em pé (700 a 899): a mesma pílula, centralizada, coluna de 680 px. Desktop e tablet deitado (≥ 900): navegação no topo, duas colunas no Hoje e no Recall, coluna de leitura de 70 ch. Detalhes em [`sistema-visual.md`](sistema-visual.md).
+
+**O Gabriel pode vetar** (se não houver resposta, vale o padrão): (a) o "+" vira satélite ao lado da pílula, em vez de canto flutuante; (b) o "Depois" mostra até 2 itens; (c) títulos de página em serifa; (d) links em argila, não em verde; (e) seis tons de disciplina.
+
+**Efeitos.** Muda tokens, botões, campos, abas e navegação (`estilos.css` e CSS dos pacotes) em 11 fatias ([`../planos/redesign-v2.md`](../planos/redesign-v2.md)), cada uma com E2E, axe nos dois temas e contraste medido. Não toca esquema, dados nem regra de domínio (D-D1).
+
+> **A conferir depois:** (1) grifos do leitor (amarelo, verde, rosa) contra verde-cacto e caramelo, e `--estrela`; (2) o "+" ao lado da pílula em aparelho real com o teclado aberto; (3) os seis tons de disciplina contra a lista real de matérias (hoje o catálogo tem 4 carreiras; mais 5 vêm do Gabriel).
+
