@@ -4,9 +4,15 @@
   gap: 0.5rem;
 }
 
+/* A explicação desce para a linha de baixo, alinhada ao nome (marca de 24 px + 12 px de vão). */
+.perfil-opcao {
+  flex-wrap: wrap;
+}
+
 .perfil-opcao .dica {
   display: block;
-  margin: 0.125rem 0 0 1.75rem;
+  flex-basis: 100%;
+  margin: 0 0 0 2.25rem;
 }
 
 .perfil-previa {
