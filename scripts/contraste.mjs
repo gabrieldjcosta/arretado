@@ -67,76 +67,118 @@ export function razao(a, b) {
   return (x + 0.05) / (y + 0.05);
 }
 
-const FUNDOS = ['fundo', 'superficie', 'superficie-2'];
+const FUNDOS = ['fundo', 'superficie', 'superficie-2', 'quente'];
+const SUPERFICIES = ['fundo', 'superficie'];
 const GRIFOS = ['grifo-1', 'grifo-2', 'grifo-3'];
 const DESTAQUES = ['destaque-prazo', 'destaque-condicao', 'destaque-absoluto', 'destaque-pena'];
 
-/** [primeiro plano, fundo, mínimo, descrição]. 4,5 = texto; 3 = traço ou ícone (WCAG 1.4.11). */
+/** [primeiro plano, fundo, mínimo]. 4,5 = texto; 3 = traço, ícone ou contorno (WCAG 1.4.11). */
 export function pares() {
   const p = [];
   for (const f of FUNDOS) {
-    p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['depois', f, 4.5]);
+    p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['link', f, 4.5]);
   }
-  for (const f of ['fundo', 'superficie']) {
+  for (const f of SUPERFICIES) {
     p.push(
-      ['primaria', f, 4.5],
+      ['titulo', f, 4.5],
       ['perigo', f, 4.5],
       ['sucesso', f, 4.5],
+      ['lugar', f, 3],
       ['foco', f, 3],
       ['estrela', f, 3],
-      ['progresso', f, 3],
+      ['cacto', f, 3],
+      ['acqua', f, 3],
+      ['borda-campo', f, 3],
       ...DESTAQUES.map((d) => [d, f, 3]),
     );
   }
+  p.push(
+    ['acqua-texto', 'fundo', 4.5],
+    ['acqua-texto', 'superficie', 4.5],
+    ['acqua-texto', 'superficie-2', 4.5],
+    // O trilho da barra de progresso é a superfície 2.
+    ['acqua', 'superficie-2', 3],
+    ['borda-forte', 'superficie', 3],
+  );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
-    p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['primaria', f, 4.5]);
+    p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['link', f, 4.5]);
   }
   p.push(
-    ['primaria-texto', 'primaria', 4.5],
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
+    // Botão primário: Terracota (claro) ou Solace (escuro) com o texto da ação; no bloco-herói, Solace.
+    ['acao-texto', 'acao', 4.5],
+    ['bloco-acao-texto', 'bloco-acao', 4.5],
+    ['bloco-acao', 'bloco-fundo', 3],
+    // Bloco-herói: o texto, o atenuado e o anel de foco próprio (o global pode não passar no verde).
+    ['bloco-texto', 'bloco-fundo', 4.5],
+    ['bloco-atenuado', 'bloco-fundo', 4.5],
+    ['bloco-foco', 'bloco-fundo', 3],
+    ['selecionado-texto', 'selecionado-fundo', 4.5],
+    ['cacto', 'selecionado-fundo', 3],
+    ['texto', 'tinta-lugar', 4.5],
+    ['texto-atenuado', 'tinta-lugar', 4.5],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;
 }
 
-/** Resultado de cada par num tema; a camada translúcida do modo foco sai de `texto` por baixo. */
+/** Resolve um valor de token (hex, rgb, var(--x), color-mix em srgb) para { r, g, b, a }. */
+function resolver(tema, texto) {
+  const t = texto.trim();
+  const v = /^var\(--([\w-]+)\)$/.exec(t);
+  if (v) {
+    if (!(v[1] in tema)) throw new Error(`token ausente: ${v[1]}`);
+    return resolver(tema, tema[v[1]]);
+  }
+  const m = /^color-mix\(in srgb,\s*(.+?)\s+(\d+(?:\.\d+)?)%\s*,\s*(.+)\)$/.exec(t);
+  if (m) return misturar(resolver(tema, m[1]), Number(m[2]), resolver(tema, m[3]));
+  return rgb(t);
+}
+
+/** Mistura `a` (com `pct` %) sobre `base`, como `color-mix(in srgb, a pct%, base)`. */
+const misturar = (a, pct, base) => ({
+  r: a.r * (pct / 100) + base.r * (1 - pct / 100),
+  g: a.g * (pct / 100) + base.g * (1 - pct / 100),
+  b: a.b * (pct / 100) + base.b * (1 - pct / 100),
+  a: 1,
+});
+
+/** Resultado de cada par num tema, mais as camadas compostas (régua, modo foco, texto branco). */
 export function medir(tema) {
   const cor = (n) => {
     if (!(n in tema)) throw new Error(`token ausente: ${n}`);
-    return rgb(tema[n]);
+    return resolver(tema, tema[n]);
   };
   const linhas = pares().map(([fg, bg, minimo]) => {
     const valor = razao(cor(fg), cor(bg));
     return { fg, bg, minimo, valor, ok: valor >= minimo };
   });
-  // Modo foco: o rótulo atenuado sobre a camada a 85%, com a letra do texto bem atrás.
+  const juntar = (fg, bg, minimo, valor) =>
+    linhas.push({ fg, bg, minimo, valor, ok: valor >= minimo });
+
+  // Modo foco: o rótulo atenuado sobre a camada a 90%, com a letra do texto bem atrás.
   const camada = sobre(cor('superficie-translucida'), cor('texto'));
-  const valor = razao(cor('texto-atenuado'), camada);
-  linhas.push({
-    fg: 'texto-atenuado',
-    bg: 'superficie-translucida/texto',
-    minimo: 4.5,
-    valor,
-    ok: valor >= 4.5,
-  });
-  // Cartão tingido (agora, selo, estado selecionado): tinta, atenuado e primária sobre o tingido
-  // (translúcido no escuro, composto sobre cada fundo) e a borda contra o tingido e o fundo.
-  for (const f of ['fundo', 'superficie']) {
-    const tingido = sobre(cor('agora-fundo'), cor(f));
-    for (const [fg, minimo] of [
-      ['texto', 4.5],
-      ['texto-atenuado', 4.5],
-      ['primaria', 4.5],
-      ['agora-borda', 3],
-    ]) {
-      const v = razao(cor(fg), tingido);
-      linhas.push({ fg, bg: `agora-fundo/${f}`, minimo, valor: v, ok: v >= minimo });
-    }
-    const vb = razao(cor('agora-borda'), cor(f));
-    linhas.push({ fg: 'agora-borda', bg: f, minimo: 3, valor: vb, ok: vb >= 3 });
+  juntar(
+    'texto-atenuado',
+    'superficie-translucida/texto',
+    4.5,
+    razao(cor('texto-atenuado'), camada),
+  );
+
+  // Régua de leitura (Areia a 45% no claro, Solace a 16% no escuro): texto e atenuado sobre ela,
+  // na superfície e no fundo.
+  for (const f of SUPERFICIES) {
+    const regua = sobre(cor('regua-fundo'), cor(f));
+    juntar('texto', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto'), regua));
+    juntar('texto-atenuado', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto-atenuado'), regua));
+    juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
   }
+
+  // Selo e interruptor em Acqua: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
+  // texto do tema não serve, então o par é o do selo: branco sobre acqua-fundo).
+  juntar('branco', 'acqua-fundo', 4.5, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('acqua-fundo')));
   return linhas;
 }
 

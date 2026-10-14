@@ -1,6 +1,6 @@
 # Redesenho v2 das telas e das plataformas — plano (14/10/2026)
 
-Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não conta** no limite de 2 tarefas de código). Origem: pedido do Gabriel em 14/10/2026 (adaptar as decisões de design; a tentativa anterior manteve o verde do plano original e reduziu a qualidade das interfaces e dos blocos de cor do Stitch). Diagnóstico: [`../design/auditoria-ui-2026-10-14.md`](../design/auditoria-ui-2026-10-14.md) (V-01 a V-21). Decisão: D-D3 em [`../design/decisoes-design.md`](../design/decisoes-design.md). Alvo visual: [`../design/sistema-visual.md`](../design/sistema-visual.md). Este plano substitui [`redesign.md`](redesign.md) (já arquivado) para a camada de apresentação; o `plano-mestre.md` continua valendo para tudo o mais.
+Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não conta** no limite de 2 tarefas de código). Origem: pedido do Gabriel em 14/10/2026 (adaptar as decisões de design; a tentativa anterior manteve o verde do plano original e reduziu a qualidade das interfaces e dos blocos de cor do Stitch). Diagnóstico: [`../design/auditoria-ui-2026-10-14.md`](../design/auditoria-ui-2026-10-14.md) (V-01 a V-21). Decisões: D-D3 e, por cima dela, **D-D4** (paleta, botões, cartões por estado, Leitor e Sessão do Gabriel, 14/10/2026) em [`../design/decisoes-design.md`](../design/decisoes-design.md); material dele em [`../design/referencias/2026-10-14-gemini/`](../design/referencias/2026-10-14-gemini/leia-me.md). Alvo visual: [`../design/sistema-visual.md`](../design/sistema-visual.md). Este plano substitui [`redesign.md`](redesign.md) (já arquivado) para a camada de apresentação; o `plano-mestre.md` continua valendo para tudo o mais.
 
 ## Como cada fatia é entregue
 
@@ -19,56 +19,58 @@ Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não co
 
 | # | Fatia | Fecha | Toca | Depende de |
 |---|---|---|---|---|
-| F1 | **Fundação**: tokens v2, botões, links, campos, abas, chips, callouts, linhas, títulos | V-02 (base), V-04, V-05, V-09, V-10, V-20 (botões), V-21 (quebra de palavra) | `estilos.css`, CSS dos pacotes, `scripts/contraste.*`, E2E de alvos e de largura | — |
-| F2 | **Casca por plataforma**: cabeçalho, pílula de navegação, "+" satélite, rodapé, safe-area | V-01, V-06, V-16, V-17 | `Shell.tsx`, casca em `estilos.css`, E2E da navegação | F1 |
-| F3 | **Hoje**: Agora v2, Depois, segurança, captura inline, duas colunas, Retorno, Fechar o dia | V-07 (Hoje), V-08, V-10 (Hoje) | `hoje/*`, `componentes/AcaoAgora`, `LinhaDepois`, `dominios/hoje/depois.ts` (novo) | F2 |
+| F1 | **Fundação** (feita; paleta D-D4): tokens, botões, links, campos, abas, chips, callouts, linhas, títulos | V-02 (base), V-04, V-05, V-09, V-10, V-20 (botões), V-21 (quebra de palavra) | `estilos.css`, CSS dos pacotes, `scripts/contraste.*`, E2E de alvos e de largura | — |
+| F2 | **Casca por plataforma**: cabeçalho, barra de navegação reta, "+" simples, rodapé, safe-area | V-01, V-06, V-16, V-17 | `Shell.tsx`, casca em `estilos.css`, E2E da navegação | F1 |
+| F3 | **Hoje**: cartões por estado, Depois, segurança, captura inline, duas colunas, Retorno, Fechar o dia, elementos vetoriais | V-07 (Hoje), V-08, V-10 (Hoje) | `hoje/*`, `componentes/AcaoAgora`, `LinhaDepois`, `dominios/hoje/depois.ts` (novo) | F2 |
 | F4 | **Revisão**: cartão central, resposta, botões sem vermelho, fim de rodada | V-14 | `recall/Drill.tsx`, `RevisarFrases.tsx` | F1 |
 | F5 | **Recall**: início, abas, listas, registrar, detalhe | V-02 (Recall), V-07 (Recall), V-12 | `recall/*` | F1, F2 |
-| F6 | **Leitor**: dock com "Lido até aqui" primário, ferramentas agrupadas, reserva de rolagem | V-03 | `biblioteca/Leitor*`, barra | F2 |
+| F6 | **Leitor** (especificação do Gabriel): controles, legenda de destaques, régua, dock, modo foco, ações do dispositivo | V-03 | `biblioteca/Leitor*`, barra | F2 |
 | F7 | **Biblioteca**: abas, filtros, normas, Acervo, súmulas, teses, resumos, precedentes, importar | V-13, V-20 (Normas) | `biblioteca/*` | F1, F2 |
 | F8 | **Plano**: matérias recolhidas com andamento, Pontos, Tarefas, Onboarding | V-11, V-21 (grade), V-02 (Pontos e Tarefas) | `plano/*` | F1, F2 |
-| F9 | **Conta e Sessão**: Conta, Aparência, Perfis, Dados, Privacidade, Orientações, Sessão | V-15 | `conta/*`, `sessao/*`, `orientacoes/*` | F1, F2 |
+| F9 | **Conta e Sessão** (Sessão pela especificação do Gabriel): Conta, Aparência, Perfis, Dados, Privacidade, Orientações, Sessão | V-15 | `conta/*`, `sessao/*`, `orientacoes/*` | F1, F2 |
 | F10 | **Transições entre rotas** (View Transitions) e atraso do `Esqueleto` | V-19 | `App.tsx`/rotas, CSS de movimento | F2 |
 | F11 | **Plataformas**: favicon, manifest, ícones, `theme-color`, `viewport-fit`, tablet deitado | V-18 | `index.html`, `public/`, `vite.config.ts` | F1 |
 
 Ordem de trabalho: F1 → F2 → F3 → F11 (barata e visível) → F4 → F6 → F5 → F8 → F7 → F9 → F10. A F10 entra por último porque a transição só vale com a casca e as rotas já no desenho final; as demais podem se sobrepor duas a duas, porque depois da F1 cada tela tem o próprio CSS de pacote.
 
-### F1 — Fundação (só CSS e testes)
+### F1 — Fundação (só CSS e testes; feita, com a paleta da D-D4)
 
-- Os três blocos de tokens (`:root`, `prefers-color-scheme: dark` e `[data-tema='escuro']`) com os valores de `sistema-visual.md`; `scripts/contraste.mjs` e `.test.ts` ganham os pares novos (o teste exige claro-escuro-sistema igual ao escuro manual).
-- `.principal` vira vidro caramelo/sol em todo o app (um estilo só); secundário em vidro; `.botao-texto` e `.botao-icone` novos; `.perigo` só cheio no diálogo.
-- Campos: todo `input` (com ou sem `type`), `select` e `textarea` com altura 48, contorno `--borda-campo` e seta própria; caixa e rádio com marca de 24 px num rótulo de 44.
-- Abas, chips, callouts, linhas de lista, cartões, estado vazio, `Esqueleto` e diálogo nos tokens novos; H1 em Literata.
+- Os três blocos de tokens (`:root`, `prefers-color-scheme: dark` e `[data-tema='escuro']`) com a paleta do Gabriel (Areia, Palha, Creme, Terracota, Caatinga, Acqua, Solace, Noite, Tinta) e os papéis de `sistema-visual.md`; `scripts/contraste.mjs` e `.test.ts` ganham os pares novos (o teste exige claro-escuro-sistema igual ao escuro manual e que nenhum CSS use token da identidade anterior).
+- `.principal` compacto (44 de altura, raio 12), Terracota no claro e Solace no escuro e dentro do bloco; secundário de contorno; `.botao-texto` (fantasma), `.botao-icone` e `.linha-acao` novos; `.perigoso` só cheio no diálogo. **Sem vidro.**
+- Campos: todo `input` (com ou sem `type`), `select` e `textarea` com altura 48, contorno `--borda-campo` e seta própria; caixa e rádio com marca de 22 px e contorno de 2 px num rótulo de 44.
+- Abas, chips, callouts, linhas de lista, cartões, estado vazio, `Esqueleto` e diálogo nos tokens novos; H1 em Literata na cor de lugar.
 - `overflow-wrap: anywhere` no conteúdo (V-21) e `min-width: 0` nos filhos de grade.
-- Sai o verde-oliva: os 13 usos de `--primaria`, 6 de `--agora-fundo` e 7 de `--agora-borda` de `estilos.css` e o de `estilos-precedentes.css`; depois `--primaria`, `--agora-*`, `--progresso`, `--depois` somem (conferir com `git grep` que nenhum TSX e nenhuma outra thread dependem deles).
-- Foco: `--bloco-foco` dentro de bloco-herói.
-- Testes: o de alvos varre as rotas principais (hoje só `/conta/dados`); novo teste de largura (390 px, sem rolagem horizontal) nas rotas semeadas.
+- Sai o verde-oliva: `--primaria`, `--agora-*`, `--progresso`, `--depois` e `--cartao-agora-*` somem do CSS (o teste de contraste falha se voltarem).
+- Foco: `--bloco-foco` dentro de bloco-herói e do item selecionado.
+- Testes: o de alvos varre as rotas principais (antes só `/conta/dados`); novo teste de largura (390 px, sem rolagem horizontal) nas rotas semeadas.
 - **Não muda estrutura de TSX.** Se um estilo exigir classe nova, a classe entra na fatia da tela.
 
 ### F2 — Casca por plataforma
 
-- Cabeçalho: marca, Ajuda e Conta em botões de ícone de vidro; no desktop, navegação em pílula ao centro e "Registrar erro (E)" à direita.
-- Navegação: pílula flutuante de vidro no celular e no tablet em pé (`fixed`, 12 px da borda e do `safe-area`), item ativo em `--selecionado-*`; "+" de 64 px ao lado, no caramelo/sol; some com o teclado aberto (`visualViewport`).
-- Rodapé legal no fim do conteúdo (botão de texto de 44), reserva de rolagem igual à altura da pílula mais 12 px, `safe-area` e 16 px: o "+" nunca cobre texto.
-- Muda o ponto de aparição do "+" (hoje < 700, passa a < 900) e o do "Registrar erro" do cabeçalho (≥ 900); ajustar os E2E que dependem desses nomes acessíveis. O atalho E e o nome "Novo registro de erro" ficam.
+- Cabeçalho: "Arretado." (ponto final em Terracota) com o cacto; "Conta" e "?" em botões de contorno; no desktop, navegação ao centro e "Registrar erro (E)" à direita.
+- Navegação: **barra reta** embaixo no celular e no tablet em pé (ícone e rótulo nas quatro áreas, `safe-area`), item atual em `--selecionado-*` ou peso 700; no desktop, no cabeçalho. **Cai** a pílula flutuante com "+" satélite da D-D3.
+- "+" simples (56 px, Terracota; Solace no escuro) acima da barra, nas telas sem captura inline; some no Hoje (a captura é o campo) e com o teclado aberto (`visualViewport`).
+- Rodapé legal no fim do conteúdo (botão fantasma de 44), reserva de rolagem igual à altura da barra mais o "+" e 16 px, `safe-area`: o "+" nunca cobre texto (fecha as 52 ocorrências de "+ sobre texto" da medida).
+- Muda o ponto de aparição do "+" e o do "Registrar erro" do cabeçalho (≥ 900); ajustar os E2E que dependem desses nomes acessíveis. O atalho E e o nome "Novo registro de erro" ficam.
 
 ### F3 — Hoje
 
-- Agora v2: etiquetas (matéria e AGORA), título em Literata, "lei · quando", trecho em caixa translúcida com a linha atual em azul claro (quando a ação é leitura salva), botão com seta e estimativa em pílula, mascote de 124 px apoiado na borda; "Escolher outra coisa" como botão de texto.
+- Cartão Agora **por estado** (ver `sistema-visual.md`): Estudando = Caatinga com ação Solace e fantasma "Trocar tarefa" lado a lado; Distraído ("Por onde começar?") = Areia com linhas de ação ("Adicionar uma lei para ler", "Escolher uma matéria", "Sessão curta de 15 min"); Determinado (revisões prontas) = cinza-areia com Terracota; Sorrindo (dia fechado) com o andamento do dia em pontos. Título em sans bold, mascote apoiado na borda.
 - Linha "✓ Seu ponto está salvo neste aparelho." quando existe ponto de retomada.
-- Depois: linha do tempo com até 2 esferas de matéria. Lista pura `listarAcoes(entrada)` em `src/dominios/hoje/depois.ts`, que importa os tipos de `proxima-acao.ts` sem mudar a assinatura de `decidirProximaAcao`.
-- Captura inline ("Anote a frase correta" + Guardar no Hoje) sobre o caso de uso que o "+" já usa; só a frase é obrigatória (D25).
+- Depois: até 2 linhas em cartão (título, matéria · minutos, ponto de tipo e seta), sob "DEPOIS · NA SEQUÊNCIA". Lista pura `listarAcoes(entrada)` em `src/dominios/hoje/depois.ts`, que importa os tipos de `proxima-acao.ts` sem mudar a assinatura de `decidirProximaAcao`.
+- Captura inline: campo "Anote a frase correta…" com "Guardar" (Caatinga) dentro, sobre o caso de uso que o "+" já usa; só a frase é obrigatória (D25).
+- Elementos vetoriais do Gabriel como componentes (`ElementoCactos`, `ElementoLampada`, `ElementoDistracao`), decorativos.
 - Desktop em duas colunas (7fr · 5fr); Retorno com o mascote Distraído; Fechar o dia com o Sorrindo; o aviso de backup deixa de usar o rótulo "Depois".
 - Conflito conhecido: `Agora.tsx`, `proxima-acao.ts` e `RecallInicio.tsx` recebem texto e fila única da thread "Aprimoramentos"; a F3 entra depois do PR deles ou rebaseia sobre ele.
 
 ### F4 a F10 (resumo)
 
-- **F4 Revisão:** cartão central em Literata de 1,5 a 1,75 rem; "Mostrar resposta" primário; resposta em callout verde "Frase correta"; De novo, Difícil e Fácil em vidro com ícone, sem vermelho; progresso fino e "Sair" no topo; "Mais opções" numa folha; fim de rodada com bloco-herói e o mascote Sorrindo. Sem mascote durante a revisão.
+- **F4 Revisão:** cartão central em Literata de 1,5 a 1,75 rem; "Mostrar resposta" primário; resposta em callout de lugar "Frase correta"; De novo, Difícil e Fácil em botões secundários com ícone, sem vermelho; progresso fino e "Sair" no topo; "Mais opções" numa folha; fim de rodada com bloco-herói e o mascote Sorrindo. Sem mascote durante a revisão.
 - **F5 Recall:** início com resumo, abas rolantes e a lista em linhas de 56 px com esfera de matéria; resultado "Errei" em cor neutra; "Revisar frases" dentro do resumo; registrar com campo único em destaque; desktop em duas colunas.
-- **F6 Leitor:** dock com "Lido até aqui" primário e quatro botões de ícone (Buscar, Filtrar, Ações, Modo foco; os nomes acessíveis ficam); reserva de rolagem para o dock nunca cobrir o texto; busca e filtro em folha; coluna de 70 ch; modo foco, penumbra e cartão de artigo **não mudam**.
+- **F6 Leitor:** pela especificação do Gabriel (ver `sistema-visual.md`): controles (A-, 18px, A+, Destaques), legenda recolhível dos quatro sublinhados, régua em Areia, dock com Buscar, Filtrar, Foco e "Lido até aqui" (os nomes acessíveis ficam), reserva de 156 px sob o artigo, modo foco em retrato e paisagem, "Ações" em folha ou diálogo; busca e filtro em folha; coluna de 70 ch. A lógica do modo foco, a penumbra e o cartão de artigo **não mudam**; sem mascote.
 - **F7 Biblioteca:** abas rolantes, filtros recolhidos, normas em cartões com esfera de matéria, Acervo com linhas de 56 px e caixa de 44, súmulas e teses numa lista só (decisão de 14/10), grade de 2 e 3 colunas em tablet e desktop.
 - **F8 Plano:** matérias recolhidas com andamento ("12 de 107"), pontos ao abrir, Tarefas e Onboarding nos componentes novos; coluna `minmax(0, 1fr)` (V-21).
-- **F9 Conta e Sessão:** listas de cartões agrupados, Aparência com controles próprios, Perfis, Dados, Privacidade e Orientações com índice; Sessão iniciar e encerrada em blocos; a faixa "Sessão · Pausar · Encerrar" (componente da thread "Aprimoramentos") posicionada e estilizada aqui.
+- **F9 Conta e Sessão:** listas de cartões agrupados, Aparência com controles próprios, Perfis, Dados, Privacidade e Orientações com índice; Sessão pela especificação do Gabriel (Modo Só Estudo, chips de tempo que só informam, bloco de Caatinga com o mascote Estudando, estacionamento em Areia, fechamento com o mascote Sorrindo); a faixa "Sessão · Pausar · Encerrar" (componente da thread "Aprimoramentos") posicionada e estilizada aqui.
 - **F10 Transições:** View Transitions de até 150 ms entre rotas, desligada com `prefers-reduced-motion` e no perfil Calmo; nunca anima texto da lei nem remonta o Leitor; atraso de 150 ms no `Esqueleto`; padrão "andamento" nas operações longas ([`transicoes-e-carregamento.md`](transicoes-e-carregamento.md)).
 
 ### F11 — Plataformas
@@ -86,8 +88,10 @@ Favicon (o cacto), `manifest.webmanifest` (nome, `display: standalone`, `theme_c
 
 ## Perguntas ao Gabriel (vale o padrão se não houver resposta)
 
-1. **Calmo desliga as transições**, como no plano de 14/10, mas Calmo é o perfil padrão (quem não escolheu perfil é "calmo"). Padrão adotado: seguir a regra, então a transição só aparece em Guiado e Leitura. Se preferir a transição no padrão, a regra passa a ser só `prefers-reduced-motion`.
-2. O "+" vira satélite da pílula, no lugar do canto (D-D3, a).
-3. O "Depois" mostra até 2 itens (D-D3, b).
-4. Títulos de página em serifa (D-D3, c); links em argila (d); seis tons de disciplina (e).
-5. **Dado, não design:** alguns títulos de pontos da Defensoria vêm com os espaços perdidos (por exemplo `diretrizeseinstrumentosconstitucionaisdodireitoconsumerista.19.Defesa…`). O app passa a quebrar a palavra, mas o catálogo precisa ser corrigido na origem.
+1. **Agora do Hoje em Caatinga ou em Areia?** O mockup do Hoje o desenha em Areia com botão Terracota; o texto da especificação e o cartão "Estudando!" do sistema, em Caatinga. Padrão: Caatinga (a troca é um token).
+2. "Prazos" no Leitor: sublinhado `#173F52` (texto da especificação) ou Acqua (legenda da imagem). Padrão: `#173F52`.
+3. Cacto ao lado do nome: mantido (D-D2), embora três dos quatro mockups não o tenham no cabeçalho.
+4. Barra de baixo reta e "+" simples, no lugar da pílula flutuante com "+" satélite da D-D3.
+5. **Calmo desliga as transições**, como no plano de 14/10, mas Calmo é o perfil padrão (quem não escolheu perfil é "calmo"). Padrão: seguir a regra, então a transição só aparece em Guiado e Leitura. Se preferir a transição no padrão, a regra passa a ser só `prefers-reduced-motion`.
+6. O "Depois" mostra até 2 itens (D-D3, b) e o título de página fica em serifa (D-D3, c).
+7. **Dado, não design:** alguns títulos de pontos da Defensoria vêm com os espaços perdidos (por exemplo `diretrizeseinstrumentosconstitucionaisdodireitoconsumerista.19.Defesa…`). O app passa a quebrar a palavra, mas o catálogo precisa ser corrigido na origem.

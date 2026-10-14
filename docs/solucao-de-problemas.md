@@ -972,6 +972,24 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** controle fixo colado à barra de baixo no tablet, ou sobre o grupo fixo do leitor. **Causa:** três cortes na folha: 899 px (barra inferior, `.acoes-leitor` acima dela), 699 px (+ flutuante, recuos). **Solução:** o grupo fixo do leitor usa o canto do **+**, então `.shell:has(.leitor) .flutuante` o esconde ali (o atalho E e o botão do cabeçalho seguem no tablet; no celular, o registro no leitor vem das ações por dispositivo). No modo foco a barra e o **+** somem.
 - **Origem:** previsto/encontrado na fatia 2 do redesign.
 
+### Botão primário sem fundo dentro de um grupo (axe: `color-contrast` em `.acoes-leitor > .principal`)
+- **Sintoma:** E2E do Leitor falha em `semViolacoes` com `color-contrast: .acoes-leitor > .principal` no tema claro; o "Lido até aqui" aparece com texto branco sobre creme. **Causa:** uma regra de descendente (`.acoes-leitor button { background: var(--superficie) }`, especificidade 0,1,1) vence `.principal { background: var(--acao) }` (0,1,0); o texto segue `--acao-texto` (branco), o fundo vira o da superfície. Antes da D-D4 o primário era vidro e o defeito não aparecia.
+- **Solução:** a regra do grupo exclui o primário (`.acoes-leitor button:not(.principal)`). **Prevenção:** ao trocar a paleta, procurar `git grep -n "button" -- '*.css'` com `background` em seletor de descendente e rodar o E2E do Leitor (axe nos dois temas).
+- **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2).
+
+### Cor da paleta do Gabriel como texto ou sublinhado reprova no contraste
+- **Sintoma:** `node scripts/contraste.mjs` ou o axe reprovam um par com Acqua `#628981` (texto, ou texto branco sobre ela: 3,9:1) ou com Solace `#CF893A` (sublinhado de condição sobre Palha: 2,5:1). **Causa:** a paleta foi escolhida para blocos e traços, não para texto pequeno. **Solução:** Acqua só em traço, ponto, barra e interruptor; texto e selo com texto branco usam `--acqua-texto` e `--acqua-fundo` (`#416a63`, 5,4:1 e 6,1:1); no claro, `--destaque-condicao` = `#b06f22` (3,6:1); no escuro, a Areia como superfície vira `--quente` (`#2f261d`). **Prevenção:** os pares estão em `scripts/contraste.mjs` e o teste exige os dois temas.
+- **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2).
+
+### axe `color-contrast` só no CI e só no escuro, em botões (transição de cor)
+- **Sintoma:** no CI (não na máquina de quem desenvolve), `semViolacoes` falha em "dark" com `color-contrast` em botões e links de botão (`.botao`, `.principal`, "Registrar erro" do cabeçalho) em acervo, biblioteca, edição integral, leitor, plano, recall e sessão; o `verificar` e o tablet passam. **Causa:** a F1 pôs `transition: background-color 140ms` em `button, .botao`; `emulateMedia({ colorScheme: 'dark' })` troca o texto na hora e o fundo leva 140 ms, então o axe, rápido no CI, lê texto claro sobre o fundo claro (medido: `.registrar-global` com fundo `#faf6ee` e texto `#f6f1e6` aos 0 ms; `.principal` com `#963417` e texto `#231f1a`). É o mesmo defeito do "color-contrast: .barra-fina-texto" mais acima.
+- **Solução:** a transição do botão fica só em `transform` e `box-shadow`; o hover muda o fundo na hora. **Prevenção:** nunca `transition` em `background-color`, `color`, `border-color` nem em `all` (nem na raiz); para ver o defeito, trocar o tema com `page.emulateMedia` e ler `getComputedStyle` a 0, 40 e 80 ms.
+- **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2, PR 150).
+
+### Alvo abaixo de 44 px que a F1 não cobre (previsto)
+- **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Backup e dados", "Voltar à Biblioteca"). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
+- **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
