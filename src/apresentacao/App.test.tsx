@@ -63,7 +63,7 @@ describe('encaixes da F3 (P0 Fundação)', () => {
   it.each([
     ['/sessao/iniciar', 'Começar uma Sessão'],
     ['/plano/onboarding', 'Para qual carreira você estuda?'],
-    ['/plano/pontos/x', 'Pontos do programa'],
+    ['/plano/pontos', 'Pontos do programa'],
     ['/plano/tarefas', 'Tarefas'],
   ])('rota %s está registrada e mostra o encaixe', async (rota, titulo) => {
     await abrirApp(rota);

@@ -1,11 +1,13 @@
-// Encaixe de `/plano/pontos/*` (pacote B3). Vazio no P0: o pacote dono preenche.
-import { Link } from 'react-router';
-import { Vazio } from '../../componentes/estados';
+// `/plano/pontos/*` (pacote B3): lista por matéria e detalhe do ponto.
+import { Route, Routes } from 'react-router';
+import { DetalheDoPonto } from './DetalheDoPonto';
+import { ListaDePontos } from './ListaDePontos';
 
 export function Pontos() {
   return (
-    <Vazio titulo="Pontos do programa" acao={<Link to="/plano">Ir para o Plano</Link>}>
-      <p>Esta tela chega em breve.</p>
-    </Vazio>
+    <Routes>
+      <Route index element={<ListaDePontos />} />
+      <Route path=":id" element={<DetalheDoPonto />} />
+    </Routes>
   );
 }

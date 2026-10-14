@@ -1,0 +1,55 @@
+/* Pontos do programa (pacote B3): estrutura e espaçamento; cores e botões vêm dos tokens. */
+.pontos-materia,
+.pontos-bloco {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin-block: var(--espaco-3, 1rem);
+}
+
+.pontos-item {
+  display: grid;
+  gap: var(--espaco-1, 0.25rem);
+  min-height: 44px;
+}
+
+.pontos-item > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.pontos-selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2, 0.5rem);
+}
+
+.pontos-form {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+}
+
+.pontos-novo > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.pontos-confirmar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2, 0.5rem);
+  align-items: center;
+}
+
+.pontos-confirmar p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.pontos-secao {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin-block: var(--espaco-2, 0.5rem);
+}
