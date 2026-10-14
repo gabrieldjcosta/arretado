@@ -86,7 +86,7 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
               Pausar
             </button>
           )}
-          <Link to="/sessao/fechar" className="botao">
+          <Link to="/sessao/fechar" className="botao discreto">
             Encerrar
           </Link>
         </div>

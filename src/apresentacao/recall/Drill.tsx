@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
+import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -184,6 +185,7 @@ export function Drill() {
     return (
       <>
         <h1>Revisar</h1>
+        <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
           titulo="Feito."
           acao={

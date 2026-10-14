@@ -25,7 +25,7 @@ const gravarDispensa = (data: string) => {
   }
 };
 
-function BoasVindas() {
+export function BoasVindas() {
   const repo = useRepositorio();
   const data = hoje(repo);
   const { dados } = useDados(situacaoDeRetorno);
