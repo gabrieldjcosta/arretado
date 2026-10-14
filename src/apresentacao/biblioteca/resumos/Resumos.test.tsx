@@ -31,5 +31,10 @@ describe('Biblioteca › Resumos', () => {
     await usuario.type(screen.getByLabelText('Resumo'), ' inconstitucional');
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(await screen.findByText(/inconstitucional/, {}, { timeout: 5000 })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Excluir resumo' }));
+    await usuario.click(screen.getByRole('button', { name: 'Excluir' }));
+    expect(
+      await screen.findByText('Nenhum resumo ainda', {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
   });
 });

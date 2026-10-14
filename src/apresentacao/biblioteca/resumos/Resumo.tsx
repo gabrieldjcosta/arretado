@@ -29,6 +29,7 @@ export function Resumo() {
   const [titulo, setTitulo] = useState('');
   const [erro, setErro] = useState<string>();
   const [anuncio, setAnuncio] = useState('');
+  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     function aoMudar() {
@@ -71,7 +72,6 @@ export function Resumo() {
   }
 
   async function apagar() {
-    if (!window.confirm('Excluir este resumo?')) return;
     await excluirResumo(repo, id);
     void navegar('/biblioteca/resumos');
   }
@@ -109,21 +109,20 @@ export function Resumo() {
       ) : (
         <article>
           <h2>{nota.titulo}</h2>
-          <div ref={corpoRef} className="resumo-corpo">
+          <div ref={corpoRef} className="resumo-corpo texto-leitura">
             {nota.conteudo}
           </div>
           <div className="linha-acoes">
-            {selecionado && (
-              <button
-                type="button"
-                className="principal"
-                onClick={() => {
-                  setFraseAberta(selecionado);
-                }}
-              >
-                Enviar às frases
-              </button>
-            )}
+            <button
+              type="button"
+              disabled={!selecionado}
+              title={selecionado ? undefined : 'Selecione um trecho do resumo'}
+              onClick={() => {
+                setFraseAberta(selecionado);
+              }}
+            >
+              Enviar às frases
+            </button>
             <button
               type="button"
               onClick={() => {
@@ -134,18 +133,44 @@ export function Resumo() {
             >
               Editar
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                void apagar();
-              }}
-            >
-              Excluir
-            </button>
           </div>
+          {confirmando ? (
+            <p className="resumo-confirmar" role="alert">
+              Excluir este resumo?{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  void apagar();
+                }}
+              >
+                Excluir
+              </button>{' '}
+              <button
+                type="button"
+                autoFocus
+                onClick={() => {
+                  setConfirmando(false);
+                }}
+              >
+                Manter
+              </button>
+            </p>
+          ) : (
+            <p className="resumo-discreto">
+              <button
+                type="button"
+                className="resumo-excluir"
+                onClick={() => {
+                  setConfirmando(true);
+                }}
+              >
+                Excluir resumo
+              </button>
+            </p>
+          )}
         </article>
       )}
-      <p role="status" className="visualmente-oculto">
+      <p role="status" className="resumo-discreto">
         {anuncio}
       </p>
       <DialogoEnviarAsFrases
@@ -166,6 +191,9 @@ export function Resumo() {
             return false;
           }
           setAnuncio('Enviado às frases.');
+          setTimeout(() => {
+            setAnuncio('');
+          }, 3000);
           return true;
         }}
         fechar={() => {
