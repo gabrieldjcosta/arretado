@@ -2123,7 +2123,7 @@ function AcoesDaLeitura({
       >
         {modoFoco ? 'Sair do foco' : 'Modo foco'}
       </button>
-      <button type="button" onClick={marcarAqui}>
+      <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui
       </button>
     </>

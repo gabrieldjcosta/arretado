@@ -2,6 +2,8 @@
 
 Atualizado em 13/10/2026 (Frases 1 feita e **revisada em sessão independente**; esquema v6 na `integracao`, **backup manual do Gabriel obrigatório antes do merge no `main`**). Ler antes de qualquer trabalho, junto com o `CLAUDE.md`. Ordem, fases e decisões abertas: [`planos/plano-mestre.md`](planos/plano-mestre.md) (fonte única). Resumo simples: [`planos/proximos-passos.md`](planos/proximos-passos.md). Problemas conhecidos: [`solucao-de-problemas.md`](solucao-de-problemas.md). Vocabulário: [`glossario.md`](glossario.md). Histórico das sessões até 13/10/2026 (cada etapa feita, suposições a confirmar): [`planos/arquivo/proxima-sessao-ate-2026-10-13.md`](planos/arquivo/proxima-sessao-ate-2026-10-13.md).
 
+> **⚠ Exceção de fase ativa (decisão do Gabriel, 13/10/2026):** design e implementação de **UI de todas as telas** rodam em paralelo à F2 (não libera esquema, sync, sanitização nem domínio de fase posterior). **Conferir conflitos** com o plano da F3, Frases 2/3 e F4 ao planejar cada etapa. Detalhes: [`design/decisoes-design.md`](design/decisoes-design.md).
+
 ## Estado
 
 - **F0** com portão fechado; **F1** implementada, portão em medição (14 dias com revisão em ≥ 10).
