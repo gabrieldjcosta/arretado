@@ -29,7 +29,11 @@ export function RecallInicio() {
       {dados && <DiasDaSemana dias={dados.dias} />}
       {vencidos > 0 ? (
         <AcaoAgora
-          titulo={`Revisar ${cartoes(lote)}`}
+          titulo={
+            frasesVencidas > 0
+              ? `Revisar ${cartoes(lote)} e ${frases(Math.min(cota, frasesVencidas))}`
+              : `Revisar ${cartoes(lote)}`
+          }
           estimativa={minutos}
           rotuloBotao="Começar"
           para="/recall/revisar"
@@ -46,13 +50,6 @@ export function RecallInicio() {
           rotuloBotao="Registrar erro"
           para="/recall/registrar"
         />
-      )}
-      {vencidos > 0 && frasesVencidas > 0 && (
-        <p>
-          <Link to="/recall/frases/revisar" className="botao">
-            Revisar frases ({frasesVencidas})
-          </Link>
-        </p>
       )}
       {vencidos > cota && (
         <p className="dica">
