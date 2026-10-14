@@ -6,7 +6,7 @@ import type { Repositorio } from '../core/persistencia';
 import { repositorioDeTeste } from '../testes/repositorio';
 import { App } from './App';
 import { SECOES, secaoDeAjuda } from './orientacoes/conteudo';
-import { RODAPE } from './Shell';
+import { RODAPE_CURTO } from './textos';
 
 async function abrirApp(rota = '/', repo?: Repositorio) {
   const r = repo ?? (await repositorioDeTeste()).repo;
@@ -33,7 +33,7 @@ describe('shell (5.1, 5.5)', () => {
     expect(screen.getByRole('button', { name: 'Ajuda' })).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('button', { name: 'Relatar problema' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
-    expect(screen.getByText(RODAPE)).toBeInTheDocument();
+    expect(screen.getByText(RODAPE_CURTO, { exact: false })).toBeInTheDocument();
   });
 
   it('navega entre as áreas e marca a atual', async () => {

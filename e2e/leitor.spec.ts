@@ -1,5 +1,12 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from './apoio';
+import {
+  abrirTodasAsNormas,
+  expect,
+  importarEPublicar,
+  rolagemAssentada,
+  semViolacoes,
+  test,
+} from './apoio';
 
 /** Rola a janela, quase uma tela por vez, até o alvo aparecer (a lista é virtualizada: ele não existe antes). */
 async function rolarAte(page: Page, alvo: Locator, tentativas = 200) {
@@ -423,6 +430,7 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   await alinharNoAlto(page, art41);
   await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
   await expect(continuar).toBeVisible();
+  await abrirTodasAsNormas(page);
   await expect(normas.getByRole('link', { name: /LEP/ })).toContainText('Última leitura:');
   expect(await leituraGravada(page)).toEqual({ quantas: 1, posicao: 'art41', lidoAte: undefined });
   await semViolacoes(page);

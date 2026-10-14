@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { colar, expect, publicar, semViolacoes, test } from './apoio';
+import { colar, expect, publicar, semViolacoes, test, abrirTodasAsNormas } from './apoio';
 
 test('Biblioteca vazia: "Importar norma" leva à importação e volta (9.5)', async ({ page }) => {
   await page.goto('/#/biblioteca');
@@ -61,6 +61,7 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   await expect(page.getByRole('heading', { name: 'Acervo: normas' })).toBeVisible();
   await semViolacoes(page);
   await page.getByRole('link', { name: 'Voltar à Biblioteca' }).click();
+  await abrirTodasAsNormas(page);
   await expect(normas.getByText('LEP', { exact: true })).toBeVisible();
 
   await normas.getByRole('link', { name: 'Importar norma' }).click();
@@ -80,6 +81,7 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
     timeout: 30_000,
   });
   await page.getByRole('link', { name: 'Ver na Biblioteca' }).click();
+  await abrirTodasAsNormas(page);
   await expect(normas.locator('li')).toHaveCount(2);
 });
 
