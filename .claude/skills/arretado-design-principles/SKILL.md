@@ -32,7 +32,7 @@ O sucesso é reduzir tempo até começar, preservar o ponto de retomada e produz
 
 ## Visual vigente
 
-- Identidade vigente nos tokens: papel esverdeado, tinta escura e sálvia como cor de ação. **Decidida e ainda não aplicada (D-D2, 14/10/2026)**: areia no claro, espresso no escuro, verde-cacto no cartão do Agora, caramelo (claro) e sol (escuro) no botão primário, mascote vetorial como coadjuvante e cacto verde ao lado do nome; ver `docs/design/sistema-visual.md`. Até a aplicação, não misture as duas paletas.
+- Identidade (D-D2, 14/10/2026, aplicada nos tokens no #120): areia no claro, espresso no escuro, **verde-cacto** no cartão do Agora, **caramelo** (claro) e **sol** (escuro) no botão primário em vidro sutil, cacto verde ao lado do nome e o mascote vetorial como coadjuvante. A fonte de verdade dos valores é `src/apresentacao/estilos.css`; o racional está em `docs/design/sistema-visual.md`.
 - Amarelo e demais cores de grifo pertencem ao conteúdo marcado no leitor, não ao CTA.
 - Interface: Atkinson Hyperlegible Next. Leitura jurídica: Literata.
 - Reutilize tokens de `src/apresentacao/estilos.css`; não crie uma segunda marca dentro do app.

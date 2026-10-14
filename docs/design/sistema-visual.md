@@ -69,9 +69,13 @@ Marca e títulos: Literata (serifa) 700. Texto da lei: Literata. Interface: Atki
 - Navegação inferior flutuante em vidro, com 4 áreas (Hoje, Plano, Recall, Biblioteca); Conta fica no cabeçalho.
 - Alvos de toque ≥ 44 px; foco visível; movimento só de 150–220 ms e respeitando `prefers-reduced-motion`.
 
-## Para implementar (adiado por decisão do Gabriel em 14/10/2026; só quando ele mandar)
+## Estado da implementação
 
-1. Trocar os tokens de `src/apresentacao/estilos.css` pelos acima (claro e escuro), mantendo os nomes existentes quando possível; reconferir `scripts/contraste.mjs`.
-2. Atualizar a skill `arretado-design-principles` (paleta e mascote no lugar de sálvia e papel esverdeado).
+A D-D2 foi aplicada no app pela thread de UI (#120). **A fonte de verdade dos valores é `src/apresentacao/estilos.css`**; a tabela de tokens acima é a proposta original e pode divergir (por exemplo, `--primaria` e `--agora-fundo`). O que resta abaixo vale como roteiro para essa thread.
+
+### Roteiro (o que ainda falta)
+
+1. (feito no #120) Trocar os tokens de `src/apresentacao/estilos.css` pelos acima (claro e escuro), mantendo os nomes existentes quando possível; reconferir `scripts/contraste.mjs`.
+2. (feito neste PR) Atualizar a skill `arretado-design-principles` (paleta e mascote no lugar de sálvia e papel esverdeado).
 3. Telas por ordem de valor: Hoje, Revisão, Leitor, Biblioteca, Recall, Conta; cada uma com E2E e axe nos dois temas.
 4. Conflitos a vigiar: cores de grifo do leitor (amarelo, verde, rosa) versus verde-cacto e caramelo; `--estrela` e `--foco` existentes.

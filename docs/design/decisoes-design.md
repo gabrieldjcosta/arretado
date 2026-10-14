@@ -39,7 +39,7 @@ Restrições que continuam valendo (de `arretado-design-principles`): sem streak
 
 Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, para a camada de apresentação. **Confirmada pelo Gabriel em 14/10/2026**: libera trocar os tokens do app (em PR próprio, com contraste e E2E) e atualizar o plano-mestre, o CLAUDE.md e a skill rretado-design-principles. Mascote canônico: **vetorial plano**.
 
-**Implementação no app adiada (Gabriel, 14/10/2026):** não há PR de componentes nem mudança em `estilos.css` por ora; o PR de documentação fica só com docs. Os tokens, a troca de componentes (cartão verde, botões em vidro, cacto na marca, mascote na Hoje) e a atualização de `scripts/contraste.mjs` ficam para quando o Gabriel mandar. Até lá, o app continua na identidade sálvia.
+**Implementação (14/10/2026):** a thread "Ajuste de UI do Arretado", dona de `estilos.css`, tokens e `AcaoAgora` (`docs/planos/f3-pacotes.md`), aplicou a D-D2 no app (#120: tokens, cacto na marca, cartão do Agora verde com mascote, botão em vidro; depois, mascote no estado vazio da Hoje). A thread de design (Stitch) **não** mexe em `estilos.css` nem em componentes: só docs, protótipo e arte do mascote. Pendente na UI (do #120): Hoje com Retorno e Fechar o Dia, Revisão, Leitor e Biblioteca na nova paleta, conferir os grifos do leitor.
 - Tema claro: fundo areia, **cartão Agora em verde-cacto profundo**, botão primário caramelo. Tema escuro: **espresso**, botão amarelo-sol.
 - Tipografia da marca "Arretado" (serifa de exibição) mantida; interface em Atkinson; texto da lei em Literata.
 - **Cacto verde ao lado do nome** no cabeçalho.
