@@ -285,6 +285,23 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(await screen.findByText('1 de 10')).toBeInTheDocument();
   });
 
+  it('com cartões e frases vencidos: uma só ação, e o fim dos cartões segue para as frases', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    await registrarErro(repo, { fraseCorreta: 'Frase correta do dia.' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall', repo);
+    expect(
+      await screen.findByRole('heading', { name: 'Revisar 1 cartão e 1 frase' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Revisar frases/ })).not.toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Começar' }));
+    await usuario.keyboard(' ');
+    await usuario.keyboard('3');
+    await usuario.click(await screen.findByRole('link', { name: 'Seguir para as frases (1)' }));
+    expect(await screen.findByText('Frase correta do dia.')).toBeInTheDocument();
+  });
+
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir('/recall', repo);

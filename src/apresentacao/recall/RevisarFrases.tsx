@@ -3,7 +3,12 @@ import { Link } from 'react-router';
 import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Frase, RespostaFrase } from '../../core/modelo';
-import { contarFrasesVencidas, filaDeFrases, revisarFrase } from '../../dominios/recall/servico';
+import {
+  contarFrasesVencidas,
+  contarVencidos,
+  filaDeFrases,
+  revisarFrase,
+} from '../../dominios/recall/servico';
 import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
@@ -12,7 +17,7 @@ import { useRepositorio } from '../dados/contexto';
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'revisando'; fila: Frase[]; indice: number }
-  | { tipo: 'fim'; restantes: number; proximoLote: number }
+  | { tipo: 'fim'; restantes: number; proximoLote: number; cartoes: number }
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
@@ -39,8 +44,16 @@ export function RevisarFrases() {
 
   const terminar = useCallback(async () => {
     try {
-      const restantes = await contarFrasesVencidas(repo);
-      setEstado({ tipo: 'fim', restantes, proximoLote: Math.min(cota.current, restantes) });
+      const [restantes, cartoes] = await Promise.all([
+        contarFrasesVencidas(repo),
+        contarVencidos(repo),
+      ]);
+      setEstado({
+        tipo: 'fim',
+        restantes,
+        proximoLote: Math.min(cota.current, restantes),
+        cartoes,
+      });
     } catch {
       setEstado({ tipo: 'falha' });
     }
@@ -137,9 +150,20 @@ export function RevisarFrases() {
         <Vazio
           titulo="Feito."
           acao={
-            <Link to="/recall/frases" className="botao principal">
-              Voltar às frases
-            </Link>
+            estado.cartoes > 0 ? (
+              <>
+                <Link to="/recall/revisar" className="botao principal">
+                  Seguir para os cartões ({estado.cartoes})
+                </Link>
+                <Link to="/recall/frases" className="botao discreto">
+                  Voltar às frases
+                </Link>
+              </>
+            ) : (
+              <Link to="/recall/frases" className="botao principal">
+                Voltar às frases
+              </Link>
+            )
           }
         >
           {estado.restantes > 0 && (

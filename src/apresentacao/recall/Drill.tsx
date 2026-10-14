@@ -5,6 +5,7 @@ import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import {
+  contarFrasesVencidas,
   contarVencidos,
   filaDoDia,
   revisar,
@@ -21,7 +22,7 @@ import { ROTULO_RESPOSTA } from './rotulos';
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'revisando'; fila: Cartao[]; indice: number; virado: boolean }
-  | { tipo: 'fim'; amanha: number; restantes: number; proximoLote: number }
+  | { tipo: 'fim'; amanha: number; restantes: number; proximoLote: number; frases: number }
   | { tipo: 'falha' };
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
@@ -51,12 +52,17 @@ export function Drill() {
 
   const terminar = useCallback(async () => {
     try {
-      const [amanha, restantes] = await Promise.all([vencemAmanha(repo), contarVencidos(repo)]);
+      const [amanha, restantes, frases] = await Promise.all([
+        vencemAmanha(repo),
+        contarVencidos(repo),
+        contarFrasesVencidas(repo),
+      ]);
       setEstado({
         tipo: 'fim',
         amanha,
         restantes,
         proximoLote: Math.min(cota.current, restantes),
+        frases,
       });
     } catch {
       setEstado({ tipo: 'falha' });
@@ -189,9 +195,20 @@ export function Drill() {
         <Vazio
           titulo="Feito."
           acao={
-            <Link to="/recall" className="botao principal">
-              Voltar ao Recall
-            </Link>
+            estado.frases > 0 ? (
+              <>
+                <Link to="/recall/frases/revisar" className="botao principal">
+                  Seguir para as frases ({estado.frases})
+                </Link>
+                <Link to="/recall" className="botao discreto">
+                  Voltar ao Recall
+                </Link>
+              </>
+            ) : (
+              <Link to="/recall" className="botao principal">
+                Voltar ao Recall
+              </Link>
+            )
           }
         >
           {estado.restantes > 0 && (
