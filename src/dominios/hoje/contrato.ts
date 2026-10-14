@@ -33,14 +33,11 @@ export interface OpcoesProximaAcao {
 }
 
 /**
- * Ordem do pacote A1: revisão vencida → leitura salva → vazio com três começos. Não implementado
- * no P0.
+ * Ordem do pacote A1: revisão vencida → leitura salva → vazio com três começos. Implementada em
+ * `proxima-acao.ts`.
  */
 export type EscolherProximaAcao = (
   repo: Repositorio,
   hoje: DataCivil,
   opcoes?: OpcoesProximaAcao,
 ) => Promise<ResultadoProximaAcao>;
-
-export const escolherProximaAcao: EscolherProximaAcao = () =>
-  Promise.reject(new Error('escolherProximaAcao: não implementado (pacote A1)'));

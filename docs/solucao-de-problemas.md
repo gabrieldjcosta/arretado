@@ -1281,3 +1281,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Esquema v7: novo campo de Sessão ou Preferências "some" ao gravar
 - **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
 - **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.
+
+### Hoje: "Começar" abre uma tela "em breve"
+- **Causa:** o botão do Agora (A1) só leva a `/sessao/iniciar?acao=…&alvo=…&id=…&rotulo=…`; a tela é do pacote A2 (Sessão leve). Antes do merge da A2, a rota mostra o encaixe do P0.
+- **Solução:** mergear a A2 junto ou antes da A1. A revisão continua acessível por Recall › Revisar (`/recall/revisar`).

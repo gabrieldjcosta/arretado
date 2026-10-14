@@ -358,7 +358,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 
 | Termo | Identificadores |
 |---|---|
-| Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao`; vazio = `ComecoSugerido` (três). Domínio puro, nada gravado. Não usar "tarefa do dia" |
+| Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao` (reúne Recall e Legislação em `apresentacao/hoje/proxima-acao.ts`); decisão pura `decidirProximaAcao` (`dominios/hoje/proxima-acao.ts`); vazio = `ComecoSugerido` (três). Nada gravado. Não usar "tarefa do dia" |
 | Alvo | `AlvoDeAcao` (`tipo`: `revisao`, `leitura`, `tarefa`, `ponto`, `livre`; `id?`; `rotulo?`): o que se vai estudar; em `Sessao.alvo` |
 | Fronteira | `Sessao.fronteira`: até onde ler nesta Sessão ("até o art. 15"); texto livre e opcional |
 | Próximo passo | `Sessao.proximoPasso`: passo pequeno pedido ao fechar a Sessão, pré-preenchido; nunca obrigatório |
@@ -369,3 +369,4 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Tarefa de estudo | `TarefaDeEstudo` (coleção `tarefasDeEstudo`, v7): passo pequeno e concreto; `estado` `aberta`/`feita`/`adiada`/`dividida` (`EstadoDaTarefa`), `paiId` (dividida em filhas), `ordem`, `autoria` `manual`/`sugerida`, `razao` (por quê). Não concluída fica na fila, sem atraso punitivo. Não usar "meta" nem "atividade" |
 | Perfil de estudo | `PerfilDeEstudo` (`calmo`, `guiado`, `leitura`) em `Preferencias.perfilDeEstudo`, com `perfilAnterior` para voltar atrás; só muda padrões da interface |
 | Encaixes do Hoje | `src/apresentacao/hoje/`: `Hoje` compõe `Retorno`, `Agora`, `RevisoesDoDia`, `Depois`, `Captura`; rotas `/sessao/*` (`RotasDaSessao`) e `/plano/{onboarding,pontos,tarefas}/*` (`RotasDoPlano`) |
+| Escolher outra coisa | Botão do bloco Agora do Hoje: dispensa o tipo de Próxima ação mostrado (`excluir`), só na tela, sem gravar; sem tipo restante cai no estado vazio com os três começos (`EstadoVazio.tsx`) |

@@ -1,25 +1,56 @@
-// Bloco "Agora" do Hoje (pacote A1). No P0 mantém o comportamento anterior: revisão vencida ou vazio.
+// Bloco "Agora" do Hoje (pacote A1): uma só ação, com o motivo, e a saída "Escolher outra coisa".
+import { useCallback, useState } from 'react';
+import type { OrigemDaAcao } from '../../core/modelo';
+import { escolherProximaAcao } from './proxima-acao';
+import { hoje } from '../../dominios/recall/servico';
+import type { Repositorio } from '../../core/persistencia';
 import { AcaoAgora } from '../componentes/AcaoAgora';
-import { Vazio } from '../componentes/estados';
+import { Esqueleto } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
-import { vencidosHoje } from '../recall/carregadores';
+import { rotaDeInicio } from './rota-de-inicio';
+import { EstadoVazio } from './EstadoVazio';
+import './estilos-hoje.css';
 
 export function Agora() {
-  const { dados: vencidos } = useDados(vencidosHoje);
-  if (vencidos !== undefined && vencidos > 0) {
+  const [dispensados, setDispensados] = useState<OrigemDaAcao['tipo'][]>([]);
+  const carregar = useCallback(
+    (repo: Repositorio) => escolherProximaAcao(repo, hoje(repo), { excluir: dispensados }),
+    [dispensados],
+  );
+  const { dados } = useDados(carregar);
+  if (dados === undefined) return <Esqueleto linhas={2} />;
+  if (dados.tipo === 'vazio') {
     return (
-      <AcaoAgora
-        titulo={
-          vencidos === 1 ? '1 cartão para revisar.' : `${String(vencidos)} cartões para revisar.`
-        }
-        rotuloBotao="Revisar"
-        para="/recall/revisar"
+      <EstadoVazio
+        comecos={dados.comecos}
+        {...(dispensados.length > 0
+          ? {
+              aoVoltar: () => {
+                setDispensados([]);
+              },
+            }
+          : {})}
       />
     );
   }
+  const { acao } = dados;
   return (
-    <Vazio titulo="Nenhuma revisão hoje">
-      <p>O Hoje completo (ponto do dia e fechamento) chega numa próxima fase.</p>
-    </Vazio>
+    <>
+      <AcaoAgora
+        titulo={acao.razao}
+        {...(acao.estimativaMin === undefined ? {} : { estimativa: acao.estimativaMin })}
+        rotuloBotao="Começar"
+        para={rotaDeInicio(acao)}
+      />
+      <button
+        type="button"
+        className="agora-outra"
+        onClick={() => {
+          setDispensados((d) => [...d, acao.tipo]);
+        }}
+      >
+        Escolher outra coisa
+      </button>
+    </>
   );
 }
