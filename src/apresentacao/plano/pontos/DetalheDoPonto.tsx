@@ -224,6 +224,15 @@ function Excluir({ ponto }: { ponto: Ponto }) {
         type="button"
         className="principal"
         onClick={() => {
+          setConfirmando(false);
+        }}
+      >
+        Não excluir
+      </button>
+      <button
+        type="button"
+        className="discreto"
+        onClick={() => {
           excluirPonto(repo, ponto.id).then(
             () => {
               void navegar('/plano/pontos');
@@ -235,14 +244,6 @@ function Excluir({ ponto }: { ponto: Ponto }) {
         }}
       >
         Sim, excluir
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setConfirmando(false);
-        }}
-      >
-        Não excluir
       </button>
     </div>
   ) : (

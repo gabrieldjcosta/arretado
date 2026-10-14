@@ -9,7 +9,7 @@ test('Pontos do programa: matéria, ponto, faixa e adiar (B3)', async ({ page })
   await page.getByLabel('Nome da matéria').fill('Direito Civil');
   await page.getByRole('button', { name: 'Adicionar matéria' }).click();
   const secao = page.getByRole('region', { name: 'Direito Civil' });
-  await secao.getByText('Adicionar ponto').click();
+  await secao.getByText('Mais', { exact: true }).click();
   await secao.getByLabel('Título do ponto').fill('Prescrição');
   await secao.getByRole('button', { name: 'Salvar ponto' }).click();
   await expect(secao.getByText('Não iniciado')).toBeVisible();
