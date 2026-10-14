@@ -214,6 +214,8 @@ Ambiente de demonstração reiniciável; 3 a 5 pessoas; pedir para começar, ret
 
 **Ordem:** F4-A (conta) vem logo após a F3 e antes da V1; F4-B e F4-C só depois da V1.
 
+**Plano detalhado da F4-A (14/10/2026):** [`f4a-contas.md`](f4a-contas.md); pacotes em [`f4a-pacotes.md`](f4a-pacotes.md).
+
 Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `referencia.md`).
 
 | Bloco | Itens |
