@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { iniciarSessao } from '../../dominios/sessao/servico';
@@ -156,5 +156,35 @@ describe('Sessão leve (A2)', () => {
     await waitFor(() => {
       expect(document.body.dataset.soEstudo).toBeUndefined();
     });
+  });
+  it('faixa da Sessão: aparece na revisão só com Sessão aberta e pausa por ali', async () => {
+    const sem = await abrir('/recall/revisar');
+    await screen.findByRole('heading', { name: 'Revisar' });
+    expect(screen.queryByRole('group', { name: 'Sessão' })).not.toBeInTheDocument();
+    expect(sem.repo).toBeDefined();
+  });
+
+  it('faixa da Sessão: pausar e voltar gravam o estado', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, { alvo: { tipo: 'livre', rotulo: 'CP' } });
+    await repo.colecao('cartoes').criar({
+      frente: 'F',
+      verso: 'V',
+      origemTipo: 'manual',
+      estado: 'ativo',
+      caixa: 1,
+      proximaRevisao: '2000-01-01',
+    });
+    const { usuario } = await abrir('/recall/revisar', repo);
+    const faixa = await screen.findByRole('group', { name: 'Sessão' });
+    await usuario.click(within(faixa).getByRole('button', { name: 'Pausar' }));
+    await waitFor(async () => {
+      expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estado).toBe('pausada');
+    });
+    await usuario.click(await within(faixa).findByRole('button', { name: 'Voltar' }));
+    await waitFor(async () => {
+      expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estado).toBe('ativa');
+    });
+    expect(within(faixa).getByRole('link', { name: 'Encerrar' })).toBeInTheDocument();
   });
 });
