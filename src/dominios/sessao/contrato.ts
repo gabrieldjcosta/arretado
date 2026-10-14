@@ -1,6 +1,5 @@
-// Contrato da Sessão leve (F3-A, pacote A2; estacionamento no A3a). Só tipos e funções que lançam
-// "não implementado"; o pacote dono preenche. A duração de uma Sessão nunca é tratada como
-// aprendizado, e pausar não declara falha.
+// Contrato da Sessão leve (F3-A, pacote A2; `estacionar` é do A3a, em `estacionamento.ts`). A duração
+// de uma Sessão nunca é tratada como aprendizado, e pausar não declara falha.
 import type { AlvoDeAcao, OrigemDaAcao, Sessao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 
@@ -19,7 +18,7 @@ export interface FechamentoDeSessao {
   proximoPasso?: string;
 }
 
-/** Assinaturas. O A2 implementa tudo em `servico.ts`; `estacionar` segue para o A3a. */
+/** Assinaturas. O A2 implementa em `servico.ts`; o A3a, `estacionar`, em `estacionamento.ts`. */
 export interface ServicoDeSessao {
   iniciarSessao: (repo: Repositorio, entrada: EntradaDeSessao) => Promise<Sessao>;
   pausarSessao: (repo: Repositorio, id: string) => Promise<Sessao>;
@@ -34,8 +33,3 @@ export interface ServicoDeSessao {
   /** Estaciona uma distração na Sessão, sem sair do estudo. */
   estacionar: (repo: Repositorio, id: string, texto: string) => Promise<Sessao>;
 }
-
-const naoImplementado = (nome: string, pacote: string): Promise<never> =>
-  Promise.reject(new Error(`${nome}: não implementado (pacote ${pacote})`));
-
-export const estacionar: ServicoDeSessao['estacionar'] = () => naoImplementado('estacionar', 'A3a');

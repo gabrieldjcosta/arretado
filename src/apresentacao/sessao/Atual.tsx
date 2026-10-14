@@ -5,6 +5,7 @@ import type { Sessao } from '../../core/modelo';
 import { pausarSessao, retomarSessao } from '../../dominios/sessao/servico';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { Alavancas } from './alavancas/Alavancas';
 import { horaDeInicio, sessaoAberta } from './carregadores';
 import './estilos-sessao.css';
 
@@ -87,6 +88,7 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
         </div>
         {erro && <Falha oQue="Não foi possível salvar." oQueFazer="Tente de novo." />}
       </section>
+      <Alavancas sessao={sessao} />
     </>
   );
 }
