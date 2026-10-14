@@ -63,14 +63,13 @@ describe('encaixes da F3 (P0 Fundação)', () => {
   });
 
   it.each([
-    ['/sessao', 'Sessão'],
-    ['/sessao/iniciar', 'Sessão'],
+    ['/sessao/iniciar', 'Começar uma Sessão'],
     ['/plano/onboarding', 'Começar o plano'],
     ['/plano/pontos/x', 'Pontos do programa'],
     ['/plano/tarefas', 'Tarefas'],
   ])('rota %s está registrada e mostra o encaixe', async (rota, titulo) => {
     await abrirApp(rota);
-    expect(screen.getByRole('heading', { name: titulo })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: titulo })).toBeInTheDocument();
   });
 
   it('/plano segue mostrando o Plano', async () => {

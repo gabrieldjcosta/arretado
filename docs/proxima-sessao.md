@@ -69,3 +69,5 @@ Sessão nova por atividade, pelo comando `/proxima` ou pelo Despacho (ver [`plan
 ## Referência
 
 Cloudflare (Worker `arretado`), projeto Supabase, comandos de validação e mapa do código: [`referencia.md`](referencia.md).
+
+**A2 Sessão leve feita (14/10/2026), sem subida de esquema (segue v7).** `src/dominios/sessao/servico.ts` implementa iniciar (um toque, tudo opcional), pausar, retomar, encerrar (próximo passo opcional, pré-preenchido por `sugerirProximoPasso`) e restaurar; telas em `/sessao/{iniciar,atual,fechar}`; `SessaoAberta` pronto para o Hoje encaixar. **Decisão:** `interrompida` não restaura (Sessão aberta que virou o dia; sem `fim`/duração). **Para o A1:** o botão "Começar" leva a `/sessao/iniciar?tipo=<TipoDeAlvo>&id=&rotulo=&origem=<OrigemDaAcao.tipo>&razao=&tarefa=`; valores inválidos são ignorados. **Para quem for dono do Hoje:** encaixar `<SessaoAberta />` (restaura ao voltar); o A2 não tocou `src/apresentacao/hoje/`. `estacionar` segue para o A3a. Verificado: `npm run check` e E2E `sessao.spec.ts` (3 aparelhos, axe 2 temas).

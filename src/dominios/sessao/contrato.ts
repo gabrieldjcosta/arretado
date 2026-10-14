@@ -19,7 +19,7 @@ export interface FechamentoDeSessao {
   proximoPasso?: string;
 }
 
-/** Assinaturas que os pacotes A2 (e A3a, `estacionar`) implementam. */
+/** Assinaturas. O A2 implementa tudo em `servico.ts`; `estacionar` segue para o A3a. */
 export interface ServicoDeSessao {
   iniciarSessao: (repo: Repositorio, entrada: EntradaDeSessao) => Promise<Sessao>;
   pausarSessao: (repo: Repositorio, id: string) => Promise<Sessao>;
@@ -29,7 +29,7 @@ export interface ServicoDeSessao {
     id: string,
     fechamento?: FechamentoDeSessao,
   ) => Promise<Sessao>;
-  /** A Sessão `ativa` ou `pausada` que ficou aberta (volta ao app); `undefined` se não houver. O A2 decide se `interrompida` também restaura. */
+  /** A Sessão `ativa` ou `pausada` que ficou aberta (volta ao app); `undefined` se não houver. `interrompida` não restaura (decisão do A2, ver `servico.ts`). */
   restaurarSessao: (repo: Repositorio) => Promise<Sessao | undefined>;
   /** Estaciona uma distração na Sessão, sem sair do estudo. */
   estacionar: (repo: Repositorio, id: string, texto: string) => Promise<Sessao>;
@@ -38,14 +38,4 @@ export interface ServicoDeSessao {
 const naoImplementado = (nome: string, pacote: string): Promise<never> =>
   Promise.reject(new Error(`${nome}: não implementado (pacote ${pacote})`));
 
-export const iniciarSessao: ServicoDeSessao['iniciarSessao'] = () =>
-  naoImplementado('iniciarSessao', 'A2');
-export const pausarSessao: ServicoDeSessao['pausarSessao'] = () =>
-  naoImplementado('pausarSessao', 'A2');
-export const retomarSessao: ServicoDeSessao['retomarSessao'] = () =>
-  naoImplementado('retomarSessao', 'A2');
-export const encerrarSessao: ServicoDeSessao['encerrarSessao'] = () =>
-  naoImplementado('encerrarSessao', 'A2');
-export const restaurarSessao: ServicoDeSessao['restaurarSessao'] = () =>
-  naoImplementado('restaurarSessao', 'A2');
 export const estacionar: ServicoDeSessao['estacionar'] = () => naoImplementado('estacionar', 'A3a');

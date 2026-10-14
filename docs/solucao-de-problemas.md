@@ -1281,3 +1281,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Esquema v7: novo campo de Sessão ou Preferências "some" ao gravar
 - **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
 - **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.
+
+### Sessão: aparece "Sessão encerrada" sem duração, ou uma Sessão antiga some do Hoje
+- **Causa:** Sessão que ficou aberta de um dia para o outro vira `interrompida` ao abrir `/sessao/*` (A2); não há como saber quando a pessoa parou, então não tem `fim` nem `duracaoSegundos`. É de propósito; nada é cobrado.
+- **Solução:** nenhuma; começar uma Sessão nova funciona normalmente. Para contar tempo, só `encerrada`.
