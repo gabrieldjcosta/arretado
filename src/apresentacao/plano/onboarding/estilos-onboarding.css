@@ -1,0 +1,51 @@
+/* Onboarding do plano (pacote B2): só estrutura e espaçamento; cores e botões vêm dos tokens. */
+.onboarding {
+  display: grid;
+  gap: var(--espaco-3, 1rem);
+}
+
+.onboarding-opcoes {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.onboarding-opcao {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2, 0.5rem);
+  min-height: 44px;
+}
+
+.onboarding-opcao input {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.onboarding-disciplinas,
+.onboarding-assuntos {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-assuntos {
+  padding-block: var(--espaco-2, 0.5rem);
+  padding-inline-start: var(--espaco-3, 1rem);
+}
+
+.onboarding details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.onboarding-navegacao {
+  flex-wrap: wrap;
+}
