@@ -165,7 +165,6 @@ function Sugestoes({
             <span className="linha-acoes">
               <button
                 type="button"
-                className="principal"
                 onClick={() => {
                   aoErro(null);
                   criarTarefa(repo, {
@@ -243,12 +242,12 @@ function Acoes({
             rodar(pularTarefa(repo, tarefa.id));
           }}
         >
-          Pular por hoje
+          Deixar para o fim
         </button>
       </div>
-      <p className="dica">Pular manda para o fim da fila; a tarefa continua aqui.</p>
+      <p className="dica">Vai para o fim da fila; a tarefa continua aqui.</p>
       <div className="campo">
-        <label htmlFor={`adiar-${tarefa.id}`}>Adiar até</label>
+        <label htmlFor={`adiar-${tarefa.id}`}>Deixar para depois, até</label>
         <input
           id={`adiar-${tarefa.id}`}
           type="date"
@@ -266,7 +265,7 @@ function Acoes({
           rodar(adiarTarefa(repo, tarefa.id, data));
         }}
       >
-        Adiar
+        Deixar para depois
       </button>
       <div className="campo">
         <label htmlFor={`dividir-${tarefa.id}`}>Dividir (uma parte por linha)</label>
@@ -320,7 +319,6 @@ export function Tarefas() {
         </p>
       )}
       <NovaTarefa pontos={dados.pontos} disciplinas={dados.disciplinas} aoErro={setErro} />
-      <Sugestoes sugestoes={dados.sugestoes} hoje={dados.hoje} aoErro={setErro} />
       <section aria-labelledby="tarefas-fila" className="tarefas-bloco">
         <h2 id="tarefas-fila">Fila</h2>
         {fila.length === 0 ? (
@@ -370,9 +368,10 @@ export function Tarefas() {
           </ol>
         )}
       </section>
+      <Sugestoes sugestoes={dados.sugestoes} hoje={dados.hoje} aoErro={setErro} />
       {adiadas.length > 0 && (
         <details className="tarefas-bloco">
-          <summary>Adiadas ({adiadas.length})</summary>
+          <summary>Para depois</summary>
           <ul className="lista-simples">
             {adiadas.map((t) => (
               <li key={t.id} className="tarefas-item">
