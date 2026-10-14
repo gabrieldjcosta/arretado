@@ -35,6 +35,12 @@ import './estilos.css';
 // Telas pesadas (leitor, importador, backup) saem do pacote inicial: o Hoje abre sem
 // baixar o estruturador nem o código de pacote. Offline continua igual (arquivos do mesmo site).
 const Importar = lazy(() => import('./biblioteca/Importar').then((m) => ({ default: m.Importar })));
+const Resumos = lazy(() =>
+  import('./biblioteca/resumos/Resumos').then((m) => ({ default: m.Resumos })),
+);
+const Resumo = lazy(() =>
+  import('./biblioteca/resumos/Resumo').then((m) => ({ default: m.Resumo })),
+);
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
 const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
 
@@ -75,6 +81,9 @@ export function App({
                 <Route path="biblioteca/acervo" element={<Acervo />} />
                 <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
                 <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
+                <Route path="biblioteca/resumos" element={<Resumos />} />
+                <Route path="biblioteca/resumos/novo" element={<Resumos novo />} />
+                <Route path="biblioteca/resumos/:id" element={<Resumo />} />
                 {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
                 <Route
                   path="biblioteca/importar/:versaoId?"
