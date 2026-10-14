@@ -1,0 +1,11 @@
+/* Entrar (F4-A, A3). Só tokens e classes existentes; a camada visual é da thread de UI. */
+.entrar-opcoes {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.entrar-form {
+  display: grid;
+  gap: 0.5rem;
+}

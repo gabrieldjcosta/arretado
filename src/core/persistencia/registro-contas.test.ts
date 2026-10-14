@@ -1,6 +1,7 @@
 import { Repositorio } from './repositorio';
 import {
   abrirRepositorioAtivo,
+  entrarNaConta,
   nomeBancoDaConta,
   nomeDoBancoAtivo,
   RegistroDeContas,
@@ -8,6 +9,8 @@ import {
 
 const UID_A = '11111111-1111-4111-8111-111111111111';
 const UID_B = '22222222-2222-4222-8222-222222222222';
+const UID_C = '33333333-3333-4333-8333-333333333333';
+const UID_D = '44444444-4444-4444-8444-444444444444';
 
 function registroDeTeste() {
   return new RegistroDeContas(`registro-${Math.random()}`);
@@ -92,5 +95,46 @@ describe('registro de contas (F4-A, A1)', () => {
     expect(repo.db.name).toBe(nomeBanco);
     repo.fechar();
     expect(Repositorio).toBeDefined();
+  });
+});
+
+describe('primeira entrada na conta (F4-A, A3)', () => {
+  it('o banco da conta nasce com usuarioId = uid e fica ativo', async () => {
+    const registro = registroDeTeste();
+    await entrarNaConta({ uid: UID_C, email: 'a@exemplo.com' }, { registro });
+    expect((await registro.contaAtiva())?.uid).toBe(UID_C);
+    const repo = await abrirRepositorioAtivo({ contasHabilitadas: true, registro });
+    expect(repo.db.name).toBe(nomeBancoDaConta(UID_C));
+    expect(repo.ctx.usuarioId).toBe(UID_C);
+    const usuarios = await repo.colecao('usuarios').todosDoUsuario();
+    expect(usuarios.map((u) => u.id)).toEqual([UID_C]);
+    repo.fechar();
+  });
+
+  it('entrar de novo na mesma conta mantém os dados e a identidade', async () => {
+    const registro = registroDeTeste();
+    await entrarNaConta({ uid: UID_D, email: 'b@exemplo.com' }, { registro });
+    const antes = await abrirRepositorioAtivo({ contasHabilitadas: true, registro });
+    await antes.colecao('tags').criar({ nome: 'da conta B' }, { origem: 'sistema' });
+    antes.fechar();
+    await entrarNaConta({ uid: UID_D, email: 'b@exemplo.com' }, { registro });
+    const depois = await abrirRepositorioAtivo({ contasHabilitadas: true, registro });
+    expect(depois.ctx.usuarioId).toBe(UID_D);
+    expect(await depois.colecao('tags').todosDoUsuario()).toHaveLength(1);
+    depois.fechar();
+  });
+
+  it('banco da conta que já existe com outra identidade é recusado, sem alterar nada', async () => {
+    const registro = registroDeTeste();
+    const outro = await Repositorio.abrir({ nomeBanco: nomeBancoDaConta(UID_A) });
+    const idLocal = outro.ctx.usuarioId;
+    outro.fechar();
+    await expect(
+      entrarNaConta({ uid: UID_A, email: 'a@exemplo.com' }, { registro }),
+    ).rejects.toThrow(/outra identidade/);
+    expect(await registro.contaAtiva()).toBeNull();
+    const deNovo = await Repositorio.abrir({ nomeBanco: nomeBancoDaConta(UID_A) });
+    expect(deNovo.ctx.usuarioId).toBe(idLocal);
+    deNovo.fechar();
   });
 });

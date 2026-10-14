@@ -13,6 +13,7 @@
     "scripts",
     "worker",
     "src/integracoes/url",
+    "src/integracoes/conta/projeto.ts",
     "eslint",
     "src/testes/setup.ts",
     "supabase",

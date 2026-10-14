@@ -1338,3 +1338,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Previsível na A3: o login volta e a tela fica em branco
 - **Causa provável:** o retorno do Google traz `?code=` na URL e o roteador é por hash (T3); se o código não for trocado antes de montar o roteador, a página não reconhece a rota. Também CSP/Trusted Types bloqueando o supabase-js.
 - **Solução prevista:** trocar o código em `main.tsx` antes do roteador e limpar a URL com `history.replaceState`; E2E do retorno do login cobre.
+
+### Entrar volta com "não foi possível entrar agora" (A3)
+- **Causa provável:** passo do painel do Supabase que falta: esquema `arretado` não exposto (Settings › API), gancho "Before User Created" desligado, URL de retorno fora da lista (Auth › URL Configuration) ou cliente Google sem o endereço de retorno do Supabase.
+- **Solução:** conferir o §12 do plano `f4a-contas.md`. O app segue funcionando sem conta.
+
+### O retorno do Google deixa `?code=…` na barra de endereço
+- **Causa:** `main.tsx` não chegou a rodar `tratarRetornoDoLogin` (build sem `VITE_CONTA=1`).
+- **Solução:** construir com `VITE_CONTA=1`. O código é de uso único; recarregar a página sem ele é seguro.
+
+### Build com `VITE_CONTA=0` ainda gera o arquivo `supabase-….js`
+- **Causa:** o `import()` do serviço existe no código; o arquivo é emitido, mas nunca é pedido com a chave desligada (a CSP também não libera a origem do Supabase).
+- **Solução:** nenhuma; é esperado. O teto de `npm run tamanho` já conta o arquivo.

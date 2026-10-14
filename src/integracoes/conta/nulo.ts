@@ -16,6 +16,12 @@ export class ServicoDeContaNulo implements ServicoDeConta {
   confirmarCodigo(): Promise<never> {
     return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
   }
+  concluirRetorno() {
+    return Promise.resolve(null);
+  }
+  aceitarTermos(): Promise<void> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
   sair() {
     return Promise.resolve();
   }
