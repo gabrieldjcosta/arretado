@@ -25,6 +25,8 @@ export interface EntradaDaProximaAcao {
   cartoesVencidos: number;
   frasesVencidas: number;
   /** A norma lida por último. `onde` ("Art. 41") e `minutos` só existem com posição guardada. */
+  /** A primeira Tarefa de estudo da fila (o que a pessoa mesma colocou, ou aceitou como sugestão). */
+  tarefa?: { id: string; titulo: string; estimativaMin?: number };
   leitura?: { normaId: string; tituloCurto: string; onde?: string; minutos?: number };
 }
 
@@ -57,6 +59,17 @@ function revisaoVencida(e: EntradaDaProximaAcao): ProximaAcao | undefined {
   };
 }
 
+function tarefaDaFila(e: EntradaDaProximaAcao): ProximaAcao | undefined {
+  const t = e.tarefa;
+  if (!t) return undefined;
+  return {
+    tipo: 'tarefa',
+    alvo: { tipo: 'tarefa', id: t.id, rotulo: t.titulo.slice(0, 200) },
+    razao: 'A próxima da sua fila de tarefas',
+    ...(t.estimativaMin !== undefined ? { estimativaMin: t.estimativaMin } : {}),
+  };
+}
+
 function leituraSalva(e: EntradaDaProximaAcao): ProximaAcao | undefined {
   const l = e.leitura;
   if (!l) return undefined;
@@ -79,6 +92,7 @@ export function decidirProximaAcao(
   const dispensados = new Set(excluir);
   const ordem: [OrigemDaAcao['tipo'], (e: EntradaDaProximaAcao) => ProximaAcao | undefined][] = [
     ['revisao_vencida', revisaoVencida],
+    ['tarefa', tarefaDaFila],
     ['leitura_salva', leituraSalva],
   ];
   for (const [tipo, montar] of ordem) {

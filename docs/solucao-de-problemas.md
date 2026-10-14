@@ -1316,3 +1316,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Pontos: excluí uma matéria sem querer
 - **Causa:** "Excluir matéria" faz exclusão lógica da matéria e dos pontos dela, com confirmação; erros, cartões e sessões ficam.
 - **Solução:** Conta › Dados › Importações desfaz uma importação inteira; para uma exclusão isolada, restaurar o backup (Conta › Dados) ou recriar a matéria.
+
+### Tarefas: a tarefa "sumiu" da fila
+- **Causa:** adiada (aparece em "Adiadas" e volta sozinha na data), dividida (as partes ficam no lugar dela) ou feita (em "Feitas", com "Voltar para a fila").
+- **Solução:** abrir "Adiadas" ou "Feitas" em `/plano/tarefas`. Excluir é lógico, mas não tem tela de restauração: recriar a tarefa.
+
+### Tarefas: a sugestão que dispensei voltou
+- **Causa:** "Não agora" vale só no dia (`localStorage` `arretado:sugestoes-dispensadas:v1`); no dia seguinte a regra roda de novo.
+- **Solução:** nenhuma; sugestão não é cobrança. Para não ver a regra, mude o que a dispara (adiar o ponto, mudar a faixa).

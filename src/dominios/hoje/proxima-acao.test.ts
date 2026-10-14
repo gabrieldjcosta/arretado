@@ -67,4 +67,24 @@ describe('decidirProximaAcao (A1)', () => {
     });
     expect(decidirProximaAcao(entrada, ['revisao_vencida', 'leitura_salva']).tipo).toBe('vazio');
   });
+
+  it('a primeira tarefa da fila vem depois da revisão vencida e antes da leitura salva', () => {
+    const tarefa = { id: 't1', titulo: 'Ler arts. 10 a 13', estimativaMin: 15 };
+    expect(decidirProximaAcao({ cartoesVencidos: 0, frasesVencidas: 0, tarefa, leitura })).toEqual({
+      tipo: 'acao',
+      acao: {
+        tipo: 'tarefa',
+        alvo: { tipo: 'tarefa', id: 't1', rotulo: 'Ler arts. 10 a 13' },
+        razao: 'A próxima da sua fila de tarefas',
+        estimativaMin: 15,
+      },
+    });
+    const comRevisao = decidirProximaAcao({ cartoesVencidos: 1, frasesVencidas: 0, tarefa });
+    expect(comRevisao).toMatchObject({ acao: { tipo: 'revisao_vencida' } });
+    const semTarefa = decidirProximaAcao(
+      { cartoesVencidos: 0, frasesVencidas: 0, tarefa, leitura },
+      ['tarefa'],
+    );
+    expect(semTarefa).toMatchObject({ acao: { tipo: 'leitura_salva' } });
+  });
 });
