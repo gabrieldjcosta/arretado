@@ -47,6 +47,7 @@ npx vitest run --project unidade --maxWorkers=4   # no Windows, se o check falha
 npm run carga      # 10 mil registros e a leitura de uma norma de 5 mil dispositivos dentro dos limiares
 npm run test:e2e   # Playwright + axe, desktop, celular e tablet
 npm run build      # dist/ com _headers
+node scripts/capturas-ui.mjs --rotas todas --medir --folhas   # revisão visual: 27 rotas × 3 aparelhos × 2 temas, com medidas (rolagem horizontal, alvos de 44 px, "+" sobre texto); exige dist/ (ver docs/design/sistema-visual.md › Como conferir)
 npm run corpus:colar   # recaptura os colados (sem rede; só depois que uma página mudar)
 npm run corpus:gabarito   # regera os gabaritos e as folhas de conferência (sem rede)
 ```

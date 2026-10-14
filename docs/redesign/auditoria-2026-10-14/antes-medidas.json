@@ -1,0 +1,731 @@
+[
+  {
+    "rota": "/",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/plano",
+    "aparelho": "celular",
+    "rolagemH": 125,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/onboarding",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/plano/pontos",
+    "aparelho": "celular",
+    "rolagemH": 125,
+    "alvosPequenos": 27,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Aportes teóricos do Direito "],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/tarefas",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 13,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Vai para o fim da fila; a ta", "Descer", "Deixar para o fim"],
+    "maisSobreTextoNoFim": ["Vai para o fim da fila; a ta", "Deixar para o fim", "Backup e dados"]
+  },
+  {
+    "rota": "/sessao/iniciar",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Súmula Vinculante 56: a falt"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/frases",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/cartoes",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 6,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/historico",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/registrar",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/revisar",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/recall/frases/revisar",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/acervo",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 48,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["288 KB"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/sumulas",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/teses",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/resumos",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/precedentes",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/importar",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Para súmula, enunciado ou no"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/biblioteca/normas/:norma",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 16,
+    "alvosPequenosEmTexto": 16,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/conta/aparencia",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 3,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Calculado na leitura, nunca "],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/conta/perfis",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": ["Backup e dados"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/conta/dados",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/conta/privacidade",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": ["Importar uma lei por endereç"],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/orientacoes",
+    "aparelho": "celular",
+    "rolagemH": 0,
+    "alvosPequenos": 12,
+    "alvosPequenosEmTexto": 12,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": ["Backup e dados"]
+  },
+  {
+    "rota": "/",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/onboarding",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/pontos",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 27,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/tarefas",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 13,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/sessao/iniciar",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/frases",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 9,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/cartoes",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 6,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/historico",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/registrar",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/revisar",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/frases/revisar",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/acervo",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 197,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/sumulas",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/teses",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/resumos",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/precedentes",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/importar",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/normas/:norma",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 22,
+    "alvosPequenosEmTexto": 22,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/aparencia",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 3,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/perfis",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/dados",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/privacidade",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/orientacoes",
+    "aparelho": "tablet",
+    "rolagemH": 0,
+    "alvosPequenos": 12,
+    "alvosPequenosEmTexto": 12,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/onboarding",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/pontos",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 27,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/plano/tarefas",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 13,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/sessao/iniciar",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/frases",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 9,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/cartoes",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 6,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/historico",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/registrar",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/revisar",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/recall/frases/revisar",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/acervo",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 241,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/sumulas",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/teses",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/resumos",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/precedentes",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/importar",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/biblioteca/normas/:norma",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 22,
+    "alvosPequenosEmTexto": 22,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 6,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/aparencia",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 3,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/perfis",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 2,
+    "alvosPequenosEmTexto": 2,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/dados",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/conta/privacidade",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 1,
+    "alvosPequenosEmTexto": 1,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  },
+  {
+    "rota": "/orientacoes",
+    "aparelho": "desktop",
+    "rolagemH": 0,
+    "alvosPequenos": 12,
+    "alvosPequenosEmTexto": 12,
+    "maisSobreTextoNoInicio": [],
+    "maisSobreTextoNoFim": []
+  }
+]
