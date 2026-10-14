@@ -1,4 +1,5 @@
-import { CSP, cabecalhosHospedagem, montarCSP } from './seguranca';
+import { URL_SUPABASE } from '../src/integracoes/conta/projeto';
+import { CSP, cabecalhosHospedagem, montarCSP, origensDoBuild } from './seguranca';
 
 describe('cabeçalhos da hospedagem', () => {
   it('repetem a CSP da meta tag e acrescentam o que a meta não aceita', () => {
@@ -26,4 +27,22 @@ describe('montarCSP', () => {
       expect(() => montarCSP([origem])).toThrow();
     },
   );
+});
+
+describe('origensDoBuild (F4-A)', () => {
+  it('com a chave desligada a CSP é a de hoje', () => {
+    expect(montarCSP(origensDoBuild(false))).toBe(CSP);
+  });
+
+  it('com a chave ligada o connect-src ganha só a origem exata do projeto Supabase', () => {
+    const csp = montarCSP(origensDoBuild(true));
+    expect(csp).toContain(`connect-src 'self' ${URL_SUPABASE};`);
+    expect(csp).toContain("require-trusted-types-for 'script'");
+    expect(csp.replace(/connect-src [^;]*/, '')).toBe(CSP.replace(/connect-src [^;]*/, ''));
+  });
+
+  it('cabeçalhos aceitam a CSP do build', () => {
+    const csp = montarCSP(origensDoBuild(true));
+    expect(cabecalhosHospedagem(csp)).toContain(`Content-Security-Policy: ${csp};`);
+  });
 });

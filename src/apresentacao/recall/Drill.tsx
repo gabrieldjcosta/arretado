@@ -17,6 +17,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
+import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
 
@@ -244,6 +245,7 @@ export function Drill() {
   return (
     <>
       <h1 className="visualmente-oculto">Revisar</h1>
+      <FaixaDaSessao />
       <div className="topo-drill">
         <Link to="/recall" className="botao discreto">
           Sair

@@ -47,6 +47,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
@@ -1616,13 +1617,16 @@ function LeitorAberto({
       {modoFoco ? (
         <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
       ) : (
-        <BarraDoLeitor
-          titulo={norma.tituloCurto}
-          tamanho={tamanho}
-          mudarTamanho={mudarTamanho}
-          destacar={destacar}
-          alternarDestaques={alternarDestaques}
-        />
+        <>
+          <FaixaDaSessao />
+          <BarraDoLeitor
+            titulo={norma.tituloCurto}
+            tamanho={tamanho}
+            mudarTamanho={mudarTamanho}
+            destacar={destacar}
+            alternarDestaques={alternarDestaques}
+          />
+        </>
       )}
       {!modoFoco && (
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>

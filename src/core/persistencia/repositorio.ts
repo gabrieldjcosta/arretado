@@ -26,6 +26,8 @@ export interface OpcoesRepositorio {
   novoId?: () => string;
   eventos?: Barramento;
   nomeAparelho?: string;
+  /** Só na criação do banco: identidade que ele já nasce com (conta: `auth.users.id`, T26). */
+  usuarioId?: string;
 }
 
 /** Ponto de entrada do core de dados: banco aberto, identidade local garantida, coleções. */
@@ -86,7 +88,7 @@ export class Repositorio {
     const base = { db, eventos, agora, novoId };
     const identidade =
       ((await db.meta.get('identidade'))?.valor as Identidade | undefined) ??
-      (await Repositorio.criarIdentidade(base, opcoes.nomeAparelho));
+      (await Repositorio.criarIdentidade(base, opcoes.nomeAparelho, opcoes.usuarioId));
     const relogio = new RelogioLogico(identidade.aparelhoId, () => agora().getTime());
     const ultima = await db.alteracoes.orderBy('ts').last();
     if (ultima) relogio.observar(ultima.ts);
@@ -102,8 +104,12 @@ export class Repositorio {
   private static async criarIdentidade(
     base: Pick<Contexto, 'db' | 'eventos' | 'agora' | 'novoId'>,
     nomeAparelho = 'Este aparelho',
+    usuarioId?: string,
   ): Promise<Identidade> {
-    const candidata: Identidade = { usuarioId: base.novoId(), aparelhoId: base.novoId() };
+    const candidata: Identidade = {
+      usuarioId: usuarioId ?? base.novoId(),
+      aparelhoId: base.novoId(),
+    };
     const relogio = new RelogioLogico(candidata.aparelhoId, () => base.agora().getTime());
     const repo = new Repositorio({ ...base, ...candidata, relogio });
     return repo.transacao(async () => {

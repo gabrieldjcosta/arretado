@@ -96,6 +96,11 @@ describe('"?" e Orientações (5.3)', () => {
     }
   });
 
+  it('com a F4-A desligada a tela Entrar não existe e Conta não oferece entrada', async () => {
+    await abrirApp('/conta/entrar');
+    expect(await screen.findByText('Tela não encontrada')).toBeInTheDocument();
+  });
+
   it('leitor e importador têm ajuda própria', () => {
     expect(secaoDeAjuda('/biblioteca/normas/abc')).toBe('legislacao');
     expect(secaoDeAjuda('/biblioteca/importar/v1')).toBe('importar-lei');
