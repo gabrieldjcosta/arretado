@@ -325,7 +325,7 @@ export function validarPrincipal(linhas) {
     if (!/^\d+$/.test(ordem) || Number(ordem) < 1)
       e(n, 'ordem', `ordem_disciplina "${ordem}" deve ser inteiro ≥ 1`);
     if (!num) a(n, 'numero_item', 'numero_item vazio (o edital numera o item?)');
-    else if (/^\d{5,}$/.test(num) || num.length > 12)
+    else if (numeroImplausivel(num))
       uma(`num|${orgao}|${ano}|${num}`, () =>
         a(
           n,
@@ -401,6 +401,8 @@ const chaveDisc = (v) =>
   semAcento(v.replace(/^\[\s*geral\s*\]\s*/i, ''))
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+/** Número de item que é trecho de texto ou documento (ex.: CNPJ), não numeração de edital. */
+const numeroImplausivel = (num) => /^\d{5,}$/.test(num) || num.length > 12;
 const ehLinhaNl = (l) => ehNaoLocalizado(l[7]) || ehNaoLocalizado(l[10]);
 const linhasValidas = (bloco, n) => (bloco ?? []).filter(({ l }) => l.length === n);
 
@@ -497,6 +499,48 @@ const slug = (s) =>
     .replace(/^-|-$/g, '');
 
 /**
+ * Faixa sugerida de uma disciplina pela presença nos editais da amostra (mesma regra que o Perplexity declarou
+ * na Magistratura): ≥85% Altíssima, ≥65% Alta, ≥35% Média, abaixo disso Baixa. Com menos de 3 editais não há base.
+ */
+export function faixaDerivada(presente, total) {
+  if (!(total >= 3) || presente < 0 || presente > total) return null;
+  const r = presente / total;
+  return r >= 0.85 ? 'Altíssima' : r >= 0.65 ? 'Alta' : r >= 0.35 ? 'Média' : 'Baixa';
+}
+
+/**
+ * Separa as linhas que não entram no catálogo: assunto que virou fragmento (< 6 caracteres) ou número de item
+ * que não é numeração (ex.: CNPJ). Linhas NÃO LOCALIZADO ficam. Devolve as mantidas e as descartadas com o motivo.
+ */
+export function descartar(principal) {
+  const mantidas = [];
+  const descartadas = [];
+  for (const x of principal) {
+    if (x.l.length !== CABECALHO_PRINCIPAL.length) {
+      mantidas.push(x);
+      continue;
+    }
+    const l = normalizarLinha(x.l);
+    if (ehLinhaNl(l)) mantidas.push(x);
+    else if (l[10].length < 6) descartadas.push({ ...x, motivo: 'assunto fragmento' });
+    else if (l[9] && numeroImplausivel(l[9]))
+      descartadas.push({ ...x, motivo: 'numero_item implausível' });
+    else mantidas.push(x);
+  }
+  return { mantidas, descartadas };
+}
+
+function faixaDaDisciplina(l) {
+  const declarada = faixaCanonica(l[5]);
+  const derivada = declarada ? null : faixaDerivada(Number(l[3]), Number(l[4]));
+  return {
+    faixaSugerida: declarada ?? derivada,
+    faixaOrigem: declarada ? 'edital' : derivada ? 'derivada' : null,
+    faixaBase: declarada || derivada ? `presente em ${l[3]} de ${l[4]} editais` : null,
+  };
+}
+
+/**
  * JSON por carreira, camelCase, pronto para o B1 (rótulo "baseado no edital X de AAAA" = orgao + ano).
  * Edital = órgão + ano + cargo + fase + fonte_url (duas edições do mesmo ano, como o ENAM, ficam separadas).
  * Disciplinas saem com o nome consolidado (bloco 2), quando existe; `nomeNoEdital` guarda o original.
@@ -569,7 +613,7 @@ export function converter({ principal, consolidadas, editais }, carreiraNome) {
         variantes: limpar(l[2]) ? limpar(l[2]).split(/\s*;\s*/) : [],
         presenteEm: Number(l[3]),
         totalEditais: Number(l[4]),
-        faixaSugerida: faixaCanonica(l[5]) ?? null,
+        ...faixaDaDisciplina(l),
       })),
   };
 }

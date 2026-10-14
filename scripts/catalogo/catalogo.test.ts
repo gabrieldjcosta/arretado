@@ -4,6 +4,8 @@ import {
   CABECALHO_EDITAIS,
   CABECALHO_PRINCIPAL,
   converter,
+  descartar,
+  faixaDerivada,
   csvNormalizado,
   lerCsv,
   separarBlocos,
@@ -273,6 +275,68 @@ describe('catálogo: disciplinas consolidadas', () => {
       'dpe-sp-2024-defensor-publico-objetiva',
       'dpe-sp-2024-defensor-publico-objetiva-2',
     ]);
+  });
+});
+
+describe('catálogo: descarte e faixa derivada', () => {
+  it('descarta assunto fragmento e numero_item que não é numeração; mantém o resto e as linhas NÃO LOCALIZADO', () => {
+    const b = ler(
+      linha(),
+      linha({ numero_item: '2', assunto: 'Nº' }),
+      linha({ numero_item: '19421427000191', assunto: 'Razão: Eu sou o autor deste documento' }),
+      linha({
+        orgao: 'DPE-BA',
+        ano_edital: '',
+        assunto: 'NÃO LOCALIZADO',
+        disciplina: '',
+        numero_item: '',
+        ordem_disciplina: '',
+        recorrencia: '',
+        fonte_url: '',
+        banca: '',
+        cargo: '',
+        fase: '',
+      }),
+    );
+    const { mantidas, descartadas } = descartar(b.principal!);
+    expect(mantidas).toHaveLength(2);
+    expect(descartadas.map((d) => d.motivo)).toEqual([
+      'assunto fragmento',
+      'numero_item implausível',
+    ]);
+  });
+
+  it.each([
+    [17, 17, 'Altíssima'],
+    [14, 17, 'Alta'],
+    [7, 13, 'Média'],
+    [1, 17, 'Baixa'],
+    [1, 2, null],
+  ])('faixaDerivada(%i de %i) = %s', (p, t, esperado) => {
+    expect(faixaDerivada(p, t)).toBe(esperado);
+  });
+
+  it('converter preenche faixa_sugerida vazia pela presença, marcando a origem', () => {
+    const b = separarBlocos(
+      [
+        '```',
+        CAB,
+        linha(),
+        '```',
+        '```',
+        CABECALHO_CONSOLIDADAS.join(','),
+        'Defensoria Pública,Direito Penal,,10,13,',
+        'Defensoria Pública,Direito Civil,,10,13,Média',
+        '```',
+      ].join('\n'),
+    );
+    const [penal, civil] = converter(b, 'Defensoria Pública').disciplinas;
+    expect(penal).toMatchObject({
+      faixaSugerida: 'Alta',
+      faixaOrigem: 'derivada',
+      faixaBase: 'presente em 10 de 13 editais',
+    });
+    expect(civil).toMatchObject({ faixaSugerida: 'Média', faixaOrigem: 'edital' });
   });
 });
 

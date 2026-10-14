@@ -4844,7 +4844,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Biodiversidade, Zoologia, Botânica E História Natural",
@@ -4853,7 +4855,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Comércio Exterior",
@@ -4862,7 +4866,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Conteúdo Específico Da Prova Discursiva",
@@ -4871,7 +4877,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Direito Administrativo",
@@ -4880,7 +4888,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Direito Constitucional",
@@ -4889,7 +4899,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Ecologia, Conservacão E Manejo Da Biodiversidade",
@@ -4898,7 +4910,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Emergências Climáticas E Ambientais",
@@ -4907,7 +4921,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Incêndios Florestais",
@@ -4916,7 +4932,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Legislação Ambiental / Institucional",
@@ -4926,7 +4944,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Licenciamento Ambiental Federal",
@@ -4935,7 +4955,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Manejo, Conservação E Reabilitação Da Fauna Silvestre",
@@ -4944,7 +4966,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Monitoramento Ambiental",
@@ -4953,7 +4977,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Planejamento E Gestão De Unidades De Conservação (Uc)",
@@ -4962,7 +4988,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Povos E Comunidades Tradicionais E Conservação Da Biodiversidade",
@@ -4971,7 +4999,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Processo Sancionador Ambiental",
@@ -4980,7 +5010,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Proteção Da Fauna",
@@ -4989,7 +5021,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Proteção De Recursos Genéticos",
@@ -4998,7 +5032,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Proteção De Recursos Pesqueiros",
@@ -5007,7 +5043,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Proteção, Controle E Monitoramento Ambiental",
@@ -5016,7 +5054,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Qualidade Ambiental",
@@ -5025,7 +5065,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "Recursos Florestais",
@@ -5034,7 +5076,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Língua Inglesa",
@@ -5043,7 +5087,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Língua Portuguesa",
@@ -5052,7 +5098,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Noções De Gestão Pública",
@@ -5061,7 +5109,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Noções De Informática",
@@ -5070,7 +5120,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Noções De Tecnologia Da Informação",
@@ -5079,7 +5131,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     },
     {
       "nome": "[Geral] Ética No Serviço Público",
@@ -5088,7 +5142,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 2,
-      "faixaSugerida": null
+      "faixaSugerida": null,
+      "faixaOrigem": null,
+      "faixaBase": null
     }
   ]
 }

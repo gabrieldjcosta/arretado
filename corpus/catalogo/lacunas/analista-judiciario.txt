@@ -1,8 +1,0 @@
-Lacunas e dúvidas
-
-- A extração integral foi confirmada nos cinco editais listados como completo.
-- Os demais órgãos do universo pedido foram marcados NÃO LOCALIZADO; nenhum assunto foi preenchido para eles.
-- Justiça Eleitoral: o concurso unificado do TSE/TREs foi tratado como um edital, evitando contar o mesmo programa repetidamente.
-- TSE/TREs: incluído o cargo de Analista Judiciário – Área Administrativa, pois o edital não ofertou Área Judiciária e o programa contém apoio jurídico.
-- Faixas ficaram vazias: a distribuição de questões ocorre por módulos, sem número verificável por disciplina.
-- Recorrência foi calculada por disciplina normalizada entre os cinco editais completos; equivalência assunto a assunto demanda revisão jurídica manual adicional.

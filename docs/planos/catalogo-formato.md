@@ -7,7 +7,8 @@ Pacote B0 da F3-B ([`f3-pacotes.md`](f3-pacotes.md)). Só documento e script: n�
 1. Uma conversa do Perplexity por carreira; cada resposta traz 3 blocos CSV e "Lacunas e dúvidas".
 2. `npm run catalogo -- validar <arquivo> [<arquivo>...]` aponta erros e avisos, agrupados por regra (`--tudo` lista todos). Cada arquivo pode ser a resposta inteira colada (os blocos entre ``` são achados pelo cabeçalho) ou um CSV só; quando o Perplexity entrega um arquivo por bloco, passe os três juntos (itens, disciplinas, editais). `-` lê da entrada padrão.
 3. Erro: devolver ao Perplexity a lista de linhas e a regra, ou corrigir à mão. Aviso: olhar, não bloqueia.
-4. `npm run catalogo -- converter <arquivo>` (só roda sem erros) grava em `corpus/catalogo/`, por carreira, `<carreira>.csv` (normalizado) e `<carreira>.json` (entrada do B1). Segunda rodada de uma carreira sobrescreve; versionar no git.
+4. `npm run catalogo -- converter <arquivo...>` (só roda sem erros) grava em `corpus/catalogo/`, por carreira, `<carreira>.csv` (normalizado) e `<carreira>.json` (entrada do B1), mais `descartes/<carreira>.txt` e o `index.json`. Segunda rodada de uma carreira sobrescreve só os arquivos dela; versionar no git.
+5. **Carreira nova = rodar `converter` só com os arquivos dela.** Nada mais muda: as outras ficam como estão e o `index.json` (lista das 10 carreiras com `disponivel`, editais e itens) a inclui sozinho. `npm run catalogo -- indice` refaz o índice sem converter. Para tirar uma carreira por enquanto, apague `<carreira>.{csv,json}` e rode `indice`.
 
 ## Bloco 1: itens (obrigatório)
 
@@ -53,6 +54,14 @@ Erro: carreira fora da lista, `presente_em_n_editais` > `total_editais` ou não 
 
 Erro: situação inválida, edital que não é NÃO LOCALIZADO sem `url` ou sem ano, edital NÃO LOCALIZADO que tem assuntos no bloco 1. Aviso: edital do bloco 1 ausente da lista, ou "completo" sem assuntos no bloco 1.
 
+## Descarte (feito no `converter`)
+
+Não entram no catálogo, e ficam listadas em `descartes/<carreira>.txt` para conferência: linha com `assunto` fragmento (menos de 6 caracteres, ex.: "Nº", "SOLUT") e linha com `numero_item` que não é numeração (5+ dígitos ou mais de 12 caracteres: CNPJ, carimbo de assinatura digital do PDF). Linhas NÃO LOCALIZADO ficam.
+
+## Faixa das disciplinas (feita no `converter`)
+
+`faixa` dos itens segue como veio (vazia sem base). `faixaSugerida` da disciplina, quando o Perplexity não preencheu, é derivada da presença nos editais da amostra, pela mesma regra que ele declarou na Magistratura: ≥85% Altíssima, ≥65% Alta, ≥35% Média, abaixo disso Baixa. Com menos de 3 editais na amostra não há base e fica vazia. O JSON marca `faixaOrigem` (`edital` ou `derivada`) e `faixaBase` ("presente em N de M editais"); a interface deve dizer que é sugestão pela amostra.
+
 ## Normalização (feita no `converter`)
 
 Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma canônica; `uf` em maiúsculas (`DFT` → `DF`); `recorrencia` sem espaços ("3 / 3" → "3/3"); prefixo `[Geral] ` nas disciplinas gerais; "não localizado" → `NÃO LOCALIZADO`. Idempotente: rodar sobre o CSV já normalizado dá o mesmo arquivo.
@@ -79,7 +88,7 @@ Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma
   editais: [{ id, orgao, uf, banca|null, ano|null, cargo|null, fase|null, situacao, fonteUrl|null,
               rotulo: "baseado no edital <orgao> de <ano>" | null,
               disciplinas: [{ nome (consolidado, quando há), nomeNoEdital, ordem, itens: [{ numero|null, assunto, faixa|null, obsFaixa|null, recorrencia|null, fonteUrl }] }] }],
-  disciplinas: [{ nome, variantes[], presenteEm, totalEditais, faixaSugerida|null }] }
+  disciplinas: [{ nome, variantes[], presenteEm, totalEditais, faixaSugerida|null, faixaOrigem|null, faixaBase|null }] }
 ```
 
 Sem data nem campo aleatório: a mesma entrada gera o mesmo arquivo. A faixa vem do edital e é só sugestão; o app não a mostra como verdade no onboarding ("Altíssima" fora do onboarding, conforme `f3-pacotes.md`). Edital NÃO LOCALIZADO aparece com `disciplinas: []`, `ano: null` e `rotulo: null` (o app não o oferece). Ids repetidos ganham sufixo `-2`, `-3`.

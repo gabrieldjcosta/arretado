@@ -1759,14 +1759,6 @@
               "fonteUrl": "https://defensoria.mt.def.br/dpmt/conteudo/EDITAL%20-%20diario_oficial_2025-12-10.pdf"
             },
             {
-              "numero": "2025",
-              "assunto": "Nº",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://defensoria.mt.def.br/dpmt/conteudo/EDITAL%20-%20diario_oficial_2025-12-10.pdf"
-            },
-            {
               "numero": "29.132",
               "assunto": "Diário Oficial",
               "faixa": null,
@@ -2331,14 +2323,6 @@
               "fonteUrl": "https://defensoria.mt.def.br/dpmt/conteudo/EDITAL%20-%20diario_oficial_2025-12-10.pdf"
             },
             {
-              "numero": "2025",
-              "assunto": "Nº",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://defensoria.mt.def.br/dpmt/conteudo/EDITAL%20-%20diario_oficial_2025-12-10.pdf"
-            },
-            {
               "numero": "29.132",
               "assunto": "Diário Oficial GRUPO II",
               "faixa": null,
@@ -2448,14 +2432,6 @@
             {
               "numero": "3",
               "assunto": "Página 257 10 de dezembro de",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://defensoria.mt.def.br/dpmt/conteudo/EDITAL%20-%20diario_oficial_2025-12-10.pdf"
-            },
-            {
-              "numero": "2025",
-              "assunto": "Nº",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -2769,40 +2745,8 @@
           "ordem": 1,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial , OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:39:27-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -2848,40 +2792,8 @@
           "ordem": 2,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "13/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "13/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "13/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:40:16-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "13/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "13/13",
@@ -2927,40 +2839,8 @@
           "ordem": 3,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:41:04-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -3006,40 +2886,8 @@
           "ordem": 5,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:41:55-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "10/13",
@@ -3093,40 +2941,8 @@
               "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
             },
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:42:43-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -3199,14 +3015,6 @@
             {
               "numero": "58.11",
               "assunto": "Lei nº 6.404/1976 e suas alterações; 58.12. Sociedade em nome coletivo; 58.13. Sociedade em comandita simples; Assinado digitalmente por DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:43:33-04'00' Foxit PDF Reader Versão:",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -3723,40 +3531,8 @@
           "ordem": 12,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:44:20-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "3/13",
@@ -3810,22 +3586,6 @@
               "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
             },
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
               "faixa": null,
@@ -3834,24 +3594,8 @@
               "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
             },
             {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:45:21-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "12.0.1",
               "assunto": "DO AMAZONAS:194",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "21427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -3897,40 +3641,8 @@
           "ordem": 15,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:46:20-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "8/13",
@@ -3984,40 +3696,8 @@
           "ordem": 17,
           "itens": [
             {
-              "numero": "19421427000191",
-              "assunto": "ND: C=BR, O=ICP-Brasil, S=AM, L= Manaus, OU=A",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "C",
-              "assunto": "SOLUT",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial , OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:47:23-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "421427000191",
-              "assunto": "SEXTA-FEIRA,",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "7/13",
@@ -4194,14 +3874,6 @@
             {
               "numero": "II",
               "assunto": "Assinado digitalmente por DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:48:30-04'00' Foxit PDF Reader Versão:",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "7/13",
@@ -4408,14 +4080,6 @@
               "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
             },
             {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:49:33-04'00' Foxit PDF Reader Versão:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
               "numero": "2380",
               "assunto": "Pág. 30 de",
               "faixa": null,
@@ -4546,14 +4210,6 @@
             {
               "numero": "I",
               "assunto": "Multipla v5, OU=19615240000129, OU=Presencial, OU=Certificado PJ A1, CN= DO AMAZONAS:",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://diario.defensoria.am.def.br/wp-content/uploads/2025/03/Edicao_2380-2025__publicada_em_21_de_marco_de_2025.pdf"
-            },
-            {
-              "numero": "19421427000191",
-              "assunto": "Razão: Eu sou o autor deste documento Localização: Data: 2025.03.21 19:50:49-04'00' Foxit PDF Reader Versão:",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "7/13",
@@ -5397,14 +5053,6 @@
             {
               "numero": "16.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-abertura-dpe-pe-13.05.pdf"
-            },
-            {
-              "numero": "16.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -8966,14 +8614,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "4",
-              "assunto": "Bens",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "4.1",
               "assunto": "Diferentes classes",
               "faixa": null,
@@ -9286,14 +8926,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "14",
-              "assunto": "Posse",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "15",
               "assunto": "Direitos reais",
               "faixa": null,
@@ -9336,14 +8968,6 @@
             {
               "numero": "15.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "15.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -9471,14 +9095,6 @@
             {
               "numero": "1.2",
               "assunto": "Função jurisdicional",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "1.3",
-              "assunto": "Ação",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -12209,14 +11825,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "10.2.7",
-              "assunto": "Tipos",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "10.2.8",
               "assunto": "Procedimento",
               "faixa": null,
@@ -14115,14 +13723,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "43",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "I",
               "assunto": "CRONOGRAMA PREVISTO Atividade Datas previstas Período de solicitação de inscrições e de solicitação de inscrição com isenção de taxa de inscrição 7 a 28/2/",
               "faixa": null,
@@ -14293,14 +13893,6 @@
             {
               "numero": "2024",
               "assunto": "Das 10 horas do primeiro dia às 18 horas do último dia (horário oficial de Brasília/DF) Divulgação do edital de resultado provisório nas provas escritas específicas 25/6/2024 * As datas e os períodos estabelecidos no cronograma são passíveis de alteração, conforme necessidade e conveniência da DPE/AC e do Cebraspe. Caso haja alteração, esta será previamente comunicada por meio de edital. ** As demais datas serão informadas por meio dos editais subsequentes a serem publicados no Diário Eletrônico Oficial da Defensoria Pública do Estado do Acre e(ou) divulgados na internet, no endereço eletrônico http://www.cebraspe.org.br/concursos/dpe_ac_24_defensor",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ac_24_defensor/arquivos/ED_1_2023_DPE_AC_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "45",
-              "assunto": "ANEXO",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -15902,14 +15494,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "10.2.7",
-              "assunto": "Tipos",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "10.2.8",
               "assunto": "Procedimento",
               "faixa": null,
@@ -17020,14 +16604,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "2.5",
-              "assunto": "Taxa",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "2.6",
               "assunto": "Contribuição de melhoria",
               "faixa": null,
@@ -17693,14 +17269,6 @@
             {
               "numero": "2",
               "assunto": "Aplicação da lei penal: princípios da legalidade e da anterioridade; a lei penal no tempo e no espaço; tempo e lugar do crime; lei penal excepcional, especial e temporária; territorialidade e extraterritorialidade da lei penal; pena cumprida no estrangeiro; eficácia da sentença estrangeira; contagem de prazo; frações não computáveis da pena; interpretação da lei penal; analogia; irretroatividade da lei penal; conflito aparente de normas penais",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "3",
-              "assunto": "Crime",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "8/13",
@@ -18559,14 +18127,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "4",
-              "assunto": "Bens",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "4.1",
               "assunto": "Diferentes classes",
               "faixa": null,
@@ -18705,14 +18265,6 @@
             {
               "numero": "10.2",
               "assunto": "Princípios",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "10.3",
-              "assunto": "Boafé",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -18919,14 +18471,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "16",
-              "assunto": "Posse",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "17",
               "assunto": "Direitos reais",
               "faixa": null,
@@ -18969,14 +18513,6 @@
             {
               "numero": "17.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "17.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -19759,14 +19295,6 @@
             {
               "numero": "4.5",
               "assunto": "Conexão e 44 continência",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "5",
-              "assunto": "Ação",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -21602,14 +21130,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "3.2",
-              "assunto": "Povo",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "7/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "3.3",
               "assunto": "Soberania e suas características",
               "faixa": null,
@@ -22511,14 +22031,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "48",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "I",
               "assunto": "CRONOGRAMA PREVISTO Atividade Datas previstas Período de solicitação de inscrição e de solicitação de inscrição com isenção de taxa de inscrição 27/10 a 25/11/",
               "faixa": null,
@@ -22673,14 +22185,6 @@
             {
               "numero": "2023",
               "assunto": "Das 10 horas do primeiro dia às 18 horas do último dia (horário oficial de Brasília/DF) Divulgação dos gabaritos oficiais definitivos e do resultado final na prova escrita objetiva e do resultado provisório nas provas escritas discursivas 15/2/2023 * As datas e os períodos estabelecidos no cronograma são passíveis de alteração, conforme necessidade e conveniência da DPE/ROe do Cebraspe. Caso haja alteração, esta será previamente comunicada por meiode edital. ** As demaisdatas serão informadaspor meio dos editais subsequentes aserem publicados no Diário Oficial EletrônicodaDefensoriaPúblicadoEstado de Rondônia e(ou)divulgados na internet,no endereço eletrônico http://www.cebraspe.org.br/concursos/dpe_ro_22_defensor",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_ro_22_defensor/arquivos/ED_1_2022_DPE_RO_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "50",
-              "assunto": "ANEXO",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -22894,14 +22398,6 @@
             {
               "numero": "3.12",
               "assunto": "Responsabilidade da pessoa jurídica e dos sócios",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "4",
-              "assunto": "Bens",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -23204,14 +22700,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
             },
             {
-              "numero": "16",
-              "assunto": "Posse",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
-            },
-            {
               "numero": "17",
               "assunto": "Direitos reais",
               "faixa": null,
@@ -23254,14 +22742,6 @@
             {
               "numero": "17.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "17.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -23477,14 +22957,6 @@
             {
               "numero": "3",
               "assunto": "Jurisdição",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "4",
-              "assunto": "Ação",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -23892,14 +23364,6 @@
             {
               "numero": "2",
               "assunto": "Aplicação da lei penal: princípios da legalidade e da anterioridade; a lei penal no tempo e no espaço; tempo e lugar do crime; lei penal excepcional, especial e temporária; territorialidade e extraterritorialidade da lei penal; pena cumprida no estrangeiro; eficácia da sentença estrangeira; contagem de prazo; frações não computáveis da pena; interpretação da lei penal; analogia; irretroatividade da lei penal; conflito aparente de normas penais",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_se_21/arquivos/ED_1_2020_DPE_SE_DEFENSOR_ABERTURA.PDF"
-            },
-            {
-              "numero": "3",
-              "assunto": "Crime",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "8/13",
@@ -29587,14 +29051,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "10.2.8",
-              "assunto": "Tipos",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "10.2.9",
               "assunto": "Procedimento",
               "faixa": null,
@@ -30521,14 +29977,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "4",
-              "assunto": "Bens",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "4.1",
               "assunto": "Diferentes classes",
               "faixa": null,
@@ -30969,14 +30417,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "17",
-              "assunto": "Posse",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "18",
               "assunto": "Direitos reais",
               "faixa": null,
@@ -31019,14 +30459,6 @@
             {
               "numero": "18.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
-              "numero": "18.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -31897,14 +31329,6 @@
             {
               "numero": "1.2",
               "assunto": "Função jurisdicional",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
-              "numero": "1.3",
-              "assunto": "Ação",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -33864,14 +33288,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "3",
-              "assunto": "Crime",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "3.1",
               "assunto": "Classificação dos crimes; teorias do crime; o fato típico e seus elementos; relação de causalidade; superveniência de causa independente; relevância da omissão; crime consumado e tentado; pena da tentativa; desistência voluntária e arrependimento eficaz; arrependimento posterior; crime impossível; crime doloso, culposo e preterdoloso; agravação pelo resultado; concurso de crimes; erro sobre elementos do tipo; descriminantes putativas; erro determinado por terceiro; erro sobre a pessoa; erro sobre a ilicitude do fato (erro de proibição); coação irresistível e obediência hierárquica; ilicitude e causas de exclusão; excesso punível; culpabilidade: teorias, elementos e causas de exclusão",
               "faixa": null,
@@ -34295,14 +33711,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "10",
-              "assunto": "Prova",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "10.1",
               "assunto": "Lei nº 9.296/1996 (interceptação telefônica)",
               "faixa": null,
@@ -34543,14 +33951,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "45",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "I",
               "assunto": "CRONOGRAMA PREVISTO Atividade Datas previstas Período de inscrições e de solicitação de inscrição com isenção de taxa de inscrição 15/10 a 16/11/",
               "faixa": null,
@@ -34695,24 +34095,8 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
             },
             {
-              "numero": "47",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
               "numero": "II",
               "assunto": "MODELO DE LAUDO PARA A INSCRIÇÃO E PARA A AVALIAÇÃO BIOPSICOSSOCIAL (candidatos que se declararam com deficiência) Atesto, para fins de participação em concurso público, que o(a) Senhor(a)____________________________________________________________________________, portador(a) do documento de identidade nº ______________________, é considerado(a) pessoa com deficiência à luz da legislação brasileira por apresentar a(s) seguinte(s) condição(ões) ________________________________________________________________________________________ ____________________________________________________________________________________, CID-10 ________________, que resulta(m) no comprometimento das seguintes funções/funcionalidades ________________________________________________________________________________________ ____________________________________________________________________________________. Informo, ainda, a provável causa do comprometimento________________________________________________________________________ ________________________________________________________________________________________ _____. Cidade/UF, ____ de _________ de 20__. Assinatura e carimbo do(a) Médico(a)",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_pi_21/arquivos/ED_1_2021_DPE_PI_DEFENSOR_ABT.PDF"
-            },
-            {
-              "numero": "48",
-              "assunto": "ANEXO",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "10/13",
@@ -36329,14 +35713,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
             },
             {
-              "numero": "10.2.8",
-              "assunto": "Tipos",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
               "numero": "10.2.9",
               "assunto": "Procedimento",
               "faixa": null,
@@ -36890,14 +36266,6 @@
             {
               "numero": "2.4",
               "assunto": "Imposto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "3/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
-              "numero": "2.5",
-              "assunto": "Taxa",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "3/13",
@@ -37527,14 +36895,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
             },
             {
-              "numero": "4",
-              "assunto": "Bens",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
               "numero": "4.1",
               "assunto": "Diferentes classes",
               "faixa": null,
@@ -37935,14 +37295,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
             },
             {
-              "numero": "17",
-              "assunto": "Posse",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
               "numero": "18",
               "assunto": "Direitos reais",
               "faixa": null,
@@ -37985,14 +37337,6 @@
             {
               "numero": "18.5",
               "assunto": "Usufruto",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "11/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
-              "numero": "18.6",
-              "assunto": "Uso",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "11/13",
@@ -38623,14 +37967,6 @@
             {
               "numero": "1.2",
               "assunto": "Função jurisdicional",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
-              "numero": "1.3",
-              "assunto": "Ação",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "12/13",
@@ -41227,14 +40563,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
             },
             {
-              "numero": "3",
-              "assunto": "Crime",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "8/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
               "numero": "3.1",
               "assunto": "Classificação dos crimes; teorias do crime; o fato típico e seus elementos; relação de causalidade; superveniência de causa independente; relevância da omissão; crime consumado e tentado; pena da tentativa;desistênciavoluntáriaearrependimentoeficaz;arrependimentoposterior;crimeimpossível;crime doloso, culposoepreterdoloso;agravaçãopelo resultado; concursode crimes; errosobre elementos dotipo; descriminantes putativas; erro determinado por terceiro; erro sobre a pessoa; erro sobre a ilicitude do fato (erro de proibição); coação irresistível e obediência hierárquica; ilicitude e causas de exclusão; excesso punível; culpabilidade: teorias, elementos e causas de exclusão",
               "faixa": null,
@@ -41612,14 +40940,6 @@
             {
               "numero": "9",
               "assunto": "Questões e processos incidentes",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "10/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
-              "numero": "10",
-              "assunto": "Prova",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "10/13",
@@ -42119,14 +41439,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
             },
             {
-              "numero": "46",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
               "numero": "I",
               "assunto": "CRONOGRAMA PREVISTO Atividade Datas previstas Período de solicitação de inscrição e de isenção de taxa de inscrição 27/12/2021 a 14/1/",
               "faixa": null,
@@ -42297,14 +41609,6 @@
             {
               "numero": "2022",
               "assunto": "Divulgaçãodoeditalderesultadoprovisórionasprovasescritas discursivas e do padrão definitivo de resposta das prova discursivas 31/5/2022 * As datas e os períodos estabelecidos no cronograma são passíveis de alteração, conforme necessidade e conveniência da DPE/TOe do Cebraspe. Caso haja alteração, esta será previamente comunicada por meio de edital. ** As demaisdatas serão informadaspor meio dos editais subsequentes aserem publicados no Diário Oficial EletrônicodaDefensoriaPúblicadoEstadodoTocantins e(ou)divulgadosna internet,noendereçoeletrônico http://www.cebraspe.org.br/concursos/dpe_to_21_defensor",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/dpe_to_21_defensor/arquivos/ED_1_DPE_TO_ABERTURA.PDF"
-            },
-            {
-              "numero": "48",
-              "assunto": "ANEXO",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "1/13",
@@ -43360,14 +42664,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "4",
-              "assunto": "Ação",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "12/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "4.1",
               "assunto": "Conceito, natureza, elementos e características",
               "faixa": null,
@@ -44102,14 +43398,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "7",
-              "assunto": "Penas",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "4/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "7.1",
               "assunto": "Espécies, cominação e aplicação",
               "faixa": null,
@@ -44732,14 +44020,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "2",
-              "assunto": "Crime",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "3",
               "assunto": "Imputabilidade penal",
               "faixa": null,
@@ -44750,14 +44030,6 @@
             {
               "numero": "4",
               "assunto": "Concurso de agentes",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
-              "numero": "5",
-              "assunto": "Penas",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "1/13",
@@ -46540,14 +45812,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "10.2",
-              "assunto": "União",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "13/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "10.3",
               "assunto": "Estados Federados.10.4DistritoFederal.10.5Municípios.11PoderJudiciário.11.1ConselhoNacionaldeJustiça.11.2 Supremo Tribunal Federal",
               "faixa": null,
@@ -47672,14 +46936,6 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "38",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "I",
               "assunto": "Da Composição das Bancas Examinadoras",
               "faixa": null,
@@ -47784,24 +47040,8 @@
               "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
             },
             {
-              "numero": "39",
-              "assunto": "ANEXO",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
               "numero": "II",
               "assunto": "MODELO DE ATESTADO PARA PERÍCIA MÉDICA (candidatos que se declararam com deficiência) Atesto, para fins de participação em concurso público, que o(a) Senhor(a)____________________________________________________________________________, portador(a) do documento de identidade nº ______________________, é considerado(a) pessoa com deficiência à luz da legislação brasileira por apresentar a(s) seguinte(s) condição(ões) ________________________________________________________________________________________ ____________________________________________________________________________________, CID-10 ________________, que resulta(m) no comprometimento das seguintes funções/funcionalidades ________________________________________________________________________________________ ____________________________________________________________________________________. Informo, ainda, a provável causa do comprometimento, conforme art. 39, inciso IV, do Decreto nº 3.298/99________________________________________________________________________________ _____________________________________________________________________________________. Cidade/UF, ____ de _________ de 20__. Assinatura e carimbo do(a) Médico(a)",
-              "faixa": null,
-              "obsFaixa": null,
-              "recorrencia": "1/13",
-              "fonteUrl": "https://cdn.cebraspe.org.br/concursos/DPU_17_DEFENSOR/arquivos/Ed%201%202017%20DPU%2017%20Defensor%20-%20abertura.PDF"
-            },
-            {
-              "numero": "40",
-              "assunto": "ANEXO",
               "faixa": null,
               "obsFaixa": null,
               "recorrencia": "1/13",
@@ -51704,7 +50944,9 @@
       ],
       "presenteEm": 3,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 3 de 13 editais"
     },
     {
       "nome": "Direito Administrativo",
@@ -51714,7 +50956,9 @@
       ],
       "presenteEm": 11,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 11 de 13 editais"
     },
     {
       "nome": "Direito Administrativo e Financeiro",
@@ -51723,7 +50967,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Administrativo e Tributário",
@@ -51732,7 +50978,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Agrário",
@@ -51741,7 +50989,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 2 de 13 editais"
     },
     {
       "nome": "Direito Ambiental",
@@ -51750,7 +51000,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 2 de 13 editais"
     },
     {
       "nome": "Direito Antidiscriminatório",
@@ -51760,7 +51012,9 @@
       ],
       "presenteEm": 3,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 3 de 13 editais"
     },
     {
       "nome": "Direito Civil",
@@ -51770,7 +51024,9 @@
       ],
       "presenteEm": 11,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 11 de 13 editais"
     },
     {
       "nome": "Direito Civil e Empresarial",
@@ -51779,7 +51035,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Constitucional",
@@ -51789,7 +51047,9 @@
       ],
       "presenteEm": 13,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 13 de 13 editais"
     },
     {
       "nome": "Direito Eleitoral",
@@ -51798,7 +51058,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Empresarial",
@@ -51807,7 +51069,9 @@
       ],
       "presenteEm": 4,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 4 de 13 editais"
     },
     {
       "nome": "Direito Internacional",
@@ -51816,7 +51080,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Penal",
@@ -51825,7 +51091,9 @@
       ],
       "presenteEm": 8,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Média",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 8 de 13 editais"
     },
     {
       "nome": "Direito Penal Militar",
@@ -51834,7 +51102,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Penal e Criminologia",
@@ -51844,7 +51114,9 @@
       ],
       "presenteEm": 4,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 4 de 13 editais"
     },
     {
       "nome": "Direito Previdenciário",
@@ -51853,7 +51125,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 2 de 13 editais"
     },
     {
       "nome": "Direito Quilombola",
@@ -51862,7 +51136,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Sanitário",
@@ -51871,7 +51147,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito Tributário",
@@ -51880,7 +51158,9 @@
       ],
       "presenteEm": 3,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 3 de 13 editais"
     },
     {
       "nome": "Direito Urbanístico e Fundiário",
@@ -51889,7 +51169,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito da Criança e do Adolescente",
@@ -51900,7 +51182,9 @@
       ],
       "presenteEm": 11,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 11 de 13 editais"
     },
     {
       "nome": "Direito da Pessoa Idosa",
@@ -51910,7 +51194,9 @@
       ],
       "presenteEm": 5,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Média",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 5 de 13 editais"
     },
     {
       "nome": "Direito das Mulheres",
@@ -51919,7 +51205,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direito do Consumidor",
@@ -51929,7 +51217,9 @@
       ],
       "presenteEm": 13,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 13 de 13 editais"
     },
     {
       "nome": "Direito do Trabalho",
@@ -51938,7 +51228,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Direitos Difusos e Coletivos",
@@ -51949,7 +51241,9 @@
       ],
       "presenteEm": 8,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Média",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 8 de 13 editais"
     },
     {
       "nome": "Direitos Humanos",
@@ -51959,7 +51253,9 @@
       ],
       "presenteEm": 12,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 12 de 13 editais"
     },
     {
       "nome": "Execução Penal",
@@ -51971,7 +51267,9 @@
       ],
       "presenteEm": 7,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Média",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 7 de 13 editais"
     },
     {
       "nome": "Filosofia do Direito / Sociologia Jurídica",
@@ -51985,7 +51283,9 @@
       ],
       "presenteEm": 7,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Média",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 7 de 13 editais"
     },
     {
       "nome": "Legislação Institucional / Lei Orgânica",
@@ -52000,7 +51300,9 @@
       ],
       "presenteEm": 12,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 12 de 13 editais"
     },
     {
       "nome": "Medicina Legal",
@@ -52009,7 +51311,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Noções De Ciência Política",
@@ -52018,7 +51322,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Processo Civil",
@@ -52028,7 +51334,9 @@
       ],
       "presenteEm": 12,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 12 de 13 editais"
     },
     {
       "nome": "Processo Penal",
@@ -52039,7 +51347,9 @@
       ],
       "presenteEm": 10,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 10 de 13 editais"
     },
     {
       "nome": "Processo Penal Militar",
@@ -52048,7 +51358,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     },
     {
       "nome": "Processo Penal e Execução Penal",
@@ -52057,7 +51369,9 @@
       ],
       "presenteEm": 3,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 3 de 13 editais"
     },
     {
       "nome": "Processo do Trabalho",
@@ -52066,7 +51380,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 13,
-      "faixaSugerida": null
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "derivada",
+      "faixaBase": "presente em 1 de 13 editais"
     }
   ]
 }

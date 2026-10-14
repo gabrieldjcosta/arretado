@@ -32815,7 +32815,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Direito Agrário",
@@ -32824,7 +32826,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 17,
-      "faixaSugerida": "Baixa"
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 1 de 17 editais"
     },
     {
       "nome": "Direito Ambiental",
@@ -32833,7 +32837,9 @@
       ],
       "presenteEm": 14,
       "totalEditais": 17,
-      "faixaSugerida": "Alta"
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 14 de 17 editais"
     },
     {
       "nome": "Direito Civil",
@@ -32842,7 +32848,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Direito Constitucional",
@@ -32851,7 +32859,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Direito Econômico e do Consumidor",
@@ -32860,7 +32870,9 @@
       ],
       "presenteEm": 6,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 6 de 17 editais"
     },
     {
       "nome": "Direito Eleitoral",
@@ -32869,7 +32881,9 @@
       ],
       "presenteEm": 8,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 8 de 17 editais"
     },
     {
       "nome": "Direito Empresarial",
@@ -32878,7 +32892,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Direito Financeiro e Tributário",
@@ -32887,7 +32903,9 @@
       ],
       "presenteEm": 12,
       "totalEditais": 17,
-      "faixaSugerida": "Alta"
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 12 de 17 editais"
     },
     {
       "nome": "Direito Internacional",
@@ -32896,7 +32914,9 @@
       ],
       "presenteEm": 6,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 6 de 17 editais"
     },
     {
       "nome": "Direito Penal",
@@ -32905,7 +32925,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Direito Previdenciário",
@@ -32914,7 +32936,9 @@
       ],
       "presenteEm": 7,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 7 de 17 editais"
     },
     {
       "nome": "Direito Tributário",
@@ -32923,7 +32947,9 @@
       ],
       "presenteEm": 2,
       "totalEditais": 17,
-      "faixaSugerida": "Baixa"
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 2 de 17 editais"
     },
     {
       "nome": "Direito Urbanístico",
@@ -32932,7 +32958,9 @@
       ],
       "presenteEm": 1,
       "totalEditais": 17,
-      "faixaSugerida": "Baixa"
+      "faixaSugerida": "Baixa",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 1 de 17 editais"
     },
     {
       "nome": "Direito da Criança e do Adolescente",
@@ -32941,7 +32969,9 @@
       ],
       "presenteEm": 8,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 8 de 17 editais"
     },
     {
       "nome": "Direito do Consumidor",
@@ -32950,7 +32980,9 @@
       ],
       "presenteEm": 8,
       "totalEditais": 17,
-      "faixaSugerida": "Média"
+      "faixaSugerida": "Média",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 8 de 17 editais"
     },
     {
       "nome": "Direitos Humanos",
@@ -32959,7 +32991,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Noções Gerais de Direito e Formação Humanística",
@@ -32968,7 +33002,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Processo Civil",
@@ -32977,7 +33013,9 @@
       ],
       "presenteEm": 17,
       "totalEditais": 17,
-      "faixaSugerida": "Altíssima"
+      "faixaSugerida": "Altíssima",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 17 de 17 editais"
     },
     {
       "nome": "Processo Penal",
@@ -32986,7 +33024,9 @@
       ],
       "presenteEm": 14,
       "totalEditais": 17,
-      "faixaSugerida": "Alta"
+      "faixaSugerida": "Alta",
+      "faixaOrigem": "edital",
+      "faixaBase": "presente em 14 de 17 editais"
     }
   ]
 }

@@ -38,6 +38,8 @@ export type CatalogoDaCarreira = {
     presenteEm: number;
     totalEditais: number;
     faixaSugerida: string | null;
+    faixaOrigem: 'edital' | 'derivada' | null;
+    faixaBase: string | null;
   }[];
 };
 export const CABECALHO_PRINCIPAL: string[];
@@ -59,3 +61,8 @@ export function validarComplementares(b: Blocos): Achado[];
 export function converter(b: Blocos, carreiraNome: string): CatalogoDaCarreira;
 export function csvNormalizado(principal: Linha[]): string;
 export function carreirasDoPrincipal(principal: Linha[]): string[];
+export function faixaDerivada(presente: number, total: number): string | null;
+export function descartar(principal: Linha[]): {
+  mantidas: Linha[];
+  descartadas: (Linha & { motivo: string })[];
+};
