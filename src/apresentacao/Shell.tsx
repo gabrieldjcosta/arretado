@@ -75,7 +75,7 @@ export function Shell() {
         <div className="acoes-globais">
           <Link
             to="/recall/registrar"
-            className="botao principal"
+            className="botao registrar-global"
             aria-keyshortcuts="E"
             title="Registrar erro (atalho: E)"
             aria-label="Registrar erro"
