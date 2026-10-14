@@ -142,7 +142,7 @@ Se ele não responder, o trabalho sem custo e sem conta externa segue (pacotes A
 | 2 | Cliente OAuth do Google (Google Cloud, tela de consentimento em produção, só e-mail e perfil básico) | Criar; passos em §12 | US$ 0 |
 | 3 | V1 só por convite (gancho no Supabase) | Sim | US$ 0 |
 | 4 | Incluir o backup manual cifrado na nuvem (A6) antes da V1 | Sim | Storage gratuito (conferir limite) |
-| 5 | Plano do Supabase na V1: gratuito **pausa após 7 dias de pouca atividade** (confirmado na documentação) e envia e-mail só pelo remetente padrão, "best-effort" e com limite baixo | Ficar no gratuito até a V1 começar; passar ao Pro (≈ US$ 25/mês, conferir) quando houver convidados, por causa da pausa e da cópia diária | US$ 0 → ≈ 25/mês |
+| 5 | Plano do Supabase na V1: o gratuito **pausa após 7 dias de pouca atividade** (confirmado na documentação); o servidor da F4-A guarda pouco e o estudo é local, então pausar não perde estudo | **Decidido com o Gabriel (14/10): ficar no gratuito**, com consulta leve diária agendada (GitHub Actions, pacote A7) para evitar a pausa; reativar é um clique no painel. Pro (≈ US$ 25/mês, conferir) só se a V1 crescer ou antes da F4-B (cópia diária, remetente de e-mail próprio) | US$ 0 |
 | 6 | Exclusão imediata e definitiva | Sim | — |
 | 7 | Revisão da política por pessoa habilitada antes da V1 | Recomendada; sem resposta, só conhecidos + aviso de teste | variável |
 | 8 | Domínio próprio (e-mail remetente confiável, endereço fixo) | Adiar; não é necessário para a V1 com poucos convidados | ≈ R$ 40–80/ano |
