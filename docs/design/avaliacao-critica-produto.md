@@ -8,7 +8,7 @@ Dono: **UI** = thread "Ajuste de UI" (estilos, tokens, `AcaoAgora`, Hoje/Sessão
 ## 1. Resumo (o que mais importa)
 
 1. **Caminho até o primeiro cartão tem 4 toques.** Hoje › Começar → Sessão › Começar → Sessão atual › "Abrir a revisão" → Revisar › "Mostrar resposta". O critério do redesign é 2 toques e 10 s. (A-1)
-2. **O Registrar erro aparece 2× no celular e disputa com o "Agora".** Botão primário no topo ("+ Erro") e o "+" flutuante, mesma rota; o primário do topo compete com o cartão Agora em toda tela. (N-1, N-2)
+2. **O botão Registrar erro do topo era primário e disputava com o "Agora".** (N-1; a duplicação com o "+" no celular que eu havia apontado não existe, ver N-2)
 3. **O leitor tem 5 botões de mesmo peso fora do foco**, e a ação de progresso mais importante ("Lido até aqui") é igual às outras. (L-1)
 4. **O "Errei" usa borda de perigo (vermelho)**, contra "sem vermelho punitivo" (plano-mestre §72). (R-2)
 5. **Dois vocabulários para o mesmo gesto** (Errei/Difícil/Fácil nos cartões; Li/De novo nas frases) e **duas telas de revisão** que o usuário precisa escolher. (R-3, R-4)
@@ -19,7 +19,7 @@ Dono: **UI** = thread "Ajuste de UI" (estilos, tokens, `AcaoAgora`, Hoje/Sessão
 | # | Elemento | Problema | Sev. | Sugestão | Dono |
 |---|---|---|---|---|---|
 | N-1 | Botão **Registrar erro** no topo, classe `principal`, em todas as telas | Segundo ponto de maior peso visual da tela; compete com o `AcaoAgora` (princípio 1). No Drill e no leitor, onde o foco é outro, ainda aparece (no foco some, ok) | Alta | Rebaixar a `botao` neutro/discreto no desktop; no celular, remover do topo (fica só o "+"). A captura continua a 1 toque pelo "+" e pela tecla E | UI |
-| N-2 | **"+ Erro" (topo) e "+" flutuante** ≤699 px | Duplicados, mesma rota (`Shell.tsx`, `estilos.css` 716–735 e 1747–1765) | Alta | Um só no celular: o flutuante. O topo no celular fica com marca, Ajuda e Conta | UI |
+| N-2 | **"+ Erro" (topo) e "+" flutuante** | **Correção (14/10):** no celular (≤699 px) o botão do topo já é ocultado (`estilos.css` ~1777); a duplicação só existe entre 700 e 899 px, onde o "+" não aparece. Sem problema real | — | Nada a fazer | — |
 | N-3 | Topo com 7 alvos (marca, 4 áreas, Registrar, Ajuda, Conta) no desktop | Áreas + ações no mesmo nível visual; "Ajuda" e "Conta" são rótulos de texto soltos | Média | Áreas à esquerda, ações à direita; Conta como ícone de pessoa com rótulo acessível (prepara a F4-A: ali vai o estado de sincronização). Ajuda continua texto até haver ícone consistente | UI |
 | N-4 | **Menu Ajuda** com 2 itens | Correto e leve. "Relatar problema" some dentro do menu (bom: não é do estudo). Fecha em Escape/clique fora (ok) | — | Manter. Falta anunciar o menu como `role="menu"` ou mantê-lo como disclosure; hoje é disclosure, aceitável | — |
 | N-5 | **Rodapé legal** longo em toda tela (`RODAPE`, D6) | Parágrafo de 2 linhas em cada tela, inclusive em Revisar e no leitor; ruído permanente (princípio 4) | Média | Rodapé de uma linha ("Seus dados ficam neste aparelho · Dados") com o texto integral em Conta › Dados e na primeira abertura. **Muda o D6: decisão do Gabriel** | Gabriel |
