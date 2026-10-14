@@ -5,6 +5,7 @@ import { Exportar } from './Exportar';
 import { Importar } from './Importar';
 import { lerAvisoDeRecarga, limparAvisoDeRecarga } from './recarga';
 import { Restauracao } from './Restauracao';
+import { Salvaguarda } from './Salvaguarda';
 
 export function Dados() {
   const [aviso] = useState(lerAvisoDeRecarga);
@@ -17,6 +18,7 @@ export function Dados() {
           {aviso}
         </p>
       )}
+      <Salvaguarda />
       <Exportar />
       <Importar />
       <Espacos />
