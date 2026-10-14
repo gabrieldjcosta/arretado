@@ -15,3 +15,4 @@ acervo/fontes
 
 # Dados brutos gerados pelas coletas (saída de script, não editada à mão)
 acervo/brutos/
+.agents/
