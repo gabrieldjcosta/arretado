@@ -32,3 +32,21 @@ test('Sessão leve: começa, pausa, volta ao reabrir, fecha com próximo passo (
   await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
   await semViolacoes(page);
 });
+
+test('Hoje: fechar o Dia depois de uma Sessão e reabrir (A3b)', async ({ page }) => {
+  await page.goto('/#/sessao/iniciar');
+  await page.getByRole('button', { name: 'Começar', exact: true }).click();
+  await page.getByRole('link', { name: 'Encerrar' }).click();
+  await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
+
+  await page.goto('/#/');
+  const bloco = page.getByRole('region', { name: 'Fechar o Dia' });
+  await expect(bloco).toContainText('1 Sessão');
+  await semViolacoes(page);
+  await bloco.getByRole('button', { name: 'Fechar o Dia' }).click();
+  await expect(bloco.getByRole('heading', { name: 'Dia fechado' })).toBeVisible();
+  await semViolacoes(page);
+  await bloco.getByRole('button', { name: 'Reabrir o Dia' }).click();
+  await expect(bloco.getByRole('button', { name: 'Fechar o Dia' })).toBeVisible();
+});
