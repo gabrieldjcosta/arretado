@@ -24,6 +24,12 @@ Fontes: avaliação de design de produto (`docs/design/avaliacao-critica-produto
 | 11 | A-6 (texto de roadmap no Plano) | B3 | F3-B troca |
 | 12 | F4-A/B (não agora): CSP com domínio Supabase/IA (arq. 9), checkpoint e poda do log (arq. 4), `check` de coleção por FK (arq. 5), Worker com JWT/limite (arq. 10), backup automático antes de subida de esquema | F4 | registrado |
 
+## Mudança de divisão (14/10, Gabriel)
+- Thread de arquitetura implementa dados/infra: log de alterações, CSP, camada de dados do backup, decisão Dexie. Itens 7 (lógica do lembrete) e 12 passam a ela; o E2E e o build já estão no #128.
+- Thread de UI: #127 (ajustes visuais), tela Conta › Dados "último backup" (depois do #126), transições (fatia própria).
+- Esta thread: plano, fluxo (A-1 feito; R-3, R-4, N-5 quando o Gabriel decidir) e copy pelo guia de voz (`docs/design/guia-de-voz.md`, #125; voz regional aprovada: neutra, sotaque só em momentos leves, ex. "danado" na recompensa).
+- Ordem de merge: #125 → #124 → #126 → #127 → fatia 2 da UI → #128 → F3-B.
+
 ## Decisões abertas do Gabriel (seguindo o padrão)
 - Um banco Dexie por conta × um banco com `usuarioId`: padrão = recomendação da revisão (um banco por `usuarioId`); nada implementado agora.
 - Voz regional na cópia: rótulos neutros, sotaque só em momentos leves; **sem mudar copy** até aprovação.
