@@ -20,7 +20,7 @@ describe('decidirProximaAcao (A1)', () => {
       tipo: 'acao',
       acao: {
         tipo: 'revisao_vencida',
-        alvo: { tipo: 'revisao', rotulo: 'cartoes' },
+        alvo: { tipo: 'revisao', rotulo: 'Revisar cartões' },
         razao: '2 cartões vencidos',
         estimativaMin: 1,
       },
@@ -30,7 +30,7 @@ describe('decidirProximaAcao (A1)', () => {
   it('só Frases: a rodada é de Frases; singular e plural', () => {
     const r = decidirProximaAcao({ cartoesVencidos: 0, frasesVencidas: 1 });
     expect(r).toMatchObject({
-      acao: { alvo: { rotulo: 'frases' }, razao: '1 frase para rever' },
+      acao: { alvo: { rotulo: 'Revisar frases' }, razao: '1 frase para rever' },
     });
     const dois = decidirProximaAcao({ cartoesVencidos: 1, frasesVencidas: 3 });
     expect(dois).toMatchObject({ acao: { razao: '1 cartão vencido e 3 frases para rever' } });

@@ -39,7 +39,7 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await expect(page.getByText('1 cartão vencido')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Começar', exact: true })).toHaveAttribute(
     'href',
-    /#\/sessao\/iniciar\?acao=revisao_vencida/,
+    /#\/sessao\/iniciar\?tipo=revisao.*origem=revisao_vencida/,
   );
   await page.goto('/#/recall/revisar');
   await expect(page.getByText('Confundi livramento condicional com progressão')).toBeVisible();

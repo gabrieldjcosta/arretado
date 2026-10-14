@@ -41,7 +41,7 @@ function revisaoVencida(e: EntradaDaProximaAcao): ProximaAcao | undefined {
   return {
     tipo: 'revisao_vencida',
     // Sem cartão vencido, a rodada é de Frases.
-    alvo: { tipo: 'revisao', rotulo: e.cartoesVencidos > 0 ? 'cartoes' : 'frases' },
+    alvo: { tipo: 'revisao', rotulo: e.cartoesVencidos > 0 ? 'Revisar cartões' : 'Revisar frases' },
     razao: partes.join(' e '),
     estimativaMin: Math.max(
       1,
