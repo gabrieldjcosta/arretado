@@ -4,6 +4,7 @@
 import { dataCivil } from '../../core/datas';
 import type { Sessao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import { obterPreferencias } from '../../core/preferencias';
 import type { EntradaDeSessao, FechamentoDeSessao } from './contrato';
 
 const vazioVira = (t: string | undefined): string | undefined => t?.trim() || undefined;
@@ -49,6 +50,9 @@ export async function iniciarSessao(repo: Repositorio, entrada: EntradaDeSessao)
   const agora = repo.ctx.agora();
   const alvo = entrada.alvo;
   const fronteira = vazioVira(entrada.fronteira);
+  // Sem escolha na entrada, vale o padrão das preferências (opcional, só informativo).
+  const temporizadorMin =
+    entrada.temporizadorMin ?? (await obterPreferencias(repo)).temporizadorPadraoMin;
   const sessao = await repo.colecao('sessoes').criar({
     tipo: !alvo || alvo.tipo === 'livre' ? 'livre' : 'estudo',
     data: dataCivil(agora),
@@ -60,7 +64,7 @@ export async function iniciarSessao(repo: Repositorio, entrada: EntradaDeSessao)
     ...(fronteira ? { fronteira } : {}),
     ...(entrada.origemDaAcao ? { origemDaAcao: entrada.origemDaAcao } : {}),
     ...(entrada.tarefaId ? { tarefaId: entrada.tarefaId } : {}),
-    ...(entrada.temporizadorMin ? { temporizadorMin: entrada.temporizadorMin } : {}),
+    ...(temporizadorMin ? { temporizadorMin } : {}),
   });
   repo.eventos.emitir('sessao.iniciada', { sessaoId: sessao.id });
   return sessao;

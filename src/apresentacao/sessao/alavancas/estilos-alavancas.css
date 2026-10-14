@@ -1,0 +1,62 @@
+/* Alavancas da Sessão (A3a). Só tokens e classes existentes; sem cor literal. */
+.alavancas {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.alavanca h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.alavanca .dica {
+  margin: 0.25rem 0 0;
+}
+
+.estacionamento-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.estacionamento-form .campo {
+  flex: 1 1 14rem;
+}
+
+.estacionamento-lista {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.estacionamento-lista.sem-marcador {
+  list-style: none;
+  padding-left: 0;
+}
+
+.estacionamento-lista label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: var(--alvo);
+}
+
+.temporizador-tempo {
+  margin: 0 0 0.5rem;
+}
+
+.so-estudo-rotulo {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: var(--alvo);
+}
+
+/* Modo "só estudo": esconde a administração; o interruptor segue na tela da Sessão. */
+body[data-so-estudo] .areas,
+body[data-so-estudo] .flutuante,
+body[data-so-estudo] .rodape,
+body[data-so-estudo] .acoes-globais .discreto {
+  display: none;
+}

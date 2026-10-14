@@ -1289,3 +1289,8 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Hoje: o Retorno não aparece depois de dias fora, ou "Fechar o Dia" some
 - **Causa:** o Retorno exige ≥ 2 dias desde a última Sessão ou Revisão (Cartão ou Frase) e some depois de "Agora não" no mesmo dia (`localStorage` `arretado.retorno-dispensado`). "Fechar o Dia" só aparece se houve Sessão encerrada ou Revisão hoje, ou se o Dia já está fechado (para reabrir).
 - **Solução:** limpar a chave acima para rever o Retorno; fazer uma Sessão ou revisão para o Dia poder ser fechado.
+
+### Só estudo ligado e a navegação sumiu
+- **Sintoma:** as áreas, Conta e o botão de erro não aparecem.
+- **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
+- **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.

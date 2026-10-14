@@ -381,3 +381,13 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Eventos da Sessão | `sessao.iniciada`, `sessao.pausada`, `sessao.retomada`, `sessao.encerrada`, `sessao.interrompida` (payload `{ sessaoId }`) |
 | Retorno | Boas-vindas do Hoje depois de ≥ 2 dias sem atividade (`situacaoDeRetorno`, `src/dominios/dia/retorno.ts`; bloco `Retorno.tsx`). Sem dívida, sem contagem de pendências, sem "sequência quebrada"; oferece o próximo passo que a pessoa deixou; "Agora não" dispensa pelo resto do dia (`localStorage`, só a data) |
 | Fechar o Dia | `fecharDia` / `reabrirDia` / `resumoDoDia` (`src/dominios/dia/fechar.ts`; bloco `FecharDia.tsx`): grava `Dia.fechadoEm` de hoje; resumo só de contagens (Sessões, cartões e Frases revisados), nunca tempo como aprendizado; não encerra Sessão aberta; só aparece se houve algo hoje. Eventos `dia.fechado`, `dia.reaberto` (payload `{ diaId }`) |
+
+
+#### A3a Alavancas na Sessão (14/10/2026; sem subida de esquema)
+
+| Termo | Identificadores |
+|---|---|
+| Estacionar / resolver nota | `estacionar`, `resolverNota(repo, id, indice, resolvida?)`, `notasPendentes` (`src/dominios/sessao/estacionamento.ts`); UI em `src/apresentacao/sessao/alavancas/` (`Estacionamento`, `NotasDoEstacionamento` ao fechar). Texto em branco não grava; Sessão encerrada não aceita nota nova, mas a nota existente pode ser marcada |
+| Temporizador (domínio) | `definirTemporizador`, `segundosRestantes` (conta só o tempo ativo; pausa congela). Padrão: `Preferencias.temporizadorPadraoMin` vale em `iniciarSessao` quando a entrada não escolhe. Passar do tempo só mostra um aviso gentil |
+| Só estudo (UI) | `SoEstudo.tsx`: interruptor na tela da Sessão; liga `document.body.dataset.soEstudo`, e `estilos-alavancas.css` esconde áreas, Conta, botão flutuante de erro e rodapé |
+| Evento | `sessao.estacionada` (payload `{ sessaoId }`) |
