@@ -514,6 +514,12 @@ legend {
   padding: 2rem 1rem;
 }
 
+.vazio-mascote {
+  display: block;
+  margin: 0 auto 0.75rem;
+  height: auto;
+}
+
 .vazio p {
   color: var(--texto-atenuado);
 }
