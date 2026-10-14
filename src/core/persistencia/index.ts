@@ -1,3 +1,5 @@
+export { CHAVE_ULTIMO_BACKUP, lerUltimoBackup, registrarBackup } from './backup';
+export { pedirArmazenamentoPersistente, type EstadoDoArmazenamento } from './armazenamento';
 export {
   AnexoAlterado,
   gravarAnexo,

@@ -1294,3 +1294,9 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Sintoma:** as áreas, Conta e o botão de erro não aparecem.
 - **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
 - **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.
+
+### Aviso "Restauração concluída." some depois da recarga (tela com `lazy`/Suspense)
+
+- **Sintoma:** E2E `dados.spec.ts` "restaurar integral" falha em `getByText('Restauração concluída.')`, mas a restauração aconteceu (aparece em "Importações"). Só no app construído, deterministicamente no CI; descoberto ao pôr `Dados` em `React.lazy` (PR #126).
+- **Causa:** `lerAvisoDeRecarga` apagava o item do `sessionStorage` dentro do inicializador do `useState`, ou seja, na renderização. O React pode repetir uma renderização (Suspense, concorrência); a segunda leitura vinha vazia.
+- **Solução:** ler sem apagar na renderização e limpar num `useEffect` (`limparAvisoDeRecarga`). **Prevenção:** nada de efeito colateral (gravar/apagar storage) em inicializador de estado ou corpo de componente; o E2E acima cobre.
