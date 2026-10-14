@@ -13,8 +13,8 @@ Fontes: avaliação de design de produto (`docs/design/avaliacao-critica-produto
 |---|---|---|---|
 | 1 | Persistência, `LimiteDeErro`, lazy por rota (arq. 1–3) | #126 | feito, aguarda merge |
 | 2 | Este plano | aqui | este PR |
-| 3 | E2E do Leitor estável: `expect.poll` no lugar de `scrollY` imediato (arq. 8) | aqui | próximo |
-| 4 | Build: `manualChunks` (dexie/zod/react), teto de tamanho no CI (arq. 3) | aqui | próximo |
+| 3 | E2E do Leitor estável: `expect.poll` no lugar de `scrollY` imediato (arq. 8) | aqui | feito (PR #128) |
+| 4 | Build: `manualChunks` (dexie/zod/react), teto de tamanho no CI (arq. 3) | aqui | feito (PR #128) |
 | 5 | Texto: A-2 ("Definir até onde"), R-6 (instrução do Drill só na 1ª vez), N-8 (atalho E em Orientações) | aqui | depois |
 | 6 | A-1 "Começar" direto ao alvo (4 → 2 toques) e unificar `RecallInicio` com `hoje/proxima-acao.ts` | aqui | depois (lógica; sem estilo) |
 | 7 | Lembrete de backup: linha única no Hoje após N dias, dispensável 7 dias (lógica e hook aqui; lugar e visual com a UI) | aqui + UI | depois do #126 |
