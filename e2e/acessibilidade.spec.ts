@@ -54,19 +54,43 @@ for (const esquema of ['light', 'dark'] as const) {
   });
 }
 
-test('alvos de toque têm pelo menos 44 px', async ({ page }) => {
-  await page.goto('/#/conta/dados');
-  await expect(page.getByRole('heading', { level: 1, name: 'Dados' })).toBeVisible();
-  const pequenos = await page.evaluate(() =>
-    Array.from(document.querySelectorAll('button, a.botao, .areas a, input[type="file"]'))
-      .map((el) => {
-        const r = el.getBoundingClientRect();
-        return { texto: el.textContent.trim(), h: r.height, w: r.width };
-      })
-      .filter((x) => x.h > 0 && (x.h < 44 || x.w < 44)),
-  );
-  expect(pequenos).toEqual([]);
-});
+// Botões, links de botão, navegação e seletor de arquivo: 44 px nas duas medidas, em todas as rotas
+// principais (o link no meio de frase é a única exceção e não entra aqui). Os projetos mudam a
+// navegação (barra de baixo, barra de cima), então a conferência roda nos três.
+for (const rota of ROTAS) {
+  test(`${rota}: alvos de toque têm pelo menos 44 px`, async ({ page }) => {
+    await page.goto(`/#${rota}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const pequenos = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('button, a.botao, .areas a, input[type="file"]'))
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          return { texto: el.textContent.trim(), h: r.height, w: r.width };
+        })
+        .filter((x) => x.h > 0 && (x.h < 44 || x.w < 44))
+        .map(
+          (x) =>
+            `${x.texto || '(sem texto)'} ${String(Math.round(x.w))}×${String(Math.round(x.h))}`,
+        ),
+    );
+    expect(pequenos).toEqual([]);
+  });
+}
+
+// Nenhuma tela rola na horizontal, nem na largura de um celular pequeno (V-21): o texto quebra
+// qualquer palavra longa e a grade usa `minmax(0, 1fr)`. Uma vez por rota, no projeto do celular.
+for (const rota of ROTAS) {
+  test(`${rota}: sem rolagem horizontal a 320 px`, async ({ page }, info) => {
+    test.skip(info.project.name !== 'celular', 'a largura é fixada no teste; basta um projeto');
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(`/#${rota}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const sobra = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(sobra).toBeLessThanOrEqual(0);
+  });
+}
 
 test('navegação por teclado: foco visível e pular para o conteúdo', async ({ page }) => {
   await page.goto('/');
