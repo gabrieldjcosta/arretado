@@ -4,11 +4,13 @@ import { useCallback, useState } from 'react';
 import type { Repositorio } from '../../core/persistencia';
 import { fecharDia, reabrirDia, resumoDoDia } from '../../dominios/dia/fechar';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { useVoz } from '../voz';
 import './estilos-dia.css';
 
 const plural = (n: number, um: string, varios: string) => `${String(n)} ${n === 1 ? um : varios}`;
 
 export function FecharDia() {
+  const texto = useVoz();
   const repo = useRepositorio();
   const [versao, setVersao] = useState(0);
   const carregar = useCallback(
@@ -40,7 +42,7 @@ export function FecharDia() {
     <section className="cartao-bloco fechar-dia" aria-label="Fechar o Dia">
       {fechado ? (
         <>
-          <h2 className="fechar-dia-titulo">Dia fechado</h2>
+          <h2 className="fechar-dia-titulo">{texto('diaFechado')}</h2>
           <p className="fechar-dia-texto">Bom descanso. Amanhã você começa de onde parou.</p>
           {r.proximoPasso && (
             <p className="fechar-dia-passo">

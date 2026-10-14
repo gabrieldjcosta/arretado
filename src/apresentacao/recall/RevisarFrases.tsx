@@ -13,6 +13,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
+import { useVoz } from '../voz';
 
 type Estado =
   | { tipo: 'carregando' }
@@ -35,6 +36,7 @@ const RESPOSTAS = [
  * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências).
  */
 export function RevisarFrases() {
+  const texto = useVoz();
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
   const [ocupado, setOcupado] = useState(false);
@@ -148,7 +150,7 @@ export function RevisarFrases() {
         <h1>Revisar frases</h1>
         <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
-          titulo="Feito."
+          titulo={texto('fimDeRodada')}
           acao={
             estado.cartoes > 0 ? (
               <>
