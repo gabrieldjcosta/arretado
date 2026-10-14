@@ -25,10 +25,10 @@ async function adpf(repo: Parameters<typeof criarPrecedente>[0]) {
 }
 
 describe('Precedentes (C2)', () => {
-  it('exige tribunal, número e texto; a tese nasce como trecho-chave', async () => {
+  it('exige só o texto (tribunal e número são opcionais); a tese nasce como trecho-chave', async () => {
     const { repo } = await repositorioDeTeste();
-    await expect(criarPrecedente(repo, { tribunal: '', numero: '1', texto: 'x' })).rejects.toThrow(
-      'Informe o tribunal e o número.',
+    expect((await criarPrecedente(repo, { texto: 'Tese sem tribunal.\nResto.' })).tituloTese).toBe(
+      'Tese sem tribunal.',
     );
     await expect(
       criarPrecedente(repo, { tribunal: 'STF', numero: '1', texto: ' ' }),

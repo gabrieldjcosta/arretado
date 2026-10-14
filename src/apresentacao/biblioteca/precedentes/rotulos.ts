@@ -10,17 +10,13 @@ export const ROTULO_DO_TRECHO: Record<RotuloDoTrecho, string> = {
 /** Do ponto de vista de quem aponta (este → outro). */
 export const VINCULO_SAINDO: Record<TipoDeVinculoEntrePrecedentes, string> = {
   relacionado: 'Relacionado a',
-  aplica: 'Aplica',
-  confirma: 'Confirma',
-  distingue: 'Distingue',
+  cita: 'Cita',
   supera: 'Supera',
 };
 
 /** Do ponto de vista de quem é apontado (outro → este). */
 export const VINCULO_ENTRANDO: Record<TipoDeVinculoEntrePrecedentes, string> = {
   relacionado: 'Relacionado a',
-  aplica: 'Aplicado por',
-  confirma: 'Confirmado por',
-  distingue: 'Distinguido por',
+  cita: 'Citado por',
   supera: 'Superado por',
 };

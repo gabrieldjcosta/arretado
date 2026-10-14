@@ -72,7 +72,10 @@ export function Precedentes({ novo = false }: { novo?: boolean }) {
               <li key={p.id}>
                 <LinhaLista
                   para={`/biblioteca/precedentes/${p.id}`}
-                  icone={p.favorito ? '★' : '§'}
+                  icone="§"
+                  selo={
+                    p.favorito ? <span className="visualmente-oculto">Favorito</span> : undefined
+                  }
                   titulo={p.tituloTese}
                   apoio={(trechoPadrao(p)?.texto ?? p.textoOriginal ?? '').slice(0, 120)}
                 />
@@ -96,7 +99,7 @@ function FormNovo({
   const [numero, setNumero] = useState('');
   const [texto, setTexto] = useState('');
   const [ocupado, setOcupado] = useState(false);
-  const pronto = tribunal.trim() !== '' && numero.trim() !== '' && texto.trim() !== '';
+  const pronto = texto.trim() !== '';
   async function aoEnviar(e: SyntheticEvent) {
     e.preventDefault();
     if (!pronto || ocupado) return;
@@ -112,12 +115,11 @@ function FormNovo({
     >
       <h2>Novo precedente</h2>
       <label className="resumo-campo">
-        Tribunal
+        Tribunal (opcional)
         <input
           type="text"
           value={tribunal}
           placeholder="STF"
-          autoFocus
           maxLength={500}
           onChange={(e) => {
             setTribunal(e.target.value);
@@ -125,7 +127,7 @@ function FormNovo({
         />
       </label>
       <label className="resumo-campo">
-        Número
+        Número (opcional)
         <input
           type="text"
           value={numero}
@@ -141,6 +143,7 @@ function FormNovo({
         <textarea
           value={texto}
           rows={10}
+          autoFocus
           onChange={(e) => {
             setTexto(e.target.value);
           }}

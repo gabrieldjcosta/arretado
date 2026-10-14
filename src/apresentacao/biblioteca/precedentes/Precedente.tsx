@@ -174,7 +174,15 @@ export function Precedente() {
               void tentar(() => alternarFavorito(repo, id));
             }}
           >
-            {p.favorito ? '★' : '☆'}
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="20" height="20">
+              <path
+                d="M12 2.6l2.8 5.9 6.5.8-4.8 4.5 1.2 6.4L12 17l-5.7 3.2 1.2-6.4-4.8-4.5 6.5-.8z"
+                fill={p.favorito ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </h2>
         {rel.superado && (

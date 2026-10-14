@@ -11,7 +11,7 @@ import type {
   VinculoEntrePrecedentes,
   VinculoPrecedenteDispositivo,
 } from '../../core/modelo';
-import type { Repositorio } from '../../core/persistencia';
+import { LIMITE_MAXIMO_PAGINA, type Repositorio } from '../../core/persistencia';
 import { novoId } from '../../core/ids';
 import { reancorar } from '../../core/util/reancoragem';
 
@@ -21,15 +21,36 @@ export const TRECHO_MAXIMO = 5_000;
 async function todosPorIndice<
   N extends 'vinculosPrecedenteDispositivo' | 'vinculosEntrePrecedentes',
 >(repo: Repositorio, nome: N, indice: string, chave: string) {
-  return (await repo.colecao(nome).listarPagina({ indice, de: chave, ate: chave, limite: 500 }))
-    .itens;
+  const itens = [];
+  let cursor: string | null = null;
+  do {
+    const pagina = await repo
+      .colecao(nome)
+      .listarPagina({ indice, de: chave, ate: chave, limite: LIMITE_MAXIMO_PAGINA, cursor });
+    itens.push(...pagina.itens);
+    cursor = pagina.proximoCursor;
+  } while (cursor);
+  return itens;
+}
+
+async function todasAsFrases(repo: Repositorio) {
+  const itens = [];
+  let cursor: string | null = null;
+  do {
+    const pagina = await repo
+      .colecao('frases')
+      .listarPagina({ limite: LIMITE_MAXIMO_PAGINA, cursor });
+    itens.push(...pagina.itens);
+    cursor = pagina.proximoCursor;
+  } while (cursor);
+  return itens;
 }
 
 // ── Precedente ────────────────────────────────────────────────────────────
 
 export interface EntradaDoPrecedente {
-  tribunal: string;
-  numero: string;
+  tribunal?: string;
+  numero?: string;
   /** Ementa, tese ou o texto que importa. */
   texto: string;
   tipo?: Precedente['tipo'];
@@ -51,26 +72,33 @@ function trecho(texto: string, inicio: number, fim: number, rotulo: RotuloDoTrec
   };
 }
 
+/** "STF ADPF 347" quando há; senão a primeira linha do texto, encurtada. */
+export function tituloDoPrecedente(tribunal: string, numero: string, texto: string): string {
+  const ref = `${tribunal} ${numero}`.trim();
+  if (ref) return ref.slice(0, 500);
+  const linha = texto.trim().split('\n', 1)[0] ?? '';
+  return linha.length > 80 ? `${linha.slice(0, 79)}…` : linha;
+}
+
 /**
- * Cria o Precedente. Só tribunal, número e o texto são obrigatórios (D25); o primeiro trecho-chave
+ * Cria o Precedente. Só o texto é obrigatório (D25); tribunal e número são opcionais; o primeiro trecho-chave
  * é a tese: o texto inteiro, até o limite do trecho (depois a pessoa marca o que importa).
  */
 export async function criarPrecedente(
   repo: Repositorio,
   entrada: EntradaDoPrecedente,
 ): Promise<Precedente> {
-  const tribunal = entrada.tribunal.trim();
-  const numero = entrada.numero.trim();
+  const tribunal = (entrada.tribunal ?? '').trim();
+  const numero = (entrada.numero ?? '').trim();
   const texto = entrada.texto.trim();
-  if (!tribunal || !numero) throw new Error('Informe o tribunal e o número.');
   if (!texto) throw new Error('Escreva ou cole o texto do precedente.');
   if (texto.length > TEXTO_MAXIMO_DO_PRECEDENTE)
     throw new Error('O texto passou do tamanho máximo.');
   return repo.colecao('precedentes').criar({
-    tituloTese: `${tribunal} ${numero}`.slice(0, 5_000),
+    tituloTese: tituloDoPrecedente(tribunal, numero, texto),
     escopo: 'nacional',
-    tribunal,
-    numero,
+    ...(tribunal ? { tribunal } : {}),
+    ...(numero ? { numero } : {}),
     ...(entrada.tipo ? { tipo: entrada.tipo } : {}),
     ...(entrada.disciplinaId ? { disciplinaId: entrada.disciplinaId } : {}),
     ...(entrada.fonteOficial ? { fonteOficial: entrada.fonteOficial } : {}),
@@ -175,7 +203,7 @@ export async function corrigirTextoDoPrecedente(
         fim: r.fim,
       };
     });
-    const frases = (await repo.colecao('frases').listarPagina({ limite: 500 })).itens;
+    const frases = await todasAsFrases(repo);
     for (const f of frases) {
       const t = f.trechoDePrecedente;
       if (t?.precedenteId !== id) continue;

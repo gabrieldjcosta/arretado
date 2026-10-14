@@ -121,13 +121,7 @@ export const VinculoPrecedenteDispositivo = z.strictObject({
 });
 export type VinculoPrecedenteDispositivo = z.infer<typeof VinculoPrecedenteDispositivo>;
 
-export const TipoDeVinculoEntrePrecedentes = z.enum([
-  'relacionado',
-  'aplica',
-  'confirma',
-  'distingue',
-  'supera',
-]);
+export const TipoDeVinculoEntrePrecedentes = z.enum(['relacionado', 'cita', 'supera']);
 export type TipoDeVinculoEntrePrecedentes = z.infer<typeof TipoDeVinculoEntrePrecedentes>;
 
 /** Uma ponta do vínculo: um Precedente do usuário ou um dispositivo do acervo (súmula, tese). */
@@ -142,14 +136,16 @@ export type PontaDeVinculo = z.infer<typeof PontaDeVinculo>;
  * `para`). Navegável nos dois sentidos pelos índices `deId` e `paraId` (cópias de `de.id` e
  * `para.id`). Os trechos-chave das duas pontas são opcionais.
  */
-export const VinculoEntrePrecedentes = z.strictObject({
-  ...camposComuns,
-  de: PontaDeVinculo,
-  para: PontaDeVinculo,
-  deId: Id,
-  paraId: Id,
-  tipoDeVinculo: TipoDeVinculoEntrePrecedentes,
-  deTrechoId: Id.optional(),
-  paraTrechoId: Id.optional(),
-});
+export const VinculoEntrePrecedentes = z
+  .strictObject({
+    ...camposComuns,
+    de: PontaDeVinculo,
+    para: PontaDeVinculo,
+    deId: Id,
+    paraId: Id,
+    tipoDeVinculo: TipoDeVinculoEntrePrecedentes,
+    deTrechoId: Id.optional(),
+    paraTrechoId: Id.optional(),
+  })
+  .refine((v) => v.deId === v.de.id && v.paraId === v.para.id, 'deId e paraId seguem as pontas.');
 export type VinculoEntrePrecedentes = z.infer<typeof VinculoEntrePrecedentes>;

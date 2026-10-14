@@ -19,8 +19,8 @@ describe('Biblioteca › Precedentes', () => {
     await usuario.click(screen.getByRole('link', { name: 'Cadastrar um precedente' }));
     const salvar = await screen.findByRole('button', { name: 'Salvar' }, espera);
     expect(salvar).toBeDisabled();
-    await usuario.type(screen.getByLabelText('Tribunal'), 'STF');
-    await usuario.type(screen.getByLabelText('Número'), 'ADPF 347');
+    await usuario.type(screen.getByLabelText(/^Tribunal/), 'STF');
+    await usuario.type(screen.getByLabelText(/^Número/), 'ADPF 347');
     await usuario.type(screen.getByLabelText(/^Texto/), 'Estado de coisas inconstitucional.');
     await usuario.click(salvar);
     await waitFor(() => {

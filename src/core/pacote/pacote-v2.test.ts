@@ -296,4 +296,28 @@ describe('pacote v7 no app v8 (F3-C, vínculos de precedentes)', () => {
     destino.fechar();
     destino2.fechar();
   });
+
+  it('substituir módulos (modo 5) com pacote v7 mantém os vínculos de precedente locais', async () => {
+    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const v7 = await comVersao((await exportarPacote(repo)).bytes, 7);
+    const p = await repo
+      .colecao('precedentes')
+      .criar({ tituloTese: 'STF ADPF 347', escopo: 'nacional' });
+    const v1 = await repo
+      .colecao('vinculosPrecedenteDispositivo')
+      .criar(camposMinimos('vinculosPrecedenteDispositivo', p.id));
+    const v2 = await repo
+      .colecao('vinculosEntrePrecedentes')
+      .criar(camposMinimos('vinculosEntrePrecedentes', p.id));
+    const pacote = await lerPacote(v7);
+    const previa = await planejar(repo, pacote, { modo: 5, modulos: ['precedentes'] });
+    expect(previa.porColecao.vinculosPrecedenteDispositivo?.excluir ?? 0).toBe(0);
+    expect(previa.porColecao.vinculosEntrePrecedentes?.excluir ?? 0).toBe(0);
+    await aplicar(repo, pacote, previa);
+    expect(
+      (await repo.db.tabela('vinculosPrecedenteDispositivo').get(v1.id))?.excluidoEm,
+    ).toBeNull();
+    expect((await repo.db.tabela('vinculosEntrePrecedentes').get(v2.id))?.excluidoEm).toBeNull();
+    repo.fechar();
+  });
 });
