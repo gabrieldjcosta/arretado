@@ -312,6 +312,17 @@ p {
   text-decoration: none;
 }
 
+.area-icone {
+  display: none;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.conta-icone svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .areas a[aria-current='page'] {
   background: var(--agora-fundo);
   box-shadow: inset 0 0 0 1.5px var(--agora-borda);
@@ -355,12 +366,19 @@ p {
 
   .areas a {
     flex: 1;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-height: 3.25rem;
     padding: 0 0.25rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .area-icone {
+    display: block;
   }
 
   .shell {
-    padding-bottom: calc(var(--alvo) + 1rem);
+    padding-bottom: calc(3.25rem + 1rem);
   }
 }
 
@@ -538,7 +556,7 @@ legend {
 
 @media (prefers-reduced-motion: no-preference) {
   .esqueleto span {
-    animation: pulsar 1.6s ease-in-out infinite;
+    animation: pulsar 0.6s ease-in-out 2;
   }
 }
 
@@ -717,11 +735,16 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+/* Registrar erro no cabeçalho: neutro, para o "Agora" ser o único destaque da tela (avaliação N-1). */
+.acoes-globais .registrar-global {
+  font-weight: 600;
+}
+
 /* Até 899 px (celular, tablet em retrato, janela estreita): "+ Erro" e áreas mais justas. Com o
    rótulo longo, a barra de cima ocupava os 712 px do tablet inteiros com a fonte do Windows e
    transbordava com a do Linux (11.1). */
 @media (max-width: 899px) {
-  .acoes-globais .principal {
+  .acoes-globais .registrar-global {
     padding: 0 0.6rem;
   }
 
@@ -908,7 +931,7 @@ a.item-norma strong {
   /* Acima da navegação das áreas, que no celular e no tablet fica no rodapé. */
   .acoes-leitor {
     right: 0.75rem;
-    bottom: calc(var(--alvo) + 1.25rem);
+    bottom: calc(3.25rem + 1.25rem);
   }
 }
 
@@ -1643,8 +1666,12 @@ dialog.dialogo-acoes {
   border: 1px solid transparent;
   border-radius: var(--raio-cartao);
   padding: 1.25rem;
-  margin: 4.5rem 0 1rem;
+  margin: 0 0 1rem;
   box-shadow: var(--sombra);
+}
+
+.acao-agora:has(.agora-mascote) {
+  margin-top: 4.5rem;
 }
 
 /* O mascote senta na borda do cartão, sozinho, sem fundo; decorativo. */
@@ -1758,7 +1785,7 @@ dialog.dialogo-acoes {
     display: inline-flex;
     position: fixed;
     right: 0.75rem;
-    bottom: calc(var(--alvo) + 1.25rem);
+    bottom: calc(3.25rem + 1.25rem);
     z-index: 5;
     width: 3.5rem;
     height: 3.5rem;
@@ -1768,7 +1795,7 @@ dialog.dialogo-acoes {
   }
 
   /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
-  .acoes-globais .principal {
+  .acoes-globais .registrar-global {
     display: none;
   }
 }
@@ -2221,18 +2248,6 @@ dialog.dialogo-previa .linha-acoes button {
   background: var(--superficie);
   color: var(--texto);
   font-weight: 600;
-}
-
-.respostas .resposta-errei {
-  border-color: var(--perigo);
-}
-
-.respostas .resposta-dificil {
-  border-color: var(--estrela);
-}
-
-.respostas .resposta-facil {
-  border-color: var(--sucesso);
 }
 
 /* Estado por texto (6.7): palavra e ícone além da cor. */
