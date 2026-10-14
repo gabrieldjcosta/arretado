@@ -27,3 +27,5 @@ export async function alterarPreferencias(
 export function cotaDiaria(preferencias: Pick<Preferencias, 'cotaDiaria'>): number {
   return preferencias.cotaDiaria ?? COTA_DIARIA_PADRAO;
 }
+
+export * from './perfis';
