@@ -1324,3 +1324,17 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Tarefas: a sugestão que dispensei voltou
 - **Causa:** "Não agora" vale só no dia (`localStorage` `arretado:sugestoes-dispensadas:v1`); no dia seguinte a regra roda de novo.
 - **Solução:** nenhuma; sugestão não é cobrança. Para não ver a regra, mude o que a dispara (adiar o ponto, mudar a faixa).
+
+## Contas (F4-A, A1; só com `VITE_CONTA=1`)
+
+### Abri o app e vieram os dados "vazios" depois de entrar numa conta
+- **Causa:** cada conta tem o próprio banco (T26); o banco sem conta (`arretado`) não é copiado sozinho. A cópia para a conta é a migração do pacote A4.
+- **Solução:** nada se perdeu. Sair da conta volta ao banco sem conta. Até a A4 existir, não ligar a chave para uso real.
+
+### Dois bancos parecidos no navegador (`arretado`, `arretado-c-…`, `arretado-registro`)
+- **Causa:** esperado (T26). `arretado-registro` só guarda qual conta está ativa.
+- **Solução:** não apagar à mão. Apagar tudo usa Conta › Dados; apagar `arretado-registro` faz o app voltar ao banco sem conta.
+
+### Previsível na A3: o login volta e a tela fica em branco
+- **Causa provável:** o retorno do Google traz `?code=` na URL e o roteador é por hash (T3); se o código não for trocado antes de montar o roteador, a página não reconhece a rota. Também CSP/Trusted Types bloqueando o supabase-js.
+- **Solução prevista:** trocar o código em `main.tsx` antes do roteador e limpar a URL com `history.replaceState`; E2E do retorno do login cobre.
