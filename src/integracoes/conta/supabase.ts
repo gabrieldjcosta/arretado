@@ -3,6 +3,7 @@
 // login (fora do pacote inicial). Telas conhecem apenas `ServicoDeConta`.
 import {
   AuthApiError,
+  FunctionsFetchError,
   createClient,
   isAuthRetryableFetchError,
   type Session,
@@ -131,10 +132,22 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
     await this.cliente.auth.signOut({ scope: 'local' });
   }
 
-  excluirConta(): Promise<void> {
-    return Promise.reject(
-      new FalhaDeConta('indisponivel', 'Excluir a conta chega no próximo pacote.'),
-    );
+  async excluirConta(): Promise<void> {
+    // Edge Function `excluir-conta`: apaga objetos do Storage e o usuário (cascata leva o resto).
+    const resposta = await this.cliente.functions.invoke<unknown>('excluir-conta', {
+      method: 'POST',
+    });
+    const error: unknown = resposta.error;
+    if (error) {
+      const semRede = error instanceof FunctionsFetchError;
+      throw new FalhaDeConta(
+        semRede ? 'sem-rede' : 'indisponivel',
+        semRede
+          ? 'Sem conexão. Nada foi apagado; tente de novo com internet.'
+          : 'Não foi possível excluir a conta agora. Nada foi apagado; tente de novo.',
+      );
+    }
+    await this.cliente.auth.signOut({ scope: 'local' }).catch(() => undefined);
   }
 
   aoMudar(ouvinte: (sessao: SessaoDeConta | null) => void): () => void {

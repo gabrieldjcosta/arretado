@@ -18,5 +18,6 @@
     "src/testes/setup.ts",
     "supabase",
     "config"
-  ]
+  ],
+  "exclude": ["supabase/functions/**/index.ts"]
 }
