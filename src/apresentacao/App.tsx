@@ -25,8 +25,10 @@ import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
 import { RevisarFrases } from './recall/RevisarFrases';
-import { Plano } from './plano/Plano';
-import { Hoje, NaoEncontrada } from './telas/Areas';
+import { Hoje } from './hoje/Hoje';
+import { RotasDoPlano } from './plano/Rotas';
+import { RotasDaSessao } from './sessao/Rotas';
+import { NaoEncontrada } from './telas/Areas';
 import './estilos.css';
 
 export function App({
@@ -43,7 +45,8 @@ export function App({
           <Routes>
             <Route element={<Shell />}>
               <Route index element={<Hoje />} />
-              <Route path="plano" element={<Plano />} />
+              <Route path="plano/*" element={<RotasDoPlano />} />
+              <Route path="sessao/*" element={<RotasDaSessao />} />
               <Route path="recall" element={<RecallInicio />}>
                 <Route index element={<ListaErros />} />
                 <Route path="frases" element={<ListaFrases />} />

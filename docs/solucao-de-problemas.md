@@ -1272,3 +1272,12 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Sintoma:** `leitor.spec.ts` "mudar o tamanho do texto…" estoura 15 s em `distanciaDoAlto` no projeto celular quando a suíte inteira roda; sozinho passa nos 3 aparelhos.
 - **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
 - **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.
+
+### Esquema v7 (F3): app v6 aberto numa aba depois de a v7 subir, ou pacote v7 num app v6
+- **Sintoma:** a aba antiga pede para recarregar (`versionchange`); um pacote exportado na v7 é recusado por app v6 com "atualize o app".
+- **Causa:** v7 criou `tarefasDeEstudo` e a coleção entra no pacote (módulo `plano`); é o comportamento desejado (R10), como na v4 a v6.
+- **Solução:** fazer o backup (Conta › Dados › Exportar) antes do merge no `main`; recarregar as abas; não abrir o app v6 sobre um banco v7 (o IndexedDB não desce de versão).
+
+### Esquema v7: novo campo de Sessão ou Preferências "some" ao gravar
+- **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
+- **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.

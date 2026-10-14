@@ -27,6 +27,7 @@ export const ROTULO_COLECAO: Record<NomeColecao, string> = {
   editais: 'Editais',
   disciplinas: 'Disciplinas',
   pontos: 'Pontos',
+  tarefasDeEstudo: 'Tarefas de estudo',
   dias: 'Dias',
   sessoes: 'Sessões',
   erros: 'Erros',

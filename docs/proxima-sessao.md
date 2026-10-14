@@ -40,6 +40,8 @@ Passagem de bastão (Frases 1): Tarefa 4b · Branch `claude/frases-1` · Último
 
 **13.3 feita (13/10/2026), sem subida de esquema:** pacote só de `legislacao` leva os anexos das fontes (`exportar.ts`, `ler.ts`, `importar.ts`); `backup-corpus.test.ts` prova ida e volta com o CP inteiro (integral e só `legislacao`, rascunho retomado). Sem tela nova.
 
+**P0 Fundação da F3 feito (13/10/2026), esquema v7 (PR draft para a `integracao`; ver o PR).** Entregue: `tarefasDeEstudo` + campos opcionais de `Sessao` e `Preferencias` + `TipoItem` `frase`/`tarefa` (T25; `supabase/migrations/20261014000000_colecao_tarefas_de_estudo.sql`, só arquivo); contratos `src/dominios/hoje/contrato.ts` e `src/dominios/sessao/contrato.ts`; `Hoje` em `src/apresentacao/hoje/` (blocos vazios por pacote), rotas `/sessao/*` e `/plano/{onboarding,pontos,tarefas}/*`. **Antes do merge: revisão independente em outra sessão e backup manual do Gabriel (Conta › Dados › Exportar); recarregar as abas depois (R10).** Os pacotes A1 e A2 (onda 1) só começam com o P0 mergeado na `integracao`.
+
 ## Depois (em ordem)
 
 | # | Atividade | Modelo | Onde roda |

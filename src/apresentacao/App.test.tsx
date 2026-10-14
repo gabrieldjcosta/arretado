@@ -53,6 +53,32 @@ describe('shell (5.1, 5.5)', () => {
   });
 });
 
+describe('encaixes da F3 (P0 Fundação)', () => {
+  it('Hoje compõe os blocos e mantém a revisão vencida e o vazio de antes', async () => {
+    await abrirApp('/');
+    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Nenhuma revisão hoje' }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ['/sessao', 'Sessão'],
+    ['/sessao/iniciar', 'Sessão'],
+    ['/plano/onboarding', 'Começar o plano'],
+    ['/plano/pontos/x', 'Pontos do programa'],
+    ['/plano/tarefas', 'Tarefas'],
+  ])('rota %s está registrada e mostra o encaixe', async (rota, titulo) => {
+    await abrirApp(rota);
+    expect(screen.getByRole('heading', { name: titulo })).toBeInTheDocument();
+  });
+
+  it('/plano segue mostrando o Plano', async () => {
+    await abrirApp('/plano');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Plano' })).toBeInTheDocument();
+  });
+});
+
 describe('"?" e Orientações (5.3)', () => {
   it('toda tela aponta para uma seção existente', () => {
     const ids = new Set(SECOES.map((s) => s.id));
