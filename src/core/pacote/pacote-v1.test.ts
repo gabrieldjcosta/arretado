@@ -29,8 +29,14 @@ async function comoPacoteV1(
   delete a['dados/pendenciasReleitura.json'];
   Reflect.deleteProperty(m.arquivos, 'dados/pendenciasReleitura.json');
   Reflect.deleteProperty(m.contagens, 'pendenciasReleitura');
-  // E as da v6 (Frases 1) e da v7 (F3, tarefas de estudo).
-  for (const nome of ['frases', 'revisoesFrase', 'tarefasDeEstudo']) {
+  // E as da v6 (Frases 1), da v7 (F3, tarefas de estudo) e da v8 (F3-C, vínculos de precedentes).
+  for (const nome of [
+    'frases',
+    'revisoesFrase',
+    'tarefasDeEstudo',
+    'vinculosPrecedenteDispositivo',
+    'vinculosEntrePrecedentes',
+  ]) {
     Reflect.deleteProperty(a, `dados/${nome}.json`);
     Reflect.deleteProperty(m.arquivos, `dados/${nome}.json`);
     Reflect.deleteProperty(m.contagens, nome);

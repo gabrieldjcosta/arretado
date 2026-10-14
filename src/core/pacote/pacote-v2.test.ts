@@ -266,3 +266,34 @@ describe('pacote v6 no app v7 e v7 de ida e volta (F3, P0)', () => {
     destino.fechar();
   });
 });
+
+describe('pacote v7 no app v8 (F3-C, vínculos de precedentes)', () => {
+  it('pacote v7 restaura sem recusa e deixa os vínculos de precedente locais vazios; v8 vai e volta', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    const p = await origem
+      .colecao('precedentes')
+      .criar({ tituloTese: 'STF ADPF 347', escopo: 'nacional' });
+    await origem.colecao('vinculosEntrePrecedentes').criar({
+      de: { tipo: 'precedente', id: p.id },
+      para: { tipo: 'precedente', id: p.id },
+      deId: p.id,
+      paraId: p.id,
+      tipoDeVinculo: 'relacionado',
+    });
+    const { bytes } = await exportarPacote(origem);
+    const v7 = await comVersao(bytes, 7);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, v7, 6);
+    expect(
+      await destino.comUsuario(origem.ctx.usuarioId).colecao('vinculosEntrePrecedentes').contar(),
+    ).toBe(0);
+    const destino2 = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino2, bytes, 6);
+    expect(
+      await destino2.comUsuario(origem.ctx.usuarioId).colecao('vinculosEntrePrecedentes').contar(),
+    ).toBe(1);
+    origem.fechar();
+    destino.fechar();
+    destino2.fechar();
+  });
+});

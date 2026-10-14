@@ -2,6 +2,24 @@
 import { z } from 'zod';
 import { camposComuns, DataCivil, Id, TextoCurto, TextoLongo } from './comum';
 
+/** Rótulo de um trecho-chave: o que ele é dentro do precedente (F3-C). */
+export const RotuloDoTrecho = z.enum(['tese', 'ementa', 'ratio', 'dispositivo_da_decisao']);
+export type RotuloDoTrecho = z.infer<typeof RotuloDoTrecho>;
+
+/**
+ * Trecho-chave (esquema v8): intervalo marcado no texto do precedente. `texto` é o que estava no
+ * intervalo ao marcar (a âncora para reancorar quando o texto é corrigido).
+ */
+export const TrechoChave = z.strictObject({
+  id: Id,
+  rotulo: RotuloDoTrecho,
+  texto: z.string().max(5_000),
+  inicio: z.int().min(0),
+  fim: z.int().min(0),
+  status: z.enum(['valida', 'reancorada', 'pendente']),
+});
+export type TrechoChave = z.infer<typeof TrechoChave>;
+
 export const Precedente = z.strictObject({
   ...camposComuns,
   tituloTese: z.string().trim().min(1).max(5_000),
@@ -33,6 +51,10 @@ export const Precedente = z.strictObject({
   textoOriginal: TextoLongo.optional(),
   traducao: TextoLongo.optional(),
   versaoResumida: TextoLongo.optional(),
+  /** Trechos-chave do texto (`textoOriginal`); a tese é o exibido por padrão (v8). */
+  trechosChave: z.array(TrechoChave).max(50).optional(),
+  /** Favorito, discreto: só a Biblioteca o mostra (v8). */
+  favorito: z.boolean().optional(),
 });
 export type Precedente = z.infer<typeof Precedente>;
 
@@ -82,3 +104,52 @@ export const EventoDeCalendario = z.strictObject({
   descricao: TextoLongo.optional(),
 });
 export type EventoDeCalendario = z.infer<typeof EventoDeCalendario>;
+
+/**
+ * Vínculo de um trecho-chave (ou do precedente todo) a um dispositivo de uma norma (v8). O
+ * `dispositivoId` é estável entre versões da norma; sem o endereço na versão nova, o vínculo fica
+ * `pendente` e entra em "Para reler" (como a estrela). `endereco` guarda o endereço para exibir.
+ */
+export const VinculoPrecedenteDispositivo = z.strictObject({
+  ...camposComuns,
+  precedenteId: Id,
+  trechoId: Id.optional(),
+  normaId: Id,
+  dispositivoId: Id,
+  endereco: z.string().max(200),
+  status: z.enum(['valida', 'pendente']),
+});
+export type VinculoPrecedenteDispositivo = z.infer<typeof VinculoPrecedenteDispositivo>;
+
+export const TipoDeVinculoEntrePrecedentes = z.enum([
+  'relacionado',
+  'aplica',
+  'confirma',
+  'distingue',
+  'supera',
+]);
+export type TipoDeVinculoEntrePrecedentes = z.infer<typeof TipoDeVinculoEntrePrecedentes>;
+
+/** Uma ponta do vínculo: um Precedente do usuário ou um dispositivo do acervo (súmula, tese). */
+export const PontaDeVinculo = z.discriminatedUnion('tipo', [
+  z.strictObject({ tipo: z.literal('precedente'), id: Id }),
+  z.strictObject({ tipo: z.literal('dispositivo'), id: Id, normaId: Id }),
+]);
+export type PontaDeVinculo = z.infer<typeof PontaDeVinculo>;
+
+/**
+ * Vínculo entre precedentes (v8): `de` → `para`, com tipo (`supera`: o de `de` supera o de
+ * `para`). Navegável nos dois sentidos pelos índices `deId` e `paraId` (cópias de `de.id` e
+ * `para.id`). Os trechos-chave das duas pontas são opcionais.
+ */
+export const VinculoEntrePrecedentes = z.strictObject({
+  ...camposComuns,
+  de: PontaDeVinculo,
+  para: PontaDeVinculo,
+  deId: Id,
+  paraId: Id,
+  tipoDeVinculo: TipoDeVinculoEntrePrecedentes,
+  deTrechoId: Id.optional(),
+  paraTrechoId: Id.optional(),
+});
+export type VinculoEntrePrecedentes = z.infer<typeof VinculoEntrePrecedentes>;

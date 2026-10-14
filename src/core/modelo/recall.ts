@@ -95,6 +95,15 @@ export const Frase = z.strictObject({
       fim: z.int().min(0),
     })
     .optional(),
+  /** Link de volta a um precedente: intervalo do texto dele, como estava ao enviar (F3-C, v8). */
+  trechoDePrecedente: z
+    .strictObject({
+      precedenteId: Id,
+      texto: z.string().max(5_000),
+      inicio: z.int().min(0),
+      fim: z.int().min(0),
+    })
+    .optional(),
   estado: EstadoFrase,
   proximaRevisao: DataCivil,
   ultimaRevisao: Instante.optional(),
