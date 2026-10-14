@@ -1300,3 +1300,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Sintoma:** E2E `dados.spec.ts` "restaurar integral" falha em `getByText('Restauração concluída.')`, mas a restauração aconteceu (aparece em "Importações"). Só no app construído, deterministicamente no CI; descoberto ao pôr `Dados` em `React.lazy` (PR #126).
 - **Causa:** `lerAvisoDeRecarga` apagava o item do `sessionStorage` dentro do inicializador do `useState`, ou seja, na renderização. O React pode repetir uma renderização (Suspense, concorrência); a segunda leitura vinha vazia.
 - **Solução:** ler sem apagar na renderização e limpar num `useEffect` (`limparAvisoDeRecarga`). **Prevenção:** nada de efeito colateral (gravar/apagar storage) em inicializador de estado ou corpo de componente; o E2E acima cobre.
+
+### Pontos: um ponto aparece "Não iniciado" mesmo com estudo feito
+- **Causa:** o andamento é derivado do que está ligado ao ponto (`pontoId` em Sessão, Erro, Cartão, Frase). Estudo em Sessão livre, ou erro/cartão sem ponto, não conta. "Primeira passada" exige Sessão **encerrada** com o ponto como alvo.
+- **Solução:** começar a Sessão pelo botão do ponto (ou escolher o ponto no erro/cartão). Nada é editado à mão: o andamento nunca é gravado.
+
+### Pontos: excluí uma matéria sem querer
+- **Causa:** "Excluir matéria" faz exclusão lógica da matéria e dos pontos dela, com confirmação; erros, cartões e sessões ficam.
+- **Solução:** Conta › Dados › Importações desfaz uma importação inteira; para uma exclusão isolada, restaurar o backup (Conta › Dados) ou recriar a matéria.
