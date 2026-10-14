@@ -76,8 +76,8 @@ function EditarMateria({
   const [novo, setNovo] = useState(nome);
   const [confirmando, setConfirmando] = useState(false);
   return (
-    <details className="pontos-novo">
-      <summary>Editar matéria</summary>
+    <div className="pontos-secao">
+      <h3>Editar matéria</h3>
       <form
         className="pontos-form"
         onSubmit={(e) => {
@@ -120,6 +120,15 @@ function EditarMateria({
             type="button"
             className="principal"
             onClick={() => {
+              setConfirmando(false);
+            }}
+          >
+            Não excluir
+          </button>
+          <button
+            type="button"
+            className="discreto"
+            onClick={() => {
               aoErro(null);
               excluirDisciplina(repo, id).catch((x: unknown) => {
                 aoErro(mensagem(x));
@@ -128,17 +137,9 @@ function EditarMateria({
           >
             Sim, excluir
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setConfirmando(false);
-            }}
-          >
-            Não excluir
-          </button>
         </div>
       )}
-    </details>
+    </div>
   );
 }
 
@@ -152,8 +153,8 @@ function NovoPonto({
   const repo = useRepositorio();
   const [titulo, setTitulo] = useState('');
   return (
-    <details className="pontos-novo">
-      <summary>Adicionar ponto</summary>
+    <div className="pontos-secao">
+      <h3>Adicionar ponto</h3>
       <form
         className="pontos-form"
         onSubmit={(e) => {
@@ -183,7 +184,7 @@ function NovoPonto({
           Salvar ponto
         </button>
       </form>
-    </details>
+    </div>
   );
 }
 
@@ -264,8 +265,11 @@ export function ListaDePontos() {
                     );
                   })}
                 </ul>
-                <NovoPonto disciplinaId={d.id} aoErro={setErro} />
-                <EditarMateria id={d.id} nome={d.nome} pontos={todos.length} aoErro={setErro} />
+                <details className="pontos-novo">
+                  <summary>Mais</summary>
+                  <NovoPonto disciplinaId={d.id} aoErro={setErro} />
+                  <EditarMateria id={d.id} nome={d.nome} pontos={todos.length} aoErro={setErro} />
+                </details>
               </section>
             );
           })}

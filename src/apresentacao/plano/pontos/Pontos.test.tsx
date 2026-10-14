@@ -53,7 +53,7 @@ describe('Plano: pontos do programa (B3)', () => {
     await usuario.click(screen.getByRole('button', { name: 'Adicionar matéria' }));
     const secao = await screen.findByRole('region', { name: 'Direito Civil' });
 
-    await usuario.click(within(secao).getByText('Adicionar ponto'));
+    await usuario.click(within(secao).getByText('Mais'));
     await usuario.type(within(secao).getByLabelText('Título do ponto'), 'Prescrição');
     await usuario.click(within(secao).getByRole('button', { name: 'Salvar ponto' }));
     await usuario.click(await within(secao).findByRole('link', { name: 'Prescrição' }));

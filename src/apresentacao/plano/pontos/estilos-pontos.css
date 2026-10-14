@@ -47,3 +47,9 @@
   flex-basis: 100%;
   margin: 0;
 }
+
+.pontos-secao {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin-block: var(--espaco-2, 0.5rem);
+}
