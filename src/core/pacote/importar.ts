@@ -213,8 +213,10 @@ export async function planejar(
     // Pacote anterior à v6 nada diz das Frases (nascem dos erros, T22). Substituir módulos não as
     // apaga; só sai a Frase do erro que a importação exclui. Restaurar integral apaga tudo, e
     // `migrarFrasesDosErros` recria as Frases dos erros restaurados.
+    // Idem as Tarefas de estudo (v7): pacote anterior não as traz e a substituição não as apaga.
     const posteriorAoPacote =
-      (nome === 'frases' || nome === 'revisoesFrase') && versaoDeOrigem(nome) > m.versaoEsquema;
+      (nome === 'frases' || nome === 'revisoesFrase' || nome === 'tarefasDeEstudo') &&
+      versaoDeOrigem(nome) > m.versaoEsquema;
     if ((modo === 5 || modo === 6) && !soFontes(nome)) {
       for (const l of locais) {
         if (idsPacote.has(l.id)) continue;

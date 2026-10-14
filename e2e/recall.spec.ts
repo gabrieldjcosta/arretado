@@ -36,8 +36,12 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   // Dia seguinte: o cartão está na fila.
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
   await page.goto('/');
-  await expect(page.getByText('1 cartão para revisar.')).toBeVisible();
-  await page.getByRole('link', { name: 'Revisar', exact: true }).click();
+  await expect(page.getByText('1 cartão vencido')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Começar', exact: true })).toHaveAttribute(
+    'href',
+    /#\/sessao\/iniciar\?tipo=revisao.*origem=revisao_vencida/,
+  );
+  await page.goto('/#/recall/revisar');
   await expect(page.getByText('Confundi livramento condicional com progressão')).toBeVisible();
   await page.keyboard.press('Space');
   await expect(page.getByText('Livramento exige requisitos do art. 83 do CP.')).toBeVisible();

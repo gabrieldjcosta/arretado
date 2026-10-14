@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import mascote from '../imagens/mascote-estudando.svg';
 
 /** O que fazer agora: uma coisa só em destaque por tela (redesign, fatia 2). */
 export function AcaoAgora({
@@ -18,6 +19,7 @@ export function AcaoAgora({
 }) {
   return (
     <section className="acao-agora" aria-label="Agora">
+      <img className="agora-mascote" src={mascote} alt="" width={96} />
       <h2 className="agora-titulo">{titulo}</h2>
       {estimativa !== undefined && <p className="agora-estimativa">cerca de {estimativa} min</p>}
       {para !== undefined ? (

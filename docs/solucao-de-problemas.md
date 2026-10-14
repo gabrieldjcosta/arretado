@@ -1272,3 +1272,31 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Sintoma:** `leitor.spec.ts` "mudar o tamanho do texto…" estoura 15 s em `distanciaDoAlto` no projeto celular quando a suíte inteira roda; sozinho passa nos 3 aparelhos.
 - **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
 - **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.
+
+### Esquema v7 (F3): app v6 aberto numa aba depois de a v7 subir, ou pacote v7 num app v6
+- **Sintoma:** a aba antiga pede para recarregar (`versionchange`); um pacote exportado na v7 é recusado por app v6 com "atualize o app".
+- **Causa:** v7 criou `tarefasDeEstudo` e a coleção entra no pacote (módulo `plano`); é o comportamento desejado (R10), como na v4 a v6.
+- **Solução:** fazer o backup (Conta › Dados › Exportar) antes do merge no `main`; recarregar as abas; não abrir o app v6 sobre um banco v7 (o IndexedDB não desce de versão).
+
+### Esquema v7: novo campo de Sessão ou Preferências "some" ao gravar
+- **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
+- **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.
+
+### Sessão: aparece "Sessão encerrada" sem duração, ou uma Sessão antiga some do Hoje
+- **Causa:** Sessão que ficou aberta de um dia para o outro vira `interrompida` ao abrir `/sessao/*` (A2); não há como saber quando a pessoa parou, então não tem `fim` nem `duracaoSegundos`. É de propósito; nada é cobrado.
+- **Solução:** nenhuma; começar uma Sessão nova funciona normalmente. Para contar tempo, só `encerrada`.
+
+### Hoje: o Retorno não aparece depois de dias fora, ou "Fechar o Dia" some
+- **Causa:** o Retorno exige ≥ 2 dias desde a última Sessão ou Revisão (Cartão ou Frase) e some depois de "Agora não" no mesmo dia (`localStorage` `arretado.retorno-dispensado`). "Fechar o Dia" só aparece se houve Sessão encerrada ou Revisão hoje, ou se o Dia já está fechado (para reabrir).
+- **Solução:** limpar a chave acima para rever o Retorno; fazer uma Sessão ou revisão para o Dia poder ser fechado.
+
+### Só estudo ligado e a navegação sumiu
+- **Sintoma:** as áreas, Conta e o botão de erro não aparecem.
+- **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
+- **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.
+
+### Aviso "Restauração concluída." some depois da recarga (tela com `lazy`/Suspense)
+
+- **Sintoma:** E2E `dados.spec.ts` "restaurar integral" falha em `getByText('Restauração concluída.')`, mas a restauração aconteceu (aparece em "Importações"). Só no app construído, deterministicamente no CI; descoberto ao pôr `Dados` em `React.lazy` (PR #126).
+- **Causa:** `lerAvisoDeRecarga` apagava o item do `sessionStorage` dentro do inicializador do `useState`, ou seja, na renderização. O React pode repetir uma renderização (Suspense, concorrência); a segunda leitura vinha vazia.
+- **Solução:** ler sem apagar na renderização e limpar num `useEffect` (`limparAvisoDeRecarga`). **Prevenção:** nada de efeito colateral (gravar/apagar storage) em inicializador de estado ou corpo de componente; o E2E acima cobre.

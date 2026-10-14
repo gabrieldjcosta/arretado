@@ -45,7 +45,7 @@ Esquemas em `src/core/modelo/`: **S** `sistema.ts`, **P** `plano.ts`, **R** `rec
 | Disciplina | `Disciplina` (P) | `disciplinas` | registros | em uso (importação de pontos, F1) |
 | Ponto | `Ponto` (P) | `pontos` | registros | em uso (importação CSV; vínculo opcional no Erro) |
 | Dia | `Dia` (P) | `dias` | registros | só esquema (F3) |
-| Sessão | `Sessao` (P) | `sessoes` | registros | só esquema (F3) |
+| Sessão | `Sessao` (P) | `sessoes` | registros | esquema v7 pronto (campos da F3); telas e serviço nos pacotes A2/A3a |
 | Erro | `Erro` (R) | `erros` | registros | em uso |
 | Cartão | `Cartao` (R) | `cartoes` | registros | em uso |
 | Revisão | `Revisao` (R) | `revisoes` (append-only) | registros | em uso |
@@ -352,3 +352,43 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Texto corrigido, Correção desfeita, Desfazer a correção (região "Correção do texto") | `AvisoDaCorrecao`, classe `aviso-da-correcao` | `CorrecaoDoTexto.tsx` |
 | Correção (versão nova `edicao_manual`) | `corrigirTextoPublicado(repo, normaId, versaoBaseId, CorrecaoDeTexto[])`, `voltarParaVersao(repo, normaId, versaoBaseId, versaoAlvoId, dispositivoIds?)` → `ResultadoDaCorrecao` (`estado` `corrigida`/`sem_mudanca`, `alterados`, `reancoradas`, `pendentes`, `recuperadas`); `CorrecaoRecusada` (`motivo`: `inexistente`, `sem_versao_vigente`, `versao_mudou`, `dispositivo_fora`, `texto_vazio`, `texto_longo`, `versao_inexistente`); `trechosCorrigidos`, `textoLimpo`, `MAXIMO_DO_TEXTO` | `src/dominios/legislacao/correcao.ts` |
 | (eventos) | `dispositivo.alterado { normaId, dispositivoId, versaoAnterior, versaoNova }`, `marcacao.pendenteReancoragem { normaId, marcacaoId, dispositivoId }` | emitidos pela correção (11.7); a F6 também |
+| Catálogo de concursos (carreira → edital → disciplina → item) | `corpus/catalogo/<carreira>.{csv,json}`, `scripts/catalogo.mjs`, `scripts/catalogo/nucleo.mjs` (`separarBlocos`, `validarPrincipal`, `validarComplementares`, `converter`), `npm run catalogo` | `docs/planos/catalogo-formato.md`; B0 da F3-B; o app lê o JSON no B1 |
+
+### F3 — Hoje, Sessão e Plano acionável (P0 Fundação, 13/10/2026 — T25; esquema v7)
+
+| Termo | Identificadores |
+|---|---|
+| Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao` (reúne Recall e Legislação em `apresentacao/hoje/proxima-acao.ts`); decisão pura `decidirProximaAcao` (`dominios/hoje/proxima-acao.ts`); vazio = `ComecoSugerido` (três). Nada gravado. Não usar "tarefa do dia" |
+| Alvo | `AlvoDeAcao` (`tipo`: `revisao`, `leitura`, `tarefa`, `ponto`, `livre`; `id?`; `rotulo?`): o que se vai estudar; em `Sessao.alvo` |
+| Fronteira | `Sessao.fronteira`: até onde ler nesta Sessão ("até o art. 15"); texto livre e opcional |
+| Próximo passo | `Sessao.proximoPasso`: passo pequeno pedido ao fechar a Sessão, pré-preenchido; nunca obrigatório |
+| Origem da ação | `Sessao.origemDaAcao` (`OrigemDaAcao`): cópia do que o Hoje mostrou ao começar |
+| Estacionamento | `Sessao.estacionamento[]` (`NotaDeEstacionamento`: `texto`, `em`, `resolvidaEm?`); `estacionar` (contrato da Sessão). Não usar "distrações" na interface como rótulo de falha |
+| Temporizador | `Sessao.temporizadorMin` e `Preferencias.temporizadorPadraoMin`: opcional, informativo; nunca bloqueia nem conta como aprendizado |
+| Modo "só estudo" | `Preferencias.modoSoEstudo`: esconde a administração durante a Sessão |
+| Tarefa de estudo | `TarefaDeEstudo` (coleção `tarefasDeEstudo`, v7): passo pequeno e concreto; `estado` `aberta`/`feita`/`adiada`/`dividida` (`EstadoDaTarefa`), `paiId` (dividida em filhas), `ordem`, `autoria` `manual`/`sugerida`, `razao` (por quê). Não concluída fica na fila, sem atraso punitivo. Não usar "meta" nem "atividade" |
+| Perfil de estudo | `PerfilDeEstudo` (`calmo`, `guiado`, `leitura`) em `Preferencias.perfilDeEstudo`, com `perfilAnterior` para voltar atrás; só muda padrões da interface |
+| Encaixes do Hoje | `src/apresentacao/hoje/`: `Hoje` compõe `Retorno`, `Agora`, `RevisoesDoDia`, `Depois`, `Captura`; rotas `/sessao/*` (`RotasDaSessao`) e `/plano/{onboarding,pontos,tarefas}/*` (`RotasDoPlano`) |
+| Escolher outra coisa | Botão do bloco Agora do Hoje: dispensa o tipo de Próxima ação mostrado (`excluir`), só na tela, sem gravar; sem tipo restante cai no estado vazio com os três começos (`EstadoVazio.tsx`) |
+
+#### A2 Sessão leve (14/10/2026; sem subida de esquema)
+
+| Termo | Identificadores |
+|---|---|
+| Sessão aberta / restaurar | `restaurarSessao` (`src/dominios/sessao/servico.ts`): devolve a Sessão `ativa` ou `pausada` do dia; `SessaoAberta` (`src/apresentacao/sessao/`) é o aviso para o Hoje encaixar. Uma só Sessão aberta por vez (`iniciarSessao` devolve a existente) |
+| Interrompida | `Sessao.estado = 'interrompida'`: Sessão que ficou aberta e virou o dia; **não restaura**, sem `fim` nem `duracaoSegundos` (não se inventa tempo de estudo). Nunca mostrada como falha |
+| Rotas da Sessão | `/sessao/iniciar` (aceita `?tipo=&id=&rotulo=&origem=&razao=&tarefa=` vindos da Próxima ação), `/sessao/atual`, `/sessao/fechar` |
+| Eventos da Sessão | `sessao.iniciada`, `sessao.pausada`, `sessao.retomada`, `sessao.encerrada`, `sessao.interrompida` (payload `{ sessaoId }`) |
+| Retorno | Boas-vindas do Hoje depois de ≥ 2 dias sem atividade (`situacaoDeRetorno`, `src/dominios/dia/retorno.ts`; bloco `Retorno.tsx`). Sem dívida, sem contagem de pendências, sem "sequência quebrada"; oferece o próximo passo que a pessoa deixou; "Agora não" dispensa pelo resto do dia (`localStorage`, só a data) |
+| Fechar o Dia | `fecharDia` / `reabrirDia` / `resumoDoDia` (`src/dominios/dia/fechar.ts`; bloco `FecharDia.tsx`): grava `Dia.fechadoEm` de hoje; resumo só de contagens (Sessões, cartões e Frases revisados), nunca tempo como aprendizado; não encerra Sessão aberta; só aparece se houve algo hoje. Eventos `dia.fechado`, `dia.reaberto` (payload `{ diaId }`) |
+
+
+#### A3a Alavancas na Sessão (14/10/2026; sem subida de esquema)
+
+| Termo | Identificadores |
+|---|---|
+| Estacionar / resolver nota | `estacionar`, `resolverNota(repo, id, indice, resolvida?)`, `notasPendentes` (`src/dominios/sessao/estacionamento.ts`); UI em `src/apresentacao/sessao/alavancas/` (`Estacionamento`, `NotasDoEstacionamento` ao fechar). Texto em branco não grava; Sessão encerrada não aceita nota nova, mas a nota existente pode ser marcada |
+| Temporizador (domínio) | `definirTemporizador`, `segundosRestantes` (conta só o tempo ativo; pausa congela). Padrão: `Preferencias.temporizadorPadraoMin` vale em `iniciarSessao` quando a entrada não escolhe. Passar do tempo só mostra um aviso gentil |
+| Só estudo (UI) | `SoEstudo.tsx`: interruptor na tela da Sessão; liga `document.body.dataset.soEstudo`, e `estilos-alavancas.css` esconde áreas, Conta, botão flutuante de erro e rodapé |
+| Evento | `sessao.estacionada` (payload `{ sessaoId }`) |
+| Catálogo de concursos (B1 da F3-B) | **Catálogo** = editais por carreira, versionados no app (`corpus/catalogo/`, gerados pelo B0). **Rótulo** = "baseado no edital X de AAAA". **Faixa sugerida** = vem do edital (`faixaOrigem: edital`) ou é derivada da presença na amostra (`derivada`), sempre com a base (`faixaBase`) | `src/dominios/catalogo/`: `FonteDoCatalogo` (`listar`, `obter`), `FonteEmbutida` (import dinâmico por carreira), `IndiceDoCatalogo`, `CarreiraDoCatalogo`, `EditalDoCatalogo`, `DisciplinaConsolidada`, `CatalogoIndisponivel`, `carreirasDisponiveis`, `carreirasPendentes`, `editaisOferecidos`, `disciplinasSugeridas`, `explicarFaixa`; ponte `linhasDoEdital` em `src/integracoes/catalogo/linhas.ts` (devolve `LinhaPonto[]` para `prepararPontos`) | existe (B1) |

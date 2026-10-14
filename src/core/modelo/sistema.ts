@@ -54,6 +54,8 @@ export const TipoItem = z.enum([
   'norma',
   'dispositivo',
   'nota',
+  'frase',
+  'tarefa',
   'precedente',
   'erro',
   'cartao',
@@ -137,6 +139,9 @@ export const COTA_DIARIA_PADRAO = 10;
 export const COTA_DIARIA_MIN = 5;
 export const COTA_DIARIA_MAX = 100;
 
+export const PerfilDeEstudo = z.enum(['calmo', 'guiado', 'leitura']);
+export type PerfilDeEstudo = z.infer<typeof PerfilDeEstudo>;
+
 export const Preferencias = z.strictObject({
   ...camposComuns,
   tema: Tema,
@@ -167,6 +172,16 @@ export const Preferencias = z.strictObject({
    * registro e o pacote anteriores continuam válidos (sem migração). A fila nunca é cortada.
    */
   cotaDiaria: z.int().min(COTA_DIARIA_MIN).max(COTA_DIARIA_MAX).optional(),
+  /**
+   * Perfil de estudo (F3-A, pacote 4; v7): muda só padrões da interface, nunca é obrigatório. Opcional:
+   * ausente é "calmo". `perfilAnterior` guarda o perfil de antes para a volta atrás.
+   */
+  perfilDeEstudo: PerfilDeEstudo.optional(),
+  perfilAnterior: PerfilDeEstudo.optional(),
+  /** Modo "só estudo": esconde a administração durante a Sessão. Opcional: ausente é desligado. */
+  modoSoEstudo: z.boolean().optional(),
+  /** Temporizador padrão das Sessões (minutos); ausente = sem temporizador. Nunca bloqueia. */
+  temporizadorPadraoMin: z.int().min(1).max(240).optional(),
   horaFechamento: z
     .string()
     .regex(/^\d{2}:\d{2}$/)
