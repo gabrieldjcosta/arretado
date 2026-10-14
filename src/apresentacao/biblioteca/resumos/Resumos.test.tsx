@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FonteEmMemoria } from '../../../dominios/acervo/fonte-em-memoria';
 import { repositorioDeTeste } from '../../../testes/repositorio';
@@ -30,8 +30,15 @@ describe('Biblioteca › Resumos', () => {
     await usuario.click(screen.getByRole('button', { name: 'Editar' }));
     await usuario.type(screen.getByLabelText('Resumo'), ' inconstitucional');
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
-    expect(await screen.findByText(/inconstitucional/, {}, { timeout: 5000 })).toBeInTheDocument();
-    await usuario.click(screen.getByRole('button', { name: 'Excluir resumo' }));
+    await waitFor(
+      () => {
+        expect(screen.getByText(/inconstitucional/)).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
+    await usuario.click(
+      await screen.findByRole('button', { name: 'Excluir resumo' }, { timeout: 5000 }),
+    );
     await usuario.click(screen.getByRole('button', { name: 'Excluir' }));
     expect(
       await screen.findByText('Nenhum resumo ainda', {}, { timeout: 5000 }),
