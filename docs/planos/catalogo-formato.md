@@ -5,9 +5,10 @@ Pacote B0 da F3-B ([`f3-pacotes.md`](f3-pacotes.md)). Só documento e script: n�
 ## Fluxo
 
 1. Uma conversa do Perplexity por carreira; cada resposta traz 3 blocos CSV e "Lacunas e dúvidas".
-2. `npm run catalogo -- validar <arquivo>` aponta erros e avisos. O arquivo pode ser a resposta inteira colada (os blocos entre ``` são achados pelo cabeçalho) ou o CSV puro. `-` lê da entrada padrão.
+2. `npm run catalogo -- validar <arquivo> [<arquivo>...]` aponta erros e avisos, agrupados por regra (`--tudo` lista todos). Cada arquivo pode ser a resposta inteira colada (os blocos entre ``` são achados pelo cabeçalho) ou um CSV só; quando o Perplexity entrega um arquivo por bloco, passe os três juntos (itens, disciplinas, editais). `-` lê da entrada padrão.
 3. Erro: devolver ao Perplexity a lista de linhas e a regra, ou corrigir à mão. Aviso: olhar, não bloqueia.
-4. `npm run catalogo -- converter <arquivo>` (só roda sem erros) grava em `corpus/catalogo/`, por carreira, `<carreira>.csv` (normalizado) e `<carreira>.json` (entrada do B1). Segunda rodada de uma carreira sobrescreve; versionar no git.
+4. `npm run catalogo -- converter <arquivo...>` (só roda sem erros) grava em `corpus/catalogo/`, por carreira, `<carreira>.csv` (normalizado) e `<carreira>.json` (entrada do B1), mais `descartes/<carreira>.txt` e o `index.json`. Segunda rodada de uma carreira sobrescreve só os arquivos dela; versionar no git.
+5. **Carreira nova = rodar `converter` só com os arquivos dela.** Nada mais muda: as outras ficam como estão e o `index.json` (lista das 10 carreiras com `disponivel`, editais e itens) a inclui sozinho. `npm run catalogo -- indice` refaz o índice sem converter. Para tirar uma carreira por enquanto, apague `<carreira>.{csv,json}` e rode `indice`.
 
 ## Bloco 1: itens (obrigatório)
 
@@ -27,7 +28,7 @@ Uma linha = um item numerado do edital. Subitens (a, b, c) ficam no mesmo `assun
 | `cargo` | texto | vazio: aviso |
 | `fase` | `objetiva`, `discursiva`, `oral`, `titulos` ou vazio (normaliza "Títulos", "TÍTULOS") | erro |
 | `disciplina` | nome consagrado; geral leva prefixo `[Geral] ` (o normalizador acrescenta para Português, Informática, Raciocínio Lógico, Matemática, Atualidades, Inglês, Conhecimentos Gerais) | vazio: erro; geral sem prefixo: aviso |
-| `ordem_disciplina` | inteiro ≥ 1; uma disciplina tem uma só ordem no edital e duas disciplinas não dividem a mesma | erro; lacuna na sequência: aviso |
+| `ordem_disciplina` | inteiro ≥ 1. Edital que reinicia a numeração por bloco (gerais, depois específicas) repete ordens: não é erro | não inteiro: erro; ordem repetida entre disciplinas, disciplina com duas ordens ou lacuna: aviso |
 | `numero_item` | numeração do edital ("1", "3.2") | vazio: aviso |
 | `assunto` | obrigatório; não pode ser subitem solto ("a) ...") | vazio: erro; curto (<6) ou "a)": aviso |
 | `faixa` | `Altíssima`, `Alta`, `Média`, `Baixa` ou vazio | inválida: erro |
@@ -35,25 +36,35 @@ Uma linha = um item numerado do edital. Subitens (a, b, c) ficam no mesmo `assun
 | `recorrencia` | `N/M` com N ≤ M (ex.: 3/3) ou vazio | erro |
 | `fonte_url` | URL http(s) do edital oficial; agregadores e cursinhos (PCI, QConcursos, Estratégia, Gran, JusBrasil etc.) são recusados | ausente/inválida/agregador: erro |
 
-**NÃO LOCALIZADO:** linha do órgão com `disciplina` (ou `assunto`) = `NÃO LOCALIZADO` e **sem** `assunto`, `numero_item`, `faixa`, `obs_faixa`, `recorrencia`. Qualquer um preenchido é erro. Sem URL: aviso.
+**NÃO LOCALIZADO:** linha do órgão com `NÃO LOCALIZADO` em `assunto` (forma que o Perplexity usa: `carreira,orgao,uf,,,,,,,,NÃO LOCALIZADO,,,,`) ou em `disciplina`, e todo o resto vazio (banca, ano, cargo, URL e demais campos não são exigidos). Qualquer outro campo de conteúdo preenchido é erro.
 
-**Duplicidade (erro):** mesma linha repetida; mesmo `numero_item` na mesma disciplina do mesmo edital com assuntos diferentes. Edital = carreira + órgão + ano + cargo + fase.
+**Duplicidade:** linha idêntica repetida no mesmo edital é erro. Mesmo `numero_item` na mesma disciplina com assuntos diferentes é aviso (editais que reiniciam a numeração por seção; também denuncia trecho de texto parar em `numero_item`). `numero_item` com 5+ dígitos ou mais de 12 caracteres: aviso.
+
+**Edital** = carreira + órgão + ano + cargo + fase + `fonte_url`. Por isso duas edições do mesmo ano (ex.: ENAM 2026, 1ª e 2ª) ficam separadas, e `fonte_url` deve ser a mesma em todas as linhas de um edital.
 
 ## Bloco 2: disciplinas consolidadas (opcional)
 
 `carreira,disciplina_normalizada,variantes_de_nome,presente_em_n_editais,total_editais,faixa_sugerida`
 
-Erro: carreira fora da lista, `presente_em_n_editais` > `total_editais` ou não inteiro, `faixa_sugerida` inválida, disciplina repetida. Aviso: disciplina que não existe no bloco 1 (e vice-versa).
+Erro: carreira fora da lista, `presente_em_n_editais` > `total_editais` ou não inteiro, `faixa_sugerida` inválida, disciplina repetida. Aviso: disciplina do bloco 1 sem par aqui (e vice-versa). O par se faz sem acento/caixa, pelo nome normalizado ou por qualquer uma das `variantes_de_nome` separadas por "; " (o Perplexity costuma deixar o nome original em caixa alta no bloco 1).
 
 ## Bloco 3: editais usados (opcional)
 
-`orgao,ano,banca,url,situação` (o validador aceita "situacao" sem acento). `situação` ∈ `completo`, `parcial`, `NÃO LOCALIZADO`.
+`orgao,ano,banca,url,situação` (o validador aceita "situacao" sem acento). `situação` ∈ `completo`, `parcial`, `NÃO LOCALIZADO`; em NÃO LOCALIZADO, ano, banca e url ficam vazios.
 
-Erro: situação inválida, edital que não é NÃO LOCALIZADO sem `url`, edital NÃO LOCALIZADO que tem assuntos no bloco 1. Aviso: edital do bloco 1 ausente da lista.
+Erro: situação inválida, edital que não é NÃO LOCALIZADO sem `url` ou sem ano, edital NÃO LOCALIZADO que tem assuntos no bloco 1. Aviso: edital do bloco 1 ausente da lista, ou "completo" sem assuntos no bloco 1.
+
+## Descarte (feito no `converter`)
+
+Não entram no catálogo, e ficam listadas em `descartes/<carreira>.txt` para conferência: linha com `assunto` fragmento (menos de 6 caracteres, ex.: "Nº", "SOLUT") e linha com `numero_item` que não é numeração (5+ dígitos ou mais de 12 caracteres: CNPJ, carimbo de assinatura digital do PDF). Linhas NÃO LOCALIZADO ficam.
+
+## Faixa das disciplinas (feita no `converter`)
+
+`faixa` dos itens segue como veio (vazia sem base). `faixaSugerida` da disciplina, quando o Perplexity não preencheu, é derivada da presença nos editais da amostra, pela mesma regra que ele declarou na Magistratura: ≥85% Altíssima, ≥65% Alta, ≥35% Média, abaixo disso Baixa. Com menos de 3 editais na amostra não há base e fica vazia. O JSON marca `faixaOrigem` (`edital` ou `derivada`) e `faixaBase` ("presente em N de M editais"); a interface deve dizer que é sugestão pela amostra.
 
 ## Normalização (feita no `converter`)
 
-Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma canônica; `uf` em maiúsculas; `recorrencia` sem espaços ("3 / 3" → "3/3"); prefixo `[Geral] ` nas disciplinas gerais; "não localizado" → `NÃO LOCALIZADO`. Idempotente: rodar sobre o CSV já normalizado dá o mesmo arquivo.
+Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma canônica; `uf` em maiúsculas (`DFT` → `DF`); `recorrencia` sem espaços ("3 / 3" → "3/3"); prefixo `[Geral] ` nas disciplinas gerais; "não localizado" → `NÃO LOCALIZADO`. Idempotente: rodar sobre o CSV já normalizado dá o mesmo arquivo.
 
 ## Carreiras e arquivos
 
@@ -74,13 +85,13 @@ Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma
 
 ```
 { versao: 1, carreira, slug,
-  editais: [{ id, orgao, uf, banca, ano, cargo, fase|null, situacao, fonteUrl,
-              rotulo: "baseado no edital <orgao> de <ano>",
-              disciplinas: [{ nome, ordem, itens: [{ numero|null, assunto, faixa|null, obsFaixa|null, recorrencia|null, fonteUrl }] }] }],
-  disciplinas: [{ nome, variantes[], presenteEm, totalEditais, faixaSugerida|null }] }
+  editais: [{ id, orgao, uf, banca|null, ano|null, cargo|null, fase|null, situacao, fonteUrl|null,
+              rotulo: "baseado no edital <orgao> de <ano>" | null,
+              disciplinas: [{ nome (consolidado, quando há), nomeNoEdital, ordem, itens: [{ numero|null, assunto, faixa|null, obsFaixa|null, recorrencia|null, fonteUrl }] }] }],
+  disciplinas: [{ nome, variantes[], presenteEm, totalEditais, faixaSugerida|null, faixaOrigem|null, faixaBase|null }] }
 ```
 
-Sem data nem campo aleatório: a mesma entrada gera o mesmo arquivo. A faixa vem do edital e é só sugestão; o app não a mostra como verdade no onboarding ("Altíssima" fora do onboarding, conforme `f3-pacotes.md`). Edital NÃO LOCALIZADO aparece com `disciplinas: []`.
+Sem data nem campo aleatório: a mesma entrada gera o mesmo arquivo. A faixa vem do edital e é só sugestão; o app não a mostra como verdade no onboarding ("Altíssima" fora do onboarding, conforme `f3-pacotes.md`). Edital NÃO LOCALIZADO aparece com `disciplinas: []`, `ano: null` e `rotulo: null` (o app não o oferece). Ids repetidos ganham sufixo `-2`, `-3`.
 
 ## Limites conhecidos
 

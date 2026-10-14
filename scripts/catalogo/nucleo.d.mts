@@ -18,14 +18,14 @@ export type Edital = {
   id: string;
   orgao: string;
   uf: string;
-  banca: string;
-  ano: number;
-  cargo: string;
+  banca: string | null;
+  ano: number | null;
+  cargo: string | null;
   fase: string | null;
   situacao: string;
-  fonteUrl: string;
-  rotulo: string;
-  disciplinas: { nome: string; ordem: number; itens: Item[] }[];
+  fonteUrl: string | null;
+  rotulo: string | null;
+  disciplinas: { nome: string; nomeNoEdital: string; ordem: number; itens: Item[] }[];
 };
 export type CatalogoDaCarreira = {
   versao: 1;
@@ -38,6 +38,8 @@ export type CatalogoDaCarreira = {
     presenteEm: number;
     totalEditais: number;
     faixaSugerida: string | null;
+    faixaOrigem: 'edital' | 'derivada' | null;
+    faixaBase: string | null;
   }[];
 };
 export const CABECALHO_PRINCIPAL: string[];
@@ -53,8 +55,14 @@ export function escreverCsv(linhas: string[][]): string;
 export function separarBlocos(texto: string): Blocos;
 export function carreiraCanonica(v: string): { nome: string; slug: string } | null;
 export function normalizarLinha(l: string[]): string[];
+export function mapaDisciplinas(consolidadas: Linha[] | null): Map<string, string>;
 export function validarPrincipal(linhas: Linha[]): Achado[];
 export function validarComplementares(b: Blocos): Achado[];
 export function converter(b: Blocos, carreiraNome: string): CatalogoDaCarreira;
 export function csvNormalizado(principal: Linha[]): string;
 export function carreirasDoPrincipal(principal: Linha[]): string[];
+export function faixaDerivada(presente: number, total: number): string | null;
+export function descartar(principal: Linha[]): {
+  mantidas: Linha[];
+  descartadas: (Linha & { motivo: string })[];
+};

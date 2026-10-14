@@ -4,6 +4,8 @@ import {
   CABECALHO_EDITAIS,
   CABECALHO_PRINCIPAL,
   converter,
+  descartar,
+  faixaDerivada,
   csvNormalizado,
   lerCsv,
   separarBlocos,
@@ -34,6 +36,10 @@ const linha = (o: Record<string, string> = {}) => {
   return CABECALHO_PRINCIPAL.map((c) => ({ ...base, ...o })[c]).join(',');
 };
 const ler = (...ls: string[]) => separarBlocos([CAB, ...ls].join('\n'));
+const avisos = (ls: string[]) =>
+  validarPrincipal(ler(...ls).principal!)
+    .filter((x) => x.nivel === 'aviso')
+    .map((x) => x.regra);
 const regras = (ls: string[]) =>
   validarPrincipal(ler(...ls).principal!)
     .filter((x) => x.nivel === 'erro')
@@ -110,13 +116,50 @@ describe('catálogo: validação do bloco principal', () => {
     expect(regras([l])).toEqual([]);
   });
 
-  it('pega duplicata, ordem repetida, item com dois assuntos e banca divergente', () => {
+  it('pega duplicata e banca divergente (erro); ordem e item repetidos só avisam', () => {
     expect(regras([linha(), linha()])).toContain('duplicata');
-    expect(regras([linha(), linha({ disciplina: 'Direito Civil', numero_item: '2' })])).toContain(
-      'ordem',
-    );
-    expect(regras([linha(), linha({ assunto: 'Outro assunto qualquer' })])).toContain('item');
     expect(regras([linha(), linha({ numero_item: '2', banca: 'FGV' })])).toContain('banca');
+    const reinicio = [linha(), linha({ disciplina: 'Direito Civil', numero_item: '2' })];
+    expect(regras(reinicio)).toEqual([]);
+    expect(avisos(reinicio)).toContain('ordem');
+    const item = [linha(), linha({ assunto: 'Outro assunto qualquer' })];
+    expect(regras(item)).toEqual([]);
+    expect(avisos(item)).toContain('item');
+  });
+
+  it('duas edições do mesmo ano (fonte_url diferente) não são duplicata', () => {
+    const outra = linha({ fonte_url: 'https://www.fcc.org.br/edital-2.pdf' });
+    expect(regras([linha(), outra])).toEqual([]);
+  });
+
+  it('NÃO LOCALIZADO aceito em assunto ou disciplina, com o resto vazio (inclusive ano e cargo)', () => {
+    const vazio = (o: Record<string, string>) =>
+      linha({
+        banca: '',
+        ano_edital: '',
+        cargo: '',
+        fase: '',
+        disciplina: '',
+        ordem_disciplina: '',
+        numero_item: '',
+        assunto: '',
+        recorrencia: '',
+        fonte_url: '',
+        ...o,
+      });
+    expect(regras([vazio({ assunto: 'NÃO LOCALIZADO' })])).toEqual([]);
+    expect(regras([vazio({ disciplina: 'NÃO LOCALIZADO' })])).toEqual([]);
+    expect(regras([vazio({ assunto: 'NÃO LOCALIZADO', numero_item: '1' })])).toContain(
+      'nao_localizado',
+    );
+  });
+
+  it('avisa numero_item implausível (trecho de texto no lugar do número)', () => {
+    expect(avisos([linha({ numero_item: '19421427000191' })])).toContain('numero_item');
+  });
+
+  it('UF DFT vira DF', () => {
+    expect(regras([linha({ uf: 'DFT' })])).toEqual([]);
   });
 
   it('linha com vírgula sem aspas vira erro de colunas', () => {
@@ -203,6 +246,97 @@ describe('catálogo: normalização e conversão', () => {
       obsFaixa: '12 de 60 questões',
     });
     expect(ba?.situacao).toBe('NÃO LOCALIZADO');
+  });
+});
+
+describe('catálogo: disciplinas consolidadas', () => {
+  it('une o nome original do edital ao nome consolidado pelas variantes', () => {
+    const b = separarBlocos(
+      [
+        '```',
+        CAB,
+        linha({ disciplina: 'DIREITO PENAL – PARTE GERAL' }),
+        '```',
+        '```',
+        CABECALHO_CONSOLIDADAS.join(','),
+        'Defensoria Pública,Direito Penal,DIREITO PENAL – PARTE GERAL; DIREITO PENAL,1,1,',
+        '```',
+      ].join('\n'),
+    );
+    expect(validarComplementares(b)).toEqual([]);
+    const d = converter(b, 'Defensoria Pública').editais[0]?.disciplinas[0];
+    expect(d).toMatchObject({ nome: 'Direito Penal', nomeNoEdital: 'DIREITO PENAL – PARTE GERAL' });
+  });
+
+  it('separa duas edições do mesmo ano no JSON', () => {
+    const b = ler(linha(), linha({ fonte_url: 'https://www.fcc.org.br/edital-2.pdf' }));
+    const j = converter(b, 'Defensoria Pública');
+    expect(j.editais.map((e) => e.id)).toEqual([
+      'dpe-sp-2024-defensor-publico-objetiva',
+      'dpe-sp-2024-defensor-publico-objetiva-2',
+    ]);
+  });
+});
+
+describe('catálogo: descarte e faixa derivada', () => {
+  it('descarta assunto fragmento e numero_item que não é numeração; mantém o resto e as linhas NÃO LOCALIZADO', () => {
+    const b = ler(
+      linha(),
+      linha({ numero_item: '2', assunto: 'Nº' }),
+      linha({ numero_item: '19421427000191', assunto: 'Razão: Eu sou o autor deste documento' }),
+      linha({
+        orgao: 'DPE-BA',
+        ano_edital: '',
+        assunto: 'NÃO LOCALIZADO',
+        disciplina: '',
+        numero_item: '',
+        ordem_disciplina: '',
+        recorrencia: '',
+        fonte_url: '',
+        banca: '',
+        cargo: '',
+        fase: '',
+      }),
+    );
+    const { mantidas, descartadas } = descartar(b.principal!);
+    expect(mantidas).toHaveLength(2);
+    expect(descartadas.map((d) => d.motivo)).toEqual([
+      'assunto fragmento',
+      'numero_item implausível',
+    ]);
+  });
+
+  it.each([
+    [17, 17, 'Altíssima'],
+    [14, 17, 'Alta'],
+    [7, 13, 'Média'],
+    [1, 17, 'Baixa'],
+    [1, 2, null],
+  ])('faixaDerivada(%i de %i) = %s', (p, t, esperado) => {
+    expect(faixaDerivada(p, t)).toBe(esperado);
+  });
+
+  it('converter preenche faixa_sugerida vazia pela presença, marcando a origem', () => {
+    const b = separarBlocos(
+      [
+        '```',
+        CAB,
+        linha(),
+        '```',
+        '```',
+        CABECALHO_CONSOLIDADAS.join(','),
+        'Defensoria Pública,Direito Penal,,10,13,',
+        'Defensoria Pública,Direito Civil,,10,13,Média',
+        '```',
+      ].join('\n'),
+    );
+    const [penal, civil] = converter(b, 'Defensoria Pública').disciplinas;
+    expect(penal).toMatchObject({
+      faixaSugerida: 'Alta',
+      faixaOrigem: 'derivada',
+      faixaBase: 'presente em 10 de 13 editais',
+    });
+    expect(civil).toMatchObject({ faixaSugerida: 'Média', faixaOrigem: 'edital' });
   });
 });
 

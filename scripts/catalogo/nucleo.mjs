@@ -142,7 +142,7 @@ export function separarBlocos(texto) {
       erros.push(`bloco "${tipo}" aparece mais de uma vez; juntar ou rodar um por vez`);
     else saida[tipo] = linhas.slice(1).map((l, i) => ({ l, n: i + 2 }));
   }
-  if (!saida.principal && !erros.length)
+  if (!saida.principal && !saida.consolidadas && !saida.editais && !erros.length)
     erros.push(
       `nenhum bloco com o cabeçalho principal (${CABECALHO_PRINCIPAL.join(',')}); cabeçalho é contrato`,
     );
@@ -198,7 +198,7 @@ export function normalizarLinha(l) {
   return [
     carreiraCanonica(carreira)?.nome ?? carreira,
     orgao,
-    uf.toUpperCase(),
+    { DFT: 'DF' }[uf.toUpperCase()] ?? uf.toUpperCase(),
     banca,
     ano,
     cargo,
@@ -225,6 +225,13 @@ export function validarPrincipal(linhas) {
   const e = (n, regra, msg) => ach.push({ nivel: 'erro', linha: n, regra, msg });
   const a = (n, regra, msg) => ach.push({ nivel: 'aviso', linha: n, regra, msg });
   const vistos = new Map();
+  const emitidos = new Set(); // avisos por edital saem uma vez só
+  const uma = (chave, fn) => {
+    if (!emitidos.has(chave)) {
+      emitidos.add(chave);
+      fn();
+    }
+  };
   const edital = new Map(); // chave do edital → { banca, disciplinas: Map(disc → ordem) , ordens: Map(ordem → disc) }
   const itens = new Map(); // edital|disc|numero → assunto
   for (const { l, n } of linhas) {
@@ -254,6 +261,22 @@ export function validarPrincipal(linhas) {
       url,
     ] = normalizarLinha(l);
     const nl = ehNaoLocalizado(disc) || ehNaoLocalizado(assunto);
+    if (nl) {
+      // Linha do órgão sem edital: o Perplexity grava NÃO LOCALIZADO em disciplina ou em assunto; o resto fica vazio.
+      if (!carreiraCanonica(carreira)) e(n, 'carreira', `carreira "${carreira}" fora da lista`);
+      if (!orgao) e(n, 'orgao', 'órgão vazio');
+      if (uf && !UFS.has(uf)) e(n, 'uf', `UF "${uf}" inválida (sigla de 2 letras ou BR)`);
+      for (const [campo, v] of [
+        ['disciplina', ehNaoLocalizado(disc) ? '' : disc],
+        ['assunto', ehNaoLocalizado(assunto) ? '' : assunto],
+        ['numero_item', num],
+        ['faixa', faixa],
+        ['obs_faixa', obs],
+        ['recorrencia', rec],
+      ])
+        if (v) e(n, 'nao_localizado', `linha NÃO LOCALIZADO não pode ter ${campo} ("${v}")`);
+      continue;
+    }
 
     if (!carreiraCanonica(carreira))
       e(
@@ -270,34 +293,23 @@ export function validarPrincipal(linhas) {
     const anoN = Number(ano);
     if (!/^\d{4}$/.test(ano) || anoN < 2015 || anoN > 2027)
       e(n, 'ano', `ano_edital "${ano}" inválido (AAAA entre 2015 e 2027)`);
-    else if (anoN < 2023) a(n, 'ano', `edital de ${anoN}: fora da janela preferida (2023 a 2026)`);
+    else if (anoN < 2023)
+      uma(`ano|${orgao}|${ano}`, () =>
+        a(n, 'ano', `${orgao}: edital de ${anoN}, fora da janela preferida (2023 a 2026)`),
+      );
     if (!cargo) a(n, 'cargo', 'cargo vazio');
     if (fase && !FASES.includes(fase))
       e(n, 'fase', `fase "${fase}" inválida (${FASES.join(', ')} ou vazio)`);
     if (!disc) e(n, 'disciplina', 'disciplina vazia');
-    if (disc && !nl && !disc.startsWith(PREFIXO_GERAL) && GERAIS.test(disc))
+    if (disc && !disc.startsWith(PREFIXO_GERAL) && GERAIS.test(disc))
       a(n, 'geral', `disciplina geral sem prefixo "${PREFIXO_GERAL}"`);
 
     if (!/^https?:\/\/[^\s/]+\.[^\s/]+/i.test(url)) {
-      nl
-        ? a(n, 'fonte_url', 'NÃO LOCALIZADO sem URL')
-        : e(n, 'fonte_url', `fonte_url ausente ou inválida: "${url}"`);
+      e(n, 'fonte_url', `fonte_url ausente ou inválida: "${url}"`);
     } else {
       const host = new URL(url).host;
       if (FONTES_PROIBIDAS.test(host + '.'))
         e(n, 'fonte_url', `fonte não oficial (${host}); só edital oficial`);
-    }
-
-    if (nl) {
-      for (const [campo, v] of [
-        ['assunto', assunto && !ehNaoLocalizado(assunto) ? assunto : ''],
-        ['numero_item', num],
-        ['faixa', faixa],
-        ['obs_faixa', obs],
-        ['recorrencia', rec],
-      ])
-        if (v) e(n, 'nao_localizado', `linha NÃO LOCALIZADO não pode ter ${campo} ("${v}")`);
-      continue;
     }
 
     if (!assunto) e(n, 'assunto', 'assunto vazio');
@@ -313,6 +325,14 @@ export function validarPrincipal(linhas) {
     if (!/^\d+$/.test(ordem) || Number(ordem) < 1)
       e(n, 'ordem', `ordem_disciplina "${ordem}" deve ser inteiro ≥ 1`);
     if (!num) a(n, 'numero_item', 'numero_item vazio (o edital numera o item?)');
+    else if (numeroImplausivel(num))
+      uma(`num|${orgao}|${ano}|${num}`, () =>
+        a(
+          n,
+          'numero_item',
+          `${orgao} ${ano}: numero_item implausível "${num}" (trecho do texto virou número?)`,
+        ),
+      );
 
     if (faixa && !FAIXAS.includes(faixa))
       e(n, 'faixa', `faixa "${faixa}" inválida (${FAIXAS.join(', ')} ou vazio)`);
@@ -327,20 +347,24 @@ export function validarPrincipal(linhas) {
         e(n, 'recorrencia', `recorrencia "${rec}" incoerente`);
     }
 
-    const chaveEd = [carreira, orgao, ano, cargo, fase].join('|');
+    const chaveEd = [carreira, orgao, ano, cargo, fase, url].join('|');
     let ed = edital.get(chaveEd);
     if (!ed) edital.set(chaveEd, (ed = { banca, disc: new Map(), ordens: new Map(), linha: n }));
     if (ed.banca !== banca)
       e(n, 'banca', `banca "${banca}" difere de "${ed.banca}" no mesmo edital (${orgao} ${ano})`);
     if (/^\d+$/.test(ordem)) {
       if (ed.disc.has(disc) && ed.disc.get(disc) !== ordem)
-        e(n, 'ordem', `"${disc}" com ordem ${ordem} e ${ed.disc.get(disc)} no mesmo edital`);
+        uma(`o2|${chaveEd}|${disc}`, () =>
+          a(n, 'ordem', `${orgao} ${ano}: "${disc}" com ordem ${ordem} e ${ed.disc.get(disc)}`),
+        );
       else ed.disc.set(disc, ordem);
       if (ed.ordens.has(ordem) && ed.ordens.get(ordem) !== disc)
-        e(
-          n,
-          'ordem',
-          `ordem ${ordem} usada por "${ed.ordens.get(ordem)}" e "${disc}" no mesmo edital`,
+        uma(`o1|${chaveEd}`, () =>
+          a(
+            n,
+            'ordem',
+            `${orgao} ${ano}: ordem ${ordem} usada por "${ed.ordens.get(ordem)}" e "${disc}" (numeração reinicia por bloco?)`,
+          ),
         );
       else ed.ordens.set(ordem, disc);
     }
@@ -351,7 +375,13 @@ export function validarPrincipal(linhas) {
     if (num) {
       const chaveItem = [chaveEd, disc, num].join('|');
       if (itens.has(chaveItem) && itens.get(chaveItem) !== assunto)
-        e(n, 'item', `item ${num} de "${disc}" com dois assuntos diferentes no mesmo edital`);
+        uma(`it|${chaveEd}|${disc}`, () =>
+          a(
+            n,
+            'item',
+            `${orgao} ${ano}: item ${num} de "${disc}" repetido com outro assunto (numeração reinicia por seção?)`,
+          ),
+        );
       else itens.set(chaveItem, assunto);
     }
   }
@@ -367,19 +397,41 @@ export function validarPrincipal(linhas) {
   return ach;
 }
 
+const chaveDisc = (v) =>
+  semAcento(v.replace(/^\[\s*geral\s*\]\s*/i, ''))
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+/** Número de item que é trecho de texto ou documento (ex.: CNPJ), não numeração de edital. */
+const numeroImplausivel = (num) => /^\d{5,}$/.test(num) || num.length > 12;
+const ehLinhaNl = (l) => ehNaoLocalizado(l[7]) || ehNaoLocalizado(l[10]);
+const linhasValidas = (bloco, n) => (bloco ?? []).filter(({ l }) => l.length === n);
+
+/**
+ * Nome da disciplina no edital → disciplina_normalizada (bloco 2), pelo nome normalizado ou por uma das variantes.
+ * O Perplexity costuma deixar o nome original (caixa alta) em `disciplina`; este mapa une tudo sob o nome consolidado.
+ */
+export function mapaDisciplinas(consolidadas) {
+  const m = new Map();
+  for (const { l } of linhasValidas(consolidadas, CABECALHO_CONSOLIDADAS.length)) {
+    const car = carreiraCanonica(l[0])?.nome ?? limpar(l[0]);
+    const norm = limpar(l[1]);
+    for (const nome of [norm, ...limpar(l[2]).split(/\s*;\s*/)])
+      if (nome && !m.has(`${car}|${chaveDisc(nome)}`)) m.set(`${car}|${chaveDisc(nome)}`, norm);
+  }
+  return m;
+}
+
 /** Bloco 2 (consolidadas) e bloco 3 (editais usados), cruzados com o principal. Só avisos, exceto campos inválidos. */
 export function validarComplementares({ principal, consolidadas, editais }) {
   const ach = [];
-  const e = (n, regra, msg) => ach.push({ nivel: 'erro', linha: n, regra, msg, bloco: undefined });
+  const e = (n, regra, msg) => ach.push({ nivel: 'erro', linha: n, regra, msg });
   const a = (n, regra, msg) => ach.push({ nivel: 'aviso', linha: n, regra, msg });
-  const p = principal
-    .filter(({ l }) => l.length === CABECALHO_PRINCIPAL.length)
-    .map(({ l }) => normalizarLinha(l));
-  const discPrincipal = new Set(
-    p.filter((l) => !ehNaoLocalizado(l[7])).map((l) => `${l[0]}|${l[7]}`),
-  );
+  const p = linhasValidas(principal, CABECALHO_PRINCIPAL.length).map(({ l }) => normalizarLinha(l));
+  const reais = p.filter((l) => !ehLinhaNl(l));
   if (consolidadas) {
+    const mapa = mapaDisciplinas(consolidadas);
     const vistas = new Set();
+    const usadas = new Set();
     for (const { l, n } of consolidadas) {
       if (l.length !== CABECALHO_CONSOLIDADAS.length) {
         e(n, 'consolidadas', `${l.length} colunas, esperado ${CABECALHO_CONSOLIDADAS.length}`);
@@ -392,31 +444,25 @@ export function validarComplementares({ principal, consolidadas, editais }) {
         e(n, 'consolidadas', `presente_em_n_editais/total_editais incoerentes: ${pres}/${tot}`);
       if (faixa && !faixaCanonica(faixa))
         e(n, 'consolidadas', `faixa_sugerida "${faixa}" inválida`);
-      const k = `${c?.nome ?? car}|${disc}`;
+      const k = `${c?.nome ?? car}|${chaveDisc(disc)}`;
       if (vistas.has(k)) e(n, 'consolidadas', `disciplina "${disc}" repetida`);
       vistas.add(k);
-      if (
-        c &&
-        !discPrincipal.has(k) &&
-        !discPrincipal.has(`${c.nome}|${PREFIXO_GERAL}${disc.replace(/^\[\s*geral\s*\]\s*/i, '')}`)
-      )
-        a(n, 'consolidadas', `"${disc}" não aparece no bloco principal`);
     }
-    const consol = new Set(
-      consolidadas
-        .filter(({ l }) => l.length === CABECALHO_CONSOLIDADAS.length)
-        .map(({ l }) => `${carreiraCanonica(l[0])?.nome ?? limpar(l[0])}|${limpar(l[1])}`),
-    );
-    for (const k of discPrincipal)
-      if (!consol.has(k) && !consol.has(k.replace(PREFIXO_GERAL, '')))
-        a(
-          0,
-          'consolidadas',
-          `disciplina "${k.split('|')[1]}" do principal ausente nas consolidadas`,
-        );
+    const semPar = new Set();
+    for (const l of reais) {
+      const alvo = mapa.get(`${l[0]}|${chaveDisc(l[7])}`);
+      if (alvo) usadas.add(`${l[0]}|${chaveDisc(alvo)}`);
+      else semPar.add(`${l[0]}|${l[7]}`);
+    }
+    for (const k of semPar)
+      a(0, 'consolidadas', `disciplina "${k.split('|')[1]}" do principal sem par nas consolidadas`);
+    for (const k of vistas)
+      if (!usadas.has(k))
+        a(0, 'consolidadas', `consolidada "${k.split('|')[1]}" não aparece no bloco principal`);
   }
   if (editais) {
     const usados = new Set();
+    const comAssunto = new Set(reais.map((x) => `${x[1]}|${x[4]}`));
     for (const { l, n } of editais) {
       if (l.length !== CABECALHO_EDITAIS.length) {
         e(n, 'editais', `${l.length} colunas, esperado ${CABECALHO_EDITAIS.length}`);
@@ -424,18 +470,17 @@ export function validarComplementares({ principal, consolidadas, editais }) {
       }
       const [orgao, ano, , url, sit] = l.map(limpar);
       const s = situacaoCanonica(sit);
+      const nl = s === 'NÃO LOCALIZADO';
       if (!s) e(n, 'editais', `situação "${sit}" inválida (${SITUACOES.join(', ')})`);
-      if (s !== 'NÃO LOCALIZADO' && !/^https?:\/\//i.test(url))
-        e(n, 'editais', `edital "${orgao} ${ano}" sem url`);
-      if (!/^\d{4}$/.test(ano)) e(n, 'editais', `ano "${ano}" inválido`);
+      if (!nl && !/^https?:\/\//i.test(url)) e(n, 'editais', `edital "${orgao} ${ano}" sem url`);
+      if (!nl && !/^\d{4}$/.test(ano)) e(n, 'editais', `ano "${ano}" inválido`);
       usados.add(`${orgao}|${ano}`);
-      if (
-        s === 'NÃO LOCALIZADO' &&
-        p.some((x) => x[1] === orgao && x[4] === ano && !ehNaoLocalizado(x[7]))
-      )
+      if (nl && comAssunto.has(`${orgao}|${ano}`))
         e(n, 'editais', `${orgao} ${ano} está NÃO LOCALIZADO mas tem assuntos no bloco principal`);
+      if (s === 'completo' && !comAssunto.has(`${orgao}|${ano}`))
+        a(n, 'editais', `${orgao} ${ano} está "completo" mas não tem assuntos no bloco principal`);
     }
-    for (const k of new Set(p.map((x) => `${x[1]}|${x[4]}`)))
+    for (const k of comAssunto)
       if (!usados.has(k))
         a(
           0,
@@ -453,44 +498,98 @@ const slug = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-/** JSON por carreira, camelCase, pronto para o B1 (rótulo "baseado no edital X de AAAA" = orgao + ano). */
+/**
+ * Faixa sugerida de uma disciplina pela presença nos editais da amostra (mesma regra que o Perplexity declarou
+ * na Magistratura): ≥85% Altíssima, ≥65% Alta, ≥35% Média, abaixo disso Baixa. Com menos de 3 editais não há base.
+ */
+export function faixaDerivada(presente, total) {
+  if (!(total >= 3) || presente < 0 || presente > total) return null;
+  const r = presente / total;
+  return r >= 0.85 ? 'Altíssima' : r >= 0.65 ? 'Alta' : r >= 0.35 ? 'Média' : 'Baixa';
+}
+
+/**
+ * Separa as linhas que não entram no catálogo: assunto que virou fragmento (< 6 caracteres) ou número de item
+ * que não é numeração (ex.: CNPJ). Linhas NÃO LOCALIZADO ficam. Devolve as mantidas e as descartadas com o motivo.
+ */
+export function descartar(principal) {
+  const mantidas = [];
+  const descartadas = [];
+  for (const x of principal) {
+    if (x.l.length !== CABECALHO_PRINCIPAL.length) {
+      mantidas.push(x);
+      continue;
+    }
+    const l = normalizarLinha(x.l);
+    if (ehLinhaNl(l)) mantidas.push(x);
+    else if (l[10].length < 6) descartadas.push({ ...x, motivo: 'assunto fragmento' });
+    else if (l[9] && numeroImplausivel(l[9]))
+      descartadas.push({ ...x, motivo: 'numero_item implausível' });
+    else mantidas.push(x);
+  }
+  return { mantidas, descartadas };
+}
+
+function faixaDaDisciplina(l) {
+  const declarada = faixaCanonica(l[5]);
+  const derivada = declarada ? null : faixaDerivada(Number(l[3]), Number(l[4]));
+  return {
+    faixaSugerida: declarada ?? derivada,
+    faixaOrigem: declarada ? 'edital' : derivada ? 'derivada' : null,
+    faixaBase: declarada || derivada ? `presente em ${l[3]} de ${l[4]} editais` : null,
+  };
+}
+
+/**
+ * JSON por carreira, camelCase, pronto para o B1 (rótulo "baseado no edital X de AAAA" = orgao + ano).
+ * Edital = órgão + ano + cargo + fase + fonte_url (duas edições do mesmo ano, como o ENAM, ficam separadas).
+ * Disciplinas saem com o nome consolidado (bloco 2), quando existe; `nomeNoEdital` guarda o original.
+ */
 export function converter({ principal, consolidadas, editais }, carreiraNome) {
   const c = carreiraCanonica(carreiraNome);
-  const linhas = principal
-    .filter(({ l }) => l.length === CABECALHO_PRINCIPAL.length)
+  const situacoes = new Map(
+    linhasValidas(editais, CABECALHO_EDITAIS.length).map(({ l }) => [
+      `${limpar(l[0])}|${limpar(l[1])}`,
+      situacaoCanonica(l[4]),
+    ]),
+  );
+  const mapa = mapaDisciplinas(consolidadas);
+  const linhas = linhasValidas(principal, CABECALHO_PRINCIPAL.length)
     .map(({ l }) => normalizarLinha(l))
     .filter((l) => l[0] === c.nome);
-  const situacoes = new Map(
-    (editais ?? [])
-      .filter(({ l }) => l.length === CABECALHO_EDITAIS.length)
-      .map(({ l }) => [`${limpar(l[0])}|${limpar(l[1])}`, situacaoCanonica(l[4])]),
-  );
   const eds = new Map();
+  const ids = new Set();
   for (const l of linhas) {
     const [, orgao, uf, banca, ano, cargo, fase, disc, ordem, num, assunto, faixa, obs, rec, url] =
       l;
-    const id = slug(`${orgao}-${ano}-${cargo}-${fase}`);
-    if (!eds.has(id))
-      eds.set(id, {
+    const nl = ehLinhaNl(l);
+    const chave = nl ? `nl|${orgao}` : [orgao, ano, cargo, fase, url].join('|');
+    if (!eds.has(chave)) {
+      let id = slug(nl ? `${orgao}-nao-localizado` : `${orgao}-${ano}-${cargo}-${fase}`);
+      for (let i = 2; ids.has(id); i++) id = `${id.replace(/-\d+$/, '')}-${i}`;
+      ids.add(id);
+      eds.set(chave, {
         id,
         orgao,
         uf,
-        banca,
-        ano: Number(ano),
-        cargo,
+        banca: banca || null,
+        ano: nl ? null : Number(ano),
+        cargo: cargo || null,
         fase: fase || null,
-        situacao: ehNaoLocalizado(disc)
-          ? 'NÃO LOCALIZADO'
-          : (situacoes.get(`${orgao}|${ano}`) ?? 'completo'),
-        fonteUrl: url,
-        rotulo: `baseado no edital ${orgao} de ${ano}`,
+        situacao: nl ? 'NÃO LOCALIZADO' : (situacoes.get(`${orgao}|${ano}`) ?? 'completo'),
+        fonteUrl: url || null,
+        rotulo: nl ? null : `baseado no edital ${orgao} de ${ano}`,
         disciplinas: new Map(),
       });
-    if (ehNaoLocalizado(disc)) continue;
-    const ed = eds.get(id);
-    if (!ed.disciplinas.has(disc))
-      ed.disciplinas.set(disc, { nome: disc, ordem: Number(ordem), itens: [] });
-    ed.disciplinas.get(disc).itens.push({
+    }
+    if (nl) continue;
+    const ed = eds.get(chave);
+    const nome = mapa.get(`${c.nome}|${chaveDisc(disc)}`) ?? disc;
+    if (!ed.disciplinas.has(nome))
+      ed.disciplinas.set(nome, { nome, nomeNoEdital: disc, ordem: Number(ordem), itens: [] });
+    const d = ed.disciplinas.get(nome);
+    d.ordem = Math.min(d.ordem, Number(ordem));
+    d.itens.push({
       numero: num || null,
       assunto,
       faixa: faixa || null,
@@ -507,17 +606,14 @@ export function converter({ principal, consolidadas, editais }, carreiraNome) {
       ...ed,
       disciplinas: [...ed.disciplinas.values()].sort((x, y) => x.ordem - y.ordem),
     })),
-    disciplinas: (consolidadas ?? [])
-      .filter(
-        ({ l }) =>
-          l.length === CABECALHO_CONSOLIDADAS.length && carreiraCanonica(l[0])?.nome === c.nome,
-      )
+    disciplinas: linhasValidas(consolidadas, CABECALHO_CONSOLIDADAS.length)
+      .filter(({ l }) => carreiraCanonica(l[0])?.nome === c.nome)
       .map(({ l }) => ({
         nome: limpar(l[1]),
-        variantes: limpar(l[2]) ? limpar(l[2]).split(/\s*[;|]\s*/) : [],
+        variantes: limpar(l[2]) ? limpar(l[2]).split(/\s*;\s*/) : [],
         presenteEm: Number(l[3]),
         totalEditais: Number(l[4]),
-        faixaSugerida: faixaCanonica(l[5]) ?? null,
+        ...faixaDaDisciplina(l),
       })),
   };
 }

@@ -1,0 +1,7 @@
+Lacunas e dúvidas
+- Foram usados 17 editais oficiais com programa integral: três edições do ENAM, oito TJs e cinco TRFs (com duas edições do TRF5).
+- NÃO LOCALIZADO nesta rodada: órgãos sem edital integral efetivamente aberto e extraído. Nenhum assunto foi completado por memória.
+- A exigência de até três editais por órgão não pôde ser satisfeita para a maioria dos tribunais, cujos concursos são menos frequentes; foram priorizados editais de 2024 a 2026.
+- recorrencia usa equivalência conservadora: texto do assunto normalizado e idêntico entre os 17 editais. Redações apenas semanticamente semelhantes não foram fundidas.
+- faixa das linhas ficou vazia. faixa_sugerida das disciplinas usa presença nos editais: Altíssima >=85%; Alta >=65%; Média >=35%; Baixa <35%.
+- Os subtópicos alfabéticos de Noções Gerais de Direito e Formação Humanística permanecem no texto do assunto, conforme a estrutura editorial do programa.

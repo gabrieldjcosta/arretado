@@ -1,0 +1,71 @@
+{
+  "versao": 1,
+  "carreiras": [
+    {
+      "nome": "Defensoria Pública",
+      "slug": "defensoria-publica",
+      "disponivel": true,
+      "arquivo": "defensoria-publica.json",
+      "editais": 13,
+      "orgaosSemEdital": 15,
+      "itens": 6161
+    },
+    {
+      "nome": "Magistratura",
+      "slug": "magistratura",
+      "disponivel": true,
+      "arquivo": "magistratura.json",
+      "editais": 17,
+      "orgaosSemEdital": 20,
+      "itens": 3843
+    },
+    {
+      "nome": "Ministério Público (Promotor)",
+      "slug": "ministerio-publico",
+      "disponivel": true,
+      "arquivo": "ministerio-publico.json",
+      "editais": 4,
+      "orgaosSemEdital": 0,
+      "itens": 337
+    },
+    {
+      "nome": "Analista Judiciário",
+      "slug": "analista-judiciario",
+      "disponivel": false
+    },
+    {
+      "nome": "Técnico Judiciário",
+      "slug": "tecnico-judiciario",
+      "disponivel": false
+    },
+    {
+      "nome": "Tribunal de Contas / área de controle",
+      "slug": "controle",
+      "disponivel": false
+    },
+    {
+      "nome": "Área ambiental (procuradoria e órgãos ambientais)",
+      "slug": "ambiental",
+      "disponivel": true,
+      "arquivo": "ambiental.json",
+      "editais": 5,
+      "orgaosSemEdital": 2,
+      "itens": 564
+    },
+    {
+      "nome": "Procuradoria (AGU/estadual/municipal)",
+      "slug": "procuradoria",
+      "disponivel": false
+    },
+    {
+      "nome": "Delegado de Polícia",
+      "slug": "delegado",
+      "disponivel": false
+    },
+    {
+      "nome": "Cartório/notarial",
+      "slug": "cartorio",
+      "disponivel": false
+    }
+  ]
+}
