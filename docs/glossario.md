@@ -408,3 +408,14 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Abertura do repositório | `abrirRepositorioAtivo({ contasHabilitadas })` e `nomeDoBancoAtivo`; `ProvedorRepositorio` usa a primeira. Com a chave desligada nem toca no registro |
 | Chave de build | `VITE_CONTA=1` liga a F4-A (`contasHabilitadas()`, `src/integracoes/conta/index.ts`); qualquer outro valor = app de hoje |
 | Serviço de conta | Porta `ServicoDeConta` (`sessao`, `entrarComGoogle`, `pedirCodigoPorEmail`, `confirmarCodigo`, `sair`, `excluirConta`, `aoMudar`); `ServicoDeContaNulo` até o pacote A3; `FalhaDeConta` com `motivo` |
+
+#### F4-A: esquema remoto da conta (A2, 14/10/2026; só arquivo e teste, não aplicado no Supabase real)
+
+| Termo | Identificadores |
+|---|---|
+| Perfil | `arretado.perfis` (`usuario_id`, `termos_versao`, `termos_aceitos_em`, `direito_ia`, `beta`): criado por gatilho ao nascer a conta; o cliente só lê o próprio; escreve só por `arretado.aceitar_termos(versao)` |
+| Convite | `arretado.convites` (e-mail em minúsculas, `usado_em`): V1 só por convite; o cliente nunca toca |
+| Gancho de cadastro | `arretado.hook_antes_de_criar_usuario(event)`: ligar em Auth › Hooks › Before User Created (passo do Gabriel) |
+| Exclusões | `arretado.exclusoes` (só data e `tinha_copia`); preenchida pela função de exclusão (A5) |
+| Cópias na nuvem | bucket privado `backups`, pasta `<uid>/`; política por pasta (A6 usa) |
+| Reversão | `supabase/rollback/20261014020000_f4a_contas.down.sql`; conferência no projeto real: `supabase/verificacao-f4a-remota.sql` |
