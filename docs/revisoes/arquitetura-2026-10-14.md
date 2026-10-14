@@ -60,3 +60,11 @@ Base: `integracao` (a620cd9). Escopo: núcleo local (Dexie), camadas, Worker, es
 ## O que este PR muda (sem esquema, sem produto)
 
 `App.tsx` (lazy + `LimiteDeErro`), `componentes/LimiteDeErro.tsx`, `core/persistencia/armazenamento.ts`, `main.tsx` (1 linha), este documento. Rotas, textos e visual iguais.
+
+## Contratos de dados para a UI (pedido da revisão de design)
+
+Entregues só como dados; texto e lugar na tela são da UI: `lerUltimoBackup` / `registrarBackup` (`core/persistencia/backup.ts`, gravado em `meta` ao exportar "Tudo"), hooks `useUltimoBackup()` → `{ dataUltimoBackup }` e `useEstadoDeArmazenamento()` → `'persistente' | 'temporario' | 'indisponivel'` (`apresentacao/dados/useSaude.ts`). Enum de sync e resultado tipado de IA (`ok | indisponivel | limite`) entram com a F4-B e a A2.
+
+## Dívida registrada
+
+Lógica de "próxima ação" duplicada entre `RecallInicio` e `hoje/proxima-acao.ts`; unificar junto da mudança "Começar direto ao alvo" da revisão de design.
