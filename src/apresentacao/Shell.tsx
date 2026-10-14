@@ -53,6 +53,17 @@ export function Shell() {
       <header className="topo">
         <Link to="/" className="marca">
           Arretado
+          <svg
+            className="marca-cacto"
+            viewBox="0 0 22 30"
+            fill="currentColor"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect x="8" y="2" width="6.5" height="26" rx="3.25" />
+            <path d="M8 15H6.2A3.2 3.2 0 0 1 3 11.8V8.5a1.6 1.6 0 0 1 3.2 0V11a.8.8 0 0 0 .8.8H8z" />
+            <path d="M14.5 19h1.8a3.2 3.2 0 0 0 3.2-3.2v-4.3a1.6 1.6 0 0 0-3.2 0V15a.8.8 0 0 1-.8.8h-1z" />
+          </svg>
         </Link>
         <nav aria-label="Áreas" className="areas">
           {AREAS.map((a) => (
