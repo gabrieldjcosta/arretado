@@ -2,10 +2,21 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 const C = {
-  fur: '#ec8c2a', furDark: '#cf6d1d', furLight: '#f6ad55', hat: '#8a4b2a', hatDark: '#6c3a1f', hatLight: '#b88459',
-  scarf: '#c23b2b', scarfDark: '#9c2d21', ink: '#4a2515', line: '#5a2a17', white: '#fffbf2', pad: '#b9561a',
+  fur: '#ec8c2a',
+  furDark: '#cf6d1d',
+  furLight: '#f6ad55',
+  hat: '#8a4b2a',
+  hatDark: '#6c3a1f',
+  hatLight: '#b88459',
+  scarf: '#c23b2b',
+  scarfDark: '#9c2d21',
+  ink: '#4a2515',
+  line: '#5a2a17',
+  white: '#fffbf2',
+  pad: '#b9561a',
 };
-const stroke = (c, w) => `stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`;
+const stroke = (c, w) =>
+  `stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`;
 
 const ears = (tilt = 0) => `
   <g transform="rotate(${tilt} 200 150)">
@@ -63,21 +74,33 @@ const mouth = {
 const sittingBody = (withLegs = true) => `
   <path d="M292,380 C352,372 366,316 340,282" fill="none" ${stroke(C.fur, 24)}/>
   <path d="M140,205 C118,262 82,322 92,386 Q98,408 130,408 H270 Q302,408 308,386 C318,322 282,262 260,205 Z" fill="${C.fur}"/>
-  ${withLegs ? `
+  ${
+    withLegs
+      ? `
   <rect x="146" y="246" width="30" height="154" rx="15" fill="${C.fur}" ${stroke(C.furDark, 3)}/>
   <rect x="224" y="246" width="30" height="154" rx="15" fill="${C.fur}" ${stroke(C.furDark, 3)}/>
-  <path d="M184,300 V392 M216,300 V392" fill="none" ${stroke(C.furDark, 3)} opacity=".5"/>` : `
+  <path d="M184,300 V392 M216,300 V392" fill="none" ${stroke(C.furDark, 3)} opacity=".5"/>`
+      : `
   <ellipse cx="128" cy="388" rx="46" ry="24" fill="${C.fur}" ${stroke(C.furDark, 3)}/>
-  <ellipse cx="272" cy="388" rx="46" ry="24" fill="${C.fur}" ${stroke(C.furDark, 3)}/>`}`;
+  <ellipse cx="272" cy="388" rx="46" ry="24" fill="${C.fur}" ${stroke(C.furDark, 3)}/>`
+  }`;
 
 const paw = (x, y, r = 22, pads = true) => `
   <circle cx="${x}" cy="${y}" r="${r}" fill="${C.fur}" ${stroke(C.furDark, 3)}/>
-  ${pads ? `<ellipse cx="${x}" cy="${y + 3}" rx="${r * 0.42}" ry="${r * 0.34}" fill="${C.pad}"/>
+  ${
+    pads
+      ? `<ellipse cx="${x}" cy="${y + 3}" rx="${r * 0.42}" ry="${r * 0.34}" fill="${C.pad}"/>
   <circle cx="${x - r * 0.46}" cy="${y - r * 0.28}" r="${r * 0.15}" fill="${C.pad}"/>
   <circle cx="${x}" cy="${y - r * 0.5}" r="${r * 0.15}" fill="${C.pad}"/>
-  <circle cx="${x + r * 0.46}" cy="${y - r * 0.28}" r="${r * 0.15}" fill="${C.pad}"/>` : `<path d="M${x - r * 0.5},${y + r * 0.1} H${x + r * 0.5} M${x - r * 0.5},${y - r * 0.3} H${x + r * 0.5}" ${stroke(C.furDark, 3)} fill="none"/>`}`;
+  <circle cx="${x + r * 0.46}" cy="${y - r * 0.28}" r="${r * 0.15}" fill="${C.pad}"/>`
+      : `<path d="M${x - r * 0.5},${y + r * 0.1} H${x + r * 0.5} M${x - r * 0.5},${y - r * 0.3} H${x + r * 0.5}" ${stroke(C.furDark, 3)} fill="none"/>`
+  }`;
 
-const svg = (corpo, nome, titulo) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 450" width="400" height="450" role="img" aria-label="${titulo}">
+const svg = (
+  corpo,
+  nome,
+  titulo,
+) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 450" width="400" height="450" role="img" aria-label="${titulo}">
   <title>${titulo}</title>
 ${corpo}
 </svg>
@@ -174,9 +197,13 @@ const pasta = process.argv[2];
 mkdirSync(pasta, { recursive: true });
 const poses = {
   estudando: [estudando, 'Mascote do Arretado estudando, com óculos redondos e um livro aberto'],
-  distraido: [distraido, 'Mascote do Arretado distraído, olhando para cima, com um lápis apontado para baixo'],
+  distraido: [
+    distraido,
+    'Mascote do Arretado distraído, olhando para cima, com um lápis apontado para baixo',
+  ],
   sorrindo: [sorrindo, 'Mascote do Arretado sorrindo, com os braços para cima'],
   determinado: [determinado, 'Mascote do Arretado determinado, com um caderno e o punho levantado'],
 };
-for (const [nome, [corpo, titulo]] of Object.entries(poses)) writeFileSync(`${pasta}/${nome}.svg`, svg(corpo, nome, titulo));
+for (const [nome, [corpo, titulo]] of Object.entries(poses))
+  writeFileSync(`${pasta}/${nome}.svg`, svg(corpo, nome, titulo));
 console.log('ok', Object.keys(poses).join(', '));
