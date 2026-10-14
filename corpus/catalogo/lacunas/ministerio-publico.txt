@@ -1,0 +1,7 @@
+Lacunas e dúvidas
+
+- NÃO LOCALIZADO: conteúdo integral não foi aberto e confirmado; nenhuma linha temática foi criada.
+- Parcial: edital oficial aberto, mas o programa integral não foi extraído com segurança.
+- Faixa e faixa_sugerida ficaram vazias por ausência de base uniforme verificável.
+- Recorrência mede equivalência no nível da disciplina normalizada entre os editais completos extraídos.
+- Alguns editais anteriores a 2023 foram usados por serem os mais recentes oficialmente localizados.

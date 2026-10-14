@@ -14,25 +14,52 @@ import {
   validarPrincipal,
 } from './catalogo/nucleo.mjs';
 
-const [, , comando, entrada, ...resto] = process.argv;
-if (!['validar', 'converter'].includes(comando) || !entrada) {
-  console.error('Uso: node scripts/catalogo.mjs <validar|converter> <arquivo|-> [--out DIR]');
+const [, , comando, ...args] = process.argv;
+const iOut = args.indexOf('--out');
+const saida = iOut >= 0 ? (args[iOut + 1] ?? 'corpus/catalogo') : 'corpus/catalogo';
+const entradas = args.filter(
+  (a, i) => a !== '--tudo' && (iOut < 0 || (i !== iOut && i !== iOut + 1)),
+);
+if (!['validar', 'converter'].includes(comando) || !entradas.length) {
+  console.error(
+    'Uso: node scripts/catalogo.mjs <validar|converter> <arquivo|-> [outros arquivos] [--out DIR]',
+  );
   process.exit(2);
 }
-const saida = resto[resto.indexOf('--out') + 1] ?? 'corpus/catalogo';
-const texto = readFileSync(entrada === '-' ? 0 : entrada, 'utf8');
 
-const blocos = separarBlocos(texto);
+// Vários arquivos (um por bloco: conteúdo, disciplinas, editais) são juntados como se fossem uma resposta só.
+const blocos = { principal: null, consolidadas: null, editais: null, erros: [] };
+for (const entrada of entradas) {
+  const b = separarBlocos(readFileSync(entrada === '-' ? 0 : entrada, 'utf8'));
+  blocos.erros.push(...b.erros.map((m) => `${entrada}: ${m}`));
+  for (const k of ['principal', 'consolidadas', 'editais']) {
+    if (!b[k]) continue;
+    if (blocos[k]) blocos.erros.push(`${entrada}: bloco "${k}" repetido entre arquivos`);
+    else blocos[k] = b[k];
+  }
+}
+if (!blocos.principal && !blocos.erros.length)
+  blocos.erros.push('nenhum bloco principal nos arquivos');
 const achados = blocos.erros.map((msg) => ({ nivel: 'erro', linha: 0, regra: 'blocos', msg }));
 if (blocos.principal) {
   achados.push(...validarPrincipal(blocos.principal), ...validarComplementares(blocos));
 }
 const erros = achados.filter((x) => x.nivel === 'erro');
 const avisos = achados.filter((x) => x.nivel === 'aviso');
-for (const x of [...erros, ...avisos])
-  console.log(
-    `${x.nivel === 'erro' ? 'ERRO ' : 'aviso'} ${x.linha ? `linha ${x.linha}: ` : ''}[${x.regra}] ${x.msg}`,
-  );
+// Agrupa por nível e regra; mostra os primeiros exemplos de cada (--tudo mostra todos).
+const tudo = process.argv.includes('--tudo');
+for (const [nivel, lista] of [
+  ['erro', erros],
+  ['aviso', avisos],
+]) {
+  const porRegra = Object.groupBy(lista, (x) => x.regra);
+  for (const [regra, xs] of Object.entries(porRegra)) {
+    console.log(`\n${nivel.toUpperCase()} [${regra}] ${xs.length}x`);
+    for (const x of tudo ? xs : xs.slice(0, 5))
+      console.log(`  ${x.linha ? `linha ${x.linha}: ` : ''}${x.msg}`);
+    if (!tudo && xs.length > 5) console.log(`  … +${xs.length - 5} (use --tudo)`);
+  }
+}
 
 const n = blocos.principal?.length ?? 0;
 console.log(

@@ -1,0 +1,5 @@
+Lacunas e dúvidas
+- NÃO LOCALIZADO: AL, AP, BA, CE, DF, ES, GO, MS, MG, PB, PA, RN, RR, RS e SP. Nenhum assunto foi preenchido nessas linhas.
+- A amostra completa usada contém 13 editais oficiais: AC, AM, MA, MT, PE, PR, RJ, RO, SC, SE, PI, TO e DPU.
+- Recorrência foi calculada no nível da disciplina normalizada, não por equivalência semântica de cada assunto; isso evita inferências não verificáveis.
+- Faixa e faixa_sugerida ficaram vazias, pois não se aplicou peso comparável por assunto entre os editais.
