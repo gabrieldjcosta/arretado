@@ -550,12 +550,13 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Sem transição de cor: ao virar o tema o texto troca na hora, e um fundo que demora 140 ms deixa
+   o texto novo sobre o fundo velho (o axe lê isso como contraste baixo, só em máquina rápida). */
 @media (prefers-reduced-motion: no-preference) {
   button,
   .botao {
     transition:
       transform 140ms ease,
-      background-color 140ms ease,
       box-shadow 140ms ease;
   }
 }
