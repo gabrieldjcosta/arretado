@@ -312,6 +312,17 @@ p {
   text-decoration: none;
 }
 
+.area-icone {
+  display: none;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.conta-icone svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .areas a[aria-current='page'] {
   background: var(--agora-fundo);
   box-shadow: inset 0 0 0 1.5px var(--agora-borda);
@@ -355,12 +366,19 @@ p {
 
   .areas a {
     flex: 1;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-height: 3.25rem;
     padding: 0 0.25rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .area-icone {
+    display: block;
   }
 
   .shell {
-    padding-bottom: calc(var(--alvo) + 1rem);
+    padding-bottom: calc(3.25rem + 1rem);
   }
 }
 
@@ -913,7 +931,7 @@ a.item-norma strong {
   /* Acima da navegação das áreas, que no celular e no tablet fica no rodapé. */
   .acoes-leitor {
     right: 0.75rem;
-    bottom: calc(var(--alvo) + 1.25rem);
+    bottom: calc(3.25rem + 1.25rem);
   }
 }
 
@@ -1767,7 +1785,7 @@ dialog.dialogo-acoes {
     display: inline-flex;
     position: fixed;
     right: 0.75rem;
-    bottom: calc(var(--alvo) + 1.25rem);
+    bottom: calc(3.25rem + 1.25rem);
     z-index: 5;
     width: 3.5rem;
     height: 3.5rem;
