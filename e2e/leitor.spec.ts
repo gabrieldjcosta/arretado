@@ -936,6 +936,36 @@ async function selecionarPalavra(page: Page, alvo: Locator, palavra: string, toq
 const apertar = (alvo: Locator, toque: boolean) => (toque ? alvo.tap() : alvo.click());
 
 /** As marcações gravadas no IndexedDB (as não excluídas). */
+function frasesGravadas(page: Page) {
+  return page.evaluate(async () => {
+    const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
+      const pedido = indexedDB.open('arretado');
+      pedido.onsuccess = () => {
+        resolver(pedido.result);
+      };
+      pedido.onerror = () => {
+        rejeitar(new Error(String(pedido.error)));
+      };
+    });
+    try {
+      const todas = await new Promise<
+        { texto: string; origemTipo: string; excluidoEm: string | null }[]
+      >((resolver, rejeitar) => {
+        const pedido = banco.transaction('frases').objectStore('frases').getAll();
+        pedido.onsuccess = () => {
+          resolver(pedido.result as never);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+      return todas.filter((f) => f.excluidoEm === null);
+    } finally {
+      banco.close();
+    }
+  });
+}
+
 function marcacoesGravadas(page: Page) {
   return page.evaluate(async () => {
     const banco = await new Promise<IDBDatabase>((resolver, rejeitar) => {
@@ -1051,6 +1081,20 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
   await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
   await expect(dialogo).toBeHidden();
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+
+  // Enviar às frases (Frases 3): o trecho abre o campo, a Frase guarda o link de volta.
+  await selecionarPalavra(page, texto, outra, toque);
+  await apertar(acoes.getByRole('button', { name: 'Enviar às frases' }), toque);
+  const envio = page.getByRole('dialog', { name: 'Enviar às frases' });
+  await expect(envio).toBeVisible();
+  await expect(envio.getByRole('textbox', { name: 'Frase' })).toHaveValue(outra);
+  await semViolacoes(page);
+  await apertar(envio.getByRole('button', { name: 'Enviar' }), toque);
+  await expect(envio).toBeHidden();
+  await expect
+    .poll(() => frasesGravadas(page))
+    .toEqual([expect.objectContaining({ texto: outra, origemTipo: 'trecho' })]);
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
 
   // No modo foco, as ações tomam o lugar do grupo fixo, sem alargar a página.

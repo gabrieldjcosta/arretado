@@ -1,0 +1,28 @@
+# Resolução CNJ 295/2019 - Autorização de viagem nacional para crianças e adolescentes
+RESOLUÇÃO Nº 295, DE 13 DE SETEMBRO DE 2019.
+Dispõe sobre autorização de viagem nacional para crianças e adolescentes.
+O PRESIDENTE DO CONSELHO NACIONAL DE JUSTIÇA, no uso de suas atribuições legais e regimentais;
+CONSIDERANDO as dificuldades enfrentadas pelas autoridades que exercem controle de trânsito de pessoas dentro do território nacional, em especial, relativamente a crianças e adolescentes;
+CONSIDERANDO a insegurança causada aos usuários em decorrência da diversidade de requisitos e exigências para trânsito de crianças e adolescentes dentro do território nacional;
+CONSIDERANDO a edição da a Lei nº 13.812, em 16 de março de 2019, que altera dispositivos da Lei nº 8.069, de 13 de julho de 1990, (Estatuto da Criança e do Adolescente – ECA);
+CONSIDERANDO a necessidade de uniformização na interpretação dos artigos 83 a 85 do ECA;
+CONSIDERANDO a entrada em vigor da Lei nº 13.726, de 08 de outubro de 2018, que o aludiu expressamente à possibilidade de que as autorizações de viagem sejam concedidas por documento particular, com reconhecimento de firma;
+CONSIDERANDO o teor da Resolução CNJ nº 131, de 26 de maio de 2011, diploma desburocratizante e que facilitou a autorização de viagens internacionais, sem descurar da necessária proteção a crianças e adolescentes;
+CONSIDERANDO que o art. 83 do ECA já contemplava a modalidade judicial de autorização de viagens quando editada a Resolução CNJ nº 131/2011 e publicada a Lei nº 13.726/2018, de modo que a Lei nº 13.812/2019 não as revogou (art. 2º, § 2º, da Lei de Introdução às Normas do Direito Brasileiro);
+CONSIDERANDO o aumento da idade a partir da qual a autorização para viagens nacionais está dispensada, elevando abruptamente o volume de pedidos de autorização judicial de viagem em tramitação nas Varas da Infância e da Juventude dos Estados e do Distrito Federal, com o início da vigência da Lei nº 13.812/2019 (cerca de 950% no Estado de São Paulo);
+CONSIDERANDO o teor dos artigos 20 e 30 da Lei de Introdução às Normas do Direito Brasileiro;
+CONSIDERANDO a importância de se manter a congruência entre o rigor exigido para autorizações de viagens nacionais e internacionais de crianças e adolescentes;
+CONSIDERANDO a deliberação do Plenário do CNJ na 296ª Sessão Ordinária, realizada em 10 de setembro de 2019, nos autos do Pedido de Providências nº 0001171-89.2018.2.00.0000;
+RESOLVE:
+Art. 1º Nenhuma criança ou adolescente menor de 16 anos poderá viajar para fora da comarca onde reside desacompanhado dos pais ou dos responsáveis sem expressa autorização judicial.
+Art. 2º A autorização para viagens de criança ou adolescente menor de 16 anos dentro do território o nacional não será exigida quando:
+I – tratar-se de comarca contígua à da residência da criança ou do adolescente menor de 16 anos, se na mesma unidade federativa ou incluída na mesma região metropolitana; e
+II – a criança ou o adolescente menor de 16 anos estiver acompanhado:
+a) de ascendente ou colateral maior, até o terceiro grau, comprovado documentalmente o parentesco; e
+b) de pessoa maior, expressamente autorizada por mãe, pai, ou responsável, por meio de escritura pública ou de documento particular com firma reconhecida por semelhança ou autenticidade.
+III – a criança ou o adolescente menor de 16 anos viajar desacompanhado expressamente autorizado por qualquer de seus genitores ou responsável legal, por meio de escritura pública ou de documento particular com firma reconhecida por semelhança ou autenticidade; e
+IV – a criança ou adolescente menor de 16 anos apresentar passaporte válido e que conste expressa autorização para que viajem desacompanhados ao exterior.
+Art. 3º Os documentos de autorizações dadas por genitores ou responsáveis legais deverão discriminar o prazo de validade, compreendendo-se, em caso de omissão, que a autorização é válida por dois anos.
+Art. 4º Ficam revogadas as disposições em contrário.
+Art. 5º Esta Resolução entra em vigor na data de sua publicação.
+Ministro DIAS TOFFOLI

@@ -16,6 +16,7 @@ import { Orientacoes } from './orientacoes/Orientacoes';
 import { Shell } from './Shell';
 import { DetalheErro } from './recall/DetalheErro';
 import { Drill } from './recall/Drill';
+import { CartaoDeLacuna } from './recall/CartaoDeLacuna';
 import { EditarCartao } from './recall/EditarCartao';
 import { Historico } from './recall/Historico';
 import { ListaCartoes } from './recall/ListaCartoes';
@@ -23,8 +24,11 @@ import { ListaErros } from './recall/ListaErros';
 import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
-import { Plano } from './plano/Plano';
-import { Hoje, NaoEncontrada } from './telas/Areas';
+import { RevisarFrases } from './recall/RevisarFrases';
+import { Hoje } from './hoje/Hoje';
+import { RotasDoPlano } from './plano/Rotas';
+import { RotasDaSessao } from './sessao/Rotas';
+import { NaoEncontrada } from './telas/Areas';
 import './estilos.css';
 
 export function App({
@@ -41,7 +45,8 @@ export function App({
           <Routes>
             <Route element={<Shell />}>
               <Route index element={<Hoje />} />
-              <Route path="plano" element={<Plano />} />
+              <Route path="plano/*" element={<RotasDoPlano />} />
+              <Route path="sessao/*" element={<RotasDaSessao />} />
               <Route path="recall" element={<RecallInicio />}>
                 <Route index element={<ListaErros />} />
                 <Route path="frases" element={<ListaFrases />} />
@@ -50,6 +55,8 @@ export function App({
               </Route>
               <Route path="recall/registrar" element={<RegistrarErro />} />
               <Route path="recall/revisar" element={<Drill />} />
+              <Route path="recall/frases/revisar" element={<RevisarFrases />} />
+              <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
               <Route path="recall/erros/:id" element={<DetalheErro />} />
               <Route path="recall/cartoes/:id" element={<EditarCartao />} />
               <Route path="biblioteca" element={<Normas />} />

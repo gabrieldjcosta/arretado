@@ -6,7 +6,7 @@ import { useDados } from '../dados/contexto';
 
 const carregar = async (repo: Repositorio) => (await listarFrases(repo, {}, null, 200)).itens;
 
-/** Lista passiva (D9, D25): as Frases em lista corrida, uma por linha. Só ler. */
+/** Lista das Frases, uma por linha (D9, D25); cada uma leva ao cartão com lacuna. */
 export function ListaFrases() {
   const { dados } = useDados(carregar);
   if (!dados) return <Esqueleto />;
@@ -22,7 +22,14 @@ export function ListaFrases() {
       <ul className="lista-simples frases texto-leitura">
         {dados.map((f) => (
           <li key={f.id}>
-            {f.erroId ? <Link to={`/recall/erros/${f.erroId}`}>{f.texto}</Link> : f.texto}
+            {f.erroId ? <Link to={`/recall/erros/${f.erroId}`}>{f.texto}</Link> : f.texto}{' '}
+            <Link
+              to={`/recall/frases/${f.id}/cartao`}
+              className="discreto"
+              aria-label={`Esconder trecho: ${f.texto}`}
+            >
+              Esconder trecho
+            </Link>
           </li>
         ))}
       </ul>

@@ -1,0 +1,29 @@
+/* Retorno e Fechar o Dia (A3b). Só tokens e classes existentes; sem cor literal. */
+.retorno-titulo,
+.fechar-dia-titulo {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.retorno-texto,
+.retorno-passo,
+.fechar-dia-texto,
+.fechar-dia-passo {
+  margin: 0 0 0.75rem;
+}
+
+.retorno-passo,
+.fechar-dia-passo {
+  color: var(--texto-atenuado);
+}
+
+.retorno .botao,
+.retorno button,
+.fechar-dia button {
+  min-height: var(--alvo);
+}
+
+.retorno,
+.fechar-dia {
+  margin-bottom: 1rem;
+}

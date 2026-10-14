@@ -1,4 +1,4 @@
-import { agendar, INTERVALOS, intervaloDaCaixa } from './agendamento';
+import { agendar, agendarFrase, INTERVALOS, intervaloDaCaixa } from './agendamento';
 
 describe('agendamento em 6 caixas (6.5)', () => {
   it('intervalos 1, 3, 7, 15, 30, 60', () => {
@@ -36,5 +36,35 @@ describe('agendamento em 6 caixas (6.5)', () => {
     expect(
       agendar({ caixa: 2, proximaRevisao: '2026-09-30' }, 'facil', '2026-09-23').atrasoDias,
     ).toBe(0);
+  });
+});
+
+describe('agendamento de frases (Frases 2)', () => {
+  it('"de novo" volta amanhã; "li" sobe um degrau a cada leitura', () => {
+    expect(agendarFrase({ proximaRevisao: '2026-09-23' }, 'de_novo', '2026-09-23')).toEqual({
+      proximaDepois: '2026-09-24',
+      atrasoDias: 0,
+    });
+    // Nunca revisada: anterior = 1 → próximo degrau = 3.
+    expect(agendarFrase({ proximaRevisao: '2026-09-23' }, 'li', '2026-09-23').proximaDepois).toBe(
+      '2026-09-26',
+    );
+    // Última revisão em 09-23, marcada para 09-26 (3 dias) → 7.
+    expect(
+      agendarFrase(
+        { proximaRevisao: '2026-09-26', ultimaRevisao: '2026-09-23T15:00:00.000Z' },
+        'li',
+        '2026-09-26',
+      ).proximaDepois,
+    ).toBe('2026-10-03');
+  });
+
+  it('no último degrau fica em 60 dias; atraso não penaliza', () => {
+    const r = agendarFrase(
+      { proximaRevisao: '2026-09-01', ultimaRevisao: '2026-07-03T15:00:00.000Z' },
+      'li',
+      '2026-09-10',
+    );
+    expect(r).toEqual({ proximaDepois: '2026-11-09', atrasoDias: 9 });
   });
 });

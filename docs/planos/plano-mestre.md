@@ -47,7 +47,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 
 ### Ordem dos portões (não negociável)
 
-**F2 → F3 → V1 (validação externa) → F4 (conta e sincronização)** e só depois **A1 (OCR), A2 (IA), C1 (cobrança), voz e G1**. O que exige rede, conta, cota de uso ou cobrança espera a F4. Relato de problema do uso real fura a fila de qualquer etapa.
+**F2 → F3 → F4-A (conta) → V1 (validação externa) → F4-B/C (sincronização e instalação)** e só depois **A1 (OCR), A2 (IA), C1 (cobrança), voz e G1**. O que exige rede, conta, cota de uso ou cobrança espera a F4. Relato de problema do uso real fura a fila de qualquer etapa.
 
 ### Conflitos resolvidos nesta consolidação
 
@@ -84,7 +84,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 |---|---|
 | **`main`** (publicado em https://arretado.gabrieldjcosta.workers.dev; último merge #82, 11/10/2026) | F0 e F1 completas; F2 etapas 7, 8, 9, 10.1–10.4, 11.1–11.9, 12.1 (Worker, ainda sem chamada real); programa do acervo (Peças 1, 2, 3a–3c, 4, 5, 6a; esquema **v5**); teses curadas (155/169, PR #72); redesign fatias 1–6 (6a e 6b, PRs #76 e #77); 11.7 (PR #81) |
 | **Só na `integracao`** (falta o merge diário do Gabriel) | PR #83, `/code-review` das etapas 8, 9 e 11 (14 achados corrigidos; relatório em [`../revisoes/f2-etapas-8-9-11.md`](../revisoes/f2-etapas-8-9-11.md)); esta consolidação. **Sem subida de esquema**: não pede backup |
-| **Portões** | F0 fechado (23/09/2026). F1 em medição (14 dias com revisão em ≥ 10; linha de base em `docs/redesign/linha-de-base.md`). F2 aberto |
+| **Portões** | F0 fechado (23/09/2026). F2 **fechado em 13/10/2026** por decisão do Gabriel (13.4 feita; medições em uso real passaram para a V1, §6). F1: medição dos 14 dias segue, sem bloquear (vai para a V1) |
 | **Verificação** | `npm run check` verde (1.593 testes no fechamento do #83); E2E dos specs tocados verde nos 3 aparelhos |
 
 ### Fases
@@ -93,12 +93,12 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 |---|---|---|---|
 | F0 | Fundamentos | — | ✅ portão fechado |
 | F1 | Recall (MVP) e pontos | F0 | ✅ implementada; portão em medição |
-| **F2** | Legislação: importar, estruturar, revisar, publicar, ler, corrigir; acervo, súmulas, teses | F1 (paralela ao uso) | **Em execução**: falta etapa 12 (12.2, 12.3, 6b), etapa 13 e o uso real |
+| **F2** | Legislação: importar, estruturar, revisar, publicar, ler, corrigir; acervo, súmulas, teses | F1 (paralela ao uso) | ✅ feita (12.2, 12.3, 6b e 13.4 em 13/10/2026); validação com uso real e testes com rede → V1 (§6) |
 | F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; Frases 1 feita (v6, PR aguarda revisão e backup) |
-| F3-A | Hoje, Sessão e retorno após pausa | portão F2 | não iniciada |
+| F3-A | Hoje, Sessão e retorno após pausa | F2 feita (sem portão de medição) | liberada |
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
-| V1 | Validação com 3 a 5 pessoas | F3 | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
-| F4 | Conta, sincronização, backup remoto, instalável offline | V1 | não iniciada |
+| V1 | Validação com 3 a 5 pessoas; reúne todas as validações adiadas (§6) | F3 e F4-A (contas) | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
+| F4 | Conta (F4-A, antes da V1), sincronização, backup remoto, instalável offline (F4-B/C, depois) | F3 | não iniciada |
 | A1 | Captura de imagem com OCR local | F4 | não iniciada |
 | A2 | Assistência opcional de IA | F4 (conta, cota, servidor) e A1 para o item 3 | não iniciada |
 | C1 | Piloto pago e cobrança | F4, V1 e prontidão comercial | não iniciada |
@@ -112,7 +112,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 
 Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12 e 13, "Critérios do portão").
 
-### A. O que falta para o portão
+### A. Fechamento da F2 (tudo feito; portão fechado em 13/10/2026)
 
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
@@ -121,10 +121,10 @@ Detalhe de cada atividade, fatos e rotina de pronto: [`F2.md`](F2.md) (etapas 12
 | 13.3 ✔ 13/10/2026 | Backup com normas: exportar → apagar → restaurar idêntico com o CP inteiro; pacote só de `legislacao` com a fonte das versões | Sonnet 5.5 médio | nuvem, sem rede |
 | 13.5 ✔ 13/10/2026 | Verificação de fechamento (pacote B abaixo) | Sonnet 5.5 médio | nuvem, sem rede |
 | 12.2 | Publicar a rota `/api/buscar-norma` e chamar de verdade LEP, CF/88 (1,8 MB) e CC; conferir o limite de processamento; se estourar, plano B da T17 | Sonnet 5.5 médio (alto se estourar) | **Feita e verificada em 13/10/2026** (sem estouro; plano B dispensado) |
-| 12.3 | Campo URL na tela Importar (decodifica no aparelho, hash do sanitizado, oferece colar se falhar) | Sonnet 5.5 médio | nuvem, depois da 12.2 |
-| 6b | Verificar atualização no site oficial pelo aparelho (D16), depois da 12.2 | Sonnet 5.5 médio | nuvem, depois da 12.2 |
-| 13.4 | `portoes/F2.md` com cada critério ligado a um teste; README e `CLAUDE.md` | Sonnet 5.5 médio | nuvem, depois de 13.1–13.3 e 13.5 |
-| — | **Uso real: 2 semanas lendo lei no Arretado** | — | **Gabriel** |
+| 12.3 ✔ 13/10/2026 | Campo URL na tela Importar (decodifica no aparelho, hash do sanitizado, oferece colar se falhar) | Sonnet 5.5 médio | nuvem, depois da 12.2 |
+| 6b ✔ 13/10/2026 | Verificar atualização no site oficial pelo aparelho (D16), depois da 12.2 | Sonnet 5.5 médio | nuvem, depois da 12.2 |
+| 13.4 ✔ 13/10/2026 | `portoes/F2.md` com cada critério ligado a um teste; README e `CLAUDE.md` | Sonnet 5.5 médio | nuvem, depois de 13.1–13.3 e 13.5 |
+| — | ~~Uso real: 2 semanas lendo lei no Arretado~~ → **movido para a V1** (§6); não bloqueia a F3 | — | Gabriel, na V1 |
 
 A etapa 12 não bloqueia a 13.1–13.3 nem a 13.5; se a 12.2 atrasar, a 13.4 registra a importação por URL como "pendente, com o colar como caminho principal" e o portão segue (D13: colar é o preferencial).
 
@@ -145,7 +145,7 @@ Cada item vira teste ou E2E quando ainda não houver; o que já está coberto é
 
 | Item | Modelo | Onde roda |
 |---|---|---|
-| Lotes com rede: Súmula Vinculante 30, lotes 3b/3d, as 63 normas a converter (`acervo/a-converter.md`), fontes complementares do acervo | Sonnet 5.5 médio | **precisa de rede** (Gabriel ou ambiente liberado) |
+| Lotes com rede: Súmula Vinculante 30, lotes 3b/3d, as 4 normas que faltam converter (`acervo/a-converter.md`; 59 de 63 feitas em 13/10/2026), fontes complementares do acervo | Sonnet 5.5 médio | **precisa de rede** (Gabriel ou ambiente liberado) |
 | Busca de súmula por consulta no índice, em vez de abrir a coleção inteira | Sonnet 5.5 médio | nuvem |
 | Correção do texto grava a norma inteira de novo (CF: ~5 mil textos); reduzir pede mudar o modelo, junto da F4 | — | F4 |
 | Capturas "antes/depois" do redesign (6.4–6.7) | Sonnet 5.5 médio | nuvem |
@@ -162,15 +162,15 @@ Cada item vira teste ou E2E quando ainda não houver; o que já está coberto é
 
 Cada pacote inclui o acabamento visual das telas que cria. A estética que sobra tem lugar certo: F3-A (Hoje e Sessão), **ajustes pós-validação** na V1 e F4-C (ícone, splash e manifesto). A 13.4 passa a listar o fluxo de Frases entre os critérios do portão.
 
-### Portão da F2 (mantido)
+### Portão da F2 (fechado em 13/10/2026, decisão do Gabriel)
 
-Duas semanas lendo legislação no Arretado, não no Acervo antigo; critérios de `F2.md` › "Critérios do portão" ligados a teste; nenhum problema aberto de perda de dado ou de posição de leitura. O portão da F1 continua medido à parte.
+Critérios de `F2.md` › "Critérios do portão" ligados a teste em [`../portoes/F2.md`](../portoes/F2.md); nenhum problema aberto de perda de dado ou de posição de leitura. **Nenhuma medição em uso real bloqueia mais a F3:** as 2 semanas lendo lei, a regra dos gabaritos conferidos, os testes com rede (12.3, 6b) e o portão de 14 dias da F1 passam a ser itens da V1 (§6). Defeito real relatado no uso continua furando a fila.
 
 ---
 
 ## 4. F3-A — Hoje, Sessão e retorno após pausa
 
-Planejamento e execução: **Opus 5.5**, só depois do portão da F2. Entidades novas (`Sessao`, `TarefaDeEstudo`) registradas no glossário na sessão de planejamento; subida de esquema segue R10.
+Planejamento e execução: **Opus 5.5**; liberada (o portão da F2 não impede mais; ver §3). Entidades novas (`Sessao`, `TarefaDeEstudo`) registradas no glossário na sessão de planejamento; subida de esquema segue R10.
 
 | Pacote | Itens |
 |---|---|
@@ -191,11 +191,27 @@ Planejamento e execução: **Opus 5.5**, só depois do portão da F2. Entidades 
 
 **Portão F3-B:** a pessoa vê o que importa, escolhe uma tarefa do tamanho certo e entende a sugestão sem manter calendário complexo. Sem IA.
 
-## 6. V1 — Validação externa (depois da F3)
+## 6. V1 — Validação externa (depois da F3 e da F4-A: contas)
+
+**Pré-requisito:** contas existirem (F4-A: login, um espaço por pessoa, sair e excluir), para testar com outras pessoas em ambiente de demonstração reiniciável. Sem sincronização entre aparelhos ainda (F4-B).
+
+**Validações adiadas, todas aqui e nenhuma bloqueando fase anterior:**
+
+| Item | Origem |
+|---|---|
+| Plano de validação com 3 a 5 pessoas (roteiro: item 5.5 do redesign, arquivado) | V1 |
+| Uso real prolongado lendo lei no Arretado (antes 2 semanas do portão da F2) | `portoes/F2.md` |
+| Portão da F1: 14 dias com revisão em ≥ 10 (linha de base: `docs/redesign/linha-de-base.md`) | `portoes/F1.md` |
+| Critério dos gabaritos conferidos (CP, ECA, CDC e CF `pendente`; §10.3) | `portoes/F2.md` |
+| Testes reais com rede: 12.3 (buscar LEP, CF/88, CC) e 6b ("Verificar atualização") | `portoes/F2.md` |
+| Nomes Frases / Revisar frases / Revisar cartões e oclusão (§10.5) | §10 |
+| Medição da linha de base adiada (redesign 1.1) | redesign |
 
 Ambiente de demonstração reiniciável; 3 a 5 pessoas; pedir para começar, retomar, registrar erro, revisar, sem instrução; observar onde hesitam ou perdem o contexto; registrar problemas, não notas de satisfação; corrigir os maiores atritos e repetir; perguntar "que ferramenta ou fluxo o Arretado substitui?". Medir a linha de base adiada (redesign 1.1) aqui. **Portão:** as tarefas centrais são entendidas sem ajuda ao vivo; usabilidade e disposição a pagar são perguntas separadas. Se a F3 atrasar muito, rever esta ordem (decisão 4 de 09/10/2026).
 
 ## 7. F4 — Conta, sincronização, backup e instalação
+
+**Ordem:** F4-A (conta) vem logo após a F3 e antes da V1; F4-B e F4-C só depois da V1.
 
 Planejamento e execução: **Opus 5.5**. Usa o projeto Supabase já criado (ver `referencia.md`).
 
@@ -248,9 +264,10 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 | 4d | **Frases 3**: Enviar às frases a partir do leitor | Sonnet 5.5 médio | nuvem |
 | 5 | **12.2** Worker com chamada real | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
 | 6 | **12.3** Campo URL, depois **6b** | Sonnet 5.5 médio | nuvem, depois da 12.2 |
-| 7 | **13.4** Portão da F2 (documento) | Sonnet 5.5 médio | nuvem |
-| 8 | **Uso real: 2 semanas** (já com o fluxo de Frases) | — | **Gabriel** |
-| 9 | Planejamento da F3 | **Opus 5.5** | nuvem, só depois do portão |
+| ✔ 7 | **13.4** Portão da F2 (documento) feito em 13/10/2026; portão fechado, medições → V1 | — | — |
+| ~~8~~ | ~~Uso real: 2 semanas~~ → V1 (§6); não bloqueia | — | Gabriel, na V1 |
+| 9 | Planejamento e execução da F3-A em pacotes verticais paralelos; F3-B prep ([`f3-pacotes.md`](f3-pacotes.md)) | **Opus 5.5** | nuvem, liberado |
+| 10 | Agente de verificação diário ([`agente-verificacao.md`](agente-verificacao.md)) | — | rotina na nuvem |
 
 Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) e a busca de súmula pelo índice (Sonnet 5.5 médio). Relato de problema do uso real fura a fila.
 
@@ -267,8 +284,8 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 
 | Dependência | Se violada |
 |---|---|
-| F3 só depois do portão da F2 | Leitura instável contamina o planejamento |
-| V1 depois da F3; F4 depois da V1 | Nuvem e conta construídas sobre fluxo não validado |
+| F3 liberada (portão da F2 fechado em 13/10/2026); medições de uso real ficam na V1 | Defeito real de leitura relatado fura a fila |
+| V1 depois da F3 e da F4-A (contas); sincronização e instalação (F4-B/C) depois da V1 | Nuvem e sincronização construídas sobre fluxo não validado; teste com outras pessoas sem conta |
 | A1, A2, C1 e voz depois da F4 | IA e cobrança sem conta, cota nem exclusão; dado preso num navegador (R6) |
 | Subida de esquema com backup e recarregar abas (R10) | Perda de dado ou app quebrado em aba aberta |
 | Esquema v6 (Frases 1) antes das 2 semanas de uso; Frases não antecipam a F3 | Uso real medido sobre o fluxo antigo; dado gravado no formato velho |
@@ -281,6 +298,8 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 | `docs/proxima-sessao.md` | Estado atual, próxima atividade e pendências; a referência operacional (Cloudflare, Supabase, comandos, mapa do código) fica em `docs/referencia.md` |
 | `docs/planos/plano-mestre.md` | **Este**: ordem, fases, regras, decisões abertas |
 | `docs/planos/proximos-passos.md` | Resumo em linguagem simples para o Gabriel |
+| `docs/planos/agente-verificacao.md` | Regras do agente de verificação diário (rotina) |
+| `docs/planos/f3-pacotes.md` | Partição da F3-A e preparação da F3-B em pacotes paralelos |
 | `docs/planos/F2.md` | Detalhe técnico da F2: fatos das fontes, atividades, rotina de pronto, critérios do portão |
 | `docs/planos/fluxo-diario.md` | Branches, PRs, merge diário, backup, retomada |
 | `docs/especificacao-parte1.md` §19, `parte2.md` §10.6 | D1–D24; regras do Legislação |

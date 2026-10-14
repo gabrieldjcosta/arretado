@@ -3,6 +3,7 @@ import type { RegistroDe } from '../../core/modelo';
 import type { Pagina, Repositorio } from '../../core/persistencia';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import {
+  contarFrasesVencidas,
   contarVencidos,
   diasComRevisao,
   maiorFilaProjetada,
@@ -10,16 +11,19 @@ import {
 } from '../../dominios/recall/servico';
 
 export async function resumoDoRecall(repo: Repositorio) {
-  const [vencidos, maiorFila, dias, amanha, preferencias, erros] = await Promise.all([
-    contarVencidos(repo),
-    maiorFilaProjetada(repo),
-    diasComRevisao(repo),
-    vencemAmanha(repo),
-    obterPreferencias(repo),
-    repo.colecao('erros').contar(),
-  ]);
+  const [vencidos, frasesVencidas, maiorFila, dias, amanha, preferencias, erros] =
+    await Promise.all([
+      contarVencidos(repo),
+      contarFrasesVencidas(repo),
+      maiorFilaProjetada(repo),
+      diasComRevisao(repo),
+      vencemAmanha(repo),
+      obterPreferencias(repo),
+      repo.colecao('erros').contar(),
+    ]);
   return {
     vencidos,
+    frasesVencidas,
     maiorFila,
     dias,
     amanha,

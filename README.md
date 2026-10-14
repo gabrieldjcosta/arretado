@@ -6,7 +6,7 @@ Plataforma de estudo para concursos jurídicos de alta complexidade, feita para 
 
 ## Estado atual
 
-**F0 (Fundamentos) e F1 (Recall + pontos) implementadas.** Portões: [`docs/portoes/F0.md`](docs/portoes/F0.md) e [`docs/portoes/F1.md`](docs/portoes/F1.md). Projeto Supabase real criado e com RLS conferida (portão da F0 fechado). Pendentes: publicação no Cloudflare (Worker `arretado`, T18) e o uso real de 14 dias — ver [`docs/proxima-sessao.md`](docs/proxima-sessao.md). **F2 (Legislação) planejada e em execução em paralelo** (decisão de 23/09/2026): [`docs/planos/F2.md`](docs/planos/F2.md).
+**F0 (Fundamentos) e F1 (Recall + pontos) implementadas.** Portões: [`docs/portoes/F0.md`](docs/portoes/F0.md) e [`docs/portoes/F1.md`](docs/portoes/F1.md); portão da F2 (fechado em 13/10/2026; medições de uso real → V1): [`docs/portoes/F2.md`](docs/portoes/F2.md). Projeto Supabase real criado e com RLS conferida (portão da F0 fechado). Pendentes: publicação no Cloudflare (Worker `arretado`, T18) e o uso real de 14 dias — ver [`docs/proxima-sessao.md`](docs/proxima-sessao.md). **F2 (Legislação) planejada e em execução em paralelo** (decisão de 23/09/2026): [`docs/planos/F2.md`](docs/planos/F2.md).
 
 - [`docs/especificacao-parte1.md`](docs/especificacao-parte1.md) — diagnóstico dos artefatos existentes, produto unificado, modelo conceitual de dados, arquitetura modular, core, plano de fases, MVP e as decisões arquiteturais **D1–D24** (seções 1–7, 15, 16, 19).
 - [`docs/especificacao-parte2.md`](docs/especificacao-parte2.md) — integração entre módulos, interface, detalhamento de cada módulo (com destaque para Legislação), acessibilidade, backup/importação, fontes oficiais, backend e sincronização, critérios de validação, riscos e backlog (seções 8–14, 17, 18, 20).
@@ -37,7 +37,7 @@ Lista completa com motivo, alternativa descartada e consequência: Parte 1, §19
 |---|---|---|
 | F0 | Fundamentos: banco local, esquema versionado, log, backup/restore com modos e prévia, sanitizador, shell, Conta e Ajustes | Restore idempotente comprovado; carga sintética aprovada |
 | F1 | **MVP**: Recall (captura, frase correta, cartão opcional, 6 caixas, drill, lista passiva) + pontos importados | 14 dias com revisão feita em ≥ 10 |
-| F2 | Legislação: importador HTML/URL, editor, leitor com modo foco, estrelas, redações ocultas (sem importação do Acervo antigo — decisão de 23/09/2026) | Lei lida no Arretado, não no Acervo, por 2 semanas |
+| F2 | Legislação: importador HTML/URL, editor, leitor com modo foco, estrelas, redações ocultas (sem importação do Acervo antigo — decisão de 23/09/2026) | Fechado em 13/10/2026; uso real medido na V1 |
 | F3 | Hoje, Dia, Sessão, Plano, reincidência | Fechamento do dia em ≥ 70% dos dias com sessão |
 | F4 | Login Google, sincronização, PWA, concurso com fases/prazos, calendário | Teste A/B offline sem perda |
 | F5 | Precedentes, Notas, busca global | — |

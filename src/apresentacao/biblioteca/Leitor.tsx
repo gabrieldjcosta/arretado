@@ -41,6 +41,7 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import type { ResultadoDaCorrecao } from '../../dominios/legislacao/correcao';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
+import { criarFraseDeTrecho } from '../../dominios/recall/servico';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
@@ -57,8 +58,9 @@ import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remiss
 import { fraseDaEstrela, procedenciaDaVersao, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
+import { VerificarAtualizacao } from './VerificarAtualizacao';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
-import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota } from './Marcacoes';
+import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota, DialogoEnviarAsFrases } from './Marcacoes';
 import {
   ATRIBUTO_FORA_DO_TEXTO,
   CLASSE_DO_TEXTO,
@@ -1142,6 +1144,9 @@ function LeitorAberto({
   const [notaAberta, setNotaAberta] = useState<
     { trecho: SelecaoNoTexto; texto: string } | { id: string } | undefined
   >(undefined);
+  const [fraseAberta, setFraseAberta] = useState<
+    { trecho: SelecaoNoTexto; texto: string } | undefined
+  >(undefined);
   const tocouNasAcoes = useRef(-Infinity);
   const temSelecao = useRef(false);
   const escolhida = escolhidaId === undefined ? undefined : marcacoes.porId.get(escolhidaId);
@@ -1159,7 +1164,8 @@ function LeitorAberto({
         );
         setEscolhidaId(undefined);
         // Anunciado uma vez, quando a seleção começa (não a cada letra que a alça percorre).
-        if (!temSelecao.current) setAnuncio('Trecho selecionado: grife numa das 3 cores ou anote.');
+        if (!temSelecao.current)
+          setAnuncio('Trecho selecionado: grife numa das 3 cores, anote ou envie às frases.');
         temSelecao.current = true;
         return;
       }
@@ -1214,6 +1220,12 @@ function LeitorAberto({
     const s = selecao;
     if (!s) return;
     setNotaAberta({ trecho: s, texto: textoDaSelecao(s) });
+    limparSelecao();
+  }
+  function enviarSelecaoAsFrases() {
+    const s = selecao;
+    if (!s) return;
+    setFraseAberta({ trecho: s, texto: textoDaSelecao(s) });
     limparSelecao();
   }
   function anotarGrifo(grifo: Marcacao) {
@@ -1615,6 +1627,7 @@ function LeitorAberto({
       {!modoFoco && (
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
+      {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
       {!modoFoco && destacar && <LegendaDestaques />}
@@ -1818,6 +1831,7 @@ function LeitorAberto({
             cortadaEm={selecao.cortada ? referenciaDoDispositivo(selecao.dispositivoId) : undefined}
             grifar={grifarSelecao}
             anotar={anotarSelecao}
+            enviarAsFrases={enviarSelecaoAsFrases}
             cancelar={() => {
               limparSelecao();
               setAnuncio('');
@@ -1920,6 +1934,33 @@ function LeitorAberto({
           {anuncio}
         </p>
       </div>
+      <DialogoEnviarAsFrases
+        aberto={fraseAberta !== undefined}
+        trecho={fraseAberta?.texto ?? ''}
+        enviar={async (texto) => {
+          if (!fraseAberta) return false;
+          const { trecho, texto: citado } = fraseAberta;
+          try {
+            await criarFraseDeTrecho(repo, {
+              texto,
+              trecho: {
+                dispositivoId: trecho.dispositivoId,
+                versaoId: aberta.versao.id,
+                texto: citado,
+                inicio: trecho.inicio,
+                fim: trecho.fim,
+              },
+            });
+          } catch {
+            return false;
+          }
+          setAnuncio('Enviado às frases.');
+          return true;
+        }}
+        fechar={() => {
+          setFraseAberta(undefined);
+        }}
+      />
       <DialogoDaNota
         aberto={notaAberta !== undefined && ('trecho' in notaAberta || notaDoDialogo !== undefined)}
         trecho={

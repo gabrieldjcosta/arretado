@@ -10,6 +10,7 @@ const ROTAS = [
   '/recall/cartoes',
   '/recall/historico',
   '/recall/revisar',
+  '/recall/frases/revisar',
   '/recall/cartoes/novo',
   '/biblioteca',
   '/biblioteca/importar',

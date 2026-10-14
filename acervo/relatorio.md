@@ -122,3 +122,64 @@
 | sumulas-tjsp | publicado | 165 | 0 | — |
 | sumulas-tnu | publicado | 89 | 0 | — |
 | teses-dpesp | publicado | 160 | 0 | — |
+| resolucao-cnj-414-2021 | publicado | 57 | 0 | alinea_sem_inciso: 1 |
+| resolucao-cnj-425-2021 | publicado | 207 | 0 | — |
+| resolucao-cnj-287-2019 | publicado | 52 | 0 | — |
+| resolucao-cnj-213-2015 | publicado | 153 | 0 | linha_solta: 2; duplicata: 8; alinea_sem_inciso: 5; item_sem_alinea: 2 |
+| resolucao-cnj-412-2021 | publicado | 66 | 0 | — |
+| resolucao-cnj-125-2010 | publicado | 120 | 0 | — |
+| resolucao-cnj-131-2011 | publicado | 27 | 0 | — |
+| resolucao-cnj-270-2018 | publicado | 23 | 0 | — |
+| resolucao-cnj-510-2023 | publicado | 75 | 0 | — |
+| resolucao-cnj-35-2007 | publicado | 104 | 0 | duplicata: 3; artigo_ausente: 3; alinea_sem_inciso: 20 |
+| resolucao-cnj-345-2020 | publicado | 31 | 0 | — |
+| resolucao-cnj-372-2021 | publicado | 12 | 0 | — |
+| resolucao-cnj-385-2021 | publicado | 27 | 0 | — |
+| resolucao-cnj-492-2023 | publicado | 17 | 0 | — |
+| resolucao-cnj-598-2024 | publicado | 13 | 0 | — |
+| recomendacao-cnj-128-2022 | publicado | 4 | 0 | — |
+| recomendacao-cnj-163-2025 | publicado | 24 | 0 | — |
+| provimento-cnj-16-2012 | publicado | 11 | 0 | duplicata: 12; artigo_ausente: 1 |
+| provimento-cnj-65-2017 | publicado | 127 | 0 | — |
+| provimento-cnj-73-2018 | publicado | 19 | 0 | duplicata: 5; paragrafo_unico_com_numerado: 1 |
+| provimento-cnj-82-2019 | publicado | 14 | 0 | — |
+| provimento-cnj-104-2020 | publicado | 12 | 0 | — |
+| provimento-cnj-122-2021 | publicado | 16 | 0 | duplicata: 3; paragrafo_unico_com_numerado: 1 |
+| provimento-cnj-152-2023 | publicado | 17 | 0 | duplicata: 6; artigo_ausente: 1; artigo_fora_de_ordem: 1 |
+| resolucao-cnj-175-2013 | publicado | 4 | 0 | — |
+| resolucao-cnj-295-2019 | publicado | 12 | 0 | — |
+| provimento-cnj-19-2012 | publicado | 5 | 0 | — |
+| provimento-cnj-28-2013 | publicado | 60 | 0 | alinea_sem_inciso: 15 |
+| provimento-cnj-44-2015 | publicado | 139 | 0 | — |
+| resolucao-conama-511-2025 | publicado | 64 | 0 | linha_solta: 1 |
+| resolucao-conanda-119-2006 | publicado | 6 | 0 | — |
+| resolucao-conanda-113-2006 | publicado | 174 | 0 | — |
+| resolucao-conanda-117-2006 | publicado | 91 | 0 | duplicata: 2; artigo_ausente: 8; artigo_fora_de_ordem: 1; paragrafo_unico_com_numerado: 1; paragrafo_1_sem_2: 1 |
+| resolucao-conanda-169-2014 | publicado | 21 | 0 | — |
+| resolucao-cnas-145-2004 | publicado | 69 | 0 | — |
+| resolucao-cnas-109-2009 | publicado | 13 | 0 | — |
+| resolucao-conjunta-cnas-conanda-1-2009 | publicado | 33 | 0 | — |
+| resolucao-cnpcp-4-2011 | publicado | 11 | 0 | — |
+| deliberacao-csdp-63-2008 | publicado | 15 | 0 | — |
+| deliberacao-csdp-89-2008 | publicado | 110 | 0 | linha_solta: 1; estrutural_repetido: 2; alinea_sem_inciso: 3 |
+| deliberacao-csdp-120-2009 | publicado | 18 | 0 | tachado_sem_dispositivo: 7; linha_solta: 1 |
+| deliberacao-csdp-134-2009 | publicado | 12 | 0 | — |
+| deliberacao-csdp-187-2010 | publicado | 94 | 0 | linha_continuada: 3; duplicata: 12; paragrafo_1_sem_2: 1 |
+| deliberacao-csdp-219-2011 | publicado | 31 | 0 | — |
+| deliberacao-csdp-249-2012 | publicado | 23 | 0 | — |
+| deliberacao-csdp-270-2013 | publicado | 98 | 0 | alinea_sem_inciso: 29 |
+| deliberacao-csdp-291-2014 | publicado | 75 | 0 | — |
+| deliberacao-csdp-296-2014 | publicado | 28 | 0 | linha_solta: 3; duplicata: 1 |
+| deliberacao-csdp-297-2014 | publicado | 66 | 0 | linha_continuada: 2; alinea_sem_inciso: 2 |
+| deliberacao-csdp-373-2020 | publicado | 118 | 0 | — |
+| deliberacao-csdp-400-2022 | publicado | 84 | 0 | — |
+| ato-normativo-dpg-216-2022 | publicado | 41 | 0 | duplicata: 1 |
+| ato-normativo-dpg-295-2025 | publicado | 31 | 0 | — |
+| ato-normativo-dpg-183-2020 | publicado | 3 | 0 | tachado_sem_dispositivo: 4 |
+| ato-normativo-dpg-146-2018 | publicado | 45 | 0 | — |
+| portaria-ms-1130-2015 | publicado | 100 | 0 | — |
+| convencao-oit-182 | publicado | 47 | 0 | alinea_sem_inciso: 11; item_sem_alinea: 16 |
+| convencao-oit-138 | publicado | 74 | 0 | duplicata: 3; alinea_sem_inciso: 18; item_sem_alinea: 33 |
+| recomendacao-oit-190 | publicado | 6 | 0 | — |
+| recomendacao-oit-146 | publicado | 8 | 0 | — |
+| resolucao-conanda-273-2025 | publicado | 70 | 0 | — |

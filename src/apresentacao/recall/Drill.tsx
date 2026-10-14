@@ -233,7 +233,13 @@ export function Drill() {
         <p className="drill-frente texto-leitura">{atual.frente}</p>
         {estado.virado && (
           <div className="frase-correta" aria-live="polite">
-            <p className="frase-correta-titulo">{atual.erroId ? 'Frase correta' : 'Resposta'}</p>
+            <p className="frase-correta-titulo">
+              {atual.tipo === 'lacuna'
+                ? 'Frase completa'
+                : atual.erroId
+                  ? 'Frase correta'
+                  : 'Resposta'}
+            </p>
             <p className="texto-leitura">
               {verso?.id !== atual.id ? (
                 <span className="dica">Carregando…</span>

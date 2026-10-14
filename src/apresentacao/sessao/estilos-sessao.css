@@ -1,0 +1,23 @@
+/* Sessão leve (A2). Só tokens e classes existentes; sem cor literal. */
+.sessao-resumo {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.sessao-detalhe {
+  margin: 0 0 0.25rem;
+  color: var(--texto-atenuado);
+}
+
+.sessao-pausada {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.sessao-aberta {
+  margin-bottom: 1rem;
+}
+
+.sessao-aberta .principal {
+  min-height: var(--alvo);
+}

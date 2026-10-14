@@ -53,6 +53,9 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Atualização (02/10/2026, 8.10):** num worktree recém-instalado, o check inteiro falhou em 25 testes de tempo e de tela (sem relação com a mudança); com `--maxWorkers=3` e o `desempenho.test.ts` sozinho (60 de 60), duas rodadas deram 2 e 1 falhas diferentes (`Leitor.test.tsx`, `App.test.tsx` e `Cannot find module …fake-indexeddb…` no `Biblioteca.test.tsx`), e cada arquivo passou sozinho. O CI do PR é a referência.
 - **Atualização (24/09/2026):** o "Sem conexão" falhou também no CI (Linux), no PR #11. Causa no teste: ele conferia o texto logo depois do evento `offline`, e a assinatura do `useSyncExternalStore` é um efeito que, sob carga, pode chegar depois. O teste passou a esperar (`findByText` e `waitFor`). Ao ver de novo "não acha um texto" em teste de tela, procurar a mesma causa (conferência síncrona logo depois de um evento) antes de rodar de novo.
 
+### E2E de falha de rede reprova com "falhas no console"
+- **Sintoma:** teste que simula resposta de erro (ex.: 502 em `/api/buscar-norma`) falha em `apoio.ts` com "falhas no console", embora a tela se comporte certo. **Causa:** o Chromium registra "Failed to load resource" no console para toda resposta de erro; o vigia do `apoio.ts` reprova qualquer falha de console. **Solução:** isolar o caso de falha num `test.describe` com `test.use({ permitirFalhasConsole: true })` (como em `biblioteca.spec.ts`, 12.3), mantendo o caminho feliz com o vigia ligado. **Origem:** 12.3, 13/10/2026.
+
 ### `npm audit` reprova o check sem mudança de dependência
 - **Sintoma:** `npm run check` (e o CI) vermelho só na etapa `audit`, com um aviso novo de pacote que ninguém mexeu. **Causa:** o aviso é publicado depois da última sessão verde; o `--audit-level=high` reprova a partir de "alto", mesmo em dependência indireta de desenvolvimento.
 - **Solução:** `npm audit fix --dry-run` para ver o que muda; se só sobe a versão de correção (patch) dentro da faixa do `package.json`, `npm audit fix` num commit separado (`chore(deps)`) e a suíte inteira de novo (o corpus confere a saída do sanitizador byte a byte). Subida de versão maior ou troca de pacote é escolha técnica: decidir com o Gabriel (T1–T18).
@@ -1235,6 +1238,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** flake de tempo sob carga (5,4 s contra o limite de 5 s na suíte inteira); passou na rodada seguinte, sem mudança de código.
 - **Solução:** rodar de novo; só investigar se falhar duas vezes seguidas.
 
+## Acervo: converter atos em PDF ou HTML para Markdown (13/10/2026)
+
+- **Como:** `node scripts/acervo-lote-md.mjs <manifesto.json>` baixa o PDF (página do CNJ, gov.br, MDS) ou a página HTML (portal da Defensoria), converte com `pdftotext` (`scripts/acervo-pdf-para-md.mjs`) e acrescenta o item em `acervo/curadoria.json`; depois `npm run acervo:gerar` e `acervo:verificar`. O manifesto aceita `cnj` (página do ato), `pdfModo: "original"`, `pdf`, `html`, `cortarEm` (deixa o anexo de fora), `semArtigos`, `manual` (Markdown já transcrito) e `anomaliasAceitas`.
+- **PDF compilado do CNJ:** o último "compilado" costuma ser o texto vigente, mas às vezes é só o anexo (Res. 412, 510, 598, Rec. 128): usar `pdfModo: "original"`. O texto compilado perde o tachado, então o dispositivo alterado aparece duas vezes (vale o último; aviso `duplicata` aceito com aviso ao leitor).
+- **PDF escaneado (sem camada de texto):** Res. CNJ 175/2013, 295/2019 e Prov. CNJ 19/2012, 28/2013, 44/2015 foram transcritos à mão (lendo o PDF) e entram com `manual: true`. Não há OCR na máquina.
+- **gov.br participamaisbrasil e BVS/Saúde:** bloqueiam download automático (403 e desafio de navegador); usar cópia do DOU ou do CONASS e dizer isso no aviso do item.
+- **`acervo:gerar` sem argumento** regrava todos os itens e o índice (as datas de coleta mudam e o hash junto): não restaurar arquivos antigos de `public/acervo/`, senão o `verificar` acusa hash diferente.
+- **Pendentes sem fonte:** Prov. CGJ-TJSP 18/2012, 16/2013, 21/2013 e Res. CONDEGE 1/2024.
+
 ### Teste de subida de esquema acusa uma linha a mais em `meta` (v6)
 - **Causa:** ao abrir, `Repositorio.abrir` roda `migrarFrasesDosErros` uma vez e grava a marca `CHAVE_MIGRACAO_FRASES` em `meta` (Frases 1).
 - **Solução:** comparar `meta` sem a marca (`tabelaSemMarca` em `migracao.test.ts`). Subida futura (v7) que crie dado depois de abrir: mesma ideia, uma marca por migração.
@@ -1250,3 +1262,35 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Frase correta não aparece em "Frases" depois do registro (v6)
 - **Causa provável:** registro gravado direto pela coleção `erros` (teste, carga, importação de pacote v6 sem a Frase), sem passar por `registrarErro`; a migração só cria Frase ao abrir pela primeira vez na v6 e ao importar pacote < v6.
 - **Solução:** registrar por `registrarErro`/`completarErro` (criam ou sincronizam a Frase). Para dado antigo, `migrarFrasesDosErros(repo)` é idempotente.
+
+### "Substituir módulos" com backup v5 apagava todas as Frases (v6; corrigido na revisão das Frases 1)
+- **Causa:** a prévia do modo 5 excluía (lógico) toda Frase local fora do pacote, e um pacote v5 não tem `frases`; `migrarFrasesDosErros` pulava o erro que já tinha Frase, mesmo excluída. Resultado: nenhuma Frase ativa.
+- **Solução:** `planejar` (modo 5, pacote < v6) não toca `frases`/`revisoesFrase`, só exclui a Frase do erro que a importação exclui; a migração só pula erro com Frase não excluída. Testes em `pacote-v2.test.ts` ("pacote v5 no app v6"). Previsível: coleção derivada nova (v7) num pacote antigo precisa da mesma regra.
+
+
+### E2E 13.5 (posição do artigo no celular) falha uma vez sob carga (visto na 6b)
+- **Sintoma:** `leitor.spec.ts` "mudar o tamanho do texto…" estoura 15 s em `distanciaDoAlto` no projeto celular quando a suíte inteira roda; sozinho passa nos 3 aparelhos.
+- **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
+- **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.
+
+### Esquema v7 (F3): app v6 aberto numa aba depois de a v7 subir, ou pacote v7 num app v6
+- **Sintoma:** a aba antiga pede para recarregar (`versionchange`); um pacote exportado na v7 é recusado por app v6 com "atualize o app".
+- **Causa:** v7 criou `tarefasDeEstudo` e a coleção entra no pacote (módulo `plano`); é o comportamento desejado (R10), como na v4 a v6.
+- **Solução:** fazer o backup (Conta › Dados › Exportar) antes do merge no `main`; recarregar as abas; não abrir o app v6 sobre um banco v7 (o IndexedDB não desce de versão).
+
+### Esquema v7: novo campo de Sessão ou Preferências "some" ao gravar
+- **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
+- **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.
+
+### Sessão: aparece "Sessão encerrada" sem duração, ou uma Sessão antiga some do Hoje
+- **Causa:** Sessão que ficou aberta de um dia para o outro vira `interrompida` ao abrir `/sessao/*` (A2); não há como saber quando a pessoa parou, então não tem `fim` nem `duracaoSegundos`. É de propósito; nada é cobrado.
+- **Solução:** nenhuma; começar uma Sessão nova funciona normalmente. Para contar tempo, só `encerrada`.
+
+### Hoje: o Retorno não aparece depois de dias fora, ou "Fechar o Dia" some
+- **Causa:** o Retorno exige ≥ 2 dias desde a última Sessão ou Revisão (Cartão ou Frase) e some depois de "Agora não" no mesmo dia (`localStorage` `arretado.retorno-dispensado`). "Fechar o Dia" só aparece se houve Sessão encerrada ou Revisão hoje, ou se o Dia já está fechado (para reabrir).
+- **Solução:** limpar a chave acima para rever o Retorno; fazer uma Sessão ou revisão para o Dia poder ser fechado.
+
+### Só estudo ligado e a navegação sumiu
+- **Sintoma:** as áreas, Conta e o botão de erro não aparecem.
+- **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
+- **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.
