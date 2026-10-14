@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FonteEmMemoria } from '../../../dominios/acervo/fonte-em-memoria';
 import { repositorioDeTeste } from '../../../testes/repositorio';
@@ -23,9 +23,9 @@ describe('Biblioteca › Precedentes', () => {
     await usuario.type(screen.getByLabelText('Número'), 'ADPF 347');
     await usuario.type(screen.getByLabelText(/^Texto/), 'Estado de coisas inconstitucional.');
     await usuario.click(salvar);
-    expect(
-      await screen.findByRole('heading', { name: /STF ADPF 347/ }, espera),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /STF ADPF 347/ })).toBeInTheDocument();
+    }, espera);
     expect(
       screen.getByText('Estado de coisas inconstitucional.', { selector: 'blockquote' }),
     ).toBeInTheDocument();

@@ -101,6 +101,14 @@ export async function publicar(page: Page, titulo: string) {
   await page.getByRole('button', { name: 'Publicar', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Biblioteca' })).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: `${titulo} publicada.` })).toBeVisible();
+  await abrirTodasAsNormas(page);
+}
+
+/** A lista de Normas fica recolhida até escolher disciplina: abre a lista completa (sem fechar se já aberta). */
+export async function abrirTodasAsNormas(page: Page) {
+  const botao = page.getByRole('button', { name: 'Todas as normas' });
+  await expect(botao).toBeVisible();
+  if ((await botao.getAttribute('aria-pressed')) !== 'true') await botao.click();
 }
 
 /** Cola a página compilada do corpus em Importar e publica com o título curto dado. */
