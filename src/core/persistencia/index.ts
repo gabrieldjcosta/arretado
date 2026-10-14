@@ -1,3 +1,4 @@
+export { pedirArmazenamentoPersistente, type EstadoDoArmazenamento } from './armazenamento';
 export {
   AnexoAlterado,
   gravarAnexo,
