@@ -10,7 +10,7 @@ Partição de 14/10/2026 do [`f4a-contas.md`](f4a-contas.md), no formato de [`f3
 4. **Dono de arquivo:** cada pacote só edita a pasta da tabela. Compartilhados (`glossario.md`, `proxima-sessao.md`, `solucao-de-problemas.md`, `decisoes-tecnicas.md`, `orientacoes/conteudo.ts`): só por acréscimo, relendo a `integracao` antes do commit.
 5. **Camada visual é da thread de UI:** os pacotes usam tokens e classes existentes, CSS próprio (`estilos-conta.css`), componentes pequenos com `className` semântico, sem cor literal.
 6. **Nada externo sem sim:** pacote que precisa de conta Google, migração no projeto real ou gasto para na etapa "Gabriel" e deixa o resto pronto (ver §12 e §11 do plano).
-7. **Ponto de salvamento:** tag `pre-f4a-<pacote>` na `integracao` antes de abrir cada pacote; backup `.arretado` do Gabriel e revisão independente antes do merge do A4.
+7. **Ponto de salvamento:** branch `backup/pre-f4a-<pacote>` (a partir da `integracao`; push de tag é recusado no ambiente) antes de abrir cada pacote; backup `.arretado` do Gabriel e revisão independente antes do merge do A4.
 8. Regras do CLAUDE.md valem: local-first, vocabulário, sem diagnóstico, `npm run check` verde, E2E nas telas novas, axe nos 2 temas.
 
 ## Pacotes

@@ -160,7 +160,7 @@ Se ele não responder, o trabalho sem custo e sem conta externa segue (pacotes A
 ## 13. Estratégia de entrega, pontos de salvamento e reversão
 
 - **Tudo atrás de uma chave:** `VITE_CONTA=0` no build é o padrão e deixa o app **idêntico ao de hoje** (serviço nulo, CSP sem origem nova, sem import do supabase-js). Liga-se na `integracao`, testa-se, só então vai ao `main`.
-- **Ponto de salvamento antes de cada pacote:** tag `pre-f4a-<pacote>` na `integracao` e branch `backup/AAAA-MM-DD` já criado pelo hook; no remoto, nada destrutivo (só migrações aditivas com o `drop` pronto). Pacote que mexe em dado (A4) exige, além disso, backup `.arretado` do Gabriel e revisão independente em outra sessão antes do merge.
+- **Ponto de salvamento antes de cada pacote:** branch `backup/pre-f4a-<pacote>` (a partir da `integracao`; push de tag é recusado no ambiente) e branch `backup/AAAA-MM-DD` já criado pelo hook; no remoto, nada destrutivo (só migrações aditivas com o `drop` pronto). Pacote que mexe em dado (A4) exige, além disso, backup `.arretado` do Gabriel e revisão independente em outra sessão antes do merge.
 - **Reversão:** local = desligar a chave e reverter o merge (a cópia anterior da migração permanece e o banco da conta pode ser exportado); remoto = rodar o `rollback` do pacote. A migração A4 não tem "desfazer" porque a origem nunca é alterada.
 - **Um merge por pacote, sem squash, nunca no `main` (fluxo diário); no máximo 2 pacotes de código ao mesmo tempo.**
 - **Observação sobre PRs de código:** cada um ganha `npm run check` verde, E2E (com `ServicoDeContaFalso` no Playwright; o projeto real só em fumaça manual com a conta de teste do Gabriel), axe nos dois temas, glossário e `solucao-de-problemas.md` atualizados.
