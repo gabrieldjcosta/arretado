@@ -1,7 +1,7 @@
 # Ordem ao coordenador — Resumos e Precedentes na Biblioteca
 
 Data: 14/10/2026 · Autor da ordem: Gabriel · Destino: coordenador do projeto
-Status: **proposta para decisão**; muda o plano-mestre (antecipa conteúdo previsto para depois da V1).
+Status: **aprovada pelo Gabriel em 14/10/2026**; vira o pacote **F3-C** (ver `f3-pacotes.md`). Antecipa conteúdo previsto para depois da V1.
 
 ## Objetivo
 Trazer para **antes da V1 (teste com 3 a 5 pessoas)** duas capacidades da Biblioteca, sem IA, sem rede e sem conta:
@@ -27,7 +27,7 @@ Cadastrar a ADPF 347 (ex.: "estado de coisas inconstitucional"). O usuário:
 - Vínculos opcionais com Ponto e com Dispositivo (reaproveita o mecanismo da Atividade B quando existir).
 - Modelo sugerido: Sonnet 5.5 médio. Nuvem, sem rede.
 
-### Atividade B — Precedente com trecho-chave e vínculo a dispositivo (**esquema v7**)
+### Atividade B — Precedente com trecho-chave e vínculo a dispositivo (**esquema v8**; o v7 já está na `integracao` desde a P0)
 - Entidade `Precedente`: tribunal, tipo (ADPF, ADI, RE, REsp, Tema, HC etc.), número, relator (opcional), data (opcional), fonte/URL (opcional).
 - **Corpo do precedente** (ementa ou texto colado, sanitizado) com **Trecho-chave** = intervalo marcado no corpo (início, fim, rótulo: `tese`, `ementa`, `ratio`, `dispositivo-da-decisão`). Um precedente pode ter vários trechos-chave. A tese é o trecho exibido por padrão (visão "só a tese").
 - **Vínculo Precedente↔Dispositivo**: por trecho-chave, N dispositivos (norma + endereço canônico, ex.: `cf88` / `art5.incXLIX`). Digitar "art. 5º, XLIX, CF" e escolher o dispositivo sugerido (busca por norma + endereço, Parte 2, item 6).
@@ -40,7 +40,7 @@ Cadastrar a ADPF 347 (ex.: "estado de coisas inconstitucional"). O usuário:
 ## Decisões que o coordenador precisa tomar antes de abrir a atividade
 1. **Tese do acervo × Trecho-chave `tese` do Precedente.** Hoje "Tese" é dispositivo de uma `Norma` com `especie: 'teses'` (peça 5 do acervo). Recomendo **não fundir**: o Precedente aponta para a tese do acervo quando existir (campo opcional `teseDoAcervo`), e o trecho-chave cobre o que não está no acervo. Registrar no glossário.
 2. **Ordem no plano**: recomendo A (resumo) logo após o portão da F2 e antes da F3; B (precedente) em seguida, também antes da F3-A, porque a V1 só vem depois da F3. Se a F3 não puder esperar, B vai para depois da V1 e A fica sozinha.
-3. **Esquema v7**: B sobe o esquema (nova tabela, índices por dispositivo). Exige desenho com modelo acima do Sonnet 5.5 médio (Opus 5.5), migração testada, **backup do Gabriel antes do merge** e revisão independente em outra sessão (risco alto: migração e reancoragem).
+3. **Esquema v8**: B sobe o esquema (v7 → v8) (nova tabela, índices por dispositivo). Exige desenho com modelo acima do Sonnet 5.5 médio (Opus 5.5), migração testada, **backup do Gabriel antes do merge** e revisão independente em outra sessão (risco alto: migração e reancoragem).
 4. **Tamanho do corpo**: limite de caracteres do corpo do precedente e do resumo (definir na atividade; backup e sanitização devem comportar).
 
 ## Regras que continuam valendo
@@ -54,10 +54,37 @@ Cadastrar a ADPF 347 (ex.: "estado de coisas inconstitucional"). O usuário:
 - `npm run check` verde; E2E verde nos 3 aparelhos nas telas novas (cadastro, lista, leitura da tese, abrir trecho, contador no leitor da lei).
 - Teste: exemplo-guia (ADPF) de ponta a ponta, incluindo reancoragem após correção do texto da norma.
 - Backup: exportar → apagar → restaurar idêntico com precedentes e vínculos.
-- Migração v6→v7 testada com dados representativos; reancoragem exata/aproximada/pendente coberta.
+- Migração v7→v8 testada com dados representativos; reancoragem exata/aproximada/pendente coberta.
 - Axe nos dois temas; alvos de toque ≥ 44 px.
 - `docs/proxima-sessao.md` atualizado; portão correspondente em `docs/portoes/`.
 
 ## Fora do escopo
 - Resumo ou tese gerados por IA, OCR, busca semântica, sincronização, importação automática de jurisprudência de sites de tribunais.
 - Banco de questões (D22).
+
+## Acréscimos aprovados (14/10/2026)
+
+### Vínculo entre precedentes (esquema v8)
+- Entidade própria `VinculoDePrecedente` (de, para, tipo): navegável nos dois sentidos e linha própria no backup. Tipos: `relacionado` (padrão), `aplica`, `confirma`, `distingue`, `supera`. Só o destino é obrigatório.
+- Origem e destino podem ser Precedente do usuário **ou** súmula/tese do acervo (sem fundir tese do acervo com trecho-chave).
+- Âncora opcional ao trecho-chave dos dois lados; o v8 já traz os campos para não exigir v9.
+- Na tela do precedente: bloco discreto "Relacionados" por tipo; "superado por" com aviso visível, como o aviso de vigência das normas.
+- Duas âncoras distintas, testadas separadamente: vínculo → dispositivo segue a **versão da norma**; trecho-chave segue a **correção do texto do precedente**.
+
+### Selecionar trecho → frase de revisão
+- Qualquer seleção no corpo do precedente (ou do resumo), não só o trecho-chave, tem "Enviar às frases": abre a captura com o trecho como frase correta; a frase guarda o link de volta (precedente + intervalo), com a regra exata → aproximada → "Para reler".
+- Critério de pronto: selecionar → frase → revisar → voltar ao trecho, inclusive depois de corrigir o texto.
+
+### Aproveitar o que já está na plataforma, e adicionar novos
+- Súmulas (STF, SV, STJ, TJSP, TNU) e teses da DPE-SP do acervo contam como precedentes da Biblioteca: aparecem na lista e na busca de Precedentes, aceitam trecho-chave, vínculo a dispositivo, vínculo a outros precedentes e "Enviar às frases". Sem copiar o texto: o precedente pessoal aponta para o item do acervo.
+- O usuário também cadastra os seus (formulário mínimo: tribunal + número + um trecho-chave).
+
+### Favoritos e organização, sempre discretos
+- Reaproveitar a Estrela existente (estrela discreta do leitor) para precedente, súmula e tese; sem tela, contador nem lembrete novos.
+- Marcador "lido / para revisar" opcional e silencioso (já há `statusLeitura` no modelo). Nada disso aparece no Hoje nem na Sessão; vive só dentro da Biblioteca.
+- Regra de interface: nenhuma ação nova compete com a leitura. Um toque, sem confirmação, desfazer à vista, sem badge.
+
+### Interface e código
+- Seguir a identidade visual vigente (cartão verde "Agora", creme/espresso, mascote só em pontos estratégicos, não no Leitor) e o guia de voz do #125.
+- Considerar a modernização do código em andamento (#126: rotas preguiçosas, `LimiteDeErro`, storage persist; #127 e fatias de UI): componentes e rotas novos entram no padrão atual, sem reintroduzir o que foi removido.
+- Ordem: depois do PR do Filtro da Biblioteca (mesma pasta `src/apresentacao/biblioteca/`) e da F3-B (B2→B4), antes da F4-A. Atividade A e B em sequência; B exige backup do Gabriel antes do merge e revisão independente.

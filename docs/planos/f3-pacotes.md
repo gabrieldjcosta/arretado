@@ -34,6 +34,8 @@ Entrega o que os outros precisam para não colidir:
 | 3 | **B2 Onboarding do plano** | `src/apresentacao/plano/onboarding/` | B1, A1 | uma pergunta por tela, disciplinas pré-marcadas, assuntos recolhidos, "sem edital", termina em "Comece por aqui" (ação da A1); texto sem jargão; tudo reversível |
 | 3 | **B3 Pontos do programa** | `src/dominios/pontos/`, `src/apresentacao/plano/pontos/` | P0 | editar disciplinas e pontos, prioridade separada do status, atividade sem alegar domínio |
 | 4 | **B4 Tarefas pequenas e sugestões** | `src/dominios/tarefas/`, `src/apresentacao/plano/tarefas/` | B3, A1 | só depois do portão F3-A; sugestão determinística com "por quê" |
+| 5 | **C1 Resumo manual** | `src/dominios/notas/`, `src/apresentacao/biblioteca/notas/` | PR do Filtro da Biblioteca, B4 | Nota tipo resumo, sanitizada, leitura com grifo/anotação e "Enviar às frases"; sem esquema novo. Detalhe: `ordem-resumos-precedentes.md` |
+| 5 | **C2 Precedentes e vínculos** | `src/dominios/precedentes/`, `src/apresentacao/biblioteca/precedentes/` | C1 | **esquema v8**; trecho-chave, vínculo a dispositivo e entre precedentes, acervo como precedente, favoritos discretos; backup do Gabriel antes do merge e revisão independente; modelo acima de Sonnet 5.5 médio no desenho |
 
 Ondas com 2 pacotes de código: **0** P0 (+B0 doc), **1** A1+A2, **2** A3a+A3b (B1 espera vaga ou entra no lugar da A3b se o Gabriel preferir catálogo antes), **3** B2+B3 (A4 entra quando houver vaga), **4** B4. Dentro de uma onda, um merge por pacote, sem squash, nunca no `main`.
 

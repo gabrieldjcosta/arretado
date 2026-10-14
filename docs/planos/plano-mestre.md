@@ -97,6 +97,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; Frases 1 feita (v6, PR aguarda revisão e backup) |
 | F3-A | Hoje, Sessão e retorno após pausa | F2 feita (sem portão de medição) | liberada |
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
+| F3-C | Resumo manual e Precedentes com trecho-chave e vínculos (antecipados para antes da V1; aprovado em 14/10/2026) | F3-B | não iniciada (`ordem-resumos-precedentes.md`) |
 | V1 | Validação com 3 a 5 pessoas; reúne todas as validações adiadas (§6) | F3 e F4-A (contas) | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
 | F4 | Conta (F4-A, antes da V1), sincronização, backup remoto, instalável offline (F4-B/C, depois) | F3 | não iniciada |
 | A1 | Captura de imagem com OCR local | F4 | não iniciada |
