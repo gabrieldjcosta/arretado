@@ -28,6 +28,7 @@ jobs:
       - run: npm run acervo:verificar
       - run: npm run carga
       - run: npm run build
+      - run: npm run tamanho
 
   # Um job por aparelho, em paralelo: a suíte inteira numa fila só passou de 20 minutos.
   e2e:

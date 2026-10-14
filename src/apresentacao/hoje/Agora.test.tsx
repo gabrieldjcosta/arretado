@@ -17,7 +17,7 @@ describe('Hoje › Agora (A1)', () => {
     expect(agora).toHaveTextContent('1 cartão vencido');
     expect(screen.getByRole('link', { name: 'Começar' })).toHaveAttribute(
       'href',
-      '#/sessao/iniciar?tipo=revisao&rotulo=Revisar+cart%C3%B5es&origem=revisao_vencida&razao=1+cart%C3%A3o+vencido',
+      '#/sessao/iniciar?tipo=revisao&rotulo=Revisar+cart%C3%B5es&origem=revisao_vencida&razao=1+cart%C3%A3o+vencido&direto=1',
     );
 
     await usuario.click(screen.getByRole('button', { name: 'Escolher outra coisa' }));
