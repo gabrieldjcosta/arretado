@@ -125,3 +125,21 @@ export async function colarTextoPuro(page: Page, texto: string) {
     );
   }, texto);
 }
+
+/** `scrollY` depois que a rolagem assentou (iguais em 3 quadros seguidos); evita comparar no meio da restauração. */
+export async function rolagemAssentada(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        let ultimo = window.scrollY;
+        let iguais = 0;
+        const quadro = () => {
+          iguais = window.scrollY === ultimo ? iguais + 1 : 0;
+          ultimo = window.scrollY;
+          if (iguais >= 3) resolve(ultimo);
+          else requestAnimationFrame(quadro);
+        };
+        requestAnimationFrame(quadro);
+      }),
+  );
+}

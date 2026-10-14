@@ -7,7 +7,7 @@ test('Sessão leve: começa, pausa, volta ao reabrir, fecha com próximo passo (
   await expect(page.getByRole('heading', { level: 1, name: 'Começar uma Sessão' })).toBeVisible();
   await semViolacoes(page);
 
-  await page.getByText('Dizer o que e até onde (opcional)').click();
+  await page.getByText('Definir até onde (opcional)').click();
   await page.getByLabel('O que vai estudar?').fill('Lei de Execução Penal');
   await page.getByLabel('Até onde?').fill('até o art. 15');
   await page.getByRole('button', { name: 'Começar', exact: true }).click();

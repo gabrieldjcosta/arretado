@@ -283,11 +283,9 @@ export function Drill() {
         </div>
       )}
       <LinhaDepois>
-        {!estado.virado
-          ? 'você diz como foi'
-          : restam > 0
-            ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
-            : 'o fim desta rodada'}
+        {restam > 0
+          ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
+          : 'o fim desta rodada'}
       </LinhaDepois>
       <details className="menu-drill">
         <summary className="botao discreto">Mais opções</summary>

@@ -7,6 +7,7 @@ import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { Alavancas } from './alavancas/Alavancas';
 import { horaDeInicio, sessaoAberta } from './carregadores';
+import { rotaDoAlvo } from './rota-do-alvo';
 import './estilos-sessao.css';
 
 export function Atual() {
@@ -37,6 +38,7 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
   const repo = useRepositorio();
   const [erro, setErro] = useState(false);
   const pausada = sessao.estado === 'pausada';
+  const destino = rotaDoAlvo(sessao.alvo);
   const mudar = (acao: typeof pausarSessao) => {
     setErro(false);
     acao(repo, sessao.id).catch(() => {
@@ -55,9 +57,11 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
             Pausada. Sem pressa: volte quando quiser.
           </p>
         ) : (
-          sessao.alvo?.tipo === 'revisao' && (
+          destino !== undefined && (
             <p>
-              <Link to="/recall/revisar">Abrir a revisão</Link>
+              <Link to={destino}>
+                {sessao.alvo?.tipo === 'leitura' ? 'Abrir a leitura' : 'Abrir a revisão'}
+              </Link>
             </p>
           )
         )}
