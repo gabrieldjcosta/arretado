@@ -67,10 +67,10 @@ export function razao(a, b) {
   return (x + 0.05) / (y + 0.05);
 }
 
-const FUNDOS = ['fundo', 'superficie', 'superficie-2'];
+const FUNDOS = ['fundo', 'superficie', 'superficie-2', 'quente'];
+const SUPERFICIES = ['fundo', 'superficie'];
 const GRIFOS = ['grifo-1', 'grifo-2', 'grifo-3'];
 const DESTAQUES = ['destaque-prazo', 'destaque-condicao', 'destaque-absoluto', 'destaque-pena'];
-const TONS = ['cacto', 'caramelo', 'ceu', 'anil', 'ameixa', 'turquesa'];
 
 /** [primeiro plano, fundo, mínimo]. 4,5 = texto; 3 = traço, ícone ou contorno (WCAG 1.4.11). */
 export function pares() {
@@ -78,21 +78,28 @@ export function pares() {
   for (const f of FUNDOS) {
     p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['link', f, 4.5]);
   }
-  for (const f of ['fundo', 'superficie']) {
+  for (const f of SUPERFICIES) {
     p.push(
-      ['cacto-texto', f, 4.5],
+      ['titulo', f, 4.5],
       ['perigo', f, 4.5],
       ['sucesso', f, 4.5],
+      ['lugar', f, 3],
       ['foco', f, 3],
       ['estrela', f, 3],
       ['cacto', f, 3],
+      ['acqua', f, 3],
       ['borda-campo', f, 3],
       ...DESTAQUES.map((d) => [d, f, 3]),
-      ...TONS.map((t) => [`tom-${t}`, f, 3]),
     );
   }
-  // O verde-cacto também desenha o contorno do item selecionado dentro do trilho das abas.
-  p.push(['cacto', 'superficie-2', 3]);
+  p.push(
+    ['acqua-texto', 'fundo', 4.5],
+    ['acqua-texto', 'superficie', 4.5],
+    ['acqua-texto', 'superficie-2', 4.5],
+    // O trilho da barra de progresso é a superfície 2.
+    ['acqua', 'superficie-2', 3],
+    ['borda-forte', 'superficie', 3],
+  );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
     p.push(['texto', f, 4.5], ['texto-atenuado', f, 4.5], ['link', f, 4.5]);
@@ -100,18 +107,34 @@ export function pares() {
   p.push(
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
+    // Botão primário: Terracota (claro) ou Solace (escuro) com o texto da ação; no bloco-herói, Solace.
     ['acao-texto', 'acao', 4.5],
-    // Bloco-herói: o texto, o atenuado e o anel de foco próprio (o global não passa no verde).
+    ['bloco-acao-texto', 'bloco-acao', 4.5],
+    ['bloco-acao', 'bloco-fundo', 3],
+    // Bloco-herói: o texto, o atenuado e o anel de foco próprio (o global pode não passar no verde).
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
-    ['realce-texto', 'realce-fundo', 4.5],
-    ['texto', 'realce-fundo', 4.5],
-    ...TONS.map((t) => ['tom-icone', `tom-${t}`, 4.5]),
+    ['cacto', 'selecionado-fundo', 3],
+    ['texto', 'tinta-lugar', 4.5],
+    ['texto-atenuado', 'tinta-lugar', 4.5],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;
+}
+
+/** Resolve um valor de token (hex, rgb, var(--x), color-mix em srgb) para { r, g, b, a }. */
+function resolver(tema, texto) {
+  const t = texto.trim();
+  const v = /^var\(--([\w-]+)\)$/.exec(t);
+  if (v) {
+    if (!(v[1] in tema)) throw new Error(`token ausente: ${v[1]}`);
+    return resolver(tema, tema[v[1]]);
+  }
+  const m = /^color-mix\(in srgb,\s*(.+?)\s+(\d+(?:\.\d+)?)%\s*,\s*(.+)\)$/.exec(t);
+  if (m) return misturar(resolver(tema, m[1]), Number(m[2]), resolver(tema, m[3]));
+  return rgb(t);
 }
 
 /** Mistura `a` (com `pct` %) sobre `base`, como `color-mix(in srgb, a pct%, base)`. */
@@ -122,11 +145,11 @@ const misturar = (a, pct, base) => ({
   a: 1,
 });
 
-/** Resultado de cada par num tema, mais as camadas compostas (vidro, tinta, modo foco). */
+/** Resultado de cada par num tema, mais as camadas compostas (régua, modo foco, texto branco). */
 export function medir(tema) {
   const cor = (n) => {
     if (!(n in tema)) throw new Error(`token ausente: ${n}`);
-    return rgb(tema[n]);
+    return resolver(tema, tema[n]);
   };
   const linhas = pares().map(([fg, bg, minimo]) => {
     const valor = razao(cor(fg), cor(bg));
@@ -135,7 +158,7 @@ export function medir(tema) {
   const juntar = (fg, bg, minimo, valor) =>
     linhas.push({ fg, bg, minimo, valor, ok: valor >= minimo });
 
-  // Modo foco: o rótulo atenuado sobre a camada a 85%, com a letra do texto bem atrás.
+  // Modo foco: o rótulo atenuado sobre a camada a 90%, com a letra do texto bem atrás.
   const camada = sobre(cor('superficie-translucida'), cor('texto'));
   juntar(
     'texto-atenuado',
@@ -144,58 +167,18 @@ export function medir(tema) {
     razao(cor('texto-atenuado'), camada),
   );
 
-  // Botão primário em vidro: o preenchimento a 90% deixa o fundo passar; o pior fundo é o mais
-  // escuro (o bloco-herói e a penumbra no claro), e o texto continua sólido.
-  const acao90 = { ...cor('acao'), a: 0.9 };
-  for (const f of ['bloco-fundo', 'penumbra', 'fundo', 'superficie']) {
-    juntar(
-      'acao-texto',
-      `acao a 90% sobre ${f}`,
-      4.5,
-      razao(cor('acao-texto'), sobre(acao90, cor(f))),
-    );
+  // Régua de leitura (Areia a 45% no claro, Solace a 16% no escuro): texto e atenuado sobre ela,
+  // na superfície e no fundo.
+  for (const f of SUPERFICIES) {
+    const regua = sobre(cor('regua-fundo'), cor(f));
+    juntar('texto', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto'), regua));
+    juntar('texto-atenuado', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto-atenuado'), regua));
+    juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
   }
 
-  // Vidro secundário (tinta a 6% ou 7%): texto e atenuado sobre cada fundo; no bloco-herói, a
-  // película creme a 12% sobre o verde.
-  for (const f of FUNDOS) {
-    const vidro = sobre(cor('vidro'), cor(f));
-    juntar('texto', `vidro sobre ${f}`, 4.5, razao(cor('texto'), vidro));
-    juntar('texto-atenuado', `vidro sobre ${f}`, 4.5, razao(cor('texto-atenuado'), vidro));
-  }
-  const noBloco = sobre(cor('vidro-no-bloco'), cor('bloco-fundo'));
-  juntar(
-    'bloco-texto',
-    'vidro-no-bloco sobre bloco-fundo',
-    4.5,
-    razao(cor('bloco-texto'), noBloco),
-  );
-  juntar(
-    'bloco-atenuado',
-    'vidro-no-bloco sobre bloco-fundo',
-    4.5,
-    razao(cor('bloco-atenuado'), noBloco),
-  );
-
-  // Tinta do cacto (callout "Frase correta", ícone de lista, linha selecionada): texto, atenuado e
-  // verde-texto sobre a mistura, na superfície e no fundo.
-  const pctCacto = Number(/(\d+)%/.exec(tema['tinta-cacto'])?.[1]);
-  for (const f of ['superficie', 'fundo']) {
-    const tinta = misturar(cor('cacto'), pctCacto, cor(f));
-    for (const fg of ['texto', 'texto-atenuado', 'cacto-texto']) {
-      juntar(fg, `tinta-cacto sobre ${f}`, 4.5, razao(cor(fg), tinta));
-    }
-  }
-
-  // Seis tons de matéria: o texto do tom sobre a tinta dele (esfera a --tom-tinta, na superfície
-  // e no fundo).
-  const pctTom = Number.parseFloat(tema['tom-tinta']);
-  for (const t of TONS) {
-    for (const f of ['superficie', 'fundo']) {
-      const tinta = misturar(cor(`tom-${t}`), pctTom, cor(f));
-      juntar(`tom-${t}-texto`, `tinta do tom sobre ${f}`, 4.5, razao(cor(`tom-${t}-texto`), tinta));
-    }
-  }
+  // Selo e interruptor em Acqua: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
+  // texto do tema não serve, então o par é o do selo: branco sobre acqua-fundo).
+  juntar('branco', 'acqua-fundo', 4.5, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('acqua-fundo')));
   return linhas;
 }
 

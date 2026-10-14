@@ -35,33 +35,56 @@
     format('woff2-variations');
 }
 
-/* Tokens de tema (T10, D-D2, D-D3). Contraste AA nos dois temas (scripts/contraste.mjs); alvos de
-   toque ≥ 44 px (Parte 2 §11). Cada cor tem um papel: ação = caramelo/sol (botão primário e "+");
-   lugar = verde-cacto (bloco-herói, item selecionado, "salvo"); conteúdo = tinta; caminho = argila
-   (claro) ou âmbar (escuro); linha atual = azul claro; matéria = seis tons; perigo = só excluir e
-   falha técnica. Alvo e racional: docs/design/sistema-visual.md. */
+/* Tokens de tema (T10, D-D2, D-D4). Contraste AA nos dois temas (scripts/contraste.mjs); alvos de
+   toque ≥ 44 px (Parte 2 §11). A paleta é do Gabriel (14/10/2026): Areia, Palha, Terracota,
+   Caatinga, Acqua, Solace e Noite. Cada cor tem um papel: ação = Terracota no claro e Solace sobre
+   o bloco escuro e no escuro; lugar e selecionado = Caatinga; calma (progresso, Cartões, "salvo")
+   = Acqua; superfície quente = Areia; conteúdo = tinta. Para texto sobre (ou na cor de) uma cor
+   da paleta que não alcança 4,5:1, o token tem um passo mais escuro (ex.: --acqua-texto). Alvo e
+   racional: docs/design/sistema-visual.md. */
 :root {
-  --fundo: #f4efe0;
-  --superficie: #fbf8ee;
-  --superficie-2: #ebe5d1;
-  --texto: #2d2a14;
-  --texto-atenuado: #5f5a3c;
-  --borda: #c9c19f;
-  /* Contorno de campo, caixa e rádio: ≥ 3:1 contra a superfície (a borda acima é só filete). */
-  --borda-campo: #8a8266;
-  --penumbra: #ece6d2;
-  --luz-do-cartao: #fbf8ee;
-  --foco: #b35900;
+  /* A paleta: valores fixos, iguais nos dois temas (quem muda de tema são os papéis abaixo). */
+  --areia: #ead2b0;
+  --palha: #f6f1e6;
+  --creme: #faf6ee;
+  --terracota: #963417;
+  --caatinga: #3b3f21;
+  --acqua: #628981;
+  --solace: #cf893a;
+  --noite: #16130f;
+  --noite-cartao: #251f19;
+  --tinta: #2b1b12;
+  --sobre-solace: #231f1a;
+  /* O verde do cacto desenhado (marca, anel do item selecionado): só traço, nunca texto pequeno. */
+  --cacto: #6f9456;
+
+  --fundo: var(--palha);
+  --superficie: var(--creme);
+  --superficie-2: #eae2d3;
+  /* Superfície quente: o quadro de Areia (estado "Distraído", estacionamento, tiles, chip inativo). */
+  --quente: var(--areia);
+  --texto: var(--tinta);
+  --texto-atenuado: #5d4d40;
+  --titulo: var(--caatinga);
+  --borda: rgb(59 63 33 / 16%);
+  /* Contorno de campo e de botão: ≥ 3:1 contra a superfície (a borda acima é só filete). */
+  --borda-campo: #8c7b68;
+  --borda-forte: var(--tinta);
+  --borda-botao: rgb(59 63 33 / 32%);
+  --penumbra: #ece5d3;
+  --luz-do-cartao: var(--creme);
+  --foco: var(--terracota);
   --perigo: #a4262c;
   --perigo-texto: #ffffff;
   --sucesso: #2e6b30;
   --aviso-fundo: #fff4d6;
   --aviso-texto: #4d3800;
-  /* Destaque automático (9.8): o traço, ≥ 3:1 contra o fundo; o texto não muda de cor. */
-  --destaque-prazo: #1d5fa8;
-  --destaque-condicao: #a54b00;
-  --destaque-absoluto: #7a3db8;
-  --destaque-pena: #b0283a;
+  /* Destaque automático (9.8): o traço, ≥ 3:1 contra o fundo; o texto não muda de cor. A categoria
+     também vai no estilo do traço (duplo, tracejado, ondulado, pontilhado). */
+  --destaque-prazo: #173f52;
+  --destaque-condicao: #b06f22;
+  --destaque-absoluto: var(--terracota);
+  --destaque-pena: var(--terracota);
   /* Grifos (11.4): 3 cores de fundo, sem nomes; o texto (e o atenuado do tachado) continua AA. */
   --grifo-1: #fff0a0;
   --grifo-2: #c8eccb;
@@ -69,56 +92,47 @@
   /* Estrela (11.2): a cheia e a faixa da herdada, ≥ 3:1 contra o fundo (4,9:1). */
   --estrela: #9a6200;
   --calha-estrela: 1.5rem;
-  /* Ação: caramelo no claro, sol no escuro. Só o botão primário e o "+". */
-  --acao: #e8892b;
-  --acao-texto: #2d2a14;
-  /* Lugar: verde-cacto. O cacto da marca, o "salvo" e o progresso; o bloco-herói (Agora, Retorno,
-     fim de rodada) com texto creme; o item selecionado (navegação, aba, chip, caixa marcada). */
-  --cacto: #5f7a2c;
-  --cacto-texto: #4f6a1f;
-  --bloco-fundo: #3f4a1a;
-  --bloco-texto: #fdf1de;
-  --bloco-atenuado: #d9d3b0;
+
+  /* Ação: Terracota no claro; dentro do bloco-herói e no escuro, Solace. Um botão primário por tela. */
+  --acao: var(--terracota);
+  --acao-texto: #ffffff;
+  --link: var(--terracota);
+  /* Lugar: o traço de "onde estou" (marca do Lido até, filete, filtro ligado). */
+  --lugar: var(--caatinga);
+  /* Calma: Acqua é traço, ponto, barra e interruptor; como texto (ou com texto branco em cima), o
+     passo mais escuro. */
+  --acqua-texto: #416a63;
+  --acqua-fundo: #416a63;
+  /* Bloco-herói (Agora, Retorno, fim de rodada, Sessão): Caatinga com texto Palha e ação Solace. */
+  --bloco-fundo: var(--caatinga);
+  --bloco-texto: var(--palha);
+  --bloco-atenuado: #d6d1b5;
   --bloco-borda: transparent;
-  /* O anel de foco global (--foco) some no verde do bloco (2,0:1); dentro dele o anel é este. */
-  --bloco-foco: #ffb627;
-  --selecionado-fundo: #3f4a1a;
-  --selecionado-texto: #fdf1de;
-  --tinta-cacto: color-mix(in srgb, var(--cacto) 14%, var(--superficie));
-  /* Caminho (link de texto) e linha atual (a única coisa em azul). */
-  --link: #9a4a1c;
-  --realce-fundo: #bcd9ff;
-  --realce-texto: #14213d;
-  /* Matéria: seis tons. A esfera leva o ícone (--tom-icone); o texto do tom vai sobre a tinta dele
-     (color-mix do tom a --tom-tinta com a superfície). Nunca só a cor: o nome vem em texto. */
-  --tom-cacto: #5f6e22;
-  --tom-caramelo: #a85a0c;
-  --tom-ceu: #1f6f9f;
-  --tom-anil: #4a54b8;
-  --tom-ameixa: #8a3f74;
-  --tom-turquesa: #0e7466;
-  --tom-cacto-texto: #3f4a1a;
-  --tom-caramelo-texto: #7a3f06;
-  --tom-ceu-texto: #14506f;
-  --tom-anil-texto: #343d8c;
-  --tom-ameixa-texto: #652c54;
-  --tom-turquesa-texto: #0a5449;
-  --tom-icone: #ffffff;
-  --tom-tinta: 14%;
-  /* Vidro: botão secundário e a mesma película dentro do bloco-herói. */
-  --vidro: rgb(45 42 20 / 6%);
-  --vidro-borda: rgb(45 42 20 / 16%);
-  --vidro-no-bloco: rgb(253 241 222 / 12%);
-  --vidro-no-bloco-borda: rgb(253 241 222 / 26%);
-  --raio-heroi: 28px;
-  --raio-cartao: 20px;
-  --raio-campo: 14px;
+  --bloco-acao: var(--solace);
+  --bloco-acao-texto: var(--sobre-solace);
+  /* O anel de foco global some no verde do bloco; dentro dele o anel é Solace. */
+  --bloco-foco: var(--solace);
+  /* Item selecionado (navegação, aba, chip, alternância ligada). */
+  --selecionado-fundo: var(--caatinga);
+  --selecionado-texto: var(--palha);
+  /* O filete que mantém a forma do selecionado visível no escuro, onde o Caatinga some no fundo. */
+  --selecionado-anel: transparent;
+  --tinta-lugar: color-mix(in srgb, var(--caatinga) 12%, var(--superficie));
+  /* Régua de leitura: o bloco em foco no Leitor (Areia a 45%, filete de Caatinga). */
+  --regua-fundo: rgb(234 210 176 / 45%);
+  --regua-barra: var(--caatinga);
+
+  --raio-heroi: 24px;
+  --raio-cartao: 16px;
+  --raio-botao: 12px;
+  --raio-campo: 12px;
   --raio-pilula: 999px;
-  --sombra: 0 10px 28px -14px rgb(45 42 20 / 18%), 0 1px 3px rgb(45 42 20 / 8%);
-  --sombra-flutuante: 0 12px 32px -12px rgb(45 42 20 / 28%), 0 2px 6px rgb(45 42 20 / 10%);
+  --sombra: 0 6px 20px -10px rgb(22 19 15 / 22%), 0 1px 3px rgb(22 19 15 / 8%);
+  --sombra-botao: 0 2px 6px rgb(22 19 15 / 14%);
+  --sombra-flutuante: 0 4px 16px rgb(22 19 15 / 12%);
   /* Modo foco (11.1): o fundo dos botões fixos deixa o texto de trás aparecer. A 90%, o rótulo
      atenuado fica AA mesmo com a letra do texto bem atrás dele (5,5:1 aqui; 5:1 no escuro). */
-  --superficie-translucida: rgb(251 248 238 / 90%);
+  --superficie-translucida: rgb(250 246 238 / 90%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -139,125 +153,99 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #1c1410;
-    --superficie: #251a14;
-    --superficie-2: #2b1f17;
-    --texto: #fdf1de;
-    --texto-atenuado: #b9a897;
-    --borda: #4d3b2d;
-    --borda-campo: #8a7561;
-    --penumbra: #130d0a;
-    --luz-do-cartao: #2b1f17;
-    --foco: #ffb454;
+    --fundo: var(--noite);
+    --superficie: #1e1914;
+    --superficie-2: #2a231c;
+    --quente: #2f261d;
+    --texto: var(--palha);
+    --texto-atenuado: #b5a898;
+    --titulo: var(--palha);
+    --borda: rgb(246 241 230 / 14%);
+    --borda-campo: #8a7a6a;
+    --borda-forte: #b5a898;
+    --borda-botao: rgb(246 241 230 / 30%);
+    --penumbra: #0e0c09;
+    --luz-do-cartao: var(--noite-cartao);
+    --foco: var(--solace);
     --perigo: #ff8a8a;
     --perigo-texto: #2a0000;
     --sucesso: #8fd18f;
     --aviso-fundo: #3a2f10;
     --aviso-texto: #ffe6a3;
-    --destaque-prazo: #7ab8f5;
-    --destaque-condicao: #ffad5c;
-    --destaque-absoluto: #c9a0ff;
-    --destaque-pena: #ff8a9a;
+    --destaque-prazo: #7fb4cf;
+    --destaque-condicao: var(--solace);
+    --destaque-absoluto: #e07b55;
+    --destaque-pena: #e07b55;
     --grifo-1: #463b0c;
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
     --estrela: #f0b429;
-    --acao: #ffb627;
-    --acao-texto: #1c1410;
-    --cacto: #9bab4a;
-    --cacto-texto: #9bab4a;
-    --bloco-fundo: #2b1f17;
-    --bloco-texto: #fdf1de;
-    --bloco-atenuado: #b9a897;
-    --bloco-borda: rgb(255 182 39 / 35%);
-    --bloco-foco: #ffb627;
-    --selecionado-fundo: #38311d;
-    --selecionado-texto: #9bab4a;
-    --tinta-cacto: color-mix(in srgb, var(--cacto) 16%, var(--superficie));
-    --link: #ffb454;
-    --realce-fundo: #2c4a68;
-    --realce-texto: #fdf1de;
-    --tom-cacto: #9bab4a;
-    --tom-caramelo: #e8892b;
-    --tom-ceu: #5cb3e6;
-    --tom-anil: #9aa4ff;
-    --tom-ameixa: #e08cc8;
-    --tom-turquesa: #4fd1bd;
-    --tom-cacto-texto: #9bab4a;
-    --tom-caramelo-texto: #e8892b;
-    --tom-ceu-texto: #5cb3e6;
-    --tom-anil-texto: #9aa4ff;
-    --tom-ameixa-texto: #e08cc8;
-    --tom-turquesa-texto: #4fd1bd;
-    --tom-icone: #1c1410;
-    --tom-tinta: 16%;
-    --vidro: rgb(253 241 222 / 7%);
-    --vidro-borda: rgb(253 241 222 / 16%);
-    --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-    --sombra-flutuante: 0 14px 32px -12px rgb(0 0 0 / 60%), 0 2px 6px rgb(0 0 0 / 30%);
-    --superficie-translucida: rgb(37 26 20 / 90%);
+    --acao: var(--solace);
+    --acao-texto: var(--sobre-solace);
+    --link: var(--solace);
+    --lugar: var(--cacto);
+    --selecionado-anel: var(--cacto);
+    --acqua-texto: #79a79d;
+    --acqua-fundo: #416a63;
+    --bloco-fundo: var(--noite-cartao);
+    --bloco-atenuado: #b5a898;
+    --bloco-borda: rgb(207 137 58 / 35%);
+    --tinta-lugar: color-mix(in srgb, var(--caatinga) 70%, var(--superficie));
+    --regua-fundo: rgb(207 137 58 / 16%);
+    --regua-barra: var(--solace);
+    --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+    --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
+    --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+    --superficie-translucida: rgb(37 31 25 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #1c1410;
-  --superficie: #251a14;
-  --superficie-2: #2b1f17;
-  --texto: #fdf1de;
-  --texto-atenuado: #b9a897;
-  --borda: #4d3b2d;
-  --borda-campo: #8a7561;
-  --penumbra: #130d0a;
-  --luz-do-cartao: #2b1f17;
-  --foco: #ffb454;
+  --fundo: var(--noite);
+  --superficie: #1e1914;
+  --superficie-2: #2a231c;
+  --quente: #2f261d;
+  --texto: var(--palha);
+  --texto-atenuado: #b5a898;
+  --titulo: var(--palha);
+  --borda: rgb(246 241 230 / 14%);
+  --borda-campo: #8a7a6a;
+  --borda-forte: #b5a898;
+  --borda-botao: rgb(246 241 230 / 30%);
+  --penumbra: #0e0c09;
+  --luz-do-cartao: var(--noite-cartao);
+  --foco: var(--solace);
   --perigo: #ff8a8a;
   --perigo-texto: #2a0000;
   --sucesso: #8fd18f;
   --aviso-fundo: #3a2f10;
   --aviso-texto: #ffe6a3;
-  --destaque-prazo: #7ab8f5;
-  --destaque-condicao: #ffad5c;
-  --destaque-absoluto: #c9a0ff;
-  --destaque-pena: #ff8a9a;
+  --destaque-prazo: #7fb4cf;
+  --destaque-condicao: var(--solace);
+  --destaque-absoluto: #e07b55;
+  --destaque-pena: #e07b55;
   --grifo-1: #463b0c;
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
   --estrela: #f0b429;
-  --acao: #ffb627;
-  --acao-texto: #1c1410;
-  --cacto: #9bab4a;
-  --cacto-texto: #9bab4a;
-  --bloco-fundo: #2b1f17;
-  --bloco-texto: #fdf1de;
-  --bloco-atenuado: #b9a897;
-  --bloco-borda: rgb(255 182 39 / 35%);
-  --bloco-foco: #ffb627;
-  --selecionado-fundo: #38311d;
-  --selecionado-texto: #9bab4a;
-  --tinta-cacto: color-mix(in srgb, var(--cacto) 16%, var(--superficie));
-  --link: #ffb454;
-  --realce-fundo: #2c4a68;
-  --realce-texto: #fdf1de;
-  --tom-cacto: #9bab4a;
-  --tom-caramelo: #e8892b;
-  --tom-ceu: #5cb3e6;
-  --tom-anil: #9aa4ff;
-  --tom-ameixa: #e08cc8;
-  --tom-turquesa: #4fd1bd;
-  --tom-cacto-texto: #9bab4a;
-  --tom-caramelo-texto: #e8892b;
-  --tom-ceu-texto: #5cb3e6;
-  --tom-anil-texto: #9aa4ff;
-  --tom-ameixa-texto: #e08cc8;
-  --tom-turquesa-texto: #4fd1bd;
-  --tom-icone: #1c1410;
-  --tom-tinta: 16%;
-  --vidro: rgb(253 241 222 / 7%);
-  --vidro-borda: rgb(253 241 222 / 16%);
-  --sombra: 0 14px 32px -16px rgb(0 0 0 / 60%);
-  --sombra-flutuante: 0 14px 32px -12px rgb(0 0 0 / 60%), 0 2px 6px rgb(0 0 0 / 30%);
-  --superficie-translucida: rgb(37 26 20 / 90%);
+  --acao: var(--solace);
+  --acao-texto: var(--sobre-solace);
+  --link: var(--solace);
+  --lugar: var(--cacto);
+  --selecionado-anel: var(--cacto);
+  --acqua-texto: #79a79d;
+  --acqua-fundo: #416a63;
+  --bloco-fundo: var(--noite-cartao);
+  --bloco-atenuado: #b5a898;
+  --bloco-borda: rgb(207 137 58 / 35%);
+  --tinta-lugar: color-mix(in srgb, var(--caatinga) 70%, var(--superficie));
+  --regua-fundo: rgb(207 137 58 / 16%);
+  --regua-barra: var(--solace);
+  --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+  --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
+  --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+  --superficie-translucida: rgb(37 31 25 / 90%);
   color-scheme: dark;
 }
 
@@ -289,8 +277,8 @@ body {
   outline-offset: 2px;
 }
 
-/* Link de texto: argila no claro e âmbar no escuro (caminho, D-D3); sublinhado fino que engrossa no
-   hover e no foco. Nunca verde: o verde é de lugar e de "salvo". */
+/* Link de texto: Terracota no claro e Solace no escuro (caminho, D-D3, D-D4); sublinhado fino que
+   engrossa no hover e no foco. Nunca verde: o verde é de lugar e de "salvo". */
 a {
   color: var(--link);
   text-decoration-thickness: 1px;
@@ -308,13 +296,16 @@ h3 {
   line-height: 1.25;
 }
 
-/* Título de página em Literata 700 (D-D3 c); a preferência de fonte sem serifa também vale aqui. */
+/* Título de página em Literata 700, na cor de lugar (Caatinga; Palha no escuro) — D-D3 c, D-D4. O
+   título de cartão e de bloco é da interface (sem serifa). A preferência de fonte sem serifa
+   também vale aqui. */
 h1 {
   font-family: var(--fonte-leitura);
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 1.75rem;
   line-height: 1.15;
   margin: 0 0 1rem;
+  color: var(--titulo);
 }
 
 h2 {
@@ -328,13 +319,13 @@ h3 {
 
 @media (min-width: 700px) {
   h1 {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 }
 
 @media (min-width: 900px) {
   h1 {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
   }
 }
 
@@ -473,7 +464,7 @@ button,
 .alternar-destaques[aria-pressed='true'] {
   background: var(--selecionado-fundo);
   color: var(--selecionado-texto);
-  box-shadow: inset 0 0 0 2px var(--cacto);
+  box-shadow: inset 0 0 0 2px var(--selecionado-anel);
   font-weight: 700;
 }
 
@@ -532,21 +523,22 @@ button,
 
 /* ── Componentes ───────────────────────────────────────────────────────── */
 
-/* Botão secundário: pílula de vidro sutil (tinta a 6% no claro, creme a 7% no escuro). É o botão de
-   qualquer ação que não seja "a" ação da tela, que é a `.principal`. Quem precisa de outro fundo
-   (transparente, opaco sobre o texto) o declara na própria regra, que vence esta. O hover troca só a
-   variável do fundo, então não mexe em quem tem fundo próprio. O desfoque não entra aqui: só onde o
-   botão flutua sobre conteúdo (primário, navegação). */
+/* Botão secundário: contorno de 1 px, fundo da superfície, compacto (12 px de raio, sem pílula). É o
+   botão de qualquer ação que não seja "a" ação da tela, que é a `.principal`. Quem precisa de outro
+   fundo (transparente, opaco sobre o texto) o declara na própria regra, que vence esta. O hover troca
+   só a variável do fundo, então não mexe em quem tem fundo próprio. */
 button,
 .botao {
   font: inherit;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   min-height: var(--alvo);
   min-width: var(--alvo);
   padding: 0 1.25rem;
-  border-radius: var(--raio-pilula);
-  border: 1px solid var(--vidro-borda);
-  background: var(--botao-fundo, var(--vidro));
+  border-radius: var(--raio-botao);
+  border: 1px solid var(--borda-botao);
+  background: var(--botao-fundo, var(--superficie));
   color: var(--texto);
   cursor: pointer;
   display: inline-flex;
@@ -556,6 +548,16 @@ button,
   text-align: center;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  .botao {
+    transition:
+      transform 140ms ease,
+      background-color 140ms ease,
+      box-shadow 140ms ease;
+  }
 }
 
 button:disabled,
@@ -573,36 +575,24 @@ button:not(:disabled):active,
 @media (hover: hover) {
   button:not(:disabled):hover,
   .botao:hover {
-    --botao-fundo: color-mix(in srgb, var(--texto) 11%, transparent);
-  }
-
-  .discreto:not(:disabled):hover,
-  .botao-texto:not(:disabled):hover {
-    background: color-mix(in srgb, var(--texto) 8%, transparent);
-  }
-
-  .principal:not(:disabled):hover {
-    filter: brightness(1.05);
+    --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--superficie));
   }
 }
 
-/* Botão primário: vidro caramelo (claro) ou sol (escuro), o mesmo em todo o app. Preenchimento a
-   90% com brilho de cima para baixo, borda branca a 38% e texto sólido; a transparência não baixa o
-   texto de 4,5:1 (scripts/contraste.mjs mede o pior fundo). Um por tela. */
+/* Botão primário: compacto (D-D4), Terracota com texto branco no claro e Solace com texto escuro no
+   escuro e dentro do bloco-herói (os tokens --acao mudam, a regra é uma só). Um por tela. */
 .principal {
-  min-height: 48px;
-  padding-inline: 1.5rem;
-  font-weight: 700;
+  background: var(--acao);
+  border-color: var(--acao);
   color: var(--acao-texto);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 0%) 55%),
-    color-mix(in srgb, var(--acao) 90%, transparent);
-  border-color: rgb(255 255 255 / 38%);
-  box-shadow:
-    0 8px 18px -10px color-mix(in srgb, var(--acao) 85%, transparent),
-    inset 0 1px 0 rgb(255 255 255 / 35%);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  box-shadow: var(--sombra-botao);
+}
+
+@media (hover: hover) {
+  .principal:not(:disabled):hover {
+    background: color-mix(in srgb, var(--acao) 88%, var(--tinta));
+    border-color: color-mix(in srgb, var(--acao) 88%, var(--tinta));
+  }
 }
 
 /* Destrutivo: secundário com texto e borda de perigo; cheio só dentro do diálogo de confirmação. */
@@ -610,7 +600,6 @@ button:not(:disabled):active,
   background: transparent;
   border-color: var(--perigo);
   color: var(--perigo);
-  font-weight: 700;
 }
 
 dialog .perigoso {
@@ -623,23 +612,34 @@ dialog .perigoso {
   border-color: transparent;
 }
 
-/* Botão de texto: o link isolado ("Voltar ao Plano", "Editar pontos") com alvo de 44 px, em vez de
-   um link de 19 px de altura. */
+/* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, 82% de opacidade; herda a cor
+   do lugar onde está (tinta na página, creme no bloco-herói). Alvo de 44 px. */
 .botao-texto {
   background: transparent;
   border-color: transparent;
-  color: var(--link);
-  padding-inline: 0.5rem;
+  box-shadow: none;
+  border-radius: 10px;
+  padding: 0 0.75rem;
+  color: inherit;
+  opacity: 0.82;
+  font-size: 0.875rem;
+  font-weight: 500;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+  text-underline-offset: 4px;
 }
 
-/* Botão de ícone: círculo de 44 com o vidro do secundário; sempre com aria-label. */
+@media (hover: hover) {
+  .botao-texto:not(:disabled):hover,
+  .discreto:not(:disabled):hover {
+    opacity: 1;
+    background: color-mix(in srgb, currentcolor 8%, transparent);
+  }
+}
+
+/* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
 .botao-icone {
   width: var(--alvo);
   padding: 0;
-  border-radius: 50%;
 }
 
 .icone {
@@ -647,8 +647,28 @@ dialog .perigoso {
   font-weight: 700;
 }
 
+/* Linha de ação (D-D4): a opção que vira uma linha inteira de toque ("Por onde começar?", folhas e
+   modais), no lugar de botões empilhados. O texto à esquerda, o que vem depois (seta, duração) à
+   direita. */
+.linha-acao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: var(--raio-botao);
+  border: 1px solid var(--borda);
+  background: var(--botao-fundo, var(--superficie));
+  color: var(--texto);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+
 /* Campos: todo input (com ou sem type), select e textarea. Altura 48, contorno de 1,5 px em
-   --borda-campo (≥ 3:1), raio 14 e 16 px (o iOS aproxima a tela abaixo disso). O `:where` deixa a
+   --borda-campo (≥ 3:1), raio 12 e 16 px (o iOS aproxima a tela abaixo disso). O `:where` deixa a
    especificidade em zero, então o CSS de cada pacote ajusta largura e flex sem briga. */
 :where(
   input:not(
@@ -710,13 +730,13 @@ select {
 
 input[type='file']::file-selector-button {
   font: inherit;
-  font-weight: 500;
+  font-weight: 600;
   min-height: 32px;
   margin-inline-end: 0.75rem;
   padding: 0 1rem;
-  border: 1px solid var(--vidro-borda);
-  border-radius: var(--raio-pilula);
-  background: var(--vidro);
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-botao);
+  background: var(--superficie);
   color: var(--texto);
   cursor: pointer;
 }
@@ -724,15 +744,15 @@ input[type='file']::file-selector-button {
 input[type='range'] {
   width: 100%;
   min-height: var(--alvo);
-  accent-color: var(--cacto);
+  accent-color: var(--lugar);
 }
 
 [aria-invalid='true'] {
   border-color: var(--perigo);
 }
 
-/* Caixa e rádio: marca própria de 24 px; marcada = o bloco verde do item selecionado. O alvo de 44
-   é o rótulo inteiro (`.opcao`), não só a marca. */
+/* Caixa e rádio: marca própria de 22 px com contorno de 2 px na tinta (D-D4); marcada = o bloco do
+   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. */
 input[type='checkbox'],
 input[type='radio'] {
   appearance: none;
@@ -740,17 +760,17 @@ input[type='radio'] {
   flex: none;
   display: inline-grid;
   place-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 22px;
+  height: 22px;
   margin: 0;
-  border: 1.5px solid var(--borda-campo);
+  border: 2px solid var(--borda-forte);
   background: var(--superficie);
   color: var(--selecionado-texto);
   cursor: pointer;
 }
 
 input[type='checkbox'] {
-  border-radius: 7px;
+  border-radius: 6px;
 }
 
 input[type='radio'] {
@@ -760,14 +780,14 @@ input[type='radio'] {
 input[type='checkbox']:checked,
 input[type='radio']:checked {
   background: var(--selecionado-fundo);
-  border-color: var(--cacto);
+  border-color: var(--selecionado-anel, var(--selecionado-fundo));
 }
 
 input[type='checkbox']:checked::after {
   content: '';
-  width: 0.75rem;
-  height: 0.4rem;
-  margin-top: -0.15rem;
+  width: 0.7rem;
+  height: 0.38rem;
+  margin-top: -0.12rem;
   border-left: 2.5px solid currentcolor;
   border-bottom: 2.5px solid currentcolor;
   transform: rotate(-45deg);
@@ -775,8 +795,8 @@ input[type='checkbox']:checked::after {
 
 input[type='radio']:checked::after {
   content: '';
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.45rem;
+  height: 0.45rem;
   border-radius: 50%;
   background: currentcolor;
 }
@@ -814,6 +834,10 @@ label {
   padding: 0.5rem 0;
   font-weight: normal;
   cursor: pointer;
+}
+
+.opcao input {
+  margin-top: 1px;
 }
 
 .dica {
@@ -911,7 +935,7 @@ legend {
 }
 
 /* Callout: tinta da cor do papel e filete de 4 px à esquerda. Aviso em --aviso-*; falha técnica com
-   o filete de perigo; a "Frase correta" é o callout verde (mais abaixo). */
+   o filete de perigo; a "Frase correta" é o callout do lugar (mais abaixo). */
 .aviso {
   background: var(--aviso-fundo);
   color: var(--aviso-texto);
@@ -978,23 +1002,13 @@ th.numero {
   max-width: var(--largura-texto);
 }
 
-/* Sem transparência (preferência do sistema) ou com cores forçadas, o vidro vira cor sólida. */
-@media (prefers-reduced-transparency: reduce) {
-  .principal {
-    background: var(--acao);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
+/* Cores forçadas (modo de alto contraste): o primário vira o botão do sistema. */
 @media (forced-colors: active) {
   .principal {
     background: ButtonFace;
     color: ButtonText;
     border: 2px solid ButtonText;
     box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
 }
 
@@ -1286,11 +1300,11 @@ a.item-norma strong {
 .marca-lido-ate {
   margin: 0.25rem 0 0;
   padding-top: 0.15rem;
-  border-top: 2px solid var(--cacto);
+  border-top: 2px solid var(--lugar);
   font-size: 0.8rem;
   font-weight: 600;
   text-align: right;
-  color: var(--cacto-texto);
+  color: var(--titulo);
 }
 
 .acoes-leitor {
@@ -1302,10 +1316,11 @@ a.item-norma strong {
   gap: 0.5rem;
 }
 
-/* Flutuam sobre o texto: fundo opaco (o vidro sutil do secundário deixaria a letra de trás passar). */
+/* Flutuam sobre o texto: fundo de superfície, sem transparência no fluxo normal (o modo foco usa a
+   translúcida, abaixo), para a letra de trás não passar. */
 .acoes-leitor button {
   background: var(--superficie);
-  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+  box-shadow: var(--sombra-flutuante);
 }
 
 @media (max-width: 899px) {
@@ -2059,20 +2074,23 @@ dialog.dialogo-acoes {
   pointer-events: none;
 }
 
-/* O botão primário (vidro caramelo/sol) vem do estilo global; no bloco ocupa a largura e é mais alto. */
+/* Dentro do bloco de Caatinga a ação é Solace (a Terracota some no verde): o botão primário global
+   só troca o par --acao / --acao-texto. No bloco ocupa a largura e é mais alto. */
+.acao-agora {
+  --acao: var(--bloco-acao);
+  --acao-texto: var(--bloco-acao-texto);
+  --foco: var(--bloco-foco);
+  --link: var(--bloco-texto);
+}
+
 .acao-agora .principal {
   min-height: 52px;
   width: 100%;
   justify-content: center;
 }
 
-/* O anel de foco global some no verde do bloco (2,0:1); dentro dele o anel é o sol (5,4:1). */
-.acao-agora :focus-visible {
-  outline-color: var(--bloco-foco);
-}
-
 .agora-titulo {
-  font-family: var(--fonte-leitura);
+  font-family: var(--fonte-interface);
   font-weight: 700;
   margin: 0 0 0.25rem;
   font-size: 1.3rem;
@@ -2106,7 +2124,7 @@ dialog.dialogo-acoes {
 .barra-fina-cheia {
   display: block;
   height: 100%;
-  background: var(--cacto);
+  background: var(--acqua);
 }
 
 .barra-fina-texto {
@@ -2469,8 +2487,8 @@ dialog.dialogo-previa .linha-acoes button {
   width: var(--alvo);
   height: var(--alvo);
   border-radius: var(--raio-campo);
-  background: var(--tinta-cacto);
-  color: var(--cacto-texto);
+  background: var(--quente);
+  color: var(--texto);
   font-weight: 700;
 }
 
@@ -2510,13 +2528,13 @@ dialog.dialogo-previa .linha-acoes button {
   white-space: nowrap;
 }
 
-/* Estado selecionado único: linha com a tinta do cacto e filete de cacto (filtros, disciplina,
-   Conta › Aparência); a marca do rádio carrega o bloco verde. */
+/* Estado selecionado único: linha com a tinta do lugar e filete do lugar (filtros, disciplina,
+   Conta › Aparência); a marca do rádio carrega o bloco de Caatinga. */
 .opcao:has(input[type='radio']:checked),
 .filtro-escolha:has(input[type='radio']:checked) {
-  background: var(--tinta-cacto);
+  background: var(--tinta-lugar);
   border-radius: var(--raio-campo);
-  box-shadow: inset 0 0 0 2px var(--cacto);
+  box-shadow: inset 0 0 0 2px var(--lugar);
 }
 
 .opcao:has(input[type='radio']),
@@ -2587,8 +2605,8 @@ dialog.dialogo-previa .linha-acoes button {
 
 .frase-correta {
   padding: 0.75rem 1rem;
-  background: var(--tinta-cacto);
-  border-left: 4px solid var(--cacto);
+  background: var(--tinta-lugar);
+  border-left: 4px solid var(--lugar);
   border-radius: var(--raio-campo);
   text-align: left;
 }
