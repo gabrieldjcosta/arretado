@@ -538,7 +538,7 @@ legend {
 
 @media (prefers-reduced-motion: no-preference) {
   .esqueleto span {
-    animation: pulsar 1.6s ease-in-out infinite;
+    animation: pulsar 1.6s ease-in-out 2;
   }
 }
 
@@ -717,11 +717,16 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+/* Registrar erro no cabeçalho: neutro, para o "Agora" ser o único destaque da tela (avaliação N-1). */
+.acoes-globais .registrar-global {
+  font-weight: 600;
+}
+
 /* Até 899 px (celular, tablet em retrato, janela estreita): "+ Erro" e áreas mais justas. Com o
    rótulo longo, a barra de cima ocupava os 712 px do tablet inteiros com a fonte do Windows e
    transbordava com a do Linux (11.1). */
 @media (max-width: 899px) {
-  .acoes-globais .principal {
+  .acoes-globais .registrar-global {
     padding: 0 0.6rem;
   }
 
@@ -1643,8 +1648,12 @@ dialog.dialogo-acoes {
   border: 1px solid transparent;
   border-radius: var(--raio-cartao);
   padding: 1.25rem;
-  margin: 4.5rem 0 1rem;
+  margin: 0 0 1rem;
   box-shadow: var(--sombra);
+}
+
+.acao-agora:has(.agora-mascote) {
+  margin-top: 4.5rem;
 }
 
 /* O mascote senta na borda do cartão, sozinho, sem fundo; decorativo. */
@@ -1768,7 +1777,7 @@ dialog.dialogo-acoes {
   }
 
   /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
-  .acoes-globais .principal {
+  .acoes-globais .registrar-global {
     display: none;
   }
 }
@@ -2221,10 +2230,6 @@ dialog.dialogo-previa .linha-acoes button {
   background: var(--superficie);
   color: var(--texto);
   font-weight: 600;
-}
-
-.respostas .resposta-errei {
-  border-color: var(--perigo);
 }
 
 .respostas .resposta-dificil {
