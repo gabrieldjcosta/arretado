@@ -132,3 +132,26 @@ Defeitos:
 - **Revisão:** rótulos inventados ("Leitura atenta", "Literalidade", "Ritmo constante"); mascote pequeno demais.
 - **Mascote:** "Determinado" tem sobrancelhas bravas e "Distraído" tem pontos de interrogação e notas musicais, que podem soar como cobrança; usar versões suaves. O filhote 3D e a folha vetorial são estilos diferentes: definir um canônico (recomendação: vetorial plano, que escala a ícone de 24 px e a SVG).
 - **Reutilização:** o recorte do mascote precisa de arquivo próprio (PNG transparente ou SVG) para não depender do Stitch.
+
+## Rodada 7 — Teste de cores com o mascote inserido (14/10/2026)
+
+Pedido do Gabriel: "as cores ainda precisam ser testadas; insira o mascote". Mesma tela Hoje (celular), quatro paletas, mascote Estudando recortado e apoiado na borda do cartão, mais uma abertura com o filhote 3D. Gerado com `stitch edit screen` sobre a folha de estados (`10328291236108129510`) e sobre o filhote (`17490486993676652548`), projeto `9953616237194891956`.
+
+| Paleta | Screen id | Leitura visual |
+|---|---|---|
+| P1 Caramelo e creme (cartão chocolate, botão sol) | `230c519340fd4adabfe0ec364a72c902` | A mais coerente com o mascote; mascote integrado; quente e legível |
+| P2 Sol e anil (cartão marinho) | `6ff3f7933bf24484baf842b334de27ff` | Boa; mais fria; texto da lei saiu em itálico |
+| P3 Cacto e areia (cartão verde) | `9b79ed107002499fb61f13dc8bd32f28` | Mascote colado como retângulo (falha); etiqueta vermelha agressiva; opaca |
+| P4 Escura espresso | `9e5864a2647b48c0939dc3b03aabe4f6` | Irmã natural da P1; mascote integrado; data com "De" maiúsculo (erro do gerador) |
+| Abertura com filhote 3D | `ace6c3e68bf34bfdbb1540232a3b1046` | Forte como retrato; palavra ARRETADO da imagem aparece cortada embaixo |
+
+### Contraste medido (WCAG 2.x; script `contraste-paletas.mjs` no scratchpad da sessão)
+
+P1 claro: texto marrom sobre creme 10,58:1 (AAA); creme sobre chocolate 10,58:1; texto do botão sobre sol 6,73:1 (AA); realce azul com texto marinho 11,04:1; verde-cacto contra creme 3,35:1 (ok para ícone); secundário `#8a5a44` sobre creme 5,19:1.
+**Falhas a corrigir:** etiqueta creme sobre argila `#c8763a` 3,08:1 (abaixo de 4,5:1 para texto pequeno); esfera caramelo `#e8892b` contra creme 2,34:1 (abaixo de 3:1).
+**Correção medida:** argila escurecida `#9a4a1c` com texto creme 5,58:1; caramelo de ícone `#a85a0c` contra creme 4,55:1 (o caramelo vivo `#e8892b` fica só para o mascote e ilustração).
+P4 escuro: creme sobre espresso 16,26:1; sobre cartão `#2b1f17` 14,35:1; botão 10,35:1; secundário `#b9a897` 7,88:1; argila contra o cartão 4,66:1. Todas passam.
+P2: marinho sobre creme 15,13:1; botão 9,11:1; etiqueta creme sobre argila 3,26:1 (mesma falha da P1, mesma correção).
+P3: etiqueta creme sobre vermelho `#c23b2b` 4,76:1 (passa), botão 5,54:1; descartada por outros motivos.
+
+Recomendação: P1 (claro) e P4 (escuro) como o par oficial, com as correções acima; P2 como alternativa fria; P3 descartada. Contraste de pares nas telas reais deve ser conferido de novo no navegador (axe) após a implementação.
