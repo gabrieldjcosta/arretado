@@ -84,6 +84,7 @@ describe('Importar por colagem (9.5)', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Biblioteca' })).toBeVisible();
     expect(screen.getByText('LEP publicada.')).toHaveAttribute('role', 'status');
+    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByText('LEP')).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Importações pendentes' })).not.toBeInTheDocument();

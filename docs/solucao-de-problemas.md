@@ -1295,6 +1295,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** o modo "só estudo" (A3a) esconde a administração enquanto a tela da Sessão está aberta (`body[data-so-estudo]`).
 - **Solução:** desmarcar "Só estudo" na própria tela da Sessão ou sair dela (`/sessao/atual` é a única tela que aplica o modo); a preferência é `modoSoEstudo`.
 
+### Onboarding do plano: "Não foi possível criar o plano" com catálogo real
+- **Causa (corrigida no B2):** assunto do edital com mais de 500 caracteres estourava `Ponto.titulo` (`TextoCurto`) e a gravação em lote falhava inteira.
+- **Solução:** `tituloDoPonto` (`integracoes/catalogo/linhas.ts`) corta numa palavra e põe "…"; teste cobre os 4 catálogos. Novo catálogo: rodar `npm test` antes de publicar.
+
+### Onboarding do plano: voltou ao passo errado ou não lembra a escolha
+- **Causa:** o rascunho fica em `localStorage` (`arretado:onboarding-plano:v1`); janela anônima ou dados do site limpos não guardam.
+- **Solução:** refazer a escolha (leva segundos); "Pular" ou criar o plano apaga o rascunho.
+
 ### Aviso "Restauração concluída." some depois da recarga (tela com `lazy`/Suspense)
 
 - **Sintoma:** E2E `dados.spec.ts` "restaurar integral" falha em `getByText('Restauração concluída.')`, mas a restauração aconteceu (aparece em "Importações"). Só no app construído, deterministicamente no CI; descoberto ao pôr `Dados` em `React.lazy` (PR #126).

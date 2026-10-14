@@ -101,6 +101,14 @@ export async function publicar(page: Page, titulo: string) {
   await page.getByRole('button', { name: 'Publicar', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Biblioteca' })).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: `${titulo} publicada.` })).toBeVisible();
+  await abrirTodasAsNormas(page);
+}
+
+/** A lista de Normas fica recolhida até escolher disciplina: abre a lista completa (sem fechar se já aberta). */
+export async function abrirTodasAsNormas(page: Page) {
+  const botao = page.getByRole('button', { name: 'Todas as normas' });
+  await expect(botao).toBeVisible();
+  if ((await botao.getAttribute('aria-pressed')) !== 'true') await botao.click();
 }
 
 /** Cola a página compilada do corpus em Importar e publica com o título curto dado. */
@@ -124,4 +132,22 @@ export async function colarTextoPuro(page: Page, texto: string) {
       new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
     );
   }, texto);
+}
+
+/** `scrollY` depois que a rolagem assentou (iguais em 3 quadros seguidos); evita comparar no meio da restauração. */
+export async function rolagemAssentada(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        let ultimo = window.scrollY;
+        let iguais = 0;
+        const quadro = () => {
+          iguais = window.scrollY === ultimo ? iguais + 1 : 0;
+          ultimo = window.scrollY;
+          if (iguais >= 3) resolve(ultimo);
+          else requestAnimationFrame(quadro);
+        };
+        requestAnimationFrame(quadro);
+      }),
+  );
 }

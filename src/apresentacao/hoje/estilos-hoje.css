@@ -16,3 +16,9 @@
   align-items: center;
   min-height: 44px;
 }
+
+.lembrete-backup {
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--texto-atenuado);
+}

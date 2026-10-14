@@ -26,7 +26,7 @@ describe('Sessão leve (A2)', () => {
 
   it('alvo e fronteira são opcionais e ficam gravados', async () => {
     const { repo, usuario } = await abrir('/sessao/iniciar');
-    await usuario.click(await screen.findByText('Dizer o que e até onde (opcional)'));
+    await usuario.click(await screen.findByText('Definir até onde (opcional)'));
     await usuario.type(screen.getByLabelText('O que vai estudar?'), 'Lei de Execução Penal');
     await usuario.type(screen.getByLabelText('Até onde?'), 'até o art. 15');
     await usuario.click(screen.getByRole('button', { name: 'Começar' }));
@@ -50,6 +50,24 @@ describe('Sessão leve (A2)', () => {
       alvo: { tipo: 'revisao', rotulo: '3 cartões' },
       origemDaAcao: { tipo: 'revisao_vencida', razao: 'Vencidos hoje' },
     });
+  });
+
+  it('com o alvo conhecido (direto=1), começa sozinha e vai direto à revisão', async () => {
+    const { repo } = await abrir(
+      '/sessao/iniciar?tipo=revisao&rotulo=Revisar+frases&origem=revisao_vencida&direto=1',
+    );
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/recall/frases/revisar');
+    });
+    const sessoes = await repo.colecao('sessoes').todosDoUsuario();
+    expect(sessoes).toHaveLength(1);
+    expect(sessoes[0]).toMatchObject({ estado: 'ativa', alvo: { tipo: 'revisao' } });
+  });
+
+  it('direto=1 sem tela própria para o alvo mostra o início normal', async () => {
+    const { repo } = await abrir('/sessao/iniciar?tipo=ponto&rotulo=CP&direto=1');
+    expect(await screen.findByRole('button', { name: 'Começar' })).toBeInTheDocument();
+    expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(0);
   });
 
   it('pausa sem falha e volta', async () => {

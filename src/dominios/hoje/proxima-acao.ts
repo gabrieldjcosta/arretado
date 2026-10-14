@@ -10,6 +10,10 @@ const SEGUNDOS_POR_ITEM = 30;
 /** Quantos itens entram numa rodada de revisão: a mesma cota da fila diária do Recall. */
 const LIMITE_DA_RODADA = 40;
 
+/** Rótulos do alvo `revisao`; a tela os usa para saber qual rodada abrir. */
+export const ROTULO_REVISAR_CARTOES = 'Revisar cartões';
+export const ROTULO_REVISAR_FRASES = 'Revisar frases';
+
 export const COMECOS: readonly [ComecoSugerido, ComecoSugerido, ComecoSugerido] = [
   { id: 'adicionar_material', rotulo: 'Adicionar uma lei para ler', para: '/biblioteca/importar' },
   { id: 'escolher_materia', rotulo: 'Escolher uma matéria', para: '/plano/onboarding' },
@@ -43,7 +47,10 @@ function revisaoVencida(e: EntradaDaProximaAcao): ProximaAcao | undefined {
   return {
     tipo: 'revisao_vencida',
     // Sem cartão vencido, a rodada é de Frases.
-    alvo: { tipo: 'revisao', rotulo: e.cartoesVencidos > 0 ? 'Revisar cartões' : 'Revisar frases' },
+    alvo: {
+      tipo: 'revisao',
+      rotulo: e.cartoesVencidos > 0 ? ROTULO_REVISAR_CARTOES : ROTULO_REVISAR_FRASES,
+    },
     razao: partes.join(' e '),
     estimativaMin: Math.max(
       1,

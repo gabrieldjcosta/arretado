@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
+import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -184,6 +185,7 @@ export function Drill() {
     return (
       <>
         <h1>Revisar</h1>
+        <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
           titulo="Feito."
           acao={
@@ -281,11 +283,9 @@ export function Drill() {
         </div>
       )}
       <LinhaDepois>
-        {!estado.virado
-          ? 'você diz como foi'
-          : restam > 0
-            ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
-            : 'o fim desta rodada'}
+        {restam > 0
+          ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
+          : 'o fim desta rodada'}
       </LinhaDepois>
       <details className="menu-drill">
         <summary className="botao discreto">Mais opções</summary>

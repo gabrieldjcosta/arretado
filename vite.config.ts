@@ -37,6 +37,21 @@ export default defineConfig({
     sourcemap: true,
     // App local-first baixado uma vez (~160 KB gzip); divisão por rota junto com o PWA (F4).
     chunkSizeWarningLimit: 700,
+    // Bibliotecas em pacotes próprios: o cache do navegador sobrevive a um deploy que só muda o app.
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor-react',
+              test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/,
+            },
+            { name: 'vendor-dexie', test: /node_modules[\\/]dexie[\\/]/ },
+            { name: 'vendor-zod', test: /node_modules[\\/]zod[\\/]/ },
+          ],
+        },
+      },
+    },
   },
   test: {
     globals: true,

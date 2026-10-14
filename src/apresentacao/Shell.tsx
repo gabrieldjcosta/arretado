@@ -6,16 +6,42 @@ import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
-
-export const RODAPE =
-  'Você é responsável por exportar e importar os próprios dados. Arquivos alterados fora do aplicativo não passam na validação e não podem ser restaurados.';
+import { RODAPE_CURTO } from './textos';
 
 const AREAS = [
-  { caminho: '/', nome: 'Hoje' },
-  { caminho: '/plano', nome: 'Plano' },
-  { caminho: '/recall', nome: 'Recall' },
-  { caminho: '/biblioteca', nome: 'Biblioteca' },
+  {
+    caminho: '/',
+    nome: 'Hoje',
+    icone: 'M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z',
+  },
+  { caminho: '/plano', nome: 'Plano', icone: 'M5 5h14v14H5zM5 10h14M9 3v4M15 3v4' },
+  { caminho: '/recall', nome: 'Recall', icone: 'M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11' },
+  {
+    caminho: '/biblioteca',
+    nome: 'Biblioteca',
+    icone:
+      'M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5zM5 18.5A1.5 1.5 0 0 0 6.5 20H19',
+  },
 ] as const;
+
+/** Ícone de linha da navegação: decorativo; o nome da área continua como texto. */
+function IconeDeArea({ d }: { d: string }) {
+  return (
+    <svg
+      className="area-icone"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
 
 /** Moldura de todas as telas: 4 áreas, menu Ajuda, Conta fora da navegação, rodapé (D6). */
 export function Shell() {
@@ -68,14 +94,15 @@ export function Shell() {
         <nav aria-label="Áreas" className="areas">
           {AREAS.map((a) => (
             <NavLink key={a.caminho} to={a.caminho} end={a.caminho === '/'}>
-              {a.nome}
+              <IconeDeArea d={a.icone} />
+              <span>{a.nome}</span>
             </NavLink>
           ))}
         </nav>
         <div className="acoes-globais">
           <Link
             to="/recall/registrar"
-            className="botao principal"
+            className="botao registrar-global"
             aria-keyshortcuts="E"
             title="Registrar erro (atalho: E)"
             aria-label="Registrar erro"
@@ -91,8 +118,19 @@ export function Shell() {
               setRelatando(true);
             }}
           />
-          <Link to="/conta" className="botao discreto" aria-label="Conta e ajustes">
-            Conta
+          <Link to="/conta" className="botao discreto conta-icone" aria-label="Conta e ajustes">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="12" cy="8.5" r="3.5" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
           </Link>
         </div>
       </header>
@@ -100,7 +138,9 @@ export function Shell() {
       <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
-      <footer className="rodape">{RODAPE}</footer>
+      <footer className="rodape">
+        {RODAPE_CURTO} <Link to="/conta/dados">Backup e dados</Link>
+      </footer>
       <Link
         to="/recall/registrar"
         className="botao principal flutuante"

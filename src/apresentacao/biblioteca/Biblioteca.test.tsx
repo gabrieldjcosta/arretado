@@ -36,6 +36,11 @@ async function rascunho(repo: Repositorio, tituloCurto: string) {
   return versao;
 }
 
+/** A lista completa fica recolhida até escolher disciplina (ou critério): "Todas as normas" a abre. */
+async function abrirTodas(usuario: ReturnType<typeof userEvent.setup>) {
+  await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
+}
+
 describe('Biblioteca › Normas (9.5)', () => {
   it('vazia: "Importar norma" leva à tela de importação', async () => {
     const { repo } = await repositorioDeTeste();
@@ -58,7 +63,8 @@ describe('Biblioteca › Normas (9.5)', () => {
     const { repo } = await repositorioDeTeste();
     await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     const pendente = await rascunho(repo, 'ECA');
-    await abrirBiblioteca(repo);
+    const usuario = await abrirBiblioteca(repo);
+    await abrirTodas(usuario);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByText('LEP')).toBeInTheDocument();
@@ -141,12 +147,13 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Esta versão já foi publicada; não é mais rascunho.',
     );
-    expect(
-      within(await screen.findByRole('region', { name: 'Normas' })).getByText('LEP'),
-    ).toBeInTheDocument();
     await usuario.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }),
     );
+    await abrirTodas(usuario);
+    expect(
+      within(await screen.findByRole('region', { name: 'Normas' })).getByText('LEP'),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Importações pendentes' })).not.toBeInTheDocument();
   });
 
@@ -162,7 +169,7 @@ describe('Biblioteca › Normas (9.5)', () => {
     await gravarPosicao(repo, eca.id, await primeiro(eca.id));
     relogio.avancar(60 * 60_000);
     await gravarPosicao(repo, lep.id, await primeiro(lep.id));
-    await abrirBiblioteca(repo);
+    const usuario = await abrirBiblioteca(repo);
 
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
@@ -171,6 +178,7 @@ describe('Biblioteca › Normas (9.5)', () => {
     const agora = screen.getByRole('region', { name: 'Agora' });
     expect(within(agora).getByRole('heading')).toHaveTextContent(/^Você parou no .+ da LEP$/);
     expect(agora).toHaveTextContent(/cerca de \d+ min/);
+    await abrirTodas(usuario);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
@@ -195,5 +203,42 @@ describe('Biblioteca › Normas (9.5)', () => {
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).toHaveClass('principal');
     expect(screen.queryByRole('link', { name: /Continuar leitura/ })).not.toBeInTheDocument();
+  });
+
+  it('a lista completa só aparece depois de escolher disciplina; ano e tipo também a abrem', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    await publicarVersao(repo, (await rascunho(repo, 'ECA')).id);
+    const usuario = await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(within(lista).queryByRole('link', { name: /^LEP/ })).not.toBeInTheDocument();
+    expect(within(lista).getByRole('status')).toHaveTextContent('Escolha uma disciplina');
+    const disciplinas = within(lista).getByRole('group', { name: 'Disciplinas' });
+    await usuario.click(within(disciplinas).getByRole('button', { name: /^Sem disciplina/ }));
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    expect(within(lista).getByRole('link', { name: /^ECA/ })).toBeInTheDocument();
+
+    // Ano e tipo filtram a lista aberta; o ano da referência "7.210/1984" entra nas opções.
+    await usuario.selectOptions(within(lista).getByLabelText('Ano'), '1984');
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    await usuario.selectOptions(within(lista).getByLabelText('Tipo de norma'), 'Lei');
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    // Tocar a disciplina de novo recolhe, mas ano/tipo ainda são critério e mantêm a lista.
+    await usuario.click(within(disciplinas).getByRole('button', { name: /^Sem disciplina/ }));
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+  });
+
+  it('sem critério e sem "Todas as normas", escolher e desmarcar a disciplina recolhe a lista', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    const usuario = await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    const botao = within(lista).getByRole('button', { name: /^Sem disciplina/ });
+    await usuario.click(botao);
+    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    await usuario.click(botao);
+    expect(within(lista).queryByRole('link', { name: /^LEP/ })).not.toBeInTheDocument();
   });
 });

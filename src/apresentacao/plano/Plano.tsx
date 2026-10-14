@@ -42,6 +42,11 @@ export function Plano() {
         <>
           <Vazio titulo="Nenhum ponto do edital ainda">
             <p>Importe seus pontos para poder vincular erros a eles.</p>
+            <p>
+              <Link to="/plano/onboarding" className="botao principal">
+                Montar pelo catálogo de concursos
+              </Link>
+            </p>
           </Vazio>
           <ImportarPontos aoImportar={setConfirmacao} />
         </>

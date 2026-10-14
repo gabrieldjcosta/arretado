@@ -53,8 +53,8 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 
 | Tema | Rascunho / direção de UI | Fica valendo |
 |---|---|---|
-| Marca-texto amarelo | Amarelo "para trechos e estado de retomada" | Amarelo **só nos grifos do leitor** (conteúdo do usuário, `--grifo-1..3`). Retomada, "agora" e seleção usam sálvia (fatia 6, aprovada em 11/10/2026) |
-| "Agora" do Hoje | Card dominante "Retomar" com destaque próprio | O **cartão sálvia aprovado** (`AcaoAgora`: `--agora-fundo`, `--agora-borda`, botão 50 px). "Retomar" é o conteúdo desse cartão, não um componente novo |
+| Marca-texto amarelo | Amarelo "para trechos e estado de retomada" | Amarelo **só nos grifos do leitor** (conteúdo do usuário, `--grifo-1..3`). Retomada, "agora" e seleção usam o verde-cacto (fatia 6, aprovada em 11/10/2026; cores trocadas pela D-D2, de 14/10/2026, aplicada nos tokens pela thread de UI no #120) |
+| "Agora" do Hoje | Card dominante "Retomar" com destaque próprio | O **cartão do Agora em verde-cacto, com o mascote** (`AcaoAgora`; D-D2 aplicada no #120): `--agora-fundo`, `--agora-borda`, botão 50 px). "Retomar" é o conteúdo desse cartão, não um componente novo |
 | Tela Hoje | 5 blocos (Retomar, Agora, Depois, Revisões, Captura rápida) | **4 blocos fixos** (D8): Agora (com a retomada), Depois (até 2), Revisões esperando, Captura rápida |
 | Perfis Calmo / Guiado / Leitura | Onboarding pergunta "o que mais atrapalha" | Só entram se **nada for obrigatório**: pular é o caminho padrão, cada ajuste tem prévia e volta atrás, a resposta configura a ênfase e não é guardada como característica da pessoa (R7). Entram na F3-A, pacote 4, depois do essencial |
 | Botões do drill | Lembrei / Quase / Não lembrei | Mantém **Errei / Difícil / Fácil** com texto e borda (fatia 6) e as 6 caixas (D10) |
@@ -72,7 +72,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 - Uma ação dominante por tela; "Depois" visualmente menor; nada de vermelho punitivo, sequência perdida, culpa por dia ruim, mascote obrigatório, chat vazio na abertura ou painel de métricas antes do hábito.
 - Registro de erro: painel lateral no desktop, folha inferior no celular, contexto (norma, dispositivo, trecho) já preenchido, "Voltar à leitura" como ação dominante depois de salvar.
 - Revisão: fila finita, um cartão por vez, origem visível, "Abrir no texto", fim com evidência concreta ("7 erros revisitados; 3 voltam amanhã").
-- Sistema visual vigente: papel esverdeado, sálvia como única cor de ação, grifos como único amarelo, Atkinson Hyperlegible Next (interface) e Literata (leitor) embutidas (T19), movimento 150–220 ms respeitando redução de movimento, ícone sempre com rótulo nas ações importantes, estado nunca só por cor.
+- Sistema visual vigente (D-D2, 14/10/2026; tokens aplicados no #120, ver `docs/design/sistema-visual.md`): areia (claro) e espresso (escuro), verde-cacto no cartão do Agora, caramelo na ação principal, cacto na marca e o mascote como coadjuvante; grifos como único amarelo de conteúdo, Atkinson Hyperlegible Next (interface) e Literata (leitor) embutidas (T19), movimento 150–220 ms respeitando redução de movimento, ícone sempre com rótulo nas ações importantes, estado nunca só por cor.
 - IA, quando chegar (A2), é **verbo contextual** ("Explique este trecho", "Transforme em cartão"), nunca uma aba ou destino.
 - Métricas de eficácia (para a V1): tempo até começar, retomada no ponto certo, erros registrados sem sair do texto, recuperação após interrupção, sessão com resultado útil, "sei o que fazer agora". Tempo no app não é métrica.
 
@@ -97,6 +97,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | F1+ Frases | Captura pela frase correta, Revisar frases e Revisar cartões, oclusão, trecho da lei → frases (§1, §3 D) | F1; roda dentro do fechamento da F2 (exceção do R13) | decidida em 13/10/2026; Frases 1 feita (v6, PR aguarda revisão e backup) |
 | F3-A | Hoje, Sessão e retorno após pausa | F2 feita (sem portão de medição) | liberada |
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
+| F3-C | Resumo manual e Precedentes com trecho-chave e vínculos (antecipados para antes da V1; aprovado em 14/10/2026) | F3-B | não iniciada (`ordem-resumos-precedentes.md`) |
 | V1 | Validação com 3 a 5 pessoas; reúne todas as validações adiadas (§6) | F3 e F4-A (contas) | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
 | F4 | Conta (F4-A, antes da V1), sincronização, backup remoto, instalável offline (F4-B/C, depois) | F3 | não iniciada |
 | A1 | Captura de imagem com OCR local | F4 | não iniciada |
