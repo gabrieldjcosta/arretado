@@ -1,6 +1,7 @@
 import { useState, type SubmitEvent } from 'react';
 import { MODULOS, type Modulo } from '../../../core/modelo';
 import { exportarPacote } from '../../../core/pacote';
+import { registrarBackup } from '../../../core/persistencia';
 import { useRepositorio } from '../../dados/contexto';
 import { baixar, ROTULO_MODULO } from './rotulos';
 
@@ -29,6 +30,7 @@ export function Exportar() {
         ...(comSenha ? { senha } : {}),
       });
       baixar(pacote.bytes, pacote.nomeArquivo);
+      if (integral) await registrarBackup(repo);
       setSenha('');
       setConfirmacao('');
       setEstado({
