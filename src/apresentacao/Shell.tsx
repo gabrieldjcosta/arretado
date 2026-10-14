@@ -6,9 +6,7 @@ import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
-
-export const RODAPE =
-  'Você é responsável por exportar e importar os próprios dados. Arquivos alterados fora do aplicativo não passam na validação e não podem ser restaurados.';
+import { RODAPE_CURTO } from './textos';
 
 const AREAS = [
   { caminho: '/', nome: 'Hoje' },
@@ -100,7 +98,9 @@ export function Shell() {
       <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
-      <footer className="rodape">{RODAPE}</footer>
+      <footer className="rodape">
+        {RODAPE_CURTO} <Link to="/conta/dados">Backup e dados</Link>
+      </footer>
       <Link
         to="/recall/registrar"
         className="botao principal flutuante"

@@ -6,6 +6,7 @@ import { Agora } from './Agora';
 import { Captura } from './Captura';
 import { Depois } from './Depois';
 import { RevisoesDoDia } from './RevisoesDoDia';
+import { LembreteDeBackup } from './LembreteDeBackup';
 import { Retorno } from './Retorno';
 
 export function Hoje() {
@@ -17,6 +18,7 @@ export function Hoje() {
       <RevisoesDoDia />
       <Depois />
       <Captura />
+      <LembreteDeBackup />
     </>
   );
 }
