@@ -1,12 +1,13 @@
 // Começar em um toque (A2). Tudo é opcional; a Próxima ação (A1) pode chegar com o alvo na URL:
 // /sessao/iniciar?tipo=revisao&id=<uuid>&rotulo=…&origem=revisao_vencida&razao=…&tarefa=<uuid>
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router';
 import { AlvoDeAcao, OrigemDaAcao } from '../../core/modelo';
 import { iniciarSessao } from '../../dominios/sessao/servico';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { sessaoAberta } from './carregadores';
+import { rotaDoAlvo } from './rota-do-alvo';
 import './estilos-sessao.css';
 
 function lerEntrada(p: URLSearchParams) {
@@ -21,6 +22,7 @@ function lerEntrada(p: URLSearchParams) {
     alvo: alvo.success ? alvo.data : undefined,
     origemDaAcao: origem.success ? origem.data : undefined,
     tarefaId: bruto('tarefa'),
+    direto: bruto('direto') === '1',
   };
 }
 
@@ -32,19 +34,10 @@ export function Iniciar() {
   const [rotulo, setRotulo] = useState('');
   const [fronteira, setFronteira] = useState('');
   const [erro, setErro] = useState(false);
+  const jaComecou = useRef(false);
   const dada = lerEntrada(params);
 
-  if (falha) {
-    return (
-      <Falha
-        oQue="Não foi possível abrir a Sessão."
-        oQueFazer="Recarregue a página e tente de novo."
-      />
-    );
-  }
-  if (aberta === undefined) return <Esqueleto />;
-  if (aberta) return <Navigate to="/sessao/atual" replace />;
-
+  const destino = dada.direto ? rotaDoAlvo(dada.alvo) : undefined;
   const comecar = () => {
     setErro(false);
     const alvo =
@@ -56,13 +49,33 @@ export function Iniciar() {
       ...(fronteira.trim() ? { fronteira } : {}),
     }).then(
       () => {
-        void navegar('/sessao/atual');
+        void navegar(destino ?? '/sessao/atual', { replace: destino !== undefined });
       },
       () => {
         setErro(true);
       },
     );
   };
+  // Alvo com tela própria (direto=1): a Sessão começa sozinha, uma única vez.
+  const automatico = aberta === null && !falha && destino !== undefined;
+  useEffect(() => {
+    if (automatico && !jaComecou.current) {
+      jaComecou.current = true;
+      comecar();
+    }
+  });
+
+  if (falha) {
+    return (
+      <Falha
+        oQue="Não foi possível abrir a Sessão."
+        oQueFazer="Recarregue a página e tente de novo."
+      />
+    );
+  }
+  if (aberta === undefined) return <Esqueleto />;
+  if (aberta) return <Navigate to="/sessao/atual" replace />;
+  if (automatico && !erro) return <Esqueleto />;
 
   return (
     <>
@@ -75,7 +88,7 @@ export function Iniciar() {
         )}
         {dada.origemDaAcao?.razao && <p className="sessao-detalhe">{dada.origemDaAcao.razao}</p>}
         <details>
-          <summary>Dizer o que e até onde (opcional)</summary>
+          <summary>Definir até onde (opcional)</summary>
           {!dada.alvo && (
             <div className="campo">
               <label htmlFor="sessao-rotulo">O que vai estudar?</label>

@@ -1302,3 +1302,9 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Onboarding do plano: voltou ao passo errado ou não lembra a escolha
 - **Causa:** o rascunho fica em `localStorage` (`arretado:onboarding-plano:v1`); janela anônima ou dados do site limpos não guardam.
 - **Solução:** refazer a escolha (leva segundos); "Pular" ou criar o plano apaga o rascunho.
+
+### Aviso "Restauração concluída." some depois da recarga (tela com `lazy`/Suspense)
+
+- **Sintoma:** E2E `dados.spec.ts` "restaurar integral" falha em `getByText('Restauração concluída.')`, mas a restauração aconteceu (aparece em "Importações"). Só no app construído, deterministicamente no CI; descoberto ao pôr `Dados` em `React.lazy` (PR #126).
+- **Causa:** `lerAvisoDeRecarga` apagava o item do `sessionStorage` dentro do inicializador do `useState`, ou seja, na renderização. O React pode repetir uma renderização (Suspense, concorrência); a segunda leitura vinha vazia.
+- **Solução:** ler sem apagar na renderização e limpar num `useEffect` (`limparAvisoDeRecarga`). **Prevenção:** nada de efeito colateral (gravar/apagar storage) em inicializador de estado ou corpo de componente; o E2E acima cobre.

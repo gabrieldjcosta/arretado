@@ -1,5 +1,12 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, importarEPublicar, semViolacoes, test } from './apoio';
+import {
+  abrirTodasAsNormas,
+  expect,
+  importarEPublicar,
+  rolagemAssentada,
+  semViolacoes,
+  test,
+} from './apoio';
 
 /** Rola a janela, quase uma tela por vez, até o alvo aparecer (a lista é virtualizada: ele não existe antes). */
 async function rolarAte(page: Page, alvo: Locator, tentativas = 200) {
@@ -423,6 +430,7 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   await alinharNoAlto(page, art41);
   await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
   await expect(continuar).toBeVisible();
+  await abrirTodasAsNormas(page);
   await expect(normas.getByRole('link', { name: /LEP/ })).toContainText('Última leitura:');
   expect(await leituraGravada(page)).toEqual({ quantas: 1, posicao: 'art41', lidoAte: undefined });
   await semViolacoes(page);
@@ -698,7 +706,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeVisible();
   await expect(tamanho).toBeInViewport();
-  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  expect(await rolagemAssentada(page)).toBe(0);
 
   // Entra com o art. 41 no alto: a moldura e a barra do leitor somem, o art. 41 continua no alto.
   const art41 = page.locator('[data-endereco="art41"]');
@@ -1065,7 +1073,7 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   const palavras = (await texto.innerText()).match(/\p{L}{5,}/gu) ?? [];
   const outra = palavras.find((p) => !p.includes(termo) && !termo.includes(p)) ?? '';
   expect(outra).not.toBe('');
-  const rolagem = await page.evaluate(() => window.scrollY);
+  const rolagem = await rolagemAssentada(page);
   await selecionarPalavra(page, texto, outra, toque);
   await apertar(acoes.getByRole('button', { name: 'Nota' }), toque);
   const dialogo = page.getByRole('dialog', { name: 'Nota' });
@@ -1078,10 +1086,10 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   await apertar(marcador, toque);
   await expect(dialogo.getByText('Cai na prova.')).toBeVisible();
   await semViolacoes(page);
-  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+  expect(Math.abs((await rolagemAssentada(page)) - rolagem)).toBeLessThan(2);
   await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
   await expect(dialogo).toBeHidden();
-  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+  expect(Math.abs((await rolagemAssentada(page)) - rolagem)).toBeLessThan(2);
 
   // Enviar às frases (Frases 3): o trecho abre o campo, a Frase guarda o link de volta.
   await selecionarPalavra(page, texto, outra, toque);
@@ -1095,7 +1103,7 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   await expect
     .poll(() => frasesGravadas(page))
     .toEqual([expect.objectContaining({ texto: outra, origemTipo: 'trecho' })]);
-  expect(Math.abs((await page.evaluate(() => window.scrollY)) - rolagem)).toBeLessThan(2);
+  expect(Math.abs((await rolagemAssentada(page)) - rolagem)).toBeLessThan(2);
 
   // No modo foco, as ações tomam o lugar do grupo fixo, sem alargar a página.
   await entrarNoFocoCorrido(page, toque);
@@ -1616,12 +1624,12 @@ test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "
   await expect(citacao).toHaveAttribute('role', 'button');
 
   // A prévia: o dispositivo citado, com a posição de leitura intacta.
-  const antes = await page.evaluate(() => window.scrollY);
+  const antes = await rolagemAssentada(page);
   await citacao.click();
   const previa = page.getByRole('dialog', { name: 'Art. 84, XIX' });
   await expect(previa).toBeVisible();
   await expect(previa).toContainText(/declarar guerra/i);
-  expect(await page.evaluate(() => window.scrollY)).toBe(antes);
+  expect(await rolagemAssentada(page)).toBe(antes);
   await semViolacoes(page);
 
   // Esc fecha e devolve o foco à citação.

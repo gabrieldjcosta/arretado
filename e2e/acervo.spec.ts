@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { FonteEmMemoria } from '../src/dominios/acervo/fonte-em-memoria';
 import type { ItemDoAcervo } from '../src/dominios/acervo/esquemas';
-import { expect, semViolacoes, test } from './apoio';
+import { expect, semViolacoes, test, abrirTodasAsNormas } from './apoio';
 
 function item(id: string): ItemDoAcervo {
   return {
@@ -84,6 +84,7 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
     rota.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
   );
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
+  await abrirTodasAsNormas(page);
   const execPenal = page.getByRole('region', { name: 'Execução Penal' });
   await expect(execPenal.getByText('LEP')).toBeVisible();
   await expect(page.getByRole('region', { name: 'Infância' })).toBeVisible();
@@ -112,6 +113,7 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
   await expect(page.getByText(/1 adicionadas/)).toBeVisible();
 
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
+  await abrirTodasAsNormas(page);
   await expect(page.getByRole('region', { name: 'Sem disciplina' }).getByText('LEP')).toBeVisible();
   await page.getByRole('button', { name: 'Mudar a disciplina de LEP' }).click();
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
