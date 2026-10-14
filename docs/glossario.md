@@ -420,3 +420,16 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Exclusões | `arretado.exclusoes` (só data e `tinha_copia`); preenchida pela função de exclusão (A5) |
 | Cópias na nuvem | bucket privado `backups`, pasta `<uid>/`; política por pasta (A6 usa) |
 | Reversão | `supabase/rollback/20261014020000_f4a_contas.down.sql`; conferência no projeto real: `supabase/verificacao-f4a-remota.sql` |
+
+#### F4-A: login (A3, 14/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificador |
+|---|---|
+| Serviço Supabase (único arquivo que importa `@supabase/supabase-js`) | `ServicoDeContaSupabase`, `src/integracoes/conta/supabase.ts` |
+| Carga sob demanda do serviço | `ServicoDeContaPreguicoso` (`import()` na primeira chamada) |
+| Serviço em memória de teste | `ServicoDeContaFalso` (`falso.ts`; convites, código, sem rede) |
+| Retorno do login pelo Google | `tratarRetornoDoLogin` (`retorno.ts`; roda em `main.tsx` antes do roteador) |
+| Primeira entrada (banco nasce com `usuarioId = uid`) | `entrarNaConta`, opção `OpcoesRepositorio.usuarioId` |
+| Projeto Supabase (URL e chave publicável) | `src/integracoes/conta/projeto.ts` |
+| Origens da CSP por build | `origensDoBuild(contas)`, `config/seguranca.ts` |
+| Tela | `/conta/entrar` (só com `VITE_CONTA=1`), `Entrar`, `VERSAO_TERMOS` |

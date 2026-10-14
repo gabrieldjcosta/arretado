@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Link } from 'react-router';
 import { relatosAguardando } from '../../suporte/relatos';
+import { contasHabilitadas } from '../../integracoes/conta';
 import { useDados } from '../dados/contexto';
 
 /** Conta e Ajustes: fora da navegação de estudo (D6, D23). */
@@ -11,6 +12,12 @@ export function Conta() {
     <>
       <h1>Conta e ajustes</h1>
       <ul className="lista-simples">
+        {contasHabilitadas() && (
+          <li>
+            <Link to="/conta/entrar">Entrar com uma conta</Link>
+            <span className="dica">Opcional; o Arretado funciona sem conta</span>
+          </li>
+        )}
         <li>
           <Link to="/conta/aparencia">Aparência</Link>
           <span className="dica">Tema e fonte de leitura</span>

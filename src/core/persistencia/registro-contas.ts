@@ -123,3 +123,28 @@ export async function abrirRepositorioAtivo(opcoes: OpcoesAbrirAtivo = {}): Prom
   const nomeBanco = resto.nomeBanco ?? (await nomeDoBancoAtivo({ contasHabilitadas, registro }));
   return Repositorio.abrir({ ...resto, nomeBanco });
 }
+
+/**
+ * Primeira entrada ou volta à conta: abre (ou cria) o banco da conta, que nasce com
+ * `usuarioId = uid`, e a marca como ativa. Banco já existente com outra identidade é erro, não
+ * conserto silencioso (misturaria dados de contas). O chamador recarrega o app para abrir o banco novo.
+ */
+export async function entrarNaConta(
+  conta: { uid: string; email: string },
+  opcoes: Omit<OpcoesAbrirAtivo, 'contasHabilitadas' | 'nomeBanco' | 'usuarioId'> = {},
+): Promise<void> {
+  const { registro = new RegistroDeContas(), ...resto } = opcoes;
+  const repo = await Repositorio.abrir({
+    ...resto,
+    nomeBanco: nomeBancoDaConta(conta.uid),
+    usuarioId: conta.uid,
+  });
+  try {
+    if (repo.ctx.usuarioId !== conta.uid) {
+      throw new Error('O banco desta conta tem outra identidade; nada foi alterado.');
+    }
+  } finally {
+    repo.fechar();
+  }
+  await registro.ativar(conta.uid, { email: conta.email, agora: resto.agora?.() });
+}

@@ -32,6 +32,7 @@ export { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 export { PREFERENCIAS_PADRAO, Repositorio, type OpcoesRepositorio } from './repositorio';
 export {
   abrirRepositorioAtivo,
+  entrarNaConta,
   nomeBancoDaConta,
   nomeDoBancoAtivo,
   NOME_REGISTRO_DE_CONTAS,

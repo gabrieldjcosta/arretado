@@ -26,6 +26,10 @@ export interface ServicoDeConta {
   entrarComGoogle(): Promise<void>;
   pedirCodigoPorEmail(email: string): Promise<void>;
   confirmarCodigo(email: string, codigo: string): Promise<SessaoDeConta>;
+  /** Termina o retorno do login pelo Google (PKCE): troca o `?code=` da URL por sessão. `null` se a URL não traz código. */
+  concluirRetorno(url: string): Promise<SessaoDeConta | null>;
+  /** Registra no servidor a versão dos termos aceita (função `arretado.aceitar_termos`). */
+  aceitarTermos(versao: string): Promise<void>;
   sair(): Promise<void>;
   excluirConta(): Promise<void>;
   /** Avisa mudanças de sessão (entrar, sair, expirar). Devolve a função que cancela. */
