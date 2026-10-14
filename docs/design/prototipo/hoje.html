@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arretado — Hoje (protótipo isolado)</title>
+<!--
+  Protótipo isolado de apresentação (D-D1): não é código do app e não toca dados.
+  Referência para adaptar aos tokens e componentes reais; o HTML do Stitch nunca entra no app.
+  Fontes: no app vêm de node_modules/@fontsource (T19); aqui há reserva do sistema para abrir sem instalar nada.
+-->
+<style>
+  :root {
+    /* Claro: areia e cacto */
+    --fundo: #f4efe0;
+    --superficie: #fbf8ee;
+    --superficie-2: #ebe5d1;
+    --texto: #2d2a14;
+    --texto-atenuado: #5f5a3c;
+    --borda: #d9d1b6;
+
+    --agora-fundo: #3f4a1a;
+    --agora-texto: #fdf1de;
+    --agora-atenuado: #d9d3b0;
+    --agora-caixa: rgb(0 0 0 / 22%);
+
+    --acao: #e8892b;
+    --acao-texto: #2d2a14;
+    --acao-vidro: rgb(232 137 43 / 88%);
+    --acao-borda: rgb(255 255 255 / 38%);
+    --vidro-suave: rgb(45 42 20 / 6%);
+    --vidro-suave-borda: rgb(45 42 20 / 14%);
+    --vidro-no-cartao: rgb(253 241 222 / 12%);
+    --vidro-no-cartao-borda: rgb(253 241 222 / 26%);
+
+    --etiqueta-fundo: #9a4a1c;
+    --etiqueta-texto: #fdf1de;
+    --realce-fundo: #bcd9ff;
+    --realce-texto: #14213d;
+
+    --esfera-verde: #5f6e22;
+    --esfera-caramelo: #a85a0c;
+    --esfera-ceu: #1f6f9f;
+    --cacto: #5f7a2c;
+
+    --sombra: 0 14px 30px -16px rgb(45 42 20 / 38%), 0 2px 4px rgb(45 42 20 / 8%);
+    --raio-cartao: 28px;
+    --raio: 16px;
+
+    --fonte-interface: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --fonte-leitura: 'Literata', Georgia, 'Times New Roman', serif;
+    color-scheme: light;
+  }
+
+  /* Escuro: espresso (modo de foco) */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema='claro']) {
+      --fundo: #1c1410; --superficie: #251a14; --superficie-2: #2b1f17;
+      --texto: #fdf1de; --texto-atenuado: #b9a897; --borda: #3d2d22;
+      --agora-fundo: #2b1f17; --agora-texto: #fdf1de; --agora-atenuado: #c9b8a6; --agora-caixa: rgb(0 0 0 / 28%);
+      --acao: #ffb627; --acao-texto: #1c1410; --acao-vidro: rgb(255 182 39 / 90%); --acao-borda: rgb(255 255 255 / 30%);
+      --vidro-suave: rgb(253 241 222 / 7%); --vidro-suave-borda: rgb(253 241 222 / 16%);
+      --etiqueta-fundo: #c8763a; --etiqueta-texto: #1c1410;
+      --realce-fundo: #2c4a68; --realce-texto: #e6f1ff;
+      --esfera-verde: #9bab4a; --esfera-caramelo: #e8892b; --esfera-ceu: #5cb3e6; --cacto: #9bab4a;
+      --sombra: 0 14px 32px -16px rgb(0 0 0 / 70%);
+      color-scheme: dark;
+    }
+  }
+  :root[data-tema='escuro'] {
+    --fundo: #1c1410; --superficie: #251a14; --superficie-2: #2b1f17;
+    --texto: #fdf1de; --texto-atenuado: #b9a897; --borda: #3d2d22;
+    --agora-fundo: #2b1f17; --agora-texto: #fdf1de; --agora-atenuado: #c9b8a6; --agora-caixa: rgb(0 0 0 / 28%);
+    --acao: #ffb627; --acao-texto: #1c1410; --acao-vidro: rgb(255 182 39 / 90%); --acao-borda: rgb(255 255 255 / 30%);
+    --vidro-suave: rgb(253 241 222 / 7%); --vidro-suave-borda: rgb(253 241 222 / 16%);
+    --etiqueta-fundo: #c8763a; --etiqueta-texto: #1c1410;
+    --realce-fundo: #2c4a68; --realce-texto: #e6f1ff;
+    --esfera-verde: #9bab4a; --esfera-caramelo: #e8892b; --esfera-ceu: #5cb3e6; --cacto: #9bab4a;
+    --sombra: 0 14px 32px -16px rgb(0 0 0 / 70%);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--fundo); color: var(--texto);
+    font-family: var(--fonte-interface); font-size: 16px; line-height: 1.45;
+  }
+  .pagina { max-width: 460px; margin: 0 auto; padding: 20px 20px 120px; }
+
+  /* Cabeçalho: marca com cacto, tema e conta */
+  .topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .marca { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-family: var(--fonte-leitura); font-weight: 700; font-size: 1.65rem; letter-spacing: -0.01em; }
+  .marca svg { width: 22px; height: 30px; flex: none; color: var(--cacto); }
+  .topo-acoes { display: flex; gap: 8px; }
+
+  .vidro-suave {
+    appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px;
+    font: 500 0.95rem var(--fonte-interface); color: inherit; text-decoration: none; cursor: pointer;
+    background: var(--vidro-suave); border: 1px solid var(--vidro-suave-borda); border-radius: 999px;
+    backdrop-filter: blur(10px) saturate(1.2); -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    transition: background 180ms ease, transform 180ms ease;
+  }
+  .vidro-suave:hover { background: rgb(128 128 128 / 14%); }
+  .vidro-suave:active { transform: translateY(1px); }
+
+  .acao {
+    appearance: none; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 0 22px;
+    font: 700 1.05rem var(--fonte-interface); color: var(--acao-texto); cursor: pointer;
+    background: linear-gradient(180deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 0%) 55%), var(--acao-vidro);
+    border: 1px solid var(--acao-borda); border-radius: 999px;
+    box-shadow: 0 10px 22px -12px var(--acao), inset 0 1px 0 rgb(255 255 255 / 35%);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+  .acao:hover { transform: translateY(-1px); }
+  .acao:active { transform: translateY(1px); }
+  .acao svg { width: 20px; height: 20px; }
+
+  :where(a, button, input):focus-visible { outline: 3px solid #b35900; outline-offset: 3px; }
+  :root[data-tema='escuro'] :where(a, button, input):focus-visible { outline-color: #ffb627; }
+
+  h1 { margin: 28px 0 0; font-family: var(--fonte-leitura); font-weight: 700; font-size: 2.5rem; line-height: 1.05; letter-spacing: -0.02em; }
+  .data { margin: 6px 0 0; color: var(--texto-atenuado); font-size: 0.95rem; }
+
+  /* Cartão Agora, com o mascote apoiado na borda superior */
+  .agora-moldura { position: relative; margin-top: 64px; }
+  .mascote {
+    position: absolute; right: 18px; bottom: calc(100% - 22px); width: 96px; height: auto; pointer-events: none;
+    filter: drop-shadow(0 6px 8px rgb(0 0 0 / 22%));
+  }
+  .agora {
+    background: var(--agora-fundo); color: var(--agora-texto); border-radius: var(--raio-cartao); padding: 22px; box-shadow: var(--sombra);
+    border: 1px solid transparent;
+  }
+  :root[data-tema='escuro'] .agora { border-color: rgb(232 137 43 / 35%); }
+  .linha-etiquetas { display: flex; gap: 8px; align-items: center; }
+  .etiqueta { padding: 5px 12px; border-radius: 999px; font: 700 0.8rem var(--fonte-interface); letter-spacing: 0.06em; text-transform: uppercase; background: var(--etiqueta-fundo); color: var(--etiqueta-texto); }
+  .etiqueta.neutra { background: var(--vidro-no-cartao); color: var(--agora-texto); border: 1px solid var(--vidro-no-cartao-borda); }
+  .agora h2 { margin: 18px 0 4px; font-family: var(--fonte-leitura); font-weight: 700; font-size: 1.6rem; line-height: 1.15; }
+  .agora .fonte { margin: 0; color: var(--agora-atenuado); font-size: 0.95rem; }
+  .trecho {
+    margin: 18px 0 20px; padding: 16px 18px; background: var(--agora-caixa); border: 1px solid var(--vidro-no-cartao-borda); border-radius: var(--raio);
+    font-family: var(--fonte-leitura); font-size: 1.1rem; line-height: 1.6;
+  }
+  .trecho mark { background: var(--realce-fundo); color: var(--realce-texto); padding: 1px 4px; border-radius: 6px; }
+
+  .secao { display: flex; justify-content: space-between; align-items: baseline; margin: 34px 4px 12px; }
+  .secao h3 { margin: 0; font: 700 0.85rem var(--fonte-interface); letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-atenuado); }
+
+  /* Depois: linha do tempo com esferas */
+  .linha-tempo { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: 12px; }
+  .linha-tempo::before { content: ''; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px; background: var(--borda); }
+  .item { position: relative; display: flex; align-items: center; gap: 14px; }
+  .esfera { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; box-shadow: 0 0 0 4px var(--fundo); z-index: 1; }
+  .esfera svg { width: 22px; height: 22px; }
+  .esfera.verde { background: var(--esfera-verde); }
+  .esfera.caramelo { background: var(--esfera-caramelo); }
+  .item a {
+    flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 12px 16px; text-decoration: none; color: inherit;
+    background: var(--superficie-2); border: 1px solid var(--borda); border-radius: var(--raio);
+  }
+  .item strong { display: block; font-size: 1.02rem; }
+  .item small { color: var(--texto-atenuado); font-size: 0.88rem; }
+  .duracao { flex: none; padding: 4px 12px; border-radius: 999px; background: var(--vidro-suave); border: 1px solid var(--vidro-suave-borda); font-size: 0.85rem; font-weight: 500; }
+
+  .salvo { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 22px 0 14px; color: var(--texto-atenuado); font-size: 0.92rem; }
+  .salvo svg { width: 18px; height: 18px; color: var(--cacto); }
+
+  .captura { display: flex; gap: 10px; padding: 8px; background: var(--superficie); border: 1px solid var(--borda); border-radius: 22px; }
+  .captura input { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; font: 400 1rem var(--fonte-interface); color: var(--texto); background: transparent; border: 0; }
+  .captura input::placeholder { color: var(--texto-atenuado); opacity: 1; }
+  .captura .vidro-suave { min-height: 44px; }
+
+  /* Navegação inferior em vidro */
+  .navegacao {
+    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(100% - 28px, 432px); z-index: 5;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px;
+    background: color-mix(in srgb, var(--superficie) 72%, transparent); border: 1px solid var(--borda); border-radius: 999px;
+    backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3); box-shadow: var(--sombra);
+  }
+  .navegacao a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px; border-radius: 999px; color: var(--texto-atenuado); text-decoration: none; font-size: 0.78rem; font-weight: 500; }
+  .navegacao a svg { width: 22px; height: 22px; }
+  .navegacao a[aria-current='page'] { color: var(--agora-texto); background: var(--agora-fundo); }
+  :root[data-tema='escuro'] .navegacao a[aria-current='page'] { color: var(--acao); background: rgb(255 182 39 / 14%); }
+
+  @media (min-width: 900px) {
+    .pagina { max-width: 1040px; padding-bottom: 60px; }
+    .grade { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: start; }
+    .navegacao { position: static; transform: none; width: auto; margin: 24px 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="topo">
+    <p class="marca">
+      Arretado
+      <!-- cacto verde ao lado do nome -->
+      <svg viewBox="0 0 22 30" fill="currentColor" role="img" aria-label="cacto">
+        <rect x="8" y="2" width="6.5" height="26" rx="3.25"/>
+        <path d="M8 15H6.2A3.2 3.2 0 0 1 3 11.8V8.5a1.6 1.6 0 0 1 3.2 0V11a.8.8 0 0 0 .8.8H8z"/>
+        <path d="M14.5 19h1.8a3.2 3.2 0 0 0 3.2-3.2v-4.3a1.6 1.6 0 0 0-3.2 0V15a.8.8 0 0 1-.8.8h-1z"/>
+        <rect x="5" y="27" width="12" height="2" rx="1" opacity=".45"/>
+      </svg>
+    </p>
+    <div class="topo-acoes">
+      <button class="vidro-suave" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+      <a class="vidro-suave" href="#conta">Conta</a>
+    </div>
+  </header>
+
+  <h1>Hoje</h1>
+  <p class="data">quarta-feira, 14 de outubro</p>
+
+  <div class="grade">
+    <section aria-labelledby="agora">
+      <div class="agora-moldura">
+        <img class="mascote" src="../mascote/estudando.png" alt="" width="96">
+        <article class="agora">
+          <div class="linha-etiquetas"><span class="etiqueta">Direito Penal</span><span class="etiqueta neutra">Agora</span></div>
+          <h2 id="agora">Você parou no art. 112, § 1º</h2>
+          <p class="fonte">Lei de Execução Penal · ontem, 21h40</p>
+          <p class="trecho">§ 1º Em todos os casos, o apenado terá que ostentar <mark>boa conduta carcerária</mark>, comprovada pelo diretor do estabelecimento, respeitadas as normas que vedam a progressão.</p>
+          <button class="acao" type="button">Continuar leitura
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="depois">
+      <div class="secao"><h3 id="depois">Depois</h3></div>
+      <ul class="linha-tempo">
+        <li class="item">
+          <span class="esfera verde"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4c0 2.6-1.3 4.6-4 5.5v-2c1.3-.6 1.9-1.5 2-2.5H7zm7 0h4v4c0 2.6-1.3 4.6-4 5.5v-2c1.3-.6 1.9-1.5 2-2.5h-2z"/></svg></span>
+          <a href="#frases"><span><strong>Revisar 6 frases</strong><small>Direito Constitucional</small></span><span class="duracao">4 min</span></a>
+        </li>
+        <li class="item">
+          <span class="esfera caramelo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="12" height="13" rx="2"/><path d="M8 4h10a2 2 0 0 1 2 2v11"/></svg></span>
+          <a href="#cartoes"><span><strong>Revisar 4 cartões</strong><small>Processo Penal</small></span><span class="duracao">3 min</span></a>
+        </li>
+      </ul>
+
+      <p class="salvo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 9.5"/></svg>
+        Seu ponto está salvo neste aparelho.
+      </p>
+
+      <form class="captura" onsubmit="return false">
+        <label class="sr" for="frase" style="position:absolute;left:-9999px">Anote a frase correta</label>
+        <input id="frase" type="text" placeholder="Anote a frase correta">
+        <button class="vidro-suave" type="submit">Guardar</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<nav class="navegacao" aria-label="Áreas do app">
+  <a href="#hoje" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>Hoje</a>
+  <a href="#plano"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Plano</a>
+  <a href="#recall"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/></svg>Recall</a>
+  <a href="#biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h5v16H5zM12 4h3v16h-3zM17.5 5.5l3 .8-3.6 13.7-3-.8z"/></svg>Biblioteca</a>
+</nav>
+
+<script>
+  // Alternância de tema só para a revisão visual do protótipo.
+  const raiz = document.documentElement;
+  document.getElementById('tema').addEventListener('click', () => {
+    const escuroAgora = raiz.dataset.tema === 'escuro' || (!raiz.dataset.tema && matchMedia('(prefers-color-scheme: dark)').matches);
+    raiz.dataset.tema = escuroAgora ? 'claro' : 'escuro';
+  });
+  const pedido = new URLSearchParams(location.search).get('tema');
+  if (pedido === 'claro' || pedido === 'escuro') raiz.dataset.tema = pedido;
+</script>
+</body>
+</html>
