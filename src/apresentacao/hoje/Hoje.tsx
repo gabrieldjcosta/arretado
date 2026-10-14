@@ -6,14 +6,16 @@ import { Agora } from './Agora';
 import { Captura } from './Captura';
 import { Depois } from './Depois';
 import { RevisoesDoDia } from './RevisoesDoDia';
-import { Retorno } from './Retorno';
+import { FecharDia } from './FecharDia';
+import { BoasVindas } from './Retorno';
 
 export function Hoje() {
   return (
     <>
       <h1>Hoje</h1>
-      <Retorno />
+      <BoasVindas />
       <Agora />
+      <FecharDia />
       <RevisoesDoDia />
       <Depois />
       <Captura />
