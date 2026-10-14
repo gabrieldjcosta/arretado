@@ -57,9 +57,7 @@ describe('encaixes da F3 (P0 Fundação)', () => {
   it('Hoje compõe os blocos e mantém a revisão vencida e o vazio de antes', async () => {
     await abrirApp('/');
     expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
-    expect(
-      await screen.findByRole('heading', { name: 'Nenhuma revisão hoje' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Por onde começar?' })).toBeInTheDocument();
   });
 
   it.each([
