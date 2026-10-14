@@ -1282,6 +1282,6 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa provável:** o esquema é `strictObject`; campo fora da lista (`Sessao`, `Preferencias`, `TarefaDeEstudo`) é recusado, não ignorado.
 - **Solução:** usar os campos já previstos pelo P0 (T25). Campo novo = PR próprio de esquema (v8), nunca dentro de um pacote da F3.
 
-### Hoje: "Começar" abre uma tela "em breve"
-- **Causa:** o botão do Agora (A1) só leva a `/sessao/iniciar?tipo=…&id=…&rotulo=…&origem=…&razao=…`; a tela é do pacote A2 (Sessão leve). Antes do merge da A2, a rota mostra o encaixe do P0.
-- **Solução:** mergear a A2 junto ou antes da A1. A revisão continua acessível por Recall › Revisar (`/recall/revisar`).
+### Sessão: aparece "Sessão encerrada" sem duração, ou uma Sessão antiga some do Hoje
+- **Causa:** Sessão que ficou aberta de um dia para o outro vira `interrompida` ao abrir `/sessao/*` (A2); não há como saber quando a pessoa parou, então não tem `fim` nem `duracaoSegundos`. É de propósito; nada é cobrado.
+- **Solução:** nenhuma; começar uma Sessão nova funciona normalmente. Para contar tempo, só `encerrada`.

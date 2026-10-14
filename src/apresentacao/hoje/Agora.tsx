@@ -8,10 +8,11 @@ import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
 import { rotaDeInicio } from './rota-de-inicio';
+import { SessaoAberta } from '../sessao/SessaoAberta';
 import { EstadoVazio } from './EstadoVazio';
 import './estilos-hoje.css';
 
-export function Agora() {
+function ProximaAcaoDoHoje() {
   const [dispensados, setDispensados] = useState<OrigemDaAcao['tipo'][]>([]);
   const carregar = useCallback(
     (repo: Repositorio) => escolherProximaAcao(repo, hoje(repo), { excluir: dispensados }),
@@ -51,6 +52,15 @@ export function Agora() {
       >
         Escolher outra coisa
       </button>
+    </>
+  );
+}
+
+export function Agora() {
+  return (
+    <>
+      <SessaoAberta />
+      <ProximaAcaoDoHoje />
     </>
   );
 }

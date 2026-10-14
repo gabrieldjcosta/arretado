@@ -370,3 +370,12 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Perfil de estudo | `PerfilDeEstudo` (`calmo`, `guiado`, `leitura`) em `Preferencias.perfilDeEstudo`, com `perfilAnterior` para voltar atrás; só muda padrões da interface |
 | Encaixes do Hoje | `src/apresentacao/hoje/`: `Hoje` compõe `Retorno`, `Agora`, `RevisoesDoDia`, `Depois`, `Captura`; rotas `/sessao/*` (`RotasDaSessao`) e `/plano/{onboarding,pontos,tarefas}/*` (`RotasDoPlano`) |
 | Escolher outra coisa | Botão do bloco Agora do Hoje: dispensa o tipo de Próxima ação mostrado (`excluir`), só na tela, sem gravar; sem tipo restante cai no estado vazio com os três começos (`EstadoVazio.tsx`) |
+
+#### A2 Sessão leve (14/10/2026; sem subida de esquema)
+
+| Termo | Identificadores |
+|---|---|
+| Sessão aberta / restaurar | `restaurarSessao` (`src/dominios/sessao/servico.ts`): devolve a Sessão `ativa` ou `pausada` do dia; `SessaoAberta` (`src/apresentacao/sessao/`) é o aviso para o Hoje encaixar. Uma só Sessão aberta por vez (`iniciarSessao` devolve a existente) |
+| Interrompida | `Sessao.estado = 'interrompida'`: Sessão que ficou aberta e virou o dia; **não restaura**, sem `fim` nem `duracaoSegundos` (não se inventa tempo de estudo). Nunca mostrada como falha |
+| Rotas da Sessão | `/sessao/iniciar` (aceita `?tipo=&id=&rotulo=&origem=&razao=&tarefa=` vindos da Próxima ação), `/sessao/atual`, `/sessao/fechar` |
+| Eventos da Sessão | `sessao.iniciada`, `sessao.pausada`, `sessao.retomada`, `sessao.encerrada`, `sessao.interrompida` (payload `{ sessaoId }`) |
