@@ -16,7 +16,7 @@ type Estado =
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
-  { resposta: 'li', rotulo: 'Li', icone: '✓', classe: 'resposta-facil' },
+  { resposta: 'li', rotulo: 'Fácil', icone: '✓', classe: 'resposta-facil' },
   { resposta: 'de_novo', rotulo: 'De novo', icone: '↻', classe: 'resposta-dificil' },
 ] as const satisfies readonly {
   resposta: RespostaFrase;
@@ -26,7 +26,7 @@ const RESPOSTAS = [
 }[];
 
 /**
- * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Li" espaça a próxima
+ * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Fácil" espaça a próxima
  * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências).
  */
 export function RevisarFrases() {
@@ -96,7 +96,7 @@ export function RevisarFrases() {
     [atual, estado, ocupado, repo, terminar],
   );
 
-  // Atalhos: 1 = Li, 2 = De novo.
+  // Atalhos: 1 = Fácil, 2 = De novo.
   useEffect(() => {
     if (estado.tipo !== 'revisando') return;
     const tecla = (e: KeyboardEvent) => {

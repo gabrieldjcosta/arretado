@@ -33,7 +33,7 @@ async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string>
 }
 
 /**
- * Drill: frente, virar, Errei / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2).
+ * Drill: frente, virar, De novo / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2).
  * Revisa até a cota por vez (fatia 3); o resto da fila espera, sem ser cortado nem reordenado, e o
  * fim oferece "Revisar mais N".
  */
@@ -221,7 +221,7 @@ export function Drill() {
 
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
-  const ICONE = { errei: '✕', dificil: '~', facil: '✓' } as const;
+  const ICONE = { errei: '↻', dificil: '~', facil: '✓' } as const;
   return (
     <>
       <h1 className="visualmente-oculto">Revisar</h1>

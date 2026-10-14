@@ -25,7 +25,7 @@ export const ROTULO_ESTADO: Record<EstadoCartao, string> = {
 };
 
 export const ROTULO_RESPOSTA: Record<RespostaRevisao, string> = {
-  errei: 'Errei',
+  errei: 'De novo',
   dificil: 'Difícil',
   facil: 'Fácil',
 };
