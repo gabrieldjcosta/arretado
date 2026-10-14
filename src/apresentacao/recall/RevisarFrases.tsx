@@ -13,6 +13,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
+import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
 
 type Estado =
@@ -197,6 +198,7 @@ export function RevisarFrases() {
   return (
     <>
       <h1 className="visualmente-oculto">Revisar frases</h1>
+      <FaixaDaSessao />
       <div className="topo-drill">
         <Link to="/recall/frases" className="botao discreto">
           Sair

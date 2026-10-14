@@ -362,6 +362,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Próxima ação | `ProximaAcao` (`src/dominios/hoje/contrato.ts`): `tipo` (`OrigemDaAcao['tipo']`: `revisao_vencida`, `leitura_salva`, `tarefa`, `escolha_propria`, `sessao_curta`), `alvo` (`AlvoDeAcao`), `razao`, `estimativaMin?`; `escolherProximaAcao` (reúne Recall e Legislação em `apresentacao/hoje/proxima-acao.ts`); decisão pura `decidirProximaAcao` (`dominios/hoje/proxima-acao.ts`); vazio = `ComecoSugerido` (três). Nada gravado. Não usar "tarefa do dia" |
 | Alvo | `AlvoDeAcao` (`tipo`: `revisao`, `leitura`, `tarefa`, `ponto`, `livre`; `id?`; `rotulo?`): o que se vai estudar; em `Sessao.alvo` |
 | Fronteira | `Sessao.fronteira`: até onde ler nesta Sessão ("até o art. 15"); texto livre e opcional |
+| Faixa da Sessão | `FaixaDaSessao` (`sessao/`), classes `.faixa-sessao*`: "Sessão · Pausar · Encerrar" no topo da revisão e do Leitor (fora do foco); só com Sessão aberta | `barra`, `banner` de sessão |
 | Próximo passo | `Sessao.proximoPasso`: passo pequeno pedido ao fechar a Sessão, pré-preenchido; nunca obrigatório |
 | Origem da ação | `Sessao.origemDaAcao` (`OrigemDaAcao`): cópia do que o Hoje mostrou ao começar |
 | Estacionamento | `Sessao.estacionamento[]` (`NotaDeEstacionamento`: `texto`, `em`, `resolvidaEm?`); `estacionar` (contrato da Sessão). Não usar "distrações" na interface como rótulo de falha |
