@@ -1,0 +1,31 @@
+/* Tarefas (pacote B4): estrutura e espaçamento; cores e botões vêm dos tokens. */
+.tarefas-bloco,
+.tarefas-form {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin-block: var(--espaco-3, 1rem);
+}
+
+.tarefas-item {
+  display: grid;
+  gap: var(--espaco-1, 0.25rem);
+}
+
+.tarefas-fila {
+  padding-inline-start: var(--espaco-3, 1rem);
+}
+
+.tarefas-selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2, 0.5rem);
+  align-items: center;
+}
+
+.tarefas-mais > summary,
+.tarefas-bloco > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}

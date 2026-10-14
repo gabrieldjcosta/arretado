@@ -4,6 +4,7 @@ import type { DataCivil, Leitura, Norma } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import type { EscolherProximaAcao } from '../../dominios/hoje/contrato';
 import { decidirProximaAcao, type EntradaDaProximaAcao } from '../../dominios/hoje/proxima-acao';
+import { carregarFila } from '../../dominios/tarefas';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
 import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
@@ -52,13 +53,30 @@ async function leituraSalva(repo: Repositorio): Promise<EntradaDaProximaAcao['le
 }
 
 export const escolherProximaAcao: EscolherProximaAcao = async (repo, hoje, opcoes) => {
-  const [cartoesVencidos, frasesVencidas, leitura] = await Promise.all([
+  const [cartoesVencidos, frasesVencidas, leitura, { fila }] = await Promise.all([
     vencidos(repo, 'cartoes', hoje),
     vencidos(repo, 'frases', hoje),
     leituraSalva(repo),
+    carregarFila(repo, hoje),
   ]);
+  const primeira = fila[0];
   return decidirProximaAcao(
-    { cartoesVencidos, frasesVencidas, ...(leitura ? { leitura } : {}) },
+    {
+      cartoesVencidos,
+      frasesVencidas,
+      ...(leitura ? { leitura } : {}),
+      ...(primeira
+        ? {
+            tarefa: {
+              id: primeira.id,
+              titulo: primeira.titulo,
+              ...(primeira.estimativaMin !== undefined
+                ? { estimativaMin: primeira.estimativaMin }
+                : {}),
+            },
+          }
+        : {}),
+    },
     opcoes?.excluir,
   );
 };
