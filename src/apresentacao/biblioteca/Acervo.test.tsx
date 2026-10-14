@@ -97,6 +97,7 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect((await screen.findAllByText('Já adicionada')).length).toBeGreaterThan(0);
 
     await usuario.click(screen.getByRole('link', { name: 'Normas' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
     const exec = await screen.findByRole('region', { name: 'Execução Penal' });
     expect(within(exec).getByText('LEP')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Infância' })).toBeInTheDocument();
