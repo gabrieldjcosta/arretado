@@ -17,6 +17,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
+import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
 
 type Estado =
@@ -39,6 +40,7 @@ async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string>
  * fim oferece "Revisar mais N".
  */
 export function Drill() {
+  const texto = useVoz();
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
   // Verso guardado com o id do cartão: nunca mostra o verso do cartão anterior.
@@ -193,7 +195,7 @@ export function Drill() {
         <h1>Revisar</h1>
         <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
-          titulo="Feito."
+          titulo={texto('fimDeRodada')}
           acao={
             estado.frases > 0 ? (
               <>
