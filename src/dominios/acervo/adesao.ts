@@ -198,8 +198,8 @@ export interface ResultadoDoLote {
 }
 
 export interface OpcoesDoLote {
-  /** Chamado antes de cada item: `feitos` de `total`. */
-  aoProgresso?: (feitos: number, total: number) => void;
+  /** Chamado antes de cada item: `feitos` de `total`; `atual` é o item que vai começar. */
+  aoProgresso?: (feitos: number, total: number, atual?: EntradaDoIndice) => void;
   /** Consultado antes de cada item; verdadeiro encerra o lote (retomável depois). */
   deveParar?: () => boolean;
   /** Disciplinas escolhidas por item (id do acervo → nomes); item ausente usa as sugeridas. */
@@ -221,8 +221,8 @@ export async function aderirEmLote(
       saida.restantes.push(...ids.slice(k));
       break;
     }
-    opcoes.aoProgresso?.(k, ids.length);
     const entrada = porId.get(id);
+    opcoes.aoProgresso?.(k, ids.length, entrada);
     if (!entrada) {
       saida.falhas.push({ id, motivo: 'Item fora do índice do acervo.' });
       continue;

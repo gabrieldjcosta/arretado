@@ -840,7 +840,8 @@ a.item-norma strong {
   font-variant-numeric: tabular-nums;
 }
 
-.andamento progress {
+.andamento progress,
+.aviso progress {
   width: 100%;
   max-width: 24rem;
 }
