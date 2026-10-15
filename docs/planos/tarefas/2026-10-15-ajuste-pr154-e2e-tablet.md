@@ -1,6 +1,6 @@
 # Tarefa: ajuste do PR #154 (e2e tablet)
 
-Atividade: destravar o PR #154 · Risco: **C** · Construtor: DeepSeek Harness (`dsh`) · Revisor: CI + coordenador
+Atividade: destravar o PR #154 · Risco: **C** · Construtor: Gemini (passou do DeepSeek, cuja rota de API não funcionou) · Revisor: CI + coordenador
 Branch: `claude/orca-orquestracao` (o do PR; este é o único agente que escreve nele) · Base do PR: `integracao`
 
 ## Contexto
