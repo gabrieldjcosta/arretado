@@ -1,0 +1,43 @@
+name: Guarda de PR
+
+# pull_request_target: roda a versão deste arquivo que está na BASE, então um PR não consegue enfraquecer a própria guarda.
+# Não faz checkout do código do PR; só consulta a lista de arquivos pela API.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  guarda:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Origem, destino e caminhos protegidos
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          set -euo pipefail
+          if [ "$BASE" = "main" ] && [ "$HEAD" != "integracao" ]; then
+            echo "::error::PR para o main só pode vir da integracao (fluxo diário; o merge é do Gabriel)."
+            exit 1
+          fi
+          arquivos=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
+          protegidos=$(printf '%s\n' "$arquivos" | grep -E '^(\.github/|\.claude/|\.githooks/|AGENTS\.md$|CLAUDE\.md$|docs/planos/contratos-agentes\.md$|supabase/|worker/|wrangler\.jsonc$|package(-lock)?\.json$|src/core/seguranca/|src/core/persistencia/migracao)' || true)
+          if [ -n "$protegidos" ]; then
+            echo "Caminhos protegidos tocados:"
+            printf '%s\n' "$protegidos"
+            case ",$LABELS," in
+              *,aprovado-gabriel,*) echo "Rótulo aprovado-gabriel presente." ;;
+              *)
+                echo "::error::Este PR toca caminhos protegidos (esquema, sync, segurança, CI, hooks, dependências, contratos). Só o Gabriel aplica o rótulo aprovado-gabriel, depois de revisar o diff."
+                exit 1
+                ;;
+            esac
+          fi

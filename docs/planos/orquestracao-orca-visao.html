@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orquestração Orca — Arretado</title>
+    <style>
+      :root {
+        --bg: #f6f5f1;
+        --card: #ffffff;
+        --ink: #1d2433;
+        --muted: #5b6475;
+        --line: #dcd9d0;
+        --accent: #1f5fbf;
+        --ok: #1c7a45;
+        --warn: #a5610a;
+        --bad: #b3261e;
+        --okbg: #e3f3ea;
+        --warnbg: #fbefd9;
+        --badbg: #fbe4e1;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #14171f;
+          --card: #1c212c;
+          --ink: #e8ebf2;
+          --muted: #9aa3b5;
+          --line: #2d3445;
+          --accent: #6ea3ff;
+          --ok: #5cc98b;
+          --warn: #e8a64a;
+          --bad: #ff8a80;
+          --okbg: #17321f;
+          --warnbg: #3a2c12;
+          --badbg: #3d1b18;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.5 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      h1 {
+        font-size: 1.7rem;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 1.2rem;
+        margin: 36px 0 12px;
+      }
+      p {
+        margin: 6px 0;
+      }
+      .sub {
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+        gap: 12px;
+      }
+      @media (min-width: 720px) {
+        .grid.c3 {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .grid.c2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.92rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .wrap {
+        overflow-x: auto;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 1px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .ok {
+        background: var(--okbg);
+        color: var(--ok);
+      }
+      .warn {
+        background: var(--warnbg);
+        color: var(--warn);
+      }
+      .bad {
+        background: var(--badbg);
+        color: var(--bad);
+      }
+      code {
+        font:
+          0.88em ui-monospace,
+          Consolas,
+          monospace;
+        background: var(--bg);
+        padding: 1px 5px;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      svg text {
+        fill: var(--ink);
+        font:
+          13px system-ui,
+          sans-serif;
+      }
+      svg .box {
+        fill: var(--card);
+        stroke: var(--line);
+        stroke-width: 1.5;
+      }
+      svg .hot {
+        fill: var(--okbg);
+        stroke: var(--ok);
+        stroke-width: 1.5;
+      }
+      svg .gate {
+        fill: var(--warnbg);
+        stroke: var(--warn);
+        stroke-width: 1.5;
+      }
+      svg .arrow {
+        stroke: var(--muted);
+        stroke-width: 1.5;
+        fill: none;
+        marker-end: url(#a);
+      }
+      svg .small {
+        font-size: 11px;
+        fill: var(--muted);
+      }
+      .risk {
+        border-left: 4px solid var(--bad);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Orquestração multiagente no Orca</h1>
+      <p class="sub">
+        Arretado · 15/10/2026 · Claude Code planeja e revisa; os outros agentes executam sob
+        contrato.
+      </p>
+
+      <h2>1. Como o trabalho circula</h2>
+      <div class="card">
+        <svg viewBox="0 0 900 330" role="img" aria-label="Fluxo do contrato ao merge">
+          <defs>
+            <marker
+              id="a"
+              viewBox="0 0 10 10"
+              refX="9"
+              refY="5"
+              markerWidth="7"
+              markerHeight="7"
+              orient="auto"
+            >
+              <path d="M0 0L10 5L0 10z" fill="currentColor" style="color: var(--muted)" />
+            </marker>
+          </defs>
+          <rect class="hot" x="10" y="20" width="170" height="64" rx="8" />
+          <text x="95" y="48" text-anchor="middle">Coordenador</text>
+          <text class="small" x="95" y="66" text-anchor="middle">Claude Sonnet / Opus</text>
+          <path class="arrow" d="M180 52H230" />
+          <rect class="box" x="232" y="20" width="150" height="64" rx="8" />
+          <text x="307" y="48" text-anchor="middle">Contrato</text>
+          <text class="small" x="307" y="66" text-anchor="middle">escopo · aceite · paradas</text>
+          <path class="arrow" d="M382 52H432" />
+          <rect class="box" x="434" y="6" width="190" height="92" rx="8" />
+          <text x="529" y="30" text-anchor="middle">Construtor (1 por branch)</text>
+          <text class="small" x="529" y="50" text-anchor="middle">
+            Antigravity · Sonnet · Hermes
+          </text>
+          <text class="small" x="529" y="66" text-anchor="middle">
+            OpenCode · DeepSeek · Gemini
+          </text>
+          <text class="small" x="529" y="82" text-anchor="middle">
+            worktree própria, claude/&lt;atividade&gt;
+          </text>
+          <path class="arrow" d="M624 52H674" />
+          <rect class="gate" x="676" y="20" width="214" height="64" rx="8" />
+          <text x="783" y="48" text-anchor="middle">Portão local</text>
+          <text class="small" x="783" y="66" text-anchor="middle">.githooks · npm run check</text>
+          <path class="arrow" d="M783 84V132" />
+          <rect class="box" x="676" y="134" width="214" height="64" rx="8" />
+          <text x="783" y="162" text-anchor="middle">PR → integracao</text>
+          <text class="small" x="783" y="180" text-anchor="middle">nunca para o main</text>
+          <path class="arrow" d="M676 166H626" />
+          <rect class="gate" x="434" y="124" width="190" height="84" rx="8" />
+          <text x="529" y="150" text-anchor="middle">Portão no GitHub</text>
+          <text class="small" x="529" y="168" text-anchor="middle">
+            verificar · e2e ×3 · guarda
+          </text>
+          <text class="small" x="529" y="184" text-anchor="middle">
+            + revisor diferente do construtor
+          </text>
+          <path class="arrow" d="M434 166H384" />
+          <rect class="hot" x="196" y="134" width="186" height="64" rx="8" />
+          <text x="289" y="162" text-anchor="middle">Coordenador ordena a fila</text>
+          <text class="small" x="289" y="180" text-anchor="middle">
+            recomenda merge / revisão / descarte
+          </text>
+          <path class="arrow" d="M196 166H146" />
+          <rect class="gate" x="10" y="134" width="134" height="64" rx="8" />
+          <text x="77" y="162" text-anchor="middle">Gabriel</text>
+          <text class="small" x="77" y="180" text-anchor="middle">risco A + merge no main</text>
+          <path class="arrow" d="M77 198V248" />
+          <rect class="box" x="10" y="250" width="134" height="56" rx="8" />
+          <text x="77" y="283" text-anchor="middle">main (1× por dia)</text>
+        </svg>
+      </div>
+
+      <h2>2. Estado hoje (verificado × pendente)</h2>
+      <div class="card wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Estado</th>
+              <th>Evidência / o que falta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Despacho, Verificação diária, Checagem semanal</td>
+              <td><span class="tag ok">suspensos</span></td>
+              <td>
+                API respondeu <code>enabled: false</code> nas três. Reativáveis na tela de rotinas.
+              </td>
+            </tr>
+            <tr>
+              <td>Rotina de Backup</td>
+              <td><span class="tag warn">mantida</span></td>
+              <td>
+                Rede de proteção do <code>main</code>; trocar por GitHub Action se quiser zerar
+                token Claude.
+              </td>
+            </tr>
+            <tr>
+              <td>Hooks locais (<code>.githooks</code>)</td>
+              <td><span class="tag ok">testados</span></td>
+              <td>
+                5 casos simulados: bloqueia push no main, exclusão da integracao; passa branch
+                claude e commit <code>wip:</code>.
+              </td>
+            </tr>
+            <tr>
+              <td><code>AGENTS.md</code> + contratos + desenho</td>
+              <td><span class="tag ok">escritos</span></td>
+              <td>
+                <code>docs/planos/contratos-agentes.md</code> e a especificação em
+                <code>docs/superpowers/specs/</code>.
+              </td>
+            </tr>
+            <tr>
+              <td>Job <code>guarda</code> (PR)</td>
+              <td><span class="tag warn">nunca rodou</span></td>
+              <td>Só roda no GitHub depois do merge na <code>integracao</code>.</td>
+            </tr>
+            <tr>
+              <td>Proteção de <code>main</code> e <code>integracao</code></td>
+              <td><span class="tag bad">não aplicada</span></td>
+              <td>
+                GitHub respondeu "Branch not protected" nos dois; auto-merge do repositório está
+                desligado.
+              </td>
+            </tr>
+            <tr>
+              <td>Testes de unidade nesta máquina</td>
+              <td><span class="tag warn">em verificação</span></td>
+              <td>
+                vitest estoura memória (6 GB de RAM, 8 workers). Reexecução com 2 workers em
+                andamento.
+              </td>
+            </tr>
+            <tr>
+              <td>Configuração do Orca (permissões, contas, skills)</td>
+              <td><span class="tag warn">manual</span></td>
+              <td>Checklist em <code>contratos-agentes.md</code> §7; só você faz na interface.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. Riscos achados</h2>
+      <div class="grid c2">
+        <div class="card risk">
+          <strong>Repositório fica público (decisão sua, 15/10)</strong>
+          <p>
+            A cota de repositório privado do GitHub acabou. Vantagem: o CI roda de graça e dá para
+            verificar tudo na nuvem. Custo: nada de segredo, dado de estudo ou chave no código;
+            busca por chaves não achou nada e <code>.env</code> está ignorado. O
+            <code>CLAUDE.md</code> ainda diz "remoto privado" e será corrigido.
+          </p>
+        </div>
+        <div class="card risk">
+          <strong>Proteção só no papel</strong>
+          <p>
+            O <code>fluxo-diario.md</code> dizia que a integracao exigia CI verde, mas não há regra
+            no GitHub. Sem ela, um agente com seu token consegue publicar no <code>main</code>.
+          </p>
+        </div>
+      </div>
+
+      <h2>4. Quem faz o quê</h2>
+      <div class="card wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Risco</th>
+              <th>Exemplos</th>
+              <th>Constrói</th>
+              <th>Revisa</th>
+              <th>Merge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag bad">A crítico</span></td>
+              <td>esquema, sync, sanitização, RLS, CI, hooks, dependências</td>
+              <td>Claude (Opus planeja)</td>
+              <td>outro agente + Gabriel</td>
+              <td>rótulo <code>aprovado-gabriel</code></td>
+            </tr>
+            <tr>
+              <td><span class="tag warn">B normal</span></td>
+              <td>atividade de fase, UI, domínio</td>
+              <td>Antigravity · Sonnet · Hermes</td>
+              <td>Gemini ou Claude</td>
+              <td>auto com CI verde</td>
+            </tr>
+            <tr>
+              <td><span class="tag ok">C mecânico</span></td>
+              <td>testes, E2E, docs, limpeza</td>
+              <td>OpenCode · DeepSeek · Gemini</td>
+              <td>CI + olhada no diff</td>
+              <td>auto com CI verde</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. O que dá para fazer nesta semana</h2>
+      <div class="card wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Atividade (plano-mestre §9, f3-pacotes)</th>
+              <th>Risco</th>
+              <th>Construtor</th>
+              <th>Revisão</th>
+              <th>Quando</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>P0 Fundação F3</strong>: esquema v7, contratos, encaixes de tela</td>
+              <td><span class="tag bad">A</span></td>
+              <td>Claude (Opus planeja e executa)</td>
+              <td>Hermes ou Gemini + você; backup seu antes do merge</td>
+              <td>Dias 1–2. Bloqueia a onda 1.</td>
+            </tr>
+            <tr>
+              <td><strong>B0 Catálogo</strong>: formato e validador (documento e script)</td>
+              <td><span class="tag ok">C</span></td>
+              <td>OpenCode, DeepSeek ou Gemini</td>
+              <td>CI + olhada no diff</td>
+              <td>Dia 1, junto com a P0. Não conta no limite de 2.</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>13.3</strong> Backup com normas · <strong>Ajustes A</strong> (foco,
+                disciplina)
+              </td>
+              <td><span class="tag warn">B</span></td>
+              <td>Antigravity ou Sonnet</td>
+              <td>Gemini ou Claude</td>
+              <td>Dias 1–3, no lugar do segundo pacote enquanto a P0 corre.</td>
+            </tr>
+            <tr>
+              <td><strong>A1 Uma próxima ação</strong> e <strong>A2 Sessão leve</strong></td>
+              <td><span class="tag warn">B</span></td>
+              <td>Antigravity (A2) e Sonnet (A1)</td>
+              <td>Gemini cruzado</td>
+              <td>Dias 3–5, só depois da P0 mesclada.</td>
+            </tr>
+            <tr>
+              <td><strong>Frases 2 e 3</strong> (revisar frases, enviar do leitor)</td>
+              <td><span class="tag warn">B</span></td>
+              <td>Sonnet ou Hermes</td>
+              <td>Gemini</td>
+              <td>Dias 4–5, se a revisão do esquema v6 já estiver feita.</td>
+            </tr>
+            <tr>
+              <td>Testes, E2E, glossário, solução de problemas das atividades acima</td>
+              <td><span class="tag ok">C</span></td>
+              <td>OpenCode e DeepSeek</td>
+              <td>CI</td>
+              <td>Em cada atividade, sem fila própria.</td>
+            </tr>
+            <tr>
+              <td>12.2 Worker com chamada real, lotes com rede</td>
+              <td><span class="tag bad">você</span></td>
+              <td>precisa de rede e de você</td>
+              <td>—</td>
+              <td>Fora da orquestração.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid c2" style="margin-top: 12px">
+        <div class="card">
+          <strong>Realista para a semana</strong>
+          <p>
+            P0 mesclada e revisada, B0, 13.3, Ajustes A, A1 e A2 abertas ou mescladas. É o que cabe
+            em 2 pacotes de código por vez, com revisão cruzada e o seu backup antes do esquema v7.
+          </p>
+        </div>
+        <div class="card risk">
+          <strong>Limite que manda no ritmo</strong>
+          <p>
+            Esta máquina tem 6 GB de RAM: no máximo 2 pacotes de código ao mesmo tempo (regra já
+            escrita no <code>f3-pacotes.md</code>). A verificação pesada vai para o CI do GitHub,
+            que é gratuito no repositório público.
+          </p>
+        </div>
+      </div>
+
+      <h2>6. Próximos passos</h2>
+      <div class="grid c3">
+        <div class="card">
+          <strong>Claude (agora)</strong>
+          <p>
+            Fechar os testes, commit, PR para a integracao, merge à mão com CI verde. Depois aplicar
+            a proteção de branch.
+          </p>
+        </div>
+        <div class="card">
+          <strong>Você (hoje)</strong>
+          <p>
+            Decidir repositório público ou privado. Configurar o Orca (permissões Manual, agentes
+            habilitados, setup
+            <code>npm ci &amp;&amp; npm run hooks:instalar</code>).
+          </p>
+        </div>
+        <div class="card">
+          <strong>Semanas 1–4</strong>
+          <p>
+            1: Claude + 1 construtor. 2: Antigravity, Gemini, OpenCode e teste das contas
+            duplicadas. 3: DeepSeek e revisão cruzada. 4: Hermes como coordenador de teste.
+          </p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
