@@ -67,7 +67,8 @@ Você é o coordenador desta Run: não edita código de produto. Leia `AGENTS.md
 **Orca:** o texto enviado ao terminal de um worker só é recebido depois de um Enter. Depois de colar ou enviar um comando, mande o Enter (ou confira na tela que a linha saiu do campo de entrada) antes de dar o despacho por feito.
 
 ## 7. Configuração do Orca (checklist; manual, na interface)
-1. Settings → Agents → Agent Permissions: **Manual** (o padrão do Orca pula permissões). Desligar confiança automática de pastas.
+1. Settings → Agents → Agent Permissions: **Manual** (o padrão do Orca pula permissões). Desligar confiança automática de pastas. **Exceção do Antigravity (Gabriel, 15/10/2026):** lista de permissões em `~/.gemini/antigravity-cli/settings.json` (`permissions.allow`: leitura, escrita só em `orca/workspaces/arretado`, `git`, `npm`, `npx`, `node`, `orca`, `gh pr view/list/checks`; `permissions.deny`: force push, push em `main`/`integracao`, `reset --hard`, `clean`, `stash`, `gh pr merge`, `npm install`, apagar arquivo). Formato: <https://antigravity.google/docs/permissions?tab=cli>.
+2. **DeepSeek (`dsh-tui`):** cadastrar como agente em Settings → Agents; enquanto não estiver, despachar como em `solucao-de-problemas.md` › "Orquestração (Orca)".
 2. Settings → Agents: habilitar só Claude Code, Antigravity, Gemini, OpenCode, DeepSeek Harness e Hermes.
 3. Autenticar cada CLI direto com a própria assinatura antes de abrir pelo Orca; conferir `git --version`, `gh auth status`, `node -v` no terminal que o Orca abre (Windows, PowerShell; um único checkout).
 4. Por repositório/worktree, comando de setup: `npm ci && npm run hooks:instalar`.
