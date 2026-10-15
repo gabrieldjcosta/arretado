@@ -16,11 +16,9 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 
 ## Interrupção por limite de uso e retomada
 - O contêiner some junto com o trabalho não enviado: ao perceber que o limite de uso se aproxima, ou a cada bloco de trabalho concluído, o Claude faz `git commit -m "wip: <atividade>"` e push no branch da atividade (o commit `wip:` pula o check; o merge na `integracao` continua exigindo check verde e CI verde).
-- Rotinas agendadas (todas amarradas à sessão persistente "Despachante Arretado", que já tem o repositório; rotinas de sessão nova não conseguem anexá-lo, testado em 10/10/2026):
-  - **Despacho** (a cada hora, 7h às 22h de Brasília): se há sessão com tag `arretado-atividade` ativa, não faz nada; senão escolhe a atividade parada (commit `wip:` ou PR aberto para a `integracao`) ou a próxima do plano e abre **uma** sessão filha por atividade, com o modelo da tabela do `CLAUDE.md` (Opus 5.5 para as pesadas, Sonnet 5.5 para as demais). O esforço não é configurável por rotina: fica no padrão do modelo.
-  - **Backup** (05:53): cria o branch `backup/AAAA-MM-DD` a partir do `main`.
-- Quando o limite de uso reseta, o próximo despacho da hora retoma a atividade parada.
-- A sessão filha de cada atividade leva a tag `arretado-atividade` (evita duas sessões na mesma atividade).
+- **Despachante horário extinto em 15/10/2026** (gastava token Claude à toa). Rotinas Despacho, Verificação diária e Checagem semanal estão suspensas (reativáveis na tela de rotinas). Quem despacha agora é o Orca, por demanda, sob os contratos de `contratos-agentes.md`. Segue ativa só a rotina **Backup** (05:53): cria o branch `backup/AAAA-MM-DD` a partir do `main`.
+- Retomada após limite de uso: o coordenador lê o commit `wip:` ou o PR aberto e despacha de novo, para o mesmo agente ou outro (a regra "um agente por branch" vale).
+- Portões: valem para todos os agentes (hooks em `.githooks`, proteção de branch e job `guarda` no GitHub). Ver `contratos-agentes.md` §8.
 
 ## Fim do dia (Gabriel)
 1. `npm run fim-do-dia`: lista os merges da `integracao` ainda fora do `main`.

@@ -26,6 +26,7 @@
     "corpus:colar": "node scripts/corpus-colar.mjs",
     "corpus:gabarito": "node scripts/corpus-gabarito.mjs",
     "fim-do-dia": "node scripts/fim-do-dia.mjs",
+    "hooks:instalar": "node scripts/instalar-hooks.mjs",
     "acervo:gerar": "node scripts/acervo.mjs gerar",
     "acervo:verificar": "node scripts/acervo.mjs verificar",
     "catalogo": "node scripts/catalogo.mjs"
