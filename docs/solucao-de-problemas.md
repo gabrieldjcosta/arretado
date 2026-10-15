@@ -1377,3 +1377,8 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Saí com "Apagar daqui" e a conta ainda aparece em outro lugar
 - **Causa:** o registro de contas é atualizado antes do banco ser apagado; se o apagamento falhar, sobra um banco `arretado-c-…` órfão, sem efeito.
 - **Solução:** nenhuma urgente; "Apagar tudo" em Conta › Dados remove o que sobrar do banco aberto.
+
+## Orquestração (Orca, 15/10/2026)
+
+- **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.
+- **Contrato despachado para atividade já feita.** Causa: o `plano-mestre.md` §9 e o `f3-pacotes.md` dão a ordem, não o estado. Conferir `docs/proxima-sessao.md`, `git log origin/integracao` e `gh pr list` antes de despachar (`contratos-agentes.md` §6).

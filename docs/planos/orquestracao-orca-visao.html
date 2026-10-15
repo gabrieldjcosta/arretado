@@ -385,11 +385,16 @@
       </div>
 
       <h2>5. O que dá para fazer nesta semana</h2>
+      <p>
+        Corrigido em 15/10/2026 a partir do <code>docs/proxima-sessao.md</code> e do
+        <code>git log</code>. A F3-A, a F3-B e a F3-C já estão na <code>integracao</code> (esquema
+        v8). A fila real é a F4-A (contas): A0–A3 e A5 feitas; faltam A4, AL, A6, A7 e o portão A8.
+      </p>
       <div class="card wrap">
         <table>
           <thead>
             <tr>
-              <th>Atividade (plano-mestre §9, f3-pacotes)</th>
+              <th>Atividade (f4a-pacotes)</th>
               <th>Risco</th>
               <th>Construtor</th>
               <th>Revisão</th>
@@ -398,56 +403,51 @@
           </thead>
           <tbody>
             <tr>
-              <td><strong>P0 Fundação F3</strong>: esquema v7, contratos, encaixes de tela</td>
+              <td>
+                <strong>A4 Migração local → conta</strong>: prévia, backup automático, cópia com
+                troca de <code>usuarioId</code>, verificação por hash, retomada
+              </td>
               <td><span class="tag bad">A</span></td>
-              <td>Claude (Opus planeja e executa)</td>
-              <td>Hermes ou Gemini + você; backup seu antes do merge</td>
-              <td>Dias 1–2. Bloqueia a onda 1.</td>
-            </tr>
-            <tr>
-              <td><strong>B0 Catálogo</strong>: formato e validador (documento e script)</td>
-              <td><span class="tag ok">C</span></td>
-              <td>OpenCode, DeepSeek ou Gemini</td>
-              <td>CI + olhada no diff</td>
-              <td>Dia 1, junto com a P0. Não conta no limite de 2.</td>
+              <td>Claude (Opus, esforço alto)</td>
+              <td>Sessão independente + você; backup seu antes do merge</td>
+              <td>Agora. Onda 3, sozinho.</td>
             </tr>
             <tr>
               <td>
-                <strong>13.3</strong> Backup com normas · <strong>Ajustes A</strong> (foco,
-                disciplina)
+                <strong>A7 Privacidade e preparo da V1</strong> (só a parte de texto: política v3,
+                termos, consentimento)
               </td>
-              <td><span class="tag warn">B</span></td>
-              <td>Antigravity ou Sonnet</td>
-              <td>Gemini ou Claude</td>
-              <td>Dias 1–3, no lugar do segundo pacote enquanto a P0 corre.</td>
-            </tr>
-            <tr>
-              <td><strong>A1 Uma próxima ação</strong> e <strong>A2 Sessão leve</strong></td>
-              <td><span class="tag warn">B</span></td>
-              <td>Antigravity (A2) e Sonnet (A1)</td>
-              <td>Gemini cruzado</td>
-              <td>Dias 3–5, só depois da P0 mesclada.</td>
-            </tr>
-            <tr>
-              <td><strong>Frases 2 e 3</strong> (revisar frases, enviar do leitor)</td>
-              <td><span class="tag warn">B</span></td>
-              <td>Sonnet ou Hermes</td>
-              <td>Gemini</td>
-              <td>Dias 4–5, se a revisão do esquema v6 já estiver feita.</td>
-            </tr>
-            <tr>
-              <td>Testes, E2E, glossário, solução de problemas das atividades acima</td>
               <td><span class="tag ok">C</span></td>
-              <td>OpenCode e DeepSeek</td>
-              <td>CI</td>
-              <td>Em cada atividade, sem fila própria.</td>
+              <td>Gemini ou OpenCode</td>
+              <td>Coordenador</td>
+              <td>
+                Em paralelo ao A4; texto não conta no limite de 2. O workflow diário do Supabase
+                toca <code>.github/</code> e é nível A.
+              </td>
             </tr>
             <tr>
-              <td>12.2 Worker com chamada real, lotes com rede</td>
+              <td><strong>AL Log do acervo por referência</strong></td>
+              <td><span class="tag bad">A</span></td>
+              <td>Claude</td>
+              <td>Sessão independente + você; backup seu</td>
+              <td>Depois do A4: os dois mexem em <code>src/core/pacote/</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>A6 Backup manual na nuvem</strong> (cifrado no aparelho)</td>
+              <td><span class="tag bad">A</span></td>
+              <td>Claude</td>
+              <td>Outro agente + você</td>
+              <td>Onda 4, depois do A4 mesclado.</td>
+            </tr>
+            <tr>
+              <td>
+                Painel do Supabase: expor o esquema <code>arretado</code>, ligar o gancho, criar o
+                cliente Google, URLs, convite; deploy da <code>excluir-conta</code>
+              </td>
               <td><span class="tag bad">você</span></td>
-              <td>precisa de rede e de você</td>
+              <td>só você</td>
               <td>—</td>
-              <td>Fora da orquestração.</td>
+              <td>Destrava a fumaça real da A3 e da A5. Fora da orquestração.</td>
             </tr>
           </tbody>
         </table>
@@ -456,8 +456,8 @@
         <div class="card">
           <strong>Realista para a semana</strong>
           <p>
-            P0 mesclada e revisada, B0, 13.3, Ajustes A, A1 e A2 abertas ou mescladas. É o que cabe
-            em 2 pacotes de código por vez, com revisão cruzada e o seu backup antes do esquema v7.
+            A4 aberto e revisado em outra sessão, texto da A7 pronto, seus passos no painel feitos e
+            a fumaça da A3 com o projeto real. AL e A6 ficam para depois do merge do A4.
           </p>
         </div>
         <div class="card risk">
