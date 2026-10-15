@@ -1,44 +1,36 @@
-# Tarefa: F4-A — A4 Migração do uso local para a conta
+# A4 Migração do uso local para a conta (visão geral, dividida em 3 contratos)
 
-Atividade: `f4a-pacotes.md`, onda 3 (sozinho) · Risco: **A (crítico, mexe em dado)** · Construtor: Claude (Opus 5.5, esforço alto) · Revisor: sessão independente (outro agente ou outra sessão Claude) + Gabriel
-Branch: `claude/f4a-a4` · Base: `integracao` · Ponto de salvamento: branch `backup/pre-f4a-a4` a partir da `integracao`, criado antes do primeiro commit
+Atividade: `f4a-pacotes.md`, onda 3 (sozinho) · Risco do conjunto: **A (mexe em dado)** · Plano: `f4a-contas.md` §5 (passos 1–6 e 8; o 7 é do A6) e §13.
+Estado conferido em 15/10/2026 (`proxima-sessao.md` e `git log`): A0–A3 e A5 na `integracao`; esquema Dexie v8.
+Divisão decidida pelo Gabriel em 15/10/2026 para gastar menos tokens: Claude fica com o núcleo (o que pode perder dado); tela e testes saem para Antigravity e DeepSeek, construindo sobre uma interface fixa.
 
-Estado conferido em 15/10/2026 (`proxima-sessao.md` e `git log`): A0, A1, A2 (aplicada), A3 e A5 já estão na `integracao`; esquema Dexie v8. `src/core/pacote/migrar-para-conta.ts` e `src/apresentacao/conta/migracao/` ainda não existem.
+| Contrato | Construtor | Nível | Branch | Base |
+|---|---|---|---|---|
+| [A4a Núcleo](2026-10-15-f4a-a4a-nucleo.md) | Claude (Opus 5.5, esforço alto) | A | `claude/f4a-a4-nucleo` | `integracao` |
+| [A4b Tela](2026-10-15-f4a-a4b-tela.md) | Antigravity | B | `claude/f4a-a4-tela` | `claude/f4a-a4-nucleo` |
+| [A4c Testes](2026-10-15-f4a-a4c-testes.md) | DeepSeek | C | `claude/f4a-a4-testes` | `claude/f4a-a4-nucleo` |
 
-## Objetivo
-Quem já estuda sem conta entra numa conta e leva todos os dados para o banco dela (`arretado-c-<uid>`), **sem nunca alterar a origem**: copiar, verificar e só então ativar. Plano: `f4a-contas.md` §5 (passos 1 a 6 e 8; o passo 7 é do A6) e §13.
+**Ordem:** o primeiro commit do `claude/f4a-a4-nucleo` já traz a interface abaixo como esqueleto (funções que lançam "não implementado"). A4b e A4c começam a partir dele, em paralelo. O A4a implementa até os testes do A4c passarem; depois o Claude junta os três num PR só para a `integracao`. Ponto de salvamento: `backup/pre-f4a-a4`.
 
-## Ler antes (só o necessário)
-`AGENTS.md`; `docs/planos/f4a-contas.md` §5 e §13; linha do A4 em `f4a-pacotes.md`; `src/core/persistencia/registro-contas.ts`; `src/core/pacote/{exportar,importar,espacos,formato}.ts` (modo integral e troca de identidade); `src/core/persistencia/log.ts` (`reconstruirDoLog`); `src/apresentacao/conta/entrar/` e `sair/` (onde a migração é oferecida); `docs/solucao-de-problemas.md`, seção "Contas (F4-A)".
+## Interface fixa (`src/core/pacote/migrar-para-conta.ts`)
+Não muda sem aviso aos três contratos. Está no esqueleto do branch do núcleo; a fonte é o arquivo.
 
-## Escopo
-Pode criar ou editar: `src/core/pacote/migrar-para-conta.ts` (+ teste), `src/apresentacao/conta/migracao/` (tela, CSS próprio sem cor literal), `src/core/persistencia/registro-contas.ts` (só campos opcionais em `ContaDoAparelho` ou chaves em `meta`, sem nova versão do registro), uma linha em `Entrar.tsx` ou `ContextoConta.tsx` para oferecer a migração depois do primeiro login, a seção "Cópia de antes da conta" em `src/apresentacao/conta/dados/` (Exportar e Apagar), E2E novo em `e2e/`, e, só por acréscimo, `docs/glossario.md`, `docs/solucao-de-problemas.md` e `docs/proxima-sessao.md`.
-Não alterar: esquema Dexie de estudo (fica em v8), `supabase/`, `src/core/seguranca/`, `src/core/persistencia/migracao*`, `.github/`, `.githooks/`, `package.json`, pastas de A6/AL.
+- `preverMigracao(origem)` → `PreviaMigracao` (coleções, registros, bytes, por coleção). Não escreve nada.
+- `migrarParaConta(origem, { uid, baixarBackup, aoAvancar?, interromperEm?, registro?, agora? })` → `ResultadoMigracao`: `{ tipo: 'concluida', uid, contagens, hash }` ou `{ tipo: 'falhou', etapa, motivo }`. Etapas: `backup` → `copia` → `verificacao` → `ativacao`. `baixarBackup` que rejeita = nada começa. `interromperEm` (só testes) lança `InterrupcaoSimulada` naquela etapa, como uma aba fechada.
+- `estadoDaMigracao(uid, registro?)` → `'nenhuma' | 'em-andamento' | 'concluida'`.
+- `copiaAnterior(registro?)` → `{ nomeBanco, uid, migradoEm } | null`; `apagarCopiaAnterior(registro?)`.
 
-## Critérios de aceite
-- [ ] Prévia antes de qualquer cópia: "N registros em M coleções, X MB… Nada sai para a internet agora."
-- [ ] Backup automático (`exportarPacote` + `registrarBackup`); se o download falhar, a migração não começa.
-- [ ] Cópia para `arretado-c-<uid>` pelo caminho integral com troca de `usuarioId` em registros e log numa transação; `aparelhoId` e relógio lógico preservados.
-- [ ] Verificação: contagem por coleção igual; hash do conjunto igual depois de normalizar `usuarioId`; `reconstruirDoLog` do banco novo = estado do banco novo. Se falhar, apaga o banco novo, mostra "nada foi alterado" e registra um Problema.
-- [ ] Conta ativada só com a verificação limpa. Interrupção deixa `migracao: em-andamento`; o banco é ignorado e refeito do zero na próxima vez.
-- [ ] A origem recebe `migradoParaConta: <uid>` e aparece em Conta › Dados como "Cópia de antes da conta (data)", com Exportar e Apagar, e nunca é apagada sozinha.
-- [ ] Teste unitário com **3 interrupções injetadas** (antes da cópia, no meio da transação e entre a verificação e a ativação), comparando contagens e hash, com origem byte a byte igual depois de cada uma.
-- [ ] Teste com uma fixture **sintética** no formato da exportação real (todas as coleções v8, log com lote do acervo). **Nenhum dado real do Gabriel entra no repositório (é público).** A rodada com a exportação real anonimizada é feita localmente, fora do git, e relatada no PR.
-- [ ] `VITE_CONTA=0`: app idêntico ao de hoje, migração inacessível.
-- [ ] E2E com `ServicoDeContaFalso`: estudar sem conta, entrar, migrar, ver os dados na conta e a cópia anterior em Dados; axe nos 2 temas.
-- [ ] Vocabulário obrigatório; texto sem culpa nem pressa; nada obrigatório além de confirmar.
+**Escolha (reversível):** a marca `migradoParaConta` do plano §5.6 fica no `meta` do registro de contas, não no banco de origem, para a origem ficar byte a byte igual (critério dos testes).
 
-## Verificação
-Máquina de 6 GB: localmente, `npx vitest run --project unidade --maxWorkers=2 <arquivos afetados>`, `npm run lint`, `npm run typecheck`, `npm run format:check`. O check completo e o E2E nos 3 aparelhos rodam no CI do PR. Commits de salvamento com `wip:`. Evidência no PR: saída dos testes de interrupção e o relato da rodada local com a exportação real (só contagens e hashes, sem conteúdo).
+## Critérios do conjunto (o PR final)
+- Prévia antes de qualquer cópia; backup automático; se o download falhar, nada começa.
+- Cópia para `arretado-c-<uid>` com troca de `usuarioId` em registros e log numa transação; `aparelhoId` e relógio lógico preservados.
+- Verificação: contagens iguais, hash igual depois de normalizar `usuarioId`, `reconstruirDoLog` = estado. Se falhar, apaga o banco novo, mostra "nada foi alterado" e registra um Problema.
+- Conta ativada só com a verificação limpa; interrupção deixa `em-andamento`, e a próxima vez refaz do zero.
+- "Cópia de antes da conta (data)" em Conta › Dados, com Exportar e Apagar, nunca apagada sozinha.
+- 3 interrupções injetadas, com origem igual byte a byte depois de cada uma; fixture **sintética** (repositório público: nenhum dado real do Gabriel no git; a rodada com a exportação real é local e o PR relata só contagens e hashes).
+- `VITE_CONTA=0`: app idêntico ao de hoje. E2E com `ServicoDeContaFalso`, axe nos 2 temas. Vocabulário obrigatório.
+- Portão A: revisão independente em outra sessão, backup `.arretado` do Gabriel e rótulo `aprovado-gabriel` antes do merge. Nenhum construtor mescla nem aplica rótulo.
 
-## Pare e pergunte se
-- precisar subir o esquema Dexie (v9) ou mudar a versão do registro;
-- o caminho integral existente não preservar `aparelhoId` ou o relógio lógico;
-- a verificação por hash divergir em dado real por motivo que não seja `usuarioId`;
-- precisar sair dos arquivos permitidos, ou a mesma falha repetir duas vezes.
-
-## Portão do nível A (não é do construtor)
-Não mesclar e não aplicar rótulo. Antes do merge: revisão independente em outra sessão, backup `.arretado` do Gabriel e rótulo `aprovado-gabriel`.
-
-## Relatório final
-Resumo · arquivos · comandos e resultado · suposições · riscos · SHA · link do PR · passagem de bastão no formato do `CLAUDE.md`.
+## Regras comuns aos três
+Leia `AGENTS.md` primeiro. Máquina de 6 GB: localmente, só `npx vitest run --project unidade --maxWorkers=2 <arquivos>`, `npm run lint`, `npm run typecheck`, `npm run format:check`; check completo e E2E rodam no CI. Commits `wip:`. Não alterar: esquema Dexie de estudo (v8), versão do registro de contas, `supabase/`, `src/core/seguranca/`, `src/core/persistencia/migracao*`, `.github/`, `.githooks/`, `package.json`. Pare e pergunte se precisar sair dos arquivos permitidos, mudar a interface, ou se a mesma falha repetir duas vezes. Relatório final: resumo · arquivos · comandos e resultado · suposições · riscos · SHA.
