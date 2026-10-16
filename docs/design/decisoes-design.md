@@ -123,3 +123,41 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 **Efeitos.** A F1 (tokens, botões, campos, abas, links, linhas, diálogos) já usa esta paleta. O plano ([`../planos/redesign-v2.md`](../planos/redesign-v2.md)) muda em: F2 (barra reta, "+" simples, cabeçalho), F3 (cartões por estado, captura inline, elementos vetoriais), F6 (Leitor pela especificação) e F9 (Sessão pela especificação). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
 
 > **A conferir depois:** (1) o Agora em Caatinga ou Areia (a); (2) o dock do Leitor com o teclado aberto e em tablet; (3) grifos do leitor contra Areia e Caatinga; (4) a arte do mascote nas poses novas (Determinado) e a origem dos SVGs de cacto, lâmpada e distração; (5) o selo de Acqua com texto branco só passa no passo `#416a63`.
+
+## D-D5 — Padrão do Stitch (projeto 9953616237194891956): marinho, creme e sol, em todas as telas (16/10/2026, material do Gabriel; vale como padrão até ele vetar; substitui a D-D4 onde divergem)
+
+**Origem.** Em 16/10/2026 o Gabriel mandou o HTML da tela Hoje (celular, 390 px) do projeto Stitch `9953616237194891956` e pediu que **todas as outras telas** sigam o mesmo padrão, compatíveis e harmônicas entre si. O link do Stitch não abre do ambiente do Claude (exige login); a leitura vem do HTML colado. Valores e leitura tela a tela: [`referencias/2026-10-16-stitch-hoje/leia-me.md`](referencias/2026-10-16-stitch-hoje/leia-me.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
+
+**Adotado (vem do Stitch):**
+- **Rótulos do menu:** Hoje · **Trilha** (antes Plano) · **Fixar** (antes Recall) · Biblioteca. "Em seguida" no lugar de "Depois". Só texto de tela: rotas, identificadores (`plano`, `recall`, `Depois`) e dados gravados não mudam.
+- **Paleta:** Creme `#fff8ec` (fundo) · Marinho `#14213d` (texto, título, bloco-herói, barra de baixo) · Sol `#ffb627` (botão primário, texto Marinho) · Argila `#c8763a` (etiqueta da matéria) · Verde-foco `#2fa36b` (Frases, "+", "salvo") · Azul-céu `#3ba7f0` (Cartões). Substitui Palha, Caatinga, Terracota, Solace e Acqua; Areia e Tinta saem; a Noite do tema escuro é refeita sobre o Marinho (F1b).
+- **Fundo creme com pontinhos:** `radial-gradient(#d6c9b3 0.75px, transparent 0.75px)` a cada 16 px, só no fundo da página (atende à anotação 2 do Gabriel, de 16/10).
+- **Arranjo (celular):** cabeçalho com "Arretado" + cacto verde e o botão "Conta" (pílula com ícone); título da página com data em minúsculas e o **"+" redondo verde na mesma linha**; **um** cartão Marinho "Agora" (etiqueta da matéria, etiqueta "no seu ritmo", título serifado, trecho da lei em caixa translúcida, **um** botão Sol de largura total "Avançar um tiquinho →"); **"Em seguida"** com até 2 itens numa linha do tempo (ponto verde = Frases, azul = Cartões; título, matéria, duração "4 min"); linha de calma "✓ Seu ponto está salvo neste aparelho."; campo "Para lembrar" com "Salvar"; **barra de baixo em pílula flutuante** Marinho com as 4 áreas e o item atual em destaque.
+
+**Mantido da D-D4 (o Stitch não mostra, ou conflita com regra do produto):**
+- **Fontes:** Atkinson Hyperlegible na interface e Literata na lei. O Stitch usa Playfair Display e Plus Jakarta Sans via Google CDN: carregar de CDN quebra o local-first/offline e envia o IP da pessoa ao Google (T10, LGPD). Padrão: **Playfair Display só nos títulos e na marca "Arretado", hospedada no próprio app (woff2 em `public/`)**; a interface segue em Atkinson, desenhada para leitura difícil. Pergunta 1 abaixo.
+- **Lei sem itálico e destaque sublinhado, nunca fundo** (o Stitch mostra a lei em itálico e o destaque como fundo azul): regra de leitura do `sistema-visual.md`.
+- **Mínimo de 13 px** (0,8125 rem) para qualquer texto e alvo de 44 px. O Stitch usa 10–12 px em etiquetas, na barra e no campo.
+- Sem sequência de dias; mascote só em pontos estratégicos; Calmo; plataformas por largura; vermelho só em excluir e falha técnica.
+
+**Correções de contraste** (medidas em 16/10 com a fórmula do `scripts/contraste.mjs`):
+
+| Par do Stitch | Medido | Uso corrigido |
+|---|---|---|
+| Branco sobre Argila (etiqueta) | 3,4:1 | texto Marinho sobre Argila (4,7:1), corpo ≥ 13 px |
+| Branco sobre Azul-céu (ícone) | 2,6:1 | ícone Marinho sobre Azul-céu, ou um azul mais escuro com branco |
+| Branco sobre Verde-foco ("+", ✓) | 3,2:1 | vale como gráfico (≥ 3:1); como **texto**, usar passo escuro do Verde-foco (a medir; alvo ≥ 4,5:1 sobre Creme) |
+| Verde-foco como texto sobre Creme | 3,0:1 | idem: passo escuro |
+| Placeholder Marinho a 40% | 2,4:1 | rótulo visível "Para lembrar" e placeholder a 70% ou mais |
+| Sol sobre Creme (botão fora do cartão Marinho) | 1,6:1 | borda Marinho de 1,5 px no botão Sol sobre fundo claro |
+| Creme a 60% e 70% sobre Marinho | 6,3 · 8,1:1 | passa |
+| Marinho sobre Sol · Marinho sobre Creme | 9,1 · 15,1:1 | passa |
+
+**O que isto muda nos planos:** [`../planos/redesign-v2.md`](../planos/redesign-v2.md) ganha a **F1b** (tokens e fontes D-D5), antes da F2, e a **F12** (harmonização de todas as telas contra o padrão). A F2 passa a ter a pílula flutuante, o "+" ao lado do título e os rótulos novos; a F3 segue o cartão Agora do Stitch. **Reverte o veto (d) da D-D4** (barra reta, sem pílula), pois o Stitch traz a pílula de volta.
+
+**Perguntas ao Gabriel** (vale o padrão se não houver resposta):
+1. Fontes: Playfair Display hospedada só em títulos e marca, interface em Atkinson (padrão), ou Playfair + Plus Jakarta Sans em tudo?
+2. Abas dentro do **Fixar**: padrão **"Frases certas · Questões · Cartões · Histórico"** ("Frases" antes de "Erros", anotação 7). "Erro" continua termo de estudo do vocabulário obrigatório; "Questões" é só o nome da aba.
+3. Tablet e desktop (o Stitch só tem o celular): derivar pelas regras de plataforma da D-D3, com a pílula virando barra no alto a partir de 700 px. Dá para pedir telas no Stitch para confirmar.
+4. Botão primário nas telas claras: Sol com texto Marinho e borda Marinho (padrão), ou Marinho com texto Creme fora do cartão Agora?
+5. Tema escuro: Marinho profundo no fundo, cartão Agora em Marinho mais claro, botão Sol igual. Padrão assim, a medir.

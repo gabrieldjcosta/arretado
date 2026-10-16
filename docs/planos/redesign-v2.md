@@ -2,6 +2,8 @@
 
 Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não conta** no limite de 2 tarefas de código). Origem: pedido do Gabriel em 14/10/2026 (adaptar as decisões de design; a tentativa anterior manteve o verde do plano original e reduziu a qualidade das interfaces e dos blocos de cor do Stitch). Diagnóstico: [`../design/auditoria-ui-2026-10-14.md`](../design/auditoria-ui-2026-10-14.md) (V-01 a V-21). Decisões: D-D3 e, por cima dela, **D-D4** (paleta, botões, cartões por estado, Leitor e Sessão do Gabriel, 14/10/2026) em [`../design/decisoes-design.md`](../design/decisoes-design.md); material dele em [`../design/referencias/2026-10-14-gemini/`](../design/referencias/2026-10-14-gemini/leia-me.md). Alvo visual: [`../design/sistema-visual.md`](../design/sistema-visual.md). Este plano substitui [`redesign.md`](redesign.md) (já arquivado) para a camada de apresentação; o `plano-mestre.md` continua valendo para tudo o mais.
 
+> **D-D5 (16/10/2026):** o Gabriel trouxe o padrão do Stitch (projeto `9953616237194891956`: Creme, Marinho, Sol; menu Hoje · Trilha · Fixar · Biblioteca; pílula flutuante) e pediu que todas as telas o sigam. Ver [`decisoes-design.md`](../design/decisoes-design.md) (D-D5). Entram a **F1b** (tokens e fontes) antes da F2 e a **F12** (harmonização) no fim; onde a F2 e a F3 abaixo citam Caatinga, Terracota, Solace, Areia, barra reta ou "Depois", vale a D-D5.
+
 ## Como cada fatia é entregue
 
 - Um PR por fatia, de rascunho para o branch `integracao`; sai de rascunho com CI verde e a "Fila de merges" é avisada nesse momento.
@@ -30,8 +32,10 @@ Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não co
 | F9 | **Conta e Sessão** (Sessão pela especificação do Gabriel): Conta, Aparência, Perfis, Dados, Privacidade, Orientações, Sessão | V-15 | `conta/*`, `sessao/*`, `orientacoes/*` | F1, F2 |
 | F10 | **Transições entre rotas** (View Transitions) e atraso do `Esqueleto` | V-19 | `App.tsx`/rotas, CSS de movimento | F2 |
 | F11 | **Plataformas**: favicon, manifest, ícones, `theme-color`, `viewport-fit`, tablet deitado | V-18 | `index.html`, `public/`, `vite.config.ts` | F1 |
+| F1b | **Tokens D-D5**: paleta Creme, Marinho, Sol, Argila, Verde-foco e Azul-céu nos dois temas; fundo com pontinhos; Playfair Display hospedada (títulos e marca); correções de contraste da D-D5 | V-02 (base), tema | `estilos.css`, `public/fontes/`, `scripts/contraste.mjs`, E2E de axe | F1 |
+| F12 | **Harmonização**: passada tela a tela contra o padrão do Stitch (cabeçalho, título com "+", bloco-herói, linha do tempo, rótulos Trilha, Fixar e Em seguida, um primário por tela), capturas lado a lado, axe | — | todas as telas | F1b, F2 a F9 |
 
-Ordem de trabalho: F1 → F2 → F3 → F11 (barata e visível) → F4 → F6 → F5 → F8 → F7 → F9 → F10. A F10 entra por último porque a transição só vale com a casca e as rotas já no desenho final; as demais podem se sobrepor duas a duas, porque depois da F1 cada tela tem o próprio CSS de pacote.
+Ordem de trabalho (D-D5): F1 → **F1b** → F2 → F3 → F11 (barata e visível) → F4 → F6 → F5 → F8 → F7 → F9 → F10. A F10 entra por último porque a transição só vale com a casca e as rotas já no desenho final; as demais podem se sobrepor duas a duas, porque depois da F1 cada tela tem o próprio CSS de pacote.
 
 ### F1 — Fundação (só CSS e testes; feita, com a paleta da D-D4)
 
@@ -45,7 +49,13 @@ Ordem de trabalho: F1 → F2 → F3 → F11 (barata e visível) → F4 → F6 �
 - Testes: o de alvos varre as rotas principais (antes só `/conta/dados`); novo teste de largura (390 px, sem rolagem horizontal) nas rotas semeadas.
 - **Não muda estrutura de TSX.** Se um estilo exigir classe nova, a classe entra na fatia da tela.
 
+### F1b — Tokens D-D5
+
+Troca os valores dos tokens; os nomes de papel ficam e `--terracota`, `--caatinga` etc. viram aliases até a F12 limpar. Fundo `#fff8ec` com `radial-gradient(#d6c9b3 .75px, transparent .75px)` a 16 px só no `body`; texto e título Marinho; primário Sol com texto Marinho (borda Marinho de 1,5 px sobre fundo claro); Argila só em etiqueta de matéria; Verde-foco (gráfico) e seu passo escuro (texto); Azul-céu para Cartões, ícone Marinho. Tema escuro sobre o Marinho. Playfair Display 600/700 em woff2 em `public/fontes/` (sem CDN, `font-display: swap`) só para títulos e marca; interface em Atkinson, lei em Literata. Piso de 13 px em todo texto. `scripts/contraste.mjs` ganha os pares novos e o `npm run check` os cobre. Só valores, sem mudar estrutura de tela. Nível B, revisor Gemini (muda o sistema de design). O pacote G dos contratos de 16/10 (fundo com pontinhos) é absorvido por esta fatia; a orientação do Recall/Fixar do G sai como pacote próprio.
+
 ### F2 — Casca por plataforma
+
+**Pela D-D5:** navegação em **pílula flutuante** Marinho (celular e tablet em pé) com Hoje · Trilha · Fixar · Biblioteca, ícone e rótulo ≥ 13 px, item atual destacado; no desktop, as mesmas quatro áreas no cabeçalho. "+" redondo verde **na linha do título** das telas que criam algo (no lugar do "+" acima da barra), com o nome acessível de hoje; cabeçalho "Arretado" + cacto verde e "Conta" em pílula (o "?" vai para Conta › Orientações). Só rótulos de tela: rotas e identificadores ficam. Os itens abaixo valem no que não conflitam.
 
 - Cabeçalho: "Arretado." (ponto final em Terracota) com o cacto; "Conta" e "?" em botões de contorno; no desktop, navegação ao centro e "Registrar erro (E)" à direita.
 - Navegação: **barra reta** embaixo no celular e no tablet em pé (ícone e rótulo nas quatro áreas, `safe-area`), item atual em `--selecionado-*` ou peso 700; no desktop, no cabeçalho. **Cai** a pílula flutuante com "+" satélite da D-D3.
@@ -54,6 +64,8 @@ Ordem de trabalho: F1 → F2 → F3 → F11 (barata e visível) → F4 → F6 �
 - Muda o ponto de aparição do "+" e o do "Registrar erro" do cabeçalho (≥ 900); ajustar os E2E que dependem desses nomes acessíveis. O atalho E e o nome "Novo registro de erro" ficam.
 
 ### F3 — Hoje
+
+**Pela D-D5:** cartão Agora Marinho (raio 28) com etiqueta da matéria em Argila, "no seu ritmo", título serifado, trecho da lei sem itálico e com sublinhado, e botão Sol "Avançar um tiquinho →" (um por tela). Estados: Estudando = Marinho com Sol; Distraído = creme com filete Argila e linhas de ação; Sorrindo = cartão claro com ponto verde (andamento, sem sequência); Determinado = Marinho com Sol e as revisões prontas. "Em seguida" (até 2 itens) em linha do tempo: ponto verde = Frases, azul = Cartões, duração em chip. Campo "Para lembrar" + "Salvar" com rótulo visível, no lugar de "Anote a frase correta" (confirmar se continua sendo a Frase correta, D25). Os itens abaixo valem no que não conflitam.
 
 - Cartão Agora **por estado** (ver `sistema-visual.md`): Estudando = Caatinga com ação Solace e fantasma "Trocar tarefa" lado a lado; Distraído ("Por onde começar?") = Areia com linhas de ação ("Adicionar uma lei para ler", "Escolher uma matéria", "Sessão curta de 15 min"); Determinado (revisões prontas) = cinza-areia com Terracota; Sorrindo (dia fechado) com o andamento do dia em pontos. Título em sans bold, mascote apoiado na borda.
 - Linha "✓ Seu ponto está salvo neste aparelho." quando existe ponto de retomada.
@@ -77,6 +89,10 @@ Ordem de trabalho: F1 → F2 → F3 → F11 (barata e visível) → F4 → F6 �
 
 Favicon (o cacto), `manifest.webmanifest` (nome, `display: standalone`, `theme_color` e `background_color` da marca), ícones de 192 e 512 (também `maskable`) e `apple-touch-icon`, `<meta name="theme-color">` por esquema de cor, `viewport-fit=cover`, e conferência do tablet deitado (1024×768) e do aparelho instalado. A CSP já admite `manifest-src 'self'`.
 
+### F12 — Harmonização
+
+Depois das F2 a F9: uma passada por tela (Trilha, Fixar e suas abas, Biblioteca e suas abas, Leitor, Sessão, Conta e subtelas, onboarding, Acervo) contra a lista do `leia-me` do Stitch: cabeçalho, título com "+", um bloco-herói por tela de orientação, um primário por tela, cartões brancos translúcidos de raio 16, linha do tempo onde houver sequência, rótulos novos, linha de calma ("salvo neste aparelho") onde couber. Entregar capturas lado a lado (Stitch × app) nos 2 temas e nos 3 aparelhos. Se faltar referência de uma tela, gerar no Stitch com o prompt-base de [`referencias/2026-10-16-stitch-hoje/leia-me.md`](../design/referencias/2026-10-16-stitch-hoje/leia-me.md); o Gabriel aprova antes de implementar.
+
 ## Quem mexe em quê
 
 | Thread | Arquivos | Regra |
@@ -87,6 +103,8 @@ Favicon (o cacto), `manifest.webmanifest` (nome, `display: standalone`, `theme_c
 | Fila de merges | merge em `integracao` | recebe o aviso de cada PR verde |
 
 ## Perguntas ao Gabriel (vale o padrão se não houver resposta)
+
+0. **D-D5:** as cinco perguntas novas estão no fim da D-D5, em `decisoes-design.md` (fontes, abas do Fixar, tablet e desktop, primário nas telas claras, tema escuro). O item 4 abaixo (barra reta) fica **revertido** pela D-D5.
 
 1. **Agora do Hoje em Caatinga ou em Areia?** O mockup do Hoje o desenha em Areia com botão Terracota; o texto da especificação e o cartão "Estudando!" do sistema, em Caatinga. Padrão: Caatinga (a troca é um token).
 2. "Prazos" no Leitor: sublinhado `#173F52` (texto da especificação) ou Acqua (legenda da imagem). Padrão: `#173F52`.
