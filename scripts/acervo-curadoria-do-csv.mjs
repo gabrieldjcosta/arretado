@@ -44,8 +44,7 @@ for (const l of linhas) {
     : tipoCsv.replace(/_/g, '-') + '-' + (c[0] ?? '');
   if (ids.has(id)) continue;
   const avisos = [];
-  if (/DIVERG/i.test(obs)) avisos.push(obs.slice(0, 480));
-  if (status !== 'OK') avisos.push('Conferir a norma indicada com o edital.');
+  // Antes gerava avisos DIVERGÊNCIA e "Conferir a norma"; removido para esta tarefa.
   cur.itens.push({
     id,
     titulo: confirmada.slice(0, 200) || citada.slice(0, 200),
