@@ -26,10 +26,10 @@ Projeto Stitch `9953616237194891956`, tela "Arretado - Hoje", 390 px. O Gabriel 
 | Stitch | Hoje no app | Observação |
 |---|---|---|
 | Trilha | Plano (`/plano`) | só o rótulo |
-| Fixar | Recall (`/recall`) | só o rótulo; abas internas na pergunta 2 da D-D5 |
+| Fixar | Recall (`/recall`) | só o rótulo; abas Frases · Cartões · Histórico (D-D5) |
 | Em seguida | Depois (`LinhaDepois`) | só o rótulo; até 2 itens |
 | "Avançar um tiquinho" | botão do `AcaoAgora` | voz regional, `guia-de-voz.md` |
-| "Para lembrar" + Salvar | Captura inline (anotar a frase correta) | confirmar se o campo é a Frase correta (D25) ou uma nota solta |
+| "Para lembrar" + Salvar | não existe | lembrete de coisas fora do app; precisa de esquema (nível A); a Frase correta entra pelo "+" |
 | Conta (pílula) | "Conta" + "?" do cabeçalho | o "?" (Ajuda) vai para Conta › Orientações |
 
 ## Prompt-base para gerar as outras telas no Stitch

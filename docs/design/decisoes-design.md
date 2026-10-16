@@ -155,9 +155,11 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 
 **O que isto muda nos planos:** [`../planos/redesign-v2.md`](../planos/redesign-v2.md) ganha a **F1b** (tokens e fontes D-D5), antes da F2, e a **F12** (harmonização de todas as telas contra o padrão). A F2 passa a ter a pílula flutuante, o "+" ao lado do título e os rótulos novos; a F3 segue o cartão Agora do Stitch. **Reverte o veto (d) da D-D4** (barra reta, sem pílula), pois o Stitch traz a pílula de volta.
 
-**Perguntas ao Gabriel** (vale o padrão se não houver resposta):
-1. Fontes: Playfair Display hospedada só em títulos e marca, interface em Atkinson (padrão), ou Playfair + Plus Jakarta Sans em tudo?
-2. Abas dentro do **Fixar**: padrão **"Frases certas · Questões · Cartões · Histórico"** ("Frases" antes de "Erros", anotação 7). "Erro" continua termo de estudo do vocabulário obrigatório; "Questões" é só o nome da aba.
-3. Tablet e desktop (o Stitch só tem o celular): derivar pelas regras de plataforma da D-D3, com a pílula virando barra no alto a partir de 700 px. Dá para pedir telas no Stitch para confirmar.
-4. Botão primário nas telas claras: Sol com texto Marinho e borda Marinho (padrão), ou Marinho com texto Creme fora do cartão Agora?
-5. Tema escuro: Marinho profundo no fundo, cartão Agora em Marinho mais claro, botão Sol igual. Padrão assim, a medir.
+**Respostas do Gabriel (16/10/2026)** às cinco perguntas da D-D5:
+1. **Fontes:** Playfair Display hospedada só em títulos e marca; interface em Atkinson. Confirmado.
+2. **Abas do Fixar:** **Frases · Cartões · Histórico** (três abas; "Erros" deixa de ser aba). Consequência: a lista e o detalhe do Erro passam a ser alcançados pela aba Frases (cada Frase leva ao Erro que a originou, com resultado, situação e causa). Nenhum dado muda; a rota `/recall/erros` fica como alias até a F5 decidir o destino. "Erro" segue como termo de estudo no vocabulário e nos filtros.
+3. **Tablet e desktop:** derivados do celular; a pílula vira barra no alto a partir de 700 px. Confirmado.
+4. **Botão primário nas telas claras:** Sol com texto Marinho e borda Marinho. Confirmado.
+5. **Tema escuro:** fundo em Marinho profundo, cartão Agora em Marinho mais claro, botão Sol igual (valores a medir na F1b). Confirmado.
+6. **Campo "Para lembrar":** serve para a pessoa **anotar o que precisa fazer fora do app** (não é a Frase correta). A **Frase correta é registrada pelo "+"**, que passa a ser o único caminho de captura (D25 continua: só a frase é obrigatória). O "Anote a frase correta" do Hoje sai.
+   - **Dependência:** o modelo não tem lugar para esse lembrete (a Tarefa de estudo é do plano de estudo). Gravá-lo exige entidade ou campo novo, ou seja, **esquema: nível A**, com Opus, revisão independente e backup do Gabriel antes do merge no `main`. Até lá, a F3 entrega o Hoje **sem** o campo "Para lembrar"; ele entra num pacote próprio, depois do desenho do dado (proposta: coleção `lembretes` com texto, `criadoEm`, `feitoEm?`, sem vínculo com Ponto; fora do Recall e do cálculo de "Agora"). Não é lembrete com hora nem notificação.

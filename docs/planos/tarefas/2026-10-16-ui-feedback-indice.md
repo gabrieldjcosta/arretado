@@ -10,7 +10,7 @@ Origem: 18 anotações do Gabriel sobre o site publicado (`arretado.gabrieldjcos
 | 4 | Plano vazio mais convidativo + prompt para IA | C |
 | 5 | Árvore de disciplinas/assuntos do onboarding crua | D |
 | 6 | Onboarding: acrescentar disciplina e assunto | D |
-| 7 | "Frases" antes de "Erros"; nomes pouco intuitivos | D-D5, pergunta 2 |
+| 7 | "Frases" antes de "Erros"; nomes pouco intuitivos | D-D5: abas Frases · Cartões · Histórico |
 | 8 | "Recall" → "Revisão" ou "Reforço" | D-D5: "Fixar" (F2) |
 | 9 | Orientação curta ao lado do título do Recall | G2 |
 | 10 | "Tudo do edital da DPE-SP" deve seguir o plano escolhido | E |
@@ -43,7 +43,7 @@ Quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutid
 O Gabriel trouxe o Hoje do projeto Stitch `9953616237194891956` e pediu o mesmo padrão em todas as telas (`docs/design/decisoes-design.md`, D-D5; plano em `docs/planos/redesign-v2.md`, fatias **F1b** e **F12**). Efeito:
 - **A a F** usam só tokens, rótulos e componentes existentes: não precisam mudar. Quando a F1b trocar os valores dos tokens, as telas deles acompanham. Os construtores não devem fixar cor nem fonte.
 - **G** foi dividido: o fundo com pontinhos (anotação 2) passa para a **F1b** (valores já definidos na D-D5: `#fff8ec` com pontos `#d6c9b3`); a orientação do Recall (anotação 9) fica como pacote próprio, **G2**, abaixo.
-- **Nomes do menu (anotações 7 e 8):** o Stitch já resolve o módulo: **Fixar** (antes Recall), junto de **Trilha** (antes Plano) e **Em seguida** (antes Depois). Falta só o nome das abas de dentro do Fixar, na pergunta 2 da D-D5 (proposta: "Frases certas · Questões · Cartões · Histórico"). A troca de rótulos entra na **F2** (casca), com o mapa único de rótulos do glossário; a mudança do `CLAUDE.md` (caminho protegido) pede o rótulo `aprovado-gabriel`.
+- **Nomes do menu (anotações 7 e 8):** o Stitch já resolve o módulo: **Fixar** (antes Recall), junto de **Trilha** (antes Plano) e **Em seguida** (antes Depois). As abas do Fixar ficaram **Frases · Cartões · Histórico** (resposta do Gabriel, D-D5). A troca de rótulos entra na **F2** (casca), com o mapa único de rótulos do glossário; a mudança do `CLAUDE.md` (caminho protegido) pede o rótulo `aprovado-gabriel`.
 
 ## G2 — Orientação no Fixar (anotação 9)
 Nível C, Antigravity, revisor Claude. Depois da F2. Em `src/apresentacao/recall/RecallInicio.tsx`, ao lado do título (abaixo, em tela estreita), em tom de dica, texto de 13 px ou mais: "Errou ou chutou uma questão? Registre a frase ou a alternativa certa. Assim você acerta da próxima vez." Teste do texto e do rótulo do módulo; E2E do Fixar com axe. Contrato completo escrito quando a F2 estiver mesclada (usa o nome final do módulo).

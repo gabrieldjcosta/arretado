@@ -65,7 +65,7 @@ Troca os valores dos tokens; os nomes de papel ficam e `--terracota`, `--caating
 
 ### F3 — Hoje
 
-**Pela D-D5:** cartão Agora Marinho (raio 28) com etiqueta da matéria em Argila, "no seu ritmo", título serifado, trecho da lei sem itálico e com sublinhado, e botão Sol "Avançar um tiquinho →" (um por tela). Estados: Estudando = Marinho com Sol; Distraído = creme com filete Argila e linhas de ação; Sorrindo = cartão claro com ponto verde (andamento, sem sequência); Determinado = Marinho com Sol e as revisões prontas. "Em seguida" (até 2 itens) em linha do tempo: ponto verde = Frases, azul = Cartões, duração em chip. Campo "Para lembrar" + "Salvar" com rótulo visível, no lugar de "Anote a frase correta" (confirmar se continua sendo a Frase correta, D25). Os itens abaixo valem no que não conflitam.
+**Pela D-D5:** cartão Agora Marinho (raio 28) com etiqueta da matéria em Argila, "no seu ritmo", título serifado, trecho da lei sem itálico e com sublinhado, e botão Sol "Avançar um tiquinho →" (um por tela). Estados: Estudando = Marinho com Sol; Distraído = creme com filete Argila e linhas de ação; Sorrindo = cartão claro com ponto verde (andamento, sem sequência); Determinado = Marinho com Sol e as revisões prontas. "Em seguida" (até 2 itens) em linha do tempo: ponto verde = Frases, azul = Cartões, duração em chip. O "Anote a frase correta" sai: a Frase correta entra só pelo "+" (D25). O campo "Para lembrar" (coisas a fazer fora do app, com rótulo visível) só entra depois do pacote de dado "lembretes" (esquema, nível A; ver D-D5, resposta 6); até lá o Hoje fica sem ele. Os itens abaixo valem no que não conflitam.
 
 - Cartão Agora **por estado** (ver `sistema-visual.md`): Estudando = Caatinga com ação Solace e fantasma "Trocar tarefa" lado a lado; Distraído ("Por onde começar?") = Areia com linhas de ação ("Adicionar uma lei para ler", "Escolher uma matéria", "Sessão curta de 15 min"); Determinado (revisões prontas) = cinza-areia com Terracota; Sorrindo (dia fechado) com o andamento do dia em pontos. Título em sans bold, mascote apoiado na borda.
 - Linha "✓ Seu ponto está salvo neste aparelho." quando existe ponto de retomada.
@@ -104,7 +104,7 @@ Depois das F2 a F9: uma passada por tela (Trilha, Fixar e suas abas, Biblioteca 
 
 ## Perguntas ao Gabriel (vale o padrão se não houver resposta)
 
-0. **D-D5:** as cinco perguntas novas estão no fim da D-D5, em `decisoes-design.md` (fontes, abas do Fixar, tablet e desktop, primário nas telas claras, tema escuro). O item 4 abaixo (barra reta) fica **revertido** pela D-D5.
+0. **D-D5:** as cinco perguntas foram respondidas em 16/10/2026 (ver o fim da D-D5 em `decisoes-design.md`). O item 4 abaixo (barra reta) fica revertido pela D-D5.
 
 1. **Agora do Hoje em Caatinga ou em Areia?** O mockup do Hoje o desenha em Areia com botão Terracota; o texto da especificação e o cartão "Estudando!" do sistema, em Caatinga. Padrão: Caatinga (a troca é um token).
 2. "Prazos" no Leitor: sublinhado `#173F52` (texto da especificação) ou Acqua (legenda da imagem). Padrão: `#173F52`.
