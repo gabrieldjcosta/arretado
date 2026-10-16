@@ -34,7 +34,7 @@ const ids = new Set(cur.itens.map((i) => i.id));
 let novos = 0;
 for (const l of linhas) {
   const c = l.split(/";"/).map((x) => x.replace(/^"|"$/g, ''));
-  const [, tipoCsv, citada, confirmada, link, , , status, , , obs] = c;
+  const [, tipoCsv, citada, confirmada, link] = c;
   const tipo = TIPOS[tipoCsv];
   const adaptador = HOSTS[link ? new URL(link).host : ''];
   if (!tipo || !adaptador || /decreto-10088/.test(link)) continue;
@@ -44,7 +44,7 @@ for (const l of linhas) {
     : tipoCsv.replace(/_/g, '-') + '-' + (c[0] ?? '');
   if (ids.has(id)) continue;
   const avisos = [];
-  // Antes gerava avisos DIVERGÊNCIA e "Conferir a norma"; removido para esta tarefa.
+  // Avisos sobre o rótulo do edital (DIVERGÊNCIA, "Conferir a norma…") não entram: o acervo serve a qualquer concurso.
   cur.itens.push({
     id,
     titulo: confirmada.slice(0, 200) || citada.slice(0, 200),
