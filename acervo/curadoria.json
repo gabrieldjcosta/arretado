@@ -16,9 +16,7 @@
           "disciplina": "Direito Processual Penal"
         }
       ],
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ],
+      "anomaliasAceitas": ["alinea_sem_inciso"],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l7210compilado.htm"
@@ -90,11 +88,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc80.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["linha_solta", "artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-complementar-federal-80-1994",
@@ -157,10 +151,7 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/1979/lei.complementar-207-05.01.1979.html"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea"]
     },
     {
       "id": "lei-complementar-estadual-893-2001",
@@ -181,9 +172,7 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2001/lei.complementar-893-09.03.2001.html"
       },
-      "anomaliasAceitas": [
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["item_sem_alinea"]
     },
     {
       "id": "decreto-lei-4657-1942",
@@ -201,9 +190,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del4657compilado.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "decreto-lei-3688-1941",
@@ -221,10 +208,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3688.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
     },
     {
       "id": "lei-federal-12850-2013",
@@ -245,10 +229,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12850.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-9503-1997",
@@ -266,10 +247,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "paragrafo_unico_com_numerado"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"]
     },
     {
       "id": "lei-federal-9605-1998",
@@ -290,9 +268,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9605.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-10826-2003",
@@ -310,10 +286,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.826.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "tachado_sem_dispositivo"
-      ]
+      "anomaliasAceitas": ["linha_solta", "tachado_sem_dispositivo"]
     },
     {
       "id": "lei-federal-8072-1990",
@@ -331,10 +304,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8072.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-11343-2006",
@@ -352,10 +322,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11343.htm"
       },
-      "anomaliasAceitas": [
-        "estrutural_substituido",
-        "paragrafo_1_sem_2"
-      ]
+      "anomaliasAceitas": ["estrutural_substituido", "paragrafo_1_sem_2"]
     },
     {
       "id": "lei-federal-8078-1990",
@@ -379,9 +346,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "lei-federal-1521-1951",
@@ -399,9 +364,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l1521.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "lei-federal-8137-1990",
@@ -439,9 +402,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9249.htm"
       },
-      "anomaliasAceitas": [
-        "paragrafo_1_sem_2"
-      ]
+      "anomaliasAceitas": ["paragrafo_1_sem_2"]
     },
     {
       "id": "lei-federal-9430-1996",
@@ -459,9 +420,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9430.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-10684-2003",
@@ -482,9 +441,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.684.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-9613-1998",
@@ -542,10 +499,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6001.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "duplicata"]
     },
     {
       "id": "lei-federal-13869-2019",
@@ -563,11 +517,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-10741-2003",
@@ -588,11 +538,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.741.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "tachado_sem_dispositivo",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["linha_solta", "tachado_sem_dispositivo", "duplicata"]
     },
     {
       "id": "lei-federal-6766-1979",
@@ -613,10 +559,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6766.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "duplicata"]
     },
     {
       "id": "lei-federal-10932-2004",
@@ -654,11 +597,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm"
       },
-      "anomaliasAceitas": [
-        "caractere_perdido",
-        "tachado_sem_dispositivo",
-        "linha_solta"
-      ]
+      "anomaliasAceitas": ["caractere_perdido", "tachado_sem_dispositivo", "linha_solta"]
     },
     {
       "id": "lei-federal-8069-1990",
@@ -762,10 +701,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-10257-2001",
@@ -786,9 +722,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/leis_2001/l10257.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-6015-1973",
@@ -806,11 +740,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "alinea_sem_inciso",
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso", "item_sem_alinea"]
     },
     {
       "id": "lei-federal-8245-1991",
@@ -828,10 +758,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8245.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
     },
     {
       "id": "lei-federal-8009-1990",
@@ -869,10 +796,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l5478.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-11804-2008",
@@ -910,11 +834,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13465.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "paragrafo_unico_com_numerado",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["linha_solta", "paragrafo_unico_com_numerado", "duplicata"]
     },
     {
       "id": "lei-federal-13709-2018",
@@ -962,9 +882,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm"
       },
-      "anomaliasAceitas": [
-        "tachado_sem_dispositivo"
-      ]
+      "anomaliasAceitas": ["tachado_sem_dispositivo"]
     },
     {
       "id": "lei-federal-13105-2015",
@@ -1022,9 +940,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12288.htm"
       },
-      "anomaliasAceitas": [
-        "linha_solta"
-      ]
+      "anomaliasAceitas": ["linha_solta"]
     },
     {
       "id": "lei-federal-9008-1995",
@@ -1062,9 +978,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-8080-1990",
@@ -1082,10 +996,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8080.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-9656-1998",
@@ -1129,9 +1040,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9394.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-11445-2007",
@@ -1190,9 +1099,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12587.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-15432-2026",
@@ -1544,9 +1451,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14119.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_so_tachado"
-      ]
+      "anomaliasAceitas": ["artigo_so_tachado"]
     },
     {
       "id": "lei-federal-12608-2012",
@@ -1581,11 +1486,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14750.htm"
       },
-      "anomaliasAceitas": [
-        "artigo_so_tachado",
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["artigo_so_tachado", "artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "lei-federal-12334-2010",
@@ -1691,9 +1592,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9433.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-12305-2010",
@@ -1711,9 +1610,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12305.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "lei-federal-14181-2021",
@@ -1950,9 +1847,7 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/1998/lei-10177-30.12.1998.html"
       },
-      "anomaliasAceitas": [
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["item_sem_alinea"]
     },
     {
       "id": "lei-estadual-14187-2010",
@@ -1970,9 +1865,7 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2010/lei-14187-19.07.2010.html"
       },
-      "anomaliasAceitas": [
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["item_sem_alinea"]
     },
     {
       "id": "lei-estadual-10948-2001",
@@ -2027,9 +1920,7 @@
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2000/lei-10705-28.12.2000.html"
       },
-      "anomaliasAceitas": [
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["item_sem_alinea"]
     },
     {
       "id": "lei-estadual-10365-1999",
@@ -2124,11 +2015,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/decreto/d5051.htm"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "item_sem_alinea",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea", "duplicata"]
     },
     {
       "id": "decreto-federal-10088-2019",
@@ -2146,9 +2033,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/decreto/d10088.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "decreto-federal-4377-2002",
@@ -2194,9 +2079,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/decreto/d9073.htm"
       },
-      "anomaliasAceitas": [
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["item_sem_alinea"]
     },
     {
       "id": "decreto-federal-12710-2025",
@@ -2472,9 +2355,7 @@
         "arquivo": "resolucao-cnj-414-2021.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4105"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "resolucao-cnj-425-2021",
@@ -2543,12 +2424,7 @@
         "arquivo": "resolucao-cnj-213-2015.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2234"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "duplicata",
-        "alinea_sem_inciso",
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["linha_solta", "duplicata", "alinea_sem_inciso", "item_sem_alinea"]
     },
     {
       "id": "resolucao-cnj-412-2021",
@@ -2680,11 +2556,7 @@
         "arquivo": "resolucao-cnj-35-2007.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/179"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente",
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["duplicata", "artigo_ausente", "alinea_sem_inciso"]
     },
     {
       "id": "resolucao-cnj-345-2020",
@@ -2773,9 +2645,7 @@
           "disciplina": "Direitos Humanos"
         }
       ],
-      "avisos": [
-        "Só a resolução, sem o Protocolo anexo."
-      ],
+      "avisos": ["Só a resolução, sem o Protocolo anexo."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "resolucao-cnj-598-2024.md",
@@ -2794,9 +2664,7 @@
           "disciplina": "Direitos Humanos"
         }
       ],
-      "avisos": [
-        "Só a resolução, sem o Protocolo anexo."
-      ],
+      "avisos": ["Só a resolução, sem o Protocolo anexo."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "recomendacao-cnj-128-2022.md",
@@ -2848,10 +2716,7 @@
         "arquivo": "provimento-cnj-16-2012.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1299"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente"
-      ]
+      "anomaliasAceitas": ["duplicata", "artigo_ausente"]
     },
     {
       "id": "provimento-cnj-65-2017",
@@ -2897,10 +2762,7 @@
         "arquivo": "provimento-cnj-73-2018.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/2623"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "paragrafo_unico_com_numerado"
-      ]
+      "anomaliasAceitas": ["duplicata", "paragrafo_unico_com_numerado"]
     },
     {
       "id": "provimento-cnj-82-2019",
@@ -2965,11 +2827,7 @@
         "arquivo": "provimento-cnj-122-2021.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/4066"
       },
-      "anomaliasAceitas": [
-        "paragrafo_1_sem_2",
-        "duplicata",
-        "paragrafo_unico_com_numerado"
-      ]
+      "anomaliasAceitas": ["paragrafo_1_sem_2", "duplicata", "paragrafo_unico_com_numerado"]
     },
     {
       "id": "provimento-cnj-152-2023",
@@ -2988,11 +2846,7 @@
         "arquivo": "provimento-cnj-152-2023.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/5283"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente",
-        "artigo_fora_de_ordem"
-      ]
+      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
     },
     {
       "id": "resolucao-cnj-175-2013",
@@ -3083,9 +2937,7 @@
         "arquivo": "provimento-cnj-28-2013.md",
         "urlOficial": "https://atos.cnj.jus.br/atos/detalhar/1730"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "provimento-cnj-44-2015",
@@ -3101,9 +2953,7 @@
           "disciplina": "Direito Civil"
         }
       ],
-      "avisos": [
-        "Transcrito à mão do PDF escaneado do ato (sem camada de texto)."
-      ],
+      "avisos": ["Transcrito à mão do PDF escaneado do ato (sem camada de texto)."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "provimento-cnj-44-2015.md",
@@ -3131,9 +2981,7 @@
         "arquivo": "resolucao-conama-511-2025.md",
         "urlOficial": "https://conama.mma.gov.br/?amp=&amp=&id=846&option=com_sisconama&task=arquivo.download"
       },
-      "anomaliasAceitas": [
-        "linha_solta"
-      ]
+      "anomaliasAceitas": ["linha_solta"]
     },
     {
       "id": "resolucao-conanda-119-2006",
@@ -3170,9 +3018,7 @@
           "disciplina": "Direitos Humanos"
         }
       ],
-      "avisos": [
-        "Alterada pela Resolução CONANDA 117/2006; ler em conjunto."
-      ],
+      "avisos": ["Alterada pela Resolução CONANDA 117/2006; ler em conjunto."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "resolucao-conanda-113-2006.md",
@@ -3247,9 +3093,7 @@
           "disciplina": "Direito da Criança e do Adolescente"
         }
       ],
-      "avisos": [
-        "Documento técnico (PNAS/2004 e NOB/SUAS): lido por seções, sem artigos."
-      ],
+      "avisos": ["Documento técnico (PNAS/2004 e NOB/SUAS): lido por seções, sem artigos."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "resolucao-cnas-145-2004.md",
@@ -3297,9 +3141,7 @@
           "disciplina": "Direitos Difusos e Coletivos"
         }
       ],
-      "avisos": [
-        "Documento técnico (Orientações Técnicas): lido por seções, sem artigos."
-      ],
+      "avisos": ["Documento técnico (Orientações Técnicas): lido por seções, sem artigos."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "resolucao-conjunta-cnas-conanda-1-2009.md",
@@ -3368,11 +3210,7 @@
         "arquivo": "deliberacao-csdp-89-2008.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/6391469"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "estrutural_repetido",
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["linha_solta", "estrutural_repetido", "alinea_sem_inciso"]
     },
     {
       "id": "deliberacao-csdp-120-2009",
@@ -3385,19 +3223,13 @@
           "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
         }
       ],
-      "avisos": [
-        "Revogada pela Deliberação CSDP 406/2022; o texto aparece tachado."
-      ],
+      "avisos": ["Revogada pela Deliberação CSDP 406/2022; o texto aparece tachado."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "deliberacao-csdp-120-2009.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/644277"
       },
-      "anomaliasAceitas": [
-        "tachado_sem_dispositivo",
-        "linha_solta",
-        "artigo_so_tachado"
-      ]
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta", "artigo_so_tachado"]
     },
     {
       "id": "deliberacao-csdp-134-2009",
@@ -3429,19 +3261,13 @@
           "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
         }
       ],
-      "avisos": [
-        "A fonte repete o art. 5º (duas redações); vale a última."
-      ],
+      "avisos": ["A fonte repete o art. 5º (duas redações); vale a última."],
       "fonte": {
         "adaptador": "markdown",
         "arquivo": "deliberacao-csdp-187-2010.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/643540"
       },
-      "anomaliasAceitas": [
-        "linha_continuada",
-        "duplicata",
-        "paragrafo_1_sem_2"
-      ]
+      "anomaliasAceitas": ["linha_continuada", "duplicata", "paragrafo_1_sem_2"]
     },
     {
       "id": "deliberacao-csdp-219-2011",
@@ -3504,9 +3330,7 @@
         "arquivo": "deliberacao-csdp-270-2013.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642620"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "deliberacao-csdp-291-2014",
@@ -3553,10 +3377,7 @@
         "arquivo": "deliberacao-csdp-296-2014.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642345"
       },
-      "anomaliasAceitas": [
-        "linha_solta",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["linha_solta", "duplicata"]
     },
     {
       "id": "deliberacao-csdp-297-2014",
@@ -3578,10 +3399,7 @@
         "arquivo": "deliberacao-csdp-297-2014.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/642323"
       },
-      "anomaliasAceitas": [
-        "linha_continuada",
-        "alinea_sem_inciso"
-      ]
+      "anomaliasAceitas": ["linha_continuada", "alinea_sem_inciso"]
     },
     {
       "id": "deliberacao-csdp-373-2020",
@@ -3644,9 +3462,7 @@
         "arquivo": "ato-normativo-dpg-216-2022.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/4221663"
       },
-      "anomaliasAceitas": [
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["duplicata"]
     },
     {
       "id": "ato-normativo-dpg-295-2025",
@@ -3686,11 +3502,7 @@
         "arquivo": "ato-normativo-dpg-183-2020.md",
         "urlOficial": "https://www.defensoria.sp.def.br/transparencia/portal-da-transparencia/legislacoes/-/legislacao/646635"
       },
-      "anomaliasAceitas": [
-        "tachado_sem_dispositivo",
-        "linha_solta",
-        "artigo_so_tachado"
-      ]
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta", "artigo_so_tachado"]
     },
     {
       "id": "ato-normativo-dpg-146-2018",
@@ -3761,10 +3573,7 @@
         "arquivo": "convencao-oit-182.md",
         "urlOficial": "https://www2.camara.leg.br/legin/fed/decret/2019/decreto-10088-5-novembro-2019-789348-normaatualizada-pe.html"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "item_sem_alinea"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea"]
     },
     {
       "id": "convencao-oit-138",
@@ -3789,11 +3598,7 @@
         "arquivo": "convencao-oit-138.md",
         "urlOficial": "https://www2.camara.leg.br/legin/fed/decret/2019/decreto-10088-5-novembro-2019-789348-normaatualizada-pe.html"
       },
-      "anomaliasAceitas": [
-        "alinea_sem_inciso",
-        "item_sem_alinea",
-        "duplicata"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea", "duplicata"]
     },
     {
       "id": "recomendacao-oit-190",
@@ -3868,19 +3673,6 @@
         "urlOficial": "https://www.gov.br/participamaisbrasil/resolucao-n-273-de-3-de-outubro-de-2025"
       },
       "anomaliasAceitas": []
-    },
-    {
-      "id": "lei-federal-13512-2026",
-      "titulo": "Lei 15.512/2026 - ECA Ambiental (direito de crianças e adolescentes à natureza)",
-      "grupo": "Leis federais",
-      "tipo": "Lei",
-      "esfera": "federal",
-      "vinculos": [],
-      "avisos": [],
-      "fonte": {
-        "adaptador": "html",
-        "url": "https://www2.camara.leg.br/legin/fed/lei/2026/lei-15512-22-setembro-2026-800007-norma-pl.html"
-      }
     }
   ]
 }
