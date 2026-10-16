@@ -60,7 +60,23 @@ async function esperarPronto(term) {
 }
 
 // Confere que o agente começou a trabalhar; se o texto ficou no campo, manda o Enter (uma vez).
-async function garantirEnvio(term) {
+async function garantirEnvio(term, despacho) {
+  if (!term.startsWith('term_')) {
+    // Sessão estruturada (Claude, Codex): não há tela; o sinal é uma fala do agente na transcrição.
+    for (let i = 0; i < 12; i++) {
+      await esperar(5000);
+      const t = orca(
+        'orchestration',
+        'worker-read',
+        '--dispatch',
+        despacho,
+        '--source',
+        'transcript',
+      ).saida;
+      if (/\[assistant\]/.test(t)) return `trabalhando (sessão estruturada ${term})`;
+    }
+    return `SEM SINAL em 60 s; orca orchestration worker-read --dispatch ${despacho}`;
+  }
   let enterMandado = false;
   for (let i = 0; i < 12; i++) {
     await esperar(5000);
@@ -112,9 +128,9 @@ async function viaWorkerStart() {
   const despacho = despachoDe(r.saida);
   const term = terminalDoAgente(r.json, r.saida);
   if (r.ok && !term) return `pronto (sessão estruturada) ${tarefa} ${despacho}`;
-  if (r.ok) return `${tarefa} ${despacho}: ${await garantirEnvio(term)}`;
+  if (r.ok) return `${tarefa} ${despacho}: ${await garantirEnvio(term, despacho)}`;
   if (/turn_start_unobserved|outcome_unknown|turn_unobserved/.test(r.saida) && term) {
-    return `${tarefa} ${despacho}: ${await garantirEnvio(term)}`;
+    return `${tarefa} ${despacho}: ${await garantirEnvio(term, despacho)}`;
   }
   if (/terminal_handle_stale/.test(r.saida) && term) {
     // O cliente abriu depois do prazo: espera ficar pronto e reaproveita o terminal.
@@ -134,7 +150,7 @@ async function viaWorkerStart() {
       run,
       '--json',
     );
-    return `${tarefa} ${despachoDe(r.saida)} (2ª tentativa): ${await garantirEnvio(term)}`;
+    return `${tarefa} ${despachoDe(r.saida)} (2ª tentativa): ${await garantirEnvio(term, despachoDe(r.saida))}`;
   }
   return `FALHOU: ${r.saida.slice(0, 800)}`;
 }
@@ -194,7 +210,7 @@ async function viaTerminal() {
     run,
     '--json',
   );
-  return `${tarefa} ${despachoDe(d.saida)} (sem supervisão): ${await garantirEnvio(term)}`;
+  return `${tarefa} ${despachoDe(d.saida)} (sem supervisão): ${await garantirEnvio(term, despachoDe(d.saida))}`;
 }
 
 const registrados = new Set([
