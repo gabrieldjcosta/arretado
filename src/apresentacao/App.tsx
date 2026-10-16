@@ -12,6 +12,7 @@ import { Perfis } from './conta/Perfis';
 import { Conta } from './conta/Conta';
 import { ProvedorConta } from './conta/entrar/ContextoConta';
 import { Entrar } from './conta/entrar/Entrar';
+import { Migracao } from './conta/migracao/Migracao';
 import { Privacidade } from './conta/Privacidade';
 import { ProvedorRepositorio } from './dados/ProvedorRepositorio';
 import { Shell } from './Shell';
@@ -129,6 +130,10 @@ export function App({
                   <Route
                     path="conta/entrar"
                     element={contasHabilitadas() ? <Entrar /> : <NaoEncontrada />}
+                  />
+                  <Route
+                    path="conta/migracao"
+                    element={contasHabilitadas() ? <Migracao /> : <NaoEncontrada />}
                   />
                   <Route path="orientacoes" element={<Orientacoes />} />
                   <Route path="orientacoes/:secao" element={<Orientacoes />} />
