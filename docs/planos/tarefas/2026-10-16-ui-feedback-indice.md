@@ -33,7 +33,6 @@ Origem: 18 anotações do Gabriel sobre o site publicado (`arretado.gabrieldjcos
 | E | [`2026-10-16-ui-e-biblioteca.md`](2026-10-16-ui-e-biblioteca.md) | B | Sonnet ou Antigravity | Gemini | `biblioteca/Normas.tsx` |
 | F | [`2026-10-16-ui-f-conta.md`](2026-10-16-ui-f-conta.md) | B | Antigravity | Gemini | `conta/Conta.tsx`, `conta/dados/*` |
 | G | `2026-10-16-ui-g-fundo-e-recall.md` | — | **Substituído**: fundo na F1b, orientação no G2 | — | — |
-
 | F1b | [`2026-10-16-ui-f1b-tokens-d-d5.md`](2026-10-16-ui-f1b-tokens-d-d5.md) | B | Antigravity ou Sonnet | Gemini + Claude | `estilos.css`, `scripts/contraste.mjs`, fontes |
 Ordem sugerida (no máximo 3 workers por Run, um por conta): **1ª rodada** A (antigravity-1), B (deepseek-harness), D (Sonnet). **2ª rodada** C, E, F. A e B tocam o acervo em arquivos diferentes e não conflitam; A e E tocam a Biblioteca em arquivos diferentes (`Acervo.tsx` × `Normas.tsx`); o G original foi absorvido pela F1b (ver abaixo).
 
