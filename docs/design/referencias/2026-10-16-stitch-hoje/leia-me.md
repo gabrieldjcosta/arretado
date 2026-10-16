@@ -29,7 +29,7 @@ Projeto Stitch `9953616237194891956`, tela "Arretado - Hoje", 390 px. O Gabriel 
 | Fixar | Recall (`/recall`) | só o rótulo; abas Frases · Cartões · Histórico (D-D5) |
 | Em seguida | Depois (`LinhaDepois`) | só o rótulo; até 2 itens |
 | "Avançar um tiquinho" | botão do `AcaoAgora` | voz regional, `guia-de-voz.md` |
-| "Para lembrar" + Salvar | não existe | lembrete de coisas fora do app; precisa de esquema (nível A); a Frase correta entra pelo "+" |
+| "Para lembrar" + Salvar | novo | texto livre opcional em `Preferencias.lembrete` (sem migração); lembrete de coisas fora do app; a Frase correta entra pelo "+" |
 | Conta (pílula) | "Conta" + "?" do cabeçalho | o "?" (Ajuda) vai para Conta › Orientações |
 
 ## Prompt-base para gerar as outras telas no Stitch
