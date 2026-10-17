@@ -1292,6 +1292,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa provável:** carga da máquina (LEP inteira + recarga); sem defeito de posição reproduzido.
 - **Solução:** rodar o arquivo sozinho (`npx playwright test e2e/leitor.spec.ts:479`); se falhar sozinho, investigar a posição de leitura.
 
+### E2E "prévia de remissões" (11.9) falha às vezes em `origem toBeVisible`, só no CI (17/10/2026)
+- **Sintoma:** `leitor.spec.ts` "prévia de remissões…" falha no celular ou no tablet em `await expect(origem).toBeVisible()` (`art5.incXLVII.alA`, 5 s, "element(s) not found") logo depois de `fill` + Enter na busca. A tela fica no começo da norma. Parecia efeito do PR 160 (volta à posição), mas não era: sem o PR 160 falha igual.
+- **Causa:** `BuscaNaNorma` calcula o endereço e os achados com `useDeferredValue(consulta)` e o Enter usava esses valores adiados. Num aparelho lento o Enter chega antes de a lista alcançar o que foi digitado e a busca não faz nada (`irParaLinha` nem é chamada). Defeito real, não só do teste.
+- **Solução:** o Enter usa a consulta digitada (`BuscaNaNorma.tsx`); o teste espera o botão "Ir para" antes do Enter. Para reproduzir uma falha parecida, limite a CPU do navegador por CDP (`Emulation.setCPUThrottlingRate`, 6) depois do import e rode o teste 5 vezes com `--workers=1 --retries=0`.
+
 ### Esquema v7 (F3): app v6 aberto numa aba depois de a v7 subir, ou pacote v7 num app v6
 - **Sintoma:** a aba antiga pede para recarregar (`versionchange`); um pacote exportado na v7 é recusado por app v6 com "atualize o app".
 - **Causa:** v7 criou `tarefasDeEstudo` e a coleção entra no pacote (módulo `plano`); é o comportamento desejado (R10), como na v4 a v6.

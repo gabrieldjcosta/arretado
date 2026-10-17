@@ -2,6 +2,7 @@
 // Sem dependência. Uso: `node scripts/contraste.mjs [--tudo]` (sai com 1 se algum par reprovar).
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const CSS = path.join(import.meta.dirname, '..', 'src', 'apresentacao', 'estilos.css');
 
@@ -96,6 +97,9 @@ export function pares() {
     ['acqua-texto', 'fundo', 4.5],
     ['acqua-texto', 'superficie', 4.5],
     ['acqua-texto', 'superficie-2', 4.5],
+    ['verde-foco-texto', 'fundo', 4.5],
+    ['verde-foco-texto', 'superficie', 4.5],
+    ['verde-foco-texto', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.
     ['acqua', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
@@ -179,6 +183,11 @@ export function medir(tema) {
   // Selo e interruptor em Acqua: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
   // texto do tema não serve, então o par é o do selo: branco sobre acqua-fundo).
   juntar('branco', 'acqua-fundo', 4.5, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('acqua-fundo')));
+
+  // D-D5: correções de contraste fixas da tabela D-D5
+  juntar('marinho', 'argila', 4.5, razao(cor('marinho'), cor('argila')));
+  juntar('marinho', 'azul-ceu', 3, razao(cor('marinho'), cor('azul-ceu')));
+  juntar('branco', 'verde-foco', 3, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('verde-foco')));
   return linhas;
 }
 
@@ -195,7 +204,7 @@ export function reprovados() {
   return { resultado, escuroSistema, escuroManual };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { resultado } = reprovados();
   const tudo = process.argv.includes('--tudo');
   let falhas = 0;
