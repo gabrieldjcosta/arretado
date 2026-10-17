@@ -1,14 +1,11 @@
 // Telas do onboarding do plano (pacote B2): cada passo é uma pergunta, sem estado próprio além do que
 // a tela mostra; o estado e a gravação do rascunho ficam em `Onboarding.tsx`.
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import {
-  chaveDeNome,
-  disciplinasDoEdital,
   rotuloDoEdital,
   type EditalDoCatalogo,
   type EntradaDaCarreira,
 } from '../../../dominios/catalogo';
-import { chaveDoItem } from '../../../integracoes/catalogo/linhas';
 import { BarraFina } from '../../componentes/BarraFina';
 import './estilos-onboarding.css';
 
@@ -124,87 +121,5 @@ export function PassoEdital({
         </label>
       ))}
     </fieldset>
-  );
-}
-
-export function PassoDisciplinas({
-  edital,
-  desmarcadas,
-  dispensados,
-  aoAlternarDisciplina,
-  aoAlternarAssunto,
-}: {
-  edital: EditalDoCatalogo;
-  desmarcadas: ReadonlySet<string>;
-  dispensados: ReadonlySet<string>;
-  aoAlternarDisciplina: (chave: string) => void;
-  aoAlternarAssunto: (chave: string) => void;
-}) {
-  // Assuntos recolhidos: a lista de uma disciplina só é montada quando ela é aberta.
-  const [abertas, setAbertas] = useState<ReadonlySet<string>>(new Set());
-  return (
-    <>
-      <p className="dica">
-        {rotuloDoEdital(edital)}. Tudo já vem marcado; desmarque o que não cai.
-      </p>
-      <ul className="onboarding-disciplinas">
-        {disciplinasDoEdital(edital).map(({ disciplina, nome }) => {
-          const chave = chaveDeNome(nome);
-          const marcada = !desmarcadas.has(chave);
-          return (
-            <li key={chave}>
-              <label className="onboarding-opcao">
-                <input
-                  type="checkbox"
-                  checked={marcada}
-                  onChange={() => {
-                    aoAlternarDisciplina(chave);
-                  }}
-                />
-                <span>{nome}</span>
-              </label>
-              <details
-                onToggle={(e) => {
-                  const aberto = e.currentTarget.open;
-                  setAbertas((atual) => {
-                    const novo = new Set(atual);
-                    if (aberto) novo.add(chave);
-                    else novo.delete(chave);
-                    return novo;
-                  });
-                }}
-              >
-                <summary>Assuntos ({disciplina.itens.length})</summary>
-                {abertas.has(chave) && (
-                  <ul className="onboarding-assuntos">
-                    {disciplina.itens.map((item, i) => {
-                      const id = chaveDoItem(nome, i);
-                      return (
-                        <li key={id}>
-                          <label className="onboarding-opcao">
-                            <input
-                              type="checkbox"
-                              checked={marcada && !dispensados.has(id)}
-                              disabled={!marcada}
-                              onChange={() => {
-                                aoAlternarAssunto(id);
-                              }}
-                            />
-                            <span>
-                              {item.numero ? `${item.numero}. ` : ''}
-                              {item.assunto}
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </details>
-            </li>
-          );
-        })}
-      </ul>
-    </>
   );
 }

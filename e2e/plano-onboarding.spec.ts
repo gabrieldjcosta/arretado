@@ -3,6 +3,7 @@ import { expect, semViolacoes, test } from './apoio';
 test('Onboarding do plano: carreira, edital, matérias e "Comece por aqui" (B2)', async ({
   page,
 }) => {
+  test.setTimeout(90_000);
   await page.goto('/#/plano/onboarding');
   await expect(
     page.getByRole('heading', { name: 'Para qual carreira você estuda?' }),
@@ -18,10 +19,29 @@ test('Onboarding do plano: carreira, edital, matérias e "Comece por aqui" (B2)'
   await expect(
     page.getByRole('heading', { name: 'Quais matérias entram no plano?' }),
   ).toBeVisible();
-  await page
-    .getByText(/^Assuntos \(\d+\)$/)
-    .first()
-    .click();
+  await page.getByText('Assuntos', { exact: true }).first().click();
+  await semViolacoes(page);
+
+  // Desmarcar um assunto troca o selo para "N de M"; desmarcar a matéria esmaece o galho.
+  const primeira = page.locator('.onboarding-cartao').first();
+  await primeira.locator('.onboarding-assuntos input[type="checkbox"]').first().uncheck();
+  await expect(primeira.locator('summary .selo')).toHaveText(/^\d+ de \d+$/);
+  await primeira.locator('.onboarding-cabeca input[type="checkbox"]').uncheck();
+  await semViolacoes(page);
+  await primeira.locator('.onboarding-cabeca input[type="checkbox"]').check();
+
+  // Acrescentar matéria e assunto; repetido não entra.
+  await page.getByLabel('+ Acrescentar disciplina').fill('Matéria Inventada');
+  await page.getByRole('button', { name: 'Acrescentar disciplina' }).click();
+  const campo = page.getByLabel('+ Acrescentar assunto em Matéria Inventada');
+  await expect(campo).toBeFocused();
+  await campo.fill('Assunto Inventado');
+  await campo.press('Enter');
+  await expect(page.getByText('Assunto Inventado')).toBeVisible();
+  await expect(campo).toBeFocused();
+  await campo.fill('assunto inventado');
+  await campo.press('Enter');
+  await expect(page.getByText('Isso já está na lista.')).toBeVisible();
   await semViolacoes(page);
 
   // Fechar e reabrir o app no meio: volta de onde parou.
@@ -39,4 +59,7 @@ test('Onboarding do plano: carreira, edital, matérias e "Comece por aqui" (B2)'
 
   await page.getByRole('link', { name: 'Começar', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Começar uma Sessão' })).toBeVisible();
+
+  await page.goto('/#/plano');
+  await expect(page.getByText('Matéria Inventada').first()).toBeVisible();
 });

@@ -21,7 +21,9 @@ import { AcaoAgora } from '../../componentes/AcaoAgora';
 import { Esqueleto, Falha, Vazio } from '../../componentes/estados';
 import { useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
-import { Moldura, PassoCarreira, PassoDisciplinas, PassoEdital } from './Passos';
+import { PassoDisciplinas } from './PassoDisciplinas';
+import { Moldura, PassoCarreira, PassoEdital } from './Passos';
+import { ACRESCENTOS_VAZIOS, linhasDosAcrescentos, validarNome } from './acrescentos';
 import { gravarRascunho, lerRascunho, limparRascunho, type Passo, type Rascunho } from './rascunho';
 
 const ORDEM: readonly Passo[] = ['carreira', 'edital', 'disciplinas', 'revisar'];
@@ -156,8 +158,11 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
         .map(({ nome }) => chaveDeNome(nome))
         .filter((c) => !desmarcadas.has(c)),
     );
-    return linhasDoEdital(edital, escolhidas, dispensados);
-  }, [edital, desmarcadas, dispensados]);
+    return [
+      ...linhasDoEdital(edital, escolhidas, dispensados),
+      ...linhasDosAcrescentos(rascunho.acrescentos, desmarcadas),
+    ];
+  }, [edital, desmarcadas, dispensados, rascunho.acrescentos]);
 
   const emRevisao = rascunho.passo === 'revisar' && edital !== undefined;
   useEffect(() => {
@@ -256,7 +261,13 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
         {...(rascunho.carreira ? { escolhida: rascunho.carreira } : {})}
         aoEscolher={(slug) => {
           if (slug !== rascunho.carreira) setCarreira(null);
-          mudar({ carreira: slug, edital: undefined, desmarcadas: [], dispensados: [] });
+          mudar({
+            carreira: slug,
+            edital: undefined,
+            desmarcadas: [],
+            dispensados: [],
+            acrescentos: ACRESCENTOS_VAZIOS,
+          });
         }}
       />,
       continuar(
@@ -278,7 +289,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
         editais={editais}
         escolhido={edital.id}
         aoEscolher={(id) => {
-          mudar({ edital: id, desmarcadas: [], dispensados: [] });
+          mudar({ edital: id, desmarcadas: [], dispensados: [], acrescentos: ACRESCENTOS_VAZIOS });
         }}
       />,
       continuar('Continuar', () => {
@@ -292,11 +303,67 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
         edital={edital}
         desmarcadas={desmarcadas}
         dispensados={dispensados}
+        acrescentos={rascunho.acrescentos}
         aoAlternarDisciplina={(c) => {
           mudar({ desmarcadas: alternar(rascunho.desmarcadas, c) });
         }}
         aoAlternarAssunto={(c) => {
           mudar({ dispensados: alternar(rascunho.dispensados, c) });
+        }}
+        aoAcrescentarAssunto={(disciplina, texto) => {
+          const chave = chaveDeNome(disciplina);
+          const doEdital = disciplinasDoEdital(edital).find((d) => chaveDeNome(d.nome) === chave);
+          const seus = rascunho.acrescentos.assuntos.filter(
+            (a) => chaveDeNome(a.disciplina) === chave,
+          );
+          const v = validarNome(texto, [
+            ...(doEdital?.disciplina.itens.map((i) => i.assunto) ?? []),
+            ...seus.map((a) => a.titulo),
+          ]);
+          if ('aviso' in v) return v.aviso;
+          mudar({
+            acrescentos: {
+              ...rascunho.acrescentos,
+              assuntos: [...rascunho.acrescentos.assuntos, { disciplina, titulo: v.texto }],
+            },
+          });
+          return undefined;
+        }}
+        aoAcrescentarDisciplina={(nome) => {
+          const v = validarNome(nome, [
+            ...disciplinasDoEdital(edital).map((d) => d.nome),
+            ...rascunho.acrescentos.disciplinas,
+          ]);
+          if ('aviso' in v) return v.aviso;
+          mudar({
+            acrescentos: {
+              ...rascunho.acrescentos,
+              disciplinas: [...rascunho.acrescentos.disciplinas, v.texto],
+            },
+          });
+          return undefined;
+        }}
+        aoTirarAssunto={(disciplina, titulo) => {
+          const chave = chaveDeNome(disciplina);
+          mudar({
+            acrescentos: {
+              ...rascunho.acrescentos,
+              assuntos: rascunho.acrescentos.assuntos.filter(
+                (a) => !(chaveDeNome(a.disciplina) === chave && a.titulo === titulo),
+              ),
+            },
+          });
+        }}
+        aoTirarDisciplina={(nome) => {
+          const chave = chaveDeNome(nome);
+          mudar({
+            acrescentos: {
+              disciplinas: rascunho.acrescentos.disciplinas.filter((d) => chaveDeNome(d) !== chave),
+              assuntos: rascunho.acrescentos.assuntos.filter(
+                (a) => chaveDeNome(a.disciplina) !== chave,
+              ),
+            },
+          });
         }}
       />,
       continuar(
