@@ -9,6 +9,7 @@ import {
 import { NOME_BANCO_PRINCIPAL, RegistroDeContas, Repositorio } from '../../../core/persistencia';
 import type { PacoteGerado } from '../../../core/pacote';
 import { baixar } from '../dados/rotulos';
+import { recarregarEm } from '../recarregar';
 import './estilos-migracao.css';
 
 function formatarMb(bytes: number): string {
@@ -34,6 +35,7 @@ type EstadoTela =
 export interface MigracaoProps {
   origem?: Repositorio;
   abrirOrigem?: () => Promise<Repositorio>;
+  /** Padrão: recarrega no Hoje para abrir o banco da conta, agora ativa (T26). */
   aoConcluir?: () => void;
   aoAgoraNao?: () => void;
   registro?: RegistroDeContas;
@@ -44,7 +46,9 @@ export interface MigracaoProps {
 export function Migracao({
   origem: origemInformada,
   abrirOrigem,
-  aoConcluir,
+  aoConcluir = () => {
+    recarregarEm('#/');
+  },
   aoAgoraNao: callbackAgoraNao,
   registro: registroInformado,
   uid: uidInformado,
@@ -224,8 +228,10 @@ export function Migracao({
             <Link
               to="/"
               className="botao principal"
-              onClick={() => {
-                aoConcluir?.();
+              onClick={(e) => {
+                // Sem recarga o app seguiria no banco de antes da conta.
+                e.preventDefault();
+                aoConcluir();
               }}
             >
               Ir para o Hoje

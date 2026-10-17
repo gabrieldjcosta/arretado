@@ -8,9 +8,11 @@ test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
   test('estudar sem conta, entrar, migrar, ver a cópia em Dados e axe nos 2 temas', async ({
     page,
   }) => {
-    // 1. Estudar sem conta: abre o Hoje
-    await page.goto('/#/');
-    await expect(page).toHaveTitle(/Arretado/i);
+    // 1. Estudar sem conta: registra uma Frase correta (sem estudo, entrar não oferece a migração).
+    await page.goto('/#/recall/registrar');
+    await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Frase registrada.')).toBeVisible();
 
     // 2. Entrar na conta
     await page.goto('/#/conta/entrar');
@@ -27,41 +29,31 @@ test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
     await campoCodigo.fill('123456');
     await page.getByRole('button', { name: 'Entrar' }).click();
 
-    // 3. Oferece a migração (redireciona para /#/conta/migracao ou navega até ela)
-    // Se ainda não estiver na tela de migração por reload, navega explicitamente
-    if (!page.url().includes('/conta/migracao')) {
-      await page.goto('/#/conta/migracao');
-    }
+    // 3. Com estudo sem conta, entrar recarrega direto na migração.
+    await expect(page).toHaveURL(/#\/conta\/migracao$/);
 
     // Tela 1: Prévia
-    await expect(page.getByRole('heading', { name: /Migrar para a conta|Prévia/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Migrar para a conta' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Prévia da cópia' })).toBeVisible();
     await semViolacoes(page);
 
-    // Clica em Copiar para a conta se o botão estiver visível
-    const botaoCopiar = page.getByRole('button', { name: 'Copiar para a conta' });
-    if (await botaoCopiar.isVisible()) {
-      await botaoCopiar.click();
+    // Tela 2 (andamento) passa rápido demais para conferir; o resultado é o que vale.
+    await page.getByRole('button', { name: 'Copiar para a conta' }).click();
 
-      // Tela 2: Andamento
-      const andamento = page.locator('.migracao-andamento');
-      if (await andamento.isVisible()) {
-        await semViolacoes(page);
-      }
+    // Tela 3: Resultado; só a conclusão passa.
+    await expect(page.getByRole('heading', { name: 'Tudo copiado' })).toBeVisible({
+      timeout: 15_000,
+    });
+    await semViolacoes(page);
 
-      // Tela 3: Resultado (pode ficar vermelho até o núcleo A4a existir)
-      const resultadoConcluido = page.getByRole('heading', { name: 'Tudo copiado' });
-      const resultadoFalhou = page.getByRole('heading', {
-        name: 'Nada foi alterado. Seus dados continuam como estavam.',
-      });
-
-      // Aguarda conclusão ou falha da migração (núcleo em implementação)
-      await expect(resultadoConcluido.or(resultadoFalhou)).toBeVisible({ timeout: 15_000 });
-      await semViolacoes(page);
-    }
+    // "Ir para o Hoje" recarrega e abre o banco da conta (T26).
+    await page.getByRole('link', { name: 'Ir para o Hoje' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
 
     // 4. Ver a cópia em Dados
     await page.goto('/#/conta/dados');
     await expect(page.getByRole('heading', { name: 'Dados' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Cópia de antes da conta/ })).toBeVisible();
     await semViolacoes(page);
   });
 });

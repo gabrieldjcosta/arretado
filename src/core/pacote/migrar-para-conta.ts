@@ -14,6 +14,7 @@ import { ENTIDADES, NOMES_COLECOES, type NomeColecao } from '../modelo';
 import {
   apagarBanco,
   BancoArretado,
+  bancoExiste,
   CHAVE_ULTIMO_BACKUP,
   NOME_BANCO_PRINCIPAL,
   nomeBancoDaConta,
@@ -191,7 +192,7 @@ export async function preverMigracao(origem: Repositorio): Promise<PreviaMigraca
 
 /** O banco da conta já guarda estudo (não só a identidade que nasce ao entrar)? */
 async function contaTemDados(nomeBanco: string): Promise<boolean> {
-  if (!(await indexedDB.databases()).some((d) => d.name === nomeBanco)) return false;
+  if (!(await bancoExiste(nomeBanco))) return false;
   const db = new BancoArretado(nomeBanco);
   await db.open();
   try {
@@ -406,7 +407,7 @@ export async function haMigracaoPendente(
 ): Promise<boolean> {
   if ((await estadoDaMigracao(uid.toLowerCase(), registro)) === 'concluida') return false;
   // Abrir um banco que não existe o criaria (com identidade nova).
-  if (!(await indexedDB.databases()).some((d) => d.name === nomeOrigem)) return false;
+  if (!(await bancoExiste(nomeOrigem))) return false;
   const origem = await Repositorio.abrir({ nomeBanco: nomeOrigem });
   try {
     if (origem.ctx.usuarioId === uid.toLowerCase()) return false;

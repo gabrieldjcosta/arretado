@@ -19,6 +19,7 @@ import {
   apagarCopiaAnterior,
   copiaAnterior,
   estadoDaMigracao,
+  haMigracaoPendente,
   InterrupcaoSimulada,
   migrarParaConta,
   preverMigracao,
@@ -495,5 +496,37 @@ describe('cópia anterior', () => {
     expect(await copiaAnterior(registro)).toBeNull();
     expect((await registro.contaAtiva())?.uid).toBe(UID);
     expect(await estadoDaMigracao(UID, registro)).toBe('concluida');
+  });
+});
+
+describe('navegador sem indexedDB.databases() (Safari e Firefox antigos)', () => {
+  beforeEach(() => {
+    Object.defineProperty(indexedDB, 'databases', { value: undefined, configurable: true });
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(indexedDB, 'databases');
+  });
+
+  it('a migração conclui e a conta com estudo próprio continua protegida', async () => {
+    const { repo: origem } = await prepararOrigem();
+    expect((await migrarParaConta(origem, opcoes(registroDeTeste()).o)).tipo).toBe('concluida');
+
+    const conta = await Repositorio.abrir({
+      nomeBanco: nomeBancoDaConta(OUTRO_UID),
+      usuarioId: OUTRO_UID,
+    });
+    await conta.colecao('tags').criar({ nome: 'Estudo já feito na conta' });
+    conta.fechar();
+    const r = await migrarParaConta(origem, opcoes(registroDeTeste(), { uid: OUTRO_UID }).o);
+    expect(r.tipo).toBe('falhou');
+  });
+
+  it('haMigracaoPendente responde sem criar o banco de origem que não existe', async () => {
+    const { repo: origem } = await prepararOrigem();
+    const registro = registroDeTeste();
+    expect(await haMigracaoPendente(UID, { registro, nomeOrigem: origem.db.name })).toBe(true);
+    const inexistente = nomeUnico('sem-banco');
+    expect(await haMigracaoPendente(UID, { registro, nomeOrigem: inexistente })).toBe(false);
+    expect(await existe(inexistente)).toBe(false);
   });
 });

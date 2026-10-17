@@ -1398,6 +1398,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** a tela Entrar mandava sempre para `#/conta/migracao`.
 - **Solução:** `destinoDepoisDeEntrar` (`conta/entrar/destino.ts`) usa `haMigracaoPendente`: migração só com estudo no banco sem conta (além da identidade que nasce ao abrir o app) e sem marca `concluida`; senão `#/conta`. O retorno do Google (`retorno.ts`) ainda leva sempre a `#/conta`: quem entra pelo Google não é levado à migração.
 
+### Ao copiar para a conta, o app troca a tela por "Os dados deste aparelho foram apagados em outra aba" (A4)
+- **Causa:** a tela Entrar ativa a conta antes de recarregar em `#/conta/migracao`; na recarga o `ProvedorRepositorio` abria o banco ativo, `arretado-c-<uid>`, e a etapa de cópia apaga e recria esse banco. O `versionchange` (`newVersion === null`) chega à própria conexão da aba, que mostra o aviso de banco apagado e desmonta a migração.
+- **Solução:** em `App.tsx` a rota `conta/migracao` tem provedor próprio, preso ao banco sem conta (`abrirOrigemDaMigracao`); nenhuma conexão da aba fica no banco da conta durante a cópia. "Ir para o Hoje" recarrega (`recarregarEm('#/')`, `conta/recarregar.ts`): toda troca de banco passa por recarga (T26), senão o estudo seguinte iria para o banco de antes da conta. Teste: `conta/migracao/MigracaoNoApp.test.tsx` (App, provedor e migração reais no fake-indexeddb).
+
+### Migração quebra com "indexedDB.databases is not a function" (A4)
+- **Causa:** `indexedDB.databases()` não existe em Safari e Firefox antigos.
+- **Solução:** `bancoExiste(nome)` (`core/persistencia/banco.ts`, `Dexie.exists`), que também não cria o banco. Teste em `migrar-para-conta.test.ts` ("navegador sem indexedDB.databases()").
+
 ### E2E `conta-migracao.spec.ts` falha em "heading Entrar" ou mostra "Tela não encontrada" (A4)
 - **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
 - **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.

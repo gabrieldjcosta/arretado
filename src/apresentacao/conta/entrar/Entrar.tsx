@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router';
 import { entrarNaConta } from '../../../core/persistencia';
 import { FalhaDeConta, type SessaoDeConta } from '../../../integracoes/conta';
 import { useServicoDeConta } from './ContextoConta';
+import { recarregarEm } from '../recarregar';
 import { destinoDepoisDeEntrar } from './destino';
 import './estilos-conta.css';
 
@@ -22,15 +23,9 @@ const AVISO_DE_ERRO: Record<string, string> = {
 const avisoDe = (motivo: string | null): string | null =>
   motivo ? (AVISO_DE_ERRO[motivo] ?? AVISO_PADRAO) : null;
 
-/** Depois de entrar o app recarrega para abrir o banco da conta (T26). */
-const recarregarEmConta = (destino: string) => {
-  window.location.hash = destino;
-  window.location.reload();
-};
-
 /** Tela Entrar: Google, ou código de 6 dígitos por e-mail; "Usar sem conta" sempre à vista. */
 export function Entrar({
-  aoEntrar = recarregarEmConta,
+  aoEntrar = recarregarEm,
   prepararConta = (s: SessaoDeConta) => entrarNaConta(s),
   destino = (s: SessaoDeConta) => destinoDepoisDeEntrar(s),
 }: {
