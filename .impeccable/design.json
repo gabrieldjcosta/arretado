@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T00:00:00Z",
+  "title": "Design System: Arretado",
+  "extensions": {
+    "colorMeta": {
+      "sol": { "role": "primary", "displayName": "Sol", "canonical": "#ffb627" },
+      "marinho": { "role": "secondary", "displayName": "Marinho", "canonical": "#14213d" },
+      "verde-foco": { "role": "secondary", "displayName": "Verde-foco", "canonical": "#2fa36b" },
+      "argila": { "role": "tertiary", "displayName": "Argila", "canonical": "#c8763a" },
+      "azul-ceu": { "role": "tertiary", "displayName": "Azul-céu", "canonical": "#3ba7f0" },
+      "creme": { "role": "neutral", "displayName": "Creme", "canonical": "#fff8ec" }
+    },
+    "typographyMeta": {
+      "titulo-pagina": {
+        "displayName": "Título de página",
+        "purpose": "H1 e marca, só em Playfair Display."
+      },
+      "corpo": { "displayName": "Corpo", "purpose": "Interface em Atkinson Hyperlegible Next." },
+      "leitura-da-lei": {
+        "displayName": "Leitura da lei",
+        "purpose": "Texto do Leitor em Literata, sem itálico."
+      }
+    },
+    "shadows": [
+      {
+        "name": "cartao",
+        "value": "0 6px 20px -10px rgb(20 33 61 / 18%), 0 1px 3px rgb(20 33 61 / 8%)",
+        "purpose": "Cartões e bloco-herói."
+      },
+      {
+        "name": "botao",
+        "value": "0 2px 6px rgb(20 33 61 / 14%)",
+        "purpose": "Botão primário."
+      },
+      {
+        "name": "flutuante",
+        "value": "0 4px 16px rgb(20 33 61 / 12%)",
+        "purpose": "Navegação flutuante, folhas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "botao",
+        "value": "140ms ease (transform, box-shadow)",
+        "purpose": "Pressionar o botão; desligado com prefers-reduced-motion."
+      },
+      {
+        "name": "entrada-do-cartao",
+        "value": "200ms ease-out",
+        "purpose": "Penumbra e luz do cartão no modo foco."
+      }
+    ],
+    "breakpoints": [
+      { "name": "tablet", "value": "700px" },
+      { "name": "desktop", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A ação da tela: Sol com texto Marinho, um por tela.",
+      "html": "<button class=\"ds-btn-primary\">Começar</button>",
+      "css": ".ds-btn-primary{background:#ffb627;color:#14213d;border:1.5px solid #14213d;border-radius:14px;min-height:44px;padding:0 20px;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;letter-spacing:-0.01em;box-shadow:0 2px 6px rgb(20 33 61 / 14%);cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}.ds-btn-primary:hover{background:color-mix(in srgb,#ffb627 88%,#14213d)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid #14213d;outline-offset:2px}"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Qualquer ação que não seja a da tela.",
+      "html": "<button class=\"ds-btn-secondary\">Trocar tarefa</button>",
+      "css": ".ds-btn-secondary{background:#fff;color:#14213d;border:1px solid rgb(20 33 61 / 20%);border-radius:14px;min-height:44px;padding:0 20px;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;cursor:pointer}.ds-btn-secondary:focus-visible{outline:2px solid #14213d;outline-offset:2px}"
+    },
+    {
+      "name": "Cartão",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Contêiner padrão: superfície branca, raio 16, borda fina e sombra suave.",
+      "html": "<div class=\"ds-card\">Seu ponto está salvo neste aparelho.</div>",
+      "css": ".ds-card{background:#fff;color:#14213d;border:1px solid rgb(20 33 61 / 12%);border-radius:16px;padding:20px;box-shadow:0 6px 20px -10px rgb(20 33 61 / 18%),0 1px 3px rgb(20 33 61 / 8%);font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}"
+    },
+    {
+      "name": "Bloco Agora",
+      "kind": "custom",
+      "refersTo": "hero-card",
+      "description": "O bloco-herói Marinho: etiqueta de matéria, título serifado e um botão Sol.",
+      "html": "<section class=\"ds-agora\"><span class=\"ds-etiqueta\">Direito Civil</span><h2>Revisar cartões</h2><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Começar</button></section>",
+      "css": ".ds-agora{background:#14213d;color:#fff8ec;border-radius:28px;padding:20px;font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-agora h2{font:700 1.3rem/1.25 'Playfair Display',Georgia,serif;margin:8px 0 4px}.ds-agora p{margin:0 0 12px;color:#b0b8c6}.ds-etiqueta{background:#c8763a;color:#14213d;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600}.ds-agora-btn{background:#ffb627;color:#14213d;border:0;border-radius:14px;min-height:44px;padding:0 20px;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;width:100%;cursor:pointer}.ds-agora-btn:focus-visible{outline:2px solid #ffb627;outline-offset:2px}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Altura 48, contorno de 1,5 px, rótulo sempre visível.",
+      "html": "<label class=\"ds-label\">Para lembrar<input class=\"ds-input\" type=\"text\"></label>",
+      "css": ".ds-label{display:grid;gap:4px;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#14213d}.ds-input{min-height:48px;padding:10px 14px;border:1.5px solid #7b8599;border-radius:14px;font:inherit;background:#fff;color:#14213d}.ds-input:focus-visible{outline:2px solid #14213d;outline-offset:2px}"
+    },
+    {
+      "name": "Abas",
+      "kind": "nav",
+      "refersTo": "nav-item-current",
+      "description": "Trilho em pílula; a aba atual é um bloco Marinho.",
+      "html": "<nav class=\"ds-abas\"><a class=\"ds-aba\" aria-current=\"page\" href=\"#\">Frases</a><a class=\"ds-aba\" href=\"#\">Cartões</a><a class=\"ds-aba\" href=\"#\">Histórico</a></nav>",
+      "css": ".ds-abas{display:flex;gap:4px;padding:4px;border-radius:999px;background:#fff9ef;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-aba{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;color:#14213d;text-decoration:none}.ds-aba[aria-current='page']{background:#14213d;color:#fff8ec;font-weight:700}.ds-aba:focus-visible{outline:2px solid #14213d;outline-offset:-2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Sertão de Estudo",
+    "overview": "O Arretado é feito para quem precisa de calor para começar e de firmeza para continuar. Sol, argila e cacto sobre um creme de papel, com um Marinho fundo no lugar do céu da noite. Há um lugar onde a pessoa chega, vê uma coisa só no centro e sabe que o ponto onde parou está guardado.",
+    "keyCharacteristics": [
+      "Uma ação dominante por tela: um botão Sol, e só um.",
+      "Bloco Marinho como lugar de foco; o resto da tela é Creme, calmo e liso.",
+      "Calor sem pressão: sem streak, sem vermelho no estudo, sem contagem de dívida.",
+      "Legibilidade acima de efeito: texto mínimo de 13 px, alvos de 44 px, contraste AA medido em script.",
+      "Local-first e offline: fontes hospedadas no próprio app, nada de CDN."
+    ],
+    "rules": [
+      {
+        "name": "The Um Sol Rule",
+        "body": "Sol é a única cor de ação e aparece num botão por tela.",
+        "section": "colors"
+      },
+      {
+        "name": "The Verde Guardado Rule",
+        "body": "Verde é \"está salvo\" e \"este é o lugar\", nunca ação nem aviso.",
+        "section": "colors"
+      },
+      {
+        "name": "The Matéria Em Argila Rule",
+        "body": "A matéria se identifica por uma etiqueta Argila com texto Marinho, nunca por faixa colorida na borda.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sem Vermelho No Estudo Rule",
+        "body": "Vermelho é de excluir e de falha técnica.",
+        "section": "colors"
+      },
+      {
+        "name": "The Piso De 13 Rule",
+        "body": "Nenhum texto abaixo de 13 px.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lei Sem Itálico Rule",
+        "body": "A lei não vai em itálico e o destaque é sublinhado, nunca fundo.",
+        "section": "typography"
+      },
+      {
+        "name": "The Serifa De Título Rule",
+        "body": "Playfair só em títulos e marca.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sem Vidro Rule",
+        "body": "Nada de vidro nem desfoque decorativo.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do manter um só botão Sol por tela, e dar a ele o texto de uma ação.",
+      "Do usar Marinho para \"onde estou\", verde para \"está guardado\", Argila só na etiqueta de matéria.",
+      "Do medir todo par de cor novo em scripts/contraste.mjs nos dois temas antes de usar.",
+      "Do hospedar fontes e ícones no próprio app; o app funciona offline."
+    ],
+    "donts": [
+      "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar.",
+      "Don't pôr faixa colorida na borda de cartão, item ou aviso, nem um tom de cor por disciplina.",
+      "Don't usar glifos Unicode como ícone; os ícones são SVG desenhados num só traço.",
+      "Don't carregar fonte ou ícone de CDN."
+    ]
+  }
+}

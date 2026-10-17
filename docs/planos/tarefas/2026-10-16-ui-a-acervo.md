@@ -7,18 +7,19 @@ Regras comuns: `AGENTS.md`; skill `arretado-design-principles`; só tokens exist
 A lista de `#/biblioteca/acervo` fica mais fácil de escolher e mais leve de ler.
 
 ## Escopo
-Arquivos permitidos: `src/apresentacao/biblioteca/Acervo.tsx`, `Acervo.test.tsx`, `EscolherDisciplinas.tsx` (se o botão de disciplina morar lá), uma folha `src/apresentacao/biblioteca/estilos-acervo.css` (nova ou existente), `e2e/` do acervo.
+Arquivos permitidos: `src/apresentacao/componentes/Icone.tsx` (novo; SVGs inline de um traço, `aria-hidden`, cor `currentColor`: `marca` e `informacao`, com teste), `src/apresentacao/biblioteca/Acervo.tsx`, `Acervo.test.tsx`, `EscolherDisciplinas.tsx` (se o botão de disciplina morar lá), uma folha `src/apresentacao/biblioteca/estilos-acervo.css` (nova ou existente), `e2e/` do acervo.
+Harmonizado com a D-D5 e a D-D6 (17/10/2026, `docs/design/decisoes-design.md`): ícones são SVG de um só traço (nunca glifos Unicode), a matéria é etiqueta Argila (nunca cor por disciplina nem faixa colorida na borda), botões e campos têm raio 14 e um só botão Sol por tela.
 Não alterar: `src/core/`, `src/dominios/`, `acervo/`, `public/acervo/`, `estilos.css`.
 
 ## O que fazer
-1. **Item como botão (11).** Cada norma vira um botão de alternar (`<button aria-pressed>`) com o título e o tamanho; tocar no título escolhe ou desfaz. Escolhido: fundo mais cheio (token de destaque já existente) e um ícone ✓ antes do título, para o estado não depender só da cor. Sem a caixinha de marcar colada no texto. Teclado: Tab chega, Espaço/Enter alterna, foco visível.
+1. **Item como botão (11).** Cada norma vira um botão de alternar (`<button aria-pressed>`) com o título e o tamanho; tocar no título escolhe ou desfaz. Escolhido: fundo `--selecionado-fundo` com texto `--selecionado-texto` e o ícone SVG `marca` antes do título, para o estado não depender só da cor. Sem a caixinha de marcar colada no texto. Teclado: Tab chega, Espaço/Enter alterna, foco visível.
 2. **"Alterar disciplina" (12).** O botão "Mudar" passa a dizer "Alterar disciplina", em tamanho menor (variante compacta de botão, se existir; senão botão-texto), mantendo alvo de 44 px pela área de toque. `aria-label` continua dizendo de qual norma.
 3. **"Disciplinas sugeridas:" (13)** no lugar de "Disciplina:".
-4. **Avisos compactos (16).** Os avisos de cada norma (`i.avisos`) saem do bloco amarelo grande: uma linha pequena com ícone ⓘ e texto em tamanho de dica; quando há mais de um, vão juntos numa lista curta. O aviso de estado da página (`role="status"`, linha ~272) não muda.
+4. **Avisos compactos (16).** Os avisos de cada norma (`i.avisos`) saem do bloco amarelo grande: uma linha pequena com o ícone SVG `informacao` e texto de dica (13 px ou mais); quando há mais de um, vão juntos numa lista curta. O aviso de estado da página (`role="status"`, linha ~272) não muda.
 
 ## Critérios de aceite
 - [ ] escolher e desfazer pelo título, com mouse, toque e teclado; o contador/ação de adicionar continua igual
-- [ ] estado escolhido visível sem depender de cor (✓ + `aria-pressed`)
+- [ ] estado escolhido visível sem depender de cor (ícone `marca` + `aria-pressed`)
 - [ ] "Alterar disciplina" e "Disciplinas sugeridas:" na tela; testes atualizados
 - [ ] um item com 2 avisos ocupa no máximo ~2 linhas de dica a mais que um item sem aviso
 

@@ -979,7 +979,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2).
 
 ### Cor da paleta do Gabriel como texto ou sublinhado reprova no contraste
-- **Sintoma:** `node scripts/contraste.mjs` ou o axe reprovam um par com Acqua `#628981` (texto, ou texto branco sobre ela: 3,9:1) ou com Solace `#CF893A` (sublinhado de condição sobre Palha: 2,5:1). **Causa:** a paleta foi escolhida para blocos e traços, não para texto pequeno. **Solução:** Acqua só em traço, ponto, barra e interruptor; texto e selo com texto branco usam `--acqua-texto` e `--acqua-fundo` (`#416a63`, 5,4:1 e 6,1:1); no claro, `--destaque-condicao` = `#b06f22` (3,6:1); no escuro, a Areia como superfície vira `--quente` (`#2f261d`). **Prevenção:** os pares estão em `scripts/contraste.mjs` e o teste exige os dois temas.
+- **Sintoma (paleta da D-D4, hoje substituída pela D-D5; a lição vale para Verde-foco e Argila):** `node scripts/contraste.mjs` ou o axe reprovam um par com Acqua `#628981` (texto, ou texto branco sobre ela: 3,9:1) ou com Solace `#CF893A` (sublinhado de condição sobre Palha: 2,5:1). **Causa:** a paleta foi escolhida para blocos e traços, não para texto pequeno. **Solução:** Acqua só em traço, ponto, barra e interruptor; texto e selo com texto branco usam `--acqua-texto` e `--acqua-fundo` (`#416a63`, 5,4:1 e 6,1:1); no claro, `--destaque-condicao` = `#b06f22` (3,6:1); no escuro, a Areia como superfície vira `--quente` (`#2f261d`). **Prevenção:** os pares estão em `scripts/contraste.mjs` e o teste exige os dois temas.
 - **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2).
 
 ### axe `color-contrast` só no CI e só no escuro, em botões (transição de cor)
