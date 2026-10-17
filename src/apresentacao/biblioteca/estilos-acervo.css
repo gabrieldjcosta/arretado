@@ -1,0 +1,115 @@
+/* Biblioteca › Acervo (pacote A, 16/10/2026): itens como botão de alternar e avisos compactos.
+   Só tokens existentes de cor, sem cor literal; alvos ≥ 44 px; contraste AA nos dois temas. */
+
+.item-acervo-botao {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+  min-height: var(--alvo, 44px);
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--raio-botao, 12px);
+  border: 1px solid var(--borda-botao);
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+  gap: 0.5rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .item-acervo-botao:not(:disabled):hover {
+    background: color-mix(in srgb, var(--texto) 6%, var(--superficie));
+  }
+}
+
+.item-acervo-botao[aria-pressed='true'] {
+  background: var(--selecionado-fundo);
+  color: var(--selecionado-texto);
+  border-color: var(--selecionado-anel, var(--selecionado-fundo));
+  box-shadow: inset 0 0 0 2px var(--selecionado-anel);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .item-acervo-botao[aria-pressed='true']:not(:disabled):hover {
+    background: color-mix(in srgb, var(--selecionado-fundo) 90%, black);
+  }
+}
+
+.item-acervo-botao[aria-pressed='true'] .dica {
+  color: var(--bloco-atenuado);
+}
+
+.item-acervo-botao:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.item-acervo-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.item-acervo-corpo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.item-acervo-disciplina {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.item-acervo-disciplina .botao-texto {
+  min-height: var(--alvo, 44px);
+}
+
+/* Avisos compactos por norma (anotação 16): linha pequena com ícone ⓘ e texto em tamanho de dica */
+.aviso-compacto {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--texto-atenuado);
+  line-height: 1.35;
+}
+
+.avisos-compactos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.25rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avisos-compactos li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--texto-atenuado);
+  line-height: 1.35;
+}
+
+.aviso-compacto-icone {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}

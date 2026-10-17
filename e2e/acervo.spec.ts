@@ -68,7 +68,10 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   await expect(page.getByRole('heading', { name: 'Acervo: normas' })).toBeVisible();
   const exec = page.getByRole('region', { name: 'Execução Penal' });
   await expect(exec.getByText('Divergente do edital.')).toBeVisible();
-  await expect(page.getByRole('checkbox', { name: /SOLTA/ })).not.toBeChecked();
+  await expect(page.getByRole('button', { name: /^SOLTA/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
   await semViolacoes(page);
 
   await page.getByRole('button', { name: /^Adicionar 2 / }).click();
@@ -99,16 +102,16 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
   await servirAcervo(page);
   await page.goto('/#/biblioteca/acervo');
   const lep = page.getByRole('region', { name: 'Execução Penal' });
-  await expect(lep.getByText('Disciplina: Execução Penal')).toBeVisible();
-  await page.getByRole('button', { name: 'Mudar a disciplina de LEP' }).click();
+  await expect(lep.getByText('Disciplinas sugeridas: Execução Penal')).toBeVisible();
+  await page.getByRole('button', { name: 'Alterar a disciplina de LEP' }).click();
   const dialogo = page.getByRole('dialog');
   await semViolacoes(page);
   await dialogo.getByRole('checkbox', { name: 'Execução Penal' }).uncheck();
   await dialogo.getByRole('checkbox', { name: 'Outros' }).check();
   await dialogo.getByRole('button', { name: 'Confirmar' }).click();
-  await expect(page.getByText('Disciplina: Outros').first()).toBeVisible();
+  await expect(page.getByText('Disciplinas sugeridas: Outros').first()).toBeVisible();
 
-  await page.getByRole('checkbox', { name: /LEP/ }).check();
+  await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
   await expect(page.getByText(/1 adicionadas/)).toBeVisible();
 
@@ -126,7 +129,7 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
 test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ page }) => {
   await servirAcervo(page);
   await page.goto('/#/biblioteca/acervo');
-  await page.getByRole('checkbox', { name: /LEP/ }).check();
+  await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
   await expect(page.getByText(/1 adicionadas/)).toBeVisible();
   await expect(page.getByText('Há versão nova')).toHaveCount(0);
