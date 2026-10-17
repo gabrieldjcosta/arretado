@@ -1,4 +1,4 @@
-import { useDeferredValue, useId, useMemo } from 'react';
+import { useCallback, useDeferredValue, useId, useMemo } from 'react';
 import {
   buscarTexto,
   resolverEndereco,
@@ -52,13 +52,17 @@ export function BuscaNaNorma({
   // A lista da CF inteira é refeita a cada letra: o campo responde antes, a lista vem logo depois.
   const adiada = useDeferredValue(consulta);
 
-  const endereco = useMemo(() => {
-    const possiveis = possiveisEnderecos(adiada);
-    if (possiveis.length === 0) return undefined;
-    const resolvido = resolverEndereco(possiveis, (e) => indiceDoEndereco(e) !== undefined);
-    const indice = resolvido === undefined ? undefined : indiceDoEndereco(resolvido.endereco);
-    return { indice, faltou: resolvido?.faltou !== undefined };
-  }, [adiada, indiceDoEndereco]);
+  const acharEndereco = useCallback(
+    (texto: string) => {
+      const possiveis = possiveisEnderecos(texto);
+      if (possiveis.length === 0) return undefined;
+      const resolvido = resolverEndereco(possiveis, (e) => indiceDoEndereco(e) !== undefined);
+      const indice = resolvido === undefined ? undefined : indiceDoEndereco(resolvido.endereco);
+      return { indice, faltou: resolvido?.faltou !== undefined };
+    },
+    [indiceDoEndereco],
+  );
+  const endereco = useMemo(() => acharEndereco(adiada), [adiada, acharEndereco]);
 
   const resultado = useMemo(
     () =>
@@ -75,8 +79,13 @@ export function BuscaNaNorma({
         className="busca-campo"
         onSubmit={(e) => {
           e.preventDefault();
-          // Enter vai ao endereço, se há; senão, ao primeiro achado do texto.
-          const primeiro = endereco?.indice ?? resultado?.achados[0]?.indice;
+          // Enter vai ao endereço, se há; senão, ao primeiro achado do texto. O que foi digitado
+          // vale, não a consulta adiada: num aparelho lento o Enter chega antes da lista alcançá-la.
+          const primeiro =
+            acharEndereco(consulta)?.indice ??
+            (textos.estado === 'pronto' && consulta.trim() !== ''
+              ? buscarTexto(textos.buscaveis, consulta, 1).achados[0]?.indice
+              : undefined);
           if (primeiro !== undefined) irPara(primeiro);
         }}
       >
