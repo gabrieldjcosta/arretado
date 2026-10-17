@@ -7,6 +7,7 @@
 import { NOMES_COLECOES, type NomeColecao } from '../../modelo';
 import { camposMinimos } from '../../modelo/fabrica';
 import { Repositorio } from '../../persistencia';
+import { sha256 } from '../bytes';
 
 const INICIO = Date.parse('2026-09-23T12:00:00.000Z');
 
@@ -54,8 +55,13 @@ export async function criarBancoSintetico(
   // Sistema (usuário, aparelho e preferências nasceram ao abrir).
   passo();
   const fonte = await c('fontes').criar(camposMinimos('fontes', ''));
-  const anexo = await c('anexos').criar({ ...camposMinimos('anexos', ''), tamanho: 4 });
-  await repo.db.anexosConteudo.put({ id: anexo.id, bytes: new Uint8Array([1, 2, 3, 4]) });
+  const bytesAnexo = new Uint8Array([1, 2, 3, 4]);
+  const anexo = await c('anexos').criar({
+    ...camposMinimos('anexos', ''),
+    tamanho: bytesAnexo.length,
+    hash: await sha256(bytesAnexo),
+  });
+  await repo.db.anexosConteudo.put({ id: anexo.id, bytes: bytesAnexo });
   const tag = await c('tags').criar({ nome: 'Execução penal' });
   const tagExcluida = await c('tags').criar({ nome: 'Rascunho' });
   await c('tags').excluir(tagExcluida.id);
