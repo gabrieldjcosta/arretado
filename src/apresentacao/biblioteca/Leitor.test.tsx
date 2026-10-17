@@ -115,7 +115,6 @@ describe('leitor da norma (9.6)', () => {
     const { repo } = await repositorioDeTeste();
     await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, '#/biblioteca');
-    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
     await usuario.click(await screen.findByRole('link', { name: /LEP/ }));
 
     expect(await screen.findByRole('heading', { level: 1, name: 'LEP' })).toBeInTheDocument();
@@ -339,8 +338,7 @@ describe('procedência da versão (13.5)', () => {
   it('a coleta aparece no leitor e na Biblioteca; "Editado à mão" só depois da edição', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
-    const usuarioLista = abrirLeitor(repo, '#/biblioteca');
-    await usuarioLista.click(await screen.findByRole('button', { name: 'Todas as normas' }));
+    abrirLeitor(repo, '#/biblioteca');
     const link = await screen.findByRole('link', { name: /LEP/ });
     expect(link).toHaveTextContent(/Coletada em \d{2}\/\d{2}\/\d{4}/);
     expect(link).not.toHaveTextContent('Editado à mão');
@@ -480,7 +478,6 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     const norma = await publicar(repo, LEI);
     const aberta = await abrirNorma(repo, norma.id);
     const usuario = abrirLeitor(repo, '#/biblioteca');
-    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
     await usuario.click(await screen.findByRole('link', { name: /LEP/ }));
     await screen.findByRole('heading', { level: 1, name: 'LEP' });
     // Abrir sem rolar não grava nada ainda.
@@ -489,7 +486,6 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     await usuario.click(screen.getByRole('link', { name: '← Biblioteca' }));
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${norma.id}`);
-    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
     expect(screen.getByRole('region', { name: 'Normas' })).toHaveTextContent('Última leitura:');
     // No alto da tela estava a primeira linha.
     expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
