@@ -62,11 +62,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/testes/setup.ts'],
     restoreMocks: true,
+    // Os testes de desempenho medem tempo: com todos os núcleos ocupados estouram o orçamento sem haver falha.
+    maxWorkers: 3,
     projects: [
       {
         extends: true,
         test: {
           name: 'unidade',
+          // Com a máquina ocupada (Orca, vários agentes) os 5 s padrão estouram sem haver falha real.
+          testTimeout: 30_000,
           include: [
             'src/**/*.test.{ts,tsx}',
             'scripts/**/*.test.ts',

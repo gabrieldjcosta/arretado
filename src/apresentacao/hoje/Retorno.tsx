@@ -49,7 +49,7 @@ export function BoasVindas() {
         </p>
       )}
       <div className="linha-acoes">
-        <Link to={rota} className="botao principal">
+        <Link to={rota} className="botao">
           {dados.proximoPasso ? 'Retomar daqui' : 'Começar leve'}
         </Link>
         <button
