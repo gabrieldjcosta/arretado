@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router';
 import { entrarNaConta } from '../../../core/persistencia';
 import { FalhaDeConta, type SessaoDeConta } from '../../../integracoes/conta';
 import { useServicoDeConta } from './ContextoConta';
+import { recarregarEm } from '../recarregar';
+import { destinoDepoisDeEntrar } from './destino';
 import './estilos-conta.css';
 
 /** Versão dos termos de teste da V1; a política v3 definitiva chega no pacote A7. */
@@ -21,19 +23,15 @@ const AVISO_DE_ERRO: Record<string, string> = {
 const avisoDe = (motivo: string | null): string | null =>
   motivo ? (AVISO_DE_ERRO[motivo] ?? AVISO_PADRAO) : null;
 
-/** Depois de entrar o app recarrega para abrir o banco da conta (T26). */
-const recarregarEmConta = () => {
-  window.location.hash = '#/conta';
-  window.location.reload();
-};
-
 /** Tela Entrar: Google, ou código de 6 dígitos por e-mail; "Usar sem conta" sempre à vista. */
 export function Entrar({
-  aoEntrar = recarregarEmConta,
+  aoEntrar = recarregarEm,
   prepararConta = (s: SessaoDeConta) => entrarNaConta(s),
+  destino = (s: SessaoDeConta) => destinoDepoisDeEntrar(s),
 }: {
-  aoEntrar?: () => void;
+  aoEntrar?: (destino: string) => void;
   prepararConta?: (sessao: SessaoDeConta) => Promise<void>;
+  destino?: (sessao: SessaoDeConta) => Promise<string>;
 }) {
   const servico = useServicoDeConta();
   const [params] = useSearchParams();
@@ -74,7 +72,8 @@ export function Entrar({
       await prepararConta(sessao);
       // O aceite no servidor não bloqueia a entrada: quem viu o aviso e entrou aceitou os termos de teste.
       await servico.aceitarTermos(VERSAO_TERMOS).catch(() => undefined);
-      aoEntrar();
+      // Na dúvida, a tela da migração: ela mesma mostra o que há e tem "Agora não".
+      aoEntrar(await destino(sessao).catch(() => '#/conta/migracao'));
     });
   };
 

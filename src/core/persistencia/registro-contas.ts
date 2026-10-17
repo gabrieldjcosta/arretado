@@ -64,8 +64,14 @@ export class RegistroDeContas {
     });
   }
 
-  /** Cria ou atualiza a conta e a torna ativa. */
-  ativar(uid: string, opcoes: { email?: string; agora?: Date } = {}): Promise<ContaDoAparelho> {
+  /**
+   * Cria ou atualiza a conta e a torna ativa. `meta` grava chaves extras na mesma transação
+   * (migração: ativar e marcar concluída de uma vez só).
+   */
+  ativar(
+    uid: string,
+    opcoes: { email?: string; agora?: Date; meta?: Record<string, unknown> } = {},
+  ): Promise<ContaDoAparelho> {
     const conta: ContaDoAparelho = {
       uid: uid.toLowerCase(),
       nomeBanco: nomeBancoDaConta(uid),
@@ -77,8 +83,33 @@ export class RegistroDeContas {
         const antiga = await db.contas.get(conta.uid);
         await db.contas.put({ ...antiga, ...conta });
         await db.meta.put({ chave: CHAVE_CONTA_ATIVA, valor: conta.uid });
+        for (const [chave, valor] of Object.entries(opcoes.meta ?? {})) {
+          if (chave === CHAVE_CONTA_ATIVA) throw new Error('Chave reservada: ' + chave);
+          await db.meta.put({ chave, valor });
+        }
       });
       return conta;
+    });
+  }
+
+  /** Valor de uma chave do registro (marcas da migração para a conta, A4). */
+  async lerMeta(chave: string): Promise<unknown> {
+    return this.com(async (db) => (await db.meta.get(chave))?.valor);
+  }
+
+  gravarMeta(chave: string, valor: unknown): Promise<void> {
+    if (chave === CHAVE_CONTA_ATIVA)
+      throw new Error('A conta ativa muda só por ativar ou desativar.');
+    return this.com(async (db) => {
+      await db.meta.put({ chave, valor });
+    });
+  }
+
+  apagarMeta(chave: string): Promise<void> {
+    if (chave === CHAVE_CONTA_ATIVA)
+      throw new Error('A conta ativa muda só por ativar ou desativar.');
+    return this.com(async (db) => {
+      await db.meta.delete(chave);
     });
   }
 

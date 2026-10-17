@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ReactNode } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
-import type { Repositorio } from '../core/persistencia';
+import { NOME_BANCO_PRINCIPAL, Repositorio } from '../core/persistencia';
 import { contasHabilitadas } from '../integracoes/conta';
 import type { FonteDoAcervo } from '../dominios/acervo/fonte';
 import { Acervo } from './biblioteca/Acervo';
@@ -12,6 +12,7 @@ import { Perfis } from './conta/Perfis';
 import { Conta } from './conta/Conta';
 import { ProvedorConta } from './conta/entrar/ContextoConta';
 import { Entrar } from './conta/entrar/Entrar';
+import { Migracao } from './conta/migracao/Migracao';
 import { Privacidade } from './conta/Privacidade';
 import { ProvedorRepositorio } from './dados/ProvedorRepositorio';
 import { Shell } from './Shell';
@@ -53,6 +54,13 @@ const Precedente = lazy(() =>
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
 const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
 
+/**
+ * A migração copia do banco sem conta para o da conta, que ela apaga e recria. Depois de entrar a
+ * conta já está ativa; se a tela abrisse o banco ativo, a cópia derrubaria a própria conexão
+ * ("apagados em outra aba"). Por isso a rota tem provedor próprio, preso ao banco de origem.
+ */
+const abrirOrigemDaMigracao = () => Repositorio.abrir({ nomeBanco: NOME_BANCO_PRINCIPAL });
+
 function Carregando({ children }: { children: ReactNode }) {
   return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
 }
@@ -65,80 +73,95 @@ export function App({
   fonteAcervo?: FonteDoAcervo;
 }) {
   return (
-    <ProvedorRepositorio {...(abrir ? { abrir } : {})}>
-      <ProvedorConta>
-        <ProvedorFonteAcervo fonte={fonteAcervo}>
-          <HashRouter>
-            <LimiteDeErro>
-              <Routes>
-                <Route element={<Shell />}>
-                  <Route index element={<Hoje />} />
-                  <Route path="plano/*" element={<RotasDoPlano />} />
-                  <Route path="sessao/*" element={<RotasDaSessao />} />
-                  <Route path="recall" element={<RecallInicio />}>
-                    <Route index element={<ListaErros />} />
-                    <Route path="frases" element={<ListaFrases />} />
-                    <Route path="cartoes" element={<ListaCartoes />} />
-                    <Route path="historico" element={<Historico />} />
-                  </Route>
-                  <Route path="recall/registrar" element={<RegistrarErro />} />
-                  <Route path="recall/revisar" element={<Drill />} />
-                  <Route path="recall/frases/revisar" element={<RevisarFrases />} />
-                  <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
-                  <Route path="recall/erros/:id" element={<DetalheErro />} />
-                  <Route path="recall/cartoes/:id" element={<EditarCartao />} />
-                  <Route path="biblioteca" element={<Normas />} />
-                  <Route path="biblioteca/acervo" element={<Acervo />} />
-                  <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
-                  <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
-                  <Route path="biblioteca/resumos" element={<Resumos />} />
-                  <Route path="biblioteca/resumos/novo" element={<Resumos novo />} />
-                  <Route path="biblioteca/resumos/:id" element={<Resumo />} />
-                  <Route path="biblioteca/precedentes" element={<Precedentes />} />
-                  <Route path="biblioteca/precedentes/novo" element={<Precedentes novo />} />
-                  <Route path="biblioteca/precedentes/:id" element={<Precedente />} />
-                  {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
-                  <Route
-                    path="biblioteca/importar/:versaoId?"
-                    element={
-                      <Carregando>
-                        <Importar />
-                      </Carregando>
-                    }
-                  />
-                  <Route
-                    path="biblioteca/normas/:normaId"
-                    element={
-                      <Carregando>
-                        <Leitor />
-                      </Carregando>
-                    }
-                  />
-                  <Route path="conta" element={<Conta />} />
-                  <Route path="conta/aparencia" element={<AparenciaConta />} />
-                  <Route path="conta/perfis" element={<Perfis />} />
-                  <Route
-                    path="conta/dados"
-                    element={
-                      <Carregando>
-                        <Dados />
-                      </Carregando>
-                    }
-                  />
-                  <Route path="conta/privacidade" element={<Privacidade />} />
-                  <Route
-                    path="conta/entrar"
-                    element={contasHabilitadas() ? <Entrar /> : <NaoEncontrada />}
-                  />
-                  <Route path="orientacoes" element={<Orientacoes />} />
-                  <Route path="orientacoes/:secao" element={<Orientacoes />} />
-                  <Route path="*" element={<NaoEncontrada />} />
+    <ProvedorConta>
+      <ProvedorFonteAcervo fonte={fonteAcervo}>
+        <HashRouter>
+          <LimiteDeErro>
+            <Routes>
+              {contasHabilitadas() && (
+                <Route
+                  element={
+                    <ProvedorRepositorio abrir={abrirOrigemDaMigracao}>
+                      <Shell />
+                    </ProvedorRepositorio>
+                  }
+                >
+                  <Route path="conta/migracao" element={<Migracao />} />
                 </Route>
-              </Routes>
-            </LimiteDeErro>
-          </HashRouter>
-        </ProvedorFonteAcervo>
-      </ProvedorConta>
-    </ProvedorRepositorio>
+              )}
+              <Route
+                element={
+                  <ProvedorRepositorio {...(abrir ? { abrir } : {})}>
+                    <Shell />
+                  </ProvedorRepositorio>
+                }
+              >
+                <Route index element={<Hoje />} />
+                <Route path="plano/*" element={<RotasDoPlano />} />
+                <Route path="sessao/*" element={<RotasDaSessao />} />
+                <Route path="recall" element={<RecallInicio />}>
+                  <Route index element={<ListaErros />} />
+                  <Route path="frases" element={<ListaFrases />} />
+                  <Route path="cartoes" element={<ListaCartoes />} />
+                  <Route path="historico" element={<Historico />} />
+                </Route>
+                <Route path="recall/registrar" element={<RegistrarErro />} />
+                <Route path="recall/revisar" element={<Drill />} />
+                <Route path="recall/frases/revisar" element={<RevisarFrases />} />
+                <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
+                <Route path="recall/erros/:id" element={<DetalheErro />} />
+                <Route path="recall/cartoes/:id" element={<EditarCartao />} />
+                <Route path="biblioteca" element={<Normas />} />
+                <Route path="biblioteca/acervo" element={<Acervo />} />
+                <Route path="biblioteca/sumulas" element={<Colecoes especie="sumulas" />} />
+                <Route path="biblioteca/teses" element={<Colecoes especie="teses" />} />
+                <Route path="biblioteca/resumos" element={<Resumos />} />
+                <Route path="biblioteca/resumos/novo" element={<Resumos novo />} />
+                <Route path="biblioteca/resumos/:id" element={<Resumo />} />
+                <Route path="biblioteca/precedentes" element={<Precedentes />} />
+                <Route path="biblioteca/precedentes/novo" element={<Precedentes novo />} />
+                <Route path="biblioteca/precedentes/:id" element={<Precedente />} />
+                {/* Uma rota só: ao colar, o id entra na rota sem desmontar a tela. */}
+                <Route
+                  path="biblioteca/importar/:versaoId?"
+                  element={
+                    <Carregando>
+                      <Importar />
+                    </Carregando>
+                  }
+                />
+                <Route
+                  path="biblioteca/normas/:normaId"
+                  element={
+                    <Carregando>
+                      <Leitor />
+                    </Carregando>
+                  }
+                />
+                <Route path="conta" element={<Conta />} />
+                <Route path="conta/aparencia" element={<AparenciaConta />} />
+                <Route path="conta/perfis" element={<Perfis />} />
+                <Route
+                  path="conta/dados"
+                  element={
+                    <Carregando>
+                      <Dados />
+                    </Carregando>
+                  }
+                />
+                <Route path="conta/privacidade" element={<Privacidade />} />
+                <Route
+                  path="conta/entrar"
+                  element={contasHabilitadas() ? <Entrar /> : <NaoEncontrada />}
+                />
+                <Route path="orientacoes" element={<Orientacoes />} />
+                <Route path="orientacoes/:secao" element={<Orientacoes />} />
+                <Route path="*" element={<NaoEncontrada />} />
+              </Route>
+            </Routes>
+          </LimiteDeErro>
+        </HashRouter>
+      </ProvedorFonteAcervo>
+    </ProvedorConta>
   );
 }

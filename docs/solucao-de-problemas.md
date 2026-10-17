@@ -1383,6 +1383,38 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** o registro de contas é atualizado antes do banco ser apagado; se o apagamento falhar, sobra um banco `arretado-c-…` órfão, sem efeito.
 - **Solução:** nenhuma urgente; "Apagar tudo" em Conta › Dados remove o que sobrar do banco aberto.
 
+### Migração para a conta falhou ou ficou "em andamento" (A4)
+- **Causa:** `baixarBackup` rejeitado (download cancelado): nada começa. Falha na cópia ou na verificação (contagens, hash normalizado do `usuarioId` ou `reconstruirDoLog` diferente do estado): o banco `arretado-c-<uid>` é apagado e o motivo fica em `problemaMigracao` no registro de contas. Aba fechada no meio: `migracao:<uid>` fica `em-andamento`, a conta não é ativada.
+- **Solução:** a origem (`arretado`) nunca é alterada; repetir a migração refaz a cópia do zero. Verificação que falha sempre no mesmo banco indica registro gravado fora do log (o histórico não o reconstrói): exportar o backup e relatar o Problema.
+
+### A migração recusa com "Esta conta já tem dados neste aparelho" (A4)
+- **Causa:** o banco da conta já tem estudo próprio (entrou na conta e estudou antes de migrar). Apagar para copiar perderia esse estudo.
+- **Solução:** nada foi alterado. Mesclar os dois é escolha explícita (espaço separado, modo 7; ou A6). Só o banco com a identidade que nasce ao entrar (usuário, aparelho, preferências) é substituído sozinho.
+
+### Previsível no A4b/A6: ponto de restauração antigo no banco da conta
+- **Causa:** pontos de restauração, logs de importação e espaços separados ficam só na cópia anterior; restaurar um ponto da origem no banco da conta seria importar outra identidade (modo 6) e trocaria o `usuarioId` do banco de volta para o local.
+- **Solução prevista:** não copiar essas coleções (como hoje); "Desfazer importação" de antes da conta só pela cópia anterior.
+
+### Por que a migração copia banco a banco, e não pela restauração integral (A4, decisão provisória de 17/10/2026)
+- **Causa:** a restauração integral (`importar.ts`, modo 6) foi feita para trocar de aparelho: com pacote de outra identidade, o banco adota o `usuarioId` do pacote (o local, não o `uid` da conta), gera `aparelhoId` novo e reescreve o log com carimbos novos. Na migração isso quebraria a identidade da conta e o relógio do aparelho, e o hash da verificação não bateria com a origem.
+- **Solução:** `migrar-para-conta.ts` lê a origem numa transação e grava no banco `arretado-c-<uid>` registros, log (`seq`, `ts`, `aparelhoId`) e binários iguais; só o `usuarioId` vira o `uid`. Snapshots (e o conteúdo deles), logs de importação e espaços separados, com as entradas de log, ficam só na cópia anterior (teste "as coleções só locais…" em `migrar-para-conta.test.ts`). Aprovada pelo coordenador em caráter provisório; a decisão final é do Gabriel no portão A. Se algum dia a migração passar a usar o modo 6, mudar antes a adoção de identidade dele.
+
+### Depois de entrar, foi para a migração sem ter nada a migrar (ou não foi, tendo) (A4)
+- **Causa:** a tela Entrar mandava sempre para `#/conta/migracao`.
+- **Solução:** `destinoDepoisDeEntrar` (`conta/entrar/destino.ts`) usa `haMigracaoPendente`: migração só com estudo no banco sem conta (além da identidade que nasce ao abrir o app) e sem marca `concluida`; senão `#/conta`. O retorno do Google (`retorno.ts`) ainda leva sempre a `#/conta`: quem entra pelo Google não é levado à migração.
+
+### Ao copiar para a conta, o app troca a tela por "Os dados deste aparelho foram apagados em outra aba" (A4)
+- **Causa:** a tela Entrar ativa a conta antes de recarregar em `#/conta/migracao`; na recarga o `ProvedorRepositorio` abria o banco ativo, `arretado-c-<uid>`, e a etapa de cópia apaga e recria esse banco. O `versionchange` (`newVersion === null`) chega à própria conexão da aba, que mostra o aviso de banco apagado e desmonta a migração.
+- **Solução:** em `App.tsx` a rota `conta/migracao` tem provedor próprio, preso ao banco sem conta (`abrirOrigemDaMigracao`); nenhuma conexão da aba fica no banco da conta durante a cópia. "Ir para o Hoje" recarrega (`recarregarEm('#/')`, `conta/recarregar.ts`): toda troca de banco passa por recarga (T26), senão o estudo seguinte iria para o banco de antes da conta. Teste: `conta/migracao/MigracaoNoApp.test.tsx` (App, provedor e migração reais no fake-indexeddb).
+
+### Migração quebra com "indexedDB.databases is not a function" (A4)
+- **Causa:** `indexedDB.databases()` não existe em Safari e Firefox antigos.
+- **Solução:** `bancoExiste(nome)` (`core/persistencia/banco.ts`, `Dexie.exists`), que também não cria o banco. Teste em `migrar-para-conta.test.ts` ("navegador sem indexedDB.databases()").
+
+### E2E `conta-migracao.spec.ts` falha em "heading Entrar" ou mostra "Tela não encontrada" (A4)
+- **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
+- **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

@@ -1,11 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { ServicoDeContaFalso } from '../../../integracoes/conta';
+import { migrarParaConta } from '../../../core/pacote/migrar-para-conta';
+import { RegistroDeContas, Repositorio } from '../../../core/persistencia';
+import { ServicoDeContaFalso, type SessaoDeConta } from '../../../integracoes/conta';
 import { ProvedorConta } from './ContextoConta';
+import { destinoDepoisDeEntrar } from './destino';
 import { Entrar, VERSAO_TERMOS } from './Entrar';
 
-function montar(servico: ServicoDeContaFalso, inicial = '/conta/entrar') {
+function montar(
+  servico: ServicoDeContaFalso,
+  inicial = '/conta/entrar',
+  destino: (s: SessaoDeConta) => Promise<string> = () => Promise.resolve('#/conta/migracao'),
+) {
   const aoEntrar = vi.fn();
   const prepararConta = vi.fn(() => Promise.resolve());
   render(
@@ -14,7 +21,7 @@ function montar(servico: ServicoDeContaFalso, inicial = '/conta/entrar') {
         <Routes>
           <Route
             path="/conta/entrar"
-            element={<Entrar aoEntrar={aoEntrar} prepararConta={prepararConta} />}
+            element={<Entrar aoEntrar={aoEntrar} prepararConta={prepararConta} destino={destino} />}
           />
           <Route path="/conta" element={<p>Conta</p>} />
         </Routes>
@@ -65,5 +72,76 @@ describe('Entrar (F4-A, A3)', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/ainda não foi liberado/i);
     await userEvent.setup().click(screen.getByRole('button', { name: 'Entrar com o Google' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/sem conexão/i);
+  });
+
+  describe('destino depois de entrar (A4)', () => {
+    const sufixo = () => Math.random().toString(36).slice(2);
+
+    async function entrarCom(destino: (s: SessaoDeConta) => Promise<string>) {
+      const { aoEntrar } = montar(
+        new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] }),
+        '/conta/entrar',
+        destino,
+      );
+      const u = userEvent.setup();
+      await u.type(screen.getByLabelText(/receba um código/i), 'a@exemplo.com');
+      await u.click(screen.getByRole('button', { name: 'Enviar código' }));
+      await u.type(await screen.findByLabelText(/código de 6 dígitos/i), '123456');
+      await u.click(screen.getByRole('button', { name: 'Entrar' }));
+      await vi.waitFor(() => {
+        expect(aoEntrar).toHaveBeenCalledTimes(1);
+      });
+      return aoEntrar.mock.calls[0]?.[0] as string;
+    }
+
+    async function origemComEstudo(): Promise<string> {
+      const nomeOrigem = `origem-entrar-${sufixo()}`;
+      const repo = await Repositorio.abrir({ nomeBanco: nomeOrigem });
+      await repo.colecao('tags').criar({ nome: 'Estudo sem conta' });
+      repo.fechar();
+      return nomeOrigem;
+    }
+
+    it('estudo sem conta e migração não feita: vai para a migração', async () => {
+      const registro = new RegistroDeContas(`registro-${sufixo()}`);
+      const nomeOrigem = await origemComEstudo();
+      expect(await entrarCom((s) => destinoDepoisDeEntrar(s, { registro, nomeOrigem }))).toBe(
+        '#/conta/migracao',
+      );
+    });
+
+    it('estudo sem conta e migração já concluída: vai para a conta', async () => {
+      const registro = new RegistroDeContas(`registro-${sufixo()}`);
+      const nomeOrigem = await origemComEstudo();
+      const origem = await Repositorio.abrir({ nomeBanco: nomeOrigem });
+      // uid fixo do ServicoDeContaFalso.
+      const r = await migrarParaConta(origem, {
+        uid: '55555555-5555-4555-8555-555555555555',
+        registro,
+        baixarBackup: () => Promise.resolve(),
+      });
+      origem.fechar();
+      expect(r.tipo).toBe('concluida');
+      expect(await entrarCom((s) => destinoDepoisDeEntrar(s, { registro, nomeOrigem }))).toBe(
+        '#/conta',
+      );
+    });
+
+    it('banco sem conta só com a identidade, ou inexistente: vai para a conta', async () => {
+      const registro = new RegistroDeContas(`registro-${sufixo()}`);
+      const soIdentidade = `origem-vazia-${sufixo()}`;
+      (await Repositorio.abrir({ nomeBanco: soIdentidade })).fechar();
+      expect(
+        await destinoDepoisDeEntrar(
+          { uid: '00000000-0000-4000-8000-000000000001', email: 'a@exemplo.com' },
+          { registro, nomeOrigem: soIdentidade },
+        ),
+      ).toBe('#/conta');
+      expect(
+        await entrarCom((s) =>
+          destinoDepoisDeEntrar(s, { registro, nomeOrigem: `nao-existe-${sufixo()}` }),
+        ),
+      ).toBe('#/conta');
+    });
   });
 });

@@ -10,6 +10,7 @@ export {
 } from './anexos';
 export {
   apagarBanco,
+  bancoExiste,
   BancoArretado,
   NOME_BANCO_PRINCIPAL,
   esquemaDaVersao,
