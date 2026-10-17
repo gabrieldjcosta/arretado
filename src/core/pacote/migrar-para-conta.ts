@@ -10,7 +10,6 @@
 // As coleções só locais (pontos de restauração, logs de importação, espaços separados) ficam na
 // cópia anterior: restaurar um ponto de restauração antigo no banco da conta trocaria a
 // identidade dele de volta para a local.
-import Dexie from 'dexie';
 import { ENTIDADES, NOMES_COLECOES, type NomeColecao } from '../modelo';
 import {
   apagarBanco,
@@ -191,7 +190,7 @@ export async function preverMigracao(origem: Repositorio): Promise<PreviaMigraca
 
 /** O banco da conta já guarda estudo (não só a identidade que nasce ao entrar)? */
 async function contaTemDados(nomeBanco: string): Promise<boolean> {
-  if (!(await Dexie.exists(nomeBanco))) return false;
+  if (!(await indexedDB.databases()).some((d) => d.name === nomeBanco)) return false;
   const db = new BancoArretado(nomeBanco);
   await db.open();
   try {
@@ -305,8 +304,10 @@ export async function migrarParaConta(
   if (origem.db.name === nomeBanco || origem.ctx.usuarioId === uid) {
     return { tipo: 'falhou', etapa: 'backup', motivo: 'Estes dados já são desta conta.' };
   }
-  // Banco da conta com estudo próprio e sem migração em andamento: não se apaga (A6 decide).
-  if (marca === null && (await contaTemDados(nomeBanco))) {
+  // Banco da conta com estudo próprio não se apaga (A6 decide): sem migração em andamento, ou com
+  // ela interrompida e a conta ativada por outro caminho (entrou e estudou nela antes de repetir).
+  const emUso = marca === null || (await registro.contaAtiva())?.uid === uid;
+  if (emUso && (await contaTemDados(nomeBanco))) {
     return {
       tipo: 'falhou',
       etapa: 'copia',
@@ -363,6 +364,9 @@ export async function migrarParaConta(
       } satisfies CopiaAnterior,
     },
   });
+  const problema = (await registro.lerMeta(CHAVE_PROBLEMA_MIGRACAO)) as
+    { uid?: string } | undefined;
+  if (problema?.uid === uid) await registro.apagarMeta(CHAVE_PROBLEMA_MIGRACAO);
   return resultado;
 }
 

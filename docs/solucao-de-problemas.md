@@ -1378,6 +1378,18 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** o registro de contas é atualizado antes do banco ser apagado; se o apagamento falhar, sobra um banco `arretado-c-…` órfão, sem efeito.
 - **Solução:** nenhuma urgente; "Apagar tudo" em Conta › Dados remove o que sobrar do banco aberto.
 
+### Migração para a conta falhou ou ficou "em andamento" (A4)
+- **Causa:** `baixarBackup` rejeitado (download cancelado): nada começa. Falha na cópia ou na verificação (contagens, hash normalizado do `usuarioId` ou `reconstruirDoLog` diferente do estado): o banco `arretado-c-<uid>` é apagado e o motivo fica em `problemaMigracao` no registro de contas. Aba fechada no meio: `migracao:<uid>` fica `em-andamento`, a conta não é ativada.
+- **Solução:** a origem (`arretado`) nunca é alterada; repetir a migração refaz a cópia do zero. Verificação que falha sempre no mesmo banco indica registro gravado fora do log (o histórico não o reconstrói): exportar o backup e relatar o Problema.
+
+### A migração recusa com "Esta conta já tem dados neste aparelho" (A4)
+- **Causa:** o banco da conta já tem estudo próprio (entrou na conta e estudou antes de migrar). Apagar para copiar perderia esse estudo.
+- **Solução:** nada foi alterado. Mesclar os dois é escolha explícita (espaço separado, modo 7; ou A6). Só o banco com a identidade que nasce ao entrar (usuário, aparelho, preferências) é substituído sozinho.
+
+### Previsível no A4b/A6: ponto de restauração antigo no banco da conta
+- **Causa:** pontos de restauração, logs de importação e espaços separados ficam só na cópia anterior; restaurar um ponto da origem no banco da conta seria importar outra identidade (modo 6) e trocaria o `usuarioId` do banco de volta para o local.
+- **Solução prevista:** não copiar essas coleções (como hoje); "Desfazer importação" de antes da conta só pela cópia anterior.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

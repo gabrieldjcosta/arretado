@@ -394,6 +394,25 @@ describe('migrarParaConta: interrupções', () => {
       expect(await fotografia(origem.db.name)).toBe(antes);
     },
   );
+
+  it('interrompida e depois usada como conta: o estudo feito nela não é apagado', async () => {
+    const { repo: origem } = await prepararOrigem();
+    const registro = registroDeTeste();
+    await expect(
+      migrarParaConta(origem, opcoes(registro, { interromperEm: 'verificacao' }).o),
+    ).rejects.toBeInstanceOf(InterrupcaoSimulada);
+    // A pessoa entrou na conta por outro caminho e estudou nela.
+    await registro.ativar(UID);
+    const conta = await abrirConta();
+    await conta.colecao('tags').criar({ nome: 'Estudo feito na conta' });
+    conta.fechar();
+    const contaAntes = await fotografia(nomeBancoDaConta(UID));
+
+    const r = await migrarParaConta(origem, opcoes(registro).o);
+
+    expect(r.tipo).toBe('falhou');
+    expect(await fotografia(nomeBancoDaConta(UID))).toBe(contaAntes);
+  });
 });
 
 describe('migrarParaConta: repetição', () => {
