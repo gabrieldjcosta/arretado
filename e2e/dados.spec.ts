@@ -104,3 +104,96 @@ test('aba aberta avisa quando outra aba sobe o esquema do banco (9.1)', async ({
   await expect(page.getByRole('alert')).toContainText('O Arretado foi atualizado em outra aba.');
   await expect(page.getByRole('alert')).toContainText('Recarregue esta página');
 });
+
+test('menu da Conta: 5 itens em cartões de linha inteira com navegação por teclado', async ({
+  page,
+}) => {
+  await page.goto('/#/conta');
+  await expect(page.getByRole('heading', { level: 1, name: 'Conta e ajustes' })).toBeVisible();
+
+  const rotulos = [
+    'Aparência',
+    'Perfis de estudo',
+    'Dados',
+    'Privacidade e segurança',
+    'Orientações',
+  ];
+
+  for (const rotulo of rotulos) {
+    const link = page.getByRole('link', { name: new RegExp(rotulo) });
+    await expect(link).toBeVisible();
+    const box = await link.boundingBox();
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+  }
+
+  // Navegação por teclado: foco passa de um cartão para o próximo com Tab
+  const linkAparencia = page.getByRole('link', { name: /Aparência/ });
+  await linkAparencia.focus();
+  await expect(linkAparencia).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: /Perfis de estudo/ })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: /Dados/ })).toBeFocused();
+});
+
+test('como guardar o backup e exportar frases e resumos em texto puro (.txt)', async ({ page }) => {
+  await page.goto('/#/conta/dados');
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Como guardar seu backup' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('“Exportar” baixa um arquivo com tudo o que você estudou'),
+  ).toBeVisible();
+  await expect(page.getByText('Guarde fora deste aparelho')).toBeVisible();
+  await expect(page.getByText('Para voltar, use “Importar”')).toBeVisible();
+
+  // Exportar em texto quando ainda não há dados
+  await expect(page.getByRole('heading', { level: 2, name: 'Exportar em texto' })).toBeVisible();
+  await expect(
+    page.getByText(
+      'Arquivo sem senha, para ler ou guardar onde quiser. Não serve para restaurar; para isso, use o backup.',
+    ),
+  ).toBeVisible();
+
+  const botaoFrasesSemDado = page.getByRole('button', { name: 'Nenhuma frase ainda' });
+  const botaoResumosSemDado = page.getByRole('button', { name: 'Nenhum resumo ainda' });
+  await expect(botaoFrasesSemDado).toBeDisabled();
+  await expect(botaoResumosSemDado).toBeDisabled();
+
+  // Registrar frase correta
+  await page.goto('/#/recall/registrar');
+  await page
+    .getByLabel('Frase correta')
+    .fill('O dolo eventual é compatível com a tentativa no júri.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+
+  // Criar resumo
+  await page.goto('/#/biblioteca/resumos/novo');
+  await page.getByLabel('Título (opcional)').fill('Controle Difuso');
+  await page.getByLabel('Resumo').fill('O controle difuso pode ser exercido por qualquer juiz.');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByRole('heading', { name: 'Controle Difuso' })).toBeVisible();
+
+  // Voltar a Dados e verificar botões habilitados e download
+  await page.goto('/#/conta/dados');
+  const botaoFrases = page.getByRole('button', { name: 'Frases corretas (.txt)' });
+  const botaoResumos = page.getByRole('button', { name: 'Resumos (.txt)' });
+  await expect(botaoFrases).toBeEnabled();
+  await expect(botaoResumos).toBeEnabled();
+
+  const dlFrases = page.waitForEvent('download');
+  await botaoFrases.click();
+  const arqFrases = await dlFrases;
+  expect(arqFrases.suggestedFilename()).toMatch(/^arretado-frases-\d{4}-\d{2}-\d{2}\.txt$/);
+  const textoFrases = await readFile(await arqFrases.path(), 'utf-8');
+  expect(textoFrases).toContain('O dolo eventual é compatível com a tentativa no júri.');
+
+  const dlResumos = page.waitForEvent('download');
+  await botaoResumos.click();
+  const arqResumos = await dlResumos;
+  expect(arqResumos.suggestedFilename()).toMatch(/^arretado-resumos-\d{4}-\d{2}-\d{2}\.txt$/);
+  const textoResumos = await readFile(await arqResumos.path(), 'utf-8');
+  expect(textoResumos).toContain('Controle Difuso');
+  expect(textoResumos).toContain('O controle difuso pode ser exercido por qualquer juiz.');
+});
