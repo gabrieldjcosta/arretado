@@ -111,7 +111,7 @@ export function pares() {
   p.push(
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
-    // Botão primário: Terracota (claro) ou Solace (escuro) com o texto da ação; no bloco-herói, Solace.
+    // Botão primário: Sol com o texto Marinho (nos dois temas e no bloco-herói).
     ['acao-texto', 'acao', 4.5],
     ['bloco-acao-texto', 'bloco-acao', 4.5],
     ['bloco-acao', 'bloco-fundo', 3],
@@ -171,7 +171,7 @@ export function medir(tema) {
     razao(cor('texto-atenuado'), camada),
   );
 
-  // Régua de leitura (Areia a 45% no claro, Solace a 16% no escuro): texto e atenuado sobre ela,
+  // Régua de leitura (--regua-fundo: Sol a 20%): texto e atenuado sobre ela,
   // na superfície e no fundo.
   for (const f of SUPERFICIES) {
     const regua = sobre(cor('regua-fundo'), cor(f));
@@ -180,7 +180,7 @@ export function medir(tema) {
     juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
   }
 
-  // Selo e interruptor em Acqua: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
+  // Selo e interruptor em Verde-foco: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
   // texto do tema não serve, então o par é o do selo: branco sobre acqua-fundo).
   juntar('branco', 'acqua-fundo', 4.5, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('acqua-fundo')));
 
