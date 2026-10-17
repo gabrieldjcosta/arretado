@@ -17,6 +17,13 @@ const args = {};
 for (let i = 2; i < process.argv.length; i += 2) {
   args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
 }
+// Sem estes, o Orca abre um worker com tarefa vazia numa worktree "undefined" (aconteceu em 17/10/2026).
+if (!args.agent || !args.nome || !(args.task || (args.contrato && args.branch && args.titulo))) {
+  console.error(
+    'uso: --agent <id> --nome <worktree> e (--task <id> | --contrato <arq> --branch <b> --titulo <t>)',
+  );
+  process.exit(2);
+}
 const run = args.run ?? 'run_02de16405a67';
 const base = args.base ?? 'origin/integracao';
 
@@ -46,7 +53,8 @@ const terminalDoAgente = (json, saida) =>
 const despachoDe = (saida) => /ctx_[0-9a-f]+/.exec(saida)?.[0];
 const tarefaDe = (saida) => /task_[0-9a-f]+/.exec(saida)?.[0];
 
-const OCUPADO = /esc to interrupt|Running|Thinking|Analyzing|Reading|Working|[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⣾⣽⣻⢿⡿⣟⣯⣷]/;
+const OCUPADO =
+  /esc to interrupt|esc to cancel|Running|Thinking|Analyzing|Reading|Working|[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⣾⣽⣻⢿⡿⣟⣯⣷]/;
 
 // O `tui-idle` do Orca dispara quando a tela desenha, mas o dsh-tui ainda carrega
 // ("Starting DSH…", "Checking…") por até ~2 min e descarta o que chega nesse meio-tempo.
