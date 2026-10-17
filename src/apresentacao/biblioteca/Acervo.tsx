@@ -22,6 +22,7 @@ import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { disciplinasSugeridas } from '../../dominios/acervo/vinculos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { EscolherDisciplinas } from './EscolherDisciplinas';
+import './estilos-acervo.css';
 
 const TITULO_DO_TIPO: Record<TipoDoAcervo, string> = {
   norma: 'normas',
@@ -337,22 +338,28 @@ export function Acervo() {
                   <ul className="lista-simples">
                     {g.itens.map((i) => {
                       const jaTem = adicionadas.has(i.id);
+                      const escolhido = !jaTem && marcados.has(i.id);
                       const parecida = jaTem ? undefined : normaParecida(i, minhas.coladas);
                       const subtitulos = i.vinculos
                         .filter((v) => modo === 'tipo' || v.disciplina === g.titulo)
                         .flatMap((v) => (v.subtitulo ? [v.subtitulo] : []));
                       return (
                         <li key={i.id}>
-                          <label className="item-acervo">
-                            <input
-                              type="checkbox"
-                              checked={jaTem || marcados.has(i.id)}
-                              disabled={jaTem || ocupado}
-                              onChange={() => {
-                                alternar(i.id);
-                              }}
-                            />
-                            <span>
+                          <button
+                            type="button"
+                            className={`item-acervo-botao${escolhido ? ' selecionado' : ''}`}
+                            aria-pressed={escolhido}
+                            disabled={jaTem || ocupado}
+                            onClick={() => {
+                              alternar(i.id);
+                            }}
+                          >
+                            {escolhido && (
+                              <span className="item-acervo-icone" aria-hidden="true">
+                                ✓
+                              </span>
+                            )}
+                            <span className="item-acervo-corpo">
                               <strong>{i.titulo}</strong>
                               <span className="dica">
                                 {' '}
@@ -360,22 +367,23 @@ export function Acervo() {
                                 {subtitulos.length > 0 && ` · ${subtitulos.join(', ')}`}
                               </span>
                             </span>
-                          </label>
+                          </button>
                           {!jaTem && (
-                            <p className="dica">
-                              Disciplina:{' '}
+                            <p className="dica item-acervo-disciplina">
+                              Disciplinas sugeridas:{' '}
                               {(disciplinasEscolhidas.get(i.id) ?? disciplinasSugeridas(i)).join(
                                 ', ',
                               ) || 'Outros'}{' '}
                               <button
                                 type="button"
+                                className="botao-texto"
                                 disabled={ocupado}
-                                aria-label={`Mudar a disciplina de ${i.titulo}`}
+                                aria-label={`Alterar a disciplina de ${i.titulo}`}
                                 onClick={() => {
                                   setEscolhendo(i);
                                 }}
                               >
-                                Mudar
+                                Alterar disciplina
                               </button>
                             </p>
                           )}
@@ -398,11 +406,25 @@ export function Acervo() {
                               </button>
                             </p>
                           )}
-                          {i.avisos.map((a) => (
-                            <p key={a} className="aviso">
-                              {a}
+                          {i.avisos.length === 1 ? (
+                            <p className="aviso-compacto dica">
+                              <span className="aviso-compacto-icone" aria-hidden="true">
+                                ⓘ
+                              </span>{' '}
+                              <span>{i.avisos[0]}</span>
                             </p>
-                          ))}
+                          ) : i.avisos.length > 1 ? (
+                            <ul className="avisos-compactos dica">
+                              {i.avisos.map((a) => (
+                                <li key={a}>
+                                  <span className="aviso-compacto-icone" aria-hidden="true">
+                                    ⓘ
+                                  </span>{' '}
+                                  <span>{a}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
                         </li>
                       );
                     })}

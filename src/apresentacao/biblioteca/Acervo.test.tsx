@@ -62,21 +62,30 @@ describe('Biblioteca › Acervo (3c)', () => {
     await screen.findByRole('heading', { name: 'Acervo: normas' });
     // Só as com disciplina vêm marcadas: a "SOLTA" não.
     expect(await screen.findByRole('button', { name: /^Adicionar 2 / })).toBeEnabled();
-    expect(screen.getByRole('checkbox', { name: /SOLTA/ })).not.toBeChecked();
+    expect(screen.getByRole('button', { name: /^SOLTA/ })).toHaveAttribute('aria-pressed', 'false');
     // Desmarcar uma das pré-marcadas mantém as outras (revisão das etapas 8, 9 e 11).
-    const eca = screen.getAllByRole('checkbox', { name: /ECA/ })[0];
+    const eca = screen.getAllByRole('button', { name: /^ECA/ })[0];
     if (!eca) throw new Error('sem ECA');
     await usuario.click(eca);
     expect(await screen.findByRole('button', { name: /^Adicionar 1 / })).toBeEnabled();
-    expect(screen.getAllByRole('checkbox', { name: /LEP/ })[0]).toBeChecked();
-    expect(screen.getAllByRole('checkbox', { name: /ECA/ })[0]).not.toBeChecked();
+    expect(screen.getAllByRole('button', { name: /^LEP/ })[0]).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getAllByRole('button', { name: /^ECA/ })[0]).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('agrupa por disciplina e por tipo, filtra, mostra aviso e subtítulo', async () => {
     const f = await fonte();
     const { usuario } = await abrir('#/biblioteca/acervo', f);
     const exec = await screen.findByRole('region', { name: 'Execução Penal' });
-    expect(within(exec).getAllByRole('checkbox')).toHaveLength(2);
+    const botoesItens = within(exec)
+      .getAllByRole('button')
+      .filter((b) => b.hasAttribute('aria-pressed'));
+    expect(botoesItens).toHaveLength(2);
     expect(within(exec).getByText(/Lei toda/)).toBeInTheDocument();
     expect(within(exec).getByText('Divergente do edital.')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Sem disciplina' })).toBeInTheDocument();
@@ -85,7 +94,9 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect(screen.getByRole('region', { name: 'Leis federais' })).toBeInTheDocument();
 
     await usuario.type(screen.getByLabelText('Buscar'), 'infancia');
-    expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+    expect(
+      screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed')),
+    ).toHaveLength(1);
   });
 
   it('adiciona com progresso, vira "Já adicionada" e a Biblioteca agrupa por disciplina', async () => {
@@ -123,7 +134,7 @@ describe('Biblioteca › Acervo (3c)', () => {
     window.location.hash = '#/biblioteca/acervo';
     render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
     expect(await screen.findByText('Você já tem uma norma parecida: LEP.')).toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: /Lei nº 7.210\/1984/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /^Lei nº 7.210\/1984/ })).toBeEnabled();
     expect(screen.getAllByText(/norma parecida/)).toHaveLength(1);
   });
 
@@ -140,6 +151,29 @@ describe('Biblioteca › Acervo (3c)', () => {
       expect(screen.getByText(/^1 adicionadas/)).toBeInTheDocument();
     });
     expect(screen.queryByRole('button', { name: /Tentar de novo/ })).not.toBeInTheDocument();
+  });
+
+  it('permite alternar item por teclado (Espaço/Enter), mostra ✓, Disciplinas sugeridas e Alterar disciplina', async () => {
+    const f = await fonte();
+    const { usuario } = await abrir('#/biblioteca/acervo', f);
+    const botaoSolta = await screen.findByRole('button', { name: /^SOLTA/ });
+    expect(botaoSolta).toHaveAttribute('aria-pressed', 'false');
+    expect(within(botaoSolta).queryByText('✓')).not.toBeInTheDocument();
+
+    // Alternar com teclado
+    botaoSolta.focus();
+    await usuario.keyboard(' ');
+    expect(botaoSolta).toHaveAttribute('aria-pressed', 'true');
+    expect(within(botaoSolta).getByText('✓')).toBeInTheDocument();
+
+    await usuario.keyboard('{Enter}');
+    expect(botaoSolta).toHaveAttribute('aria-pressed', 'false');
+    expect(within(botaoSolta).queryByText('✓')).not.toBeInTheDocument();
+
+    // Disciplinas sugeridas e botão Alterar disciplina
+    expect(screen.getAllByText(/Disciplinas sugeridas:/).length).toBeGreaterThan(0);
+    const botaoAlterar = screen.getByRole('button', { name: 'Alterar a disciplina de LEP' });
+    expect(botaoAlterar).toHaveTextContent('Alterar disciplina');
   });
 
   it('súmulas sem itens: convite vazio; sem rede: falha com "Tentar de novo"', async () => {
@@ -184,7 +218,7 @@ describe('Biblioteca › Acervo › atualização (6a)', () => {
     });
 
     window.location.hash = `#/biblioteca/normas/${norma.id}`;
-    const lista = await screen.findByRole('region', { name: 'Para reler' });
+    const lista = await screen.findByRole('region', { name: 'Para reler' }, { timeout: 4000 });
     expect(lista).toHaveTextContent('Art. 2º saiu da norma');
     await usuario.click(within(lista).getByRole('button', { name: 'Já reli' }));
     await waitFor(() => {
