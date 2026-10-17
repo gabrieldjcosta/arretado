@@ -1390,6 +1390,10 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** pontos de restauração, logs de importação e espaços separados ficam só na cópia anterior; restaurar um ponto da origem no banco da conta seria importar outra identidade (modo 6) e trocaria o `usuarioId` do banco de volta para o local.
 - **Solução prevista:** não copiar essas coleções (como hoje); "Desfazer importação" de antes da conta só pela cópia anterior.
 
+### Por que a migração copia banco a banco, e não pela restauração integral (A4, decisão provisória de 17/10/2026)
+- **Causa:** a restauração integral (`importar.ts`, modo 6) foi feita para trocar de aparelho: com pacote de outra identidade, o banco adota o `usuarioId` do pacote (o local, não o `uid` da conta), gera `aparelhoId` novo e reescreve o log com carimbos novos. Na migração isso quebraria a identidade da conta e o relógio do aparelho, e o hash da verificação não bateria com a origem.
+- **Solução:** `migrar-para-conta.ts` lê a origem numa transação e grava no banco `arretado-c-<uid>` registros, log (`seq`, `ts`, `aparelhoId`) e binários iguais; só o `usuarioId` vira o `uid`. Snapshots (e o conteúdo deles), logs de importação e espaços separados, com as entradas de log, ficam só na cópia anterior (teste "as coleções só locais…" em `migrar-para-conta.test.ts`). Aprovada pelo coordenador em caráter provisório; a decisão final é do Gabriel no portão A. Se algum dia a migração passar a usar o modo 6, mudar antes a adoção de identidade dele.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

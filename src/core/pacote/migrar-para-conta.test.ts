@@ -277,6 +277,48 @@ describe('migrarParaConta: sucesso', () => {
     expect(await fotografia(origem.db.name)).toBe(antes);
   });
 
+  it('as coleções só locais e o log delas ficam na cópia anterior, fora do banco da conta', async () => {
+    const { repo: origem, ids } = await prepararOrigem();
+    const usuarioLocal = origem.ctx.usuarioId;
+    const soLocais = new Set<string>(SO_LOCAIS);
+    expect([...soLocais].sort()).toEqual(['espacos', 'logsImportacao', 'snapshots']);
+    const registrosAntes = new Map<NomeColecao, unknown[]>();
+    for (const nome of SO_LOCAIS) {
+      const lista = porId(await origem.db.tabela(nome).toArray());
+      expect(lista.length, nome).toBeGreaterThan(0);
+      registrosAntes.set(nome, lista);
+    }
+    const logLocalAntes = (await origem.db.alteracoes.toArray()).filter((a) =>
+      soLocais.has(a.colecao),
+    );
+    expect(new Set(logLocalAntes.map((a) => a.colecao))).toEqual(soLocais);
+    const conteudoSnapshot = await origem.db.snapshotsConteudo.get(ids.snapshot);
+    expect(conteudoSnapshot).toBeDefined();
+
+    const r = await migrarParaConta(origem, opcoes(registroDeTeste()).o);
+    expect(r.tipo).toBe('concluida');
+
+    // Banco da conta: nenhum registro, nenhuma entrada de log, nenhum binário de snapshot.
+    const conta = await abrirConta();
+    abertos.push(conta);
+    for (const nome of SO_LOCAIS) expect(await conta.db.tabela(nome).count(), nome).toBe(0);
+    expect(await conta.db.snapshotsConteudo.count()).toBe(0);
+    expect((await conta.db.alteracoes.toArray()).filter((a) => soLocais.has(a.colecao))).toEqual(
+      [],
+    );
+
+    // Cópia anterior: tudo continua lá, com a identidade local.
+    for (const nome of SO_LOCAIS) {
+      const depois = porId(await origem.db.tabela(nome).toArray());
+      expect(depois, nome).toEqual(registrosAntes.get(nome));
+      expect(depois.every((x) => x.usuarioId === usuarioLocal)).toBe(true);
+    }
+    expect((await origem.db.alteracoes.toArray()).filter((a) => soLocais.has(a.colecao))).toEqual(
+      logLocalAntes,
+    );
+    expect(await origem.db.snapshotsConteudo.get(ids.snapshot)).toEqual(conteudoSnapshot);
+  });
+
   it('o hash não depende do uid: a mesma origem dá o mesmo hash em contas diferentes', async () => {
     const a = await prepararOrigem();
     const b = await prepararOrigem();
