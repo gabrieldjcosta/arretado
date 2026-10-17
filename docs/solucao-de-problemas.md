@@ -1394,6 +1394,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** a restauração integral (`importar.ts`, modo 6) foi feita para trocar de aparelho: com pacote de outra identidade, o banco adota o `usuarioId` do pacote (o local, não o `uid` da conta), gera `aparelhoId` novo e reescreve o log com carimbos novos. Na migração isso quebraria a identidade da conta e o relógio do aparelho, e o hash da verificação não bateria com a origem.
 - **Solução:** `migrar-para-conta.ts` lê a origem numa transação e grava no banco `arretado-c-<uid>` registros, log (`seq`, `ts`, `aparelhoId`) e binários iguais; só o `usuarioId` vira o `uid`. Snapshots (e o conteúdo deles), logs de importação e espaços separados, com as entradas de log, ficam só na cópia anterior (teste "as coleções só locais…" em `migrar-para-conta.test.ts`). Aprovada pelo coordenador em caráter provisório; a decisão final é do Gabriel no portão A. Se algum dia a migração passar a usar o modo 6, mudar antes a adoção de identidade dele.
 
+### Depois de entrar, foi para a migração sem ter nada a migrar (ou não foi, tendo) (A4)
+- **Causa:** a tela Entrar mandava sempre para `#/conta/migracao`.
+- **Solução:** `destinoDepoisDeEntrar` (`conta/entrar/destino.ts`) usa `haMigracaoPendente`: migração só com estudo no banco sem conta (além da identidade que nasce ao abrir o app) e sem marca `concluida`; senão `#/conta`. O retorno do Google (`retorno.ts`) ainda leva sempre a `#/conta`: quem entra pelo Google não é levado à migração.
+
+### E2E `conta-migracao.spec.ts` falha em "heading Entrar" ou mostra "Tela não encontrada" (A4)
+- **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
+- **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

@@ -1,6 +1,10 @@
 import { test, expect, semViolacoes } from './apoio';
 
 test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
+  // O build do E2E não liga `VITE_CONTA`, então /conta/entrar e /conta/migracao não existem; e,
+  // ligada, a tela Entrar falaria com o Supabase real (e-mail de verdade). Volta a rodar quando houver
+  // serviço de conta falso no build de teste (escolha técnica pendente com o Gabriel).
+  test.fixme();
   test('estudar sem conta, entrar, migrar, ver a cópia em Dados e axe nos 2 temas', async ({
     page,
   }) => {
