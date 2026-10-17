@@ -13,6 +13,7 @@ export function FecharDia() {
   const texto = useVoz();
   const repo = useRepositorio();
   const [versao, setVersao] = useState(0);
+  const [falhou, setFalhou] = useState(false);
   const carregar = useCallback(
     (r: Repositorio) => resumoDoDia(r).then((x) => ({ x, versao })),
     [versao],
@@ -31,11 +32,14 @@ export function FecharDia() {
     r.frasesRevisadas > 0 ? plural(r.frasesRevisadas, 'Frase revisada', 'Frases revisadas') : '',
   ].filter(Boolean);
   const mudar = (acao: (rep: Repositorio) => Promise<unknown>) => {
+    setFalhou(false);
     acao(repo).then(
       () => {
         setVersao((v) => v + 1);
       },
-      () => undefined,
+      () => {
+        setFalhou(true);
+      },
     );
   };
   return (
@@ -60,7 +64,7 @@ export function FecharDia() {
         </>
       ) : (
         <>
-          <h2 className="fechar-dia-titulo">Hoje</h2>
+          <h2 className="fechar-dia-titulo">Resumo do Dia</h2>
           <p className="fechar-dia-texto">{partes.join(' · ')}.</p>
           {r.proximoPasso && (
             <p className="fechar-dia-passo">
@@ -79,6 +83,11 @@ export function FecharDia() {
             Fechar o Dia
           </button>
         </>
+      )}
+      {falhou && (
+        <p role="alert" className="dica">
+          Problema ao salvar. Seu Dia segue como estava; tente de novo.
+        </p>
       )}
     </section>
   );

@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
-    "test": "vitest run --project unidade",
+    "test": "vitest run --project unidade --exclude src/dominios/legislacao/desempenho.test.ts && vitest run --project unidade src/dominios/legislacao/desempenho.test.ts",
     "test:watch": "vitest --project unidade",
     "test:e2e": "playwright test",
     "audit": "npm audit --audit-level=high",
