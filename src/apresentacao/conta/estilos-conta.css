@@ -1,0 +1,126 @@
+/* Conta e dados (pacote UI F, 16/10/2026): menu em cartões de linha inteira e exportação em texto.
+   Só tokens existentes de cor; alvos ≥ 44 px; contraste AA nos dois temas. */
+
+.menu-conta-lista {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-conta-lista > li {
+  margin: 0;
+  padding: 0;
+}
+
+.cartao-link-conta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.875rem 1rem;
+  border-radius: var(--raio-cartao, 16px);
+  border: 1px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+@media (hover: hover) {
+  .cartao-link-conta:hover {
+    background: color-mix(in srgb, var(--texto) 5%, var(--superficie));
+    border-color: color-mix(in srgb, var(--borda) 60%, var(--texto));
+  }
+}
+
+.cartao-link-conta:active {
+  transform: scale(0.995);
+}
+
+.cartao-link-conta:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.cartao-link-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  color: var(--foco, currentColor);
+}
+
+.cartao-link-icone svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.cartao-link-texto {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.cartao-link-titulo {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--texto);
+  line-height: 1.3;
+}
+
+.cartao-link-conta .dica {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--texto-atenuado);
+  line-height: 1.3;
+}
+
+.cartao-link-seta {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  line-height: 1;
+}
+
+/* Como guardar seu backup */
+.como-guardar-backup {
+  margin-bottom: 1.25rem;
+}
+
+.passos-backup {
+  margin: 0.75rem 0;
+  padding-inline-start: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--texto);
+}
+
+.passos-backup li {
+  line-height: 1.4;
+}
+
+/* Exportar em texto */
+.exportar-texto-secao {
+  margin-top: 1.25rem;
+}
+
+.exportar-texto-secao .dica {
+  margin: 0.5rem 0 1rem;
+}
+
+.botoes-exportar-texto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}

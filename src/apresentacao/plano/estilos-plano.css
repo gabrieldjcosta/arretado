@@ -1,0 +1,76 @@
+/* Folha de estilo do Plano (UI-C) */
+
+.plano-vazio-caminhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+  justify-content: center;
+  margin-top: var(--espaco-3);
+}
+
+.plano-vazio-caminhos .botao {
+  min-height: var(--alvo);
+  text-decoration: none;
+}
+
+.plano-importar-bloco.afastado,
+.vazio + .plano-importar-bloco {
+  margin-top: var(--espaco-5);
+}
+
+.importar-ajuda-ia {
+  margin: var(--espaco-3) 0;
+}
+
+.importar-ajuda-ia summary {
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.importar-ajuda-ia-conteudo {
+  margin-top: var(--espaco-2);
+}
+
+.importar-prompt-bloco {
+  margin: var(--espaco-2) 0;
+}
+
+.importar-prompt-texto {
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-campo);
+  padding: var(--espaco-3);
+  font-family: monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 240px;
+  overflow-y: auto;
+  color: var(--texto);
+  margin: 0 0 var(--espaco-2);
+}
+
+.importar-opcoes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espaco-3);
+  align-items: start;
+  margin-top: var(--espaco-3);
+}
+
+@media (min-width: 640px) {
+  .importar-opcoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.importar-colado-campo textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.importar-colado-acoes {
+  margin-top: var(--espaco-2);
+}

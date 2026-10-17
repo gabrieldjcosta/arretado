@@ -9,6 +9,8 @@ import {
   publicarVersao,
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
+import type { ItemDoAcervo } from '../../dominios/acervo/esquemas';
+import { FonteEmMemoria } from '../../dominios/acervo/fonte-em-memoria';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
@@ -36,9 +38,42 @@ async function rascunho(repo: Repositorio, tituloCurto: string) {
   return versao;
 }
 
-/** A lista completa fica recolhida até escolher disciplina (ou critério): "Todas as normas" a abre. */
-async function abrirTodas(usuario: ReturnType<typeof userEvent.setup>) {
-  await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
+/** Edital do plano com uma disciplina; o acervo de teste conhece "Execução Penal". */
+async function plano(repo: Repositorio, titulo: string, disciplina: string) {
+  const edital = await repo.colecao('editais').criar({ titulo, versao: 1 });
+  await repo.colecao('disciplinas').criar({ nome: disciplina, editalId: edital.id });
+}
+
+const itemDoAcervo = (id: string): ItemDoAcervo => ({
+  id,
+  versao: 1,
+  norma: { tituloCurto: id.toUpperCase(), tipo: 'Lei', esfera: 'federal' },
+  nos: [
+    {
+      endereco: 'art1',
+      categoria: 'normativo',
+      tipo: 'artigo',
+      rotulo: 'Art. 1º',
+      status: 'vigente',
+      confianca: 'alta',
+      trechos: [{ texto: 'Texto.' }],
+    },
+  ],
+});
+
+async function abrirComAcervo(repo: Repositorio) {
+  const fonte = await FonteEmMemoria.criar([
+    { item: itemDoAcervo('lep'), vinculos: [{ disciplina: 'Execução Penal' }] },
+  ]);
+  window.location.hash = '#/biblioteca';
+  render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={fonte} />);
+  await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
+}
+
+/** Vincula a norma já publicada a uma disciplina do usuário. */
+async function vincular(repo: Repositorio, normaId: string, nome: string) {
+  const d = await repo.colecao('disciplinas').criar({ nome });
+  await repo.colecao('vinculosDisciplina').criar({ normaId, disciplinaId: d.id });
 }
 
 describe('Biblioteca › Normas (9.5)', () => {
@@ -59,12 +94,42 @@ describe('Biblioteca › Normas (9.5)', () => {
     );
   });
 
+  it('vazio sem plano: só acervo e importar, sem botão de edital', async () => {
+    const { repo } = await repositorioDeTeste();
+    await abrirComAcervo(repo);
+
+    await screen.findByRole('heading', { name: 'Nenhuma norma ainda' });
+    expect(screen.getByRole('link', { name: 'Escolher no acervo' })).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Importar norma' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Tudo do edital/ })).not.toBeInTheDocument();
+  });
+
+  it('vazio com plano do edital que o acervo conhece: "Tudo do edital de <nome>"', async () => {
+    const { repo } = await repositorioDeTeste();
+    await plano(repo, 'DPE-SP', 'Execução Penal');
+    await abrirComAcervo(repo);
+
+    expect(await screen.findByRole('link', { name: 'Tudo do edital de DPE-SP' })).toHaveAttribute(
+      'href',
+      '#/biblioteca/acervo?tudo=1',
+    );
+    expect(screen.getByRole('link', { name: 'Escolher no acervo' })).not.toHaveClass('principal');
+  });
+
+  it('vazio com edital sem vínculo no acervo: sem botão de edital', async () => {
+    const { repo } = await repositorioDeTeste();
+    await plano(repo, 'Concurso próprio', 'Tributário');
+    await abrirComAcervo(repo);
+
+    await screen.findByRole('heading', { name: 'Nenhuma norma ainda' });
+    expect(screen.queryByRole('link', { name: /Tudo do edital/ })).not.toBeInTheDocument();
+  });
+
   it('lista só as publicadas; o rascunho fica na faixa, com Retomar', async () => {
     const { repo } = await repositorioDeTeste();
     await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     const pendente = await rascunho(repo, 'ECA');
-    const usuario = await abrirBiblioteca(repo);
-    await abrirTodas(usuario);
+    await abrirBiblioteca(repo);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByText('LEP')).toBeInTheDocument();
@@ -80,10 +145,7 @@ describe('Biblioteca › Normas (9.5)', () => {
       'href',
       '#/biblioteca/acervo?tipo=norma',
     );
-    expect(within(lista).getByRole('link', { name: 'Tudo do edital da DPE-SP' })).toHaveAttribute(
-      'href',
-      '#/biblioteca/acervo?tudo=1',
-    );
+    expect(within(lista).queryByRole('link', { name: /^Tudo do edital/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Nenhuma norma ainda' })).not.toBeInTheDocument();
 
     const faixa = screen.getByRole('region', { name: 'Importações pendentes' });
@@ -150,7 +212,6 @@ describe('Biblioteca › Normas (9.5)', () => {
     await usuario.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }),
     );
-    await abrirTodas(usuario);
     expect(
       within(await screen.findByRole('region', { name: 'Normas' })).getByText('LEP'),
     ).toBeInTheDocument();
@@ -169,7 +230,7 @@ describe('Biblioteca › Normas (9.5)', () => {
     await gravarPosicao(repo, eca.id, await primeiro(eca.id));
     relogio.avancar(60 * 60_000);
     await gravarPosicao(repo, lep.id, await primeiro(lep.id));
-    const usuario = await abrirBiblioteca(repo);
+    await abrirBiblioteca(repo);
 
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
@@ -178,7 +239,6 @@ describe('Biblioteca › Normas (9.5)', () => {
     const agora = screen.getByRole('region', { name: 'Agora' });
     expect(within(agora).getByRole('heading')).toHaveTextContent(/^Você parou no .+ da LEP$/);
     expect(agora).toHaveTextContent(/cerca de \d+ min/);
-    await abrirTodas(usuario);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
@@ -205,40 +265,85 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(screen.queryByRole('link', { name: /Continuar leitura/ })).not.toBeInTheDocument();
   });
 
-  it('a lista completa só aparece depois de escolher disciplina; ano e tipo também a abrem', async () => {
+  it('agrupa por disciplina em seções retráteis; a norma sem disciplina vai para "Outras"', async () => {
     const { repo } = await repositorioDeTeste();
-    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
     await publicarVersao(repo, (await rascunho(repo, 'ECA')).id);
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    await vincular(repo, lep.id, 'Execução Penal');
+    await vincular(repo, lep.id, 'Penal');
     const usuario = await abrirBiblioteca(repo);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
-    expect(within(lista).queryByRole('link', { name: /^LEP/ })).not.toBeInTheDocument();
-    expect(within(lista).getByRole('status')).toHaveTextContent('Escolha uma disciplina');
-    const disciplinas = within(lista).getByRole('group', { name: 'Disciplinas' });
-    await usuario.click(within(disciplinas).getByRole('button', { name: /^Sem disciplina/ }));
-    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
-    expect(within(lista).getByRole('link', { name: /^ECA/ })).toBeInTheDocument();
-
-    // Ano e tipo filtram a lista aberta; o ano da referência "7.210/1984" entra nas opções.
-    await usuario.selectOptions(within(lista).getByLabelText('Ano'), '1984');
-    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
-    await usuario.selectOptions(within(lista).getByLabelText('Tipo de norma'), 'Lei');
-    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
-    // Tocar a disciplina de novo recolhe, mas ano/tipo ainda são critério e mantêm a lista.
-    await usuario.click(within(disciplinas).getByRole('button', { name: /^Sem disciplina/ }));
-    expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    const exec = await within(lista).findByRole('group', { name: 'Execução Penal' });
+    expect(exec).toHaveAttribute('open');
+    expect(within(exec).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    // A norma em duas disciplinas aparece nas duas.
+    expect(
+      within(within(lista).getByRole('group', { name: 'Penal' })).getByRole('link', {
+        name: /^LEP/,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(within(lista).getByRole('group', { name: 'Outras' })).getByRole('link', {
+        name: /^CP/,
+      }),
+    ).toBeInTheDocument();
+    // Retrátil por teclado: o resumo recolhe e a escolha fica lembrada.
+    const resumo = within(exec).getByText('Execução Penal').closest('summary');
+    if (!resumo) throw new Error('sem resumo');
+    await usuario.click(resumo);
+    await waitFor(() => {
+      expect(within(lista).getByRole('group', { name: 'Execução Penal' })).not.toHaveAttribute(
+        'open',
+      );
+    });
   });
 
-  it('sem critério e sem "Todas as normas", escolher e desmarcar a disciplina recolhe a lista', async () => {
+  it('com mais de 3 disciplinas os grupos começam fechados', async () => {
     const { repo } = await repositorioDeTeste();
-    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    const nomes = ['A', 'B', 'C', 'D'];
+    for (const nome of nomes) {
+      const n = (await publicarVersao(repo, (await rascunho(repo, 'N' + nome)).id)).norma;
+      await vincular(repo, n.id, nome);
+    }
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    for (const nome of nomes) {
+      expect(await within(lista).findByRole('group', { name: nome })).not.toHaveAttribute('open');
+    }
+  });
+
+  it('busca e filtro combinam, contam e limpam', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    const eca = (await publicarVersao(repo, (await rascunho(repo, 'ECA')).id)).norma;
+    await vincular(repo, lep.id, 'Execução Penal');
+    await vincular(repo, eca.id, 'Infância');
     const usuario = await abrirBiblioteca(repo);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
-    const botao = within(lista).getByRole('button', { name: /^Sem disciplina/ });
-    await usuario.click(botao);
+    await within(lista).findByRole('link', { name: /^LEP/ });
+    expect(within(lista).queryByText(/^\d+ normas?$/)).not.toBeInTheDocument();
+
+    await usuario.type(within(lista).getByLabelText('Buscar norma'), 'zzz');
+    expect(await within(lista).findByText('Nenhuma norma com esse nome.')).toBeInTheDocument();
+
+    await usuario.click(within(lista).getByRole('button', { name: 'Limpar busca' }));
+    expect(await within(lista).findByRole('link', { name: /^ECA/ })).toBeInTheDocument();
     expect(within(lista).getByRole('link', { name: /^LEP/ })).toBeInTheDocument();
-    await usuario.click(botao);
+
+    await usuario.type(within(lista).getByLabelText('Buscar norma'), 'lep');
+    expect(await within(lista).findByText('1 norma')).toBeInTheDocument();
+    expect(within(lista).queryByRole('link', { name: /^ECA/ })).not.toBeInTheDocument();
+
+    // O filtro por disciplina combina com a busca.
+    await usuario.selectOptions(within(lista).getByLabelText('Disciplina'), 'Infância');
+    expect(await within(lista).findByText('Nenhuma norma com esse nome.')).toBeInTheDocument();
+    await usuario.click(within(lista).getByRole('button', { name: 'Limpar busca' }));
+    await usuario.selectOptions(within(lista).getByLabelText('Disciplina'), 'Infância');
+    expect(await within(lista).findByRole('link', { name: /^ECA/ })).toBeInTheDocument();
     expect(within(lista).queryByRole('link', { name: /^LEP/ })).not.toBeInTheDocument();
   });
 });

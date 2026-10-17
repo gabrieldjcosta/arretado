@@ -146,9 +146,7 @@
           "disciplina": "Direito Administrativo"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA: a LC 207/1979 é a Lei Orgânica da Polícia do Estado de SP (não regime disciplinar da DPE); o rótulo \"\"regime disciplinar\"\" do edital não casa com a ementa. Confirmar no edital o contexto da citação (provável aplicação subsidiária via LC 988/2006)."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/1979/lei.complementar-207-05.01.1979.html"
@@ -169,9 +167,7 @@
           "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA: a LC 893/2001 institui o Regulamento Disciplinar da Polícia Militar (não da Defensoria Pública). Norma existe e número/ano conferem; descrição do edital/chunk (\"\"Regime disciplinar da Defensoria Pública SP\"\") parece imprecisa. Última atualização: Lei 18.442/2026."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2001/lei.complementar-893-09.03.2001.html"
@@ -1273,9 +1269,7 @@
           "disciplina": "Direitos Difusos e Coletivos"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA: edital cita 13.512/2026, mas a norma é a Lei 15.512, de 22/09/2026 (publ. DOU 23/09/2026), que altera Leis 6.938, 8.069 e 12.187. Página da Câmara aberta e conferida. URL provável no Planalto (não confirmada): https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15512.htm"
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15512.htm"
@@ -1666,7 +1660,7 @@
           "disciplina": "Direito Administrativo"
         }
       ],
-      "avisos": ["Conferir a norma indicada com o edital."],
+      "avisos": [],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/l15263.htm"
@@ -1866,9 +1860,7 @@
           "disciplina": "Direito Administrativo"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA de descrição: a Lei SP 14.187, de 19/07/2010, trata de penalidades administrativas por atos de discriminação racial (regulamentada pelo Decreto SP 56.153/2010), não de \"\"denúncias administrativas\"\" genéricas. Número/ano casam. Confirmado por resultado de busca (título/ementa/data conferidos no trecho); a abertura direta do domínio foi bloqueada no ambiente (ECONNRESET/403/404 espúrio)."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2010/lei-14187-19.07.2010.html"
@@ -1906,9 +1898,7 @@
           "disciplina": "Direito Administrativo"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA de descrição: a Lei SP 11.199, de 12/07/2002, proíbe a discriminação de pessoas com HIV/AIDS (não \"\"denúncias administrativas\"\"). Número/ano casam. Possível troca na lista (idx 97 e 99 receberam o mesmo apelido). Confirmado por resultado de busca (título/ementa/data conferidos no trecho); a abertura direta do domínio foi bloqueada no ambiente (ECONNRESET/403/404 espúrio)."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/2002/lei-11199-12.07.2002.html"
@@ -2176,9 +2166,7 @@
           "disciplina": "Outros"
         }
       ],
-      "avisos": [
-        "DIVERGÊNCIA de descrição: o Decreto SP 55.334, de 11/01/2010, autoriza a Secretaria da Habitação a firmar convênio com a CDHU para gestão de recursos de auxílio-moradia emergencial (famílias desabrigadas por chuvas em municípios em calamidade) - não é o decreto de \"\"locação social\"\" da Lei 10.365/1999. Número/ano casam. Confirmado por abertura direta da página."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "html",
         "url": "https://www.al.sp.gov.br/repositorio/legislacao/decreto/2010/decreto-55334-11.01.2010.html"

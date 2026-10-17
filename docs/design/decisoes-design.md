@@ -123,3 +123,43 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 **Efeitos.** A F1 (tokens, botões, campos, abas, links, linhas, diálogos) já usa esta paleta. O plano ([`../planos/redesign-v2.md`](../planos/redesign-v2.md)) muda em: F2 (barra reta, "+" simples, cabeçalho), F3 (cartões por estado, captura inline, elementos vetoriais), F6 (Leitor pela especificação) e F9 (Sessão pela especificação). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
 
 > **A conferir depois:** (1) o Agora em Caatinga ou Areia (a); (2) o dock do Leitor com o teclado aberto e em tablet; (3) grifos do leitor contra Areia e Caatinga; (4) a arte do mascote nas poses novas (Determinado) e a origem dos SVGs de cacto, lâmpada e distração; (5) o selo de Acqua com texto branco só passa no passo `#416a63`.
+
+## D-D5 — Padrão do Stitch (projeto 9953616237194891956): marinho, creme e sol, em todas as telas (16/10/2026, material do Gabriel; vale como padrão até ele vetar; substitui a D-D4 onde divergem)
+
+**Origem.** Em 16/10/2026 o Gabriel mandou o HTML da tela Hoje (celular, 390 px) do projeto Stitch `9953616237194891956` e pediu que **todas as outras telas** sigam o mesmo padrão, compatíveis e harmônicas entre si. O link do Stitch não abre do ambiente do Claude (exige login); a leitura vem do HTML colado. Valores e leitura tela a tela: [`referencias/2026-10-16-stitch-hoje/leia-me.md`](referencias/2026-10-16-stitch-hoje/leia-me.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
+
+**Adotado (vem do Stitch):**
+- **Rótulos do menu:** Hoje · **Trilha** (antes Plano) · **Fixar** (antes Recall) · Biblioteca. "Em seguida" no lugar de "Depois". Só texto de tela: rotas, identificadores (`plano`, `recall`, `Depois`) e dados gravados não mudam.
+- **Paleta:** Creme `#fff8ec` (fundo) · Marinho `#14213d` (texto, título, bloco-herói, barra de baixo) · Sol `#ffb627` (botão primário, texto Marinho) · Argila `#c8763a` (etiqueta da matéria) · Verde-foco `#2fa36b` (Frases, "+", "salvo") · Azul-céu `#3ba7f0` (Cartões). Substitui Palha, Caatinga, Terracota, Solace e Acqua; Areia e Tinta saem; a Noite do tema escuro é refeita sobre o Marinho (F1b).
+- **Fundo creme com pontinhos:** `radial-gradient(#d6c9b3 0.75px, transparent 0.75px)` a cada 16 px, só no fundo da página (atende à anotação 2 do Gabriel, de 16/10).
+- **Arranjo (celular):** cabeçalho com "Arretado" + cacto verde e o botão "Conta" (pílula com ícone); título da página com data em minúsculas e o **"+" redondo verde na mesma linha**; **um** cartão Marinho "Agora" (etiqueta da matéria, etiqueta "no seu ritmo", título serifado, trecho da lei em caixa translúcida, **um** botão Sol de largura total "Avançar um tiquinho →"); **"Em seguida"** com até 2 itens numa linha do tempo (ponto verde = Frases, azul = Cartões; título, matéria, duração "4 min"); linha de calma "✓ Seu ponto está salvo neste aparelho."; campo "Para lembrar" com "Salvar"; **barra de baixo em pílula flutuante** Marinho com as 4 áreas e o item atual em destaque.
+
+**Mantido da D-D4 (o Stitch não mostra, ou conflita com regra do produto):**
+- **Fontes:** Atkinson Hyperlegible na interface e Literata na lei. O Stitch usa Playfair Display e Plus Jakarta Sans via Google CDN: carregar de CDN quebra o local-first/offline e envia o IP da pessoa ao Google (T10, LGPD). Padrão: **Playfair Display só nos títulos e na marca "Arretado", hospedada no próprio app (woff2 em `public/`)**; a interface segue em Atkinson, desenhada para leitura difícil. Pergunta 1 abaixo.
+- **Lei sem itálico e destaque sublinhado, nunca fundo** (o Stitch mostra a lei em itálico e o destaque como fundo azul): regra de leitura do `sistema-visual.md`.
+- **Mínimo de 13 px** (0,8125 rem) para qualquer texto e alvo de 44 px. O Stitch usa 10–12 px em etiquetas, na barra e no campo.
+- Sem sequência de dias; mascote só em pontos estratégicos; Calmo; plataformas por largura; vermelho só em excluir e falha técnica.
+
+**Correções de contraste** (medidas em 16/10 com a fórmula do `scripts/contraste.mjs`):
+
+| Par do Stitch | Medido | Uso corrigido |
+|---|---|---|
+| Branco sobre Argila (etiqueta) | 3,4:1 | texto Marinho sobre Argila (4,7:1), corpo ≥ 13 px |
+| Branco sobre Azul-céu (ícone) | 2,6:1 | ícone Marinho sobre Azul-céu, ou um azul mais escuro com branco |
+| Branco sobre Verde-foco ("+", ✓) | 3,2:1 | vale como gráfico (≥ 3:1); como **texto**, usar passo escuro do Verde-foco (a medir; alvo ≥ 4,5:1 sobre Creme) |
+| Verde-foco como texto sobre Creme | 3,0:1 | idem: passo escuro |
+| Placeholder Marinho a 40% | 2,4:1 | rótulo visível "Para lembrar" e placeholder a 70% ou mais |
+| Sol sobre Creme (botão fora do cartão Marinho) | 1,6:1 | borda Marinho de 1,5 px no botão Sol sobre fundo claro |
+| Creme a 60% e 70% sobre Marinho | 6,3 · 8,1:1 | passa |
+| Marinho sobre Sol · Marinho sobre Creme | 9,1 · 15,1:1 | passa |
+
+**O que isto muda nos planos:** [`../planos/redesign-v2.md`](../planos/redesign-v2.md) ganha a **F1b** (tokens e fontes D-D5), antes da F2, e a **F12** (harmonização de todas as telas contra o padrão). A F2 passa a ter a pílula flutuante, o "+" ao lado do título e os rótulos novos; a F3 segue o cartão Agora do Stitch. **Reverte o veto (d) da D-D4** (barra reta, sem pílula), pois o Stitch traz a pílula de volta.
+
+**Respostas do Gabriel (16/10/2026)** às cinco perguntas da D-D5:
+1. **Fontes:** Playfair Display hospedada só em títulos e marca; interface em Atkinson. Confirmado.
+2. **Abas do Fixar:** **Frases · Cartões · Histórico** (três abas; "Erros" deixa de ser aba). Consequência: a lista e o detalhe do Erro passam a ser alcançados pela aba Frases (cada Frase leva ao Erro que a originou, com resultado, situação e causa). Nenhum dado muda; a rota `/recall/erros` fica como alias até a F5 decidir o destino. "Erro" segue como termo de estudo no vocabulário e nos filtros.
+3. **Tablet e desktop:** derivados do celular; a pílula vira barra no alto a partir de 700 px. Confirmado.
+4. **Botão primário nas telas claras:** Sol com texto Marinho e borda Marinho. Confirmado.
+5. **Tema escuro:** fundo em Marinho profundo, cartão Agora em Marinho mais claro, botão Sol igual (valores a medir na F1b). Confirmado.
+6. **Campo "Para lembrar":** serve para a pessoa **anotar o que precisa fazer fora do app** (não é a Frase correta). A **Frase correta é registrada pelo "+"**, que passa a ser o único caminho de captura (D25 continua: só a frase é obrigatória). O "Anote a frase correta" do Hoje sai.
+   - **Como guardar (simples, sem esquema novo):** um campo de texto livre, opcional, em `Preferencias` (`lembrete?: string`), como já foi feito com `destacarCondicionantesEPrazos` (opcional, ausente = vazio, **sem migração**, esquema segue). Sem coleção, sem data, sem lista, sem hora, sem notificação, fora do Recall e do cálculo de "Agora". "Salvar" grava o texto; esvaziar apaga. Entra com o Hoje na F3 (nível B); só se o arquivo de backup rejeitar o campo novo é que vira tarefa de nível A.

@@ -104,11 +104,9 @@ export async function publicar(page: Page, titulo: string) {
   await abrirTodasAsNormas(page);
 }
 
-/** A lista de Normas fica recolhida até escolher disciplina: abre a lista completa (sem fechar se já aberta). */
+/** A lista de Normas já vem agrupada e aberta (até 3 disciplinas): espera a seção aparecer. */
 export async function abrirTodasAsNormas(page: Page) {
-  const botao = page.getByRole('button', { name: 'Todas as normas' });
-  await expect(botao).toBeVisible();
-  if ((await botao.getAttribute('aria-pressed')) !== 'true') await botao.click();
+  await expect(page.getByRole('region', { name: 'Normas' })).toBeVisible();
 }
 
 /** Cola a página compilada do corpus em Importar e publica com o título curto dado. */

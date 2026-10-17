@@ -34,16 +34,88 @@
   list-style: none;
 }
 
+/* Cada matéria é um cartão; o galho dos assuntos tem linha-guia à esquerda. */
+.onboarding-cartao {
+  padding: var(--espaco-2, 0.5rem) var(--espaco-3, 1rem);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-campo, 8px);
+  background: var(--superficie);
+}
+
+.onboarding-cabeca {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2, 0.5rem);
+}
+
+.onboarding-cabeca .onboarding-opcao {
+  flex: 1;
+}
+
+.onboarding-cartao[data-desmarcada] .onboarding-galho,
+.onboarding-cartao[data-desmarcada] .onboarding-assuntos {
+  color: var(--texto-atenuado);
+  border-inline-start-color: var(--borda);
+}
+
 .onboarding-assuntos {
+  margin-inline-start: var(--espaco-2, 0.5rem);
   padding-block: var(--espaco-2, 0.5rem);
   padding-inline-start: var(--espaco-3, 1rem);
+  border-inline-start: 2px solid var(--borda-botao);
+}
+
+.onboarding-assuntos > li {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2, 0.5rem);
+}
+
+.onboarding-assuntos > li > .onboarding-opcao {
+  flex: 1;
 }
 
 .onboarding details > summary {
   display: flex;
   align-items: center;
+  gap: var(--espaco-2, 0.5rem);
   min-height: 44px;
   cursor: pointer;
+  list-style: none;
+}
+
+.onboarding details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.onboarding-seta {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-inline-end: 2px solid currentcolor;
+  border-block-end: 2px solid currentcolor;
+  transform: rotate(-45deg);
+}
+
+.onboarding details[open] > summary .onboarding-seta {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .onboarding-seta {
+    transition: transform 0.15s;
+  }
+}
+
+.onboarding-acrescentar {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin-block: var(--espaco-2, 0.5rem);
+}
+
+.onboarding-acrescentar input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
 }
 
 .onboarding-navegacao {

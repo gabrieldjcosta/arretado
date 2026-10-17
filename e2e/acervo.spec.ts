@@ -64,11 +64,14 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();
   await semViolacoes(page);
 
-  await page.getByRole('link', { name: 'Tudo do edital da DPE-SP' }).click();
+  await page.goto('/#/biblioteca/acervo?tudo=1');
   await expect(page.getByRole('heading', { name: 'Acervo: normas' })).toBeVisible();
   const exec = page.getByRole('region', { name: 'Execução Penal' });
   await expect(exec.getByText('Divergente do edital.')).toBeVisible();
-  await expect(page.getByRole('checkbox', { name: /SOLTA/ })).not.toBeChecked();
+  await expect(page.getByRole('button', { name: /^SOLTA/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
   await semViolacoes(page);
 
   await page.getByRole('button', { name: /^Adicionar 2 / }).click();
@@ -85,9 +88,9 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   );
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
-  const execPenal = page.getByRole('region', { name: 'Execução Penal' });
+  const execPenal = page.getByRole('group', { name: 'Execução Penal' });
   await expect(execPenal.getByText('LEP')).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Infância' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Infância' })).toBeVisible();
   await semViolacoes(page);
   await execPenal.getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByText('Texto do primeiro artigo.')).toBeVisible();
@@ -99,34 +102,34 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
   await servirAcervo(page);
   await page.goto('/#/biblioteca/acervo');
   const lep = page.getByRole('region', { name: 'Execução Penal' });
-  await expect(lep.getByText('Disciplina: Execução Penal')).toBeVisible();
-  await page.getByRole('button', { name: 'Mudar a disciplina de LEP' }).click();
+  await expect(lep.getByText('Disciplinas sugeridas: Execução Penal')).toBeVisible();
+  await page.getByRole('button', { name: 'Alterar a disciplina de LEP' }).click();
   const dialogo = page.getByRole('dialog');
   await semViolacoes(page);
   await dialogo.getByRole('checkbox', { name: 'Execução Penal' }).uncheck();
   await dialogo.getByRole('checkbox', { name: 'Outros' }).check();
   await dialogo.getByRole('button', { name: 'Confirmar' }).click();
-  await expect(page.getByText('Disciplina: Outros').first()).toBeVisible();
+  await expect(page.getByText('Disciplinas sugeridas: Outros').first()).toBeVisible();
 
-  await page.getByRole('checkbox', { name: /LEP/ }).check();
+  await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
   await expect(page.getByText(/1 adicionadas/)).toBeVisible();
 
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
-  await expect(page.getByRole('region', { name: 'Sem disciplina' }).getByText('LEP')).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Outras' }).getByText('LEP')).toBeVisible();
   await page.getByRole('button', { name: 'Mudar a disciplina de LEP' }).click();
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Execução Penal' }).getByText('LEP')).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Execução Penal' }).getByText('LEP')).toBeVisible();
   await semViolacoes(page);
 });
 
 test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ page }) => {
   await servirAcervo(page);
   await page.goto('/#/biblioteca/acervo');
-  await page.getByRole('checkbox', { name: /LEP/ }).check();
+  await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
   await expect(page.getByText(/1 adicionadas/)).toBeVisible();
   await expect(page.getByText('Há versão nova')).toHaveCount(0);
