@@ -15,6 +15,21 @@ import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
+/** Deixa um teste segurar a leitura de uma janela de textos (o IndexedDB responde fora de hora). */
+const leitura = vi.hoisted(() => ({
+  segurar: undefined as ((inicio: number) => Promise<void> | undefined) | undefined,
+}));
+vi.mock('../../dominios/legislacao/leitor', async (original) => {
+  const real = await original<typeof import('../../dominios/legislacao/leitor')>();
+  return {
+    ...real,
+    lerJanela: async (...args: Parameters<typeof real.lerJanela>) => {
+      await leitura.segurar?.(args[2].inicio);
+      return real.lerJanela(...args);
+    },
+  };
+});
+
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
 const LEI: Bloco[] = [
   linha('LEI Nº 7.210, DE 11 DE JULHO DE 1984.'),
@@ -543,6 +558,56 @@ describe('posição lembrada e "lido até" (9.7)', () => {
       { timeout: 2000 },
     );
     expect((await obterLeitura(repo, norma.id))?.lidoAteId).toBe(idDe('art1.incI'));
+  });
+
+  it('a volta à posição espera os textos em volta chegarem: com eles o tamanho das linhas muda', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, blocosDeNormaSintetica(1000), 'Sintética');
+    const aberta = await abrirNorma(repo, norma.id);
+    await gravarPosicao(repo, norma.id, aberta.nos[600]!.dispositivo.id);
+    // O jsdom não rola nem tem altura de página (o virtualizador limita o destino a ela): a rolagem
+    // pedida vira a posição da janela, como no navegador.
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      value: 1_000_000,
+      configurable: true,
+    });
+    vi.spyOn(window, 'scrollTo').mockImplementation(((opcoes: ScrollToOptions) => {
+      Object.defineProperty(window, 'scrollY', { value: opcoes.top ?? 0, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+    }) as typeof window.scrollTo);
+    // A janela de textos em volta da posição vem com a abertura; as outras, que o leitor pede ao
+    // desenhar a lista, demoram.
+    const liberar: (() => void)[] = [];
+    let pedidas = 0;
+    leitura.segurar = () => {
+      if (!document.querySelector('.lista-leitor')) return undefined;
+      pedidas += 1;
+      return new Promise<void>((resolver) => {
+        liberar.push(resolver);
+      });
+    };
+    try {
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await waitFor(
+        () => {
+          expect(pedidas).toBeGreaterThan(0);
+        },
+        { timeout: 5000 },
+      );
+      const lista = document.querySelector('.lista-leitor');
+      // Várias voltas de quadro com a linha no lugar e os textos em falta: ainda não deu a volta.
+      await new Promise((resolver) => setTimeout(resolver, 300));
+      expect(lista).toHaveClass('voltando');
+
+      for (const resolver of liberar) resolver();
+      await waitFor(() => {
+        expect(lista).not.toHaveClass('voltando');
+      });
+      expect(document.querySelectorAll('.texto-carregando')).toHaveLength(0);
+    } finally {
+      leitura.segurar = undefined;
+      Reflect.deleteProperty(document.documentElement, 'scrollHeight');
+    }
   });
 
   it('posição num dispositivo que a versão não tem: abre no começo, sem erro', async () => {
