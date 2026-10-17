@@ -1616,6 +1616,7 @@ test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "
   // Vai ao art. 5º, XLVII, a, pela busca por endereço (a lista é virtualizada).
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await page.getByRole('searchbox', { name: 'Texto ou endereço' }).fill('art. 5º, XLVII, a');
+  await expect(page.getByRole('button', { name: /^Ir para/ })).toBeVisible();
   await page.keyboard.press('Enter');
   const origem = page.locator('[data-endereco="art5.incXLVII.alA"]');
   await expect(origem).toBeVisible();
