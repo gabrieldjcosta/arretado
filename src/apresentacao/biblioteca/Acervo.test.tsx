@@ -55,10 +55,9 @@ async function abrir(rota: string, f: FonteEmMemoria) {
 }
 
 describe('Biblioteca › Acervo (3c)', () => {
-  it('Biblioteca vazia oferece "Tudo do edital" e marca o que falta', async () => {
+  it('"Tudo do edital" marca o que falta', async () => {
     const f = await fonte();
-    const { usuario } = await abrir('#/biblioteca', f);
-    await usuario.click(await screen.findByRole('link', { name: 'Tudo do edital da DPE-SP' }));
+    const { usuario } = await abrir('#/biblioteca/acervo?tudo=1', f);
     await screen.findByRole('heading', { name: 'Acervo: normas' });
     // Só as com disciplina vêm marcadas: a "SOLTA" não.
     expect(await screen.findByRole('button', { name: /^Adicionar 2 / })).toBeEnabled();
@@ -108,10 +107,9 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect((await screen.findAllByText('Já adicionada')).length).toBeGreaterThan(0);
 
     await usuario.click(screen.getByRole('link', { name: 'Normas' }));
-    await usuario.click(await screen.findByRole('button', { name: 'Todas as normas' }));
-    const exec = await screen.findByRole('region', { name: 'Execução Penal' });
+    const exec = await screen.findByRole('group', { name: 'Execução Penal' });
     expect(within(exec).getByText('LEP')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Infância' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Infância' })).toBeInTheDocument();
   });
 
   it('avisa, sem bloquear, quando o item é uma norma já colada', async () => {

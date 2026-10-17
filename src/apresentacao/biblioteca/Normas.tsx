@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
-import type { Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
+import type { Edital, Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import type { EntradaDoIndice } from '../../dominios/acervo/esquemas';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
 import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
@@ -10,7 +11,6 @@ import {
   RascunhoIndisponivel,
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
-import { SEM_DISCIPLINA } from '../../dominios/acervo/agrupar';
 import { itensComVersaoNova } from '../../dominios/acervo/atualizacao';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Dialogo } from '../componentes/Dialogo';
@@ -30,6 +30,7 @@ import {
   passaNoFiltro,
   type CriteriosDeNormas,
 } from './filtroDeNormas';
+import { editalComNormasNoAcervo } from './editalDoPlano';
 import { referenciaDoNo } from './linhas';
 
 interface ItemDaDisciplina {
@@ -39,7 +40,10 @@ interface ItemDaDisciplina {
   trecho?: string;
 }
 
-/** Normas por disciplina (vínculos do acervo); o que não tem vínculo fica em "Sem disciplina". */
+/** Grupo das normas sem disciplina. */
+const OUTRAS = 'Outras';
+
+/** Normas por disciplina (vínculos do acervo); o que não tem vínculo fica em "Outras". */
 function agruparPorDisciplina(
   normas: readonly Norma[],
   vinculos: readonly VinculoDeDisciplina[],
@@ -53,12 +57,12 @@ function agruparPorDisciplina(
   };
   for (const n of normas) {
     const seus = vinculos.filter((v) => v.normaId === n.id);
-    if (seus.length === 0) pôr(SEM_DISCIPLINA, { norma: n });
+    if (seus.length === 0) pôr(OUTRAS, { norma: n });
     for (const v of seus) {
       const titulo =
         (v.disciplinaId === undefined ? undefined : nomeDe.get(v.disciplinaId)) ??
         v.sugestao ??
-        SEM_DISCIPLINA;
+        OUTRAS;
       pôr(titulo, {
         norma: n,
         ...(v.subtitulo === undefined ? {} : { subtitulo: v.subtitulo }),
@@ -69,9 +73,9 @@ function agruparPorDisciplina(
   return [...mapa.entries()]
     .map(([titulo, itens]) => ({ titulo, itens }))
     .sort((a, b) =>
-      a.titulo === SEM_DISCIPLINA
+      a.titulo === OUTRAS
         ? 1
-        : b.titulo === SEM_DISCIPLINA
+        : b.titulo === OUTRAS
           ? -1
           : a.titulo.localeCompare(b.titulo, 'pt-BR'),
     );
@@ -83,12 +87,13 @@ interface Pendente {
 }
 
 async function carregarBiblioteca(repo: Repositorio) {
-  const [normas, pendentes, leituras, vinculos, disciplinas] = await Promise.all([
+  const [normas, pendentes, leituras, vinculos, disciplinas, editais] = await Promise.all([
     normasPublicadas(repo),
     rascunhosPendentes(repo),
     leiturasPorNorma(repo),
     repo.colecao('vinculosDisciplina').todosDoUsuario(),
     repo.colecao('disciplinas').todosDoUsuario(),
+    repo.colecao('editais').todosDoUsuario(),
   ]);
   const nomeDe = new Map(disciplinas.map((d) => [d.id, d.nome]));
   const soNormas = normas.filter((n) => n.especie !== 'sumulas' && n.especie !== 'teses');
@@ -103,6 +108,8 @@ async function carregarBiblioteca(repo: Repositorio) {
   }
   return {
     nomesDeDisciplinas: disciplinas.map((d) => d.nome),
+    editais,
+    disciplinas,
     normas: soNormas,
     pendentes,
     leituras,
@@ -209,18 +216,29 @@ const importar = (principal: boolean) => (
 );
 
 /** Sempre visível: leva ao catálogo de normas do acervo, por disciplina. */
-const doAcervo = (
-  <Link to="/biblioteca/acervo?tipo=norma" className="botao">
-    Adicionar do acervo
+const doAcervo = (rotulo: string, principal = false) => (
+  <Link to="/biblioteca/acervo?tipo=norma" className={principal ? 'botao principal' : 'botao'}>
+    {rotulo}
   </Link>
 );
 
-/** Atalho: as normas do edital de uma vez. */
-const doEdital = (principal: boolean) => (
-  <Link to="/biblioteca/acervo?tudo=1" className={principal ? 'botao principal' : 'botao'}>
-    Tudo do edital da DPE-SP
-  </Link>
-);
+/** Atalho: as normas do edital do plano de uma vez; só existe se o acervo conhece esse edital. */
+const doEdital = (edital: Edital | undefined, principal: boolean) =>
+  edital && (
+    <Link to="/biblioteca/acervo?tudo=1" className={principal ? 'botao principal' : 'botao'}>
+      Tudo do edital de {edital.titulo}
+    </Link>
+  );
+
+/** Cinco tons suaves, em rodízio, um por disciplina (só na faixa lateral do grupo). */
+function indiceDoTom(grupos: readonly { titulo: string }[], titulo: string): number {
+  return (
+    Math.max(
+      0,
+      grupos.findIndex((g) => g.titulo === titulo),
+    ) % 5
+  );
+}
 
 /** Biblioteca › Normas (F2, 9.5; Parte 2 §9.2): as normas publicadas e a retomada da importação. */
 export function Normas() {
@@ -247,13 +265,15 @@ export function Normas() {
     else novo.delete(nome);
     setParams(novo, { replace: true });
   };
-  const [todas, setTodas] = useState(false);
+  // Grupos abertos ou fechados à mão; sem escolha, abertos até 3 disciplinas.
+  const [abertos, setAbertos] = useState<ReadonlyMap<string, boolean>>(new Map());
   const [mudando, setMudando] = useState<{ norma: Norma; atuais: string[] } | null>(null);
   const [falhaAoMudar, setFalhaAoMudar] = useState<string | null>(null);
   const fonte = useFonteAcervo();
   // Disciplinas que o acervo conhece: opções do "Mudar disciplina" além das do usuário.
   const [disciplinasDoAcervo, setDisciplinasDoAcervo] = useState<string[]>([]);
   // Normas do acervo com versão maior no índice: o selo "Há versão nova" (sem rede, nenhum selo).
+  const [itensDoIndice, setItensDoIndice] = useState<readonly EntradaDoIndice[]>([]);
   const [comVersaoNova, setComVersaoNova] = useState<ReadonlySet<string>>(new Set());
   useEffect(() => {
     let ativo = true;
@@ -261,6 +281,7 @@ export function Normas() {
       .listar()
       .then((indice) => {
         if (ativo) {
+          setItensDoIndice(indice.itens);
           setDisciplinasDoAcervo([
             ...new Set(indice.itens.flatMap((i) => i.vinculos.map((v) => v.disciplina))),
           ]);
@@ -313,8 +334,15 @@ export function Normas() {
     );
   }
 
-  const listar = todas || haCriterio(criterios);
-  const grupos = dados && listar ? filtrarGrupos(dados.porDisciplina, criterios) : [];
+  const filtrando = haCriterio(criterios);
+  const grupos = dados ? filtrarGrupos(dados.porDisciplina, criterios) : [];
+  const total = grupos.reduce((soma, g) => soma + g.itens.length, 0);
+  const edital = dados
+    ? editalComNormasNoAcervo(dados.editais, dados.disciplinas, itensDoIndice)
+    : undefined;
+  const limparCriterios = () => {
+    setParams(new URLSearchParams(), { replace: true });
+  };
   const opcoes = dados ? opcoesDeFiltro(dados.normas) : { anos: [], tipos: [] };
 
   return (
@@ -375,15 +403,18 @@ export function Normas() {
               titulo="Nenhuma norma ainda"
               acao={
                 <>
-                  {doEdital(true)}
-                  {doAcervo}
+                  {doEdital(edital, true)}
+                  {doAcervo('Escolher no acervo', !edital)}
                   {importar(false)}
                 </>
               }
             >
               <p>
-                Adicione as normas do edital de uma vez, ou cole a lei da página do Planalto ou da
-                ALESP: o Arretado separa artigos, parágrafos e incisos para você ler e marcar.
+                {edital
+                  ? 'Adicione as normas do edital de uma vez, ou cole'
+                  : 'Escolha normas no acervo, ou cole'}{' '}
+                a lei da página do Planalto ou da ALESP: o Arretado separa artigos, parágrafos e
+                incisos para você ler e marcar.
               </p>
             </Vazio>
           ) : (
@@ -404,13 +435,15 @@ export function Normas() {
                 <div className="cabecalho-secao">
                   <h2 id="titulo-normas">Normas</h2>
                   <div className="acoes-item">
-                    {doAcervo}
+                    {doAcervo('Adicionar do acervo')}
                     {importar(!dados.continuar)}
                   </div>
                 </div>
-                <p>
-                  <Link to="/biblioteca/acervo?tudo=1">Tudo do edital da DPE-SP</Link>
-                </p>
+                {edital && (
+                  <p>
+                    <Link to="/biblioteca/acervo?tudo=1">Tudo do edital de {edital.titulo}</Link>
+                  </p>
+                )}
                 <label className="busca-campo">
                   <span>Buscar norma</span>
                   <input
@@ -423,6 +456,23 @@ export function Normas() {
                   />
                 </label>
                 <div className="filtros">
+                  <div className="campo">
+                    <label htmlFor="filtro-disciplina">Disciplina</label>
+                    <select
+                      id="filtro-disciplina"
+                      value={criterios.disciplina}
+                      onChange={(e) => {
+                        mudarCriterio('disciplina', e.target.value);
+                      }}
+                    >
+                      <option value="">Todas</option>
+                      {dados.porDisciplina.map((d) => (
+                        <option key={d.titulo} value={d.titulo}>
+                          {d.titulo} ({d.itens.length})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="campo">
                     <label htmlFor="filtro-ano">Ano</label>
                     <select
@@ -458,51 +508,39 @@ export function Normas() {
                     </select>
                   </div>
                 </div>
-                <div role="group" aria-label="Disciplinas" className="acoes-item">
-                  {dados.porDisciplina.map((g) => (
-                    <button
-                      key={g.titulo}
-                      type="button"
-                      className={criterios.disciplina === g.titulo ? 'botao principal' : 'botao'}
-                      aria-pressed={criterios.disciplina === g.titulo}
-                      onClick={() => {
-                        setTodas(false);
-                        mudarCriterio(
-                          'disciplina',
-                          criterios.disciplina === g.titulo ? '' : g.titulo,
-                        );
-                      }}
-                    >
-                      {g.titulo} ({g.itens.length})
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className={todas && criterios.disciplina === '' ? 'botao principal' : 'botao'}
-                    aria-pressed={todas && criterios.disciplina === ''}
-                    onClick={() => {
-                      setTodas(!todas);
-                      mudarCriterio('disciplina', '');
-                    }}
-                  >
-                    Todas as normas
-                  </button>
-                </div>
-                {!listar && (
+                {filtrando && total > 0 && (
                   <p role="status" className="dica">
-                    Escolha uma disciplina para ver as normas, ou busque por título, ano ou tipo.
+                    {total === 1 ? '1 norma' : `${String(total)} normas`}
                   </p>
                 )}
-                {listar && grupos.length === 0 && (
-                  <p role="status" className="dica">
-                    Nenhuma norma com esses filtros. Tente outra combinação.
-                  </p>
+                {total === 0 && (
+                  <div role="status" className="dica">
+                    <p>
+                      {filtrando ? 'Nenhuma norma com esse nome.' : 'Nenhuma norma para mostrar.'}
+                    </p>
+                    {filtrando && (
+                      <button type="button" onClick={limparCriterios}>
+                        Limpar busca
+                      </button>
+                    )}
+                  </div>
                 )}
                 {grupos.map((g) => (
-                  <section key={g.titulo} aria-label={g.titulo}>
-                    {(g.titulo !== SEM_DISCIPLINA || dados.porDisciplina.length > 1) && (
-                      <h3>{g.titulo}</h3>
-                    )}
+                  <details
+                    key={g.titulo}
+                    aria-label={g.titulo}
+                    className={`grupo-de-normas tom-${String(indiceDoTom(dados.porDisciplina, g.titulo))}`}
+                    open={filtrando || (abertos.get(g.titulo) ?? dados.porDisciplina.length <= 3)}
+                    onToggle={(e) => {
+                      // Com critério, a lista abre os grupos com resultado: aí nada se lembra.
+                      if (filtrando) return;
+                      const aberto = e.currentTarget.open;
+                      setAbertos((atual) => new Map(atual).set(g.titulo, aberto));
+                    }}
+                  >
+                    <summary>
+                      <h3>{g.titulo}</h3> <span>({g.itens.length})</span>
+                    </summary>
                     <ul className="lista-simples lista-de-linhas">
                       {g.itens.map(({ norma: n, subtitulo, trecho }) => {
                         const leitura = dados.leituras.get(n.id);
@@ -544,7 +582,7 @@ export function Normas() {
                         );
                       })}
                     </ul>
-                  </section>
+                  </details>
                 ))}
               </section>
             </>
