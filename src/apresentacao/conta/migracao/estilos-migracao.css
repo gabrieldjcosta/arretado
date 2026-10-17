@@ -1,0 +1,63 @@
+/* Migração do uso local para a conta (F4-A, A4). */
+/* Só tokens existentes e sem cores literais. */
+
+.migracao-tela {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-4);
+  max-width: var(--largura-texto);
+}
+
+.migracao-andamento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4);
+  background: var(--superficie);
+  border-radius: var(--raio-cartao);
+  border: 1px solid var(--borda);
+}
+
+.migracao-etapa-anuncio {
+  font-weight: 500;
+  color: var(--titulo);
+  margin: 0;
+}
+
+.migracao-etapas-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+}
+
+.migracao-etapas-lista li {
+  padding: var(--espaco-2) var(--espaco-3);
+  border-radius: var(--raio-botao);
+  min-height: var(--alvo);
+  display: flex;
+  align-items: center;
+  color: var(--texto-atenuado);
+}
+
+.migracao-etapas-lista li.atual {
+  color: var(--bloco-acao-texto);
+  background: var(--bloco-acao);
+  font-weight: 500;
+}
+
+.migracao-etapas-lista li.passada {
+  color: var(--sucesso);
+}
+
+.migracao-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+}
+
+.copia-anterior-secao {
+  margin-top: var(--espaco-3);
+}

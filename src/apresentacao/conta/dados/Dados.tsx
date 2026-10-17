@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ApagarTudo } from './ApagarTudo';
+import { CopiaAnteriorSecao } from './CopiaAnterior';
 import { Espacos } from './Espacos';
 import { Exportar } from './Exportar';
 import { Importar } from './Importar';
@@ -24,6 +25,7 @@ export function Dados() {
       <Exportar />
       <Importar />
       <Espacos />
+      <CopiaAnteriorSecao />
       <Restauracao />
       <ApagarTudo />
     </>

@@ -23,7 +23,7 @@ const avisoDe = (motivo: string | null): string | null =>
 
 /** Depois de entrar o app recarrega para abrir o banco da conta (T26). */
 const recarregarEmConta = () => {
-  window.location.hash = '#/conta';
+  window.location.hash = '#/conta/migracao';
   window.location.reload();
 };
 
