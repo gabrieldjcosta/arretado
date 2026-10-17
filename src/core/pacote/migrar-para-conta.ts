@@ -15,6 +15,7 @@ import {
   apagarBanco,
   BancoArretado,
   CHAVE_ULTIMO_BACKUP,
+  NOME_BANCO_PRINCIPAL,
   nomeBancoDaConta,
   reconstruirDoLog,
   RegistroDeContas,
@@ -390,6 +391,30 @@ export async function estadoDaMigracao(
   registro: RegistroDeContas = new RegistroDeContas(),
 ): Promise<EstadoDaMigracao> {
   return (await lerMarca(registro, uid))?.estado ?? 'nenhuma';
+}
+
+/**
+ * Depois de entrar: há estudo sem conta a levar para esta conta? Não, se a migração já terminou,
+ * se o banco sem conta não existe ou se ele só tem a identidade que nasce ao abrir o app.
+ */
+export async function haMigracaoPendente(
+  uid: string,
+  {
+    registro = new RegistroDeContas(),
+    nomeOrigem = NOME_BANCO_PRINCIPAL,
+  }: { registro?: RegistroDeContas; nomeOrigem?: string } = {},
+): Promise<boolean> {
+  if ((await estadoDaMigracao(uid.toLowerCase(), registro)) === 'concluida') return false;
+  // Abrir um banco que não existe o criaria (com identidade nova).
+  if (!(await indexedDB.databases()).some((d) => d.name === nomeOrigem)) return false;
+  const origem = await Repositorio.abrir({ nomeBanco: nomeOrigem });
+  try {
+    if (origem.ctx.usuarioId === uid.toLowerCase()) return false;
+    const { porColecao } = await preverMigracao(origem);
+    return Object.keys(porColecao).some((n) => !IDENTIDADE.includes(n as NomeColecao));
+  } finally {
+    origem.fechar();
+  }
 }
 
 export async function copiaAnterior(
