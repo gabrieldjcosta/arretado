@@ -5,6 +5,7 @@ import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
+import './estilos-plano.css';
 
 const ROTULO_FAIXA: Record<Faixa, string> = {
   altissima: 'Altíssima',
@@ -40,15 +41,30 @@ export function Plano() {
       )}
       {dados.pontos.length === 0 ? (
         <>
-          <Vazio titulo="Nenhum ponto do edital ainda">
-            <p>Importe seus pontos para poder vincular erros a eles.</p>
+          <Vazio titulo="Monte seu plano do seu jeito">
             <p>
-              <Link to="/plano/onboarding" className="botao principal">
-                Montar pelo catálogo de concursos
-              </Link>
+              Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir
+              do nosso catálogo de concursos.
             </p>
+            <div className="plano-vazio-caminhos">
+              <Link to="/plano/onboarding" className="botao">
+                Montar pelo catálogo
+              </Link>
+              <a
+                href="#importar-edital"
+                className="botao"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById('importar-edital')
+                    ?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Trazer meu edital
+              </a>
+            </div>
           </Vazio>
-          <ImportarPontos aoImportar={setConfirmacao} />
+          <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
       ) : (
         <>

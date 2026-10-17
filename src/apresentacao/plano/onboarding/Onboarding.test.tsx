@@ -47,6 +47,42 @@ describe('Plano: onboarding pelo catálogo (B2)', () => {
     expect(disciplinas.some((d) => d.nome === primeira.labels?.[0]?.textContent)).toBe(false);
   });
 
+  it('acrescenta matéria e assunto, recusa repetido e grava os dois no plano', async () => {
+    const { repo, usuario } = await abrir();
+    await usuario.click(
+      await screen.findByRole('radio', { name: 'Ministério Público (Promotor)' }),
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Continuar' }));
+    await screen.findByRole('radio', { name: /edital MPGO de 2023/ });
+    await usuario.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    const campo = await screen.findByRole('textbox', { name: '+ Acrescentar disciplina' });
+    await usuario.type(campo, 'Direito Aeroespacial{Enter}');
+    // A matéria nova abre já com o campo de assunto em foco.
+    const assunto = await screen.findByRole('textbox', {
+      name: '+ Acrescentar assunto em Direito Aeroespacial',
+    });
+    expect(assunto).toHaveFocus();
+    await usuario.type(assunto, 'Inelegibilidades{Enter}');
+    expect(assunto).toHaveFocus();
+    expect(screen.getByText('Inelegibilidades')).toBeInTheDocument();
+    await usuario.type(assunto, 'inelegibilidades{Enter}');
+    expect(screen.getByText('Isso já está na lista.')).toBeInTheDocument();
+    await usuario.type(campo, 'direito aeroespacial{Enter}');
+    expect(screen.getAllByText('Isso já está na lista.')).toHaveLength(2);
+
+    await usuario.click(screen.getByRole('button', { name: 'Continuar' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Criar meu plano' }));
+    await screen.findByText(/Comece por aqui:/);
+    const disciplinas = await repo.colecao('disciplinas').todosDoUsuario();
+    const nova = disciplinas.find((d) => d.nome === 'Direito Aeroespacial');
+    const pontos = await repo.colecao('pontos').todosDoUsuario();
+    const ponto = pontos.find((p) => p.titulo === 'Inelegibilidades');
+    expect(ponto?.disciplinaId).toBe(nova?.id);
+    expect(ponto?.codigo).toBeUndefined();
+    expect(ponto?.faixa).toBeUndefined();
+  });
+
   it('guarda a escolha a cada tela e retoma de onde parou', async () => {
     const { usuario } = await abrir();
     await usuario.click(

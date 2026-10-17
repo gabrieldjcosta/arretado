@@ -308,6 +308,8 @@ function useTextos(
   const [falhou, setFalhou] = useState(false);
   const [tentativa, setTentativa] = useState(0);
   const vivo = useRef(true);
+  // Pedidos de janela ainda sem resposta: enquanto há algum, o que está desenhado não é o definitivo.
+  const emVoo = useRef(0);
 
   useEffect(() => {
     vivo.current = true;
@@ -321,11 +323,13 @@ function useTextos(
       for (const janela of janelasQueCobrem(de, ate, aberta.nos.length)) {
         if (pedidas.has(janela)) continue;
         pedidas.add(janela);
+        emVoo.current += 1;
         lerJanela(repo, aberta, {
           inicio: janela * TEXTOS_POR_PEDIDO,
           quantidade: TEXTOS_POR_PEDIDO,
         }).then(
           (itens) => {
+            emVoo.current -= 1;
             if (!vivo.current) return;
             setTextos((antes) => {
               const depois = new Map(antes);
@@ -335,6 +339,7 @@ function useTextos(
           },
           () => {
             // Volta para a fila: "Tentar de novo" pede outra vez.
+            emVoo.current -= 1;
             pedidas.delete(janela);
             if (vivo.current) setFalhou(true);
           },
@@ -349,7 +354,7 @@ function useTextos(
     setTentativa((t) => t + 1);
   }, []);
 
-  return { textos, pedir, falhou, tentarDeNovo, tentativa };
+  return { textos, pedir, emVoo, falhou, tentarDeNovo, tentativa };
 }
 
 /** Onde termina a barra fixa do Shell (`.topo`, sticky): o que fica abaixo dela é o alto da tela. */
@@ -381,7 +386,7 @@ function LeitorAberto({
     () => (filtro ? linhasTodas.filter((l) => filtro.visiveis.has(l.indice)) : linhasTodas),
     [linhasTodas, filtro],
   );
-  const { textos, pedir, falhou, tentarDeNovo, tentativa } = useTextos(
+  const { textos, pedir, emVoo, falhou, tentarDeNovo, tentativa } = useTextos(
     repo,
     aberta,
     primeira,
@@ -484,8 +489,10 @@ function LeitorAberto({
 
   // Volta à posição guardada. As linhas de cima ainda não foram medidas (só há estimativa), então
   // o destino muda à medida que elas aparecem: rola, espera o quadro seguinte e confere de novo,
-  // até a linha ficar no alto por alguns quadros. Sem posição, abre no começo (a rolagem da
-  // Biblioteca viria junto).
+  // até a linha ficar no alto por alguns quadros. Os textos em volta têm de ter chegado: o texto
+  // que chega muda a altura das linhas de cima (outro tamanho de texto, por exemplo) e o destino
+  // com ela; dar a volta por concluída antes disso larga a tela fora da posição. Sem posição, abre
+  // no começo (a rolagem da Biblioteca viria junto).
   useEffect(() => {
     if (porArtigo) {
       // O cartão não tem a lista para voltar: a volta é de quando ela reaparecer.
@@ -503,7 +510,13 @@ function LeitorAberto({
     const conferir = () => {
       const destino = virtualizador.getOffsetForIndex(linhaInicial, 'start')?.[0];
       const desenhada = lista.current?.querySelector(`[data-index="${String(linhaInicial)}"]`);
-      if (destino !== undefined && desenhada && Math.abs(window.scrollY - destino) <= 1) {
+      const comTexto = !lista.current?.querySelector('.texto-carregando') && emVoo.current === 0;
+      if (
+        destino !== undefined &&
+        desenhada &&
+        comTexto &&
+        Math.abs(window.scrollY - destino) <= 1
+      ) {
         noLugar += 1;
       } else {
         noLugar = 0;
@@ -520,7 +533,7 @@ function LeitorAberto({
     return () => {
       cancelAnimationFrame(quadro);
     };
-  }, [virtualizador, linhaInicial, retorno.vez, porArtigo]);
+  }, [virtualizador, linhaInicial, retorno.vez, porArtigo, emVoo]);
 
   // Artigo por artigo (11.8). `artigoAtual` é um nó (índice em `nos`); o artigo mostrado é a unidade
   // que o contém (o título e o capítulo valem o primeiro artigo abaixo deles). Derivado das linhas de

@@ -2689,3 +2689,43 @@ dialog.dialogo-previa .linha-acoes button {
     box-shadow: var(--sombra);
   }
 }
+
+/* Biblioteca › Normas: grupos retráteis por disciplina; o tom aparece só na faixa lateral. */
+.grupo-de-normas {
+  margin-block: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 6px solid var(--tom-do-grupo, var(--borda-forte));
+}
+
+.grupo-de-normas > summary {
+  display: flex;
+  gap: 0.5rem;
+  min-height: 44px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.grupo-de-normas > summary h3 {
+  display: inline;
+  margin: 0;
+}
+
+.grupo-de-normas.tom-0 {
+  --tom-do-grupo: var(--acqua);
+}
+
+.grupo-de-normas.tom-1 {
+  --tom-do-grupo: var(--solace);
+}
+
+.grupo-de-normas.tom-2 {
+  --tom-do-grupo: var(--cacto);
+}
+
+.grupo-de-normas.tom-3 {
+  --tom-do-grupo: var(--areia);
+}
+
+.grupo-de-normas.tom-4 {
+  --tom-do-grupo: var(--destaque-prazo);
+}
