@@ -111,3 +111,8 @@ export class BancoArretado extends Dexie {
 export function apagarBanco(nome: string): Promise<void> {
   return Dexie.delete(nome);
 }
+
+/** O banco existe? Sem criá-lo e sem `indexedDB.databases()`, que falta em navegadores antigos. */
+export function bancoExiste(nome: string): Promise<boolean> {
+  return Dexie.exists(nome);
+}
