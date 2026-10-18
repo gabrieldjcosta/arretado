@@ -218,4 +218,63 @@ describe('Componente ExportarTexto', () => {
     expect(criarUrl).toHaveBeenCalledTimes(2);
     expect(clicar).toHaveBeenCalledTimes(2);
   });
+
+  it('o .txt não leva frase, resumo nem matéria excluídos', async () => {
+    const { repo } = await repositorioDeTeste({ inicio: '2026-10-16T12:00:00.000Z' });
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Direito Penal' });
+    const apagada = await repo.colecao('disciplinas').criar({ nome: 'Matéria Apagada' });
+    const base = { origemTipo: 'manual' as const, estado: 'ativa' as const };
+    await repo.colecao('frases').criar({
+      ...base,
+      texto: 'Frase que fica.',
+      disciplinaId: penal.id,
+      proximaRevisao: '2026-10-17',
+    });
+    const frase = await repo.colecao('frases').criar({
+      ...base,
+      texto: 'Frase apagada.',
+      disciplinaId: penal.id,
+      proximaRevisao: '2026-10-17',
+    });
+    await repo.colecao('frases').criar({
+      ...base,
+      texto: 'Frase de matéria apagada.',
+      disciplinaId: apagada.id,
+      proximaRevisao: '2026-10-17',
+    });
+    await repo.colecao('frases').excluir(frase.id);
+    await repo.colecao('disciplinas').excluir(apagada.id);
+    await repo
+      .colecao('notas')
+      .criar({ tipo: 'resumo', titulo: 'Fica', conteudo: 'Corpo que fica.' });
+    const nota = await repo
+      .colecao('notas')
+      .criar({ tipo: 'resumo', titulo: 'Apagado', conteudo: 'Corpo apagado.' });
+    await repo.colecao('notas').excluir(nota.id);
+
+    const blobs: Blob[] = [];
+    Object.assign(URL, {
+      createObjectURL: vi.fn((b: Blob) => {
+        blobs.push(b);
+        return 'blob:http://localhost/teste';
+      }),
+      revokeObjectURL: vi.fn(),
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+    const usuario = userEvent.setup();
+    render(
+      <ContextoRepositorio.Provider value={repo}>
+        <ExportarTexto />
+      </ContextoRepositorio.Provider>,
+    );
+    await usuario.click(await screen.findByRole('button', { name: 'Frases corretas (.txt)' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Resumos (.txt)' }));
+    const [frases, resumos] = await Promise.all(blobs.map((b) => b.text()));
+
+    expect(frases).toContain('Frase que fica.');
+    expect(frases).not.toContain('Frase apagada.');
+    expect(frases).not.toContain('Matéria Apagada');
+    expect(resumos).toContain('Corpo que fica.');
+    expect(resumos).not.toContain('Corpo apagado.');
+  });
 });

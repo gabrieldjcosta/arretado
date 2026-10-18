@@ -87,14 +87,20 @@ interface Pendente {
 }
 
 async function carregarBiblioteca(repo: Repositorio) {
-  const [normas, pendentes, leituras, vinculos, disciplinas, editais] = await Promise.all([
-    normasPublicadas(repo),
-    rascunhosPendentes(repo),
-    leiturasPorNorma(repo),
-    repo.colecao('vinculosDisciplina').todosDoUsuario(),
-    repo.colecao('disciplinas').todosDoUsuario(),
-    repo.colecao('editais').todosDoUsuario(),
-  ]);
+  const [normas, pendentes, leituras, todosVinculos, todasDisciplinas, todosEditais] =
+    await Promise.all([
+      normasPublicadas(repo),
+      rascunhosPendentes(repo),
+      leiturasPorNorma(repo),
+      repo.colecao('vinculosDisciplina').todosDoUsuario(),
+      repo.colecao('disciplinas').todosDoUsuario(),
+      repo.colecao('editais').todosDoUsuario(),
+    ]);
+  const vivo = <T extends { excluidoEm: string | null }>(itens: readonly T[]) =>
+    itens.filter((i) => i.excluidoEm === null);
+  const vinculos = vivo(todosVinculos);
+  const disciplinas = vivo(todasDisciplinas);
+  const editais = vivo(todosEditais);
   const nomeDe = new Map(disciplinas.map((d) => [d.id, d.nome]));
   const soNormas = normas.filter((n) => n.especie !== 'sumulas' && n.especie !== 'teses');
   const porDisciplina = agruparPorDisciplina(soNormas, vinculos, nomeDe);
