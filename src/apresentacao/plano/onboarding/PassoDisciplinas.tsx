@@ -1,13 +1,8 @@
 // Passo "Quais matérias entram no plano?": cada matéria é um cartão com a árvore de assuntos, e a pessoa
 // pode acrescentar matéria e assunto que o catálogo não trouxe.
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
-import {
-  chaveDeNome,
-  disciplinasDoEdital,
-  rotuloDoEdital,
-  type EditalDoCatalogo,
-} from '../../../dominios/catalogo';
-import { chaveDoItem } from '../../../integracoes/catalogo/linhas';
+import { chaveDeNome, rotuloDoEdital, type EditalDoCatalogo } from '../../../dominios/catalogo';
+import { montarArvore, type AssuntoDaArvore } from './arvore';
 import type { Acrescentos } from './rascunho';
 import './estilos-onboarding.css';
 
@@ -58,14 +53,6 @@ function CampoAcrescentar({
   );
 }
 
-interface AssuntoDaArvore {
-  id: string;
-  texto: string;
-  codigo?: string;
-  /** Acrescentado pela pessoa. */
-  seu?: boolean;
-}
-
 export function PassoDisciplinas({
   edital,
   desmarcadas,
@@ -108,29 +95,7 @@ export function PassoDisciplinas({
       return novo;
     });
   };
-  const doEdital = disciplinasDoEdital(edital).map(({ disciplina, nome }) => ({
-    nome,
-    seu: false,
-    assuntos: disciplina.itens.map((item, i): AssuntoDaArvore => ({
-      id: chaveDoItem(nome, i),
-      texto: item.assunto,
-      ...(item.numero ? { codigo: item.numero } : {}),
-    })),
-  }));
-  const todas = [
-    ...doEdital,
-    ...acrescentos.disciplinas.map((nome) => ({ nome, seu: true, assuntos: [] })),
-  ].map((d) => {
-    const chave = chaveDeNome(d.nome);
-    const seus = acrescentos.assuntos
-      .filter((a) => chaveDeNome(a.disciplina) === chave)
-      .map((a): AssuntoDaArvore => ({
-        id: `seu#${chave}#${chaveDeNome(a.titulo)}`,
-        texto: a.titulo,
-        seu: true,
-      }));
-    return { ...d, chave, assuntos: [...d.assuntos, ...seus] };
-  });
+  const todas = montarArvore(edital, acrescentos);
   return (
     <>
       <p className="dica">

@@ -4,7 +4,6 @@ import {
   criarDisciplina,
   criarPonto,
   descreverAtividade,
-  EdicaoInvalida,
   excluirDisciplina,
   renomearDisciplina,
   ROTULO_STATUS,
@@ -15,14 +14,11 @@ import {
 import { Selo } from '../../componentes/Selo';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { useDados, useRepositorio } from '../../dados/contexto';
+import { mensagem } from '../erros';
 import { carregarPontos, ROTULO_FAIXA } from './carregar';
 import './estilos-pontos.css';
 
 type Filtro = 'todos' | StatusDoPonto;
-
-function mensagem(e: unknown): string {
-  return e instanceof EdicaoInvalida ? e.message : 'Não foi possível salvar. Nada foi alterado.';
-}
 
 function NovaMateria({ aoErro }: { aoErro: (m: string | null) => void }) {
   const repo = useRepositorio();
