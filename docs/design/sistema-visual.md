@@ -122,7 +122,7 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 |---|---|
 | **Botão primário** (`.principal`) | Compacto: altura 44, padding `0 20px`, raio 12, peso 600, `.9375rem`, espaçamento `-0,01em`, `--sombra-botao`; fundo `--acao`, texto `--acao-texto`, sem borda. Na folha do Agora: largura total, 52 de altura, `1.0625rem`. **Um por tela.** Hover escurece 14% em direção à tinta; pressionado desce 1 px; desabilitado a 50% sem sombra; transição de 140 ms só em `transform` e `box-shadow` e só sem `prefers-reduced-motion` (nunca em cor: ao virar o tema o texto troca na hora e o fundo ficaria atrasado, o que o axe lê como contraste baixo). |
 | **Botão secundário** (`button`, `.botao`) | Mesma forma, fundo `--superficie` (cal), contorno de 1 px `--borda-botao`, texto `--texto`. |
-| **Botão fantasma** (`.botao-texto`) | Sem caixa, sublinhado de 4 px, cor herdada e 82% de opacidade, peso 500, `.875rem`, alvo 44. Vai **ao lado** do primário ("Escolher outra coisa", "Pausar"). |
+| **Botão fantasma** (`.botao-texto`) | Sem caixa, sublinhado de 4 px, cor herdada sem opacidade (a 82%, a cor atenuada de uma dica cai para 3,8:1 na areia), peso 500, `.875rem`, alvo 44. Vai **ao lado** do primário ("Escolher outra coisa", "Pausar"). |
 | **Botão de ícone** (`.botao-icone`) | Quadrado de 44 com o contorno do secundário; `aria-label` sempre. |
 | **Linha de ação** (`.linha-acao`) | Linha inteira de toque: altura 52, raio 12, filete `--borda`, fundo da superfície; texto à esquerda e seta ou duração à direita. |
 | **Destrutivo** (`.perigoso`) | Secundário com texto e borda `--perigo`; só vira cheio dentro do diálogo de confirmação. |

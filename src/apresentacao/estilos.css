@@ -680,8 +680,9 @@ dialog .perigoso {
   border-color: transparent;
 }
 
-/* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, 82% de opacidade; herda a cor
-   do lugar onde está (a tinta, na página e na folha). Alvo de 44 px. */
+/* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
+   onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
+   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. */
 .botao-texto {
   background: transparent;
   border-color: transparent;
@@ -689,7 +690,6 @@ dialog .perigoso {
   border-radius: 12px;
   padding: 0 0.75rem;
   color: inherit;
-  opacity: 0.82;
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: underline;

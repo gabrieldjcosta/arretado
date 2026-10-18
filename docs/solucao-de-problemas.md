@@ -999,6 +999,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** `node scripts/contraste.mjs` reprova um par novo, ou a área atual "some" na barra. **Causa:** a luz (`--luz` `#6fe3d6`) é clara demais para texto ou traço sobre a areia; o vidro (`--vidro` `#0f7f72`) passa para botão e traço (3,95:1 sobre a areia), mas não para texto pequeno; o cal sobre a areia quase não contrasta (é "onde estou" pela forma, não pela cor). **Solução:** a luz só como ponto ou Estrela, sempre com contorno de tinta (`--ponto-contorno`, `--estrela-contorno`); texto de link e de sucesso em `--vidro-texto` (`#0a6157`, 5,9:1); a área e a aba atuais em cal levam também peso 700, `--atual-sombra` e `aria-current`. **Prevenção:** todo par novo entra em `scripts/contraste.mjs` nos dois temas antes de ir para a tela.
 - **Origem:** previsto — P1 do Ponto de luz (18/10/2026); vale para a P2 a P6.
 
+### axe `color-contrast` em "Alterar disciplina" (botão fantasma dentro de dica) depois da troca de paleta
+- **Sintoma:** no CI, `e2e/acervo.spec.ts` (3c e 6a) e `e2e/biblioteca.spec.ts` (9.5) falham em `semViolacoes`, só no claro e nos três aparelhos, com `color-contrast` em `button[aria-label="Alterar a disciplina de …"]` e `.item-acervo-disciplina > .botao-texto`. O `acessibilidade.spec.ts` passa, porque as telas dele não têm itens do acervo. **Causa:** o `.botao-texto` herdava a cor do lugar com `opacity: 0.82`; dentro de `p.dica` a cor herdada já é a atenuada (`--texto-atenuado`, 5,5:1 na areia), e a 82% ela cai para 3,8:1 na areia (4,4:1 na cal). No creme da D-D5 a folga escondia o defeito.
+- **Solução:** o fantasma não usa mais opacidade (D-D7); a cor herdada vale inteira. **Prevenção:** texto nunca leva `opacity` abaixo de 1 fora de estado desabilitado; ao trocar a paleta, rodar também `acervo.spec.ts` e `biblioteca.spec.ts` localmente (`npx playwright test e2e/acervo.spec.ts e2e/biblioteca.spec.ts`), não só o `acessibilidade.spec.ts`.
+- **Origem:** ocorrido em 18/10/2026 (P1 do Ponto de luz, PR #186).
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
