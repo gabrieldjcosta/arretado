@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { relatosAguardando } from '../../suporte/relatos';
 import { contasHabilitadas } from '../../integracoes/conta';
 import { useDados } from '../dados/contexto';
+import { RegistrarAceite } from './entrar/RegistrarAceite';
 import { ContaDoAparelhoSecao } from './sair/ContaDoAparelho';
 import './estilos-conta.css';
 
@@ -134,7 +135,12 @@ export function Conta() {
           </li>
         ))}
       </ul>
-      {contasHabilitadas() && <ContaDoAparelhoSecao />}
+      {contasHabilitadas() && (
+        <>
+          <RegistrarAceite />
+          <ContaDoAparelhoSecao />
+        </>
+      )}
       {pendentes > 0 && (
         <p className="dica">
           {pendentes === 1

@@ -8,6 +8,8 @@ import {
 import { sairDaConta, trocarDeConta } from '../../../core/pacote';
 import { Dialogo } from '../../componentes/Dialogo';
 import { useRepositorio } from '../../dados/contexto';
+import { ConfirmarCopia } from '../dados/ConfirmarCopia';
+import { podeApagarComCopia } from '../dados/recomecar';
 import { useServicoDeConta } from '../entrar/ContextoConta';
 import './estilos-sair.css';
 
@@ -78,7 +80,7 @@ export function ContaDoAparelhoSecao({
   };
 
   // "Apagar daqui" só com cópia recente ou depois de confirmar que a pessoa exportou.
-  const podeApagar = estado.ultimaCopia !== null || exportei;
+  const podeApagar = podeApagarComCopia(estado.ultimaCopia, exportei);
 
   const sair = async () => {
     setFase('apagando');
@@ -189,22 +191,12 @@ export function ContaDoAparelhoSecao({
           />
           Apagar daqui (aparelho emprestado)
         </label>
-        {apagarAqui && !estado.ultimaCopia && (
-          <label className="opcao">
-            <input
-              type="checkbox"
-              checked={exportei}
-              onChange={(e) => {
-                setExportei(e.target.checked);
-              }}
-            />
-            Já exportei os meus dados e guardei o arquivo.
-          </label>
-        )}
-        {apagarAqui && !podeApagar && (
-          <p className="dica">
-            Antes de apagar, <Link to="/conta/dados">exporte uma cópia</Link>.
-          </p>
+        {apagarAqui && (
+          <ConfirmarCopia
+            ultimaCopia={estado.ultimaCopia}
+            exportei={exportei}
+            aoMudar={setExportei}
+          />
         )}
         {fase === 'falhou' && (
           <p role="alert" className="aviso falha">
