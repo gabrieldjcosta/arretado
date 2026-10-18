@@ -4,7 +4,6 @@ import { Link } from 'react-router';
 import type { Disciplina, Ponto, TarefaDeEstudo } from '../../../core/modelo';
 import {
   adiarTarefa,
-  carregarFila,
   concluirTarefa,
   criarTarefa,
   dividirTarefa,
@@ -14,35 +13,17 @@ import {
   reabrirTarefa,
   type Sugestao,
 } from '../../../dominios/tarefas';
-import { dataCivil } from '../../../core/datas';
-import type { Repositorio } from '../../../core/persistencia';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { Selo } from '../../componentes/Selo';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
 import { mensagem } from '../erros';
+import { carregarTarefas } from './carregar';
 import { gravarDispensadas, lerDispensadas } from './dispensadas';
-import { sugestoesDoDia } from './sugestoes-do-dia';
+import { estimativaDe } from './estimativa';
 import './estilos-tarefas.css';
 
 const LIMITE_DE_SUGESTOES = 3;
-
-async function carregar(repo: Repositorio) {
-  const hoje = dataCivil(repo.ctx.agora());
-  const [fila, sugestoes, pontos, disciplinas] = await Promise.all([
-    carregarFila(repo, hoje),
-    sugestoesDoDia(repo),
-    repo.colecao('pontos').todosDoUsuario(),
-    repo.colecao('disciplinas').todosDoUsuario(),
-  ]);
-  return {
-    hoje,
-    fila,
-    sugestoes,
-    pontos: pontos.filter((p) => p.excluidoEm === null),
-    disciplinas: disciplinas.filter((d) => d.excluidoEm === null),
-  };
-}
 
 function NovaTarefa({
   pontos,
@@ -60,11 +41,11 @@ function NovaTarefa({
   const enviar = (e: SyntheticEvent) => {
     e.preventDefault();
     aoErro(null);
-    const min = Number.parseInt(minutos, 10);
+    const estimativa = estimativaDe(minutos);
     criarTarefa(repo, {
       titulo,
       ...(pontoId ? { pontoId } : {}),
-      ...(Number.isInteger(min) && min >= 1 && min <= 600 ? { estimativaMin: min } : {}),
+      ...(estimativa ? { estimativaMin: estimativa } : {}),
     }).then(
       () => {
         setTitulo('');
@@ -296,12 +277,18 @@ function Acoes({
 }
 
 export function Tarefas() {
-  const { dados } = useDados(carregar);
+  const { dados } = useDados(carregarTarefas);
   const [erro, setErro] = useState<string | null>(null);
   const repo = useRepositorio();
   if (!dados) return <Esqueleto />;
   const nomeDoPonto = new Map(dados.pontos.map((p) => [p.id, p.titulo]));
   const { fila, adiadas, feitas } = dados.fila;
+  // "Voltar" das adiadas e das feitas é o mesmo caminho: reabrir e mostrar a falha, se houver.
+  const voltarAFila = (t: TarefaDeEstudo) => {
+    reabrirTarefa(repo, t.id).catch((x: unknown) => {
+      setErro(mensagem(x));
+    });
+  };
   return (
     <>
       <h1>Tarefas</h1>
@@ -376,9 +363,7 @@ export function Tarefas() {
                 <button
                   type="button"
                   onClick={() => {
-                    reabrirTarefa(repo, t.id).catch((x: unknown) => {
-                      setErro(mensagem(x));
-                    });
+                    voltarAFila(t);
                   }}
                 >
                   Voltar agora
@@ -398,9 +383,7 @@ export function Tarefas() {
                 <button
                   type="button"
                   onClick={() => {
-                    reabrirTarefa(repo, t.id).catch((x: unknown) => {
-                      setErro(mensagem(x));
-                    });
+                    voltarAFila(t);
                   }}
                 >
                   Voltar para a fila
