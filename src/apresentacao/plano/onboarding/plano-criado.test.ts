@@ -50,9 +50,10 @@ describe('Onboarding: "Comece por aqui" depois de criar o plano (B2)', () => {
   });
 
   it('ponto sem matéria conhecida mostra o ponto, sem matéria', () => {
-    const pacote = pacoteCom([{ id: 'p1', titulo: 'Prescrição', disciplinaId: 'd9' }], [
-      { id: 'd1', nome: 'Direito Civil' },
-    ]);
+    const pacote = pacoteCom(
+      [{ id: 'p1', titulo: 'Prescrição', disciplinaId: 'd9' }],
+      [{ id: 'd1', nome: 'Direito Civil' }],
+    );
     expect(planoCriado(pacote, linhas(['Prescrição']))).toEqual({
       ponto: { id: 'p1', titulo: 'Prescrição', disciplinaId: 'd9' },
     });
