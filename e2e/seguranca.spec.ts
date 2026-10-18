@@ -133,11 +133,13 @@ test.describe('payload malicioso no fluxo completo de colar', () => {
   });
 });
 
-test.describe('política de privacidade v2', () => {
+test.describe('política de privacidade v2 (versão anterior dentro da v3)', () => {
   test('Conta › Privacidade diz o que a busca por URL envia e o que não sai do aparelho', async ({
     page,
   }) => {
     await page.goto('/#/conta/privacidade');
+    await expect(page.getByRole('heading', { level: 1, name: /versão 3/ })).toBeVisible();
+    await page.getByText(/Versão anterior \(política v2/).click();
     await expect(page.getByRole('heading', { level: 2, name: /política v2/ })).toBeVisible();
     await expect(page.getByText('envia só o endereço da lei')).toBeVisible();
     await expect(page.getByText('nenhum dado de estudo sai do aparelho')).toBeVisible();
