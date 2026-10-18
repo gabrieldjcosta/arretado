@@ -128,6 +128,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** encerrar o servidor antigo e rodar `npm run test:e2e` de novo. **Prevenção:** não deixar `preview` aberto entre rodadas; o CI sempre sobe o seu.
 - **Origem:** previsto — toda atividade com tela.
 
+### Commit no contêiner Linux passa sem rodar o `npm run check`
+- **Sintoma:** `git commit` mostra "hint: The '.githooks/pre-commit' hook was ignored because it's not set as executable" e grava sem o check. **Causa:** os ganchos estão no git sem o bit de execução (`100644`); no Windows isso não importa, no Linux (sessões do Claude na nuvem) o git os ignora, inclusive o `pre-push` que barra o `main` e o force push.
+- **Solução:** rodar `npm run check` à mão antes de cada commit e nunca enviar ao `main` nem forçar. **Prevenção:** dar o bit no git (`git update-index --chmod=+x .githooks/*`), caminho protegido: pede o rótulo `aprovado-gabriel`.
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
+### Pasta `C:` aparece na raiz do repositório depois do E2E
+- **Sintoma:** `git status` mostra `?? C:/` com PNGs do Plano vazio em `C:/Users/gabri/.gemini/...`. **Causa:** `e2e/plano-vazio.spec.ts` grava capturas de evidência num caminho fixo do Windows; no Linux ele vira uma pasta relativa à raiz.
+- **Solução:** `rm -rf ./C:` antes do commit e nada de `git add -A`. **Prevenção:** o teste gravar em `info.outputPath()` (fica para quem cuidar desse teste).
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
 ### `console.info` de teste que passa não aparece (relatório da métrica do corpus)
 - **Sintoma:** `npx vitest run --project unidade src/dominios/legislacao/estruturador-corpus.test.ts` passa e não mostra a tabela da métrica da 8.9 nem a linha do portão; o mesmo com qualquer `console.info` ou `console.log` de teste que passa, em qualquer área. **Causa:** dentro do Claude Code, o vitest 5 reconhece o agente (variável `CLAUDECODE`, pelo `std-env`) e troca o reporter padrão pelo `agent` (o mínimo), que só mostra a saída dos testes que falham. No terminal do Gabriel, o `npm test` mostra o relatório.
 - **Solução:** rodar com `--reporter=default` para ver a saída. **Prevenção:** teste não depende da saída para falhar: na métrica, o piso, a linha de base, as regras e os pendentes falham com a mensagem própria (as divergências, cortadas em 20, e cada diferença da linha de base).
