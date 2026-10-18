@@ -9,6 +9,7 @@ import {
   registrarErro,
 } from '../../dominios/recall/servico';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro, type Complemento } from './CamposErro';
 import { ROTULO_RESULTADO } from './rotulos';
@@ -202,7 +203,7 @@ export function RegistrarErro() {
             Completar este erro
           </Link>
           <Link to="/recall" className="botao discreto">
-            Voltar ao Recall
+            Voltar ao {ROTULO_DA_AREA.recall}
           </Link>
         </div>
       </>

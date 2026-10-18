@@ -141,9 +141,10 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 | **Callout** | Fundo `--tinta-lugar`, filete de 4 px à esquerda, ícone e texto; "Frase correta" em lugar, aviso em `--aviso-*`, perigo em `--perigo`. |
 | **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--andamento`; sempre com texto ("3 de 12"). |
 | **Estado vazio** | Ícone pequeno, frase curta, um botão primário. Sem texto longo e sem mascote. |
-| **Navegação** | Destino (P2): abas Hoje · Trilha · Fixar · Biblioteca sobre a areia (ícone 24 + rótulo ≥ 13 px, alvo ≥ 44), a atual em cal; embaixo até 899 px, no cabeçalho a partir de 900; `safe-area`. No código hoje: barra fixa embaixo na areia, rótulos Plano e Recall, atual em cal. |
-| **Cabeçalho** | Na areia: "Arretado" (Gabarito 700) com o cacto em vidro; Ajuda e Conta à direita; no desktop, a navegação no meio e "Registrar erro" (com a tecla E). Destino (P2): o "+" redondo em cal na linha do título das telas que criam algo; até lá, no celular, o "+" flutuante já é cal com tinta. |
-| **Rodapé** | Linha legal curta e o link "Backup e dados". No fim do conteúdo, nunca sob a navegação fixa. |
+| **Navegação** | Abas Hoje · Trilha · Fixar · Biblioteca sobre a areia (`nav.areas`), a atual em cal com `--atual-sombra` e o rótulo em negrito. Até 899 px, presas embaixo, com filete em cima: ícone de 22 sobre o rótulo de 13 px, aba de 56, `safe-area` embaixo; com o teclado aberto saem da frente (`.shell[data-teclado]`, `useTecladoAberto`). A partir de 900, no centro do cabeçalho, só o rótulo, pílula de 44. Nomes de `ROTULO_DA_AREA` (`textos.ts`); rotas `/plano` e `/recall`. |
+| **Cabeçalho** | Preso no alto (`sticky`), na areia, com filete embaixo: "Arretado" (Gabarito 700) com o cacto em vidro; Ajuda (texto) e Conta (ícone de pessoa num alvo de 44) à direita; a partir de 900 px, as áreas no meio e "Registrar erro" neutro com a tecla E. O Leitor mede a altura dele (`.topo`) para prender as próprias barras logo abaixo. |
+| **"+" no título** | `TituloComMais`: o título e o "+" na mesma linha; o "+" é redondo, 44 px, cal com tinta e `--atual-sombra`, e abre o registro de erro. No Hoje e no Fixar (as telas em que se registra); nas outras, a tecla E e, a partir de 900 px, o "Registrar erro" do cabeçalho. Não há "+" flutuante. |
+| **Rodapé** | Linha legal curta e "Backup e dados" como botão de texto de 44 px, centralizados no fim do conteúdo, acima da reserva das abas; nunca sob a navegação fixa. |
 | **Diálogo** | `dialog` nativo, raio 16, `--superficie`, fundo `rgb(0 0 0 / 45%)`, `--sombra-flutuante`; no celular, folha presa à borda de baixo. |
 
 ### A caneta e o cachorro (P3 em diante)
@@ -163,17 +164,17 @@ Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e
 
 | Elemento | Celular | Tablet em pé | Desktop e tablet deitado |
 |---|---|---|---|
-| Cabeçalho | na areia: "Arretado" à esquerda; Ajuda e Conta à direita | igual, gutter 24 | marca · navegação ao centro · "Registrar erro (E)", Ajuda, Conta |
+| Cabeçalho | na areia, gutter 16: "Arretado" à esquerda; Ajuda e Conta à direita | igual, gutter 24 | marca · navegação ao centro · "Registrar erro (E)", Ajuda, Conta |
 | Navegação | abas sobre a areia, ícone e rótulo nas quatro áreas, atual em cal, `env(safe-area-inset-bottom)` | as mesmas, centralizadas em até 560 px | no cabeçalho, pegajosa (`sticky`), atual em cal |
-| "+" | redondo em cal, na linha do título (P2) | idem | idem |
-| Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna de 40 rem centralizada | até 65 rem, 2 colunas (7fr · 5fr) no Hoje, no Fixar e na Trilha |
+| "+" | redondo em cal, na linha do título do Hoje e do Fixar | idem | idem, e "Registrar erro (E)" no cabeçalho |
+| Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna, gutter 24 (destino: 40 rem centralizada) | coluna de 900 px, gutter 32 (destino: até 65 rem, 2 colunas, 7fr · 5fr, no Hoje, no Fixar e na Trilha) |
 | H1 | 1,875 rem | 2,125 rem | 2,375 rem |
 | Hoje | título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, Em seguida | idem, folha mais larga | à esquerda o Agora; à direita Em seguida e "Para lembrar" |
 | Leitor | ver abaixo | estrutura à esquerda, coluna de lei à direita | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
 | Rodapé | fim do conteúdo, acima da reserva | idem | uma linha, centralizada |
 | Formulários | largura total, rótulo acima | coluna de 32 rem | coluna de 32 rem alinhada à esquerda do conteúdo |
 
-Regras de plataforma: as abas e o dock nunca cobrem texto (reserva de rolagem = altura das abas + 12 px + `safe-area` + 16 px); com o teclado aberto as abas somem (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha). No app de loja (futuro): corpo na fonte do sistema com Dynamic Type, Gabarito só nos títulos; a caneta sobre a areia é o ícone.
+Regras de plataforma: as abas e o dock nunca cobrem texto (reserva de rolagem = `--abas-altura`, a altura das abas com o filete, os 6 px de cima, a aba de 56 e, embaixo, 14 px ou a área segura, o que for maior; o rodapé termina 16 px acima delas; o dock do Leitor fica 16 px acima das abas); com o teclado aberto as abas somem (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha). No app de loja (futuro): corpo na fonte do sistema com Dynamic Type, Gabarito só nos títulos; a caneta sobre a areia é o ícone.
 
 ## Leitor e Sessão
 
@@ -224,7 +225,7 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 
 - **Nome:** "Arretado" em Gabarito 700 (`--fonte-titulo`), com o pequeno cacto em vidro (`--cacto`) ao lado, na altura da caixa-alta. Sem martelo, balança nem outros clichês jurídicos.
 - **A caneta-cacto de vidro** é o objeto da marca no app: ponteiro da retomada nas três poses; no app de loja, ícone sobre a areia (P7).
-- **Mascote:** o cachorro em um traço só, caramelo pela cor, só no Resumo do Dia e no fim de rodada. As ilustrações vetoriais antigas (`mascote/`, `src/apresentacao/imagens/`) saem do Agora, do estado vazio, da revisão e da Sessão nas fases P3, P5 e P6.
+- **Mascote:** o cachorro em um traço só, caramelo pela cor, só no Resumo do Dia e no fim de rodada. O mascote antigo saiu do app na P2 (pedido do Gabriel, 18/10/2026); os desenhos ficam só como histórico em `docs/design/mascote/`.
 
 ## Mapa do código
 
@@ -232,7 +233,7 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 |---|---|
 | Tokens, base, botões, campos, abas, cartões, navegação, rodapé | `src/apresentacao/estilos.css` (cada fase seguinte move para o CSS do próprio pacote o que for da sua tela) |
 | Fontes | `src/apresentacao/fontes/` (Gabarito, licença OFL); Atkinson e Literata de `node_modules/@fontsource*` |
-| Casca (cabeçalho, navegação, "+", rodapé) | `src/apresentacao/Shell.tsx` |
+| Casca (cabeçalho, navegação, "+", rodapé) | `src/apresentacao/Shell.tsx`, `componentes/TituloComMais.tsx` (o "+"), `componentes/teclado-aberto.ts` (teclado aberto), `componentes/MenuAjuda.tsx`; nomes das áreas em `textos.ts` (`ROTULO_DA_AREA`) |
 | Hoje | `src/apresentacao/hoje/*`, `componentes/AcaoAgora.tsx`, `LinhaDepois.tsx`, `LinhaLista.tsx`; lógica pura em `src/dominios/hoje/` |
 | Revisão e Fixar | `src/apresentacao/recall/*` (`Drill.tsx`, `RevisarFrases.tsx`, `RecallInicio.tsx`, listas) |
 | Leitor e Biblioteca | `src/apresentacao/biblioteca/*` |
@@ -244,6 +245,6 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 ## Como conferir
 
 1. `npm run check` (lint, tipos, testes, auditoria) e o E2E da tela tocada, com axe nos dois temas.
-2. `npm run build && node scripts/capturas-ui.mjs --rotas todas --medir --folhas`: fotografa as rotas × 3 aparelhos × 2 temas e mede rolagem horizontal, alvos de 44 px e texto sob o "+". `--zoom 2` repete a 200%.
+2. `npm run build && node scripts/capturas-ui.mjs --rotas todas --medir --folhas`: fotografa as rotas × 3 aparelhos × 2 temas e mede rolagem horizontal, alvos de 44 px e texto sob as abas de baixo no fim da página. `--zoom 2` repete a 200%.
 3. Comparar com as capturas do protótipo em [`referencias/2026-10-18-ponto-de-luz/`](referencias/2026-10-18-ponto-de-luz/) e com o contrato (tese, forma, acabamento, interação, padrões permitidos).
 4. Em cada PR de fase: folhas "antes e depois" da tela, tema claro e escuro, celular, tablet e desktop, em `docs/redesign/ponto-de-luz/<fase>/`.

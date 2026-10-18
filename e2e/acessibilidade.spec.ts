@@ -133,38 +133,84 @@ test('as fontes embutidas carregam (T19)', async ({ page }) => {
   expect(carregadas).toEqual([true, true, true, true, true]);
 });
 
-test('casca: barra de áreas por teclado, + flutuante só no celular e atalho E (fatia 2)', async ({
+test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px e atalho E (P2)', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  const titulo = page.getByRole('heading', { level: 1, name: 'Hoje' });
+  await expect(titulo).toBeVisible();
   const largura = page.viewportSize()?.width ?? 1280;
+  const altura = page.viewportSize()?.height ?? 0;
   const areas = page.getByRole('navigation', { name: 'Áreas' });
-  await expect(areas.getByRole('link')).toHaveText(['Hoje', 'Plano', 'Recall', 'Biblioteca']);
+  await expect(areas.getByRole('link')).toHaveText(['Hoje', 'Trilha', 'Fixar', 'Biblioteca']);
 
   const caixa = await areas.boundingBox();
-  const altura = page.viewportSize()?.height ?? 0;
   if (largura < 900) {
-    // Barra inferior (celular e tablet).
+    // Abas embaixo (celular e tablet em pé), presas à borda.
     expect(caixa?.y ?? 0).toBeGreaterThan(altura / 2);
+    expect(Math.round((caixa?.y ?? 0) + (caixa?.height ?? 0))).toBe(altura);
   } else {
     expect(caixa?.y ?? 0).toBeLessThan(altura / 2);
   }
 
+  // O "+" fica na linha do título, à direita dele, em qualquer largura.
   const mais = page.getByRole('link', { name: 'Novo registro de erro' });
-  if (largura < 700) {
-    await expect(mais).toBeVisible();
-    const m = await mais.boundingBox();
-    // Sem colidir com a barra de baixo.
-    expect((m?.y ?? 0) + (m?.height ?? 0)).toBeLessThanOrEqual(caixa?.y ?? 0);
-  } else {
-    await expect(mais).toBeHidden();
-  }
+  await expect(mais).toBeVisible();
+  const t = await titulo.boundingBox();
+  const m = await mais.boundingBox();
+  if (!t || !m) throw new Error('sem caixa do título ou do +');
+  expect(Math.abs(t.y + t.height / 2 - (m.y + m.height / 2))).toBeLessThan(12);
+  expect(m.x).toBeGreaterThan(t.x + t.width);
 
-  // Foco visível na barra: Tab até o primeiro link das áreas.
-  await areas.getByRole('link', { name: 'Recall' }).focus();
-  await expect(areas.getByRole('link', { name: 'Recall' })).toBeFocused();
+  // "Registrar erro" no cabeçalho só a partir de 900 px; Conta e Ajuda em qualquer largura.
+  const topo = page.getByRole('banner');
+  const noCabecalho = topo.getByRole('link', { name: 'Registrar erro' });
+  if (largura < 900) await expect(noCabecalho).toBeHidden();
+  else await expect(noCabecalho).toBeVisible();
+  await expect(topo.getByRole('link', { name: 'Conta e ajustes' })).toBeVisible();
+  await expect(topo.getByRole('button', { name: 'Ajuda', exact: true })).toBeVisible();
+
+  // Foco visível nas abas.
+  await areas.getByRole('link', { name: 'Fixar' }).focus();
+  await expect(areas.getByRole('link', { name: 'Fixar' })).toBeFocused();
 
   await page.keyboard.press('e');
   await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
 });
+
+// As abas de baixo (até 899 px) nunca cobrem texto no fim da página: a rolagem reserva a altura delas.
+for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/orientacoes']) {
+  test(`${rota}: as abas não cobrem texto no fim da página`, async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 1280) >= 900, 'as abas só ficam embaixo até 899 px');
+    await page.goto(`/#${rota}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const cobertos = await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      const abas = document.querySelector('nav.areas');
+      if (!abas) return ['(sem abas)'];
+      const a = abas.getBoundingClientRect();
+      const achados = new Set<string>();
+      // 4 = NodeFilter.SHOW_TEXT
+      const passeio = document.createTreeWalker(document.body, 4);
+      for (let no = passeio.nextNode(); no; no = passeio.nextNode()) {
+        const texto = (no.textContent ?? '').trim();
+        const pai = no.parentElement;
+        if (!texto || abas.contains(no) || !pai || pai.closest('.visualmente-oculto')) continue;
+        const faixa = document.createRange();
+        faixa.selectNodeContents(no);
+        for (const c of faixa.getClientRects()) {
+          if (
+            c.width > 1 &&
+            c.left < a.right &&
+            c.right > a.left &&
+            c.top < a.bottom &&
+            c.bottom > a.top
+          )
+            achados.add(texto.replace(/\s+/g, ' ').slice(0, 28));
+        }
+      }
+      return Array.from(achados);
+    });
+    expect(cobertos).toEqual([]);
+  });
+}

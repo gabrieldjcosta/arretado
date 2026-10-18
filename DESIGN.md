@@ -110,6 +110,12 @@ components:
     textColor: '{colors.tinta}'
     rounded: '{rounded.pilula}'
     height: '44px'
+  button-mais:
+    backgroundColor: '{colors.cal}'
+    textColor: '{colors.tinta}'
+    rounded: '{rounded.pilula}'
+    width: '44px'
+    height: '44px'
 ---
 
 # Design System: Arretado
@@ -122,7 +128,7 @@ A luz do sertão como tinta: areia clara, uma folha de cal com sombra fresca, e 
 
 O sistema é claro e firme. O chão é areia lisa, sem textura; a profundidade vem só da sombra fresca da folha. Os títulos usam a Gabarito (geométrica, feita por fundição brasileira para uma plataforma de ensino, com o nome da folha de respostas); a interface usa a Atkinson Hyperlegible, desenhada para leitura difícil; a lei fica na Literata. A cor tem papel: vidro é a ação, cal é "onde estou", tinta é o texto e o marcado, a luz só reporta estado. Vermelho só para excluir e para falha técnica, nunca no estudo.
 
-Estado desta descrição: a base (tokens, letras, botões, campos, cartões, folha do Agora, área e aba atuais, Estrela de luz) está no código desde a fase P1 de [`docs/planos/ponto-de-luz.md`](docs/planos/ponto-de-luz.md). A casca (abas sobre a areia com a atual em cal, "+" na linha do título), os pontos do Dia, a caneta nas três poses e o traço do cachorro são o destino das fases P2 a P7 e estão descritos aqui como regra, mesmo onde o código ainda não chegou. Decisão: D-D7 em [`docs/design/decisoes-design.md`](docs/design/decisoes-design.md); contrato: [`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`](docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md).
+Estado desta descrição: a base (tokens, letras, botões, campos, cartões, folha do Agora, área e aba atuais, Estrela de luz) está no código desde a fase P1 de [`docs/planos/ponto-de-luz.md`](docs/planos/ponto-de-luz.md), e a casca (cabeçalho, abas sobre a areia com a atual em cal, "+" na linha do título) desde a P2. Os pontos do Dia, a caneta nas três poses e o traço do cachorro são o destino das fases P3 a P7 e estão descritos aqui como regra, mesmo onde o código ainda não chegou. Decisão: D-D7 em [`docs/design/decisoes-design.md`](docs/design/decisoes-design.md); contrato: [`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`](docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md).
 
 **Key Characteristics:**
 
@@ -200,7 +206,7 @@ Uma paleta de dia claro (areia, cal, vidro) com uma tinta azul-sombra que ancora
 
 Um conteúdo de coluna única de até 900 px, centrado, com respiro generoso, e a lei em até 70ch. Escala de espaço de 4 em 4 (4, 8, 16, 24, 32, 48 px). Três larguras: celular até 699 px, tablet em pé de 700 a 899 px e desktop a partir de 900 px. No celular e no tablet em pé as abas das áreas ficam embaixo; no desktop, no cabeçalho.
 
-Destino (P2): cabeçalho na areia com a marca, Ajuda e Conta; abas Hoje · Trilha · Fixar · Biblioteca sobre a areia, com ícone e rótulo de 13 px ou mais e a atual em cal; o título da página leva o "+" redondo em cal na mesma linha, nas telas que criam algo. No Hoje (P3), a ordem é: título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, "Em seguida". O rodapé legal fica no fim do conteúdo e a rolagem reserva espaço para as abas.
+A casca (P2): cabeçalho preso no alto, na areia, com a marca, Ajuda e Conta; abas Hoje · Trilha · Fixar · Biblioteca sobre a areia, com ícone e rótulo de 13 px ou mais e a atual em cal; o título da página leva o "+" redondo em cal na mesma linha, nas telas em que se registra (Hoje e Fixar). Recuo lateral de 16 px no celular, 24 no tablet em pé e 32 a partir de 900 px; a partir de 900 o cabeçalho segue a coluna de 900 px, e a marca alinha com o título. O rodapé legal fica no fim do conteúdo, e a rolagem reserva a altura das abas (com a área segura do aparelho): no fim da página, nada fica embaixo delas. No Hoje (P3), a ordem é: título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, "Em seguida".
 
 Alvos de toque de pelo menos 44 px (campos em 48). Nenhuma tela rola na horizontal a 390 px; palavras longas quebram (`overflow-wrap: anywhere`).
 
@@ -254,8 +260,10 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 
 ### Navigation
 
-- **Destino (P2):** abas sobre a areia no celular e no tablet em pé; no alto a partir de 900 px. Quatro áreas: Hoje, Trilha, Fixar, Biblioteca, com ícone e rótulo. A atual em cal, com a sombra fresca e o rótulo em negrito.
-- **Hoje no código:** barra fixa embaixo na areia com as quatro áreas (rótulos Plano e Recall) e a atual em cal; cabeçalho na areia com a marca "Arretado" (Gabarito) e o cacto em vidro, "Registrar erro", Ajuda e Conta; o "+" flutuante no celular, em cal com tinta.
+- **Abas das áreas:** Hoje, Trilha, Fixar e Biblioteca, sobre a areia. Até 899 px, presas embaixo, com filete em cima, ícone de 22 px sobre o rótulo de 13 px, aba de 56 px (no tablet em pé, juntas no meio, em até 560 px); a partir de 900, no centro do cabeçalho, só o rótulo, em pílula de 44 px. A atual em cal, com a sombra fresca e o rótulo em negrito. Com o teclado aberto, as abas de baixo saem da frente (`data-teclado` na casca). Os nomes vêm de um mapa só (`ROTULO_DA_AREA`); as rotas seguem `/plano` e `/recall`.
+- **Cabeçalho:** "Arretado" em Gabarito 700 com o cacto em vidro, Ajuda (texto) e Conta (ícone de pessoa num alvo de 44); a partir de 900 px, "Registrar erro" neutro com a tecla E ao lado.
+- **"+" no título:** redondo, 44 px, cal com tinta e a sombra fresca, na linha do título do Hoje e do Fixar; abre o registro de erro. Não é vidro. A tecla E registra de qualquer tela.
+- **Rodapé:** o aviso curto e "Backup e dados" como botão de texto de 44 px, no fim do conteúdo.
 
 ### Leitor da lei (signature)
 

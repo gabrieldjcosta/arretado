@@ -37,7 +37,7 @@ export function MenuAjuda({
       <button
         ref={botao}
         type="button"
-        className="discreto"
+        className="discreto ajuda-botao"
         aria-expanded={aberto}
         aria-controls="menu-ajuda-itens"
         onClick={() => {
