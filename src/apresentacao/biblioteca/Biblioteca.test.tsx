@@ -347,3 +347,45 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(within(lista).queryByRole('link', { name: /^LEP/ })).not.toBeInTheDocument();
   });
 });
+
+describe('Biblioteca › Normas: itens excluídos não vazam', () => {
+  it('vínculo excluído não mantém a norma no grupo da disciplina', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    await vincular(repo, lep.id, 'Execução Penal');
+    for (const v of await repo.colecao('vinculosDisciplina').todosDoUsuario()) {
+      await repo.colecao('vinculosDisciplina').excluir(v.id);
+    }
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(await within(lista).findByRole('group', { name: 'Outras' })).toBeInTheDocument();
+    expect(within(lista).queryByRole('group', { name: 'Execução Penal' })).not.toBeInTheDocument();
+  });
+
+  it('disciplina excluída não dá nome ao grupo da norma', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    await vincular(repo, lep.id, 'Execução Penal');
+    for (const d of await repo.colecao('disciplinas').todosDoUsuario()) {
+      await repo.colecao('disciplinas').excluir(d.id);
+    }
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(await within(lista).findByRole('group', { name: 'Outras' })).toBeInTheDocument();
+    expect(within(lista).queryByRole('group', { name: 'Execução Penal' })).not.toBeInTheDocument();
+  });
+
+  it('edital excluído não oferece "Tudo do edital"', async () => {
+    const { repo } = await repositorioDeTeste();
+    await plano(repo, 'DPE-SP', 'Execução Penal');
+    for (const e of await repo.colecao('editais').todosDoUsuario()) {
+      await repo.colecao('editais').excluir(e.id);
+    }
+    await abrirComAcervo(repo);
+
+    await screen.findByRole('heading', { name: 'Nenhuma norma ainda' });
+    expect(screen.queryByRole('link', { name: /Tudo do edital/ })).not.toBeInTheDocument();
+  });
+});

@@ -47,7 +47,7 @@ function conferirArvore(item: ItemDoAcervo): void {
 
 async function normaJaAdicionada(repo: Repositorio, acervoId: string) {
   const normas = await repo.colecao('normas').todosDoUsuario();
-  return normas.find((n) => n.origemAcervo?.id === acervoId);
+  return normas.find((n) => n.excluidoEm === null && n.origemAcervo?.id === acervoId);
 }
 
 /** Baixa e confere o item (fora de transação: pode demorar). */

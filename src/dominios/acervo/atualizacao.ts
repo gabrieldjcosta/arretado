@@ -49,7 +49,8 @@ export async function itensComVersaoNova(
 ): Promise<{ normaId: string; entrada: EntradaDoIndice; versaoAderida: number }[]> {
   const normas = await repo.colecao('normas').todosDoUsuario();
   const porAcervo = new Map<string, Norma>();
-  for (const n of normas) if (n.origemAcervo) porAcervo.set(n.origemAcervo.id, n);
+  for (const n of normas)
+    if (n.excluidoEm === null && n.origemAcervo) porAcervo.set(n.origemAcervo.id, n);
   const saida: { normaId: string; entrada: EntradaDoIndice; versaoAderida: number }[] = [];
   for (const entrada of entradas) {
     const norma = porAcervo.get(entrada.id);
@@ -62,7 +63,7 @@ export async function itensComVersaoNova(
 
 async function normaDoAcervo(repo: Repositorio, acervoId: string) {
   const normas = await repo.colecao('normas').todosDoUsuario();
-  const norma = normas.find((n) => n.origemAcervo?.id === acervoId);
+  const norma = normas.find((n) => n.excluidoEm === null && n.origemAcervo?.id === acervoId);
   if (!norma?.origemAcervo || !norma.versaoVigenteId) {
     throw new AtualizacaoRecusada(acervoId, 'nao_adicionada');
   }
