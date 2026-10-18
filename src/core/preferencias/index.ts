@@ -29,3 +29,4 @@ export function cotaDiaria(preferencias: Pick<Preferencias, 'cotaDiaria'>): numb
 }
 
 export * from './perfis';
+export * from './consentimento';
