@@ -19,7 +19,11 @@ const CONHECIDA = 'Progressão de regime exige um sexto da pena cumprida.';
 // Iterações mínimas aceitas pelo formato: o teste não precisa da lentidão de produção.
 const RAPIDO = { iteracoes: 1_000 };
 
-const ERRO = { resultado: 'errou' as const, oQueFoi: 'Prazo do art. 112', status: 'aberto' as const };
+const ERRO = {
+  resultado: 'errou' as const,
+  oQueFoi: 'Prazo do art. 112',
+  status: 'aberto' as const,
+};
 
 async function montar() {
   const ctx = await repositorioDeTeste({ usuarioId: UID });
@@ -35,7 +39,11 @@ const frases = async (repo: Awaited<ReturnType<typeof montar>>['repo']) =>
     .sort();
 
 function contem(bytes: Uint8Array, texto: string): boolean {
-  return Buffer.from(bytes).includes(Buffer.from(texto, 'utf8'));
+  const agulha = new TextEncoder().encode(texto);
+  for (let i = 0; i + agulha.length <= bytes.length; i += 1) {
+    if (agulha.every((b, j) => bytes[i + j] === b)) return true;
+  }
+  return false;
 }
 
 describe('cópia cifrada na nuvem (F4-A, A6)', () => {

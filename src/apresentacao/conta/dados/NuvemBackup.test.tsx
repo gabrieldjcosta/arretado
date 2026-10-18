@@ -25,7 +25,9 @@ async function montar(opcoes: { semRede?: boolean; comCopia?: boolean } = {}) {
   });
   const servico = new ServicoDeContaFalso({ sessao: SESSAO });
   if (opcoes.comCopia) await guardarCopiaNaNuvem(repo, servico, FRASE, { iteracoes: RAPIDO });
-  const usado = opcoes.semRede ? new ServicoDeContaFalso({ sessao: SESSAO, semRede: true }) : servico;
+  const usado = opcoes.semRede
+    ? new ServicoDeContaFalso({ sessao: SESSAO, semRede: true })
+    : servico;
   const recarregar = vi.fn();
   const tela = render(
     <ContextoRepositorio.Provider value={repo}>

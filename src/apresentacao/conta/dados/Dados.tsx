@@ -6,6 +6,7 @@ import { Exportar } from './Exportar';
 import { ExportarTexto } from './ExportarTexto';
 import { Importar } from './Importar';
 import { AVISO_DE_RESPONSABILIDADE } from '../../textos';
+import { NuvemBackup } from './NuvemBackup';
 import { lerAvisoDeRecarga, limparAvisoDeRecarga } from './recarga';
 import { Restauracao } from './Restauracao';
 import { Salvaguarda } from './Salvaguarda';
@@ -36,6 +37,7 @@ export function Dados() {
       </section>
       <p className="dica">{AVISO_DE_RESPONSABILIDADE}</p>
       <Exportar />
+      <NuvemBackup />
       <ExportarTexto />
       <Importar />
       <Espacos />

@@ -3,6 +3,7 @@ import { ServicoDeContaPreguicoso } from './preguicoso';
 import type { ServicoDeConta } from './interface';
 
 export {
+  type CopiaNaNuvem,
   FalhaDeConta,
   type MotivoDeFalha,
   type ServicoDeConta,

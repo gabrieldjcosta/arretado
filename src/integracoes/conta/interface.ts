@@ -20,6 +20,13 @@ export class FalhaDeConta extends Error {
   }
 }
 
+/** Uma cópia cifrada guardada em `backups/<uid>/` (A6). O servidor só vê bytes opacos. */
+export interface CopiaNaNuvem {
+  /** Nome dentro da pasta da conta: `AAAA-MM-DDTHH-MM-SS-<hash8>.arretado`. */
+  nome: string;
+  tamanho: number;
+}
+
 export interface ServicoDeConta {
   /** Sessão conhecida agora, ou `null` (sem conta ou sessão expirada). Não exige rede. */
   sessao(): Promise<SessaoDeConta | null>;
@@ -32,6 +39,11 @@ export interface ServicoDeConta {
   aceitarTermos(versao: string): Promise<void>;
   sair(): Promise<void>;
   excluirConta(): Promise<void>;
+  /** Cópias cifradas na nuvem da conta com sessão (A6); sem sessão ou sem rede, recusam. */
+  listarCopias(): Promise<CopiaNaNuvem[]>;
+  enviarCopia(nome: string, bytes: Uint8Array): Promise<void>;
+  baixarCopia(nome: string): Promise<Uint8Array>;
+  apagarCopia(nome: string): Promise<void>;
   /** Avisa mudanças de sessão (entrar, sair, expirar). Devolve a função que cancela. */
   aoMudar(ouvinte: (sessao: SessaoDeConta | null) => void): () => void;
 }
