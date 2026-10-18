@@ -28,7 +28,19 @@ export {
   type Pagina,
 } from './colecao';
 export type { Contexto } from './contexto';
-export { reconstruirDoLog } from './log';
+export { desfazerAlteracao, reconstruirDoLog, type Estado } from './log';
+export {
+  carimboDoLote,
+  FonteDoLoteAusente,
+  idDoLote,
+  idsDoLote,
+  OPERACAO_ADESAO,
+  referenciasNoLog,
+  registrosDoLote,
+  type ConteudoDoLote,
+  type ReferenciaDeAcervo,
+  type Reidratador,
+} from './lote-acervo';
 export { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 export { PREFERENCIAS_PADRAO, Repositorio, type OpcoesRepositorio } from './repositorio';
 export {

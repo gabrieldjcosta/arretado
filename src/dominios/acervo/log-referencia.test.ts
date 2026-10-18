@@ -9,6 +9,7 @@ import {
   OPERACAO_ADESAO,
   reconstruirDoLog,
   registrosDoLote,
+  BancoArretado,
   RegistroDeContas,
   Repositorio,
   type Alteracao,
@@ -49,7 +50,11 @@ function itemCom(id: string, artigos: number, versao = 1, sufixo = ''): ItemDoAc
         pai: 'tit1',
         trechos: [{ texto: `Texto ${String(k + 1)}${sufixo}.` }, { texto: ' fim', enfase: true }],
         ...(k % 3 === 0
-          ? { notasVigencia: [{ texto: 'Redação dada pela Lei nº 1, de 2020', lei: 'Lei nº 1', ano: 2020 }] }
+          ? {
+              notasVigencia: [
+                { texto: 'Redação dada pela Lei nº 1, de 2020', lei: 'Lei nº 1', ano: 2020 },
+              ],
+            }
           : {}),
         ...(k % 4 === 1 ? { procedencia: { rotulo: 'DOU', data: '2020-01-02' } } : {}),
         ...(k % 5 === 2 ? { renumeradoDe: `art${String(k + 50)}` } : {}),
@@ -157,9 +162,10 @@ async function usoAleatorio(
     } else if (op === 2 && d) {
       await repo.colecao('dispositivos').atualizar(d.id, { rotulo: undefined });
     } else if (op === 3 && t) {
-      await repo
-        .colecao('textosDispositivo')
-        .atualizar(t.id, { trechos: [{ texto: `Mudado ${String(passo)}` }], notasVigencia: undefined });
+      await repo.colecao('textosDispositivo').atualizar(t.id, {
+        trechos: [{ texto: `Mudado ${String(passo)}` }],
+        notasVigencia: undefined,
+      });
     } else if (op === 4 && d) {
       await repo.colecao('dispositivos').excluir(d.id);
     } else if (op === 5 && norma) {
@@ -242,32 +248,35 @@ describe('entradas antigas', () => {
   it('o log gravado antes do AL reconstrói sem fonte nenhuma', () => {
     const estado = comoMapa(reconstruirDoLog(antigo.log as Alteracao[]));
     const esperado = new Map(
-      Object.entries(antigo.tabelas).map(([k, v]) => [k as NomeColecao, ordenar(v)]),
+      Object.entries(antigo.tabelas).map(([k, v]) => [k as NomeColecao, ordenar(v as unknown[])]),
     );
     expect(estado).toEqual(esperado);
   });
 
   it('não são reescritas: adesão nova sobre log antigo; o todo reconstrói', async () => {
-    const repo = await Repositorio.abrir({ nomeBanco: nomeBanco() });
-    // O banco de antes: registros e log do app anterior, copiados como estavam.
-    const doDono = antigo.log[0]?.usuarioId;
-    await repo.transacao(async () => {
-      for (const [nome, lista] of Object.entries(antigo.tabelas)) {
-        await repo.db.tabela(nome as NomeColecao).bulkPut(lista as never[]);
+    // O banco de antes: registros, log (com seq) e identidade do app anterior, como estavam.
+    const nome = nomeBanco();
+    const usuarioId = antigo.tabelas.usuarios[0]!.id;
+    const aparelhoId = antigo.tabelas.aparelhos[0]!.id;
+    const db = new BancoArretado(nome);
+    await db.open();
+    await db.transaction('rw', db.tables, async () => {
+      for (const [colecao, lista] of Object.entries(antigo.tabelas)) {
+        await db.tabela(colecao as NomeColecao).bulkAdd(lista as never[]);
       }
-      await repo.db.alteracoes.bulkAdd(antigo.log as Alteracao[]);
+      await db.alteracoes.bulkAdd(antigo.log as Alteracao[]);
+      await db.meta.put({ chave: 'identidade', valor: { usuarioId, aparelhoId } });
     });
-    const ctx = repo.comUsuario(doDono!);
+    db.close();
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
     const fonte = await FonteEmMemoria.criar([{ item: itemCom('lei-nova', 3) }]);
-    await aderirAoItem(ctx, fonte, (await fonte.listar()).itens[0]!);
+    await aderirAoItem(repo, fonte, (await fonte.listar()).itens[0]!);
     const depois = await log(repo);
     expect(depois.slice(0, antigo.log.length)).toEqual(antigo.log);
     const reidratar = await reidratadorDoAcervo(fonte, depois);
-    const doLog = comoMapa(reconstruirDoLog(depois.filter((a) => a.usuarioId === doDono), reidratar));
-    const gravado = await tabelas(repo);
-    for (const [nome, lista] of doLog) {
-      expect(lista).toEqual((gravado.get(nome) ?? []).filter((r) => (r as { usuarioId: string }).usuarioId === doDono));
-    }
+    const doLog = comoMapa(reconstruirDoLog(depois, reidratar));
+    expect(doLog).toEqual(await tabelas(repo));
+    expect(depois.filter((x) => x.operacao === OPERACAO_ADESAO)).toHaveLength(1);
     repo.fechar();
   });
 });
@@ -282,7 +291,11 @@ describe('edição posterior', () => {
     await repo.colecao('dispositivos').atualizar(art2.id, { rotulo: 'Art. 2º-A' });
     const alteracoes = await log(repo);
     const ultima = alteracoes.at(-1)!;
-    expect(ultima).toMatchObject({ operacao: 'atualizar', colecao: 'dispositivos', registroId: art2.id });
+    expect(ultima).toMatchObject({
+      operacao: 'atualizar',
+      colecao: 'dispositivos',
+      registroId: art2.id,
+    });
     expect(ultima.dados).not.toHaveProperty('endereco');
     const estado = reconstruirDoLog(alteracoes, await reidratadorDoAcervo(fonte, alteracoes));
     expect(estado.get('dispositivos')?.get(art2.id)).toMatchObject({
@@ -306,7 +319,10 @@ describe('desfazer', () => {
       ...(await repo.colecao('dispositivos').todosDoUsuario()).map((d) => d.id),
       ...(await repo.colecao('textosDispositivo').todosDoUsuario()).map((t) => t.id),
     ]);
-    const afetados = [...(antes.get('dispositivos')?.entries() ?? []), ...(antes.get('textosDispositivo')?.entries() ?? [])];
+    const afetados = [
+      ...(antes.get('dispositivos')?.entries() ?? []),
+      ...(antes.get('textosDispositivo')?.entries() ?? []),
+    ];
     expect(new Set(afetados.map(([id]) => id))).toEqual(ids);
     expect(afetados.every(([, registro]) => registro === null)).toBe(true);
     repo.fechar();
@@ -316,10 +332,16 @@ describe('desfazer', () => {
     const { repo, fonte, indice } = await montar();
     await aderirAoItem(repo, fonte, indice.itens[0]!);
     const original = (await repo.colecao('textosDispositivo').todosDoUsuario())[2]!;
-    await repo.colecao('textosDispositivo').atualizar(original.id, { trechos: [{ texto: 'Outro' }] });
+    await repo
+      .colecao('textosDispositivo')
+      .atualizar(original.id, { trechos: [{ texto: 'Outro' }] });
     const alteracoes = await log(repo);
     const edicao = alteracoes.at(-1)!;
-    const antes = desfazerAlteracao(alteracoes, edicao.seq!, await reidratadorDoAcervo(fonte, alteracoes));
+    const antes = desfazerAlteracao(
+      alteracoes,
+      edicao.seq!,
+      await reidratadorDoAcervo(fonte, alteracoes),
+    );
     expect(antes.get('textosDispositivo')?.get(original.id)).toEqual(original);
     repo.fechar();
   });
@@ -384,15 +406,14 @@ describe('fonte ausente ou trocada', () => {
 });
 
 describe('migração para a conta com lote por referência', () => {
-  const UID = '0b7c2f3e-5a1d-4c6e-9f80-123456789abc';
-
   async function origemComAdesao() {
     const { repo, fonte, indice } = await montar();
     await aderirAoItem(repo, fonte, indice.itens[1]!);
-    await repo.colecao('dispositivos').atualizar(
-      (await repo.colecao('dispositivos').todosDoUsuario())[3]!.id,
-      { rotulo: 'Editado' },
-    );
+    await repo
+      .colecao('dispositivos')
+      .atualizar((await repo.colecao('dispositivos').todosDoUsuario())[3]!.id, {
+        rotulo: 'Editado',
+      });
     return { repo, fonte };
   }
 
@@ -400,7 +421,7 @@ describe('migração para a conta com lote por referência', () => {
     const { repo, fonte } = await origemComAdesao();
     const registro = new RegistroDeContas(`reg-${Math.random().toString(36).slice(2)}`);
     const r = await migrarParaConta(repo, {
-      uid: UID,
+      uid: crypto.randomUUID(),
       registro,
       baixarBackup: () => Promise.resolve(),
       prepararReidratacao: (alteracoes) => reidratadorDoAcervo(fonte, alteracoes),
@@ -415,7 +436,7 @@ describe('migração para a conta com lote por referência', () => {
     const registro = new RegistroDeContas(`reg-${Math.random().toString(36).slice(2)}`);
     const vazia = await FonteEmMemoria.criar([]);
     const r = await migrarParaConta(repo, {
-      uid: UID,
+      uid: crypto.randomUUID(),
       registro,
       baixarBackup: () => Promise.resolve(),
       prepararReidratacao: (alteracoes) => reidratadorDoAcervo(vazia, alteracoes),

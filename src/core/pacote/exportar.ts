@@ -2,7 +2,7 @@
 import { zipSync, type Zippable } from 'fflate';
 import { dataCivil, horaCivil } from '../datas';
 import { colecoesDoModulo, MODULOS, type Modulo, type NomeColecao } from '../modelo';
-import { VERSAO_ESQUEMA, type Repositorio } from '../persistencia';
+import { OPERACAO_ADESAO, VERSAO_ESQUEMA, type Repositorio } from '../persistencia';
 import { jsonCanonico } from '../util/json-canonico';
 import { VERSAO_APP } from '../versao';
 import { paraBytes, sha256 } from './bytes';
@@ -65,6 +65,8 @@ export async function exportarPacote(
   const escopo: Escopo = opcoes.escopo ?? { tipo: 'integral' };
   const modulos: Modulo[] = escopo.tipo === 'integral' ? [...MODULOS] : [...escopo.modulos];
   const conteudo: Record<string, Uint8Array> = {};
+  // Log com árvore do acervo por referência (AL) só é lido pelo app novo: formato 2; sem, segue 1.
+  let versaoFormato: Manifesto['versaoFormato'] = 1;
   const contagens: Record<string, number> = {};
 
   // Sem o módulo `sistema`, o pacote com `legislacao` leva só os anexos que são fonte de versão
@@ -94,6 +96,7 @@ export async function exportarPacote(
     if (opcoes.incluirLog) {
       // Mesma chave de índice → ordem da chave primária (seq): o log sai em ordem.
       const log = await repo.db.alteracoes.where('usuarioId').equals(repo.ctx.usuarioId).toArray();
+      if (log.some((a) => a.operacao === OPERACAO_ADESAO)) versaoFormato = VERSAO_FORMATO;
       conteudo[ARQUIVO_LOG] = serializarLista(
         log.map((a) => {
           const semSeq = { ...a };
@@ -117,7 +120,7 @@ export async function exportarPacote(
   const agora = repo.ctx.agora();
   const manifesto: Manifesto = {
     formato: FORMATO,
-    versaoFormato: VERSAO_FORMATO,
+    versaoFormato,
     versaoEsquema: VERSAO_ESQUEMA,
     versaoApp: VERSAO_APP,
     criadoEm: agora.toISOString(),
@@ -138,7 +141,7 @@ export async function exportarPacote(
 
   if (opcoes.senha !== undefined) {
     const { cifra, conteudo: cifrado } = await cifrar(bytes, opcoes.senha, opcoes.iteracoes);
-    const externo: ManifestoCifrado = { formato: FORMATO, versaoFormato: VERSAO_FORMATO, cifra };
+    const externo: ManifestoCifrado = { formato: FORMATO, versaoFormato, cifra };
     bytes = zipSync({
       [ARQUIVO_MANIFESTO]: paraBytes(JSON.stringify(externo, null, 2)),
       [ARQUIVO_CIFRADO]: [cifrado, { level: 0 }],

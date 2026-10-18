@@ -25,7 +25,10 @@ describe('ids do lote', () => {
   it('não colidem com ids sequenciais de teste', () => {
     const base = '00000000-0000-7000-8000-000000000005';
     const seq = new Set(
-      Array.from({ length: 1000 }, (_, n) => `00000000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`),
+      Array.from(
+        { length: 1000 },
+        (_, n) => `00000000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`,
+      ),
     );
     for (let k = 0; k < 1000; k++) expect(seq.has(idDoLote(base, k))).toBe(false);
   });
@@ -36,7 +39,9 @@ describe('carimbos do lote', () => {
     expect(carimboDoLote('0000000001000-000005-abcdef01', 0)).toBe('0000000001000-000005-abcdef01');
     expect(carimboDoLote('0000000001000-000005-abcdef01', 3)).toBe('0000000001000-000008-abcdef01');
     expect(carimboDoLote('0000000001000-999998-abcdef01', 3)).toBe('0000000001001-000001-abcdef01');
-    const lista = Array.from({ length: 2000 }, (_, k) => carimboDoLote('0000000001000-999000-abcdef01', k));
+    const lista = Array.from({ length: 2000 }, (_, k) =>
+      carimboDoLote('0000000001000-999000-abcdef01', k),
+    );
     expect(lista.every((c) => TsLogico.safeParse(c).success)).toBe(true);
     expect([...lista].sort()).toEqual(lista);
     expect(new Set(lista).size).toBe(lista.length);
@@ -80,8 +85,8 @@ describe('reconstruir sem a fonte', () => {
   });
 
   it('conteúdo com quantidade diferente da referência é recusado', () => {
-    expect(() =>
-      reconstruirDoLog([entrada], () => ({ dispositivos: [], textos: [] })),
-    ).toThrow(/não confere/);
+    expect(() => reconstruirDoLog([entrada], () => ({ dispositivos: [], textos: [] }))).toThrow(
+      /não confere/,
+    );
   });
 });

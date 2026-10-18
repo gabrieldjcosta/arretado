@@ -36,7 +36,9 @@ async function comLote() {
             confianca: 'alta',
           },
         ],
-        textos: [{ versaoId, normaId, dispositivoId: idDoLote(base, 0), trechos: [{ texto: 'Texto.' }] }],
+        textos: [
+          { versaoId, normaId, dispositivoId: idDoLote(base, 0), trechos: [{ texto: 'Texto.' }] },
+        ],
       },
     ),
   );

@@ -11,7 +11,9 @@ const nomeBanco = () => `carga-cf-${Math.random().toString(36).slice(2)}`;
 
 describe('adesão da CF/88', () => {
   it('mede tempo, entradas e bytes do log', async () => {
-    const bruto: unknown = JSON.parse(await readFile('public/acervo/constituicao-1988.json', 'utf-8'));
+    const bruto: unknown = JSON.parse(
+      await readFile('public/acervo/constituicao-1988.json', 'utf-8'),
+    );
     const item = ItemDoAcervo.parse(bruto);
     const fonte = await FonteEmMemoria.criar([{ item }]);
     const [entrada] = (await fonte.listar()).itens;

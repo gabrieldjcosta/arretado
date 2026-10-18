@@ -1,8 +1,17 @@
 // Adesão ao acervo (spec §4): baixa o item, confere esquema e hash do índice, converte para o
 // formato local e grava numa transação. Idempotente (adicionar de novo não duplica); a falha de
-// um item não afeta os demais, e o lote é retomável (o que já entrou é pulado).
-import type { Dados } from '../../core/persistencia';
-import type { Repositorio } from '../../core/persistencia';
+// um item não afeta os demais, e o lote é retomável (o que já entrou é pulado). No log, a árvore
+// entra por referência (AL): `reidratadorDoAcervo` a refaz pela fonte para reconstruir e desfazer.
+import {
+  idDoLote,
+  referenciasNoLog,
+  type Alteracao,
+  type ConteudoDoLote,
+  type Dados,
+  type ReferenciaDeAcervo,
+  type Reidratador,
+  type Repositorio,
+} from '../../core/persistencia';
 import type { EntradaDoIndice, ItemDoAcervo } from './esquemas';
 import type { FonteDoAcervo } from './fonte';
 import { hashDoItem } from './hash';
@@ -61,6 +70,83 @@ export async function baixarConferido(
   if ((await hashDoItem(item)) !== entrada.hash) throw new AdesaoRecusada(entrada.id, 'hash');
   conferirArvore(item);
   return item;
+}
+
+/**
+ * Dispositivos e textos do item, na ordem dos nós, com os ids derivados de `base` (o mesmo na
+ * adesão e na reidratação: é o que faz o log por referência refazer exatamente o gravado).
+ */
+export function conteudoDoItem(
+  item: ItemDoAcervo,
+  normaId: string,
+  versaoId: string,
+  base: string,
+): ConteudoDoLote {
+  const idPorEndereco = new Map<string, string>();
+  const dispositivos: Dados<'dispositivos'>[] = [];
+  const textos: Dados<'textosDispositivo'>[] = [];
+  for (const [k, no] of item.nos.entries()) {
+    const id = idDoLote(base, k);
+    idPorEndereco.set(no.endereco, id);
+    const paiId = no.pai === undefined ? undefined : idPorEndereco.get(no.pai);
+    dispositivos.push({
+      normaId,
+      endereco: no.endereco,
+      categoria: no.categoria,
+      tipo: no.tipo,
+      ordem: k + 1,
+      status: no.status,
+      confianca: no.confianca,
+      ...(paiId === undefined ? {} : { paiId }),
+      ...(no.rotulo === undefined ? {} : { rotulo: no.rotulo }),
+      ...(no.renumeradoDe === undefined ? {} : { renumeradoDe: no.renumeradoDe }),
+    });
+    textos.push({
+      versaoId,
+      dispositivoId: id,
+      normaId,
+      trechos: no.trechos,
+      ...(no.notasVigencia === undefined ? {} : { notasVigencia: no.notasVigencia }),
+      ...(no.procedencia === undefined ? {} : { procedencia: no.procedencia }),
+      ...(no.redacoesAnteriores === undefined ? {} : { redacoesAnteriores: no.redacoesAnteriores }),
+    });
+  }
+  return { dispositivos, textos };
+}
+
+/** O item exato da referência: a versão atual, se o hash bater, ou a guardada por hash. */
+async function itemDaReferencia(
+  fonte: FonteDoAcervo,
+  ref: ReferenciaDeAcervo,
+): Promise<ItemDoAcervo | undefined> {
+  const confere = async (item: ItemDoAcervo | undefined) =>
+    item?.id === ref.itemId && item.versao === ref.versao && (await hashDoItem(item)) === ref.hash
+      ? item
+      : undefined;
+  const atual = await confere(await fonte.obter(ref.itemId).catch(() => undefined));
+  if (atual) return atual;
+  if (!fonte.obterVersao) return undefined;
+  return confere(await fonte.obterVersao(ref.itemId, ref.hash).catch(() => undefined));
+}
+
+/**
+ * Busca na fonte cada item referenciado no log (conferindo versão e hash) e devolve o reidratador
+ * síncrono de `reconstruirDoLog`/`desfazerAlteracao`. Item ausente ou que não confere fica sem
+ * conteúdo: reconstruir lança `FonteDoLoteAusente` (Problema explícito, nunca estado inventado).
+ */
+export async function reidratadorDoAcervo(
+  fonte: FonteDoAcervo,
+  alteracoes: Iterable<Alteracao>,
+): Promise<Reidratador> {
+  const itens = new Map<string, ItemDoAcervo | undefined>();
+  for (const ref of referenciasNoLog(alteracoes)) {
+    if (!itens.has(ref.hash)) itens.set(ref.hash, await itemDaReferencia(fonte, ref));
+  }
+  return (ref) => {
+    const item = itens.get(ref.hash);
+    if (item?.id !== ref.itemId) return undefined;
+    return conteudoDoItem(item, ref.normaId, ref.versaoId, ref.base);
+  };
 }
 
 export interface OpcoesDaAdesao {
@@ -128,44 +214,12 @@ export async function aderirAoItem(
       },
       { id: versaoId, origem: 'importacao' },
     );
-    const idPorEndereco = new Map<string, string>();
-    const dispositivos: { id: string; dados: Dados<'dispositivos'> }[] = [];
-    const textos: { dados: Dados<'textosDispositivo'> }[] = [];
-    for (const [k, no] of item.nos.entries()) {
-      const id = repo.ctx.novoId();
-      idPorEndereco.set(no.endereco, id);
-      const paiId = no.pai === undefined ? undefined : idPorEndereco.get(no.pai);
-      dispositivos.push({
-        id,
-        dados: {
-          normaId,
-          endereco: no.endereco,
-          categoria: no.categoria,
-          tipo: no.tipo,
-          ordem: k + 1,
-          status: no.status,
-          confianca: no.confianca,
-          ...(paiId === undefined ? {} : { paiId }),
-          ...(no.rotulo === undefined ? {} : { rotulo: no.rotulo }),
-          ...(no.renumeradoDe === undefined ? {} : { renumeradoDe: no.renumeradoDe }),
-        },
-      });
-      textos.push({
-        dados: {
-          versaoId,
-          dispositivoId: id,
-          normaId,
-          trechos: no.trechos,
-          ...(no.notasVigencia === undefined ? {} : { notasVigencia: no.notasVigencia }),
-          ...(no.procedencia === undefined ? {} : { procedencia: no.procedencia }),
-          ...(no.redacoesAnteriores === undefined
-            ? {}
-            : { redacoesAnteriores: no.redacoesAnteriores }),
-        },
-      });
-    }
-    await repo.colecao('dispositivos').criarLote(dispositivos, { origem: 'importacao' });
-    await repo.colecao('textosDispositivo').criarLote(textos, { origem: 'importacao' });
+    // Árvore por referência (AL): uma entrada `acervo-adesao` no log, não uma por registro.
+    const base = repo.ctx.novoId();
+    await repo.gravarLoteDoAcervo(
+      { itemId: item.id, versao: item.versao, hash: entrada.hash, normaId, versaoId, base },
+      conteudoDoItem(item, normaId, versaoId, base),
+    );
     await definirVinculos(
       repo,
       normaId,

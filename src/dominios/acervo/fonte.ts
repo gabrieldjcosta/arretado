@@ -9,6 +9,11 @@ export interface FonteDoAcervo {
   listar(): Promise<IndiceDoAcervo>;
   /** O corpo de um item, validado pelo esquema (o hash é conferido pela adesão). */
   obter(id: string): Promise<ItemDoAcervo>;
+  /**
+   * Uma versão antiga do item, pelo hash (AL: os arquivos do acervo são imutáveis por hash; a
+   * reidratação do log pede a versão aderida mesmo depois de publicada outra). Opcional.
+   */
+  obterVersao?(id: string, hash: string): Promise<ItemDoAcervo>;
 }
 
 export type MotivoFonteIndisponivel = 'sem_rede' | 'nao_encontrado' | 'formato_invalido';
