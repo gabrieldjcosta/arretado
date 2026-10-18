@@ -183,6 +183,12 @@ export function medir(tema) {
     for (const d of DESTAQUES) juntar(d, `regua-fundo sobre ${f}`, 3, razao(cor(d), regua));
   }
 
+  // O anel do ponto do Dia que ainda não foi feito (tinta a 55%): contorno de 3:1 sobre o fundo
+  // e sobre a superfície, onde os pontos podem ficar.
+  for (const f of SUPERFICIES) {
+    juntar('ponto-apagado', f, 3, razao(sobre(cor('ponto-apagado'), cor(f)), cor(f)));
+  }
+
   // D-D7: os pares do contrato da direção, com os valores fixos da paleta.
   const branco = { r: 255, g: 255, b: 255, a: 1 };
   juntar('tinta', 'areia', 4.5, razao(cor('tinta'), cor('areia')));

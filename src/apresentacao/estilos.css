@@ -108,6 +108,23 @@
   --estrela-contorno: var(--ponto-contorno);
   --calha-estrela: 1.5rem;
   --traco-cachorro: var(--traco);
+  /* O anel do ponto do Dia que ainda não foi feito: a tinta a 55%, 3,4:1 na areia (a 45% do
+     protótipo seriam 2,6:1, abaixo dos 3:1 que um contorno pede). */
+  --ponto-apagado: rgb(23 36 58 / 55%);
+  /* A caneta (P3): o vidro do ciano ao verde, o único objeto com volume e o único gradiente. À
+     noite o brilho de borda é menor e só o halo da ponta cresce (`--caneta-halo-*` são opacidades:
+     a caneta desenha os dois halos e o tema acende um). */
+  --caneta-0: #dffcff;
+  --caneta-1: #9af0dc;
+  --caneta-2: #5fcf8f;
+  --caneta-3: #2b8f5e;
+  --caneta-4: #17422f;
+  --caneta-miolo: #0f3b2b;
+  --caneta-borda: #ffffff;
+  --caneta-borda-opacidade: 0.7;
+  --caneta-brilho: 0.8;
+  --caneta-halo-dia: 0.85;
+  --caneta-halo-noite: 0;
 
   /* A ação é vidro com texto branco, um botão por tela; o caminho (link) é o passo escuro. */
   --acao: var(--vidro);
@@ -207,6 +224,18 @@
     --ponto-contorno: var(--noite-tinta);
     --estrela: var(--noite-vidro);
     --traco-cachorro: var(--noite-traco);
+    --ponto-apagado: rgb(238 243 248 / 55%);
+    --caneta-0: #bdf3ff;
+    --caneta-1: #7fe3cf;
+    --caneta-2: #4cc07f;
+    --caneta-3: #237a50;
+    --caneta-4: #123526;
+    --caneta-miolo: #0b2a1f;
+    --caneta-borda: #dffcff;
+    --caneta-borda-opacidade: 0.55;
+    --caneta-brilho: 0.6;
+    --caneta-halo-dia: 0;
+    --caneta-halo-noite: 1;
     --acao: var(--noite-vidro);
     --acao-texto: var(--noite);
     --acao-borda: transparent;
@@ -272,6 +301,18 @@
   --ponto-contorno: var(--noite-tinta);
   --estrela: var(--noite-vidro);
   --traco-cachorro: var(--noite-traco);
+  --ponto-apagado: rgb(238 243 248 / 55%);
+  --caneta-0: #bdf3ff;
+  --caneta-1: #7fe3cf;
+  --caneta-2: #4cc07f;
+  --caneta-3: #237a50;
+  --caneta-4: #123526;
+  --caneta-miolo: #0b2a1f;
+  --caneta-borda: #dffcff;
+  --caneta-borda-opacidade: 0.55;
+  --caneta-brilho: 0.6;
+  --caneta-halo-dia: 0;
+  --caneta-halo-noite: 1;
   --acao: var(--noite-vidro);
   --acao-texto: var(--noite);
   --acao-borda: transparent;
@@ -2293,6 +2334,18 @@ dialog.dialogo-acoes {
 .agora-estimativa {
   margin: 0 0 0.75rem;
   color: var(--bloco-atenuado);
+}
+
+/* O botão de vidro e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */
+.agora-acoes {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.acao-agora .agora-outra {
+  margin-top: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .linha-depois {
