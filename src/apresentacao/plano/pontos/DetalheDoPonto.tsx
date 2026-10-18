@@ -4,7 +4,6 @@ import type { Faixa, Ponto } from '../../../core/modelo';
 import {
   adiarPonto,
   descreverAtividade,
-  EdicaoInvalida,
   editarPonto,
   excluirPonto,
   mudarFaixa,
@@ -17,14 +16,11 @@ import { Selo } from '../../componentes/Selo';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
+import { mensagem } from '../erros';
 import { carregarPontos, ROTULO_FAIXA, type DadosDosPontos } from './carregar';
 import './estilos-pontos.css';
 
 const FAIXAS = Object.keys(ROTULO_FAIXA) as Faixa[];
-
-function mensagem(e: unknown): string {
-  return e instanceof EdicaoInvalida ? e.message : 'Não foi possível salvar. Nada foi alterado.';
-}
 
 function Formulario({ ponto, dados }: { ponto: Ponto; dados: DadosDosPontos }) {
   const repo = useRepositorio();

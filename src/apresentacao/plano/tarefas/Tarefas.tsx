@@ -12,7 +12,6 @@ import {
   moverTarefa,
   pularTarefa,
   reabrirTarefa,
-  TarefaInvalida,
   type Sugestao,
 } from '../../../dominios/tarefas';
 import { dataCivil } from '../../../core/datas';
@@ -21,6 +20,7 @@ import { Esqueleto, Vazio } from '../../componentes/estados';
 import { Selo } from '../../componentes/Selo';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
+import { mensagem } from '../erros';
 import { gravarDispensadas, lerDispensadas } from './dispensadas';
 import { sugestoesDoDia } from './sugestoes-do-dia';
 import './estilos-tarefas.css';
@@ -42,10 +42,6 @@ async function carregar(repo: Repositorio) {
     pontos: pontos.filter((p) => p.excluidoEm === null),
     disciplinas: disciplinas.filter((d) => d.excluidoEm === null),
   };
-}
-
-function mensagem(e: unknown): string {
-  return e instanceof TarefaInvalida ? e.message : 'Não foi possível salvar. Nada foi alterado.';
 }
 
 function NovaTarefa({
