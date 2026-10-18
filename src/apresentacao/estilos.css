@@ -90,7 +90,7 @@
   --aviso-texto: #4d3800;
 
   --destaque-prazo: #173f52;
-  --destaque-condicao: #b06f22;
+  --destaque-condicao: #ab6b21;
   --destaque-absoluto: #a5582a;
   --destaque-pena: #a5582a;
 
@@ -660,6 +660,22 @@ button:not(:disabled):active,
   .principal:not(:disabled):hover {
     background: color-mix(in srgb, var(--acao) 86%, var(--tinta));
     border-color: var(--acao-borda, transparent);
+  }
+}
+
+/* Marcado (D-D7): o botão de alternar ligado (`aria-pressed`, como "Errei" no registro e o filtro
+   de estado dos cartões) é tinta, não vidro; o vidro fica para a ação da tela, que é uma só. */
+.principal[aria-pressed='true'] {
+  background: var(--selecionado-fundo);
+  border-color: var(--selecionado-fundo);
+  color: var(--selecionado-texto);
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .principal[aria-pressed='true']:not(:disabled):hover {
+    background: color-mix(in srgb, var(--selecionado-fundo) 88%, var(--selecionado-texto));
+    border-color: var(--selecionado-fundo);
   }
 }
 
@@ -1591,7 +1607,9 @@ button.estrela[data-origem='direta'] path {
   fill: var(--estrela-luz);
 }
 
-/* Sobre a faixa: o contorno da tinta separa a estrela dela. */
+/* Herdada (só na linha ativa): a estrela pequena sobre a faixa tracejada. De dia, o contorno da tinta
+   a separa da faixa de vidro (3,2:1); à noite, o contorno claro quase some sobre o vidro claro
+   (1,2:1) e quem a separa é a largura, bem maior que a da faixa de 3 px. A P4 redesenha a estrela. */
 button.estrela[data-origem='herdada'] path {
   fill: var(--estrela-luz);
   stroke: var(--estrela-contorno);

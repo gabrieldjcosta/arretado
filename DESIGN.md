@@ -192,7 +192,7 @@ Uma paleta de dia claro (areia, cal, vidro) com uma tinta azul-sombra que ancora
 
 **The Piso De 13 Rule.** Nenhum texto abaixo de 0.8125rem (13 px). Caixa-alta com espaçamento de letras só em etiqueta ("Em seguida").
 
-**The Lei Sem Itálico Rule.** A lei não vai em itálico e o destaque dela é sublinhado, nunca fundo. Prazos, condições, termos absolutos e penas têm sublinhados distintos (#173f52, #b06f22, #a5582a).
+**The Lei Sem Itálico Rule.** A lei não vai em itálico e o destaque dela é sublinhado, nunca fundo. Prazos, condições, termos absolutos e penas têm sublinhados distintos (#173f52, #ab6b21, #a5582a).
 
 **The Título Com Razão Rule.** Gabarito só em títulos e marca, porque tem razão registrada (ensino, folha de respostas). "Sem serifa" troca só a letra da lei.
 

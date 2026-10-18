@@ -46,10 +46,10 @@ Saíram com a D-D7 (o teste de contraste falha se algum CSS voltar a usá-los): 
 |---|---|---|---|
 | `--fundo` | Areia `#f1e6d3` · Noite `#0b1b33` | tela, cabeçalho, barra das áreas | — |
 | `--superficie` | Cal `#ffffff` · `#142a4a` | campos, cartões, folha, linhas | — |
-| `--superficie-2` | Areia funda `#e7d8be` · `#07152a` | trilho de abas, selo, trilho do andamento, esqueleto | `--texto-atenuado` 4,9:1 · 9,4:1 |
+| `--superficie-2` | Areia funda `#e7d8be` · `#07152a` | trilho de abas, selo, trilho do andamento, esqueleto | `--texto-atenuado` 4,9:1 · 9,0:1 |
 | `--quente` | Areia funda `#e7d8be` · `#1c375d` | ícone de linha de lista, faixa quente | `--texto` 11,1:1 · 10,7:1 |
 | `--borda` | tinta a 12% · tinta clara a 14% | filetes decorativos | — |
-| `--borda-campo` | `#727c8f` · `#7387a8` | contorno de campo | 3,4:1 na areia, 4,2:1 na cal · 4,7:1 e 4,0:1 |
+| `--borda-campo` | `#727c8f` · `#7387a8` | contorno de campo | 3,4:1 na areia, 4,2:1 na cal · 4,7:1 e 3,9:1 |
 | `--borda-forte` | Tinta · `#a9b7cc` | contorno de caixa e rádio | 15,6:1 · 7,1:1 |
 | `--texto` | Tinta `#17243a` · `#eef3f8` | texto | 12,6:1 na areia · 15,4:1 na noite |
 | `--texto-atenuado` | `#4f5b70` · `#a9b7cc` | apoio, rótulo | 5,5:1 na areia, 6,9:1 na cal · 8,5:1 e 7,1:1 |
@@ -85,11 +85,11 @@ O anel de foco global é tinta no dia (2 px, `outline-offset: 2px`) e vidro clar
 | Token | Dia · noite | O quê | Estilo |
 |---|---|---|---|
 | `--destaque-prazo` | `#173f52` · `#7fb4cf` | prazos e tempo | duplo, deslocamento de 4 px |
-| `--destaque-condicao` | `#b06f22` · `#f2c062` | exceções e condições | tracejado, 4 px |
+| `--destaque-condicao` | `#ab6b21` · `#f2c062` | exceções e condições | tracejado, 4 px; 3,5:1 na areia e 3,1:1 sob a régua |
 | `--destaque-absoluto` | `#a5582a` · `#f09a68` | termos absolutos | ondulado, 3 px |
 | `--destaque-pena` | `#a5582a` · `#f09a68` | penas, quóruns e frações | pontilhado, 4 px |
 
-Contra a areia: 9,1:1 (prazo); 3,3:1 (condição); 4,2:1 (absoluto e pena). À noite, 7,7:1 · 10,3:1 · 7,8:1. O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
+Contra a areia: 9,1:1 (prazo); 3,5:1 (condição); 4,2:1 (absoluto e pena); sob a régua, a condição fica em 3,1:1. À noite, 7,7:1 · 10,2:1 · 7,8:1. O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
 
 ### Estado (sem mudança)
 

@@ -174,12 +174,13 @@ export function medir(tema) {
   );
 
   // Régua de leitura (--regua-fundo: tinta a 6%): texto e atenuado sobre ela,
-  // na superfície e no fundo.
+  // na superfície e no fundo; os sublinhados dos destaques também passam por baixo dela.
   for (const f of SUPERFICIES) {
     const regua = sobre(cor('regua-fundo'), cor(f));
     juntar('texto', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto'), regua));
     juntar('texto-atenuado', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto-atenuado'), regua));
     juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
+    for (const d of DESTAQUES) juntar(d, `regua-fundo sobre ${f}`, 3, razao(cor(d), regua));
   }
 
   // D-D7: os pares do contrato da direção, com os valores fixos da paleta.

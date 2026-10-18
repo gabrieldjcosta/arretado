@@ -22,4 +22,5 @@ Trabalho de UI, em esforço máximo; **não conta** no limite de 2 tarefas de c�
 
 ## Estado
 
-- **P1 em PR** (18/10/2026).
+- **P1 em PR** (18/10/2026, #186).
+- Pendente para a P2: a skill `.claude/skills/arretado-design-principles/SKILL.md` ainda descreve a D-D5 (Playfair, Sol, Marinho) e é carregada em todo trabalho de UI; a atualização para a D-D7 vai no PR da P2, que pede o rótulo `aprovado-gabriel` (caminho protegido). Até lá, valem `DESIGN.md` e a D-D7.

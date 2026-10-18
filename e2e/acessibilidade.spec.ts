@@ -115,14 +115,22 @@ test('as fontes embutidas carregam (T19)', async ({ page }) => {
       document.fonts.load("400 16px 'Literata'"),
       document.fonts.load("800 16px 'Gabarito'"),
     ]);
+    // Uma família sem face declarada também passa no `check`: confere que a face da Gabarito
+    // existe e carregou.
+    let gabaritoCarregada = false;
+    document.fonts.forEach((f) => {
+      if (f.family.replace(/["']/g, '') === 'Gabarito' && f.status === 'loaded')
+        gabaritoCarregada = true;
+    });
     return [
       document.fonts.check("400 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("700 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("400 16px 'Literata'"),
       document.fonts.check("800 16px 'Gabarito'"),
+      gabaritoCarregada,
     ];
   });
-  expect(carregadas).toEqual([true, true, true, true]);
+  expect(carregadas).toEqual([true, true, true, true, true]);
 });
 
 test('casca: barra de áreas por teclado, + flutuante só no celular e atalho E (fatia 2)', async ({
