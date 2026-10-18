@@ -18,6 +18,8 @@ Roteiro do que conferir antes de convidar alguém para a V1 (plano-mestre §6; p
 - [ ] Supabase › Auth › Providers › Email: confirmação ligada, login só por código.
 - [ ] Deploy da Edge Function `excluir-conta` (só com o sim do Gabriel).
 - [ ] Rodar `supabase/verificacao-rls-remota.sql` no projeto real depois de tudo.
+- [ ] Gabriel cadastra os 2 secrets do repositório (GitHub › Settings › Secrets and variables › Actions): `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY` (nunca a `secret`/`service_role`). Sem eles a consulta diária termina verde com aviso.
+  - Nota: 4xx também conta como resposta do projeto; vermelho só com 5xx ou tempo esgotado nas 3 tentativas.
 
 ## 3. Fumaça antes de convidar (contas de teste do Gabriel)
 
@@ -50,8 +52,9 @@ select email, criado_em, usado_em from arretado.convites order by criado_em;
 
 ## 5. O que ainda é código (antes da V1)
 
-- "Apagar tudo e recomeçar": exclui o banco local e os objetos da nuvem, mantém a conta (o ambiente reiniciável do plano-mestre §6).
-- Registro do consentimento: no servidor (`aceitar_termos`) e no Aparelho (`Usuario.consentimentos`), com o texto de [`../politica/consentimento-login-backup.md`](../politica/consentimento-login-backup.md).
-- Tela Conta › Privacidade passando a mostrar a política v3 (o texto já está pronto em [`../politica/`](../politica/)).
-- E2E de Entrar com `VITE_CONTA=1` e axe nos dois temas (pendência da A3).
-- Consulta leve diária (GitHub Actions) que mantém o projeto Supabase ativo no plano gratuito.
+- [x] "Apagar tudo e recomeçar": exclui o banco local e os objetos da nuvem, mantém a conta (o ambiente reiniciável do plano-mestre §6). Entregue no #184.
+- [x] Registro do consentimento no Aparelho (`Usuario.consentimentos`), com o texto de [`../politica/consentimento-login-backup.md`](../politica/consentimento-login-backup.md). Entregue no #184.
+- [ ] Registro do consentimento no servidor (`aceitar_termos`).
+- [x] Tela Conta › Privacidade mostrando a política v3 (o texto está em [`../politica/`](../politica/)). Entregue no #184.
+- [ ] E2E de Entrar com `VITE_CONTA=1` e axe nos dois temas (pendência da A3).
+- [x] Consulta leve diária (GitHub Actions) que mantém o projeto Supabase ativo no plano gratuito: `.github/workflows/consulta-diaria.yml` (cron diário às 09:17 UTC + execução manual; GET em `/rest/v1/` com a chave publicável, sem escrita nem dado pessoal). Teste: Actions › Consulta diária › Run workflow; o log mostra `HTTP 200`.
