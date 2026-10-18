@@ -136,10 +136,10 @@
   --regua-fundo: rgb(255 182 39 / 20%);
   --regua-barra: var(--marinho);
 
-  --raio-heroi: 24px;
+  --raio-heroi: 28px;
   --raio-cartao: 16px;
-  --raio-botao: 12px;
-  --raio-campo: 12px;
+  --raio-botao: 14px;
+  --raio-campo: 14px;
   --raio-pilula: 999px;
   --sombra: 0 6px 20px -10px rgb(20 33 61 / 18%), 0 1px 3px rgb(20 33 61 / 8%);
   --sombra-botao: 0 2px 6px rgb(20 33 61 / 14%);
@@ -153,7 +153,7 @@
   --fonte-leitura: 'Literata', Georgia, 'Times New Roman', serif;
   --tamanho-leitura: 18px;
   --alvo: 44px;
-  --raio: 12px;
+  --raio: 14px;
   --espaco-1: 0.25rem;
   --espaco-2: 0.5rem;
   --espaco-3: 1rem;
@@ -321,7 +321,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Link de texto: Terracota/Argila no claro e Solace/Sol no escuro (caminho, D-D3, D-D5); sublinhado
+/* Link de texto: terra queimada (--link) no claro e Sol no escuro (caminho, D-D5); sublinhado
    fino que engrossa no hover e no foco. Nunca verde: o verde é de lugar e de "salvo". */
 a {
   color: var(--link);
@@ -662,7 +662,7 @@ dialog .perigoso {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0 0.75rem;
   color: inherit;
   opacity: 0.82;
@@ -2582,7 +2582,7 @@ dialog.dialogo-previa .linha-acoes button {
 }
 
 /* Estado selecionado único: linha com a tinta do lugar e filete do lugar (filtros, disciplina,
-   Conta › Aparência); a marca do rádio carrega o bloco de Caatinga. */
+   Conta › Aparência); a marca do rádio carrega o bloco Marinho. */
 .opcao:has(input[type='radio']:checked),
 .filtro-escolha:has(input[type='radio']:checked) {
   background: var(--tinta-lugar);

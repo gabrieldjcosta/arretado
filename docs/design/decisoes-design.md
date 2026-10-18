@@ -135,7 +135,7 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 - **Arranjo (celular):** cabeçalho com "Arretado" + cacto verde e o botão "Conta" (pílula com ícone); título da página com data em minúsculas e o **"+" redondo verde na mesma linha**; **um** cartão Marinho "Agora" (etiqueta da matéria, etiqueta "no seu ritmo", título serifado, trecho da lei em caixa translúcida, **um** botão Sol de largura total "Avançar um tiquinho →"); **"Em seguida"** com até 2 itens numa linha do tempo (ponto verde = Frases, azul = Cartões; título, matéria, duração "4 min"); linha de calma "✓ Seu ponto está salvo neste aparelho."; campo "Para lembrar" com "Salvar"; **barra de baixo em pílula flutuante** Marinho com as 4 áreas e o item atual em destaque.
 
 **Mantido da D-D4 (o Stitch não mostra, ou conflita com regra do produto):**
-- **Fontes:** Atkinson Hyperlegible na interface e Literata na lei. O Stitch usa Playfair Display e Plus Jakarta Sans via Google CDN: carregar de CDN quebra o local-first/offline e envia o IP da pessoa ao Google (T10, LGPD). Padrão: **Playfair Display só nos títulos e na marca "Arretado", hospedada no próprio app (woff2 em `public/`)**; a interface segue em Atkinson, desenhada para leitura difícil. Pergunta 1 abaixo.
+- **Fontes:** Atkinson Hyperlegible na interface e Literata na lei. O Stitch usa Playfair Display e Plus Jakarta Sans via Google CDN: carregar de CDN quebra o local-first/offline e envia o IP da pessoa ao Google (T10, LGPD). Padrão: **Playfair Display só nos títulos e na marca "Arretado", hospedada no próprio app (woff2 em `src/apresentacao/fontes/`)**; a interface segue em Atkinson, desenhada para leitura difícil. Pergunta 1 abaixo.
 - **Lei sem itálico e destaque sublinhado, nunca fundo** (o Stitch mostra a lei em itálico e o destaque como fundo azul): regra de leitura do `sistema-visual.md`.
 - **Mínimo de 13 px** (0,8125 rem) para qualquer texto e alvo de 44 px. O Stitch usa 10–12 px em etiquetas, na barra e no campo.
 - Sem sequência de dias; mascote só em pontos estratégicos; Calmo; plataformas por largura; vermelho só em excluir e falha técnica.
@@ -163,3 +163,15 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 5. **Tema escuro:** fundo em Marinho profundo, cartão Agora em Marinho mais claro, botão Sol igual (valores a medir na F1b). Confirmado.
 6. **Campo "Para lembrar":** serve para a pessoa **anotar o que precisa fazer fora do app** (não é a Frase correta). A **Frase correta é registrada pelo "+"**, que passa a ser o único caminho de captura (D25 continua: só a frase é obrigatória). O "Anote a frase correta" do Hoje sai.
    - **Como guardar (simples, sem esquema novo):** um campo de texto livre, opcional, em `Preferencias` (`lembrete?: string`), como já foi feito com `destacarCondicionantesEPrazos` (opcional, ausente = vazio, **sem migração**, esquema segue). Sem coleção, sem data, sem lista, sem hora, sem notificação, fora do Recall e do cálculo de "Agora". "Salvar" grava o texto; esvaziar apaga. Entra com o Hoje na F3 (nível B); só se o arquivo de backup rejeitar o campo novo é que vira tarefa de nível A.
+
+## D-D6 — Harmonização da D-D5: raios macios, matéria em Argila, ícones SVG e fontes (17/10/2026, pedido do Gabriel)
+
+Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.md` na raiz). Só apresentação (D-D1).
+
+- **Macio e convidativo:** botão e campo passam de 12 a **14 px**, o bloco-herói de 24 a **28 px** (como o cartão Agora do Stitch) e o raio genérico `--raio` a 14. Cartão fica em 16, pílula em 999: o que está dentro tem raio menor que o que o contém. Valores em `src/apresentacao/estilos.css`.
+- **Matéria em Argila, sem tom por disciplina:** a matéria se identifica pela etiqueta Argila com texto Marinho. Fica vetado dar a cada disciplina uma cor própria ou uma faixa colorida na borda (reafirma a D-D4 e a D-D5). Grupos de disciplina na Biblioteca usam nome e contagem, em neutro.
+- **Ícones são SVG de um só traço**, não glifos Unicode (✓, ⓘ, ☆, 📍). O estado continua sem depender só de cor.
+- **Fontes:** a Playfair Display fica em `src/apresentacao/fontes/` (não em `public/fontes/`), como no código da F1b.
+- **Palavra "vencido":** sai da linha principal do Hoje (soa como dívida); o título é a ação em verbo e o motivo vem abaixo.
+- **Marca:** "Arretado" sem ponto final, com o cacto verde (o ponto final em Terracota era da D-D4 e saiu).
+- **Documentos atualizados:** `sistema-visual.md`, `redesign-v2.md` (F2 e F3 reescritas na D-D5), `glossario.md`, `solucao-de-problemas.md` e a skill `arretado-design-principles`. Os registros D-D2, D-D3 e D-D4 acima ficam como histórico: onde divergem, vale a D-D5 e depois esta.

@@ -42,7 +42,7 @@ Quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutid
 
 ## Padrão do Stitch (D-D5, 16/10/2026) e o que muda nestes pacotes
 O Gabriel trouxe o Hoje do projeto Stitch `9953616237194891956` e pediu o mesmo padrão em todas as telas (`docs/design/decisoes-design.md`, D-D5; plano em `docs/planos/redesign-v2.md`, fatias **F1b** e **F12**). Efeito:
-- **A a F** usam só tokens, rótulos e componentes existentes: não precisam mudar. Quando a F1b trocar os valores dos tokens, as telas deles acompanham. Os construtores não devem fixar cor nem fonte.
+- **A a F** usam só tokens, rótulos e componentes existentes (com os ajustes da D-D6: ícones SVG, matéria em Argila sem tom por disciplina, raios macios). Quando a F1b trocar os valores dos tokens, as telas deles acompanham. Os construtores não devem fixar cor nem fonte.
 - **G** foi dividido: o fundo com pontinhos (anotação 2) passa para a **F1b** (valores já definidos na D-D5: `#fff8ec` com pontos `#d6c9b3`); a orientação do Recall (anotação 9) fica como pacote próprio, **G2**, abaixo.
 - **Nomes do menu (anotações 7 e 8):** o Stitch já resolve o módulo: **Fixar** (antes Recall), junto de **Trilha** (antes Plano) e **Em seguida** (antes Depois). As abas do Fixar ficaram **Frases · Cartões · Histórico** (resposta do Gabriel, D-D5). A troca de rótulos entra na **F2** (casca), com o mapa único de rótulos do glossário; a mudança do `CLAUDE.md` (caminho protegido) pede o rótulo `aprovado-gabriel`.
 

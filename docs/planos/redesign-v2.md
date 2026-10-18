@@ -2,7 +2,7 @@
 
 Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não conta** no limite de 2 tarefas de código). Origem: pedido do Gabriel em 14/10/2026 (adaptar as decisões de design; a tentativa anterior manteve o verde do plano original e reduziu a qualidade das interfaces e dos blocos de cor do Stitch). Diagnóstico: [`../design/auditoria-ui-2026-10-14.md`](../design/auditoria-ui-2026-10-14.md) (V-01 a V-21). Decisões: D-D3 e, por cima dela, **D-D4** (paleta, botões, cartões por estado, Leitor e Sessão do Gabriel, 14/10/2026) em [`../design/decisoes-design.md`](../design/decisoes-design.md); material dele em [`../design/referencias/2026-10-14-gemini/`](../design/referencias/2026-10-14-gemini/leia-me.md). Alvo visual: [`../design/sistema-visual.md`](../design/sistema-visual.md). Este plano substitui [`redesign.md`](redesign.md) (já arquivado) para a camada de apresentação; o `plano-mestre.md` continua valendo para tudo o mais.
 
-> **D-D5 (16/10/2026):** o Gabriel trouxe o padrão do Stitch (projeto `9953616237194891956`: Creme, Marinho, Sol; menu Hoje · Trilha · Fixar · Biblioteca; pílula flutuante) e pediu que todas as telas o sigam. Ver [`decisoes-design.md`](../design/decisoes-design.md) (D-D5). Entram a **F1b** (tokens e fontes) antes da F2 e a **F12** (harmonização) no fim; onde a F2 e a F3 abaixo citam Caatinga, Terracota, Solace, Areia, barra reta ou "Depois", vale a D-D5.
+> **D-D5 (16/10/2026):** o Gabriel trouxe o padrão do Stitch (projeto `9953616237194891956`: Creme, Marinho, Sol; menu Hoje · Trilha · Fixar · Biblioteca; pílula flutuante) e pediu que todas as telas o sigam. Ver [`decisoes-design.md`](../design/decisoes-design.md) (D-D5). Entram a **F1b** (tokens e fontes) antes da F2 e a **F12** (harmonização) no fim; as fatias F2 e F3 abaixo foram reescritas na D-D5 em 17/10/2026, e a D-D6 fixa raios macios (botão e campo 14, bloco-herói 28), matéria em Argila sem tom por disciplina e ícones SVG.
 
 ## Como cada fatia é entregue
 
@@ -32,12 +32,14 @@ Dono: thread "Redesenho de telas e plataformas" (UI, esforço máximo; **não co
 | F9 | **Conta e Sessão** (Sessão pela especificação do Gabriel): Conta, Aparência, Perfis, Dados, Privacidade, Orientações, Sessão | V-15 | `conta/*`, `sessao/*`, `orientacoes/*` | F1, F2 |
 | F10 | **Transições entre rotas** (View Transitions) e atraso do `Esqueleto` | V-19 | `App.tsx`/rotas, CSS de movimento | F2 |
 | F11 | **Plataformas**: favicon, manifest, ícones, `theme-color`, `viewport-fit`, tablet deitado | V-18 | `index.html`, `public/`, `vite.config.ts` | F1 |
-| F1b | **Tokens D-D5**: paleta Creme, Marinho, Sol, Argila, Verde-foco e Azul-céu nos dois temas; fundo com pontinhos; Playfair Display hospedada (títulos e marca); correções de contraste da D-D5 | V-02 (base), tema | `estilos.css`, `public/fontes/`, `scripts/contraste.mjs`, E2E de axe | F1 |
+| F1b | **Tokens D-D5**: paleta Creme, Marinho, Sol, Argila, Verde-foco e Azul-céu nos dois temas; fundo com pontinhos; Playfair Display hospedada (títulos e marca); correções de contraste da D-D5 | V-02 (base), tema | `estilos.css`, `src/apresentacao/fontes/`, `scripts/contraste.mjs`, E2E de axe | F1 |
 | F12 | **Harmonização**: passada tela a tela contra o padrão do Stitch (cabeçalho, título com "+", bloco-herói, linha do tempo, rótulos Trilha, Fixar e Em seguida, um primário por tela), capturas lado a lado, axe | — | todas as telas | F1b, F2 a F9 |
 
 Ordem de trabalho (D-D5): F1 → **F1b** → F2 → F3 → F11 (barata e visível) → F4 → F6 → F5 → F8 → F7 → F9 → F10. A F10 entra por último porque a transição só vale com a casca e as rotas já no desenho final; as demais podem se sobrepor duas a duas, porque depois da F1 cada tela tem o próprio CSS de pacote.
 
 ### F1 — Fundação (só CSS e testes; feita, com a paleta da D-D4)
+
+> **Histórico:** esta fatia foi feita com a paleta da D-D4 (Areia, Palha, Terracota, Caatinga, Acqua, Solace). A F1b (D-D5) trocou os valores; os nomes antigos viram aliases até a F12.
 
 - Os três blocos de tokens (`:root`, `prefers-color-scheme: dark` e `[data-tema='escuro']`) com a paleta do Gabriel (Areia, Palha, Creme, Terracota, Caatinga, Acqua, Solace, Noite, Tinta) e os papéis de `sistema-visual.md`; `scripts/contraste.mjs` e `.test.ts` ganham os pares novos (o teste exige claro-escuro-sistema igual ao escuro manual e que nenhum CSS use token da identidade anterior).
 - `.principal` compacto (44 de altura, raio 12), Terracota no claro e Solace no escuro e dentro do bloco; secundário de contorno; `.botao-texto` (fantasma), `.botao-icone` e `.linha-acao` novos; `.perigoso` só cheio no diálogo. **Sem vidro.**
@@ -51,38 +53,38 @@ Ordem de trabalho (D-D5): F1 → **F1b** → F2 → F3 → F11 (barata e visíve
 
 ### F1b — Tokens D-D5
 
-Troca os valores dos tokens; os nomes de papel ficam e `--terracota`, `--caatinga` etc. viram aliases até a F12 limpar. Fundo `#fff8ec` com `radial-gradient(#d6c9b3 .75px, transparent .75px)` a 16 px só no `body`; texto e título Marinho; primário Sol com texto Marinho (borda Marinho de 1,5 px sobre fundo claro); Argila só em etiqueta de matéria; Verde-foco (gráfico) e seu passo escuro (texto); Azul-céu para Cartões, ícone Marinho. Tema escuro sobre o Marinho. Playfair Display 600/700 em woff2 em `public/fontes/` (sem CDN, `font-display: swap`) só para títulos e marca; interface em Atkinson, lei em Literata. Piso de 13 px em todo texto. `scripts/contraste.mjs` ganha os pares novos e o `npm run check` os cobre. Só valores, sem mudar estrutura de tela. Nível B, revisor Gemini (muda o sistema de design). O pacote G dos contratos de 16/10 (fundo com pontinhos) é absorvido por esta fatia; a orientação do Recall/Fixar do G sai como pacote próprio.
+Troca os valores dos tokens; os nomes de papel ficam e `--terracota`, `--caatinga` etc. viram aliases até a F12 limpar. Fundo `#fff8ec` com `radial-gradient(#d6c9b3 .75px, transparent .75px)` a 16 px só no `body`; texto e título Marinho; primário Sol com texto Marinho (borda Marinho de 1,5 px sobre fundo claro); Argila só em etiqueta de matéria; Verde-foco (gráfico) e seu passo escuro (texto); Azul-céu para Cartões, ícone Marinho. Tema escuro sobre o Marinho. Playfair Display 600/700 em woff2 em `src/apresentacao/fontes/` (sem CDN, `font-display: swap`) só para títulos e marca; interface em Atkinson, lei em Literata. Piso de 13 px em todo texto. `scripts/contraste.mjs` ganha os pares novos e o `npm run check` os cobre. Só valores, sem mudar estrutura de tela. Nível B, revisor Gemini (muda o sistema de design). O pacote G dos contratos de 16/10 (fundo com pontinhos) é absorvido por esta fatia; a orientação do Recall/Fixar do G sai como pacote próprio.
 
-### F2 — Casca por plataforma
+### F2 — Casca por plataforma (D-D5)
 
-**Pela D-D5:** navegação em **pílula flutuante** Marinho (celular e tablet em pé) com Hoje · Trilha · Fixar · Biblioteca, ícone e rótulo ≥ 13 px, item atual destacado; no desktop, as mesmas quatro áreas no cabeçalho. "+" redondo verde **na linha do título** das telas que criam algo (no lugar do "+" acima da barra), com o nome acessível de hoje; cabeçalho "Arretado" + cacto verde e "Conta" em pílula (o "?" vai para Conta › Orientações). Só rótulos de tela: rotas e identificadores ficam. Os itens abaixo valem no que não conflitam.
+Rótulos de tela: **Hoje · Trilha · Fixar · Biblioteca** ("Em seguida" no lugar de "Depois"); só texto, rotas e identificadores (`plano`, `recall`, `Depois`) ficam.
 
-- Cabeçalho: "Arretado." (ponto final em Terracota) com o cacto; "Conta" e "?" em botões de contorno; no desktop, navegação ao centro e "Registrar erro (E)" à direita.
-- Navegação: **barra reta** embaixo no celular e no tablet em pé (ícone e rótulo nas quatro áreas, `safe-area`), item atual em `--selecionado-*` ou peso 700; no desktop, no cabeçalho. **Cai** a pílula flutuante com "+" satélite da D-D3.
-- "+" simples (56 px, Terracota; Solace no escuro) acima da barra, nas telas sem captura inline; some no Hoje (a captura é o campo) e com o teclado aberto (`visualViewport`).
-- Rodapé legal no fim do conteúdo (botão fantasma de 44), reserva de rolagem igual à altura da barra mais o "+" e 16 px, `safe-area`: o "+" nunca cobre texto (fecha as 52 ocorrências de "+ sobre texto" da medida).
-- Muda o ponto de aparição do "+" e o do "Registrar erro" do cabeçalho (≥ 900); ajustar os E2E que dependem desses nomes acessíveis. O atalho E e o nome "Novo registro de erro" ficam.
+- **Navegação:** pílula flutuante Marinho no celular e no tablet em pé, com as quatro áreas (ícone e rótulo ≥ 13 px, alvo ≥ 44, `safe-area`); item atual em Sol sobre a pílula ou Creme sobre Marinho. A partir de 700 px vira barra no alto; no desktop, as mesmas quatro áreas no cabeçalho, ao centro. É o único ponto onde a barra tem transparência (vidro só onde algo flutua sobre o texto).
+- **Cabeçalho:** "Arretado" (Playfair Display 700) com o cacto verde e o botão "Conta" em pílula; o "?" vai para Conta › Orientações; no desktop, "Registrar erro (E)" à direita.
+- **"+":** botão redondo verde **na linha do título** das telas que criam algo (substitui o "+" acima da barra); mesmo nome acessível de hoje; o atalho E e o nome "Novo registro de erro" ficam.
+- **Rodapé legal** no fim do conteúdo (botão fantasma de 44) e reserva de rolagem igual à altura da pílula mais 16 px e `safe-area`: nada fixo cobre texto (fecha as 52 ocorrências de "+ sobre texto" da medida).
+- Ajustar os E2E que dependem dos nomes acessíveis e do ponto de aparição do "+" e do "Registrar erro" (≥ 900).
+- Estado do código: a barra de baixo reta e o "+" simples acima dela (D-D4) ainda estão em `estilos.css`; esta fatia os troca.
 
-### F3 — Hoje
+### F3 — Hoje (D-D5)
 
-**Pela D-D5:** cartão Agora Marinho (raio 28) com etiqueta da matéria em Argila, "no seu ritmo", título serifado, trecho da lei sem itálico e com sublinhado, e botão Sol "Avançar um tiquinho →" (um por tela). Estados: Estudando = Marinho com Sol; Distraído = creme com filete Argila e linhas de ação; Sorrindo = cartão claro com ponto verde (andamento, sem sequência); Determinado = Marinho com Sol e as revisões prontas. "Em seguida" (até 2 itens) em linha do tempo: ponto verde = Frases, azul = Cartões, duração em chip. O "Anote a frase correta" sai: a Frase correta entra só pelo "+" (D25). Entra o campo "Para lembrar" (coisas a fazer fora do app; rótulo visível; "Salvar"), guardado como texto livre opcional em `Preferencias.lembrete`, sem esquema novo (D-D5, resposta 6). Os itens abaixo valem no que não conflitam.
-
-- Cartão Agora **por estado** (ver `sistema-visual.md`): Estudando = Caatinga com ação Solace e fantasma "Trocar tarefa" lado a lado; Distraído ("Por onde começar?") = Areia com linhas de ação ("Adicionar uma lei para ler", "Escolher uma matéria", "Sessão curta de 15 min"); Determinado (revisões prontas) = cinza-areia com Terracota; Sorrindo (dia fechado) com o andamento do dia em pontos. Título em sans bold, mascote apoiado na borda.
-- Linha "✓ Seu ponto está salvo neste aparelho." quando existe ponto de retomada.
-- Depois: até 2 linhas em cartão (título, matéria · minutos, ponto de tipo e seta), sob "DEPOIS · NA SEQUÊNCIA". Lista pura `listarAcoes(entrada)` em `src/dominios/hoje/depois.ts`, que importa os tipos de `proxima-acao.ts` sem mudar a assinatura de `decidirProximaAcao`.
-- Captura inline: campo "Anote a frase correta…" com "Guardar" (Caatinga) dentro, sobre o caso de uso que o "+" já usa; só a frase é obrigatória (D25).
+- **Cartão Agora** Marinho (`#223559` no escuro), raio 28, com etiqueta da matéria em Argila (texto Marinho), etiqueta "no seu ritmo", título serifado, trecho da lei sem itálico e com sublinhado, e botão Sol "Avançar um tiquinho →" (um por tela). O título é a ação em verbo; o motivo vem numa linha abaixo ("1 cartão para hoje"; sem "vencido").
+- **Estados:** Estudando = Marinho com Sol; Distraído = creme quente com filete Argila e linhas de ação ("Adicionar uma lei para ler", "Escolher uma matéria", "Sessão curta de 15 min"); Sorrindo (dia fechado) = cartão claro com ponto verde e o andamento do dia em pontos, sem sequência; Determinado = Marinho com Sol e as revisões prontas.
+- **Em seguida** (até 2 itens) em linha do tempo: ponto verde = Frases, azul = Cartões; título, matéria, duração em chip. Lista pura `listarAcoes(entrada)` em `src/dominios/hoje/depois.ts`, que importa os tipos de `proxima-acao.ts` sem mudar a assinatura de `decidirProximaAcao`.
+- **Para lembrar:** campo de texto livre, opcional, em `Preferencias.lembrete` (rótulo visível, "Salvar"), sem esquema novo (D-D5, resposta 6). O "Anote a frase correta" do Hoje sai: a Frase correta entra só pelo "+" (D25).
+- Linha "Seu ponto está salvo neste aparelho." (ícone SVG de marca, não glifo) quando existe ponto de retomada.
 - Elementos vetoriais do Gabriel como componentes (`ElementoCactos`, `ElementoLampada`, `ElementoDistracao`), decorativos.
-- Desktop em duas colunas (7fr · 5fr); Retorno com o mascote Distraído; Fechar o dia com o Sorrindo; o aviso de backup deixa de usar o rótulo "Depois".
+- Desktop em duas colunas (7fr · 5fr); Retorno com o mascote Distraído; Fechar o dia com o Sorrindo (h2 "Resumo do Dia"); o aviso de backup deixa de usar o rótulo "Depois".
 - Conflito conhecido: `Agora.tsx`, `proxima-acao.ts` e `RecallInicio.tsx` recebem texto e fila única da thread "Aprimoramentos"; a F3 entra depois do PR deles ou rebaseia sobre ele.
 
 ### F4 a F10 (resumo)
 
 - **F4 Revisão:** cartão central em Literata de 1,5 a 1,75 rem; "Mostrar resposta" primário; resposta em callout de lugar "Frase correta"; De novo, Difícil e Fácil em botões secundários com ícone, sem vermelho; progresso fino e "Sair" no topo; "Mais opções" numa folha; fim de rodada com bloco-herói e o mascote Sorrindo. Sem mascote durante a revisão.
 - **F5 Recall:** início com resumo, abas rolantes e a lista em linhas de 56 px com esfera de matéria; resultado "Errei" em cor neutra; "Revisar frases" dentro do resumo; registrar com campo único em destaque; desktop em duas colunas.
-- **F6 Leitor:** pela especificação do Gabriel (ver `sistema-visual.md`): controles (A-, 18px, A+, Destaques), legenda recolhível dos quatro sublinhados, régua em Areia, dock com Buscar, Filtrar, Foco e "Lido até aqui" (os nomes acessíveis ficam), reserva de 156 px sob o artigo, modo foco em retrato e paisagem, "Ações" em folha ou diálogo; busca e filtro em folha; coluna de 70 ch. A lógica do modo foco, a penumbra e o cartão de artigo **não mudam**; sem mascote.
+- **F6 Leitor:** pela especificação do Gabriel (ver `sistema-visual.md`): controles (A-, 18px, A+, Destaques), legenda recolhível dos quatro sublinhados, régua em creme quente, dock com Buscar, Filtrar, Foco e "Lido até aqui" (os nomes acessíveis ficam), reserva de 156 px sob o artigo, modo foco em retrato e paisagem, "Ações" em folha ou diálogo; busca e filtro em folha; coluna de 70 ch. A lógica do modo foco, a penumbra e o cartão de artigo **não mudam**; sem mascote.
 - **F7 Biblioteca:** abas rolantes, filtros recolhidos, normas em cartões com esfera de matéria, Acervo com linhas de 56 px e caixa de 44, súmulas e teses numa lista só (decisão de 14/10), grade de 2 e 3 colunas em tablet e desktop.
 - **F8 Plano:** matérias recolhidas com andamento ("12 de 107"), pontos ao abrir, Tarefas e Onboarding nos componentes novos; coluna `minmax(0, 1fr)` (V-21).
-- **F9 Conta e Sessão:** listas de cartões agrupados, Aparência com controles próprios, Perfis, Dados, Privacidade e Orientações com índice; Sessão pela especificação do Gabriel (Modo Só Estudo, chips de tempo que só informam, bloco de Caatinga com o mascote Estudando, estacionamento em Areia, fechamento com o mascote Sorrindo); a faixa "Sessão · Pausar · Encerrar" (componente da thread "Aprimoramentos") posicionada e estilizada aqui.
+- **F9 Conta e Sessão:** listas de cartões agrupados, Aparência com controles próprios, Perfis, Dados, Privacidade e Orientações com índice; Sessão pela especificação do Gabriel (Modo Só Estudo, chips de tempo que só informam, bloco de Marinho com o mascote Estudando, estacionamento em creme quente, fechamento com o mascote Sorrindo); a faixa "Sessão · Pausar · Encerrar" (componente da thread "Aprimoramentos") posicionada e estilizada aqui.
 - **F10 Transições:** View Transitions de até 150 ms entre rotas, desligada com `prefers-reduced-motion` e no perfil Calmo; nunca anima texto da lei nem remonta o Leitor; atraso de 150 ms no `Esqueleto`; padrão "andamento" nas operações longas ([`transicoes-e-carregamento.md`](transicoes-e-carregamento.md)).
 
 ### F11 — Plataformas
@@ -102,12 +104,12 @@ Depois das F2 a F9: uma passada por tela (Trilha, Fixar e suas abas, Biblioteca 
 | Contas, login e banco (F4-A) | telas de conta e login atrás de `VITE_CONTA=0` | usa os componentes da F1 quando ela chegar; até lá, estilo mínimo |
 | Fila de merges | merge em `integracao` | recebe o aviso de cada PR verde |
 
-## Perguntas ao Gabriel (vale o padrão se não houver resposta)
+## Perguntas ao Gabriel (encerradas pela D-D5 e pela D-D6; ficam como registro)
 
 0. **D-D5:** as cinco perguntas foram respondidas em 16/10/2026 (ver o fim da D-D5 em `decisoes-design.md`). O item 4 abaixo (barra reta) fica revertido pela D-D5.
 
-1. **Agora do Hoje em Caatinga ou em Areia?** O mockup do Hoje o desenha em Areia com botão Terracota; o texto da especificação e o cartão "Estudando!" do sistema, em Caatinga. Padrão: Caatinga (a troca é um token).
-2. "Prazos" no Leitor: sublinhado `#173F52` (texto da especificação) ou Acqua (legenda da imagem). Padrão: `#173F52`.
+1. **Agora do Hoje em Marinho ou em creme quente?** O mockup do Hoje o desenha em creme quente com botão Sol; o texto da especificação e o cartão "Estudando!" do sistema, em Marinho. Padrão: Marinho (a troca é um token).
+2. "Prazos" no Leitor: sublinhado `#173F52` (texto da especificação) ou Verde-foco (legenda da imagem). Padrão: `#173F52`.
 3. Cacto ao lado do nome: mantido (D-D2), embora três dos quatro mockups não o tenham no cabeçalho.
 4. Barra de baixo reta e "+" simples, no lugar da pílula flutuante com "+" satélite da D-D3.
 5. **Calmo desliga as transições**, como no plano de 14/10, mas Calmo é o perfil padrão (quem não escolheu perfil é "calmo"). Padrão: seguir a regra, então a transição só aparece em Guiado e Leitura. Se preferir a transição no padrão, a regra passa a ser só `prefers-reduced-motion`.

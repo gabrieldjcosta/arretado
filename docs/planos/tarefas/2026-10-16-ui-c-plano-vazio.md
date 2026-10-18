@@ -8,11 +8,12 @@ Quem chega no Plano sem pontos entende os dois caminhos e, sem saber montar plan
 
 ## Escopo
 Arquivos permitidos: `src/apresentacao/plano/Plano.tsx`, `ImportarPontos.tsx`, os testes ao lado, uma folha de estilo do plano (nova ou existente), `e2e/` do plano.
+Harmonizado com a D-D5 e a D-D6 (17/10/2026, `docs/design/decisoes-design.md`): ícones são SVG de um só traço (nunca glifos Unicode), a matéria é etiqueta Argila (nunca cor por disciplina nem faixa colorida na borda), botões e campos têm raio 14 e um só botão Sol por tela.
 Não alterar: `src/integracoes/pontos/` (o leitor de CSV já aceita `;`, tab e `,`), `src/core/`, `src/dominios/`.
 
 ## O que fazer
 1. **Espaço (3).** `section.cartao-bloco` de importar fica afastada do vazio de cima (margem do token de espaçamento médio ou maior).
-2. **Texto do vazio (4).** Título e texto mais acolhedores, no tom do `docs/design/guia-de-voz.md`. Base: "Monte seu plano do seu jeito" / "Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir do nosso catálogo de concursos." Dois caminhos lado a lado, com o mesmo peso visual: "Montar pelo catálogo" (o link atual) e "Trazer meu edital" (rola até a importação).
+2. **Texto do vazio (4).** Título e texto mais acolhedores, no tom do `docs/design/guia-de-voz.md`. Base: "Monte seu plano do seu jeito" / "Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir do nosso catálogo de concursos." Dois caminhos lado a lado, com o mesmo peso visual, ambos botões secundários: "Montar pelo catálogo" (o link atual) e "Trazer meu edital" (rola até a importação). O botão Sol (um só na tela) fica na própria importação ("Ler o texto colado" e a confirmação da prévia). Na navegação, a tela é a Trilha depois da F2; aqui o rótulo de tela não muda.
 3. **Orientação para IA.** Dentro da importação, um `<details>` "Não sabe montar a planilha?" com: "Copie o texto abaixo, cole na sua IA preferida junto com o conteúdo programático do edital e traga o resultado para cá." e o prompt num bloco de texto com botão "Copiar" (`navigator.clipboard`; se falhar, seleciona o texto). Prompt, literal:
 
 ```text
