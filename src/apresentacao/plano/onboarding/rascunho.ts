@@ -1,5 +1,7 @@
 // Rascunho do onboarding do plano: guardado no aparelho a cada tela (só ids e chaves, nada de
 // identificação), para fechar o app no meio e voltar de onde parou. Sem localStorage, segue sem salvar.
+import { apagarJson, gravarJson, lerJson } from '../armazenamento';
+
 const CHAVE = 'arretado:onboarding-plano:v1';
 
 export type Passo = 'carreira' | 'edital' | 'disciplinas' | 'revisar';
@@ -49,38 +51,26 @@ function lerAcrescentos(v: unknown): Acrescentos {
 }
 
 export function lerRascunho(): Rascunho {
-  try {
-    const bruto: unknown = JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null');
-    if (typeof bruto !== 'object' || bruto === null) return RASCUNHO_VAZIO;
-    const o = bruto as Record<string, unknown>;
-    const passo = PASSOS.find((p) => p === o.passo) ?? 'carreira';
-    const carreira = texto(o.carreira);
-    const edital = texto(o.edital);
-    return {
-      passo,
-      ...(carreira ? { carreira } : {}),
-      ...(edital ? { edital } : {}),
-      desmarcadas: lista(o.desmarcadas),
-      dispensados: lista(o.dispensados),
-      acrescentos: lerAcrescentos(o.acrescentos),
-    };
-  } catch {
-    return RASCUNHO_VAZIO;
-  }
+  const bruto = lerJson(CHAVE);
+  if (typeof bruto !== 'object' || bruto === null) return RASCUNHO_VAZIO;
+  const o = bruto as Record<string, unknown>;
+  const passo = PASSOS.find((p) => p === o.passo) ?? 'carreira';
+  const carreira = texto(o.carreira);
+  const edital = texto(o.edital);
+  return {
+    passo,
+    ...(carreira ? { carreira } : {}),
+    ...(edital ? { edital } : {}),
+    desmarcadas: lista(o.desmarcadas),
+    dispensados: lista(o.dispensados),
+    acrescentos: lerAcrescentos(o.acrescentos),
+  };
 }
 
 export function gravarRascunho(r: Rascunho): void {
-  try {
-    window.localStorage.setItem(CHAVE, JSON.stringify(r));
-  } catch {
-    /* sem armazenamento: o fluxo segue, só não retoma */
-  }
+  gravarJson(CHAVE, r);
 }
 
 export function limparRascunho(): void {
-  try {
-    window.localStorage.removeItem(CHAVE);
-  } catch {
-    /* idem */
-  }
+  apagarJson(CHAVE);
 }
