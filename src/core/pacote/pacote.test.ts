@@ -120,7 +120,10 @@ describe('leitura e validação (3.1, 3.4)', () => {
         m[campo] = valor;
         a['manifesto.json'] = strToU8(JSON.stringify(m));
       });
-    expect(await recusa(lerPacote(trocar('versaoFormato', 2)))).toBe('formato_desconhecido');
+    expect(await recusa(lerPacote(trocar('versaoFormato', 0)))).toBe('formato_desconhecido');
+    expect(await recusa(lerPacote(trocar('versaoFormato', '2')))).toBe('formato_desconhecido');
+    // Formato mais novo que o deste app (AL): pede para atualizar, como o esquema posterior.
+    expect(await recusa(lerPacote(trocar('versaoFormato', 3)))).toBe('versao_posterior');
     expect(await recusa(lerPacote(trocar('versaoEsquema', 99)))).toBe('versao_posterior');
   });
 

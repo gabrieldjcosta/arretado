@@ -1,0 +1,598 @@
+{
+ "item": {
+  "id": "lei-antiga",
+  "versao": 1,
+  "norma": {
+   "tituloCurto": "LEI ANTIGA",
+   "tipo": "Lei",
+   "esfera": "federal"
+  },
+  "nos": [
+   {
+    "endereco": "tit1",
+    "categoria": "estrutural",
+    "tipo": "titulo",
+    "rotulo": "TÍTULO I",
+    "status": "vigente",
+    "confianca": "alta",
+    "trechos": [
+     {
+      "texto": "Disposições gerais"
+     }
+    ]
+   },
+   {
+    "endereco": "art1",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "rotulo": "Art. 1º",
+    "status": "vigente",
+    "confianca": "alta",
+    "pai": "tit1",
+    "trechos": [
+     {
+      "texto": "Texto do artigo."
+     }
+    ]
+   },
+   {
+    "endereco": "art2",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "rotulo": "Art. 2º",
+    "status": "vigente",
+    "confianca": "alta",
+    "pai": "tit1",
+    "trechos": [
+     {
+      "texto": "Outro artigo."
+     }
+    ]
+   }
+  ]
+ },
+ "log": [
+  {
+   "ts": "1792152002000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000001",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000001",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:01.000Z",
+    "atualizadoEm": "2026-10-16T12:00:01.000Z",
+    "tsLogico": "1792152002000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "consentimentos": []
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "usuarios",
+   "seq": 1
+  },
+  {
+   "ts": "1792152004000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000002",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000002",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:03.000Z",
+    "atualizadoEm": "2026-10-16T12:00:03.000Z",
+    "tsLogico": "1792152004000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "nome": "Este aparelho",
+    "plataforma": "Mozilla/5.0 (win32) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1"
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "aparelhos",
+   "seq": 2
+  },
+  {
+   "ts": "1792152006000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000003",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000003",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:05.000Z",
+    "atualizadoEm": "2026-10-16T12:00:05.000Z",
+    "tsLogico": "1792152006000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "tema": "sistema",
+    "fonteLeitura": "serifa",
+    "tamanhoFonte": 18,
+    "mostrarRedacoesAnteriores": false,
+    "modulosDesabilitados": [],
+    "retencaoSnapshots": 5
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "preferencias",
+   "seq": 3
+  },
+  {
+   "ts": "1792152011000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000004",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000004",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:10.000Z",
+    "atualizadoEm": "2026-10-16T12:00:10.000Z",
+    "tsLogico": "1792152011000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "tituloCurto": "LEI ANTIGA",
+    "escopo": "catalogo",
+    "tipo": "Lei",
+    "esfera": "federal",
+    "origemAcervo": {
+     "id": "lei-antiga",
+     "versao": 1,
+     "hash": "d353e6bc5ff9e2f3604bed77d2177296d50494eb1cb852139ae5e3b599e7e475"
+    },
+    "versaoVigenteId": "00000000-0000-7000-8000-000000000005"
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "normas",
+   "seq": 4
+  },
+  {
+   "ts": "1792152013000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000005",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000005",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:12.000Z",
+    "atualizadoEm": "2026-10-16T12:00:12.000Z",
+    "tsLogico": "1792152013000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "status": "vigente",
+    "capturadaEm": "2026-10-16T12:00:09.000Z",
+    "origemEntrada": "arquivo",
+    "hash": "d353e6bc5ff9e2f3604bed77d2177296d50494eb1cb852139ae5e3b599e7e475",
+    "fonte": "Acervo do Arretado"
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "versoesNorma",
+   "seq": 5
+  },
+  {
+   "ts": "1792152015000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "dispositivos",
+   "registroId": "00000000-0000-7000-8000-000000000006",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000006",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:14.000Z",
+    "tsLogico": "1792152015000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "tit1",
+    "categoria": "estrutural",
+    "tipo": "titulo",
+    "ordem": 1,
+    "rotulo": "TÍTULO I",
+    "status": "vigente",
+    "confianca": "alta"
+   },
+   "seq": 6
+  },
+  {
+   "ts": "1792152016000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "dispositivos",
+   "registroId": "00000000-0000-7000-8000-000000000007",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000007",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:14.000Z",
+    "tsLogico": "1792152016000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "art1",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "ordem": 2,
+    "paiId": "00000000-0000-7000-8000-000000000006",
+    "rotulo": "Art. 1º",
+    "status": "vigente",
+    "confianca": "alta"
+   },
+   "seq": 7
+  },
+  {
+   "ts": "1792152017000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "dispositivos",
+   "registroId": "00000000-0000-7000-8000-000000000008",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000008",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:14.000Z",
+    "tsLogico": "1792152017000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "art2",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "ordem": 3,
+    "paiId": "00000000-0000-7000-8000-000000000006",
+    "rotulo": "Art. 2º",
+    "status": "vigente",
+    "confianca": "alta"
+   },
+   "seq": 8
+  },
+  {
+   "ts": "1792152019000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "textosDispositivo",
+   "registroId": "00000000-0000-7000-8000-000000000009",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-000000000009",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:18.000Z",
+    "tsLogico": "1792152019000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000006",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Disposições gerais"
+     }
+    ]
+   },
+   "seq": 9
+  },
+  {
+   "ts": "1792152020000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "textosDispositivo",
+   "registroId": "00000000-0000-7000-8000-00000000000a",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-00000000000a",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:18.000Z",
+    "tsLogico": "1792152020000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000007",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Texto do artigo."
+     }
+    ]
+   },
+   "seq": 10
+  },
+  {
+   "ts": "1792152021000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "textosDispositivo",
+   "registroId": "00000000-0000-7000-8000-00000000000b",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-00000000000b",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:18.000Z",
+    "tsLogico": "1792152021000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000008",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Outro artigo."
+     }
+    ]
+   },
+   "seq": 11
+  },
+  {
+   "ts": "1792152023000-000000-00000002",
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "vinculosDisciplina",
+   "registroId": "00000000-0000-7000-8000-00000000000c",
+   "operacao": "gravar",
+   "dados": {
+    "id": "00000000-0000-7000-8000-00000000000c",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:22.000Z",
+    "atualizadoEm": "2026-10-16T12:00:22.000Z",
+    "tsLogico": "1792152023000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "sugestao": "Direito Penal"
+   },
+   "seq": 12
+  },
+  {
+   "ts": "1792152025000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000007",
+   "operacao": "atualizar",
+   "dados": {
+    "atualizadoEm": "2026-10-16T12:00:24.000Z",
+    "tsLogico": "1792152025000-000000-00000002",
+    "rotulo": "Art. 1º-A"
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "dispositivos",
+   "seq": 13
+  },
+  {
+   "ts": "1792152027000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-00000000000a",
+   "operacao": "atualizar",
+   "dados": {
+    "atualizadoEm": "2026-10-16T12:00:26.000Z",
+    "tsLogico": "1792152027000-000000-00000002",
+    "trechos": [
+     {
+      "texto": "Texto corrigido."
+     }
+    ]
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "textosDispositivo",
+   "seq": 14
+  },
+  {
+   "ts": "1792152030000-000000-00000002",
+   "registroId": "00000000-0000-7000-8000-000000000008",
+   "operacao": "atualizar",
+   "dados": {
+    "atualizadoEm": "2026-10-16T12:00:29.000Z",
+    "tsLogico": "1792152030000-000000-00000002",
+    "excluidoEm": "2026-10-16T12:00:28.000Z"
+   },
+   "aparelhoId": "00000000-0000-7000-8000-000000000002",
+   "usuarioId": "00000000-0000-7000-8000-000000000001",
+   "colecao": "dispositivos",
+   "seq": 15
+  }
+ ],
+ "tabelas": {
+  "usuarios": [
+   {
+    "id": "00000000-0000-7000-8000-000000000001",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:01.000Z",
+    "atualizadoEm": "2026-10-16T12:00:01.000Z",
+    "tsLogico": "1792152002000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "consentimentos": []
+   }
+  ],
+  "aparelhos": [
+   {
+    "id": "00000000-0000-7000-8000-000000000002",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:03.000Z",
+    "atualizadoEm": "2026-10-16T12:00:03.000Z",
+    "tsLogico": "1792152004000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "nome": "Este aparelho",
+    "plataforma": "Mozilla/5.0 (win32) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1"
+   }
+  ],
+  "preferencias": [
+   {
+    "id": "00000000-0000-7000-8000-000000000003",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:05.000Z",
+    "atualizadoEm": "2026-10-16T12:00:05.000Z",
+    "tsLogico": "1792152006000-000000-00000002",
+    "origem": "sistema",
+    "excluidoEm": null,
+    "tema": "sistema",
+    "fonteLeitura": "serifa",
+    "tamanhoFonte": 18,
+    "mostrarRedacoesAnteriores": false,
+    "modulosDesabilitados": [],
+    "retencaoSnapshots": 5
+   }
+  ],
+  "normas": [
+   {
+    "id": "00000000-0000-7000-8000-000000000004",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:10.000Z",
+    "atualizadoEm": "2026-10-16T12:00:10.000Z",
+    "tsLogico": "1792152011000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "tituloCurto": "LEI ANTIGA",
+    "escopo": "catalogo",
+    "tipo": "Lei",
+    "esfera": "federal",
+    "origemAcervo": {
+     "id": "lei-antiga",
+     "versao": 1,
+     "hash": "d353e6bc5ff9e2f3604bed77d2177296d50494eb1cb852139ae5e3b599e7e475"
+    },
+    "versaoVigenteId": "00000000-0000-7000-8000-000000000005"
+   }
+  ],
+  "versoesNorma": [
+   {
+    "id": "00000000-0000-7000-8000-000000000005",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:12.000Z",
+    "atualizadoEm": "2026-10-16T12:00:12.000Z",
+    "tsLogico": "1792152013000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "status": "vigente",
+    "capturadaEm": "2026-10-16T12:00:09.000Z",
+    "origemEntrada": "arquivo",
+    "hash": "d353e6bc5ff9e2f3604bed77d2177296d50494eb1cb852139ae5e3b599e7e475",
+    "fonte": "Acervo do Arretado"
+   }
+  ],
+  "dispositivos": [
+   {
+    "id": "00000000-0000-7000-8000-000000000006",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:14.000Z",
+    "tsLogico": "1792152015000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "tit1",
+    "categoria": "estrutural",
+    "tipo": "titulo",
+    "ordem": 1,
+    "rotulo": "TÍTULO I",
+    "status": "vigente",
+    "confianca": "alta"
+   },
+   {
+    "id": "00000000-0000-7000-8000-000000000007",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:24.000Z",
+    "tsLogico": "1792152025000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "art1",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "ordem": 2,
+    "paiId": "00000000-0000-7000-8000-000000000006",
+    "rotulo": "Art. 1º-A",
+    "status": "vigente",
+    "confianca": "alta"
+   },
+   {
+    "id": "00000000-0000-7000-8000-000000000008",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:14.000Z",
+    "atualizadoEm": "2026-10-16T12:00:29.000Z",
+    "tsLogico": "1792152030000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": "2026-10-16T12:00:28.000Z",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "endereco": "art2",
+    "categoria": "normativo",
+    "tipo": "artigo",
+    "ordem": 3,
+    "paiId": "00000000-0000-7000-8000-000000000006",
+    "rotulo": "Art. 2º",
+    "status": "vigente",
+    "confianca": "alta"
+   }
+  ],
+  "textosDispositivo": [
+   {
+    "id": "00000000-0000-7000-8000-000000000009",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:18.000Z",
+    "tsLogico": "1792152019000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000006",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Disposições gerais"
+     }
+    ]
+   },
+   {
+    "id": "00000000-0000-7000-8000-00000000000a",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:26.000Z",
+    "tsLogico": "1792152027000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000007",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Texto corrigido."
+     }
+    ]
+   },
+   {
+    "id": "00000000-0000-7000-8000-00000000000b",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:18.000Z",
+    "atualizadoEm": "2026-10-16T12:00:18.000Z",
+    "tsLogico": "1792152021000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "versaoId": "00000000-0000-7000-8000-000000000005",
+    "dispositivoId": "00000000-0000-7000-8000-000000000008",
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "trechos": [
+     {
+      "texto": "Outro artigo."
+     }
+    ]
+   }
+  ],
+  "vinculosDisciplina": [
+   {
+    "id": "00000000-0000-7000-8000-00000000000c",
+    "usuarioId": "00000000-0000-7000-8000-000000000001",
+    "criadoEm": "2026-10-16T12:00:22.000Z",
+    "atualizadoEm": "2026-10-16T12:00:22.000Z",
+    "tsLogico": "1792152023000-000000-00000002",
+    "origem": "importacao",
+    "excluidoEm": null,
+    "normaId": "00000000-0000-7000-8000-000000000004",
+    "sugestao": "Direito Penal"
+   }
+  ]
+ }
+}
