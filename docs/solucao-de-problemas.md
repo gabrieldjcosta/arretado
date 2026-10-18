@@ -1415,6 +1415,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
 - **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
 
+### Apagar tudo e recomeçar com conta ativa deixa o app sem identidade (A7)
+- **Causa:** apagar só o banco da conta e manter a conta ativa no registro faz o app recriar um banco com `usuarioId` aleatório, não o `uid`.
+- **Solução:** `apagarTudoERecomecar` apaga e recria o banco com `entrarNaConta`; se a recriação falhar, desativa a conta (volta a "sem conta") e relança o erro. Nada é apagado antes de checar a cópia recente ou a exportação confirmada.
+
+### Aceite do login não aparece em Usuario.consentimentos (A7)
+- **Causa:** o aceite acontece antes de a conta existir no Aparelho (e o login do Google sai da página); ele só é gravado quando Conta abre já dentro do banco da conta ativa. Sem `localStorage`, a tela Entrar recusa entrar.
+- **Solução:** abrir Conta depois de entrar (`RegistrarAceite`); a marca fica até haver conta ativa com banco aberto.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

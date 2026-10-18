@@ -445,3 +445,13 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Trocar de conta já conhecida | `trocarDeConta(uid)` |
 | Seção da tela Conta | `ContaDoAparelhoSecao`, `src/apresentacao/conta/sair/` |
 | Exclusão da conta no servidor | Edge Function `excluir-conta`, lógica testável em `supabase/functions/excluir-conta/handler.ts` (`index.ts` é o ajuste Deno) |
+
+#### F4-A: consentimento, recomeçar e política v3 (A7, código, 18/10/2026; sem subida de esquema, segue v8)
+
+| Termo | Identificador |
+|---|---|
+| Consentimento local | `registrarConsentimento(repo, escopo)`, `temConsentimento`, `exigirConsentimento`, `src/core/preferencias/consentimento.ts`; grava em `Usuario.consentimentos` com `versaoPolitica` = `v3:login` ou `v3:backup-nuvem` (o escopo vai junto da versão; o modelo não tem campo próprio) |
+| Aceite no servidor (porta nula) | `registrarConsentimentoNoServidor`: não faz nada até a decisão do Gabriel sobre a RPC `aceitar_termos` |
+| Aceite do login pendente | `marcarAceiteDoLogin`, `registrarAceitePendente`, `RegistrarAceite` (`src/apresentacao/conta/entrar/`); marca `arretado:aceite-login-pendente` no localStorage |
+| Apagar tudo e recomeçar | `apagarTudoERecomecar(repo, { registro, exportei })` e `podeApagarComCopia` (`src/apresentacao/conta/dados/recomecar.ts`); `ConfirmarCopia` é o trecho de tela dividido com o "Apagar daqui" |
+| Política v3 na tela | `POLITICA_V3` em `src/apresentacao/orientacoes/conteudo.ts`, exibida por `Privacidade`; a v2 fica em `<details>` como versão anterior |

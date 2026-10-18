@@ -18,7 +18,7 @@ async function montar(comCopia: boolean) {
   const u = userEvent.setup();
   await u.click(screen.getByRole('button', { name: 'Apagar tudo…' }));
   await u.click(screen.getByLabelText(/Entendo que os dados/));
-  return { u, botao: () => screen.getByRole('button', { name: 'Apagar tudo', exact: true }) };
+  return { u, botao: () => screen.getByRole('button', { name: /^Apagar tudo$/ }) };
 }
 
 describe('Apagar tudo e recomeçar (A7)', () => {

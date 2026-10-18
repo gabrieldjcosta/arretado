@@ -31,7 +31,7 @@ describe('Conta › Privacidade (A7)', () => {
 
   it('não usa rótulo clínico', () => {
     const { container } = montar();
-    const texto = container.textContent ?? '';
+    const texto = container.textContent;
     expect(texto).not.toMatch(/TDAH|autis|transtorno/i);
   });
 });
