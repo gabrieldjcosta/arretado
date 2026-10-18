@@ -444,14 +444,42 @@ button,
   white-space: nowrap;
 }
 
-/* ── Estrutura ─────────────────────────────────────────────────────────── */
+/* ── Estrutura: a casca (D-D7, P2) ─────────────────────────────────────── */
+
+/* Medidas da casca. --gutter: o recuo lateral do cabeçalho e do conteúdo (16 px no celular, 24 no
+   tablet em pé, 32 a partir de 900). --largura-casca: a largura do conteúdo e, a partir de 900 px, a
+   do cabeçalho, para a marca alinhar com o título. --abas-altura: o que as abas de baixo ocupam (até
+   899 px, com a área segura do aparelho); a rolagem reserva essa altura e o dock do Leitor fica
+   acima dela. Com o teclado aberto, no modo foco e no "só estudo" as abas saem e ela zera. */
+:root {
+  --gutter: 1rem;
+  --largura-casca: 900px;
+  --abas-altura: 0px;
+}
+
+@media (min-width: 700px) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --gutter: 2rem;
+  }
+}
 
 .shell {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  padding-bottom: var(--abas-altura);
 }
 
+/* Cabeçalho na areia (D-D7): a marca à esquerda; Ajuda e Conta à direita; de 900 px em diante, as
+   áreas ao centro e "Registrar erro" com a tecla E. O filete de baixo separa o cabeçalho preso do
+   texto que rola por baixo. Os recuos somam a área segura (entalhe), que só existe com
+   viewport-fit=cover (P7). */
 .topo {
   position: sticky;
   top: 0;
@@ -461,9 +489,10 @@ button,
      duas linhas em vez de alargar a página (no tablet, a página larga desalinha os botões fixos). */
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  /* Sobre a areia (D-D7): a área atual, em cal, se destaca dela. */
+  column-gap: 0.5rem;
+  min-height: calc(3.625rem + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) max(var(--gutter), env(safe-area-inset-right, 0px)) 0
+    max(var(--gutter), env(safe-area-inset-left, 0px));
   background: var(--fundo);
   border-bottom: 1px solid var(--borda);
 }
@@ -473,7 +502,7 @@ button,
   font-weight: 700;
   font-size: 1.1875rem;
   letter-spacing: -0.01em;
-  gap: 0.35rem;
+  gap: 0.3125rem;
   color: var(--texto);
   text-decoration: none;
   margin-right: auto;
@@ -489,6 +518,51 @@ button,
   color: var(--cacto);
 }
 
+.acoes-globais {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Ajuda em texto e Conta num alvo de 44 com o ícone de 22; o ícone encosta no recuo da página (o
+   alvo avança 10 px sobre ele). As regras dos botões da casca levam o pai no seletor: `button, .botao`
+   vem depois no arquivo e, com a mesma especificidade, venceria (display, recuo e raio). */
+.acoes-globais .ajuda-botao {
+  padding: 0 0.75rem;
+}
+
+.acoes-globais .conta-botao {
+  width: var(--alvo);
+  padding: 0;
+  margin-right: -0.625rem;
+}
+
+.conta-botao svg {
+  width: 1.375rem;
+  height: 1.375rem;
+  flex: none;
+}
+
+/* Registrar erro no cabeçalho só a partir de 900 px, neutro (a ação da tela é a de vidro), com a
+   tecla E ao lado. Até 899 px o registro é o "+" do título (Hoje e Fixar) e a tecla E. */
+.acoes-globais .registrar-global {
+  display: none;
+  padding: 0 0.875rem 0 1rem;
+}
+
+.registrar-global .atalho {
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: 6px;
+  background: var(--superficie-2);
+  color: var(--texto-atenuado);
+}
+
+/* Abas das áreas (D-D7): sobre a areia, em pílula; a atual em cal com a sombra fresca e o rótulo em
+   negrito (o estado não depende só da cor). O ícone aparece nas abas de baixo. */
 .areas {
   display: flex;
   gap: 0.25rem;
@@ -500,21 +574,24 @@ button,
   justify-content: center;
   min-height: var(--alvo);
   min-width: var(--alvo);
-  padding: 0 0.75rem;
+  padding: 0 0.875rem;
   border-radius: var(--raio-pilula);
   color: var(--texto);
+  font-weight: 500;
   text-decoration: none;
+}
+
+@media (hover: hover) {
+  .areas a:not([aria-current='page']):hover {
+    background: color-mix(in srgb, var(--texto) 6%, transparent);
+  }
 }
 
 .area-icone {
   display: none;
-  width: 1.4rem;
-  height: 1.4rem;
-}
-
-.conta-icone svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.375rem;
+  height: 1.375rem;
+  flex: none;
 }
 
 /* Onde estou (D-D7): a área e a aba atuais são cal sobre a areia, com a sombra fresca e o rótulo
@@ -535,56 +612,134 @@ button,
   font-weight: 700;
 }
 
-.acoes-globais {
-  display: flex;
-  gap: 0.25rem;
-}
-
 .conteudo {
   flex: 1;
   width: 100%;
-  max-width: 900px;
+  max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1rem var(--gutter);
 }
 
+/* Título com o "+" na mesma linha (TituloComMais, D-D7): o "+" é redondo, em cal com a tinta e a
+   sombra da área atual, de 44 px, e registra um erro. Não é vidro: o vidro é a ação da tela. */
+.titulo-com-mais {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.titulo-com-mais h1 {
+  margin: 0;
+  min-width: 0;
+}
+
+.titulo-com-mais .mais {
+  flex: none;
+  width: var(--alvo);
+  padding: 0;
+  border-color: transparent;
+  border-radius: 50%;
+  box-shadow: var(--atual-sombra);
+}
+
+.mais svg {
+  width: 1.375rem;
+  height: 1.375rem;
+  flex: none;
+}
+
+/* Rodapé legal no fim do conteúdo, acima da reserva das abas: o aviso curto e "Backup e dados" como
+   botão de texto de 44 px. */
 .rodape {
-  max-width: 900px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.25rem;
+  width: 100%;
+  max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem var(--gutter) 1rem;
   font-size: 0.8125rem;
   color: var(--texto-atenuado);
 }
 
-/* Barra inferior até 899 px (celular e tablet em retrato); o + flutuante só no celular (699 px). */
+.rodape p {
+  margin: 0;
+}
+
+.rodape .botao-texto {
+  padding: 0 0.5rem;
+  font-size: inherit;
+}
+
+/* Até 899 px (celular e tablet em pé): as abas ficam embaixo, presas à borda, sobre a areia, com o
+   filete de cima separando-as do texto que rola; ícone de 22 sobre o rótulo de 13 px, aba de 56. No
+   tablet em pé ficam juntas no meio, em até 560 px. Com o teclado aberto saem da frente. */
 @media (max-width: 899px) {
+  :root {
+    --abas-altura: calc(1px + 0.375rem + 3.5rem + max(0.875rem, env(safe-area-inset-bottom, 0px)));
+  }
+
   .areas {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    inset: auto 0 0;
     z-index: 5;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.375rem max(0.5rem, env(safe-area-inset-right, 0px))
+      max(0.875rem, env(safe-area-inset-bottom, 0px)) max(0.5rem, env(safe-area-inset-left, 0px));
     background: var(--fundo);
     border-top: 1px solid var(--borda);
-    padding: 0.25rem;
   }
 
   .areas a {
-    flex: 1;
     flex-direction: column;
-    gap: 0.1rem;
-    min-height: 3.25rem;
+    gap: 0.1875rem;
+    min-height: 3.5rem;
     padding: 0 0.25rem;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
   }
 
   .area-icone {
     display: block;
   }
 
-  .shell {
-    padding-bottom: calc(3.25rem + 1rem);
+  .shell[data-teclado] {
+    --abas-altura: 0px;
+  }
+
+  .shell[data-teclado] .areas {
+    display: none;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 899px) {
+  .areas {
+    padding-inline: max(0.5rem, calc((100% - 35rem) / 2));
+  }
+}
+
+/* A partir de 900 px: o cabeçalho na largura do conteúdo; as áreas ao centro, só com o rótulo (para
+   caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
+@media (min-width: 900px) {
+  .topo {
+    padding-inline: max(var(--gutter), calc((100% - var(--largura-casca)) / 2 + var(--gutter)));
+  }
+
+  .marca {
+    margin-right: 0;
+  }
+
+  .areas {
+    margin-inline: auto;
+  }
+
+  .acoes-globais .registrar-global {
+    display: inline-flex;
   }
 }
 
@@ -983,12 +1138,6 @@ legend {
   background: color-mix(in srgb, var(--superficie-2) 60%, transparent);
 }
 
-.vazio-mascote {
-  display: block;
-  margin: 0 auto 0.75rem;
-  height: auto;
-}
-
 .vazio p {
   max-width: 36ch;
   margin-inline: auto;
@@ -1208,38 +1357,6 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-.rotulo-curto {
-  display: none;
-}
-
-/* Registrar erro no cabeçalho: neutro, para o "Agora" ser o único destaque da tela (avaliação N-1). */
-.acoes-globais .registrar-global {
-  font-weight: 600;
-}
-
-/* Até 899 px (celular, tablet em retrato, janela estreita): "+ Erro" e áreas mais justas. Com o
-   rótulo longo, a barra de cima ocupava os 712 px do tablet inteiros com a fonte do Windows e
-   transbordava com a do Linux (11.1). */
-@media (max-width: 899px) {
-  .acoes-globais .registrar-global {
-    padding: 0 0.6rem;
-  }
-
-  .rotulo-longo {
-    display: none;
-  }
-
-  .rotulo-curto {
-    display: inline;
-  }
-}
-
-@media (min-width: 700px) and (max-width: 899px) {
-  .areas a {
-    padding: 0 0.5rem;
-  }
-}
-
 /* Biblioteca › Normas (F2, 9.5) */
 .cabecalho-secao {
   display: flex;
@@ -1394,10 +1511,12 @@ a.item-norma strong {
   color: var(--titulo);
 }
 
+/* O dock fica acima das abas de baixo (--abas-altura, que zera a partir de 900 px, com o teclado
+   aberto e no modo foco). */
 .acoes-leitor {
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: calc(var(--abas-altura) + 1rem);
   z-index: 4;
   display: flex;
   gap: 0.5rem;
@@ -1410,27 +1529,18 @@ a.item-norma strong {
   box-shadow: var(--sombra-flutuante);
 }
 
-@media (max-width: 899px) {
-  /* Acima da navegação das áreas, que no celular e no tablet fica no rodapé. */
-  .acoes-leitor {
-    right: 0.75rem;
-    bottom: calc(3.25rem + 1.25rem);
-  }
-}
-
 /* Modo foco (11.1): só o texto. A moldura do Shell some (o leitor põe o atributo na raiz e o tira
    ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
    da folga dela, e o grupo fixo desce ao canto. */
 :root[data-modo-foco] .topo,
 :root[data-modo-foco] .areas,
-:root[data-modo-foco] .flutuante,
 :root[data-modo-foco] .faixa-offline,
 :root[data-modo-foco] .rodape {
   display: none;
 }
 
 :root[data-modo-foco] .shell {
-  padding-bottom: 0;
+  --abas-altura: 0px;
 }
 
 .em-foco .acoes-leitor {
@@ -2136,7 +2246,7 @@ dialog.dialogo-acoes {
   margin-top: 0.75rem;
 }
 
-/* ── Redesign, fatia 2: agora / depois, barra fina, dias, + flutuante ──────── */
+/* ── Redesign, fatia 2: agora / depois, barra fina, dias ───────────────────── */
 
 /* A folha do Agora (D-D7): cal com a sombra fresca, sobre a areia. */
 .acao-agora {
@@ -2148,20 +2258,6 @@ dialog.dialogo-acoes {
   padding: 1.25rem;
   margin: 0 0 1rem;
   box-shadow: var(--sombra-folha);
-}
-
-.acao-agora:has(.agora-mascote) {
-  margin-top: 4.5rem;
-}
-
-/* O mascote senta na borda do cartão, sozinho, sem fundo; decorativo. */
-.agora-mascote {
-  position: absolute;
-  right: 1rem;
-  bottom: calc(100% - 1.5rem);
-  width: 6rem;
-  height: auto;
-  pointer-events: none;
 }
 
 /* Dentro da folha a ação é o vidro (sem borda): o botão primário global só troca o par
@@ -2253,54 +2349,6 @@ dialog.dialogo-acoes {
 .dia-marca.feito {
   background: var(--cacto);
   border-color: var(--cacto);
-}
-
-.flutuante {
-  display: none;
-}
-
-/* Celular: a lista não deixa o último item sob o + (3,5 rem + folga acima da barra). */
-@media (max-width: 699px) {
-  .shell:not(:has(.leitor)) .conteudo {
-    padding-bottom: 5.5rem;
-  }
-
-  .flutuante {
-    display: inline-flex;
-    position: fixed;
-    right: 0.75rem;
-    bottom: calc(3.25rem + 1.25rem);
-    z-index: 5;
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 50%;
-    font-size: 1.75rem;
-    /* D-D7: o "+" é cal com tinta, porque o vidro fica para a ação da tela (um por tela); na P2 do
-       Ponto de luz ele sai do canto e sobe para a linha do título. */
-    background: var(--superficie);
-    border-color: var(--borda-botao);
-    color: var(--texto);
-    box-shadow:
-      var(--sombra-flutuante),
-      inset 0 1px 0 rgb(255 255 255 / 35%);
-  }
-
-  @media (hover: hover) {
-    .principal.flutuante:not(:disabled):hover {
-      background: var(--superficie-2);
-      border-color: var(--borda-botao);
-    }
-  }
-
-  /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
-  .acoes-globais .registrar-global {
-    display: none;
-  }
-}
-
-/* O grupo fixo do leitor ocupa o canto do +; o registro continua pelo atalho e pelo cabeçalho. */
-.shell:has(.leitor) .flutuante {
-  display: none;
 }
 
 /* Artigo por artigo (11.8): um cartão iluminado com o artigo inteiro e, acima e abaixo, a espiada
@@ -2669,7 +2717,7 @@ dialog.dialogo-previa .linha-acoes button {
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
-  box-shadow: var(--sombra);
+  box-shadow: var(--sombra-flutuante);
 }
 
 .menu-ajuda-itens .botao,

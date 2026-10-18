@@ -14,16 +14,16 @@ export const SECOES: Secao[] = [
     id: 'como-funciona',
     titulo: 'Como o Arretado funciona',
     paragrafos: [
-      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Plano (onde você está no edital), Recall (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
-      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Recall (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
+      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Trilha (onde você está no edital), Fixar (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
+      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Fixar (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
       'Nada é obrigatório além do mínimo: você completa os detalhes quando quiser.',
     ],
   },
   {
     id: 'recall',
-    titulo: 'Recall: erros, cartões e revisões',
+    titulo: 'Fixar: erros, cartões e revisões',
     paragrafos: [
-      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. O botão "Registrar erro" está em todas as telas; no teclado, a tecla E também abre o registro.',
+      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. Para registrar, toque no "+" ao lado do título do Hoje ou do Fixar; no computador, "Registrar erro" fica no alto de toda tela. No teclado, a tecla E abre o registro de qualquer tela.',
       'O resto é opcional, em "Mais detalhes" ou depois: se errou ou acertou sem certeza, o que foi, a causa, a convicção, a fonte da questão. Quando o texto dá pistas, o Arretado sugere uma causa — ela só vale quando você confirma.',
       'Se você escreveu o que foi, o Arretado pergunta se quer um cartão. O cartão nunca é criado sozinho. A frente é o que foi; o verso é a frase correta.',
       'Os cartões voltam em 1, 3, 7, 15, 30 e 60 dias. Na revisão, mostre a resposta e diga como foi: "De novo" volta ao começo, "Difícil" repete o intervalo, "Fácil" avança. No teclado: espaço mostra a resposta; 1, 2 e 3 respondem.',
@@ -59,10 +59,10 @@ export const SECOES: Secao[] = [
     id: 'pontos',
     titulo: 'Importar os pontos do edital',
     paragrafos: [
-      'Em Plano, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
+      'Na Trilha, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
       'A primeira linha precisa ter as colunas Disciplina e Ponto. Opcionais: Faixa (Altíssima, Alta, Média ou Extra) e Código. Exemplo de linha: Execução Penal; 3; Progressão de regime; Alta.',
       'Importar a mesma planilha de novo não duplica nada: só entram os pontos novos. Como toda importação, dá para desfazer em Conta › Dados.',
-      'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com o Plano completo.',
+      'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com a Trilha completa.',
     ],
   },
   {

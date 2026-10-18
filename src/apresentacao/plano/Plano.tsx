@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import type { Disciplina, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
+import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
 import { ROTULO_FAIXA } from './pontos/carregar';
@@ -27,7 +28,7 @@ export function Plano() {
 
   return (
     <>
-      <h1>Plano</h1>
+      <h1>{ROTULO_DA_AREA.plano}</h1>
       {confirmacao && (
         <p role="status" className="sucesso">
           {confirmacao}

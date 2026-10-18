@@ -195,7 +195,7 @@ export function ListaDePontos() {
       <h1>Pontos do programa</h1>
       <p className="dica">
         O que cai (faixa) e o que você já fez (andamento) são coisas separadas.{' '}
-        <Link to="/plano">Voltar ao Plano</Link>
+        <Link to="/plano">Voltar à Trilha</Link>
       </p>
       {erro && (
         <p role="alert" className="aviso falha">

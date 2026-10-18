@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Frase, RespostaFrase } from '../../core/modelo';
 import {
@@ -149,7 +148,6 @@ export function RevisarFrases() {
     return (
       <>
         <h1>Revisar frases</h1>
-        <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
           titulo={texto('fimDeRodada')}
           acao={

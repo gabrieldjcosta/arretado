@@ -49,7 +49,6 @@ function ProximaAcaoDoHoje() {
         {...(acao.estimativaMin === undefined ? {} : { estimativa: acao.estimativaMin })}
         rotuloBotao="Começar"
         para={rotaDeInicio(acao)}
-        mascote
       />
       <button
         type="button"

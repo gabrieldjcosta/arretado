@@ -2,6 +2,8 @@
 // docs/planos/f3-pacotes.md): Agora e RevisoesDoDia = A1; Retorno = A3b; Depois = B4; Captura = sem
 // dono, o primeiro pacote que precisar. Depois do P0, quem não é dono não edita este arquivo nem o
 // de outro pacote. Estilo novo vai em CSS próprio do pacote, sem cor literal.
+import { TituloComMais } from '../componentes/TituloComMais';
+import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { Captura } from './Captura';
 import { Depois } from './Depois';
@@ -13,7 +15,7 @@ import { BoasVindas } from './Retorno';
 export function Hoje() {
   return (
     <>
-      <h1>Hoje</h1>
+      <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
       <BoasVindas />
       <Agora />
       <FecharDia />

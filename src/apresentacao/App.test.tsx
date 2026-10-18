@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { obterPreferencias } from '../core/preferencias';
 import { exportarPacote } from '../core/pacote';
 import type { Repositorio } from '../core/persistencia';
+import { simularJanelaVisual } from '../testes/janela-visual';
 import { repositorioDeTeste } from '../testes/repositorio';
 import { App } from './App';
 import { SECOES, secaoDeAjuda } from './orientacoes/conteudo';
@@ -29,11 +30,72 @@ describe('shell (5.1, 5.5)', () => {
       within(areas)
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Hoje', 'Plano', 'Recall', 'Biblioteca']);
+    ).toEqual(['Hoje', 'Trilha', 'Fixar', 'Biblioteca']);
     expect(screen.getByRole('button', { name: 'Ajuda' })).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('button', { name: 'Relatar problema' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
     expect(screen.getByText(RODAPE_CURTO, { exact: false })).toBeInTheDocument();
+  });
+
+  it('o cabeçalho traz Conta e Ajuda, e o rodapé leva a Backup e dados (P2)', async () => {
+    await abrirApp();
+    const topo = screen.getByRole('banner');
+    expect(within(topo).getByRole('link', { name: 'Conta e ajustes' })).toHaveAttribute(
+      'href',
+      '#/conta',
+    );
+    expect(within(topo).getByRole('button', { name: 'Ajuda' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('contentinfo')).getByRole('link', { name: 'Backup e dados' }),
+    ).toHaveAttribute('href', '#/conta/dados');
+  });
+
+  it.each([
+    ['/', 'Hoje'],
+    ['/recall', 'Fixar'],
+  ])(
+    '%s: o "+" fica na linha do título %s e abre o registro de erro (P2)',
+    async (rota, titulo) => {
+      const { usuario } = await abrirApp(rota);
+      const h1 = await screen.findByRole('heading', { level: 1, name: titulo });
+      const mais = within(h1.parentElement ?? document.body).getByRole('link', {
+        name: 'Novo registro de erro',
+      });
+      await usuario.click(mais);
+      expect(
+        await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it.each(['/plano', '/biblioteca'])(
+    '%s não tem o "+" (só as telas que registram)',
+    async (rota) => {
+      await abrirApp(rota);
+      await screen.findByRole('heading', { level: 1 });
+      expect(screen.queryByRole('link', { name: 'Novo registro de erro' })).not.toBeInTheDocument();
+    },
+  );
+
+  it('com o teclado aberto, a casca se marca para as abas saírem da frente (P2)', async () => {
+    const janela = simularJanelaVisual(window.innerHeight);
+    try {
+      await abrirApp('/recall/registrar');
+      const campo = await screen.findByLabelText('Frase correta');
+      expect(document.querySelector('.shell')).not.toHaveAttribute('data-teclado');
+      act(() => {
+        campo.focus();
+        janela.visual.height = window.innerHeight - 300;
+        janela.avisar();
+      });
+      // A casca é lida de novo a cada tentativa: sob carga (o `check` inteiro), a tela ainda pode
+      // renderizar depois do foco, e uma referência guardada antes ficaria velha.
+      await waitFor(() => {
+        expect(document.querySelector('.shell')).toHaveAttribute('data-teclado', 'aberto');
+      });
+    } finally {
+      janela.restaurar();
+    }
   });
 
   it('navega entre as áreas e marca a atual', async () => {
@@ -70,9 +132,9 @@ describe('encaixes da F3 (P0 Fundação)', () => {
     expect(await screen.findByRole('heading', { name: titulo })).toBeInTheDocument();
   });
 
-  it('/plano segue mostrando o Plano', async () => {
+  it('/plano segue mostrando a Trilha (rótulo novo, rota antiga)', async () => {
     await abrirApp('/plano');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Plano' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Trilha' })).toBeInTheDocument();
   });
 });
 

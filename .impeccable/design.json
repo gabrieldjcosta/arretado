@@ -4,19 +4,46 @@
   "title": "Design System: Arretado",
   "extensions": {
     "colorMeta": {
-      "vidro": { "role": "primary", "displayName": "Vidro", "canonical": "#0f7f72" },
-      "cal": { "role": "secondary", "displayName": "Cal", "canonical": "#ffffff" },
-      "tinta": { "role": "secondary", "displayName": "Tinta", "canonical": "#17243a" },
-      "luz": { "role": "tertiary", "displayName": "Luz", "canonical": "#6fe3d6" },
-      "traco": { "role": "tertiary", "displayName": "Traço", "canonical": "#c8742f" },
-      "areia": { "role": "neutral", "displayName": "Areia", "canonical": "#f1e6d3" }
+      "vidro": {
+        "role": "primary",
+        "displayName": "Vidro",
+        "canonical": "#0f7f72"
+      },
+      "cal": {
+        "role": "secondary",
+        "displayName": "Cal",
+        "canonical": "#ffffff"
+      },
+      "tinta": {
+        "role": "secondary",
+        "displayName": "Tinta",
+        "canonical": "#17243a"
+      },
+      "luz": {
+        "role": "tertiary",
+        "displayName": "Luz",
+        "canonical": "#6fe3d6"
+      },
+      "traco": {
+        "role": "tertiary",
+        "displayName": "Traço",
+        "canonical": "#c8742f"
+      },
+      "areia": {
+        "role": "neutral",
+        "displayName": "Areia",
+        "canonical": "#f1e6d3"
+      }
     },
     "typographyMeta": {
       "titulo-pagina": {
         "displayName": "Título de página",
         "purpose": "H1 e marca, só em Gabarito."
       },
-      "corpo": { "displayName": "Corpo", "purpose": "Interface em Atkinson Hyperlegible Next." },
+      "corpo": {
+        "displayName": "Corpo",
+        "purpose": "Interface em Atkinson Hyperlegible Next."
+      },
       "leitura-da-lei": {
         "displayName": "Leitura da lei",
         "purpose": "Texto do Leitor em Literata, sem itálico."
@@ -62,8 +89,14 @@
       }
     ],
     "breakpoints": [
-      { "name": "tablet", "value": "700px" },
-      { "name": "desktop", "value": "900px" }
+      {
+        "name": "tablet",
+        "value": "700px"
+      },
+      {
+        "name": "desktop",
+        "value": "900px"
+      }
     ]
   },
   "components": [
@@ -114,6 +147,22 @@
       "description": "Trilho em pílula na areia funda; a aba atual é cal com a sombra fresca.",
       "html": "<nav class=\"ds-abas\"><a class=\"ds-aba\" aria-current=\"page\" href=\"#\">Frases</a><a class=\"ds-aba\" href=\"#\">Cartões</a><a class=\"ds-aba\" href=\"#\">Histórico</a></nav>",
       "css": ".ds-abas{display:flex;gap:4px;padding:4px;border-radius:999px;background:#e7d8be;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-aba{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;color:#17243a;text-decoration:none}.ds-aba[aria-current='page']{background:#fff;color:#17243a;font-weight:700;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-aba:focus-visible{outline:2px solid #17243a;outline-offset:-2px}"
+    },
+    {
+      "name": "Abas das áreas",
+      "kind": "nav",
+      "refersTo": "nav-item-current",
+      "description": "Até 899 px, presas embaixo sobre a areia, com filete em cima: ícone de 22 sobre o rótulo de 13, aba de 56. A atual em cal com a sombra fresca e o rótulo em negrito. A partir de 900 px, no centro do cabeçalho, só o rótulo, em pílula de 44.",
+      "html": "<nav class=\"ds-areas\" aria-label=\"Áreas\"><a href=\"#\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z\"/></svg><span>Hoje</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 5h14v14H5zM5 10h14M9 3v4M15 3v4\"/></svg><span>Trilha</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11\"/></svg><span>Fixar</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5zM5 18.5A1.5 1.5 0 0 0 6.5 20H19\"/></svg><span>Biblioteca</span></a></nav>",
+      "css": ".ds-areas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:6px 8px 14px;background:#f1e6d3;border-top:1px solid rgb(23 36 58 / 12%);font:500 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-areas a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border-radius:999px;color:#17243a;text-decoration:none}.ds-areas svg{width:22px;height:22px}.ds-areas a[aria-current='page']{background:#fff;font-weight:700;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-areas a:focus-visible{outline:2px solid #17243a;outline-offset:-2px}"
+    },
+    {
+      "name": "Mais",
+      "kind": "button",
+      "refersTo": "button-mais",
+      "description": "O \"+\" na linha do título do Hoje e do Fixar: redondo, 44 px, cal com tinta e a sombra fresca; abre o registro de erro. Não é vidro (o vidro é a ação da tela).",
+      "html": "<div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div>",
+      "css": ".ds-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-titulo h1{margin:0;font:800 30px Gabarito,system-ui,sans-serif;color:#17243a}.ds-mais{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#fff;color:#17243a;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-mais svg{width:22px;height:22px}.ds-mais:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
     }
   ],
   "narrative": {

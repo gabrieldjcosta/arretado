@@ -975,13 +975,15 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** texto em Arial/Georgia/system-ui; console com violação de `font-src`; `document.fonts.check` falso. **Causa:** `@font-face` apontando fora do pacote (caminho relativo a `src/apresentacao/`: `../../node_modules/...`) ou arquivo inlinado como `data:` (a CSP só aceita `'self'`; o Vite só inlina abaixo de 4 KB, os `.woff2` têm mais). **Solução:** conferir que `dist/assets/*.woff2` existem após `npm run build`. O E2E "as fontes embutidas carregam" cobre. Subconjunto: só `latin`; se aparecer caractere fora (raro em português), acrescentar `latin-ext`.
 - **Origem:** previsto — fatia 1 do redesign.
 
-### Dois "Registrar erro" na tela (cabeçalho e +)
-- **Sintoma:** teste (jsdom ou E2E) com `getByRole('link', { name: 'Registrar erro' })` falha por ter 0 ou 2 resultados. **Causa:** a casca tem o botão do cabeçalho (oculto por CSS no celular, ≤ 699 px) e o **+** flutuante (oculto a partir de 700 px). No jsdom não há CSS, então os dois existem; o **+** tem outro nome acessível ("Novo registro de erro") para não duplicar. No celular, o botão do cabeçalho some e o E2E precisa clicar no **+**. **Solução:** nos E2E que clicam nele, usar `/^(Registrar erro|Novo registro de erro)$/`: só o visível entra no `getByRole`.
-- **Origem:** encontrado na fatia 2 do redesign (09/10/2026).
+### Dois caminhos para registrar erro: o "+" do título e o "Registrar erro" do cabeçalho
+- **Sintoma:** teste com `getByRole('link', { name: 'Registrar erro' })` não acha nada no celular e no tablet, ou o E2E não acha o "+" fora do Hoje e do Fixar. **Causa:** desde a P2 do Ponto de luz, o "Registrar erro" do cabeçalho só aparece a partir de 900 px (`display: none` abaixo; no jsdom, sem CSS, ele sempre existe), e o "+" ("Novo registro de erro") só existe no título do Hoje e do Fixar (`TituloComMais`). Os nomes acessíveis são diferentes, então não colidem.
+- **Solução:** o E2E que registra a partir do Hoje ou do Fixar clica em "Novo registro de erro" (visível em toda largura); em outra tela, tecla E ou `page.goto('/#/recall/registrar')`. **Prevenção:** E2E "casca: abas por teclado, "+" no título…" (`e2e/acessibilidade.spec.ts`).
+- **Origem:** encontrado na fatia 2 do redesign (09/10/2026); reescrito na P2 do Ponto de luz (18/10/2026).
 
-### Barra inferior até 899 px, + só até 699 px
-- **Sintoma:** controle fixo colado à barra de baixo no tablet, ou sobre o grupo fixo do leitor. **Causa:** três cortes na folha: 899 px (barra inferior, `.acoes-leitor` acima dela), 699 px (+ flutuante, recuos). **Solução:** o grupo fixo do leitor usa o canto do **+**, então `.shell:has(.leitor) .flutuante` o esconde ali (o atalho E e o botão do cabeçalho seguem no tablet; no celular, o registro no leitor vem das ações por dispositivo). No modo foco a barra e o **+** somem.
-- **Origem:** previsto/encontrado na fatia 2 do redesign.
+### Abas de baixo até 899 px: reserva de rolagem e dock pela `--abas-altura`
+- **Sintoma:** texto do fim da página sob as abas, o dock do Leitor colado nelas, ou um vão vazio embaixo no modo foco, no "só estudo" ou com o teclado aberto. **Causa:** as abas ficam presas embaixo até 899 px; a reserva (`.shell { padding-bottom }`) e o dock (`.acoes-leitor { bottom }`) dependem da altura delas.
+- **Solução:** tudo lê `--abas-altura` (definida no `@media (max-width: 899px)`, com a área segura), e quem esconde as abas a zera no mesmo lugar (`.shell[data-teclado]`, `:root[data-modo-foco] .shell`, `body[data-so-estudo] .shell`). **Prevenção:** E2E "as abas não cobrem texto no fim da página" (`e2e/acessibilidade.spec.ts`) e `capturas-ui.mjs --medir` ("Abas sobre texto no fim da página").
+- **Origem:** previsto/encontrado na fatia 2 do redesign; reescrito na P2 do Ponto de luz (18/10/2026).
 
 ### Botão primário sem fundo dentro de um grupo (axe: `color-contrast` em `.acoes-leitor > .principal`)
 - **Sintoma:** E2E do Leitor falha em `semViolacoes` com `color-contrast: .acoes-leitor > .principal` no tema claro; o "Lido até aqui" aparece com texto branco sobre creme. **Causa:** uma regra de descendente (`.acoes-leitor button { background: var(--superficie) }`, especificidade 0,1,1) vence `.principal { background: var(--acao) }` (0,1,0); o texto segue `--acao-texto` (branco), o fundo vira o da superfície. Antes da D-D4 o primário era vidro e o defeito não aparecia.
@@ -998,7 +1000,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2, PR 150).
 
 ### Alvo abaixo de 44 px que a F1 não cobre (previsto)
-- **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Backup e dados", "Voltar à Biblioteca"). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
+- **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Voltar à Biblioteca"; o "Backup e dados" virou botão de texto de 44 px na P2 do Ponto de luz). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
 
 ### Fonte nova pelo npm trava o PR na "Guarda do PR"
@@ -1013,6 +1015,27 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** no CI, `e2e/acervo.spec.ts` (3c e 6a) e `e2e/biblioteca.spec.ts` (9.5) falham em `semViolacoes`, só no claro e nos três aparelhos, com `color-contrast` em `button[aria-label="Alterar a disciplina de …"]` e `.item-acervo-disciplina > .botao-texto`. O `acessibilidade.spec.ts` passa, porque as telas dele não têm itens do acervo. **Causa:** o `.botao-texto` herdava a cor do lugar com `opacity: 0.82`; dentro de `p.dica` a cor herdada já é a atenuada (`--texto-atenuado`, 5,5:1 na areia), e a 82% ela cai para 3,8:1 na areia (4,4:1 na cal). No creme da D-D5 o par já reprovava (4,3:1), mas o axe não media: o `body` tinha a textura de pontos (`radial-gradient`), e o axe-core marca como "incompleto", não como violação, todo texto com `background-image` na pilha de fundo. Com o fundo liso da D-D7, o axe passou a medir pela primeira vez todo texto posto direto na página.
 - **Solução:** o fantasma não usa mais opacidade (D-D7); a cor herdada vale inteira. **Prevenção:** texto nunca leva `opacity` abaixo de 1 fora de estado desabilitado; nunca textura nem imagem no fundo do `body` (além de vetada pela D-D7, esconde do axe os defeitos de contraste); ao trocar a paleta, rodar a suíte E2E inteira (`npx playwright test`), não só o `acessibilidade.spec.ts`, porque o axe roda dentro da maioria dos specs (12 de 16).
 - **Origem:** ocorrido em 18/10/2026 (P1 do Ponto de luz, PR #186).
+
+### Ícone vira um ponto, o "+" fica quadrado ou "Registrar erro" aparece no celular (cascata do botão)
+- **Sintoma:** captura com o ícone da Conta e o do "+" reduzidos a um ponto, o "+" de cantos arredondados em vez de redondo, ou o "Registrar erro" do cabeçalho visível abaixo de 900 px, com o cabeçalho em duas linhas. **Causa:** a regra base `button, .botao` (display, recuo de 20 px dos lados, raio de 12) vem depois da casca em `estilos.css` e tem a mesma especificidade de uma classe só (`.conta-botao`, `.mais`, `.registrar-global`); vence, e o recuo de 40 px num alvo de 44 espreme o SVG.
+- **Solução:** a regra do componente leva o pai no seletor (`.acoes-globais .conta-botao`, `.titulo-com-mais .mais`, também dentro do `@media`), e o SVG ganha `flex: none`. **Prevenção:** conferir as capturas do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### Captura sem dados, ou o Leitor estoura o tempo, depois de trocar de porta
+- **Sintoma:** `node scripts/capturas-ui.mjs --url http://localhost:<outra porta>` fotografa o app vazio, e as rotas do Leitor esperam até o tempo-limite. **Causa:** o estado semeado é o IndexedDB guardado por origem (`estado/<nome>.json`, do `storageState`); copiado de uma pasta semeada em outra porta, não abre na nova.
+- **Solução:** `--semear` na primeira captura de cada porta, ou uma pasta de saída por porta (antes e depois em portas fixas, por exemplo 4181 e 4182). **Prevenção:** esta entrada.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### A medida acusa texto que não está na tela (`<details>` dentro de outro fechado)
+- **Sintoma:** `--medir` lista em "Abas sobre texto" um texto que não aparece na captura (na Trilha do tablet, "Não sabe montar a planilha?"). **Causa:** o `<summary>` de um `<details>` que está dentro de outro `<details>` fechado não é desenhado, mas o navegador ainda devolve uma caixa para ele.
+- **Solução:** `visivel()` em `scripts/capturas-ui.mjs` sobe por todos os `<details>` fechados em volta do elemento (corrigido). **Prevenção:** ao estranhar uma medida, abrir a captura antes de mexer na tela.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### `pkill -f` derruba o próprio comando (código 144)
+- **Sintoma:** um comando que para o `vite preview` e o sobe de novo termina com código 144, e o servidor não volta. **Causa:** `pkill -f "vite preview --port 4182"` (ou `pgrep -f … | xargs kill`) casa também com a linha do próprio shell, que contém o mesmo texto.
+- **Solução:** parar e subir em comandos separados, com um padrão que não casa consigo mesmo: `pkill -f "vite preview --port 418[2]"`. **Prevenção:** esta entrada.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz, ambiente Linux da nuvem).
+
 
 ## Uso do app
 

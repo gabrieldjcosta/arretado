@@ -294,7 +294,7 @@ export function Tarefas() {
       <h1>Tarefas</h1>
       <p className="dica">
         Passos pequenos, como “ler arts. 10 a 13”. O que não der fica na fila, sem cobrança.{' '}
-        <Link to="/plano">Voltar ao Plano</Link>
+        <Link to="/plano">Voltar à Trilha</Link>
       </p>
       {erro && (
         <p role="alert" className="aviso falha">

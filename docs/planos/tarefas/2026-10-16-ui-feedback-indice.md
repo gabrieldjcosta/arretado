@@ -37,8 +37,8 @@ Origem: 18 anotações do Gabriel sobre o site publicado (`arretado.gabrieldjcos
 
 Ordem sugerida (no máximo 3 workers por Run, um por conta): **1ª rodada** A (antigravity-1), B (deepseek-harness), D (Sonnet). **2ª rodada** C, E, F. A e B tocam o acervo em arquivos diferentes e não conflitam; A e E tocam a Biblioteca em arquivos diferentes (`Acervo.tsx` × `Normas.tsx`); o G original foi absorvido pela F1b (ver abaixo).
 
-## H — Mascote (aguarda o PNG)
-Quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutida), com as cores do sistema visual, e trocar o arquivo usado por `img.vazio-mascote` em `src/apresentacao/hoje/EstadoVazio.tsx`. Contrato escrito quando o arquivo chegar.
+## H — Mascote (cancelado)
+**Cancelado em 18/10/2026:** a D-D7 trocou o mascote pelo traço do cachorro, e o mascote antigo saiu do app na P2 do Ponto de luz. Texto original: quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutida), com as cores do sistema visual, e trocar o arquivo usado por `img.vazio-mascote` em `src/apresentacao/hoje/EstadoVazio.tsx`. Contrato escrito quando o arquivo chegar.
 
 ## Padrão do Stitch (D-D5, 16/10/2026) e o que muda nestes pacotes
 O Gabriel trouxe o Hoje do projeto Stitch `9953616237194891956` e pediu o mesmo padrão em todas as telas (`docs/design/decisoes-design.md`, D-D5; plano em `docs/planos/redesign-v2.md`, fatias **F1b** e **F12**). Efeito:
@@ -49,5 +49,5 @@ O Gabriel trouxe o Hoje do projeto Stitch `9953616237194891956` e pediu o mesmo 
 ## G2 — Orientação no Fixar (anotação 9)
 Nível C, Antigravity, revisor Claude. Depois da F2. Em `src/apresentacao/recall/RecallInicio.tsx`, ao lado do título (abaixo, em tela estreita), em tom de dica, texto de 13 px ou mais: "Errou ou chutou uma questão? Registre a frase ou a alternativa certa. Assim você acerta da próxima vez." Teste do texto e do rótulo do módulo; E2E do Fixar com axe. Contrato completo escrito quando a F2 estiver mesclada (usa o nome final do módulo).
 
-## H — Mascote (aguarda o PNG)
-Quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutida), com as cores da D-D5, e trocar o arquivo usado por `img.vazio-mascote` em `src/apresentacao/hoje/EstadoVazio.tsx`. No Stitch o cartão Agora já reserva espaço para o mascote acima dele. Contrato escrito quando o arquivo chegar.
+## H — Mascote (cancelado)
+**Cancelado em 18/10/2026:** a D-D7 trocou o mascote pelo traço do cachorro, e o mascote antigo saiu do app na P2 do Ponto de luz. Texto original: quando o Gabriel mandar o PNG: vetorizar em SVG limpo (paths, sem imagem embutida), com as cores da D-D5, e trocar o arquivo usado por `img.vazio-mascote` em `src/apresentacao/hoje/EstadoVazio.tsx`. No Stitch o cartão Agora já reserva espaço para o mascote acima dele. Contrato escrito quando o arquivo chegar.

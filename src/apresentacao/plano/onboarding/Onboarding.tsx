@@ -83,7 +83,7 @@ function ComecePorAqui({ ponto, materia }: PlanoCriado) {
       )}
       {materia && <p className="dica">Matéria: {materia}</p>}
       <p className="dica">
-        Para desfazer, use Conta › Dados › Importações. Em <Link to="/plano">Plano</Link> estão
+        Para desfazer, use Conta › Dados › Importações. Na <Link to="/plano">Trilha</Link> estão
         todos os pontos.
       </p>
     </>

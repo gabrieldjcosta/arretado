@@ -4,7 +4,9 @@ import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { TituloComMais } from '../componentes/TituloComMais';
 import { useDados } from '../dados/contexto';
+import { ROTULO_DA_AREA } from '../textos';
 import { resumoDoRecall } from './carregadores';
 
 /** Segundos por cartão na estimativa do início; ajustar com o uso real (fatia 3). */
@@ -25,7 +27,7 @@ export function RecallInicio() {
 
   return (
     <>
-      <h1>Recall</h1>
+      <TituloComMais>{ROTULO_DA_AREA.recall}</TituloComMais>
       {dados && <DiasDaSemana dias={dados.dias} />}
       {vencidos > 0 ? (
         <AcaoAgora
@@ -80,7 +82,7 @@ export function RecallInicio() {
           </button>
         </p>
       )}
-      <nav aria-label="Seções do Recall" className="abas">
+      <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
         <NavLink to="/recall" end>
           Erros
         </NavLink>
