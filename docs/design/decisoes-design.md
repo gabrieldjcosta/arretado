@@ -175,3 +175,45 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 - **Palavra "vencido":** sai da linha principal do Hoje (soa como dívida); o título é a ação em verbo e o motivo vem abaixo.
 - **Marca:** "Arretado" sem ponto final, com o cacto verde (o ponto final em Terracota era da D-D4 e saiu).
 - **Documentos atualizados:** `sistema-visual.md`, `redesign-v2.md` (F2 e F3 reescritas na D-D5), `glossario.md`, `solucao-de-problemas.md` e a skill `arretado-design-principles`. Os registros D-D2, D-D3 e D-D4 acima ficam como histórico: onde divergem, vale a D-D5 e depois esta.
+
+## D-D7 — Ponto de luz: areia, cal, vidro e luz; Gabarito nos títulos; a caneta de vidro (18/10/2026, decisão do Gabriel)
+
+**Origem.** Nas rodadas de direção visual de 18/10/2026 (genjutsu:bunshin, nível "só a direção"; página https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb), o Gabriel escolheu a direção **"Ponto de luz, segunda versão"** no cartão da rodada 3 (15:46Z). Às 17:23Z ele autorizou a construção no app ("leve o contrato dessa thread a uma nova thread para continuar o desenvolvimento do bushin. tem minha autorização"). A direção troca a paleta da D-D5, e esta autorização é a decisão de design nova que o contrato pedia. Contrato da direção: [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md). Execução: [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio. **Substitui a D-D5 e a D-D6 onde divergem.**
+
+**Paleta (troca a da D-D5).** Contraste medido com `scripts/contraste.mjs`, nos dois temas.
+
+| Papel | Dia | Noite | Uso |
+|---|---|---|---|
+| Chão (areia) | `#f1e6d3` | `#0b1b33` | fundo da página, cabeçalho, barra das áreas |
+| Areia funda | `#e7d8be` | `#07152a` | trilho das abas, selo, faixa quente, trilho do andamento |
+| Folha (cal) | `#ffffff` | `#142a4a` | folha do Agora, cartões, campos, área e aba atuais ("onde estou"), o lido no Leitor |
+| Tinta | `#17243a` (12,6:1 na areia) | `#eef3f8` (12,9:1 na folha) | texto, títulos, foco, caixa marcada |
+| Tinta 2 | `#4f5b70` (5,5:1 na areia) | `#a9b7cc` | texto atenuado |
+| Vidro | `#0f7f72`, texto branco (4,9:1) | `#7df3e1`, texto `#0b1b33` (13:1) | a ação: botão primário, cacto da marca, andamento (o "+" é cal com tinta) |
+| Vidro texto | `#0a6157` (5,9:1 na areia) | `#7df3e1` | link e texto de "salvo" |
+| Luz | `#6fe3d6` | `#7df3e1` | pontos do Dia, Estrela, ponta da caneta; nunca texto, sempre com contorno na tinta |
+| Traço | `#c8742f` | `#ffb46b` | só o traço do cachorro |
+
+**Regras novas.**
+- **Um vidro por tela:** o vidro é a única cor de ação (substitui "Um Sol"); dois botões disputando o vidro = um deles é secundário.
+- **Cal é "onde estou":** a folha do Agora, a área e a aba atuais (cal sobre a areia, com a sombra fresca e o rótulo em negrito) e o lido no Leitor. Marcado (caixa, rádio, botão ligado) é tinta cheia com a marca em cal.
+- **A luz só reporta estado** (pontos do Dia: apagado, aceso pela metade, aceso; a Estrela) e marca a ponta da caneta. Nunca segue o dedo nem a rolagem: a régua de leitura fica em tinta.
+- **Sem textura:** o fundo é liso (os pontinhos da D-D5 saem). Profundidade só pela sombra fresca da folha (`0 14px 28px -10px` tinta a 16%) e pelo halo na ponta da caneta.
+- **Matéria em neutro:** sem Argila e sem cor por disciplina; nem couro nem caramelo como cor de interface. O caramelo fica só no traço do cachorro. Os grupos de disciplina da Biblioteca perdem a faixa de cor (fica o filete neutro).
+- **Destaques da lei** ficam (sublinhado, nunca fundo), com o passo de absolutos e penas escurecido para `#a5582a` (4,2:1 na areia) e o de condições, à noite, em `#f2c062`.
+
+**Letras.** **Gabarito** (variável, 400 a 900, hospedada em `src/apresentacao/fontes/`, licença OFL) nos títulos e na marca, no lugar da Playfair Display; Atkinson Hyperlegible Next na interface; Literata na lei. "Sem serifa" (Conta › Aparência) troca só a letra da lei, porque os títulos já são sem serifa. No app de loja: corpo na fonte do sistema com Dynamic Type e Gabarito só nos títulos.
+
+**Raios.** Folha e cartão 16; botão e campo 12; abas e navegação em pílula. Alvo de 44 px e piso de 13 px continuam.
+
+**A caneta.** A caneta-cacto de vidro (coluna com dois braços, do ciano ao verde, ponta cônica escura com o ponto de luz) é o único objeto com volume e o único lugar com gradiente, em três poses fixas: encostada na folha do Agora (Hoje; no Fixar, no Cartão atual), deitada ao fim de "Lido até aqui" (Leitor) e largada ao fim do traço do cachorro (Resumo do Dia e fim de rodada). Nunca botão, painel, fundo de texto, nem mais de uma por tela.
+
+**Mascote.** O cachorro em um traço só, caramelo pela cor, só no Resumo do Dia e no fim de rodada (nunca no Leitor nem na Revisão). As ilustrações atuais do mascote saem do Agora, do estado vazio e da Sessão nas fases de cada tela.
+
+**Movimento.** 160 a 220 ms, `cubic-bezier(.2, .7, .2, 1)`; o ponto acende uma vez (escala 0,6 a 1); a caneta muda de lugar por salto; o traço do cachorro se desenha uma vez em 300 ms; com `prefers-reduced-motion`, tudo aparece pronto.
+
+**Mantido da D-D5 e da D-D6.** Rótulos Hoje · Trilha · Fixar · Biblioteca e "Em seguida"; abas do Fixar (Frases · Cartões · Histórico); campo "Para lembrar"; uma ação dominante por tela; sem vermelho no estudo; sem sequência de dias; Calmo; ícones SVG de um só traço; "vencido" fora da linha principal; fontes e ícones hospedados no app; plataformas por largura (celular até 699 px, tablet de 700 a 899, desktop a partir de 900); tablet e desktop derivados do celular.
+
+**Revogado da D-D5 e da D-D6.** A paleta (Creme, Marinho, Sol, Argila, Verde-foco, Azul-céu), o fundo com pontinhos, o bloco-herói Marinho, o botão Sol com borda Marinho, a Playfair Display, os raios de 14 (botão) e de 28 (bloco-herói), a etiqueta de matéria em Argila, o verde como "salvo", o azul como Cartões, a pílula flutuante Marinho (a navegação vira abas sobre a areia, com a atual em cal) e o mascote sentado na borda do cartão Agora.
+
+**Construção em fases**, cada uma num PR para a `integracao` ([`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md)): P1 fundação (tokens, letras, componentes base, contraste) → P2 casca → P3 Hoje → P4 Leitor → P5 Fixar e revisão → P6 demais telas → P7 plataformas. Os documentos `DESIGN.md`, `sistema-visual.md`, `glossario.md` e `.impeccable/design.json` passam a descrever esta decisão; a skill `arretado-design-principles` (caminho protegido) é atualizada num PR à parte, com o rótulo do Gabriel. Os registros D-D2 a D-D6 acima ficam como histórico.

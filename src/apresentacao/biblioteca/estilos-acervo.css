@@ -41,7 +41,7 @@
 }
 
 .item-acervo-botao[aria-pressed='true'] .dica {
-  color: var(--bloco-atenuado);
+  color: var(--selecionado-atenuado);
 }
 
 .item-acervo-botao:disabled {

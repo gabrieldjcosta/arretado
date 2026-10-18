@@ -35,125 +35,134 @@
     format('woff2-variations');
 }
 
+/* Gabarito (D-D7): títulos e marca. Variável de 400 a 900, hospedada no app (nada de CDN: o app
+   funciona sem rede e não manda o IP da pessoa a terceiros). Licença OFL em fontes/OFL.txt. */
 @font-face {
-  font-family: 'Playfair Display';
+  font-family: 'Gabarito';
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400 900;
   font-display: swap;
-  src: url('./fontes/playfair-display-latin-600-normal.woff2') format('woff2');
+  src: url('./fontes/gabarito-latin-wght-normal.woff2') format('woff2-variations');
 }
 
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('./fontes/playfair-display-latin-700-normal.woff2') format('woff2');
-}
-
-/* Tokens de tema (T10, D-D5). Contraste AA nos dois temas (scripts/contraste.mjs); alvos de
-   toque ≥ 44 px (Parte 2 §11). Padrão do Stitch (16/10/2026): Creme #fff8ec, Marinho #14213d,
-   Sol #ffb627, Argila #c8763a, Verde-foco #2fa36b, Azul-céu #3ba7f0.
-   Alvo e racional: docs/design/sistema-visual.md. */
+/* Tokens de tema (T10, D-D7 "Ponto de luz"). Contraste AA nos dois temas (scripts/contraste.mjs);
+   alvos de toque ≥ 44 px (Parte 2 §11). Chão de areia, folha de cal com sombra fresca, tinta
+   sombra, botão de vidro e o ponto de luz; à noite, o mesmo mundo no azul fundo.
+   Alvo e racional: DESIGN.md e docs/design/sistema-visual.md; decisão: decisoes-design.md (D-D7). */
 :root {
-  /* A paleta D-D5: valores fixos nos dois temas (quem muda de tema são os papéis abaixo). */
-  --creme: #fff8ec;
-  --marinho: #14213d;
-  --sol: #ffb627;
-  --argila: #c8763a;
-  --verde-foco: #2fa36b;
-  --verde-foco-texto: #268256;
-  --azul-ceu: #3ba7f0;
-  --ponto-fundo: #d6c9b3;
+  /* A paleta D-D7: valores fixos nos dois temas (quem muda de tema são os papéis abaixo). */
+  --areia: #f1e6d3;
+  --areia-funda: #e7d8be;
+  --cal: #ffffff;
+  --tinta: #17243a;
+  --tinta-2: #4f5b70;
+  --vidro: #0f7f72;
+  --vidro-texto: #0a6157;
+  --luz: #6fe3d6;
+  --traco: #c8742f;
+  --noite: #0b1b33;
+  --noite-funda: #07152a;
+  --noite-folha: #142a4a;
+  --noite-quente: #1c375d;
+  --noite-tinta: #eef3f8;
+  --noite-tinta-2: #a9b7cc;
+  --noite-vidro: #7df3e1;
+  --noite-traco: #ffb46b;
 
-  /* Aliases temporários (F1b, D-D5 item 8): compatibilidade com pacotes anteriores. */
-  --areia: #f5ebd9;
-  --palha: var(--creme);
-  --terracota: var(--sol);
-  --caatinga: var(--marinho);
-  --acqua: var(--verde-foco);
-  --acqua-texto: var(--verde-foco-texto);
-  --acqua-fundo: #268256;
-  --solace: var(--sol);
-  --noite: #0c1527;
-  --noite-cartao: #1b2a47;
-  --tinta: var(--marinho);
-  --sobre-solace: var(--marinho);
-  --cacto: var(--verde-foco);
-
-  --fundo: var(--creme);
-  --superficie: #ffffff;
-  --superficie-2: #fff9ef;
-  --quente: var(--areia);
-  --texto: var(--marinho);
-  --texto-atenuado: #4f596e;
-  --titulo: var(--marinho);
-  --borda: rgb(20 33 61 / 12%);
-  --borda-campo: #7b8599;
-  --borda-forte: var(--marinho);
-  --borda-botao: rgb(20 33 61 / 20%);
-  --penumbra: #ede3d1;
-  --luz-do-cartao: #ffffff;
-  --foco: var(--marinho);
+  --fundo: var(--areia);
+  --superficie: var(--cal);
+  --superficie-2: var(--areia-funda);
+  --quente: var(--areia-funda);
+  --texto: var(--tinta);
+  --texto-atenuado: var(--tinta-2);
+  --titulo: var(--tinta);
+  --borda: rgb(23 36 58 / 12%);
+  --borda-campo: #727c8f;
+  --borda-forte: var(--tinta);
+  --borda-botao: rgb(23 36 58 / 20%);
+  --penumbra: #e4d6bd;
+  --luz-do-cartao: var(--cal);
+  --foco: var(--tinta);
   --perigo: #a4262c;
   --perigo-texto: #ffffff;
-  --sucesso: #268256;
+  --sucesso: var(--vidro-texto);
   --aviso-fundo: #fff4d6;
   --aviso-texto: #4d3800;
 
   --destaque-prazo: #173f52;
   --destaque-condicao: #b06f22;
-  --destaque-absoluto: var(--argila);
-  --destaque-pena: var(--argila);
+  --destaque-absoluto: #a5582a;
+  --destaque-pena: #a5582a;
 
   --grifo-1: #fff0a0;
   --grifo-2: #c8eccb;
   --grifo-3: #fcdde8;
 
-  --estrela: #9a6200;
+  /* O ponto de luz (pontos do Dia, Estrela, ponta da caneta): nunca texto, sempre com contorno na
+     tinta e núcleo branco. A faixa das linhas estreladas fica em vidro. */
+  --ponto-luz: var(--luz);
+  --ponto-contorno: var(--tinta);
+  --ponto-nucleo: #ffffff;
+  --estrela: var(--vidro);
+  --estrela-luz: var(--ponto-luz);
+  --estrela-contorno: var(--ponto-contorno);
   --calha-estrela: 1.5rem;
+  --traco-cachorro: var(--traco);
 
-  --acao: var(--sol);
-  --acao-texto: var(--marinho);
-  --acao-borda: var(--marinho);
-  --link: #963417;
-  --lugar: var(--marinho);
+  /* A ação é vidro com texto branco, um botão por tela; o caminho (link) é o passo escuro. */
+  --acao: var(--vidro);
+  --acao-texto: #ffffff;
+  --acao-borda: transparent;
+  --link: var(--vidro-texto);
+  --cacto: var(--vidro);
+  --andamento: var(--vidro);
+  --lugar: var(--tinta);
 
-  --bloco-fundo: var(--marinho);
-  --bloco-texto: var(--creme);
-  --bloco-atenuado: #b0b8c6;
+  /* A folha do Agora (bloco-herói): cal com a sombra fresca e o botão de vidro. */
+  --bloco-fundo: var(--cal);
+  --bloco-texto: var(--tinta);
+  --bloco-atenuado: var(--tinta-2);
   --bloco-borda: transparent;
-  --bloco-acao: var(--sol);
-  --bloco-acao-texto: var(--marinho);
+  --bloco-acao: var(--vidro);
+  --bloco-acao-texto: #ffffff;
   --bloco-acao-borda: transparent;
-  --bloco-foco: var(--sol);
+  --bloco-foco: var(--tinta);
 
-  --selecionado-fundo: var(--marinho);
-  --selecionado-texto: var(--creme);
+  /* "Onde estou": a área e a aba atuais são cal sobre a areia, com a sombra fresca. */
+  --atual-fundo: var(--cal);
+  --atual-texto: var(--tinta);
+  --atual-sombra: 0 4px 12px -4px rgb(23 36 58 / 16%);
+
+  /* Marcado (caixa, rádio, botão ligado): tinta cheia com a marca em cal. */
+  --selecionado-fundo: var(--tinta);
+  --selecionado-texto: var(--cal);
+  --selecionado-atenuado: #c9d1dc;
   --selecionado-anel: transparent;
-  --tinta-lugar: color-mix(in srgb, var(--marinho) 10%, var(--superficie));
+  --tinta-lugar: color-mix(in srgb, var(--tinta) 6%, var(--superficie));
 
-  --regua-fundo: rgb(255 182 39 / 20%);
-  --regua-barra: var(--marinho);
+  /* Régua de leitura: segue o dedo e o cursor, então é tinta (a luz nunca segue o ponteiro). */
+  --regua-fundo: rgb(23 36 58 / 6%);
+  --regua-barra: var(--tinta-2);
 
-  --raio-heroi: 28px;
+  --raio-heroi: 16px;
   --raio-cartao: 16px;
-  --raio-botao: 14px;
-  --raio-campo: 14px;
+  --raio-botao: 12px;
+  --raio-campo: 12px;
   --raio-pilula: 999px;
-  --sombra: 0 6px 20px -10px rgb(20 33 61 / 18%), 0 1px 3px rgb(20 33 61 / 8%);
-  --sombra-botao: 0 2px 6px rgb(20 33 61 / 14%);
-  --sombra-flutuante: 0 4px 16px rgb(20 33 61 / 12%);
+  --sombra: 0 1px 2px rgb(23 36 58 / 6%), 0 6px 16px -10px rgb(23 36 58 / 16%);
+  --sombra-folha: 0 14px 28px -10px rgb(23 36 58 / 16%), 0 1px 0 rgb(23 36 58 / 16%);
+  --sombra-botao: 0 2px 6px rgb(23 36 58 / 14%);
+  --sombra-flutuante: 0 4px 16px rgb(23 36 58 / 14%);
 
   --superficie-translucida: rgb(255 255 255 / 90%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --fonte-titulo: 'Playfair Display', Georgia, serif;
+  --fonte-titulo: 'Gabarito', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
   --fonte-leitura: 'Literata', Georgia, 'Times New Roman', serif;
   --tamanho-leitura: 18px;
   --alvo: 44px;
-  --raio: 14px;
+  --raio: 12px;
   --espaco-1: 0.25rem;
   --espaco-2: 0.5rem;
   --espaco-3: 1rem;
@@ -165,127 +174,140 @@
   color-scheme: light;
 }
 
+/* Noite (D-D7): o mesmo mundo no azul fundo; botão e luz em vidro claro com texto da noite. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) {
-    --fundo: #0c1527;
-    --superficie: #1b2a47;
-    --superficie-2: #223559;
-    --quente: #223559;
-    --texto: var(--creme);
-    --texto-atenuado: #a8b5cc;
-    --titulo: var(--creme);
-    --borda: rgb(255 248 236 / 14%);
-    --borda-campo: #64789e;
-    --borda-forte: #a8b5cc;
-    --borda-botao: rgb(255 248 236 / 25%);
-    --penumbra: #080e1a;
-    --luz-do-cartao: #1b2a47;
-    --foco: var(--sol);
+    --fundo: var(--noite);
+    --superficie: var(--noite-folha);
+    --superficie-2: var(--noite-funda);
+    --quente: var(--noite-quente);
+    --texto: var(--noite-tinta);
+    --texto-atenuado: var(--noite-tinta-2);
+    --titulo: var(--noite-tinta);
+    --borda: rgb(238 243 248 / 14%);
+    --borda-campo: #7387a8;
+    --borda-forte: var(--noite-tinta-2);
+    --borda-botao: rgb(238 243 248 / 25%);
+    --penumbra: #050e1c;
+    --luz-do-cartao: var(--noite-folha);
+    --foco: var(--noite-vidro);
     --perigo: #ff8a8a;
     --perigo-texto: #2a0000;
-    --sucesso: #62c995;
+    --sucesso: var(--noite-vidro);
     --aviso-fundo: #3a2f10;
     --aviso-texto: #ffe6a3;
     --destaque-prazo: #7fb4cf;
-    --destaque-condicao: var(--sol);
+    --destaque-condicao: #f2c062;
     --destaque-absoluto: #f09a68;
     --destaque-pena: #f09a68;
     --grifo-1: #463b0c;
     --grifo-2: #183d29;
     --grifo-3: #4a1c34;
-    --estrela: var(--sol);
-    --acao: var(--sol);
-    --acao-texto: var(--marinho);
+    --ponto-luz: var(--noite-vidro);
+    --ponto-contorno: var(--noite-tinta);
+    --estrela: var(--noite-vidro);
+    --traco-cachorro: var(--noite-traco);
+    --acao: var(--noite-vidro);
+    --acao-texto: var(--noite);
     --acao-borda: transparent;
-    --link: var(--sol);
-    --lugar: var(--azul-ceu);
-    --selecionado-anel: var(--azul-ceu);
-    --acqua-texto: #62c995;
-    --acqua-fundo: #268256;
-    --verde-foco-texto: #62c995;
-    --bloco-fundo: #223559;
-    --bloco-texto: var(--creme);
-    --bloco-atenuado: #a8b5cc;
+    --link: var(--noite-vidro);
+    --cacto: var(--noite-vidro);
+    --andamento: var(--noite-vidro);
+    --lugar: var(--noite-tinta);
+    --bloco-fundo: var(--noite-folha);
+    --bloco-texto: var(--noite-tinta);
+    --bloco-atenuado: var(--noite-tinta-2);
     --bloco-borda: transparent;
-    --bloco-acao: var(--sol);
-    --bloco-acao-texto: var(--marinho);
+    --bloco-acao: var(--noite-vidro);
+    --bloco-acao-texto: var(--noite);
     --bloco-acao-borda: transparent;
-    --bloco-foco: var(--sol);
-    --selecionado-fundo: #223559;
-    --selecionado-texto: var(--creme);
-    --tinta-lugar: color-mix(in srgb, var(--azul-ceu) 15%, var(--superficie));
-    --regua-fundo: rgb(255 182 39 / 16%);
-    --regua-barra: var(--sol);
-    --ponto-fundo: rgb(255 255 255 / 8%);
-    --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+    --bloco-foco: var(--noite-vidro);
+    --atual-fundo: var(--noite-folha);
+    --atual-texto: var(--noite-tinta);
+    --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
+    --selecionado-fundo: var(--noite-tinta);
+    --selecionado-texto: var(--noite);
+    --selecionado-atenuado: #3b4a63;
+    --selecionado-anel: transparent;
+    --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
+    --regua-fundo: rgb(238 243 248 / 8%);
+    --regua-barra: var(--noite-tinta-2);
+    --sombra: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 20px -12px rgb(0 0 0 / 50%);
+    --sombra-folha: 0 14px 28px -10px rgb(0 0 0 / 45%), 0 1px 0 rgb(0 0 0 / 45%);
     --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
     --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
-    --superficie-translucida: rgb(27 42 71 / 90%);
+    --superficie-translucida: rgb(20 42 74 / 90%);
     color-scheme: dark;
   }
 }
 
 :root[data-tema='escuro'] {
-  --fundo: #0c1527;
-  --superficie: #1b2a47;
-  --superficie-2: #223559;
-  --quente: #223559;
-  --texto: var(--creme);
-  --texto-atenuado: #a8b5cc;
-  --titulo: var(--creme);
-  --borda: rgb(255 248 236 / 14%);
-  --borda-campo: #64789e;
-  --borda-forte: #a8b5cc;
-  --borda-botao: rgb(255 248 236 / 25%);
-  --penumbra: #080e1a;
-  --luz-do-cartao: #1b2a47;
-  --foco: var(--sol);
+  --fundo: var(--noite);
+  --superficie: var(--noite-folha);
+  --superficie-2: var(--noite-funda);
+  --quente: var(--noite-quente);
+  --texto: var(--noite-tinta);
+  --texto-atenuado: var(--noite-tinta-2);
+  --titulo: var(--noite-tinta);
+  --borda: rgb(238 243 248 / 14%);
+  --borda-campo: #7387a8;
+  --borda-forte: var(--noite-tinta-2);
+  --borda-botao: rgb(238 243 248 / 25%);
+  --penumbra: #050e1c;
+  --luz-do-cartao: var(--noite-folha);
+  --foco: var(--noite-vidro);
   --perigo: #ff8a8a;
   --perigo-texto: #2a0000;
-  --sucesso: #62c995;
+  --sucesso: var(--noite-vidro);
   --aviso-fundo: #3a2f10;
   --aviso-texto: #ffe6a3;
   --destaque-prazo: #7fb4cf;
-  --destaque-condicao: var(--sol);
+  --destaque-condicao: #f2c062;
   --destaque-absoluto: #f09a68;
   --destaque-pena: #f09a68;
   --grifo-1: #463b0c;
   --grifo-2: #183d29;
   --grifo-3: #4a1c34;
-  --estrela: var(--sol);
-  --acao: var(--sol);
-  --acao-texto: var(--marinho);
+  --ponto-luz: var(--noite-vidro);
+  --ponto-contorno: var(--noite-tinta);
+  --estrela: var(--noite-vidro);
+  --traco-cachorro: var(--noite-traco);
+  --acao: var(--noite-vidro);
+  --acao-texto: var(--noite);
   --acao-borda: transparent;
-  --link: var(--sol);
-  --lugar: var(--azul-ceu);
-  --selecionado-anel: var(--azul-ceu);
-  --acqua-texto: #62c995;
-  --acqua-fundo: #268256;
-  --verde-foco-texto: #62c995;
-  --bloco-fundo: #223559;
-  --bloco-texto: var(--creme);
-  --bloco-atenuado: #a8b5cc;
+  --link: var(--noite-vidro);
+  --cacto: var(--noite-vidro);
+  --andamento: var(--noite-vidro);
+  --lugar: var(--noite-tinta);
+  --bloco-fundo: var(--noite-folha);
+  --bloco-texto: var(--noite-tinta);
+  --bloco-atenuado: var(--noite-tinta-2);
   --bloco-borda: transparent;
-  --bloco-acao: var(--sol);
-  --bloco-acao-texto: var(--marinho);
+  --bloco-acao: var(--noite-vidro);
+  --bloco-acao-texto: var(--noite);
   --bloco-acao-borda: transparent;
-  --bloco-foco: var(--sol);
-  --selecionado-fundo: #223559;
-  --selecionado-texto: var(--creme);
-  --tinta-lugar: color-mix(in srgb, var(--azul-ceu) 15%, var(--superficie));
-  --regua-fundo: rgb(255 182 39 / 16%);
-  --regua-barra: var(--sol);
-  --ponto-fundo: rgb(255 255 255 / 8%);
-  --sombra: 0 10px 28px -14px rgb(0 0 0 / 60%);
+  --bloco-foco: var(--noite-vidro);
+  --atual-fundo: var(--noite-folha);
+  --atual-texto: var(--noite-tinta);
+  --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
+  --selecionado-fundo: var(--noite-tinta);
+  --selecionado-texto: var(--noite);
+  --selecionado-atenuado: #3b4a63;
+  --selecionado-anel: transparent;
+  --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
+  --regua-fundo: rgb(238 243 248 / 8%);
+  --regua-barra: var(--noite-tinta-2);
+  --sombra: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 20px -12px rgb(0 0 0 / 50%);
+  --sombra-folha: 0 14px 28px -10px rgb(0 0 0 / 45%), 0 1px 0 rgb(0 0 0 / 45%);
   --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
   --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
-  --superficie-translucida: rgb(27 42 71 / 90%);
+  --superficie-translucida: rgb(20 42 74 / 90%);
   color-scheme: dark;
 }
 
+/* "Sem serifa" troca só a letra da lei: os títulos já são sem serifa (Gabarito). */
 :root[data-fonte='sem_serifa'] {
   --fonte-leitura: var(--fonte-interface);
-  --fonte-titulo: var(--fonte-interface);
 }
 
 *,
@@ -302,18 +324,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Chão liso (D-D7): sem textura; a profundidade vem só da sombra fresca da folha. */
 body {
   margin: 0;
   min-height: 100dvh;
   background-color: var(--fundo);
-  background-image: radial-gradient(var(--ponto-fundo) 0.75px, transparent 0.75px);
-  background-size: 16px 16px;
-}
-
-@media (prefers-contrast: more) {
-  body {
-    background-image: none;
-  }
 }
 
 :focus-visible {
@@ -321,8 +336,8 @@ body {
   outline-offset: 2px;
 }
 
-/* Link de texto: terra queimada (--link) no claro e Sol no escuro (caminho, D-D5); sublinhado
-   fino que engrossa no hover e no foco. Nunca verde: o verde é de lugar e de "salvo". */
+/* Link de texto: o passo escuro do vidro (--link) no claro e o vidro claro à noite (caminho, D-D7);
+   sublinhado fino que engrossa no hover e no foco. */
 a {
   color: var(--link);
   text-decoration-thickness: 1px;
@@ -340,13 +355,13 @@ h3 {
   line-height: 1.25;
 }
 
-/* Título de página em Playfair Display 700, na cor de título (Marinho; Creme no escuro) — D-D5.
-   A preferência de fonte sem serifa também vale aqui. */
+/* Título de página em Gabarito 800, na cor de título (tinta; à noite, a tinta clara) — D-D7. */
 h1 {
   font-family: var(--fonte-titulo);
-  font-weight: 700;
-  font-size: 1.75rem;
-  line-height: 1.15;
+  font-weight: 800;
+  font-size: 1.875rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   margin: 0 0 1rem;
   color: var(--titulo);
 }
@@ -362,13 +377,13 @@ h3 {
 
 @media (min-width: 700px) {
   h1 {
-    font-size: 2rem;
+    font-size: 2.125rem;
   }
 }
 
 @media (min-width: 900px) {
   h1 {
-    font-size: 2.25rem;
+    font-size: 2.375rem;
   }
 }
 
@@ -448,15 +463,17 @@ button,
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background: var(--superficie);
+  /* Sobre a areia (D-D7): a área atual, em cal, se destaca dela. */
+  background: var(--fundo);
   border-bottom: 1px solid var(--borda);
 }
 
 .marca {
   font-family: var(--fonte-titulo);
   font-weight: 700;
-  font-size: 1.25rem;
-  gap: 0.4rem;
+  font-size: 1.1875rem;
+  letter-spacing: -0.01em;
+  gap: 0.35rem;
   color: var(--texto);
   text-decoration: none;
   margin-right: auto;
@@ -466,8 +483,8 @@ button,
 }
 
 .marca-cacto {
-  width: 1rem;
-  height: 1.4rem;
+  width: 0.8125rem;
+  height: 1.125rem;
   flex: none;
   color: var(--cacto);
 }
@@ -500,10 +517,17 @@ button,
   height: 1.5rem;
 }
 
-/* O item selecionado (navegação, aba, alternância ligada) é o mesmo bloco verde: fundo e texto de
-   --selecionado-*, e um filete de cacto que mantém a forma visível também no escuro. */
+/* Onde estou (D-D7): a área e a aba atuais são cal sobre a areia, com a sombra fresca e o rótulo
+   em negrito (o estado não depende só da cor). */
 .areas a[aria-current='page'],
-.abas a[aria-current='page'],
+.abas a[aria-current='page'] {
+  background: var(--atual-fundo);
+  color: var(--atual-texto);
+  box-shadow: var(--atual-sombra);
+  font-weight: 700;
+}
+
+/* Ligado (alternância): tinta cheia com o texto em cal, como a caixa marcada. */
 .alternar-destaques[aria-pressed='true'] {
   background: var(--selecionado-fundo);
   color: var(--selecionado-texto);
@@ -541,7 +565,7 @@ button,
     right: 0;
     z-index: 5;
     justify-content: space-around;
-    background: var(--superficie);
+    background: var(--fundo);
     border-top: 1px solid var(--borda);
     padding: 0.25rem;
   }
@@ -623,8 +647,8 @@ button:not(:disabled):active,
   }
 }
 
-/* Botão primário: compacto (D-D5), fundo Sol com texto Marinho. Borda Marinho de 1,5 px sobre
-   fundo claro; sem borda dentro do bloco-herói Marinho e no escuro (--acao-borda). Um por tela. */
+/* Botão primário: compacto, de vidro (D-D7): fundo --acao com texto branco (à noite, vidro claro
+   com o texto da noite). Sem borda: o vidro passa de 3:1 sobre a areia e sobre a cal. Um por tela. */
 .principal {
   background: var(--acao);
   border: 1.5px solid var(--acao-borda, transparent);
@@ -634,7 +658,7 @@ button:not(:disabled):active,
 
 @media (hover: hover) {
   .principal:not(:disabled):hover {
-    background: color-mix(in srgb, var(--acao) 88%, var(--marinho));
+    background: color-mix(in srgb, var(--acao) 86%, var(--tinta));
     border-color: var(--acao-borda, transparent);
   }
 }
@@ -657,7 +681,7 @@ dialog .perigoso {
 }
 
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, 82% de opacidade; herda a cor
-   do lugar onde está (tinta na página, creme no bloco-herói). Alvo de 44 px. */
+   do lugar onde está (a tinta, na página e na folha). Alvo de 44 px. */
 .botao-texto {
   background: transparent;
   border-color: transparent;
@@ -1487,10 +1511,10 @@ dialog.dialogo-busca {
 }
 
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
-   nem mudança de medida: o texto não se move. */
+   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). */
 .linha-leitor[data-regua] .dispositivo {
-  background: color-mix(in srgb, var(--cacto) 9%, transparent);
-  box-shadow: inset 3px 0 0 var(--cacto);
+  background: var(--regua-fundo);
+  box-shadow: inset 3px 0 0 var(--regua-barra);
 }
 
 .linha-leitor {
@@ -1553,8 +1577,9 @@ button.estrela path {
   stroke-linejoin: round;
 }
 
+/* Estrela de luz (D-D7): o ponto de luz com contorno na tinta. */
 button.estrela[data-origem='direta'] {
-  color: var(--estrela);
+  color: var(--estrela-contorno);
 }
 
 button.estrela[data-origem='direta'] svg {
@@ -1563,15 +1588,14 @@ button.estrela[data-origem='direta'] svg {
 }
 
 button.estrela[data-origem='direta'] path {
-  fill: currentcolor;
+  fill: var(--estrela-luz);
 }
 
-/* Sobre a faixa: o contorno da cor do fundo separa a estrela dela. */
+/* Sobre a faixa: o contorno da tinta separa a estrela dela. */
 button.estrela[data-origem='herdada'] path {
-  fill: var(--estrela);
-  stroke: var(--fundo);
-  stroke-width: 4;
-  paint-order: stroke;
+  fill: var(--estrela-luz);
+  stroke: var(--estrela-contorno);
+  stroke-width: 1.5;
 }
 
 button.estrela[data-origem='herdada'] svg {
@@ -2096,6 +2120,7 @@ dialog.dialogo-acoes {
 
 /* ── Redesign, fatia 2: agora / depois, barra fina, dias, + flutuante ──────── */
 
+/* A folha do Agora (D-D7): cal com a sombra fresca, sobre a areia. */
 .acao-agora {
   position: relative;
   background: var(--bloco-fundo);
@@ -2104,7 +2129,7 @@ dialog.dialogo-acoes {
   border-radius: var(--raio-heroi);
   padding: 1.25rem;
   margin: 0 0 1rem;
-  box-shadow: var(--sombra);
+  box-shadow: var(--sombra-folha);
 }
 
 .acao-agora:has(.agora-mascote) {
@@ -2121,8 +2146,8 @@ dialog.dialogo-acoes {
   pointer-events: none;
 }
 
-/* Dentro do bloco Marinho a ação é Sol (sem borda): o botão primário global
-   só troca o par --acao / --acao-texto e zera a borda. No bloco ocupa a largura e é mais alto. */
+/* Dentro da folha a ação é o vidro (sem borda): o botão primário global só troca o par
+   --acao / --acao-texto e zera a borda. Na folha ocupa a largura e é mais alto. */
 .acao-agora {
   --acao: var(--bloco-acao);
   --acao-texto: var(--bloco-acao-texto);
@@ -2135,13 +2160,15 @@ dialog.dialogo-acoes {
   min-height: 52px;
   width: 100%;
   justify-content: center;
+  font-size: 1.0625rem;
 }
 
 .agora-titulo {
   font-family: var(--fonte-titulo);
-  font-weight: 600;
+  font-weight: 750;
+  line-height: 1.12;
   margin: 0 0 0.25rem;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 }
 
 .agora-motivo {
@@ -2177,7 +2204,7 @@ dialog.dialogo-acoes {
 .barra-fina-cheia {
   display: block;
   height: 100%;
-  background: var(--acqua);
+  background: var(--andamento);
 }
 
 .barra-fina-texto {
@@ -2230,9 +2257,21 @@ dialog.dialogo-acoes {
     height: 3.5rem;
     border-radius: 50%;
     font-size: 1.75rem;
+    /* D-D7: o "+" é cal com tinta, porque o vidro fica para a ação da tela (um por tela); na P2 do
+       Ponto de luz ele sai do canto e sobe para a linha do título. */
+    background: var(--superficie);
+    border-color: var(--borda-botao);
+    color: var(--texto);
     box-shadow:
       var(--sombra-flutuante),
       inset 0 1px 0 rgb(255 255 255 / 35%);
+  }
+
+  @media (hover: hover) {
+    .principal.flutuante:not(:disabled):hover {
+      background: var(--superficie-2);
+      border-color: var(--borda-botao);
+    }
   }
 
   /* No celular o + substitui o botão do cabeçalho (mesmo destino e atalho E). */
@@ -2744,11 +2783,12 @@ dialog.dialogo-previa .linha-acoes button {
   }
 }
 
-/* Biblioteca › Normas: grupos retráteis por disciplina; o tom aparece só na faixa lateral. */
+/* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por
+   disciplina nem faixa colorida, D-D6 e D-D7): só o filete fino. */
 .grupo-de-normas {
   margin-block: 0.75rem;
   padding-inline-start: 0.75rem;
-  border-inline-start: 6px solid var(--tom-do-grupo, var(--borda-forte));
+  border-inline-start: 1px solid var(--borda);
 }
 
 .grupo-de-normas > summary {
@@ -2762,24 +2802,4 @@ dialog.dialogo-previa .linha-acoes button {
 .grupo-de-normas > summary h3 {
   display: inline;
   margin: 0;
-}
-
-.grupo-de-normas.tom-0 {
-  --tom-do-grupo: var(--acqua);
-}
-
-.grupo-de-normas.tom-1 {
-  --tom-do-grupo: var(--solace);
-}
-
-.grupo-de-normas.tom-2 {
-  --tom-do-grupo: var(--cacto);
-}
-
-.grupo-de-normas.tom-3 {
-  --tom-do-grupo: var(--areia);
-}
-
-.grupo-de-normas.tom-4 {
-  --tom-do-grupo: var(--destaque-prazo);
 }

@@ -991,6 +991,14 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Backup e dados", "Voltar à Biblioteca"). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
 
+### Fonte nova pelo npm trava o PR na "Guarda do PR"
+- **Sintoma:** o PR que acrescenta uma fonte com `npm install @fontsource...` fica vermelho no check da guarda, sem erro de código. **Causa:** `package.json` e `package-lock.json` são caminhos protegidos; só passam com o rótulo `aprovado-gabriel`, que só o Gabriel põe. **Solução (Ponto de luz, D-D7):** a Gabarito entrou como arquivo, `src/apresentacao/fontes/gabarito-latin-wght-normal.woff2` (subconjunto `latin`, eixo de peso 400 a 900), com a licença em `fontes/OFL.txt`, um `@font-face` com `font-weight: 400 900` e `format('woff2-variations')`, e o `preload` no `index.html`. A Atkinson e a Literata seguem pelo `@fontsource`. **Prevenção:** fonte, ícone ou imagem nova entra como arquivo no app (nunca CDN, por ser local-first); dependência nova no `package.json` vai num PR à parte, pedindo o rótulo ao Gabriel.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026).
+
+### Luz, cal e vidro da D-D7 sem contraste onde não devem ser texto
+- **Sintoma:** `node scripts/contraste.mjs` reprova um par novo, ou a área atual "some" na barra. **Causa:** a luz (`--luz` `#6fe3d6`) é clara demais para texto ou traço sobre a areia; o vidro (`--vidro` `#0f7f72`) passa para botão e traço (3,95:1 sobre a areia), mas não para texto pequeno; o cal sobre a areia quase não contrasta (é "onde estou" pela forma, não pela cor). **Solução:** a luz só como ponto ou Estrela, sempre com contorno de tinta (`--ponto-contorno`, `--estrela-contorno`); texto de link e de sucesso em `--vidro-texto` (`#0a6157`, 5,9:1); a área e a aba atuais em cal levam também peso 700, `--atual-sombra` e `aria-current`. **Prevenção:** todo par novo entra em `scripts/contraste.mjs` nos dois temas antes de ir para a tela.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026); vale para a P2 a P6.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).

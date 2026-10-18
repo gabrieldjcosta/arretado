@@ -106,20 +106,23 @@ test('navegação por teclado: foco visível e pular para o conteúdo', async ({
 test('as fontes embutidas carregam (T19)', async ({ page }) => {
   await page.goto('/#/recall');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  // `document.fonts.check` só vale depois de a fonte ter sido pedida: força o pedido das duas.
+  // `document.fonts.check` só vale depois de a fonte ter sido pedida: força o pedido das três
+  // (a Gabarito dos títulos, D-D7, é variável: um arquivo serve de 400 a 900).
   const carregadas = await page.evaluate(async () => {
     await Promise.all([
       document.fonts.load("400 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.load("700 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.load("400 16px 'Literata'"),
+      document.fonts.load("800 16px 'Gabarito'"),
     ]);
     return [
       document.fonts.check("400 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("700 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("400 16px 'Literata'"),
+      document.fonts.check("800 16px 'Gabarito'"),
     ];
   });
-  expect(carregadas).toEqual([true, true, true]);
+  expect(carregadas).toEqual([true, true, true, true]);
 });
 
 test('casca: barra de áreas por teclado, + flutuante só no celular e atalho E (fatia 2)', async ({

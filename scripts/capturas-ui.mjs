@@ -224,9 +224,8 @@ async function semear(browser, o, url) {
   });
 
   await passo('abrir a LEP e marcar "Lido até aqui" no art. 112', async () => {
-    const todas = page.getByRole('button', { name: 'Todas as normas' });
-    await todas.waitFor();
-    if ((await todas.getAttribute('aria-pressed')) !== 'true') await todas.click();
+    // A lista de Normas já vem agrupada e aberta (o botão "Todas as normas" saiu).
+    await page.getByRole('region', { name: 'Normas' }).waitFor();
     await page
       .getByRole('region', { name: 'Normas' })
       .getByRole('link', { name: /LEP/ })
