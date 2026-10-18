@@ -189,6 +189,18 @@ for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/o
       const abas = document.querySelector('nav.areas');
       if (!abas) return ['(sem abas)'];
       const a = abas.getBoundingClientRect();
+      // O conteúdo de um `<details>` fechado não é desenhado (só o `<summary>` dele), mas ainda tem
+      // caixa; vale para cada `<details>` fechado em volta (o prompt da IA, na Trilha vazia).
+      const fechado = (el: Element) => {
+        for (
+          let d = el.closest('details:not([open])');
+          d;
+          d = d.parentElement?.closest('details:not([open])') ?? null
+        ) {
+          if (el.closest('summary')?.parentElement !== d) return true;
+        }
+        return false;
+      };
       const achados = new Set<string>();
       // 4 = NodeFilter.SHOW_TEXT
       const passeio = document.createTreeWalker(document.body, 4);
@@ -196,6 +208,7 @@ for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/o
         const texto = (no.textContent ?? '').trim();
         const pai = no.parentElement;
         if (!texto || abas.contains(no) || !pai || pai.closest('.visualmente-oculto')) continue;
+        if (fechado(pai)) continue;
         const faixa = document.createRange();
         faixa.selectNodeContents(no);
         for (const c of faixa.getClientRects()) {
