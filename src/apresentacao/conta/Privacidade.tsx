@@ -1,23 +1,32 @@
 import { Link } from 'react-router';
-import { SECOES } from '../orientacoes/conteudo';
+import { POLITICA_V3, SECOES, type Secao } from '../orientacoes/conteudo';
+
+const Bloco = ({ secao }: { secao: Secao }) => (
+  <section aria-labelledby={`p-${secao.id}`}>
+    <h2 id={`p-${secao.id}`}>{secao.titulo}</h2>
+    {secao.paragrafos.map((p) => (
+      <p key={p}>{p}</p>
+    ))}
+  </section>
+);
 
 export function Privacidade() {
-  const secao = SECOES.find((s) => s.id === 'privacidade');
-  const dados = SECOES.find((s) => s.id === 'seus-dados');
+  const anteriores = SECOES.filter((s) => s.id === 'seus-dados' || s.id === 'privacidade');
   return (
     <>
-      <h1>Privacidade e segurança</h1>
-      {[dados, secao].map(
-        (s) =>
-          s && (
-            <section key={s.id}>
-              <h2>{s.titulo}</h2>
-              {s.paragrafos.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-            </section>
-          ),
-      )}
+      <h1>Política de privacidade (versão 3)</h1>
+      <p className="dica">
+        Vale quando você usa uma conta. Sem conta, continua valendo a versão 2, logo abaixo.
+      </p>
+      {POLITICA_V3.map((s) => (
+        <Bloco key={s.id} secao={s} />
+      ))}
+      <details className="cartao-bloco">
+        <summary>Versão anterior (política v2, para quem usa sem conta)</summary>
+        {anteriores.map((s) => (
+          <Bloco key={s.id} secao={s} />
+        ))}
+      </details>
       <div className="linha-acoes">
         <Link to="/conta/dados" className="botao">
           Exportar ou apagar meus dados

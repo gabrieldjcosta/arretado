@@ -6,6 +6,7 @@ import { RegistroDeContas, Repositorio } from '../../../core/persistencia';
 import { ServicoDeContaFalso, type SessaoDeConta } from '../../../integracoes/conta';
 import { ProvedorConta } from './ContextoConta';
 import { destinoDepoisDeEntrar } from './destino';
+import { aceiteDoLoginPendente, descartarAceiteDoLogin } from './aceite';
 import { Entrar, VERSAO_TERMOS } from './Entrar';
 
 function montar(
@@ -31,7 +32,34 @@ function montar(
   return { aoEntrar, prepararConta };
 }
 
+afterEach(descartarAceiteDoLogin);
+
 describe('Entrar (F4-A, A3)', () => {
+  it('o aceite só existe depois do clique em entrar; "Usar sem conta" não pede nada (A7)', async () => {
+    montar(new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] }));
+    expect(aceiteDoLoginPendente()).toBeNull();
+    expect(screen.getByRole('link', { name: 'Usar sem conta' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Conta › Privacidade/ })).toBeInTheDocument();
+    const u = userEvent.setup();
+    await u.type(screen.getByLabelText(/receba um código/i), 'a@exemplo.com');
+    await u.click(screen.getByRole('button', { name: 'Enviar código' }));
+    expect(aceiteDoLoginPendente()).not.toBeNull();
+  });
+
+  it('sem a marca de aceite, o código não entra (A7)', async () => {
+    const servico = new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] });
+    const { aoEntrar, prepararConta } = montar(servico);
+    const u = userEvent.setup();
+    await u.type(screen.getByLabelText(/receba um código/i), 'a@exemplo.com');
+    await u.click(screen.getByRole('button', { name: 'Enviar código' }));
+    descartarAceiteDoLogin();
+    await u.type(await screen.findByLabelText(/código de 6 dígitos/i), '123456');
+    await u.click(screen.getByRole('button', { name: 'Entrar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/sem aceitar/i);
+    expect(prepararConta).not.toHaveBeenCalled();
+    expect(aoEntrar).not.toHaveBeenCalled();
+  });
+
   it('código por e-mail: pede, confirma, prepara o banco da conta e registra o aceite', async () => {
     const servico = new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] });
     const { aoEntrar, prepararConta } = montar(servico);
