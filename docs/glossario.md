@@ -100,6 +100,7 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Redação anterior, nota de vigência | sub-registros de `TextoDeDispositivo` (`redacoesAnteriores[]`, `notasVigencia[]`), não de `Dispositivo` |
 | Âncora, pausa, consentimento, histórico de datas | `Marcacao.ancora { texto, inicio, fim }`, `Sessao.pausas[]`, `Usuario.consentimentos[]`, `FasePrazo.historicoDatas[]` |
 | Alteração (entrada do log) | `Alteracao` na tabela Dexie `alteracoes`; não está em `ENTIDADES` |
+| Lote por referência (AL, F4-A) | a adesão a um item do acervo grava a árvore nas tabelas, mas no log só uma entrada `operacao: 'acervo-adesao'` (`OPERACAO_ADESAO`) com a `ReferenciaDeAcervo`; ids do lote = `idDoLote(base, k)` (UUID derivado, em ordem), carimbos = `carimboDoLote(tsBase, k)`; `Repositorio.gravarLoteDoAcervo`, `conteudoDoItem`, `registrosDoLote`, `idsDoLote`, `referenciasNoLog`. **Reidratador** (`Reidratador`, `reidratadorDoAcervo(fonte, log)`) = o que refaz o lote pela fonte, conferindo versão e hash; `reconstruirDoLog(log, reidratar)` e `desfazerAlteracao(log, seq, reidratar)` o usam; sem a fonte, `FonteDoLoteAusente` (Problema explícito). Versão guardada: `FonteDoAcervo.obterVersao(id, hash)`, arquivo `historico/<id>.<hash>.json` |
 | Módulo | `Modulo` / `MODULOS`: unidade do pacote e de `Preferencias.modulosDesabilitados` |
 | Hoje, Biblioteca, Calendário, Pendência, Backup | tela provisória `Hoje` (`src/apresentacao/telas/Areas.tsx`); a Biblioteca é `Normas` (`src/apresentacao/biblioteca/Normas.tsx`, 9.5); as visões e derivados são da F3/F4; backup é arquivo + `LogDeImportacao` |
 | Tokens da identidade nova (redesign, fatia 1) | variáveis CSS em `estilos.css`: `--agora-fundo` e `--agora-borda` (o cartão tingido de sálvia: `agora` = cartão tingido, desde a fatia 6; o marca-texto amarelo, `--agora`, `--agora-texto` e `--agora-faixa`, saiu), `--raio-cartao`, `--depois` (recuado) e `--progresso`; `--primaria` é a sálvia (botão e link); `--fonte-interface` = Atkinson Hyperlegible Next, `--fonte-leitura` = Literata. Conferidos por `scripts/contraste.mjs` |
@@ -145,7 +146,7 @@ Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`
 | Evento | Emitido por | Payload |
 |---|---|---|
 | `registro.criado`, `registro.atualizado`, `registro.excluido` | `Colecao.criar`; `atualizar` e `restaurar`; `excluir` | `{ colecao, id }` |
-| `registro.lote` | `Colecao.gravarLote`, `Colecao.removerFisico` | `{ colecao, quantidade }` |
+| `registro.lote` | `Colecao.gravarLote`, `Colecao.criarLote`, `Colecao.removerFisico`, `Repositorio.gravarLoteDoAcervo` (um por coleção) | `{ colecao, quantidade }` |
 | `erro.registrado` | `registrarErro` | `{ erroId, pontoId, sessaoId }` |
 | `erro.atualizado` | `completarErro` | `{ erroId, pontoId }` |
 | `erro.excluido` | `excluirErro` | `{ erroId }` |

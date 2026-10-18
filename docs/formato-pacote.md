@@ -32,7 +32,7 @@ conteudo.cifrado        o ZIP "sem cifra" acima, cifrado
 | Campo | Conteúdo |
 |---|---|
 | `formato` | `"arretado-pacote"` |
-| `versaoFormato` | `1` |
+| `versaoFormato` | `1`; `2` (F4-A, AL) quando o `log.json` tem entrada `acervo-adesao`. Sem ela o pacote continua saindo na `1`, que o app anterior lê |
 | `versaoEsquema` | versão do esquema local que gerou o pacote (2 desde a F2, 9.1; 3 desde a 8.10; ver "Compatibilidade entre versões do esquema") |
 | `versaoApp` | versão do app que gerou o pacote |
 | `criadoEm` | instante ISO 8601 UTC |
@@ -52,7 +52,7 @@ Em ordem; qualquer falha recusa o pacote inteiro com mensagem clara, sem escreve
 
 1. É um ZIP com `manifesto.json` válido e `formato` correto.
 2. Cifrado → exige senha; senha errada ou conteúdo alterado → recusa (o GCM detecta).
-3. `versaoFormato` conhecido; `versaoEsquema` ≤ versão local (posterior → "atualize o app"); anterior → registros migrados.
+3. `versaoFormato` conhecido (`1` ou `2`; maior que o do app → "atualize o app"; o app de antes do AL recusa a `2` com "formato que esta versão do app não conhece"); `versaoEsquema` ≤ versão local (posterior → "atualize o app"); anterior → registros migrados.
 4. Conteúdo descompactado até 512 MB (conferido antes de descompactar: proteção contra "zip bomb").
 5. Todo arquivo listado existe, nenhum arquivo sobra, cada `sha256` confere, `hashConjunto` confere.
 6. Todo registro passa no esquema da sua coleção e pertence ao `usuarioId` do manifesto.
@@ -86,7 +86,7 @@ Regras comuns:
 - **Idempotência**: repetir o mesmo pacote no mesmo modo não altera nada.
 - **Snapshot** automático antes de qualquer modo que escreva; **LogDeImportação** com hash do pacote, modo, contagens e snapshot; **rollback** de um clique enquanto o snapshot existir (retenção mínima de 5). O rollback também guarda o estado anterior e pode ser desfeito.
 - Coleções só locais (log de importações, snapshots, espaços) nunca entram no pacote.
-- O `log.json`, quando presente, é guardado para auditoria e não é reaplicado: os registros são a verdade.
+- O `log.json`, quando presente, é guardado para auditoria e não é reaplicado: os registros são a verdade. Desde o AL (F4-A), a árvore de um item do acervo aderido entra no log como uma só entrada `acervo-adesao` (`dados` = `ReferenciaDeAcervo`: `itemId`, `versao`, `hash`, `normaId`, `versaoId`, `base` dos ids, `tsBase`, `instante`, `quantidade`), sem o texto; refazer esse trecho pede a fonte do acervo (`historico/<id>.<hash>.json`). Entradas antigas (uma por registro) seguem iguais.
 
 ## Compatibilidade entre versões do esquema
 
