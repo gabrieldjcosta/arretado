@@ -1349,6 +1349,23 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** "Não agora" vale só no dia (`localStorage` `arretado:sugestoes-dispensadas:v1`); no dia seguinte a regra roda de novo.
 - **Solução:** nenhuma; sugestão não é cobrança. Para não ver a regra, mude o que a dispara (adiar o ponto, mudar a faixa).
 
+## Log de lote por referência (F4-A, AL, 17/10/2026)
+
+### "O histórico usa o item X (versão N) do acervo, mas a fonte dele não está disponível"
+- **Causa:** a adesão grava no log uma entrada `acervo-adesao` (referência: item, versão, hash) em vez de copiar cada registro; refazer o histórico (`reconstruirDoLog`, `desfazerAlteracao`, a verificação da migração para a conta) busca o item na fonte e confere versão e hash. Sem o arquivo (sem rede, item retirado, versão nova publicada sem guardar a antiga) o resultado é `FonteDoLoteAusente`, nunca estado inventado. Os dados nas tabelas não são afetados: só o refazer do histórico.
+- **Solução:** com rede, tentar de novo. Se a versão aderida sumiu, recolocar `public/acervo/historico/<id>.<hash>.json` (o `gerarAcervo` guarda a anterior ao trocar de hash; nunca apagar essa pasta). A migração que falha por isso deixa a origem intacta.
+
+### Pacote recusado com "formato que esta versão do app não conhece"
+- **Causa:** pacote com log que tem `acervo-adesao` sai na `versaoFormato` 2; o app de antes do AL só lê a 1 (a mensagem dele não pode mais mudar). Sem log, ou log sem adesão por referência, o pacote segue na 1.
+- **Solução:** atualizar o app (recarregar a aba). Para levar a um app antigo, exportar sem o log.
+
+### Teste semeia log antigo e o `bulkAdd` de `alteracoes` falha com `ConstraintError`
+- **Causa:** o banco aberto por `Repositorio.abrir` já tem as entradas `seq` 1–3 da identidade; a fixture traz os mesmos `seq`.
+- **Solução:** semear um `BancoArretado` cru (tabelas, log e `meta.identidade` da fixture) e só depois abrir o `Repositorio` (ver `log-referencia.test.ts`).
+
+### Previsível (F4-B): sync e tabela remota `alteracoes`
+- A tabela remota precisa aceitar `operacao = 'acervo-adesao'` (o `dados` é só a referência: o conteúdo do acervo não sobe). Ao baixar num aparelho, refazer o lote pede a fonte do acervo, como aqui.
+
 ## Contas (F4-A, A1; só com `VITE_CONTA=1`)
 
 ### Abri o app e vieram os dados "vazios" depois de entrar numa conta
