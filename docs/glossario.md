@@ -413,6 +413,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Abertura do repositório | `abrirRepositorioAtivo({ contasHabilitadas })` e `nomeDoBancoAtivo`; `ProvedorRepositorio` usa a primeira. Com a chave desligada nem toca no registro |
 | Chave de build | `VITE_CONTA=1` liga a F4-A (`contasHabilitadas()`, `src/integracoes/conta/index.ts`); qualquer outro valor = app de hoje |
 | Serviço de conta | Porta `ServicoDeConta` (`sessao`, `entrarComGoogle`, `pedirCodigoPorEmail`, `confirmarCodigo`, `sair`, `excluirConta`, `aoMudar`); `ServicoDeContaNulo` até o pacote A3; `FalhaDeConta` com `motivo` |
+| Cópia na nuvem (F4-A, A6; T28) | Na interface: "Cópia na nuvem", "Guardar cópia na nuvem", "Com cópia na nuvem (data)", "Salvo neste aparelho"; a senha da cópia é "frase". Porta: `ServicoDeConta.listarCopias`, `enviarCopia`, `baixarCopia`, `apagarCopia` (`CopiaNaNuvem { nome, tamanho }`, objeto `backups/<uid>/<nome>`). Orquestração em `src/integracoes/conta/backup-nuvem.ts`: `guardarCopiaNaNuvem` (cifra no aparelho, envia, retém `MANTER_NA_NUVEM` = 3), `listarCopiasNaNuvem`, `abrirCopiaDaNuvem`, `preverUsoDaCopia` (modo 6), `usarCopiaDaNuvem` (snapshot antes), `separarCopiaDaNuvem` (modo 7), `nomeDaCopia`/`instanteDaCopia` (`AAAA-MM-DDTHH-MM-SS-<hash8>.arretado`, UTC). Tela: `NuvemBackup`, `NuvemBackupRestaurar` (`src/apresentacao/conta/dados/`); falso: `ServicoDeContaFalso.copias`, `operacoesDeCopia`, `falharProximoEnvio` |
 
 #### F4-A: esquema remoto da conta (A2, 14/10/2026; só arquivo e teste, não aplicado no Supabase real)
 
