@@ -236,16 +236,6 @@ const doEdital = (edital: Edital | undefined, principal: boolean) =>
     </Link>
   );
 
-/** Cinco tons suaves, em rodízio, um por disciplina (só na faixa lateral do grupo). */
-function indiceDoTom(grupos: readonly { titulo: string }[], titulo: string): number {
-  return (
-    Math.max(
-      0,
-      grupos.findIndex((g) => g.titulo === titulo),
-    ) % 5
-  );
-}
-
 /** Biblioteca › Normas (F2, 9.5; Parte 2 §9.2): as normas publicadas e a retomada da importação. */
 export function Normas() {
   const repo = useRepositorio();
@@ -535,7 +525,7 @@ export function Normas() {
                   <details
                     key={g.titulo}
                     aria-label={g.titulo}
-                    className={`grupo-de-normas tom-${String(indiceDoTom(dados.porDisciplina, g.titulo))}`}
+                    className="grupo-de-normas"
                     open={filtrando || (abertos.get(g.titulo) ?? dados.porDisciplina.length <= 3)}
                     onToggle={(e) => {
                       // Com critério, a lista abre os grupos com resultado: aí nada se lembra.

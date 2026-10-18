@@ -33,7 +33,7 @@ Estudo diário em celular e desktop, em Sessões curtas e retomadas. Local-first
 
 ## Brand Commitments
 
-Nome provisório "Arretado" (antes "Acumen"), com o cacto verde ao lado do nome; mascote vetorial como coadjuvante. Sensação-alvo: ânimo e conforto, sem economia de atenção às custas do encantamento. Os detalhes visuais vigentes ficam em `docs/design/` e em `src/apresentacao/estilos.css`, não aqui.
+Nome provisório "Arretado" (antes "Acumen"), com o pequeno cacto ao lado do nome; direção visual "Ponto de luz" (D-D7, 18/10/2026): a caneta-cacto de vidro marca onde a pessoa parou e o cachorro em um traço só aparece como coadjuvante, só ao fechar o Dia e a rodada. Sensação-alvo: ânimo e clareza, sem economia de atenção às custas do encantamento. Os detalhes visuais vigentes ficam em `DESIGN.md`, `docs/design/` e `src/apresentacao/estilos.css`, não aqui.
 
 ## Evidence on Hand
 

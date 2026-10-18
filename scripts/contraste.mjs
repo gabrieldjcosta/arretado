@@ -88,20 +88,20 @@ export function pares() {
       ['foco', f, 3],
       ['estrela', f, 3],
       ['cacto', f, 3],
-      ['acqua', f, 3],
+      ['andamento', f, 3],
       ['borda-campo', f, 3],
+      // O botão de vidro sai da areia e da cal sem borda (D-D7).
+      ['acao', f, 3],
+      // O ponto de luz e a Estrela: o contorno na tinta é o que os separa do fundo.
+      ['ponto-contorno', f, 3],
+      ['estrela-contorno', f, 3],
       ...DESTAQUES.map((d) => [d, f, 3]),
     );
   }
   p.push(
-    ['acqua-texto', 'fundo', 4.5],
-    ['acqua-texto', 'superficie', 4.5],
-    ['acqua-texto', 'superficie-2', 4.5],
-    ['verde-foco-texto', 'fundo', 4.5],
-    ['verde-foco-texto', 'superficie', 4.5],
-    ['verde-foco-texto', 'superficie-2', 4.5],
+    ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.
-    ['acqua', 'superficie-2', 3],
+    ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
@@ -111,16 +111,18 @@ export function pares() {
   p.push(
     ['perigo-texto', 'perigo', 4.5],
     ['aviso-texto', 'aviso-fundo', 4.5],
-    // Botão primário: Sol com o texto Marinho (nos dois temas e no bloco-herói).
+    // Botão primário: vidro com texto branco; à noite, vidro claro com o texto da noite (D-D7).
     ['acao-texto', 'acao', 4.5],
     ['bloco-acao-texto', 'bloco-acao', 4.5],
     ['bloco-acao', 'bloco-fundo', 3],
-    // Bloco-herói: o texto, o atenuado e o anel de foco próprio (o global pode não passar no verde).
+    // A folha do Agora: o texto, o atenuado e o anel de foco próprio.
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
+    // Onde estou (área e aba atuais, em cal) e o marcado (tinta cheia).
+    ['atual-texto', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
-    ['cacto', 'selecionado-fundo', 3],
+    ['selecionado-atenuado', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
   );
@@ -171,23 +173,22 @@ export function medir(tema) {
     razao(cor('texto-atenuado'), camada),
   );
 
-  // Régua de leitura (--regua-fundo: Sol a 20%): texto e atenuado sobre ela,
-  // na superfície e no fundo.
+  // Régua de leitura (--regua-fundo: tinta a 6%): texto e atenuado sobre ela,
+  // na superfície e no fundo; os sublinhados dos destaques também passam por baixo dela.
   for (const f of SUPERFICIES) {
     const regua = sobre(cor('regua-fundo'), cor(f));
     juntar('texto', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto'), regua));
     juntar('texto-atenuado', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto-atenuado'), regua));
     juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
+    for (const d of DESTAQUES) juntar(d, `regua-fundo sobre ${f}`, 3, razao(cor(d), regua));
   }
 
-  // Selo e interruptor em Verde-foco: texto branco sobre o passo escuro (claro) ou escuro sobre ele (o
-  // texto do tema não serve, então o par é o do selo: branco sobre acqua-fundo).
-  juntar('branco', 'acqua-fundo', 4.5, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('acqua-fundo')));
-
-  // D-D5: correções de contraste fixas da tabela D-D5
-  juntar('marinho', 'argila', 4.5, razao(cor('marinho'), cor('argila')));
-  juntar('marinho', 'azul-ceu', 3, razao(cor('marinho'), cor('azul-ceu')));
-  juntar('branco', 'verde-foco', 3, razao({ r: 255, g: 255, b: 255, a: 1 }, cor('verde-foco')));
+  // D-D7: os pares do contrato da direção, com os valores fixos da paleta.
+  const branco = { r: 255, g: 255, b: 255, a: 1 };
+  juntar('tinta', 'areia', 4.5, razao(cor('tinta'), cor('areia')));
+  juntar('branco', 'vidro', 4.5, razao(branco, cor('vidro')));
+  juntar('noite-tinta', 'noite-folha', 4.5, razao(cor('noite-tinta'), cor('noite-folha')));
+  juntar('noite', 'noite-vidro', 4.5, razao(cor('noite'), cor('noite-vidro')));
   return linhas;
 }
 

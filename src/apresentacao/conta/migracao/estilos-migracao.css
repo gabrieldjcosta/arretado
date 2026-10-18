@@ -42,10 +42,11 @@
   color: var(--texto-atenuado);
 }
 
+/* Etapa atual (D-D7): "onde estou" dentro da folha de cal é o tom de lugar, não o vidro da ação. */
 .migracao-etapas-lista li.atual {
-  color: var(--bloco-acao-texto);
-  background: var(--bloco-acao);
-  font-weight: 500;
+  color: var(--texto);
+  background: var(--tinta-lugar);
+  font-weight: 700;
 }
 
 .migracao-etapas-lista li.passada {

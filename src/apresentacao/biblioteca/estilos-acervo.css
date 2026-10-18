@@ -41,7 +41,7 @@
 }
 
 .item-acervo-botao[aria-pressed='true'] .dica {
-  color: var(--bloco-atenuado);
+  color: var(--selecionado-atenuado);
 }
 
 .item-acervo-botao:disabled {
@@ -111,5 +111,4 @@
 .aviso-compacto-icone {
   flex-shrink: 0;
   font-size: 0.85rem;
-  opacity: 0.9;
 }

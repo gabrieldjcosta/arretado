@@ -128,6 +128,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** encerrar o servidor antigo e rodar `npm run test:e2e` de novo. **Prevenção:** não deixar `preview` aberto entre rodadas; o CI sempre sobe o seu.
 - **Origem:** previsto — toda atividade com tela.
 
+### Commit no contêiner Linux passa sem rodar o `npm run check`
+- **Sintoma:** `git commit` mostra "hint: The '.githooks/pre-commit' hook was ignored because it's not set as executable" e grava sem o check. **Causa:** os ganchos estão no git sem o bit de execução (`100644`); no Windows isso não importa, no Linux (sessões do Claude na nuvem) o git os ignora, inclusive o `pre-push` que barra o `main` e o force push.
+- **Solução:** rodar `npm run check` à mão antes de cada commit e nunca enviar ao `main` nem forçar. **Prevenção:** dar o bit no git (`git update-index --chmod=+x .githooks/*`), caminho protegido: pede o rótulo `aprovado-gabriel`.
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
+### Pasta `C:` aparece na raiz do repositório depois do E2E
+- **Sintoma:** `git status` mostra `?? C:/` com PNGs do Plano vazio em `C:/Users/gabri/.gemini/...`. **Causa:** `e2e/plano-vazio.spec.ts` grava capturas de evidência num caminho fixo do Windows; no Linux ele vira uma pasta relativa à raiz.
+- **Solução:** `rm -rf ./C:` antes do commit e nada de `git add -A`. **Prevenção:** o teste gravar em `info.outputPath()` (fica para quem cuidar desse teste).
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
 ### `console.info` de teste que passa não aparece (relatório da métrica do corpus)
 - **Sintoma:** `npx vitest run --project unidade src/dominios/legislacao/estruturador-corpus.test.ts` passa e não mostra a tabela da métrica da 8.9 nem a linha do portão; o mesmo com qualquer `console.info` ou `console.log` de teste que passa, em qualquer área. **Causa:** dentro do Claude Code, o vitest 5 reconhece o agente (variável `CLAUDECODE`, pelo `std-env`) e troca o reporter padrão pelo `agent` (o mínimo), que só mostra a saída dos testes que falham. No terminal do Gabriel, o `npm test` mostra o relatório.
 - **Solução:** rodar com `--reporter=default` para ver a saída. **Prevenção:** teste não depende da saída para falhar: na métrica, o piso, a linha de base, as regras e os pendentes falham com a mensagem própria (as divergências, cortadas em 20, e cada diferença da linha de base).
@@ -990,6 +1000,19 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Alvo abaixo de 44 px que a F1 não cobre (previsto)
 - **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Backup e dados", "Voltar à Biblioteca"). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
+
+### Fonte nova pelo npm trava o PR na "Guarda do PR"
+- **Sintoma:** o PR que acrescenta uma fonte com `npm install @fontsource...` fica vermelho no check da guarda, sem erro de código. **Causa:** `package.json` e `package-lock.json` são caminhos protegidos; só passam com o rótulo `aprovado-gabriel`, que só o Gabriel põe. **Solução (Ponto de luz, D-D7):** a Gabarito entrou como arquivo, `src/apresentacao/fontes/gabarito-latin-wght-normal.woff2` (subconjunto `latin`, eixo de peso 400 a 900), com a licença em `fontes/OFL.txt`, um `@font-face` com `font-weight: 400 900` e `format('woff2-variations')`, e o `preload` no `index.html`. A Atkinson e a Literata seguem pelo `@fontsource`. **Prevenção:** fonte, ícone ou imagem nova entra como arquivo no app (nunca CDN, por ser local-first); dependência nova no `package.json` vai num PR à parte, pedindo o rótulo ao Gabriel.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026).
+
+### Luz, cal e vidro da D-D7 sem contraste onde não devem ser texto
+- **Sintoma:** `node scripts/contraste.mjs` reprova um par novo, ou a área atual "some" na barra. **Causa:** a luz (`--luz` `#6fe3d6`) é clara demais para texto ou traço sobre a areia; o vidro (`--vidro` `#0f7f72`) passa para botão e traço (3,95:1 sobre a areia), mas não para texto pequeno; o cal sobre a areia quase não contrasta (é "onde estou" pela forma, não pela cor). **Solução:** a luz só como ponto ou Estrela, sempre com contorno de tinta (`--ponto-contorno`, `--estrela-contorno`); texto de link e de sucesso em `--vidro-texto` (`#0a6157`, 5,9:1); a área e a aba atuais em cal levam também peso 700, `--atual-sombra` e `aria-current`. **Prevenção:** todo par novo entra em `scripts/contraste.mjs` nos dois temas antes de ir para a tela.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026); vale para a P2 a P6.
+
+### axe `color-contrast` em "Alterar disciplina" (botão fantasma dentro de dica) depois da troca de paleta
+- **Sintoma:** no CI, `e2e/acervo.spec.ts` (3c e 6a) e `e2e/biblioteca.spec.ts` (9.5) falham em `semViolacoes`, só no claro e nos três aparelhos, com `color-contrast` em `button[aria-label="Alterar a disciplina de …"]` e `.item-acervo-disciplina > .botao-texto`. O `acessibilidade.spec.ts` passa, porque as telas dele não têm itens do acervo. **Causa:** o `.botao-texto` herdava a cor do lugar com `opacity: 0.82`; dentro de `p.dica` a cor herdada já é a atenuada (`--texto-atenuado`, 5,5:1 na areia), e a 82% ela cai para 3,8:1 na areia (4,4:1 na cal). No creme da D-D5 o par já reprovava (4,3:1), mas o axe não media: o `body` tinha a textura de pontos (`radial-gradient`), e o axe-core marca como "incompleto", não como violação, todo texto com `background-image` na pilha de fundo. Com o fundo liso da D-D7, o axe passou a medir pela primeira vez todo texto posto direto na página.
+- **Solução:** o fantasma não usa mais opacidade (D-D7); a cor herdada vale inteira. **Prevenção:** texto nunca leva `opacity` abaixo de 1 fora de estado desabilitado; nunca textura nem imagem no fundo do `body` (além de vetada pela D-D7, esconde do axe os defeitos de contraste); ao trocar a paleta, rodar a suíte E2E inteira (`npx playwright test`), não só o `acessibilidade.spec.ts`, porque o axe roda dentro da maioria dos specs (12 de 16).
+- **Origem:** ocorrido em 18/10/2026 (P1 do Ponto de luz, PR #186).
 
 ## Uso do app
 
