@@ -98,6 +98,17 @@ export const SECOES: Secao[] = [
     ],
   },
   {
+    id: 'conta-e-privacidade',
+    titulo: 'Conta e política de privacidade v3',
+    paragrafos: [
+      'A conta é opcional: dá para usar tudo sem entrar. Quando você entra com uma conta, passa a valer a política de privacidade v3, no lugar da v2.',
+      'Ao entrar, só o seu e-mail e os dados que o provedor de login informa (nome e foto) saem do Aparelho. Nada do seu estudo sai, salvo a cópia cifrada que você pedir.',
+      'O servidor (Supabase, região de São Paulo) guarda só o essencial da conta e, se houver, as cópias cifradas da nuvem. A frase de cifra fica só com você: sem ela, nem o Arretado abre a cópia.',
+      'Sair, trocar de conta e excluir tudo ficam em Conta › Dados. A exclusão da conta é imediata e definitiva. Não perguntamos nem guardamos diagnóstico; não há rastreadores nem estatísticas de uso.',
+      'Leia a política v3 inteira em Conta › Privacidade.',
+    ],
+  },
+  {
     id: 'seguranca-pessoal',
     titulo: 'Cuidados com seus dados',
     paragrafos: [
