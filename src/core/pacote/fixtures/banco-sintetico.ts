@@ -1,6 +1,6 @@
 // Banco sintético para os testes da migração para a conta (A4). Dados inventados (o repositório é
 // público), determinístico: mesma semente = mesmo banco, ids, carimbos e log iguais.
-// Cobre todas as coleções da v8 pelo caminho real de escrita (`Colecao`, com log): criações,
+// Cobre todas as coleções da v9 pelo caminho real de escrita (`Colecao`, com log): criações,
 // atualizações, exclusão lógica, remoção física, um lote de adesão ao acervo numa transação,
 // conteúdo binário de anexo e as coleções só locais (snapshot com conteúdo, log de importação,
 // espaço separado).
@@ -87,6 +87,7 @@ export async function criarBancoSintetico(
     pontoId: ponto.id,
   });
   await c('tarefasDeEstudo').atualizar(tarefa.id, { estado: 'feita' });
+  await c('ciclos').criar({ ...camposMinimos('ciclos', disciplina.id), concursoId: concurso.id });
   await c('vinculos').criar(camposMinimos('vinculos', ponto.id));
 
   // Execução.

@@ -72,7 +72,6 @@ export function Precedentes({ novo = false }: { novo?: boolean }) {
               <li key={p.id}>
                 <LinhaLista
                   para={`/biblioteca/precedentes/${p.id}`}
-                  icone="§"
                   selo={
                     p.favorito ? <span className="visualmente-oculto">Favorito</span> : undefined
                   }

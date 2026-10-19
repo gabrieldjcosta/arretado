@@ -10,6 +10,7 @@ import {
   Preferencias,
   Sessao,
   TarefaDeEstudo,
+  Ciclo,
   versaoDeOrigem,
 } from '../modelo';
 import { sha256 } from '../pacote/bytes';
@@ -368,6 +369,39 @@ describe('subida de esquema v6 → v7 (F3, P0): `tarefasDeEstudo` e campos opcio
     });
     expect(Preferencias.safeParse(novas).success).toBe(true);
     expect(usuarioId).toBe(novas.usuarioId);
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+});
+
+describe('subida de esquema v8 → v9 (ciclos): `ciclos` e campos opcionais da Sessão', () => {
+  it('só `ciclos` nasce na v9; as coleções antigas mantêm os índices', () => {
+    expect(NOMES_COLECOES.filter((n) => versaoDeOrigem(n) === 9)).toEqual(['ciclos']);
+    expect(colecoesNaVersao(8)).not.toContain('ciclos');
+    const v8 = esquemaDaVersao(8);
+    const v9 = esquemaDaVersao(9);
+    for (const [tabela, indices] of Object.entries(v8)) expect(v9[tabela]).toBe(indices);
+    expect(Object.keys(v9).filter((t) => !(t in v8))).toEqual(['ciclos']);
+  });
+
+  it('abre o banco v8 como v9 sem perder nada; Sessão antiga segue válida e aceita cicloId', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId } = await bancoAntigo(nome, 8);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
+    }
+    expect(await repo.db.tabela('ciclos').count()).toBe(0);
+    const ciclo = await repo.colecao('ciclos').criar(camposMinimos('ciclos', usuarioId));
+    expect(Ciclo.safeParse(ciclo).success).toBe(true);
+    const sessao = (await repo.colecao('sessoes').todosDoUsuario())[0];
+    if (!sessao) throw new Error('sessão esperada');
+    expect(Sessao.safeParse(sessao).success).toBe(true);
+    const nova = await repo
+      .colecao('sessoes')
+      .atualizar(sessao.id, { cicloId: ciclo.id, blocoOrdem: 0 });
+    expect(Sessao.safeParse(nova).success).toBe(true);
     repo.fechar();
     await apagarBanco(nome);
   });

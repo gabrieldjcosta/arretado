@@ -3,6 +3,7 @@
 import { useRef, useState, type SyntheticEvent } from 'react';
 import { CORES_DO_GRIFO, type CorDoGrifo } from '../../dominios/legislacao/marcacoes';
 import { Dialogo } from '../componentes/Dialogo';
+import { Icone } from '../componentes/Icone';
 
 /** O texto da âncora no diálogo: até aqui, com reticências. */
 const CITACAO_MAXIMA = 240;
@@ -54,7 +55,7 @@ export function AcoesDaSelecao({
         Enviar às frases
       </button>
       <button type="button" aria-label="Cancelar a marcação" onClick={cancelar}>
-        ✕
+        <Icone nome="fechar" />
       </button>
     </div>
   );
@@ -97,7 +98,7 @@ export function AcoesDoGrifo({
         Tirar
       </button>
       <button type="button" aria-label="Fechar as ações do grifo" onClick={fechar}>
-        ✕
+        <Icone nome="fechar" />
       </button>
     </div>
   );

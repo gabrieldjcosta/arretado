@@ -9,9 +9,9 @@ import {
   suspenderCartao,
 } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
+import { Icone } from '../componentes/Icone';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { hoje } from '../../dominios/recall/servico';
-import { IconeDoFixar } from './icones';
 import { formatarData, ROTULO_ESTADO } from './rotulos';
 
 const ESTADOS: EstadoCartao[] = ['ativo', 'suspenso', 'arquivado'];
@@ -77,11 +77,13 @@ export function ListaCartoes() {
             {dados.itens.map((c) => (
               <li key={c.id}>
                 <span>
-                  <Link to={`/recall/cartoes/${c.id}`}>{c.frente || '(sem frente)'}</Link>
+                  <Link to={`/recall/cartoes/${c.id}`} className="cartao-frente">
+                    {c.frente || '(sem frente)'}
+                  </Link>
                   <br />
                   {c.estado === 'ativo' && c.proximaRevisao <= hojeCivil && (
                     <span className="estado-texto estado-vencido">
-                      <IconeDoFixar nome="relogio" />
+                      <Icone nome="relogio" />
                       Para revisar
                     </span>
                   )}{' '}

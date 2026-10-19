@@ -21,11 +21,3 @@
   gap: var(--espaco-2, 0.5rem);
   align-items: center;
 }
-
-.tarefas-mais > summary,
-.tarefas-bloco > summary {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  cursor: pointer;
-}

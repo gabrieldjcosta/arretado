@@ -206,7 +206,7 @@ export function Precedente() {
             setTextoAberto(e.currentTarget.open);
           }}
         >
-          <summary>Texto completo</summary>
+          <summary className="botao botao-texto na-margem">Texto completo</summary>
           <div ref={textoRef} className="precedente-texto texto-leitura">
             {segmentos.map((s, i) =>
               s.trecho ? (

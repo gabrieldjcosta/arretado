@@ -142,7 +142,7 @@ export function EdicaoIntegral({
         setAberto(e.currentTarget.open);
       }}
     >
-      <summary>Editar o texto inteiro</summary>
+      <summary className="botao botao-texto na-margem">Editar o texto inteiro</summary>
       <p className="dica" id={idDica}>
         Uma linha para cada dispositivo, começando pelo rótulo (Art. 1º, § 1º, I -, a), CAPÍTULO I,
         com o nome na linha de baixo). Ao salvar, o texto é reorganizado: o que você não mudou fica

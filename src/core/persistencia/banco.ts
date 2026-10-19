@@ -29,7 +29,12 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  * `Precedente.trechosChave` e `favorito`. Só coleção nova e campos opcionais: sem índice novo em
  * coleção antiga e sem transformar registro. Backup do Gabriel antes do merge; recarregar as abas.
  */
-export const VERSAO_ESQUEMA = 8;
+/**
+ * v9: Ciclo de estudo: coleção `ciclos` e `Sessao.cicloId`/`blocoOrdem` (opcionais). Só coleção
+ * nova e campos opcionais: sem índice novo em coleção antiga e sem transformar registro. Backup do
+ * Gabriel antes do merge no `main`; recarregar as abas.
+ */
+export const VERSAO_ESQUEMA = 9;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 

@@ -18,7 +18,7 @@ export function ListaFrases() {
   if (!dados) return <Esqueleto />;
   const verErros = (
     <p className="mais-da-lista">
-      <Link to="/recall/erros" className="botao botao-texto">
+      <Link to="/recall/erros" className="botao botao-texto na-margem">
         Ver os erros, com filtros
       </Link>
     </p>
@@ -43,7 +43,7 @@ export function ListaFrases() {
             </span>
             <Link
               to={`/recall/frases/${f.id}/cartao`}
-              className="botao botao-texto"
+              className="botao botao-texto na-margem"
               aria-label={`Esconder trecho: ${f.texto}`}
             >
               Esconder trecho

@@ -5,8 +5,8 @@ import type { Repositorio } from '../../core/persistencia';
 import { completude } from '../../dominios/recall/causa';
 import { listarErros, type FiltroErros } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
+import { Icone } from '../componentes/Icone';
 import { useDados } from '../dados/contexto';
-import { IconeDoFixar } from './icones';
 import { ROTULO_RESULTADO, ROTULO_STATUS } from './rotulos';
 
 const RESULTADOS: readonly string[] = ['errou', 'acertou_inseguro'];
@@ -62,8 +62,8 @@ function ListaErros() {
 
   return (
     <section aria-label="Erros">
-      <details className="filtros-da-lista" open={temFiltro}>
-        <summary className="botao botao-texto">Filtros</summary>
+      <details open={temFiltro}>
+        <summary className="botao botao-texto na-margem">Filtros</summary>
         <div className="filtros">
           <div className="campo">
             <label htmlFor="filtro-resultado">Resultado</label>
@@ -133,7 +133,7 @@ function ListaErros() {
               <li key={e.id}>
                 <Link to={`/recall/erros/${e.id}`} className="item-lista">
                   <span className="estado-texto">
-                    <IconeDoFixar nome={e.resultado === 'errou' ? 'errei' : 'inseguro'} />
+                    <Icone nome={e.resultado === 'errou' ? 'fechar' : 'ajuda'} />
                     {ROTULO_RESULTADO[e.resultado]}
                   </span>
                   <span>{e.fraseCorreta ?? e.oQueFoi}</span>
@@ -166,7 +166,7 @@ export function ErrosComFiltros() {
     <>
       <h1>Erros</h1>
       <p className="voltar-da-lista">
-        <Link to="/recall/frases" className="botao botao-texto">
+        <Link to="/recall/frases" className="botao botao-texto na-margem">
           Voltar às frases
         </Link>
       </p>

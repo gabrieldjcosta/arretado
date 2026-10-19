@@ -485,7 +485,7 @@ describe('Fixar na P5 do Ponto de luz', () => {
     expect(window.location.hash).toBe('#/recall/erros');
     const linha = (await screen.findAllByRole('listitem'))[0];
     expect(linha).toHaveTextContent('Errei');
-    expect(linha?.querySelector('svg.icone-fixar')).not.toBeNull();
+    expect(linha?.querySelector('svg.icone-svg')).not.toBeNull();
     await usuario.click(screen.getByRole('link', { name: 'Voltar às frases' }));
     expect(await screen.findByRole('link', { name: 'Frase A.' })).toBeInTheDocument();
   });
@@ -520,7 +520,7 @@ describe('Fixar na P5 do Ponto de luz', () => {
     relogio.avancar(86_400_000);
     await abrir('/recall/cartoes', repo);
     const estado = await screen.findByText('Para revisar');
-    expect(estado.querySelector('svg.icone-fixar')).not.toBeNull();
+    expect(estado.querySelector('svg.icone-svg')).not.toBeNull();
   });
 
   it('cartões: uma caneta encostada fora do cartão, respostas com desenho e, no fim, a deitada', async () => {
@@ -538,7 +538,7 @@ describe('Fixar na P5 do Ponto de luz', () => {
       'button',
     );
     expect(respostas.map((b) => b.textContent)).toEqual(['De novo', 'Difícil', 'Fácil']);
-    for (const b of respostas) expect(b.querySelector('svg.icone-fixar')).not.toBeNull();
+    for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
     await usuario.keyboard('3');
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
     expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
@@ -555,7 +555,7 @@ describe('Fixar na P5 do Ponto de luz', () => {
       'button',
     );
     expect(respostas.map((b) => b.textContent)).toEqual(['Fácil', 'De novo']);
-    for (const b of respostas) expect(b.querySelector('svg.icone-fixar')).not.toBeNull();
+    for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
     await usuario.keyboard('1');
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
     expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
