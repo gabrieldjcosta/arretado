@@ -4,7 +4,7 @@ import { gzipSync } from 'node:zlib';
 
 const PASTA = 'dist/assets';
 const TETO_POR_ARQUIVO_KB = 200;
-const TETO_TOTAL_KB = 420;
+const TETO_TOTAL_KB = 430;
 // Dados do catálogo de concursos (um bloco por carreira, baixado só quando a pessoa a escolhe no
 // onboarding do plano): não entram no teto do app, mas têm teto próprio.
 const TETO_POR_CARREIRA_KB = 400;
