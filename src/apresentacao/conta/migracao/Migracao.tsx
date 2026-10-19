@@ -95,14 +95,15 @@ export function Migracao({
   useEffect(() => {
     if (estado !== 'resultado-concluido' || !uidDestino || !navigator.onLine) return;
     let cancelado = false;
+    const foiCancelado = () => cancelado;
     let repoAberto: Repositorio | null = null;
     void (async () => {
       try {
         if ((await servico.sessao())?.uid !== uidDestino) return;
         const copias = await listarCopiasNaNuvem(servico);
-        if (cancelado || !deveOferecerCopiaDaNuvem(copias, navigator.onLine)) return;
+        if (foiCancelado() || !deveOferecerCopiaDaNuvem(copias, navigator.onLine)) return;
         const repo = await abrirConta(uidDestino);
-        if (cancelado) {
+        if (foiCancelado()) {
           repo.fechar();
           return;
         }
