@@ -1176,7 +1176,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Alvos que restam abaixo de 44 px (P6)
 - **Sintoma:** `capturas-ui.mjs --medir` ainda lista as notas de vigência do Leitor ("(Redação dada pela Lei nº …)", 278 × 19), as remissões no texto ("II", 15 × 27), "Fazer agora" no Hoje (74 × 19), "Aparência" no meio de uma frase de Perfis (63 × 19) e, no Fixar, "registrar um erro" (118 × 21, na linha "Depois:"). **Causa:** são links em linha de texto, a exceção "em linha" da WCAG 2.5.8 (o alvo é limitado pela altura da linha); a nota de vigência é uma linha miúda inteira de link, e dar 44 px a cada uma deixaria cada artigo bem mais alto.
-- **Solução:** nenhuma, de propósito. Decisão do Gabriel de 19/10/2026: **manter** as notas de vigência e as remissões como links em linha, cobertos pela exceção da WCAG 2.5.8; não há PR de ampliação. O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
+- **Solução:** as notas de vigência e as remissões do Leitor passam a ter alvo de pelo menos 24 px (`.notas-vigencia a` em bloco em linha com 24 px de altura; `.remissao` com 0,35 rem de folga lateral). Decisão do Gabriel de 19/10/2026 15:31Z (**Ampliar**), que substitui o "manter" de 13:38Z. Os demais links em linha ficam como estavam. O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
 - **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
 
 ### As capturas `--rotas todas` não mostram a Sessão aberta (P6)

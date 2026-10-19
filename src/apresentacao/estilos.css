@@ -2219,8 +2219,13 @@ button.estrela:focus-visible {
   color: var(--texto-atenuado);
 }
 
+/* Alvo de 24 px (WCAG 2.5.8), decisão do Gabriel de 19/10/2026 (Ampliar). */
 .notas-vigencia a {
   color: inherit;
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 0.25rem;
+  box-sizing: border-box;
 }
 
 .alternar-linha {
@@ -2884,6 +2889,9 @@ dialog.dialogo-acoes {
 /* A citação é texto com sublinhado pontilhado discreto (sem fundo, sem mudar a cor). */
 .remissao {
   cursor: pointer;
+  /* Alvo de 24 px de largura mesmo em citação curta ("II"); a quebra de linha segue livre. */
+  padding-inline: 0.35rem;
+  margin-inline: -0.35rem;
   text-decoration: underline dotted;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
