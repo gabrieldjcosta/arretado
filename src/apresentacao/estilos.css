@@ -1385,6 +1385,9 @@ button.grande,
 }
 
 .frases .texto-leitura a {
+  display: flex;
+  align-items: center;
+  min-height: var(--alvo);
   color: var(--texto);
   text-decoration: none;
 }
@@ -1395,13 +1398,12 @@ button.grande,
 
 /* "Ver os erros", "Voltar às frases", "Filtros" e "Mais opções": o texto alinhado à margem, o alvo de
    44 px estendido por fora. */
-.mais-da-lista,
-.voltar-da-lista {
+.mais-da-lista {
   margin: 0.5rem 0 0;
 }
 
 .voltar-da-lista {
-  margin-top: 0;
+  margin: 0;
 }
 
 .mais-da-lista .botao-texto,
@@ -2884,9 +2886,10 @@ dialog.dialogo-previa .linha-acoes button {
   min-height: 50px;
 }
 
+/* `min-width: min-content` (e não o `var(--alvo)` do botão): com o rótulo em uma linha o botão nunca
+   fica menor que o conteúdo, e com fonte ampliada o terceiro desce de linha em vez de pisar no vizinho. */
 .respostas button {
-  flex: 1;
-  min-width: 0;
+  min-width: min-content;
   padding-inline: 0.5rem;
   white-space: nowrap;
   border-width: 2px;
@@ -2948,9 +2951,10 @@ dialog.dialogo-previa .linha-acoes button {
 }
 
 /* A revisão numa coluna só (D-D7, P5): faixa da Sessão, topo com a caneta, cartão e respostas na
-   mesma largura, para a caneta pousar na borda do cartão em qualquer tela. */
+   mesma largura, para a caneta pousar na borda do cartão em qualquer tela. A classe é `.coluna-drill`
+   porque `.revisao` já é a revisão do rascunho da Biblioteca. */
 @media (min-width: 700px) {
-  .revisao {
+  .coluna-drill {
     max-width: 40rem;
     margin-inline: auto;
   }

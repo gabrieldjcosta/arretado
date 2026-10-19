@@ -8,7 +8,8 @@ const CAMINHOS = {
   facil: ['M5 12.5l4.5 4.5L19 7.5'],
   errei: ['M7 7l10 10', 'M17 7L7 17'],
   inseguro: ['M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.6', 'M12 17h.01'],
-  paraHoje: ['M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z', 'M12 8v4.2l2.8 1.8'],
+  /** Relógio: o cartão já está no prazo de revisão. */
+  relogio: ['M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z', 'M12 8v4.2l2.8 1.8'],
 } as const;
 
 export type NomeDoIcone = keyof typeof CAMINHOS;

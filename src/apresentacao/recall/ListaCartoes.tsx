@@ -81,8 +81,8 @@ export function ListaCartoes() {
                   <br />
                   {c.estado === 'ativo' && c.proximaRevisao <= hojeCivil && (
                     <span className="estado-texto estado-vencido">
-                      <IconeDoFixar nome="paraHoje" />
-                      Para hoje
+                      <IconeDoFixar nome="relogio" />
+                      Para revisar
                     </span>
                   )}{' '}
                   <span className="dica">

@@ -1,6 +1,38 @@
+import type { Page } from '@playwright/test';
 import { expect, semViolacoes, test } from './apoio';
 
 const DIA = 86_400_000;
+
+/** As respostas da revisão: dentro da tela, com 44 px de altura, o rótulo dentro do botão e sem pisar umas nas outras. */
+async function respostasCabem(page: Page) {
+  const caixas = await page
+    .getByRole('group', { name: 'Como foi?' })
+    .getByRole('button')
+    .evaluateAll((botoes) =>
+      botoes.map((b) => {
+        const r = b.getBoundingClientRect();
+        return { x: r.x, y: r.y, w: r.width, h: r.height, sobra: b.scrollWidth - b.clientWidth };
+      }),
+    );
+  const largura = await page.evaluate(() => document.documentElement.clientWidth);
+  expect(caixas).toHaveLength(3);
+  for (const c of caixas) {
+    expect(c.h).toBeGreaterThanOrEqual(44);
+    expect(c.sobra).toBeLessThanOrEqual(0);
+    expect(c.x).toBeGreaterThanOrEqual(0);
+    expect(c.x + c.w).toBeLessThanOrEqual(largura);
+  }
+  caixas.forEach((a, i) => {
+    for (const b of caixas.slice(i + 1)) {
+      const separados =
+        a.x + a.w <= b.x + 0.5 ||
+        b.x + b.w <= a.x + 0.5 ||
+        a.y + a.h <= b.y + 0.5 ||
+        b.y + b.h <= a.y + 0.5;
+      expect(separados).toBe(true);
+    }
+  });
+}
 
 test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', async ({
   page,
@@ -233,6 +265,20 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   await expect(page.locator('svg.caneta')).toHaveAttribute('data-pose', 'encostada');
   await page.keyboard.press('Space');
   await expect(page.getByText('Frase completa')).toBeVisible();
+  // P5: as três respostas cabem a 320 px e com a fonte ampliada (o terceiro desce de linha).
+  const tela = page.viewportSize();
+  await respostasCabem(page);
+  await page.setViewportSize({ width: 320, height: 640 });
+  await respostasCabem(page);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%';
+  });
+  await respostasCabem(page);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '';
+  });
+  if (tela) await page.setViewportSize(tela);
   await semViolacoes(page);
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();

@@ -212,7 +212,7 @@ describe('correções da revisão da etapa 6', () => {
     const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
-    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Fixar' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar aos erros' }));
     await waitFor(async () => {
       expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe(
         'Suspensão condicional.',
@@ -389,6 +389,30 @@ describe('Fixar na P5 do Ponto de luz', () => {
     const { usuario } = await abrir('/recall/frases', repo);
     await usuario.click(await screen.findByRole('link', { name: 'Esconder trecho: Frase A.' }));
     expect(window.location.hash).toBe(`#/recall/frases/${frase?.id ?? ''}/cartao`);
+  });
+
+  it('sem nenhuma frase (Erro antigo, sem frase correta), a aba ainda leva aos Erros e o detalhe volta a eles', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erro = await erroAntigo(repo, 'Sursis');
+    const { usuario } = await abrir('/recall/frases', repo);
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Nenhuma frase ainda' }),
+    ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Ver os erros, com filtros' }));
+    await usuario.click(await screen.findByRole('link', { name: /Sursis/ }));
+    expect(window.location.hash).toBe(`#/recall/erros/${erro.id}`);
+    await usuario.click(await screen.findByRole('link', { name: 'Voltar aos erros' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/recall/erros');
+  });
+
+  it('cartões: o que já está no prazo diz "Para revisar", com desenho', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    relogio.avancar(86_400_000);
+    await abrir('/recall/cartoes', repo);
+    const estado = await screen.findByText('Para revisar');
+    expect(estado.querySelector('svg.icone-fixar')).not.toBeNull();
   });
 
   it('cartões: uma caneta encostada fora do cartão, respostas com desenho e, no fim, a deitada', async () => {

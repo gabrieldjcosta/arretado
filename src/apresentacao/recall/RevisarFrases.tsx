@@ -148,7 +148,7 @@ export function RevisarFrases() {
 
   if (estado.tipo === 'fim') {
     return (
-      <div className="revisao fim-de-rodada">
+      <div className="coluna-drill fim-de-rodada">
         <h1>Revisar frases</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
@@ -197,7 +197,7 @@ export function RevisarFrases() {
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
   return (
-    <div className="revisao">
+    <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar frases</h1>
       <FaixaDaSessao />
       <TopoDaRevisao

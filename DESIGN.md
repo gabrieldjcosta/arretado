@@ -262,9 +262,9 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 
 ### Fixar e revisão (P5)
 
-- **Abas do Fixar:** Frases · Cartões · Histórico, no trilho da areia funda; `/recall` cai nas Frases. Os Erros não são aba: a lista com filtros é a página `/recall/erros` ("Erros" e "Voltar às frases"), a que se chega por "Ver os erros, com filtros" no fim da lista de Frases.
+- **Abas do Fixar:** Frases · Cartões · Histórico, no trilho da areia funda; `/recall` cai nas Frases. Os Erros não são aba: a lista com filtros é a página `/recall/erros` ("Erros" e "Voltar às frases"), a que se chega por "Ver os erros, com filtros" no fim da lista de Frases (também sem Frase nenhuma); o detalhe do Erro volta a ela.
 - **Linha de frase:** o texto em Literata e, à direita, "Esconder trecho" como botão de texto sublinhado de 44 px (era 139 × 29).
-- **Estado por palavra e desenho:** o desenho (SVG de um traço, `currentColor`, 18 px) vem antes da palavra, na tinta: "Errei" (xis) e "Acertei sem certeza" (interrogação) na lista de Erros, "Para hoje" (relógio) no cartão que vence, e "De novo" (setas), "Difícil" (onda) e "Fácil" (marca) nas respostas. Nunca vermelho, nunca glifo de texto.
+- **Estado por palavra e desenho:** o desenho (SVG de um traço, `currentColor`, 18 px) vem antes da palavra, na tinta: "Errei" (xis) e "Acertei sem certeza" (interrogação) na lista de Erros, "Para revisar" (relógio) no cartão que já está no prazo, e "De novo" (setas), "Difícil" (onda) e "Fácil" (marca) nas respostas. Nunca vermelho, nunca glifo de texto.
 - **Cartão atual:** uma coluna só (40 rem a partir de 700 px) com a faixa da Sessão, o topo, o cartão e as respostas. No topo, "Sair" (texto sublinhado), o andamento ("1 de 4") e, no canto, a caneta encostada (56 × 76), fora do cartão, com a ponta 7 px dentro da borda dele. As respostas são três botões de borda de 2 px numa linha (até 379 px, com o desenho sobre o rótulo); "Mostrar resposta" é o único vidro.
 - **Fim de rodada:** a caneta deitada em repouso (104 × 58) acima do título ("Feito.", ou o sotaque, uma em três), "Amanhã: N cartões." e as ações centradas: "Seguir para as frases (N)" em vidro e "Voltar ao Fixar" em texto. Sem cachorro e sem desenho próprio: quem desenha é o Resumo do Dia, uma vez por Dia fechado.
 

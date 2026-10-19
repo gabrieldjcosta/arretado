@@ -27,7 +27,7 @@ function filtroDe(p: URLSearchParams): FiltroErros {
  * Erros por recência, com filtros guardados no endereço (voltar preserva o filtro). "Erros" deixou de
  * ser aba do Fixar (D-D5); a lista vive em `/recall/erros` e se chega a ela pela aba Frases.
  */
-export function ListaErros() {
+function ListaErros() {
   const [params, setParams] = useSearchParams();
   const filtro = filtroDe(params);
   const chave = params.toString();
