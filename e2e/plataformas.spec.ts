@@ -22,8 +22,8 @@ test('o index.html estende a página até a borda e liga ícones, manifest e cor
   }));
   expect(cabeca.viewport).toContain('viewport-fit=cover');
   expect(cabeca.cores).toEqual([
-    ['(prefers-color-scheme: light)', '#f1e6d3'],
-    ['(prefers-color-scheme: dark)', '#0b1b33'],
+    ['(prefers-color-scheme: light)', '#f6f8fb'],
+    ['(prefers-color-scheme: dark)', '#0b1322'],
   ]);
   // Cada link responde 200 com o tipo certo (a CSP deixa passar: `img-src` e `manifest-src` são 'self').
   for (const [rel, href] of cabeca.links) {
@@ -62,11 +62,11 @@ test('a cor da barra acompanha o tema escolhido à mão e volta ao do aparelho',
   await page.goto('/#/conta/aparencia');
   await page.getByLabel('Escuro').check();
   await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
-  expect(await cores()).toEqual(['#0b1b33', '#0b1b33']);
+  expect(await cores()).toEqual(['#0b1322', '#0b1322']);
   await page.getByLabel('Claro').check();
   await expect(page.locator('html')).toHaveAttribute('data-tema', 'claro');
-  expect(await cores()).toEqual(['#f1e6d3', '#f1e6d3']);
+  expect(await cores()).toEqual(['#f6f8fb', '#f6f8fb']);
   await page.getByLabel('Igual ao aparelho').check();
   await expect(page.locator('html')).not.toHaveAttribute('data-tema');
-  expect(await cores()).toEqual(['#f1e6d3', '#0b1b33']);
+  expect(await cores()).toEqual(['#f6f8fb', '#0b1322']);
 });

@@ -1,5 +1,7 @@
 # Contrato da direção: Ponto de luz, segunda versão
 
+> **Superado em 19/10/2026 pela D-D9 (Tinta e noite).** Este contrato descreve a direção da D-D7 e fica como histórico: paleta, letras, formas, marca, caneta, abas e Hoje passaram a valer pelo [contrato da D-D9](../2026-10-19-tinta-e-noite/contrato.md), e o que continua valendo está nas seções "Mantido" e "Revogado" da D-D9 em [`decisoes-design.md`](../../decisoes-design.md).
+
 Escolhida pelo Gabriel no cartão da rodada 3 das direções visuais (genjutsu:bunshin, 18/10/2026, 15:46Z); construção no app autorizada por ele às 17:23Z do mesmo dia. Registro da decisão: [`../../decisoes-design.md`](../../decisoes-design.md) (D-D7). Execução em fases: [`../../../planos/ponto-de-luz.md`](../../../planos/ponto-de-luz.md). Este contrato é o que toda construção e toda revisão seguram o trabalho contra.
 
 Página das três rodadas: https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb (seção "Ponto de luz, segunda versão"). Fontes do protótipo nos arquivos do projeto, em `redesenho/bunshin/.bunshin/direction/fonte/` (telas em `r3-script.js`, regras em `r2.css` e `r3.css`, caneta em `sertao-svg.mjs`, função `simboloCanetaV2`). Capturas do protótipo nesta pasta: [`hoje-celular-dia.png`](hoje-celular-dia.png), [`hoje-celular-noite.png`](hoje-celular-noite.png), [`leitor-tablet-dia.png`](leitor-tablet-dia.png).

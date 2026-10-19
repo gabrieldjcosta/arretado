@@ -120,6 +120,8 @@ components:
 
 # Design System: Arretado
 
+> **Superado em 19/10/2026 pela D-D9 (Tinta e noite).** Os tokens do cabeçalho (`colors`, `typography`, `rounded`, `components`) e a descrição abaixo ainda são os da D-D7 (Ponto de luz) e só são reescritos na Q8 ([`docs/planos/tinta-e-noite.md`](docs/planos/tinta-e-noite.md)). Desde a Q1 o código tem a paleta, as letras e as formas da D-D9: dia "Tinta e marca-texto" (papel `#F6F8FB`, tinta `#0F1C3A`, lima `#EEFA4B` só como halo, Schibsted Grotesk) e noite "Noite de mandacaru" (noite `#0B1322`, serra `#131D31`, luz `#F2F6FF`, âmbar `#FFC53D`, Familjen Grotesk). Onde este arquivo divergir, valem [o contrato da D-D9](docs/design/referencias/2026-10-19-tinta-e-noite/contrato.md), [a decisão](docs/design/decisoes-design.md) e `src/apresentacao/estilos.css`.
+
 ## Overview
 
 **Creative North Star: "Ponto de luz"**
