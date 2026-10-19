@@ -143,6 +143,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** rodar com `--reporter=default` para ver a saída. **Prevenção:** teste não depende da saída para falhar: na métrica, o piso, a linha de base, as regras e os pendentes falham com a mensagem própria (as divergências, cortadas em 20, e cada diferença da linha de base).
 - **Origem:** ocorrido em 01/10/2026 (atividade 8.9; movido para cá na revisão da 8.9).
 
+### E2E recarrega a página antes de a gravação terminar (`hasText: 'Salvo.'` casa com "Ainda não salvo.")
+- **Sintoma:** no CI, só no projeto "celular" e em cerca de metade das rodadas, os dois E2E do "Para lembrar" (`hoje-colunas.spec.ts`) falharam juntos: depois de `page.reload()` o campo voltava vazio (`toHaveValue` esgota os 5 s com `unexpected value ""`); localmente nunca. O "element(s) not found" no fim da mensagem vem de um poll antigo (o Playwright não o apaga), não do último. **Causa:** `filter({ hasText: 'Salvo.' })` casa por texto contido e sem diferenciar maiúscula, então também casa com "Ainda não salvo."; a espera passava na hora, sem esperar a gravação, e o reload derrubava a gravação em andamento. Reproduzido segurando uma transação de escrita no banco por 800 ms antes de salvar; no CI não deu para ler o traço (o servidor de artefatos é bloqueado), então o que o runner atrasa é inferido.
+- **Solução:** esperar o aviso exato, `filter({ hasText: /^Salvo\.$/ })`. **Prevenção:** estado que é parte do texto de outro (ou que muda só na capitalização) se espera com regex ancorada ou `exact: true`; antes de recarregar, esperar o que só aparece depois da gravação.
+- **Origem:** ocorrido em 19/10/2026 (P7b, #215; corrigido no #216).
+
 ## Persistência local (IndexedDB/Dexie)
 
 ### `PrematureCommitError` numa transação
