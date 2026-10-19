@@ -593,9 +593,15 @@ function LeitorAberto({
       setVoltando(volta !== undefined);
       setRetorno((r) => ({ linha: volta, vez: r.vez + 1 }));
     } else if (!antes && porArtigo) {
+      // A lista sai da página com as linhas medidas na largura de agora. A estrutura da norma (700
+      // a 1199 px) some no modo foco, então a coluna da lista que volta tem outra largura, e o que
+      // o virtualizador guardou é de outra: cada linha de cima encolhe ao ser medida de novo, e essa
+      // remedida ele só compensa com a rolagem parada ou indo para baixo. Descartadas aqui, a lista
+      // que volta mede as linhas como numa abertura nova, cuja primeira medida ele sempre compensa.
+      measure();
       window.scrollTo(0, 0);
     }
-  }, [porArtigo, ordem, unidades, linhas, artigoAtual]);
+  }, [porArtigo, ordem, unidades, linhas, artigoAtual, measure]);
 
   // Modo foco (11.1): a moldura do Shell some (atributo na raiz; ver estilos.css) e o leitor tira a
   // barra dele. A troca muda o que fica acima da lista e, com a estrutura ao lado (700 a 1199 px),
