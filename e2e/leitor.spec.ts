@@ -1754,7 +1754,7 @@ test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela seg
   expect(sobra).toBe(0);
 });
 
-test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, a Estrela de quatro pontas, o dock em vidro e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
+test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, a Estrela de quatro pontas, o dock sólido e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
   page,
 }, info) => {
   test.setTimeout(180_000);
@@ -1858,13 +1858,11 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
   const pilula = await dock.evaluate((el) => {
     const s = getComputedStyle(el);
-    return {
-      desfoque: s.backdropFilter,
-      alfa: Number(/[,/]\s*([\d.]+)\)$/.exec(s.backgroundColor)?.[1] ?? 1),
-    };
+    return { desfoque: s.backdropFilter, fundo: s.backgroundColor };
   });
   expect(pilula.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
-  expect(pilula.alfa, 'a superfície inteira, sem transparência').toBe(1);
+  // Opaco: o navegador escreve `rgb(…)` sem o quarto número (a cor com transparência é `rgba(…)`).
+  expect(pilula.fundo, 'a superfície inteira, sem transparência').toMatch(/^rgb\(/);
 
   // A Estrela de luz: quatro pontas e o aro que a separa da faixa.
   const botao = await estrelaDe(page, 'art3', 'Estrela: Art. 3º');
@@ -1906,8 +1904,9 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   expect(sobraNaBarra).toBe(0);
   await semViolacoes(page);
 
-  // Em 320 px (o menor celular): a pílula do dock cabe numa linha, a cal do lido não encosta na
-  // borda da tela e nada rola na horizontal. A largura é fixada aqui, então só o projeto do celular.
+  // Em 320 px (o menor celular): a pílula do dock e a legenda dos destaques cabem numa linha, a cal
+  // do lido não encosta na borda da tela e nada rola na horizontal. A largura é fixada aqui, então só
+  // o projeto do celular.
   if (info.project.name === 'celular') {
     await page.setViewportSize({ width: 320, height: 640 });
     await rolarAte(page, art3);
@@ -1919,12 +1918,18 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
       return {
         sobra: raiz.scrollWidth - raiz.clientWidth,
         linhasDoDock: new Set(botoes.map((b) => Math.round(b.getBoundingClientRect().top))).size,
+        linhasDaLegenda: new Set(
+          [...document.querySelectorAll('.legenda-destaques li')].map((i) =>
+            Math.round(i.getBoundingClientRect().top),
+          ),
+        ).size,
         pilulaDentro: pilula !== undefined && pilula.left >= 0 && pilula.right <= raiz.clientWidth,
         folgaDoLido: raiz.clientWidth - (faixaDoLido?.right ?? raiz.clientWidth),
       };
     });
     expect(estreito.sobra).toBeLessThanOrEqual(0);
     expect(estreito.linhasDoDock, 'o dock cabe numa linha em 320 px').toBe(1);
+    expect(estreito.linhasDaLegenda, 'a legenda cabe numa linha em 320 px').toBe(1);
     expect(estreito.pilulaDentro, 'a pílula do dock fica dentro da tela').toBe(true);
     expect(estreito.folgaDoLido, 'a cal do lido não encosta na borda').toBeGreaterThanOrEqual(7.5);
     await semViolacoes(page);

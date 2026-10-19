@@ -1112,6 +1112,36 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** o painel é `.estrutura-da-norma`. **Prevenção:** antes de nomear uma classe, `git grep -n '\.nome\b' src` no CSS e no TSX; vale também para as regras que dependem da ordem no arquivo.
 - **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
 
+### Estrutura da norma: o bloco de agora só muda quando o cabeçalho chega ao alto (P4)
+- **Sintoma:** com o cabeçalho do capítulo II a 15% da tela, a estrutura ainda mostra o capítulo I. **Causa:** a conta partia do nó no alto da tela (`noDoAlto`, que também grava a posição), e o olho de quem lê está mais abaixo.
+- **Solução:** a estrutura usa `noDaLeitura` (`Leitor.tsx`): o primeiro cabeçalho de bloco entre o alto e a linha de leitura (`FRACAO_DA_LEITURA`, um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho, o nó do alto. Uma conta só (a do "primeiro cabeçalho") para a rolagem e para o toque: tocar numa seção a leva ao alto e a deixa como a de agora, e o bloco não pisca entre pai e filho. O E2E rola o capítulo para 15% e para 55% da tela. **Prevenção:** no jsdom a página mede 0 (a leitura estaria sempre "no pé") e a tela tem 768 px: o teste fixa `scrollHeight` e `innerHeight` (200 px põe a linha de leitura na linha do alto, de 60 px).
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o bloco que termina numa rubrica nunca fica "lida" (P4)
+- **Sintoma:** o "lido até" no último artigo de uma seção do Código Penal deixa a seção "em leitura", enquanto a faixa já mostra a linha como lida. **Causa:** a rubrica (`nome`) é um nó depois do dispositivo e fecha o bloco, mas o "lido até" marca o dispositivo, nunca a rubrica; o estado "lida" pedia o último nó.
+- **Solução:** `IndiceDaEstrutura.ultimo` (`estrutura.ts`): o último nó que o "lido até" alcança, sem a rubrica dobrada no nó de antes (a mesma regra de `montarLinhas`); `estadoDoBloco` compara com ele. Teste com rubrica antes de cada artigo em `estrutura.test.ts`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### CSS que nunca valeu: a margem perde para uma regra de classe e elemento (P4)
+- **Sintoma:** `.estrutura-acima { margin-bottom }` e `margin-top` de `.tipo-parte` e `.tipo-titulo` não mudam nada no navegador. **Causa:** `.estrutura-da-norma ol { margin: 0 }` e `.dispositivo.estrutura { margin-top }` têm mais especificidade, venham antes ou depois no arquivo.
+- **Solução:** o caminho da estrutura é `.estrutura-da-norma .estrutura-acima`; as duas margens dos tipos, que nunca valeram (vinham do tempo do `padding`), saíram e o ritmo do texto ficou como estava. **Prevenção:** ao mexer numa propriedade, conferir o valor calculado no navegador (`getComputedStyle`), não só a regra.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Painel da estrutura sob as abas de baixo e cortado com letra maior (P4)
+- **Sintoma:** de 700 a 899 px (tablet em pé, celular deitado) o fim da lista fica sob as abas fixas, e o bloco de agora, que o painel traz ao fim da rolagem, também; com a letra padrão do navegador maior, de 1200 px em diante o painel começa fora da janela. **Causa:** a altura máxima não descontava `--abas-altura`; e o ponto de corte era em px, enquanto a faixa do painel é em rem.
+- **Solução:** `max-height` desconta `var(--abas-altura, 0px)` (zero de 900 px em diante e com o teclado aberto) e o corte da margem é `min-width: 75em` (1200 px na letra de 16 px, e cresce com ela).
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Legenda dos destaques alarga a página com a letra maior (P4)
+- **Sintoma:** com "Destaques" ligado e o texto ampliado, a página rola na horizontal. **Causa:** a legenda curta estava em `flex-wrap: nowrap`, e as quatro palavras não encolhem.
+- **Solução:** a legenda quebra se não couber (em 320 px cabe numa linha, e o E2E confere as duas coisas). **Prevenção:** "numa linha só" é uma medida a conferir, não um `nowrap`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Modo foco: "Próximo artigo" vira texto sem caixa na bandeja (P4)
+- **Sintoma:** na bandeja aberta, o botão principal é o menos visível: negrito, sem fundo nem contorno, e "Sair do foco" parece mais um botão do que ele. **Causa:** `.em-foco .acoes-leitor button` (translúcido e atenuado, para os botões do canto) tem mais especificidade que `.principal`.
+- **Solução:** `.em-foco .bandeja-itens button.principal` devolve o vidro de ação (e o hover dele); "Sair do foco" é o que recua, de propósito.
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
