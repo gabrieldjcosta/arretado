@@ -16,12 +16,14 @@ import { chromium } from '@playwright/test';
 
 const PUBLIC = path.join(import.meta.dirname, '..', 'public');
 
-// Cores fixas de estilos.css (tema claro): --areia e --caneta-0 a --caneta-4, --caneta-miolo.
+// Cores fixas da D-D7 (tema claro), congeladas até a Q4 da D-D9 (docs/planos/tinta-e-noite.md): a
+// Q1 trocou os tokens (a areia e o vidro saíram de estilos.css) e deixou os ícones como estavam.
+// `--caneta-0` a `--caneta-4` e `--caneta-miolo` seguem em estilos.css, provisórios até a Q4.
 const AREIA = '#f1e6d3';
 const VIDRO = ['#dffcff', '#9af0dc', '#5fcf8f', '#2b8f5e', '#17422f'];
 const MIOLO = '#0f3b2b';
 const BRANCO = '#ffffff';
-const HALO = '#7df3e1'; // --noite-vidro: o halo da ponta
+const HALO = '#7df3e1'; // o halo da ponta (era --noite-vidro, token que saiu na Q1)
 
 const LADO = 512;
 const CORPO = 'M19 166 L21 28 A11 11 0 0 1 43 28 L45 166 L32 200 Z';

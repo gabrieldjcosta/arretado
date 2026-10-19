@@ -1,6 +1,7 @@
 /* O ponto de luz e a caneta (D-D7, P3). Vetores decorativos: nenhum leva texto. As cores vêm dos
    tokens (`--ponto-*`, `--caneta-*` em estilos.css); o tema troca o vidro, o brilho e o halo sem
-   que o componente saiba. */
+   que o componente saiba. D-D9: o halo é o `--ponto-halo` do mundo (lima de dia, âmbar à noite); o
+   vidro (`--caneta-*`) é provisório e a caneta de vidro nova o refaz na Q4. */
 
 /* ── Ponto de luz ─────────────────────────────────────────────────────── */
 
@@ -102,11 +103,11 @@
 }
 
 .caneta-halo-dia {
-  fill: var(--noite-vidro);
+  fill: var(--ponto-halo);
   opacity: var(--caneta-halo-dia);
 }
 
 .caneta-halo-noite {
-  fill: var(--noite-vidro);
+  fill: var(--ponto-halo);
   opacity: var(--caneta-halo-noite);
 }
