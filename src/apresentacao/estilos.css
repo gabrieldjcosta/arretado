@@ -466,8 +466,8 @@ button,
 }
 
 .pular:focus {
-  left: 1rem;
-  top: 1rem;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
   z-index: 10;
   background: var(--superficie);
   padding: 0.5rem 1rem;
@@ -488,11 +488,13 @@ button,
    tablet em pé, 32 a partir de 900). --largura-casca: a largura do conteúdo e, a partir de 900 px, a
    do cabeçalho, para a marca alinhar com o título. --abas-altura: o que as abas de baixo ocupam (até
    899 px, com a área segura do aparelho); a rolagem reserva essa altura e o dock do Leitor fica
-   acima dela. Com o teclado aberto, no modo foco e no "só estudo" as abas saem e ela zera. */
+   acima dela. A partir de 900 px não há abas embaixo e ela é só a área segura (o indicador de
+   início do iPhone deitado). Com o teclado aberto, no modo foco e no "só estudo" as abas saem e
+   ela zera. */
 :root {
   --gutter: 1rem;
   --largura-casca: 900px;
-  --abas-altura: 0px;
+  --abas-altura: env(safe-area-inset-bottom, 0px);
 }
 
 @media (min-width: 700px) {
@@ -668,7 +670,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 1rem var(--gutter);
+  padding: 1rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 
 /* Título com o "+" na mesma linha (TituloComMais, D-D7): o "+" é redondo, em cal com a tinta e a
@@ -712,7 +715,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 0.5rem var(--gutter) 1rem;
+  padding: 0.5rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
   font-size: 0.8125rem;
   color: var(--texto-atenuado);
 }
@@ -770,7 +774,8 @@ button,
 
 @media (min-width: 700px) and (max-width: 899px) {
   .areas {
-    padding-inline: max(0.5rem, calc((100% - 35rem) / 2));
+    padding-left: max(0.5rem, env(safe-area-inset-left, 0px), calc((100% - 35rem) / 2));
+    padding-right: max(0.5rem, env(safe-area-inset-right, 0px), calc((100% - 35rem) / 2));
   }
 }
 
@@ -778,7 +783,12 @@ button,
    caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
 @media (min-width: 900px) {
   .topo {
-    padding-inline: max(var(--gutter), calc((100% - var(--largura-casca)) / 2 + var(--gutter)));
+    padding-left: calc(
+      max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+    padding-right: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
   }
 
   .marca {
@@ -1265,7 +1275,9 @@ legend {
 
 dialog {
   width: min(560px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-top, 0px)) - max(1rem, env(safe-area-inset-bottom, 0px))
+  );
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   background: var(--superficie);
@@ -1628,8 +1640,8 @@ a.item-norma strong {
   height: 58px;
 }
 
-/* O dock fica acima das abas de baixo (--abas-altura, que zera a partir de 900 px, com o teclado
-   aberto e no modo foco). */
+/* O dock fica acima das abas de baixo (--abas-altura: as abas e a área segura; a partir de 900 px é só
+   a área segura, e com o teclado aberto e no modo foco zera). */
 .acoes-leitor {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
@@ -1685,6 +1697,45 @@ a.item-norma strong {
   }
 }
 
+/* O trilho (P7): a partir de 1200 px, a mesma folga que põe a estrutura da norma na margem da
+   esquerda, as ferramentas saem do canto de baixo e ficam na margem da direita, ao lado da coluna de
+   lei e à altura da estrutura. O dock vira a pílula em pé; as ações do trecho marcado e o aviso da
+   Estrela ocupam o mesmo trilho. O modo foco mantém o canto. */
+@media (min-width: 75em) {
+  .leitor:not(.em-foco) .acoes-leitor {
+    top: calc(var(--barra-fixa, 4rem) + 0.75rem);
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    bottom: auto;
+    left: calc(50% + var(--largura-texto) / 2 + 1.5rem);
+    flex-direction: column;
+    max-width: 13rem;
+  }
+
+  .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
+    flex-direction: column;
+    border-radius: 22px;
+  }
+
+  /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
+  .leitor:not(.em-foco) .aviso-da-estrela {
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    max-width: 100%;
+    margin: 0.5rem 0 0;
+    text-align: left;
+  }
+
+  .leitor:not(.em-foco) .acoes-marcacao {
+    justify-content: flex-start;
+  }
+
+  .leitor:not(.em-foco) .aviso-da-selecao {
+    text-align: left;
+  }
+}
+
 @media (forced-colors: active) {
   .acoes-leitor .dock-do-leitor {
     background: Canvas;
@@ -1704,6 +1755,11 @@ a.item-norma strong {
 
 :root[data-modo-foco] .shell {
   --abas-altura: 0px;
+}
+
+/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. */
+:root[data-modo-foco] .conteudo {
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
 }
 
 .em-foco .acoes-leitor {
@@ -1765,7 +1821,6 @@ a.item-norma strong {
    metade de baixo), e o dispositivo achado ganha um contorno, sem mudar a altura da linha. */
 dialog.dialogo-busca {
   margin: max(1rem, env(safe-area-inset-top)) auto auto;
-  max-height: calc(100dvh - 2rem);
 }
 
 .busca-campo {
@@ -2744,7 +2799,9 @@ dialog.dialogo-acoes {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: calc(100dvh - 2rem);
+  /* O .conteudo tem 1rem embaixo e, em cima, o maior entre 1rem e a área segura (ver
+     `:root[data-modo-foco] .conteudo`): a página não passa da tela. */
+  min-height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
   padding-top: calc(var(--alvo) + 2rem);
 }
 
@@ -2841,13 +2898,16 @@ dialog.dialogo-previa {
   max-width: none;
   max-height: 70dvh;
   overflow-y: auto;
+  padding-bottom: max(1.5rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
   border-radius: var(--raio) var(--raio) 0 0;
 }
 
 @media (min-width: 700px) {
   dialog.dialogo-previa {
-    margin: auto 1.5rem 1.5rem auto;
+    margin: auto max(1.5rem, env(safe-area-inset-right, 0px))
+      max(1.5rem, env(safe-area-inset-bottom, 0px)) auto;
     width: min(32rem, calc(100vw - 3rem));
+    padding-bottom: 1.5rem;
     border-radius: var(--raio);
   }
 }
@@ -2903,6 +2963,24 @@ dialog.dialogo-previa .linha-acoes button {
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   box-shadow: var(--sombra-flutuante);
+  /* Rede de segurança (tela muito baixa ou texto ampliado): a pilha rola por dentro em vez de passar
+     do alto da tela, onde o primeiro item ficaria fora do alcance. */
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-bottom, 0px)) - var(--alvo) - 0.5rem -
+      max(1rem, env(safe-area-inset-top, 0px))
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* No celular deitado a pilha de nove não cabe acima do ⋯: vira duas colunas (a ordem do teclado segue
+   a da leitura, uma coluna e depois a outra). */
+@media (max-height: 33.75rem) {
+  .bandeja-itens {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+  }
 }
 
 .bandeja-itens button {
