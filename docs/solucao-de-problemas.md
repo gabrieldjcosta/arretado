@@ -1084,7 +1084,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Botão do dock, do seletor de fonte ou da estrutura volta ao estilo de botão comum (P4)
 - **Sintoma:** botão do Leitor com borda, recuo de 20 px e raio de 12 no lugar do que a regra do componente pede, ou sem fundo no hover. **Causa:** a regra base `button, .botao` de `estilos.css` vem antes da CSS do Leitor e tem a especificidade de uma classe só; vence a regra de uma classe, e o hover só troca `--botao-fundo` (a mesma cascata da P2).
-- **Solução:** o seletor leva o pai (`.acoes-leitor .dock-do-leitor button`, `.tamanho-texto button`, `.estrutura .estrutura-item`) e o fundo vem de `var(--botao-fundo, transparent)`, para o hover continuar valendo. **Prevenção:** conferir a captura do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Solução:** o seletor leva o pai (`.acoes-leitor .dock-do-leitor button`, `.tamanho-texto button`, `.estrutura-da-norma .estrutura-item`) e o fundo vem de `var(--botao-fundo, transparent)`, para o hover continuar valendo. **Prevenção:** conferir a captura do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
 - **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
 
 ### A Estrela de luz some sobre a faixa de vidro à noite (P4)
@@ -1096,6 +1096,21 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** o rótulo de "Buscar", "Filtrar", "Ações" ou "Modo foco" fica difícil de ler com a letra da lei passando por trás. **Causa:** 92% de opacidade não é opaco, e `backdrop-filter` não existe em todo navegador (nem com `prefers-reduced-transparency`).
 - **Solução:** `scripts/contraste.mjs` mede `texto` e `texto-atenuado` sobre `--vidro-do-dock` composto com o pior fundo (13,3:1 e 5,9:1 no dia; 10,3:1 e 5,7:1 à noite), então vale mesmo sem o desfoque; sem `backdrop-filter` (sem suporte, transparência reduzida, `forced-colors`) o dock fica sólido (`--superficie` ou `Canvas`). **Prevenção:** novo texto sobre o dock entra em `scripts/contraste.mjs`.
 - **Origem:** previsto — P4 do Ponto de luz (19/10/2026).
+
+### Cores forçadas: barras pretas entre as linhas do Leitor, ou a barra da estrela some (P4)
+- **Sintoma:** com `forced-colors: active` (Windows, contraste alto; no Playwright, `forcedColors: 'active'`), cada linha lida ganha 6 px de barra preta em cima e embaixo, e a barra da estrela na calha desaparece. **Causa:** o modo troca o fundo, a sombra e a imagem de fundo pelas cores do sistema e pinta a borda transparente (o vão de 3 px da faixa do lido) com a cor do texto; a barra da estrela é só fundo, então vira a cor do chão. Uma regra de `forced-colors` posta antes da regra base perde pela ordem no arquivo (mesma especificidade).
+- **Solução:** a regra de cores forçadas vem logo depois da base: `border-block-color: Canvas` na faixa (a geometria não muda) e, na barra da estrela, `width: 0` com `border-inline-start: 3px solid CanvasText` (`dashed` na herdada). A seção de agora na estrutura, a régua e o filtro ligado do dock vão em `outline: 2px solid Highlight`. **Prevenção:** ao pôr borda transparente, sombra ou fundo que carregam estado, capturar também com `forcedColors: 'active'`; o texto "Lido até aqui" continua dizendo onde a pessoa parou.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026), por captura em cores forçadas.
+
+### Dock do Leitor quebra em duas linhas em 320 px, com vazio ao lado de "Modo foco" (P4)
+- **Sintoma:** em 320 px a pílula do dock ocupa a largura toda, com Buscar, Filtrar e Ações numa linha e "Modo foco" sozinho na outra, à direita. **Causa:** os quatro botões com 12 px de respiro de cada lado somam cerca de 313 px, e só há 288.
+- **Solução:** até 349 px o respiro cai para 8 px (a altura de 44 px do alvo não muda) e os quatro cabem numa linha (`e2e/leitor.spec.ts`, seção de 320 px do teste da P4); com o texto do sistema ampliado ainda quebra em duas, sem alargar a página. **Prevenção:** ao acrescentar um botão ao dock, medir em 320 px.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
+
+### Estilo do painel da estrutura vaza para os cabeçalhos do texto (P4)
+- **Sintoma:** com a classe `.estrutura` no painel `<nav>`, as regras dele (`position: sticky`, `overflow-y: auto`, `max-height`) valeriam também para `.dispositivo.estrutura`, a linha de cabeçalho de título e capítulo no texto, que já usa essa classe. **Causa:** nome de classe global repetido para duas coisas.
+- **Solução:** o painel é `.estrutura-da-norma`. **Prevenção:** antes de nomear uma classe, `git grep -n '\.nome\b' src` no CSS e no TSX; vale também para as regras que dependem da ordem no arquivo.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
 
 ## Uso do app
 
