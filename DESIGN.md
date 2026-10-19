@@ -238,7 +238,7 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 - **Primary:** fundo vidro, texto branco (à noite, vidro claro com o texto da noite), sem borda. Um por tela; largura total e 52 px de altura na folha do Agora. Compacto fora dela.
 - **Secondary:** fundo cal, contorno de 1 px, texto tinta.
 - **Hover / Focus:** o primário escurece 14% em direção à tinta no hover (só com ponteiro) e desce 1 px ao ser pressionado, com transição de 140 ms só de transformação e sombra (nunca de cor); anel de foco de 2 px com 2 px de recuo, tinta no dia e vidro claro à noite.
-- **Ghost (botão-texto):** sem caixa, sublinhado, ao lado do primário ("Escolher outra coisa"). **Perigoso:** contorno vermelho; cheio só dentro do diálogo de confirmação.
+- **Ghost (botão-texto):** sem caixa, sublinhado, ao lado do primário ("Escolher outra coisa") ou sozinho no começo da linha, com a letra alinhada ao texto da página ("Voltar", "Mais"). **Perigoso:** contorno vermelho; cheio só dentro do diálogo de confirmação.
 
 ### Chips and Tabs
 
@@ -254,6 +254,8 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 - **Pontos do Dia (P3):** Leitura, Cartões e Frases, cada um com um ponto de luz de 22 px e o nome em 13 px, peso 600: apagado (anel na tinta a 55%, 3,4:1 na areia), aceso pela metade (atual) e aceso (feito), com o estado também em texto para o leitor de tela ("Leitura, feito hoje"). Feito: houve atividade hoje e nada mais está na vez. Atual: é o que o Agora oferece, ou foi começado hoje e ainda há o que fazer. Apagado: ainda não hoje (um anel não cobra, nem quando nada vence). O ponto acende uma vez em 160 ms, na visita ao Hoje em que ficou aceso (feito) e na anterior, no mesmo dia, ainda não estava; o que passa a ser a vez (pela metade) aparece sem animação, dispensar a sugestão não acende nada, a primeira visita do dia abre quieta, e com `prefers-reduced-motion` ele aparece aceso.
 - **Em seguida:** até 2 itens (a mesma decisão do Agora, sem o que ele já mostra nem o que a pessoa dispensou), nome em negrito 600 e tempo em 13 px, sobre a areia. Só texto: sem botão, porque a ação é uma só.
 - **Resumo do Dia (P3):** cartão com o que houve em linhas curtas (Sessões, cartões e Frases revisados) e o próximo passo; "Fechar o Dia" é um botão secundário (o vidro é do Agora). Fechado, mostra o cachorro (112 × 94) e, largada ao fim do traço, a caneta (120 × 67), "Bom descanso." e "Reabrir o Dia".
+
+- **Listas (P6):** em linhas sobre a areia, com o filete entre elas: título em 600, uma linha de apoio atenuada e a seta de traço único à direita, alvo de 64 px (`LinhaLista`; no Acervo, a marca de 22 px à esquerda). O cartão fica para o que agrupa: um formulário com os botões dele, a Sessão em andamento, o resumo do que houve. O "Voltar" vem acima do título, com a seta. A Estrela do Leitor tem a caixa de 44 × 44 (à esquerda da calha, nunca sobre o texto), sem mexer na altura da linha.
 
 ### Inputs / Fields
 
@@ -286,6 +288,7 @@ Um traço só, caramelo pela cor, orelha semiereta, focinho e olho como pontos, 
 ### Do:
 
 - **Do** manter um só botão de vidro por tela, e dar a ele o texto de uma ação ("Continuar", "Começar").
+- **Do** pôr lista em linhas sobre a areia e deixar o cartão para o que agrupa.
 - **Do** usar cal para "onde estou", tinta para o texto e o marcado, a luz só para estado.
 - **Do** mostrar onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo.
 - **Do** medir todo par de cor novo em `scripts/contraste.mjs` nos dois temas antes de usar.
