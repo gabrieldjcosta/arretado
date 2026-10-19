@@ -28,9 +28,9 @@ describe('pintar o quadro parado', () => {
     pintarAte(c, 0);
     expect(c.tracos.children).toHaveLength(0);
     pintarAte(c, 2);
-    // O chão e o tronco; só o tronco leva aguada.
-    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(2);
-    expect(c.lavis.querySelectorAll('.quadro-lavis-vidro')).toHaveLength(1);
+    // O chão e o tronco (o aro e o núcleo); o tubo é oco, sem aguada.
+    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(3);
+    expect(c.lavis.children).toHaveLength(0);
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
   });
 
@@ -45,14 +45,35 @@ describe('pintar o quadro parado', () => {
     expect(olho?.getAttribute('d')).toMatch(/h0$/);
   });
 
-  it('o papel de cor vira classe e a largura vira atributo; a opacidade só quando há', () => {
+  it('o papel de cor vira classe e a largura vira atributo', () => {
     const c = novasCamadas();
-    pintarParte(c, parte('espinhos'));
-    const [nervuras, espinhos] = [...c.tracos.querySelectorAll('.quadro-fio')];
-    expect(nervuras).toHaveClass('quadro-cor-vidro');
-    expect(nervuras?.getAttribute('opacity')).toBe('0.55');
-    expect(espinhos?.hasAttribute('opacity')).toBe(false);
-    expect(espinhos?.getAttribute('stroke-width')).toBe('1.8');
+    pintarParte(c, parte('tronco'));
+    const [aro, nucleo] = [...c.tracos.querySelectorAll('.quadro-fio')];
+    expect(aro).toHaveClass('quadro-cor-vidro');
+    expect(aro?.getAttribute('stroke-width')).toBe('1.6');
+    expect(nucleo).toHaveClass('quadro-cor-nucleo');
+    expect(nucleo?.getAttribute('stroke-width')).toBe('3.4');
+  });
+
+  it('a ponta do núcleo é um ponto liso; na parte de hoje é maior e leva a marca atrás', () => {
+    const c = novasCamadas();
+    pintarParte(c, parte('braco-direito'));
+    expect(c.tracos.querySelectorAll('.quadro-ponto')).toHaveLength(1);
+    expect(c.tracos.querySelector('.quadro-ponto')?.getAttribute('r')).toBe('4');
+    expect(c.tracos.querySelector('.quadro-hoje')).toBeNull();
+    expect(c.tracos.querySelector('.quadro-marca')).toBeNull();
+
+    limpar(c);
+    pintarParte(c, parte('braco-direito'), true);
+    const hoje = c.tracos.querySelector('.quadro-hoje');
+    expect(hoje).toHaveClass('quadro-ponto');
+    expect([hoje?.getAttribute('cx'), hoje?.getAttribute('cy'), hoje?.getAttribute('r')]).toEqual([
+      '200',
+      '98',
+      '5.5',
+    ]);
+    // A marca vem antes do ponto, para ficar sob ele.
+    expect(hoje?.previousElementSibling).toHaveClass('quadro-marca');
   });
 
   it('limpar esvazia o papel e larga a caneta', () => {
@@ -67,7 +88,7 @@ describe('pintar o quadro parado', () => {
 
   it('a ponta da caneta deitada vai para onde se pede', () => {
     expect(posicaoDaCaneta(10.04, 20)).toBe(
-      'translate(10 20) scale(0.6) translate(-32 -200) rotate(65 32 200)',
+      'translate(10 20) scale(0.38) rotate(65) translate(-60 -262)',
     );
   });
 });
@@ -108,7 +129,8 @@ describe('desenharParte', () => {
       new AbortController().signal,
     );
     expect(terminou).toBe(true);
-    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(2);
+    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(3);
+    expect(c.tracos.querySelectorAll('.quadro-hoje')).toHaveLength(1);
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
   });
 
@@ -136,11 +158,8 @@ describe('desenharParte', () => {
     expect(terminou).toBe(true);
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
     // Terminado, o traço é igual ao pintado de uma vez: um traço só, sem pontilhado nem estilo.
-    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(2);
-    expect(c.tracos.querySelector('[style]')).toBeNull();
-    const aguada = c.lavis.querySelector('.quadro-lavis-vidro');
-    expect(aguada).not.toBeNull();
-    expect(aguada?.hasAttribute('opacity')).toBe(false);
+    expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(3);
+    expect(c.tracos.querySelector('.quadro-fio[style]')).toBeNull();
   });
 
   it('a flor brota ao fim do traço e o bicho ganha o olho', async () => {
@@ -158,11 +177,38 @@ describe('desenharParte', () => {
       expect(await terminou).toBe(true);
       expect(c.tracos.querySelectorAll('.quadro-miolo')).toHaveLength(1);
       expect(soltas).toHaveBeenCalledOnce();
+      // Pronto o traço, a aguada deixa de ser pela metade.
+      expect(c.lavis.querySelector('.quadro-lavis-cal')?.hasAttribute('opacity')).toBe(false);
 
       const bicho = desenharParte(c, parte('calango'), 'calmo', new AbortController().signal);
       await vi.advanceTimersByTimeAsync(5000);
       expect(await bicho).toBe(true);
       expect(c.tracos.querySelectorAll('.quadro-olho')).toHaveLength(1);
+    } finally {
+      Reflect.deleteProperty(window.SVGElement.prototype, 'animate');
+    }
+  });
+
+  it('a ponta do núcleo brota com a marca ao fim do traço', async () => {
+    const c = novasCamadas();
+    const soltas = vi.fn();
+    Object.assign(window.SVGElement.prototype, { animate: soltas });
+    try {
+      const terminou = desenharParte(
+        c,
+        parte('braco-direito'),
+        'calmo',
+        new AbortController().signal,
+      );
+      // Antes do fim do núcleo ainda não há ponto.
+      await vi.advanceTimersByTimeAsync(300);
+      expect(c.tracos.querySelector('.quadro-ponto')).toBeNull();
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(await terminou).toBe(true);
+      expect(c.tracos.querySelectorAll('.quadro-hoje')).toHaveLength(1);
+      expect(c.tracos.querySelectorAll('.quadro-marca')).toHaveLength(1);
+      // A marca e o ponto brotam juntos.
+      expect(soltas).toHaveBeenCalledTimes(2);
     } finally {
       Reflect.deleteProperty(window.SVGElement.prototype, 'animate');
     }

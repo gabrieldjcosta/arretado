@@ -35,6 +35,22 @@ describe('as 16 partes do quadro do cacto', () => {
     expect(fios.filter((f) => f.lavis).length).toBeGreaterThan(5);
   });
 
+  it('só o núcleo de tinta leva ponta, e ela é o fim do traço, dentro do quadro', () => {
+    const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
+    const fios = PARTES.flatMap((p) => p.fios);
+    expect(fios.filter((f) => f.cor === 'nucleo')).toHaveLength(3);
+    const comPonta = fios.filter((f) => f.ponta);
+    expect(comPonta.map((f) => f.cor)).toEqual(['nucleo', 'nucleo', 'nucleo']);
+    for (const { d, ponta } of comPonta) {
+      const [x = 0, y = 0] = ponta ?? [];
+      expect(x).toBeGreaterThan(0);
+      expect(x).toBeLessThan(largura);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(altura);
+      expect(d.endsWith(`V${String(y)}`)).toBe(true);
+    }
+  });
+
   it('a caneta é largada dentro do quadro', () => {
     const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
     expect(REPOUSO.x).toBeGreaterThan(0);

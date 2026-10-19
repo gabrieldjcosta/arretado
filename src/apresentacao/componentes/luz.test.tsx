@@ -39,7 +39,7 @@ describe('PontoDeLuz (D-D7, P3)', () => {
   });
 });
 
-describe('Caneta (D-D7, P3)', () => {
+describe('Caneta (D-D7, P3; de vidro na D-D9, Q4)', () => {
   it('é decorativa e traz a pose na caixa da vista', () => {
     const { container } = render(
       <>
@@ -50,13 +50,13 @@ describe('Caneta (D-D7, P3)', () => {
     const [encostada, deitada] = [...container.querySelectorAll('svg')];
     expect(encostada).toHaveAttribute('aria-hidden', 'true');
     expect(encostada).toHaveAttribute('data-pose', 'encostada');
-    expect(encostada).toHaveAttribute('viewBox', '0 0 150 205');
+    expect(encostada).toHaveAttribute('viewBox', '0 0 170 228');
     expect(deitada).toHaveAttribute('data-pose', 'deitada');
-    expect(deitada).toHaveAttribute('viewBox', '0 0 190 106');
+    expect(deitada).toHaveAttribute('viewBox', '0 0 246 140');
     expect(deitada).toHaveClass('caneta', 'pouso');
   });
 
-  it('cada caneta leva o gradiente e os filtros com ids próprios', () => {
+  it('cada caneta leva a tinta, os filtros e a máscara com ids próprios', () => {
     const { container } = render(
       <>
         <Caneta pose="encostada" />
@@ -64,18 +64,33 @@ describe('Caneta (D-D7, P3)', () => {
       </>,
     );
     const ids = [...container.querySelectorAll('[id]')].map((el) => el.id);
-    expect(ids).toHaveLength(6);
-    expect(new Set(ids).size).toBe(6);
-    // Cada preenchimento e traço de gradiente aponta para um id que existe.
-    const usos = [...container.querySelectorAll('[fill^="url(#"], [stroke^="url(#"]')];
+    // A tinta, o halo, a sombra e o aro: quatro por caneta.
+    expect(ids).toHaveLength(8);
+    expect(new Set(ids).size).toBe(8);
+    // Cada preenchimento, traço, filtro e máscara aponta para um id que existe.
+    const usos = [
+      ...container.querySelectorAll(
+        '[fill^="url(#"], [stroke^="url(#"], [filter^="url(#"], [mask^="url(#"]',
+      ),
+    ];
     expect(usos.length).toBeGreaterThan(0);
     for (const el of usos) {
-      const uso = [el.getAttribute('fill'), el.getAttribute('stroke')].find((v) =>
-        v?.startsWith('url(#'),
-      );
+      const uso = (['fill', 'stroke', 'filter', 'mask'] as const)
+        .map((a) => el.getAttribute(a))
+        .find((v) => v?.startsWith('url(#'));
       const alvo = (uso ?? '').slice('url(#'.length, -1);
       expect(container.querySelector(`[id="${alvo}"]`)).not.toBeNull();
     }
+  });
+
+  it('é toda de vidro: ponta incluída, com o furo de tinta à vista, a esfera e três faíscas', () => {
+    const { container } = render(<Caneta pose="encostada" />);
+    expect(container.querySelectorAll('.caneta-vidro')).toHaveLength(1);
+    expect(container.querySelector('.caneta-aro')).not.toBeNull();
+    expect(container.querySelector('path[stroke^="url(#"]')).not.toBeNull();
+    expect(container.querySelector('path[fill^="url(#"]')).not.toBeNull();
+    expect(container.querySelectorAll('.caneta-esfera')).toHaveLength(1);
+    expect(container.querySelectorAll('.caneta-faisca')).toHaveLength(3);
   });
 });
 
@@ -89,12 +104,13 @@ describe('CanetaDefs e CanetaDesenho (A caneta que desenha)', () => {
         </g>
       </svg>,
     );
-    expect(container.querySelector('#quadro-vidro')).not.toBeNull();
-    expect(container.querySelector('#quadro-halo-dia')).not.toBeNull();
-    expect(container.querySelector('#quadro-halo-noite')).not.toBeNull();
-    expect(container.querySelector('path[fill="url(#quadro-vidro)"]')).not.toBeNull();
-    expect(container.querySelector('circle[filter="url(#quadro-halo-noite)"]')).not.toBeNull();
-    expect(container.querySelectorAll('.caneta-ponto')).toHaveLength(4);
+    for (const parte of ['tinta', 'halo', 'sombra', 'aro']) {
+      expect(container.querySelector(`#quadro-${parte}`)).not.toBeNull();
+    }
+    expect(container.querySelector('path[fill="url(#quadro-tinta)"]')).not.toBeNull();
+    expect(container.querySelector('circle[filter="url(#quadro-halo)"]')).not.toBeNull();
+    expect(container.querySelector('rect[mask="url(#quadro-aro)"]')).not.toBeNull();
+    expect(container.querySelectorAll('.caneta-faisca')).toHaveLength(3);
   });
 });
 
