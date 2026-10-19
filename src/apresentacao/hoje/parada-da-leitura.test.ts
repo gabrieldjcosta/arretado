@@ -1,4 +1,4 @@
-import { quandoDeParar, rotuloDaParada } from './parada';
+import { quandoDeParar, rotuloDaParada } from './parada-da-leitura';
 
 describe('Hoje › linha de parada (P3)', () => {
   describe('rotuloDaParada', () => {

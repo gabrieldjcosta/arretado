@@ -9,7 +9,7 @@ import type { ProximaAcao, ResultadoProximaAcao } from '../../dominios/hoje/cont
 import { decidirProximaAcao, type EntradaDaProximaAcao } from '../../dominios/hoje/proxima-acao';
 import { hoje as hojeDe } from '../../dominios/recall/servico';
 import { useDados } from '../dados/contexto';
-import { quandoDeParar, rotuloDaParada, type ParadaDaLeitura } from './parada';
+import { quandoDeParar, rotuloDaParada, type ParadaDaLeitura } from './parada-da-leitura';
 import { estadoDosPontos, type EstadosDosPontos } from './pontos';
 import { reunirEntradas } from './proxima-acao';
 

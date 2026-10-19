@@ -1528,3 +1528,10 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Entrar mostra "Não foi possível guardar o seu aceite neste navegador."
 
 **Causa:** `localStorage` indisponível (modo privado, armazenamento bloqueado ou cheio); a marca do aceite não pôde ser gravada. **Solução:** liberar o armazenamento do site ou usar uma janela normal; sem a marca o login não segue. "Sem aceitar não dá para entrar" fica só para o código por e-mail sem marca.
+
+### Typecheck acusa "file name differs only in casing" e o `eslint .` trava no Windows (T7, 19/10/2026)
+
+- **Sintoma:** no Windows, `npm run typecheck` avisa que o nome do arquivo difere só na caixa e o `npm run lint` passa de 5 minutos nas worktrees; no CI (Linux) tudo passa.
+- **Causa:** `hoje/Parada.tsx` (componente) e `hoje/parada.ts` (lógica) coexistiam; num sistema de arquivos sem distinção de maiúsculas `./Parada` e `./parada` são o mesmo caminho.
+- **Solução:** a lógica virou `hoje/parada-da-leitura.ts` (`git mv`, imports atualizados).
+- **Regra:** nomes de arquivo não podem diferir só pela caixa. Conferir com `git ls-files | sort -f | uniq -di` (sem saída = ok).
