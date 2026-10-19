@@ -88,3 +88,25 @@ describe('decidirProximaAcao (A1)', () => {
     expect(semTarefa).toMatchObject({ acao: { tipo: 'leitura_salva' } });
   });
 });
+
+describe('bloco do ciclo na Próxima ação', () => {
+  const ciclo = { id: 'c1', disciplina: 'Penal', blocoOrdem: 2, total: 8, volta: 3, minutos: 40 };
+  it('vem depois da revisão vencida e antes da tarefa e da leitura salva', () => {
+    const base = { cartoesVencidos: 0, frasesVencidas: 0, ciclo, leitura };
+    const r = decidirProximaAcao(base);
+    expect(r).toMatchObject({
+      tipo: 'acao',
+      acao: {
+        tipo: 'ciclo',
+        alvo: { tipo: 'ciclo', id: 'c1', rotulo: 'Penal' },
+        razao: 'Bloco 3 de 8 da volta 3 do seu ciclo',
+        estimativaMin: 40,
+        blocoOrdem: 2,
+      },
+    });
+    expect(decidirProximaAcao({ ...base, cartoesVencidos: 1 })).toMatchObject({
+      acao: { tipo: 'revisao_vencida' },
+    });
+    expect(decidirProximaAcao(base, ['ciclo'])).toMatchObject({ acao: { tipo: 'leitura_salva' } });
+  });
+});

@@ -112,7 +112,7 @@ export type Dia = z.infer<typeof Dia>;
  * leitura salva (norma); `tarefa` = Tarefa de estudo; `ponto` = ponto do programa; `livre` = a pessoa
  * escolheu sem sugestão. O `id` aponta para o item quando houver; o `rotulo` é o texto mostrado.
  */
-export const TipoDeAlvo = z.enum(['revisao', 'leitura', 'tarefa', 'ponto', 'livre']);
+export const TipoDeAlvo = z.enum(['revisao', 'leitura', 'tarefa', 'ponto', 'livre', 'ciclo']);
 export type TipoDeAlvo = z.infer<typeof TipoDeAlvo>;
 
 export const AlvoDeAcao = z.strictObject({
@@ -124,7 +124,14 @@ export type AlvoDeAcao = z.infer<typeof AlvoDeAcao>;
 
 /** De onde veio a Próxima ação que originou a Sessão (cópia do que foi mostrado; não é recalculado). */
 export const OrigemDaAcao = z.strictObject({
-  tipo: z.enum(['revisao_vencida', 'leitura_salva', 'tarefa', 'escolha_propria', 'sessao_curta']),
+  tipo: z.enum([
+    'revisao_vencida',
+    'leitura_salva',
+    'tarefa',
+    'escolha_propria',
+    'sessao_curta',
+    'ciclo',
+  ]),
   razao: TextoCurto.optional(),
 });
 export type OrigemDaAcao = z.infer<typeof OrigemDaAcao>;
@@ -237,6 +244,11 @@ export const Ciclo = z.strictObject({
   /** Pesos de que os blocos saíram; permitem reajustar sem perder a escolha da pessoa. */
   pesos: z.array(PesoDoCiclo).max(40),
   ativo: z.boolean().optional(),
+  /** Blocos que a pessoa pulou sem Sessão; entram na posição como uma Sessão encerrada. */
+  pulos: z
+    .array(z.strictObject({ em: Instante, blocoOrdem: z.int().min(0) }))
+    .max(500)
+    .optional(),
   /** Mudanças de peso, no molde do `logPrioridade` dos pontos. */
   logDePesos: z
     .array(

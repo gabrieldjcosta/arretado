@@ -22,6 +22,8 @@ function lerEntrada(p: URLSearchParams) {
     alvo: alvo.success ? alvo.data : undefined,
     origemDaAcao: origem.success ? origem.data : undefined,
     tarefaId: bruto('tarefa'),
+    cicloId: bruto('ciclo'),
+    blocoOrdem: /^\d+$/.test(bruto('bloco') ?? '') ? Number(bruto('bloco')) : undefined,
     direto: bruto('direto') === '1',
   };
 }
@@ -46,6 +48,9 @@ export function Iniciar() {
       ...(alvo ? { alvo } : {}),
       ...(dada.origemDaAcao ? { origemDaAcao: dada.origemDaAcao } : {}),
       ...(dada.tarefaId ? { tarefaId: dada.tarefaId } : {}),
+      ...(dada.cicloId && dada.blocoOrdem !== undefined
+        ? { cicloId: dada.cicloId, blocoOrdem: dada.blocoOrdem }
+        : {}),
       ...(fronteira.trim() ? { fronteira } : {}),
     }).then(
       () => {
