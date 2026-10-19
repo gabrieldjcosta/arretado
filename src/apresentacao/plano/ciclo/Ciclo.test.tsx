@@ -55,3 +55,39 @@ describe('Ciclo de estudo (C3)', () => {
     expect(await screen.findByRole('listitem', { current: 'step' })).not.toHaveTextContent('Penal');
   });
 });
+
+describe('Ajuste pelo desempenho (C5)', () => {
+  it('sugere subir a matéria com mais erro; aceitar muda o peso e desfazer devolve', async () => {
+    const { repo, usuario } = await abrir('#/plano/ciclo/novo');
+    await usuario.click(await screen.findByRole('button', { name: 'Continuar' }));
+    await usuario.click(screen.getByRole('button', { name: 'Continuar' }));
+    await usuario.click(screen.getByRole('radio', { name: /Igual para todas/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Continuar' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Criar ciclo' }));
+    await screen.findByRole('heading', { name: 'Volta 1' });
+
+    const pontos = await repo.colecao('pontos').todosDoUsuario();
+    const penal = pontos.find((p) => p.titulo === 'P0')!;
+    const civil = pontos.find((p) => p.titulo === 'C')!;
+    const hoje = new Date().toISOString().slice(0, 10);
+    const sessao = (pontoId: string, feitas: number, acertos: number) =>
+      repo.colecao('sessoes').criar({
+        tipo: 'estudo',
+        data: hoje,
+        inicio: new Date().toISOString(),
+        fim: new Date().toISOString(),
+        estado: 'encerrada',
+        pausas: [],
+        pontoId,
+        questoesFeitas: feitas,
+        questoesAcertadas: acertos,
+      });
+    await sessao(penal.id, 40, 20);
+    await sessao(civil.id, 40, 38);
+
+    await usuario.click(await screen.findByRole('button', { name: 'Aceitar' }));
+    expect((await cicloAtivo(repo))?.blocos).toHaveLength(3);
+    await usuario.click(await screen.findByRole('button', { name: 'Desfazer' }));
+    expect((await cicloAtivo(repo))?.blocos).toHaveLength(2);
+  });
+});
