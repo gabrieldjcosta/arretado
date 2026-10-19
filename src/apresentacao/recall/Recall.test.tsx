@@ -212,7 +212,7 @@ describe('correções da revisão da etapa 6', () => {
     const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
-    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Recall' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Fixar' }));
     await waitFor(async () => {
       expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe(
         'Suspensão condicional.',

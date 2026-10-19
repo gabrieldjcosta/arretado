@@ -13,7 +13,7 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
     'C:/Users/gabri/.gemini/antigravity-cli/brain/656dd014-91ce-47b3-8b69-0d12f2e1f91a';
 
   await page.goto('/#/plano');
-  await expect(page.getByRole('heading', { level: 1, name: 'Plano' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
 
   // 1. Vazio acolhedor com título e texto base
   await expect(

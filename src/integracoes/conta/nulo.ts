@@ -28,6 +28,18 @@ export class ServicoDeContaNulo implements ServicoDeConta {
   excluirConta(): Promise<void> {
     return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
   }
+  listarCopias(): Promise<never> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
+  enviarCopia(): Promise<void> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
+  baixarCopia(): Promise<never> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
+  apagarCopia(): Promise<void> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
   aoMudar() {
     return () => {};
   }

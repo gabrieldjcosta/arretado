@@ -3,7 +3,7 @@
 | Item | Estado | Nós | A confirmar | Anomalias |
 |---|---|---|---|---|
 | lei-federal-7210-1984 | publicado | 871 | 0 | alinea_sem_inciso: 24 |
-| constituicao-1988 | publicado | 3572 | 0 | — |
+| constituicao-1988 | publicado | 3579 | 0 | — |
 | constituicao-estadual-1989 | publicado | 1547 | 0 | duplicata: 8; artigo_so_tachado: 1; alinea_sem_inciso: 17; item_sem_alinea: 111; paragrafo_unico_com_numerado: 1 |
 | emenda-constitucional-80-2014 | publicado | 11 | 0 | linha_solta: 2; artigo_ausente: 1; artigo_fora_de_ordem: 1 |
 | lei-complementar-federal-80-1994 | publicado | 856 | 0 | estrutural_repetido: 2; alinea_sem_inciso: 10; paragrafo_unico_com_numerado: 1 |

@@ -4,6 +4,7 @@ import { alterarPreferencias, cotaDiaria, obterPreferencias } from '../../core/p
 import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { ROTULO_DA_AREA } from '../textos';
 
 const TEMAS: { valor: Tema; nome: string }[] = [
   { valor: 'sistema', nome: 'Igual ao aparelho' },
@@ -162,7 +163,7 @@ export function AparenciaConta() {
         </p>
       </fieldset>
       <fieldset>
-        <legend>Recall</legend>
+        <legend>{ROTULO_DA_AREA.recall}</legend>
         <label htmlFor="cota-diaria">Cartões por vez</label>{' '}
         <input
           id="cota-diaria"

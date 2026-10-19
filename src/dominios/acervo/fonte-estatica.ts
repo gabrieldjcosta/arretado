@@ -36,4 +36,15 @@ export class FonteEstatica implements FonteDoAcervo {
     if (!r.success) throw new FonteIndisponivel('formato_invalido', `${id}.json`);
     return r.data;
   }
+
+  /** Versão guardada ao publicar outra: `<base>/historico/<id>.<hash>.json` (imutável). */
+  async obterVersao(id: string, hash: string): Promise<ItemDoAcervo> {
+    if (!/^[a-z0-9][a-z0-9-]{0,127}$/.test(id) || !/^[0-9a-f]{64}$/.test(hash)) {
+      throw new FonteIndisponivel('nao_encontrado', id);
+    }
+    const caminho = `historico/${id}.${hash}.json`;
+    const r = ItemDoAcervo.safeParse(await this.json(caminho));
+    if (!r.success) throw new FonteIndisponivel('formato_invalido', caminho);
+    return r.data;
+  }
 }

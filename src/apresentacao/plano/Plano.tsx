@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import type { Disciplina, Faixa, Ponto } from '../../core/modelo';
+import type { Disciplina, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
+import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
+import { ROTULO_FAIXA } from './pontos/carregar';
 import './estilos-plano.css';
-
-const ROTULO_FAIXA: Record<Faixa, string> = {
-  altissima: 'Altíssima',
-  alta: 'Alta',
-  media: 'Média',
-  extra: 'Extra',
-};
 
 function porDisciplina(disciplinas: Disciplina[], pontos: Ponto[]) {
   const ordenadas = [...disciplinas].sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
@@ -33,7 +28,7 @@ export function Plano() {
 
   return (
     <>
-      <h1>Plano</h1>
+      <h1>{ROTULO_DA_AREA.plano}</h1>
       {confirmacao && (
         <p role="status" className="sucesso">
           {confirmacao}

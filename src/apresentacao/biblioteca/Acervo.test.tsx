@@ -224,3 +224,42 @@ describe('Biblioteca › Acervo › atualização (6a)', () => {
     });
   });
 });
+
+describe('Biblioteca › Acervo: normas excluídas não vazam', () => {
+  it('norma do acervo excluída não aparece como "Já adicionada"', async () => {
+    const f = await fonte();
+    const { repo } = await repositorioDeTeste();
+    await aderirEmLote(repo, f, ['lep']);
+    for (const n of await repo.colecao('normas').todosDoUsuario()) {
+      await repo.colecao('normas').excluir(n.id);
+    }
+    window.location.hash = '#/biblioteca/acervo';
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
+    const botao = await screen.findByRole('button', { name: /^LEP/ });
+    expect(botao).toBeEnabled();
+    expect(screen.queryByText('Já adicionada')).not.toBeInTheDocument();
+  });
+
+  it('norma colada excluída não gera o aviso de norma parecida', async () => {
+    const f = await FonteEmMemoria.criar([
+      {
+        item: {
+          ...item('lep'),
+          norma: { tituloCurto: 'Lei nº 7.210/1984', tipo: 'Lei', esfera: 'federal' },
+        },
+      },
+    ]);
+    const { repo } = await repositorioDeTeste();
+    const colada = await repo.colecao('normas').criar({
+      tituloCurto: 'LEP',
+      escopo: 'pessoal',
+      tipo: 'Lei',
+      referencia: '7.210/1984',
+    });
+    await repo.colecao('normas').excluir(colada.id);
+    window.location.hash = '#/biblioteca/acervo';
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
+    expect(await screen.findByRole('button', { name: /^Lei nº 7.210\/1984/ })).toBeEnabled();
+    expect(screen.queryByText(/norma parecida/)).not.toBeInTheDocument();
+  });
+});

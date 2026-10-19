@@ -8,6 +8,8 @@ import {
 } from '../../../core/pacote/migrar-para-conta';
 import { NOME_BANCO_PRINCIPAL, RegistroDeContas, Repositorio } from '../../../core/persistencia';
 import type { PacoteGerado } from '../../../core/pacote';
+import { reidratadorDoAcervo } from '../../../dominios/acervo/adesao';
+import { useFonteAcervo } from '../../dados/fonteAcervoContexto';
 import { baixar } from '../dados/rotulos';
 import { recarregarEm } from '../recarregar';
 import './estilos-migracao.css';
@@ -55,6 +57,7 @@ export function Migracao({
   baixarBackup,
 }: MigracaoProps) {
   const navigate = useNavigate();
+  const fonteAcervo = useFonteAcervo();
   const [registro] = useState(() => registroInformado ?? new RegistroDeContas());
   const [repoOrigem, setRepoOrigem] = useState<Repositorio | null>(origemInformada ?? null);
   const [uidDestino, setUidDestino] = useState<string | null>(uidInformado ?? null);
@@ -141,6 +144,8 @@ export function Migracao({
           setEtapaAtual(etapa);
         },
         registro,
+        // Log com árvore do acervo por referência (AL): a verificação reidrata pela fonte.
+        prepararReidratacao: (log) => reidratadorDoAcervo(fonteAcervo, log),
       });
 
       if (resultado.tipo === 'concluida') {

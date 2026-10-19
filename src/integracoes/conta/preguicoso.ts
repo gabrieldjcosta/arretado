@@ -37,6 +37,18 @@ export class ServicoDeContaPreguicoso implements ServicoDeConta {
   async excluirConta() {
     await (await this.servico()).excluirConta();
   }
+  async listarCopias() {
+    return (await this.servico()).listarCopias();
+  }
+  async enviarCopia(nome: string, bytes: Uint8Array) {
+    await (await this.servico()).enviarCopia(nome, bytes);
+  }
+  async baixarCopia(nome: string) {
+    return (await this.servico()).baixarCopia(nome);
+  }
+  async apagarCopia(nome: string) {
+    await (await this.servico()).apagarCopia(nome);
+  }
   aoMudar(ouvinte: (sessao: SessaoDeConta | null) => void): () => void {
     let cancelado = false;
     let cancelar = () => {};

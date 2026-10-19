@@ -1,74 +1,46 @@
-// Bloco "Agora" do Hoje (pacote A1): uma só ação, com o motivo, e a saída "Escolher outra coisa".
-import { useCallback, useState } from 'react';
-import type { OrigemDaAcao } from '../../core/modelo';
-import type { ProximaAcao } from '../../dominios/hoje/contrato';
-import { escolherProximaAcao } from './proxima-acao';
-import { hoje } from '../../dominios/recall/servico';
-import type { Repositorio } from '../../core/persistencia';
+// Bloco "Agora" do Hoje (pacote A1; D-D7, P3): uma só ação, com o motivo, a saída "Escolher outra
+// coisa" e, acima da folha, onde a pessoa parou de ler com a caneta encostada nela.
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
-import { useDados } from '../dados/contexto';
-import { rotaDeInicio } from './rota-de-inicio';
 import { SessaoAberta } from '../sessao/SessaoAberta';
 import { EstadoVazio } from './EstadoVazio';
+import { Parada } from './Parada';
+import type { HojeEmAndamento } from './retrato';
+import { rotaDeInicio } from './rota-de-inicio';
+import { motivoDaAcao, rotuloDoBotao, tituloDaAcao } from './textos-da-acao';
 import './estilos-hoje.css';
 
-/** Título em verbo: a ação primeiro, o motivo logo abaixo. */
-function tituloDaAcao(acao: ProximaAcao): string {
-  return acao.tipo === 'leitura_salva' ? 'Continuar a leitura' : (acao.alvo.rotulo ?? acao.razao);
-}
-
-function ProximaAcaoDoHoje() {
-  const [dispensados, setDispensados] = useState<OrigemDaAcao['tipo'][]>([]);
-  const carregar = useCallback(
-    (repo: Repositorio) => escolherProximaAcao(repo, hoje(repo), { excluir: dispensados }),
-    [dispensados],
-  );
-  const { dados } = useDados(carregar);
-  if (dados === undefined) return <Esqueleto linhas={2} />;
-  if (dados.tipo === 'vazio') {
-    return (
-      <EstadoVazio
-        comecos={dados.comecos}
-        {...(dispensados.length > 0
-          ? {
-              aoVoltar: () => {
-                setDispensados([]);
-              },
-            }
-          : {})}
-      />
-    );
+function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
+  const { retrato, dispensou, dispensar, voltar } = hoje;
+  if (retrato === undefined) return <Esqueleto linhas={2} />;
+  const { agora, parada, diaFechado } = retrato;
+  if (agora.tipo === 'vazio') {
+    return <EstadoVazio comecos={agora.comecos} {...(dispensou ? { aoVoltar: voltar } : {})} />;
   }
-  const { acao } = dados;
+  const { acao } = agora;
+  const motivo = motivoDaAcao(acao);
   return (
     <>
+      <Parada {...(parada === undefined ? {} : { parada })} comCaneta={!diaFechado} />
       <AcaoAgora
         titulo={tituloDaAcao(acao)}
-        motivo={acao.razao}
+        {...(motivo === undefined ? {} : { motivo })}
         {...(acao.estimativaMin === undefined ? {} : { estimativa: acao.estimativaMin })}
-        rotuloBotao="Começar"
+        rotuloBotao={rotuloDoBotao(acao)}
         para={rotaDeInicio(acao)}
-        mascote
-      />
-      <button
-        type="button"
-        className="agora-outra"
-        onClick={() => {
-          setDispensados((d) => [...d, acao.tipo]);
+        aoEscolherOutra={() => {
+          dispensar(acao.tipo);
         }}
-      >
-        Escolher outra coisa
-      </button>
+      />
     </>
   );
 }
 
-export function Agora() {
+export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
   return (
     <>
       <SessaoAberta />
-      <ProximaAcaoDoHoje />
+      <ProximaAcaoDoHoje hoje={hoje} />
     </>
   );
 }

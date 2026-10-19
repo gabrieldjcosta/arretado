@@ -72,6 +72,26 @@ describe('gerarAcervo', () => {
     await expect(gerarAcervo(p, 'nao-existe')).rejects.toThrow(/fora da curadoria/);
   });
 
+  it('versão nova guarda a anterior em historico/<id>.<hash>.json, intacta (AL)', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    const lerIndice = async () =>
+      JSON.parse(await readFile(join(p.saida, 'indice.json'), 'utf-8')) as {
+        itens: { id: string; hash: string }[];
+      };
+    const hashDe = async (id: string) => (await lerIndice()).itens.find((i) => i.id === id)?.hash;
+    const antigo = await hashDe('lei-ok');
+    const corpoAntigo = await readFile(join(p.saida, 'lei-ok.json'));
+    await writeFile(join(p.fontes, 'ok.md'), '# LEI Nº 1\n\nArt. 1º Primeiro.\n\nArt. 2º Outro.\n');
+    await gerarAcervo(p, 'lei-ok');
+    expect(await hashDe('lei-ok')).not.toBe(antigo);
+    const guardado = await readFile(join(p.saida, 'historico', `lei-ok.${String(antigo)}.json`));
+    expect(Buffer.compare(guardado, corpoAntigo)).toBe(0);
+    // Gerar de novo sem mudança não mexe no histórico nem cria entrada repetida.
+    await gerarAcervo(p);
+    expect(await verificarPasta(p.saida)).toEqual([]);
+  });
+
   it('verificarPasta acusa o arquivo adulterado', async () => {
     const p = await montar();
     await gerarAcervo(p);

@@ -4,21 +4,26 @@ import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
+import { useTecladoAberto } from './componentes/teclado-aberto';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
-import { RODAPE_CURTO } from './textos';
+import { RODAPE_CURTO, ROTULO_DA_AREA } from './textos';
 
 const AREAS = [
   {
     caminho: '/',
-    nome: 'Hoje',
+    nome: ROTULO_DA_AREA.hoje,
     icone: 'M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z',
   },
-  { caminho: '/plano', nome: 'Plano', icone: 'M5 5h14v14H5zM5 10h14M9 3v4M15 3v4' },
-  { caminho: '/recall', nome: 'Recall', icone: 'M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11' },
+  { caminho: '/plano', nome: ROTULO_DA_AREA.plano, icone: 'M5 5h14v14H5zM5 10h14M9 3v4M15 3v4' },
+  {
+    caminho: '/recall',
+    nome: ROTULO_DA_AREA.recall,
+    icone: 'M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11',
+  },
   {
     caminho: '/biblioteca',
-    nome: 'Biblioteca',
+    nome: ROTULO_DA_AREA.biblioteca,
     icone:
       'M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5zM5 18.5A1.5 1.5 0 0 0 6.5 20H19',
   },
@@ -43,11 +48,17 @@ function IconeDeArea({ d }: { d: string }) {
   );
 }
 
-/** Moldura de todas as telas: 4 áreas, menu Ajuda, Conta fora da navegação, rodapé (D6). */
+/**
+ * Moldura de todas as telas (D6; casca da D-D7, P2): cabeçalho na areia com a marca, Ajuda e Conta;
+ * as quatro áreas em abas sobre a areia, embaixo até 899 px e no cabeçalho a partir de 900 (com
+ * "Registrar erro" e a tecla E); rodapé no fim do conteúdo. O "+" mora no título das telas que
+ * registram (`TituloComMais`). Com o teclado aberto, as abas saem da frente.
+ */
 export function Shell() {
   const { pathname } = useLocation();
   const navegar = useNavigate();
   const [relatando, setRelatando] = useState(false);
+  const tecladoAberto = useTecladoAberto();
 
   // Atalho global "E": registrar erro (fora de campos de texto).
   useEffect(() => {
@@ -63,7 +74,7 @@ export function Shell() {
   }, [navegar]);
 
   return (
-    <div className="shell">
+    <div className="shell" data-teclado={tecladoAberto ? 'aberto' : undefined}>
       <AplicarAparencia />
       <a
         className="pular"
@@ -107,10 +118,10 @@ export function Shell() {
             title="Registrar erro (atalho: E)"
             aria-label="Registrar erro"
           >
-            <span className="rotulo-longo">Registrar erro</span>
-            <span className="rotulo-curto" aria-hidden="true">
-              + Erro
-            </span>
+            Registrar erro
+            <kbd className="atalho" aria-hidden="true">
+              E
+            </kbd>
           </Link>
           <MenuAjuda
             paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
@@ -118,7 +129,7 @@ export function Shell() {
               setRelatando(true);
             }}
           />
-          <Link to="/conta" className="botao discreto conta-icone" aria-label="Conta e ajustes">
+          <Link to="/conta" className="botao discreto conta-botao" aria-label="Conta e ajustes">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -128,8 +139,8 @@ export function Shell() {
               aria-hidden="true"
               focusable="false"
             >
-              <circle cx="12" cy="8.5" r="3.5" />
-              <path d="M5 20a7 7 0 0 1 14 0" />
+              <circle cx="12" cy="9" r="3.5" />
+              <path d="M5.5 19.5c1.2-3.2 3.7-4.8 6.5-4.8s5.3 1.6 6.5 4.8" />
             </svg>
           </Link>
         </div>
@@ -139,16 +150,11 @@ export function Shell() {
         <Outlet />
       </main>
       <footer className="rodape">
-        {RODAPE_CURTO} <Link to="/conta/dados">Backup e dados</Link>
+        <p>{RODAPE_CURTO}</p>
+        <Link to="/conta/dados" className="botao botao-texto">
+          Backup e dados
+        </Link>
       </footer>
-      <Link
-        to="/recall/registrar"
-        className="botao principal flutuante"
-        aria-label="Novo registro de erro"
-        title="Registrar erro (atalho: E)"
-      >
-        <span aria-hidden="true">+</span>
-      </Link>
       <RelatarProblema
         aberto={relatando}
         aoFechar={() => {

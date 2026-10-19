@@ -3,7 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { lerTemas, medir, razao } from './contraste.mjs';
 
-/** Tokens da identidade anterior (verde-oliva): saíram do app na fundação do redesenho v2. */
+/** Tokens das identidades anteriores: a verde-oliva saiu na fundação do redesenho v2; a paleta da
+ * D-D5 (creme, marinho, sol) e os seus aliases saíram com o Ponto de luz (D-D7). */
 const TOKENS_REMOVIDOS = [
   'primaria',
   'primaria-texto',
@@ -14,6 +15,20 @@ const TOKENS_REMOVIDOS = [
   'cartao-agora-fundo',
   'cartao-agora-texto',
   'cartao-agora-atenuado',
+  'creme',
+  'marinho',
+  'sol',
+  'argila',
+  'verde-foco',
+  'azul-ceu',
+  'ponto-fundo',
+  'palha',
+  'terracota',
+  'caatinga',
+  'acqua',
+  'solace',
+  'sobre-solace',
+  'noite-cartao',
 ];
 
 function arquivosCss(pasta: string): string[] {

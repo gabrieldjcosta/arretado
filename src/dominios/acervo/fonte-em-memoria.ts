@@ -12,6 +12,8 @@ export class FonteEmMemoria implements FonteDoAcervo {
   private constructor(
     private readonly indice: IndiceDoAcervo,
     private readonly itens: Map<string, ItemDoAcervo>,
+    /** Versões guardadas por hash (os arquivos imutáveis da fonte estática). */
+    private readonly historico: Map<string, ItemDoAcervo> = new Map(),
   ) {}
 
   static async criar(
@@ -21,6 +23,7 @@ export class FonteEmMemoria implements FonteDoAcervo {
       vinculos?: VinculoSugerido[];
       avisos?: string[];
     }[],
+    opcoes: { historico?: readonly ItemDoAcervo[] } = {},
   ): Promise<FonteEmMemoria> {
     const itens = new Map<string, ItemDoAcervo>();
     const lista: EntradaDoIndice[] = [];
@@ -42,6 +45,14 @@ export class FonteEmMemoria implements FonteDoAcervo {
     return new FonteEmMemoria(
       { formato: 'arretado-acervo', versaoIndice: 1, geradoEm: '2026-10-10', itens: lista },
       itens,
+      new Map(
+        await Promise.all(
+          (opcoes.historico ?? []).map(async (i): Promise<[string, ItemDoAcervo]> => [
+            await hashDoItem(i),
+            i,
+          ]),
+        ),
+      ),
     );
   }
 
@@ -55,6 +66,13 @@ export class FonteEmMemoria implements FonteDoAcervo {
     const item = this.itens.get(id);
     if (this.falhas.has(id)) return Promise.reject(new FonteIndisponivel('sem_rede'));
     if (!item) return Promise.reject(new FonteIndisponivel('nao_encontrado', id));
+    return Promise.resolve(item);
+  }
+
+  obterVersao(id: string, hash: string): Promise<ItemDoAcervo> {
+    this.pedidos.push(`${id}@${hash.slice(0, 8)}`);
+    const item = this.historico.get(hash);
+    if (item?.id !== id) return Promise.reject(new FonteIndisponivel('nao_encontrado', id));
     return Promise.resolve(item);
   }
 

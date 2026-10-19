@@ -76,6 +76,14 @@ describe('FonteEstatica', () => {
     await expect(f.obter('ruim')).rejects.toMatchObject({ motivo: 'formato_invalido' });
     await expect(f.obter('nada')).rejects.toMatchObject({ motivo: 'nao_encontrado' });
     await expect(f.obter('../x')).rejects.toBeInstanceOf(FonteIndisponivel);
+    // Versão guardada por hash (AL): historico/<id>.<hash>.json; hash fora do formato nem é pedido.
+    const h = 'c'.repeat(64);
+    corpo.set(`/acervo/historico/lei-a.${h}.json`, item('lei-a'));
+    expect((await f.obterVersao('lei-a', h)).id).toBe('lei-a');
+    await expect(f.obterVersao('lei-a', 'd'.repeat(64))).rejects.toMatchObject({
+      motivo: 'nao_encontrado',
+    });
+    await expect(f.obterVersao('lei-a', '../x')).rejects.toBeInstanceOf(FonteIndisponivel);
     const semRede = new FonteEstatica('/acervo', () => Promise.reject(new Error('off')));
     await expect(semRede.listar()).rejects.toMatchObject({ motivo: 'sem_rede' });
   });

@@ -1,10 +1,11 @@
 import type { Modulo, NomeColecao } from '../../../core/modelo';
+import { ROTULO_DA_AREA } from '../../textos';
 
 export const ROTULO_MODULO: Record<Modulo, string> = {
   sistema: 'Conta e preferências',
-  plano: 'Plano (concursos e pontos)',
+  plano: `${ROTULO_DA_AREA.plano} (concursos e pontos)`,
   execucao: 'Dias e sessões',
-  recall: 'Recall (erros, frases, cartões e revisões)',
+  recall: `${ROTULO_DA_AREA.recall} (erros, frases, cartões e revisões)`,
   legislacao: 'Legislação',
   catalogo: 'Catálogo',
   precedentes: 'Precedentes',

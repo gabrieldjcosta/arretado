@@ -637,6 +637,20 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await expect(agora).toContainText(/cerca de \d+ min/);
   await expect(agora.getByRole('link', { name: 'Continuar leitura: LEP' })).toBeVisible();
   await semViolacoes(page);
+
+  // O Hoje diz onde parou na linha de parada, com a caneta encostada na folha; a folha não repete o
+  // motivo, e os três pontos do Dia estão lá, com o estado também em palavras (D-D7, P3).
+  await page.getByRole('link', { name: 'Hoje' }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.locator('.parada')).toContainText(/Você parou em LEP, art\. \d/);
+  await expect(page.locator('svg.caneta')).toHaveCount(1);
+  const folhaDoHoje = page.getByRole('region', { name: 'Agora' });
+  await expect(folhaDoHoje.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
+  await expect(folhaDoHoje).not.toContainText('Você parou');
+  await expect(
+    page.getByRole('list', { name: 'Andamento do Dia' }).getByRole('listitem'),
+  ).toHaveText(['Leitura, feito hoje', 'Cartões, ainda não', 'Frases, ainda não']);
+  await semViolacoes(page);
 });
 
 /** O dispositivo da linha no alto da tela (logo abaixo da barra fixa) e quanto dela ficou acima. */

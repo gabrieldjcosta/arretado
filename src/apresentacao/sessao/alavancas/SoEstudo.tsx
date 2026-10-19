@@ -1,4 +1,4 @@
-// Modo "só estudo" (A3a): esconde a administração (áreas, Conta, botão de erro flutuante, rodapé)
+// Modo "só estudo" (A3a): esconde a administração (áreas, Ajuda, Conta, rodapé)
 // enquanto a Sessão está na tela. O interruptor continua visível; é a preferência `modoSoEstudo`.
 import { useCallback, useEffect } from 'react';
 import { alterarPreferencias, obterPreferencias } from '../../../core/preferencias';

@@ -1,0 +1,158 @@
+/* O ponto de luz, a caneta e o traço do cachorro (D-D7, P3). Vetores decorativos: nenhum leva texto.
+   As cores vêm dos tokens (`--ponto-*`, `--caneta-*`, `--traco-cachorro` em estilos.css); o tema
+   troca o vidro, o brilho e o halo sem que o componente saiba. */
+
+/* ── Ponto de luz ─────────────────────────────────────────────────────── */
+
+.ponto-de-luz {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  transform-origin: 50% 50%;
+}
+
+.ponto-luz {
+  fill: var(--ponto-luz);
+}
+
+.ponto-anel {
+  fill: none;
+  stroke: var(--ponto-contorno);
+  stroke-width: 1.5;
+}
+
+.ponto-anel.apagado {
+  stroke: var(--ponto-apagado);
+}
+
+.ponto-nucleo {
+  fill: var(--ponto-nucleo);
+}
+
+/* Acende uma vez, em 160 ms (escala 0,6 a 1, opacidade 0 a 1). Com movimento reduzido o ponto só
+   aparece aceso: a ordem, o conteúdo e a ação não mudam. */
+@media (prefers-reduced-motion: no-preference) {
+  .ponto-de-luz.acende {
+    animation: ponto-acende 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes ponto-acende {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ── Caneta ───────────────────────────────────────────────────────────── */
+
+.caneta {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.caneta-vidro-0 {
+  stop-color: var(--caneta-0);
+}
+
+.caneta-vidro-1 {
+  stop-color: var(--caneta-1);
+}
+
+.caneta-vidro-2 {
+  stop-color: var(--caneta-2);
+}
+
+.caneta-vidro-3 {
+  stop-color: var(--caneta-3);
+}
+
+.caneta-vidro-4 {
+  stop-color: var(--caneta-4);
+}
+
+.caneta-miolo {
+  fill: var(--caneta-miolo);
+  opacity: 0.22;
+}
+
+.caneta-borda {
+  fill: none;
+  stroke: var(--caneta-borda);
+  stroke-width: 1.3;
+  opacity: var(--caneta-borda-opacidade);
+}
+
+.caneta-brilho {
+  fill: none;
+  stroke: var(--ponto-nucleo);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  opacity: var(--caneta-brilho);
+}
+
+.caneta-brilho-braco {
+  stroke-width: 2.2;
+  opacity: calc(var(--caneta-brilho) * 0.9);
+}
+
+.caneta-ponto {
+  fill: var(--ponto-nucleo);
+}
+
+.caneta-halo-dia {
+  fill: var(--noite-vidro);
+  opacity: var(--caneta-halo-dia);
+}
+
+.caneta-halo-noite {
+  fill: var(--noite-vidro);
+  opacity: var(--caneta-halo-noite);
+}
+
+/* ── Traço do cachorro ────────────────────────────────────────────────── */
+
+.traco-do-cachorro {
+  display: block;
+  color: var(--traco-cachorro);
+}
+
+.traco-linha {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.traco-ponto {
+  fill: currentcolor;
+}
+
+/* Ao fechar o Dia o traço se desenha uma vez, em 300 ms e em linha reta (linear); olho e focinho
+   aparecem ao fim. Sem a classe `desenha`, ou com movimento reduzido, o cachorro já está pronto. */
+@media (prefers-reduced-motion: no-preference) {
+  .traco-do-cachorro.desenha .traco-linha {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: traco-desenha 300ms linear forwards;
+  }
+
+  .traco-do-cachorro.desenha .traco-ponto {
+    opacity: 0;
+    animation: traco-aparece 1ms linear 300ms forwards;
+  }
+}
+
+@keyframes traco-desenha {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes traco-aparece {
+  to {
+    opacity: 1;
+  }
+}

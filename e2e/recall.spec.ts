@@ -17,10 +17,10 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
 
-  // Captura em menos de 30 s (Parte 2 §17), pelo botão global.
+  // Captura em menos de 30 s (Parte 2 §17), pelo "+" do título do Hoje (P2 do Ponto de luz).
   const t0 = Date.now();
   // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
-  await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
+  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
   await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
   await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
@@ -102,8 +102,12 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
 
   // Disciplina e ponto opcionais, fora de "mais detalhes", lembrados no registro seguinte e
-  // depois de recarregar (D25).
-  await page.getByRole('link', { name: /^(Registrar erro|Novo registro de erro)$/ }).click();
+  // depois de recarregar (D25). O "+" fica no título do Hoje e do Fixar, não na Trilha.
+  await page
+    .getByRole('navigation', { name: 'Áreas' })
+    .getByRole('link', { name: 'Fixar', exact: true })
+    .click();
+  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
   await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
   await page
     .getByLabel('Ponto do edital (opcional)')
@@ -204,7 +208,7 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   ).toBeVisible();
   await semViolacoes(page);
   await page.getByRole('button', { name: 'Criar cartão' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Recall' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
 
   // Dia seguinte: a Frase e o cartão vencem; cada modo revisa o seu.
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));

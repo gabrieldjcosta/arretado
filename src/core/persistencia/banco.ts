@@ -41,8 +41,12 @@ export interface Alteracao {
   usuarioId: string;
   colecao: NomeColecao;
   registroId: string;
-  /** `gravar` = registro completo; `atualizar` = campos alterados; `remover` = apagamento físico. */
-  operacao: 'gravar' | 'atualizar' | 'remover';
+  /**
+   * `gravar` = registro completo; `atualizar` = campos alterados; `remover` = apagamento físico;
+   * `acervo-adesao` = árvore de um item do acervo por referência (`dados` = `ReferenciaDeAcervo`;
+   * os registros vêm da fonte do acervo, ver `lote-acervo.ts`).
+   */
+  operacao: 'gravar' | 'atualizar' | 'remover' | 'acervo-adesao';
   dados?: Record<string, unknown>;
   removidos?: string[];
 }

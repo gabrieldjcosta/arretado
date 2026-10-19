@@ -61,7 +61,9 @@ export function Acervo() {
   }, [fonte, tentativa]);
 
   const carregarNormas = useCallback(async (r: typeof repo) => {
-    const normas = await r.colecao('normas').todosDoUsuario();
+    const normas = (await r.colecao('normas').todosDoUsuario()).filter(
+      (n) => n.excluidoEm === null,
+    );
     return {
       adicionadas: new Set(normas.flatMap((n) => (n.origemAcervo ? [n.origemAcervo.id] : []))),
       coladas: normas.filter((n) => n.origemAcervo === undefined),
@@ -69,7 +71,10 @@ export function Acervo() {
   }, []);
   const { dados: minhas } = useDados(carregarNormas);
   const carregarDisciplinas = useCallback(
-    async (r: typeof repo) => (await r.colecao('disciplinas').todosDoUsuario()).map((d) => d.nome),
+    async (r: typeof repo) =>
+      (await r.colecao('disciplinas').todosDoUsuario())
+        .filter((d) => d.excluidoEm === null)
+        .map((d) => d.nome),
     [],
   );
   const { dados: nomesDasMinhas } = useDados(carregarDisciplinas);
