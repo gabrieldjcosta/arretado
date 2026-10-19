@@ -10,6 +10,7 @@ import {
 } from '../../dominios/recall/servico';
 import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { usePassagemDeCartao } from '../componentes/passagem';
 import { marcarEscolha } from '../componentes/traco/escolha';
@@ -17,7 +18,6 @@ import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
-import { IconeDoFixar, type NomeDoIcone } from './icones';
 import { TopoDaRevisao } from './TopoDaRevisao';
 
 type Estado =
@@ -27,8 +27,8 @@ type Estado =
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
-  { resposta: 'li', rotulo: 'Fácil', icone: 'facil', classe: 'resposta-facil' },
-  { resposta: 'de_novo', rotulo: 'De novo', icone: 'deNovo', classe: 'resposta-dificil' },
+  { resposta: 'li', rotulo: 'Fácil', icone: 'marca', classe: 'resposta-facil' },
+  { resposta: 'de_novo', rotulo: 'De novo', icone: 'repetir', classe: 'resposta-dificil' },
 ] as const satisfies readonly {
   resposta: RespostaFrase;
   rotulo: string;
@@ -242,7 +242,7 @@ export function RevisarFrases() {
             aria-keyshortcuts={String(i + 1)}
             onClick={() => void responder(r.resposta)}
           >
-            <IconeDoFixar nome={r.icone} />
+            <Icone nome={r.icone} />
             {r.rotulo}
             <TracoDeSelecao chave={`frase:${r.resposta}`} ativo={escolhida === r.resposta} />
           </button>
@@ -253,8 +253,8 @@ export function RevisarFrases() {
           ? `${restam === 1 ? 'mais 1 frase' : `mais ${String(restam)} frases`} nesta rodada`
           : 'o fim desta rodada'}
       </LinhaDepois>
-      <details className="menu-drill">
-        <summary className="botao botao-texto">Mais opções</summary>
+      <details>
+        <summary className="botao botao-texto na-margem">Mais opções</summary>
         <div className="linha-acoes">
           <Link to={`/recall/frases/${atual.id}/cartao`} className="botao">
             Esconder um trecho (criar cartão)

@@ -1002,6 +1002,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Alvo abaixo de 44 px que a F1 não cobre (previsto)
 - **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Voltar à Biblioteca"; o "Backup e dados" virou botão de texto de 44 px na P2 do Ponto de luz). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
+- **Atualização (P6, 19/10/2026):** fechados "Voltar à Biblioteca" (`Voltar`, 44 px), `summary` "Mais" e "Definir até onde" (viram `botao botao-texto na-margem`), o rótulo do Acervo (linha de 44 px com a marca de 22 px), as linhas-link da Trilha, da Sessão e das Orientações e a Estrela (caixa de 44 × 44; 40 × 44 no celular e no cartão do modo foco). Restam os links em linha de texto (ver "Alvos que restam abaixo de 44 px (P6)"); ao trazer a P5, a frente do cartão em Cartões também passou a 44 px (`.cartao-frente`).
 
 ### Fonte nova pelo npm trava o PR na "Guarda do PR"
 - **Sintoma:** o PR que acrescenta uma fonte com `npm install @fontsource...` fica vermelho no check da guarda, sem erro de código. **Causa:** `package.json` e `package-lock.json` são caminhos protegidos; só passam com o rótulo `aprovado-gabriel`, que só o Gabriel põe. **Solução (Ponto de luz, D-D7):** a Gabarito entrou como arquivo, `src/apresentacao/fontes/gabarito-latin-wght-normal.woff2` (subconjunto `latin`, eixo de peso 400 a 900), com a licença em `fontes/OFL.txt`, um `@font-face` com `font-weight: 400 900` e `format('woff2-variations')`, e o `preload` no `index.html`. A Atkinson e a Literata seguem pelo `@fontsource`. **Prevenção:** fonte, ícone ou imagem nova entra como arquivo no app (nunca CDN, por ser local-first); dependência nova no `package.json` vai num PR à parte, pedindo o rótulo ao Gabriel.
@@ -1049,8 +1050,8 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Hoje com Sessão aberta: dois botões de vidro e dois "Continuar" (previsto)
 - **Sintoma:** com uma Sessão aberta, o Hoje tem o "Continuar" do aviso (`SessaoAberta`, `.principal`) e o botão de vidro da folha do Agora, e, se a ação do Agora é a leitura, o rótulo dele também é "Continuar". **Causa:** o aviso é do pacote A2 (Sessão) e ainda traz o primário de vidro; a regra "um vidro por tela" (D-D7) só fura nesse estado. Os dois links têm o mesmo nome em regiões com nomes diferentes ("Sessão aberta" e "Agora").
-- **Solução:** fica para a P6 (Sessão): o aviso passa a secundário, ou a folha cede o vidro. Enquanto isso, consulta de teste por região. **Prevenção:** esta entrada.
-- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+- **Solução:** resolvido na P6 (19/10/2026): `SessaoAberta` perdeu o vidro ("Continuar" é `botao`, "Encerrar" é `botao botao-texto`), o do Hoje é o do Agora; os dois links ainda têm o mesmo nome em regiões diferentes, então a consulta de teste segue por região. **Prevenção:** esta entrada.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026); resolvido na P6.
 
 ### Duas canetas, ou nenhuma, no Hoje; o cachorro não se desenha no teste (P3)
 - **Sintoma:** `svg.caneta` aparece duas vezes (ou nenhuma) no Hoje; ou o teste de unidade não vê o traço se desenhar. **Causa:** a caneta é uma por tela e muda de lugar por salto: com o Dia aberto, fica na linha de parada (encostada, só quando há folha do Agora); com o Dia fechado, só no Resumo do Dia (deitada), e `retrato.diaFechado` decide (`Parada comCaneta`). O jsdom não aplica CSS, então a animação (`traco-desenha`, 300 ms) só se confere no navegador.
@@ -1147,6 +1148,44 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** na bandeja aberta, o botão principal é o menos visível: negrito, sem fundo nem contorno, e "Sair do foco" parece mais um botão do que ele. **Causa:** `.em-foco .acoes-leitor button` (translúcido e atenuado, para os botões do canto) tem mais especificidade que `.principal`.
 - **Solução:** `.em-foco .bandeja-itens button.principal` devolve o vidro de ação (e o hover dele); "Sair do foco" é o que recua, de propósito.
 - **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Glifo trocado por SVG muda o nome acessível e quebra teste (P6)
+- **Sintoma:** depois que `←`, `✓`, `✎` viram `Icone`, falham `getByRole('link', { name: '← Biblioteca' })` e `toHaveTextContent('A jurisdição penal✎ será exercida.')` (`Leitor.test.tsx`), `within(botao).getByText('✓')` (`Acervo.test.tsx`) e o E2E `/^← Voltar a Art\. 5º, XLVII/` (`e2e/leitor.spec.ts`). **Causa:** o glifo era texto e entrava no nome e no `textContent`; o SVG é `aria-hidden` e não tem texto.
+- **Solução:** o nome fica sem o glifo (`Voltar nome="Voltar à Biblioteca"` com o texto visível "Biblioteca", que o nome contém, WCAG 2.5.3; `/^Voltar a Art\. 5º, XLVII/`); a marca do Acervo se confere pelo SVG (`.item-acervo-marca svg`), além do `aria-pressed`. **Prevenção:** ao trocar glifo por ícone, `git grep -n` do glifo em `src` e `e2e` antes de rodar a suíte; o ícone nunca entra no nome. O Fixar saiu da P5 já com SVG (juntado ao `Icone` na P6); resta só o `→` de `Perfis.tsx`.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### `.discreto` ficou sublinhado no cabeçalho e no menu da Ajuda (P6, tratado)
+- **Sintoma:** com `.discreto` igual a `.botao-texto`, "Ajuda" e os itens do menu dela passariam a 14 px, peso 500 e sublinhados. **Causa:** o cabeçalho usava `.discreto` só para tirar a caixa do botão.
+- **Solução:** `.acoes-globais .ajuda-botao, .menu-ajuda-itens .discreto` devolvem 15 px, peso 600 e sem sublinhado; nas telas, `.discreto` é o fantasma sublinhado (o que restou no Fixar, da P5, é o mesmo botão). **Prevenção:** ao mudar uma classe usada em muitas telas, `git grep -n 'discreto' src` e conferir cada lugar na captura.
+- **Origem:** previsto e tratado na P6 do Ponto de luz (19/10/2026).
+
+### `<summary>` com `.botao` fica com o recuo ou o `display` errados (P6)
+- **Sintoma:** o `summary` sozinho num `<details>`, com `botao botao-texto na-margem`, saía com recuo e alinhamento diferentes dos outros botões-texto. **Causa:** regras de componente com o pai no seletor (`.pontos-novo > summary`, `.tarefas-mais > summary`, `.importar-ajuda-ia summary`) têm mais especificidade que `.botao` e `.na-margem` e redefinem `display` e `padding`.
+- **Solução:** essas regras saíram (o `summary` é o botão). **Prevenção:** ao pôr `.botao` num `summary`, `git grep -n 'summary' src --include=*.css` e apagar o que redefine `display`, `padding` e `margin`.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### Estrela com alvo de 44 px sem mexer no texto (P6)
+- **Sintoma:** a Estrela media 24 × 29 (pergunta aberta no PR #201). **Causa:** a calha tem 24 px e a caixa do botão era a da calha; alargar para a direita pisaria no texto (no modo foco a margem do lido é 0).
+- **Solução:** a caixa do botão passa a 44 × 44, ainda fora do fluxo: `inset-inline-start: calc(var(--calha-estrela) - var(--estrela-largura))`, `padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela))` (o conteúdo segue com 24 px e a estrela no mesmo ponto) e `margin-block-start: calc((1.6em - var(--alvo)) / 2)` (o mesmo centro na altura). Não é `::after`: o `--medir` e o leitor de tela olham a caixa do botão. A largura é `min(var(--alvo), calha + --estrela-folga)`: a caixa só avança até onde há folga à esquerda, que é o recuo da página (`--gutter`, 16 px no celular) e, no cartão do modo foco, o recuo do cartão (1rem). Sem esse limite, a caixa passava 4 px da borda da tela e do cartão (o `overflow-y: auto` do cartão corta também no eixo x): o toque nos 4 px da esquerda não chegava ao botão e o anel de foco (`outline-offset: -2px`) perdia o lado esquerdo; o `getBoundingClientRect` não enxerga esse corte, só o `document.elementFromPoint`. Medido no Leitor (`estrela.mjs`, `estrela-clip.mjs`): 44 × 44 na lista de 700 px para cima, 40 × 44 no celular e no cartão do modo foco, o SVG no mesmo centro, o texto a 66 px da esquerda no celular e 413 px no desktop. **Prevenção:** alvo maior que o desenho se faz na caixa do botão, com a posição compensada e conferida por `elementFromPoint` na ponta (o E2E `caixaInteiraDaEstrela` faz isso na lista e no modo foco, nos três aparelhos).
+- **Origem:** pergunta aberta na P4, fechada na P6 do Ponto de luz (19/10/2026).
+
+### Marcador de nota com SVG não pode crescer a linha do Leitor (P6, previsto)
+- **Sintoma esperado:** o lápis de 18 px (`.icone-svg`) dentro de uma linha de texto aumenta a altura dela, e o virtualizador mede e deriva. **Solução:** `button.marcador-nota .icone-svg { display: inline; width: 1em; height: 1em; vertical-align: -0.125em }`. Conferido injetando o mesmo marcador numa linha do Leitor (`marcador.mjs`): 115,19 px de altura antes e depois. **Prevenção:** ícone dentro de texto corrido se mede em `em`, nunca no tamanho de ícone de botão.
+- **Origem:** previsto e tratado na P6 do Ponto de luz (19/10/2026).
+
+### Alvos que restam abaixo de 44 px (P6)
+- **Sintoma:** `capturas-ui.mjs --medir` ainda lista as notas de vigência do Leitor ("(Redação dada pela Lei nº …)", 278 × 19), as remissões no texto ("II", 15 × 27), "Fazer agora" no Hoje (74 × 19), "Aparência" no meio de uma frase de Perfis (63 × 19) e, no Fixar, "registrar um erro" (118 × 21, na linha "Depois:"). **Causa:** são links em linha de texto, a exceção "em linha" da WCAG 2.5.8 (o alvo é limitado pela altura da linha); a nota de vigência é uma linha miúda inteira de link, e dar 44 px a cada uma deixaria cada artigo bem mais alto.
+- **Solução:** nenhuma na P6; decisão do Gabriel (ampliar as notas ou aceitar a exceção). O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### As capturas `--rotas todas` não mostram a Sessão aberta (P6)
+- **Sintoma:** `/sessao/atual`, o Hoje com Sessão aberta e a faixa da Sessão na revisão e no Leitor saem como "Nenhuma Sessão aberta". **Causa:** o estado semeado não tem Sessão aberta, e o app a cria só pela interface. **Solução:** `sessao-aberta.mjs` (em `/mnt/project-files/redesenho/ponto-de-luz/p6/`): começa a Sessão pela tela, passa por Hoje, Sessão rodando, pausada, Leitor, revisão e "Encerrar a Sessão" e mede vidro e alvos de cada uma. **Prevenção:** tela que depende de uma ação da pessoa precisa de roteiro próprio.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### Duas fases em paralelo resolvem a mesma coisa com nomes diferentes e o merge não avisa (P6)
+- **Sintoma:** depois de trazer a P5 (#203) para a P6 (#206) o merge só deu conflito em documentos, mas o código tinha dois componentes de ícone (`IconeDoFixar` e `Icone`, com o mesmo SVG e caminhos repetidos), duas regras de recuo para o botão-texto (`.mais-da-lista .botao-texto`, `.menu-drill > summary` e outras, mais o `.na-margem`) e a classe `.icone-fixar` igual a `.icone-svg`. **Causa:** cada fase criou a sua ferramenta sem ver a da outra; o git só enxerga linhas iguais.
+- **Solução:** o `Icone` ficou com todos os desenhos (`repetir`, `onda`, `ajuda`, `relogio`), `recall/icones.tsx` e `.icone-fixar` saíram, e o recuo é só `.na-margem`. **Prevenção:** depois de mesclar uma fase paralela, `git diff --stat <base antiga> HEAD` e uma busca por `svg`, `margin-inline-start: -0.75rem` e por `summary` nos arquivos novos; o merge limpo não prova que há uma só ferramenta.
+- **Origem:** encontrado ao trazer a P5 para a P6 (19/10/2026).
 
 ### favicon.ico sai com as três imagens do mesmo tamanho (P7)
 - **Sintoma:** o `favicon.ico` declara 16, 32 e 48 px, mas as três imagens dentro dele são de 48. **Causa:** `scripts/icones-app.mjs` rasterizava com `Promise.all` numa só página do Playwright: os três `setViewportSize` correm juntos e o tamanho da janela é o do último que pediu.

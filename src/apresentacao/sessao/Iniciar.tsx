@@ -88,7 +88,7 @@ export function Iniciar() {
         )}
         {dada.origemDaAcao?.razao && <p className="sessao-detalhe">{dada.origemDaAcao.razao}</p>}
         <details>
-          <summary>Definir até onde (opcional)</summary>
+          <summary className="botao botao-texto na-margem">Definir até onde (opcional)</summary>
           {!dada.alvo && (
             <div className="campo">
               <label htmlFor="sessao-rotulo">O que vai estudar?</label>

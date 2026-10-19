@@ -21,8 +21,10 @@ export function Privacidade() {
       {POLITICA_V3.map((s) => (
         <Bloco key={s.id} secao={s} />
       ))}
-      <details className="cartao-bloco">
-        <summary>Versão anterior (política v2, para quem usa sem conta)</summary>
+      <details>
+        <summary className="botao botao-texto na-margem">
+          Versão anterior (política v2, para quem usa sem conta)
+        </summary>
         {anteriores.map((s) => (
           <Bloco key={s.id} secao={s} />
         ))}

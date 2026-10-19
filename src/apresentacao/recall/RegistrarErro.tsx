@@ -293,7 +293,7 @@ export function RegistrarErro() {
           </div>
         )}
         <details>
-          <summary className="botao discreto">Mais detalhes (opcional)</summary>
+          <summary className="botao botao-texto na-margem">Mais detalhes (opcional)</summary>
           <div role="group" aria-label="Resultado" className="linha-acoes grupo-resultado">
             {(['errou', 'acertou_inseguro'] as const).map((r) => (
               <button

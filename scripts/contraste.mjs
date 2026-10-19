@@ -128,7 +128,6 @@ export function pares() {
     // A estrutura da norma (P4): o nome da seção, atenuado, sobre a cal de "onde estou".
     ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
-    ['selecionado-atenuado', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
   );

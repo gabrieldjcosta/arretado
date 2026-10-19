@@ -1099,6 +1099,13 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   await expect(dialogo).toBeHidden();
   const marcador = texto.getByRole('button', { name: `Nota: ${outra}` });
   await expect(marcador).toBeVisible();
+  // O lápis é um ícone na altura da letra: o marcador não é mais alto que a linha de texto (a lista é
+  // virtualizada e a linha não pode crescer com ele).
+  const medidas = await marcador.evaluate((el) => ({
+    alto: el.getBoundingClientRect().height,
+    linha: parseFloat(getComputedStyle(el.parentElement ?? el).lineHeight),
+  }));
+  expect(medidas.alto).toBeLessThan(medidas.linha);
   await apertar(marcador, toque);
   await expect(dialogo.getByText('Cai na prova.')).toBeVisible();
   await semViolacoes(page);
@@ -1153,6 +1160,22 @@ async function estrelaDe(page: Page, endereco: string, nome: string) {
   const botao = page.getByRole('button', { name: nome, exact: true });
   await expect(botao).toBeVisible();
   return botao;
+}
+
+/**
+ * A caixa da estrela (D-D7, P6): 44 de altura e, de largura, ao menos 40 (44 onde há folga à esquerda:
+ * o celular e o cartão do modo foco têm 16 px), e inteira à vista: o toque na ponta esquerda dela
+ * chega ao botão, sem o corte da borda da tela nem do cartão.
+ */
+async function caixaInteiraDaEstrela(botao: Locator) {
+  const caixa = await botao.evaluate((el) => {
+    const c = el.getBoundingClientRect();
+    const sob = document.elementFromPoint(c.left + 2, c.top + c.height / 2);
+    return { largura: c.width, altura: c.height, acerta: sob?.closest('button.estrela') === el };
+  });
+  expect(caixa.altura).toBeCloseTo(44, 0);
+  expect(caixa.largura).toBeGreaterThanOrEqual(40);
+  expect(caixa.acerta).toBe(true);
 }
 
 /** As origens das estrelas gravadas no IndexedDB (as não excluídas), em ordem. */
@@ -1238,9 +1261,9 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   expect(await art10.evaluate((el) => el.getBoundingClientRect().height)).toBe(alturaAntes);
   expect(Math.abs((await distanciaDoAlto(secao)) - alto)).toBeLessThan(1);
   // A herdada é só a barra tracejada; o botão aparece na linha ativa.
-  await expect(
-    await estrelaDe(page, 'art10', 'Estrela: Art. 10 (herdada de Seção I)'),
-  ).toHaveAttribute('aria-pressed', 'true');
+  const estrelaDoArt10 = await estrelaDe(page, 'art10', 'Estrela: Art. 10 (herdada de Seção I)');
+  await expect(estrelaDoArt10).toHaveAttribute('aria-pressed', 'true');
+  await caixaInteiraDaEstrela(estrelaDoArt10);
   const barra = page.locator('.linha-leitor[data-estrela-origem="herdada"]').first();
   expect(await barra.evaluate((el) => getComputedStyle(el, '::before').backgroundImage)).toContain(
     'repeating-linear-gradient',
@@ -1271,7 +1294,9 @@ test('estrela: estrelar a Seção I propaga; desmarcar um artigo vira exceção;
   // No modo foco, o mesmo controle; estrelar de novo o art. 11 desfaz a exceção.
   await entrarNoFocoCorrido(page, toque);
   // A linha ativa pode ter mudado com a moldura que saiu: o ponteiro a reativa.
-  await estrelaDe(page, 'art11', 'Estrela: Art. 11 (exceção: fora da estrela de Seção I)');
+  await caixaInteiraDaEstrela(
+    await estrelaDe(page, 'art11', 'Estrela: Art. 11 (exceção: fora da estrela de Seção I)'),
+  );
   await semViolacoes(page);
   await apertar(excecao, toque);
   await expect(estrela('Estrela: Art. 11 (herdada de Seção I)')).toBeVisible();
@@ -1659,7 +1684,7 @@ test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "
   await previa.getByRole('button', { name: 'Ir para Art. 84, XIX' }).click();
   const alvo = page.locator('[data-endereco="art84.incXIX"]');
   await expect(alvo).toBeInViewport();
-  const voltar = page.getByRole('button', { name: /^← Voltar a Art\. 5º, XLVII/ });
+  const voltar = page.getByRole('button', { name: /^Voltar a Art\. 5º, XLVII/ });
   await expect(voltar).toBeVisible();
   await semViolacoes(page);
   await voltar.click();

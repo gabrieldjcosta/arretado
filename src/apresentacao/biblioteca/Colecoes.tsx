@@ -15,14 +15,12 @@ import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 const TEXTOS = {
   sumulas: {
     titulo: 'Súmulas',
-    icone: 'S',
     vazio: 'Nenhuma súmula ainda',
     exemplo: 'súmula 593, SV 11',
     explica: 'Adicione as coleções de súmulas do acervo para lê-las e achá-las pelo número.',
   },
   teses: {
     titulo: 'Teses',
-    icone: 'T',
     vazio: 'Nenhuma tese ainda',
     exemplo: 'tese 12',
     explica: 'Adicione as teses do acervo para lê-las e achá-las pelo número.',
@@ -127,7 +125,6 @@ export function Colecoes({ especie }: { especie: EspecieDeColecao }) {
                 <li key={a.norma.id}>
                   <LinhaLista
                     para={paraLeitor(a)}
-                    icone={t.icone}
                     titulo={a.norma.tituloCurto}
                     {...(a.norma.ementa ? { apoio: a.norma.ementa } : {})}
                   />
@@ -145,7 +142,6 @@ export function Colecoes({ especie }: { especie: EspecieDeColecao }) {
                 <li key={n.id}>
                   <LinhaLista
                     para={`/biblioteca/normas/${n.id}`}
-                    icone={t.icone}
                     titulo={n.tituloCurto}
                     {...(n.ementa ? { apoio: n.ementa } : {})}
                   />

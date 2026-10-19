@@ -25,7 +25,7 @@ export function Dados() {
         </p>
       )}
       <Salvaguarda />
-      <section className="cartao-bloco como-guardar-backup" aria-labelledby="t-como-guardar">
+      <section className="como-guardar-backup" aria-labelledby="t-como-guardar">
         <h2 id="t-como-guardar">{COMO_GUARDAR_BACKUP.titulo}</h2>
         <ol className="passos-backup">
           <li>{COMO_GUARDAR_BACKUP.passo1}</li>

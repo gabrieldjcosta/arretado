@@ -29,13 +29,6 @@
   gap: var(--espaco-2, 0.5rem);
 }
 
-.pontos-novo > summary {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  cursor: pointer;
-}
-
 .pontos-confirmar {
   display: flex;
   flex-wrap: wrap;

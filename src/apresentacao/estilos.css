@@ -156,7 +156,6 @@
   /* Marcado (caixa, rádio, botão ligado): tinta cheia com a marca em cal. */
   --selecionado-fundo: var(--tinta);
   --selecionado-texto: var(--cal);
-  --selecionado-atenuado: #c9d1dc;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--tinta) 6%, var(--superficie));
 
@@ -260,7 +259,6 @@
     --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
     --selecionado-fundo: var(--noite-tinta);
     --selecionado-texto: var(--noite);
-    --selecionado-atenuado: #3b4a63;
     --selecionado-anel: transparent;
     --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
     --regua-fundo: rgb(238 243 248 / 8%);
@@ -338,7 +336,6 @@
   --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
   --selecionado-fundo: var(--noite-tinta);
   --selecionado-texto: var(--noite);
-  --selecionado-atenuado: #3b4a63;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
   --regua-fundo: rgb(238 243 248 / 8%);
@@ -577,6 +574,19 @@ button,
    vem depois no arquivo e, com a mesma especificidade, venceria (display, recuo e raio). */
 .acoes-globais .ajuda-botao {
   padding: 0 0.75rem;
+}
+
+/* Os controles da casca (Ajuda e o menu dela) ficam em texto simples: o sublinhado de `.discreto` é
+   da ação ao lado da primária, na página. */
+.acoes-globais .ajuda-botao,
+.menu-ajuda-itens .discreto {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu-ajuda-itens .discreto {
+  padding: 0 1.25rem;
 }
 
 .acoes-globais .conta-botao {
@@ -902,15 +912,12 @@ dialog .perigoso {
   color: var(--perigo-texto);
 }
 
-.discreto {
-  background: transparent;
-  border-color: transparent;
-}
-
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
    onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
-   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. */
-.botao-texto {
+   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. `.discreto` é o mesmo botão (antes
+   era texto sem sublinhado e com 20 px de recuo, que não parecia ação). */
+.botao-texto,
+.discreto {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
@@ -929,6 +936,20 @@ dialog .perigoso {
     opacity: 1;
     background: color-mix(in srgb, currentcolor 8%, transparent);
   }
+}
+
+/* O botão-texto sozinho no começo da linha ("Voltar", "Mais", "Importar outra planilha"): o recuo de
+   12 px do alvo sai pela margem, e a letra fica alinhada ao texto da página. Fora dele (ao lado de
+   outro botão) o recuo é o espaço entre os dois. */
+.na-margem {
+  margin-inline-start: -0.75rem;
+}
+
+/* Ícone de traço único (componentes/Icone.tsx): na altura do texto, na cor dele. */
+.icone-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
 }
 
 /* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
@@ -1161,6 +1182,11 @@ legend {
   padding: 1.25rem;
   margin-bottom: 1rem;
   box-shadow: var(--sombra);
+}
+
+/* O título abre o cartão: a margem de cima dele somada ao recuo do cartão deixava um vazio de 45 px. */
+.cartao-bloco > h2:first-child {
+  margin-top: 0;
 }
 
 .linha-acoes {
@@ -1409,25 +1435,21 @@ button.grande,
   text-decoration: none;
 }
 
-.frases .botao-texto {
-  margin-inline-start: -0.75rem;
+/* A frente do cartão é o link da linha (Cartões): alvo de 44 px, não os 21 px do texto. */
+.cartao-frente {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo);
 }
 
-/* "Ver os erros", "Voltar às frases", "Filtros" e "Mais opções": o texto alinhado à margem, o alvo de
-   44 px estendido por fora. */
+/* O parágrafo do link "Ver os erros" e o de "Voltar às frases" (o texto alinhado à margem é do
+   `.na-margem`). */
 .mais-da-lista {
   margin: 0.5rem 0 0;
 }
 
 .voltar-da-lista {
   margin: 0;
-}
-
-.mais-da-lista .botao-texto,
-.voltar-da-lista .botao-texto,
-.filtros-da-lista > summary,
-.menu-drill > summary {
-  margin-inline-start: -0.75rem;
 }
 
 .cartao-drill {
@@ -1602,12 +1624,6 @@ a.item-norma strong {
   gap: 0 1rem;
   margin: -0.5rem 0 0.5rem;
   color: var(--texto-atenuado);
-}
-
-/* "Ir ao lido até" é o botão fantasma (.botao-texto): o recuo do alvo de 44 px sai pela margem, e o
-   texto dele alinha com o "Lido até" quando passa para a linha de baixo. */
-.lido-ate .botao-texto {
-  margin-inline-start: -0.75rem;
 }
 
 /* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
@@ -1928,14 +1944,24 @@ dialog.dialogo-busca {
   }
 }
 
+/* Alvo de 44 px (D-D7, P6) com a estrela onde estava: a caixa avança para a margem da página, à esquerda
+   da calha (nunca sobre o texto), e sobe e desce o que falta à altura de 1,6em, o que não mexe na altura
+   da linha. O recuo devolve a calha ao conteúdo, que centra a estrela na mesma posição de antes. A
+   caixa só avança até onde há folga (--estrela-folga: o recuo da página, 16 px no celular, e o recuo do
+   cartão do modo foco, 1rem): 44 × 44 de 700 px para cima, 40 × 44 onde a folga é menor, sem o corte
+   da borda da tela nem do cartão (que levaria o anel de foco junto). */
 button.estrela {
+  --estrela-folga: var(--gutter);
+  --estrela-largura: min(var(--alvo), calc(var(--calha-estrela) + var(--estrela-folga)));
   position: absolute;
-  inset-inline-start: 0;
-  width: var(--calha-estrela);
-  height: 1.6em;
+  inset-inline-start: calc(var(--calha-estrela) - var(--estrela-largura));
+  width: var(--estrela-largura);
+  height: var(--alvo);
+  margin-block-start: calc((1.6em - var(--alvo)) / 2);
   min-width: 0;
   min-height: 0;
   padding: 0;
+  padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela));
   border: 0;
   border-radius: 4px;
   background: transparent;
@@ -2210,6 +2236,17 @@ button.estrela:focus-visible {
   color: var(--texto-atenuado);
   text-align: left;
   cursor: pointer;
+  gap: 0.25rem;
+}
+
+/* A seta de abrir (ícone, não glifo): para baixo aberto, para a direita fechado. */
+.alternar-linha .icone-svg {
+  width: 1em;
+  height: 1em;
+}
+
+.alternar-linha[aria-expanded='false'] .icone-svg {
+  transform: rotate(-90deg);
 }
 
 /* Revogado e vetado (8.10): uma linha atenuada, que abre o resto. */
@@ -2343,6 +2380,14 @@ button.marcador-nota {
   font-size: 0.75em;
   line-height: 1.2;
   vertical-align: 0.15em;
+}
+
+/* O lápis da nota é um ícone na altura da letra: não aumenta a linha (a lista é virtualizada). */
+button.marcador-nota .icone-svg {
+  display: inline;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
 }
 
 /* As ações da marcação no lugar do grupo fixo: as 3 cores, Nota e fechar; quebram em duas linhas
@@ -2747,6 +2792,11 @@ dialog.dialogo-acoes {
   box-shadow: var(--sombra-folha);
 }
 
+/* O cartão rola por dentro e corta o que passa do recuo dele (1rem): a caixa da estrela cabe nele. */
+.cartao-artigo button.estrela {
+  --estrela-folga: 1rem;
+}
+
 /* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o
    cartão na vertical (a largura já centra em .area-artigo). O respiro de cima iguala o de baixo,
    que reserva o canto dos botões fixos; o cartão só rola por dentro quando o artigo não cabe. */
@@ -2984,30 +3034,28 @@ dialog.dialogo-previa .linha-acoes button {
 
 /* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
 
+/* Linha de lista (D-D7, P6): em linha sobre a areia, só o filete do `li` embaixo; sem cartão por item. */
+.lista-de-linhas > li {
+  padding: 0;
+  min-height: 0;
+}
+
 .linha-lista {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
   min-height: 64px;
-  padding: 0.5rem 0.75rem;
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-cartao);
+  padding: 0.5rem 0;
   color: var(--texto);
   text-decoration: none;
 }
 
-.linha-lista-icone {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--alvo);
-  height: var(--alvo);
-  border-radius: var(--raio-campo);
-  background: var(--quente);
-  color: var(--texto);
-  font-weight: 700;
+@media (hover: hover) {
+  .linha-lista:hover .linha-lista-titulo {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .linha-lista-texto {
@@ -3090,7 +3138,6 @@ dialog.dialogo-previa .linha-acoes button {
 
 .lista-de-linhas {
   display: grid;
-  gap: 0.5rem;
 }
 
 /* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. No topo, "Sair" e o andamento
@@ -3201,12 +3248,6 @@ dialog.dialogo-previa .linha-acoes button {
 
 .estado-texto.estado-vencido {
   min-width: 0;
-}
-
-.icone-fixar {
-  width: 1.125rem;
-  height: 1.125rem;
-  flex: none;
 }
 
 /* "Sair do foco": recuado, sem competir com "Próximo artigo". */

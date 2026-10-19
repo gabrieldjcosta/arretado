@@ -14,6 +14,7 @@ import {
 } from '../../dominios/recall/servico';
 import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { usePassagemDeCartao } from '../componentes/passagem';
 import { marcarEscolha } from '../componentes/traco/escolha';
@@ -22,7 +23,6 @@ import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
-import { IconeDoFixar, type NomeDoIcone } from './icones';
 import { ROTULO_RESPOSTA } from './rotulos';
 import { TopoDaRevisao } from './TopoDaRevisao';
 
@@ -34,9 +34,9 @@ type Estado =
 
 /** O desenho de cada resposta (traço único, `currentColor`): o rótulo diz o que é, o desenho acompanha. */
 const ICONE = {
-  errei: 'deNovo',
-  dificil: 'dificil',
-  facil: 'facil',
+  errei: 'repetir',
+  dificil: 'onda',
+  facil: 'marca',
 } as const satisfies Record<RespostaRevisao, NomeDoIcone>;
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
@@ -324,7 +324,7 @@ export function Drill() {
               aria-keyshortcuts={String(i + 1)}
               onClick={() => void responder(r)}
             >
-              <IconeDoFixar nome={ICONE[r]} />
+              <Icone nome={ICONE[r]} />
               {ROTULO_RESPOSTA[r]}
               <TracoDeSelecao chave={`resposta:${r}`} ativo={escolhida === r} />
             </button>
@@ -336,8 +336,8 @@ export function Drill() {
           ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
           : 'o fim desta rodada'}
       </LinhaDepois>
-      <details className="menu-drill">
-        <summary className="botao botao-texto">Mais opções</summary>
+      <details>
+        <summary className="botao botao-texto na-margem">Mais opções</summary>
         <div className="linha-acoes">
           <button
             type="button"

@@ -12,6 +12,7 @@ import {
   type StatusDoPonto,
 } from '../../../dominios/pontos';
 import { Selo } from '../../componentes/Selo';
+import { Voltar } from '../../componentes/Voltar';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { mensagem } from '../erros';
@@ -36,8 +37,8 @@ function NovaMateria({ aoErro }: { aoErro: (m: string | null) => void }) {
     );
   };
   return (
-    <details className="pontos-novo">
-      <summary>Nova matéria</summary>
+    <details>
+      <summary className="botao botao-texto na-margem">Nova matéria</summary>
       <form onSubmit={enviar} className="pontos-form">
         <div className="campo">
           <label htmlFor="nova-materia">Nome da matéria</label>
@@ -192,10 +193,10 @@ export function ListaDePontos() {
 
   return (
     <>
+      <Voltar para="/plano">Voltar à Trilha</Voltar>
       <h1>Pontos do programa</h1>
       <p className="dica">
-        O que cai (faixa) e o que você já fez (andamento) são coisas separadas.{' '}
-        <Link to="/plano">Voltar à Trilha</Link>
+        O que cai (faixa) e o que você já fez (andamento) são coisas separadas.
       </p>
       {erro && (
         <p role="alert" className="aviso falha">
@@ -261,8 +262,8 @@ export function ListaDePontos() {
                     );
                   })}
                 </ul>
-                <details className="pontos-novo">
-                  <summary>Mais</summary>
+                <details>
+                  <summary className="botao botao-texto na-margem">Mais</summary>
                   <NovoPonto disciplinaId={d.id} aoErro={setErro} />
                   <EditarMateria id={d.id} nome={d.nome} pontos={todos.length} aoErro={setErro} />
                 </details>
