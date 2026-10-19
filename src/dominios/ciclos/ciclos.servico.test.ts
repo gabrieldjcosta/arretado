@@ -6,6 +6,7 @@ import {
   CicloInvalido,
   cicloAtivo,
   criarCiclo,
+  desfazerUltimoAjuste,
   listarCiclos,
   posicaoDoCiclo,
   pularBloco,
@@ -112,5 +113,31 @@ describe('serviço de ciclos', () => {
     await expect(ajustarPeso(repo, ciclo.id, 'x', 2, 'manual')).rejects.toBeInstanceOf(
       CicloInvalido,
     );
+  });
+});
+
+describe('desfazer o ajuste por erro (C5)', () => {
+  it('volta o peso, registra a volta e só desfaz ajuste por erro ainda em vigor', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const civil = await repo.colecao('disciplinas').criar({ nome: 'Civil' });
+    const c = await criarCiclo(repo, {
+      nome: 'C',
+      modelo: 'manual',
+      pesos: [
+        { disciplinaId: penal.id, peso: 1 },
+        { disciplinaId: civil.id, peso: 1 },
+      ],
+    });
+    await expect(desfazerUltimoAjuste(repo, c.id)).rejects.toBeInstanceOf(CicloInvalido);
+    await ajustarPeso(repo, c.id, penal.id, 2, 'erro', 'Penal: 40% de erro');
+    const volta = await desfazerUltimoAjuste(repo, c.id);
+    expect(volta.pesos.find((p) => p.disciplinaId === penal.id)?.peso).toBe(1);
+    expect(volta.blocos).toHaveLength(2);
+    expect(volta.logDePesos?.map((r) => [r.origem, r.antes, r.depois])).toEqual([
+      ['erro', 1, 2],
+      ['manual', 2, 1],
+    ]);
+    await expect(desfazerUltimoAjuste(repo, c.id)).rejects.toBeInstanceOf(CicloInvalido);
   });
 });

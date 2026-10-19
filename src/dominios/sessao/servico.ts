@@ -121,12 +121,17 @@ export async function encerrarSessao(
   const fim = repo.ctx.agora().toISOString();
   const pausas = fecharUltimaPausa(s, fim);
   const proximoPasso = vazioVira(fechamento?.proximoPasso);
+  const feitas = fechamento?.questoesFeitas;
+  const acertadas = Math.min(fechamento?.questoesAcertadas ?? 0, feitas ?? 0);
   const nova = await repo.colecao('sessoes').atualizar(id, {
     estado: 'encerrada',
     fim,
     pausas,
     duracaoSegundos: duracaoEmSegundos({ inicio: s.inicio, pausas }, fim),
     ...(proximoPasso ? { proximoPasso } : {}),
+    ...(feitas !== undefined && feitas > 0
+      ? { questoesFeitas: Math.floor(feitas), questoesAcertadas: Math.floor(acertadas) }
+      : {}),
   });
   repo.eventos.emitir('sessao.encerrada', { sessaoId: id });
   return nova;

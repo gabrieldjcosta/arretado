@@ -140,3 +140,24 @@ export async function posicaoDoCiclo(repo: Repositorio, ciclo: Ciclo) {
   ];
   return posicaoNoCiclo(ciclo.blocos.length, marcas);
 }
+
+/** Último ajuste por erro ainda em vigor (o peso atual é o que ele deixou); `undefined` se não houver. */
+export function ultimoAjusteDesfazivel(ciclo: Ciclo) {
+  const log = ciclo.logDePesos ?? [];
+  for (let i = log.length - 1; i >= 0; i--) {
+    const r = log[i];
+    if (r?.origem !== 'erro') continue;
+    const atual = ciclo.pesos.find((p) => p.disciplinaId === r.disciplinaId)?.peso;
+    return atual === r.depois ? r : undefined;
+  }
+  return undefined;
+}
+
+/** Desfaz o último ajuste por erro: volta o peso e registra a volta no log (nada é apagado). */
+export async function desfazerUltimoAjuste(repo: Repositorio, id: string): Promise<Ciclo> {
+  const ciclo = await repo.colecao('ciclos').obter(id);
+  if (!ciclo) throw new CicloInvalido('Ciclo não encontrado.');
+  const r = ultimoAjusteDesfazivel(ciclo);
+  if (!r) throw new CicloInvalido('Não há ajuste para desfazer.');
+  return ajustarPeso(repo, id, r.disciplinaId, r.antes, 'manual', 'Ajuste desfeito');
+}

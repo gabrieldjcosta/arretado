@@ -158,3 +158,19 @@ describe('Sessão leve (A2)', () => {
     expect(sugerirProximoPasso({})).toBe('');
   });
 });
+
+describe('questões ao encerrar (C5)', () => {
+  it('grava feitas e acertos (acertos nunca passam das feitas); zero ou vazio não grava', async () => {
+    const { repo } = await repositorioDeTeste();
+    const a = await encerrarSessao(repo, (await iniciarSessao(repo, {})).id, {
+      questoesFeitas: 10,
+      questoesAcertadas: 12,
+    });
+    expect(a).toMatchObject({ questoesFeitas: 10, questoesAcertadas: 10 });
+    const b = await encerrarSessao(repo, (await iniciarSessao(repo, {})).id, {
+      questoesFeitas: 0,
+      questoesAcertadas: 0,
+    });
+    expect(b.questoesFeitas).toBeUndefined();
+  });
+});

@@ -2,7 +2,15 @@
 import { useState } from 'react';
 import { Link, Route, Routes } from 'react-router';
 import type { Ciclo as CicloGravado } from '../../../core/modelo';
-import { ajustarPeso, ativarCiclo, pularBloco, PESO_MAX, PESO_MIN } from '../../../dominios/ciclos';
+import {
+  ajustarPeso,
+  ativarCiclo,
+  desfazerUltimoAjuste,
+  pularBloco,
+  ultimoAjusteDesfazivel,
+  PESO_MAX,
+  PESO_MIN,
+} from '../../../dominios/ciclos';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { Voltar } from '../../componentes/Voltar';
 import { useDados, useRepositorio } from '../../dados/contexto';
@@ -70,6 +78,80 @@ function Pesos({ ciclo, dados }: { ciclo: CicloGravado; dados: DadosDoCiclo }) {
   );
 }
 
+/** Sugestão de peso pelo desempenho: nunca aplica sozinha, e o último ajuste volta com um toque. */
+function Ajustes({ ciclo, dados }: { ciclo: CicloGravado; dados: DadosDoCiclo }) {
+  const repo = useRepositorio();
+  const [adiadas, setAdiadas] = useState<readonly string[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
+  const visiveis = dados.sugestoes.filter((x) => !adiadas.includes(x.disciplinaId));
+  const desfazivel = ultimoAjusteDesfazivel(ciclo);
+  const rodar = (promessa: Promise<unknown>) => {
+    setErro(null);
+    promessa.catch((x: unknown) => {
+      setErro(mensagem(x));
+    });
+  };
+  if (visiveis.length === 0 && !desfazivel) return null;
+  return (
+    <section aria-labelledby="ciclo-ajustes" className="cartao-bloco">
+      <h2 id="ciclo-ajustes">Ajuste pelo seu desempenho</h2>
+      <p className="dica">Sugestão sua para o ciclo, não um cartão de revisão. Você decide.</p>
+      {erro && (
+        <p role="alert" className="erro">
+          {erro}
+        </p>
+      )}
+      <ul className="lista-simples">
+        {visiveis.map((x) => (
+          <li key={x.disciplinaId}>
+            <span>
+              {x.razao}{' '}
+              <span className="dica">
+                {x.para > x.de ? 'Sobe' : 'Desce'} de {x.de} para {x.para}{' '}
+                {x.para === 1 ? 'vez' : 'vezes'} por volta.
+              </span>
+            </span>
+            <span className="ciclo-passos">
+              <button
+                type="button"
+                className="principal"
+                onClick={() => {
+                  rodar(ajustarPeso(repo, ciclo.id, x.disciplinaId, x.para, 'erro', x.razao));
+                }}
+              >
+                Aceitar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdiadas([...adiadas, x.disciplinaId]);
+                }}
+              >
+                Agora não
+              </button>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {desfazivel && (
+        <p>
+          Último ajuste: {nomeDe(dados, desfazivel.disciplinaId)}, de {desfazivel.antes} para{' '}
+          {desfazivel.depois}.{' '}
+          <button
+            type="button"
+            className="botao-texto"
+            onClick={() => {
+              rodar(desfazerUltimoAjuste(repo, ciclo.id));
+            }}
+          >
+            Desfazer
+          </button>
+        </p>
+      )}
+    </section>
+  );
+}
+
 function Volta({ ciclo, dados }: { ciclo: CicloGravado; dados: DadosDoCiclo }) {
   const repo = useRepositorio();
   const atual = dados.posicao?.indice ?? 0;
@@ -124,6 +206,7 @@ function Visao() {
         <>
           <p className="dica">{ativo.nome}</p>
           <Volta ciclo={ativo} dados={dados} />
+          <Ajustes ciclo={ativo} dados={dados} />
           <Pesos ciclo={ativo} dados={dados} />
           <Link to="/plano/ciclo/novo" className="botao botao-texto na-margem">
             Criar outro ciclo
