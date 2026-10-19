@@ -115,6 +115,18 @@ const ESPERA_PARA_GRAVAR = 800;
 const QUADROS_NO_LUGAR = 3;
 /** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
 const LIMITE_PARA_VOLTAR = 2000;
+/** Quadros em que o alto da tela é reconferido depois de trocar o modo foco (as linhas se remedem). */
+const QUADROS_DA_TROCA = 12;
+/** As teclas que rolam a página: a pessoa rolando encerra a conferência do alto (F e Esc, não). */
+const TECLAS_DE_ROLAGEM = new Set([
+  'PageUp',
+  'PageDown',
+  'Home',
+  'End',
+  'ArrowUp',
+  'ArrowDown',
+  ' ',
+]);
 /** Atalho da busca na norma (11.6): não é F (modo foco) nem E (registrar erro). */
 const TECLA_DA_BUSCA = '/';
 /**
@@ -581,12 +593,16 @@ function LeitorAberto({
   }, [porArtigo, ordem, unidades, linhas, artigoAtual]);
 
   // Modo foco (11.1): a moldura do Shell some (atributo na raiz; ver estilos.css) e o leitor tira a
-  // barra dele. A troca muda só o que fica acima da lista, não as linhas (a coluna tem a mesma
-  // largura): o mesmo dispositivo continua no alto da tela, na mesma altura dentro da linha. A
-  // conta parte da rolagem de antes da troca (o navegador pode já tê-la ajustado ao tirar a
-  // moldura), é feita antes da pintura e conferida no quadro seguinte. Durante a volta à posição
-  // guardada (9.7), quem acerta a rolagem é a volta, que já confere a cada quadro.
+  // barra dele. A troca muda o que fica acima da lista e, com a estrutura ao lado (700 a 1199 px),
+  // a largura da coluna: o mesmo dispositivo continua no alto da tela, na mesma altura dentro da
+  // linha. A conta parte da rolagem de antes da troca (o navegador pode já tê-la ajustado ao tirar a
+  // moldura), é feita antes da pintura e conferida nos quadros seguintes (as linhas se remedem).
+  // Durante a volta à posição guardada (9.7), quem acerta a rolagem é a volta, que já confere a
+  // cada quadro.
   const focoAntes = useRef(modoFoco);
+  // A linha do alto (e o quanto dela já passou) de uma troca que ainda confere o alto: a troca
+  // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou.
+  const ancoraDaTroca = useRef<{ index: number; dentro: number } | undefined>(undefined);
   // O controle com o foco do teclado saiu da tela na troca (a barra do leitor, a do Shell): o foco
   // vai para o botão do canto, em vez de cair no corpo da página.
   const devolverFoco = useRef(false);
@@ -604,11 +620,18 @@ function LeitorAberto({
     }
     // Ainda nas medidas de antes da troca: o virtualizador só as refaz depois de `medir`.
     const margemAntes = margemMedida.current;
-    const alto = rolagem.current + barraFixaMedida.current;
-    const item = virtualizador.getVirtualItemForOffset(alto + FOLGA_DO_ALTO);
+    const pendente = ancoraDaTroca.current;
+    ancoraDaTroca.current = undefined;
+    const daAncora =
+      pendente && virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
+    const alto = daAncora
+      ? daAncora.start + pendente.dentro
+      : rolagem.current + barraFixaMedida.current;
+    const item = daAncora || virtualizador.getVirtualItemForOffset(alto + FOLGA_DO_ALTO);
     caixaDoLeitor.current?.style.removeProperty('--folga-do-foco');
     medir();
     let quadro = 0;
+    const encerrar = new AbortController();
     if (trocou && !voltandoAgora.current && item !== undefined && !porArtigoAgora.current) {
       const dentro = alto - item.start;
       if (item.index === 0 && dentro <= 0) {
@@ -621,25 +644,51 @@ function LeitorAberto({
         );
         // Perto do fim, a moldura que saiu encurta a página e a rolagem seria cortada (o texto
         // desceria e o dispositivo do alto mudaria): a folga do modo foco repõe o que faltou.
-        const maximo = document.documentElement.scrollHeight - window.innerHeight;
-        if (modoFoco && destino > maximo) {
-          caixaDoLeitor.current?.style.setProperty(
-            '--folga-do-foco',
-            `${String(Math.ceil(destino - maximo))}px`,
-          );
-        }
+        let folga = 0;
+        const garantirRolagem = (alvo: number) => {
+          const maximo = document.documentElement.scrollHeight - window.innerHeight;
+          if (!modoFoco || alvo <= maximo) return;
+          folga += Math.ceil(alvo - maximo);
+          caixaDoLeitor.current?.style.setProperty('--folga-do-foco', `${String(folga)}px`);
+        };
+        garantirRolagem(destino);
         window.scrollTo(0, destino);
-        quadro = requestAnimationFrame(() => {
+        // Com a estrutura ao lado (700 a 1199 px) a coluna do texto muda de largura na troca: as
+        // linhas de cima só são remedidas depois da pintura e o alto sai do lugar (o virtualizador
+        // não compensa quando a rolagem acabou de subir). Por isso a conferência dura alguns
+        // quadros, e a rolagem da pessoa a encerra.
+        let restantes = QUADROS_DA_TROCA;
+        ancoraDaTroca.current = { index: item.index, dentro };
+        const conferir = () => {
+          if (restantes <= 0) return;
           const desenhada = lista.current?.querySelector(`[data-index="${String(item.index)}"]`);
-          if (!desenhada) return;
-          const erro = desenhada.getBoundingClientRect().top - (barraFixaMedida.current - dentro);
-          if (Math.abs(erro) > 1) window.scrollBy(0, erro);
-        });
+          if (desenhada) {
+            const erro = desenhada.getBoundingClientRect().top - (barraFixaMedida.current - dentro);
+            if (Math.abs(erro) > 1) {
+              garantirRolagem(window.scrollY + erro);
+              window.scrollBy(0, erro);
+            }
+          }
+          restantes -= 1;
+          if (restantes > 0) quadro = requestAnimationFrame(conferir);
+          else ancoraDaTroca.current = undefined;
+        };
+        quadro = requestAnimationFrame(conferir);
+        const parar = (e: Event) => {
+          if (e instanceof KeyboardEvent && !TECLAS_DE_ROLAGEM.has(e.key)) return;
+          restantes = 0;
+          ancoraDaTroca.current = undefined;
+          cancelAnimationFrame(quadro);
+        };
+        for (const gesto of ['wheel', 'touchmove', 'keydown']) {
+          window.addEventListener(gesto, parar, { passive: true, signal: encerrar.signal });
+        }
       }
       rolagem.current = window.scrollY;
     }
     return () => {
       cancelAnimationFrame(quadro);
+      encerrar.abort();
       delete raiz.dataset.modoFoco;
     };
   }, [modoFoco, porArtigo, medir, virtualizador]);
