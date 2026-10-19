@@ -7,6 +7,7 @@ import {
   separarCopiaDaNuvem,
   usarCopiaDaNuvem,
 } from '../../../integracoes/conta/backup-nuvem';
+import type { CopiaNaNuvem } from '../../../integracoes/conta';
 import { useRepositorio } from '../../dados/contexto';
 import { useServicoDeConta } from '../entrar/ContextoConta';
 import { PreviaImportacao, type Resolucoes } from './PreviaImportacao';
@@ -14,8 +15,8 @@ import { PreviaImportacao, type Resolucoes } from './PreviaImportacao';
 type Escolha = 'usar' | 'manter' | 'separar';
 
 type Etapa =
-  | { tipo: 'frase' }
-  | { tipo: 'escolher'; pacote: PacoteLido }
+  | { tipo: 'frase'; escolha?: Escolha }
+  | { tipo: 'escolher'; pacote?: PacoteLido }
   | { tipo: 'previa'; pacote: PacoteLido; previa: Previa }
   | { tipo: 'feito'; texto: string };
 
@@ -58,16 +59,21 @@ export function NuvemBackupRestaurar({
   recarregar = () => {
     window.location.reload();
   },
+  copia,
   aoFechar,
 }: {
   nome: string;
   data: string;
   recarregar?: () => void;
+  /** Inicia pelas escolhas no fim da migração; a cópia ainda só baixa após escolha explícita. */
+  copia?: CopiaNaNuvem;
   aoFechar: () => void;
 }) {
   const repo = useRepositorio();
   const servico = useServicoDeConta();
-  const [etapa, setEtapa] = useState<Etapa>({ tipo: 'frase' });
+  const [etapa, setEtapa] = useState<Etapa>(() =>
+    copia ? { tipo: 'escolher' } : { tipo: 'frase' },
+  );
   const [frase, setFrase] = useState('');
   const [escolha, setEscolha] = useState<Escolha | null>(null);
   const [nomeEspaco, setNomeEspaco] = useState(`Cópia da nuvem de ${data}`);
@@ -91,6 +97,22 @@ export function NuvemBackupRestaurar({
     void executar(async () => {
       const pacote = await abrirCopiaDaNuvem(servico, nome, frase);
       setFrase('');
+      if (etapa.tipo === 'frase' && etapa.escolha === 'usar') {
+        setEtapa({ tipo: 'previa', pacote, previa: await preverUsoDaCopia(repo, pacote) });
+        return;
+      }
+      if (etapa.tipo === 'frase' && etapa.escolha === 'separar') {
+        const { espaco } = await separarCopiaDaNuvem(
+          repo,
+          pacote,
+          nomeEspaco.trim() || `Cópia da nuvem de ${data}`,
+        );
+        setEtapa({
+          tipo: 'feito',
+          texto: `Cópia aberta no espaço separado "${espaco.nome}". Para juntar com o que está aqui, use Mesclar em "Espaços separados".`,
+        });
+        return;
+      }
       setEtapa({ tipo: 'escolher', pacote });
     });
   };
@@ -106,6 +128,10 @@ export function NuvemBackupRestaurar({
         return;
       }
       if (escolha === 'separar') {
+        if (!etapa.pacote) {
+          setEtapa({ tipo: 'frase', escolha });
+          return;
+        }
         const { espaco } = await separarCopiaDaNuvem(
           repo,
           etapa.pacote,
@@ -117,7 +143,12 @@ export function NuvemBackupRestaurar({
         });
         return;
       }
-      setEtapa({ ...etapa, tipo: 'previa', previa: await preverUsoDaCopia(repo, etapa.pacote) });
+      const pacote = etapa.pacote;
+      if (!pacote) {
+        setEtapa({ tipo: 'frase', escolha });
+        return;
+      }
+      setEtapa({ tipo: 'previa', pacote, previa: await preverUsoDaCopia(repo, pacote) });
     });
   };
 
@@ -168,8 +199,9 @@ export function NuvemBackupRestaurar({
       {etapa.tipo === 'escolher' && (
         <>
           <p>
-            A frase abriu a cópia: {totalDeRegistros(etapa.pacote)} registros, guardados em {data}.
-            Nada mudou neste aparelho até você escolher.
+            {etapa.pacote
+              ? `A frase abriu a cópia: ${totalDeRegistros(etapa.pacote)} registros, guardados em ${data}. Nada mudou neste aparelho até você escolher.`
+              : `Há uma cópia guardada na nuvem de ${data}. Nada mudou neste aparelho até você escolher.`}
           </p>
           <fieldset>
             <legend>O que fazer com esta cópia</legend>
