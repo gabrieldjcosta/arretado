@@ -1399,21 +1399,48 @@ button.grande,
   align-items: end;
 }
 
+/* Frases (D-D7, P5): o texto em fonte de leitura à esquerda e "Esconder trecho" à direita, ou logo
+   abaixo quando a frase é longa; a ação tem alvo de 44 px e a mesma letra da interface. */
 .frases li {
   line-height: 1.6;
 }
 
-.frases a {
+.frases .texto-leitura {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.frases .texto-leitura a {
+  display: flex;
+  align-items: center;
+  min-height: var(--alvo);
   color: var(--texto);
   text-decoration: none;
 }
 
-.cartao-drill {
-  min-height: 10rem;
+.frases .botao-texto {
+  margin-inline-start: -0.75rem;
 }
 
-.respostas button {
-  min-width: 6rem;
+/* "Ver os erros", "Voltar às frases", "Filtros" e "Mais opções": o texto alinhado à margem, o alvo de
+   44 px estendido por fora. */
+.mais-da-lista {
+  margin: 0.5rem 0 0;
+}
+
+.voltar-da-lista {
+  margin: 0;
+}
+
+.mais-da-lista .botao-texto,
+.voltar-da-lista .botao-texto,
+.filtros-da-lista > summary,
+.menu-drill > summary {
+  margin-inline-start: -0.75rem;
+}
+
+.cartao-drill {
+  min-height: 10rem;
 }
 
 details > summary {
@@ -3034,16 +3061,31 @@ dialog.dialogo-previa .linha-acoes button {
   display: grid;
 }
 
-/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. */
+/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. No topo, "Sair" e o andamento
+   e, no canto, a caneta encostada (D-D7, P5): 56 × 76, a ponta 7 px dentro da borda do cartão (a
+   margem de -10 px embaixo a faz descer sobre ele; o z-index a põe acima dele e da passagem). */
 .topo-drill {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
+.topo-drill .botao-texto {
+  margin-inline-start: -0.75rem;
+}
+
 .topo-drill .barra-fina {
   flex: 1;
   margin-bottom: 0;
+}
+
+.topo-caneta {
+  align-self: flex-end;
+  width: 56px;
+  height: 76px;
+  margin: 0 -8px -10px 0;
 }
 
 .cartao-drill {
@@ -3092,32 +3134,47 @@ dialog.dialogo-previa .linha-acoes button {
   min-height: 50px;
 }
 
+/* `min-width: min-content` (e não o `var(--alvo)` do botão): com o rótulo em uma linha o botão nunca
+   fica menor que o conteúdo, e com fonte ampliada o terceiro desce de linha em vez de pisar no vizinho. */
 .respostas button {
-  flex: 1;
+  min-width: min-content;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
   border-width: 2px;
   background: var(--superficie);
   color: var(--texto);
   font-weight: 600;
 }
 
-/* Estado por texto (6.7): palavra e ícone além da cor. */
+/* Em telas estreitas (320 px) as três respostas só cabem numa linha com o desenho sobre o rótulo. */
+@media (max-width: 379px) {
+  .respostas button {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+/* Estado por texto (6.7): palavra e ícone além da cor. Na tinta, nunca em vermelho (D-D7): erro de
+   estudo e revisão para hoje não são falha técnica. */
 .estado-texto {
   display: inline-flex;
   align-items: center;
-  gap: 0.15rem;
+  vertical-align: middle;
+  gap: 0.375rem;
   min-width: 9rem;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--texto);
 }
 
-.estado-texto.estado-errou,
-.estado-texto.estado-vencido {
-  color: var(--perigo);
-}
-
 .estado-texto.estado-vencido {
   min-width: 0;
+}
+
+.icone-fixar {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
 }
 
 /* "Sair do foco": recuado, sem competir com "Próximo artigo". */
@@ -3141,13 +3198,31 @@ dialog.dialogo-previa .linha-acoes button {
   font-family: var(--fonte-leitura);
 }
 
+/* A revisão numa coluna só (D-D7, P5): faixa da Sessão, topo com a caneta, cartão e respostas na
+   mesma largura, para a caneta pousar na borda do cartão em qualquer tela. A classe é `.coluna-drill`
+   porque `.revisao` já é a revisão do rascunho da Biblioteca. */
 @media (min-width: 700px) {
-  .cartao-drill {
+  .coluna-drill {
     max-width: 40rem;
     margin-inline: auto;
+  }
+
+  .cartao-drill {
     padding: 2.5rem 2rem;
     box-shadow: var(--sombra);
   }
+}
+
+/* O fim da rodada (D-D7, P5): a caneta deitada, em repouso, acima do título, e as ações ao centro.
+   Sem cachorro nem desenho próprio: quem desenha é o Resumo do Dia, uma vez por Dia fechado. */
+.fim-de-rodada .fim-caneta {
+  width: 104px;
+  height: 58px;
+  margin: 0 auto 0.75rem;
+}
+
+.fim-de-rodada .linha-acoes {
+  justify-content: center;
 }
 
 /* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por
