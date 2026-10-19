@@ -26,6 +26,7 @@ import { ErrosComFiltros } from './recall/ListaErros';
 import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
+import { RegistrarVarios } from './recall/RegistrarVarios';
 import { RevisarFrases } from './recall/RevisarFrases';
 import { Hoje } from './hoje/Hoje';
 import { RotasDoPlano } from './plano/Rotas';
@@ -107,6 +108,7 @@ export function App({
                 </Route>
                 <Route path="recall/erros" element={<ErrosComFiltros />} />
                 <Route path="recall/registrar" element={<RegistrarErro />} />
+                <Route path="recall/registrar/varios" element={<RegistrarVarios />} />
                 <Route path="recall/revisar" element={<Drill />} />
                 <Route path="recall/frases/revisar" element={<RevisarFrases />} />
                 <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
