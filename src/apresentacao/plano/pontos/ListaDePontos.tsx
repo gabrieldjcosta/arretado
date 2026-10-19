@@ -37,7 +37,7 @@ function NovaMateria({ aoErro }: { aoErro: (m: string | null) => void }) {
     );
   };
   return (
-    <details className="pontos-novo">
+    <details>
       <summary className="botao botao-texto na-margem">Nova matéria</summary>
       <form onSubmit={enviar} className="pontos-form">
         <div className="campo">
@@ -262,7 +262,7 @@ export function ListaDePontos() {
                     );
                   })}
                 </ul>
-                <details className="pontos-novo">
+                <details>
                   <summary className="botao botao-texto na-margem">Mais</summary>
                   <NovoPonto disciplinaId={d.id} aoErro={setErro} />
                   <EditarMateria id={d.id} nome={d.nome} pontos={todos.length} aoErro={setErro} />

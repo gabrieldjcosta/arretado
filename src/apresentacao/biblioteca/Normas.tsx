@@ -564,7 +564,7 @@ export function Normas() {
                             <button
                               type="button"
                               className="botao-texto na-margem"
-                              aria-label={`Mudar a disciplina de ${n.tituloCurto}`}
+                              aria-label={`Mudar disciplina de ${n.tituloCurto}`}
                               onClick={() => {
                                 setFalhaAoMudar(null);
                                 void disciplinasDaNorma(repo, n.id).then((atuais) => {

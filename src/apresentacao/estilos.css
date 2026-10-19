@@ -153,7 +153,6 @@
   /* Marcado (caixa, rádio, botão ligado): tinta cheia com a marca em cal. */
   --selecionado-fundo: var(--tinta);
   --selecionado-texto: var(--cal);
-  --selecionado-atenuado: #c9d1dc;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--tinta) 6%, var(--superficie));
 
@@ -256,7 +255,6 @@
     --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
     --selecionado-fundo: var(--noite-tinta);
     --selecionado-texto: var(--noite);
-    --selecionado-atenuado: #3b4a63;
     --selecionado-anel: transparent;
     --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
     --regua-fundo: rgb(238 243 248 / 8%);
@@ -333,7 +331,6 @@
   --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
   --selecionado-fundo: var(--noite-tinta);
   --selecionado-texto: var(--noite);
-  --selecionado-atenuado: #3b4a63;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
   --regua-fundo: rgb(238 243 248 / 8%);
@@ -1589,12 +1586,6 @@ a.item-norma strong {
   color: var(--texto-atenuado);
 }
 
-/* "Ir ao lido até" é o botão fantasma (.botao-texto): o recuo do alvo de 44 px sai pela margem, e o
-   texto dele alinha com o "Lido até" quando passa para a linha de baixo. */
-.lido-ate .botao-texto {
-  margin-inline-start: -0.75rem;
-}
-
 /* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
    frase. Altura da caneta, no mínimo: o corpo sobe da ponta, e o texto de cima não pode ficar sob ele. */
 .marca-lido-ate {
@@ -1872,17 +1863,22 @@ dialog.dialogo-busca {
 
 /* Alvo de 44 px (D-D7, P6) com a estrela onde estava: a caixa avança para a margem da página, à esquerda
    da calha (nunca sobre o texto), e sobe e desce o que falta à altura de 1,6em, o que não mexe na altura
-   da linha. O recuo devolve a calha ao conteúdo, que centra a estrela na mesma posição de antes. */
+   da linha. O recuo devolve a calha ao conteúdo, que centra a estrela na mesma posição de antes. A
+   caixa só avança até onde há folga (--estrela-folga: o recuo da página, 16 px no celular, e o recuo do
+   cartão do modo foco, 1rem): 44 × 44 de 700 px para cima, 40 × 44 onde a folga é menor, sem o corte
+   da borda da tela nem do cartão (que levaria o anel de foco junto). */
 button.estrela {
+  --estrela-folga: var(--gutter);
+  --estrela-largura: min(var(--alvo), calc(var(--calha-estrela) + var(--estrela-folga)));
   position: absolute;
-  inset-inline-start: calc(var(--calha-estrela) - var(--alvo));
-  width: var(--alvo);
+  inset-inline-start: calc(var(--calha-estrela) - var(--estrela-largura));
+  width: var(--estrela-largura);
   height: var(--alvo);
   margin-block-start: calc((1.6em - var(--alvo)) / 2);
   min-width: 0;
   min-height: 0;
   padding: 0;
-  padding-inline-start: calc(var(--alvo) - var(--calha-estrela));
+  padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela));
   border: 0;
   border-radius: 4px;
   background: transparent;
@@ -2711,6 +2707,11 @@ dialog.dialogo-acoes {
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   box-shadow: var(--sombra-folha);
+}
+
+/* O cartão rola por dentro e corta o que passa do recuo dele (1rem): a caixa da estrela cabe nele. */
+.cartao-artigo button.estrela {
+  --estrela-folga: 1rem;
 }
 
 /* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o

@@ -70,7 +70,7 @@ function NovaTarefa({
           }}
         />
       </div>
-      <details className="tarefas-mais">
+      <details>
         <summary className="botao botao-texto na-margem">
           Ligar a um ponto ou estimar (opcional)
         </summary>
@@ -197,7 +197,7 @@ function Acoes({
     });
   };
   return (
-    <details className="tarefas-mais">
+    <details>
       <summary className="botao botao-texto na-margem">Mais</summary>
       <div className="linha-acoes">
         <button

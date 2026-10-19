@@ -1006,6 +1006,8 @@ describe('grifos e notas (11.4)', () => {
     const marcador = await screen.findByRole('button', { name: 'Nota: jurisdição penal' });
     // O marcador vem logo depois do trecho anotado e não conta no texto (nem no offset).
     expect(dispositivo('art2')).toHaveTextContent('A jurisdição penal será exercida.');
+    expect(marcador.previousSibling?.textContent).toMatch(/jurisdição penal$/);
+    expect(marcador.nextSibling?.textContent).toMatch(/^\s?será exercida/);
     expect(await marcacoesGravadas(repo)).toEqual([
       expect.objectContaining({
         tipo: 'nota',

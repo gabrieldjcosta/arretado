@@ -128,7 +128,7 @@ function Prioridade({ ponto }: { ponto: Ponto }) {
       </div>
       {ponto.logPrioridade && ponto.logPrioridade.length > 0 && (
         <details>
-          <summary>Histórico da faixa</summary>
+          <summary className="botao botao-texto na-margem">Histórico da faixa</summary>
           <ul className="lista-simples">
             {ponto.logPrioridade.map((l) => (
               <li key={l.em}>

@@ -16,11 +16,7 @@ export function Voltar({
   children: ReactNode;
 }) {
   return (
-    <Link
-      to={para}
-      className="botao botao-texto na-margem"
-      {...(nome === undefined ? {} : { 'aria-label': nome })}
-    >
+    <Link to={para} className="botao botao-texto na-margem" aria-label={nome}>
       <Icone nome="voltar" />
       {children}
     </Link>

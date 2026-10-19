@@ -23,16 +23,19 @@ export function Atual() {
   if (sessao === undefined) return <Esqueleto />;
   if (sessao === null) {
     return (
-      <Vazio
-        titulo="Nenhuma Sessão aberta"
-        acao={
-          <Link to="/sessao/iniciar" className="botao principal">
-            Começar uma Sessão
-          </Link>
-        }
-      >
-        <p>Quando quiser estudar, comece uma Sessão em um toque.</p>
-      </Vazio>
+      <>
+        <h1>Sessão</h1>
+        <Vazio
+          titulo="Nenhuma Sessão aberta"
+          acao={
+            <Link to="/sessao/iniciar" className="botao principal">
+              Começar uma Sessão
+            </Link>
+          }
+        >
+          <p>Quando quiser estudar, comece uma Sessão em um toque.</p>
+        </Vazio>
+      </>
     );
   }
   return <SessaoEmAndamento sessao={sessao} />;

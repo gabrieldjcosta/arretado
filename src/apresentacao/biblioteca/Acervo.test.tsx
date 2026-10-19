@@ -170,7 +170,7 @@ describe('Biblioteca › Acervo (3c)', () => {
 
     // Disciplinas sugeridas e botão Alterar disciplina
     expect(screen.getAllByText(/Disciplinas sugeridas:/).length).toBeGreaterThan(0);
-    const botaoAlterar = screen.getByRole('button', { name: 'Alterar a disciplina de LEP' });
+    const botaoAlterar = screen.getByRole('button', { name: 'Alterar disciplina de LEP' });
     expect(botaoAlterar).toHaveTextContent('Alterar disciplina');
   });
 

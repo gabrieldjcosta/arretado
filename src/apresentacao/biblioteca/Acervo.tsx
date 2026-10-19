@@ -381,7 +381,7 @@ export function Acervo() {
                                 type="button"
                                 className="botao-texto"
                                 disabled={ocupado}
-                                aria-label={`Alterar a disciplina de ${i.titulo}`}
+                                aria-label={`Alterar disciplina de ${i.titulo}`}
                                 onClick={() => {
                                   setEscolhendo(i);
                                 }}
@@ -392,9 +392,7 @@ export function Acervo() {
                           )}
                           {parecida && (
                             <p className="aviso-compacto dica">
-                              <span className="aviso-compacto-icone" aria-hidden="true">
-                                <Icone nome="info" />
-                              </span>{' '}
+                              <Icone nome="info" />
                               <span>Você já tem uma norma parecida: {parecida.tituloCurto}.</span>
                             </p>
                           )}
@@ -414,18 +412,14 @@ export function Acervo() {
                           )}
                           {i.avisos.length === 1 ? (
                             <p className="aviso-compacto dica">
-                              <span className="aviso-compacto-icone" aria-hidden="true">
-                                <Icone nome="info" />
-                              </span>{' '}
+                              <Icone nome="info" />
                               <span>{i.avisos[0]}</span>
                             </p>
                           ) : i.avisos.length > 1 ? (
                             <ul className="avisos-compactos dica">
                               {i.avisos.map((a) => (
                                 <li key={a}>
-                                  <span className="aviso-compacto-icone" aria-hidden="true">
-                                    <Icone nome="info" />
-                                  </span>{' '}
+                                  <Icone nome="info" />
                                   <span>{a}</span>
                                 </li>
                               ))}

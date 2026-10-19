@@ -13,9 +13,7 @@ const CAMINHOS = {
   info: ['M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z', 'M12 11v5', 'M12 8h.01'],
 } as const;
 
-export type NomeDoIcone = keyof typeof CAMINHOS;
-
-export function Icone({ nome, className }: { nome: NomeDoIcone; className?: string }) {
+export function Icone({ nome, className }: { nome: keyof typeof CAMINHOS; className?: string }) {
   return (
     <svg
       className={className ? `icone-svg ${className}` : 'icone-svg'}

@@ -4,6 +4,8 @@ import { expect, test } from './apoio';
 const ROTAS = [
   '/',
   '/plano',
+  '/plano/pontos',
+  '/plano/tarefas',
   '/recall',
   '/recall/registrar',
   '/recall/frases',
@@ -14,12 +16,15 @@ const ROTAS = [
   '/recall/cartoes/novo',
   '/biblioteca',
   '/biblioteca/importar',
+  '/biblioteca/acervo',
   '/conta',
   '/conta/aparencia',
   '/conta/perfis',
   '/conta/dados',
   '/conta/privacidade',
   '/orientacoes',
+  '/sessao/atual',
+  '/sessao/iniciar',
 ];
 
 for (const esquema of ['light', 'dark'] as const) {
@@ -54,15 +59,20 @@ for (const esquema of ['light', 'dark'] as const) {
   });
 }
 
-// Botões, links de botão, navegação e seletor de arquivo: 44 px nas duas medidas, em todas as rotas
-// principais (o link no meio de frase é a única exceção e não entra aqui). Os projetos mudam a
-// navegação (barra de baixo, barra de cima), então a conferência roda nos três.
+// Botões, links de botão, `summary` de botão, linhas de lista, navegação e seletor de arquivo: 44 px nas
+// duas medidas, em todas as rotas principais (o link no meio de frase é a única exceção e não entra
+// aqui). Os projetos mudam a navegação (barra de baixo, barra de cima), então a conferência roda nos
+// três.
 for (const rota of ROTAS) {
   test(`${rota}: alvos de toque têm pelo menos 44 px`, async ({ page }) => {
     await page.goto(`/#${rota}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const pequenos = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('button, a.botao, .areas a, input[type="file"]'))
+      Array.from(
+        document.querySelectorAll(
+          'button, a.botao, summary.botao, a.linha-lista, .areas a, input[type="file"]',
+        ),
+      )
         .map((el) => {
           const r = el.getBoundingClientRect();
           return { texto: el.textContent.trim(), h: r.height, w: r.width };

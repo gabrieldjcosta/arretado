@@ -285,7 +285,7 @@ export function RevisaoDoRascunho({ versaoId, aConfirmar, aoMudar, aoIndisponive
           if (e.currentTarget.open) void carregarNos();
         }}
       >
-        <summary>Corrigir por bloco</summary>
+        <summary className="botao botao-texto na-margem">Corrigir por bloco</summary>
         <p className="dica">
           Um bloco é um capítulo (ou outro trecho) ou um intervalo de artigos. Abra o bloco para ver
           só as linhas dele, confirmar tudo, converter um tipo de linha em outro ou trocar uma

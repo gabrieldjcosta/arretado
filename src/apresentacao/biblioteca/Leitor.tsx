@@ -1763,7 +1763,7 @@ function LeitorAberto({
           <span>
             Lido até <strong>{referenciaLidoAte}</strong>
           </span>
-          <button type="button" className="botao-texto" onClick={irAoLidoAte}>
+          <button type="button" className="botao-texto na-margem" onClick={irAoLidoAte}>
             Ir ao lido até
           </button>
         </p>

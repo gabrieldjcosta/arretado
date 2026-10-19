@@ -255,7 +255,7 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 - **Em seguida:** até 2 itens (a mesma decisão do Agora, sem o que ele já mostra nem o que a pessoa dispensou), nome em negrito 600 e tempo em 13 px, sobre a areia. Só texto: sem botão, porque a ação é uma só.
 - **Resumo do Dia (P3):** cartão com o que houve em linhas curtas (Sessões, cartões e Frases revisados) e o próximo passo; "Fechar o Dia" é um botão secundário (o vidro é do Agora). Fechado, mostra o cachorro (112 × 94) e, largada ao fim do traço, a caneta (120 × 67), "Bom descanso." e "Reabrir o Dia".
 
-- **Listas (P6):** em linhas sobre a areia, com o filete entre elas: título em 600, uma linha de apoio atenuada e a seta de traço único à direita, alvo de 64 px (`LinhaLista`; no Acervo, a marca de 22 px à esquerda). O cartão fica para o que agrupa: um formulário com os botões dele, a Sessão em andamento, o resumo do que houve. O "Voltar" vem acima do título, com a seta. A Estrela do Leitor tem a caixa de 44 × 44 (à esquerda da calha, nunca sobre o texto), sem mexer na altura da linha.
+- **Listas (P6):** em linhas sobre a areia, com o filete entre elas: título em 600, uma linha de apoio atenuada e a seta de traço único à direita, alvo de 64 px (`LinhaLista`; no Acervo, a marca de 22 px à esquerda). O cartão fica para o que agrupa: um formulário com os botões dele, a Sessão em andamento, o resumo do que houve. O "Voltar" vem acima do título, com a seta. A Estrela do Leitor tem a caixa de 44 × 44 (à esquerda da calha, nunca sobre o texto; 40 × 44 no celular e no cartão do modo foco, onde a folga é de 16 px), sem mexer na altura da linha.
 
 ### Inputs / Fields
 

@@ -53,8 +53,10 @@
   border-color: var(--selecionado-anel, var(--selecionado-fundo));
 }
 
-/* Já adicionada: a marca só desenhada, na cor do texto atenuado, e a linha sem o toque. */
-.item-acervo-botao:disabled .item-acervo-marca {
+/* Já adicionada: a marca só desenhada, na cor do texto atenuado, e a linha sem o toque. Só a que não
+   está marcada: enquanto o Acervo adiciona, toda linha fica desabilitada, e a marcada não perde o
+   preenchimento. */
+.item-acervo-botao:disabled[aria-pressed='false'] .item-acervo-marca {
   background: transparent;
   border-color: var(--texto-atenuado);
   color: var(--texto-atenuado);
@@ -108,12 +110,9 @@
   line-height: 1.35;
 }
 
-.aviso-compacto-icone {
-  flex-shrink: 0;
-  align-self: center;
-}
-
-.aviso-compacto-icone .icone-svg {
+.aviso-compacto .icone-svg,
+.avisos-compactos .icone-svg {
   width: 1rem;
   height: 1rem;
+  align-self: center;
 }
