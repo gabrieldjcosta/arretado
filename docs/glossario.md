@@ -462,3 +462,9 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Política v3 na tela | `POLITICA_V3` em `src/apresentacao/orientacoes/conteudo.ts`, exibida por `Privacidade`; a v2 fica em `<details>` como versão anterior |
 
 | Aceite no login e na cópia na nuvem (T2) | O provedor do repositório chama `registrarAceitePendente` ao abrir o banco da conta (grava `v3:login`); `NuvemBackup` exige e grava `v3:backup-nuvem` antes do primeiro envio (`exigirConsentimento`). Aviso `AVISO_SEM_ARMAZENAMENTO` quando o navegador não guarda a marca. |
+
+#### F4-A: portão e fumaça (A8)
+
+| Termo | Identificadores |
+|---|---|
+| Fumaça real | Roteiro manual com duas contas descartáveis e dados sintéticos em [`portoes/F4A.md`](portoes/F4A.md); verifica RLS, cópia cifrada, migração, troca, offline e exclusão no projeto publicado. O resultado é registrado sem e-mails, tokens, UUIDs ou conteúdo de estudo. |
