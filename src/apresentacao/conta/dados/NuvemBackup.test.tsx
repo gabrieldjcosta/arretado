@@ -70,6 +70,7 @@ describe('Cópia na nuvem em Conta › Dados (F4-A, A6)', () => {
       expect(screen.getByText(/perder a frase é perder a cópia/i)).toBeInTheDocument();
       await usuario.type(screen.getByLabelText(/^Frase/), FRASE);
       await usuario.type(screen.getByLabelText('Repita a frase'), FRASE);
+      await usuario.click(screen.getByRole('checkbox', { name: /entendi e aceito/i }));
       await usuario.click(screen.getByRole('button', { name: 'Cifrar e guardar' }));
       expect(await screen.findByText(/cópia guardada na nuvem/i)).toBeInTheDocument();
       expect(screen.getByText(/com cópia na nuvem/i)).toBeInTheDocument();
