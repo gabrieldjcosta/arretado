@@ -30,6 +30,34 @@ vi.mock('../../dominios/legislacao/leitor', async (original) => {
   };
 });
 
+/**
+ * Conta quantas vezes o leitor manda o virtualizador descartar as medidas das linhas (`measure`).
+ * O contador troca a função uma vez por virtualizador, então a identidade dela não muda entre
+ * renderizações (o efeito do tamanho do texto, que depende dela, não roda a mais).
+ */
+const virtualizadores = vi.hoisted(() => ({
+  descartes: 0,
+  vistos: new WeakSet<object>(),
+}));
+vi.mock('@tanstack/react-virtual', async (original) => {
+  const real = await original<typeof import('@tanstack/react-virtual')>();
+  return {
+    ...real,
+    useWindowVirtualizer: (...args: Parameters<typeof real.useWindowVirtualizer>) => {
+      const virtualizador = real.useWindowVirtualizer(...args);
+      if (!virtualizadores.vistos.has(virtualizador)) {
+        virtualizadores.vistos.add(virtualizador);
+        const medir = virtualizador.measure;
+        virtualizador.measure = () => {
+          virtualizadores.descartes += 1;
+          medir();
+        };
+      }
+      return virtualizador;
+    },
+  };
+});
+
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
 const LEI: Bloco[] = [
   linha('LEI Nº 7.210, DE 11 DE JULHO DE 1984.'),
@@ -1821,6 +1849,21 @@ describe('palco do modo foco (F entra no cartão)', () => {
     // Só o ⋯ e o fio de progresso: nenhum controle da bandeja à vista.
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Buscar' })).not.toBeInTheDocument();
+  });
+
+  it('ao entrar no cartão, as medidas das linhas são descartadas: a lista que volta mede de novo (P4)', async () => {
+    // A estrutura da norma some no modo foco e a coluna da lista que volta tem outra largura; o que
+    // o virtualizador guardou é de outra, e a remedida das linhas de cima ele não compensa.
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const antes = virtualizadores.descartes;
+    await usuario.keyboard('f');
+    await waitFor(() => {
+      expect(document.querySelector('.cartao-artigo')).not.toBeNull();
+    });
+    expect(virtualizadores.descartes).toBeGreaterThan(antes);
   });
 
   it('com a lente corrido gravada, F entra no texto corrido, sem cartão', async () => {
