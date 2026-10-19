@@ -54,6 +54,7 @@ const TELAS = [
   ['/recall/frases', 'Fixar'],
   ['/biblioteca', 'Biblioteca'],
   ['/conta', 'Conta'],
+  ['/sessao/iniciar', 'Começar a Sessão'],
 ] as const;
 
 const SO_NO_DESKTOP = 'o aparelho é emulado no teste (tamanho e áreas seguras); basta um projeto';
@@ -87,13 +88,15 @@ async function emular(page: Page, aparelho: Aparelho) {
 
 /**
  * Texto e controles à vista dentro das margens que o aparelho reserva. O texto vale pelas linhas que
- * ocupa (não pela caixa do bloco); controles e desenhos, pela caixa. Cada um conta pelo que aparece:
- * o que a rolagem de um ancestral corta (as fileiras de abas que rolam de lado) não é medido, nem o
- * que está escondido (`<details>` fechado).
+ * ocupa (não pela caixa do bloco); controles com fundo ou borda e desenhos, pela caixa (um link ou
+ * botão sem fundo nem borda vale pelo texto e pelo desenho de dentro). Cada um conta pelo que
+ * aparece: o que a rolagem de um ancestral corta (as fileiras de abas que rolam de lado) não é
+ * medido, nem o que está escondido (`<details>` fechado).
  *
- * O que é fixo vale nas quatro bordas, sempre. O que é grudado (o cabeçalho, a lista de títulos do
- * Leitor) só está preso depois de rolar: no `topo` ainda é página; no `meio` e no `pe`, vale nas
- * quatro. O resto rola, então só o alto conta no `topo` e só o pé, no `pe`; os lados, sempre.
+ * O que é fixo vale nas quatro bordas, sempre, até fora da tela (não chega lá rolando). O que é
+ * grudado (o cabeçalho, a lista de títulos do Leitor) só está preso depois de rolar: no `topo` ainda
+ * é página; no `meio` e no `pe`, vale nas quatro. O resto rola, então só o alto conta no `topo` e só
+ * o pé, no `pe`; os lados, sempre.
  */
 async function invasoes(page: Page, area: Area, onde: Onde): Promise<string[]> {
   return page.evaluate(
@@ -142,9 +145,10 @@ async function invasoes(page: Page, area: Area, onde: Onde): Promise<string[]> {
 
       const ver = (rotulo: string, el: Element, caixa: DOMRect, doTexto = false) => {
         const r = aparece(el, caixa, doTexto);
-        if (!r || r.right <= 0 || r.left >= window.innerWidth) return;
-        const aVista = r.bottom > 0 && r.top < window.innerHeight;
         const { fixo, grudado } = posicoes(el);
+        // O que rola chega à tela rolando; um fixo que está inteiro fora dela não chega nunca.
+        if (!r || (!fixo && (r.right <= 0 || r.left >= window.innerWidth))) return;
+        const aVista = fixo || (r.bottom > 0 && r.top < window.innerHeight);
         const preso = fixo || (grudado && onde !== 'topo');
         const fora =
           r.left < esquerda - 0.5 ||
@@ -174,13 +178,28 @@ async function invasoes(page: Page, area: Area, onde: Onde): Promise<string[]> {
         for (const r of intervalo.getClientRects()) ver(`"${texto.slice(0, 30)}"`, dono, r, true);
       }
 
+      /** A caixa tem tinta própria (fundo, borda ou sombra)? Sem isso a tinta é o que há dentro. */
+      const temTinta = (estilo: CSSStyleDeclaration) =>
+        estilo.backgroundImage !== 'none' ||
+        estilo.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+        estilo.boxShadow !== 'none' ||
+        ['Top', 'Right', 'Bottom', 'Left'].some(
+          (lado) =>
+            estilo.getPropertyValue(`border-${lado.toLowerCase()}-style`) !== 'none' &&
+            Number.parseFloat(estilo.getPropertyValue(`border-${lado.toLowerCase()}-width`)) > 0,
+        );
+
       for (const el of document.querySelectorAll(
         'a[href], button, input, select, textarea, summary, svg, img',
       )) {
         const estilo = getComputedStyle(el);
         if (!el.checkVisibility() || estilo.visibility === 'hidden') continue;
+        // Link, botão-texto e a Estrela não têm fundo nem borda: a caixa deles (que pode avançar
+        // para a margem da página) é alvo de toque, não tinta. A tinta é o texto e o desenho de
+        // dentro, medidos à parte.
+        if (el.matches('a[href], button, summary') && !temTinta(estilo)) continue;
         // Margem negativa é o recuo com que o botão alinha o desenho à margem da página: a parte da
-        // caixa que sobra por causa dela é alvo de toque, não tinta.
+        // caixa que sobra por causa dela também é alvo de toque, não tinta.
         const r = el.getBoundingClientRect();
         const aEsquerda = Math.max(0, -Number.parseFloat(estilo.marginLeft));
         const aDireita = Math.max(0, -Number.parseFloat(estilo.marginRight));
@@ -230,6 +249,14 @@ for (const aparelho of APARELHOS) {
       await page.goto(`/#${rota}`);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       await semInvasoes(page, aparelho.area);
+      if (aparelho.largura >= 900) {
+        // A partir de 900 px o cabeçalho segue a coluna do conteúdo, também com a área segura dos lados.
+        const [marca, titulo] = await page.evaluate(() => [
+          document.querySelector('.marca')?.getBoundingClientRect().left ?? -1,
+          document.querySelector('main h1')?.getBoundingClientRect().left ?? -2,
+        ]);
+        expect(Math.abs(marca - titulo), 'a marca alinha com o título').toBeLessThanOrEqual(1);
+      }
     });
   }
 
@@ -246,15 +273,50 @@ for (const aparelho of APARELHOS) {
     await expect(page.getByRole('heading', { level: 3, name: 'Art. 1º' })).toBeVisible();
     await semInvasoes(page, aparelho.area, ['topo', 'meio']);
 
-    // O cartão do artigo no centro da tela, sem moldura, com a bandeja do foco aberta.
+    // A busca com tantos achados que o diálogo cresce até onde a tela deixa: ele fica nas áreas seguras.
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    const busca = page.getByRole('dialog', { name: 'Buscar na norma' });
+    await busca.getByRole('searchbox', { name: 'Texto ou endereço' }).fill('de');
+    await expect(busca.getByText(/os \d+ primeiros abaixo\./)).toBeVisible();
+    await semInvasoes(page, aparelho.area, ['topo']);
+    await busca.getByRole('button', { name: 'Fechar' }).click();
+    await expect(busca).toBeHidden();
+
+    // O cartão do artigo no centro da tela, sem moldura, com a bandeja do foco aberta. Do começo da
+    // norma, onde o cartão é curto: sem a moldura a página é só o cartão centrado, e a ilha em cima
+    // não a faz rolar (um artigo longo num celular deitado já rola um pouco, por causa do respiro).
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await rolagemAssentada(page);
     await page.getByRole('button', { name: 'Modo foco' }).click();
     await expect(page).toHaveURL(/[?&]foco=artigo/);
     await page.getByRole('button', { name: 'Mais ações do foco' }).click();
     await semInvasoes(page, aparelho.area, ['topo']);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight),
+      'sobra de rolagem no foco do artigo',
+    ).toBeLessThanOrEqual(0);
 
     // O texto corrido sem moldura (o cabeçalho some): a primeira linha ainda fica abaixo da ilha.
     await page.getByRole('button', { name: 'Texto corrido', exact: true }).click();
     await expect(page).toHaveURL(/[?&]foco=texto/);
     await semInvasoes(page, aparelho.area, ['topo', 'meio']);
+  });
+
+  test(`${aparelho.nome}: a Sessão, também no "Só estudo", não põe nada nas áreas do aparelho`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== 'desktop', SO_NO_DESKTOP);
+    await emular(page, aparelho);
+    await page.goto('/#/sessao/iniciar');
+    await page.getByRole('button', { name: 'Começar', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
+    await semInvasoes(page, aparelho.area);
+
+    // Sem as abas nem o rodapé, o que a casca reserva embaixo é só a área segura do aparelho.
+    await page.getByRole('checkbox', { name: 'Só estudo' }).click();
+    await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeHidden();
+    await semInvasoes(page, aparelho.area);
   });
 }

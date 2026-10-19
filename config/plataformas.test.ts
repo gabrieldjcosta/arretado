@@ -120,7 +120,17 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
 
   it('o SVG usa a areia e o vidro da caneta de estilos.css (rode o script se mudarem)', () => {
     const svg = texto('public/icone.svg');
-    const esperadas = ['areia', 'caneta-0', 'caneta-1', 'caneta-2', 'caneta-3', 'caneta-4'];
+    // A areia, as cinco cores do vidro, o miolo e o halo da ponta (--noite-vidro).
+    const esperadas = [
+      'areia',
+      'caneta-0',
+      'caneta-1',
+      'caneta-2',
+      'caneta-3',
+      'caneta-4',
+      'caneta-miolo',
+      'noite-vidro',
+    ];
     for (const nome of esperadas) expect(svg, nome).toContain(token(nome));
   });
 });

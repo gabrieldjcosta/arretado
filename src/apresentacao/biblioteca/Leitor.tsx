@@ -1956,8 +1956,8 @@ function LeitorAberto({
           </div>
         )}
       </div>
-      {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
-          sai (o foco do teclado fica nele). */}
+      {/* Fixo no canto (a partir de 1200 px, no trilho da margem da direita), acompanha a rolagem; no
+          modo foco, semitransparente. O mesmo botão entra e sai (o foco do teclado fica nele). */}
       <div
         className="acoes-leitor"
         onPointerDownCapture={() => {

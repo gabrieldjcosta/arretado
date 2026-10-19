@@ -469,8 +469,8 @@ button,
 }
 
 .pular:focus {
-  left: 1rem;
-  top: 1rem;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
   z-index: 10;
   background: var(--superficie);
   padding: 0.5rem 1rem;
@@ -773,9 +773,12 @@ button,
    caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
 @media (min-width: 900px) {
   .topo {
-    --recuo: calc((100% - var(--largura-casca)) / 2 + var(--gutter));
-    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px), var(--recuo));
-    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px), var(--recuo));
+    padding-left: calc(
+      max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+    padding-right: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
   }
 
   .marca {
@@ -1246,7 +1249,9 @@ legend {
 
 dialog {
   width: min(560px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-top, 0px)) - max(1rem, env(safe-area-inset-bottom, 0px))
+  );
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   background: var(--superficie);
@@ -1592,8 +1597,8 @@ a.item-norma strong {
   height: 58px;
 }
 
-/* O dock fica acima das abas de baixo (--abas-altura, que zera a partir de 900 px, com o teclado
-   aberto e no modo foco). */
+/* O dock fica acima das abas de baixo (--abas-altura: as abas e a área segura; a partir de 900 px é só
+   a área segura, e com o teclado aberto e no modo foco zera). */
 .acoes-leitor {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
@@ -1660,29 +1665,27 @@ a.item-norma strong {
     bottom: auto;
     left: calc(50% + var(--largura-texto) / 2 + 1.5rem);
     flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
     max-width: 13rem;
   }
 
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
     flex-direction: column;
-    flex-wrap: nowrap;
     border-radius: 22px;
   }
 
+  /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
   .leitor:not(.em-foco) .aviso-da-estrela {
     top: 100%;
     right: auto;
     bottom: auto;
     left: 0;
+    max-width: 100%;
     margin: 0.5rem 0 0;
     text-align: left;
   }
 
   .leitor:not(.em-foco) .acoes-marcacao {
     justify-content: flex-start;
-    max-width: none;
   }
 
   .leitor:not(.em-foco) .aviso-da-selecao {
@@ -1775,7 +1778,6 @@ a.item-norma strong {
    metade de baixo), e o dispositivo achado ganha um contorno, sem mudar a altura da linha. */
 dialog.dialogo-busca {
   margin: max(1rem, env(safe-area-inset-top)) auto auto;
-  max-height: calc(100dvh - 2rem);
 }
 
 .busca-campo {
@@ -2720,7 +2722,9 @@ dialog.dialogo-acoes {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: calc(100dvh - 2rem);
+  /* O .conteudo tem 1rem embaixo e, em cima, o maior entre 1rem e a área segura (ver
+     `:root[data-modo-foco] .conteudo`): a página não passa da tela. */
+  min-height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
   padding-top: calc(var(--alvo) + 2rem);
 }
 
