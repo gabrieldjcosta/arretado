@@ -11,7 +11,9 @@ import {
   separarBlocos,
   validarComplementares,
   validarPrincipal,
+  dividirLinhas,
 } from './nucleo.mjs';
+import { dividirItem, dividirItens, limparRuido } from './dividir.mjs';
 
 const CAB = CABECALHO_PRINCIPAL.join(',');
 const URL = 'https://www.fcc.org.br/edital.pdf';
@@ -361,5 +363,110 @@ describe('catálogo: blocos complementares', () => {
     const r = validarComplementares(b);
     expect(r.filter((x) => x.nivel === 'erro').length).toBeGreaterThanOrEqual(3);
     expect(r.some((x) => x.nivel === 'aviso')).toBe(true);
+  });
+});
+
+describe('divisão de assuntos juntados (dividir.mjs)', () => {
+  it('separa marcadores numerados embutidos e dá a cada pedaço o próprio número', () => {
+    const r = dividirItem(
+      '17',
+      'Poder Legislativo: a) Funções; b) Atos. 18. Poder Executivo: a) Presidente; b) Ministros. 19. Poder Judiciário: a) Funções',
+    );
+    expect(r.map((x) => x.numero)).toEqual(['17', '18', '19']);
+    expect(r[1]?.assunto).toBe('Poder Executivo: a) Presidente; b) Ministros.');
+  });
+
+  it('aceita marcador composto (17.5 → 17.6, 18)', () => {
+    const r = dividirItem(
+      '17.5',
+      'Ações prejudiciais. 17.6. Embargos à execução. 17.7. Suspensão do processo. 18. Processos nos tribunais',
+    );
+    expect(r.map((x) => x.numero)).toEqual(['17.5', '17.6', '17.7', '18']);
+  });
+
+  it('não confunde "art. 5." nem número fora de sequência com marcador', () => {
+    const t = 'Direitos fundamentais (CF, art. 5. Liberdade de expressão). Lei 8.078. Consumidor';
+    expect(dividirItem('3', t)).toHaveLength(1);
+  });
+
+  it('quebra item longo em frases, juntando títulos curtos ao assunto seguinte', () => {
+    const frasesLongas = [
+      'Poder Executivo.',
+      'Presidente e Vice-Presidente da República: atribuições e responsabilidades.',
+      'Poder Legislativo.',
+      'Órgãos, funcionamento e competências do Congresso Nacional e das Casas legislativas.',
+      'Processo legislativo ordinário e especial, com as espécies normativas do art. 59 da Constituição.',
+      'Fiscalização contábil, financeira e orçamentária pelo Tribunal de Contas da União e pelo Congresso.',
+      'Poder Judiciário: Supremo Tribunal Federal, competência originária e recursal, súmula vinculante.',
+    ].join(' ');
+    const r = dividirItem('9', frasesLongas);
+    expect(r.length).toBeGreaterThan(2);
+    expect(r.map((x) => x.numero)).toEqual(r.map((_, i) => `9.${String(i + 1)}`));
+    expect(r.every((x) => x.assunto.length >= 90)).toBe(true);
+    expect(r.map((x) => x.assunto).join(' ')).toBe(frasesLongas);
+  });
+
+  it('não divide item curto nem desmonta "art." no meio da frase', () => {
+    expect(dividirItem('1', 'Princípios do Direito Penal; aplicação da lei penal')).toEqual([
+      { numero: '1', assunto: 'Princípios do Direito Penal; aplicação da lei penal' },
+    ]);
+  });
+
+  it('tira cabeçalho de página e descarta anexo do edital', () => {
+    expect(
+      limparRuido(
+        'Edital Nº 0031/2026-DMAG retificação (9998416) SEI 8.2026.7030/000283-0 / pg. 39 Usucapião',
+      ),
+    ).toBe('Usucapião');
+    expect(
+      dividirItem(
+        '44',
+        'ANEXO II - MODELO DE DECLARAÇÃO DE HIPOSSUFICIÊNCIA Eu, ____, CPF ____, declaro',
+      ),
+    ).toEqual([]);
+  });
+
+  it('é idempotente e a divisão de linhas herda os campos e some com cópias idênticas', () => {
+    const longo = Array.from(
+      { length: 8 },
+      (_, i) =>
+        `Tópico número ${String(i + 1)} do edital com texto suficiente para passar do mínimo de um assunto.`,
+    ).join(' ');
+    const l = (num: string, assunto: string) => ({
+      l: [
+        'Defensoria Pública',
+        'DPE-SP',
+        'SP',
+        'FCC',
+        '2024',
+        'Defensor',
+        'objetiva',
+        'Direito Penal',
+        '1',
+        num,
+        assunto,
+        'Alta',
+        'base',
+        '3/3',
+        URL,
+      ],
+      n: 1,
+    });
+    const { mantidas } = dividirLinhas([l('2', longo), l('2', longo)]);
+    expect(mantidas.length).toBeGreaterThan(2);
+    expect(mantidas.every((x) => x.l[11] === 'Alta' && x.l[13] === '3/3')).toBe(true);
+    const de = dividirLinhas(mantidas).mantidas;
+    expect(de.map((x) => x.l)).toEqual(mantidas.map((x) => x.l));
+    const itens = dividirItens([
+      {
+        numero: '2',
+        assunto: longo,
+        faixa: 'Alta',
+        obsFaixa: 'base',
+        recorrencia: '3/3',
+        fonteUrl: URL,
+      },
+    ]).itens;
+    expect(dividirItens(itens).itens).toEqual(itens);
   });
 });

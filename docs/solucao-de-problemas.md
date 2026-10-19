@@ -1579,3 +1579,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
   - **Cline, 18/10/2026:** funciona como revisor, mas ao iniciar mostra um aviso promocional que segura o campo de entrada; o Orca não reconhece o terminal como pronto e o despacho parece parado. Depois do `worker-start`, mande um Enter (ou uma tecla) para fechar o aviso e confira com `orca terminal show` que o prompt saiu do campo. **Antigravity** falhou como revisor e foi descartado pelo Gabriel (18/10/2026).
 - **Contrato despachado para atividade já feita.** Causa: o `plano-mestre.md` §9 e o `f3-pacotes.md` dão a ordem, não o estado. Conferir `docs/proxima-sessao.md`, `git log origin/integracao` e `gh pr list` antes de despachar (`contratos-agentes.md` §6).
 - **Projeto Supabase pausado (plano gratuito, 7 dias sem uso).** Sintoma: requisições ao projeto falham ou o painel mostra "Paused". Causa: inatividade. Solução: o workflow `consulta-diaria` evita (precisa dos segredos `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY`; sem eles só avisa); se já pausou, "Restore project" no painel ou `restore_project`.
+
+### Entrar mostra "Não foi possível guardar o seu aceite neste navegador."
+
+**Causa:** `localStorage` indisponível (modo privado, armazenamento bloqueado ou cheio); a marca do aceite não pôde ser gravada. **Solução:** liberar o armazenamento do site ou usar uma janela normal; sem a marca o login não segue. "Sem aceitar não dá para entrar" fica só para o código por e-mail sem marca.

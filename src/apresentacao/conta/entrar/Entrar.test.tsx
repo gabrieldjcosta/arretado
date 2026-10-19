@@ -46,6 +46,25 @@ describe('Entrar (F4-A, A3)', () => {
     expect(aceiteDoLoginPendente()).not.toBeNull();
   });
 
+  it('se o navegador não guarda a marca, mostra o aviso próprio (A7)', async () => {
+    const servico = new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] });
+    const guardar = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('cheio');
+    });
+    try {
+      montar(servico);
+      const u = userEvent.setup();
+      await u.type(screen.getByLabelText(/receba um código/i), 'a@exemplo.com');
+      await u.click(screen.getByRole('button', { name: 'Enviar código' }));
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Não foi possível guardar o seu aceite neste navegador.',
+      );
+      expect(screen.getByRole('alert')).not.toHaveTextContent(/sem aceitar/i);
+    } finally {
+      guardar.mockRestore();
+    }
+  });
+
   it('sem a marca de aceite, o código não entra (A7)', async () => {
     const servico = new ServicoDeContaFalso({ convidados: ['a@exemplo.com'] });
     const { aoEntrar, prepararConta } = montar(servico);
