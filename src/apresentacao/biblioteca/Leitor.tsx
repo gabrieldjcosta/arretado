@@ -1740,7 +1740,12 @@ function LeitorAberto({
   // do leitor (tamanho do texto, destaques), a legenda e a referência do "lido até" ficam fora.
   // O título continua como cabeçalho da página, só para o leitor de tela.
   return (
-    <div ref={caixaDoLeitor} className={modoFoco ? 'leitor em-foco' : 'leitor'}>
+    <div
+      ref={caixaDoLeitor}
+      className={modoFoco ? 'leitor em-foco' : 'leitor'}
+      // A estrutura da norma e o trilho de ferramentas se alinham pelo fim do cabeçalho preso.
+      style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
+    >
       {modoFoco ? (
         <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
       ) : (
@@ -1839,11 +1844,7 @@ function LeitorAberto({
           Se continuar, feche as outras abas do Arretado.
         </p>
       )}
-      <div
-        className="leitor-corpo"
-        data-com-estrutura={comEstrutura ? '' : undefined}
-        style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
-      >
+      <div className="leitor-corpo" data-com-estrutura={comEstrutura ? '' : undefined}>
         {comEstrutura && (
           <EstruturaDaNorma
             nos={nos}
@@ -1961,8 +1962,8 @@ function LeitorAberto({
           </div>
         )}
       </div>
-      {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
-          sai (o foco do teclado fica nele). */}
+      {/* Fixo no canto (a partir de 1200 px, no trilho da margem da direita), acompanha a rolagem; no
+          modo foco, semitransparente. O mesmo botão entra e sai (o foco do teclado fica nele). */}
       <div
         className="acoes-leitor"
         onPointerDownCapture={() => {

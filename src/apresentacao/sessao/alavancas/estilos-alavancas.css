@@ -54,7 +54,8 @@
 }
 
 /* Modo "só estudo": esconde a administração (as áreas, Ajuda, Conta e o rodapé); o interruptor
-   segue na tela da Sessão. Sem as abas de baixo, a casca não reserva a altura delas. */
+   segue na tela da Sessão. Sem as abas de baixo, a casca não reserva a altura delas, só a área segura
+   do aparelho (o indicador de início do iPhone). */
 body[data-so-estudo] .areas,
 body[data-so-estudo] .rodape,
 body[data-so-estudo] .acoes-globais :is(.menu-ajuda, .conta-botao) {
@@ -62,5 +63,5 @@ body[data-so-estudo] .acoes-globais :is(.menu-ajuda, .conta-botao) {
 }
 
 body[data-so-estudo] .shell {
-  --abas-altura: 0px;
+  --abas-altura: env(safe-area-inset-bottom, 0px);
 }

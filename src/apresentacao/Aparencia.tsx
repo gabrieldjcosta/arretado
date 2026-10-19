@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { obterPreferencias } from '../core/preferencias';
+import { aplicarCorDaBarra } from './cor-da-barra';
 import { useDados } from './dados/contexto';
 
 /** Aplica tema e fonte de leitura das Preferências ao documento. */
@@ -11,6 +12,7 @@ export function AplicarAparencia() {
     const raiz = document.documentElement;
     if (dados.tema === 'sistema') delete raiz.dataset.tema;
     else raiz.dataset.tema = dados.tema;
+    aplicarCorDaBarra(dados.tema);
     raiz.dataset.fonte = dados.fonteLeitura;
     raiz.style.setProperty('--tamanho-leitura', `${String(dados.tamanhoFonte)}px`);
   }, [dados]);
