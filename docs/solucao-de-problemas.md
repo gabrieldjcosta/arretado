@@ -1514,6 +1514,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** o aceite acontece antes de a conta existir no Aparelho (e o login do Google sai da página); ele só é gravado quando Conta abre já dentro do banco da conta ativa. Sem `localStorage`, a tela Entrar recusa entrar.
 - **Solução:** abrir Conta depois de entrar (`RegistrarAceite`); a marca fica até haver conta ativa com banco aberto.
 
+## A caneta que desenha (D-D8, 19/10/2026)
+
+- **Teste de tela não vê o traço nem a passagem.** Causa: o jsdom não tem `matchMedia`, e o setup (`src/testes/setup.ts`) o instala já em movimento reduzido, que não anima nada. Solução: `simularMovimento('normal' | 'calmo')` (`src/testes/movimento.ts`) e, para o perfil, gravar `perfilDeEstudo` nas Preferências do repositório do teste: `AplicarAparencia` reescreve `data-perfil` a partir delas, então mexer só no `dataset` não basta. O jsdom também não tem `Element.animate`, layout nem geometria de SVG: os testes dão `animate`, `getTotalLength` e `getPointAtLength` de mentira.
+- **Teste do fim da rodada falha de vez em quando ("Feito." não aparece).** Causa: fora do Calmo o fim da rodada sorteia o sotaque (uma em três: "Danado de bom! Rodada feita."). Solução: `vi.spyOn(Math, 'random').mockReturnValue(0.99)` no teste.
+- **Parte do desenho some ou aparece como um ponto.** Causa: um subtraço `M x y` sem segmento não desenha nada (vira ponto só com ponta redonda e comprimento zero); o traço pontilhado aparece como ponto antes de começar. Solução: pontos são `M x y h0` (ver `cena.ts`), e `desenhar.ts` esconde o fio (`visibility: hidden`) enquanto ele tem zero desenhado.
+- **A caneta fica parada no meio do quadro ou o quadro nunca aparece pronto (previsível).** Causa provável: o `useLayoutEffect` de `QuadroDoCacto` foi abortado (o Dia foi reaberto ou a tela trocou) e o desenho em andamento não termina. Solução: o efeito sempre repinta as partes anteriores e, se não for para desenhar, a de hoje (`pintarAte` e `pintarParte`); conferir o `dias` que a tela recebe.
+- **Previsível na P4 e na P5.** O traço de seleção só desenha depois de um clique ou tecla no item (a memória de intenção dura 1,2 s e não é consumida, para a aba da Biblioteca que remonta também desenhar); atalhos de teclado que escolhem sem foco no item chamam `marcarEscolha(chave)`. A passagem do cartão anima o próprio elemento (`ref` em `usePassagemDeCartao`): não pôr `transform`, `opacity` nem `transition` fixos nesse elemento por CSS, e o último cartão da rodada não passa de propósito.
+- **`npm run lint` acusava erro dentro de `.claude/skills`.** Causa: o PR #194 trouxe skills com scripts e fluxos que não são código do app. Solução: `.claude` entrou em `ignores` do `eslint.config.js` (como já estava no `.prettierignore`).
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.

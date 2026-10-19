@@ -4,6 +4,8 @@ Escolhida pelo Gabriel no cartão da rodada 3 das direções visuais (genjutsu:b
 
 Página das três rodadas: https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb (seção "Ponto de luz, segunda versão"). Fontes do protótipo nos arquivos do projeto, em `redesenho/bunshin/.bunshin/direction/fonte/` (telas em `r3-script.js`, regras em `r2.css` e `r3.css`, caneta em `sertao-svg.mjs`, função `simboloCanetaV2`). Capturas do protótipo nesta pasta: [`hoje-celular-dia.png`](hoje-celular-dia.png), [`hoje-celular-noite.png`](hoje-celular-noite.png), [`leitor-tablet-dia.png`](leitor-tablet-dia.png).
 
+> **Emendado em 19/10/2026 (D-D8, pedido do Gabriel):** o cachorro do Resumo do Dia saiu e a caneta passou a andar sobre o quadro do cacto, no traço de seleção e na passagem do cartão. Onde este contrato fala do cachorro, do `--traco-cachorro` ou da caneta que só muda de lugar por salto, vale [a D-D8](../../decisoes-design.md).
+
 ## Tese
 A luz do sertão como tinta: areia clara, uma folha de cal com sombra fresca, e a caneta-cacto de vidro descansando exatamente onde você parou, com um ponto de luz na ponta. O futuro do sertão acontece de dia claro.
 

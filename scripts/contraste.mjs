@@ -95,6 +95,8 @@ export function pares() {
       // O ponto de luz e a Estrela: o contorno na tinta é o que os separa do fundo.
       ['ponto-contorno', f, 3],
       ['estrela-contorno', f, 3],
+      // O traço de seleção em volta do que acabou de ser escolhido: tinta de dia, luz à noite.
+      ['fio-selecao', f, 3],
       ...DESTAQUES.map((d) => [d, f, 3]),
     );
   }
@@ -103,6 +105,8 @@ export function pares() {
     // O trilho da barra de progresso é a superfície 2.
     ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
+    // O caramelo é só o sol e o miolo das flores do quadro do cacto, sobre a cal (não sobre a areia).
+    ['caramelo', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {

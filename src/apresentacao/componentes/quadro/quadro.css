@@ -1,0 +1,75 @@
+/* O quadro do cacto (D-D7, "A caneta que desenha"): o desenho de traço que cresce a cada Dia
+   fechado. Só tokens do tema: o vidro é o cacto, a tinta são os bichos e as flores, a tinta 2 é o
+   chão e a nuvem, o caramelo é só o sol e o miolo das flores. Nada de cor por disciplina. */
+
+.quadro-do-cacto {
+  margin: 0.5rem 0 0.875rem;
+}
+
+.quadro {
+  max-width: 30rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-campo);
+  background: var(--superficie);
+  overflow: hidden;
+  line-height: 0;
+}
+
+.quadro svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.quadro-fio {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quadro-cor-vidro {
+  stroke: var(--cacto);
+}
+
+.quadro-cor-tinta {
+  stroke: var(--texto);
+}
+
+.quadro-cor-tinta2 {
+  stroke: var(--texto-atenuado);
+}
+
+.quadro-cor-caramelo {
+  stroke: var(--caramelo);
+}
+
+/* A aguada sob o traço fechado: o vidro e a tinta diluídos, ou a cal da própria folha. */
+.quadro-lavis-vidro {
+  fill: color-mix(in srgb, var(--cacto) 13%, transparent);
+}
+
+.quadro-lavis-tinta {
+  fill: color-mix(in srgb, var(--texto) 9%, transparent);
+}
+
+.quadro-lavis-cal {
+  fill: var(--superficie);
+}
+
+.quadro-miolo {
+  fill: var(--caramelo);
+}
+
+.quadro-olho {
+  fill: none;
+  stroke: var(--texto);
+  stroke-linecap: round;
+}
+
+/* O que a caneta desenhou hoje: uma frase, sem número nem meta. Guarda a altura para o texto
+   chegar sem empurrar o resto da tela. */
+.quadro-legenda {
+  min-height: 1.5em;
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}

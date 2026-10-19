@@ -2,7 +2,13 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event';
 import { alterarPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
-import { criarCartaoDeErro, criarCartaoManual, registrarErro } from '../../dominios/recall/servico';
+import {
+  criarCartaoDeErro,
+  criarCartaoManual,
+  criarFraseDeTrecho,
+  registrarErro,
+} from '../../dominios/recall/servico';
+import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
@@ -353,5 +359,107 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Revisar mais/ })).not.toBeInTheDocument();
     expect(await repo.colecao('revisoes').contar()).toBe(25);
+  });
+});
+
+describe('a passagem do cartão (A caneta que desenha)', () => {
+  /** O jsdom não anima: cada `animate` vira uma animação já terminada e o teste vê o que foi pedido. */
+  const pedidos: Keyframe[][] = [];
+  const saidas = () => pedidos.filter((q) => q.some((f) => f.transform === 'translateX(-28px)'));
+
+  beforeEach(() => {
+    pedidos.length = 0;
+    Object.assign(Element.prototype, {
+      animate: (keyframes: Keyframe[]) => {
+        pedidos.push(keyframes);
+        return {
+          finished: Promise.resolve(),
+          cancel: () => undefined,
+          addEventListener: () => undefined,
+        };
+      },
+    });
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(Element.prototype, 'animate');
+  });
+
+  it('Drill: o cartão sai e o seguinte entra; o último cartão não passa, o fim da rodada toma a tela', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    // Saiu 190 ms para a esquerda e o novo entrou 210 ms pela direita.
+    expect(saidas()).toHaveLength(1);
+    expect(pedidos).toHaveLength(2);
+    expect(await repo.colecao('revisoes').contar()).toBe(1);
+
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(saidas()).toHaveLength(1);
+    expect(await repo.colecao('revisoes').contar()).toBe(2);
+  });
+
+  it('Frases: a frase passa para a seguinte pelo clique ou pela tecla', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    const trecho = (n: number) => ({
+      dispositivoId: '11111111-1111-4111-8111-111111111111',
+      texto: `trecho ${String(n)}`,
+      inicio: 0,
+      fim: 7,
+    });
+    await criarFraseDeTrecho(repo, { texto: 'Frase um', trecho: trecho(1) });
+    await criarFraseDeTrecho(repo, { texto: 'Frase dois', trecho: trecho(2) });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/frases/revisar', repo);
+
+    await screen.findByText('1 de 2');
+    await usuario.click(screen.getByRole('button', { name: /Fácil/ }));
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(saidas()).toHaveLength(1);
+    expect(await repo.colecao('revisoesFrase').contar()).toBe(1);
+  });
+
+  it('com o perfil Calmo nas Preferências, o cartão só esmaece: nada se desloca', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    await alterarPreferencias(repo, { perfilDeEstudo: 'calmo' });
+    const { usuario } = await abrir('/recall/revisar', repo);
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(pedidos.length).toBeGreaterThanOrEqual(2);
+    expect(pedidos.flat().some((f) => f.transform !== undefined)).toBe(false);
+  });
+
+  it('com movimento reduzido, troca na hora e nada é animado', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(pedidos).toHaveLength(0);
   });
 });
