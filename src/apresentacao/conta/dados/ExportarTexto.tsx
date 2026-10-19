@@ -22,6 +22,7 @@ export function ExportarTexto() {
     ]);
     const mapaDisciplinas: Record<string, string> = {};
     for (const d of disciplinasRes) {
+      if (d.excluidoEm !== null) continue;
       mapaDisciplinas[d.id] = d.nome;
     }
     return {

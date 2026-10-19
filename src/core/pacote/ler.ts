@@ -22,6 +22,7 @@ import {
   PASTA_ANEXOS,
   PASTA_DADOS,
   VERSAO_FORMATO,
+  VERSOES_FORMATO_LIDAS,
 } from './formato';
 
 export interface PacoteLido {
@@ -76,7 +77,14 @@ function verificarCabecalho(obj: unknown): void {
   if (typeof o !== 'object' || o === null || o.formato !== FORMATO) {
     throw new PacoteRecusado('nao_e_pacote');
   }
-  if (o.versaoFormato !== VERSAO_FORMATO) throw new PacoteRecusado('formato_desconhecido');
+  const v = o.versaoFormato;
+  // Formato mais novo que o deste app (AL em diante): pede para atualizar, como o esquema posterior.
+  if (typeof v === 'number' && Number.isInteger(v) && v > VERSAO_FORMATO) {
+    throw new PacoteRecusado('versao_posterior');
+  }
+  if (!(VERSOES_FORMATO_LIDAS as readonly unknown[]).includes(v)) {
+    throw new PacoteRecusado('formato_desconhecido');
+  }
 }
 
 export async function lerPacote(

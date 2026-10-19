@@ -14,16 +14,16 @@ export const SECOES: Secao[] = [
     id: 'como-funciona',
     titulo: 'Como o Arretado funciona',
     paragrafos: [
-      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Plano (onde você está no edital), Recall (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
-      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Recall (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
+      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Trilha (onde você está no edital), Fixar (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
+      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Fixar (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
       'Nada é obrigatório além do mínimo: você completa os detalhes quando quiser.',
     ],
   },
   {
     id: 'recall',
-    titulo: 'Recall: erros, cartões e revisões',
+    titulo: 'Fixar: erros, cartões e revisões',
     paragrafos: [
-      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. O botão "Registrar erro" está em todas as telas; no teclado, a tecla E também abre o registro.',
+      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. Para registrar, toque no "+" ao lado do título do Hoje ou do Fixar; no computador, "Registrar erro" fica no alto de toda tela. No teclado, a tecla E abre o registro de qualquer tela.',
       'O resto é opcional, em "Mais detalhes" ou depois: se errou ou acertou sem certeza, o que foi, a causa, a convicção, a fonte da questão. Quando o texto dá pistas, o Arretado sugere uma causa — ela só vale quando você confirma.',
       'Se você escreveu o que foi, o Arretado pergunta se quer um cartão. O cartão nunca é criado sozinho. A frente é o que foi; o verso é a frase correta.',
       'Os cartões voltam em 1, 3, 7, 15, 30 e 60 dias. Na revisão, mostre a resposta e diga como foi: "De novo" volta ao começo, "Difícil" repete o intervalo, "Fácil" avança. No teclado: espaço mostra a resposta; 1, 2 e 3 respondem.',
@@ -59,10 +59,10 @@ export const SECOES: Secao[] = [
     id: 'pontos',
     titulo: 'Importar os pontos do edital',
     paragrafos: [
-      'Em Plano, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
+      'Na Trilha, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
       'A primeira linha precisa ter as colunas Disciplina e Ponto. Opcionais: Faixa (Altíssima, Alta, Média ou Extra) e Código. Exemplo de linha: Execução Penal; 3; Progressão de regime; Alta.',
       'Importar a mesma planilha de novo não duplica nada: só entram os pontos novos. Como toda importação, dá para desfazer em Conta › Dados.',
-      'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com o Plano completo.',
+      'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com a Trilha completa.',
     ],
   },
   {
@@ -98,6 +98,17 @@ export const SECOES: Secao[] = [
     ],
   },
   {
+    id: 'conta-e-privacidade',
+    titulo: 'Conta e política de privacidade v3',
+    paragrafos: [
+      'A conta é opcional: dá para usar tudo sem entrar. Quando você entra com uma conta, passa a valer a política de privacidade v3, no lugar da v2.',
+      'Ao entrar, só o seu e-mail e os dados que o provedor de login informa (nome e foto) saem do Aparelho. Nada do seu estudo sai, salvo a cópia cifrada que você pedir.',
+      'O servidor (Supabase, região de São Paulo) guarda só o essencial da conta e, se houver, as cópias cifradas da nuvem. A frase de cifra fica só com você: sem ela, nem o Arretado abre a cópia.',
+      'Sair, trocar de conta e excluir tudo ficam em Conta › Dados. A exclusão da conta é imediata e definitiva. Não perguntamos nem guardamos diagnóstico; não há rastreadores nem estatísticas de uso.',
+      'Leia a política v3 inteira em Conta › Privacidade.',
+    ],
+  },
+  {
     id: 'seguranca-pessoal',
     titulo: 'Cuidados com seus dados',
     paragrafos: [
@@ -123,6 +134,130 @@ export const SECOES: Secao[] = [
       'Aparelho: o computador, tablet ou celular onde você usa o Arretado.',
       'Dispositivo: uma unidade da lei (artigo, parágrafo, inciso, alínea…).',
       'Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta: aparecem nas áreas à medida que as funções chegam.',
+    ],
+  },
+];
+
+/**
+ * Política de privacidade v3 (vale com conta). Espelha docs/politica/politica-de-privacidade-v3.md;
+ * as tabelas viram uma linha por item. Os marcadores [A DEFINIR PELO GABRIEL] ficam visíveis até
+ * ele definir controlador e contato — não preencher aqui por conta própria.
+ */
+export const POLITICA_V3: Secao[] = [
+  {
+    id: 'v3-resumo',
+    titulo: 'Resumo',
+    paragrafos: [
+      'Sem conta, nada muda em relação à versão 2: seus dados ficam neste Aparelho e nada sai dele.',
+      'Com conta, sai do Aparelho só o essencial para manter a sua conta: o seu e-mail, os dados que o provedor de login informa e, se você pedir, uma cópia cifrada dos seus dados.',
+      'Nada do seu estudo vai para o servidor, salvo dentro da cópia cifrada que você pedir.',
+      'Na fase de teste, o cadastro é só por convite: e-mail não convidado não entra.',
+      'Não perguntamos nem guardamos diagnóstico. Nenhum campo para isso existe, no Aparelho ou no servidor.',
+      'Não há rastreadores nem estatísticas de uso.',
+      'Você pode sair, exportar tudo e excluir a conta a qualquer momento. A exclusão é imediata e definitiva.',
+    ],
+  },
+  {
+    id: 'v3-quem-cuida',
+    titulo: 'Quem cuida dos seus dados',
+    paragrafos: [
+      'O responsável pelo tratamento (o "controlador") é o Gabriel, criador do Arretado. [A DEFINIR PELO GABRIEL: se o controlador é pessoa física ou empresa.]',
+      'O contato do encarregado (a pessoa que atende você sobre os seus dados): [A DEFINIR PELO GABRIEL: contato do encarregado.]',
+      'Operadores — empresas que tratam dados por conta do Arretado, cada uma só no que faz:',
+      'Supabase: guarda o essencial da conta e as cópias cifradas da nuvem, em projeto na região São Paulo.',
+      'Cloudflare: publica o app e busca a página da lei quando você importa por endereço, na rede global dela.',
+      'Google: provedor de login, quando você entra com Google, na rede global dele.',
+    ],
+  },
+  {
+    id: 'v3-o-que-sai',
+    titulo: 'O que sai do Aparelho quando você entra',
+    paragrafos: [
+      '1. O seu e-mail.',
+      '2. Os dados que o provedor de login informa: com Google, o nome e a foto da sua conta Google. Isso não dá para impedir e o Supabase guarda junto com a conta.',
+      '3. Só quando você pedir, uma cópia cifrada dos seus dados (veja "Cópia cifrada na nuvem").',
+      'Nada mais. Erros, Cartões, Normas, grifos, notas, Revisões, Sessões e preferências ficam no Aparelho. O relato de Problema também fica no Aparelho nesta versão.',
+    ],
+  },
+  {
+    id: 'v3-onde-fica',
+    titulo: 'Onde cada dado fica (servidor)',
+    paragrafos: [
+      'E-mail, provedor de login, nome e foto (se o Google informar): na conta do login no Supabase, para identificar a sua conta.',
+      'Versão dos termos aceitos e data do aceite; o que a conta pode usar: no seu perfil, que só você lê, para saber o que você aceitou.',
+      'E-mail convidado, data do convite e data de uso: na lista de convites, sem acesso pelo app, para controlar quem entra no teste.',
+      'Cópia cifrada dos seus dados: em arquivos do Supabase Storage, em pasta só sua, a cópia que você pedir.',
+      'As tabelas de registros de estudo e de alterações ficam vazias nesta versão: a sincronização automática entre Aparelhos ainda não existe.',
+    ],
+  },
+  {
+    id: 'v3-copia-cifrada',
+    titulo: 'Cópia cifrada na nuvem',
+    paragrafos: [
+      'Você pede, o Arretado cifra e envia. A cifra acontece no Aparelho (AES-256-GCM, chave derivada da sua frase por PBKDF2): a frase nunca sai dele, e o servidor guarda bytes que não dizem nada sem a frase.',
+      'Sem a frase, nem o Arretado abre a cópia. Perdeu a frase, perdeu a cópia — isso é dito antes de cifrar.',
+      'São mantidas as 3 últimas cópias; as mais velhas saem. As cópias apagam junto com a conta.',
+      'Para restaurar, o Arretado baixa, pede a frase, mostra uma prévia e cria um ponto de restauração antes de aplicar.',
+    ],
+  },
+  {
+    id: 'v3-bases-legais',
+    titulo: 'Bases legais',
+    paragrafos: [
+      'Consentimento: entrar com conta, aceitar os termos de teste e guardar cópia cifrada na nuvem.',
+      'Execução do serviço: guardar o essencial para manter a sua conta funcionando (login, perfil, convite, cópia que você pediu).',
+      'Você pode revogar o consentimento: sair e excluir a conta (veja "Direitos do titular").',
+    ],
+  },
+  {
+    id: 'v3-fora-do-brasil',
+    titulo: 'Transferência para fora do Brasil',
+    paragrafos: [
+      'Os dados do servidor ficam na região São Paulo do Supabase. Duas exceções: ao entrar com Google, o seu e-mail passa pelo Google, provedor global, e pode ser tratado fora do Brasil; e a Cloudflare usa a rede global dela para publicar o app e buscar a página da lei.',
+      'Nenhum conteúdo de estudo sai do Aparelho nesses caminhos, salvo a cópia cifrada que você pedir, guardada no Supabase.',
+    ],
+  },
+  {
+    id: 'v3-retencao',
+    titulo: 'Retenção e exclusão',
+    paragrafos: [
+      'Os dados ficam enquanto a conta existir.',
+      'Excluir a conta (Conta › Dados) apaga na hora, de forma definitiva: perfil, registros da conta, histórico e cópias da nuvem. Não há prazo de "arrependimento": isso é dito antes de confirmar, e a confirmação é digitada.',
+      'Sair apaga os dados do Aparelho se você escolher "Apagar daqui" (recomendado em Aparelho emprestado).',
+      'Os convites guardam o e-mail convidado e as datas enquanto durar o teste; saem quando o convite é apagado.',
+      'Cópia do provedor: no plano gratuito atual, o Supabase não mantém cópias diárias próprias do banco. Se o plano mudar, as cópias do provedor passam a existir e expiram na janela dele; esta política dirá a janela real quando isso acontecer.',
+      'O que você guarda fora do app (exportação e backups seus) é responsabilidade sua.',
+    ],
+  },
+  {
+    id: 'v3-direitos',
+    titulo: 'Direitos do titular e como exercer',
+    paragrafos: [
+      'Confirmar que há tratamento: esta política e a tela Conta › Privacidade.',
+      'Acesso e portabilidade: "Exportar" em Conta › Dados (arquivo .arretado).',
+      'Correção: editar o registro no app; o e-mail, trocar na conta do provedor de login.',
+      'Eliminação: "Excluir conta" em Conta › Dados (imediata e definitiva).',
+      'Saber com quem os dados são tratados: os operadores listados acima; ninguém mais recebe os seus dados.',
+      'Revogar o consentimento: sair e excluir a conta.',
+      'Falar com o encarregado: [A DEFINIR PELO GABRIEL: contato do encarregado.]',
+    ],
+  },
+  {
+    id: 'v3-continua-igual',
+    titulo: 'O que continua igual',
+    paragrafos: [
+      'O Arretado funciona sem internet e sem conta; o estudo nunca depende de rede. "Usar sem conta" continua existindo.',
+      'Texto colado de páginas externas é limpo antes de ser usado.',
+      'Importar lei por endereço envia só o endereço, para a Cloudflare buscar a página no site de origem (Planalto ou ALESP).',
+      'O relato de Problema leva a descrição, a tela, a versão do app e o Aparelho — nunca conteúdo de estudo.',
+      'Não há rastreadores, estatísticas de uso nem propaganda.',
+    ],
+  },
+  {
+    id: 'v3-versoes',
+    titulo: 'Versões e mudanças',
+    paragrafos: [
+      'Esta é a versão 3. Mudança que faça dado novo sair do Aparelho vem com aviso na tela antes de valer. A versão 2, que vale para quem usa sem conta, fica logo abaixo como versão anterior.',
     ],
   },
 ];

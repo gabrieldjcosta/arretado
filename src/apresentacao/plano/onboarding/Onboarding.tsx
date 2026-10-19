@@ -2,7 +2,6 @@
 // reversível (os pontos entram pelo mesmo caminho da importação: prévia, snapshot, log e desfazer).
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import type { Ponto } from '../../../core/modelo';
 import { aplicar } from '../../../core/pacote';
 import {
   CatalogoIndisponivel,
@@ -21,9 +20,10 @@ import { AcaoAgora } from '../../componentes/AcaoAgora';
 import { Esqueleto, Falha, Vazio } from '../../componentes/estados';
 import { useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
+import { ACRESCENTOS_VAZIOS, linhasDosAcrescentos, validarNome } from './acrescentos';
+import { planoCriado, type PlanoCriado } from './plano-criado';
 import { PassoDisciplinas } from './PassoDisciplinas';
 import { Moldura, PassoCarreira, PassoEdital } from './Passos';
-import { ACRESCENTOS_VAZIOS, linhasDosAcrescentos, validarNome } from './acrescentos';
 import { gravarRascunho, lerRascunho, limparRascunho, type Passo, type Rascunho } from './rascunho';
 
 const ORDEM: readonly Passo[] = ['carreira', 'edital', 'disciplinas', 'revisar'];
@@ -65,7 +65,7 @@ function SemEdital() {
   );
 }
 
-function ComecePorAqui({ ponto, materia }: { ponto?: Ponto; materia?: string }) {
+function ComecePorAqui({ ponto, materia }: PlanoCriado) {
   return (
     <>
       {ponto ? (
@@ -83,7 +83,7 @@ function ComecePorAqui({ ponto, materia }: { ponto?: Ponto; materia?: string }) 
       )}
       {materia && <p className="dica">Matéria: {materia}</p>}
       <p className="dica">
-        Para desfazer, use Conta › Dados › Importações. Em <Link to="/plano">Plano</Link> estão
+        Para desfazer, use Conta › Dados › Importações. Na <Link to="/plano">Trilha</Link> estão
         todos os pontos.
       </p>
     </>
@@ -100,7 +100,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
   const [semEdital, setSemEdital] = useState(false);
   const [preparado, setPreparado] = useState<PontosPreparados | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const [criado, setCriado] = useState<{ ponto?: Ponto; materia?: string } | null>(null);
+  const [criado, setCriado] = useState<PlanoCriado | null>(null);
   const [erroAoCriar, setErroAoCriar] = useState(false);
 
   const mudar = (parte: Partial<Rascunho>) => {
@@ -196,16 +196,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
         descricao: 'Plano pelo catálogo',
       });
       limparRascunho();
-      const pontos = (preparado.pacote.registros.get('pontos') ?? []) as Ponto[];
-      const primeiro =
-        pontos.find((p) => p.faixa === 'altissima' && linhas.some((l) => l.titulo === p.titulo)) ??
-        pontos[0];
-      const materia = (preparado.pacote.registros.get('disciplinas') ?? []).find(
-        (d) => d.id === primeiro?.disciplinaId,
-      )?.nome;
-      setCriado(
-        primeiro ? { ponto: primeiro, ...(typeof materia === 'string' ? { materia } : {}) } : {},
-      );
+      setCriado(planoCriado(preparado.pacote, linhas));
     } catch {
       setErroAoCriar(true);
     } finally {

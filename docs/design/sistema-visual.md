@@ -1,116 +1,118 @@
-# Sistema visual do Arretado — v3
+# Sistema visual do Arretado — v4 (Ponto de luz)
 
-> **D-D5 (16/10/2026) — Fatia F1b implementada:** a paleta, o menu (Hoje · Trilha · Fixar · Biblioteca), a pílula flutuante, a tipografia (Playfair Display nos títulos) e o fundo com pontinhos vêm do Stitch (`decisoes-design.md`, D-D5). As tabelas de tokens abaixo refletem a implementação da fatia **F1b**. Mapa de papéis: Palha → Creme `#fff8ec` · Tinta e Caatinga (texto, título, bloco) → Marinho `#14213d` · Terracota e Solace (primário) → Sol `#ffb627` com texto Marinho · Acqua e ponto de Frases → Verde-foco `#2fa36b` (texto: passo escuro `#268256` claro / `#62c995` escuro) · ponto de Cartões → Azul-céu `#3ba7f0` · etiqueta de matéria → Argila `#c8763a`. Regras que não mudam: piso de 13 px, alvo de 44 px, lei sem itálico, destaque sublinhado, vidro só no dock do Leitor e na pílula. Fundo com pontinhos em `radial-gradient(var(--ponto-fundo) 0.75px, transparent 0.75px)` com 16px de passo, desligado sob `prefers-contrast: more`.
+> **D-D7 (18/10/2026) — Ponto de luz.** Direção escolhida pelo Gabriel nas rodadas de 18/10/2026 e autorizada para construção no app no mesmo dia ([`decisoes-design.md`](decisoes-design.md), D-D7; contrato em [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md)). Mapa da troca: Creme → **Areia** `#f1e6d3` (chão liso, sem pontinhos) · Marinho (texto, título) → **Tinta** `#17243a` · Marinho (bloco-herói, item atual) → **Cal** `#ffffff` com a sombra fresca · Sol (ação) → **Vidro** `#0f7f72` com texto branco · Verde-foco ("salvo", progresso) → **Vidro** e **Vidro texto** `#0a6157` · Azul-céu e Argila → saem (tipo e matéria em texto, em neutro) · Playfair Display → **Gabarito**. Novos: **Luz** `#6fe3d6` (pontos do Dia, Estrela, ponta da caneta) e **Traço** `#c8742f` (só o cachorro). Regras que não mudam: piso de 13 px, alvo de 44 px, lei sem itálico, destaque sublinhado, uma ação por tela, sem vermelho no estudo.
 
-Base: a identidade D-D2 (areia, espresso, cacto, mascote; aprovada em 14/10/2026), os papéis de cor e as plataformas da D-D3 e, por cima, a **D-D4** (paleta, botões, cartões por estado, Leitor e Sessão do Gabriel, 14/10/2026) — tudo em [`decisoes-design.md`](decisoes-design.md); a D-D3 e a D-D4 valem como padrão até o Gabriel vetar. A referência de fidelidade são os mockups do Gabriel em [`referencias/2026-10-14-gemini/`](referencias/2026-10-14-gemini/leia-me.md) (o protótipo [`prototipo/hoje.html`](prototipo/hoje.html) é da D-D2 e está superado nas cores e nos botões). Diagnóstico que originou esta versão: [`auditoria-ui-2026-10-14.md`](auditoria-ui-2026-10-14.md). Execução: [`../planos/redesign-v2.md`](../planos/redesign-v2.md). Só apresentação (D-D1).
+Base: as decisões D-D1 a D-D6 em [`decisoes-design.md`](decisoes-design.md), que ficam como histórico onde a D-D7 diverge. Execução em fases: [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md) (P1 fundação, P2 casca, P3 Hoje, P4 Leitor, P5 Fixar, P6 demais telas, P7 plataformas). Resumo no formato do Stitch: [`../../DESIGN.md`](../../DESIGN.md). Só apresentação (D-D1).
 
-**Fonte de verdade dos valores:** `src/apresentacao/estilos.css` (e os CSS dos pacotes). Este texto é o alvo e o mapa; enquanto uma fatia não chegou, o código ainda diverge dele. Contraste de cada par: `scripts/contraste.mjs` (e `npm run check`).
+**Fonte de verdade dos valores:** `src/apresentacao/estilos.css` (e os CSS dos pacotes). Este texto é o alvo e o mapa; enquanto uma fase não chegou, o código ainda diverge dele. Contraste de cada par: `scripts/contraste.mjs` (e `npm run check`).
 
 ## Princípios
 
-1. **Uma ação dominante por tela**, em Sol (botão com texto Marinho).
-2. **Cor tem função** (tabela abaixo). Nada de verde "de enfeite".
-3. **Bloco de cor orienta, não anima:** um bloco-herói por tela de orientação, e a cor do bloco diz o **estado** da pessoa. Leitor e Revisão em curso ficam calmos.
+1. **Uma ação dominante por tela**, em vidro (botão com texto branco; à noite, vidro claro com o texto da noite).
+2. **Cor tem função** (tabela abaixo). Nada de cor "de enfeite"; a luz só reporta estado.
+3. **Uma folha sobe do chão:** a folha de cal do Agora, com a sombra fresca, é o único lugar de foco da tela de orientação. Leitor e Revisão em curso ficam calmos.
 4. **O texto da lei é o protagonista**; tudo em volta cede.
-5. **Segurança visível:** "salvo neste aparelho" e o ponto de retomada sempre à vista.
+5. **Segurança visível:** onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo (os pontos do Dia acesos) sempre à vista.
 6. **Mesmo jeito em celular, tablet e desktop;** o que muda é a disposição, não o vocabulário visual.
 7. **Nada depende de movimento, de transparência nem de cor sozinha.**
 
 ## Papéis de cor
 
-| Papel | Pergunta | Claro | Escuro |
+| Papel | Pergunta | Dia | Noite |
 |---|---|---|---|
-| Ação | "O que faço agora?" | Sol `--acao` (texto Marinho) | Sol `--acao` (texto Marinho) |
-| Ação dentro do bloco-herói | idem | Sol `--bloco-acao` | Sol `--bloco-acao` |
-| Lugar e selecionado | "Onde estou? O que guardei?" | Marinho `--lugar`, `--selecionado-*`, `--bloco-*` | Verde-foco texto `--lugar`; bloco `#223559` |
-| Calma | "O que anda bem?" | Verde-foco `--verde-foco` (texto: `--verde-foco-texto`) | Verde-foco (texto `#62c995`) |
-| Superfície quente | quadro de estado | `#f4ebd9` `--quente` | `#23324d` |
-| Conteúdo | 1 coluna, gutter 16, reserva embaixo para a pílula | 1 coluna de 40 rem centralizada | até 65 rem, 2 colunas (7fr · 5fr) no Hoje, no Fixar e na Trilha |
-| Caminho | "Para onde posso ir?" | Marinho `--link` | Sol `--link` |
+| Ação | "O que faço agora?" | Vidro `--acao` (texto branco) | Vidro claro `--acao` (texto da noite) |
+| Ação dentro da folha | idem | Vidro `--bloco-acao` | Vidro claro `--bloco-acao` |
+| Onde estou | "Onde estou?" | Cal `--atual-*`, `--bloco-fundo` sobre a areia | Folha da noite `#142a4a` sobre a noite |
+| Marcado | "O que liguei?" | Tinta `--selecionado-*` (marca em cal) | Tinta clara (marca na noite) |
+| Estado | "Está feito? Está salvo?" | Luz `--ponto-luz` com contorno `--ponto-contorno` | Vidro claro com contorno claro |
+| Caminho | "Para onde posso ir?" | Vidro texto `--link` | Vidro claro `--link` |
 | Realce de termo | "Que tipo de termo é este?" | `--destaque-*` (sublinhado, ver Leitor) | os mesmos, mais claros |
 | Perigo | "Isto apaga" ou falha técnica | `--perigo` | `--perigo` |
 
-Regras: Sol só em botão primário, "+" e foco no escuro; Marinho é o texto e o foco no claro; Verde-foco nunca como texto pequeno sem o passo `--verde-foco-texto` (`#268256` claro / `#62c995` escuro); vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada. O **tipo da tarefa** é um ponto de cor ao lado do texto (Frases = Verde-foco `#2fa36b`, Cartões = Azul-céu `#3ba7f0`, leitura = lugar); a matéria vai sempre em texto (Argila `#c8763a`).
+Regras: vidro só em botão primário, cacto da marca e andamento (o "+" é cal com tinta); a luz nunca é texto, nunca pulsa, nunca segue o dedo e sempre tem o contorno na tinta; vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada; caramelo é só do traço do cachorro. O **tipo da tarefa** (Leitura, Cartões, Frases) vai em texto, com o ponto de luz dizendo o estado; a matéria vai sempre em texto, em neutro.
 
 ## Tokens
 
-Todos os pares de texto passam em 4,5:1 e os gráficos (contorno, ícone, foco, sublinhado) em 3:1, medidos com `scripts/contraste.mjs`. Colunas: claro · escuro.
+Todos os pares de texto passam em 4,5:1 e os gráficos (contorno, ícone, foco, sublinhado) em 3:1, medidos com `scripts/contraste.mjs`. Colunas: dia · noite.
 
-### A paleta (valores fixos e canônicos da D-D5)
+### A paleta (valores fixos e canônicos da D-D7)
 
-`--creme #fff8ec` · `--marinho #14213d` · `--sol #ffb627` · `--argila #c8763a` · `--verde-foco #2fa36b` · `--verde-foco-texto #268256` (claro) / `#62c995` (escuro) · `--azul-ceu #3ba7f0` · `--ponto-fundo #d6c9b3`.
-Aliases mantidos para retrocompatibilidade: `--areia`, `--palha`, `--terracota`, `--caatinga`, `--acqua`, `--acqua-texto`, `--acqua-fundo`, `--solace`, `--noite`, `--noite-cartao`, `--tinta`, `--sobre-solace`, `--cacto`.
+`--areia #f1e6d3` · `--areia-funda #e7d8be` · `--cal #ffffff` · `--tinta #17243a` · `--tinta-2 #4f5b70` · `--vidro #0f7f72` · `--vidro-texto #0a6157` · `--luz #6fe3d6` · `--traco #c8742f` · `--noite #0b1b33` · `--noite-funda #07152a` · `--noite-folha #142a4a` · `--noite-quente #1c375d` · `--noite-tinta #eef3f8` · `--noite-tinta-2 #a9b7cc` · `--noite-vidro #7df3e1` · `--noite-traco #ffb46b`.
+Saíram com a D-D7 (o teste de contraste falha se algum CSS voltar a usá-los): `--creme`, `--marinho`, `--sol`, `--argila`, `--verde-foco`, `--azul-ceu`, `--ponto-fundo` e os aliases `--palha`, `--terracota`, `--caatinga`, `--acqua`, `--solace`, `--sobre-solace`, `--noite-cartao`.
 
 ### Superfície e texto
 
-| Token | Claro · escuro | Uso | Contraste medido |
+| Token | Dia · noite | Uso | Contraste medido |
 |---|---|---|---|
-| `--fundo` | Creme `#fff8ec` · `#0c1527` | tela | — |
-| `--superficie` | `#ffffff` · `#1b2a47` | campos, cartões, linhas | — |
-| `--superficie-2` | `#fff9ef` · `#223559` | trilho de abas, barra de paginação, trilho do progresso | — |
-| `--quente` | `#f5ebd9` · `#223559` | cartão Distraído, tiles, chip inativo | `--texto` ≥ 4,5:1 nos dois |
-| `--borda` | Marinho a 12% (`#e1dbcf`) · Creme a 14% (`#2c3954`) | filetes decorativos | — |
-| `--borda-campo` | `#7b8599` · `#64789e` | contorno de campo | ≥ 3:1 sobre `--superficie` |
-| `--borda-forte` | Marinho · `#fff8ec` | contorno de caixa e rádio | 15,2:1 · 8,3:1 |
-| `--texto` | Marinho `#14213d` · Creme `#fff8ec` | texto | 15,7:1 sobre `--fundo` · 16,7:1 |
-| `--texto-atenuado` | `#4f596e` · `#a8b5cc` | apoio, rótulo | ≥ 4,5:1 sobre `--fundo` e `--superficie` |
-| `--titulo` | Marinho `#14213d` · Creme `#fff8ec` | título de página (H1) | 15,7:1 · 16,7:1 |
+| `--fundo` | Areia `#f1e6d3` · Noite `#0b1b33` | tela, cabeçalho, barra das áreas | — |
+| `--superficie` | Cal `#ffffff` · `#142a4a` | campos, cartões, folha, linhas | — |
+| `--superficie-2` | Areia funda `#e7d8be` · `#07152a` | trilho de abas, selo, trilho do andamento, esqueleto | `--texto-atenuado` 4,9:1 · 9,0:1 |
+| `--quente` | Areia funda `#e7d8be` · `#1c375d` | ícone de linha de lista, faixa quente | `--texto` 11,1:1 · 10,7:1 |
+| `--borda` | tinta a 12% · tinta clara a 14% | filetes decorativos | — |
+| `--borda-campo` | `#727c8f` · `#7387a8` | contorno de campo | 3,4:1 na areia, 4,2:1 na cal · 4,7:1 e 3,9:1 |
+| `--borda-forte` | Tinta · `#a9b7cc` | contorno de caixa e rádio | 15,6:1 · 7,1:1 |
+| `--texto` | Tinta `#17243a` · `#eef3f8` | texto | 12,6:1 na areia · 15,4:1 na noite |
+| `--texto-atenuado` | `#4f5b70` · `#a9b7cc` | apoio, rótulo | 5,5:1 na areia, 6,9:1 na cal · 8,5:1 e 7,1:1 |
+| `--titulo` | Tinta · `#eef3f8` | título de página (H1) | 12,6:1 · 15,4:1 |
+| `--penumbra` / `--luz-do-cartao` | `#e4d6bd` / Cal · `#050e1c` / `#142a4a` | palco do modo foco | `--texto-atenuado` na penumbra 4,8:1 |
 
-### Ação, lugar, calma e bloco
+### Ação, lugar, estado e folha
 
-| Token | Claro · escuro | Uso | Contraste medido |
+| Token | Dia · noite | Uso | Contraste medido |
 |---|---|---|---|
-| `--acao` / `--acao-texto` | Sol `#ffb627` / Marinho `#14213d` · Sol `#ffb627` / Marinho `#14213d` | botão primário e "+" | 11,5:1 · 11,5:1 (borda 1,5px Marinho no claro) |
-| `--link` | terra queimada `#963417` · Sol `#ffb627` | link de texto | ≥ 4,5:1 sobre `--fundo` nos dois |
-| `--foco` | Marinho `#14213d` · Sol `#ffb627` | anel de foco global (2 px) | 15,7:1 · 11,8:1 |
-| `--lugar` | Marinho · Azul-céu `#3ba7f0` | filete, marca do "Lido até aqui", filtro ligado | ≥ 3:1 nos dois |
-| `--verde-foco` | `#2fa36b` | progresso, ponto de Frases, "salvo", interruptor | branco sobre verde 3,1:1 |
-| `--verde-foco-texto` | `#268256` · `#62c995` | texto em verde / calma | 4,7:1 sobre fundo (4,55:1 sobre `--superficie` e `--superficie-2`) · 9,4:1 (7,1:1 sobre `--superficie`) |
-| `--azul-ceu` | `#3ba7f0` | ponto de Cartões | sobre Marinho 5,9:1 |
-| `--argila` | `#c8763a` | etiqueta de matéria | sobre Marinho 4,6:1 |
-| `--bloco-fundo` | Marinho `#14213d` · `#223559` | bloco-herói e cartão Estudando | — |
-| `--bloco-texto` / `--bloco-atenuado` | Creme / `#b0b8c6` · Creme / `#a8b5cc` | texto no bloco | ≥ 4,5:1 nos dois |
-| `--bloco-acao` / `--bloco-acao-texto` | Sol / Marinho | botão primário **no bloco** | 11,5:1; Sol sobre bloco escuro 7,7:1 |
-| `--bloco-borda` | Marinho a 12% · Creme a 14% | contorno do bloco | — |
-| `--bloco-foco` | Sol `#ffb627` | anel de foco dentro do bloco | 8,9:1 · 7,7:1 |
-| `--selecionado-fundo` / `-texto` / `-anel` | Marinho / Creme / transparente · Creme / Marinho / Sol | item atual, aba, chip, caixa marcada | 15,7:1 · 16,7:1 |
-| `--tinta-lugar` | Marinho a 10% · Azul-céu a 15% | linha selecionada, "Frase correta", ícone de lista | — |
-| `--regua-fundo` / `--regua-barra` | Sol a 20% / Marinho · Sol a 16% / Sol | régua de leitura | — |
+| `--acao` / `--acao-texto` | Vidro `#0f7f72` / branco · `#7df3e1` / `#0b1b33` | botão primário | 4,9:1 · 13:1; o vidro tem 3,9:1 na areia (sem borda) |
+| `--link` | `#0a6157` · `#7df3e1` | link de texto | 5,9:1 na areia, 5,1:1 na penumbra · 13:1 |
+| `--foco` | Tinta · `#7df3e1` | anel de foco global (2 px) | 12,6:1 · 13:1 |
+| `--lugar` | Tinta · `#eef3f8` | filete, marca do "Lido até aqui", opção marcada | ≥ 3:1 nos dois |
+| `--cacto` / `--andamento` | Vidro · `#7df3e1` | o cacto da marca, achado da busca, preenchimento do andamento | 3,9:1 na areia, 3,5:1 na areia funda · ≥ 10:1 |
+| `--sucesso` | `#0a6157` · `#7df3e1` | texto de "salvo" | 5,9:1 · 13:1 |
+| `--ponto-luz` / `--ponto-contorno` / `--ponto-nucleo` | Luz `#6fe3d6` / Tinta / branco · `#7df3e1` / `#eef3f8` / branco | pontos do Dia, ponta da caneta | contorno 12,6:1 na areia · 15,4:1 na noite |
+| `--estrela` / `--estrela-luz` / `--estrela-contorno` | Vidro / Luz / Tinta · `#7df3e1` / `#7df3e1` / `#eef3f8` | faixa da calha / miolo / contorno da Estrela | faixa 3,9:1 na areia; contorno 12,6:1 |
+| `--traco-cachorro` | `#c8742f` · `#ffb46b` | só o traço do cachorro (decorativo) | — |
+| `--bloco-fundo` | Cal · `#142a4a` | folha do Agora | — |
+| `--bloco-texto` / `--bloco-atenuado` | Tinta / `#4f5b70` · `#eef3f8` / `#a9b7cc` | texto na folha | 15,6:1 e 6,9:1 · 12,9:1 e 7,1:1 |
+| `--bloco-acao` / `--bloco-acao-texto` | Vidro / branco · `#7df3e1` / `#0b1b33` | botão primário **na folha** | 4,9:1 · 13:1 |
+| `--bloco-foco` | Tinta · `#7df3e1` | anel de foco dentro da folha | 15,6:1 · 10,8:1 |
+| `--atual-fundo` / `--atual-texto` / `--atual-sombra` | Cal / Tinta / sombra fresca · `#142a4a` / `#eef3f8` / preto a 45% | área e aba atuais | 15,6:1 · 12,9:1 |
+| `--selecionado-fundo` / `-texto` / `-atenuado` | Tinta / Cal / `#c9d1dc` · `#eef3f8` / `#0b1b33` / `#3b4a63` | caixa e rádio marcados, botão ligado, item escolhido | 15,6:1 · 15,4:1 |
+| `--tinta-lugar` | tinta a 6% sobre a superfície · tinta clara a 8% | linha marcada, "Frase correta" | `--texto-atenuado` 6,1:1 |
+| `--regua-fundo` / `--regua-barra` | tinta a 6% / Tinta 2 · tinta clara a 8% / `#a9b7cc` | régua de leitura (segue o dedo; por isso nunca luz) | atenuado 5,0:1 na areia |
 
-O anel de foco global é Marinho no claro (2 px, `outline-offset: 2px`) e Sol no escuro. Dentro do bloco-herói claro, o anel passa a `--bloco-foco` (Sol `#ffb627`).
+O anel de foco global é tinta no dia (2 px, `outline-offset: 2px`) e vidro claro à noite. Dentro da folha, `--bloco-foco`.
 
 ### Destaques do leitor (sublinhado, nunca fundo)
 
-| Token | Claro · escuro | O quê | Estilo |
+| Token | Dia · noite | O quê | Estilo |
 |---|---|---|---|
 | `--destaque-prazo` | `#173f52` · `#7fb4cf` | prazos e tempo | duplo, deslocamento de 4 px |
-| `--destaque-condicao` | `#b06f22` · Sol | exceções e condições | tracejado, 4 px |
-| `--destaque-absoluto` | Argila · `#f09a68` | termos absolutos | ondulado, 3 px |
-| `--destaque-pena` | Argila · `#f09a68` | penas, quóruns e frações | pontilhado, 4 px |
+| `--destaque-condicao` | `#ab6b21` · `#f2c062` | exceções e condições | tracejado, 4 px; 3,5:1 na areia e 3,1:1 sob a régua |
+| `--destaque-absoluto` | `#a5582a` · `#f09a68` | termos absolutos | ondulado, 3 px |
+| `--destaque-pena` | `#a5582a` · `#f09a68` | penas, quóruns e frações | pontilhado, 4 px |
 
-Contra `--fundo`: 15,7:1 · 9,1:1 (prazo); 3,4:1 · 11,8:1 (condição); 5,5:1 · 6,5:1 (absoluto e pena). O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
+Contra a areia: 9,1:1 (prazo); 3,5:1 (condição); 4,2:1 (absoluto e pena); sob a régua, a condição fica em 3,1:1. À noite, 7,7:1 · 10,2:1 · 7,8:1. O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
 
 ### Estado (sem mudança)
 
-`--perigo`, `--sucesso`, `--aviso-fundo/-texto`, grifos (`--grifo-1` a `-3`) e `--estrela` ficam como estão. **Saíram** na F1: `--primaria`, `--primaria-texto`, `--agora-fundo`, `--agora-borda`, `--depois`, `--progresso`, `--cartao-agora-*`; o teste de contraste falha se algum CSS voltar a usá-los.
+`--perigo`, `--aviso-fundo/-texto` e os grifos (`--grifo-1` a `-3`) ficam como estavam. **Saíram** na F1 do redesenho v2: `--primaria`, `--primaria-texto`, `--agora-fundo`, `--agora-borda`, `--depois`, `--progresso`, `--cartao-agora-*`.
 
 ## Forma, espaço, tipografia
 
 | Item | Valor |
 |---|---|
-| Raios | `--raio-heroi` 28 · `--raio-cartao` 16 · `--raio-botao` 14 · `--raio-campo` 14 · `--raio` 14 (linhas, callouts, diálogo) · `--raio-pilula` 999 (chip, aba, barra, interruptor). Macio e convidativo: o que está dentro tem raio menor que o que o contém. |
+| Raios | `--raio-heroi` (folha) 16 · `--raio-cartao` 16 · `--raio-botao` 12 · `--raio-campo` 12 · `--raio` 12 (linhas, callouts, diálogo) · `--raio-pilula` 999 (aba, selo, área atual, interruptor). O que está dentro tem raio menor que o que o contém. |
 | Espaço | `--espaco-1` 0,25 rem · `-2` 0,5 · `-3` 1 · `-4` 1,5 · `-5` 2 · `-6` 3 |
-| Sombras | `--sombra` (cartão) · `--sombra-botao` (`0 2px 6px`, no primário) · `--sombra-flutuante` (`0 4px 16px`, dock, "+", folha); no escuro, preto |
+| Sombras | `--sombra-folha` (a sombra fresca: `0 14px 28px -10px` tinta a 16% e `0 1px 0` tinta a 16%) · `--sombra` (cartão, mais baixa) · `--atual-sombra` (área e aba atuais) · `--sombra-botao` (`0 2px 6px`, no primário) · `--sombra-flutuante` (`0 4px 16px`, dock, diálogo); à noite, preto |
+| Fundo | Liso, sem textura (os pontinhos da D-D5 saíram). |
 | Alvo | `--alvo` 44 px: botões, links isolados, linhas de lista; campos 48 |
-| Fundo com pontinhos | `radial-gradient(var(--ponto-fundo) 0.75px, transparent 0.75px)` 16px × 16px no `body`. Desligado sob `@media (prefers-contrast: more)` (`background-image: none`). Cartões, campos e leitor têm fundo opaco sem pontinhos (`background-image: none`). |
 | Gutter | 16 px (celular) · 24 (tablet em pé) · 32 (≥ 900) |
 | Coluna | 40 rem (celular e tablet em pé) · 65 rem (≥ 900) · leitura 70 ch |
-| Título de página (H1) e marca | Playfair Display 700 (`--fonte-titulo`), cor `--titulo`, 1,75 rem (celular) · 2 (tablet) · 2,25 (≥ 900), linha 1,15. Mapeia para Atkinson quando `:root[data-fonte='sem_serifa']`. |
-| Título de cartão e de bloco | Atkinson 700 (sans), 1,0625 a 1,3 rem; `.agora-titulo` usa `--fonte-titulo` 600 |
+| Título de página (H1) | Gabarito 800 (`--fonte-titulo`), `-0,02em`, cor `--titulo`, 1,875 rem (celular) · 2,125 (tablet) · 2,375 (≥ 900), linha 1,1 |
+| Marca | "Arretado" em Gabarito 700, 1,1875 rem, `-0,01em`, com o cacto em `--cacto` (13 × 18 px) |
+| Título da folha | Gabarito 750, 1,5 rem, linha 1,12 (`.agora-titulo`) |
 | Seção (H2) / cartão (H3) | Atkinson 700, 1,25 rem / 1,0625 rem |
 | Corpo · pequeno · rótulo | Atkinson 1 rem · 0,875 · 0,8125 (piso de 13 px mantido em `.rodape`, `.rotulo-discreto`, `.marcador`) |
 | Cartão de destaque e frase de revisão | Literata 700, 1,5 a 1,75 rem |
-| Lei | Literata, `--tamanho-leitura` (18 px, preferência da pessoa) |
+| Lei | Literata, `--tamanho-leitura` (18 px, preferência da pessoa); "Sem serifa" troca só esta letra |
 
 Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS aproxima abaixo disso).
 
@@ -118,128 +120,124 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 
 | Componente | Especificação |
 |---|---|
-| **Botão primário** (`.principal`) | Compacto: altura 44, padding `0 20px`, raio 14, peso 600, `.9375rem`, espaçamento `-0,01em`, `--sombra-botao`; fundo `--acao`, texto `--acao-texto`, borda `1.5px solid var(--acao-borda, transparent)` (com borda Marinho no claro fora do bloco). Largura total só em cartão e formulário (altura 52 no bloco-herói). **Um por tela.** Hover escurece 12%; pressionado desce 1 px; desabilitado a 50% sem sombra; transição de 140 ms só em `transform` e `box-shadow` e só sem `prefers-reduced-motion` (nunca em cor: ao virar o tema o texto troca na hora e o fundo ficaria atrasado, o que o axe lê como contraste baixo). |
-| **Botão secundário** (`button`, `.botao`) | Mesma forma, fundo `--superficie`, contorno de 1 px `--borda-botao`, texto `--texto`. |
-| **Botão fantasma** (`.botao-texto`) | Sem caixa, sublinhado de 4 px, cor herdada e 82% de opacidade, peso 500, `.875rem`, alvo 44. Vai **ao lado** do primário ("Trocar tarefa", "Pausar") e é o "Voltar ao Plano" e o "Editar pontos": link isolado nunca fica com 19 px de altura. |
+| **Botão primário** (`.principal`) | Compacto: altura 44, padding `0 20px`, raio 12, peso 600, `.9375rem`, espaçamento `-0,01em`, `--sombra-botao`; fundo `--acao`, texto `--acao-texto`, sem borda. Na folha do Agora: largura total, 52 de altura, `1.0625rem`. **Um por tela.** Hover escurece 14% em direção à tinta; pressionado desce 1 px; desabilitado a 50% sem sombra; transição de 140 ms só em `transform` e `box-shadow` e só sem `prefers-reduced-motion` (nunca em cor: ao virar o tema o texto troca na hora e o fundo ficaria atrasado, o que o axe lê como contraste baixo). |
+| **Botão secundário** (`button`, `.botao`) | Mesma forma, fundo `--superficie` (cal), contorno de 1 px `--borda-botao`, texto `--texto`. |
+| **Botão fantasma** (`.botao-texto`) | Sem caixa, sublinhado de 4 px, cor herdada sem opacidade (a 82%, a cor atenuada de uma dica cai para 3,8:1 na areia), peso 500, `.875rem`, alvo 44. Vai **ao lado** do primário ("Escolher outra coisa", "Pausar"). |
 | **Botão de ícone** (`.botao-icone`) | Quadrado de 44 com o contorno do secundário; `aria-label` sempre. |
-| **Linha de ação** (`.linha-acao`) | Linha inteira de toque: altura 52, padding `10px 14px`, raio 14, filete `--borda`, fundo da superfície; texto à esquerda e seta ou duração à direita. Substitui botões empilhados ("Por onde começar?", folhas, modais). |
+| **Linha de ação** (`.linha-acao`) | Linha inteira de toque: altura 52, raio 12, filete `--borda`, fundo da superfície; texto à esquerda e seta ou duração à direita. |
 | **Destrutivo** (`.perigoso`) | Secundário com texto e borda `--perigo`; só vira cheio dentro do diálogo de confirmação. |
-| **Link em texto** | `--link`, sublinhado fino com `text-underline-offset: 0.2em`, 2 px no hover e no foco. Nunca em verde. |
-| **Campo** | Altura 48, raio 14, fundo `--superficie`, contorno 1,5 px `--borda-campo`, 16 px, rótulo sempre visível acima. Vale para `input` com qualquer `type` (ou sem), `select` (seta própria feita com gradiente, para caber na CSP) e `textarea`. Erro: contorno e texto `--perigo` mais ícone e frase; nunca só cor. |
-| **Caixa e rádio** | Marca própria de 22 px com contorno de 2 px em `--borda-forte` (Tinta no claro), raio 6 (caixa) ou círculo (rádio), dentro de um rótulo de 44 de altura; marcada = `--selecionado-fundo` com marca em `--selecionado-texto` (e anel de cacto no escuro). A linha inteira é o alvo. |
-| **Aba** (`.abas`) | Trilho `--superficie-2` em pílula; aba atual = `--selecionado-*`; no celular rola na horizontal sem quebrar linha; anel de foco por dentro. |
-| **Chip** | Pílula 32 de altura dentro de alvo de 44; selecionado = `--selecionado-*`; inativo = `--quente`. |
-| **Linha de lista** | Altura mínima 56, alvo inteiro, título, apoio em atenuado, sem sublinhado; ponto de tipo, seta ou duração à direita; filete entre linhas. |
-| **Cartão** | `--superficie`, raio 16, borda `--borda`, `--sombra`; título de cartão em sans bold. |
-| **Bloco-herói** | `--bloco-fundo`, raio 28, texto `--bloco-texto`, padding 20 a 28; carrega no máximo etiqueta, título (sans bold), apoio, um botão primário e um fantasma. A cor do bloco é o estado (ver abaixo). Mascote só aqui (e no estado vazio). |
+| **Link em texto** | `--link`, sublinhado fino com `text-underline-offset: 0.2em`, 2 px no hover e no foco. |
+| **Campo** | Altura 48, raio 12, fundo `--superficie`, contorno 1,5 px `--borda-campo`, 16 px, rótulo sempre visível acima. Erro: contorno e texto `--perigo` mais ícone e frase; nunca só cor. |
+| **Caixa e rádio** | Marca própria de 22 px com contorno de 2 px em `--borda-forte`, raio 6 (caixa) ou círculo (rádio), dentro de um rótulo de 44; marcada = `--selecionado-fundo` (tinta) com a marca em `--selecionado-texto` (cal). A linha inteira é o alvo. |
+| **Área e aba atuais** | `--atual-fundo` (cal) com `--atual-sombra` e o rótulo em negrito, sobre a areia (barra das áreas, cabeçalho) ou sobre o trilho `--superficie-2` (abas). O estado não depende só da cor: negrito, sombra e `aria-current`. |
+| **Aba** (`.abas`) | Trilho `--superficie-2` (areia funda) em pílula; aba atual em cal; no celular rola na horizontal sem quebrar linha; anel de foco por dentro. |
+| **Botão ligado** (`aria-pressed`) | `--selecionado-*`: tinta cheia com o texto em cal (ex.: "Destaques" no Leitor, item escolhido no Acervo). |
+| **Selo** | Pílula `--superficie-2` com texto `--texto`. |
+| **Linha de lista** | Altura mínima 56, alvo inteiro, título, apoio em atenuado, sem sublinhado; seta ou duração à direita; filete entre linhas. |
+| **Cartão** | `--superficie` (cal), raio 16, borda `--borda`, `--sombra`; título de cartão em sans bold. |
+| **Folha do Agora** (`.acao-agora`) | `--bloco-fundo` (cal), raio 16, `--sombra-folha`, texto `--bloco-texto`, padding 20; carrega título (Gabarito 750), motivo e tempo em `--bloco-atenuado`, um botão de vidro e um fantasma. A caneta encostada na borda de cima à direita (P3); nenhum mascote. |
+| **Pontos do Dia** (P3) | Leitura, Cartões e Frases; cada um com um ponto de 22 px: apagado (anel `--ponto-contorno` a 45%), aceso pela metade (atual: metade direita em `--ponto-luz`, anel e núcleo), aceso (feito: círculo `--ponto-luz`, anel e núcleo `--ponto-nucleo`). Rótulo em 13 px peso 600, atenuado; o atual em `--texto`. Acende uma vez em 160 ms. |
+| **Estrela** | A estrela de luz: miolo `--estrela-luz`, contorno `--estrela-contorno`; faixa da calha em `--estrela` (cheia na direta, tracejada na herdada). Na P4 vira a estrela de quatro pontas do contrato. |
 | **Callout** | Fundo `--tinta-lugar`, filete de 4 px à esquerda, ícone e texto; "Frase correta" em lugar, aviso em `--aviso-*`, perigo em `--perigo`. |
-| **Ponto de tipo** | 10 a 12 px, decorativo (`aria-hidden`): Frases Verde-foco, Cartões Azul-céu, leitura `--lugar`; o tipo vem em texto. |
-| **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--acqua`; sempre com texto ("3 de 12"). |
-| **Estado vazio** | Ícone ou mascote pequeno, frase curta, um botão primário. Sem texto longo. |
-| **Navegação** | Celular e tablet em pé: pílula flutuante Marinho com Hoje · Trilha · Fixar · Biblioteca (ícone 24 + rótulo ≥ 13 px, alvo ≥ 44), item atual em Sol sobre a pílula ou Creme sobre Marinho; `safe-area`. A partir de 700 px vira barra no alto. Hoje o código ainda tem barra reta fixa embaixo (F2 troca). |
-| **Cabeçalho** | "Arretado" (Playfair Display 700 / `--fonte-titulo`) com o cacto verde; botão "Conta" em pílula (o "?" vai para Conta › Orientações); no desktop, a navegação entra no meio e "Registrar erro" (com a tecla E) à direita. O "+" redondo verde fica na linha do título das telas que criam algo. |
-| **Rodapé** | Linha legal curta e o link "Backup e dados" (botão fantasma, 44). No fim do conteúdo, nunca sob a navegação fixa. |
+| **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--andamento`; sempre com texto ("3 de 12"). |
+| **Estado vazio** | Ícone pequeno, frase curta, um botão primário. Sem texto longo e sem mascote. |
+| **Navegação** | Abas Hoje · Trilha · Fixar · Biblioteca sobre a areia (`nav.areas`), a atual em cal com `--atual-sombra` e o rótulo em negrito. Até 899 px, presas embaixo, com filete em cima: ícone de 22 sobre o rótulo de 13 px, aba de 56, `safe-area` embaixo; com o teclado aberto saem da frente (`.shell[data-teclado]`, `useTecladoAberto`). A partir de 900, no centro do cabeçalho, só o rótulo, pílula de 44. Nomes de `ROTULO_DA_AREA` (`textos.ts`); rotas `/plano` e `/recall`. |
+| **Cabeçalho** | Preso no alto (`sticky`), na areia, com filete embaixo: "Arretado" (Gabarito 700) com o cacto em vidro; Ajuda (texto) e Conta (ícone de pessoa num alvo de 44) à direita; a partir de 900 px, as áreas no meio e "Registrar erro" neutro com a tecla E. O Leitor mede a altura dele (`.topo`) para prender as próprias barras logo abaixo. |
+| **"+" no título** | `TituloComMais`: o título e o "+" na mesma linha; o "+" é redondo, 44 px, cal com tinta e `--atual-sombra`, e abre o registro de erro. No Hoje e no Fixar (as telas em que se registra); nas outras, a tecla E e, a partir de 900 px, o "Registrar erro" do cabeçalho. Não há "+" flutuante. |
+| **Rodapé** | Linha legal curta e "Backup e dados" como botão de texto de 44 px, centralizados no fim do conteúdo, acima da reserva das abas; nunca sob a navegação fixa. |
 | **Diálogo** | `dialog` nativo, raio 16, `--superficie`, fundo `rgb(0 0 0 / 45%)`, `--sombra-flutuante`; no celular, folha presa à borda de baixo. |
 
-### Blocos por estado (F3, Retorno e Fechar o dia)
+### A caneta e o cachorro (P3 em diante)
 
-| Estado | Bloco | Ação | Conteúdo |
-|---|---|---|---|
-| Estudando (retomar: "Você parou no Art. 112, § 1º") | Marinho (`#223559` no escuro) | Sol "Avançar um tiquinho →" + fantasma "Escolher outra coisa" | etiqueta de matéria em Argila, "no seu ritmo", título serifado, trecho da lei em caixa translúcida, mascote Estudando |
-| Distraído ("Por onde começar?") | creme quente (`--quente`) com filete Argila | linhas de ação | mascote Distraído e os símbolos de distração |
-| Sorrindo (dia fechado) | Creme (cartão claro, ponto verde) | botão de contorno "Ver resumo do dia" | mascote Sorrindo entre os cactos e o andamento do dia em pontos — **andamento das tarefas, nunca sequência de dias** |
-| Determinado (revisões prontas) | Marinho com Sol | Sol "Iniciar N frases →" | mascote Determinado e a lista do que está pronto |
+| Peça | Especificação |
+|---|---|
+| **Caneta** | Coluna de vidro com dois braços, do ciano ao verde (`#dffcff`, `#9af0dc`, `#5fcf8f`, `#2b8f5e`, `#17422f`), brilho de borda, três pontos de luz nas pontas dos membros e a ponta cônica escura com o ponto de luz; versões de dia e de noite (halo maior só na ponta, à noite). SVG com `<symbol>` e gradiente em `userSpaceOnUse`; cor literal por tema dentro do símbolo. Poses: encostada a 35° (Hoje, Cartão atual), deitada a 65° (Lido até aqui), largada (Resumo do Dia, fim de rodada). Decorativa (`aria-hidden`); uma por tela. |
+| **Cachorro** | Um traço (`TRACO_CACHORRO`) em `--traco-cachorro`, 3,6 px, pontas redondas; olho e focinho como pontos; lenço em V. Desenha-se uma vez em 300 ms (`stroke-dashoffset`, linear), olho e nariz no fim; com `prefers-reduced-motion`, pronto. Só no Resumo do Dia e no fim de rodada. |
 
-O Agora do Hoje usa o primeiro (Marinho) por padrão (D-D5; a pergunta Caatinga × Areia da D-D4 está encerrada).
+### Vidro é objeto, nunca superfície
 
-### Botões não são vidro
-
-O vidro (transparência com desfoque) saiu dos botões e da navegação. Fica **só** onde algo flutua sobre o texto: o dock do Leitor (fundo da superfície a 92%, `blur(12px)`) e, no modo foco, os botões fixos de `--superficie-translucida` (90%). Com `prefers-reduced-transparency: reduce` e em `forced-colors` vira cor sólida, sem `backdrop-filter`. Texto sempre sólido: a transparência nunca baixa o contraste do texto abaixo de 4,5:1 sobre o pior fundo possível.
+O vidro desfocado não entra em botão nem em navegação. Fica **só** onde algo flutua sobre o texto: o dock do Leitor (fundo da superfície a 92%, `blur(12px)`) e, no modo foco, os botões fixos de `--superficie-translucida` (90%). Com `prefers-reduced-transparency: reduce` e em `forced-colors` vira cor sólida, sem `backdrop-filter`. Texto sempre sólido: a transparência nunca baixa o contraste do texto abaixo de 4,5:1 sobre o pior fundo possível. O "vidro" da paleta é a cor da ação e o material da caneta.
 
 ## Plataformas
 
-Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e tablet deitado ≥ 900** (os de hoje no CSS). Referências: 390×844, 768×1024 (e 712×1138 na suíte), 1440×900 (e 1024×768).
+Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e tablet deitado ≥ 900**. Referências: 390×844, 768×1024 (e 712×1138 na suíte), 1440×900 (e 1024×768).
 
 | Elemento | Celular | Tablet em pé | Desktop e tablet deitado |
 |---|---|---|---|
-| Cabeçalho | 64 px: "Arretado" à esquerda; "Conta" e "?" à direita | igual, gutter 24 | 72 px: marca · navegação ao centro · "Registrar erro (E)", "Conta", "?" |
-| Navegação | pílula flutuante Marinho, ícone e rótulo nas quatro áreas, `env(safe-area-inset-bottom)`; sem "+" fixo (o "+" fica na linha do título) | a mesma pílula, centralizada em até 560 px | no cabeçalho, pegajosa (`sticky`), item atual em bloco; sem "+" fixo |
-| Conteúdo | 1 coluna, gutter 16, reserva embaixo para a barra e o "+" | 1 coluna de 40 rem centralizada | até 65 rem, 2 colunas (7fr · 5fr) no Hoje, no Recall e no Plano |
-| H1 | 1,75 rem | 2 rem | 2,25 rem |
-| Hoje | cartão Agora por estado, Em seguida (até 2 linhas, linha do tempo), campo "Para lembrar" | Agora em 2 colunas internas (texto · mascote) | à esquerda o Agora; à direita Em seguida e "Para lembrar"; mascote apoiado na borda do bloco |
-| Fixar | resumo + abas rolantes + lista | idem, lista em cartões | à esquerda resumo e abas; à direita a lista; revisão em coluna única de 40 rem |
-| Biblioteca | abas rolantes, filtros recolhidos, lista de normas | grade de 2 colunas | grade de 3 colunas, filtros em barra lateral |
-| Trilha | matérias recolhidas com andamento; pontos ao abrir | idem | matérias à esquerda, pontos à direita |
-| Leitor | ver abaixo | ver abaixo | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
+| Cabeçalho | na areia, gutter 16: "Arretado" à esquerda; Ajuda e Conta à direita | igual, gutter 24 | marca · navegação ao centro · "Registrar erro (E)", Ajuda, Conta |
+| Navegação | abas sobre a areia, ícone e rótulo nas quatro áreas, atual em cal, `env(safe-area-inset-bottom)` | as mesmas, centralizadas em até 560 px | no cabeçalho, pegajosa (`sticky`), atual em cal |
+| "+" | redondo em cal, na linha do título do Hoje e do Fixar | idem | idem, e "Registrar erro (E)" no cabeçalho |
+| Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna, gutter 24 (destino: 40 rem centralizada) | coluna de 900 px, gutter 32 (destino: até 65 rem, 2 colunas, 7fr · 5fr, no Hoje, no Fixar e na Trilha) |
+| H1 | 1,875 rem | 2,125 rem | 2,375 rem |
+| Hoje | título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, Em seguida | idem, folha mais larga | à esquerda o Agora; à direita Em seguida e "Para lembrar" |
+| Leitor | ver abaixo | estrutura à esquerda, coluna de lei à direita | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
 | Rodapé | fim do conteúdo, acima da reserva | idem | uma linha, centralizada |
 | Formulários | largura total, rótulo acima | coluna de 32 rem | coluna de 32 rem alinhada à esquerda do conteúdo |
 
-Regras de plataforma: a pílula e o dock nunca cobrem texto (reserva de rolagem = altura da pílula + 12 px + `safe-area` + 16 px); com o teclado aberto a pílula some (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha).
+Regras de plataforma: as abas e o dock nunca cobrem texto (reserva de rolagem = `--abas-altura`, a altura das abas com o filete, os 6 px de cima, a aba de 56 e, embaixo, 14 px ou a área segura, o que for maior; o rodapé termina 16 px acima delas; o dock do Leitor fica 16 px acima das abas); com o teclado aberto as abas somem (o campo ganha a tela); `viewport-fit=cover` e `env(safe-area-inset-*)` em tudo que é fixo; toque sem depender de `:hover`; teclado e atalhos do desktop intactos (E registra erro; Esc fecha). No app de loja (futuro): corpo na fonte do sistema com Dynamic Type, Gabarito só nos títulos; a caneta sobre a areia é o ícone.
 
-## Leitor e Sessão (D-D4; valores da especificação do Gabriel)
+## Leitor e Sessão
 
-Fonte completa: [`referencias/2026-10-14-gemini/especificacao-leitor-sessao.md`](referencias/2026-10-14-gemini/especificacao-leitor-sessao.md). Aqui, o que o código precisa saber.
+Fonte da especificação de comportamento: [`referencias/2026-10-14-gemini/especificacao-leitor-sessao.md`](referencias/2026-10-14-gemini/especificacao-leitor-sessao.md) (D-D4). As cores de lá (Marinho, Creme, Sol) leem-se pela tabela de troca do topo deste arquivo.
 
-**Leitor (F6).**
-
-| Parte | Especificação |
-|---|---|
-| Controles | linha `space-between`, gap 8: seletor de fonte segmentado (pílula de 38, contorno Marinho a 18%, A- e A+ de 44 × 38, rótulo "18px") e "Destaques" (pílula de 38; ligado = Marinho com texto Creme e ícone de marca SVG) |
-| Legenda dos destaques | uma linha recolhível sob os controles, só com Destaques ligado: Prazos, Exceções, Absolutos, Penas, cada um com o seu sublinhado |
-| Régua de leitura | `--regua-fundo`, filete esquerdo de 4 px de Marinho, raio `0 12px 12px 0`, padding `12px 14px`; no canto de cima à direita, estrela SVG (alvo 44 × 44) e o chip "Ações" (32 de altura, raio 8, Creme) |
-| Dock (retrato) | fixo, `bottom: 76px` (acima da barra), 16 px dos lados, `z-index: 30`, gap 10: pílula à esquerda (altura 52, Creme a 92%, `blur(12px)`, 3 colunas Buscar, Filtrar, Foco) e "Lido até aqui" com ícone SVG de marcador à direita (`min-width` 112, altura 52, raio 14, Marinho e Creme, peso 600); o artigo tem `padding-bottom: 156px` |
-| Modo foco | retrato: coluna centrada, padding 16, gap 12; paisagem (`orientation: landscape` e `max-height: 560px`, ou largura ≥ 768): grade `minmax(0, 1fr) 220px`, gap 16, `100dvh` sem rolagem; vizinhos em `max-height: 2.8em`, opacidade 0,42 e máscara em gradiente; painel: barra de paginação (44, `--superficie-2`, raio 14), grade 2 × 2 de ações (54, Areia, raio 12) e "Sair do foco" (44, Marinho) |
-| Ações do dispositivo | folha de baixo (celular) ou diálogo de 420 px (desktop): três tiles (Estrelar, Copiar ref., Corrigir texto; 64 de altura, `--quente`, raio 14), primário Sol de 48 "Registrar erro neste artigo →", linha de ação "Criar cartão deste trecho" |
-
-O texto da lei nunca é animado e o Leitor nunca é remontado (regras existentes); sem mascote no Leitor.
-
-**Sessão (F9).**
+**Leitor (P4).**
 
 | Parte | Especificação |
 |---|---|
-| Cabeçalho | "Modo Só Estudo" (interruptor em Verde-foco; ligado, esconde a barra global e os avisos do rodapé) e chips 15, 25, 45 e 60 min (34 de altura; ativo Marinho, inativo `--quente`) com "X min passados (só informa)" |
-| Tarefa ativa | bloco de Marinho, mascote Estudando à esquerda (96 px), primário Sol "Voltar à leitura →" e fantasma "Pausar" |
-| Estacionamento | cartão `--quente`, mascote Distraído no cabeçalho, campo (Creme, raio 14) e "Estacionar" compacto (40, raio 14, `--quente`, contorno Marinho) |
-| Fechar sessão | mascote Sorrindo entre os cactos, selo Verde-foco "25 min · Art. 112 a 118 lidos", caixas de 22 px para resolver ou descartar o estacionado, primário Sol "Guardar e fechar sessão →" |
+| Lido | o trecho lido fica sobre a faixa de cal (raio 8, `padding 2px 12px`) sobre a areia; o que falta, sobre a areia |
+| "Lido até aqui" | rótulo de 13 px peso 700 em `--texto`, com a caneta deitada a 65° logo ao lado |
+| Estrutura | seções com o ponto de luz do estado (feita, atual, falta); a atual em cal |
+| Controles | seletor de fonte segmentado (A-, 18 px, A+) e "Destaques" (ligado = tinta cheia com texto em cal) |
+| Legenda dos destaques | uma linha recolhível sob os controles: Prazos, Exceções, Absolutos, Penas, cada um com o seu sublinhado |
+| Régua de leitura | `--regua-fundo` e filete de 3 px em `--regua-barra` (tinta: segue o dedo, então nunca é luz) |
+| Estrela | estrela de luz na calha, com a faixa em vidro |
+| Dock e modo foco | como na especificação, nos tokens novos (penumbra `--penumbra`, cartão `--luz-do-cartao`) |
+
+O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Leitor.
+
+**Sessão (P6).** Interruptor "Modo Só Estudo" em vidro; chips de tempo que só informam (ativo em tinta cheia, inativo `--quente`); a tarefa ativa numa folha de cal com o botão de vidro; o estacionamento em `--quente`; o fechamento com o resumo em texto e um botão de vidro. Sem o mascote antigo (o cachorro em um traço só fica para o Resumo do Dia).
 
 ## Movimento
 
 | O quê | Como |
 |---|---|
-| Pressionar, hover, foco | 120 a 160 ms, `ease-out`, só cor, sombra e 1 px de deslocamento |
-| Cartão virando, aba trocando, folha abrindo | 180 a 220 ms |
-| Entre rotas (F10) | View Transitions, fade de até 150 ms, cabeçalho e navegação fixos; **nunca** anima texto da lei nem remonta o Leitor; desligada com `prefers-reduced-motion` e no perfil Calmo (plano C do dia 14/10) |
+| Pressionar, hover, foco | 120 a 160 ms, `ease-out`, só sombra e 1 px de deslocamento (nunca cor) |
+| Ponto do Dia acendendo | 160 ms, `cubic-bezier(.2, .7, .2, 1)`, escala 0,6 a 1 e opacidade 0 a 1, uma vez |
+| Folha subindo, aba trocando | 180 a 220 ms, `cubic-bezier(.2, .7, .2, 1)` |
+| Caneta | muda de lugar por salto; nunca gira nem desliza |
+| Traço do cachorro | 300 ms linear (`stroke-dashoffset`), uma vez, ao fechar o Dia |
+| Entre rotas (F10) | View Transitions, fade de até 150 ms; **nunca** anima texto da lei nem remonta o Leitor; desligada com `prefers-reduced-motion` e no perfil Calmo |
 | Carregando | `Esqueleto` com atraso de 150 ms; operações longas no padrão "andamento" (ver [`../planos/transicoes-e-carregamento.md`](../planos/transicoes-e-carregamento.md)) |
 
-Movimento só quando explica. Nenhuma informação depende dele; sem movimento a ordem e o conteúdo são os mesmos.
+Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro desfocado atrás de texto, luz que acompanha o dedo, ciclo de dia e noite, confete, som. Com `prefers-reduced-motion`, os pontos aparecem acesos e o cachorro pronto; ordem, conteúdo e ação não mudam.
 
 ## Acessibilidade e robustez
 
-- Contraste: texto 4,5:1, gráficos e contornos 3:1, nos dois temas e em cada fundo possível (inclusive no bloco-herói, na régua e sob o dock).
-- Alvos de 44 px em botões, links isolados, linhas de lista, campos e abas (exceção: link dentro de frase corrida). A suíte passa a varrer as rotas principais.
-- Foco visível de 3 px em tudo, com `--bloco-foco` dentro do bloco; link "pular para o conteúdo"; atalhos mantidos.
+- Contraste: texto 4,5:1, gráficos e contornos 3:1, nos dois temas e em cada fundo possível (inclusive na folha, na régua e sob o dock).
+- Alvos de 44 px em botões, links isolados, linhas de lista, campos e abas (exceção: link dentro de frase corrida).
+- Foco visível em tudo, com `--bloco-foco` dentro da folha; link "pular para o conteúdo"; atalhos mantidos.
 - Texto quebra qualquer palavra longa (`overflow-wrap: anywhere` no conteúdo) e nenhuma tela rola na horizontal a 320 px nem a 200% de zoom.
 - Transparência e movimento têm saída (`prefers-reduced-transparency`, `prefers-reduced-motion`, `forced-colors`).
-- Cor nunca sozinha: tipo de tarefa, destaque, andamento, erro e "salvo" têm texto, ícone ou estilo de linha.
-- Mascote, cactos, lâmpada e símbolos de distração são decorativos: `alt=""` ou `aria-hidden`; nada depende deles.
+- Cor nunca sozinha: tipo de tarefa, destaque, andamento, área atual, erro e "salvo" têm texto, ícone, peso ou estilo de linha.
+- Caneta, pontos de luz decorativos e o cachorro: `aria-hidden`; o estado de cada ponto do Dia vem em texto acessível.
 
 ## Marca e mascote
 
-- **Nome:** "Arretado" em Playfair Display 700 (`--fonte-titulo`), e **um cacto verde** ao lado (SVG em `--cacto`), na altura da caixa-alta; vale também como favicon (F11). Sem martelo, balança nem outros clichês jurídicos. (Três dos quatro mockups não têm o cacto no cabeçalho: veto em aberto, D-D4 c.)
-- **Mascote:** vetorial plano (decisão de 14/10/2026), [`mascote/`](mascote/) com `estudando`, `distraido`, `sorrindo` e `determinado`, gerado por `mascote/gerar-mascote.mjs`. **Aparece** no Hoje (apoiado na borda do bloco Agora), na retomada depois de dias (Distraído, acolhedor, sem culpa), na Sessão (Estudando, Distraído e Sorrindo), no estado vazio e na abertura; 80 a 124 px. **Não aparece** no Leitor, na Revisão em curso, em erro punitivo nem em todas as telas ao mesmo tempo.
-- **Elementos vetoriais** do Gabriel (`ElementoCactos`, `ElementoLampada`, `ElementoDistracao`, na especificação): componentes decorativos em `src/apresentacao/componentes/` (F3), traço `--tinta`.
-- Próximo: refinar as poses com o Gabriel (proporções, mãos, expressão); origem da arte e uso comercial a confirmar (D-D2, "a conferir").
+- **Nome:** "Arretado" em Gabarito 700 (`--fonte-titulo`), com o pequeno cacto em vidro (`--cacto`) ao lado, na altura da caixa-alta. Sem martelo, balança nem outros clichês jurídicos.
+- **A caneta-cacto de vidro** é o objeto da marca no app: ponteiro da retomada nas três poses; no app de loja, ícone sobre a areia (P7).
+- **Mascote:** o cachorro em um traço só, caramelo pela cor, só no Resumo do Dia e no fim de rodada. O mascote antigo saiu do app na P2 (pedido do Gabriel, 18/10/2026); os desenhos ficam só como histórico em `docs/design/mascote/`.
 
 ## Mapa do código
 
 | Parte | Onde |
 |---|---|
-| Tokens, base, botões, campos, abas, cartões, navegação, rodapé | `src/apresentacao/estilos.css` (F1 e F2; cada fatia seguinte move para o CSS do próprio pacote o que for da sua tela) |
-| Casca (cabeçalho, navegação, "+", rodapé) | `src/apresentacao/Shell.tsx` |
+| Tokens, base, botões, campos, abas, cartões, navegação, rodapé | `src/apresentacao/estilos.css` (cada fase seguinte move para o CSS do próprio pacote o que for da sua tela) |
+| Fontes | `src/apresentacao/fontes/` (Gabarito, licença OFL); Atkinson e Literata de `node_modules/@fontsource*` |
+| Casca (cabeçalho, navegação, "+", rodapé) | `src/apresentacao/Shell.tsx`, `componentes/TituloComMais.tsx` (o "+"), `componentes/teclado-aberto.ts` (teclado aberto), `componentes/MenuAjuda.tsx`; nomes das áreas em `textos.ts` (`ROTULO_DA_AREA`) |
 | Hoje | `src/apresentacao/hoje/*`, `componentes/AcaoAgora.tsx`, `LinhaDepois.tsx`, `LinhaLista.tsx`; lógica pura em `src/dominios/hoje/` |
-| Revisão e Recall | `src/apresentacao/recall/*` (`Drill.tsx`, `RevisarFrases.tsx`, `RecallInicio.tsx`, listas) |
+| Revisão e Fixar | `src/apresentacao/recall/*` (`Drill.tsx`, `RevisarFrases.tsx`, `RecallInicio.tsx`, listas) |
 | Leitor e Biblioteca | `src/apresentacao/biblioteca/*` |
-| Plano | `src/apresentacao/plano/*` (`pontos/`, `tarefas/`, `onboarding/`) |
+| Trilha | `src/apresentacao/plano/*` (`pontos/`, `tarefas/`, `onboarding/`) |
 | Conta e Sessão | `src/apresentacao/conta/*`, `src/apresentacao/sessao/*` |
 | Contraste | `scripts/contraste.mjs`, `scripts/contraste.test.ts` |
 | Capturas e medidas | `scripts/capturas-ui.mjs` |
@@ -247,6 +245,6 @@ Movimento só quando explica. Nenhuma informação depende dele; sem movimento a
 ## Como conferir
 
 1. `npm run check` (lint, tipos, testes, auditoria) e o E2E da tela tocada, com axe nos dois temas.
-2. `npm run build && node scripts/capturas-ui.mjs --rotas todas --medir --folhas`: fotografa 27 rotas × 3 aparelhos × 2 temas e mede rolagem horizontal, alvos de 44 px e texto sob o "+". Comparar com [`../redesign/auditoria-2026-10-14/antes-medidas.json`](../redesign/auditoria-2026-10-14/antes-medidas.json). `--zoom 2` repete a 200%.
-3. Revisão pelo formato de `.claude/skills/arretado-visual-review` (achados com id, prioridade e correção).
-4. Em cada PR de fatia: folhas "antes e depois" da tela, tema claro e escuro, celular, tablet e desktop.
+2. `npm run build && node scripts/capturas-ui.mjs --rotas todas --medir --folhas`: fotografa as rotas × 3 aparelhos × 2 temas e mede rolagem horizontal, alvos de 44 px e texto sob as abas de baixo no fim da página. `--zoom 2` repete a 200%.
+3. Comparar com as capturas do protótipo em [`referencias/2026-10-18-ponto-de-luz/`](referencias/2026-10-18-ponto-de-luz/) e com o contrato (tese, forma, acabamento, interação, padrões permitidos).
+4. Em cada PR de fase: folhas "antes e depois" da tela, tema claro e escuro, celular, tablet e desktop, em `docs/redesign/ponto-de-luz/<fase>/`.

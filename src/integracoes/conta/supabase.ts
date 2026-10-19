@@ -6,10 +6,16 @@ import {
   FunctionsFetchError,
   createClient,
   isAuthRetryableFetchError,
+  StorageApiError,
   type Session,
   type SupabaseClient,
 } from '@supabase/supabase-js';
-import { FalhaDeConta, type ServicoDeConta, type SessaoDeConta } from './interface';
+import {
+  FalhaDeConta,
+  type CopiaNaNuvem,
+  type ServicoDeConta,
+  type SessaoDeConta,
+} from './interface';
 import {
   CHAVE_PUBLICAVEL,
   RETORNO_DESENVOLVIMENTO,
@@ -18,6 +24,22 @@ import {
 } from './projeto';
 
 const CHAVE_DE_ARMAZENAMENTO = 'arretado-auth';
+/** Bucket privado do esquema A2 (`supabase/migrations/20261014020000_f4a_contas.sql`): uma pasta por `uid`. */
+const BUCKET_DE_COPIAS = 'backups';
+
+/** Erro do Storage em motivo de tela; a cópia local nunca depende disto. */
+function falhaDeCopia(erro: unknown, acao: string): FalhaDeConta {
+  const texto = erro instanceof Error ? erro.message.toLowerCase() : '';
+  const semRede =
+    (typeof navigator !== 'undefined' && !navigator.onLine) ||
+    texto.includes('failed to fetch') ||
+    texto.includes('network');
+  if (semRede) return new FalhaDeConta('sem-rede', `Sem conexão agora. ${acao}`);
+  if (erro instanceof StorageApiError && (erro.status === 401 || erro.status === 403)) {
+    return new FalhaDeConta('recusado', `A sessão venceu; entre de novo. ${acao}`);
+  }
+  return new FalhaDeConta('indisponivel', `Não foi possível falar com o servidor agora. ${acao}`);
+}
 
 function paraSessao(sessao: Session | null): SessaoDeConta | null {
   if (!sessao?.user.email) return null;
@@ -148,6 +170,68 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
       );
     }
     await this.cliente.auth.signOut({ scope: 'local' }).catch(() => undefined);
+  }
+
+  /** Pasta da conta no bucket; o servidor recusa outra (RLS por `storage.foldername`). */
+  private async pastaDaConta(): Promise<string> {
+    const sessao = await this.sessao();
+    if (!sessao) throw new FalhaDeConta('indisponivel', 'Entre na conta para usar a nuvem.');
+    return sessao.uid;
+  }
+
+  async listarCopias(): Promise<CopiaNaNuvem[]> {
+    const pasta = await this.pastaDaConta();
+    try {
+      const { data, error } = await this.cliente.storage
+        .from(BUCKET_DE_COPIAS)
+        .list(pasta, { limit: 100, sortBy: { column: 'name', order: 'desc' } });
+      if (error) throw error;
+      return data
+        .filter((o) => o.id !== null && o.name.endsWith('.arretado'))
+        .map((o) => ({ nome: o.name, tamanho: o.metadata?.size ?? 0 }));
+    } catch (erro) {
+      throw falhaDeCopia(erro, 'A lista aparece quando a internet voltar.');
+    }
+  }
+
+  async enviarCopia(nome: string, bytes: Uint8Array): Promise<void> {
+    const pasta = await this.pastaDaConta();
+    try {
+      const { error } = await this.cliente.storage
+        .from(BUCKET_DE_COPIAS)
+        .upload(`${pasta}/${nome}`, bytes, {
+          contentType: 'application/octet-stream',
+          upsert: false,
+        });
+      if (error) throw error;
+    } catch (erro) {
+      throw falhaDeCopia(erro, 'Nada foi apagado da nuvem.');
+    }
+  }
+
+  async baixarCopia(nome: string): Promise<Uint8Array> {
+    const pasta = await this.pastaDaConta();
+    try {
+      const { data, error } = await this.cliente.storage
+        .from(BUCKET_DE_COPIAS)
+        .download(`${pasta}/${nome}`);
+      if (error) throw error;
+      return new Uint8Array(await data.arrayBuffer());
+    } catch (erro) {
+      throw falhaDeCopia(erro, 'Nada foi alterado neste aparelho.');
+    }
+  }
+
+  async apagarCopia(nome: string): Promise<void> {
+    const pasta = await this.pastaDaConta();
+    try {
+      const { error } = await this.cliente.storage
+        .from(BUCKET_DE_COPIAS)
+        .remove([`${pasta}/${nome}`]);
+      if (error) throw error;
+    } catch (erro) {
+      throw falhaDeCopia(erro, 'A cópia continua na nuvem.');
+    }
   }
 
   aoMudar(ouvinte: (sessao: SessaoDeConta | null) => void): () => void {

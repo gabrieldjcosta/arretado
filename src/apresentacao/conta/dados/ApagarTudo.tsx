@@ -1,25 +1,47 @@
-import { useState } from 'react';
-import { apagarTudo } from '../../../core/pacote';
+import { useEffect, useState } from 'react';
+import { lerUltimoBackup } from '../../../core/persistencia';
 import { Dialogo } from '../../componentes/Dialogo';
 import { useRepositorio } from '../../dados/contexto';
+import { ConfirmarCopia } from './ConfirmarCopia';
+import { apagarTudoERecomecar, podeApagarComCopia } from './recomecar';
 
-/** Apagar tudo (direito do titular, D18): confirmação só para o destrutivo. */
+/**
+ * Apagar tudo e recomeçar (direito do titular, D18): confirmação só para o destrutivo e, como no
+ * "Apagar daqui" da conta, só com cópia recente ou exportação confirmada.
+ */
 export function ApagarTudo() {
   const repo = useRepositorio();
   const [aberto, setAberto] = useState(false);
   const [entendi, setEntendi] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [falhou, setFalhou] = useState(false);
+  const [ultimaCopia, setUltimaCopia] = useState<string | null | undefined>(undefined);
+  const [exportei, setExportei] = useState(false);
+
+  useEffect(() => {
+    if (!aberto) return;
+    let vivo = true;
+    void lerUltimoBackup(repo).then((c) => {
+      if (vivo) setUltimaCopia(c);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [aberto, repo]);
 
   const fechar = () => {
     setAberto(false);
     setEntendi(false);
+    setExportei(false);
   };
 
   return (
     <section className="cartao-bloco" aria-labelledby="t-apagar">
-      <h2 id="t-apagar">Apagar tudo</h2>
-      <p>Apaga todos os dados do Arretado neste aparelho, inclusive pontos de restauração.</p>
+      <h2 id="t-apagar">Apagar tudo e recomeçar</h2>
+      <p>
+        Apaga todos os dados do Arretado neste aparelho, inclusive pontos de restauração, e volta ao
+        começo. Pede uma cópia recente ou a confirmação de que você exportou.
+      </p>
       <button
         type="button"
         onClick={() => {
@@ -33,6 +55,9 @@ export function ApagarTudo() {
           Não há como desfazer. Se quiser guardar uma cópia, feche esta janela e use
           &quot;Exportar&quot; antes.
         </p>
+        {ultimaCopia !== undefined && (
+          <ConfirmarCopia ultimaCopia={ultimaCopia} exportei={exportei} aoMudar={setExportei} />
+        )}
         {falhou && (
           <div role="alert" className="aviso falha">
             <p>
@@ -63,10 +88,16 @@ export function ApagarTudo() {
           <button
             type="button"
             className="perigoso"
-            disabled={!entendi || ocupado || falhou}
+            disabled={
+              !entendi ||
+              ocupado ||
+              falhou ||
+              ultimaCopia === undefined ||
+              !podeApagarComCopia(ultimaCopia, exportei)
+            }
             onClick={() => {
               setOcupado(true);
-              apagarTudo(repo).then(
+              apagarTudoERecomecar(repo, { exportei }).then(
                 () => {
                   window.location.reload();
                 },

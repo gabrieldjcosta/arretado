@@ -87,14 +87,20 @@ interface Pendente {
 }
 
 async function carregarBiblioteca(repo: Repositorio) {
-  const [normas, pendentes, leituras, vinculos, disciplinas, editais] = await Promise.all([
-    normasPublicadas(repo),
-    rascunhosPendentes(repo),
-    leiturasPorNorma(repo),
-    repo.colecao('vinculosDisciplina').todosDoUsuario(),
-    repo.colecao('disciplinas').todosDoUsuario(),
-    repo.colecao('editais').todosDoUsuario(),
-  ]);
+  const [normas, pendentes, leituras, todosVinculos, todasDisciplinas, todosEditais] =
+    await Promise.all([
+      normasPublicadas(repo),
+      rascunhosPendentes(repo),
+      leiturasPorNorma(repo),
+      repo.colecao('vinculosDisciplina').todosDoUsuario(),
+      repo.colecao('disciplinas').todosDoUsuario(),
+      repo.colecao('editais').todosDoUsuario(),
+    ]);
+  const vivo = <T extends { excluidoEm: string | null }>(itens: readonly T[]) =>
+    itens.filter((i) => i.excluidoEm === null);
+  const vinculos = vivo(todosVinculos);
+  const disciplinas = vivo(todasDisciplinas);
+  const editais = vivo(todosEditais);
   const nomeDe = new Map(disciplinas.map((d) => [d.id, d.nome]));
   const soNormas = normas.filter((n) => n.especie !== 'sumulas' && n.especie !== 'teses');
   const porDisciplina = agruparPorDisciplina(soNormas, vinculos, nomeDe);
@@ -229,16 +235,6 @@ const doEdital = (edital: Edital | undefined, principal: boolean) =>
       Tudo do edital de {edital.titulo}
     </Link>
   );
-
-/** Cinco tons suaves, em rodízio, um por disciplina (só na faixa lateral do grupo). */
-function indiceDoTom(grupos: readonly { titulo: string }[], titulo: string): number {
-  return (
-    Math.max(
-      0,
-      grupos.findIndex((g) => g.titulo === titulo),
-    ) % 5
-  );
-}
 
 /** Biblioteca › Normas (F2, 9.5; Parte 2 §9.2): as normas publicadas e a retomada da importação. */
 export function Normas() {
@@ -529,7 +525,7 @@ export function Normas() {
                   <details
                     key={g.titulo}
                     aria-label={g.titulo}
-                    className={`grupo-de-normas tom-${String(indiceDoTom(dados.porDisciplina, g.titulo))}`}
+                    className="grupo-de-normas"
                     open={filtrando || (abertos.get(g.titulo) ?? dados.porDisciplina.length <= 3)}
                     onToggle={(e) => {
                       // Com critério, a lista abre os grupos com resultado: aí nada se lembra.

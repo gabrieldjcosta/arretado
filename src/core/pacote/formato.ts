@@ -3,7 +3,15 @@ import { z } from 'zod';
 import { Id, Instante, MODULOS } from '../modelo';
 
 export const FORMATO = 'arretado-pacote';
-export const VERSAO_FORMATO = 1;
+/**
+ * Versão de formato do pacote. 1: original. 2 (F4-A, AL): o log pode ter entradas `acervo-adesao`
+ * (árvore de um item do acervo por referência); o app anterior recusa a 2. Pacote sem essa entrada
+ * continua saindo na 1, que o app anterior lê.
+ */
+export const VERSAO_FORMATO = 2;
+/** Versões que este app lê. */
+export const VERSOES_FORMATO_LIDAS = [1, 2] as const;
+const VersaoFormato = z.union([z.literal(1), z.literal(2)]);
 export const EXTENSAO = '.arretado';
 export const ARQUIVO_MANIFESTO = 'manifesto.json';
 export const ARQUIVO_CIFRADO = 'conteudo.cifrado';
@@ -22,7 +30,7 @@ export type Escopo = z.infer<typeof Escopo>;
 
 export const Manifesto = z.strictObject({
   formato: z.literal(FORMATO),
-  versaoFormato: z.literal(VERSAO_FORMATO),
+  versaoFormato: VersaoFormato,
   versaoEsquema: z.int().min(1),
   versaoApp: z.string().max(50),
   criadoEm: Instante,
@@ -42,7 +50,7 @@ const Base64 = z.string().regex(/^[A-Za-z0-9+/]+={0,2}$/);
 
 export const ManifestoCifrado = z.strictObject({
   formato: z.literal(FORMATO),
-  versaoFormato: z.literal(VERSAO_FORMATO),
+  versaoFormato: VersaoFormato,
   cifra: z.strictObject({
     algoritmo: z.literal('AES-256-GCM'),
     kdf: z.literal('PBKDF2-SHA-256'),

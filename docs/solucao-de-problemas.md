@@ -128,6 +128,16 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** encerrar o servidor antigo e rodar `npm run test:e2e` de novo. **Prevenção:** não deixar `preview` aberto entre rodadas; o CI sempre sobe o seu.
 - **Origem:** previsto — toda atividade com tela.
 
+### Commit no contêiner Linux passa sem rodar o `npm run check`
+- **Sintoma:** `git commit` mostra "hint: The '.githooks/pre-commit' hook was ignored because it's not set as executable" e grava sem o check. **Causa:** os ganchos estão no git sem o bit de execução (`100644`); no Windows isso não importa, no Linux (sessões do Claude na nuvem) o git os ignora, inclusive o `pre-push` que barra o `main` e o force push.
+- **Solução:** rodar `npm run check` à mão antes de cada commit e nunca enviar ao `main` nem forçar. **Prevenção:** dar o bit no git (`git update-index --chmod=+x .githooks/*`), caminho protegido: pede o rótulo `aprovado-gabriel`.
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
+### Pasta `C:` aparece na raiz do repositório depois do E2E
+- **Sintoma:** `git status` mostra `?? C:/` com PNGs do Plano vazio em `C:/Users/gabri/.gemini/...`. **Causa:** `e2e/plano-vazio.spec.ts` grava capturas de evidência num caminho fixo do Windows; no Linux ele vira uma pasta relativa à raiz.
+- **Solução:** `rm -rf ./C:` antes do commit e nada de `git add -A`. **Prevenção:** o teste gravar em `info.outputPath()` (fica para quem cuidar desse teste).
+- **Origem:** ocorrido em 18/10/2026 (Ponto de luz, P1).
+
 ### `console.info` de teste que passa não aparece (relatório da métrica do corpus)
 - **Sintoma:** `npx vitest run --project unidade src/dominios/legislacao/estruturador-corpus.test.ts` passa e não mostra a tabela da métrica da 8.9 nem a linha do portão; o mesmo com qualquer `console.info` ou `console.log` de teste que passa, em qualquer área. **Causa:** dentro do Claude Code, o vitest 5 reconhece o agente (variável `CLAUDECODE`, pelo `std-env`) e troca o reporter padrão pelo `agent` (o mínimo), que só mostra a saída dos testes que falham. No terminal do Gabriel, o `npm test` mostra o relatório.
 - **Solução:** rodar com `--reporter=default` para ver a saída. **Prevenção:** teste não depende da saída para falhar: na métrica, o piso, a linha de base, as regras e os pendentes falham com a mensagem própria (as divergências, cortadas em 20, e cada diferença da linha de base).
@@ -965,13 +975,15 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Sintoma:** texto em Arial/Georgia/system-ui; console com violação de `font-src`; `document.fonts.check` falso. **Causa:** `@font-face` apontando fora do pacote (caminho relativo a `src/apresentacao/`: `../../node_modules/...`) ou arquivo inlinado como `data:` (a CSP só aceita `'self'`; o Vite só inlina abaixo de 4 KB, os `.woff2` têm mais). **Solução:** conferir que `dist/assets/*.woff2` existem após `npm run build`. O E2E "as fontes embutidas carregam" cobre. Subconjunto: só `latin`; se aparecer caractere fora (raro em português), acrescentar `latin-ext`.
 - **Origem:** previsto — fatia 1 do redesign.
 
-### Dois "Registrar erro" na tela (cabeçalho e +)
-- **Sintoma:** teste (jsdom ou E2E) com `getByRole('link', { name: 'Registrar erro' })` falha por ter 0 ou 2 resultados. **Causa:** a casca tem o botão do cabeçalho (oculto por CSS no celular, ≤ 699 px) e o **+** flutuante (oculto a partir de 700 px). No jsdom não há CSS, então os dois existem; o **+** tem outro nome acessível ("Novo registro de erro") para não duplicar. No celular, o botão do cabeçalho some e o E2E precisa clicar no **+**. **Solução:** nos E2E que clicam nele, usar `/^(Registrar erro|Novo registro de erro)$/`: só o visível entra no `getByRole`.
-- **Origem:** encontrado na fatia 2 do redesign (09/10/2026).
+### Dois caminhos para registrar erro: o "+" do título e o "Registrar erro" do cabeçalho
+- **Sintoma:** teste com `getByRole('link', { name: 'Registrar erro' })` não acha nada no celular e no tablet, ou o E2E não acha o "+" fora do Hoje e do Fixar. **Causa:** desde a P2 do Ponto de luz, o "Registrar erro" do cabeçalho só aparece a partir de 900 px (`display: none` abaixo; no jsdom, sem CSS, ele sempre existe), e o "+" ("Novo registro de erro") só existe no título do Hoje e do Fixar (`TituloComMais`). Os nomes acessíveis são diferentes, então não colidem.
+- **Solução:** o E2E que registra a partir do Hoje ou do Fixar clica em "Novo registro de erro" (visível em toda largura); em outra tela, tecla E ou `page.goto('/#/recall/registrar')`. **Prevenção:** E2E "casca: abas por teclado, "+" no título…" (`e2e/acessibilidade.spec.ts`).
+- **Origem:** encontrado na fatia 2 do redesign (09/10/2026); reescrito na P2 do Ponto de luz (18/10/2026).
 
-### Barra inferior até 899 px, + só até 699 px
-- **Sintoma:** controle fixo colado à barra de baixo no tablet, ou sobre o grupo fixo do leitor. **Causa:** três cortes na folha: 899 px (barra inferior, `.acoes-leitor` acima dela), 699 px (+ flutuante, recuos). **Solução:** o grupo fixo do leitor usa o canto do **+**, então `.shell:has(.leitor) .flutuante` o esconde ali (o atalho E e o botão do cabeçalho seguem no tablet; no celular, o registro no leitor vem das ações por dispositivo). No modo foco a barra e o **+** somem.
-- **Origem:** previsto/encontrado na fatia 2 do redesign.
+### Abas de baixo até 899 px: reserva de rolagem e dock pela `--abas-altura`
+- **Sintoma:** texto do fim da página sob as abas, o dock do Leitor colado nelas, ou um vão vazio embaixo no modo foco, no "só estudo" ou com o teclado aberto. **Causa:** as abas ficam presas embaixo até 899 px; a reserva (`.shell { padding-bottom }`) e o dock (`.acoes-leitor { bottom }`) dependem da altura delas.
+- **Solução:** tudo lê `--abas-altura` (definida no `@media (max-width: 899px)`, com a área segura), e quem esconde as abas a zera no mesmo lugar (`.shell[data-teclado]`, `:root[data-modo-foco] .shell`, `body[data-so-estudo] .shell`). **Prevenção:** E2E "as abas não cobrem texto no fim da página" (`e2e/acessibilidade.spec.ts`) e `capturas-ui.mjs --medir` ("Abas sobre texto no fim da página").
+- **Origem:** previsto/encontrado na fatia 2 do redesign; reescrito na P2 do Ponto de luz (18/10/2026).
 
 ### Botão primário sem fundo dentro de um grupo (axe: `color-contrast` em `.acoes-leitor > .principal`)
 - **Sintoma:** E2E do Leitor falha em `semViolacoes` com `color-contrast: .acoes-leitor > .principal` no tema claro; o "Lido até aqui" aparece com texto branco sobre creme. **Causa:** uma regra de descendente (`.acoes-leitor button { background: var(--superficie) }`, especificidade 0,1,1) vence `.principal { background: var(--acao) }` (0,1,0); o texto segue `--acao-texto` (branco), o fundo vira o da superfície. Antes da D-D4 o primário era vidro e o defeito não aparecia.
@@ -988,8 +1000,42 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 14/10/2026 (F1 do redesign v2, PR 150).
 
 ### Alvo abaixo de 44 px que a F1 não cobre (previsto)
-- **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Backup e dados", "Voltar à Biblioteca"). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
+- **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Voltar à Biblioteca"; o "Backup e dados" virou botão de texto de 44 px na P2 do Ponto de luz). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
+
+### Fonte nova pelo npm trava o PR na "Guarda do PR"
+- **Sintoma:** o PR que acrescenta uma fonte com `npm install @fontsource...` fica vermelho no check da guarda, sem erro de código. **Causa:** `package.json` e `package-lock.json` são caminhos protegidos; só passam com o rótulo `aprovado-gabriel`, que só o Gabriel põe. **Solução (Ponto de luz, D-D7):** a Gabarito entrou como arquivo, `src/apresentacao/fontes/gabarito-latin-wght-normal.woff2` (subconjunto `latin`, eixo de peso 400 a 900), com a licença em `fontes/OFL.txt`, um `@font-face` com `font-weight: 400 900` e `format('woff2-variations')`, e o `preload` no `index.html`. A Atkinson e a Literata seguem pelo `@fontsource`. **Prevenção:** fonte, ícone ou imagem nova entra como arquivo no app (nunca CDN, por ser local-first); dependência nova no `package.json` vai num PR à parte, pedindo o rótulo ao Gabriel.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026).
+
+### Luz, cal e vidro da D-D7 sem contraste onde não devem ser texto
+- **Sintoma:** `node scripts/contraste.mjs` reprova um par novo, ou a área atual "some" na barra. **Causa:** a luz (`--luz` `#6fe3d6`) é clara demais para texto ou traço sobre a areia; o vidro (`--vidro` `#0f7f72`) passa para botão e traço (3,95:1 sobre a areia), mas não para texto pequeno; o cal sobre a areia quase não contrasta (é "onde estou" pela forma, não pela cor). **Solução:** a luz só como ponto ou Estrela, sempre com contorno de tinta (`--ponto-contorno`, `--estrela-contorno`); texto de link e de sucesso em `--vidro-texto` (`#0a6157`, 5,9:1); a área e a aba atuais em cal levam também peso 700, `--atual-sombra` e `aria-current`. **Prevenção:** todo par novo entra em `scripts/contraste.mjs` nos dois temas antes de ir para a tela.
+- **Origem:** previsto — P1 do Ponto de luz (18/10/2026); vale para a P2 a P6.
+
+### axe `color-contrast` em "Alterar disciplina" (botão fantasma dentro de dica) depois da troca de paleta
+- **Sintoma:** no CI, `e2e/acervo.spec.ts` (3c e 6a) e `e2e/biblioteca.spec.ts` (9.5) falham em `semViolacoes`, só no claro e nos três aparelhos, com `color-contrast` em `button[aria-label="Alterar a disciplina de …"]` e `.item-acervo-disciplina > .botao-texto`. O `acessibilidade.spec.ts` passa, porque as telas dele não têm itens do acervo. **Causa:** o `.botao-texto` herdava a cor do lugar com `opacity: 0.82`; dentro de `p.dica` a cor herdada já é a atenuada (`--texto-atenuado`, 5,5:1 na areia), e a 82% ela cai para 3,8:1 na areia (4,4:1 na cal). No creme da D-D5 o par já reprovava (4,3:1), mas o axe não media: o `body` tinha a textura de pontos (`radial-gradient`), e o axe-core marca como "incompleto", não como violação, todo texto com `background-image` na pilha de fundo. Com o fundo liso da D-D7, o axe passou a medir pela primeira vez todo texto posto direto na página.
+- **Solução:** o fantasma não usa mais opacidade (D-D7); a cor herdada vale inteira. **Prevenção:** texto nunca leva `opacity` abaixo de 1 fora de estado desabilitado; nunca textura nem imagem no fundo do `body` (além de vetada pela D-D7, esconde do axe os defeitos de contraste); ao trocar a paleta, rodar a suíte E2E inteira (`npx playwright test`), não só o `acessibilidade.spec.ts`, porque o axe roda dentro da maioria dos specs (12 de 16).
+- **Origem:** ocorrido em 18/10/2026 (P1 do Ponto de luz, PR #186).
+
+### Ícone vira um ponto, o "+" fica quadrado ou "Registrar erro" aparece no celular (cascata do botão)
+- **Sintoma:** captura com o ícone da Conta e o do "+" reduzidos a um ponto, o "+" de cantos arredondados em vez de redondo, ou o "Registrar erro" do cabeçalho visível abaixo de 900 px, com o cabeçalho em duas linhas. **Causa:** a regra base `button, .botao` (display, recuo de 20 px dos lados, raio de 12) vem depois da casca em `estilos.css` e tem a mesma especificidade de uma classe só (`.conta-botao`, `.mais`, `.registrar-global`); vence, e o recuo de 40 px num alvo de 44 espreme o SVG.
+- **Solução:** a regra do componente leva o pai no seletor (`.acoes-globais .conta-botao`, `.titulo-com-mais .mais`, também dentro do `@media`), e o SVG ganha `flex: none`. **Prevenção:** conferir as capturas do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### Captura sem dados, ou o Leitor estoura o tempo, depois de trocar de porta
+- **Sintoma:** `node scripts/capturas-ui.mjs --url http://localhost:<outra porta>` fotografa o app vazio, e as rotas do Leitor esperam até o tempo-limite. **Causa:** o estado semeado é o IndexedDB guardado por origem (`estado/<nome>.json`, do `storageState`); copiado de uma pasta semeada em outra porta, não abre na nova.
+- **Solução:** `--semear` na primeira captura de cada porta, ou uma pasta de saída por porta (antes e depois em portas fixas, por exemplo 4181 e 4182). **Prevenção:** esta entrada.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### A medida acusa texto que não está na tela (`<details>` dentro de outro fechado)
+- **Sintoma:** `--medir` lista em "Abas sobre texto" um texto que não aparece na captura (na Trilha do tablet, "Não sabe montar a planilha?"). **Causa:** o `<summary>` de um `<details>` que está dentro de outro `<details>` fechado não é desenhado, mas o navegador ainda devolve uma caixa para ele.
+- **Solução:** `visivel()` em `scripts/capturas-ui.mjs` sobe por todos os `<details>` fechados em volta do elemento (corrigido). **Prevenção:** ao estranhar uma medida, abrir a captura antes de mexer na tela.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz).
+
+### `pkill -f` derruba o próprio comando (código 144)
+- **Sintoma:** um comando que para o `vite preview` e o sobe de novo termina com código 144, e o servidor não volta. **Causa:** `pkill -f "vite preview --port 4182"` (ou `pgrep -f … | xargs kill`) casa também com a linha do próprio shell, que contém o mesmo texto.
+- **Solução:** parar e subir em comandos separados, com um padrão que não casa consigo mesmo: `pkill -f "vite preview --port 418[2]"`. **Prevenção:** esta entrada.
+- **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz, ambiente Linux da nuvem).
+
 
 ## Uso do app
 
@@ -1349,6 +1395,23 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** "Não agora" vale só no dia (`localStorage` `arretado:sugestoes-dispensadas:v1`); no dia seguinte a regra roda de novo.
 - **Solução:** nenhuma; sugestão não é cobrança. Para não ver a regra, mude o que a dispara (adiar o ponto, mudar a faixa).
 
+## Log de lote por referência (F4-A, AL, 17/10/2026)
+
+### "O histórico usa o item X (versão N) do acervo, mas a fonte dele não está disponível"
+- **Causa:** a adesão grava no log uma entrada `acervo-adesao` (referência: item, versão, hash) em vez de copiar cada registro; refazer o histórico (`reconstruirDoLog`, `desfazerAlteracao`, a verificação da migração para a conta) busca o item na fonte e confere versão e hash. Sem o arquivo (sem rede, item retirado, versão nova publicada sem guardar a antiga) o resultado é `FonteDoLoteAusente`, nunca estado inventado. Os dados nas tabelas não são afetados: só o refazer do histórico.
+- **Solução:** com rede, tentar de novo. Se a versão aderida sumiu, recolocar `public/acervo/historico/<id>.<hash>.json` (o `gerarAcervo` guarda a anterior ao trocar de hash; nunca apagar essa pasta). A migração que falha por isso deixa a origem intacta.
+
+### Pacote recusado com "formato que esta versão do app não conhece"
+- **Causa:** pacote com log que tem `acervo-adesao` sai na `versaoFormato` 2; o app de antes do AL só lê a 1 (a mensagem dele não pode mais mudar). Sem log, ou log sem adesão por referência, o pacote segue na 1.
+- **Solução:** atualizar o app (recarregar a aba). Para levar a um app antigo, exportar sem o log.
+
+### Teste semeia log antigo e o `bulkAdd` de `alteracoes` falha com `ConstraintError`
+- **Causa:** o banco aberto por `Repositorio.abrir` já tem as entradas `seq` 1–3 da identidade; a fixture traz os mesmos `seq`.
+- **Solução:** semear um `BancoArretado` cru (tabelas, log e `meta.identidade` da fixture) e só depois abrir o `Repositorio` (ver `log-referencia.test.ts`).
+
+### Previsível (F4-B): sync e tabela remota `alteracoes`
+- A tabela remota precisa aceitar `operacao = 'acervo-adesao'` (o `dados` é só a referência: o conteúdo do acervo não sobe). Ao baixar num aparelho, refazer o lote pede a fonte do acervo, como aqui.
+
 ## Contas (F4-A, A1; só com `VITE_CONTA=1`)
 
 ### Abri o app e vieram os dados "vazios" depois de entrar numa conta
@@ -1395,6 +1458,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** pontos de restauração, logs de importação e espaços separados ficam só na cópia anterior; restaurar um ponto da origem no banco da conta seria importar outra identidade (modo 6) e trocaria o `usuarioId` do banco de volta para o local.
 - **Solução prevista:** não copiar essas coleções (como hoje); "Desfazer importação" de antes da conta só pela cópia anterior.
 
+### "Esta frase não abre a cópia" ao restaurar da nuvem (A6)
+- **Causa:** a cópia foi cifrada no aparelho com outra frase (o GCM recusa frase errada e arquivo alterado da mesma forma). O servidor não tem a frase; não há recuperação.
+- **Solução:** nada foi alterado no aparelho. Tentar a frase certa; sem ela, a cópia não abre (dito antes de cifrar). Guardar uma cópia nova com uma frase anotada.
+
+### Previsível no A6: lista da nuvem vazia mesmo com cópia, ou "A sessão venceu" (A6)
+- **Causa:** a política do bucket `backups` só deixa a conta ver a pasta `<uid>/`; sessão vencida (401/403) ou bucket ainda não criado no projeto real (migração A2 não aplicada) parecem lista vazia ou recusa.
+- **Solução:** entrar de novo; conferir no painel do Supabase que o bucket `backups` existe (privado, 50 MB, `application/octet-stream`) e que `verificacao-f4a-remota.sql` passa. Envio que falha não apaga as anteriores; a retenção de 3 só roda depois do envio confirmado.
+
 ### Por que a migração copia banco a banco, e não pela restauração integral (A4, decisão provisória de 17/10/2026)
 - **Causa:** a restauração integral (`importar.ts`, modo 6) foi feita para trocar de aparelho: com pacote de outra identidade, o banco adota o `usuarioId` do pacote (o local, não o `uid` da conta), gera `aparelhoId` novo e reescreve o log com carimbos novos. Na migração isso quebraria a identidade da conta e o relógio do aparelho, e o hash da verificação não bateria com a origem.
 - **Solução:** `migrar-para-conta.ts` lê a origem numa transação e grava no banco `arretado-c-<uid>` registros, log (`seq`, `ts`, `aparelhoId`) e binários iguais; só o `usuarioId` vira o `uid`. Snapshots (e o conteúdo deles), logs de importação e espaços separados, com as entradas de log, ficam só na cópia anterior (teste "as coleções só locais…" em `migrar-para-conta.test.ts`). Aprovada pelo coordenador em caráter provisório; a decisão final é do Gabriel no portão A. Se algum dia a migração passar a usar o modo 6, mudar antes a adoção de identidade dele.
@@ -1415,6 +1486,14 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
 - **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
 
+### Apagar tudo e recomeçar com conta ativa deixa o app sem identidade (A7)
+- **Causa:** apagar só o banco da conta e manter a conta ativa no registro faz o app recriar um banco com `usuarioId` aleatório, não o `uid`.
+- **Solução:** `apagarTudoERecomecar` apaga e recria o banco com `entrarNaConta`; se a recriação falhar, desativa a conta (volta a "sem conta") e relança o erro. Nada é apagado antes de checar a cópia recente ou a exportação confirmada.
+
+### Aceite do login não aparece em Usuario.consentimentos (A7)
+- **Causa:** o aceite acontece antes de a conta existir no Aparelho (e o login do Google sai da página); ele só é gravado quando Conta abre já dentro do banco da conta ativa. Sem `localStorage`, a tela Entrar recusa entrar.
+- **Solução:** abrir Conta depois de entrar (`RegistrarAceite`); a marca fica até haver conta ativa com banco aberto.
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.
@@ -1422,4 +1501,6 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
   - **Modelo do `dsh-tui`:** confira o rodapé (em 15/10/2026 estava em `nvidia/nemotron-3.5-lightning-30b-a3b`, não DeepSeek).
   - **Causa medida em 16/10/2026 e script.** Três falhas distintas: (a) `worker-start` com agente de terminal (Antigravity, Hermes) dá `terminal_handle_stale` quando o cliente demora a abrir (aviso de primeira execução na tela) e nada é enviado; (b) a segunda tentativa (`--retry-of … --terminal`) escreve o texto mas ele fica no campo (`turn_start_unobserved`) até um Enter; (c) o `orca terminal wait --for tui-idle` dispara quando a tela desenha, mas o `dsh-tui` ainda mostra "Starting DSH…" e "Checking…" por até ~2 min e descarta o que chega nesse meio-tempo. `node scripts/orca-despachar.mjs --agent <id> --contrato <arquivo> --branch <branch> --nome <worktree> --titulo <título>` trata as três: espera a tela ficar pronta (sem "Starting/Checking"), reaproveita o terminal, confere que o agente começou ("esc to interrupt", indicador girando) e manda um Enter se o texto ficou parado. Para o `dsh-tui` usa worktree + `terminal create` + `dispatch --inject` (o despacho fica "sem supervisão": o `worker_done` chega, mas `worker-stop` não fecha o processo). Se ainda assim não começar, mandar um prompt curto com `orca terminal send --text … --enter --wait-submit 15`, que funcionou com o `dsh-tui` já carregado.
   - **Hermes, 16/10/2026:** abriu com o modelo grátis `longcat-2.5-preview:free`, não Claude. Conferir o modelo antes de usar como construtor.
+  - **Cline, 18/10/2026:** funciona como revisor, mas ao iniciar mostra um aviso promocional que segura o campo de entrada; o Orca não reconhece o terminal como pronto e o despacho parece parado. Depois do `worker-start`, mande um Enter (ou uma tecla) para fechar o aviso e confira com `orca terminal show` que o prompt saiu do campo. **Antigravity** falhou como revisor e foi descartado pelo Gabriel (18/10/2026).
 - **Contrato despachado para atividade já feita.** Causa: o `plano-mestre.md` §9 e o `f3-pacotes.md` dão a ordem, não o estado. Conferir `docs/proxima-sessao.md`, `git log origin/integracao` e `gh pr list` antes de despachar (`contratos-agentes.md` §6).
+- **Projeto Supabase pausado (plano gratuito, 7 dias sem uso).** Sintoma: requisições ao projeto falham ou o painel mostra "Paused". Causa: inatividade. Solução: o workflow `consulta-diaria` evita (precisa dos segredos `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY`; sem eles só avisa); se já pausou, "Restore project" no painel ou `restore_project`.

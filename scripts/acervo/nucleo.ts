@@ -200,6 +200,34 @@ export function relatorioEmMarkdown(
 }
 
 /**
+ * Arquivos do acervo imutáveis por hash (F4-A, AL): antes de trocar `<id>.json` por uma versão de
+ * hash diferente, a atual vai para `historico/<id>.<hash>.json` (o log por referência reidrata
+ * pela versão aderida). Nunca sobrescreve o que já está no histórico.
+ */
+async function guardarVersaoAnterior(
+  pastas: Pastas,
+  atual: IndiceDoAcervo | undefined,
+  id: string,
+  hashNovo: string,
+): Promise<void> {
+  const anterior = atual?.itens.find((e) => e.id === id);
+  if (!anterior || anterior.hash === hashNovo) return;
+  let corpo: Buffer;
+  try {
+    corpo = await readFile(join(pastas.saida, `${id}.json`));
+  } catch {
+    return;
+  }
+  const pasta = join(pastas.saida, 'historico');
+  await mkdir(pasta, { recursive: true });
+  await writeFile(join(pasta, `${id}.${anterior.hash}.json`), corpo, { flag: 'wx' }).catch(
+    (e: unknown) => {
+      if ((e as { code?: string }).code !== 'EEXIST') throw e;
+    },
+  );
+}
+
+/**
  * Gera o acervo. Com `soId`, refaz só esse item e mantém os demais do índice atual. Item com
  * anomalia fica fora do índice (e o arquivo antigo dele sai).
  */
@@ -220,6 +248,7 @@ export async function gerarAcervo(
     const gerado = await gerarItem(pastas, cur);
     linhas.push({ cur, gerado });
     if (gerado.entrada && gerado.corpo !== undefined) {
+      await guardarVersaoAnterior(pastas, atual, cur.id, gerado.entrada.hash);
       await writeFile(join(pastas.saida, `${cur.id}.json`), gerado.corpo);
       porId.set(cur.id, gerado.entrada);
     } else {

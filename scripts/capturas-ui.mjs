@@ -9,7 +9,7 @@
 //   --semear             refaz o estado semeado (vazio, leitura, completo); automático se faltar
 //   --estado <nome>      vazio | leitura | completo (padrão completo)
 //   --rotas <a,b,c>      padrão: as principais; "todas" = as 27; ":norma" vira o id da LEP semeada
-//   --medir              mede por DOM em cada tela (rolagem horizontal, alvos < 44 px, "+" sobre texto)
+//   --medir              mede por DOM em cada tela (rolagem horizontal, alvos < 44 px, abas sobre texto)
 //                        e grava medidas.json; imprime o resumo
 //   --aparelhos <a,b>    celular (390×844), tablet (768×1024), desktop (1440×900)
 //   --temas <a,b>        claro, escuro
@@ -224,9 +224,8 @@ async function semear(browser, o, url) {
   });
 
   await passo('abrir a LEP e marcar "Lido até aqui" no art. 112', async () => {
-    const todas = page.getByRole('button', { name: 'Todas as normas' });
-    await todas.waitFor();
-    if ((await todas.getAttribute('aria-pressed')) !== 'true') await todas.click();
+    // A lista de Normas já vem agrupada e aberta (o botão "Todas as normas" saiu).
+    await page.getByRole('region', { name: 'Normas' }).waitFor();
     await page
       .getByRole('region', { name: 'Normas' })
       .getByRole('link', { name: /LEP/ })
@@ -304,14 +303,22 @@ async function semear(browser, o, url) {
 /**
  * Medidas por DOM da tela montada. Roda no navegador (page.evaluate): não usa nada de fora.
  * Rolagem horizontal (no celular o navegador alarga a janela, então compara com a largura do
- * aparelho), alvos de toque abaixo de 44 px e o "+" flutuante sobre texto (no começo e no fim da página).
+ * aparelho), alvos de toque abaixo de 44 px e o texto sob as abas de baixo no fim da página (até 899 px
+ * as abas ficam presas embaixo; no meio da página o texto rola por baixo delas, mas no fim a reserva de
+ * rolagem tem de deixá-lo todo acima).
  */
 function medirTela(larguraDoAparelho) {
   const visivel = (el) => {
-    // O conteúdo de um `<details>` fechado não é desenhado (só o `<summary>`), mas o navegador
-    // ainda devolve uma caixa para ele; não é tela, então não entra nas medidas.
-    const fechado = el.closest('details:not([open])');
-    if (fechado && !el.closest('summary')) return false;
+    // O conteúdo de um `<details>` fechado não é desenhado (só o `<summary>` dele), mas o navegador
+    // ainda devolve uma caixa para ele; não é tela, então não entra nas medidas. Vale para cada
+    // `<details>` fechado em volta: o `<summary>` de um `<details>` dentro de outro fechado também some.
+    for (
+      let fechado = el.parentElement?.closest('details:not([open])') ?? null;
+      fechado;
+      fechado = fechado.parentElement?.closest('details:not([open])') ?? null
+    ) {
+      if (el.closest('summary')?.parentElement !== fechado) return false;
+    }
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) return false;
     const s = window.getComputedStyle(el);
@@ -363,16 +370,17 @@ function medirTela(larguraDoAparelho) {
     .filter(({ r }) => r.width < 44 || r.height < 44)
     .sort((a, b) => Math.min(a.r.width, a.r.height) - Math.min(b.r.width, b.r.height));
 
-  const fab = document.querySelector('a.flutuante');
+  const abas = document.querySelector('nav.areas');
   const textoSob = () => {
-    if (!fab || !visivel(fab)) return [];
-    const f = fab.getBoundingClientRect();
+    if (!abas || !visivel(abas) || window.getComputedStyle(abas).position !== 'fixed') return [];
+    const f = abas.getBoundingClientRect();
     const achados = new Set();
     // 4 = NodeFilter.SHOW_TEXT
     const passeio = document.createTreeWalker(document.body, 4);
     for (let no = passeio.nextNode(); no; no = passeio.nextNode()) {
       const texto = (no.textContent ?? '').trim();
-      if (!texto || fab.contains(no) || !no.parentElement || !visivel(no.parentElement)) continue;
+      if (!texto || abas.contains(no) || !no.parentElement || !visivel(no.parentElement)) continue;
+      if (no.parentElement.closest('.visualmente-oculto')) continue;
       const faixa = document.createRange();
       faixa.selectNodeContents(no);
       for (const c of faixa.getClientRects()) {
@@ -387,8 +395,6 @@ function medirTela(larguraDoAparelho) {
     }
     return Array.from(achados).slice(0, 3);
   };
-  window.scrollTo(0, 0);
-  const noInicio = textoSob();
   window.scrollTo(0, raiz.scrollHeight);
   const noFim = textoSob();
   window.scrollTo(0, 0);
@@ -404,11 +410,11 @@ function medirTela(larguraDoAparelho) {
         ({ el, r }) =>
           `${rotulo(el)} ${String(Math.round(r.width))}×${String(Math.round(r.height))}`,
       ),
-    maisSobreTexto: { inicio: noInicio, fim: noFim },
+    abasSobreTexto: noFim,
   };
 }
 
-/** Resumo legível das medidas: o que estoura a largura, o que o "+" cobre e os alvos pequenos. */
+/** Resumo legível das medidas: o que estoura a largura, o que as abas cobrem e os alvos pequenos. */
 function resumirMedidas(medidas) {
   const quem = (m) => `${m.aparelho}/${m.tema} ${m.rota}`;
   const secao = (titulo, linhas) =>
@@ -416,12 +422,9 @@ function resumirMedidas(medidas) {
   const rolagem = medidas
     .filter((m) => m.rolagemH > 0)
     .map((m) => `  +${String(m.rolagemH)}px  ${quem(m)}  ${m.largos.join('; ')}`);
-  const mais = medidas
-    .filter((m) => m.maisSobreTexto.fim.length > 0 || m.maisSobreTexto.inicio.length > 0)
-    .map(
-      (m) =>
-        `  ${quem(m)}  início: ${m.maisSobreTexto.inicio.join(' | ') || '-'}  fim: ${m.maisSobreTexto.fim.join(' | ') || '-'}`,
-    );
+  const abas = medidas
+    .filter((m) => m.abasSobreTexto.length > 0)
+    .map((m) => `  ${quem(m)}  ${m.abasSobreTexto.join(' | ')}`);
   const alvos = medidas
     .filter((m) => m.alvosPequenos > 0)
     .map(
@@ -430,7 +433,7 @@ function resumirMedidas(medidas) {
     );
   return [
     secao('Rolagem horizontal', rolagem),
-    secao('"+" sobre texto', mais),
+    secao('Abas sobre texto no fim da página', abas),
     secao('Telas com alvos < 44 px', alvos),
   ].join('\n');
 }

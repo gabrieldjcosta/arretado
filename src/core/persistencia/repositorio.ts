@@ -1,9 +1,17 @@
+import Dexie from 'dexie';
 import { Barramento } from '../eventos/barramento';
 import { novoId as novoIdPadrao, RelogioLogico } from '../ids';
 import type { NomeColecao, Preferencias } from '../modelo';
 import { BancoArretado, NOME_BANCO_PRINCIPAL } from './banco';
 import { Colecao, type Dados } from './colecao';
 import type { Contexto } from './contexto';
+import {
+  carimboDoLote,
+  montarRegistrosDoLote,
+  OPERACAO_ADESAO,
+  type ConteudoDoLote,
+  type ReferenciaDeAcervo,
+} from './lote-acervo';
 import { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
 
 interface Identidade {
@@ -72,6 +80,53 @@ export class Repositorio {
       chave: 'identidade',
       valor: { usuarioId, aparelhoId: this.ctx.aparelhoId } satisfies Identidade,
     });
+  }
+
+  /**
+   * Grava a árvore de um item do acervo (AL, F4-A): os registros entram nas tabelas como em
+   * `criarLote`, mas o log ganha uma só entrada `acervo-adesao` com a referência (ids derivados
+   * de `base`, carimbos seguidos a partir de um `tick`); o conteúdo se refaz pela fonte do acervo.
+   * O carimbo da entrada é o último do lote, para o relógio reaberto nunca emitir um menor.
+   * Chamar dentro de `transacao`.
+   */
+  async gravarLoteDoAcervo(
+    ref: Pick<ReferenciaDeAcervo, 'itemId' | 'versao' | 'hash' | 'normaId' | 'versaoId' | 'base'>,
+    conteudo: ConteudoDoLote,
+  ): Promise<ReferenciaDeAcervo> {
+    const quantidade = conteudo.dispositivos.length;
+    const tsBase = this.ctx.relogio.tick();
+    const completa: ReferenciaDeAcervo = {
+      ...ref,
+      tsBase,
+      instante: this.ctx.agora().toISOString(),
+      quantidade,
+    };
+    const { dispositivos, textos } = montarRegistrosDoLote(completa, this.ctx.usuarioId, conteudo);
+    const tsFinal = quantidade === 0 ? tsBase : carimboDoLote(tsBase, 2 * quantidade - 1);
+    this.ctx.relogio.observar(tsFinal);
+    const db = this.db;
+    await db.transaction(
+      'rw',
+      [db.tabela('dispositivos'), db.tabela('textosDispositivo'), db.alteracoes],
+      async () => {
+        await db.tabela('dispositivos').bulkAdd(dispositivos);
+        await db.tabela('textosDispositivo').bulkAdd(textos);
+        await db.alteracoes.add({
+          ts: tsFinal,
+          aparelhoId: this.ctx.aparelhoId,
+          usuarioId: this.ctx.usuarioId,
+          colecao: 'dispositivos',
+          registroId: ref.normaId,
+          operacao: OPERACAO_ADESAO,
+          dados: { ...completa },
+        });
+        Dexie.currentTransaction.idbtrans.addEventListener('complete', () => {
+          this.eventos.emitir('registro.lote', { colecao: 'dispositivos', quantidade });
+          this.eventos.emitir('registro.lote', { colecao: 'textosDispositivo', quantidade });
+        });
+      },
+    );
+    return completa;
   }
 
   fechar(): void {

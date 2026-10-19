@@ -16,6 +16,7 @@ export async function sugestoesDoDia(repo: Repositorio): Promise<Sugestao[]> {
   const materiaDoPonto = new Map(pontos.map((p) => [p.id, p.disciplinaId]));
   const ultima = new Map<string, string>();
   for (const s of sessoes) {
+    if (s.excluidoEm !== null) continue;
     if (s.estado !== 'encerrada' || !s.pontoId) continue;
     const m = materiaDoPonto.get(s.pontoId);
     if (m && s.data > (ultima.get(m) ?? '')) ultima.set(m, s.data);

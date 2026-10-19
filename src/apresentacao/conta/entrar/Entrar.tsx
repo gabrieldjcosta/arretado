@@ -1,16 +1,20 @@
-import { useState, type SyntheticEvent } from 'react';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { entrarNaConta } from '../../../core/persistencia';
 import { FalhaDeConta, type SessaoDeConta } from '../../../integracoes/conta';
 import { useServicoDeConta } from './ContextoConta';
 import { recarregarEm } from '../recarregar';
+import { aceiteDoLoginPendente, descartarAceiteDoLogin, marcarAceiteDoLogin } from './aceite';
 import { destinoDepoisDeEntrar } from './destino';
 import './estilos-conta.css';
 
-/** Versão dos termos de teste da V1; a política v3 definitiva chega no pacote A7. */
+/** Versão dos termos de teste da V1 (aceite no servidor; o aceite local da política v3 está em `aceite.ts`). */
 export const VERSAO_TERMOS = 'teste-1';
 
 const AVISO_PADRAO = 'Não foi possível entrar agora. Você continua usando o Arretado sem conta.';
+
+const AVISO_SEM_ACEITE =
+  'Sem aceitar não dá para entrar. Você continua usando o Arretado sem conta.';
 
 const AVISO_DE_ERRO: Record<string, string> = {
   'sem-convite': 'Este e-mail ainda não foi liberado. Você continua usando o Arretado sem conta.',
@@ -41,6 +45,9 @@ export function Entrar({
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(avisoDe(params.get('erro')));
 
+  // Marca velha de uma visita anterior não vale: o aceite é desta tela, clicando agora.
+  useEffect(descartarAceiteDoLogin, []);
+
   async function executar(fn: () => Promise<void>) {
     setOcupado(true);
     setAviso(null);
@@ -53,12 +60,23 @@ export function Entrar({
     }
   }
 
+  // Clicar em "Entrar" é o aceite do texto acima (docs/politica/consentimento-login-backup.md).
+  // Sem a marca gravada, nada de entrar.
+  const aceitar = (): boolean => {
+    marcarAceiteDoLogin();
+    if (aceiteDoLoginPendente() !== null) return true;
+    setAviso(AVISO_SEM_ACEITE);
+    return false;
+  };
+
   const google = () => {
+    if (!aceitar()) return;
     void executar(() => servico.entrarComGoogle());
   };
 
   const pedirCodigo = (e: SyntheticEvent) => {
     e.preventDefault();
+    if (!aceitar()) return;
     void executar(async () => {
       await servico.pedirCodigoPorEmail(email);
       setEtapa('codigo');
@@ -67,6 +85,10 @@ export function Entrar({
 
   const confirmar = (e: SyntheticEvent) => {
     e.preventDefault();
+    if (aceiteDoLoginPendente() === null) {
+      setAviso(AVISO_SEM_ACEITE);
+      return;
+    }
     void executar(async () => {
       const sessao = await servico.confirmarCodigo(email, codigo);
       await prepararConta(sessao);
@@ -81,15 +103,33 @@ export function Entrar({
     <>
       <h1>Entrar</h1>
       <section aria-labelledby="o-que-sai">
-        <h2 id="o-que-sai">O que sai do seu aparelho</h2>
-        <ul>
-          <li>Seu e-mail e a conta.</li>
-          <li>O que o Google informa ao entrar (nome e foto), se você usar o Google.</li>
-          <li>Nada do que você estuda: Erros, Cartões, Frases e Sessões ficam no aparelho.</li>
-          <li>Só vai uma cópia, cifrada no aparelho, se você pedir.</li>
-          <li>Você pode continuar sem conta, sem perder nada.</li>
-        </ul>
-        <p className="dica">Ao entrar você aceita os termos de teste desta versão.</p>
+        <h2 id="o-que-sai">O que sai do seu Aparelho</h2>
+        <ol>
+          <li>
+            Ao entrar, o Arretado recebe o seu e-mail e os dados que o provedor de login informa
+            (nome e foto, se você entrar com Google). Só isso sai do Aparelho.
+          </li>
+          <li>
+            Nada do seu estudo sai: Erros, Cartões, Normas, grifos e notas ficam neste Aparelho.
+          </li>
+          <li>
+            Só se você pedir, uma cópia cifrada dos seus dados vai para a nuvem. A frase de cifra
+            fica só com você; sem ela, nem o Arretado abre a cópia.
+          </li>
+          <li>
+            Não perguntamos nem guardamos diagnóstico, e não há rastreadores nem estatísticas de
+            uso.
+          </li>
+          <li>
+            Sair e apagar tudo ficam em Conta › Dados, a qualquer momento. A exclusão da conta é
+            imediata e definitiva. Não quer entrar agora? Continue sem conta, como até agora.
+          </li>
+        </ol>
+        <p className="dica">
+          Ao entrar (com o Google ou pelo código) você aceita este texto e a política de privacidade
+          versão 3. Leia a política inteira em{' '}
+          <Link to="/conta/privacidade">Conta › Privacidade</Link>.
+        </p>
       </section>
 
       {aviso && (

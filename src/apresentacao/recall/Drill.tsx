@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import mascoteSorrindo from '../imagens/mascote-sorrindo.svg';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -18,6 +17,7 @@ import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
+import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
 
@@ -194,7 +194,6 @@ export function Drill() {
     return (
       <>
         <h1>Revisar</h1>
-        <img className="vazio-mascote" src={mascoteSorrindo} alt="" width={96} />
         <Vazio
           titulo={texto('fimDeRodada')}
           acao={
@@ -204,12 +203,12 @@ export function Drill() {
                   Seguir para as frases ({estado.frases})
                 </Link>
                 <Link to="/recall" className="botao discreto">
-                  Voltar ao Recall
+                  Voltar ao {ROTULO_DA_AREA.recall}
                 </Link>
               </>
             ) : (
               <Link to="/recall" className="botao principal">
-                Voltar ao Recall
+                Voltar ao {ROTULO_DA_AREA.recall}
               </Link>
             )
           }

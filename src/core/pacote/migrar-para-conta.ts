@@ -16,12 +16,14 @@ import {
   BancoArretado,
   bancoExiste,
   CHAVE_ULTIMO_BACKUP,
+  FonteDoLoteAusente,
   NOME_BANCO_PRINCIPAL,
   nomeBancoDaConta,
   reconstruirDoLog,
   RegistroDeContas,
   Repositorio,
   type Alteracao,
+  type Reidratador,
 } from '../persistencia';
 import { iguais, jsonCanonico } from '../util/json-canonico';
 import { sha256 } from './bytes';
@@ -57,6 +59,11 @@ export interface OpcoesMigracao {
   interromperEm?: EtapaMigracao;
   registro?: RegistroDeContas;
   agora?: Date;
+  /**
+   * Reidrata as entradas `acervo-adesao` do log (AL) pela fonte do acervo, para a verificação
+   * refazer o histórico. Sem isso, log com referência faz a migração falhar (nada é inventado).
+   */
+  prepararReidratacao?: (log: readonly Alteracao[]) => Promise<Reidratador>;
 }
 
 export type EstadoDaMigracao = 'nenhuma' | 'em-andamento' | 'concluida';
@@ -243,6 +250,7 @@ async function verificar(
   origem: Repositorio,
   nomeBanco: string,
   uid: string,
+  prepararReidratacao?: OpcoesMigracao['prepararReidratacao'],
 ): Promise<{ contagens: Partial<Record<NomeColecao, number>>; hash: string }> {
   const conta = await Repositorio.abrir({ nomeBanco });
   try {
@@ -262,8 +270,14 @@ async function verificar(
     }
     let estado;
     try {
-      estado = reconstruirDoLog(daConta.log);
-    } catch {
+      const reidratar = prepararReidratacao ? await prepararReidratacao(daConta.log) : undefined;
+      estado = reconstruirDoLog(daConta.log, reidratar);
+    } catch (e) {
+      if (e instanceof FonteDoLoteAusente) {
+        throw new VerificacaoFalhou(
+          `${e.message} Sem ela, o histórico não pode ser conferido; tente de novo com o acervo disponível.`,
+        );
+      }
       throw new VerificacaoFalhou('O histórico de alterações não pôde ser refeito.');
     }
     for (const [nome, lista] of daConta.registros) {
@@ -343,7 +357,7 @@ export async function migrarParaConta(
   etapa('verificacao');
   let verificado;
   try {
-    verificado = await verificar(origem, nomeBanco, uid);
+    verificado = await verificar(origem, nomeBanco, uid, opcoes.prepararReidratacao);
   } catch (e) {
     return falhar(registro, uid, nomeBanco, 'verificacao', motivoDe(e), agora);
   }
