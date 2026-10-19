@@ -2219,8 +2219,13 @@ button.estrela:focus-visible {
   color: var(--texto-atenuado);
 }
 
+/* Alvo de 24 px (WCAG 2.5.8), decisão do Gabriel de 19/10/2026 (Ampliar). */
 .notas-vigencia a {
   color: inherit;
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 0.25rem;
+  box-sizing: border-box;
 }
 
 .alternar-linha {
@@ -2884,6 +2889,9 @@ dialog.dialogo-acoes {
 /* A citação é texto com sublinhado pontilhado discreto (sem fundo, sem mudar a cor). */
 .remissao {
   cursor: pointer;
+  /* Alvo de 24 px de largura mesmo em citação curta ("II"); a quebra de linha segue livre. */
+  padding-inline: 0.35rem;
+  margin-inline: -0.35rem;
   text-decoration: underline dotted;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
@@ -3317,4 +3325,39 @@ dialog.dialogo-previa .linha-acoes button {
 .grupo-de-normas > summary h3 {
   display: inline;
   margin: 0;
+}
+
+/* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */
+.lacuna-editor {
+  user-select: text;
+  -webkit-user-select: text;
+}
+.lacuna-tarja {
+  display: inline;
+  min-height: 0;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--texto);
+  color: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.lacuna-tarja:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+/* Sob o editor de lacuna: sugerir por regra e um cartão por trecho; só cores e tamanhos existentes. */
+.barra-de-lacuna {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.lacuna-separados {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
 }

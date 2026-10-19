@@ -33,6 +33,12 @@ export function camposMinimos<N extends NomeColecao>(nome: N, ref: string): Espe
     editais: { titulo: 'Edital', versao: 1 },
     disciplinas: { nome: 'Direito Penal' },
     pontos: { titulo: 'Execução penal' },
+    ciclos: {
+      nome: 'Ciclo',
+      modelo: 'manual',
+      blocos: [{ disciplinaId: ref, minutos: 40 }],
+      pesos: [{ disciplinaId: ref, peso: 1 }],
+    },
     tarefasDeEstudo: {
       titulo: 'Ler arts. 10 a 13 da LEP',
       estado: 'aberta',

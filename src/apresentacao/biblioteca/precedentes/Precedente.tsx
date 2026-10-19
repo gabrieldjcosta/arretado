@@ -1,5 +1,6 @@
 // Um precedente (F3-C, C2): a tese primeiro, o texto sob pedido, a lei e os relacionados. Tudo
 // opcional e discreto: nenhum bloco aparece vazio e nada compete com a leitura.
+import { criarCartoesDeLacuna } from '../../../dominios/recall/servico';
 import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type {
@@ -566,20 +567,19 @@ export function Precedente() {
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
-        enviar={async (texto) => {
+        enviar={async (texto, ocultos, separados) => {
           if (!fraseAberta) return false;
-          const ok = await tentar(
-            () =>
-              criarFraseDePrecedente(repo, {
-                texto,
-                precedenteId: id,
-                citado: fraseAberta.texto,
-                inicio: fraseAberta.inicio,
-                fim: fraseAberta.fim,
-                ...(p.disciplinaId ? { disciplinaId: p.disciplinaId } : {}),
-              }),
-            'Enviado às frases.',
-          );
+          const ok = await tentar(async () => {
+            const frase = await criarFraseDePrecedente(repo, {
+              texto,
+              precedenteId: id,
+              citado: fraseAberta.texto,
+              inicio: fraseAberta.inicio,
+              fim: fraseAberta.fim,
+              ...(p.disciplinaId ? { disciplinaId: p.disciplinaId } : {}),
+            });
+            if (ocultos.length > 0) await criarCartoesDeLacuna(repo, frase.id, ocultos, separados);
+          }, 'Enviado às frases.');
           return ok;
         }}
         fechar={() => {

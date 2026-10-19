@@ -5,6 +5,7 @@ import { gravarPosicao } from '../../dominios/legislacao/leituras';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { criarCartaoManual, hoje } from '../../dominios/recall/servico';
 import { COMECOS } from '../../dominios/hoje/proxima-acao';
+import { criarCiclo } from '../../dominios/ciclos';
 import { escolherProximaAcao } from './proxima-acao';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
@@ -103,5 +104,40 @@ describe('escolherProximaAcao (A1)', () => {
     const antes = await repo.colecao('sessoes').contar();
     await escolherProximaAcao(repo, hoje(repo));
     expect(await repo.colecao('sessoes').contar()).toBe(antes);
+  });
+});
+
+describe('Próxima ação com Ciclo ativo', () => {
+  it('mostra o bloco atual com a matéria; avança quando a Sessão do bloco é encerrada', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const civil = await repo.colecao('disciplinas').criar({ nome: 'Civil' });
+    const ciclo = await criarCiclo(repo, {
+      nome: 'C',
+      modelo: 'manual',
+      pesos: [
+        { disciplinaId: penal.id, peso: 1 },
+        { disciplinaId: civil.id, peso: 1 },
+      ],
+    });
+    const dia = hoje(repo);
+    const primeiro = await escolherProximaAcao(repo, dia);
+    expect(primeiro).toMatchObject({
+      tipo: 'acao',
+      acao: { tipo: 'ciclo', alvo: { id: ciclo.id, rotulo: 'Penal' }, blocoOrdem: 0 },
+    });
+    await repo.colecao('sessoes').criar({
+      tipo: 'estudo',
+      data: dia,
+      inicio: relogio.agora.toISOString(),
+      fim: relogio.agora.toISOString(),
+      estado: 'encerrada',
+      pausas: [],
+      cicloId: ciclo.id,
+      blocoOrdem: 0,
+    });
+    expect(await escolherProximaAcao(repo, dia)).toMatchObject({
+      acao: { tipo: 'ciclo', alvo: { rotulo: 'Civil' }, blocoOrdem: 1 },
+    });
   });
 });

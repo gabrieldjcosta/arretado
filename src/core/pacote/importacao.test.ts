@@ -1,5 +1,5 @@
 import { Repositorio, apagarBanco } from '../persistencia';
-import { alterarPreferencias } from '../preferencias';
+import { alterarPreferencias, obterPreferencias } from '../preferencias';
 import { exportarPacote } from './exportar';
 import { lerPacote } from './ler';
 import { aplicar, ImportacaoInvalida, planejar, type ModoEscrita } from './importar';
@@ -233,6 +233,22 @@ describe('modo 5 (3.6)', () => {
     expect(await a.repo.colecao('erros').obter(extra.id, { incluirExcluidos: true })).toBeDefined();
     const prefs = await a.repo.colecao('preferencias').todosDoUsuario();
     expect(prefs[0]?.tema).toBe('escuro');
+  });
+});
+
+describe('"Para lembrar" no pacote (P7b)', () => {
+  it('vai e volta no pacote; o pacote de antes do campo restaura sem ele', async () => {
+    const r = relogio();
+    const a = await comDados(r);
+    const { bytes: antes } = await exportarPacote(a.repo);
+    await alterarPreferencias(a.repo, { lembrete: 'Pedir o livro de Processo Penal' });
+    const { bytes: depois } = await exportarPacote(a.repo);
+
+    const b = await segundoAparelho(depois, r);
+    expect((await obterPreferencias(b)).lembrete).toBe('Pedir o livro de Processo Penal');
+
+    await importar(b, antes, 6);
+    expect(await obterPreferencias(b)).not.toHaveProperty('lembrete');
   });
 });
 

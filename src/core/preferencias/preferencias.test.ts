@@ -1,4 +1,4 @@
-import { Preferencias } from '../modelo';
+import { LEMBRETE_MAX, Preferencias } from '../modelo';
 import { Repositorio } from '../persistencia';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { alterarPreferencias, cotaDiaria, obterPreferencias } from './index';
@@ -78,5 +78,22 @@ describe('preferências (1.7)', () => {
     expect(nova.espiadaDosVizinhos).toBe(true);
     expect(Preferencias.safeParse({ ...nova, lenteDoFoco: 'janela' }).success).toBe(false);
     expect(Preferencias.safeParse({ ...nova, espiadaDosVizinhos: 'sim' }).success).toBe(false);
+  });
+
+  it('"Para lembrar": ausente é vazio, muda sem migração e respeita o tamanho máximo (P7b)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const antiga = await obterPreferencias(repo);
+    expect(antiga).not.toHaveProperty('lembrete');
+    const nova = await alterarPreferencias(repo, { lembrete: 'Pedir o livro de Processo Penal' });
+    expect(nova.lembrete).toBe('Pedir o livro de Processo Penal');
+    const vazia = await alterarPreferencias(repo, { lembrete: '' });
+    expect(vazia.lembrete).toBe('');
+    expect(Preferencias.safeParse({ ...nova, lembrete: 'a'.repeat(LEMBRETE_MAX) }).success).toBe(
+      true,
+    );
+    expect(
+      Preferencias.safeParse({ ...nova, lembrete: 'a'.repeat(LEMBRETE_MAX + 1) }).success,
+    ).toBe(false);
+    expect(Preferencias.safeParse({ ...nova, lembrete: 12 }).success).toBe(false);
   });
 });

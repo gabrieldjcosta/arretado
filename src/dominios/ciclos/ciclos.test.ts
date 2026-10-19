@@ -1,5 +1,6 @@
 import { sugerirAjustes } from './ajuste';
 import { gerarBlocos, voltasPorSemana } from './gerar';
+import { pesosDoModelo } from './modelos';
 import { calcularPesos, taxaDeErro } from './pesos';
 
 describe('calcularPesos', () => {
@@ -86,5 +87,34 @@ describe('sugerirAjustes', () => {
     ).toBeUndefined();
     const r = sugerirAjustes([m('a', 2, 0, 60, 0.05), ...base]);
     expect(r.find((s) => s.disciplinaId === 'a')).toMatchObject({ de: 2, para: 1 });
+  });
+});
+
+describe('pesosDoModelo', () => {
+  const materias = [
+    { disciplinaId: 'a', nome: 'Penal', itensAltos: 6 },
+    { disciplinaId: 'b', nome: 'Civil', itensAltos: 2 },
+    { disciplinaId: 'c', nome: 'Tributário', itensAltos: 0 },
+  ];
+  it('igual dá 1 a todas; equilibrado segue os assuntos altos', () => {
+    expect(pesosDoModelo('igual', materias).pesos.map((p) => p.peso)).toEqual([1, 1, 1]);
+    expect(pesosDoModelo('equilibrado', materias).pesos.map((p) => p.peso)).toEqual([2, 1, 1]);
+  });
+  it('reta final deixa pouco cobrada em 1 e sobe a muito cobrada', () => {
+    expect(pesosDoModelo('reta_final', materias).pesos.map((p) => p.peso)).toEqual([3, 1, 1]);
+  });
+  it('reforço sem questões suficientes avisa e usa o equilíbrio; com amostra, sobe a pior', () => {
+    const sem = pesosDoModelo('reforco', materias);
+    expect(sem.aviso).toContain('equilíbrio');
+    expect(sem.pesos.map((p) => p.peso)).toEqual([2, 1, 1]);
+    const com = pesosDoModelo(
+      'reforco',
+      materias.map((m, i) => ({
+        ...m,
+        desempenho: i === 1 ? { erros: 25, questoes: 40 } : { erros: 3, questoes: 40 },
+      })),
+    );
+    expect(com.aviso).toBeUndefined();
+    expect(com.pesos[1]).toMatchObject({ peso: 2 });
   });
 });

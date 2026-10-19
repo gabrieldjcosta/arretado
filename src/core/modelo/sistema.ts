@@ -139,6 +139,9 @@ export const COTA_DIARIA_PADRAO = 10;
 export const COTA_DIARIA_MIN = 5;
 export const COTA_DIARIA_MAX = 100;
 
+/** Tamanho máximo do "Para lembrar" do Hoje (P7b): uma nota curta, não um caderno. */
+export const LEMBRETE_MAX = 500;
+
 export const PerfilDeEstudo = z.enum(['calmo', 'guiado', 'leitura']);
 export type PerfilDeEstudo = z.infer<typeof PerfilDeEstudo>;
 
@@ -186,6 +189,12 @@ export const Preferencias = z.strictObject({
     .string()
     .regex(/^\d{2}:\d{2}$/)
     .optional(),
+  /**
+   * "Para lembrar" do Hoje (P7b; D-D5, resposta 6): o que a pessoa precisa fazer fora do app, em texto
+   * livre. Opcional: ausente é vazio, e o registro e o pacote anteriores continuam válidos (sem
+   * migração). Só texto: é mostrado como texto, nunca como HTML.
+   */
+  lembrete: z.string().max(LEMBRETE_MAX).optional(),
   modulosDesabilitados: z.array(z.string().max(40)),
   retencaoSnapshots: z.int().min(5).max(100),
 });

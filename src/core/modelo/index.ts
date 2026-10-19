@@ -74,6 +74,12 @@ export const ENTIDADES = {
     indices: ['usuarioId', 'pontoId', 'paiId', '[usuarioId+estado]'],
     desdeVersao: 7,
   },
+  ciclos: {
+    esquema: P.Ciclo,
+    modulo: 'plano',
+    indices: ['usuarioId', 'concursoId'],
+    desdeVersao: 9,
+  },
   // execução
   dias: { esquema: P.Dia, modulo: 'execucao', indices: ['usuarioId', '[usuarioId+data]'] },
   sessoes: {

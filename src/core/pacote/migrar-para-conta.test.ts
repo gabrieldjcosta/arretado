@@ -1,5 +1,5 @@
 // Migração do uso local para a conta (F4-A, A4; plano f4a-contas.md §5). Repositório real no
-// fake-indexeddb e banco sintético com todas as coleções da v8 (fixtures/banco-sintetico.ts).
+// fake-indexeddb e banco sintético com todas as coleções da v9 (fixtures/banco-sintetico.ts).
 import Dexie from 'dexie';
 import { colecoesNaVersao, ENTIDADES, NOMES_COLECOES, type NomeColecao } from '../modelo';
 import {
@@ -132,10 +132,10 @@ beforeEach(async () => {
 });
 
 describe('banco sintético (fixture)', () => {
-  it('cobre todas as coleções da v8, com exclusão lógica, lote de adesão e só locais', async () => {
+  it('cobre todas as coleções da v9, com exclusão lógica, lote de adesão e só locais', async () => {
     const { repo, contagens, ids } = await prepararOrigem();
-    expect(VERSAO_ESQUEMA).toBe(8);
-    for (const nome of colecoesNaVersao(8)) expect(contagens[nome], nome).toBeGreaterThan(0);
+    expect(VERSAO_ESQUEMA).toBe(9);
+    for (const nome of colecoesNaVersao(9)) expect(contagens[nome], nome).toBeGreaterThan(0);
     expect(
       (await repo.colecao('tags').obter(ids.tagExcluida, { incluirExcluidos: true }))?.excluidoEm,
     ).not.toBeNull();

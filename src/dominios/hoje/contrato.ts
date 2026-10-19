@@ -13,6 +13,8 @@ export interface ProximaAcao {
   razao: string;
   /** Minutos prováveis; ausente quando não há base honesta para estimar. */
   estimativaMin?: number;
+  /** Só no tipo `ciclo`: o bloco do Ciclo que a Sessão vai trabalhar (alvo.id = Ciclo). */
+  blocoOrdem?: number;
 }
 
 /** Um dos três começos concretos do estado vazio (nenhum material ainda). */

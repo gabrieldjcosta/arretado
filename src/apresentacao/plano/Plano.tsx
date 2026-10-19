@@ -69,6 +69,9 @@ export function Plano() {
           <Link to="/plano/pontos" className="botao botao-texto na-margem">
             Editar pontos e matérias
           </Link>
+          <Link to="/plano/ciclo" className="botao botao-texto na-margem">
+            Ciclo de estudo
+          </Link>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
               <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>

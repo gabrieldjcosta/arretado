@@ -11,6 +11,10 @@ export function rotaDeInicio(acao: ProximaAcao): string {
   if (acao.alvo.id !== undefined) q.set('id', acao.alvo.id);
   if (acao.alvo.rotulo !== undefined) q.set('rotulo', acao.alvo.rotulo);
   if (acao.alvo.tipo === 'tarefa' && acao.alvo.id !== undefined) q.set('tarefa', acao.alvo.id);
+  if (acao.tipo === 'ciclo' && acao.alvo.id !== undefined && acao.blocoOrdem !== undefined) {
+    q.set('ciclo', acao.alvo.id);
+    q.set('bloco', String(acao.blocoOrdem));
+  }
   q.set('origem', acao.tipo);
   q.set('razao', acao.razao);
   if (rotaDoAlvo(acao.alvo) !== undefined) q.set('direto', '1');

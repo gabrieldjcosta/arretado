@@ -143,6 +143,11 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** rodar com `--reporter=default` para ver a saída. **Prevenção:** teste não depende da saída para falhar: na métrica, o piso, a linha de base, as regras e os pendentes falham com a mensagem própria (as divergências, cortadas em 20, e cada diferença da linha de base).
 - **Origem:** ocorrido em 01/10/2026 (atividade 8.9; movido para cá na revisão da 8.9).
 
+### E2E recarrega a página antes de a gravação terminar (`hasText: 'Salvo.'` casa com "Ainda não salvo.")
+- **Sintoma:** no CI, só no projeto "celular" e em cerca de metade das rodadas, os dois E2E do "Para lembrar" (`hoje-colunas.spec.ts`) falharam juntos: depois de `page.reload()` o campo voltava vazio (`toHaveValue` esgota os 5 s com `unexpected value ""`); localmente nunca. O "element(s) not found" no fim da mensagem vem de um poll antigo (o Playwright não o apaga), não do último. **Causa:** `filter({ hasText: 'Salvo.' })` casa por texto contido e sem diferenciar maiúscula, então também casa com "Ainda não salvo."; a espera passava na hora, sem esperar a gravação, e o reload derrubava a gravação em andamento. Reproduzido segurando uma transação de escrita no banco por 800 ms antes de salvar; no CI não deu para ler o traço (o servidor de artefatos é bloqueado), então o que o runner atrasa é inferido.
+- **Solução:** esperar o aviso exato, `filter({ hasText: /^Salvo\.$/ })`. **Prevenção:** estado que é parte do texto de outro (ou que muda só na capitalização) se espera com regex ancorada ou `exact: true`; antes de recarregar, esperar o que só aparece depois da gravação.
+- **Origem:** ocorrido em 19/10/2026 (P7b, #215; corrigido no #216).
+
 ## Persistência local (IndexedDB/Dexie)
 
 ### `PrematureCommitError` numa transação
@@ -937,6 +942,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado; o leitor e Conta › Aparência leem `?? false`), sem migração e sem subir a versão do esquema; `PREFERENCIAS_PADRAO` não o grava.
 - **Prevenção:** `preferencias.test.ts` (o registro sem o campo valida e muda) e `pacote-v1.test.ts` (pacote v1 sem o campo restaura integral, com os destaques desligados).
 - **No sentido contrário (app anterior à 9.8 diante do campo novo):** a leitura não valida o esquema (só a escrita), então a aba aberta antes do merge continua lendo; mas, depois de o destaque ser ligado noutra aba, ela recusa gravar qualquer preferência ("Não foi possível guardar a mudança", ao mudar o tema ou o A−/A+), e um app anterior recusa o pacote novo com o campo como "arquivo alterado fora do aplicativo". Nada se perde: recarregar a aba (ou atualizar o app no celular) resolve. Por isso, ao publicar a 9.8, recarregar as abas abertas do Arretado.
+- **Repetido na P7b (19/10/2026):** `lembrete` (o "Para lembrar" do Hoje) é opcional como o `destacarCondicionantesEPrazos` e tem as mesmas consequências, com um agravante: quem o grava é o Hoje, a tela mais aberta, então a aba ou o app instalado de antes da P7b recusa gravar qualquer preferência assim que a pessoa salva uma nota noutra aba. Também nada se perde: recarregar a aba ou atualizar o app resolve. Ao publicar a P7b, recarregar as abas abertas.
 - **Origem:** previsto na 9.8; tratado em 06/10/2026 (9.8).
 
 ### Regra de destaque quadrática ou cega a acento
@@ -1175,7 +1181,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Alvos que restam abaixo de 44 px (P6)
 - **Sintoma:** `capturas-ui.mjs --medir` ainda lista as notas de vigência do Leitor ("(Redação dada pela Lei nº …)", 278 × 19), as remissões no texto ("II", 15 × 27), "Fazer agora" no Hoje (74 × 19), "Aparência" no meio de uma frase de Perfis (63 × 19) e, no Fixar, "registrar um erro" (118 × 21, na linha "Depois:"). **Causa:** são links em linha de texto, a exceção "em linha" da WCAG 2.5.8 (o alvo é limitado pela altura da linha); a nota de vigência é uma linha miúda inteira de link, e dar 44 px a cada uma deixaria cada artigo bem mais alto.
-- **Solução:** nenhuma na P6; decisão do Gabriel (ampliar as notas ou aceitar a exceção). O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
+- **Solução:** as notas de vigência e as remissões do Leitor passam a ter alvo de pelo menos 24 px (`.notas-vigencia a` em bloco em linha com 24 px de altura; `.remissao` com 0,35 rem de folga lateral). Decisão do Gabriel de 19/10/2026 15:31Z (**Ampliar**), que substitui o "manter" de 13:38Z. Os demais links em linha ficam como estavam. O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
 - **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
 
 ### As capturas `--rotas todas` não mostram a Sessão aberta (P6)

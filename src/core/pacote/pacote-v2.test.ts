@@ -321,3 +321,21 @@ describe('pacote v7 no app v8 (F3-C, vínculos de precedentes)', () => {
     repo.fechar();
   });
 });
+
+describe('pacote v8 no app v9 (ciclos)', () => {
+  it('pacote v8 restaura sem recusa e deixa os ciclos locais vazios; v9 vai e volta', async () => {
+    const origem = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await origem.colecao('ciclos').criar(camposMinimos('ciclos', origem.ctx.usuarioId));
+    const { bytes } = await exportarPacote(origem);
+    const v8 = await comVersao(bytes, 8);
+    const destino = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino, v8, 6);
+    expect(await destino.comUsuario(origem.ctx.usuarioId).colecao('ciclos').contar()).toBe(0);
+    const destino2 = await Repositorio.abrir({ nomeBanco: nomeBanco() });
+    await importar(destino2, bytes, 6);
+    expect(await destino2.comUsuario(origem.ctx.usuarioId).colecao('ciclos').contar()).toBe(1);
+    origem.fechar();
+    destino.fechar();
+    destino2.fechar();
+  });
+});

@@ -180,9 +180,9 @@ Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e
 | Cabeçalho | na areia, gutter 16: "Arretado" à esquerda; Ajuda e Conta à direita | igual, gutter 24 | marca · navegação ao centro · "Registrar erro (E)", Ajuda, Conta |
 | Navegação | abas sobre a areia, ícone e rótulo nas quatro áreas, atual em cal, `env(safe-area-inset-bottom)` | as mesmas, centralizadas em até 560 px | no cabeçalho, pegajosa (`sticky`), atual em cal |
 | "+" | redondo em cal, na linha do título do Hoje e do Fixar | idem | idem, e "Registrar erro (E)" no cabeçalho |
-| Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna, gutter 24 (destino: 40 rem centralizada) | coluna de 900 px, gutter 32 (destino: até 65 rem, 2 colunas, 7fr · 5fr, no Hoje, no Fixar e na Trilha) |
+| Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna, gutter 24 (destino: 40 rem centralizada) | coluna de 900 px, gutter 32; o Hoje divide a parte do meio em 2 colunas, 7fr · 5fr (P7b); destino no Fixar e na Trilha: até 65 rem, 2 colunas |
 | H1 | 1,875 rem | 2,125 rem | 2,375 rem |
-| Hoje | título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, Em seguida | idem, folha mais larga | à esquerda o Agora; à direita Em seguida e "Para lembrar" |
+| Hoje | título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, Em seguida, "Para lembrar" | idem, folha mais larga | à esquerda a linha de parada e o Agora; à direita Em seguida e "Para lembrar" (7fr · 5fr, P7b); o Resumo do Dia e o resto seguem em largura inteira, embaixo |
 | Leitor | ver abaixo; sem estrutura (o filtro por bloco faz o papel) | estrutura à esquerda (11 rem), coluna de lei à direita | coluna de 70 ch centralizada com a estrutura (13 rem) ao lado e, a partir de 1200, na margem; nessa largura as ferramentas saem do canto e ficam num trilho na margem da direita (P7) |
 | Rodapé | fim do conteúdo, acima da reserva | idem | uma linha, centralizada |
 | Formulários | largura total, rótulo acima | coluna de 32 rem | coluna de 32 rem alinhada à esquerda do conteúdo |

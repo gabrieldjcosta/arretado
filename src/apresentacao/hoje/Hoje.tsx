@@ -5,6 +5,9 @@
 //
 // O que a tela mostra de uma vez (os pontos do Dia, a linha de parada, o Agora e o "Em seguida") vem
 // de um só retrato dos dados (`useRetratoDoHoje`), para os blocos nunca discordarem entre si.
+//
+// Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; o "Em seguida" e o "Para lembrar" à
+// direita. Abaixo disso as duas viram uma só, na mesma ordem.
 import { TituloComMais } from '../componentes/TituloComMais';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
@@ -12,6 +15,7 @@ import { Captura } from './Captura';
 import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
 import { LembreteDeBackup } from './LembreteDeBackup';
+import { ParaLembrar } from './ParaLembrar';
 import { PontosDoDia } from './PontosDoDia';
 import { RevisoesDoDia } from './RevisoesDoDia';
 import { BoasVindas } from './Retorno';
@@ -24,8 +28,15 @@ export function Hoje() {
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
       <PontosDoDia retrato={hoje.retrato} />
       <BoasVindas />
-      <Agora hoje={hoje} />
-      <Depois acoes={hoje.retrato?.emSeguida ?? []} />
+      <div className="hoje-colunas">
+        <div>
+          <Agora hoje={hoje} />
+        </div>
+        <div>
+          <Depois acoes={hoje.retrato?.emSeguida ?? []} />
+          <ParaLembrar />
+        </div>
+      </div>
       <FecharDia />
       <RevisoesDoDia />
       <Captura />
