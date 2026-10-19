@@ -128,9 +128,25 @@
       "name": "Folha do Agora",
       "kind": "custom",
       "refersTo": "folha-agora",
-      "description": "A folha de cal com a sombra fresca: título em Gabarito, motivo, tempo e um botão de vidro.",
-      "html": "<section class=\"ds-agora\"><h2>Continuar a leitura</h2><p>Seção II, Dos Regimes. Faltam 5 parágrafos do art. 112.</p><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Continuar</button></section>",
-      "css": ".ds-agora{background:#fff;color:#17243a;border-radius:16px;padding:20px;box-shadow:0 14px 28px -10px rgb(23 36 58 / 16%),0 1px 0 rgb(23 36 58 / 16%);font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-agora h2{font:750 1.5rem/1.12 'Gabarito','Atkinson Hyperlegible Next',system-ui,sans-serif;margin:0 0 4px}.ds-agora p{margin:0 0 4px;color:#4f5b70}.ds-agora-btn{background:#0f7f72;color:#fff;border:0;border-radius:12px;min-height:52px;margin-top:8px;padding:0 20px;font:600 17px 'Atkinson Hyperlegible Next',system-ui,sans-serif;width:100%;cursor:pointer}.ds-agora-btn:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
+      "description": "A folha de cal com a sombra fresca: título em Gabarito, motivo, tempo e um botão de vidro; dentro dela, \"Escolher outra coisa\" como botão de texto sublinhado.",
+      "html": "<section class=\"ds-agora\"><h2>Continuar a leitura</h2><p>Seção II, Dos Regimes. Faltam 5 parágrafos do art. 112.</p><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Continuar</button><button class=\"ds-agora-outra\">Escolher outra coisa</button></section>",
+      "css": ".ds-agora{background:#fff;color:#17243a;border-radius:16px;padding:20px;box-shadow:0 14px 28px -10px rgb(23 36 58 / 16%),0 1px 0 rgb(23 36 58 / 16%);font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-agora h2{font:750 1.5rem/1.12 'Gabarito','Atkinson Hyperlegible Next',system-ui,sans-serif;margin:0 0 4px}.ds-agora p{margin:0 0 4px;color:#4f5b70}.ds-agora-btn{background:#0f7f72;color:#fff;border:0;border-radius:12px;min-height:52px;margin-top:8px;padding:0 20px;font:600 17px 'Atkinson Hyperlegible Next',system-ui,sans-serif;width:100%;cursor:pointer}.ds-agora-btn:focus-visible{outline:2px solid #17243a;outline-offset:2px}.ds-agora-outra{display:block;margin:6px auto 0;padding:0 8px;min-height:44px;background:none;border:0;color:#17243a;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;text-decoration:underline;cursor:pointer}"
+    },
+    {
+      "name": "Pontos do Dia",
+      "kind": "custom",
+      "refersTo": "pontos-do-dia",
+      "description": "Leitura, Cartões e Frases numa linha sob o título do Hoje: um círculo de 22 px, sempre com o contorno na tinta, e o rótulo ao lado. Apagado (só o anel), pela metade (é a vez) ou aceso (feito hoje). O estado também vem em texto, para o leitor de tela. Acende uma vez, em 160 ms.",
+      "html": "<ul class=\"ds-pontos\"><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg>Leitura</li><li class=\"atual\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3a9 9 0 0 1 0 18z\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg>Cartões</li><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"rgb(23 36 58 / 55%)\" stroke-width=\"1.5\"/></svg>Frases</li></ul>",
+      "css": ".ds-pontos{display:flex;gap:18px;margin:0;padding:0;list-style:none;font:600 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#4f5b70}.ds-pontos li{display:flex;align-items:center;gap:6px}.ds-pontos li.atual{color:#17243a}.ds-pontos svg{width:22px;height:22px}"
+    },
+    {
+      "name": "Linha de parada",
+      "kind": "custom",
+      "refersTo": "linha-de-parada",
+      "description": "Onde e quando a leitura parou, à esquerda; a caneta de pé à direita, com a ponta dentro da folha do Agora. Sem a caneta quando o Dia está fechado (ela fica no Resumo do Dia).",
+      "html": "<p class=\"ds-parada\">Você parou em <strong>LEP, art. 112, § 2º</strong><span>ontem, 21h40</span></p>",
+      "css": ".ds-parada{margin:0;font:400 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#4f5b70}.ds-parada strong{font-weight:700;color:#17243a}.ds-parada span{display:block;font-size:13px}"
     },
     {
       "name": "Campo de texto",

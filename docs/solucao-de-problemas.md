@@ -1037,6 +1037,26 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz, ambiente Linux da nuvem).
 
 
+### Anel do ponto "apagado" reprova 3:1 com a tinta a 45% (P3)
+- **Sintoma:** `node scripts/contraste.mjs` reprova o anel do ponto apagado se ele usar a tinta a 45%, o valor do protótipo. **Causa:** 45% de tinta sobre a areia dá 2,6:1, abaixo dos 3:1 que o contorno de um componente pede (WCAG 1.4.11); o axe não acusa (o ponto é um SVG decorativo, sem texto), só o script.
+- **Solução:** token `--ponto-apagado` (tinta a 55%: 3,4:1 sobre a areia e 3,6:1 sobre a cal; à noite, a tinta clara a 55%: 5,4:1 e 4,9:1), com os pares `ponto-apagado` × superfícies em `scripts/contraste.mjs` (o `contraste.test.ts` o roda). **Prevenção:** todo traço novo com opacidade vira token e par medido; a opacidade nunca vai solta no componente.
+- **Origem:** encontrado na P3 do Ponto de luz (18/10/2026).
+
+### Hoje: texto que a P3 repetiu ou moveu quebra teste (previsto)
+- **Sintoma:** `getByText('cerca de 5 min')` (RTL ou Playwright, em modo estrito) falha com mais de um elemento no Hoje; ou um teste procura "Você parou no Art. 1º da LEP" dentro da região "Agora" e não acha. **Causa:** a folha do Agora e o "Em seguida" mostram o tempo no mesmo formato; e, desde a P3, quem parou de ler vê onde e quando na linha de parada (`Parada`, acima da folha), e a folha não repete o motivo (`motivoDaAcao`). A Biblioteca segue com o `AcaoAgora` e o motivo no título (`Normas.tsx`).
+- **Solução:** escopar a consulta pela região (`getByRole('region', { name: 'Agora' })` ou `'Em seguida'`); o onde parou está em `.parada`. **Prevenção:** `hoje/Hoje.test.tsx` e o passo do Hoje em `e2e/leitor.spec.ts` mostram o escopo.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+
+### Hoje com Sessão aberta: dois botões de vidro e dois "Continuar" (previsto)
+- **Sintoma:** com uma Sessão aberta, o Hoje tem o "Continuar" do aviso (`SessaoAberta`, `.principal`) e o botão de vidro da folha do Agora, e, se a ação do Agora é a leitura, o rótulo dele também é "Continuar". **Causa:** o aviso é do pacote A2 (Sessão) e ainda traz o primário de vidro; a regra "um vidro por tela" (D-D7) só fura nesse estado. Os dois links têm o mesmo nome em regiões com nomes diferentes ("Sessão aberta" e "Agora").
+- **Solução:** fica para a P6 (Sessão): o aviso passa a secundário, ou a folha cede o vidro. Enquanto isso, consulta de teste por região. **Prevenção:** esta entrada.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+
+### Duas canetas, ou nenhuma, no Hoje; o cachorro não se desenha no teste (P3)
+- **Sintoma:** `svg.caneta` aparece duas vezes (ou nenhuma) no Hoje; ou o teste de unidade não vê o traço se desenhar. **Causa:** a caneta é uma por tela e muda de lugar por salto: com o Dia aberto, fica na linha de parada (encostada, só quando há folha do Agora); com o Dia fechado, só no Resumo do Dia (deitada), e `retrato.diaFechado` decide (`Parada comCaneta`). O jsdom não aplica CSS, então a animação (`traco-desenha`, 300 ms) só se confere no navegador.
+- **Solução:** `Hoje.test.tsx` ("uma caneta por tela…") confere as poses e o lugar; `e2e/sessao.spec.ts` lê `getComputedStyle(…).animationName` (`traco-desenha` com movimento normal, `none` com `prefers-reduced-motion`). **Prevenção:** o Leitor (P4) e o Fixar (P5) usam o mesmo `Caneta`; cada tela, uma só.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).

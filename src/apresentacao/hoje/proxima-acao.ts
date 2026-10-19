@@ -33,38 +33,55 @@ function ultimaLida(normas: readonly Norma[], leituras: ReadonlyMap<string, Leit
   return ultima;
 }
 
-async function leituraSalva(repo: Repositorio): Promise<EntradaDaProximaAcao['leitura']> {
+/** A leitura salva e quando foi lida (instante), para a linha de parada do Hoje. */
+interface LeituraSalva {
+  leitura: NonNullable<EntradaDaProximaAcao['leitura']>;
+  lidaEm: string;
+}
+
+async function leituraSalva(repo: Repositorio): Promise<LeituraSalva | undefined> {
   const [normas, leituras] = await Promise.all([normasPublicadas(repo), leiturasPorNorma(repo)]);
   const achada = ultimaLida(normas, leituras);
   if (!achada) return undefined;
   const { norma, leitura } = achada;
   const base = { normaId: norma.id, tituloCurto: norma.tituloCurto };
+  const quando = lidaEm(leitura);
   const posicao = leitura.posicaoId ?? leitura.lidoAteId;
-  if (posicao === undefined) return base;
+  if (posicao === undefined) return { leitura: base, lidaEm: quando };
   try {
     const { nos, indiceDe } = await abrirNorma(repo, norma.id);
     const indice = indiceDe.get(posicao);
-    if (indice === undefined) return base;
+    if (indice === undefined) return { leitura: base, lidaEm: quando };
     const onde = referenciaDoNo(nos, indiceDe, indice);
-    return onde === '' ? base : { ...base, onde, minutos: minutosAteOFimDaSecao(nos, indice) };
+    return {
+      leitura: onde === '' ? base : { ...base, onde, minutos: minutosAteOFimDaSecao(nos, indice) },
+      lidaEm: quando,
+    };
   } catch {
-    return base; // norma que não abre: segue sem o ponto
+    return { leitura: base, lidaEm: quando }; // norma que não abre: segue sem o ponto
   }
 }
 
-export const escolherProximaAcao: EscolherProximaAcao = async (repo, hoje, opcoes) => {
-  const [cartoesVencidos, frasesVencidas, leitura, { fila }] = await Promise.all([
+/** Tudo o que o Hoje sabe do estudo para decidir (e mostrar) a Próxima ação. */
+export interface EntradasDoHoje {
+  entrada: EntradaDaProximaAcao;
+  /** Quando a norma da leitura salva foi lida por último (instante); ausente sem leitura salva. */
+  leituraEm?: string;
+}
+
+export async function reunirEntradas(repo: Repositorio, hoje: DataCivil): Promise<EntradasDoHoje> {
+  const [cartoesVencidos, frasesVencidas, salva, { fila }] = await Promise.all([
     vencidos(repo, 'cartoes', hoje),
     vencidos(repo, 'frases', hoje),
     leituraSalva(repo),
     carregarFila(repo, hoje),
   ]);
   const primeira = fila[0];
-  return decidirProximaAcao(
-    {
+  return {
+    entrada: {
       cartoesVencidos,
       frasesVencidas,
-      ...(leitura ? { leitura } : {}),
+      ...(salva ? { leitura: salva.leitura } : {}),
       ...(primeira
         ? {
             tarefa: {
@@ -77,6 +94,11 @@ export const escolherProximaAcao: EscolherProximaAcao = async (repo, hoje, opcoe
           }
         : {}),
     },
-    opcoes?.excluir,
-  );
+    ...(salva ? { leituraEm: salva.lidaEm } : {}),
+  };
+}
+
+export const escolherProximaAcao: EscolherProximaAcao = async (repo, hoje, opcoes) => {
+  const { entrada } = await reunirEntradas(repo, hoje);
+  return decidirProximaAcao(entrada, opcoes?.excluir);
 };
