@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
+import { LockupParado } from './componentes/LockupParado';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
@@ -38,7 +39,7 @@ function IconeDeArea({ d }: { d: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.7"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -50,10 +51,11 @@ function IconeDeArea({ d }: { d: string }) {
 }
 
 /**
- * Moldura de todas as telas (D6; casca da D-D7, P2): cabeçalho na areia com a marca, Ajuda e Conta;
- * as quatro áreas em abas sobre a areia, embaixo até 899 px e no cabeçalho a partir de 900 (com
- * "Registrar erro" e a tecla E); rodapé no fim do conteúdo. O "+" mora no título das telas que
- * registram (`TituloComMais`). Com o teclado aberto, as abas saem da frente.
+ * Moldura de todas as telas (D6; casca da D-D9, Q2): cabeçalho com o lockup da marca, Ajuda e Conta;
+ * as quatro áreas em abas sobre o chão, a atual com o traço de caneta embaixo (no CSS), embaixo até
+ * 899 px e no cabeçalho a partir de 900 (com "Registrar erro" e a tecla E); rodapé no fim do
+ * conteúdo. O "+" mora no título das telas que registram (`TituloComMais`). Com o teclado aberto, as
+ * abas saem da frente.
  */
 export function Shell() {
   const { pathname } = useLocation();
@@ -89,19 +91,8 @@ export function Shell() {
         Pular para o conteúdo
       </a>
       <header className="topo">
-        <Link to="/" className="marca">
-          Arretado
-          <svg
-            className="marca-cacto"
-            viewBox="0 0 22 30"
-            fill="currentColor"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <rect x="8" y="2" width="6.5" height="26" rx="3.25" />
-            <path d="M8 15H6.2A3.2 3.2 0 0 1 3 11.8V8.5a1.6 1.6 0 0 1 3.2 0V11a.8.8 0 0 0 .8.8H8z" />
-            <path d="M14.5 19h1.8a3.2 3.2 0 0 0 3.2-3.2v-4.3a1.6 1.6 0 0 0-3.2 0V15a.8.8 0 0 1-.8.8h-1z" />
-          </svg>
+        <Link to="/" className="marca" aria-label="Arretado, início">
+          <LockupParado />
         </Link>
         <nav aria-label="Áreas" className="areas">
           {AREAS.map((a) => (
