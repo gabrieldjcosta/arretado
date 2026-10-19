@@ -1649,6 +1649,47 @@ a.item-norma strong {
   }
 }
 
+/* O trilho (P7): a partir de 1200 px, a mesma folga que põe a estrutura da norma na margem da
+   esquerda, as ferramentas saem do canto de baixo e ficam na margem da direita, ao lado da coluna de
+   lei e à altura da estrutura. O dock vira a pílula em pé; as ações do trecho marcado e o aviso da
+   Estrela ocupam o mesmo trilho. O modo foco mantém o canto. */
+@media (min-width: 75em) {
+  .leitor:not(.em-foco) .acoes-leitor {
+    top: calc(var(--barra-fixa, 4rem) + 0.75rem);
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    bottom: auto;
+    left: calc(50% + var(--largura-texto) / 2 + 1.5rem);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    max-width: 13rem;
+  }
+
+  .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-radius: 22px;
+  }
+
+  .leitor:not(.em-foco) .aviso-da-estrela {
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    margin: 0.5rem 0 0;
+    text-align: left;
+  }
+
+  .leitor:not(.em-foco) .acoes-marcacao {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .leitor:not(.em-foco) .aviso-da-selecao {
+    text-align: left;
+  }
+}
+
 @media (forced-colors: active) {
   .acoes-leitor .dock-do-leitor {
     background: Canvas;

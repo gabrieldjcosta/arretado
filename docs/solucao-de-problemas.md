@@ -1142,6 +1142,34 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `.em-foco .bandeja-itens button.principal` devolve o vidro de ação (e o hover dele); "Sair do foco" é o que recua, de propósito.
 - **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
 
+### favicon.ico sai com as três imagens do mesmo tamanho (P7)
+- **Sintoma:** o `favicon.ico` declara 16, 32 e 48 px, mas as três imagens dentro dele são de 48. **Causa:** `scripts/icones-app.mjs` rasterizava com `Promise.all` numa só página do Playwright: os três `setViewportSize` correm juntos e o tamanho da janela é o do último que pediu.
+- **Solução:** uma de cada vez (laço com `await`). **Prevenção:** `config/plataformas.test.ts` lê o cabeçalho IHDR do PNG de cada entrada do ICO e compara com o tamanho declarado.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### `?raw` de um `.css` volta vazio no Vitest (P7)
+- **Sintoma:** `import css from './estilos.css?raw'` num teste da `unidade` dá `''`, e a conferência de token contra constante passa sem ler nada. **Causa:** o Vitest trata o CSS como módulo vazio (o `?raw` de `.html` funciona). **Solução:** teste em ambiente `node` (`// @vitest-environment node`) que lê o arquivo (`readFileSync`) ou usa `lerTemas()` de `scripts/contraste.mjs`, como `config/plataformas.test.ts`. O tsconfig do Node não tem a lib DOM, então esse teste não importa código de DOM: lê a fonte (`cor-da-barra.ts`) com regex.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### A barra do navegador não segue o tema escolhido à mão (P7)
+- **Sintoma:** com "Escuro" em Conta › Aparência e o aparelho no claro, a barra de cima (Chrome Android, Safari) continua areia. **Causa:** as metas `theme-color` com `media="(prefers-color-scheme: …)"` só leem o esquema do aparelho, não o `data-tema` da página; o manifest não varia por esquema.
+- **Solução:** `aplicarCorDaBarra(tema)` (`src/apresentacao/cor-da-barra.ts`, chamada por `AplicarAparencia`) põe a mesma cor nas duas metas quando o tema é `claro` ou `escuro` e devolve a cada uma a sua em `sistema`. **Prevenção:** teste de unidade (as metas do `index.html` de verdade) e E2E `e2e/plataformas.spec.ts`; `config/plataformas.test.ts` compara as cores com `--areia` e `--noite`.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### iPhone: a ilha, o entalhe ou o indicador de início cobrem texto (P7)
+- **Sintoma:** com `viewport-fit=cover` (P7), texto ou botão sob a ilha no alto, colado no entalhe no celular deitado ou sob o indicador de início. **Causa:** a página vai até a borda do vidro e só recua quem lê `env(safe-area-inset-*)`. Faltavam: o recuo lateral de `.conteudo` e `.rodape`; o cabeçalho a partir de 900 px (a regra de 900 px trocava o recuo e perdia a área segura); `.areas` de 700 a 899 px; a reserva de baixo de 900 px em diante (`--abas-altura` valia 0); a folha e o balão da prévia (`dialog.dialogo-previa`); o alto do texto no modo foco, sem o cabeçalho que reservava a ilha.
+- **Solução:** `max(var(--gutter), env(...))` nos recuos e `--abas-altura: env(safe-area-inset-bottom, 0px)` como valor-base. **Prevenção:** `e2e/areas-seguras.spec.ts` emula as áreas (Chromium, `Emulation.setSafeAreaInsetsOverride`; o WebKit do Playwright não emula) em três iPhones e confere cada tela; a primeira coisa que ele faz é ler `env()` e comparar com o que pediu, para um Chromium que ignorasse a emulação não deixar tudo passar sem medir nada. Sem a correção, 13 dos 18 testes falham: em pé, as cinco telas comuns passam (o cabeçalho e as abas já leem o alto e o embaixo), e falham o modo foco do Leitor e tudo o que é deitado.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### E2E das áreas seguras: o que não é falha (P7)
+- **Sintoma:** a medição acusa texto ou controle "fora" que ninguém vê. **Causa e solução:** (1) texto num `<details>` fechado: o retângulo é o de antes de esconder; pula quem não passa em `checkVisibility()`. (2) fileira de abas que rola de lado (Fixar, Biblioteca): a caixa passa da borda, mas o que aparece é o recorte do ancestral com `overflow`; mede-se o recorte, e o texto é cortado também pelo próprio elemento (`.visualmente-oculto` tem 1 × 1 px com o texto vazando). (3) elemento grudado (`sticky`, a estrutura da norma): antes de rolar ele é página; só vale nas quatro bordas depois de rolar (pontos `meio` e `pe`); o fixo vale sempre. (4) margem negativa que alinha o desenho do botão à margem da página: o excedente é alvo de toque, não tinta. (5) página que ainda carrega: mede só quando `scrollHeight` parou. (6) áreas pedidas nas quatro bordas ao mesmo tempo em 412 px não existem em aparelho: o teste usa os três iPhones reais.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### Bandeja do modo foco cortada no celular deitado (P7)
+- **Sintoma:** com o iPhone deitado (altura de 393 a 430 px), ao abrir o ⋯ os primeiros itens (Buscar, Filtrar, Ações) ficam acima da tela, onde não se chega (a bandeja é fixa e não rola). **Causa:** a pilha de nove botões de 44 px passa de 440 px acima do ⋯, sem limite de altura.
+- **Solução:** até 540 px de altura a bandeja vira duas colunas (a ordem do teclado segue a da leitura, uma coluna e depois a outra), e `max-height` com `overflow-y: auto` fica como rede de segurança (tela muito baixa, texto ampliado). **Prevenção:** `e2e/areas-seguras.spec.ts` abre a bandeja em cada aparelho.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026), pelo E2E das áreas seguras.
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
