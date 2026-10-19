@@ -7,6 +7,7 @@ const ROTAS = [
   '/recall',
   '/recall/registrar',
   '/recall/frases',
+  '/recall/erros',
   '/recall/cartoes',
   '/recall/historico',
   '/recall/revisar',

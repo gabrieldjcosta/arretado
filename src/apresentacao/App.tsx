@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ReactNode } from 'react';
-import { HashRouter, Route, Routes } from 'react-router';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { NOME_BANCO_PRINCIPAL, Repositorio } from '../core/persistencia';
 import { contasHabilitadas } from '../integracoes/conta';
 import type { FonteDoAcervo } from '../dominios/acervo/fonte';
@@ -22,7 +22,7 @@ import { CartaoDeLacuna } from './recall/CartaoDeLacuna';
 import { EditarCartao } from './recall/EditarCartao';
 import { Historico } from './recall/Historico';
 import { ListaCartoes } from './recall/ListaCartoes';
-import { ListaErros } from './recall/ListaErros';
+import { ErrosComFiltros } from './recall/ListaErros';
 import { ListaFrases } from './recall/ListaFrases';
 import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
@@ -100,11 +100,12 @@ export function App({
                 <Route path="plano/*" element={<RotasDoPlano />} />
                 <Route path="sessao/*" element={<RotasDaSessao />} />
                 <Route path="recall" element={<RecallInicio />}>
-                  <Route index element={<ListaErros />} />
+                  <Route index element={<Navigate to="frases" replace />} />
                   <Route path="frases" element={<ListaFrases />} />
                   <Route path="cartoes" element={<ListaCartoes />} />
                   <Route path="historico" element={<Historico />} />
                 </Route>
+                <Route path="recall/erros" element={<ErrosComFiltros />} />
                 <Route path="recall/registrar" element={<RegistrarErro />} />
                 <Route path="recall/revisar" element={<Drill />} />
                 <Route path="recall/frases/revisar" element={<RevisarFrases />} />

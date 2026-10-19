@@ -7,7 +7,6 @@ import { completarErro, criarCartaoDeErro, excluirErro } from '../../dominios/re
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
-import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro } from './CamposErro';
 import { formatarQuando, ROTULO_RESULTADO, ROTULO_STATUS } from './rotulos';
@@ -63,10 +62,7 @@ export function DetalheErro() {
   if (!dados) return <Esqueleto linhas={6} />;
   if (!dados.erro) {
     return (
-      <Vazio
-        titulo="Erro não encontrado"
-        acao={<Link to="/recall">Voltar ao {ROTULO_DA_AREA.recall}</Link>}
-      >
+      <Vazio titulo="Erro não encontrado" acao={<Link to="/recall/erros">Voltar aos erros</Link>}>
         <p>Ele pode ter sido excluído.</p>
       </Vazio>
     );
@@ -262,7 +258,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
         <p className="dica">Para criar cartão deste erro, escreva "o que foi" (a pergunta).</p>
       )}
       <p>
-        <Link to="/recall">Voltar ao {ROTULO_DA_AREA.recall}</Link>
+        <Link to="/recall/erros">Voltar aos erros</Link>
       </p>
 
       <Dialogo
@@ -279,7 +275,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
             className="perigoso"
             onClick={() => {
               void excluirErro(repo, erro.id).then(() => {
-                void navegar('/recall');
+                void navegar('/recall/erros');
               });
             }}
           >
