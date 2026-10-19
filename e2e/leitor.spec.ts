@@ -1887,4 +1887,28 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   );
   expect(sobraNaBarra).toBe(0);
   await semViolacoes(page);
+
+  // Em 320 px (o menor celular): a pílula do dock cabe numa linha, a cal do lido não encosta na
+  // borda da tela e nada rola na horizontal. A largura é fixada aqui, então só o projeto do celular.
+  if (info.project.name === 'celular') {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await rolarAte(page, art3);
+    const estreito = await page.evaluate(() => {
+      const raiz = document.documentElement;
+      const pilula = document.querySelector('.dock-do-leitor')?.getBoundingClientRect();
+      const faixaDoLido = document.querySelector('[data-endereco="art3"]')?.getBoundingClientRect();
+      const botoes = [...document.querySelectorAll('.dock-do-leitor button')];
+      return {
+        sobra: raiz.scrollWidth - raiz.clientWidth,
+        linhasDoDock: new Set(botoes.map((b) => Math.round(b.getBoundingClientRect().top))).size,
+        pilulaDentro: pilula !== undefined && pilula.left >= 0 && pilula.right <= raiz.clientWidth,
+        folgaDoLido: raiz.clientWidth - (faixaDoLido?.right ?? raiz.clientWidth),
+      };
+    });
+    expect(estreito.sobra).toBeLessThanOrEqual(0);
+    expect(estreito.linhasDoDock, 'o dock cabe numa linha em 320 px').toBe(1);
+    expect(estreito.pilulaDentro, 'a pílula do dock fica dentro da tela').toBe(true);
+    expect(estreito.folgaDoLido, 'a cal do lido não encosta na borda').toBeGreaterThanOrEqual(7.5);
+    await semViolacoes(page);
+  }
 });

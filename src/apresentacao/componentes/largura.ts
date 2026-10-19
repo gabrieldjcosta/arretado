@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 /** A consulta de mídia da largura mínima, ou nada onde não há `matchMedia` (jsdom). */
 function consultar(px: number): MediaQueryList | undefined {
@@ -12,16 +12,16 @@ function consultar(px: number): MediaQueryList | undefined {
  * com a janela, sem medir a cada quadro. Sem `matchMedia` (jsdom, navegadores muito antigos), não.
  */
 export function useLarguraMinima(px: number): boolean {
+  const consulta = useMemo(() => consultar(px), [px]);
   const assinar = useCallback(
     (aviso: () => void) => {
-      const consulta = consultar(px);
       consulta?.addEventListener('change', aviso);
       return () => {
         consulta?.removeEventListener('change', aviso);
       };
     },
-    [px],
+    [consulta],
   );
-  const ler = useCallback(() => consultar(px)?.matches ?? false, [px]);
+  const ler = useCallback(() => consulta?.matches ?? false, [consulta]);
   return useSyncExternalStore(assinar, ler, () => false);
 }

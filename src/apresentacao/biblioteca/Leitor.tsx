@@ -117,6 +117,8 @@ const QUADROS_NO_LUGAR = 3;
 const LIMITE_PARA_VOLTAR = 2000;
 /** Quadros em que o alto da tela é reconferido depois de trocar o modo foco (as linhas se remedem). */
 const QUADROS_DA_TROCA = 12;
+/** Por quanto tempo a linha do alto de uma troca serve de ponto de partida da troca seguinte. */
+const VALIDADE_DA_ANCORA = 1500;
 /** As teclas que rolam a página: a pessoa rolando encerra a conferência do alto (F e Esc, não). */
 const TECLAS_DE_ROLAGEM = new Set([
   'PageUp',
@@ -602,7 +604,10 @@ function LeitorAberto({
   const focoAntes = useRef(modoFoco);
   // A linha do alto (e o quanto dela já passou) de uma troca que ainda confere o alto: a troca
   // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou.
-  const ancoraDaTroca = useRef<{ index: number; dentro: number } | undefined>(undefined);
+  // Vale só por um instante (`ate`): uma conferência interrompida não deixa âncora velha.
+  const ancoraDaTroca = useRef<{ index: number; dentro: number; ate: number } | undefined>(
+    undefined,
+  );
   // O controle com o foco do teclado saiu da tela na troca (a barra do leitor, a do Shell): o foco
   // vai para o botão do canto, em vez de cair no corpo da página.
   const devolverFoco = useRef(false);
@@ -620,10 +625,12 @@ function LeitorAberto({
     }
     // Ainda nas medidas de antes da troca: o virtualizador só as refaz depois de `medir`.
     const margemAntes = margemMedida.current;
-    const pendente = ancoraDaTroca.current;
-    ancoraDaTroca.current = undefined;
+    const pendente = trocou ? ancoraDaTroca.current : undefined;
+    if (trocou) ancoraDaTroca.current = undefined;
     const daAncora =
-      pendente && virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
+      pendente &&
+      pendente.ate > performance.now() &&
+      virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
     const alto = daAncora
       ? daAncora.start + pendente.dentro
       : rolagem.current + barraFixaMedida.current;
@@ -658,7 +665,11 @@ function LeitorAberto({
         // não compensa quando a rolagem acabou de subir). Por isso a conferência dura alguns
         // quadros, e a rolagem da pessoa a encerra.
         let restantes = QUADROS_DA_TROCA;
-        ancoraDaTroca.current = { index: item.index, dentro };
+        ancoraDaTroca.current = {
+          index: item.index,
+          dentro,
+          ate: performance.now() + VALIDADE_DA_ANCORA,
+        };
         const conferir = () => {
           if (restantes <= 0) return;
           const desenhada = lista.current?.querySelector(`[data-index="${String(item.index)}"]`);
@@ -675,7 +686,12 @@ function LeitorAberto({
         };
         quadro = requestAnimationFrame(conferir);
         const parar = (e: Event) => {
-          if (e instanceof KeyboardEvent && !TECLAS_DE_ROLAGEM.has(e.key)) return;
+          if (e instanceof KeyboardEvent) {
+            // Só a tecla que rola a página, e não a que age dentro de um campo (a busca, um seletor).
+            if (!TECLAS_DE_ROLAGEM.has(e.key)) return;
+            if (e.target instanceof Element && e.target.closest('input, select, textarea, dialog'))
+              return;
+          }
           restantes = 0;
           ancoraDaTroca.current = undefined;
           cancelAnimationFrame(quadro);

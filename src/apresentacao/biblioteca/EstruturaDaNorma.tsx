@@ -92,7 +92,8 @@ export function EstruturaDaNorma({
   }, [vista, pedir]);
 
   // O bloco de agora fica à vista dentro do painel (que rola sozinho quando a lista é grande). Rola
-  // só o painel, por salto: nunca a página, que é a leitura.
+  // só o painel, por salto: nunca a página, que é a leitura. Refaz quando os nomes chegam, que
+  // mudam a altura das linhas.
   const painel = useRef<HTMLElement>(null);
   useEffect(() => {
     const quadro = painel.current;
@@ -103,7 +104,7 @@ export function EstruturaDaNorma({
     else if (atual.offsetTop + atual.offsetHeight > quadro.scrollTop + quadro.clientHeight) {
       quadro.scrollTop = atual.offsetTop + atual.offsetHeight - quadro.clientHeight + folga;
     }
-  }, [vista]);
+  }, [vista, textos]);
 
   const item = (bloco: number, aqui: boolean) => {
     const estado = estadoDoBloco(estrutura, bloco, lidoAte);
@@ -129,7 +130,7 @@ export function EstruturaDaNorma({
   };
 
   return (
-    <nav ref={painel} className="estrutura" aria-label="Estrutura da norma">
+    <nav ref={painel} className="estrutura-da-norma" aria-label="Estrutura da norma">
       {vista.acima.length > 0 && (
         <ol className="estrutura-acima">
           {vista.acima.map((bloco) => {

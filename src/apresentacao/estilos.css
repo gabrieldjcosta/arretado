@@ -1543,8 +1543,11 @@ a.item-norma strong {
   position: relative;
   width: 100%;
   /* O lido vai sobre uma faixa de cal que passa 12 px do texto de cada lado (P4): a margem anda a
-     calha da estrela e o texto para a faixa não pisar na estrela. Fora da lista (cartão, prévia) é 0. */
+     calha da estrela e o texto para a faixa não pisar na estrela. Fora da lista (cartão, prévia) é 0.
+     No fim da linha a faixa passa só até metade do recuo lateral da casca (8 px no celular), para a
+     cal não encostar na borda da tela; o texto fica onde estava. */
   --margem-do-lido: 12px;
+  --margem-do-lido-fim: min(var(--margem-do-lido), calc(var(--gutter, 1rem) / 2));
 }
 
 /* Voltando à posição guardada (9.7): a lista só aparece no lugar, sem o salto do começo até ela. */
@@ -1629,6 +1632,14 @@ a.item-norma strong {
 
 .acoes-leitor .dock-do-leitor button.filtro-ligado {
   box-shadow: inset 0 0 0 2px var(--cacto);
+}
+
+/* Em 320 px os quatro botões só cabem numa linha com o respiro menor (o alvo continua com 44 px de
+   altura); sem isso a pílula quebra e deixa um vazio ao lado de "Modo foco". */
+@media (max-width: 349px) {
+  .acoes-leitor .dock-do-leitor button {
+    padding-inline: 0.5rem;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -1763,6 +1774,17 @@ dialog.dialogo-busca {
   box-shadow: inset 3px 0 0 var(--regua-barra);
 }
 
+/* Cores forçadas tiram sombra e imagem de fundo: o realce da régua e o filtro ligado do dock passam
+   a um contorno do sistema, que leva o estado. A faixa do lido some nesse modo (a marca "Lido até
+   aqui", em texto, continua dizendo onde parou). */
+@media (forced-colors: active) {
+  .linha-leitor[data-regua] .dispositivo,
+  .acoes-leitor .dock-do-leitor button.filtro-ligado {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 .linha-leitor {
   position: absolute;
   top: 0;
@@ -1790,6 +1812,20 @@ dialog.dialogo-busca {
 /* A herdada é só a barra, em traço tracejado: sem ícone, a origem não depende da cor (peça 1). */
 .linha-leitor[data-estrela-origem='herdada']::before {
   background: repeating-linear-gradient(to bottom, var(--estrela) 0 6px, transparent 6px 10px);
+}
+
+/* Cores forçadas tiram o fundo e o gradiente: a barra passa a ser uma borda em cor do sistema (cheia
+   na direta, tracejada na herdada), de 3 px como era, e a origem segue legível. */
+@media (forced-colors: active) {
+  .linha-leitor[data-estrelada]::before {
+    width: 0;
+    background: none;
+    border-inline-start: 3px solid CanvasText;
+  }
+
+  .linha-leitor[data-estrela-origem='herdada']::before {
+    border-inline-start-style: dashed;
+  }
 }
 
 button.estrela {
@@ -1912,8 +1948,10 @@ button.estrela:focus-visible {
      .lista-leitor) alarga a caixa dos dois lados sem mexer no texto: é a folga da faixa de cal. */
   --recuo: 0px;
   margin-inline: calc(var(--margem-do-lido, 0px) * -1);
+  margin-inline-end: calc(var(--margem-do-lido-fim, var(--margem-do-lido, 0px)) * -1);
   padding: 0.35rem var(--margem-do-lido, 0px);
   padding-inline-start: calc(var(--margem-do-lido, 0px) + var(--recuo));
+  padding-inline-end: var(--margem-do-lido-fim, var(--margem-do-lido, 0px));
   font-family: var(--fonte-leitura);
   font-size: var(--tamanho-leitura);
   line-height: 1.6;
@@ -1971,6 +2009,14 @@ button.estrela:focus-visible {
 
 .lista-leitor .linha-leitor[data-lido] .dispositivo {
   background-color: var(--superficie);
+}
+
+/* Cores forçadas pintam a borda transparente (o vão entre as faixas) com a cor do texto: ela passa a
+   ser a do fundo, e a geometria fica igual. */
+@media (forced-colors: active) {
+  .lista-leitor .dispositivo {
+    border-block-color: Canvas;
+  }
 }
 
 .texto-dispositivo {
