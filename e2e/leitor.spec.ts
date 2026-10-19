@@ -133,8 +133,10 @@ test('ler a LEP compilada: abre em menos de 1 s, virtualizada, com cabeçalhos, 
       .locator(`[data-endereco="${endereco}"]`)
       .evaluate((el) => Number.parseFloat(getComputedStyle(el).paddingInlineStart));
   await expect(page.locator('[data-endereco="art2.parUnico"]')).toBeVisible();
-  expect(await recuoDe('art2')).toBe(0);
-  expect(await recuoDe('art2.parUnico')).toBeGreaterThan(0);
+  // O artigo fica só na folga da faixa do lido (12 px de cada lado, P4); o parágrafo recua além dela.
+  const folga = await recuoDe('art2');
+  expect(folga).toBeLessThanOrEqual(12);
+  expect(await recuoDe('art2.parUnico')).toBeGreaterThan(folga);
 
   // Nota de vigência atenuada, fora do texto (Art. 6º: "Redação dada pela Lei nº 10.792").
   await rolarAte(page, page.locator('[data-endereco="art6"]'));
@@ -1750,4 +1752,139 @@ test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela seg
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(sobra).toBe(0);
+});
+
+test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, a Estrela de quatro pontas, o dock em vidro e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  const largo = (page.viewportSize()?.width ?? 0) >= 700;
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+
+  // A estrutura: só de 700 px para cima, fora do modo foco; no celular o filtro por bloco faz o papel.
+  const estrutura = page.getByRole('navigation', { name: 'Estrutura da norma' });
+  if (largo) await expect(estrutura).toBeVisible();
+  else await expect(estrutura).toHaveCount(0);
+
+  // "Lido até aqui" no art. 3º (Título I): o art. 3º vai sobre a faixa de cal; o que falta, na areia.
+  const art3 = page.locator('[data-endereco="art3"]');
+  await rolarAte(page, art3);
+  await alinharNoAlto(page, art3);
+  await page.getByRole('button', { name: 'Lido até aqui' }).click();
+  const marca = page.locator('.marca-lido-ate');
+  await expect(marca).toHaveCount(1);
+  await expect(marca).toHaveText('Lido até aqui');
+  // A caneta deitada ao fim do rótulo é desenho (aria-hidden), e só há uma por tela.
+  await expect(marca.locator('svg.caneta[data-pose="deitada"][aria-hidden="true"]')).toHaveCount(1);
+  await expect(page.locator('svg.caneta')).toHaveCount(1);
+  const aposOLido = page.locator('[data-endereco="art3.parUnico"]');
+  await expect(aposOLido).toBeVisible();
+  const faixa = (alvo: Locator) =>
+    alvo.evaluate((el) => {
+      const s = getComputedStyle(el);
+      const amostra = document.createElement('i');
+      amostra.style.background = 'var(--superficie)';
+      document.body.append(amostra);
+      const cal = getComputedStyle(amostra).backgroundColor;
+      amostra.remove();
+      return {
+        fundo: s.backgroundColor,
+        cal,
+        borda: s.borderTopWidth,
+        raio: s.borderTopLeftRadius,
+      };
+    });
+  const lido = await faixa(art3);
+  const falta = await faixa(aposOLido);
+  expect(lido.fundo, 'o lido vai sobre a cal').toBe(lido.cal);
+  expect(falta.fundo, 'o que falta fica na areia').toBe('rgba(0, 0, 0, 0)');
+  // Mesma geometria lido ou não: a linha não muda de altura quando o "lido até" anda.
+  expect([lido.borda, lido.raio]).toEqual(['3px', '8px']);
+  expect([falta.borda, falta.raio]).toEqual(['3px', '8px']);
+  await semViolacoes(page);
+
+  // A estrutura mostra a seção de agora em cal, com o estado em palavras, e tocar leva o bloco ao alto.
+  if (largo) {
+    const agora = estrutura.locator('[aria-current="location"]');
+    await expect(agora).toHaveCount(1);
+    await expect(agora).toContainText('TÍTULO I');
+    await expect(agora).toContainText('em leitura');
+    const titulo2 = estrutura.getByRole('button', { name: /^TÍTULO II\b/ });
+    await expect(titulo2).toContainText('ainda não lida');
+    await expect(titulo2.locator('svg')).toHaveCount(1);
+    await apertar(titulo2, toque);
+    const cabecalho = page.getByRole('heading', { level: 2, name: /TÍTULO II\b/ });
+    await expect(cabecalho).toBeVisible();
+    await rolagemAssentada(page);
+    await expect.poll(async () => Math.abs(await distanciaDoAlto(cabecalho))).toBeLessThan(2);
+    // No título, ele é o de agora e os capítulos dele ficam logo abaixo (subir um nível é tocar no caminho).
+    await expect(estrutura.locator('[aria-current="location"]')).toContainText('TÍTULO II');
+    const dentro = estrutura.getByRole('list', { name: 'Dentro de TÍTULO II' });
+    await expect(dentro.getByRole('listitem').first()).toContainText('CAPÍTULO I');
+    const sobra = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(sobra).toBe(0);
+    await semViolacoes(page);
+    // De volta ao art. 3º, para as partes de baixo.
+    await page.getByRole('button', { name: 'Ir ao lido até' }).click();
+    await expect(art3).toBeVisible();
+  }
+
+  // O dock: Buscar, Filtrar, Ações e Modo foco numa só pílula de vidro desfocado; "Lido até aqui" fica fora.
+  const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
+  await expect(dock.getByRole('button')).toHaveText(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
+  await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
+  const vidro = await dock.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return {
+      desfoque: s.backdropFilter,
+      alfa: Number(/[,/]\s*([\d.]+)\)$/.exec(s.backgroundColor)?.[1] ?? 1),
+    };
+  });
+  expect(vidro.desfoque).toBe('blur(12px)');
+  expect(vidro.alfa, 'a superfície a 92%').toBeCloseTo(0.92, 2);
+
+  // A Estrela de luz: quatro pontas e o aro que a separa da faixa.
+  const botao = await estrelaDe(page, 'art3', 'Estrela: Art. 3º');
+  await apertar(botao, toque);
+  const direta = page.locator('button.estrela[data-origem="direta"]');
+  await expect(direta).toHaveCount(1);
+  await expect(direta.locator('svg path.ponta')).toHaveCount(1);
+  await expect(direta.locator('svg path.aro')).toHaveCount(1);
+  expect(
+    await direta
+      .locator('svg path.ponta')
+      .evaluate((p) => p.getAttribute('d')?.split(/[\s,]+/).length),
+  ).toBeGreaterThan(8);
+  await semViolacoes(page);
+
+  // Os controles da barra: o seletor de fonte numa pílula e a legenda dos destaques numa linha só.
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+  });
+  const destaques = page.getByRole('button', { name: 'Destaques' });
+  if ((await destaques.getAttribute('aria-pressed')) !== 'true') await apertar(destaques, toque);
+  const legenda = page.getByRole('list', { name: 'Legenda dos destaques' });
+  await expect(legenda.getByRole('listitem')).toHaveText([
+    'Prazos',
+    'Exceções',
+    'Absolutos',
+    'Penas',
+  ]);
+  const linhas = await legenda
+    .getByRole('listitem')
+    .evaluateAll(
+      (itens) => new Set(itens.map((i) => Math.round(i.getBoundingClientRect().top))).size,
+    );
+  expect(linhas, 'a legenda cabe numa linha').toBe(1);
+  await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeVisible();
+  const sobraNaBarra = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(sobraNaBarra).toBe(0);
+  await semViolacoes(page);
 });

@@ -172,6 +172,9 @@
   --sombra-flutuante: 0 4px 16px rgb(23 36 58 / 14%);
 
   --superficie-translucida: rgb(255 255 255 / 90%);
+  /* O vidro do dock do Leitor (D-D7): a superfície a 92%, com o desfoque por trás (única superfície
+     de vidro desfocado do app, junto dos botões do modo foco). */
+  --vidro-do-dock: rgb(255 255 255 / 92%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -266,6 +269,7 @@
     --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
     --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
     --superficie-translucida: rgb(20 42 74 / 90%);
+    --vidro-do-dock: rgb(20 42 74 / 92%);
     color-scheme: dark;
   }
 }
@@ -343,6 +347,7 @@
   --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
   --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
   --superficie-translucida: rgb(20 42 74 / 90%);
+  --vidro-do-dock: rgb(20 42 74 / 92%);
   color-scheme: dark;
 }
 
@@ -1505,10 +1510,14 @@ a.item-norma strong {
   min-width: 0;
 }
 
+/* O seletor de fonte é uma pílula só (P4): A−, o tamanho e A+ como segmentos, no contorno do botão
+   secundário. Cada segmento mantém o alvo de 44 px. */
 .tamanho-texto {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-pilula);
+  background: var(--superficie);
 }
 
 .tamanho-texto output {
@@ -1520,11 +1529,22 @@ a.item-norma strong {
 
 .tamanho-texto button {
   min-width: var(--alvo);
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: var(--raio-pilula);
+  background: var(--botao-fundo, transparent);
+}
+
+.barra-leitor .alternar-destaques {
+  border-radius: var(--raio-pilula);
 }
 
 .lista-leitor {
   position: relative;
   width: 100%;
+  /* O lido vai sobre uma faixa de cal que passa 12 px do texto de cada lado (P4): a margem anda a
+     calha da estrela e o texto para a faixa não pisar na estrela. Fora da lista (cartão, prévia) é 0. */
+  --margem-do-lido: 12px;
 }
 
 /* Voltando à posição guardada (9.7): a lista só aparece no lugar, sem o salto do começo até ela. */
@@ -1542,14 +1562,23 @@ a.item-norma strong {
   color: var(--texto-atenuado);
 }
 
+/* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
+   frase. Altura da caneta, no mínimo: o corpo sobe da ponta, e o texto de cima não pode ficar sob ele. */
 .marca-lido-ate {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
   margin: 0.25rem 0 0;
-  padding-top: 0.15rem;
-  border-top: 2px solid var(--lugar);
+  min-height: 3.625rem;
+  font-family: var(--fonte-interface);
   font-size: 0.8125rem;
-  font-weight: 600;
-  text-align: right;
-  color: var(--titulo);
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.caneta-do-lido {
+  width: 104px;
+  height: 58px;
 }
 
 /* O dock fica acima das abas de baixo (--abas-altura, que zera a partir de 900 px, com o teclado
@@ -1563,11 +1592,60 @@ a.item-norma strong {
   gap: 0.5rem;
 }
 
-/* Flutuam sobre o texto: fundo de superfície, sem transparência no fluxo normal (o modo foco usa a
-   translúcida, abaixo), para a letra de trás não passar. */
+/* Flutuam sobre o texto: fundo de superfície, para a letra de trás não passar. O modo foco usa a
+   translúcida, abaixo; o grupo de ferramentas do dock é o vidro desfocado (.dock-do-leitor). */
 .acoes-leitor button:not(.principal) {
   background: var(--superficie);
   box-shadow: var(--sombra-flutuante);
+}
+
+/* O dock em vidro (P4): Buscar, Filtrar, Ações e Modo foco numa só pílula, a superfície a 92% e o
+   fundo desfocado em 12 px, então a letra que passa por trás vira só uma sombra e o rótulo continua
+   sólido (AA sobre o pior fundo, ver scripts/contraste.mjs). Quebra em duas linhas, sem alargar a
+   página, quando a tela é estreita. Sem transparência ou em cores forçadas, vira cor sólida. */
+.acoes-leitor .dock-do-leitor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: 26px;
+  background: var(--vidro-do-dock);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--sombra-flutuante);
+}
+
+.acoes-leitor .dock-do-leitor button {
+  min-width: 0;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: var(--raio-pilula);
+  background: var(--botao-fundo, transparent);
+  box-shadow: none;
+}
+
+.acoes-leitor .dock-do-leitor button.filtro-ligado {
+  box-shadow: inset 0 0 0 2px var(--cacto);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .acoes-leitor .dock-do-leitor {
+    background: var(--superficie);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .acoes-leitor .dock-do-leitor {
+    background: Canvas;
+    border: 1px solid CanvasText;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Modo foco (11.1): só o texto. A moldura do Shell some (o leitor põe o atributo na raiz e o tira
@@ -1674,13 +1752,14 @@ dialog.dialogo-busca {
 .linha-leitor.achado-da-busca .dispositivo {
   outline: 2px solid var(--cacto);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
-   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). */
+   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). A cor
+   vai em camada de imagem, para somar à faixa de cal do lido em vez de trocá-la. */
 .linha-leitor[data-regua] .dispositivo {
-  background: var(--regua-fundo);
+  background-image: linear-gradient(var(--regua-fundo), var(--regua-fundo));
   box-shadow: inset 3px 0 0 var(--regua-barra);
 }
 
@@ -1689,8 +1768,9 @@ dialog.dialogo-busca {
   top: 0;
   left: 0;
   width: 100%;
-  /* A calha da estrela (11.2), em toda linha: pôr ou tirar a estrela não muda a largura do texto. */
-  padding-inline-start: var(--calha-estrela);
+  /* A calha da estrela (11.2), em toda linha: pôr ou tirar a estrela não muda a largura do texto. Na
+     lista, mais a margem da faixa do lido (ver .lista-leitor). */
+  padding-inline-start: calc(var(--calha-estrela) + var(--margem-do-lido, 0px));
 }
 
 /* Estrela (11.2). O botão fica na calha, posto fora do fluxo (`position: absolute` sem `top`: a
@@ -1737,14 +1817,30 @@ button.estrela svg {
   overflow: visible;
 }
 
-button.estrela path {
+button.estrela path.ponta {
   fill: none;
   stroke: currentcolor;
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
 
-/* Estrela de luz (D-D7): o ponto de luz com contorno na tinta. */
+/* O aro (P4): a mesma estrela, mais gorda e na cor do fundo, por baixo. Corta a faixa de vidro em
+   volta da estrela, nos dois temas (à noite o contorno claro e a faixa clara se confundiriam). Só
+   a estrela que está sobre a faixa leva o aro. A cor segue o chão do lugar (--aro-da-estrela). */
+button.estrela path.aro {
+  display: none;
+  fill: var(--aro-da-estrela, var(--fundo));
+  stroke: var(--aro-da-estrela, var(--fundo));
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+button.estrela[data-origem='direta'] path.aro,
+button.estrela[data-origem='herdada'] path.aro {
+  display: block;
+}
+
+/* Estrela de luz (D-D7): as quatro pontas em luz, com contorno na tinta. */
 button.estrela[data-origem='direta'] {
   color: var(--estrela-contorno);
 }
@@ -1754,25 +1850,27 @@ button.estrela[data-origem='direta'] svg {
   height: 1.2em;
 }
 
-button.estrela[data-origem='direta'] path {
+button.estrela[data-origem='direta'] path.ponta {
   fill: var(--estrela-luz);
 }
 
-/* Herdada (só na linha ativa): a estrela pequena sobre a faixa tracejada. De dia, o contorno da tinta
-   a separa da faixa de vidro (3,2:1); à noite, o contorno claro quase some sobre o vidro claro
-   (1,2:1) e quem a separa é a largura, bem maior que a da faixa de 3 px. A P4 redesenha a estrela. */
-button.estrela[data-origem='herdada'] path {
+/* Herdada (só na linha ativa): a estrela pequena sobre a faixa tracejada, no mesmo desenho, com o
+   aro cortando a faixa e o contorno na tinta (de dia) ou na tinta clara (à noite). */
+button.estrela[data-origem='herdada'] {
+  color: var(--estrela-contorno);
+}
+
+button.estrela[data-origem='herdada'] path.ponta {
   fill: var(--estrela-luz);
-  stroke: var(--estrela-contorno);
-  stroke-width: 1.5;
 }
 
 button.estrela[data-origem='herdada'] svg {
-  width: 0.85em;
-  height: 0.85em;
+  width: 0.95em;
+  height: 0.95em;
 }
 
 button.estrela[data-origem='excecao'] path.corte {
+  fill: none;
   stroke: var(--texto);
   stroke-width: 2;
   stroke-linecap: round;
@@ -1810,7 +1908,12 @@ button.estrela:focus-visible {
 }
 
 .dispositivo {
-  padding: 0.35rem 0;
+  /* O recuo do nível (data-recuo) entra por --recuo. A margem do lido (só na lista, ver
+     .lista-leitor) alarga a caixa dos dois lados sem mexer no texto: é a folga da faixa de cal. */
+  --recuo: 0px;
+  margin-inline: calc(var(--margem-do-lido, 0px) * -1);
+  padding: 0.35rem var(--margem-do-lido, 0px);
+  padding-inline-start: calc(var(--margem-do-lido, 0px) + var(--recuo));
   font-family: var(--fonte-leitura);
   font-size: var(--tamanho-leitura);
   line-height: 1.6;
@@ -1822,37 +1925,52 @@ button.estrela:focus-visible {
 }
 
 .dispositivo[data-recuo='1'] {
-  padding-inline-start: 1.25rem;
+  --recuo: 1.25rem;
 }
 
 .dispositivo[data-recuo='2'] {
-  padding-inline-start: 2.5rem;
+  --recuo: 2.5rem;
 }
 
 .dispositivo[data-recuo='3'] {
-  padding-inline-start: 3.75rem;
+  --recuo: 3.75rem;
 }
 
 .dispositivo[data-recuo='4'] {
-  padding-inline-start: 5rem;
+  --recuo: 5rem;
 }
 
 @media (max-width: 699px) {
   .dispositivo[data-recuo='1'] {
-    padding-inline-start: 0.9rem;
+    --recuo: 0.9rem;
   }
 
   .dispositivo[data-recuo='2'] {
-    padding-inline-start: 1.8rem;
+    --recuo: 1.8rem;
   }
 
   .dispositivo[data-recuo='3'] {
-    padding-inline-start: 2.7rem;
+    --recuo: 2.7rem;
   }
 
   .dispositivo[data-recuo='4'] {
-    padding-inline-start: 3.6rem;
+    --recuo: 3.6rem;
   }
+}
+
+/* O lido (P4): na lista, da primeira linha ao "lido até aqui", o texto vai sobre a faixa de cal
+   (raio 8, com 12 px de folga de cada lado); o que falta fica na areia. A geometria é a mesma lido
+   ou não (a faixa só pinta o miolo, e a borda transparente dá o vão de 6 px entre as faixas), para
+   a linha não mudar de altura quando o "lido até" anda. */
+.lista-leitor .dispositivo {
+  border-block: 3px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+  padding-block: calc(0.35rem - 3px);
+}
+
+.lista-leitor .linha-leitor[data-lido] .dispositivo {
+  background-color: var(--superficie);
 }
 
 .texto-dispositivo {
@@ -1864,7 +1982,7 @@ button.estrela:focus-visible {
 }
 
 .dispositivo.tipo-artigo {
-  padding-top: 0.9rem;
+  margin-top: 0.55rem;
 }
 
 .rubrica {
@@ -1875,7 +1993,7 @@ button.estrela:focus-visible {
 
 /* Nós da estrutura: o rótulo pequeno sobre o nome, do maior nível ao menor */
 .dispositivo.estrutura {
-  padding-top: 1.25rem;
+  margin-top: 0.9rem;
   font-weight: 700;
 }
 
@@ -1899,12 +2017,12 @@ button.estrela:focus-visible {
 .tipo-parte,
 .tipo-livro {
   font-size: calc(var(--tamanho-leitura) * 1.35);
-  padding-top: 2rem;
+  margin-top: 1.65rem;
 }
 
 .tipo-titulo {
   font-size: calc(var(--tamanho-leitura) * 1.2);
-  padding-top: 1.75rem;
+  margin-top: 1.4rem;
 }
 
 .tipo-capitulo,
@@ -2036,6 +2154,11 @@ p.linha-atenuada {
   font-size: 0.85rem;
   line-height: 1.8;
   color: var(--texto-atenuado);
+}
+
+/* No leitor, uma linha só (P4): os quatro nomes curtos cabem até em 320 px. */
+.legenda-destaques.curta {
+  flex-wrap: nowrap;
 }
 
 /* Grifos e notas (11.4): o grifo é o fundo (o destaque automático é o traço, sem fundo), com o
@@ -2170,6 +2293,11 @@ button.marcador-nota {
   border: 2px solid var(--cacto);
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+/* No grupo de vidro o botão não tem borda: o contorno do filtro ligado entra por dentro, como anel. */
+.acoes-leitor .dock-do-leitor button.filtro-ligado {
+  border: 0;
 }
 
 .filtro-ativo {
@@ -2436,6 +2564,26 @@ dialog.dialogo-acoes {
   margin-bottom: 0;
 }
 
+/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. */
+.bandeja-botao svg,
+.seta-do-cartao svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.bandeja-botao svg {
+  fill: currentcolor;
+}
+
+.seta-do-cartao svg {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .seta-do-cartao {
   min-width: var(--alvo);
   min-height: var(--alvo);
@@ -2458,9 +2606,11 @@ dialog.dialogo-acoes {
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--luz-do-cartao);
+  /* O aro da estrela corta a faixa na cor do chão de quem a segura: aqui, a luz do cartão. */
+  --aro-da-estrela: var(--luz-do-cartao);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra-folha);
 }
 
 /* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o
@@ -2627,8 +2777,8 @@ dialog.dialogo-previa .linha-acoes button {
   padding: 0.5rem;
   background: var(--superficie);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra-flutuante);
 }
 
 .bandeja-itens button {

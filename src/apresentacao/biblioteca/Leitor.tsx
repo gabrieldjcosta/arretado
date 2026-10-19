@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
@@ -44,6 +45,8 @@ import { SO_VETADO } from '../../dominios/legislacao/redacoes';
 import { criarFraseDeTrecho } from '../../dominios/recall/servico';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
+import { useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
@@ -51,7 +54,9 @@ import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
+import { EstruturaDaNorma } from './EstruturaDaNorma';
 import { dispositivosComErro } from './errosVinculados';
+import { indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
@@ -94,6 +99,8 @@ const TAMANHO_MAXIMO = 32;
 const PASSO_DO_TAMANHO = 2;
 const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
+/** A partir daqui (tablet em pé) a estrutura da norma fica ao lado do texto (P4). */
+const LARGURA_DA_ESTRUTURA = 700;
 /** Quanto tempo a origem da estrela fica por extenso acima do grupo fixo, depois do toque. */
 const AVISO_DA_ESTRELA = 4_000;
 
@@ -949,6 +956,19 @@ function LeitorAberto({
     return false;
   }
 
+  // A estrutura da norma (P4): ao lado do texto a partir do tablet em pé, fora do modo foco. O corpo
+  // do Leitor (a lista ou o cartão) é o mesmo nos dois casos: o painel só entra antes dele.
+  const estrutura = useMemo(() => indiceDaEstrutura(nos), [nos]);
+  const larguraDeTablet = useLarguraMinima(LARGURA_DA_ESTRUTURA);
+  const comEstrutura = larguraDeTablet && !modoFoco && temEstrutura(estrutura);
+  const noDoAltoNaArvore = useCallback((): number | undefined => {
+    const id = noDoAlto();
+    return id === undefined ? undefined : aberta.indiceDe.get(id);
+  }, [noDoAlto, aberta.indiceDe]);
+  function irAoBloco(indice: number) {
+    if (irAoNo(indice)) setAnuncio('Filtro desligado para mostrar este bloco.');
+  }
+
   function irAoLidoAte() {
     if (indiceLidoAte === undefined) return;
     if (irAoNo(indiceLidoAte)) setAnuncio('Filtro desligado para mostrar onde você parou.');
@@ -1473,13 +1493,16 @@ function LeitorAberto({
     });
   }
 
-  // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até".
+  // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até". Do começo
+  // da norma até o "lido até" (inclusive) a linha é lida (`data-lido`): na lista, vai sobre a faixa
+  // de cal; o cartão não usa a faixa.
   function propriedadesDaLinha(linha: LinhaDoLeitor) {
     const dispositivo = nos[linha.indice]?.dispositivo;
     const id = dispositivo?.id ?? '';
     const estado = dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
     return {
       className: id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor',
+      'data-lido': indiceLidoAte !== undefined && linha.indice <= indiceLidoAte ? '' : undefined,
       'data-estrelada': estado?.estrelado ? '' : undefined,
       'data-contexto': filtro && !filtro.casados.has(linha.indice) ? '' : undefined,
       'data-linha-id': id === '' ? undefined : id,
@@ -1516,7 +1539,12 @@ function LeitorAberto({
             )
           }
         />
-        {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
+        {id === lidoAte && (
+          <p className="marca-lido-ate">
+            Lido até aqui
+            <Caneta pose="deitada" className="caneta-do-lido" />
+          </p>
+        )}
       </>
     );
   }
@@ -1647,7 +1675,7 @@ function LeitorAberto({
       {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
-      {!modoFoco && destacar && <LegendaDestaques />}
+      {!modoFoco && destacar && <LegendaDestaques curta />}
       {!modoFoco && referenciaLidoAte && (
         <p className="lido-ate">
           <span>
@@ -1725,110 +1753,127 @@ function LeitorAberto({
           Se continuar, feche as outras abas do Arretado.
         </p>
       )}
-      {porArtigo ? (
-        <div
-          key="artigo"
-          ref={definirLista}
-          className={preferencias?.espiadaDosVizinhos ? 'area-artigo com-espiada' : 'area-artigo'}
-          onClick={aoClicarNaLista}
-          onKeyDown={aoTeclarNaLista}
-          onPointerOver={ativarLinha}
-          onFocus={ativarLinha}
-          onTouchStart={comecouODeslize}
-          onTouchEnd={terminouODeslize}
-        >
-          {ordem === undefined ? (
-            <div role="status" className="aviso">
-              <p>Nenhum artigo para ler por aqui.</p>
-              <p className="dica">
-                {filtro
-                  ? 'O filtro deixou só títulos e capítulos. Mude o filtro ou volte ao texto corrido.'
-                  : 'Esta norma não tem artigos. Volte ao texto corrido.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              {vizinho(ordem - 1, 'anterior')}
-              <section
-                ref={cartao}
-                className="cartao-artigo"
-                aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
-                tabIndex={0}
-              >
-                {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
-                {linhas
-                  .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
-                  .map((linha) => (
-                    <div key={linha.indice} {...propriedadesDaLinha(linha)}>
-                      {conteudoDaLinha(linha)}
-                    </div>
-                  ))}
-                {remissoesDoCartao.length > 0 && (
-                  <div className="remissoes-do-artigo">
-                    <h3>Remissões deste artigo</h3>
-                    <ul>
-                      {remissoesDoCartao.map(({ alvo, origem }) => (
-                        <li key={alvo}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDadosDaPrevia(undefined);
-                              setPrevia({ origem, alvo });
-                            }}
-                          >
-                            {referenciaDaBusca(alvo)}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </section>
-              <SetasDoCartao
-                anterior={() => {
-                  irAoAnterior.current();
-                }}
-                proximo={() => {
-                  irAoProximo.current();
-                }}
-                noPrimeiro={ordem <= 0}
-                noUltimo={ordem + 1 >= unidades.length}
-              >
-                <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
-              </SetasDoCartao>
-              {vizinho(ordem + 1, 'seguinte')}
-            </>
-          )}
-        </div>
-      ) : (
-        <div
-          key="lista"
-          ref={definirLista}
-          className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
-          aria-busy={voltando}
-          style={{ height: virtualizador.getTotalSize() }}
-          onClick={aoClicarNaLista}
-          onKeyDown={aoTeclarNaLista}
-          onPointerOver={ativarLinha}
-          onFocus={ativarLinha}
-        >
-          {visiveis.map((virtual) => {
-            const linha = linhas[virtual.index];
-            if (!linha) return null;
-            return (
-              <div
-                key={virtual.key}
-                data-index={virtual.index}
-                ref={virtualizador.measureElement}
-                {...propriedadesDaLinha(linha)}
-                style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
-              >
-                {conteudoDaLinha(linha)}
+      <div
+        className="leitor-corpo"
+        data-com-estrutura={comEstrutura ? '' : undefined}
+        style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
+      >
+        {comEstrutura && (
+          <EstruturaDaNorma
+            nos={nos}
+            estrutura={estrutura}
+            textos={textos}
+            pedir={pedir}
+            lidoAte={indiceLidoAte}
+            noDoAlto={noDoAltoNaArvore}
+            ir={irAoBloco}
+          />
+        )}
+        {porArtigo ? (
+          <div
+            key="artigo"
+            ref={definirLista}
+            className={preferencias?.espiadaDosVizinhos ? 'area-artigo com-espiada' : 'area-artigo'}
+            onClick={aoClicarNaLista}
+            onKeyDown={aoTeclarNaLista}
+            onPointerOver={ativarLinha}
+            onFocus={ativarLinha}
+            onTouchStart={comecouODeslize}
+            onTouchEnd={terminouODeslize}
+          >
+            {ordem === undefined ? (
+              <div role="status" className="aviso">
+                <p>Nenhum artigo para ler por aqui.</p>
+                <p className="dica">
+                  {filtro
+                    ? 'O filtro deixou só títulos e capítulos. Mude o filtro ou volte ao texto corrido.'
+                    : 'Esta norma não tem artigos. Volte ao texto corrido.'}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      )}
+            ) : (
+              <>
+                {vizinho(ordem - 1, 'anterior')}
+                <section
+                  ref={cartao}
+                  className="cartao-artigo"
+                  aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
+                  tabIndex={0}
+                >
+                  {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
+                  {linhas
+                    .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
+                    .map((linha) => (
+                      <div key={linha.indice} {...propriedadesDaLinha(linha)}>
+                        {conteudoDaLinha(linha)}
+                      </div>
+                    ))}
+                  {remissoesDoCartao.length > 0 && (
+                    <div className="remissoes-do-artigo">
+                      <h3>Remissões deste artigo</h3>
+                      <ul>
+                        {remissoesDoCartao.map(({ alvo, origem }) => (
+                          <li key={alvo}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDadosDaPrevia(undefined);
+                                setPrevia({ origem, alvo });
+                              }}
+                            >
+                              {referenciaDaBusca(alvo)}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </section>
+                <SetasDoCartao
+                  anterior={() => {
+                    irAoAnterior.current();
+                  }}
+                  proximo={() => {
+                    irAoProximo.current();
+                  }}
+                  noPrimeiro={ordem <= 0}
+                  noUltimo={ordem + 1 >= unidades.length}
+                >
+                  <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
+                </SetasDoCartao>
+                {vizinho(ordem + 1, 'seguinte')}
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            key="lista"
+            ref={definirLista}
+            className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
+            aria-busy={voltando}
+            style={{ height: virtualizador.getTotalSize() }}
+            onClick={aoClicarNaLista}
+            onKeyDown={aoTeclarNaLista}
+            onPointerOver={ativarLinha}
+            onFocus={ativarLinha}
+          >
+            {visiveis.map((virtual) => {
+              const linha = linhas[virtual.index];
+              if (!linha) return null;
+              return (
+                <div
+                  key={virtual.key}
+                  data-index={virtual.index}
+                  ref={virtualizador.measureElement}
+                  {...propriedadesDaLinha(linha)}
+                  style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
+                >
+                  {conteudoDaLinha(linha)}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
       {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
           sai (o foco do teclado fica nele). */}
       <div
@@ -2099,47 +2144,49 @@ function AcoesDaLeitura({
           ← Voltar a {voltarDaRemissao.para}
         </button>
       )}
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        aria-keyshortcuts={TECLA_DA_BUSCA}
-        title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
-        onClick={abrirBusca}
-      >
-        Buscar
-      </button>
-      <button
-        type="button"
-        className={filtro === undefined ? undefined : 'filtro-ligado'}
-        aria-haspopup="dialog"
-        aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
-        title={
-          filtro === undefined
-            ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
-            : `Mostrando só: ${filtro}. Toque para mudar o filtro`
-        }
-        onClick={abrirFiltro}
-      >
-        {filtro === undefined ? 'Filtrar' : 'Filtrado'}
-      </button>
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
-        onClick={abrirAcoes}
-      >
-        Ações
-      </button>
-      <button
-        ref={botaoDoFoco}
-        type="button"
-        aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-        data-lente={lenteDoFoco}
-        title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
-        onClick={alternarFoco}
-      >
-        {modoFoco ? 'Sair do foco' : 'Modo foco'}
-      </button>
+      <div role="group" aria-label="Ferramentas da leitura" className="dock-do-leitor">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-keyshortcuts={TECLA_DA_BUSCA}
+          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+          onClick={abrirBusca}
+        >
+          Buscar
+        </button>
+        <button
+          type="button"
+          className={filtro === undefined ? undefined : 'filtro-ligado'}
+          aria-haspopup="dialog"
+          aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
+          title={
+            filtro === undefined
+              ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
+              : `Mostrando só: ${filtro}. Toque para mudar o filtro`
+          }
+          onClick={abrirFiltro}
+        >
+          {filtro === undefined ? 'Filtrar' : 'Filtrado'}
+        </button>
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
+          onClick={abrirAcoes}
+        >
+          Ações
+        </button>
+        <button
+          ref={botaoDoFoco}
+          type="button"
+          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+          data-lente={lenteDoFoco}
+          title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
+          onClick={alternarFoco}
+        >
+          {modoFoco ? 'Sair do foco' : 'Modo foco'}
+        </button>
+      </div>
       <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui
       </button>

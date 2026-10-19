@@ -77,6 +77,7 @@ Saíram com a D-D7 (o teste de contraste falha se algum CSS voltar a usá-los): 
 | `--selecionado-fundo` / `-texto` / `-atenuado` | Tinta / Cal / `#c9d1dc` · `#eef3f8` / `#0b1b33` / `#3b4a63` | caixa e rádio marcados, botão ligado, item escolhido | 15,6:1 · 15,4:1 |
 | `--tinta-lugar` | tinta a 6% sobre a superfície · tinta clara a 8% | linha marcada, "Frase correta" | `--texto-atenuado` 6,1:1 |
 | `--regua-fundo` / `--regua-barra` | tinta a 6% / Tinta 2 · tinta clara a 8% / `#a9b7cc` | régua de leitura (segue o dedo; por isso nunca luz) | atenuado 5,0:1 na areia |
+| `--vidro-do-dock` | a superfície a 92%: branco · `#142a4a` | fundo do dock do Leitor, com `blur(12px)` (única superfície de vidro desfocado, junto dos botões do modo foco) | rótulo sobre o pior fundo (letra preta por trás): 13,3:1 e atenuado 5,9:1 · 10,3:1 e 5,7:1 |
 
 O anel de foco global é tinta no dia (2 px, `outline-offset: 2px`) e vidro claro à noite. Dentro da folha, `--bloco-foco`.
 
@@ -140,7 +141,7 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 | **Pontos do Dia** (P3, `PontosDoDia`, `PontoDeLuz`) | Leitura, Cartões e Frases; cada um com um ponto de 22 px: apagado (anel em `--ponto-apagado`, a tinta a 55%: 3,4:1 na areia e 5,4:1 na noite; a 45% do protótipo eram 2,6:1, abaixo dos 3:1 que um contorno pede), aceso pela metade (atual: metade direita em `--ponto-luz`, anel e núcleo), aceso (feito: círculo `--ponto-luz`, anel `--ponto-contorno` e núcleo `--ponto-nucleo`). Rótulo em 13 px peso 600, atenuado; o atual em `--texto`; o estado também em texto, só para o leitor de tela (`.visualmente-oculto`: "Leitura, feito hoje"). Acende uma vez em 160 ms (escala de 0,6 a 1 e opacidade), na visita ao Hoje em que o ponto ficou aceso (feito) e na anterior, no mesmo dia, ainda não estava (`arretado.pontos-vistos` em `localStorage`); a vez (pela metade) aparece sem animação, e a primeira visita do dia abre quieta. |
 | **Em seguida** (P3, `Depois`) | Rótulo em 13 px, 700, caixa-alta com 0,06 em de espaço entre letras, `--texto-atenuado`; até 2 itens de 44 de altura, nome em peso 600 e tempo ("cerca de 6 min") em 13 px, 400, atenuado; sobre a areia, sem botão. |
 | **Resumo do Dia** (P3, `FecharDia`) | `.cartao-bloco`: título, linhas do que houve, próximo passo e um botão secundário ("Fechar o Dia" ou "Reabrir o Dia"). Fechado: o cachorro (112 × 94) e, absoluta a 54 px da esquerda e 36 de cima, a caneta deitada (120 × 67) com a ponta no lenço; "Bom descanso. Amanhã você começa de onde parou." |
-| **Estrela** | A estrela de luz: miolo `--estrela-luz`, contorno `--estrela-contorno`; faixa da calha em `--estrela` (cheia na direta, tracejada na herdada). Na P4 vira a estrela de quatro pontas do contrato. |
+| **Estrela** | A estrela de luz de quatro pontas (P4, `Estrela.tsx`): miolo `--estrela-luz`, contorno `--estrela-contorno` e aro na cor do chão (`--aro-da-estrela`, que corta a faixa); faixa da calha em `--estrela` (cheia na direta, tracejada na herdada). A exceção é a estrela vazia cortada. |
 | **Callout** | Fundo `--tinta-lugar`, filete de 4 px à esquerda, ícone e texto; "Frase correta" em lugar, aviso em `--aviso-*`, perigo em `--perigo`. |
 | **Progresso** | Barra de 6 px `--superficie-2` com preenchimento `--andamento`; sempre com texto ("3 de 12"). |
 | **Estado vazio** | Ícone pequeno, frase curta, um botão primário. Sem texto longo e sem mascote. |
@@ -173,7 +174,7 @@ Pontos de quebra: **celular < 700 px**, **tablet em pé 700 a 899**, **desktop e
 | Conteúdo | 1 coluna, gutter 16, reserva embaixo para as abas | 1 coluna, gutter 24 (destino: 40 rem centralizada) | coluna de 900 px, gutter 32 (destino: até 65 rem, 2 colunas, 7fr · 5fr, no Hoje, no Fixar e na Trilha) |
 | H1 | 1,875 rem | 2,125 rem | 2,375 rem |
 | Hoje | título com "+", pontos do Dia, linha de parada com a caneta, folha do Agora, Em seguida | idem, folha mais larga | à esquerda o Agora; à direita Em seguida e "Para lembrar" |
-| Leitor | ver abaixo | estrutura à esquerda, coluna de lei à direita | coluna de 70 ch centralizada; ferramentas num trilho à direita (≥ 1200) |
+| Leitor | ver abaixo; sem estrutura (o filtro por bloco faz o papel) | estrutura à esquerda (11 rem), coluna de lei à direita | coluna de 70 ch centralizada com a estrutura (13 rem) ao lado e, a partir de 1200, na margem; ferramentas num trilho à direita (≥ 1200, P7) |
 | Rodapé | fim do conteúdo, acima da reserva | idem | uma linha, centralizada |
 | Formulários | largura total, rótulo acima | coluna de 32 rem | coluna de 32 rem alinhada à esquerda do conteúdo |
 
@@ -187,14 +188,15 @@ Fonte da especificação de comportamento: [`referencias/2026-10-14-gemini/espec
 
 | Parte | Especificação |
 |---|---|
-| Lido | o trecho lido fica sobre a faixa de cal (raio 8, `padding 2px 12px`) sobre a areia; o que falta, sobre a areia |
-| "Lido até aqui" | rótulo de 13 px peso 700 em `--texto`, com a caneta deitada a 65° logo ao lado |
-| Estrutura | seções com o ponto de luz do estado (feita, atual, falta); a atual em cal |
-| Controles | seletor de fonte segmentado (A-, 18 px, A+) e "Destaques" (ligado = tinta cheia com texto em cal) |
-| Legenda dos destaques | uma linha recolhível sob os controles: Prazos, Exceções, Absolutos, Penas, cada um com o seu sublinhado |
-| Régua de leitura | `--regua-fundo` e filete de 3 px em `--regua-barra` (tinta: segue o dedo, então nunca é luz) |
-| Estrela | estrela de luz na calha, com a faixa em vidro |
-| Dock e modo foco | como na especificação, nos tokens novos (penumbra `--penumbra`, cartão `--luz-do-cartao`) |
+| Lido | da primeira linha ao "lido até" (`data-lido`), o texto vai sobre a faixa de cal (`--superficie`, raio 8) sobre a areia, com 12 px de folga de cada lado do texto (`--margem-do-lido`, só na lista; o cartão do artigo não tem faixa). A geometria é a mesma lido ou não (borda transparente de 3 px e `background-clip: padding-box`, vão de 6 px entre as faixas de linhas vizinhas), para a altura da linha não mudar quando o "lido até" anda e o virtualizador não derivar. O que falta ler fica na areia |
+| "Lido até aqui" | `.marca-lido-ate`: rótulo de 13 px peso 700 em `--texto` (Atkinson) e, logo ao lado, a caneta deitada (`Caneta pose="deitada"`, 104 × 58) com a ponta no fim da frase; a linha tem no mínimo 58 px de altura (o corpo da caneta sobe da ponta). A caneta é decorativa (`aria-hidden`); o botão e o anúncio ("Lido até Art. 1º, I.") não mudam |
+| Estrutura | `EstruturaDaNorma` (`estrutura.ts` faz as contas), a partir de 700 px e fora do modo foco: faixa de 11 rem (13 rem em 900 px ou mais) à esquerda da coluna de lei; de 1200 px em diante fica na margem esquerda e a coluna mantém os 70 ch. Lista o bloco de agora e os irmãos dele (as seções do capítulo), cada um com o `PontoDeLuz` do estado (lida = aceso, em leitura = pela metade, ainda não lida = apagado; também em texto para o leitor de tela), rótulo em 700 e nome em atenuado (até 3 linhas); o de agora em cal com `--atual-sombra` e `aria-current="location"`, e os blocos de dentro dele logo abaixo, um degrau à direita num filete (as seções, se ele é um capítulo); acima, o caminho (título, capítulo) em texto atenuado, e tocar no caminho sobe um nível (o bloco de lá vira o de agora, e a lista, a dos irmãos dele). Segue a rolagem por salto (o bloco de agora muda quando a leitura passa de bloco, não a cada nó) e fica preso abaixo do cabeçalho, rolando por dentro quando a lista é maior que a tela. Tocar leva o bloco ao alto; se o filtro o escondeu, desliga o filtro e avisa. Não aparece no celular (lá o filtro por bloco faz o papel) nem em normas sem título ou capítulo |
+| Controles | seletor de fonte numa pílula só, com contorno de 1 px (`--borda-botao`): A−, o tamanho (18 px) e A+ como segmentos de 44 de alvo; "Destaques" em pílula (ligado = tinta cheia com texto em cal) |
+| Legenda dos destaques | uma linha sob os controles, só com "Destaques" ligado: Prazos, Exceções, Absolutos, Penas (o nome inteiro na dica), cada um com o seu sublinhado; cabe até em 320 px. Recolher não foi preciso: ela some com o botão |
+| Régua de leitura | `--regua-fundo` e filete de 3 px em `--regua-barra` (tinta: segue o dedo, então nunca é luz); a cor entra como camada de imagem, para somar à faixa de cal do lido |
+| Estrela | a estrela de luz de quatro pontas na calha (`--estrela-luz` com contorno `--estrela-contorno`), com o aro na cor do chão (`--aro-da-estrela`) cortando a faixa de vidro, nos dois temas; a herdada é a mesma estrela, menor |
+| Dock | `.dock-do-leitor`: Buscar, Filtrar, Ações e Modo foco numa só pílula (raio 26, 4 px de respiro, `--sombra-flutuante`) em vidro desfocado (`--vidro-do-dock` = a superfície a 92%, `backdrop-filter: blur(12px)`); "Lido até aqui" fica fora, em botão de vidro de ação. O rótulo sobre o pior fundo (letra preta por trás) tem 13,3:1 no dia e 10,3:1 à noite (`scripts/contraste.mjs`). Com `prefers-reduced-transparency` vira `--superficie` e em `forced-colors` `Canvas`, sem desfoque. Em 320 px quebra em duas linhas |
+| Modo foco | penumbra `--penumbra`, cartão em `--luz-do-cartao` com raio 16 e `--sombra-folha`, bandeja com raio 16 e `--sombra-flutuante`, botões de `--superficie-translucida` (90%); o "⋯" e as setas do cartão são SVG de um traço |
 
 O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Leitor.
 

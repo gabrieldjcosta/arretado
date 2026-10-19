@@ -1057,6 +1057,41 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `Hoje.test.tsx` ("uma caneta por tela…") confere as poses e o lugar; `e2e/sessao.spec.ts` lê `getComputedStyle(…).animationName` (`traco-desenha` com movimento normal, `none` com `prefers-reduced-motion`). **Prevenção:** o Leitor (P4) e o Fixar (P5) usam o mesmo `Caneta`; cada tela, uma só.
 - **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
 
+### Leitor: a linha muda de altura, ou a posição lembrada deriva, quando o "lido até" anda (P4)
+- **Sintoma:** ao marcar "Lido até aqui", as linhas de baixo pulam alguns pixels, ou a posição guardada volta fora do lugar. **Causa:** o virtualizador mede cada linha (`offsetHeight`) e soma as medidas contra `lista.current.offsetTop` (`scrollMargin`); se a linha lida tivesse recuo ou borda diferente da não lida, o "lido até" andando mudaria a altura de várias linhas de uma vez; e um ancestral posicionado da lista (`position: relative` ou `sticky`) faria o `offsetTop` ser contado contra ele.
+- **Solução:** a faixa de cal tem a mesma geometria lida ou não (`border-block: 3px solid transparent` e `background-clip: padding-box` em `.lista-leitor .dispositivo`; só a `background-color` muda com `data-lido`); a folga de 12 px vem de `--margem-do-lido` (margem negativa e recuo iguais); o `.leitor-corpo` que envolve a estrutura e a lista é uma grade sem `position`. **Prevenção:** em `[data-lido]` mude só cor ou sombra; nunca `padding`, `border` ou `margin`. Compare as capturas de antes e depois (a altura da lista é a mesma).
+- **Origem:** previsto e tratado na P4 do Ponto de luz (19/10/2026).
+
+### E2E do recuo por nível falha com a faixa do lido: o artigo "recuado" em 12 px (P4)
+- **Sintoma:** `e2e/leitor.spec.ts` ("ler a LEP compilada…"), `expect(await recuoDe('art2')).toBe(0)` recebe 12. **Causa:** o teste lia o `padding-inline-start` do `.dispositivo`, e na lista ele agora soma a folga da faixa do lido (`--margem-do-lido`, 12 px) ao recuo do nível (`--recuo`); o texto não saiu do lugar (a margem negativa compensa).
+- **Solução:** o teste compara o parágrafo com o artigo (maior que a folga, de no máximo 12 px). **Prevenção:** recuo se mede pela diferença entre níveis, nunca pelo padding absoluto; o E2E isolado da fase não achou isso, só a suíte inteira.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o teste de unidade não a vê, ou a rolagem fica sempre em 0 (P4)
+- **Sintoma:** `getByRole('navigation', { name: 'Estrutura da norma' })` não acha nada; ou, ao tocar num bloco, `window.scrollTo` recebe sempre `top: 0`. **Causa:** a estrutura só aparece a partir de 700 px (`useLarguraMinima`) e o jsdom não tem `matchMedia`, então a janela é sempre "estreita"; e o virtualizador limita a rolagem a `documentElement.scrollHeight - innerHeight`, que no jsdom é 0.
+- **Solução:** o teste define `window.matchMedia` (o helper `larguraDaJanela` de `Leitor.test.tsx`, apagado no `afterEach`) e, para conferir a rolagem, `vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000)`. **Prevenção:** o Playwright mede o que o jsdom não vê (o E2E do Leitor confere a estrutura no tablet e no desktop e a ausência no celular).
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o botão some entre achar e clicar (teste instável, P4)
+- **Sintoma:** `await usuario.click(await within(estrutura).findByRole('button', …))` não faz nada e o passo seguinte falha (o filtro continua ligado, por exemplo). **Causa:** a lista da estrutura troca quando o alto da tela passa de um bloco a outro, no quadro seguinte à rolagem ou ao filtro (`requestAnimationFrame`); o botão achado pode ser desmontado antes de o clique chegar.
+- **Solução:** esperar o estado novo antes de achar o botão (no teste do filtro, o caminho "TÍTULO I, DO OBJETO" aparece quando a lista troca). **Prevenção:** com a estrutura na tela, depois de rolar ou filtrar, espere por algo que só existe depois da troca.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Botão do dock, do seletor de fonte ou da estrutura volta ao estilo de botão comum (P4)
+- **Sintoma:** botão do Leitor com borda, recuo de 20 px e raio de 12 no lugar do que a regra do componente pede, ou sem fundo no hover. **Causa:** a regra base `button, .botao` de `estilos.css` vem antes da CSS do Leitor e tem a especificidade de uma classe só; vence a regra de uma classe, e o hover só troca `--botao-fundo` (a mesma cascata da P2).
+- **Solução:** o seletor leva o pai (`.acoes-leitor .dock-do-leitor button`, `.tamanho-texto button`, `.estrutura .estrutura-item`) e o fundo vem de `var(--botao-fundo, transparent)`, para o hover continuar valendo. **Prevenção:** conferir a captura do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### A Estrela de luz some sobre a faixa de vidro à noite (P4)
+- **Sintoma:** à noite, a estrela (direta ou herdada) quase não se separa da faixa da calha. **Causa:** o contorno claro (`--estrela-contorno`, `#eef3f8`) sobre a faixa de vidro claro (`#7df3e1`) tem 1,2:1; de dia o contorno em tinta separa (3,2:1), à noite só a largura da estrela separava.
+- **Solução:** o aro (`path.aro`): a mesma estrela, mais gorda e na cor do chão (`--aro-da-estrela`, padrão `--fundo`), por baixo, que corta a faixa em volta dela nos dois temas; no cartão do modo foco o chão é `--luz-do-cartao`. **Prevenção:** ao pôr um objeto claro sobre a faixa de vidro, recortar a faixa em volta dele, não depender do contorno.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Previsível: dock em vidro e a letra por trás (P4)
+- **Sintoma:** o rótulo de "Buscar", "Filtrar", "Ações" ou "Modo foco" fica difícil de ler com a letra da lei passando por trás. **Causa:** 92% de opacidade não é opaco, e `backdrop-filter` não existe em todo navegador (nem com `prefers-reduced-transparency`).
+- **Solução:** `scripts/contraste.mjs` mede `texto` e `texto-atenuado` sobre `--vidro-do-dock` composto com o pior fundo (13,3:1 e 5,9:1 no dia; 10,3:1 e 5,7:1 à noite), então vale mesmo sem o desfoque; sem `backdrop-filter` (sem suporte, transparência reduzida, `forced-colors`) o dock fica sólido (`--superficie` ou `Canvas`). **Prevenção:** novo texto sobre o dock entra em `scripts/contraste.mjs`.
+- **Origem:** previsto — P4 do Ponto de luz (19/10/2026).
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).

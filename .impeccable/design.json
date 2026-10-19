@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-18T00:00:00Z",
+  "generatedAt": "2026-10-19T00:00:00Z",
   "title": "Design System: Arretado",
   "extensions": {
     "colorMeta": {
@@ -69,6 +69,11 @@
         "name": "botao",
         "value": "0 2px 6px rgb(23 36 58 / 14%)",
         "purpose": "Botão primário."
+      },
+      {
+        "name": "flutuante",
+        "value": "0 4px 16px rgb(23 36 58 / 14%)",
+        "purpose": "O dock do Leitor e o que flutua sobre o texto (diálogos, bandeja do foco)."
       }
     ],
     "motion": [
@@ -147,6 +152,30 @@
       "description": "Onde e quando a leitura parou, à esquerda; a caneta de pé à direita, com a ponta dentro da folha do Agora. Sem a caneta quando o Dia está fechado (ela fica no Resumo do Dia).",
       "html": "<p class=\"ds-parada\">Você parou em <strong>LEP, art. 112, § 2º</strong><span>ontem, 21h40</span></p>",
       "css": ".ds-parada{margin:0;font:400 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#4f5b70}.ds-parada strong{font-weight:700;color:#17243a}.ds-parada span{display:block;font-size:13px}"
+    },
+    {
+      "name": "Lido sobre a faixa de cal",
+      "kind": "custom",
+      "refersTo": "lido-na-faixa",
+      "description": "No Leitor, do começo da norma ao \"lido até\", o texto vai sobre uma faixa de cal de raio 8, com 12 px de folga de cada lado; o que falta ler fica na areia. \"Lido até aqui\" fecha o lido, em 13 px peso 700, com a caneta deitada ao lado.",
+      "html": "<div class=\"ds-lido\"><p>Art. 112. A pena privativa de liberdade será executada em forma progressiva.</p><p class=\"marca\">Lido até aqui</p></div><p class=\"ds-falta\">§ 1º A transferência para regime menos rigoroso será determinada pelo juiz.</p>",
+      "css": ".ds-lido{background:#fff;color:#17243a;border-radius:8px;padding:6px 12px;font:400 18px/1.6 'Literata',Georgia,serif}.ds-lido p{margin:0}.ds-lido .marca{margin-top:4px;font:700 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-falta{margin:6px 0 0;padding:0 12px;color:#17243a;font:400 18px/1.6 'Literata',Georgia,serif}"
+    },
+    {
+      "name": "Estrutura da norma",
+      "kind": "nav",
+      "refersTo": "estrutura-da-norma",
+      "description": "Ao lado do texto, a partir de 700 px: o bloco de agora e os irmãos dele (as seções do capítulo), cada um com o ponto de luz do que já foi lido (aceso = lida, pela metade = em leitura, apagado = ainda não lida); o de agora em cal com a sombra fresca e os blocos de dentro dele logo abaixo, num degrau. O caminho (título, capítulo) vai acima, em texto atenuado, e tocar nele sobe um nível.",
+      "html": "<nav class=\"ds-estrutura\" aria-label=\"Estrutura da norma\"><p class=\"acima\">TÍTULO I, Da Execução Penal</p><ul><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg><span><b>Seção I</b><i>Disposições Gerais</i></span></li><li class=\"aqui\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3a9 9 0 0 1 0 18z\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg><span><b>Seção II</b><i>Dos Regimes</i></span></li><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"rgb(23 36 58 / 55%)\" stroke-width=\"1.5\"/></svg><span><b>Seção III</b><i>Das Autorizações</i></span></li></ul></nav>",
+      "css": ".ds-estrutura{width:200px;font:400 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#17243a}.ds-estrutura .acima{margin:0 0 8px;padding:4px 10px;color:#4f5b70}.ds-estrutura ul{display:grid;gap:2px;margin:0;padding:0;list-style:none}.ds-estrutura li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:12px}.ds-estrutura li.aqui{background:#fff;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-estrutura svg{width:20px;height:20px;flex:none}.ds-estrutura span{display:grid;line-height:1.3}.ds-estrutura b{font-weight:700}.ds-estrutura i{font-style:normal;color:#4f5b70}"
+    },
+    {
+      "name": "Dock do Leitor",
+      "kind": "custom",
+      "refersTo": "dock-do-leitor",
+      "description": "Buscar, Filtrar, Ações e Modo foco numa só pílula de vidro desfocado (a superfície a 92% com o fundo em blur de 12 px); \"Lido até aqui\" fica ao lado, em botão de vidro de ação. É a única superfície de vidro desfocado do app, junto dos botões do modo foco; sólida com transparência reduzida e em cores forçadas.",
+      "html": "<div class=\"ds-dock\"><div class=\"grupo\" role=\"group\" aria-label=\"Ferramentas da leitura\"><button>Buscar</button><button>Filtrar</button><button>Ações</button><button>Modo foco</button></div><button class=\"principal\">Lido até aqui</button></div>",
+      "css": ".ds-dock{display:flex;gap:8px;align-items:center;justify-content:flex-end;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-dock .grupo{display:flex;gap:2px;padding:4px;border:1px solid rgb(23 36 58 / 12%);border-radius:26px;background:rgb(255 255 255 / 92%);backdrop-filter:blur(12px);box-shadow:0 4px 16px rgb(23 36 58 / 14%)}.ds-dock .grupo button{min-height:44px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:#17243a;font:inherit}.ds-dock .principal{min-height:44px;padding:0 20px;border:0;border-radius:12px;background:#0f7f72;color:#fff;font:inherit;box-shadow:0 2px 6px rgb(23 36 58 / 14%)}"
     },
     {
       "name": "Campo de texto",
@@ -246,7 +275,7 @@
     ],
     "donts": [
       "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar.",
-      "Don't pôr textura, vidro desfocado, iridescência, gradiente em texto, brilho pulsando ou confete.",
+      "Don't pôr textura, vidro desfocado atrás de texto (a exceção é o dock do Leitor e os botões do modo foco), iridescência, gradiente em texto, brilho pulsando ou confete.",
       "Don't dar cor própria a uma disciplina, nem usar couro ou caramelo como cor de interface.",
       "Don't usar glifos Unicode como ícone; os ícones são SVG desenhados num só traço.",
       "Don't carregar fonte ou ícone de CDN."

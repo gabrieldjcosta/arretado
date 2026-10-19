@@ -1957,3 +1957,346 @@ describe('prévia de remissões (11.9)', () => {
     expect(await screen.findByRole('dialog', { name: 'Art. 3º' })).toBeInTheDocument();
   });
 });
+
+describe('Ponto de luz no Leitor (P4)', () => {
+  afterEach(() => {
+    delete (window as Partial<Window>).matchMedia;
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+    vi.restoreAllMocks();
+  });
+
+  /** O jsdom não tem `matchMedia`: responde às consultas de largura mínima como uma janela de `px`. */
+  function larguraDaJanela(px: number) {
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: (consulta: string) => ({
+        matches: px >= Number(/min-width:\s*(\d+)px/.exec(consulta)?.[1] ?? Infinity),
+        media: consulta,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }),
+    });
+  }
+
+  const LEI_DE_BLOCOS: Bloco[] = [
+    linha('LEI Nº 7.210, DE 11 DE JULHO DE 1984.'),
+    linha('Institui a Lei de Execução Penal.'),
+    linha('O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta:'),
+    linha('TÍTULO I'),
+    linha('DO OBJETO'),
+    linha('CAPÍTULO I'),
+    linha('DA EXECUÇÃO'),
+    linha('Art. 1º A execução penal tem por objetivo efetivar a sentença.'),
+    linha('Art. 2º A jurisdição penal será exercida.'),
+    linha('CAPÍTULO II'),
+    linha('DO CONDENADO'),
+    linha('Art. 3º Ao condenado serão assegurados os direitos.'),
+    linha('Art. 4º O condenado terá assistência material.'),
+    linha('TÍTULO II'),
+    linha('DO FIM'),
+    linha('Art. 5º Esta Lei entra em vigor.'),
+  ];
+
+  const LEI_COM_SECOES: Bloco[] = [
+    linha('LEI Nº 7.212, DE 1 DE JANEIRO DE 2000.'),
+    linha('Dispõe sobre o que tem seções.'),
+    linha('O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta:'),
+    linha('TÍTULO I'),
+    linha('DO OBJETO'),
+    linha('CAPÍTULO I'),
+    linha('DA EXECUÇÃO'),
+    linha('Seção I'),
+    linha('Disposições Gerais'),
+    linha('Art. 1º A execução penal tem por objetivo efetivar a sentença.'),
+    linha('Seção II'),
+    linha('Dos Regimes'),
+    linha('Art. 2º A jurisdição penal será exercida.'),
+    linha('CAPÍTULO II'),
+    linha('DO CONDENADO'),
+    linha('Art. 3º Ao condenado serão assegurados os direitos.'),
+  ];
+
+  const LEI_SEM_BLOCOS: Bloco[] = [
+    linha('LEI Nº 7.211, DE 1 DE JANEIRO DE 2000.'),
+    linha('Dispõe sobre pouca coisa.'),
+    linha('O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta:'),
+    linha('Art. 1º Primeiro artigo.'),
+    linha('Art. 2º Segundo artigo.'),
+  ];
+
+  /** A linha (índice do virtualizador) onde está o dispositivo; cada linha mede 60 px no jsdom. */
+  const linhaDoDispositivo = (endereco: string) =>
+    Number(dispositivo(endereco).closest('[data-index]')?.getAttribute('data-index'));
+
+  it('o lido vai sobre a faixa de cal, até o "lido até"; a marca ganha a caneta deitada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art2')).toBeInTheDocument();
+    });
+    const lido = (endereco: string) => dispositivo(endereco).closest('.linha-leitor');
+    // Sem "lido até", nada está sobre a faixa.
+    expect(document.querySelector('[data-lido]')).toBeNull();
+
+    rolarPara(4 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+    // Do começo ao "lido até" (o inciso I do art. 1º), inclusive; o que falta ler fica de fora.
+    expect(lido('tit1')).toHaveAttribute('data-lido');
+    expect(lido('art1')).toHaveAttribute('data-lido');
+    expect(lido('art1.incI')).toHaveAttribute('data-lido');
+    expect(lido('art1.incII')).not.toHaveAttribute('data-lido');
+    expect(lido('art2')).not.toHaveAttribute('data-lido');
+
+    // A marca continua dizendo "Lido até aqui" e leva a caneta deitada, só desenho (aria-hidden).
+    const marca = document.querySelector('.marca-lido-ate');
+    expect(marca).toHaveTextContent(/^Lido até aqui$/);
+    const caneta = marca?.querySelector('svg.caneta-do-lido');
+    expect(caneta).toHaveAttribute('data-pose', 'deitada');
+    expect(caneta).toHaveAttribute('aria-hidden', 'true');
+    expect(document.querySelectorAll('svg.caneta')).toHaveLength(1);
+  });
+
+  it('a Estrela de luz tem quatro pontas e o aro que a separa da faixa', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const estrela = await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º');
+    const ponta = estrela.querySelector('svg path.ponta');
+    expect(estrela.querySelector('svg path.aro')).not.toBeNull();
+    // Quatro pontas e quatro vales: oito vértices.
+    expect(ponta?.getAttribute('d')?.match(/-?\d+(?:\.\d+)?/g)).toHaveLength(16);
+    expect(estrela.querySelector('svg path.corte')).toBeNull();
+  });
+
+  it('as ferramentas ficam numa só pílula; "Lido até aqui" fica fora dela', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    const ferramentas = screen.getByRole('group', { name: 'Ferramentas da leitura' });
+    expect(
+      within(ferramentas)
+        .getAllByRole('button')
+        .map((botao) => botao.textContent),
+    ).toEqual(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
+    const principal = screen.getByRole('button', { name: 'Lido até aqui' });
+    expect(ferramentas).not.toContainElement(principal);
+    expect(principal).toHaveClass('principal');
+  });
+
+  it('a legenda dos destaques cabe numa linha: o nome curto na tela e o inteiro na dica', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: true });
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    const legenda = await screen.findByRole('list', { name: 'Legenda dos destaques' });
+    expect(legenda).toHaveClass('curta');
+    const itens = within(legenda)
+      .getAllByRole('listitem')
+      .map((item) => item.firstElementChild);
+    expect(itens.map((item) => item?.textContent)).toEqual([
+      'Prazos',
+      'Exceções',
+      'Absolutos',
+      'Penas',
+    ]);
+    expect(itens.map((item) => item?.getAttribute('title'))).toEqual([
+      'Prazos e tempo',
+      'Exceções e condições',
+      'Termos absolutos',
+      'Penas, quóruns e frações',
+    ]);
+  });
+
+  describe('estrutura da norma', () => {
+    const estruturaNaTela = () => screen.queryByRole('navigation', { name: 'Estrutura da norma' });
+
+    it('de 700 px para cima, mostra os blocos com o estado de cada um e a de agora marcada', async () => {
+      larguraDaJanela(768);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+      await waitFor(() => {
+        expect(dispositivo('art5')).toBeInTheDocument();
+      });
+      const bloco = (nome: RegExp) => within(estrutura).findByRole('button', { name: nome });
+
+      // No preâmbulo, antes do primeiro bloco: os títulos da norma, nenhum lido nem de agora.
+      expect(await bloco(/^TÍTULO I DO OBJETO, ainda não lida$/)).not.toHaveAttribute(
+        'aria-current',
+      );
+      expect(await bloco(/^TÍTULO II DO FIM, ainda não lida$/)).toBeInTheDocument();
+      expect(within(estrutura).queryByRole('button', { name: /CAPÍTULO/ })).toBeNull();
+
+      // A leitura entra no capítulo I (sem seções): a lista passa a ser a dos capítulos do título,
+      // com o título acima, como caminho, e o capítulo I como o de agora.
+      rolarPara(linhaDoDispositivo('art1') * 60);
+      const capitulo1 = await bloco(/^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/);
+      expect(capitulo1).toHaveAttribute('aria-current', 'location');
+      expect(await bloco(/^CAPÍTULO II DO CONDENADO, ainda não lida$/)).not.toHaveAttribute(
+        'aria-current',
+      );
+      expect(
+        within(estrutura).getByRole('button', { name: /^TÍTULO I, DO OBJETO$/ }),
+      ).toBeVisible();
+
+      // "Lido até aqui" no art. 1º: o capítulo I está em leitura (atual); o II, não lido.
+      await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+      expect(await bloco(/^CAPÍTULO I DA EXECUÇÃO, em leitura$/)).toBeInTheDocument();
+      expect(await bloco(/^CAPÍTULO II DO CONDENADO, ainda não lida$/)).toBeInTheDocument();
+
+      // Depois, no art. 3º (capítulo II): o "lido até" não mudou, só a de agora.
+      rolarPara(linhaDoDispositivo('art3') * 60);
+      await waitFor(() => {
+        expect(within(estrutura).getByRole('button', { name: /^CAPÍTULO II/ })).toHaveAttribute(
+          'aria-current',
+          'location',
+        );
+      });
+      expect(
+        within(estrutura).getByRole('button', { name: /^CAPÍTULO I DA EXECUÇÃO, em leitura$/ }),
+      ).not.toHaveAttribute('aria-current');
+
+      // Marcado o art. 4º (o último do capítulo II): o I está lido (feito) e o II também.
+      rolarPara(linhaDoDispositivo('art4') * 60);
+      await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+      expect(await bloco(/^CAPÍTULO I DA EXECUÇÃO, lida$/)).toBeInTheDocument();
+      expect(await bloco(/^CAPÍTULO II DO CONDENADO, lida$/)).toBeInTheDocument();
+    });
+
+    it('no capítulo que tem seções, ele é o de agora e as seções ficam logo abaixo, cada uma com o seu estado', async () => {
+      larguraDaJanela(1024);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_COM_SECOES);
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+      await waitFor(() => {
+        expect(dispositivo('art3')).toBeInTheDocument();
+      });
+
+      // No cabeçalho do capítulo I, que tem duas seções.
+      rolarPara(linhaDoDispositivo('tit1.cap1') * 60);
+      const capitulo = await within(estrutura).findByRole('button', {
+        name: /^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/,
+      });
+      expect(capitulo).toHaveAttribute('aria-current', 'location');
+      const dentro = within(estrutura).getByRole('list', { name: 'Dentro de CAPÍTULO I' });
+      expect(
+        await within(dentro).findByRole('button', { name: /^Seção I Disposições Gerais/ }),
+      ).not.toHaveAttribute('aria-current');
+      expect(within(dentro).getAllByRole('listitem')).toHaveLength(2);
+      // O outro capítulo é irmão, sem nada dentro dele.
+      expect(
+        within(estrutura).getByRole('button', { name: /^CAPÍTULO II DO CONDENADO/ }),
+      ).not.toHaveAttribute('aria-current');
+      expect(within(estrutura).queryByRole('list', { name: 'Dentro de CAPÍTULO II' })).toBeNull();
+
+      // Lido até o art. 1º, o único artigo da seção I: ela está lida.
+      rolarPara(linhaDoDispositivo('art1') * 60);
+      await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+      // A leitura está na seção I: a lista passa a ser a das seções, e a seção I é a de agora.
+      const secao1 = await within(estrutura).findByRole('button', {
+        name: /^Seção I Disposições Gerais, lida$/,
+      });
+      expect(secao1).toHaveAttribute('aria-current', 'location');
+      expect(within(estrutura).queryByRole('list', { name: /^Dentro de/ })).toBeNull();
+      expect(
+        within(estrutura).getByRole('button', { name: /^Seção II Dos Regimes, ainda não lida$/ }),
+      ).toBeInTheDocument();
+      expect(
+        within(estrutura).getByRole('button', { name: /^CAPÍTULO I, DA EXECUÇÃO$/ }),
+      ).toBeVisible();
+    });
+
+    it('tocar num bloco leva o texto até ele', async () => {
+      larguraDaJanela(1024);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+      await waitFor(() => {
+        expect(dispositivo('art5')).toBeInTheDocument();
+      });
+      // O jsdom não tem layout: a página mede 0 e o virtualizador nunca rola para além do alto.
+      vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000);
+      const rolagem = vi.spyOn(window, 'scrollTo');
+      await usuario.click(
+        await within(estrutura).findByRole('button', { name: /^TÍTULO II DO FIM/ }),
+      );
+      await waitFor(() => {
+        expect(rolagem).toHaveBeenCalledWith(
+          expect.objectContaining({ top: linhaDoDispositivo('tit2') * 60 }),
+        );
+      });
+    });
+
+    it('com um filtro que esconde o bloco, tocar nele desliga o filtro e avisa', async () => {
+      larguraDaJanela(1024);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      const aberta = await abrirNorma(repo, norma.id);
+      const art3 = aberta.nos.find((n) => n.dispositivo.endereco === 'art3')?.dispositivo.id ?? '';
+      await criarGrifo(
+        repo,
+        { normaId: norma.id, versaoId: aberta.versao.id, dispositivoId: art3, inicio: 3, fim: 12 },
+        1,
+      );
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+      await screen.findByText(/A jurisdição penal será exercida/);
+
+      await usuario.click(screen.getByRole('button', { name: 'Filtrar' }));
+      const dialogo = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+      await usuario.click(within(dialogo).getByRole('radio', { name: /Só com grifo ou nota/ }));
+      await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+      expect(document.querySelector('[data-endereco="tit1.cap1"]')).toBeNull();
+
+      // Com o filtro, o alto da tela é outro e a estrutura segue: o título que abre a lista é o de
+      // agora, com os capítulos dele logo abaixo. O capítulo I é o que o filtro escondeu.
+      await within(estrutura).findByRole('list', { name: 'Dentro de TÍTULO I' });
+      await usuario.click(
+        await within(estrutura).findByRole('button', { name: /^CAPÍTULO I DA EXECUÇÃO/ }),
+      );
+      expect(await screen.findByText('Filtro desligado para mostrar este bloco.')).toHaveAttribute(
+        'role',
+        'status',
+      );
+      expect(await screen.findByRole('button', { name: 'Filtrar' })).not.toHaveClass(
+        'filtro-ligado',
+      );
+    });
+
+    it('não aparece no celular: lá a estrutura continua no filtro por bloco', async () => {
+      larguraDaJanela(390);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await screen.findByText(/Esta Lei entra em vigor/);
+      expect(estruturaNaTela()).toBeNull();
+    });
+
+    it('não aparece no modo foco, que tira tudo o que não é o texto', async () => {
+      larguraDaJanela(1024);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+      await screen.findByText(/Esta Lei entra em vigor/);
+      expect(estruturaNaTela()).toBeNull();
+    });
+
+    it('não aparece numa norma sem títulos nem capítulos para listar', async () => {
+      larguraDaJanela(1024);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_SEM_BLOCOS);
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await screen.findByText(/Segundo artigo/);
+      expect(estruturaNaTela()).toBeNull();
+    });
+  });
+});
