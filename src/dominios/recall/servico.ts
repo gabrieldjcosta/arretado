@@ -693,3 +693,23 @@ export async function criarCartaoDeLacuna(
   repo.eventos.emitir('cartao.criado', { cartaoId: cartao.id });
   return cartao;
 }
+
+/**
+ * Os trechos escolhidos viram cartões: um só com todos escondidos, ou, com `separados`, um cartão
+ * por trecho (esconde um de cada vez).
+ */
+export async function criarCartoesDeLacuna(
+  repo: Repositorio,
+  fraseId: string,
+  ocultos: readonly Intervalo[],
+  separados = false,
+): Promise<Cartao[]> {
+  if (!separados) return [await criarCartaoDeLacuna(repo, fraseId, ocultos)];
+  const frase = await repo.colecao('frases').obter(fraseId);
+  if (!frase) throw new Error('Esta frase não existe mais.');
+  const unidos = normalizarOcultos(frase.texto, ocultos);
+  if (unidos.length === 0) throw new Error('Selecione o trecho que você quer esconder.');
+  const cartoes: Cartao[] = [];
+  for (const o of unidos) cartoes.push(await criarCartaoDeLacuna(repo, fraseId, [o]));
+  return cartoes;
+}

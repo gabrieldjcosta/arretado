@@ -4,6 +4,8 @@ import type { Intervalo } from '../../core/modelo';
 import { criarCartaoDeLacuna, fraseDoErro, registrarErro } from '../../dominios/recall/servico';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { pontosEDisciplinas } from './carregadores';
+import { sugerirOcultos } from '../../dominios/recall/sugestao';
+import { BarraDeLacuna } from './BarraDeLacuna';
 import { EditorDeLacuna } from './EditorDeLacuna';
 
 /**
@@ -124,17 +126,40 @@ export function RegistrarVarios() {
           </div>
         )}
         {linhas.length > 0 && (
+          <button
+            type="button"
+            className="botao botao-texto na-margem"
+            onClick={() => {
+              const achados = Object.fromEntries(
+                linhas.map((l) => [l, sugerirOcultos(l)] as const).filter(([, o]) => o.length > 0),
+              );
+              setOcultos({ ...ocultos, ...achados });
+            }}
+          >
+            Sugerir lacunas em todas
+          </button>
+        )}
+        {linhas.length > 0 && (
           <ul className="lista-simples frases" aria-label="Frases a registrar">
             {linhas.map((linha) => (
               <li key={linha}>
                 {aberta === linha ? (
-                  <EditorDeLacuna
-                    texto={linha}
-                    ocultos={ocultos[linha] ?? []}
-                    aoMudar={(o) => {
-                      setOcultos({ ...ocultos, [linha]: o });
-                    }}
-                  />
+                  <>
+                    <EditorDeLacuna
+                      texto={linha}
+                      ocultos={ocultos[linha] ?? []}
+                      aoMudar={(o) => {
+                        setOcultos({ ...ocultos, [linha]: o });
+                      }}
+                    />
+                    <BarraDeLacuna
+                      texto={linha}
+                      ocultos={ocultos[linha] ?? []}
+                      aoMudar={(o) => {
+                        setOcultos({ ...ocultos, [linha]: o });
+                      }}
+                    />
+                  </>
                 ) : (
                   <span className="texto-leitura">{linha}</span>
                 )}

@@ -4,7 +4,7 @@ import type { Erro, Intervalo, ResultadoErro } from '../../core/modelo';
 import { sugerirCausa } from '../../dominios/recall/causa';
 import {
   criarCartaoDeErro,
-  criarCartaoDeLacuna,
+  criarCartoesDeLacuna,
   fraseDoErro,
   LIMITE_FILA_DIARIA,
   maiorFilaProjetada,
@@ -14,6 +14,7 @@ import { useDados, useRepositorio } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro, type Complemento } from './CamposErro';
+import { BarraDeLacuna } from './BarraDeLacuna';
 import { EditorDeLacuna } from './EditorDeLacuna';
 import { ROTULO_RESULTADO } from './rotulos';
 
@@ -65,6 +66,7 @@ export function RegistrarErro() {
   const [resultado, setResultado] = useState<ResultadoErro | null>(null);
   const [ocultos, setOcultos] = useState<Intervalo[]>([]);
   const [escondendo, setEscondendo] = useState(false);
+  const [separados, setSeparados] = useState(false);
   const [oQueFoi, setOQueFoi] = useState('');
   const [complemento, setComplemento] = useState<Complemento>({});
   const [lembrada, setEscolha] = useState<Escolha>(lerEscolha);
@@ -114,7 +116,7 @@ export function RegistrarErro() {
       if (ocultos.length > 0) {
         // Frase e cartão de lacuna de uma vez: o erro já está salvo se o cartão falhar.
         const f = await fraseDoErro(repo, erro.id);
-        if (f) await criarCartaoDeLacuna(repo, f.id, ocultos);
+        if (f) await criarCartoesDeLacuna(repo, f.id, ocultos, separados);
         const maior = await maiorFilaProjetada(repo);
         setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
       } else {
@@ -276,6 +278,13 @@ export function RegistrarErro() {
                 Selecione o que quer lembrar: o trecho some. Toque na tarja para mostrar.
               </p>
               <EditorDeLacuna texto={frase.trim()} ocultos={ocultos} aoMudar={setOcultos} />
+              <BarraDeLacuna
+                texto={frase.trim()}
+                ocultos={ocultos}
+                aoMudar={setOcultos}
+                separados={separados}
+                aoSeparar={setSeparados}
+              />
             </>
           )}
         </div>

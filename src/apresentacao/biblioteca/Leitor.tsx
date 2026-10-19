@@ -17,6 +17,7 @@ import {
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type {
   Dispositivo as DispositivoDoModelo,
+  Intervalo,
   Leitura,
   Marcacao,
   TextoDeDispositivo,
@@ -42,7 +43,8 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import type { ResultadoDaCorrecao } from '../../dominios/legislacao/correcao';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
-import { criarCartaoDeLacuna, criarFraseDeTrecho } from '../../dominios/recall/servico';
+import { criarCartoesDeLacuna, criarFraseDeTrecho } from '../../dominios/recall/servico';
+import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Caneta } from '../componentes/Caneta';
@@ -1267,7 +1269,7 @@ function LeitorAberto({
     { trecho: SelecaoNoTexto; texto: string } | { id: string } | undefined
   >(undefined);
   const [fraseAberta, setFraseAberta] = useState<
-    { trecho: SelecaoNoTexto; texto: string } | undefined
+    { trecho: SelecaoNoTexto; texto: string; ocultos?: Intervalo[] } | undefined
   >(undefined);
   const tocouNasAcoes = useRef(-Infinity);
   const temSelecao = useRef(false);
@@ -1349,6 +1351,38 @@ function LeitorAberto({
     if (!s) return;
     setFraseAberta({ trecho: s, texto: textoDaSelecao(s) });
     limparSelecao();
+  }
+  /** Os grifos do dispositivo viram as lacunas: abre o envio às frases já com eles escondidos. */
+  function cartaoDosGrifosDe(grifo: Marcacao) {
+    const indice = aberta.indiceDe.get(grifo.dispositivoId);
+    const trechos = indice === undefined ? undefined : textos.get(indice)?.texto?.trechos;
+    if (!trechos) return;
+    if (trechos.some((t) => t.tachado === true)) {
+      setAnuncio(
+        'Há trecho revogado neste dispositivo: selecione o trecho e use Enviar às frases.',
+      );
+      return;
+    }
+    const gravado = trechos.map((t) => t.texto).join('');
+    const { texto, ocultos } = ocultosDosGrifos(
+      gravado,
+      marcacoes.porDispositivo.get(grifo.dispositivoId) ?? [],
+    );
+    if (ocultos.length === 0) {
+      setAnuncio('Os grifos deste dispositivo não cabem no texto.');
+      return;
+    }
+    setEscolhidaId(undefined);
+    setFraseAberta({
+      trecho: {
+        dispositivoId: grifo.dispositivoId,
+        inicio: 0,
+        fim: gravado.length,
+        cortada: false,
+      },
+      texto,
+      ocultos,
+    });
   }
   function anotarGrifo(grifo: Marcacao) {
     setEscolhidaId(undefined);
@@ -2000,6 +2034,9 @@ function LeitorAberto({
             anotar={() => {
               anotarGrifo(escolhida);
             }}
+            cartaoDosGrifos={() => {
+              cartaoDosGrifosDe(escolhida);
+            }}
             tirar={() => {
               setEscolhidaId(undefined);
               void marcacoes.remover(escolhida.id).then((deu) => {
@@ -2090,7 +2127,8 @@ function LeitorAberto({
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
-        enviar={async (texto, ocultos) => {
+        ocultosIniciais={fraseAberta?.ocultos}
+        enviar={async (texto, ocultos, separados) => {
           if (!fraseAberta) return false;
           const { trecho, texto: citado } = fraseAberta;
           try {
@@ -2104,7 +2142,7 @@ function LeitorAberto({
                 fim: trecho.fim,
               },
             });
-            if (ocultos.length > 0) await criarCartaoDeLacuna(repo, frase.id, ocultos);
+            if (ocultos.length > 0) await criarCartoesDeLacuna(repo, frase.id, ocultos, separados);
           } catch {
             return false;
           }

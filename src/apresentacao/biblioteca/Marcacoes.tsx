@@ -2,6 +2,7 @@
 // grifo escolhido) e o diálogo da nota. O estado das marcações fica em `usarMarcacoes.ts`.
 import { useRef, useState, type SyntheticEvent } from 'react';
 import type { Intervalo } from '../../core/modelo';
+import { BarraDeLacuna } from '../recall/BarraDeLacuna';
 import { EditorDeLacuna } from '../recall/EditorDeLacuna';
 import { CORES_DO_GRIFO, type CorDoGrifo } from '../../dominios/legislacao/marcacoes';
 import { Dialogo } from '../componentes/Dialogo';
@@ -68,12 +69,15 @@ export function AcoesDoGrifo({
   cor,
   mudar,
   anotar,
+  cartaoDosGrifos,
   tirar,
   fechar,
 }: {
   cor: number;
   mudar: (cor: CorDoGrifo) => void;
   anotar: () => void;
+  /** Os grifos deste dispositivo viram as lacunas de um cartão. */
+  cartaoDosGrifos: () => void;
   tirar: () => void;
   fechar: () => void;
 }) {
@@ -95,6 +99,9 @@ export function AcoesDoGrifo({
       ))}
       <button type="button" onClick={anotar}>
         Nota
+      </button>
+      <button type="button" onClick={cartaoDosGrifos}>
+        Cartão dos grifos
       </button>
       <button type="button" aria-label="Tirar o grifo" onClick={tirar}>
         Tirar
@@ -277,34 +284,46 @@ function ConteudoDaNota({
 export function DialogoEnviarAsFrases({
   aberto,
   trecho,
+  ocultosIniciais,
   enviar,
   fechar,
 }: {
   aberto: boolean;
   /** O texto selecionado, que abre o campo. */
   trecho: string;
-  /** `ocultos`: com trechos escondidos, a Frase nasce com o cartão de lacuna. */
-  enviar: (texto: string, ocultos: Intervalo[]) => Promise<boolean>;
+  /** Trechos já escondidos (os grifos do dispositivo): o editor abre com eles. */
+  ocultosIniciais?: Intervalo[];
+  /** `ocultos`: com trechos escondidos, a Frase nasce com o cartão de lacuna (`separados`: um por trecho). */
+  enviar: (texto: string, ocultos: Intervalo[], separados: boolean) => Promise<boolean>;
   fechar: () => void;
 }) {
   return (
     <Dialogo aberto={aberto} aoFechar={fechar} titulo="Enviar às frases" classe="dialogo-nota">
-      <ConteudoDoEnvio key={trecho} trecho={trecho} enviar={enviar} fechar={fechar} />
+      <ConteudoDoEnvio
+        key={trecho}
+        trecho={trecho}
+        ocultosIniciais={ocultosIniciais}
+        enviar={enviar}
+        fechar={fechar}
+      />
     </Dialogo>
   );
 }
 
 function ConteudoDoEnvio({
   trecho,
+  ocultosIniciais,
   enviar,
   fechar,
 }: {
   trecho: string;
-  enviar: (texto: string, ocultos: Intervalo[]) => Promise<boolean>;
+  ocultosIniciais: Intervalo[] | undefined;
+  enviar: (texto: string, ocultos: Intervalo[], separados: boolean) => Promise<boolean>;
   fechar: () => void;
 }) {
-  const [ocultos, setOcultos] = useState<Intervalo[]>([]);
-  const [escondendo, setEscondendo] = useState(false);
+  const [ocultos, setOcultos] = useState<Intervalo[]>(ocultosIniciais ?? []);
+  const [escondendo, setEscondendo] = useState((ocultosIniciais?.length ?? 0) > 0);
+  const [separados, setSeparados] = useState(false);
   const [texto, setTexto] = useState(trecho.slice(0, TEXTO_MAXIMO_DA_FRASE));
   const [ocupado, setOcupado] = useState(false);
   const [falha, setFalha] = useState(false);
@@ -316,7 +335,7 @@ function ConteudoDoEnvio({
     trava.current = true;
     setOcupado(true);
     setFalha(false);
-    const deu = await enviar(texto.trim(), ocultos);
+    const deu = await enviar(texto.trim(), ocultos, separados);
     setOcupado(false);
     if (deu) fechar();
     else {
@@ -362,6 +381,13 @@ function ConteudoDoEnvio({
             Selecione o que quer lembrar: o trecho some. Toque na tarja para mostrar.
           </p>
           <EditorDeLacuna texto={texto.trim()} ocultos={ocultos} aoMudar={setOcultos} />
+          <BarraDeLacuna
+            texto={texto.trim()}
+            ocultos={ocultos}
+            aoMudar={setOcultos}
+            separados={separados}
+            aoSeparar={setSeparados}
+          />
         </>
       )}
       {falha && (
