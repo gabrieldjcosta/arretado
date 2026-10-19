@@ -937,6 +937,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `destacarCondicionantesEPrazos` opcional (ausente = desligado; o leitor e Conta › Aparência leem `?? false`), sem migração e sem subir a versão do esquema; `PREFERENCIAS_PADRAO` não o grava.
 - **Prevenção:** `preferencias.test.ts` (o registro sem o campo valida e muda) e `pacote-v1.test.ts` (pacote v1 sem o campo restaura integral, com os destaques desligados).
 - **No sentido contrário (app anterior à 9.8 diante do campo novo):** a leitura não valida o esquema (só a escrita), então a aba aberta antes do merge continua lendo; mas, depois de o destaque ser ligado noutra aba, ela recusa gravar qualquer preferência ("Não foi possível guardar a mudança", ao mudar o tema ou o A−/A+), e um app anterior recusa o pacote novo com o campo como "arquivo alterado fora do aplicativo". Nada se perde: recarregar a aba (ou atualizar o app no celular) resolve. Por isso, ao publicar a 9.8, recarregar as abas abertas do Arretado.
+- **Repetido na P7b (19/10/2026):** `lembrete` (o "Para lembrar" do Hoje) é opcional como o `destacarCondicionantesEPrazos` e tem as mesmas consequências, com um agravante: quem o grava é o Hoje, a tela mais aberta, então a aba ou o app instalado de antes da P7b recusa gravar qualquer preferência assim que a pessoa salva uma nota noutra aba. Também nada se perde: recarregar a aba ou atualizar o app resolve. Ao publicar a P7b, recarregar as abas abertas.
 - **Origem:** previsto na 9.8; tratado em 06/10/2026 (9.8).
 
 ### Regra de destaque quadrática ou cega a acento
@@ -1175,7 +1176,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Alvos que restam abaixo de 44 px (P6)
 - **Sintoma:** `capturas-ui.mjs --medir` ainda lista as notas de vigência do Leitor ("(Redação dada pela Lei nº …)", 278 × 19), as remissões no texto ("II", 15 × 27), "Fazer agora" no Hoje (74 × 19), "Aparência" no meio de uma frase de Perfis (63 × 19) e, no Fixar, "registrar um erro" (118 × 21, na linha "Depois:"). **Causa:** são links em linha de texto, a exceção "em linha" da WCAG 2.5.8 (o alvo é limitado pela altura da linha); a nota de vigência é uma linha miúda inteira de link, e dar 44 px a cada uma deixaria cada artigo bem mais alto.
-- **Solução:** nenhuma na P6; decisão do Gabriel (ampliar as notas ou aceitar a exceção). O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
+- **Solução:** nenhuma, de propósito. Decisão do Gabriel de 19/10/2026: **manter** as notas de vigência e as remissões como links em linha, cobertos pela exceção da WCAG 2.5.8; não há PR de ampliação. O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
 - **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
 
 ### As capturas `--rotas todas` não mostram a Sessão aberta (P6)
