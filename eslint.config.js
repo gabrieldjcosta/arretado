@@ -9,6 +9,8 @@ export default tseslint.config(
   {
     ignores: [
       'dist',
+      '.claude/skills/**',
+      '.claude/skills/**',
       'coverage',
       'playwright-report',
       'test-results',
