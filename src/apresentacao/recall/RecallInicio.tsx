@@ -5,12 +5,27 @@ import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { TituloComMais } from '../componentes/TituloComMais';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { resumoDoRecall } from './carregadores';
 
 /** Segundos por cartão na estimativa do início; ajustar com o uso real (fatia 3). */
 export const SEGUNDOS_POR_CARTAO = 30;
+
+/** Uma aba do Recall: link de rota com o traço de seleção (D-D7, "A caneta que desenha"). */
+function AbaDoRecall({ para, rotulo }: { para: string; rotulo: string }) {
+  return (
+    <NavLink to={para}>
+      {({ isActive }) => (
+        <>
+          {rotulo}
+          <TracoDeSelecao chave={`recall:${para}`} ativo={isActive} />
+        </>
+      )}
+    </NavLink>
+  );
+}
 
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
 const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
@@ -87,9 +102,9 @@ export function RecallInicio() {
         </p>
       )}
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
-        <NavLink to="/recall/frases">Frases</NavLink>
-        <NavLink to="/recall/cartoes">Cartões</NavLink>
-        <NavLink to="/recall/historico">Histórico</NavLink>
+        <AbaDoRecall para="/recall/frases" rotulo="Frases" />
+        <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />
+        <AbaDoRecall para="/recall/historico" rotulo="Histórico" />
       </nav>
       <Outlet />
     </>

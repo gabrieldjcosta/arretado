@@ -15,6 +15,9 @@ import {
 import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { usePassagemDeCartao } from '../componentes/passagem';
+import { marcarEscolha } from '../componentes/traco/escolha';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { ROTULO_DA_AREA } from '../textos';
@@ -47,7 +50,8 @@ async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string>
 /**
  * Drill: frente, virar, De novo / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2).
  * Revisa até a cota por vez (fatia 3); o resto da fila espera, sem ser cortado nem reordenado, e o
- * fim oferece "Revisar mais N".
+ * fim oferece "Revisar mais N". Ao responder, a resposta ganha o traço de seleção e o cartão passa
+ * para o seguinte ("A caneta que desenha"; sem movimento, a troca é na hora).
  */
 export function Drill() {
   const texto = useVoz();
@@ -56,9 +60,12 @@ export function Drill() {
   // Verso guardado com o id do cartão: nunca mostra o verso do cartão anterior.
   const [verso, setVerso] = useState<{ id: string; texto: string } | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  /** A resposta tocada, enquanto o cartão passa: é a que ganha o traço de seleção. */
+  const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   const inicio = useRef(0);
   const botaoVirar = useRef<HTMLButtonElement>(null);
+  const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
 
   const cota = useRef(0);
 
@@ -146,19 +153,31 @@ export function Drill() {
 
   const responder = useCallback(
     async (resposta: RespostaRevisao) => {
-      if (!atual || ocupado) return;
+      if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      // Pelo clique ou pela tecla (1, 2, 3), a resposta ganha o traço de seleção.
+      marcarEscolha(`resposta:${resposta}`);
+      setEscolhida(resposta);
       try {
-        await revisar(repo, atual.id, resposta, { duracaoMs: performance.now() - inicio.current });
-        avancar();
+        const gravada = revisar(repo, atual.id, resposta, {
+          duracaoMs: performance.now() - inicio.current,
+        });
+        if (estado.indice + 1 >= estado.fila.length) {
+          // O último cartão não passa: o fim da rodada toma a tela.
+          await gravada;
+          avancar();
+        } else {
+          await passar(gravada, avancar);
+        }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
       } finally {
         setOcupado(false);
+        setEscolhida(null);
       }
     },
-    [atual, ocupado, repo, avancar],
+    [atual, estado, ocupado, repo, avancar, passar],
   );
 
   // Atalhos: espaço/Enter vira; 1, 2, 3 respondem (Parte 2 §11).
@@ -260,7 +279,7 @@ export function Drill() {
         max={estado.fila.length}
         rotulo="Cartão"
       />
-      <article className="cartao-bloco cartao-drill" aria-label="Cartão">
+      <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
         <p className="drill-frente texto-leitura">{atual.frente}</p>
         {estado.virado && (
           <div className="frase-correta" aria-live="polite">
@@ -307,6 +326,7 @@ export function Drill() {
             >
               <IconeDoFixar nome={ICONE[r]} />
               {ROTULO_RESPOSTA[r]}
+              <TracoDeSelecao chave={`resposta:${r}`} ativo={escolhida === r} />
             </button>
           ))}
         </div>

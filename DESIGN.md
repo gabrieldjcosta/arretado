@@ -128,7 +128,7 @@ A luz do sertão como tinta: areia clara, uma folha de cal com sombra fresca, e 
 
 O sistema é claro e firme. O chão é areia lisa, sem textura; a profundidade vem só da sombra fresca da folha. Os títulos usam a Gabarito (geométrica, feita por fundição brasileira para uma plataforma de ensino, com o nome da folha de respostas); a interface usa a Atkinson Hyperlegible, desenhada para leitura difícil; a lei fica na Literata. A cor tem papel: vidro é a ação, cal é "onde estou", tinta é o texto e o marcado, a luz só reporta estado. Vermelho só para excluir e para falha técnica, nunca no estudo.
 
-Estado desta descrição: a base (tokens, letras, botões, campos, cartões, folha do Agora, área e aba atuais, Estrela de luz) está no código desde a fase P1 de [`docs/planos/ponto-de-luz.md`](docs/planos/ponto-de-luz.md), e a casca (cabeçalho, abas sobre a areia com a atual em cal, "+" na linha do título) desde a P2. O Hoje (P3) também está no código: os pontos do Dia, a linha de parada com a caneta encostada na folha, a folha do Agora com o botão de vidro e "Escolher outra coisa", o "Em seguida" e o Resumo do Dia com o traço do cachorro e a caneta largada. O Leitor (P4) também: o lido sobre a faixa de cal, a caneta deitada em "Lido até aqui", a Estrela de quatro pontas, a estrutura da norma com pontos de luz, o dock em vidro e o modo foco nos tokens novos. O Fixar e a revisão (P5) também: abas Frases · Cartões · Histórico, estado por palavra e desenho, o Cartão atual com a caneta encostada e o fim de rodada com a caneta deitada, sem cachorro. A P7 (plataformas) também: o ícone, o favicon e o manifest, a cor da barra nos dois temas, as áreas seguras do aparelho em tudo que é fixo e o trilho de ferramentas do Leitor a partir de 1200 px. O resto das telas é o destino da fase P6 e está descrito aqui como regra, mesmo onde o código ainda não chegou. Decisão: D-D7 em [`docs/design/decisoes-design.md`](docs/design/decisoes-design.md); contrato: [`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`](docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md).
+Estado desta descrição: a base (tokens, letras, botões, campos, cartões, folha do Agora, área e aba atuais, Estrela de luz) está no código desde a fase P1 de [`docs/planos/ponto-de-luz.md`](docs/planos/ponto-de-luz.md), e a casca (cabeçalho, abas sobre a areia com a atual em cal, "+" na linha do título) desde a P2. O Hoje (P3) também está no código: os pontos do Dia, a linha de parada com a caneta encostada na folha, a folha do Agora com o botão de vidro e "Escolher outra coisa", o "Em seguida" e o Resumo do Dia com o quadro do cacto e a caneta largada nele (pós-P3, "A caneta que desenha", 19/10/2026: o traço de seleção e a passagem do cartão também estão no código). O Leitor (P4) também: o lido sobre a faixa de cal, a caneta deitada em "Lido até aqui", a Estrela de quatro pontas, a estrutura da norma com pontos de luz, o dock em vidro e o modo foco nos tokens novos. O Fixar e a revisão (P5) também: abas Frases · Cartões · Histórico, estado por palavra e desenho, o Cartão atual com a caneta encostada e o fim de rodada com a caneta deitada, sem cachorro. A P7 (plataformas) também: o ícone, o favicon e o manifest, a cor da barra nos dois temas, as áreas seguras do aparelho em tudo que é fixo e o trilho de ferramentas do Leitor a partir de 1200 px. O resto das telas é o destino da fase P6 e está descrito aqui como regra, mesmo onde o código ainda não chegou. Decisão: D-D7 em [`docs/design/decisoes-design.md`](docs/design/decisoes-design.md); contrato: [`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`](docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md).
 
 **Key Characteristics:**
 
@@ -155,7 +155,7 @@ Uma paleta de dia claro (areia, cal, vidro) com uma tinta azul-sombra que ancora
 ### Tertiary
 
 - **Luz** (#6fe3d6): pontos do Dia, Estrela e ponta da caneta. Nunca texto, sempre com contorno na tinta e núcleo branco. À noite, #7df3e1.
-- **Traço** (#c8742f): só o traço do cachorro (à noite, #ffb46b). Caramelo nunca é cor de interface.
+- **Traço** (#c8742f, token `--caramelo`): só o sol e o miolo das flores do quadro do cacto (à noite, #ffb46b). Caramelo nunca é cor de interface.
 
 ### Neutral
 
@@ -228,7 +228,7 @@ Plano, com um só degrau de luz: o chão de areia, a cal por cima. A profundidad
 
 ## Shapes
 
-Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 px, abas e navegação em pílula (999 px). Contornos de 1 px nos cartões e de 1,5 px nos campos. A caneta, os pontos de luz, a Estrela e o traço do cachorro são vetores; a caneta é o único objeto com volume e o único lugar com gradiente.
+Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 px, abas e navegação em pílula (999 px). Contornos de 1 px nos cartões e de 1,5 px nos campos. A caneta, os pontos de luz, a Estrela e o quadro do cacto são vetores; a caneta é o único objeto com volume e o único lugar com gradiente.
 
 ## Components
 
@@ -253,7 +253,7 @@ Firme e claro, em degraus: botões e campos em 12 px, cartões e a folha em 16 p
 - **Linha de parada (P3):** "Você parou em LEP, art. 112, § 2º" em 15 px atenuado, com a norma e o Dispositivo em negrito na tinta, e a hora em 13 px ("hoje, 22h10", "ontem, 22h10" ou "dia 12/10, 22h10"; nunca conta dias fora). Aparece com a leitura salva; a caneta de pé (76 × 104) aparece com a folha, mesmo sem leitura. Com o Dia fechado a linha fica só em texto: a caneta vai para o Resumo do Dia.
 - **Pontos do Dia (P3):** Leitura, Cartões e Frases, cada um com um ponto de luz de 22 px e o nome em 13 px, peso 600: apagado (anel na tinta a 55%, 3,4:1 na areia), aceso pela metade (atual) e aceso (feito), com o estado também em texto para o leitor de tela ("Leitura, feito hoje"). Feito: houve atividade hoje e nada mais está na vez. Atual: é o que o Agora oferece, ou foi começado hoje e ainda há o que fazer. Apagado: ainda não hoje (um anel não cobra, nem quando nada vence). O ponto acende uma vez em 160 ms, na visita ao Hoje em que ficou aceso (feito) e na anterior, no mesmo dia, ainda não estava; o que passa a ser a vez (pela metade) aparece sem animação, dispensar a sugestão não acende nada, a primeira visita do dia abre quieta, e com `prefers-reduced-motion` ele aparece aceso.
 - **Em seguida:** até 2 itens (a mesma decisão do Agora, sem o que ele já mostra nem o que a pessoa dispensou), nome em negrito 600 e tempo em 13 px, sobre a areia. Só texto: sem botão, porque a ação é uma só.
-- **Resumo do Dia (P3):** cartão com o que houve em linhas curtas (Sessões, cartões e Frases revisados) e o próximo passo; "Fechar o Dia" é um botão secundário (o vidro é do Agora). Fechado, mostra o cachorro (112 × 94) e, largada ao fim do traço, a caneta (120 × 67), "Bom descanso." e "Reabrir o Dia".
+- **Resumo do Dia (P3):** cartão com o que houve em linhas curtas (Sessões, cartões e Frases revisados) e o próximo passo; "Fechar o Dia" é um botão secundário (o vidro é do Agora). Fechado, mostra o quadro do cacto com a caneta largada nele e a legenda do que ela desenhou hoje, "Bom descanso." e "Reabrir o Dia".
 
 ### Inputs / Fields
 
@@ -281,13 +281,17 @@ Coluna de 70 ch em Literata sobre a areia. O trecho lido, do começo da norma at
 
 ### A caneta (signature)
 
-Coluna de vidro com dois braços, do ciano ao verde (#dffcff, #9af0dc, #5fcf8f, #2b8f5e, #17422f), brilho de borda, três pontos de luz nas pontas dos membros e a ponta cônica escura com o ponto de luz. Três poses fixas: encostada a 35° na folha do Agora (Hoje; no Fixar, no Cartão atual), deitada a 65° ao fim de "Lido até aqui" (Leitor), largada ao fim do traço do cachorro (Resumo do Dia); em repouso, deitada, no fim de rodada do Fixar. Muda de lugar por salto, nunca gira nem desliza. Nunca botão, painel, fundo de texto, nem mais de uma por tela. Decorativa (`aria-hidden`). O ícone do app (P7) é a mesma caneta a 35° sobre a areia, em cores fixas do tema claro e sem sombra, no favicon, no ícone instalável e no do iOS (a versão "maskable" leva a caneta inteira dentro do círculo de 40%).
+Coluna de vidro com dois braços, do ciano ao verde (#dffcff, #9af0dc, #5fcf8f, #2b8f5e, #17422f), brilho de borda, três pontos de luz nas pontas dos membros e a ponta cônica escura com o ponto de luz. Três poses fixas: encostada a 35° na folha do Agora (Hoje; no Fixar, no Cartão atual), deitada a 65° ao fim de "Lido até aqui" (Leitor), largada no canto do quadro do cacto (Resumo do Dia); em repouso, deitada, no fim de rodada do Fixar. Muda de lugar por salto, nunca gira nem desliza; no quadro, ela anda sobre o traço que desenha e volta a ser largada. Nunca botão, painel, fundo de texto, nem mais de uma por tela. Decorativa (`aria-hidden`). O ícone do app (P7) é a mesma caneta a 35° sobre a areia, em cores fixas do tema claro e sem sombra, no favicon, no ícone instalável e no do iOS (a versão "maskable" leva a caneta inteira dentro do círculo de 40%).
 
-No código (`componentes/Caneta.tsx`): uma caneta de pé desenhada com a ponta em (32, 200) e girada em torno dela, 35° encostada e 65° deitada; as cores vêm dos tokens `--caneta-0` a `--caneta-4`, `--caneta-miolo`, `--caneta-borda` e `--caneta-brilho` (o tema os troca, e o componente não leva cor literal), e o halo da ponta são dois círculos cujas opacidades (`--caneta-halo-dia`, `--caneta-halo-noite`) o tema troca. A "largada" é a deitada posta ao fim do traço do cachorro. No Hoje, a caneta passa por salto da folha do Agora (Dia aberto) para o Resumo do Dia (Dia fechado).
+No código (`componentes/Caneta.tsx`): uma caneta de pé desenhada com a ponta em (32, 200) e girada em torno dela, 35° encostada e 65° deitada; as cores vêm dos tokens `--caneta-0` a `--caneta-4`, `--caneta-miolo`, `--caneta-borda` e `--caneta-brilho` (o tema os troca, e o componente não leva cor literal), e o halo da ponta são dois círculos cujas opacidades (`--caneta-halo-dia`, `--caneta-halo-noite`) o tema troca. A "largada" é a deitada posta no canto do quadro do cacto (`QuadroDoCacto` a move dentro do próprio `<svg>` com `CanetaDesenho`). No Hoje, a caneta passa por salto da folha do Agora (Dia aberto) para o Resumo do Dia (Dia fechado).
 
-### O cachorro
+### O quadro do cacto (A caneta que desenha)
 
-Um traço só, caramelo pela cor, orelha semiereta, focinho e olho como pontos, lenço em V; só no Resumo do Dia (o fim de rodada do Fixar leva a caneta deitada, sem cachorro). Ao fechar o Dia, desenha-se uma vez em 300 ms (com `prefers-reduced-motion`, aparece pronto); ao abrir o Hoje com o Dia já fechado, aparece pronto. Decorativo (`componentes/TracoDoCachorro.tsx`).
+Um desenho de traço em 16 partes que cresce a cada Dia fechado: o chão, o tronco, os dois braços, as nervuras e os espinhos, três flores, o sol, as aves, o calango, a nuvem, a chuva, o capim, o tatu-bola e a borboleta. O Dia fechado de número N desenha a parte ((N − 1) mod 16) + 1; depois da 16ª, o Dia seguinte abre uma folha nova. Conta Dias fechados, nunca uma sequência: faltar um Dia não apaga nada, e nenhum número aparece na tela. Só no Resumo do Dia, depois de fechar (`componentes/quadro/`). A caneta sai do repouso, anda sobre cada fio enquanto ele se faz e volta a ser largada. A cena é decorativa (`aria-hidden`); a legenda ("Hoje a caneta desenhou o chão.", `role="status"`) só é dita quando a parte terminou. Cores por papel: vidro = o cacto, tinta = bichos e flores, tinta 2 = chão e nuvem, caramelo = só o sol e o miolo das flores.
+
+### O traço de seleção e a passagem do cartão
+
+O **traço** (`componentes/traco/`): ao escolher uma área, uma aba da Biblioteca ou uma resposta, uma linha fina (tinta de dia, luz à noite) se desenha em volta do item, com a ponta de luz à frente, e some. A **passagem** (`componentes/passagem.ts`): ao responder um Cartão ou uma Frase, o cartão sai para a esquerda e o seguinte entra pela direita; o último cartão não passa, o fim da rodada toma a tela. `movimentoAgora()` (`apresentacao/movimento.ts`) é lido na hora de usar: **reduzido** (`prefers-reduced-motion`) não anda nada, o quadro aparece pronto e o cartão troca na hora; **Calmo** (só o perfil Calmo, escolhido em Conta › Perfis) mantém o desenho do Dia, mas o traço só aparece e esmaece e o cartão só esmaece; **normal** (o padrão, sem perfil, e os perfis Guiado e Leitura) desenha o traço e desloca o cartão. Tempos em `docs/design/sistema-visual.md`.
 
 ## Do's and Don'ts
 
@@ -297,7 +301,7 @@ Um traço só, caramelo pela cor, orelha semiereta, focinho e olho como pontos, 
 - **Do** usar cal para "onde estou", tinta para o texto e o marcado, a luz só para estado.
 - **Do** mostrar onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo.
 - **Do** medir todo par de cor novo em `scripts/contraste.mjs` nos dois temas antes de usar.
-- **Do** respeitar `prefers-reduced-motion` (pontos acesos e cachorro pronto) e `prefers-contrast`. Movimento de 160 a 220 ms, `cubic-bezier(.2, .7, .2, 1)`, só quando explica.
+- **Do** respeitar `prefers-reduced-motion` (pontos acesos e quadro do cacto pronto) e `prefers-contrast`. Movimento de 160 a 220 ms, `cubic-bezier(.2, .7, .2, 1)`, só quando explica.
 - **Do** hospedar fontes e ícones no próprio app; o app funciona offline.
 
 ### Don't:
