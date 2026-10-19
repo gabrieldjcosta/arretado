@@ -180,6 +180,8 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 > **Emendada em 19/10/2026 pela D-D8:** o cachorro do Resumo do Dia saiu (no lugar, o quadro do cacto) e a caneta, que mudava de lugar só por salto, passa a andar sobre o traço que desenha no quadro. O resto vale.
 
+> **Superada em 19/10/2026 pela D-D9 onde diverge:** a paleta (areia, cal, vidro, luz, traço), a Gabarito nos títulos, os raios de 16 e 12, a sombra fresca da folha, a aba e a área atuais em cal, o botão de vidro, a caneta verde, a marca "Arretado" com o cacto de vidro, o "Você parou em" do Hoje e o "Em seguida" sem botão. Ficam as regras de comportamento (uma ação por tela, a luz só reporta estado, sem textura, matéria em neutro, destaques da lei sublinhados), o movimento, o vocabulário e o que a seção "Mantido" lista. O que cada coisa virou está na D-D9, mais abaixo neste arquivo.
+
 **Origem.** Nas rodadas de direção visual de 18/10/2026 (genjutsu:bunshin, nível "só a direção"; página https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb), o Gabriel escolheu a direção **"Ponto de luz, segunda versão"** no cartão da rodada 3 (15:46Z). Às 17:23Z ele autorizou a construção no app ("leve o contrato dessa thread a uma nova thread para continuar o desenvolvimento do bushin. tem minha autorização"). A direção troca a paleta da D-D5, e esta autorização é a decisão de design nova que o contrato pedia. Contrato da direção: [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md). Execução: [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio. **Substitui a D-D5 e a D-D6 onde divergem.**
 
 **Paleta (troca a da D-D5).** Contraste medido com `scripts/contraste.mjs`, nos dois temas.
@@ -222,6 +224,8 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 ## D-D8 — A caneta que desenha: o quadro do cacto no lugar do cachorro, e a caneta no traço de seleção e na passagem do cartão (19/10/2026, decisão do Gabriel)
 
+> **Emendada em 19/10/2026 pela D-D9 só nas cores:** o quadro do cacto (16 partes, uma por Dia fechado), o traço de seleção, a passagem do cartão e o movimento em três modos valem; a luz do traço e a caneta passam a ser as do mundo (tinta e lima de dia, luz e âmbar à noite) e o caramelo do sol e das flores é refeito na Q4.
+
 **Origem.** O Gabriel não gostou do cachorro ao fechar o Dia e pediu que a caneta entrasse nas animações de sucesso, de um jeito coerente com o conceito (a cada Dia fechado ela desenha um traço de um cacto; depois de pronto, flores, animais e outros elementos), e nas animações sutis de seleção, migração e passagem de cartão (por exemplo, uma linha néon singela em volta). Prévia: https://claude.ai/artifact/Q8cGYPvUrVCM77RG3o51Qr. Aprovada em 19/10/2026 às 02:07Z ("Construir tudo"). Pediu ainda para usar as skills ponytail, genjutsu:bunshin e impeccable (vindas no PR #194) na construção.
 
 **Quadro do cacto.** Um desenho em 16 partes (chão, tronco, dois braços, nervuras e espinhos, três flores, sol, aves, calango, nuvem, chuva, capim, tatu-bola, borboleta). O Dia fechado de número N (Dias distintos com `fechadoEm`) desenha a parte ((N − 1) mod 16) + 1; depois da 16ª, o Dia seguinte abre uma folha nova. Nunca uma sequência: faltar um Dia não tira nada, e nenhum número aparece na tela (a legenda só diz "Hoje a caneta desenhou o chão."). Só no Resumo do Dia, depois de fechar; reaberto o Dia, o quadro some e, ao fechar de novo, a mesma parte se desenha de novo. A caneta deitada sai do canto, anda sobre cada fio enquanto ele se faz e volta a ser largada: é a única exceção ao "só por salto" da D-D7.
@@ -235,3 +239,43 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que sai.** O cachorro (`TracoDoCachorro`) e o token `--traco-cachorro` (vira `--caramelo`, só o sol e o miolo das flores). Não há mais personagem; a skill `arretado-design-principles` (caminho protegido) foi atualizada no PR, com o rótulo `aprovado-gabriel`.
 
 **Escolha reversível, confirmada pelo Gabriel em 19/10/2026 (o movimento completo).** Sem perfil escolhido o app usa o movimento normal (a prévia aprovada abria assim), ao contrário da voz regional, que sem perfil fica neutra: quem nunca abriu Perfis vê o traço e o deslocamento, e só o perfil Calmo os troca por esmaecer. Para o padrão ser o Calmo, é trocar uma linha em `movimentoAgora()` (`src/apresentacao/movimento.ts`) e em `Aparencia.tsx`.
+
+## D-D9 — Tinta e noite: o dia "Tinta e marca-texto" e a noite "Noite de mandacaru" no lugar do Ponto de luz (19/10/2026, decisão do Gabriel)
+
+**Origem.** Na thread "Marca e identidade visual" (19/10/2026), a partir das pranchas da marca v2 (três mundos, em `redesenho/marca/v2/` nos arquivos do projeto), o Gabriel escolheu o **mundo 2, "Tinta e marca-texto", para o dia** e o **mundo 1, "Noite de mandacaru", para a noite** (18:04Z) e dispensou o mundo 3, "Azulejo", sem mais trabalho (18:19Z). Antes dissera qual final da escrita do nome queria (o B: a caneta volta sob o nome, deixa um traço de luz e vira o cacto; 17:41Z) e pedira a caneta inteira de vidro, ponta incluída, com o miolo de tinta à vista, e o cacto novo no cabeçalho no lugar do ponto (17:49Z e 17:52Z); às 17:54Z e 17:55Z, que "Você parou em" virasse "Retomar em" (com a hora de salvo) e que o "Em seguida" virasse um menu expansível com troca de atividade. Às 19:25Z autorizou a construção: "pode implementar os mundos quando resetar o uso diário". Contrato da direção, com os valores copiados das pranchas (o repositório não enxerga os arquivos do projeto): [`referencias/2026-10-19-tinta-e-noite/contrato.md`](referencias/2026-10-19-tinta-e-noite/contrato.md). Execução em fases (Q1 a Q8): [`../planos/tinta-e-noite.md`](../planos/tinta-e-noite.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio. **Substitui a D-D7 onde diverge (ver "Revogado") e emenda a D-D8 só nas cores.** O merge no `main` continua só do Gabriel; os PRs vão em rascunho para a `integracao`.
+
+**O tema escolhe o mundo.** O interruptor é o de sempre (Conta › Aparência: claro, escuro ou igual ao aparelho): o tema claro é o dia e o escuro é a noite. Os dois mundos diferem também na forma, então os tokens de forma (raios, sombra do botão, filete da folha, peso e fonte do título) existem nos três blocos de tema de `estilos.css`. Os papéis de cor mantêm os nomes; as paletas cruas ficam fixas em `:root` (a da noite com o prefixo `--n-`) e o papel novo `--luz` é a "luz do mundo", de que quase todo destaque é apelido.
+
+**Paleta** (substitui a da D-D7; contraste medido com `scripts/contraste.mjs`, nos dois temas).
+
+| Papel | Dia | Noite | Uso |
+|---|---|---|---|
+| Chão | papel `#F6F8FB` | noite `#0B1322` | fundo da página, cabeçalho, barra das áreas |
+| Folha | `#FFFFFF`, filete de 1 px `#DDE2EA` | serra `#131D31`, sem filete | folha do Agora, cartões, campos |
+| Texto | tinta `#0F1C3A` (15,8:1 no papel) | `#EEF2FA` (16,6:1 na noite) | texto, títulos |
+| Atenuado | `#4A5878` (6,7:1) | `#A4B1CB` (8,6:1) | texto atenuado |
+| Ação | tinta cheia, texto branco (16,8:1) | luz `#F2F6FF` cheia, texto `#0B1322` (17,2:1) | botão principal, foco, link, andamento |
+| Contorno de controle | `#6E7A96` (4,0:1) | `#5C6B8C` (3,5:1 na noite) | campo, botão secundário, "+" |
+| Ponto de luz | tinta, com halo de lima `#EEFA4B` | âmbar `#FFC53D` (11,8:1) | "onde parei": pontos do Dia, Estrela, ponta da caneta |
+
+**Forma.** Dia: botão e campo com raio 6, folha 8, chip 6, sombra baixa e dura de 2 px `#0A1428` no botão principal, filete de 1 px na folha, títulos em peso 800. Noite: raios 12, 14 e 10, nenhuma sombra e nenhum filete, títulos em peso 700.
+
+**Letras.** **Schibsted Grotesk** (800) nos títulos do dia e **Familjen Grotesk** (700) nos da noite, no lugar da Gabarito; Atkinson Hyperlegible Next na interface; Literata na lei. As duas dos títulos são variáveis (um arquivo cada), hospedadas em `src/apresentacao/fontes/` com o texto da licença OFL ao lado (nunca CDN); o `index.html` pré-carrega uma por `prefers-color-scheme`, então cada pessoa baixa só a do tema do aparelho.
+
+**Regras novas.**
+- **Uma ação por tela, sem cor de ação:** a ação é a luz do mundo (tinta de dia, luz à noite) cheia. "Um vidro por tela" vira "um botão principal por tela"; dois botões disputando a ação = um deles é secundário. O caminho (link) é a mesma luz, sublinhada.
+- **A lima é só halo.** Fica atrás do ponto de "onde parei" e na ponta da caneta; nunca é fundo de texto nem cor de texto (1,07:1 no papel). À noite o âmbar acende o ponto.
+- **A folha deixa de se separar do chão por contraste** (1,06:1 no dia e 1,10:1 na noite; na D-D7 eram 1,24 e 1,20). No dia a separação é o filete; na noite, o tom. "Cal é onde estou" acaba: a aba atual é texto em negrito com um traço de caneta embaixo (Q2); o lido no Leitor precisa de um sinal novo (Q3).
+- **Sombra:** só a sombra dura de 2 px do botão principal do dia. A sombra fresca da folha saiu.
+- **A marca** é o nome "arretado" escrito num traço só, em minúsculas, com o cacto simplificado ao lado (tronco e dois braços em L, o esquerdo mais alto), no lugar do "Arretado" em Gabarito com o cacto de vidro; na primeira abertura se escreve letra a letra e a caneta vira o cacto (final B; Q2 e Q6).
+- **A caneta** é toda de vidro, ponta incluída, com o miolo de tinta à vista; cores por variáveis `--pen-*` em cada mundo (Q4). Decorativa e no máximo uma por tela, como antes.
+- **Abas** com o traço de caneta persistente embaixo da atual. **Pontos do Dia** com a forma de cada mundo (aros de rabisco de dia, círculos de noite). **Dia fechado** com o quadro do cacto nos dois temas.
+- **Hoje:** "Retomar em" e "salvo hoje, 22h10" no lugar de "Você parou em" (só na linha do Hoje); "Em seguida" vira menu expansível com "Trocar" (só apresentação, nesta visita, sem gravar nada).
+
+**Mantido da D-D7, da D-D6 e da D-D5.** Rótulos Hoje · Trilha · Fixar · Biblioteca e "Em seguida"; abas do Fixar (Frases · Cartões · Histórico); campo "Para lembrar"; a luz só reporta estado; sem textura; matéria em neutro; destaques da lei sublinhados (nunca fundo); sem vermelho no estudo; sem sequência de dias; Calmo; ícones SVG de um só traço; "vencido" fora da linha principal; fontes e ícones hospedados no app; plataformas por largura (celular até 699 px, tablet de 700 a 899, desktop a partir de 900); tablet e desktop derivados do celular; alvo de 44 px, piso de 13 px e contraste AA. A D-D8 (quadro do cacto, traço de seleção, passagem do cartão, movimento em três modos) vale inteira.
+
+**Revogado da D-D7.** A paleta (areia, areia funda, cal, tinta `#17243a`, vidro, vidro-texto, luz teal, traço caramelo, noite `#0b1b33` e os `--noite-*`), a Gabarito, os raios de 16 e de 12, a sombra fresca da folha, "cal é onde estou" (a área e a aba atuais em cal), o botão de vidro e o "um vidro por tela", o "+" em cal, a marca "Arretado" em Gabarito com o cacto de vidro, a caneta de vidro verde (`--caneta-*`, provisória até a Q4), os ícones do app sobre a areia (provisórios até a Q4), "Você parou em" na linha do Hoje e o "Em seguida" sem botão.
+
+**Suposições abertas** (o Gabriel confirma a cada entrega; texto completo no plano): duas fontes de título em vez de uma; frequência da escrita do nome; o que "Trocar" faz sem regra de domínio; "Retomar em" só no Hoje (as outras ocorrências de "Você parou" vão numa lista para ele); "Amanhã você começa de onde parou" fica; telas sem prancha derivadas dos dois mundos; e o teto do pacote (425 kB de JS), que o SVG da escrita pode pedir para subir.
+
+**Construção em fases**, cada uma num PR de rascunho para a `integracao` ([`../planos/tinta-e-noite.md`](../planos/tinta-e-noite.md)): Q1 fundação (docs, tokens, fontes, contraste, barra e manifest) → Q2 casca e Q4 caneta de vidro → Q3 controles e folha e Q6 escrita do nome → Q5 Hoje e Q7 varredura das telas sem prancha → Q8 fecho. `DESIGN.md` e `sistema-visual.md` descrevem a D-D7 até a Q8 os reescrever (levam uma faixa de "superado" desde a Q1); até lá o contrato manda. A seção "Visual vigente" da skill `arretado-design-principles` (caminho protegido) fica falsa desde a Q1 e só é reescrita na Q8, em PR próprio com o rótulo `aprovado-gabriel`. Os registros D-D2 a D-D8 acima ficam como histórico.
