@@ -25,7 +25,11 @@ export function Atual() {
     return (
       <Vazio
         titulo="Nenhuma Sessão aberta"
-        acao={<Link to="/sessao/iniciar">Começar uma Sessão</Link>}
+        acao={
+          <Link to="/sessao/iniciar" className="botao principal">
+            Começar uma Sessão
+          </Link>
+        }
       >
         <p>Quando quiser estudar, comece uma Sessão em um toque.</p>
       </Vazio>

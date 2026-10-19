@@ -26,7 +26,7 @@ export function FaixaDaSessao() {
       <button type="button" className="botao-texto faixa-sessao__acao" onClick={alternar}>
         {pausada ? 'Voltar' : 'Pausar'}
       </button>
-      <Link to="/sessao/fechar" className="botao-texto faixa-sessao__acao">
+      <Link to="/sessao/fechar" className="botao botao-texto faixa-sessao__acao">
         Encerrar
       </Link>
       {falha && (

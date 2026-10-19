@@ -1172,6 +1172,11 @@ legend {
   box-shadow: var(--sombra);
 }
 
+/* O título abre o cartão: a margem de cima dele somada ao recuo do cartão deixava um vazio de 45 px. */
+.cartao-bloco > h2:first-child {
+  margin-top: 0;
+}
+
 .linha-acoes {
   display: flex;
   flex-wrap: wrap;
