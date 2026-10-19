@@ -3,3 +3,4 @@ export * from './gerar';
 export * from './pesos';
 export * from './posicao';
 export * from './servico';
+export * from './modelos';
