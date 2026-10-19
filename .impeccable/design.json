@@ -88,9 +88,19 @@
         "purpose": "Um ponto do Dia acende uma vez (escala .6 a 1)."
       },
       {
-        "name": "traco-do-cachorro",
-        "value": "300ms linear (stroke-dashoffset)",
-        "purpose": "O cachorro se desenha uma vez ao fechar o Dia."
+        "name": "quadro-do-cacto",
+        "value": "520 a 1100ms por fio, curva senoidal (stroke-dashoffset)",
+        "purpose": "A caneta desenha a parte de hoje do quadro do cacto uma vez, ao fechar o Dia; com movimento reduzido, pronto."
+      },
+      {
+        "name": "traco-de-selecao",
+        "value": "240ms + 120ms + 260ms, cubic-bezier(.2, .7, .2, 1) (Calmo: 380ms de opacidade)",
+        "purpose": "Linha fina em volta do item escolhido; com movimento reduzido, nenhum."
+      },
+      {
+        "name": "passagem-do-cartao",
+        "value": "190ms de saída e 210ms de entrada, cubic-bezier(.2, .7, .2, 1) (Calmo: 150 e 170ms de opacidade)",
+        "purpose": "O cartão respondido sai e o seguinte entra; com movimento reduzido, troca na hora."
       }
     ],
     "breakpoints": [

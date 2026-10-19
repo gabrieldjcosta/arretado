@@ -1,6 +1,6 @@
 # Sistema visual do Arretado — v4 (Ponto de luz)
 
-> **D-D7 (18/10/2026) — Ponto de luz.** Direção escolhida pelo Gabriel nas rodadas de 18/10/2026 e autorizada para construção no app no mesmo dia ([`decisoes-design.md`](decisoes-design.md), D-D7; contrato em [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md)). Mapa da troca: Creme → **Areia** `#f1e6d3` (chão liso, sem pontinhos) · Marinho (texto, título) → **Tinta** `#17243a` · Marinho (bloco-herói, item atual) → **Cal** `#ffffff` com a sombra fresca · Sol (ação) → **Vidro** `#0f7f72` com texto branco · Verde-foco ("salvo", progresso) → **Vidro** e **Vidro texto** `#0a6157` · Azul-céu e Argila → saem (tipo e matéria em texto, em neutro) · Playfair Display → **Gabarito**. Novos: **Luz** `#6fe3d6` (pontos do Dia, Estrela, ponta da caneta) e **Traço** `#c8742f` (só o cachorro). Regras que não mudam: piso de 13 px, alvo de 44 px, lei sem itálico, destaque sublinhado, uma ação por tela, sem vermelho no estudo.
+> **D-D7 (18/10/2026) — Ponto de luz.** Direção escolhida pelo Gabriel nas rodadas de 18/10/2026 e autorizada para construção no app no mesmo dia ([`decisoes-design.md`](decisoes-design.md), D-D7; contrato em [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md)). Mapa da troca: Creme → **Areia** `#f1e6d3` (chão liso, sem pontinhos) · Marinho (texto, título) → **Tinta** `#17243a` · Marinho (bloco-herói, item atual) → **Cal** `#ffffff` com a sombra fresca · Sol (ação) → **Vidro** `#0f7f72` com texto branco · Verde-foco ("salvo", progresso) → **Vidro** e **Vidro texto** `#0a6157` · Azul-céu e Argila → saem (tipo e matéria em texto, em neutro) · Playfair Display → **Gabarito**. Novos: **Luz** `#6fe3d6` (pontos do Dia, Estrela, ponta da caneta) e **Traço** `#c8742f` (só o sol e o miolo das flores do quadro do cacto). Regras que não mudam: piso de 13 px, alvo de 44 px, lei sem itálico, destaque sublinhado, uma ação por tela, sem vermelho no estudo.
 
 Base: as decisões D-D1 a D-D6 em [`decisoes-design.md`](decisoes-design.md), que ficam como histórico onde a D-D7 diverge. Execução em fases: [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md) (P1 fundação, P2 casca, P3 Hoje, P4 Leitor, P5 Fixar, P6 demais telas, P7 plataformas). Resumo no formato do Stitch: [`../../DESIGN.md`](../../DESIGN.md). Só apresentação (D-D1).
 
@@ -29,7 +29,7 @@ Base: as decisões D-D1 a D-D6 em [`decisoes-design.md`](decisoes-design.md), qu
 | Realce de termo | "Que tipo de termo é este?" | `--destaque-*` (sublinhado, ver Leitor) | os mesmos, mais claros |
 | Perigo | "Isto apaga" ou falha técnica | `--perigo` | `--perigo` |
 
-Regras: vidro só em botão primário, cacto da marca e andamento (o "+" é cal com tinta); a luz nunca é texto, nunca pulsa, nunca segue o dedo e sempre tem o contorno na tinta; vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada; caramelo é só do traço do cachorro. O **tipo da tarefa** (Leitura, Cartões, Frases) vai em texto, com o ponto de luz dizendo o estado; a matéria vai sempre em texto, em neutro.
+Regras: vidro só em botão primário, cacto da marca e andamento (o "+" é cal com tinta); a luz nunca é texto, nunca pulsa, nunca segue o dedo e sempre tem o contorno na tinta; vermelho nunca no estudo; amarelo, verde e rosa são dos grifos do leitor e de mais nada; caramelo é só do sol e do miolo das flores do quadro do cacto. O **tipo da tarefa** (Leitura, Cartões, Frases) vai em texto, com o ponto de luz dizendo o estado; a matéria vai sempre em texto, em neutro.
 
 ## Tokens
 
@@ -68,7 +68,8 @@ Saíram com a D-D7 (o teste de contraste falha se algum CSS voltar a usá-los): 
 | `--sucesso` | `#0a6157` · `#7df3e1` | texto de "salvo" | 5,9:1 · 13:1 |
 | `--ponto-luz` / `--ponto-contorno` / `--ponto-nucleo` | Luz `#6fe3d6` / Tinta / branco · `#7df3e1` / `#eef3f8` / branco | pontos do Dia, ponta da caneta | contorno 12,6:1 na areia · 15,4:1 na noite |
 | `--estrela` / `--estrela-luz` / `--estrela-contorno` | Vidro / Luz / Tinta · `#7df3e1` / `#7df3e1` / `#eef3f8` | faixa da calha / miolo / contorno da Estrela | faixa 3,9:1 na areia; contorno 12,6:1 |
-| `--traco-cachorro` | `#c8742f` · `#ffb46b` | só o traço do cachorro (decorativo) | — |
+| `--caramelo` | `#c8742f` · `#ffb46b` | só o sol e o miolo das flores do quadro do cacto (decorativo) | 3:1 na cal |
+| `--fio-selecao` | Tinta · `#7df3e1` | o traço de seleção em volta do item escolhido | 3:1 nos dois |
 | `--bloco-fundo` | Cal · `#142a4a` | folha do Agora | — |
 | `--bloco-texto` / `--bloco-atenuado` | Tinta / `#4f5b70` · `#eef3f8` / `#a9b7cc` | texto na folha | 15,6:1 e 6,9:1 · 12,9:1 e 7,1:1 |
 | `--bloco-acao` / `--bloco-acao-texto` | Vidro / branco · `#7df3e1` / `#0b1b33` | botão primário **na folha** | 4,9:1 · 13:1 |
@@ -142,7 +143,7 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 | **Linha de parada** (P3, `.parada`) | "Você parou em LEP, art. 112, § 2º": 15 px em `--texto-atenuado`, a norma e o Dispositivo em negrito `--texto`; a hora em 13 px numa linha própria ("hoje, 22h10", "ontem, 22h10", "dia 12/10, 22h10"). Com a caneta (`.com-caneta`): linha flex, texto à esquerda com 24 px de respiro embaixo, caneta de pé de 76 × 104 à direita (margem direita de −10), e a linha sobe 16 px sobre a folha (`z-index` 2). Sem a caneta (Dia fechado), só o texto. |
 | **Pontos do Dia** (P3, `PontosDoDia`, `PontoDeLuz`) | Leitura, Cartões e Frases; cada um com um ponto de 22 px: apagado (anel em `--ponto-apagado`, a tinta a 55%: 3,4:1 na areia e 5,4:1 na noite; a 45% do protótipo eram 2,6:1, abaixo dos 3:1 que um contorno pede), aceso pela metade (atual: metade direita em `--ponto-luz`, anel e núcleo), aceso (feito: círculo `--ponto-luz`, anel `--ponto-contorno` e núcleo `--ponto-nucleo`). Rótulo em 13 px peso 600, atenuado; o atual em `--texto`; o estado também em texto, só para o leitor de tela (`.visualmente-oculto`: "Leitura, feito hoje"). Acende uma vez em 160 ms (escala de 0,6 a 1 e opacidade), na visita ao Hoje em que o ponto ficou aceso (feito) e na anterior, no mesmo dia, ainda não estava (`arretado.pontos-vistos` em `localStorage`); a vez (pela metade) aparece sem animação, e a primeira visita do dia abre quieta. |
 | **Em seguida** (P3, `Depois`) | Rótulo em 13 px, 700, caixa-alta com 0,06 em de espaço entre letras, `--texto-atenuado`; até 2 itens de 44 de altura, nome em peso 600 e tempo ("cerca de 6 min") em 13 px, 400, atenuado; sobre a areia, sem botão. |
-| **Resumo do Dia** (P3, `FecharDia`) | `.cartao-bloco`: título, linhas do que houve, próximo passo e um botão secundário ("Fechar o Dia" ou "Reabrir o Dia"). Fechado: o cachorro (112 × 94) e, absoluta a 54 px da esquerda e 36 de cima, a caneta deitada (120 × 67) com a ponta no lenço; "Bom descanso. Amanhã você começa de onde parou." |
+| **Resumo do Dia** (P3, `FecharDia`) | `.cartao-bloco`: título, linhas do que houve, próximo passo e um botão secundário ("Fechar o Dia" ou "Reabrir o Dia"). Fechado: o quadro do cacto (até 30 rem de largura, proporção 340 × 200, borda de 1 px, raio 12) com a caneta largada no canto de baixo e a legenda do que ela desenhou hoje; "Bom descanso. Amanhã você começa de onde parou." |
 | **Abas do Fixar** (P5, `RecallInicio`) | Frases · Cartões · Histórico no trilho `.abas`; `/recall` redireciona para `/recall/frases`. "Erros" deixou de ser aba: a lista com filtros é a página `/recall/erros` (`ErrosComFiltros`: título, "Voltar às frases" e a lista), a que se chega por "Ver os erros, com filtros" no fim das Frases (e também quando não há Frase nenhuma); o detalhe do Erro volta a ela ("Voltar aos erros"). |
 | **Linha de frase** (P5, `ListaFrases`) | Texto em Literata (`.texto-leitura`) que abre o erro de origem e, à direita, "Esconder trecho" como `.botao-texto` de 44 px (`aria-label` com a frase); o botão se recua 12 px para o texto ficar na margem. |
 | **Estado por palavra e desenho** (P5, `Icone`, `.estado-texto`) | SVG de traço único em `currentColor` (18 px, traço de 2, pontas redondas), `aria-hidden`, antes da palavra em `--texto`; nunca vermelho, nunca glifo Unicode. Nomes: `errei` (xis), `inseguro` (interrogação), `relogio` (relógio), `deNovo` (setas), `dificil` (onda) e `facil` (marca). "Para revisar" (o prazo chegou) no lugar de "Vencido": não afirma que o cartão é da rodada de hoje, que respeita a cota. |
@@ -159,12 +160,12 @@ Itálico nunca no trecho da lei. Em celular, campos com no mínimo 16 px (o iOS 
 | **Rodapé** | Linha legal curta e "Backup e dados" como botão de texto de 44 px, centralizados no fim do conteúdo, acima da reserva das abas; nunca sob a navegação fixa. |
 | **Diálogo** | `dialog` nativo, raio 16, `--superficie`, fundo `rgb(0 0 0 / 45%)`, `--sombra-flutuante`; no celular, folha presa à borda de baixo. |
 
-### A caneta e o cachorro (P3 em diante)
+### A caneta e o quadro do cacto (P3 em diante)
 
 | Peça | Especificação |
 |---|---|
-| **Caneta** | Coluna de vidro com dois braços, do ciano ao verde (`#dffcff`, `#9af0dc`, `#5fcf8f`, `#2b8f5e`, `#17422f`), brilho de borda, três pontos de luz nas pontas dos membros e a ponta cônica escura com o ponto de luz; versões de dia e de noite (halo maior só na ponta, à noite). SVG inline (`Caneta`): uma caneta de pé com a ponta em (32, 200), girada em torno dela, gradiente em `userSpaceOnUse` (id por `useId`), cores nos tokens `--caneta-0` a `--caneta-4`, `--caneta-miolo`, `--caneta-borda`, `--caneta-brilho` e os dois halos da ponta (`--caneta-halo-dia`, `--caneta-halo-noite`, opacidades que o tema troca); nenhuma cor literal no componente. Poses: encostada a 35° (viewBox 150 × 205; Hoje, Cartão atual), deitada a 65° (viewBox 190 × 106; Lido até aqui, fim de rodada do Fixar, em repouso, e, largada ao fim do traço do cachorro, Resumo do Dia). Decorativa (`aria-hidden`); uma por tela. |
-| **Cachorro** | Um traço (`TRACO_CACHORRO`) em `--traco-cachorro`, 3,6 px, pontas redondas; olho e focinho como pontos; lenço em V. Desenha-se uma vez em 300 ms (`stroke-dashoffset`, linear), olho e nariz no fim, só no instante em que o Dia é fechado (aberto já fechado, aparece pronto); com `prefers-reduced-motion`, pronto. Só no Resumo do Dia. |
+| **Caneta** | Coluna de vidro com dois braços, do ciano ao verde (`#dffcff`, `#9af0dc`, `#5fcf8f`, `#2b8f5e`, `#17422f`), brilho de borda, três pontos de luz nas pontas dos membros e a ponta cônica escura com o ponto de luz; versões de dia e de noite (halo maior só na ponta, à noite). SVG inline (`Caneta`): uma caneta de pé com a ponta em (32, 200), girada em torno dela, gradiente em `userSpaceOnUse` (id por `useId`), cores nos tokens `--caneta-0` a `--caneta-4`, `--caneta-miolo`, `--caneta-borda`, `--caneta-brilho` e os dois halos da ponta (`--caneta-halo-dia`, `--caneta-halo-noite`, opacidades que o tema troca); nenhuma cor literal no componente. Poses: encostada a 35° (viewBox 150 × 205; Hoje, Cartão atual), deitada a 65° (viewBox 190 × 106; Lido até aqui e, em repouso, o fim de rodada do Fixar). No quadro do cacto (Resumo do Dia) a mesma caneta deitada está largada no canto e anda sobre o traço de hoje (`CanetaDesenho`, o mesmo desenho dentro do `<svg>` do quadro). Decorativa (`aria-hidden`); uma por tela. |
+| **Quadro do cacto** | 16 partes de traço (`componentes/quadro/cena.ts`, viewBox 340 × 200), uma por Dia fechado: a parte de número ((N − 1) mod 16) + 1. Cada fio é um `<path>` com `stroke-dasharray`/`stroke-dashoffset` por subtraço (`M`), de 520 a 1100 ms conforme o comprimento, com a curva senoidal `suave`; a caneta anda no ponto (`getPointAtLength`) e volta ao repouso; a aguada (`lavis`) aparece na segunda metade do fio e o miolo das flores brota em 180 ms. Só no instante em que o Dia é fechado (aberto já fechado, o quadro aparece pronto); com `prefers-reduced-motion`, pronto. Cena `aria-hidden`; legenda `role=status` dita ao terminar. |
 
 ### Vidro é objeto, nunca superfície
 
@@ -224,7 +225,7 @@ Fonte da especificação de comportamento: [`referencias/2026-10-14-gemini/espec
 
 O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Leitor.
 
-**Sessão (P6).** Interruptor "Modo Só Estudo" em vidro; chips de tempo que só informam (ativo em tinta cheia, inativo `--quente`); a tarefa ativa numa folha de cal com o botão de vidro; o estacionamento em `--quente`; o fechamento com o resumo em texto e um botão de vidro. Sem o mascote antigo (o cachorro em um traço só fica para o Resumo do Dia).
+**Sessão (P6).** Interruptor "Modo Só Estudo" em vidro; chips de tempo que só informam (ativo em tinta cheia, inativo `--quente`); a tarefa ativa numa folha de cal com o botão de vidro; o estacionamento em `--quente`; o fechamento com o resumo em texto e um botão de vidro. Sem o mascote antigo; o Resumo do Dia tem o quadro do cacto.
 
 ## Movimento
 
@@ -234,11 +235,13 @@ O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Le
 | Ponto do Dia acendendo | 160 ms, `cubic-bezier(.2, .7, .2, 1)`, escala 0,6 a 1 e opacidade 0 a 1, uma vez |
 | Folha subindo, aba trocando | 180 a 220 ms, `cubic-bezier(.2, .7, .2, 1)` |
 | Caneta | muda de lugar por salto; nunca gira nem desliza |
-| Traço do cachorro | 300 ms linear (`stroke-dashoffset`), uma vez, ao fechar o Dia |
+| Quadro do cacto | de 520 a 1100 ms por fio (a parte inteira leva de 1,3 a 2,5 s, medido no Chromium), uma vez, ao fechar o Dia; só aqui a caneta anda |
+| Traço de seleção | normal: 240 ms desenhando, 120 ms parado, 260 ms sumindo; Calmo: contorno inteiro que esmaece em 380 ms; reduzido: nada |
+| Passagem do cartão | normal: sai 190 ms (28 px à esquerda) e entra 210 ms (de 12 px à direita, dentro da calha da tela) com pausa de 150 ms; Calmo: só opacidade, 150 e 170 ms, pausa de 140 ms; reduzido: troca na hora |
 | Entre rotas (F10) | View Transitions, fade de até 150 ms; **nunca** anima texto da lei nem remonta o Leitor; desligada com `prefers-reduced-motion` e no perfil Calmo |
 | Carregando | `Esqueleto` com atraso de 150 ms; operações longas no padrão "andamento" (ver [`../planos/transicoes-e-carregamento.md`](../planos/transicoes-e-carregamento.md)) |
 
-Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro desfocado atrás de texto, luz que acompanha o dedo, ciclo de dia e noite, confete, som. Com `prefers-reduced-motion`, os pontos aparecem acesos e o cachorro pronto; ordem, conteúdo e ação não mudam.
+Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro desfocado atrás de texto, luz que acompanha o dedo, ciclo de dia e noite, confete, som. Com `prefers-reduced-motion`, os pontos aparecem acesos e o quadro do cacto pronto; o traço de seleção não é desenhado e o cartão troca na hora; ordem, conteúdo e ação não mudam.
 
 ## Acessibilidade e robustez
 
@@ -248,13 +251,13 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 - Texto quebra qualquer palavra longa (`overflow-wrap: anywhere` no conteúdo) e nenhuma tela rola na horizontal a 320 px nem a 200% de zoom.
 - Transparência e movimento têm saída (`prefers-reduced-transparency`, `prefers-reduced-motion`, `forced-colors`).
 - Cor nunca sozinha: tipo de tarefa, destaque, andamento, área atual, erro e "salvo" têm texto, ícone, peso ou estilo de linha.
-- Caneta, pontos de luz decorativos e o cachorro: `aria-hidden`; o estado de cada ponto do Dia vem em texto acessível.
+- Caneta, pontos de luz decorativos e o quadro do cacto: `aria-hidden` (a legenda do quadro é `role="status"`); o estado de cada ponto do Dia vem em texto acessível.
 
 ## Marca e mascote
 
 - **Nome:** "Arretado" em Gabarito 700 (`--fonte-titulo`), com o pequeno cacto em vidro (`--cacto`) ao lado, na altura da caixa-alta. Sem martelo, balança nem outros clichês jurídicos.
 - **A caneta-cacto de vidro** é o objeto da marca no app: ponteiro da retomada nas três poses; no app de loja, ícone sobre a areia (P7).
-- **Mascote:** o cachorro em um traço só, caramelo pela cor, só no Resumo do Dia. O mascote antigo saiu do app na P2 (pedido do Gabriel, 18/10/2026); os desenhos ficam só como histórico em `docs/design/mascote/`.
+- **Mascote:** nenhum. O cachorro do Resumo do Dia saiu em 19/10/2026 (o Gabriel não gostou) e o mascote antigo saiu na P2 (18/10/2026); no lugar, a caneta desenha o quadro do cacto a cada Dia fechado. Os desenhos ficam só como histórico em `docs/design/mascote/`.
 
 ## Mapa do código
 

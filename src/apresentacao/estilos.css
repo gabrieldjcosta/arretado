@@ -107,7 +107,10 @@
   --estrela-luz: var(--ponto-luz);
   --estrela-contorno: var(--ponto-contorno);
   --calha-estrela: 1.5rem;
-  --traco-cachorro: var(--traco);
+  --caramelo: var(--traco);
+  /* O traço de seleção ("A caneta que desenha"): a linha que se desenha em volta do que acabou de ser
+     escolhido, na tinta; à noite, na luz. Sem brilho: a ponta é o ponto de luz, com contorno. */
+  --fio-selecao: var(--tinta);
   /* O anel do ponto do Dia que ainda não foi feito: a tinta a 55%, 3,4:1 na areia (a 45% do
      protótipo seriam 2,6:1, abaixo dos 3:1 que um contorno pede). */
   --ponto-apagado: rgb(23 36 58 / 55%);
@@ -222,7 +225,8 @@
     --ponto-luz: var(--noite-vidro);
     --ponto-contorno: var(--noite-tinta);
     --estrela: var(--noite-vidro);
-    --traco-cachorro: var(--noite-traco);
+    --caramelo: var(--noite-traco);
+    --fio-selecao: var(--noite-vidro);
     --ponto-apagado: rgb(238 243 248 / 55%);
     --caneta-0: #bdf3ff;
     --caneta-1: #7fe3cf;
@@ -298,7 +302,8 @@
   --ponto-luz: var(--noite-vidro);
   --ponto-contorno: var(--noite-tinta);
   --estrela: var(--noite-vidro);
-  --traco-cachorro: var(--noite-traco);
+  --caramelo: var(--noite-traco);
+  --fio-selecao: var(--noite-vidro);
   --ponto-apagado: rgb(238 243 248 / 55%);
   --caneta-0: #bdf3ff;
   --caneta-1: #7fe3cf;

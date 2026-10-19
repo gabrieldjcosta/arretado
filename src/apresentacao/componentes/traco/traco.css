@@ -1,0 +1,33 @@
+/* O traço de seleção (D-D7, "A caneta que desenha"): a linha que se desenha em volta do item recém
+   escolhido. Só tokens: a tinta de dia, a luz à noite, e a ponta é o ponto de luz com o contorno. */
+
+/* O traço é filho do item e se posiciona sobre ele. */
+.areas a,
+.abas a,
+.respostas button {
+  position: relative;
+}
+
+/* Parado, não existe: o <svg> só aparece (`data-ativo`) enquanto o traço se desenha. */
+.traco-sel {
+  display: none;
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.traco-sel[data-ativo] {
+  display: block;
+}
+
+.traco-sel rect {
+  fill: none;
+  stroke: var(--fio-selecao);
+  stroke-width: 1.6;
+}
+
+.traco-sel circle {
+  fill: var(--ponto-luz);
+  stroke: var(--ponto-contorno);
+  stroke-width: 1.2;
+}

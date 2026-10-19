@@ -2,9 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { AcaoAgora } from './AcaoAgora';
-import { Caneta } from './Caneta';
+import { Caneta, CanetaDefs, CanetaDesenho } from './Caneta';
 import { PontoDeLuz } from './PontoDeLuz';
-import { TracoDoCachorro } from './TracoDoCachorro';
 
 describe('PontoDeLuz (D-D7, P3)', () => {
   it('aceso: círculo cheio com o contorno e o núcleo', () => {
@@ -80,20 +79,22 @@ describe('Caneta (D-D7, P3)', () => {
   });
 });
 
-describe('TracoDoCachorro (D-D7, P3)', () => {
-  it('um traço só, com o olho e o focinho como pontos', () => {
-    const { container } = render(<TracoDoCachorro />);
-    const cachorro = container.querySelector('svg');
-    expect(cachorro).toHaveAttribute('aria-hidden', 'true');
-    expect(cachorro).not.toHaveClass('desenha');
-    expect(container.querySelectorAll('path.traco-linha')).toHaveLength(1);
-    expect(container.querySelector('path.traco-linha')).toHaveAttribute('pathLength', '100');
-    expect(container.querySelectorAll('circle.traco-ponto')).toHaveLength(2);
-  });
-
-  it('com `desenha`, se desenha; a classe de fora é mantida', () => {
-    const { container } = render(<TracoDoCachorro desenha className="fora" />);
-    expect(container.querySelector('svg')).toHaveClass('traco-do-cachorro', 'desenha', 'fora');
+describe('CanetaDefs e CanetaDesenho (A caneta que desenha)', () => {
+  it('desenham a mesma caneta por dentro de outro svg, com ids próprios', () => {
+    const { container } = render(
+      <svg>
+        <CanetaDefs id="quadro" />
+        <g data-pose="deitada">
+          <CanetaDesenho id="quadro" />
+        </g>
+      </svg>,
+    );
+    expect(container.querySelector('#quadro-vidro')).not.toBeNull();
+    expect(container.querySelector('#quadro-halo-dia')).not.toBeNull();
+    expect(container.querySelector('#quadro-halo-noite')).not.toBeNull();
+    expect(container.querySelector('path[fill="url(#quadro-vidro)"]')).not.toBeNull();
+    expect(container.querySelector('circle[filter="url(#quadro-halo-noite)"]')).not.toBeNull();
+    expect(container.querySelectorAll('.caneta-ponto')).toHaveLength(4);
   });
 });
 

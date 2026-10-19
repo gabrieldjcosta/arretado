@@ -12,6 +12,9 @@ import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { usePassagemDeCartao } from '../componentes/passagem';
+import { marcarEscolha } from '../componentes/traco/escolha';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
@@ -35,16 +38,20 @@ const RESPOSTAS = [
 
 /**
  * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Fácil" espaça a próxima
- * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências).
+ * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências). Ao
+ * responder, a resposta ganha o traço de seleção e a frase passa para a seguinte.
  */
 export function RevisarFrases() {
   const texto = useVoz();
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
   const [ocupado, setOcupado] = useState(false);
+  /** A resposta tocada, enquanto a frase passa: é a que ganha o traço de seleção. */
+  const [escolhida, setEscolhida] = useState<RespostaFrase | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   const inicio = useRef(0);
   const cota = useRef(0);
+  const { cartao: cartaoDaFrase, passar } = usePassagemDeCartao();
 
   const terminar = useCallback(async () => {
     try {
@@ -98,19 +105,30 @@ export function RevisarFrases() {
       if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      // Pelo clique ou pela tecla (1, 2), a resposta ganha o traço de seleção.
+      marcarEscolha(`frase:${resposta}`);
+      setEscolhida(resposta);
       try {
-        await revisarFrase(repo, atual.id, resposta, {
+        const gravada = revisarFrase(repo, atual.id, resposta, {
           duracaoMs: performance.now() - inicio.current,
         });
-        if (estado.indice + 1 >= estado.fila.length) await terminar();
-        else setEstado({ ...estado, indice: estado.indice + 1 });
+        if (estado.indice + 1 >= estado.fila.length) {
+          // A última frase não passa: o fim da rodada toma a tela.
+          await gravada;
+          await terminar();
+        } else {
+          await passar(gravada, () => {
+            setEstado({ ...estado, indice: estado.indice + 1 });
+          });
+        }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
       } finally {
         setOcupado(false);
+        setEscolhida(null);
       }
     },
-    [atual, estado, ocupado, repo, terminar],
+    [atual, estado, ocupado, passar, repo, terminar],
   );
 
   // Atalhos: 1 = Fácil, 2 = De novo.
@@ -206,7 +224,7 @@ export function RevisarFrases() {
         max={estado.fila.length}
         rotulo="Frase"
       />
-      <article className="cartao-bloco cartao-drill" aria-label="Frase">
+      <article ref={cartaoDaFrase} className="cartao-bloco cartao-drill" aria-label="Frase">
         <p className="drill-frente texto-leitura">{atual.texto}</p>
       </article>
       {falha && (
@@ -226,6 +244,7 @@ export function RevisarFrases() {
           >
             <Icone nome={r.icone} />
             {r.rotulo}
+            <TracoDeSelecao chave={`frase:${r.resposta}`} ativo={escolhida === r.resposta} />
           </button>
         ))}
       </div>

@@ -1,11 +1,11 @@
-// Fechar o Dia (pacote A3b; D-D7, P3): resumo do que aconteceu, sem meta nem nota, e um gesto de
-// encerrar. Fechado, o Resumo do Dia mostra o cachorro num traço só e a caneta largada ao fim dele.
-// Só aparece quando houve algo hoje (ou o Dia já foi fechado, para poder reabrir).
+// Fechar o Dia (pacote A3b; D-D7, P3 e "A caneta que desenha"): resumo do que aconteceu, sem meta nem
+// nota, e um gesto de encerrar. Fechado, o Resumo do Dia mostra o quadro do cacto, onde a caneta
+// desenha a parte de hoje. Só aparece quando houve algo hoje (ou o Dia já foi fechado, para poder
+// reabrir).
 import { useCallback, useState } from 'react';
 import type { Repositorio } from '../../core/persistencia';
 import { fecharDia, reabrirDia, resumoDoDia } from '../../dominios/dia/fechar';
-import { Caneta } from '../componentes/Caneta';
-import { TracoDoCachorro } from '../componentes/TracoDoCachorro';
+import { QuadroDoCacto } from '../componentes/quadro/QuadroDoCacto';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useVoz } from '../voz';
 import './estilos-dia.css';
@@ -17,7 +17,7 @@ export function FecharDia() {
   const repo = useRepositorio();
   const [versao, setVersao] = useState(0);
   const [falhou, setFalhou] = useState(false);
-  /** O traço do cachorro só se desenha na hora em que a pessoa fecha o Dia; já fechado, ele aparece pronto. */
+  /** A parte de hoje só se desenha na hora em que a pessoa fecha o Dia; já fechado, o quadro aparece pronto. */
   const [desenha, setDesenha] = useState(false);
   const carregar = useCallback(
     (r: Repositorio) => resumoDoDia(r).then((x) => ({ x, versao })),
@@ -36,11 +36,11 @@ export function FecharDia() {
       : '',
     r.frasesRevisadas > 0 ? plural(r.frasesRevisadas, 'Frase revisada', 'Frases revisadas') : '',
   ].filter(Boolean);
-  const mudar = (acao: (rep: Repositorio) => Promise<unknown>, aoConcluir: () => void) => {
+  const mudar = (acao: (rep: Repositorio) => Promise<unknown>, aoConcluir?: () => void) => {
     setFalhou(false);
     acao(repo).then(
       () => {
-        aoConcluir();
+        aoConcluir?.();
         setVersao((v) => v + 1);
       },
       () => {
@@ -61,10 +61,7 @@ export function FecharDia() {
         <>
           <h2 className="fechar-dia-titulo">{texto('diaFechado')}</h2>
           {lista}
-          <div className="fechar-dia-pouso">
-            <TracoDoCachorro desenha={desenha} />
-            <Caneta pose="deitada" className="pouso-caneta" />
-          </div>
+          <QuadroDoCacto dias={r.diasFechados} desenha={desenha} />
           <p className="fechar-dia-texto">Bom descanso. Amanhã você começa de onde parou.</p>
           {r.proximoPasso && (
             <p className="fechar-dia-passo">
@@ -74,9 +71,7 @@ export function FecharDia() {
           <button
             type="button"
             onClick={() => {
-              mudar(reabrirDia, () => {
-                setDesenha(false);
-              });
+              mudar(reabrirDia);
             }}
           >
             Reabrir o Dia
