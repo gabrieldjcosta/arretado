@@ -5,6 +5,7 @@ import {
   type Repositorio,
 } from '../../core/persistencia';
 import { contasHabilitadas } from '../../integracoes/conta';
+import { registrarAceitePendente } from '../conta/entrar/aceite';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
 
@@ -20,9 +21,12 @@ const abrirPadrao = () => abrirRepositorioAtivo({ contasHabilitadas: contasHabil
 /** Abre o banco local uma vez e o oferece às telas. */
 export function ProvedorRepositorio({
   abrir = abrirPadrao,
+  registro,
   children,
 }: {
   abrir?: () => Promise<Repositorio>;
+  /** Só para testes: o registro de contas onde está a conta ativa. */
+  registro?: Parameters<typeof registrarAceitePendente>[1];
   children: ReactNode;
 }) {
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
@@ -37,6 +41,10 @@ export function ProvedorRepositorio({
           setEstado({ tipo: 'fechadoPorOutraAba', motivo });
         });
         setEstado({ tipo: 'pronto', repo });
+        // O aceite do login vira Usuario.consentimentos assim que o banco da conta abre, sem esperar
+        // a pessoa abrir Conta. Idempotente; se falhar, a marca fica e a abertura segue.
+        if (contasHabilitadas())
+          void registrarAceitePendente(repo, registro).catch(() => undefined);
       },
       (excecao: unknown) => {
         if (ativo) setEstado({ tipo: 'falha', excecao });
@@ -46,7 +54,7 @@ export function ProvedorRepositorio({
       ativo = false;
       desinscrever();
     };
-  }, [abrir]);
+  }, [abrir, registro]);
 
   if (estado.tipo === 'carregando') {
     return (

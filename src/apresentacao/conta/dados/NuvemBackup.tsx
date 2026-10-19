@@ -11,6 +11,11 @@ import {
   listarCopiasNaNuvem,
   MANTER_NA_NUVEM,
 } from '../../../integracoes/conta/backup-nuvem';
+import {
+  exigirConsentimento,
+  registrarConsentimento,
+  temConsentimento,
+} from '../../../core/preferencias';
 import { useRepositorio } from '../../dados/contexto';
 import { useServicoDeConta } from '../entrar/ContextoConta';
 import { NuvemBackupRestaurar } from './NuvemBackupRestaurar';
@@ -51,6 +56,9 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: 'ok' | 'falha'; texto: string } | null>(null);
   const [restaurando, setRestaurando] = useState<string | null>(null);
+  // null = ainda lendo; true = já aceitou a política v3 para a cópia na nuvem; false = precisa pedir.
+  const [aceitoAntes, setAceitoAntes] = useState<boolean | null>(null);
+  const [marcouAceite, setMarcouAceite] = useState(false);
 
   const carregar = useCallback(async () => {
     setLista({ tipo: 'carregando' });
@@ -73,6 +81,21 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
 
   useEffect(() => {
     const vivo = { ativo: true };
+    void temConsentimento(repo, 'backup-nuvem').then(
+      (sim) => {
+        if (vivo.ativo) setAceitoAntes(sim);
+      },
+      () => {
+        if (vivo.ativo) setAceitoAntes(false);
+      },
+    );
+    return () => {
+      vivo.ativo = false;
+    };
+  }, [repo]);
+
+  useEffect(() => {
+    const vivo = { ativo: true };
     void servico.sessao().then((s) => {
       if (!vivo.ativo) return;
       setSessao(s);
@@ -86,17 +109,25 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
   // Só a conta ativa neste aparelho guarda cópia (o banco aberto é o dela, T26).
   if (!sessao || sessao.uid !== repo.ctx.usuarioId) return null;
 
+  const precisaAceite = aceitoAntes !== true;
   const fraseInvalida = frase.length < 8 || frase !== confirmacao;
+  const semAceite = aceitoAntes === null || (precisaAceite && !marcouAceite);
   const recente = lista.tipo === 'ok' ? lista.copias[0] : undefined;
 
   const guardar = async (e: SubmitEvent) => {
     e.preventDefault();
+    if (semAceite) return;
     setEnviando(true);
     setMensagem(null);
     try {
+      // Aceito uma vez (versão v3); sem aceite gravado, nada sai do Aparelho.
+      if (precisaAceite) await registrarConsentimento(repo, 'backup-nuvem');
+      await exigirConsentimento(repo, 'backup-nuvem');
+      setAceitoAntes(true);
       await guardarCopiaNaNuvem(repo, servico, frase, iteracoes ? { iteracoes } : {});
       setFrase('');
       setConfirmacao('');
+      setMarcouAceite(false);
       setGuardando(false);
       setMensagem({
         tipo: 'ok',
@@ -168,6 +199,29 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
             O Arretado não guarda nem envia a frase. Perder a frase é perder a cópia: sem ela,
             ninguém consegue abrir o arquivo, nem nós. Anote-a num lugar seguro.
           </p>
+          {precisaAceite && (
+            <fieldset className="campo">
+              <legend>Antes da primeira cópia</legend>
+              <p>
+                A cópia sai do Aparelho já cifrada (AES-256-GCM), com uma frase que só você conhece.
+                O servidor guarda bytes opacos: sem a frase, nem o Arretado abre a cópia. Perdeu a
+                frase, perdeu a cópia, sem jeito de recuperar. São mantidas as{' '}
+                {String(MANTER_NA_NUVEM)} últimas cópias. Apagar a conta apaga as cópias.
+              </p>
+              <label htmlFor="nuvem-aceite">
+                <input
+                  id="nuvem-aceite"
+                  type="checkbox"
+                  checked={marcouAceite}
+                  onChange={(ev) => {
+                    setMarcouAceite(ev.target.checked);
+                  }}
+                />{' '}
+                Entendi e aceito guardar uma cópia cifrada na nuvem (política de privacidade, versão
+                3).
+              </label>
+            </fieldset>
+          )}
           <div className="campo">
             <label htmlFor="nuvem-frase">Frase (mínimo 8 caracteres)</label>
             <input
@@ -193,7 +247,11 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
             />
           </div>
           <div className="linha-acoes">
-            <button type="submit" className="principal" disabled={enviando || fraseInvalida}>
+            <button
+              type="submit"
+              className="principal"
+              disabled={enviando || fraseInvalida || semAceite}
+            >
               {enviando ? 'Cifrando e enviando…' : 'Cifrar e guardar'}
             </button>
             <button
@@ -203,6 +261,7 @@ function NuvemBackupDaConta({ iteracoes, recarregar }: PropsNuvemBackup) {
                 setGuardando(false);
                 setFrase('');
                 setConfirmacao('');
+                setMarcouAceite(false);
               }}
             >
               Cancelar

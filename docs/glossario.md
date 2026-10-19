@@ -459,3 +459,5 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Aceite do login pendente | `marcarAceiteDoLogin`, `registrarAceitePendente`, `RegistrarAceite` (`src/apresentacao/conta/entrar/`); marca `arretado:aceite-login-pendente` no localStorage |
 | Apagar tudo e recomeçar | `apagarTudoERecomecar(repo, { registro, exportei })` e `podeApagarComCopia` (`src/apresentacao/conta/dados/recomecar.ts`); `ConfirmarCopia` é o trecho de tela dividido com o "Apagar daqui" |
 | Política v3 na tela | `POLITICA_V3` em `src/apresentacao/orientacoes/conteudo.ts`, exibida por `Privacidade`; a v2 fica em `<details>` como versão anterior |
+
+| Aceite no login e na cópia na nuvem (T2) | O provedor do repositório chama `registrarAceitePendente` ao abrir o banco da conta (grava `v3:login`); `NuvemBackup` exige e grava `v3:backup-nuvem` antes do primeiro envio (`exigirConsentimento`). Aviso `AVISO_SEM_ARMAZENAMENTO` quando o navegador não guarda a marca. |
