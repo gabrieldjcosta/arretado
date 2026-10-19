@@ -182,7 +182,7 @@ describe('"?" e Orientações (5.3)', () => {
 
 describe('Ajuda › Relatar problema (5.4)', () => {
   it('exige descrição, guarda na fila local e limita a 1 por dia', async () => {
-    const { repo, usuario } = await abrirApp('/recall');
+    const { repo, usuario } = await abrirApp('/recall/frases');
     await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('button', { name: 'Relatar problema' }));
     const guardar = screen.getByRole('button', { name: 'Guardar relato' });
@@ -191,7 +191,7 @@ describe('Ajuda › Relatar problema (5.4)', () => {
     await usuario.click(guardar);
     expect(await screen.findByText(/aguardando envio/)).toBeInTheDocument();
     const relatos = await repo.colecao('relatos').todosDoUsuario();
-    expect(relatos).toMatchObject([{ descricao: 'A lista não carrega', tela: '/recall' }]);
+    expect(relatos).toMatchObject([{ descricao: 'A lista não carrega', tela: '/recall/frases' }]);
 
     await usuario.click(screen.getByRole('button', { name: 'Fechar' }));
     await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));

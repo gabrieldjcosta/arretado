@@ -15,7 +15,11 @@ export const SEGUNDOS_POR_CARTAO = 30;
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
 const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
 
-/** Recall: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas (Parte 2 §9.2). */
+/**
+ * Fixar: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas Frases ·
+ * Cartões · Histórico (Parte 2 §9.2; D-D5: "Erros" deixou de ser aba). Quem chega a `/recall` cai
+ * na aba Frases.
+ */
 export function RecallInicio() {
   const { dados } = useDados(resumoDoRecall);
   const [avisoDispensado, setAvisoDispensado] = useState(false);
@@ -83,9 +87,6 @@ export function RecallInicio() {
         </p>
       )}
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
-        <NavLink to="/recall" end>
-          Erros
-        </NavLink>
         <NavLink to="/recall/frases">Frases</NavLink>
         <NavLink to="/recall/cartoes">Cartões</NavLink>
         <NavLink to="/recall/historico">Histórico</NavLink>

@@ -11,6 +11,7 @@ import {
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { hoje } from '../../dominios/recall/servico';
+import { IconeDoFixar } from './icones';
 import { formatarData, ROTULO_ESTADO } from './rotulos';
 
 const ESTADOS: EstadoCartao[] = ['ativo', 'suspenso', 'arquivado'];
@@ -80,8 +81,8 @@ export function ListaCartoes() {
                   <br />
                   {c.estado === 'ativo' && c.proximaRevisao <= hojeCivil && (
                     <span className="estado-texto estado-vencido">
-                      <span aria-hidden="true">! </span>
-                      Vencido
+                      <IconeDoFixar nome="paraHoje" />
+                      Para hoje
                     </span>
                   )}{' '}
                   <span className="dica">

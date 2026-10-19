@@ -195,7 +195,12 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
 
   // Cartão com lacuna: seleciona "art. 83" e esconde.
   await page.goto('/#/recall/frases');
-  await page.getByRole('link', { name: /^Esconder trecho:/ }).click();
+  // P5: "Esconder trecho" é um alvo de toque inteiro (era 139 × 29 px).
+  const esconder = page.getByRole('link', { name: /^Esconder trecho:/ });
+  const caixa = await esconder.boundingBox();
+  expect(caixa?.height).toBeGreaterThanOrEqual(44);
+  expect(caixa?.width).toBeGreaterThanOrEqual(44);
+  await esconder.click();
   await expect(page.getByRole('heading', { name: 'Esconder trecho' })).toBeVisible();
   await page.getByLabel('Texto da frase').evaluate((el: HTMLTextAreaElement) => {
     const i = el.value.indexOf('art. 83');
@@ -214,16 +219,24 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
   await page.goto('/#/recall');
   await page.reload();
+  // P5: as abas são Frases · Cartões · Histórico, e o Fixar cai nas Frases.
+  await expect(
+    page.getByRole('navigation', { name: 'Seções do Fixar' }).getByRole('link'),
+  ).toHaveText(['Frases', 'Cartões', 'Histórico']);
+  await expect(page).toHaveURL(/#\/recall\/frases$/);
   // Uma só ação para os dois tipos: cartões primeiro; ao fim, segue para as frases.
   await expect(page.getByRole('heading', { name: 'Revisar 1 cartão e 1 frase' })).toBeVisible();
   await expect(page.getByRole('link', { name: /^Revisar frases/ })).toHaveCount(0);
   await page.getByRole('link', { name: 'Começar' }).click();
   await expect(page.getByText('Livramento exige requisitos do […] do CP.')).toBeVisible();
+  // P5: uma caneta por tela, encostada no cartão atual e deitada no fim da rodada.
+  await expect(page.locator('svg.caneta')).toHaveAttribute('data-pose', 'encostada');
   await page.keyboard.press('Space');
   await expect(page.getByText('Frase completa')).toBeVisible();
   await semViolacoes(page);
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+  await expect(page.locator('svg.caneta')).toHaveAttribute('data-pose', 'deitada');
   await page.getByRole('link', { name: /^Seguir para as frases \(1\)$/ }).click();
   await expect(page.getByText('Livramento exige requisitos do art. 83 do CP.')).toBeVisible();
   await semViolacoes(page);

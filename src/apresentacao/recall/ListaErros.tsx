@@ -6,6 +6,7 @@ import { completude } from '../../dominios/recall/causa';
 import { listarErros, type FiltroErros } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
+import { IconeDoFixar } from './icones';
 import { ROTULO_RESULTADO, ROTULO_STATUS } from './rotulos';
 
 const RESULTADOS: readonly string[] = ['errou', 'acertou_inseguro'];
@@ -22,7 +23,10 @@ function filtroDe(p: URLSearchParams): FiltroErros {
   };
 }
 
-/** Aba Erros: por recência, com filtros guardados no endereço (voltar preserva o filtro). */
+/**
+ * Erros por recência, com filtros guardados no endereço (voltar preserva o filtro). "Erros" deixou de
+ * ser aba do Fixar (D-D5); a lista vive em `/recall/erros` e se chega a ela pela aba Frases.
+ */
 export function ListaErros() {
   const [params, setParams] = useSearchParams();
   const filtro = filtroDe(params);
@@ -58,8 +62,8 @@ export function ListaErros() {
 
   return (
     <section aria-label="Erros">
-      <details open={temFiltro}>
-        <summary className="botao discreto">Filtros</summary>
+      <details className="filtros-da-lista" open={temFiltro}>
+        <summary className="botao botao-texto">Filtros</summary>
         <div className="filtros">
           <div className="campo">
             <label htmlFor="filtro-resultado">Resultado</label>
@@ -128,8 +132,8 @@ export function ListaErros() {
             {dados.itens.map((e) => (
               <li key={e.id}>
                 <Link to={`/recall/erros/${e.id}`} className="item-lista">
-                  <span className={`estado-texto estado-${e.resultado}`}>
-                    <span aria-hidden="true">{e.resultado === 'errou' ? '✕' : '?'} </span>
+                  <span className="estado-texto">
+                    <IconeDoFixar nome={e.resultado === 'errou' ? 'errei' : 'inseguro'} />
                     {ROTULO_RESULTADO[e.resultado]}
                   </span>
                   <span>{e.fraseCorreta ?? e.oQueFoi}</span>
@@ -153,5 +157,20 @@ export function ListaErros() {
         </>
       )}
     </section>
+  );
+}
+
+/** A página dos Erros: o título, o caminho de volta às Frases e a lista com os filtros. */
+export function ErrosComFiltros() {
+  return (
+    <>
+      <h1>Erros</h1>
+      <p className="voltar-da-lista">
+        <Link to="/recall/frases" className="botao botao-texto">
+          Voltar às frases
+        </Link>
+      </p>
+      <ListaErros />
+    </>
   );
 }
