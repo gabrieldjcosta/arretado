@@ -1418,25 +1418,21 @@ button.grande,
   text-decoration: none;
 }
 
-.frases .botao-texto {
-  margin-inline-start: -0.75rem;
+/* A frente do cartão é o link da linha (Cartões): alvo de 44 px, não os 21 px do texto. */
+.cartao-frente {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo);
 }
 
-/* "Ver os erros", "Voltar às frases", "Filtros" e "Mais opções": o texto alinhado à margem, o alvo de
-   44 px estendido por fora. */
+/* O parágrafo do link "Ver os erros" e o de "Voltar às frases" (o texto alinhado à margem é do
+   `.na-margem`). */
 .mais-da-lista {
   margin: 0.5rem 0 0;
 }
 
 .voltar-da-lista {
   margin: 0;
-}
-
-.mais-da-lista .botao-texto,
-.voltar-da-lista .botao-texto,
-.filtros-da-lista > summary,
-.menu-drill > summary {
-  margin-inline-start: -0.75rem;
 }
 
 .cartao-drill {
@@ -3169,12 +3165,6 @@ dialog.dialogo-previa .linha-acoes button {
 
 .estado-texto.estado-vencido {
   min-width: 0;
-}
-
-.icone-fixar {
-  width: 1.125rem;
-  height: 1.125rem;
-  flex: none;
 }
 
 /* "Sair do foco": recuado, sem competir com "Próximo artigo". */
