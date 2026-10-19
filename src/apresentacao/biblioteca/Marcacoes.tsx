@@ -1,6 +1,8 @@
 // Grifos e notas no leitor (F2, 11.4): as ações do grupo fixo enquanto há trecho selecionado (ou
 // grifo escolhido) e o diálogo da nota. O estado das marcações fica em `usarMarcacoes.ts`.
 import { useRef, useState, type SyntheticEvent } from 'react';
+import type { Intervalo } from '../../core/modelo';
+import { EditorDeLacuna } from '../recall/EditorDeLacuna';
 import { CORES_DO_GRIFO, type CorDoGrifo } from '../../dominios/legislacao/marcacoes';
 import { Dialogo } from '../componentes/Dialogo';
 import { Icone } from '../componentes/Icone';
@@ -281,7 +283,8 @@ export function DialogoEnviarAsFrases({
   aberto: boolean;
   /** O texto selecionado, que abre o campo. */
   trecho: string;
-  enviar: (texto: string) => Promise<boolean>;
+  /** `ocultos`: com trechos escondidos, a Frase nasce com o cartão de lacuna. */
+  enviar: (texto: string, ocultos: Intervalo[]) => Promise<boolean>;
   fechar: () => void;
 }) {
   return (
@@ -297,9 +300,11 @@ function ConteudoDoEnvio({
   fechar,
 }: {
   trecho: string;
-  enviar: (texto: string) => Promise<boolean>;
+  enviar: (texto: string, ocultos: Intervalo[]) => Promise<boolean>;
   fechar: () => void;
 }) {
+  const [ocultos, setOcultos] = useState<Intervalo[]>([]);
+  const [escondendo, setEscondendo] = useState(false);
   const [texto, setTexto] = useState(trecho.slice(0, TEXTO_MAXIMO_DA_FRASE));
   const [ocupado, setOcupado] = useState(false);
   const [falha, setFalha] = useState(false);
@@ -311,7 +316,7 @@ function ConteudoDoEnvio({
     trava.current = true;
     setOcupado(true);
     setFalha(false);
-    const deu = await enviar(texto);
+    const deu = await enviar(texto.trim(), ocultos);
     setOcupado(false);
     if (deu) fechar();
     else {
@@ -335,9 +340,30 @@ function ConteudoDoEnvio({
           autoFocus
           onChange={(e) => {
             setTexto(e.target.value);
+            setOcultos([]);
           }}
         />
       </label>
+      <button
+        type="button"
+        className="botao botao-texto na-margem"
+        aria-expanded={escondendo}
+        disabled={!texto.trim()}
+        onClick={() => {
+          setEscondendo(!escondendo);
+          setOcultos([]);
+        }}
+      >
+        {escondendo ? 'Sem lacuna' : 'Criar também um cartão com lacuna'}
+      </button>
+      {escondendo && texto.trim() && (
+        <>
+          <p className="dica">
+            Selecione o que quer lembrar: o trecho some. Toque na tarja para mostrar.
+          </p>
+          <EditorDeLacuna texto={texto.trim()} ocultos={ocultos} aoMudar={setOcultos} />
+        </>
+      )}
       {falha && (
         <p role="alert" className="aviso falha">
           Não foi possível enviar. Tente de novo; nada foi perdido.

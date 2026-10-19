@@ -42,7 +42,7 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import type { ResultadoDaCorrecao } from '../../dominios/legislacao/correcao';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
-import { criarFraseDeTrecho } from '../../dominios/recall/servico';
+import { criarCartaoDeLacuna, criarFraseDeTrecho } from '../../dominios/recall/servico';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Caneta } from '../componentes/Caneta';
@@ -2090,11 +2090,11 @@ function LeitorAberto({
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
-        enviar={async (texto) => {
+        enviar={async (texto, ocultos) => {
           if (!fraseAberta) return false;
           const { trecho, texto: citado } = fraseAberta;
           try {
-            await criarFraseDeTrecho(repo, {
+            const frase = await criarFraseDeTrecho(repo, {
               texto,
               trecho: {
                 dispositivoId: trecho.dispositivoId,
@@ -2104,6 +2104,7 @@ function LeitorAberto({
                 fim: trecho.fim,
               },
             });
+            if (ocultos.length > 0) await criarCartaoDeLacuna(repo, frase.id, ocultos);
           } catch {
             return false;
           }
