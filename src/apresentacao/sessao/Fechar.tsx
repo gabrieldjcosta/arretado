@@ -25,9 +25,19 @@ export function Fechar() {
   if (sessao === undefined) return <Esqueleto />;
   if (sessao === null) {
     return (
-      <Vazio titulo="Nenhuma Sessão aberta" acao={<Link to="/">Ir para o Hoje</Link>}>
-        <p>Não há o que encerrar.</p>
-      </Vazio>
+      <>
+        <h1>Encerrar a Sessão</h1>
+        <Vazio
+          titulo="Nenhuma Sessão aberta"
+          acao={
+            <Link to="/" className="botao principal">
+              Ir para o Hoje
+            </Link>
+          }
+        >
+          <p>Não há o que encerrar.</p>
+        </Vazio>
+      </>
     );
   }
   return <FormularioDeFechamento sessao={sessao} aoEncerrar={setEncerrada} repo={repo} />;
@@ -87,12 +97,22 @@ function FormularioDeFechamento({
 
 function Encerrada({ sessao }: { sessao: Sessao }) {
   return (
-    <Vazio titulo="Sessão encerrada" acao={<Link to="/">Ir para o Hoje</Link>}>
-      {sessao.proximoPasso ? (
-        <p>Próximo passo guardado: {sessao.proximoPasso}</p>
-      ) : (
-        <p>Bom descanso. Você decide o que vem depois.</p>
-      )}
-    </Vazio>
+    <>
+      <h1>Encerrar a Sessão</h1>
+      <Vazio
+        titulo="Sessão encerrada"
+        acao={
+          <Link to="/" className="botao principal">
+            Ir para o Hoje
+          </Link>
+        }
+      >
+        {sessao.proximoPasso ? (
+          <p>Próximo passo guardado: {sessao.proximoPasso}</p>
+        ) : (
+          <p>Bom descanso. Você decide o que vem depois.</p>
+        )}
+      </Vazio>
+    </>
   );
 }

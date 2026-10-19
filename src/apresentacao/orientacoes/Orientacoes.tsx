@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router';
 import { SECOES, VERSAO_ORIENTACOES } from './conteudo';
+import './estilos-orientacoes.css';
 
 export function Orientacoes() {
   const { secao } = useParams();
@@ -13,10 +14,10 @@ export function Orientacoes() {
   }, [secao]);
 
   return (
-    <article>
+    <article className="documento">
       <h1>Orientações</h1>
       <nav aria-label="Seções das Orientações">
-        <ul>
+        <ul className="indice-de-secoes">
           {SECOES.map((s) => (
             <li key={s.id}>
               <Link to={`/orientacoes/${s.id}`}>{s.titulo}</Link>

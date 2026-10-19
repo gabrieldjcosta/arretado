@@ -52,6 +52,14 @@ export const NOME_DESTAQUE: Record<CategoriaDestaque, string> = {
   pena: 'Penas, quóruns e frações',
 };
 
+/** O nome curto, para a legenda de uma linha só do leitor (a inteira fica em Conta › Aparência). */
+export const NOME_CURTO_DESTAQUE: Record<CategoriaDestaque, string> = {
+  prazo: 'Prazos',
+  condicao: 'Exceções',
+  absoluto: 'Absolutos',
+  pena: 'Penas',
+};
+
 /** O traço de cada categoria, dito por extenso: o destaque não depende só da cor. */
 export const TRACO_DESTAQUE: Record<CategoriaDestaque, string> = {
   prazo: 'sublinhado duplo',

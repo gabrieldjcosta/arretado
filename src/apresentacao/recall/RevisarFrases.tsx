@@ -8,12 +8,17 @@ import {
   filaDeFrases,
   revisarFrase,
 } from '../../dominios/recall/servico';
-import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { usePassagemDeCartao } from '../componentes/passagem';
+import { marcarEscolha } from '../componentes/traco/escolha';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
+import { TopoDaRevisao } from './TopoDaRevisao';
 
 type Estado =
   | { tipo: 'carregando' }
@@ -22,27 +27,31 @@ type Estado =
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
-  { resposta: 'li', rotulo: 'Fácil', icone: '✓', classe: 'resposta-facil' },
-  { resposta: 'de_novo', rotulo: 'De novo', icone: '↻', classe: 'resposta-dificil' },
+  { resposta: 'li', rotulo: 'Fácil', icone: 'marca', classe: 'resposta-facil' },
+  { resposta: 'de_novo', rotulo: 'De novo', icone: 'repetir', classe: 'resposta-dificil' },
 ] as const satisfies readonly {
   resposta: RespostaFrase;
   rotulo: string;
-  icone: string;
+  icone: NomeDoIcone;
   classe: string;
 }[];
 
 /**
  * Revisar frases (Frases 2): a frase no centro da tela, sem esconder nada. "Fácil" espaça a próxima
- * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências).
+ * leitura; "De novo" traz a frase de volta amanhã. Cota própria, a mesma do dia (preferências). Ao
+ * responder, a resposta ganha o traço de seleção e a frase passa para a seguinte.
  */
 export function RevisarFrases() {
   const texto = useVoz();
   const repo = useRepositorio();
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' });
   const [ocupado, setOcupado] = useState(false);
+  /** A resposta tocada, enquanto a frase passa: é a que ganha o traço de seleção. */
+  const [escolhida, setEscolhida] = useState<RespostaFrase | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   const inicio = useRef(0);
   const cota = useRef(0);
+  const { cartao: cartaoDaFrase, passar } = usePassagemDeCartao();
 
   const terminar = useCallback(async () => {
     try {
@@ -96,19 +105,30 @@ export function RevisarFrases() {
       if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      // Pelo clique ou pela tecla (1, 2), a resposta ganha o traço de seleção.
+      marcarEscolha(`frase:${resposta}`);
+      setEscolhida(resposta);
       try {
-        await revisarFrase(repo, atual.id, resposta, {
+        const gravada = revisarFrase(repo, atual.id, resposta, {
           duracaoMs: performance.now() - inicio.current,
         });
-        if (estado.indice + 1 >= estado.fila.length) await terminar();
-        else setEstado({ ...estado, indice: estado.indice + 1 });
+        if (estado.indice + 1 >= estado.fila.length) {
+          // A última frase não passa: o fim da rodada toma a tela.
+          await gravada;
+          await terminar();
+        } else {
+          await passar(gravada, () => {
+            setEstado({ ...estado, indice: estado.indice + 1 });
+          });
+        }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
       } finally {
         setOcupado(false);
+        setEscolhida(null);
       }
     },
-    [atual, estado, ocupado, repo, terminar],
+    [atual, estado, ocupado, passar, repo, terminar],
   );
 
   // Atalhos: 1 = Fácil, 2 = De novo.
@@ -146,17 +166,18 @@ export function RevisarFrases() {
 
   if (estado.tipo === 'fim') {
     return (
-      <>
+      <div className="coluna-drill fim-de-rodada">
         <h1>Revisar frases</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
+          marca={<Caneta pose="deitada" className="fim-caneta" />}
           acao={
             estado.cartoes > 0 ? (
               <>
                 <Link to="/recall/revisar" className="botao principal">
                   Seguir para os cartões ({estado.cartoes})
                 </Link>
-                <Link to="/recall/frases" className="botao discreto">
+                <Link to="/recall/frases" className="botao botao-texto">
                   Voltar às frases
                 </Link>
               </>
@@ -187,23 +208,23 @@ export function RevisarFrases() {
             </>
           )}
         </Vazio>
-      </>
+      </div>
     );
   }
 
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
   return (
-    <>
+    <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar frases</h1>
       <FaixaDaSessao />
-      <div className="topo-drill">
-        <Link to="/recall/frases" className="botao discreto">
-          Sair
-        </Link>
-        <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Frase" />
-      </div>
-      <article className="cartao-bloco cartao-drill" aria-label="Frase">
+      <TopoDaRevisao
+        sair="/recall/frases"
+        valor={estado.indice + 1}
+        max={estado.fila.length}
+        rotulo="Frase"
+      />
+      <article ref={cartaoDaFrase} className="cartao-bloco cartao-drill" aria-label="Frase">
         <p className="drill-frente texto-leitura">{atual.texto}</p>
       </article>
       {falha && (
@@ -221,8 +242,9 @@ export function RevisarFrases() {
             aria-keyshortcuts={String(i + 1)}
             onClick={() => void responder(r.resposta)}
           >
-            <span aria-hidden="true">{r.icone} </span>
+            <Icone nome={r.icone} />
             {r.rotulo}
+            <TracoDeSelecao chave={`frase:${r.resposta}`} ativo={escolhida === r.resposta} />
           </button>
         ))}
       </div>
@@ -231,8 +253,8 @@ export function RevisarFrases() {
           ? `${restam === 1 ? 'mais 1 frase' : `mais ${String(restam)} frases`} nesta rodada`
           : 'o fim desta rodada'}
       </LinhaDepois>
-      <details className="menu-drill">
-        <summary className="botao discreto">Mais opções</summary>
+      <details>
+        <summary className="botao botao-texto na-margem">Mais opções</summary>
         <div className="linha-acoes">
           <Link to={`/recall/frases/${atual.id}/cartao`} className="botao">
             Esconder um trecho (criar cartão)
@@ -244,6 +266,6 @@ export function RevisarFrases() {
           )}
         </div>
       </details>
-    </>
+    </div>
   );
 }

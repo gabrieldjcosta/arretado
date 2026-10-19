@@ -1,4 +1,4 @@
-/* Retorno e Fechar o Dia (A3b). Só tokens e classes existentes; sem cor literal. */
+/* Retorno e Fechar o Dia (A3b; D-D7, P3). Só tokens e classes existentes; sem cor literal. */
 .retorno-titulo,
 .fechar-dia-titulo {
   margin: 0 0 0.5rem;
@@ -26,4 +26,13 @@
 .retorno,
 .fechar-dia {
   margin-bottom: 1rem;
+}
+
+/* O Resumo do Dia: o que houve, em linhas curtas. */
+.fechar-dia-lista {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
 }

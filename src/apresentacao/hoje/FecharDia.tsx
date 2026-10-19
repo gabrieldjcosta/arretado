@@ -1,8 +1,11 @@
-// Fechar o Dia (pacote A3b): resumo do que aconteceu, sem meta nem nota, e um gesto de encerrar.
-// Só aparece quando houve algo hoje (ou o Dia já foi fechado, para poder reabrir).
+// Fechar o Dia (pacote A3b; D-D7, P3 e "A caneta que desenha"): resumo do que aconteceu, sem meta nem
+// nota, e um gesto de encerrar. Fechado, o Resumo do Dia mostra o quadro do cacto, onde a caneta
+// desenha a parte de hoje. Só aparece quando houve algo hoje (ou o Dia já foi fechado, para poder
+// reabrir).
 import { useCallback, useState } from 'react';
 import type { Repositorio } from '../../core/persistencia';
 import { fecharDia, reabrirDia, resumoDoDia } from '../../dominios/dia/fechar';
+import { QuadroDoCacto } from '../componentes/quadro/QuadroDoCacto';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useVoz } from '../voz';
 import './estilos-dia.css';
@@ -14,6 +17,8 @@ export function FecharDia() {
   const repo = useRepositorio();
   const [versao, setVersao] = useState(0);
   const [falhou, setFalhou] = useState(false);
+  /** A parte de hoje só se desenha na hora em que a pessoa fecha o Dia; já fechado, o quadro aparece pronto. */
+  const [desenha, setDesenha] = useState(false);
   const carregar = useCallback(
     (r: Repositorio) => resumoDoDia(r).then((x) => ({ x, versao })),
     [versao],
@@ -31,10 +36,11 @@ export function FecharDia() {
       : '',
     r.frasesRevisadas > 0 ? plural(r.frasesRevisadas, 'Frase revisada', 'Frases revisadas') : '',
   ].filter(Boolean);
-  const mudar = (acao: (rep: Repositorio) => Promise<unknown>) => {
+  const mudar = (acao: (rep: Repositorio) => Promise<unknown>, aoConcluir?: () => void) => {
     setFalhou(false);
     acao(repo).then(
       () => {
+        aoConcluir?.();
         setVersao((v) => v + 1);
       },
       () => {
@@ -42,11 +48,20 @@ export function FecharDia() {
       },
     );
   };
+  const lista = partes.length > 0 && (
+    <ul className="fechar-dia-lista">
+      {partes.map((parte) => (
+        <li key={parte}>{parte}</li>
+      ))}
+    </ul>
+  );
   return (
     <section className="cartao-bloco fechar-dia" aria-label="Fechar o Dia">
       {fechado ? (
         <>
           <h2 className="fechar-dia-titulo">{texto('diaFechado')}</h2>
+          {lista}
+          <QuadroDoCacto dias={r.diasFechados} desenha={desenha} />
           <p className="fechar-dia-texto">Bom descanso. Amanhã você começa de onde parou.</p>
           {r.proximoPasso && (
             <p className="fechar-dia-passo">
@@ -65,7 +80,7 @@ export function FecharDia() {
       ) : (
         <>
           <h2 className="fechar-dia-titulo">Resumo do Dia</h2>
-          <p className="fechar-dia-texto">{partes.join(' · ')}.</p>
+          {lista}
           {r.proximoPasso && (
             <p className="fechar-dia-passo">
               Para amanhã: <q>{r.proximoPasso}</q>
@@ -77,7 +92,9 @@ export function FecharDia() {
           <button
             type="button"
             onClick={() => {
-              mudar(fecharDia);
+              mudar(fecharDia, () => {
+                setDesenha(true);
+              });
             }}
           >
             Fechar o Dia

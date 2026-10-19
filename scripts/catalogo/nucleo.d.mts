@@ -66,3 +66,7 @@ export function descartar(principal: Linha[]): {
   mantidas: Linha[];
   descartadas: (Linha & { motivo: string })[];
 };
+export function dividirLinhas(principal: Linha[]): {
+  mantidas: Linha[];
+  descartadas: (Linha & { motivo: string })[];
+};

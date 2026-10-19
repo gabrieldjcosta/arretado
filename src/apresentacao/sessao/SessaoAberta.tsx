@@ -1,5 +1,5 @@
 // Aviso "você deixou uma Sessão aberta", para o Hoje encaixar (A2 restaura ao voltar). Não mostra
-// nada quando não há Sessão aberta; sem culpa, sem cobrança.
+// nada quando não há Sessão aberta; sem culpa, sem cobrança. Sem vidro: o do Hoje é o do Agora.
 import { Link } from 'react-router';
 import { useDados } from '../dados/contexto';
 import { horaDeInicio, sessaoAberta } from './carregadores';
@@ -16,10 +16,10 @@ export function SessaoAberta() {
       </p>
       <p className="sessao-detalhe">Começou às {horaDeInicio(sessao.inicio)}.</p>
       <div className="linha-acoes">
-        <Link to="/sessao/atual" className="botao principal">
+        <Link to="/sessao/atual" className="botao">
           Continuar
         </Link>
-        <Link to="/sessao/fechar" className="botao">
+        <Link to="/sessao/fechar" className="botao botao-texto">
           Encerrar
         </Link>
       </div>

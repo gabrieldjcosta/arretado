@@ -30,6 +30,29 @@ Partição de 14/10/2026 do [`f4a-contas.md`](f4a-contas.md), no formato de [`f3
 
 Ondas com 2 pacotes de código: **1** A1+A2, **2** A3 + AL (A7 em paralelo só como texto), **3** A4 (sozinho), **4** A5+A6, **5** A7, **6** A8. A3 pode começar o código (contra o serviço falso) enquanto o Gabriel faz os passos 1–5; só a fumaça com o projeto real espera.
 
+## Estado conferido em 19/10/2026
+
+Os SHAs abaixo foram confirmados com `git log origin/integracao`; estados sem PR ainda não são entregas concluídas.
+
+| Pacote / atividade | Estado | PR · SHA |
+|---|---|---|
+| A0 + A1 | Feito | #144 · `0282ef1` |
+| A2 | Feito; migração aplicada/verificada no projeto real em 14/10; exposição do esquema e configuração do Auth ainda ficam com Gabriel | #147 · `f35f746`; #148 · `fd99971` |
+| A3 | Código feito; E2E/fumaça pendentes | #149 · `a5bf9d6` |
+| A4a + A4b | Código feito; exportação real/E2E pendentes | #168 · `802597a` |
+| A5 | Código feito; deploy da função aguarda Gabriel | #152 · `8531f30` |
+| AL | Feito | #179 · `1968a56` |
+| A6 | Implementação mesclada; ajustes do T3 em andamento | #183 · `5c76b8d` |
+| A7 docs | Feito | #182 · `fd62e9b` |
+| A7 código | Feito; #184 entrou na `integracao` pelo #188 | #188 · `3640f9b` |
+| Consulta diária | Feita | #185 · `47524fc` |
+| T2 consentimento | Feito | #193 · `b30c02b` |
+| T3 ajustes A6/§5.7 | **Em andamento; não declarar feito** | — |
+| T4 E2E com serviço falso/axe | **Pendente; não declarar feito** | — |
+| T5 documento do portão | Em andamento | — |
+| T6 revisão independente | Pendente | — |
+| Fumaça A8 | Pendente; Gabriel | — |
+
 ## Critérios do portão da F4-A (A8)
 
 - RLS: duas contas de teste, nenhuma lê, grava, apaga nem lista dado da outra (perfil, backup, log); anônimo não lê nada pessoal; cliente não altera `direito_ia` nem `beta`.

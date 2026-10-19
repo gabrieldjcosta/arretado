@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 
 export type AbaDaBiblioteca = 'norma' | 'sumulas' | 'teses' | 'resumos' | 'precedentes';
 
@@ -17,6 +18,7 @@ export function AbasDaBiblioteca({ atual }: { atual: AbaDaBiblioteca }) {
       {ABAS.map((a) => (
         <Link key={a.chave} to={a.para} {...(a.chave === atual ? { 'aria-current': 'page' } : {})}>
           {a.rotulo}
+          <TracoDeSelecao chave={`biblioteca:${a.chave}`} ativo={a.chave === atual} />
         </Link>
       ))}
     </nav>

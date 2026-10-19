@@ -1,8 +1,13 @@
 import { useCallback, useEffect } from 'react';
 import { obterPreferencias } from '../core/preferencias';
+import { aplicarCorDaBarra } from './cor-da-barra';
 import { useDados } from './dados/contexto';
 
-/** Aplica tema e fonte de leitura das Preferências ao documento. */
+/**
+ * Aplica tema, fonte de leitura e perfil das Preferências ao documento. O perfil vai em
+ * `data-perfil` (ausente se não há perfil): é dele que `movimentoAgora` sabe o quanto a interface
+ * se mexe.
+ */
 export function AplicarAparencia() {
   const { dados } = useDados(useCallback((r) => obterPreferencias(r), []));
 
@@ -11,7 +16,10 @@ export function AplicarAparencia() {
     const raiz = document.documentElement;
     if (dados.tema === 'sistema') delete raiz.dataset.tema;
     else raiz.dataset.tema = dados.tema;
+    aplicarCorDaBarra(dados.tema);
     raiz.dataset.fonte = dados.fonteLeitura;
+    if (dados.perfilDeEstudo) raiz.dataset.perfil = dados.perfilDeEstudo;
+    else delete raiz.dataset.perfil;
     raiz.style.setProperty('--tamanho-leitura', `${String(dados.tamanhoFonte)}px`);
   }, [dados]);
 

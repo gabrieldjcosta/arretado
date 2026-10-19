@@ -133,7 +133,7 @@ export function ImportarPontos({
             Alta, Média ou Extra) e Código.
           </p>
           <details className="importar-ajuda-ia">
-            <summary className="botao discreto">Não sabe montar a planilha?</summary>
+            <summary className="botao botao-texto na-margem">Não sabe montar a planilha?</summary>
             <div className="importar-ajuda-ia-conteudo">
               <p className="dica">
                 Copie o texto abaixo, cole na sua IA preferida junto com o conteúdo programático do

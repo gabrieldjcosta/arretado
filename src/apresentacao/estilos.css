@@ -107,7 +107,27 @@
   --estrela-luz: var(--ponto-luz);
   --estrela-contorno: var(--ponto-contorno);
   --calha-estrela: 1.5rem;
-  --traco-cachorro: var(--traco);
+  --caramelo: var(--traco);
+  /* O traço de seleção ("A caneta que desenha"): a linha que se desenha em volta do que acabou de ser
+     escolhido, na tinta; à noite, na luz. Sem brilho: a ponta é o ponto de luz, com contorno. */
+  --fio-selecao: var(--tinta);
+  /* O anel do ponto do Dia que ainda não foi feito: a tinta a 55%, 3,4:1 na areia (a 45% do
+     protótipo seriam 2,6:1, abaixo dos 3:1 que um contorno pede). */
+  --ponto-apagado: rgb(23 36 58 / 55%);
+  /* A caneta (P3): o vidro do ciano ao verde, o único objeto com volume e o único gradiente. À
+     noite o brilho de borda é menor e só o halo da ponta cresce (`--caneta-halo-*` são opacidades:
+     a caneta desenha os dois halos e o tema acende um). */
+  --caneta-0: #dffcff;
+  --caneta-1: #9af0dc;
+  --caneta-2: #5fcf8f;
+  --caneta-3: #2b8f5e;
+  --caneta-4: #17422f;
+  --caneta-miolo: #0f3b2b;
+  --caneta-borda: #ffffff;
+  --caneta-borda-opacidade: 0.7;
+  --caneta-brilho: 0.8;
+  --caneta-halo-dia: 0.85;
+  --caneta-halo-noite: 0;
 
   /* A ação é vidro com texto branco, um botão por tela; o caminho (link) é o passo escuro. */
   --acao: var(--vidro);
@@ -136,7 +156,6 @@
   /* Marcado (caixa, rádio, botão ligado): tinta cheia com a marca em cal. */
   --selecionado-fundo: var(--tinta);
   --selecionado-texto: var(--cal);
-  --selecionado-atenuado: #c9d1dc;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--tinta) 6%, var(--superficie));
 
@@ -206,7 +225,20 @@
     --ponto-luz: var(--noite-vidro);
     --ponto-contorno: var(--noite-tinta);
     --estrela: var(--noite-vidro);
-    --traco-cachorro: var(--noite-traco);
+    --caramelo: var(--noite-traco);
+    --fio-selecao: var(--noite-vidro);
+    --ponto-apagado: rgb(238 243 248 / 55%);
+    --caneta-0: #bdf3ff;
+    --caneta-1: #7fe3cf;
+    --caneta-2: #4cc07f;
+    --caneta-3: #237a50;
+    --caneta-4: #123526;
+    --caneta-miolo: #0b2a1f;
+    --caneta-borda: #dffcff;
+    --caneta-borda-opacidade: 0.55;
+    --caneta-brilho: 0.6;
+    --caneta-halo-dia: 0;
+    --caneta-halo-noite: 1;
     --acao: var(--noite-vidro);
     --acao-texto: var(--noite);
     --acao-borda: transparent;
@@ -227,7 +259,6 @@
     --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
     --selecionado-fundo: var(--noite-tinta);
     --selecionado-texto: var(--noite);
-    --selecionado-atenuado: #3b4a63;
     --selecionado-anel: transparent;
     --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
     --regua-fundo: rgb(238 243 248 / 8%);
@@ -271,7 +302,20 @@
   --ponto-luz: var(--noite-vidro);
   --ponto-contorno: var(--noite-tinta);
   --estrela: var(--noite-vidro);
-  --traco-cachorro: var(--noite-traco);
+  --caramelo: var(--noite-traco);
+  --fio-selecao: var(--noite-vidro);
+  --ponto-apagado: rgb(238 243 248 / 55%);
+  --caneta-0: #bdf3ff;
+  --caneta-1: #7fe3cf;
+  --caneta-2: #4cc07f;
+  --caneta-3: #237a50;
+  --caneta-4: #123526;
+  --caneta-miolo: #0b2a1f;
+  --caneta-borda: #dffcff;
+  --caneta-borda-opacidade: 0.55;
+  --caneta-brilho: 0.6;
+  --caneta-halo-dia: 0;
+  --caneta-halo-noite: 1;
   --acao: var(--noite-vidro);
   --acao-texto: var(--noite);
   --acao-borda: transparent;
@@ -292,7 +336,6 @@
   --atual-sombra: 0 4px 12px -4px rgb(0 0 0 / 45%);
   --selecionado-fundo: var(--noite-tinta);
   --selecionado-texto: var(--noite);
-  --selecionado-atenuado: #3b4a63;
   --selecionado-anel: transparent;
   --tinta-lugar: color-mix(in srgb, var(--noite-tinta) 8%, var(--superficie));
   --regua-fundo: rgb(238 243 248 / 8%);
@@ -428,8 +471,8 @@ button,
 }
 
 .pular:focus {
-  left: 1rem;
-  top: 1rem;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
   z-index: 10;
   background: var(--superficie);
   padding: 0.5rem 1rem;
@@ -450,11 +493,13 @@ button,
    tablet em pé, 32 a partir de 900). --largura-casca: a largura do conteúdo e, a partir de 900 px, a
    do cabeçalho, para a marca alinhar com o título. --abas-altura: o que as abas de baixo ocupam (até
    899 px, com a área segura do aparelho); a rolagem reserva essa altura e o dock do Leitor fica
-   acima dela. Com o teclado aberto, no modo foco e no "só estudo" as abas saem e ela zera. */
+   acima dela. A partir de 900 px não há abas embaixo e ela é só a área segura (o indicador de
+   início do iPhone deitado). Com o teclado aberto, no modo foco e no "só estudo" as abas saem e
+   ela zera. */
 :root {
   --gutter: 1rem;
   --largura-casca: 900px;
-  --abas-altura: 0px;
+  --abas-altura: env(safe-area-inset-bottom, 0px);
 }
 
 @media (min-width: 700px) {
@@ -529,6 +574,19 @@ button,
    vem depois no arquivo e, com a mesma especificidade, venceria (display, recuo e raio). */
 .acoes-globais .ajuda-botao {
   padding: 0 0.75rem;
+}
+
+/* Os controles da casca (Ajuda e o menu dela) ficam em texto simples: o sublinhado de `.discreto` é
+   da ação ao lado da primária, na página. */
+.acoes-globais .ajuda-botao,
+.menu-ajuda-itens .discreto {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu-ajuda-itens .discreto {
+  padding: 0 1.25rem;
 }
 
 .acoes-globais .conta-botao {
@@ -617,7 +675,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 1rem var(--gutter);
+  padding: 1rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 
 /* Título com o "+" na mesma linha (TituloComMais, D-D7): o "+" é redondo, em cal com a tinta e a
@@ -661,7 +720,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 0.5rem var(--gutter) 1rem;
+  padding: 0.5rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
   font-size: 0.8125rem;
   color: var(--texto-atenuado);
 }
@@ -719,7 +779,8 @@ button,
 
 @media (min-width: 700px) and (max-width: 899px) {
   .areas {
-    padding-inline: max(0.5rem, calc((100% - 35rem) / 2));
+    padding-left: max(0.5rem, env(safe-area-inset-left, 0px), calc((100% - 35rem) / 2));
+    padding-right: max(0.5rem, env(safe-area-inset-right, 0px), calc((100% - 35rem) / 2));
   }
 }
 
@@ -727,7 +788,12 @@ button,
    caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
 @media (min-width: 900px) {
   .topo {
-    padding-inline: max(var(--gutter), calc((100% - var(--largura-casca)) / 2 + var(--gutter)));
+    padding-left: calc(
+      max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+    padding-right: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
   }
 
   .marca {
@@ -846,15 +912,12 @@ dialog .perigoso {
   color: var(--perigo-texto);
 }
 
-.discreto {
-  background: transparent;
-  border-color: transparent;
-}
-
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
    onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
-   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. */
-.botao-texto {
+   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. `.discreto` é o mesmo botão (antes
+   era texto sem sublinhado e com 20 px de recuo, que não parecia ação). */
+.botao-texto,
+.discreto {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
@@ -873,6 +936,20 @@ dialog .perigoso {
     opacity: 1;
     background: color-mix(in srgb, currentcolor 8%, transparent);
   }
+}
+
+/* O botão-texto sozinho no começo da linha ("Voltar", "Mais", "Importar outra planilha"): o recuo de
+   12 px do alvo sai pela margem, e a letra fica alinhada ao texto da página. Fora dele (ao lado de
+   outro botão) o recuo é o espaço entre os dois. */
+.na-margem {
+  margin-inline-start: -0.75rem;
+}
+
+/* Ícone de traço único (componentes/Icone.tsx): na altura do texto, na cor dele. */
+.icone-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
 }
 
 /* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
@@ -1107,6 +1184,11 @@ legend {
   box-shadow: var(--sombra);
 }
 
+/* O título abre o cartão: a margem de cima dele somada ao recuo do cartão deixava um vazio de 45 px. */
+.cartao-bloco > h2:first-child {
+  margin-top: 0;
+}
+
 .linha-acoes {
   display: flex;
   flex-wrap: wrap;
@@ -1198,7 +1280,9 @@ legend {
 
 dialog {
   width: min(560px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-top, 0px)) - max(1rem, env(safe-area-inset-bottom, 0px))
+  );
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   background: var(--superficie);
@@ -1332,21 +1416,44 @@ button.grande,
   align-items: end;
 }
 
+/* Frases (D-D7, P5): o texto em fonte de leitura à esquerda e "Esconder trecho" à direita, ou logo
+   abaixo quando a frase é longa; a ação tem alvo de 44 px e a mesma letra da interface. */
 .frases li {
   line-height: 1.6;
 }
 
-.frases a {
+.frases .texto-leitura {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.frases .texto-leitura a {
+  display: flex;
+  align-items: center;
+  min-height: var(--alvo);
   color: var(--texto);
   text-decoration: none;
 }
 
-.cartao-drill {
-  min-height: 10rem;
+/* A frente do cartão é o link da linha (Cartões): alvo de 44 px, não os 21 px do texto. */
+.cartao-frente {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo);
 }
 
-.respostas button {
-  min-width: 6rem;
+/* O parágrafo do link "Ver os erros" e o de "Voltar às frases" (o texto alinhado à margem é do
+   `.na-margem`). */
+.mais-da-lista {
+  margin: 0.5rem 0 0;
+}
+
+.voltar-da-lista {
+  margin: 0;
+}
+
+.cartao-drill {
+  min-height: 10rem;
 }
 
 details > summary {
@@ -1464,10 +1571,14 @@ a.item-norma strong {
   min-width: 0;
 }
 
+/* O seletor de fonte é uma pílula só (P4): A−, o tamanho e A+ como segmentos, no contorno do botão
+   secundário. Cada segmento mantém o alvo de 44 px. */
 .tamanho-texto {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-pilula);
+  background: var(--superficie);
 }
 
 .tamanho-texto output {
@@ -1479,11 +1590,25 @@ a.item-norma strong {
 
 .tamanho-texto button {
   min-width: var(--alvo);
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: var(--raio-pilula);
+  background: var(--botao-fundo, transparent);
+}
+
+.barra-leitor .alternar-destaques {
+  border-radius: var(--raio-pilula);
 }
 
 .lista-leitor {
   position: relative;
   width: 100%;
+  /* O lido vai sobre uma faixa de cal que passa 12 px do texto de cada lado (P4): a margem anda a
+     calha da estrela e o texto para a faixa não pisar na estrela. Fora da lista (cartão, prévia) é 0.
+     No fim da linha a faixa passa só até metade do recuo lateral da casca (8 px no celular), para a
+     cal não encostar na borda da tela; o texto fica onde estava. */
+  --margem-do-lido: 12px;
+  --margem-do-lido-fim: min(var(--margem-do-lido), calc(var(--gutter, 1rem) / 2));
 }
 
 /* Voltando à posição guardada (9.7): a lista só aparece no lugar, sem o salto do começo até ela. */
@@ -1496,23 +1621,32 @@ a.item-norma strong {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 0.5rem;
+  gap: 0 1rem;
   margin: -0.5rem 0 0.5rem;
   color: var(--texto-atenuado);
 }
 
+/* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
+   frase. Altura da caneta, no mínimo: o corpo sobe da ponta, e o texto de cima não pode ficar sob ele. */
 .marca-lido-ate {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
   margin: 0.25rem 0 0;
-  padding-top: 0.15rem;
-  border-top: 2px solid var(--lugar);
+  min-height: 3.625rem;
+  font-family: var(--fonte-interface);
   font-size: 0.8125rem;
-  font-weight: 600;
-  text-align: right;
-  color: var(--titulo);
+  font-weight: 700;
+  color: var(--texto);
 }
 
-/* O dock fica acima das abas de baixo (--abas-altura, que zera a partir de 900 px, com o teclado
-   aberto e no modo foco). */
+.caneta-do-lido {
+  width: 104px;
+  height: 58px;
+}
+
+/* O dock fica acima das abas de baixo (--abas-altura: as abas e a área segura; a partir de 900 px é só
+   a área segura, e com o teclado aberto e no modo foco zera). */
 .acoes-leitor {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
@@ -1522,11 +1656,96 @@ a.item-norma strong {
   gap: 0.5rem;
 }
 
-/* Flutuam sobre o texto: fundo de superfície, sem transparência no fluxo normal (o modo foco usa a
-   translúcida, abaixo), para a letra de trás não passar. */
+/* Flutuam sobre o texto: fundo de superfície, para a letra de trás não passar. O modo foco usa a
+   translúcida, abaixo; o grupo de ferramentas do dock é a pílula sólida (.dock-do-leitor). */
 .acoes-leitor button:not(.principal) {
   background: var(--superficie);
   box-shadow: var(--sombra-flutuante);
+}
+
+/* O dock (P4): Buscar, Filtrar, Ações e Modo foco numa só pílula, em superfície sólida: o contrato
+   da D-D7 proíbe vidro desfocado atrás de texto, então a letra que passa por trás não passa. Quebra
+   em duas linhas, sem alargar a página, quando a tela é estreita. */
+.acoes-leitor .dock-do-leitor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: 26px;
+  background: var(--superficie);
+  box-shadow: var(--sombra-flutuante);
+}
+
+.acoes-leitor .dock-do-leitor button {
+  min-width: 0;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: var(--raio-pilula);
+  background: var(--botao-fundo, transparent);
+  box-shadow: none;
+}
+
+/* O filtro ligado no dock não tem borda: o contorno entra por dentro, como anel. */
+.acoes-leitor .dock-do-leitor button.filtro-ligado {
+  border: 0;
+  box-shadow: inset 0 0 0 2px var(--cacto);
+}
+
+/* Em 320 px os quatro botões só cabem numa linha com o respiro menor (o alvo continua com 44 px de
+   altura); sem isso a pílula quebra e deixa um vazio ao lado de "Modo foco". */
+@media (max-width: 349px) {
+  .acoes-leitor .dock-do-leitor button {
+    padding-inline: 0.5rem;
+  }
+}
+
+/* O trilho (P7): a partir de 1200 px, a mesma folga que põe a estrutura da norma na margem da
+   esquerda, as ferramentas saem do canto de baixo e ficam na margem da direita, ao lado da coluna de
+   lei e à altura da estrutura. O dock vira a pílula em pé; as ações do trecho marcado e o aviso da
+   Estrela ocupam o mesmo trilho. O modo foco mantém o canto. */
+@media (min-width: 75em) {
+  .leitor:not(.em-foco) .acoes-leitor {
+    top: calc(var(--barra-fixa, 4rem) + 0.75rem);
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    bottom: auto;
+    left: calc(50% + var(--largura-texto) / 2 + 1.5rem);
+    flex-direction: column;
+    max-width: 13rem;
+  }
+
+  .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
+    flex-direction: column;
+    border-radius: 22px;
+  }
+
+  /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
+  .leitor:not(.em-foco) .aviso-da-estrela {
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    max-width: 100%;
+    margin: 0.5rem 0 0;
+    text-align: left;
+  }
+
+  .leitor:not(.em-foco) .acoes-marcacao {
+    justify-content: flex-start;
+  }
+
+  .leitor:not(.em-foco) .aviso-da-selecao {
+    text-align: left;
+  }
+}
+
+@media (forced-colors: active) {
+  .acoes-leitor .dock-do-leitor {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
 }
 
 /* Modo foco (11.1): só o texto. A moldura do Shell some (o leitor põe o atributo na raiz e o tira
@@ -1541,6 +1760,11 @@ a.item-norma strong {
 
 :root[data-modo-foco] .shell {
   --abas-altura: 0px;
+}
+
+/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. */
+:root[data-modo-foco] .conteudo {
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
 }
 
 .em-foco .acoes-leitor {
@@ -1575,11 +1799,33 @@ a.item-norma strong {
   }
 }
 
+/* Sem transparência (preferência do sistema), os botões do foco são opacos. */
+@media (prefers-reduced-transparency: reduce) {
+  .em-foco .acoes-leitor button {
+    background: var(--superficie);
+  }
+}
+
+/* Na bandeja aberta (um cartão sólido), "Próximo artigo" é a ação da tela e fica de vidro, como todo
+   .principal: sem isto a regra de cima (mais específica) o deixaria um texto negrito sem caixa, o
+   menos visível dos botões, e "Sair do foco" é o que recua. */
+.em-foco .bandeja-itens button.principal {
+  background: var(--acao);
+  color: var(--acao-texto);
+  box-shadow: var(--sombra-botao);
+}
+
+@media (hover: hover) {
+  .em-foco .bandeja-itens button.principal:not([aria-disabled='true']):hover {
+    background: color-mix(in srgb, var(--acao) 86%, var(--tinta));
+    color: var(--acao-texto);
+  }
+}
+
 /* Busca dentro da norma (11.6): o diálogo fica no alto da tela (no celular, o teclado ocupa a
    metade de baixo), e o dispositivo achado ganha um contorno, sem mudar a altura da linha. */
 dialog.dialogo-busca {
   margin: max(1rem, env(safe-area-inset-top)) auto auto;
-  max-height: calc(100dvh - 2rem);
 }
 
 .busca-campo {
@@ -1633,14 +1879,26 @@ dialog.dialogo-busca {
 .linha-leitor.achado-da-busca .dispositivo {
   outline: 2px solid var(--cacto);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
-   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). */
+   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). A cor
+   vai em camada de imagem, para somar à faixa de cal do lido em vez de trocá-la. */
 .linha-leitor[data-regua] .dispositivo {
-  background: var(--regua-fundo);
+  background-image: linear-gradient(var(--regua-fundo), var(--regua-fundo));
   box-shadow: inset 3px 0 0 var(--regua-barra);
+}
+
+/* Cores forçadas tiram sombra e imagem de fundo: o realce da régua e o filtro ligado do dock passam
+   a um contorno do sistema, que leva o estado. A faixa do lido some nesse modo (a marca "Lido até
+   aqui", em texto, continua dizendo onde parou). */
+@media (forced-colors: active) {
+  .linha-leitor[data-regua] .dispositivo,
+  .acoes-leitor .dock-do-leitor button.filtro-ligado {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 
 .linha-leitor {
@@ -1648,8 +1906,9 @@ dialog.dialogo-busca {
   top: 0;
   left: 0;
   width: 100%;
-  /* A calha da estrela (11.2), em toda linha: pôr ou tirar a estrela não muda a largura do texto. */
-  padding-inline-start: var(--calha-estrela);
+  /* A calha da estrela (11.2), em toda linha: pôr ou tirar a estrela não muda a largura do texto. Na
+     lista, mais a margem da faixa do lido (ver .lista-leitor). */
+  padding-inline-start: calc(var(--calha-estrela) + var(--margem-do-lido, 0px));
 }
 
 /* Estrela (11.2). O botão fica na calha, posto fora do fluxo (`position: absolute` sem `top`: a
@@ -1671,14 +1930,38 @@ dialog.dialogo-busca {
   background: repeating-linear-gradient(to bottom, var(--estrela) 0 6px, transparent 6px 10px);
 }
 
+/* Cores forçadas tiram o fundo e o gradiente: a barra passa a ser uma borda em cor do sistema (cheia
+   na direta, tracejada na herdada), de 3 px como era, e a origem segue legível. */
+@media (forced-colors: active) {
+  .linha-leitor[data-estrelada]::before {
+    width: 0;
+    background: none;
+    border-inline-start: 3px solid CanvasText;
+  }
+
+  .linha-leitor[data-estrela-origem='herdada']::before {
+    border-inline-start-style: dashed;
+  }
+}
+
+/* Alvo de 44 px (D-D7, P6) com a estrela onde estava: a caixa avança para a margem da página, à esquerda
+   da calha (nunca sobre o texto), e sobe e desce o que falta à altura de 1,6em, o que não mexe na altura
+   da linha. O recuo devolve a calha ao conteúdo, que centra a estrela na mesma posição de antes. A
+   caixa só avança até onde há folga (--estrela-folga: o recuo da página, 16 px no celular, e o recuo do
+   cartão do modo foco, 1rem): 44 × 44 de 700 px para cima, 40 × 44 onde a folga é menor, sem o corte
+   da borda da tela nem do cartão (que levaria o anel de foco junto). */
 button.estrela {
+  --estrela-folga: var(--gutter);
+  --estrela-largura: min(var(--alvo), calc(var(--calha-estrela) + var(--estrela-folga)));
   position: absolute;
-  inset-inline-start: 0;
-  width: var(--calha-estrela);
-  height: 1.6em;
+  inset-inline-start: calc(var(--calha-estrela) - var(--estrela-largura));
+  width: var(--estrela-largura);
+  height: var(--alvo);
+  margin-block-start: calc((1.6em - var(--alvo)) / 2);
   min-width: 0;
   min-height: 0;
   padding: 0;
+  padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela));
   border: 0;
   border-radius: 4px;
   background: transparent;
@@ -1696,14 +1979,30 @@ button.estrela svg {
   overflow: visible;
 }
 
-button.estrela path {
+button.estrela path.ponta {
   fill: none;
   stroke: currentcolor;
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
 
-/* Estrela de luz (D-D7): o ponto de luz com contorno na tinta. */
+/* O aro (P4): a mesma estrela, mais gorda e na cor do fundo, por baixo. Corta a faixa de vidro em
+   volta da estrela, nos dois temas (à noite o contorno claro e a faixa clara se confundiriam). Só
+   a estrela que está sobre a faixa leva o aro. A cor segue o chão do lugar (--aro-da-estrela). */
+button.estrela path.aro {
+  display: none;
+  fill: var(--aro-da-estrela, var(--fundo));
+  stroke: var(--aro-da-estrela, var(--fundo));
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+button.estrela[data-origem='direta'] path.aro,
+button.estrela[data-origem='herdada'] path.aro {
+  display: block;
+}
+
+/* Estrela de luz (D-D7): as quatro pontas em luz, com contorno na tinta. */
 button.estrela[data-origem='direta'] {
   color: var(--estrela-contorno);
 }
@@ -1713,25 +2012,27 @@ button.estrela[data-origem='direta'] svg {
   height: 1.2em;
 }
 
-button.estrela[data-origem='direta'] path {
+button.estrela[data-origem='direta'] path.ponta {
   fill: var(--estrela-luz);
 }
 
-/* Herdada (só na linha ativa): a estrela pequena sobre a faixa tracejada. De dia, o contorno da tinta
-   a separa da faixa de vidro (3,2:1); à noite, o contorno claro quase some sobre o vidro claro
-   (1,2:1) e quem a separa é a largura, bem maior que a da faixa de 3 px. A P4 redesenha a estrela. */
-button.estrela[data-origem='herdada'] path {
+/* Herdada (só na linha ativa): a estrela pequena sobre a faixa tracejada, no mesmo desenho, com o
+   aro cortando a faixa e o contorno na tinta (de dia) ou na tinta clara (à noite). */
+button.estrela[data-origem='herdada'] {
+  color: var(--estrela-contorno);
+}
+
+button.estrela[data-origem='herdada'] path.ponta {
   fill: var(--estrela-luz);
-  stroke: var(--estrela-contorno);
-  stroke-width: 1.5;
 }
 
 button.estrela[data-origem='herdada'] svg {
-  width: 0.85em;
-  height: 0.85em;
+  width: 0.95em;
+  height: 0.95em;
 }
 
 button.estrela[data-origem='excecao'] path.corte {
+  fill: none;
   stroke: var(--texto);
   stroke-width: 2;
   stroke-linecap: round;
@@ -1769,7 +2070,14 @@ button.estrela:focus-visible {
 }
 
 .dispositivo {
-  padding: 0.35rem 0;
+  /* O recuo do nível (data-recuo) entra por --recuo. A margem do lido (só na lista, ver
+     .lista-leitor) alarga a caixa dos dois lados sem mexer no texto: é a folga da faixa de cal. */
+  --recuo: 0px;
+  margin-inline: calc(var(--margem-do-lido, 0px) * -1);
+  margin-inline-end: calc(var(--margem-do-lido-fim, var(--margem-do-lido, 0px)) * -1);
+  padding: 0.35rem var(--margem-do-lido, 0px);
+  padding-inline-start: calc(var(--margem-do-lido, 0px) + var(--recuo));
+  padding-inline-end: var(--margem-do-lido-fim, var(--margem-do-lido, 0px));
   font-family: var(--fonte-leitura);
   font-size: var(--tamanho-leitura);
   line-height: 1.6;
@@ -1781,36 +2089,59 @@ button.estrela:focus-visible {
 }
 
 .dispositivo[data-recuo='1'] {
-  padding-inline-start: 1.25rem;
+  --recuo: 1.25rem;
 }
 
 .dispositivo[data-recuo='2'] {
-  padding-inline-start: 2.5rem;
+  --recuo: 2.5rem;
 }
 
 .dispositivo[data-recuo='3'] {
-  padding-inline-start: 3.75rem;
+  --recuo: 3.75rem;
 }
 
 .dispositivo[data-recuo='4'] {
-  padding-inline-start: 5rem;
+  --recuo: 5rem;
 }
 
 @media (max-width: 699px) {
   .dispositivo[data-recuo='1'] {
-    padding-inline-start: 0.9rem;
+    --recuo: 0.9rem;
   }
 
   .dispositivo[data-recuo='2'] {
-    padding-inline-start: 1.8rem;
+    --recuo: 1.8rem;
   }
 
   .dispositivo[data-recuo='3'] {
-    padding-inline-start: 2.7rem;
+    --recuo: 2.7rem;
   }
 
   .dispositivo[data-recuo='4'] {
-    padding-inline-start: 3.6rem;
+    --recuo: 3.6rem;
+  }
+}
+
+/* O lido (P4): na lista, da primeira linha ao "lido até aqui", o texto vai sobre a faixa de cal
+   (raio 8, com 12 px de folga de cada lado); o que falta fica na areia. A geometria é a mesma lido
+   ou não (a faixa só pinta o miolo, e a borda transparente dá o vão de 6 px entre as faixas), para
+   a linha não mudar de altura quando o "lido até" anda. */
+.lista-leitor .dispositivo {
+  border-block: 3px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+  padding-block: calc(0.35rem - 3px);
+}
+
+.lista-leitor .linha-leitor[data-lido] .dispositivo {
+  background-color: var(--superficie);
+}
+
+/* Cores forçadas pintam a borda transparente (o vão entre as faixas) com a cor do texto: ela passa a
+   ser a do fundo, e a geometria fica igual. */
+@media (forced-colors: active) {
+  .lista-leitor .dispositivo {
+    border-block-color: Canvas;
   }
 }
 
@@ -1823,7 +2154,7 @@ button.estrela:focus-visible {
 }
 
 .dispositivo.tipo-artigo {
-  padding-top: 0.9rem;
+  margin-top: 0.55rem;
 }
 
 .rubrica {
@@ -1834,7 +2165,7 @@ button.estrela:focus-visible {
 
 /* Nós da estrutura: o rótulo pequeno sobre o nome, do maior nível ao menor */
 .dispositivo.estrutura {
-  padding-top: 1.25rem;
+  margin-top: 0.9rem;
   font-weight: 700;
 }
 
@@ -1858,12 +2189,10 @@ button.estrela:focus-visible {
 .tipo-parte,
 .tipo-livro {
   font-size: calc(var(--tamanho-leitura) * 1.35);
-  padding-top: 2rem;
 }
 
 .tipo-titulo {
   font-size: calc(var(--tamanho-leitura) * 1.2);
-  padding-top: 1.75rem;
 }
 
 .tipo-capitulo,
@@ -1907,6 +2236,17 @@ button.estrela:focus-visible {
   color: var(--texto-atenuado);
   text-align: left;
   cursor: pointer;
+  gap: 0.25rem;
+}
+
+/* A seta de abrir (ícone, não glifo): para baixo aberto, para a direita fechado. */
+.alternar-linha .icone-svg {
+  width: 1em;
+  height: 1em;
+}
+
+.alternar-linha[aria-expanded='false'] .icone-svg {
+  transform: rotate(-90deg);
 }
 
 /* Revogado e vetado (8.10): uma linha atenuada, que abre o resto. */
@@ -2040,6 +2380,14 @@ button.marcador-nota {
   font-size: 0.75em;
   line-height: 1.2;
   vertical-align: 0.15em;
+}
+
+/* O lápis da nota é um ícone na altura da letra: não aumenta a linha (a lista é virtualizada). */
+button.marcador-nota .icone-svg {
+  display: inline;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
 }
 
 /* As ações da marcação no lugar do grupo fixo: as 3 cores, Nota e fechar; quebram em duas linhas
@@ -2295,6 +2643,18 @@ dialog.dialogo-acoes {
   color: var(--bloco-atenuado);
 }
 
+/* O botão de vidro e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */
+.agora-acoes {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.acao-agora .agora-outra {
+  margin-top: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
 .linha-depois {
   color: var(--texto-atenuado);
   margin: 0 0 1rem;
@@ -2383,6 +2743,26 @@ dialog.dialogo-acoes {
   margin-bottom: 0;
 }
 
+/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. */
+.bandeja-botao svg,
+.seta-do-cartao svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.bandeja-botao svg {
+  fill: currentcolor;
+}
+
+.seta-do-cartao svg {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .seta-do-cartao {
   min-width: var(--alvo);
   min-height: var(--alvo);
@@ -2405,9 +2785,16 @@ dialog.dialogo-acoes {
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--luz-do-cartao);
+  /* O aro da estrela corta a faixa na cor do chão de quem a segura: aqui, a luz do cartão. */
+  --aro-da-estrela: var(--luz-do-cartao);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra-folha);
+}
+
+/* O cartão rola por dentro e corta o que passa do recuo dele (1rem): a caixa da estrela cabe nele. */
+.cartao-artigo button.estrela {
+  --estrela-folga: 1rem;
 }
 
 /* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o
@@ -2417,7 +2804,9 @@ dialog.dialogo-acoes {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: calc(100dvh - 2rem);
+  /* O .conteudo tem 1rem embaixo e, em cima, o maior entre 1rem e a área segura (ver
+     `:root[data-modo-foco] .conteudo`): a página não passa da tela. */
+  min-height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
   padding-top: calc(var(--alvo) + 2rem);
 }
 
@@ -2514,13 +2903,16 @@ dialog.dialogo-previa {
   max-width: none;
   max-height: 70dvh;
   overflow-y: auto;
+  padding-bottom: max(1.5rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
   border-radius: var(--raio) var(--raio) 0 0;
 }
 
 @media (min-width: 700px) {
   dialog.dialogo-previa {
-    margin: auto 1.5rem 1.5rem auto;
+    margin: auto max(1.5rem, env(safe-area-inset-right, 0px))
+      max(1.5rem, env(safe-area-inset-bottom, 0px)) auto;
     width: min(32rem, calc(100vw - 3rem));
+    padding-bottom: 1.5rem;
     border-radius: var(--raio);
   }
 }
@@ -2574,8 +2966,26 @@ dialog.dialogo-previa .linha-acoes button {
   padding: 0.5rem;
   background: var(--superficie);
   border: 1px solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
+  border-radius: var(--raio-cartao);
+  box-shadow: var(--sombra-flutuante);
+  /* Rede de segurança (tela muito baixa ou texto ampliado): a pilha rola por dentro em vez de passar
+     do alto da tela, onde o primeiro item ficaria fora do alcance. */
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-bottom, 0px)) - var(--alvo) - 0.5rem -
+      max(1rem, env(safe-area-inset-top, 0px))
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* No celular deitado a pilha de nove não cabe acima do ⋯: vira duas colunas (a ordem do teclado segue
+   a da leitura, uma coluna e depois a outra). */
+@media (max-height: 33.75rem) {
+  .bandeja-itens {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+  }
 }
 
 .bandeja-itens button {
@@ -2624,30 +3034,28 @@ dialog.dialogo-previa .linha-acoes button {
 
 /* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
 
+/* Linha de lista (D-D7, P6): em linha sobre a areia, só o filete do `li` embaixo; sem cartão por item. */
+.lista-de-linhas > li {
+  padding: 0;
+  min-height: 0;
+}
+
 .linha-lista {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
   min-height: 64px;
-  padding: 0.5rem 0.75rem;
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-cartao);
+  padding: 0.5rem 0;
   color: var(--texto);
   text-decoration: none;
 }
 
-.linha-lista-icone {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--alvo);
-  height: var(--alvo);
-  border-radius: var(--raio-campo);
-  background: var(--quente);
-  color: var(--texto);
-  font-weight: 700;
+@media (hover: hover) {
+  .linha-lista:hover .linha-lista-titulo {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .linha-lista-texto {
@@ -2730,19 +3138,33 @@ dialog.dialogo-previa .linha-acoes button {
 
 .lista-de-linhas {
   display: grid;
-  gap: 0.5rem;
 }
 
-/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. */
+/* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. No topo, "Sair" e o andamento
+   e, no canto, a caneta encostada (D-D7, P5): 56 × 76, a ponta 7 px dentro da borda do cartão (a
+   margem de -10 px embaixo a faz descer sobre ele; o z-index a põe acima dele e da passagem). */
 .topo-drill {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
+.topo-drill .botao-texto {
+  margin-inline-start: -0.75rem;
+}
+
 .topo-drill .barra-fina {
   flex: 1;
   margin-bottom: 0;
+}
+
+.topo-caneta {
+  align-self: flex-end;
+  width: 56px;
+  height: 76px;
+  margin: 0 -8px -10px 0;
 }
 
 .cartao-drill {
@@ -2791,28 +3213,37 @@ dialog.dialogo-previa .linha-acoes button {
   min-height: 50px;
 }
 
+/* `min-width: min-content` (e não o `var(--alvo)` do botão): com o rótulo em uma linha o botão nunca
+   fica menor que o conteúdo, e com fonte ampliada o terceiro desce de linha em vez de pisar no vizinho. */
 .respostas button {
-  flex: 1;
+  min-width: min-content;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
   border-width: 2px;
   background: var(--superficie);
   color: var(--texto);
   font-weight: 600;
 }
 
-/* Estado por texto (6.7): palavra e ícone além da cor. */
+/* Em telas estreitas (320 px) as três respostas só cabem numa linha com o desenho sobre o rótulo. */
+@media (max-width: 379px) {
+  .respostas button {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+/* Estado por texto (6.7): palavra e ícone além da cor. Na tinta, nunca em vermelho (D-D7): erro de
+   estudo e revisão para hoje não são falha técnica. */
 .estado-texto {
   display: inline-flex;
   align-items: center;
-  gap: 0.15rem;
+  vertical-align: middle;
+  gap: 0.375rem;
   min-width: 9rem;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--texto);
-}
-
-.estado-texto.estado-errou,
-.estado-texto.estado-vencido {
-  color: var(--perigo);
 }
 
 .estado-texto.estado-vencido {
@@ -2840,13 +3271,31 @@ dialog.dialogo-previa .linha-acoes button {
   font-family: var(--fonte-leitura);
 }
 
+/* A revisão numa coluna só (D-D7, P5): faixa da Sessão, topo com a caneta, cartão e respostas na
+   mesma largura, para a caneta pousar na borda do cartão em qualquer tela. A classe é `.coluna-drill`
+   porque `.revisao` já é a revisão do rascunho da Biblioteca. */
 @media (min-width: 700px) {
-  .cartao-drill {
+  .coluna-drill {
     max-width: 40rem;
     margin-inline: auto;
+  }
+
+  .cartao-drill {
     padding: 2.5rem 2rem;
     box-shadow: var(--sombra);
   }
+}
+
+/* O fim da rodada (D-D7, P5): a caneta deitada, em repouso, acima do título, e as ações ao centro.
+   Sem cachorro nem desenho próprio: quem desenha é o Resumo do Dia, uma vez por Dia fechado. */
+.fim-de-rodada .fim-caneta {
+  width: 104px;
+  height: 58px;
+  margin: 0 auto 0.75rem;
+}
+
+.fim-de-rodada .linha-acoes {
+  justify-content: center;
 }
 
 /* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por

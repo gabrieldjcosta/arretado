@@ -5,6 +5,7 @@ import { FaixaOffline } from './componentes/estados';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
+import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { RelatarProblema } from './suporte/RelatarProblema';
 import { RODAPE_CURTO, ROTULO_DA_AREA } from './textos';
@@ -105,8 +106,13 @@ export function Shell() {
         <nav aria-label="Áreas" className="areas">
           {AREAS.map((a) => (
             <NavLink key={a.caminho} to={a.caminho} end={a.caminho === '/'}>
-              <IconeDeArea d={a.icone} />
-              <span>{a.nome}</span>
+              {({ isActive }) => (
+                <>
+                  <IconeDeArea d={a.icone} />
+                  <span>{a.nome}</span>
+                  <TracoDeSelecao chave={`area:${a.caminho}`} ativo={isActive} />
+                </>
+              )}
             </NavLink>
           ))}
         </nav>

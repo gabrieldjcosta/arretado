@@ -1002,6 +1002,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 ### Alvo abaixo de 44 px que a F1 não cobre (previsto)
 - **Sintoma:** `node scripts/capturas-ui.mjs --medir` ainda lista, depois da F1: o rótulo de caixa de seleção do Acervo (323 × 29), `summary` "Mais" (33 × 44) em Tarefas, `summary` "Definir até onde" (24 de altura) na Sessão, e links de texto isolados ("Voltar à Biblioteca"; o "Backup e dados" virou botão de texto de 44 px na P2 do Ponto de luz). **Causa:** não são `button` nem `.botao`; o teste de alvos da suíte só mede `button`, `a.botao`, `.areas a` e `input[type=file]`. **Solução:** F7 (Acervo com linhas de 56 px), F8 (Tarefas), F9 (Sessão) e a F2 (rodapé como botão fantasma). **Prevenção:** ao fechar cada fatia, rodar a captura com `--medir` e comparar com `docs/redesign/auditoria-2026-10-14/antes-medidas.json`.
 - **Origem:** previsto — fatias F2, F7, F8 e F9 do redesign v2.
+- **Atualização (P6, 19/10/2026):** fechados "Voltar à Biblioteca" (`Voltar`, 44 px), `summary` "Mais" e "Definir até onde" (viram `botao botao-texto na-margem`), o rótulo do Acervo (linha de 44 px com a marca de 22 px), as linhas-link da Trilha, da Sessão e das Orientações e a Estrela (caixa de 44 × 44; 40 × 44 no celular e no cartão do modo foco). Restam os links em linha de texto (ver "Alvos que restam abaixo de 44 px (P6)"); ao trazer a P5, a frente do cartão em Cartões também passou a 44 px (`.cartao-frente`).
 
 ### Fonte nova pelo npm trava o PR na "Guarda do PR"
 - **Sintoma:** o PR que acrescenta uma fonte com `npm install @fontsource...` fica vermelho no check da guarda, sem erro de código. **Causa:** `package.json` e `package-lock.json` são caminhos protegidos; só passam com o rótulo `aprovado-gabriel`, que só o Gabriel põe. **Solução (Ponto de luz, D-D7):** a Gabarito entrou como arquivo, `src/apresentacao/fontes/gabarito-latin-wght-normal.woff2` (subconjunto `latin`, eixo de peso 400 a 900), com a licença em `fontes/OFL.txt`, um `@font-face` com `font-weight: 400 900` e `format('woff2-variations')`, e o `preload` no `index.html`. A Atkinson e a Literata seguem pelo `@fontsource`. **Prevenção:** fonte, ícone ou imagem nova entra como arquivo no app (nunca CDN, por ser local-first); dependência nova no `package.json` vai num PR à parte, pedindo o rótulo ao Gabriel.
@@ -1036,6 +1037,183 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** parar e subir em comandos separados, com um padrão que não casa consigo mesmo: `pkill -f "vite preview --port 418[2]"`. **Prevenção:** esta entrada.
 - **Origem:** ocorrido em 18/10/2026 (P2 do Ponto de luz, ambiente Linux da nuvem).
 
+
+### Anel do ponto "apagado" reprova 3:1 com a tinta a 45% (P3)
+- **Sintoma:** `node scripts/contraste.mjs` reprova o anel do ponto apagado se ele usar a tinta a 45%, o valor do protótipo. **Causa:** 45% de tinta sobre a areia dá 2,6:1, abaixo dos 3:1 que o contorno de um componente pede (WCAG 1.4.11); o axe não acusa (o ponto é um SVG decorativo, sem texto), só o script.
+- **Solução:** token `--ponto-apagado` (tinta a 55%: 3,4:1 sobre a areia e 3,6:1 sobre a cal; à noite, a tinta clara a 55%: 5,4:1 e 4,9:1), com os pares `ponto-apagado` × superfícies em `scripts/contraste.mjs` (o `contraste.test.ts` o roda). **Prevenção:** todo traço novo com opacidade vira token e par medido; a opacidade nunca vai solta no componente.
+- **Origem:** encontrado na P3 do Ponto de luz (18/10/2026).
+
+### Hoje: texto que a P3 repetiu ou moveu quebra teste (previsto)
+- **Sintoma:** `getByText('cerca de 5 min')` (RTL ou Playwright, em modo estrito) falha com mais de um elemento no Hoje; ou um teste procura "Você parou no Art. 1º da LEP" dentro da região "Agora" e não acha. **Causa:** a folha do Agora e o "Em seguida" mostram o tempo no mesmo formato; e, desde a P3, quem parou de ler vê onde e quando na linha de parada (`Parada`, acima da folha), e a folha não repete o motivo (`motivoDaAcao`). A Biblioteca segue com o `AcaoAgora` e o motivo no título (`Normas.tsx`).
+- **Solução:** escopar a consulta pela região (`getByRole('region', { name: 'Agora' })` ou `'Em seguida'`); o onde parou está em `.parada`. **Prevenção:** `hoje/Hoje.test.tsx` e o passo do Hoje em `e2e/leitor.spec.ts` mostram o escopo.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+
+### Hoje com Sessão aberta: dois botões de vidro e dois "Continuar" (previsto)
+- **Sintoma:** com uma Sessão aberta, o Hoje tem o "Continuar" do aviso (`SessaoAberta`, `.principal`) e o botão de vidro da folha do Agora, e, se a ação do Agora é a leitura, o rótulo dele também é "Continuar". **Causa:** o aviso é do pacote A2 (Sessão) e ainda traz o primário de vidro; a regra "um vidro por tela" (D-D7) só fura nesse estado. Os dois links têm o mesmo nome em regiões com nomes diferentes ("Sessão aberta" e "Agora").
+- **Solução:** resolvido na P6 (19/10/2026): `SessaoAberta` perdeu o vidro ("Continuar" é `botao`, "Encerrar" é `botao botao-texto`), o do Hoje é o do Agora; os dois links ainda têm o mesmo nome em regiões diferentes, então a consulta de teste segue por região. **Prevenção:** esta entrada.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026); resolvido na P6.
+
+### Duas canetas, ou nenhuma, no Hoje; o cachorro não se desenha no teste (P3)
+- **Sintoma:** `svg.caneta` aparece duas vezes (ou nenhuma) no Hoje; ou o teste de unidade não vê o traço se desenhar. **Causa:** a caneta é uma por tela e muda de lugar por salto: com o Dia aberto, fica na linha de parada (encostada, só quando há folha do Agora); com o Dia fechado, só no Resumo do Dia (deitada), e `retrato.diaFechado` decide (`Parada comCaneta`). O jsdom não aplica CSS, então a animação (`traco-desenha`, 300 ms) só se confere no navegador.
+- **Solução:** `Hoje.test.tsx` ("uma caneta por tela…") confere as poses e o lugar; `e2e/sessao.spec.ts` lê `getComputedStyle(…).animationName` (`traco-desenha` com movimento normal, `none` com `prefers-reduced-motion`). **Prevenção:** o Leitor (P4) e o Fixar (P5) usam o mesmo `Caneta`; cada tela, uma só.
+- **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
+
+### Leitor: a linha muda de altura, ou a posição lembrada deriva, quando o "lido até" anda (P4)
+- **Sintoma:** ao marcar "Lido até aqui", as linhas de baixo pulam alguns pixels, ou a posição guardada volta fora do lugar. **Causa:** o virtualizador mede cada linha (`offsetHeight`) e soma as medidas contra `lista.current.offsetTop` (`scrollMargin`); se a linha lida tivesse recuo ou borda diferente da não lida, o "lido até" andando mudaria a altura de várias linhas de uma vez; e um ancestral posicionado da lista (`position: relative` ou `sticky`) faria o `offsetTop` ser contado contra ele.
+- **Solução:** a faixa de cal tem a mesma geometria lida ou não (`border-block: 3px solid transparent` e `background-clip: padding-box` em `.lista-leitor .dispositivo`; só a `background-color` muda com `data-lido`); a folga de 12 px vem de `--margem-do-lido` (margem negativa e recuo iguais); o `.leitor-corpo` que envolve a estrutura e a lista é uma grade sem `position`. **Prevenção:** em `[data-lido]` mude só cor ou sombra; nunca `padding`, `border` ou `margin`. Compare as capturas de antes e depois (a altura da lista é a mesma).
+- **Origem:** previsto e tratado na P4 do Ponto de luz (19/10/2026).
+
+### E2E do recuo por nível falha com a faixa do lido: o artigo "recuado" em 12 px (P4)
+- **Sintoma:** `e2e/leitor.spec.ts` ("ler a LEP compilada…"), `expect(await recuoDe('art2')).toBe(0)` recebe 12. **Causa:** o teste lia o `padding-inline-start` do `.dispositivo`, e na lista ele agora soma a folga da faixa do lido (`--margem-do-lido`, 12 px) ao recuo do nível (`--recuo`); o texto não saiu do lugar (a margem negativa compensa).
+- **Solução:** o teste compara o parágrafo com o artigo (maior que a folga, de no máximo 12 px). **Prevenção:** recuo se mede pela diferença entre níveis, nunca pelo padding absoluto; o E2E isolado da fase não achou isso, só a suíte inteira.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Modo foco: o dispositivo do alto sai do lugar ao entrar ou sair no tablet (P4)
+- **Sintoma:** só no projeto tablet, `e2e/leitor.spec.ts` ("modo foco … o mesmo dispositivo no alto ao entrar e sair") fica a 85 px do alto depois de entrar, e a 200 px depois de F e Esc seguidos; e o de grifos e notas no modo foco não acha o grupo "Marcar o trecho selecionado" (a palavra caiu fora da tela). **Causa:** de 700 a 1199 px a estrutura ocupa uma coluna e sai no modo foco, então a coluna do texto alarga (472 para 664 px em 712) e as linhas de cima se remedem só depois da pintura; a conta do efeito do modo foco, feita antes dela, supunha a mesma largura, e o virtualizador não compensa quando a rolagem acabou de subir (`scrollDirection` `backward`, virtual-core 3.17). Perto do fim da norma a página também encurtava além da folga prevista.
+- **Solução:** o efeito do modo foco confere o alto por 12 quadros (`QUADROS_DA_TROCA`) e corrige a diferença; a linha ancorada fica em `ancoraDaTroca`, para uma troca seguinte (F e Esc) partir dela e não da rolagem em curso; a folga do fim da norma é recalculada a cada correção; roda, toque e teclas de rolagem encerram a conferência. **Prevenção:** tudo que mudar a largura da coluna do texto entre os dois modos depende desta conferência; o E2E do modo foco só falha no tablet, então rode os três projetos.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026), na suíte E2E inteira.
+
+### Troca de lente no modo foco: a linha para uma linha acima do alto, de vez em quando no CI do tablet (P4)
+- **Sintoma:** no CI, só `e2e (tablet)`, `e2e/leitor.spec.ts` ("palco do foco …") ficou a 29 px do alto, uma linha de texto (18 px × 1,6), por 5 s depois de "Texto corrido" na bandeja: na rodada 611 (PR da P4) e na 617 (a `integracao` depois do merge, o mesmo valor); a 613, com o mesmo código, passou. Antes da P4 o teste não tinha caído nas 60 rodadas anteriores. Em mais de 30 rodadas locais não reproduziu (também com a CPU a um terço e a um sexto da velocidade e com a thread engasgando ao acaso).
+- **Causa (provável, não reproduzida):** a estrutura da norma some no modo foco, então a coluna do texto tem 472 px fora dele e 664 px dentro (tablet, 712 px). As medidas das linhas que o virtualizador guarda são de 472 px, e a lista que volta do cartão monta com elas: um gravador de quadros na página viu 17 linhas encolherem de uma vez, uma ou duas linhas cada. O virtualizador (virtual-core 3.17, `resizeItem`) só compensa a remedida de uma linha acima da dobra se a rolagem não vai para cima (`scrollDirection` `backward`), e a volta à posição termina com 3 quadros no lugar: uma medida que chega depois deles, com a rolagem ainda indo para cima, deixa o alto a uma linha do lugar e nada corrige. A primeira medida de uma linha ele compensa sempre.
+- **Solução:** ao entrar no cartão o leitor descarta as medidas (`measure()` no efeito do cartão), então a lista que volta mede as linhas como numa abertura nova. O teste de unidade conta os descartes e falha sem a troca. **Prevenção:** se um modo muda a largura da coluna do texto e a lista é desmontada no meio, descarte as medidas na saída da lista; se a falha voltar no CI, o trace do teste está no artefato `playwright-report-tablet` da rodada (fica 7 dias).
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026), no CI (rodadas 611 e 617). Se a falha voltar depois da correção, a causa acima estava errada ou incompleta: guardar o estado da página no momento da falha (rolagem, `offsetTop` da lista, posição da linha) antes de mexer de novo.
+
+### Estrutura da norma: o teste de unidade não a vê, ou a rolagem fica sempre em 0 (P4)
+- **Sintoma:** `getByRole('navigation', { name: 'Estrutura da norma' })` não acha nada; ou, ao tocar num bloco, `window.scrollTo` recebe sempre `top: 0`. **Causa:** a estrutura só aparece a partir de 700 px (`useLarguraMinima`) e o jsdom não tem `matchMedia`, então a janela é sempre "estreita"; e o virtualizador limita a rolagem a `documentElement.scrollHeight - innerHeight`, que no jsdom é 0.
+- **Solução:** o teste define `window.matchMedia` (o helper `larguraDaJanela` de `Leitor.test.tsx`, apagado no `afterEach`) e, para conferir a rolagem, `vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000)`. **Prevenção:** o Playwright mede o que o jsdom não vê (o E2E do Leitor confere a estrutura no tablet e no desktop e a ausência no celular).
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o botão some entre achar e clicar (teste instável, P4)
+- **Sintoma:** `await usuario.click(await within(estrutura).findByRole('button', …))` não faz nada e o passo seguinte falha (o filtro continua ligado, por exemplo). **Causa:** a lista da estrutura troca quando o alto da tela passa de um bloco a outro, no quadro seguinte à rolagem ou ao filtro (`requestAnimationFrame`); o botão achado pode ser desmontado antes de o clique chegar.
+- **Solução:** esperar o estado novo antes de achar o botão (no teste do filtro, o caminho "TÍTULO I, DO OBJETO" aparece quando a lista troca). **Prevenção:** com a estrutura na tela, depois de rolar ou filtrar, espere por algo que só existe depois da troca.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Botão do dock, do seletor de fonte ou da estrutura volta ao estilo de botão comum (P4)
+- **Sintoma:** botão do Leitor com borda, recuo de 20 px e raio de 12 no lugar do que a regra do componente pede, ou sem fundo no hover. **Causa:** a regra base `button, .botao` de `estilos.css` vem antes da CSS do Leitor e tem a especificidade de uma classe só; vence a regra de uma classe, e o hover só troca `--botao-fundo` (a mesma cascata da P2).
+- **Solução:** o seletor leva o pai (`.acoes-leitor .dock-do-leitor button`, `.tamanho-texto button`, `.estrutura-da-norma .estrutura-item`) e o fundo vem de `var(--botao-fundo, transparent)`, para o hover continuar valendo. **Prevenção:** conferir a captura do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### A Estrela de luz some sobre a faixa de vidro à noite (P4)
+- **Sintoma:** à noite, a estrela (direta ou herdada) quase não se separa da faixa da calha. **Causa:** o contorno claro (`--estrela-contorno`, `#eef3f8`) sobre a faixa de vidro claro (`#7df3e1`) tem 1,2:1; de dia o contorno em tinta separa (3,2:1), à noite só a largura da estrela separava.
+- **Solução:** o aro (`path.aro`): a mesma estrela, mais gorda e na cor do chão (`--aro-da-estrela`, padrão `--fundo`), por baixo, que corta a faixa em volta dela nos dois temas; no cartão do modo foco o chão é `--luz-do-cartao`. **Prevenção:** ao pôr um objeto claro sobre a faixa de vidro, recortar a faixa em volta dele, não depender do contorno.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Dock em vidro desfocado contra o contrato (P4)
+- **Sintoma:** o dock do Leitor saiu com `backdrop-filter: blur(12px)` sobre a superfície a 92%, e a letra da lei aparecia borrada atrás dos rótulos; a revisão do acabamento apontou que o contrato da D-D7 proíbe "vidro desfocado atrás de texto". **Causa:** `docs/design/sistema-visual.md` (escrito na P1) permitia o desfoque só no dock e nos botões do foco, e o contrato (`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`: "sem vidro desfocado"; "Glassmorphism" descartado) não deixa exceção.
+- **Solução:** o dock é uma pílula sólida de `--superficie` (sem `backdrop-filter`; `Canvas` e contorno `CanvasText` em `forced-colors`), o token `--vidro-do-dock` saiu, e o E2E confere `backdrop-filter: none` e fundo opaco. Os botões do modo foco seguem em `--superficie-translucida` (90%, sem desfoque), com `prefers-reduced-transparency` opaco. **Prevenção:** quando o documento de sistema e o contrato divergirem, vale o contrato, e o PR registra a divergência e corrige o documento.
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Cores forçadas: barras pretas entre as linhas do Leitor, ou a barra da estrela some (P4)
+- **Sintoma:** com `forced-colors: active` (Windows, contraste alto; no Playwright, `forcedColors: 'active'`), cada linha lida ganha 6 px de barra preta em cima e embaixo, e a barra da estrela na calha desaparece. **Causa:** o modo troca o fundo, a sombra e a imagem de fundo pelas cores do sistema e pinta a borda transparente (o vão de 3 px da faixa do lido) com a cor do texto; a barra da estrela é só fundo, então vira a cor do chão. Uma regra de `forced-colors` posta antes da regra base perde pela ordem no arquivo (mesma especificidade).
+- **Solução:** a regra de cores forçadas vem logo depois da base: `border-block-color: Canvas` na faixa (a geometria não muda) e, na barra da estrela, `width: 0` com `border-inline-start: 3px solid CanvasText` (`dashed` na herdada). A seção de agora na estrutura, a régua e o filtro ligado do dock vão em `outline: 2px solid Highlight`. **Prevenção:** ao pôr borda transparente, sombra ou fundo que carregam estado, capturar também com `forcedColors: 'active'`; o texto "Lido até aqui" continua dizendo onde a pessoa parou.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026), por captura em cores forçadas.
+
+### Dock do Leitor quebra em duas linhas em 320 px, com vazio ao lado de "Modo foco" (P4)
+- **Sintoma:** em 320 px a pílula do dock ocupa a largura toda, com Buscar, Filtrar e Ações numa linha e "Modo foco" sozinho na outra, à direita. **Causa:** os quatro botões com 12 px de respiro de cada lado somam cerca de 313 px, e só há 288.
+- **Solução:** até 349 px o respiro cai para 8 px (a altura de 44 px do alvo não muda) e os quatro cabem numa linha (`e2e/leitor.spec.ts`, seção de 320 px do teste da P4); com o texto do sistema ampliado ainda quebra em duas, sem alargar a página. **Prevenção:** ao acrescentar um botão ao dock, medir em 320 px.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
+
+### Estilo do painel da estrutura vaza para os cabeçalhos do texto (P4)
+- **Sintoma:** com a classe `.estrutura` no painel `<nav>`, as regras dele (`position: sticky`, `overflow-y: auto`, `max-height`) valeriam também para `.dispositivo.estrutura`, a linha de cabeçalho de título e capítulo no texto, que já usa essa classe. **Causa:** nome de classe global repetido para duas coisas.
+- **Solução:** o painel é `.estrutura-da-norma`. **Prevenção:** antes de nomear uma classe, `git grep -n '\.nome\b' src` no CSS e no TSX; vale também para as regras que dependem da ordem no arquivo.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o bloco de agora só muda quando o cabeçalho chega ao alto (P4)
+- **Sintoma:** com o cabeçalho do capítulo II a 15% da tela, a estrutura ainda mostra o capítulo I. **Causa:** a conta partia do nó no alto da tela (`noDoAlto`, que também grava a posição), e o olho de quem lê está mais abaixo.
+- **Solução:** a estrutura usa `noDaLeitura` (`Leitor.tsx`): o primeiro cabeçalho de bloco entre o alto e a linha de leitura (`FRACAO_DA_LEITURA`, um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho, o nó do alto. Uma conta só (a do "primeiro cabeçalho") para a rolagem e para o toque: tocar numa seção a leva ao alto e a deixa como a de agora, e o bloco não pisca entre pai e filho. O E2E rola o capítulo para 15% e para 55% da tela. **Prevenção:** no jsdom a página mede 0 (a leitura estaria sempre "no pé") e a tela tem 768 px: o teste fixa `scrollHeight` e `innerHeight` (200 px põe a linha de leitura na linha do alto, de 60 px).
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o bloco que termina numa rubrica nunca fica "lida" (P4)
+- **Sintoma:** o "lido até" no último artigo de uma seção do Código Penal deixa a seção "em leitura", enquanto a faixa já mostra a linha como lida. **Causa:** a rubrica (`nome`) é um nó depois do dispositivo e fecha o bloco, mas o "lido até" marca o dispositivo, nunca a rubrica; o estado "lida" pedia o último nó.
+- **Solução:** `IndiceDaEstrutura.ultimo` (`estrutura.ts`): o último nó que o "lido até" alcança, sem a rubrica dobrada no nó de antes (a mesma regra de `montarLinhas`); `estadoDoBloco` compara com ele. Teste com rubrica antes de cada artigo em `estrutura.test.ts`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### CSS que nunca valeu: a margem perde para uma regra de classe e elemento (P4)
+- **Sintoma:** `.estrutura-acima { margin-bottom }` e `margin-top` de `.tipo-parte` e `.tipo-titulo` não mudam nada no navegador. **Causa:** `.estrutura-da-norma ol { margin: 0 }` e `.dispositivo.estrutura { margin-top }` têm mais especificidade, venham antes ou depois no arquivo.
+- **Solução:** o caminho da estrutura é `.estrutura-da-norma .estrutura-acima`; as duas margens dos tipos, que nunca valeram (vinham do tempo do `padding`), saíram e o ritmo do texto ficou como estava. **Prevenção:** ao mexer numa propriedade, conferir o valor calculado no navegador (`getComputedStyle`), não só a regra.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Painel da estrutura sob as abas de baixo e cortado com letra maior (P4)
+- **Sintoma:** de 700 a 899 px (tablet em pé, celular deitado) o fim da lista fica sob as abas fixas, e o bloco de agora, que o painel traz ao fim da rolagem, também; com a letra padrão do navegador maior, de 1200 px em diante o painel começa fora da janela. **Causa:** a altura máxima não descontava `--abas-altura`; e o ponto de corte era em px, enquanto a faixa do painel é em rem.
+- **Solução:** `max-height` desconta `var(--abas-altura, 0px)` (zero de 900 px em diante e com o teclado aberto) e o corte da margem é `min-width: 75em` (1200 px na letra de 16 px, e cresce com ela).
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Legenda dos destaques alarga a página com a letra maior (P4)
+- **Sintoma:** com "Destaques" ligado e o texto ampliado, a página rola na horizontal. **Causa:** a legenda curta estava em `flex-wrap: nowrap`, e as quatro palavras não encolhem.
+- **Solução:** a legenda quebra se não couber (em 320 px cabe numa linha, e o E2E confere as duas coisas). **Prevenção:** "numa linha só" é uma medida a conferir, não um `nowrap`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Modo foco: "Próximo artigo" vira texto sem caixa na bandeja (P4)
+- **Sintoma:** na bandeja aberta, o botão principal é o menos visível: negrito, sem fundo nem contorno, e "Sair do foco" parece mais um botão do que ele. **Causa:** `.em-foco .acoes-leitor button` (translúcido e atenuado, para os botões do canto) tem mais especificidade que `.principal`.
+- **Solução:** `.em-foco .bandeja-itens button.principal` devolve o vidro de ação (e o hover dele); "Sair do foco" é o que recua, de propósito.
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Glifo trocado por SVG muda o nome acessível e quebra teste (P6)
+- **Sintoma:** depois que `←`, `✓`, `✎` viram `Icone`, falham `getByRole('link', { name: '← Biblioteca' })` e `toHaveTextContent('A jurisdição penal✎ será exercida.')` (`Leitor.test.tsx`), `within(botao).getByText('✓')` (`Acervo.test.tsx`) e o E2E `/^← Voltar a Art\. 5º, XLVII/` (`e2e/leitor.spec.ts`). **Causa:** o glifo era texto e entrava no nome e no `textContent`; o SVG é `aria-hidden` e não tem texto.
+- **Solução:** o nome fica sem o glifo (`Voltar nome="Voltar à Biblioteca"` com o texto visível "Biblioteca", que o nome contém, WCAG 2.5.3; `/^Voltar a Art\. 5º, XLVII/`); a marca do Acervo se confere pelo SVG (`.item-acervo-marca svg`), além do `aria-pressed`. **Prevenção:** ao trocar glifo por ícone, `git grep -n` do glifo em `src` e `e2e` antes de rodar a suíte; o ícone nunca entra no nome. O Fixar saiu da P5 já com SVG (juntado ao `Icone` na P6); resta só o `→` de `Perfis.tsx`.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### `.discreto` ficou sublinhado no cabeçalho e no menu da Ajuda (P6, tratado)
+- **Sintoma:** com `.discreto` igual a `.botao-texto`, "Ajuda" e os itens do menu dela passariam a 14 px, peso 500 e sublinhados. **Causa:** o cabeçalho usava `.discreto` só para tirar a caixa do botão.
+- **Solução:** `.acoes-globais .ajuda-botao, .menu-ajuda-itens .discreto` devolvem 15 px, peso 600 e sem sublinhado; nas telas, `.discreto` é o fantasma sublinhado (o que restou no Fixar, da P5, é o mesmo botão). **Prevenção:** ao mudar uma classe usada em muitas telas, `git grep -n 'discreto' src` e conferir cada lugar na captura.
+- **Origem:** previsto e tratado na P6 do Ponto de luz (19/10/2026).
+
+### `<summary>` com `.botao` fica com o recuo ou o `display` errados (P6)
+- **Sintoma:** o `summary` sozinho num `<details>`, com `botao botao-texto na-margem`, saía com recuo e alinhamento diferentes dos outros botões-texto. **Causa:** regras de componente com o pai no seletor (`.pontos-novo > summary`, `.tarefas-mais > summary`, `.importar-ajuda-ia summary`) têm mais especificidade que `.botao` e `.na-margem` e redefinem `display` e `padding`.
+- **Solução:** essas regras saíram (o `summary` é o botão). **Prevenção:** ao pôr `.botao` num `summary`, `git grep -n 'summary' src --include=*.css` e apagar o que redefine `display`, `padding` e `margin`.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### Estrela com alvo de 44 px sem mexer no texto (P6)
+- **Sintoma:** a Estrela media 24 × 29 (pergunta aberta no PR #201). **Causa:** a calha tem 24 px e a caixa do botão era a da calha; alargar para a direita pisaria no texto (no modo foco a margem do lido é 0).
+- **Solução:** a caixa do botão passa a 44 × 44, ainda fora do fluxo: `inset-inline-start: calc(var(--calha-estrela) - var(--estrela-largura))`, `padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela))` (o conteúdo segue com 24 px e a estrela no mesmo ponto) e `margin-block-start: calc((1.6em - var(--alvo)) / 2)` (o mesmo centro na altura). Não é `::after`: o `--medir` e o leitor de tela olham a caixa do botão. A largura é `min(var(--alvo), calha + --estrela-folga)`: a caixa só avança até onde há folga à esquerda, que é o recuo da página (`--gutter`, 16 px no celular) e, no cartão do modo foco, o recuo do cartão (1rem). Sem esse limite, a caixa passava 4 px da borda da tela e do cartão (o `overflow-y: auto` do cartão corta também no eixo x): o toque nos 4 px da esquerda não chegava ao botão e o anel de foco (`outline-offset: -2px`) perdia o lado esquerdo; o `getBoundingClientRect` não enxerga esse corte, só o `document.elementFromPoint`. Medido no Leitor (`estrela.mjs`, `estrela-clip.mjs`): 44 × 44 na lista de 700 px para cima, 40 × 44 no celular e no cartão do modo foco, o SVG no mesmo centro, o texto a 66 px da esquerda no celular e 413 px no desktop. **Prevenção:** alvo maior que o desenho se faz na caixa do botão, com a posição compensada e conferida por `elementFromPoint` na ponta (o E2E `caixaInteiraDaEstrela` faz isso na lista e no modo foco, nos três aparelhos).
+- **Origem:** pergunta aberta na P4, fechada na P6 do Ponto de luz (19/10/2026).
+
+### Marcador de nota com SVG não pode crescer a linha do Leitor (P6, previsto)
+- **Sintoma esperado:** o lápis de 18 px (`.icone-svg`) dentro de uma linha de texto aumenta a altura dela, e o virtualizador mede e deriva. **Solução:** `button.marcador-nota .icone-svg { display: inline; width: 1em; height: 1em; vertical-align: -0.125em }`. Conferido injetando o mesmo marcador numa linha do Leitor (`marcador.mjs`): 115,19 px de altura antes e depois. **Prevenção:** ícone dentro de texto corrido se mede em `em`, nunca no tamanho de ícone de botão.
+- **Origem:** previsto e tratado na P6 do Ponto de luz (19/10/2026).
+
+### Alvos que restam abaixo de 44 px (P6)
+- **Sintoma:** `capturas-ui.mjs --medir` ainda lista as notas de vigência do Leitor ("(Redação dada pela Lei nº …)", 278 × 19), as remissões no texto ("II", 15 × 27), "Fazer agora" no Hoje (74 × 19), "Aparência" no meio de uma frase de Perfis (63 × 19) e, no Fixar, "registrar um erro" (118 × 21, na linha "Depois:"). **Causa:** são links em linha de texto, a exceção "em linha" da WCAG 2.5.8 (o alvo é limitado pela altura da linha); a nota de vigência é uma linha miúda inteira de link, e dar 44 px a cada uma deixaria cada artigo bem mais alto.
+- **Solução:** nenhuma na P6; decisão do Gabriel (ampliar as notas ou aceitar a exceção). O `--medir` separa "em texto" dos demais; fora de texto não sobra nada. **Prevenção:** esta entrada.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### As capturas `--rotas todas` não mostram a Sessão aberta (P6)
+- **Sintoma:** `/sessao/atual`, o Hoje com Sessão aberta e a faixa da Sessão na revisão e no Leitor saem como "Nenhuma Sessão aberta". **Causa:** o estado semeado não tem Sessão aberta, e o app a cria só pela interface. **Solução:** `sessao-aberta.mjs` (em `/mnt/project-files/redesenho/ponto-de-luz/p6/`): começa a Sessão pela tela, passa por Hoje, Sessão rodando, pausada, Leitor, revisão e "Encerrar a Sessão" e mede vidro e alvos de cada uma. **Prevenção:** tela que depende de uma ação da pessoa precisa de roteiro próprio.
+- **Origem:** encontrado na P6 do Ponto de luz (19/10/2026).
+
+### Duas fases em paralelo resolvem a mesma coisa com nomes diferentes e o merge não avisa (P6)
+- **Sintoma:** depois de trazer a P5 (#203) para a P6 (#206) o merge só deu conflito em documentos, mas o código tinha dois componentes de ícone (`IconeDoFixar` e `Icone`, com o mesmo SVG e caminhos repetidos), duas regras de recuo para o botão-texto (`.mais-da-lista .botao-texto`, `.menu-drill > summary` e outras, mais o `.na-margem`) e a classe `.icone-fixar` igual a `.icone-svg`. **Causa:** cada fase criou a sua ferramenta sem ver a da outra; o git só enxerga linhas iguais.
+- **Solução:** o `Icone` ficou com todos os desenhos (`repetir`, `onda`, `ajuda`, `relogio`), `recall/icones.tsx` e `.icone-fixar` saíram, e o recuo é só `.na-margem`. **Prevenção:** depois de mesclar uma fase paralela, `git diff --stat <base antiga> HEAD` e uma busca por `svg`, `margin-inline-start: -0.75rem` e por `summary` nos arquivos novos; o merge limpo não prova que há uma só ferramenta.
+- **Origem:** encontrado ao trazer a P5 para a P6 (19/10/2026).
+
+### favicon.ico sai com as três imagens do mesmo tamanho (P7)
+- **Sintoma:** o `favicon.ico` declara 16, 32 e 48 px, mas as três imagens dentro dele são de 48. **Causa:** `scripts/icones-app.mjs` rasterizava com `Promise.all` numa só página do Playwright: os três `setViewportSize` correm juntos e o tamanho da janela é o do último que pediu.
+- **Solução:** uma de cada vez (laço com `await`). **Prevenção:** `config/plataformas.test.ts` lê o cabeçalho IHDR do PNG de cada entrada do ICO e compara com o tamanho declarado.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### `?raw` de um `.css` volta vazio no Vitest (P7)
+- **Sintoma:** `import css from './estilos.css?raw'` num teste da `unidade` dá `''`, e a conferência de token contra constante passa sem ler nada. **Causa:** o Vitest trata o CSS como módulo vazio (o `?raw` de `.html` funciona). **Solução:** teste em ambiente `node` (`// @vitest-environment node`) que lê o arquivo (`readFileSync`) ou usa `lerTemas()` de `scripts/contraste.mjs`, como `config/plataformas.test.ts`. O tsconfig do Node não tem a lib DOM, então esse teste não importa código de DOM: lê a fonte (`cor-da-barra.ts`) com regex.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### A barra do navegador não segue o tema escolhido à mão (P7)
+- **Sintoma:** com "Escuro" em Conta › Aparência e o aparelho no claro, a barra de cima (Chrome Android, Safari) continua areia. **Causa:** as metas `theme-color` com `media="(prefers-color-scheme: …)"` só leem o esquema do aparelho, não o `data-tema` da página; o manifest não varia por esquema.
+- **Solução:** `aplicarCorDaBarra(tema)` (`src/apresentacao/cor-da-barra.ts`, chamada por `AplicarAparencia`) põe a mesma cor nas duas metas quando o tema é `claro` ou `escuro` e devolve a cada uma a sua em `sistema`. **Prevenção:** teste de unidade (as metas do `index.html` de verdade) e E2E `e2e/plataformas.spec.ts`; `config/plataformas.test.ts` compara as cores com `--areia` e `--noite`.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### iPhone: a ilha, o entalhe ou o indicador de início cobrem texto (P7)
+- **Sintoma:** com `viewport-fit=cover` (P7), texto ou botão sob a ilha no alto, colado no entalhe no celular deitado ou sob o indicador de início. **Causa:** a página vai até a borda do vidro e só recua quem lê `env(safe-area-inset-*)`. Faltavam: o recuo lateral de `.conteudo` e `.rodape`; o cabeçalho a partir de 900 px (a regra de 900 px trocava o recuo e perdia a área segura); `.areas` de 700 a 899 px; a reserva de baixo de 900 px em diante (`--abas-altura` valia 0); a folha e o balão da prévia (`dialog.dialogo-previa`); o alto do texto no modo foco, sem o cabeçalho que reservava a ilha; o `min-height` do foco do artigo (`100dvh - 2rem` somado à ilha deixava a página rolar sobrando); os diálogos (`max-height: 100dvh - 2rem` com a margem de cima maior que 1 rem passa do fim da tela, como a busca com 100 achados); o "Só estudo", que zerava `--abas-altura` e levava o conteúdo até o indicador de início; o link "Pular para o conteúdo" com foco.
+- **Solução:** `max(var(--gutter), env(...))` nos recuos; `--abas-altura: env(safe-area-inset-bottom, 0px)` como valor-base e também no "Só estudo"; `max-height` dos diálogos descontando o maior entre 1 rem e a área segura de cima e de baixo; no foco do artigo, o `min-height` com o mesmo `max()` do `padding` de `.conteudo`. **Prevenção:** `e2e/areas-seguras.spec.ts` emula as áreas (Chromium, `Emulation.setSafeAreaInsetsOverride`; o WebKit do Playwright não emula) em três iPhones e confere cada tela; a primeira coisa que ele faz é ler `env()` e comparar com o que pediu, para um Chromium que ignorasse a emulação não deixar tudo passar sem medir nada. Cada correção tem um teste que falha sem ela (conferido desfazendo uma de cada vez em 19/10/2026): o cabeçalho a partir de 900 px (as seis telas do Pro Max deitado e o alinhamento da marca com o título), o "Só estudo" (iPhone deitado e Pro Max), a busca com 100 achados (iPhone em pé), a sobra de rolagem do foco do artigo (43 px sem a correção, iPhone em pé) e o aviso da Estrela no trilho (`e2e/trilho-do-leitor.spec.ts`). O link de pular não tem teste (só aparece com o foco do teclado).
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### E2E das áreas seguras: o que não é falha (P7)
+- **Sintoma:** a medição acusa texto ou controle "fora" que ninguém vê. **Causa e solução:** (1) texto num `<details>` fechado: o retângulo é o de antes de esconder; pula quem não passa em `checkVisibility()`. (2) fileira de abas que rola de lado (Fixar, Biblioteca): a caixa passa da borda, mas o que aparece é o recorte do ancestral com `overflow`; mede-se o recorte, e o texto é cortado também pelo próprio elemento (`.visualmente-oculto` tem 1 × 1 px com o texto vazando). (3) elemento grudado (`sticky`, a estrutura da norma): antes de rolar ele é página; só vale nas quatro bordas depois de rolar (pontos `meio` e `pe`); o fixo vale sempre. (4) controle sem fundo nem borda (link, botão-texto, a Estrela de 44 px que avança 16 px para a margem): a caixa é alvo de toque, não tinta, e mede-se o texto e o desenho de dentro; nos que têm tinta, a margem negativa que alinha o desenho à margem da página tira o excedente da conta. (5) página que ainda carrega: mede só quando `scrollHeight` parou. (6) áreas pedidas nas quatro bordas ao mesmo tempo em 412 px não existem em aparelho: o teste usa os três iPhones reais. **Limites conhecidos:** a área segura de cima só passa de zero em aparelho real com barra de status translúcida ou tela cheia (os lados, deitado, e o embaixo são os reais); no foco do artigo, um cartão alto no Pro Max deitado ainda deixa uns 37 px de rolagem sobrando (o respiro simétrico de 76 px do cartão, da P4), por isso o teste entra no foco do começo da norma, onde o cartão é curto; no foco do texto `fimDaBarraFixa()` (`Leitor.tsx`) devolve 0, então um salto para um dispositivo pode pôr a linha sob a ilha se houver área segura em cima.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026).
+
+### Bandeja do modo foco cortada no celular deitado (P7)
+- **Sintoma:** com o iPhone deitado (altura de 393 a 430 px), ao abrir o ⋯ os primeiros itens (Buscar, Filtrar, Ações) ficam acima da tela, onde não se chega (a bandeja é fixa e não rola). **Causa:** a pilha de nove botões de 44 px passa de 440 px acima do ⋯, sem limite de altura.
+- **Solução:** até 540 px de altura a bandeja vira duas colunas (a ordem do teclado segue a da leitura, uma coluna e depois a outra), e `max-height` com `overflow-y: auto` fica como rede de segurança (tela muito baixa, texto ampliado). **Prevenção:** `e2e/areas-seguras.spec.ts` abre a bandeja em cada aparelho.
+- **Origem:** encontrado na P7 do Ponto de luz (19/10/2026), pelo E2E das áreas seguras.
 
 ## Uso do app
 
@@ -1494,6 +1672,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Causa:** o aceite acontece antes de a conta existir no Aparelho (e o login do Google sai da página); ele só é gravado quando Conta abre já dentro do banco da conta ativa. Sem `localStorage`, a tela Entrar recusa entrar.
 - **Solução:** abrir Conta depois de entrar (`RegistrarAceite`); a marca fica até haver conta ativa com banco aberto.
 
+## A caneta que desenha (D-D8, 19/10/2026)
+
+- **Teste de tela não vê o traço nem a passagem.** Causa: o jsdom não tem `matchMedia`, e o setup (`src/testes/setup.ts`) o instala já em movimento reduzido, que não anima nada. Solução: `simularMovimento('normal' | 'calmo')` (`src/testes/movimento.ts`) e, para o perfil, gravar `perfilDeEstudo` nas Preferências do repositório do teste: `AplicarAparencia` reescreve `data-perfil` a partir delas, então mexer só no `dataset` não basta. O jsdom também não tem `Element.animate`, layout nem geometria de SVG: os testes dão `animate`, `getTotalLength` e `getPointAtLength` de mentira.
+- **Teste do fim da rodada falha de vez em quando ("Feito." não aparece).** Causa: fora do Calmo o fim da rodada sorteia o sotaque (uma em três: "Danado de bom! Rodada feita."). Solução: `vi.spyOn(Math, 'random').mockReturnValue(0.99)` no teste.
+- **Parte do desenho some ou aparece como um ponto.** Causa: um subtraço `M x y` sem segmento não desenha nada (vira ponto só com ponta redonda e comprimento zero); o traço pontilhado aparece como ponto antes de começar. Solução: pontos são `M x y h0` (ver `cena.ts`), e `desenhar.ts` esconde o fio (`visibility: hidden`) enquanto ele tem zero desenhado.
+- **A caneta fica parada no meio do quadro ou o quadro nunca aparece pronto (previsível).** Causa provável: o `useLayoutEffect` de `QuadroDoCacto` foi abortado (o Dia foi reaberto ou a tela trocou) e o desenho em andamento não termina. Solução: o efeito sempre repinta as partes anteriores e, se não for para desenhar, a de hoje (`pintarAte` e `pintarParte`); conferir o `dias` que a tela recebe.
+- **Previsível na P4 e na P5.** O traço de seleção só desenha depois de um clique ou tecla no item (a memória de intenção dura 1,2 s e não é consumida, para a aba da Biblioteca que remonta também desenhar); atalhos de teclado que escolhem sem foco no item chamam `marcarEscolha(chave)`. A passagem do cartão anima o próprio elemento (`ref` em `usePassagemDeCartao`): não pôr `transform`, `opacity` nem `transition` fixos nesse elemento por CSS, e o último cartão da rodada não passa de propósito.
+- **`npm run lint` acusava erro dentro de `.claude/skills`.** Causa: o PR #194 trouxe skills com scripts e fluxos que não são código do app. Solução: `.claude` entrou em `ignores` do `eslint.config.js` (como já estava no `.prettierignore`).
+
 ## Orquestração (Orca, 15/10/2026)
 
 - **Comando enviado ao worker não chega.** O terminal do worker no Orca recebe o texto, mas só o processa depois de um Enter. Depois de enviar, mande o Enter e confira que a linha saiu do campo de entrada.
@@ -1504,3 +1691,19 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
   - **Cline, 18/10/2026:** funciona como revisor, mas ao iniciar mostra um aviso promocional que segura o campo de entrada; o Orca não reconhece o terminal como pronto e o despacho parece parado. Depois do `worker-start`, mande um Enter (ou uma tecla) para fechar o aviso e confira com `orca terminal show` que o prompt saiu do campo. **Antigravity** falhou como revisor e foi descartado pelo Gabriel (18/10/2026).
 - **Contrato despachado para atividade já feita.** Causa: o `plano-mestre.md` §9 e o `f3-pacotes.md` dão a ordem, não o estado. Conferir `docs/proxima-sessao.md`, `git log origin/integracao` e `gh pr list` antes de despachar (`contratos-agentes.md` §6).
 - **Projeto Supabase pausado (plano gratuito, 7 dias sem uso).** Sintoma: requisições ao projeto falham ou o painel mostra "Paused". Causa: inatividade. Solução: o workflow `consulta-diaria` evita (precisa dos segredos `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY`; sem eles só avisa); se já pausou, "Restore project" no painel ou `restore_project`.
+
+### Entrar mostra "Não foi possível guardar o seu aceite neste navegador."
+
+**Causa:** `localStorage` indisponível (modo privado, armazenamento bloqueado ou cheio); a marca do aceite não pôde ser gravada. **Solução:** liberar o armazenamento do site ou usar uma janela normal; sem a marca o login não segue. "Sem aceitar não dá para entrar" fica só para o código por e-mail sem marca.
+
+## Fixar e revisão (P5 do Ponto de luz, 19/10/2026)
+
+- **Teste ou link que abria `/recall` esperando a lista de Erros cai nas Frases.** Causa: "Erros" deixou de ser aba (D-D5); `/recall` redireciona (`Navigate replace`) para `/recall/frases`. Solução: a lista com filtros é `/recall/erros` (`ErrosComFiltros`), e o filtro (`?completar=1` e os outros) fica no endereço dessa rota.
+- **A caneta do topo da revisão some atrás do cartão ou fica fora do lugar.** Causa: o cartão vem depois no DOM e pinta por cima de quem não tem camada; a caneta só desce sobre ele pela margem de -10 px embaixo. Solução: `.topo-drill` leva `position: relative; z-index: 2`, e a caneta fica fora do `<article>` (a passagem do cartão anima o elemento, e a caneta não anda com ele). Previsível: `transform` ou `overflow: hidden` em `.coluna-drill` cortariam ou moveriam a caneta; não pôr.
+- **"De novo" quebrava em duas linhas ao trocar o glifo pelo desenho.** Causa: três botões `flex: 1` com `min-width: 6rem` e padding de 1,5 rem não comportam desenho e rótulo num celular de 390 px; em 320 px o terceiro ia para a linha de baixo. Solução: `padding-inline: .5rem`, `white-space: nowrap`, `min-width: min-content` e, até 379 px, o desenho sobre o rótulo. Não usar `min-width: 0` (o botão traz `min-width: var(--alvo)`): as três respostas ficariam sempre numa fileira e, com fonte ampliada, o rótulo pisaria no vizinho; com `min-content` o terceiro desce de linha (a 150%) e a 200% cada um ocupa a sua.
+- **O texto de um `inline-flex` com desenho fica mais alto que o texto ao lado ("Para revisar" junto da data).** Causa: a linha de base de um `inline-flex` é a do primeiro item, e o SVG não tem texto, então a base cai no pé do desenho. Solução: `vertical-align: middle` em `.estado-texto`.
+- **Topo e respostas da revisão largos e só o cartão estreito (tablet e desktop).** Causa: `max-width` e `margin-inline: auto` estavam só em `.cartao-drill`. Solução: o envoltório `.coluna-drill` (40 rem a partir de 700 px) leva a faixa da Sessão, o topo, o cartão e as respostas; `.cartao-drill` fica só com o respiro e a sombra.
+- **A regra de coluna do Fixar encolheu a revisão do rascunho da Biblioteca (Importar).** Causa: `.revisao` já era a classe de `RevisaoDoRascunho`; a regra `.revisao { max-width: 40rem; margin-inline: auto }` valia para as duas. Solução: a coluna do Fixar é `.coluna-drill`. Antes de nomear uma classe: `git grep -n '\.nome\b' src`.
+- **Sem Frase nenhuma, a lista de Erros ficava sem entrada.** Causa: "Ver os erros, com filtros" só vinha depois das linhas; Erro anterior à v6 (sem frase correta) ou com a frase correta apagada não tem Frase ativa, e a aba mostrava só "Nenhuma frase ainda". Solução: o link vem também no estado vazio (`ListaFrases`; teste em `Recall.test.tsx`).
+- **"Para hoje" em todo cartão vencido contradizia a cota** ("Hoje: 10 de 25. Os outros esperam" e 25 rótulos "Para hoje"). Solução: "Para revisar", que diz que o prazo chegou e não que o cartão é da rodada de hoje.
+- **"Voltar ao Fixar" no detalhe do Erro caía nas Frases** (o laço "completar depois" perdia a lista). Causa: `/recall` virou redirecionamento. Solução: o detalhe e a exclusão voltam a `/recall/erros` ("Voltar aos erros"); o filtro mora no endereço, e o botão Voltar do navegador o preserva.

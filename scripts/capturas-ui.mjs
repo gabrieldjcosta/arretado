@@ -67,6 +67,7 @@ const ROTAS_TODAS = [
   '/recall/frases',
   '/recall/cartoes',
   '/recall/historico',
+  '/recall/erros',
   '/recall/registrar',
   '/recall/revisar',
   '/recall/frases/revisar',

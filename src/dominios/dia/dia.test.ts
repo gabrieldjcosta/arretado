@@ -71,6 +71,45 @@ describe('Fechar o Dia (A3b)', () => {
     expect((await diaDeHoje(repo))?.fechadoEm).toBeDefined();
   });
 
+  it('conta os Dias fechados, o total e nunca uma sequência', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    expect((await resumoDoDia(repo)).diasFechados).toBe(0);
+
+    await fecharDia(repo);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(1);
+
+    // Faltar três Dias não tira nada: o total só cresce.
+    relogio.avancar(4 * DIA);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(1);
+    await fecharDia(repo);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(2);
+
+    // Reabrir o Dia de hoje o tira da conta até fechá-lo de novo; um Dia aberto não conta.
+    await reabrirDia(repo);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(1);
+    await fecharDia(repo);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(2);
+  });
+
+  it('dois registros do mesmo Dia contam uma vez só', async () => {
+    const { repo } = await repositorioDeTeste();
+    const data = dataCivil(repo.ctx.agora());
+    const fechadoEm = repo.ctx.agora().toISOString();
+    await repo.colecao('dias').criar({ data, fechadoEm });
+    await repo.colecao('dias').criar({ data, fechadoEm });
+    expect((await resumoDoDia(repo)).diasFechados).toBe(1);
+  });
+
+  it('um Dia excluído não conta', async () => {
+    const { repo } = await repositorioDeTeste();
+    const fechado = await repo.colecao('dias').criar({
+      data: dataCivil(repo.ctx.agora()),
+      fechadoEm: repo.ctx.agora().toISOString(),
+    });
+    await repo.colecao('dias').excluir(fechado.id);
+    expect((await resumoDoDia(repo)).diasFechados).toBe(0);
+  });
+
   it('fechar o Dia não encerra a Sessão aberta', async () => {
     const { repo } = await repositorioDeTeste();
     await sessao(repo, 'ativa');

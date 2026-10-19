@@ -13,6 +13,8 @@ export const VERSAO_TERMOS = 'teste-1';
 
 const AVISO_PADRAO = 'Não foi possível entrar agora. Você continua usando o Arretado sem conta.';
 
+const AVISO_SEM_ARMAZENAMENTO = 'Não foi possível guardar o seu aceite neste navegador.';
+
 const AVISO_SEM_ACEITE =
   'Sem aceitar não dá para entrar. Você continua usando o Arretado sem conta.';
 
@@ -65,7 +67,7 @@ export function Entrar({
   const aceitar = (): boolean => {
     marcarAceiteDoLogin();
     if (aceiteDoLoginPendente() !== null) return true;
-    setAviso(AVISO_SEM_ACEITE);
+    setAviso(AVISO_SEM_ARMAZENAMENTO);
     return false;
   };
 

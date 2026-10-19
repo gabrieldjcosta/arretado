@@ -8,7 +8,7 @@
       "arquivo": "defensoria-publica.json",
       "editais": 13,
       "orgaosSemEdital": 15,
-      "itens": 6161
+      "itens": 8609
     },
     {
       "nome": "Magistratura",
@@ -17,7 +17,7 @@
       "arquivo": "magistratura.json",
       "editais": 17,
       "orgaosSemEdital": 20,
-      "itens": 3843
+      "itens": 6485
     },
     {
       "nome": "Ministério Público (Promotor)",
@@ -26,7 +26,7 @@
       "arquivo": "ministerio-publico.json",
       "editais": 4,
       "orgaosSemEdital": 0,
-      "itens": 337
+      "itens": 896
     },
     {
       "nome": "Analista Judiciário",

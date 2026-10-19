@@ -12,20 +12,32 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
-import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { usePassagemDeCartao } from '../componentes/passagem';
+import { marcarEscolha } from '../componentes/traco/escolha';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
+import { TopoDaRevisao } from './TopoDaRevisao';
 
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'revisando'; fila: Cartao[]; indice: number; virado: boolean }
   | { tipo: 'fim'; amanha: number; restantes: number; proximoLote: number; frases: number }
   | { tipo: 'falha' };
+
+/** O desenho de cada resposta (traço único, `currentColor`): o rótulo diz o que é, o desenho acompanha. */
+const ICONE = {
+  errei: 'repetir',
+  dificil: 'onda',
+  facil: 'marca',
+} as const satisfies Record<RespostaRevisao, NomeDoIcone>;
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
   if (cartao.verso !== null) return cartao.verso;
@@ -38,7 +50,8 @@ async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string>
 /**
  * Drill: frente, virar, De novo / Difícil / Fácil. Sem caixa nem intervalo à vista (Parte 2 §9.2).
  * Revisa até a cota por vez (fatia 3); o resto da fila espera, sem ser cortado nem reordenado, e o
- * fim oferece "Revisar mais N".
+ * fim oferece "Revisar mais N". Ao responder, a resposta ganha o traço de seleção e o cartão passa
+ * para o seguinte ("A caneta que desenha"; sem movimento, a troca é na hora).
  */
 export function Drill() {
   const texto = useVoz();
@@ -47,9 +60,12 @@ export function Drill() {
   // Verso guardado com o id do cartão: nunca mostra o verso do cartão anterior.
   const [verso, setVerso] = useState<{ id: string; texto: string } | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  /** A resposta tocada, enquanto o cartão passa: é a que ganha o traço de seleção. */
+  const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   const inicio = useRef(0);
   const botaoVirar = useRef<HTMLButtonElement>(null);
+  const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
 
   const cota = useRef(0);
 
@@ -137,19 +153,31 @@ export function Drill() {
 
   const responder = useCallback(
     async (resposta: RespostaRevisao) => {
-      if (!atual || ocupado) return;
+      if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      // Pelo clique ou pela tecla (1, 2, 3), a resposta ganha o traço de seleção.
+      marcarEscolha(`resposta:${resposta}`);
+      setEscolhida(resposta);
       try {
-        await revisar(repo, atual.id, resposta, { duracaoMs: performance.now() - inicio.current });
-        avancar();
+        const gravada = revisar(repo, atual.id, resposta, {
+          duracaoMs: performance.now() - inicio.current,
+        });
+        if (estado.indice + 1 >= estado.fila.length) {
+          // O último cartão não passa: o fim da rodada toma a tela.
+          await gravada;
+          avancar();
+        } else {
+          await passar(gravada, avancar);
+        }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
       } finally {
         setOcupado(false);
+        setEscolhida(null);
       }
     },
-    [atual, ocupado, repo, avancar],
+    [atual, estado, ocupado, repo, avancar, passar],
   );
 
   // Atalhos: espaço/Enter vira; 1, 2, 3 respondem (Parte 2 §11).
@@ -192,17 +220,18 @@ export function Drill() {
 
   if (estado.tipo === 'fim') {
     return (
-      <>
+      <div className="coluna-drill fim-de-rodada">
         <h1>Revisar</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
+          marca={<Caneta pose="deitada" className="fim-caneta" />}
           acao={
             estado.frases > 0 ? (
               <>
                 <Link to="/recall/frases/revisar" className="botao principal">
                   Seguir para as frases ({estado.frases})
                 </Link>
-                <Link to="/recall" className="botao discreto">
+                <Link to="/recall" className="botao botao-texto">
                   Voltar ao {ROTULO_DA_AREA.recall}
                 </Link>
               </>
@@ -234,24 +263,23 @@ export function Drill() {
           )}
           <p>Amanhã: {estado.amanha === 1 ? '1 cartão' : `${String(estado.amanha)} cartões`}.</p>
         </Vazio>
-      </>
+      </div>
     );
   }
 
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
-  const ICONE = { errei: '↻', dificil: '~', facil: '✓' } as const;
   return (
-    <>
+    <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar</h1>
       <FaixaDaSessao />
-      <div className="topo-drill">
-        <Link to="/recall" className="botao discreto">
-          Sair
-        </Link>
-        <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Cartão" />
-      </div>
-      <article className="cartao-bloco cartao-drill" aria-label="Cartão">
+      <TopoDaRevisao
+        sair="/recall"
+        valor={estado.indice + 1}
+        max={estado.fila.length}
+        rotulo="Cartão"
+      />
+      <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
         <p className="drill-frente texto-leitura">{atual.frente}</p>
         {estado.virado && (
           <div className="frase-correta" aria-live="polite">
@@ -296,8 +324,9 @@ export function Drill() {
               aria-keyshortcuts={String(i + 1)}
               onClick={() => void responder(r)}
             >
-              <span aria-hidden="true">{ICONE[r]} </span>
+              <Icone nome={ICONE[r]} />
               {ROTULO_RESPOSTA[r]}
+              <TracoDeSelecao chave={`resposta:${r}`} ativo={escolhida === r} />
             </button>
           ))}
         </div>
@@ -307,8 +336,8 @@ export function Drill() {
           ? `${restam === 1 ? 'mais 1 cartão' : `mais ${String(restam)} cartões`} nesta rodada`
           : 'o fim desta rodada'}
       </LinhaDepois>
-      <details className="menu-drill">
-        <summary className="botao discreto">Mais opções</summary>
+      <details>
+        <summary className="botao botao-texto na-margem">Mais opções</summary>
         <div className="linha-acoes">
           <button
             type="button"
@@ -330,6 +359,6 @@ export function Drill() {
           )}
         </div>
       </details>
-    </>
+    </div>
   );
 }

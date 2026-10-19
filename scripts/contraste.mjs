@@ -95,6 +95,8 @@ export function pares() {
       // O ponto de luz e a Estrela: o contorno na tinta é o que os separa do fundo.
       ['ponto-contorno', f, 3],
       ['estrela-contorno', f, 3],
+      // O traço de seleção em volta do que acabou de ser escolhido: tinta de dia, luz à noite.
+      ['fio-selecao', f, 3],
       ...DESTAQUES.map((d) => [d, f, 3]),
     );
   }
@@ -103,6 +105,8 @@ export function pares() {
     // O trilho da barra de progresso é a superfície 2.
     ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
+    // O caramelo é só o sol e o miolo das flores do quadro do cacto, sobre a cal (não sobre a areia).
+    ['caramelo', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
@@ -121,8 +125,9 @@ export function pares() {
     ['bloco-foco', 'bloco-fundo', 3],
     // Onde estou (área e aba atuais, em cal) e o marcado (tinta cheia).
     ['atual-texto', 'atual-fundo', 4.5],
+    // A estrutura da norma (P4): o nome da seção, atenuado, sobre a cal de "onde estou".
+    ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
-    ['selecionado-atenuado', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
   );
@@ -181,6 +186,12 @@ export function medir(tema) {
     juntar('texto-atenuado', `regua-fundo sobre ${f}`, 4.5, razao(cor('texto-atenuado'), regua));
     juntar('regua-barra', `regua-fundo sobre ${f}`, 3, razao(cor('regua-barra'), regua));
     for (const d of DESTAQUES) juntar(d, `regua-fundo sobre ${f}`, 3, razao(cor(d), regua));
+  }
+
+  // O anel do ponto do Dia que ainda não foi feito (tinta a 55%): contorno de 3:1 sobre o fundo
+  // e sobre a superfície, onde os pontos podem ficar.
+  for (const f of SUPERFICIES) {
+    juntar('ponto-apagado', f, 3, razao(sobre(cor('ponto-apagado'), cor(f)), cor(f)));
   }
 
   // D-D7: os pares do contrato da direção, com os valores fixos da paleta.
