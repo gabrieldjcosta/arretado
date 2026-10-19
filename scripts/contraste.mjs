@@ -125,6 +125,8 @@ export function pares() {
     ['bloco-foco', 'bloco-fundo', 3],
     // Onde estou (área e aba atuais, em cal) e o marcado (tinta cheia).
     ['atual-texto', 'atual-fundo', 4.5],
+    // A estrutura da norma (P4): o nome da seção, atenuado, sobre a cal de "onde estou".
+    ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['selecionado-atenuado', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],

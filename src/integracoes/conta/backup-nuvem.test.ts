@@ -3,6 +3,7 @@ import { exportarPacote, PacoteRecusado, restaurarSnapshot } from '../../core/pa
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   abrirCopiaDaNuvem,
+  deveOferecerCopiaDaNuvem,
   guardarCopiaNaNuvem,
   listarCopiasNaNuvem,
   MANTER_NA_NUVEM,
@@ -51,6 +52,25 @@ describe('cópia cifrada na nuvem (F4-A, A6)', () => {
     expect(nomeDaCopia(new Date('2026-10-18T09:05:07.123Z'), 'abcdef0123456789')).toBe(
       '2026-10-18T09-05-07-abcdef01.arretado',
     );
+  });
+
+  it('registra ultimoBackupEm depois de confirmar o envio', async () => {
+    const { repo, servico } = await montar();
+
+    await guardarCopiaNaNuvem(repo, servico, FRASE, RAPIDO);
+
+    expect(await repo.db.meta.get('ultimoBackup')).toEqual({
+      chave: 'ultimoBackup',
+      valor: repo.ctx.agora().toISOString(),
+    });
+  });
+
+  it('oferece escolhas só com cópia e conexão', () => {
+    const copias = [{ nome: '2026-10-18T09-05-07-abcdef01.arretado', tamanho: 42 }];
+
+    expect(deveOferecerCopiaDaNuvem(copias, true)).toBe(true);
+    expect(deveOferecerCopiaDaNuvem([], true)).toBe(false);
+    expect(deveOferecerCopiaDaNuvem(copias, false)).toBe(false);
   });
 
   it('bytes enviados não contêm texto claro do estudo nem a frase', async () => {
@@ -154,11 +174,13 @@ describe('cópia cifrada na nuvem (F4-A, A6)', () => {
 
   it('envio interrompido não apaga a anterior', async () => {
     const { repo, relogio, servico } = await montar();
+    await repo.db.meta.put({ chave: 'ultimoBackup', valor: '2026-10-17T09:00:00.000Z' });
     for (let i = 0; i < MANTER_NA_NUVEM; i += 1) {
       await guardarCopiaNaNuvem(repo, servico, FRASE, RAPIDO);
       relogio.avancar(60_000);
     }
     const antes = (await listarCopiasNaNuvem(servico)).map((c) => c.nome);
+    const ultimoBackupAntes = await repo.db.meta.get('ultimoBackup');
 
     servico.falharProximoEnvio = true;
     await expect(guardarCopiaNaNuvem(repo, servico, FRASE, RAPIDO)).rejects.toBeInstanceOf(
@@ -166,6 +188,7 @@ describe('cópia cifrada na nuvem (F4-A, A6)', () => {
     );
     expect((await listarCopiasNaNuvem(servico)).map((c) => c.nome)).toEqual(antes);
     expect(servico.operacoesDeCopia.some((o) => o.startsWith('apagar:'))).toBe(false);
+    expect(await repo.db.meta.get('ultimoBackup')).toEqual(ultimoBackupAntes);
   });
 
   it('sem rede: listar recusa como sem-rede, sem tocar no local', async () => {
@@ -182,7 +205,10 @@ describe('cópia cifrada na nuvem (F4-A, A6)', () => {
 
   it('frase vazia não sai do aparelho', async () => {
     const { repo, servico } = await montar();
-    await expect(guardarCopiaNaNuvem(repo, servico, '', RAPIDO)).rejects.toThrow();
+    await expect(guardarCopiaNaNuvem(repo, servico, '', RAPIDO)).rejects.toMatchObject({
+      name: 'FalhaDeConta',
+      motivo: 'invalido',
+    });
     expect(servico.operacoesDeCopia).toHaveLength(0);
   });
 });

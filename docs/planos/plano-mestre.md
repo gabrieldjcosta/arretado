@@ -99,7 +99,7 @@ Proposta em uma frase: **volte exatamente de onde parou e faça uma coisa por ve
 | F3-B | Plano acionável e sugestões explicáveis | F3-A | não iniciada |
 | F3-C | Resumo manual e Precedentes com trecho-chave e vínculos (antecipados para antes da V1; aprovado em 14/10/2026) | F3-B | não iniciada (`ordem-resumos-precedentes.md`) |
 | V1 | Validação com 3 a 5 pessoas; reúne todas as validações adiadas (§6) | F3 e F4-A (contas) | não iniciada (roteiro: item 5.5 do redesign, arquivado) |
-| F4 | Conta (F4-A, antes da V1), sincronização, backup remoto, instalável offline (F4-B/C, depois) | F3 | não iniciada |
+| F4 | Conta (F4-A, antes da V1), sincronização, backup remoto, instalável offline (F4-B/C, depois) | F3 | F4-A em portão; F4-B/C depois da V1 |
 | A1 | Captura de imagem com OCR local | F4 | não iniciada |
 | A2 | Assistência opcional de IA | F4 (conta, cota, servidor) e A1 para o item 3 | não iniciada |
 | C1 | Piloto pago e cobrança | F4, V1 e prontidão comercial | não iniciada |
@@ -273,6 +273,19 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 | 10 | Agente de verificação diário ([`agente-verificacao.md`](agente-verificacao.md)) | — | rotina na nuvem |
 
 Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) e a busca de súmula pelo índice (Sonnet 5.5 médio). Relato de problema do uso real fura a fila.
+
+### F4-A e V1 — estado em 19/10/2026
+
+| Etapa | Estado | Evidência / próxima ação |
+|---|---|---|
+| T1 — fila A7 | Feito | #188 · `3640f9b` (código), #185 · `47524fc` (consulta diária), conferidos em `origin/integracao` |
+| T2 — consentimento | Feito | #193 · `b30c02b`, conferido em `origin/integracao`; aceite v3 fica no Aparelho conforme D2 |
+| T3 — ajustes do A6 e §5.7 | **Em andamento** | Não declarar feito até o merge conferido em `origin/integracao` |
+| T4 — E2E da conta com serviço falso e axe | **Pendente** | Não iniciado conforme despacho; depende da decisão D1 |
+| T5 — portão e fumaça documentados | Em andamento | `docs/portoes/F4A.md`; aguarda revisão do coordenador no PR |
+| T6 — revisão independente do conjunto | Pendente | Depois dos T1–T5 mesclados |
+| Fumaça A8 | Pendente | Gabriel executa os SQLs remotos e os fluxos A/B; portão permanece aberto |
+| V1 | Não iniciada | Depois da F3 e da F4-A; não preencher marcadores nem adiantar convites |
 
 ## 10. Decisões que esperam o Gabriel
 

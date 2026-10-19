@@ -2,10 +2,11 @@
 // texto vigente (não entra nos offsets da seleção) e posto por cima da calha, sem mudar a altura da
 // linha. A origem não depende só da cor: direta é a estrela cheia grande; herdada, a cheia pequena
 // sobre a faixa que desce do nó estrelado; exceção, a vazia cortada; sem estrela, a vazia fina.
+// Estrela de luz de quatro pontas (D-D7, P4); o aro, na cor do fundo, corta a faixa em volta dela.
 import type { EstadoDaEstrela } from '../../dominios/legislacao/estrelas';
 import { nomeDaEstrela } from './rotulos';
 
-const PONTAS = 'M12 2.6l2.8 5.9 6.5.8-4.8 4.5 1.2 6.4L12 17l-5.7 3.2 1.2-6.4-4.8-4.5 6.5-.8z';
+const PONTAS = 'M12 2.5 14.2 9.8 21.5 12 14.2 14.2 12 21.5 9.8 14.2 2.5 12 9.8 9.8z';
 
 export function BotaoDaEstrela({
   alvoId,
@@ -32,7 +33,8 @@ export function BotaoDaEstrela({
       title={nome}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d={PONTAS} />
+        <path className="aro" d={PONTAS} />
+        <path className="ponta" d={PONTAS} />
         {estado.origem === 'excecao' && <path className="corte" d="M4 20.5L20.5 4" />}
       </svg>
     </button>

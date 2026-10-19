@@ -1057,6 +1057,91 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 - **Solução:** `Hoje.test.tsx` ("uma caneta por tela…") confere as poses e o lugar; `e2e/sessao.spec.ts` lê `getComputedStyle(…).animationName` (`traco-desenha` com movimento normal, `none` com `prefers-reduced-motion`). **Prevenção:** o Leitor (P4) e o Fixar (P5) usam o mesmo `Caneta`; cada tela, uma só.
 - **Origem:** previsto — P3 do Ponto de luz (18/10/2026).
 
+### Leitor: a linha muda de altura, ou a posição lembrada deriva, quando o "lido até" anda (P4)
+- **Sintoma:** ao marcar "Lido até aqui", as linhas de baixo pulam alguns pixels, ou a posição guardada volta fora do lugar. **Causa:** o virtualizador mede cada linha (`offsetHeight`) e soma as medidas contra `lista.current.offsetTop` (`scrollMargin`); se a linha lida tivesse recuo ou borda diferente da não lida, o "lido até" andando mudaria a altura de várias linhas de uma vez; e um ancestral posicionado da lista (`position: relative` ou `sticky`) faria o `offsetTop` ser contado contra ele.
+- **Solução:** a faixa de cal tem a mesma geometria lida ou não (`border-block: 3px solid transparent` e `background-clip: padding-box` em `.lista-leitor .dispositivo`; só a `background-color` muda com `data-lido`); a folga de 12 px vem de `--margem-do-lido` (margem negativa e recuo iguais); o `.leitor-corpo` que envolve a estrutura e a lista é uma grade sem `position`. **Prevenção:** em `[data-lido]` mude só cor ou sombra; nunca `padding`, `border` ou `margin`. Compare as capturas de antes e depois (a altura da lista é a mesma).
+- **Origem:** previsto e tratado na P4 do Ponto de luz (19/10/2026).
+
+### E2E do recuo por nível falha com a faixa do lido: o artigo "recuado" em 12 px (P4)
+- **Sintoma:** `e2e/leitor.spec.ts` ("ler a LEP compilada…"), `expect(await recuoDe('art2')).toBe(0)` recebe 12. **Causa:** o teste lia o `padding-inline-start` do `.dispositivo`, e na lista ele agora soma a folga da faixa do lido (`--margem-do-lido`, 12 px) ao recuo do nível (`--recuo`); o texto não saiu do lugar (a margem negativa compensa).
+- **Solução:** o teste compara o parágrafo com o artigo (maior que a folga, de no máximo 12 px). **Prevenção:** recuo se mede pela diferença entre níveis, nunca pelo padding absoluto; o E2E isolado da fase não achou isso, só a suíte inteira.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Modo foco: o dispositivo do alto sai do lugar ao entrar ou sair no tablet (P4)
+- **Sintoma:** só no projeto tablet, `e2e/leitor.spec.ts` ("modo foco … o mesmo dispositivo no alto ao entrar e sair") fica a 85 px do alto depois de entrar, e a 200 px depois de F e Esc seguidos; e o de grifos e notas no modo foco não acha o grupo "Marcar o trecho selecionado" (a palavra caiu fora da tela). **Causa:** de 700 a 1199 px a estrutura ocupa uma coluna e sai no modo foco, então a coluna do texto alarga (472 para 664 px em 712) e as linhas de cima se remedem só depois da pintura; a conta do efeito do modo foco, feita antes dela, supunha a mesma largura, e o virtualizador não compensa quando a rolagem acabou de subir (`scrollDirection` `backward`, virtual-core 3.17). Perto do fim da norma a página também encurtava além da folga prevista.
+- **Solução:** o efeito do modo foco confere o alto por 12 quadros (`QUADROS_DA_TROCA`) e corrige a diferença; a linha ancorada fica em `ancoraDaTroca`, para uma troca seguinte (F e Esc) partir dela e não da rolagem em curso; a folga do fim da norma é recalculada a cada correção; roda, toque e teclas de rolagem encerram a conferência. **Prevenção:** tudo que mudar a largura da coluna do texto entre os dois modos depende desta conferência; o E2E do modo foco só falha no tablet, então rode os três projetos.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026), na suíte E2E inteira.
+
+### Estrutura da norma: o teste de unidade não a vê, ou a rolagem fica sempre em 0 (P4)
+- **Sintoma:** `getByRole('navigation', { name: 'Estrutura da norma' })` não acha nada; ou, ao tocar num bloco, `window.scrollTo` recebe sempre `top: 0`. **Causa:** a estrutura só aparece a partir de 700 px (`useLarguraMinima`) e o jsdom não tem `matchMedia`, então a janela é sempre "estreita"; e o virtualizador limita a rolagem a `documentElement.scrollHeight - innerHeight`, que no jsdom é 0.
+- **Solução:** o teste define `window.matchMedia` (o helper `larguraDaJanela` de `Leitor.test.tsx`, apagado no `afterEach`) e, para conferir a rolagem, `vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000)`. **Prevenção:** o Playwright mede o que o jsdom não vê (o E2E do Leitor confere a estrutura no tablet e no desktop e a ausência no celular).
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o botão some entre achar e clicar (teste instável, P4)
+- **Sintoma:** `await usuario.click(await within(estrutura).findByRole('button', …))` não faz nada e o passo seguinte falha (o filtro continua ligado, por exemplo). **Causa:** a lista da estrutura troca quando o alto da tela passa de um bloco a outro, no quadro seguinte à rolagem ou ao filtro (`requestAnimationFrame`); o botão achado pode ser desmontado antes de o clique chegar.
+- **Solução:** esperar o estado novo antes de achar o botão (no teste do filtro, o caminho "TÍTULO I, DO OBJETO" aparece quando a lista troca). **Prevenção:** com a estrutura na tela, depois de rolar ou filtrar, espere por algo que só existe depois da troca.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Botão do dock, do seletor de fonte ou da estrutura volta ao estilo de botão comum (P4)
+- **Sintoma:** botão do Leitor com borda, recuo de 20 px e raio de 12 no lugar do que a regra do componente pede, ou sem fundo no hover. **Causa:** a regra base `button, .botao` de `estilos.css` vem antes da CSS do Leitor e tem a especificidade de uma classe só; vence a regra de uma classe, e o hover só troca `--botao-fundo` (a mesma cascata da P2).
+- **Solução:** o seletor leva o pai (`.acoes-leitor .dock-do-leitor button`, `.tamanho-texto button`, `.estrutura-da-norma .estrutura-item`) e o fundo vem de `var(--botao-fundo, transparent)`, para o hover continuar valendo. **Prevenção:** conferir a captura do celular antes do PR; o teste de unidade (jsdom) não aplica CSS.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### A Estrela de luz some sobre a faixa de vidro à noite (P4)
+- **Sintoma:** à noite, a estrela (direta ou herdada) quase não se separa da faixa da calha. **Causa:** o contorno claro (`--estrela-contorno`, `#eef3f8`) sobre a faixa de vidro claro (`#7df3e1`) tem 1,2:1; de dia o contorno em tinta separa (3,2:1), à noite só a largura da estrela separava.
+- **Solução:** o aro (`path.aro`): a mesma estrela, mais gorda e na cor do chão (`--aro-da-estrela`, padrão `--fundo`), por baixo, que corta a faixa em volta dela nos dois temas; no cartão do modo foco o chão é `--luz-do-cartao`. **Prevenção:** ao pôr um objeto claro sobre a faixa de vidro, recortar a faixa em volta dele, não depender do contorno.
+- **Origem:** encontrado na P4 do Ponto de luz (19/10/2026).
+
+### Dock em vidro desfocado contra o contrato (P4)
+- **Sintoma:** o dock do Leitor saiu com `backdrop-filter: blur(12px)` sobre a superfície a 92%, e a letra da lei aparecia borrada atrás dos rótulos; a revisão do acabamento apontou que o contrato da D-D7 proíbe "vidro desfocado atrás de texto". **Causa:** `docs/design/sistema-visual.md` (escrito na P1) permitia o desfoque só no dock e nos botões do foco, e o contrato (`docs/design/referencias/2026-10-18-ponto-de-luz/contrato.md`: "sem vidro desfocado"; "Glassmorphism" descartado) não deixa exceção.
+- **Solução:** o dock é uma pílula sólida de `--superficie` (sem `backdrop-filter`; `Canvas` e contorno `CanvasText` em `forced-colors`), o token `--vidro-do-dock` saiu, e o E2E confere `backdrop-filter: none` e fundo opaco. Os botões do modo foco seguem em `--superficie-translucida` (90%, sem desfoque), com `prefers-reduced-transparency` opaco. **Prevenção:** quando o documento de sistema e o contrato divergirem, vale o contrato, e o PR registra a divergência e corrige o documento.
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Cores forçadas: barras pretas entre as linhas do Leitor, ou a barra da estrela some (P4)
+- **Sintoma:** com `forced-colors: active` (Windows, contraste alto; no Playwright, `forcedColors: 'active'`), cada linha lida ganha 6 px de barra preta em cima e embaixo, e a barra da estrela na calha desaparece. **Causa:** o modo troca o fundo, a sombra e a imagem de fundo pelas cores do sistema e pinta a borda transparente (o vão de 3 px da faixa do lido) com a cor do texto; a barra da estrela é só fundo, então vira a cor do chão. Uma regra de `forced-colors` posta antes da regra base perde pela ordem no arquivo (mesma especificidade).
+- **Solução:** a regra de cores forçadas vem logo depois da base: `border-block-color: Canvas` na faixa (a geometria não muda) e, na barra da estrela, `width: 0` com `border-inline-start: 3px solid CanvasText` (`dashed` na herdada). A seção de agora na estrutura, a régua e o filtro ligado do dock vão em `outline: 2px solid Highlight`. **Prevenção:** ao pôr borda transparente, sombra ou fundo que carregam estado, capturar também com `forcedColors: 'active'`; o texto "Lido até aqui" continua dizendo onde a pessoa parou.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026), por captura em cores forçadas.
+
+### Dock do Leitor quebra em duas linhas em 320 px, com vazio ao lado de "Modo foco" (P4)
+- **Sintoma:** em 320 px a pílula do dock ocupa a largura toda, com Buscar, Filtrar e Ações numa linha e "Modo foco" sozinho na outra, à direita. **Causa:** os quatro botões com 12 px de respiro de cada lado somam cerca de 313 px, e só há 288.
+- **Solução:** até 349 px o respiro cai para 8 px (a altura de 44 px do alvo não muda) e os quatro cabem numa linha (`e2e/leitor.spec.ts`, seção de 320 px do teste da P4); com o texto do sistema ampliado ainda quebra em duas, sem alargar a página. **Prevenção:** ao acrescentar um botão ao dock, medir em 320 px.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
+
+### Estilo do painel da estrutura vaza para os cabeçalhos do texto (P4)
+- **Sintoma:** com a classe `.estrutura` no painel `<nav>`, as regras dele (`position: sticky`, `overflow-y: auto`, `max-height`) valeriam também para `.dispositivo.estrutura`, a linha de cabeçalho de título e capítulo no texto, que já usa essa classe. **Causa:** nome de classe global repetido para duas coisas.
+- **Solução:** o painel é `.estrutura-da-norma`. **Prevenção:** antes de nomear uma classe, `git grep -n '\.nome\b' src` no CSS e no TSX; vale também para as regras que dependem da ordem no arquivo.
+- **Origem:** encontrado na revisão da P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o bloco de agora só muda quando o cabeçalho chega ao alto (P4)
+- **Sintoma:** com o cabeçalho do capítulo II a 15% da tela, a estrutura ainda mostra o capítulo I. **Causa:** a conta partia do nó no alto da tela (`noDoAlto`, que também grava a posição), e o olho de quem lê está mais abaixo.
+- **Solução:** a estrutura usa `noDaLeitura` (`Leitor.tsx`): o primeiro cabeçalho de bloco entre o alto e a linha de leitura (`FRACAO_DA_LEITURA`, um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho, o nó do alto. Uma conta só (a do "primeiro cabeçalho") para a rolagem e para o toque: tocar numa seção a leva ao alto e a deixa como a de agora, e o bloco não pisca entre pai e filho. O E2E rola o capítulo para 15% e para 55% da tela. **Prevenção:** no jsdom a página mede 0 (a leitura estaria sempre "no pé") e a tela tem 768 px: o teste fixa `scrollHeight` e `innerHeight` (200 px põe a linha de leitura na linha do alto, de 60 px).
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
+### Estrutura da norma: o bloco que termina numa rubrica nunca fica "lida" (P4)
+- **Sintoma:** o "lido até" no último artigo de uma seção do Código Penal deixa a seção "em leitura", enquanto a faixa já mostra a linha como lida. **Causa:** a rubrica (`nome`) é um nó depois do dispositivo e fecha o bloco, mas o "lido até" marca o dispositivo, nunca a rubrica; o estado "lida" pedia o último nó.
+- **Solução:** `IndiceDaEstrutura.ultimo` (`estrutura.ts`): o último nó que o "lido até" alcança, sem a rubrica dobrada no nó de antes (a mesma regra de `montarLinhas`); `estadoDoBloco` compara com ele. Teste com rubrica antes de cada artigo em `estrutura.test.ts`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### CSS que nunca valeu: a margem perde para uma regra de classe e elemento (P4)
+- **Sintoma:** `.estrutura-acima { margin-bottom }` e `margin-top` de `.tipo-parte` e `.tipo-titulo` não mudam nada no navegador. **Causa:** `.estrutura-da-norma ol { margin: 0 }` e `.dispositivo.estrutura { margin-top }` têm mais especificidade, venham antes ou depois no arquivo.
+- **Solução:** o caminho da estrutura é `.estrutura-da-norma .estrutura-acima`; as duas margens dos tipos, que nunca valeram (vinham do tempo do `padding`), saíram e o ritmo do texto ficou como estava. **Prevenção:** ao mexer numa propriedade, conferir o valor calculado no navegador (`getComputedStyle`), não só a regra.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Painel da estrutura sob as abas de baixo e cortado com letra maior (P4)
+- **Sintoma:** de 700 a 899 px (tablet em pé, celular deitado) o fim da lista fica sob as abas fixas, e o bloco de agora, que o painel traz ao fim da rolagem, também; com a letra padrão do navegador maior, de 1200 px em diante o painel começa fora da janela. **Causa:** a altura máxima não descontava `--abas-altura`; e o ponto de corte era em px, enquanto a faixa do painel é em rem.
+- **Solução:** `max-height` desconta `var(--abas-altura, 0px)` (zero de 900 px em diante e com o teclado aberto) e o corte da margem é `min-width: 75em` (1200 px na letra de 16 px, e cresce com ela).
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Legenda dos destaques alarga a página com a letra maior (P4)
+- **Sintoma:** com "Destaques" ligado e o texto ampliado, a página rola na horizontal. **Causa:** a legenda curta estava em `flex-wrap: nowrap`, e as quatro palavras não encolhem.
+- **Solução:** a legenda quebra se não couber (em 320 px cabe numa linha, e o E2E confere as duas coisas). **Prevenção:** "numa linha só" é uma medida a conferir, não um `nowrap`.
+- **Origem:** encontrado na revisão enxuta da P4 do Ponto de luz (19/10/2026).
+
+### Modo foco: "Próximo artigo" vira texto sem caixa na bandeja (P4)
+- **Sintoma:** na bandeja aberta, o botão principal é o menos visível: negrito, sem fundo nem contorno, e "Sair do foco" parece mais um botão do que ele. **Causa:** `.em-foco .acoes-leitor button` (translúcido e atenuado, para os botões do canto) tem mais especificidade que `.principal`.
+- **Solução:** `.em-foco .bandeja-itens button.principal` devolve o vidro de ação (e o hover dele); "Sair do foco" é o que recua, de propósito.
+- **Origem:** encontrado na revisão do acabamento da P4 do Ponto de luz (19/10/2026).
+
 ## Uso do app
 
 Para o Gabriel, em linguagem simples. Vale para o que já está pronto (F0 e F1). Endereço do app: https://arretado.gabrieldjcosta.workers.dev (no ar desde 23/09/2026).
