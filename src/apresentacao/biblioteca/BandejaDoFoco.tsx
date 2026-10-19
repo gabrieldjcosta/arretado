@@ -211,7 +211,11 @@ export function BandejaDoFoco({
           setAberta((a) => !a);
         }}
       >
-        ⋯
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="5" cy="12" r="1.9" />
+          <circle cx="12" cy="12" r="1.9" />
+          <circle cx="19" cy="12" r="1.9" />
+        </svg>
       </button>
     </div>
   );
@@ -241,7 +245,9 @@ export function SetasDoCartao({
         aria-keyshortcuts="ArrowLeft"
         onClick={anterior}
       >
-        ‹
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
       </button>
       {children}
       <button
@@ -252,7 +258,9 @@ export function SetasDoCartao({
         aria-keyshortcuts="ArrowRight"
         onClick={proximo}
       >
-        ›
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M9 5l7 7-7 7" />
+        </svg>
       </button>
     </nav>
   );
