@@ -3339,3 +3339,17 @@ dialog.dialogo-previa .linha-acoes button {
   outline: 2px solid var(--foco);
   outline-offset: 2px;
 }
+
+/* Sob o editor de lacuna: sugerir por regra e um cartão por trecho; só cores e tamanhos existentes. */
+.barra-de-lacuna {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.lacuna-separados {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}

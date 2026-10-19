@@ -1,5 +1,5 @@
 // Um resumo (F3-C, C1): leitura com "Enviar às frases" em qualquer seleção, e edição.
-import { criarCartaoDeLacuna } from '../../../dominios/recall/servico';
+import { criarCartoesDeLacuna } from '../../../dominios/recall/servico';
 import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import {
@@ -177,7 +177,7 @@ export function Resumo() {
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
-        enviar={async (texto, ocultos) => {
+        enviar={async (texto, ocultos, separados) => {
           if (!fraseAberta) return false;
           try {
             const frase = await criarFraseDeResumo(repo, {
@@ -188,7 +188,7 @@ export function Resumo() {
               fim: fraseAberta.fim,
               ...(nota.disciplinaId ? { disciplinaId: nota.disciplinaId } : {}),
             });
-            if (ocultos.length > 0) await criarCartaoDeLacuna(repo, frase.id, ocultos);
+            if (ocultos.length > 0) await criarCartoesDeLacuna(repo, frase.id, ocultos, separados);
           } catch {
             return false;
           }
