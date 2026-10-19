@@ -36,6 +36,23 @@ const LEI: Bloco[] = [
   linha('Art. 5º Quinto artigo.'),
 ];
 
+// Cada artigo tem a rubrica acima (a última linha de cada capítulo é a rubrica dobrada no artigo).
+const COM_RUBRICA: Bloco[] = [
+  linha('LEI Nº 102, DE 1 DE JANEIRO DE 2000.'),
+  linha('Dispõe sobre rubricas.'),
+  linha('O PRESIDENTE DA REPÚBLICA Faço saber que o Congresso Nacional decreta:'),
+  linha('CAPÍTULO I'),
+  linha('Das Regras'),
+  linha('Do prazo'),
+  linha('Art. 1º Primeiro artigo.'),
+  linha('Da forma'),
+  linha('Art. 2º Segundo artigo.'),
+  linha('CAPÍTULO II'),
+  linha('Das Exceções'),
+  linha('Da ação'),
+  linha('Art. 3º Terceiro artigo.'),
+];
+
 const SEM_ESTRUTURA: Bloco[] = [
   linha('LEI Nº 101, DE 1 DE JANEIRO DE 2000.'),
   linha('Dispõe sobre pouca coisa.'),
@@ -181,5 +198,23 @@ describe('estrutura da norma (P4 do Ponto de luz)', () => {
     expect(estados(ix('CAPÍTULO II'))).toEqual(['feito', 'feito', 'atual']);
     // No fim da norma, tudo feito.
     expect(estados(aberta.nos.length - 1)).toEqual(['feito', 'feito', 'feito']);
+  });
+
+  it('o "lido até" marca o dispositivo, nunca a rubrica: o bloco que termina numa rubrica fica feito no último artigo', async () => {
+    const aberta = await abrir(COM_RUBRICA);
+    const ix = (rotulo: string) => aberta.nos.findIndex((n) => n.dispositivo.rotulo === rotulo);
+    const e = indiceDaEstrutura(aberta.nos);
+    const estados = (lidoAte: number) =>
+      ['CAPÍTULO I', 'CAPÍTULO II'].map((r) => estadoDoBloco(e, ix(r), lidoAte));
+    // A rubrica vem logo depois do artigo na árvore, e fecha o capítulo (é o último nó dele).
+    expect(aberta.nos[ix('Art. 2º') + 1]?.dispositivo.tipo).toBe('nome');
+    expect(e.fim[ix('CAPÍTULO I')]).toBe(ix('CAPÍTULO II'));
+    expect(e.ultimo[ix('CAPÍTULO I')]).toBe(ix('Art. 2º'));
+    // No art. 2º, que o "lido até" alcança (a rubrica dele não), o capítulo I está feito.
+    expect(estados(ix('Art. 1º'))).toEqual(['atual', 'falta']);
+    expect(estados(ix('Art. 2º'))).toEqual(['feito', 'falta']);
+    // No fim da norma, a última rubrica é do último artigo, e o último capítulo também fecha.
+    expect(e.ultimo[ix('CAPÍTULO II')]).toBe(ix('Art. 3º'));
+    expect(estados(ix('Art. 3º'))).toEqual(['feito', 'feito']);
   });
 });

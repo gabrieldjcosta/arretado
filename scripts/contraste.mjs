@@ -175,12 +175,6 @@ export function medir(tema) {
     razao(cor('texto-atenuado'), camada),
   );
 
-  // Dock do Leitor (P4, --vidro-do-dock: a superfície a 92% com o fundo desfocado): o rótulo sobre
-  // o vidro com a letra do texto bem atrás. É o pior caso: o desfoque de 12 px só a clareia.
-  const vidroDoDock = sobre(cor('vidro-do-dock'), cor('texto'));
-  juntar('texto', 'vidro-do-dock/texto', 4.5, razao(cor('texto'), vidroDoDock));
-  juntar('texto-atenuado', 'vidro-do-dock/texto', 4.5, razao(cor('texto-atenuado'), vidroDoDock));
-
   // Régua de leitura (--regua-fundo: tinta a 6%): texto e atenuado sobre ela,
   // na superfície e no fundo; os sublinhados dos destaques também passam por baixo dela.
   for (const f of SUPERFICIES) {

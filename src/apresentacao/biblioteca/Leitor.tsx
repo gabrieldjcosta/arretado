@@ -56,7 +56,7 @@ import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
 import { EstruturaDaNorma } from './EstruturaDaNorma';
 import { dispositivosComErro } from './errosVinculados';
-import { indiceDaEstrutura, temEstrutura } from './estrutura';
+import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
@@ -109,6 +109,11 @@ const AVISO_DA_ESTRELA = 4_000;
  * só mostra o fim (menos que isso) já foi lida. Também absorve a rolagem arredondada ao voltar.
  */
 const FOLGA_DO_ALTO = 8;
+/**
+ * A linha de leitura da estrutura da norma: esta fração da tela abaixo da barra fixa. O olho não
+ * está no alto da tela, então o bloco que acaba de entrar já é o de agora.
+ */
+const FRACAO_DA_LEITURA = 0.25;
 /** Rolagem parada por este tempo grava a posição (gravar a cada evento escreveria sem parar). */
 const ESPERA_PARA_GRAVAR = 800;
 /** Quadros seguidos com a linha no lugar para dar a volta à posição por concluída. */
@@ -117,8 +122,6 @@ const QUADROS_NO_LUGAR = 3;
 const LIMITE_PARA_VOLTAR = 2000;
 /** Quadros em que o alto da tela é reconferido depois de trocar o modo foco (as linhas se remedem). */
 const QUADROS_DA_TROCA = 12;
-/** Por quanto tempo a linha do alto de uma troca serve de ponto de partida da troca seguinte. */
-const VALIDADE_DA_ANCORA = 1500;
 /** As teclas que rolam a página: a pessoa rolando encerra a conferência do alto (F e Esc, não). */
 const TECLAS_DE_ROLAGEM = new Set([
   'PageUp',
@@ -603,11 +606,9 @@ function LeitorAberto({
   // cada quadro.
   const focoAntes = useRef(modoFoco);
   // A linha do alto (e o quanto dela já passou) de uma troca que ainda confere o alto: a troca
-  // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou.
-  // Vale só por um instante (`ate`): uma conferência interrompida não deixa âncora velha.
-  const ancoraDaTroca = useRef<{ index: number; dentro: number; ate: number } | undefined>(
-    undefined,
-  );
+  // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou. Cada
+  // execução do efeito a consome, então uma conferência interrompida não deixa âncora velha.
+  const ancoraDaTroca = useRef<{ index: number; dentro: number } | undefined>(undefined);
   // O controle com o foco do teclado saiu da tela na troca (a barra do leitor, a do Shell): o foco
   // vai para o botão do canto, em vez de cair no corpo da página.
   const devolverFoco = useRef(false);
@@ -626,11 +627,9 @@ function LeitorAberto({
     // Ainda nas medidas de antes da troca: o virtualizador só as refaz depois de `medir`.
     const margemAntes = margemMedida.current;
     const pendente = trocou ? ancoraDaTroca.current : undefined;
-    if (trocou) ancoraDaTroca.current = undefined;
+    ancoraDaTroca.current = undefined;
     const daAncora =
-      pendente &&
-      pendente.ate > performance.now() &&
-      virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
+      pendente && virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
     const alto = daAncora
       ? daAncora.start + pendente.dentro
       : rolagem.current + barraFixaMedida.current;
@@ -665,11 +664,7 @@ function LeitorAberto({
         // não compensa quando a rolagem acabou de subir). Por isso a conferência dura alguns
         // quadros, e a rolagem da pessoa a encerra.
         let restantes = QUADROS_DA_TROCA;
-        ancoraDaTroca.current = {
-          index: item.index,
-          dentro,
-          ate: performance.now() + VALIDADE_DA_ANCORA,
-        };
+        ancoraDaTroca.current = { index: item.index, dentro };
         const conferir = () => {
           if (restantes <= 0) return;
           const desenhada = lista.current?.querySelector(`[data-index="${String(item.index)}"]`);
@@ -1026,10 +1021,30 @@ function LeitorAberto({
   const estrutura = useMemo(() => indiceDaEstrutura(nos), [nos]);
   const larguraDeTablet = useLarguraMinima(LARGURA_DA_ESTRUTURA);
   const comEstrutura = larguraDeTablet && !modoFoco && temEstrutura(estrutura);
-  const noDoAltoNaArvore = useCallback((): number | undefined => {
-    const id = noDoAlto();
-    return id === undefined ? undefined : aberta.indiceDe.get(id);
-  }, [noDoAlto, aberta.indiceDe]);
+  // O nó da leitura, para a estrutura: o primeiro cabeçalho de bloco entre o alto da tela e a linha de
+  // leitura (um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho,
+  // o nó do alto. O olho chega ao cabeçalho antes de ele chegar ao alto, e tocar numa seção da
+  // estrutura (que a leva ao alto) a deixa como a de agora, não um bloco de dentro dela.
+  const noDaLeitura = useCallback((): number | undefined => {
+    if (porArtigoAgora.current) {
+      const id = artigoNoAlto.current;
+      return id === undefined ? undefined : aberta.indiceDe.get(id);
+    }
+    const alto = window.scrollY + barraFixaMedida.current + FOLGA_DO_ALTO;
+    const visivel = window.innerHeight - barraFixaMedida.current;
+    const noPe = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    const doAlto = virtualizador.getVirtualItemForOffset(alto);
+    const daLeitura = virtualizador.getVirtualItemForOffset(
+      alto + (noPe ? visivel : visivel * FRACAO_DA_LEITURA),
+    );
+    if (doAlto === undefined || daLeitura === undefined) return undefined;
+    for (let i = doAlto.index; i <= daLeitura.index; i++) {
+      const indice = linhas[i]?.indice;
+      const no = indice === undefined ? undefined : nos[indice];
+      if (no && ehBloco(no)) return indice;
+    }
+    return linhas[doAlto.index]?.indice;
+  }, [virtualizador, linhas, nos, aberta.indiceDe]);
   function irAoBloco(indice: number) {
     if (irAoNo(indice)) setAnuncio('Filtro desligado para mostrar este bloco.');
   }
@@ -1746,7 +1761,7 @@ function LeitorAberto({
           <span>
             Lido até <strong>{referenciaLidoAte}</strong>
           </span>
-          <button type="button" className="discreto" onClick={irAoLidoAte}>
+          <button type="button" className="botao-texto" onClick={irAoLidoAte}>
             Ir ao lido até
           </button>
         </p>
@@ -1830,7 +1845,8 @@ function LeitorAberto({
             textos={textos}
             pedir={pedir}
             lidoAte={indiceLidoAte}
-            noDoAlto={noDoAltoNaArvore}
+            noDaLeitura={noDaLeitura}
+            voltando={voltando}
             ir={irAoBloco}
           />
         )}

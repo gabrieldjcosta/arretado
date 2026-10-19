@@ -2116,6 +2116,19 @@ describe('Ponto de luz no Leitor (P4)', () => {
   describe('estrutura da norma', () => {
     const estruturaNaTela = () => screen.queryByRole('navigation', { name: 'Estrutura da norma' });
 
+    // O jsdom não tem layout: a página mede 0 (a leitura estaria sempre no pé dela) e a tela, 768 px.
+    // Com 200 px, a linha de leitura (um quarto da tela abaixo do alto) cai na linha do alto, que
+    // mede 60 px, e as contas por linha ficam claras; o teste da linha de leitura usa outra altura.
+    let alturaDaTela = 768;
+    beforeEach(() => {
+      alturaDaTela = window.innerHeight;
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 200 });
+      vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000);
+    });
+    afterEach(() => {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: alturaDaTela });
+    });
+
     it('de 700 px para cima, mostra os blocos com o estado de cada um e a de agora marcada', async () => {
       larguraDaJanela(768);
       const { repo } = await repositorioDeTeste();
@@ -2214,6 +2227,30 @@ describe('Ponto de luz no Leitor (P4)', () => {
       ).toBeVisible();
     });
 
+    it('segue a linha de leitura, um quarto da tela abaixo do alto: o capítulo que está por entrar já é o de agora', async () => {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 400 });
+      larguraDaJanela(768);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI_DE_BLOCOS);
+      abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+      await waitFor(() => {
+        expect(dispositivo('art5')).toBeInTheDocument();
+      });
+      const deAgora = () => estrutura.querySelector('[aria-current="location"]');
+      // No art. 1º, o cabeçalho do capítulo II está a duas linhas (120 px) do alto, além da linha de
+      // leitura (100 px): o capítulo I segue sendo o de agora.
+      rolarPara(linhaDoDispositivo('art1') * 60);
+      await waitFor(() => {
+        expect(deAgora()).toHaveTextContent(/^CAPÍTULO I /);
+      });
+      // No art. 2º, ele está a uma linha (60 px): já entrou na linha de leitura, antes de chegar ao alto.
+      rolarPara(linhaDoDispositivo('art2') * 60);
+      await waitFor(() => {
+        expect(deAgora()).toHaveTextContent(/^CAPÍTULO II /);
+      });
+    });
+
     it('tocar num bloco leva o texto até ele', async () => {
       larguraDaJanela(1024);
       const { repo } = await repositorioDeTeste();
@@ -2223,8 +2260,6 @@ describe('Ponto de luz no Leitor (P4)', () => {
       await waitFor(() => {
         expect(dispositivo('art5')).toBeInTheDocument();
       });
-      // O jsdom não tem layout: a página mede 0 e o virtualizador nunca rola para além do alto.
-      vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(100_000);
       const rolagem = vi.spyOn(window, 'scrollTo');
       await usuario.click(
         await within(estrutura).findByRole('button', { name: /^TÍTULO II DO FIM/ }),

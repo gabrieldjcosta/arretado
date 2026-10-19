@@ -37,7 +37,8 @@ function nomeDoBloco(
  * leitura, ainda não lida) e o de agora em cal, com os blocos de dentro dele logo abaixo; acima, o
  * caminho até a lista (título, capítulo). Tocar leva o bloco ao alto da tela, e tocar no caminho
  * sobe um nível. O estado vem do "lido até" (uma ação da pessoa); o bloco de agora segue a rolagem,
- * por salto, e só a lista que muda de bloco faz a tela se redesenhar.
+ * por salto, assim que o cabeçalho dele passa da linha de leitura (um quarto da tela abaixo do alto),
+ * e só a lista que muda de bloco faz a tela se redesenhar.
  */
 export function EstruturaDaNorma({
   nos,
@@ -45,7 +46,8 @@ export function EstruturaDaNorma({
   textos,
   pedir,
   lidoAte,
-  noDoAlto,
+  noDaLeitura,
+  voltando,
   ir,
 }: {
   nos: readonly NoDaLeitura[];
@@ -55,13 +57,15 @@ export function EstruturaDaNorma({
   pedir: (de: number, ate: number) => void;
   /** Índice do nó do "lido até", se há. */
   lidoAte: number | undefined;
-  /** Índice do nó no alto da tela, se há. */
-  noDoAlto: () => number | undefined;
+  /** Índice do nó da leitura (o cabeçalho de bloco que já passou da linha de leitura, ou o do alto da tela), se há. */
+  noDaLeitura: () => number | undefined;
+  /** O leitor volta à posição guardada: os nomes esperam, para não atrasar o texto que ela pede. */
+  voltando: boolean;
   ir: (indice: number) => void;
 }) {
   // O bloco mais fundo da leitura: muda quando ela passa de um bloco a outro, não a cada nó.
   const blocoDoAlto = () => {
-    const no = noDoAlto();
+    const no = noDaLeitura();
     return no === undefined ? RAIZ : (estrutura.dentroDe[no] ?? RAIZ);
   };
   const [dentro, setDentro] = useState(blocoDoAlto);
@@ -69,7 +73,7 @@ export function EstruturaDaNorma({
     let quadro = 0;
     const conferir = () => {
       quadro = 0;
-      const no = noDoAlto();
+      const no = noDaLeitura();
       setDentro(no === undefined ? RAIZ : (estrutura.dentroDe[no] ?? RAIZ));
     };
     const aoRolar = () => {
@@ -83,13 +87,14 @@ export function EstruturaDaNorma({
       window.removeEventListener('scroll', aoRolar);
       window.removeEventListener('resize', aoRolar);
     };
-  }, [noDoAlto, estrutura]);
+  }, [noDaLeitura, estrutura]);
 
   const vista = useMemo(() => vistaDaEstrutura(estrutura, dentro), [estrutura, dentro]);
   useEffect(() => {
+    if (voltando) return;
     const blocos = [...vista.acima, ...vista.itens.flatMap((item) => [item.bloco, ...item.dentro])];
     for (const bloco of blocos) pedir(bloco, bloco + 1);
-  }, [vista, pedir]);
+  }, [vista, pedir, voltando]);
 
   // O bloco de agora fica à vista dentro do painel (que rola sozinho quando a lista é grande). Rola
   // só o painel, por salto: nunca a página, que é a leitura. Refaz quando os nomes chegam, que

@@ -19,20 +19,20 @@
   }
 }
 
-/* Com folga dos lados da coluna de lei (1200 px), o painel fica na margem da esquerda e a coluna
-   mantém os 70 ch. */
-@media (min-width: 1200px) {
+/* Com folga dos lados da coluna de lei (1200 px na letra padrão do navegador; em `em`, para a folga
+   acompanhar a faixa, que é em rem), o painel fica na margem da esquerda e a coluna mantém os 70 ch. */
+@media (min-width: 75em) {
   .leitor-corpo[data-com-estrutura] {
     margin-inline-start: calc(-1 * (var(--faixa-da-estrutura) + 1.5rem));
   }
 }
 
 /* Preso abaixo do cabeçalho (o Leitor põe a altura dele em --barra-fixa) e com rolagem própria
-   quando a lista é maior que a tela. */
+   quando a lista é maior que a tela; até 899 px, acima das abas de baixo (--abas-altura). */
 .estrutura-da-norma {
   position: sticky;
   top: calc(var(--barra-fixa, 4rem) + 0.75rem);
-  max-height: calc(100dvh - var(--barra-fixa, 4rem) - 1.5rem);
+  max-height: calc(100dvh - var(--barra-fixa, 4rem) - var(--abas-altura, 0px) - 1.5rem);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -48,7 +48,7 @@
   list-style: none;
 }
 
-.estrutura-acima {
+.estrutura-da-norma .estrutura-acima {
   margin-bottom: 0.5rem;
 }
 

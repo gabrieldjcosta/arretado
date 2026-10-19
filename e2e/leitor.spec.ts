@@ -1829,24 +1829,42 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     );
     expect(sobra).toBe(0);
     await semViolacoes(page);
+    // A estrutura segue a linha de leitura, um quarto da tela abaixo do alto, não o alto: o cabeçalho
+    // do capítulo que sobe até um sexto da tela já é o de agora; a meio da tela, ainda não.
+    const cap2 = page.locator('[data-endereco="tit2.cap2"]');
+    await rolarAte(page, cap2);
+    await alinharNoAlto(page, cap2);
+    const visivel = await page.evaluate(
+      () =>
+        window.innerHeight - (document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0),
+    );
+    await page.evaluate((dy) => {
+      window.scrollBy(0, dy);
+    }, -visivel * 0.55);
+    await expect(estrutura.locator('[aria-current="location"]')).not.toContainText('CAPÍTULO II');
+    await page.evaluate((dy) => {
+      window.scrollBy(0, dy);
+    }, visivel * 0.4);
+    await expect(estrutura.locator('[aria-current="location"]')).toContainText('CAPÍTULO II');
     // De volta ao art. 3º, para as partes de baixo.
     await page.getByRole('button', { name: 'Ir ao lido até' }).click();
     await expect(art3).toBeVisible();
   }
 
-  // O dock: Buscar, Filtrar, Ações e Modo foco numa só pílula de vidro desfocado; "Lido até aqui" fica fora.
+  // O dock: Buscar, Filtrar, Ações e Modo foco numa só pílula sólida (o contrato proíbe vidro desfocado
+  // atrás de texto); "Lido até aqui" fica fora.
   const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
   await expect(dock.getByRole('button')).toHaveText(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
-  const vidro = await dock.evaluate((el) => {
+  const pilula = await dock.evaluate((el) => {
     const s = getComputedStyle(el);
     return {
       desfoque: s.backdropFilter,
       alfa: Number(/[,/]\s*([\d.]+)\)$/.exec(s.backgroundColor)?.[1] ?? 1),
     };
   });
-  expect(vidro.desfoque).toBe('blur(12px)');
-  expect(vidro.alfa, 'a superfície a 92%').toBeCloseTo(0.92, 2);
+  expect(pilula.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
+  expect(pilula.alfa, 'a superfície inteira, sem transparência').toBe(1);
 
   // A Estrela de luz: quatro pontas e o aro que a separa da faixa.
   const botao = await estrelaDe(page, 'art3', 'Estrela: Art. 3º');

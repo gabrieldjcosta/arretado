@@ -21,10 +21,24 @@ export interface IndiceDaEstrutura {
   readonly dentroDe: Int32Array;
   /** Onde cada bloco termina (exclusive, índice de nó): o próximo nó de nível igual ou menor. */
   readonly fim: Int32Array;
+  /**
+   * O último nó de cada bloco que o "lido até" alcança: o último dele, a menos que seja a rubrica
+   * dobrada no nó de antes (o "lido até" marca o dispositivo, nunca a rubrica).
+   */
+  readonly ultimo: Int32Array;
   /** O bloco que contém cada bloco (`RAIZ` no de cima). */
   readonly pai: Int32Array;
   /** Os blocos de dentro de cada bloco (ou da raiz, em `RAIZ`), em ordem de leitura. */
   readonly filhos: ReadonlyMap<number, readonly number[]>;
+}
+
+/** O último nó marcável de um trecho que termina em `fim` (exclusive): a rubrica dobrada vale o pai. */
+function ultimoMarcavel(nos: readonly NoDaLeitura[], fim: number): number {
+  const ultimo = fim - 1;
+  const rubrica = nos[ultimo]?.dispositivo;
+  return rubrica?.tipo === 'nome' && nos[ultimo - 1]?.dispositivo.id === rubrica.paiId
+    ? ultimo - 1
+    : ultimo;
 }
 
 /**
@@ -57,7 +71,8 @@ export function indiceDaEstrutura(nos: readonly NoDaLeitura[]): IndiceDaEstrutur
       dentroDe[i] = contido;
     }
   });
-  return { dentroDe, fim, pai, filhos };
+  const ultimo = Int32Array.from(fim, (f, i) => (dentroDe[i] === i ? ultimoMarcavel(nos, f) : i));
+  return { dentroDe, fim, ultimo, pai, filhos };
 }
 
 /** A norma tem estrutura para mostrar (ao menos um bloco). */
@@ -119,8 +134,9 @@ export function vistaDaEstrutura(indice: IndiceDaEstrutura, no: number): VistaDa
 }
 
 /**
- * O estado do bloco pelo "lido até" (índice de nó): feito se o "lido até" passou do último nó dele,
- * atual se está dentro dele, falta se ainda não chegou. Sem "lido até", falta.
+ * O estado do bloco pelo "lido até" (índice de nó): feito se o "lido até" chegou ao último nó dele
+ * (sem a rubrica que fecha o bloco: ela é do dispositivo de antes), atual se está dentro dele, falta
+ * se ainda não chegou. Sem "lido até", falta.
  */
 export function estadoDoBloco(
   indice: IndiceDaEstrutura,
@@ -128,5 +144,5 @@ export function estadoDoBloco(
   lidoAte: number | undefined,
 ): EstadoDoPonto {
   if (lidoAte === undefined || lidoAte < bloco) return 'falta';
-  return lidoAte >= (indice.fim[bloco] ?? bloco + 1) - 1 ? 'feito' : 'atual';
+  return lidoAte >= (indice.ultimo[bloco] ?? bloco) ? 'feito' : 'atual';
 }

@@ -172,9 +172,6 @@
   --sombra-flutuante: 0 4px 16px rgb(23 36 58 / 14%);
 
   --superficie-translucida: rgb(255 255 255 / 90%);
-  /* O vidro do dock do Leitor (D-D7): a superfície a 92%, com o desfoque por trás (única superfície
-     de vidro desfocado do app, junto dos botões do modo foco). */
-  --vidro-do-dock: rgb(255 255 255 / 92%);
 
   --fonte-interface:
     'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -269,7 +266,6 @@
     --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
     --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
     --superficie-translucida: rgb(20 42 74 / 90%);
-    --vidro-do-dock: rgb(20 42 74 / 92%);
     color-scheme: dark;
   }
 }
@@ -347,7 +343,6 @@
   --sombra-botao: 0 2px 6px rgb(0 0 0 / 30%);
   --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
   --superficie-translucida: rgb(20 42 74 / 90%);
-  --vidro-do-dock: rgb(20 42 74 / 92%);
   color-scheme: dark;
 }
 
@@ -1560,9 +1555,15 @@ a.item-norma strong {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 0.5rem;
+  gap: 0 1rem;
   margin: -0.5rem 0 0.5rem;
   color: var(--texto-atenuado);
+}
+
+/* "Ir ao lido até" é o botão fantasma (.botao-texto): o recuo do alvo de 44 px sai pela margem, e o
+   texto dele alinha com o "Lido até" quando passa para a linha de baixo. */
+.lido-ate .botao-texto {
+  margin-inline-start: -0.75rem;
 }
 
 /* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
@@ -1596,16 +1597,15 @@ a.item-norma strong {
 }
 
 /* Flutuam sobre o texto: fundo de superfície, para a letra de trás não passar. O modo foco usa a
-   translúcida, abaixo; o grupo de ferramentas do dock é o vidro desfocado (.dock-do-leitor). */
+   translúcida, abaixo; o grupo de ferramentas do dock é a pílula sólida (.dock-do-leitor). */
 .acoes-leitor button:not(.principal) {
   background: var(--superficie);
   box-shadow: var(--sombra-flutuante);
 }
 
-/* O dock em vidro (P4): Buscar, Filtrar, Ações e Modo foco numa só pílula, a superfície a 92% e o
-   fundo desfocado em 12 px, então a letra que passa por trás vira só uma sombra e o rótulo continua
-   sólido (AA sobre o pior fundo, ver scripts/contraste.mjs). Quebra em duas linhas, sem alargar a
-   página, quando a tela é estreita. Sem transparência ou em cores forçadas, vira cor sólida. */
+/* O dock (P4): Buscar, Filtrar, Ações e Modo foco numa só pílula, em superfície sólida: o contrato
+   da D-D7 proíbe vidro desfocado atrás de texto, então a letra que passa por trás não passa. Quebra
+   em duas linhas, sem alargar a página, quando a tela é estreita. */
 .acoes-leitor .dock-do-leitor {
   display: flex;
   flex-wrap: wrap;
@@ -1615,9 +1615,7 @@ a.item-norma strong {
   padding: 4px;
   border: 1px solid var(--borda);
   border-radius: 26px;
-  background: var(--vidro-do-dock);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: var(--superficie);
   box-shadow: var(--sombra-flutuante);
 }
 
@@ -1630,7 +1628,9 @@ a.item-norma strong {
   box-shadow: none;
 }
 
+/* O filtro ligado no dock não tem borda: o contorno entra por dentro, como anel. */
 .acoes-leitor .dock-do-leitor button.filtro-ligado {
+  border: 0;
   box-shadow: inset 0 0 0 2px var(--cacto);
 }
 
@@ -1642,20 +1642,10 @@ a.item-norma strong {
   }
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .acoes-leitor .dock-do-leitor {
-    background: var(--superficie);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
 @media (forced-colors: active) {
   .acoes-leitor .dock-do-leitor {
     background: Canvas;
     border: 1px solid CanvasText;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
 }
 
@@ -1702,6 +1692,29 @@ a.item-norma strong {
   .em-foco .acoes-leitor button:hover {
     background: var(--superficie);
     color: var(--texto);
+  }
+}
+
+/* Sem transparência (preferência do sistema), os botões do foco são opacos. */
+@media (prefers-reduced-transparency: reduce) {
+  .em-foco .acoes-leitor button {
+    background: var(--superficie);
+  }
+}
+
+/* Na bandeja aberta (um cartão sólido), "Próximo artigo" é a ação da tela e fica de vidro, como todo
+   .principal: sem isto a regra de cima (mais específica) o deixaria um texto negrito sem caixa, o
+   menos visível dos botões, e "Sair do foco" é o que recua. */
+.em-foco .bandeja-itens button.principal {
+  background: var(--acao);
+  color: var(--acao-texto);
+  box-shadow: var(--sombra-botao);
+}
+
+@media (hover: hover) {
+  .em-foco .bandeja-itens button.principal:not([aria-disabled='true']):hover {
+    background: color-mix(in srgb, var(--acao) 86%, var(--tinta));
+    color: var(--acao-texto);
   }
 }
 
@@ -2063,12 +2076,10 @@ button.estrela:focus-visible {
 .tipo-parte,
 .tipo-livro {
   font-size: calc(var(--tamanho-leitura) * 1.35);
-  margin-top: 1.65rem;
 }
 
 .tipo-titulo {
   font-size: calc(var(--tamanho-leitura) * 1.2);
-  margin-top: 1.4rem;
 }
 
 .tipo-capitulo,
@@ -2200,11 +2211,6 @@ p.linha-atenuada {
   font-size: 0.85rem;
   line-height: 1.8;
   color: var(--texto-atenuado);
-}
-
-/* No leitor, uma linha só (P4): os quatro nomes curtos cabem até em 320 px. */
-.legenda-destaques.curta {
-  flex-wrap: nowrap;
 }
 
 /* Grifos e notas (11.4): o grifo é o fundo (o destaque automático é o traço, sem fundo), com o
@@ -2339,11 +2345,6 @@ button.marcador-nota {
   border: 2px solid var(--cacto);
   text-decoration: underline;
   text-underline-offset: 0.2em;
-}
-
-/* No grupo de vidro o botão não tem borda: o contorno do filtro ligado entra por dentro, como anel. */
-.acoes-leitor .dock-do-leitor button.filtro-ligado {
-  border: 0;
 }
 
 .filtro-ativo {
