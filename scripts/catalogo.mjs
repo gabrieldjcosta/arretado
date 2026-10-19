@@ -1,6 +1,7 @@
 // Catálogo de concursos (B0): valida e converte o CSV do Perplexity. Contrato em docs/planos/catalogo-formato.md.
 //   node scripts/catalogo.mjs validar <arquivo...>              só relatório; sai com 1 se houver erro (--tudo lista todos os achados)
 //   node scripts/catalogo.mjs converter <arquivo...> [--out DIR] valida e grava DIR/<carreira>.{csv,json}, descartes/ e index.json
+//   node scripts/catalogo.mjs dividir [--out DIR]               divide, nos CSV/JSON já gravados, os itens em que vários assuntos foram juntados
 //   node scripts/catalogo.mjs indice [--out DIR]                refaz o index.json a partir dos JSON existentes
 // <arquivo> pode ser um CSV só ou a resposta inteira do Perplexity (blocos entre ```); "-" lê da entrada padrão.
 // Carreira nova: rode `converter` só com os arquivos dela; as outras não são tocadas e o índice a inclui.
@@ -13,11 +14,14 @@ import {
   converter,
   csvNormalizado,
   descartar,
+  dividirLinhas,
+  lerCsv,
   normalizarLinha,
   separarBlocos,
   validarComplementares,
   validarPrincipal,
 } from './catalogo/nucleo.mjs';
+import { dividirItens } from './catalogo/dividir.mjs';
 
 const [, , comando, ...args] = process.argv;
 const iOut = args.indexOf('--out');
@@ -26,6 +30,30 @@ const entradas = args.filter(
   (a, i) => a !== '--tudo' && (iOut < 0 || (i !== iOut && i !== iOut + 1)),
 );
 if (comando === 'indice') {
+  atualizarIndice(saida);
+  process.exit(0);
+}
+if (comando === 'dividir') {
+  for (const [, slug] of CARREIRAS) {
+    const csv = join(saida, `${slug}.csv`);
+    const arqJson = join(saida, `${slug}.json`);
+    if (!existsSync(csv) || !existsSync(arqJson)) continue;
+    const linhas = lerCsv(readFileSync(csv, 'utf8')).map((l, i) => ({ l, n: i + 1 }));
+    const { mantidas, descartadas } = dividirLinhas(linhas.slice(1));
+    const json = JSON.parse(readFileSync(arqJson, 'utf8'));
+    let antes = 0;
+    let depois = 0;
+    for (const ed of json.editais)
+      for (const d of ed.disciplinas) {
+        antes += d.itens.length;
+        d.itens = dividirItens(d.itens).itens;
+        depois += d.itens.length;
+      }
+    writeFileSync(csv, csvNormalizado(mantidas));
+    writeFileSync(arqJson, JSON.stringify(json, null, 2) + '\n');
+    anexosNosDescartes(saida, slug, descartadas);
+    console.log(`${slug}: ${antes} → ${depois} itens (${descartadas.length} anexos tirados)`);
+  }
   atualizarIndice(saida);
   process.exit(0);
 }
@@ -81,7 +109,9 @@ if (comando === 'converter') {
   for (const nome of carreirasDoPrincipal(blocos.principal)) {
     const { slug } = carreiraCanonica(nome);
     const doCarreira = blocos.principal.filter(({ l }) => carreiraCanonica(l[0])?.nome === nome);
-    const { mantidas, descartadas } = descartar(doCarreira);
+    const { mantidas: aposDescarte, descartadas } = descartar(doCarreira);
+    const { mantidas, descartadas: anexos } = dividirLinhas(aposDescarte);
+    descartadas.push(...anexos);
     writeFileSync(join(saida, `${slug}.csv`), csvNormalizado(mantidas));
     const json = converter({ ...blocos, principal: mantidas }, nome);
     writeFileSync(join(saida, `${slug}.json`), JSON.stringify(json, null, 2) + '\n');
@@ -103,6 +133,21 @@ if (comando === 'converter') {
   }
 }
 if (['converter', 'indice'].includes(comando)) atualizarIndice(saida);
+
+/** Anexos tirados na divisão entram em `descartes/<carreira>.txt` (sem repetir o que já está lá). */
+function anexosNosDescartes(dir, slug, descartadas) {
+  if (!descartadas.length) return;
+  const arq = join(dir, 'descartes', `${slug}.txt`);
+  mkdirSync(join(dir, 'descartes'), { recursive: true });
+  const atual = existsSync(arq) ? readFileSync(arq, 'utf8').split('\n').filter(Boolean) : [];
+  const novas = descartadas
+    .map(({ l, motivo }) => {
+      const [, orgao, , , ano, , , disc, , num, assunto] = normalizarLinha(l);
+      return `${motivo} · ${orgao} ${ano} · ${disc} · item "${num}" · "${assunto.slice(0, 80)}"`;
+    })
+    .filter((t) => !atual.includes(t));
+  writeFileSync(arq, [...atual, ...novas].join('\n') + '\n');
+}
 
 /** corpus/catalogo/index.json: o que o app (B1) lê para saber quais carreiras existem; carreira nova entra sozinha. */
 function atualizarIndice(dir) {

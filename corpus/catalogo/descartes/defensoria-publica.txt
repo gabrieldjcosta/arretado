@@ -93,3 +93,7 @@ linha 5655 · assunto fragmento · DPU 2017 · DIREITO CONSTITUCIONAL · item "1
 linha 5793 · assunto fragmento · DPU 2017 · NOÇÕES DE CIÊNCIA POLÍTICA · item "38" · "ANEXO"
 linha 5807 · assunto fragmento · DPU 2017 · NOÇÕES DE CIÊNCIA POLÍTICA · item "39" · "ANEXO"
 linha 5809 · assunto fragmento · DPU 2017 · NOÇÕES DE CIÊNCIA POLÍTICA · item "40" · "ANEXO"
+anexo do edital · DPE/PE 2025 · DIREITO INSTITUCIONAL · item "44" · "ANEXO II - MODELO DE DECLARAÇÃO DE HIPOSSUFICIÊNCIA DE RECURSOS FINANCEIROS Eu,_"
+anexo do edital · DPE/PE 2025 · DIREITO INSTITUCIONAL · item "45" · "ANEXO III - FORMULÁRIO DE AUTODECLARAÇÃO DE CANDIDATO NEGRO Eu, ________________"
+anexo do edital · DPE/PE 2025 · DIREITO INSTITUCIONAL · item "46" · "ANEXO IV - FORMULÁRIO DE AUTODECLARAÇÃO DE CANDIDATO INDÍGENA Eu, ______________"
+anexo do edital · DPE/PE 2025 · DIREITO INSTITUCIONAL · item "47" · "ANEXO V - FORMULÁRIO DE AUTODECLARAÇÃO DE CANDIDATO TRANS Eu, __________________"

@@ -1,6 +1,8 @@
 // Núcleo do catálogo de concursos (B0): lê o CSV do Perplexity, valida, normaliza e converte em JSON por carreira.
 // Contrato: docs/planos/catalogo-formato.md. Sem rede, sem dependências.
 
+import { dividirItem } from './dividir.mjs';
+
 export const CABECALHO_PRINCIPAL = [
   'carreira',
   'orgao',
@@ -526,6 +528,39 @@ export function descartar(principal) {
     else if (l[9] && numeroImplausivel(l[9]))
       descartadas.push({ ...x, motivo: 'numero_item implausível' });
     else mantidas.push(x);
+  }
+  return { mantidas, descartadas };
+}
+
+/**
+ * Divide as linhas em que a extração juntou vários assuntos num só (ver `dividir.mjs`) e tira anexos do edital.
+ * Cada linha nova herda todos os campos da original; só `numero_item` e `assunto` mudam. Idempotente.
+ * Devolve as linhas resultantes e os anexos retirados (para a lista de descartes).
+ */
+export function dividirLinhas(principal) {
+  const vistas = new Set();
+  const mantidas = [];
+  const descartadas = [];
+  for (const x of principal) {
+    if (x.l.length !== CABECALHO_PRINCIPAL.length) {
+      mantidas.push(x);
+      continue;
+    }
+    const l = normalizarLinha(x.l);
+    if (ehLinhaNl(l)) {
+      mantidas.push(x);
+      continue;
+    }
+    const partes = dividirItem(l[9] || null, l[10]);
+    if (!partes.length) descartadas.push({ ...x, motivo: 'anexo do edital' });
+    for (const p of partes) {
+      const nova = l.map((v, i) => (i === 9 ? (p.numero ?? '') : i === 10 ? p.assunto : v));
+      // a extração às vezes repete o mesmo item gigante; depois de dividido, as cópias ficam idênticas
+      const chave = JSON.stringify(nova);
+      if (vistas.has(chave)) continue;
+      vistas.add(chave);
+      mantidas.push({ ...x, l: nova });
+    }
   }
   return { mantidas, descartadas };
 }

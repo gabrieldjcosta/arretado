@@ -62,6 +62,10 @@ Não entram no catálogo, e ficam listadas em `descartes/<carreira>.txt` para co
 
 `faixa` dos itens segue como veio (vazia sem base). `faixaSugerida` da disciplina, quando o Perplexity não preencheu, é derivada da presença nos editais da amostra, pela mesma regra que ele declarou na Magistratura: ≥85% Altíssima, ≥65% Alta, ≥35% Média, abaixo disso Baixa. Com menos de 3 editais na amostra não há base e fica vazia. O JSON marca `faixaOrigem` (`edital` ou `derivada`) e `faixaBase` ("presente em N de M editais"); a interface deve dizer que é sugestão pela amostra.
 
+## Divisão de assuntos juntados (feita no `converter`; `npm run catalogo -- dividir` nos já gravados)
+
+A extração de PDF às vezes junta vários assuntos num item só (marcadores "18." embutidos, parágrafos de frases, listas de ";" longas). `scripts/catalogo/dividir.mjs` quebra em fronteira de marcador, de frase (item > 400 caracteres) ou de ";" (item > 900), tira anexos do edital e cabeçalho de página, e some com cópias idênticas. Faixa, recorrência e fonte vão para cada assunto novo; `numero_item` novo é `N.1`, `N.2`… (ou o marcador achado). Idempotente. Resultado e tabela por disciplina: [`../revisoes/catalogo-assuntos-juntados-2026-10-19.md`](../revisoes/catalogo-assuntos-juntados-2026-10-19.md).
+
 ## Normalização (feita no `converter`)
 
 Remove BOM e cercas ```; reduz espaços; carreira, `faixa` e `fase` para a forma canônica; `uf` em maiúsculas (`DFT` → `DF`); `recorrencia` sem espaços ("3 / 3" → "3/3"); prefixo `[Geral] ` nas disciplinas gerais; "não localizado" → `NÃO LOCALIZADO`. Idempotente: rodar sobre o CSV já normalizado dá o mesmo arquivo.
