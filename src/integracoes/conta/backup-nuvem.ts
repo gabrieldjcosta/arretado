@@ -13,8 +13,9 @@ import {
   type ResultadoImportacao,
 } from '../../core/pacote';
 import { sha256 } from '../../core/pacote/bytes';
+import { registrarBackup } from '../../core/persistencia';
 import type { Repositorio } from '../../core/persistencia';
-import type { CopiaNaNuvem, ServicoDeConta } from './interface';
+import { FalhaDeConta, type CopiaNaNuvem, type ServicoDeConta } from './interface';
 
 /** Quantas cópias ficam na nuvem; a mais antiga sai só depois do envio da nova confirmado. */
 export const MANTER_NA_NUVEM = 3;
@@ -41,6 +42,14 @@ export async function listarCopiasNaNuvem(servico: Copias): Promise<CopiaNaNuvem
     .sort((a, b) => (a.nome < b.nome ? 1 : a.nome > b.nome ? -1 : 0));
 }
 
+/** A migração só oferece a escolha quando há cópia e a conexão está disponível. */
+export function deveOferecerCopiaDaNuvem(
+  copias: readonly CopiaNaNuvem[],
+  online: boolean,
+): boolean {
+  return online && copias.length > 0;
+}
+
 export interface CopiaEnviada {
   nome: string;
   /** Cópias antigas que saíram da nuvem (retenção de 3). */
@@ -57,7 +66,7 @@ export async function guardarCopiaNaNuvem(
   frase: string,
   opcoes: { iteracoes?: number } = {},
 ): Promise<CopiaEnviada> {
-  if (frase.length === 0) throw new Error('Frase vazia.');
+  if (frase.length === 0) throw new FalhaDeConta('invalido', 'Frase vazia.');
   const { bytes } = await exportarPacote(repo, {
     escopo: { tipo: 'integral' },
     incluirAnexos: true,
@@ -66,6 +75,7 @@ export async function guardarCopiaNaNuvem(
   });
   const nome = nomeDaCopia(repo.ctx.agora(), await sha256(bytes));
   await servico.enviarCopia(nome, bytes);
+  await registrarBackup(repo);
 
   const excedentes = (await listarCopiasNaNuvem(servico))
     .filter((c) => c.nome !== nome)
