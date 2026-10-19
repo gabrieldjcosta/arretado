@@ -60,13 +60,17 @@ test('a partir de 900 px o Agora fica à esquerda e o Para lembrar à direita; a
   }
 });
 
+// O aviso "Salvo.", e só ele: `hasText: 'Salvo.'` casa por texto contido e sem diferenciar maiúscula,
+// então também acertaria "Ainda não salvo." e o teste recarregaria antes de a gravação terminar.
+const salvo = (page: Page) => page.getByRole('status').filter({ hasText: /^Salvo\.$/ });
+
 test('o Para lembrar: escrever, salvar e ainda estar lá depois de recarregar', async ({ page }) => {
   await page.goto('/');
   const campo = page.getByRole('textbox', { name: 'Para lembrar' });
   await campo.fill('Ligar para o cartório');
   await expect(page.getByRole('status').filter({ hasText: 'Ainda não salvo.' })).toBeVisible();
   await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Salvo.' })).toBeVisible();
+  await expect(salvo(page)).toBeVisible();
 
   await page.reload();
   await expect(campo).toHaveValue('Ligar para o cartório');
@@ -78,7 +82,7 @@ test('o Para lembrar grava ao sair do campo, sem apertar Salvar', async ({ page 
   const campo = page.getByRole('textbox', { name: 'Para lembrar' });
   await campo.fill('Pedir o livro de Processo Penal');
   await page.getByRole('heading', { level: 1, name: 'Hoje' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Salvo.' })).toBeVisible();
+  await expect(salvo(page)).toBeVisible();
 
   await page.reload();
   await expect(campo).toHaveValue('Pedir o livro de Processo Penal');

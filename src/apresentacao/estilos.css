@@ -3326,3 +3326,24 @@ dialog.dialogo-previa .linha-acoes button {
   display: inline;
   margin: 0;
 }
+
+/* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */
+.lacuna-editor {
+  user-select: text;
+  -webkit-user-select: text;
+}
+.lacuna-tarja {
+  display: inline;
+  min-height: 0;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--texto);
+  color: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.lacuna-tarja:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}

@@ -475,3 +475,9 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Termo | Identificadores |
 |---|---|
 | Fumaça real | Roteiro manual com duas contas descartáveis e dados sintéticos em [`portoes/F4A.md`](portoes/F4A.md); verifica RLS, cópia cifrada, migração, troca, offline e exclusão no projeto publicado. O resultado é registrado sem e-mails, tokens, UUIDs ou conteúdo de estudo. |
+
+#### Lacuna em um gesto
+
+| Termo | Identificadores |
+|---|---|
+| Tarja (trecho escondido) | `EditorDeLacuna` (`recall/EditorDeLacuna.tsx`, helpers em `lacuna.ts`): selecionar esconde na hora (mouse e teclado ao soltar; toque após pausa de 600 ms), tocar na tarja mostra; a seleção se alarga até a palavra inteira (`ajustarAPalavras`). Usado em `RegistrarErro` ("Criar cartão com lacuna"), `RegistrarVarios` (`/recall/registrar/varios`, uma frase por linha) e em `DialogoEnviarAsFrases` (Leitor, Resumo, Precedente), que passa `ocultos` a `criarCartaoDeLacuna` |

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { Link } from 'react-router';
-import type { Erro, ResultadoErro } from '../../core/modelo';
+import type { Erro, Intervalo, ResultadoErro } from '../../core/modelo';
 import { sugerirCausa } from '../../dominios/recall/causa';
 import {
   criarCartaoDeErro,
+  criarCartaoDeLacuna,
+  fraseDoErro,
   LIMITE_FILA_DIARIA,
   maiorFilaProjetada,
   registrarErro,
@@ -12,6 +14,7 @@ import { useDados, useRepositorio } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro, type Complemento } from './CamposErro';
+import { EditorDeLacuna } from './EditorDeLacuna';
 import { ROTULO_RESULTADO } from './rotulos';
 
 type Depois =
@@ -60,6 +63,8 @@ export function RegistrarErro() {
   const vinculos = useDados(pontosEDisciplinas);
   const [frase, setFrase] = useState('');
   const [resultado, setResultado] = useState<ResultadoErro | null>(null);
+  const [ocultos, setOcultos] = useState<Intervalo[]>([]);
+  const [escondendo, setEscondendo] = useState(false);
   const [oQueFoi, setOQueFoi] = useState('');
   const [complemento, setComplemento] = useState<Complemento>({});
   const [lembrada, setEscolha] = useState<Escolha>(lerEscolha);
@@ -106,7 +111,15 @@ export function RegistrarErro() {
         ...(resultado ? { resultado } : {}),
         ...(oQueFoi.trim() ? { oQueFoi } : {}),
       });
-      setDepois(erro.oQueFoi ? { tipo: 'perguntar', erro } : { tipo: 'sem-cartao', erro });
+      if (ocultos.length > 0) {
+        // Frase e cartão de lacuna de uma vez: o erro já está salvo se o cartão falhar.
+        const f = await fraseDoErro(repo, erro.id);
+        if (f) await criarCartaoDeLacuna(repo, f.id, ocultos);
+        const maior = await maiorFilaProjetada(repo);
+        setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
+      } else {
+        setDepois(erro.oQueFoi ? { tipo: 'perguntar', erro } : { tipo: 'sem-cartao', erro });
+      }
     } catch {
       setFalha('Não foi possível salvar. Confira os campos e tente de novo; nada foi perdido.');
     } finally {
@@ -131,6 +144,8 @@ export function RegistrarErro() {
   // Disciplina e ponto continuam escolhidos para o registro seguinte.
   const outro = () => {
     setFrase('');
+    setOcultos([]);
+    setEscondendo(false);
     setResultado(null);
     setOQueFoi('');
     setComplemento({});
@@ -236,11 +251,33 @@ export function RegistrarErro() {
             aria-describedby="erro-frase-dica"
             onChange={(e) => {
               setFrase(e.target.value);
+              setOcultos([]);
             }}
           />
           <p id="erro-frase-dica" className="dica">
             O certo, em uma linha: é o que você vai revisar.
           </p>
+          {pronto && (
+            <button
+              type="button"
+              className="botao botao-texto na-margem"
+              aria-expanded={escondendo}
+              onClick={() => {
+                setEscondendo(!escondendo);
+                setOcultos([]);
+              }}
+            >
+              {escondendo ? 'Sem lacuna' : 'Criar cartão com lacuna'}
+            </button>
+          )}
+          {pronto && escondendo && (
+            <>
+              <p className="dica">
+                Selecione o que quer lembrar: o trecho some. Toque na tarja para mostrar.
+              </p>
+              <EditorDeLacuna texto={frase.trim()} ocultos={ocultos} aoMudar={setOcultos} />
+            </>
+          )}
         </div>
         {disciplinas && disciplinas.length > 0 && (
           <div className="campo">
@@ -343,6 +380,9 @@ export function RegistrarErro() {
           <button type="submit" className="principal" disabled={!pronto || salvando}>
             {salvando ? 'Salvando…' : 'Salvar'}
           </button>
+          <Link to="/recall/registrar/varios" className="botao discreto">
+            Registrar vários
+          </Link>
         </div>
         {!pronto && <p className="dica">Para salvar: escreva a frase correta.</p>}
       </form>
