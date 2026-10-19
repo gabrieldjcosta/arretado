@@ -12,7 +12,7 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
-import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { usePassagemDeCartao } from '../componentes/passagem';
@@ -22,13 +22,22 @@ import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
+import { IconeDoFixar, type NomeDoIcone } from './icones';
 import { ROTULO_RESPOSTA } from './rotulos';
+import { TopoDaRevisao } from './TopoDaRevisao';
 
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'revisando'; fila: Cartao[]; indice: number; virado: boolean }
   | { tipo: 'fim'; amanha: number; restantes: number; proximoLote: number; frases: number }
   | { tipo: 'falha' };
+
+/** O desenho de cada resposta (traço único, `currentColor`): o rótulo diz o que é, o desenho acompanha. */
+const ICONE = {
+  errei: 'deNovo',
+  dificil: 'dificil',
+  facil: 'facil',
+} as const satisfies Record<RespostaRevisao, NomeDoIcone>;
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
   if (cartao.verso !== null) return cartao.verso;
@@ -211,17 +220,18 @@ export function Drill() {
 
   if (estado.tipo === 'fim') {
     return (
-      <>
+      <div className="coluna-drill fim-de-rodada">
         <h1>Revisar</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
+          marca={<Caneta pose="deitada" className="fim-caneta" />}
           acao={
             estado.frases > 0 ? (
               <>
                 <Link to="/recall/frases/revisar" className="botao principal">
                   Seguir para as frases ({estado.frases})
                 </Link>
-                <Link to="/recall" className="botao discreto">
+                <Link to="/recall" className="botao botao-texto">
                   Voltar ao {ROTULO_DA_AREA.recall}
                 </Link>
               </>
@@ -253,23 +263,22 @@ export function Drill() {
           )}
           <p>Amanhã: {estado.amanha === 1 ? '1 cartão' : `${String(estado.amanha)} cartões`}.</p>
         </Vazio>
-      </>
+      </div>
     );
   }
 
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
-  const ICONE = { errei: '↻', dificil: '~', facil: '✓' } as const;
   return (
-    <>
+    <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar</h1>
       <FaixaDaSessao />
-      <div className="topo-drill">
-        <Link to="/recall" className="botao discreto">
-          Sair
-        </Link>
-        <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Cartão" />
-      </div>
+      <TopoDaRevisao
+        sair="/recall"
+        valor={estado.indice + 1}
+        max={estado.fila.length}
+        rotulo="Cartão"
+      />
       <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
         <p className="drill-frente texto-leitura">{atual.frente}</p>
         {estado.virado && (
@@ -315,7 +324,7 @@ export function Drill() {
               aria-keyshortcuts={String(i + 1)}
               onClick={() => void responder(r)}
             >
-              <span aria-hidden="true">{ICONE[r]} </span>
+              <IconeDoFixar nome={ICONE[r]} />
               {ROTULO_RESPOSTA[r]}
               <TracoDeSelecao chave={`resposta:${r}`} ativo={escolhida === r} />
             </button>
@@ -328,7 +337,7 @@ export function Drill() {
           : 'o fim desta rodada'}
       </LinhaDepois>
       <details className="menu-drill">
-        <summary className="botao discreto">Mais opções</summary>
+        <summary className="botao botao-texto">Mais opções</summary>
         <div className="linha-acoes">
           <button
             type="button"
@@ -350,6 +359,6 @@ export function Drill() {
           )}
         </div>
       </details>
-    </>
+    </div>
   );
 }

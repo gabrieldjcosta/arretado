@@ -148,7 +148,7 @@ describe('completar depois (6.3)', () => {
       fraseCorreta: 'F.',
       causa: 'lacuna',
     });
-    const { usuario } = await abrir('/recall', repo);
+    const { usuario } = await abrir('/recall/erros', repo);
     const lista = await screen.findByRole('list');
     expect(within(lista).getAllByRole('listitem')).toHaveLength(2);
     expect(within(lista).getAllByText('completar')).toHaveLength(1);
@@ -218,7 +218,7 @@ describe('correções da revisão da etapa 6', () => {
     const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
-    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Fixar' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar aos erros' }));
     await waitFor(async () => {
       expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe(
         'Suspensão condicional.',
@@ -461,5 +461,103 @@ describe('a passagem do cartão (A caneta que desenha)', () => {
     await usuario.keyboard('3');
     expect(await screen.findByText('2 de 2')).toBeInTheDocument();
     expect(pedidos).toHaveLength(0);
+  });
+});
+
+describe('Fixar na P5 do Ponto de luz', () => {
+  const canetas = () => [...document.querySelectorAll<SVGElement>('svg.caneta')];
+
+  it('abas Frases · Cartões · Histórico: /recall cai nas Frases e os Erros ficam em /recall/erros', async () => {
+    const { repo } = await repositorioDeTeste();
+    await registrarErro(repo, { resultado: 'errou', fraseCorreta: 'Frase A.' });
+    const { usuario } = await abrir('/recall', repo);
+    const abas = await screen.findByRole('navigation', { name: 'Seções do Fixar' });
+    expect(
+      within(abas)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Frases', 'Cartões', 'Histórico']);
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/recall/frases');
+    });
+    await usuario.click(await screen.findByRole('link', { name: 'Ver os erros, com filtros' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/recall/erros');
+    const linha = (await screen.findAllByRole('listitem'))[0];
+    expect(linha).toHaveTextContent('Errei');
+    expect(linha?.querySelector('svg.icone-fixar')).not.toBeNull();
+    await usuario.click(screen.getByRole('link', { name: 'Voltar às frases' }));
+    expect(await screen.findByRole('link', { name: 'Frase A.' })).toBeInTheDocument();
+  });
+
+  it('cada frase oferece "Esconder trecho", que abre o cartão de lacuna dela', async () => {
+    const { repo } = await repositorioDeTeste();
+    await registrarErro(repo, { resultado: 'errou', fraseCorreta: 'Frase A.' });
+    const [frase] = await repo.colecao('frases').todosDoUsuario();
+    const { usuario } = await abrir('/recall/frases', repo);
+    await usuario.click(await screen.findByRole('link', { name: 'Esconder trecho: Frase A.' }));
+    expect(window.location.hash).toBe(`#/recall/frases/${frase?.id ?? ''}/cartao`);
+  });
+
+  it('sem nenhuma frase (Erro antigo, sem frase correta), a aba ainda leva aos Erros e o detalhe volta a eles', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erro = await erroAntigo(repo, 'Sursis');
+    const { usuario } = await abrir('/recall/frases', repo);
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Nenhuma frase ainda' }),
+    ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Ver os erros, com filtros' }));
+    await usuario.click(await screen.findByRole('link', { name: /Sursis/ }));
+    expect(window.location.hash).toBe(`#/recall/erros/${erro.id}`);
+    await usuario.click(await screen.findByRole('link', { name: 'Voltar aos erros' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/recall/erros');
+  });
+
+  it('cartões: o que já está no prazo diz "Para revisar", com desenho', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    relogio.avancar(86_400_000);
+    await abrir('/recall/cartoes', repo);
+    const estado = await screen.findByText('Para revisar');
+    expect(estado.querySelector('svg.icone-fixar')).not.toBeNull();
+  });
+
+  it('cartões: uma caneta encostada fora do cartão, respostas com desenho e, no fim, a deitada', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    expect(await screen.findByText('Frente 1')).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+    expect(screen.getByRole('article', { name: 'Cartão' }).contains(canetas()[0] ?? null)).toBe(
+      false,
+    );
+    await usuario.keyboard(' ');
+    const respostas = within(await screen.findByRole('group', { name: 'Como foi?' })).getAllByRole(
+      'button',
+    );
+    expect(respostas.map((b) => b.textContent)).toEqual(['De novo', 'Difícil', 'Fácil']);
+    for (const b of respostas) expect(b.querySelector('svg.icone-fixar')).not.toBeNull();
+    await usuario.keyboard('3');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
+  });
+
+  it('frases: a mesma caneta encostada, respostas com desenho e a deitada no fim', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await registrarErro(repo, { fraseCorreta: 'Frase do dia.' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/frases/revisar', repo);
+    expect(await screen.findByText('Frase do dia.')).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+    const respostas = within(screen.getByRole('group', { name: 'Como foi?' })).getAllByRole(
+      'button',
+    );
+    expect(respostas.map((b) => b.textContent)).toEqual(['Fácil', 'De novo']);
+    for (const b of respostas) expect(b.querySelector('svg.icone-fixar')).not.toBeNull();
+    await usuario.keyboard('1');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
   });
 });

@@ -14,17 +14,9 @@ import { resumoDoRecall } from './carregadores';
 export const SEGUNDOS_POR_CARTAO = 30;
 
 /** Uma aba do Recall: link de rota com o traço de seleção (D-D7, "A caneta que desenha"). */
-function AbaDoRecall({
-  para,
-  fim = false,
-  rotulo,
-}: {
-  para: string;
-  fim?: boolean;
-  rotulo: string;
-}) {
+function AbaDoRecall({ para, rotulo }: { para: string; rotulo: string }) {
   return (
-    <NavLink to={para} end={fim}>
+    <NavLink to={para}>
       {({ isActive }) => (
         <>
           {rotulo}
@@ -38,7 +30,11 @@ function AbaDoRecall({
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
 const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
 
-/** Recall: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas (Parte 2 §9.2). */
+/**
+ * Fixar: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas Frases ·
+ * Cartões · Histórico (Parte 2 §9.2; D-D5: "Erros" deixou de ser aba). Quem chega a `/recall` cai
+ * na aba Frases.
+ */
 export function RecallInicio() {
   const { dados } = useDados(resumoDoRecall);
   const [avisoDispensado, setAvisoDispensado] = useState(false);
@@ -106,7 +102,6 @@ export function RecallInicio() {
         </p>
       )}
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
-        <AbaDoRecall para="/recall" fim rotulo="Erros" />
         <AbaDoRecall para="/recall/frases" rotulo="Frases" />
         <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />
         <AbaDoRecall para="/recall/historico" rotulo="Histórico" />

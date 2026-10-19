@@ -8,7 +8,7 @@ import {
   filaDeFrases,
   revisarFrase,
 } from '../../dominios/recall/servico';
-import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { usePassagemDeCartao } from '../componentes/passagem';
@@ -17,6 +17,8 @@ import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
 import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
+import { IconeDoFixar, type NomeDoIcone } from './icones';
+import { TopoDaRevisao } from './TopoDaRevisao';
 
 type Estado =
   | { tipo: 'carregando' }
@@ -25,12 +27,12 @@ type Estado =
   | { tipo: 'falha' };
 
 const RESPOSTAS = [
-  { resposta: 'li', rotulo: 'Fácil', icone: '✓', classe: 'resposta-facil' },
-  { resposta: 'de_novo', rotulo: 'De novo', icone: '↻', classe: 'resposta-dificil' },
+  { resposta: 'li', rotulo: 'Fácil', icone: 'facil', classe: 'resposta-facil' },
+  { resposta: 'de_novo', rotulo: 'De novo', icone: 'deNovo', classe: 'resposta-dificil' },
 ] as const satisfies readonly {
   resposta: RespostaFrase;
   rotulo: string;
-  icone: string;
+  icone: NomeDoIcone;
   classe: string;
 }[];
 
@@ -164,17 +166,18 @@ export function RevisarFrases() {
 
   if (estado.tipo === 'fim') {
     return (
-      <>
+      <div className="coluna-drill fim-de-rodada">
         <h1>Revisar frases</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
+          marca={<Caneta pose="deitada" className="fim-caneta" />}
           acao={
             estado.cartoes > 0 ? (
               <>
                 <Link to="/recall/revisar" className="botao principal">
                   Seguir para os cartões ({estado.cartoes})
                 </Link>
-                <Link to="/recall/frases" className="botao discreto">
+                <Link to="/recall/frases" className="botao botao-texto">
                   Voltar às frases
                 </Link>
               </>
@@ -205,22 +208,22 @@ export function RevisarFrases() {
             </>
           )}
         </Vazio>
-      </>
+      </div>
     );
   }
 
   if (!atual) return null;
   const restam = estado.fila.length - estado.indice - 1;
   return (
-    <>
+    <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar frases</h1>
       <FaixaDaSessao />
-      <div className="topo-drill">
-        <Link to="/recall/frases" className="botao discreto">
-          Sair
-        </Link>
-        <BarraFina valor={estado.indice + 1} max={estado.fila.length} rotulo="Frase" />
-      </div>
+      <TopoDaRevisao
+        sair="/recall/frases"
+        valor={estado.indice + 1}
+        max={estado.fila.length}
+        rotulo="Frase"
+      />
       <article ref={cartaoDaFrase} className="cartao-bloco cartao-drill" aria-label="Frase">
         <p className="drill-frente texto-leitura">{atual.texto}</p>
       </article>
@@ -239,7 +242,7 @@ export function RevisarFrases() {
             aria-keyshortcuts={String(i + 1)}
             onClick={() => void responder(r.resposta)}
           >
-            <span aria-hidden="true">{r.icone} </span>
+            <IconeDoFixar nome={r.icone} />
             {r.rotulo}
             <TracoDeSelecao chave={`frase:${r.resposta}`} ativo={escolhida === r.resposta} />
           </button>
@@ -251,7 +254,7 @@ export function RevisarFrases() {
           : 'o fim desta rodada'}
       </LinhaDepois>
       <details className="menu-drill">
-        <summary className="botao discreto">Mais opções</summary>
+        <summary className="botao botao-texto">Mais opções</summary>
         <div className="linha-acoes">
           <Link to={`/recall/frases/${atual.id}/cartao`} className="botao">
             Esconder um trecho (criar cartão)
@@ -263,6 +266,6 @@ export function RevisarFrases() {
           )}
         </div>
       </details>
-    </>
+    </div>
   );
 }

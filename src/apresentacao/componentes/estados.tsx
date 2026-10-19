@@ -1,18 +1,24 @@
 import type { ReactNode } from 'react';
 import { useConectado } from './conexao';
 
-/** Estado vazio: um convite (o que é este espaço) e a ação que o preenche (Parte 2 §9.1). */
+/**
+ * Estado vazio: um convite (o que é este espaço) e a ação que o preenche (Parte 2 §9.1). A `marca`,
+ * se houver, é o desenho decorativo acima do título (o fim de uma rodada de revisão).
+ */
 export function Vazio({
   titulo,
   children,
   acao,
+  marca,
 }: {
   titulo: string;
   children?: ReactNode;
   acao?: ReactNode;
+  marca?: ReactNode;
 }) {
   return (
     <section className="vazio">
+      {marca}
       <h2>{titulo}</h2>
       {children}
       {acao && <div className="linha-acoes">{acao}</div>}
