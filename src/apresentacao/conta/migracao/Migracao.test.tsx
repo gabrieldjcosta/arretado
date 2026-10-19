@@ -319,7 +319,9 @@ describe('Telas de migração (F4-A, A4b)', () => {
 
       await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
       expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
-      await waitFor(() => expect(listarCopias).toHaveBeenCalled());
+      await waitFor(() => {
+        expect(listarCopias).toHaveBeenCalled();
+      });
       expect(screen.queryByRole('radio')).toBeNull();
       expect(abrirRepositorioConta).not.toHaveBeenCalled();
     });
@@ -394,7 +396,9 @@ describe('Telas de migração (F4-A, A4b)', () => {
 
       await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
       expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
-      await waitFor(() => expect(listarCopias).toHaveBeenCalled());
+      await waitFor(() => {
+        expect(listarCopias).toHaveBeenCalled();
+      });
       expect(screen.queryByRole('radio')).toBeNull();
     });
   });
