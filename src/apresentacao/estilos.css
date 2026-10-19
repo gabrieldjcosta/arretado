@@ -491,11 +491,13 @@ button,
    tablet em pé, 32 a partir de 900). --largura-casca: a largura do conteúdo e, a partir de 900 px, a
    do cabeçalho, para a marca alinhar com o título. --abas-altura: o que as abas de baixo ocupam (até
    899 px, com a área segura do aparelho); a rolagem reserva essa altura e o dock do Leitor fica
-   acima dela. Com o teclado aberto, no modo foco e no "só estudo" as abas saem e ela zera. */
+   acima dela. A partir de 900 px não há abas embaixo e ela é só a área segura (o indicador de
+   início do iPhone deitado). Com o teclado aberto, no modo foco e no "só estudo" as abas saem e
+   ela zera. */
 :root {
   --gutter: 1rem;
   --largura-casca: 900px;
-  --abas-altura: 0px;
+  --abas-altura: env(safe-area-inset-bottom, 0px);
 }
 
 @media (min-width: 700px) {
@@ -658,7 +660,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 1rem var(--gutter);
+  padding: 1rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 
 /* Título com o "+" na mesma linha (TituloComMais, D-D7): o "+" é redondo, em cal com a tinta e a
@@ -702,7 +705,8 @@ button,
   width: 100%;
   max-width: var(--largura-casca);
   margin: 0 auto;
-  padding: 0.5rem var(--gutter) 1rem;
+  padding: 0.5rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
+    max(var(--gutter), env(safe-area-inset-left, 0px));
   font-size: 0.8125rem;
   color: var(--texto-atenuado);
 }
@@ -760,7 +764,8 @@ button,
 
 @media (min-width: 700px) and (max-width: 899px) {
   .areas {
-    padding-inline: max(0.5rem, calc((100% - 35rem) / 2));
+    padding-left: max(0.5rem, env(safe-area-inset-left, 0px), calc((100% - 35rem) / 2));
+    padding-right: max(0.5rem, env(safe-area-inset-right, 0px), calc((100% - 35rem) / 2));
   }
 }
 
@@ -768,7 +773,9 @@ button,
    caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
 @media (min-width: 900px) {
   .topo {
-    padding-inline: max(var(--gutter), calc((100% - var(--largura-casca)) / 2 + var(--gutter)));
+    --recuo: calc((100% - var(--largura-casca)) / 2 + var(--gutter));
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px), var(--recuo));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px), var(--recuo));
   }
 
   .marca {
@@ -1661,6 +1668,11 @@ a.item-norma strong {
 
 :root[data-modo-foco] .shell {
   --abas-altura: 0px;
+}
+
+/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. */
+:root[data-modo-foco] .conteudo {
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
 }
 
 .em-foco .acoes-leitor {
@@ -2764,13 +2776,16 @@ dialog.dialogo-previa {
   max-width: none;
   max-height: 70dvh;
   overflow-y: auto;
+  padding-bottom: max(1.5rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
   border-radius: var(--raio) var(--raio) 0 0;
 }
 
 @media (min-width: 700px) {
   dialog.dialogo-previa {
-    margin: auto 1.5rem 1.5rem auto;
+    margin: auto max(1.5rem, env(safe-area-inset-right, 0px))
+      max(1.5rem, env(safe-area-inset-bottom, 0px)) auto;
     width: min(32rem, calc(100vw - 3rem));
+    padding-bottom: 1.5rem;
     border-radius: var(--raio);
   }
 }
@@ -2826,6 +2841,24 @@ dialog.dialogo-previa .linha-acoes button {
   border: 1px solid var(--borda);
   border-radius: var(--raio-cartao);
   box-shadow: var(--sombra-flutuante);
+  /* Rede de segurança (tela muito baixa ou texto ampliado): a pilha rola por dentro em vez de passar
+     do alto da tela, onde o primeiro item ficaria fora do alcance. */
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-bottom, 0px)) - var(--alvo) - 0.5rem -
+      max(1rem, env(safe-area-inset-top, 0px))
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* No celular deitado a pilha de nove não cabe acima do ⋯: vira duas colunas (a ordem do teclado segue
+   a da leitura, uma coluna e depois a outra). */
+@media (max-height: 33.75rem) {
+  .bandeja-itens {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(5, auto);
+  }
 }
 
 .bandeja-itens button {

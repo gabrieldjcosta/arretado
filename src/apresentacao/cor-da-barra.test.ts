@@ -4,7 +4,7 @@ import { COR_DA_BARRA, aplicarCorDaBarra } from './cor-da-barra';
 /** As metas theme-color do index.html de verdade, copiadas para o documento do teste. */
 function metasDoIndex(): HTMLMetaElement[] {
   const pagina = new DOMParser().parseFromString(indexHtml, 'text/html');
-  return Array.from(pagina.querySelectorAll('meta[name="theme-color"]'), (m) => {
+  return Array.from(pagina.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]'), (m) => {
     const copia = document.importNode(m, true);
     document.head.append(copia);
     return copia;
