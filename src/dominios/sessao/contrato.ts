@@ -8,6 +8,9 @@ export interface EntradaDeSessao {
   alvo?: AlvoDeAcao;
   origemDaAcao?: OrigemDaAcao;
   tarefaId?: string;
+  /** Ciclo e bloco que a Sessão trabalha (a posição do Ciclo sai das Sessões encerradas). */
+  cicloId?: string;
+  blocoOrdem?: number;
   /** Até onde ler ("até o art. 15"); opcional. */
   fronteira?: string;
   temporizadorMin?: number;

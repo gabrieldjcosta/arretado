@@ -5,6 +5,7 @@ import type { Repositorio } from '../../core/persistencia';
 import type { EscolherProximaAcao } from '../../dominios/hoje/contrato';
 import { decidirProximaAcao, type EntradaDaProximaAcao } from '../../dominios/hoje/proxima-acao';
 import { carregarFila } from '../../dominios/tarefas';
+import { cicloAtivo, posicaoDoCiclo } from '../../dominios/ciclos';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
 import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
@@ -62,6 +63,25 @@ async function leituraSalva(repo: Repositorio): Promise<LeituraSalva | undefined
   }
 }
 
+/** O bloco atual do Ciclo ativo, com o nome da matéria; ausente sem Ciclo ou com matéria apagada. */
+async function blocoAtual(repo: Repositorio): Promise<EntradaDaProximaAcao['ciclo']> {
+  const ciclo = await cicloAtivo(repo);
+  if (!ciclo) return undefined;
+  const { indice, volta } = await posicaoDoCiclo(repo, ciclo);
+  const bloco = ciclo.blocos[indice];
+  if (!bloco) return undefined;
+  const disciplina = await repo.colecao('disciplinas').obter(bloco.disciplinaId);
+  if (!disciplina || disciplina.excluidoEm !== null) return undefined;
+  return {
+    id: ciclo.id,
+    disciplina: disciplina.nome,
+    blocoOrdem: indice,
+    total: ciclo.blocos.length,
+    volta,
+    minutos: bloco.minutos,
+  };
+}
+
 /** Tudo o que o Hoje sabe do estudo para decidir (e mostrar) a Próxima ação. */
 export interface EntradasDoHoje {
   entrada: EntradaDaProximaAcao;
@@ -70,17 +90,19 @@ export interface EntradasDoHoje {
 }
 
 export async function reunirEntradas(repo: Repositorio, hoje: DataCivil): Promise<EntradasDoHoje> {
-  const [cartoesVencidos, frasesVencidas, salva, { fila }] = await Promise.all([
+  const [cartoesVencidos, frasesVencidas, salva, { fila }, ciclo] = await Promise.all([
     vencidos(repo, 'cartoes', hoje),
     vencidos(repo, 'frases', hoje),
     leituraSalva(repo),
     carregarFila(repo, hoje),
+    blocoAtual(repo),
   ]);
   const primeira = fila[0];
   return {
     entrada: {
       cartoesVencidos,
       frasesVencidas,
+      ...(ciclo ? { ciclo } : {}),
       ...(salva ? { leitura: salva.leitura } : {}),
       ...(primeira
         ? {

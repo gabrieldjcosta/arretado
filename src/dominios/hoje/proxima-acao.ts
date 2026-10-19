@@ -27,6 +27,15 @@ export interface EntradaDaProximaAcao {
   /** A norma lida por último. `onde` ("Art. 41") e `minutos` só existem com posição guardada. */
   /** A primeira Tarefa de estudo da fila (o que a pessoa mesma colocou, ou aceitou como sugestão). */
   tarefa?: { id: string; titulo: string; estimativaMin?: number };
+  /** O bloco atual do Ciclo ativo (a camada de tela calcula a posição). */
+  ciclo?: {
+    id: string;
+    disciplina: string;
+    blocoOrdem: number;
+    total: number;
+    volta: number;
+    minutos: number;
+  };
   leitura?: { normaId: string; tituloCurto: string; onde?: string; minutos?: number };
 }
 
@@ -56,6 +65,18 @@ function revisaoVencida(e: EntradaDaProximaAcao): ProximaAcao | undefined {
       1,
       Math.ceil((Math.min(total, LIMITE_DA_RODADA) * SEGUNDOS_POR_ITEM) / 60),
     ),
+  };
+}
+
+function blocoDoCiclo(e: EntradaDaProximaAcao): ProximaAcao | undefined {
+  const c = e.ciclo;
+  if (!c) return undefined;
+  return {
+    tipo: 'ciclo',
+    alvo: { tipo: 'ciclo', id: c.id, rotulo: c.disciplina.slice(0, 200) },
+    razao: `Bloco ${String(c.blocoOrdem + 1)} de ${String(c.total)} da volta ${String(c.volta)} do seu ciclo`,
+    estimativaMin: c.minutos,
+    blocoOrdem: c.blocoOrdem,
   };
 }
 
@@ -92,6 +113,7 @@ export function decidirProximaAcao(
   const dispensados = new Set(excluir);
   const ordem: [OrigemDaAcao['tipo'], (e: EntradaDaProximaAcao) => ProximaAcao | undefined][] = [
     ['revisao_vencida', revisaoVencida],
+    ['ciclo', blocoDoCiclo],
     ['tarefa', tarefaDaFila],
     ['leitura_salva', leituraSalva],
   ];
