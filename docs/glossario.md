@@ -376,6 +376,7 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Temporizador | `Sessao.temporizadorMin` e `Preferencias.temporizadorPadraoMin`: opcional, informativo; nunca bloqueia nem conta como aprendizado |
 | Modo "só estudo" | `Preferencias.modoSoEstudo`: esconde a administração durante a Sessão |
 | Tarefa de estudo | `TarefaDeEstudo` (coleção `tarefasDeEstudo`, v7): passo pequeno e concreto; `estado` `aberta`/`feita`/`adiada`/`dividida` (`EstadoDaTarefa`), `paiId` (dividida em filhas), `ordem`, `autoria` `manual`/`sugerida`, `razao` (por quê). Não concluída fica na fila, sem atraso punitivo. Não usar "meta" nem "atividade" |
+| Ciclo, bloco, volta, peso | `Ciclo` (esquema só na C2); `BlocoGerado` (`disciplinaId`, `minutos`) em `src/dominios/ciclos/`; volta = uma passada pelos blocos; peso = aparições da matéria por volta, 1 a 4 (`PESO_MIN`/`PESO_MAX`, `calcularPesos`, `gerarBlocos`, `sugerirAjustes`). Pular bloco é neutro, sem "atrasado" |
 | Perfil de estudo | `PerfilDeEstudo` (`calmo`, `guiado`, `leitura`) em `Preferencias.perfilDeEstudo`, com `perfilAnterior` para voltar atrás; só muda padrões da interface |
 | Encaixes do Hoje | `src/apresentacao/hoje/`: `Hoje` compõe `PontosDoDia`, `Retorno`, `Agora`, `Depois`, `FecharDia`, `RevisoesDoDia`, `Captura`; rotas `/sessao/*` (`RotasDaSessao`) e `/plano/{onboarding,pontos,tarefas}/*` (`RotasDoPlano`) |
 | Escolher outra coisa | Botão-texto dentro da folha do Agora (`AcaoAgora`, `aoEscolherOutra`; `useRetratoDoHoje` guarda as dispensas): dispensa o tipo de Próxima ação mostrado (`excluir`), só na tela, sem gravar; sem tipo restante cai no estado vazio com os três começos (`EstadoVazio.tsx`) |
@@ -463,3 +464,9 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Política v3 na tela | `POLITICA_V3` em `src/apresentacao/orientacoes/conteudo.ts`, exibida por `Privacidade`; a v2 fica em `<details>` como versão anterior |
 
 | Aceite no login e na cópia na nuvem (T2) | O provedor do repositório chama `registrarAceitePendente` ao abrir o banco da conta (grava `v3:login`); `NuvemBackup` exige e grava `v3:backup-nuvem` antes do primeiro envio (`exigirConsentimento`). Aviso `AVISO_SEM_ARMAZENAMENTO` quando o navegador não guarda a marca. |
+
+#### F4-A: portão e fumaça (A8)
+
+| Termo | Identificadores |
+|---|---|
+| Fumaça real | Roteiro manual com duas contas descartáveis e dados sintéticos em [`portoes/F4A.md`](portoes/F4A.md); verifica RLS, cópia cifrada, migração, troca, offline e exclusão no projeto publicado. O resultado é registrado sem e-mails, tokens, UUIDs ou conteúdo de estudo. |

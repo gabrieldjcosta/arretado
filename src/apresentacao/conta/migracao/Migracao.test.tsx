@@ -1,13 +1,19 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render as renderBase, screen, waitFor } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as moduloMigracao from '../../../core/pacote/migrar-para-conta';
 import * as moduloExportar from '../../../core/pacote/exportar';
 import { RegistroDeContas, type Repositorio } from '../../../core/persistencia';
+import { ProvedorConta } from '../entrar/ContextoConta';
+import { ContextoRepositorio } from '../../dados/contexto';
+import { FalhaDeConta, ServicoDeContaFalso } from '../../../integracoes/conta';
 import * as moduloIntegracaoConta from '../../../integracoes/conta';
 import { CopiaAnteriorSecao } from '../dados/CopiaAnterior';
 import { Migracao } from './Migracao';
+
+const render = (ui: ReactElement) => renderBase(<ProvedorConta>{ui}</ProvedorConta>);
 
 vi.mock('../../../core/pacote/migrar-para-conta', () => ({
   preverMigracao: vi.fn(),
@@ -223,6 +229,173 @@ describe('Telas de migração (F4-A, A4b)', () => {
       // Clica para tentar de novo
       await u.click(botaoTentarDeNovo);
       expect(moduloMigracao.migrarParaConta).toHaveBeenCalledTimes(2);
+    });
+
+    it('oferece as três escolhas sem pré-marcação e espera a escolha da pessoa', async () => {
+      vi.mocked(moduloMigracao.preverMigracao).mockResolvedValue({
+        colecoes: 3,
+        registros: 50,
+        bytes: 10240,
+        porColecao: {},
+      });
+      vi.mocked(moduloMigracao.migrarParaConta).mockResolvedValue({
+        tipo: 'concluida',
+        uid: uidConta,
+        contagens: {},
+        hash: 'hash-123',
+      });
+
+      const nome = '2026-10-18T09-05-07-abcdef01.arretado';
+      const servico = new ServicoDeContaFalso({
+        sessao: { uid: uidConta, email: 'teste@exemplo.com' },
+      });
+      servico.copias.set(`${uidConta}/${nome}`, new Uint8Array([1, 2, 3]));
+      const baixarCopia = vi.spyOn(servico, 'baixarCopia');
+      const repoDestino = { fechar: vi.fn() } as unknown as Repositorio;
+      const abrirRepositorioConta = vi.fn().mockResolvedValue(repoDestino);
+      const u = userEvent.setup();
+
+      render(
+        <ContextoRepositorio.Provider value={repoFalso}>
+          <ProvedorConta servico={servico}>
+            <MemoryRouter>
+              <Migracao
+                origem={repoFalso}
+                registro={registroFalso}
+                uid={uidConta}
+                abrirRepositorioConta={abrirRepositorioConta}
+              />
+            </MemoryRouter>
+          </ProvedorConta>
+        </ContextoRepositorio.Provider>,
+      );
+
+      await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
+      const usar = await screen.findByRole('radio', { name: /usar a cópia da nuvem/i });
+      const manter = screen.getByRole('radio', { name: /manter o que está neste aparelho/i });
+      const separar = screen.getByRole('radio', { name: /espaço separado/i });
+      for (const radio of [usar, manter, separar]) expect(radio).not.toBeChecked();
+      expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+      expect(abrirRepositorioConta).toHaveBeenCalledWith(uidConta);
+      expect(baixarCopia).not.toHaveBeenCalled();
+
+      await u.click(usar);
+      expect(screen.getByRole('button', { name: 'Continuar' })).toBeEnabled();
+      expect(baixarCopia).not.toHaveBeenCalled();
+    });
+
+    it('sem cópia na nuvem não mostra as escolhas', async () => {
+      vi.mocked(moduloMigracao.preverMigracao).mockResolvedValue({
+        colecoes: 3,
+        registros: 50,
+        bytes: 10240,
+        porColecao: {},
+      });
+      vi.mocked(moduloMigracao.migrarParaConta).mockResolvedValue({
+        tipo: 'concluida',
+        uid: uidConta,
+        contagens: {},
+        hash: 'hash-123',
+      });
+      const servico = new ServicoDeContaFalso({
+        sessao: { uid: uidConta, email: 'teste@exemplo.com' },
+      });
+      const listarCopias = vi.spyOn(servico, 'listarCopias');
+      const abrirRepositorioConta = vi.fn();
+      const u = userEvent.setup();
+
+      render(
+        <ProvedorConta servico={servico}>
+          <MemoryRouter>
+            <Migracao
+              origem={repoFalso}
+              registro={registroFalso}
+              uid={uidConta}
+              abrirRepositorioConta={abrirRepositorioConta}
+            />
+          </MemoryRouter>
+        </ProvedorConta>,
+      );
+
+      await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
+      expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
+      await waitFor(() => expect(listarCopias).toHaveBeenCalled());
+      expect(screen.queryByRole('radio')).toBeNull();
+      expect(abrirRepositorioConta).not.toHaveBeenCalled();
+    });
+
+    it('sem rede não consulta a nuvem nem mostra as escolhas', async () => {
+      vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(false);
+      vi.mocked(moduloMigracao.preverMigracao).mockResolvedValue({
+        colecoes: 3,
+        registros: 50,
+        bytes: 10240,
+        porColecao: {},
+      });
+      vi.mocked(moduloMigracao.migrarParaConta).mockResolvedValue({
+        tipo: 'concluida',
+        uid: uidConta,
+        contagens: {},
+        hash: 'hash-123',
+      });
+      const servico = new ServicoDeContaFalso({
+        sessao: { uid: uidConta, email: 'teste@exemplo.com' },
+      });
+      servico.copias.set(
+        `${uidConta}/2026-10-18T09-05-07-abcdef01.arretado`,
+        new Uint8Array([1, 2, 3]),
+      );
+      const listarCopias = vi.spyOn(servico, 'listarCopias');
+      const u = userEvent.setup();
+
+      render(
+        <ProvedorConta servico={servico}>
+          <MemoryRouter>
+            <Migracao origem={repoFalso} registro={registroFalso} uid={uidConta} />
+          </MemoryRouter>
+        </ProvedorConta>,
+      );
+
+      await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
+      expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
+      expect(listarCopias).not.toHaveBeenCalled();
+      expect(screen.queryByRole('radio')).toBeNull();
+    });
+
+    it('falha ao listar a nuvem não impede a conclusão da migração', async () => {
+      vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(true);
+      vi.mocked(moduloMigracao.preverMigracao).mockResolvedValue({
+        colecoes: 3,
+        registros: 50,
+        bytes: 10240,
+        porColecao: {},
+      });
+      vi.mocked(moduloMigracao.migrarParaConta).mockResolvedValue({
+        tipo: 'concluida',
+        uid: uidConta,
+        contagens: {},
+        hash: 'hash-123',
+      });
+      const servico = new ServicoDeContaFalso({
+        sessao: { uid: uidConta, email: 'teste@exemplo.com' },
+      });
+      const listarCopias = vi
+        .spyOn(servico, 'listarCopias')
+        .mockRejectedValue(new FalhaDeConta('indisponivel', 'Sem conexão.'));
+      const u = userEvent.setup();
+
+      render(
+        <ProvedorConta servico={servico}>
+          <MemoryRouter>
+            <Migracao origem={repoFalso} registro={registroFalso} uid={uidConta} />
+          </MemoryRouter>
+        </ProvedorConta>,
+      );
+
+      await u.click(await screen.findByRole('button', { name: 'Copiar para a conta' }));
+      expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
+      await waitFor(() => expect(listarCopias).toHaveBeenCalled());
+      expect(screen.queryByRole('radio')).toBeNull();
     });
   });
 
