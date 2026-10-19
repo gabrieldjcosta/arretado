@@ -1,15 +1,67 @@
 // "Para lembrar" do Hoje (P7b; D-D5, resposta 6): uma nota livre sobre o que fazer fora do app. Não é
 // a Frase correta (essa entra pelo "+"). Fica em `Preferencias.lembrete`: "Salvar" grava, sair do campo
 // também (o que se escreve e não se salva não some ao tocar em "Começar"), e esvaziar o campo apaga.
-// Sem data, lista, hora nem aviso; fora do Recall e do cálculo do Agora.
+// Sem data, hora nem aviso; fora do Recall e do cálculo do Agora. Acima do campo ficam as notas que a
+// pessoa guardou no Estacionamento da Sessão (as mais recentes ainda por resolver), cada uma com uma caixa.
 import { useCallback, useId, useRef, useState, type SubmitEvent } from 'react';
 import { LEMBRETE_MAX } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
+import type { Repositorio } from '../../core/persistencia';
+import {
+  chaveDeNota,
+  notasParaLembrar,
+  resolverNota,
+  type EnderecoDeNota,
+} from '../../dominios/sessao/estacionamento';
 import { useDados, useRepositorio } from '../dados/contexto';
 import './estilos-hoje.css';
 
 /** Daqui até o teto o campo mostra quantos caracteres já tem: colar mais que o teto corta sem dizer. */
 const AVISO_DO_TETO = LEMBRETE_MAX - 50;
+
+/**
+ * As notas do Estacionamento ainda por resolver, de todas as Sessões; a caixa chama `resolverNota`.
+ * A nota que a pessoa toca continua na lista, marcada ou não, até ela sair do Hoje: dá para desfazer.
+ */
+function NotasDasSessoes() {
+  const repo = useRepositorio();
+  const [tocadas, setTocadas] = useState<readonly EnderecoDeNota[]>([]);
+  const [falhou, setFalhou] = useState(false);
+  const carregar = useCallback((r: Repositorio) => notasParaLembrar(r, tocadas), [tocadas]);
+  const { dados: notas } = useDados(carregar);
+  if (!notas?.length) return null;
+  return (
+    <>
+      <ul className="para-lembrar-notas" aria-label="Guardado nas Sessões">
+        {notas.map((n) => (
+          <li key={chaveDeNota(n)}>
+            <label className="opcao">
+              <input
+                type="checkbox"
+                checked={Boolean(n.resolvidaEm)}
+                onChange={(e) => {
+                  setFalhou(false);
+                  setTocadas((t) =>
+                    t.some((x) => chaveDeNota(x) === chaveDeNota(n)) ? t : [...t, n],
+                  );
+                  resolverNota(repo, n.sessaoId, n.indice, e.target.checked).catch(() => {
+                    setFalhou(true);
+                  });
+                }}
+              />
+              <span>{n.texto}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      {falhou && (
+        <p role="alert" className="aviso falha">
+          Problema ao marcar. Tente de novo.
+        </p>
+      )}
+    </>
+  );
+}
 
 /** O campo parte do que está salvo ao abrir o Hoje e, daí em diante, vale o que a pessoa escreve. */
 function Campo({ inicial }: { inicial: string }) {
@@ -49,6 +101,7 @@ function Campo({ inicial }: { inicial: string }) {
       <h2 id={titulo} className="para-lembrar-titulo">
         Para lembrar
       </h2>
+      <NotasDasSessoes />
       <form
         onSubmit={(e) => {
           void salvar(e);

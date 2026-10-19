@@ -163,6 +163,27 @@
   min-height: 5.5rem;
 }
 
+/* As notas do Estacionamento acima do campo: linhas de 44 px com a caixa do app. A marcada fica
+   riscada até a pessoa sair do Hoje, para dar para desfazer um toque sem querer. */
+.para-lembrar-notas {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.para-lembrar-notas .opcao {
+  margin: 0;
+}
+
+.para-lembrar-notas span {
+  overflow-wrap: anywhere;
+}
+
+.para-lembrar-notas input:checked + span {
+  color: var(--texto-atenuado);
+  text-decoration: line-through;
+}
+
 .para-lembrar .linha-acoes {
   align-items: center;
   margin-top: 0.5rem;

@@ -3,6 +3,7 @@ import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   definirTemporizador,
   estacionar,
+  notasParaLembrar,
   notasPendentes,
   resolverNota,
   segundosRestantes,
@@ -55,6 +56,96 @@ describe('Estacionamento (A3a)', () => {
     const d = await resolverNota(repo, s.id, 0, false);
     expect(d.estacionamento?.[0]?.resolvidaEm).toBeUndefined();
     expect(await resolverNota(repo, s.id, 9)).toMatchObject({ id: s.id });
+  });
+});
+
+describe('Notas para lembrar (Hoje)', () => {
+  it('junta as pendentes de todas as Sessões, a mais recente primeiro, com o endereço de cada uma', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const a = await iniciarSessao(repo, {});
+    await estacionar(repo, a.id, 'ligar para o cartório');
+    relogio.avancar(MIN);
+    await estacionar(repo, a.id, 'pedir o livro');
+    await encerrarSessao(repo, a.id);
+    relogio.avancar(MIN);
+    const b = await iniciarSessao(repo, {});
+    await estacionar(repo, b.id, 'pagar a taxa');
+
+    expect(await notasParaLembrar(repo)).toMatchObject([
+      { texto: 'pagar a taxa', sessaoId: b.id, indice: 0 },
+      { texto: 'pedir o livro', sessaoId: a.id, indice: 1 },
+      { texto: 'ligar para o cartório', sessaoId: a.id, indice: 0 },
+    ]);
+  });
+
+  it('não traz as resolvidas nem as de uma Sessão excluída; o endereço resolve a nota', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const a = await iniciarSessao(repo, {});
+    await estacionar(repo, a.id, 'a');
+    relogio.avancar(MIN);
+    await estacionar(repo, a.id, 'b');
+    await encerrarSessao(repo, a.id);
+    relogio.avancar(MIN);
+    const b = await iniciarSessao(repo, {});
+    await estacionar(repo, b.id, 'c');
+
+    const [, meio] = await notasParaLembrar(repo); // c, b, a: resolve a do meio (b)
+    await resolverNota(repo, meio?.sessaoId ?? '', meio?.indice ?? -1);
+    expect((await notasParaLembrar(repo)).map((n) => n.texto)).toEqual(['c', 'a']);
+
+    await repo.colecao('sessoes').excluir(b.id);
+    expect((await notasParaLembrar(repo)).map((n) => n.texto)).toEqual(['a']);
+  });
+
+  it('corta no limite, ficando com as mais recentes', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, {});
+    for (const n of [1, 2, 3, 4, 5, 6, 7]) {
+      relogio.avancar(MIN);
+      await estacionar(repo, s.id, `nota ${String(n)}`);
+    }
+    expect((await notasParaLembrar(repo)).map((n) => n.texto)).toEqual([
+      'nota 7',
+      'nota 6',
+      'nota 5',
+      'nota 4',
+      'nota 3',
+    ]);
+  });
+
+  it('mantém as notas pedidas, resolvidas ou não, além das cinco pendentes', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, {});
+    for (const n of [1, 2, 3, 4, 5, 6]) {
+      relogio.avancar(MIN);
+      await estacionar(repo, s.id, `nota ${String(n)}`);
+    }
+    await resolverNota(repo, s.id, 5); // a mais recente
+    const mantida = { sessaoId: s.id, indice: 5 };
+
+    expect((await notasParaLembrar(repo)).map((n) => n.texto)).toEqual([
+      'nota 5',
+      'nota 4',
+      'nota 3',
+      'nota 2',
+      'nota 1',
+    ]);
+    const com = await notasParaLembrar(repo, [mantida]);
+    expect(com.map((n) => n.texto)).toEqual([
+      'nota 6',
+      'nota 5',
+      'nota 4',
+      'nota 3',
+      'nota 2',
+      'nota 1',
+    ]);
+    expect(com[0]?.resolvidaEm).toBeDefined();
+  });
+
+  it('sem notas, a lista é vazia', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, {});
+    expect(await notasParaLembrar(repo)).toEqual([]);
   });
 });
 
