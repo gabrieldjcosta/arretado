@@ -14,7 +14,7 @@ import {
   type RefObject,
   type TouchEvent as ReactTouchEvent,
 } from 'react';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type {
   Dispositivo as DispositivoDoModelo,
   Leitura,
@@ -46,6 +46,8 @@ import { criarFraseDeTrecho } from '../../dominios/recall/servico';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Caneta } from '../componentes/Caneta';
+import { Icone } from '../componentes/Icone';
+import { Voltar } from '../componentes/Voltar';
 import { useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
@@ -293,9 +295,9 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
   }
   return (
     <>
-      <p>
-        <Link to="/biblioteca">← Biblioteca</Link>
-      </p>
+      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
+        Biblioteca
+      </Voltar>
       {carga.tipo === 'carregando' ? (
         <Esqueleto />
       ) : carga.excecao instanceof NormaIndisponivel ? (
@@ -2013,7 +2015,8 @@ function LeitorAberto({
               <>
                 {origemDoVoltar !== undefined && (
                   <button type="button" className="voltar-da-remissao" onClick={voltarDaRemissao}>
-                    ← Voltar a {referenciaDaBusca(origemDoVoltar)}
+                    <Icone nome="voltar" />
+                    Voltar a {referenciaDaBusca(origemDoVoltar)}
                   </button>
                 )}
                 <BandejaDoFoco
@@ -2222,7 +2225,8 @@ function AcoesDaLeitura({
           title={`Voltar a ${voltarDaRemissao.para}`}
           onClick={voltarDaRemissao.voltar}
         >
-          ← Voltar a {voltarDaRemissao.para}
+          <Icone nome="voltar" />
+          Voltar a {voltarDaRemissao.para}
         </button>
       )}
       <div role="group" aria-label="Ferramentas da leitura" className="dock-do-leitor">
@@ -2291,9 +2295,9 @@ function BarraDoLeitor({
 }) {
   return (
     <div className="barra-leitor">
-      <Link to="/biblioteca" className="botao discreto">
-        ← Biblioteca
-      </Link>
+      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
+        Biblioteca
+      </Voltar>
       <h1>{titulo}</h1>
       <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
         <button
@@ -2451,7 +2455,7 @@ function TrechosDoTexto({
             {...{ [ATRIBUTO_FORA_DO_TEXTO]: '' }}
             aria-label={`Nota: ${marcas?.notas.find((n) => n.id === id)?.rotulo ?? ''}`}
           >
-            <span aria-hidden="true">✎</span>
+            <Icone nome="nota" />
           </button>
         ))}
       </Fragment>
@@ -2525,7 +2529,7 @@ function Redacoes({
         onClick={aoAlternar}
       >
         {rotulo}
-        <span aria-hidden="true">{aberto ? ' ▾' : ' ▸'}</span>
+        <Icone nome="abre" />
       </button>
       {aberto && <ListaDeRedacoes redacoes={redacoes} />}
     </div>
@@ -2655,7 +2659,7 @@ function Dispositivo({
             onClick={alternarEste}
           >
             {legenda}
-            <span aria-hidden="true">{expandido ? ' ▾' : ' ▸'}</span>
+            <Icone nome="abre" />
           </button>
         ) : (
           <p className="linha-atenuada">{legenda}</p>

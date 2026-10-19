@@ -64,9 +64,11 @@ export function Plano() {
       ) : (
         <>
           <p className="dica">
-            {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.{' '}
-            <Link to="/plano/pontos">Editar pontos e matérias</Link>
+            {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.
           </p>
+          <Link to="/plano/pontos" className="botao botao-texto na-margem">
+            Editar pontos e matérias
+          </Link>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
               <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>
@@ -84,7 +86,7 @@ export function Plano() {
             </section>
           ))}
           <details>
-            <summary className="botao discreto">Importar outra planilha</summary>
+            <summary className="botao botao-texto na-margem">Importar outra planilha</summary>
             <ImportarPontos aoImportar={setConfirmacao} />
           </details>
         </>

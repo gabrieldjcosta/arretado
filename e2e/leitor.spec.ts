@@ -1659,7 +1659,7 @@ test('prévia de remissões: tocar em "art. 84, XIX" na CF abre o dispositivo, "
   await previa.getByRole('button', { name: 'Ir para Art. 84, XIX' }).click();
   const alvo = page.locator('[data-endereco="art84.incXIX"]');
   await expect(alvo).toBeInViewport();
-  const voltar = page.getByRole('button', { name: /^← Voltar a Art\. 5º, XLVII/ });
+  const voltar = page.getByRole('button', { name: /^Voltar a Art\. 5º, XLVII/ });
   await expect(voltar).toBeVisible();
   await semViolacoes(page);
   await voltar.click();

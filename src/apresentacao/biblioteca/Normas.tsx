@@ -436,9 +436,9 @@ export function Normas() {
                   </div>
                 </div>
                 {edital && (
-                  <p>
-                    <Link to="/biblioteca/acervo?tudo=1">Tudo do edital de {edital.titulo}</Link>
-                  </p>
+                  <Link to="/biblioteca/acervo?tudo=1" className="botao botao-texto na-margem">
+                    Tudo do edital de {edital.titulo}
+                  </Link>
                 )}
                 <label className="busca-campo">
                   <span>Buscar norma</span>
@@ -555,7 +555,6 @@ export function Normas() {
                           <li key={`${n.id}-${trecho ?? ''}`}>
                             <LinhaLista
                               para={para}
-                              icone="§"
                               titulo={n.tituloCurto}
                               {...(apoio ? { apoio } : {})}
                               {...(comVersaoNova.has(n.id)
@@ -564,6 +563,7 @@ export function Normas() {
                             />
                             <button
                               type="button"
+                              className="botao-texto na-margem"
                               aria-label={`Mudar a disciplina de ${n.tituloCurto}`}
                               onClick={() => {
                                 setFalhaAoMudar(null);

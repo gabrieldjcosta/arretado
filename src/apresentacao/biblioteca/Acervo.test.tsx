@@ -151,22 +151,22 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect(screen.queryByRole('button', { name: /Tentar de novo/ })).not.toBeInTheDocument();
   });
 
-  it('permite alternar item por teclado (Espaço/Enter), mostra ✓, Disciplinas sugeridas e Alterar disciplina', async () => {
+  it('permite alternar item por teclado (Espaço/Enter), mostra a marca, Disciplinas sugeridas e Alterar disciplina', async () => {
     const f = await fonte();
     const { usuario } = await abrir('#/biblioteca/acervo', f);
     const botaoSolta = await screen.findByRole('button', { name: /^SOLTA/ });
     expect(botaoSolta).toHaveAttribute('aria-pressed', 'false');
-    expect(within(botaoSolta).queryByText('✓')).not.toBeInTheDocument();
+    expect(botaoSolta.querySelector('.item-acervo-marca svg')).toBeNull();
 
     // Alternar com teclado
     botaoSolta.focus();
     await usuario.keyboard(' ');
     expect(botaoSolta).toHaveAttribute('aria-pressed', 'true');
-    expect(within(botaoSolta).getByText('✓')).toBeInTheDocument();
+    expect(botaoSolta.querySelector('.item-acervo-marca svg')).not.toBeNull();
 
     await usuario.keyboard('{Enter}');
     expect(botaoSolta).toHaveAttribute('aria-pressed', 'false');
-    expect(within(botaoSolta).queryByText('✓')).not.toBeInTheDocument();
+    expect(botaoSolta.querySelector('.item-acervo-marca svg')).toBeNull();
 
     // Disciplinas sugeridas e botão Alterar disciplina
     expect(screen.getAllByText(/Disciplinas sugeridas:/).length).toBeGreaterThan(0);

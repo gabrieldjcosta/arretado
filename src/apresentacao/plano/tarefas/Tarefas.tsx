@@ -15,6 +15,7 @@ import {
 } from '../../../dominios/tarefas';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { Selo } from '../../componentes/Selo';
+import { Voltar } from '../../componentes/Voltar';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
 import { mensagem } from '../erros';
@@ -70,7 +71,9 @@ function NovaTarefa({
         />
       </div>
       <details className="tarefas-mais">
-        <summary>Ligar a um ponto ou estimar (opcional)</summary>
+        <summary className="botao botao-texto na-margem">
+          Ligar a um ponto ou estimar (opcional)
+        </summary>
         <div className="campo">
           <label htmlFor="tarefa-ponto">Ponto</label>
           <select
@@ -195,7 +198,7 @@ function Acoes({
   };
   return (
     <details className="tarefas-mais">
-      <summary>Mais</summary>
+      <summary className="botao botao-texto na-margem">Mais</summary>
       <div className="linha-acoes">
         <button
           type="button"
@@ -291,10 +294,10 @@ export function Tarefas() {
   };
   return (
     <>
+      <Voltar para="/plano">Voltar à Trilha</Voltar>
       <h1>Tarefas</h1>
       <p className="dica">
-        Passos pequenos, como “ler arts. 10 a 13”. O que não der fica na fila, sem cobrança.{' '}
-        <Link to="/plano">Voltar à Trilha</Link>
+        Passos pequenos, como “ler arts. 10 a 13”. O que não der fica na fila, sem cobrança.
       </p>
       {erro && (
         <p role="alert" className="aviso falha">
@@ -325,7 +328,7 @@ export function Tarefas() {
                 {t.razao && <span className="dica">Por quê: {t.razao}</span>}
                 <span className="linha-acoes">
                   <Link
-                    className="botao principal"
+                    className="botao"
                     to={rotaDeInicio({
                       tipo: 'tarefa',
                       razao: 'Tarefa da sua fila',
@@ -354,7 +357,7 @@ export function Tarefas() {
       <Sugestoes sugestoes={dados.sugestoes} hoje={dados.hoje} aoErro={setErro} />
       {adiadas.length > 0 && (
         <details className="tarefas-bloco">
-          <summary>Para depois</summary>
+          <summary className="botao botao-texto na-margem">Para depois</summary>
           <ul className="lista-simples">
             {adiadas.map((t) => (
               <li key={t.id} className="tarefas-item">
@@ -375,7 +378,7 @@ export function Tarefas() {
       )}
       {feitas.length > 0 && (
         <details className="tarefas-bloco">
-          <summary>Feitas ({feitas.length})</summary>
+          <summary className="botao botao-texto na-margem">Feitas ({feitas.length})</summary>
           <ul className="lista-simples">
             {feitas.map((t) => (
               <li key={t.id} className="tarefas-item">

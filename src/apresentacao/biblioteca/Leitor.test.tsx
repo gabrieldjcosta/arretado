@@ -162,7 +162,7 @@ describe('leitor da norma (9.6)', () => {
     ).toBeInTheDocument();
     expect(within(paragrafo).getByRole('list', { name: 'Notas de vigência' })).toBeInTheDocument();
     // O "Voltar" leva à Biblioteca.
-    await usuario.click(screen.getByRole('link', { name: '← Biblioteca' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar à Biblioteca' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Biblioteca' }),
     ).toBeInTheDocument();
@@ -328,7 +328,7 @@ describe('leitor da norma (9.6)', () => {
     const { norma } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     expect(await screen.findByText(/ainda não foi publicada/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '← Biblioteca' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Voltar à Biblioteca' })).toBeInTheDocument();
 
     act(() => {
       window.location.hash = '#/biblioteca/normas/nao-existe';
@@ -498,7 +498,7 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     // Abrir sem rolar não grava nada ainda.
     expect(await obterLeitura(repo, norma.id)).toBeUndefined();
 
-    await usuario.click(screen.getByRole('link', { name: '← Biblioteca' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar à Biblioteca' }));
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${norma.id}`);
     expect(screen.getByRole('region', { name: 'Normas' })).toHaveTextContent('Última leitura:');
@@ -658,7 +658,7 @@ describe('modo foco (11.1)', () => {
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
     expect(barraDoLeitor()).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Destaques' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: '← Biblioteca' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Voltar à Biblioteca' })).not.toBeInTheDocument();
     expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Ir ao lido até' })).not.toBeInTheDocument();
     // A marca do "lido até" é do texto: continua na linha.
@@ -1005,7 +1005,7 @@ describe('grifos e notas (11.4)', () => {
 
     const marcador = await screen.findByRole('button', { name: 'Nota: jurisdição penal' });
     // O marcador vem logo depois do trecho anotado e não conta no texto (nem no offset).
-    expect(dispositivo('art2')).toHaveTextContent('A jurisdição penal✎ será exercida.');
+    expect(dispositivo('art2')).toHaveTextContent('A jurisdição penal será exercida.');
     expect(await marcacoesGravadas(repo)).toEqual([
       expect.objectContaining({
         tipo: 'nota',

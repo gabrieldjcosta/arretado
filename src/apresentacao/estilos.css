@@ -572,6 +572,19 @@ button,
   padding: 0 0.75rem;
 }
 
+/* Os controles da casca (Ajuda e o menu dela) ficam em texto simples: o sublinhado de `.discreto` é
+   da ação ao lado da primária, na página. */
+.acoes-globais .ajuda-botao,
+.menu-ajuda-itens .discreto {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu-ajuda-itens .discreto {
+  padding: 0 1.25rem;
+}
+
 .acoes-globais .conta-botao {
   width: var(--alvo);
   padding: 0;
@@ -887,15 +900,12 @@ dialog .perigoso {
   color: var(--perigo-texto);
 }
 
-.discreto {
-  background: transparent;
-  border-color: transparent;
-}
-
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
    onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
-   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. */
-.botao-texto {
+   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. `.discreto` é o mesmo botão (antes
+   era texto sem sublinhado e com 20 px de recuo, que não parecia ação). */
+.botao-texto,
+.discreto {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
@@ -914,6 +924,20 @@ dialog .perigoso {
     opacity: 1;
     background: color-mix(in srgb, currentcolor 8%, transparent);
   }
+}
+
+/* O botão-texto sozinho no começo da linha ("Voltar", "Mais", "Importar outra planilha"): o recuo de
+   12 px do alvo sai pela margem, e a letra fica alinhada ao texto da página. Fora dele (ao lado de
+   outro botão) o recuo é o espaço entre os dois. */
+.na-margem {
+  margin-inline-start: -0.75rem;
+}
+
+/* Ícone de traço único (componentes/Icone.tsx): na altura do texto, na cor dele. */
+.icone-svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
 }
 
 /* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
@@ -1841,14 +1865,19 @@ dialog.dialogo-busca {
   }
 }
 
+/* Alvo de 44 px (D-D7, P6) com a estrela onde estava: a caixa avança para a margem da página, à esquerda
+   da calha (nunca sobre o texto), e sobe e desce o que falta à altura de 1,6em, o que não mexe na altura
+   da linha. O recuo devolve a calha ao conteúdo, que centra a estrela na mesma posição de antes. */
 button.estrela {
   position: absolute;
-  inset-inline-start: 0;
-  width: var(--calha-estrela);
-  height: 1.6em;
+  inset-inline-start: calc(var(--calha-estrela) - var(--alvo));
+  width: var(--alvo);
+  height: var(--alvo);
+  margin-block-start: calc((1.6em - var(--alvo)) / 2);
   min-width: 0;
   min-height: 0;
   padding: 0;
+  padding-inline-start: calc(var(--alvo) - var(--calha-estrela));
   border: 0;
   border-radius: 4px;
   background: transparent;
@@ -2123,6 +2152,17 @@ button.estrela:focus-visible {
   color: var(--texto-atenuado);
   text-align: left;
   cursor: pointer;
+  gap: 0.25rem;
+}
+
+/* A seta de abrir (ícone, não glifo): para baixo aberto, para a direita fechado. */
+.alternar-linha .icone-svg {
+  width: 1em;
+  height: 1em;
+}
+
+.alternar-linha[aria-expanded='false'] .icone-svg {
+  transform: rotate(-90deg);
 }
 
 /* Revogado e vetado (8.10): uma linha atenuada, que abre o resto. */
@@ -2256,6 +2296,14 @@ button.marcador-nota {
   font-size: 0.75em;
   line-height: 1.2;
   vertical-align: 0.15em;
+}
+
+/* O lápis da nota é um ícone na altura da letra: não aumenta a linha (a lista é virtualizada). */
+button.marcador-nota .icone-svg {
+  display: inline;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
 }
 
 /* As ações da marcação no lugar do grupo fixo: as 3 cores, Nota e fechar; quebram em duas linhas
@@ -2874,30 +2922,28 @@ dialog.dialogo-previa .linha-acoes button {
 
 /* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
 
+/* Linha de lista (D-D7, P6): em linha sobre a areia, só o filete do `li` embaixo; sem cartão por item. */
+.lista-de-linhas > li {
+  padding: 0;
+  min-height: 0;
+}
+
 .linha-lista {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
   min-height: 64px;
-  padding: 0.5rem 0.75rem;
-  background: var(--superficie);
-  border: 1px solid var(--borda);
-  border-radius: var(--raio-cartao);
+  padding: 0.5rem 0;
   color: var(--texto);
   text-decoration: none;
 }
 
-.linha-lista-icone {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--alvo);
-  height: var(--alvo);
-  border-radius: var(--raio-campo);
-  background: var(--quente);
-  color: var(--texto);
-  font-weight: 700;
+@media (hover: hover) {
+  .linha-lista:hover .linha-lista-titulo {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .linha-lista-texto {
@@ -2980,7 +3026,6 @@ dialog.dialogo-previa .linha-acoes button {
 
 .lista-de-linhas {
   display: grid;
-  gap: 0.5rem;
 }
 
 /* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. */

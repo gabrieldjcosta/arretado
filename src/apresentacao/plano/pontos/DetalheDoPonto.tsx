@@ -13,6 +13,7 @@ import {
   statusDoPonto,
 } from '../../../dominios/pontos';
 import { Selo } from '../../componentes/Selo';
+import { Voltar } from '../../componentes/Voltar';
 import { Esqueleto, Vazio } from '../../componentes/estados';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { rotaDeInicio } from '../../hoje/rota-de-inicio';
@@ -82,9 +83,7 @@ function Formulario({ ponto, dados }: { ponto: Ponto; dados: DadosDosPontos }) {
           ))}
         </select>
       </div>
-      <button type="submit" className="principal">
-        Salvar
-      </button>
+      <button type="submit">Salvar</button>
       {salvo && (
         <p role="status" className="sucesso">
           Salvo.
@@ -269,10 +268,8 @@ export function DetalheDoPonto() {
   const status = statusDoPonto(ponto, a, dados.hoje);
   return (
     <>
+      <Voltar para="/plano/pontos">Todos os pontos</Voltar>
       <h1>{ponto.titulo.length > 120 ? `${ponto.titulo.slice(0, 117)}…` : ponto.titulo}</h1>
-      <p>
-        <Link to="/plano/pontos">Todos os pontos</Link>
-      </p>
       <section aria-labelledby="ponto-andamento-titulo" className="pontos-bloco">
         <h2 id="ponto-andamento-titulo">Andamento</h2>
         <p>

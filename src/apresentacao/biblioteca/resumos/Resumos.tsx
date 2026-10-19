@@ -65,7 +65,6 @@ export function Resumos({ novo = false }: { novo?: boolean }) {
               <li key={n.id}>
                 <LinhaLista
                   para={`/biblioteca/resumos/${n.id}`}
-                  icone="¶"
                   titulo={n.titulo}
                   apoio={n.conteudo.slice(0, 100)}
                 />
