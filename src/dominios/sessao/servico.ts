@@ -64,6 +64,9 @@ export async function iniciarSessao(repo: Repositorio, entrada: EntradaDeSessao)
     ...(fronteira ? { fronteira } : {}),
     ...(entrada.origemDaAcao ? { origemDaAcao: entrada.origemDaAcao } : {}),
     ...(entrada.tarefaId ? { tarefaId: entrada.tarefaId } : {}),
+    ...(entrada.cicloId && entrada.blocoOrdem !== undefined
+      ? { cicloId: entrada.cicloId, blocoOrdem: entrada.blocoOrdem }
+      : {}),
     ...(temporizadorMin ? { temporizadorMin } : {}),
   });
   repo.eventos.emitir('sessao.iniciada', { sessaoId: sessao.id });
