@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-/** O que fazer agora: uma coisa só em destaque por tela (redesign, fatia 2; folha de cal, D-D7). */
+/** O que fazer agora: uma coisa só em destaque por tela (redesign, fatia 2; a folha do Agora). */
 export function AcaoAgora({
   titulo,
   motivo,

@@ -1781,7 +1781,7 @@ test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela seg
   expect(sobra).toBe(0);
 });
 
-test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, a Estrela de quatro pontas, o dock sólido e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
+test('Ponto de luz no Leitor: o lido sobre a faixa da folha com a caneta deitada, a Estrela de quatro pontas, o dock sólido e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
   page,
 }, info) => {
   test.setTimeout(180_000);
@@ -1796,7 +1796,7 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   if (largo) await expect(estrutura).toBeVisible();
   else await expect(estrutura).toHaveCount(0);
 
-  // "Lido até aqui" no art. 3º (Título I): o art. 3º vai sobre a faixa de cal; o que falta, na areia.
+  // "Lido até aqui" no art. 3º (Título I): o art. 3º vai sobre a faixa da folha; o que falta, no chão.
   const art3 = page.locator('[data-endereco="art3"]');
   await rolarAte(page, art3);
   await alinharNoAlto(page, art3);
@@ -1815,11 +1815,11 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
       const amostra = document.createElement('i');
       amostra.style.background = 'var(--superficie)';
       document.body.append(amostra);
-      const cal = getComputedStyle(amostra).backgroundColor;
+      const folha = getComputedStyle(amostra).backgroundColor;
       amostra.remove();
       return {
         fundo: s.backgroundColor,
-        cal,
+        folha,
         borda: s.borderTopWidth,
         raio: s.borderTopLeftRadius,
         sombra: s.boxShadow,
@@ -1827,8 +1827,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     });
   const lido = await faixa(art3);
   const falta = await faixa(aposOLido);
-  expect(lido.fundo, 'o lido vai sobre a cal').toBe(lido.cal);
-  expect(falta.fundo, 'o que falta fica na areia').toBe('rgba(0, 0, 0, 0)');
+  expect(lido.fundo, 'o lido vai sobre a folha').toBe(lido.folha);
+  expect(falta.fundo, 'o que falta fica no chão').toBe('rgba(0, 0, 0, 0)');
   // Folha e chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite): sem outro sinal a faixa
   // do lido some. D-D9, Q3: ela leva a linha de 1 px do mundo (`--sombra-folha`, por dentro); o que falta, nenhuma.
   expect(lido.sombra, 'o lido leva a linha da folha').toMatch(/ 1px inset$/);
@@ -1838,7 +1838,7 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   expect([falta.borda, falta.raio]).toEqual(['3px', '8px']);
   await semViolacoes(page);
 
-  // A estrutura mostra a seção de agora em cal, com o estado em palavras, e tocar leva o bloco ao alto.
+  // A estrutura mostra a seção de agora na folha, com o estado em palavras, e tocar leva o bloco ao alto.
   if (largo) {
     const agora = estrutura.locator('[aria-current="location"]');
     await expect(agora).toHaveCount(1);
@@ -1913,7 +1913,7 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   ).toBeGreaterThan(8);
   await semViolacoes(page);
 
-  // Os controles da barra: o seletor de fonte numa pílula e a legenda dos destaques numa linha só.
+  // Os controles da barra: o seletor de fonte numa caixa e a legenda dos destaques numa linha só.
   await page.evaluate(() => {
     window.scrollTo(0, 0);
   });
@@ -1939,7 +1939,7 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
   expect(sobraNaBarra).toBe(0);
   await semViolacoes(page);
 
-  // Em 320 px (o menor celular): a pílula do dock e a legenda dos destaques cabem numa linha, a cal
+  // Em 320 px (o menor celular): a barra do dock e a legenda dos destaques cabem numa linha, a faixa
   // do lido não encosta na borda da tela e nada rola na horizontal. A largura é fixada aqui, então só
   // o projeto do celular.
   if (info.project.name === 'celular') {
@@ -1947,7 +1947,7 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await rolarAte(page, art3);
     const estreito = await page.evaluate(() => {
       const raiz = document.documentElement;
-      const pilula = document.querySelector('.dock-do-leitor')?.getBoundingClientRect();
+      const barra = document.querySelector('.dock-do-leitor')?.getBoundingClientRect();
       const faixaDoLido = document.querySelector('[data-endereco="art3"]')?.getBoundingClientRect();
       const botoes = [...document.querySelectorAll('.dock-do-leitor button')];
       return {
@@ -1958,15 +1958,17 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
             Math.round(i.getBoundingClientRect().top),
           ),
         ).size,
-        pilulaDentro: pilula !== undefined && pilula.left >= 0 && pilula.right <= raiz.clientWidth,
+        barraDentro: barra !== undefined && barra.left >= 0 && barra.right <= raiz.clientWidth,
         folgaDoLido: raiz.clientWidth - (faixaDoLido?.right ?? raiz.clientWidth),
       };
     });
     expect(estreito.sobra).toBeLessThanOrEqual(0);
     expect(estreito.linhasDoDock, 'o dock cabe numa linha em 320 px').toBe(1);
     expect(estreito.linhasDaLegenda, 'a legenda cabe numa linha em 320 px').toBe(1);
-    expect(estreito.pilulaDentro, 'a pílula do dock fica dentro da tela').toBe(true);
-    expect(estreito.folgaDoLido, 'a cal do lido não encosta na borda').toBeGreaterThanOrEqual(7.5);
+    expect(estreito.barraDentro, 'a barra do dock fica dentro da tela').toBe(true);
+    expect(estreito.folgaDoLido, 'a faixa do lido não encosta na borda').toBeGreaterThanOrEqual(
+      7.5,
+    );
     await semViolacoes(page);
   }
 });

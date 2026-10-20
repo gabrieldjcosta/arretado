@@ -2075,7 +2075,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
   const linhaDoDispositivo = (endereco: string) =>
     Number(dispositivo(endereco).closest('[data-index]')?.getAttribute('data-index'));
 
-  it('o lido vai sobre a faixa de cal, até o "lido até"; a marca ganha a caneta deitada', async () => {
+  it('o lido vai sobre a faixa da folha, até o "lido até"; a marca ganha a caneta deitada', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -2118,7 +2118,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
     expect(estrela.querySelector('svg path.corte')).toBeNull();
   });
 
-  it('as ferramentas ficam numa só pílula; "Lido até aqui" fica fora dela', async () => {
+  it('as ferramentas ficam numa só barra; "Lido até aqui" fica fora dela', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);

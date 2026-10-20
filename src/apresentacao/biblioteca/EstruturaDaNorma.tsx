@@ -34,7 +34,7 @@ function nomeDoBloco(
 /**
  * A estrutura da norma ao lado do texto (Ponto de luz, P4; tablet e desktop): o bloco de agora e os
  * irmãos dele (as seções do capítulo), cada um com o ponto de luz do que já foi lido (feita, em
- * leitura, ainda não lida) e o de agora em cal, com os blocos de dentro dele logo abaixo; acima, o
+ * leitura, ainda não lida) e o de agora na folha, com os blocos de dentro dele logo abaixo; acima, o
  * caminho até a lista (título, capítulo). Tocar leva o bloco ao alto da tela, e tocar no caminho
  * sobe um nível. O estado vem do "lido até" (uma ação da pessoa); o bloco de agora segue a rolagem,
  * por salto, assim que o cabeçalho dele passa da linha de leitura (um quarto da tela abaixo do alto),
