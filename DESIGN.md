@@ -232,7 +232,7 @@ Duas paletas fixas, uma por mundo; o tema escolhe o mundo e troca os papéis (`-
 
 **The Luz Do Mundo Rule.** Ação, foco, link, "onde estou" e marcado são uma cor só, a luz do mundo, e o tema a troca num lugar só (`--luz`). Nada de uma cor de ação à parte.
 
-**The Lima É Só Halo Rule.** A lima do marca-texto fica atrás do ponto e na ponta da caneta. Nunca é fundo de texto, nunca é cor de texto, nunca marca um estado sozinha.
+**The Lima É Só Halo Rule.** A lima do marca-texto fica atrás do ponto, na ponta da caneta e na marca de hoje do quadro do cacto (só de dia). Nunca é fundo de texto, nunca é cor de texto, nunca marca um estado sozinha.
 
 **The Luz Só Reporta Rule.** O ponto de luz diz um estado real (feito, atual, falta; Estrela; "onde parei") ou marca a ponta da caneta. Nunca pulsa, nunca segue o dedo nem a rolagem, nunca é texto, nunca aparece sem o contorno na luz do mundo.
 
@@ -264,7 +264,7 @@ Duas paletas fixas, uma por mundo; o tema escolhe o mundo e troca os papéis (`-
 
 **The Lei Sem Itálico Rule.** A lei não vai em itálico e o destaque dela é sublinhado, nunca fundo. Prazos, condições, termos absolutos e penas têm sublinhados distintos (de dia #173f52, #ab6b21 e #a5582a; à noite #7fb4cf, #f2c062 e #f09a68).
 
-**The Título Só Título Rule.** A grotesca do mundo é só de título, da folha e do rótulo "Em seguida". "Sem serifa" (Conta › Aparência) troca só a letra da lei.
+**The Título Só Título Rule.** A grotesca do mundo é só de título, da folha e, de dia, do rótulo "Em seguida" (à noite ele é da interface). "Sem serifa" (Conta › Aparência) troca só a letra da lei.
 
 ## Layout
 
@@ -348,7 +348,7 @@ Angular de dia, arredondado à noite, e o que está dentro tem raio menor que o 
 
 ### A marca (signature)
 
-O nome "arretado" escrito num traço só, em minúsculas, com o cacto simplificado ao lado (tronco e dois braços em L, o esquerdo mais alto) e o ponto de luz de "onde parei". No cabeçalho vive como lockup parado de 144 px (`LockupParado`, o traço segue o texto do mundo e o ponto é o único objeto de cor); na abertura o nome se escreve letra a letra, a caneta volta por baixo deixando um traço de luz e vira o cacto (o final B, 2,64 s). A frequência é uma constante só (`FREQUENCIA`, em `componentes/escrita/frequencia.ts`): completa só na primeira abertura no aparelho, curta (1,2 s) na primeira de cada Dia, parada nas demais; com movimento reduzido fica parada, no perfil Calmo só esmaece, e um toque ou uma tecla pula para o quadro final.
+O nome "arretado" escrito num traço só, em minúsculas, com o cacto simplificado ao lado (tronco e dois braços em L, o esquerdo mais alto) e o ponto de luz de "onde parei". No cabeçalho vive como lockup parado de 144 px (`LockupParado`, o traço segue o texto do mundo e o ponto é o único objeto de cor); na abertura o nome se escreve letra a letra, a caneta volta por baixo deixando um traço de luz e vira o cacto (o final B, 2,64 s). A frequência é uma constante só (`FREQUENCIA`, em `componentes/escrita/frequencia.ts`; a escolha é do Gabriel e segue aberta): completa só na primeira abertura no aparelho, curta (1,2 s) na primeira de cada Dia, parada nas demais; com movimento reduzido fica parada, no perfil Calmo só esmaece, e um toque ou uma tecla pula para o quadro final.
 
 ### Leitor da lei (signature)
 
