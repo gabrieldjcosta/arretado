@@ -95,6 +95,19 @@ const FORMAS_DO_PONTO = ['forma-ponto-anel', 'forma-ponto-atual', 'forma-ponto-f
  * a mesma linha, `--borda-folha`. */
 const TOKENS_REMOVIDOS_NA_Q3 = ['bloco-borda'];
 
+/** O que a Q7 tirou: a aba de página atual e a seção atual da norma usam os papéis (`--superficie` e o
+ * contorno do controle) no lugar de `--atual-*`; as camadas que flutuam (diálogo, bandeja, menu e dock)
+ * perderam a sombra (`--sombra-flutuante`: o contrato só dá profundidade à sombra dura do botão de dia) e o
+ * dock e o seletor de fonte o raio de pílula (`--raio-pilula`); `--ponto-nucleo` não tinha mais uso. */
+const TOKENS_REMOVIDOS_NA_Q7 = [
+  'atual-fundo',
+  'atual-texto',
+  'atual-sombra',
+  'sombra-flutuante',
+  'raio-pilula',
+  'ponto-nucleo',
+];
+
 /** A forma de cada mundo (D-D9): o dia é angular; a noite é arredondada. A folha em repouso leva a linha de
  * 1 px do mundo nos dois (a `--borda` das pranchas Dia fechado: #838FA7 de dia, #34425E à noite), não o
  * filete decorativo (#DDE2EA) nem a falta de linha: sem ela a folha some no chão (1,06:1 e 1,10:1). */
@@ -318,6 +331,54 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
           ),
       );
       expect(usos).toEqual([]);
+    });
+  });
+
+  describe('varredura das telas (D-D9, Q7)', () => {
+    const css = () => arquivosCss(path.join(import.meta.dirname, '..', 'src'));
+
+    it('os tokens que a Q7 tirou não existem nem são usados em nenhum CSS', () => {
+      for (const t of TOKENS_REMOVIDOS_NA_Q7) expect(claro).not.toHaveProperty(t);
+      const usos = css().flatMap((arquivo) =>
+        readFileSync(arquivo, 'utf8')
+          .split('\n')
+          .flatMap((linha, i) =>
+            TOKENS_REMOVIDOS_NA_Q7.filter((t) => new RegExp(`--${t}(?![\\w-])`).test(linha)).map(
+              (t) => `${path.basename(arquivo)}:${i + 1} --${t}`,
+            ),
+          ),
+      );
+      expect(usos).toEqual([]);
+    });
+
+    it('nenhum CSS usa raio de pílula: a forma vem dos tokens de raio de cada mundo', () => {
+      const pilulas = css().flatMap((arquivo) =>
+        readFileSync(arquivo, 'utf8')
+          .split('\n')
+          .flatMap((linha, i) =>
+            /border-radius:\s*\d{3,}px/.test(linha) ? [`${path.basename(arquivo)}:${i + 1}`] : [],
+          ),
+      );
+      expect(pilulas).toEqual([]);
+    });
+
+    it('nenhuma sombra tem desfoque: a profundidade é só a sombra dura do botão de dia', () => {
+      // Cada `box-shadow` e cada `--sombra*` com um comprimento de desfoque (o terceiro) acima de zero.
+      const comDesfoque = css().flatMap((arquivo) => {
+        const texto = readFileSync(arquivo, 'utf8');
+        return [...texto.matchAll(/(box-shadow|--sombra[\w-]*):\s*([^;]+);/g)].flatMap(
+          ([, nome, valor]) =>
+            (valor ?? '')
+              .replace(/(rgb|rgba|color-mix|var)\([^)]*(\([^)]*\))?[^)]*\)/g, '')
+              .split(',')
+              .filter((camada) => {
+                const medidas = camada.match(/-?[\d.]+(px|rem|em)?(?![\w%])/g) ?? [];
+                return medidas.length >= 3 && parseFloat(medidas[2] ?? '0') > 0;
+              })
+              .map((camada) => `${path.basename(arquivo)} ${nome ?? ''}:${camada.trim()}`),
+        );
+      });
+      expect(comDesfoque).toEqual([]);
     });
   });
 });

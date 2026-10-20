@@ -153,10 +153,6 @@ export function pares(mundo = 'dia') {
     // o botão é o rótulo.
     ['texto-atenuado', 'fundo-controle', 4.5],
     ['perigo', 'fundo-controle', 4.5],
-    // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
-    ['atual-texto', 'atual-fundo', 4.5],
-    // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
-    ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
