@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
-import { LockupParado } from './componentes/LockupParado';
+import { Marca } from './componentes/escrita/Marca';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
@@ -92,7 +92,7 @@ export function Shell() {
       </a>
       <header className="topo">
         <Link to="/" className="marca" aria-label="Arretado, início">
-          <LockupParado />
+          <Marca />
         </Link>
         <nav aria-label="Áreas" className="areas">
           {AREAS.map((a) => (

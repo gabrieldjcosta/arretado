@@ -24,7 +24,9 @@ async function montar(opcoes: { perfil?: 'calmo' | 'guiado'; repo?: Repositorio 
     </ContextoRepositorio.Provider>,
   );
   const escrita = () => vista.container.querySelector('svg.eb');
-  return { ...vista, repo, escrita };
+  // O lockup parado (Q2) tem o ponto de luz em `.lockup-ponto`; a escrita, não.
+  const parado = () => vista.container.querySelector('svg.lockup .lockup-ponto');
+  return { ...vista, repo, escrita, parado };
 }
 
 const guardado = () => window.localStorage.getItem(CHAVE);
@@ -44,11 +46,12 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
   });
 
-  it('nas demais aberturas do Dia: parada na hora, sem esperar nem gravar de novo', async () => {
+  it('nas demais aberturas do Dia: o lockup parado na hora, sem esperar nem gravar de novo', async () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
     const antes = guardado();
-    const { escrita } = await montar();
-    expect(escrita()).toHaveClass('pulou');
+    const { escrita, parado } = await montar();
+    expect(escrita()).toBeNull();
+    expect(parado()).not.toBeNull();
     expect(guardado()).toBe(antes);
   });
 
@@ -100,10 +103,11 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     expect(escrita()).not.toHaveClass('calmo');
   });
 
-  it('movimento reduzido do sistema: parada, e a primeira vez não é gasta', async () => {
+  it('movimento reduzido do sistema: o lockup parado, e a primeira vez não é gasta', async () => {
     simularMovimento('reduzido');
-    const { escrita } = await montar();
-    expect(escrita()).toHaveClass('pulou');
+    const { escrita, parado } = await montar();
+    expect(escrita()).toBeNull();
+    expect(parado()).not.toBeNull();
     expect(guardado()).toBeNull();
     // Quando a pessoa deixar de reduzir, a primeira vez ainda está lá.
     simularMovimento('normal');

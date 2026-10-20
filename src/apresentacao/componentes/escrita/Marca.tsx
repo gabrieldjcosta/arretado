@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { obterPreferencias } from '../../../core/preferencias';
 import { useRepositorio } from '../../dados/contexto';
+import { LockupParado } from '../LockupParado';
 import { movimentoDoPerfil, type Movimento } from '../../movimento';
 import { EscritaDoNome } from './EscritaDoNome';
 import { escritaDaAbertura, lembrarDaEscrita } from './frequencia';
@@ -62,7 +63,8 @@ export function Marca() {
     };
   }, [escrevendo, quando]);
 
-  if (!parada && movimento === null) {
+  if (parada) return <LockupParado />;
+  if (movimento === null) {
     return (
       <svg className="lockup" viewBox={CAIXA_DO_LOCKUP} aria-hidden="true" focusable="false" />
     );
@@ -71,7 +73,7 @@ export function Marca() {
     <EscritaDoNome
       curta={escrita === 'curta'}
       calmo={movimento === 'calmo'}
-      pulou={parada || pulou || movimento === 'reduzido'}
+      pulou={pulou || movimento === 'reduzido'}
     />
   );
 }
