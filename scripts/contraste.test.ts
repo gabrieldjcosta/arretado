@@ -138,6 +138,61 @@ const TOKENS_POR_MUNDO = [
   'fonte-titulo',
 ];
 
+/** Os tokens da caneta e do quadro do cacto que a Q4 trocou: `--caneta-*` virou `--pen-*` e o
+ * caramelo saiu (o sol e o miolo das flores agora são tinta; a ponta do núcleo leva a marca do mundo). */
+const TOKENS_REMOVIDOS_NA_Q4 = [
+  'caramelo',
+  'caneta-0',
+  'caneta-1',
+  'caneta-2',
+  'caneta-3',
+  'caneta-4',
+  'caneta-miolo',
+  'caneta-borda',
+  'caneta-borda-opacidade',
+  'caneta-brilho',
+  'caneta-halo-dia',
+  'caneta-halo-noite',
+];
+
+/** A caneta de vidro e o quadro do cacto, como nas pranchas m2/m1-dia-fechado e no kit (`pen.mjs` v5):
+ * o dia leva o vidro claro, a tinta e o halo lima; a noite, o vidro a 14%, o furo âmbar e o halo âmbar. */
+const CANETA_DO_DIA = {
+  'pen-rim': 'var(--tinta-funda)',
+  'pen-vidro': '#edf0f6',
+  'pen-vidro2': '#c7cedb',
+  'pen-vidro-a': '0.9',
+  'pen-tinta': 'var(--tinta)',
+  'pen-tinta2': 'var(--tinta)',
+  'pen-brilho': '#ffffff',
+  'pen-halo': 'var(--marca)',
+  'pen-halo-op': '1',
+  'pen-esfera': 'var(--tinta)',
+  'pen-luz': '#ffffff',
+  'pen-sombra': 'var(--tinta)',
+  'pen-sombra-op': '0.16',
+  'quadro-chao': 'var(--linha)',
+  'quadro-aro': 'var(--tinta)',
+  'quadro-marca': 'var(--marca)',
+};
+/** O que a noite troca; `--pen-luz` e `--pen-sombra` ficam como no dia (a sombra some em `--pen-sombra-op` 0). */
+const CANETA_DA_NOITE = {
+  'pen-rim': 'var(--n-vidro)',
+  'pen-vidro': 'var(--n-vidro)',
+  'pen-vidro2': 'var(--n-vidro)',
+  'pen-vidro-a': '0.14',
+  'pen-tinta': '#fff1c2',
+  'pen-tinta2': 'var(--n-ambar)',
+  'pen-brilho': '#e8f0ff',
+  'pen-halo': '#ffd978',
+  'pen-halo-op': '0.9',
+  'pen-esfera': '#fffbe8',
+  'pen-sombra-op': '0',
+  'quadro-chao': 'var(--n-borda)',
+  'quadro-aro': 'color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite))',
+  'quadro-marca': 'transparent',
+};
+
 function arquivosCss(pasta: string): string[] {
   return readdirSync(pasta, { withFileTypes: true }).flatMap((e) => {
     const caminho = path.join(pasta, e.name);
@@ -188,22 +243,28 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
     expect(escuroManual['fonte-titulo']).toMatch(/^'Familjen Grotesk'/);
   });
 
+  it('a caneta e o quadro do cacto têm os tokens dos dois mundos nos três blocos (Q4)', () => {
+    expect(claro).toMatchObject(CANETA_DO_DIA);
+    for (const bloco of [escuroSistema, escuroManual]) expect(bloco).toMatchObject(CANETA_DA_NOITE);
+  });
+
   it('a casca muda de um mundo para o outro como no contrato da D-D9 (Q2)', () => {
     expect(claro).toMatchObject(CASCA_DO_DIA);
     expect(escuroManual).toMatchObject(CASCA_DA_NOITE);
   });
 
   it('os tokens da identidade anterior não existem nem são usados em nenhum CSS', () => {
-    for (const t of TOKENS_REMOVIDOS) expect(claro).not.toHaveProperty(t);
+    const removidos = [...TOKENS_REMOVIDOS, ...TOKENS_REMOVIDOS_NA_Q4];
+    for (const t of removidos) expect(claro).not.toHaveProperty(t);
     // O nome inteiro: depois de `--nome` não vem letra, número, hífen nem sublinhado.
     const usadoEm = (linha: string, t: string) => new RegExp(`--${t}(?![\\w-])`).test(linha);
     const usos = arquivosCss(path.join(import.meta.dirname, '..', 'src')).flatMap((arquivo) =>
       readFileSync(arquivo, 'utf8')
         .split('\n')
         .flatMap((linha, i) =>
-          TOKENS_REMOVIDOS.filter((t) => usadoEm(linha, t)).map(
-            (t) => `${path.basename(arquivo)}:${i + 1} --${t}`,
-          ),
+          removidos
+            .filter((t) => usadoEm(linha, t))
+            .map((t) => `${path.basename(arquivo)}:${i + 1} --${t}`),
         ),
     );
     expect(usos).toEqual([]);

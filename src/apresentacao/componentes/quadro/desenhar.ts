@@ -2,7 +2,7 @@
 // caneta sobre o traço de hoje. Imperativo de propósito: o React só dá ao <svg> três grupos vazios
 // (lavis, traços, caneta) e nunca olha dentro deles.
 import { CURVA, esperar, suave, type Movimento } from '../../movimento';
-import { PARTES, REPOUSO, type Fio, type Parte } from './cena';
+import { ANDANDO, mover, PARTES, REPOUSO, type Fio, type Parte } from './cena';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -14,13 +14,20 @@ export interface Camadas {
 
 const um = (n: number) => String(Math.round(n * 10) / 10);
 
-/** O `transform` que põe a ponta da caneta deitada (65°) em (x, y) do quadro. */
-export function posicaoDaCaneta(x: number, y: number): string {
-  return `translate(${um(x)} ${um(y)}) scale(${String(REPOUSO.escala)}) translate(-32 -200) rotate(65 32 200)`;
+/**
+ * O `transform` que põe a ponta da caneta (de pé, com a ponta em (60, 262) no desenho) em (x, y) do
+ * quadro, na pose dada: andando sobre o traço, a menos que se peça outra.
+ */
+export function posicaoDaCaneta(
+  x: number,
+  y: number,
+  pose: { escala: number; graus: number } = ANDANDO,
+): string {
+  return `translate(${um(x)} ${um(y)}) scale(${String(pose.escala)}) rotate(${String(pose.graus)}) translate(-60 -262)`;
 }
 
-/** Onde a caneta fica largada: a ponta no fim do chão desenhado, à direita do cacto. */
-export const REPOUSO_DA_CANETA = posicaoDaCaneta(REPOUSO.x, REPOUSO.y);
+/** Onde a caneta fica largada: quase deitada, sob o chão do desenho, à direita do cacto. */
+export const REPOUSO_DA_CANETA = posicaoDaCaneta(REPOUSO.x, REPOUSO.y, REPOUSO);
 
 function criar<K extends 'path' | 'circle'>(
   tag: K,
@@ -31,15 +38,12 @@ function criar<K extends 'path' | 'circle'>(
   return el;
 }
 
-function traco(d: string, fio: Fio): SVGPathElement {
-  const el = criar('path', {
+const traco = (d: string, fio: Fio) =>
+  criar('path', {
     class: `quadro-fio quadro-cor-${fio.cor}`,
     d,
     'stroke-width': fio.largura,
   });
-  if (fio.opacidade !== undefined) el.setAttribute('opacity', String(fio.opacidade));
-  return el;
-}
 
 function lavisDe(fio: Fio): SVGPathElement | undefined {
   return fio.lavis
@@ -53,17 +57,35 @@ const mioloDe = (centro: readonly [number, number]) =>
 const olhoDe = (olho: NonNullable<Fio['olho']>) =>
   criar('path', { class: 'quadro-olho', d: olho.d, 'stroke-width': olho.largura });
 
-function pintarFio(c: Camadas, fio: Fio): void {
+/** A marca de hoje (o marca-texto): uma mancha de 9 de raio, feita à mão, centrada no ponto. */
+const MARCA =
+  'M-8.8 -.6C-9 -5.9 -4.4 -9.4 1 -9.1C6.4 -8.8 9.8 -4.6 9.2 .9C8.6 6 4 9.2 -1 8.6C-6 8 -8.6 4.6 -8.8 -.6Z';
+
+/**
+ * A ponta do núcleo: um ponto de luz de 4 de raio e, na parte de hoje, um de 5,5 com a marca (lima de
+ * dia) atrás. A marca vem primeiro, para ficar sob o ponto.
+ */
+function pontaDe(centro: readonly [number, number], hoje: boolean): SVGElement[] {
+  const [cx, cy] = centro;
+  if (!hoje) return [criar('circle', { class: 'quadro-ponto', cx, cy, r: 4 })];
+  return [
+    criar('path', { class: 'quadro-marca', d: mover(MARCA, cx, cy) }),
+    criar('circle', { class: 'quadro-ponto quadro-hoje', cx, cy, r: 5.5 }),
+  ];
+}
+
+function pintarFio(c: Camadas, fio: Fio, hoje: boolean): void {
   const lavis = lavisDe(fio);
   if (lavis) c.lavis.append(lavis);
   c.tracos.append(traco(fio.d, fio));
   if (fio.miolo) c.tracos.append(mioloDe(fio.miolo));
   if (fio.olho) c.tracos.append(olhoDe(fio.olho));
+  if (fio.ponta) c.tracos.append(...pontaDe(fio.ponta, hoje));
 }
 
-/** A parte inteira, de uma vez, sem limpar o que já está no papel. */
-export function pintarParte(c: Camadas, parte: Parte): void {
-  for (const fio of parte.fios) pintarFio(c, fio);
+/** A parte inteira, de uma vez, sem limpar o que já está no papel; `hoje` põe a marca no fim do núcleo. */
+export function pintarParte(c: Camadas, parte: Parte, hoje = false): void {
+  for (const fio of parte.fios) pintarFio(c, fio, hoje);
 }
 
 /** Papel limpo e caneta largada. */
@@ -150,13 +172,13 @@ function correr(
   });
 }
 
-/** O miolo da flor brota ao fim do fio: de um ponto ao tamanho cheio, na curva do app. */
-function brotar(grupo: SVGGElement, miolo: SVGCircleElement): void {
-  miolo.style.transformBox = 'fill-box';
-  miolo.style.transformOrigin = 'center';
-  grupo.append(miolo);
-  if (typeof miolo.animate === 'function') {
-    miolo.animate(
+/** O miolo da flor e a ponta do núcleo brotam ao fim do fio: de um ponto ao tamanho cheio, na curva do app. */
+function brotar(grupo: SVGGElement, el: SVGElement): void {
+  el.style.transformBox = 'fill-box';
+  el.style.transformOrigin = 'center';
+  grupo.append(el);
+  if (typeof el.animate === 'function') {
+    el.animate(
       [
         { transform: 'scale(0)', opacity: 0 },
         { transform: 'scale(1)', opacity: 1 },
@@ -179,7 +201,7 @@ export async function desenharParte(
 ): Promise<boolean> {
   c.caneta.setAttribute('transform', REPOUSO_DA_CANETA);
   if (movimento === 'reduzido') {
-    pintarParte(c, parte);
+    pintarParte(c, parte, true);
     return !sinal.aborted;
   }
   await esperar(200, sinal);
@@ -194,6 +216,7 @@ export async function desenharParte(
     lavis?.removeAttribute('opacity');
     if (fio.miolo) brotar(c.tracos, mioloDe(fio.miolo));
     if (fio.olho) c.tracos.append(olhoDe(fio.olho));
+    if (fio.ponta) for (const el of pontaDe(fio.ponta, true)) brotar(c.tracos, el);
     await esperar(50, sinal);
   }
   await esperar(440, sinal);

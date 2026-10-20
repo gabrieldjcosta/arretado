@@ -128,27 +128,43 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
     ]);
   });
 
-  it('o SVG usa o vidro da caneta de estilos.css (rode o script se mudarem)', () => {
+  it('o favicon SVG usa o papel, a tinta e a lima do dia (rode o script se mudarem)', () => {
     const svg = texto('public/icone.svg');
-    // As cinco cores do vidro e o miolo, que ainda vêm de estilos.css (provisórios até a Q4).
-    for (const nome of [
-      'caneta-0',
-      'caneta-1',
-      'caneta-2',
-      'caneta-3',
-      'caneta-4',
-      'caneta-miolo',
-    ]) {
-      expect(svg, nome).toContain(token(nome));
-    }
+    expect(svg, 'papel').toContain(token('papel'));
+    expect(svg, 'tinta').toContain(token('tinta'));
+    expect(svg, 'lima').toContain(token('marca'));
   });
 
-  it('o ícone segue com a areia e o halo da D-D7, até a Q4 refazê-lo na D-D9', () => {
-    // Estas duas cores saíram de estilos.css (o chão agora é o --papel e o halo da ponta, o
-    // --ponto-halo): ficam aqui como estão no scripts/icones-app.mjs. A Q4 (caneta de vidro nova,
-    // ícone sobre o papel) troca as duas e este teste passa a comparar com os tokens.
-    const svg = texto('public/icone.svg');
-    expect(svg, 'areia da D-D7').toContain('#f1e6d3');
-    expect(svg, 'halo da D-D7').toContain('#7df3e1');
+  it('o script do ícone tem as cores do dia e a geometria da caneta de Caneta.tsx', () => {
+    // Sem espaço depois do "=": o Prettier quebra a linha das geometrias mais compridas.
+    const junto = (fonte: string) => fonte.replace(/=\s+'/g, "= '");
+    const script = junto(texto('scripts/icones-app.mjs'));
+    const cores: Record<string, string> = {
+      PAPEL: 'papel',
+      TINTA: 'tinta',
+      TINTA_FUNDA: 'tinta-funda',
+      VIDRO: 'pen-vidro',
+      VIDRO_2: 'pen-vidro2',
+      MARCA: 'marca',
+    };
+    for (const [constante, nome] of Object.entries(cores)) {
+      expect(script, constante).toContain(`const ${constante} = '${token(nome)}';`);
+    }
+    const caneta = junto(texto('src/apresentacao/componentes/Caneta.tsx'));
+    for (const nome of [
+      'TRONCO',
+      'BRACOS',
+      'FURO',
+      'CONE',
+      'CONE_CLARO',
+      'CONE_FURO',
+      'CONE_SOMBRA',
+    ]) {
+      const geometria = new RegExp(`const ${nome} = '([^']+)';`).exec(caneta)?.[1];
+      expect(geometria, nome).toBeDefined();
+      expect(script, nome).toContain(`const ${nome} = '${geometria ?? ''}';`);
+    }
+    expect(script).toContain('const ARO = 5;');
+    expect(caneta).toContain('const ARO = 5;');
   });
 });

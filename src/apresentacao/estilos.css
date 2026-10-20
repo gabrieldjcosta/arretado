@@ -123,8 +123,7 @@
 
   /* O ponto de luz ("onde parei": pontos do Dia, Estrela, ponta da caneta): de dia a tinta, com o halo
      de lima (a marca-texto) atrás; à noite a luz, e o âmbar acende o "onde parei". Nunca texto, e a
-     lima nunca é fundo de texto (1,07:1 no papel). O caramelo e as cores da caneta abaixo são
-     provisórios: o quadro do cacto e a caneta de vidro os refazem na Q4. */
+     lima nunca é fundo de texto (1,07:1 no papel). */
   --ponto-luz: var(--luz);
   --ponto-halo: var(--marca);
   --ponto-contorno: var(--luz);
@@ -134,21 +133,31 @@
   --estrela-luz: var(--ponto-luz);
   --estrela-contorno: var(--ponto-contorno);
   --calha-estrela: 1.5rem;
-  --caramelo: #c8742f;
   /* O traço de seleção ("A caneta que desenha"): a linha que se desenha em volta do que acabou de ser
      escolhido, na luz do mundo. Sem brilho: a ponta é o ponto de luz, com contorno. */
   --fio-selecao: var(--luz);
-  --caneta-0: #dffcff;
-  --caneta-1: #9af0dc;
-  --caneta-2: #5fcf8f;
-  --caneta-3: #2b8f5e;
-  --caneta-4: #17422f;
-  --caneta-miolo: #0f3b2b;
-  --caneta-borda: #ffffff;
-  --caneta-borda-opacidade: 0.7;
-  --caneta-brilho: 0.8;
-  --caneta-halo-dia: 0.85;
-  --caneta-halo-noite: 0;
+  /* A caneta de vidro (D-D9, Q4; contrato "A caneta de vidro"): o aro, os dois tons do vidro e a
+     opacidade dele, a tinta do furo (do tronco à ponta), o brilho, o halo e a esfera da ponta, as
+     faíscas e a sombra. Só a caneta tem gradiente. De dia é vidro claro com a tinta no furo e a lima de
+     halo; à noite, vidro quase transparente com o furo em âmbar. */
+  --pen-rim: var(--tinta-funda);
+  --pen-vidro: #edf0f6;
+  --pen-vidro2: #c7cedb;
+  --pen-vidro-a: 0.9;
+  --pen-tinta: var(--tinta);
+  --pen-tinta2: var(--tinta);
+  --pen-brilho: #ffffff;
+  --pen-halo: var(--marca);
+  --pen-halo-op: 1;
+  --pen-esfera: var(--tinta);
+  --pen-luz: #ffffff;
+  --pen-sombra: var(--tinta);
+  --pen-sombra-op: 0.16;
+  /* O quadro do cacto (D-D9, Q4): o chão, o aro de vidro dos tubos e a marca de hoje (a lima do
+     marca-texto, só de dia). O núcleo de tinta é a luz do mundo e a ponta de hoje, a tinta da caneta. */
+  --quadro-chao: var(--linha);
+  --quadro-aro: var(--tinta);
+  --quadro-marca: var(--marca);
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -278,18 +287,20 @@
     --luz: var(--n-luz);
     --ponto-halo: var(--n-ambar);
     --ponto-apagado: var(--n-texto-2);
-    --caramelo: #ffb46b;
-    --caneta-0: #bdf3ff;
-    --caneta-1: #7fe3cf;
-    --caneta-2: #4cc07f;
-    --caneta-3: #237a50;
-    --caneta-4: #123526;
-    --caneta-miolo: #0b2a1f;
-    --caneta-borda: #dffcff;
-    --caneta-borda-opacidade: 0.55;
-    --caneta-brilho: 0.6;
-    --caneta-halo-dia: 0;
-    --caneta-halo-noite: 1;
+    --pen-rim: var(--n-vidro);
+    --pen-vidro: var(--n-vidro);
+    --pen-vidro2: var(--n-vidro);
+    --pen-vidro-a: 0.14;
+    --pen-tinta: #fff1c2;
+    --pen-tinta2: var(--n-ambar);
+    --pen-brilho: #e8f0ff;
+    --pen-halo: #ffd978;
+    --pen-halo-op: 0.9;
+    --pen-esfera: #fffbe8;
+    --pen-sombra-op: 0;
+    --quadro-chao: var(--n-borda);
+    --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
+    --quadro-marca: transparent;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
@@ -350,18 +361,20 @@
   --luz: var(--n-luz);
   --ponto-halo: var(--n-ambar);
   --ponto-apagado: var(--n-texto-2);
-  --caramelo: #ffb46b;
-  --caneta-0: #bdf3ff;
-  --caneta-1: #7fe3cf;
-  --caneta-2: #4cc07f;
-  --caneta-3: #237a50;
-  --caneta-4: #123526;
-  --caneta-miolo: #0b2a1f;
-  --caneta-borda: #dffcff;
-  --caneta-borda-opacidade: 0.55;
-  --caneta-brilho: 0.6;
-  --caneta-halo-dia: 0;
-  --caneta-halo-noite: 1;
+  --pen-rim: var(--n-vidro);
+  --pen-vidro: var(--n-vidro);
+  --pen-vidro2: var(--n-vidro);
+  --pen-vidro-a: 0.14;
+  --pen-tinta: #fff1c2;
+  --pen-tinta2: var(--n-ambar);
+  --pen-brilho: #e8f0ff;
+  --pen-halo: #ffd978;
+  --pen-halo-op: 0.9;
+  --pen-esfera: #fffbe8;
+  --pen-sombra-op: 0;
+  --quadro-chao: var(--n-borda);
+  --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
+  --quadro-marca: transparent;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
@@ -1782,7 +1795,7 @@ a.item-norma strong {
   align-items: flex-end;
   gap: 0.25rem;
   margin: 0.25rem 0 0;
-  min-height: 3.625rem;
+  min-height: 3.75rem;
   font-family: var(--fonte-interface);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -1791,7 +1804,7 @@ a.item-norma strong {
 
 .caneta-do-lido {
   width: 104px;
-  height: 58px;
+  height: 59px;
 }
 
 /* O dock fica acima das abas de baixo (--abas-altura: as abas e a área segura; a partir de 900 px é só
@@ -3311,8 +3324,9 @@ dialog.dialogo-previa .linha-acoes button {
 }
 
 /* Drill: o cartão ocupa o centro; só "Mostrar resposta" tem destaque. No topo, "Sair" e o andamento
-   e, no canto, a caneta encostada (D-D7, P5): 56 × 76, a ponta 7 px dentro da borda do cartão (a
-   margem de -10 px embaixo a faz descer sobre ele; o z-index a põe acima dele e da passagem). */
+   e, no canto, a caneta encostada (D-D7, P5; de vidro na D-D9, Q4): 58 × 78, a ponta 7 px dentro da
+   borda do cartão (a margem de -13 px embaixo a faz descer sobre ele; o z-index a põe acima dele e da
+   passagem). */
 .topo-drill {
   position: relative;
   z-index: 2;
@@ -3332,9 +3346,9 @@ dialog.dialogo-previa .linha-acoes button {
 
 .topo-caneta {
   align-self: flex-end;
-  width: 56px;
-  height: 76px;
-  margin: 0 -8px -10px 0;
+  width: 58px;
+  height: 78px;
+  margin: 0 -8px -13px 0;
 }
 
 .cartao-drill {
@@ -3460,7 +3474,7 @@ dialog.dialogo-previa .linha-acoes button {
    Sem cachorro nem desenho próprio: quem desenha é o Resumo do Dia, uma vez por Dia fechado. */
 .fim-de-rodada .fim-caneta {
   width: 104px;
-  height: 58px;
+  height: 59px;
   margin: 0 auto 0.75rem;
 }
 

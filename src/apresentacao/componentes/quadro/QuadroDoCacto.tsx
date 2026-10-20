@@ -28,7 +28,7 @@ export function QuadroDoCacto({ dias, desenha }: { dias: number; desenha: boolea
     const camadas = { lavis: lavis.current, tracos: tracos.current, caneta: caneta.current };
     pintarAte(camadas, indice);
     if (!desenha) {
-      pintarParte(camadas, parte);
+      pintarParte(camadas, parte, true);
       return;
     }
     const controle = new AbortController();
