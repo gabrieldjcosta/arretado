@@ -9,8 +9,8 @@ const RAIZ = path.join(import.meta.dirname, '..');
 const ler = (arquivo: string) => readFileSync(path.join(RAIZ, arquivo));
 const texto = (arquivo: string) => ler(arquivo).toString('utf8');
 
-const claro = lerTemas().claro as Record<string, string>;
-/** Um token de estilos.css no tema claro (a paleta fica nesse bloco). */
+const { claro } = lerTemas();
+/** Um token de estilos.css no tema claro (as paletas dos dois mundos ficam nesse bloco). */
 function token(nome: string): string {
   const valor = claro[nome];
   if (valor === undefined) throw new Error(`token --${nome} não achado em estilos.css`);
@@ -58,10 +58,20 @@ describe('index.html', () => {
 });
 
 describe('cor da barra', () => {
-  it('é o chão de cada tema, --areia e --noite (src/apresentacao/cor-da-barra.ts)', () => {
+  it('é o chão de cada tema, --papel e --n-noite (src/apresentacao/cor-da-barra.ts)', () => {
     const fonte = texto('src/apresentacao/cor-da-barra.ts');
     const cores = /claro: '(#[0-9a-f]{6})', escuro: '(#[0-9a-f]{6})'/.exec(fonte)?.slice(1);
-    expect(cores).toEqual([token('areia'), token('noite')]);
+    expect(cores).toEqual([token('papel'), token('n-noite')]);
+  });
+
+  it('o index.html traz uma meta por tema, nas mesmas cores', () => {
+    const html = texto('index.html');
+    expect(html).toContain(
+      `<meta name="theme-color" content="${token('papel')}" media="(prefers-color-scheme: light)" />`,
+    );
+    expect(html).toContain(
+      `<meta name="theme-color" content="${token('n-noite')}" media="(prefers-color-scheme: dark)" />`,
+    );
   });
 });
 
@@ -78,9 +88,9 @@ describe('manifest', () => {
     expect(manifesto.id).not.toBe('');
   });
 
-  it('usa a areia do tema claro na abertura (o escuro troca a meta do index.html)', () => {
-    expect(manifesto.theme_color).toBe(token('areia'));
-    expect(manifesto.background_color).toBe(token('areia'));
+  it('usa o papel do tema claro na abertura (o escuro troca a meta do index.html)', () => {
+    expect(manifesto.theme_color).toBe(token('papel'));
+    expect(manifesto.background_color).toBe(token('papel'));
   });
 
   it('declara ícones que existem, com o tamanho dito, e um maskable', () => {
@@ -118,19 +128,43 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
     ]);
   });
 
-  it('o SVG usa a areia e o vidro da caneta de estilos.css (rode o script se mudarem)', () => {
+  it('o favicon SVG usa o papel, a tinta e a lima do dia (rode o script se mudarem)', () => {
     const svg = texto('public/icone.svg');
-    // A areia, as cinco cores do vidro, o miolo e o halo da ponta (--noite-vidro).
-    const esperadas = [
-      'areia',
-      'caneta-0',
-      'caneta-1',
-      'caneta-2',
-      'caneta-3',
-      'caneta-4',
-      'caneta-miolo',
-      'noite-vidro',
-    ];
-    for (const nome of esperadas) expect(svg, nome).toContain(token(nome));
+    expect(svg, 'papel').toContain(token('papel'));
+    expect(svg, 'tinta').toContain(token('tinta'));
+    expect(svg, 'lima').toContain(token('marca'));
+  });
+
+  it('o script do ícone tem as cores do dia e a geometria da caneta de Caneta.tsx', () => {
+    // Sem espaço depois do "=": o Prettier quebra a linha das geometrias mais compridas.
+    const junto = (fonte: string) => fonte.replace(/=\s+'/g, "= '");
+    const script = junto(texto('scripts/icones-app.mjs'));
+    const cores: Record<string, string> = {
+      PAPEL: 'papel',
+      TINTA: 'tinta',
+      TINTA_FUNDA: 'tinta-funda',
+      VIDRO: 'pen-vidro',
+      VIDRO_2: 'pen-vidro2',
+      MARCA: 'marca',
+    };
+    for (const [constante, nome] of Object.entries(cores)) {
+      expect(script, constante).toContain(`const ${constante} = '${token(nome)}';`);
+    }
+    const caneta = junto(texto('src/apresentacao/componentes/Caneta.tsx'));
+    for (const nome of [
+      'TRONCO',
+      'BRACOS',
+      'FURO',
+      'CONE',
+      'CONE_CLARO',
+      'CONE_FURO',
+      'CONE_SOMBRA',
+    ]) {
+      const geometria = new RegExp(`const ${nome} = '([^']+)';`).exec(caneta)?.[1];
+      expect(geometria, nome).toBeDefined();
+      expect(script, nome).toContain(`const ${nome} = '${geometria ?? ''}';`);
+    }
+    expect(script).toContain('const ARO = 5;');
+    expect(caneta).toContain('const ARO = 5;');
   });
 });

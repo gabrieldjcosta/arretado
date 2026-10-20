@@ -1617,7 +1617,7 @@ function LeitorAberto({
 
   // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até". Do começo
   // da norma até o "lido até" (inclusive) a linha é lida (`data-lido`): na lista, vai sobre a faixa
-  // de cal; o cartão não usa a faixa.
+  // da folha; o cartão não usa a faixa.
   function propriedadesDaLinha(linha: LinhaDoLeitor) {
     const dispositivo = nos[linha.indice]?.dispositivo;
     const id = dispositivo?.id ?? '';

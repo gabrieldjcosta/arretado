@@ -1,6 +1,6 @@
 /* A estrutura da norma ao lado do texto (Ponto de luz, P4). O Leitor só a desenha de 700 px para
    cima (tablet e desktop); no celular a estrutura continua no filtro por bloco. Os valores vêm dos
-   tokens de estilos.css: o ponto de luz, a cal de "onde estou" e a tinta do texto. */
+   tokens de estilos.css: o ponto de luz, a folha de "onde estou" e a tinta do texto. */
 
 /* A lista e o painel lado a lado. O corpo do Leitor não é posicionado: o virtualizador mede o
    deslocamento da lista contra a página, e um ancestral posicionado o mudaria. */
@@ -68,8 +68,9 @@
   overflow-wrap: anywhere;
 }
 
-/* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai em
-   cal com a sombra fresca, como a aba atual: o estado dela não é só a cor (negrito e aria-current). */
+/* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai na
+   folha com o contorno do controle, como a aba de página atual: o estado dela não é só a cor (negrito
+   e aria-current). */
 .estrutura-da-norma .estrutura-item {
   width: 100%;
   justify-content: flex-start;
@@ -85,8 +86,8 @@
 }
 
 .estrutura-da-norma .estrutura-item[data-aqui] {
-  background: var(--atual-fundo);
-  box-shadow: var(--atual-sombra);
+  background: var(--superficie);
+  box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
 }
 
 /* Cores forçadas tiram o fundo e a sombra: o contorno do sistema leva a seção de agora. */

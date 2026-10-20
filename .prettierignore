@@ -15,3 +15,6 @@ acervo/fontes
 
 # Dados brutos gerados pelas coletas (saída de script, não editada à mão)
 acervo/brutos/
+
+# CSS gerado pelo kit da marca (keyframes da escrita do nome): não se edita à mão
+src/apresentacao/componentes/escrita/escrita-b.css

@@ -345,7 +345,7 @@ export function RegistrarErro() {
               <button
                 key={r}
                 type="button"
-                className={resultado === r ? 'principal' : undefined}
+                className={resultado === r ? 'chip principal' : 'chip'}
                 aria-pressed={resultado === r}
                 onClick={() => {
                   setResultado(resultado === r ? null : r);

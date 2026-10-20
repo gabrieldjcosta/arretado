@@ -1,5 +1,5 @@
 import { restaurarMovimento, simularMovimento } from '../testes/movimento';
-import { curva, esperar, movimentoAgora, suave } from './movimento';
+import { curva, esperar, movimentoAgora, movimentoDoPerfil, suave } from './movimento';
 
 describe('movimentoAgora (A caneta que desenha)', () => {
   it('o movimento reduzido do sistema vence qualquer perfil', () => {
@@ -27,6 +27,16 @@ describe('movimentoAgora (A caneta que desenha)', () => {
     expect(movimentoAgora()).toBe('normal');
     simularMovimento('reduzido');
     expect(movimentoAgora()).toBe('reduzido');
+  });
+
+  it('movimentoDoPerfil decide pelo perfil dado, sem ler o documento', () => {
+    simularMovimento('normal');
+    document.documentElement.dataset.perfil = 'calmo';
+    expect(movimentoDoPerfil(undefined)).toBe('normal');
+    expect(movimentoDoPerfil('guiado')).toBe('normal');
+    expect(movimentoDoPerfil('calmo')).toBe('calmo');
+    simularMovimento('reduzido');
+    expect(movimentoDoPerfil('calmo')).toBe('reduzido');
   });
 
   it('sem matchMedia, não mexe em nada', () => {

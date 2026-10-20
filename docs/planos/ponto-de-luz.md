@@ -1,5 +1,7 @@
 # Ponto de luz — construção da direção no app (18/10/2026)
 
+> **Superado em 19/10/2026 pela D-D9 (Tinta e noite).** As fases P1 a P7b deste plano estão todas mergeadas e ficam como histórico do que a D-D7 construiu. A paleta, as letras, as formas, a marca, a caneta, as abas e o Hoje passam a ser os da D-D9, em fases Q1 a Q8: ver [`tinta-e-noite.md`](tinta-e-noite.md) e a [D-D9](../design/decisoes-design.md).
+
 Trabalho de UI, em esforço máximo; **não conta** no limite de 2 tarefas de código. Decisão: **D-D7** em [`../design/decisoes-design.md`](../design/decisoes-design.md), com o contrato da direção em [`../design/referencias/2026-10-18-ponto-de-luz/contrato.md`](../design/referencias/2026-10-18-ponto-de-luz/contrato.md). Alvo visual e valores: [`../../DESIGN.md`](../../DESIGN.md) e [`../design/sistema-visual.md`](../design/sistema-visual.md). Este plano assume a casca, as telas e a harmonização que o [`redesign-v2.md`](redesign-v2.md) previa nas fatias F2, F3 e F12 (a F1 e a F1b de lá já estão no código e esta P1 troca os valores delas); o rascunho da F2 de 14/10 (`/mnt/project-files/redesenho/f2-casca-rascunho.patch`, barra reta da D-D4) serve de base para a P2 só no que não é visual (teclado aberto, `MenuAjuda`, ajudas de teste).
 
 ## Como cada fase é entregue
