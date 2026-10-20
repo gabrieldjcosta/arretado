@@ -96,8 +96,8 @@ export function validar(linhas) {
       erros.push({ linha: n, regra: 'assunto-maior-que-materia', msg: l.assunto_tec });
     if (Number(l.total_disciplina) < 30)
       avisos.push({ linha: n, regra: 'amostra-fraca', msg: l.disciplina });
-    if (!l.hierarquia.includes('.')) {
-      const k = `${l.banca}|${l.cargo}|${l.disciplina}`;
+    if (l.hierarquia ? !l.hierarquia.includes('.') : l.nivel === '1') {
+      const k = `${l.banca}|${l.cargo}|${l.disciplina}|${l.ano_de}-${l.ano_ate}`;
       topo.set(k, (topo.get(k) ?? 0) + Number(l.pct_disciplina));
     }
   });
@@ -108,7 +108,8 @@ export function validar(linhas) {
   return { erros, avisos };
 }
 
-export function lerCsv(texto) {
+export function lerCsv(bruto) {
+  const texto = bruto.replace(/^\uFEFF/, '');
   const linhas = [];
   let campo = '',
     reg = [],
