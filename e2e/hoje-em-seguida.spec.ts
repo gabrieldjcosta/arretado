@@ -53,6 +53,17 @@ const bloco = (page: Page) => page.locator('details.em-seguida-bloco');
 const resumo = (page: Page) => page.locator('details.em-seguida-bloco > summary');
 const estaAberto = (el: Locator) => el.evaluate((d) => (d as HTMLDetailsElement).open);
 
+/**
+ * Espera o fim das animações de abrir do "Em seguida" (180 ms, `translateY`). Medida no meio delas, a altura
+ * sai com erro de float (44 − 2^-14 = 43,99994) e o alvo de 44 px parece falhar por nada.
+ */
+const emRepouso = (page: Page) =>
+  page.evaluate(async () => {
+    const animacoes =
+      document.querySelector('.em-seguida-bloco')?.getAnimations({ subtree: true }) ?? [];
+    await Promise.allSettled(animacoes.map((a) => a.finished));
+  });
+
 /** Quanto a página passa da largura da janela (0 = nada rola de lado). */
 const rolagemLateral = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -121,6 +132,7 @@ test('Hoje: "Retomar em", a caneta com a ponta na borda da folha e o "Em seguida
   await expect(linhas).toHaveCount(2);
   await expect(linhas.first()).toContainText('Ler arts. 112 a 117 da LEP');
   await expect(linhas.nth(1)).toContainText('Continuar a leitura');
+  await emRepouso(page);
   for (const alvo of [
     resumo(page),
     page.locator('.em-seguida-linha').first(),
@@ -129,6 +141,7 @@ test('Hoje: "Retomar em", a caneta com a ponta na borda da folha e o "Em seguida
     expect((await caixa(alvo)).h).toBeGreaterThanOrEqual(44);
   }
   await linhas.first().locator('summary').click();
+  await emRepouso(page);
   for (const chip of await linhas.first().getByRole('button').all()) {
     expect((await caixa(chip)).h).toBeGreaterThanOrEqual(44);
   }
