@@ -9,7 +9,11 @@
 // Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; o "Em seguida" (um `<details>`, com o
 // "Trocar" de cada item, Q5) e o "Para lembrar" à direita. Abaixo disso as duas viram uma só, na mesma
 // ordem.
+//
+// A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
+// montam aqui só porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
+import { EntradaDoDia } from '../entrada/EntradaDoDia';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { Captura } from './Captura';
@@ -46,6 +50,7 @@ export function Hoje() {
       <RevisoesDoDia />
       <Captura />
       <LembreteDeBackup />
+      <EntradaDoDia retrato={hoje.retrato} />
     </>
   );
 }

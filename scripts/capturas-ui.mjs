@@ -193,6 +193,24 @@ const TAREFAS = [
   'Revisar o resumo de prisões cautelares',
 ];
 
+// A Chegada e a Entrada do Dia são um <dialog> modal sobre o Hoje (src/apresentacao/entrada/regras.ts):
+// a captura quer as telas, então parte de um aparelho que já viu as duas.
+const ABERTURA_JA_VISTA = {
+  'arretado:chegada:v1': '{"vista":true}',
+  'arretado:entrada-do-dia:v1': '{"dia":"9999-12-31"}',
+};
+async function aberturaJaVista(ctx) {
+  await ctx.addInitScript((chaves) => {
+    try {
+      for (const [chave, valor] of Object.entries(chaves)) {
+        if (window.localStorage.getItem(chave) === null) window.localStorage.setItem(chave, valor);
+      }
+    } catch {
+      /* sem armazenamento */
+    }
+  }, ABERTURA_JA_VISTA);
+}
+
 /** Semeia pela interface, no relógio de "ontem à noite", e grava um estado por marco. */
 async function semear(browser, o, url) {
   const pastaEstado = path.join(o.saida, 'estado');
@@ -203,6 +221,7 @@ async function semear(browser, o, url) {
     timezoneId: 'America/Sao_Paulo',
     reducedMotion: 'reduce',
   });
+  await aberturaJaVista(ctx);
   const page = await ctx.newPage();
   await page.clock.setFixedTime(new Date('2026-10-13T21:40:00-03:00'));
   const gravar = async (nome) => {
@@ -462,6 +481,7 @@ async function capturar(browser, o, url, info) {
         reducedMotion: 'reduce',
         storageState: path.join(o.saida, 'estado', `${o.estado}.json`),
       });
+      await aberturaJaVista(ctx);
       const page = await ctx.newPage();
       await page.clock.setFixedTime(new Date(o.agora));
       for (const rota of o.rotas) {
