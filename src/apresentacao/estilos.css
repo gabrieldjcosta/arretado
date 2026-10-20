@@ -91,7 +91,6 @@
   --fundo: var(--papel);
   --superficie: var(--folha);
   --superficie-2: color-mix(in srgb, var(--tinta) 5%, var(--papel));
-  --quente: var(--superficie-2);
   --texto: var(--tinta);
   --texto-atenuado: var(--tinta-2);
   --titulo: var(--tinta);
@@ -428,7 +427,7 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-/* Chão liso (D-D7): sem textura; a profundidade vem só da sombra fresca da folha. */
+/* Chão liso: sem textura. A folha se separa dele pela linha de 1 px do mundo (`--borda-folha`), não por sombra. */
 body {
   margin: 0;
   min-height: 100dvh;
@@ -549,7 +548,7 @@ button,
   white-space: nowrap;
 }
 
-/* ── Estrutura: a casca (D-D7, P2) ─────────────────────────────────────── */
+/* ── Estrutura: a casca (D-D9, Q2) ─────────────────────────────────────── */
 
 /* Medidas da casca. --gutter: o recuo lateral do cabeçalho e do conteúdo (16 px no celular, 24 no
    tablet em pé, 32 a partir de 900). --largura-casca: a largura do conteúdo e, a partir de 900 px, a
@@ -674,7 +673,7 @@ button,
   flex: none;
 }
 
-/* Registrar erro no cabeçalho só a partir de 900 px, neutro (a ação da tela é a de vidro), com a
+/* Registrar erro no cabeçalho só a partir de 900 px, neutro (a ação da tela é o botão primário), com a
    tecla E ao lado. Até 899 px o registro é o "+" do título (Hoje e Fixar) e a tecla E. */
 .acoes-globais .registrar-global {
   display: none;
@@ -772,7 +771,7 @@ button,
   font-weight: 700;
 }
 
-/* Ligado (alternância): tinta cheia com o texto em cal, como a caixa marcada. */
+/* Ligado (alternância): cheio na luz do mundo, com o texto invertido, como a caixa marcada. */
 .alternar-destaques[aria-pressed='true'] {
   background: var(--selecionado-fundo);
   color: var(--selecionado-texto);
@@ -1016,8 +1015,8 @@ button:not(:disabled):active,
   }
 }
 
-/* Marcado (D-D7): o botão de alternar ligado (`aria-pressed`, como "Errei" no registro e o filtro
-   de estado dos cartões) é tinta, não vidro; o vidro fica para a ação da tela, que é uma só. */
+/* Marcado: o botão de alternar ligado (`aria-pressed`, como "Errei" no registro e o filtro de estado
+   dos cartões) é a luz do mundo cheia, sem a sombra dura; ela fica para a ação da tela, que é uma só. */
 .principal[aria-pressed='true'] {
   background: var(--selecionado-fundo);
   border-color: var(--selecionado-fundo);
@@ -1066,8 +1065,8 @@ dialog .perigoso {
 }
 
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
-   onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
-   atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. `.discreto` é o mesmo botão (antes
+   onde está (a tinta, na página e na folha). Sem opacidade: numa dica, a cor herdada já é a
+   atenuada, e a 82% ela cai para 4,3:1 no papel. Alvo de 44 px. `.discreto` é o mesmo botão (antes
    era texto sem sublinhado e com 20 px de recuo, que não parecia ação). */
 .botao-texto,
 .discreto {
@@ -1773,10 +1772,10 @@ a.item-norma strong {
 .lista-leitor {
   position: relative;
   width: 100%;
-  /* O lido vai sobre uma faixa de cal que passa 12 px do texto de cada lado (P4): a margem anda a
+  /* O lido vai sobre uma faixa da folha que passa 12 px do texto de cada lado (P4): a margem anda a
      calha da estrela e o texto para a faixa não pisar na estrela. Fora da lista (cartão, prévia) é 0.
      No fim da linha a faixa passa só até metade do recuo lateral da casca (8 px no celular), para a
-     cal não encostar na borda da tela; o texto fica onde estava. */
+     faixa não encostar na borda da tela; o texto fica onde estava. */
   --margem-do-lido: 12px;
   --margem-do-lido-fim: min(var(--margem-do-lido), calc(var(--gutter, 1rem) / 2));
 }
@@ -1975,7 +1974,7 @@ a.item-norma strong {
   }
 }
 
-/* Na bandeja aberta (um cartão sólido), "Próximo artigo" é a ação da tela e fica de vidro, como todo
+/* Na bandeja aberta (um cartão sólido), "Próximo artigo" é a ação da tela e fica no botão primário, como todo
    .principal: sem isto a regra de cima (mais específica) o deixaria um texto negrito sem caixa, o
    menos visível dos botões, e "Sair do foco" é o que recua. */
 .em-foco .bandeja-itens button.principal {
@@ -2052,8 +2051,8 @@ dialog.dialogo-busca {
 }
 
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
-   nem mudança de medida: o texto não se move. Em tinta: a luz nunca segue o ponteiro (D-D7). A cor
-   vai em camada de imagem, para somar à faixa de cal do lido em vez de trocá-la. */
+   nem mudança de medida: o texto não se move. A luz nunca segue o ponteiro. A cor
+   vai em camada de imagem, para somar à faixa do lido em vez de trocá-la. */
 .linha-leitor[data-regua] .dispositivo {
   background-image: linear-gradient(var(--regua-fundo), var(--regua-fundo));
   box-shadow: inset 3px 0 0 var(--regua-barra);
@@ -2155,8 +2154,8 @@ button.estrela path.ponta {
   stroke-linejoin: round;
 }
 
-/* O aro (P4): a mesma estrela, mais gorda e na cor do fundo, por baixo. Corta a faixa de vidro em
-   volta da estrela, nos dois temas (à noite o contorno claro e a faixa clara se confundiriam). Só
+/* O aro (P4): a mesma estrela, mais gorda e na cor do fundo, por baixo. Corta a faixa do lido em
+   volta da estrela, nos dois temas (o contorno da estrela e a faixa não se misturam). Só
    a estrela que está sobre a faixa leva o aro. A cor segue o chão do lugar (--aro-da-estrela). */
 button.estrela path.aro {
   display: none;
@@ -2171,7 +2170,7 @@ button.estrela[data-origem='herdada'] path.aro {
   display: block;
 }
 
-/* Estrela de luz (D-D7): as quatro pontas em luz, com contorno na tinta. */
+/* Estrela de luz: as quatro pontas e o contorno na luz do mundo (a tinta de dia, a luz à noite). */
 button.estrela[data-origem='direta'] {
   color: var(--estrela-contorno);
 }
@@ -2240,7 +2239,7 @@ button.estrela:focus-visible {
 
 .dispositivo {
   /* O recuo do nível (data-recuo) entra por --recuo. A margem do lido (só na lista, ver
-     .lista-leitor) alarga a caixa dos dois lados sem mexer no texto: é a folga da faixa de cal. */
+     .lista-leitor) alarga a caixa dos dois lados sem mexer no texto: é a folga da faixa do lido. */
   --recuo: 0px;
   margin-inline: calc(var(--margem-do-lido, 0px) * -1);
   margin-inline-end: calc(var(--margem-do-lido-fim, var(--margem-do-lido, 0px)) * -1);
@@ -2791,8 +2790,8 @@ dialog.dialogo-acoes {
   margin: 0 0 1rem;
 }
 
-/* Dentro da folha a ação é o vidro (sem borda): o botão primário global só troca o par
-   --acao / --acao-texto e zera a borda. Na folha ocupa a largura e é mais alto. */
+/* Dentro da folha a ação é o botão primário na luz do mundo (sem borda): o botão primário global só
+   troca o par --acao / --acao-texto e zera a borda. Na folha ocupa a largura e é mais alto. */
 .acao-agora {
   --acao: var(--bloco-acao);
   --acao-texto: var(--bloco-acao-texto);
@@ -2831,7 +2830,7 @@ dialog.dialogo-acoes {
   color: var(--bloco-atenuado);
 }
 
-/* O botão de vidro e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */
+/* O botão primário e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */
 .agora-acoes {
   display: grid;
   gap: 0.375rem;
@@ -3218,7 +3217,7 @@ dialog.dialogo-previa .linha-acoes button {
 
 /* ── Fatia 6 (acabamento): linha de lista, selo e estado selecionado ───────── */
 
-/* Linha de lista (D-D7, P6): em linha sobre a areia, só o filete do `li` embaixo; sem cartão por item. */
+/* Linha de lista (D-D7, P6): em linha sobre o fundo, só o filete do `li` embaixo; sem cartão por item. */
 .lista-de-linhas > li {
   padding: 0;
   min-height: 0;
@@ -3279,7 +3278,7 @@ dialog.dialogo-previa .linha-acoes button {
 }
 
 /* Estado selecionado único: linha com a tinta do lugar e filete do lugar (filtros, disciplina,
-   Conta › Aparência); a marca do rádio carrega o bloco Marinho. */
+   Conta › Aparência); o rádio marcado leva o tom do lugar. */
 .opcao:has(input[type='radio']:checked),
 .filtro-escolha:has(input[type='radio']:checked) {
   background: var(--tinta-lugar);

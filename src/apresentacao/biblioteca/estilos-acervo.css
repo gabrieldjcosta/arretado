@@ -1,5 +1,5 @@
-/* Biblioteca › Acervo (pacote A, 16/10/2026; D-D7, P6): cada item é uma linha sobre a areia com a marca
-   de 22 px à esquerda (marcada = tinta cheia com a marca em cal, como a caixa), não um cartão por item.
+/* Biblioteca › Acervo (pacote A, 16/10/2026; D-D7, P6): cada item é uma linha sobre o fundo com a marca
+   de 22 px à esquerda (marcada = a luz do mundo cheia com a marca invertida, como a caixa), não um cartão por item.
    Só tokens existentes de cor, sem cor literal; alvos ≥ 44 px; contraste AA nos dois temas. */
 
 .item-acervo-botao {

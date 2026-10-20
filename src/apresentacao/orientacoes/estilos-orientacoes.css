@@ -1,4 +1,4 @@
-/* Orientações (D-D7, P6): o índice em linhas de 44 px sobre a areia, com filete, e o texto na
+/* Orientações (D-D7, P6): o índice em linhas de 44 px sobre o fundo, com filete, e o texto na
    medida de leitura (70 ch), em vez de uma lista de bolinhas com alvos de 21 px. */
 .documento p {
   max-width: 70ch;
