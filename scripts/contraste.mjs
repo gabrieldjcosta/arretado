@@ -147,13 +147,19 @@ export function pares(mundo = 'dia') {
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
-    // "Onde estou" (provisório até a Q2): o texto sobre o fundo da aba atual.
+    // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
     ['atual-texto', 'atual-fundo', 4.5],
     // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
     ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
+    // A casca (D-D9, Q2): o rótulo da aba atual é a luz do mundo, em texto de 13 a 15 px sobre o chão;
+    // o "+" do título é o texto sobre o fundo do controle; o ponto do lockup (a tinta de dia, o âmbar
+    // à noite) fica sobre o chão do cabeçalho.
+    ['luz', 'fundo', 4.5],
+    ['texto', 'fundo-controle', 4.5],
+    ['marca-ponto', 'fundo', 3],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;
