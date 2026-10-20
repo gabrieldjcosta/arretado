@@ -1820,12 +1820,17 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
         cal,
         borda: s.borderTopWidth,
         raio: s.borderTopLeftRadius,
+        sombra: s.boxShadow,
       };
     });
   const lido = await faixa(art3);
   const falta = await faixa(aposOLido);
   expect(lido.fundo, 'o lido vai sobre a cal').toBe(lido.cal);
   expect(falta.fundo, 'o que falta fica na areia').toBe('rgba(0, 0, 0, 0)');
+  // Folha e chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite): sem outro sinal a faixa
+  // do lido some. D-D9, Q3: ela leva a linha de 1 px do mundo (`--sombra-folha`, por dentro); o que falta, nenhuma.
+  expect(lido.sombra, 'o lido leva a linha da folha').toMatch(/ 1px inset$/);
+  expect(falta.sombra, 'o que falta não leva linha').toBe('none');
   // Mesma geometria lido ou não: a linha não muda de altura quando o "lido até" anda.
   expect([lido.borda, lido.raio]).toEqual(['3px', '8px']);
   expect([falta.borda, falta.raio]).toEqual(['3px', '8px']);
@@ -1839,7 +1844,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await expect(agora).toContainText('em leitura');
     const titulo2 = estrutura.getByRole('button', { name: /^TÍTULO II\b/ });
     await expect(titulo2).toContainText('ainda não lida');
-    await expect(titulo2.locator('svg')).toHaveCount(1);
+    // O ponto é um `span` que o CSS desenha por máscara (D-D9, Q3), não mais um SVG: o estado vai no atributo.
+    await expect(titulo2.locator('.ponto-de-luz')).toHaveAttribute('data-estado', 'falta');
     await apertar(titulo2, toque);
     const cabecalho = page.getByRole('heading', { level: 2, name: /TÍTULO II\b/ });
     await expect(cabecalho).toBeVisible();

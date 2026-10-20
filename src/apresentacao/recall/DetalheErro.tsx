@@ -158,7 +158,7 @@ function FormularioErro({ erro, temCartao }: { erro: Erro; temCartao: boolean })
           <button
             key={r}
             type="button"
-            className={rascunho.resultado === r ? 'principal' : ''}
+            className={rascunho.resultado === r ? 'chip principal' : 'chip'}
             aria-pressed={rascunho.resultado === r}
             onClick={() => {
               mudar({ resultado: r });

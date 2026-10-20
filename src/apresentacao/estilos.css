@@ -170,11 +170,11 @@
   --andamento: var(--luz);
   --lugar: var(--luz);
 
-  /* A folha do Agora (bloco-herói): a folha com o filete, sem sombra, e o botão da ação. */
+  /* A folha do Agora (bloco-herói): a folha com a linha do mundo (`--borda-folha`), sem sombra, e o
+     botão da ação. */
   --bloco-fundo: var(--superficie);
   --bloco-texto: var(--texto);
   --bloco-atenuado: var(--texto-atenuado);
-  --bloco-borda: transparent;
   --bloco-acao: var(--luz);
   --bloco-acao-texto: #ffffff;
   --bloco-acao-borda: transparent;
@@ -205,22 +205,38 @@
   --regua-fundo: rgb(15 28 58 / 6%);
   --regua-barra: var(--tinta-2);
 
-  /* A forma do mundo (D-D9): o dia é angular e leva filete; a noite é arredondada e sem filete. Os
-     papéis de raio de sempre apontam para estes. Literais de raio e componentes ficam para a Q3. */
+  /* A forma do mundo (D-D9; ligada nos componentes na Q3): o dia é angular, e o botão desce 1 px e
+     leva a sombra baixa junto; a noite é arredondada, sem sombra, e o botão encolhe um pouco. A folha
+     em repouso leva a linha do mundo de 1 px (a prancha mostra a `--borda`: #838FA7 de dia, #34425E à
+     noite), não o filete decorativo. O contorno e o fundo do controle (campo, chip, botão, "+") são
+     `--espessura-contorno` e `--fundo-controle`, da casca, acima. Os papéis de raio de sempre apontam
+     para estes. */
   --raio-botao: 6px;
   --raio-folha: 8px;
   --raio-chip: 6px;
   --sombra-botao: 0 2px 0 var(--tinta-funda);
-  --borda-folha: 1px solid var(--filete);
+  --aperto-botao: translateY(1px);
+  --sombra-botao-aperto: 0 1px 0 var(--tinta-funda);
+  --borda-folha: 1px solid var(--linha);
   --peso-titulo: 800;
+  --peso-titulo-folha: 800;
+  --espaco-titulo-folha: -0.02em;
   --raio-heroi: var(--raio-folha);
   --raio-cartao: var(--raio-folha);
   --raio-campo: var(--raio-botao);
   --raio-pilula: 999px;
   --raio: var(--raio-folha);
   --sombra: none;
-  --sombra-folha: inset 0 0 0 1px var(--filete);
+  --sombra-folha: inset 0 0 0 1px var(--linha);
   --sombra-flutuante: 0 4px 16px rgb(15 28 58 / 14%);
+
+  /* A forma dos pontos do Dia (componentes/luz.css as pinta com `--ponto-*`): de dia um rabisco (o anel
+     de caneta e a hachura de marca-texto, de lado a lado quando feito); à noite um círculo com o
+     miolo cheio ou pela metade. Máscaras de SVG de dados (a CSP libera em `img-src`); sem `;` nem
+     chaves, que o `scripts/contraste.mjs` não entende. O estado muda a forma, nunca só a cor. */
+  --forma-ponto-anel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --forma-ponto-atual: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3CclipPath id='c'%3E%3Cpath d='M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3'/%3E%3C/clipPath%3E%3Cpath clip-path='url(%23c)' d='M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --forma-ponto-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3CclipPath id='c'%3E%3Cpath d='M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3'/%3E%3C/clipPath%3E%3Cpath clip-path='url(%23c)' d='M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8 11.6 19.1 14.4 3.3 14.5 17.9 17.3 5.3 17.4 16.2 19 8.4' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 
   --superficie-translucida: rgb(255 255 255 / 90%);
 
@@ -301,10 +317,17 @@
     --raio-folha: 14px;
     --raio-chip: 10px;
     --sombra-botao: none;
-    --borda-folha: none;
+    --aperto-botao: scale(0.975);
+    --sombra-botao-aperto: none;
+    --borda-folha: 1px solid var(--n-borda);
     --peso-titulo: 700;
-    --sombra-folha: none;
+    --peso-titulo-folha: 600;
+    --espaco-titulo-folha: -0.005em;
+    --sombra-folha: inset 0 0 0 1px var(--n-borda);
     --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+    --forma-ponto-anel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E");
+    --forma-ponto-atual: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M11 3A8 8 0 0 0 11 19Z'/%3E%3C/svg%3E");
+    --forma-ponto-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3C/svg%3E");
     --superficie-translucida: rgb(19 29 49 / 90%);
     --fonte-titulo: 'Familjen Grotesk', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
     color-scheme: dark;
@@ -368,10 +391,17 @@
   --raio-folha: 14px;
   --raio-chip: 10px;
   --sombra-botao: none;
-  --borda-folha: none;
+  --aperto-botao: scale(0.975);
+  --sombra-botao-aperto: none;
+  --borda-folha: 1px solid var(--n-borda);
   --peso-titulo: 700;
-  --sombra-folha: none;
+  --peso-titulo-folha: 600;
+  --espaco-titulo-folha: -0.005em;
+  --sombra-folha: inset 0 0 0 1px var(--n-borda);
   --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
+  --forma-ponto-anel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E");
+  --forma-ponto-atual: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M11 3A8 8 0 0 0 11 19Z'/%3E%3C/svg%3E");
+  --forma-ponto-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3C/svg%3E");
   --superficie-translucida: rgb(19 29 49 / 90%);
   --fonte-titulo: 'Familjen Grotesk', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
   color-scheme: dark;
@@ -900,10 +930,11 @@ button,
 
 /* ── Componentes ───────────────────────────────────────────────────────── */
 
-/* Botão secundário: contorno de 1 px, fundo da superfície, compacto (12 px de raio, sem pílula). É o
-   botão de qualquer ação que não seja "a" ação da tela, que é a `.principal`. Quem precisa de outro
-   fundo (transparente, opaco sobre o texto) o declara na própria regra, que vence esta. O hover troca
-   só a variável do fundo, então não mexe em quem tem fundo próprio. */
+/* Botão secundário (D-D9, Q3): o contorno do mundo (1,5 px de dia, 1 px à noite) em --borda-botao
+   (≥ 3:1), o fundo do controle, o raio do botão (6 px de dia, 12 à noite). É o botão de qualquer ação
+   que não seja "a" ação da tela, que é a `.principal`. Quem precisa de outro fundo (transparente,
+   opaco sobre o texto) o declara na própria regra, que vence esta. O hover troca só a variável do
+   fundo, então não mexe em quem tem fundo próprio. */
 button,
 .botao {
   font: inherit;
@@ -914,8 +945,8 @@ button,
   min-width: var(--alvo);
   padding: 0 1.25rem;
   border-radius: var(--raio-botao);
-  border: 1px solid var(--borda-botao);
-  background: var(--botao-fundo, var(--superficie));
+  border: var(--espessura-contorno) solid var(--borda-botao);
+  background: var(--botao-fundo, var(--fundo-controle));
   color: var(--texto);
   cursor: pointer;
   display: inline-flex;
@@ -945,15 +976,17 @@ button:disabled,
   box-shadow: none;
 }
 
+/* O aperto é o do mundo: de dia o botão desce 1 px e a sombra baixa junto (o botão afunda no papel);
+   à noite ele encolhe um pouco (a luz cede ao toque). */
 button:not(:disabled):active,
 .botao:active {
-  transform: translateY(1px);
+  transform: var(--aperto-botao);
 }
 
 @media (hover: hover) {
   button:not(:disabled):hover,
   .botao:hover {
-    --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--superficie));
+    --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--fundo-controle));
   }
 }
 
@@ -964,6 +997,10 @@ button:not(:disabled):active,
   border: 1.5px solid var(--acao-borda, transparent);
   color: var(--acao-texto);
   box-shadow: var(--sombra-botao);
+}
+
+.principal:not(:disabled, [aria-pressed='true']):active {
+  box-shadow: var(--sombra-botao-aperto);
 }
 
 @media (hover: hover) {
@@ -1001,6 +1038,27 @@ dialog .perigoso {
   color: var(--perigo-texto);
 }
 
+/* O hover do destrutivo (D-D9, Q3): o contorno ganha 8% de perigo no fundo; no diálogo, o cheio cede 12%
+   para o texto. A letra segue a 5,4:1 ou mais nos dois mundos. */
+@media (hover: hover) {
+  .perigoso:not(:disabled):hover {
+    background: color-mix(in srgb, var(--perigo) 8%, var(--fundo-controle));
+  }
+
+  dialog .perigoso:not(:disabled):hover {
+    background: color-mix(in srgb, var(--perigo) 88%, var(--perigo-texto));
+  }
+}
+
+/* Chip (D-D9, Q3): o botão de alternar em grupo ("Errei", o filtro de estado dos cartões), com
+   `aria-pressed`. Mais justo que o botão e com o raio do chip (6 px de dia, 10 à noite); ligado, leva
+   a luz cheia da `.principal[aria-pressed='true']` e continua do mesmo tamanho, sem pular de largura. */
+.chip {
+  padding: 0 0.875rem;
+  border-radius: var(--raio-chip);
+  font-size: 0.875rem;
+}
+
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
    onde está (a tinta, na página e na folha). Sem opacidade (D-D7): numa dica, a cor herdada já é a
    atenuada, e a 82% ela cai para 3,8:1 na areia. Alvo de 44 px. `.discreto` é o mesmo botão (antes
@@ -1010,7 +1068,7 @@ dialog .perigoso {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  border-radius: 12px;
+  border-radius: var(--raio-botao);
   padding: 0 0.75rem;
   color: inherit;
   font-size: 0.875rem;
@@ -1072,9 +1130,11 @@ dialog .perigoso {
   text-decoration: none;
 }
 
-/* Campos: todo input (com ou sem type), select e textarea. Altura 48, contorno de 1,5 px em
-   --borda-campo (≥ 3:1), raio 12 e 16 px (o iOS aproxima a tela abaixo disso). O `:where` deixa a
-   especificidade em zero, então o CSS de cada pacote ajusta largura e flex sem briga. */
+/* Campos: todo input (com ou sem type), select e textarea. Altura 48, o contorno do mundo (1,5 px de
+   dia, 1 px à noite) em --borda-campo (≥ 3:1), o raio do botão e 16 px de letra (o iOS aproxima a tela
+   abaixo disso). O fundo é o da superfície, e não o do controle: à noite o contorno (--n-linha) tem
+   3:1 sobre a serra, mas só 2,7:1 sobre a serra 2. O `:where` deixa a especificidade em zero, então o
+   CSS de cada pacote ajusta largura e flex sem briga. */
 :where(
   input:not(
     [type='checkbox'],
@@ -1095,7 +1155,7 @@ dialog .perigoso {
   width: 100%;
   min-height: 48px;
   padding: 0.625rem 0.875rem;
-  border: 1.5px solid var(--borda-campo);
+  border: var(--espessura-contorno) solid var(--borda-campo);
   border-radius: var(--raio-campo);
   background: var(--superficie);
   color: var(--texto);
@@ -1174,8 +1234,9 @@ input[type='radio'] {
   cursor: pointer;
 }
 
+/* A caixa tem a metade do raio do botão: 3 px de dia (angular), 6 px à noite. */
 input[type='checkbox'] {
-  border-radius: 6px;
+  border-radius: calc(var(--raio-botao) / 2);
 }
 
 input[type='radio'] {
@@ -1263,10 +1324,13 @@ legend {
   padding: 0 0.25rem;
 }
 
+/* O cartão comum e a folha do Agora (D-D9, Q3) levam a mesma linha de 1 px do mundo (`--borda-folha`) e o
+   raio da folha: folha e chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite), então é a
+   linha e o raio que fazem o cartão. */
 .cartao-bloco {
   background: var(--superficie);
   background-image: none;
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
   padding: 1.25rem;
   margin-bottom: 1rem;
@@ -1302,11 +1366,15 @@ legend {
   border-bottom: 1px solid var(--borda);
 }
 
+/* O estado vazio é uma folha (D-D9, Q3; na prancha `vazio` é a folha do Agora sem dados): o fundo e a
+   linha de 1 px do mundo, e os botões de dentro só com o contorno (o fundo do controle é o da folha). */
 .vazio {
+  --fundo-controle: var(--superficie);
   text-align: center;
   padding: 2rem 1rem;
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
-  background: color-mix(in srgb, var(--superficie-2) 60%, transparent);
+  background: var(--superficie);
 }
 
 .vazio p {
@@ -1323,7 +1391,7 @@ legend {
 .esqueleto span {
   display: block;
   height: 1rem;
-  border-radius: 8px;
+  border-radius: var(--raio-chip);
   background: var(--superficie-2);
 }
 
@@ -1421,14 +1489,16 @@ th.numero {
 
 /* ── Recall ────────────────────────────────────────────────────────────── */
 
-/* Abas: trilho em pílula; a aba atual é o item selecionado (bloco verde, ver mais acima). No celular o
-   trilho rola na horizontal em vez de quebrar linha ou alargar a página. */
+/* Abas de página (D-D9, Q3): um trilho com a forma do mundo (o raio do botão mais o recuo de 4 px do
+   trilho, para as curvas serem concêntricas: 10 px de dia, 16 à noite), e cada aba com o raio do
+   botão. A atual é "onde estou" (a folha com o contorno e o rótulo em negrito, ver mais acima). No
+   celular o trilho rola na horizontal em vez de quebrar linha ou alargar a página. */
 .abas {
   display: flex;
   gap: 0.25rem;
   margin: 1.25rem 0 1rem;
   padding: 0.25rem;
-  border-radius: var(--raio-pilula);
+  border-radius: calc(var(--raio-botao) + 0.25rem);
   background: var(--superficie-2);
   overflow-x: auto;
   scrollbar-width: none;
@@ -1446,9 +1516,16 @@ th.numero {
   min-height: var(--alvo);
   padding: 0 1rem;
   color: var(--texto);
+  font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
-  border-radius: var(--raio-pilula);
+  border-radius: var(--raio-botao);
+}
+
+@media (hover: hover) {
+  .abas a:not([aria-current='page']):hover {
+    background: color-mix(in srgb, var(--texto) 6%, transparent);
+  }
 }
 
 /* O anel de foco por dentro: o trilho que rola cortaria o de fora. Dentro do item selecionado
@@ -1968,7 +2045,7 @@ dialog.dialogo-busca {
 .linha-leitor.achado-da-busca .dispositivo {
   outline: 2px solid var(--cacto);
   outline-offset: 2px;
-  border-radius: 8px;
+  border-radius: var(--raio-folha);
 }
 
 /* Régua de leitura (fatia 4): realce da linha sob o dedo, o cursor ou o foco. Só cor, sem animação
@@ -2211,19 +2288,28 @@ button.estrela:focus-visible {
   }
 }
 
-/* O lido (P4): na lista, da primeira linha ao "lido até aqui", o texto vai sobre a faixa de cal
-   (raio 8, com 12 px de folga de cada lado); o que falta fica na areia. A geometria é a mesma lido
-   ou não (a faixa só pinta o miolo, e a borda transparente dá o vão de 6 px entre as faixas), para
-   a linha não mudar de altura quando o "lido até" anda. */
+/* O lido (P4): na lista, da primeira linha ao "lido até aqui", o texto vai sobre a faixa da folha
+   (raio da folha, com 12 px de folga de cada lado); o que falta fica no chão. Folha e chão quase não
+   se separam pela cor (1,06:1 de dia, 1,10:1 à noite), então a faixa leva a linha de 1 px do mundo
+   (D-D9, Q3). A geometria é a mesma lido ou não (a faixa só pinta o miolo, e a borda transparente dá o
+   vão de 6 px entre as faixas), para a linha não mudar de altura quando o "lido até" anda. */
 .lista-leitor .dispositivo {
   border-block: 3px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--raio-folha);
   background-clip: padding-box;
   padding-block: calc(0.35rem - 3px);
 }
 
 .lista-leitor .linha-leitor[data-lido] .dispositivo {
   background-color: var(--superficie);
+  box-shadow: var(--sombra-folha);
+}
+
+/* Sob a régua de leitura a barra de 3 px (acima) e a linha do lido somam, em vez de uma tirar a outra. */
+.lista-leitor .linha-leitor[data-lido][data-regua] .dispositivo {
+  box-shadow:
+    inset 3px 0 0 var(--regua-barra),
+    var(--sombra-folha);
 }
 
 /* Cores forçadas pintam a borda transparente (o vão entre as faixas) com a cor do texto: ela passa a
@@ -2690,16 +2776,16 @@ dialog.dialogo-acoes {
 
 /* ── Redesign, fatia 2: agora / depois, barra fina, dias ───────────────────── */
 
-/* A folha do Agora (D-D7): cal com a sombra fresca, sobre a areia. */
+/* A folha do Agora (D-D9, Q3): a folha sobre o chão, com a linha do mundo (`--borda-folha`) e o raio
+   da folha (8 px de dia, 14 à noite). */
 .acao-agora {
   position: relative;
   background: var(--bloco-fundo);
   color: var(--bloco-texto);
-  border: 1px solid var(--bloco-borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-heroi);
   padding: 1.25rem;
   margin: 0 0 1rem;
-  box-shadow: var(--sombra-folha);
 }
 
 /* Dentro da folha a ação é o vidro (sem borda): o botão primário global só troca o par
@@ -2710,6 +2796,9 @@ dialog.dialogo-acoes {
   --acao-borda: var(--bloco-acao-borda, transparent);
   --foco: var(--bloco-foco);
   --link: var(--bloco-texto);
+  /* Os controles na folha só têm o contorno: o fundo deles é o da própria folha (na prancha, o
+     botão secundário da noite é transparente sobre a serra). */
+  --fundo-controle: var(--bloco-fundo);
 }
 
 .acao-agora .principal {
@@ -2717,14 +2806,16 @@ dialog.dialogo-acoes {
   width: 100%;
   justify-content: center;
   font-size: 1.0625rem;
+  font-weight: 700;
 }
 
 .agora-titulo {
   font-family: var(--fonte-titulo);
-  font-weight: 750;
-  line-height: 1.12;
+  font-weight: var(--peso-titulo-folha);
+  letter-spacing: var(--espaco-titulo-folha);
+  line-height: 1.15;
   margin: 0 0 0.25rem;
-  font-size: 1.5rem;
+  font-size: 1.625rem;
 }
 
 .agora-motivo {
@@ -2881,9 +2972,8 @@ dialog.dialogo-acoes {
   background: var(--luz-do-cartao);
   /* O aro da estrela corta a faixa na cor do chão de quem a segura: aqui, a luz do cartão. */
   --aro-da-estrela: var(--luz-do-cartao);
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
-  box-shadow: var(--sombra-folha);
 }
 
 /* O cartão rola por dentro e corta o que passa do recuo dele (1rem): a caixa da estrela cabe nele. */

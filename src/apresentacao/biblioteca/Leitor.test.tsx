@@ -2262,7 +2262,10 @@ describe('Ponto de luz no Leitor (P4)', () => {
       const secao1 = await within(estrutura).findByRole('button', {
         name: /^Seção I Disposições Gerais, lida$/,
       });
-      expect(secao1).toHaveAttribute('aria-current', 'location');
+      // O "lido" chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera.
+      await waitFor(() => {
+        expect(secao1).toHaveAttribute('aria-current', 'location');
+      });
       expect(within(estrutura).queryByRole('list', { name: /^Dentro de/ })).toBeNull();
       expect(
         within(estrutura).getByRole('button', { name: /^Seção II Dos Regimes, ainda não lida$/ }),
