@@ -632,10 +632,10 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
     window.scrollBy(0, el.getBoundingClientRect().top - 140);
   });
   await page.waitForTimeout(1200);
-  // Sair grava a posição; a Biblioteca diz onde parou e quanto falta, no mesmo botão de sempre.
+  // Sair grava a posição; a Biblioteca diz onde continuar e quanto falta, no mesmo botão de sempre.
   await page.getByRole('link', { name: 'Biblioteca' }).first().click();
   const agora = page.getByRole('region', { name: 'Agora' });
-  await expect(agora.getByRole('heading')).toContainText('Você parou no');
+  await expect(agora.getByRole('heading')).toContainText('Continuar a leitura no');
   await expect(agora).toContainText(/cerca de \d+ min/);
   await expect(agora.getByRole('link', { name: 'Continuar leitura: LEP' })).toBeVisible();
   await semViolacoes(page);

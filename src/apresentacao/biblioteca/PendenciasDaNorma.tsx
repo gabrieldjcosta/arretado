@@ -13,7 +13,7 @@ const QUE_FICOU: Record<PendenciaDeReleitura['tipo'], string> = {
   erro: 'Erro',
   vinculo: 'Vínculo com disciplina',
   lido_ate: 'Lido até',
-  posicao: 'Onde você parou',
+  posicao: 'Onde continuar a leitura',
   precedente: 'Precedente vinculado',
 };
 
