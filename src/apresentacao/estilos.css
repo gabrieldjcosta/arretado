@@ -1366,11 +1366,15 @@ legend {
   border-bottom: 1px solid var(--borda);
 }
 
+/* O estado vazio é uma folha (D-D9, Q3; na prancha `vazio` é a folha do Agora sem dados): o fundo e a
+   linha de 1 px do mundo, e os botões de dentro só com o contorno (o fundo do controle é o da folha). */
 .vazio {
+  --fundo-controle: var(--superficie);
   text-align: center;
   padding: 2rem 1rem;
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
-  background: color-mix(in srgb, var(--superficie-2) 60%, transparent);
+  background: var(--superficie);
 }
 
 .vazio p {
