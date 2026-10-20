@@ -1673,7 +1673,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 
 ### E2E `conta-migracao.spec.ts` falha em "heading Entrar" ou mostra "Tela não encontrada" (A4)
 - **Causa:** (1) o build do E2E não liga `VITE_CONTA`, então as rotas da conta não existem; ligar faria a tela Entrar falar com o Supabase real. (2) Com várias worktrees, o `reuseExistingServer` do Playwright reaproveita o `vite preview` da porta 4173 de outra worktree: o teste roda contra o app errado.
-- **Solução:** o spec está em `test.fixme()` até haver serviço de conta falso no build de teste (escolha do Gabriel). Para rodar E2E numa worktree com a 4173 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
+- **Solução:** (1) resolvida na T30: os `e2e/conta-*.spec.ts` rodam nos projetos `conta-*` (build `--mode e2e-conta`, serviço de conta falso, porta 4174), sem `test.fixme()`; ver o último item desta seção. (2) Para rodar E2E numa worktree com a 4173 ou a 4174 ocupada, usar uma config local que estenda `playwright.config.ts` com outra porta e `reuseExistingServer: false`; não matar o servidor da outra worktree.
 
 ### Apagar tudo e recomeçar com conta ativa deixa o app sem identidade (A7)
 - **Causa:** apagar só o banco da conta e manter a conta ativa no registro faz o app recriar um banco com `usuarioId` aleatório, não o `uid`.
@@ -1682,6 +1682,10 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 ### Aceite do login não aparece em Usuario.consentimentos (A7)
 - **Causa:** o aceite acontece antes de a conta existir no Aparelho (e o login do Google sai da página); ele só é gravado quando Conta abre já dentro do banco da conta ativa. Sem `localStorage`, a tela Entrar recusa entrar.
 - **Solução:** abrir Conta depois de entrar (`RegistrarAceite`); a marca fica até haver conta ativa com banco aberto.
+
+### E2E da conta falha com `/conta/entrar` inexistente ou falando com o Supabase (T30)
+- **Causa:** os `e2e/conta-*.spec.ts` só rodam nos projetos `conta-*` (porta 4174, build `--mode e2e-conta`); no build padrão (`VITE_CONTA=0`) as rotas de conta não existem.
+- **Solução:** `npx playwright test e2e/conta --project=conta-desktop --workers=1`. O estado do serviço falso vive em `localStorage` (chave `arretado:e2e-conta`), então cada teste começa limpo. Confirmar que o pacote de produção não leva o falso: `VITE_CONTA=1 npx vite build --outDir node_modules/.tmp-prod --emptyOutDir` e `grep -l ServicoDeContaFalso node_modules/.tmp-prod/assets/*.js` (vazio).
 
 ## A caneta que desenha (D-D8, 19/10/2026)
 
