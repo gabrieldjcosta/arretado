@@ -9,6 +9,7 @@ import {
   suspenderCartao,
 } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
+import { Icone } from '../componentes/Icone';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { hoje } from '../../dominios/recall/servico';
 import { formatarData, ROTULO_ESTADO } from './rotulos';
@@ -76,12 +77,14 @@ export function ListaCartoes() {
             {dados.itens.map((c) => (
               <li key={c.id}>
                 <span>
-                  <Link to={`/recall/cartoes/${c.id}`}>{c.frente || '(sem frente)'}</Link>
+                  <Link to={`/recall/cartoes/${c.id}`} className="cartao-frente">
+                    {c.frente || '(sem frente)'}
+                  </Link>
                   <br />
                   {c.estado === 'ativo' && c.proximaRevisao <= hojeCivil && (
                     <span className="estado-texto estado-vencido">
-                      <span aria-hidden="true">! </span>
-                      Vencido
+                      <Icone nome="relogio" />
+                      Para revisar
                     </span>
                   )}{' '}
                   <span className="dica">

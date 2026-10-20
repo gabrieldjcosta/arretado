@@ -22,11 +22,6 @@
   margin: var(--espaco-3) 0;
 }
 
-.importar-ajuda-ia summary {
-  cursor: pointer;
-  padding: 0 0.5rem;
-}
-
 .importar-ajuda-ia-conteudo {
   margin-top: var(--espaco-2);
 }

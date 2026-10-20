@@ -23,12 +23,19 @@ export function Atual() {
   if (sessao === undefined) return <Esqueleto />;
   if (sessao === null) {
     return (
-      <Vazio
-        titulo="Nenhuma Sessão aberta"
-        acao={<Link to="/sessao/iniciar">Começar uma Sessão</Link>}
-      >
-        <p>Quando quiser estudar, comece uma Sessão em um toque.</p>
-      </Vazio>
+      <>
+        <h1>Sessão</h1>
+        <Vazio
+          titulo="Nenhuma Sessão aberta"
+          acao={
+            <Link to="/sessao/iniciar" className="botao principal">
+              Começar uma Sessão
+            </Link>
+          }
+        >
+          <p>Quando quiser estudar, comece uma Sessão em um toque.</p>
+        </Vazio>
+      </>
     );
   }
   return <SessaoEmAndamento sessao={sessao} />;
@@ -52,18 +59,10 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
         <p className="sessao-resumo">{sessao.alvo?.rotulo ?? 'Sessão livre'}</p>
         {sessao.fronteira && <p className="sessao-detalhe">Até onde: {sessao.fronteira}</p>}
         <p className="sessao-detalhe">Começou às {horaDeInicio(sessao.inicio)}.</p>
-        {pausada ? (
+        {pausada && (
           <p className="sessao-pausada" role="status">
             Pausada. Sem pressa: volte quando quiser.
           </p>
-        ) : (
-          destino !== undefined && (
-            <p>
-              <Link to={destino}>
-                {sessao.alvo?.tipo === 'leitura' ? 'Abrir a leitura' : 'Abrir a revisão'}
-              </Link>
-            </p>
-          )
         )}
         <div className="linha-acoes">
           {pausada ? (
@@ -77,16 +76,23 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
               Voltar à Sessão
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => {
-                mudar(pausarSessao);
-              }}
-            >
-              Pausar
-            </button>
+            <>
+              {destino !== undefined && (
+                <Link to={destino} className="botao principal">
+                  {sessao.alvo?.tipo === 'leitura' ? 'Abrir a leitura' : 'Abrir a revisão'}
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  mudar(pausarSessao);
+                }}
+              >
+                Pausar
+              </button>
+            </>
           )}
-          <Link to="/sessao/fechar" className="botao discreto">
+          <Link to="/sessao/fechar" className="botao botao-texto">
             Encerrar
           </Link>
         </div>

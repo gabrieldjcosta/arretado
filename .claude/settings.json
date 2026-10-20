@@ -6,5 +6,9 @@
       { "matcher": "Bash", "hooks": [{ "type": "command", "command": "node .claude/hooks/check-antes-do-commit.mjs", "timeout": 600 }] }
     ],
     "Stop": [{ "hooks": [{ "type": "command", "command": "node .claude/hooks/parada.mjs", "timeout": 600 }] }]
-  }
+  },
+  "extraKnownMarketplaces": {
+    "thedotmack": { "source": { "source": "github", "repo": "thedotmack/claude-mem", "ref": "v14.0.1" } }
+  },
+  "enabledPlugins": { "claude-mem@thedotmack": true }
 }

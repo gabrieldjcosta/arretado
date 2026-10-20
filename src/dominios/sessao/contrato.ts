@@ -8,6 +8,9 @@ export interface EntradaDeSessao {
   alvo?: AlvoDeAcao;
   origemDaAcao?: OrigemDaAcao;
   tarefaId?: string;
+  /** Ciclo e bloco que a Sessão trabalha (a posição do Ciclo sai das Sessões encerradas). */
+  cicloId?: string;
+  blocoOrdem?: number;
   /** Até onde ler ("até o art. 15"); opcional. */
   fronteira?: string;
   temporizadorMin?: number;
@@ -16,6 +19,9 @@ export interface EntradaDeSessao {
 export interface FechamentoDeSessao {
   /** Próximo passo pequeno; vem pré-preenchido e a pessoa pode deixar em branco. */
   proximoPasso?: string;
+  /** Questões feitas na Sessão e quantas acertou; opcionais, alimentam o desempenho do Ciclo. */
+  questoesFeitas?: number;
+  questoesAcertadas?: number;
 }
 
 /** Assinaturas. O A2 implementa em `servico.ts`; o A3a, `estacionar`, em `estacionamento.ts`. */

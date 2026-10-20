@@ -17,7 +17,3 @@
 .sessao-aberta {
   margin-bottom: 1rem;
 }
-
-.sessao-aberta .principal {
-  min-height: var(--alvo);
-}

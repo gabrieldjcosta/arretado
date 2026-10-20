@@ -4,9 +4,12 @@ import { expect, test } from './apoio';
 const ROTAS = [
   '/',
   '/plano',
+  '/plano/pontos',
+  '/plano/tarefas',
   '/recall',
   '/recall/registrar',
   '/recall/frases',
+  '/recall/erros',
   '/recall/cartoes',
   '/recall/historico',
   '/recall/revisar',
@@ -14,12 +17,15 @@ const ROTAS = [
   '/recall/cartoes/novo',
   '/biblioteca',
   '/biblioteca/importar',
+  '/biblioteca/acervo',
   '/conta',
   '/conta/aparencia',
   '/conta/perfis',
   '/conta/dados',
   '/conta/privacidade',
   '/orientacoes',
+  '/sessao/atual',
+  '/sessao/iniciar',
 ];
 
 for (const esquema of ['light', 'dark'] as const) {
@@ -54,15 +60,20 @@ for (const esquema of ['light', 'dark'] as const) {
   });
 }
 
-// Botões, links de botão, navegação e seletor de arquivo: 44 px nas duas medidas, em todas as rotas
-// principais (o link no meio de frase é a única exceção e não entra aqui). Os projetos mudam a
-// navegação (barra de baixo, barra de cima), então a conferência roda nos três.
+// Botões, links de botão, `summary` de botão, linhas de lista, navegação e seletor de arquivo: 44 px nas
+// duas medidas, em todas as rotas principais (o link no meio de frase é a única exceção e não entra
+// aqui). Os projetos mudam a navegação (barra de baixo, barra de cima), então a conferência roda nos
+// três.
 for (const rota of ROTAS) {
   test(`${rota}: alvos de toque têm pelo menos 44 px`, async ({ page }) => {
     await page.goto(`/#${rota}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const pequenos = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('button, a.botao, .areas a, input[type="file"]'))
+      Array.from(
+        document.querySelectorAll(
+          'button, a.botao, summary.botao, a.linha-lista, .areas a, input[type="file"]',
+        ),
+      )
         .map((el) => {
           const r = el.getBoundingClientRect();
           return { texto: el.textContent.trim(), h: r.height, w: r.width };
@@ -106,31 +117,36 @@ test('navegação por teclado: foco visível e pular para o conteúdo', async ({
 test('as fontes embutidas carregam (T19)', async ({ page }) => {
   await page.goto('/#/recall');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  // `document.fonts.check` só vale depois de a fonte ter sido pedida: força o pedido das três
-  // (a Gabarito dos títulos, D-D7, é variável: um arquivo serve de 400 a 900).
+  // `document.fonts.check` só vale depois de a fonte ter sido pedida: força o pedido das cinco.
+  // Os títulos têm uma letra por mundo (D-D9): a Schibsted Grotesk do Dia (800) e a Familjen
+  // Grotesk da Noite (700), ambas variáveis (um arquivo serve de 400 ao peso máximo).
   const carregadas = await page.evaluate(async () => {
     await Promise.all([
       document.fonts.load("400 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.load("700 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.load("400 16px 'Literata'"),
-      document.fonts.load("800 16px 'Gabarito'"),
+      document.fonts.load("800 16px 'Schibsted Grotesk'"),
+      document.fonts.load("700 16px 'Familjen Grotesk'"),
     ]);
-    // Uma família sem face declarada também passa no `check`: confere que a face da Gabarito
-    // existe e carregou.
-    let gabaritoCarregada = false;
+    // Uma família sem face declarada também passa no `check`: confere que a face de cada letra
+    // dos títulos existe e carregou.
+    const facesCarregadas = new Set<string>();
     document.fonts.forEach((f) => {
-      if (f.family.replace(/["']/g, '') === 'Gabarito' && f.status === 'loaded')
-        gabaritoCarregada = true;
+      if (f.status === 'loaded') facesCarregadas.add(f.family.replace(/["']/g, ''));
     });
     return [
       document.fonts.check("400 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("700 16px 'Atkinson Hyperlegible Next'"),
       document.fonts.check("400 16px 'Literata'"),
-      document.fonts.check("800 16px 'Gabarito'"),
-      gabaritoCarregada,
+      document.fonts.check("800 16px 'Schibsted Grotesk'"),
+      document.fonts.check("700 16px 'Familjen Grotesk'"),
+      facesCarregadas.has('Schibsted Grotesk'),
+      facesCarregadas.has('Familjen Grotesk'),
+      facesCarregadas.has('Gabarito'),
     ];
   });
-  expect(carregadas).toEqual([true, true, true, true, true]);
+  // A Gabarito (D-D7) saiu: nenhuma face dela fica declarada.
+  expect(carregadas).toEqual([true, true, true, true, true, true, true, false]);
 });
 
 test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px e atalho E (P2)', async ({

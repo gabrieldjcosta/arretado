@@ -17,6 +17,8 @@ import {
 import type { EntradaDoIndice, IndiceDoAcervo, TipoDoAcervo } from '../../dominios/acervo/esquemas';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone } from '../componentes/Icone';
+import { Voltar } from '../componentes/Voltar';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { disciplinasSugeridas } from '../../dominios/acervo/vinculos';
@@ -221,10 +223,8 @@ export function Acervo() {
         <Esqueleto />
       ) : (
         <>
-          <div className="cabecalho-secao">
-            <h2>Acervo: {TITULO_DO_TIPO[tipo]}</h2>
-            <Link to="/biblioteca">Voltar à Biblioteca</Link>
-          </div>
+          <Voltar para="/biblioteca">Voltar à Biblioteca</Voltar>
+          <h2>Acervo: {TITULO_DO_TIPO[tipo]}</h2>
           {visiveis.length === 0 && busca === '' ? (
             <Vazio titulo={`Ainda não há ${TITULO_DO_TIPO[tipo]} no acervo`}>
               <p>Quando houver, elas aparecem aqui para você adicionar.</p>
@@ -359,11 +359,9 @@ export function Acervo() {
                               alternar(i.id);
                             }}
                           >
-                            {escolhido && (
-                              <span className="item-acervo-icone" aria-hidden="true">
-                                ✓
-                              </span>
-                            )}
+                            <span className="item-acervo-marca" aria-hidden="true">
+                              {(escolhido || jaTem) && <Icone nome="marca" />}
+                            </span>
                             <span className="item-acervo-corpo">
                               <strong>{i.titulo}</strong>
                               <span className="dica">
@@ -383,7 +381,7 @@ export function Acervo() {
                                 type="button"
                                 className="botao-texto"
                                 disabled={ocupado}
-                                aria-label={`Alterar a disciplina de ${i.titulo}`}
+                                aria-label={`Alterar disciplina de ${i.titulo}`}
                                 onClick={() => {
                                   setEscolhendo(i);
                                 }}
@@ -393,8 +391,9 @@ export function Acervo() {
                             </p>
                           )}
                           {parecida && (
-                            <p className="aviso">
-                              Você já tem uma norma parecida: {parecida.tituloCurto}.
+                            <p className="aviso-compacto dica">
+                              <Icone nome="info" />
+                              <span>Você já tem uma norma parecida: {parecida.tituloCurto}.</span>
                             </p>
                           )}
                           {jaTem && novaDe.has(i.id) && (
@@ -413,18 +412,14 @@ export function Acervo() {
                           )}
                           {i.avisos.length === 1 ? (
                             <p className="aviso-compacto dica">
-                              <span className="aviso-compacto-icone" aria-hidden="true">
-                                ⓘ
-                              </span>{' '}
+                              <Icone nome="info" />
                               <span>{i.avisos[0]}</span>
                             </p>
                           ) : i.avisos.length > 1 ? (
                             <ul className="avisos-compactos dica">
                               {i.avisos.map((a) => (
                                 <li key={a}>
-                                  <span className="aviso-compacto-icone" aria-hidden="true">
-                                    ⓘ
-                                  </span>{' '}
+                                  <Icone nome="info" />
                                   <span>{a}</span>
                                 </li>
                               ))}

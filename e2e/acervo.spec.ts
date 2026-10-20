@@ -103,7 +103,7 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
   await page.goto('/#/biblioteca/acervo');
   const lep = page.getByRole('region', { name: 'Execução Penal' });
   await expect(lep.getByText('Disciplinas sugeridas: Execução Penal')).toBeVisible();
-  await page.getByRole('button', { name: 'Alterar a disciplina de LEP' }).click();
+  await page.getByRole('button', { name: 'Alterar disciplina de LEP' }).click();
   const dialogo = page.getByRole('dialog');
   await semViolacoes(page);
   await dialogo.getByRole('checkbox', { name: 'Execução Penal' }).uncheck();
@@ -118,7 +118,7 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
   await expect(page.getByRole('group', { name: 'Outras' }).getByText('LEP')).toBeVisible();
-  await page.getByRole('button', { name: 'Mudar a disciplina de LEP' }).click();
+  await page.getByRole('button', { name: 'Mudar disciplina de LEP' }).click();
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();

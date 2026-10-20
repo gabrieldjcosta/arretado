@@ -2,7 +2,13 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event';
 import { alterarPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
-import { criarCartaoDeErro, criarCartaoManual, registrarErro } from '../../dominios/recall/servico';
+import {
+  criarCartaoDeErro,
+  criarCartaoManual,
+  criarFraseDeTrecho,
+  registrarErro,
+} from '../../dominios/recall/servico';
+import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
@@ -142,7 +148,7 @@ describe('completar depois (6.3)', () => {
       fraseCorreta: 'F.',
       causa: 'lacuna',
     });
-    const { usuario } = await abrir('/recall', repo);
+    const { usuario } = await abrir('/recall/erros', repo);
     const lista = await screen.findByRole('list');
     expect(within(lista).getAllByRole('listitem')).toHaveLength(2);
     expect(within(lista).getAllByText('completar')).toHaveLength(1);
@@ -212,7 +218,7 @@ describe('correções da revisão da etapa 6', () => {
     const erro = await erroAntigo(repo, 'Sursis');
     const { usuario } = await abrir(`/recall/erros/${erro.id}`, repo);
     await usuario.type(await screen.findByLabelText('Frase correta'), 'Suspensão condicional.');
-    await usuario.click(screen.getByRole('link', { name: 'Voltar ao Fixar' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar aos erros' }));
     await waitFor(async () => {
       expect((await repo.colecao('erros').obter(erro.id))?.fraseCorreta).toBe(
         'Suspensão condicional.',
@@ -353,5 +359,205 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Revisar mais/ })).not.toBeInTheDocument();
     expect(await repo.colecao('revisoes').contar()).toBe(25);
+  });
+});
+
+describe('a passagem do cartão (A caneta que desenha)', () => {
+  /** O jsdom não anima: cada `animate` vira uma animação já terminada e o teste vê o que foi pedido. */
+  const pedidos: Keyframe[][] = [];
+  const saidas = () => pedidos.filter((q) => q.some((f) => f.transform === 'translateX(-28px)'));
+
+  beforeEach(() => {
+    pedidos.length = 0;
+    Object.assign(Element.prototype, {
+      animate: (keyframes: Keyframe[]) => {
+        pedidos.push(keyframes);
+        return {
+          finished: Promise.resolve(),
+          cancel: () => undefined,
+          addEventListener: () => undefined,
+        };
+      },
+    });
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(Element.prototype, 'animate');
+  });
+
+  it('Drill: o cartão sai e o seguinte entra; o último cartão não passa, o fim da rodada toma a tela', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    // Saiu 190 ms para a esquerda e o novo entrou 210 ms pela direita.
+    expect(saidas()).toHaveLength(1);
+    expect(pedidos).toHaveLength(2);
+    expect(await repo.colecao('revisoes').contar()).toBe(1);
+
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(saidas()).toHaveLength(1);
+    expect(await repo.colecao('revisoes').contar()).toBe(2);
+  });
+
+  it('Frases: a frase passa para a seguinte pelo clique ou pela tecla', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    const trecho = (n: number) => ({
+      dispositivoId: '11111111-1111-4111-8111-111111111111',
+      texto: `trecho ${String(n)}`,
+      inicio: 0,
+      fim: 7,
+    });
+    await criarFraseDeTrecho(repo, { texto: 'Frase um', trecho: trecho(1) });
+    await criarFraseDeTrecho(repo, { texto: 'Frase dois', trecho: trecho(2) });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/frases/revisar', repo);
+
+    await screen.findByText('1 de 2');
+    await usuario.click(screen.getByRole('button', { name: /Fácil/ }));
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(saidas()).toHaveLength(1);
+    expect(await repo.colecao('revisoesFrase').contar()).toBe(1);
+  });
+
+  it('com o perfil Calmo nas Preferências, o cartão só esmaece: nada se desloca', async () => {
+    simularMovimento('normal');
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    await alterarPreferencias(repo, { perfilDeEstudo: 'calmo' });
+    const { usuario } = await abrir('/recall/revisar', repo);
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(pedidos.length).toBeGreaterThanOrEqual(2);
+    expect(pedidos.flat().some((f) => f.transform !== undefined)).toBe(false);
+  });
+
+  it('com movimento reduzido, troca na hora e nada é animado', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Primeira', verso: 'v1' });
+    await criarCartaoManual(repo, { frente: 'Segunda', verso: 'v2' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    await screen.findByText('1 de 2');
+    await usuario.keyboard(' ');
+    await screen.findByRole('group', { name: 'Como foi?' });
+    await usuario.keyboard('3');
+    expect(await screen.findByText('2 de 2')).toBeInTheDocument();
+    expect(pedidos).toHaveLength(0);
+  });
+});
+
+describe('Fixar na P5 do Ponto de luz', () => {
+  const canetas = () => [...document.querySelectorAll<SVGElement>('svg.caneta')];
+
+  it('abas Frases · Cartões · Histórico: /recall cai nas Frases e os Erros ficam em /recall/erros', async () => {
+    const { repo } = await repositorioDeTeste();
+    await registrarErro(repo, { resultado: 'errou', fraseCorreta: 'Frase A.' });
+    const { usuario } = await abrir('/recall', repo);
+    const abas = await screen.findByRole('navigation', { name: 'Seções do Fixar' });
+    expect(
+      within(abas)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Frases', 'Cartões', 'Histórico']);
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/recall/frases');
+    });
+    await usuario.click(await screen.findByRole('link', { name: 'Ver os erros, com filtros' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/recall/erros');
+    const linha = (await screen.findAllByRole('listitem'))[0];
+    expect(linha).toHaveTextContent('Errei');
+    expect(linha?.querySelector('svg.icone-svg')).not.toBeNull();
+    await usuario.click(screen.getByRole('link', { name: 'Voltar às frases' }));
+    expect(await screen.findByRole('link', { name: 'Frase A.' })).toBeInTheDocument();
+  });
+
+  it('cada frase oferece "Esconder trecho", que abre o cartão de lacuna dela', async () => {
+    const { repo } = await repositorioDeTeste();
+    await registrarErro(repo, { resultado: 'errou', fraseCorreta: 'Frase A.' });
+    const [frase] = await repo.colecao('frases').todosDoUsuario();
+    const { usuario } = await abrir('/recall/frases', repo);
+    await usuario.click(await screen.findByRole('link', { name: 'Esconder trecho: Frase A.' }));
+    expect(window.location.hash).toBe(`#/recall/frases/${frase?.id ?? ''}/cartao`);
+  });
+
+  it('sem nenhuma frase (Erro antigo, sem frase correta), a aba ainda leva aos Erros e o detalhe volta a eles', async () => {
+    const { repo } = await repositorioDeTeste();
+    const erro = await erroAntigo(repo, 'Sursis');
+    const { usuario } = await abrir('/recall/frases', repo);
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Nenhuma frase ainda' }),
+    ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('link', { name: 'Ver os erros, com filtros' }));
+    await usuario.click(await screen.findByRole('link', { name: /Sursis/ }));
+    expect(window.location.hash).toBe(`#/recall/erros/${erro.id}`);
+    await usuario.click(await screen.findByRole('link', { name: 'Voltar aos erros' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/recall/erros');
+  });
+
+  it('cartões: o que já está no prazo diz "Para revisar", com desenho', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    relogio.avancar(86_400_000);
+    await abrir('/recall/cartoes', repo);
+    const estado = await screen.findByText('Para revisar');
+    expect(estado.querySelector('svg.icone-svg')).not.toBeNull();
+  });
+
+  it('cartões: uma caneta encostada fora do cartão, respostas com desenho e, no fim, a deitada', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    expect(await screen.findByText('Frente 1')).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+    expect(screen.getByRole('article', { name: 'Cartão' }).contains(canetas()[0] ?? null)).toBe(
+      false,
+    );
+    await usuario.keyboard(' ');
+    const respostas = within(await screen.findByRole('group', { name: 'Como foi?' })).getAllByRole(
+      'button',
+    );
+    expect(respostas.map((b) => b.textContent)).toEqual(['De novo', 'Difícil', 'Fácil']);
+    for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
+    await usuario.keyboard('3');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
+  });
+
+  it('frases: a mesma caneta encostada, respostas com desenho e a deitada no fim', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await registrarErro(repo, { fraseCorreta: 'Frase do dia.' });
+    relogio.avancar(86_400_000);
+    const { usuario } = await abrir('/recall/frases/revisar', repo);
+    expect(await screen.findByText('Frase do dia.')).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+    const respostas = within(screen.getByRole('group', { name: 'Como foi?' })).getAllByRole(
+      'button',
+    );
+    expect(respostas.map((b) => b.textContent)).toEqual(['Fácil', 'De novo']);
+    for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
+    await usuario.keyboard('1');
+    expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
+    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
   });
 });

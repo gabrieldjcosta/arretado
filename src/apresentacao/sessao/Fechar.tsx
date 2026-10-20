@@ -25,9 +25,19 @@ export function Fechar() {
   if (sessao === undefined) return <Esqueleto />;
   if (sessao === null) {
     return (
-      <Vazio titulo="Nenhuma Sessão aberta" acao={<Link to="/">Ir para o Hoje</Link>}>
-        <p>Não há o que encerrar.</p>
-      </Vazio>
+      <>
+        <h1>Encerrar a Sessão</h1>
+        <Vazio
+          titulo="Nenhuma Sessão aberta"
+          acao={
+            <Link to="/" className="botao principal">
+              Ir para o Hoje
+            </Link>
+          }
+        >
+          <p>Não há o que encerrar.</p>
+        </Vazio>
+      </>
     );
   }
   return <FormularioDeFechamento sessao={sessao} aoEncerrar={setEncerrada} repo={repo} />;
@@ -44,9 +54,15 @@ function FormularioDeFechamento({
 }) {
   const [passo, setPasso] = useState(() => sugerirProximoPasso(sessao));
   const [erro, setErro] = useState(false);
+  const [feitas, setFeitas] = useState('');
+  const [acertos, setAcertos] = useState('');
   const encerrar = () => {
     setErro(false);
-    encerrarSessao(repo, sessao.id, { proximoPasso: passo }).then(aoEncerrar, () => {
+    encerrarSessao(repo, sessao.id, {
+      proximoPasso: passo,
+      questoesFeitas: Number(feitas) || 0,
+      questoesAcertadas: Number(acertos) || 0,
+    }).then(aoEncerrar, () => {
       setErro(true);
     });
   };
@@ -70,6 +86,38 @@ function FormularioDeFechamento({
             Um passo pequeno para a próxima vez. Pode apagar e deixar em branco.
           </p>
         </div>
+        <details>
+          <summary className="botao botao-texto na-margem">Fez questões? (opcional)</summary>
+          <div className="campo">
+            <label htmlFor="sessao-feitas">Questões feitas</label>
+            <input
+              id="sessao-feitas"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={999}
+              value={feitas}
+              onChange={(e) => {
+                setFeitas(e.target.value);
+              }}
+            />
+          </div>
+          <div className="campo">
+            <label htmlFor="sessao-acertos">Quantas acertou</label>
+            <input
+              id="sessao-acertos"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={999}
+              value={acertos}
+              onChange={(e) => {
+                setAcertos(e.target.value);
+              }}
+            />
+          </div>
+          <p className="dica">Ajuda o ciclo a sugerir mais vezes a matéria em que você erra.</p>
+        </details>
         <div className="linha-acoes">
           <button type="button" className="principal" onClick={encerrar}>
             Encerrar
@@ -87,12 +135,22 @@ function FormularioDeFechamento({
 
 function Encerrada({ sessao }: { sessao: Sessao }) {
   return (
-    <Vazio titulo="Sessão encerrada" acao={<Link to="/">Ir para o Hoje</Link>}>
-      {sessao.proximoPasso ? (
-        <p>Próximo passo guardado: {sessao.proximoPasso}</p>
-      ) : (
-        <p>Bom descanso. Você decide o que vem depois.</p>
-      )}
-    </Vazio>
+    <>
+      <h1>Encerrar a Sessão</h1>
+      <Vazio
+        titulo="Sessão encerrada"
+        acao={
+          <Link to="/" className="botao principal">
+            Ir para o Hoje
+          </Link>
+        }
+      >
+        {sessao.proximoPasso ? (
+          <p>Próximo passo guardado: {sessao.proximoPasso}</p>
+        ) : (
+          <p>Bom descanso. Você decide o que vem depois.</p>
+        )}
+      </Vazio>
+    </>
   );
 }

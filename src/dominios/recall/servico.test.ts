@@ -6,6 +6,7 @@ import {
   contarFrasesVencidas,
   contarVencidos,
   criarCartaoDeLacuna,
+  criarCartoesDeLacuna,
   criarCartaoDeDispositivo,
   criarFraseDeTrecho,
   criarCartaoDeErro,
@@ -532,5 +533,20 @@ describe('Revisar frases e cartão com lacuna (Frases 2)', () => {
     const doErro = await criarCartaoDeErro(repo, erro.id);
     expect(doErro.id).not.toBe(c.id);
     await expect(criarCartaoDeLacuna(repo, frase.id, [])).rejects.toThrow(/Selecione/);
+  });
+
+  it('um cartão por trecho esconde um de cada vez', async () => {
+    const { repo } = await preparar();
+    const erro = await registrarErro(repo, { fraseCorreta: 'A pena é de 6 meses.' });
+    const frase = (await fraseDoErro(repo, erro.id))!;
+    const ocultos = [
+      { inicio: 12, fim: 13 },
+      { inicio: 14, fim: 20 },
+    ];
+    const juntos = await criarCartoesDeLacuna(repo, frase.id, ocultos);
+    expect(juntos).toHaveLength(1);
+    const separados = await criarCartoesDeLacuna(repo, frase.id, ocultos, true);
+    expect(separados.map((c) => c.frente)).toEqual(['A pena é de […] meses.', 'A pena é de 6 […]']);
+    await expect(criarCartoesDeLacuna(repo, frase.id, [], true)).rejects.toThrow(/Selecione/);
   });
 });

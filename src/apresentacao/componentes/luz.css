@@ -1,6 +1,7 @@
-/* O ponto de luz, a caneta e o traço do cachorro (D-D7, P3). Vetores decorativos: nenhum leva texto.
-   As cores vêm dos tokens (`--ponto-*`, `--caneta-*`, `--traco-cachorro` em estilos.css); o tema
-   troca o vidro, o brilho e o halo sem que o componente saiba. */
+/* O ponto de luz e a caneta (D-D7, P3). Vetores decorativos: nenhum leva texto. As cores vêm dos
+   tokens (`--ponto-*`, `--caneta-*` em estilos.css); o tema troca o vidro, o brilho e o halo sem
+   que o componente saiba. D-D9: o halo é o `--ponto-halo` do mundo (lima de dia, âmbar à noite); o
+   vidro (`--caneta-*`) é provisório e a caneta de vidro nova o refaz na Q4. */
 
 /* ── Ponto de luz ─────────────────────────────────────────────────────── */
 
@@ -102,57 +103,11 @@
 }
 
 .caneta-halo-dia {
-  fill: var(--noite-vidro);
+  fill: var(--ponto-halo);
   opacity: var(--caneta-halo-dia);
 }
 
 .caneta-halo-noite {
-  fill: var(--noite-vidro);
+  fill: var(--ponto-halo);
   opacity: var(--caneta-halo-noite);
-}
-
-/* ── Traço do cachorro ────────────────────────────────────────────────── */
-
-.traco-do-cachorro {
-  display: block;
-  color: var(--traco-cachorro);
-}
-
-.traco-linha {
-  fill: none;
-  stroke: currentcolor;
-  stroke-width: 3.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.traco-ponto {
-  fill: currentcolor;
-}
-
-/* Ao fechar o Dia o traço se desenha uma vez, em 300 ms e em linha reta (linear); olho e focinho
-   aparecem ao fim. Sem a classe `desenha`, ou com movimento reduzido, o cachorro já está pronto. */
-@media (prefers-reduced-motion: no-preference) {
-  .traco-do-cachorro.desenha .traco-linha {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    animation: traco-desenha 300ms linear forwards;
-  }
-
-  .traco-do-cachorro.desenha .traco-ponto {
-    opacity: 0;
-    animation: traco-aparece 1ms linear 300ms forwards;
-  }
-}
-
-@keyframes traco-desenha {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes traco-aparece {
-  to {
-    opacity: 1;
-  }
 }

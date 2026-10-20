@@ -112,7 +112,7 @@ export type Dia = z.infer<typeof Dia>;
  * leitura salva (norma); `tarefa` = Tarefa de estudo; `ponto` = ponto do programa; `livre` = a pessoa
  * escolheu sem sugestão. O `id` aponta para o item quando houver; o `rotulo` é o texto mostrado.
  */
-export const TipoDeAlvo = z.enum(['revisao', 'leitura', 'tarefa', 'ponto', 'livre']);
+export const TipoDeAlvo = z.enum(['revisao', 'leitura', 'tarefa', 'ponto', 'livre', 'ciclo']);
 export type TipoDeAlvo = z.infer<typeof TipoDeAlvo>;
 
 export const AlvoDeAcao = z.strictObject({
@@ -124,7 +124,14 @@ export type AlvoDeAcao = z.infer<typeof AlvoDeAcao>;
 
 /** De onde veio a Próxima ação que originou a Sessão (cópia do que foi mostrado; não é recalculado). */
 export const OrigemDaAcao = z.strictObject({
-  tipo: z.enum(['revisao_vencida', 'leitura_salva', 'tarefa', 'escolha_propria', 'sessao_curta']),
+  tipo: z.enum([
+    'revisao_vencida',
+    'leitura_salva',
+    'tarefa',
+    'escolha_propria',
+    'sessao_curta',
+    'ciclo',
+  ]),
   razao: TextoCurto.optional(),
 });
 export type OrigemDaAcao = z.infer<typeof OrigemDaAcao>;
@@ -164,6 +171,9 @@ export const Sessao = z.strictObject({
   tarefaId: Id.optional(),
   /** Temporizador opcional escolhido para esta Sessão; informativo, nunca bloqueia nem mede aprendizado. */
   temporizadorMin: z.int().min(1).max(240).optional(),
+  /** Ciclo e bloco (posição na volta) que a Sessão trabalha; a posição do Ciclo vem destas Sessões (v9). */
+  cicloId: Id.optional(),
+  blocoOrdem: z.int().min(0).optional(),
   conteudosAcessados: z
     .array(z.strictObject({ tipo: z.enum(['norma', 'nota', 'precedente']), id: Id, em: Instante }))
     .optional(),
@@ -202,3 +212,55 @@ export const TarefaDeEstudo = z.strictObject({
   concluidaEm: Instante.optional(),
 });
 export type TarefaDeEstudo = z.infer<typeof TarefaDeEstudo>;
+
+/** Uma parada da volta do Ciclo: matéria + minutos. A ordem é a do array. */
+export const BlocoDoCiclo = z.strictObject({
+  disciplinaId: Id,
+  minutos: z.int().min(5).max(240),
+});
+export type BlocoDoCiclo = z.infer<typeof BlocoDoCiclo>;
+
+export const PesoDoCiclo = z.strictObject({
+  disciplinaId: Id,
+  /** Aparições por volta (1 a 4). */
+  peso: z.int().min(1).max(4),
+});
+export type PesoDoCiclo = z.infer<typeof PesoDoCiclo>;
+
+export const ModeloDeCiclo = z.enum(['equilibrado', 'reforco', 'reta_final', 'igual', 'manual']);
+export type ModeloDeCiclo = z.infer<typeof ModeloDeCiclo>;
+
+/**
+ * Ciclo de estudo (F3, v9; plano em planos/trilha-adaptavel-e-ciclos.md): blocos que a pessoa
+ * percorre e repete em voltas. A posição atual e o nº da volta não são gravados: saem das Sessões
+ * com `cicloId` (uma só fonte de verdade, sem conflito no sync). No máximo um `ativo`.
+ */
+export const Ciclo = z.strictObject({
+  ...camposComuns,
+  nome: TextoCurto,
+  concursoId: Id.optional(),
+  modelo: ModeloDeCiclo,
+  blocos: z.array(BlocoDoCiclo).min(1).max(40),
+  /** Pesos de que os blocos saíram; permitem reajustar sem perder a escolha da pessoa. */
+  pesos: z.array(PesoDoCiclo).max(40),
+  ativo: z.boolean().optional(),
+  /** Blocos que a pessoa pulou sem Sessão; entram na posição como uma Sessão encerrada. */
+  pulos: z
+    .array(z.strictObject({ em: Instante, blocoOrdem: z.int().min(0) }))
+    .max(500)
+    .optional(),
+  /** Mudanças de peso, no molde do `logPrioridade` dos pontos. */
+  logDePesos: z
+    .array(
+      z.strictObject({
+        em: Instante,
+        disciplinaId: Id,
+        antes: z.int().min(1).max(4),
+        depois: z.int().min(1).max(4),
+        origem: z.enum(['manual', 'erro', 'incidencia', 'modelo']),
+        motivo: TextoCurto.optional(),
+      }),
+    )
+    .optional(),
+});
+export type Ciclo = z.infer<typeof Ciclo>;

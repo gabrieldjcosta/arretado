@@ -7,15 +7,17 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
   type RefObject,
   type TouchEvent as ReactTouchEvent,
 } from 'react';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type {
   Dispositivo as DispositivoDoModelo,
+  Intervalo,
   Leitura,
   Marcacao,
   TextoDeDispositivo,
@@ -41,9 +43,14 @@ import {
 import { gravarPosicao, marcarLidoAte, obterLeitura } from '../../dominios/legislacao/leituras';
 import type { ResultadoDaCorrecao } from '../../dominios/legislacao/correcao';
 import { SO_VETADO } from '../../dominios/legislacao/redacoes';
-import { criarFraseDeTrecho } from '../../dominios/recall/servico';
+import { criarCartoesDeLacuna, criarFraseDeTrecho } from '../../dominios/recall/servico';
+import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
+import { Caneta } from '../componentes/Caneta';
+import { Icone } from '../componentes/Icone';
+import { Voltar } from '../componentes/Voltar';
+import { useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
@@ -51,7 +58,9 @@ import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
+import { EstruturaDaNorma } from './EstruturaDaNorma';
 import { dispositivosComErro } from './errosVinculados';
+import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
@@ -94,6 +103,8 @@ const TAMANHO_MAXIMO = 32;
 const PASSO_DO_TAMANHO = 2;
 const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
+/** A partir daqui (tablet em pé) a estrutura da norma fica ao lado do texto (P4). */
+const LARGURA_DA_ESTRUTURA = 700;
 /** Quanto tempo a origem da estrela fica por extenso acima do grupo fixo, depois do toque. */
 const AVISO_DA_ESTRELA = 4_000;
 
@@ -102,12 +113,29 @@ const AVISO_DA_ESTRELA = 4_000;
  * só mostra o fim (menos que isso) já foi lida. Também absorve a rolagem arredondada ao voltar.
  */
 const FOLGA_DO_ALTO = 8;
+/**
+ * A linha de leitura da estrutura da norma: esta fração da tela abaixo da barra fixa. O olho não
+ * está no alto da tela, então o bloco que acaba de entrar já é o de agora.
+ */
+const FRACAO_DA_LEITURA = 0.25;
 /** Rolagem parada por este tempo grava a posição (gravar a cada evento escreveria sem parar). */
 const ESPERA_PARA_GRAVAR = 800;
 /** Quadros seguidos com a linha no lugar para dar a volta à posição por concluída. */
 const QUADROS_NO_LUGAR = 3;
 /** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
 const LIMITE_PARA_VOLTAR = 2000;
+/** Quadros em que o alto da tela é reconferido depois de trocar o modo foco (as linhas se remedem). */
+const QUADROS_DA_TROCA = 12;
+/** As teclas que rolam a página: a pessoa rolando encerra a conferência do alto (F e Esc, não). */
+const TECLAS_DE_ROLAGEM = new Set([
+  'PageUp',
+  'PageDown',
+  'Home',
+  'End',
+  'ArrowUp',
+  'ArrowDown',
+  ' ',
+]);
 /** Atalho da busca na norma (11.6): não é F (modo foco) nem E (registrar erro). */
 const TECLA_DA_BUSCA = '/';
 /**
@@ -269,9 +297,9 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
   }
   return (
     <>
-      <p>
-        <Link to="/biblioteca">← Biblioteca</Link>
-      </p>
+      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
+        Biblioteca
+      </Voltar>
       {carga.tipo === 'carregando' ? (
         <Esqueleto />
       ) : carga.excecao instanceof NormaIndisponivel ? (
@@ -569,17 +597,28 @@ function LeitorAberto({
       setVoltando(volta !== undefined);
       setRetorno((r) => ({ linha: volta, vez: r.vez + 1 }));
     } else if (!antes && porArtigo) {
+      // A lista sai da página com as linhas medidas na largura de agora. A estrutura da norma (700
+      // a 1199 px) some no modo foco, então a coluna da lista que volta tem outra largura, e o que
+      // o virtualizador guardou é de outra: cada linha de cima encolhe ao ser medida de novo, e essa
+      // remedida ele só compensa com a rolagem parada ou indo para baixo. Descartadas aqui, a lista
+      // que volta mede as linhas como numa abertura nova, cuja primeira medida ele sempre compensa.
+      measure();
       window.scrollTo(0, 0);
     }
-  }, [porArtigo, ordem, unidades, linhas, artigoAtual]);
+  }, [porArtigo, ordem, unidades, linhas, artigoAtual, measure]);
 
   // Modo foco (11.1): a moldura do Shell some (atributo na raiz; ver estilos.css) e o leitor tira a
-  // barra dele. A troca muda só o que fica acima da lista, não as linhas (a coluna tem a mesma
-  // largura): o mesmo dispositivo continua no alto da tela, na mesma altura dentro da linha. A
-  // conta parte da rolagem de antes da troca (o navegador pode já tê-la ajustado ao tirar a
-  // moldura), é feita antes da pintura e conferida no quadro seguinte. Durante a volta à posição
-  // guardada (9.7), quem acerta a rolagem é a volta, que já confere a cada quadro.
+  // barra dele. A troca muda o que fica acima da lista e, com a estrutura ao lado (700 a 1199 px),
+  // a largura da coluna: o mesmo dispositivo continua no alto da tela, na mesma altura dentro da
+  // linha. A conta parte da rolagem de antes da troca (o navegador pode já tê-la ajustado ao tirar a
+  // moldura), é feita antes da pintura e conferida nos quadros seguintes (as linhas se remedem).
+  // Durante a volta à posição guardada (9.7), quem acerta a rolagem é a volta, que já confere a
+  // cada quadro.
   const focoAntes = useRef(modoFoco);
+  // A linha do alto (e o quanto dela já passou) de uma troca que ainda confere o alto: a troca
+  // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou. Cada
+  // execução do efeito a consome, então uma conferência interrompida não deixa âncora velha.
+  const ancoraDaTroca = useRef<{ index: number; dentro: number } | undefined>(undefined);
   // O controle com o foco do teclado saiu da tela na troca (a barra do leitor, a do Shell): o foco
   // vai para o botão do canto, em vez de cair no corpo da página.
   const devolverFoco = useRef(false);
@@ -597,11 +636,18 @@ function LeitorAberto({
     }
     // Ainda nas medidas de antes da troca: o virtualizador só as refaz depois de `medir`.
     const margemAntes = margemMedida.current;
-    const alto = rolagem.current + barraFixaMedida.current;
-    const item = virtualizador.getVirtualItemForOffset(alto + FOLGA_DO_ALTO);
+    const pendente = trocou ? ancoraDaTroca.current : undefined;
+    ancoraDaTroca.current = undefined;
+    const daAncora =
+      pendente && virtualizador.getVirtualItems().find((v) => v.index === pendente.index);
+    const alto = daAncora
+      ? daAncora.start + pendente.dentro
+      : rolagem.current + barraFixaMedida.current;
+    const item = daAncora || virtualizador.getVirtualItemForOffset(alto + FOLGA_DO_ALTO);
     caixaDoLeitor.current?.style.removeProperty('--folga-do-foco');
     medir();
     let quadro = 0;
+    const encerrar = new AbortController();
     if (trocou && !voltandoAgora.current && item !== undefined && !porArtigoAgora.current) {
       const dentro = alto - item.start;
       if (item.index === 0 && dentro <= 0) {
@@ -614,25 +660,56 @@ function LeitorAberto({
         );
         // Perto do fim, a moldura que saiu encurta a página e a rolagem seria cortada (o texto
         // desceria e o dispositivo do alto mudaria): a folga do modo foco repõe o que faltou.
-        const maximo = document.documentElement.scrollHeight - window.innerHeight;
-        if (modoFoco && destino > maximo) {
-          caixaDoLeitor.current?.style.setProperty(
-            '--folga-do-foco',
-            `${String(Math.ceil(destino - maximo))}px`,
-          );
-        }
+        let folga = 0;
+        const garantirRolagem = (alvo: number) => {
+          const maximo = document.documentElement.scrollHeight - window.innerHeight;
+          if (!modoFoco || alvo <= maximo) return;
+          folga += Math.ceil(alvo - maximo);
+          caixaDoLeitor.current?.style.setProperty('--folga-do-foco', `${String(folga)}px`);
+        };
+        garantirRolagem(destino);
         window.scrollTo(0, destino);
-        quadro = requestAnimationFrame(() => {
+        // Com a estrutura ao lado (700 a 1199 px) a coluna do texto muda de largura na troca: as
+        // linhas de cima só são remedidas depois da pintura e o alto sai do lugar (o virtualizador
+        // não compensa quando a rolagem acabou de subir). Por isso a conferência dura alguns
+        // quadros, e a rolagem da pessoa a encerra.
+        let restantes = QUADROS_DA_TROCA;
+        ancoraDaTroca.current = { index: item.index, dentro };
+        const conferir = () => {
+          if (restantes <= 0) return;
           const desenhada = lista.current?.querySelector(`[data-index="${String(item.index)}"]`);
-          if (!desenhada) return;
-          const erro = desenhada.getBoundingClientRect().top - (barraFixaMedida.current - dentro);
-          if (Math.abs(erro) > 1) window.scrollBy(0, erro);
-        });
+          if (desenhada) {
+            const erro = desenhada.getBoundingClientRect().top - (barraFixaMedida.current - dentro);
+            if (Math.abs(erro) > 1) {
+              garantirRolagem(window.scrollY + erro);
+              window.scrollBy(0, erro);
+            }
+          }
+          restantes -= 1;
+          if (restantes > 0) quadro = requestAnimationFrame(conferir);
+          else ancoraDaTroca.current = undefined;
+        };
+        quadro = requestAnimationFrame(conferir);
+        const parar = (e: Event) => {
+          if (e instanceof KeyboardEvent) {
+            // Só a tecla que rola a página, e não a que age dentro de um campo (a busca, um seletor).
+            if (!TECLAS_DE_ROLAGEM.has(e.key)) return;
+            if (e.target instanceof Element && e.target.closest('input, select, textarea, dialog'))
+              return;
+          }
+          restantes = 0;
+          ancoraDaTroca.current = undefined;
+          cancelAnimationFrame(quadro);
+        };
+        for (const gesto of ['wheel', 'touchmove', 'keydown']) {
+          window.addEventListener(gesto, parar, { passive: true, signal: encerrar.signal });
+        }
       }
       rolagem.current = window.scrollY;
     }
     return () => {
       cancelAnimationFrame(quadro);
+      encerrar.abort();
       delete raiz.dataset.modoFoco;
     };
   }, [modoFoco, porArtigo, medir, virtualizador]);
@@ -949,6 +1026,39 @@ function LeitorAberto({
     return false;
   }
 
+  // A estrutura da norma (P4): ao lado do texto a partir do tablet em pé, fora do modo foco. O corpo
+  // do Leitor (a lista ou o cartão) é o mesmo nos dois casos: o painel só entra antes dele.
+  const estrutura = useMemo(() => indiceDaEstrutura(nos), [nos]);
+  const larguraDeTablet = useLarguraMinima(LARGURA_DA_ESTRUTURA);
+  const comEstrutura = larguraDeTablet && !modoFoco && temEstrutura(estrutura);
+  // O nó da leitura, para a estrutura: o primeiro cabeçalho de bloco entre o alto da tela e a linha de
+  // leitura (um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho,
+  // o nó do alto. O olho chega ao cabeçalho antes de ele chegar ao alto, e tocar numa seção da
+  // estrutura (que a leva ao alto) a deixa como a de agora, não um bloco de dentro dela.
+  const noDaLeitura = useCallback((): number | undefined => {
+    if (porArtigoAgora.current) {
+      const id = artigoNoAlto.current;
+      return id === undefined ? undefined : aberta.indiceDe.get(id);
+    }
+    const alto = window.scrollY + barraFixaMedida.current + FOLGA_DO_ALTO;
+    const visivel = window.innerHeight - barraFixaMedida.current;
+    const noPe = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    const doAlto = virtualizador.getVirtualItemForOffset(alto);
+    const daLeitura = virtualizador.getVirtualItemForOffset(
+      alto + (noPe ? visivel : visivel * FRACAO_DA_LEITURA),
+    );
+    if (doAlto === undefined || daLeitura === undefined) return undefined;
+    for (let i = doAlto.index; i <= daLeitura.index; i++) {
+      const indice = linhas[i]?.indice;
+      const no = indice === undefined ? undefined : nos[indice];
+      if (no && ehBloco(no)) return indice;
+    }
+    return linhas[doAlto.index]?.indice;
+  }, [virtualizador, linhas, nos, aberta.indiceDe]);
+  function irAoBloco(indice: number) {
+    if (irAoNo(indice)) setAnuncio('Filtro desligado para mostrar este bloco.');
+  }
+
   function irAoLidoAte() {
     if (indiceLidoAte === undefined) return;
     if (irAoNo(indiceLidoAte)) setAnuncio('Filtro desligado para mostrar onde você parou.');
@@ -1159,7 +1269,7 @@ function LeitorAberto({
     { trecho: SelecaoNoTexto; texto: string } | { id: string } | undefined
   >(undefined);
   const [fraseAberta, setFraseAberta] = useState<
-    { trecho: SelecaoNoTexto; texto: string } | undefined
+    { trecho: SelecaoNoTexto; texto: string; ocultos?: Intervalo[] } | undefined
   >(undefined);
   const tocouNasAcoes = useRef(-Infinity);
   const temSelecao = useRef(false);
@@ -1241,6 +1351,38 @@ function LeitorAberto({
     if (!s) return;
     setFraseAberta({ trecho: s, texto: textoDaSelecao(s) });
     limparSelecao();
+  }
+  /** Os grifos do dispositivo viram as lacunas: abre o envio às frases já com eles escondidos. */
+  function cartaoDosGrifosDe(grifo: Marcacao) {
+    const indice = aberta.indiceDe.get(grifo.dispositivoId);
+    const trechos = indice === undefined ? undefined : textos.get(indice)?.texto?.trechos;
+    if (!trechos) return;
+    if (trechos.some((t) => t.tachado === true)) {
+      setAnuncio(
+        'Há trecho revogado neste dispositivo: selecione o trecho e use Enviar às frases.',
+      );
+      return;
+    }
+    const gravado = trechos.map((t) => t.texto).join('');
+    const { texto, ocultos } = ocultosDosGrifos(
+      gravado,
+      marcacoes.porDispositivo.get(grifo.dispositivoId) ?? [],
+    );
+    if (ocultos.length === 0) {
+      setAnuncio('Os grifos deste dispositivo não cabem no texto.');
+      return;
+    }
+    setEscolhidaId(undefined);
+    setFraseAberta({
+      trecho: {
+        dispositivoId: grifo.dispositivoId,
+        inicio: 0,
+        fim: gravado.length,
+        cortada: false,
+      },
+      texto,
+      ocultos,
+    });
   }
   function anotarGrifo(grifo: Marcacao) {
     setEscolhidaId(undefined);
@@ -1473,13 +1615,16 @@ function LeitorAberto({
     });
   }
 
-  // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até".
+  // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até". Do começo
+  // da norma até o "lido até" (inclusive) a linha é lida (`data-lido`): na lista, vai sobre a faixa
+  // de cal; o cartão não usa a faixa.
   function propriedadesDaLinha(linha: LinhaDoLeitor) {
     const dispositivo = nos[linha.indice]?.dispositivo;
     const id = dispositivo?.id ?? '';
     const estado = dispositivo && estrelavel(dispositivo) ? estrelas.estados.get(id) : undefined;
     return {
       className: id === achadoId ? 'linha-leitor achado-da-busca' : 'linha-leitor',
+      'data-lido': indiceLidoAte !== undefined && linha.indice <= indiceLidoAte ? '' : undefined,
       'data-estrelada': estado?.estrelado ? '' : undefined,
       'data-contexto': filtro && !filtro.casados.has(linha.indice) ? '' : undefined,
       'data-linha-id': id === '' ? undefined : id,
@@ -1516,7 +1661,12 @@ function LeitorAberto({
             )
           }
         />
-        {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
+        {id === lidoAte && (
+          <p className="marca-lido-ate">
+            Lido até aqui
+            <Caneta pose="deitada" className="caneta-do-lido" />
+          </p>
+        )}
       </>
     );
   }
@@ -1626,7 +1776,12 @@ function LeitorAberto({
   // do leitor (tamanho do texto, destaques), a legenda e a referência do "lido até" ficam fora.
   // O título continua como cabeçalho da página, só para o leitor de tela.
   return (
-    <div ref={caixaDoLeitor} className={modoFoco ? 'leitor em-foco' : 'leitor'}>
+    <div
+      ref={caixaDoLeitor}
+      className={modoFoco ? 'leitor em-foco' : 'leitor'}
+      // A estrutura da norma e o trilho de ferramentas se alinham pelo fim do cabeçalho preso.
+      style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
+    >
       {modoFoco ? (
         <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
       ) : (
@@ -1647,13 +1802,13 @@ function LeitorAberto({
       {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
-      {!modoFoco && destacar && <LegendaDestaques />}
+      {!modoFoco && destacar && <LegendaDestaques curta />}
       {!modoFoco && referenciaLidoAte && (
         <p className="lido-ate">
           <span>
             Lido até <strong>{referenciaLidoAte}</strong>
           </span>
-          <button type="button" className="discreto" onClick={irAoLidoAte}>
+          <button type="button" className="botao-texto na-margem" onClick={irAoLidoAte}>
             Ir ao lido até
           </button>
         </p>
@@ -1725,112 +1880,126 @@ function LeitorAberto({
           Se continuar, feche as outras abas do Arretado.
         </p>
       )}
-      {porArtigo ? (
-        <div
-          key="artigo"
-          ref={definirLista}
-          className={preferencias?.espiadaDosVizinhos ? 'area-artigo com-espiada' : 'area-artigo'}
-          onClick={aoClicarNaLista}
-          onKeyDown={aoTeclarNaLista}
-          onPointerOver={ativarLinha}
-          onFocus={ativarLinha}
-          onTouchStart={comecouODeslize}
-          onTouchEnd={terminouODeslize}
-        >
-          {ordem === undefined ? (
-            <div role="status" className="aviso">
-              <p>Nenhum artigo para ler por aqui.</p>
-              <p className="dica">
-                {filtro
-                  ? 'O filtro deixou só títulos e capítulos. Mude o filtro ou volte ao texto corrido.'
-                  : 'Esta norma não tem artigos. Volte ao texto corrido.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              {vizinho(ordem - 1, 'anterior')}
-              <section
-                ref={cartao}
-                className="cartao-artigo"
-                aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
-                tabIndex={0}
-              >
-                {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
-                {linhas
-                  .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
-                  .map((linha) => (
-                    <div key={linha.indice} {...propriedadesDaLinha(linha)}>
-                      {conteudoDaLinha(linha)}
-                    </div>
-                  ))}
-                {remissoesDoCartao.length > 0 && (
-                  <div className="remissoes-do-artigo">
-                    <h3>Remissões deste artigo</h3>
-                    <ul>
-                      {remissoesDoCartao.map(({ alvo, origem }) => (
-                        <li key={alvo}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDadosDaPrevia(undefined);
-                              setPrevia({ origem, alvo });
-                            }}
-                          >
-                            {referenciaDaBusca(alvo)}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </section>
-              <SetasDoCartao
-                anterior={() => {
-                  irAoAnterior.current();
-                }}
-                proximo={() => {
-                  irAoProximo.current();
-                }}
-                noPrimeiro={ordem <= 0}
-                noUltimo={ordem + 1 >= unidades.length}
-              >
-                <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
-              </SetasDoCartao>
-              {vizinho(ordem + 1, 'seguinte')}
-            </>
-          )}
-        </div>
-      ) : (
-        <div
-          key="lista"
-          ref={definirLista}
-          className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
-          aria-busy={voltando}
-          style={{ height: virtualizador.getTotalSize() }}
-          onClick={aoClicarNaLista}
-          onKeyDown={aoTeclarNaLista}
-          onPointerOver={ativarLinha}
-          onFocus={ativarLinha}
-        >
-          {visiveis.map((virtual) => {
-            const linha = linhas[virtual.index];
-            if (!linha) return null;
-            return (
-              <div
-                key={virtual.key}
-                data-index={virtual.index}
-                ref={virtualizador.measureElement}
-                {...propriedadesDaLinha(linha)}
-                style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
-              >
-                {conteudoDaLinha(linha)}
+      <div className="leitor-corpo" data-com-estrutura={comEstrutura ? '' : undefined}>
+        {comEstrutura && (
+          <EstruturaDaNorma
+            nos={nos}
+            estrutura={estrutura}
+            textos={textos}
+            pedir={pedir}
+            lidoAte={indiceLidoAte}
+            noDaLeitura={noDaLeitura}
+            voltando={voltando}
+            ir={irAoBloco}
+          />
+        )}
+        {porArtigo ? (
+          <div
+            key="artigo"
+            ref={definirLista}
+            className={preferencias?.espiadaDosVizinhos ? 'area-artigo com-espiada' : 'area-artigo'}
+            onClick={aoClicarNaLista}
+            onKeyDown={aoTeclarNaLista}
+            onPointerOver={ativarLinha}
+            onFocus={ativarLinha}
+            onTouchStart={comecouODeslize}
+            onTouchEnd={terminouODeslize}
+          >
+            {ordem === undefined ? (
+              <div role="status" className="aviso">
+                <p>Nenhum artigo para ler por aqui.</p>
+                <p className="dica">
+                  {filtro
+                    ? 'O filtro deixou só títulos e capítulos. Mude o filtro ou volte ao texto corrido.'
+                    : 'Esta norma não tem artigos. Volte ao texto corrido.'}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      )}
-      {/* Fixo no canto, acompanha a rolagem; no modo foco, semitransparente. O mesmo botão entra e
-          sai (o foco do teclado fica nele). */}
+            ) : (
+              <>
+                {vizinho(ordem - 1, 'anterior')}
+                <section
+                  ref={cartao}
+                  className="cartao-artigo"
+                  aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
+                  tabIndex={0}
+                >
+                  {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
+                  {linhas
+                    .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
+                    .map((linha) => (
+                      <div key={linha.indice} {...propriedadesDaLinha(linha)}>
+                        {conteudoDaLinha(linha)}
+                      </div>
+                    ))}
+                  {remissoesDoCartao.length > 0 && (
+                    <div className="remissoes-do-artigo">
+                      <h3>Remissões deste artigo</h3>
+                      <ul>
+                        {remissoesDoCartao.map(({ alvo, origem }) => (
+                          <li key={alvo}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDadosDaPrevia(undefined);
+                                setPrevia({ origem, alvo });
+                              }}
+                            >
+                              {referenciaDaBusca(alvo)}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </section>
+                <SetasDoCartao
+                  anterior={() => {
+                    irAoAnterior.current();
+                  }}
+                  proximo={() => {
+                    irAoProximo.current();
+                  }}
+                  noPrimeiro={ordem <= 0}
+                  noUltimo={ordem + 1 >= unidades.length}
+                >
+                  <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
+                </SetasDoCartao>
+                {vizinho(ordem + 1, 'seguinte')}
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            key="lista"
+            ref={definirLista}
+            className={voltando ? 'lista-leitor voltando' : 'lista-leitor'}
+            aria-busy={voltando}
+            style={{ height: virtualizador.getTotalSize() }}
+            onClick={aoClicarNaLista}
+            onKeyDown={aoTeclarNaLista}
+            onPointerOver={ativarLinha}
+            onFocus={ativarLinha}
+          >
+            {visiveis.map((virtual) => {
+              const linha = linhas[virtual.index];
+              if (!linha) return null;
+              return (
+                <div
+                  key={virtual.key}
+                  data-index={virtual.index}
+                  ref={virtualizador.measureElement}
+                  {...propriedadesDaLinha(linha)}
+                  style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
+                >
+                  {conteudoDaLinha(linha)}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      {/* Fixo no canto (a partir de 1200 px, no trilho da margem da direita), acompanha a rolagem; no
+          modo foco, semitransparente. O mesmo botão entra e sai (o foco do teclado fica nele). */}
       <div
         className="acoes-leitor"
         onPointerDownCapture={() => {
@@ -1865,6 +2034,9 @@ function LeitorAberto({
             anotar={() => {
               anotarGrifo(escolhida);
             }}
+            cartaoDosGrifos={() => {
+              cartaoDosGrifosDe(escolhida);
+            }}
             tirar={() => {
               setEscolhidaId(undefined);
               void marcacoes.remover(escolhida.id).then((deu) => {
@@ -1887,7 +2059,8 @@ function LeitorAberto({
               <>
                 {origemDoVoltar !== undefined && (
                   <button type="button" className="voltar-da-remissao" onClick={voltarDaRemissao}>
-                    ← Voltar a {referenciaDaBusca(origemDoVoltar)}
+                    <Icone nome="voltar" />
+                    Voltar a {referenciaDaBusca(origemDoVoltar)}
                   </button>
                 )}
                 <BandejaDoFoco
@@ -1954,11 +2127,12 @@ function LeitorAberto({
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
-        enviar={async (texto) => {
+        ocultosIniciais={fraseAberta?.ocultos}
+        enviar={async (texto, ocultos, separados) => {
           if (!fraseAberta) return false;
           const { trecho, texto: citado } = fraseAberta;
           try {
-            await criarFraseDeTrecho(repo, {
+            const frase = await criarFraseDeTrecho(repo, {
               texto,
               trecho: {
                 dispositivoId: trecho.dispositivoId,
@@ -1968,6 +2142,7 @@ function LeitorAberto({
                 fim: trecho.fim,
               },
             });
+            if (ocultos.length > 0) await criarCartoesDeLacuna(repo, frase.id, ocultos, separados);
           } catch {
             return false;
           }
@@ -2096,50 +2271,53 @@ function AcoesDaLeitura({
           title={`Voltar a ${voltarDaRemissao.para}`}
           onClick={voltarDaRemissao.voltar}
         >
-          ← Voltar a {voltarDaRemissao.para}
+          <Icone nome="voltar" />
+          Voltar a {voltarDaRemissao.para}
         </button>
       )}
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        aria-keyshortcuts={TECLA_DA_BUSCA}
-        title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
-        onClick={abrirBusca}
-      >
-        Buscar
-      </button>
-      <button
-        type="button"
-        className={filtro === undefined ? undefined : 'filtro-ligado'}
-        aria-haspopup="dialog"
-        aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
-        title={
-          filtro === undefined
-            ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
-            : `Mostrando só: ${filtro}. Toque para mudar o filtro`
-        }
-        onClick={abrirFiltro}
-      >
-        {filtro === undefined ? 'Filtrar' : 'Filtrado'}
-      </button>
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
-        onClick={abrirAcoes}
-      >
-        Ações
-      </button>
-      <button
-        ref={botaoDoFoco}
-        type="button"
-        aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-        data-lente={lenteDoFoco}
-        title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
-        onClick={alternarFoco}
-      >
-        {modoFoco ? 'Sair do foco' : 'Modo foco'}
-      </button>
+      <div role="group" aria-label="Ferramentas da leitura" className="dock-do-leitor">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-keyshortcuts={TECLA_DA_BUSCA}
+          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+          onClick={abrirBusca}
+        >
+          Buscar
+        </button>
+        <button
+          type="button"
+          className={filtro === undefined ? undefined : 'filtro-ligado'}
+          aria-haspopup="dialog"
+          aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
+          title={
+            filtro === undefined
+              ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
+              : `Mostrando só: ${filtro}. Toque para mudar o filtro`
+          }
+          onClick={abrirFiltro}
+        >
+          {filtro === undefined ? 'Filtrar' : 'Filtrado'}
+        </button>
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
+          onClick={abrirAcoes}
+        >
+          Ações
+        </button>
+        <button
+          ref={botaoDoFoco}
+          type="button"
+          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+          data-lente={lenteDoFoco}
+          title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
+          onClick={alternarFoco}
+        >
+          {modoFoco ? 'Sair do foco' : 'Modo foco'}
+        </button>
+      </div>
       <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui
       </button>
@@ -2163,9 +2341,9 @@ function BarraDoLeitor({
 }) {
   return (
     <div className="barra-leitor">
-      <Link to="/biblioteca" className="botao discreto">
-        ← Biblioteca
-      </Link>
+      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
+        Biblioteca
+      </Voltar>
       <h1>{titulo}</h1>
       <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
         <button
@@ -2323,7 +2501,7 @@ function TrechosDoTexto({
             {...{ [ATRIBUTO_FORA_DO_TEXTO]: '' }}
             aria-label={`Nota: ${marcas?.notas.find((n) => n.id === id)?.rotulo ?? ''}`}
           >
-            <span aria-hidden="true">✎</span>
+            <Icone nome="nota" />
           </button>
         ))}
       </Fragment>
@@ -2397,7 +2575,7 @@ function Redacoes({
         onClick={aoAlternar}
       >
         {rotulo}
-        <span aria-hidden="true">{aberto ? ' ▾' : ' ▸'}</span>
+        <Icone nome="abre" />
       </button>
       {aberto && <ListaDeRedacoes redacoes={redacoes} />}
     </div>
@@ -2527,7 +2705,7 @@ function Dispositivo({
             onClick={alternarEste}
           >
             {legenda}
-            <span aria-hidden="true">{expandido ? ' ▾' : ' ▸'}</span>
+            <Icone nome="abre" />
           </button>
         ) : (
           <p className="linha-atenuada">{legenda}</p>

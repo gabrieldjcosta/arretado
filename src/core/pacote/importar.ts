@@ -213,12 +213,13 @@ export async function planejar(
     // Pacote anterior à v6 nada diz das Frases (nascem dos erros, T22). Substituir módulos não as
     // apaga; só sai a Frase do erro que a importação exclui. Restaurar integral apaga tudo, e
     // `migrarFrasesDosErros` recria as Frases dos erros restaurados.
-    // Idem as Tarefas de estudo (v7) e os vínculos de precedente (v8): pacote anterior não os traz
+    // Idem as Tarefas de estudo (v7), os vínculos de precedente (v8) e os Ciclos (v9): pacote anterior não os traz
     // e a substituição não os apaga.
     const posteriorAoPacote =
       (nome === 'frases' ||
         nome === 'revisoesFrase' ||
         nome === 'tarefasDeEstudo' ||
+        nome === 'ciclos' ||
         nome === 'vinculosPrecedenteDispositivo' ||
         nome === 'vinculosEntrePrecedentes') &&
       versaoDeOrigem(nome) > m.versaoEsquema;

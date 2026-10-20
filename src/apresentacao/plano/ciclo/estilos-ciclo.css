@@ -1,0 +1,56 @@
+/* Ciclo de estudo (C3): volta, bloco atual e assistente. Só tokens; a vez atual é "onde estou" (cal). */
+.ciclo-volta {
+  list-style: none;
+  margin: var(--espaco-2) 0 var(--espaco-3);
+  padding: 0;
+  display: grid;
+  gap: var(--espaco-1);
+}
+
+.ciclo-volta li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  min-height: var(--alvo);
+  align-items: center;
+  padding-inline: var(--espaco-3);
+  border-radius: var(--raio-campo);
+}
+
+.ciclo-volta .ciclo-atual {
+  background: var(--superficie);
+  box-shadow: var(--sombra-folha);
+  font-weight: 700;
+}
+
+.ciclo-volta .ciclo-feito {
+  color: var(--texto-atenuado);
+}
+
+.ciclo-passos {
+  display: inline-flex;
+  gap: var(--espaco-2);
+}
+
+.ciclo-opcao {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-height: var(--alvo);
+}
+
+.ciclo-modelo .dica {
+  display: block;
+}
+
+.ciclo-grupo {
+  border: 0;
+  padding: 0;
+  margin: var(--espaco-3) 0;
+}
+
+.ciclo-grupo legend {
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: var(--espaco-1);
+}

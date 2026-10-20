@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {
   migrarParaConta,
@@ -6,11 +6,25 @@ import {
   type EtapaMigracao,
   type PreviaMigracao,
 } from '../../../core/pacote/migrar-para-conta';
-import { NOME_BANCO_PRINCIPAL, RegistroDeContas, Repositorio } from '../../../core/persistencia';
+import {
+  nomeBancoDaConta,
+  NOME_BANCO_PRINCIPAL,
+  RegistroDeContas,
+  Repositorio,
+} from '../../../core/persistencia';
 import type { PacoteGerado } from '../../../core/pacote';
 import { reidratadorDoAcervo } from '../../../dominios/acervo/adesao';
+import type { CopiaNaNuvem } from '../../../integracoes/conta';
+import {
+  deveOferecerCopiaDaNuvem,
+  instanteDaCopia,
+  listarCopiasNaNuvem,
+} from '../../../integracoes/conta/backup-nuvem';
 import { useFonteAcervo } from '../../dados/fonteAcervoContexto';
-import { baixar } from '../dados/rotulos';
+import { ContextoRepositorio } from '../../dados/contexto';
+import { NuvemBackupRestaurar } from '../dados/NuvemBackupRestaurar';
+import { formatarInstante, baixar } from '../dados/rotulos';
+import { useServicoDeConta } from '../entrar/ContextoConta';
 import { recarregarEm } from '../recarregar';
 import './estilos-migracao.css';
 
@@ -43,6 +57,7 @@ export interface MigracaoProps {
   registro?: RegistroDeContas;
   uid?: string;
   baixarBackup?: (pacote: PacoteGerado) => Promise<void>;
+  abrirRepositorioConta?: (uid: string) => Promise<Repositorio>;
 }
 
 export function Migracao({
@@ -55,9 +70,11 @@ export function Migracao({
   registro: registroInformado,
   uid: uidInformado,
   baixarBackup,
+  abrirRepositorioConta,
 }: MigracaoProps) {
   const navigate = useNavigate();
   const fonteAcervo = useFonteAcervo();
+  const servico = useServicoDeConta();
   const [registro] = useState(() => registroInformado ?? new RegistroDeContas());
   const [repoOrigem, setRepoOrigem] = useState<Repositorio | null>(origemInformada ?? null);
   const [uidDestino, setUidDestino] = useState<string | null>(uidInformado ?? null);
@@ -65,6 +82,43 @@ export function Migracao({
   const [estado, setEstado] = useState<EstadoTela>('carregando');
   const [etapaAtual, setEtapaAtual] = useState<EtapaMigracao>('backup');
   const [motivoFalha, setMotivoFalha] = useState<string | null>(null);
+  const [copiaNaNuvem, setCopiaNaNuvem] = useState<CopiaNaNuvem | null>(null);
+  const [repoConta, setRepoConta] = useState<Repositorio | null>(null);
+  const abrirConta = useCallback(
+    (uid: string) =>
+      abrirRepositorioConta
+        ? abrirRepositorioConta(uid)
+        : Repositorio.abrir({ nomeBanco: nomeBancoDaConta(uid) }),
+    [abrirRepositorioConta],
+  );
+
+  useEffect(() => {
+    if (estado !== 'resultado-concluido' || !uidDestino || !navigator.onLine) return;
+    let cancelado = false;
+    const foiCancelado = () => cancelado;
+    let repoAberto: Repositorio | null = null;
+    void (async () => {
+      try {
+        if ((await servico.sessao())?.uid !== uidDestino) return;
+        const copias = await listarCopiasNaNuvem(servico);
+        if (foiCancelado() || !deveOferecerCopiaDaNuvem(copias, navigator.onLine)) return;
+        const repo = await abrirConta(uidDestino);
+        if (foiCancelado()) {
+          repo.fechar();
+          return;
+        }
+        repoAberto = repo;
+        setRepoConta(repo);
+        setCopiaNaNuvem(copias[0] ?? null);
+      } catch {
+        // A migração já terminou; falha da nuvem não pode bloqueá-la.
+      }
+    })();
+    return () => {
+      cancelado = true;
+      repoAberto?.fechar();
+    };
+  }, [abrirConta, estado, servico, uidDestino]);
 
   useEffect(() => {
     let cancelado = false;
@@ -229,6 +283,18 @@ export function Migracao({
         <div className="migracao-resultado sucesso">
           <h2>Tudo copiado</h2>
           <p>Seus dados de estudo estão disponíveis na sua conta neste aparelho.</p>
+          {copiaNaNuvem && repoConta && (
+            <ContextoRepositorio.Provider value={repoConta}>
+              <NuvemBackupRestaurar
+                nome={copiaNaNuvem.nome}
+                data={formatarInstante(instanteDaCopia(copiaNaNuvem.nome) ?? copiaNaNuvem.nome)}
+                copia={copiaNaNuvem}
+                aoFechar={() => {
+                  setCopiaNaNuvem(null);
+                }}
+              />
+            </ContextoRepositorio.Provider>
+          )}
           <div className="linha-acoes">
             <Link
               to="/"

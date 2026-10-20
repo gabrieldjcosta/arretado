@@ -1,8 +1,12 @@
 # Contrato da direção: Ponto de luz, segunda versão
 
+> **Superado em 19/10/2026 pela D-D9 (Tinta e noite).** Este contrato descreve a direção da D-D7 e fica como histórico: paleta, letras, formas, marca, caneta, abas e Hoje passaram a valer pelo [contrato da D-D9](../2026-10-19-tinta-e-noite/contrato.md), e o que continua valendo está nas seções "Mantido" e "Revogado" da D-D9 em [`decisoes-design.md`](../../decisoes-design.md).
+
 Escolhida pelo Gabriel no cartão da rodada 3 das direções visuais (genjutsu:bunshin, 18/10/2026, 15:46Z); construção no app autorizada por ele às 17:23Z do mesmo dia. Registro da decisão: [`../../decisoes-design.md`](../../decisoes-design.md) (D-D7). Execução em fases: [`../../../planos/ponto-de-luz.md`](../../../planos/ponto-de-luz.md). Este contrato é o que toda construção e toda revisão seguram o trabalho contra.
 
 Página das três rodadas: https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb (seção "Ponto de luz, segunda versão"). Fontes do protótipo nos arquivos do projeto, em `redesenho/bunshin/.bunshin/direction/fonte/` (telas em `r3-script.js`, regras em `r2.css` e `r3.css`, caneta em `sertao-svg.mjs`, função `simboloCanetaV2`). Capturas do protótipo nesta pasta: [`hoje-celular-dia.png`](hoje-celular-dia.png), [`hoje-celular-noite.png`](hoje-celular-noite.png), [`leitor-tablet-dia.png`](leitor-tablet-dia.png).
+
+> **Emendado em 19/10/2026 (D-D8, pedido do Gabriel):** o cachorro do Resumo do Dia saiu e a caneta passou a andar sobre o quadro do cacto, no traço de seleção e na passagem do cartão. Onde este contrato fala do cachorro, do `--traco-cachorro` ou da caneta que só muda de lugar por salto, vale [a D-D8](../../decisoes-design.md).
 
 ## Tese
 A luz do sertão como tinta: areia clara, uma folha de cal com sombra fresca, e a caneta-cacto de vidro descansando exatamente onde você parou, com um ponto de luz na ponta. O futuro do sertão acontece de dia claro.

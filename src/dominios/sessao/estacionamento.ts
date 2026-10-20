@@ -51,6 +51,37 @@ export async function resolverNota(
 export const notasPendentes = (s: Pick<Sessao, 'estacionamento'>): NotaDeEstacionamento[] =>
   (s.estacionamento ?? []).filter((n) => !n.resolvidaEm);
 
+/** Quantas notas ainda por resolver o "Para lembrar" do Hoje mostra. */
+const NOTAS_PARA_LEMBRAR = 5;
+
+/** Onde uma nota está: a Sessão e a posição nela, o que `resolverNota` pede. */
+export interface EnderecoDeNota {
+  sessaoId: string;
+  indice: number;
+}
+
+export interface NotaParaLembrar extends NotaDeEstacionamento, EnderecoDeNota {}
+
+export const chaveDeNota = (n: EnderecoDeNota) => `${n.sessaoId}/${String(n.indice)}`;
+
+/**
+ * As notas ainda por resolver de todas as Sessões (até `NOTAS_PARA_LEMBRAR`), da mais recente para a mais
+ * antiga, mais as de `manter` onde estiverem, resolvidas ou não: quem acabou de marcar uma nota ainda a
+ * vê e pode desfazer. Lê todas as Sessões, como o resumo do Dia já faz a cada carga do Hoje; sem esquema novo.
+ */
+export async function notasParaLembrar(
+  repo: Repositorio,
+  manter: readonly EnderecoDeNota[] = [],
+): Promise<NotaParaLembrar[]> {
+  const mantidas = new Set(manter.map(chaveDeNota));
+  const todas = (await repo.colecao('sessoes').todosDoUsuario())
+    .filter((s) => !s.excluidoEm)
+    .flatMap((s) => (s.estacionamento ?? []).map((n, indice) => ({ ...n, sessaoId: s.id, indice })))
+    .sort((a, b) => b.em.localeCompare(a.em));
+  const pendentes = todas.filter((n) => !n.resolvidaEm).slice(0, NOTAS_PARA_LEMBRAR);
+  return todas.filter((n) => pendentes.includes(n) || mantidas.has(chaveDeNota(n)));
+}
+
 /** Escolhe ou tira o temporizador desta Sessão. `undefined` = sem temporizador. Só informativo. */
 export async function definirTemporizador(
   repo: Repositorio,

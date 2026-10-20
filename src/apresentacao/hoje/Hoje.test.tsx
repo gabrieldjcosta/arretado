@@ -43,7 +43,8 @@ function abrirHoje(repo: Repositorio) {
   return { usuario, ...tela };
 }
 
-const canetas = () => [...document.querySelectorAll<SVGElement>('svg.caneta')];
+// A caneta da folha do Agora é um <svg>; no quadro do cacto é o grupo que anda sobre o desenho.
+const canetas = () => [...document.querySelectorAll<SVGElement>('svg.caneta, .quadro-caneta')];
 
 describe('Hoje › Ponto de luz (P3)', () => {
   beforeEach(() => {
@@ -120,8 +121,9 @@ describe('Hoje › Ponto de luz (P3)', () => {
       expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
     });
     expect(resumo.contains(canetas()[0] ?? null)).toBe(true);
-    // O cachorro se desenha na hora em que o Dia é fechado.
-    expect(resumo.querySelector('.traco-do-cachorro')).toHaveClass('desenha');
+    // O quadro do cacto mostra o que a caneta desenhou hoje (o primeiro Dia fechado desenha o chão).
+    expect(resumo.querySelector('.quadro')).not.toBeNull();
+    expect(await within(resumo).findByText('Hoje a caneta desenhou o chão.')).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: 'Reabrir o Dia' }));
     await screen.findByRole('button', { name: 'Fechar o Dia' });
@@ -130,7 +132,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
     });
   });
 
-  it('o Dia que já abre fechado mostra o cachorro pronto, sem se desenhar', async () => {
+  it('o Dia que já abre fechado mostra o quadro pronto, com a legenda de hoje', async () => {
     const { repo } = await repositorioDeTeste();
     const s = await iniciarSessao(repo, {});
     await encerrarSessao(repo, s.id);
@@ -142,8 +144,10 @@ describe('Hoje › Ponto de luz (P3)', () => {
     abrirHoje(repo);
     const resumo = await screen.findByRole('region', { name: 'Fechar o Dia' });
     await within(resumo).findByRole('button', { name: 'Reabrir o Dia' });
-    expect(resumo.querySelector('.traco-do-cachorro')).not.toBeNull();
-    expect(resumo.querySelector('.traco-do-cachorro')).not.toHaveClass('desenha');
+    expect(resumo.querySelector('.quadro')).not.toBeNull();
+    // Nada da parte de hoje falta no papel: o chão já está desenhado, e a legenda já está dita.
+    expect(resumo.querySelectorAll('.quadro-fio')).toHaveLength(1);
+    expect(within(resumo).getByRole('status')).toHaveTextContent('Hoje a caneta desenhou o chão.');
   });
 
   it('o ponto acende uma vez, na visita em que ficou aceso; a primeira abre quieta', async () => {

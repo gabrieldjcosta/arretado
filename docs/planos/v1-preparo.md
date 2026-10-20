@@ -52,9 +52,9 @@ select email, criado_em, usado_em from arretado.convites order by criado_em;
 
 ## 5. O que ainda é código (antes da V1)
 
-- [x] "Apagar tudo e recomeçar": exclui o banco local e os objetos da nuvem, mantém a conta (o ambiente reiniciável do plano-mestre §6). Entregue no #184.
-- [x] Registro do consentimento no Aparelho (`Usuario.consentimentos`), com o texto de [`../politica/consentimento-login-backup.md`](../politica/consentimento-login-backup.md). Entregue no #184.
-- [ ] Registro do consentimento no servidor (`aceitar_termos`).
-- [x] Tela Conta › Privacidade mostrando a política v3 (o texto está em [`../politica/`](../politica/)). Entregue no #184.
-- [ ] E2E de Entrar com `VITE_CONTA=1` e axe nos dois temas (pendência da A3).
-- [x] Consulta leve diária (GitHub Actions) que mantém o projeto Supabase ativo no plano gratuito: `.github/workflows/consulta-diaria.yml` (cron diário às 09:17 UTC + execução manual; GET em `/rest/v1/` com a chave publicável, sem escrita nem dado pessoal). Teste: Actions › Consulta diária › Run workflow; o log mostra `HTTP 200`.
+- [x] "Apagar tudo e recomeçar": exclui o banco local e os objetos da nuvem, mantém a conta (o ambiente reiniciável do plano-mestre §6). Código mesclado no #188 (`3640f9b`, conferido em `origin/integracao`).
+- [x] Registro do consentimento no Aparelho (`Usuario.consentimentos`), com o texto de [`../politica/consentimento-login-backup.md`](../politica/consentimento-login-backup.md). #188 (`3640f9b`), conferido em `origin/integracao`.
+- [ ] Registro do consentimento v3 no servidor (`aceitar_termos`): pendente da decisão D2 em [`f4a-fila-2026-10-18.md`](f4a-fila-2026-10-18.md). A RPC existe, mas `registrarConsentimentoNoServidor` é porta nula; T2 não alterou essa decisão. Não declarar feito.
+- [x] Tela Conta › Privacidade mostrando a política v3 (o texto está em [`../politica/`](../politica/)). Código mesclado no #188 (`3640f9b`, conferido em `origin/integracao`).
+- [ ] E2E de Entrar com `VITE_CONTA=1` e axe nos dois temas: pendente do T4; `e2e/conta-migracao.spec.ts` ainda usa `test.fixme()`.
+- [x] Consulta leve diária (GitHub Actions) que mantém o projeto Supabase ativo no plano gratuito: `.github/workflows/consulta-diaria.yml` (cron diário às 09:17 UTC + execução manual; GET em `/rest/v1/` com a chave publicável, sem escrita nem dado pessoal). #185 (`47524fc`, conferido em `origin/integracao`). Teste: Actions › Consulta diária › Run workflow; o log mostra `HTTP 200`.

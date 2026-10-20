@@ -5,6 +5,7 @@ import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { TituloComMais } from '../componentes/TituloComMais';
+import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { resumoDoRecall } from './carregadores';
@@ -12,10 +13,28 @@ import { resumoDoRecall } from './carregadores';
 /** Segundos por cartão na estimativa do início; ajustar com o uso real (fatia 3). */
 export const SEGUNDOS_POR_CARTAO = 30;
 
+/** Uma aba do Recall: link de rota com o traço de seleção (D-D7, "A caneta que desenha"). */
+function AbaDoRecall({ para, rotulo }: { para: string; rotulo: string }) {
+  return (
+    <NavLink to={para}>
+      {({ isActive }) => (
+        <>
+          {rotulo}
+          <TracoDeSelecao chave={`recall:${para}`} ativo={isActive} />
+        </>
+      )}
+    </NavLink>
+  );
+}
+
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
 const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
 
-/** Recall: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas (Parte 2 §9.2). */
+/**
+ * Fixar: uma ação principal (revisar até a cota, se houver fila; senão registrar) e as abas Frases ·
+ * Cartões · Histórico (Parte 2 §9.2; D-D5: "Erros" deixou de ser aba). Quem chega a `/recall` cai
+ * na aba Frases.
+ */
 export function RecallInicio() {
   const { dados } = useDados(resumoDoRecall);
   const [avisoDispensado, setAvisoDispensado] = useState(false);
@@ -83,12 +102,9 @@ export function RecallInicio() {
         </p>
       )}
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
-        <NavLink to="/recall" end>
-          Erros
-        </NavLink>
-        <NavLink to="/recall/frases">Frases</NavLink>
-        <NavLink to="/recall/cartoes">Cartões</NavLink>
-        <NavLink to="/recall/historico">Histórico</NavLink>
+        <AbaDoRecall para="/recall/frases" rotulo="Frases" />
+        <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />
+        <AbaDoRecall para="/recall/historico" rotulo="Histórico" />
       </nav>
       <Outlet />
     </>
