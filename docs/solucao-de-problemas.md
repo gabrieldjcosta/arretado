@@ -1737,6 +1737,13 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **O E2E deixa uma pasta `C:/` na raiz do repositório (fora do Windows).** Causa: `e2e/plano-vazio.spec.ts` grava cinco capturas em `pastaEvidencia`, que é o caminho fixo `C:/Users/gabri/.gemini/antigravity-cli/brain/…` (commit `7d8251b`); no Linux isso vira uma pasta relativa chamada `C:` e o `git status` a mostra como não rastreada. Não é da Q1 (o teste é anterior). Solução: apagar a pasta (`rm -rf ./C:`) antes de `git add`, e nunca usar `git add -A` depois de um E2E completo. Prevenção sugerida (fora da Q1): o teste gravar em `test-results/` (ignorado pelo git) ou só quando `process.platform === 'win32'`.
 - **`capturas-ui.mjs` deixa o servidor de pré-visualização vivo, e a rodada seguinte o reaproveita sem avisar.** Causa: o script sobe `npx vite preview --port 4180 --strictPort` e, ao fim, mata só o `npx` (`filho.kill()`); o `vite` filho fica na porta (PPID 1). Na rodada seguinte o novo não sobe (`--strictPort`) e o `fetch` de espera do script responde com o velho. O `vite preview` serve o `dist/` do disco a cada pedido, então a captura "depois" da Q1 saiu certa depois de reconstruir (mostra a paleta nova), mas um servidor velho esconderia uma falha de subida. Solução: depois de cada rodada, `pkill -f 'vite preview --port 4180'` (ou passar `--url` de um servidor seu). Prevenção sugerida (fora da Q1): `spawn` com `detached` e matar o grupo de processos.
 
+### Typecheck acusa "file name differs only in casing" e o `eslint .` trava no Windows (T7, 19/10/2026)
+
+- **Sintoma:** no Windows, `npm run typecheck` avisa que o nome do arquivo difere só na caixa e o `npm run lint` passa de 5 minutos nas worktrees; no CI (Linux) tudo passa.
+- **Causa:** `hoje/Parada.tsx` (componente) e `hoje/parada.ts` (lógica) coexistiam; num sistema de arquivos sem distinção de maiúsculas `./Parada` e `./parada` são o mesmo caminho.
+- **Solução:** a lógica virou `hoje/parada-da-leitura.ts` (`git mv`, imports atualizados).
+- **Regra:** nomes de arquivo não podem diferir só pela caixa. Conferir com `git ls-files | sort -f | uniq -di` (sem saída = ok).
+
 ## Caneta de vidro (D-D9, Q4, 19/10/2026)
 
 - **Elemento só de preenchimento da caneta ganha contorno que não devia (aro, halo, esfera, faíscas).** Causa: `stroke` herda; dentro de um grupo ou do `<svg>` do quadro do cacto que passe traço, o que não declara `stroke` pega o do pai. Solução: em `luz.css`, `.caneta-aro`, `.caneta-halo`, `.caneta-esfera` e `.caneta-faisca` levam `stroke: none`; o cone do vidro leva `stroke="none"` no próprio `<path>`. Prevenção: peça nova na caneta que só preenche declara `stroke: none`.
