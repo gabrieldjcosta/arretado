@@ -5,37 +5,28 @@ import { AcaoAgora } from './AcaoAgora';
 import { Caneta, CanetaDefs, CanetaDesenho } from './Caneta';
 import { PontoDeLuz } from './PontoDeLuz';
 
-describe('PontoDeLuz (D-D7, P3)', () => {
-  it('aceso: círculo cheio com o contorno e o núcleo', () => {
+describe('PontoDeLuz (D-D7, P3; por mundo na D-D9, Q3)', () => {
+  it('é decorativo: um quadrado sem texto, escondido do leitor de tela', () => {
     const { container } = render(<PontoDeLuz estado="feito" />);
-    const ponto = container.querySelector('svg');
-    expect(ponto).toHaveAttribute('data-estado', 'feito');
+    const ponto = container.firstElementChild;
+    expect(ponto).toHaveClass('ponto-de-luz');
     expect(ponto).toHaveAttribute('aria-hidden', 'true');
-    expect(ponto?.querySelector('circle.ponto-luz')).not.toBeNull();
-    expect(ponto?.querySelector('circle.ponto-anel')).not.toHaveClass('apagado');
-    expect(ponto?.querySelector('.ponto-nucleo')).not.toBeNull();
+    expect(ponto).toBeEmptyDOMElement();
   });
 
-  it('pela metade: só um lado aceso, com o contorno inteiro', () => {
-    const { container } = render(<PontoDeLuz estado="atual" />);
-    expect(container.querySelector('path.ponto-luz')).not.toBeNull();
-    expect(container.querySelector('circle.ponto-luz')).toBeNull();
-    expect(container.querySelector('.ponto-anel')).not.toHaveClass('apagado');
-    expect(container.querySelector('.ponto-nucleo')).not.toBeNull();
-  });
-
-  it('apagado: um anel só, sem luz nem núcleo', () => {
-    const { container } = render(<PontoDeLuz estado="falta" />);
-    expect(container.querySelector('.ponto-luz')).toBeNull();
-    expect(container.querySelector('.ponto-nucleo')).toBeNull();
-    expect(container.querySelector('.ponto-anel')).toHaveClass('apagado');
-  });
+  it.each(['feito', 'atual', 'falta'] as const)(
+    'leva o estado %s no atributo que o CSS lê para escolher a forma do mundo',
+    (estado) => {
+      const { container } = render(<PontoDeLuz estado={estado} />);
+      expect(container.firstElementChild).toHaveAttribute('data-estado', estado);
+    },
+  );
 
   it('só se anima quando pedido', () => {
     const { container, rerender } = render(<PontoDeLuz estado="feito" />);
-    expect(container.querySelector('svg')).not.toHaveClass('acende');
+    expect(container.firstElementChild).not.toHaveClass('acende');
     rerender(<PontoDeLuz estado="feito" acende />);
-    expect(container.querySelector('svg')).toHaveClass('acende');
+    expect(container.firstElementChild).toHaveClass('acende');
   });
 });
 

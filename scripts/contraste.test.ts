@@ -72,13 +72,42 @@ const PALETA_DA_NOITE = {
   'n-vidro': '#9db7e8',
 };
 
-/** A forma de cada mundo (D-D9): o dia é angular e leva filete; a noite é arredondada e sem filete. */
+/** Os controles e a folha (D-D9, Q3): o aperto do botão (de dia ele desce 1 px e a sombra baixa junto; à noite
+ * encolhe), a sombra da folha (a mesma linha de 1 px, por dentro) e o título dela. */
+const CONTROLES_DO_DIA = {
+  'aperto-botao': 'translateY(1px)',
+  'sombra-botao-aperto': '0 1px 0 var(--tinta-funda)',
+  'espessura-contorno': '1.5px',
+  'fundo-controle': 'var(--superficie)',
+  'sombra-folha': 'inset 0 0 0 1px var(--linha)',
+  'peso-titulo-folha': '800',
+  'espaco-titulo-folha': '-0.02em',
+};
+const CONTROLES_DA_NOITE = {
+  'aperto-botao': 'scale(0.975)',
+  'sombra-botao-aperto': 'none',
+  'espessura-contorno': '1px',
+  'fundo-controle': 'var(--superficie-2)',
+  'sombra-folha': 'inset 0 0 0 1px var(--n-borda)',
+  'peso-titulo-folha': '600',
+  'espaco-titulo-folha': '-0.005em',
+};
+/** A forma do ponto do Dia (Q3): uma máscara para o anel e uma para cada estado com miolo (atual, feito). */
+const FORMAS_DO_PONTO = ['forma-ponto-anel', 'forma-ponto-atual', 'forma-ponto-feito'];
+
+/** O que a Q3 tirou: a borda transparente da folha do Agora (`--bloco-borda`); agora a folha e o cartão levam
+ * a mesma linha, `--borda-folha`. */
+const TOKENS_REMOVIDOS_NA_Q3 = ['bloco-borda'];
+
+/** A forma de cada mundo (D-D9): o dia é angular; a noite é arredondada. A folha em repouso leva a linha de
+ * 1 px do mundo nos dois (a `--borda` das pranchas Dia fechado: #838FA7 de dia, #34425E à noite), não o
+ * filete decorativo (#DDE2EA) nem a falta de linha: sem ela a folha some no chão (1,06:1 e 1,10:1). */
 const FORMA_DO_DIA = {
   'raio-botao': '6px',
   'raio-folha': '8px',
   'raio-chip': '6px',
   'sombra-botao': '0 2px 0 var(--tinta-funda)',
-  'borda-folha': '1px solid var(--filete)',
+  'borda-folha': '1px solid var(--linha)',
   'peso-titulo': '800',
 };
 const FORMA_DA_NOITE = {
@@ -86,7 +115,7 @@ const FORMA_DA_NOITE = {
   'raio-folha': '14px',
   'raio-chip': '10px',
   'sombra-botao': 'none',
-  'borda-folha': 'none',
+  'borda-folha': '1px solid var(--n-borda)',
   'peso-titulo': '700',
 };
 /** Os tokens que existem nos três blocos de tema: a forma, o hover da ação e a fonte do título. */
@@ -164,5 +193,48 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
   ])('todos os pares passam no tema %s', (_nome, tema) => {
     const reprovados = medir(tema).filter((l) => !l.ok);
     expect(reprovados.map((l) => `${l.fg}/${l.bg} ${l.valor.toFixed(2)}<${l.minimo}`)).toEqual([]);
+  });
+
+  describe('controles, folha e pontos do Dia (D-D9, Q3)', () => {
+    it('os tokens dos controles, da folha e da forma do ponto estão nos três blocos', () => {
+      const nomes = [...Object.keys(CONTROLES_DO_DIA), ...FORMAS_DO_PONTO];
+      for (const [bloco, tokens] of [
+        ['claro', claro],
+        ['escuro (sistema)', escuroSistema],
+        ['escuro (manual)', escuroManual],
+      ] as const) {
+        const faltam = nomes.filter((t) => !(t in tokens));
+        expect(faltam, `faltam no bloco ${bloco}`).toEqual([]);
+      }
+    });
+
+    it('o aperto, o contorno e o título da folha mudam de um mundo para o outro', () => {
+      expect(claro).toMatchObject(CONTROLES_DO_DIA);
+      expect(escuroManual).toMatchObject(CONTROLES_DA_NOITE);
+    });
+
+    it('o ponto do Dia tem uma forma por estado e uma por mundo: o estado nunca é só a cor', () => {
+      for (const tokens of [claro, escuroSistema, escuroManual]) {
+        const formas = FORMAS_DO_PONTO.map((f) => tokens[f]);
+        expect(new Set(formas).size, 'anel, atual e feito diferem').toBe(FORMAS_DO_PONTO.length);
+        for (const forma of formas) expect(forma).toMatch(/^url\("data:image\/svg\+xml,/);
+      }
+      for (const f of FORMAS_DO_PONTO)
+        expect(claro[f], `${f} muda com o mundo`).not.toBe(escuroManual[f]);
+    });
+
+    it('os tokens que a Q3 tirou não existem nem são usados em nenhum CSS', () => {
+      for (const t of TOKENS_REMOVIDOS_NA_Q3) expect(claro).not.toHaveProperty(t);
+      const usos = arquivosCss(path.join(import.meta.dirname, '..', 'src')).flatMap((arquivo) =>
+        readFileSync(arquivo, 'utf8')
+          .split('\n')
+          .flatMap((linha, i) =>
+            TOKENS_REMOVIDOS_NA_Q3.filter((t) => new RegExp(`--${t}(?![\\w-])`).test(linha)).map(
+              (t) => `${path.basename(arquivo)}:${i + 1} --${t}`,
+            ),
+          ),
+      );
+      expect(usos).toEqual([]);
+    });
   });
 });
