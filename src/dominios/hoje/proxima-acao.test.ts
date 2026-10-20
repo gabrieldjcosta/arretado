@@ -41,13 +41,13 @@ describe('decidirProximaAcao (A1)', () => {
     expect(r).toMatchObject({ acao: { estimativaMin: 20 } });
   });
 
-  it('leitura salva diz onde parou e quanto falta; sem posição, só a norma', () => {
+  it('leitura salva diz onde continuar e quanto falta; sem posição, só a norma', () => {
     expect(decidirProximaAcao({ cartoesVencidos: 0, frasesVencidas: 0, leitura })).toEqual({
       tipo: 'acao',
       acao: {
         tipo: 'leitura_salva',
         alvo: { tipo: 'leitura', id: 'n1', rotulo: 'LEP' },
-        razao: 'Você parou no Art. 41 da LEP',
+        razao: 'Continuar a leitura no Art. 41 da LEP',
         estimativaMin: 5,
       },
     });
@@ -56,7 +56,7 @@ describe('decidirProximaAcao (A1)', () => {
       frasesVencidas: 0,
       leitura: { normaId: 'n1', tituloCurto: 'LEP' },
     });
-    expect(sem).toMatchObject({ acao: { razao: 'Você estava lendo a LEP' } });
+    expect(sem).toMatchObject({ acao: { razao: 'Continuar a leitura da LEP' } });
     expect(sem.tipo === 'acao' && sem.acao.estimativaMin).toBeUndefined();
   });
 

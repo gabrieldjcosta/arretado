@@ -18,7 +18,7 @@ const tarefa: ProximaAcao = {
 const leitura: ProximaAcao = {
   tipo: 'leitura_salva',
   alvo: { tipo: 'leitura', id: 'n1', rotulo: 'LEP' },
-  razao: 'Você parou no Art. 2º da LEP',
+  razao: 'Continuar a leitura no Art. 2º da LEP',
 };
 
 const resumo = () => screen.getByText('Em seguida').closest('summary');

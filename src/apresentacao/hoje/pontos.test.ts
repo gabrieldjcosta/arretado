@@ -16,7 +16,7 @@ const revisao = (rotulo: string): ProximaAcao => ({
 const leitura: ProximaAcao = {
   tipo: 'leitura_salva',
   alvo: { tipo: 'leitura', id: 'n1', rotulo: 'LEP' },
-  razao: 'Você estava lendo a LEP',
+  razao: 'Continuar a leitura da LEP',
 };
 const tarefa: ProximaAcao = {
   tipo: 'tarefa',
