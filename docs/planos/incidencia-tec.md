@@ -100,3 +100,6 @@ Mudanças no plano:
 
 ### 12.1 Resultado da T2b (2026-10-19)
 55 matérias jurídicas extraídas sem login (curl, 3,5 s entre páginas, sem bloqueio) → `/mnt/project-files/dados-tec/bruto/publico/*.json` (fora do git do projeto) e `dados-tec/incidencia-global.csv`: 9.170 linhas, 3.226 com artigo identificado. Atenção: a árvore é **hierárquica e as contagens do pai incluem as dos filhos** (coluna `hierarquia`); somar só um nível por vez. Colunas de banca/cargo ficam `*`/vazias (camada G). Script: `/tmp/claude-0/s/bin/tec-publico.mjs` e `flat.mjs` (a versionar na T2). `norma_ref` e `dispositivo_ref` vêm de regex sobre o nome ("art. 1º do CP") e precisam do mapa para endereços do acervo.
+
+## Peso por artigo (piloto FCC × DPE-SP)
+`node scripts/incidencia.mjs artigos <tabela.csv> <saida.csv> [ano_de-ano_ate]` converte as linhas do recorte em peso e faixa por artigo do CP e do ECA. Regra: cada artigo recebe `qtd_questoes / nº de artigos` da linha mais específica que o cobre (a coluna `dispositivo_ref` do TEC às vezes herda o intervalo do pai, então vale o intervalo do nome do assunto). Faixas por massa acumulada: Altíssima até 40%, Alta até 70%, Média até 90%, Baixa o resto. Intervalos com letra (217-A) enumeram só os extremos. Artigo ausente = sem incidência medida (o app trata como Baixa).
