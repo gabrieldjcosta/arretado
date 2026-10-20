@@ -34,11 +34,13 @@ async function jaViuAChegada(page: Page) {
 }
 
 /**
- * Prova uma ausência: o Hoje carregou e a decisão (algumas leituras locais, milissegundos) já teve
- * tempo de abrir uma folha. Os testes em que a folha abre provam, ao contrário, que ela abre rápido.
+ * Prova uma ausência: o retrato do Hoje já carregou (é ele que põe a decisão em marcha) e a decisão
+ * (algumas leituras locais, milissegundos) já teve tempo de abrir uma folha. Os testes em que a folha
+ * abre provam, ao contrário, que ela abre rápido.
  */
 async function nadaAbre(page: Page) {
   await expect(hoje(page)).toBeVisible();
+  await expect(page.getByRole('region', { name: /^(Agora|Por onde começar)$/ })).toBeVisible();
   await page.waitForTimeout(600);
   await expect(folhaAberta(page)).toHaveCount(0);
 }
@@ -336,7 +338,7 @@ test.describe('Entrada do Dia › se o conteúdo não carregar', () => {
 
     await nadaAbre(page);
     // A rota de teste viu o pedido: sem ele, "não abriu" valeria também para "nunca tentou".
-    expect(pedidos).toBeGreaterThan(0);
+    await expect.poll(() => pedidos).toBeGreaterThan(0);
     expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_ENTRADA)).toBeNull();
     // O Hoje responde.
     await page.getByRole('link', { name: 'Novo registro de erro' }).click();
