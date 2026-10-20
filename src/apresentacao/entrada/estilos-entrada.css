@@ -1,0 +1,109 @@
+/* A Chegada e a Entrada do Dia (D-D9): duas folhas no <dialog> do app, sobre o Hoje. Só tokens, sem cor
+   literal (as pranchas são da D-D7; a cor e a forma aqui são as do mundo atual). O diálogo base
+   (estilos.css) dá a largura, a linha da folha, o fundo e a rolagem por dentro, que vale a 200% de zoom
+   e com texto grande. Sem movimento: a folha aparece parada, então o movimento reduzido e o perfil
+   Calmo não pedem nada à parte. */
+dialog.dialogo-entrada h2,
+dialog.dialogo-chegada h2 {
+  margin: 0 0 var(--espaco-3);
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-titulo);
+  font-size: 1.5rem;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--titulo);
+  text-wrap: balance;
+}
+
+dialog.dialogo-chegada h2 {
+  font-size: 2rem;
+}
+
+/* A Citação em fonte de leitura. Os versos mantêm a quebra de linha do original (`\n` no texto). */
+.entrada-citacao,
+.entrada-citacao blockquote {
+  margin: 0;
+}
+
+.entrada-citacao p {
+  margin: 0;
+  font-family: var(--fonte-leitura);
+  font-size: 1.25rem;
+  line-height: 1.45;
+  white-space: pre-line;
+  text-wrap: balance;
+}
+
+.entrada-citacao figcaption {
+  margin-top: var(--espaco-2);
+  font-size: 0.875rem;
+  color: var(--texto-atenuado);
+}
+
+dialog.dialogo-entrada hr {
+  border: 0;
+  border-top: 1px solid var(--borda);
+  margin: var(--espaco-3) 0;
+}
+
+dialog.dialogo-entrada h3 {
+  margin: 0 0 var(--espaco-1);
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.entrada-dica {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* O botão principal leva o nome do Agora ("Começar: …"), que pode ser comprido: quebra em vez de vazar. */
+dialog.dialogo-entrada .principal {
+  padding-block: var(--espaco-2);
+  max-width: 100%;
+}
+
+/* A Chegada: um caminho principal, um secundário e a trilha, que ocupa a linha toda. Uma coluna no
+   celular; duas quando a folha tem largura para elas. */
+.chegada-acoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: var(--espaco-2);
+  margin-top: var(--espaco-4);
+}
+
+.chegada-acoes .botao {
+  width: 100%;
+  min-height: 3.25rem;
+  font-size: 1.0625rem;
+}
+
+.chegada-acoes .chegada-trilha {
+  grid-column: 1 / -1;
+  flex-direction: column;
+  gap: 2px;
+  min-height: var(--alvo);
+  padding: var(--espaco-1) var(--espaco-2);
+  font-size: 1rem;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.chegada-trilha b {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.chegada-trilha span {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
+}
+
+.chegada-depois {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espaco-3);
+}
