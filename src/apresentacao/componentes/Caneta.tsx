@@ -146,9 +146,10 @@ export function CanetaDesenho({ id }: { id: string }) {
  *
  * Desenhada em pé, com a ponta em (60, 262), e girada: 35° encostada (na folha do Agora, no Cartão
  * atual) e 65° deitada (ao fim de "Lido até aqui"). No quadro do cacto, depois de fechar o Dia, a
- * deitada é a da caneta que desenha. Toda de vidro, ponta incluída, com o miolo de tinta à vista (D-D9,
- * Q4). As cores vêm dos tokens `--pen-*`: cada mundo troca o vidro, a tinta e o halo da ponta (lima
- * de dia, âmbar à noite) sem que o componente saiba.
+ * caneta é a deitada: anda a 65° sobre o traço e fica largada quase deitada, a 84° (`quadro/cena.ts`).
+ * Toda de vidro, ponta incluída, com o miolo de tinta à vista (D-D9, Q4). As cores vêm dos tokens
+ * `--pen-*`: cada mundo troca o vidro, a tinta e o halo da ponta (lima de dia, âmbar à noite) sem que
+ * o componente saiba.
  */
 export function Caneta({ pose, className }: { pose: PoseDaCaneta; className?: string }) {
   const id = useId();

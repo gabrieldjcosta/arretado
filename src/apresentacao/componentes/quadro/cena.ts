@@ -40,8 +40,13 @@ export interface Parte {
 }
 
 export const VIEWBOX = '0 0 340 200';
-/** Onde a caneta fica largada: a ponta no fim do chão desenhado, à direita do cacto. */
-export const REPOUSO = { x: 222, y: 156, escala: 0.38 } as const;
+/**
+ * Onde a caneta fica largada, como nas pranchas "Dia fechado" (D-D9, Q4): quase deitada (84°), pequena
+ * (0,30) e com a ponta em (214, 183), sob o chão do desenho, à direita do cacto.
+ */
+export const REPOUSO = { x: 214, y: 183, escala: 0.3, graus: 84 } as const;
+/** Como a caneta anda sobre o traço: deitada a 65°, em 0,38. Do repouso ao traço ela muda de lugar por salto. */
+export const ANDANDO = { escala: 0.38, graus: 65 } as const;
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const rad = (g: number) => (g * Math.PI) / 180;

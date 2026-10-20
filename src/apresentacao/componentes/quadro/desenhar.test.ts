@@ -86,10 +86,14 @@ describe('pintar o quadro parado', () => {
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
   });
 
-  it('a ponta da caneta deitada vai para onde se pede', () => {
+  it('a ponta da caneta andando vai para onde se pede', () => {
     expect(posicaoDaCaneta(10.04, 20)).toBe(
       'translate(10 20) scale(0.38) rotate(65) translate(-60 -262)',
     );
+  });
+
+  it('largada, a caneta fica quase deitada e menor do que andando, como nas pranchas', () => {
+    expect(REPOUSO_DA_CANETA).toBe('translate(214 183) scale(0.3) rotate(84) translate(-60 -262)');
   });
 });
 

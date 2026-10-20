@@ -51,12 +51,25 @@ describe('as 16 partes do quadro do cacto', () => {
     }
   });
 
-  it('a caneta é largada dentro do quadro', () => {
+  it('a caneta é largada dentro do quadro, inteira e sob o chão do desenho', () => {
     const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
-    expect(REPOUSO.x).toBeGreaterThan(0);
-    expect(REPOUSO.x).toBeLessThan(largura);
-    expect(REPOUSO.y).toBeGreaterThan(0);
-    expect(REPOUSO.y).toBeLessThan(altura);
+    const { x, y, escala, graus } = REPOUSO;
+    const giro = (graus * Math.PI) / 180;
+    // Os cantos da caixa do vidro, em relação à ponta, com a caneta de pé: 46 para cada lado (os braços)
+    // e 246 de altura (o topo do tronco). Girados e escalados, têm de ficar no quadro.
+    for (const [dx, dy] of [
+      [-46, -246],
+      [46, -246],
+      [-46, 0],
+      [46, 0],
+    ] as const) {
+      const px = x + escala * (dx * Math.cos(giro) - dy * Math.sin(giro));
+      const py = y + escala * (dx * Math.sin(giro) + dy * Math.cos(giro));
+      expect(px).toBeGreaterThan(0);
+      expect(px).toBeLessThan(largura);
+      expect(py).toBeGreaterThan(160); // o chão passa entre 153 e 159
+      expect(py).toBeLessThan(altura);
+    }
   });
 });
 

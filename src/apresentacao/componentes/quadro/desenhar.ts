@@ -2,7 +2,7 @@
 // caneta sobre o traço de hoje. Imperativo de propósito: o React só dá ao <svg> três grupos vazios
 // (lavis, traços, caneta) e nunca olha dentro deles.
 import { CURVA, esperar, suave, type Movimento } from '../../movimento';
-import { mover, PARTES, REPOUSO, type Fio, type Parte } from './cena';
+import { ANDANDO, mover, PARTES, REPOUSO, type Fio, type Parte } from './cena';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -14,13 +14,20 @@ export interface Camadas {
 
 const um = (n: number) => String(Math.round(n * 10) / 10);
 
-/** O `transform` que põe a ponta da caneta deitada (65°; ponta em (60, 262) no desenho) em (x, y) do quadro. */
-export function posicaoDaCaneta(x: number, y: number): string {
-  return `translate(${um(x)} ${um(y)}) scale(${String(REPOUSO.escala)}) rotate(65) translate(-60 -262)`;
+/**
+ * O `transform` que põe a ponta da caneta (de pé, com a ponta em (60, 262) no desenho) em (x, y) do
+ * quadro, na pose dada: andando sobre o traço, a menos que se peça outra.
+ */
+export function posicaoDaCaneta(
+  x: number,
+  y: number,
+  pose: { escala: number; graus: number } = ANDANDO,
+): string {
+  return `translate(${um(x)} ${um(y)}) scale(${String(pose.escala)}) rotate(${String(pose.graus)}) translate(-60 -262)`;
 }
 
-/** Onde a caneta fica largada: a ponta no fim do chão desenhado, à direita do cacto. */
-export const REPOUSO_DA_CANETA = posicaoDaCaneta(REPOUSO.x, REPOUSO.y);
+/** Onde a caneta fica largada: quase deitada, sob o chão do desenho, à direita do cacto. */
+export const REPOUSO_DA_CANETA = posicaoDaCaneta(REPOUSO.x, REPOUSO.y, REPOUSO);
 
 function criar<K extends 'path' | 'circle'>(
   tag: K,
