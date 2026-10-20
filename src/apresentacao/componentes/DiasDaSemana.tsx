@@ -1,3 +1,5 @@
+import { PontoDeLuz } from './PontoDeLuz';
+
 /** Os últimos 7 dias com revisão (janela móvel, nunca zera); do mais antigo ao mais recente. */
 export function DiasDaSemana({ dias }: { dias: readonly boolean[] }) {
   const n = dias.filter(Boolean).length;
@@ -11,7 +13,7 @@ export function DiasDaSemana({ dias }: { dias: readonly boolean[] }) {
     <p className="dias-da-semana">
       <span className="dias-marcas" aria-hidden="true">
         {dias.map((feito, i) => (
-          <span key={i} className={feito ? 'dia-marca feito' : 'dia-marca'} />
+          <PontoDeLuz key={i} estado={feito ? 'feito' : 'falta'} />
         ))}
       </span>
       <span>{texto}</span>

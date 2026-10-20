@@ -80,3 +80,32 @@ test('Alavancas da Sessão: estacionamento, temporizador e só estudo (A3a)', as
   await expect(page.getByLabel('ver o preço do livro')).toBeChecked();
   await semViolacoes(page);
 });
+
+test('A nota guardada na Sessão fica no Para lembrar do Hoje até ser marcada como resolvida', async ({
+  page,
+}) => {
+  await page.goto('/#/sessao/iniciar');
+  await page.getByRole('button', { name: 'Começar', exact: true }).click();
+  const campo = page.getByLabel('Deixar para depois');
+  await campo.fill('ligar para o cartório');
+  await campo.press('Enter');
+  await expect(page.getByText('Guardado para depois.')).toBeVisible();
+  await page.getByRole('link', { name: 'Encerrar' }).click();
+  await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
+
+  await page.goto('/#/');
+  const lista = page.getByRole('list', { name: 'Guardado nas Sessões' });
+  const caixa = lista.getByRole('checkbox', { name: 'ligar para o cartório' });
+  await expect(caixa).not.toBeChecked();
+  await semViolacoes(page);
+
+  await caixa.click();
+  await expect(caixa).toBeChecked();
+  await semViolacoes(page);
+
+  // Resolvida, a nota não volta ao abrir o Hoje de novo.
+  await page.reload();
+  await expect(page.getByRole('textbox', { name: 'Para lembrar' })).toBeVisible();
+  await expect(lista).toHaveCount(0);
+});

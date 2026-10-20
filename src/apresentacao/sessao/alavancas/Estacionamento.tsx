@@ -46,7 +46,8 @@ export function Estacionamento({ sessao }: { sessao: Sessao }) {
             aria-describedby="estacionamento-dica"
           />
           <p id="estacionamento-dica" className="dica">
-            Anote a distração em uma linha e siga. Nada aqui é cobrado.
+            Anote a distração em uma linha e siga. Nada aqui é cobrado. Fica no Hoje, em Para
+            lembrar.
           </p>
         </div>
         <button type="submit">Guardar</button>

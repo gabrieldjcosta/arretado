@@ -12,15 +12,22 @@ export const CURVA = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
 
 /**
  * Movimento reduzido do sistema vence tudo. Depois, só o perfil Calmo acalma os toques: sem perfil
- * escolhido, e nos perfis Guiado e Leitura, andam por inteiro. `AplicarAparencia` põe o perfil em
- * `data-perfil` (ausente se não há perfil).
+ * escolhido, e nos perfis Guiado e Leitura, andam por inteiro.
  */
-export function movimentoAgora(): Movimento {
+export function movimentoDoPerfil(perfil: string | undefined): Movimento {
   const janela: Partial<Pick<Window, 'matchMedia'>> = window;
   // Sem `matchMedia` (o jsdom não tem), é mais seguro não mexer em nada.
   if (janela.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? true) return 'reduzido';
-  return document.documentElement.dataset.perfil === 'calmo' ? 'calmo' : 'normal';
+  return perfil === 'calmo' ? 'calmo' : 'normal';
 }
+
+/**
+ * O movimento de agora, pelo perfil que `AplicarAparencia` pôs em `data-perfil` (ausente se não há
+ * perfil). Quem decide logo ao montar, antes de o `AplicarAparencia` ter lido as Preferências, lê o
+ * perfil delas e usa `movimentoDoPerfil`.
+ */
+export const movimentoAgora = (): Movimento =>
+  movimentoDoPerfil(document.documentElement.dataset.perfil);
 
 /** Seno suave de 0 a 1: o traço do Dia sai devagar, anda e assenta. */
 export const suave = (progresso: number): number => 0.5 - 0.5 * Math.cos(Math.PI * progresso);

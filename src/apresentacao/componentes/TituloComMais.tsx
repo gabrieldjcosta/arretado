@@ -2,9 +2,10 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
 /**
- * Título da tela com o "+" redondo em cal na mesma linha (D-D7, P2). O "+" abre o registro de erro,
- * por onde entra a Frase correta (D25); fica nas telas em que se registra (Hoje e Fixar). Nas outras,
- * o registro segue pela tecla E e, a partir de 900 px, pelo "Registrar erro" do cabeçalho.
+ * Título da tela com o "+" redondo, de 48 px e com o contorno do controle, na mesma linha (D-D9, Q2).
+ * O "+" abre o registro de erro, por onde entra a Frase correta (D25); fica nas telas em que se
+ * registra (Hoje e Fixar). Nas outras, o registro segue pela tecla E e, a partir de 900 px, pelo
+ * "Registrar erro" do cabeçalho.
  */
 export function TituloComMais({ children }: { children: ReactNode }) {
   return (
@@ -20,7 +21,7 @@ export function TituloComMais({ children }: { children: ReactNode }) {
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.8"
           strokeLinecap="round"
           aria-hidden="true"
           focusable="false"

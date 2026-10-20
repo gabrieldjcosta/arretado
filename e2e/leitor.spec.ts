@@ -640,15 +640,17 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await expect(agora.getByRole('link', { name: 'Continuar leitura: LEP' })).toBeVisible();
   await semViolacoes(page);
 
-  // O Hoje diz onde parou na linha de parada, com a caneta encostada na folha; a folha não repete o
-  // motivo, e os três pontos do Dia estão lá, com o estado também em palavras (D-D7, P3).
+  // O Hoje diz onde retomar na linha de parada ("Retomar em", com a hora do salvamento), com a caneta
+  // encostada na folha; a folha não repete o motivo, e os três pontos do Dia estão lá, com o estado também
+  // em palavras (D-D7, P3; D-D9, Q5).
   await page.getByRole('link', { name: 'Hoje' }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  await expect(page.locator('.parada')).toContainText(/Você parou em LEP, art\. \d/);
+  await expect(page.locator('.parada')).toContainText(/Retomar em LEP, art\. \d/);
+  await expect(page.locator('.parada')).toContainText(/salvo (hoje|ontem), \d{2}h\d{2}/);
   await expect(page.locator('svg.caneta')).toHaveCount(1);
   const folhaDoHoje = page.getByRole('region', { name: 'Agora' });
   await expect(folhaDoHoje.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
-  await expect(folhaDoHoje).not.toContainText('Você parou');
+  await expect(folhaDoHoje).not.toContainText('Retomar em');
   await expect(
     page.getByRole('list', { name: 'Andamento do Dia' }).getByRole('listitem'),
   ).toHaveText(['Leitura, feito hoje', 'Cartões, ainda não', 'Frases, ainda não']);
@@ -1820,12 +1822,17 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
         cal,
         borda: s.borderTopWidth,
         raio: s.borderTopLeftRadius,
+        sombra: s.boxShadow,
       };
     });
   const lido = await faixa(art3);
   const falta = await faixa(aposOLido);
   expect(lido.fundo, 'o lido vai sobre a cal').toBe(lido.cal);
   expect(falta.fundo, 'o que falta fica na areia').toBe('rgba(0, 0, 0, 0)');
+  // Folha e chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite): sem outro sinal a faixa
+  // do lido some. D-D9, Q3: ela leva a linha de 1 px do mundo (`--sombra-folha`, por dentro); o que falta, nenhuma.
+  expect(lido.sombra, 'o lido leva a linha da folha').toMatch(/ 1px inset$/);
+  expect(falta.sombra, 'o que falta não leva linha').toBe('none');
   // Mesma geometria lido ou não: a linha não muda de altura quando o "lido até" anda.
   expect([lido.borda, lido.raio]).toEqual(['3px', '8px']);
   expect([falta.borda, falta.raio]).toEqual(['3px', '8px']);
@@ -1839,7 +1846,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await expect(agora).toContainText('em leitura');
     const titulo2 = estrutura.getByRole('button', { name: /^TÍTULO II\b/ });
     await expect(titulo2).toContainText('ainda não lida');
-    await expect(titulo2.locator('svg')).toHaveCount(1);
+    // O ponto é um `span` que o CSS desenha por máscara (D-D9, Q3), não mais um SVG: o estado vai no atributo.
+    await expect(titulo2.locator('.ponto-de-luz')).toHaveAttribute('data-estado', 'falta');
     await apertar(titulo2, toque);
     const cabecalho = page.getByRole('heading', { level: 2, name: /TÍTULO II\b/ });
     await expect(cabecalho).toBeVisible();
@@ -1876,18 +1884,20 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await expect(art3).toBeVisible();
   }
 
-  // O dock: Buscar, Filtrar, Ações e Modo foco numa só pílula sólida (o contrato proíbe vidro desfocado
+  // O dock: Buscar, Filtrar, Ações e Modo foco numa só barra sólida (o contrato proíbe vidro desfocado
   // atrás de texto); "Lido até aqui" fica fora.
   const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
   await expect(dock.getByRole('button')).toHaveText(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
-  const pilula = await dock.evaluate((el) => {
+  const barra = await dock.evaluate((el) => {
     const s = getComputedStyle(el);
-    return { desfoque: s.backdropFilter, fundo: s.backgroundColor };
+    return { desfoque: s.backdropFilter, fundo: s.backgroundColor, sombra: s.boxShadow };
   });
-  expect(pilula.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
+  expect(barra.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
   // Opaco: o navegador escreve `rgb(…)` sem o quarto número (a cor com transparência é `rgba(…)`).
-  expect(pilula.fundo, 'a superfície inteira, sem transparência').toMatch(/^rgb\(/);
+  expect(barra.fundo, 'a superfície inteira, sem transparência').toMatch(/^rgb\(/);
+  // Sem sombra: a camada se separa pela linha da folha (D-D9, Q7), não por profundidade.
+  expect(barra.sombra, 'o dock não leva sombra').toBe('none');
 
   // A Estrela de luz: quatro pontas e o aro que a separa da faixa.
   const botao = await estrelaDe(page, 'art3', 'Estrela: Art. 3º');

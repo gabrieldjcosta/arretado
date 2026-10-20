@@ -49,9 +49,12 @@
   color: var(--texto);
 }
 
-/* A linha de parada (D-D7, P3): "Você parou em LEP, art. 112, § 2º" e a hora, à esquerda; a caneta de
-   pé à direita, a ponta 16 px dentro da folha do Agora (que sobe por baixo dela e abre 26 px de topo).
-   Só a linha, sem a caneta, quando o Dia está fechado (a caneta fica no Resumo do Dia). */
+/* A linha de parada (D-D9, Q5; antes D-D7, P3): "Retomar em", o lugar exato em negrito e "salvo hoje,
+   22h10", à esquerda; a caneta de pé (de vidro, Q4) à direita, a 35°, com a ponta sobre a borda de
+   cima da folha do Agora: a folha sobe 7,5 px por baixo dela, a altura da caixa da caneta abaixo da
+   ponta. De dia o lugar leva uma faixa de caneta embaixo e, no fim dela, o ponto de luz do cabeçalho;
+   à noite, só o texto (`--marca-da-parada` é 1 de dia e 0 à noite). Só a linha, sem a caneta, quando o
+   Dia está fechado (a caneta fica no Resumo do Dia). */
 .parada {
   margin: 0 0 0.75rem;
 }
@@ -59,17 +62,61 @@
 .parada-texto {
   margin: 0;
   font-size: 0.9375rem;
+  line-height: 1.35;
   color: var(--texto-atenuado);
+  font-variant-numeric: tabular-nums;
 }
 
-.parada-texto strong {
-  font-weight: 700;
-  color: var(--texto);
-}
-
-.parada-quando {
+.parada-onde {
+  position: relative;
   display: block;
-  font-size: 0.8125rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 2px 0 6px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+
+/* Sobre o ponto e o halo dele, que descem até a linha de baixo quando o lugar é curto. */
+.parada-quando {
+  position: relative;
+  display: block;
+}
+
+.parada-onde::before,
+.parada-onde::after {
+  content: '';
+  position: absolute;
+  opacity: var(--marca-da-parada);
+  pointer-events: none;
+}
+
+/* A faixa: um traço de caneta da largura do lugar (a forma da prancha, esticada na largura; a altura é
+   fixa, então a espessura não muda). */
+.parada-onde::before {
+  right: -2px;
+  bottom: -5px;
+  left: -2px;
+  height: 6px;
+  background: var(--marca-ponto);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'%3E%3Cpath d='M1 3C50 2 100 4 150 2.6S190 3 199 2.4' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")
+    0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'%3E%3Cpath d='M1 3C50 2 100 4 150 2.6S190 3 199 2.4' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")
+    0 0 / 100% 100% no-repeat;
+}
+
+/* O ponto de luz no fim da faixa, centrado nela: o do cabeçalho, a tinta com o halo de lima. */
+.parada-onde::after {
+  right: -11px;
+  bottom: -6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--marca-ponto);
+  box-shadow: 0 0 0 5px var(--marca-disco);
 }
 
 .parada.com-caneta {
@@ -78,59 +125,200 @@
   display: flex;
   align-items: flex-end;
   gap: 0.375rem;
-  margin: 0 0 -1rem;
+  margin: 0 0 -7.5px;
 }
 
 .parada.com-caneta .parada-texto {
   flex: 1;
   min-width: 0;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1.375rem;
 }
 
 .parada-caneta {
-  width: 76px;
-  height: 104px;
-  margin: 0 -10px 0 auto;
+  width: 68px;
+  height: 91px;
+  margin-left: auto;
 }
 
-.parada.com-caneta + .acao-agora {
-  padding-top: 1.625rem;
-}
-
-/* "Em seguida" (D-D7, P3): até dois itens sobre a areia; o nome em negrito e o tempo em 13 px. */
+/* "Em seguida" (D-D9, Q5): um <details> nativo sobre o chão, subordinado ao Agora (sem fundo, sombra
+   nem peso de ação). Fechado: o rótulo, a primeira atividade e a seta; aberto: a lista, com uma
+   divisória de 1 px, e por atividade outro <details> com o "Trocar" e as outras atividades em chips. */
 .em-seguida {
   margin: 0 0 1rem;
 }
 
-.em-seguida-titulo,
+.em-seguida-bloco > summary,
+.em-seguida-troca > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.em-seguida-bloco > summary::-webkit-details-marker,
+.em-seguida-troca > summary::-webkit-details-marker {
+  display: none;
+}
+
+.em-seguida-resumo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 3rem;
+}
+
+.em-seguida-rotulo {
+  flex: none;
+  font-family: var(--fonte-rotulo);
+  font-size: var(--tamanho-rotulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--texto-atenuado);
+}
+
+/* O que vem: o nome encurta com reticências, o ", mais 1" não. Aberto, o espaço fica e o texto some:
+   a lista logo abaixo diz o mesmo. */
+.em-seguida-vem {
+  display: flex;
+  /* width: 0 + grow: o texto sem quebra não entra na largura mínima da coluna (senão ela vaza a 200% de zoom). */
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  color: var(--texto-atenuado);
+}
+
+.em-seguida-vem-nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.em-seguida-bloco[open] > .em-seguida-resumo .em-seguida-vem {
+  visibility: hidden;
+}
+
+/* A seta: o traço da prancha pela máscara (a cor é o texto) e, aberto, de cabeça para baixo. */
+.em-seguida-seta {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--texto);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5 12 15.5 18 9.5'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5 12 15.5 18 9.5'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+
+.em-seguida-bloco[open] > .em-seguida-resumo .em-seguida-seta {
+  transform: rotate(180deg);
+}
+
+/* Cores forçadas pintam o fundo com a cor do sistema, e a máscara sumiria: a seta pede o texto dele. */
+@media (forced-colors: active) {
+  .em-seguida-seta {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+
+.em-seguida-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.em-seguida-lista > li {
+  border-top: 1px solid var(--borda);
+}
+
+.em-seguida-linha {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.375rem 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.em-seguida-nome {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.em-seguida-tempo {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Trocar" é só o aviso do que a linha faz: a linha inteira (56 px) é o alvo do toque. */
+.em-seguida-trocar {
+  flex: none;
+  min-width: var(--alvo);
+  text-align: right;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.em-seguida-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 0 0.875rem;
+}
+
+.em-seguida-opcoes-rotulo {
+  flex-basis: 100%;
+  font-size: 0.8125rem;
+  color: var(--texto-atenuado);
+}
+
+.em-seguida-opcoes .chip {
+  max-width: 100%;
+}
+
+/* A seta gira e o que abre desce 4 px, ambos em 180 ms; só transformação (sem cor nem opacidade). Com
+   movimento reduzido ou no perfil Calmo, nada anda. */
+@media (prefers-reduced-motion: no-preference) {
+  .em-seguida-seta {
+    transition: transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .em-seguida-bloco[open] > .em-seguida-lista,
+  .em-seguida-troca[open] > .em-seguida-opcoes {
+    animation: em-seguida-abre 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  html[data-perfil='calmo'] .em-seguida-seta {
+    transition: none;
+  }
+
+  html[data-perfil='calmo'] .em-seguida-bloco[open] > .em-seguida-lista,
+  html[data-perfil='calmo'] .em-seguida-troca[open] > .em-seguida-opcoes {
+    animation: none;
+  }
+}
+
+@keyframes em-seguida-abre {
+  from {
+    transform: translateY(-4px);
+  }
+}
+
 .para-lembrar-titulo {
   margin: 0 0 0.375rem;
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--texto-atenuado);
-}
-
-.em-seguida-lista {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.em-seguida-lista li {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 44px;
-  font-weight: 600;
-}
-
-.em-seguida-tempo {
-  font-size: 0.8125rem;
-  font-weight: 400;
   color: var(--texto-atenuado);
 }
 
@@ -161,6 +349,27 @@
 
 .para-lembrar textarea {
   min-height: 5.5rem;
+}
+
+/* As notas do Estacionamento acima do campo: linhas de 44 px com a caixa do app. A marcada fica
+   riscada até a pessoa sair do Hoje, para dar para desfazer um toque sem querer. */
+.para-lembrar-notas {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.para-lembrar-notas .opcao {
+  margin: 0;
+}
+
+.para-lembrar-notas span {
+  overflow-wrap: anywhere;
+}
+
+.para-lembrar-notas input:checked + span {
+  color: var(--texto-atenuado);
+  text-decoration: line-through;
 }
 
 .para-lembrar .linha-acoes {
