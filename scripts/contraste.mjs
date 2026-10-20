@@ -116,13 +116,20 @@ export function pares(mundo = 'dia') {
   // o halo. À noite o próprio ponto é âmbar e se separa da noite e da serra.
   if (mundo === 'dia') p.push(['ponto-luz', 'ponto-halo', 3]);
   else for (const f of SUPERFICIES) p.push(['ponto-halo', f, 3]);
+  // A caneta de vidro e o quadro do cacto (Q4): o aro e o furo de tinta da caneta e o aro do cacto se
+  // separam do fundo com 3:1. O vidro em si (claro de dia, a 14% à noite) e o chão do quadro são
+  // decoração, como nas pranchas, e ficam de fora. A esfera da ponta se lê sobre o halo de dia; à
+  // noite o halo âmbar se separa da noite.
+  for (const f of SUPERFICIES) {
+    p.push(['pen-rim', f, 3], ['pen-tinta', f, 3], ['pen-tinta2', f, 3], ['quadro-aro', f, 3]);
+  }
+  if (mundo === 'dia') p.push(['pen-esfera', 'pen-halo', 3]);
+  else for (const f of SUPERFICIES) p.push(['pen-halo', f, 3]);
   p.push(
     ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.
     ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
-    // O caramelo é provisório (o sol e o miolo das flores do quadro do cacto, até a Q4), sobre a folha.
-    ['caramelo', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
