@@ -140,19 +140,25 @@ export function pares(mundo = 'dia') {
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
-    // O botão secundário e o chip (D-D9, Q3): o rótulo, o atenuado e o perigo sobre o fundo do controle
-    // (a folha de dia, a serra 2 à noite). O contorno (3:1) é medido sobre o chão e a folha, acima: à
-    // noite, sobre a serra 2, ele cai a 2,7:1, e quem identifica o botão é o rótulo.
-    ['texto', 'fundo-controle', 4.5],
+    // O botão secundário e o chip (D-D9, Q3): o atenuado e o perigo sobre o fundo do controle (a folha
+    // de dia, a serra 2 à noite; o texto sobre ele está mais abaixo, na casca da Q2). O contorno (3:1) é
+    // medido sobre o chão e a folha, acima: à noite, sobre a serra 2, ele cai a 2,7:1, e quem identifica
+    // o botão é o rótulo.
     ['texto-atenuado', 'fundo-controle', 4.5],
     ['perigo', 'fundo-controle', 4.5],
-    // "Onde estou" (provisório até a Q2): o texto sobre o fundo da aba atual.
+    // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
     ['atual-texto', 'atual-fundo', 4.5],
     // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
     ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
+    // A casca (D-D9, Q2): o rótulo da aba atual é a luz do mundo, em texto de 13 a 15 px sobre o chão;
+    // o "+" do título é o texto sobre o fundo do controle; o ponto do lockup (a tinta de dia, o âmbar
+    // à noite) fica sobre o chão do cabeçalho.
+    ['luz', 'fundo', 4.5],
+    ['texto', 'fundo-controle', 4.5],
+    ['marca-ponto', 'fundo', 3],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;

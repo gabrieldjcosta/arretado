@@ -77,8 +77,6 @@ const PALETA_DA_NOITE = {
 const CONTROLES_DO_DIA = {
   'aperto-botao': 'translateY(1px)',
   'sombra-botao-aperto': '0 1px 0 var(--tinta-funda)',
-  'espessura-contorno': '1.5px',
-  'fundo-controle': 'var(--superficie)',
   'sombra-folha': 'inset 0 0 0 1px var(--linha)',
   'peso-titulo-folha': '800',
   'espaco-titulo-folha': '-0.02em',
@@ -86,8 +84,6 @@ const CONTROLES_DO_DIA = {
 const CONTROLES_DA_NOITE = {
   'aperto-botao': 'scale(0.975)',
   'sombra-botao-aperto': 'none',
-  'espessura-contorno': '1px',
-  'fundo-controle': 'var(--superficie-2)',
   'sombra-folha': 'inset 0 0 0 1px var(--n-borda)',
   'peso-titulo-folha': '600',
   'espaco-titulo-folha': '-0.005em',
@@ -118,8 +114,29 @@ const FORMA_DA_NOITE = {
   'borda-folha': '1px solid var(--n-borda)',
   'peso-titulo': '700',
 };
-/** Os tokens que existem nos três blocos de tema: a forma, o hover da ação e a fonte do título. */
-const TOKENS_POR_MUNDO = [...Object.keys(FORMA_DO_DIA), 'acao-hover', 'fonte-titulo'];
+/**
+ * A casca (D-D9, Q2): o ponto do lockup do cabeçalho (a tinta com o halo de lima de dia, só o âmbar à
+ * noite), a espessura do contorno do controle e o fundo dele (o "+" do título; a Q3 liga campo e chip).
+ */
+const CASCA_DO_DIA = {
+  'marca-ponto': 'var(--ponto-luz)',
+  'marca-disco': 'var(--ponto-halo)',
+  'espessura-contorno': '1.5px',
+  'fundo-controle': 'var(--superficie)',
+};
+const CASCA_DA_NOITE = {
+  'marca-ponto': 'var(--ponto-halo)',
+  'marca-disco': 'transparent',
+  'espessura-contorno': '1px',
+  'fundo-controle': 'var(--superficie-2)',
+};
+/** Os tokens que existem nos três blocos de tema: a forma, a casca, o hover da ação e a fonte do título. */
+const TOKENS_POR_MUNDO = [
+  ...Object.keys(FORMA_DO_DIA),
+  ...Object.keys(CASCA_DO_DIA),
+  'acao-hover',
+  'fonte-titulo',
+];
 
 function arquivosCss(pasta: string): string[] {
   return readdirSync(pasta, { withFileTypes: true }).flatMap((e) => {
@@ -153,7 +170,7 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
     }
   });
 
-  it('os tokens de forma, o hover da ação e a fonte do título estão nos três blocos', () => {
+  it('os tokens de forma, da casca, o hover da ação e a fonte do título estão nos três blocos', () => {
     for (const [bloco, tokens] of [
       ['claro', claro],
       ['escuro (sistema)', escuroSistema],
@@ -169,6 +186,11 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
     expect(escuroManual).toMatchObject(FORMA_DA_NOITE);
     expect(claro['fonte-titulo']).toMatch(/^'Schibsted Grotesk'/);
     expect(escuroManual['fonte-titulo']).toMatch(/^'Familjen Grotesk'/);
+  });
+
+  it('a casca muda de um mundo para o outro como no contrato da D-D9 (Q2)', () => {
+    expect(claro).toMatchObject(CASCA_DO_DIA);
+    expect(escuroManual).toMatchObject(CASCA_DA_NOITE);
   });
 
   it('os tokens da identidade anterior não existem nem são usados em nenhum CSS', () => {
