@@ -28,6 +28,8 @@ export interface RespostaDeExclusao {
 
 /** Origens do app que podem chamar a função (iguais às URLs de retorno do login). */
 export const ORIGENS_PERMITIDAS: readonly string[] = [
+  'https://arretado.cc',
+  // Endereço antigo: sai da lista quando os dados locais já tiverem sido migrados para arretado.cc.
   'https://arretado.gabrieldjcosta.workers.dev',
   'http://localhost:5173',
 ];
