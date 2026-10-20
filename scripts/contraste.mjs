@@ -147,6 +147,12 @@ export function pares(mundo = 'dia') {
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
+    // O botão secundário e o chip (D-D9, Q3): o atenuado e o perigo sobre o fundo do controle (a folha
+    // de dia, a serra 2 à noite; o texto sobre ele está mais abaixo, na casca da Q2). O contorno (3:1) é
+    // medido sobre o chão e a folha, acima: à noite, sobre a serra 2, ele cai a 2,7:1, e quem identifica
+    // o botão é o rótulo.
+    ['texto-atenuado', 'fundo-controle', 4.5],
+    ['perigo', 'fundo-controle', 4.5],
     // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
     ['atual-texto', 'atual-fundo', 4.5],
     // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
@@ -231,8 +237,9 @@ export function medir(tema, mundo = mundoDe(tema)) {
   }
 
   // D-D9: os pares do contrato, com os valores fixos da paleta de cada mundo (valem nos dois temas,
-  // porque as duas paletas ficam no mesmo bloco). Filete (dia) e borda (noite) são decoração e ficam
-  // de fora: 1,22:1 e 1,85:1 no chão, de propósito.
+  // porque as duas paletas ficam no mesmo bloco). O filete (dia) e a borda (noite) são decoração e
+  // ficam de fora: 1,22:1 e 1,85:1 no chão, de propósito. A linha da folha de dia é a `linha`, medida
+  // abaixo com 3:1; a da noite é a borda, decoração. Folha e chão: 1,06:1 de dia, 1,10:1 à noite.
   const par = (fg, bg, minimo) => juntar(fg, bg, minimo, razao(cor(fg), cor(bg)));
   const branco = { r: 255, g: 255, b: 255, a: 1 };
   // Dia: tinta e tinta 2 sobre o papel e a folha; contorno do controle e linha com 3:1.

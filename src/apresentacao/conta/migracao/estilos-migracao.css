@@ -15,7 +15,7 @@
   padding: var(--espaco-4);
   background: var(--superficie);
   border-radius: var(--raio-cartao);
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
 }
 
 .migracao-etapa-anuncio {

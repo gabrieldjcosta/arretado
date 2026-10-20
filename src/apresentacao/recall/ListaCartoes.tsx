@@ -51,7 +51,7 @@ export function ListaCartoes() {
             key={e}
             type="button"
             aria-pressed={estado === e}
-            className={estado === e ? 'principal' : ''}
+            className={estado === e ? 'chip principal' : 'chip'}
             onClick={() => {
               setParams(e === 'ativo' ? {} : { estado: e }, { replace: true });
             }}
