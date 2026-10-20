@@ -1884,18 +1884,20 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await expect(art3).toBeVisible();
   }
 
-  // O dock: Buscar, Filtrar, Ações e Modo foco numa só pílula sólida (o contrato proíbe vidro desfocado
+  // O dock: Buscar, Filtrar, Ações e Modo foco numa só barra sólida (o contrato proíbe vidro desfocado
   // atrás de texto); "Lido até aqui" fica fora.
   const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
   await expect(dock.getByRole('button')).toHaveText(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
-  const pilula = await dock.evaluate((el) => {
+  const barra = await dock.evaluate((el) => {
     const s = getComputedStyle(el);
-    return { desfoque: s.backdropFilter, fundo: s.backgroundColor };
+    return { desfoque: s.backdropFilter, fundo: s.backgroundColor, sombra: s.boxShadow };
   });
-  expect(pilula.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
+  expect(barra.desfoque, 'sem vidro desfocado atrás do texto').toBe('none');
   // Opaco: o navegador escreve `rgb(…)` sem o quarto número (a cor com transparência é `rgba(…)`).
-  expect(pilula.fundo, 'a superfície inteira, sem transparência').toMatch(/^rgb\(/);
+  expect(barra.fundo, 'a superfície inteira, sem transparência').toMatch(/^rgb\(/);
+  // Sem sombra: a camada se separa pela linha da folha (D-D9, Q7), não por profundidade.
+  expect(barra.sombra, 'o dock não leva sombra').toBe('none');
 
   // A Estrela de luz: quatro pontas e o aro que a separa da faixa.
   const botao = await estrelaDe(page, 'art3', 'Estrela: Art. 3º');

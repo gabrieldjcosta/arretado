@@ -127,7 +127,6 @@
   --ponto-luz: var(--luz);
   --ponto-halo: var(--marca);
   --ponto-contorno: var(--luz);
-  --ponto-nucleo: #ffffff;
   --ponto-apagado: var(--tinta-2);
   --estrela: var(--luz);
   --estrela-luz: var(--ponto-luz);
@@ -180,12 +179,6 @@
   --bloco-acao-borda: transparent;
   --bloco-foco: var(--luz);
 
-  /* "Onde estou" da estrutura da norma (biblioteca/estrutura.css): folha com o contorno do controle,
-     provisório até a Q7. A casca (abas) não os usa mais: a aba atual leva o traço de caneta. */
-  --atual-fundo: var(--superficie);
-  --atual-texto: var(--texto);
-  --atual-sombra: inset 0 0 0 1.5px var(--contorno);
-
   /* A casca (D-D9, Q2). O lockup do cabeçalho: o ponto de luz ao lado do nome é a tinta com o halo de
      lima atrás, de dia; à noite, só o ponto, em âmbar. O contorno do controle (o "+" do título; a Q3
      liga campo e chip) é de 1,5 px de dia e de 1 px à noite, e o fundo dele é a folha de dia e a serra
@@ -229,11 +222,9 @@
   --raio-heroi: var(--raio-folha);
   --raio-cartao: var(--raio-folha);
   --raio-campo: var(--raio-botao);
-  --raio-pilula: 999px;
   --raio: var(--raio-folha);
   --sombra: none;
   --sombra-folha: inset 0 0 0 1px var(--linha);
-  --sombra-flutuante: 0 4px 16px rgb(15 28 58 / 14%);
 
   /* A forma dos pontos do Dia (componentes/luz.css as pinta com `--ponto-*`): de dia um rabisco (o anel
      de caneta e a hachura de marca-texto, de lado a lado quando feito); à noite um círculo com o
@@ -309,7 +300,6 @@
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
-    --atual-sombra: inset 0 0 0 1px var(--n-linha);
     --marca-ponto: var(--ponto-halo);
     --marca-disco: transparent;
     /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
@@ -334,7 +324,6 @@
     --peso-titulo-folha: 600;
     --espaco-titulo-folha: -0.005em;
     --sombra-folha: inset 0 0 0 1px var(--n-borda);
-    --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
     --forma-ponto-anel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E");
     --forma-ponto-atual: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M11 3A8 8 0 0 0 11 19Z'/%3E%3C/svg%3E");
     --forma-ponto-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3C/svg%3E");
@@ -388,7 +377,6 @@
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
-  --atual-sombra: inset 0 0 0 1px var(--n-linha);
   --marca-ponto: var(--ponto-halo);
   --marca-disco: transparent;
   /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
@@ -413,7 +401,6 @@
   --peso-titulo-folha: 600;
   --espaco-titulo-folha: -0.005em;
   --sombra-folha: inset 0 0 0 1px var(--n-borda);
-  --sombra-flutuante: 0 4px 16px rgb(0 0 0 / 40%);
   --forma-ponto-anel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E");
   --forma-ponto-atual: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M11 3A8 8 0 0 0 11 19Z'/%3E%3C/svg%3E");
   --forma-ponto-feito: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3C/svg%3E");
@@ -626,14 +613,17 @@ button,
   text-decoration: none;
   margin-right: auto;
   min-height: var(--alvo);
+  /* Com a fonte muito ampliada os 9 rem passam da tela: a marca encolhe com ela em vez de rolar. */
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
 }
 
 .lockup {
   display: block;
-  flex: none;
+  flex: 0 1 auto;
   width: 9rem;
+  max-width: 100%;
   height: auto;
   overflow: visible;
 }
@@ -697,7 +687,7 @@ button,
   line-height: 1;
   padding: 0.2rem 0.4rem;
   border: 1px solid var(--borda-botao);
-  border-radius: 6px;
+  border-radius: var(--raio-chip);
   background: var(--superficie-2);
   color: var(--texto-atenuado);
 }
@@ -772,12 +762,13 @@ button,
   }
 }
 
-/* "Onde estou" das abas de página (Biblioteca e outras; a Q3 as refaz): cal sobre o chão, com a
-   sombra do contorno e o rótulo em negrito. */
+/* "Onde estou" das abas de página (Biblioteca e outras; D-D9, Q7): a folha sobre o trilho, com o
+   contorno do controle por dentro (o 1,5 px que o `border` perderia) e o rótulo em negrito. O traço
+   de caneta fica nas abas de área (`.areas`): lá é a casca, aqui é um seletor de dentro da tela. */
 .abas a[aria-current='page'] {
-  background: var(--atual-fundo);
-  color: var(--atual-texto);
-  box-shadow: var(--atual-sombra);
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
   font-weight: 700;
 }
 
@@ -890,7 +881,7 @@ button,
     gap: 0.25rem;
     min-height: 4.4375rem;
     padding: 0 0.25rem;
-    font-size: 0.8125rem;
+    font-size: min(0.8125rem, 4.4vw);
     line-height: 1.4;
   }
 
@@ -1450,17 +1441,19 @@ legend {
   padding: 0.25rem;
 }
 
+/* As camadas que flutuam (diálogo, bandeja do foco, menu Ajuda e dock do Leitor; D-D9, Q7) levam a linha
+   da folha e nenhuma sombra: o contrato só dá profundidade à sombra dura do botão de dia; a camada se
+   separa do que está atrás pela linha (e pelo fundo opaco), e o diálogo ainda pelo véu. */
 dialog {
   width: min(560px, calc(100vw - 2rem));
   max-height: calc(
     100dvh - max(1rem, env(safe-area-inset-top, 0px)) - max(1rem, env(safe-area-inset-bottom, 0px))
   );
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
   background: var(--superficie);
   color: var(--texto);
   padding: 1.5rem;
-  box-shadow: var(--sombra-flutuante);
 }
 
 dialog::backdrop {
@@ -1585,7 +1578,7 @@ button.grande,
 .marcador {
   font-size: 0.8125rem;
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--raio-chip);
   background: var(--aviso-fundo);
   color: var(--aviso-texto);
 }
@@ -1593,7 +1586,7 @@ button.grande,
 .filtros {
   display: grid;
   gap: 0 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
   align-items: end;
 }
 
@@ -1752,18 +1745,18 @@ a.item-norma strong {
   min-width: 0;
 }
 
-/* O seletor de fonte é uma pílula só (P4): A−, o tamanho e A+ como segmentos, no contorno do botão
-   secundário. Cada segmento mantém o alvo de 44 px. */
+/* O seletor de fonte é um controle só (P4): A−, o tamanho e A+ como segmentos, no contorno, no fundo e
+   no raio do botão secundário (D-D9, Q7). Cada segmento mantém o alvo de 44 px. */
 .tamanho-texto {
   display: flex;
   align-items: center;
-  border: 1px solid var(--borda-botao);
-  border-radius: var(--raio-pilula);
-  background: var(--superficie);
+  border: var(--espessura-contorno) solid var(--borda-botao);
+  border-radius: var(--raio-botao);
+  background: var(--fundo-controle);
 }
 
 .tamanho-texto output {
-  min-width: 3.5rem;
+  min-width: min(3.5rem, 56px);
   text-align: center;
   font-variant-numeric: tabular-nums;
   color: var(--texto-atenuado);
@@ -1771,14 +1764,10 @@ a.item-norma strong {
 
 .tamanho-texto button {
   min-width: var(--alvo);
-  padding: 0 0.5rem;
+  padding: 0 min(0.5rem, 12px);
   border: 0;
-  border-radius: var(--raio-pilula);
+  border-radius: calc(var(--raio-botao) - 1px);
   background: var(--botao-fundo, transparent);
-}
-
-.barra-leitor .alternar-destaques {
-  border-radius: var(--raio-pilula);
 }
 
 .lista-leitor {
@@ -1837,16 +1826,17 @@ a.item-norma strong {
   gap: 0.5rem;
 }
 
-/* Flutuam sobre o texto: fundo de superfície, para a letra de trás não passar. O modo foco usa a
-   translúcida, abaixo; o grupo de ferramentas do dock é a pílula sólida (.dock-do-leitor). */
+/* Flutuam sobre o texto: fundo opaco (o do controle), para a letra de trás não passar. O modo foco usa
+   a translúcida, abaixo; o grupo de ferramentas do dock é a barra sólida (.dock-do-leitor). */
 .acoes-leitor button:not(.principal) {
-  background: var(--superficie);
-  box-shadow: var(--sombra-flutuante);
+  background: var(--fundo-controle);
 }
 
-/* O dock (P4): Buscar, Filtrar, Ações e Modo foco numa só pílula, em superfície sólida: o contrato
-   da D-D7 proíbe vidro desfocado atrás de texto, então a letra que passa por trás não passa. Quebra
-   em duas linhas, sem alargar a página, quando a tela é estreita. */
+/* O dock (P4): Buscar, Filtrar, Ações e Modo foco numa só barra, em fundo sólido: o contrato proíbe
+   vidro desfocado atrás de texto, então a letra que passa por trás não passa. Quebra em duas linhas,
+   sem alargar a página, quando a tela é estreita. Raio de controle com o recuo de 4 px somado (as
+   curvas de dentro e de fora são concêntricas, como no trilho das abas de página), linha da folha e
+   o fundo do controle: de noite ele sobe um tom sobre o cartão que cobre (D-D9, Q7). */
 .acoes-leitor .dock-do-leitor {
   display: flex;
   flex-wrap: wrap;
@@ -1854,17 +1844,16 @@ a.item-norma strong {
   gap: 2px;
   max-width: 100%;
   padding: 4px;
-  border: 1px solid var(--borda);
-  border-radius: 26px;
-  background: var(--superficie);
-  box-shadow: var(--sombra-flutuante);
+  border: var(--borda-folha);
+  border-radius: calc(var(--raio-botao) + 4px);
+  background: var(--fundo-controle);
 }
 
 .acoes-leitor .dock-do-leitor button {
   min-width: 0;
   padding: 0 0.75rem;
   border: 0;
-  border-radius: var(--raio-pilula);
+  border-radius: var(--raio-botao);
   background: var(--botao-fundo, transparent);
   box-shadow: none;
 }
@@ -1876,7 +1865,7 @@ a.item-norma strong {
 }
 
 /* Em 320 px os quatro botões só cabem numa linha com o respiro menor (o alvo continua com 44 px de
-   altura); sem isso a pílula quebra e deixa um vazio ao lado de "Modo foco". */
+   altura); sem isso o dock quebra e deixa um vazio ao lado de "Modo foco". */
 @media (max-width: 349px) {
   .acoes-leitor .dock-do-leitor button {
     padding-inline: 0.5rem;
@@ -1885,7 +1874,7 @@ a.item-norma strong {
 
 /* O trilho (P7): a partir de 1200 px, a mesma folga que põe a estrutura da norma na margem da
    esquerda, as ferramentas saem do canto de baixo e ficam na margem da direita, ao lado da coluna de
-   lei e à altura da estrutura. O dock vira a pílula em pé; as ações do trecho marcado e o aviso da
+   lei e à altura da estrutura. O dock vira a barra em pé; as ações do trecho marcado e o aviso da
    Estrela ocupam o mesmo trilho. O modo foco mantém o canto. */
 @media (min-width: 75em) {
   .leitor:not(.em-foco) .acoes-leitor {
@@ -1899,7 +1888,6 @@ a.item-norma strong {
 
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
     flex-direction: column;
-    border-radius: 22px;
   }
 
   /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
@@ -2144,7 +2132,7 @@ button.estrela {
   padding: 0;
   padding-inline-start: calc(var(--estrela-largura) - var(--calha-estrela));
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--raio-botao);
   background: transparent;
   color: var(--texto-atenuado);
   font-family: var(--fonte-interface);
@@ -2568,7 +2556,7 @@ button.marcador-nota {
   padding: 0 0.2em;
   margin: 0 0.1em;
   border: 1px solid var(--borda);
-  border-radius: 4px;
+  border-radius: var(--raio-chip);
   background: var(--superficie-2);
   color: var(--texto-atenuado);
   font-family: var(--fonte-interface);
@@ -2870,7 +2858,7 @@ dialog.dialogo-acoes {
 .barra-fina-trilho {
   flex: 1;
   height: 0.4rem;
-  border-radius: 999px;
+  border-radius: calc(var(--raio-chip) / 3);
   background: var(--superficie-2);
   overflow: hidden;
 }
@@ -2899,16 +2887,11 @@ dialog.dialogo-acoes {
   gap: 0.3rem;
 }
 
-.dia-marca {
-  width: 0.65rem;
-  height: 0.65rem;
-  border-radius: 50%;
-  border: 2px solid var(--borda);
-}
-
-.dia-marca.feito {
-  background: var(--cacto);
-  border-color: var(--cacto);
+/* Os dias com revisão: o ponto do Dia de cada mundo (`PontoDeLuz`, componentes/luz.css) em 16 px, só
+   o anel (falta) ou com o miolo cheio (feito). */
+.dias-marcas .ponto-de-luz {
+  width: 16px;
+  height: 16px;
 }
 
 /* Artigo por artigo (11.8): um cartão iluminado com o artigo inteiro e, acima e abaixo, a espiada
@@ -3167,9 +3150,8 @@ dialog.dialogo-previa .linha-acoes button {
   gap: 0.25rem;
   padding: 0.5rem;
   background: var(--superficie);
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
-  box-shadow: var(--sombra-flutuante);
   /* Rede de segurança (tela muito baixa ou texto ampliado): a pilha rola por dentro em vez de passar
      do alto da tela, onde o primeiro item ficaria fora do alcance. */
   max-height: calc(
@@ -3287,7 +3269,7 @@ dialog.dialogo-previa .linha-acoes button {
   display: inline-flex;
   align-items: center;
   padding: 0.1rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--raio-chip);
   border: 1px solid var(--borda);
   background: var(--superficie-2);
   color: var(--texto);
@@ -3325,9 +3307,8 @@ dialog.dialogo-previa .linha-acoes button {
   min-width: 13rem;
   padding: 0.5rem;
   background: var(--superficie);
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
   border-radius: var(--raio-cartao);
-  box-shadow: var(--sombra-flutuante);
 }
 
 .menu-ajuda-itens .botao,
@@ -3443,7 +3424,7 @@ dialog.dialogo-previa .linha-acoes button {
   align-items: center;
   vertical-align: middle;
   gap: 0.375rem;
-  min-width: 9rem;
+  min-width: min(9rem, 100%);
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--texto);

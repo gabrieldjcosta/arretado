@@ -68,8 +68,9 @@
   overflow-wrap: anywhere;
 }
 
-/* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai em
-   cal com a sombra fresca, como a aba atual: o estado dela não é só a cor (negrito e aria-current). */
+/* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai na
+   folha com o contorno do controle, como a aba de página atual: o estado dela não é só a cor (negrito
+   e aria-current). */
 .estrutura-da-norma .estrutura-item {
   width: 100%;
   justify-content: flex-start;
@@ -85,8 +86,8 @@
 }
 
 .estrutura-da-norma .estrutura-item[data-aqui] {
-  background: var(--atual-fundo);
-  box-shadow: var(--atual-sombra);
+  background: var(--superficie);
+  box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
 }
 
 /* Cores forçadas tiram o fundo e a sombra: o contorno do sistema leva a seção de agora. */
