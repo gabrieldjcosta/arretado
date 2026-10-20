@@ -116,13 +116,20 @@ export function pares(mundo = 'dia') {
   // o halo. À noite o próprio ponto é âmbar e se separa da noite e da serra.
   if (mundo === 'dia') p.push(['ponto-luz', 'ponto-halo', 3]);
   else for (const f of SUPERFICIES) p.push(['ponto-halo', f, 3]);
+  // A caneta de vidro e o quadro do cacto (Q4): o aro e o furo de tinta da caneta e o aro do cacto se
+  // separam do fundo com 3:1. O vidro em si (claro de dia, a 14% à noite) e o chão do quadro são
+  // decoração, como nas pranchas, e ficam de fora. A esfera da ponta se lê sobre o halo de dia; à
+  // noite o halo âmbar se separa da noite.
+  for (const f of SUPERFICIES) {
+    p.push(['pen-rim', f, 3], ['pen-tinta', f, 3], ['pen-tinta2', f, 3], ['quadro-aro', f, 3]);
+  }
+  if (mundo === 'dia') p.push(['pen-esfera', 'pen-halo', 3]);
+  else for (const f of SUPERFICIES) p.push(['pen-halo', f, 3]);
   p.push(
     ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.
     ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
-    // O caramelo é provisório (o sol e o miolo das flores do quadro do cacto, até a Q4), sobre a folha.
-    ['caramelo', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
@@ -140,13 +147,19 @@ export function pares(mundo = 'dia') {
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
-    // "Onde estou" (provisório até a Q2): o texto sobre o fundo da aba atual.
+    // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
     ['atual-texto', 'atual-fundo', 4.5],
     // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
     ['texto-atenuado', 'atual-fundo', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
+    // A casca (D-D9, Q2): o rótulo da aba atual é a luz do mundo, em texto de 13 a 15 px sobre o chão;
+    // o "+" do título é o texto sobre o fundo do controle; o ponto do lockup (a tinta de dia, o âmbar
+    // à noite) fica sobre o chão do cabeçalho.
+    ['luz', 'fundo', 4.5],
+    ['texto', 'fundo-controle', 4.5],
+    ['marca-ponto', 'fundo', 3],
   );
   for (const g of GRIFOS) p.push(['texto', g, 4.5], ['texto-atenuado', g, 4.5]);
   return p;

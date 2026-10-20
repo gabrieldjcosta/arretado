@@ -162,9 +162,10 @@ test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px
 
   const caixa = await areas.boundingBox();
   if (largura < 900) {
-    // Abas embaixo (celular e tablet em pé), presas à borda.
+    // Abas embaixo (celular e tablet em pé), presas à borda, com os 80 px da prancha (D-D9, Q2).
     expect(caixa?.y ?? 0).toBeGreaterThan(altura / 2);
     expect(Math.round((caixa?.y ?? 0) + (caixa?.height ?? 0))).toBe(altura);
+    expect(Math.round(caixa?.height ?? 0)).toBe(80);
   } else {
     expect(caixa?.y ?? 0).toBeLessThan(altura / 2);
   }
@@ -193,6 +194,55 @@ test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px
   await page.keyboard.press('e');
   await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
 });
+
+// Casca da D-D9 (Q2): o lockup parado no cabeçalho (144 px), o "+" de 48 px e o traço de caneta embaixo da
+// aba atual. O traço é só CSS (máscara colorida pelo token `--luz` do mundo): vive na aba da rota atual,
+// na cor da tinta de dia e da luz de noite, e muda de aba junto com a rota.
+for (const [esquema, cor] of [
+  ['light', 'rgb(15, 28, 58)'],
+  ['dark', 'rgb(242, 246, 255)'],
+] as const) {
+  test.describe(`casca da D-D9 (Q2) — tema ${esquema === 'light' ? 'claro' : 'escuro'}`, () => {
+    test.use({ colorScheme: esquema });
+    test('lockup, "+" de 48 px e traço da aba atual', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+
+      const lockup = await page
+        .getByRole('banner')
+        .getByRole('link', { name: 'Arretado, início' })
+        .locator('svg.lockup')
+        .boundingBox();
+      expect(Math.round(lockup?.width ?? 0)).toBe(144);
+      const mais = await page.getByRole('link', { name: 'Novo registro de erro' }).boundingBox();
+      expect([Math.round(mais?.width ?? 0), Math.round(mais?.height ?? 0)]).toEqual([48, 48]);
+
+      const areas = page.getByRole('navigation', { name: 'Áreas' });
+      const traco = (aba: string) =>
+        areas.getByRole('link', { name: aba }).evaluate((a) => {
+          const c = getComputedStyle(a, '::after');
+          return {
+            conteudo: c.content,
+            largura: c.width,
+            altura: c.height,
+            cor: c.backgroundColor,
+            mascara: c.maskImage,
+          };
+        });
+      const atual = await traco('Hoje');
+      expect(atual).toMatchObject({ conteudo: '""', largura: '30px', altura: '6px', cor });
+      expect(atual.mascara).toContain('data:image/svg+xml');
+      for (const outra of ['Trilha', 'Fixar', 'Biblioteca']) {
+        expect(['none', 'normal']).toContain((await traco(outra)).conteudo);
+      }
+
+      await areas.getByRole('link', { name: 'Trilha' }).click();
+      await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
+      expect((await traco('Trilha')).largura).toBe('30px');
+      expect(['none', 'normal']).toContain((await traco('Hoje')).conteudo);
+    });
+  });
+}
 
 // As abas de baixo (até 899 px) nunca cobrem texto no fim da página: a rolagem reserva a altura delas.
 for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/orientacoes']) {

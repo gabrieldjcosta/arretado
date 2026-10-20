@@ -35,12 +35,41 @@ describe('as 16 partes do quadro do cacto', () => {
     expect(fios.filter((f) => f.lavis).length).toBeGreaterThan(5);
   });
 
-  it('a caneta é largada dentro do quadro', () => {
+  it('só o núcleo de tinta leva ponta, e ela é o fim do traço, dentro do quadro', () => {
     const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
-    expect(REPOUSO.x).toBeGreaterThan(0);
-    expect(REPOUSO.x).toBeLessThan(largura);
-    expect(REPOUSO.y).toBeGreaterThan(0);
-    expect(REPOUSO.y).toBeLessThan(altura);
+    const fios = PARTES.flatMap((p) => p.fios);
+    expect(fios.filter((f) => f.cor === 'nucleo')).toHaveLength(3);
+    const comPonta = fios.filter((f) => f.ponta);
+    expect(comPonta.map((f) => f.cor)).toEqual(['nucleo', 'nucleo', 'nucleo']);
+    for (const { d, ponta } of comPonta) {
+      const [x = 0, y = 0] = ponta ?? [];
+      expect(x).toBeGreaterThan(0);
+      expect(x).toBeLessThan(largura);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(altura);
+      expect(d.endsWith(`V${String(y)}`)).toBe(true);
+    }
+  });
+
+  it('a caneta é largada dentro do quadro, inteira e sob o chão do desenho', () => {
+    const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
+    const { x, y, escala, graus } = REPOUSO;
+    const giro = (graus * Math.PI) / 180;
+    // Os cantos da caixa do vidro, em relação à ponta, com a caneta de pé: 46 para cada lado (os braços)
+    // e 246 de altura (o topo do tronco). Girados e escalados, têm de ficar no quadro.
+    for (const [dx, dy] of [
+      [-46, -246],
+      [46, -246],
+      [-46, 0],
+      [46, 0],
+    ] as const) {
+      const px = x + escala * (dx * Math.cos(giro) - dy * Math.sin(giro));
+      const py = y + escala * (dx * Math.sin(giro) + dy * Math.cos(giro));
+      expect(px).toBeGreaterThan(0);
+      expect(px).toBeLessThan(largura);
+      expect(py).toBeGreaterThan(160); // o chão passa entre 153 e 159
+      expect(py).toBeLessThan(altura);
+    }
   });
 });
 

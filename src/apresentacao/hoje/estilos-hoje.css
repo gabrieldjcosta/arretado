@@ -50,7 +50,8 @@
 }
 
 /* A linha de parada (D-D7, P3): "Você parou em LEP, art. 112, § 2º" e a hora, à esquerda; a caneta de
-   pé à direita, a ponta 16 px dentro da folha do Agora (que sobe por baixo dela e abre 26 px de topo).
+   pé (de vidro, D-D9 Q4) à direita, a ponta 11 px dentro da folha do Agora (que sobe 18 px por baixo
+   dela e abre 28 px de topo).
    Só a linha, sem a caneta, quando o Dia está fechado (a caneta fica no Resumo do Dia). */
 .parada {
   margin: 0 0 0.75rem;
@@ -78,7 +79,7 @@
   display: flex;
   align-items: flex-end;
   gap: 0.375rem;
-  margin: 0 0 -1rem;
+  margin: 0 0 -1.125rem;
 }
 
 .parada.com-caneta .parada-texto {
@@ -88,13 +89,13 @@
 }
 
 .parada-caneta {
-  width: 76px;
-  height: 104px;
-  margin: 0 -10px 0 auto;
+  width: 68px;
+  height: 91px;
+  margin: 0 -4px 0 auto;
 }
 
 .parada.com-caneta + .acao-agora {
-  padding-top: 1.625rem;
+  padding-top: 1.75rem;
 }
 
 /* "Em seguida" (D-D7, P3): até dois itens sobre a areia; o nome em negrito e o tempo em 13 px. */
