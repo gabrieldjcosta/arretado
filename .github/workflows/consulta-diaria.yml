@@ -1,7 +1,9 @@
 name: Consulta diária
 
 # Uma requisição leve por dia ao projeto Supabase, para o plano gratuito não pausar por inatividade.
-# Só leitura, sem dado pessoal. URL e chave vêm dos segredos do repositório (o repositório é público).
+# Lê 1 id de `arretado.catalogo` (leitura anônima, sem dado pessoal) e só passa com HTTP 200: o banco respondeu.
+# Segredo ausente ou qualquer outro código (4xx incluso) reprova o job. A raiz `/rest/v1/` não serve: recusa
+# chave publicável com 401 e não toca o banco. URL e chave vêm dos segredos do repositório (o repositório é público).
 on:
   schedule:
     - cron: '17 9 * * *'
@@ -25,20 +27,19 @@ jobs:
         shell: bash
         run: |
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
-            echo "::warning::Segredos SUPABASE_URL e/ou SUPABASE_PUBLISHABLE_KEY ausentes; consulta não feita."
-            exit 0
+            echo "::error::Segredos SUPABASE_URL e/ou SUPABASE_PUBLISHABLE_KEY ausentes; consulta não feita."
+            exit 1
           fi
           base="${SUPABASE_URL%/}"
           for tentativa in 1 2 3; do
             codigo=$(curl --silent --output /dev/null --write-out '%{http_code}' \
               --max-time 20 --request GET \
               --header "apikey: $SUPABASE_PUBLISHABLE_KEY" \
-              "$base/rest/v1/" || true)
+              --header "Accept-Profile: arretado" \
+              "$base/rest/v1/catalogo?select=id&limit=1" || true)
             echo "Tentativa $tentativa: HTTP ${codigo:-sem resposta}"
-            case "$codigo" in
-              [234]??) exit 0 ;;
-            esac
+            [ "$codigo" = 200 ] && exit 0
             [ "$tentativa" -lt 3 ] && sleep $((tentativa * 15))
           done
-          echo "::error::Supabase não respondeu (5xx ou timeout) em 3 tentativas."
+          echo "::error::Consulta ao Supabase falhou em 3 tentativas (esperado HTTP 200; último: ${codigo:-sem resposta})."
           exit 1
