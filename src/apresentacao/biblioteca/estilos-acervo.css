@@ -37,7 +37,7 @@
   width: 22px;
   height: 22px;
   border: 2px solid var(--borda-forte);
-  border-radius: 6px;
+  border-radius: calc(var(--raio-botao) / 2);
   background: var(--superficie);
   color: var(--selecionado-texto);
 }

@@ -1844,7 +1844,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa de cal com a caneta deitada, 
     await expect(agora).toContainText('em leitura');
     const titulo2 = estrutura.getByRole('button', { name: /^TÍTULO II\b/ });
     await expect(titulo2).toContainText('ainda não lida');
-    await expect(titulo2.locator('svg')).toHaveCount(1);
+    // O ponto é um `span` que o CSS desenha por máscara (D-D9, Q3), não mais um SVG: o estado vai no atributo.
+    await expect(titulo2.locator('.ponto-de-luz')).toHaveAttribute('data-estado', 'falta');
     await apertar(titulo2, toque);
     const cabecalho = page.getByRole('heading', { level: 2, name: /TÍTULO II\b/ });
     await expect(cabecalho).toBeVisible();

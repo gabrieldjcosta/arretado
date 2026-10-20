@@ -1025,6 +1025,18 @@ dialog .perigoso {
   color: var(--perigo-texto);
 }
 
+/* O hover do destrutivo (D-D9, Q3): o contorno ganha 8% de perigo no fundo; no diálogo, o cheio cede 12%
+   para o texto. A letra segue a 5,4:1 ou mais nos dois mundos. */
+@media (hover: hover) {
+  .perigoso:not(:disabled):hover {
+    background: color-mix(in srgb, var(--perigo) 8%, var(--fundo-controle));
+  }
+
+  dialog .perigoso:not(:disabled):hover {
+    background: color-mix(in srgb, var(--perigo) 88%, var(--perigo-texto));
+  }
+}
+
 /* Chip (D-D9, Q3): o botão de alternar em grupo ("Errei", o filtro de estado dos cartões), com
    `aria-pressed`. Mais justo que o botão e com o raio do chip (6 px de dia, 10 à noite); ligado, leva
    a luz cheia da `.principal[aria-pressed='true']` e continua do mesmo tamanho, sem pular de largura. */
