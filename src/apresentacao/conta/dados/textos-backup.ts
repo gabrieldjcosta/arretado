@@ -28,6 +28,7 @@ export const TEXTOS_EXPORTAR_TEXTO = {
   dica: 'Arquivo sem senha, para ler ou guardar onde quiser. Não serve para restaurar; para isso, use o backup.',
   frasesBotao: 'Frases corretas (.txt)',
   resumosBotao: 'Resumos (.txt)',
+  tudoBotao: 'Tudo para usar fora (.zip: Markdown e CSV)',
   semFrases: 'Nenhuma frase ainda',
   semResumos: 'Nenhum resumo ainda',
 };
@@ -164,7 +165,10 @@ export function formatarResumosTexto(
 }
 
 /** Nome do arquivo exportado com a data no formato AAAA-MM-DD. */
-export function nomeArquivoExportacao(tipo: 'frases' | 'resumos', data = new Date()): string {
+export function nomeArquivoExportacao(
+  tipo: 'frases' | 'resumos' | 'tudo',
+  data = new Date(),
+): string {
   return `arretado-${tipo}-${dataCivil(data)}.txt`;
 }
 
