@@ -185,6 +185,11 @@
      2 à noite. */
   --marca-ponto: var(--ponto-luz);
   --marca-disco: var(--ponto-halo);
+  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
+     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
+  --marca-da-parada: 1;
+  --fonte-rotulo: var(--fonte-titulo);
+  --tamanho-rotulo: 0.9375rem;
   --espessura-contorno: 1.5px;
   --fundo-controle: var(--superficie);
 
@@ -297,6 +302,11 @@
     --bloco-acao-texto: var(--n-noite);
     --marca-ponto: var(--ponto-halo);
     --marca-disco: transparent;
+    /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
+       seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
+    --marca-da-parada: 0;
+    --fonte-rotulo: var(--fonte-interface);
+    --tamanho-rotulo: 0.875rem;
     --espessura-contorno: 1px;
     --fundo-controle: var(--superficie-2);
     --selecionado-texto: var(--n-noite);
@@ -369,6 +379,11 @@
   --bloco-acao-texto: var(--n-noite);
   --marca-ponto: var(--ponto-halo);
   --marca-disco: transparent;
+  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
+     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
+  --marca-da-parada: 0;
+  --fonte-rotulo: var(--fonte-interface);
+  --tamanho-rotulo: 0.875rem;
   --espessura-contorno: 1px;
   --fundo-controle: var(--superficie-2);
   --selecionado-texto: var(--n-noite);

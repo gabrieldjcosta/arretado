@@ -5,7 +5,15 @@ import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico
 import { decidirProximaAcao, type EntradaDaProximaAcao } from '../../dominios/hoje/proxima-acao';
 import { criarCartaoManual } from '../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { acoesEmSeguida, carregarRetrato, ITENS_EM_SEGUIDA } from './retrato';
+import {
+  acoesEmSeguida,
+  agoraEOutras,
+  carregarRetrato,
+  emSeguidaComTrocas,
+  ITENS_EM_SEGUIDA,
+  trocarDeLugar,
+  type RetratoDoHoje,
+} from './retrato';
 
 const DIA = 24 * 60 * 60_000;
 
@@ -40,6 +48,12 @@ const tudo: EntradaDaProximaAcao = {
   tarefa: { id: 't1', titulo: 'Ler arts. 1 a 5', estimativaMin: 7 },
   leitura: { normaId: 'n1', tituloCurto: 'LEP', onde: 'Art. 2º', minutos: 9 },
 };
+/** Os quatro tipos com algo a fazer: o Agora é a revisão, e a leitura fica fora do "Em seguida". */
+const completo: EntradaDaProximaAcao = {
+  ...tudo,
+  ciclo: { id: 'c1', disciplina: 'Penal', blocoOrdem: 1, total: 5, volta: 1, minutos: 25 },
+};
+const tipos = (acoes: readonly { tipo: string }[]) => acoes.map((a) => a.tipo);
 
 describe('Hoje › retrato (P3)', () => {
   describe('acoesEmSeguida', () => {
@@ -76,12 +90,94 @@ describe('Hoje › retrato (P3)', () => {
     });
   });
 
+  describe('agoraEOutras', () => {
+    it('sem preferência é a decisão: o Agora e, na ordem, todas as outras com algo a fazer', () => {
+      const { agora, outras } = agoraEOutras(completo, []);
+      expect(agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'revisao_vencida' } });
+      expect(tipos(outras)).toEqual(['ciclo', 'tarefa', 'leitura_salva']);
+    });
+
+    it('o tipo preferido vira o Agora, e o da decisão passa a ser uma das outras', () => {
+      const { agora, outras } = agoraEOutras(completo, [], 'leitura_salva');
+      expect(agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'leitura_salva' } });
+      expect(tipos(outras)).toEqual(['revisao_vencida', 'ciclo', 'tarefa']);
+    });
+
+    it('o preferido que foi dispensado, ou que não tem o que fazer, não conta', () => {
+      expect(agoraEOutras(completo, ['leitura_salva'], 'leitura_salva').agora).toMatchObject({
+        acao: { tipo: 'revisao_vencida' },
+      });
+      expect(agoraEOutras(tudo, [], 'ciclo').agora).toMatchObject({
+        acao: { tipo: 'revisao_vencida' },
+      });
+    });
+
+    it('sem nada a fazer: o vazio e nenhuma outra', () => {
+      const vazio: EntradaDaProximaAcao = { cartoesVencidos: 0, frasesVencidas: 0 };
+      const { agora, outras } = agoraEOutras(vazio, [], 'tarefa');
+      expect(agora.tipo).toBe('vazio');
+      expect(outras).toEqual([]);
+    });
+  });
+
+  describe('trocarDeLugar', () => {
+    it('o tipo que já estava em outro lugar troca de lugar com o que estava neste', () => {
+      expect(trocarDeLugar(['ciclo', 'tarefa'], 0, 'tarefa')).toEqual(['tarefa', 'ciclo']);
+    });
+
+    it('um tipo que estava fora da lista entra no lugar e o de lá sai', () => {
+      expect(trocarDeLugar(['ciclo', 'tarefa'], 1, 'leitura_salva')).toEqual([
+        'ciclo',
+        'leitura_salva',
+      ]);
+    });
+
+    it('o mesmo tipo no mesmo lugar não muda nada, e a lista de entrada fica como estava', () => {
+      const entrada = ['ciclo', 'tarefa'] as const;
+      expect(trocarDeLugar(entrada, 0, 'ciclo')).toEqual(['ciclo', 'tarefa']);
+      trocarDeLugar(entrada, 0, 'tarefa');
+      expect(entrada).toEqual(['ciclo', 'tarefa']);
+    });
+  });
+
+  describe('emSeguidaComTrocas', () => {
+    const { agora, outras } = agoraEOutras(completo, []);
+    const retrato: RetratoDoHoje = {
+      data: '2026-10-14',
+      agora,
+      emSeguida: outras.slice(0, ITENS_EM_SEGUIDA),
+      outras,
+      pontos: { leitura: 'falta', cartoes: 'atual', frases: 'falta' },
+      diaFechado: false,
+    };
+
+    it('sem troca, é o "em seguida" da decisão', () => {
+      expect(tipos(emSeguidaComTrocas(retrato, undefined))).toEqual(['ciclo', 'tarefa']);
+    });
+
+    it('com troca, segue a ordem da pessoa, e pode trazer uma que ficou de fora', () => {
+      expect(tipos(emSeguidaComTrocas(retrato, ['leitura_salva', 'ciclo']))).toEqual([
+        'leitura_salva',
+        'ciclo',
+      ]);
+    });
+
+    it('uma ordem que não cabe mais nos dados é ignorada, e carregando não há nada', () => {
+      expect(tipos(emSeguidaComTrocas(retrato, ['revisao_vencida', 'ciclo']))).toEqual([
+        'ciclo',
+        'tarefa',
+      ]);
+      expect(emSeguidaComTrocas(undefined, ['ciclo'])).toEqual([]);
+    });
+  });
+
   describe('carregarRetrato', () => {
     it('sem nada: o vazio com os três começos, os pontos apagados e sem parada', async () => {
       const { repo } = await repositorioDeTeste();
       const r = await carregarRetrato(repo);
       expect(r.agora.tipo).toBe('vazio');
       expect(r.emSeguida).toEqual([]);
+      expect(r.outras).toEqual([]);
       expect(r.parada).toBeUndefined();
       expect(r.pontos).toEqual({ leitura: 'falta', cartoes: 'falta', frases: 'falta' });
       expect(r.diaFechado).toBe(false);
@@ -93,7 +189,7 @@ describe('Hoje › retrato (P3)', () => {
       await lerLep(repo);
       const r = await carregarRetrato(repo);
       expect(r.agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'leitura_salva' } });
-      expect(r.parada).toEqual({ rotulo: 'LEP, art. 1º', quando: 'hoje, 09h00' });
+      expect(r.parada).toEqual({ rotulo: 'LEP, art. 1º', quando: 'salvo hoje, 09h00' });
       expect(r.pontos.leitura).toBe('feito');
     });
 
@@ -105,7 +201,8 @@ describe('Hoje › retrato (P3)', () => {
       const r = await carregarRetrato(repo);
       expect(r.agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'revisao_vencida' } });
       expect(r.emSeguida.map((a) => a.tipo)).toEqual(['leitura_salva']);
-      expect(r.parada).toEqual({ rotulo: 'LEP, art. 1º', quando: 'dia 23/09, 09h00' });
+      expect(r.outras.map((a) => a.tipo)).toEqual(['leitura_salva']);
+      expect(r.parada).toEqual({ rotulo: 'LEP, art. 1º', quando: 'salvo dia 23/09, 09h00' });
       expect(r.pontos).toEqual({ leitura: 'falta', cartoes: 'atual', frases: 'falta' });
     });
 

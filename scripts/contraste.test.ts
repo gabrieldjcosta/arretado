@@ -143,6 +143,20 @@ const CASCA_DA_NOITE = {
   'espessura-contorno': '1px',
   'fundo-controle': 'var(--superficie-2)',
 };
+/**
+ * O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 e 0), e o rótulo do "Em
+ * seguida" é o título de dia (Schibsted, 15 px) e a interface à noite (Atkinson, 14 px), como no contrato.
+ */
+const HOJE_DO_DIA = {
+  'marca-da-parada': '1',
+  'fonte-rotulo': 'var(--fonte-titulo)',
+  'tamanho-rotulo': '0.9375rem',
+};
+const HOJE_DA_NOITE = {
+  'marca-da-parada': '0',
+  'fonte-rotulo': 'var(--fonte-interface)',
+  'tamanho-rotulo': '0.875rem',
+};
 /** Os tokens que existem nos três blocos de tema: a forma, a casca, o hover da ação e a fonte do título. */
 const TOKENS_POR_MUNDO = [
   ...Object.keys(FORMA_DO_DIA),
@@ -264,6 +278,11 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
   it('a casca muda de um mundo para o outro como no contrato da D-D9 (Q2)', () => {
     expect(claro).toMatchObject(CASCA_DO_DIA);
     expect(escuroManual).toMatchObject(CASCA_DA_NOITE);
+  });
+
+  it('a linha de parada e o rótulo do "Em seguida" mudam de mundo nos três blocos (Q5)', () => {
+    expect(claro).toMatchObject(HOJE_DO_DIA);
+    for (const bloco of [escuroSistema, escuroManual]) expect(bloco).toMatchObject(HOJE_DA_NOITE);
   });
 
   it('os tokens da identidade anterior não existem nem são usados em nenhum CSS', () => {
