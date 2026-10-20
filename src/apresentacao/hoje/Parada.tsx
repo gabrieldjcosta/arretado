@@ -1,6 +1,6 @@
 // A linha de parada do Hoje (D-D7, P3): onde a pessoa parou de ler e a caneta encostada na folha.
 import { Caneta } from '../componentes/Caneta';
-import type { ParadaDaLeitura } from './parada';
+import type { ParadaDaLeitura } from './parada-da-leitura';
 
 /**
  * "Você parou em LEP, art. 112, § 2º" com a hora, e a caneta-cacto de pé na borda de cima da folha
