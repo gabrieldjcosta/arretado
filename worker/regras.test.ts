@@ -172,8 +172,18 @@ describe('buscarPagina: corpos não lidos (revisão das etapas 8, 9 e 11)', () =
 });
 
 describe('rota /api/buscar-norma', () => {
+  let ambiente: Parameters<typeof worker.fetch>[1];
   const rota = (caminho: string, init?: RequestInit) =>
-    worker.fetch(new Request(`https://arretado.exemplo.workers.dev${caminho}`, init));
+    worker.fetch(
+      new Request(`https://arretado.exemplo.workers.dev${caminho}`, {
+        ...init,
+        headers: new Headers({
+          'Sec-Fetch-Site': 'same-origin',
+          ...(init?.headers as Record<string, string>),
+        }),
+      }),
+      ambiente,
+    );
 
   it('repassa os bytes com tipo neutro e cabeçalhos de segurança', async () => {
     const bytes = new Uint8Array([0x3c, 0xe7, 0x3e]);
@@ -202,6 +212,34 @@ describe('rota /api/buscar-norma', () => {
     expect((await rota('/api/buscar-norma?url=x', { method: 'POST' })).status).toBe(405);
     expect((await rota('/api/outra')).status).toBe(404);
     expect(buscar).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('recusa pedido de outro site ou sem Sec-Fetch-Site (403) sem buscar nada', async () => {
+    const buscar = vi.fn();
+    vi.stubGlobal('fetch', buscar);
+    const alvo = `/api/buscar-norma?url=${encodeURIComponent('https://www.planalto.gov.br/x')}`;
+    for (const cabecalho of ['cross-site', 'same-site', 'none', '']) {
+      const r = await rota(alvo, { headers: { 'Sec-Fetch-Site': cabecalho } });
+      expect(r.status).toBe(403);
+      expect(await r.json()).toEqual({ erro: 'origem_nao_permitida' });
+    }
+    expect(buscar).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('responde 429 quando o limitador recusa e consulta por IP', async () => {
+    const buscar = vi.fn();
+    vi.stubGlobal('fetch', buscar);
+    const limit = vi.fn().mockResolvedValue({ success: false });
+    ambiente = { LIMITADOR: { limit } };
+    const r = await rota('/api/buscar-norma?url=x', {
+      headers: { 'CF-Connecting-IP': '203.0.113.9' },
+    });
+    expect(r.status).toBe(429);
+    expect(limit).toHaveBeenCalledWith({ key: '203.0.113.9' });
+    expect(buscar).not.toHaveBeenCalled();
+    ambiente = undefined;
     vi.unstubAllGlobals();
   });
 });
