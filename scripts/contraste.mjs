@@ -70,7 +70,7 @@ export function razao(a, b) {
   return (x + 0.05) / (y + 0.05);
 }
 
-const FUNDOS = ['fundo', 'superficie', 'superficie-2', 'quente'];
+const FUNDOS = ['fundo', 'superficie', 'superficie-2'];
 const SUPERFICIES = ['fundo', 'superficie'];
 const GRIFOS = ['grifo-1', 'grifo-2', 'grifo-3'];
 const DESTAQUES = ['destaque-prazo', 'destaque-condicao', 'destaque-absoluto', 'destaque-pena'];

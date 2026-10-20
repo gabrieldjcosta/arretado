@@ -91,7 +91,6 @@
   --fundo: var(--papel);
   --superficie: var(--folha);
   --superficie-2: color-mix(in srgb, var(--tinta) 5%, var(--papel));
-  --quente: var(--superficie-2);
   --texto: var(--tinta);
   --texto-atenuado: var(--tinta-2);
   --titulo: var(--tinta);

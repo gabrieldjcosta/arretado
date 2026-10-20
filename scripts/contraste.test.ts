@@ -3,11 +3,19 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { lerTemas, medir, razao } from './contraste.mjs';
 
-/** Tokens das identidades anteriores: a verde-oliva saiu na fundação do redesenho v2; a paleta da
- * D-D5 (creme, marinho, sol) e os seus aliases saíram com o Ponto de luz (D-D7); a paleta da D-D7
- * (areia, cal, vidro, noite-*) saiu com "Tinta e noite" (D-D9). `tinta`, `tinta-2` e `luz` voltam com
- * outro sentido e não estão aqui. A varredura casa o nome inteiro (`--cal` não pega `--calha-estrela`). */
+/**
+ * Os tokens que saíram, por identidade e por fase: a verde-oliva saiu na fundação do redesenho v2; a paleta
+ * da D-D5 (creme, marinho, sol) e os seus aliases saíram com o Ponto de luz (D-D7); a paleta da D-D7
+ * (areia, cal, vidro, noite-*) saiu com "Tinta e noite" (D-D9). Dentro da D-D9: a Q3 tirou a borda
+ * transparente da folha do Agora (`--bloco-borda`); a Q4 trocou `--caneta-*` por `--pen-*` e tirou o
+ * caramelo; a Q7 tirou `--atual-*` (a aba e a seção atuais usam os papéis `--superficie` e o contorno do
+ * controle), `--sombra-flutuante` (as camadas que flutuam perderam a sombra: o contrato só dá profundidade
+ * à sombra dura do botão de dia), `--raio-pilula` e `--ponto-nucleo`; a Q8 tirou `--quente`, o apelido de
+ * `--superficie-2` que já não tinha uso. `tinta`, `tinta-2` e `luz` voltam com outro sentido e não
+ * estão aqui. A varredura casa o nome inteiro (`--cal` não pega `--calha-estrela`).
+ */
 const TOKENS_REMOVIDOS = [
+  // Antes da D-D9
   'primaria',
   'primaria-texto',
   'agora-fundo',
@@ -45,6 +53,30 @@ const TOKENS_REMOVIDOS = [
   'noite-tinta-2',
   'noite-vidro',
   'noite-traco',
+  // Q3
+  'bloco-borda',
+  // Q4
+  'caramelo',
+  'caneta-0',
+  'caneta-1',
+  'caneta-2',
+  'caneta-3',
+  'caneta-4',
+  'caneta-miolo',
+  'caneta-borda',
+  'caneta-borda-opacidade',
+  'caneta-brilho',
+  'caneta-halo-dia',
+  'caneta-halo-noite',
+  // Q7
+  'atual-fundo',
+  'atual-texto',
+  'atual-sombra',
+  'sombra-flutuante',
+  'raio-pilula',
+  'ponto-nucleo',
+  // Q8
+  'quente',
 ];
 
 /** A paleta de cada mundo, como nas pranchas m2-agora (dia) e m1-agora (noite): é o contrato da D-D9. */
@@ -90,23 +122,6 @@ const CONTROLES_DA_NOITE = {
 };
 /** A forma do ponto do Dia (Q3): uma máscara para o anel e uma para cada estado com miolo (atual, feito). */
 const FORMAS_DO_PONTO = ['forma-ponto-anel', 'forma-ponto-atual', 'forma-ponto-feito'];
-
-/** O que a Q3 tirou: a borda transparente da folha do Agora (`--bloco-borda`); agora a folha e o cartão levam
- * a mesma linha, `--borda-folha`. */
-const TOKENS_REMOVIDOS_NA_Q3 = ['bloco-borda'];
-
-/** O que a Q7 tirou: a aba de página atual e a seção atual da norma usam os papéis (`--superficie` e o
- * contorno do controle) no lugar de `--atual-*`; as camadas que flutuam (diálogo, bandeja, menu e dock)
- * perderam a sombra (`--sombra-flutuante`: o contrato só dá profundidade à sombra dura do botão de dia) e o
- * dock e o seletor de fonte o raio de pílula (`--raio-pilula`); `--ponto-nucleo` não tinha mais uso. */
-const TOKENS_REMOVIDOS_NA_Q7 = [
-  'atual-fundo',
-  'atual-texto',
-  'atual-sombra',
-  'sombra-flutuante',
-  'raio-pilula',
-  'ponto-nucleo',
-];
 
 /** A forma de cada mundo (D-D9): o dia é angular; a noite é arredondada. A folha em repouso leva a linha de
  * 1 px do mundo nos dois (a `--borda` das pranchas Dia fechado: #838FA7 de dia, #34425E à noite), não o
@@ -163,23 +178,6 @@ const TOKENS_POR_MUNDO = [
   ...Object.keys(CASCA_DO_DIA),
   'acao-hover',
   'fonte-titulo',
-];
-
-/** Os tokens da caneta e do quadro do cacto que a Q4 trocou: `--caneta-*` virou `--pen-*` e o
- * caramelo saiu (o sol e o miolo das flores agora são tinta; a ponta do núcleo leva a marca do mundo). */
-const TOKENS_REMOVIDOS_NA_Q4 = [
-  'caramelo',
-  'caneta-0',
-  'caneta-1',
-  'caneta-2',
-  'caneta-3',
-  'caneta-4',
-  'caneta-miolo',
-  'caneta-borda',
-  'caneta-borda-opacidade',
-  'caneta-brilho',
-  'caneta-halo-dia',
-  'caneta-halo-noite',
 ];
 
 /** A caneta de vidro e o quadro do cacto, como nas pranchas m2/m1-dia-fechado e no kit (`pen.mjs` v5):
@@ -285,8 +283,8 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
     for (const bloco of [escuroSistema, escuroManual]) expect(bloco).toMatchObject(HOJE_DA_NOITE);
   });
 
-  it('os tokens da identidade anterior não existem nem são usados em nenhum CSS', () => {
-    const removidos = [...TOKENS_REMOVIDOS, ...TOKENS_REMOVIDOS_NA_Q4];
+  it('os tokens que saíram não existem nem são usados em nenhum CSS', () => {
+    const removidos = TOKENS_REMOVIDOS;
     for (const t of removidos) expect(claro).not.toHaveProperty(t);
     // O nome inteiro: depois de `--nome` não vem letra, número, hífen nem sublinhado.
     const usadoEm = (linha: string, t: string) => new RegExp(`--${t}(?![\\w-])`).test(linha);
@@ -337,38 +335,10 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
       for (const f of FORMAS_DO_PONTO)
         expect(claro[f], `${f} muda com o mundo`).not.toBe(escuroManual[f]);
     });
-
-    it('os tokens que a Q3 tirou não existem nem são usados em nenhum CSS', () => {
-      for (const t of TOKENS_REMOVIDOS_NA_Q3) expect(claro).not.toHaveProperty(t);
-      const usos = arquivosCss(path.join(import.meta.dirname, '..', 'src')).flatMap((arquivo) =>
-        readFileSync(arquivo, 'utf8')
-          .split('\n')
-          .flatMap((linha, i) =>
-            TOKENS_REMOVIDOS_NA_Q3.filter((t) => new RegExp(`--${t}(?![\\w-])`).test(linha)).map(
-              (t) => `${path.basename(arquivo)}:${i + 1} --${t}`,
-            ),
-          ),
-      );
-      expect(usos).toEqual([]);
-    });
   });
 
   describe('varredura das telas (D-D9, Q7)', () => {
     const css = () => arquivosCss(path.join(import.meta.dirname, '..', 'src'));
-
-    it('os tokens que a Q7 tirou não existem nem são usados em nenhum CSS', () => {
-      for (const t of TOKENS_REMOVIDOS_NA_Q7) expect(claro).not.toHaveProperty(t);
-      const usos = css().flatMap((arquivo) =>
-        readFileSync(arquivo, 'utf8')
-          .split('\n')
-          .flatMap((linha, i) =>
-            TOKENS_REMOVIDOS_NA_Q7.filter((t) => new RegExp(`--${t}(?![\\w-])`).test(linha)).map(
-              (t) => `${path.basename(arquivo)}:${i + 1} --${t}`,
-            ),
-          ),
-      );
-      expect(usos).toEqual([]);
-    });
 
     it('nenhum CSS usa raio de pílula: a forma vem dos tokens de raio de cada mundo', () => {
       const pilulas = css().flatMap((arquivo) =>
