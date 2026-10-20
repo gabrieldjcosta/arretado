@@ -1,91 +1,208 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T00:00:00Z",
+  "generatedAt": "2026-10-20T00:00:00Z",
   "title": "Design System: Arretado",
   "extensions": {
     "colorMeta": {
-      "vidro": {
+      "tinta": {
         "role": "primary",
-        "displayName": "Vidro",
-        "canonical": "#0f7f72"
+        "displayName": "Tinta",
+        "canonical": "#0f1c3a"
       },
-      "cal": {
+      "n-luz": {
+        "role": "primary",
+        "displayName": "Luz",
+        "canonical": "#f2f6ff"
+      },
+      "folha": {
         "role": "secondary",
-        "displayName": "Cal",
+        "displayName": "Folha",
         "canonical": "#ffffff"
       },
-      "tinta": {
+      "n-serra": {
         "role": "secondary",
-        "displayName": "Tinta",
-        "canonical": "#17243a"
+        "displayName": "Serra",
+        "canonical": "#131d31"
       },
-      "luz": {
+      "n-serra-2": {
+        "role": "secondary",
+        "displayName": "Serra 2",
+        "canonical": "#1c2942"
+      },
+      "tinta-funda": {
+        "role": "secondary",
+        "displayName": "Tinta funda",
+        "canonical": "#0a1428"
+      },
+      "marca": {
         "role": "tertiary",
-        "displayName": "Luz",
-        "canonical": "#6fe3d6"
+        "displayName": "Lima",
+        "canonical": "#eefa4b"
       },
-      "traco": {
+      "n-ambar": {
         "role": "tertiary",
-        "displayName": "Traço",
-        "canonical": "#c8742f"
+        "displayName": "Âmbar",
+        "canonical": "#ffc53d"
       },
-      "areia": {
+      "n-vidro": {
+        "role": "tertiary",
+        "displayName": "Vidro da noite",
+        "canonical": "#9db7e8"
+      },
+      "papel": {
         "role": "neutral",
-        "displayName": "Areia",
-        "canonical": "#f1e6d3"
+        "displayName": "Papel",
+        "canonical": "#f6f8fb"
+      },
+      "n-noite": {
+        "role": "neutral",
+        "displayName": "Noite",
+        "canonical": "#0b1322"
+      },
+      "tinta-2": {
+        "role": "neutral",
+        "displayName": "Tinta 2",
+        "canonical": "#4a5878"
+      },
+      "n-texto": {
+        "role": "neutral",
+        "displayName": "Texto da noite",
+        "canonical": "#eef2fa"
+      },
+      "n-texto-2": {
+        "role": "neutral",
+        "displayName": "Texto 2 da noite",
+        "canonical": "#a4b1cb"
+      },
+      "contorno": {
+        "role": "neutral",
+        "displayName": "Contorno",
+        "canonical": "#6e7a96"
+      },
+      "n-linha": {
+        "role": "neutral",
+        "displayName": "Linha da noite",
+        "canonical": "#5c6b8c"
+      },
+      "linha": {
+        "role": "neutral",
+        "displayName": "Linha",
+        "canonical": "#838fa7"
+      },
+      "n-borda": {
+        "role": "neutral",
+        "displayName": "Borda da noite",
+        "canonical": "#34425e"
+      },
+      "filete": {
+        "role": "neutral",
+        "displayName": "Filete",
+        "canonical": "#dde2ea"
+      },
+      "perigo": {
+        "role": "neutral",
+        "displayName": "Perigo",
+        "canonical": "#a4262c"
+      },
+      "aviso-fundo": {
+        "role": "neutral",
+        "displayName": "Fundo do aviso",
+        "canonical": "#fff4d6"
+      },
+      "aviso-texto": {
+        "role": "neutral",
+        "displayName": "Texto do aviso",
+        "canonical": "#4d3800"
       }
     },
     "typographyMeta": {
       "titulo-pagina": {
         "displayName": "Título de página",
-        "purpose": "H1 e marca, só em Gabarito."
+        "purpose": "H1 de dia: Schibsted Grotesk 800, 30, 34 e 38 px."
+      },
+      "titulo-pagina-noite": {
+        "displayName": "Título de página, noite",
+        "purpose": "H1 à noite: Familjen Grotesk 700, nos mesmos tamanhos."
+      },
+      "titulo-folha": {
+        "displayName": "Título da folha",
+        "purpose": "Título da folha do Agora e do Resumo do Dia, de dia."
+      },
+      "titulo-folha-noite": {
+        "displayName": "Título da folha, noite",
+        "purpose": "O mesmo título à noite, em peso 600."
+      },
+      "secao": {
+        "displayName": "Seção",
+        "purpose": "H2 em Atkinson 700; H3 em 1,0625 rem."
       },
       "corpo": {
         "displayName": "Corpo",
         "purpose": "Interface em Atkinson Hyperlegible Next."
       },
+      "botao": {
+        "displayName": "Botão",
+        "purpose": "Rótulo de botão em Atkinson 600, 15 px."
+      },
+      "rotulo-em-seguida": {
+        "displayName": "Rótulo \"Em seguida\"",
+        "purpose": "De dia, o título em 15 px, peso 800."
+      },
+      "rotulo-em-seguida-noite": {
+        "displayName": "Rótulo \"Em seguida\", noite",
+        "purpose": "À noite, a interface em 14 px, peso 700."
+      },
       "leitura-da-lei": {
         "displayName": "Leitura da lei",
         "purpose": "Texto do Leitor em Literata, sem itálico."
+      },
+      "dica": {
+        "displayName": "Dica",
+        "purpose": "Apoio e estado em 0,9 rem, atenuado."
       }
     },
     "shadows": [
       {
-        "name": "folha",
-        "value": "0 14px 28px -10px rgb(23 36 58 / 16%), 0 1px 0 rgb(23 36 58 / 16%)",
-        "purpose": "A sombra fresca: folha do Agora e folhas que sobem."
+        "name": "botao-do-dia",
+        "value": "0 2px 0 #0a1428",
+        "purpose": "O carimbo do mundo de dia: a única sombra do app, no botão principal. Ao apertar, o botão desce 1 px e a sombra vai a 0 1px 0."
       },
       {
-        "name": "cartao",
-        "value": "0 1px 2px rgb(23 36 58 / 6%), 0 6px 16px -10px rgb(23 36 58 / 16%)",
-        "purpose": "Cartões comuns."
+        "name": "linha-da-folha",
+        "value": "1px solid #838fa7 (dia) · 1px solid #34425e (noite)",
+        "purpose": "A folha do Agora, o cartão, o estado vazio, o diálogo, o menu Ajuda e o dock se separam do chão por esta linha, não pela cor nem pela sombra."
       },
       {
-        "name": "atual",
-        "value": "0 4px 12px -4px rgb(23 36 58 / 16%)",
-        "purpose": "Área e aba atuais, em cal sobre a areia."
+        "name": "faixa-do-lido",
+        "value": "inset 0 0 0 1px #838fa7 (dia) · inset 0 0 0 1px #34425e (noite)",
+        "purpose": "A mesma linha, por dentro, na faixa do trecho lido no Leitor."
       },
       {
-        "name": "botao",
-        "value": "0 2px 6px rgb(23 36 58 / 14%)",
-        "purpose": "Botão primário."
-      },
-      {
-        "name": "flutuante",
-        "value": "0 4px 16px rgb(23 36 58 / 14%)",
-        "purpose": "O dock do Leitor e o que flutua sobre o texto (diálogos, bandeja do foco)."
+        "name": "noite",
+        "value": "none",
+        "purpose": "À noite não há sombra nenhuma; o botão principal encolhe a 0,975 ao apertar."
       }
     ],
     "motion": [
       {
         "name": "botao",
         "value": "140ms ease (transform, box-shadow)",
-        "purpose": "Pressionar o botão; desligado com prefers-reduced-motion."
+        "purpose": "Pressionar o botão: de dia desce 1 px com a sombra a 1 px, à noite encolhe a 0,975; nunca anima cor; desligado com prefers-reduced-motion."
       },
       {
         "name": "ponto-acende",
         "value": "160ms cubic-bezier(.2, .7, .2, 1)",
         "purpose": "Um ponto do Dia acende uma vez (escala .6 a 1)."
+      },
+      {
+        "name": "em-seguida-abre",
+        "value": "180ms cubic-bezier(.2, .7, .2, 1)",
+        "purpose": "A lista do \"Em seguida\" desce 4 px ao abrir; no perfil Calmo, sem animação."
+      },
+      {
+        "name": "escrita-do-nome",
+        "value": "2,64 s completa · 1,2 s curta (Calmo: 0,24 s de opacidade)",
+        "purpose": "O nome \"arretado\" se escreve e a caneta vira o cacto: completa só na primeira abertura no aparelho, curta na primeira de cada Dia, parada nas demais; com movimento reduzido, parada."
       },
       {
         "name": "quadro-do-cacto",
@@ -101,6 +218,11 @@
         "name": "passagem-do-cartao",
         "value": "190ms de saída e 210ms de entrada, cubic-bezier(.2, .7, .2, 1) (Calmo: 150 e 170ms de opacidade)",
         "purpose": "O cartão respondido sai e o seguinte entra; com movimento reduzido, troca na hora."
+      },
+      {
+        "name": "modo-foco",
+        "value": "200ms ease-out",
+        "purpose": "A penumbra e o cartão do modo foco entram uma vez."
       }
     ],
     "breakpoints": [
@@ -111,6 +233,10 @@
       {
         "name": "desktop",
         "value": "900px"
+      },
+      {
+        "name": "trilho-do-leitor",
+        "value": "1200px"
       }
     ]
   },
@@ -119,176 +245,200 @@
       "name": "Botão primário",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "A ação da tela: vidro com texto branco, um por tela.",
-      "html": "<button class=\"ds-btn-primary\">Continuar</button>",
-      "css": ".ds-btn-primary{background:#0f7f72;color:#fff;border:0;border-radius:12px;min-height:44px;padding:0 20px;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;letter-spacing:-0.01em;box-shadow:0 2px 6px rgb(23 36 58 / 14%);cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}.ds-btn-primary:hover{background:color-mix(in srgb,#0f7f72 86%,#17243a)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
+      "description": "A ação da tela, um por tela. De dia, tinta cheia com texto branco, raio 6 e a sombra dura de 2 px (desce 1 px ao apertar); à noite, luz cheia com o texto da noite, raio 12, sem sombra (encolhe ao apertar).",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><button class=\"ds-btn-primary\">Continuar</button></div><div class=\"ds-noite\"><button class=\"ds-btn-primary\">Continuar</button></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-btn-primary{min-height:44px;padding:0 20px;border:1.5px solid transparent;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;letter-spacing:-0.01em;cursor:pointer;transition:transform 140ms ease,box-shadow 140ms ease}.ds-dia .ds-btn-primary{background:#0f1c3a;color:#fff;border-radius:6px;box-shadow:0 2px 0 #0a1428}.ds-dia .ds-btn-primary:hover{background:color-mix(in srgb,#0f1c3a 80%,#4a5878)}.ds-dia .ds-btn-primary:active{transform:translateY(1px);box-shadow:0 1px 0 #0a1428}.ds-dia .ds-btn-primary:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite .ds-btn-primary{background:#f2f6ff;color:#0b1322;border-radius:12px;box-shadow:none}.ds-noite .ds-btn-primary:hover{background:color-mix(in srgb,#f2f6ff 88%,#9db7e8)}.ds-noite .ds-btn-primary:active{transform:scale(.975)}.ds-noite .ds-btn-primary:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     },
     {
       "name": "Botão secundário",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Qualquer ação que não seja a da tela.",
-      "html": "<button class=\"ds-btn-secondary\">Trocar tarefa</button>",
-      "css": ".ds-btn-secondary{background:#fff;color:#17243a;border:1px solid rgb(23 36 58 / 20%);border-radius:12px;min-height:44px;padding:0 20px;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;cursor:pointer}.ds-btn-secondary:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
+      "description": "Qualquer ação que não seja a da tela: o fundo do controle (a folha de dia, a serra 2 à noite), o contorno do mundo (1,5 px de dia, 1 px à noite) e o texto do mundo.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><button class=\"ds-btn-secondary\">Trocar tarefa</button></div><div class=\"ds-noite\"><button class=\"ds-btn-secondary\">Trocar tarefa</button></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-btn-secondary{min-height:44px;padding:0 20px;font:600 15px/1 'Atkinson Hyperlegible Next',system-ui,sans-serif;letter-spacing:-0.01em;cursor:pointer}.ds-dia .ds-btn-secondary{background:#fff;color:#0f1c3a;border:1.5px solid #6e7a96;border-radius:6px}.ds-dia .ds-btn-secondary:hover{background:color-mix(in srgb,#0f1c3a 6%,#fff)}.ds-dia .ds-btn-secondary:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite .ds-btn-secondary{background:#1c2942;color:#eef2fa;border:1px solid #5c6b8c;border-radius:12px}.ds-noite .ds-btn-secondary:hover{background:color-mix(in srgb,#eef2fa 6%,#1c2942)}.ds-noite .ds-btn-secondary:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     },
     {
       "name": "Cartão",
       "kind": "card",
       "refersTo": "card",
-      "description": "Contêiner padrão: cal, raio 16, borda fina e sombra baixa.",
-      "html": "<div class=\"ds-card\">Seu ponto está salvo neste aparelho.</div>",
-      "css": ".ds-card{background:#fff;color:#17243a;border:1px solid rgb(23 36 58 / 12%);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgb(23 36 58 / 6%),0 6px 16px -10px rgb(23 36 58 / 16%);font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}"
+      "description": "Contêiner que agrupa (um formulário com os botões, a Sessão em andamento, o resumo do que houve): a folha com a linha de 1 px do mundo, raio 8 de dia e 14 à noite, sem sombra.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><div class=\"ds-card\">Seu ponto está salvo neste aparelho.</div></div><div class=\"ds-noite\"><div class=\"ds-card\">Seu ponto está salvo neste aparelho.</div></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-card{padding:20px;font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-dia .ds-card{background:#fff;color:#0f1c3a;border:1px solid #838fa7;border-radius:8px}.ds-noite .ds-card{background:#131d31;color:#eef2fa;border:1px solid #34425e;border-radius:14px}"
     },
     {
       "name": "Folha do Agora",
       "kind": "custom",
       "refersTo": "folha-agora",
-      "description": "A folha de cal com a sombra fresca: título em Gabarito, motivo, tempo e um botão de vidro; dentro dela, \"Escolher outra coisa\" como botão de texto sublinhado.",
-      "html": "<section class=\"ds-agora\"><h2>Continuar a leitura</h2><p>Seção II, Dos Regimes. Faltam 5 parágrafos do art. 112.</p><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Continuar</button><button class=\"ds-agora-outra\">Escolher outra coisa</button></section>",
-      "css": ".ds-agora{background:#fff;color:#17243a;border-radius:16px;padding:20px;box-shadow:0 14px 28px -10px rgb(23 36 58 / 16%),0 1px 0 rgb(23 36 58 / 16%);font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-agora h2{font:750 1.5rem/1.12 'Gabarito','Atkinson Hyperlegible Next',system-ui,sans-serif;margin:0 0 4px}.ds-agora p{margin:0 0 4px;color:#4f5b70}.ds-agora-btn{background:#0f7f72;color:#fff;border:0;border-radius:12px;min-height:52px;margin-top:8px;padding:0 20px;font:600 17px 'Atkinson Hyperlegible Next',system-ui,sans-serif;width:100%;cursor:pointer}.ds-agora-btn:focus-visible{outline:2px solid #17243a;outline-offset:2px}.ds-agora-outra{display:block;margin:6px auto 0;padding:0 8px;min-height:44px;background:none;border:0;color:#17243a;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;text-decoration:underline;cursor:pointer}"
+      "description": "A folha com a linha do mundo: título em 26 px (Schibsted 800 de dia, Familjen 600 à noite), motivo e tempo atenuados, o botão principal de 52 px e, abaixo, \"Escolher outra coisa\" como botão de texto sublinhado. Dentro dela os controles levam o fundo da própria folha.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><section class=\"ds-agora\"><h2>Continuar a leitura</h2><p>Seção II, Dos Regimes. Faltam 5 parágrafos do art. 112.</p><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Continuar</button><button class=\"ds-agora-outra\">Escolher outra coisa</button></section></div><div class=\"ds-noite\"><section class=\"ds-agora\"><h2>Continuar a leitura</h2><p>Seção II, Dos Regimes. Faltam 5 parágrafos do art. 112.</p><p>cerca de 6 min</p><button class=\"ds-agora-btn\">Continuar</button><button class=\"ds-agora-outra\">Escolher outra coisa</button></section></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-agora{padding:20px;font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-agora h2{margin:0 0 4px;font-size:26px;line-height:1.15}.ds-agora p{margin:0 0 4px}.ds-agora-btn{display:block;width:100%;min-height:52px;margin-top:8px;padding:0 20px;border:1.5px solid transparent;font:700 17px 'Atkinson Hyperlegible Next',system-ui,sans-serif;cursor:pointer}.ds-agora-outra{display:block;margin:6px auto 0;padding:0 8px;min-height:44px;background:none;border:0;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;color:inherit;cursor:pointer}.ds-dia .ds-agora{background:#fff;color:#0f1c3a;border:1px solid #838fa7;border-radius:8px}.ds-dia .ds-agora h2{font-family:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;font-weight:800;letter-spacing:-0.02em}.ds-dia .ds-agora p{color:#4a5878}.ds-dia .ds-agora-btn{background:#0f1c3a;color:#fff;border-radius:6px;box-shadow:0 2px 0 #0a1428}.ds-dia .ds-agora-btn:focus-visible,.ds-dia .ds-agora-outra:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite .ds-agora{background:#131d31;color:#eef2fa;border:1px solid #34425e;border-radius:14px}.ds-noite .ds-agora h2{font-family:'Familjen Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;font-weight:600;letter-spacing:-0.005em}.ds-noite .ds-agora p{color:#a4b1cb}.ds-noite .ds-agora-btn{background:#f2f6ff;color:#0b1322;border-radius:12px}.ds-noite .ds-agora-btn:focus-visible,.ds-noite .ds-agora-outra:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     },
     {
       "name": "Pontos do Dia",
       "kind": "custom",
       "refersTo": "pontos-do-dia",
-      "description": "Leitura, Cartões e Frases numa linha sob o título do Hoje: um círculo de 22 px, sempre com o contorno na tinta, e o rótulo ao lado. Apagado (só o anel), pela metade (é a vez) ou aceso (feito hoje). O estado também vem em texto, para o leitor de tela. Acende uma vez, em 160 ms.",
-      "html": "<ul class=\"ds-pontos\"><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg>Leitura</li><li class=\"atual\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3a9 9 0 0 1 0 18z\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg>Cartões</li><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"rgb(23 36 58 / 55%)\" stroke-width=\"1.5\"/></svg>Frases</li></ul>",
-      "css": ".ds-pontos{display:flex;gap:18px;margin:0;padding:0;list-style:none;font:600 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#4f5b70}.ds-pontos li{display:flex;align-items:center;gap:6px}.ds-pontos li.atual{color:#17243a}.ds-pontos svg{width:22px;height:22px}"
+      "description": "Leitura, Cartões e Frases numa linha sob o título do Hoje: um ponto de 22 px e o rótulo de 13 px. A forma muda por mundo e por estado, nunca só a cor: de dia um anel de caneta irregular com a hachura de marca-texto, em tinta (metade quando é a vez, inteira quando feito); à noite um círculo, vazio, com a metade cheia ou cheio. O estado também vem em texto, para o leitor de tela. Acende uma vez, em 160 ms.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><ul class=\"ds-pontos\"><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><clipPath id=\"c1\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\"/></clipPath><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path clip-path=\"url(#c1)\" d=\"M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8 11.6 19.1 14.4 3.3 14.5 17.9 17.3 5.3 17.4 16.2 19 8.4\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"2.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Leitura</li><li class=\"atual\"><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><clipPath id=\"c2\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\"/></clipPath><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path clip-path=\"url(#c2)\" d=\"M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"2.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Cartões</li><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#4a5878\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Frases</li></ul></div><div class=\"ds-noite\"><ul class=\"ds-pontos\"><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\" fill=\"none\" stroke=\"#f2f6ff\" stroke-width=\"1.6\"/><circle cx=\"11\" cy=\"11\" r=\"8\" fill=\"#f2f6ff\"/></svg>Leitura</li><li class=\"atual\"><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\" fill=\"none\" stroke=\"#f2f6ff\" stroke-width=\"1.6\"/><path d=\"M11 3A8 8 0 0 0 11 19Z\" fill=\"#f2f6ff\"/></svg>Cartões</li><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\" fill=\"none\" stroke=\"#a4b1cb\" stroke-width=\"1.6\"/></svg>Frases</li></ul></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-pontos{display:flex;gap:18px;margin:0;padding:0;list-style:none;font:600 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-pontos li{display:flex;align-items:center;gap:6px}.ds-pontos svg{width:22px;height:22px}.ds-dia .ds-pontos{color:#4a5878}.ds-dia .ds-pontos li.atual{color:#0f1c3a}.ds-noite .ds-pontos{color:#a4b1cb}.ds-noite .ds-pontos li.atual{color:#eef2fa}"
     },
     {
       "name": "Linha de parada",
       "kind": "custom",
       "refersTo": "linha-de-parada",
-      "description": "Onde e quando a leitura parou, à esquerda; a caneta de pé à direita, com a ponta dentro da folha do Agora. Sem a caneta quando o Dia está fechado (ela fica no Resumo do Dia).",
-      "html": "<p class=\"ds-parada\">Você parou em <strong>LEP, art. 112, § 2º</strong><span>ontem, 21h40</span></p>",
-      "css": ".ds-parada{margin:0;font:400 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#4f5b70}.ds-parada strong{font-weight:700;color:#17243a}.ds-parada span{display:block;font-size:13px}"
+      "description": "\"Retomar em\" e o lugar exato em negrito, com \"salvo ontem, 21h40\" embaixo. De dia o lugar leva uma faixa de caneta e, no fim dela, o ponto de luz com o halo de lima; à noite, só o texto. A caneta de pé fica à direita, com a ponta sobre a borda da folha do Agora; sem ela quando o Dia está fechado (ela fica no Resumo do Dia).",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><p class=\"ds-parada\">Retomar em <strong class=\"ds-onde\">LEP, art. 112, § 2º</strong><span>salvo ontem, 21h40</span></p></div><div class=\"ds-noite\"><p class=\"ds-parada\">Retomar em <strong class=\"ds-onde\">LEP, art. 112, § 2º</strong><span>salvo ontem, 21h40</span></p></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-parada{margin:0;font:400 15px/1.35 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-onde{position:relative;display:block;width:fit-content;margin:2px 0 6px;font-size:17px;font-weight:700;line-height:24px}.ds-parada span{display:block}.ds-dia .ds-parada{color:#4a5878}.ds-dia .ds-onde{color:#0f1c3a}.ds-dia .ds-onde::before{content:'';position:absolute;right:-2px;bottom:-5px;left:-2px;height:6px;background:#0f1c3a;-webkit-mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'%3E%3Cpath d='M1 3C50 2 100 4 150 2.6S190 3 199 2.4' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E\") 0 0/100% 100% no-repeat;mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'%3E%3Cpath d='M1 3C50 2 100 4 150 2.6S190 3 199 2.4' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E\") 0 0/100% 100% no-repeat}.ds-dia .ds-onde::after{content:'';position:absolute;right:-11px;bottom:-6px;width:8px;height:8px;border-radius:50%;background:#0f1c3a;box-shadow:0 0 0 5px #eefa4b}.ds-noite .ds-parada{color:#a4b1cb}.ds-noite .ds-onde{color:#eef2fa}"
     },
     {
-      "name": "Lido sobre a faixa de cal",
+      "name": "Lido na faixa da folha",
       "kind": "custom",
       "refersTo": "lido-na-faixa",
-      "description": "No Leitor, do começo da norma ao \"lido até\", o texto vai sobre uma faixa de cal de raio 8, com 12 px de folga de cada lado; o que falta ler fica na areia. \"Lido até aqui\" fecha o lido, em 13 px peso 700, com a caneta deitada ao lado.",
-      "html": "<div class=\"ds-lido\"><p>Art. 112. A pena privativa de liberdade será executada em forma progressiva.</p><p class=\"marca\">Lido até aqui</p></div><p class=\"ds-falta\">§ 1º A transferência para regime menos rigoroso será determinada pelo juiz.</p>",
-      "css": ".ds-lido{background:#fff;color:#17243a;border-radius:8px;padding:6px 12px;font:400 18px/1.6 'Literata',Georgia,serif}.ds-lido p{margin:0}.ds-lido .marca{margin-top:4px;font:700 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-falta{margin:6px 0 0;padding:0 12px;color:#17243a;font:400 18px/1.6 'Literata',Georgia,serif}"
+      "description": "No Leitor, do começo da norma ao \"lido até\", o texto vai sobre a faixa da folha (raio 8, a linha de 1 px do mundo por dentro, 12 px de folga de cada lado); o que falta ler fica no chão. \"Lido até aqui\" fecha o lido, em 13 px peso 700, com a caneta deitada ao lado.",
+      "html": "<div class=\"ds-chao\"><div class=\"ds-lido\"><p>Art. 112. A pena privativa de liberdade será executada em forma progressiva.</p><p class=\"marca\">Lido até aqui</p></div><p class=\"ds-falta\">§ 1º A transferência para regime menos rigoroso será determinada pelo juiz.</p></div>",
+      "css": ".ds-chao{background:#f6f8fb;padding:12px;border-radius:8px}.ds-lido{background:#fff;color:#0f1c3a;border-radius:8px;box-shadow:inset 0 0 0 1px #838fa7;padding:6px 12px;font:400 18px/1.6 'Literata',Georgia,serif}.ds-lido p{margin:0}.ds-lido .marca{margin-top:4px;font:700 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-falta{margin:6px 0 0;padding:0 12px;color:#0f1c3a;font:400 18px/1.6 'Literata',Georgia,serif}"
     },
     {
       "name": "Estrutura da norma",
       "kind": "nav",
       "refersTo": "estrutura-da-norma",
-      "description": "Ao lado do texto, a partir de 700 px: o bloco de agora e os irmãos dele (as seções do capítulo), cada um com o ponto de luz do que já foi lido (aceso = lida, pela metade = em leitura, apagado = ainda não lida); o de agora em cal com a sombra fresca e os blocos de dentro dele logo abaixo, num degrau. O caminho (título, capítulo) vai acima, em texto atenuado, e tocar nele sobe um nível.",
-      "html": "<nav class=\"ds-estrutura\" aria-label=\"Estrutura da norma\"><p class=\"acima\">TÍTULO I, Da Execução Penal</p><ul><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg><span><b>Seção I</b><i>Disposições Gerais</i></span></li><li class=\"aqui\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3a9 9 0 0 1 0 18z\" fill=\"#6fe3d6\"/><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"#17243a\" stroke-width=\"1.5\"/><circle cx=\"12\" cy=\"12\" r=\"3.4\" fill=\"#fff\"/></svg><span><b>Seção II</b><i>Dos Regimes</i></span></li><li><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"rgb(23 36 58 / 55%)\" stroke-width=\"1.5\"/></svg><span><b>Seção III</b><i>Das Autorizações</i></span></li></ul></nav>",
-      "css": ".ds-estrutura{width:200px;font:400 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#17243a}.ds-estrutura .acima{margin:0 0 8px;padding:4px 10px;color:#4f5b70}.ds-estrutura ul{display:grid;gap:2px;margin:0;padding:0;list-style:none}.ds-estrutura li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:12px}.ds-estrutura li.aqui{background:#fff;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-estrutura svg{width:20px;height:20px;flex:none}.ds-estrutura span{display:grid;line-height:1.3}.ds-estrutura b{font-weight:700}.ds-estrutura i{font-style:normal;color:#4f5b70}"
+      "description": "Ao lado do texto, a partir de 700 px: o bloco de agora e os irmãos dele (as seções do capítulo), cada um com o ponto de luz do que já foi lido (inteiro = lida, metade = em leitura, só o anel = ainda não lida); o de agora vai na folha com o contorno do controle e os blocos de dentro dele logo abaixo, num degrau. O caminho (título, capítulo) vai acima, em texto atenuado, e tocar nele sobe um nível.",
+      "html": "<nav class=\"ds-estrutura\" aria-label=\"Estrutura da norma\"><p class=\"acima\">TÍTULO I, Da Execução Penal</p><ul><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><clipPath id=\"e1\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\"/></clipPath><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path clip-path=\"url(#e1)\" d=\"M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8 11.6 19.1 14.4 3.3 14.5 17.9 17.3 5.3 17.4 16.2 19 8.4\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"2.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span><b>Seção I</b><i>Disposições Gerais</i></span></li><li class=\"aqui\"><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><clipPath id=\"e2\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\"/></clipPath><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path clip-path=\"url(#e2)\" d=\"M3 14 5.7 5.7 5.8 17.7 8.6 3.4 8.8 19 11.5 2.8\" fill=\"none\" stroke=\"#0f1c3a\" stroke-width=\"2.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span><b>Seção II</b><i>Dos Regimes</i></span></li><li><svg viewBox=\"0 0 22 22\" aria-hidden=\"true\"><path d=\"M16.1 5.1C14.6 3.9 12.8 3.3 10.9 3.4C6.7 3.6 3.4 7.1 3.5 11.3C3.6 15.5 7.1 18.8 11.3 18.7C15.4 18.6 18.7 15.2 18.6 11C18.5 8.6 17.5 6.6 15.8 5.1C14.6 4 13.1 3.2 11.4 3\" fill=\"none\" stroke=\"#4a5878\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span><b>Seção III</b><i>Das Autorizações</i></span></li></ul></nav>",
+      "css": ".ds-estrutura{width:200px;padding:12px;background:#f6f8fb;border-radius:8px;font:400 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#0f1c3a}.ds-estrutura .acima{margin:0 0 8px;padding:4px 10px;color:#4a5878}.ds-estrutura ul{display:grid;gap:2px;margin:0;padding:0;list-style:none}.ds-estrutura li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px}.ds-estrutura li.aqui{background:#fff;box-shadow:inset 0 0 0 1.5px #6e7a96}.ds-estrutura svg{width:20px;height:20px;flex:none}.ds-estrutura span{display:grid;line-height:1.3}.ds-estrutura b{font-weight:700}.ds-estrutura i{font-style:normal;color:#4a5878}"
     },
     {
       "name": "Dock do Leitor",
       "kind": "custom",
       "refersTo": "dock-do-leitor",
-      "description": "Buscar, Filtrar, Ações e Modo foco numa só pílula sólida (a superfície, sem desfoque: a letra da lei não passa por trás); \"Lido até aqui\" fica ao lado, em botão de vidro de ação. Em cores forçadas é Canvas com contorno CanvasText.",
-      "html": "<div class=\"ds-dock\"><div class=\"grupo\" role=\"group\" aria-label=\"Ferramentas da leitura\"><button>Buscar</button><button>Filtrar</button><button>Ações</button><button>Modo foco</button></div><button class=\"principal\">Lido até aqui</button></div>",
-      "css": ".ds-dock{display:flex;gap:8px;align-items:center;justify-content:flex-end;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-dock .grupo{display:flex;gap:2px;padding:4px;border:1px solid rgb(23 36 58 / 12%);border-radius:26px;background:#fff;box-shadow:0 4px 16px rgb(23 36 58 / 14%)}.ds-dock .grupo button{min-height:44px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:#17243a;font:inherit}.ds-dock .principal{min-height:44px;padding:0 20px;border:0;border-radius:12px;background:#0f7f72;color:#fff;font:inherit;box-shadow:0 2px 6px rgb(23 36 58 / 14%)}"
+      "description": "Buscar, Filtrar, Ações e Modo foco numa só barra sólida (o fundo do controle, a linha da folha, raio do botão + 4 px, sem sombra e sem desfoque: a letra da lei não passa por trás); \"Lido até aqui\" fica ao lado, em botão principal. Em cores forçadas é Canvas com contorno CanvasText.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><div class=\"ds-dock\"><div class=\"grupo\" role=\"group\" aria-label=\"Ferramentas da leitura\"><button>Buscar</button><button>Filtrar</button><button>Ações</button><button>Modo foco</button></div><button class=\"principal\">Lido até aqui</button></div></div><div class=\"ds-noite\"><div class=\"ds-dock\"><div class=\"grupo\" role=\"group\" aria-label=\"Ferramentas da leitura\"><button>Buscar</button><button>Filtrar</button><button>Ações</button><button>Modo foco</button></div><button class=\"principal\">Lido até aqui</button></div></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-dock{display:flex;gap:8px;align-items:center;justify-content:flex-end;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-dock .grupo{display:flex;gap:2px;padding:4px}.ds-dock .grupo button{min-height:44px;padding:0 12px;border:0;background:transparent;font:inherit}.ds-dock .principal{min-height:44px;padding:0 20px;font:inherit;border:0}.ds-dia .grupo{background:#fff;border:1px solid #838fa7;border-radius:10px}.ds-dia .grupo button{color:#0f1c3a;border-radius:6px}.ds-dia .principal{background:#0f1c3a;color:#fff;border-radius:6px;box-shadow:0 2px 0 #0a1428}.ds-noite .grupo{background:#1c2942;border:1px solid #34425e;border-radius:16px}.ds-noite .grupo button{color:#eef2fa;border-radius:12px}.ds-noite .principal{background:#f2f6ff;color:#0b1322;border-radius:12px}"
     },
     {
       "name": "Campo de texto",
       "kind": "input",
       "refersTo": "field",
-      "description": "Altura 48, contorno de 1,5 px, rótulo sempre visível.",
-      "html": "<label class=\"ds-label\">Para lembrar<input class=\"ds-input\" type=\"text\"></label>",
-      "css": ".ds-label{display:grid;gap:4px;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#17243a}.ds-input{min-height:48px;padding:10px 14px;border:1.5px solid #727c8f;border-radius:12px;font:inherit;background:#fff;color:#17243a}.ds-input:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
+      "description": "Altura 48, contorno do mundo (1,5 px de dia, 1 px à noite), raio do botão, fundo da superfície (a folha de dia, a serra à noite) e rótulo sempre visível.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><label class=\"ds-label\">Para lembrar<input class=\"ds-input\" type=\"text\"></label></div><div class=\"ds-noite\"><label class=\"ds-label\">Para lembrar<input class=\"ds-input\" type=\"text\"></label></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-label{display:grid;gap:4px;font:600 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-input{min-height:48px;padding:10px 14px;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-dia .ds-label{color:#0f1c3a}.ds-dia .ds-input{background:#fff;color:#0f1c3a;border:1.5px solid #6e7a96;border-radius:6px}.ds-dia .ds-input:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite .ds-label{color:#eef2fa}.ds-noite .ds-input{background:#131d31;color:#eef2fa;border:1px solid #5c6b8c;border-radius:12px}.ds-noite .ds-input:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     },
     {
-      "name": "Abas",
+      "name": "Abas de página",
       "kind": "nav",
       "refersTo": "nav-item-current",
-      "description": "Trilho em pílula na areia funda; a aba atual é cal com a sombra fresca.",
+      "description": "Trilho com o raio do botão + 4 px sobre a superfície 2; a aba atual é a folha com o contorno do controle por dentro e o rótulo em negrito. No celular o trilho rola na horizontal.",
       "html": "<nav class=\"ds-abas\"><a class=\"ds-aba\" aria-current=\"page\" href=\"#\">Frases</a><a class=\"ds-aba\" href=\"#\">Cartões</a><a class=\"ds-aba\" href=\"#\">Histórico</a></nav>",
-      "css": ".ds-abas{display:flex;gap:4px;padding:4px;border-radius:999px;background:#e7d8be;font:400 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-aba{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;color:#17243a;text-decoration:none}.ds-aba[aria-current='page']{background:#fff;color:#17243a;font-weight:700;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-aba:focus-visible{outline:2px solid #17243a;outline-offset:-2px}"
+      "css": ".ds-abas{display:flex;gap:4px;padding:4px;border-radius:10px;background:color-mix(in srgb,#0f1c3a 5%,#f6f8fb);font:600 16px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-aba{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:6px;color:#0f1c3a;text-decoration:none}.ds-aba[aria-current='page']{background:#fff;font-weight:700;box-shadow:inset 0 0 0 1.5px #6e7a96}.ds-aba:focus-visible{outline:2px solid #0f1c3a;outline-offset:-3px}"
     },
     {
       "name": "Abas das áreas",
       "kind": "nav",
       "refersTo": "nav-item-current",
-      "description": "Até 899 px, presas embaixo sobre a areia, com filete em cima: ícone de 22 sobre o rótulo de 13, aba de 56. A atual em cal com a sombra fresca e o rótulo em negrito. A partir de 900 px, no centro do cabeçalho, só o rótulo, em pílula de 44.",
+      "description": "Até 899 px, presas embaixo no chão, com a divisória em cima: ícone de 24 sobre o rótulo de 13, barra de 80. A atual vai na luz do mundo, em negrito, com o traço de caneta embaixo (30 × 6 px). A partir de 900 px, no centro do cabeçalho, só o rótulo.",
       "html": "<nav class=\"ds-areas\" aria-label=\"Áreas\"><a href=\"#\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z\"/></svg><span>Hoje</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 5h14v14H5zM5 10h14M9 3v4M15 3v4\"/></svg><span>Trilha</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11\"/></svg><span>Fixar</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5zM5 18.5A1.5 1.5 0 0 0 6.5 20H19\"/></svg><span>Biblioteca</span></a></nav>",
-      "css": ".ds-areas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:6px 8px 14px;background:#f1e6d3;border-top:1px solid rgb(23 36 58 / 12%);font:500 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-areas a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border-radius:999px;color:#17243a;text-decoration:none}.ds-areas svg{width:22px;height:22px}.ds-areas a[aria-current='page']{background:#fff;font-weight:700;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-areas a:focus-visible{outline:2px solid #17243a;outline-offset:-2px}"
+      "css": ".ds-areas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 0 8px;background:#f6f8fb;border-top:1px solid #dde2ea;font:400 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-areas a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:71px;color:#4a5878;font-weight:600;text-decoration:none}.ds-areas svg{width:24px;height:24px}.ds-areas a[aria-current='page']{color:#0f1c3a;font-weight:700}.ds-areas a[aria-current='page']::after{content:'';position:absolute;left:50%;bottom:5px;width:30px;height:6px;margin-left:-15px;background:#0f1c3a;-webkit-mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M2 4C9 2.6 19 4.4 28 2.2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E\") center/100% 100% no-repeat;mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M2 4C9 2.6 19 4.4 28 2.2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E\") center/100% 100% no-repeat}.ds-areas a:focus-visible{outline:2px solid #0f1c3a;outline-offset:-3px}"
     },
     {
       "name": "Mais",
       "kind": "button",
       "refersTo": "button-mais",
-      "description": "O \"+\" na linha do título do Hoje e do Fixar: redondo, 44 px, cal com tinta e a sombra fresca; abre o registro de erro. Não é vidro (o vidro é a ação da tela).",
-      "html": "<div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div>",
-      "css": ".ds-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-titulo h1{margin:0;font:800 30px Gabarito,system-ui,sans-serif;color:#17243a}.ds-mais{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#fff;color:#17243a;box-shadow:0 4px 12px -4px rgb(23 36 58 / 16%)}.ds-mais svg{width:22px;height:22px}.ds-mais:focus-visible{outline:2px solid #17243a;outline-offset:2px}"
+      "description": "O \"+\" na linha do título do Hoje e do Fixar: redondo, 48 px, com o contorno e o fundo do controle de cada mundo; abre o registro de erro. Não é a ação da tela.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div></div><div class=\"ds-noite\"><div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-titulo h1{margin:0;font-size:30px;line-height:1.1;letter-spacing:-0.02em}.ds-mais{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%}.ds-mais svg{width:24px;height:24px}.ds-dia h1{font:800 30px/1.1 'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;color:#0f1c3a}.ds-dia .ds-mais{background:#fff;color:#0f1c3a;border:1.5px solid #6e7a96}.ds-dia .ds-mais:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite h1{font:700 30px/1.1 'Familjen Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;color:#eef2fa}.ds-noite .ds-mais{background:#1c2942;color:#eef2fa;border:1px solid #5c6b8c}.ds-noite .ds-mais:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     }
   ],
   "narrative": {
-    "northStar": "Ponto de luz",
-    "overview": "A luz do sertão como tinta: areia clara, uma folha de cal com sombra fresca, e a caneta-cacto de vidro descansando exatamente onde a pessoa parou, com um ponto de luz na ponta. Um chão calmo onde só uma coisa sobe: a folha do que fazer agora, com um botão de vidro.",
+    "northStar": "Tinta e noite",
+    "overview": "Duas luzes para o mesmo estudo. De dia, tinta sobre papel: o texto, a ação e o ponto de \"onde parei\" são a mesma tinta azul-noite sobre um papel quase branco; a folha é branca, de cantos pouco arredondados e com uma linha fina em volta; o botão principal leva uma sombra baixa e dura, como um carimbo; a lima do marca-texto aparece só como halo atrás do ponto, nunca como fundo de texto. À noite, a \"Noite de mandacaru\": um azul fundo no chão, a serra um tom acima, o texto frio, as formas arredondadas, nenhuma sombra e o ponto em âmbar. O tema escolhe o mundo: o interruptor é o de sempre (Conta › Aparência: claro, escuro ou igual ao aparelho). A promessa é a mesma nos dois: voltar de onde parou e fazer uma coisa por vez.\n\nO sistema é plano e firme. O chão é liso, sem textura. A folha e o chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite), então a separação é a linha de 1 px do mundo em volta da folha, e a única profundidade do app é a sombra dura do botão principal do dia. Os títulos usam a Schibsted Grotesk de dia e a Familjen Grotesk à noite; a interface usa a Atkinson Hyperlegible, desenhada para leitura difícil; a lei fica na Literata. A cor tem papel: a luz do mundo (tinta de dia, luz à noite) é a ação, o foco, o link e o \"onde estou\"; o ponto de luz só reporta estado; o vermelho é só de excluir e de falha técnica. A caneta de vidro é o único objeto com volume e o único lugar com gradiente.\n\nA sensação-alvo é ânimo e clareza, sem barulho: nada pisca, nada acusa, nada se acumula como dívida. Em vez de uma interface que cobra, há um chão calmo onde só uma coisa sobe: a folha do que fazer agora, com um botão principal.",
     "keyCharacteristics": [
-      "Uma ação dominante por tela: um botão de vidro, e só um.",
-      "A folha de cal como lugar de foco; o resto da tela é areia, calma e lisa.",
+      "Uma ação dominante por tela: um botão principal, e só um.",
+      "A folha, com a linha de 1 px do mundo, como lugar de foco; o resto da tela é o chão, calmo e liso.",
+      "Forma por mundo: angular de dia (raios de 6 e 8 px), arredondada à noite (12 e 14 px).",
       "Calor sem pressão: sem streak, sem vermelho no estudo, sem contagem de dívida.",
-      "Legibilidade acima de efeito: texto mínimo de 13 px, alvos de 44 px, contraste AA medido em script.",
+      "Legibilidade acima de efeito: texto mínimo de 13 px, alvos de 44 px, contraste AA medido em script nos dois temas.",
       "Local-first e offline: fontes hospedadas no próprio app, nada de CDN."
     ],
     "rules": [
       {
-        "name": "The Um Vidro Rule",
-        "body": "Vidro é a única cor de ação e aparece num botão por tela.",
+        "name": "The Um Botão Principal Rule",
+        "body": "A ação da tela é a luz do mundo cheia (tinta de dia, luz à noite) e aparece num botão por tela. Se dois botões disputam a ação, um deles é secundário (o contorno do mundo sobre o fundo do controle).",
         "section": "colors"
       },
       {
-        "name": "The Cal Onde Estou Rule",
-        "body": "Cal sobre a areia é \"onde estou\": a folha do Agora, a área e a aba atuais, o lido no Leitor.",
+        "name": "The Luz Do Mundo Rule",
+        "body": "Ação, foco, link, \"onde estou\" e marcado são uma cor só, a luz do mundo, e o tema a troca num lugar só (--luz). Nada de uma cor de ação à parte.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lima É Só Halo Rule",
+        "body": "A lima do marca-texto fica atrás do ponto e na ponta da caneta. Nunca é fundo de texto, nunca é cor de texto, nunca marca um estado sozinha.",
         "section": "colors"
       },
       {
         "name": "The Luz Só Reporta Rule",
-        "body": "A luz diz um estado real ou marca a ponta da caneta; nunca pulsa, nunca segue o dedo, nunca é texto.",
+        "body": "O ponto de luz diz um estado real (feito, atual, falta; Estrela; \"onde parei\") ou marca a ponta da caneta. Nunca pulsa, nunca segue o dedo nem a rolagem, nunca é texto, nunca aparece sem o contorno na luz do mundo.",
+        "section": "colors"
+      },
+      {
+        "name": "The Folha Com Linha Rule",
+        "body": "A folha se separa do chão pela linha de 1 px do mundo (--borda-folha), não pela cor nem pela sombra. Nenhuma peça pode depender de \"folha sobre chão\" como contraste.",
         "section": "colors"
       },
       {
         "name": "The Matéria Em Neutro Rule",
-        "body": "A matéria se identifica pelo nome, sem cor por disciplina nem faixa colorida na borda.",
+        "body": "A matéria se identifica pelo nome, em neutro: sem cor por disciplina e sem faixa colorida na borda.",
         "section": "colors"
       },
       {
         "name": "The Sem Vermelho No Estudo Rule",
-        "body": "Vermelho é de excluir e de falha técnica.",
+        "body": "Vermelho é de excluir e de falha técnica. Erro de estudo, atraso e revisão pendente nunca ficam vermelhos.",
         "section": "colors"
       },
       {
         "name": "The Piso De 13 Rule",
-        "body": "Nenhum texto abaixo de 13 px.",
+        "body": "Nenhum texto abaixo de 0.8125rem (13 px). Caixa-alta com espaçamento de letras só em etiqueta (\"Para lembrar\").",
         "section": "typography"
       },
       {
         "name": "The Lei Sem Itálico Rule",
-        "body": "A lei não vai em itálico e o destaque é sublinhado, nunca fundo.",
+        "body": "A lei não vai em itálico e o destaque dela é sublinhado, nunca fundo. Prazos, condições, termos absolutos e penas têm sublinhados distintos (de dia #173f52, #ab6b21 e #a5582a; à noite #7fb4cf, #f2c062 e #f09a68).",
         "section": "typography"
       },
       {
-        "name": "The Título Com Razão Rule",
-        "body": "Gabarito só em títulos e marca.",
+        "name": "The Título Só Título Rule",
+        "body": "A grotesca do mundo é só de título, da folha e do rótulo \"Em seguida\". \"Sem serifa\" (Conta › Aparência) troca só a letra da lei.",
         "section": "typography"
+      },
+      {
+        "name": "The Sombra Só No Botão Do Dia Rule",
+        "body": "Nenhum box-shadow ou --sombra* leva desfoque; a profundidade é só a sombra dura do botão principal do dia (guarda em scripts/contraste.test.ts).",
+        "section": "elevation"
       },
       {
         "name": "The Sem Vidro Desfocado Rule",
-        "body": "Vidro é objeto e cor de ação, nunca superfície desfocada atrás de texto.",
+        "body": "O vidro é objeto (a caneta) e nunca superfície desfocada atrás de texto. Só os botões do modo foco têm transparência (a camada a 90%, sem desfoque), e é função, não enfeite; o dock do Leitor é uma barra sólida.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do manter um só botão de vidro por tela, e dar a ele o texto de uma ação.",
-      "Do usar cal para \"onde estou\", tinta para o texto e o marcado, a luz só para estado.",
-      "Do medir todo par de cor novo em scripts/contraste.mjs nos dois temas antes de usar.",
+      "Do manter um só botão principal por tela, e dar a ele o texto de uma ação (\"Continuar\", \"Começar\").",
+      "Do pôr lista em linhas sobre o chão e deixar o cartão para o que agrupa.",
+      "Do separar a folha do chão pela linha de 1 px do mundo, e usar a luz do mundo para ação, foco, link e \"onde estou\".",
+      "Do deixar a lima só como halo e o ponto de luz só para estado.",
+      "Do mostrar onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo.",
+      "Do medir todo par de cor novo em scripts/contraste.mjs nos dois temas antes de usar, e manter os três blocos de token de estilos.css iguais.",
+      "Do respeitar prefers-reduced-motion (pontos acesos e quadro do cacto pronto) e prefers-contrast. Movimento de 160 a 220 ms, cubic-bezier(.2, .7, .2, 1), só quando explica.",
       "Do hospedar fontes e ícones no próprio app; o app funciona offline."
     ],
     "donts": [
-      "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar.",
-      "Don't pôr textura, vidro desfocado atrás de texto (só os botões do modo foco têm transparência, sem desfoque), iridescência, gradiente em texto, brilho pulsando ou confete.",
-      "Don't dar cor própria a uma disciplina, nem usar couro ou caramelo como cor de interface.",
-      "Don't usar glifos Unicode como ícone; os ícones são SVG desenhados num só traço.",
-      "Don't carregar fonte ou ícone de CDN."
+      "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar. \"Vencido\" e \"Você parou em\" soam como dívida: prefira \"para hoje\", \"Retomar em\" e \"Continuar\".",
+      "Don't pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque, gradiente em texto, brilho pulsando, lens flare, parallax, confete ou som.",
+      "Don't usar a lima como fundo ou cor de texto, a luz como texto, sem contorno, pulsando ou seguindo o dedo; nem mais de uma caneta por tela.",
+      "Don't dar cor própria a uma disciplina, faixa colorida na borda de cartão, item ou aviso, nem usar couro ou caramelo como cor de interface.",
+      "Don't usar raio de pílula nem peça que dependa da folha se separar do chão pela cor.",
+      "Don't usar glifos Unicode (✓, ⓘ) como ícone; os ícones são SVG desenhados num só traço.",
+      "Don't usar texto abaixo de 13 px nem alvo abaixo de 44 px.",
+      "Don't carregar fonte ou ícone de CDN (quebra o offline e envia o IP da pessoa a terceiros).",
+      "Don't renderizar HTML colado sem sanitizar, nem aplicar rótulo clínico ou de diagnóstico em qualquer tela."
     ]
   }
 }
