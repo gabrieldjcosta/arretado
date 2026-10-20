@@ -483,3 +483,4 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Termo | Identificadores |
 |---|---|
 | Tarja (trecho escondido) | `EditorDeLacuna` (`recall/EditorDeLacuna.tsx`, helpers em `lacuna.ts`): selecionar esconde na hora (mouse e teclado ao soltar; toque após pausa de 600 ms), tocar na tarja mostra; a seleção se alarga até a palavra inteira (`ajustarAPalavras`). Usado em `RegistrarErro` ("Criar cartão com lacuna"), `RegistrarVarios` (`/recall/registrar/varios`, uma frase por linha) e em `DialogoEnviarAsFrases` (Leitor, Resumo, Precedente), que passa `ocultos` a `criarCartaoDeLacuna` |
+| Serviço de conta falso do E2E | `ServicoDeContaFalsoE2E` (`integracoes/conta/falso-e2e.ts`), escolhido em `criarServicoDeConta` só com `--mode e2e-conta`; diferente do `ServicoDeContaFalso` (memória, testes de unidade). Projetos Playwright `conta-desktop`, `conta-celular`, `conta-tablet` (T30) |
