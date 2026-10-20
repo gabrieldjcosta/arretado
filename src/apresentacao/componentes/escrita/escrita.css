@@ -1,0 +1,65 @@
+/* A escrita do nome (D-D9, Q6): o que é do app em volta do CSS gerado do kit (escrita-b.css). Os
+   keyframes e as regras do kit leem `--luz` (o ponto e o traço de luz), `--disco` (o halo de
+   marca-texto atrás do ponto) e os `--pen-*` da caneta; aqui eles seguem o mundo, como o lockup parado
+   (`--marca-ponto` e `--marca-disco`, em estilos.css). */
+.eb {
+  --luz: var(--marca-ponto);
+  --disco: var(--marca-disco);
+  overflow: visible;
+}
+
+/* Modo curto, a primeira abertura de cada Dia: começa 1,45 s adiante, com o nome já escrito e a caneta
+   junto do "o", e dura 1,2 s. */
+.eb.curta {
+  --d: -1.45s;
+}
+
+/* A caneta de vidro do kit (pen.mjs v5): cada mundo troca o vidro, a tinta e o halo da ponta pelos
+   `--pen-*`. Os caminhos só de preenchimento levam `stroke: none` porque o <svg> passa o traço adiante. */
+.eb .pen-corpo {
+  opacity: var(--pen-vidro-a);
+}
+
+.eb .pen-vidro {
+  fill: var(--pen-vidro);
+  stroke: var(--pen-vidro);
+}
+
+.eb .pen-vidro2 {
+  fill: var(--pen-vidro2);
+  stroke: var(--pen-vidro2);
+}
+
+.eb .pen-aro {
+  fill: var(--pen-rim);
+  stroke: none;
+}
+
+.eb .pen-brilho {
+  stroke: var(--pen-brilho);
+  stroke-opacity: 0.85;
+}
+
+.eb .pen-faisca {
+  fill: var(--pen-luz);
+  stroke: none;
+}
+
+.eb .pen-halo {
+  fill: var(--pen-halo);
+  stroke: none;
+  opacity: var(--pen-halo-op);
+}
+
+.eb .pen-esfera {
+  fill: var(--pen-esfera);
+  stroke: none;
+}
+
+.eb .pen-tinta-0 {
+  stop-color: var(--pen-tinta);
+}
+
+.eb .pen-tinta-1 {
+  stop-color: var(--pen-tinta2);
+}

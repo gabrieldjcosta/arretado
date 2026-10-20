@@ -2075,7 +2075,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
   const linhaDoDispositivo = (endereco: string) =>
     Number(dispositivo(endereco).closest('[data-index]')?.getAttribute('data-index'));
 
-  it('o lido vai sobre a faixa de cal, até o "lido até"; a marca ganha a caneta deitada', async () => {
+  it('o lido vai sobre a faixa da folha, até o "lido até"; a marca ganha a caneta deitada', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -2118,7 +2118,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
     expect(estrela.querySelector('svg path.corte')).toBeNull();
   });
 
-  it('as ferramentas ficam numa só pílula; "Lido até aqui" fica fora dela', async () => {
+  it('as ferramentas ficam numa só barra; "Lido até aqui" fica fora dela', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -2262,7 +2262,10 @@ describe('Ponto de luz no Leitor (P4)', () => {
       const secao1 = await within(estrutura).findByRole('button', {
         name: /^Seção I Disposições Gerais, lida$/,
       });
-      expect(secao1).toHaveAttribute('aria-current', 'location');
+      // O "lido" chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera.
+      await waitFor(() => {
+        expect(secao1).toHaveAttribute('aria-current', 'location');
+      });
       expect(within(estrutura).queryByRole('list', { name: /^Dentro de/ })).toBeNull();
       expect(
         within(estrutura).getByRole('button', { name: /^Seção II Dos Regimes, ainda não lida$/ }),

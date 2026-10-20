@@ -1061,7 +1061,8 @@ function LeitorAberto({
 
   function irAoLidoAte() {
     if (indiceLidoAte === undefined) return;
-    if (irAoNo(indiceLidoAte)) setAnuncio('Filtro desligado para mostrar onde você parou.');
+    if (irAoNo(indiceLidoAte))
+      setAnuncio('Filtro desligado para mostrar onde continuar a leitura.');
   }
 
   // Artigo por artigo (11.8): a frase do artigo para o leitor de tela, e a navegação.
@@ -1617,7 +1618,7 @@ function LeitorAberto({
 
   // O que a lista e o cartão desenham de uma linha: o dispositivo e a marca do "lido até". Do começo
   // da norma até o "lido até" (inclusive) a linha é lida (`data-lido`): na lista, vai sobre a faixa
-  // de cal; o cartão não usa a faixa.
+  // da folha; o cartão não usa a faixa.
   function propriedadesDaLinha(linha: LinhaDoLeitor) {
     const dispositivo = nos[linha.indice]?.dispositivo;
     const id = dispositivo?.id ?? '';
@@ -1876,7 +1877,7 @@ function LeitorAberto({
         <p role="alert" className="aviso falha">
           {falhaAoMarcar
             ? 'Não foi possível marcar o "lido até".'
-            : 'Não foi possível guardar onde você parou.'}{' '}
+            : 'Não foi possível guardar a posição da leitura.'}{' '}
           Se continuar, feche as outras abas do Arretado.
         </p>
       )}

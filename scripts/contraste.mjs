@@ -70,7 +70,7 @@ export function razao(a, b) {
   return (x + 0.05) / (y + 0.05);
 }
 
-const FUNDOS = ['fundo', 'superficie', 'superficie-2', 'quente'];
+const FUNDOS = ['fundo', 'superficie', 'superficie-2'];
 const SUPERFICIES = ['fundo', 'superficie'];
 const GRIFOS = ['grifo-1', 'grifo-2', 'grifo-3'];
 const DESTAQUES = ['destaque-prazo', 'destaque-condicao', 'destaque-absoluto', 'destaque-pena'];
@@ -116,13 +116,20 @@ export function pares(mundo = 'dia') {
   // o halo. À noite o próprio ponto é âmbar e se separa da noite e da serra.
   if (mundo === 'dia') p.push(['ponto-luz', 'ponto-halo', 3]);
   else for (const f of SUPERFICIES) p.push(['ponto-halo', f, 3]);
+  // A caneta de vidro e o quadro do cacto (Q4): o aro e o furo de tinta da caneta e o aro do cacto se
+  // separam do fundo com 3:1. O vidro em si (claro de dia, a 14% à noite) e o chão do quadro são
+  // decoração, como nas pranchas, e ficam de fora. A esfera da ponta se lê sobre o halo de dia; à
+  // noite o halo âmbar se separa da noite.
+  for (const f of SUPERFICIES) {
+    p.push(['pen-rim', f, 3], ['pen-tinta', f, 3], ['pen-tinta2', f, 3], ['quadro-aro', f, 3]);
+  }
+  if (mundo === 'dia') p.push(['pen-esfera', 'pen-halo', 3]);
+  else for (const f of SUPERFICIES) p.push(['pen-halo', f, 3]);
   p.push(
     ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.
     ['andamento', 'superficie-2', 3],
     ['borda-forte', 'superficie', 3],
-    // O caramelo é provisório (o sol e o miolo das flores do quadro do cacto, até a Q4), sobre a folha.
-    ['caramelo', 'superficie', 3],
   );
   // Palco do modo foco: a penumbra da página e a luz do cartão.
   for (const f of ['penumbra', 'luz-do-cartao']) {
@@ -140,10 +147,12 @@ export function pares(mundo = 'dia') {
     ['bloco-texto', 'bloco-fundo', 4.5],
     ['bloco-atenuado', 'bloco-fundo', 4.5],
     ['bloco-foco', 'bloco-fundo', 3],
-    // "Onde estou" da estrutura da norma (provisório até a Q7): o texto sobre o fundo da seção atual.
-    ['atual-texto', 'atual-fundo', 4.5],
-    // A estrutura da norma (P4): o nome da seção, atenuado, sobre o fundo de "onde estou".
-    ['texto-atenuado', 'atual-fundo', 4.5],
+    // O botão secundário e o chip (D-D9, Q3): o atenuado e o perigo sobre o fundo do controle (a folha
+    // de dia, a serra 2 à noite; o texto sobre ele está mais abaixo, na casca da Q2). O contorno (3:1) é
+    // medido sobre o chão e a folha, acima: à noite, sobre a serra 2, ele cai a 2,7:1, e quem identifica
+    // o botão é o rótulo.
+    ['texto-atenuado', 'fundo-controle', 4.5],
+    ['perigo', 'fundo-controle', 4.5],
     ['selecionado-texto', 'selecionado-fundo', 4.5],
     ['texto', 'tinta-lugar', 4.5],
     ['texto-atenuado', 'tinta-lugar', 4.5],
@@ -224,8 +233,9 @@ export function medir(tema, mundo = mundoDe(tema)) {
   }
 
   // D-D9: os pares do contrato, com os valores fixos da paleta de cada mundo (valem nos dois temas,
-  // porque as duas paletas ficam no mesmo bloco). Filete (dia) e borda (noite) são decoração e ficam
-  // de fora: 1,22:1 e 1,85:1 no chão, de propósito.
+  // porque as duas paletas ficam no mesmo bloco). O filete (dia) e a borda (noite) são decoração e
+  // ficam de fora: 1,22:1 e 1,85:1 no chão, de propósito. A linha da folha de dia é a `linha`, medida
+  // abaixo com 3:1; a da noite é a borda, decoração. Folha e chão: 1,06:1 de dia, 1,10:1 à noite.
   const par = (fg, bg, minimo) => juntar(fg, bg, minimo, razao(cor(fg), cor(bg)));
   const branco = { r: 255, g: 255, b: 255, a: 1 };
   // Dia: tinta e tinta 2 sobre o papel e a folha; contorno do controle e linha com 3:1.

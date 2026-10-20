@@ -1,23 +1,30 @@
 // A cena do quadro do cacto (D-D7, "A caneta que desenha"): 16 partes, uma por Dia fechado. Cada parte
 // é uma lista de fios (path + papel de cor). Coordenadas finais no `VIEWBOX`; o chão fica em y = 156.
-// Sem cor literal: o papel de cor (`vidro`, `tinta`, `tinta2`, `caramelo`) vira token em `quadro.css`.
+// Sem cor literal: o papel de cor (`vidro`, `nucleo`, `tinta`, `tinta2`, `chao`) vira token em `quadro.css`.
 
-/** O papel de cor de um fio: vidro = o cacto; tinta = bichos e flores; tinta2 = o atenuado; caramelo = só o sol e o miolo das flores. */
-export type CorDoFio = 'vidro' | 'tinta' | 'tinta2' | 'caramelo';
+/**
+ * O papel de cor de um fio: vidro = o aro dos tubos do cacto, a chuva e o capim; nucleo = o furo de
+ * tinta que corre pelo meio do cacto; tinta = bichos, flores e o sol; tinta2 = o atenuado; chao = o chão.
+ */
+export type CorDoFio = 'vidro' | 'nucleo' | 'tinta' | 'tinta2' | 'chao';
 
-/** O lavis (aguada) sob um fio fechado: vidro e tinta diluídos, ou a cal da folha. */
-export type TipoDeLavis = 'vidro' | 'tinta' | 'cal';
+/** O lavis (aguada) sob um fio fechado: a tinta diluída, ou o fundo do quadro para tapar o que passa por baixo. */
+export type TipoDeLavis = 'tinta' | 'cal';
 
 export interface Fio {
   /** O traço. Subtrações (`M`) desenham-se uma depois da outra. */
   d: string;
   cor: CorDoFio;
   largura: number;
-  opacidade?: number;
   /** A aguada sob o fio: `area` é o contorno fechado que ela preenche; aparece na segunda metade do fio. */
   lavis?: { tipo: TipoDeLavis; area: string };
-  /** Centro do miolo (as flores): um ponto de caramelo que brota quando o fio termina. */
+  /** Centro do miolo (as flores): um ponto de tinta que brota quando o fio termina. */
   miolo?: readonly [number, number];
+  /**
+   * Onde o núcleo de tinta termina: um ponto de luz, pequeno e liso nas partes já feitas e, na de
+   * hoje, maior e com a marca atrás (D-D9, Q4).
+   */
+  ponta?: readonly [number, number];
   /**
    * O olho (os bichos): um ponto de tinta posto quando o fio termina. `d` é um traço de comprimento
    * zero (`M… h0`: sozinho, o `M` não desenha nada) e `largura` é o diâmetro do ponto.
@@ -33,8 +40,13 @@ export interface Parte {
 }
 
 export const VIEWBOX = '0 0 340 200';
-/** Onde a caneta fica largada: a ponta no fim do chão desenhado, à direita do cacto. */
-export const REPOUSO = { x: 222, y: 156, escala: 0.6 } as const;
+/**
+ * Onde a caneta fica largada, como nas pranchas "Dia fechado" (D-D9, Q4): quase deitada (84°), pequena
+ * (0,30) e com a ponta em (214, 183), sob o chão do desenho, à direita do cacto.
+ */
+export const REPOUSO = { x: 214, y: 183, escala: 0.3, graus: 84 } as const;
+/** Como a caneta anda sobre o traço: deitada a 65°, em 0,38. Do repouso ao traço ela muda de lugar por salto. */
+export const ANDANDO = { escala: 0.38, graus: 65 } as const;
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const rad = (g: number) => (g * Math.PI) / 180;
@@ -172,7 +184,7 @@ export const PARTES: readonly [Parte, ...Parte[]] = [
   {
     id: 'chao',
     nome: 'o chão',
-    fios: [{ d: 'M14 156C60 153 100 159 150 156S250 153 326 157', cor: 'tinta2', largura: 2.4 }],
+    fios: [{ d: 'M14 156C60 153 100 159 150 156S250 153 326 157', cor: 'chao', largura: 1.8 }],
   },
   {
     id: 'tronco',
@@ -181,9 +193,9 @@ export const PARTES: readonly [Parte, ...Parte[]] = [
       {
         d: 'M133 156V122M133 94V57A17 17 0 0 1 167 57V110M167 138V156',
         cor: 'vidro',
-        largura: 3,
-        lavis: { tipo: 'vidro', area: 'M133 156V57A17 17 0 0 1 167 57V156Z' },
+        largura: 1.6,
       },
+      { d: 'M150 156V57', cor: 'nucleo', largura: 3.4, ponta: [150, 57] },
     ],
   },
   {
@@ -193,11 +205,13 @@ export const PARTES: readonly [Parte, ...Parte[]] = [
       {
         d: 'M133 94H111V82A11 11 0 0 0 89 82V111A11 11 0 0 0 100 122H133',
         cor: 'vidro',
-        largura: 3,
-        lavis: {
-          tipo: 'vidro',
-          area: 'M133 94H111V82A11 11 0 0 0 89 82V111A11 11 0 0 0 100 122H133Z',
-        },
+        largura: 1.6,
+      },
+      {
+        d: 'M150 108H114A14 14 0 0 1 100 94V82',
+        cor: 'nucleo',
+        largura: 3.4,
+        ponta: [100, 82],
       },
     ],
   },
@@ -208,19 +222,20 @@ export const PARTES: readonly [Parte, ...Parte[]] = [
       {
         d: 'M167 110H189V98A11 11 0 0 1 211 98V127A11 11 0 0 1 200 138H167',
         cor: 'vidro',
-        largura: 3,
-        lavis: {
-          tipo: 'vidro',
-          area: 'M167 110H189V98A11 11 0 0 1 211 98V127A11 11 0 0 1 200 138H167Z',
-        },
+        largura: 1.6,
+      },
+      {
+        d: 'M150 124H186A14 14 0 0 0 200 110V98',
+        cor: 'nucleo',
+        largura: 3.4,
+        ponta: [200, 98],
       },
     ],
   },
   {
     id: 'espinhos',
-    nome: 'as nervuras e os espinhos',
+    nome: 'os espinhos',
     fios: [
-      { d: 'M150 150V62M100 116V92M200 132V108', cor: 'vidro', largura: 1.6, opacidade: 0.55 },
       {
         d: 'M127 70l-6-2M127 86l-6-2M127 134l-6-1M173 72l6-2M173 90l6-2M173 146l6-1M86 96l-6-2M86 104l-6-2M214 112l6-2M214 120l6-1',
         cor: 'vidro',
@@ -271,8 +286,8 @@ export const PARTES: readonly [Parte, ...Parte[]] = [
     id: 'sol',
     nome: 'o sol',
     fios: [
-      { d: circulo(56, 48, 11), cor: 'caramelo', largura: 2.4 },
-      { d: raios(56, 48, 16, 22, 8, 22.5), cor: 'caramelo', largura: 2.4 },
+      { d: circulo(56, 48, 11), cor: 'tinta', largura: 2.4 },
+      { d: raios(56, 48, 16, 22, 8, 22.5), cor: 'tinta', largura: 2.4 },
     ],
   },
   {

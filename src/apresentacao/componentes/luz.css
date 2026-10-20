@@ -1,33 +1,69 @@
-/* O ponto de luz e a caneta (D-D7, P3). Vetores decorativos: nenhum leva texto. As cores vêm dos
-   tokens (`--ponto-*`, `--caneta-*` em estilos.css); o tema troca o vidro, o brilho e o halo sem
-   que o componente saiba. D-D9: o halo é o `--ponto-halo` do mundo (lima de dia, âmbar à noite); o
-   vidro (`--caneta-*`) é provisório e a caneta de vidro nova o refaz na Q4. */
+/* O ponto de luz e a caneta (D-D7, P3; D-D9, Q4). Vetores decorativos: nenhum leva texto. As cores vêm
+   dos tokens (`--ponto-*` e `--pen-*` em estilos.css); o tema troca o vidro, a tinta e o halo sem que o
+   componente saiba. O halo do ponto é o `--ponto-halo` do mundo (lima de dia, âmbar à noite). */
 
 /* ── Ponto de luz ─────────────────────────────────────────────────────── */
 
+/* O ponto do Dia por mundo (D-D9, Q3), sem SVG no JS: duas camadas de máscara, o anel (`::before`) e o
+   miolo (`::after`: a hachura de marca-texto de dia, o círculo à noite). A forma de cada mundo vem de
+   `--forma-ponto-*` e a cor de `--ponto-*` (estilos.css). O estado muda a forma, nunca só a cor:
+   apagado é só o anel, atual é o miolo pela metade, feito é o miolo inteiro. */
 .ponto-de-luz {
+  position: relative;
+  display: inline-block;
   width: 22px;
   height: 22px;
   flex: none;
   transform-origin: 50% 50%;
 }
 
-.ponto-luz {
-  fill: var(--ponto-luz);
+.ponto-de-luz::before,
+.ponto-de-luz::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
-.ponto-anel {
-  fill: none;
-  stroke: var(--ponto-contorno);
-  stroke-width: 1.5;
+.ponto-de-luz::before {
+  background: var(--ponto-contorno);
+  -webkit-mask: var(--forma-ponto-anel) center / 100% 100% no-repeat;
+  mask: var(--forma-ponto-anel) center / 100% 100% no-repeat;
 }
 
-.ponto-anel.apagado {
-  stroke: var(--ponto-apagado);
+.ponto-de-luz[data-estado='falta']::before {
+  background: var(--ponto-apagado);
 }
 
-.ponto-nucleo {
-  fill: var(--ponto-nucleo);
+.ponto-de-luz[data-estado='atual']::after {
+  background: var(--ponto-luz);
+  -webkit-mask: var(--forma-ponto-atual) center / 100% 100% no-repeat;
+  mask: var(--forma-ponto-atual) center / 100% 100% no-repeat;
+}
+
+.ponto-de-luz[data-estado='feito']::after {
+  background: var(--ponto-luz);
+  -webkit-mask: var(--forma-ponto-feito) center / 100% 100% no-repeat;
+  mask: var(--forma-ponto-feito) center / 100% 100% no-repeat;
+}
+
+/* O anel de dia é rabisco: numa lista, cada ponto gira o seu um pouco, como na prancha. O círculo da
+   noite não muda com a rotação. */
+li:nth-child(3n + 2) > .ponto-de-luz::before {
+  rotate: 40deg;
+}
+
+li:nth-child(3n) > .ponto-de-luz::before {
+  rotate: -50deg;
+}
+
+/* Cores forçadas pintam o fundo com a cor do sistema, e a máscara ficaria da cor da página: o ponto
+   pede o texto do sistema e sai do ajuste automático (a forma ainda diz o estado). */
+@media (forced-colors: active) {
+  .ponto-de-luz::before,
+  .ponto-de-luz::after {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
 }
 
 /* Acende uma vez, em 160 ms (escala 0,6 a 1, opacidade 0 a 1). Com movimento reduzido o ponto só
@@ -47,67 +83,65 @@
 
 /* ── Caneta ───────────────────────────────────────────────────────────── */
 
+/* A caneta de vidro (D-D9, Q4): contrato "A caneta de vidro". Cada classe pinta uma camada do desenho
+   de `Caneta.tsx`; `stroke: none` nas que só preenchem, porque o quadro do cacto põe o traço no `<svg>`
+   e ele desce por herança. */
 .caneta {
   display: block;
   flex: none;
   overflow: visible;
 }
 
-.caneta-vidro-0 {
-  stop-color: var(--caneta-0);
+.caneta-tinta-0 {
+  stop-color: var(--pen-tinta);
 }
 
-.caneta-vidro-1 {
-  stop-color: var(--caneta-1);
+.caneta-tinta-1 {
+  stop-color: var(--pen-tinta2);
 }
 
-.caneta-vidro-2 {
-  stop-color: var(--caneta-2);
+.caneta-sombra {
+  fill: var(--pen-sombra);
+  stroke: var(--pen-sombra);
+  opacity: var(--pen-sombra-op);
 }
 
-.caneta-vidro-3 {
-  stop-color: var(--caneta-3);
+.caneta-corpo {
+  opacity: var(--pen-vidro-a);
 }
 
-.caneta-vidro-4 {
-  stop-color: var(--caneta-4);
+.caneta-vidro {
+  fill: var(--pen-vidro);
+  stroke: var(--pen-vidro);
 }
 
-.caneta-miolo {
-  fill: var(--caneta-miolo);
-  opacity: 0.22;
+.caneta-vidro-claro {
+  fill: var(--pen-vidro2);
+  stroke: var(--pen-vidro2);
 }
 
-.caneta-borda {
-  fill: none;
-  stroke: var(--caneta-borda);
-  stroke-width: 1.3;
-  opacity: var(--caneta-borda-opacidade);
+.caneta-aro {
+  fill: var(--pen-rim);
+  stroke: none;
 }
 
 .caneta-brilho {
-  fill: none;
-  stroke: var(--ponto-nucleo);
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  opacity: var(--caneta-brilho);
+  stroke: var(--pen-brilho);
+  stroke-opacity: 0.85;
 }
 
-.caneta-brilho-braco {
-  stroke-width: 2.2;
-  opacity: calc(var(--caneta-brilho) * 0.9);
+.caneta-halo {
+  fill: var(--pen-halo);
+  stroke: none;
+  opacity: var(--pen-halo-op);
 }
 
-.caneta-ponto {
-  fill: var(--ponto-nucleo);
+.caneta-esfera {
+  fill: var(--pen-esfera);
+  stroke: none;
 }
 
-.caneta-halo-dia {
-  fill: var(--ponto-halo);
-  opacity: var(--caneta-halo-dia);
-}
-
-.caneta-halo-noite {
-  fill: var(--ponto-halo);
-  opacity: var(--caneta-halo-noite);
+.caneta-faisca {
+  fill: var(--pen-luz);
+  stroke: none;
 }

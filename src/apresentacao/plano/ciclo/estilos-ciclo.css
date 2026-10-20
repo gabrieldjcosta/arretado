@@ -1,4 +1,4 @@
-/* Ciclo de estudo (C3): volta, bloco atual e assistente. Só tokens; a vez atual é "onde estou" (cal). */
+/* Ciclo de estudo (C3): volta, bloco atual e assistente. Só tokens; a vez atual é "onde estou" (a folha com a linha). */
 .ciclo-volta {
   list-style: none;
   margin: var(--espaco-2) 0 var(--espaco-3);

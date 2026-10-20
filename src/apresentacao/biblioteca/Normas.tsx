@@ -419,8 +419,8 @@ export function Normas() {
                 <AcaoAgora
                   titulo={
                     dados.ponto
-                      ? `Você parou no ${dados.ponto.referencia} da ${dados.continuar.tituloCurto}`
-                      : `Você estava lendo a ${dados.continuar.tituloCurto}`
+                      ? `Continuar a leitura no ${dados.ponto.referencia} da ${dados.continuar.tituloCurto}`
+                      : `Continuar a leitura da ${dados.continuar.tituloCurto}`
                   }
                   estimativa={dados.ponto?.minutos}
                   rotuloBotao={`Continuar leitura: ${dados.continuar.tituloCurto}`}

@@ -235,9 +235,11 @@ describe('Biblioteca › Normas (9.5)', () => {
     const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
     expect(continuar).toHaveClass('principal');
-    // O "agora" diz onde parou e quanto falta da seção (fatia 4).
+    // O "agora" diz onde continuar e quanto falta da seção (fatia 4).
     const agora = screen.getByRole('region', { name: 'Agora' });
-    expect(within(agora).getByRole('heading')).toHaveTextContent(/^Você parou no .+ da LEP$/);
+    expect(within(agora).getByRole('heading')).toHaveTextContent(
+      /^Continuar a leitura no .+ da LEP$/,
+    );
     expect(agora).toHaveTextContent(/cerca de \d+ min/);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.

@@ -1,7 +1,7 @@
 // A linha de parada do Hoje (D-D7, P3): onde a pessoa parou de ler e quando, em palavras simples.
 import { dataCivil, diferencaEmDias, horaCivil } from '../../core/datas';
 
-/** O que a linha de parada mostra: "LEP, art. 112, § 2º" e "ontem, 22h10". */
+/** O que a linha de parada mostra: "LEP, art. 112, § 2º" e "salvo ontem, 22h10". */
 export interface ParadaDaLeitura {
   rotulo: string;
   quando: string;
@@ -19,16 +19,16 @@ export function rotuloDaParada(tituloCurto: string, onde: string | undefined): s
 }
 
 /**
- * "hoje, 22h10", "ontem, 22h10" ou "dia 12/10, 22h10": quando a pessoa parou, na hora de Brasília.
- * Nunca conta dias fora: a linha informa, não cobra.
+ * "salvo hoje, 22h10", "salvo ontem, 22h10" ou "salvo dia 12/10, 22h10": quando a leitura foi salva
+ * pela última vez, na hora de Brasília (T14). Nunca conta dias fora: a linha informa, não cobra.
  */
 export function quandoDeParar(instante: string, agora: Date): string {
   const quando = new Date(instante);
   const hora = horaCivil(quando).replace(':', 'h');
   const dia = dataCivil(quando);
   const dias = diferencaEmDias(dia, dataCivil(agora));
-  if (dias <= 0) return `hoje, ${hora}`;
-  if (dias === 1) return `ontem, ${hora}`;
+  if (dias <= 0) return `salvo hoje, ${hora}`;
+  if (dias === 1) return `salvo ontem, ${hora}`;
   const [, mes, diaDoMes] = dia.split('-');
-  return `dia ${diaDoMes ?? ''}/${mes ?? ''}, ${hora}`;
+  return `salvo dia ${diaDoMes ?? ''}/${mes ?? ''}, ${hora}`;
 }

@@ -33,7 +33,7 @@ Estudo diário em celular e desktop, em Sessões curtas e retomadas. Local-first
 
 ## Brand Commitments
 
-Nome provisório "Arretado" (antes "Acumen"), com o pequeno cacto ao lado do nome; direção visual "Ponto de luz" (D-D7, 18/10/2026): a caneta-cacto de vidro marca onde a pessoa parou e, a cada Dia fechado, ela desenha mais uma parte de um quadro de cacto, sem número nem sequência (D-D8, 19/10/2026). Sensação-alvo: ânimo e clareza, sem economia de atenção às custas do encantamento. Os detalhes visuais vigentes ficam em `DESIGN.md`, `docs/design/` e `src/apresentacao/estilos.css`, não aqui.
+Nome provisório "Arretado" (antes "Acumen"), escrito num traço só com o pequeno cacto ao lado; direção visual "Tinta e noite" (D-D9, 19/10/2026): dois mundos que o tema escolhe, o dia de tinta sobre papel e a noite de mandacaru; a caneta de vidro marca onde a pessoa parou e, a cada Dia fechado, ela desenha mais uma parte de um quadro de cacto, sem número nem sequência (D-D8, 19/10/2026). Sensação-alvo: ânimo e clareza, sem economia de atenção às custas do encantamento. Os detalhes visuais vigentes ficam em `DESIGN.md`, `docs/design/` e `src/apresentacao/estilos.css`, não aqui.
 
 ## Evidence on Hand
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { Icone } from './Icone';
 
 /**
- * Linha de lista (D-D7, P6): título, uma linha de apoio e a seta, em linha sobre a areia com o filete
+ * Linha de lista (D-D7, P6): título, uma linha de apoio e a seta, em linha sobre o fundo com o filete
  * embaixo (a lista não vira uma pilha de cartões; o cartão fica para o que agrupa).
  */
 export function LinhaLista({

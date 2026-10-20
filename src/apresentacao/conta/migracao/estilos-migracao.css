@@ -15,7 +15,7 @@
   padding: var(--espaco-4);
   background: var(--superficie);
   border-radius: var(--raio-cartao);
-  border: 1px solid var(--borda);
+  border: var(--borda-folha);
 }
 
 .migracao-etapa-anuncio {
@@ -42,7 +42,7 @@
   color: var(--texto-atenuado);
 }
 
-/* Etapa atual (D-D7): "onde estou" dentro da folha de cal é o tom de lugar, não o vidro da ação. */
+/* Etapa atual: "onde estou" dentro da folha é o tom de lugar (`--tinta-lugar`), não a cor da ação. */
 .migracao-etapas-lista li.atual {
   color: var(--texto);
   background: var(--tinta-lugar);
