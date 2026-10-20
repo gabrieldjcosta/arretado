@@ -426,14 +426,14 @@
       "Do deixar a lima só como halo e o ponto de luz só para estado.",
       "Do mostrar onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo.",
       "Do medir todo par de cor novo em scripts/contraste.mjs nos dois temas antes de usar, e manter os três blocos de token de estilos.css iguais.",
-      "Do respeitar prefers-reduced-motion (pontos acesos e quadro do cacto pronto) e prefers-contrast. Movimento de 160 a 220 ms, cubic-bezier(.2, .7, .2, 1), só quando explica.",
+      "Do respeitar prefers-reduced-motion (pontos acesos e quadro do cacto pronto) e forced-colors. Movimento de 160 a 220 ms, cubic-bezier(.2, .7, .2, 1), só quando explica.",
       "Do hospedar fontes e ícones no próprio app; o app funciona offline."
     ],
     "donts": [
       "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar. \"Vencido\" e \"Você parou em\" soam como dívida: prefira \"para hoje\", \"Retomar em\" e \"Continuar\".",
       "Don't pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque, gradiente em texto, brilho pulsando, lens flare, parallax, confete ou som.",
       "Don't usar a lima como fundo ou cor de texto, a luz como texto, sem contorno, pulsando ou seguindo o dedo; nem mais de uma caneta por tela.",
-      "Don't dar cor própria a uma disciplina, faixa colorida na borda de cartão, item ou aviso, nem usar couro ou caramelo como cor de interface.",
+      "Don't dar cor própria a uma disciplina, faixa colorida na borda de cartão, item ou aviso.",
       "Don't usar raio de pílula nem peça que dependa da folha se separar do chão pela cor.",
       "Don't usar glifos Unicode (✓, ⓘ) como ícone; os ícones são SVG desenhados num só traço.",
       "Don't usar texto abaixo de 13 px nem alvo abaixo de 44 px.",
