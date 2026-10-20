@@ -31,6 +31,13 @@ async function montar(opcoes: { perfil?: 'calmo' | 'guiado'; repo?: Repositorio 
 
 const guardado = () => window.localStorage.getItem(CHAVE);
 
+// A escrita aparece no DOM antes do efeito que guarda o Dia e liga o toque que pula; sob carga o
+// `waitFor` do DOM termina antes dele. Quem afirma sobre o que o efeito faz espera o Dia guardado.
+const diaGuardado = (dia: string) =>
+  waitFor(() => {
+    expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia });
+  });
+
 describe('Marca do cabeçalho (D-D9, Q6)', () => {
   it('primeira abertura: espera as Preferências e escreve o nome inteiro', async () => {
     const { container, escrita } = await montar();
@@ -43,7 +50,7 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     expect(escrita()).not.toHaveClass('curta');
     expect(escrita()).not.toHaveClass('calmo');
     expect(escrita()).not.toHaveClass('pulou');
-    expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+    await diaGuardado('2026-10-20');
   });
 
   it('nas demais aberturas do Dia: o lockup parado na hora, sem esperar nem gravar de novo', async () => {
@@ -62,7 +69,7 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
       expect(escrita()).toHaveClass('curta');
     });
     expect(escrita()).not.toHaveClass('pulou');
-    expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+    await diaGuardado('2026-10-20');
   });
 
   it('um toque pula para o quadro final', async () => {
@@ -70,6 +77,7 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     await waitFor(() => {
       expect(escrita()).not.toBeNull();
     });
+    await diaGuardado('2026-10-20');
     fireEvent.pointerDown(document.body);
     await waitFor(() => {
       expect(escrita()).toHaveClass('pulou');
@@ -81,6 +89,7 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     await waitFor(() => {
       expect(escrita()).not.toBeNull();
     });
+    await diaGuardado('2026-10-20');
     fireEvent.keyDown(document.body, { key: 'Tab' });
     await waitFor(() => {
       expect(escrita()).toHaveClass('pulou');
