@@ -31,14 +31,16 @@ jobs:
             exit 1
           fi
           base="${SUPABASE_URL%/}"
+          corpo=$(mktemp)
           for tentativa in 1 2 3; do
-            codigo=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            codigo=$(curl --silent --output "$corpo" --write-out '%{http_code}' \
               --max-time 20 --request GET \
               --header "apikey: $SUPABASE_PUBLISHABLE_KEY" \
               --header "Accept-Profile: arretado" \
               "$base/rest/v1/catalogo?select=id&limit=1" || true)
             echo "Tentativa $tentativa: HTTP ${codigo:-sem resposta}"
             [ "$codigo" = 200 ] && exit 0
+            head -c 300 "$corpo"; echo
             [ "$tentativa" -lt 3 ] && sleep $((tentativa * 15))
           done
           echo "::error::Consulta ao Supabase falhou em 3 tentativas (esperado HTTP 200; último: ${codigo:-sem resposta})."
