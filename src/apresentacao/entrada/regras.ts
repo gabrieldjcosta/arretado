@@ -54,20 +54,20 @@ async function aparelhoNasceuHoje(repo: Repositorio, dia: string): Promise<boole
 
 /**
  * O que abre agora, se algo abre. A ordem é a das regras: nunca duas vezes no mesmo Dia; nunca com o
- * Dia fechado; a Chegada, só no aparelho que nasceu hoje e ainda não a viu; a Entrada, nunca com
- * Sessão aberta, com o Retorno à vista ou com o "só estudo" ligado, e só se o conteúdo carregar.
+ * Dia fechado, com Sessão aberta, com o Retorno à vista ou com o "só estudo" ligado; então a Chegada,
+ * só no aparelho que nasceu hoje e ainda não a viu, ou a Entrada, e só se o conteúdo carregar.
  */
 export async function decidir(repo: Repositorio): Promise<Abertura | undefined> {
   const dia = hoje(repo);
   if (entradaJaAbriu(dia)) return undefined;
   const resumo = await resumoDoDia(repo);
   if (resumo.dia?.fechadoEm) return undefined;
-  if (!chegadaJaVista() && (await aparelhoNasceuHoje(repo, dia))) return { tipo: 'chegada', dia };
   const [retorno, preferencias] = await Promise.all([
     situacaoDeRetorno(repo),
     obterPreferencias(repo),
   ]);
   if (resumo.sessaoAberta || retorno || preferencias.modoSoEstudo === true) return undefined;
+  if (!chegadaJaVista() && (await aparelhoNasceuHoje(repo, dia))) return { tipo: 'chegada', dia };
   const conteudo = await conteudoDoDia(dia);
   if (conteudo === undefined) return undefined;
   return {

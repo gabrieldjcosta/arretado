@@ -130,6 +130,18 @@ describe('Entrada do Dia › quando abre', () => {
     expect((await decidir(repo))?.tipo).toBe('entrada');
   });
 
+  it('a Chegada respeita o mesmo: nem com Sessão aberta, nem com o "só estudo" ligado', async () => {
+    aparelhoNovo();
+    const { repo } = await repositorioDeTeste();
+    const sessao = await iniciarSessao(repo, {});
+    expect(await decidir(repo)).toBeUndefined();
+    await encerrarSessao(repo, sessao.id);
+    await alterarPreferencias(repo, { modoSoEstudo: true });
+    expect(await decidir(repo)).toBeUndefined();
+    await alterarPreferencias(repo, { modoSoEstudo: false });
+    expect(await decidir(repo)).toEqual({ tipo: 'chegada', dia: HOJE });
+  });
+
   it('nunca com o Retorno à vista (dias fora)', async () => {
     localStorage.removeItem(CHAVE_ENTRADA);
     const { repo, relogio } = await repositorioDeTeste();
