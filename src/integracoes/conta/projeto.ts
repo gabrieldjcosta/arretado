@@ -6,5 +6,5 @@ export const URL_SUPABASE = 'https://dgwoemewvpabbppascuw.supabase.co';
 export const CHAVE_PUBLICAVEL = 'sb_publishable_OLF0T2liRn-jknoeDbsH0g_M6wKVhsg';
 
 /** Endereços de retorno do login, iguais aos da lista permitida no painel do Supabase (plano §4.2). */
-export const RETORNO_PRODUCAO = 'https://arretado.gabrieldjcosta.workers.dev/';
+export const RETORNO_PRODUCAO = 'https://arretado.cc/';
 export const RETORNO_DESENVOLVIMENTO = 'http://localhost:5173/';

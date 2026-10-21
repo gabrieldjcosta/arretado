@@ -15,7 +15,7 @@ O Gabriel conferiu em 23/09/2026: builds do `main` verdes no painel (o último, 
   - opcional: desligar os builds de branches que não são o `main`, que marcam todo PR com um check vermelho sem efeito (ver `solucao-de-problemas.md` › "Check `Workers Builds` vermelho em todo PR").
 - A importação por URL da F2 (T17, atividades 12.1–12.2) entra neste mesmo Worker como rota `/api/buscar-norma` (`main` + `assets.run_worker_first` no `wrangler.jsonc`). Plano B, se uma lei imensa estourar o limite de processamento: Edge Function no projeto Supabase, aceitando a pausa (ver T17).
 
-Os dados ficam no navegador de cada endereço. Usar sempre https://arretado.gabrieldjcosta.workers.dev; trocar de endereço ou de navegador pede exportar e importar em Conta › Dados.
+Os dados ficam no navegador de cada endereço. Endereço oficial: https://arretado.cc (decisão de 20/10/2026; o `workers.dev` segue no ar durante a transição). Os dados de um endereço não aparecem no outro: antes de passar a usar o `arretado.cc`, exportar em Conta › Dados no endereço antigo e importar no novo. Trocar de endereço ou de navegador pede exportar e importar em Conta › Dados.
 
 ## Projeto Supabase (atividade 4.3, concluída em 23/09/2026)
 
