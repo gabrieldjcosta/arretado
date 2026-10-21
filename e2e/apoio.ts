@@ -7,6 +7,12 @@ interface Opcoes {
   permitirViolacoes: boolean;
   /** Para testes que provocam falha no console de propósito. */
   permitirFalhasConsole: boolean;
+  /**
+   * Todo teste abre o app como um aparelho que já viu a Chegada e a Entrada do Dia, porque as duas são
+   * um <dialog> modal (o resto da tela fica inerte) e todo teste começa num aparelho novo. Só a
+   * `entrada-do-dia.spec.ts` desliga isto (`test.use({ semearAbertura: false })`).
+   */
+  semearAbertura: boolean;
 }
 
 /**
@@ -16,8 +22,9 @@ interface Opcoes {
 export const test = base.extend<Opcoes & { vigiar: undefined }>({
   permitirViolacoes: [false, { option: true }],
   permitirFalhasConsole: [false, { option: true }],
+  semearAbertura: [true, { option: true }],
   vigiar: [
-    async ({ page, permitirViolacoes, permitirFalhasConsole }, use) => {
+    async ({ page, permitirViolacoes, permitirFalhasConsole, semearAbertura }, use) => {
       await page.addInitScript(() => {
         const w = window as unknown as { __violacoes: string[] };
         w.__violacoes = [];
@@ -27,6 +34,23 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
           );
         });
       });
+      if (semearAbertura) {
+        // As mesmas chaves de `src/apresentacao/entrada/regras.ts`; só põe o que falta, então um teste
+        // que apague as chaves e recarregue as recebe de volta (a `entrada-do-dia.spec.ts` confere o resultado).
+        await page.addInitScript(() => {
+          try {
+            const guardado = window.localStorage;
+            if (guardado.getItem('arretado:chegada:v1') === null) {
+              guardado.setItem('arretado:chegada:v1', '{"vista":true}');
+            }
+            if (guardado.getItem('arretado:entrada-do-dia:v1') === null) {
+              guardado.setItem('arretado:entrada-do-dia:v1', '{"dia":"9999-12-31"}');
+            }
+          } catch {
+            /* sem armazenamento */
+          }
+        });
+      }
       const falhas: string[] = [];
       page.on('console', (m) => {
         if (m.type() === 'error') falhas.push(m.text());

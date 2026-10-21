@@ -104,4 +104,11 @@ describe('excluir-conta (F4-A, A5)', () => {
     expect((await excluirConta(pedido(), deps)).status).toBe(200);
     expect(chamadas).toContain(`apagarUsuario:${UID}`);
   });
+
+  it('aceita o domínio oficial arretado.cc', async () => {
+    const { deps } = dependencias();
+    const r = await excluirConta({ ...pedido(), origem: 'https://arretado.cc' }, deps);
+    expect(r.status).toBe(200);
+    expect(r.cabecalhos['Access-Control-Allow-Origin']).toBe('https://arretado.cc');
+  });
 });

@@ -99,8 +99,8 @@ function leituraSalva(e: EntradaDaProximaAcao): ProximaAcao | undefined {
     alvo: { tipo: 'leitura', id: l.normaId, rotulo: l.tituloCurto },
     razao:
       l.onde === undefined
-        ? `Você estava lendo a ${l.tituloCurto}`
-        : `Você parou no ${l.onde} da ${l.tituloCurto}`,
+        ? `Continuar a leitura da ${l.tituloCurto}`
+        : `Continuar a leitura no ${l.onde} da ${l.tituloCurto}`,
     ...(l.onde !== undefined && l.minutos !== undefined ? { estimativaMin: l.minutos } : {}),
   };
 }

@@ -69,7 +69,7 @@ describe('escolherProximaAcao (A1)', () => {
     expect(r.tipo).toBe('vazio');
   });
 
-  it('sem revisão: a norma lida por último, com onde parou e quanto falta', async () => {
+  it('sem revisão: a norma lida por último, com onde continuar e quanto falta', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await lerLep(repo);
     const r = await escolherProximaAcao(repo, hoje(repo));
@@ -81,7 +81,7 @@ describe('escolherProximaAcao (A1)', () => {
       },
     });
     if (r.tipo !== 'acao') throw new Error('esperava ação');
-    expect(r.acao.razao).toMatch(/^Você parou no Art\. 1º da LEP$/);
+    expect(r.acao.razao).toMatch(/^Continuar a leitura no Art\. 1º da LEP$/);
     expect(r.acao.estimativaMin).toBeGreaterThanOrEqual(1);
   });
 
