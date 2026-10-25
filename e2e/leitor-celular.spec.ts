@@ -6,6 +6,10 @@ import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from 
 // Filtrar e Ações a dois toques, no "Mais" (B). Aqui se mede onde cada coisa fica, no estilo do
 // `trilho-do-leitor.spec.ts`; o E2E do Leitor só pergunta se os botões estão à vista.
 
+// O CI desenha o texto com hinting inteiro, uns 3% mais largo que o do computador de quem escreve o
+// teste: a barra de 360 px passava aqui e quebrava lá. Com a flag o E2E mede o mesmo texto nos dois.
+test.use({ launchOptions: { args: ['--font-render-hinting=full'] } });
+
 const TELAS = [
   { largura: 390, altura: 844 },
   { largura: 375, altura: 667 },
@@ -91,7 +95,10 @@ for (const { largura, altura } of TELAS) {
     expect(m.barra.direita).toBeLessThanOrEqual(m.largura);
     expect(m.botoes.map((b) => b.nome)).toEqual(['Buscar', 'Modo foco', 'Mais', 'Lido até aqui']);
     for (const b of m.botoes) {
-      expect(b.base - b.topo, `${b.nome}: alvo de 44 px`).toBeGreaterThanOrEqual(43.9);
+      expect(b.base - b.topo, `${b.nome}: alvo de 44 px de altura`).toBeGreaterThanOrEqual(43.9);
+      expect(b.direita - b.esquerda, `${b.nome}: alvo de 44 px de largura`).toBeGreaterThanOrEqual(
+        43.9,
+      );
       expect(b.fonte, `${b.nome}: texto de 13 px ou mais`).toBeGreaterThanOrEqual(13);
       expect(b.esquerda, `${b.nome} dentro da tela`).toBeGreaterThanOrEqual(0);
       expect(b.direita, `${b.nome} dentro da tela`).toBeLessThanOrEqual(m.largura);
