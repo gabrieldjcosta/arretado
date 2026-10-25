@@ -328,20 +328,25 @@ export function Drill() {
       )}
       {!estado.virado ? (
         <div className="linha-acoes acoes-drill">
-          <div className="certeza" role="group" aria-label="Quanta certeza?">
-            {CERTEZAS.map(([valor, rotulo]) => (
-              <button
-                key={valor}
-                type="button"
-                className="chip"
-                onClick={() => {
-                  certeza.current = valor;
-                  virar();
-                }}
-              >
-                {rotulo}
-              </button>
-            ))}
+          <div className="certeza" role="group" aria-labelledby="certeza-rotulo">
+            <p id="certeza-rotulo" className="certeza-rotulo">
+              Quanta certeza?
+            </p>
+            <div className="certeza-opcoes">
+              {CERTEZAS.map(([valor, rotulo]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  className="chip"
+                  onClick={() => {
+                    certeza.current = valor;
+                    virar();
+                  }}
+                >
+                  {rotulo}
+                </button>
+              ))}
+            </div>
           </div>
           <button ref={botaoVirar} type="button" className="principal grande" onClick={virar}>
             Mostrar resposta

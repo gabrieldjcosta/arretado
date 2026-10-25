@@ -80,7 +80,7 @@ export function ordenarPorValor<T extends ItemParaOrdenar>(
  * "sem Ponto" de quem tem Ponto sem faixa seria falso); a espera não entra: lida como atraso.
  */
 export function motivoDoItem(item: ItemParaOrdenar): string {
-  if (item.erroComCerteza) return 'Você tinha certeza e a resposta era outra: vale rever logo';
+  if (item.erroComCerteza) return 'Tinha certeza e saiu diferente';
   const caixa = item.caixa <= 2 ? 'ainda frágil' : `caixa ${String(item.caixa)}`;
   return item.faixa === undefined
     ? caixa
