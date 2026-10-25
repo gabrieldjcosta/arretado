@@ -49,3 +49,8 @@ Começar pelo passo 1 em carreiras já cobertas (Defensoria, Magistratura, MP, a
 - Páginas de banca mudam de layout: o radar deve falhar com aviso, não calar.
 - PDF escaneado ou com tabela quebrada: extração automática errada passa batida; por isso a revisão obrigatória antes de publicar.
 - Recorrência e faixa por disciplina (hoje sobre 13 editais da Defensoria) precisam ser recalculadas a cada edital novo; hoje é manual. Incluir no passo 2.
+
+## Passo 1 construído (25/10/2026)
+`node scripts/editais/radar.mjs` lê `docs/editais/fontes.json` (páginas das bancas), compara os links de PDF com `docs/editais/estado.json` e acrescenta o que apareceu em `docs/editais/fila.json` (`novo` em página-índice, `retificado` em página de concurso). Primeira leitura de uma fonte é linha de base; fonte que falha dá aviso e sai com código 2. Só detecta: não baixa PDF nem toca no catálogo. Fontes iniciais: FCC (lista e DPE-BA), FGV (lista); acrescentar Cebraspe e Fundatec ao liberar os domínios. Sem os domínios liberados todas dão erro de rede.
+
+Rotina proposta (não criada): diária, 06h BRT, numa sessão com os domínios liberados; roda o radar, e se a fila cresceu abre PR com `estado.json` e `fila.json` e avisa o Gabriel.

@@ -57,6 +57,17 @@ export function curva(progresso: number): number {
   return emY(Math.min(1, Math.max(0, t)));
 }
 
+/**
+ * A página recarregou (ou saiu) no meio de um quadro: o SVG já está num documento inativo e o
+ * navegador recusa medi-lo (`InvalidStateError`). Não há mais o que desenhar; o resto é erro de verdade.
+ */
+export function documentoInativo(erro: unknown): boolean {
+  // Pelo nome, e não por `instanceof Error`: o erro pode vir de outra janela (outro `Error`).
+  return (
+    typeof erro === 'object' && erro !== null && 'name' in erro && erro.name === 'InvalidStateError'
+  );
+}
+
 /** Espera `ms`; resolve também se o `sinal` abortar (quem chama confere `sinal.aborted`). */
 export function esperar(ms: number, sinal: AbortSignal): Promise<void> {
   return new Promise((resolver) => {

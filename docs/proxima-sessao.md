@@ -94,7 +94,7 @@ Passagem de bastão (Frases 1): Tarefa 4b · Branch `claude/frases-1` · Último
 | — | ~~Uso real: 2 semanas~~ → V1 | — | — |
 | 9 | F3-A em pacotes paralelos + F3-B prep (`planos/f3-pacotes.md`) | **Opus 5.5** | nuvem, liberado |
 
-Sem bloquear: lotes com rede (SV 30, 3b/3d; normas a converter: 59 de 63 feitas em 13/10/2026, faltam os provimentos CGJ-TJSP 18/2012, 16/2013 e 21/2013 e a Res. CONDEGE 1/2024, ver `acervo/a-converter.md`) e busca de súmula pelo índice (Sonnet 5.5 médio, nuvem). Relato de problema do uso real fura a fila.
+Sem bloquear: lotes com rede (SV 30, 3b/3d; normas a converter: 59 de 63 feitas em 13/10/2026, faltam os provimentos CGJ-TJSP 18/2012, 16/2013 e 21/2013 e a Res. CONDEGE 1/2024; o lote das carreiras de 25/10/2026 pôs 88 normas (86 do Planalto citadas em 30% dos editais e mais 2 pedidas pela incidência) e deixou 6, com 2 anexos escaneados e 4 resoluções em sites bloqueados na nuvem; ver `acervo/a-converter.md`) e busca de súmula pelo índice (Sonnet 5.5 médio, nuvem). Relato de problema do uso real fura a fila.
 
 ## Pendências do Gabriel
 

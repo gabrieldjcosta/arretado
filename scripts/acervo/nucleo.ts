@@ -47,6 +47,19 @@ export function blocosDoPlanalto(bytes: Uint8Array, base: string): Bloco[] {
   return sanitizarHtml(decodificarPagina(bytes), { base }).blocos;
 }
 
+/** Corta no último bloco cujo texto é `marca` (o índice no fim da página do Código Civil). */
+export function cortarBlocos(blocos: Bloco[], marca: string | undefined): Bloco[] {
+  if (marca === undefined) return blocos;
+  const k = blocos.findLastIndex(
+    (b) =>
+      b.trechos
+        .map((t) => t.texto)
+        .join('')
+        .trim() === marca,
+  );
+  return k < 0 ? blocos : blocos.slice(0, k);
+}
+
 const ultimaRequisicao = new Map<string, number>();
 
 /** Uma requisição por segundo por servidor, com User-Agent identificado. */
@@ -136,7 +149,7 @@ export async function gerarItem(pastas: Pastas, cur: ItemDaCuradoria): Promise<I
               cur,
               cur.fonte.adaptador === 'markdown'
                 ? markdownParaBlocos(texto)
-                : blocosDoPlanalto(bruto.bytes, cur.fonte.url),
+                : cortarBlocos(blocosDoPlanalto(bruto.bytes, cur.fonte.url), cur.cortarEm),
               bruto.coletadoEm,
               bruto.urlOficial,
             );
