@@ -11,7 +11,7 @@ Em 13/10/2026 foram convertidos 59 dos 63 itens (115 a 177) em `acervo/fontes/`,
 
 ## Lote das carreiras (25/10/2026): 6 itens
 
-Normas citadas em pelo menos 30% dos editais de uma carreira do catálogo que ficaram fora do lote de 86. Os dois decretos têm o texto num PDF escaneado, sem camada de texto (não há OCR na nuvem): transcrever à mão lendo o PDF e registrar com `manual: true`. As quatro resoluções estão em sites que a nuvem não alcança (gov.br, cnj.jus.br): baixar o ato numa máquina com rede e rodar `node scripts/acervo-lote-md.mjs <manifesto>`.
+Normas citadas em pelo menos 30% dos editais de uma carreira do catálogo que ficaram fora do lote das carreiras (88 normas). Os dois decretos têm o texto num PDF escaneado, sem camada de texto (não há OCR na nuvem): transcrever à mão lendo o PDF e registrar com `manual: true`. As quatro resoluções estão em sites que a nuvem não alcança (gov.br, cnj.jus.br): baixar o ato numa máquina com rede e rodar `node scripts/acervo-lote-md.mjs <manifesto>`.
 
 | Norma                                                                             | Arquivo                       | Carreira (editais que citam) | Link oficial                                                     | Obs.                                                                                                 |
 | --------------------------------------------------------------------------------- | ----------------------------- | ---------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |

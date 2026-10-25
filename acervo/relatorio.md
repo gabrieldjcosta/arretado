@@ -269,3 +269,5 @@
 | decreto-federal-8772-2016 | publicado | 910 | 0 | linha_solta: 3; duplicata: 1 |
 | decreto-federal-4340-2002 | publicado | 168 | 0 | — |
 | lei-federal-14944-2024 | publicado | 293 | 0 | — |
+| decreto-lei-1001-1969 | publicado | 1827 | 0 | linha_solta: 1; alinea_sem_inciso: 31 |
+| lei-estadual-10261-1968 | publicado | 1079 | 0 | linha_solta: 3; duplicata: 5; artigo_so_tachado: 4; artigo_ausente: 1; alinea_sem_inciso: 5; item_sem_alinea: 44 |

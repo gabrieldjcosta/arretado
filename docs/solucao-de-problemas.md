@@ -1361,7 +1361,7 @@ Sintoma: o ambiente na nuvem não alcança STF, STJ, TJSP nem a TNU (`curl` devo
 
 ### Acervo: lote das carreiras (25/10/2026)
 
-86 normas do Planalto citadas em pelo menos 30% dos editais de uma carreira do catálogo (Defensoria, Magistratura, MP, ambiental).
+86 normas do Planalto citadas em pelo menos 30% dos editais de uma carreira do catálogo (Defensoria, Magistratura, MP, ambiental), mais duas pedidas para o pacote de estrelas da incidência: o Código Penal Militar (Decreto-Lei 1.001/1969) e a Lei (SP) 10.261/1968, do site da Assembleia.
 
 - **Código Civil com centenas de `estrutural_repetido`:** depois do fecho, a página do Planalto traz um índice que repete Livros, Títulos e Capítulos. `cortarEm: "ÍNDICE"` no item da curadoria corta a página no último bloco com esse texto exato (o primeiro "ÍNDICE" é o link do topo). Não confundir com o `cortarEm` do manifesto do `acervo-lote-md.mjs`, que é uma expressão regular.
 - **Texto some e nada bloqueia (`linha_solta`):** uma linha com grafia errada no Planalto não vira dispositivo, e o estruturador a tira do item; como `linha_solta` é aceito em bloco, o item sai incompleto e verde. Achados: inciso com L minúsculo ("l -") na Lei 7.347/1985, "lI" na Lei 4.591/1964, "arágrafo único" no Código Eleitoral e títulos de capítulo em minúsculas na Lei 11.419/2006. Solução: fonte Markdown em `acervo/fontes/<id>.md`, tirada da página com a grafia corrigida (`urlOficial` no Planalto), e um aviso na curadoria dizendo o que mudou. **Previsível:** qualquer norma nova do Planalto. Ler as `linha_solta` de cada item novo antes de publicar; as que sobraram neste lote são títulos de divisão ou preâmbulo.

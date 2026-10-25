@@ -5392,6 +5392,53 @@
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14944.htm"
       },
       "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-1001-1969",
+      "titulo": "Decreto-Lei 1.001/1969 (Código Penal Militar)",
+      "grupo": "Leis federais",
+      "tituloCurto": "Código Penal Militar",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del1001.htm"
+      },
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-estadual-10261-1968",
+      "titulo": "Lei (SP) 10.261/1968 (Estatuto dos Funcionários Públicos Civis do Estado)",
+      "grupo": "Leis estaduais",
+      "tipo": "Lei",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [
+        "No parágrafo único do art. 95, as alíneas a a e aparecem duas vezes (itens 1 e 2): a lista mostra uma série só e a outra fica como redação anterior.",
+        "A página da Assembleia não traz o art. 267-K (vai do 267-J ao 267-L), e o nome do Título VII aparece cortado."
+      ],
+      "fonte": {
+        "adaptador": "html",
+        "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/1968/lei-10261-28.10.1968.html"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "duplicata",
+        "artigo_so_tachado",
+        "artigo_ausente",
+        "alinea_sem_inciso",
+        "item_sem_alinea"
+      ]
     }
   ]
 }
