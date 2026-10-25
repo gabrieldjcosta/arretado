@@ -92,7 +92,14 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
     return Promise.resolve();
   }
   servidorDeSincronizacao(): ServidorDeSincronizacao {
-    return { enviarLote: () => Promise.resolve({ seq_max: 0, divergentes: [] }) };
+    return {
+      enviarLote: () => Promise.resolve({ seq_max: 0, divergentes: [] }),
+      puxarLog: () => Promise.resolve([]),
+      lerRegistro: () => Promise.resolve(null),
+      instantaneoInicio: () => Promise.resolve(0),
+      puxarRegistros: () => Promise.resolve([]),
+      registrarSincronia: () => Promise.resolve(),
+    };
   }
   sair(): Promise<void> {
     this.definir(null);
