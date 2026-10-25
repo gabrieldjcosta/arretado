@@ -2,7 +2,8 @@
 // estrutural (título, capítulo, seção…). Só a `direta` e a `excecao` são gravadas; a herança é
 // calculada na leitura, pela gravada mais próxima no caminho até a raiz (`estrelaEfetiva`): estrelar
 // a Seção I acende tudo dentro dela, desmarcar um artigo dela grava a exceção, estrelar de novo o
-// artigo apaga a exceção. `herdada` fica reservado no modelo e `pacote` é da F7.
+// artigo apaga a exceção. `herdada` fica reservado no modelo. A de `pacote` (incidência) é gravada
+// por `aplicarPacote` e vale como estrela do próprio nó, sem herança.
 //
 // Invariante (decisão da 11.2): toda exceção tem o pai efetivamente estrelado. Desestrelar um nó
 // apaga as exceções que ficaram sem estrela acima (as órfãs): senão, estrelar de novo o nó um dia
@@ -38,7 +39,7 @@ export function estrelavel(no: NoDaEstrela): boolean {
   return no.tipo !== 'nome' && no.status !== 'revogado' && no.status !== 'vetado';
 }
 
-export type OrigemDaEstrela = 'direta' | 'herdada' | 'excecao';
+export type OrigemDaEstrela = 'direta' | 'herdada' | 'pacote' | 'excecao';
 
 export interface EstadoDaEstrela {
   estrelado: boolean;
@@ -50,13 +51,13 @@ export interface EstadoDaEstrela {
 
 const SEM_ESTRELA: EstadoDaEstrela = { estrelado: false };
 
-/** As estrelas pessoais gravadas, por alvo (a de pacote, F7, fica fora daqui). */
+/** As estrelas pessoais gravadas, por alvo (direta, pacote e exceção). */
 export type EstrelasPorAlvo = ReadonlyMap<string, Estrela>;
 
 export function porAlvo(estrelas: readonly Estrela[]): Map<string, Estrela> {
   const mapa = new Map<string, Estrela>();
   for (const e of estrelas) {
-    if (e.origemTipo === 'direta' || e.origemTipo === 'excecao') mapa.set(e.alvoId, e);
+    if (e.origemTipo !== 'herdada') mapa.set(e.alvoId, e);
   }
   return mapa;
 }
@@ -69,7 +70,8 @@ function gravadaAcima(arvore: ArvoreDaEstrela, gravadas: EstrelasPorAlvo, paiId?
     const no = arvore.porId.get(id);
     if (!no) return undefined;
     const gravada = estrelavel(no) ? gravadas.get(id) : undefined;
-    if (gravada) return gravada;
+    // A de pacote é só do próprio nó: não herda nem corta a herança de quem está mais acima.
+    if (gravada && gravada.origemTipo !== 'pacote') return gravada;
     id = no.paiId;
   }
   return undefined;
@@ -87,7 +89,9 @@ export function estrelaEfetiva(
   const no = arvore.porId.get(id);
   if (!no || !estrelavel(no)) return SEM_ESTRELA;
   const propria = gravadas.get(id);
-  if (propria?.origemTipo === 'direta') return { estrelado: true, origem: 'direta' };
+  if (propria?.origemTipo === 'direta' || propria?.origemTipo === 'pacote') {
+    return { estrelado: true, origem: propria.origemTipo };
+  }
   const acima = gravadaAcima(arvore, gravadas, no.paiId);
   if (acima?.origemTipo !== 'direta') return SEM_ESTRELA;
   return propria?.origemTipo === 'excecao'
@@ -119,13 +123,13 @@ export class EstrelaInvalida extends Error {
   }
 }
 
-/** As estrelas pessoais da norma (direta e exceção), sem as excluídas. */
+/** As estrelas da norma (direta, pacote e exceção), sem as excluídas. */
 export function estrelasDaNorma(repo: Repositorio, normaId: string): Promise<Estrela[]> {
   return todos(repo.colecao('estrelas'), {
     indice: 'normaId',
     de: normaId,
     ate: normaId,
-    filtro: (e: Estrela) => e.origemTipo === 'direta' || e.origemTipo === 'excecao',
+    filtro: (e: Estrela) => e.origemTipo !== 'herdada',
   });
 }
 
@@ -193,7 +197,8 @@ const passoDeEstrelar: Passo = async (repo, arvore, gravadas, alvoId) => {
 };
 
 const passoDeDesestrelar: Passo = async (repo, arvore, gravadas, alvoId) => {
-  if (gravadas.get(alvoId)?.origemTipo === 'direta') await apagar(repo, gravadas, alvoId);
+  if (['direta', 'pacote'].includes(gravadas.get(alvoId)?.origemTipo ?? ''))
+    await apagar(repo, gravadas, alvoId);
   if (estrelaEfetiva(arvore, gravadas, alvoId).estrelado) {
     await gravar(repo, arvore, gravadas, alvoId, 'excecao');
   }
