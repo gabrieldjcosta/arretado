@@ -118,3 +118,41 @@
   height: 1rem;
   align-self: center;
 }
+
+/* "A lei mudou" (AP-05): itens recolhidos numa linha de 44 px; só o primeiro vem aberto. */
+.lei-mudou-lista,
+.lei-mudou-guardado {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lei-mudou-lista > li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.lei-mudou-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+}
+
+.lei-mudou-linha h3 {
+  margin: 0;
+}
+
+.lei-mudou del {
+  text-decoration: line-through;
+}
+
+.lei-mudou b {
+  font-weight: 700;
+}
+
+.lei-mudou textarea {
+  width: 100%;
+  min-height: 6rem;
+}

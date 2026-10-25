@@ -1964,6 +1964,8 @@ a.item-norma strong {
       1px + 4px + var(--alvo) + 10px + max(4px, env(safe-area-inset-bottom, 0px))
     );
     --abas-altura: var(--barra-do-leitor);
+    /* O foco por Tab ou script não pode parar sob a barra (WCAG 2.4.11). */
+    scroll-padding-bottom: calc(var(--barra-do-leitor) + 1rem);
   }
 
   :root[data-leitor]:not([data-modo-foco]) .areas {
