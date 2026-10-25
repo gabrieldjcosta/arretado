@@ -6,9 +6,11 @@ import type { Alteracao } from '../persistencia';
 /**
  * Coleções que nunca saem do aparelho. `usuarios` leva `consentimentos`, que valem para o aparelho
  * onde a pessoa aceitou; e nasce com o mesmo id (o da conta) em todo aparelho, o que daria Conflito
- * garantido na primeira sincronização.
+ * garantido na primeira sincronização. `snapshots` e `espacos` descrevem coisas que só existem
+ * neste aparelho (`snapshotsConteudo`; o banco isolado `nomeBanco`): o registro sozinho seria um
+ * ponto de restauração que o outro aparelho não abre, e a poda de um apagaria o ponto do outro.
  */
-export const COLECOES_SO_LOCAIS: readonly NomeColecao[] = ['usuarios'];
+export const COLECOES_SO_LOCAIS: readonly NomeColecao[] = ['usuarios', 'snapshots', 'espacos'];
 
 /** Campos de aparência que cada aparelho guarda só para si (Q3). Metas e perfil de estudo sincronizam. */
 export const CAMPOS_DO_APARELHO: Partial<Record<NomeColecao, readonly string[]>> = {

@@ -2,6 +2,8 @@
 // Convergência da sincronização (F4-B, B3): aparelhos de verdade (Dexie no fake-indexeddb) falando
 // com o SQL real das migrações em PGlite. Prova o que o plano §11 promete: aparelho novo recebe tudo
 // e não reenvia; edição cruzada gera Conflito e NUNCA perde dado; a escolha da pessoa converge.
+import { z } from 'zod';
+import { ENTIDADES } from '../src/core/modelo';
 import { camposMinimos } from '../src/core/modelo/fabrica';
 import { aderirAoItem, reidratadorDoAcervo } from '../src/dominios/acervo/adesao';
 import type { ItemDoAcervo } from '../src/dominios/acervo/esquemas';
@@ -18,6 +20,7 @@ import {
   resolverConflito,
   rodadaDeSincronizacao,
   ResolucaoPendenteDeEnvio,
+  FalhaDeSincronizacao,
   type Escolha,
 } from '../src/core/sincronizacao';
 import { criarBancoRemoto, type BancoRemoto } from './servidor-pglite';
@@ -44,12 +47,12 @@ async function novoUsuario(): Promise<string> {
   return uid;
 }
 
-async function aparelho(uid: string, fonte?: FonteEmMemoria) {
+async function aparelho(uid: string, fonte?: FonteEmMemoria, atrasoDoRelogioMs = 0) {
   contadorDeBancos += 1;
   const repo = await Repositorio.abrir({
     nomeBanco: `conv-${String(contadorDeBancos)}-${Math.random().toString(36).slice(2)}`,
     usuarioId: uid,
-    agora,
+    agora: atrasoDoRelogioMs === 0 ? agora : () => new Date(agora().getTime() - atrasoDoRelogioMs),
   });
   const servidor = remoto.servidorDe(uid);
   const ctx = {
@@ -629,4 +632,272 @@ describe('propriedade: convergência com edição concorrente', () => {
     },
     120_000,
   );
+});
+
+/** Troca o esquema de `erros` para simular um app mais novo ou mais antigo (nos tipos, ENTIDADES é só leitura). */
+const trocarEsquemaDeErros = (esquema: unknown) => {
+  (ENTIDADES.erros as { esquema: unknown }).esquema = esquema;
+};
+
+describe('queda no meio da rodada (revisão independente do B3)', () => {
+  /**
+   * A e B editam o mesmo registro sem se ver. `aPrimeiro`: a edição de A tem o carimbo MENOR (foi
+   * feita antes, offline) mas B chega ao servidor primeiro. Depois A envia: o servidor recusa a edição
+   * de A (divergente) e A cai antes de abrir o Conflito (rede some ao ler o registro de lá).
+   */
+  async function quedaAposOEnvio(aPrimeiro: boolean) {
+    const uid = await novoUsuario();
+    const A = await aparelho(uid);
+    const B = await aparelho(uid);
+    const e = await criarErro(A, 'base');
+    await A.rodada();
+    await B.rodada();
+    if (aPrimeiro) {
+      await A.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'A offline' });
+      await B.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'B' });
+    } else {
+      await B.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'B' });
+      await A.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'A offline' });
+    }
+    await B.rodada();
+    const lerDeLa = A.servidor.lerRegistro.bind(A.servidor);
+    A.servidor.lerRegistro = () => Promise.reject(new FalhaDeSincronizacao('Sem conexão.', false));
+    await expect(A.rodada()).rejects.toThrow();
+    A.servidor.lerRegistro = lerDeLa;
+    await A.rodada();
+    await A.rodada();
+    return { uid, A, B, e };
+  }
+
+  it.each([true, false])(
+    'a edição recusada pelo servidor não some em silêncio (a de A é a mais antiga: %s)',
+    async (aPrimeiro) => {
+      const { A, e } = await quedaAposOEnvio(aPrimeiro);
+      const local = await lerErro(A, e.id);
+      const conflitos = await contarConflitos(A.repo.db);
+      // Ou a edição de A continua lá, ou a pessoa tem um Conflito para decidir: nunca só o 'B'.
+      expect(local?.oQueFoi === 'A offline' || conflitos > 0).toBe(true);
+    },
+  );
+  it('edição feita durante a rodada, com o relógio do aparelho atrasado, não é sobrescrita pela recepção', async () => {
+    const uid = await novoUsuario();
+    const B = await aparelho(uid);
+    const A = await aparelho(uid, undefined, 10 * 60_000); // relógio 10 min atrás: o carimbo dela é menor
+    const e = await criarErro(B, 'base');
+    await B.rodada();
+    await A.rodada();
+    await B.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'B' });
+    await B.rodada();
+    // A já enviou o que tinha; a pessoa edita o mesmo registro enquanto a recepção está puxando.
+    const puxar = A.servidor.puxarLog.bind(A.servidor);
+    A.servidor.puxarLog = async (...args) => {
+      await A.repo.colecao('erros').atualizar(e.id, { oQueFoi: 'A durante a rodada' });
+      return puxar(...args);
+    };
+    await A.rodada();
+    A.servidor.puxarLog = puxar;
+    expect((await lerErro(A, e.id))?.oQueFoi).toBe('A durante a rodada');
+    expect(await contarConflitos(A.repo.db)).toBe(1);
+  });
+
+  // Achado 2 da revisão: hoje reprova de verdade (a quarentena por esquema desatualizado é definitiva e
+  // o campo opcional novo não sobe `VERSAO_ESQUEMA`). `it.fails` mantém a árvore verde e fica vermelho
+  // quando o achado for resolvido: aí troque por `it`.
+  it.fails(
+    'campo opcional novo de um app mais recente: ao atualizar, o aparelho antigo recebe o registro',
+    async () => {
+      const uid = await novoUsuario();
+      const A = await aparelho(uid); // fica no app antigo até a atualização
+      const B = await aparelho(uid); // app novo: o esquema de erros ganhou um campo opcional
+      await A.rodada();
+      await B.rodada();
+      const antigo = ENTIDADES.erros.esquema;
+      const novo = (antigo as unknown as z.ZodObject).extend({ campoNovo: z.string().optional() });
+      try {
+        trocarEsquemaDeErros(novo);
+        const e = await B.repo.colecao('erros').criar({
+          ...camposMinimos('erros', uid),
+          oQueFoi: 'com campo novo',
+          campoNovo: 'x',
+        } as never);
+        await B.rodada();
+
+        trocarEsquemaDeErros(antigo);
+        const r = await A.rodada();
+        expect(r.recebido.quarentena).toBe(1);
+        expect(await lerErro(A, e.id)).toBeUndefined();
+
+        // A atualizou o app: o plano (§7) promete que, ao atualizar, retoma sem perder a entrada.
+        trocarEsquemaDeErros(novo);
+        await A.rodada();
+        await A.rodada();
+        expect(await lerErro(A, e.id)).toBeTruthy();
+      } finally {
+        trocarEsquemaDeErros(antigo);
+      }
+    },
+  );
+});
+
+describe('propriedade com quedas de rede no meio da rodada (revisão independente do B3)', () => {
+  const METODOS = [
+    'enviarLote',
+    'puxarLog',
+    'lerRegistro',
+    'instantaneoInicio',
+    'puxarRegistros',
+    'registrarSincronia',
+  ] as const;
+
+  /** Uma rodada em que a `naChamada`-ésima chamada ao servidor falha (rede some); devolve null se caiu. */
+  async function rodadaComQueda(a: Aparelho, naChamada: number) {
+    const servidor = a.servidor as unknown as Record<
+      string,
+      (...args: unknown[]) => Promise<unknown>
+    >;
+    const originais = new Map(METODOS.map((m) => [m, servidor[m]]));
+    let n = 0;
+    for (const m of METODOS) {
+      const original = originais.get(m);
+      servidor[m] = (...args: unknown[]) => {
+        n += 1;
+        if (n === naChamada) return Promise.reject(new FalhaDeSincronizacao('Sem conexão.', false));
+        return original?.(...args) ?? Promise.resolve(undefined);
+      };
+    }
+    try {
+      return await a.rodada();
+    } catch {
+      return null;
+    } finally {
+      for (const m of METODOS) servidor[m] = originais.get(m) as never;
+    }
+  }
+
+  it.each(Array.from({ length: 40 }, (_, i) => i + 1))(
+    'semente %i: nenhuma edição recusada fica sem Conflito, mesmo com quedas',
+    async (semente) => {
+      const sorteio = gerador(semente);
+      const sorteie = (n: number) => Math.floor(sorteio() * n);
+      const uid = await novoUsuario();
+      const aparelhos = [await aparelho(uid), await aparelho(uid), await aparelho(uid)];
+
+      for (let passo = 0; passo < 70; passo++) {
+        const a = aparelhos[sorteie(aparelhos.length)];
+        if (!a) continue;
+        const acao = sorteio();
+        const conhecidos = (await a.repo.colecao('erros').todosDoUsuario()).filter(
+          (r) => r.excluidoEm === null,
+        );
+        if (acao < 0.3 || conhecidos.length === 0) {
+          await criarErro(a, `s${String(semente)}p${String(passo)}`);
+        } else if (acao < 0.65) {
+          const alvo = conhecidos[sorteie(conhecidos.length)];
+          if (alvo) {
+            await a.repo.colecao('erros').atualizar(alvo.id, {
+              [sorteio() < 0.5 ? 'oQueFoi' : 'justificativa']: `p${String(passo)}`,
+            });
+          }
+        } else if (acao < 0.75) {
+          const alvo = conhecidos[sorteie(conhecidos.length)];
+          if (alvo) await a.repo.colecao('erros').excluir(alvo.id);
+        } else if (sorteio() < 0.5) {
+          await rodadaComQueda(a, 1 + sorteie(3));
+        } else {
+          await a.rodada();
+        }
+      }
+
+      const escolhas: Escolha[] = [
+        { tipo: 'daqui' },
+        { tipo: 'de-la' },
+        { tipo: 'campos', daqui: ['oQueFoi'] },
+      ];
+      let calmo = false;
+      for (let volta = 0; volta < 25 && !calmo; volta++) {
+        let mexeu = false;
+        for (const a of aparelhos) {
+          const r = await a.rodada();
+          if (r.envio.enviadas > 0 || r.recebido.aplicadas > 0 || r.recebido.conflitos > 0)
+            mexeu = true;
+          for (const c of await listarConflitos(a.repo.db)) {
+            await resolverConflito(
+              a.repo,
+              a.ctx,
+              c.id,
+              escolhas[sorteie(escolhas.length)] ?? escolhas[0]!,
+            );
+            mexeu = true;
+          }
+        }
+        calmo = !mexeu;
+      }
+      expect(calmo).toBe(true);
+
+      // Cada edição recusada ou ficou no registro final, ou tinha um Conflito aberto de quando foi feita
+      // até hoje (criado depois dela, ou criado antes e só resolvido depois): a pessoa decidiu.
+      const recusadas = await remoto.db.query<{
+        aparelho_id: string;
+        registro_id: string;
+        ts: string;
+        dados: Record<string, unknown> | null;
+      }>(
+        "select aparelho_id, registro_id, ts, dados from arretado.alteracoes where usuario_id = $1 and divergente and operacao = 'atualizar'",
+        [uid],
+      );
+      for (const r of recusadas.rows) {
+        const dono = aparelhos.find((x) => x.ctx.aparelhoId === r.aparelho_id);
+        const feita = Number(r.ts.slice(0, 13));
+        const final = (await dono?.repo.db.tabela('erros').get(r.registro_id)) as
+          Record<string, unknown> | undefined;
+        const sobreviveu = Object.entries(r.dados ?? {})
+          .filter(([k]) => k === 'oQueFoi' || k === 'justificativa')
+          .every(([k, v]) => final?.[k] === v);
+        const cobertos = (
+          await dono?.repo.db.conflitos
+            .where('[colecao+registroId]')
+            .equals(['erros', r.registro_id])
+            .toArray()
+        )?.filter(
+          (c) =>
+            Date.parse(c.criadoEm) >= feita ||
+            (c.resolvidoEm !== undefined && Date.parse(c.resolvidoEm) >= feita),
+        );
+        expect(sobreviveu || (cobertos?.length ?? 0) > 0).toBe(true);
+      }
+    },
+    120_000,
+  );
+});
+
+describe('coleções que não saem do aparelho (revisão independente do B3)', () => {
+  it('ponto de restauração e espaço separado são do aparelho: o registro não viaja', async () => {
+    const uid = await novoUsuario();
+    const A = await aparelho(uid);
+    const B = await aparelho(uid);
+    await A.rodada();
+    await B.rodada();
+    // O conteúdo vive em `snapshotsConteudo` e no banco isolado `nomeBanco`, que nunca saem de A.
+    // (Mesmo que `criarSnapshot`, sem importar o pacote, que lê a versão injetada pelo Vite.)
+    const idPonto = A.repo.ctx.novoId();
+    const ponto = await A.repo.transacao(async () => {
+      await A.repo.db.snapshotsConteudo.add({ id: idPonto, bytes: new Uint8Array([1, 2, 3]) });
+      return A.repo
+        .colecao('snapshots')
+        .criar(
+          { motivo: 'manual', tamanho: 3, hash: 'b'.repeat(64), versaoEsquema: VERSAO_ESQUEMA },
+          { id: idPonto, origem: 'sistema' },
+        );
+    });
+    const espaco = await A.repo
+      .colecao('espacos')
+      .criar(
+        { nome: 'Espaço de A', nomeBanco: 'banco-so-de-a', hashPacote: 'a'.repeat(64) },
+        { origem: 'importacao' },
+      );
+    await A.rodada();
+    await B.rodada();
+    expect(await B.repo.colecao('snapshots').obter(ponto.id)).toBeUndefined();
+    expect(await B.repo.colecao('espacos').obter(espaco.id)).toBeUndefined();
+  });
 });

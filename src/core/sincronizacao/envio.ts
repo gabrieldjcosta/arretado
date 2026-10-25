@@ -1,5 +1,10 @@
 import type { Alteracao, BancoArretado } from '../persistencia';
-import { lerSeqEnviado, ultimoTsDoRegistro, CHAVE_SEQ_ENVIADO } from './log-local';
+import {
+  anotarDivergencias,
+  lerSeqEnviado,
+  ultimoTsDoRegistro,
+  CHAVE_SEQ_ENVIADO,
+} from './log-local';
 import { semCamposDoAparelho, sincroniza } from './politica';
 import {
   FalhaDeSincronizacao,
@@ -135,6 +140,8 @@ export async function enviarPendentes(
         ctx.versaoEsquema,
         itens.map((i) => i.entrada),
       );
+      // Antes de o cursor andar: cair daqui até o Conflito abrir não pode perder a divergência.
+      await anotarDivergencias(db, r.divergentes);
       resultado.enviadas += itens.length;
       resultado.divergentes.push(...r.divergentes);
     } catch (erro) {

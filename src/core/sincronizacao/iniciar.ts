@@ -63,9 +63,12 @@ export async function rodadaDeSincronizacao(
   ctx: ContextoDeRecepcao,
 ): Promise<{ envio: ResultadoDoEnvio; recebido: ResultadoDaRecepcao }> {
   let recebido = resultadoVazioDaRecepcao();
+  // Sobras de uma rodada que caiu entre o envio e a abertura do Conflito (antes de qualquer recepção).
+  const deAntes = await registrarDivergencias(repo, servidor, ctx);
   if (await recargaNecessaria(repo)) recebido = await recarregarDaConta(repo, servidor, ctx);
   const envio = await enviarPendentes(repo.db, servidor, ctx);
-  const novosConflitos = await registrarDivergencias(repo, servidor, ctx, envio.divergentes);
+  const novosConflitos =
+    deAntes + (await registrarDivergencias(repo, servidor, ctx, envio.divergentes));
   const puxado = await receberNovidades(repo, servidor, ctx);
   if (puxado.precisaRecarga) {
     const refeito = await recarregarDaConta(repo, servidor, ctx);
