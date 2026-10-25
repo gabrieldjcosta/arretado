@@ -120,8 +120,9 @@ test.describe('Chegada', () => {
     await page.goto('/#/');
     const folha = chegada(page);
     await expect(folha).toBeVisible();
-    await expect(folha.getByRole('link', { name: 'Registrar um erro' })).toBeFocused();
+    await expect(folha.getByRole('link', { name: 'Escolher meu concurso' })).toBeFocused();
     await expect(folha.getByRole('link', { name: 'Ler uma norma' })).toBeVisible();
+    await expect(folha.getByRole('link', { name: 'Registrar um erro' })).toBeVisible();
     await expect(folha.getByRole('link', { name: /^Montar uma trilha/ })).toBeVisible();
     await expect(folha.getByRole('button', { name: 'Agora não' })).toBeVisible();
     await focoFicaNaFolha(page);
@@ -135,6 +136,7 @@ test.describe('Chegada', () => {
   });
 
   for (const [nome, rota, titulo] of [
+    ['Escolher meu concurso', /#\/comecar$/, 'Qual concurso você estuda?'],
     ['Registrar um erro', /#\/recall\/registrar$/, 'Registrar erro'],
     ['Ler uma norma', /#\/biblioteca$/, 'Biblioteca'],
     ['Montar uma trilha', /#\/plano\/onboarding$/, 'Para qual carreira você estuda?'],

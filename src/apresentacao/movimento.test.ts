@@ -1,5 +1,25 @@
 import { restaurarMovimento, simularMovimento } from '../testes/movimento';
-import { curva, esperar, movimentoAgora, movimentoDoPerfil, suave } from './movimento';
+import {
+  curva,
+  documentoInativo,
+  esperar,
+  movimentoAgora,
+  movimentoDoPerfil,
+  suave,
+} from './movimento';
+
+describe('documentoInativo', () => {
+  it('reconhece o erro do navegador que mede um SVG de página que já saiu', () => {
+    expect(documentoInativo(new DOMException('inactive document', 'InvalidStateError'))).toBe(true);
+  });
+
+  it('o resto é erro de verdade', () => {
+    expect(documentoInativo(new TypeError('x'))).toBe(false);
+    expect(documentoInativo(new DOMException('x', 'NotFoundError'))).toBe(false);
+    expect(documentoInativo('InvalidStateError')).toBe(false);
+    expect(documentoInativo(undefined)).toBe(false);
+  });
+});
 
 describe('movimentoAgora (A caneta que desenha)', () => {
   it('o movimento reduzido do sistema vence qualquer perfil', () => {

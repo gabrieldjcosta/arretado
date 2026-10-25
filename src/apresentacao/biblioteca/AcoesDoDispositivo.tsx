@@ -23,6 +23,8 @@ export interface AlvoDasAcoes {
   texto: string | undefined;
   /** O texto gravado inteiro (o tachado inclusive), o que a correção edita (11.7); ausente como `texto`. */
   textoGravado?: string | undefined;
+  /** Abre já no formulário do erro (o "Registrar erro" do Mais, no celular), sem a lista de ações. */
+  comecarRegistrando?: boolean;
 }
 
 /** Cabe no verso do cartão (20.000 no modelo). */
@@ -72,7 +74,7 @@ function Conteudo({
   aoFechar: () => void;
 }) {
   const repo = useRepositorio();
-  const [registrando, setRegistrando] = useState(false);
+  const [registrando, setRegistrando] = useState(alvo.comecarRegistrando === true);
   const [corrigindo, setCorrigindo] = useState(false);
   const textoGravado = alvo.textoGravado;
   const [aviso, setAviso] = useState('');

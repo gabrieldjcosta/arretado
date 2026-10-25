@@ -54,6 +54,18 @@ export const ItemDaCuradoria = z.strictObject({
    * do índice bloqueiam o item.
    */
   cortarEm: TextoCurto.optional(),
+  /**
+   * Cabeçalhos que a hierarquia do app não tem (SUBTÍTULO do Código Civil): expressões regulares
+   * da linha inteira; a linha que casa sai antes do estruturador, junto com a do nome logo abaixo.
+   * Sem isso o cabeçalho colaria no texto do último dispositivo antes dele.
+   */
+  cabecalhosSemNivel: z.array(z.string().min(1).max(120)).max(5).default([]),
+  /**
+   * Corrigem o que o estruturador leu do alto da página quando ela traz links de navegação no meio
+   * do cabeçalho (Código Civil: "ÍNDICE", "Lei de Introdução…" e "P A R T E G E R A L" com espaços).
+   */
+  tituloOficial: TextoCurto.optional(),
+  ementa: z.string().min(1).max(500).optional(),
   /** Avisos de leitura que o curador viu e aceitou para este item (tipos de `TIPOS_DE_ANOMALIA`). */
   anomaliasAceitas: z.array(z.enum(TIPOS_DE_ANOMALIA as [string, ...string[]])).default([]),
 });

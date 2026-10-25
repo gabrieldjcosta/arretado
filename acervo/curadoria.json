@@ -301,11 +301,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8072.htm"
-      },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-11343-2006",
@@ -514,11 +514,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm"
-      },
-      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-10741-2003",
@@ -698,11 +698,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
-      },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-10257-2001",
@@ -1483,11 +1483,12 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14750.htm"
       },
-      "anomaliasAceitas": ["artigo_so_tachado", "artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": ["artigo_so_tachado"]
     },
     {
       "id": "lei-federal-12334-2010",
@@ -3688,14 +3689,17 @@
         }
       ],
       "avisos": [
-        "O índice do fim da página do Planalto ficou de fora. Os Subtítulos (no Direito de Empresa e no de Família) não aparecem como divisão, e os Capítulos de cada um se repetem na lista."
+        "O índice do fim da página do Planalto ficou de fora. Os Subtítulos (no Direito de Empresa e no de Família) e o cabeçalho da Parte Geral não aparecem como divisão, e os Capítulos de cada Subtítulo se repetem na lista."
       ],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406.htm"
       },
-      "anomaliasAceitas": ["linha_solta", "duplicata", "estrutural_repetido"],
-      "cortarEm": "ÍNDICE"
+      "anomaliasAceitas": ["duplicata", "estrutural_repetido"],
+      "cortarEm": "ÍNDICE",
+      "cabecalhosSemNivel": ["^SUBTÍTULO [IVXLCDM]+$"],
+      "tituloOficial": "Código Civil",
+      "ementa": "Institui o Código Civil."
     },
     {
       "id": "decreto-lei-2848-1940",
@@ -3760,12 +3764,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente",
-        "artigo_fora_de_ordem",
-        "paragrafo_unico_com_numerado"
-      ]
+      "anomaliasAceitas": ["duplicata", "paragrafo_unico_com_numerado"]
     },
     {
       "id": "lei-federal-9099-1995",
@@ -3990,7 +3989,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8038.htm"
       },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem", "alinea_sem_inciso"]
+      "anomaliasAceitas": ["alinea_sem_inciso"]
     },
     {
       "id": "lei-federal-8842-1994",
@@ -4267,8 +4266,7 @@
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/lei/l10.931.htm"
-      },
-      "anomaliasAceitas": ["artigo_fora_de_ordem", "artigo_ausente"]
+      }
     },
     {
       "id": "lei-federal-14382-2022",
@@ -4305,8 +4303,7 @@
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2020/lei/l14010.htm"
-      },
-      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-6830-1980",
@@ -4623,7 +4620,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6515.htm"
       },
-      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem", "item_sem_alinea"]
+      "anomaliasAceitas": ["duplicata", "item_sem_alinea"]
     },
     {
       "id": "lei-federal-9278-1996",
@@ -4817,8 +4814,7 @@
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9096.htm"
-      },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-complementar-federal-86-1996",
@@ -4991,7 +4987,6 @@
         }
       ],
       "avisos": [
-        "A divisão em Partes (Primeira a Quinta) não aparece, e os Títulos de cada Parte se repetem na lista.",
         "Na página do Planalto, o parágrafo único do art. 153 vem grafado \"arágrafo único\"; aqui foi corrigido."
       ],
       "fonte": {
@@ -4999,13 +4994,8 @@
         "arquivo": "lei-federal-4737-1965.md",
         "urlOficial": "https://www.planalto.gov.br/ccivil_03/leis/l4737.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "estrutural_repetido",
-        "artigo_ausente",
-        "alinea_sem_inciso",
-        "paragrafo_1_sem_2"
-      ]
+      "anomaliasAceitas": ["duplicata", "artigo_ausente", "alinea_sem_inciso", "paragrafo_1_sem_2"],
+      "tituloOficial": "Código Eleitoral"
     },
     {
       "id": "lei-federal-9609-1998",
@@ -5094,18 +5084,14 @@
           "disciplina": "Direito Financeiro e Tributário"
         }
       ],
-      "avisos": [
-        "A divisão em Livros (Primeiro e Segundo) não aparece, e os Títulos de cada Livro se repetem na lista."
-      ],
+      "avisos": [],
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l5172.htm"
       },
-      "anomaliasAceitas": [
-        "estrutural_repetido",
-        "alinea_sem_inciso",
-        "paragrafo_unico_com_numerado"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"],
+      "tituloOficial": "Código Tributário Nacional",
+      "ementa": "Dispõe sobre o Sistema Tributário Nacional e institui normas gerais de direito tributário aplicáveis à União, Estados e Municípios."
     },
     {
       "id": "lei-federal-13123-2015",
@@ -5259,13 +5245,7 @@
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm"
       },
-      "anomaliasAceitas": [
-        "duplicata",
-        "artigo_ausente",
-        "artigo_fora_de_ordem",
-        "alinea_sem_inciso",
-        "paragrafo_1_sem_2"
-      ]
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_1_sem_2"]
     },
     {
       "id": "decreto-federal-6514-2008",
@@ -5439,6 +5419,81 @@
         "alinea_sem_inciso",
         "item_sem_alinea"
       ]
+    },
+    {
+      "id": "lei-federal-9307-1996",
+      "titulo": "Lei 9.307/1996 (Arbitragem)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9307.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-9868-1999",
+      "titulo": "Lei 9.868/1999 (ADI e ADC)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9868.htm"
+      },
+      "anomaliasAceitas": ["linha_solta"]
+    },
+    {
+      "id": "lei-federal-9882-1999",
+      "titulo": "Lei 9.882/1999 (ADPF)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9882.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12318-2010",
+      "titulo": "Lei 12.318/2010 (Alienação Parental)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12318.htm"
+      },
+      "anomaliasAceitas": []
     }
   ]
 }
