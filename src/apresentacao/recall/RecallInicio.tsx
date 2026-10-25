@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
+import { minutosDoLote } from '../../dominios/recall/ordem-de-valor';
 import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
@@ -9,9 +10,6 @@ import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { resumoDoRecall } from './carregadores';
-
-/** Segundos por cartão na estimativa do início; ajustar com o uso real (fatia 3). */
-export const SEGUNDOS_POR_CARTAO = 30;
 
 /** Uma aba do Recall: link de rota com o traço de seleção (D-D7, "A caneta que desenha"). */
 function AbaDoRecall({ para, rotulo }: { para: string; rotulo: string }) {
@@ -42,7 +40,7 @@ export function RecallInicio() {
   const frasesVencidas = dados?.frasesVencidas ?? 0;
   const cota = dados?.cota ?? 10;
   const lote = Math.min(cota, vencidos);
-  const minutos = Math.max(1, Math.ceil((lote * SEGUNDOS_POR_CARTAO) / 60));
+  const minutos = minutosDoLote(lote);
 
   return (
     <>
