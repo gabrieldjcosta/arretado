@@ -9,6 +9,7 @@ import {
   criarPosse,
   iniciarSincronizacao,
   lerQuarentenaDeRecebidos,
+  sincroniza,
   type EstadoDePosse,
   type Posse,
   type ResultadoDaRodada,
@@ -34,12 +35,17 @@ const INICIAL: EstadoDaTelaDeSincronizacao = {
   emQuarentena: 0,
   ultimaRodada: null,
   posse: { tipo: 'parada' },
+  bloqueioEm: null,
 };
 
-/** Texto curto para a tela; nunca o stack. */
+/** Quanto a descarga do pendente pode atrasar a cessão da posse (plano §4). */
+const TETO_ANTES_DE_PERDER_MS = 5_000;
+
+/** Texto curto para a tela, sem a mensagem técnica (Dexie, zod, HTTP); o detalhe vai ao console. */
 function textoDaFalha(falha: unknown): string {
-  if (falha instanceof Error && falha.message) return falha.message;
-  return 'Falha desconhecida.';
+  console.warn('Problema na sincronização:', falha);
+  if (falha instanceof TypeError) return 'o servidor não respondeu (sem conexão ou fora do ar)';
+  return 'o servidor recusou ou o app não conseguiu aplicar a resposta';
 }
 
 export function ProvedorSincronizacao({
@@ -75,7 +81,13 @@ export function ProvedorSincronizacao({
     let cancelarEventos = () => {};
     let timerMedida: ReturnType<typeof setTimeout> | null = null;
     const aplicarTrava = (posse: EstadoDePosse) => {
-      repo.bloquearEscrita(motivoDaTrava(posse, navigator.onLine));
+      // O que nunca sai deste aparelho (tema, letra, coleções só locais) não espera a posse.
+      repo.bloquearEscrita(motivoDaTrava(posse, navigator.onLine), {
+        isenta: (e) => !sincroniza(e),
+        aoBloquear: () => {
+          if (vivo()) setEstado((e) => ({ ...e, bloqueioEm: Date.now() }));
+        },
+      });
     };
     const aoMudarRede = () => {
       aplicarTrava(controle.current?.posse.estado() ?? { tipo: 'parada' });
@@ -122,12 +134,12 @@ export function ProvedorSincronizacao({
           aplicarTrava(p);
           if (vivo()) setEstado((e) => ({ ...e, posse: p }));
         },
-        // Antes de ceder a posse, sobe o que ficou pendente (plano §4).
+        // Antes de ceder a posse, sobe o que ficou pendente (plano §4): espera a rodada, com teto.
         antesDePerder: () =>
-          new Promise<void>((resolver) => {
-            sync.pedir(true);
-            setTimeout(resolver, 1_500);
-          }),
+          Promise.race([
+            sync.rodadaAgora(),
+            new Promise<void>((resolver) => setTimeout(resolver, TETO_ANTES_DE_PERDER_MS)),
+          ]),
       });
       controle.current = { sync, posse };
       setEstado((e) => ({ ...e, ligada: true, parada: null }));

@@ -15,6 +15,10 @@ export function motivoDaTrava(posse: EstadoDePosse, conectado: boolean): string 
   return posse.tipo === 'de-outro' && conectado ? 'Outro aparelho está editando agora.' : null;
 }
 
+/** Na faixa, logo depois de uma escrita recusada pela trava (a tela que tentou não precisa explicar). */
+export const AVISO_DE_BLOQUEIO =
+  'Não dá para editar: outro aparelho está editando. Passar a editar aqui?';
+
 /** Aviso curto da faixa no alto da tela, só nos estados que mudam o que a pessoa pode fazer. */
 export const AVISO_DA_POSSE: Partial<Record<EstadoDePosse['tipo'], string>> = {
   'de-outro': 'Você está usando outro aparelho agora. Passar a editar aqui?',

@@ -12,6 +12,10 @@
   padding: 0.35rem 1rem;
 }
 
+.faixa-posse-alerta span {
+  font-weight: 600;
+}
+
 .faixa-posse .botao {
   color: inherit;
   border-color: currentcolor;

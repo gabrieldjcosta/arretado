@@ -10,7 +10,7 @@ import {
 } from '../modelo';
 import { iguais } from '../util/json-canonico';
 import type { Alteracao, BancoArretado } from './banco';
-import { EscritaBloqueada, type Contexto } from './contexto';
+import { EscritaBloqueada, type Contexto, type EscritaPrevista } from './contexto';
 
 /** Campos que o usuário (ou o domínio) fornece; os comuns são controlados aqui. */
 export type Dados<N extends NomeColecao> = Omit<RegistroDe<N>, keyof CamposComuns>;
@@ -77,9 +77,15 @@ export class Colecao<N extends NomeColecao> {
     return res.data as RegistroDe<N>;
   }
 
-  private escrever<T>(fn: () => Promise<T>): Promise<T> {
-    const motivo = this.ctx.trava.motivo;
-    if (motivo !== null) return Promise.reject(new EscritaBloqueada(motivo));
+  private escrever<T>(
+    fn: () => Promise<T>,
+    prevista: EscritaPrevista = { colecao: this.nome, operacao: 'gravar' },
+  ): Promise<T> {
+    const { motivo, isenta, aoBloquear } = this.ctx.trava;
+    if (motivo !== null && !isenta?.(prevista)) {
+      aoBloquear?.(motivo);
+      return Promise.reject(new EscritaBloqueada(motivo));
+    }
     return this.db.transaction('rw', [this.tabela, this.db.alteracoes], fn);
   }
 
@@ -208,6 +214,11 @@ export class Colecao<N extends NomeColecao> {
     evento: string,
     permitirExcluido = false,
   ): Promise<RegistroDe<N>> {
+    const prevista: EscritaPrevista = {
+      colecao: this.nome,
+      operacao: 'atualizar',
+      dados: alteracoes,
+    };
     return this.escrever(async () => {
       const atual = await this.tabela.get(id);
       if (!atual || atual.usuarioId !== this.ctx.usuarioId) {
@@ -238,7 +249,7 @@ export class Colecao<N extends NomeColecao> {
       });
       this.aposConfirmar(evento, { colecao: this.nome, id });
       return registro;
-    });
+    }, prevista);
   }
 
   /**

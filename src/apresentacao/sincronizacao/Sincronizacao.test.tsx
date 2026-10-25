@@ -1,7 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { temConsentimento, registrarConsentimento } from '../../core/preferencias';
+import {
+  alterarPreferencias,
+  temConsentimento,
+  registrarConsentimento,
+} from '../../core/preferencias';
 import { ServicoDeContaFalso } from '../../integracoes/conta';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { ProvedorConta } from '../conta/entrar/ContextoConta';
@@ -89,6 +93,17 @@ describe('Conta › Sincronização (F4-B, B4)', () => {
     await expect(
       repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'x' }),
     ).resolves.toBeTruthy();
+  });
+
+  it('escrita recusada pela trava: a faixa vira alerta com o convite para passar a edição (sem a tela tratar)', async () => {
+    const servico = new ServicoDeContaFalso({ sessao: SESSAO });
+    servico.donoDaPosse = 'outro-aparelho';
+    const { repo } = await montar({ comAceite: true, servico });
+    expect(await screen.findByText(/Você está usando outro Aparelho agora/)).toBeInTheDocument();
+    await expect(repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'x' })).rejects.toThrow();
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Não dá para editar/);
+    // O que é só do aparelho (tamanho da letra) passa pela trava.
+    await expect(alterarPreferencias(repo, { tamanhoFonte: 20 })).resolves.toBeTruthy();
   });
 
   it('sem resposta do servidor de posse: edita com aviso (Q1)', async () => {

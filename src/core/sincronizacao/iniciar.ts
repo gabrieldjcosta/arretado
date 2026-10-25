@@ -49,10 +49,16 @@ export type ResultadoDaRodada =
 export interface Sincronizacao {
   /** Pede uma rodada (envia, puxa; junta com gravações próximas). `agora` pula a espera de juntar. */
   pedir(agora?: boolean): void;
+  /** Uma rodada sem atraso; resolve quando ela termina (com ou sem falha). */
+  rodadaAgora(): Promise<void>;
   parar(): void;
 }
 
-const NADA: Sincronizacao = { pedir: () => undefined, parar: () => undefined };
+const NADA: Sincronizacao = {
+  pedir: () => undefined,
+  rodadaAgora: () => Promise.resolve(),
+  parar: () => undefined,
+};
 
 const INTERVALO_PADRAO_MS = 60_000;
 
@@ -111,7 +117,18 @@ export async function iniciarSincronizacao(opcoes: OpcoesDeSincronizacao): Promi
     prepararReidratacao: opcoes.prepararReidratacao,
   };
 
+  // Quem chamou `rodadaAgora` espera a próxima rodada que começar depois do pedido.
+  let esperando: (() => void)[] = [];
   const rodada = async () => {
+    const avisar = esperando;
+    esperando = [];
+    try {
+      await rodadaCompleta();
+    } finally {
+      for (const r of avisar) r();
+    }
+  };
+  const rodadaCompleta = async () => {
     const { envio, recebido } = await rodadaDeSincronizacao(repo, servidor, ctx);
     if (
       envio.enviadas > 0 ||
@@ -149,7 +166,14 @@ export async function iniciarSincronizacao(opcoes: OpcoesDeSincronizacao): Promi
     pedir: (agora) => {
       agendador.pedir(agora);
     },
+    rodadaAgora: () =>
+      new Promise<void>((resolver) => {
+        esperando.push(resolver);
+        agendador.pedir(true);
+      }),
     parar: () => {
+      for (const r of esperando) r();
+      esperando = [];
       cancelar();
       if (periodico !== null) clearInterval(periodico);
       agendador.parar();

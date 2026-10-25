@@ -4,7 +4,7 @@ import { novoId as novoIdPadrao, RelogioLogico } from '../ids';
 import type { NomeColecao, Preferencias } from '../modelo';
 import { BancoArretado, NOME_BANCO_PRINCIPAL } from './banco';
 import { Colecao, type Dados } from './colecao';
-import type { Contexto } from './contexto';
+import type { Contexto, TravaDeEscrita } from './contexto';
 import {
   carimboDoLote,
   montarRegistrosDoLote,
@@ -52,9 +52,14 @@ export class Repositorio {
     return this.ctx.eventos;
   }
 
-  /** Outro aparelho está editando (D17): `motivo` bloqueia as escritas; `null` libera. */
-  bloquearEscrita(motivo: string | null): void {
+  /**
+   * Outro aparelho está editando (D17): `motivo` bloqueia as escritas; `null` libera. `isenta` deixa
+   * passar o que nunca sai deste aparelho; `aoBloquear` avisa cada recusa.
+   */
+  bloquearEscrita(motivo: string | null, opcoes: Omit<TravaDeEscrita, 'motivo'> = {}): void {
     this.ctx.trava.motivo = motivo;
+    this.ctx.trava.isenta = opcoes.isenta;
+    this.ctx.trava.aoBloquear = opcoes.aoBloquear;
   }
 
   colecao<N extends NomeColecao>(nome: N): Colecao<N> {

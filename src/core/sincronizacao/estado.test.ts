@@ -18,6 +18,9 @@ describe('estadoDaSincronizacao (os três estados da tela)', () => {
       estadoDaSincronizacao({ pendentes: 0, ultimaRodada: { ...ok, ok: false }, conflitos: 0 }),
     ).toBe('enviado');
     expect(estadoDaSincronizacao({ pendentes: 0, ultimaRodada: ok, conflitos: 1 })).toBe('enviado');
+    expect(
+      estadoDaSincronizacao({ pendentes: 0, ultimaRodada: ok, conflitos: 0, emQuarentena: 1 }),
+    ).toBe('enviado');
   });
   it('cada estado tem palavra na tela', () => {
     expect(Object.keys(ROTULO_DO_ESTADO).sort()).toEqual(['enviado', 'igual', 'salvo']);

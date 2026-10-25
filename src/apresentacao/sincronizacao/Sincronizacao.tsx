@@ -132,6 +132,7 @@ export function Sincronizacao() {
     pendentes: estado.pendentes,
     ultimaRodada: estado.ultimaRodada,
     conflitos: estado.conflitos,
+    emQuarentena: estado.emQuarentena,
   });
   const posse = estado.posse;
   const editarAqui = async () => {

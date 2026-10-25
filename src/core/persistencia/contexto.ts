@@ -1,5 +1,6 @@
 import type { Barramento } from '../eventos/barramento';
 import type { RelogioLogico } from '../ids';
+import type { NomeColecao } from '../modelo';
 import type { BancoArretado } from './banco';
 
 /**
@@ -9,6 +10,17 @@ import type { BancoArretado } from './banco';
  */
 export interface TravaDeEscrita {
   motivo: string | null;
+  /** Escrita que passa mesmo travada: a que nunca sai deste aparelho (coleção só local, campos do aparelho). */
+  isenta?: (escrita: EscritaPrevista) => boolean;
+  /** Chamado a cada escrita recusada (a faixa de posse avisa; as telas não precisam tratar uma a uma). */
+  aoBloquear?: (motivo: string) => void;
+}
+
+/** O que uma escrita vai pôr no log, antes de abrir a transação. */
+export interface EscritaPrevista {
+  colecao: NomeColecao;
+  operacao: 'gravar' | 'atualizar' | 'remover';
+  dados?: Record<string, unknown>;
 }
 
 export class EscritaBloqueada extends Error {
