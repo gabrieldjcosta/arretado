@@ -15,6 +15,11 @@
 alter table arretado.perfis add column sincronizacao_versao text
   check (sincronizacao_versao is null or length(sincronizacao_versao) between 1 and 32);
 alter table arretado.perfis add column sincronizacao_aceita_em timestamptz;
+-- Trava por conta (Q2, 25/10): sem o plano Pro só as contas que o Gabriel liga sincronizam. Ninguém
+-- do cliente escreve em `perfis` (só select); o dono liga no painel/SQL:
+--   update arretado.perfis set sincronizacao_liberada = true
+--    where usuario_id in (select id from auth.users where email in ('…', '…'));
+alter table arretado.perfis add column sincronizacao_liberada boolean not null default false;
 
 create function arretado.aceitar_sincronizacao(versao text) returns void
 language plpgsql security definer set search_path = ''
@@ -115,6 +120,10 @@ begin
   if not exists (select 1 from arretado.perfis p
                   where p.usuario_id = eu and p.sincronizacao_aceita_em is not null) then
     raise exception 'sincronização não aceita' using errcode = '42501';
+  end if;
+  if not exists (select 1 from arretado.perfis p
+                  where p.usuario_id = eu and p.sincronizacao_liberada) then
+    raise exception 'sincronização não liberada para esta conta' using errcode = '42501';
   end if;
   return eu;
 end;

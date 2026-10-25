@@ -9,6 +9,7 @@ drop function if exists arretado.enviar_lote(uuid, smallint, jsonb);
 drop function if exists arretado.exigir_sincronizacao();
 drop function if exists arretado.aceitar_sincronizacao(text);
 drop table if exists arretado.aparelhos_sync;
+alter table arretado.perfis drop column if exists sincronizacao_liberada;
 alter table arretado.perfis drop column if exists sincronizacao_aceita_em;
 alter table arretado.perfis drop column if exists sincronizacao_versao;
 

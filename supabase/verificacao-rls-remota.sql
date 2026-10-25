@@ -15,6 +15,8 @@
 begin;
 insert into auth.users (id) values
   ('0199a6c4-0000-7000-8000-00000000000a'), ('0199a6c4-0000-7000-8000-00000000000b'), ('0199a6c4-0000-7000-8000-00000000000c');
+update arretado.perfis set sincronizacao_liberada = true
+  where usuario_id in ('0199a6c4-0000-7000-8000-00000000000a', '0199a6c4-0000-7000-8000-00000000000b');
 create temp table resultado (teste text primary key, obtido text) on commit drop;
 grant select, insert on resultado to authenticated, anon;
 

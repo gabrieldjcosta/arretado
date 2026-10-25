@@ -198,7 +198,7 @@ Cada contrato, ao ser despachado, segue o formato de `docs/planos/tarefas/` (Obj
 | # | Escolha | Efeito no plano |
 |---|---|---|
 | Q1 | Sem posse e sem rede **edita, com aviso** | Como recomendado no §4 |
-| Q2 | **Gratuito só com o Gabriel** | Como o padrão: sem Pro agora; ninguém além do Gabriel sincroniza até contratar o Pro |
+| Q2 | **Gratuito só com o Gabriel** (25/10: trava `perfis.sincronizacao_liberada`, ligada só nas 2 contas existentes) | Como o padrão: sem Pro agora; ninguém além do Gabriel sincroniza até contratar o Pro |
 | Q3 | **Aparência e movimento locais** | Tema, movimento e tamanho de letra ficam por aparelho; metas e perfil sincronizam (§5) |
 | Q4 | **Ligada ao entrar** (muda o plano) | Não há interruptor desligado por padrão. A sincronização liga para quem aceitar `v4:sincronizar` no login. **Tensão com Q2/Q7:** sem Pro e sem revisão jurídica, o convite precisa continuar limitado a conhecidos (gancho de convite ligado) e a v4 publicada **antes** do B2 ir ao `main`. No `integracao`/teste, o B2 pode ligar por interruptor de build até lá |
 | Q5 | **Log 30 dias, aparelho parado 90** | Como o §3 |

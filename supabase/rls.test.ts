@@ -75,6 +75,9 @@ const ID_B = '0199a6c4-0000-7000-8000-0000000000b1';
 
 describe('RLS do esquema remoto', () => {
   beforeAll(async () => {
+    await db.exec(
+      `update arretado.perfis set sincronizacao_liberada = true where usuario_id in ('${A}', '${B}')`,
+    );
     // Dados de A e B gravados cada um pelo próprio dono (confirmados fora da transação desfeita).
     for (const [dono, id] of [
       [A, ID_A],

@@ -47,6 +47,10 @@ beforeAll(async () => {
   await db.exec(PRELUDIO);
   for (const sql of MIGRACOES) await db.exec(sql);
   await db.exec(`insert into auth.users values ('${A}'), ('${B}'), ('${C}');`);
+  // A e B liberadas pelo dono do serviço; C nunca é.
+  await db.exec(
+    `update arretado.perfis set sincronizacao_liberada = true where usuario_id in ('${A}', '${B}')`,
+  );
   for (const dono of [A, B]) {
     await db.exec('begin');
     await db.exec(`set local role authenticated; set local request.jwt.claim.sub = '${dono}'`);
@@ -621,4 +625,28 @@ describe('reversão (B1)', () => {
       await d.close();
     }
   }, 60_000);
+});
+
+describe('trava por conta (sincronizacao_liberada)', () => {
+  it('conta que aceitou mas não foi liberada é recusada; o cliente não liga a trava', async () => {
+    await como(C, () => db.query("select arretado.aceitar_sincronizacao('v4:sincronizar')"));
+    await expect(
+      enviar(C, AP1, [
+        {
+          ts: ts(20),
+          colecao: 'erros',
+          registro_id: ID(20),
+          operacao: 'gravar',
+          dados: erro(20, C),
+        },
+      ]),
+    ).rejects.toThrow(/não liberada/);
+    await expect(
+      como(C, () =>
+        db.query('update arretado.perfis set sincronizacao_liberada = true where usuario_id = $1', [
+          C,
+        ]),
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
 });
