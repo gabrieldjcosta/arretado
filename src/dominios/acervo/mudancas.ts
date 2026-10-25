@@ -3,7 +3,7 @@
 // antes (lido da versão arquivada) e o de agora. Só lê: nenhum texto da pessoa é alterado.
 import type { Faixa } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
-import { todos } from './consultas';
+import { dispositivosDaNorma, todos } from './consultas';
 import { textoDosTrechos } from './comparacao';
 
 export type TipoAfetado = 'frase' | 'cartao' | 'estrela' | 'erro';
@@ -139,9 +139,7 @@ export async function mudancasQueAfetam(
   }
 
   const dispositivos = new Map(
-    (await repo.colecao('dispositivos').todosDoUsuario())
-      .filter((d) => d.normaId === normaId)
-      .map((d) => [d.id, d]),
+    (await dispositivosDaNorma(repo.colecao('dispositivos'), normaId)).map((d) => [d.id, d]),
   );
   const ordemTipo: Record<TipoAfetado, number> = { frase: 0, cartao: 1, estrela: 2, erro: 3 };
   const saida: MudancaDeDispositivo[] = [];

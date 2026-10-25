@@ -16,6 +16,9 @@ const ROTULO: Record<TipoAfetado, string> = {
   erro: 'Erro',
 };
 
+const nome = (p: PendenciaDeReleitura, m: MudancaDeDispositivo | undefined) =>
+  m?.rotulo ?? p.rotulo ?? m?.endereco ?? p.enderecoAntigo;
+
 /**
  * "A lei mudou" (AP-05): o texto de um dispositivo mudou no mesmo endereço e a pessoa guardou algo
  * sobre ele. Mostra o de antes e o de agora; "Já reli" resolve o aviso e "Atualizar minha Frase" é
@@ -34,10 +37,7 @@ export function LeiMudou({
   const [editando, setEditando] = useState<{ id: string; texto: string }>();
   const [falha, setFalha] = useState(false);
   const porDispositivo = new Map(mudancas.map((m) => [m.dispositivoId, m]));
-  const lista = pendencias.flatMap((p) => {
-    const m = porDispositivo.get(p.referenciaId ?? '');
-    return m ? [{ p, m }] : [];
-  });
+  const lista = pendencias.map((p) => ({ p, m: porDispositivo.get(p.referenciaId ?? '') }));
   if (lista.length === 0) return null;
 
   const guardar = () => {
@@ -104,18 +104,22 @@ export function LeiMudou({
       <ul className="lista-simples">
         {lista.map(({ p, m }) => (
           <li key={p.id}>
-            <h3>{m.rotulo ?? m.endereco}</h3>
-            <p>
-              <strong>Antes:</strong> {m.antes}
-            </p>
-            <p>
-              <strong>Agora:</strong> {m.agora}
-            </p>
-            <p>Você guardou:</p>
-            <ul className="lista-simples">{m.afetados.map(item)}</ul>
+            <h3>{nome(p, m)}</h3>
+            {m && (
+              <>
+                <p>
+                  <strong>Antes:</strong> {m.antes}
+                </p>
+                <p>
+                  <strong>Agora:</strong> {m.agora}
+                </p>
+                <p>Você guardou:</p>
+                <ul className="lista-simples">{m.afetados.map(item)}</ul>
+              </>
+            )}
             <button
               type="button"
-              aria-label={`Já reli ${m.rotulo ?? m.endereco}`}
+              aria-label={`Já reli ${nome(p, m)}`}
               onClick={() => {
                 void resolverPendencia(repo, p.id).then(aoMudar);
               }}
