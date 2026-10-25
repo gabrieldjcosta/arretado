@@ -1,6 +1,6 @@
 // Verificação do acervo gerado (roda no CI): esquema do índice e de cada item, hash, tamanho,
 // identidade, versão e árvore. Puro: recebe o índice e os arquivos já lidos.
-import { IndiceDoAcervo, ItemDoAcervo } from '../../src/dominios/acervo/esquemas';
+import { IndiceDoAcervo, ItemDoAcervo, PacoteDePartida } from '../../src/dominios/acervo/esquemas';
 import { hashDoItem } from '../../src/dominios/acervo/hash';
 import { arvoreValida } from './construir';
 
@@ -15,10 +15,12 @@ export interface ProblemaDoAcervo {
 /**
  * @param indiceJson texto de `indice.json`
  * @param arquivos bytes de cada `<id>.json`, pelo nome do arquivo
+ * @param pacoteJson texto de `pacote-de-partida.json`, se existe: cada id dele precisa estar no índice
  */
 export async function verificarAcervo(
   indiceJson: string,
   arquivos: ReadonlyMap<string, Uint8Array>,
+  pacoteJson?: string,
 ): Promise<ProblemaDoAcervo[]> {
   const problemas: ProblemaDoAcervo[] = [];
   let bruto: unknown;
@@ -65,5 +67,25 @@ export async function verificarAcervo(
     const id = nome.replace(/\.json$/, '');
     if (!ids.has(id)) problemas.push({ id, problema: 'arquivo fora do índice' });
   }
+  if (pacoteJson !== undefined) problemas.push(...problemasDoPacote(pacoteJson, ids));
   return problemas;
+}
+
+/** O pacote de partida: esquema válido e cada norma dele no índice (senão "Adicionar e ler" falha). */
+function problemasDoPacote(pacoteJson: string, ids: ReadonlySet<string>): ProblemaDoAcervo[] {
+  const id = 'pacote-de-partida';
+  let bruto: unknown;
+  try {
+    bruto = JSON.parse(pacoteJson);
+  } catch {
+    return [{ id, problema: 'pacote-de-partida.json não é JSON' }];
+  }
+  const pacote = PacoteDePartida.safeParse(bruto);
+  if (!pacote.success)
+    return [{ id, problema: `esquema do pacote: ${pacote.error.message.slice(0, 300)}` }];
+  return Object.entries(pacote.data.carreiras).flatMap(([carreira, c]) =>
+    c.normas
+      .filter((n) => !ids.has(n.id))
+      .map((n) => ({ id, problema: `${carreira} cita ${n.id}, que não está no índice` })),
+  );
 }

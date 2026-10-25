@@ -16,6 +16,7 @@ export {
   esquemaDaVersao,
   VERSAO_ESQUEMA,
   type Alteracao,
+  type Conflito,
   type MotivoFechamento,
 } from './banco';
 export {
@@ -34,11 +35,12 @@ export {
   FonteDoLoteAusente,
   idDoLote,
   idsDoLote,
+  montarRegistrosDoLote,
   OPERACAO_ADESAO,
+  ReferenciaDeAcervo,
   referenciasNoLog,
   registrosDoLote,
   type ConteudoDoLote,
-  type ReferenciaDeAcervo,
   type Reidratador,
 } from './lote-acervo';
 export { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';

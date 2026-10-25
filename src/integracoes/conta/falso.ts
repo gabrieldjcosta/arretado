@@ -1,5 +1,10 @@
 // Serviço de conta em memória para testes (unidade e E2E): sem rede, com lista de convites.
 import {
+  FalhaDeSincronizacao,
+  type EntradaDeEnvio,
+  type ServidorDeSincronizacao,
+} from '../../core/sincronizacao';
+import {
   FalhaDeConta,
   type CopiaNaNuvem,
   type ServicoDeConta,
@@ -10,6 +15,19 @@ export class ServicoDeContaFalso implements ServicoDeConta {
   private atual: SessaoDeConta | null;
   private readonly ouvintes = new Set<(s: SessaoDeConta | null) => void>();
   readonly aceites: string[] = [];
+  readonly aceitesDeSincronizacao: string[] = [];
+  /** Lotes recebidos por `enviarLote`, na ordem. */
+  readonly lotesRecebidos: EntradaDeEnvio[][] = [];
+  /** Próximas respostas de `enviarLote` que falham (`null` = rede; `FalhaDeSincronizacao` = recusa). */
+  readonly falhasDeEnvio: (FalhaDeSincronizacao | null)[] = [];
+  /** Divergências a devolver no próximo lote. */
+  divergenciasDoProximoLote: {
+    colecao: string;
+    registro_id: string;
+    ts_servidor: string | null;
+  }[] = [];
+  /** Conta ainda não liberada para sincronizar (`sincronizacao_liberada` falso). */
+  semLiberacao = false;
   codigosPedidos: string[] = [];
   /** Bucket `backups` em memória: chave `<uid>/<nome>`. */
   readonly copias = new Map<string, Uint8Array>();
@@ -80,6 +98,32 @@ export class ServicoDeContaFalso implements ServicoDeConta {
   aceitarTermos(versao: string): Promise<void> {
     this.aceites.push(versao);
     return Promise.resolve();
+  }
+  aceitarSincronizacao(versao: string): Promise<void> {
+    if (this.semLiberacao) {
+      return Promise.reject(new FalhaDeConta('sem-convite', 'Sincronização não liberada.'));
+    }
+    this.aceitesDeSincronizacao.push(versao);
+    return Promise.resolve();
+  }
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    return {
+      enviarLote: (_aparelhoId, _versao, entradas) => {
+        if (this.falhasDeEnvio.length > 0) {
+          const falha = this.falhasDeEnvio.shift() ?? null;
+          return Promise.reject(falha ?? new FalhaDeSincronizacao('Sem conexão.', false));
+        }
+        this.lotesRecebidos.push(entradas);
+        const divergentes = this.divergenciasDoProximoLote;
+        this.divergenciasDoProximoLote = [];
+        return Promise.resolve({ seq_max: this.lotesRecebidos.length, divergentes });
+      },
+      puxarLog: () => Promise.resolve([]),
+      lerRegistro: () => Promise.resolve(null),
+      instantaneoInicio: () => Promise.resolve(0),
+      puxarRegistros: () => Promise.resolve([]),
+      registrarSincronia: () => Promise.resolve(),
+    };
   }
   sair(): Promise<void> {
     this.definir(null);

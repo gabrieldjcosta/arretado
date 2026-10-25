@@ -11,6 +11,7 @@ const b = (...trechos: (string | Trecho)[]): Bloco => ({
   trechos: trechos.map((t) => (typeof t === 'string' ? { texto: t } : t)),
 });
 const tachado = (texto: string): Trecho => ({ texto, tachado: true });
+const ligado = (texto: string, link: string): Trecho => ({ texto, link });
 const blocos = (...linhas: (string | Bloco)[]) =>
   linhas.map((l) => (typeof l === 'string' ? b(l) : l));
 
@@ -40,8 +41,8 @@ describe('estruturador: blocos pré-normativos (regra 2)', () => {
         'Subchefia para Assuntos Jurídicos',
         'DECRETO-LEI No 2.848, DE 7 DE DEZEMBRO DE 1940',
         'Texto compilado',
-        b({ texto: 'Vigência', link: 'https://www.planalto.gov.br/vigencia' }),
-        b({ texto: '(Vide Lei nº 1.521, de 1951)', link: 'https://www.planalto.gov.br/l1521' }),
+        b(ligado('Vigência', 'https://www.planalto.gov.br/vigencia')),
+        b(ligado('(Vide Lei nº 1.521, de 1951)', 'https://www.planalto.gov.br/l1521')),
         'Código Penal.',
         'O PRESIDENTE DA REPÚBLICA , usando da atribuição que lhe confere o art. 180 da Constituição, decreta a seguinte Lei:',
         'CÓDIGO PENAL',
@@ -964,7 +965,7 @@ describe('estruturador: anexos (regra 11, 8.7)', () => {
           { texto: 'I - ' },
           { texto: 'Defensor', enfase: true },
           { texto: ' ' },
-          { texto: '(Vide Lei nº 1, de 2000)', link: 'https://www.planalto.gov.br/l1' },
+          ligado('(Vide Lei nº 1, de 2000)', 'https://www.planalto.gov.br/l1'),
         ),
         'ANEXO II',
         'Tabela',
@@ -1010,7 +1011,7 @@ describe('estruturador: anexos (regra 11, 8.7)', () => {
       { texto: 'I - ' },
       { texto: 'Defensor', enfase: true },
       { texto: ' ' },
-      { texto: '(Vide Lei nº 1, de 2000)', link: 'https://www.planalto.gov.br/l1' },
+      ligado('(Vide Lei nº 1, de 2000)', 'https://www.planalto.gov.br/l1'),
     ]);
     expect(anexos(r)[0]?.notas).toEqual([]);
     expect(todos(r.nos).filter((n) => n.tipo === 'artigo' || n.tipo === 'titulo')).toHaveLength(1);
@@ -2384,9 +2385,9 @@ describe('estruturador: notas de vigência (regra 7, 8.5)', () => {
       blocos(
         b(
           'Art. 159 - Seqüestrar pessoa com o fim de obter vantagem: ',
-          { texto: '(Vide Lei nº 8.072, de 25.7.90)', link: 'https://www.planalto.gov.br/l8072' },
+          ligado('(Vide Lei nº 8.072, de 25.7.90)', 'https://www.planalto.gov.br/l8072'),
           ' ',
-          { texto: 'Vigência', link: 'https://www.planalto.gov.br/v' },
+          ligado('Vigência', 'https://www.planalto.gov.br/v'),
         ),
         '§ 3º - Se resulta a morte: (Vide Lei nº 8.072, de 25.7.90)',
         'Pena - reclusão, de vinte e quatro a trinta anos. (Redação dada pela Lei nº 8.072, de 25.7.1990)',

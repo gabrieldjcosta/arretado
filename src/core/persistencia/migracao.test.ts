@@ -406,3 +406,41 @@ describe('subida de esquema v8 → v9 (ciclos): `ciclos` e campos opcionais da S
     await apagarBanco(nome);
   });
 });
+
+describe('subida de esquema v9 → v10 (F4-B, B2s): tabela interna `conflitos`', () => {
+  it('só `conflitos` nasce na v10; nenhuma coleção nova nem índice alterado', () => {
+    expect(VERSAO_ESQUEMA).toBe(10);
+    expect(colecoesNaVersao(10)).toEqual(colecoesNaVersao(9));
+    const v9 = esquemaDaVersao(9);
+    const v10 = esquemaDaVersao(10);
+    for (const [tabela, indices] of Object.entries(v9)) expect(v10[tabela]).toBe(indices);
+    expect(Object.keys(v10).filter((t) => !(t in v9))).toEqual(['conflitos']);
+    expect(NOMES_COLECOES).not.toContain('conflitos');
+  });
+
+  it('abre o banco v9 como v10 sem perder nada; a tabela nasce vazia e aceita um Conflito', async () => {
+    const nome = nomeBanco();
+    const { antes, usuarioId } = await bancoAntigo(nome, 9);
+    const repo = await Repositorio.abrir({ nomeBanco: nome });
+    expect(repo.db.verno).toBe(VERSAO_ESQUEMA);
+    for (const [tabela, registros] of Object.entries(antes)) {
+      expect(await tabelaSemMarca(repo, tabela)).toEqual(registros);
+    }
+    expect(await repo.db.conflitos.count()).toBe(0);
+    await repo.db.conflitos.put({
+      id: '0199a6c4-0000-7000-8000-0000000000c1',
+      colecao: 'erros',
+      registroId: usuarioId,
+      minha: { nota: 'daqui' },
+      deles: { nota: 'de lá' },
+      aparelhoDeles: '0199a6c4-0000-7000-8000-0000000000e2',
+      tsDeles: '1790000000000-000000-0000000a',
+      criadoEm: '2026-10-25T12:00:00.000Z',
+    });
+    expect(
+      await repo.db.conflitos.where('[colecao+registroId]').equals(['erros', usuarioId]).count(),
+    ).toBe(1);
+    repo.fechar();
+    await apagarBanco(nome);
+  });
+});

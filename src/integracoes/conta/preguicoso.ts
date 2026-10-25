@@ -1,4 +1,5 @@
 // Serviço de conta que só carrega o Supabase quando alguém o usa (fora do pacote inicial, plano §4.4).
+import type { ServidorDeSincronizacao } from '../../core/sincronizacao';
 import type { ServicoDeConta, SessaoDeConta } from './interface';
 
 type Carregador = () => Promise<ServicoDeConta>;
@@ -30,6 +31,20 @@ export class ServicoDeContaPreguicoso implements ServicoDeConta {
   }
   async aceitarTermos(versao: string) {
     await (await this.servico()).aceitarTermos(versao);
+  }
+  async aceitarSincronizacao(versao: string) {
+    await (await this.servico()).aceitarSincronizacao(versao);
+  }
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    const real = async () => (await this.servico()).servidorDeSincronizacao();
+    return {
+      enviarLote: async (...a) => (await real()).enviarLote(...a),
+      puxarLog: async (...a) => (await real()).puxarLog(...a),
+      lerRegistro: async (...a) => (await real()).lerRegistro(...a),
+      instantaneoInicio: async () => (await real()).instantaneoInicio(),
+      puxarRegistros: async (...a) => (await real()).puxarRegistros(...a),
+      registrarSincronia: async (...a) => (await real()).registrarSincronia(...a),
+    };
   }
   async sair() {
     await (await this.servico()).sair();

@@ -1,3 +1,4 @@
+import { FalhaDeSincronizacao, type ServidorDeSincronizacao } from '../../core/sincronizacao';
 import { FalhaDeConta, type ServicoDeConta } from './interface';
 
 const INDISPONIVEL = 'Contas ainda não estão disponíveis nesta versão.';
@@ -21,6 +22,20 @@ export class ServicoDeContaNulo implements ServicoDeConta {
   }
   aceitarTermos(): Promise<void> {
     return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
+  aceitarSincronizacao(): Promise<void> {
+    return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
+  }
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    const recusa = () => Promise.reject(new FalhaDeSincronizacao(INDISPONIVEL, false));
+    return {
+      enviarLote: recusa,
+      puxarLog: recusa,
+      lerRegistro: recusa,
+      instantaneoInicio: recusa,
+      puxarRegistros: recusa,
+      registrarSincronia: recusa,
+    };
   }
   sair() {
     return Promise.resolve();

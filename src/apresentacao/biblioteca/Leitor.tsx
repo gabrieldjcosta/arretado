@@ -50,7 +50,7 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Caneta } from '../componentes/Caneta';
 import { Icone } from '../componentes/Icone';
 import { Voltar } from '../componentes/Voltar';
-import { useLarguraMinima } from '../componentes/largura';
+import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
@@ -58,6 +58,7 @@ import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
+import { MaisDoLeitor } from './MaisDoLeitor';
 import { EstruturaDaNorma } from './EstruturaDaNorma';
 import { dispositivosComErro } from './errosVinculados';
 import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
@@ -105,6 +106,8 @@ const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
 /** A partir daqui (tablet em pé) a estrutura da norma fica ao lado do texto (P4). */
 const LARGURA_DA_ESTRUTURA = 700;
+/** Até aqui (celular) o grupo fixo é a barra de uma linha com o "Mais"; o CSS usa o mesmo corte. */
+const LARGURA_DO_CELULAR = LARGURA_DA_ESTRUTURA - 1;
 /** Quanto tempo a origem da estrela fica por extenso acima do grupo fixo, depois do toque. */
 const AVISO_DA_ESTRELA = 4_000;
 
@@ -614,6 +617,36 @@ function LeitorAberto({
   // moldura), é feita antes da pintura e conferida nos quadros seguintes (as linhas se remedem).
   // Durante a volta à posição guardada (9.7), quem acerta a rolagem é a volta, que já confere a
   // cada quadro.
+  // Celular (menos de 700 px): a barra de baixo é a de uma linha, com o "Mais" (estilos.css).
+  const celular = useLarguraMaxima(LARGURA_DO_CELULAR);
+  // Dentro da norma, o celular troca as abas das áreas pela barra do leitor: o atributo na raiz
+  // (como o do modo foco; ver estilos.css) vive enquanto a norma está aberta.
+  useLayoutEffect(() => {
+    const raiz = document.documentElement;
+    raiz.dataset.leitor = '';
+    return () => {
+      delete raiz.dataset.leitor;
+    };
+  }, []);
+  // A barra de baixo do celular quebra em duas linhas numa tela estreita ou com texto grande: o CSS
+  // só sabe a altura de uma, então o que ela ocupa de fato vai para `--barra-do-leitor` (estilos.css),
+  // e o fim da página reserva essa altura.
+  const barraDoLeitor = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const barra = barraDoLeitor.current;
+    if (!celular || !barra || typeof ResizeObserver === 'undefined') return;
+    const raiz = document.documentElement;
+    const medirBarra = () => {
+      raiz.style.setProperty('--barra-do-leitor', `${String(barra.offsetHeight)}px`);
+    };
+    medirBarra();
+    const observador = new ResizeObserver(medirBarra);
+    observador.observe(barra);
+    return () => {
+      observador.disconnect();
+      raiz.style.removeProperty('--barra-do-leitor');
+    };
+  }, [celular]);
   const focoAntes = useRef(modoFoco);
   // A linha do alto (e o quanto dela já passou) de uma troca que ainda confere o alto: a troca
   // seguinte (F e Esc seguidos) parte dela, não da rolagem em curso, que ainda não se assentou. Cada
@@ -1495,6 +1528,12 @@ function LeitorAberto({
         }
       : undefined;
   function abrirAcoes() {
+    abrirAcoesDe(false);
+  }
+  function abrirRegistro() {
+    abrirAcoesDe(true);
+  }
+  function abrirAcoesDe(comecarRegistrando: boolean) {
     const id = noDoAlto() ?? posicao.current;
     const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
     if (indice === undefined) return;
@@ -1529,6 +1568,7 @@ function LeitorAberto({
         texto === undefined || trechos === undefined
           ? undefined
           : trechos.map((t) => t.texto).join(''),
+      ...(comecarRegistrando ? { comecarRegistrando } : {}),
     });
   }
   const [falhaDoFiltro, setFalhaDoFiltro] = useState<string | undefined>(undefined);
@@ -2002,6 +2042,7 @@ function LeitorAberto({
       {/* Fixo no canto (a partir de 1200 px, no trilho da margem da direita), acompanha a rolagem; no
           modo foco, semitransparente. O mesmo botão entra e sai (o foco do teclado fica nele). */}
       <div
+        ref={barraDoLeitor}
         className="acoes-leitor"
         onPointerDownCapture={() => {
           tocouNasAcoes.current = performance.now();
@@ -2101,6 +2142,7 @@ function LeitorAberto({
               </>
             ) : (
               <AcoesDaLeitura
+                compacto={celular}
                 modoFoco={modoFoco}
                 botaoDoFoco={botaoDoFoco}
                 lenteDoFoco={lenteDoFoco}
@@ -2108,6 +2150,7 @@ function LeitorAberto({
                 abrirFiltro={() => {
                   setFiltroAberto(true);
                 }}
+                abrirRegistro={abrirRegistro}
                 abrirAcoes={abrirAcoes}
                 filtro={filtro?.descricao}
                 alternarFoco={alternarFoco}
@@ -2236,24 +2279,30 @@ function LeitorAberto({
   );
 }
 
-/** O grupo fixo sem marcação em curso: buscar, modo foco e "lido até". */
+/** O grupo fixo sem marcação em curso: buscar, modo foco e "lido até" (no celular, Filtrar, Registrar erro e Ações moram no Mais). */
 function AcoesDaLeitura({
+  compacto,
   modoFoco,
   botaoDoFoco,
   lenteDoFoco,
   abrirBusca,
   abrirFiltro,
+  abrirRegistro,
   abrirAcoes,
   filtro,
   alternarFoco,
   marcarAqui,
   voltarDaRemissao,
 }: {
+  /** Celular (menos de 700 px): Filtrar, Registrar erro e Ações moram no "Mais", e a barra cabe numa linha. */
+  compacto: boolean;
   modoFoco: boolean;
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
   lenteDoFoco: string;
   abrirBusca: () => void;
   abrirFiltro: () => void;
+  /** Só no celular: o Registrar erro do Mais, que abre o painel de Ações já no formulário. */
+  abrirRegistro: () => void;
   abrirAcoes: () => void;
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
@@ -2263,6 +2312,29 @@ function AcoesDaLeitura({
   /** Depois de "ir para" uma remissão (11.9): de onde se veio, e a volta. */
   voltarDaRemissao: { para: string; voltar: () => void } | undefined;
 }) {
+  const buscar = (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-keyshortcuts={TECLA_DA_BUSCA}
+      title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+      onClick={abrirBusca}
+    >
+      Buscar
+    </button>
+  );
+  const foco = (
+    <button
+      ref={botaoDoFoco}
+      type="button"
+      aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+      data-lente={lenteDoFoco}
+      title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
+      onClick={alternarFoco}
+    >
+      {modoFoco ? 'Sair do foco' : 'Modo foco'}
+    </button>
+  );
   return (
     <>
       {voltarDaRemissao && (
@@ -2277,47 +2349,44 @@ function AcoesDaLeitura({
         </button>
       )}
       <div role="group" aria-label="Ferramentas da leitura" className="dock-do-leitor">
-        <button
-          type="button"
-          aria-haspopup="dialog"
-          aria-keyshortcuts={TECLA_DA_BUSCA}
-          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
-          onClick={abrirBusca}
-        >
-          Buscar
-        </button>
-        <button
-          type="button"
-          className={filtro === undefined ? undefined : 'filtro-ligado'}
-          aria-haspopup="dialog"
-          aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
-          title={
-            filtro === undefined
-              ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
-              : `Mostrando só: ${filtro}. Toque para mudar o filtro`
-          }
-          onClick={abrirFiltro}
-        >
-          {filtro === undefined ? 'Filtrar' : 'Filtrado'}
-        </button>
-        <button
-          type="button"
-          aria-haspopup="dialog"
-          title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
-          onClick={abrirAcoes}
-        >
-          Ações
-        </button>
-        <button
-          ref={botaoDoFoco}
-          type="button"
-          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-          data-lente={lenteDoFoco}
-          title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
-          onClick={alternarFoco}
-        >
-          {modoFoco ? 'Sair do foco' : 'Modo foco'}
-        </button>
+        {buscar}
+        {compacto ? (
+          <>
+            {foco}
+            <MaisDoLeitor
+              filtro={filtro}
+              abrirFiltro={abrirFiltro}
+              abrirRegistro={abrirRegistro}
+              abrirAcoes={abrirAcoes}
+            />
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className={filtro === undefined ? undefined : 'filtro-ligado'}
+              aria-haspopup="dialog"
+              aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
+              title={
+                filtro === undefined
+                  ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
+                  : `Mostrando só: ${filtro}. Toque para mudar o filtro`
+              }
+              onClick={abrirFiltro}
+            >
+              {filtro === undefined ? 'Filtrar' : 'Filtrado'}
+            </button>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
+              onClick={abrirAcoes}
+            >
+              Ações
+            </button>
+            {foco}
+          </>
+        )}
       </div>
       <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui

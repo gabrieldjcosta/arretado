@@ -11,6 +11,14 @@ import {
   type SupabaseClient,
 } from '@supabase/supabase-js';
 import {
+  FalhaDeSincronizacao,
+  type ChaveDeRegistro,
+  type EntradaRecebida,
+  type RegistroRemoto,
+  type RespostaDeEnvio,
+  type ServidorDeSincronizacao,
+} from '../../core/sincronizacao';
+import {
   FalhaDeConta,
   type CopiaNaNuvem,
   type ServicoDeConta,
@@ -50,6 +58,39 @@ function paraSessao(sessao: Session | null): SessaoDeConta | null {
 function enderecoDeRetorno(): string {
   const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   return local ? RETORNO_DESENVOLVIMENTO : RETORNO_PRODUCAO;
+}
+
+/**
+ * Falha de `enviar_lote`: só 4xx de conteúdo (400, 409, 422) é definitiva e leva à quarentena.
+ * Rede (0), sessão ou liberação (401, 403), limite (429) e 5xx tentam de novo mais tarde.
+ */
+export function traduzirFalhaDeEnvio(status: number): FalhaDeSincronizacao {
+  const definitiva = [400, 409, 422].includes(status);
+  return new FalhaDeSincronizacao(
+    definitiva ? 'O servidor recusou esta alteração.' : 'Sem conexão ou servidor indisponível.',
+    definitiva,
+  );
+}
+
+/** Colunas de `alteracoes` que a puxada lê (plano §5); `seq` e o resto saem como `EntradaRecebida`. */
+const COLUNAS_DO_LOG =
+  'seq, aparelho_id, ts, colecao, registro_id, operacao, dados, removidos, base_ts, divergente, versao_esquema';
+const COLUNAS_DO_REGISTRO = 'colecao, id, ts_logico, dados, excluido_em';
+const SO_LETRAS = /^[A-Za-z]{2,40}$/;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Leitura que falhou (rede, sessão, limite): nunca definitiva, o agendador repete com espera. */
+async function lerOuFalhar<T>(
+  consulta: () => PromiseLike<{ data: unknown; error: unknown }>,
+): Promise<T | null> {
+  let r;
+  try {
+    r = await consulta();
+  } catch {
+    throw new FalhaDeSincronizacao('Sem conexão.', false);
+  }
+  if (r.error) throw new FalhaDeSincronizacao('Sem conexão ou servidor indisponível.', false);
+  return r.data as T | null;
 }
 
 /** Traduz erro do Supabase em motivo que a tela sabe explicar, sem vazar texto técnico. */
@@ -147,6 +188,94 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
   async aceitarTermos(versao: string): Promise<void> {
     const { error } = await this.cliente.schema('arretado').rpc('aceitar_termos', { versao });
     if (error) throw new FalhaDeConta('indisponivel', 'Não foi possível registrar o aceite agora.');
+  }
+
+  async aceitarSincronizacao(versao: string): Promise<void> {
+    const { error } = await this.cliente
+      .schema('arretado')
+      .rpc('aceitar_sincronizacao', { versao });
+    if (!error) return;
+    // 'não foi liberado' vem do servidor quando a conta não está em `sincronizacao_liberada`.
+    throw traduzirErro(error);
+  }
+
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    return {
+      enviarLote: async (aparelhoId, versaoEsquema, entradas) => {
+        let resposta;
+        try {
+          resposta = await this.cliente.schema('arretado').rpc('enviar_lote', {
+            p_aparelho: aparelhoId,
+            p_versao: versaoEsquema,
+            p_entradas: entradas,
+          });
+        } catch {
+          throw new FalhaDeSincronizacao('Sem conexão.', false);
+        }
+        if (resposta.error) throw traduzirFalhaDeEnvio(resposta.status);
+        return resposta.data as RespostaDeEnvio;
+      },
+      puxarLog: async (depoisDe, limite, operacao) => {
+        const dados = await lerOuFalhar<EntradaRecebida[]>(() => {
+          const q = this.cliente
+            .schema('arretado')
+            .from('alteracoes')
+            .select(COLUNAS_DO_LOG)
+            .gt('seq', depoisDe)
+            .order('seq', { ascending: true })
+            .limit(limite);
+          return operacao ? q.eq('operacao', operacao) : q;
+        });
+        return dados ?? [];
+      },
+      lerRegistro: async (colecao, id) => {
+        const dados = await lerOuFalhar<RegistroRemoto>(() =>
+          this.cliente
+            .schema('arretado')
+            .from('registros')
+            .select(COLUNAS_DO_REGISTRO)
+            .eq('colecao', colecao)
+            .eq('id', id)
+            .maybeSingle(),
+        );
+        return dados;
+      },
+      instantaneoInicio: async () => {
+        const dados = await lerOuFalhar<number>(() =>
+          this.cliente.schema('arretado').rpc('instantaneo_inicio'),
+        );
+        return dados ?? 0;
+      },
+      puxarRegistros: async (depois: ChaveDeRegistro | null, limite: number) => {
+        if (depois && (!SO_LETRAS.test(depois.colecao) || !UUID.test(depois.id))) {
+          throw new FalhaDeSincronizacao('Cursor de recarga inválido.', true);
+        }
+        const dados = await lerOuFalhar<RegistroRemoto[]>(() => {
+          const q = this.cliente
+            .schema('arretado')
+            .from('registros')
+            .select(COLUNAS_DO_REGISTRO)
+            .order('colecao', { ascending: true })
+            .order('id', { ascending: true })
+            .limit(limite);
+          return depois
+            ? q.or(
+                `colecao.gt.${depois.colecao},and(colecao.eq.${depois.colecao},id.gt.${depois.id})`,
+              )
+            : q;
+        });
+        return dados ?? [];
+      },
+      registrarSincronia: async (aparelhoId, seqRecebido, versaoEsquema) => {
+        await lerOuFalhar(() =>
+          this.cliente.schema('arretado').rpc('registrar_sincronia', {
+            p_aparelho: aparelhoId,
+            p_seq: seqRecebido,
+            p_versao: versaoEsquema,
+          }),
+        );
+      },
+    };
   }
 
   async sair(): Promise<void> {
