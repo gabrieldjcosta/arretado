@@ -43,10 +43,10 @@ export function ParaComecar() {
   const [andamento, setAndamento] = useState<Andamento | null>(null);
   const [falhou, setFalhou] = useState<Falhou | null>(null);
 
+  // `hasOwn`: o endereço é de quem digita, e "constructor" ou "__proto__" não são carreiras.
+  const carreiras = carga.estado === 'pronto' ? carga.dados.pacote.carreiras : undefined;
   const carreira =
-    carga.estado === 'pronto' && slug !== undefined
-      ? carga.dados.pacote.carreiras[slug]
-      : undefined;
+    carreiras && slug !== undefined && Object.hasOwn(carreiras, slug) ? carreiras[slug] : undefined;
   const { presentes, faltam } =
     carga.estado === 'pronto' && carreira
       ? normasDaPartida(carreira, carga.dados.indice)

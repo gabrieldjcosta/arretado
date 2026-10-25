@@ -105,8 +105,9 @@ describe('Escolher meu concurso › Qual concurso você estuda?', () => {
 describe('Escolher meu concurso › Para começar', () => {
   it('mostra as normas do acervo na ordem do pacote, com os editais, e diz o que falta', async () => {
     await abrir('#/comecar/carreira-a', await fonte());
-    expect(await screen.findByRole('heading', { level: 1, name: 'Para começar' })).toBeVisible();
+    // O título também aparece no carregamento, então a carreira é o que diz que a tela chegou.
     expect(await screen.findByText('Carreira A')).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: 'Para começar' })).toBeVisible();
 
     const linhas = within(screen.getByRole('list')).getAllByRole('listitem');
     expect(linhas.map((l) => l.textContent)).toEqual([
@@ -172,12 +173,15 @@ describe('Escolher meu concurso › Para começar', () => {
     expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(2);
   });
 
-  it('uma carreira que não está no pacote leva de volta à lista', async () => {
-    await abrir('#/comecar/nao-existe', await fonte());
-    expect(await screen.findByText('Esse concurso não está na lista')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Escolher meu concurso' })).toHaveAttribute(
-      'href',
-      '#/comecar',
-    );
-  });
+  it.each(['nao-existe', 'constructor', '__proto__', 'toString'])(
+    'a carreira "%s", que não está no pacote, leva de volta à lista',
+    async (slug) => {
+      await abrir(`#/comecar/${slug}`, await fonte());
+      expect(await screen.findByText('Esse concurso não está na lista')).toBeVisible();
+      expect(screen.getByRole('link', { name: 'Escolher meu concurso' })).toHaveAttribute(
+        'href',
+        '#/comecar',
+      );
+    },
+  );
 });
