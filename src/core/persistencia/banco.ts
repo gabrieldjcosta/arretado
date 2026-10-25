@@ -34,7 +34,13 @@ import { colecoesNaVersao, ENTIDADES, type NomeColecao, type RegistroDe } from '
  * nova e campos opcionais: sem índice novo em coleção antiga e sem transformar registro. Backup do
  * Gabriel antes do merge no `main`; recarregar as abas.
  */
-export const VERSAO_ESQUEMA = 9;
+/**
+ * v10: F4-B (B2s), tabela interna `conflitos` (Conta › Conflitos: duas versões do mesmo registro
+ * vindas da sincronização, nunca sobrescritas em silêncio). Interna como `alteracoes` e `meta`: não
+ * é entidade, não entra no pacote nem sobe ao servidor. Sem coleção nova, índice novo em coleção
+ * antiga nem transformação de registro. Backup do Gabriel antes do merge no `main`; recarregar as abas.
+ */
+export const VERSAO_ESQUEMA = 10;
 
 export const NOME_BANCO_PRINCIPAL = 'arretado';
 
@@ -56,6 +62,25 @@ export interface Alteracao {
   removidos?: string[];
 }
 
+/**
+ * Divergência recebida na sincronização (plano F4-B §5): o registro local fica como está e a versão
+ * do outro aparelho espera aqui até a pessoa escolher. `resolvidoEm` marca o item como decidido.
+ */
+export interface Conflito {
+  id: string;
+  colecao: NomeColecao;
+  registroId: string;
+  /** Registro como está neste aparelho (`null` = apagado aqui). */
+  minha: Record<string, unknown> | null;
+  /** Versão que veio do outro aparelho (`null` = apagada lá). */
+  deles: Record<string, unknown> | null;
+  aparelhoDeles: string;
+  /** Carimbo lógico (T7) da versão que veio. */
+  tsDeles: string;
+  criadoEm: string;
+  resolvidoEm?: string;
+}
+
 export interface EntradaMeta {
   chave: string;
   valor: unknown;
@@ -75,6 +100,7 @@ export function esquemaDaVersao(versao: number): Record<string, string> {
   }
   stores.alteracoes = '++seq, ts, usuarioId, [colecao+registroId]';
   stores.meta = 'chave';
+  if (versao >= 10) stores.conflitos = 'id, [colecao+registroId], resolvidoEm';
   stores.anexosConteudo = 'id';
   stores.snapshotsConteudo = 'id';
   return stores;
@@ -86,6 +112,7 @@ export type MotivoFechamento = 'versao' | 'apagado';
 export class BancoArretado extends Dexie {
   alteracoes!: Table<Alteracao, number>;
   meta!: Table<EntradaMeta, string>;
+  conflitos!: Table<Conflito, string>;
   anexosConteudo!: Table<Conteudo, string>;
   snapshotsConteudo!: Table<Conteudo, string>;
 
