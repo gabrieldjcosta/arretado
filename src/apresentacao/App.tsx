@@ -33,6 +33,7 @@ import { RotasDoPlano } from './plano/Rotas';
 import { RotasDaSessao } from './sessao/Rotas';
 import { NaoEncontrada } from './telas/Areas';
 import { Esqueleto } from './componentes/estados';
+import { ProvedorSincronizacao } from './sincronizacao/ProvedorSincronizacao';
 import { LimiteDeErro } from './componentes/LimiteDeErro';
 import { Orientacoes } from './orientacoes/Orientacoes';
 import './estilos.css';
@@ -63,6 +64,13 @@ const ParaComecar = lazy(() =>
   import('./comecar/ParaComecar').then((m) => ({ default: m.ParaComecar })),
 );
 const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
+// Sincronização e Conflitos (F4-B, B4): só com conta; fora do pacote inicial.
+const Sincronizacao = lazy(() =>
+  import('./sincronizacao/Sincronizacao').then((m) => ({ default: m.Sincronizacao })),
+);
+const Conflitos = lazy(() =>
+  import('./sincronizacao/Conflitos').then((m) => ({ default: m.Conflitos })),
+);
 
 /**
  * A migração copia do banco sem conta para o da conta, que ela apaga e recria. Depois de entrar a
@@ -70,6 +78,11 @@ const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m
  * ("apagados em outra aba"). Por isso a rota tem provedor próprio, preso ao banco de origem.
  */
 const abrirOrigemDaMigracao = () => Repositorio.abrir({ nomeBanco: NOME_BANCO_PRINCIPAL });
+
+// No build de E2E da conta (T30) a posse renova e a puxada roda a cada 2 s, para o teste de três
+// aparelhos não esperar os 30 s e 60 s do plano; no build de produção o objeto é vazio e some.
+const RITMO_DA_SINCRONIZACAO =
+  import.meta.env.MODE === 'e2e-conta' ? { renovacaoMs: 2_000, intervaloDePuxadaMs: 2_000 } : {};
 
 function Carregando({ children }: { children: ReactNode }) {
   return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
@@ -102,7 +115,13 @@ export function App({
               <Route
                 element={
                   <ProvedorRepositorio {...(abrir ? { abrir } : {})}>
-                    <Shell />
+                    {contasHabilitadas() ? (
+                      <ProvedorSincronizacao {...RITMO_DA_SINCRONIZACAO}>
+                        <Shell />
+                      </ProvedorSincronizacao>
+                    ) : (
+                      <Shell />
+                    )}
                   </ProvedorRepositorio>
                 }
               >
@@ -197,6 +216,30 @@ export function App({
                 <Route
                   path="conta/entrar"
                   element={contasHabilitadas() ? <Entrar /> : <NaoEncontrada />}
+                />
+                <Route
+                  path="conta/sincronizacao"
+                  element={
+                    contasHabilitadas() ? (
+                      <Carregando>
+                        <Sincronizacao />
+                      </Carregando>
+                    ) : (
+                      <NaoEncontrada />
+                    )
+                  }
+                />
+                <Route
+                  path="conta/conflitos"
+                  element={
+                    contasHabilitadas() ? (
+                      <Carregando>
+                        <Conflitos />
+                      </Carregando>
+                    ) : (
+                      <NaoEncontrada />
+                    )
+                  }
                 />
                 <Route path="orientacoes" element={<Orientacoes />} />
                 <Route path="orientacoes/:secao" element={<Orientacoes />} />

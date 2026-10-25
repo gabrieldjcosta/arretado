@@ -1,0 +1,113 @@
+/* Sincronização e Conflitos (F4-B, B4). Só tokens existentes; alvos ≥ 44 px vêm de .botao; contraste AA nos dois mundos. */
+
+.faixa-posse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  background: var(--aviso-fundo);
+  color: var(--aviso-texto);
+  font-size: 0.9rem;
+  padding: 0.35rem 1rem;
+}
+
+.faixa-posse .botao {
+  color: inherit;
+  border-color: currentcolor;
+}
+
+.estado-sync {
+  margin: 0.5rem 0;
+}
+
+.lista-de-conflitos {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.conflito h3 {
+  margin-top: 0;
+}
+
+.lado-a-lado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+.versao-conflito {
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-campo);
+  padding: 0.75rem;
+  background: var(--superficie-2);
+  min-width: 0;
+}
+
+.versao-conflito h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.versao-conflito dl {
+  margin: 0;
+}
+
+.versao-conflito dl > div {
+  display: grid;
+  grid-template-columns: minmax(6rem, 10rem) 1fr;
+  gap: 0.25rem 0.75rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--borda);
+}
+
+.versao-conflito dl > div:first-child {
+  border-top: 0;
+}
+
+.versao-conflito dt {
+  color: var(--texto-suave, var(--texto));
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.versao-conflito dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.versao-conflito mark {
+  background: var(--grifo-1);
+  color: var(--texto);
+  padding: 0 0.15rem;
+  border-radius: 2px;
+}
+
+.campo-a-campo {
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-campo);
+  padding: 0.75rem 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.escolha-de-campo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.35rem 0;
+}
+
+.escolha-de-campo .nome-do-campo {
+  min-width: 8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 420px) {
+  .versao-conflito dl > div {
+    grid-template-columns: 1fr;
+  }
+}

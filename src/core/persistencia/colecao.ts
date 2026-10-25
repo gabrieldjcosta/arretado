@@ -10,7 +10,7 @@ import {
 } from '../modelo';
 import { iguais } from '../util/json-canonico';
 import type { Alteracao, BancoArretado } from './banco';
-import type { Contexto } from './contexto';
+import { EscritaBloqueada, type Contexto } from './contexto';
 
 /** Campos que o usuário (ou o domínio) fornece; os comuns são controlados aqui. */
 export type Dados<N extends NomeColecao> = Omit<RegistroDe<N>, keyof CamposComuns>;
@@ -78,6 +78,8 @@ export class Colecao<N extends NomeColecao> {
   }
 
   private escrever<T>(fn: () => Promise<T>): Promise<T> {
+    const motivo = this.ctx.trava.motivo;
+    if (motivo !== null) return Promise.reject(new EscritaBloqueada(motivo));
     return this.db.transaction('rw', [this.tabela, this.db.alteracoes], fn);
   }
 
