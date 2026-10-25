@@ -5,42 +5,55 @@
 --   01, 02, 13, 14 → 1        03, 04, 05, 06 → 0
 --   07, 12 → recusado 42501 (row-level security)   08–11, 15 → recusado 42501 (permission denied)
 -- Rodado de novo em 25/09/2026, depois da migração colecao_leituras (9.1), com o 16 → aceitou.
+--
+-- Depois da migração 20261025000000 (F4-B, B1) o cliente não escreve direto em registros, alteracoes
+-- nem posse_aparelho: a escrita é arretado.enviar_lote, que exige aceitar a sincronização. Esperado:
+--   01, 02, 13, 14 → 1     03, 04 → 0     16 → aceitou
+--   05, 06, 08–12, 15, B1-1, B1-2 → recusado 42501 (permission denied / sincronização não aceita)
+--   07 → recusado 23514 (o JSON do registro não é do dono)
 
 begin;
 insert into auth.users (id) values
-  ('0199a6c4-0000-7000-8000-00000000000a'), ('0199a6c4-0000-7000-8000-00000000000b');
+  ('0199a6c4-0000-7000-8000-00000000000a'), ('0199a6c4-0000-7000-8000-00000000000b'), ('0199a6c4-0000-7000-8000-00000000000c');
 create temp table resultado (teste text primary key, obtido text) on commit drop;
 grant select, insert on resultado to authenticated, anon;
 
--- A grava um registro e uma entrada no log
+-- A aceita a sincronização e grava um registro (e a entrada no log) por enviar_lote
 set local role authenticated;
 set local request.jwt.claim.sub = '0199a6c4-0000-7000-8000-00000000000a';
-insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
-values ('erros', '0199a6c4-0000-7000-8000-0000000000a1', '0199a6c4-0000-7000-8000-00000000000a',
-  '1790000000000-000000-0000000a', now(),
-  '{"id":"0199a6c4-0000-7000-8000-0000000000a1","usuarioId":"0199a6c4-0000-7000-8000-00000000000a","oQueFoi":"x"}');
-insert into arretado.alteracoes (usuario_id, aparelho_id, ts, colecao, registro_id, operacao)
-values ('0199a6c4-0000-7000-8000-00000000000a', '0199a6c4-0000-7000-8000-00000000000a',
-  '1790000000000-000000-0000000a', 'erros', '0199a6c4-0000-7000-8000-0000000000a1', 'gravar');
+select arretado.aceitar_sincronizacao('v4:sincronizar');
+select arretado.enviar_lote('0199a6c4-0000-7000-8000-0000000000e1', 9::smallint, '[{
+  "ts": "1790000000000-000000-0000000a", "colecao": "erros", "registro_id": "0199a6c4-0000-7000-8000-0000000000a1",
+  "operacao": "gravar",
+  "dados": {"id": "0199a6c4-0000-7000-8000-0000000000a1", "usuarioId": "0199a6c4-0000-7000-8000-00000000000a", "oQueFoi": "x"}
+}]'::jsonb);
 insert into resultado select '01 A lê os próprios registros', count(*)::text from arretado.registros;
 insert into resultado select '02 A lê o próprio log', count(*)::text from arretado.alteracoes;
 
 -- B tenta ler, alterar, apagar e gravar em nome de A
 set local request.jwt.claim.sub = '0199a6c4-0000-7000-8000-00000000000b';
+select arretado.aceitar_sincronizacao('v4:sincronizar');
 insert into resultado select '03 B lê registros de A', count(*)::text from arretado.registros;
 insert into resultado select '04 B lê o log de A', count(*)::text from arretado.alteracoes;
-with u as (
-  update arretado.registros set excluido_em = now(), dados = dados || '{"oQueFoi":"B"}'
-  where id = '0199a6c4-0000-7000-8000-0000000000a1' returning 1)
-insert into resultado select '05 B altera registro de A (linhas afetadas)', count(*)::text from u;
-with d as (
-  delete from arretado.registros where id = '0199a6c4-0000-7000-8000-0000000000a1' returning 1)
-insert into resultado select '06 B apaga registro de A (linhas afetadas)', count(*)::text from d;
 do $$ begin
-  insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
-  values ('erros', '0199a6c4-0000-7000-8000-0000000000a2', '0199a6c4-0000-7000-8000-00000000000a',
-    '1790000000000-000000-0000000a', now(),
-    '{"id":"0199a6c4-0000-7000-8000-0000000000a2","usuarioId":"0199a6c4-0000-7000-8000-00000000000a"}');
+  update arretado.registros set excluido_em = now(), dados = dados || '{"oQueFoi":"B"}'
+  where id = '0199a6c4-0000-7000-8000-0000000000a1';
+  insert into resultado values ('05 B altera registro de A', 'aceitou');
+exception when others then
+  insert into resultado values ('05 B altera registro de A', 'recusado ' || sqlstate || ': ' || sqlerrm);
+end $$;
+do $$ begin
+  delete from arretado.registros where id = '0199a6c4-0000-7000-8000-0000000000a1';
+  insert into resultado values ('06 B apaga registro de A', 'aceitou');
+exception when others then
+  insert into resultado values ('06 B apaga registro de A', 'recusado ' || sqlstate || ': ' || sqlerrm);
+end $$;
+do $$ begin
+  perform arretado.enviar_lote('0199a6c4-0000-7000-8000-0000000000e1', 9::smallint, '[{
+    "ts": "1790000000000-000000-0000000a", "colecao": "erros",
+    "registro_id": "0199a6c4-0000-7000-8000-0000000000a2", "operacao": "gravar",
+    "dados": {"id": "0199a6c4-0000-7000-8000-0000000000a2", "usuarioId": "0199a6c4-0000-7000-8000-00000000000a"}
+  }]'::jsonb);
   insert into resultado values ('07 B grava registro em nome de A', 'aceitou');
 exception when others then
   insert into resultado values ('07 B grava registro em nome de A', 'recusado ' || sqlstate || ': ' || sqlerrm);
@@ -86,10 +99,11 @@ insert into resultado select '13 A: registro intacto (não excluído, oQueFoi=x)
 insert into resultado select '14 A: log intacto (1 linha, gravar)', count(*)::text
   from arretado.alteracoes where operacao = 'gravar';
 do $$ begin
-  insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
-  values ('leituras', '0199a6c4-0000-7000-8000-0000000000a3', '0199a6c4-0000-7000-8000-00000000000a',
-    '1790000000000-000000-0000000a', now(),
-    '{"id":"0199a6c4-0000-7000-8000-0000000000a3","usuarioId":"0199a6c4-0000-7000-8000-00000000000a"}');
+  perform arretado.enviar_lote('0199a6c4-0000-7000-8000-0000000000e1', 9::smallint, '[{
+    "ts": "1790000000001-000000-0000000a", "colecao": "leituras",
+    "registro_id": "0199a6c4-0000-7000-8000-0000000000a3", "operacao": "gravar",
+    "dados": {"id": "0199a6c4-0000-7000-8000-0000000000a3", "usuarioId": "0199a6c4-0000-7000-8000-00000000000a"}
+  }]'::jsonb);
   insert into resultado values ('16 A grava na coleção leituras (9.1)', 'aceitou');
 exception when others then
   insert into resultado values ('16 A grava na coleção leituras (9.1)', 'recusado ' || sqlstate || ': ' || sqlerrm);
@@ -104,24 +118,23 @@ exception when others then
   insert into resultado values ('15 anônimo lê registros', 'recusado ' || sqlstate || ': ' || sqlerrm);
 end $$;
 
--- ── F4-B (B1): depois da migração 20261025000000 o cliente não escreve direto em registros /
--- alteracoes / posse_aparelho. As verificações acima que gravam direto em registros passam a
--- dar "recusado 42501" (esperado); a escrita legítima é enviar_lote, que exige o aceite.
+-- ── F4-B (B1): o cliente não escreve direto; quem não aceitou a sincronização não usa a função ──
 set local role authenticated;
 do $$ begin
   insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
   values ('erros', '0199a6c4-0000-7000-8000-0000000000f1', '0199a6c4-0000-7000-8000-00000000000a',
     '1790000000000-000000-0000000a', now(),
     '{"id":"0199a6c4-0000-7000-8000-0000000000f1","usuarioId":"0199a6c4-0000-7000-8000-00000000000a"}');
-  insert into resultado values ('B1-1 A grava direto em registros (esperado: recusado 42501)', 'aceitou');
+  insert into resultado values ('B1-1 A grava direto em registros', 'aceitou');
 exception when others then
-  insert into resultado values ('B1-1 A grava direto em registros (esperado: recusado 42501)', 'recusado ' || sqlstate);
+  insert into resultado values ('B1-1 A grava direto em registros', 'recusado ' || sqlstate || ': ' || sqlerrm);
 end $$;
+set local request.jwt.claim.sub = '0199a6c4-0000-7000-8000-00000000000c';
 do $$ begin
   perform arretado.enviar_lote('0199a6c4-0000-7000-8000-0000000000e1', 9::smallint, '[]'::jsonb);
-  insert into resultado values ('B1-2 enviar_lote sem aceitar a sincronização (esperado: recusado 42501)', 'aceitou');
+  insert into resultado values ('B1-2 C (sem aceitar a sincronização) chama enviar_lote', 'aceitou');
 exception when others then
-  insert into resultado values ('B1-2 enviar_lote sem aceitar a sincronização (esperado: recusado 42501)', 'recusado ' || sqlstate);
+  insert into resultado values ('B1-2 C (sem aceitar a sincronização) chama enviar_lote', 'recusado ' || sqlstate || ': ' || sqlerrm);
 end $$;
 reset role;
 select teste, obtido from resultado order by teste;

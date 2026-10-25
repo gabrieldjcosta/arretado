@@ -10,29 +10,46 @@
 -- Sem `check (colecao in (...))`: a lista de coleções válidas é a do cliente (ENTIDADES + zod).
 
 -- ── Aceite da sincronização (v4) ────────────────────────────────────────────────────────────
--- Coluna própria: `termos_versao` guarda o aceite do teste e não deve ser sobrescrito.
+-- Colunas próprias: `termos_versao` guarda o aceite do teste e não deve ser sobrescrito. Guarda
+-- também QUAL texto foi aceito (prova do consentimento).
+alter table arretado.perfis add column sincronizacao_versao text
+  check (sincronizacao_versao is null or length(sincronizacao_versao) between 1 and 32);
 alter table arretado.perfis add column sincronizacao_aceita_em timestamptz;
 
-create function arretado.aceitar_sincronizacao() returns void
+create function arretado.aceitar_sincronizacao(versao text) returns void
 language plpgsql security definer set search_path = ''
 as $$
 begin
   if auth.uid() is null then
     raise exception 'sem sessão' using errcode = '28000';
   end if;
-  update arretado.perfis set sincronizacao_aceita_em = coalesce(sincronizacao_aceita_em, now())
+  if versao is null or length(versao) not between 1 and 32 then
+    raise exception 'versão inválida' using errcode = '22023';
+  end if;
+  update arretado.perfis set sincronizacao_versao = versao, sincronizacao_aceita_em = now()
    where usuario_id = auth.uid();
 end;
 $$;
-revoke execute on function arretado.aceitar_sincronizacao() from public, anon;
-grant execute on function arretado.aceitar_sincronizacao() to authenticated;
+revoke execute on function arretado.aceitar_sincronizacao(text) from public, anon;
+grant execute on function arretado.aceitar_sincronizacao(text) to authenticated;
 
--- ── registros: sem lista fixa de coleções; escrita só pela função ───────────────────────────
+-- ── registros: sem lista fixa de coleções; chave por dono; escrita só pela função ───────────
 alter table arretado.registros drop constraint registros_colecao_check;
 alter table arretado.registros add constraint registros_colecao_check
   check (colecao ~ '^[A-Za-z]{2,40}$');
 alter table arretado.registros add constraint registros_dados_tamanho
   check (pg_column_size(dados) < 1048576);
+-- O check original deixava passar `dados` que não é objeto ou sem `id`/`usuarioId` (NULL não
+-- reprova um check); `atualizar` com `removidos: ['id']` apagava a chave.
+alter table arretado.registros drop constraint registros_check;
+alter table arretado.registros add constraint registros_check check (
+  jsonb_typeof(dados) = 'object'
+  and dados->>'id' is not distinct from id::text
+  and dados->>'usuarioId' is not distinct from usuario_id::text);
+-- Chave por dono: o mesmo (colecao, id) em duas contas (ex.: o mesmo pacote importado) não colide,
+-- e a consulta paginada de um aparelho novo varre só as linhas do dono.
+alter table arretado.registros drop constraint registros_pkey;
+alter table arretado.registros add primary key (usuario_id, colecao, id);
 
 drop policy registros_dono on arretado.registros;
 create policy registros_ler on arretado.registros
@@ -50,6 +67,9 @@ alter table arretado.alteracoes add constraint alteracoes_operacao_check
   check (operacao in ('gravar', 'atualizar', 'remover', 'acervo-adesao'));
 alter table arretado.alteracoes add constraint alteracoes_dados_tamanho
   check (dados is null or pg_column_size(dados) < 1048576);
+-- Sem isto, `acervo-adesao` e `remover` de registro inexistente guardam qualquer texto em `colecao`.
+alter table arretado.alteracoes add constraint alteracoes_colecao_check
+  check (colecao ~ '^[A-Za-z]{2,40}$');
 create unique index alteracoes_idempotencia
   on arretado.alteracoes (usuario_id, aparelho_id, ts, registro_id);
 
@@ -112,64 +132,82 @@ declare
   atual arretado.registros%rowtype;
   existe boolean;
   novos jsonb;
+  dados_e jsonb;
+  remov text[];
   base text;
   divergiu boolean;
   op text;
   divergentes jsonb := '[]'::jsonb;
 begin
   if jsonb_typeof(p_entradas) <> 'array' or jsonb_array_length(p_entradas) > 500
-     or length(p_entradas::text) > 2097152 then
+     or octet_length(p_entradas::text) > 2097152 then
     raise exception 'lote inválido ou grande demais' using errcode = '22023';
   end if;
 
-  for e in select * from jsonb_array_elements(p_entradas) loop
+  -- Um lote por vez por conta. `seq` sai na ordem do commit (o leitor incremental `seq > último`
+  -- não pula uma entrada que confirmou depois de outra) e dois aparelhos não se travam nas
+  -- mesmas linhas. Vale até o fim da transação.
+  perform pg_advisory_xact_lock(hashtextextended(eu::text, 0));
+
+  for e in select value from jsonb_array_elements(p_entradas) loop
     op := e->>'operacao';
     base := nullif(e->>'base_ts', '');
+    dados_e := case when jsonb_typeof(e->'dados') = 'null' then null else e->'dados' end;
+    if (dados_e is not null and jsonb_typeof(dados_e) <> 'object')
+       or (op = 'gravar' and dados_e is null)
+       or jsonb_typeof(e->'removidos') not in ('array', 'null') then
+      raise exception 'entrada com forma inválida (dados é objeto; removidos é lista)'
+        using errcode = '22023';
+    end if;
+    remov := case when jsonb_typeof(e->'removidos') = 'array'
+                  then array(select jsonb_array_elements_text(e->'removidos')) end;
 
     insert into arretado.alteracoes
       (usuario_id, aparelho_id, ts, colecao, registro_id, operacao, dados, removidos, base_ts,
        versao_esquema)
     values
-      (eu, p_aparelho, e->>'ts', e->>'colecao', (e->>'registro_id')::uuid, op, e->'dados',
-       case when jsonb_typeof(e->'removidos') = 'array'
-            then array(select jsonb_array_elements_text(e->'removidos')) end,
+      (eu, p_aparelho, e->>'ts', e->>'colecao', (e->>'registro_id')::uuid, op, dados_e, remov,
        base, p_versao)
     on conflict (usuario_id, aparelho_id, ts, registro_id) do nothing
     returning seq into nova_seq;
 
-    -- Entrada repetida (envio refeito): já está no log e já foi aplicada.
-    continue when nova_seq is null;
+    if nova_seq is null then
+      -- Envio refeito: a entrada já está no log e já foi aplicada. Se ela divergiu, avisa de novo:
+      -- a primeira resposta pode ter se perdido e o aparelho não saberia do Conflito.
+      if exists (select 1 from arretado.alteracoes a
+                  where a.usuario_id = eu and a.aparelho_id = p_aparelho
+                    and a.ts = e->>'ts' and a.registro_id = (e->>'registro_id')::uuid
+                    and a.divergente) then
+        divergentes := divergentes || jsonb_build_object(
+          'colecao', e->>'colecao', 'registro_id', e->>'registro_id',
+          'ts_servidor', (select r.ts_logico from arretado.registros r
+                           where r.usuario_id = eu and r.colecao = e->>'colecao'
+                             and r.id = (e->>'registro_id')::uuid));
+      end if;
+      continue;
+    end if;
     -- Item do acervo vai por referência: não há linha de estado.
     continue when op = 'acervo-adesao';
 
     select * into atual from arretado.registros r
-     where r.colecao = e->>'colecao' and r.id = (e->>'registro_id')::uuid and r.usuario_id = eu
+     where r.usuario_id = eu and r.colecao = e->>'colecao' and r.id = (e->>'registro_id')::uuid
      for update;
     existe := found;
 
     novos := null;
     if op = 'gravar' then
-      novos := e->'dados';
+      novos := dados_e;
     elsif existe then
       if op = 'atualizar' then
-        novos := (atual.dados || coalesce(e->'dados', '{}'::jsonb))
-                 - coalesce(array(select jsonb_array_elements_text(e->'removidos')), '{}');
+        novos := (atual.dados || coalesce(dados_e, '{}'::jsonb)) - coalesce(remov, '{}');
       else
         novos := atual.dados;
       end if;
     end if;
 
-    if existe then
-      divergiu := atual.ts_logico is distinct from base;
-      -- Mesmo conteúdo que o servidor já tem não é divergência.
-      if divergiu and novos is not null and novos = atual.dados
-         and (op <> 'remover') = (atual.excluido_em is null) then
-        divergiu := false;
-        continue;
-      end if;
-    else
-      divergiu := base is not null or novos is null;
-    end if;
+    -- Avança só se a entrada partiu do estado que o servidor tem; senão fica no log como divergente.
+    divergiu := case when existe then atual.ts_logico is distinct from base
+                     else base is not null or novos is null end;
 
     if divergiu then
       update arretado.alteracoes set divergente = true where seq = nova_seq;
@@ -180,7 +218,7 @@ begin
       update arretado.registros
          set dados = novos, ts_logico = e->>'ts', atualizado_em = now(), recebido_em = now(),
              excluido_em = case when op = 'remover' then now() end
-       where colecao = atual.colecao and id = atual.id;
+       where usuario_id = eu and colecao = atual.colecao and id = atual.id;
     else
       insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
       values (e->>'colecao', (e->>'registro_id')::uuid, eu, e->>'ts', now(), novos);
@@ -196,12 +234,15 @@ revoke execute on function arretado.enviar_lote(uuid, smallint, jsonb) from publ
 grant execute on function arretado.enviar_lote(uuid, smallint, jsonb) to authenticated;
 
 -- Ponto de corte para um aparelho novo: ler antes de baixar `registros` (plano §1).
+-- Volátil de propósito: espera o lote em andamento (mesma trava do enviar_lote) e só então lê o
+-- máximo, num instantâneo novo; uma função `stable` leria o instantâneo anterior à espera.
 create function arretado.instantaneo_inicio() returns bigint
-language plpgsql stable security definer set search_path = ''
+language plpgsql security definer set search_path = ''
 as $$
 declare
   eu uuid := arretado.exigir_sincronizacao();
 begin
+  perform pg_advisory_xact_lock(hashtextextended(eu::text, 0));
   return coalesce((select max(a.seq) from arretado.alteracoes a where a.usuario_id = eu), 0);
 end;
 $$;
@@ -215,8 +256,12 @@ as $$
 declare
   eu uuid := arretado.exigir_sincronizacao();
 begin
+  -- O seq informado nunca passa do maior que existe: um valor absurdo não pode adiantar a poda.
   insert into arretado.aparelhos_sync (usuario_id, aparelho_id, ultimo_seq_recebido, versao_esquema)
-  values (eu, p_aparelho, p_seq, p_versao)
+  values (eu, p_aparelho,
+          least(greatest(p_seq, 0),
+                coalesce((select max(a.seq) from arretado.alteracoes a where a.usuario_id = eu), 0)),
+          p_versao)
   on conflict (usuario_id, aparelho_id) do update
     set ultimo_seq_recebido = greatest(arretado.aparelhos_sync.ultimo_seq_recebido, excluded.ultimo_seq_recebido),
         versao_esquema = excluded.versao_esquema,
@@ -238,6 +283,7 @@ declare
   atual arretado.posse_aparelho%rowtype;
   livre boolean;
 begin
+  perform pg_advisory_xact_lock(hashtextextended(eu::text, 0));
   select * into atual from arretado.posse_aparelho where usuario_id = eu for update;
   livre := not found
     or atual.aparelho_id = p_aparelho

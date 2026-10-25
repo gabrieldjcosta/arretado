@@ -7,10 +7,16 @@ import { ENTIDADES, NOMES_COLECOES } from '../src/core/modelo';
 import { PRELUDIO } from './prelude-supabase';
 
 const PASTA = path.join(import.meta.dirname, 'migrations');
-const MIGRACOES = readdirSync(PASTA)
+const ARQUIVOS = readdirSync(PASTA)
   .filter((f) => f.endsWith('.sql'))
-  .sort()
-  .map((f) => readFileSync(path.join(PASTA, f), 'utf8'));
+  .sort();
+const MIGRACOES = ARQUIVOS.map((f) => readFileSync(path.join(PASTA, f), 'utf8'));
+
+const ARQUIVO_B1 = '20261025000000_f4b_sincronizacao';
+const DOWN = readFileSync(
+  path.join(import.meta.dirname, 'rollback', `${ARQUIVO_B1}.down.sql`),
+  'utf8',
+);
 
 const A = '0199a6c4-0000-7000-8000-00000000000a';
 const B = '0199a6c4-0000-7000-8000-00000000000b';
@@ -44,7 +50,7 @@ beforeAll(async () => {
   for (const dono of [A, B]) {
     await db.exec('begin');
     await db.exec(`set local role authenticated; set local request.jwt.claim.sub = '${dono}'`);
-    await db.exec('select arretado.aceitar_sincronizacao()');
+    await db.exec("select arretado.aceitar_sincronizacao('v4:sincronizar')");
     await db.exec('commit');
   }
 }, 60_000);
@@ -83,14 +89,15 @@ const erro = (n: number, dono: string, extra: Record<string, unknown> = {}) => (
   ...extra,
 });
 
-async function estado(id: string) {
+async function estado(dono: string, id: string) {
   const r = await db.query<{
     dados: Record<string, unknown>;
     ts_logico: string;
     excluido: boolean;
   }>(
-    `select dados, ts_logico, excluido_em is not null as excluido from arretado.registros where id = $1`,
-    [id],
+    `select dados, ts_logico, excluido_em is not null as excluido from arretado.registros
+      where usuario_id = $1 and id = $2`,
+    [dono, id],
   );
   return r.rows[0];
 }
@@ -109,7 +116,7 @@ describe('enviar_lote', () => {
     ]);
     expect(r.divergentes).toEqual([]);
     expect(r.seq_max).toBeGreaterThan(0);
-    expect((await estado(ID(1)))?.ts_logico).toBe(ts(1));
+    expect((await estado(A, ID(1)))?.ts_logico).toBe(ts(1));
   });
 
   it('é idempotente: o mesmo lote duas vezes dá o mesmo resultado', async () => {
@@ -142,7 +149,7 @@ describe('enviar_lote', () => {
         removidos: ['extra'],
       },
     ]);
-    const e = await estado(ID(3));
+    const e = await estado(A, ID(3));
     expect(e?.ts_logico).toBe(ts(4));
     expect(e?.dados).toEqual(erro(3, A, { nota: 'b' }));
   });
@@ -170,7 +177,7 @@ describe('enviar_lote', () => {
       },
     ]);
     expect(r.divergentes).toEqual([{ colecao: 'erros', registro_id: ID(5), ts_servidor: ts(6) }]);
-    const e = await estado(ID(5));
+    const e = await estado(A, ID(5));
     expect(e?.ts_logico).toBe(ts(6));
     expect(e?.dados.nota).toBe('do aparelho 1');
     const marcada = await db.query(
@@ -191,7 +198,7 @@ describe('enviar_lote', () => {
         base_ts: ts(8),
       },
     ]);
-    const e = await estado(ID(8));
+    const e = await estado(A, ID(8));
     expect(e?.excluido).toBe(true);
     expect(e?.ts_logico).toBe(ts(9));
     expect(e?.dados).toEqual(erro(8, A));
@@ -208,7 +215,7 @@ describe('enviar_lote', () => {
       },
     ]);
     expect(r.divergentes).toEqual([]);
-    expect(await estado(ID(10))).toBeUndefined();
+    expect(await estado(A, ID(10))).toBeUndefined();
     const log = await db.query(`select 1 from arretado.alteracoes where ts = $1`, [ts(10)]);
     expect(log.rows).toHaveLength(1);
   });
@@ -275,7 +282,7 @@ describe('enviar_lote', () => {
       ]),
     ).rejects.toThrow();
     expect(await contarAlteracoes(A)).toBe(antes);
-    expect(await estado(ID(13))).toBeUndefined();
+    expect(await estado(A, ID(13))).toBeUndefined();
   });
 
   it('exige sessão e aceite; B não toca em dado de A', async () => {
@@ -293,13 +300,12 @@ describe('enviar_lote', () => {
     await expect(
       db.query(`select arretado.enviar_lote($1, 9::smallint, '[]'::jsonb)`, [AP1]),
     ).rejects.toThrow(/permission denied|sem sessão/);
-    // B grava no mesmo (colecao, id) de A: é outro registro do outro dono? Não: a chave é global.
-    await expect(
-      enviar(B, AP1, [
-        { ts: ts(16), colecao: 'erros', registro_id: ID(1), operacao: 'gravar', dados: erro(1, B) },
-      ]),
-    ).rejects.toThrow();
-    expect((await estado(ID(1)))?.dados.usuarioId).toBe(A);
+    // B grava no mesmo (colecao, id) de A: a chave é por dono, então é outro registro e o de A fica.
+    await enviar(B, AP1, [
+      { ts: ts(16), colecao: 'erros', registro_id: ID(1), operacao: 'gravar', dados: erro(1, B) },
+    ]);
+    expect((await estado(A, ID(1)))?.dados.usuarioId).toBe(A);
+    expect((await estado(B, ID(1)))?.dados.usuarioId).toBe(B);
     const vistoPorB = await como(B, () =>
       db.query(`select count(*)::int as n from arretado.registros where usuario_id = $1`, [A]),
     );
@@ -381,4 +387,238 @@ describe('posse de aparelho (D17)', () => {
   it('sem aceite da sincronização não há posse', async () => {
     await expect(pedir(C, AP1)).rejects.toThrow(/sincronização não aceita/);
   });
+});
+
+describe('enviar_lote: reenvio, forma da entrada e limites', () => {
+  /** Entrada fora do contrato (o tipo `Entrada` não deixa escrever isto à mão). */
+  const torta = (e: Record<string, unknown>) => e as unknown as Entrada;
+
+  it('reenviar um lote cuja entrada divergiu devolve a mesma divergência', async () => {
+    await enviar(A, AP1, [
+      { ts: ts(20), colecao: 'erros', registro_id: ID(20), operacao: 'gravar', dados: erro(20, A) },
+      {
+        ts: ts(21),
+        colecao: 'erros',
+        registro_id: ID(20),
+        operacao: 'atualizar',
+        base_ts: ts(20),
+        dados: { nota: 'a' },
+      },
+    ]);
+    const lote: Entrada[] = [
+      {
+        ts: ts(22),
+        colecao: 'erros',
+        registro_id: ID(20),
+        operacao: 'atualizar',
+        base_ts: ts(20),
+        dados: { nota: 'b' },
+      },
+    ];
+    const primeira = await enviar(A, AP2, lote);
+    expect(primeira.divergentes).toHaveLength(1);
+    // A resposta se perdeu e o aparelho manda de novo: precisa saber do Conflito outra vez.
+    expect((await enviar(A, AP2, lote)).divergentes).toEqual(primeira.divergentes);
+  });
+
+  it('reenviar entradas já aplicadas, depois de outro aparelho escrever por cima, não muda nada', async () => {
+    const lote: Entrada[] = [
+      { ts: ts(30), colecao: 'erros', registro_id: ID(30), operacao: 'gravar', dados: erro(30, A) },
+      {
+        ts: ts(31),
+        colecao: 'erros',
+        registro_id: ID(30),
+        operacao: 'atualizar',
+        base_ts: ts(30),
+        dados: { nota: 'a' },
+      },
+    ];
+    await enviar(A, AP1, lote);
+    await enviar(A, AP2, [
+      {
+        ts: ts(32),
+        colecao: 'erros',
+        registro_id: ID(30),
+        operacao: 'atualizar',
+        base_ts: ts(31),
+        dados: { nota: 'b' },
+      },
+    ]);
+    const n = await contarAlteracoes(A);
+    expect((await enviar(A, AP1, lote)).divergentes).toEqual([]);
+    expect(await contarAlteracoes(A)).toBe(n);
+    const e = await estado(A, ID(30));
+    expect(e?.ts_logico).toBe(ts(32));
+    expect(e?.dados.nota).toBe('b');
+  });
+
+  it('dados precisa ser objeto; atualizar só com remoção funciona; removidos não apaga id nem dono', async () => {
+    for (const dados of [[1, 2], 'texto', null, 42]) {
+      await expect(
+        enviar(A, AP1, [
+          torta({ ts: ts(40), colecao: 'erros', registro_id: ID(40), operacao: 'gravar', dados }),
+        ]),
+      ).rejects.toThrow(/forma inválida/);
+    }
+    await enviar(A, AP1, [
+      {
+        ts: ts(41),
+        colecao: 'erros',
+        registro_id: ID(41),
+        operacao: 'gravar',
+        dados: erro(41, A, { nota: 'a', outra: 'b' }),
+      },
+    ]);
+    await enviar(A, AP1, [
+      torta({
+        ts: ts(42),
+        colecao: 'erros',
+        registro_id: ID(41),
+        operacao: 'atualizar',
+        base_ts: ts(41),
+        dados: null,
+        removidos: ['outra'],
+      }),
+    ]);
+    expect((await estado(A, ID(41)))?.dados).toEqual(erro(41, A, { nota: 'a' }));
+    const seguinte = { ts: ts(43), colecao: 'erros', registro_id: ID(41), base_ts: ts(42) };
+    await expect(
+      enviar(A, AP1, [torta({ ...seguinte, operacao: 'atualizar', removidos: ['id'] })]),
+    ).rejects.toThrow(/check/);
+    await expect(
+      enviar(A, AP1, [torta({ ...seguinte, operacao: 'atualizar', removidos: 'nota' })]),
+    ).rejects.toThrow(/forma inválida/);
+  });
+
+  it('nome de coleção inválido não entra nem no log (acervo-adesao e remover sem linha)', async () => {
+    for (const operacao of ['acervo-adesao', 'remover'] as const) {
+      await expect(
+        enviar(A, AP1, [
+          {
+            ts: ts(50),
+            colecao: "x'; --",
+            registro_id: ID(50),
+            operacao,
+            dados: { itemId: 'cf88' },
+          },
+        ]),
+      ).rejects.toThrow(/check/);
+    }
+  });
+
+  it('o limite de 1 MiB vale para o estado, não só para a entrada', async () => {
+    const grande = 'x'.repeat(600_000);
+    await enviar(A, AP1, [
+      {
+        ts: ts(60),
+        colecao: 'erros',
+        registro_id: ID(60),
+        operacao: 'gravar',
+        dados: erro(60, A, { texto: grande }),
+      },
+    ]);
+    await expect(
+      enviar(A, AP1, [
+        {
+          ts: ts(61),
+          colecao: 'erros',
+          registro_id: ID(60),
+          operacao: 'atualizar',
+          base_ts: ts(60),
+          dados: { outro: grande },
+        },
+      ]),
+    ).rejects.toThrow(/registros_dados_tamanho/);
+  });
+});
+
+describe('aceite, trava e sincronia', () => {
+  it('aceitar_sincronizacao guarda a versão do texto aceito e recusa versão vazia', async () => {
+    const r = await db.query<{ sincronizacao_versao: string }>(
+      'select sincronizacao_versao from arretado.perfis where usuario_id = $1',
+      [A],
+    );
+    expect(r.rows[0]?.sincronizacao_versao).toBe('v4:sincronizar');
+    await expect(
+      como(A, () => db.query("select arretado.aceitar_sincronizacao('')")),
+    ).rejects.toThrow(/versão inválida/);
+  });
+
+  it('instantaneo_inicio é volátil: depois de esperar a trava precisa de instantâneo novo', async () => {
+    const r = await db.query<{ provolatile: string }>(
+      `select provolatile from pg_proc
+        where proname = 'instantaneo_inicio' and pronamespace = 'arretado'::regnamespace`,
+    );
+    expect(r.rows[0]?.provolatile).toBe('v');
+  });
+
+  it('as funções que ordenam o log e a posse pegam a mesma trava da conta', async () => {
+    // O PGlite tem uma conexão só e não reproduz a corrida; este teste só impede que a trava suma.
+    const r = await db.query<{ proname: string }>(
+      `select proname from pg_proc
+        where pronamespace = 'arretado'::regnamespace
+          and prosrc like '%pg_advisory_xact_lock(hashtextextended(eu::text, 0))%'
+        order by proname`,
+    );
+    expect(r.rows.map((x) => x.proname)).toEqual([
+      'enviar_lote',
+      'instantaneo_inicio',
+      'pedir_posse',
+    ]);
+  });
+
+  it('registrar_sincronia não aceita seq acima do maior que existe', async () => {
+    await como(A, () =>
+      db.query('select arretado.registrar_sincronia($1, $2, 9::smallint)', [AP1, 999_999_999]),
+    );
+    const r = await como(A, () =>
+      db.query<{ recebido: string; maximo: string }>(
+        `select ultimo_seq_recebido::text as recebido,
+                (select max(seq)::text from arretado.alteracoes where usuario_id = $2) as maximo
+           from arretado.aparelhos_sync where aparelho_id = $1`,
+        [AP1, A],
+      ),
+    );
+    expect(Number(r.rows[0]!.recebido)).toBeLessThanOrEqual(Number(r.rows[0]!.maximo));
+  });
+});
+
+describe('reversão (B1)', () => {
+  async function foto(d: PGlite) {
+    const q = async (sql: string) => (await d.query<Record<string, unknown>>(sql)).rows;
+    return {
+      colunas: await q(`select table_name, column_name, data_type, is_nullable, column_default
+        from information_schema.columns where table_schema = 'arretado' order by 1, 2`),
+      restricoes: await q(`select conrelid::regclass::text as tabela, conname,
+        pg_get_constraintdef(oid) as def from pg_constraint
+        where connamespace = 'arretado'::regnamespace order by 1, 2`),
+      indices: await q(`select tablename, indexname, indexdef from pg_indexes
+        where schemaname = 'arretado' order by 1, 2`),
+      politicas: await q(`select tablename, policyname, cmd, roles::text as roles, qual, with_check
+        from pg_policies where schemaname = 'arretado' order by 1, 2`),
+      tabelas: await q(`select relname, relacl::text as acl, relrowsecurity, relforcerowsecurity
+        from pg_class where relnamespace = 'arretado'::regnamespace and relkind = 'r' order by 1`),
+      funcoes: await q(`select proname, pg_get_function_identity_arguments(oid) as args, prosecdef,
+        proacl::text as acl from pg_proc where pronamespace = 'arretado'::regnamespace order by 1, 2`),
+    };
+  }
+
+  it('o down devolve o esquema anterior e o up volta a aplicar com o mesmo resultado', async () => {
+    const d = new PGlite();
+    try {
+      await d.exec(PRELUDIO);
+      const i = ARQUIVOS.findIndex((f) => f.startsWith(ARQUIVO_B1));
+      for (const sql of MIGRACOES.slice(0, i)) await d.exec(sql);
+      const antes = await foto(d);
+      await d.exec(MIGRACOES[i]!);
+      const comB1 = await foto(d);
+      expect(comB1).not.toEqual(antes);
+      await d.exec(DOWN);
+      expect(await foto(d)).toEqual(antes);
+      await d.exec(MIGRACOES[i]!);
+      expect(await foto(d)).toEqual(comB1);
+    } finally {
+      await d.close();
+    }
+  }, 60_000);
 });

@@ -82,7 +82,7 @@ describe('RLS do esquema remoto', () => {
     ] as const) {
       await db.exec('begin');
       await db.exec(`set local role authenticated; set local request.jwt.claim.sub = '${dono}'`);
-      await db.exec('select arretado.aceitar_sincronizacao()');
+      await db.exec("select arretado.aceitar_sincronizacao('v4:sincronizar')");
       await erro(id, dono);
       await db.exec('commit');
     }
@@ -212,6 +212,18 @@ describe('RLS do esquema remoto', () => {
 });
 
 describe('lints dos advisors do Supabase (atividade 4.3)', () => {
+  it('toda função security definer tem search_path vazio e nenhuma é executável por anon ou public', async () => {
+    const r = await db.query(`
+      select p.proname from pg_proc p
+       where p.pronamespace = 'arretado'::regnamespace and p.prosecdef
+         and (not exists (select 1 from unnest(coalesce(p.proconfig, '{}')) c
+                          where c = 'search_path=""')
+              or has_function_privilege('anon', p.oid, 'execute')
+              or exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+                          where a.grantee = 0))`);
+    expect(r.rows).toEqual([]);
+  });
+
   it('nenhuma tabela tem duas políticas permissivas para o mesmo papel e ação', async () => {
     const r = await db.query(`
       select p.tablename, r.papel, a.acao

@@ -1,14 +1,16 @@
 -- Reversão da F4-B (B1). Seguro enquanto registros/alteracoes estão vazios; com dados de estudo
--- na nuvem, exportar antes (a volta da lista fixa de coleções recusa coleção fora dela).
+-- na nuvem, exportar antes (a volta da lista fixa de coleções recusa coleção fora dela e a volta da
+-- chave (colecao, id) recusa o mesmo par em duas contas).
 drop function if exists arretado.soltar_posse(uuid);
 drop function if exists arretado.pedir_posse(uuid, boolean);
 drop function if exists arretado.registrar_sincronia(uuid, bigint, smallint);
 drop function if exists arretado.instantaneo_inicio();
 drop function if exists arretado.enviar_lote(uuid, smallint, jsonb);
 drop function if exists arretado.exigir_sincronizacao();
-drop function if exists arretado.aceitar_sincronizacao();
+drop function if exists arretado.aceitar_sincronizacao(text);
 drop table if exists arretado.aparelhos_sync;
 alter table arretado.perfis drop column if exists sincronizacao_aceita_em;
+alter table arretado.perfis drop column if exists sincronizacao_versao;
 
 drop policy if exists posse_ler on arretado.posse_aparelho;
 create policy posse_dono on arretado.posse_aparelho
@@ -19,6 +21,7 @@ grant insert, update on arretado.posse_aparelho to authenticated;
 
 drop index if exists arretado.alteracoes_idempotencia;
 alter table arretado.alteracoes drop constraint if exists alteracoes_dados_tamanho;
+alter table arretado.alteracoes drop constraint if exists alteracoes_colecao_check;
 delete from arretado.alteracoes where operacao = 'acervo-adesao';
 alter table arretado.alteracoes drop constraint alteracoes_operacao_check;
 alter table arretado.alteracoes add constraint alteracoes_operacao_check
@@ -50,3 +53,8 @@ alter table arretado.registros add constraint registros_colecao_check check (col
     'precedentes', 'vinculosPrecedenteDispositivo', 'vinculosEntrePrecedentes',
     'notas', 'achados', 'eventosCalendario', 'relatos'
   ));
+alter table arretado.registros drop constraint registros_check;
+alter table arretado.registros add constraint registros_check
+  check (dados->>'id' = id::text and dados->>'usuarioId' = usuario_id::text);
+alter table arretado.registros drop constraint registros_pkey;
+alter table arretado.registros add primary key (colecao, id);
