@@ -104,6 +104,25 @@ exception when others then
   insert into resultado values ('15 anônimo lê registros', 'recusado ' || sqlstate || ': ' || sqlerrm);
 end $$;
 
+-- ── F4-B (B1): depois da migração 20261025000000 o cliente não escreve direto em registros /
+-- alteracoes / posse_aparelho. As verificações acima que gravam direto em registros passam a
+-- dar "recusado 42501" (esperado); a escrita legítima é enviar_lote, que exige o aceite.
+set local role authenticated;
+do $$ begin
+  insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
+  values ('erros', '0199a6c4-0000-7000-8000-0000000000f1', '0199a6c4-0000-7000-8000-00000000000a',
+    '1790000000000-000000-0000000a', now(),
+    '{"id":"0199a6c4-0000-7000-8000-0000000000f1","usuarioId":"0199a6c4-0000-7000-8000-00000000000a"}');
+  insert into resultado values ('B1-1 A grava direto em registros (esperado: recusado 42501)', 'aceitou');
+exception when others then
+  insert into resultado values ('B1-1 A grava direto em registros (esperado: recusado 42501)', 'recusado ' || sqlstate);
+end $$;
+do $$ begin
+  perform arretado.enviar_lote('0199a6c4-0000-7000-8000-0000000000e1', 9::smallint, '[]'::jsonb);
+  insert into resultado values ('B1-2 enviar_lote sem aceitar a sincronização (esperado: recusado 42501)', 'aceitou');
+exception when others then
+  insert into resultado values ('B1-2 enviar_lote sem aceitar a sincronização (esperado: recusado 42501)', 'recusado ' || sqlstate);
+end $$;
 reset role;
 select teste, obtido from resultado order by teste;
 rollback;

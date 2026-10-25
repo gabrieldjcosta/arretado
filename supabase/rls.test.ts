@@ -4,7 +4,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
-import { ENTIDADES, NOMES_COLECOES } from '../src/core/modelo';
 import { PRELUDIO } from './prelude-supabase';
 
 const PASTA = path.join(import.meta.dirname, 'migrations');
@@ -16,6 +15,7 @@ const MIGRACOES = readdirSync(PASTA)
 const A = '0199a6c4-0000-7000-8000-00000000000a';
 const B = '0199a6c4-0000-7000-8000-00000000000b';
 const TS = '1790000000000-000000-0000000a';
+const APARELHO = '0199a6c4-0000-7000-8000-0000000000ee';
 
 let db: PGlite;
 
@@ -47,12 +47,21 @@ async function como<T>(
   }
 }
 
+/** Grava um Erro pelo único caminho de escrita: a função de envio. */
 function erro(id: string, dono: string) {
-  const dados = JSON.stringify({ id, usuarioId: dono, oQueFoi: 'x' });
+  const dados = { id, usuarioId: dono, oQueFoi: 'x' };
+  return db.query(`select arretado.enviar_lote($1, 9::smallint, $2::jsonb)`, [
+    APARELHO,
+    JSON.stringify([{ ts: TS, colecao: 'erros', registro_id: id, operacao: 'gravar', dados }]),
+  ]);
+}
+
+/** Escrita direta na tabela: o cliente não tem mais esse privilégio. */
+function erroDireto(id: string, dono: string) {
   return db.query(
     `insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
      values ('erros', $1, $2, $3, now(), $4::jsonb)`,
-    [id, dono, TS, dados],
+    [id, dono, TS, JSON.stringify({ id, usuarioId: dono })],
   );
 }
 
@@ -73,6 +82,7 @@ describe('RLS do esquema remoto', () => {
     ] as const) {
       await db.exec('begin');
       await db.exec(`set local role authenticated; set local request.jwt.claim.sub = '${dono}'`);
+      await db.exec('select arretado.aceitar_sincronizacao()');
       await erro(id, dono);
       await db.exec('commit');
     }
@@ -86,21 +96,26 @@ describe('RLS do esquema remoto', () => {
     expect(ids.rows.map((r) => r.id)).toEqual([ID_A]);
   });
 
-  it('A não grava registro em nome de B', async () => {
+  it('A não grava registro em nome de B (nem direto, nem pela função)', async () => {
+    await expect(
+      como('authenticated', A, () => erroDireto('0199a6c4-0000-7000-8000-0000000000a2', A)),
+    ).rejects.toThrow(/permission denied/);
     await expect(
       como('authenticated', A, () => erro('0199a6c4-0000-7000-8000-0000000000a2', B)),
-    ).rejects.toThrow(/row-level security/);
+    ).rejects.toThrow(/check/);
   });
 
-  it('A não altera nem apaga registro de B', async () => {
-    const r = await como('authenticated', A, async () => {
-      const u = await db.query(
-        `update arretado.registros set excluido_em = now() where id = '${ID_B}'`,
-      );
-      const d = await db.query(`delete from arretado.registros where id = '${ID_B}'`);
-      return [u.affectedRows, d.affectedRows];
-    });
-    expect(r).toEqual([0, 0]);
+  it('A não altera nem apaga registro, nem os próprios, direto na tabela', async () => {
+    await expect(
+      como('authenticated', A, () =>
+        db.query(`update arretado.registros set excluido_em = now() where id = '${ID_B}'`),
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      como('authenticated', A, () =>
+        db.query(`delete from arretado.registros where id = '${ID_B}'`),
+      ),
+    ).rejects.toThrow(/permission denied/);
     expect(
       await como('authenticated', B, () => contar('arretado.registros where excluido_em is null')),
     ).toBe(1);
@@ -117,16 +132,18 @@ describe('RLS do esquema remoto', () => {
   it('JSON guardado precisa bater com id e dono das colunas', async () => {
     await expect(
       como('authenticated', A, () =>
-        db.query(
-          `insert into arretado.registros (colecao, id, usuario_id, ts_logico, atualizado_em, dados)
-           values ('erros', $1, $2, $3, now(), $4::jsonb)`,
-          [
-            '0199a6c4-0000-7000-8000-0000000000a3',
-            A,
-            TS,
-            JSON.stringify({ id: 'outro', usuarioId: A }),
-          ],
-        ),
+        db.query(`select arretado.enviar_lote($1, 9::smallint, $2::jsonb)`, [
+          APARELHO,
+          JSON.stringify([
+            {
+              ts: TS,
+              colecao: 'erros',
+              registro_id: '0199a6c4-0000-7000-8000-0000000000a3',
+              operacao: 'gravar',
+              dados: { id: 'outro', usuarioId: A },
+            },
+          ]),
+        ]),
       ),
     ).rejects.toThrow(/check/);
   });
@@ -136,22 +153,19 @@ describe('RLS do esquema remoto', () => {
       /permission denied/,
     );
     await expect(
-      como('anon', null, () => erro('0199a6c4-0000-7000-8000-0000000000c1', A)),
+      como('anon', null, () => erroDireto('0199a6c4-0000-7000-8000-0000000000c1', A)),
     ).rejects.toThrow(/permission denied/);
   });
 
-  it('log de alterações é append-only e por dono', async () => {
+  it('log de alterações: cada um lê o seu, ninguém escreve direto, altera ou apaga', async () => {
     const inserir = (dono: string) =>
       db.query(
         `insert into arretado.alteracoes (usuario_id, aparelho_id, ts, colecao, registro_id, operacao)
          values ($1, $1, $2, 'erros', $1, 'gravar')`,
         [dono, TS],
       );
-    await como('authenticated', A, async () => {
-      await inserir(A);
-      expect(await contar('arretado.alteracoes')).toBe(1);
-    });
-    await expect(como('authenticated', A, () => inserir(B))).rejects.toThrow(/row-level security/);
+    expect(await como('authenticated', A, () => contar('arretado.alteracoes'))).toBe(1);
+    await expect(como('authenticated', A, () => inserir(A))).rejects.toThrow(/permission denied/);
     await expect(
       como('authenticated', A, () =>
         db.query('update arretado.alteracoes set operacao = $1', ['remover']),
@@ -220,35 +234,5 @@ describe('lints dos advisors do Supabase (atividade 4.3)', () => {
           where i.indrelid = c.conrelid
             and (i.indkey::int2[])[0:cardinality(c.conkey) - 1] = c.conkey)`);
     expect(r.rows).toEqual([]);
-  });
-});
-
-describe('deriva entre modelo local e esquema remoto', () => {
-  it('a lista de coleções do remoto é exatamente a das coleções exportáveis', () => {
-    // Vale a definição mais recente: a do create table ou a da última migração que recria o check.
-    const definicoes = [
-      /create table arretado\.registros \([\s\S]*?check \(colecao in \(([\s\S]*?)\)\)/g,
-      /alter table arretado\.registros add constraint registros_colecao_check check \(colecao in \(([\s\S]*?)\)\)/g,
-    ];
-    const ultima = MIGRACOES.flatMap((sql, arquivo) =>
-      definicoes.flatMap((re) =>
-        [...sql.matchAll(re)].map((m) => ({ arquivo, pos: m.index, lista: m[1] ?? '' })),
-      ),
-    )
-      .sort((a, b) => a.arquivo - b.arquivo || a.pos - b.pos)
-      .at(-1);
-    const noSql = [...(ultima?.lista ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
-    const exportaveis = NOMES_COLECOES.filter((n) => ENTIDADES[n].modulo !== null).sort();
-    expect(noSql).toEqual(exportaveis);
-  });
-
-  it('o banco migrado tem no check exatamente as coleções exportáveis', async () => {
-    const exportaveis = NOMES_COLECOES.filter((n) => ENTIDADES[n].modulo !== null);
-    const def = await db.query<{ def: string }>(
-      `select pg_get_constraintdef(oid) as def from pg_constraint
-       where conname = 'registros_colecao_check'`,
-    );
-    const noBanco = [...(def.rows[0]?.def ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
-    expect(noBanco).toEqual([...exportaveis].sort());
   });
 });

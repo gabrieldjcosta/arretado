@@ -23,7 +23,7 @@ O esquema inicial já tem as duas tabelas; o plano antigo só descrevia o log. D
 | `alteracoes` | **Log**: verdade histórica, append-only, `seq` do servidor. Serve para o recebimento incremental e para auditar | só a função `enviar_lote` | o dono |
 | `registros` | **Estado atual** de cada `(colecao, id)` com `ts_logico`. Serve para **aparelho novo começar** e para detectar divergência | só a função `enviar_lote` (o cliente perde `insert/update/delete` direto) | o dono |
 
-**`enviar_lote(aparelho_id, versao_esquema, entradas[])`** (função SQL `security invoker`, RLS continua valendo), numa transação:
+**`enviar_lote(aparelho_id, versao_esquema, entradas[])`** (função SQL `security definer` com `search_path` vazio e dono sempre `auth.uid()`: o cliente perdeu a escrita direta, e a função exige a sessão e `perfis.sincronizacao_aceita_em`, coluna própria para não sobrescrever `termos_versao`), numa transação:
 1. Insere cada entrada em `alteracoes` com `on conflict do nothing` (índice único do §2). Entrada repetida = ignorada.
 2. Para cada entrada nova, atualiza `registros`:
    - `gravar`/`atualizar`/`remover` carregam `base_ts` (o `tsLogico` do registro que o aparelho tinha ao editar; `null` se criou).
