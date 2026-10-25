@@ -36,4 +36,32 @@ describe('PendenciasDaNorma (revisão das etapas 8, 9 e 11)', () => {
     });
     expect(await repo.colecao('marcacoes').obter(nota.id)).toBeUndefined();
   });
+
+  it('aviso de texto alterado não diz que o dispositivo saiu da norma (AP-05)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const normaId = crypto.randomUUID();
+    await repo.colecao('pendenciasReleitura').criar({
+      normaId,
+      versaoId: crypto.randomUUID(),
+      tipo: 'texto_alterado',
+      enderecoAntigo: 'art180',
+      rotulo: 'Art. 180',
+      referenciaId: crypto.randomUUID(),
+    });
+    const usuario = userEvent.setup();
+    render(
+      <ContextoRepositorio.Provider value={repo}>
+        <PendenciasDaNorma normaId={normaId} />
+      </ContextoRepositorio.Provider>,
+    );
+    const caixa = await screen.findByRole('region', { name: 'Para reler' });
+    expect(caixa).toHaveTextContent('Art. 180');
+    // O dispositivo continua na norma; só o texto mudou. "Saiu da norma" e "sem lugar" seriam falsos.
+    expect(caixa).not.toHaveTextContent('saiu da norma');
+    expect(caixa).not.toHaveTextContent('sem lugar');
+    await usuario.click(within(caixa).getByRole('button', { name: 'Já reli' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('region', { name: 'Para reler' })).not.toBeInTheDocument();
+    });
+  });
 });

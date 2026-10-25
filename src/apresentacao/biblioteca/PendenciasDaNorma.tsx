@@ -36,19 +36,28 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
   const [tirando, setTirando] = useState<string>();
   const [falha, setFalha] = useState(false);
   if (!dados || (dados.pendencias.length === 0 && dados.grifos.length === 0)) return null;
+  // `texto_alterado` (AP-05): o dispositivo continua na norma, só o texto mudou; "saiu da norma" seria falso.
+  const semLugar = dados.pendencias.filter((p) => p.tipo !== 'texto_alterado');
+  const mudaram = dados.pendencias.filter((p) => p.tipo === 'texto_alterado');
+  const jaReli = (id: string) => {
+    void resolverPendencia(repo, id).then(recarregar);
+  };
   return (
     <section className="aviso" aria-label="Para reler">
       <h2>Para reler</h2>
-      <p>O texto desta norma mudou. O que ficou sem lugar no texto de agora:</p>
-      {dados.pendencias.length > 0 && (
+      <p>
+        O texto desta norma mudou.
+        {semLugar.length > 0 && ' O que ficou sem lugar no texto de agora:'}
+      </p>
+      {semLugar.length > 0 && (
         <ul className="lista-simples">
-          {dados.pendencias.map((p) => (
+          {semLugar.map((p) => (
             <li key={p.id}>
               {QUE_FICOU[p.tipo]}: {p.rotulo ?? p.enderecoAntigo} saiu da norma.{' '}
               <button
                 type="button"
                 onClick={() => {
-                  void resolverPendencia(repo, p.id).then(recarregar);
+                  jaReli(p.id);
                 }}
               >
                 Já reli
@@ -56,6 +65,26 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
             </li>
           ))}
         </ul>
+      )}
+      {mudaram.length > 0 && (
+        <>
+          <p>O texto mudou nestes dispositivos, em que você guardou algo:</p>
+          <ul className="lista-simples">
+            {mudaram.map((p) => (
+              <li key={p.id}>
+                {p.rotulo ?? p.enderecoAntigo}{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    jaReli(p.id);
+                  }}
+                >
+                  Já reli
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
       {dados.grifos.length > 0 && (
         <>
