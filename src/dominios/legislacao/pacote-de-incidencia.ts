@@ -4,7 +4,9 @@
 // uma escolha do usuário.
 import type { Estrela } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import { abrirNorma } from './leitor';
 import {
+  arvoreDaEstrela,
   estrelaEfetiva,
   estrelasDaNorma,
   estrelavel,
@@ -56,5 +58,40 @@ export async function aplicarPacote(
       resultado.gravadas.push(numero);
     }
   });
+  return resultado;
+}
+
+/** O pacote como chega ao app: por item do acervo, os números de artigo a estrelar. */
+export interface PacoteImportado {
+  id: string;
+  normas: Readonly<Record<string, readonly string[]>>;
+}
+
+export interface ResultadoDoPacote {
+  /** Por item do acervo: o que foi aplicado; os itens que o usuário não adicionou ficam em `semNorma`. */
+  porNorma: Record<string, PacoteAplicado>;
+  semNorma: string[];
+}
+
+/** Aplica o pacote às normas do acervo que o usuário já adicionou; as demais são só relatadas. */
+export async function aplicarPacoteNaBiblioteca(
+  repo: Repositorio,
+  pacote: PacoteImportado,
+): Promise<ResultadoDoPacote> {
+  const normas = (await repo.colecao('normas').todosDoUsuario()).filter(
+    (n) => n.excluidoEm === null && n.origemAcervo !== undefined,
+  );
+  const resultado: ResultadoDoPacote = { porNorma: {}, semNorma: [] };
+  for (const [itemId, numeros] of Object.entries(pacote.normas)) {
+    const norma = normas.find((n) => n.origemAcervo?.id === itemId);
+    if (!norma) {
+      resultado.semNorma.push(itemId);
+      continue;
+    }
+    const aberta = await abrirNorma(repo, norma.id);
+    const arvore = arvoreDaEstrela(norma.id, aberta.nos);
+    const enderecos = new Map(aberta.nos.map((n) => [n.dispositivo.id, n.dispositivo.endereco]));
+    resultado.porNorma[itemId] = await aplicarPacote(repo, arvore, pacote.id, numeros, enderecos);
+  }
   return resultado;
 }

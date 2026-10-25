@@ -9,7 +9,7 @@ import {
   porAlvo,
 } from './estrelas';
 import { abrirNorma } from './leitor';
-import { aplicarPacote, enderecoDoArtigo } from './pacote-de-incidencia';
+import { aplicarPacote, aplicarPacoteNaBiblioteca, enderecoDoArtigo } from './pacote-de-incidencia';
 import { criarRascunho, publicarVersao } from './servico';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
@@ -107,5 +107,19 @@ describe('aplicarPacote', () => {
       enderecoDe,
     );
     expect(r.mantidas).toEqual(['2']);
+  });
+  it('aplica à norma adicionada do acervo e relata a que falta', async () => {
+    const { repo, arvore, id } = await publicada();
+    await repo.colecao('normas').atualizar(arvore.normaId, {
+      origemAcervo: { id: 'lei-x-1-2000', versao: 1, hash: 'a'.repeat(64) },
+    });
+    const r = await aplicarPacoteNaBiblioteca(repo, {
+      id: '11111111-1111-4111-8111-111111111111',
+      normas: { 'lei-x-1-2000': ['2', '4'], 'lei-y-2-2000': ['1'] },
+    });
+    expect(r.semNorma).toEqual(['lei-y-2-2000']);
+    expect(r.porNorma['lei-x-1-2000']?.gravadas).toEqual(['2', '4']);
+    const gravadas = porAlvo(await estrelasDaNorma(repo, arvore.normaId));
+    expect(gravadas.get(id('art4'))?.origemTipo).toBe('pacote');
   });
 });

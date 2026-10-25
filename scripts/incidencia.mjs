@@ -1,10 +1,12 @@
 // Incidência por assunto (TEC). Contrato em docs/planos/incidencia-tec.md.
 //   node scripts/incidencia.mjs achatar <pasta-json> <saida.csv>   achata os jsonMateria baixados (dados ficam FORA do repo)
 //   node scripts/incidencia.mjs validar <tabela.csv>                relatório; sai com 1 se houver erro
+//   node scripts/incidencia.mjs pacote <artigos.csv> <saida.json> <id-uuid> <titulo>   pacote de estrelas (Altíssima e Alta) por item do acervo
 //   node scripts/incidencia.mjs artigos <tabela.csv> <saida.csv> [ano_de-ano_ate]   peso e faixa por artigo (CP e ECA) de um recorte
 import fs from 'node:fs';
 import path from 'node:path';
 import { pesoPorArtigo } from './incidencia/artigos.mjs';
+import { montarPacote } from './incidencia/pacote.mjs';
 import { achatar, lerCsv, paraCsv, validar } from './incidencia/nucleo.mjs';
 
 const [cmd, a, b, recorte] = process.argv.slice(2);
@@ -36,6 +38,15 @@ if (cmd === 'achatar' && a && b) {
     ].join('\n') + '\n',
   );
   console.log(`${res.length} artigos em ${b}`);
+} else if (cmd === 'pacote' && a && b && recorte && process.argv[6]) {
+  const { pacote, ignoradas } = montarPacote(lerCsv(fs.readFileSync(a, 'utf8')), {
+    id: recorte,
+    titulo: process.argv[6],
+  });
+  fs.writeFileSync(b, JSON.stringify(pacote));
+  console.log(
+    `${Object.keys(pacote.normas).length} normas em ${b}; sem item do acervo: ${ignoradas.join(', ') || '—'}`,
+  );
 } else {
   console.error(
     'uso: achatar <pasta-json> <saida.csv> | validar <tabela.csv> | artigos <tabela.csv> <saida.csv> [ano_de-ano_ate]',
