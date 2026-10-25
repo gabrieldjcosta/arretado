@@ -67,9 +67,6 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
     return limpar;
   }
 
-  const comprimento = fio.getTotalLength();
-  fio.style.strokeDasharray = String(comprimento);
-  fio.style.strokeDashoffset = String(comprimento);
   const ponta = document.createElementNS(NS, 'circle');
   ponta.setAttribute('r', '3.2');
   const pousar = (distancia: number) => {
@@ -77,7 +74,18 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
     ponta.setAttribute('cx', String(ponto.x));
     ponta.setAttribute('cy', String(ponto.y));
   };
-  pousar(0);
+  let comprimento = 0;
+  try {
+    comprimento = fio.getTotalLength();
+    fio.style.strokeDasharray = String(comprimento);
+    fio.style.strokeDashoffset = String(comprimento);
+    pousar(0);
+  } catch (erro) {
+    // A página recarregou entre a escolha e o primeiro quadro: o navegador não mede um documento inativo.
+    if (!documentoInativo(erro)) throw erro;
+    limpar();
+    return nada;
+  }
   svg.append(ponta);
 
   const inicio = performance.now();
