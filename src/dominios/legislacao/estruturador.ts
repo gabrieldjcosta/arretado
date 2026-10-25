@@ -158,7 +158,7 @@ const SEPARADOR_DO_ANEXO = /\s*[-–—.:]?\s*/uy;
 const MAX_LINHAS_DO_NOME = 4;
 
 /** Citação da lei alterada, entre aspas ('"IV - a qualquer outro…".', CDC, arts. 110 a 117). */
-const ABRE_CITACAO = /^["“«]/u;
+export const ABRE_CITACAO = /^["“«]/u;
 /** Fim da citação: aspas no fim do texto, antes de pontuação, "(NR)" e notas. */
 const FECHA_CITACAO = /["”»][\s.,;:)]*(?:\(NR\)[\s.]*)?$/u;
 
@@ -2172,7 +2172,7 @@ function lerCabecalhoDeAnexo(l: Linha): CabecalhoDeAnexo | undefined {
 }
 
 /** A linha fecha a citação (aspas no fim, antes de pontuação, "(NR)" e notas). */
-function fechaCitacao(l: Linha): boolean {
+export function fechaCitacao(l: Linha): boolean {
   const { fim } = separarNotasFinais(l);
   return FECHA_CITACAO.test(l.chave.slice(0, fim).trimEnd());
 }

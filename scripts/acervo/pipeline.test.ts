@@ -5,6 +5,7 @@ import {
   construirItemArticulado,
   construirItemSemArtigos,
   entradaDoIndice,
+  juntarCitacoes,
   semCabecalhos,
 } from './construir';
 import { verificarAcervo } from './verificar';
@@ -140,6 +141,141 @@ describe('construção', () => {
     expect(com.item?.norma).toMatchObject({
       tituloOficial: 'Código de Teste',
       ementa: 'Institui o Código de Teste.',
+    });
+  });
+
+  describe('citação de outra lei com vários artigos', () => {
+    const cinco = [1, 2, 3, 4, 5].map((n) => `Art. ${String(n)}º Regra ${String(n)}.`).join('\n\n');
+    const texto = (n: { trechos: { texto: string }[] } | undefined) =>
+      (n?.trechos ?? []).map((t) => t.texto).join('');
+    const artigos = (lei: string) => {
+      const r = construirItemArticulado(
+        cur({ anomaliasAceitas: ['artigo_fora_de_ordem', 'artigo_ausente', 'linha_solta'] }),
+        markdownParaBlocos(lei),
+        '2026-10-10',
+        undefined,
+      );
+      return r.item?.nos ?? [];
+    };
+
+    it('a aspa que abre no primeiro artigo e fecha no último deixa os artigos da outra lei dentro do artigo que altera', () => {
+      const nos = artigos(
+        [
+          cinco,
+          'Art. 6º Os arts. 157 e 159 do Código Penal passam a vigorar assim:',
+          '"Art. 157. .....................',
+          '§ 3º .....................',
+          'Pena - reclusão, de sete a quinze anos.',
+          'Art. 159. .....................',
+          'Pena - reclusão, de oito a quinze anos.',
+          '.....................".',
+          'Art. 7º Esta lei entra em vigor na data de sua publicação.',
+        ].join('\n\n'),
+      );
+      expect(nos.filter((n) => n.tipo === 'artigo').map((n) => n.endereco)).toEqual([
+        'art1',
+        'art2',
+        'art3',
+        'art4',
+        'art5',
+        'art6',
+        'art7',
+      ]);
+      const art6 = texto(nos.find((n) => n.endereco === 'art6'));
+      expect(art6).toContain('Art. 157.');
+      expect(art6).toContain('Art. 159.');
+      expect(art6).toContain('de oito a quinze anos');
+      expect(art6).toContain('\nArt. 159.');
+      expect(art6).not.toContain('\uE000');
+    });
+
+    it('sem aspa que feche antes do artigo seguinte, nada é juntado', () => {
+      const blocos = markdownParaBlocos(
+        [
+          'Art. 6º Altera a lei:',
+          '"Art. 159. .....................',
+          'Art. 160. Outro artigo da outra lei.',
+          'Art. 7º Esta lei entra em vigor.',
+        ].join('\n\n'),
+      );
+      expect(juntarCitacoes(blocos)).toHaveLength(blocos.length);
+    });
+
+    it('citação que abre e fecha no mesmo bloco, ou sem artigo no meio, fica como estava', () => {
+      const blocos = markdownParaBlocos(
+        [
+          'Art. 6º Altera a lei:',
+          '"Art. 159. Texto novo." (NR)',
+          '"Art. 160. Começa aqui',
+          'e continua sem artigo no meio."',
+          'Art. 7º Esta lei entra em vigor.',
+        ].join('\n\n'),
+      );
+      expect(juntarCitacoes(blocos)).toHaveLength(blocos.length);
+    });
+
+    it('junta com quebra de linha o que vai da aspa que abre à que fecha', () => {
+      const blocos = markdownParaBlocos(
+        [
+          'Art. 6º Altera a lei:',
+          '"Art. 157. .....................',
+          'Art. 159. .....................',
+          'Pena - reclusão.".',
+          'Art. 7º Esta lei entra em vigor.',
+        ].join('\n\n'),
+      );
+      const juntos = juntarCitacoes(blocos);
+      expect(juntos).toHaveLength(3);
+      expect(juntos[1]?.trechos.map((t) => t.texto).join('')).toBe(
+        '"Art. 157. .....................\uE000Art. 159. .....................\uE000Pena - reclusão.".',
+      );
+    });
+
+    it('a citação que abre num capítulo também é juntada, e aspas de um trecho no meio não a fecham', () => {
+      const blocos = markdownParaBlocos(
+        [
+          'Art. 53. A Lei nº 4.591 passa a vigorar acrescida do seguinte Capítulo:',
+          '"CAPÍTULO I-A',
+          'Art. 31-A. A incorporação poderá ser submetida ao regime da afetação:',
+          'I - subconjuntos (art. 8º, alínea "a"); e',
+          'II - edifícios (art. 8º, alínea "b").',
+          'Art. 31-B. Considera-se constituído o patrimônio de afetação."',
+          'Art. 54. Esta Lei entra em vigor.',
+        ].join('\n\n'),
+      );
+      const juntos = juntarCitacoes(blocos);
+      expect(juntos).toHaveLength(3);
+      expect(juntos[1]?.trechos.map((t) => t.texto).join('')).toContain(
+        'alínea "b").\uE000Art. 31-B.',
+      );
+    });
+
+    it('lê as linhas normalizadas: o espaço na frente do "Art." do Planalto não esconde a citação', () => {
+      const bloco = (texto: string) => ({ trechos: [{ texto }] });
+      const blocos = [
+        bloco(' Art. 53. Acrescenta o capítulo:'),
+        bloco(' "CAPÍTULO I-A'),
+        bloco(' Art. 31-A. Texto.'),
+        bloco(' Art. 31-B. Texto."'),
+        bloco(' Art. 54. Esta Lei entra em vigor.'),
+      ];
+      expect(juntarCitacoes(blocos)).toHaveLength(3);
+    });
+
+    it('citação que não fecha antes do artigo seguinte, ou que passa por título, fica como estava', () => {
+      const semFecho = markdownParaBlocos(
+        [
+          'Art. 21. Altera a lei:',
+          '"CAPÍTULO IV',
+          'Art. 6º Texto.',
+          'Art. 22. Esta Lei vale.',
+        ].join('\n\n'),
+      );
+      expect(juntarCitacoes(semFecho)).toHaveLength(semFecho.length);
+      const comTitulo = markdownParaBlocos(
+        ['Art. 21. Altera a lei:', '"Art. 6º Texto.', 'CAPÍTULO V', 'Art. 7º Texto."'].join('\n\n'),
+      );
+      expect(juntarCitacoes(comTitulo)).toHaveLength(comTitulo.length);
     });
   });
 

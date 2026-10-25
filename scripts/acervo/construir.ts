@@ -8,7 +8,11 @@ import {
 } from '../../src/dominios/acervo/esquemas';
 import { hashDoItem } from '../../src/dominios/acervo/hash';
 import type { Rascunho } from '../../src/dominios/legislacao/rascunho';
-import { estruturar } from '../../src/dominios/legislacao/estruturador';
+import { lerInicioDeArtigo } from '../../src/dominios/legislacao/artigo';
+import { lerRotuloEstrutural } from '../../src/dominios/legislacao/estrutura';
+import { ABRE_CITACAO, estruturar, fechaCitacao } from '../../src/dominios/legislacao/estruturador';
+import { prepararLinhas, type Linha } from '../../src/dominios/legislacao/linhas';
+import { normalizarBlocos } from '../../src/dominios/legislacao/normalizacao';
 import { metadadosDaNorma, registrosDaArvore } from '../../src/dominios/legislacao/registros';
 import type { Bloco, Trecho } from '../../src/core/seguranca/sanitizador';
 import type { ItemDaCuradoria } from './curadoria';
@@ -163,6 +167,117 @@ export function semCabecalhos(blocos: readonly Bloco[], padroes: readonly string
   return saida;
 }
 
+/** A maior citação de outra lei no acervo (as partes vetadas e mantidas da Lei 8.112) tem umas 40 linhas. */
+const MAX_BLOCOS_DA_CITACAO = 200;
+
+/**
+ * Separa os blocos que `juntarCitacoes` junta. Um caractere de uso privado, porque a normalização
+ * do estruturador desfaria uma quebra de linha (espaço); `restaurarQuebras` o troca por "\n".
+ */
+const QUEBRA = '\uE000';
+
+const numeroDoArtigo = (chave: string): number | undefined => {
+  const n = /^art(\d+)/.exec(lerInicioDeArtigo(chave)?.endereco ?? '')?.[1];
+  return n === undefined ? undefined : Number(n);
+};
+
+/** Abre uma citação que começa num artigo ('"Art. 157. …') ou num título, capítulo ou seção ('"CAPÍTULO I-A'). */
+const abreCitacaoDeDispositivo = (l: Linha): boolean => {
+  if (!ABRE_CITACAO.test(l.chave)) return false;
+  const resto = { ...l, chave: l.chave.slice(1).trimStart(), texto: l.texto.slice(1).trimStart() };
+  return lerInicioDeArtigo(resto.chave) !== undefined || lerRotuloEstrutural(resto) !== undefined;
+};
+
+const aparar = (trechos: readonly Trecho[]): Trecho[] => {
+  const copia = trechos.map((t) => ({ ...t }));
+  const primeiro = copia[0];
+  const ultimo = copia[copia.length - 1];
+  if (primeiro) primeiro.texto = primeiro.texto.trimStart();
+  if (ultimo) ultimo.texto = ultimo.texto.trimEnd();
+  return copia;
+};
+
+/** Aspa de sobra na linha (a chave já as traz uniformes): a linha abre ou fecha uma citação. */
+const temAspaDeSobra = (l: Linha): boolean => (l.chave.match(/"/g)?.length ?? 0) % 2 === 1;
+
+/**
+ * Citação de outra lei que atravessa vários artigos (Lei 8.072, art. 6º: '"Art. 157. …', "Art.
+ * 159. …", '…."'; Lei 8.112, partes vetadas e mantidas). A aspa só abre no primeiro e fecha no
+ * último, e o estruturador encerra a citação no primeiro "Art." sem aspa: os artigos da outra lei
+ * viram artigos desta, ou, depois do fecho, refazem os da própria lei com o texto antigo. Aqui o
+ * que vai da aspa que abre à que fecha vira um bloco só, que ele lê como a citação que é (o
+ * fecho é a primeira linha com aspa de sobra: aspas de um trecho no meio, como 'alínea "b").',
+ * não fecham).
+ *
+ * Só junta se a citação abre num dispositivo da outra lei e tem um artigo no meio. Se antes do
+ * fecho vier o artigo desta lei (o do dispositivo de cima ou o seguinte) ou um título, capítulo ou
+ * seção, a aspa não fechou na fonte e tudo fica como estava.
+ */
+export function juntarCitacoes(blocos: readonly Bloco[]): Bloco[] {
+  // As linhas são as do estruturador (blocos normalizados: sem o espaço na frente do "Art." do Planalto).
+  const linhas = new Map(prepararLinhas(normalizarBlocos(blocos).blocos).map((l) => [l.i, l]));
+  const saida: Bloco[] = [];
+  let artigo = 0;
+  for (let i = 0; i < blocos.length; i++) {
+    const bloco = blocos[i] as Bloco;
+    const l = linhas.get(i);
+    if (!l) {
+      saida.push(bloco);
+      continue;
+    }
+    const fim = abreCitacaoDeDispositivo(l) && temAspaDeSobra(l) ? fimDaCitacao(i) : undefined;
+    if (fim === undefined) {
+      artigo = numeroDoArtigo(l.chave) ?? artigo;
+      saida.push(bloco);
+      continue;
+    }
+    const trechos = aparar(bloco.trechos);
+    for (let j = i + 1; j <= fim; j++)
+      if (linhas.has(j)) trechos.push({ texto: QUEBRA }, ...aparar((blocos[j] as Bloco).trechos));
+    saida.push({ trechos });
+    i = fim;
+  }
+  return saida;
+
+  /** Onde a citação que abre em `de` fecha, ou `undefined` se não há artigo no meio ou ela não fecha. */
+  function fimDaCitacao(de: number): number | undefined {
+    let comArtigo = false;
+    for (let j = de + 1; j < blocos.length && j <= de + MAX_BLOCOS_DA_CITACAO; j++) {
+      const m = linhas.get(j);
+      if (!m) continue;
+      const n = numeroDoArtigo(m.chave);
+      if (n === artigo || n === artigo + 1 || lerRotuloEstrutural(m)) return undefined;
+      if (n !== undefined) comArtigo = true;
+      if (temAspaDeSobra(m)) return comArtigo && fechaCitacao(m) ? j : undefined;
+    }
+    return undefined;
+  }
+}
+
+type TrechoDoNo = NoDoItem['trechos'][number];
+
+/** Troca a `QUEBRA` de `juntarCitacoes` por uma quebra de linha, como o estruturador faz nas citações. */
+export function restaurarQuebras(nos: readonly NoDoItem[]): NoDoItem[] {
+  const quebrar = (trechos: readonly TrechoDoNo[]): TrechoDoNo[] =>
+    trechos.flatMap((t) =>
+      t.texto.includes(QUEBRA)
+        ? t.texto
+            .split(QUEBRA)
+            .flatMap((parte, k): TrechoDoNo[] => [
+              ...(k > 0 ? [{ texto: '\n' }] : []),
+              ...(parte === '' ? [] : [{ ...t, texto: parte }]),
+            ])
+        : [t],
+    );
+  return nos.map((no) => ({
+    ...no,
+    trechos: quebrar(no.trechos),
+    ...(no.redacoesAnteriores && {
+      redacoesAnteriores: no.redacoesAnteriores.map((r) => ({ ...r, trechos: quebrar(r.trechos) })),
+    }),
+  }));
+}
+
 /** Item de lei articulada: passa pelo estruturador e pela porta de qualidade. */
 export function construirItemArticulado(
   cur: ItemDaCuradoria,
@@ -170,8 +285,10 @@ export function construirItemArticulado(
   coletadoEm: string,
   urlOficial: string | undefined,
 ): ResultadoDaConstrucao {
-  const rascunho = estruturar(semCabecalhos(blocos, cur.cabecalhosSemNivel), { formato: 'html' });
-  const nos = nosDoRascunho(rascunho);
+  const rascunho = estruturar(juntarCitacoes(semCabecalhos(blocos, cur.cabecalhosSemNivel)), {
+    formato: 'html',
+  });
+  const nos = restaurarQuebras(nosDoRascunho(rascunho));
   const bloqueios: string[] = [];
   const aceitas = new Set<string>(cur.anomaliasAceitas);
   const agrupadas = new Map<string, { n: number; mensagem: string; conflito: boolean }>();
@@ -191,6 +308,7 @@ export function construirItemArticulado(
   }
   const erro = arvoreValida(nos);
   if (erro) bloqueios.push(`árvore inválida: ${erro}`);
+  if (JSON.stringify(nos).includes(QUEBRA)) bloqueios.push('quebra de citação fora dos trechos');
   const aConfirmar = nos.filter((n) => n.confianca === 'a_confirmar').length;
   const resultado: ResultadoDaConstrucao = {
     id: cur.id,

@@ -16,7 +16,7 @@
 | lei-federal-9503-1997 | publicado | 1831 | 0 | alinea_sem_inciso: 3; paragrafo_unico_com_numerado: 1 |
 | lei-federal-9605-1998 | publicado | 320 | 0 | duplicata: 2 |
 | lei-federal-10826-2003 | publicado | 184 | 0 | tachado_sem_dispositivo: 2; linha_solta: 6 |
-| lei-federal-8072-1990 | publicado | 63 | 0 | artigo_ausente: 5; artigo_fora_de_ordem: 1 |
+| lei-federal-8072-1990 | publicado | 53 | 0 | — |
 | lei-federal-11343-2006 | publicado | 463 | 0 | estrutural_substituido: 1; paragrafo_1_sem_2: 1 |
 | lei-federal-8078-1990 | publicado | 539 | 0 | alinea_sem_inciso: 2 |
 | lei-federal-1521-1951 | publicado | 82 | 0 | alinea_sem_inciso: 2 |
@@ -27,7 +27,7 @@
 | lei-federal-9613-1998 | publicado | 191 | 0 | — |
 | lei-federal-7716-1989 | publicado | 45 | 0 | — |
 | lei-federal-6001-1973 | publicado | 187 | 0 | duplicata: 3; alinea_sem_inciso: 9 |
-| lei-federal-13869-2019 | publicado | 124 | 0 | duplicata: 4; artigo_ausente: 2; artigo_fora_de_ordem: 1 |
+| lei-federal-13869-2019 | publicado | 124 | 0 | — |
 | lei-federal-10741-2003 | publicado | 377 | 0 | tachado_sem_dispositivo: 1; linha_solta: 2; duplicata: 2 |
 | lei-federal-6766-1979 | publicado | 293 | 0 | duplicata: 1; alinea_sem_inciso: 5 |
 | lei-federal-10932-2004 | publicado | 5 | 0 | — |
@@ -36,7 +36,7 @@
 | lei-federal-9455-1997 | publicado | 21 | 0 | — |
 | lei-federal-12847-2013 | publicado | 110 | 0 | — |
 | lei-federal-10216-2001 | publicado | 34 | 0 | — |
-| lei-federal-13146-2015 | publicado | 502 | 0 | artigo_ausente: 1; artigo_fora_de_ordem: 1 |
+| lei-federal-13146-2015 | publicado | 490 | 0 | — |
 | lei-federal-10257-2001 | publicado | 332 | 0 | duplicata: 2 |
 | lei-federal-6015-1973 | publicado | 1141 | 0 | linha_solta: 2; alinea_sem_inciso: 12; item_sem_alinea: 94 |
 | lei-federal-8245-1991 | publicado | 370 | 0 | linha_solta: 1; alinea_sem_inciso: 24 |
@@ -77,7 +77,7 @@
 | lei-federal-12651-2012 | publicado | 608 | 0 | — |
 | lei-federal-14119-2021 | publicado | 149 | 0 | artigo_so_tachado: 1 |
 | lei-federal-12608-2012 | publicado | 207 | 0 | — |
-| lei-federal-14750-2023 | publicado | 37 | 0 | artigo_so_tachado: 1; artigo_ausente: 1; artigo_fora_de_ordem: 1 |
+| lei-federal-14750-2023 | publicado | 7 | 0 | artigo_so_tachado: 1 |
 | lei-federal-12334-2010 | publicado | 260 | 0 | — |
 | lei-federal-14755-2023 | publicado | 83 | 0 | — |
 | lei-federal-9795-1999 | publicado | 128 | 0 | — |
@@ -186,7 +186,7 @@
 | lei-federal-10406-2002 | publicado | 4711 | 0 | duplicata: 4; estrutural_repetido: 14 |
 | decreto-lei-2848-1940 | publicado | 2045 | 0 | tachado_sem_dispositivo: 1; estrutural_substituido: 2; duplicata: 1; artigo_ausente: 1; alinea_sem_inciso: 27; paragrafo_unico_com_numerado: 2; paragrafo_1_sem_2: 2 |
 | lei-federal-8987-1995 | publicado | 251 | 0 | — |
-| lei-federal-14133-2021 | publicado | 1582 | 0 | duplicata: 7; artigo_ausente: 1; artigo_fora_de_ordem: 1; paragrafo_unico_com_numerado: 1 |
+| lei-federal-14133-2021 | publicado | 1550 | 0 | duplicata: 7; paragrafo_unico_com_numerado: 1 |
 | lei-federal-9099-1995 | publicado | 297 | 0 | — |
 | decreto-lei-3689-1941 | publicado | 2382 | 0 | duplicata: 1; alinea_sem_inciso: 43 |
 | lei-federal-7853-1989 | publicado | 95 | 0 | — |
@@ -197,7 +197,7 @@
 | lei-federal-9784-1999 | publicado | 261 | 0 | — |
 | lei-federal-11079-2004 | publicado | 215 | 0 | — |
 | lei-federal-8429-1992 | publicado | 277 | 0 | tachado_sem_dispositivo: 1; linha_solta: 2 |
-| lei-federal-8038-1990 | publicado | 133 | 0 | artigo_ausente: 3; artigo_fora_de_ordem: 1; alinea_sem_inciso: 2 |
+| lei-federal-8038-1990 | publicado | 128 | 0 | alinea_sem_inciso: 2 |
 | lei-federal-8842-1994 | publicado | 104 | 0 | — |
 | lei-federal-8629-1993 | publicado | 214 | 0 | tachado_sem_dispositivo: 1; linha_solta: 4 |
 | lei-federal-601-1850 | publicado | 41 | 0 | — |
@@ -211,9 +211,9 @@
 | decreto-lei-911-1969 | publicado | 79 | 0 | — |
 | lei-federal-9514-1997 | publicado | 241 | 0 | duplicata: 2 |
 | lei-federal-4591-1964 | publicado | 543 | 0 | duplicata: 2; alinea_sem_inciso: 49 |
-| lei-federal-10931-2004 | publicado | 364 | 0 | artigo_fora_de_ordem: 3; artigo_ausente: 2 |
+| lei-federal-10931-2004 | publicado | 255 | 0 | — |
 | lei-federal-14382-2022 | publicado | 137 | 0 | artigo_so_tachado: 4; paragrafo_1_sem_2: 1 |
-| lei-federal-14010-2020 | publicado | 56 | 0 | duplicata: 4; artigo_ausente: 1; artigo_fora_de_ordem: 1 |
+| lei-federal-14010-2020 | publicado | 56 | 0 | — |
 | lei-federal-6830-1980 | publicado | 162 | 0 | — |
 | lei-federal-12016-2009 | publicado | 76 | 0 | — |
 | lei-federal-4717-1965 | publicado | 96 | 0 | alinea_sem_inciso: 13; paragrafo_unico_com_numerado: 1 |
@@ -229,7 +229,7 @@
 | lei-federal-14230-2021 | publicado | 19 | 0 | — |
 | decreto-federal-20910-1932 | publicado | 12 | 0 | — |
 | decreto-lei-4597-1942 | publicado | 5 | 0 | artigo_ausente: 1 |
-| lei-federal-6515-1977 | publicado | 138 | 0 | duplicata: 1; artigo_ausente: 1; artigo_fora_de_ordem: 1; item_sem_alinea: 13 |
+| lei-federal-6515-1977 | publicado | 136 | 0 | duplicata: 1; item_sem_alinea: 13 |
 | lei-federal-9278-1996 | publicado | 18 | 0 | — |
 | lei-federal-9507-1997 | publicado | 55 | 0 | — |
 | lei-federal-8560-1992 | publicado | 27 | 0 | — |
@@ -239,7 +239,7 @@
 | lei-federal-9494-1997 | publicado | 13 | 0 | — |
 | lei-federal-11105-2005 | publicado | 244 | 0 | — |
 | decreto-lei-201-1967 | publicado | 71 | 0 | — |
-| lei-federal-9096-1995 | publicado | 405 | 0 | artigo_ausente: 1; artigo_fora_de_ordem: 1 |
+| lei-federal-9096-1995 | publicado | 403 | 0 | — |
 | lei-complementar-federal-86-1996 | publicado | 3 | 0 | — |
 | lei-complementar-federal-35-1979 | publicado | 480 | 0 | duplicata: 2; sem_pai: 1; alinea_sem_inciso: 19 |
 | lei-federal-6404-1976 | publicado | 1932 | 0 | alinea_sem_inciso: 105 |
@@ -261,7 +261,7 @@
 | lei-federal-5197-1967 | publicado | 92 | 0 | alinea_sem_inciso: 26 |
 | decreto-federal-7724-2012 | publicado | 410 | 0 | — |
 | decreto-federal-1171-1994 | publicado | 6 | 0 | — |
-| lei-federal-8112-1990 | publicado | 1048 | 0 | duplicata: 10; artigo_ausente: 4; artigo_fora_de_ordem: 1; alinea_sem_inciso: 5; paragrafo_1_sem_2: 1 |
+| lei-federal-8112-1990 | publicado | 1042 | 0 | alinea_sem_inciso: 5; paragrafo_1_sem_2: 1 |
 | decreto-federal-6514-2008 | publicado | 800 | 0 | — |
 | lei-federal-10410-2002 | publicado | 134 | 0 | artigo_so_tachado: 1 |
 | lei-federal-11284-2006 | publicado | 593 | 0 | — |
