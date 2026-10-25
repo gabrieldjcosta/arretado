@@ -152,6 +152,8 @@ Tipos-base do mesmo arquivo: `DataCivil` (`AAAA-MM-DD` no fuso `America/Sao_Paul
 | Ponto, Dia, Sessão, Revisão | `Ponto` (item do edital), `Dia` (dia de estudo materializado), `Sessao` (de estudo), `Revisao` (resposta a um cartão) | `ponto` para outra coisa; `data` é `DataCivil`, não Dia; `Sessao` para login (F4: proposto `login`); `revisao` para a conferência do rascunho (usar `confirmar`, §12) |
 | Anexo | entidade `Anexo` = arquivo | entidade para anexo de norma: é `Dispositivo` com `tipo: 'anexo'` |
 | Conflito | `Conflito` = conflito de importação do pacote | o mesmo tipo para anomalia do estruturador (§12) |
+| Conflito de sincronização | `Conflito` em `core/persistencia/banco.ts` (tabela interna `conflitos`: `minha`, `deles`, `tsDeles`); `resolverConflito` com `Escolha` (`daqui`, `de-la`, `campos`) | `merge`, `colisão`; "conflito" para a divergência que o servidor recusa (é `DivergenciaNoServidor`, que vira Conflito no aparelho) |
+| Recarga, Quarentena de recebidos | `recarregarDaConta` (baixa o estado em `registros` num aparelho novo); `sync.quarentenaRecebidos` (entrada recebida recusada pelo esquema) | `restore`, `full sync`; misturar com a quarentena de envio (`sync.quarentena`) |
 | Versão | `VersaoDeNorma`, referência `versaoId` | `versao` para apontar a versão da norma (é `versaoId`); outras versões levam qualificador (`versaoApp`, `versaoEsquema`, `versaoFormato`), salvo o número inteiro `Edital.versao` / `PacoteDeIncidencia.versao` |
 
 Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`src/apresentacao/orientacoes/conteudo.ts`, seção `vocabulario`).

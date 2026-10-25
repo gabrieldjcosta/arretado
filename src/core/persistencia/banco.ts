@@ -60,6 +60,11 @@ export interface Alteracao {
   operacao: 'gravar' | 'atualizar' | 'remover' | 'acervo-adesao';
   dados?: Record<string, unknown>;
   removidos?: string[];
+  /**
+   * `ts` do registro como o servidor o tinha quando a pessoa resolveu um Conflito (F4-B, B3). Só a
+   * resolução grava; sem ele o envio usa o `ts` da entrada anterior do mesmo registro neste log.
+   */
+  baseTs?: string | null;
 }
 
 /**

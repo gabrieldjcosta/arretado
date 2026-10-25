@@ -27,8 +27,14 @@ export class ServicoDeContaNulo implements ServicoDeConta {
     return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
   }
   servidorDeSincronizacao(): ServidorDeSincronizacao {
+    const recusa = () => Promise.reject(new FalhaDeSincronizacao(INDISPONIVEL, false));
     return {
-      enviarLote: () => Promise.reject(new FalhaDeSincronizacao(INDISPONIVEL, false)),
+      enviarLote: recusa,
+      puxarLog: recusa,
+      lerRegistro: recusa,
+      instantaneoInicio: recusa,
+      puxarRegistros: recusa,
+      registrarSincronia: recusa,
     };
   }
   sair() {
