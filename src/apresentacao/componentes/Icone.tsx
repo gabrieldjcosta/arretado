@@ -21,6 +21,8 @@ const CAMINHOS = {
   ajuda: ['M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.9-1.1 1.6', 'M12 17h.01'],
   /** Relógio: o cartão já está no prazo de revisão. */
   relogio: [CIRCULO, 'M12 8v4.2l2.8 1.8'],
+  /** Quatro quadrados: o Mapa da norma. */
+  mapa: ['M5 5h5.5v5.5H5z', 'M13.5 5H19v5.5h-5.5z', 'M5 13.5h5.5V19H5z', 'M13.5 13.5H19V19h-5.5z'],
 } as const;
 
 export type NomeDoIcone = keyof typeof CAMINHOS;

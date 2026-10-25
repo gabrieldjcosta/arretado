@@ -1803,6 +1803,19 @@ a.item-norma strong {
   visibility: hidden;
 }
 
+/* A chamada do Mapa da norma (AP-04) sob a barra do Leitor: o link com o ícone e a dica ao lado. */
+.chamada-do-mapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.75rem;
+  margin: -0.25rem 0 0.5rem;
+}
+
+.chamada-do-mapa .dica {
+  margin: 0;
+}
+
 /* "Lido até" (9.7): a referência sob a barra, a marca na linha e o botão que acompanha a rolagem */
 .lido-ate {
   display: flex;
