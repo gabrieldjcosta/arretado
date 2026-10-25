@@ -59,7 +59,7 @@ export function cabecalhosHospedagem(csp: string = CSP): string {
     '  Referrer-Policy: no-referrer',
     '  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()',
     '  Cross-Origin-Opener-Policy: same-origin',
-    '  Strict-Transport-Security: max-age=31536000',
+    '  Strict-Transport-Security: max-age=31536000; includeSubDomains',
     '/assets/*',
     '  Cache-Control: public, max-age=31536000, immutable',
     '/index.html',
