@@ -53,6 +53,9 @@ const Precedente = lazy(() =>
   import('./biblioteca/precedentes/Precedente').then((m) => ({ default: m.Precedente })),
 );
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
+const MapaDaNorma = lazy(() =>
+  import('./biblioteca/mapa/MapaDaNorma').then((m) => ({ default: m.MapaDaNorma })),
+);
 // "Escolher meu concurso": duas telas curtas, baixadas só quando a pessoa chega a elas.
 const Comecar = lazy(() => import('./comecar/Comecar').then((m) => ({ default: m.Comecar })));
 const ParaComecar = lazy(() =>
@@ -159,6 +162,14 @@ export function App({
                   element={
                     <Carregando>
                       <Leitor />
+                    </Carregando>
+                  }
+                />
+                <Route
+                  path="biblioteca/normas/:normaId/mapa"
+                  element={
+                    <Carregando>
+                      <MapaDaNorma />
                     </Carregando>
                   }
                 />
