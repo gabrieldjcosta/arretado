@@ -36,9 +36,9 @@ describe('decidirProximaAcao (A1)', () => {
     expect(dois).toMatchObject({ acao: { razao: '1 cartão vencido e 3 frases para rever' } });
   });
 
-  it('estimativa: 30 s por item, no máximo 40 itens', () => {
-    const r = decidirProximaAcao({ cartoesVencidos: 100, frasesVencidas: 0 });
-    expect(r).toMatchObject({ acao: { estimativaMin: 20 } });
+  it('estimativa: a camada de tela informa os minutos da rodada que o Recall serve', () => {
+    const r = decidirProximaAcao({ cartoesVencidos: 100, frasesVencidas: 0, minutosDaRodada: 5 });
+    expect(r).toMatchObject({ acao: { estimativaMin: 5 } });
   });
 
   it('leitura salva diz onde continuar e quanto falta; sem posição, só a norma', () => {

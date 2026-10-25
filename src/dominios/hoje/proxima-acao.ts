@@ -5,11 +5,6 @@
 import type { OrigemDaAcao } from '../../core/modelo';
 import type { ComecoSugerido, ProximaAcao, ResultadoProximaAcao } from './contrato';
 
-/** Segundos por cartão ou Frase na estimativa da revisão (mesmo palpite do Recall). */
-const SEGUNDOS_POR_ITEM = 30;
-/** Quantos itens entram numa rodada de revisão: a mesma cota da fila diária do Recall. */
-const LIMITE_DA_RODADA = 40;
-
 /** Rótulos do alvo `revisao`; a tela os usa para saber qual rodada abrir. */
 export const ROTULO_REVISAR_CARTOES = 'Revisar cartões';
 export const ROTULO_REVISAR_FRASES = 'Revisar frases';
@@ -24,6 +19,8 @@ export const COMECOS: readonly [ComecoSugerido, ComecoSugerido, ComecoSugerido] 
 export interface EntradaDaProximaAcao {
   cartoesVencidos: number;
   frasesVencidas: number;
+  /** Minutos da rodada que o Recall de fato serve (a cota, não a fila toda); ausente = 1. */
+  minutosDaRodada?: number;
   /** A norma lida por último. `onde` ("Art. 41") e `minutos` só existem com posição guardada. */
   /** A primeira Tarefa de estudo da fila (o que a pessoa mesma colocou, ou aceitou como sugestão). */
   tarefa?: { id: string; titulo: string; estimativaMin?: number };
@@ -61,10 +58,7 @@ function revisaoVencida(e: EntradaDaProximaAcao): ProximaAcao | undefined {
       rotulo: e.cartoesVencidos > 0 ? ROTULO_REVISAR_CARTOES : ROTULO_REVISAR_FRASES,
     },
     razao: partes.join(' e '),
-    estimativaMin: Math.max(
-      1,
-      Math.ceil((Math.min(total, LIMITE_DA_RODADA) * SEGUNDOS_POR_ITEM) / 60),
-    ),
+    estimativaMin: e.minutosDaRodada ?? 1,
   };
 }
 
