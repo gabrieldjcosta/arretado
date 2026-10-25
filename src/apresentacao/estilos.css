@@ -1388,6 +1388,11 @@ legend {
   color: var(--texto-atenuado);
 }
 
+/* O título e a frase da folha são centrados; as ações também (antes ficavam à esquerda, sob o texto). */
+.vazio .linha-acoes {
+  justify-content: center;
+}
+
 .esqueleto {
   display: grid;
   gap: 0.75rem;
@@ -1742,6 +1747,19 @@ a.item-norma strong {
   flex: 1 1 8rem;
   margin: 0;
   min-width: 0;
+}
+
+/* No celular o título longo (o nome oficial das normas do acervo: a metade passa de 55 caracteres) desce
+   para uma linha inteira sob o "Biblioteca", em 24 px e equilibrado, em vez de virar quatro linhas ou mais
+   numa coluna estreita ao lado dele (a 320 px a palavra chegava a quebrar no meio). shortcut: acima de uns
+   120 caracteres ainda passa de cinco linhas; reduzir a letra de novo se isso incomodar. */
+@media (max-width: 699px) {
+  .barra-leitor h1.titulo-longo {
+    flex-basis: 100%;
+    margin-bottom: 0.25rem;
+    font-size: 1.5rem;
+    text-wrap: balance;
+  }
 }
 
 /* O seletor de fonte é um controle só (P4): A−, o tamanho e A+ como segmentos, no contorno, no fundo e

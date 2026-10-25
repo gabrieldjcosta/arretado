@@ -1,7 +1,7 @@
 # Arretado — instruções para o Claude Code
 
 ## O que é este repositório
-Plataforma pessoal de preparação para concursos jurídicos (usuário principal: Gabriel, TDAH, banca FCC, Defensoria/SP).
+Plataforma pessoal de preparação para concursos jurídicos de qualquer carreira do catálogo (hoje Defensoria, Magistratura, Ministério Público e área ambiental). Usuário principal hoje: Gabriel (TDAH; estuda para a Defensoria/SP, banca FCC, a primeira banca atendida). O produto não se prende a essa carreira nem a essa banca.
 **Direção de produto (09/10/2026):** o Arretado é a plataforma de estudo para quem tem dificuldade de concentração, pensada para, no futuro, ser cobrada e crescer; é um produto só, não dois. Regra de dados e de comunicação: diagnóstico (TDAH, autismo etc.) nunca é perguntado nem guardado e é orientação interna; a fala pública parte do comportamento ("dificuldade de concentração", "não sei por onde começar"), sem rótulo clínico nem promessa de tratamento. Plano único (fonte única; vale em divergência): `docs/planos/plano-mestre.md`; planos antigos em `docs/planos/arquivo/`.
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore). Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado; conteúdo recomeça do zero.
 
