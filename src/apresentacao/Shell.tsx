@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
+import { AvisoDeAtualizacao } from './componentes/AvisoDeAtualizacao';
 import { Marca } from './componentes/escrita/Marca';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
 import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
 import { secaoDeAjuda } from './orientacoes/conteudo';
+import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
 import { RODAPE_CURTO, ROTULO_DA_AREA } from './textos';
 
@@ -142,6 +144,8 @@ export function Shell() {
         </div>
       </header>
       <FaixaOffline />
+      <AvisoDePosse />
+      <AvisoDeAtualizacao />
       <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
       </main>

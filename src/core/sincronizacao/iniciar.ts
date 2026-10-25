@@ -31,6 +31,8 @@ export interface OpcoesDeSincronizacao {
    * estado, B4, assina).
    */
   aoTerminar?: (resultado: ResultadoDoEnvio, recebido: ResultadoDaRecepcao) => void;
+  /** Toda rodada, inclusive as que falharam (a tela de estado mostra a causa como Problema). */
+  aoRodada?: (resultado: ResultadoDaRodada) => void;
   /** Fonte do acervo para refazer as adesões recebidas de outro aparelho. */
   prepararReidratacao?: (log: readonly Alteracao[]) => Promise<Reidratador>;
   agendador?: Pick<OpcoesDoAgendador, 'atrasoMs' | 'esperaInicialMs' | 'maxEsperaMs'>;
@@ -40,9 +42,13 @@ export interface OpcoesDeSincronizacao {
   visivel?: () => boolean;
 }
 
+export type ResultadoDaRodada =
+  | { ok: true; envio: ResultadoDoEnvio; recebido: ResultadoDaRecepcao }
+  | { ok: false; falha: unknown };
+
 export interface Sincronizacao {
-  /** Pede uma rodada agora (envia, puxa; junta com gravações próximas). */
-  pedir(): void;
+  /** Pede uma rodada (envia, puxa; junta com gravações próximas). `agora` pula a espera de juntar. */
+  pedir(agora?: boolean): void;
   parar(): void;
 }
 
@@ -117,9 +123,14 @@ export async function iniciarSincronizacao(opcoes: OpcoesDeSincronizacao): Promi
     ) {
       opcoes.aoTerminar?.(envio, recebido);
     }
+    opcoes.aoRodada?.({ ok: true, envio, recebido });
   };
 
-  const agendador = criarAgendador({ ...opcoes.agendador, executar: rodada });
+  const agendador = criarAgendador({
+    ...opcoes.agendador,
+    executar: rodada,
+    aoFalhar: (falha) => opcoes.aoRodada?.({ ok: false, falha }),
+  });
   const cancelar = repo.eventos.assinar('*', () => {
     agendador.pedir();
   });
@@ -135,8 +146,8 @@ export async function iniciarSincronizacao(opcoes: OpcoesDeSincronizacao): Promi
       : null;
 
   return {
-    pedir: () => {
-      agendador.pedir();
+    pedir: (agora) => {
+      agendador.pedir(agora);
     },
     parar: () => {
       cancelar();

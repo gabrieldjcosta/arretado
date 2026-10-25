@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { pedirArmazenamentoPersistente } from './core/persistencia';
 import { App } from './apresentacao/App';
 import { contasHabilitadas, criarServicoDeConta, tratarRetornoDoLogin } from './integracoes/conta';
+import { registrarServiceWorker } from './offline/registro';
 
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Elemento #raiz ausente em index.html');
 
 void pedirArmazenamentoPersistente();
+// Abrir sem rede (AP-00): o service worker guarda o app no aparelho; sem ele, nada muda.
+void registrarServiceWorker();
 
 /** Com a F4-A ligada, o retorno do login (`?code=`) é tratado antes do roteador por hash. */
 async function iniciar(elemento: HTMLElement) {

@@ -2,7 +2,10 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import pacote from './package.json' with { type: 'json' };
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { cabecalhosHospedagem, montarCSP, origensDoBuild } from './config/seguranca';
+import { entraNoPrecache, montarServiceWorker, nomeDoCache } from './config/offline';
 
 /**
  * CSP estrita (D18, T9). Só na versão construída: o servidor de desenvolvimento do Vite
@@ -27,11 +30,56 @@ function csp(contas: boolean): Plugin {
   };
 }
 
+/**
+ * Abrir sem rede (AP-00, T31): publica `sw.js` com a lista do que guardar no aparelho. Roda depois dos
+ * outros plugins (`enforce: 'post'`) para ver todos os arquivos do build; os de `public/` (ícones,
+ * manifesto, acervo) não passam pelo bundle, então entram pela lista fixa abaixo.
+ */
+function offline(): Plugin {
+  const slugsDoCatalogo: string[] = (
+    JSON.parse(readFileSync('corpus/catalogo/index.json', 'utf8')) as {
+      carreiras: { slug: string }[];
+    }
+  ).carreiras.map((c) => c.slug);
+  const DE_PUBLIC = [
+    'manifest.webmanifest',
+    'favicon.ico',
+    'icone.svg',
+    'icone-192.png',
+    'icone-512.png',
+    'icone-maskable-512.png',
+    'apple-touch-icon.png',
+  ];
+  return {
+    name: 'arretado-offline',
+    apply: 'build',
+    enforce: 'post',
+    generateBundle(_opcoes, saida) {
+      const doBundle = Object.keys(saida).filter((f) => entraNoPrecache(f, slugsDoCatalogo));
+      const precache = [...DE_PUBLIC, ...doBundle];
+      // A marca muda com qualquer arquivo do build: nome novo de cache a cada publicação.
+      const marca = createHash('sha256')
+        .update(precache.sort().join('\n'))
+        .digest('hex')
+        .slice(0, 12);
+      const fonte = readFileSync('src/offline/service-worker.js', 'utf8');
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sw.js',
+        source: montarServiceWorker(fonte, {
+          cache: nomeDoCache(pacote.version, marca),
+          precache,
+        }),
+      });
+    },
+  };
+}
+
 // `VITE_CONTA=1` no ambiente do build liga a F4-A (padrão desligado; mesma chave que o app lê).
 const contas = process.env.VITE_CONTA === '1';
 
 export default defineConfig({
-  plugins: [react(), csp(contas)],
+  plugins: [react(), csp(contas), offline()],
   define: {
     __VERSAO_APP__: JSON.stringify(pacote.version),
   },

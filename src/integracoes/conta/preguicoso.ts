@@ -44,6 +44,8 @@ export class ServicoDeContaPreguicoso implements ServicoDeConta {
       instantaneoInicio: async () => (await real()).instantaneoInicio(),
       puxarRegistros: async (...a) => (await real()).puxarRegistros(...a),
       registrarSincronia: async (...a) => (await real()).registrarSincronia(...a),
+      pedirPosse: async (...a) => (await real()).pedirPosse(...a),
+      soltarPosse: async (...a) => (await real()).soltarPosse(...a),
     };
   }
   async sair() {

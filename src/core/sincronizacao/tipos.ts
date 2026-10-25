@@ -65,6 +65,24 @@ export interface RegistroRemoto {
   excluido_em: string | null;
 }
 
+/** Resposta de `pedir_posse` (D17, plano §4). */
+export interface RespostaDePosse {
+  concedida: boolean;
+  /** Quem tem a posse depois da chamada. */
+  aparelho_id: string;
+  /** Última renovação do dono atual; só quando `concedida` é falso. */
+  ultimo_sinal?: string;
+}
+
+/** Resposta de `pedir_posse` (D17, plano §4). */
+export interface RespostaDePosse {
+  concedida: boolean;
+  /** Quem tem a posse depois da chamada. */
+  aparelho_id: string;
+  /** Última renovação do dono atual; só quando `concedida` é falso. */
+  ultimo_sinal?: string;
+}
+
 export interface ChaveDeRegistro {
   colecao: string;
   id: string;
@@ -91,4 +109,8 @@ export interface ServidorDeSincronizacao {
   puxarRegistros(depois: ChaveDeRegistro | null, limite: number): Promise<RegistroRemoto[]>;
   /** Avisa o servidor até onde este aparelho já recebeu (base da poda, B5). */
   registrarSincronia(aparelhoId: string, seqRecebido: number, versaoEsquema: number): Promise<void>;
+  /** Posse de edição (D17): concede sozinha se o outro aparelho está parado; `forcar` assume de um em uso. */
+  pedirPosse(aparelhoId: string, forcar: boolean): Promise<RespostaDePosse>;
+  /** Devolve a posse ao fechar o app ou esconder a aba; melhor esforço (pode cair com a aba). */
+  soltarPosse(aparelhoId: string): Promise<void>;
 }

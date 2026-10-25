@@ -16,6 +16,7 @@ import {
   type EntradaRecebida,
   type RegistroRemoto,
   type RespostaDeEnvio,
+  type RespostaDePosse,
   type ServidorDeSincronizacao,
 } from '../../core/sincronizacao';
 import {
@@ -123,6 +124,8 @@ export function traduzirErro(erro: unknown): FalhaDeConta {
 
 export class ServicoDeContaSupabase implements ServicoDeConta {
   private readonly cliente: SupabaseClient;
+  /** Token da sessão, guardado para o `fetch keepalive` de `soltarPosse` (a aba pode estar fechando). */
+  private token: string | null = null;
 
   constructor(cliente?: SupabaseClient) {
     this.cliente =
@@ -137,6 +140,9 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
           storageKey: CHAVE_DE_ARMAZENAMENTO,
         },
       });
+    this.cliente.auth.onAuthStateChange((_evento, sessao) => {
+      this.token = sessao?.access_token ?? null;
+    });
   }
 
   async sessao(): Promise<SessaoDeConta | null> {
@@ -274,6 +280,31 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
             p_versao: versaoEsquema,
           }),
         );
+      },
+      pedirPosse: async (aparelhoId, forcar) => {
+        const r = await lerOuFalhar<RespostaDePosse>(() =>
+          this.cliente.schema('arretado').rpc('pedir_posse', {
+            p_aparelho: aparelhoId,
+            p_forcar: forcar,
+          }),
+        );
+        if (!r) throw new FalhaDeSincronizacao('Sem resposta do servidor.', false);
+        return r;
+      },
+      soltarPosse: async (aparelhoId) => {
+        // Chamado ao esconder ou fechar a aba: `keepalive` deixa o pedido sair mesmo com a página indo embora.
+        if (this.token === null) return;
+        await fetch(`${URL_SUPABASE}/rest/v1/rpc/soltar_posse`, {
+          method: 'POST',
+          keepalive: true,
+          headers: {
+            apikey: CHAVE_PUBLICAVEL,
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json',
+            'Content-Profile': 'arretado',
+          },
+          body: JSON.stringify({ p_aparelho: aparelhoId }),
+        });
       },
     };
   }

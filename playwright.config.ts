@@ -22,6 +22,9 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
+    // O service worker (AP-00) responderia do cache e passaria por cima de `page.route`; só a
+    // `offline.spec.ts` o liga (`test.use({ serviceWorkers: 'allow' })`).
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',

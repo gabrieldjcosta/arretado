@@ -25,6 +25,8 @@ class ServidorFalso implements ServidorDeSincronizacao {
   readonly instantaneoInicio = RECEPCAO_VAZIA.instantaneoInicio;
   readonly puxarRegistros = RECEPCAO_VAZIA.puxarRegistros;
   readonly registrarSincronia = RECEPCAO_VAZIA.registrarSincronia;
+  readonly pedirPosse = RECEPCAO_VAZIA.pedirPosse;
+  readonly soltarPosse = RECEPCAO_VAZIA.soltarPosse;
   readonly chamadas: EntradaDeEnvio[][] = [];
   readonly recebidas = new Map<string, EntradaDeEnvio>();
   falharNaChamada: number | null = null;

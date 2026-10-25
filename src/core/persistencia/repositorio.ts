@@ -52,6 +52,11 @@ export class Repositorio {
     return this.ctx.eventos;
   }
 
+  /** Outro aparelho está editando (D17): `motivo` bloqueia as escritas; `null` libera. */
+  bloquearEscrita(motivo: string | null): void {
+    this.ctx.trava.motivo = motivo;
+  }
+
   colecao<N extends NomeColecao>(nome: N): Colecao<N> {
     let c = this.cache.get(nome);
     if (!c) {
@@ -140,7 +145,7 @@ export class Repositorio {
     const agora = opcoes.agora ?? (() => new Date());
     const eventos = opcoes.eventos ?? new Barramento();
 
-    const base = { db, eventos, agora, novoId };
+    const base = { db, eventos, agora, novoId, trava: { motivo: null } };
     const identidade =
       ((await db.meta.get('identidade'))?.valor as Identidade | undefined) ??
       (await Repositorio.criarIdentidade(base, opcoes.nomeAparelho, opcoes.usuarioId));
@@ -157,7 +162,7 @@ export class Repositorio {
    * Relê a identidade dentro da transação: se outra aba acabou de criá-la, usa a dela.
    */
   private static async criarIdentidade(
-    base: Pick<Contexto, 'db' | 'eventos' | 'agora' | 'novoId'>,
+    base: Pick<Contexto, 'db' | 'eventos' | 'agora' | 'novoId' | 'trava'>,
     nomeAparelho = 'Este aparelho',
     usuarioId?: string,
   ): Promise<Identidade> {
