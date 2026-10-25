@@ -1,7 +1,7 @@
 // Serviço de conta do build de E2E (`vite build --mode e2e-conta`, T30): sem rede e sem Supabase.
 // Ao contrário do `ServicoDeContaFalso` (memória, testes de unidade), guarda tudo em `localStorage`,
 // porque entrar recarrega a página e `criarServicoDeConta()` é chamado mais de uma vez no app.
-import type { ServidorDeSincronizacao } from '../../core/sincronizacao';
+import { FalhaDeSincronizacao, type ServidorDeSincronizacao } from '../../core/sincronizacao';
 import {
   FalhaDeConta,
   type CopiaNaNuvem,
@@ -39,6 +39,30 @@ export function uidDoEmail(email: string): string {
   let h = 0;
   for (const c of email.trim().toLowerCase()) h = (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0;
   return `00000000-0000-4000-8000-${h.toString(16).padStart(8, '0')}0000`;
+}
+
+/** Chama o servidor falso do teste; a sessão vai no corpo (o servidor é por conta). */
+async function chamarServidor<T>(
+  funcao: string,
+  corpo: Record<string, unknown>,
+  opcoes: { keepalive?: boolean } = {},
+): Promise<T> {
+  const sessao = lerEstado().sessao;
+  if (!sessao) throw new FalhaDeSincronizacao('Sem sessão.', false);
+  let r: Response;
+  try {
+    r = await fetch(`/__sync/${funcao}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid: sessao.uid, ...corpo }),
+      keepalive: opcoes.keepalive ?? false,
+    });
+  } catch {
+    throw new FalhaDeSincronizacao('Sem conexão.', false);
+  }
+  if (!r.ok)
+    throw new FalhaDeSincronizacao(`Servidor respondeu ${String(r.status)}.`, r.status === 422);
+  return (await r.json()) as T;
 }
 
 const paraBase64 = (b: Uint8Array) => btoa(String.fromCharCode(...b));
@@ -88,17 +112,28 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
     gravarEstado({ ...estado, aceites: [...estado.aceites, versao] });
     return Promise.resolve();
   }
-  aceitarSincronizacao(): Promise<void> {
-    return Promise.resolve();
+  aceitarSincronizacao(versao: string): Promise<void> {
+    return chamarServidor('aceitar_sincronizacao', { versao }).then(() => undefined);
   }
+  /**
+   * O servidor da sincronização mora no teste (Playwright responde `/__sync/<função>` com
+   * `page.route`, em `e2e/sincronizacao-servidor.ts`): é o único jeito de três aparelhos (três
+   * contextos, sem `localStorage` em comum) verem a mesma conta. Sem a rota, cai como sem rede.
+   */
   servidorDeSincronizacao(): ServidorDeSincronizacao {
     return {
-      enviarLote: () => Promise.resolve({ seq_max: 0, divergentes: [] }),
-      puxarLog: () => Promise.resolve([]),
-      lerRegistro: () => Promise.resolve(null),
-      instantaneoInicio: () => Promise.resolve(0),
-      puxarRegistros: () => Promise.resolve([]),
-      registrarSincronia: () => Promise.resolve(),
+      enviarLote: (aparelhoId, versao, entradas) =>
+        chamarServidor('enviar_lote', { aparelhoId, versao, entradas }),
+      puxarLog: (depoisDe, limite, operacao) =>
+        chamarServidor('puxar_log', { depoisDe, limite, operacao: operacao ?? null }),
+      lerRegistro: (colecao, id) => chamarServidor('ler_registro', { colecao, id }),
+      instantaneoInicio: () => chamarServidor('instantaneo_inicio', {}),
+      puxarRegistros: (depois, limite) => chamarServidor('puxar_registros', { depois, limite }),
+      registrarSincronia: (aparelhoId, seqRecebido, versaoEsquema) =>
+        chamarServidor('registrar_sincronia', { aparelhoId, seqRecebido, versaoEsquema }),
+      pedirPosse: (aparelhoId, forcar) => chamarServidor('pedir_posse', { aparelhoId, forcar }),
+      soltarPosse: (aparelhoId) =>
+        chamarServidor('soltar_posse', { aparelhoId }, { keepalive: true }),
     };
   }
   sair(): Promise<void> {

@@ -35,6 +35,8 @@ export class ServicoDeContaNulo implements ServicoDeConta {
       instantaneoInicio: recusa,
       puxarRegistros: recusa,
       registrarSincronia: recusa,
+      pedirPosse: recusa,
+      soltarPosse: recusa,
     };
   }
   sair() {

@@ -2,6 +2,22 @@ import type { Barramento } from '../eventos/barramento';
 import type { RelogioLogico } from '../ids';
 import type { BancoArretado } from './banco';
 
+/**
+ * Trava de escrita (D17, F4-B B4): com `motivo`, toda escrita pelas coleções falha com
+ * `EscritaBloqueada` (outro aparelho está editando agora). A recepção da sincronização grava direto
+ * no banco e não passa por ela. Mutável de propósito: a posse muda sem reabrir o repositório.
+ */
+export interface TravaDeEscrita {
+  motivo: string | null;
+}
+
+export class EscritaBloqueada extends Error {
+  constructor(readonly motivo: string) {
+    super(motivo);
+    this.name = 'EscritaBloqueada';
+  }
+}
+
 /** Dependências de toda escrita: banco, identidade local, relógio, eventos. */
 export interface Contexto {
   readonly db: BancoArretado;
@@ -11,4 +27,5 @@ export interface Contexto {
   readonly eventos: Barramento;
   readonly agora: () => Date;
   readonly novoId: () => string;
+  readonly trava: TravaDeEscrita;
 }
