@@ -60,6 +60,7 @@ export function LeiMudou({
   );
   const titulo = useRef<HTMLHeadingElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
+  const aviso = useRef<HTMLParagraphElement>(null);
   const aoFechar = useRef<string | null>(null);
   const editar = editando?.id;
 
@@ -68,6 +69,9 @@ export function LeiMudou({
     campo.current?.focus();
     campo.current?.closest('.campo')?.scrollIntoView({ block: 'nearest' });
   }, [editar]);
+  useEffect(() => {
+    if (falha !== undefined) aviso.current?.scrollIntoView({ block: 'nearest' });
+  }, [falha]);
   useEffect(() => {
     if (aoFechar.current === null) return;
     const alvo = document.getElementById(aoFechar.current);
@@ -145,7 +149,7 @@ export function LeiMudou({
             Deixar como está
           </button>
           {falha === a.id && (
-            <p role="alert" className="aviso falha">
+            <p ref={aviso} role="alert" className="aviso falha">
               Não foi possível guardar a Frase. Nada foi alterado.
             </p>
           )}
