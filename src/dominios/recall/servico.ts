@@ -437,7 +437,7 @@ export async function filaDoDia(repo: Repositorio, maximo = 1_000): Promise<Cart
 }
 
 /** Um cartão da fila já com a faixa do Ponto (ou nenhuma), pronto para `ordenarPorValor`. */
-export type CartaoComFaixa = Cartao & { faixa?: Faixa };
+export type CartaoComFaixa = Cartao & { faixa?: Faixa; erroComCerteza?: boolean };
 
 /**
  * A fila de hoje do mais para o menos valioso (AP-01). Mesmos cartões de `filaDoDia`, outra ordem;
@@ -450,11 +450,44 @@ export async function filaPorValor(repo: Repositorio): Promise<CartaoComFaixa[]>
   for (const id of new Set(fila.flatMap((c) => (c.pontoId ? [c.pontoId] : [])))) {
     faixas.set(id, (await repo.colecao('pontos').obter(id))?.faixa);
   }
+  const hipercorrecao = await cartoesErradosComCerteza(repo);
   const comFaixa = fila.map((c): CartaoComFaixa => {
     const faixa = c.pontoId ? faixas.get(c.pontoId) : undefined;
-    return faixa ? { ...c, faixa } : c;
+    return {
+      ...c,
+      ...(faixa ? { faixa } : {}),
+      ...(hipercorrecao.has(c.id) ? { erroComCerteza: true } : {}),
+    };
   });
   return ordenarPorValor(comFaixa, hoje(repo));
+}
+
+/** Quantas Revisões recentes a consulta de certeza olha (a mais nova de cada cartão decide). */
+const REVISOES_RECENTES = 500;
+
+/**
+ * Cartões cuja Revisão mais recente foi um Errei com certeza 3: quem errou tendo certeza é quem mais
+ * corrige depois do feedback (AP-02), então volta na frente na Sessão seguinte. Só olha as últimas
+ * as últimas 500 Revisões; sem certeza informada, nada muda.
+ */
+async function cartoesErradosComCerteza(repo: Repositorio): Promise<Set<string>> {
+  const u = repo.ctx.usuarioId;
+  const p: Pagina<Revisao> = await repo.colecao('revisoes').listarPagina({
+    indice: '[usuarioId+em]',
+    de: [u, ''],
+    ate: [u, '\uffff'],
+    ordem: 'desc',
+    limite: REVISOES_RECENTES,
+    cursor: null,
+  });
+  const vistos = new Set<string>();
+  const marcados = new Set<string>();
+  for (const r of p.itens) {
+    if (vistos.has(r.cartaoId)) continue;
+    vistos.add(r.cartaoId);
+    if (r.resposta === 'errei' && r.certeza === 3) marcados.add(r.cartaoId);
+  }
+  return marcados;
 }
 
 /**
@@ -500,7 +533,7 @@ export async function revisar(
   repo: Repositorio,
   cartaoId: string,
   resposta: RespostaRevisao,
-  opcoes: { duracaoMs?: number } = {},
+  opcoes: { duracaoMs?: number; certeza?: 1 | 2 | 3 } = {},
 ): Promise<{ cartao: Cartao; revisao: Revisao }> {
   const dia = hoje(repo);
   const resultado = await repo.transacao(async () => {
@@ -520,6 +553,7 @@ export async function revisar(
       proximaDepois: a.proximaDepois,
       atrasoDias: a.atrasoDias,
       ...(opcoes.duracaoMs !== undefined ? { duracaoMs: Math.round(opcoes.duracaoMs) } : {}),
+      ...(opcoes.certeza !== undefined ? { certeza: opcoes.certeza } : {}),
     });
     const atualizado = await repo.colecao('cartoes').atualizar(cartaoId, {
       caixa: a.caixaDepois,

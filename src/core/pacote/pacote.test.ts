@@ -93,6 +93,28 @@ describe('exportação (3.2)', () => {
 });
 
 describe('leitura e validação (3.1, 3.4)', () => {
+  it('Revisão com e sem certeza (AP-02) sobrevive ao pacote', async () => {
+    const { repo } = await repoComDados();
+    const cartao = (await repo.colecao('cartoes').todosDoUsuario())[0]!;
+    const base = {
+      cartaoId: cartao.id,
+      em: '2026-09-24T12:00:00.000Z',
+      data: '2026-09-24',
+      resposta: 'errei' as const,
+      caixaAntes: 1,
+      caixaDepois: 1,
+      proximaAntes: '2026-09-24',
+      proximaDepois: '2026-09-25',
+      atrasoDias: 0,
+    };
+    await repo.colecao('revisoes').criar(base);
+    await repo.colecao('revisoes').criar({ ...base, certeza: 3 });
+    const { bytes } = await exportarPacote(repo);
+    const lidas = (await lerPacote(bytes)).registros.get('revisoes') ?? [];
+    expect(lidas).toHaveLength(2);
+    expect(lidas.map((r) => (r as { certeza?: number }).certeza).sort()).toEqual([3, undefined]);
+  });
+
   it('lê de volta exatamente os registros exportados', async () => {
     const { repo } = await repoComDados();
     const { bytes } = await exportarPacote(repo);

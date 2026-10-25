@@ -35,6 +35,8 @@ export interface ItemParaOrdenar {
   proximaRevisao: DataCivil;
   /** Faixa do Ponto a que o item aponta; ausente = sem Ponto ou Ponto sem faixa. */
   faixa?: Faixa | undefined;
+  /** A Revisão mais recente foi um Errei com certeza 3 (AP-02): volta na frente. */
+  erroComCerteza?: boolean | undefined;
 }
 
 const PESO_DA_FAIXA: Record<Faixa, number> = { altissima: 3, alta: 2, media: 1, extra: 0 };
@@ -47,13 +49,15 @@ const ROTULO_DA_FAIXA: Record<Faixa, string> = {
   extra: 'extra',
 };
 const TETO_DE_DIAS = 14;
+/** Vale mais que uma faixa inteira (20) e menos que duas: o erro com certeza sobe, sem atropelar tudo. */
+const BONUS_ERRO_COM_CERTEZA = 30;
 
 /** Valor do item: a faixa pesa mais; depois a caixa (menor = mais perto de esquecer) e a espera. */
 export function valorDe(item: ItemParaOrdenar, hoje: DataCivil): number {
   const faixa = item.faixa === undefined ? PESO_NEUTRO : PESO_DA_FAIXA[item.faixa];
   const fragilidade = 6 - Math.min(Math.max(item.caixa, 1), 6); // caixa 1 → 5; caixa 6 → 0
   const espera = Math.min(Math.max(diferencaEmDias(item.proximaRevisao, hoje), 0), TETO_DE_DIAS);
-  return faixa * 20 + fragilidade * 3 + espera;
+  return faixa * 20 + fragilidade * 3 + espera + (item.erroComCerteza ? BONUS_ERRO_COM_CERTEZA : 0);
 }
 
 /** Do maior valor ao menor. Desempate fixo (data, caixa, id): mesma entrada, mesma ordem, nada se perde. */
@@ -76,6 +80,7 @@ export function ordenarPorValor<T extends ItemParaOrdenar>(
  * "sem Ponto" de quem tem Ponto sem faixa seria falso); a espera não entra: lida como atraso.
  */
 export function motivoDoItem(item: ItemParaOrdenar): string {
+  if (item.erroComCerteza) return 'Você tinha certeza e a resposta era outra: vale rever logo';
   const caixa = item.caixa <= 2 ? 'ainda frágil' : `caixa ${String(item.caixa)}`;
   return item.faixa === undefined
     ? caixa

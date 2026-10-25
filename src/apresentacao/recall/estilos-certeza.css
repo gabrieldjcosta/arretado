@@ -1,0 +1,14 @@
+/* Quanta certeza? (AP-02): três chips de 44 px acima de "Mostrar resposta"; tocar em um já mostra a
+   resposta, e o botão de baixo pula a pergunta. Só tokens. */
+.certeza {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 26rem);
+  margin-bottom: 0.5rem;
+}
+
+.certeza .chip {
+  min-height: var(--alvo, 44px);
+  padding-inline: 0.25rem;
+}

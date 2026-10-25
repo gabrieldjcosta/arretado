@@ -291,3 +291,33 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   await page.keyboard.press('1');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
 });
+
+test('certeza antes de ver a resposta: três chips de 44 px; tocar mostra a resposta; pular segue igual (AP-02)', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  for (let i = 1; i <= 2; i += 1) {
+    await page.goto('/#/recall/cartoes/novo');
+    await page.getByLabel('Frente (pergunta)').fill(`Pergunta ${String(i)}`);
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page).toHaveURL(/#\/recall\/cartoes$/);
+  }
+  await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
+  await page.goto('/#/recall/revisar');
+  const grupo = page.getByRole('group', { name: 'Quanta certeza?' });
+  await expect(grupo).toBeVisible();
+  for (const nome of ['Chutando', 'Acho que sei', 'Tenho certeza']) {
+    const caixa = await grupo.getByRole('button', { name: nome }).boundingBox();
+    expect(caixa?.height).toBeGreaterThanOrEqual(44);
+  }
+  await semViolacoes(page);
+  await grupo.getByRole('button', { name: 'Tenho certeza' }).click();
+  await respostasCabem(page);
+  await page.getByRole('button', { name: 'De novo' }).click();
+  // Segundo cartão: "Mostrar resposta" pula a certeza e tudo segue como antes.
+  await page.getByRole('button', { name: 'Mostrar resposta' }).click();
+  await page.getByRole('button', { name: 'Fácil' }).click();
+  await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+});

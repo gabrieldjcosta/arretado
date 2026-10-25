@@ -1,4 +1,5 @@
 import type { Evento } from '../../core/eventos/barramento';
+import { Revisao } from '../../core/modelo';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   arquivarCartao,
@@ -16,6 +17,7 @@ import {
   excluirErro,
   filaDeFrases,
   filaDoDia,
+  filaPorValor,
   fraseDoErro,
   historicoRevisoes,
   listarCartoes,
@@ -462,6 +464,41 @@ describe('dias com revisão nos últimos 7 (fatia 3)', () => {
     await revisar(outro, d.id, 'errei');
     relogio.avancar(2 * 3_600_000); // 01h30 de 24/09 em SP: o dia 23 é a penúltima marca
     expect(await diasComRevisao(outro)).toEqual([false, false, false, false, false, true, false]);
+  });
+});
+
+describe('Certeza na Revisão (AP-02)', () => {
+  it('guarda a certeza quando informada e não grava nada quando pulada', async () => {
+    const { repo, relogio } = await preparar();
+    const a = await criarCartaoManual(repo, { frente: 'a', verso: 'v' });
+    const b = await criarCartaoManual(repo, { frente: 'b', verso: 'v' });
+    relogio.avancar(DIA);
+    const com = await revisar(repo, a.id, 'errei', { certeza: 3 });
+    const sem = await revisar(repo, b.id, 'errei');
+    expect(com.revisao.certeza).toBe(3);
+    expect('certeza' in sem.revisao).toBe(false);
+    // Revisão antiga (sem o campo) continua válida no esquema; certeza fora de 1 a 3 não.
+    expect(Revisao.safeParse(sem.revisao).success).toBe(true);
+    expect(Revisao.safeParse({ ...sem.revisao, certeza: 2 }).success).toBe(true);
+    expect(Revisao.safeParse({ ...sem.revisao, certeza: 4 }).success).toBe(false);
+  });
+
+  it('errar com certeza 3 sobe o cartão na ordem de valor da vez seguinte; a data não muda', async () => {
+    const { repo, relogio } = await preparar();
+    const a = await criarCartaoManual(repo, { frente: 'a', verso: 'v' });
+    const b = await criarCartaoManual(repo, { frente: 'b', verso: 'v' });
+    relogio.avancar(DIA);
+    await revisar(repo, a.id, 'errei', { certeza: 3 });
+    await revisar(repo, b.id, 'errei', { certeza: 1 });
+    relogio.avancar(DIA);
+    const fila = await filaPorValor(repo);
+    expect(fila.map((c) => c.id)).toEqual([a.id, b.id]);
+    expect(fila[0]?.erroComCerteza).toBe(true);
+    expect(fila[1]?.erroComCerteza).toBeUndefined();
+    // As datas de Revisão ficam como o agendador deixou.
+    expect(fila.map((c) => c.proximaRevisao)).toEqual(
+      (await filaDoDia(repo)).map((c) => c.proximaRevisao),
+    );
   });
 });
 
