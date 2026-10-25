@@ -10,6 +10,7 @@ import { aderirEmLote, type ResultadoDoLote } from '../../dominios/acervo/adesao
 import {
   agrupar,
   filtrarEntradas,
+  NORMA_GRANDE,
   normaParecida,
   tamanhoLegivel,
   type ModoDeAgrupar,
@@ -66,8 +67,13 @@ export function Acervo() {
     const normas = (await r.colecao('normas').todosDoUsuario()).filter(
       (n) => n.excluidoEm === null,
     );
+    // Do item do acervo à norma que ele virou na biblioteca: é o que "Abrir" precisa.
+    const normaDe = new Map(
+      normas.flatMap((n) => (n.origemAcervo ? [[n.origemAcervo.id, n.id] as const] : [])),
+    );
     return {
-      adicionadas: new Set(normas.flatMap((n) => (n.origemAcervo ? [n.origemAcervo.id] : []))),
+      adicionadas: new Set(normaDe.keys()),
+      normaDe,
       coladas: normas.filter((n) => n.origemAcervo === undefined),
     };
   }, []);
@@ -189,6 +195,9 @@ export function Acervo() {
   const pendentesVisiveis = visiveis.filter((i) => !adicionadas?.has(i.id));
   const titulos = new Map(indice?.itens.map((i) => [i.id, i.titulo]));
   const falhados = resultado?.falhas.map((f) => f.id) ?? [];
+  // Quando só uma norma entrou, o aviso já leva a ela; com várias, cada linha tem o seu "Abrir".
+  const entraram = resultado ? [...resultado.adicionadas, ...resultado.jaAdicionadas] : [];
+  const abrirDaUnica = entraram.length === 1 ? minhas?.normaDe.get(entraram[0] ?? '') : undefined;
   const marcadosValidos = [...marcados].filter((id) => !adicionadas?.has(id));
   const tamanhoMarcado = indice
     ? indice.itens.filter((i) => marcadosValidos.includes(i.id)).reduce((s, i) => s + i.tamanho, 0)
@@ -290,7 +299,7 @@ export function Acervo() {
                     value={progresso.feitos}
                     max={progresso.total}
                   />
-                  {progresso.atual && progresso.atual.tamanho > 500_000 && (
+                  {progresso.atual && progresso.atual.tamanho > NORMA_GRANDE && (
                     <p className="dica">
                       Norma grande: salvar no aparelho leva alguns segundos. Pode continuar; nada
                       depende da internet.
@@ -311,11 +320,16 @@ export function Acervo() {
               {resultado && (
                 <div role="status" className="sucesso">
                   <p>
-                    {resultado.adicionadas.length + resultado.jaAdicionadas.length} adicionadas
+                    {entraram.length} {entraram.length === 1 ? 'adicionada' : 'adicionadas'}
                     {resultado.restantes.length > 0 &&
                       `; ${resultado.restantes.length} ficaram para depois`}
                     {resultado.falhas.length > 0 && `; ${resultado.falhas.length} falharam`}.
                   </p>
+                  {abrirDaUnica && (
+                    <Link to={`/biblioteca/normas/${abrirDaUnica}`} className="botao">
+                      Abrir
+                    </Link>
+                  )}
                   {resultado.falhas.length > 0 && (
                     <>
                       <ul className="lista-simples">
@@ -345,6 +359,12 @@ export function Acervo() {
                       const jaTem = adicionadas.has(i.id);
                       const escolhido = !jaTem && marcados.has(i.id);
                       const parecida = jaTem ? undefined : normaParecida(i, minhas.coladas);
+                      // O tamanho só aparece quando pesa (uma norma grande demora a gravar); no mais, é ruído.
+                      const detalhe = jaTem
+                        ? 'Já adicionada'
+                        : i.tamanho > NORMA_GRANDE
+                          ? tamanhoLegivel(i.tamanho)
+                          : undefined;
                       const subtitulos = i.vinculos
                         .filter((v) => modo === 'tipo' || v.disciplina === g.titulo)
                         .flatMap((v) => (v.subtitulo ? [v.subtitulo] : []));
@@ -366,11 +386,23 @@ export function Acervo() {
                               <strong>{i.titulo}</strong>
                               <span className="dica">
                                 {' '}
-                                {jaTem ? 'Já adicionada' : tamanhoLegivel(i.tamanho)}
-                                {subtitulos.length > 0 && ` · ${subtitulos.join(', ')}`}
+                                {detalhe}
+                                {subtitulos.length > 0 &&
+                                  `${detalhe === undefined ? '' : ' · '}${subtitulos.join(', ')}`}
                               </span>
                             </span>
                           </button>
+                          {jaTem && minhas.normaDe.has(i.id) && (
+                            <p className="item-acervo-disciplina">
+                              <Link
+                                to={`/biblioteca/normas/${minhas.normaDe.get(i.id) ?? ''}`}
+                                className="botao botao-texto"
+                                aria-label={`Abrir ${i.titulo}`}
+                              >
+                                Abrir
+                              </Link>
+                            </p>
+                          )}
                           {!jaTem && (
                             <p className="dica item-acervo-disciplina">
                               Disciplinas sugeridas:{' '}

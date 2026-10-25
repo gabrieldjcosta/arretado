@@ -112,6 +112,66 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect(screen.getByRole('group', { name: 'Infância' })).toBeInTheDocument();
   });
 
+  it('só mostra o tamanho da norma grande: o das pequenas é ruído', async () => {
+    const grande: ItemDoAcervo = {
+      ...item('grande'),
+      nos: [
+        {
+          endereco: 'art1',
+          categoria: 'normativo',
+          tipo: 'artigo',
+          rotulo: 'Art. 1º',
+          status: 'vigente',
+          confianca: 'alta',
+          trechos: [{ texto: 'x'.repeat(600_000) }],
+        },
+      ],
+    };
+    const f = await FonteEmMemoria.criar([{ item: item('lep') }, { item: grande }]);
+    await abrir('#/biblioteca/acervo', f);
+    expect(await screen.findByRole('button', { name: /^GRANDE/ })).toHaveTextContent(/\d+ KB/);
+    expect(screen.getByRole('button', { name: /^LEP/ })).not.toHaveTextContent(/\d+ (B|KB|MB)/);
+  });
+
+  it('depois de adicionar, "Abrir" leva à norma: no aviso, quando só uma entrou, e na linha dela', async () => {
+    const f = await fonte();
+    const { repo, usuario } = await abrir('#/biblioteca/acervo', f);
+    await usuario.click(await screen.findByRole('button', { name: /^SOLTA/ }));
+    await usuario.click(screen.getByRole('button', { name: /^Adicionar 1 / }));
+    const aviso = (await screen.findByText(/^1 adicionada\./)).closest('[role="status"]');
+    if (!(aviso instanceof HTMLElement)) throw new Error('sem o aviso');
+    const solta = (await repo.colecao('normas').todosDoUsuario()).find(
+      (n) => n.origemAcervo?.id === 'solta',
+    );
+    const destino = `#/biblioteca/normas/${solta?.id ?? ''}`;
+    // A lista de normas do aparelho chega um instante depois do aviso.
+    expect(await within(aviso).findByRole('link', { name: 'Abrir' })).toHaveAttribute(
+      'href',
+      destino,
+    );
+    expect(await screen.findByRole('link', { name: 'Abrir SOLTA' })).toHaveAttribute(
+      'href',
+      destino,
+    );
+    // As que não entraram não têm "Abrir"; ainda mostram as disciplinas sugeridas.
+    expect(screen.queryByRole('link', { name: /^Abrir (LEP|ECA)/ })).toBeNull();
+    expect(screen.getAllByRole('button', { name: /^Alterar disciplina de LEP/ })).not.toHaveLength(
+      0,
+    );
+  });
+
+  it('com várias adicionadas, o aviso não escolhe uma: cada linha tem o seu "Abrir"', async () => {
+    const f = await fonte();
+    const { usuario } = await abrir('#/biblioteca/acervo', f);
+    await usuario.click(await screen.findByRole('button', { name: 'Marcar todos que faltam' }));
+    await usuario.click(screen.getByRole('button', { name: /^Adicionar 3 / }));
+    await screen.findByText(/3 adicionadas/);
+    expect(screen.queryByRole('link', { name: 'Abrir' })).toBeNull();
+    for (const nome of ['Abrir LEP', 'Abrir ECA', 'Abrir SOLTA']) {
+      expect((await screen.findAllByRole('link', { name: nome })).length).toBeGreaterThan(0);
+    }
+  });
+
   it('avisa, sem bloquear, quando o item é uma norma já colada', async () => {
     const f = await FonteEmMemoria.criar([
       {
@@ -146,7 +206,7 @@ describe('Biblioteca › Acervo (3c)', () => {
     f.falhas.clear();
     await usuario.click(screen.getByRole('button', { name: 'Tentar de novo (1)' }));
     await waitFor(() => {
-      expect(screen.getByText(/^1 adicionadas/)).toBeInTheDocument();
+      expect(screen.getByText(/^1 adicionada\./)).toBeInTheDocument();
     });
     expect(screen.queryByRole('button', { name: /Tentar de novo/ })).not.toBeInTheDocument();
   });
