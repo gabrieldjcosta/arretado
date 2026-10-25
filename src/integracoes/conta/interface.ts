@@ -1,5 +1,6 @@
 // Porta de conta e login (F4-A, A1; plano em docs/planos/f4a-contas.md §4).
 // As telas conhecem só esta interface; o Supabase entra no pacote A3 como implementação isolada.
+import type { ServidorDeSincronizacao } from '../../core/sincronizacao';
 
 export interface SessaoDeConta {
   /** `auth.users.id`: vira o `usuarioId` do banco da conta. */
@@ -37,6 +38,10 @@ export interface ServicoDeConta {
   concluirRetorno(url: string): Promise<SessaoDeConta | null>;
   /** Registra no servidor a versão dos termos aceita (função `arretado.aceitar_termos`). */
   aceitarTermos(versao: string): Promise<void>;
+  /** Registra o aceite da sincronização (v4, `arretado.aceitar_sincronizacao`); recusa se a conta não foi liberada. */
+  aceitarSincronizacao(versao: string): Promise<void>;
+  /** Porta de envio do log (F4-B, B2): chama `arretado.enviar_lote` com a sessão atual. */
+  servidorDeSincronizacao(): ServidorDeSincronizacao;
   sair(): Promise<void>;
   excluirConta(): Promise<void>;
   /** Cópias cifradas na nuvem da conta com sessão (A6); sem sessão ou sem rede, recusam. */

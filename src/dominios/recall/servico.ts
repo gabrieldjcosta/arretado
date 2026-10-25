@@ -4,14 +4,23 @@ import { dataCivil, somarDias } from '../../core/datas';
 import type {
   Cartao,
   Erro,
+  Faixa,
   Frase,
   Intervalo,
   RespostaFrase,
   RespostaRevisao,
   Revisao,
 } from '../../core/modelo';
-import type { Alteracoes, Dados, Pagina, Repositorio } from '../../core/persistencia';
+import {
+  LIMITE_MAXIMO_PAGINA,
+  type Alteracoes,
+  type Dados,
+  type Pagina,
+  type Repositorio,
+} from '../../core/persistencia';
 import { agendar, agendarFrase } from './agendamento';
+import { provaPorVir } from './prova';
+import { ordenarPorValor } from './ordem-de-valor';
 import { ACAO_RECOMENDADA, completude, sugerirCausa } from './causa';
 
 export function hoje(repo: Repositorio): string {
@@ -434,6 +443,63 @@ export async function filaDoDia(repo: Repositorio, maximo = 1_000): Promise<Cart
     );
 }
 
+/** Um cartão da fila já com a faixa do Ponto (ou nenhuma), pronto para `ordenarPorValor`. */
+export type CartaoComFaixa = Cartao & { faixa?: Faixa; erroComCerteza?: boolean };
+
+/**
+ * A fila de hoje do mais para o menos valioso (AP-01). Mesmos cartões de `filaDoDia`, outra ordem;
+ * nenhuma data de Revisão é tocada. O Hoje e o Drill chamam esta, e por isso o lote que um mostra
+ * é o que o outro entrega.
+ */
+export async function filaPorValor(repo: Repositorio): Promise<CartaoComFaixa[]> {
+  const fila = await filaDoDia(repo);
+  const faixas = new Map<string, Faixa | undefined>();
+  for (const id of new Set(fila.flatMap((c) => (c.pontoId ? [c.pontoId] : [])))) {
+    faixas.set(id, (await repo.colecao('pontos').obter(id))?.faixa);
+  }
+  const hipercorrecao = await cartoesErradosComCerteza(repo);
+  const comFaixa = fila.map((c): CartaoComFaixa => {
+    const faixa = c.pontoId ? faixas.get(c.pontoId) : undefined;
+    return {
+      ...c,
+      ...(faixa ? { faixa } : {}),
+      ...(hipercorrecao.has(c.id) ? { erroComCerteza: true } : {}),
+    };
+  });
+  return ordenarPorValor(comFaixa, hoje(repo));
+}
+
+/**
+ * Quantas Revisões recentes a consulta de certeza olha (a mais nova de cada cartão decide): uma
+ * página, o máximo que `listarPagina` entrega. Pedir mais seria cortado em silêncio.
+ */
+const REVISOES_RECENTES = LIMITE_MAXIMO_PAGINA;
+
+/**
+ * Cartões cuja Revisão mais recente foi um Errei com certeza 3: quem errou tendo certeza é quem mais
+ * corrige depois do feedback (AP-02), então volta na frente na Sessão seguinte. Só olha as
+ * `REVISOES_RECENTES` últimas Revisões; sem certeza informada, nada muda.
+ */
+async function cartoesErradosComCerteza(repo: Repositorio): Promise<Set<string>> {
+  const u = repo.ctx.usuarioId;
+  const p: Pagina<Revisao> = await repo.colecao('revisoes').listarPagina({
+    indice: '[usuarioId+em]',
+    de: [u, ''],
+    ate: [u, '\uffff'],
+    ordem: 'desc',
+    limite: REVISOES_RECENTES,
+    cursor: null,
+  });
+  const vistos = new Set<string>();
+  const marcados = new Set<string>();
+  for (const r of p.itens) {
+    if (vistos.has(r.cartaoId)) continue;
+    vistos.add(r.cartaoId);
+    if (r.resposta === 'errei' && r.certeza === 3) marcados.add(r.cartaoId);
+  }
+  return marcados;
+}
+
 /**
  * Os últimos `janela` dias (padrão 7; do mais antigo ao de hoje) em que houve Revisão, pela data
  * civil local gravada na revisão. Janela móvel: nunca zera na virada da semana. Consulta, não entidade.
@@ -477,14 +543,14 @@ export async function revisar(
   repo: Repositorio,
   cartaoId: string,
   resposta: RespostaRevisao,
-  opcoes: { duracaoMs?: number } = {},
+  opcoes: { duracaoMs?: number; certeza?: 1 | 2 | 3 } = {},
 ): Promise<{ cartao: Cartao; revisao: Revisao }> {
   const dia = hoje(repo);
   const resultado = await repo.transacao(async () => {
     const cartao = await repo.colecao('cartoes').obter(cartaoId);
     if (!cartao) throw new Error('Este cartão não existe mais.');
     if (cartao.estado !== 'ativo') throw new Error('Este cartão não está na fila.');
-    const a = agendar(cartao, resposta, dia);
+    const a = agendar(cartao, resposta, dia, await provaPorVir(repo, dia, cartao.pontoId));
     const em = repo.ctx.agora().toISOString();
     const revisao = await repo.colecao('revisoes').criar({
       cartaoId,
@@ -497,6 +563,7 @@ export async function revisar(
       proximaDepois: a.proximaDepois,
       atrasoDias: a.atrasoDias,
       ...(opcoes.duracaoMs !== undefined ? { duracaoMs: Math.round(opcoes.duracaoMs) } : {}),
+      ...(opcoes.certeza !== undefined ? { certeza: opcoes.certeza } : {}),
     });
     const atualizado = await repo.colecao('cartoes').atualizar(cartaoId, {
       caixa: a.caixaDepois,
@@ -613,7 +680,7 @@ export async function revisarFrase(
     const frase = await repo.colecao('frases').obter(fraseId);
     if (!frase) throw new Error('Esta frase não existe mais.');
     if (frase.estado !== 'ativa') throw new Error('Esta frase não está na fila.');
-    const a = agendarFrase(frase, resposta, dia);
+    const a = agendarFrase(frase, resposta, dia, await provaPorVir(repo, dia, frase.pontoId));
     const em = repo.ctx.agora().toISOString();
     const revisao = await repo.colecao('revisoesFrase').criar({
       fraseId,

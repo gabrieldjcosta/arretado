@@ -4,9 +4,11 @@ import { Dialogo } from '../componentes/Dialogo';
 import { lembrarDaChegada } from './regras';
 
 /**
- * A Chegada (D-D9): a folha de orientação da primeira vez no aparelho, sobre o Hoje. Três caminhos que
- * levam a telas que já existem e "Agora não". O nome escrito é o do cabeçalho (`Marca`, na frequência
- * dela): aqui ele não se repete. Grava ao aparecer, e a Entrada do Dia não abre no mesmo Dia.
+ * A Chegada (D-D9): a folha de orientação da primeira vez no aparelho, sobre o Hoje. O caminho principal
+ * é escolher o concurso (da folha a uma norma aberta em três toques); ler uma norma e registrar um erro
+ * são os outros dois, a trilha vem em texto, e "Agora não" fecha. O nome escrito é o do cabeçalho
+ * (`Marca`, na frequência dela): aqui ele não se repete. Grava ao aparecer, e a Entrada do Dia não abre
+ * no mesmo Dia.
  */
 export function Chegada({ dia }: { dia: string }) {
   const [aberto, setAberto] = useState(true);
@@ -27,16 +29,19 @@ export function Chegada({ dia }: { dia: string }) {
     >
       <div className="chegada-acoes">
         <Link
-          to="/recall/registrar"
+          to="/comecar"
           className="botao principal"
           ref={(el) => {
             principal.current = el;
           }}
         >
-          Registrar um erro
+          Escolher meu concurso
         </Link>
         <Link to="/biblioteca" className="botao">
           Ler uma norma
+        </Link>
+        <Link to="/recall/registrar" className="botao">
+          Registrar um erro
         </Link>
         <Link to="/plano/onboarding" className="botao botao-texto chegada-trilha">
           <b>Montar uma trilha</b>

@@ -3,12 +3,16 @@ import type { Repositorio } from '../persistencia';
 /** Versão da política de privacidade em vigor com conta (docs/politica/politica-de-privacidade-v3.md). */
 export const VERSAO_POLITICA = 'v3';
 
-/** O que a pessoa aceitou: entrar na conta, ou guardar cópia cifrada na nuvem. */
-export type EscopoDeConsentimento = 'login' | 'backup-nuvem';
+/** O que a pessoa aceitou: entrar na conta, guardar cópia cifrada na nuvem, ou sincronizar entre aparelhos. */
+export type EscopoDeConsentimento = 'login' | 'backup-nuvem' | 'sincronizar';
+
+/** Política que cobre a sincronização entre aparelhos (F4-B); ainda não publicada, então só vale com a v4. */
+export const VERSAO_POLITICA_SINCRONIZACAO = 'v4';
 
 // O modelo (Usuario.consentimentos) não tem campo de escopo e o esquema não sobe aqui: o escopo
 // vai junto da versão, "v3:login" (cabe nos 20 caracteres de `versaoPolitica`).
-const chave = (escopo: EscopoDeConsentimento) => `${VERSAO_POLITICA}:${escopo}`;
+const chave = (escopo: EscopoDeConsentimento) =>
+  `${escopo === 'sincronizar' ? VERSAO_POLITICA_SINCRONIZACAO : VERSAO_POLITICA}:${escopo}`;
 
 async function usuarioDoAparelho(repo: Repositorio) {
   const [usuario] = await repo.colecao('usuarios').todosDoUsuario();

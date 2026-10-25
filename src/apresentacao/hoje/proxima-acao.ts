@@ -4,6 +4,8 @@ import type { DataCivil, Leitura, Norma } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import type { EscolherProximaAcao } from '../../dominios/hoje/contrato';
 import { decidirProximaAcao, type EntradaDaProximaAcao } from '../../dominios/hoje/proxima-acao';
+import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
+import { minutosDoLote } from '../../dominios/recall/ordem-de-valor';
 import { carregarFila } from '../../dominios/tarefas';
 import { cicloAtivo, posicaoDoCiclo } from '../../dominios/ciclos';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
@@ -90,18 +92,25 @@ export interface EntradasDoHoje {
 }
 
 export async function reunirEntradas(repo: Repositorio, hoje: DataCivil): Promise<EntradasDoHoje> {
-  const [cartoesVencidos, frasesVencidas, salva, { fila }, ciclo] = await Promise.all([
-    vencidos(repo, 'cartoes', hoje),
-    vencidos(repo, 'frases', hoje),
-    leituraSalva(repo),
-    carregarFila(repo, hoje),
-    blocoAtual(repo),
-  ]);
+  const [cartoesVencidos, frasesVencidas, salva, { fila }, ciclo, preferencias] = await Promise.all(
+    [
+      vencidos(repo, 'cartoes', hoje),
+      vencidos(repo, 'frases', hoje),
+      leituraSalva(repo),
+      carregarFila(repo, hoje),
+      blocoAtual(repo),
+      obterPreferencias(repo),
+    ],
+  );
   const primeira = fila[0];
   return {
     entrada: {
       cartoesVencidos,
       frasesVencidas,
+      minutosDaRodada: minutosDoLote(
+        Math.min(cartoesVencidos, cotaDiaria(preferencias)) +
+          Math.min(frasesVencidas, cotaDiaria(preferencias)),
+      ),
       ...(ciclo ? { ciclo } : {}),
       ...(salva ? { leitura: salva.leitura } : {}),
       ...(primeira

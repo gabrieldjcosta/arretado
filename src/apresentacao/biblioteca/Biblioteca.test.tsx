@@ -94,14 +94,20 @@ describe('Biblioteca › Normas (9.5)', () => {
     );
   });
 
-  it('vazio sem plano: só acervo e importar, sem botão de edital', async () => {
+  it('vazio sem plano: "Escolher meu concurso" é o principal, com o acervo e a importação ao lado, sem botão de edital', async () => {
     const { repo } = await repositorioDeTeste();
     await abrirComAcervo(repo);
 
     await screen.findByRole('heading', { name: 'Nenhuma norma ainda' });
-    expect(screen.getByRole('link', { name: 'Escolher no acervo' })).toHaveClass('principal');
-    expect(screen.getByRole('link', { name: 'Importar norma' })).toBeInTheDocument();
+    // A mesma porta da Chegada e do Hoje vazio.
+    const concurso = screen.getByRole('link', { name: 'Escolher meu concurso' });
+    expect(concurso).toHaveAttribute('href', '#/comecar');
+    expect(concurso).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Escolher no acervo' })).not.toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Importar norma' })).not.toHaveClass('principal');
     expect(screen.queryByRole('link', { name: /Tudo do edital/ })).not.toBeInTheDocument();
+    // Quem chega aqui pela primeira vez não precisa saber de que órgão são as leis.
+    expect(screen.queryByText(/ALESP/)).not.toBeInTheDocument();
   });
 
   it('vazio com plano do edital que o acervo conhece: "Tudo do edital de <nome>"', async () => {
@@ -114,6 +120,8 @@ describe('Biblioteca › Normas (9.5)', () => {
       '#/biblioteca/acervo?tudo=1',
     );
     expect(screen.getByRole('link', { name: 'Escolher no acervo' })).not.toHaveClass('principal');
+    // Quem já tem edital no plano escolheu o concurso: o atalho dele é o do edital.
+    expect(screen.queryByRole('link', { name: 'Escolher meu concurso' })).not.toBeInTheDocument();
   });
 
   it('vazio com edital sem vínculo no acervo: sem botão de edital', async () => {
