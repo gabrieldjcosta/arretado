@@ -22,7 +22,7 @@ describe('radar de editais', () => {
   it('primeira leitura é linha de base e não alerta', () => {
     const r = comparar({}, [{ fonte, links: ['https://x.org/a.pdf'] }], '2026-10-25');
     expect(r.fila).toEqual([]);
-    expect(r.novoEstado[fonte.id].links).toEqual(['https://x.org/a.pdf']);
+    expect(r.novoEstado[fonte.id]?.links).toEqual(['https://x.org/a.pdf']);
   });
 
   it('link novo vira retificado (edital) ou novo (indice)', () => {
@@ -33,7 +33,7 @@ describe('radar de editais', () => {
       url: 'https://x.org/ret.pdf',
     });
     const indice = { ...fonte, tipo: 'indice' as const };
-    expect(comparar(estado, [{ ...leitura, fonte: indice }], '2026-10-25').fila[0].tipo).toBe(
+    expect(comparar(estado, [{ ...leitura, fonte: indice }], '2026-10-25').fila[0]?.tipo).toBe(
       'novo',
     );
   });
