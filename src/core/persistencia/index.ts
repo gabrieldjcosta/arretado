@@ -28,7 +28,7 @@ export {
   type Dados,
   type Pagina,
 } from './colecao';
-export type { Contexto } from './contexto';
+export { EscritaBloqueada, type Contexto, type TravaDeEscrita } from './contexto';
 export { desfazerAlteracao, reconstruirDoLog, type Estado } from './log';
 export {
   carimboDoLote,

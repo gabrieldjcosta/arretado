@@ -8,11 +8,13 @@ export interface OpcoesDoAgendador {
   /** Primeira espera depois de uma falha; dobra até `maxEsperaMs`. */
   esperaInicialMs?: number;
   maxEsperaMs?: number;
+  /** Cada rodada que rejeitou (a tela mostra a causa como Problema, B4). */
+  aoFalhar?: (falha: unknown) => void;
 }
 
 export interface Agendador {
-  /** Pede um envio; vários pedidos seguidos viram um só. */
-  pedir(): void;
+  /** Pede um envio; vários pedidos seguidos viram um só. `agora` não espera o atraso de juntar. */
+  pedir(agora?: boolean): void;
   /** Cancela o que está agendado e ignora pedidos futuros. */
   parar(): void;
 }
@@ -28,7 +30,11 @@ export function criarAgendador(opcoes: OpcoesDoAgendador): Agendador {
   let falhas = 0;
 
   const agendar = (ms: number) => {
-    if (parado || timer !== null) return;
+    if (parado) return;
+    if (timer !== null) {
+      if (ms > 0) return;
+      clearTimeout(timer); // "Sincronizar agora" encurta um atraso já marcado
+    }
     timer = setTimeout(() => {
       timer = null;
       void rodar();
@@ -45,9 +51,10 @@ export function criarAgendador(opcoes: OpcoesDoAgendador): Agendador {
     try {
       await opcoes.executar();
       falhas = 0;
-    } catch {
+    } catch (falha: unknown) {
       falhas += 1;
       repetir = true;
+      opcoes.aoFalhar?.(falha);
     } finally {
       rodando = false;
     }
@@ -58,10 +65,10 @@ export function criarAgendador(opcoes: OpcoesDoAgendador): Agendador {
   };
 
   return {
-    pedir() {
+    pedir(agora = false) {
       if (parado) return;
       if (rodando) repetir = true;
-      else agendar(atraso);
+      else agendar(agora ? 0 : atraso);
     },
     parar() {
       parado = true;

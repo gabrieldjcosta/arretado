@@ -70,6 +70,10 @@ export function RecallInicio() {
           para="/recall/registrar"
         />
       )}
+      <p className="dica">
+        <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no texto
+        da lei (piloto).
+      </p>
       {vencidos > cota && (
         <p className="dica">
           Hoje: {lote} de {vencidos}. Os outros esperam; nada é apagado.

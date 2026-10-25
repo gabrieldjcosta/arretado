@@ -42,7 +42,8 @@ export function montarCSP(origens: readonly string[] = ORIGENS_DE_CONEXAO): stri
     "base-uri 'none'",
     "form-action 'none'",
     "require-trusted-types-for 'script'",
-    'trusted-types dompurify',
+    // `offline`: só o endereço fixo do service worker (src/offline/registro.ts).
+    'trusted-types dompurify offline',
   ].join('; ');
 }
 
@@ -63,6 +64,9 @@ export function cabecalhosHospedagem(csp: string = CSP): string {
     '/assets/*',
     '  Cache-Control: public, max-age=31536000, immutable',
     '/index.html',
+    '  Cache-Control: no-cache',
+    // O navegador confere o service worker a cada abertura: nunca pode vir de um cache HTTP velho.
+    '/sw.js',
     '  Cache-Control: no-cache',
     '',
   ].join('\n');
