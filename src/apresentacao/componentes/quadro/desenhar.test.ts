@@ -230,4 +230,27 @@ describe('desenharParte', () => {
     expect(await resultado).toBe(false);
     expect(c.caneta.getAttribute('transform')).toBe(parada);
   });
+
+  it('a página que recarrega no meio do traço (documento inativo) para sem lançar', async () => {
+    const c = novasCamadas();
+    const resultado = desenharParte(c, parte('tronco'), 'normal', new AbortController().signal);
+    await vi.advanceTimersByTimeAsync(300);
+    Object.assign(window.SVGElement.prototype, {
+      getPointAtLength: () => {
+        throw new DOMException('The element is in an inactive document.', 'InvalidStateError');
+      },
+    });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(await resultado).toBe(false);
+  });
+
+  it('um erro que não é de documento inativo continua sendo erro', async () => {
+    Object.assign(window.SVGElement.prototype, {
+      getPointAtLength: () => {
+        throw new TypeError('geometria quebrada');
+      },
+    });
+    void desenharParte(novasCamadas(), parte('tronco'), 'normal', new AbortController().signal);
+    await expect(vi.advanceTimersByTimeAsync(3000)).rejects.toThrow('geometria quebrada');
+  });
 });

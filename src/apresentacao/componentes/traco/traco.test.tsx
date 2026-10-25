@@ -197,6 +197,32 @@ describe('tracar (o traço de seleção)', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(ambiente.animacoes).toHaveLength(0);
   });
+
+  it('a página que recarrega no meio do traço (documento inativo) o encerra sem lançar', async () => {
+    const { svg } = itemComTraco();
+    tracar(svg, 'normal');
+    await vi.advanceTimersByTimeAsync(50);
+    Object.assign(window.SVGElement.prototype, {
+      getPointAtLength: () => {
+        throw new DOMException('The element is in an inactive document.', 'InvalidStateError');
+      },
+    });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(svg.childNodes).toHaveLength(0);
+    expect(svg.hasAttribute('data-ativo')).toBe(false);
+    expect(ambiente.animacoes).toHaveLength(0);
+  });
+
+  it('um erro que não é de documento inativo continua sendo erro', async () => {
+    const { svg } = itemComTraco();
+    tracar(svg, 'normal');
+    Object.assign(window.SVGElement.prototype, {
+      getPointAtLength: () => {
+        throw new TypeError('geometria quebrada');
+      },
+    });
+    await expect(vi.advanceTimersByTimeAsync(1000)).rejects.toThrow('geometria quebrada');
+  });
 });
 
 describe('TracoDeSelecao', () => {

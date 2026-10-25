@@ -1,7 +1,7 @@
 // O traço de seleção (D-D7, "A caneta que desenha"): uma linha fina que se desenha em volta do item
 // que acabou de ser escolhido, com a ponta de luz à frente, some e deixa o item como estava. Imperativo
 // de propósito: o React só dá o <svg> vazio dentro do item, e esta função enche e esvazia.
-import { curva, movimentoAgora, type Movimento } from '../../movimento';
+import { curva, documentoInativo, movimentoAgora, type Movimento } from '../../movimento';
 
 const NS = 'http://www.w3.org/2000/svg';
 /** O <svg> é 3 px maior que o item de cada lado: sobra lugar para a ponta de luz e o contorno dela. */
@@ -84,7 +84,14 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
   const passo = (agora: number) => {
     const progresso = curva(Math.min(1, (agora - inicio) / DESENHA_MS));
     fio.style.strokeDashoffset = String(comprimento * (1 - progresso));
-    pousar(progresso * comprimento);
+    try {
+      pousar(progresso * comprimento);
+    } catch (erro) {
+      // A página recarregou no meio do traço: o quadro chegou depois de o documento ficar inativo.
+      if (!documentoInativo(erro)) throw erro;
+      limpar();
+      return;
+    }
     if (agora - inicio < DESENHA_MS) {
       quadro = requestAnimationFrame(passo);
       return;
