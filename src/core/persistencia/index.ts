@@ -16,6 +16,7 @@ export {
   esquemaDaVersao,
   VERSAO_ESQUEMA,
   type Alteracao,
+  type Conflito,
   type MotivoFechamento,
 } from './banco';
 export {
