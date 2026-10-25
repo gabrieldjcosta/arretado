@@ -189,6 +189,33 @@ test('mapa: a chamada no Leitor, os quadrados por faixa, o próximo trecho e a v
   await expect(page.locator('[data-endereco="art2"]')).toBeVisible();
 });
 
+test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva ao Leitor', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await adicionarEAbrir(page);
+  // Põe o art. 3º perto do alto e espera a posição ser guardada: o Hoje passa a ter leitura salva.
+  await page.locator('[data-endereco="art3"]').evaluate((el) => {
+    window.scrollBy(0, el.getBoundingClientRect().top - 140);
+  });
+  await page.waitForTimeout(1200);
+  // No celular o Leitor não tem a barra com o "Hoje": vai-se pela rota.
+  await page.goto('/#/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  const agora = page.getByRole('region', { name: 'Agora' });
+  await expect(agora.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
+  // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º.
+  const linha = page.locator('.agora-no-mapa');
+  await expect(linha).toContainText('Agora no mapa: cai muito, uns 1 min.');
+  const caixa = await linha.getByRole('link', { name: 'Ler Art. 2º' }).boundingBox();
+  expect(caixa?.height).toBeGreaterThanOrEqual(44);
+  await expect(page.getByText(/atrasad|pendente|dívida|faltam/i)).toHaveCount(0);
+  await semViolacoes(page);
+  await linha.getByRole('link', { name: 'Ler Art. 2º' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  await expect(page.locator('[data-endereco="art2"]')).toBeInViewport();
+});
+
 test.describe('sem rede', () => {
   // Os pedidos abortados viram "Failed to load resource" no console: é o que se testa.
   test.use({ permitirFalhasConsole: true });
