@@ -37,11 +37,34 @@ const linhasNaTela = (page: Page) => page.locator('.dispositivo');
 /** O ⋯ do modo foco: a única coisa à vista além do texto. */
 const maisDoFoco = (page: Page) => page.getByRole('button', { name: 'Mais ações do foco' });
 
-/** Um controle da bandeja do foco; abre a bandeja (o ⋯) se ele ainda não está à vista. */
+/** O "Mais" da barra do celular (menos de 700 px), onde moram Filtrar e Ações fora do modo foco. */
+const maisDoLeitor = (page: Page) => page.getByRole('button', { name: /^Mais(\.|$)/ });
+
+/** O celular (menos de 700 px): a barra do Leitor é a de uma linha, e as abas das áreas saem da norma. */
+const noCelular = (page: Page) => (page.viewportSize()?.width ?? Infinity) < 700;
+
+/** As abas das áreas, fora do modo foco: à vista, menos no celular, onde a norma as troca pela barra do Leitor. */
+const abasForaDoFoco = (page: Page, areas: Locator) =>
+  noCelular(page) ? expect(areas).toBeHidden() : expect(areas).toBeVisible();
+
+/**
+ * Sai da norma para a Biblioteca sem mexer na rolagem (sair grava a posição). Com as abas à vista, é o
+ * toque nelas; no celular elas saem da norma, e a saída sem rolar é o "voltar" do aparelho.
+ */
+async function sairParaABiblioteca(page: Page) {
+  if (noCelular(page)) await page.goBack();
+  else await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+}
+
+/**
+ * Um controle da bandeja do foco; abre a bandeja (o ⋯) se ele ainda não está à vista. Fora do modo foco
+ * no celular, Filtrar e Ações moram no "Mais" da barra, que abre no lugar do ⋯.
+ */
 async function naBandejaDoFoco(page: Page, nome: string | RegExp) {
   const botao = page.getByRole('button', { name: nome, exact: typeof nome === 'string' });
-  if (!(await botao.isVisible()) && (await maisDoFoco(page).isVisible())) {
-    await maisDoFoco(page).click();
+  if (!(await botao.isVisible())) {
+    if (await maisDoFoco(page).isVisible()) await maisDoFoco(page).click();
+    else if (await maisDoLeitor(page).isVisible()) await maisDoLeitor(page).click();
   }
   return botao;
 }
@@ -426,11 +449,11 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   await normas.getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
 
-  // Sai pela navegação das áreas (sempre à vista) com o art. 41 no alto da tela.
+  // Sai pelas abas das áreas (no celular, pelo "voltar" do aparelho) com o art. 41 no alto da tela.
   const art41 = page.locator('[data-endereco="art41"]');
   await rolarAte(page, art41);
   await alinharNoAlto(page, art41);
-  await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await sairParaABiblioteca(page);
   await expect(continuar).toBeVisible();
   await abrirTodasAsNormas(page);
   await expect(normas.getByRole('link', { name: /LEP/ })).toContainText('Última leitura:');
@@ -502,7 +525,7 @@ test('mudar o tamanho do texto fora da norma não perde a posição, e a proced�
   const art41 = page.locator('[data-endereco="art41"]');
   await rolarAte(page, art41);
   await alinharNoAlto(page, art41);
-  await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await sairParaABiblioteca(page);
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art41');
 
   // O tamanho muda em Conta › Aparência (a barra do leitor não acompanha a rolagem).
@@ -633,7 +656,7 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   });
   await page.waitForTimeout(1200);
   // Sair grava a posição; a Biblioteca diz onde continuar e quanto falta, no mesmo botão de sempre.
-  await page.getByRole('link', { name: 'Biblioteca' }).first().click();
+  await sairParaABiblioteca(page);
   const agora = page.getByRole('region', { name: 'Agora' });
   await expect(agora.getByRole('heading')).toContainText('Continuar a leitura no');
   await expect(agora).toContainText(/cerca de \d+ min/);
@@ -760,7 +783,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await alinharNoAlto(page, art60);
   await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeFocused();
-  await expect(areas).toBeVisible();
+  await abasForaDoFoco(page, areas);
   await expect(page).not.toHaveURL(/foco=/);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art60');
@@ -769,7 +792,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await entrarNoFocoCorrido(page);
   await expect(areas).toBeHidden();
   await page.goBack();
-  await expect(areas).toBeVisible();
+  await abasForaDoFoco(page, areas);
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
   await page.goForward();
@@ -793,7 +816,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art105');
   // Recarregar não perde a entrada do histórico: sair volta a ela, na mesma posição.
   await sairDoFocoPelaBandeja(page);
-  await expect(areas).toBeVisible();
+  await abasForaDoFoco(page, areas);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
   await expect(page.locator('.lido-ate')).toContainText('Lido até Art. 105');
 
@@ -823,7 +846,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await page.keyboard.press('Control+f');
   await page.evaluate(() => new Promise((resolver) => requestAnimationFrame(resolver)));
   expect(page.url()).not.toMatch(/foco=/);
-  await expect(areas).toBeVisible();
+  await abasForaDoFoco(page, areas);
 
   // No fim da norma, a página encurta sem a moldura: o mesmo dispositivo continua no alto, no
   // mesmo ponto, ao entrar e ao sair.
@@ -1348,7 +1371,11 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
 
   // O grupo fixo ganhou um botão: com quatro, cabe na tela (quebra em duas linhas, se preciso).
   const grupo = page.locator('.acoes-leitor');
-  await expect(page.getByRole('button', { name: 'Filtrar', exact: true })).toBeVisible();
+  await expect(
+    noCelular(page)
+      ? maisDoLeitor(page)
+      : page.getByRole('button', { name: 'Filtrar', exact: true }),
+  ).toBeVisible();
   const caixa = await grupo.boundingBox();
   const largura = page.viewportSize()?.width ?? 0;
   expect(caixa).not.toBeNull();
@@ -1383,7 +1410,12 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
       return noFim || Math.abs((await distanciaDoAlto(secao)) - antes) < 2;
     })
     .toBe(true);
-  await expect(page.getByRole('button', { name: /^Filtrado: estrelados/ })).toBeVisible();
+  // No celular o filtro ligado se mostra no anel do "Mais" (o item "Filtrado" está dentro dele).
+  await expect(
+    noCelular(page)
+      ? page.getByRole('button', { name: 'Mais. Filtrado: estrelados' })
+      : page.getByRole('button', { name: /^Filtrado: estrelados/ }),
+  ).toBeVisible();
   await semViolacoes(page);
   await naoTemLargura();
 
@@ -1438,7 +1470,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await rolarAteExistir(page, artigo);
   await alinharNoAlto(page, artigo);
   const alturaAntes = await distanciaDoAlto(artigo);
-  await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+  await apertar(await naBandejaDoFoco(page, /^Ações/), toque);
   const dialogo = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(dialogo).toBeVisible();
   await expect(dialogo.getByText('art. 9º-A, LEP', { exact: true })).toBeVisible();
@@ -1479,7 +1511,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await naoTemLargura();
 
   // O filtro "com erro vinculado" acha o artigo.
-  await apertar(page.getByRole('button', { name: /^(Filtrar|Filtrado)/ }), toque);
+  await apertar(await naBandejaDoFoco(page, /^(Filtrar|Filtrado)/), toque);
   const filtro = page.getByRole('dialog', { name: 'Filtrar a norma' });
   await filtro.getByRole('radio', { name: 'Só com erro vinculado' }).check();
   await apertar(filtro.getByRole('button', { name: 'Mostrar', exact: true }), toque);
@@ -1488,7 +1520,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
 
   // No modo foco, o botão está no grupo e abre as mesmas ações, sem alargar a página.
   await entrarNoFocoCorrido(page, toque);
-  await apertar(await naBandejaDoFoco(page, 'Ações'), toque);
+  await apertar(await naBandejaDoFoco(page, /^Ações/), toque);
   const emFoco = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(emFoco).toBeVisible();
   await expect(emFoco.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
@@ -1625,7 +1657,7 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeHidden();
   await expect(areas).toBeHidden();
   await page.keyboard.press('Escape');
-  await expect(areas).toBeVisible();
+  await abasForaDoFoco(page, areas);
   await expect(page).not.toHaveURL(/foco=/);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
 
@@ -1725,7 +1757,7 @@ test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela seg
 
   // Estrelar e corrigir pelas ações do dispositivo.
   const abrirAcoes = async () => {
-    await apertar(page.getByRole('button', { name: 'Ações', exact: true }), toque);
+    await apertar(await naBandejaDoFoco(page, /^Ações/), toque);
     const dialogo = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
     await expect(dialogo).toBeVisible();
     return dialogo;
@@ -1885,9 +1917,11 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com a caneta deitada
   }
 
   // O dock: Buscar, Filtrar, Ações e Modo foco numa só barra sólida (o contrato proíbe vidro desfocado
-  // atrás de texto); "Lido até aqui" fica fora.
+  // atrás de texto); "Lido até aqui" fica fora. No celular, Filtrar e Ações moram no "Mais".
   const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
-  await expect(dock.getByRole('button')).toHaveText(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
+  await expect(dock.getByRole('button')).toHaveText(
+    noCelular(page) ? ['Buscar', 'Modo foco', 'Mais'] : ['Buscar', 'Filtrar', 'Ações', 'Modo foco'],
+  );
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
   const barra = await dock.evaluate((el) => {
     const s = getComputedStyle(el);

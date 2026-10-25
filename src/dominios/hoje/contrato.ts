@@ -19,7 +19,7 @@ export interface ProximaAcao {
 
 /** Um dos três começos concretos do estado vazio (nenhum material ainda). */
 export interface ComecoSugerido {
-  id: 'adicionar_material' | 'escolher_materia' | 'sessao_curta';
+  id: 'escolher_concurso' | 'ler_norma' | 'registrar_erro';
   rotulo: string;
   /** Rota do app que o começo abre. */
   para: string;

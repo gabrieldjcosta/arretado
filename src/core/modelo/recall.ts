@@ -177,5 +177,7 @@ export const Revisao = z.strictObject({
   proximaDepois: DataCivil,
   atrasoDias: z.int().min(0),
   duracaoMs: z.int().min(0).optional(),
+  /** Quanta certeza havia antes de ver a resposta: 1 chutando, 2 acho que sei, 3 tenho certeza (AP-02). */
+  certeza: z.int().min(1).max(3).optional(),
 });
 export type Revisao = z.infer<typeof Revisao>;

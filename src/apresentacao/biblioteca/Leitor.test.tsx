@@ -11,6 +11,7 @@ import {
   marcarEditadoAMao,
   publicarVersao,
 } from '../../dominios/legislacao/servico';
+import { instalarMatchMedia } from '../../testes/movimento';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -2397,5 +2398,166 @@ describe('Ponto de luz no Leitor (P4)', () => {
       await screen.findByText(/Segundo artigo/);
       expect(estruturaNaTela()).toBeNull();
     });
+  });
+});
+
+describe('barra do leitor no celular (menos de 700 px)', () => {
+  afterEach(() => {
+    instalarMatchMedia();
+    delete document.documentElement.dataset.leitor;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  /** O jsdom não tem `matchMedia`: uma janela de `px` responde às consultas de largura mínima e máxima. */
+  function janelaDe(px: number) {
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: (consulta: string) => {
+        const limite = Number(/(\d+)px/.exec(consulta)?.[1] ?? NaN);
+        return {
+          matches: consulta.includes('max-width') ? px <= limite : px >= limite,
+          media: consulta,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+        };
+      },
+    });
+  }
+
+  const nomesDoDock = () =>
+    within(screen.getByRole('group', { name: 'Ferramentas da leitura' }))
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+
+  it('a barra tem Buscar, Modo foco e Mais; Filtrar, Registrar erro e Ações moram no Mais, a dois toques', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    expect(nomesDoDock()).toEqual(['Buscar', 'Modo foco', 'Mais']);
+    expect(screen.getByRole('button', { name: 'Lido até aqui' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Filtrar' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Ações' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Registrar erro' })).toBeNull();
+
+    const mais = screen.getByRole('button', { name: 'Mais' });
+    expect(mais).toHaveAttribute('aria-expanded', 'false');
+    await usuario.click(mais);
+    expect(mais).toHaveAttribute('aria-expanded', 'true');
+    const menu = screen.getByRole('group', { name: 'Mais ferramentas da leitura' });
+    expect(
+      within(menu)
+        .getAllByRole('button')
+        .map((b) => b.firstElementChild?.textContent),
+    ).toEqual(['Filtrar', 'Registrar erro', 'Ações']);
+
+    // Filtrar: o diálogo abre e o menu fecha (a volta do foco ao Mais, ao fechar o diálogo, é do E2E:
+    // o jsdom não tem <dialog> modal).
+    await usuario.click(within(menu).getByRole('button', { name: /^Filtrar/ }));
+    expect(await screen.findByRole('dialog', { name: 'Filtrar a norma' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    expect(mais).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('Ações abre as ações do dispositivo no alto da tela', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    rolarPara(60 * 8);
+
+    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+    await usuario.click(screen.getByRole('button', { name: /^Ações/ }));
+    expect(await screen.findByRole('dialog', { name: /^Ações de / })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+  });
+
+  it('Registrar erro, no Mais, abre as ações já no formulário do erro, sem a lista de ações', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    rolarPara(60 * 8);
+
+    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+    await usuario.click(screen.getByRole('button', { name: /^Registrar erro/ }));
+    const painel = await screen.findByRole('dialog', { name: /^Ações de / });
+    expect(within(painel).getByLabelText('Frase correta')).toBeInTheDocument();
+    expect(within(painel).queryByRole('button', { name: 'Criar cartão deste trecho' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+  });
+
+  it('o Esc fecha o menu e devolve o foco ao Mais; tocar fora também fecha', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const mais = screen.getByRole('button', { name: 'Mais' });
+
+    await usuario.click(mais);
+    await usuario.keyboard('{Escape}');
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    expect(mais).toHaveFocus();
+
+    await usuario.click(mais);
+    expect(screen.getByRole('group', { name: 'Mais ferramentas da leitura' })).toBeInTheDocument();
+    await usuario.click(screen.getByText(/A jurisdição penal/));
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    // Tocar no próprio Mais abre e fecha.
+    await usuario.click(mais);
+    await usuario.click(mais);
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+  });
+
+  it('com o filtro ligado, o Mais ganha o anel e o menu diz o que está filtrado', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await usuario.click(await estrelaDe(usuario, 'art2', 'Estrela: Art. 2º'));
+    await screen.findByRole('button', { name: 'Estrela: Art. 2º (direta)' });
+
+    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+    await usuario.click(screen.getByRole('button', { name: /^Filtrar/ }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
+    await usuario.click(within(dialogo).getByRole('radio', { name: /Só os estrelados/ }));
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
+
+    const mais = screen.getByRole('button', { name: 'Mais. Filtrado: estrelados' });
+    expect(mais).toHaveClass('filtro-ligado');
+    await usuario.click(mais);
+    const item = screen.getByRole('button', { name: /^Filtrado/ });
+    expect(item).toHaveClass('filtro-ligado');
+    expect(item).toHaveTextContent('Mostrando só: estrelados');
+  });
+
+  it('o atributo da raiz que tira as abas vale enquanto a norma está aberta', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    expect(document.documentElement).toHaveAttribute('data-leitor');
+
+    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
+    expect(document.documentElement).not.toHaveAttribute('data-leitor');
+  });
+
+  it('a partir de 700 px (e sem matchMedia) a barra segue com os quatro botões do dock', async () => {
+    janelaDe(768);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    expect(nomesDoDock()).toEqual(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
+    expect(screen.queryByRole('button', { name: 'Mais' })).toBeNull();
   });
 });

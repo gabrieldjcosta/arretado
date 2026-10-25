@@ -325,6 +325,29 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(await termina('guiado')).toHaveTextContent('Danado de bom! Rodada feita.');
   });
 
+  it('certeza (AP-02): tocar numa mostra a resposta e grava; pular não grava; os atalhos seguem', async () => {
+    const repo = await comVencidos(2);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    const grupo = await screen.findByRole('group', { name: 'Quanta certeza?' });
+    expect(
+      within(grupo)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Chutando', 'Acho que sei', 'Tenho certeza']);
+    await usuario.click(within(grupo).getByRole('button', { name: 'Tenho certeza' }));
+    expect(await screen.findByRole('group', { name: 'Como foi?' })).toBeInTheDocument();
+    await usuario.keyboard('1');
+    // Segundo cartão: Espaço revela (pula a certeza) e o 3 responde, como antes.
+    await screen.findByRole('button', { name: 'Mostrar resposta' });
+    await usuario.keyboard(' ');
+    await usuario.keyboard('3');
+    await waitFor(async () => {
+      expect((await repo.colecao('revisoes').todosDoUsuario()).length).toBe(2);
+    });
+    const revisoes = await repo.colecao('revisoes').todosDoUsuario();
+    expect(revisoes.map((r) => r.certeza).sort()).toEqual([3, undefined]);
+  });
+
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir('/recall', repo);
@@ -512,6 +535,19 @@ describe('Fixar na P5 do Ponto de luz', () => {
     await usuario.click(await screen.findByRole('link', { name: 'Voltar aos erros' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Erros' })).toBeInTheDocument();
     expect(window.location.hash).toBe('#/recall/erros');
+  });
+
+  it('sem nenhuma frase, a aba diz de onde elas vêm e leva à leitura de uma norma', async () => {
+    const { repo } = await repositorioDeTeste();
+    await abrir('/recall/frases', repo);
+    const titulo = await screen.findByRole('heading', { level: 2, name: 'Nenhuma frase ainda' });
+    const vazio = titulo.closest('section');
+    if (!vazio) throw new Error('sem o estado vazio');
+    expect(vazio).toHaveTextContent('envia às frases durante a leitura');
+    expect(within(vazio).getByRole('link', { name: 'Ler uma norma' })).toHaveAttribute(
+      'href',
+      '#/biblioteca',
+    );
   });
 
   it('cartões: o que já está no prazo diz "Para revisar", com desenho', async () => {

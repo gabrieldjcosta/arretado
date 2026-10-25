@@ -18,7 +18,8 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  // Um reteste só no CI: os flakes de relógio no tablet (Leitor) passavam num rerun; o relatório marca o teste como "flaky".
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     trace: 'retain-on-failure',

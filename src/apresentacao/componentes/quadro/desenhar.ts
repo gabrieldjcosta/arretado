@@ -214,7 +214,15 @@ export async function desenharParte(
   await esperar(200, sinal);
   for (const fio of parte.fios) {
     if (sinal.aborted) return false;
-    const { trechos, total, lavis } = preparar(c, fio);
+    let preparado: ReturnType<typeof preparar>;
+    try {
+      preparado = preparar(c, fio);
+    } catch (erro) {
+      // A página recarregou durante a espera: o navegador não mede um documento inativo.
+      if (!documentoInativo(erro)) throw erro;
+      return false;
+    }
+    const { trechos, total, lavis } = preparado;
     const duracao = Math.max(520, Math.min(1100, total / 0.22));
     if (!(await correr(c, trechos, total, lavis, duracao, sinal))) return false;
     // Pronto, o fio volta a ser um traço só, igual ao pintado de uma vez (a opacidade não se soma nos cruzamentos).

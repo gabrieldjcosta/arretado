@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -7,6 +7,7 @@ import {
   contarFrasesVencidas,
   contarVencidos,
   filaDoDia,
+  filaPorValor,
   revisar,
   suspenderCartao,
   vencemAmanha,
@@ -25,6 +26,7 @@ import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
 import { TopoDaRevisao } from './TopoDaRevisao';
+import './estilos-certeza.css';
 
 type Estado =
   | { tipo: 'carregando' }
@@ -38,6 +40,13 @@ const ICONE = {
   dificil: 'onda',
   facil: 'marca',
 } as const satisfies Record<RespostaRevisao, NomeDoIcone>;
+
+/** As três respostas da fase de certeza: tocar numa já mostra a resposta; "Mostrar resposta" pula. */
+const CERTEZAS = [
+  [1, 'Chutando'],
+  [2, 'Acho que sei'],
+  [3, 'Tenho certeza'],
+] as const;
 
 async function carregarVerso(repo: Repositorio, cartao: Cartao): Promise<string> {
   if (cartao.verso !== null) return cartao.verso;
@@ -64,10 +73,16 @@ export function Drill() {
   const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   const inicio = useRef(0);
+  /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
+  const certeza = useRef<1 | 2 | 3 | undefined>(undefined);
   const botaoVirar = useRef<HTMLButtonElement>(null);
   const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
 
   const cota = useRef(0);
+  // `?itens=N`: o lote que o Hoje montou pelo valor (AP-01). Só vale na primeira rodada; "Revisar
+  // mais" volta à fila e à cota de sempre.
+  const [params] = useSearchParams();
+  const itensDoHoje = useRef(Number(params.get('itens')) || 0);
 
   const terminar = useCallback(async () => {
     try {
@@ -91,7 +106,9 @@ export function Drill() {
   /** Carrega o próximo lote: os mais atrasados primeiro, até a cota. */
   const iniciarLote = useCallback(
     (ativo: () => boolean = () => true) => {
-      Promise.all([filaDoDia(repo), obterPreferencias(repo)]).then(
+      const itens = itensDoHoje.current;
+      itensDoHoje.current = 0;
+      Promise.all([itens > 0 ? filaPorValor(repo) : filaDoDia(repo), obterPreferencias(repo)]).then(
         ([fila, preferencias]) => {
           if (!ativo()) return;
           cota.current = cotaDiaria(preferencias);
@@ -99,7 +116,7 @@ export function Drill() {
           else {
             setEstado({
               tipo: 'revisando',
-              fila: fila.slice(0, cota.current),
+              fila: fila.slice(0, itens > 0 ? itens : cota.current),
               indice: 0,
               virado: false,
             });
@@ -126,6 +143,7 @@ export function Drill() {
   useEffect(() => {
     if (!atual) return;
     inicio.current = performance.now();
+    certeza.current = undefined;
     botaoVirar.current?.focus();
     let ativo = true;
     carregarVerso(repo, atual).then(
@@ -162,6 +180,7 @@ export function Drill() {
       try {
         const gravada = revisar(repo, atual.id, resposta, {
           duracaoMs: performance.now() - inicio.current,
+          ...(certeza.current === undefined ? {} : { certeza: certeza.current }),
         });
         if (estado.indice + 1 >= estado.fila.length) {
           // O último cartão não passa: o fim da rodada toma a tela.
@@ -309,6 +328,26 @@ export function Drill() {
       )}
       {!estado.virado ? (
         <div className="linha-acoes acoes-drill">
+          <div className="certeza" role="group" aria-labelledby="certeza-rotulo">
+            <p id="certeza-rotulo" className="certeza-rotulo">
+              Quanta certeza?
+            </p>
+            <div className="certeza-opcoes">
+              {CERTEZAS.map(([valor, rotulo]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  className="chip"
+                  onClick={() => {
+                    certeza.current = valor;
+                    virar();
+                  }}
+                >
+                  {rotulo}
+                </button>
+              ))}
+            </div>
+          </div>
           <button ref={botaoVirar} type="button" className="principal grande" onClick={virar}>
             Mostrar resposta
           </button>

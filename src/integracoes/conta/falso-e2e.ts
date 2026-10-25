@@ -1,6 +1,7 @@
 // Serviço de conta do build de E2E (`vite build --mode e2e-conta`, T30): sem rede e sem Supabase.
 // Ao contrário do `ServicoDeContaFalso` (memória, testes de unidade), guarda tudo em `localStorage`,
 // porque entrar recarrega a página e `criarServicoDeConta()` é chamado mais de uma vez no app.
+import type { ServidorDeSincronizacao } from '../../core/sincronizacao';
 import {
   FalhaDeConta,
   type CopiaNaNuvem,
@@ -86,6 +87,12 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
     const estado = lerEstado();
     gravarEstado({ ...estado, aceites: [...estado.aceites, versao] });
     return Promise.resolve();
+  }
+  aceitarSincronizacao(): Promise<void> {
+    return Promise.resolve();
+  }
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    return { enviarLote: () => Promise.resolve({ seq_max: 0, divergentes: [] }) };
   }
   sair(): Promise<void> {
     this.definir(null);

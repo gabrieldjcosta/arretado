@@ -6,6 +6,7 @@ import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
+import { ProvaDoPlano } from './ProvaDoPlano';
 import { ROTULO_FAIXA } from './pontos/carregar';
 import './estilos-plano.css';
 
@@ -29,6 +30,7 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
           {confirmacao}
