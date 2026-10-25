@@ -443,6 +443,7 @@
 
 .agora-no-mapa .botao {
   min-height: var(--alvo, 44px);
+}
 /* "A lei mudou" no Hoje (AP-05): afastado da folha de cima e sem filete sob a última norma. */
 .lei-mudou-no-hoje {
   margin-top: 1rem;
