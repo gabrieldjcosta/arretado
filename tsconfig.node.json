@@ -16,6 +16,7 @@
     "src/integracoes/conta/projeto.ts",
     "eslint",
     "src/testes/setup.ts",
+    "src/globais.d.ts",
     "supabase",
     "config"
   ],

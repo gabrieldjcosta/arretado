@@ -59,6 +59,7 @@ async function aparelho(uid: string, fonte?: FonteEmMemoria, atrasoDoRelogioMs =
     usuarioId: uid,
     aparelhoId: repo.ctx.aparelhoId,
     versaoEsquema: VERSAO_ESQUEMA,
+    versaoApp: '1.0',
     ...(fonte
       ? { prepararReidratacao: (log: readonly Alteracao[]) => reidratadorDoAcervo(fonte, log) }
       : {}),
@@ -700,43 +701,65 @@ describe('queda no meio da rodada (revisão independente do B3)', () => {
     expect(await contarConflitos(A.repo.db)).toBe(1);
   });
 
-  // Achado 2 da revisão: hoje reprova de verdade (a quarentena por esquema desatualizado é definitiva e
-  // o campo opcional novo não sobe `VERSAO_ESQUEMA`). `it.fails` mantém a árvore verde e fica vermelho
-  // quando o achado for resolvido: aí troque por `it`.
-  it.fails(
-    'campo opcional novo de um app mais recente: ao atualizar, o aparelho antigo recebe o registro',
-    async () => {
+  // Achado 2 da revisão: campo opcional novo (ou valor novo de enum) de um app mais recente não sobe
+  // `VERSAO_ESQUEMA`; no app antigo a entrada fica em quarentena e volta quando o app muda de versão.
+  const casosDeEsquemaNovo = [
+    {
+      nome: 'campo opcional novo',
+      antes: (z0: typeof z) => ({ campoNovo: z0.string().optional() }),
+      depois: (z0: typeof z) => ({ campoNovo: z0.string().optional() }),
+      dadoNovo: 'x',
+      antigo: false,
+    },
+    {
+      nome: 'valor novo de enum',
+      antes: (z0: typeof z) => ({ tipoNovo: z0.enum(['a']).optional() }),
+      depois: (z0: typeof z) => ({ tipoNovo: z0.enum(['a', 'b']).optional() }),
+      dadoNovo: 'b',
+      antigo: true,
+    },
+  ];
+  for (const caso of casosDeEsquemaNovo) {
+    it(`${caso.nome} de um app mais recente: ao atualizar o app, o aparelho antigo recebe o registro`, async () => {
       const uid = await novoUsuario();
       const A = await aparelho(uid); // fica no app antigo até a atualização
-      const B = await aparelho(uid); // app novo: o esquema de erros ganhou um campo opcional
+      const B = await aparelho(uid); // app novo
+      B.ctx.versaoApp = '2.0';
       await A.rodada();
       await B.rodada();
-      const antigo = ENTIDADES.erros.esquema;
-      const novo = (antigo as unknown as z.ZodObject).extend({ campoNovo: z.string().optional() });
+      const base = ENTIDADES.erros.esquema;
+      const antigo = caso.antigo ? (base as unknown as z.ZodObject).extend(caso.antes(z)) : base;
+      const novo = (base as unknown as z.ZodObject).extend(caso.depois(z));
+      const nomeDoCampo = caso.antigo ? 'tipoNovo' : 'campoNovo';
       try {
         trocarEsquemaDeErros(novo);
         const e = await B.repo.colecao('erros').criar({
           ...camposMinimos('erros', uid),
-          oQueFoi: 'com campo novo',
-          campoNovo: 'x',
-        } as never);
+          oQueFoi: 'com esquema novo',
+          [nomeDoCampo]: caso.dadoNovo,
+        });
         await B.rodada();
 
         trocarEsquemaDeErros(antigo);
         const r = await A.rodada();
         expect(r.recebido.quarentena).toBe(1);
         expect(await lerErro(A, e.id)).toBeUndefined();
+        // Mesma versão do app: não insiste a cada rodada.
+        expect((await A.rodada()).recebido.quarentena).toBe(0);
+        expect(await lerErro(A, e.id)).toBeUndefined();
 
-        // A atualizou o app: o plano (§7) promete que, ao atualizar, retoma sem perder a entrada.
+        // A atualizou o app: a entrada guardada na quarentena volta sozinha.
         trocarEsquemaDeErros(novo);
-        await A.rodada();
-        await A.rodada();
+        A.ctx.versaoApp = '2.0';
+        const depois = await A.rodada();
+        expect(depois.recebido.aplicadas).toBeGreaterThan(0);
         expect(await lerErro(A, e.id)).toBeTruthy();
+        expect(await lerQuarentenaDeRecebidos(A.repo)).toHaveLength(0);
       } finally {
-        trocarEsquemaDeErros(antigo);
+        trocarEsquemaDeErros(base);
       }
-    },
-  );
+    });
+  }
 });
 
 describe('propriedade com quedas de rede no meio da rodada (revisão independente do B3)', () => {
