@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { gerarAcervo, verificarPasta, type Pastas } from './nucleo';
+import { compararAcervo, gerarAcervo, verificarPasta, type Pastas } from './nucleo';
 
 const pastas: string[] = [];
 afterEach(async () => {
@@ -46,6 +46,34 @@ async function montar(): Promise<Pastas> {
     relatorio: join(raiz, 'relatorio.md'),
   };
 }
+
+describe('compararAcervo', () => {
+  it('só lê: iguais aos publicados, depois diferente quando a fonte muda, bloqueado e sem cache', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    const antes = await readFile(join(p.saida, 'indice.json'), 'utf-8');
+    const situacoes = async () =>
+      Object.fromEntries((await compararAcervo(p)).map((i) => [i.id, i.situacao]));
+    expect(await situacoes()).toEqual({
+      'lei-ok': 'igual',
+      'doc-tecnico': 'igual',
+      'lei-ruim': 'bloqueado',
+    });
+    await writeFile(
+      join(p.fontes, 'ok.md'),
+      '# LEI Nº 1\n\nArt. 1º Primeiro.\n\nArt. 2º Segundo.\n\nArt. 3º Terceiro.\n',
+    );
+    const [ok] = await compararAcervo(p, 'lei-ok');
+    expect(ok).toMatchObject({
+      situacao: 'diferente',
+      nosAntes: 2,
+      nosDepois: 3,
+      surgiram: ['art3'],
+    });
+    expect(await readFile(join(p.saida, 'indice.json'), 'utf-8')).toBe(antes);
+    await expect(compararAcervo(p, 'nao-existe')).rejects.toThrow(/fora da curadoria/);
+  });
+});
 
 describe('gerarAcervo', () => {
   it('publica os íntegros, bloqueia o com anomalia e escreve o relatório', async () => {
@@ -98,6 +126,53 @@ describe('gerarAcervo', () => {
     const arquivo = join(p.saida, 'lei-ok.json');
     await writeFile(arquivo, (await readFile(arquivo, 'utf-8')).replace('Primeiro', 'Primeira'));
     expect((await verificarPasta(p.saida)).map((x) => x.problema).join('|')).toMatch(/hash/);
+  });
+});
+
+describe('pacote de partida na pasta do acervo', () => {
+  const pacote = (ids: string[]) =>
+    JSON.stringify({
+      versao: 1,
+      aprovadoEm: '2026-10-25',
+      aprovadoPor: 'Teste',
+      regra: 'Teste',
+      carreiras: {
+        'carreira-a': {
+          nome: 'Carreira A',
+          editaisComTexto: 4,
+          normas: ids.map((id) => ({ id, titulo: id, editaisQueCitam: 3, porcentagem: 75 })),
+        },
+      },
+    });
+
+  it('não é tomado por item do acervo, e confere quando cada norma dele está no índice', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), pacote(['lei-ok', 'doc-tecnico']));
+    expect(await verificarPasta(p.saida)).toEqual([]);
+  });
+
+  it('acusa a norma do pacote que não está no índice', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), pacote(['lei-ok', 'lei-sumiu']));
+    expect(await verificarPasta(p.saida)).toEqual([
+      {
+        id: 'pacote-de-partida',
+        problema: 'carreira-a cita lei-sumiu, que não está no índice',
+      },
+    ]);
+  });
+
+  it('acusa o pacote que não é JSON ou fora do esquema', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), 'não é json');
+    expect((await verificarPasta(p.saida)).map((x) => x.problema)).toEqual([
+      'pacote-de-partida.json não é JSON',
+    ]);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), '{"versao":2}');
+    expect((await verificarPasta(p.saida))[0]?.problema).toMatch(/^esquema do pacote/);
   });
 });
 

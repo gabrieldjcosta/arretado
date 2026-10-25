@@ -53,6 +53,11 @@ const Precedente = lazy(() =>
   import('./biblioteca/precedentes/Precedente').then((m) => ({ default: m.Precedente })),
 );
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
+// "Escolher meu concurso": duas telas curtas, baixadas só quando a pessoa chega a elas.
+const Comecar = lazy(() => import('./comecar/Comecar').then((m) => ({ default: m.Comecar })));
+const ParaComecar = lazy(() =>
+  import('./comecar/ParaComecar').then((m) => ({ default: m.ParaComecar })),
+);
 const Dados = lazy(() => import('./conta/dados/Dados').then((m) => ({ default: m.Dados })));
 
 /**
@@ -98,6 +103,22 @@ export function App({
                 }
               >
                 <Route index element={<Hoje />} />
+                <Route
+                  path="comecar"
+                  element={
+                    <Carregando>
+                      <Comecar />
+                    </Carregando>
+                  }
+                />
+                <Route
+                  path="comecar/:carreira"
+                  element={
+                    <Carregando>
+                      <ParaComecar />
+                    </Carregando>
+                  }
+                />
                 <Route path="plano/*" element={<RotasDoPlano />} />
                 <Route path="sessao/*" element={<RotasDaSessao />} />
                 <Route path="recall" element={<RecallInicio />}>

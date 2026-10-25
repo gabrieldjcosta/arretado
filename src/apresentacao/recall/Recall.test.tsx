@@ -514,6 +514,19 @@ describe('Fixar na P5 do Ponto de luz', () => {
     expect(window.location.hash).toBe('#/recall/erros');
   });
 
+  it('sem nenhuma frase, a aba diz de onde elas vêm e leva à leitura de uma norma', async () => {
+    const { repo } = await repositorioDeTeste();
+    await abrir('/recall/frases', repo);
+    const titulo = await screen.findByRole('heading', { level: 2, name: 'Nenhuma frase ainda' });
+    const vazio = titulo.closest('section');
+    if (!vazio) throw new Error('sem o estado vazio');
+    expect(vazio).toHaveTextContent('envia às frases durante a leitura');
+    expect(within(vazio).getByRole('link', { name: 'Ler uma norma' })).toHaveAttribute(
+      'href',
+      '#/biblioteca',
+    );
+  });
+
   it('cartões: o que já está no prazo diz "Para revisar", com desenho', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });

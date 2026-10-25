@@ -1,7 +1,7 @@
 // O motor do quadro do cacto (D-D7, "A caneta que desenha"): pinta as partes já feitas e anda a
 // caneta sobre o traço de hoje. Imperativo de propósito: o React só dá ao <svg> três grupos vazios
 // (lavis, traços, caneta) e nunca olha dentro deles.
-import { CURVA, esperar, suave, type Movimento } from '../../movimento';
+import { CURVA, documentoInativo, esperar, suave, type Movimento } from '../../movimento';
 import { ANDANDO, mover, PARTES, REPOUSO, type Fio, type Parte } from './cena';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -160,10 +160,17 @@ function correr(
       // A aguada aparece na segunda metade do fio.
       lavis?.setAttribute('opacity', String(Math.max(0, Math.min(1, (suavizado - 0.45) / 0.55))));
       if (ativo) {
-        const ponto = ativo.el.getPointAtLength(
-          Math.max(0, Math.min(ativo.comprimento, andado - ativo.inicio)),
-        );
-        c.caneta.setAttribute('transform', posicaoDaCaneta(ponto.x, ponto.y));
+        try {
+          const ponto = ativo.el.getPointAtLength(
+            Math.max(0, Math.min(ativo.comprimento, andado - ativo.inicio)),
+          );
+          c.caneta.setAttribute('transform', posicaoDaCaneta(ponto.x, ponto.y));
+        } catch (erro) {
+          // A página recarregou no meio do traço: o quadro chegou depois de o documento ficar inativo.
+          if (!documentoInativo(erro)) throw erro;
+          resolver(false);
+          return;
+        }
       }
       if (progresso < 1) requestAnimationFrame(passo);
       else resolver(true);
@@ -207,7 +214,15 @@ export async function desenharParte(
   await esperar(200, sinal);
   for (const fio of parte.fios) {
     if (sinal.aborted) return false;
-    const { trechos, total, lavis } = preparar(c, fio);
+    let preparado: ReturnType<typeof preparar>;
+    try {
+      preparado = preparar(c, fio);
+    } catch (erro) {
+      // A página recarregou durante a espera: o navegador não mede um documento inativo.
+      if (!documentoInativo(erro)) throw erro;
+      return false;
+    }
+    const { trechos, total, lavis } = preparado;
     const duracao = Math.max(520, Math.min(1100, total / 0.22));
     if (!(await correr(c, trechos, total, lavis, duracao, sinal))) return false;
     // Pronto, o fio volta a ser um traço só, igual ao pintado de uma vez (a opacidade não se soma nos cruzamentos).

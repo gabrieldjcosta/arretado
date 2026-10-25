@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Quem estuda para concursos jurídicos de alta complexidade e tem dificuldade de concentração: começar sem decidir, voltar depois de uma pausa sem culpa, ler sem se perder. Hoje o único usuário é o autor (Gabriel, banca FCC, Defensoria Pública de SP); o produto é desenhado para, no futuro, ser cobrado e crescer. Duas situações de entrada, descritas por comportamento: "não sei por onde começar" e "voltei e perdi o fio".
+Quem estuda para concursos jurídicos de alta complexidade, em qualquer carreira do catálogo (hoje Defensoria, Magistratura, Ministério Público e área ambiental), e tem dificuldade de concentração: começar sem decidir, voltar depois de uma pausa sem culpa, ler sem se perder. O produto é um só para todas as carreiras e bancas, desenhado para, no futuro, ser cobrado e crescer. Hoje quem usa é o autor (Gabriel, que estuda para a Defensoria Pública de SP, banca FCC) e uma pessoa próxima a ele. Duas situações de entrada, descritas por comportamento: "não sei por onde começar" e "voltei e perdi o fio".
 
 ## Product Purpose
 
@@ -16,7 +16,7 @@ Converter erros, questões e leitura de legislação em uma próxima ação de e
 
 ## Positioning
 
-Dois diferenciais, com a retomada como núcleo: (1) a próxima ação única e a retomada sem culpa, com o ponto de parada sempre salvo; (2) o leitor de legislação feito para a letra de lei cobrada pela FCC (Estrela com herança por bloco, redações anteriores guardadas e ocultas, modo foco).
+Dois diferenciais, com a retomada como núcleo: (1) a próxima ação única e a retomada sem culpa, com o ponto de parada sempre salvo; (2) o leitor de legislação feito para a letra de lei cobrada em provas jurídicas, com a FCC como primeira banca atendida (Estrela com herança por bloco, redações anteriores guardadas e ocultas, modo foco).
 
 ## Operating Context
 
@@ -37,7 +37,7 @@ Nome provisório "Arretado" (antes "Acumen"), escrito num traço só com o peque
 
 ## Evidence on Hand
 
-Especificação em duas partes, plano-mestre, brief de design (`docs/design/brief-app.md`), auditoria de UI de 14/10/2026 e uso real pelo autor. Não há usuários externos, depoimentos, métricas de mercado nem preços definidos: nada disso deve ser inventado. Nada do Acervo antigo nem do Acumen v2 foi importado; o conteúdo recomeça do zero.
+Especificação em duas partes, plano-mestre, brief de design (`docs/design/brief-app.md`), auditoria de UI de 14/10/2026 e uso real pelo autor. Não há usuários externos, depoimentos, métricas de mercado nem preços definidos: nada disso deve ser inventado. A oferta prevista é um plano único para todas as carreiras, e o preço só se discute depois do teste com pessoas e da V1 (`docs/planos/plano-mestre.md`, §1). Nada do Acervo antigo nem do Acumen v2 foi importado; o conteúdo recomeça do zero.
 
 ## Product Principles
 

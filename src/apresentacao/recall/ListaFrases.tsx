@@ -11,7 +11,8 @@ const carregar = async (repo: Repositorio) => (await listarFrases(repo, {}, null
  * originou (é por aqui que se chega a ele, já que "Erros" deixou de ser aba) e, por "Esconder
  * trecho", ao cartão com lacuna. A lista dos Erros, com os filtros (resultado, situação,
  * "completar"), é a página `/recall/erros`, a que um link no fim desta lista leva. O link fica
- * também sem Frase nenhuma: Erro antigo, sem frase correta, só se alcança por ele.
+ * também sem Frase nenhuma: Erro antigo, sem frase correta, só se alcança por ele. Sem Frase, a aba
+ * diz de onde elas vêm (o Erro e o trecho enviado na leitura) e leva à Biblioteca.
  */
 export function ListaFrases() {
   const { dados } = useDados(carregar);
@@ -26,8 +27,18 @@ export function ListaFrases() {
   if (dados.length === 0) {
     return (
       <>
-        <Vazio titulo="Nenhuma frase ainda">
-          <p>Ao registrar um erro, escreva a frase correta: ela aparece aqui.</p>
+        <Vazio
+          titulo="Nenhuma frase ainda"
+          acao={
+            <Link to="/biblioteca" className="botao">
+              Ler uma norma
+            </Link>
+          }
+        >
+          <p>
+            Elas vêm do erro que você registra, com a frase correta, e do trecho de norma que você
+            envia às frases durante a leitura.
+          </p>
         </Vazio>
         {verErros}
       </>

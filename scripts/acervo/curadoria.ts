@@ -48,6 +48,24 @@ export const ItemDaCuradoria = z.strictObject({
    * um Anexo com blocos pelos títulos do Markdown, sem passar pelo estruturador (regra de 10/10/2026).
    */
   semArtigos: z.boolean().default(false),
+  /**
+   * Página do Planalto com um índice depois do fecho, que repete a estrutura (Código Civil): o
+   * texto acaba no último bloco igual a este ("ÍNDICE"). Sem o bloco, nada é cortado e os avisos
+   * do índice bloqueiam o item.
+   */
+  cortarEm: TextoCurto.optional(),
+  /**
+   * Cabeçalhos que a hierarquia do app não tem (SUBTÍTULO do Código Civil): expressões regulares
+   * da linha inteira; a linha que casa sai antes do estruturador, junto com a do nome logo abaixo.
+   * Sem isso o cabeçalho colaria no texto do último dispositivo antes dele.
+   */
+  cabecalhosSemNivel: z.array(z.string().min(1).max(120)).max(5).default([]),
+  /**
+   * Corrigem o que o estruturador leu do alto da página quando ela traz links de navegação no meio
+   * do cabeçalho (Código Civil: "ÍNDICE", "Lei de Introdução…" e "P A R T E G E R A L" com espaços).
+   */
+  tituloOficial: TextoCurto.optional(),
+  ementa: z.string().min(1).max(500).optional(),
   /** Avisos de leitura que o curador viu e aceitou para este item (tipos de `TIPOS_DE_ANOMALIA`). */
   anomaliasAceitas: z.array(z.enum(TIPOS_DE_ANOMALIA as [string, ...string[]])).default([]),
 });
