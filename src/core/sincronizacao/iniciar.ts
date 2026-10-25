@@ -8,6 +8,7 @@ import {
   type Repositorio,
 } from '../persistencia';
 import { temConsentimento } from '../preferencias';
+import { VERSAO_APP } from '../versao';
 import { criarAgendador, type OpcoesDoAgendador } from './agendador';
 import { registrarDivergencias } from './divergencias';
 import { enviarPendentes, type ResultadoDoEnvio } from './envio';
@@ -100,6 +101,7 @@ export async function iniciarSincronizacao(opcoes: OpcoesDeSincronizacao): Promi
     usuarioId,
     aparelhoId: repo.ctx.aparelhoId,
     versaoEsquema: VERSAO_ESQUEMA,
+    versaoApp: VERSAO_APP,
     prepararReidratacao: opcoes.prepararReidratacao,
   };
 

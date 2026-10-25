@@ -41,6 +41,8 @@ const MAX_NA_QUARENTENA = 200;
 export interface ContextoDeRecepcao extends ContextoDeEnvio {
   /** Prepara a fonte do acervo para reidratar as adesões recebidas (mesma peça de `migrar-para-conta`). */
   prepararReidratacao?: (log: readonly Alteracao[]) => Promise<Reidratador>;
+  /** Versão do app; a quarentena por esquema só é tentada de novo quando ela muda. */
+  versaoApp?: string;
 }
 
 export interface EntradaRecebidaEmQuarentena {
@@ -51,6 +53,8 @@ export interface EntradaRecebidaEmQuarentena {
   em: string;
   /** A fonte do acervo pode voltar: a recepção tenta de novo nas próximas rodadas. */
   retentavel: boolean;
+  /** Só nas recusas do esquema: a versão do app que recusou; tenta de novo quando for outra. */
+  versaoApp?: string;
   /** A entrada, para tentar de novo; ausente quando veio da recarga (que relê o estado do servidor). */
   entrada?: EntradaRecebida;
 }
@@ -111,6 +115,7 @@ export async function anotarQuarentena(
   e: { seq: number; colecao: string; registro_id: string; entrada?: EntradaRecebida },
   motivo: string,
   retentavel = false,
+  versaoApp?: string,
 ): Promise<void> {
   const atual = (await x.db.meta.get(CHAVE_QUARENTENA_RECEBIDOS))?.valor;
   const lista = Array.isArray(atual) ? (atual as EntradaRecebidaEmQuarentena[]) : [];
@@ -124,6 +129,7 @@ export async function anotarQuarentena(
     motivo: motivo.slice(0, 300),
     em: x.agora().toISOString(),
     retentavel,
+    ...(versaoApp === undefined ? {} : { versaoApp }),
     ...(e.entrada ? { entrada: e.entrada } : {}),
   });
   await x.db.meta.put({
@@ -142,7 +148,14 @@ export async function lerQuarentenaDeRecebidos(
 type Desfecho = 'aplicada' | 'ignorada' | 'conflito' | 'quarentena';
 
 type Passo =
-  | { tipo: 'fim'; desfecho: Desfecho; motivo?: string; precisaRecarga?: boolean }
+  | {
+      tipo: 'fim';
+      desfecho: Desfecho;
+      motivo?: string;
+      precisaRecarga?: boolean;
+      /** Recusa do esquema deste app: tenta de novo quando o app mudar de versão. */
+      porEsquema?: boolean;
+    }
   | { tipo: 'precisa-estado' };
 
 /** Remove de `dados` o que não deve entrar por uma entrada de outro aparelho (campos só deste aparelho). */
@@ -270,7 +283,13 @@ async function decidir(
 
   if (e.operacao === 'gravar') {
     const v = validarRegistro(nome, e.dados, x.usuarioId, id);
-    if (!v.ok) return { tipo: 'fim', desfecho: 'quarentena', motivo: v.motivo };
+    if (!v.ok)
+      return {
+        tipo: 'fim',
+        desfecho: 'quarentena',
+        motivo: v.motivo,
+        porEsquema: v.esquema === true,
+      };
     await adotarRegistro(x, nome, v.registro, local);
     await registrarNoLog(x, {
       ts: e.ts,
@@ -297,7 +316,13 @@ async function decidir(
   for (const k of e.removidos ?? [])
     if (!CAMPOS_DE_CARIMBO.includes(k)) Reflect.deleteProperty(mesclado, k);
   const v = validarRegistro(nome, mesclado, x.usuarioId, id);
-  if (!v.ok) return { tipo: 'fim', desfecho: 'quarentena', motivo: v.motivo };
+  if (!v.ok)
+    return {
+      tipo: 'fim',
+      desfecho: 'quarentena',
+      motivo: v.motivo,
+      porEsquema: v.esquema === true,
+    };
   await db.tabela(nome).put(v.registro as never);
   await registrarNoLog(x, {
     ts: e.ts,
@@ -355,7 +380,8 @@ async function tratar(
           x,
           { ...e, entrada: e },
           passo.motivo ?? 'entrada recusada',
-          e.operacao === OPERACAO_ADESAO,
+          e.operacao === OPERACAO_ADESAO || passo.porEsquema === true,
+          passo.porEsquema === true ? (ctx.versaoApp ?? '') : undefined,
         );
       }
       if (avancarCursor) await db.meta.put({ chave: CHAVE_SEQ_RECEBIDO, valor: e.seq });
@@ -402,15 +428,23 @@ async function retentarQuarentena(
   tocadas: Set<NomeColecao>,
 ): Promise<void> {
   const lista = await lerQuarentenaDeRecebidos(repo);
-  const retentaveis = lista.filter((q) => q.retentavel);
-  if (retentaveis.length === 0 || !ctx.prepararReidratacao) return;
-  const restante = lista.filter((q) => !q.retentavel);
+  // Adesão do acervo: tenta a cada rodada (a fonte pode ter voltado). Recusa do esquema: só quando o app mudou.
+  const aTentar = lista.filter((q) =>
+    !q.retentavel
+      ? false
+      : q.versaoApp === undefined
+        ? ctx.prepararReidratacao !== undefined
+        : ctx.versaoApp !== undefined && q.versaoApp !== ctx.versaoApp,
+  );
+  if (aTentar.length === 0) return;
+  const restante = lista.filter((q) => !aTentar.includes(q));
   const ainda: EntradaRecebidaEmQuarentena[] = [];
-  for (const q of retentaveis) {
+  for (const q of aTentar) {
     if (!q.entrada) continue;
     // O cursor já passou desta entrada: não anda de novo.
     const d = await tratar(repo, servidor, ctx, q.entrada, tocadas, false);
-    if (d.desfecho === 'quarentena') ainda.push(q);
+    if (d.desfecho === 'quarentena')
+      ainda.push(q.versaoApp === undefined ? q : { ...q, versaoApp: ctx.versaoApp ?? '' });
     else contar(resultado, d);
   }
   await repo.db.meta.put({ chave: CHAVE_QUARENTENA_RECEBIDOS, valor: [...restante, ...ainda] });
