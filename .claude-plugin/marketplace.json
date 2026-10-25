@@ -1,0 +1,11 @@
+{
+  "name": "arretado-mods",
+  "owner": { "name": "Gabriel Costa" },
+  "plugins": [
+    {
+      "name": "painel-da-thread",
+      "source": "./mods/painel-da-thread",
+      "description": "Mostra o estado da thread: tarefas, subagents e atividade, em painel (desktop) e faixa compacta (celular)."
+    }
+  ]
+}
