@@ -9,9 +9,9 @@ describe('decidirProximaAcao (A1)', () => {
       comecos: COMECOS,
     });
     expect(COMECOS.map((c) => c.id)).toEqual([
-      'adicionar_material',
-      'escolher_materia',
-      'sessao_curta',
+      'escolher_concurso',
+      'ler_norma',
+      'registrar_erro',
     ]);
   });
 

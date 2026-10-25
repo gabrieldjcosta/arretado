@@ -278,6 +278,9 @@ export async function gerarAcervo(
   };
 }
 
+/** O pacote de partida mora ao lado do índice, mas não é item do acervo: curadoria à mão, conferida à parte. */
+const ARQUIVO_DO_PACOTE = 'pacote-de-partida.json';
+
 /** Lê a pasta do acervo e confere (índice ausente = acervo ainda não gerado: sem problemas). */
 export async function verificarPasta(saida: string): Promise<ProblemaDoAcervo[]> {
   let indiceJson: string;
@@ -288,8 +291,9 @@ export async function verificarPasta(saida: string): Promise<ProblemaDoAcervo[]>
   }
   const arquivos = new Map<string, Uint8Array>();
   for (const nome of await readdir(saida)) {
-    if (nome !== 'indice.json' && nome.endsWith('.json'))
+    if (nome !== 'indice.json' && nome !== ARQUIVO_DO_PACOTE && nome.endsWith('.json'))
       arquivos.set(nome, await readFile(join(saida, nome)));
   }
-  return verificarAcervo(indiceJson, arquivos);
+  const pacoteJson = await readFile(join(saida, ARQUIVO_DO_PACOTE), 'utf-8').catch(() => undefined);
+  return verificarAcervo(indiceJson, arquivos, pacoteJson);
 }

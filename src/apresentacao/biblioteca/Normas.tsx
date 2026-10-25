@@ -402,6 +402,11 @@ export function Normas() {
                   {doEdital(edital, true)}
                   {doAcervo('Escolher no acervo', !edital)}
                   {importar(false)}
+                  {!edital && (
+                    <Link to="/comecar" className="botao botao-texto">
+                      Escolher meu concurso
+                    </Link>
+                  )}
                 </>
               }
             >
@@ -409,8 +414,8 @@ export function Normas() {
                 {edital
                   ? 'Adicione as normas do edital de uma vez, ou cole'
                   : 'Escolha normas no acervo, ou cole'}{' '}
-                a lei da página do Planalto ou da ALESP: o Arretado separa artigos, parágrafos e
-                incisos para você ler e marcar.
+                a lei do site oficial: o Arretado separa artigos, parágrafos e incisos para você ler
+                e marcar.
               </p>
             </Vazio>
           ) : (

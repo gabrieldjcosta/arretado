@@ -1,4 +1,4 @@
-import { IndiceDoAcervo, ItemDoAcervo } from './esquemas';
+import { IndiceDoAcervo, ItemDoAcervo, PacoteDePartida } from './esquemas';
 import { FonteIndisponivel, type FonteDoAcervo } from './fonte';
 
 /** Acervo como arquivos estáticos: `<base>/indice.json` e `<base>/<id>.json`. */
@@ -34,6 +34,12 @@ export class FonteEstatica implements FonteDoAcervo {
     if (!/^[a-z0-9][a-z0-9-]{0,127}$/.test(id)) throw new FonteIndisponivel('nao_encontrado', id);
     const r = ItemDoAcervo.safeParse(await this.json(`${id}.json`));
     if (!r.success) throw new FonteIndisponivel('formato_invalido', `${id}.json`);
+    return r.data;
+  }
+
+  async pacoteDePartida(): Promise<PacoteDePartida> {
+    const r = PacoteDePartida.safeParse(await this.json('pacote-de-partida.json'));
+    if (!r.success) throw new FonteIndisponivel('formato_invalido', 'pacote-de-partida.json');
     return r.data;
   }
 

@@ -101,6 +101,53 @@ describe('gerarAcervo', () => {
   });
 });
 
+describe('pacote de partida na pasta do acervo', () => {
+  const pacote = (ids: string[]) =>
+    JSON.stringify({
+      versao: 1,
+      aprovadoEm: '2026-10-25',
+      aprovadoPor: 'Teste',
+      regra: 'Teste',
+      carreiras: {
+        'carreira-a': {
+          nome: 'Carreira A',
+          editaisComTexto: 4,
+          normas: ids.map((id) => ({ id, titulo: id, editaisQueCitam: 3, porcentagem: 75 })),
+        },
+      },
+    });
+
+  it('não é tomado por item do acervo, e confere quando cada norma dele está no índice', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), pacote(['lei-ok', 'doc-tecnico']));
+    expect(await verificarPasta(p.saida)).toEqual([]);
+  });
+
+  it('acusa a norma do pacote que não está no índice', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), pacote(['lei-ok', 'lei-sumiu']));
+    expect(await verificarPasta(p.saida)).toEqual([
+      {
+        id: 'pacote-de-partida',
+        problema: 'carreira-a cita lei-sumiu, que não está no índice',
+      },
+    ]);
+  });
+
+  it('acusa o pacote que não é JSON ou fora do esquema', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), 'não é json');
+    expect((await verificarPasta(p.saida)).map((x) => x.problema)).toEqual([
+      'pacote-de-partida.json não é JSON',
+    ]);
+    await writeFile(join(p.saida, 'pacote-de-partida.json'), '{"versao":2}');
+    expect((await verificarPasta(p.saida))[0]?.problema).toMatch(/^esquema do pacote/);
+  });
+});
+
 describe('acervo versionado', () => {
   it('public/acervo (se existir) confere com o índice e os hashes', async () => {
     const problemas = await verificarPasta(join(process.cwd(), 'public', 'acervo'));
