@@ -11,7 +11,13 @@ import type {
   RespostaRevisao,
   Revisao,
 } from '../../core/modelo';
-import type { Alteracoes, Dados, Pagina, Repositorio } from '../../core/persistencia';
+import {
+  LIMITE_MAXIMO_PAGINA,
+  type Alteracoes,
+  type Dados,
+  type Pagina,
+  type Repositorio,
+} from '../../core/persistencia';
 import { agendar, agendarFrase } from './agendamento';
 import { provaPorVir } from './prova';
 import { ordenarPorValor } from './ordem-de-valor';
@@ -463,13 +469,16 @@ export async function filaPorValor(repo: Repositorio): Promise<CartaoComFaixa[]>
   return ordenarPorValor(comFaixa, hoje(repo));
 }
 
-/** Quantas Revisões recentes a consulta de certeza olha (a mais nova de cada cartão decide). */
-const REVISOES_RECENTES = 500;
+/**
+ * Quantas Revisões recentes a consulta de certeza olha (a mais nova de cada cartão decide): uma
+ * página, o máximo que `listarPagina` entrega. Pedir mais seria cortado em silêncio.
+ */
+const REVISOES_RECENTES = LIMITE_MAXIMO_PAGINA;
 
 /**
  * Cartões cuja Revisão mais recente foi um Errei com certeza 3: quem errou tendo certeza é quem mais
- * corrige depois do feedback (AP-02), então volta na frente na Sessão seguinte. Só olha as últimas
- * as últimas 500 Revisões; sem certeza informada, nada muda.
+ * corrige depois do feedback (AP-02), então volta na frente na Sessão seguinte. Só olha as
+ * `REVISOES_RECENTES` últimas Revisões; sem certeza informada, nada muda.
  */
 async function cartoesErradosComCerteza(repo: Repositorio): Promise<Set<string>> {
   const u = repo.ctx.usuarioId;
