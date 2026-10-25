@@ -54,6 +54,7 @@ const Precedente = lazy(() =>
 );
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
 // "Escolher meu concurso": duas telas curtas, baixadas só quando a pessoa chega a elas.
+const AcheOErro = lazy(() => import('./recall/AcheOErro').then((m) => ({ default: m.AcheOErro })));
 const Comecar = lazy(() => import('./comecar/Comecar').then((m) => ({ default: m.Comecar })));
 const ParaComecar = lazy(() =>
   import('./comecar/ParaComecar').then((m) => ({ default: m.ParaComecar })),
@@ -131,6 +132,14 @@ export function App({
                 <Route path="recall/registrar" element={<RegistrarErro />} />
                 <Route path="recall/registrar/varios" element={<RegistrarVarios />} />
                 <Route path="recall/revisar" element={<Drill />} />
+                <Route
+                  path="recall/ache-o-erro"
+                  element={
+                    <Carregando>
+                      <AcheOErro />
+                    </Carregando>
+                  }
+                />
                 <Route path="recall/frases/revisar" element={<RevisarFrases />} />
                 <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
                 <Route path="recall/erros/:id" element={<DetalheErro />} />

@@ -1,0 +1,95 @@
+/* Ache o erro (AP-06): a folha com o texto do dispositivo, os trechos tocáveis com sublinhado
+   pontilhado e, depois de conferir, a troca riscada ao lado do texto certo. Só tokens. O alvo do
+   trecho cresce por padding e margem negativa: 44 px de toque sem mexer no fluxo do texto. */
+.ache-folha {
+  text-align: left;
+}
+
+.ache-referencia {
+  display: inline-block;
+  margin: 0 0 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-chip);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.ache-instrucao {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--texto-atenuado);
+}
+
+.ache-texto {
+  margin: 0;
+  font-size: clamp(1.0625rem, 3.8vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.trecho-candidato {
+  all: unset;
+  cursor: pointer;
+  border-bottom: 1.5px dotted currentColor;
+  padding: 0.6rem 0.1em;
+  margin: -0.6rem -0.1em;
+  border-radius: 3px;
+}
+
+/* Marca-texto cheio com a tinta escura (a tinta não muda na Noite): contraste alto nos dois mundos. */
+.trecho-candidato[aria-pressed='true'] {
+  border-bottom: 2px solid var(--tinta);
+  background: var(--marca);
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+.trecho-candidato:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.ache-del {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--texto-atenuado);
+}
+
+.ache-ins {
+  text-decoration: none;
+  background: var(--marca);
+  color: var(--tinta);
+  padding: 0 0.2em;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.ache-respostas {
+  flex-direction: column;
+  align-items: stretch;
+  width: min(100%, 26rem);
+  margin-inline: auto;
+}
+
+.ache-respostas .principal.grande {
+  min-height: 50px;
+}
+
+.ache-outras {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ache-piloto dl {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.25rem 1rem;
+  margin: 0.5rem 0 0;
+}
+
+.ache-piloto dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
