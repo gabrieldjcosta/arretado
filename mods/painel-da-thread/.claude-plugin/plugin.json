@@ -1,0 +1,1 @@
+{ "name": "painel-da-thread", "version": "0.1.0", "license": "MIT", "description": "Mostra o estado da thread: tarefas, subagents e atividade, em painel (desktop) e faixa compacta (celular).", "types": "./types/index.d.ts" }
