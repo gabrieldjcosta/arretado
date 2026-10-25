@@ -36,11 +36,14 @@ export class ServicoDeContaPreguicoso implements ServicoDeConta {
     await (await this.servico()).aceitarSincronizacao(versao);
   }
   servidorDeSincronizacao(): ServidorDeSincronizacao {
+    const real = async () => (await this.servico()).servidorDeSincronizacao();
     return {
-      enviarLote: async (aparelhoId, versaoEsquema, entradas) =>
-        (await this.servico())
-          .servidorDeSincronizacao()
-          .enviarLote(aparelhoId, versaoEsquema, entradas),
+      enviarLote: async (...a) => (await real()).enviarLote(...a),
+      puxarLog: async (...a) => (await real()).puxarLog(...a),
+      lerRegistro: async (...a) => (await real()).lerRegistro(...a),
+      instantaneoInicio: async () => (await real()).instantaneoInicio(),
+      puxarRegistros: async (...a) => (await real()).puxarRegistros(...a),
+      registrarSincronia: async (...a) => (await real()).registrarSincronia(...a),
     };
   }
   async sair() {
