@@ -48,6 +48,12 @@ export const ItemDaCuradoria = z.strictObject({
    * um Anexo com blocos pelos títulos do Markdown, sem passar pelo estruturador (regra de 10/10/2026).
    */
   semArtigos: z.boolean().default(false),
+  /**
+   * Página do Planalto com um índice depois do fecho, que repete a estrutura (Código Civil): o
+   * texto acaba no último bloco igual a este ("ÍNDICE"). Sem o bloco, nada é cortado e os avisos
+   * do índice bloqueiam o item.
+   */
+  cortarEm: TextoCurto.optional(),
   /** Avisos de leitura que o curador viu e aceitou para este item (tipos de `TIPOS_DE_ANOMALIA`). */
   anomaliasAceitas: z.array(z.enum(TIPOS_DE_ANOMALIA as [string, ...string[]])).default([]),
 });
