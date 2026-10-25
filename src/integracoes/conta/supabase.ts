@@ -11,6 +11,11 @@ import {
   type SupabaseClient,
 } from '@supabase/supabase-js';
 import {
+  FalhaDeSincronizacao,
+  type RespostaDeEnvio,
+  type ServidorDeSincronizacao,
+} from '../../core/sincronizacao';
+import {
   FalhaDeConta,
   type CopiaNaNuvem,
   type ServicoDeConta,
@@ -50,6 +55,18 @@ function paraSessao(sessao: Session | null): SessaoDeConta | null {
 function enderecoDeRetorno(): string {
   const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   return local ? RETORNO_DESENVOLVIMENTO : RETORNO_PRODUCAO;
+}
+
+/**
+ * Falha de `enviar_lote`: só 4xx de conteúdo (400, 409, 422) é definitiva e leva à quarentena.
+ * Rede (0), sessão ou liberação (401, 403), limite (429) e 5xx tentam de novo mais tarde.
+ */
+export function traduzirFalhaDeEnvio(status: number): FalhaDeSincronizacao {
+  const definitiva = [400, 409, 422].includes(status);
+  return new FalhaDeSincronizacao(
+    definitiva ? 'O servidor recusou esta alteração.' : 'Sem conexão ou servidor indisponível.',
+    definitiva,
+  );
 }
 
 /** Traduz erro do Supabase em motivo que a tela sabe explicar, sem vazar texto técnico. */
@@ -147,6 +164,34 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
   async aceitarTermos(versao: string): Promise<void> {
     const { error } = await this.cliente.schema('arretado').rpc('aceitar_termos', { versao });
     if (error) throw new FalhaDeConta('indisponivel', 'Não foi possível registrar o aceite agora.');
+  }
+
+  async aceitarSincronizacao(versao: string): Promise<void> {
+    const { error } = await this.cliente
+      .schema('arretado')
+      .rpc('aceitar_sincronizacao', { versao });
+    if (!error) return;
+    // 'não foi liberado' vem do servidor quando a conta não está em `sincronizacao_liberada`.
+    throw traduzirErro(error);
+  }
+
+  servidorDeSincronizacao(): ServidorDeSincronizacao {
+    return {
+      enviarLote: async (aparelhoId, versaoEsquema, entradas) => {
+        let resposta;
+        try {
+          resposta = await this.cliente.schema('arretado').rpc('enviar_lote', {
+            p_aparelho: aparelhoId,
+            p_versao: versaoEsquema,
+            p_entradas: entradas,
+          });
+        } catch {
+          throw new FalhaDeSincronizacao('Sem conexão.', false);
+        }
+        if (resposta.error) throw traduzirFalhaDeEnvio(resposta.status);
+        return resposta.data as RespostaDeEnvio;
+      },
+    };
   }
 
   async sair(): Promise<void> {
