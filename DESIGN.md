@@ -252,7 +252,7 @@ Duas paletas fixas, uma por mundo; o tema escolhe o mundo e troca os papéis (`-
 
 ### Hierarchy
 
-- **Display** (título 800 de dia e 700 à noite, 1.875rem, 1.1, -0.02em): título de página (H1); 2.125rem a partir de 700 px e 2.375rem a partir de 900 px (30, 34 e 38 px, a escala do app; a prancha tinha 40/1, o Gabriel escolheu a do app em 20/10/2026). No Leitor do celular, o título com mais de 30 caracteres (o nome oficial das normas) desce para uma linha inteira sob o "Biblioteca", em 1.5rem (24 px) e equilibrado. Cor de título: a do texto do mundo.
+- **Display** (título 800 de dia e 700 à noite, 1.875rem, 1.1, -0.02em): título de página (H1); 2.125rem a partir de 700 px e 2.375rem a partir de 900 px (30, 34 e 38 px, a escala do app; a prancha tinha 40/1, o Gabriel escolheu a do app em 20/10/2026). No Leitor do celular, o título com mais de 30 caracteres (o nome oficial das normas) desce para uma linha inteira sob o "Biblioteca", em 1.5rem (24 px) e equilibrado (o Gabriel escolheu os 24 px em 25/10/2026, no cartão do PR #275). Cor de título: a do texto do mundo.
 - **Headline** (título 800 de dia e 600 à noite, 1.625rem, 1.15, -0.02em de dia e -0.005em à noite): título da folha do Agora e do Resumo do Dia.
 - **Title** (Atkinson 700, 1.25rem, 1.25): seções (H2); H3 em 1.0625rem.
 - **Body** (Atkinson 400, 1rem, 1.5): texto da interface. A lei usa Literata de 18 px (ajustável), medida de até 70ch e sem itálico.
