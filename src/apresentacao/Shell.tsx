@@ -113,7 +113,6 @@ export function Shell() {
             className="botao registrar-global"
             aria-keyshortcuts="E"
             title="Registrar erro (atalho: E)"
-            aria-label="Registrar erro"
           >
             Registrar erro
             <kbd className="atalho" aria-hidden="true">
