@@ -107,9 +107,8 @@ test('o cache guarda o app inteiro e nada que leve dado pessoal ou pese demais',
   expect(caminhos.some((c) => c.endsWith('.woff2'))).toBe(true);
   // Fora: acervo, Supabase, blocos do catálogo, mapas de código e a API do Worker.
   expect(caminhos.filter((c) => c.startsWith('/acervo/') || c.startsWith('/api/'))).toEqual([]);
-  expect(caminhos.filter((c) => /supabase|defensoria-publica|magistratura|\.map$/.test(c))).toEqual(
-    [],
-  );
+  expect(caminhos.filter((c) => c.endsWith('.map'))).toEqual([]);
+  expect(caminhos.filter((c) => /supabase|defensoria-publica|magistratura/.test(c))).toEqual([]);
   // Limite documentado em docs/solucao-de-problemas.md: o pré-cache cabe em 3 MB.
   expect(bytes).toBeLessThan(3 * 1024 * 1024);
 });

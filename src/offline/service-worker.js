@@ -54,6 +54,8 @@ self.addEventListener('activate', (evento) => {
 });
 
 self.addEventListener('message', (evento) => {
+  // Só uma página deste site (o botão "Atualizar") manda ativar.
+  if (evento.origin !== self.location.origin) return;
   if (evento.data && evento.data.tipo === 'ativar') void self.skipWaiting();
 });
 
