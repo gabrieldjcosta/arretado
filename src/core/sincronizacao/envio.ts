@@ -1,4 +1,6 @@
 import type { Alteracao, BancoArretado } from '../persistencia';
+import { lerSeqEnviado, ultimoTsDoRegistro, CHAVE_SEQ_ENVIADO } from './log-local';
+import { semCamposDoAparelho, sincroniza } from './politica';
 import {
   FalhaDeSincronizacao,
   type DivergenciaNoServidor,
@@ -10,8 +12,7 @@ import {
 export const MAX_ENTRADAS_POR_LOTE = 200;
 export const MAX_BYTES_POR_LOTE = 1_000_000;
 
-/** `meta`: último `seq` local já confirmado pelo servidor (cursor de envio, por banco de conta). */
-export const CHAVE_SEQ_ENVIADO = 'sync.ultimoSeqEnviado';
+export { CHAVE_SEQ_ENVIADO };
 /** `meta`: entradas que o servidor recusou de forma definitiva; nunca são apagadas nem reenviadas. */
 export const CHAVE_QUARENTENA = 'sync.quarentena';
 
@@ -37,37 +38,48 @@ export interface ResultadoDoEnvio {
   divergentes: DivergenciaNoServidor[];
 }
 
-async function lerSeqEnviado(db: BancoArretado): Promise<number> {
-  const v = (await db.meta.get(CHAVE_SEQ_ENVIADO))?.valor;
-  return typeof v === 'number' ? v : 0;
-}
-
 /**
- * `base_ts` da entrada: o `ts` da entrada anterior do mesmo registro neste log (o servidor guarda o
- * `ts_logico` da última que avançou). `acervo-adesao` não tem estado no servidor.
+ * `base_ts` da entrada: a versão do registro que este aparelho conhecia ao editar (a última entrada
+ * anterior que sincroniza, própria ou recebida; o servidor guarda o `ts_logico` da última que
+ * avançou). Uma resolução de Conflito traz a sua em `baseTs`. `acervo-adesao` não tem estado no servidor.
  */
 async function baseDe(db: BancoArretado, a: Alteracao): Promise<string | null> {
   if (a.operacao === 'acervo-adesao' || a.operacao === 'gravar') return null;
-  const anterior = await db.alteracoes
-    .where('[colecao+registroId]')
-    .equals([a.colecao, a.registroId])
-    .reverse()
-    .filter((x) => x.seq !== undefined && a.seq !== undefined && x.seq < a.seq)
-    .first();
-  return anterior?.ts ?? null;
+  if (a.baseTs !== undefined) return a.baseTs;
+  if (a.seq === undefined) return null;
+  return ultimoTsDoRegistro(db, a.colecao, a.registroId, a.seq);
 }
 
 async function paraEnvio(db: BancoArretado, a: Alteracao): Promise<EntradaDeEnvio> {
+  const base = await baseDe(db, a);
+  let operacao = a.operacao;
+  let { dados, removidos } = semCamposDoAparelho(a);
+  if (operacao === 'atualizar' && base === null) {
+    // Sem cadeia: o registro nasceu de uma adesão do acervo, que sobe por referência e não deixa
+    // linha no servidor. Uma `atualizar` ali divergiria para sempre; sobe o registro inteiro, que
+    // o servidor cria (`gravar` com base nula). As edições seguintes encadeiam nesta.
+    const atual = await db.tabela(a.colecao).get(a.registroId);
+    if (atual) {
+      operacao = 'gravar';
+      dados = { ...atual };
+      removidos = undefined;
+    }
+  }
   const e: EntradaDeEnvio = {
     ts: a.ts,
     colecao: a.colecao,
     registro_id: a.registroId,
-    operacao: a.operacao,
-    base_ts: await baseDe(db, a),
+    operacao,
+    base_ts: base,
   };
-  if (a.dados) e.dados = a.dados;
-  if (a.removidos) e.removidos = a.removidos;
+  if (dados) e.dados = dados;
+  if (removidos) e.removidos = removidos;
   return e;
+}
+
+/** A entrada é deste aparelho e desta conta e vale para o servidor (não é recebida nem só do aparelho). */
+function sobeDaqui(a: Alteracao, usuarioId: string, aparelhoId: string): boolean {
+  return a.usuarioId === usuarioId && a.aparelhoId === aparelhoId && sincroniza(a);
 }
 
 /** Agrupa em lotes de até `MAX_ENTRADAS_POR_LOTE` e `MAX_BYTES_POR_LOTE`; uma entrada grande fica sozinha. */
@@ -103,7 +115,8 @@ interface Item {
  * - Recusa definitiva (`FalhaDeSincronizacao.definitiva`): o lote é dividido ao meio até isolar a
  *   entrada ruim, que vai para a quarentena em `meta`; as demais seguem.
  * - Falha não definitiva (rede, sessão, servidor): propaga; o chamador tenta de novo mais tarde.
- * Entradas de outro usuário (banco antes da migração) são puladas sem enviar.
+ * Entradas de outro usuário (banco antes da migração), as recebidas de outros aparelhos e as que só
+ * mexem em campos do aparelho (`politica.ts`) são puladas sem enviar.
  */
 export async function enviarPendentes(
   db: BancoArretado,
@@ -153,7 +166,7 @@ export async function enviarPendentes(
 
     const proprias: Item[] = [];
     for (const a of pagina) {
-      if (a.seq === undefined || a.usuarioId !== ctx.usuarioId) continue;
+      if (a.seq === undefined || !sobeDaqui(a, ctx.usuarioId, ctx.aparelhoId)) continue;
       proprias.push({ seq: a.seq, entrada: await paraEnvio(db, a) });
     }
     for (const lote of montarLotes(proprias)) {
@@ -161,7 +174,7 @@ export async function enviarPendentes(
       const ultimo = lote.at(-1);
       if (ultimo) await avancar(ultimo.seq);
     }
-    // Entradas puladas (outro usuário) também ficam para trás do cursor.
+    // Entradas puladas (recebidas, de outro usuário ou só do aparelho) também ficam para trás do cursor.
     const ultimoDaPagina = pagina.at(-1)?.seq;
     if (ultimoDaPagina !== undefined && ultimoDaPagina > (await lerSeqEnviado(db))) {
       await avancar(ultimoDaPagina);
@@ -171,11 +184,15 @@ export async function enviarPendentes(
 }
 
 /** Quantas entradas do log local ainda esperam envio (para o estado "Enviado à conta" na tela). */
-export async function contarPendentes(db: BancoArretado, usuarioId: string): Promise<number> {
+export async function contarPendentes(
+  db: BancoArretado,
+  usuarioId: string,
+  aparelhoId: string,
+): Promise<number> {
   const cursor = await lerSeqEnviado(db);
   return db.alteracoes
     .where('seq')
     .above(cursor)
-    .filter((a) => a.usuarioId === usuarioId)
+    .filter((a) => sobeDaqui(a, usuarioId, aparelhoId))
     .count();
 }

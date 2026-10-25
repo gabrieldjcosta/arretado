@@ -118,6 +118,11 @@ export class ServicoDeContaFalso implements ServicoDeConta {
         this.divergenciasDoProximoLote = [];
         return Promise.resolve({ seq_max: this.lotesRecebidos.length, divergentes });
       },
+      puxarLog: () => Promise.resolve([]),
+      lerRegistro: () => Promise.resolve(null),
+      instantaneoInicio: () => Promise.resolve(0),
+      puxarRegistros: () => Promise.resolve([]),
+      registrarSincronia: () => Promise.resolve(),
     };
   }
   sair(): Promise<void> {

@@ -1,5 +1,6 @@
 import { camposMinimos } from '../modelo/fabrica';
 import type { Repositorio } from '../persistencia';
+import { RECEPCAO_VAZIA } from '../../testes/servidor-vazio';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   CHAVE_QUARENTENA,
@@ -19,6 +20,11 @@ import {
 
 /** Servidor em memória com a mesma regra de idempotência do índice único do servidor real. */
 class ServidorFalso implements ServidorDeSincronizacao {
+  readonly puxarLog = RECEPCAO_VAZIA.puxarLog;
+  readonly lerRegistro = RECEPCAO_VAZIA.lerRegistro;
+  readonly instantaneoInicio = RECEPCAO_VAZIA.instantaneoInicio;
+  readonly puxarRegistros = RECEPCAO_VAZIA.puxarRegistros;
+  readonly registrarSincronia = RECEPCAO_VAZIA.registrarSincronia;
   readonly chamadas: EntradaDeEnvio[][] = [];
   readonly recebidas = new Map<string, EntradaDeEnvio>();
   falharNaChamada: number | null = null;
@@ -67,15 +73,16 @@ describe('enviarPendentes', () => {
     const servidor = new ServidorFalso();
     const e1 = await novoErro();
     await novoErro();
-    const total = await repo.db.alteracoes.count();
-    expect(await contarPendentes(repo.db, ctx.usuarioId)).toBe(total);
+    // `usuarios` nunca sai do aparelho (política); o resto do log sobe.
+    const total = await repo.db.alteracoes.filter((a) => a.colecao !== 'usuarios').count();
+    expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(total);
 
     const r = await enviarPendentes(repo.db, servidor, ctx);
     expect(r.enviadas).toBe(total);
     expect(servidor.chamadas).toHaveLength(1);
     const seqs = (await repo.db.alteracoes.toArray()).map((a) => a.seq);
     expect(await cursor(repo)).toBe(Math.max(...(seqs as number[])));
-    expect(await contarPendentes(repo.db, ctx.usuarioId)).toBe(0);
+    expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(0);
 
     const r2 = await enviarPendentes(repo.db, servidor, ctx);
     expect(r2.enviadas).toBe(0);
@@ -103,14 +110,16 @@ describe('enviarPendentes', () => {
     const servidor = new ServidorFalso();
     servidor.falharNaChamada = 2;
     await expect(enviarPendentes(repo.db, servidor, ctx)).rejects.toThrow('sem rede');
-    const pendentes = await contarPendentes(repo.db, ctx.usuarioId);
+    const pendentes = await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId);
     expect(pendentes).toBeGreaterThan(0);
     expect(pendentes).toBeLessThan(await repo.db.alteracoes.count());
 
     servidor.falharNaChamada = null;
     await enviarPendentes(repo.db, servidor, ctx);
-    expect(await contarPendentes(repo.db, ctx.usuarioId)).toBe(0);
-    expect(servidor.recebidas.size).toBe(await repo.db.alteracoes.count());
+    expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(0);
+    expect(servidor.recebidas.size).toBe(
+      await repo.db.alteracoes.filter((a) => a.colecao !== 'usuarios').count(),
+    );
     repo.fechar();
   });
 
@@ -139,7 +148,7 @@ describe('enviarPendentes', () => {
     const entradaRuim = (await repo.db.alteracoes.toArray()).find((a) => a.registroId === ruim.id);
     expect(quarentena[0]?.seq).toBe(entradaRuim?.seq);
     expect([...servidor.recebidas.values()].some((e) => e.registro_id === ruim.id)).toBe(false);
-    expect(await contarPendentes(repo.db, ctx.usuarioId)).toBe(0);
+    expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(0);
     // Nada foi apagado do log local.
     expect(entradaRuim).toBeTruthy();
     repo.fechar();
@@ -162,7 +171,7 @@ describe('enviarPendentes', () => {
     const r = await enviarPendentes(repo.db, servidor, ctx);
     expect([...servidor.recebidas.values()].some((e) => e.registro_id.endsWith('fe'))).toBe(false);
     expect(r.divergentes).toEqual(servidor.divergentes);
-    expect(await contarPendentes(repo.db, ctx.usuarioId)).toBe(0);
+    expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(0);
     repo.fechar();
   });
 });

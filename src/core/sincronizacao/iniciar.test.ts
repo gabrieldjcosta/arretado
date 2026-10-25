@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { RECEPCAO_VAZIA } from '../../testes/servidor-vazio';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { registrarConsentimento } from '../preferencias';
+import { alterarPreferencias, registrarConsentimento } from '../preferencias';
 import { iniciarSincronizacao } from './iniciar';
 import type { ServidorDeSincronizacao } from './tipos';
 
@@ -8,7 +9,7 @@ import type { ServidorDeSincronizacao } from './tipos';
 const setTimeoutReal = globalThis.setTimeout;
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -55,6 +56,30 @@ describe('iniciarSincronizacao', () => {
     s.parar();
   });
 
+  it('puxa o log do servidor de tempos em tempos enquanto a aba está à vista', async () => {
+    const { repo, conta, usuarioId } = await cenario();
+    await registrarConsentimento(repo, 'sincronizar');
+    let aba = true;
+    const s = await iniciarSincronizacao({
+      repo,
+      servidor: conta.servidor,
+      usuarioId,
+      intervaloDePuxadaMs: 20_000,
+      visivel: () => aba,
+    });
+    await avancar(10_000);
+    const aoAbrir = conta.contagem.puxadas;
+    expect(aoAbrir).toBeGreaterThan(0);
+    await avancar(40_000);
+    expect(conta.contagem.puxadas).toBeGreaterThan(aoAbrir);
+    aba = false;
+    await avancar(10_000); // deixa terminar a rodada que já estava agendada
+    const comAbaFechada = conta.contagem.puxadas;
+    await avancar(60_000);
+    expect(conta.contagem.puxadas).toBe(comAbaFechada);
+    s.parar();
+  });
+
   it('parar cancela envios futuros', async () => {
     const { repo, conta, usuarioId } = await cenario();
     await registrarConsentimento(repo, 'sincronizar');
@@ -73,7 +98,8 @@ describe('iniciarSincronizacao', () => {
 });
 
 async function alterarAlgo(repo: Awaited<ReturnType<typeof cenario>>['repo']) {
-  await registrarConsentimento(repo, 'backup-nuvem');
+  // Preferência que sincroniza (`usuarios` e a aparência ficam no aparelho).
+  await alterarPreferencias(repo, { modulosDesabilitados: ['x'] });
 }
 
 /** Avança o relógio falso e dá voltas reais para o IndexedDB falso terminar o que o timer iniciou. */
@@ -84,11 +110,17 @@ async function avancar(ms: number) {
 
 function servidorFalso() {
   const lotesRecebidos: unknown[][] = [];
+  const contagem = { puxadas: 0 };
   const servidor: ServidorDeSincronizacao = {
+    ...RECEPCAO_VAZIA,
+    puxarLog: () => {
+      contagem.puxadas += 1;
+      return Promise.resolve([]);
+    },
     enviarLote: (_aparelho, _versao, entradas) => {
       lotesRecebidos.push(entradas);
       return Promise.resolve({ seq_max: lotesRecebidos.length, divergentes: [] });
     },
   };
-  return { servidor, lotesRecebidos };
+  return { servidor, lotesRecebidos, contagem };
 }
