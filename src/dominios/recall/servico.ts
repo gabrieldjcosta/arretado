@@ -4,6 +4,7 @@ import { dataCivil, somarDias } from '../../core/datas';
 import type {
   Cartao,
   Erro,
+  Faixa,
   Frase,
   Intervalo,
   RespostaFrase,
@@ -12,6 +13,7 @@ import type {
 } from '../../core/modelo';
 import type { Alteracoes, Dados, Pagina, Repositorio } from '../../core/persistencia';
 import { agendar, agendarFrase } from './agendamento';
+import { ordenarPorValor } from './ordem-de-valor';
 import { ACAO_RECOMENDADA, completude, sugerirCausa } from './causa';
 
 export function hoje(repo: Repositorio): string {
@@ -432,6 +434,27 @@ export async function filaDoDia(repo: Repositorio, maximo = 1_000): Promise<Cart
           ? -1
           : 1,
     );
+}
+
+/** Um cartão da fila já com a faixa do Ponto (ou nenhuma), pronto para `ordenarPorValor`. */
+export type CartaoComFaixa = Cartao & { faixa?: Faixa };
+
+/**
+ * A fila de hoje do mais para o menos valioso (AP-01). Mesmos cartões de `filaDoDia`, outra ordem;
+ * nenhuma data de Revisão é tocada. O Hoje e o Drill chamam esta, e por isso o lote que um mostra
+ * é o que o outro entrega.
+ */
+export async function filaPorValor(repo: Repositorio): Promise<CartaoComFaixa[]> {
+  const fila = await filaDoDia(repo);
+  const faixas = new Map<string, Faixa | undefined>();
+  for (const id of new Set(fila.flatMap((c) => (c.pontoId ? [c.pontoId] : [])))) {
+    faixas.set(id, (await repo.colecao('pontos').obter(id))?.faixa);
+  }
+  const comFaixa = fila.map((c): CartaoComFaixa => {
+    const faixa = c.pontoId ? faixas.get(c.pontoId) : undefined;
+    return faixa ? { ...c, faixa } : c;
+  });
+  return ordenarPorValor(comFaixa, hoje(repo));
 }
 
 /**

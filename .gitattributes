@@ -5,3 +5,9 @@
 # no índice (colados.json) e ficam como a área de transferência os entregou.
 corpus/normas/*.html -text
 corpus/normas/*.colado.txt -text
+
+# Logs só de acréscimo: dois PRs que acrescentam entradas ao fim não precisam de conflito manual.
+# Vale para merges feitos com git (local, ou a Fila trazendo a integracao); o botão de mesclar do
+# GitHub ignora este arquivo.
+docs/solucao-de-problemas.md merge=union
+docs/glossario.md merge=union

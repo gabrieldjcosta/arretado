@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -7,6 +7,7 @@ import {
   contarFrasesVencidas,
   contarVencidos,
   filaDoDia,
+  filaPorValor,
   revisar,
   suspenderCartao,
   vencemAmanha,
@@ -68,6 +69,10 @@ export function Drill() {
   const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
 
   const cota = useRef(0);
+  // `?itens=N`: o lote que o Hoje montou pelo valor (AP-01). Só vale na primeira rodada; "Revisar
+  // mais" volta à fila e à cota de sempre.
+  const [params] = useSearchParams();
+  const itensDoHoje = useRef(Number(params.get('itens')) || 0);
 
   const terminar = useCallback(async () => {
     try {
@@ -91,7 +96,9 @@ export function Drill() {
   /** Carrega o próximo lote: os mais atrasados primeiro, até a cota. */
   const iniciarLote = useCallback(
     (ativo: () => boolean = () => true) => {
-      Promise.all([filaDoDia(repo), obterPreferencias(repo)]).then(
+      const itens = itensDoHoje.current;
+      itensDoHoje.current = 0;
+      Promise.all([itens > 0 ? filaPorValor(repo) : filaDoDia(repo), obterPreferencias(repo)]).then(
         ([fila, preferencias]) => {
           if (!ativo()) return;
           cota.current = cotaDiaria(preferencias);
@@ -99,7 +106,7 @@ export function Drill() {
           else {
             setEstado({
               tipo: 'revisando',
-              fila: fila.slice(0, cota.current),
+              fila: fila.slice(0, itens > 0 ? itens : cota.current),
               indice: 0,
               virado: false,
             });
