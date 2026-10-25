@@ -30,7 +30,9 @@ export function ehColecao(nome: string): nome is NomeColecao {
   return (NOMES_COLECOES as readonly string[]).includes(nome);
 }
 
-export type Validado = { ok: true; registro: Registro } | { ok: false; motivo: string };
+/** `esquema`: o esquema deste app recusou o registro (talvez um app mais novo o escreveu); vale tentar de novo após atualizar. */
+export type Validado =
+  { ok: true; registro: Registro } | { ok: false; motivo: string; esquema?: true };
 
 /** Registro como a coleção o exige e do dono e do id esperados; o que vem de fora nunca entra sem isto. */
 export function validarRegistro(
@@ -45,6 +47,7 @@ export function validarRegistro(
     return {
       ok: false,
       motivo: `registro inválido em ${nome}: ${p?.path.join('.') ?? ''} ${p?.message ?? ''}`.trim(),
+      esquema: true,
     };
   }
   if (r.data.id !== id)

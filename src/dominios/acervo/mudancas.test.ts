@@ -84,6 +84,11 @@ describe('mudancasQueAfetam', () => {
     expect(m?.agora).toContain('2 (dois) a 6 (seis) anos');
     expect(m?.afetados.map((a) => a.tipo)).toEqual(['cartao', 'frase', 'estrela']);
     expect(m?.afetados[0]?.faixa).toBe('altissima');
+    expect(m?.afetados.map((a) => a.titulo)).toEqual([
+      'Pena da receptação?',
+      'Receptação: 1 a 4 anos',
+      'Estrela',
+    ]);
     // O texto da pessoa não muda.
     expect((await repo.colecao('frases').obter(frase.id))?.texto).toBe('Receptação: 1 a 4 anos');
     repo.fechar();
