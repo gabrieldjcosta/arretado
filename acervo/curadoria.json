@@ -301,11 +301,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l8072.htm"
-      },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-11343-2006",
@@ -514,11 +514,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm"
-      },
-      "anomaliasAceitas": ["duplicata", "artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-10741-2003",
@@ -698,11 +698,11 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
-      },
-      "anomaliasAceitas": ["artigo_ausente", "artigo_fora_de_ordem"]
+      }
     },
     {
       "id": "lei-federal-10257-2001",
@@ -1483,11 +1483,12 @@
         }
       ],
       "avisos": [],
+      "versao": 2,
       "fonte": {
         "adaptador": "planalto",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14750.htm"
       },
-      "anomaliasAceitas": ["artigo_so_tachado", "artigo_ausente", "artigo_fora_de_ordem"]
+      "anomaliasAceitas": ["artigo_so_tachado"]
     },
     {
       "id": "lei-federal-12334-2010",
@@ -3672,6 +3673,1825 @@
         "adaptador": "markdown",
         "arquivo": "resolucao-conanda-273-2025.md",
         "urlOficial": "https://www.gov.br/participamaisbrasil/resolucao-n-273-de-3-de-outubro-de-2025"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-10406-2002",
+      "titulo": "Lei 10.406/2002 (Código Civil)",
+      "grupo": "Leis federais",
+      "tituloCurto": "Código Civil",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "O índice do fim da página do Planalto ficou de fora. Os Subtítulos (no Direito de Empresa e no de Família) e o cabeçalho da Parte Geral não aparecem como divisão, e os Capítulos de cada Subtítulo se repetem na lista."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "estrutural_repetido"],
+      "cortarEm": "ÍNDICE",
+      "cabecalhosSemNivel": ["^SUBTÍTULO [IVXLCDM]+$"],
+      "tituloOficial": "Código Civil",
+      "ementa": "Institui o Código Civil."
+    },
+    {
+      "id": "decreto-lei-2848-1940",
+      "titulo": "Decreto-Lei 2.848/1940 (Código Penal)",
+      "grupo": "Leis federais",
+      "tituloCurto": "Código Penal",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848.htm"
+      },
+      "anomaliasAceitas": [
+        "tachado_sem_dispositivo",
+        "estrutural_substituido",
+        "duplicata",
+        "artigo_ausente",
+        "alinea_sem_inciso",
+        "paragrafo_unico_com_numerado",
+        "paragrafo_1_sem_2"
+      ]
+    },
+    {
+      "id": "lei-federal-8987-1995",
+      "titulo": "Lei 8.987/1995 (Concessões e permissões de serviços públicos)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8987compilada.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-14133-2021",
+      "titulo": "Lei 14.133/2021 (Licitações e Contratos Administrativos)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [
+        "Os arts. 337-E a 337-P, entre os arts. 178 e 179, são do Código Penal (crimes em licitações), que esta lei acrescentou."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "paragrafo_unico_com_numerado"]
+    },
+    {
+      "id": "lei-federal-9099-1995",
+      "titulo": "Lei 9.099/1995 (Juizados Especiais Cíveis e Criminais)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9099.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-3689-1941",
+      "titulo": "Decreto-Lei 3.689/1941 (Código de Processo Penal)",
+      "grupo": "Leis federais",
+      "tituloCurto": "CPP",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-7853-1989",
+      "titulo": "Lei 7.853/1989 (apoio às pessoas com deficiência e tutela coletiva dos seus interesses)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l7853.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-complementar-federal-123-2006",
+      "titulo": "Lei Complementar 123/2006 (Estatuto da Microempresa e da Empresa de Pequeno Porte)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        },
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "tachado_sem_dispositivo",
+        "duplicata",
+        "artigo_so_tachado"
+      ]
+    },
+    {
+      "id": "lei-federal-11101-2005",
+      "titulo": "Lei 11.101/2005 (Recuperação judicial, extrajudicial e falência)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm"
+      },
+      "anomaliasAceitas": ["artigo_so_tachado"]
+    },
+    {
+      "id": "decreto-federal-678-1992",
+      "titulo": "Decreto 678/1992 (promulga a Convenção Americana sobre Direitos Humanos)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        }
+      ],
+      "avisos": [
+        "Na Convenção, a alínea de um item numerado segue na linha do item (por exemplo, art. 8, 2, a a h).",
+        "As declarações e reservas dos outros Estados ficaram de fora; a do Brasil está no art. 2º do decreto."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "decreto-federal-678-1992.md",
+        "urlOficial": "https://www.planalto.gov.br/ccivil_03/decreto/d0678.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "item_sem_alinea"]
+    },
+    {
+      "id": "lei-federal-9296-1996",
+      "titulo": "Lei 9.296/1996 (Interceptação telefônica)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9296.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9784-1999",
+      "titulo": "Lei 9.784/1999 (Processo administrativo federal)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-11079-2004",
+      "titulo": "Lei 11.079/2004 (Parcerias público-privadas)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/lei/l11079.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8429-1992",
+      "titulo": "Lei 8.429/1992 (Improbidade administrativa)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"
+      },
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta"]
+    },
+    {
+      "id": "lei-federal-8038-1990",
+      "titulo": "Lei 8.038/1990 (processos perante o STJ e o STF)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [
+        "Os arts. 497 a 508, entre os arts. 42 e 43, são do CPC de 1973, que esta lei alterou."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8038.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-8842-1994",
+      "titulo": "Lei 8.842/1994 (Política Nacional do Idoso)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Humanos"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8842.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8629-1993",
+      "titulo": "Lei 8.629/1993 (Reforma agrária)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Agrário"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8629.htm"
+      },
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta"]
+    },
+    {
+      "id": "lei-federal-601-1850",
+      "titulo": "Lei 601/1850 (Lei de Terras)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Agrário"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l0601-1850.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8934-1994",
+      "titulo": "Lei 8.934/1994 (Registro Público de Empresas Mercantis)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8934.htm"
+      },
+      "anomaliasAceitas": ["estrutural_substituido"]
+    },
+    {
+      "id": "lei-federal-1060-1950",
+      "titulo": "Lei 1.060/1950 (Assistência judiciária gratuita)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Princípios e Atribuições Institucionais da Defensoria Pública do Estado"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l1060.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"]
+    },
+    {
+      "id": "lei-federal-4504-1964",
+      "titulo": "Lei 4.504/1964 (Estatuto da Terra)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Agrário"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l4504.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-13874-2019",
+      "titulo": "Lei 13.874/2019 (Declaração de Direitos de Liberdade Econômica)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13874.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-3365-1941",
+      "titulo": "Decreto-Lei 3.365/1941 (Desapropriação por utilidade pública)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3365.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-12846-2013",
+      "titulo": "Lei 12.846/2013 (Lei Anticorrupção)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-13303-2016",
+      "titulo": "Lei 13.303/2016 (Estatuto das Estatais)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13303.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-911-1969",
+      "titulo": "Decreto-Lei 911/1969 (Alienação fiduciária e busca e apreensão)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/1965-1988/Del0911.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9514-1997",
+      "titulo": "Lei 9.514/1997 (Financiamento imobiliário e alienação fiduciária de imóvel)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9514.htm"
+      },
+      "anomaliasAceitas": ["duplicata"]
+    },
+    {
+      "id": "lei-federal-4591-1964",
+      "titulo": "Lei 4.591/1964 (Condomínio em edificações e incorporações imobiliárias)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Na página do Planalto, o inciso II do art. 66 vem grafado \"lI\"; aqui foi corrigido."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "lei-federal-4591-1964.md",
+        "urlOficial": "https://www.planalto.gov.br/ccivil_03/leis/l4591.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-10931-2004",
+      "titulo": "Lei 10.931/2004 (Patrimônio de afetação e Cédula de Crédito Bancário)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [
+        "Os arts. 31-A a 31-F (Lei 4.591/1964), 66-B (Lei 4.728/1965), 213 e 214 (Lei 6.015/1973), entre os arts. 53 e 60, são das leis que esta altera."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/lei/l10.931.htm"
+      }
+    },
+    {
+      "id": "lei-federal-14382-2022",
+      "titulo": "Lei 14.382/2022 (Sistema Eletrônico dos Registros Públicos, SERP)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14382.htm"
+      },
+      "anomaliasAceitas": ["artigo_so_tachado", "paragrafo_1_sem_2"]
+    },
+    {
+      "id": "lei-federal-14010-2020",
+      "titulo": "Lei 14.010/2020 (Regime Jurídico Emergencial e Transitório na pandemia, RJET)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Os arts. 6º e 7º, vetados e depois promulgados, aparecem no fim, depois do art. 21, como na página do Planalto."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2020/lei/l14010.htm"
+      }
+    },
+    {
+      "id": "lei-federal-6830-1980",
+      "titulo": "Lei 6.830/1980 (Execução fiscal)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l6830.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12016-2009",
+      "titulo": "Lei 12.016/2009 (Mandado de segurança)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12016.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-4717-1965",
+      "titulo": "Lei 4.717/1965 (Ação popular)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l4717.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"]
+    },
+    {
+      "id": "lei-federal-7347-1985",
+      "titulo": "Lei 7.347/1985 (Ação civil pública)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [
+        "Na página do Planalto, os incisos I e II do art. 1º vêm grafados com a letra l; aqui foram corrigidos."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "lei-federal-7347-1985.md",
+        "urlOficial": "https://www.planalto.gov.br/ccivil_03/leis/l7347compilada.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-11419-2006",
+      "titulo": "Lei 11.419/2006 (Processo judicial eletrônico)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [
+        "Na página do Planalto, os títulos dos Capítulos III e IV vêm em minúsculas; aqui foram corrigidos."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "lei-federal-11419-2006.md",
+        "urlOficial": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11419.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9279-1996",
+      "titulo": "Lei 9.279/1996 (Propriedade industrial)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9279.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9807-1999",
+      "titulo": "Lei 9.807/1999 (Proteção a vítimas e testemunhas)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9807.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-complementar-federal-64-1990",
+      "titulo": "Lei Complementar 64/1990 (Inelegibilidades)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Eleitoral"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp64.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9504-1997",
+      "titulo": "Lei 9.504/1997 (Lei das Eleições)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Eleitoral"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9504.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-4320-1964",
+      "titulo": "Lei 4.320/1964 (Normas gerais de direito financeiro)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Financeiro e Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l4320.htm"
+      },
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-complementar-federal-101-2000",
+      "titulo": "Lei Complementar 101/2000 (Lei de Responsabilidade Fiscal)",
+      "grupo": "Leis complementares",
+      "tituloCurto": "LRF",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Financeiro e Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp101.htm"
+      },
+      "anomaliasAceitas": ["duplicata"]
+    },
+    {
+      "id": "lei-federal-13655-2018",
+      "titulo": "Lei 13.655/2018 (altera a LINDB: segurança jurídica e eficiência)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Altera a LINDB: os arts. 20 a 30 vêm entre aspas no art. 1º. Para ler no lugar, abra a LINDB (Decreto-Lei 4.657/1942)."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13655.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-14230-2021",
+      "titulo": "Lei 14.230/2021 (altera a Lei de Improbidade Administrativa)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [
+        "Altera a Lei 8.429/1992: o texto novo vem entre aspas no art. 2º. Para ler no lugar, abra a Lei 8.429/1992."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14230.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-federal-20910-1932",
+      "titulo": "Decreto 20.910/1932 (Prescrição quinquenal contra a Fazenda Pública)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d20910.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-4597-1942",
+      "titulo": "Decreto-Lei 4.597/1942 (Prescrição das dívidas da Fazenda Pública)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/1937-1946/Del4597.htm"
+      },
+      "anomaliasAceitas": ["artigo_ausente"]
+    },
+    {
+      "id": "lei-federal-6515-1977",
+      "titulo": "Lei 6.515/1977 (Lei do Divórcio)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": ["O art. 155, entre os arts. 52 e 53, é de outra lei, que esta altera."],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l6515.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "item_sem_alinea"]
+    },
+    {
+      "id": "lei-federal-9278-1996",
+      "titulo": "Lei 9.278/1996 (União estável)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9278.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9507-1997",
+      "titulo": "Lei 9.507/1997 (Habeas data)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9507.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8560-1992",
+      "titulo": "Lei 8.560/1992 (Investigação de paternidade)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8560.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-10259-2001",
+      "titulo": "Lei 10.259/2001 (Juizados Especiais Federais)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/leis_2001/l10259.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12153-2009",
+      "titulo": "Lei 12.153/2009 (Juizados Especiais da Fazenda Pública)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12153.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8437-1992",
+      "titulo": "Lei 8.437/1992 (Medidas cautelares contra o Poder Público)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8437.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9494-1997",
+      "titulo": "Lei 9.494/1997 (Tutela antecipada contra a Fazenda Pública)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9494.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-11105-2005",
+      "titulo": "Lei 11.105/2005 (Lei de Biossegurança)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11105.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-201-1967",
+      "titulo": "Decreto-Lei 201/1967 (Responsabilidade de prefeitos e vereadores)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del0201.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9096-1995",
+      "titulo": "Lei 9.096/1995 (Partidos políticos)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Eleitoral"
+        }
+      ],
+      "avisos": ["O art. 120, entre os arts. 60 e 61, é de outra lei, que esta altera."],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9096.htm"
+      }
+    },
+    {
+      "id": "lei-complementar-federal-86-1996",
+      "titulo": "Lei Complementar 86/1996 (Ação rescisória eleitoral)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Eleitoral"
+        }
+      ],
+      "avisos": [
+        "Acrescenta a alínea j ao inciso I do art. 22 do Código Eleitoral (texto entre aspas no art. 1º)."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp86.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-complementar-federal-35-1979",
+      "titulo": "Lei Complementar 35/1979 (Lei Orgânica da Magistratura Nacional)",
+      "grupo": "Leis complementares",
+      "tituloCurto": "LOMAN",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Legislação Institucional / Lei Orgânica"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp35.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "sem_pai", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-6404-1976",
+      "titulo": "Lei 6.404/1976 (Sociedades por ações)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l6404compilada.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-13058-2014",
+      "titulo": "Lei 13.058/2014 (Guarda compartilhada)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Altera o Código Civil (arts. 1.583, 1.584, 1.585 e 1.634): o texto novo vem entre aspas no art. 2º. Para ler no lugar, abra o Código Civil."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13058.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8935-1994",
+      "titulo": "Lei 8.935/1994 (Serviços notariais e de registro)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8935.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-11417-2006",
+      "titulo": "Lei 11.417/2006 (Súmula vinculante)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11417.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12414-2011",
+      "titulo": "Lei 12.414/2011 (Cadastro positivo)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito do Consumidor"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12414.htm"
+      },
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta"]
+    },
+    {
+      "id": "decreto-federal-9936-2019",
+      "titulo": "Decreto 9.936/2019 (regulamenta o Cadastro Positivo)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito do Consumidor"
+        },
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/decreto/d9936.htm"
+      },
+      "anomaliasAceitas": ["linha_continuada"]
+    },
+    {
+      "id": "lei-federal-4737-1965",
+      "titulo": "Lei 4.737/1965 (Código Eleitoral)",
+      "grupo": "Leis federais",
+      "tituloCurto": "Código Eleitoral",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Eleitoral"
+        }
+      ],
+      "avisos": [
+        "Na página do Planalto, o parágrafo único do art. 153 vem grafado \"arágrafo único\"; aqui foi corrigido."
+      ],
+      "fonte": {
+        "adaptador": "markdown",
+        "arquivo": "lei-federal-4737-1965.md",
+        "urlOficial": "https://www.planalto.gov.br/ccivil_03/leis/l4737.htm"
+      },
+      "anomaliasAceitas": ["duplicata", "artigo_ausente", "alinea_sem_inciso", "paragrafo_1_sem_2"],
+      "tituloOficial": "Código Eleitoral"
+    },
+    {
+      "id": "lei-federal-9609-1998",
+      "titulo": "Lei 9.609/1998 (Programa de computador)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9609.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-7960-1989",
+      "titulo": "Lei 7.960/1989 (Prisão temporária)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l7960.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9492-1997",
+      "titulo": "Lei 9.492/1997 (Protesto de títulos)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9492.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-11076-2004",
+      "titulo": "Lei 11.076/2004 (Títulos do agronegócio)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Empresarial"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2004/lei/l11076.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-5172-1966",
+      "titulo": "Lei 5.172/1966 (Código Tributário Nacional)",
+      "grupo": "Leis federais",
+      "tituloCurto": "CTN",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        },
+        {
+          "disciplina": "Direito Financeiro e Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l5172.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"],
+      "tituloOficial": "Código Tributário Nacional",
+      "ementa": "Dispõe sobre o Sistema Tributário Nacional e institui normas gerais de direito tributário aplicáveis à União, Estados e Municípios."
+    },
+    {
+      "id": "lei-federal-13123-2015",
+      "titulo": "Lei 13.123/2015 (Patrimônio genético e conhecimento tradicional associado)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13123.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-complementar-federal-75-1993",
+      "titulo": "Lei Complementar 75/1993 (Estatuto do Ministério Público da União)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Legislação Institucional / Lei Orgânica"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp75.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-8625-1993",
+      "titulo": "Lei 8.625/1993 (Lei Orgânica Nacional do Ministério Público)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Legislação Institucional / Lei Orgânica"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8625.htm"
+      },
+      "anomaliasAceitas": ["linha_continuada"]
+    },
+    {
+      "id": "lei-complementar-federal-105-2001",
+      "titulo": "Lei Complementar 105/2001 (Sigilo das operações financeiras)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp105.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-5197-1967",
+      "titulo": "Lei 5.197/1967 (Proteção à fauna)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l5197.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "decreto-federal-7724-2012",
+      "titulo": "Decreto 7.724/2012 (regulamenta a Lei de Acesso à Informação)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/decreto/d7724.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-federal-1171-1994",
+      "titulo": "Decreto 1.171/1994 (Código de Ética do Servidor Público Civil Federal)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [
+        "O Código de Ética está no Anexo, em texto corrido: as regras são numeradas em romanos, sem artigos."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto/d1171.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8112-1990",
+      "titulo": "Lei 8.112/1990 (Regime jurídico dos servidores públicos federais)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [
+        "Os arts. 192, 193, 231, 240 e 250, vetados e depois promulgados, aparecem no fim, depois do art. 253, como na página do Planalto."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_1_sem_2"]
+    },
+    {
+      "id": "decreto-federal-6514-2008",
+      "titulo": "Decreto 6.514/2008 (Infrações e sanções administrativas ambientais)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/decreto/d6514.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-10410-2002",
+      "titulo": "Lei 10.410/2002 (Carreira de Especialista em Meio Ambiente)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10410.htm"
+      },
+      "anomaliasAceitas": ["artigo_so_tachado"]
+    },
+    {
+      "id": "lei-federal-11284-2006",
+      "titulo": "Lei 11.284/2006 (Gestão de florestas públicas)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11284.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-complementar-federal-140-2011",
+      "titulo": "Lei Complementar 140/2011 (Cooperação federativa em matéria ambiental)",
+      "grupo": "Leis complementares",
+      "tipo": "Lei complementar",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp140.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-federal-8772-2016",
+      "titulo": "Decreto 8.772/2016 (regulamenta a Lei 13.123/2015, patrimônio genético)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/decreto/d8772.htm"
+      },
+      "anomaliasAceitas": ["linha_solta", "duplicata"]
+    },
+    {
+      "id": "decreto-federal-4340-2002",
+      "titulo": "Decreto 4.340/2002 (regulamenta o SNUC)",
+      "grupo": "Decretos",
+      "tipo": "Decreto",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto/2002/d4340.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-14944-2024",
+      "titulo": "Lei 14.944/2024 (Política Nacional de Manejo Integrado do Fogo)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Ambiental"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14944.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-1001-1969",
+      "titulo": "Decreto-Lei 1.001/1969 (Código Penal Militar)",
+      "grupo": "Leis federais",
+      "tituloCurto": "Código Penal Militar",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del1001.htm"
+      },
+      "anomaliasAceitas": ["linha_solta", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-estadual-10261-1968",
+      "titulo": "Lei (SP) 10.261/1968 (Estatuto dos Funcionários Públicos Civis do Estado)",
+      "grupo": "Leis estaduais",
+      "tipo": "Lei",
+      "esfera": "estadual",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [
+        "No parágrafo único do art. 95, as alíneas a a e aparecem duas vezes (itens 1 e 2): a lista mostra uma série só e a outra fica como redação anterior.",
+        "A página da Assembleia não traz o art. 267-K (vai do 267-J ao 267-L), e o nome do Título VII aparece cortado."
+      ],
+      "fonte": {
+        "adaptador": "html",
+        "url": "https://www.al.sp.gov.br/repositorio/legislacao/lei/1968/lei-10261-28.10.1968.html"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "duplicata",
+        "artigo_so_tachado",
+        "artigo_ausente",
+        "alinea_sem_inciso",
+        "item_sem_alinea"
+      ]
+    },
+    {
+      "id": "lei-federal-9307-1996",
+      "titulo": "Lei 9.307/1996 (Arbitragem)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9307.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-9868-1999",
+      "titulo": "Lei 9.868/1999 (ADI e ADC)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9868.htm"
+      },
+      "anomaliasAceitas": ["linha_solta"]
+    },
+    {
+      "id": "lei-federal-9882-1999",
+      "titulo": "Lei 9.882/1999 (ADPF)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9882.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12318-2010",
+      "titulo": "Lei 12.318/2010 (Alienação Parental)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12318.htm"
       },
       "anomaliasAceitas": []
     }

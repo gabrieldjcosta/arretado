@@ -2326,6 +2326,13 @@ function AcoesDaLeitura({
   );
 }
 
+/**
+ * Acima de tantos caracteres o título não cabe em duas linhas ao lado do "Biblioteca" no celular:
+ * ele desce para uma linha inteira (`.titulo-longo`, estilos.css). O nome oficial das normas do
+ * acervo quase sempre passa disso; o nome curto que a pessoa dá ao importar, quase nunca.
+ */
+const TITULO_LONGO = 30;
+
 /** A barra do leitor (fora do modo foco): voltar, título, tamanho do texto e destaques. */
 function BarraDoLeitor({
   titulo,
@@ -2345,7 +2352,7 @@ function BarraDoLeitor({
       <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
         Biblioteca
       </Voltar>
-      <h1>{titulo}</h1>
+      <h1 className={titulo.length > TITULO_LONGO ? 'titulo-longo' : undefined}>{titulo}</h1>
       <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
         <button
           type="button"

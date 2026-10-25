@@ -6,6 +6,7 @@ describe('cabeçalhos da hospedagem', () => {
     const h = cabecalhosHospedagem();
     expect(h).toContain(`Content-Security-Policy: ${CSP}; frame-ancestors 'none'`);
     expect(h).toContain('X-Content-Type-Options: nosniff');
+    expect(h).toContain('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     expect(h).toMatch(/^\/\*\n/);
   });
 });
