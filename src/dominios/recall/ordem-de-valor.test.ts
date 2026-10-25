@@ -58,6 +58,20 @@ describe('ordenarPorValor', () => {
   });
 });
 
+describe('erro com certeza (AP-02)', () => {
+  it('sobe acima de uma faixa a mais, mas não de duas', () => {
+    const itens = [
+      item('alta', { faixa: 'alta' }),
+      item('certeza', { faixa: 'media', erroComCerteza: true }),
+      item('extra-certeza', { faixa: 'extra', erroComCerteza: true }),
+    ];
+    const ids = ordenarPorValor(itens, HOJE).map((i) => i.id);
+    expect(ids[0]).toBe('certeza');
+    expect(ids.indexOf('extra-certeza')).toBeGreaterThan(ids.indexOf('certeza'));
+    expect(motivoDoItem(itens[1]!)).toMatch(/certeza/);
+  });
+});
+
 describe('minutos e itens', () => {
   it('30 s por item: 5, 10, 25 e 45 minutos', () => {
     expect([5, 10, 25, 45].map(itensQueCabem)).toEqual([10, 20, 50, 90]);
