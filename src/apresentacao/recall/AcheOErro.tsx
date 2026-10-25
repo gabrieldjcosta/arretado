@@ -107,17 +107,23 @@ function TextoParaTocar({
     if (c.inicio > cursor) pedacos.push(item.mostrado.slice(cursor, c.inicio));
     const ativo = selecao?.inicio === c.inicio;
     pedacos.push(
-      <button
+      <span
         key={c.inicio}
-        type="button"
+        role="button"
+        tabIndex={0}
         className="trecho-candidato"
         aria-pressed={ativo}
         onClick={() => {
           aoTocar(c);
         }}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          aoTocar(c);
+        }}
       >
         {item.mostrado.slice(c.inicio, c.fim)}
-      </button>,
+      </span>,
     );
     cursor = c.fim;
   }
@@ -151,12 +157,14 @@ function fraseDoResultado(
   item: ItemDoAcheOErro,
 ): string {
   if (resposta.tipo === 'nao_sei') return 'Sem problema. Este é o texto certo.';
-  const quem = certeza ? NOME_DA_CERTEZA[certeza] : 'Você';
+  // Com a certeza escolhida: "Você tinha certeza e achou a troca."; sem ela: "Você achou a troca."
+  const quem = certeza ? `${NOME_DA_CERTEZA[certeza]} e` : 'Você';
   if (acertou) {
     const oQue = item.troca ? 'achou a troca' : 'viu que estava certa como está';
-    return `${quem} e ${oQue}. O Ache o erro volta a este trecho em ${String(DIAS_ATE_REVISITA)} dias.`;
+    return `${quem} ${oQue}. O Ache o erro volta a este trecho em ${String(DIAS_ATE_REVISITA)} dias.`;
   }
-  return `${quem} e não era isso. A Frase correta foi para as suas Frases e volta amanhã.`;
+  const errou = certeza ? `${quem} não era isso.` : 'Não era isso.';
+  return `${errou} A Frase correta foi para as suas Frases e volta amanhã.`;
 }
 
 export function AcheOErro() {
@@ -321,7 +329,7 @@ export function AcheOErro() {
     return (
       <div className="coluna-drill">
         <h1>Ache o erro</h1>
-        <p className="texto-leitura">
+        <p>
           Rodada feita: {rodada.acertos} de {rodada.itens.length}.
         </p>
         <div className="linha-acoes acoes-drill">

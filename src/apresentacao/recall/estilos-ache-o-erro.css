@@ -1,6 +1,8 @@
 /* Ache o erro (AP-06): a folha com o texto do dispositivo, os trechos tocáveis com sublinhado
-   pontilhado e, depois de conferir, a troca riscada ao lado do texto certo. Só tokens. O alvo do
-   trecho cresce por padding e margem negativa: 44 px de toque sem mexer no fluxo do texto. */
+   pontilhado e, depois de conferir, a troca riscada ao lado do texto certo. Só tokens. O trecho é um
+   <span role="button"> (inline de verdade: quebra entre linhas como o texto). O alvo cresce por
+   padding (44 px de toque sem mexer no fluxo); o sublinhado e o marca-texto ficam no texto
+   (text-decoration e background-clip), não na caixa do alvo. */
 .ache-folha {
   text-align: left;
 }
@@ -30,16 +32,20 @@
 .trecho-candidato {
   all: unset;
   cursor: pointer;
-  border-bottom: 1.5px dotted currentColor;
-  padding: 0.6rem 0.1em;
-  margin: -0.6rem -0.1em;
-  border-radius: 3px;
+  text-decoration: underline dotted currentColor;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  background-clip: content-box;
+  padding: 0.8rem 0.1em;
+  margin: 0 -0.1em;
 }
 
 /* Marca-texto cheio com a tinta escura (a tinta não muda na Noite): contraste alto nos dois mundos. */
 .trecho-candidato[aria-pressed='true'] {
-  border-bottom: 2px solid var(--tinta);
+  text-decoration: underline solid var(--tinta);
+  text-decoration-thickness: 2px;
   background: var(--marca);
+  background-clip: content-box;
   color: var(--tinta);
   font-weight: 600;
 }
