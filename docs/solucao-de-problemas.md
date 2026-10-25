@@ -1895,6 +1895,16 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **O lote da AP-01 é de Cartões.** Frases seguem pela rodada própria ("Seguir para as frases"), sem limite de lote; `RevisarFrases` ficou fora do escopo.
 - **E2E na nuvem: `chromium_headless_shell-1194` ausente.** O Playwright do repo pede o build 1194 e o container tem o 1243. Contorno só local: criar `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell` como link para `chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell` e um arquivo `INSTALLATION_COMPLETE`.
 
+### Ache o erro (AP-06, piloto, 25/10/2026)
+- **Troca que se entrega sozinha.** Se só os destaques fossem tocáveis, um substituto fora do dicionário do detector ("inclusive", "permitido") seria o único trecho sem sublinhado e daria a resposta. `candidatosDeToque` junta os destaques e as palavras dos dois lados de cada par, em qualquer texto (certo ou trocado).
+- **Número e unidade desconcordam.** "1 (um) ano" → "2 (dois) anos": a troca de número leva a unidade quando ela vem logo depois (`concordar`); no primeiro número de um intervalo ("de um a quatro anos") só o número muda. O teste de corpus confere singular só com 1.
+- **Intervalo que vira decrescente.** "de 2 (dois) a 8 (oito) anos" não pode virar "de 8 a 8": a validação lê os números do destaque antes e depois e exige a ordem crescente mantida.
+- **"privativa" não troca.** "pena privativa de liberdade" → "concorrente" era absurdo; o par saiu do dicionário. Só pares que preservam gênero e número por construção entram.
+- **Camadas: a rodada mora em `dominios/legislacao`.** `dominios/recall` não pode importar de `dominios/legislacao` (regra `arretado/camadas`); por isso `ache-o-erro.ts` e `medicao-ache-o-erro.ts` ficam ao lado de `trocas.ts`.
+- **Contraste do marca-texto na Noite.** `--marca` a 45% sobre a superfície escura, com o texto claro, reprovou no axe (`color-contrast: ins`, só no celular). Marca-texto cheio com `color: var(--tinta)` (a tinta não muda na Noite) passa nos dois mundos.
+- **"Está certa como está" fora do fluxo de acerto.** A nota aparece sempre que o item não tem troca, mesmo quando a pessoa tocou em algo (errou): é o texto certo à vista, que o piloto exige.
+- **Teto de JS: 443 → 449,6 kB (teto 450).** O chunk próprio pesa 6,6 kB gzip. Com `TopoDaRevisao` (Caneta e BarraFina) importado pela tela, o rolldown separava um chunk compartilhado e o total passava a 451: a tela usa um topo simples ("Sair" e "N de 8"). Sobra 0,4 kB para as outras frentes em voo; subir o teto é decisão do Gabriel.
+
 ## Leitor no celular e primeiro uso (Onda 1, 25/10/2026)
 
 - **E2E no celular não acha a aba "Biblioteca" dentro do Leitor, ou perde a posição ao sair.** Causa: abaixo de 700 px o Leitor põe `data-leitor` na raiz e as abas das áreas somem (a barra do leitor fica no lugar delas), então o clique espera um elemento escondido até estourar o tempo; o link "Voltar à Biblioteca" do alto sai, mas rola a página ao começo e apaga a posição que o teste queria conferir. Solução: no celular sair pelo "voltar" do aparelho (`page.goBack()`), no `sairParaABiblioteca` de `e2e/leitor.spec.ts`; nos outros aparelhos, a aba. Prevenção: `e2e/leitor-celular.spec.ts` prova que as abas somem e como se sai.
