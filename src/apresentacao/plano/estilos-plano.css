@@ -69,3 +69,22 @@
 .importar-colado-acoes {
   margin-top: var(--espaco-2);
 }
+
+/* Data da prova (AP-03): uma linha recolhida; o formulário só abre a pedido. */
+.prova-do-plano {
+  margin-bottom: var(--espaco-4);
+}
+
+.prova-do-plano .prova-guardada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--espaco-2);
+  margin: 0;
+}
+
+.prova-do-plano .prova-informar {
+  min-height: var(--alvo);
+  padding-left: 0;
+  margin-left: 0;
+}
