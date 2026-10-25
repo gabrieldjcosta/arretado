@@ -183,3 +183,21 @@
 | recomendacao-oit-190 | publicado | 6 | 0 | — |
 | recomendacao-oit-146 | publicado | 8 | 0 | — |
 | resolucao-conanda-273-2025 | publicado | 70 | 0 | — |
+| decreto-lei-2848-1940 | publicado | 2005 | 0 | artigo_ausente: 1; alinea_sem_inciso: 24; paragrafo_unico_com_numerado: 1; paragrafo_1_sem_2: 1 |
+| decreto-lei-3689-1941 | publicado | 2370 | 0 | artigo_ausente: 4; alinea_sem_inciso: 43 |
+| lei-federal-10406-2002 | publicado | 4651 | 0 | estrutural_repetido: 14; artigo_ausente: 1 |
+| lei-federal-5172-1966 | publicado | 981 | 0 | linha_solta: 3; artigo_ausente: 2; alinea_sem_inciso: 7; paragrafo_unico_com_numerado: 1 |
+| lei-federal-7347-1985 | publicado | 55 | 0 | linha_solta: 2 |
+| lei-federal-9099-1995 | publicado | 297 | 0 | — |
+| lei-federal-12153-2009 | publicado | 66 | 0 | — |
+| lei-federal-8429-1992 | publicado | 277 | 0 | tachado_sem_dispositivo: 1; linha_solta: 2 |
+| lei-federal-12016-2009 | publicado | 76 | 0 | — |
+| lei-federal-9784-1999 | publicado | 261 | 0 | — |
+| lei-federal-9307-1996 | publicado | 168 | 0 | alinea_sem_inciso: 2 |
+| lei-federal-4717-1965 | publicado | 96 | 0 | alinea_sem_inciso: 13; paragrafo_unico_com_numerado: 1 |
+| lei-federal-9868-1999 | publicado | 123 | 0 | linha_solta: 1 |
+| lei-federal-9882-1999 | publicado | 42 | 0 | — |
+| lei-federal-8560-1992 | publicado | 27 | 0 | — |
+| lei-federal-12318-2010 | publicado | 35 | 0 | — |
+| lei-federal-9296-1996 | publicado | 39 | 0 | — |
+| lei-federal-7960-1989 | publicado | 35 | 0 | — |

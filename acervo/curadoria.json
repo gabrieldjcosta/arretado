@@ -3674,6 +3674,368 @@
         "urlOficial": "https://www.gov.br/participamaisbrasil/resolucao-n-273-de-3-de-outubro-de-2025"
       },
       "anomaliasAceitas": []
+    },
+    {
+      "id": "decreto-lei-2848-1940",
+      "titulo": "Decreto-Lei 2.848/1940 (Código Penal)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm"
+      },
+      "anomaliasAceitas": [
+        "artigo_ausente",
+        "alinea_sem_inciso",
+        "paragrafo_unico_com_numerado",
+        "paragrafo_1_sem_2"
+      ]
+    },
+    {
+      "id": "decreto-lei-3689-1941",
+      "titulo": "Decreto-Lei 3.689/1941 (Código de Processo Penal)",
+      "grupo": "Leis federais",
+      "tipo": "Decreto-lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm"
+      },
+      "anomaliasAceitas": ["artigo_ausente", "alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-10406-2002",
+      "titulo": "Lei 10.406/2002 (Código Civil)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [
+        "Os Subtítulos do Livro II (Título II) e do Livro IV (Títulos I e II) não aparecem: a hierarquia do Arretado não tem esse nível. Os Capítulos seguem na ordem do texto, e a numeração recomeça em cada Subtítulo."
+      ],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm"
+      },
+      "anomaliasAceitas": ["estrutural_repetido", "artigo_ausente"],
+      "cabecalhosSemNivel": ["^SUBTÍTULO [IVXLCDM]+$"],
+      "tituloOficial": "Código Civil",
+      "ementa": "Institui o Código Civil."
+    },
+    {
+      "id": "lei-federal-5172-1966",
+      "titulo": "Lei 5.172/1966 (Código Tributário Nacional)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Tributário"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm"
+      },
+      "anomaliasAceitas": [
+        "linha_solta",
+        "artigo_ausente",
+        "alinea_sem_inciso",
+        "paragrafo_unico_com_numerado"
+      ],
+      "tituloOficial": "Código Tributário Nacional"
+    },
+    {
+      "id": "lei-federal-7347-1985",
+      "titulo": "Lei 7.347/1985 (Ação Civil Pública)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l7347orig.htm"
+      },
+      "anomaliasAceitas": ["linha_solta"]
+    },
+    {
+      "id": "lei-federal-9099-1995",
+      "titulo": "Lei 9.099/1995 (Juizados Especiais Cíveis e Criminais)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9099.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12153-2009",
+      "titulo": "Lei 12.153/2009 (Juizados Especiais da Fazenda Pública)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        },
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12153.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8429-1992",
+      "titulo": "Lei 8.429/1992 (Improbidade Administrativa)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        },
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"
+      },
+      "anomaliasAceitas": ["tachado_sem_dispositivo", "linha_solta"],
+      "ementa": "Dispõe sobre as sanções aplicáveis em virtude da prática de atos de improbidade administrativa, de que trata o § 4º do art. 37 da Constituição Federal; e dá outras providências."
+    },
+    {
+      "id": "lei-federal-12016-2009",
+      "titulo": "Lei 12.016/2009 (Mandado de Segurança)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        },
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12016.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9784-1999",
+      "titulo": "Lei 9.784/1999 (Processo Administrativo Federal)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Administrativo"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9307-1996",
+      "titulo": "Lei 9.307/1996 (Arbitragem)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9307.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso"]
+    },
+    {
+      "id": "lei-federal-4717-1965",
+      "titulo": "Lei 4.717/1965 (Ação Popular)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direitos Difusos e Coletivos"
+        },
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l4717.htm"
+      },
+      "anomaliasAceitas": ["alinea_sem_inciso", "paragrafo_unico_com_numerado"]
+    },
+    {
+      "id": "lei-federal-9868-1999",
+      "titulo": "Lei 9.868/1999 (ADI e ADC)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9868.htm"
+      },
+      "anomaliasAceitas": ["linha_solta"]
+    },
+    {
+      "id": "lei-federal-9882-1999",
+      "titulo": "Lei 9.882/1999 (ADPF)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Constitucional"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9882.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-8560-1992",
+      "titulo": "Lei 8.560/1992 (Investigação de Paternidade)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8560.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-12318-2010",
+      "titulo": "Lei 12.318/2010 (Alienação Parental)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Civil"
+        },
+        {
+          "disciplina": "Direito da Criança e do Adolescente"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12318.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-9296-1996",
+      "titulo": "Lei 9.296/1996 (Interceptação Telefônica)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9296.htm"
+      },
+      "anomaliasAceitas": []
+    },
+    {
+      "id": "lei-federal-7960-1989",
+      "titulo": "Lei 7.960/1989 (Prisão Temporária)",
+      "grupo": "Leis federais",
+      "tipo": "Lei",
+      "esfera": "federal",
+      "vinculos": [
+        {
+          "disciplina": "Direito Processual Penal"
+        }
+      ],
+      "avisos": [],
+      "fonte": {
+        "adaptador": "planalto",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l7960.htm"
+      },
+      "anomaliasAceitas": []
     }
   ]
 }
