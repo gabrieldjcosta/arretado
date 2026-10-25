@@ -2,6 +2,7 @@
 // artigo de maior incidência; cada um vira uma estrela `pacote` no dispositivo `art<N>` da árvore.
 // Quem já tem estrela (direta, pacote ou herdada) ou exceção fica como está: o pacote nunca desfaz
 // uma escolha do usuário.
+import { z } from 'zod';
 import type { Estrela } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { abrirNorma } from './leitor';
@@ -94,4 +95,26 @@ export async function aplicarPacoteNaBiblioteca(
     resultado.porNorma[itemId] = await aplicarPacote(repo, arvore, pacote.id, numeros, enderecos);
   }
   return resultado;
+}
+
+const PacoteJson = z.strictObject({
+  id: z.uuid(),
+  titulo: z.string().min(1).max(200),
+  normas: z.record(z.string().regex(/^[a-z0-9][a-z0-9-]{0,127}$/), z.array(z.string().max(20))),
+});
+
+export class PacoteIlegivel extends Error {
+  constructor() {
+    super('Este arquivo não é um pacote de estrelas.');
+    this.name = 'PacoteIlegivel';
+  }
+}
+
+/** Lê o JSON do pacote (gerado por `scripts/incidencia.mjs pacote`). */
+export function lerPacoteDeEstrelas(texto: string): PacoteImportado & { titulo: string } {
+  try {
+    return PacoteJson.parse(JSON.parse(texto));
+  } catch {
+    throw new PacoteIlegivel();
+  }
 }

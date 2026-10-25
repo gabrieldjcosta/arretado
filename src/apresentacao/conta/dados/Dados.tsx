@@ -5,6 +5,7 @@ import { Espacos } from './Espacos';
 import { Exportar } from './Exportar';
 import { ExportarTexto } from './ExportarTexto';
 import { Importar } from './Importar';
+import { ImportarEstrelas } from './ImportarEstrelas';
 import { AVISO_DE_RESPONSABILIDADE } from '../../textos';
 import { NuvemBackup } from './NuvemBackup';
 import { lerAvisoDeRecarga, limparAvisoDeRecarga } from './recarga';
@@ -40,6 +41,7 @@ export function Dados() {
       <NuvemBackup />
       <ExportarTexto />
       <Importar />
+      <ImportarEstrelas />
       <Espacos />
       <CopiaAnteriorSecao />
       <Restauracao />
