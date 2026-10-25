@@ -9,6 +9,19 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # typescript-eslint limita o peer do TypeScript (< 6.1) e o Node do projeto é o 22: os dois
+    # saltos de versão maior quebraram o `npm ci` na integracao em 22/10/2026.
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # Playwright e playwright-core ficam em 1.56.1 de propósito (docs/solucao-de-problemas.md).
+      - dependency-name: '@playwright/test'
+      - dependency-name: playwright-core
+      # virtual-core 3.19 trouxe tratamento de gesto no iOS e classificação de rolagem (+2,4 kB gzip no Leitor,
+      # acima do teto do JS) e mexe na rolagem do Leitor: fica no 3.14.13 / 3.17.11 até alguém medir e testar.
+      - dependency-name: '@tanstack/react-virtual'
   - package-ecosystem: github-actions
     directory: /
     schedule:
