@@ -415,7 +415,10 @@ async function aplicar(
 
   // A lei mudou (AP-05): o texto mudou no mesmo endereço e a pessoa guardou algo sobre ele. Um aviso
   // por dispositivo; nenhum texto da pessoa é tocado. O antes e o agora vêm das versões.
-  const avisos = await mudancasQueAfetam(repo, normaId);
+  const revogadosIds = new Set(
+    comparacao.revogados.flatMap((r) => idPorEnderecoNovo.get(r.endereco) ?? []),
+  );
+  const avisos = await mudancasQueAfetam(repo, normaId, revogadosIds);
   await repo.colecao('pendenciasReleitura').criarLote(
     avisos.map((m) => ({
       dados: {

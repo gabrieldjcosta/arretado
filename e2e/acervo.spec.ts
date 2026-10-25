@@ -32,11 +32,17 @@ function item(id: string): ItemDoAcervo {
 }
 
 /** Serve um acervo de 3 itens no lugar de `/acervo/*` (o do site ainda não tem lote). */
-async function servirAcervo(page: Page, versaoDaLep = 1) {
+async function servirAcervo(page: Page, versaoDaLep = 1, textoNovo = false) {
   const lep = item('lep');
+  const [primeiro] = lep.nos;
+  if (textoNovo && primeiro)
+    primeiro.trechos = [{ texto: 'Texto do primeiro artigo, agora com prazo de seis meses.' }];
   const fonte = await FonteEmMemoria.criar([
     {
-      item: versaoDaLep === 1 ? lep : { ...lep, versao: versaoDaLep, nos: lep.nos.slice(0, 1) },
+      item:
+        versaoDaLep === 1
+          ? lep
+          : { ...lep, versao: versaoDaLep, nos: textoNovo ? lep.nos : lep.nos.slice(0, 1) },
       vinculos: [{ disciplina: 'Execução Penal', subtitulo: 'Lei toda' }],
       avisos: ['Divergente do edital.'],
     },
@@ -145,6 +151,51 @@ test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ pa
   await semViolacoes(page);
   await dialogo.getByRole('button', { name: 'Atualizar agora' }).click();
   await expect(page.getByText(/Há versão nova/)).toHaveCount(0);
+});
+
+test('acervo: a lei mudou avisa o que você guardou sobre o artigo, com antes e agora (AP-05)', async ({
+  page,
+}) => {
+  await servirAcervo(page);
+  await page.goto('/#/biblioteca/acervo');
+  await page.getByRole('button', { name: /^LEP/ }).click();
+  await page.getByRole('button', { name: /^Adicionar 1 / }).click();
+  await expect(page.getByText(/1 adicionada\./)).toBeVisible();
+  await page.getByRole('link', { name: 'Normas', exact: true }).click();
+  await abrirTodasAsNormas(page);
+  await page
+    .getByRole('group', { name: 'Execução Penal' })
+    .getByRole('link', { name: /LEP/ })
+    .click();
+  await expect(page.getByText('Texto do primeiro artigo.')).toBeVisible();
+  await page.locator('[data-endereco="art1"]').hover();
+  const estrela = page.getByRole('button', { name: 'Estrela: Art. 1º' });
+  await estrela.click();
+  await expect(estrela).toHaveAttribute('aria-pressed', 'true');
+  await page.unroute('**/acervo/*.json');
+  await servirAcervo(page, 2, true);
+  await page.goto('/#/biblioteca/acervo');
+  await page.getByRole('button', { name: 'Atualizar', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Atualizar agora' }).click();
+  await expect(page.getByText(/Há versão nova/)).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Normas', exact: true }).click();
+  await abrirTodasAsNormas(page);
+  await page
+    .getByRole('group', { name: 'Execução Penal' })
+    .getByRole('link', { name: /LEP/ })
+    .click();
+  const aviso = page.getByRole('region', { name: 'A lei mudou' });
+  await expect(aviso).toContainText('Antes: Texto do primeiro artigo.');
+  await expect(aviso).toContainText(
+    'Agora: Texto do primeiro artigo, agora com prazo de seis meses.',
+  );
+  await expect(aviso).toContainText('Estrela');
+  await semViolacoes(page);
+  const ja = aviso.getByRole('button', { name: /^Já reli/ });
+  expect((await ja.boundingBox())?.height).toBeGreaterThanOrEqual(24);
+  await ja.click();
+  await expect(aviso).toHaveCount(0);
 });
 
 test.describe('sem rede', () => {

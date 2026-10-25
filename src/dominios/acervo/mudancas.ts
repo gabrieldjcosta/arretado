@@ -11,6 +11,8 @@ export type TipoAfetado = 'frase' | 'cartao' | 'estrela' | 'erro';
 export interface ItemAfetado {
   tipo: TipoAfetado;
   id: string;
+  /** Como a pessoa o conhece: o texto da Frase, a frente do Cartão, o que foi o Erro. */
+  titulo: string;
   /** Faixa do Ponto ligado ao item, quando houver. */
   faixa?: Faixa | undefined;
 }
@@ -25,6 +27,7 @@ export interface MudancaDeDispositivo {
   afetados: ItemAfetado[];
 }
 
+const REVOGADO = new Set(['revogado', 'eficacia_cessada']);
 const PESO: Record<Faixa, number> = { altissima: 3, alta: 2, media: 1, extra: 0 };
 const peso = (f: Faixa | undefined) => (f === undefined ? PESO.media : PESO[f]);
 
@@ -35,6 +38,8 @@ const peso = (f: Faixa | undefined) => (f === undefined ? PESO.media : PESO[f]);
 export async function mudancasQueAfetam(
   repo: Repositorio,
   normaId: string,
+  /** Dispositivos que mudaram sem mudar o texto (revogados na atualização que está sendo aplicada). */
+  tambem: ReadonlySet<string> = new Set(),
 ): Promise<MudancaDeDispositivo[]> {
   const norma = await repo.colecao('normas').obter(normaId);
   if (!norma?.versaoVigenteId) return [];
@@ -67,6 +72,21 @@ export async function mudancasQueAfetam(
     const antigo = antes.get(id);
     if (antigo !== undefined && antigo !== texto) mudados.add(id);
   }
+  for (const id of tambem) mudados.add(id);
+  // Já avisados e ainda abertos (a tela relê o aviso depois): o aviso é o registro de que mudou.
+  for (const p of await todos(repo.colecao('pendenciasReleitura'), {
+    indice: 'normaId',
+    de: normaId,
+    ate: normaId,
+  })) {
+    if (
+      p.tipo === 'texto_alterado' &&
+      p.resolvidaEm === undefined &&
+      p.referenciaId !== undefined
+    ) {
+      mudados.add(p.referenciaId);
+    }
+  }
   if (mudados.size === 0) return [];
 
   const faixaDoPonto = new Map(
@@ -93,7 +113,7 @@ export async function mudancasQueAfetam(
     const d = f.trecho?.dispositivoId;
     if (d === undefined) continue;
     dispositivoDaFrase.set(f.id, d);
-    somar(d, { tipo: 'frase', id: f.id, faixa: faixaDe(f.pontoId) });
+    somar(d, { tipo: 'frase', id: f.id, titulo: f.texto, faixa: faixaDe(f.pontoId) });
   }
   for (const c of vivos(await repo.colecao('cartoes').todosDoUsuario())) {
     if (c.estado === 'arquivado') continue;
@@ -103,14 +123,19 @@ export async function mudancasQueAfetam(
         : c.fraseId === undefined
           ? undefined
           : dispositivoDaFrase.get(c.fraseId);
-    somar(d, { tipo: 'cartao', id: c.id, faixa: faixaDe(c.pontoId) });
+    somar(d, { tipo: 'cartao', id: c.id, titulo: c.frente, faixa: faixaDe(c.pontoId) });
   }
   for (const e of vivos(await repo.colecao('estrelas').todosDoUsuario())) {
-    if (e.normaId === normaId) somar(e.alvoId, { tipo: 'estrela', id: e.id });
+    if (e.normaId === normaId) somar(e.alvoId, { tipo: 'estrela', id: e.id, titulo: 'Estrela' });
   }
   for (const e of vivos(await repo.colecao('erros').todosDoUsuario())) {
     if (e.status !== 'descartado')
-      somar(e.dispositivoId, { tipo: 'erro', id: e.id, faixa: faixaDe(e.pontoId) });
+      somar(e.dispositivoId, {
+        tipo: 'erro',
+        id: e.id,
+        titulo: e.oQueFoi ?? e.fraseCorreta ?? 'Erro',
+        faixa: faixaDe(e.pontoId),
+      });
   }
 
   const dispositivos = new Map(
@@ -129,10 +154,24 @@ export async function mudancasQueAfetam(
       endereco: d.endereco,
       rotulo: d.rotulo,
       antes: antes.get(dispositivoId) ?? '',
-      agora: agora.get(dispositivoId) ?? '',
+      agora: (REVOGADO.has(d.status) ? 'Revogado. ' : '') + (agora.get(dispositivoId) ?? ''),
       afetados: itens,
     });
   }
   const topo = (m: MudancaDeDispositivo) => Math.max(...m.afetados.map((i) => peso(i.faixa)));
   return saida.sort((a, b) => topo(b) - topo(a) || a.endereco.localeCompare(b.endereco));
+}
+
+/**
+ * "Atualizar minha Frase": a pessoa reescreve a Frase depois de ler o texto novo. É sempre ação dela
+ * (o app nunca troca o texto em silêncio); a data da próxima Revisão não muda.
+ */
+export async function atualizarTextoDaFrase(
+  repo: Repositorio,
+  fraseId: string,
+  texto: string,
+): Promise<void> {
+  const limpo = texto.trim();
+  if (limpo === '' || limpo.length > 2_000) throw new Error('Texto da Frase inválido.');
+  await repo.colecao('frases').atualizar(fraseId, { texto: limpo });
 }
