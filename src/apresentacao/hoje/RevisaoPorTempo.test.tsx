@@ -32,9 +32,7 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
     expect(screen.getByText('cerca de 5 min')).toBeInTheDocument();
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
-    expect(
-      await screen.findByText(/10 cartões, pelo que mais cai.*Cerca de 5 min/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/10 cartões, os mais perto de esquecer/)).toBeInTheDocument();
     expect(screen.getByText(/Os outros 2 cartões continuam na fila/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Começar' })).toHaveAttribute(
       'href',
@@ -57,11 +55,23 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     const usuario = abrirHoje(repo);
     const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
-    expect(await screen.findByText(/5 cartões, pelo que mais cai/)).toBeInTheDocument();
+    expect(await screen.findByText(/5 cartões, os mais perto de esquecer/)).toBeInTheDocument();
     expect(screen.getByText(/Depois de uma pausa o lote vem mais curto/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Começar' })).toHaveAttribute(
       'href',
       '#/recall/revisar?itens=5',
     );
+  });
+
+  it('com 1 cartão sobrando, a frase fica no singular', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await cartoes(repo, 11);
+    relogio.avancar(DIA);
+    const usuario = abrirHoje(repo);
+    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
+    expect(
+      await screen.findByText(/O outro 1 cartão continua na fila e entra nos próximos dias/),
+    ).toBeInTheDocument();
   });
 });

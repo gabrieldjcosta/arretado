@@ -399,25 +399,19 @@
 }
 
 .tempo-do-hoje-opcoes {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
   gap: 0.5rem;
+  width: min(100%, 24rem);
 }
 
 .tempo-do-hoje-opcoes .chip {
   min-height: var(--alvo, 44px);
-  min-width: var(--alvo, 44px);
+  padding-inline: 0.25rem;
 }
 
 .tempo-do-hoje-porque {
   margin: 0.5rem 0;
-}
-
-.tempo-do-hoje-porque summary {
-  min-height: var(--alvo, 44px);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
 }
 
 .tempo-do-hoje-porque ol {

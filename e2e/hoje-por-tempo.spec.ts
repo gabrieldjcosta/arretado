@@ -31,7 +31,7 @@ test('escolher 5 min: o Hoje mostra 10 cartões, o Drill entrega 10 e o resto fi
     expect(caixa?.height).toBeGreaterThanOrEqual(44);
   }
   await quatro.getByRole('button', { name: '5 min', exact: true }).click();
-  await expect(page.getByText(/10 cartões, pelo que mais cai.*Cerca de 5 min/)).toBeVisible();
+  await expect(page.getByText(/10 cartões, os mais perto de esquecer/)).toBeVisible();
   await expect(page.getByText(/Os outros 2 cartões continuam na fila/)).toBeVisible();
   await page.getByText('Por que estes?').click();
   await expect(page.locator('.tempo-do-hoje-porque li')).toHaveCount(10);
@@ -44,7 +44,7 @@ test('escolher 5 min: o Hoje mostra 10 cartões, o Drill entrega 10 e o resto fi
   // Escolher 10 min leva os 12 que há (20 caberiam).
   await page.goto('/#/');
   await page.getByRole('button', { name: '10 min', exact: true }).click();
-  await expect(page.getByText(/12 cartões, pelo que mais cai/)).toBeVisible();
+  await expect(page.getByText(/12 cartões, os mais perto de esquecer/)).toBeVisible();
   await page.getByRole('link', { name: 'Começar' }).click();
   await expect(page.getByText('1 de 12')).toBeVisible();
 });

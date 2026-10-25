@@ -80,13 +80,10 @@ describe('minutos e itens', () => {
 });
 
 describe('motivoDoItem', () => {
-  it('diz faixa, caixa e espera, sem culpa', () => {
-    const m = motivoDoItem(
-      item('a', { faixa: 'alta', caixa: 1, proximaRevisao: '2026-10-20' }),
-      HOJE,
-    );
-    expect(m).toBe('Ponto de faixa alta · ainda frágil · esperando há 5 dias');
-    expect(motivoDoItem(item('b'), HOJE)).toBe('Sem Ponto ligado · caixa 3 · vence hoje');
-    expect(m).not.toMatch(/atras|pendente|dívida/i);
+  it('diz faixa (se houver) e caixa, sem culpa nem espera', () => {
+    const m = motivoDoItem(item('a', { faixa: 'alta', caixa: 1, proximaRevisao: '2026-10-01' }));
+    expect(m).toBe('Ponto de faixa alta · ainda frágil');
+    expect(motivoDoItem(item('b'))).toBe('caixa 3');
+    expect(m).not.toMatch(/atras|pendente|dívida|esperando/i);
   });
 });

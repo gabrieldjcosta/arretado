@@ -71,13 +71,13 @@ export function ordenarPorValor<T extends ItemParaOrdenar>(
   );
 }
 
-/** O motivo do item em uma linha, sem cobrança (nada de "atrasado"). */
-export function motivoDoItem(item: ItemParaOrdenar, hoje: DataCivil): string {
-  const dias = diferencaEmDias(item.proximaRevisao, hoje);
-  const faixa =
-    item.faixa === undefined ? 'Sem Ponto ligado' : `Ponto de faixa ${ROTULO_DA_FAIXA[item.faixa]}`;
+/**
+ * O motivo do item em uma linha, sem cobrança. A faixa só entra quando o Ponto tem uma (dizer
+ * "sem Ponto" de quem tem Ponto sem faixa seria falso); a espera não entra: lida como atraso.
+ */
+export function motivoDoItem(item: ItemParaOrdenar): string {
   const caixa = item.caixa <= 2 ? 'ainda frágil' : `caixa ${String(item.caixa)}`;
-  const espera =
-    dias >= 1 ? `esperando há ${String(dias)} ${dias === 1 ? 'dia' : 'dias'}` : 'vence hoje';
-  return `${faixa} · ${caixa} · ${espera}`;
+  return item.faixa === undefined
+    ? caixa
+    : `Ponto de faixa ${ROTULO_DA_FAIXA[item.faixa]} · ${caixa}`;
 }
