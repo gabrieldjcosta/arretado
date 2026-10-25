@@ -31,3 +31,26 @@ export async function marcacoesPendentes(repo: Repositorio, normaId: string): Pr
   });
   return lista.filter((m) => m.status === 'pendente');
 }
+
+export interface AvisoDeLeiMudou {
+  normaId: string;
+  titulo: string;
+  /** Dispositivos com aviso "texto alterado" ainda por reler. */
+  quantos: number;
+}
+
+/** As normas com aviso "A lei mudou" aberto (AP-05), para o Hoje; as de mais avisos primeiro. */
+export async function avisosDeLeiMudou(repo: Repositorio): Promise<AvisoDeLeiMudou[]> {
+  const abertas = (await repo.colecao('pendenciasReleitura').todosDoUsuario()).filter(
+    (p) => p.excluidoEm === null && p.tipo === 'texto_alterado' && p.resolvidaEm === undefined,
+  );
+  const porNorma = new Map<string, number>();
+  for (const p of abertas) porNorma.set(p.normaId, (porNorma.get(p.normaId) ?? 0) + 1);
+  const saida: AvisoDeLeiMudou[] = [];
+  for (const [normaId, quantos] of porNorma) {
+    const norma = await repo.colecao('normas').obter(normaId);
+    if (!norma || norma.excluidoEm !== null) continue;
+    saida.push({ normaId, titulo: norma.tituloCurto, quantos });
+  }
+  return saida.sort((a, b) => b.quantos - a.quantos || a.titulo.localeCompare(b.titulo));
+}
