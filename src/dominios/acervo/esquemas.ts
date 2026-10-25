@@ -84,3 +84,38 @@ export const ItemDoAcervo = z.strictObject({
   nos: z.array(NoDoItem).min(1).max(MAX_NOS),
 });
 export type ItemDoAcervo = z.infer<typeof ItemDoAcervo>;
+
+/**
+ * O pacote de partida (Onda 1, 25/10/2026): por carreira do catálogo, as normas do acervo que mais
+ * aparecem nos assuntos dos editais dela. Curadoria revisada por Gabriel; fica ao lado do índice
+ * (`public/acervo/pacote-de-partida.json`) e a verificação do acervo confere que cada id existe nele.
+ */
+export const NormaDoPacote = z.strictObject({
+  /** O id do item no acervo. */
+  id: IdDoAcervo,
+  titulo: TextoCurto,
+  /** Em quantos dos editais com texto a norma é citada. */
+  editaisQueCitam: z.int().min(1),
+  /** `editaisQueCitam` em % de `editaisComTexto`, arredondado. */
+  porcentagem: z.int().min(0).max(100),
+});
+export type NormaDoPacote = z.infer<typeof NormaDoPacote>;
+
+export const CarreiraDoPacote = z.strictObject({
+  nome: TextoCurto,
+  /** Editais da carreira no catálogo que têm o texto dos assuntos. */
+  editaisComTexto: z.int().min(1),
+  normas: z.array(NormaDoPacote).min(1).max(8),
+});
+export type CarreiraDoPacote = z.infer<typeof CarreiraDoPacote>;
+
+export const PacoteDePartida = z.strictObject({
+  versao: z.literal(1),
+  aprovadoEm: DataCivil,
+  aprovadoPor: TextoCurto,
+  /** Como a lista foi tirada (para quem for refazê-la). */
+  regra: z.string().max(1000),
+  /** Pelo slug da carreira no catálogo (`corpus/catalogo/index.json`). */
+  carreiras: z.record(z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/), CarreiraDoPacote),
+});
+export type PacoteDePartida = z.infer<typeof PacoteDePartida>;

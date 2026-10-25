@@ -66,24 +66,28 @@ describe('Chegada › primeira vez neste aparelho', () => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
 
-  it('abre a folha de boas-vindas com três caminhos reais, o foco no primeiro, e lembra que viu', async () => {
+  it('abre a folha de boas-vindas com os caminhos reais, o foco no principal (escolher o concurso), e lembra que viu', async () => {
     const { repo } = await repositorioDeTeste();
     abrirHoje(repo);
 
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-    const registrar = within(folha).getByRole('link', { name: 'Registrar um erro' });
-    expect(registrar).toHaveAttribute('href', '#/recall/registrar');
+    const escolher = within(folha).getByRole('link', { name: 'Escolher meu concurso' });
+    expect(escolher).toHaveAttribute('href', '#/comecar');
+    expect(escolher).toHaveClass('principal');
     expect(within(folha).getByRole('link', { name: 'Ler uma norma' })).toHaveAttribute(
       'href',
       '#/biblioteca',
     );
+    const registrar = within(folha).getByRole('link', { name: 'Registrar um erro' });
+    expect(registrar).toHaveAttribute('href', '#/recall/registrar');
+    expect(registrar).not.toHaveClass('principal');
     expect(within(folha).getByRole('link', { name: /^Montar uma trilha/ })).toHaveAttribute(
       'href',
       '#/plano/onboarding',
     );
     expect(within(folha).getByRole('button', { name: 'Agora não' })).toBeVisible();
     await waitFor(() => {
-      expect(registrar).toHaveFocus();
+      expect(escolher).toHaveFocus();
     });
     expect(chegadaJaVista()).toBe(true);
     // A Entrada do Dia não vem junto: o Dia da Chegada já tem a sua folha.
@@ -101,16 +105,17 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   });
 
-  it('um dos caminhos leva à tela dele, sem a folha por cima', async () => {
+  it.each([
+    ['Escolher meu concurso', 'Qual concurso você estuda?'],
+    ['Registrar um erro', 'Registrar erro'],
+  ])('"%s" leva à tela dele, sem a folha por cima', async (caminho, titulo) => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = abrirHoje(repo);
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
 
-    await usuario.click(within(folha).getByRole('link', { name: 'Registrar um erro' }));
+    await usuario.click(within(folha).getByRole('link', { name: caminho }));
 
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: titulo })).toBeInTheDocument();
     expect(folhas()).toBeNull();
   });
 

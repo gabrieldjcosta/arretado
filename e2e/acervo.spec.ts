@@ -113,7 +113,7 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
 
   await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
-  await expect(page.getByText(/1 adicionadas/)).toBeVisible();
+  await expect(page.getByText(/1 adicionada\./)).toBeVisible();
 
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
@@ -131,7 +131,7 @@ test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ pa
   await page.goto('/#/biblioteca/acervo');
   await page.getByRole('button', { name: /^LEP/ }).click();
   await page.getByRole('button', { name: /^Adicionar 1 / }).click();
-  await expect(page.getByText(/1 adicionadas/)).toBeVisible();
+  await expect(page.getByText(/1 adicionada\./)).toBeVisible();
   await expect(page.getByText('Há versão nova')).toHaveCount(0);
 
   await page.unroute('**/acervo/*.json');

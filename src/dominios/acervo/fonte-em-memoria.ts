@@ -1,5 +1,11 @@
 import { jsonCanonico } from '../../core/util/json-canonico';
-import type { EntradaDoIndice, IndiceDoAcervo, ItemDoAcervo, VinculoSugerido } from './esquemas';
+import type {
+  EntradaDoIndice,
+  IndiceDoAcervo,
+  ItemDoAcervo,
+  PacoteDePartida,
+  VinculoSugerido,
+} from './esquemas';
 import { FonteIndisponivel, type FonteDoAcervo } from './fonte';
 import { hashDoItem } from './hash';
 
@@ -14,6 +20,7 @@ export class FonteEmMemoria implements FonteDoAcervo {
     private readonly itens: Map<string, ItemDoAcervo>,
     /** Versões guardadas por hash (os arquivos imutáveis da fonte estática). */
     private readonly historico: Map<string, ItemDoAcervo> = new Map(),
+    private readonly pacote?: PacoteDePartida,
   ) {}
 
   static async criar(
@@ -23,7 +30,7 @@ export class FonteEmMemoria implements FonteDoAcervo {
       vinculos?: VinculoSugerido[];
       avisos?: string[];
     }[],
-    opcoes: { historico?: readonly ItemDoAcervo[] } = {},
+    opcoes: { historico?: readonly ItemDoAcervo[]; pacote?: PacoteDePartida } = {},
   ): Promise<FonteEmMemoria> {
     const itens = new Map<string, ItemDoAcervo>();
     const lista: EntradaDoIndice[] = [];
@@ -40,6 +47,7 @@ export class FonteEmMemoria implements FonteDoAcervo {
         versao: item.versao,
         hash: await hashDoItem(item),
         coletadoEm: '2026-10-10',
+        ...(item.norma.urlOficial === undefined ? {} : { urlOficial: item.norma.urlOficial }),
       });
     }
     return new FonteEmMemoria(
@@ -53,6 +61,7 @@ export class FonteEmMemoria implements FonteDoAcervo {
           ]),
         ),
       ),
+      opcoes.pacote,
     );
   }
 
@@ -67,6 +76,12 @@ export class FonteEmMemoria implements FonteDoAcervo {
     if (this.falhas.has(id)) return Promise.reject(new FonteIndisponivel('sem_rede'));
     if (!item) return Promise.reject(new FonteIndisponivel('nao_encontrado', id));
     return Promise.resolve(item);
+  }
+
+  pacoteDePartida(): Promise<PacoteDePartida> {
+    this.pedidos.push('pacote');
+    if (!this.pacote) return Promise.reject(new FonteIndisponivel('nao_encontrado', 'pacote'));
+    return Promise.resolve(this.pacote);
   }
 
   obterVersao(id: string, hash: string): Promise<ItemDoAcervo> {
