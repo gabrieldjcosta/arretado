@@ -114,6 +114,42 @@ describe('estruturador: blocos pré-normativos (regra 2)', () => {
     expect(porEndereco(r, 'art1')?.rotuloLido).toBe('Artigo 1º -');
   });
 
+  it('ordinal por extenso e "Complementar": LIVRO PRIMEIRO e SEGUNDO (CTN), LIVRO COMPLEMENTAR (CC)', () => {
+    const r = estruturar(
+      blocos(
+        'LIVRO PRIMEIRO',
+        'SISTEMA TRIBUTÁRIO NACIONAL',
+        'TÍTULO I',
+        'Disposições Gerais',
+        'Art. 1º Esta Lei regula o sistema.',
+        'LIVRO SEGUNDO',
+        'NORMAS GERAIS DE DIREITO TRIBUTÁRIO',
+        'TÍTULO I',
+        'Legislação Tributária',
+        'Art. 96. A expressão legislação tributária compreende as leis.',
+        'LIVRO COMPLEMENTAR',
+        'DAS DISPOSIÇÕES FINAIS E TRANSITÓRIAS',
+        'Art. 2.028. Serão os da lei anterior os prazos.',
+        'Parte segunda do texto continua a frase do artigo anterior.',
+      ),
+    );
+    expect(
+      todos(r.nos)
+        .filter((n) => n.tipo === 'livro')
+        .map((n) => [n.endereco, n.rotulo]),
+    ).toEqual([
+      ['liv1', 'LIVRO PRIMEIRO'],
+      ['liv2', 'LIVRO SEGUNDO'],
+      ['livComplementar', 'LIVRO COMPLEMENTAR'],
+    ]);
+    expect(porEndereco(r, 'liv2.tit1')).toBeDefined();
+    expect(nomeDe(porEndereco(r, 'liv2'))).toBe('NORMAS GERAIS DE DIREITO TRIBUTÁRIO');
+    expect(porEndereco(r, 'art2028')).toBeDefined();
+    // Minúscula não é rótulo: a linha continua o artigo.
+    expect(todos(r.nos).filter((n) => n.tipo === 'parte')).toEqual([]);
+    expect(tipos(r)).toEqual([]);
+  });
+
   it('CF: rótulo "PREÂMBULO", sem ementa e sem número', () => {
     const r = estruturar(
       blocos(

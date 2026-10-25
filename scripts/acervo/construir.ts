@@ -145,6 +145,24 @@ export function montar(
   });
 }
 
+/** Tira os cabeçalhos que casam com algum padrão e a linha do nome logo abaixo (`cabecalhosSemNivel`). */
+export function semCabecalhos(blocos: readonly Bloco[], padroes: readonly string[]): Bloco[] {
+  if (padroes.length === 0) return [...blocos];
+  const res = padroes.map((p) => new RegExp(p, 'u'));
+  const saida: Bloco[] = [];
+  for (let i = 0; i < blocos.length; i++) {
+    const bloco = blocos[i] as Bloco;
+    const texto = bloco.trechos
+      .map((t) => t.texto)
+      .join('')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (res.some((re) => re.test(texto))) i++;
+    else saida.push(bloco);
+  }
+  return saida;
+}
+
 /** Item de lei articulada: passa pelo estruturador e pela porta de qualidade. */
 export function construirItemArticulado(
   cur: ItemDaCuradoria,
@@ -152,7 +170,7 @@ export function construirItemArticulado(
   coletadoEm: string,
   urlOficial: string | undefined,
 ): ResultadoDaConstrucao {
-  const rascunho = estruturar(blocos, { formato: 'html' });
+  const rascunho = estruturar(semCabecalhos(blocos, cur.cabecalhosSemNivel), { formato: 'html' });
   const nos = nosDoRascunho(rascunho);
   const bloqueios: string[] = [];
   const aceitas = new Set<string>(cur.anomaliasAceitas);
@@ -187,11 +205,11 @@ export function construirItemArticulado(
     cur,
     nos,
     {
-      tituloOficial: m.tituloOficial,
+      tituloOficial: cur.tituloOficial ?? m.tituloOficial,
       referencia: m.referencia,
       tipo: m.tipo,
       epigrafe: m.epigrafe,
-      ementa: m.ementa,
+      ementa: cur.ementa ?? m.ementa,
       preambulo: m.preambulo,
     },
     coletadoEm,

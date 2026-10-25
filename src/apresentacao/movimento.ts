@@ -63,9 +63,7 @@ export function curva(progresso: number): number {
  */
 export function documentoInativo(erro: unknown): boolean {
   // Pelo nome, e não por `instanceof Error`: o erro pode vir de outra janela (outro `Error`).
-  return (
-    typeof erro === 'object' && erro !== null && 'name' in erro && erro.name === 'InvalidStateError'
-  );
+  return (erro as { name?: unknown } | null)?.name === 'InvalidStateError';
 }
 
 /** Espera `ms`; resolve também se o `sinal` abortar (quem chama confere `sinal.aborted`). */

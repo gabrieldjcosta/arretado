@@ -84,7 +84,7 @@ import { anomalia, marcarConflitos, validarEstrutura } from './validacao';
  * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.5 na 8.5…),
  * para a fonte guardada ser reprocessada quando o estruturador melhorar.
  */
-export const VERSAO_ESTRUTURADOR = '0.8';
+export const VERSAO_ESTRUTURADOR = '0.9';
 
 export interface OpcoesEstruturar {
   /** `texto` (texto puro): tudo "a confirmar" (regra 12). Padrão: `html`. */
