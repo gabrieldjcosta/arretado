@@ -17,6 +17,24 @@ if (prototipo && typeof prototipo.scrollIntoView !== 'function') {
   prototipo.scrollIntoView = () => undefined;
 }
 
+// O jsdom não implementa showModal(). Desde o 30.1.3 ele também nega foco a quem está dentro de um
+// <dialog> fechado, e o autoFocus do React roda antes de o <dialog> abrir. Aqui o showModal() faz o que
+// o navegador faz: abre e foca o primeiro controle (nos diálogos do app, o campo com autoFocus).
+if (
+  typeof HTMLDialogElement !== 'undefined' &&
+  typeof HTMLDialogElement.prototype.showModal !== 'function'
+) {
+  HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+    this.setAttribute('open', '');
+    this.querySelector<HTMLElement>(
+      'input, textarea, select, button, a[href], [tabindex]',
+    )?.focus();
+  };
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
+  };
+}
+
 // O jsdom não implementa a rolagem da janela (o leitor abre no começo): sem isto, avisa "Not implemented".
 if (typeof window !== 'undefined') window.scrollTo = () => undefined;
 
