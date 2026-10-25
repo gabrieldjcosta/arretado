@@ -70,7 +70,16 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{js,mjs}'],
+    ignores: ['src/offline/service-worker.js'],
     extends: [js.configs.recommended],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // O service worker roda no navegador, fora do bundle; os dois marcadores entram no build.
+    files: ['src/offline/service-worker.js'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: { ...globals.serviceworker, __CACHE__: 'readonly', __PRECACHE__: 'readonly' },
+    },
   },
 );
