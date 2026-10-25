@@ -194,10 +194,11 @@ Na interface, a lista vive em Orientações › "Palavras que o Arretado usa" (`
 | Core | `src/core/`: `datas`, `eventos`, `ids`, `modelo`, `pacote`, `persistencia`, `preferencias`, `seguranca`, `util`, `versao.ts` | só `src/core` |
 | Domínios | `src/dominios/recall/`; `src/dominios/legislacao/` (F2: estruturador desde a 8.1; `registros.ts` e `servico.ts` desde a 9.2) | `src/core` e o próprio módulo; nunca outro domínio |
 | Suporte | `src/suporte/relatos.ts` | `src/core` e `src/suporte` |
+| Offline | `src/offline/`: `service-worker.js` (publicado como `/sw.js`; fora do bundle, lint com globais de service worker) e `registro.ts` (`registrarServiceWorker`, `useAtualizacaoPronta`, `aplicarAtualizacao`; T31) | `src/core` e React; a regra não o restringe |
 | Integrações | `src/integracoes/pontos/`; `src/integracoes/normas/` (planejado, 12.1–12.3) | `src/core`, `src/integracoes` e qualquer domínio |
 | Apresentação | `src/apresentacao/`: `App.tsx`, `Shell.tsx`, `Aparencia.tsx`, `componentes/`, `conta/` (+ `dados/`), `dados/`, `orientacoes/`, `plano/`, `recall/`, `suporte/`, `telas/`, `biblioteca/` (F2, desde a 9.5) | tudo |
 | Utilitários de teste | `src/testes/` (`repositorioDeTeste`, `gerarCarga`, `blocosDeNormaSintetica` (9.4: norma de N dispositivos para a carga da leitura), `setup`) | tudo; core, domínios, suporte e integrações só os importam em `*.test.ts(x)` (a regra não impede a apresentação de importá-los fora de teste) |
-| Fora de `src/` | `eslint/`, `supabase/`, `scripts/`, `corpus/`, `e2e/`, `config/`; `worker/` (planejado, 12.1) | não verificado pela regra |
+| Fora de `src/` | `eslint/`, `supabase/`, `scripts/`, `corpus/`, `e2e/`, `config/` (`seguranca.ts`: CSP e `_headers`; `offline.ts`: o que entra no pré-cache, T31); `worker/` (planejado, 12.1) | não verificado pela regra |
 
 - Pacotes restritos (mesma regra; testes isentos): `dexie` e `dexie-react-hooks` só em `src/core/persistencia` (T4); `dompurify` só em `src/core/seguranca` (T9).
 - `no-restricted-syntax` proíbe `dangerouslySetInnerHTML`, `innerHTML` e `outerHTML` (T9; isentos testes, `src/testes/` e `e2e/`).
