@@ -1,0 +1,70 @@
+/* "Qual concurso você estuda?" e "Para começar" (Onda 1, 25/10/2026): uma pergunta por tela e a resposta
+   por um toque. Só tokens existentes; alvos de 44 px ou mais; as linhas de escolha são o botão
+   secundário em duas linhas (nome e o apoio), do tamanho da tela. */
+.comecar {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+
+.comecar > ul,
+.comecar > .principal,
+.comecar > .aviso {
+  width: 100%;
+}
+
+.comecar-cabeca {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.comecar-cabeca > * {
+  margin: 0;
+}
+
+.comecar-carreira {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--texto-atenuado);
+}
+
+.comecar-escolhas {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comecar-escolha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.125rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding-block: 0.5rem;
+  text-align: start;
+}
+
+.comecar-escolha span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--texto-atenuado);
+}
+
+/* Cada norma: o título à esquerda e, sob ele ou ao lado, em quantos editais aparece. */
+.comecar-normas > li > strong {
+  flex: 1 1 14rem;
+  font-weight: 600;
+}
+
+.comecar-acervo {
+  justify-self: center;
+}
+
+/* As frases de apoio são curtas: sem a última palavra sozinha numa linha. */
+.comecar > .dica {
+  text-wrap: balance;
+}

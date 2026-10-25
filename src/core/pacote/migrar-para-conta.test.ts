@@ -132,10 +132,11 @@ beforeEach(async () => {
 });
 
 describe('banco sintético (fixture)', () => {
-  it('cobre todas as coleções da v9, com exclusão lógica, lote de adesão e só locais', async () => {
+  it('cobre todas as coleções da v10, com exclusão lógica, lote de adesão e só locais', async () => {
     const { repo, contagens, ids } = await prepararOrigem();
-    expect(VERSAO_ESQUEMA).toBe(9);
-    for (const nome of colecoesNaVersao(9)) expect(contagens[nome], nome).toBeGreaterThan(0);
+    expect(VERSAO_ESQUEMA).toBe(10);
+    for (const nome of colecoesNaVersao(VERSAO_ESQUEMA))
+      expect(contagens[nome], nome).toBeGreaterThan(0);
     expect(
       (await repo.colecao('tags').obter(ids.tagExcluida, { incluirExcluidos: true }))?.excluidoEm,
     ).not.toBeNull();

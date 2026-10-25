@@ -223,6 +223,32 @@ describe('tracar (o traço de seleção)', () => {
     });
     await expect(vi.advanceTimersByTimeAsync(1000)).rejects.toThrow('geometria quebrada');
   });
+
+  it.each(['getTotalLength', 'getPointAtLength'])(
+    'a página que recarrega antes do primeiro quadro (%s) o encerra sem lançar',
+    (medida) => {
+      const { svg } = itemComTraco();
+      Object.assign(window.SVGElement.prototype, {
+        [medida]: () => {
+          throw new DOMException('The element is in an inactive document.', 'InvalidStateError');
+        },
+      });
+      const cancelar = tracar(svg, 'normal');
+      expect(svg.childNodes).toHaveLength(0);
+      expect(svg.hasAttribute('data-ativo')).toBe(false);
+      expect(cancelar).not.toThrow();
+    },
+  );
+
+  it('um erro de medida que não é de documento inativo também continua sendo erro', () => {
+    const { svg } = itemComTraco();
+    Object.assign(window.SVGElement.prototype, {
+      getTotalLength: () => {
+        throw new TypeError('geometria quebrada');
+      },
+    });
+    expect(() => tracar(svg, 'normal')).toThrow('geometria quebrada');
+  });
 });
 
 describe('TracoDeSelecao', () => {

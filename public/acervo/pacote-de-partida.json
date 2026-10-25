@@ -1,0 +1,152 @@
+{
+  "versao": 1,
+  "aprovadoEm": "2026-10-25",
+  "aprovadoPor": "Gabriel",
+  "regra": "3 a 5 normas por carreira: as mais citadas nos assuntos dos editais do catálogo (corte de 30% dos editais com texto) que o acervo tem; desempate pelo número de menções; sem dado do TEC.",
+  "carreiras": {
+    "defensoria-publica": {
+      "nome": "Defensoria Pública",
+      "editaisComTexto": 14,
+      "normas": [
+        {
+          "id": "constituicao-1988",
+          "titulo": "Constituição da República Federativa do Brasil de 1988",
+          "editaisQueCitam": 14,
+          "porcentagem": 100
+        },
+        {
+          "id": "lei-federal-8078-1990",
+          "titulo": "Lei 8.078/1990 (Código de Defesa do Consumidor)",
+          "editaisQueCitam": 14,
+          "porcentagem": 100
+        },
+        {
+          "id": "lei-federal-11340-2006",
+          "titulo": "Lei 11.340/2006 (Lei Maria da Penha)",
+          "editaisQueCitam": 13,
+          "porcentagem": 93
+        },
+        {
+          "id": "lei-federal-10741-2003",
+          "titulo": "Lei 10.741/2003 (Estatuto da Pessoa Idosa)",
+          "editaisQueCitam": 13,
+          "porcentagem": 93
+        },
+        {
+          "id": "lei-federal-8245-1991",
+          "titulo": "Lei 8.245/1991 - Lei de Locações",
+          "editaisQueCitam": 13,
+          "porcentagem": 93
+        }
+      ]
+    },
+    "magistratura": {
+      "nome": "Magistratura",
+      "editaisComTexto": 17,
+      "normas": [
+        {
+          "id": "constituicao-1988",
+          "titulo": "Constituição da República Federativa do Brasil de 1988",
+          "editaisQueCitam": 17,
+          "porcentagem": 100
+        },
+        {
+          "id": "lei-federal-8069-1990",
+          "titulo": "Lei 8.069/1990 (ECA)",
+          "editaisQueCitam": 16,
+          "porcentagem": 94
+        },
+        {
+          "id": "lei-federal-8078-1990",
+          "titulo": "Lei 8.078/1990 (Código de Defesa do Consumidor)",
+          "editaisQueCitam": 15,
+          "porcentagem": 88
+        },
+        {
+          "id": "decreto-lei-2848-1940",
+          "titulo": "Decreto-Lei 2.848/1940 (Código Penal)",
+          "editaisQueCitam": 12,
+          "porcentagem": 71
+        },
+        {
+          "id": "lei-federal-10406-2002",
+          "titulo": "Lei 10.406/2002 (Código Civil)",
+          "editaisQueCitam": 11,
+          "porcentagem": 65
+        }
+      ]
+    },
+    "ministerio-publico": {
+      "nome": "Ministério Público (Promotor)",
+      "editaisComTexto": 4,
+      "normas": [
+        {
+          "id": "constituicao-1988",
+          "titulo": "Constituição da República Federativa do Brasil de 1988",
+          "editaisQueCitam": 4,
+          "porcentagem": 100
+        },
+        {
+          "id": "lei-federal-8078-1990",
+          "titulo": "Lei 8.078/1990 (Código de Defesa do Consumidor)",
+          "editaisQueCitam": 4,
+          "porcentagem": 100
+        },
+        {
+          "id": "lei-federal-8429-1992",
+          "titulo": "Lei 8.429/1992 (Improbidade administrativa)",
+          "editaisQueCitam": 3,
+          "porcentagem": 75
+        },
+        {
+          "id": "lei-federal-9099-1995",
+          "titulo": "Lei 9.099/1995 (Juizados Especiais Cíveis e Criminais)",
+          "editaisQueCitam": 3,
+          "porcentagem": 75
+        },
+        {
+          "id": "lei-federal-8625-1993",
+          "titulo": "Lei 8.625/1993 (Lei Orgânica Nacional do Ministério Público)",
+          "editaisQueCitam": 3,
+          "porcentagem": 75
+        }
+      ]
+    },
+    "ambiental": {
+      "nome": "Área ambiental (procuradoria e órgãos ambientais)",
+      "editaisComTexto": 5,
+      "normas": [
+        {
+          "id": "lei-federal-5197-1967",
+          "titulo": "Lei 5.197/1967 (Proteção à fauna)",
+          "editaisQueCitam": 3,
+          "porcentagem": 60
+        },
+        {
+          "id": "lei-federal-9784-1999",
+          "titulo": "Lei 9.784/1999 (Processo administrativo federal)",
+          "editaisQueCitam": 3,
+          "porcentagem": 60
+        },
+        {
+          "id": "lei-federal-6938-1981",
+          "titulo": "Lei 6.938/1981 - Política Nacional do Meio Ambiente",
+          "editaisQueCitam": 2,
+          "porcentagem": 40
+        },
+        {
+          "id": "lei-federal-9605-1998",
+          "titulo": "Lei 9.605/1998 (Crimes Ambientais)",
+          "editaisQueCitam": 2,
+          "porcentagem": 40
+        },
+        {
+          "id": "lei-federal-9985-2000",
+          "titulo": "Lei 9.985/2000 - SNUC",
+          "editaisQueCitam": 2,
+          "porcentagem": 40
+        }
+      ]
+    }
+  }
+}
