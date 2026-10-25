@@ -14,6 +14,7 @@ import {
   type ComparacaoDeVersoes,
   type NoAntigo,
 } from './comparacao';
+import { mudancasQueAfetam } from './mudancas';
 import type { EntradaDoIndice, ItemDoAcervo } from './esquemas';
 import type { FonteDoAcervo } from './fonte';
 
@@ -412,12 +413,32 @@ async function aplicar(
   }
   await repo.colecao('normas').atualizar(normaId, novaNorma);
 
+  // A lei mudou (AP-05): o texto mudou no mesmo endereço e a pessoa guardou algo sobre ele. Um aviso
+  // por dispositivo; nenhum texto da pessoa é tocado. O antes e o agora vêm das versões.
+  const revogadosIds = new Set(
+    comparacao.revogados.flatMap((r) => idPorEnderecoNovo.get(r.endereco) ?? []),
+  );
+  const avisos = await mudancasQueAfetam(repo, normaId, revogadosIds);
+  await repo.colecao('pendenciasReleitura').criarLote(
+    avisos.map((m) => ({
+      dados: {
+        normaId,
+        versaoId,
+        tipo: 'texto_alterado' as const,
+        enderecoAntigo: m.endereco,
+        ...(m.rotulo === undefined ? {} : { rotulo: m.rotulo }),
+        referenciaId: m.dispositivoId,
+      },
+    })),
+    { origem: 'importacao' },
+  );
+
   return {
     estado: 'atualizada',
     normaId,
     versaoId,
     comparacao,
-    pendencias: pendencias.length,
+    pendencias: pendencias.length + avisos.length,
     reancoradas,
     marcacoesPendentes,
   };

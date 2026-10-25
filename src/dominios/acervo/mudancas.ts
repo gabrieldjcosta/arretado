@@ -3,7 +3,7 @@
 // antes (lido da versão arquivada) e o de agora. Só lê: nenhum texto da pessoa é alterado.
 import type { Faixa } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
-import { todos } from './consultas';
+import { dispositivosDaNorma, todos } from './consultas';
 import { textoDosTrechos } from './comparacao';
 
 export type TipoAfetado = 'frase' | 'cartao' | 'estrela' | 'erro';
@@ -35,6 +35,8 @@ const peso = (f: Faixa | undefined) => (f === undefined ? PESO.media : PESO[f]);
 export async function mudancasQueAfetam(
   repo: Repositorio,
   normaId: string,
+  /** Dispositivos que mudaram sem mudar o texto (revogados na atualização que está sendo aplicada). */
+  tambem: ReadonlySet<string> = new Set(),
 ): Promise<MudancaDeDispositivo[]> {
   const norma = await repo.colecao('normas').obter(normaId);
   if (!norma?.versaoVigenteId) return [];
@@ -67,6 +69,7 @@ export async function mudancasQueAfetam(
     const antigo = antes.get(id);
     if (antigo !== undefined && antigo !== texto) mudados.add(id);
   }
+  for (const id of tambem) mudados.add(id);
   if (mudados.size === 0) return [];
 
   const faixaDoPonto = new Map(
@@ -114,9 +117,7 @@ export async function mudancasQueAfetam(
   }
 
   const dispositivos = new Map(
-    (await repo.colecao('dispositivos').todosDoUsuario())
-      .filter((d) => d.normaId === normaId)
-      .map((d) => [d.id, d]),
+    (await dispositivosDaNorma(repo.colecao('dispositivos'), normaId)).map((d) => [d.id, d]),
   );
   const ordemTipo: Record<TipoAfetado, number> = { frase: 0, cartao: 1, estrela: 2, erro: 3 };
   const saida: MudancaDeDispositivo[] = [];
