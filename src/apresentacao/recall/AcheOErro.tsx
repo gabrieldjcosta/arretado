@@ -401,9 +401,7 @@ export function AcheOErro() {
         ) : (
           <div aria-live="polite">
             <TextoCerto item={item} />
-            {item.troca === undefined && (
-              <p className="ache-instrucao">Estava certa como está.</p>
-            )}
+            {item.troca === undefined && <p className="ache-instrucao">Estava certa como está.</p>}
           </div>
         )}
       </article>
