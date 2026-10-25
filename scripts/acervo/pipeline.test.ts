@@ -3,7 +3,7 @@ import { Curadoria, ItemDaCuradoria } from './curadoria';
 import { markdownParaBlocos, markdownParaSecoes, trechosDaLinha } from './markdown';
 import { construirItemArticulado, construirItemSemArtigos, entradaDoIndice } from './construir';
 import { verificarAcervo } from './verificar';
-import { decodificarPagina } from './nucleo';
+import { cortarBlocos, decodificarPagina } from './nucleo';
 import type { IndiceDoAcervo } from '../../src/dominios/acervo/esquemas';
 
 const cur = (extra: Record<string, unknown> = {}) =>
@@ -232,5 +232,20 @@ describe('páginas salvas e numeração repetida', () => {
       undefined,
     );
     expect(r.bloqueios).toEqual([]);
+  });
+
+  it('corta no último "ÍNDICE" (o do fim do Código Civil, não o link do topo)', () => {
+    const b = (texto: string) => ({ trechos: [{ texto }] });
+    const pagina = [
+      b('ÍNDICE'),
+      b('Art. 1º Toda pessoa.'),
+      b('Brasília, 10 de janeiro de 2002'),
+      b(' ÍNDICE '),
+      b('LIVRO I'),
+    ];
+    expect(cortarBlocos(pagina, 'ÍNDICE')).toEqual(pagina.slice(0, 3));
+    expect(cortarBlocos(pagina, 'SUMÁRIO')).toBe(pagina);
+    expect(cortarBlocos(pagina, undefined)).toBe(pagina);
+    expect(cur({ cortarEm: 'ÍNDICE' }).cortarEm).toBe('ÍNDICE');
   });
 });
