@@ -84,7 +84,7 @@ import { anomalia, marcarConflitos, validarEstrutura } from './validacao';
  * Vai para `VersaoDeNorma.versaoAdaptador`: sobe a cada atividade que muda a saída (0.5 na 8.5…),
  * para a fonte guardada ser reprocessada quando o estruturador melhorar.
  */
-export const VERSAO_ESTRUTURADOR = '0.8';
+export const VERSAO_ESTRUTURADOR = '0.9';
 
 export interface OpcoesEstruturar {
   /** `texto` (texto puro): tudo "a confirmar" (regra 12). Padrão: `html`. */
@@ -147,6 +147,8 @@ function* todasAsNotas(
 
 /** Local e data que abrem o fecho ("Brasília, 11 de julho de 1984;", "Palácio dos Bandeirantes, 9 de…"). */
 const FECHO = /^\p{Lu}[\p{L} ]{2,40}, (?:em )?\d{1,2}º? de \p{L}+ de \d{4}/u;
+/** Depois do aviso do DOU, o Planalto põe um ÍNDICE com a estrutura repetida (Código Civil). */
+const INDICE = /^[ÍI]NDICE$/iu;
 /**
  * Regra 11: cabeçalho de anexo, só em maiúsculas, como no gabarito (`RE_ANEXO`): "ANEXO", "ANEXO
  * II", "ANEXO 1", "ANEXO ÚNICO" e "ANEXO - Revogado." (ALESP). O separador (na chave, o travessão
@@ -283,6 +285,8 @@ class Corpo {
   private quebrado: Linha | undefined;
   private zona: 'corpo' | 'fecho' | 'anexo' = 'corpo';
   private fecho: Descarte | undefined;
+  /** O ÍNDICE do fecho foi aberto: só artigo reabre o corpo, rótulo é cópia da estrutura. */
+  private indice = false;
   private tituloSolto: TituloSolto | undefined;
   private anexo: AnexoAberto | undefined;
   private bloco: BlocoAberto = { prefixo: '', maior: 0 };
@@ -377,13 +381,17 @@ class Corpo {
       return;
     }
     if (this.zona === 'fecho' && this.fecho) {
-      // Depois do fecho, só artigo ou rótulo reabre o corpo. O título solto em caixa alta logo
-      // antes do artigo que recomeça a numeração abre um bloco (o ADCT da CF).
-      if (l.tachada || !(lerInicioDeArtigo(l.chave) || lerRotuloEstrutural(l))) {
+      // Depois do fecho, só artigo ou rótulo reabre o corpo, menos num ÍNDICE (tabela de links do
+      // Planalto com a estrutura repetida), onde só o artigo reabre. O título solto em caixa alta
+      // logo antes do artigo que recomeça a numeração abre um bloco (o ADCT da CF).
+      if (INDICE.test(l.chave)) this.indice = true;
+      const reabre = !this.indice && lerRotuloEstrutural(l);
+      if (l.tachada || !(lerInicioDeArtigo(l.chave) || reabre)) {
         this.fecho.linhas.fim = l.i;
         this.lerTituloSolto(l);
         return;
       }
+      this.indice = false;
       this.zona = 'corpo';
     }
     const rotulo = l.tachada ? undefined : lerRotuloEstrutural(l);
@@ -1326,6 +1334,7 @@ class Corpo {
     this.cabecalho = undefined;
     this.soltarPendentes();
     this.zona = 'fecho';
+    this.indice = false;
     this.fecho = { motivo: 'fecho', linhas: { inicio: l.i, fim: l.i } };
     this.descartes.push(this.fecho);
   }

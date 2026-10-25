@@ -37,8 +37,9 @@ export interface RotuloEstrutural {
 }
 
 const PALAVRA = /^(parte|livro|t[ií]tulo|cap[ií]tulo|subse[cç][aã]o|se[cç][aã]o) +(?=\S)/iu;
+// Ordinal por extenso ("LIVRO PRIMEIRO" do CTN, "PARTE SEGUNDA" do Código Eleitoral) e "LIVRO COMPLEMENTAR" do CC.
 const NUMERAL =
-  /^(GERAL|Geral|ESPECIAL|Especial|[IVXLCDM]+|\d{1,3}|[ÚU]NIC[OA]|[ÚU]nic[oa])(?:-([A-Z]))?(?=$|[\s.:\-(])/u;
+  /^(GERAL|Geral|ESPECIAL|Especial|COMPLEMENTAR|Complementar|(?:PRIMEIR|SEGUND|TERCEIR|QUART|QUINT|SEXT|S[ÉE]TIM|OITAV|NON|D[ÉE]CIM)[OA]|(?:Primeir|Segund|Terceir|Quart|Quint|Sext|S[ée]tim|Oitav|Non|D[ée]cim)[oa]|[IVXLCDM]+|\d{1,3}|[ÚU]NIC[OA]|[ÚU]nic[oa])(?:-([A-Z]))?(?=$|[\s.:\-(])/u;
 const SEPARADOR = /^\s*(?:[-.:]\s*)?/;
 
 const TIPO: Record<string, TipoEstrutural> = {
@@ -74,6 +75,8 @@ function numeral(bruto: string): string {
   const n = semAcento(bruto).toLowerCase();
   const palavra = PALAVRA_NUMERAL[n];
   if (palavra !== undefined) return palavra;
+  const ordinal = ORDINAIS.findIndex((o) => n.startsWith(o));
+  if (ordinal >= 0) return String(ordinal + 1);
   if (/^\d+$/.test(n)) return String(Number(n));
   return String(romano(bruto));
 }
@@ -81,9 +84,24 @@ function numeral(bruto: string): string {
 const PALAVRA_NUMERAL: Record<string, string> = {
   geral: 'Geral',
   especial: 'Especial',
+  complementar: 'Complementar',
   unico: 'Unico',
   unica: 'Unico',
 };
+
+/** Raiz do ordinal por extenso, na ordem: "primeir" (primeiro, primeira) vale 1, "segund" vale 2… */
+const ORDINAIS = [
+  'primeir',
+  'segund',
+  'terceir',
+  'quart',
+  'quint',
+  'sext',
+  'setim',
+  'oitav',
+  'non',
+  'decim',
+];
 
 const VALOR: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
 
