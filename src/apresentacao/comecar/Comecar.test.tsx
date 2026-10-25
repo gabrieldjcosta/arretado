@@ -115,6 +115,10 @@ describe('Escolher meu concurso › Para começar', () => {
       'Lei B2 de 4 editais',
     ]);
     expect(screen.getByRole('button', { name: 'Adicionar e ler' })).toBeEnabled();
+    // Uma linha acima do botão diz o que ele faz.
+    expect(
+      screen.getByText('As 2 normas entram no aparelho e a primeira abre para ler.'),
+    ).toBeVisible();
     expect(screen.getByRole('link', { name: 'Ver todo o acervo' })).toHaveAttribute(
       'href',
       '#/biblioteca/acervo',
@@ -134,6 +138,11 @@ describe('Escolher meu concurso › Para começar', () => {
     await abrir('#/comecar/carreira-b', await fonte());
     await screen.findByRole('button', { name: 'Adicionar e ler' });
     expect(screen.queryByText(/Faltam no acervo/)).toBeNull();
+  });
+
+  it('com uma norma só, a linha acima do botão fala no singular', async () => {
+    await abrir('#/comecar/carreira-b', await fonte());
+    expect(await screen.findByText('A norma entra no aparelho e abre para ler.')).toBeVisible();
   });
 
   it('"Adicionar e ler" adiciona todas, sem repetir, e abre a primeira no Leitor', async () => {

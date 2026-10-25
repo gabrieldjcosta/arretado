@@ -105,7 +105,7 @@ export function MaisDoLeitor({
             }}
           >
             <span>Ações</span>
-            <small>Erro, cartão e referência do dispositivo</small>
+            <small>Cartão e referência do dispositivo</small>
           </button>
         </div>
       )}

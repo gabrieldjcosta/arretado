@@ -63,3 +63,8 @@
 .comecar-acervo {
   justify-self: center;
 }
+
+/* As frases de apoio são curtas: sem a última palavra sozinha numa linha. */
+.comecar > .dica {
+  text-wrap: balance;
+}

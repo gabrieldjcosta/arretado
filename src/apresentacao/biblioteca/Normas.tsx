@@ -400,13 +400,13 @@ export function Normas() {
               acao={
                 <>
                   {doEdital(edital, true)}
-                  {doAcervo('Escolher no acervo', !edital)}
-                  {importar(false)}
                   {!edital && (
-                    <Link to="/comecar" className="botao botao-texto">
+                    <Link to="/comecar" className="botao principal">
                       Escolher meu concurso
                     </Link>
                   )}
+                  {doAcervo('Escolher no acervo')}
+                  {importar(false)}
                 </>
               }
             >

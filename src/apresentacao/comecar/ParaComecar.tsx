@@ -175,14 +175,23 @@ export function ParaComecar() {
             </div>
           )}
           {presentes.length > 0 ? (
-            <button
-              type="button"
-              className="principal grande"
-              disabled={andamento !== null}
-              onClick={() => void adicionarELer()}
-            >
-              {falhou ? 'Tentar de novo' : 'Adicionar e ler'}
-            </button>
+            <>
+              {!andamento && !falhou && (
+                <p className="dica">
+                  {presentes.length === 1
+                    ? 'A norma entra no aparelho e abre para ler.'
+                    : `As ${String(presentes.length)} normas entram no aparelho e a primeira abre para ler.`}
+                </p>
+              )}
+              <button
+                type="button"
+                className="principal grande"
+                disabled={andamento !== null}
+                onClick={() => void adicionarELer()}
+              >
+                {falhou ? 'Tentar de novo' : 'Adicionar e ler'}
+              </button>
+            </>
           ) : (
             <p>Nenhuma dessas normas está no acervo ainda.</p>
           )}
