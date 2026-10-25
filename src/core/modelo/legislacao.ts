@@ -260,7 +260,16 @@ export const PendenciaDeReleitura = z.strictObject({
   normaId: Id,
   /** A versão que passou a ser a vigente e fez o endereço sumir. */
   versaoId: Id,
-  tipo: z.enum(['estrela', 'erro', 'vinculo', 'lido_ate', 'posicao', 'precedente']),
+  /** `texto_alterado` (AP-05): o texto mudou no mesmo endereço; `referenciaId` é o dispositivo. */
+  tipo: z.enum([
+    'estrela',
+    'erro',
+    'vinculo',
+    'lido_ate',
+    'posicao',
+    'precedente',
+    'texto_alterado',
+  ]),
   enderecoAntigo: z.string().max(200),
   rotulo: TextoCurto.optional(),
   /** O registro que apontava para o endereço (estrela, erro, vínculo ou leitura). */
