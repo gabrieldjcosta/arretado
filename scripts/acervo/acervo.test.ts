@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { gerarAcervo, verificarPasta, type Pastas } from './nucleo';
+import { compararAcervo, gerarAcervo, verificarPasta, type Pastas } from './nucleo';
 
 const pastas: string[] = [];
 afterEach(async () => {
@@ -46,6 +46,34 @@ async function montar(): Promise<Pastas> {
     relatorio: join(raiz, 'relatorio.md'),
   };
 }
+
+describe('compararAcervo', () => {
+  it('só lê: iguais aos publicados, depois diferente quando a fonte muda, bloqueado e sem cache', async () => {
+    const p = await montar();
+    await gerarAcervo(p);
+    const antes = await readFile(join(p.saida, 'indice.json'), 'utf-8');
+    const situacoes = async () =>
+      Object.fromEntries((await compararAcervo(p)).map((i) => [i.id, i.situacao]));
+    expect(await situacoes()).toEqual({
+      'lei-ok': 'igual',
+      'doc-tecnico': 'igual',
+      'lei-ruim': 'bloqueado',
+    });
+    await writeFile(
+      join(p.fontes, 'ok.md'),
+      '# LEI Nº 1\n\nArt. 1º Primeiro.\n\nArt. 2º Segundo.\n\nArt. 3º Terceiro.\n',
+    );
+    const [ok] = await compararAcervo(p, 'lei-ok');
+    expect(ok).toMatchObject({
+      situacao: 'diferente',
+      nosAntes: 2,
+      nosDepois: 3,
+      surgiram: ['art3'],
+    });
+    expect(await readFile(join(p.saida, 'indice.json'), 'utf-8')).toBe(antes);
+    await expect(compararAcervo(p, 'nao-existe')).rejects.toThrow(/fora da curadoria/);
+  });
+});
 
 describe('gerarAcervo', () => {
   it('publica os íntegros, bloqueia o com anomalia e escreve o relatório', async () => {

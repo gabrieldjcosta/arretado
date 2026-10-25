@@ -310,3 +310,65 @@ export async function verificarPasta(saida: string): Promise<ProblemaDoAcervo[]>
   const pacoteJson = await readFile(join(saida, ARQUIVO_DO_PACOTE), 'utf-8').catch(() => undefined);
   return verificarAcervo(indiceJson, arquivos, pacoteJson);
 }
+
+export interface DiferencaDoItem {
+  id: string;
+  situacao: 'igual' | 'diferente' | 'bloqueado' | 'sem cache';
+  nosAntes?: number;
+  nosDepois?: number;
+  sumiram?: string[];
+  surgiram?: string[];
+  mudaram?: string[];
+  bloqueios?: string[];
+}
+
+/**
+ * Refaz cada item como o `gerar` faria, mas só do cache e das fontes (sem rede, sem gravar nada), e
+ * compara os nós com os que estão em `public/acervo`. É o teste de regressão de uma mudança no
+ * estruturador ou no pipeline: quem mudou, o que sumiu, o que surgiu.
+ */
+export async function compararAcervo(pastas: Pastas, soId?: string): Promise<DiferencaDoItem[]> {
+  const curadoria = await lerCuradoria(pastas);
+  const alvo = soId === undefined ? curadoria.itens : curadoria.itens.filter((i) => i.id === soId);
+  if (soId !== undefined && alvo.length === 0) throw new Error(`id fora da curadoria: ${soId}`);
+  const saida: DiferencaDoItem[] = [];
+  for (const cur of alvo) {
+    const precisaDoCache = cur.fonte.adaptador === 'planalto' || cur.fonte.adaptador === 'html';
+    if (
+      precisaDoCache &&
+      !(await stat(arquivoDoCache(pastas, cur.id)).then(
+        () => true,
+        () => false,
+      ))
+    ) {
+      saida.push({ id: cur.id, situacao: 'sem cache' });
+      continue;
+    }
+    const { construcao } = await gerarItem(pastas, cur);
+    if (!construcao.item) {
+      saida.push({ id: cur.id, situacao: 'bloqueado', bloqueios: construcao.bloqueios });
+      continue;
+    }
+    const publicado = await readFile(join(pastas.saida, `${cur.id}.json`), 'utf-8').then(
+      (t) => (JSON.parse(t) as { nos: { endereco: string }[] }).nos,
+      () => [],
+    );
+    const antes = new Map(publicado.map((n) => [n.endereco, JSON.stringify(n)]));
+    const depois = new Map(construcao.item.nos.map((n) => [n.endereco, JSON.stringify(n)]));
+    const sumiram = [...antes.keys()].filter((k) => !depois.has(k));
+    const surgiram = [...depois.keys()].filter((k) => !antes.has(k));
+    const mudaram = [...antes.keys()].filter(
+      (k) => depois.has(k) && antes.get(k) !== depois.get(k),
+    );
+    saida.push({
+      id: cur.id,
+      situacao: sumiram.length + surgiram.length + mudaram.length === 0 ? 'igual' : 'diferente',
+      nosAntes: antes.size,
+      nosDepois: depois.size,
+      sumiram,
+      surgiram,
+      mudaram,
+    });
+  }
+  return saida;
+}
