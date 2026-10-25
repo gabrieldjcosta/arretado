@@ -74,4 +74,16 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
       await screen.findByText(/O outro 1 cartão continua na fila e entra nos próximos dias/),
     ).toBeInTheDocument();
   });
+
+  it('lista só 10 motivos no "Por que estes?" e diz quantos faltam', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await cartoes(repo, 30);
+    relogio.avancar(DIA);
+    const usuario = abrirHoje(repo);
+    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    await usuario.click(within(quatro).getByRole('button', { name: '25 min' }));
+    await screen.findByText(/30 cartões, os mais perto de esquecer/);
+    expect(document.querySelectorAll('.tempo-do-hoje-porque li')).toHaveLength(10);
+    expect(screen.getByText(/e mais 20, na mesma ordem de valor/)).toBeInTheDocument();
+  });
 });

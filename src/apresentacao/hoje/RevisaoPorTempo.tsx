@@ -22,6 +22,9 @@ async function carregarFila(repo: Repositorio) {
   return { fila, diasFora: retorno?.diasFora ?? 0 };
 }
 
+/** Quantos itens o "Por que estes?" lista; o lote de 45 min chega a 90. */
+const MOTIVOS_VISIVEIS = 10;
+
 const cartoes = (n: number) => (n === 1 ? '1 cartão' : `${String(n)} cartões`);
 const resumo = (texto: string) => (texto.length > 70 ? `${texto.slice(0, 69)}…` : texto);
 
@@ -104,13 +107,16 @@ export function RevisaoPorTempo({
       <details className="tempo-do-hoje-porque">
         <summary className="botao botao-texto na-margem">Por que estes?</summary>
         <ol>
-          {escolhidos.map((c) => (
+          {escolhidos.slice(0, MOTIVOS_VISIVEIS).map((c) => (
             <li key={c.id}>
               <span>{resumo(c.frente)}</span>
               <span className="dica">{motivoDoItem(c)}</span>
             </li>
           ))}
         </ol>
+        {lote > MOTIVOS_VISIVEIS && (
+          <p className="dica">e mais {String(lote - MOTIVOS_VISIVEIS)}, na mesma ordem de valor.</p>
+        )}
       </details>
       {resto > 0 && (
         <p className="dica">
