@@ -113,7 +113,7 @@ Contra o papel: 10,6:1 (prazo), 4,1:1 (condição), 4,9:1 (absoluto e pena); na 
 | Alvo | `--alvo` 44 px: botões, links isolados, linhas de lista; campos 48 |
 | Gutter | 16 px (celular) · 24 (tablet em pé) · 32 (≥ 900) |
 | Coluna | casca de 900 px (`--largura-casca`) · leitura 70 ch (`--largura-texto`) · Cartão atual do Fixar 40 rem a partir de 700 px · diálogo 560 px |
-| Título de página (H1) | Schibsted Grotesk 800 · Familjen Grotesk 700 (`--fonte-titulo`, `--peso-titulo`), `-0,02em`, cor `--titulo`, linha 1,1; 1,875 rem (30 px, celular) · 2,125 (34 px, ≥ 700) · 2,375 (38 px, ≥ 900). É a escala do app, que o Gabriel escolheu em 20/10/2026; a prancha tinha 40/1, 44 e 48 px |
+| Título de página (H1) | Schibsted Grotesk 800 · Familjen Grotesk 700 (`--fonte-titulo`, `--peso-titulo`), `-0,02em`, cor `--titulo`, linha 1,1; 1,875 rem (30 px, celular) · 2,125 (34 px, ≥ 700) · 2,375 (38 px, ≥ 900). É a escala do app, que o Gabriel escolheu em 20/10/2026; a prancha tinha 40/1, 44 e 48 px. Exceção: no Leitor do celular (< 700 px), o título com mais de 30 caracteres (o nome oficial das normas) vai para uma linha inteira sob o "Biblioteca", em 1,5 rem (24 px) e equilibrado (`.titulo-longo`; o Gabriel escolheu os 24 px em 25/10/2026, no cartão do PR #275) |
 | Título da folha | `.agora-titulo`: 1,625 rem, linha 1,15; 800 e `-0,02em` de dia, 600 e `-0,005em` à noite (`--peso-titulo-folha`, `--espaco-titulo-folha`) |
 | Rótulo "Em seguida" | `--fonte-rotulo` e `--tamanho-rotulo`: título 800 a 15 px de dia, Atkinson 700 a 14 px à noite |
 | Seção (H2) / cartão (H3) | Atkinson 700, 1,25 rem / 1,0625 rem |

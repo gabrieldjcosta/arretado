@@ -103,3 +103,6 @@ Mudanças no plano:
 
 ## Peso por artigo (piloto FCC × DPE-SP)
 `node scripts/incidencia.mjs artigos <tabela.csv> <saida.csv> [ano_de-ano_ate]` converte as linhas do recorte em peso e faixa por artigo do CP e do ECA. Regra: cada artigo recebe `qtd_questoes / nº de artigos` da linha mais específica que o cobre (a coluna `dispositivo_ref` do TEC às vezes herda o intervalo do pai, então vale o intervalo do nome do assunto). Faixas por massa acumulada: Altíssima até 40%, Alta até 70%, Média até 90%, Baixa o resto. Intervalos com letra (217-A) enumeram só os extremos. Artigo ausente = sem incidência medida (o app trata como Baixa).
+
+## Pacote de estrelas
+`node scripts/incidencia.mjs pacote <artigos.csv> <saida.json> <id-uuid> <titulo>` junta as faixas Altíssima e Alta da tabela de peso por artigo num pacote `{ id, titulo, normas: { <item do acervo>: [artigos] } }`. O arquivo fica fora do repositório. No app, `aplicarPacoteNaBiblioteca` (`src/dominios/legislacao/pacote-de-incidencia.ts`) grava estrelas `pacote` nos artigos das normas que o usuário já adicionou; quem já tem estrela, herança ou exceção fica como está, e as normas ainda não adicionadas voltam em `semNorma`. O toque do usuário no controle tira a estrela de pacote como qualquer outra.

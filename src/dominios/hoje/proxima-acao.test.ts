@@ -8,11 +8,7 @@ describe('decidirProximaAcao (A1)', () => {
       tipo: 'vazio',
       comecos: COMECOS,
     });
-    expect(COMECOS.map((c) => c.id)).toEqual([
-      'adicionar_material',
-      'escolher_materia',
-      'sessao_curta',
-    ]);
+    expect(COMECOS.map((c) => c.id)).toEqual(['escolher_concurso', 'ler_norma', 'registrar_erro']);
   });
 
   it('revisão vencida vem antes da leitura salva', () => {

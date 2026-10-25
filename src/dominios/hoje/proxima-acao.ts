@@ -10,9 +10,9 @@ export const ROTULO_REVISAR_CARTOES = 'Revisar cartões';
 export const ROTULO_REVISAR_FRASES = 'Revisar frases';
 
 export const COMECOS: readonly [ComecoSugerido, ComecoSugerido, ComecoSugerido] = [
-  { id: 'adicionar_material', rotulo: 'Adicionar uma lei para ler', para: '/biblioteca/importar' },
-  { id: 'escolher_materia', rotulo: 'Escolher uma matéria', para: '/plano/onboarding' },
-  { id: 'sessao_curta', rotulo: 'Começar uma sessão curta', para: '/sessao/iniciar' },
+  { id: 'escolher_concurso', rotulo: 'Escolher meu concurso', para: '/comecar' },
+  { id: 'ler_norma', rotulo: 'Ler uma norma', para: '/biblioteca' },
+  { id: 'registrar_erro', rotulo: 'Registrar um erro', para: '/recall/registrar' },
 ];
 
 /** O que o Hoje sabe do estudo, já contado e resumido pela camada de tela. */

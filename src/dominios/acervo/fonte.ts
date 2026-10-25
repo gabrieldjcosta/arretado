@@ -1,4 +1,4 @@
-import type { IndiceDoAcervo, ItemDoAcervo } from './esquemas';
+import type { IndiceDoAcervo, ItemDoAcervo, PacoteDePartida } from './esquemas';
 
 /**
  * Porta do acervo (spec §4). O app só fala com ela; a implementação estática lê arquivos do mesmo
@@ -9,6 +9,8 @@ export interface FonteDoAcervo {
   listar(): Promise<IndiceDoAcervo>;
   /** O corpo de um item, validado pelo esquema (o hash é conferido pela adesão). */
   obter(id: string): Promise<ItemDoAcervo>;
+  /** As normas com que cada carreira começa ("Para começar"), validadas pelo esquema. */
+  pacoteDePartida(): Promise<PacoteDePartida>;
   /**
    * Uma versão antiga do item, pelo hash (AL: os arquivos do acervo são imutáveis por hash; a
    * reidratação do log pede a versão aderida mesmo depois de publicada outra). Opcional.

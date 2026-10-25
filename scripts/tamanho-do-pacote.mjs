@@ -10,8 +10,10 @@ const TETO_POR_ARQUIVO_KB = 200;
 // conteúdo de partida (12 Citações e 12 dicas, baixado só quando a Entrada abre) e 1,1 do código.
 // 429 → 431 (Gabriel, 20/10/2026, no mesmo PR): o #238 (exportação em Markdown e CSV) entrou na
 // integracao antes e os dois somam 430,0 kB.
-// 431 → 450 (Gabriel, 25/10/2026, cartão da estratégia): de uma vez, para as apostas AP-01 a AP-05;
-// cada PR mede e relata o tamanho.
+// 431 → 450 (Gabriel, 25/10/2026, cartão da estratégia: subir de uma vez, e não PR a PR): a Onda 1 (Leitor
+// no celular e primeiro uso) levou o JS de 430,9 a 435,9 kB. As duas telas de "Escolher meu concurso" somam
+// 3,3 (baixadas só quando a pessoa chega a elas, mas entram na soma), o Mais e a barra do Leitor 0,6, e o
+// esquema do pacote, o Acervo e a Chegada o resto. Cada PR de código mede e relata o tamanho.
 const TETO_TOTAL_KB = 450;
 // Dados do catálogo de concursos (um bloco por carreira, baixado só quando a pessoa a escolhe no
 // onboarding do plano): não entram no teto do app, mas têm teto próprio.

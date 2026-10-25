@@ -23,7 +23,9 @@ describe('Hoje › Agora (A1)', () => {
     await usuario.click(screen.getByRole('button', { name: 'Escolher outra coisa' }));
     expect(await screen.findByRole('heading', { name: 'Por onde começar?' })).toBeInTheDocument();
     expect(
-      screen.getAllByRole('link', { name: /lei para ler|matéria|sessão curta/i }),
+      screen.getAllByRole('link', {
+        name: /escolher meu concurso|ler uma norma|registrar um erro/i,
+      }),
     ).toHaveLength(3);
 
     await usuario.click(screen.getByRole('button', { name: 'Voltar à sugestão' }));
