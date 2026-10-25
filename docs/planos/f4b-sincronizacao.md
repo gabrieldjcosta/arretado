@@ -23,12 +23,12 @@ O esquema inicial já tem as duas tabelas; o plano antigo só descrevia o log. D
 | `alteracoes` | **Log**: verdade histórica, append-only, `seq` do servidor. Serve para o recebimento incremental e para auditar | só a função `enviar_lote` | o dono |
 | `registros` | **Estado atual** de cada `(colecao, id)` com `ts_logico`. Serve para **aparelho novo começar** e para detectar divergência | só a função `enviar_lote` (o cliente perde `insert/update/delete` direto) | o dono |
 
-**`enviar_lote(aparelho_id, versao_esquema, entradas[])`** (função SQL `security invoker`, RLS continua valendo), numa transação:
+**`enviar_lote(aparelho_id, versao_esquema, entradas[])`** (função SQL `security definer` com `search_path` vazio e dono sempre `auth.uid()`: o cliente perdeu a escrita direta, e a função exige a sessão e `perfis.sincronizacao_aceita_em`, coluna própria para não sobrescrever `termos_versao`; e `perfis.sincronizacao_liberada`, a trava por conta da Q2 que só o dono do serviço liga), numa transação:
 1. Insere cada entrada em `alteracoes` com `on conflict do nothing` (índice único do §2). Entrada repetida = ignorada.
 2. Para cada entrada nova, atualiza `registros`:
    - `gravar`/`atualizar`/`remover` carregam `base_ts` (o `tsLogico` do registro que o aparelho tinha ao editar; `null` se criou).
    - Se `registros.ts_logico` = `base_ts` (ou o registro não existe e `base_ts` é nulo): **avança** (`dados`, `ts_logico`, `atualizado_em`; `remover` grava `excluido_em` e mantém a última `dados` como lápide).
-   - Se for diferente: **não avança**. A entrada fica no log marcada `divergente = true`. É a base da detecção de Conflito (§5). Se o conteúdo resultante for idêntico ao do servidor, não é divergência.
+   - Se for diferente: **não avança**. A entrada fica no log marcada `divergente = true`. É a base da detecção de Conflito (§5). Conteúdo igual **também** diverge no servidor: `tsLogico` e `atualizadoEm` vão dentro do JSON de cada entrada, então dois lados nunca são byte a byte iguais. Dizer que duas versões são equivalentes (e adotar o maior carimbo) é do cliente, no B3.
 3. Devolve `{ seq_max, divergentes: [{colecao, registro_id, ts_servidor}] }` para o aparelho avisar a pessoa.
 - Regra de grão: **conflito é por registro** (não por campo). É mais conservador que o §9 antigo ("conflito de campo"), mas simples e nunca perde dado; com posse os casos são raros. Se a medição da V1/fumaça mostrar muito conflito falso, o refino por campo (usando `removidos`/chaves de `atualizar`) entra num pacote B3b.
 - Colunas novas (migração aditiva em B1): `alteracoes.base_ts text`, `alteracoes.divergente boolean not null default false`, `alteracoes.versao_esquema smallint`, `registros.excluido_em` já existe.
@@ -138,7 +138,7 @@ Seções a reescrever:
 6. **Aparelho emprestado**: "Sair e apagar daqui" apaga o banco local; os dados continuam na conta.
 7. **Sem rastreio, sem venda, sem treino de IA com seus dados**, texto mantido e reforçado (não existe IA no servidor hoje).
 
-**Aceite novo:** `v4:sincronizar`, gravado no Aparelho (`Usuario.consentimentos`) e, no servidor, na RPC `aceitar_termos` (decisão D2 do `f4a-fila`, que agora **deixa de ser adiável**: sem aceite no servidor, o servidor não aceita `enviar_lote`; a função checa `perfis.termos_versao`). Quem não aceita continua com a conta como hoje (só login e cópia cifrada).
+**Aceite novo:** `v4:sincronizar`, gravado no Aparelho (`Usuario.consentimentos`) e, no servidor, na RPC `aceitar_sincronizacao(versao)` (grava `perfis.sincronizacao_versao` e `sincronizacao_aceita_em`, colunas próprias para não sobrescrever `termos_versao`; decisão D2 do `f4a-fila`, que agora **deixa de ser adiável**: sem aceite no servidor, o servidor não aceita `enviar_lote`). Quem não aceita continua com a conta como hoje (só login e cópia cifrada).
 **Termos de teste v2:** troca a linha "Seus dados de estudo ficam no seu Aparelho. Não há sincronização" por "os dados ficam no Aparelho **e** na sua conta quando a sincronização estiver ligada; é uma função de teste, pode falhar; guarde uma cópia mesmo assim"; mantém "sem garantia".
 **Não confundir:** o aceite do login continua v3 para quem não ativa a sincronização; a sincronização é um **interruptor próprio** (Conta › Sincronização, desligado por padrão no início; ligado por padrão só depois do portão da F4-B).
 **Condição de convite:** com sincronização ligada, **só pessoas conhecidas** até a revisão jurídica.
@@ -170,7 +170,7 @@ Ordem: B1 → B2 → B3 → B4 (+B2b) → B5 → B6. Máximo 2 tarefas de códig
 
 | Pacote | O quê | Risco | Portão (aceite) | Quem decide |
 |---|---|---|---|---|
-| **B1 Esquema remoto** | Migração aditiva + rollback: `enviar_lote`, `instantaneo_inicio`, `pedir_posse`, `soltar_posse`, `aparelhos_sync`; colunas `base_ts`, `divergente`, `versao_esquema`; índice único; remover `check` de coleção; cliente perde escrita direta em `registros`; `acervo-adesao` na `operacao`; `aceitar_termos` com `v4:sincronizar` | A | testes PGlite do §11 verdes; `verificacao-rls-remota.sql` ampliado; rollback testado | Gabriel (aplicar no real) |
+| **B1 Esquema remoto** | Migração aditiva + rollback: `enviar_lote`, `instantaneo_inicio`, `pedir_posse`, `soltar_posse`, `aparelhos_sync`; colunas `base_ts`, `divergente`, `versao_esquema`; índice único; remover `check` de coleção; cliente perde escrita direta em `registros`; `acervo-adesao` na `operacao`; `aceitar_sincronizacao('v4:sincronizar')` | A | testes PGlite do §11 verdes; `verificacao-rls-remota.sql` ampliado; rollback testado | Gabriel (aplicar no real) |
 | **B2 Envio** | Serviço de sync em `src/integracoes/conta/sync/` (porta + implementação Supabase + falsa); fila, lotes, cursor, backoff, carga inicial, quarentena; interruptor de sincronização e aceite `v4:sincronizar` | A | dois bancos locais enviam e o PGlite recebe idêntico; lote repetido 2× = 1×; queda no meio retoma; sem rede nada quebra; `npm run check` e teto do pacote JS (**import() separado; o teto 428 kB é medido no PR**) | Gabriel (teto, se estourar) |
 | **B2b Anexos** | Bucket `anexos`, envio por hash, download sob demanda, cota e limite | A | anexo sobe uma vez; outro aparelho baixa ao abrir; exclusão de conta apaga os objetos | Gabriel (limite/cota) |
 | **B3 Recebimento e Conflitos** | Puxada, aplicação por `tsLogico`/`base_ts`, `observar`, recarga completa de aparelho novo, tabela interna `conflitos`, lógica de resolução (funções puras), quarentena de dado inválido, parada por versão mais nova | A, **o maior** | propriedade de convergência; Conflito nunca perde dado; aparelho novo durante edições; sem conflito falso nos casos de posse | Gabriel (textos de Conflito com a thread de UI) |
@@ -184,7 +184,7 @@ Cada contrato, ao ser despachado, segue o formato de `docs/planos/tarefas/` (Obj
 
 ## 13. Segurança e LGPD (item da fase, D18/R11)
 
-- **RLS é a defesa:** `enviar_lote` é `security invoker`; `registros` e `alteracoes` só por ela; testes PGlite de B não toca A (inclusive tentando `usuario_id` de A no JSON).
+- **RLS é a defesa:** `enviar_lote` é `security definer` com `search_path` vazio e dono sempre `auth.uid()`; `registros` e `alteracoes` só por ela; testes PGlite de B não toca A (inclusive tentando `usuario_id` de A no JSON).
 - **Sanitização:** nada do que vem do servidor vira HTML; valida pelo zod antes de gravar; o texto que a pessoa colou continua passando pelo sanitizador no uso.
 - **Privacidade:** dados legíveis pelo operador (dito na v4); minimização: acervo e snapshots não sobem; sem diagnóstico; aviso de notas.
 - **Exclusão:** `on delete cascade` já cobre `registros`, `alteracoes`, `posse_aparelho`; a função de exclusão estende ao bucket `anexos`. Teste: criar dados, excluir a conta, verificar zero linhas e zero objetos.
@@ -198,7 +198,7 @@ Cada contrato, ao ser despachado, segue o formato de `docs/planos/tarefas/` (Obj
 | # | Escolha | Efeito no plano |
 |---|---|---|
 | Q1 | Sem posse e sem rede **edita, com aviso** | Como recomendado no §4 |
-| Q2 | **Gratuito só com o Gabriel** | Como o padrão: sem Pro agora; ninguém além do Gabriel sincroniza até contratar o Pro |
+| Q2 | **Gratuito só com o Gabriel** (25/10: trava `perfis.sincronizacao_liberada`, ligada só nas 2 contas existentes) | Como o padrão: sem Pro agora; ninguém além do Gabriel sincroniza até contratar o Pro |
 | Q3 | **Aparência e movimento locais** | Tema, movimento e tamanho de letra ficam por aparelho; metas e perfil sincronizam (§5) |
 | Q4 | **Ligada ao entrar** (muda o plano) | Não há interruptor desligado por padrão. A sincronização liga para quem aceitar `v4:sincronizar` no login. **Tensão com Q2/Q7:** sem Pro e sem revisão jurídica, o convite precisa continuar limitado a conhecidos (gancho de convite ligado) e a v4 publicada **antes** do B2 ir ao `main`. No `integracao`/teste, o B2 pode ligar por interruptor de build até lá |
 | Q5 | **Log 30 dias, aparelho parado 90** | Como o §3 |
