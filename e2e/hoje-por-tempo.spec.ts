@@ -48,3 +48,34 @@ test('escolher 5 min: o Hoje mostra 10 cartões, o Drill entrega 10 e o resto fi
   await page.getByRole('link', { name: 'Começar' }).click();
   await expect(page.getByText('1 de 12')).toBeVisible();
 });
+
+test('volta de pausa: o Começar vem antes do cartão de boas-vindas e cabe acima da barra', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  for (let i = 1; i <= 3; i += 1) {
+    await page.goto('/#/recall/cartoes/novo');
+    await page.getByLabel('Frente (pergunta)').fill(`Pergunta ${String(i)}`);
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page).toHaveURL(/#\/recall\/cartoes$/);
+  }
+  await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
+  await page.goto('/#/recall/revisar');
+  await page.getByRole('button', { name: 'Mostrar resposta' }).click();
+  await page.getByRole('button', { name: 'Fácil' }).click();
+  await page.clock.setFixedTime(new Date(inicio.getTime() + 10 * DIA));
+  await page.goto('/#/');
+  await page.reload();
+
+  const comecar = page
+    .getByRole('region', { name: 'Agora' })
+    .getByRole('link', { name: 'Começar' });
+  const boasVindas = page.getByRole('region', { name: 'Bem-vindo de volta' });
+  await expect(boasVindas).toBeVisible();
+  const [a, b] = await Promise.all([comecar.boundingBox(), boasVindas.boundingBox()]);
+  expect(a && b && a.y < b.y).toBe(true);
+  const altura = page.viewportSize()?.height ?? 0;
+  expect((a?.y ?? 0) + (a?.height ?? 0)).toBeLessThan(altura - 80);
+});

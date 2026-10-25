@@ -32,10 +32,11 @@ export function Hoje() {
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
       <PontosDoDia retrato={hoje.retrato} />
-      <BoasVindas />
       <div className="hoje-colunas">
         <div>
           <Agora hoje={hoje} />
+          {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
+          <BoasVindas />
         </div>
         <div>
           <Depois
