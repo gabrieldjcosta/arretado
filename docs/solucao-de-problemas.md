@@ -1903,7 +1903,7 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Camadas: a rodada mora em `dominios/legislacao`.** `dominios/recall` não pode importar de `dominios/legislacao` (regra `arretado/camadas`); por isso `ache-o-erro.ts` e `medicao-ache-o-erro.ts` ficam ao lado de `trocas.ts`.
 - **Contraste do marca-texto na Noite.** `--marca` a 45% sobre a superfície escura, com o texto claro, reprovou no axe (`color-contrast: ins`, só no celular). Marca-texto cheio com `color: var(--tinta)` (a tinta não muda na Noite) passa nos dois mundos.
 - **"Está certa como está" fora do fluxo de acerto.** A nota aparece sempre que o item não tem troca, mesmo quando a pessoa tocou em algo (errou): é o texto certo à vista, que o piloto exige.
-- **Teto de JS: 442 → 449 kB (teto 450).** A tela e o gerador pesam ~6,6 kB gzip no chunk próprio. Sobra 1 kB para as outras frentes em voo; se o próximo PR estourar, a decisão de subir o teto é do Gabriel.
+- **Teto de JS: 443 → 449,6 kB (teto 450).** O chunk próprio pesa 6,6 kB gzip. Com `TopoDaRevisao` (Caneta e BarraFina) importado pela tela, o rolldown separava um chunk compartilhado e o total passava a 451: a tela usa um topo simples ("Sair" e "N de 8"). Sobra 0,4 kB para as outras frentes em voo; subir o teto é decisão do Gabriel.
 
 ## Leitor no celular e primeiro uso (Onda 1, 25/10/2026)
 

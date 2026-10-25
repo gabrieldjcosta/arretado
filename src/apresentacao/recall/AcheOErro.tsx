@@ -33,7 +33,6 @@ import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { useRepositorio } from '../dados/contexto';
 import { gravarJson, lerJson } from '../plano/armazenamento';
-import { TopoDaRevisao } from './TopoDaRevisao';
 import './estilos-certeza.css';
 import './estilos-ache-o-erro.css';
 
@@ -371,12 +370,14 @@ export function AcheOErro() {
   return (
     <div className="coluna-drill">
       <h1 className="visualmente-oculto">Ache o erro</h1>
-      <TopoDaRevisao
-        sair="/recall"
-        valor={rodada.indice + 1}
-        max={rodada.itens.length}
-        rotulo="Frase"
-      />
+      <div className="topo-drill">
+        <Link to="/recall" className="botao botao-texto">
+          Sair
+        </Link>
+        <p className="dica" aria-live="polite">
+          {rodada.indice + 1} de {rodada.itens.length}
+        </p>
+      </div>
       <article className="cartao-bloco ache-folha" aria-label="Frase">
         <p className="ache-referencia">
           {item.referencia}
