@@ -19,6 +19,7 @@ import {
   type Repositorio,
 } from '../../core/persistencia';
 import { agendar, agendarFrase } from './agendamento';
+import { provaPorVir } from './prova';
 import { ordenarPorValor } from './ordem-de-valor';
 import { ACAO_RECOMENDADA, completude, sugerirCausa } from './causa';
 
@@ -549,7 +550,7 @@ export async function revisar(
     const cartao = await repo.colecao('cartoes').obter(cartaoId);
     if (!cartao) throw new Error('Este cartão não existe mais.');
     if (cartao.estado !== 'ativo') throw new Error('Este cartão não está na fila.');
-    const a = agendar(cartao, resposta, dia);
+    const a = agendar(cartao, resposta, dia, await provaPorVir(repo, dia, cartao.pontoId));
     const em = repo.ctx.agora().toISOString();
     const revisao = await repo.colecao('revisoes').criar({
       cartaoId,
@@ -679,7 +680,7 @@ export async function revisarFrase(
     const frase = await repo.colecao('frases').obter(fraseId);
     if (!frase) throw new Error('Esta frase não existe mais.');
     if (frase.estado !== 'ativa') throw new Error('Esta frase não está na fila.');
-    const a = agendarFrase(frase, resposta, dia);
+    const a = agendarFrase(frase, resposta, dia, await provaPorVir(repo, dia, frase.pontoId));
     const em = repo.ctx.agora().toISOString();
     const revisao = await repo.colecao('revisoesFrase').criar({
       fraseId,

@@ -1,3 +1,4 @@
+import { somarDias } from '../../core/datas';
 import { agendar, agendarFrase, INTERVALOS, intervaloDaCaixa } from './agendamento';
 
 describe('agendamento em 6 caixas (6.5)', () => {
@@ -66,5 +67,60 @@ describe('agendamento de frases (Frases 2)', () => {
       '2026-09-10',
     );
     expect(r).toEqual({ proximaDepois: '2026-11-09', atrasoDias: 9 });
+  });
+});
+
+describe('a prova no centro (AP-03)', () => {
+  const HOJE = '2026-10-25';
+  const emDias = (n: number) => somarDias(HOJE, n);
+  const estado = { caixa: 5, proximaRevisao: HOJE };
+
+  it.each([77, 30, 7])('com a prova em %i dias, nenhuma Revisão cai depois dela', (horizonte) => {
+    const prova = { data: emDias(horizonte) };
+    for (const caixa of [1, 2, 3, 4, 5, 6]) {
+      for (const resposta of ['errei', 'dificil', 'facil'] as const) {
+        const { proximaDepois } = agendar({ caixa, proximaRevisao: HOJE }, resposta, HOJE, prova);
+        expect(proximaDepois <= prova.data).toBe(true);
+        expect(proximaDepois >= emDias(1)).toBe(true);
+      }
+    }
+    const frase = agendarFrase(
+      { proximaRevisao: HOJE, ultimaRevisao: '2026-09-01T12:00:00Z' },
+      'li',
+      HOJE,
+      prova,
+    );
+    expect(frase.proximaDepois <= prova.data).toBe(true);
+  });
+
+  it('a caixa 6 (60 dias) com prova em 30 dias fica antes da prova, não em 60', () => {
+    const { proximaDepois } = agendar(estado, 'facil', HOJE, { data: emDias(30) });
+    expect(proximaDepois).toBe(emDias(29));
+  });
+
+  it('Altíssima e Alta passam de novo uma semana antes da prova; Média só é limitada', () => {
+    const data = emDias(77);
+    expect(agendar(estado, 'facil', HOJE, { data, faixa: 'altissima' }).proximaDepois).toBe(
+      emDias(60),
+    );
+    // Prova em 40 dias: o intervalo de 60 passaria dela; a faixa alta volta no dia 33.
+    expect(agendar(estado, 'facil', HOJE, { data: emDias(40), faixa: 'alta' }).proximaDepois).toBe(
+      emDias(33),
+    );
+    expect(agendar(estado, 'facil', HOJE, { data: emDias(40), faixa: 'media' }).proximaDepois).toBe(
+      emDias(39),
+    );
+  });
+
+  it('sem prova, com prova hoje ou já passada, nada muda', () => {
+    const base = agendar(estado, 'facil', HOJE);
+    expect(base.proximaDepois).toBe(emDias(60));
+    expect(agendar(estado, 'facil', HOJE, undefined)).toEqual(base);
+    expect(agendar(estado, 'facil', HOJE, { data: HOJE })).toEqual(base);
+    expect(agendar(estado, 'facil', HOJE, { data: emDias(-3) })).toEqual(base);
+  });
+
+  it('prova amanhã: a Revisão vai para amanhã, nunca para depois', () => {
+    expect(agendar(estado, 'facil', HOJE, { data: emDias(1) }).proximaDepois).toBe(emDias(1));
   });
 });

@@ -1,5 +1,6 @@
 import type { Evento } from '../../core/eventos/barramento';
 import { Revisao } from '../../core/modelo';
+import { definirDataDaProva, dataDaProvaInformada } from './prova';
 import { LIMITE_MAXIMO_PAGINA } from '../../core/persistencia';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
@@ -465,6 +466,40 @@ describe('dias com revisão nos últimos 7 (fatia 3)', () => {
     await revisar(outro, d.id, 'errei');
     relogio.avancar(2 * 3_600_000); // 01h30 de 24/09 em SP: o dia 23 é a penúltima marca
     expect(await diasComRevisao(outro)).toEqual([false, false, false, false, false, true, false]);
+  });
+});
+
+describe('Data da prova (AP-03)', () => {
+  it('limita o intervalo pela prova guardada; apagar a data devolve o comportamento de antes', async () => {
+    const { repo, relogio } = await preparar();
+    const c = await criarCartaoManual(repo, { frente: 'a', verso: 'v' });
+    relogio.avancar(DIA);
+    // Sem data: caixa 1 → 2 pelo "fácil", 3 dias.
+    const sem = await revisar(repo, c.id, 'facil');
+    expect(sem.revisao.proximaDepois).toBe('2026-09-27');
+
+    await definirDataDaProva(repo, '2026-09-30');
+    expect(await dataDaProvaInformada(repo)).toBe('2026-09-30');
+    relogio.avancar(3 * DIA);
+    const com = await revisar(repo, c.id, 'facil');
+    expect(com.revisao.proximaDepois).toBe('2026-09-29');
+
+    await definirDataDaProva(repo, '2026-12-01');
+    await definirDataDaProva(repo, null);
+    expect(await dataDaProvaInformada(repo)).toBeUndefined();
+    const fases = await repo.colecao('fasesPrazos').todosDoUsuario();
+    expect(fases.filter((x) => x.excluidoEm === null)).toHaveLength(0);
+  });
+
+  it('trocar a data guarda o histórico e não duplica a Fase', async () => {
+    const { repo } = await preparar();
+    await definirDataDaProva(repo, '2027-01-10');
+    await definirDataDaProva(repo, '2027-02-14');
+    const fases = await repo.colecao('fasesPrazos').todosDoUsuario();
+    expect(fases).toHaveLength(1);
+    expect(fases[0]).toMatchObject({ titulo: 'Prova objetiva', dataInicio: '2027-02-14' });
+    expect(fases[0]?.historicoDatas).toHaveLength(1);
+    expect(await repo.colecao('concursos').todosDoUsuario()).toHaveLength(1);
   });
 });
 
