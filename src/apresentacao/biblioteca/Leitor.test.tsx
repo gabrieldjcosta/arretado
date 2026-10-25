@@ -160,7 +160,10 @@ describe('leitor da norma (9.6)', () => {
     const usuario = abrirLeitor(repo, '#/biblioteca');
     await usuario.click(await screen.findByRole('link', { name: /LEP/ }));
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'LEP' })).toBeInTheDocument();
+    const titulo = await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    expect(titulo).toBeInTheDocument();
+    // Um nome curto fica ao lado do "Biblioteca" (só o longo ganha a classe que o faz descer).
+    expect(titulo).not.toHaveClass('titulo-longo');
     // Título → capítulo → artigo: um nível a mais em cada degrau, a partir do 2.
     expect(await screen.findByRole('heading', { level: 2, name: /TÍTULO I/ })).toHaveTextContent(
       'DO OBJETO',
@@ -267,6 +270,19 @@ describe('leitor da norma (9.6)', () => {
     // O inciso vigente ao lado continua com o texto.
     expect(within(dispositivo('art89A.incI')).getByText(/promover a defesa/)).toBeInTheDocument();
   }, 30_000);
+
+  it('o nome oficial longo da norma ganha a classe que o faz descer no celular', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(
+      repo,
+      LEI,
+      'Constituição da República Federativa do Brasil de 1988',
+    );
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /^Constituição da República/ }),
+    ).toHaveClass('titulo-longo');
+  });
 
   it('vetado só com o esqueleto (rubrica e texto "(VETADO)"): linha sem expansão; a redação anterior fica na linha fechada (8.10)', async () => {
     const { repo } = await repositorioDeTeste();
