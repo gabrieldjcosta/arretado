@@ -12,7 +12,9 @@ describe('Plano › data da prova (AP-03)', () => {
     render(<App abrir={() => Promise.resolve(repo)} />);
 
     expect(screen.queryByLabelText('Data da prova objetiva (opcional)')).not.toBeInTheDocument();
-    await usuario.click(await screen.findByRole('button', { name: 'Informar a data da prova (opcional)' }));
+    await usuario.click(
+      await screen.findByRole('button', { name: 'Informar a data da prova (opcional)' }),
+    );
     const campo = screen.getByLabelText('Data da prova objetiva (opcional)');
     expect(campo).toHaveFocus();
     expect(screen.queryByRole('button', { name: 'Guardar a data' })).not.toBeInTheDocument();
