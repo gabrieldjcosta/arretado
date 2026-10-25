@@ -11,7 +11,7 @@ const TETO_POR_ARQUIVO_KB = 200;
 // 429 → 431 (Gabriel, 20/10/2026, no mesmo PR): o #238 (exportação em Markdown e CSV) entrou na
 // integracao antes e os dois somam 430,0 kB.
 // 431 → 436 (Onda 1, 25/10/2026, Leitor no celular e primeiro uso; a confirmar pelo Gabriel no PR): o JS foi
-// de 430,8 a 435,6 kB. As duas telas de "Escolher meu concurso" somam 3,3 (baixadas só quando a pessoa
+// de 430,9 a 435,9 kB. As duas telas de "Escolher meu concurso" somam 3,3 (baixadas só quando a pessoa
 // chega a elas, mas entram na soma), o Mais e a barra do Leitor 0,6, e o esquema do pacote, o Acervo e a
 // Chegada o resto.
 const TETO_TOTAL_KB = 436;
