@@ -152,7 +152,13 @@ describe('atualizarItem', () => {
     const r = await atualizarItem(repo, fonte2, e2);
     if (r.estado !== 'atualizada') throw new Error('não atualizou');
     expect(r.comparacao.alterados.map((n) => n.endereco)).toEqual(['art1', 'art2']);
-    expect(r.pendencias).toBe(0);
+    // AP-05: art1 e art2 mudaram de texto e têm Frase ou Estrela da pessoa; cada um vira um aviso.
+    expect(r.pendencias).toBe(2);
+    const avisos = (await repo.colecao('pendenciasReleitura').todosDoUsuario()).filter(
+      (p) => p.tipo === 'texto_alterado',
+    );
+    expect(avisos.map((p) => p.enderecoAntigo).sort()).toEqual(['art1', 'art2']);
+    expect(avisos.every((p) => p.resolvidaEm === undefined)).toBe(true);
     expect(r.reancoradas).toBe(1);
     expect(r.marcacoesPendentes).toBe(1);
 

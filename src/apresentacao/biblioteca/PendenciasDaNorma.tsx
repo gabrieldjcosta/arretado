@@ -15,6 +15,7 @@ const QUE_FICOU: Record<PendenciaDeReleitura['tipo'], string> = {
   lido_ate: 'Lido até',
   posicao: 'Onde continuar a leitura',
   precedente: 'Precedente vinculado',
+  texto_alterado: 'Texto mudou',
 };
 
 /**
