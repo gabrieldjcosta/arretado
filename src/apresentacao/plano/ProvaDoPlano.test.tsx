@@ -31,11 +31,11 @@ describe('Plano › data da prova (AP-03)', () => {
     });
     expect(await screen.findByText('Prova objetiva: 10/01/2099')).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Mudar' })).toHaveFocus();
+      expect(screen.getByRole('button', { name: 'Mudar a data da prova' })).toHaveFocus();
     });
     expect(document.body.textContent).not.toMatch(/faltam|restam \d+ dias|contagem/i);
 
-    await usuario.click(screen.getByRole('button', { name: 'Tirar' }));
+    await usuario.click(screen.getByRole('button', { name: 'Tirar a data da prova' }));
     await waitFor(async () => {
       expect(await dataDaProvaInformada(repo)).toBeUndefined();
     });

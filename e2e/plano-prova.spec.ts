@@ -19,12 +19,12 @@ test('informar a data da prova no Plano, ver depois de recarregar e tirar', asyn
   await semViolacoes(page);
   await guardar.click();
   await expect(page.getByText('Prova objetiva: 10/01/2027')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Mudar' })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Mudar a data da prova' })).toBeFocused();
   await page.reload();
   await expect(page.getByText('Prova objetiva: 10/01/2027')).toBeVisible();
   await expect(page.getByText(/faltam|contagem regressiva/i)).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Tirar' }).click();
+  await page.getByRole('button', { name: 'Tirar a data da prova' }).click();
   await expect(
     page.getByRole('button', { name: 'Informar a data da prova (opcional)' }),
   ).toBeVisible();

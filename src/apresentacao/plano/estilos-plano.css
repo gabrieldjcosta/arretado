@@ -88,3 +88,7 @@
   padding-left: 0;
   margin-left: 0;
 }
+
+.prova-do-plano input[type='date'] {
+  max-width: 16rem;
+}

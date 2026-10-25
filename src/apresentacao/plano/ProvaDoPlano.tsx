@@ -18,6 +18,7 @@ export function ProvaDoPlano() {
   const { dados } = useDados(dataDaProvaInformada);
   const [aberto, setAberto] = useState(false);
   const [digitada, setDigitada] = useState<string | null>(null);
+  const [pendente, setPendente] = useState<string | null>(null);
   const [falha, setFalha] = useState(false);
   const campo = useRef<HTMLInputElement>(null);
   const mudar = useRef<HTMLButtonElement>(null);
@@ -30,7 +31,8 @@ export function ProvaDoPlano() {
   const valida = valor >= amanha;
   const passou = valor !== '' && valor <= hoje;
   const guardada = dados !== undefined;
-  const editando = aberto || (!guardada && digitada !== null);
+  const gravado = pendente !== null && dados === pendente;
+  const editando = (aberto && !gravado) || (!guardada && digitada !== null);
 
   useEffect(() => {
     const alvo = { campo, mudar, informar }[devolverFoco.current ?? 'campo'].current;
@@ -42,6 +44,7 @@ export function ProvaDoPlano() {
 
   const abrir = () => {
     devolverFoco.current = 'campo';
+    setPendente(null);
     setAberto(true);
   };
 
@@ -50,7 +53,8 @@ export function ProvaDoPlano() {
     definirDataDaProva(repo, data).then(
       () => {
         setDigitada(null);
-        setAberto(false);
+        if (data === null) setAberto(false);
+        else setPendente(data);
         devolverFoco.current = data === null ? 'informar' : 'mudar';
       },
       () => {
@@ -67,12 +71,19 @@ export function ProvaDoPlano() {
             Prova objetiva: {formatar(dados)}
             {dados <= hoje && ' · já passou; atualize quando souber a próxima'}
           </span>
-          <button ref={mudar} type="button" className="botao-texto" onClick={abrir}>
+          <button
+            ref={mudar}
+            type="button"
+            className="botao-texto"
+            aria-label="Mudar a data da prova"
+            onClick={abrir}
+          >
             Mudar
           </button>
           <button
             type="button"
             className="botao-texto"
+            aria-label="Tirar a data da prova"
             onClick={() => {
               gravar(null);
             }}
@@ -130,7 +141,7 @@ export function ProvaDoPlano() {
               onClick={() => {
                 setDigitada(null);
                 setAberto(false);
-                devolverFoco.current = guardada ? 'mudar' : null;
+                devolverFoco.current = guardada ? 'mudar' : 'informar';
               }}
             >
               Cancelar
