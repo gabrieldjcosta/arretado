@@ -193,7 +193,24 @@ Cada contrato, ao ser despachado, segue o formato de `docs/planos/tarefas/` (Obj
 - **CSP:** nenhuma origem nova (o Supabase já está permitido); sem `wss://` na primeira versão.
 - **Trocar de conta no mesmo aparelho:** um banco por conta (T26) continua; a sincronização nunca lê nem grava o banco de outra conta (teste E2E existente estendido).
 
+## 13b. Decisões do Gabriel (25/10/2026, cartões; valem sobre o texto acima)
+
+| # | Escolha | Efeito no plano |
+|---|---|---|
+| Q1 | Sem posse e sem rede **edita, com aviso** | Como recomendado no §4 |
+| Q2 | **Gratuito só com o Gabriel** | Como o padrão: sem Pro agora; ninguém além do Gabriel sincroniza até contratar o Pro |
+| Q3 | **Aparência e movimento locais** | Tema, movimento e tamanho de letra ficam por aparelho; metas e perfil sincronizam (§5) |
+| Q4 | **Ligada ao entrar** (muda o plano) | Não há interruptor desligado por padrão. A sincronização liga para quem aceitar `v4:sincronizar` no login. **Tensão com Q2/Q7:** sem Pro e sem revisão jurídica, o convite precisa continuar limitado a conhecidos (gancho de convite ligado) e a v4 publicada **antes** do B2 ir ao `main`. No `integracao`/teste, o B2 pode ligar por interruptor de build até lá |
+| Q5 | **Log 30 dias, aparelho parado 90** | Como o §3 |
+| Q6 | **10 MB por anexo** | Como o §6 |
+| Q7 | **Só conhecidos, aviso de teste** | Como o padrão; revisão jurídica não bloqueia |
+| Q8 | **Esquema v10 antes, num PR só do esquema** (muda o plano) | Novo pacote **B2s** antes do B3: sobe `VERSAO_ESQUEMA` para 10 com a tabela interna `conflitos` (sem mexer em registro), com backup manual do Gabriel e revisão independente; B3 passa a depender do B2s |
+
+Itens a ajustar nos pacotes quando forem despachados: B4 troca "interruptor desligado" por "liga após o aceite"; B6 mede também o efeito de ligar por padrão; riscos 7 do §15 passa a "v4 publicada antes de qualquer `main` com envio ligado".
+
 ## 14. Perguntas ao Gabriel (cada uma com padrão seguro)
+
+Respondidas em 25/10: ver §13b.
 
 | # | Pergunta | Padrão se não houver resposta |
 |---|---|---|
