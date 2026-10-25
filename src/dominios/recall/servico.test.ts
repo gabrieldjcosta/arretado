@@ -1,5 +1,6 @@
 import type { Evento } from '../../core/eventos/barramento';
 import { Revisao } from '../../core/modelo';
+import { LIMITE_MAXIMO_PAGINA } from '../../core/persistencia';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   arquivarCartao,
@@ -499,6 +500,80 @@ describe('Certeza na Revisão (AP-02)', () => {
     expect(fila.map((c) => c.proximaRevisao)).toEqual(
       (await filaDoDia(repo)).map((c) => c.proximaRevisao),
     );
+  });
+
+  it('só o Errei com certeza 3 marca: Fácil, Difícil e certeza 1 ou 2 não', async () => {
+    const { repo, relogio } = await preparar();
+    const casos = [
+      ['facil com 3', 'facil', 3],
+      ['dificil com 3', 'dificil', 3],
+      ['errei com 2', 'errei', 2],
+      ['errei com 1', 'errei', 1],
+      ['errei com 3', 'errei', 3],
+    ] as const;
+    const criados = [];
+    for (const [frente, resposta, certeza] of casos) {
+      const cartao = await criarCartaoManual(repo, { frente, verso: 'v' });
+      criados.push({ cartao, resposta, certeza });
+    }
+    relogio.avancar(DIA);
+    for (const { cartao, resposta, certeza } of criados) {
+      await revisar(repo, cartao.id, resposta, { certeza });
+    }
+    relogio.avancar(60 * DIA);
+    const marcados = (await filaPorValor(repo)).filter((c) => c.erroComCerteza);
+    expect(marcados.map((c) => c.frente)).toEqual(['errei com 3']);
+  });
+
+  it('vale a Revisão mais recente do cartão: acertar depois tira a marca, errar com certeza a põe', async () => {
+    const { repo, relogio } = await preparar();
+    const a = await criarCartaoManual(repo, { frente: 'a', verso: 'v' });
+    const b = await criarCartaoManual(repo, { frente: 'b', verso: 'v' });
+    relogio.avancar(DIA);
+    await revisar(repo, a.id, 'errei', { certeza: 3 });
+    await revisar(repo, b.id, 'facil', { certeza: 3 });
+    relogio.avancar(DIA);
+    await revisar(repo, a.id, 'facil');
+    await revisar(repo, b.id, 'errei', { certeza: 3 });
+    relogio.avancar(60 * DIA);
+    const marcados = (await filaPorValor(repo)).filter((c) => c.erroComCerteza);
+    expect(marcados.map((c) => c.id)).toEqual([b.id]);
+  });
+
+  it('o bônus é o que põe o cartão marcado à frente: sem ele, vale a ordem de sempre', async () => {
+    const ordem = async (certezaDoSegundo: 1 | 3) => {
+      const { repo, relogio } = await preparar();
+      const primeiro = await criarCartaoManual(repo, { frente: 'primeiro', verso: 'v' });
+      const segundo = await criarCartaoManual(repo, { frente: 'segundo', verso: 'v' });
+      relogio.avancar(DIA);
+      await revisar(repo, primeiro.id, 'errei', { certeza: 1 });
+      await revisar(repo, segundo.id, 'errei', { certeza: certezaDoSegundo });
+      relogio.avancar(DIA);
+      return (await filaPorValor(repo)).map((c) => c.frente);
+    };
+    expect(await ordem(1)).toEqual(['primeiro', 'segundo']);
+    expect(await ordem(3)).toEqual(['segundo', 'primeiro']);
+  });
+
+  it('olha só a página mais recente de Revisões: a marca de um cartão esquecido some', async () => {
+    const { repo, relogio } = await preparar();
+    const a = await criarCartaoManual(repo, { frente: 'a', verso: 'v' });
+    const b = await criarCartaoManual(repo, { frente: 'b', verso: 'v' });
+    relogio.avancar(DIA);
+    await revisar(repo, a.id, 'errei', { certeza: 3 });
+    // A Revisão do `a` + estas fecham exatamente uma página: o `a` ainda entra.
+    for (let i = 1; i < LIMITE_MAXIMO_PAGINA; i += 1) {
+      relogio.avancar(60_000);
+      await revisar(repo, b.id, 'errei');
+    }
+    relogio.avancar(2 * DIA);
+    const marcado = async () =>
+      (await filaPorValor(repo)).find((c) => c.id === a.id)?.erroComCerteza === true;
+    expect(await marcado()).toBe(true);
+    // Mais uma e a do `a` sai da página. Limite conhecido: se a consulta passar a paginar,
+    // atualize este teste e o comentário de `REVISOES_RECENTES`.
+    await revisar(repo, b.id, 'errei');
+    expect(await marcado()).toBe(false);
   });
 });
 
