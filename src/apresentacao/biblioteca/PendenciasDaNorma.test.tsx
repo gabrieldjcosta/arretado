@@ -54,14 +54,14 @@ describe('PendenciasDaNorma (revisão das etapas 8, 9 e 11)', () => {
         <PendenciasDaNorma normaId={normaId} />
       </ContextoRepositorio.Provider>,
     );
-    const caixa = await screen.findByRole('region', { name: 'Para reler' });
+    const caixa = await screen.findByRole('region', { name: 'A lei mudou' });
     expect(caixa).toHaveTextContent('Art. 180');
     // O dispositivo continua na norma; só o texto mudou. "Saiu da norma" e "sem lugar" seriam falsos.
     expect(caixa).not.toHaveTextContent('saiu da norma');
     expect(caixa).not.toHaveTextContent('sem lugar');
-    await usuario.click(within(caixa).getByRole('button', { name: 'Já reli' }));
+    await usuario.click(within(caixa).getByRole('button', { name: 'Já reli Art. 180' }));
     await waitFor(() => {
-      expect(screen.queryByRole('region', { name: 'Para reler' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('region', { name: 'A lei mudou' })).not.toBeInTheDocument();
     });
   });
 });

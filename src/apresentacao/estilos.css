@@ -1445,6 +1445,30 @@ legend {
   padding: 0.25rem;
 }
 
+/* Versão nova pronta (AP-00): a mesma faixa do "sem conexão", com as duas ações ao lado do texto;
+   os botões mantêm o alvo de 44 px pela própria classe. */
+.faixa-atualizacao {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 0.75rem;
+  background: var(--aviso-fundo);
+  color: var(--aviso-texto);
+  font-size: 0.85rem;
+  padding: 0.25rem 1rem;
+}
+
+.faixa-atualizacao-acoes {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.faixa-atualizacao .botao-texto {
+  font-size: inherit;
+  color: inherit;
+}
+
 /* As camadas que flutuam (diálogo, bandeja do foco, menu Ajuda e dock do Leitor; D-D9, Q7) levam a linha
    da folha e nenhuma sombra: o contrato só dá profundidade à sombra dura do botão de dia; a camada se
    separa do que está atrás pela linha (e pelo fundo opaco), e o diálogo ainda pelo véu. */
@@ -1803,6 +1827,19 @@ a.item-norma strong {
   visibility: hidden;
 }
 
+/* A chamada do Mapa da norma (AP-04) sob a barra do Leitor: o link com o ícone e a dica ao lado. */
+.chamada-do-mapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.75rem;
+  margin: -0.25rem 0 0.5rem;
+}
+
+.chamada-do-mapa .dica {
+  margin: 0;
+}
+
 /* "Lido até" (9.7): a referência sob a barra, a marca na linha e o botão que acompanha a rolagem */
 .lido-ate {
   display: flex;
@@ -1940,6 +1977,8 @@ a.item-norma strong {
       1px + 4px + var(--alvo) + 10px + max(4px, env(safe-area-inset-bottom, 0px))
     );
     --abas-altura: var(--barra-do-leitor);
+    /* O foco por Tab ou script não pode parar sob a barra (WCAG 2.4.11). */
+    scroll-padding-bottom: calc(var(--barra-do-leitor) + 1rem);
   }
 
   :root[data-leitor]:not([data-modo-foco]) .areas {
@@ -2050,6 +2089,7 @@ a.item-norma strong {
 :root[data-modo-foco] .topo,
 :root[data-modo-foco] .areas,
 :root[data-modo-foco] .faixa-offline,
+:root[data-modo-foco] .faixa-atualizacao,
 :root[data-modo-foco] .rodape {
   display: none;
 }

@@ -5,8 +5,10 @@ import {
   pendenciasAbertas,
   resolverPendencia,
 } from '../../dominios/acervo/pendencias';
+import { mudancasQueAfetam } from '../../dominios/acervo/mudancas';
 import { removerMarcacao } from '../../dominios/legislacao/marcacoes';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { LeiMudou } from './LeiMudou';
 
 const QUE_FICOU: Record<PendenciaDeReleitura['tipo'], string> = {
   estrela: 'Estrela',
@@ -28,6 +30,7 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
     async (r: typeof repo) => ({
       pendencias: await pendenciasAbertas(r, normaId),
       grifos: await marcacoesPendentes(r, normaId),
+      mudancas: await mudancasQueAfetam(r, normaId),
     }),
     [normaId],
   );
@@ -36,47 +39,25 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
   const [tirando, setTirando] = useState<string>();
   const [falha, setFalha] = useState(false);
   if (!dados || (dados.pendencias.length === 0 && dados.grifos.length === 0)) return null;
-  // `texto_alterado` (AP-05): o dispositivo continua na norma, só o texto mudou; "saiu da norma" seria falso.
-  const semLugar = dados.pendencias.filter((p) => p.tipo !== 'texto_alterado');
-  const mudaram = dados.pendencias.filter((p) => p.tipo === 'texto_alterado');
-  const jaReli = (id: string) => {
-    void resolverPendencia(repo, id).then(recarregar);
-  };
+  const avisos = dados.pendencias.filter((p) => p.tipo === 'texto_alterado');
+  const perdidas = dados.pendencias.filter((p) => p.tipo !== 'texto_alterado');
+  const aviso = <LeiMudou pendencias={avisos} mudancas={dados.mudancas} aoMudar={recarregar} />;
+  if (perdidas.length === 0 && dados.grifos.length === 0) return aviso;
   return (
-    <section className="aviso" aria-label="Para reler">
-      <h2>Para reler</h2>
-      <p>
-        O texto desta norma mudou.
-        {semLugar.length > 0 && ' O que ficou sem lugar no texto de agora:'}
-      </p>
-      {semLugar.length > 0 && (
-        <ul className="lista-simples">
-          {semLugar.map((p) => (
-            <li key={p.id}>
-              {QUE_FICOU[p.tipo]}: {p.rotulo ?? p.enderecoAntigo} saiu da norma.{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  jaReli(p.id);
-                }}
-              >
-                Já reli
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {mudaram.length > 0 && (
-        <>
-          <p>O texto mudou nestes dispositivos, em que você guardou algo:</p>
+    <>
+      {aviso}
+      <section className="aviso" aria-label="Para reler">
+        <h2>Para reler</h2>
+        <p>O texto desta norma mudou. O que ficou sem lugar no texto de agora:</p>
+        {perdidas.length > 0 && (
           <ul className="lista-simples">
-            {mudaram.map((p) => (
+            {perdidas.map((p) => (
               <li key={p.id}>
-                {p.rotulo ?? p.enderecoAntigo}{' '}
+                {QUE_FICOU[p.tipo]}: {p.rotulo ?? p.enderecoAntigo} saiu da norma.{' '}
                 <button
                   type="button"
                   onClick={() => {
-                    jaReli(p.id);
+                    void resolverPendencia(repo, p.id).then(recarregar);
                   }}
                 >
                   Já reli
@@ -84,65 +65,65 @@ export function PendenciasDaNorma({ normaId }: { normaId: string }) {
               </li>
             ))}
           </ul>
-        </>
-      )}
-      {dados.grifos.length > 0 && (
-        <>
-          <p>Grifos e notas sem o trecho no texto de agora:</p>
-          <ul className="lista-simples">
-            {dados.grifos.map((m) => (
-              <li key={m.id}>
-                “{m.ancora.texto}”{m.nota !== undefined && <> Nota: {m.nota}</>}{' '}
-                {tirando === m.id ? (
-                  <>
+        )}
+        {dados.grifos.length > 0 && (
+          <>
+            <p>Grifos e notas sem o trecho no texto de agora:</p>
+            <ul className="lista-simples">
+              {dados.grifos.map((m) => (
+                <li key={m.id}>
+                  “{m.ancora.texto}”{m.nota !== undefined && <> Nota: {m.nota}</>}{' '}
+                  {tirando === m.id ? (
+                    <>
+                      <button
+                        type="button"
+                        className="perigoso"
+                        onClick={() => {
+                          setFalha(false);
+                          removerMarcacao(repo, m.id).then(
+                            () => {
+                              setTirando(undefined);
+                              recarregar();
+                            },
+                            () => {
+                              setFalha(true);
+                            },
+                          );
+                        }}
+                      >
+                        Tirar mesmo
+                      </button>{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTirando(undefined);
+                        }}
+                      >
+                        Manter
+                      </button>
+                    </>
+                  ) : (
                     <button
                       type="button"
-                      className="perigoso"
+                      aria-label={`Tirar “${m.ancora.texto}”`}
                       onClick={() => {
-                        setFalha(false);
-                        removerMarcacao(repo, m.id).then(
-                          () => {
-                            setTirando(undefined);
-                            recarregar();
-                          },
-                          () => {
-                            setFalha(true);
-                          },
-                        );
+                        setTirando(m.id);
                       }}
                     >
-                      Tirar mesmo
-                    </button>{' '}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTirando(undefined);
-                      }}
-                    >
-                      Manter
+                      Tirar
                     </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    aria-label={`Tirar “${m.ancora.texto}”`}
-                    onClick={() => {
-                      setTirando(m.id);
-                    }}
-                  >
-                    Tirar
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-          {falha && (
-            <p role="alert" className="aviso falha">
-              Não foi possível tirar. Tente de novo.
-            </p>
-          )}
-        </>
-      )}
-    </section>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {falha && (
+              <p role="alert" className="aviso falha">
+                Não foi possível tirar. Tente de novo.
+              </p>
+            )}
+          </>
+        )}
+      </section>
+    </>
   );
 }

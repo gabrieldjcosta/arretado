@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { FaixaOffline } from './componentes/estados';
+import { AvisoDeAtualizacao } from './componentes/AvisoDeAtualizacao';
 import { Marca } from './componentes/escrita/Marca';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
@@ -144,6 +145,7 @@ export function Shell() {
       </header>
       <FaixaOffline />
       <AvisoDePosse />
+      <AvisoDeAtualizacao />
       <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
       </main>

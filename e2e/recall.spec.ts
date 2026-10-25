@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoes, test } from './apoio';
+import { expect, importarEPublicar, semViolacoes, test } from './apoio';
 
 const DIA = 86_400_000;
 
@@ -325,4 +325,76 @@ test('certeza antes de ver a resposta: três chips de 44 px; tocar mostra a resp
   await page.getByRole('button', { name: 'Mostrar resposta' }).click();
   await page.getByRole('button', { name: 'Fácil' }).click();
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
+});
+
+test('Ache o erro: uma rodada inteira; a frase falsa não vira Frase e o erro vira Frase correta (AP-06)', async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await page.clock.setFixedTime(new Date('2026-10-26T12:00:00-03:00'));
+  await importarEPublicar(page, 'eca-compilado', 'ECA');
+
+  await page.goto('/#/recall');
+  await page.getByRole('link', { name: 'Ache o erro' }).click();
+  await expect(page.getByRole('heading', { name: 'Ache o erro' })).toBeVisible();
+
+  const frase = page.getByRole('article', { name: 'Frase' });
+  const conferir = page.getByRole('button', { name: 'Conferir' });
+  let semTroca = 0;
+  for (let i = 0; i < 8; i++) {
+    await expect(page.getByText(`${String(i + 1)} de 8`, { exact: true })).toBeVisible();
+    await expect(frase.getByText('Toque nela.')).toBeVisible();
+    const candidatos = frase.getByRole('button');
+    expect(await candidatos.count()).toBeGreaterThan(0);
+    if (i === 0) {
+      await semViolacoes(page);
+      // Alvo de 44 px no trecho tocável (padding fora do fluxo do texto).
+      const alvo = await candidatos.first().boundingBox();
+      expect(alvo?.height ?? 0).toBeGreaterThanOrEqual(40);
+    }
+    // Sem trecho tocado, "Conferir" espera; os outros dois são respostas de primeira classe.
+    await expect(conferir).toBeDisabled();
+    await page.getByRole('button', { name: 'Tenho certeza' }).click();
+    if (i === 1) await page.getByRole('button', { name: 'Não sei' }).click();
+    else if (i === 2) await page.getByRole('button', { name: 'Está certa como está' }).click();
+    else {
+      await candidatos.first().click();
+      await expect(candidatos.first()).toHaveAttribute('aria-pressed', 'true');
+      await conferir.click();
+    }
+    const resultado = page.getByRole('status');
+    await expect(resultado).toBeVisible();
+    // O texto certo aparece na hora: com a troca riscada, ou a frase como estava.
+    const riscadas = await frase.locator('del').count();
+    if (riscadas === 0) {
+      semTroca += 1;
+      await expect(frase.getByText('Estava certa como está.')).toBeVisible();
+    } else {
+      expect(await frase.locator('ins').count()).toBe(1);
+    }
+    if (i === 1) {
+      await expect(resultado).toHaveText('Sem problema. Este é o texto certo.');
+      await expect(page.getByRole('button', { name: 'Guardar a Frase correta' })).toBeVisible();
+    }
+    if (i === 2) {
+      // O terceiro item sempre tem troca: "certa como está" erra, e o Erro leva a Frase correta.
+      await expect(resultado).toContainText('não era isso');
+      await expect(page.getByRole('button', { name: 'Guardar a Frase correta' })).toHaveCount(0);
+      await semViolacoes(page);
+    }
+    await page.getByRole('button', { name: i < 7 ? 'Próxima' : 'Terminar a rodada' }).click();
+  }
+  // Um em cada quatro vem sem troca (o 4º e o 8º), e os sem troca podem ter sido "achados" por
+  // engano: o que conta é a frase certa à vista em todos.
+  expect(semTroca).toBe(2);
+  await expect(page.getByText(/^Rodada feita: \d de 8\.$/)).toBeVisible();
+  await page.getByText('Como vai o piloto (dia 1 de 14)').click();
+  await expect(page.getByText('Sem troca')).toBeVisible();
+
+  // Cada erro (o do item 3, pelo menos) virou Erro com a Frase correta: há Frases, e nenhuma veio
+  // de "Não sei" (o item 2 não gravou nada).
+  await page.goto('/#/recall/frases');
+  const frases = page.getByRole('region', { name: 'Frases' }).locator('li');
+  await expect(frases.first()).toBeVisible();
+  expect(await frases.count()).toBeLessThanOrEqual(6);
 });

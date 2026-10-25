@@ -54,7 +54,11 @@ const Precedente = lazy(() =>
   import('./biblioteca/precedentes/Precedente').then((m) => ({ default: m.Precedente })),
 );
 const Leitor = lazy(() => import('./biblioteca/Leitor').then((m) => ({ default: m.Leitor })));
+const MapaDaNorma = lazy(() =>
+  import('./biblioteca/mapa/MapaDaNorma').then((m) => ({ default: m.MapaDaNorma })),
+);
 // "Escolher meu concurso": duas telas curtas, baixadas só quando a pessoa chega a elas.
+const AcheOErro = lazy(() => import('./recall/AcheOErro').then((m) => ({ default: m.AcheOErro })));
 const Comecar = lazy(() => import('./comecar/Comecar').then((m) => ({ default: m.Comecar })));
 const ParaComecar = lazy(() =>
   import('./comecar/ParaComecar').then((m) => ({ default: m.ParaComecar })),
@@ -150,6 +154,14 @@ export function App({
                 <Route path="recall/registrar" element={<RegistrarErro />} />
                 <Route path="recall/registrar/varios" element={<RegistrarVarios />} />
                 <Route path="recall/revisar" element={<Drill />} />
+                <Route
+                  path="recall/ache-o-erro"
+                  element={
+                    <Carregando>
+                      <AcheOErro />
+                    </Carregando>
+                  }
+                />
                 <Route path="recall/frases/revisar" element={<RevisarFrases />} />
                 <Route path="recall/frases/:id/cartao" element={<CartaoDeLacuna />} />
                 <Route path="recall/erros/:id" element={<DetalheErro />} />
@@ -178,6 +190,14 @@ export function App({
                   element={
                     <Carregando>
                       <Leitor />
+                    </Carregando>
+                  }
+                />
+                <Route
+                  path="biblioteca/normas/:normaId/mapa"
+                  element={
+                    <Carregando>
+                      <MapaDaNorma />
                     </Carregando>
                   }
                 />
