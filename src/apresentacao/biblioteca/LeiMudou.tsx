@@ -64,7 +64,9 @@ export function LeiMudou({
   const editar = editando?.id;
 
   useEffect(() => {
-    if (editar !== undefined) campo.current?.focus();
+    if (editar === undefined) return;
+    campo.current?.focus();
+    campo.current?.closest('.campo')?.scrollIntoView({ block: 'nearest' });
   }, [editar]);
   useEffect(() => {
     if (aoFechar.current === null) return;
@@ -143,9 +145,9 @@ export function LeiMudou({
             Deixar como está
           </button>
           {falha === a.id && (
-            <span role="alert" className="aviso falha">
+            <p role="alert" className="aviso falha">
               Não foi possível guardar a Frase. Nada foi alterado.
-            </span>
+            </p>
           )}
         </span>
       )}
