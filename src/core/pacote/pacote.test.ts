@@ -216,5 +216,9 @@ describe('cifra (3.3)', () => {
     const { bytes } = await exportarPacote(repo, { senha: 's' });
     const cab = ManifestoCifrado.parse(JSON.parse(deBytes(unzipSync(bytes)['manifesto.json']!)));
     expect(cab.cifra.iteracoes).toBe(600_000);
+    // Pacote hostil não trava o aparelho pedindo iterações demais; o padrão segue aceito.
+    const hostil = { ...cab, cifra: { ...cab.cifra, iteracoes: 3_000_000 } };
+    expect(ManifestoCifrado.safeParse(hostil).success).toBe(false);
+    expect(ManifestoCifrado.safeParse(cab).success).toBe(true);
   });
 });

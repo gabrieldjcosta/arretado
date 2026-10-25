@@ -18,3 +18,5 @@ acervo/brutos/
 
 # CSS gerado pelo kit da marca (keyframes da escrita do nome): não se edita à mão
 src/apresentacao/componentes/escrita/escrita-b.css
+/mods
+/.claude-plugin
