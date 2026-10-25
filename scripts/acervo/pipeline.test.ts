@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { Curadoria, ItemDaCuradoria } from './curadoria';
 import { markdownParaBlocos, markdownParaSecoes, trechosDaLinha } from './markdown';
-import { construirItemArticulado, construirItemSemArtigos, entradaDoIndice } from './construir';
+import {
+  construirItemArticulado,
+  construirItemSemArtigos,
+  entradaDoIndice,
+  semCabecalhos,
+} from './construir';
 import { verificarAcervo } from './verificar';
 import { cortarBlocos, decodificarPagina } from './nucleo';
 import type { IndiceDoAcervo } from '../../src/dominios/acervo/esquemas';
@@ -101,6 +106,41 @@ describe('construção', () => {
     );
     expect(ea.hash).toBe(eb.hash);
     expect(ea.tamanho).toBe(new TextEncoder().encode(corpo).length);
+  });
+
+  it('cabeçalho sem nível sai com a linha do nome; título e ementa da curadoria valem', () => {
+    const lei = [
+      'Art. 1º Primeiro.',
+      '',
+      'SUBTÍTULO II',
+      '',
+      'Da Sociedade Personificada',
+      '',
+      'Art. 2º Segundo.',
+    ].join('\n');
+    const blocos = markdownParaBlocos(lei);
+    expect(semCabecalhos(blocos, ['^SUBTÍTULO [IVXLCDM]+$'])).toHaveLength(2);
+    expect(semCabecalhos(blocos, [])).toHaveLength(blocos.length);
+    const sem = construirItemArticulado(cur(), blocos, '2026-10-10', undefined);
+    const texto = (n: { trechos: { texto: string }[] } | undefined) =>
+      (n?.trechos ?? []).map((t) => t.texto).join('');
+    expect(texto(sem.item?.nos.find((n) => n.endereco === 'art1'))).toContain('SUBTÍTULO');
+    const com = construirItemArticulado(
+      cur({
+        cabecalhosSemNivel: ['^SUBTÍTULO [IVXLCDM]+$'],
+        tituloOficial: 'Código de Teste',
+        ementa: 'Institui o Código de Teste.',
+      }),
+      blocos,
+      '2026-10-10',
+      undefined,
+    );
+    expect(com.bloqueios).toEqual([]);
+    expect(com.item?.nos.map((n) => n.endereco)).toEqual(['art1', 'art2']);
+    expect(com.item?.norma).toMatchObject({
+      tituloOficial: 'Código de Teste',
+      ementa: 'Institui o Código de Teste.',
+    });
   });
 
   it('sem artigos reconhecidos, o item é bloqueado e nada vai para o site', () => {
