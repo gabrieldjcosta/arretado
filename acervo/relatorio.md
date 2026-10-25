@@ -183,7 +183,7 @@
 | recomendacao-oit-190 | publicado | 6 | 0 | — |
 | recomendacao-oit-146 | publicado | 8 | 0 | — |
 | resolucao-conanda-273-2025 | publicado | 70 | 0 | — |
-| lei-federal-10406-2002 | publicado | 4713 | 0 | linha_solta: 4; duplicata: 4; estrutural_repetido: 14 |
+| lei-federal-10406-2002 | publicado | 4711 | 0 | duplicata: 4; estrutural_repetido: 14 |
 | decreto-lei-2848-1940 | publicado | 2045 | 0 | tachado_sem_dispositivo: 1; estrutural_substituido: 2; duplicata: 1; artigo_ausente: 1; alinea_sem_inciso: 27; paragrafo_unico_com_numerado: 2; paragrafo_1_sem_2: 2 |
 | lei-federal-8987-1995 | publicado | 251 | 0 | — |
 | lei-federal-14133-2021 | publicado | 1582 | 0 | duplicata: 7; artigo_ausente: 1; artigo_fora_de_ordem: 1; paragrafo_unico_com_numerado: 1 |
@@ -248,12 +248,12 @@
 | lei-federal-11417-2006 | publicado | 31 | 0 | — |
 | lei-federal-12414-2011 | publicado | 112 | 0 | tachado_sem_dispositivo: 1; linha_solta: 3 |
 | decreto-federal-9936-2019 | publicado | 168 | 0 | linha_continuada: 1 |
-| lei-federal-4737-1965 | publicado | 1463 | 0 | duplicata: 1; estrutural_repetido: 24; artigo_ausente: 2; alinea_sem_inciso: 2; paragrafo_1_sem_2: 3 |
+| lei-federal-4737-1965 | publicado | 1472 | 0 | duplicata: 1; artigo_ausente: 2; alinea_sem_inciso: 2; paragrafo_1_sem_2: 3 |
 | lei-federal-9609-1998 | publicado | 65 | 0 | — |
 | lei-federal-7960-1989 | publicado | 35 | 0 | — |
 | lei-federal-9492-1997 | publicado | 173 | 0 | — |
 | lei-federal-11076-2004 | publicado | 290 | 0 | — |
-| lei-federal-5172-1966 | publicado | 1058 | 0 | estrutural_repetido: 42; alinea_sem_inciso: 7; paragrafo_unico_com_numerado: 1 |
+| lei-federal-5172-1966 | publicado | 1062 | 0 | alinea_sem_inciso: 7; paragrafo_unico_com_numerado: 1 |
 | lei-federal-13123-2015 | publicado | 345 | 0 | — |
 | lei-complementar-federal-75-1993 | publicado | 1361 | 0 | alinea_sem_inciso: 16 |
 | lei-federal-8625-1993 | publicado | 433 | 0 | linha_continuada: 1 |
@@ -271,3 +271,7 @@
 | lei-federal-14944-2024 | publicado | 293 | 0 | — |
 | decreto-lei-1001-1969 | publicado | 1827 | 0 | linha_solta: 1; alinea_sem_inciso: 31 |
 | lei-estadual-10261-1968 | publicado | 1079 | 0 | linha_solta: 3; duplicata: 5; artigo_so_tachado: 4; artigo_ausente: 1; alinea_sem_inciso: 5; item_sem_alinea: 44 |
+| lei-federal-9307-1996 | publicado | 168 | 0 | alinea_sem_inciso: 2 |
+| lei-federal-9868-1999 | publicado | 123 | 0 | linha_solta: 1 |
+| lei-federal-9882-1999 | publicado | 42 | 0 | — |
+| lei-federal-12318-2010 | publicado | 35 | 0 | — |
