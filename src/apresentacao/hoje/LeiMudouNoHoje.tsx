@@ -18,7 +18,11 @@ export function LeiMudouNoHoje() {
               {a.titulo}: o texto mudou em {a.quantos}{' '}
               {a.quantos === 1 ? 'dispositivo' : 'dispositivos'} em que você guardou algo.
             </span>
-            <Link to={`/biblioteca/normas/${a.normaId}`} className="botao">
+            <Link
+              to={`/biblioteca/normas/${a.normaId}`}
+              className="botao"
+              aria-label={`Ver o que mudou em ${a.titulo}`}
+            >
               Ver o que mudou
             </Link>
           </li>

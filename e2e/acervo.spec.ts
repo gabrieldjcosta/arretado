@@ -184,7 +184,7 @@ test('acervo: a lei mudou avisa o que você guardou sobre o artigo, com antes e 
   const noHoje = page.getByRole('region', { name: 'A lei mudou' });
   await expect(noHoje).toContainText('o texto mudou em 1 dispositivo em que você guardou algo');
   await semViolacoes(page);
-  await noHoje.getByRole('link', { name: 'Ver o que mudou' }).click();
+  await noHoje.getByRole('link', { name: /^Ver o que mudou em / }).click();
   const aviso = page.getByRole('region', { name: 'A lei mudou' });
   await expect(aviso).toContainText('Antes: Texto do primeiro artigo.');
   await expect(aviso).toContainText(

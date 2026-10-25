@@ -46,7 +46,7 @@ describe('A lei mudou no Hoje (AP-05)', () => {
     const aviso = await screen.findByRole('region', { name: 'A lei mudou' });
     expect(aviso).toHaveTextContent('CP: o texto mudou em 1 dispositivo em que você guardou algo.');
     expect(aviso.textContent).not.toMatch(/atrasad|pendente|dívida/i);
-    expect(within(aviso).getByRole('link', { name: 'Ver o que mudou' })).toHaveAttribute(
+    expect(within(aviso).getByRole('link', { name: 'Ver o que mudou em CP' })).toHaveAttribute(
       'href',
       `#/biblioteca/normas/${adesao.normaId}`,
     );
