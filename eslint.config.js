@@ -9,6 +9,7 @@ export default tseslint.config(
   {
     ignores: [
       'dist',
+      'mods',
       '.claude/skills/**',
       '.claude/skills/**',
       'coverage',

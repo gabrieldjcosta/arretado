@@ -54,7 +54,7 @@ export const ManifestoCifrado = z.strictObject({
   cifra: z.strictObject({
     algoritmo: z.literal('AES-256-GCM'),
     kdf: z.literal('PBKDF2-SHA-256'),
-    iteracoes: z.int().min(1_000).max(10_000_000),
+    iteracoes: z.int().min(1_000).max(2_000_000),
     sal: Base64,
     iv: Base64,
   }),
