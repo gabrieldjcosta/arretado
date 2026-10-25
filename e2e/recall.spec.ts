@@ -313,6 +313,11 @@ test('certeza antes de ver a resposta: três chips de 44 px; tocar mostra a resp
     expect(caixa?.height).toBeGreaterThanOrEqual(44);
   }
   await semViolacoes(page);
+  // Tela baixa (320 × 568): o rótulo e os chips não empurram "Mostrar resposta" para baixo da barra.
+  await page.setViewportSize({ width: 320, height: 568 });
+  const pular = await page.getByRole('button', { name: 'Mostrar resposta' }).boundingBox();
+  expect((pular?.y ?? 0) + (pular?.height ?? 0)).toBeLessThan(568 - 80);
+  await page.setViewportSize({ width: 390, height: 844 });
   await grupo.getByRole('button', { name: 'Tenho certeza' }).click();
   await respostasCabem(page);
   await page.getByRole('button', { name: 'De novo' }).click();
