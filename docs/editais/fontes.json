@@ -1,0 +1,24 @@
+[
+  {
+    "id": "fcc-dpeba-125",
+    "orgao": "DPE-BA",
+    "banca": "FCC",
+    "tipo": "edital",
+    "url": "https://www.concursosfcc.com.br/concursos/dpeba125/index.html"
+  },
+  {
+    "id": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "indice",
+    "url": "https://www.concursosfcc.com.br/",
+    "padrao": "/concursos/[a-z0-9]+/index\\.html"
+  },
+  {
+    "id": "fgv-lista",
+    "orgao": "várias",
+    "banca": "FGV",
+    "tipo": "indice",
+    "url": "https://conhecimento.fgv.br/concursos"
+  }
+]
