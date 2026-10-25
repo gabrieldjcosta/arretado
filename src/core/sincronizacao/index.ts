@@ -8,6 +8,12 @@ export {
 } from './conflitos';
 export { registrarDivergencias } from './divergencias';
 export {
+  ROTULO_DO_ESTADO,
+  estadoDaSincronizacao,
+  type EstadoDaSincronizacao,
+  type SinaisDeSincronizacao,
+} from './estado';
+export {
   CHAVE_QUARENTENA,
   CHAVE_SEQ_ENVIADO,
   MAX_BYTES_POR_LOTE,
@@ -23,9 +29,11 @@ export {
   iniciarSincronizacao,
   rodadaDeSincronizacao,
   type OpcoesDeSincronizacao,
+  type ResultadoDaRodada,
   type Sincronizacao,
 } from './iniciar';
 export { CAMPOS_DO_APARELHO, COLECOES_SO_LOCAIS, ehSoLocal, sincroniza } from './politica';
+export { criarPosse, type EstadoDePosse, type OpcoesDePosse, type Posse } from './posse';
 export {
   CHAVE_PARADA_POR_VERSAO,
   CHAVE_QUARENTENA_RECEBIDOS,
@@ -60,5 +68,6 @@ export {
   type EntradaRecebida,
   type RegistroRemoto,
   type RespostaDeEnvio,
+  type RespostaDePosse,
   type ServidorDeSincronizacao,
 } from './tipos';

@@ -3,6 +3,7 @@ import { relatosAguardando } from '../../suporte/relatos';
 import { contasHabilitadas } from '../../integracoes/conta';
 import { LinhaLista } from '../componentes/LinhaLista';
 import { useDados } from '../dados/contexto';
+import { LinhaDeSincronizacao } from './LinhaDeSincronizacao';
 import { RegistrarAceite } from './entrar/RegistrarAceite';
 import { ContaDoAparelhoSecao } from './sair/ContaDoAparelho';
 import './estilos-conta.css';
@@ -40,6 +41,11 @@ export function Conta() {
             <LinhaLista para={item.caminho} titulo={item.titulo} apoio={item.dica} />
           </li>
         ))}
+        {contasHabilitadas() && (
+          <li>
+            <LinhaDeSincronizacao />
+          </li>
+        )}
       </ul>
       {contasHabilitadas() && (
         <>

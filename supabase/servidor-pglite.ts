@@ -8,6 +8,7 @@ import {
   FalhaDeSincronizacao,
   type EntradaRecebida,
   type RegistroRemoto,
+  type RespostaDePosse,
   type ServidorDeSincronizacao,
 } from '../src/core/sincronizacao';
 import { PRELUDIO } from './prelude-supabase';
@@ -126,6 +127,18 @@ export async function criarBancoRemoto(): Promise<BancoRemoto> {
               'select arretado.registrar_sincronia($1::uuid, $2::bigint, $3::smallint)',
               [aparelhoId, seq, versao],
             );
+          }),
+        pedirPosse: (aparelhoId, forcar) =>
+          chamar(async () => {
+            const r = await db.query<{ v: RespostaDePosse }>(
+              'select arretado.pedir_posse($1::uuid, $2::boolean) as v',
+              [aparelhoId, forcar],
+            );
+            return r.rows[0]?.v ?? { concedida: false, aparelho_id: aparelhoId };
+          }),
+        soltarPosse: (aparelhoId) =>
+          chamar(async () => {
+            await db.query('select arretado.soltar_posse($1::uuid)', [aparelhoId]);
           }),
       };
     },

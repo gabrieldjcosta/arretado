@@ -1,0 +1,163 @@
+/* O Mapa da norma (AP-04). Cada artigo é um quadrado; a classe de incidência muda o desenho do miolo
+   (cheio, hachura, pontos, contorno, tracejado), nunca só a cor. O que a pessoa já cobriu vira ponto
+   (o canto arredondado, como o ponto de luz); o próximo trecho leva o halo do marca-texto do mundo
+   (`--ponto-halo`: lima de dia, âmbar à noite). Os valores vêm dos tokens de estilos.css. */
+
+.mapa-da-norma .mapa-resumo {
+  margin: 0 0 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.mapa-da-norma .mapa-rotulo {
+  margin: 0 0 0.375rem;
+  font-family: var(--fonte-interface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+}
+
+/* A grade: colunas quantas couberem, cada quadrado de 24 px (o alvo mínimo da WCAG 2.5.8, como os
+   alvos do Leitor) e um respiro de 3 px; a 320 px dá 10 por linha, sem rolagem na horizontal. */
+.mapa-grade {
+  --lado: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--lado), 1fr));
+  gap: 3px;
+  margin: 0.5rem 0 0.75rem;
+  padding: 2px;
+}
+
+@media (min-width: 700px) {
+  .mapa-grade {
+    --lado: 28px;
+    gap: 4px;
+  }
+}
+
+.mapa-quadrado {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: var(--lado);
+  min-height: var(--lado);
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid var(--texto);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--texto);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* Cai muito: cheio. */
+.mapa-quadrado[data-classe='altissima'] {
+  background: var(--texto);
+}
+
+/* Cai: hachura diagonal. */
+.mapa-quadrado[data-classe='alta'] {
+  background: repeating-linear-gradient(135deg, var(--texto) 0 2px, transparent 2px 5.5px);
+}
+
+/* Cai às vezes: pontos. */
+.mapa-quadrado[data-classe='media'] {
+  background: radial-gradient(circle, var(--texto) 1.1px, transparent 1.6px) 1px 1px / 6px 6px;
+}
+
+/* Raro: só o contorno. */
+.mapa-quadrado[data-classe='baixa'] {
+  background: transparent;
+}
+
+/* Sem questão medida: contorno tracejado, atenuado. */
+.mapa-quadrado[data-classe='sem'] {
+  border: 1px dashed var(--contorno);
+  background: transparent;
+}
+
+/* Fora de vigor: o desenho da faixa fica, mais apagado. */
+.mapa-quadrado[data-fora] {
+  opacity: 0.45;
+}
+
+/* Já cobri: o quadrado vira ponto (o canto redondo é a forma, não só a cor). */
+.mapa-quadrado[data-coberto] {
+  border-radius: 50%;
+}
+
+/* O próximo trecho: o halo do marca-texto por fora, como atrás do ponto de "onde parei". */
+.mapa-quadrado[data-proximo] {
+  box-shadow: 0 0 0 3px var(--ponto-halo);
+}
+
+.mapa-quadrado:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.mapa-quadrado[aria-pressed='true'] {
+  outline: 2px solid var(--texto);
+  outline-offset: 1px;
+}
+
+/* O artigo escolhido em palavras, sempre com lugar (a linha não pula quando aparece). */
+.mapa-escolhido {
+  min-height: 1.75rem;
+  margin: 0 0 0.75rem;
+}
+
+.mapa-escolhido .botao-texto {
+  margin-inline-start: 0.25rem;
+}
+
+.mapa-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-family: var(--fonte-interface);
+  font-size: 0.8125rem;
+  color: var(--texto-atenuado);
+}
+
+.mapa-legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.mapa-legenda .mapa-quadrado {
+  --lado: 16px;
+  width: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  cursor: default;
+}
+
+.mapa-legenda .mapa-quadrado[data-proximo] {
+  box-shadow: 0 0 0 2px var(--ponto-halo);
+}
+
+/* Cores forçadas: o fundo some; o contorno e as hachuras pedem a cor do sistema. */
+@media (forced-colors: active) {
+  .mapa-quadrado {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .mapa-quadrado[data-classe='altissima'] {
+    background: CanvasText;
+  }
+
+  .mapa-quadrado[data-proximo] {
+    box-shadow: 0 0 0 3px Highlight;
+  }
+}

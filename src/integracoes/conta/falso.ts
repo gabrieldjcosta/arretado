@@ -35,6 +35,10 @@ export class ServicoDeContaFalso implements ServicoDeConta {
   readonly operacoesDeCopia: string[] = [];
   /** Simula a conexão caindo no meio do próximo envio (nada fica gravado). */
   falharProximoEnvio = false;
+  /** Aparelho com a posse (D17); outro só assume com `forcar`. */
+  donoDaPosse: string | null = null;
+  /** `pedirPosse` cai como se não houvesse rede. */
+  falhaDePosse = false;
 
   constructor(
     private readonly opcoes: {
@@ -123,6 +127,24 @@ export class ServicoDeContaFalso implements ServicoDeConta {
       instantaneoInicio: () => Promise.resolve(0),
       puxarRegistros: () => Promise.resolve([]),
       registrarSincronia: () => Promise.resolve(),
+      pedirPosse: (aparelhoId, forcar) => {
+        if (this.falhaDePosse)
+          return Promise.reject(new FalhaDeSincronizacao('Sem conexão.', false));
+        const dono = this.donoDaPosse;
+        if (dono === null || dono === aparelhoId || forcar) {
+          this.donoDaPosse = aparelhoId;
+          return Promise.resolve({ concedida: true, aparelho_id: aparelhoId });
+        }
+        return Promise.resolve({
+          concedida: false,
+          aparelho_id: dono,
+          ultimo_sinal: '2026-10-25T12:00:00.000Z',
+        });
+      },
+      soltarPosse: (aparelhoId) => {
+        if (this.donoDaPosse === aparelhoId) this.donoDaPosse = null;
+        return Promise.resolve();
+      },
     };
   }
   sair(): Promise<void> {
