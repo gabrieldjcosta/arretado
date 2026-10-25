@@ -179,12 +179,12 @@ test('acervo: a lei mudou avisa o que você guardou sobre o artigo, com antes e 
   await page.getByRole('dialog').getByRole('button', { name: 'Atualizar agora' }).click();
   await expect(page.getByText(/Há versão nova/)).toHaveCount(0);
 
-  await page.getByRole('link', { name: 'Normas', exact: true }).click();
-  await abrirTodasAsNormas(page);
-  await page
-    .getByRole('group', { name: 'Execução Penal' })
-    .getByRole('link', { name: /LEP/ })
-    .click();
+  // O Hoje avisa e leva à norma.
+  await page.goto('/#/');
+  const noHoje = page.getByRole('region', { name: 'A lei mudou' });
+  await expect(noHoje).toContainText('o texto mudou em 1 dispositivo em que você guardou algo');
+  await semViolacoes(page);
+  await noHoje.getByRole('link', { name: 'Ver o que mudou' }).click();
   const aviso = page.getByRole('region', { name: 'A lei mudou' });
   await expect(aviso).toContainText('Antes: Texto do primeiro artigo.');
   await expect(aviso).toContainText(

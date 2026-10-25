@@ -19,6 +19,7 @@ import { Agora } from './Agora';
 import { Captura } from './Captura';
 import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
+import { LeiMudouNoHoje } from './LeiMudouNoHoje';
 import { LembreteDeBackup } from './LembreteDeBackup';
 import { ParaLembrar } from './ParaLembrar';
 import { PontosDoDia } from './PontosDoDia';
@@ -37,6 +38,7 @@ export function Hoje() {
           <Agora hoje={hoje} />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
+          <LeiMudouNoHoje />
         </div>
         <div>
           <Depois
