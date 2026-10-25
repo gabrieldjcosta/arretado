@@ -242,3 +242,35 @@ test('numa tela estreita ou com texto grande a barra quebra em duas linhas, sem 
     });
   }
 });
+
+test('com o texto a 300% o dock quebra em linhas e nenhum rótulo passa da caixa do botão', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
+  await abrirALep(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '300%';
+  });
+
+  const rotulos = await page.evaluate(() =>
+    [...document.querySelectorAll('.acoes-leitor button')].map((botao) => {
+      const texto = document.createRange();
+      texto.selectNodeContents(botao);
+      const t = texto.getBoundingClientRect();
+      const b = botao.getBoundingClientRect();
+      return {
+        nome: botao.textContent.trim(),
+        foraAEsquerda: b.left - t.left,
+        foraADireita: t.right - b.right,
+      };
+    }),
+  );
+  expect(rotulos.map((r) => r.nome)).toEqual(['Buscar', 'Modo foco', 'Mais', 'Lido até aqui']);
+  for (const r of rotulos) {
+    expect(r.foraAEsquerda, `${r.nome}: rótulo dentro do botão, à esquerda`).toBeLessThanOrEqual(1);
+    expect(r.foraADireita, `${r.nome}: rótulo dentro do botão, à direita`).toBeLessThanOrEqual(1);
+  }
+  const m = await medir(page);
+  expect(m.sobraDeLado, 'nada rola de lado').toBeLessThanOrEqual(0);
+});

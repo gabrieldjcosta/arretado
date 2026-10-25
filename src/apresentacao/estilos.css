@@ -1915,7 +1915,7 @@ a.item-norma strong {
    "Lido até aqui" à direita. Filtrar e Ações moram no Mais (a dois toques). A janela de leitura passa
    de 69% para cerca de 85% a 390 × 844. --abas-altura é o que a barra ocupa (4 px, o dock de 54 px, a
    área segura): a rolagem reserva essa altura, e o fim da norma sobe acima dela. Se a tela é estreita
-   demais ou o texto do aparelho é grande, a barra quebra em duas linhas, sem rolar de lado nem cortar. */
+   demais ou o texto do aparelho é grande, a barra quebra em linhas, sem rolar de lado nem cortar. */
 @media (max-width: 699px) {
   :root[data-leitor]:not([data-modo-foco]) {
     --barra-do-leitor: calc(
@@ -1944,8 +1944,9 @@ a.item-norma strong {
     border-top: 1px solid var(--borda);
   }
 
+  /* Com o texto muito grande o dock quebra em linhas, e elas alinham pela esquerda, onde ele mora. */
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
-    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
 
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor button {
