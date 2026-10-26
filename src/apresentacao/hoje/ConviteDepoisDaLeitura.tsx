@@ -39,26 +39,30 @@ export function ConviteDepoisDaLeitura() {
   const [fechado, setFechado] = useState(dispensado);
   if (!dados || fechado) return null;
   return (
-    <p className="convite-depois-da-leitura">
-      <span>
+    <div className="convite-depois-da-leitura">
+      <p>
         Algo em {dados.titulo} vale lembrar? Selecione o trecho e toque em “Enviar às frases”: ele
-        volta para você revisar.
-      </span>{' '}
-      <Link to={`/biblioteca/normas/${dados.normaId}`}>Abrir {dados.titulo}</Link>{' '}
-      <button
-        type="button"
-        className="discreto"
-        onClick={() => {
-          try {
-            localStorage.setItem(CHAVE, '1');
-          } catch {
-            /* sem armazenamento: some só até recarregar */
-          }
-          setFechado(true);
-        }}
-      >
-        Agora não
-      </button>
-    </p>
+        vira uma Frase para a Revisão.
+      </p>
+      <div className="linha-acoes">
+        <Link to={`/biblioteca/normas/${dados.normaId}`} className="botao botao-texto na-margem">
+          Abrir {dados.titulo}
+        </Link>
+        <button
+          type="button"
+          className="discreto"
+          onClick={() => {
+            try {
+              localStorage.setItem(CHAVE, '1');
+            } catch {
+              /* sem armazenamento: some só até recarregar */
+            }
+            setFechado(true);
+          }}
+        >
+          Agora não
+        </button>
+      </div>
+    </div>
   );
 }
