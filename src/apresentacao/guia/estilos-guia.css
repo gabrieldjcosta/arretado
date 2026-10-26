@@ -1,0 +1,35 @@
+/* Guia da primeira abertura: cartão quieto na própria tela (D-D9), sem sombra nem animação. */
+.guia-da-tela {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--borda-forte);
+  border-radius: var(--raio-folha);
+}
+
+.guia-da-tela h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.guia-da-tela dl {
+  margin: 0 0 0.5rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.guia-da-tela dt {
+  display: inline;
+  font-weight: 600;
+}
+
+.guia-da-tela dd {
+  display: inline;
+  margin: 0;
+  color: var(--texto-atenuado);
+}
+
+.guia-da-tela dt::after {
+  content: ': ';
+}

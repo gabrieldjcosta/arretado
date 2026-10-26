@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import type { Edital, Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
@@ -345,6 +346,7 @@ export function Normas() {
     <>
       <h1>Biblioteca</h1>
       <AbasDaBiblioteca atual="norma" />
+      <GuiaDaTela tela="biblioteca" />
       {aviso && (
         <p role="status" className="sucesso">
           {aviso}

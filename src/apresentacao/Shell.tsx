@@ -7,6 +7,7 @@ import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
 import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
+import { reabrirGuia, telaDoGuia } from './guia/memoria';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
@@ -122,6 +123,12 @@ export function Shell() {
           </Link>
           <MenuAjuda
             paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
+            {...(telaDoGuia(pathname) && {
+              aoGuia: () => {
+                const tela = telaDoGuia(pathname);
+                if (tela) reabrirGuia(tela);
+              },
+            })}
             aoRelatar={() => {
               setRelatando(true);
             }}

@@ -5,6 +5,7 @@ import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { TituloComMais } from '../componentes/TituloComMais';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
@@ -103,6 +104,7 @@ export function RecallInicio() {
           </button>
         </p>
       )}
+      <GuiaDaTela tela="recall" />
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
         <AbaDoRecall para="/recall/frases" rotulo="Frases" />
         <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />

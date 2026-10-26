@@ -1,0 +1,50 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { repositorioDeTeste } from '../../testes/repositorio';
+import { App } from '../App';
+import { telaDoGuia } from './memoria';
+
+async function abrir(rota: string) {
+  const { repo } = await repositorioDeTeste();
+  window.location.hash = rota;
+  const usuario = userEvent.setup();
+  render(<App abrir={() => Promise.resolve(repo)} />);
+  await screen.findByRole('navigation', { name: 'Áreas' });
+  return usuario;
+}
+
+describe('Guia da primeira abertura', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('aparece na primeira abertura do Hoje e "Entendi" o fecha', async () => {
+    const usuario = await abrir('#/');
+    expect(
+      await screen.findByRole('heading', { name: 'O que cada opção faz' }),
+    ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Entendi' }));
+    expect(screen.queryByRole('heading', { name: 'O que cada opção faz' })).toBeNull();
+  });
+
+  it('não volta depois de visto e reabre pelo menu Ajuda', async () => {
+    localStorage.setItem('arretado.guia.hoje', '1');
+    const usuario = await abrir('#/');
+    await screen.findByRole('heading', { name: 'Hoje' });
+    expect(screen.queryByRole('heading', { name: 'O que cada opção faz' })).toBeNull();
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ver o guia desta tela' }));
+    expect(
+      await screen.findByRole('heading', { name: 'O que cada opção faz' }),
+    ).toBeInTheDocument();
+  });
+
+  it('cada área tem o seu guia; telas de trabalho não têm', () => {
+    expect(telaDoGuia('/')).toBe('hoje');
+    expect(telaDoGuia('/plano')).toBe('plano');
+    expect(telaDoGuia('/recall/frases')).toBe('recall');
+    expect(telaDoGuia('/biblioteca')).toBe('biblioteca');
+    expect(telaDoGuia('/biblioteca/normas/x')).toBeUndefined();
+    expect(telaDoGuia('/recall/revisar')).toBeUndefined();
+  });
+});

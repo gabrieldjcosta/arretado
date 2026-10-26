@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link } from 'react-router';
 import type { Disciplina, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
@@ -30,6 +31,7 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      <GuiaDaTela tela="plano" />
       <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
