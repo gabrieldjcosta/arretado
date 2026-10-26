@@ -1,10 +1,28 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { Repositorio } from '../../core/persistencia';
+import { FIXAR_POR_DIA } from '../../dominios/recall/fixar-estas';
 import { listarFrases } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
+import { FixarEstas } from './FixarEstas';
+import { sumulasVinculantes } from './fixar-estas';
 
-const carregar = async (repo: Repositorio) => (await listarFrases(repo, {}, null, 200)).itens;
+const carregar = async (repo: Repositorio) => {
+  const [frases, sumulas, todas] = await Promise.all([
+    listarFrases(repo, {}, null, 200),
+    sumulasVinculantes(repo).catch(() => undefined),
+    repo.colecao('frases').todosDoUsuario(),
+  ]);
+  const fixadas = new Set(
+    todas.flatMap((f) => (f.excluidoEm === null ? [f.trecho?.dispositivoId] : [])),
+  );
+  return {
+    frases: frases.itens,
+    paraFixar: (sumulas ?? []).filter((s) => !fixadas.has(s.dispositivoId)),
+    semColecao: sumulas === undefined,
+  };
+};
 
 /**
  * Aba Frases (D9, D25, D-D5): a lista das Frases, uma por linha. Cada uma leva ao Erro que a
@@ -16,6 +34,20 @@ const carregar = async (repo: Repositorio) => (await listarFrases(repo, {}, null
  */
 export function ListaFrases() {
   const { dados } = useDados(carregar);
+  const [fixadas, setFixadas] = useState<number | null>(null);
+  const aviso = useRef<HTMLParagraphElement>(null);
+  const levarOFoco = useRef(false);
+  // "Fixar N frases" recarrega a lista e o cartão some junto: o foco vai à linha que diz o que houve.
+  useEffect(() => {
+    if (levarOFoco.current && aviso.current) {
+      levarOFoco.current = false;
+      aviso.current.focus();
+    }
+  });
+  const aoFixar = (n: number) => {
+    levarOFoco.current = true;
+    setFixadas(n);
+  };
   if (!dados) return <Esqueleto />;
   const verErros = (
     <p className="mais-da-lista">
@@ -24,7 +56,8 @@ export function ListaFrases() {
       </Link>
     </p>
   );
-  if (dados.length === 0) {
+  const { frases, paraFixar, semColecao } = dados;
+  if (frases.length === 0) {
     return (
       <>
         <Vazio
@@ -40,14 +73,21 @@ export function ListaFrases() {
             envia às frases durante a leitura.
           </p>
         </Vazio>
+        <FixarEstas itens={paraFixar} semColecao={semColecao} aoFixar={aoFixar} />
         {verErros}
       </>
     );
   }
   return (
     <section aria-label="Frases">
+      {fixadas !== null && (
+        <p ref={aviso} tabIndex={-1} className="sucesso">
+          {fixadas === 1 ? '1 frase fixada.' : `${String(fixadas)} frases fixadas.`} A Revisão
+          começa amanhã, {FIXAR_POR_DIA} por dia.
+        </p>
+      )}
       <ul className="lista-simples frases">
-        {dados.map((f) => (
+        {frases.map((f) => (
           <li key={f.id}>
             <span className="texto-leitura">
               {f.erroId ? <Link to={`/recall/erros/${f.erroId}`}>{f.texto}</Link> : f.texto}
@@ -62,6 +102,7 @@ export function ListaFrases() {
           </li>
         ))}
       </ul>
+      <FixarEstas itens={paraFixar} aoFixar={aoFixar} />
       {verErros}
     </section>
   );

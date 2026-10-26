@@ -1994,3 +1994,9 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - O Ciclo só pesa pela incidência quando o Concurso do plano tem banca e cargo que casam com a tabela do recorte (`materias.json`: hoje FCC × Defensor). Outro concurso, sem rede ou sem arquivo: pesa pelo edital, como antes (`carregarCiclo` engole a falha).
 - O casamento é pelo nome da matéria do edital, sem acento nem caixa (`chaves` da tabela). Matéria nova do catálogo que não casa pesa a média das citadas; para casar, acrescente o nome em `chaves`.
 - A tabela vem do resumo por matéria (`resumo-por-materia-fcc-dpesp.csv`, parcela = % do total de questões do recorte); não cita a fonte na tela.
+
+## Fixar estas (26/10/2026)
+
+- A oferta só lista as súmulas vinculantes da coleção que a pessoa **já adicionou** (origem do acervo `sumulas-stf-vinculantes`); sem ela, o cartão leva ao Acervo. A SV 30 não consta do acervo (pendente no STF) e as revogadas ficam de fora.
+- As revisões saem em partes de 5 por dia (`FIXAR_POR_DIA`) para não somar 60 frases no mesmo dia. Para mudar o ritmo, só essa constante.
+- E2E fora da nuvem padrão: o Playwright do repo pede o Chromium 1194 e o ambiente tem outro; usar uma config local com `launchOptions.executablePath` (não versionada).
