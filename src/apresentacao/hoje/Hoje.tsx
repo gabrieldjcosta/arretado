@@ -18,6 +18,7 @@ import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
 import { Captura } from './Captura';
+import { ConviteDepoisDaLeitura } from './ConviteDepoisDaLeitura';
 import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
 import { LeiMudouNoHoje } from './LeiMudouNoHoje';
@@ -53,6 +54,7 @@ export function Hoje() {
       <FecharDia />
       <RevisoesDoDia />
       <Captura />
+      <ConviteDepoisDaLeitura />
       <LembreteDeBackup />
       <AvisoDeAtualizacao />
       <EntradaDoDia retrato={hoje.retrato} />
