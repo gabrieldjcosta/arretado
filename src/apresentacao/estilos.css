@@ -567,6 +567,13 @@ button,
   scroll-padding-bottom: calc(var(--abas-altura) + 1rem);
 }
 
+/* O Leitor fica de fora: ele guarda a posição pela linha de leitura, e um recuo faria o foco ou o toque
+   perto da borda mover a página (a estrela, o filtro e a prévia deixavam de manter a linha no lugar). A
+   barra de baixo do celular tem o recuo dela, adiante. */
+:root[data-leitor] {
+  scroll-padding: 0;
+}
+
 @media (min-width: 700px) {
   :root {
     --gutter: 1.5rem;
