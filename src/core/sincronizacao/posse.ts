@@ -50,6 +50,9 @@ export function criarPosse(opcoes: OpcoesDePosse): Posse {
   let parado = false;
   let pedindo: Promise<EstadoDePosse> | null = null;
   let timerOculta: ReturnType<typeof setTimeout> | null = null;
+  // Cada pedido ganha um número; a resposta de um pedido mais antigo que outro já enviado é descartada
+  // (a renovação periódica pode responder depois do "passar para cá" e desfazê-lo).
+  let ultimoPedido = 0;
 
   const mudar = (novo: EstadoDePosse) => {
     if (novo.tipo === estado.tipo && JSON.stringify(novo) === JSON.stringify(estado)) return;
@@ -60,9 +63,11 @@ export function criarPosse(opcoes: OpcoesDePosse): Posse {
   const pedir = (forcar = false): Promise<EstadoDePosse> => {
     if (parado) return Promise.resolve(estado);
     if (pedindo && !forcar) return pedindo;
+    const numero = ++ultimoPedido;
     const chamada = (async () => {
       try {
         const r = await servidor.pedirPosse(aparelhoId, forcar);
+        if (numero !== ultimoPedido) return estado;
         if (r.concedida) {
           mudar({ tipo: 'minha' });
         } else {
@@ -75,6 +80,7 @@ export function criarPosse(opcoes: OpcoesDePosse): Posse {
           });
         }
       } catch {
+        if (numero !== ultimoPedido) return estado;
         // Sem resposta: quem tinha a posse continua editando; quem não tinha, edita com aviso.
         if (estado.tipo !== 'minha') mudar({ tipo: 'sem-confirmacao' });
       }
@@ -125,6 +131,7 @@ export function criarPosse(opcoes: OpcoesDePosse): Posse {
     soltar,
     parar() {
       parado = true;
+      ultimoPedido += 1; // resposta em voo não muda mais nada
       clearInterval(periodico);
       if (timerOculta !== null) clearTimeout(timerOculta);
       if (temDocumento) {

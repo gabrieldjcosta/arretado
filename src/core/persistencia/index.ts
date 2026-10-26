@@ -28,7 +28,13 @@ export {
   type Dados,
   type Pagina,
 } from './colecao';
-export { EscritaBloqueada, type Contexto, type TravaDeEscrita } from './contexto';
+export {
+  EscritaBloqueada,
+  type Contexto,
+  type EscritaPrevista,
+  type TravaDeEscrita,
+} from './contexto';
+export { NOME_PADRAO_ANTIGO, nomeDaPlataforma } from './aparelho';
 export { desfazerAlteracao, reconstruirDoLog, type Estado } from './log';
 export {
   carimboDoLote,

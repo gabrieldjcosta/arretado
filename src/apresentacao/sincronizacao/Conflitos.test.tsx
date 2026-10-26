@@ -31,7 +31,7 @@ async function montar() {
       </MemoryRouter>
     </ContextoRepositorio.Provider>,
   );
-  await screen.findByRole('heading', { level: 3, name: /Fontes/ });
+  await screen.findByRole('heading', { level: 2, name: /Fontes/ });
   return { repo, fonte, usuario: userEvent.setup() };
 }
 
@@ -42,35 +42,42 @@ async function marcarTudoEnviado(repo: Awaited<ReturnType<typeof montar>>['repo'
 }
 
 describe('Conta › Conflitos (F4-B, B4)', () => {
-  it('mostra as duas versões com o campo diferente em destaque', async () => {
+  it('mostra as duas versões só com o campo que difere, em palavras, e os iguais recolhidos', async () => {
     await montar();
-    expect(screen.getByRole('heading', { level: 4, name: 'A daqui' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: /A de lá/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'A deste Aparelho' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'A do outro Aparelho' }),
+    ).toBeInTheDocument();
     const marcados = screen.getAllByText(/Manual (antigo|novo)/, { selector: 'mark' });
     expect(marcados).toHaveLength(2);
+    expect(screen.getAllByText('Título')).toHaveLength(2);
+    expect(screen.queryByText('titulo')).not.toBeInTheDocument();
+    // O que não difere (tipo = livro) fica dentro de "campos iguais".
+    expect(screen.getAllByText(/campo(s)? igua(l|is)/)).toHaveLength(2);
+    for (const valor of screen.getAllByText('livro')) expect(valor).not.toBeVisible();
   });
 
   it('com mudança ainda não enviada, pede para sincronizar antes e não grava nada', async () => {
     const { repo, usuario } = await montar();
-    await usuario.click(screen.getByRole('button', { name: 'Ficar com a daqui' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ficar com a deste Aparelho' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/ainda não enviadas/);
     expect(await listarConflitos(repo.db)).toHaveLength(1);
   });
 
-  it('"Ficar com a de lá" adota a versão do outro Aparelho e fecha o Conflito', async () => {
+  it('"Ficar com a do <nome>" adota a versão do outro Aparelho e fecha o Conflito', async () => {
     const { repo, fonte, usuario } = await montar();
     await marcarTudoEnviado(repo);
-    await usuario.click(screen.getByRole('button', { name: 'Ficar com a de lá' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ficar com a do outro Aparelho' }));
     await waitFor(() => {
       expect(screen.getByText('Nenhum Conflito. Seus Aparelhos concordam.')).toBeInTheDocument();
     });
     expect((await repo.colecao('fontes').obter(fonte.id))?.titulo).toBe('Manual novo');
   });
 
-  it('"Ficar com a daqui" mantém a versão deste Aparelho e fecha o Conflito', async () => {
+  it('"Ficar com a deste Aparelho" mantém a versão deste Aparelho e fecha o Conflito', async () => {
     const { repo, fonte, usuario } = await montar();
     await marcarTudoEnviado(repo);
-    await usuario.click(screen.getByRole('button', { name: 'Ficar com a daqui' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ficar com a deste Aparelho' }));
     await waitFor(() => {
       expect(screen.getByText('Nenhum Conflito. Seus Aparelhos concordam.')).toBeInTheDocument();
     });

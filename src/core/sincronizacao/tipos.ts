@@ -74,15 +74,6 @@ export interface RespostaDePosse {
   ultimo_sinal?: string;
 }
 
-/** Resposta de `pedir_posse` (D17, plano §4). */
-export interface RespostaDePosse {
-  concedida: boolean;
-  /** Quem tem a posse depois da chamada. */
-  aparelho_id: string;
-  /** Última renovação do dono atual; só quando `concedida` é falso. */
-  ultimo_sinal?: string;
-}
-
 export interface ChaveDeRegistro {
   colecao: string;
   id: string;

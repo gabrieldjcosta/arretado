@@ -26,6 +26,7 @@ export function criarAgendador(opcoes: OpcoesDoAgendador): Agendador {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let rodando = false;
   let repetir = false;
+  let repetirAgora = false; // pedir(true) durante uma rodada: a próxima sai sem o atraso
   let parado = false;
   let falhas = 0;
 
@@ -60,15 +61,19 @@ export function criarAgendador(opcoes: OpcoesDoAgendador): Agendador {
     }
     if (repetir) {
       repetir = false;
-      agendar(falhas > 0 ? Math.min(maximo, inicial * 2 ** (falhas - 1)) : atraso);
+      const ja = repetirAgora;
+      repetirAgora = false;
+      agendar(falhas > 0 ? Math.min(maximo, inicial * 2 ** (falhas - 1)) : ja ? 0 : atraso);
     }
   };
 
   return {
     pedir(agora = false) {
       if (parado) return;
-      if (rodando) repetir = true;
-      else agendar(agora ? 0 : atraso);
+      if (rodando) {
+        repetir = true;
+        if (agora) repetirAgora = true;
+      } else agendar(agora ? 0 : atraso);
     },
     parar() {
       parado = true;

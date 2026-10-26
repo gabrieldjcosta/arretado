@@ -252,11 +252,11 @@ export function proximoTrecho(
   };
 }
 
-/** "Art. 157" ou "Arts. 59 a 62" (os rótulos dos extremos, sem o "Art."). */
+/** "art. 157" ou "arts. 59 a 62", para o meio da frase ("Ler arts. 59 a 62"), como se cita. */
 export function rotuloDoTrecho(quadrados: readonly QuadradoDoMapa[], trecho: TrechoDoMapa): string {
   const de = quadrados[trecho.de]?.rotulo ?? '';
   const ate = quadrados[trecho.ate]?.rotulo ?? '';
-  if (trecho.de === trecho.ate) return de;
   const numero = (rotulo: string) => rotulo.replace(/^Art\.\s*/i, '');
-  return `Arts. ${numero(de)} a ${numero(ate)}`;
+  if (trecho.de === trecho.ate) return `art. ${numero(de)}`;
+  return `arts. ${numero(de)} a ${numero(ate)}`;
 }

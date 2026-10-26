@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import type { Norma } from '../../../core/modelo';
 import { Icone } from '../../componentes/Icone';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
+import { jaVisitouOMapa } from './visita';
 
 /**
  * A chamada do Mapa da norma sob a barra do Leitor (AP-04): só na norma do acervo que tem arquivo de
@@ -33,7 +34,7 @@ export function ChamadaDoMapa({ norma }: { norma: Norma }) {
         <Icone nome="mapa" />
         Mapa da norma
       </Link>
-      <span className="dica">o que mais cai e por onde começar</span>
+      {!jaVisitouOMapa() && <span className="dica">o que mais cai e por onde começar</span>}
     </p>
   );
 }

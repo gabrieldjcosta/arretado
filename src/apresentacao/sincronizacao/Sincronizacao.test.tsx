@@ -1,7 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { temConsentimento, registrarConsentimento } from '../../core/preferencias';
+import {
+  alterarPreferencias,
+  temConsentimento,
+  registrarConsentimento,
+} from '../../core/preferencias';
 import { ServicoDeContaFalso } from '../../integracoes/conta';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { ProvedorConta } from '../conta/entrar/ContextoConta';
@@ -13,7 +17,12 @@ import { Sincronizacao } from './Sincronizacao';
 const SESSAO = { uid: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', email: 'a@exemplo.com' };
 
 async function montar(
-  opcoes: { comSessao?: boolean; comAceite?: boolean; servico?: ServicoDeContaFalso } = {},
+  opcoes: {
+    comSessao?: boolean;
+    comAceite?: boolean;
+    servico?: ServicoDeContaFalso;
+    rota?: string;
+  } = {},
 ) {
   const { repo } = await repositorioDeTeste();
   if (opcoes.comAceite) await registrarConsentimento(repo, 'sincronizar');
@@ -24,10 +33,11 @@ async function montar(
     <ContextoRepositorio.Provider value={repo}>
       <ProvedorConta servico={servico}>
         <ProvedorSincronizacao renovacaoMs={60_000} intervaloDePuxadaMs={0}>
-          <MemoryRouter initialEntries={['/conta/sincronizacao']}>
+          <MemoryRouter initialEntries={[opcoes.rota ?? '/conta/sincronizacao']}>
             <AvisoDePosse />
             <Routes>
               <Route path="/conta/sincronizacao" element={<Sincronizacao />} />
+              <Route path="/hoje" element={<p>Hoje</p>} />
             </Routes>
           </MemoryRouter>
         </ProvedorSincronizacao>
@@ -80,6 +90,8 @@ describe('Conta › Sincronização (F4-B, B4)', () => {
     servico.donoDaPosse = 'outro-aparelho';
     const { repo, usuario } = await montar({ comAceite: true, servico });
     expect(await screen.findByText(/Você está usando outro Aparelho agora/)).toBeInTheDocument();
+    // Nesta tela o cartão diz o mesmo e tem o botão: a faixa de cima não repete.
+    expect(screen.queryByText('Outro Aparelho em uso.')).not.toBeInTheDocument();
     await expect(repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'x' })).rejects.toThrow(
       'Outro aparelho está editando agora.',
     );
@@ -89,6 +101,67 @@ describe('Conta › Sincronização (F4-B, B4)', () => {
     await expect(
       repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'x' }),
     ).resolves.toBeTruthy();
+  });
+
+  it('fora da tela de Sincronização, outro Aparelho em uso é uma faixa curta com o botão', async () => {
+    const servico = new ServicoDeContaFalso({ sessao: SESSAO });
+    servico.donoDaPosse = 'outro-aparelho';
+    const { usuario } = await montar({ comAceite: true, servico, rota: '/hoje' });
+    const faixa = await screen.findByRole('status');
+    expect(faixa).toHaveTextContent('Outro Aparelho em uso.');
+    await usuario.click(within(faixa).getByRole('button', { name: 'Passar a editar aqui' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Outro Aparelho em uso.')).not.toBeInTheDocument();
+    });
+  });
+
+  it('escrita recusada pela trava: a faixa vira alerta com o convite para passar a edição (sem a tela tratar)', async () => {
+    const servico = new ServicoDeContaFalso({ sessao: SESSAO });
+    servico.donoDaPosse = 'outro-aparelho';
+    const { repo } = await montar({ comAceite: true, servico });
+    expect(await screen.findByText(/Você está usando outro Aparelho agora/)).toBeInTheDocument();
+    await expect(repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'x' })).rejects.toThrow();
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Não dá para editar/);
+    // O que é só do aparelho (tamanho da letra) passa pela trava.
+    await expect(alterarPreferencias(repo, { tamanhoFonte: 20 })).resolves.toBeTruthy();
+  });
+
+  it('"Seus Aparelhos" marca este Aparelho, mostra a plataforma em palavras e renomeia', async () => {
+    const { repo, usuario } = await montar({ comAceite: true });
+    expect(await screen.findByRole('heading', { name: 'Seus Aparelhos' })).toBeInTheDocument();
+    const aparelho = await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId);
+    expect(aparelho?.nome).not.toBe('Este aparelho');
+    expect(screen.getByText('(este)')).toBeInTheDocument();
+    expect(screen.queryByText(/Mozilla/)).not.toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Renomear' }));
+    const campo = screen.getByLabelText('Nome do Aparelho');
+    await usuario.clear(campo);
+    await usuario.type(campo, 'Notebook da sala');
+    await usuario.click(screen.getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => {
+      expect(screen.getByText('Notebook da sala')).toBeInTheDocument();
+    });
+    expect((await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId))?.nome).toBe(
+      'Notebook da sala',
+    );
+  });
+
+  it('o aparelho que ainda se chamava "Este aparelho" é renomeado pela plataforma ao abrir', async () => {
+    const { repo } = await repositorioDeTeste({ nomeAparelho: 'Este aparelho' });
+    const aparelho = await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId);
+    expect(aparelho?.nome).not.toBe('Este aparelho');
+  });
+
+  it('rodada que falhou: o Problema fica no cartão Estado e "Precisa de você" não abre sem Conflito', async () => {
+    const servico = new ServicoDeContaFalso({ sessao: SESSAO });
+    const { repo, usuario } = await montar({ comAceite: true, servico });
+    await screen.findByRole('heading', { name: 'Estado' });
+    servico.falhasDeEnvio.push(null);
+    await repo.colecao('fontes').criar({ tipo: 'livro', titulo: 'Manual' });
+    await usuario.click(screen.getByRole('button', { name: 'Sincronizar agora' }));
+    const estado = screen.getByRole('region', { name: 'Estado' });
+    expect(await within(estado).findByText(/Problema na última tentativa/)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Precisa de você' })).not.toBeInTheDocument();
   });
 
   it('sem resposta do servidor de posse: edita com aviso (Q1)', async () => {

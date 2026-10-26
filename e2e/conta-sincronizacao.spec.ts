@@ -77,26 +77,35 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
     const b = await novoAparelho(browser, contextOptions, servidor, 'B');
     await entrarPorCodigo(b.page, EMAIL);
     await ligarSincronizacao(b.page);
-    const faixaB = b.page.getByRole('status').filter({ hasText: 'outro aparelho agora' });
-    await expect(faixaB).toBeVisible({ timeout: 20_000 });
+    // Na tela de Sincronização quem diz isto é o cartão "Quem está editando"; a faixa de cima só
+    // aparece nas outras telas (o botão é o mesmo).
+    await expect(b.page.getByRole('button', { name: 'Passar a editar aqui' })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(
+      b.page.getByRole('status').filter({ hasText: 'Outro Aparelho em uso' }),
+    ).toHaveCount(0);
     await semViolacoes(b.page);
     // A Frase de A chegou a B pela recarga completa, antes de qualquer edição.
     await b.page.goto('/#/recall/frases');
     await expect(b.page.getByText(FRASE_A)).toBeVisible({ timeout: 20_000 });
+    const faixaB = b.page.getByRole('status').filter({ hasText: 'Outro Aparelho em uso' });
+    await expect(faixaB).toBeVisible();
+    await semViolacoes(b.page);
 
     // "Passar a editar aqui": B assume; A descobre na renovação seguinte e vira só leitura.
     await b.page.getByRole('button', { name: 'Passar a editar aqui' }).click();
     await expect(faixaB).toHaveCount(0);
     expect(servidor.donoDaPosse).not.toBeNull();
-    await expect(page.getByRole('status').filter({ hasText: 'outro aparelho agora' })).toBeVisible({
-      timeout: 20_000,
-    });
+    await page.goto('/#/recall/frases');
+    const faixaA = page.getByRole('status').filter({ hasText: 'Outro Aparelho em uso' });
+    await expect(faixaA).toBeVisible({ timeout: 20_000 });
 
     // Conflito: A sem rede edita mesmo assim (Q1); B, com a posse, muda o mesmo registro.
     servidor.cortarRede('A');
     await page.context().setOffline(true);
     await expect(
-      page.getByRole('status').filter({ hasText: 'Sem confirmar qual aparelho' }),
+      page.getByRole('status').filter({ hasText: 'Sem confirmar qual Aparelho' }),
     ).toBeVisible({ timeout: 20_000 });
     await escolherPerfil(page, 'Guiado');
     await escolherPerfil(b.page, 'Leitura');
@@ -112,11 +121,29 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
       timeout: 20_000,
     });
     await page.getByRole('link', { name: '1 Conflito para decidir' }).click();
-    await expect(page.getByRole('heading', { level: 3, name: /Preferências/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: /Preferências/ })).toBeVisible();
     await expect(page.locator('mark', { hasText: 'guiado' })).toBeVisible();
     await expect(page.locator('mark', { hasText: 'leitura' })).toBeVisible();
     await semViolacoes(page);
-    await page.getByRole('button', { name: 'Ficar com a daqui' }).click();
+    // O cartão tem recuo e as versões cabem dentro dele, e a tela não rola na horizontal nem com a
+    // letra a 200% (a regra de lista de linhas vencia o recuo do cartão; a grade de 16 rem estourava).
+    const cartao = await page.locator('.conflito').boundingBox();
+    const versao = await page.locator('.versao-conflito').first().boundingBox();
+    if (!cartao || !versao) throw new Error('O cartão do Conflito não tem caixa na tela.');
+    expect(versao.x - cartao.x).toBeGreaterThanOrEqual(12);
+    expect(cartao.x + cartao.width - (versao.x + versao.width)).toBeGreaterThanOrEqual(12);
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '200%';
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '';
+    });
+    await page.getByRole('button', { name: 'Ficar com a deste Aparelho' }).click();
     await expect(page.getByText('Nenhum Conflito. Seus Aparelhos concordam.')).toBeVisible();
 
     // A escolha chega a B: o perfil Guiado passa a valer lá também.
@@ -136,9 +163,9 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
     await expect(c.page.getByText('Este Aparelho.', { exact: true })).toBeVisible({
       timeout: 20_000,
     });
-    await expect(c.page.getByRole('status').filter({ hasText: 'outro aparelho' })).toHaveCount(0);
     await c.page.goto('/#/recall/frases');
     await expect(c.page.getByText(FRASE_A)).toBeVisible({ timeout: 20_000 });
+    await expect(c.page.getByRole('status').filter({ hasText: 'Outro Aparelho' })).toHaveCount(0);
 
     expect(excecoesDeA, 'exceções em A').toEqual([]);
     expect(b.falhas, 'falhas no console de B').toEqual([]);
