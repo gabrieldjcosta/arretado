@@ -16,18 +16,20 @@ export function AvisoDeAtualizacao() {
   return (
     <p className="aviso-de-atualizacao" role="status">
       <span>Uma versão nova do Arretado está pronta.</span>{' '}
-      <button type="button" className="discreto" onClick={aplicarAtualizacao}>
-        Atualizar
-      </button>{' '}
-      <button
-        type="button"
-        className="discreto"
-        onClick={() => {
-          setAdiado(true);
-        }}
-      >
-        Depois
-      </button>
+      <span className="acoes-do-aviso">
+        <button type="button" className="discreto" onClick={aplicarAtualizacao}>
+          Atualizar
+        </button>{' '}
+        <button
+          type="button"
+          className="discreto"
+          onClick={() => {
+            setAdiado(true);
+          }}
+        >
+          Depois
+        </button>
+      </span>
     </p>
   );
 }

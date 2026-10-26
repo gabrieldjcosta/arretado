@@ -3485,6 +3485,11 @@ dialog.dialogo-previa .linha-acoes button {
   margin-inline-start: -0.75rem;
 }
 
+/* O "N de 8" do Ache o erro é um <p>: sem zerar a margem de baixo, o centro dele subia ao lado do "Sair". */
+.topo-drill p {
+  margin: 0;
+}
+
 .topo-drill .barra-fina {
   flex: 1;
   margin-bottom: 0;

@@ -24,6 +24,11 @@
   color: var(--texto-atenuado);
 }
 
+/* As duas escolhas andam juntas: quando não cabem ao lado do texto, vão as duas para a linha de baixo. */
+.aviso-de-atualizacao .acoes-do-aviso {
+  white-space: nowrap;
+}
+
 /* Os pontos do Dia (D-D7, P3): Leitura, Cartões e Frases, cada um um ponto de luz com o nome ao lado.
    O ponto da vez leva o texto cheio; os outros, o atenuado. Só informa: nada aqui cobra. */
 .pontos-do-dia {
