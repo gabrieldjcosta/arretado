@@ -3,7 +3,7 @@
 // saem depois da escrita confirmada, só com ids.
 import { dataCivil } from '../../core/datas';
 import type { Sessao } from '../../core/modelo';
-import { EscritaBloqueada, type Repositorio } from '../../core/persistencia';
+import type { Repositorio } from '../../core/persistencia';
 import { obterPreferencias } from '../../core/preferencias';
 import type { EntradaDeSessao, FechamentoDeSessao } from './contrato';
 
@@ -33,13 +33,14 @@ export async function restaurarSessao(repo: Repositorio): Promise<Sessao | undef
     if (s.data < hoje || escolhida) {
       // Fecha como interrompida a de outro dia e as repetidas (sobra de abas ou de falha antiga).
       const pausas = s.pausas.map((p) => (p.fim ? p : { ...p, fim: p.inicio }));
-      try {
-        await repo.colecao('sessoes').atualizar(s.id, { estado: 'interrompida', pausas });
-        repo.eventos.emitir('sessao.interrompida', { sessaoId: s.id });
-      } catch (e: unknown) {
-        // Outro aparelho está editando (posse, D17): a tela só lê; a sobra fecha quando a posse voltar.
-        if (!(e instanceof EscritaBloqueada)) throw e;
-      }
+      // Outro aparelho está editando (posse, D17): a tela só lê e não acende o aviso de bloqueio; a
+      // sobra fecha quando a posse voltar.
+      if (
+        !repo.escritaPermitida({ colecao: 'sessoes', operacao: 'atualizar', dados: { estado: 1 } })
+      )
+        continue;
+      await repo.colecao('sessoes').atualizar(s.id, { estado: 'interrompida', pausas });
+      repo.eventos.emitir('sessao.interrompida', { sessaoId: s.id });
     } else escolhida = s;
   }
   return escolhida;

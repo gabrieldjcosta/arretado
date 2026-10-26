@@ -1,5 +1,5 @@
 // Trava de escrita (posse de outro aparelho, D17) nas escritas automáticas e no que é só do aparelho.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { iniciarSessao, restaurarSessao } from './servico';
 import { alterarPreferencias } from '../../core/preferencias';
@@ -16,6 +16,17 @@ describe('trava de escrita', () => {
     // O carregador `sessaoAberta` (Atual, Iniciar, Fechar, FaixaDaSessao, Hoje › Agora) só lê: a
     // escrita da "interrompida" fica para quando a posse voltar.
     await expect(restaurarSessao(repo)).resolves.toBeUndefined();
+  });
+
+  it('a Sessão de outro dia adiada não acende o aviso de bloqueio (a pessoa não fez nada)', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await iniciarSessao(repo, {});
+    relogio.avancar(DIA);
+    const aoBloquear = vi.fn();
+    repo.bloquearEscrita('Outro aparelho está editando agora.', { aoBloquear });
+    await expect(restaurarSessao(repo)).resolves.toBeUndefined();
+    await expect(restaurarSessao(repo)).resolves.toBeUndefined(); // cada evento de sync refaz o carregador
+    expect(aoBloquear).not.toHaveBeenCalled();
   });
 
   it('tema e tamanho da letra são do aparelho (nunca sincronizam) e passam pela trava', async () => {
