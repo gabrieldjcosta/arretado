@@ -1,0 +1,16 @@
+{"versao":1,"recorte":"fcc-defensor-sp","banca":"fcc","cargo":"defensor","materias":[
+{"nome":"Direito Administrativo","parcela":0.0495,"chaves":["direito administrativo"]},
+{"nome":"Direito Constitucional","parcela":0.0893,"chaves":["direito constitucional"]},
+{"nome":"Legislação Civil e Processual Civil Especial","parcela":0.0458,"chaves":["direitos difusos e coletivos","direito do idoso"]},
+{"nome":"Direito Civil","parcela":0.0651,"chaves":["direito civil"]},
+{"nome":"Direito Penal","parcela":0.0627,"chaves":["direito penal","direito penal e criminologia"]},
+{"nome":"Direito Processual Penal","parcela":0.0772,"chaves":["direito processual penal"]},
+{"nome":"Direito Tributário","parcela":0.035,"chaves":["direito tributario"]},
+{"nome":"Direito da Criança e do Adolescente","parcela":0.082,"chaves":["direito da crianca e do adolescente"]},
+{"nome":"Legislação Penal e Processual Penal Especial","parcela":0.0458,"chaves":["direito penal e processual penal extravagante","execucao penal","direito da execucao penal","direito das execucoes penais","direito processual penal e execucao penal"]},
+{"nome":"Legislação Específica das Defensorias Públicas","parcela":0.0869,"chaves":["principios institucionais da defensoria publica","principios e atribuicoes institucionais da defensoria publica","legislacao e principios da defensoria publica"]},
+{"nome":"Direitos Humanos","parcela":0.1074,"chaves":["direitos humanos"]},
+{"nome":"Direito do Consumidor","parcela":0.0205,"chaves":["direito do consumidor"]},
+{"nome":"Direito Processual Civil","parcela":0.076,"chaves":["direito processual civil"]},
+{"nome":"Teoria Geral, Filosofia e Sociologia Jurídica","parcela":0.0483,"chaves":["filosofia do direito e sociologia juridica","filosofia do direito","filosofia e sociologia juridica"]}
+]}

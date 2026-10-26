@@ -5,6 +5,7 @@ import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { TituloComMais } from '../componentes/TituloComMais';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
@@ -70,6 +71,7 @@ export function RecallInicio() {
           para="/recall/registrar"
         />
       )}
+      {dados?.primeiroUso && <GuiaDaTela tela="recall" />}
       <p className="dica">
         <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no texto
         da lei (piloto).
