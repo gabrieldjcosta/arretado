@@ -20,7 +20,7 @@ describe('calcularPesos', () => {
     ]);
     expect(base).toBe('incidencia');
     expect(pesos.map((p) => p.peso)).toEqual([3, 1, 1]);
-    expect(pesos[0]?.razao).toContain('TEC');
+    expect(pesos[0]?.razao).toBe('peso pelas questões da banca');
   });
   it('ajuste manual vence e respeita o teto', () => {
     const { pesos } = calcularPesos([{ disciplinaId: 'a', itensAltos: 1, pesoManual: 9 }]);

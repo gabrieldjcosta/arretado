@@ -4,10 +4,13 @@ import { Link } from 'react-router';
 /** Menu "Ajuda": ajuda sobre a tela e "Relatar problema" (juntou o "?" e o "!"; muda o D6). */
 export function MenuAjuda({
   paraAjuda,
+  aoGuia,
   aoRelatar,
 }: {
   /** Rota da seção de orientações desta tela. */
   paraAjuda: string;
+  /** Reabre o guia da tela atual; ausente onde a tela não tem guia. */
+  aoGuia?: () => void;
   aoRelatar: () => void;
 }) {
   const [aberto, setAberto] = useState(false);
@@ -57,6 +60,18 @@ export function MenuAjuda({
           >
             Ajuda sobre esta tela
           </Link>
+          {aoGuia && (
+            <button
+              type="button"
+              className="discreto"
+              onClick={() => {
+                setAberto(false);
+                aoGuia();
+              }}
+            >
+              O que cada opção faz
+            </button>
+          )}
           <button
             type="button"
             className="discreto"
