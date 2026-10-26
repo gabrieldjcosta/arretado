@@ -3,8 +3,24 @@ import type { Repositorio } from '../../core/persistencia';
 import { listarFrases } from '../../dominios/recall/servico';
 import { Esqueleto, Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
+import { FixarEstas } from './FixarEstas';
+import { sumulasVinculantes } from './fixar-estas';
 
-const carregar = async (repo: Repositorio) => (await listarFrases(repo, {}, null, 200)).itens;
+const carregar = async (repo: Repositorio) => {
+  const [frases, sumulas, todas] = await Promise.all([
+    listarFrases(repo, {}, null, 200),
+    sumulasVinculantes(repo).catch(() => undefined),
+    repo.colecao('frases').todosDoUsuario(),
+  ]);
+  const fixadas = new Set(
+    todas.flatMap((f) => (f.excluidoEm === null ? [f.trecho?.dispositivoId] : [])),
+  );
+  return {
+    frases: frases.itens,
+    paraFixar: (sumulas ?? []).filter((s) => !fixadas.has(s.dispositivoId)),
+    semColecao: sumulas === undefined,
+  };
+};
 
 /**
  * Aba Frases (D9, D25, D-D5): a lista das Frases, uma por linha. Cada uma leva ao Erro que a
@@ -24,7 +40,8 @@ export function ListaFrases() {
       </Link>
     </p>
   );
-  if (dados.length === 0) {
+  const { frases, paraFixar, semColecao } = dados;
+  if (frases.length === 0) {
     return (
       <>
         <Vazio
@@ -40,6 +57,7 @@ export function ListaFrases() {
             envia às frases durante a leitura.
           </p>
         </Vazio>
+        <FixarEstas itens={paraFixar} semColecao={semColecao} />
         {verErros}
       </>
     );
@@ -47,7 +65,7 @@ export function ListaFrases() {
   return (
     <section aria-label="Frases">
       <ul className="lista-simples frases">
-        {dados.map((f) => (
+        {frases.map((f) => (
           <li key={f.id}>
             <span className="texto-leitura">
               {f.erroId ? <Link to={`/recall/erros/${f.erroId}`}>{f.texto}</Link> : f.texto}
@@ -62,6 +80,7 @@ export function ListaFrases() {
           </li>
         ))}
       </ul>
+      <FixarEstas itens={paraFixar} />
       {verErros}
     </section>
   );

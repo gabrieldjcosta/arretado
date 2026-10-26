@@ -1641,6 +1641,22 @@ button.grande,
   margin: 0;
 }
 
+/* "Fixar estas": a oferta no fim das Frases e a lista que rola dentro do diálogo. */
+.fixar-estas {
+  margin: 1.5rem 0 0;
+}
+
+.fixar-estas h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.fixar-estas-lista {
+  max-height: min(40vh, 22rem);
+  overflow-y: auto;
+  margin: 0.75rem 0;
+}
+
 .cartao-drill {
   min-height: 10rem;
 }
