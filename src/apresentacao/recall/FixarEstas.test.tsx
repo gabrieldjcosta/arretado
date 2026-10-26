@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -37,11 +37,14 @@ describe('Fixar estas', () => {
     expect(await repo.colecao('frases').todosDoUsuario()).toHaveLength(0);
   });
 
-  it('confirmar cria as Frases', async () => {
-    const { repo, usuario } = await montar({ itens });
+  it('confirmar cria as Frases e diz quantas à lista, que dá o aviso', async () => {
+    const aoFixar = vi.fn();
+    const { repo, usuario } = await montar({ itens, aoFixar });
     await usuario.click(screen.getByRole('button', { name: 'Ver a lista' }));
     await usuario.click(await screen.findByRole('button', { name: 'Fixar 3 frases' }));
-    expect(await screen.findByText('3 frases fixadas.')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(aoFixar).toHaveBeenCalledWith(3);
+    });
     expect(await repo.colecao('frases').todosDoUsuario()).toHaveLength(3);
   });
 

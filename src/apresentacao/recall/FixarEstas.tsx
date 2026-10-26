@@ -8,8 +8,7 @@ import {
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
 
-const PREVIA = 140;
-const previa = (t: string) => (t.length > PREVIA ? `${t.slice(0, PREVIA).trimEnd()}…` : t);
+const frases = (n: number) => (n === 1 ? '1 frase' : `${String(n)} frases`);
 
 /**
  * "Fixar estas": oferta opcional de levar uma lista pronta (hoje, as súmulas vinculantes) às
@@ -18,15 +17,17 @@ const previa = (t: string) => (t.length > PREVIA ? `${t.slice(0, PREVIA).trimEnd
 export function FixarEstas({
   itens,
   semColecao = false,
+  aoFixar,
 }: {
   itens: readonly EnunciadoParaFixar[];
   /** A coleção ainda não está na Biblioteca: a oferta leva a adicioná-la. */
   semColecao?: boolean;
+  /** Depois de gravar. Este cartão some com a recarga da lista, então o aviso é de quem a lista. */
+  aoFixar?: (fixadas: number) => void;
 }) {
   const repo = useRepositorio();
   const [aberto, setAberto] = useState(false);
   const [falha, setFalha] = useState(false);
-  const [anuncio, setAnuncio] = useState('');
   const idDescricao = useId();
   if (itens.length === 0 && !semColecao) return null;
   if (semColecao) {
@@ -42,13 +43,13 @@ export function FixarEstas({
       </section>
     );
   }
-  const dias = Math.ceil(itens.length / FIXAR_POR_DIA);
 
   return (
     <section className="fixar-estas" aria-label="Fixar as súmulas vinculantes">
       <h2>Fixar as súmulas vinculantes</h2>
       <p>
-        {itens.length} enunciados que a prova costuma cobrar. Você vê a lista antes de confirmar.
+        Uma Frase para cada súmula vinculante vigente ({itens.length}). Você vê a lista antes de
+        confirmar.
       </p>
       <button
         type="button"
@@ -60,25 +61,24 @@ export function FixarEstas({
       >
         Ver a lista
       </button>
-      <p role="status" className="visualmente-oculto">
-        {anuncio}
-      </p>
       <Dialogo
         aberto={aberto}
         aoFechar={() => {
           setAberto(false);
         }}
         titulo="Fixar as súmulas vinculantes?"
+        classe="dialogo-lista"
         descritoPor={idDescricao}
       >
         <p id={idDescricao}>
-          Entram {itens.length} frases, {FIXAR_POR_DIA} por dia a partir de amanhã (cerca de {dias}{' '}
-          dias). Nada muda até você confirmar, e dá para apagar cada frase depois.
+          As Frases entram agora; a Revisão delas começa amanhã, {FIXAR_POR_DIA} por dia.
         </p>
         <ul className="lista-simples fixar-estas-lista" tabIndex={0} aria-label="Súmulas">
           {itens.map((i) => (
             <li key={i.dispositivoId}>
-              <strong>{i.rotulo}</strong> {previa(i.texto)}
+              <span>
+                <strong>{i.rotulo}:</strong> {i.texto}
+              </span>
             </li>
           ))}
         </ul>
@@ -86,12 +86,12 @@ export function FixarEstas({
         <div className="linha-acoes">
           <button
             type="button"
-            className="botao"
+            className="principal"
             onClick={() => {
               fixarEstas(repo, itens).then(
                 (r) => {
-                  setAnuncio(`${String(r.fixadas)} frases fixadas.`);
                   setAberto(false);
+                  aoFixar?.(r.fixadas);
                 },
                 () => {
                   setFalha(true);
@@ -99,7 +99,7 @@ export function FixarEstas({
               );
             }}
           >
-            Fixar {itens.length} frases
+            Fixar {frases(itens.length)}
           </button>
           <button
             type="button"
