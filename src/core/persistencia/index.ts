@@ -34,6 +34,7 @@ export {
   type EscritaPrevista,
   type TravaDeEscrita,
 } from './contexto';
+export { NOME_PADRAO_ANTIGO, nomeDaPlataforma } from './aparelho';
 export { desfazerAlteracao, reconstruirDoLog, type Estado } from './log';
 export {
   carimboDoLote,

@@ -1,23 +1,45 @@
 // Conta › Sincronização (F4-B, B4; plano §0 e §4): os três estados, a posse do aparelho, os seus
 // aparelhos, "Sincronizar agora" e os Problemas. Vocabulário: Aparelho, Problema, Conflito.
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type SyntheticEvent } from 'react';
 import { Link } from 'react-router';
+import { nomeDaPlataforma } from '../../core/persistencia';
 import { FalhaDeConta } from '../../integracoes/conta';
 import { estadoDaSincronizacao, ROTULO_DO_ESTADO } from '../../core/sincronizacao/estado';
 import { useConectado } from '../componentes/conexao';
 import { Selo } from '../componentes/Selo';
-import { useDados } from '../dados/contexto';
+import { useDados, useRepositorio } from '../dados/contexto';
 import { formatarQuando } from '../recall/rotulos';
 import { useSincronizacao } from './contexto';
 import { ROTULO_DA_POSSE } from './rotulos';
 import './estilos-sincronizacao.css';
 
-const O_QUE_MUDA = [
-  'O que você estuda passa a ser guardado também na sua conta e aparece em todos os seus Aparelhos: Erros, Cartões, Normas, grifos, notas, Revisões, Sessões e Dias.',
-  'Esses dados ficam legíveis só por você no banco. Por não serem cifrados com uma frase sua, a equipe que administra o serviço consegue tecnicamente lê-los; isso só acontece para manter o serviço ou quando você pedir ajuda.',
-  'Não escreva dados de saúde nas suas notas: elas vão para o servidor. Não perguntamos nem guardamos diagnóstico.',
-  'Tema, letra e aparência ficam em cada Aparelho. O conteúdo das leis não sobe, só a referência.',
-  'É uma função de teste: pode falhar. Guarde uma cópia em Conta › Dados mesmo assim. Sair ou excluir a conta continua em Conta, a qualquer momento.',
+/** O texto aceito (política v4). A abertura em negrito só ajuda a achar o que importa; o texto segue igual. */
+const O_QUE_MUDA: readonly { abertura: string; texto: string }[] = [
+  {
+    abertura: 'O que vai',
+    texto:
+      'O que você estuda passa a ser guardado também na sua conta e aparece em todos os seus Aparelhos: Erros, Cartões, Normas, grifos, notas, Revisões, Sessões e Dias.',
+  },
+  {
+    abertura: 'Quem pode ler',
+    texto:
+      'Esses dados ficam legíveis só por você no banco. Por não serem cifrados com uma frase sua, a equipe que administra o serviço consegue tecnicamente lê-los; isso só acontece para manter o serviço ou quando você pedir ajuda.',
+  },
+  {
+    abertura: 'O que não escrever',
+    texto:
+      'Não escreva dados de saúde nas suas notas: elas vão para o servidor. Não perguntamos nem guardamos diagnóstico.',
+  },
+  {
+    abertura: 'O que fica só no Aparelho',
+    texto:
+      'Tema, letra e aparência ficam em cada Aparelho. O conteúdo das leis não sobe, só a referência.',
+  },
+  {
+    abertura: 'É um teste',
+    texto:
+      'É uma função de teste: pode falhar. Guarde uma cópia em Conta › Dados mesmo assim. Sair ou excluir a conta continua em Conta, a qualquer momento.',
+  },
 ];
 
 function Ligar() {
@@ -37,8 +59,10 @@ function Ligar() {
       <h2 id="t-ligar-sync">Ligar a sincronização</h2>
       <p>Com ela ligada, seus Aparelhos ficam iguais sem você fazer nada.</p>
       <ol>
-        {O_QUE_MUDA.map((t) => (
-          <li key={t}>{t}</li>
+        {O_QUE_MUDA.map((item) => (
+          <li key={item.abertura}>
+            <strong>{item.abertura}.</strong> {item.texto}
+          </li>
         ))}
       </ol>
       <p className="dica">
@@ -72,7 +96,100 @@ function Ligar() {
   );
 }
 
+function LinhaDeAparelho({
+  id,
+  nome,
+  plataforma,
+  esteAparelho,
+}: {
+  id: string;
+  nome: string;
+  plataforma: string;
+  esteAparelho: boolean;
+}) {
+  const repo = useRepositorio();
+  const [editando, setEditando] = useState(false);
+  const [rascunho, setRascunho] = useState(nome);
+  const [falha, setFalha] = useState(false);
+  const guardar = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    const novo = rascunho.trim();
+    if (!novo || novo === nome) {
+      setEditando(false);
+      return;
+    }
+    setFalha(false);
+    try {
+      await repo.colecao('aparelhos').atualizar(id, { nome: novo });
+      setEditando(false);
+    } catch {
+      // Trava de escrita (outro Aparelho editando) ou falha do banco: a faixa de posse explica a trava.
+      setFalha(true);
+    }
+  };
+  const idCampo = `nome-aparelho-${id}`;
+  if (editando) {
+    return (
+      <li>
+        <form
+          className="linha-acoes"
+          onSubmit={(e) => {
+            void guardar(e);
+          }}
+        >
+          <label htmlFor={idCampo}>Nome do Aparelho</label>
+          <input
+            id={idCampo}
+            type="text"
+            value={rascunho}
+            maxLength={500}
+            onChange={(e) => {
+              setRascunho(e.target.value);
+            }}
+          />
+          <button type="submit" className="botao">
+            Guardar
+          </button>
+          <button
+            type="button"
+            className="botao discreto"
+            onClick={() => {
+              setRascunho(nome);
+              setEditando(false);
+            }}
+          >
+            Cancelar
+          </button>
+          {falha && (
+            <p className="aviso" role="alert">
+              Não foi possível guardar o nome agora.
+            </p>
+          )}
+        </form>
+      </li>
+    );
+  }
+  return (
+    <li>
+      <strong>{nome}</strong>
+      {esteAparelho && <span className="dica"> (este)</span>}
+      <span className="dica"> · {nomeDaPlataforma(plataforma)}</span>{' '}
+      <button
+        type="button"
+        className="botao discreto"
+        onClick={() => {
+          setRascunho(nome);
+          setEditando(true);
+        }}
+      >
+        Renomear
+      </button>
+    </li>
+  );
+}
+
 function Aparelhos() {
+  const repo = useRepositorio();
   const aparelhos = useDados(useCallback((r) => r.colecao('aparelhos').todosDoUsuario(), []));
   const lista = aparelhos.dados ?? [];
   if (lista.length === 0) return null;
@@ -81,10 +198,13 @@ function Aparelhos() {
       <h2 id="t-aparelhos">Seus Aparelhos</h2>
       <ul className="lista-simples">
         {lista.map((a) => (
-          <li key={a.id}>
-            <strong>{a.nome}</strong>
-            <span className="dica"> {a.plataforma.slice(0, 60)}</span>
-          </li>
+          <LinhaDeAparelho
+            key={a.id}
+            id={a.id}
+            nome={a.nome}
+            plataforma={a.plataforma}
+            esteAparelho={a.id === repo.ctx.aparelhoId}
+          />
         ))}
       </ul>
     </section>
