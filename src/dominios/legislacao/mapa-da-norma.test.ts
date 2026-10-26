@@ -147,14 +147,14 @@ describe('mapa da norma: próximo trecho', () => {
   it('começa pelo primeiro da melhor faixa livre e segue pelos vizinhos de faixa igual ou melhor', () => {
     const t = proximoTrecho(q, cobertura(q, undefined).cobertos);
     expect(t).toEqual({ de: 1, ate: 2, artigos: 2, classe: 'altissima', minutos: 2 });
-    expect(rotuloDoTrecho(q, t!)).toBe('Arts. 2 a 3');
+    expect(rotuloDoTrecho(q, t!)).toBe('arts. 2 a 3');
   });
 
   it('pula o coberto e o revogado, e desce de faixa quando a de cima acabou', () => {
     const t = proximoTrecho(q, cobertura(q, 7).cobertos);
     // Até o art. 3 lido; o 4 é revogado; sobram 5 (média) e 5-A (alta): a alta vem primeiro.
     expect(t).toEqual({ de: 5, ate: 5, artigos: 1, classe: 'alta', minutos: 1 });
-    expect(rotuloDoTrecho(q, t!)).toBe('Art. 5-A');
+    expect(rotuloDoTrecho(q, t!)).toBe('art. 5-A');
     const depois = proximoTrecho(q, cobertura(q, 7, new Set([11])).cobertos);
     expect(depois?.classe).toBe('media');
   });

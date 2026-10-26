@@ -14,6 +14,7 @@ import type { Repositorio } from '../../core/persistencia';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { useDados } from '../dados/contexto';
 import type { ProximaAcao } from '../../dominios/hoje/contrato';
+import { AgoraNoMapa } from './AgoraNoMapa';
 import { rotaDeInicio } from './rota-de-inicio';
 import { motivoDaAcao, rotuloDoBotao, tituloDaAcao } from './textos-da-acao';
 
@@ -32,11 +33,14 @@ export function RevisaoPorTempo({
   acao,
   antes,
   aoEscolherOutra,
+  normaLida,
 }: {
   acao: ProximaAcao;
   /** A linha de parada: fica entre o seletor e a folha, onde a caneta encosta na borda dela. */
   antes: ReactNode;
   aoEscolherOutra: () => void;
+  /** A norma da leitura salva: com tempo sobrando depois do lote, o Hoje aponta o trecho do mapa. */
+  normaLida?: string;
 }) {
   const { dados } = useDados(carregarFila);
   const [minutos, setMinutos] = useState<number | null>(null);
@@ -125,6 +129,9 @@ export function RevisaoPorTempo({
             : `Os outros ${String(resto)} cartões continuam na fila e entram`}{' '}
           nos próximos dias, por ordem de valor.
         </p>
+      )}
+      {normaLida !== undefined && (
+        <AgoraNoMapa normaId={normaLida} sobra={minutos - minutosDoLote(lote)} />
       )}
     </>
   );

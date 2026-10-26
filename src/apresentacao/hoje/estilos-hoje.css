@@ -426,6 +426,29 @@
   overflow-wrap: anywhere;
 }
 
+/* "Agora no mapa" (AP-04): o ícone e o texto em duas colunas, e o toque de 44 px embaixo do texto,
+   alinhado a ele em qualquer largura (sem o ícone sozinho numa linha nem o link solto à direita). */
+.agora-no-mapa {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: 0 0.5rem;
+  align-items: start;
+  margin: 0.5rem 0;
+}
+
+.agora-no-mapa .icone-svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.15rem;
+}
+
+.agora-no-mapa .botao {
+  grid-column: 2;
+  justify-self: start;
+  padding-inline: 0;
+  min-height: var(--alvo, 44px);
+}
+
 /* "A lei mudou" no Hoje (AP-05): afastado da folha de cima e sem filete sob a última norma. */
 .lei-mudou-no-hoje {
   margin-top: 1rem;
