@@ -131,6 +131,7 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
       puxarRegistros: (depois, limite) => chamarServidor('puxar_registros', { depois, limite }),
       registrarSincronia: (aparelhoId, seqRecebido, versaoEsquema) =>
         chamarServidor('registrar_sincronia', { aparelhoId, seqRecebido, versaoEsquema }),
+      pontoDaPoda: () => chamarServidor('ponto_da_poda', {}),
       pedirPosse: (aparelhoId, forcar) => chamarServidor('pedir_posse', { aparelhoId, forcar }),
       soltarPosse: (aparelhoId) =>
         chamarServidor('soltar_posse', { aparelhoId }, { keepalive: true }),

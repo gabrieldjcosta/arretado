@@ -11,6 +11,7 @@ import { FonteEmMemoria } from '../src/dominios/acervo/fonte-em-memoria';
 import { Repositorio, VERSAO_ESQUEMA, type Alteracao } from '../src/core/persistencia';
 import {
   CHAVE_PARADA_POR_VERSAO,
+  CHAVE_RECARGA_NECESSARIA,
   lerSeqRecebido,
   contarConflitos,
   contarPendentes,
@@ -535,6 +536,101 @@ function gerador(semente: number) {
   };
 }
 
+describe('poda do log (B5)', () => {
+  /** Envelhece o log da conta e o último sinal de um aparelho, e roda a poda como o pg_cron. */
+  async function envelhecerEPodar(uid: string, parado?: Aparelho): Promise<number> {
+    await remoto.db.query(
+      `update arretado.alteracoes set recebido_em = now() - interval '40 days' where usuario_id = $1`,
+      [uid],
+    );
+    if (parado) {
+      await remoto.db.query(
+        `update arretado.aparelhos_sync set visto_em = now() - interval '100 days' where aparelho_id = $1`,
+        [parado.ctx.aparelhoId],
+      );
+    }
+    return podarAgora();
+  }
+  async function podarAgora(): Promise<number> {
+    const r = await remoto.db.query<{ v: number }>(
+      'select arretado.podar_sincronizacao()::int as v',
+    );
+    return r.rows[0]?.v ?? 0;
+  }
+
+  async function cenario() {
+    const uid = await novoUsuario();
+    const A = await aparelho(uid);
+    const B = await aparelho(uid);
+    const e1 = await criarErro(A, 'v1');
+    const e2 = await criarErro(A, 'vai sair');
+    await A.rodada();
+    await B.rodada();
+    // B fica parado; A segue estudando.
+    await A.repo.colecao('erros').atualizar(e1.id, { oQueFoi: 'v2' });
+    await A.repo.colecao('erros').excluir(e2.id);
+    const e3 = await criarErro(A, 'novo');
+    await A.rodada();
+    return { uid, A, B, ids: [e1.id, e2.id, e3.id] };
+  }
+
+  async function convergiu(A: Aparelho, B: Aparelho, ids: string[]) {
+    for (const id of ids) expect(await lerErro(B, id)).toEqual(await lerErro(A, id));
+    expect(await contarConflitos(B.repo.db)).toBe(0);
+    expect(await B.repo.db.meta.get(CHAVE_RECARGA_NECESSARIA)).toBeUndefined();
+    expect(await lerSeqRecebido(B.repo)).toBeGreaterThanOrEqual(await B.servidor.pontoDaPoda());
+    const outra = await B.rodada();
+    expect(outra.recebido.aplicadas).toBe(0);
+  }
+
+  it('aparelho parado há mais de 90 dias recarrega de registros e converge, sem Conflito', async () => {
+    const { uid, A, B, ids } = await cenario();
+    expect(await envelhecerEPodar(uid, B)).toBeGreaterThan(0);
+    expect(await B.servidor.pontoDaPoda()).toBeGreaterThan(await lerSeqRecebido(B.repo));
+    await B.rodada();
+    await convergiu(A, B, ids);
+    // Um aparelho novo também começa bem a partir do log podado.
+    const C = await aparelho(uid);
+    await C.rodada();
+    await convergiu(A, C, ids);
+  });
+
+  it('aparelho atrasado mas visto há pouco segura a poda e segue pelo log', async () => {
+    const { uid, A, B, ids } = await cenario();
+    const cursorDeB = await lerSeqRecebido(B.repo);
+    await envelhecerEPodar(uid);
+    expect(await B.servidor.pontoDaPoda()).toBeLessThanOrEqual(cursorDeB);
+    const r = await B.rodada();
+    expect(r.recebido.aplicadas).toBeGreaterThan(0);
+    await convergiu(A, B, ids);
+  });
+
+  it('poda no meio da puxada: o aparelho percebe pelo ponto da poda e recarrega', async () => {
+    const { uid, A, B, ids } = await cenario();
+    await remoto.db.query(
+      `update arretado.aparelhos_sync set visto_em = now() - interval '100 days' where aparelho_id = $1`,
+      [B.ctx.aparelhoId],
+    );
+    await remoto.db.query(
+      `update arretado.alteracoes set recebido_em = now() - interval '40 days' where usuario_id = $1`,
+      [uid],
+    );
+    const puxar = B.servidor.puxarLog.bind(B.servidor);
+    let primeira = true;
+    B.servidor.puxarLog = async (...a) => {
+      if (primeira && a[2] === undefined) {
+        primeira = false;
+        await podarAgora();
+      }
+      return puxar(...a);
+    };
+    await B.rodada();
+    B.servidor.puxarLog = puxar;
+    expect(primeira).toBe(false);
+    await convergiu(A, B, ids);
+  });
+});
+
 describe('propriedade: convergência com edição concorrente', () => {
   it.each([1, 2, 3, 4, 5, 6])(
     'semente %i',
@@ -770,6 +866,7 @@ describe('propriedade com quedas de rede no meio da rodada (revisão independent
     'instantaneoInicio',
     'puxarRegistros',
     'registrarSincronia',
+    'pontoDaPoda',
   ] as const;
 
   /** Uma rodada em que a `naChamada`-ésima chamada ao servidor falha (rede some); devolve null se caiu. */
