@@ -34,13 +34,15 @@ export function GuiaDaTela({ tela, omitir = [] }: { tela: TelaComGuia; omitir?: 
     const el = cartao.current;
     if (!aberto || !el || typeof IntersectionObserver === 'undefined') return;
     let espera: ReturnType<typeof setTimeout> | undefined;
+    // Um diálogo aberto (a folha de boas-vindas) cobre o cartão sem tirá-lo da janela: espera fechar.
+    const conferir = () => {
+      if (document.querySelector('dialog[open]')) espera = setTimeout(conferir, MS_PARA_VER);
+      else marcarGuiaVisto(tela);
+    };
     const obs = new IntersectionObserver(
       ([e]) => {
         clearTimeout(espera);
-        if (e?.isIntersecting)
-          espera = setTimeout(() => {
-            marcarGuiaVisto(tela);
-          }, MS_PARA_VER);
+        if (e?.isIntersecting) espera = setTimeout(conferir, MS_PARA_VER);
       },
       { threshold: 0.5 },
     );

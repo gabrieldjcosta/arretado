@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
+import { GuiaDaTela } from './GuiaDaTela';
 import { telaDoGuia } from './memoria';
 
 async function abrir(rota: string) {
@@ -54,5 +55,39 @@ describe('Guia da primeira abertura', () => {
     expect(telaDoGuia('/biblioteca')).toBe('biblioteca');
     expect(telaDoGuia('/biblioteca/normas/x')).toBeUndefined();
     expect(telaDoGuia('/recall/revisar')).toBeUndefined();
+  });
+});
+
+describe('Guia › visto pela janela', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    document.querySelectorAll('dialog').forEach((d) => {
+      d.remove();
+    });
+    localStorage.clear();
+  });
+
+  it('com um diálogo aberto por cima, só vale como visto depois que ele fecha', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(private fn: (e: { isIntersecting: boolean }[]) => void) {}
+        observe() {
+          this.fn([{ isIntersecting: true }]);
+        }
+        disconnect() {}
+      },
+    );
+    const folha = document.createElement('dialog');
+    folha.setAttribute('open', '');
+    document.body.append(folha);
+    render(<GuiaDaTela tela="recall" />);
+    vi.advanceTimersByTime(3500);
+    expect(localStorage.getItem('arretado.guia.recall')).toBeNull();
+    folha.remove();
+    vi.advanceTimersByTime(1500);
+    expect(localStorage.getItem('arretado.guia.recall')).toBe('2');
   });
 });

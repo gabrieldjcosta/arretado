@@ -20,7 +20,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
         opcao: 'Escolher meu concurso',
         efeito: 'você diz qual concurso estuda e o app traz as normas com que ele começa.',
       },
-      { opcao: '+', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
+      { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
       {
         opcao: 'Leitura · Cartões · Frases',
         efeito: 'acendem sozinhos quando você lê, revisa ou fixa.',
