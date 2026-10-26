@@ -37,7 +37,7 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
   await expect(secaoImportar).toBeVisible();
 
   // 4. Detalhes de orientação para IA e prompt com botão copiar
-  const detalhesIa = page.getByText('Não sabe montar a planilha?');
+  const detalhesIa = page.locator('summary', { hasText: 'Não sabe montar a planilha?' });
   await expect(detalhesIa).toBeVisible();
   await detalhesIa.click();
 

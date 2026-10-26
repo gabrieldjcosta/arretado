@@ -103,7 +103,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
 
     render(<App abrir={() => Promise.resolve(repo)} />);
 
-    const sumario = await screen.findByText('Não sabe montar a planilha?');
+    const sumario = await screen.findByText('Não sabe montar a planilha?', { selector: 'summary' });
     await usuario.click(sumario);
 
     expect(screen.getByText(/Transforme o conteúdo programático do edital/)).toBeInTheDocument();
@@ -186,7 +186,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
 
     render(<App abrir={() => Promise.resolve(repo)} />);
 
-    const sumario = await screen.findByText('Não sabe montar a planilha?');
+    const sumario = await screen.findByText('Não sabe montar a planilha?', { selector: 'summary' });
     await usuario.click(sumario);
 
     const botaoCopiar = screen.getByRole('button', { name: 'Copiar' });
