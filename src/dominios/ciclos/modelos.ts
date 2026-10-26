@@ -16,6 +16,7 @@ export interface MateriaParaModelo {
   /** Assuntos de faixa Altíssima e Alta no plano (proxy enquanto não há incidência do TEC). */
   itensAltos: number;
   incidencia?: number;
+  incidenciaMedia?: boolean;
   desempenho?: DesempenhoDaMateria;
 }
 

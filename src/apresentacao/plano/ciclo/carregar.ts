@@ -8,7 +8,12 @@ import {
   sugerirAjustes,
   type MateriaParaModelo,
   type SugestaoDeAjuste,
+  incidenciaDasMaterias,
+  type IncidenciaDaMateria,
+  tabelaServeAoEdital,
+  TabelaDeMaterias,
 } from '../../../dominios/ciclos';
+import { fonteIncidenciaPadrao } from '../../dados/fonteIncidenciaContexto';
 
 export interface DadosDoCiclo {
   ativo: Ciclo | undefined;
@@ -22,6 +27,41 @@ export interface DadosDoCiclo {
 }
 
 const JANELA_EM_DIAS = 30;
+
+/**
+ * A parcela de cada matéria no recorte da banca, quando o edital do plano é o dele. Sem rede, sem
+ * arquivo ou com outro edital, volta vazio e o Ciclo pesa pelo edital, como antes.
+ */
+async function incidenciaDoPlano(repo: Repositorio, vivas: readonly Disciplina[]) {
+  try {
+    const [editais, concursos] = await Promise.all([
+      repo.colecao('editais').todosDoUsuario(),
+      repo.colecao('concursos').todosDoUsuario(),
+    ]);
+    const edital = editais.find(
+      (e) => e.excluidoEm === null && vivas.some((d) => d.editalId === e.id),
+    );
+    const concurso = concursos.find((c) => c.excluidoEm === null && c.id === edital?.concursoId);
+    if (!concurso) return new Map<string, IncidenciaDaMateria>();
+    const { dados: indice } = await fonteIncidenciaPadrao.indice();
+    for (const r of indice.recortes) {
+      const bruto = await fonteIncidenciaPadrao
+        .json(`${r.id}/materias.json`)
+        .catch(() => undefined);
+      const lida = TabelaDeMaterias.safeParse(bruto?.dados);
+      const dados = lida.success && lida.data.recorte === r.id ? lida.data : undefined;
+      if (dados && tabelaServeAoEdital(dados, concurso)) {
+        return incidenciaDasMaterias(
+          dados,
+          vivas.map((d) => ({ disciplinaId: d.id, nome: d.nome })),
+        );
+      }
+    }
+  } catch {
+    // Local-first: o peso por incidência é um extra.
+  }
+  return new Map<string, IncidenciaDaMateria>();
+}
 
 /** Função estável (módulo): `useDados` recarrega sozinho a cada mudança no repositório. */
 export async function carregarCiclo(repo: Repositorio): Promise<DadosDoCiclo> {
@@ -56,15 +96,18 @@ export async function carregarCiclo(repo: Repositorio): Promise<DadosDoCiclo> {
     atual.erros += Math.max(0, s.questoesFeitas - (s.questoesAcertadas ?? 0));
     desempenho.set(d, atual);
   }
+  const incidencia = await incidenciaDoPlano(repo, vivas);
   const materias = vivas.map((d) => {
     const itensAltos = vivos.filter(
       (p) => p.disciplinaId === d.id && (p.faixa === 'altissima' || p.faixa === 'alta'),
     ).length;
     const des = desempenho.get(d.id);
+    const inc = incidencia.get(d.id);
     return {
       disciplinaId: d.id,
       nome: d.nome,
       itensAltos,
+      ...(inc ? { incidencia: inc.incidencia, incidenciaMedia: inc.mediaDasOutras } : {}),
       ...(des ? { desempenho: des } : {}),
     };
   });
