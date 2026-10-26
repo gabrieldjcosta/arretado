@@ -102,7 +102,9 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     // O art. 1º já está coberto; o próximo são os dois "cai muito" vizinhos.
     const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
     expect(ler).toHaveAttribute('href', `#/biblioteca/normas/${normaId}?ir=art3`);
-    expect(ler.parentElement).toHaveTextContent('Agora no mapa: cai muito, uns 2 min.');
+    expect(ler.parentElement).toHaveTextContent(
+      'Pelo mapa, o próximo trecho cai muito, cerca de 2 min.',
+    );
     expect(document.body.textContent).not.toMatch(/atrasad|pendente|dívida|faltam/i);
     // O "Continuar" segue onde a pessoa parou.
     expect(screen.getByRole('link', { name: 'Continuar' })).toHaveAttribute(
@@ -119,7 +121,7 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: 'Continuar' })).toBeInTheDocument();
     });
-    expect(screen.queryByText(/no mapa/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/do mapa|Pelo mapa/)).not.toBeInTheDocument();
   });
 
   it('depois do lote por tempo, entra só quando o trecho cabe no tempo que sobra', async () => {
@@ -131,17 +133,17 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     const usuario = abrirHoje(repo, fonte(ARQUIVOS));
     const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
     // Sem escolher o tempo, a folha dos cartões não traz o mapa.
-    expect(screen.queryByText(/no mapa/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/do mapa|Pelo mapa/)).not.toBeInTheDocument();
     // 5 min: 10 cartões levam os 5 min; o trecho de 2 min não cabe.
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
     await screen.findByText(/10 cartões, os mais perto de esquecer/);
-    expect(screen.queryByText(/no mapa/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/do mapa|Pelo mapa/)).not.toBeInTheDocument();
     // 10 min: os 12 cartões levam 6 min; sobram 4, e o trecho cabe.
     await usuario.click(within(quatro).getByRole('button', { name: '10 min' }));
     await screen.findByText(/12 cartões, os mais perto de esquecer/);
     const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
     expect(ler.parentElement).toHaveTextContent(
-      'Depois dos cartões, no mapa: cai muito, uns 2 min.',
+      'Sobra tempo para um trecho do mapa: cai muito, cerca de 2 min.',
     );
   });
 });

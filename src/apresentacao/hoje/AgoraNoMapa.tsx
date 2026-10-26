@@ -1,4 +1,5 @@
-// "Agora no mapa" no Hoje (AP-04): abaixo da folha, o próximo trecho que mais cai na norma que a
+// "Agora no mapa" no Hoje (AP-04; na tela, "Pelo mapa, o próximo trecho…", porque "Agora" já é o nome
+// da folha): abaixo da folha, o próximo trecho que mais cai na norma que a
 // pessoa está lendo, com a faixa e os minutos, e o toque que abre o Leitor nele. Depois do lote de
 // Cartões por tempo, só aparece quando o trecho cabe no tempo que sobra. Nada aqui cobra: sem arquivo
 // de incidência, sem rede na primeira vez ou com tudo o que cai já coberto, a linha não existe.
@@ -30,8 +31,10 @@ export function AgoraNoMapa({
     <p className="agora-no-mapa dica">
       <Icone nome="mapa" />
       <span>
-        {sobra === undefined ? 'Agora no mapa' : 'Depois dos cartões, no mapa'}:{' '}
-        {NOME_DA_CLASSE[trecho.classe]}, uns {String(trecho.minutos)} min.
+        {sobra === undefined
+          ? 'Pelo mapa, o próximo trecho'
+          : 'Sobra tempo para um trecho do mapa:'}{' '}
+        {NOME_DA_CLASSE[trecho.classe]}, cerca de {String(trecho.minutos)} min.
       </span>
       <Link
         to={`/biblioteca/normas/${normaId}?ir=${trecho.endereco}`}

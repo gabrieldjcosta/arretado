@@ -206,7 +206,7 @@ test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva
   await expect(agora.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
   // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º.
   const linha = page.locator('.agora-no-mapa');
-  await expect(linha).toContainText('Agora no mapa: cai muito, uns 1 min.');
+  await expect(linha).toContainText('Pelo mapa, o próximo trecho cai muito, cerca de 1 min.');
   const caixa = await linha.getByRole('link', { name: 'Ler art. 2º' }).boundingBox();
   expect(caixa?.height).toBeGreaterThanOrEqual(44);
   await expect(page.getByText(/atrasad|pendente|dívida|faltam/i)).toHaveCount(0);
