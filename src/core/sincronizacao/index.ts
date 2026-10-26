@@ -33,6 +33,13 @@ export {
   type Sincronizacao,
 } from './iniciar';
 export { CAMPOS_DO_APARELHO, COLECOES_SO_LOCAIS, ehSoLocal, sincroniza } from './politica';
+export {
+  CHAVE_PODA_LOCAL,
+  DIAS_DE_GUARDA_DO_LOG,
+  compactarLog,
+  podarLogLocal,
+  type CorteDaPoda,
+} from './poda-local';
 export { criarPosse, type EstadoDePosse, type OpcoesDePosse, type Posse } from './posse';
 export {
   CHAVE_PARADA_POR_VERSAO,

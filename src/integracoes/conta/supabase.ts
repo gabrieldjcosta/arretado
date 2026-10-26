@@ -281,6 +281,12 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
           }),
         );
       },
+      pontoDaPoda: async () => {
+        const dados = await lerOuFalhar<number>(() =>
+          this.cliente.schema('arretado').rpc('ponto_da_poda'),
+        );
+        return dados ?? 0;
+      },
       pedirPosse: async (aparelhoId, forcar) => {
         const r = await lerOuFalhar<RespostaDePosse>(() =>
           this.cliente.schema('arretado').rpc('pedir_posse', {

@@ -127,6 +127,7 @@ export class ServicoDeContaFalso implements ServicoDeConta {
       instantaneoInicio: () => Promise.resolve(0),
       puxarRegistros: () => Promise.resolve([]),
       registrarSincronia: () => Promise.resolve(),
+      pontoDaPoda: () => Promise.resolve(0),
       pedirPosse: (aparelhoId, forcar) => {
         if (this.falhaDePosse)
           return Promise.reject(new FalhaDeSincronizacao('Sem conexão.', false));

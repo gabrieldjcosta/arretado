@@ -7,6 +7,7 @@ export const RECEPCAO_VAZIA: Omit<ServidorDeSincronizacao, 'enviarLote'> = {
   instantaneoInicio: () => Promise.resolve(0),
   puxarRegistros: () => Promise.resolve([]),
   registrarSincronia: () => Promise.resolve(),
+  pontoDaPoda: () => Promise.resolve(0),
   pedirPosse: (aparelhoId) => Promise.resolve({ concedida: true, aparelho_id: aparelhoId }),
   soltarPosse: () => Promise.resolve(),
 };

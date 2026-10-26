@@ -451,6 +451,20 @@ async function retentarQuarentena(
 }
 
 /**
+ * A poda do servidor (B5) já tirou do log entradas acima de `cursor`? Então o log não basta: marca a
+ * recarga (sobrevive a uma queda) e a rodada refaz o estado a partir de `registros`.
+ */
+async function ficouAtrasDaPoda(
+  repo: Repositorio,
+  servidor: ServidorDeSincronizacao,
+  cursor: number,
+): Promise<boolean> {
+  if ((await servidor.pontoDaPoda()) <= cursor) return false;
+  await repo.db.meta.put({ chave: CHAVE_RECARGA_NECESSARIA, valor: true });
+  return true;
+}
+
+/**
  * Puxa e aplica o log do servidor acima do cursor. Falha de rede propaga (o agendador repete); o
  * cursor só anda depois de cada entrada ser tratada. Entrada de um app mais novo para a recepção.
  */
@@ -463,6 +477,13 @@ export async function receberNovidades(
   const tocadas = new Set<NomeColecao>();
   try {
     await retentarQuarentena(repo, servidor, ctx, resultado, tocadas);
+    // O ponto da poda é lido antes (aparelho que volta depois de muito tempo nem puxa o log com
+    // buracos) e depois (a poda semanal pode ter rodado no meio da puxada).
+    const antes = await lerSeqRecebido(repo);
+    if (await ficouAtrasDaPoda(repo, servidor, antes)) {
+      resultado.precisaRecarga = true;
+      return resultado;
+    }
     for (;;) {
       const cursor = await lerSeqRecebido(repo);
       const pagina = await servidor.puxarLog(cursor, TAMANHO_DA_PAGINA);
@@ -482,6 +503,7 @@ export async function receberNovidades(
       if (pagina.length < TAMANHO_DA_PAGINA) break;
     }
     await repo.db.meta.delete(CHAVE_PARADA_POR_VERSAO);
+    if (await ficouAtrasDaPoda(repo, servidor, antes)) resultado.precisaRecarga = true;
     return resultado;
   } finally {
     emitirTocadas(repo, tocadas);

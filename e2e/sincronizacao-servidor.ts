@@ -140,6 +140,8 @@ export class ServidorDeSincronizacaoFalso {
       }
       case 'registrar_sincronia':
         return null;
+      case 'ponto_da_poda':
+        return 0;
       case 'pedir_posse':
         return this.pedirPosse(String(c.aparelhoId), Boolean(c.forcar));
       case 'soltar_posse':
