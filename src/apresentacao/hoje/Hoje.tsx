@@ -16,6 +16,7 @@ import { TituloComMais } from '../componentes/TituloComMais';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
+import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
 import { Captura } from './Captura';
 import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
@@ -53,6 +54,7 @@ export function Hoje() {
       <RevisoesDoDia />
       <Captura />
       <LembreteDeBackup />
+      <AvisoDeAtualizacao />
       <EntradaDoDia retrato={hoje.retrato} />
     </>
   );

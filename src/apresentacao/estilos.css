@@ -561,6 +561,17 @@ button,
   --gutter: 1rem;
   --largura-casca: 900px;
   --abas-altura: env(safe-area-inset-bottom, 0px);
+  /* O foco por Tab ou por script não pode parar sob o cabeçalho preso nem sob as abas de baixo
+     (WCAG 2.4.11). O Leitor tem a folga dele embaixo (mais específica, adiante). */
+  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
+  scroll-padding-bottom: calc(var(--abas-altura) + 1rem);
+}
+
+/* O Leitor fica de fora: ele guarda a posição pela linha de leitura, e um recuo faria o foco ou o toque
+   perto da borda mover a página (a estrela, o filtro e a prévia deixavam de manter a linha no lugar). A
+   barra de baixo do celular tem o recuo dela, adiante. */
+:root[data-leitor] {
+  scroll-padding: 0;
 }
 
 @media (min-width: 700px) {
@@ -1445,30 +1456,6 @@ legend {
   padding: 0.25rem;
 }
 
-/* Versão nova pronta (AP-00): a mesma faixa do "sem conexão", com as duas ações ao lado do texto;
-   os botões mantêm o alvo de 44 px pela própria classe. */
-.faixa-atualizacao {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 0 0.75rem;
-  background: var(--aviso-fundo);
-  color: var(--aviso-texto);
-  font-size: 0.85rem;
-  padding: 0.25rem 1rem;
-}
-
-.faixa-atualizacao-acoes {
-  display: inline-flex;
-  gap: 0.25rem;
-}
-
-.faixa-atualizacao .botao-texto {
-  font-size: inherit;
-  color: inherit;
-}
-
 /* As camadas que flutuam (diálogo, bandeja do foco, menu Ajuda e dock do Leitor; D-D9, Q7) levam a linha
    da folha e nenhuma sombra: o contrato só dá profundidade à sombra dura do botão de dia; a camada se
    separa do que está atrás pela linha (e pelo fundo opaco), e o diálogo ainda pelo véu. */
@@ -2089,7 +2076,6 @@ a.item-norma strong {
 :root[data-modo-foco] .topo,
 :root[data-modo-foco] .areas,
 :root[data-modo-foco] .faixa-offline,
-:root[data-modo-foco] .faixa-atualizacao,
 :root[data-modo-foco] .rodape {
   display: none;
 }
@@ -3504,6 +3490,11 @@ dialog.dialogo-previa .linha-acoes button {
 
 .topo-drill .botao-texto {
   margin-inline-start: -0.75rem;
+}
+
+/* O "N de 8" do Ache o erro é um <p>: sem zerar a margem de baixo, o centro dele subia ao lado do "Sair". */
+.topo-drill p {
+  margin: 0;
 }
 
 .topo-drill .barra-fina {

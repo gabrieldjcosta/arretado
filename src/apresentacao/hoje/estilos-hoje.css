@@ -17,10 +17,16 @@
   min-height: 44px;
 }
 
-.lembrete-backup {
+.lembrete-backup,
+.aviso-de-atualizacao {
   margin: 0.75rem 0;
   font-size: 0.9rem;
   color: var(--texto-atenuado);
+}
+
+/* As duas escolhas andam juntas: quando não cabem ao lado do texto, vão as duas para a linha de baixo. */
+.aviso-de-atualizacao .acoes-do-aviso {
+  white-space: nowrap;
 }
 
 /* Os pontos do Dia (D-D7, P3): Leitura, Cartões e Frases, cada um um ponto de luz com o nome ao lado.
