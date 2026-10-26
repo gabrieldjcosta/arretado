@@ -33,6 +33,7 @@ import { useDados, useRepositorio } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
 import { indiceDaEstrutura, RAIZ } from '../estrutura';
 import { coberturaDaNorma, type CoberturaDaNorma } from './cobertura-da-norma';
+import { lembrarVisitaAoMapa } from './visita';
 import './mapa.css';
 
 /** O Mapa da norma (AP-04): a faixa de cada artigo, o que a pessoa já cobriu e por onde começar. */
@@ -225,6 +226,9 @@ function Mapa({
       ...(noTrecho(posicao) ? ['próximo trecho'] : []),
     ].join(', ');
 
+  useEffect(() => {
+    lembrarVisitaAoMapa();
+  }, []);
   const titulo = aberta.norma.tituloCurto;
   const recorte = mapa?.recorte;
   const q = escolhido === undefined ? undefined : quadrados[escolhido.posicao];
@@ -272,6 +276,31 @@ function Mapa({
           />
         </>
       )}
+      <ul className="mapa-legenda" aria-label="Legenda do mapa">
+        {CLASSES.map((classe: ClasseDoArtigo) => (
+          <li key={classe}>
+            <span className="mapa-quadrado" data-classe={classe} aria-hidden="true" />
+            {NOME_DA_CLASSE[classe]}
+          </li>
+        ))}
+        <li>
+          <span className="mapa-quadrado" data-classe="baixa" data-coberto="" aria-hidden="true" />
+          círculo: já cobri
+        </li>
+        <li>
+          <span className="mapa-quadrado" data-classe="alta" data-fora="" aria-hidden="true" />
+          esmaecido: fora de vigor
+        </li>
+        <li>
+          <span
+            className="mapa-quadrado"
+            data-classe="altissima"
+            data-proximo=""
+            aria-hidden="true"
+          />
+          próximo trecho
+        </li>
+      </ul>
       <div
         ref={grade}
         role="group"
@@ -312,27 +341,6 @@ function Mapa({
           </>
         )}
       </p>
-      <ul className="mapa-legenda" aria-label="Legenda do mapa">
-        {CLASSES.map((classe: ClasseDoArtigo) => (
-          <li key={classe}>
-            <span className="mapa-quadrado" data-classe={classe} aria-hidden="true" />
-            {NOME_DA_CLASSE[classe]}
-          </li>
-        ))}
-        <li>
-          <span className="mapa-quadrado" data-classe="alta" data-coberto="" aria-hidden="true" />
-          já cobri
-        </li>
-        <li>
-          <span
-            className="mapa-quadrado"
-            data-classe="altissima"
-            data-proximo=""
-            aria-hidden="true"
-          />
-          próximo trecho
-        </li>
-      </ul>
       <p className="dica">
         Ordem de leitura, não previsão: quando uma questão cobre vários artigos, o peso se divide
         entre eles. Cobrir é ler até um ponto, ou deixar grifo, nota, Estrela ou Erro no artigo.

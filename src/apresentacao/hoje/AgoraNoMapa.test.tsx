@@ -100,7 +100,7 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     abrirHoje(repo, fonte(ARQUIVOS));
     await screen.findByRole('heading', { name: 'Continuar a leitura' });
     // O art. 1º já está coberto; o próximo são os dois "cai muito" vizinhos.
-    const ler = await screen.findByRole('link', { name: 'Ler Arts. 3º a 4º' });
+    const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
     expect(ler).toHaveAttribute('href', `#/biblioteca/normas/${normaId}?ir=art3`);
     expect(ler.parentElement).toHaveTextContent('Agora no mapa: cai muito, uns 2 min.');
     expect(document.body.textContent).not.toMatch(/atrasad|pendente|dívida|faltam/i);
@@ -139,7 +139,7 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     // 10 min: os 12 cartões levam 6 min; sobram 4, e o trecho cabe.
     await usuario.click(within(quatro).getByRole('button', { name: '10 min' }));
     await screen.findByText(/12 cartões, os mais perto de esquecer/);
-    const ler = await screen.findByRole('link', { name: 'Ler Arts. 3º a 4º' });
+    const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
     expect(ler.parentElement).toHaveTextContent(
       'Depois dos cartões, no mapa: cai muito, uns 2 min.',
     );

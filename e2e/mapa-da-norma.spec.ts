@@ -169,7 +169,7 @@ test('mapa: a chamada no Leitor, os quadrados por faixa, o próximo trecho e a v
 
   // O próximo trecho: o primeiro "cai muito" livre (art. 2º), só ele (o 3º é "cai às vezes").
   const agora = page.getByRole('region', { name: 'Agora' });
-  await expect(agora.getByRole('heading', { name: 'Ler Art. 2º' })).toBeVisible();
+  await expect(agora.getByRole('heading', { name: 'Ler art. 2º' })).toBeVisible();
   await expect(agora).toContainText('Do objeto e da aplicação · cai muito');
   await expect(agora).toContainText('cerca de 1 min');
   await semViolacoes(page);
@@ -207,11 +207,11 @@ test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva
   // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º.
   const linha = page.locator('.agora-no-mapa');
   await expect(linha).toContainText('Agora no mapa: cai muito, uns 1 min.');
-  const caixa = await linha.getByRole('link', { name: 'Ler Art. 2º' }).boundingBox();
+  const caixa = await linha.getByRole('link', { name: 'Ler art. 2º' }).boundingBox();
   expect(caixa?.height).toBeGreaterThanOrEqual(44);
   await expect(page.getByText(/atrasad|pendente|dívida|faltam/i)).toHaveCount(0);
   await semViolacoes(page);
-  await linha.getByRole('link', { name: 'Ler Art. 2º' }).click();
+  await linha.getByRole('link', { name: 'Ler art. 2º' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await expect(page.locator('[data-endereco="art2"]')).toBeInViewport();
 });

@@ -90,9 +90,19 @@
   border-radius: 50%;
 }
 
-/* O próximo trecho: o halo do marca-texto por fora, como atrás do ponto de "onde parei". */
+/* O próximo trecho: o desenho do ponto de luz, o halo do marca-texto e, por fora, o contorno de tinta.
+   A lima de dia tem 1,07:1 contra o papel; sem o contorno, em tons de cinza o trecho sumiria. */
 .mapa-quadrado[data-proximo] {
-  box-shadow: 0 0 0 3px var(--ponto-halo);
+  box-shadow:
+    0 0 0 2px var(--ponto-halo),
+    0 0 0 3px var(--ponto-contorno);
+}
+
+/* O foco das setas nunca fica sob o cabeçalho preso nem sob as abas e a barra do escolhido
+   (WCAG 2.4.11); scroll-margin nos quadrados não bastou. */
+:root:has(.mapa-da-norma) {
+  scroll-padding-top: 4.5rem;
+  scroll-padding-bottom: calc(var(--abas-altura) + 5.5rem);
 }
 
 .mapa-quadrado:focus-visible {
@@ -105,10 +115,24 @@
   outline-offset: 1px;
 }
 
-/* O artigo escolhido em palavras, sempre com lugar (a linha não pula quando aparece). */
+/* O artigo escolhido em palavras: a grade passa de uma tela, então a barra fica presa logo acima das
+   abas, onde o toque a vê; vazia, não ocupa lugar. */
 .mapa-escolhido {
+  position: sticky;
+  bottom: var(--abas-altura);
+  z-index: 1;
   min-height: 1.75rem;
   margin: 0 0 0.75rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--contorno);
+  background: var(--superficie);
+}
+
+.mapa-escolhido:empty {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .mapa-escolhido .botao-texto {
@@ -142,7 +166,9 @@
 }
 
 .mapa-legenda .mapa-quadrado[data-proximo] {
-  box-shadow: 0 0 0 2px var(--ponto-halo);
+  box-shadow:
+    0 0 0 1.5px var(--ponto-halo),
+    0 0 0 2.5px var(--ponto-contorno);
 }
 
 /* Cores forçadas: o fundo some; o contorno e as hachuras pedem a cor do sistema. */
@@ -158,6 +184,8 @@
   }
 
   .mapa-quadrado[data-proximo] {
-    box-shadow: 0 0 0 3px Highlight;
+    box-shadow:
+      0 0 0 2px Highlight,
+      0 0 0 3px CanvasText;
   }
 }

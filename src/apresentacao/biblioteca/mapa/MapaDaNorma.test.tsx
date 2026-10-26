@@ -129,7 +129,7 @@ describe('Mapa da norma', () => {
     ).toBeInTheDocument();
     // O próximo trecho: os dois "cai muito" vizinhos, mesmo cruzando o capítulo.
     const agora = screen.getByRole('region', { name: 'Agora' });
-    expect(within(agora).getByRole('heading', { name: 'Ler Arts. 2º a 3º' })).toBeInTheDocument();
+    expect(within(agora).getByRole('heading', { name: 'Ler arts. 2º a 3º' })).toBeInTheDocument();
     expect(agora).toHaveTextContent('cai muito');
     expect(agora).toHaveTextContent('cerca de 2 min');
     expect(within(agora).getByRole('link', { name: 'Começar' })).toHaveAttribute(
@@ -140,7 +140,7 @@ describe('Mapa da norma', () => {
     expect(quadrados[1]).toHaveAttribute('tabindex', '0');
     expect(quadrados[0]).toHaveAttribute('tabindex', '-1');
     expect(screen.getByRole('list', { name: 'Legenda do mapa' })).toHaveTextContent(
-      'cai muitocaicai às vezesrarosem questãojá cobripróximo trecho',
+      'cai muitocaicai às vezesrarosem questãocírculo: já cobriesmaecido: fora de vigorpróximo trecho',
     );
   });
 
@@ -174,7 +174,7 @@ describe('Mapa da norma', () => {
     expect(quadrados[0]).toHaveAttribute('data-coberto');
     // Pela massa: 1 + 3 de 6.
     expect(screen.getByText(/Você cobriu/)).toHaveTextContent('Você cobriu 67%');
-    expect(screen.getByRole('heading', { name: 'Ler Art. 3º' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ler art. 3º' })).toBeInTheDocument();
 
     // Tocar num quadrado diz o artigo em palavras, com a rubrica, e leva ao Leitor.
     await usuario.click(quadrados[0]!);
