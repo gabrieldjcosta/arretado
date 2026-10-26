@@ -13,6 +13,7 @@ import {
   type ReferenciaDeAcervo,
 } from './lote-acervo';
 import { CHAVE_MIGRACAO_FRASES, migrarFrasesDosErros } from './migracao-frases';
+import { NOME_PADRAO_ANTIGO, nomeDaPlataforma, plataformaAtual } from './aparelho';
 
 interface Identidade {
   usuarioId: string;
@@ -168,6 +169,7 @@ export class Repositorio {
     if (ultima) relogio.observar(ultima.ts);
     const repo = new Repositorio({ ...base, ...identidade, relogio });
     if (!(await db.meta.get(CHAVE_MIGRACAO_FRASES))) await migrarFrasesDosErros(repo);
+    await nomearAparelhoPelaPlataforma(repo);
     return repo;
   }
 
@@ -177,7 +179,7 @@ export class Repositorio {
    */
   private static async criarIdentidade(
     base: Pick<Contexto, 'db' | 'eventos' | 'agora' | 'novoId' | 'trava'>,
-    nomeAparelho = 'Este aparelho',
+    nomeAparelho?: string,
     usuarioId?: string,
   ): Promise<Identidade> {
     const candidata: Identidade = {
@@ -192,12 +194,13 @@ export class Repositorio {
       await repo
         .colecao('usuarios')
         .criar({ consentimentos: [] }, { id: candidata.usuarioId, origem: 'sistema' });
-      await repo
-        .colecao('aparelhos')
-        .criar(
-          { nome: nomeAparelho, plataforma: plataformaAtual() },
-          { id: candidata.aparelhoId, origem: 'sistema' },
-        );
+      await repo.colecao('aparelhos').criar(
+        {
+          nome: nomeAparelho ?? nomeDaPlataforma(plataformaAtual()),
+          plataforma: plataformaAtual(),
+        },
+        { id: candidata.aparelhoId, origem: 'sistema' },
+      );
       await repo.colecao('preferencias').criar(PREFERENCIAS_PADRAO, { origem: 'sistema' });
       await repo.db.meta.put({ chave: 'identidade', valor: candidata });
       return candidata;
@@ -205,7 +208,15 @@ export class Repositorio {
   }
 }
 
-function plataformaAtual(): string {
-  const ua = typeof navigator === 'undefined' ? 'desconhecida' : navigator.userAgent;
-  return ua.slice(0, 200) || 'desconhecida';
+/**
+ * O aparelho atual que ainda se chama "Este aparelho" (nome padrão até o B4) passa a chamar-se pela
+ * plataforma. Escrita normal (entra no log e sincroniza); nome dado pela pessoa fica como está. Uma
+ * leitura por abertura, sem marca na `meta` (as subidas de esquema conferem a `meta` inteira).
+ */
+async function nomearAparelhoPelaPlataforma(repo: Repositorio): Promise<void> {
+  const aparelhos = repo.colecao('aparelhos');
+  const atual = await aparelhos.obter(repo.ctx.aparelhoId);
+  if (atual && atual.nome === NOME_PADRAO_ANTIGO) {
+    await aparelhos.atualizar(atual.id, { nome: nomeDaPlataforma(atual.plataforma) });
+  }
 }
