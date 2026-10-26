@@ -21,6 +21,8 @@ export interface EstadoDaTelaDeSincronizacao {
   emQuarentena: number;
   ultimaRodada: RodadaVista | null;
   posse: EstadoDePosse;
+  /** Última escrita recusada pela trava (ms); a faixa de posse avisa por alguns segundos. */
+  bloqueioEm: number | null;
 }
 
 export interface ControleDeSincronizacao {

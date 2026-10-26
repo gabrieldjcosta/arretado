@@ -10,6 +10,8 @@ export interface SinaisDeSincronizacao {
   ultimaRodada: { ok: boolean; em: string } | null;
   /** Conflitos abertos em Conta › Conflitos. */
   conflitos: number;
+  /** Entradas recebidas que não puderam ser aplicadas; com elas este aparelho não está igual. */
+  emQuarentena?: number;
 }
 
 export const ROTULO_DO_ESTADO: Record<EstadoDaSincronizacao, string> = {
@@ -20,11 +22,12 @@ export const ROTULO_DO_ESTADO: Record<EstadoDaSincronizacao, string> = {
 
 /**
  * `salvo`: há o que enviar. `igual`: nada a enviar, a última rodada recebeu tudo e não há Conflito
- * esperando a pessoa. `enviado`: tudo subiu, mas não dá para afirmar que este aparelho já tem o
- * dos outros (rodada que falhou, ainda nenhuma rodada, ou Conflito aberto).
+ * esperando a pessoa nem entrada em quarentena. `enviado`: tudo subiu, mas não dá para afirmar que
+ * este aparelho já tem o dos outros (rodada que falhou, ainda nenhuma rodada, Conflito aberto ou
+ * mudança recebida que ficou de lado).
  */
 export function estadoDaSincronizacao(s: SinaisDeSincronizacao): EstadoDaSincronizacao {
   if (s.pendentes > 0) return 'salvo';
-  if (s.ultimaRodada?.ok && s.conflitos === 0) return 'igual';
+  if (s.ultimaRodada?.ok && s.conflitos === 0 && (s.emQuarentena ?? 0) === 0) return 'igual';
   return 'enviado';
 }

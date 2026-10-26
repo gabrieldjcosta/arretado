@@ -33,6 +33,12 @@ export async function restaurarSessao(repo: Repositorio): Promise<Sessao | undef
     if (s.data < hoje || escolhida) {
       // Fecha como interrompida a de outro dia e as repetidas (sobra de abas ou de falha antiga).
       const pausas = s.pausas.map((p) => (p.fim ? p : { ...p, fim: p.inicio }));
+      // Outro aparelho está editando (posse, D17): a tela só lê e não acende o aviso de bloqueio; a
+      // sobra fecha quando a posse voltar.
+      if (
+        !repo.escritaPermitida({ colecao: 'sessoes', operacao: 'atualizar', dados: { estado: 1 } })
+      )
+        continue;
       await repo.colecao('sessoes').atualizar(s.id, { estado: 'interrompida', pausas });
       repo.eventos.emitir('sessao.interrompida', { sessaoId: s.id });
     } else escolhida = s;
