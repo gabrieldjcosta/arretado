@@ -1,5 +1,6 @@
-// Conta › Conflitos (F4-B, B4; plano §5): as duas versões lado a lado, campos diferentes em
-// destaque, e três escolhas: Ficar com a daqui / Ficar com a de lá / Escolher campo a campo.
+// Conta › Conflitos (F4-B, B4; plano §5): as duas versões lado a lado, só os campos que diferem
+// (os iguais ficam recolhidos), nomes e valores em palavras, e três escolhas: Ficar com a deste
+// Aparelho / Ficar com a do outro (pelo nome) / Escolher campo a campo.
 // A escolha vira uma entrada normal do log (resolver.ts); o registro local fica como está até ela.
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router';
@@ -14,20 +15,12 @@ import {
 import { ROTULO_COLECAO } from '../conta/dados/rotulos';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { formatarQuando } from '../recall/rotulos';
+import { rotuloDoCampo, valorEmTexto } from './campos';
 import { useSincronizacao } from './contexto';
 import './estilos-sincronizacao.css';
 
 /** Campos que a pessoa não escolhe: identidade e carimbos do sistema. */
 const OCULTOS = new Set(['id', 'usuarioId', 'criadoEm', 'atualizadoEm', 'tsLogico', 'origem']);
-
-function valorEmTexto(v: unknown): string {
-  if (v === undefined) return '(sem valor)';
-  if (v === null) return '(vazio)';
-  if (typeof v === 'string') return v;
-  if (typeof v === 'boolean') return v ? 'sim' : 'não';
-  if (typeof v === 'number') return String(v);
-  return JSON.stringify(v);
-}
 
 type Lado = 'daqui' | 'de-la';
 
@@ -48,24 +41,35 @@ function Versao({
       </div>
     );
   }
-  const campos = Object.keys(registro).filter((k) => !OCULTOS.has(k));
+  const iguais = Object.keys(registro).filter((k) => !OCULTOS.has(k) && !diferentes.includes(k));
   return (
     <div className="versao-conflito">
       <h3>{titulo}</h3>
       <dl>
-        {campos.map((k) => (
-          <div key={k} className={diferentes.includes(k) ? 'campo-diferente' : undefined}>
-            <dt>{k}</dt>
+        {diferentes.map((k) => (
+          <div key={k} className="campo-diferente">
+            <dt>{rotuloDoCampo(k)}</dt>
             <dd>
-              {diferentes.includes(k) ? (
-                <mark>{valorEmTexto(registro[k])}</mark>
-              ) : (
-                valorEmTexto(registro[k])
-              )}
+              <mark>{valorEmTexto(registro[k])}</mark>
             </dd>
           </div>
         ))}
       </dl>
+      {iguais.length > 0 && (
+        <details className="campos-iguais">
+          <summary>
+            {iguais.length === 1 ? '1 campo igual' : `${String(iguais.length)} campos iguais`}
+          </summary>
+          <dl>
+            {iguais.map((k) => (
+              <div key={k}>
+                <dt>{rotuloDoCampo(k)}</dt>
+                <dd>{valorEmTexto(registro[k])}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
     </div>
   );
 }
@@ -113,9 +117,9 @@ function ItemDeConflito({
         <p>Você apagou aqui; o outro Aparelho mudou.</p>
       )}
       <div className="lado-a-lado">
-        <Versao titulo="A daqui" registro={conflito.minha} diferentes={diferentes} />
+        <Versao titulo="A deste Aparelho" registro={conflito.minha} diferentes={diferentes} />
         <Versao
-          titulo={`A de lá (${nomeDoAparelho})`}
+          titulo={`A do ${nomeDoAparelho}`}
           registro={conflito.deles}
           diferentes={diferentes}
         />
@@ -126,7 +130,7 @@ function ItemDeConflito({
           <legend>Para cada campo, qual versão fica?</legend>
           {diferentes.map((k) => (
             <div key={k} className="escolha-de-campo">
-              <span className="nome-do-campo">{k}</span>
+              <span className="nome-do-campo">{rotuloDoCampo(k)}</span>
               {(['daqui', 'de-la'] as const).map((lado) => (
                 <label key={lado} className="opcao">
                   <input
@@ -137,7 +141,7 @@ function ItemDeConflito({
                       setPorCampo((p) => ({ ...p, [k]: lado }));
                     }}
                   />
-                  {lado === 'daqui' ? 'A daqui' : 'A de lá'}
+                  {lado === 'daqui' ? 'Deste Aparelho' : `Do ${nomeDoAparelho}`}
                 </label>
               ))}
             </div>
@@ -192,7 +196,7 @@ function ItemDeConflito({
                 void resolver({ tipo: 'daqui' });
               }}
             >
-              Ficar com a daqui
+              Ficar com a deste Aparelho
             </button>
             <button
               type="button"
@@ -202,7 +206,7 @@ function ItemDeConflito({
                 void resolver({ tipo: 'de-la' });
               }}
             >
-              Ficar com a de lá
+              Ficar com a do {nomeDoAparelho}
             </button>
             {conflito.minha !== null && conflito.deles !== null && diferentes.length > 1 && (
               <button

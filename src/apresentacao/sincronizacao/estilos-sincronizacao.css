@@ -100,6 +100,17 @@
   border-radius: 2px;
 }
 
+.campos-iguais {
+  margin-top: 0.5rem;
+}
+
+.campos-iguais > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--texto-suave, var(--texto));
+  min-height: 24px;
+}
+
 .campo-a-campo {
   border: 1px solid var(--borda);
   border-radius: var(--raio-campo);
