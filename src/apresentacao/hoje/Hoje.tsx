@@ -41,7 +41,7 @@ export function Hoje() {
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
           <LeiMudouNoHoje />
-          <GuiaDaTela tela="hoje" />
+          {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
           <Depois

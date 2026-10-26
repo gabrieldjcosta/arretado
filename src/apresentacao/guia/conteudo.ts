@@ -1,56 +1,86 @@
-// Guia da primeira abertura de cada área: o que cada opção faz, em linhas curtas. Vocabulário
-// canônico; nada que soe como cobrança. Mudou o texto de uma tela: suba `versao` dela.
+// Guia da primeira abertura de cada área: só o estado vazio, e cada linha começa pelo rótulo exato de
+// um controle que está na tela. Vocabulário canônico; nada que soe como cobrança. Mudou o texto de
+// uma tela: suba `versao` dela.
 
 export type TelaComGuia = 'hoje' | 'plano' | 'recall' | 'biblioteca';
 
 export interface Guia {
-  titulo: string;
   /** Muda quando o conteúdo muda de forma que valha mostrar de novo. */
   versao: number;
   linhas: { opcao: string; efeito: string }[];
 }
 
+export const TITULO_DO_GUIA = 'O que cada opção faz';
+
 export const GUIAS: Record<TelaComGuia, Guia> = {
   hoje: {
-    titulo: 'O que cada opção faz',
-    versao: 1,
+    versao: 2,
     linhas: [
-      { opcao: 'Botão grande', efeito: 'abre a próxima ação do seu Dia. Uma só, sem lista.' },
-      { opcao: 'Em seguida', efeito: 'mostra o que vem depois; “Trocar” escolhe outra.' },
+      {
+        opcao: 'Escolher meu concurso',
+        efeito: 'você diz qual concurso estuda e o app traz as normas com que ele começa.',
+      },
       { opcao: '+', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
-      { opcao: 'Pontos do Dia', efeito: 'acendem sozinhos quando você lê, revisa ou fixa.' },
+      {
+        opcao: 'Leitura · Cartões · Frases',
+        efeito: 'acendem sozinhos quando você lê, revisa ou fixa.',
+      },
+      { opcao: 'Para lembrar', efeito: 'uma nota sobre o que fazer fora do app.' },
     ],
   },
   plano: {
-    titulo: 'O que cada opção faz',
-    versao: 1,
+    versao: 2,
     linhas: [
-      { opcao: 'Montar pelo catálogo', efeito: 'você escolhe um concurso e os Pontos já vêm.' },
-      { opcao: 'Trazer meu edital', efeito: 'importa suas disciplinas e Pontos.' },
-      { opcao: 'Pontos', efeito: 'servem para ligar cada Erro ao assunto do edital.' },
+      {
+        opcao: 'Informar a data da prova',
+        efeito:
+          'opcional. O app deixa de marcar Revisão depois dela e faz uma passada final pelos Pontos mais cobrados.',
+      },
+      {
+        opcao: 'Montar pelo catálogo',
+        efeito:
+          'uma pergunta por tela, da carreira às matérias; você vê a prévia antes de os Pontos entrarem e pode desfazer.',
+      },
+      {
+        opcao: 'Trazer meu edital',
+        efeito:
+          'leva ao formulário abaixo, para importar disciplinas e Pontos por planilha (CSV) ou colando a tabela que uma IA gerou.',
+      },
+      {
+        opcao: 'Não sabe montar a planilha?',
+        efeito: 'copia um pedido pronto para você colar numa IA junto com o texto do edital.',
+      },
     ],
   },
   recall: {
-    titulo: 'O que cada opção faz',
-    versao: 1,
+    versao: 2,
     linhas: [
-      { opcao: 'Começar', efeito: 'abre a Revisão de hoje: Cartões e Frases, até a cota.' },
       {
         opcao: 'Registrar erro',
         efeito: 'guarda a Frase correta; o Cartão só nasce se você quiser.',
       },
       { opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' },
-      { opcao: 'Ache o erro', efeito: 'uma rodada com trechos trocados no texto da lei.' },
+      {
+        opcao: 'Ver os erros, com filtros',
+        efeito: 'a lista dos Erros que você registrou.',
+      },
     ],
   },
   biblioteca: {
-    titulo: 'O que cada opção faz',
-    versao: 1,
+    versao: 2,
     linhas: [
-      { opcao: 'Abrir uma Norma', efeito: 'lê por Dispositivo e lembra até onde você leu.' },
-      { opcao: 'Estrela', efeito: 'marca um Dispositivo para achar de novo.' },
-      { opcao: 'Buscar norma', efeito: 'procura no acervo e adiciona à sua Biblioteca.' },
-      { opcao: 'Súmulas · Teses · Resumos · Precedentes', efeito: 'as abas do alto.' },
+      {
+        opcao: 'Escolher meu concurso',
+        efeito: 'o app traz as normas com que ele começa.',
+      },
+      {
+        opcao: 'Escolher no acervo',
+        efeito: 'abre o acervo para você adicionar normas à sua Biblioteca.',
+      },
+      {
+        opcao: 'Importar norma',
+        efeito: 'você cola a lei do site oficial e o app separa artigos, parágrafos e incisos.',
+      },
     ],
   },
 };

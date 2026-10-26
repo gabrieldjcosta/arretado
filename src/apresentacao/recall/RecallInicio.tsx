@@ -71,6 +71,7 @@ export function RecallInicio() {
           para="/recall/registrar"
         />
       )}
+      {dados?.primeiroUso && <GuiaDaTela tela="recall" />}
       <p className="dica">
         <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no texto
         da lei (piloto).
@@ -104,7 +105,6 @@ export function RecallInicio() {
           </button>
         </p>
       )}
-      <GuiaDaTela tela="recall" />
       <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
         <AbaDoRecall para="/recall/frases" rotulo="Frases" />
         <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />

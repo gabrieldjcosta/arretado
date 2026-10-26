@@ -69,7 +69,7 @@ export function MenuAjuda({
                 aoGuia();
               }}
             >
-              Ver o guia desta tela
+              O que cada opção faz
             </button>
           )}
           <button

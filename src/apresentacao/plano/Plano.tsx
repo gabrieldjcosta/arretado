@@ -31,7 +31,6 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
-      <GuiaDaTela tela="plano" />
       <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
@@ -63,6 +62,7 @@ export function Plano() {
               </a>
             </div>
           </Vazio>
+          <GuiaDaTela tela="plano" />
           <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
       ) : (

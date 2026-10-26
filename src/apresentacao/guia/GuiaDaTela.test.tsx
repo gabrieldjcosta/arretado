@@ -28,15 +28,23 @@ describe('Guia da primeira abertura', () => {
   });
 
   it('não volta depois de visto e reabre pelo menu Ajuda', async () => {
-    localStorage.setItem('arretado.guia.hoje', '1');
+    localStorage.setItem('arretado.guia.hoje', '2');
     const usuario = await abrir('#/');
     await screen.findByRole('heading', { name: 'Hoje' });
     expect(screen.queryByRole('heading', { name: 'O que cada opção faz' })).toBeNull();
     await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
-    await usuario.click(screen.getByRole('button', { name: 'Ver o guia desta tela' }));
+    await usuario.click(screen.getByRole('button', { name: 'O que cada opção faz' }));
     expect(
       await screen.findByRole('heading', { name: 'O que cada opção faz' }),
     ).toBeInTheDocument();
+  });
+
+  it('sair da tela sem o cartão ter sido visto não gasta o guia', async () => {
+    const usuario = await abrir('#/');
+    await screen.findByRole('heading', { name: 'O que cada opção faz' });
+    await usuario.click(screen.getByRole('link', { name: /Biblioteca/ }));
+    await screen.findByRole('heading', { name: 'Biblioteca' });
+    expect(localStorage.getItem('arretado.guia.hoje')).toBeNull();
   });
 
   it('cada área tem o seu guia; telas de trabalho não têm', () => {

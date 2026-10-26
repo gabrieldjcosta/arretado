@@ -1,20 +1,37 @@
 /* Guia da primeira abertura: cartão quieto na própria tela (D-D9), sem sombra nem animação. */
 .guia-da-tela {
   margin: 1rem 0;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem 0.75rem;
   background: var(--superficie);
   border: 1px solid var(--borda);
-  border-left: 3px solid var(--borda-forte);
+  border-left: 3px solid var(--borda);
   border-radius: var(--raio-folha);
 }
 
+.guia-cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 0.5rem;
+}
+
 .guia-da-tela h2 {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 1rem;
 }
 
+.guia-da-tela h2:focus-visible {
+  outline-offset: 2px;
+}
+
+/* O rótulo do botão alinha com a borda direita do texto, mantendo o alvo de 44 px. */
+.guia-cabeca .discreto {
+  margin-right: -0.75rem;
+}
+
 .guia-da-tela dl {
-  margin: 0 0 0.5rem;
+  margin: 0;
   display: grid;
   gap: 0.4rem;
 }

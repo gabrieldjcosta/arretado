@@ -346,7 +346,6 @@ export function Normas() {
     <>
       <h1>Biblioteca</h1>
       <AbasDaBiblioteca atual="norma" />
-      <GuiaDaTela tela="biblioteca" />
       {aviso && (
         <p role="status" className="sucesso">
           {aviso}
@@ -397,29 +396,32 @@ export function Normas() {
             </section>
           )}
           {dados.normas.length === 0 ? (
-            <Vazio
-              titulo="Nenhuma norma ainda"
-              acao={
-                <>
-                  {doEdital(edital, true)}
-                  {!edital && (
-                    <Link to="/comecar" className="botao principal">
-                      Escolher meu concurso
-                    </Link>
-                  )}
-                  {doAcervo('Escolher no acervo')}
-                  {importar(false)}
-                </>
-              }
-            >
-              <p>
-                {edital
-                  ? 'Adicione as normas do edital de uma vez, ou cole'
-                  : 'Escolha normas no acervo, ou cole'}{' '}
-                a lei do site oficial: o Arretado separa artigos, parágrafos e incisos para você ler
-                e marcar.
-              </p>
-            </Vazio>
+            <>
+              <Vazio
+                titulo="Nenhuma norma ainda"
+                acao={
+                  <>
+                    {doEdital(edital, true)}
+                    {!edital && (
+                      <Link to="/comecar" className="botao principal">
+                        Escolher meu concurso
+                      </Link>
+                    )}
+                    {doAcervo('Escolher no acervo')}
+                    {importar(false)}
+                  </>
+                }
+              >
+                <p>
+                  {edital
+                    ? 'Adicione as normas do edital de uma vez, ou cole'
+                    : 'Escolha normas no acervo, ou cole'}{' '}
+                  a lei do site oficial: o Arretado separa artigos, parágrafos e incisos para você
+                  ler e marcar.
+                </p>
+              </Vazio>
+              <GuiaDaTela tela="biblioteca" omitir={edital ? ['Escolher meu concurso'] : []} />
+            </>
           ) : (
             <>
               {dados.continuar && (
