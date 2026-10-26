@@ -134,7 +134,7 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = '';
     });
-    await page.getByRole('button', { name: 'Ficar com a daqui' }).click();
+    await page.getByRole('button', { name: 'Ficar com a deste Aparelho' }).click();
     await expect(page.getByText('Nenhum Conflito. Seus Aparelhos concordam.')).toBeVisible();
 
     // A escolha chega a B: o perfil Guiado passa a valer lá também.
