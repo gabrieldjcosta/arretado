@@ -1,24 +1,28 @@
 /* Sincronização e Conflitos (F4-B, B4). Só tokens existentes; alvos ≥ 44 px vêm de .botao; contraste AA nos dois mundos. */
 
+/* A faixa de posse: uma linha quando cabe (o texto e o botão de texto de 44 px ao lado, a 390 px) e,
+   quando não, o botão desce sob o texto. Mesmo ritmo da faixa de sem conexão, que fica logo acima. O
+   botão é o `.discreto` (sublinhado, herda a cor do aviso); com contorno e largura inteira a faixa
+   passava de 100 px. */
 .faixa-posse {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem 1rem;
+  gap: 0 0.75rem;
   background: var(--aviso-fundo);
   color: var(--aviso-texto);
   font-size: 0.9rem;
-  padding: 0.35rem 1rem;
+  padding: 0.25rem 1rem;
+  text-align: center;
+}
+
+.faixa-posse span {
+  text-wrap: balance;
 }
 
 .faixa-posse-alerta span {
   font-weight: 600;
-}
-
-.faixa-posse .botao {
-  color: inherit;
-  border-color: currentcolor;
 }
 
 .estado-sync {

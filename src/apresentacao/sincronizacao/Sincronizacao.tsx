@@ -286,6 +286,13 @@ export function Sincronizacao() {
             : 'Ainda não sincronizou nesta abertura.'}
           {!conectado && ' Sem conexão: o envio espera a rede.'}
         </p>
+        {estado.ultimaRodada && !estado.ultimaRodada.ok && (
+          <p className="aviso" role="status">
+            Problema na última tentativa
+            {estado.ultimaRodada.falha ? `: ${estado.ultimaRodada.falha}` : ''}. O app tenta de novo
+            sozinho.
+          </p>
+        )}
         <div className="linha-acoes">
           <button
             type="button"
@@ -318,16 +325,14 @@ export function Sincronizacao() {
                   void editarAqui();
                 }}
               >
-                {editando ? 'Passando…' : 'Editar neste aparelho'}
+                {editando ? 'Passando…' : 'Passar a editar aqui'}
               </button>
             </div>
           </>
         )}
       </section>
 
-      {(estado.conflitos > 0 ||
-        estado.emQuarentena > 0 ||
-        (estado.ultimaRodada && !estado.ultimaRodada.ok)) && (
+      {(estado.conflitos > 0 || estado.emQuarentena > 0) && (
         <section className="cartao-bloco" aria-labelledby="t-problemas-sync">
           <h2 id="t-problemas-sync">Precisa de você</h2>
           {estado.conflitos > 0 && (
@@ -343,16 +348,9 @@ export function Sincronizacao() {
           {estado.emQuarentena > 0 && (
             <p>
               {estado.emQuarentena === 1
-                ? '1 mudança recebida ficou de lado'
-                : `${String(estado.emQuarentena)} mudanças recebidas ficaram de lado`}{' '}
-              (Problema: o app não conseguiu aplicá-las). Atualizar o app costuma resolver; nada foi
-              perdido.
-            </p>
-          )}
-          {estado.ultimaRodada && !estado.ultimaRodada.ok && (
-            <p className="aviso" role="status">
-              Problema na última tentativa: {estado.ultimaRodada.falha ?? 'sem detalhe'}. O app
-              tenta de novo sozinho.
+                ? '1 mudança recebida ficou de lado (Problema: o app não conseguiu aplicá-la).'
+                : `${String(estado.emQuarentena)} mudanças recebidas ficaram de lado (Problema: o app não conseguiu aplicá-las).`}{' '}
+              Atualizar o app costuma resolver; nada foi perdido.
             </p>
           )}
         </section>

@@ -3,6 +3,7 @@
 // Uma escrita recusada pela trava muda a faixa para alerta por alguns segundos: é o aviso comum
 // das telas que gravam (nenhuma trata `EscritaBloqueada` por conta própria).
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useConectado } from '../componentes/conexao';
 import { useSincronizacao } from './contexto';
 import { AVISO_DA_POSSE, AVISO_DE_BLOQUEIO } from './rotulos';
@@ -13,6 +14,7 @@ export const ALERTA_DE_BLOQUEIO_MS = 6_000;
 export function AvisoDePosse() {
   const sync = useSincronizacao();
   const conectado = useConectado();
+  const { pathname } = useLocation();
   const [passando, setPassando] = useState(false);
   const bloqueioEm = sync?.estado.bloqueioEm ?? null;
   // Guarda qual recusa já expirou; o timer só marca a expiração (nada de relógio na renderização).
@@ -34,6 +36,9 @@ export function AvisoDePosse() {
   // Sem rede, "de outro" não trava nada (Q1): o aviso é o de sem confirmação.
   const soLeitura = posse.tipo === 'de-outro' && conectado;
   const emAlerta = soLeitura && alerta;
+  // Na tela de Sincronização o cartão "Quem está editando" já diz isto, com o mesmo botão: a faixa só
+  // volta ali como alerta de escrita recusada.
+  if (pathname === '/conta/sincronizacao' && !emAlerta) return null;
   return (
     <div
       className={emAlerta ? 'faixa-posse faixa-posse-alerta' : 'faixa-posse'}
