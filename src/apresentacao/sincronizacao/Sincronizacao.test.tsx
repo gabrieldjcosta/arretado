@@ -106,6 +106,32 @@ describe('Conta › Sincronização (F4-B, B4)', () => {
     await expect(alterarPreferencias(repo, { tamanhoFonte: 20 })).resolves.toBeTruthy();
   });
 
+  it('"Seus Aparelhos" marca este Aparelho, mostra a plataforma em palavras e renomeia', async () => {
+    const { repo, usuario } = await montar({ comAceite: true });
+    expect(await screen.findByRole('heading', { name: 'Seus Aparelhos' })).toBeInTheDocument();
+    const aparelho = await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId);
+    expect(aparelho?.nome).not.toBe('Este aparelho');
+    expect(screen.getByText('(este)')).toBeInTheDocument();
+    expect(screen.queryByText(/Mozilla/)).not.toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Renomear' }));
+    const campo = screen.getByLabelText('Nome do Aparelho');
+    await usuario.clear(campo);
+    await usuario.type(campo, 'Notebook da sala');
+    await usuario.click(screen.getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => {
+      expect(screen.getByText('Notebook da sala')).toBeInTheDocument();
+    });
+    expect((await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId))?.nome).toBe(
+      'Notebook da sala',
+    );
+  });
+
+  it('o aparelho que ainda se chamava "Este aparelho" é renomeado pela plataforma ao abrir', async () => {
+    const { repo } = await repositorioDeTeste({ nomeAparelho: 'Este aparelho' });
+    const aparelho = await repo.colecao('aparelhos').obter(repo.ctx.aparelhoId);
+    expect(aparelho?.nome).not.toBe('Este aparelho');
+  });
+
   it('sem resposta do servidor de posse: edita com aviso (Q1)', async () => {
     const servico = new ServicoDeContaFalso({ sessao: SESSAO });
     servico.falhaDePosse = true;
