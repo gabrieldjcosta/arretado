@@ -7,6 +7,7 @@ import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
 import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
+import { reabrirGuia, telaDoGuia, useGuiaMontado } from './guia/memoria';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
@@ -63,6 +64,8 @@ export function Shell() {
   const navegar = useNavigate();
   const [relatando, setRelatando] = useState(false);
   const tecladoAberto = useTecladoAberto();
+  const telaComGuia = telaDoGuia(pathname);
+  const guiaMontado = useGuiaMontado(telaComGuia);
 
   // Atalho global "E": registrar erro (fora de campos de texto).
   useEffect(() => {
@@ -122,6 +125,12 @@ export function Shell() {
           </Link>
           <MenuAjuda
             paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
+            {...(telaComGuia &&
+              guiaMontado && {
+                aoGuia: () => {
+                  reabrirGuia(telaComGuia);
+                },
+              })}
             aoRelatar={() => {
               setRelatando(true);
             }}

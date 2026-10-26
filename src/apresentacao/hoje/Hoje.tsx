@@ -13,11 +13,13 @@
 // A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
 // montam aqui só porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
 import { Captura } from './Captura';
+import { ConviteDepoisDaLeitura } from './ConviteDepoisDaLeitura';
 import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
 import { LeiMudouNoHoje } from './LeiMudouNoHoje';
@@ -40,6 +42,7 @@ export function Hoje() {
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
           <LeiMudouNoHoje />
+          {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
           <Depois
@@ -53,6 +56,7 @@ export function Hoje() {
       <FecharDia />
       <RevisoesDoDia />
       <Captura />
+      <ConviteDepoisDaLeitura />
       <LembreteDeBackup />
       <AvisoDeAtualizacao />
       <EntradaDoDia retrato={hoje.retrato} />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link } from 'react-router';
 import type { Disciplina, Ponto } from '../../core/modelo';
 import { Esqueleto, Vazio } from '../componentes/estados';
@@ -61,6 +62,7 @@ export function Plano() {
               </a>
             </div>
           </Vazio>
+          <GuiaDaTela tela="plano" />
           <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
       ) : (

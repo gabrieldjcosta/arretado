@@ -1988,3 +1988,15 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **O "N de 8" do Ache o erro fica mais alto que o "Sair" no topo.** Causa: o contador é um `<p>` com margem de baixo (12 px; 24 px a 200% de fonte) dentro de `.topo-drill` (flex, `align-items: center`), então o centro do texto subia 6 a 12 px e a linha crescia a 200%. Solução: `.topo-drill p { margin: 0 }`. Prevenção: elemento de texto dentro de uma linha flex de topo começa sem margem.
 - **A faixa de posse ocupava uns 106 px a 390 px e repetia o botão da tela de Sincronização.** Causa: `.faixa-posse .botao` punha `border-color: currentcolor` no `.discreto` (virava um botão contornado), o texto tinha 58 caracteres e a tela de Sincronização já mostra o mesmo aviso e o mesmo botão no cartão "Quem está editando". Solução: texto "Outro Aparelho em uso." e o botão como `.discreto` puro (sublinhado, 44 px): uma linha a 390 px e duas a 320 px (o botão desce); `AvisoDePosse` não renderiza em `/conta/sincronizacao`, a não ser como alerta de escrita recusada. Os E2E conferem a faixa em outra tela (Frases), não na de Sincronização. Previsível: um aviso que vira alerta ali repete o botão por seis segundos.
 - **"Precisa de você" aparecia com algo que o app resolve sozinho.** Causa: o aviso "Problema na última tentativa… O app tenta de novo sozinho." morava no cartão que lista o que depende da pessoa. Solução: o aviso vai para o cartão Estado; "Precisa de você" só abre com Conflito ou mudança recebida de lado. A frase deixou de dizer "sem detalhe" quando não há causa.
+
+## Peso do Ciclo pela banca (26/10/2026)
+
+- O Ciclo só pesa pela incidência quando o Concurso do plano tem banca e cargo que casam com a tabela do recorte (`materias.json`: hoje FCC × Defensor). Outro concurso, sem rede ou sem arquivo: pesa pelo edital, como antes (`carregarCiclo` engole a falha).
+- O casamento é pelo nome da matéria do edital, sem acento nem caixa (`chaves` da tabela). Matéria nova do catálogo que não casa pesa a média das citadas; para casar, acrescente o nome em `chaves`.
+- A tabela vem do resumo por matéria (`resumo-por-materia-fcc-dpesp.csv`, parcela = % do total de questões do recorte); não cita a fonte na tela.
+
+## Fixar estas (26/10/2026)
+
+- A oferta só lista as súmulas vinculantes da coleção que a pessoa **já adicionou** (origem do acervo `sumulas-stf-vinculantes`); sem ela, o cartão leva ao Acervo. A SV 30 não consta do acervo (pendente no STF) e as revogadas ficam de fora.
+- As revisões saem em partes de 5 por dia (`FIXAR_POR_DIA`) para não somar 60 frases no mesmo dia. Para mudar o ritmo, só essa constante.
+- E2E fora da nuvem padrão: o Playwright do repo pede o Chromium 1194 e o ambiente tem outro; usar uma config local com `launchOptions.executablePath` (não versionada).
