@@ -2072,7 +2072,8 @@ a.item-norma strong {
 
 /* Modo foco (11.1): só o texto. A moldura do Shell some (o leitor põe o atributo na raiz e o tira
    ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
-   da folga dela, e o grupo fixo desce ao canto. */
+   da folga dela, e o grupo fixo desce ao canto. A `.faixa-posse` fica de propósito: é o único aviso de
+   escrita travada (outro Aparelho editando), e agora cabe em uma linha. */
 :root[data-modo-foco] .topo,
 :root[data-modo-foco] .areas,
 :root[data-modo-foco] .faixa-offline,

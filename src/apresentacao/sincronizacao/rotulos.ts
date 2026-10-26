@@ -16,11 +16,14 @@ export function motivoDaTrava(posse: EstadoDePosse, conectado: boolean): string 
 }
 
 /** Na faixa, logo depois de uma escrita recusada pela trava (a tela que tentou não precisa explicar). */
-export const AVISO_DE_BLOQUEIO =
-  'Não dá para editar: outro aparelho está editando. Passar a editar aqui?';
+export const AVISO_DE_BLOQUEIO = 'Não dá para editar: outro Aparelho está editando.';
 
-/** Aviso curto da faixa no alto da tela, só nos estados que mudam o que a pessoa pode fazer. */
+/**
+ * Aviso curto da faixa no alto da tela, só nos estados que mudam o que a pessoa pode fazer. O texto de
+ * "de-outro" é só o fato: o botão "Passar a editar aqui" ao lado é a pergunta, e assim a faixa cabe em
+ * uma linha a 390 px.
+ */
 export const AVISO_DA_POSSE: Partial<Record<EstadoDePosse['tipo'], string>> = {
-  'de-outro': 'Você está usando outro aparelho agora. Passar a editar aqui?',
-  'sem-confirmacao': 'Sem confirmar qual aparelho está ativo. Você pode editar.',
+  'de-outro': 'Outro Aparelho em uso.',
+  'sem-confirmacao': 'Sem confirmar qual Aparelho está ativo. Você pode editar.',
 };
