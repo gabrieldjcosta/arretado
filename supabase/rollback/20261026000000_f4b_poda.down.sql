@@ -1,5 +1,7 @@
--- Reversão da F4-B (B5, poda). Não devolve o que a poda já apagou do log: o estado continua em
--- `registros` e os aparelhos recarregam se precisarem.
+-- Reversão da F4-B (B5, poda). Não devolve o que a poda já apagou do log, e leva junto o ponto da
+-- poda: o aparelho que ficou atrás dele deixa de saber que o log tem buracos e não recarrega. Por
+-- isso só é segura antes da primeira poda; depois, para desligar a poda, basta
+-- `select cron.unschedule('arretado-podar-sincronizacao')`.
 do $$
 begin
   if exists (select 1 from pg_extension where extname = 'pg_cron') then

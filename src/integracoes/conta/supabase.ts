@@ -94,6 +94,22 @@ async function lerOuFalhar<T>(
   return r.data as T | null;
 }
 
+/**
+ * Resposta de `ponto_da_poda`. Sem a migração do B5 no servidor a função não existe (PostgREST
+ * `PGRST202`) e nada foi podado: 0. Sem isso, o app publicado antes da migração (ou depois da
+ * reversão) falharia toda rodada na recepção e não receberia mais nada dos outros Aparelhos.
+ */
+export function pontoDaPodaDaResposta(r: {
+  data: unknown;
+  error: { code?: string } | null;
+}): number {
+  if (r.error) {
+    if (r.error.code === 'PGRST202') return 0;
+    throw new FalhaDeSincronizacao('Sem conexão ou servidor indisponível.', false);
+  }
+  return typeof r.data === 'number' ? r.data : Number(r.data ?? 0);
+}
+
 /** Traduz erro do Supabase em motivo que a tela sabe explicar, sem vazar texto técnico. */
 export function traduzirErro(erro: unknown): FalhaDeConta {
   if (erro instanceof FalhaDeConta) return erro;
@@ -282,10 +298,13 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
         );
       },
       pontoDaPoda: async () => {
-        const dados = await lerOuFalhar<number>(() =>
-          this.cliente.schema('arretado').rpc('ponto_da_poda'),
-        );
-        return dados ?? 0;
+        let r;
+        try {
+          r = await this.cliente.schema('arretado').rpc('ponto_da_poda');
+        } catch {
+          throw new FalhaDeSincronizacao('Sem conexão.', false);
+        }
+        return pontoDaPodaDaResposta(r);
       },
       pedirPosse: async (aparelhoId, forcar) => {
         const r = await lerOuFalhar<RespostaDePosse>(() =>

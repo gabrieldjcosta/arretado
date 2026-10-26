@@ -124,8 +124,8 @@ end;
 $$;
 revoke execute on function arretado.podar_sincronizacao(interval, interval) from public, anon, authenticated;
 
--- Agenda semanal (domingo, 06:17 UTC). No Supabase o pg_cron é ligado em Integrations › Cron; se
--- não estiver disponível (PGlite dos testes), a migração segue sem agenda.
+-- Agenda semanal (domingo, 06:17 UTC). No Supabase o pg_cron está sempre disponível, então esta
+-- migração liga a extensão sozinha; se não estiver (PGlite dos testes), segue sem agenda.
 do $$
 begin
   if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
