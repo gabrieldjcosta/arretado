@@ -25,19 +25,21 @@
   margin: 0.5rem 0;
 }
 
+/* Só a lista: o cartão de cada Conflito é o `.cartao-bloco` (com `.lista-simples` a regra `> li` o
+   virava uma linha flexível sem recuo, e o botão "Escolher campo a campo" ficava sob as versões). */
 .lista-de-conflitos {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.conflito h3 {
+.conflito h2 {
   margin-top: 0;
 }
 
 .lado-a-lado {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   gap: 1rem;
   margin: 0.75rem 0;
 }
@@ -50,7 +52,7 @@
   min-width: 0;
 }
 
-.versao-conflito h4 {
+.versao-conflito h3 {
   margin: 0 0 0.5rem;
   font-size: 1rem;
 }
@@ -83,9 +85,17 @@
   white-space: pre-wrap;
 }
 
+/* O campo que difere: filete de tinta na linha e valor em negrito (a forma, não só a cor), com o
+   marca-texto por trás. O grifo (`--grifo-*`) é do texto marcado no Leitor, não da interface. */
+.versao-conflito dl > .campo-diferente {
+  border-inline-start: 3px solid var(--texto);
+  padding-inline-start: 0.5rem;
+}
+
 .versao-conflito mark {
-  background: var(--grifo-1);
-  color: var(--texto);
+  background: var(--marca);
+  color: var(--tinta);
+  font-weight: 600;
   padding: 0 0.15rem;
   border-radius: 2px;
 }
@@ -113,5 +123,13 @@
 @media (max-width: 420px) {
   .versao-conflito dl > div {
     grid-template-columns: 1fr;
+  }
+}
+
+/* No celular o nome do campo leva a linha toda: as duas escolhas ficam juntas embaixo dele, em vez de
+   quebrar cada uma de um jeito. */
+@media (max-width: 560px) {
+  .escolha-de-campo .nome-do-campo {
+    flex: 1 1 100%;
   }
 }

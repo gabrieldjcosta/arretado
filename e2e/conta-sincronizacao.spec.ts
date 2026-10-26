@@ -112,10 +112,28 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
       timeout: 20_000,
     });
     await page.getByRole('link', { name: '1 Conflito para decidir' }).click();
-    await expect(page.getByRole('heading', { level: 3, name: /Preferências/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: /Preferências/ })).toBeVisible();
     await expect(page.locator('mark', { hasText: 'guiado' })).toBeVisible();
     await expect(page.locator('mark', { hasText: 'leitura' })).toBeVisible();
     await semViolacoes(page);
+    // O cartão tem recuo e as versões cabem dentro dele, e a tela não rola na horizontal nem com a
+    // letra a 200% (a regra de lista de linhas vencia o recuo do cartão; a grade de 16 rem estourava).
+    const cartao = await page.locator('.conflito').boundingBox();
+    const versao = await page.locator('.versao-conflito').first().boundingBox();
+    if (!cartao || !versao) throw new Error('O cartão do Conflito não tem caixa na tela.');
+    expect(versao.x - cartao.x).toBeGreaterThanOrEqual(12);
+    expect(cartao.x + cartao.width - (versao.x + versao.width)).toBeGreaterThanOrEqual(12);
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '200%';
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '';
+    });
     await page.getByRole('button', { name: 'Ficar com a daqui' }).click();
     await expect(page.getByText('Nenhum Conflito. Seus Aparelhos concordam.')).toBeVisible();
 

@@ -43,7 +43,7 @@ function Versao({
   if (!registro) {
     return (
       <div className="versao-conflito">
-        <h4>{titulo}</h4>
+        <h3>{titulo}</h3>
         <p className="dica">Apagado.</p>
       </div>
     );
@@ -51,7 +51,7 @@ function Versao({
   const campos = Object.keys(registro).filter((k) => !OCULTOS.has(k));
   return (
     <div className="versao-conflito">
-      <h4>{titulo}</h4>
+      <h3>{titulo}</h3>
       <dl>
         {campos.map((k) => (
           <div key={k} className={diferentes.includes(k) ? 'campo-diferente' : undefined}>
@@ -100,12 +100,12 @@ function ItemDeConflito({
   const idTitulo = `conflito-${conflito.id}`;
   return (
     <li className="cartao-bloco conflito" aria-labelledby={idTitulo}>
-      <h3 id={idTitulo}>
+      <h2 id={idTitulo}>
         {ROTULO_COLECAO[conflito.colecao]}{' '}
         <span className="dica">
           · mudado em {nomeDoAparelho} em {formatarQuando(conflito.criadoEm)}
         </span>
-      </h3>
+      </h2>
       {conflito.deles === null && conflito.minha !== null && (
         <p>Foi apagado no outro Aparelho; você mudou aqui.</p>
       )}
@@ -256,7 +256,7 @@ export function Conflitos() {
       ) : lista.length === 0 ? (
         <p role="status">Nenhum Conflito. Seus Aparelhos concordam.</p>
       ) : (
-        <ul className="lista-simples lista-de-conflitos">
+        <ul className="lista-de-conflitos">
           {lista.map((c) => (
             <ItemDeConflito
               key={c.id}

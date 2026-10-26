@@ -31,7 +31,7 @@ async function montar() {
       </MemoryRouter>
     </ContextoRepositorio.Provider>,
   );
-  await screen.findByRole('heading', { level: 3, name: /Fontes/ });
+  await screen.findByRole('heading', { level: 2, name: /Fontes/ });
   return { repo, fonte, usuario: userEvent.setup() };
 }
 
@@ -44,8 +44,8 @@ async function marcarTudoEnviado(repo: Awaited<ReturnType<typeof montar>>['repo'
 describe('Conta › Conflitos (F4-B, B4)', () => {
   it('mostra as duas versões com o campo diferente em destaque', async () => {
     await montar();
-    expect(screen.getByRole('heading', { level: 4, name: 'A daqui' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: /A de lá/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'A daqui' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: /A de lá/ })).toBeInTheDocument();
     const marcados = screen.getAllByText(/Manual (antigo|novo)/, { selector: 'mark' });
     expect(marcados).toHaveLength(2);
   });

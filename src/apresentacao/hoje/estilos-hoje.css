@@ -17,7 +17,8 @@
   min-height: 44px;
 }
 
-.lembrete-backup {
+.lembrete-backup,
+.aviso-de-atualizacao {
   margin: 0.75rem 0;
   font-size: 0.9rem;
   color: var(--texto-atenuado);
