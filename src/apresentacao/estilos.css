@@ -1233,7 +1233,8 @@ input[type='range'] {
 }
 
 /* Caixa e rádio: marca própria de 22 px com contorno de 2 px na tinta (D-D4); marcada = o bloco do
-   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. */
+   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. A marca de dentro
+   também é em px: em rem crescia com a fonte e estourava a caixa a 200%. */
 input[type='checkbox'],
 input[type='radio'] {
   appearance: none;
@@ -1267,9 +1268,9 @@ input[type='radio']:checked {
 
 input[type='checkbox']:checked::after {
   content: '';
-  width: 0.7rem;
-  height: 0.38rem;
-  margin-top: -0.12rem;
+  width: 11px;
+  height: 6px;
+  margin-top: -2px;
   border-left: 2.5px solid currentcolor;
   border-bottom: 2.5px solid currentcolor;
   transform: rotate(-45deg);
@@ -1277,8 +1278,8 @@ input[type='checkbox']:checked::after {
 
 input[type='radio']:checked::after {
   content: '';
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentcolor;
 }
