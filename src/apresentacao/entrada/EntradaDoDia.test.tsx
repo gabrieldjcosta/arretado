@@ -153,7 +153,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
   });
 });
 
-/** A linha quieta da Entrada do Dia (S4), acima do Agora. */
+/** A linha quieta da Entrada do Dia (S4), abaixo do Agora. */
 const linha = () => document.querySelector('.linha-do-dia');
 
 describe('Entrada do Dia › primeira abertura de cada Dia', () => {
@@ -161,7 +161,7 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
 
-  it('é uma linha acima do Agora, com a saudação e a dica; nada de folha nem de Citação', async () => {
+  it('é uma linha abaixo do Agora, com a saudação e a dica; nada de folha nem de Citação', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
     relogio.avancar(DIA);
@@ -176,10 +176,11 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     expect(linha()).not.toHaveTextContent(par.citacao.texto.slice(0, 20));
     expect(folhas()).toBeNull();
     expect(screen.queryByRole('dialog')).toBeNull();
-    // Acima do Agora, na ordem do documento.
+    // Depois do Agora, na ordem do documento, e fora dele: o Começar não desce por causa da dica.
     const agora = screen.getByRole('region', { name: 'Agora' });
-    const posicao = linha()!.compareDocumentPosition(agora);
+    const posicao = agora.compareDocumentPosition(linha()!);
     expect(posicao & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(agora.contains(linha())).toBe(false);
     expect(entradaJaAbriu('2026-09-24')).toBe(true);
     // Fala do produto: nada que cobre.
     expect(linha()).not.toHaveTextContent(/Você parou|atrasad|pendente|Frase\b/i);

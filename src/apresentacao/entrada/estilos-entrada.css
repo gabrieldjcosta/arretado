@@ -16,9 +16,9 @@ dialog.dialogo-chegada h2 {
   font-size: 2rem;
 }
 
-/* A linha do dia: saudação e dica, em texto atenuado, sem caixa nem botão. */
+/* A linha do dia: saudação e dica, em texto atenuado, sem caixa nem botão. Vem depois do Agora. */
 .linha-do-dia {
-  margin: 0 0 var(--espaco-3);
+  margin: var(--espaco-3) 0;
   font-size: 0.9375rem;
   line-height: 1.45;
   color: var(--texto-atenuado);

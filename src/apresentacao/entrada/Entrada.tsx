@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { lembrarDaEntrada, type Abertura } from './regras';
 
 /**
- * A Entrada do Dia (S4, 27/10/2026): deixou de ser uma folha modal. É uma linha quieta acima do Agora,
- * com a saudação e a dica de hoje; quem não a lê não perde nada e ninguém precisa fechá-la. A folha que
+ * A Entrada do Dia (S4, 27/10/2026): deixou de ser uma folha modal. É uma linha quieta logo abaixo do
+ * Agora, com a saudação e a dica de hoje; quem não a lê não perde nada e ninguém precisa fechá-la. A folha que
  * recebe quem volta depois de dias é o Retorno (`BoasVindas`). Grava ao aparecer: fechar o aplicativo
  * não a traz de volta no mesmo Dia.
  */

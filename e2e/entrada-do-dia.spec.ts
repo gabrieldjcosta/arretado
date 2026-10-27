@@ -193,14 +193,14 @@ test.describe('Chegada', () => {
   });
 });
 
-test.describe('Entrada do Dia (S4: uma linha quieta acima do Agora)', () => {
+test.describe('Entrada do Dia (S4: uma linha quieta abaixo do Agora)', () => {
   test.beforeEach(async ({ page }) => {
     await jaViuAChegada(page);
   });
 
   const linha = (page: Page) => page.locator('.linha-do-dia');
 
-  test('a saudação e a dica do Dia viram uma linha acima do Agora, sem folha por cima', async ({
+  test('a saudação e a dica do Dia viram uma linha abaixo do Agora, sem folha por cima', async ({
     page,
   }) => {
     await page.clock.setFixedTime(HOJE);
@@ -212,12 +212,12 @@ test.describe('Entrada do Dia (S4: uma linha quieta acima do Agora)', () => {
     // A Citação deixou a tela; o Hoje não está inerte.
     await expect(page.getByRole('blockquote')).toHaveCount(0);
     await expect(page.getByRole('region', { name: /^(Agora|Por onde começar)$/ })).toBeVisible();
-    const acima = await page.evaluate(() => {
+    const abaixo = await page.evaluate(() => {
       const l = document.querySelector('.linha-do-dia')?.getBoundingClientRect();
       const g = document.querySelector('[aria-label="Agora"], [aria-label="Por onde começar"]');
-      return l !== undefined && g ? l.bottom <= g.getBoundingClientRect().top : false;
+      return l !== undefined && g ? g.getBoundingClientRect().bottom <= l.top : false;
     });
-    expect(acima).toBe(true);
+    expect(abaixo).toBe(true);
   });
 
   test('recarregar no mesmo Dia não a repete; o Dia seguinte traz outra dica', async ({ page }) => {
