@@ -15,6 +15,8 @@ export function rotaDeInicio(acao: ProximaAcao): string {
     q.set('ciclo', acao.alvo.id);
     q.set('bloco', String(acao.blocoOrdem));
   }
+  // Trecho do mapa: o Leitor abre nele, no artigo por artigo e "seguindo o mapa".
+  if (acao.trecho) q.set('ir', acao.trecho.endereco);
   q.set('origem', acao.tipo);
   q.set('razao', acao.razao);
   if (rotaDoAlvo(acao.alvo) !== undefined) q.set('direto', '1');

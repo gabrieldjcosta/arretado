@@ -29,11 +29,12 @@ const NA_NORMA = [
 
 /**
  * A Chegada (D-D9): a folha de orientação da primeira vez no aparelho, sobre o Hoje. O caminho principal
- * é escolher o concurso (da folha a uma norma aberta em três toques); ler uma norma e registrar um erro
- * são os outros dois, a trilha pelo edital vem em texto, os quatro menus em uma linha cada, e "Agora
- * não" fecha. O nome escrito é o do cabeçalho (`Marca`, na frequência dela): aqui ele não se repete.
- * Grava ao aparecer, e a Entrada do Dia não abre no mesmo Dia. Sem `dia`, é a reabertura pelo menu
- * Ajuda ("Rever as boas-vindas"): não grava nada e fecha ao seguir um caminho.
+ * é escolher o concurso (da folha a uma norma aberta em três toques, com a Trilha montada junto); ler
+ * uma norma e registrar um erro são os outros dois, a trilha passo a passo vem em texto, os quatro
+ * menus em uma linha cada, e "Agora não" fecha. O nome escrito é o do cabeçalho (`Marca`, na
+ * frequência dela): aqui ele não se repete. Grava ao aparecer, e a Entrada do Dia não abre no mesmo
+ * Dia. Sem `dia`, é a reabertura pelo menu Ajuda ("Rever as boas-vindas"): não grava nada e fecha ao
+ * seguir um caminho.
  */
 export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void }) {
   const [aberto, setAberto] = useState(true);
@@ -79,8 +80,8 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
           Registrar um erro
         </Link>
         <Link to="/plano/onboarding" onClick={seguir} className="botao botao-texto chegada-trilha">
-          <b>Montar uma trilha</b>
-          <span>com base nos editais de concursos parecidos; ou traga o seu, na Trilha</span>
+          <b>Montar a trilha passo a passo</b>
+          <span>escolhendo edital e matérias; ou traga o seu edital, na Trilha</span>
         </Link>
       </div>
       <div className="chegada-depois">

@@ -81,10 +81,9 @@ describe('Chegada › primeira vez neste aparelho', () => {
     const registrar = within(folha).getByRole('link', { name: 'Registrar um erro' });
     expect(registrar).toHaveAttribute('href', '#/recall/registrar');
     expect(registrar).not.toHaveClass('principal');
-    expect(within(folha).getByRole('link', { name: /^Montar uma trilha/ })).toHaveAttribute(
-      'href',
-      '#/plano/onboarding',
-    );
+    expect(
+      within(folha).getByRole('link', { name: /^Montar a trilha passo a passo/ }),
+    ).toHaveAttribute('href', '#/plano/onboarding');
     expect(within(folha).getByRole('button', { name: 'Agora não' })).toBeVisible();
     await waitFor(() => {
       expect(escolher).toHaveFocus();

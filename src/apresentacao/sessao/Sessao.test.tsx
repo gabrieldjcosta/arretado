@@ -64,6 +64,17 @@ describe('Sessão leve (A2)', () => {
     expect(sessoes[0]).toMatchObject({ estado: 'ativa', alvo: { tipo: 'revisao' } });
   });
 
+  it('leitura direta com o trecho do mapa (ir=) abre o Leitor no trecho, seguindo o mapa', async () => {
+    const NORMA = '11111111-1111-4111-8111-111111111111';
+    const { repo } = await abrir(
+      `/sessao/iniciar?tipo=leitura&id=${NORMA}&rotulo=LEP&ir=art3&origem=leitura_salva&direto=1`,
+    );
+    await waitFor(() => {
+      expect(window.location.hash).toBe(`#/biblioteca/normas/${NORMA}?ir=art3&foco=artigo&mapa=1`);
+    });
+    expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(1);
+  });
+
   it('direto=1 sem tela própria para o alvo mostra o início normal', async () => {
     const { repo } = await abrir('/sessao/iniciar?tipo=ponto&rotulo=CP&direto=1');
     expect(await screen.findByRole('button', { name: 'Começar' })).toBeInTheDocument();
@@ -157,14 +168,14 @@ describe('Sessão leve (A2)', () => {
       expect(document.body.dataset.soEstudo).toBeUndefined();
     });
   });
-  it('faixa da Sessão: aparece na revisão só com Sessão aberta e pausa por ali', async () => {
+  it('canto da Sessão: não aparece na revisão sem Sessão aberta', async () => {
     const sem = await abrir('/recall/revisar');
     await screen.findByRole('heading', { name: 'Revisar' });
-    expect(screen.queryByRole('group', { name: 'Sessão' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /bloquinho/ })).not.toBeInTheDocument();
     expect(sem.repo).toBeDefined();
   });
 
-  it('faixa da Sessão: pausar e voltar gravam o estado', async () => {
+  it('canto da Sessão: pausar e voltar gravam o estado', async () => {
     const { repo } = await repositorioDeTeste();
     await iniciarSessao(repo, { alvo: { tipo: 'livre', rotulo: 'CP' } });
     await repo.colecao('cartoes').criar({
@@ -176,7 +187,8 @@ describe('Sessão leve (A2)', () => {
       proximaRevisao: '2000-01-01',
     });
     const { usuario } = await abrir('/recall/revisar', repo);
-    const faixa = await screen.findByRole('group', { name: 'Sessão' });
+    await usuario.click(await screen.findByRole('button', { name: /Abrir o bloquinho/ }));
+    const faixa = await screen.findByRole('group', { name: 'Sessão em andamento' });
     await usuario.click(within(faixa).getByRole('button', { name: 'Pausar' }));
     await waitFor(async () => {
       expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estado).toBe('pausada');

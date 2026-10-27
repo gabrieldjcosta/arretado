@@ -145,6 +145,10 @@ export const NotaDeEstacionamento = z.strictObject({
 });
 export type NotaDeEstacionamento = z.infer<typeof NotaDeEstacionamento>;
 
+/** O que a pessoa vai fazer na Sessão (escolhido ao começar; opcional, sem rótulo clínico nem cobrança). */
+export const AtividadeDeSessao = z.enum(['questoes', 'lei', 'material', 'jurisprudencia']);
+export type AtividadeDeSessao = z.infer<typeof AtividadeDeSessao>;
+
 export const Sessao = z.strictObject({
   ...camposComuns,
   tipo: z.enum(['estudo', 'livre', 'simulado']),
@@ -169,6 +173,8 @@ export const Sessao = z.strictObject({
   origemDaAcao: OrigemDaAcao.optional(),
   /** Tarefa de estudo que a Sessão trabalha (opcional). */
   tarefaId: Id.optional(),
+  /** Tipo de atividade escolhido ao começar (questões, lei, material próprio, jurisprudência). */
+  atividade: AtividadeDeSessao.optional(),
   /** Temporizador opcional escolhido para esta Sessão; informativo, nunca bloqueia nem mede aprendizado. */
   temporizadorMin: z.int().min(1).max(240).optional(),
   /** Ciclo e bloco (posição na volta) que a Sessão trabalha; a posição do Ciclo vem destas Sessões (v9). */

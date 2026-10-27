@@ -13,7 +13,6 @@ import {
   rascunhosPendentes,
 } from '../../dominios/legislacao/servico';
 import { itensComVersaoNova } from '../../dominios/acervo/atualizacao';
-import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { LinhaLista } from '../componentes/LinhaLista';
@@ -129,7 +128,7 @@ async function carregarBiblioteca(repo: Repositorio) {
 
 /**
  * Onde a leitura parou e quanto falta da seção: "Art. 41" e os minutos. Sem o ponto (norma sem
- * posição guardada, ou que não abre), o "Continuar leitura" aparece sem eles.
+ * posição guardada, ou que não abre), o "Retomar" aparece sem eles.
  */
 async function pontoDaLeitura(
   repo: Repositorio,
@@ -152,7 +151,7 @@ async function pontoDaLeitura(
   }
 }
 
-/** A norma publicada lida por último: a do "Continuar leitura" (Parte 2 §9.2). */
+/** A norma publicada lida por último: a do "Retomar" (Parte 2 §9.2). */
 function ultimaLida(normas: readonly Norma[], leituras: ReadonlyMap<string, Leitura>) {
   let ultima: { norma: Norma; leitura: Leitura } | undefined;
   for (const norma of normas) {
@@ -454,16 +453,15 @@ export function Normas() {
           ) : (
             <>
               {dados.continuar && (
-                <AcaoAgora
-                  titulo={
-                    dados.ponto
-                      ? `Continuar a leitura no ${dados.ponto.referencia} da ${dados.continuar.tituloCurto}`
-                      : `Continuar a leitura da ${dados.continuar.tituloCurto}`
-                  }
-                  estimativa={dados.ponto?.minutos}
-                  rotuloBotao={`Continuar leitura: ${dados.continuar.tituloCurto}`}
-                  para={`/biblioteca/normas/${dados.continuar.id}`}
-                />
+                <p className="retomar-leitura">
+                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao principal">
+                    Retomar: {dados.continuar.tituloCurto}
+                    {dados.ponto ? `, ${dados.ponto.referencia}` : ''}
+                  </Link>
+                  {dados.ponto?.minutos !== undefined && (
+                    <span className="dica"> cerca de {dados.ponto.minutos} min</span>
+                  )}
+                </p>
               )}
               <section aria-labelledby="titulo-normas">
                 <div className="cabecalho-secao">

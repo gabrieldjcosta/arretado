@@ -4,6 +4,7 @@ import {
   encerrarSessao,
   iniciarSessao,
   pausarSessao,
+  registrarQuestao,
   restaurarSessao,
   retomarSessao,
   sugerirProximoPasso,
@@ -172,5 +173,43 @@ describe('questões ao encerrar (C5)', () => {
       questoesAcertadas: 0,
     });
     expect(b.questoesFeitas).toBeUndefined();
+  });
+});
+
+describe('Atividade e contagem de questões', () => {
+  it('grava a atividade escolhida ao começar', async () => {
+    const { repo } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, { atividade: 'jurisprudencia' });
+    expect(s.atividade).toBe('jurisprudencia');
+  });
+
+  it('conta acertos e erros e o fechamento sem números guarda a contagem', async () => {
+    const { repo } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, { atividade: 'questoes' });
+    await registrarQuestao(repo, s.id, true);
+    await registrarQuestao(repo, s.id, true);
+    const parcial = await registrarQuestao(repo, s.id, false);
+    expect(parcial).toMatchObject({ questoesFeitas: 3, questoesAcertadas: 2 });
+    const fechada = await encerrarSessao(repo, s.id);
+    expect(fechada).toMatchObject({ questoesFeitas: 3, questoesAcertadas: 2 });
+  });
+
+  it('o número digitado ao fechar vale mais que a contagem', async () => {
+    const { repo } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, { atividade: 'questoes' });
+    await registrarQuestao(repo, s.id, true);
+    const fechada = await encerrarSessao(repo, s.id, {
+      questoesFeitas: 10,
+      questoesAcertadas: 7,
+    });
+    expect(fechada).toMatchObject({ questoesFeitas: 10, questoesAcertadas: 7 });
+  });
+
+  it('Sessão encerrada não muda ao contar de novo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const s = await iniciarSessao(repo, {});
+    await encerrarSessao(repo, s.id);
+    const depois = await registrarQuestao(repo, s.id, true);
+    expect(depois.questoesFeitas).toBeUndefined();
   });
 });
