@@ -473,3 +473,8 @@
 .lei-mudou-no-hoje .lista-simples > li:last-child {
   border-bottom: 0;
 }
+
+/* S7: o botão "Avisos (n)" que guarda os blocos além do orçamento do Hoje. */
+.avisos-do-hoje {
+  margin-block: var(--espaco-2);
+}

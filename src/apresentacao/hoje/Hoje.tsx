@@ -6,9 +6,10 @@
 // O que a tela mostra de uma vez (os pontos do Dia, a linha de parada, o Agora e o "Em seguida") vem
 // de um só retrato dos dados (`useRetratoDoHoje`), para os blocos nunca discordarem entre si.
 //
-// Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; o "Em seguida" (um `<details>`, com o
-// "Trocar" de cada item, Q5) e o "Para lembrar" à direita. Abaixo disso as duas viram uma só, na mesma
-// ordem.
+// Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; à direita os blocos abaixo dele, com
+// orçamento de dois à vista (S7, `BlocosDoHoje`): o "Em seguida", o Fechar o Dia, "A lei mudou", o "Para
+// lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Avisos (n)". Abaixo de
+// 900 px as duas viram uma só, na mesma ordem.
 //
 // A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
 // montam aqui só porque o Hoje é onde o aplicativo abre.
@@ -18,6 +19,7 @@ import { EntradaDoDia } from '../entrada/EntradaDoDia';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
+import { BlocosDoHoje } from './BlocosDoHoje';
 import { Captura } from './Captura';
 import { ConviteDepoisDaLeitura } from './ConviteDepoisDaLeitura';
 import { Depois } from './Depois';
@@ -41,24 +43,27 @@ export function Hoje() {
           <Agora hoje={hoje} />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
-          <LeiMudouNoHoje />
           {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
-          <Depois
-            acoes={hoje.emSeguida}
-            opcoes={hoje.retrato?.outras ?? []}
-            aoTrocar={hoje.trocar}
-          />
-          <ParaLembrar />
+          {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Avisos (n)". */}
+          <BlocosDoHoje>
+            <Depois
+              acoes={hoje.emSeguida}
+              opcoes={hoje.retrato?.outras ?? []}
+              aoTrocar={hoje.trocar}
+            />
+            <FecharDia />
+            <LeiMudouNoHoje />
+            <ParaLembrar />
+            <ConviteDepoisDaLeitura />
+            <LembreteDeBackup />
+            <AvisoDeAtualizacao />
+          </BlocosDoHoje>
         </div>
       </div>
-      <FecharDia />
       <RevisoesDoDia />
       <Captura />
-      <ConviteDepoisDaLeitura />
-      <LembreteDeBackup />
-      <AvisoDeAtualizacao />
       <EntradaDoDia retrato={hoje.retrato} />
     </>
   );
