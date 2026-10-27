@@ -5,12 +5,15 @@ import { Link } from 'react-router';
 export function MenuAjuda({
   paraAjuda,
   aoGuia,
+  aoBoasVindas,
   aoRelatar,
 }: {
   /** Rota da seção de orientações desta tela. */
   paraAjuda: string;
   /** Reabre o guia da tela atual; ausente onde a tela não tem guia. */
   aoGuia?: () => void;
+  /** Reabre a folha de boas-vindas, de qualquer tela. */
+  aoBoasVindas?: () => void;
   aoRelatar: () => void;
 }) {
   const [aberto, setAberto] = useState(false);
@@ -70,6 +73,19 @@ export function MenuAjuda({
               }}
             >
               O que cada opção faz
+            </button>
+          )}
+          {aoBoasVindas && (
+            <button
+              type="button"
+              className="discreto"
+              onClick={() => {
+                setAberto(false);
+                botao.current?.focus();
+                aoBoasVindas();
+              }}
+            >
+              Rever as boas-vindas
             </button>
           )}
           <button
