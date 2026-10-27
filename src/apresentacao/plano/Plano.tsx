@@ -22,7 +22,8 @@ function porDisciplina(disciplinas: Disciplina[], pontos: Ponto[]) {
 }
 
 function resumoDosPontos(n: number) {
-  return n === 1 ? '1 ponto' : `${String(n)} pontos`;
+  // Espaço sem quebra: o número não fica numa linha e "pontos" na outra.
+  return n === 1 ? '1\u00a0ponto' : `${String(n)}\u00a0pontos`;
 }
 
 /** Plano na F1: pontos importados, só para vincular erros. Edição e sugestão chegam na F3. */
@@ -85,7 +86,7 @@ export function Plano() {
               <details className="trilha-materia" open={grupos.length === 1 || undefined}>
                 <summary>
                   <span className="trilha-seta" aria-hidden="true" />
-                  <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>
+                  <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>{' '}
                   <span className="dica">{resumoDosPontos(pontos.length)}</span>
                 </summary>
                 <ul className="lista-simples">
