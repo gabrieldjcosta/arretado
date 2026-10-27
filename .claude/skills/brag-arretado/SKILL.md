@@ -1,5 +1,5 @@
 ---
-name: mostrar-arretado
+name: brag-arretado
 description: >
   Mostrar o Arretado a quem não o conhece: guia de ferramentas, texto da tela
   de primeiros passos e roteiro de vídeo de demonstração, todos a partir de um
@@ -9,7 +9,7 @@ license: MIT
 argument-hint: "[guia|primeiros-passos|video] [foco]"
 ---
 
-# Mostrar o Arretado
+# Brag Arretado
 
 Uma fonte, três saídas. Nada se escreve sobre o app sem sair do inventário.
 
