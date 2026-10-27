@@ -226,7 +226,7 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(screen.queryByRole('region', { name: 'Importações pendentes' })).not.toBeInTheDocument();
   });
 
-  it('"Continuar leitura" abre a norma lida por último; cada norma mostra a última leitura (9.7)', async () => {
+  it('"Retomar" abre a norma lida por último; cada norma mostra a última leitura (9.7)', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     const { norma: lep } = await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     const { norma: eca } = await publicarVersao(repo, (await rascunho(repo, 'ECA')).id);
@@ -240,15 +240,14 @@ describe('Biblioteca › Normas (9.5)', () => {
     await gravarPosicao(repo, lep.id, await primeiro(lep.id));
     await abrirBiblioteca(repo);
 
-    const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
+    // R2: uma linha só, sem a folha do Agora (que fica no Hoje); diz onde e quanto falta.
+    const continuar = await screen.findByRole('link', { name: /^Retomar: LEP, / });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
+    expect(screen.queryByRole('region', { name: 'Agora' })).not.toBeInTheDocument();
+    expect(continuar.closest('p')).toHaveTextContent(/cerca de \d+ min/);
+    // Uma ação dominante por tela: "Retomar" é a principal, e só ela.
     expect(continuar).toHaveClass('principal');
-    // O "agora" diz onde continuar e quanto falta da seção (fatia 4).
-    const agora = screen.getByRole('region', { name: 'Agora' });
-    expect(within(agora).getByRole('heading')).toHaveTextContent(
-      /^Continuar a leitura no .+ da LEP$/,
-    );
-    expect(agora).toHaveTextContent(/cerca de \d+ min/);
+    expect([...screen.getByRole('main').querySelectorAll('.principal')]).toEqual([continuar]);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
@@ -265,14 +264,14 @@ describe('Biblioteca › Normas (9.5)', () => {
     );
   });
 
-  it('sem leitura, não há "Continuar leitura" e "Importar norma" é a ação principal (9.7)', async () => {
+  it('sem leitura, não há "Retomar" e "Importar norma" é a ação principal (9.7)', async () => {
     const { repo } = await repositorioDeTeste();
     await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     await abrirBiblioteca(repo);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).toHaveClass('principal');
-    expect(screen.queryByRole('link', { name: /Continuar leitura/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Retomar/ })).not.toBeInTheDocument();
   });
 
   it('agrupa por disciplina em seções retráteis; a norma sem disciplina vai para "Outras"', async () => {
