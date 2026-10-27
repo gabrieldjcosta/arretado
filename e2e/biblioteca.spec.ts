@@ -158,6 +158,8 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
       timeout: 30_000,
     },
   );
+  // O botão desabilita enquanto busca e larga o foco no <body>: ao fim, o foco volta a ele.
+  await expect(verificar).toBeFocused();
   const maisNova = Buffer.from(
     bytes
       .toString('latin1')
@@ -172,12 +174,12 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
       headers: { 'Content-Type': 'application/octet-stream', 'X-Tipo-Origem': 'text/html' },
     }),
   );
+  // A 320×568 px o painel rola por dentro: o resultado novo aparece à vista, sem a pessoa rolar à mão.
+  await page.setViewportSize({ width: 320, height: 568 });
   await verificar.click();
-  await expect(
-    page.getByText(/Há indício de alteração: a página cita Lei nº 99.999, de 2099/),
-  ).toBeVisible({
-    timeout: 30_000,
-  });
+  const indicio = page.getByText(/Há indício de alteração: a página cita Lei nº 99.999, de 2099/);
+  await expect(indicio).toBeVisible({ timeout: 30_000 });
+  await expect(indicio).toBeInViewport({ ratio: 1 });
   await semViolacoes(page);
 });
 
