@@ -11,26 +11,34 @@ import { rotuloDaAtividade } from './atividades';
 import { sessaoAberta } from './carregadores';
 import './estilos-canto.css';
 
+const minutosDe = (s: Sessao, agora: string) => Math.floor(duracaoEmSegundos(s, agora) / 60);
+
+// Com o temporizador escolhido (padrão das preferências), só informa até onde: sem alarme nem cobrança.
+// O "N de M min" vale até os M min, inclusive. Depois volta a "N min": "40 de 25 min" lê como estouro, e o
+// aviso gentil (o que o Temporizador da tela dava) mora no bloquinho, a partir dos M min.
 const textoDoTempo = (s: Sessao, agora: string) => {
-  const min = Math.floor(duracaoEmSegundos(s, agora) / 60);
-  const decorrido = min < 1 ? 'agora' : `${String(min)} min`;
-  // Com o temporizador escolhido (padrão das preferências), só informa até onde: sem alarme nem cobrança.
-  return s.temporizadorMin && min >= 1
+  const min = minutosDe(s, agora);
+  if (min < 1) return 'agora';
+  return s.temporizadorMin && min <= s.temporizadorMin
     ? `${String(min)} de ${String(s.temporizadorMin)} min`
-    : decorrido;
+    : `${String(min)} min`;
 };
+
+const passouDoTempo = (s: Sessao, agora: string) =>
+  s.temporizadorMin !== undefined && minutosDe(s, agora) >= s.temporizadorMin;
 
 export function CantoDaSessao() {
   const { pathname } = useLocation();
   const { dados: sessao } = useDados(sessaoAberta);
   if (!sessao || pathname === '/sessao/iniciar' || pathname === '/sessao/fechar') return null;
-  return <Canto sessao={sessao} />;
+  return <Canto sessao={sessao} naSessao={pathname === '/sessao/atual'} />;
 }
 
-function Canto({ sessao }: { sessao: Sessao }) {
+function Canto({ sessao, naSessao }: { sessao: Sessao; naSessao: boolean }) {
   const repo = useRepositorio();
   const campo = useRef<HTMLInputElement>(null);
   const relogio = useRef<HTMLButtonElement>(null);
+  const mensagem = useRef<HTMLParagraphElement>(null);
   const [aberto, setAberto] = useState(false);
   const [texto, setTexto] = useState('');
   const [aviso, setAviso] = useState('');
@@ -43,8 +51,14 @@ function Canto({ sessao }: { sessao: Sessao }) {
       clearInterval(id);
     };
   }, [repo]);
+  // O bloquinho rola por dentro (tela baixa, texto a 200%): o aviso de guardou ou falhou nasce abaixo da
+  // dobra, então vem à vista, sem animar.
+  useEffect(() => {
+    if (aviso) mensagem.current?.scrollIntoView({ block: 'nearest' });
+  }, [aviso]);
   const pausada = sessao.estado === 'pausada';
   const tempo = textoDoTempo(sessao, agora);
+  const passou = passouDoTempo(sessao, agora);
   const alternar = () => {
     setAberto((v) => !v);
     setAviso('');
@@ -71,7 +85,7 @@ function Canto({ sessao }: { sessao: Sessao }) {
   };
   return (
     <div
-      className="canto-sessao"
+      className={naSessao ? 'canto-sessao canto-sessao--na-tela' : 'canto-sessao'}
       onKeyDown={(e) => {
         if (e.key !== 'Escape' || !aberto) return;
         // Só o bloquinho fecha (o modo foco do Leitor respeita o `defaultPrevented`), e o foco volta ao relógio.
@@ -88,15 +102,24 @@ function Canto({ sessao }: { sessao: Sessao }) {
         aria-label={`Sessão${pausada ? ' pausada' : ''}, ${tempo}. ${aberto ? 'Fechar' : 'Abrir'} o bloquinho`}
         onClick={alternar}
       >
-        <span className="canto-sessao__rotulo">{pausada ? 'Sessão ' : 'Sessão · '}</span>
-        {pausada ? 'pausada' : tempo}
+        {/* Um invólucro só: o botão é flex, e rótulo e tempo soltos virariam duas colunas que quebram cada uma por si. */}
+        <span>
+          <span className="canto-sessao__rotulo">{pausada ? 'Sessão ' : 'Sessão · '}</span>
+          <span className="canto-sessao__tempo">{pausada ? 'pausada' : tempo}</span>
+        </span>
       </button>
       {aberto && (
-        <div className="canto-sessao__painel" role="group" aria-label="Sessão em andamento">
+        <div className="canto-sessao__painel" role="group" aria-label="Bloquinho da Sessão">
           <p className="canto-sessao__titulo">
             {sessao.atividade ? rotuloDaAtividade(sessao.atividade) : 'Sessão'}
             {pausada ? ' (pausada)' : ''}
           </p>
+          {passou && (
+            <p className="dica">
+              Os {sessao.temporizadorMin} min do temporizador passaram. Siga, pause ou encerre
+              quando quiser. Nada é cobrado.
+            </p>
+          )}
           <form onSubmit={guardar} className="canto-sessao__nota">
             <label htmlFor="canto-nota" className="visualmente-oculto">
               Anotar uma distração
@@ -116,16 +139,18 @@ function Canto({ sessao }: { sessao: Sessao }) {
             />
             <button type="submit">Guardar</button>
           </form>
-          <p role="status" className="dica">
+          <p ref={mensagem} role="status" className="dica">
             {aviso}
           </p>
           <div className="linha-acoes">
             <button type="button" onClick={pausarOuVoltar}>
               {pausada ? 'Voltar' : 'Pausar'}
             </button>
-            <Link to="/sessao/atual" className="botao botao-texto">
-              Ver a Sessão
-            </Link>
+            {!naSessao && (
+              <Link to="/sessao/atual" className="botao botao-texto">
+                Ver a Sessão
+              </Link>
+            )}
             <Link to="/sessao/fechar" className="botao botao-texto">
               Encerrar
             </Link>

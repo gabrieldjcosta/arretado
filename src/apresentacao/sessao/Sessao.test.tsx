@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { iniciarSessao } from '../../dominios/sessao/servico';
@@ -144,11 +144,90 @@ describe('Sessão leve (A2)', () => {
     });
   });
 
-  it('o temporizador padrão aparece no canto como "de N min", sem bloquear nada', async () => {
-    const { repo } = await repositorioDeTeste();
+  it('o canto diz "N de M min" com temporizador, "N min" sem ele e "agora" no primeiro minuto', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
     await iniciarSessao(repo, { temporizadorMin: 25 });
     await abrir('/sessao/atual', repo);
-    expect(await screen.findByRole('button', { name: /de 25 min|agora/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /bloquinho/ })).toHaveTextContent(
+      'Sessão · agora',
+    );
+    cleanup();
+    relogio.avancar(60_000);
+    await abrir('/sessao/atual', repo);
+    expect(await screen.findByRole('button', { name: /bloquinho/ })).toHaveTextContent(
+      'Sessão · 1 de 25 min',
+    );
+    cleanup();
+    relogio.avancar(11 * 60_000);
+    await abrir('/sessao/atual', repo);
+    const relogioDoCanto = await screen.findByRole('button', { name: /bloquinho/ });
+    expect(relogioDoCanto).toHaveTextContent('Sessão · 12 de 25 min');
+    expect(relogioDoCanto).toHaveAccessibleName('Sessão, 12 de 25 min. Abrir o bloquinho');
+  });
+
+  it('sem temporizador o canto mostra só os minutos', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await iniciarSessao(repo, {});
+    relogio.avancar(12 * 60_000);
+    await abrir('/sessao/atual', repo);
+    expect(await screen.findByRole('button', { name: /bloquinho/ })).toHaveTextContent(
+      'Sessão · 12 min',
+    );
+  });
+
+  it('passou do tempo: o canto volta a "N min" e o bloquinho avisa sem cobrar', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await iniciarSessao(repo, { temporizadorMin: 25 });
+    relogio.avancar(40 * 60_000);
+    const { usuario } = await abrir('/sessao/atual', repo);
+    const relogioDoCanto = await screen.findByRole('button', { name: /bloquinho/ });
+    expect(relogioDoCanto).toHaveTextContent('Sessão · 40 min');
+    expect(relogioDoCanto).not.toHaveTextContent('de 25');
+    await usuario.click(relogioDoCanto);
+    const bloquinho = await screen.findByRole('group', { name: 'Bloquinho da Sessão' });
+    expect(within(bloquinho).getByText(/Os 25 min do temporizador passaram/)).toBeInTheDocument();
+    expect(within(bloquinho).getByText(/Nada é cobrado/)).toBeInTheDocument();
+  });
+
+  it('dentro do prazo o bloquinho não traz aviso de tempo; ao completar, avisa sem cobrar', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await iniciarSessao(repo, { temporizadorMin: 25 });
+    relogio.avancar(24 * 60_000);
+    const { usuario } = await abrir('/sessao/atual', repo);
+    const dentro = await screen.findByRole('button', { name: /bloquinho/ });
+    expect(dentro).toHaveTextContent('Sessão · 24 de 25 min');
+    await usuario.click(dentro);
+    const bloquinho = await screen.findByRole('group', { name: 'Bloquinho da Sessão' });
+    expect(within(bloquinho).queryByText(/passaram/)).not.toBeInTheDocument();
+    cleanup();
+    relogio.avancar(60_000);
+    await abrir('/sessao/atual', repo);
+    const completo = await screen.findByRole('button', { name: /bloquinho/ });
+    expect(completo).toHaveTextContent('Sessão · 25 de 25 min');
+    await usuario.click(completo);
+    expect(await screen.findByText(/Os 25 min do temporizador passaram/)).toBeInTheDocument();
+  });
+
+  it('na tela da Sessão o bloquinho não oferece "Ver a Sessão"', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, {});
+    const { usuario } = await abrir('/sessao/atual', repo);
+    await usuario.click(await screen.findByRole('button', { name: /Abrir o bloquinho/ }));
+    const bloquinho = await screen.findByRole('group', { name: 'Bloquinho da Sessão' });
+    expect(within(bloquinho).queryByRole('link', { name: 'Ver a Sessão' })).not.toBeInTheDocument();
+    expect(within(bloquinho).getByRole('link', { name: 'Encerrar' })).toBeInTheDocument();
+  });
+
+  it('o aviso do bloquinho vem à vista: o painel rola por dentro em telas pequenas', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, {});
+    const { usuario } = await abrir('/sessao/atual', repo);
+    await usuario.click(await screen.findByRole('button', { name: /Abrir o bloquinho/ }));
+    const rolar = vi.spyOn(Element.prototype, 'scrollIntoView');
+    await usuario.type(screen.getByLabelText('Anotar uma distração'), 'ver o preço{Enter}');
+    const aviso = await screen.findByText('Guardado para depois.');
+    expect(rolar).toHaveBeenCalledWith({ block: 'nearest' });
+    expect(rolar.mock.contexts).toContain(aviso);
   });
 
   it('só estudo liga e desliga pelo interruptor da própria Sessão', async () => {
@@ -184,7 +263,7 @@ describe('Sessão leve (A2)', () => {
     });
     const { usuario } = await abrir('/recall/revisar', repo);
     await usuario.click(await screen.findByRole('button', { name: /Abrir o bloquinho/ }));
-    const faixa = await screen.findByRole('group', { name: 'Sessão em andamento' });
+    const faixa = await screen.findByRole('group', { name: 'Bloquinho da Sessão' });
     await usuario.click(within(faixa).getByRole('button', { name: 'Pausar' }));
     await waitFor(async () => {
       expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estado).toBe('pausada');
@@ -194,5 +273,7 @@ describe('Sessão leve (A2)', () => {
       expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estado).toBe('ativa');
     });
     expect(within(faixa).getByRole('link', { name: 'Encerrar' })).toBeInTheDocument();
+    // Fora da tela da Sessão o link de volta existe.
+    expect(within(faixa).getByRole('link', { name: 'Ver a Sessão' })).toBeInTheDocument();
   });
 });

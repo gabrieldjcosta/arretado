@@ -24,19 +24,34 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* O tempo ("12 de 25 min") é um bloco em linha: com texto ampliado desce inteiro para a linha de baixo do rótulo
+   e só se parte nos espaços quando nem sozinho cabe. */
+.canto-sessao__tempo {
+  display: inline-block;
+}
+
+/* Na tela da Sessão ele não flutua, assenta no fim da casca: lá moram Pausar, Encerrar e Acertei/Errei, que um
+   relógio preso embaixo cobriria já na primeira tela (320 px, texto a 200%). */
+.canto-sessao--na-tela {
+  position: relative;
+  bottom: auto;
+}
+
 /* Em foco só o tempo (o nome inteiro está no aria-label): o relógio não toma a largura do dock de baixo. */
 :root[data-modo-foco] .canto-sessao__rotulo {
   display: none;
 }
 
 /* O bloquinho abre para cima do relógio sem tomar lugar no fluxo (a página não pula ao abrir) e rola
-   por dentro se a tela é baixa (celular deitado, texto ampliado). */
+   por dentro se a tela é baixa (celular deitado, texto ampliado). A altura máxima deixa de fora o cabeçalho
+   preso (3,75 rem; 90 px quando quebra em duas linhas, a 195 px) e o relógio com até duas linhas, para o
+   campo nunca ficar sob o cabeçalho. */
 .canto-sessao__painel {
   position: absolute;
   inset-block-end: calc(100% + 0.5rem);
   inset-inline-start: 0;
   width: min(20rem, calc(100vw - 2rem));
-  max-height: calc(100dvh - var(--abas-altura) - var(--alvo) - 3rem);
+  max-height: calc(100dvh - var(--abas-altura) - 2 * var(--alvo) - 2rem - max(3.75rem, 90px));
   overflow-y: auto;
   padding: 0.75rem;
   border: var(--borda-folha);
@@ -49,13 +64,15 @@
   color: var(--texto-atenuado);
 }
 
+/* Com texto ampliado o campo não fica espremido ("Anota"): o Guardar desce para a linha de baixo. */
 .canto-sessao__nota {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .canto-sessao__nota input {
-  flex: 1 1 auto;
+  flex: 1 1 10rem;
   min-width: 0;
 }
 
