@@ -5,6 +5,7 @@ import type { ProximaAcao } from '../../dominios/hoje/contrato';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
 import { Icone } from '../componentes/Icone';
+import { ComecarSessao } from '../sessao/ComecarSessao';
 import { SessaoAberta } from '../sessao/SessaoAberta';
 import { ROTULO_REVISAR_CARTOES } from '../../dominios/hoje/proxima-acao';
 import { EstadoVazio } from './EstadoVazio';
@@ -83,10 +84,20 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
 }
 
 export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
+  const normaLida = hoje.retrato
+    ? [
+        ...(hoje.retrato.agora.tipo === 'acao' ? [hoje.retrato.agora.acao] : []),
+        ...hoje.retrato.outras,
+      ].find((a) => a.tipo === 'leitura_salva')?.alvo.id
+    : undefined;
   return (
     <>
       <SessaoAberta />
       <ProximaAcaoDoHoje hoje={hoje} />
+      {/* No Hoje vazio o começo é um só ("Por onde começar?"): o cartão de Sessão espera haver o que fazer. */}
+      {hoje.retrato?.agora.tipo === 'acao' && (
+        <ComecarSessao {...(normaLida === undefined ? {} : { normaLida })} />
+      )}
     </>
   );
 }

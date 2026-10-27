@@ -1,6 +1,6 @@
 // Contrato da Sessão leve (F3-A, pacote A2; `estacionar` é do A3a, em `estacionamento.ts`). A duração
 // de uma Sessão nunca é tratada como aprendizado, e pausar não declara falha.
-import type { AlvoDeAcao, OrigemDaAcao, Sessao } from '../../core/modelo';
+import type { AlvoDeAcao, AtividadeDeSessao, OrigemDaAcao, Sessao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 
 export interface EntradaDeSessao {
@@ -8,6 +8,8 @@ export interface EntradaDeSessao {
   alvo?: AlvoDeAcao;
   origemDaAcao?: OrigemDaAcao;
   tarefaId?: string;
+  /** Ausente = Sessão sem tipo (as antigas e a livre). */
+  atividade?: AtividadeDeSessao;
   /** Ciclo e bloco que a Sessão trabalha (a posição do Ciclo sai das Sessões encerradas). */
   cicloId?: string;
   blocoOrdem?: number;

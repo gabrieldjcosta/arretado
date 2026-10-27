@@ -46,6 +46,11 @@ export async function prepararPontos(
   });
 
   const disciplinas = new Map<string, Disciplina>();
+  // Disciplina que a pessoa já criou com o mesmo nome é reaproveitada, não duplicada.
+  for (const d of await repo.colecao('disciplinas').todosDoUsuario()) {
+    if (!d.excluidoEm && !disciplinas.has(chave(d.nome))) disciplinas.set(chave(d.nome), d);
+  }
+  const jaExistem = new Set(disciplinas.keys());
   for (const [ordem, l] of linhas.entries()) {
     const k = chave(l.disciplina);
     if (!disciplinas.has(k)) {
@@ -96,12 +101,12 @@ export async function prepararPontos(
       modulos: ['plano'],
       incluiLog: false,
       incluiAnexos: false,
-      contagens: { disciplinas: disciplinas.size, pontos: pontos.length },
+      contagens: { disciplinas: disciplinas.size - jaExistem.size, pontos: pontos.length },
       arquivos: {},
       hashConjunto: hashArquivo,
     },
     registros: new Map<NomeColecao, Record<string, unknown>[]>([
-      ['disciplinas', [...disciplinas.values()]],
+      ['disciplinas', [...disciplinas].filter(([k]) => !jaExistem.has(k)).map(([, d]) => d)],
       ['pontos', pontos],
     ]),
     log: null,
