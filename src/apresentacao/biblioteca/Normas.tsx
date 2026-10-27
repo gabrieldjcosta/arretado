@@ -233,8 +233,9 @@ function linhasDeNormas(
       porNorma.set(norma.id, linha);
     }
   }
+  // `numeric`: "Lei 8.078/1990" vem antes de "Lei 11.340/2006" (sem isso, o "1" de 11 vence o "8").
   return [...porNorma.values()].sort((a, b) =>
-    a.norma.tituloCurto.localeCompare(b.norma.tituloCurto, 'pt-BR'),
+    a.norma.tituloCurto.localeCompare(b.norma.tituloCurto, 'pt-BR', { numeric: true }),
   );
 }
 
@@ -558,12 +559,13 @@ export function Normas() {
                     )}
                   </div>
                 )}
-                <ul className="lista-simples lista-de-linhas">
+                <ul className="lista-simples lista-de-linhas lista-de-normas">
                   {linhas.map(({ norma: n, subtitulo, trecho, disciplinas }) => {
                     const leitura = dados.leituras.get(n.id);
+                    // A leitura vem primeiro: é o dado da pessoa e o que a linha de uma só vista mais perderia.
                     const apoio = [
-                      disciplinas.join(' · '),
                       leitura ? `Última leitura: ${formatarQuando(lidaEm(leitura))}` : '',
+                      disciplinas.join(' · '),
                       subtitulo,
                       descricaoDe(n),
                       dados.procedencias.get(n.id),

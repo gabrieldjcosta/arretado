@@ -294,6 +294,39 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(within(lista).queryByText('Outras')).not.toBeInTheDocument();
   });
 
+  it('no apoio, a leitura vem antes das disciplinas: a linha curta perde o fim primeiro (R1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    await vincular(repo, lep.id, 'Execução Penal');
+    await vincular(repo, lep.id, 'Penal');
+    const { nos } = await abrirNorma(repo, lep.id);
+    await gravarPosicao(
+      repo,
+      lep.id,
+      (nos.find((n) => n.dispositivo.tipo === 'artigo') ?? nos[0]!).dispositivo.id,
+    );
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(await within(lista).findByRole('link', { name: /^LEP/ })).toHaveTextContent(
+      /Última leitura: .+ · Execução Penal · Penal/,
+    );
+  });
+
+  it('a ordem é alfabética e lê o número como número: "Lei 8.078" antes de "Lei 11.340" (R1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    for (const titulo of ['Lei 11.340/2006', 'Lei 8.078/1990', 'CP'])
+      await publicarVersao(repo, (await rascunho(repo, titulo)).id);
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    await within(lista).findByRole('link', { name: /^CP/ });
+    const titulos = within(lista)
+      .getAllByRole('link', { name: /^(CP|Lei)/ })
+      .map((a) => a.querySelector('.linha-lista-titulo')?.textContent);
+    expect(titulos).toEqual(['CP', 'Lei 8.078/1990', 'Lei 11.340/2006']);
+  });
+
   it('filtrada por disciplina, a lista mostra só as normas dela', async () => {
     const { repo } = await repositorioDeTeste();
     const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
