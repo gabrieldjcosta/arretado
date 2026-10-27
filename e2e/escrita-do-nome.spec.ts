@@ -31,9 +31,9 @@ async function lockup(page: Page): Promise<Buffer> {
 }
 
 /**
- * Quantos pontos diferem de verdade entre dois recortes PNG (canal a canal, além de 40 em 255): o
+ * Quantos pontos diferem de verdade entre dois recortes PNG (canal a canal, além de 16 em 255): o
  * lockup parado e o quadro final da escrita desenham os mesmos caminhos, mas um é tracejado e o outro
- * não, e a serrilha do Chromium muda alguns níveis nas bordas (medido 17 a 31 no tablet depois que o Hoje ganhou o cartão "Começar uma Sessão"; a causa da rasterização não foi investigada), enquanto um traço faltando ou fora do lugar muda o canal por inteiro. -1 se os tamanhos diferem.
+ * não, e a serrilha do Chromium muda 1 ou 2 níveis nas bordas. -1 se os tamanhos diferem.
  */
 async function pontosDiferentes(page: Page, a: Buffer, b: Buffer): Promise<number> {
   return page.evaluate(
@@ -54,7 +54,7 @@ async function pontosDiferentes(page: Page, a: Buffer, b: Buffer): Promise<numbe
         const maior = Math.max(
           ...[0, 1, 2, 3].map((k) => Math.abs((x.data[i + k] ?? 0) - (y.data[i + k] ?? 0))),
         );
-        if (maior > 40) diferentes += 1;
+        if (maior > 16) diferentes += 1;
       }
       return diferentes;
     },

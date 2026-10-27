@@ -35,3 +35,7 @@
   max-width: 100%;
   overflow-wrap: anywhere;
 }
+
+.comecar-sessao .dica {
+  margin: 0.75rem 0 0;
+}

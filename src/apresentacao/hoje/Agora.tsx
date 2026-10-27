@@ -68,7 +68,10 @@ export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
     <>
       <SessaoAberta />
       <ProximaAcaoDoHoje hoje={hoje} />
-      <ComecarSessao {...(normaLida === undefined ? {} : { normaLida })} />
+      {/* No Hoje vazio o começo é um só ("Por onde começar?"): o cartão de Sessão espera haver o que fazer. */}
+      {hoje.retrato?.agora.tipo === 'acao' && (
+        <ComecarSessao {...(normaLida === undefined ? {} : { normaLida })} />
+      )}
     </>
   );
 }

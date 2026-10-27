@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
+import { criarCartaoManual } from '../../dominios/recall/servico';
 import { iniciarSessao } from '../../dominios/sessao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -14,9 +15,17 @@ async function abrir(rota: string, repo?: Repositorio) {
   return { repo: r, usuario };
 }
 
+/** Um cartão vencido faz o Agora ser uma ação (no Hoje vazio o cartão de Sessão não aparece). */
+async function repoComAgora() {
+  const { repo } = await repositorioDeTeste();
+  const c = await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
+  await repo.colecao('cartoes').atualizar(c.id, { proximaRevisao: '2000-01-01' });
+  return repo;
+}
+
 describe('Atividade da Sessão no Hoje', () => {
   it('um toque no tipo começa a Sessão com a atividade e leva à tela dela', async () => {
-    const { repo, usuario } = await abrir('/');
+    const { repo, usuario } = await abrir('/', await repoComAgora());
     await usuario.click(await screen.findByRole('button', { name: /Jurisprudência/ }));
     await waitFor(() => {
       expect(window.location.hash).toBe('#/biblioteca/precedentes');
@@ -26,7 +35,7 @@ describe('Atividade da Sessão no Hoje', () => {
   });
 
   it('sugere questões quando não há leitura nem escolha anterior', async () => {
-    await abrir('/');
+    await abrir('/', await repoComAgora());
     const sugerido = await screen.findByRole('button', { name: /Questões/ });
     expect(sugerido).toHaveTextContent('(sugerido)');
   });
@@ -38,6 +47,12 @@ describe('Atividade da Sessão no Hoje', () => {
     expect(await screen.findByRole('region', { name: 'Sessão aberta' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
   });
+});
+
+it('no Hoje vazio não há cartão de Sessão: o começo é um só', async () => {
+  await abrir('/');
+  await screen.findByRole('heading', { name: 'Por onde começar?' });
+  expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
 });
 
 describe('Sessão de questões', () => {

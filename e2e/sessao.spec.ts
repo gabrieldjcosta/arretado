@@ -113,7 +113,16 @@ test('A nota guardada na Sessão fica no Para lembrar do Hoje até ser marcada c
 test('Sessão por atividade: questões no cartão do Hoje, Errei guarda o erro e o canto fica sobre as abas', async ({
   page,
 }) => {
+  // Com um cartão vencido o Hoje tem uma ação; no Hoje vazio o começo é um só e não há cartão de Sessão.
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  await page.goto('/#/recall/cartoes/novo');
+  await page.getByLabel('Frente (pergunta)').fill('Pergunta');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page).toHaveURL(/#\/recall\/cartoes$/);
+  await page.clock.setFixedTime(new Date(inicio.getTime() + 86_400_000));
   await page.goto('/#/');
+  await page.reload();
   await page.getByRole('button', { name: /Questões/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
   await page.getByRole('button', { name: 'Acertei' }).click();
