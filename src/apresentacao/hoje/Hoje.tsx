@@ -10,8 +10,8 @@
 // "Trocar" de cada item, Q5) e o "Para lembrar" à direita. Abaixo disso as duas viram uma só, na mesma
 // ordem.
 //
-// A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
-// montam aqui só porque o Hoje é onde o aplicativo abre.
+// A Chegada (`EntradaDoDia`, D-D9) é uma folha sobre o Hoje, não parte do layout; a Entrada do Dia (S4)
+// é a linha quieta acima do Agora. Montam aqui porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
@@ -36,6 +36,8 @@ export function Hoje() {
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
       <PontosDoDia retrato={hoje.retrato} />
+      {/* A Chegada (folha) e a linha do dia (S4): a linha fica acima do Agora. */}
+      <EntradaDoDia retrato={hoje.retrato} />
       <div className="hoje-colunas">
         <div>
           <Agora hoje={hoje} />
@@ -59,7 +61,6 @@ export function Hoje() {
       <ConviteDepoisDaLeitura />
       <LembreteDeBackup />
       <AvisoDeAtualizacao />
-      <EntradaDoDia retrato={hoje.retrato} />
     </>
   );
 }

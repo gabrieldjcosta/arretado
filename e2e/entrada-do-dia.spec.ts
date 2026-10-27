@@ -14,13 +14,11 @@ const CHAVE_CHEGADA = 'arretado:chegada:v1';
 const CHAVE_ENTRADA = 'arretado:entrada-do-dia:v1';
 
 // A Entrada de 21/10/2026 é a da prancha: Ricardo Reis e "Tentar lembrar vale mais que reler".
-const ONTEM = new Date('2026-10-20T21:40:00-03:00');
 const HOJE = new Date('2026-10-21T09:30:00-03:00');
 
 const hoje = (page: Page) => page.getByRole('heading', { level: 1, name: 'Hoje' });
 const folhaAberta = (page: Page) => page.locator('dialog[open]');
 const chegada = (page: Page) => page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-const entrada = (page: Page) => page.getByRole('dialog', { name: 'Bom dia' });
 
 /** O aparelho já viu a Chegada: o que abre, no Hoje, é a Entrada do Dia. */
 async function jaViuAChegada(page: Page) {
@@ -43,14 +41,6 @@ async function nadaAbre(page: Page) {
   await expect(page.getByRole('region', { name: /^(Agora|Por onde começar)$/ })).toBeVisible();
   await page.waitForTimeout(600);
   await expect(folhaAberta(page)).toHaveCount(0);
-}
-
-/** Cria uma tarefa (no relógio de então) para a Próxima ação do Hoje não ser vazia. */
-async function criarTarefa(page: Page, titulo: string) {
-  await page.goto('/#/plano/tarefas');
-  await page.getByLabel('O que fazer?').fill(titulo);
-  await page.getByRole('button', { name: 'Adicionar tarefa' }).click();
-  await expect(page.getByRole('region', { name: 'Fila' }).getByText(titulo)).toBeVisible();
 }
 
 /**
@@ -203,122 +193,56 @@ test.describe('Chegada', () => {
   });
 });
 
-test.describe('Entrada do Dia', () => {
+test.describe('Entrada do Dia (S4: uma linha quieta acima do Agora)', () => {
   test.beforeEach(async ({ page }) => {
     await jaViuAChegada(page);
   });
 
-  test('abre com a saudação, a Citação e a dica do Dia; o foco vai para o botão do Agora', async ({
+  const linha = (page: Page) => page.locator('.linha-do-dia');
+
+  test('a saudação e a dica do Dia viram uma linha acima do Agora, sem folha por cima', async ({
     page,
   }) => {
     await page.clock.setFixedTime(HOJE);
     await page.goto('/#/');
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    await expect(folha.getByRole('blockquote')).toContainText(
-      'Sê todo em cada coisa. Põe quanto és No mínimo que fazes.',
-    );
-    await expect(folha.locator('figcaption')).toHaveText('Fernando Pessoa (Ricardo Reis), Odes');
-    // Os versos mantêm a quebra do original.
-    await expect(folha.locator('.entrada-citacao p')).toHaveCSS('white-space', 'pre-line');
-    await expect(folha.getByRole('heading', { level: 3, name: 'Dica de hoje' })).toBeVisible();
-    await expect(folha).toContainText('Tentar lembrar vale mais que reler.');
-    // Sem Agora (o Hoje vazio), o único caminho é "Continuar", com o foco.
-    await expect(folha.getByRole('button', { name: 'Continuar' })).toBeFocused();
-    await expect(folha).toHaveAccessibleDescription(/Tentar lembrar vale mais que reler\./);
-    await focoFicaNaFolha(page);
+    await expect(linha(page)).toBeVisible();
+    await expect(linha(page)).toContainText('Bom dia.');
+    await expect(linha(page)).toContainText('Tentar lembrar vale mais que reler.');
+    await expect(folhaAberta(page)).toHaveCount(0);
+    // A Citação deixou a tela; o Hoje não está inerte.
+    await expect(page.getByRole('blockquote')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: /^(Agora|Por onde começar)$/ })).toBeVisible();
+    const acima = await page.evaluate(() => {
+      const l = document.querySelector('.linha-do-dia')?.getBoundingClientRect();
+      const g = document.querySelector('[aria-label="Agora"], [aria-label="Por onde começar"]');
+      return l !== undefined && g ? l.bottom <= g.getBoundingClientRect().top : false;
+    });
+    expect(acima).toBe(true);
   });
 
-  test('no Dia seguinte o botão leva ao Agora e a folha não fica por cima', async ({ page }) => {
-    await page.clock.setFixedTime(ONTEM);
-    await criarTarefa(page, 'Ler arts. 112 a 117 da LEP');
-    await page.goto('/#/');
-    await expect(hoje(page)).toBeVisible();
-    // A Entrada de ontem (21h40): fecha, e o Dia dela acabou.
-    await page
-      .getByRole('dialog', { name: 'Boa noite' })
-      .getByRole('button', { name: 'Agora não' })
-      .click();
-    await expect(folhaAberta(page)).toHaveCount(0);
-
-    await page.clock.setFixedTime(HOJE);
-    await page.reload();
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    const comecar = folha.getByRole('link', { name: 'Começar: Ler arts. 112 a 117 da LEP' });
-    await expect(comecar).toBeFocused();
-    await expect(folha.getByRole('button', { name: 'Agora não' })).toBeVisible();
-
-    await comecar.click();
-    await expect(page).toHaveURL(/#\/sessao\/iniciar\?/);
-    await expect(folhaAberta(page)).toHaveCount(0);
-  });
-
-  test('Esc fecha; recarregar no mesmo Dia, ou fechar o aplicativo com ela aberta, não a traz de volta', async ({
-    page,
-  }) => {
+  test('recarregar no mesmo Dia não a repete; o Dia seguinte traz outra dica', async ({ page }) => {
     await page.clock.setFixedTime(HOJE);
     await page.goto('/#/');
-    await expect(entrada(page)).toBeVisible();
+    const dica = await linha(page).innerText();
 
     await page.reload();
     await nadaAbre(page);
-
-    // Outro Dia, outra Entrada; Esc a fecha.
-    await page.clock.setFixedTime(new Date(HOJE.getTime() + 24 * 60 * 60_000));
-    await page.reload();
-    await expect(entrada(page)).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(folhaAberta(page)).toHaveCount(0);
-    await expect(hoje(page)).toBeVisible();
-  });
-
-  test('o Dia seguinte traz outro par de Citação e dica', async ({ page }) => {
-    await page.clock.setFixedTime(HOJE);
-    await page.goto('/#/');
-    const primeira = await entrada(page).getByRole('blockquote').innerText();
-    const dica = await entrada(page).locator('.entrada-dica').innerText();
+    await expect(linha(page)).toHaveCount(0);
 
     await page.clock.setFixedTime(new Date(HOJE.getTime() + 24 * 60 * 60_000));
     await page.reload();
-    await expect(entrada(page)).toBeVisible();
-    expect(await entrada(page).getByRole('blockquote').innerText()).not.toBe(primeira);
-    expect(await entrada(page).locator('.entrada-dica').innerText()).not.toBe(dica);
+    await expect(linha(page)).toBeVisible();
+    expect(await linha(page).innerText()).not.toBe(dica);
   });
 
-  test('sem violações do axe, nos dois temas, com alvos de 44 px', async ({ page }) => {
-    await page.clock.setFixedTime(HOJE);
-    await page.goto('/#/');
-    await expect(entrada(page)).toBeVisible();
-    await semViolacoes(page);
-    await alvosDe44(entrada(page));
-  });
-
-  test('com zoom de 200% e com texto grande, a folha rola por dentro e tudo se alcança', async ({
-    page,
-  }) => {
-    await page.clock.setFixedTime(ONTEM);
-    await criarTarefa(page, 'Ler arts. 112 a 117 da LEP');
+  test('sem violações do axe e sem rolagem lateral a 200% de zoom', async ({ page }) => {
     await page.clock.setFixedTime(HOJE);
     await page.setViewportSize({ width: 195, height: 400 });
     await page.goto('/#/');
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-    const agoraNao = folha.getByRole('button', { name: 'Agora não' });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-
+    await expect(linha(page)).toBeVisible();
+    expect(await rolagemLateral(page)).toMatchObject({ pagina: 0 });
     await page.setViewportSize({ width: 390, height: 800 });
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = '200%';
-    });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    await folha.getByRole('link', { name: /^Começar:/ }).scrollIntoViewIfNeeded();
-    await expect(folha.getByRole('link', { name: /^Começar:/ })).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
+    await semViolacoes(page);
   });
 });
 
@@ -326,7 +250,7 @@ test.describe('Entrada do Dia › se o conteúdo não carregar', () => {
   // O pedido do trecho que falha é, ele mesmo, um erro de console; o que não pode haver é erro da página.
   test.use({ permitirFalhasConsole: true });
 
-  test('a folha não abre, nada é gravado e o Hoje segue usável', async ({ page }) => {
+  test('a linha não aparece, nada é gravado e o Hoje segue usável', async ({ page }) => {
     const erros: string[] = [];
     page.on('pageerror', (e) => erros.push(e.message));
     let pedidos = 0;
