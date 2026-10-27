@@ -128,15 +128,14 @@ describe('Sessão leve (A2)', () => {
     expect(await screen.findByText('Nenhuma Sessão aberta')).toBeInTheDocument();
   });
 
-  it('estaciona uma distração sem sair da Sessão e a mostra ao fechar', async () => {
+  it('o bloquinho do canto guarda uma distração na própria Sessão e a mostra ao fechar', async () => {
     const { repo, usuario } = await abrir('/sessao/iniciar');
     await usuario.click(await screen.findByRole('button', { name: 'Começar' }));
-    await usuario.type(await screen.findByLabelText('Deixar para depois'), 'ver o preço{Enter}');
+    await usuario.click(await screen.findByRole('button', { name: /Abrir o bloquinho/ }));
+    await usuario.type(screen.getByLabelText('Anotar uma distração'), 'ver o preço{Enter}');
     expect(await screen.findByText('Guardado para depois.')).toBeInTheDocument();
-    expect(screen.getByLabelText('Deixar para depois')).toHaveFocus();
-    expect(screen.getByRole('button', { name: 'Pausar' })).toBeInTheDocument();
     expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.estacionamento).toHaveLength(1);
-    await usuario.click(screen.getByRole('link', { name: 'Encerrar' }));
+    await usuario.click(screen.getAllByRole('link', { name: 'Encerrar' })[0]!);
     await usuario.click(await screen.findByLabelText('ver o preço'));
     await waitFor(async () => {
       expect(
@@ -145,14 +144,11 @@ describe('Sessão leve (A2)', () => {
     });
   });
 
-  it('temporizador é opcional: escolhe e tira, sem bloquear a Sessão', async () => {
-    const { repo, usuario } = await abrir('/sessao/iniciar');
-    await usuario.click(await screen.findByRole('button', { name: 'Começar' }));
-    await usuario.click(await screen.findByRole('button', { name: '25 min' }));
-    expect(await screen.findByText(/Faltam cerca de 25 min dos 25 min/)).toBeInTheDocument();
-    expect((await repo.colecao('sessoes').todosDoUsuario())[0]?.temporizadorMin).toBe(25);
-    await usuario.click(screen.getByRole('button', { name: 'Tirar o temporizador' }));
-    expect(await screen.findByRole('button', { name: '15 min' })).toBeInTheDocument();
+  it('o temporizador padrão aparece no canto como "de N min", sem bloquear nada', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, { temporizadorMin: 25 });
+    await abrir('/sessao/atual', repo);
+    expect(await screen.findByRole('button', { name: /de 25 min|agora/ })).toBeInTheDocument();
   });
 
   it('só estudo liga e desliga pelo interruptor da própria Sessão', async () => {

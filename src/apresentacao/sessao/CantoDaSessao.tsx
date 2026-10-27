@@ -1,5 +1,5 @@
 // Canto da Sessão: com uma Sessão aberta, um relógio discreto no canto de baixo à esquerda de toda tela
-// (menos as da própria Sessão). Tocar abre o bloquinho: anotar uma distração sem sair do estudo,
+// (menos as de começar e de encerrar a Sessão). Tocar abre o bloquinho: anotar uma distração sem sair do estudo,
 // pausar ou encerrar. Mostra só o tempo decorrido, sem alarme nem cobrança.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
@@ -13,13 +13,17 @@ import './estilos-canto.css';
 
 const textoDoTempo = (s: Sessao, agora: string) => {
   const min = Math.floor(duracaoEmSegundos(s, agora) / 60);
-  return min < 1 ? 'agora' : `${String(min)} min`;
+  const decorrido = min < 1 ? 'agora' : `${String(min)} min`;
+  // Com o temporizador escolhido (padrão das preferências), só informa até onde: sem alarme nem cobrança.
+  return s.temporizadorMin && min >= 1
+    ? `${String(min)} de ${String(s.temporizadorMin)} min`
+    : decorrido;
 };
 
 export function CantoDaSessao() {
   const { pathname } = useLocation();
   const { dados: sessao } = useDados(sessaoAberta);
-  if (!sessao || pathname.startsWith('/sessao')) return null;
+  if (!sessao || pathname === '/sessao/iniciar' || pathname === '/sessao/fechar') return null;
   return <Canto sessao={sessao} />;
 }
 
