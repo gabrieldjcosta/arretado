@@ -2997,6 +2997,23 @@ dialog.dialogo-acoes {
   min-height: var(--alvo);
 }
 
+/* "Verificar atualização" nas Ações: fala da norma inteira, não do trecho. Vem sob o próprio título,
+   afastada do grupo de cima, e o botão ocupa a linha como os outros. */
+.verificar-atualizacao {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.verificar-atualizacao h3,
+.verificar-atualizacao [role='status'] p {
+  margin: 0;
+}
+
+.verificar-atualizacao button {
+  min-height: var(--alvo);
+}
+
 .erros-vinculados {
   margin: 0;
   padding-left: 1.25rem;
