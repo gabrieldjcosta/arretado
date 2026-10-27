@@ -3022,11 +3022,15 @@ dialog.dialogo-acoes {
   line-height: 1.15;
   margin: 0 0 0.25rem;
   font-size: 1.625rem;
+  /* "Ler arts. 1.059 a 1.062" a 320 px: o intervalo inteiro na segunda linha, sem o "a" pendurado. */
+  text-wrap: balance;
 }
 
 .agora-motivo {
   margin: 0 0 0.25rem;
   color: var(--bloco-atenuado);
+  /* Sem o "muito" sozinho na segunda linha ("Pelo mapa, o próximo trecho: cai muito" a 320 px). */
+  text-wrap: balance;
 }
 
 .agora-estimativa {
