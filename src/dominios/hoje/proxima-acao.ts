@@ -108,7 +108,8 @@ function leituraSalva(e: EntradaDaProximaAcao): ProximaAcao | undefined {
     return {
       tipo: 'leitura_salva',
       alvo,
-      razao: `Pelo mapa, o próximo trecho da ${l.tituloCurto} ${l.trecho.faixa}`,
+      // Sem a norma na frase: a linha "Retomar em" a diz, e o nome não tem gênero fixo (do CP, da LEP).
+      razao: `Pelo mapa, o próximo trecho: ${l.trecho.faixa}`,
       estimativaMin: l.trecho.minutos,
       trecho: { endereco: l.trecho.endereco, rotulo: l.trecho.rotulo, continuar },
     };

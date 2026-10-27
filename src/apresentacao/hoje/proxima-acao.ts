@@ -66,7 +66,8 @@ async function trechoDoMapa(
   ]).finally(() => {
     clearTimeout(relogio);
   });
-  if (!t) return undefined;
+  // Só o que raro cai por cobrir: o Agora não propõe o raro como ação dominante; fica o de sempre.
+  if (!t || t.classe === 'baixa') return undefined;
   const rotulo = t.rotulo.startsWith('Art') ? `a${t.rotulo.slice(1)}` : t.rotulo;
   return { endereco: t.endereco, rotulo, faixa: NOME_DA_CLASSE[t.classe], minutos: t.minutos };
 }

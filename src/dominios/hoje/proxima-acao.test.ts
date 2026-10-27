@@ -69,7 +69,7 @@ describe('decidirProximaAcao (A1)', () => {
       acao: {
         tipo: 'leitura_salva',
         alvo: { tipo: 'leitura', id: 'n1', rotulo: 'LEP' },
-        razao: 'Pelo mapa, o próximo trecho da LEP cai muito',
+        razao: 'Pelo mapa, o próximo trecho: cai muito',
         estimativaMin: 2,
         trecho: {
           endereco: 'art3',
@@ -79,6 +79,24 @@ describe('decidirProximaAcao (A1)', () => {
       },
     });
   });
+
+  it.each([
+    ['Código Penal', 'raro'],
+    ['CPP', 'cai'],
+    ['Constituição da República Federativa do Brasil de 1988', 'cai muito'],
+    ['Lei 8.069/1990 (ECA)', 'cai às vezes'],
+  ])(
+    'o motivo do trecho de %s não leva o nome da norma e fecha com a faixa "%s"',
+    (tituloCurto, faixa) => {
+      const trecho = { endereco: 'art3', rotulo: 'arts. 3º a 4º', faixa, minutos: 2 };
+      const r = decidirProximaAcao({
+        cartoesVencidos: 0,
+        frasesVencidas: 0,
+        leitura: { ...leitura, tituloCurto, trecho },
+      });
+      expect(r.tipo === 'acao' && r.acao.razao).toBe(`Pelo mapa, o próximo trecho: ${faixa}`);
+    },
+  );
 
   it('"Escolher outra coisa": dispensar passa ao seguinte e, no fim, ao vazio', () => {
     const entrada = { cartoesVencidos: 1, frasesVencidas: 0, leitura };
