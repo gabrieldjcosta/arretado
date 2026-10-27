@@ -3690,27 +3690,6 @@ dialog.dialogo-previa .linha-acoes button {
   justify-content: center;
 }
 
-/* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por
-   disciplina nem faixa colorida, D-D6 e D-D7): só o filete fino. */
-.grupo-de-normas {
-  margin-block: 0.75rem;
-  padding-inline-start: 0.75rem;
-  border-inline-start: 1px solid var(--borda);
-}
-
-.grupo-de-normas > summary {
-  display: flex;
-  gap: 0.5rem;
-  min-height: 44px;
-  align-items: center;
-  cursor: pointer;
-}
-
-.grupo-de-normas > summary h3 {
-  display: inline;
-  margin: 0;
-}
-
 /* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */
 .lacuna-editor {
   user-select: text;

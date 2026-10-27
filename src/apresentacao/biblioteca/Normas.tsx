@@ -209,6 +209,35 @@ function filtrarGrupos<G extends { titulo: string; itens: ItemDaDisciplina[] }>(
     .filter((g) => g.itens.length > 0);
 }
 
+/** Uma linha por norma (R1): as disciplinas vão no apoio; o trecho só vale com a disciplina filtrada. */
+interface LinhaDeNorma extends ItemDaDisciplina {
+  disciplinas: string[];
+}
+
+/**
+ * Sem filtro de disciplina, cada norma aparece uma vez, com todas as suas disciplinas; com o filtro,
+ * a lista é a do grupo, e o trecho e o subtítulo do vínculo daquela disciplina voltam.
+ */
+function linhasDeNormas(
+  grupos: readonly { titulo: string; itens: ItemDaDisciplina[] }[],
+  disciplinaFiltrada: string,
+): LinhaDeNorma[] {
+  if (disciplinaFiltrada !== '') {
+    return grupos.flatMap((g) => g.itens.map((i) => ({ ...i, disciplinas: [] })));
+  }
+  const porNorma = new Map<string, LinhaDeNorma>();
+  for (const g of grupos) {
+    for (const { norma } of g.itens) {
+      const linha = porNorma.get(norma.id) ?? { norma, disciplinas: [] };
+      if (g.titulo !== OUTRAS) linha.disciplinas.push(g.titulo);
+      porNorma.set(norma.id, linha);
+    }
+  }
+  return [...porNorma.values()].sort((a, b) =>
+    a.norma.tituloCurto.localeCompare(b.norma.tituloCurto, 'pt-BR'),
+  );
+}
+
 /** Aviso deixado pela tela Importar ao publicar ou descartar (estado da navegação). */
 function avisoDaNavegacao(estado: unknown): string | null {
   if (typeof estado !== 'object' || estado === null || !('aviso' in estado)) return null;
@@ -262,8 +291,6 @@ export function Normas() {
     else novo.delete(nome);
     setParams(novo, { replace: true });
   };
-  // Grupos abertos ou fechados à mão; sem escolha, abertos até 3 disciplinas.
-  const [abertos, setAbertos] = useState<ReadonlyMap<string, boolean>>(new Map());
   const [mudando, setMudando] = useState<{ norma: Norma; atuais: string[] } | null>(null);
   const [falhaAoMudar, setFalhaAoMudar] = useState<string | null>(null);
   const fonte = useFonteAcervo();
@@ -333,7 +360,8 @@ export function Normas() {
 
   const filtrando = haCriterio(criterios);
   const grupos = dados ? filtrarGrupos(dados.porDisciplina, criterios) : [];
-  const total = grupos.reduce((soma, g) => soma + g.itens.length, 0);
+  const linhas = linhasDeNormas(grupos, criterios.disciplina);
+  const total = linhas.length;
   const edital = dados
     ? editalComNormasNoAcervo(dados.editais, dados.disciplinas, itensDoIndice)
     : undefined;
@@ -530,65 +558,48 @@ export function Normas() {
                     )}
                   </div>
                 )}
-                {grupos.map((g) => (
-                  <details
-                    key={g.titulo}
-                    aria-label={g.titulo}
-                    className="grupo-de-normas"
-                    open={filtrando || (abertos.get(g.titulo) ?? dados.porDisciplina.length <= 3)}
-                    onToggle={(e) => {
-                      // Com critério, a lista abre os grupos com resultado: aí nada se lembra.
-                      if (filtrando) return;
-                      const aberto = e.currentTarget.open;
-                      setAbertos((atual) => new Map(atual).set(g.titulo, aberto));
-                    }}
-                  >
-                    <summary>
-                      <h3>{g.titulo}</h3> <span>({g.itens.length})</span>
-                    </summary>
-                    <ul className="lista-simples lista-de-linhas">
-                      {g.itens.map(({ norma: n, subtitulo, trecho }) => {
-                        const leitura = dados.leituras.get(n.id);
-                        const apoio = [
-                          leitura ? `Última leitura: ${formatarQuando(lidaEm(leitura))}` : '',
-                          subtitulo,
-                          descricaoDe(n),
-                          dados.procedencias.get(n.id),
-                        ]
-                          .filter(Boolean)
-                          .join(' · ');
-                        const para = `/biblioteca/normas/${n.id}${
-                          trecho === undefined ? '' : `?ir=${encodeURIComponent(trecho)}`
-                        }`;
-                        return (
-                          <li key={`${n.id}-${trecho ?? ''}`}>
-                            <LinhaLista
-                              para={para}
-                              titulo={n.tituloCurto}
-                              {...(apoio ? { apoio } : {})}
-                              {...(comVersaoNova.has(n.id)
-                                ? { selo: <Selo>Há versão nova</Selo> }
-                                : {})}
-                            />
-                            <button
-                              type="button"
-                              className="botao-texto na-margem"
-                              aria-label={`Mudar disciplina de ${n.tituloCurto}`}
-                              onClick={() => {
-                                setFalhaAoMudar(null);
-                                void disciplinasDaNorma(repo, n.id).then((atuais) => {
-                                  setMudando({ norma: n, atuais });
-                                });
-                              }}
-                            >
-                              Mudar disciplina
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </details>
-                ))}
+                <ul className="lista-simples lista-de-linhas">
+                  {linhas.map(({ norma: n, subtitulo, trecho, disciplinas }) => {
+                    const leitura = dados.leituras.get(n.id);
+                    const apoio = [
+                      disciplinas.join(' · '),
+                      leitura ? `Última leitura: ${formatarQuando(lidaEm(leitura))}` : '',
+                      subtitulo,
+                      descricaoDe(n),
+                      dados.procedencias.get(n.id),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ');
+                    const para = `/biblioteca/normas/${n.id}${
+                      trecho === undefined ? '' : `?ir=${encodeURIComponent(trecho)}`
+                    }`;
+                    return (
+                      <li key={`${n.id}-${trecho ?? ''}`}>
+                        <LinhaLista
+                          para={para}
+                          titulo={n.tituloCurto}
+                          {...(apoio ? { apoio } : {})}
+                          {...(comVersaoNova.has(n.id)
+                            ? { selo: <Selo>Há versão nova</Selo> }
+                            : {})}
+                        />
+                        <button
+                          type="button"
+                          className="botao-texto na-margem"
+                          aria-label={`Mudar disciplina de ${n.tituloCurto}`}
+                          onClick={() => {
+                            setFalhaAoMudar(null);
+                            void disciplinasDaNorma(repo, n.id).then((atuais) => {
+                              setMudando({ norma: n, atuais });
+                            });
+                          }}
+                        >
+                          Mudar disciplina
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </section>
             </>
           )}
