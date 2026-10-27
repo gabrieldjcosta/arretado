@@ -45,6 +45,9 @@ interface LeituraSalva {
   lidaEm: string;
 }
 
+/** Quanto o Hoje espera o mapa: rede fraca não prende o Agora (cai em "Continuar a leitura"). */
+const ESPERA_DO_MAPA_MS = 1500;
+
 /** O próximo trecho do mapa como a entrada o quer; nada sem fonte, sem mapa ou com tudo coberto. */
 async function trechoDoMapa(
   repo: Repositorio,
@@ -52,7 +55,17 @@ async function trechoDoMapa(
   normaId: string,
 ): Promise<NonNullable<EntradaDaProximaAcao['leitura']>['trecho']> {
   if (!fonte) return undefined;
-  const t = await trechoParaLer(repo, fonte, normaId).catch(() => undefined);
+  let relogio: ReturnType<typeof setTimeout> | undefined;
+  const t = await Promise.race([
+    trechoParaLer(repo, fonte, normaId).catch(() => undefined),
+    new Promise<undefined>((resolve) => {
+      relogio = setTimeout(() => {
+        resolve(undefined);
+      }, ESPERA_DO_MAPA_MS);
+    }),
+  ]).finally(() => {
+    clearTimeout(relogio);
+  });
   if (!t) return undefined;
   const rotulo = t.rotulo.startsWith('Art') ? `a${t.rotulo.slice(1)}` : t.rotulo;
   return { endereco: t.endereco, rotulo, faixa: NOME_DA_CLASSE[t.classe], minutos: t.minutos };
