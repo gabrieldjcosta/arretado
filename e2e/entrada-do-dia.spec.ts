@@ -123,7 +123,7 @@ test.describe('Chegada', () => {
     await expect(folha.getByRole('link', { name: 'Escolher meu concurso' })).toBeFocused();
     await expect(folha.getByRole('link', { name: 'Ler uma norma' })).toBeVisible();
     await expect(folha.getByRole('link', { name: 'Registrar um erro' })).toBeVisible();
-    await expect(folha.getByRole('link', { name: /^Montar uma trilha/ })).toBeVisible();
+    await expect(folha.getByRole('link', { name: /^Montar a trilha passo a passo/ })).toBeVisible();
     await expect(folha.getByRole('button', { name: 'Agora não' })).toBeVisible();
     await focoFicaNaFolha(page);
 
@@ -139,7 +139,7 @@ test.describe('Chegada', () => {
     ['Escolher meu concurso', /#\/comecar$/, 'Qual concurso você estuda?'],
     ['Registrar um erro', /#\/recall\/registrar$/, 'Registrar erro'],
     ['Ler uma norma', /#\/biblioteca$/, 'Biblioteca'],
-    ['Montar uma trilha', /#\/plano\/onboarding$/, 'Para qual carreira você estuda?'],
+    ['Montar a trilha passo a passo', /#\/plano\/onboarding$/, 'Para qual carreira você estuda?'],
   ] as const) {
     test(`"${nome}" leva à tela dele, sem a folha por cima`, async ({ page }) => {
       await page.goto('/#/');
