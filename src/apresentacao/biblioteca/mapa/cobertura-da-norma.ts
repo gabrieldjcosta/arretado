@@ -14,6 +14,7 @@ import {
 } from '../../../dominios/legislacao/mapa-da-norma';
 import { marcacoesDaNorma } from '../../../dominios/legislacao/marcacoes';
 import { dispositivosComErro } from '../errosVinculados';
+import { artigosFeitos } from './feitos';
 
 export interface CoberturaDaNorma {
   aberta: NormaAberta;
@@ -44,6 +45,7 @@ export async function coberturaDaNorma(
   for (const id of marcacoes.keys()) marcar(id);
   for (const e of estrelas) if (e.origemTipo === 'direta') marcar(e.alvoId);
   for (const id of erros) marcar(id);
+  for (const id of artigosFeitos(normaId)) marcar(id);
   const lidoAte =
     leitura?.lidoAteId === undefined ? undefined : aberta.indiceDe.get(leitura.lidoAteId);
   return { aberta, lidoAte, marcados };

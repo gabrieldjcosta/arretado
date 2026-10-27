@@ -92,3 +92,53 @@
 .prova-do-plano input[type='date'] {
   max-width: 16rem;
 }
+
+/* Matérias da Trilha: menus recolhidos, nome e contagem à vista (mesmo filete neutro das normas). */
+.trilha-materia {
+  margin-block: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--borda);
+}
+
+/* Nome e contagem correm como texto: quebram juntos, e a contagem desce para a coluna do nome, nunca para
+   baixo da seta. A seta fica no recuo, na altura da primeira linha (10px = metade do alvo menos a linha). */
+.trilha-materia > summary {
+  position: relative;
+  display: block;
+  min-height: var(--alvo);
+  padding-block: 10px;
+  padding-inline-start: 1rem;
+  cursor: pointer;
+}
+
+.trilha-materia > summary h2 {
+  display: inline;
+  margin: 0 0.25rem 0 0;
+  font-size: 1.125rem;
+}
+
+.trilha-seta {
+  position: absolute;
+  inset-block-start: calc(10px + 0.4375rem);
+  inset-inline-start: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-inline-end: 2px solid currentcolor;
+  border-block-end: 2px solid currentcolor;
+  transform: rotate(-45deg);
+}
+
+.trilha-materia[open] > summary .trilha-seta {
+  transform: rotate(45deg);
+}
+
+/* Só transformação, no tempo e na curva do app; com movimento reduzido ou no perfil Calmo, nada anda. */
+@media (prefers-reduced-motion: no-preference) {
+  .trilha-seta {
+    transition: transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  html[data-perfil='calmo'] .trilha-seta {
+    transition: none;
+  }
+}
