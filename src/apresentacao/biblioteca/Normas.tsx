@@ -425,7 +425,7 @@ export function Normas() {
             <>
               {dados.continuar && (
                 <p className="retomar-leitura">
-                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao">
+                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao principal">
                     Retomar: {dados.continuar.tituloCurto}
                     {dados.ponto ? `, ${dados.ponto.referencia}` : ''}
                   </Link>

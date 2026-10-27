@@ -245,6 +245,9 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
     expect(screen.queryByRole('region', { name: 'Agora' })).not.toBeInTheDocument();
     expect(continuar.closest('p')).toHaveTextContent(/cerca de \d+ min/);
+    // Uma ação dominante por tela: "Retomar" é a principal, e só ela.
+    expect(continuar).toHaveClass('principal');
+    expect([...screen.getByRole('main').querySelectorAll('.principal')]).toEqual([continuar]);
     const lista = screen.getByRole('region', { name: 'Normas' });
     // "Importar norma" deixa de ser a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
