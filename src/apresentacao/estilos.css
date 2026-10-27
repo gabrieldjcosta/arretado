@@ -3711,6 +3711,15 @@ dialog.dialogo-previa .linha-acoes button {
   margin: 0;
 }
 
+/* Biblioteca › Normas: a linha "Retomar" no lugar da folha grande do Agora (que fica só no Hoje). */
+.retomar-leitura {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin-block: 0.75rem;
+}
+
 /* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */
 .lacuna-editor {
   user-select: text;
