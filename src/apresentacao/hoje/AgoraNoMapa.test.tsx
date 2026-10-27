@@ -101,7 +101,10 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     await screen.findByRole('heading', { name: 'Continuar a leitura' });
     // O art. 1º já está coberto; o próximo são os dois "cai muito" vizinhos.
     const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
-    expect(ler).toHaveAttribute('href', `#/biblioteca/normas/${normaId}?ir=art3`);
+    expect(ler).toHaveAttribute(
+      'href',
+      `#/biblioteca/normas/${normaId}?ir=art3&foco=artigo&mapa=1`,
+    );
     expect(ler.parentElement).toHaveTextContent(
       'Pelo mapa, o próximo trecho cai muito, cerca de 2 min.',
     );

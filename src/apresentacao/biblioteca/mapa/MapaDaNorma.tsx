@@ -272,7 +272,7 @@ function Mapa({
             motivo={[blocoDoTrecho, NOME_DA_CLASSE[trecho.classe]].filter(Boolean).join(' · ')}
             estimativa={trecho.minutos}
             rotuloBotao="Começar"
-            para={`/biblioteca/normas/${normaId}?ir=${encodeURIComponent(quadrados[trecho.de]?.endereco ?? '')}`}
+            para={`/biblioteca/normas/${normaId}?ir=${encodeURIComponent(quadrados[trecho.de]?.endereco ?? '')}&foco=artigo&mapa=1`}
           />
         </>
       )}

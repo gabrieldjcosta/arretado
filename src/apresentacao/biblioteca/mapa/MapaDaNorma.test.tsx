@@ -134,7 +134,7 @@ describe('Mapa da norma', () => {
     expect(agora).toHaveTextContent('cerca de 2 min');
     expect(within(agora).getByRole('link', { name: 'Começar' })).toHaveAttribute(
       'href',
-      `/biblioteca/normas/${norma.id}?ir=art2`,
+      `/biblioteca/normas/${norma.id}?ir=art2&foco=artigo&mapa=1`,
     );
     // O primeiro quadrado do trecho é o que entra no Tab.
     expect(quadrados[1]).toHaveAttribute('tabindex', '0');

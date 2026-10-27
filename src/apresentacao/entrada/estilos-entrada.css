@@ -107,3 +107,31 @@ dialog.dialogo-entrada .principal {
   justify-content: center;
   margin-top: var(--espaco-3);
 }
+
+/* Os quatro menus, depois dos caminhos: uma linha cada, o nome em negrito. */
+.chegada-menus-titulo {
+  margin: var(--espaco-4) 0 var(--espaco-1);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chegada-menus {
+  margin: 0;
+  display: grid;
+  gap: var(--espaco-1);
+}
+
+.chegada-menus dt {
+  display: inline;
+  font-weight: 600;
+}
+
+.chegada-menus dt::after {
+  content: ': ';
+}
+
+.chegada-menus dd {
+  display: inline;
+  margin: 0;
+  color: var(--texto-atenuado);
+}
