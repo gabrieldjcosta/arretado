@@ -13,6 +13,11 @@
   text-decoration: none;
 }
 
+/* O passo a passo é um aparte: respira abaixo dos botões em vez de colar neles. */
+.plano-vazio-caminhos + .dica {
+  margin-top: var(--espaco-3);
+}
+
 .plano-importar-bloco.afastado,
 .vazio + .plano-importar-bloco {
   margin-top: var(--espaco-5);

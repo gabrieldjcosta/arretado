@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { NORMA_GRANDE } from '../../dominios/acervo/agrupar';
 import { adicionarPartida, normasDaPartida } from '../../dominios/acervo/partida';
@@ -57,6 +57,7 @@ export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
   const [andamento, setAndamento] = useState<Andamento | null>(null);
   const [falhou, setFalhou] = useState<Falhou | null>(null);
   const [querTrilha, setQuerTrilha] = useState(true);
+  const idTrilha = useId();
   // Tentar de novo depois de uma falha nas normas não cria a Trilha duas vezes.
   const [trilhaMontada, setTrilhaMontada] = useState(false);
 
@@ -209,7 +210,7 @@ export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
               )}
               {falhou.trilha && (
                 <p>
-                  Dá para montar a Trilha depois, na <Link to="/plano">Trilha</Link>.
+                  Dá para montar depois, na <Link to="/plano">Trilha</Link>.
                 </p>
               )}
               {falhou.falhas.length > 0 && (
@@ -235,6 +236,9 @@ export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
                 <label className="opcao comecar-trilha">
                   <input
                     type="checkbox"
+                    // O nome é só o título; o apoio é a descrição (senão o leitor de tela lê tudo como nome).
+                    aria-labelledby={`${idTrilha}-nome`}
+                    aria-describedby={`${idTrilha}-apoio`}
                     checked={querTrilha}
                     disabled={andamento !== null}
                     onChange={(e) => {
@@ -242,8 +246,8 @@ export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
                     }}
                   />
                   <span>
-                    <b>Montar também a Trilha</b>
-                    <span className="dica">
+                    <b id={`${idTrilha}-nome`}>Montar também a Trilha</b>
+                    <span className="dica" id={`${idTrilha}-apoio`}>
                       {trilha.materias} matérias, {trilha.rotulo}. Dá para ajustar e desfazer
                       depois.
                     </span>

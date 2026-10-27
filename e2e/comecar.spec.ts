@@ -170,7 +170,8 @@ test.describe('primeiro uso, num aparelho novo', () => {
     // A Trilha do edital mais recente vem marcada: o mesmo toque monta as normas e a Trilha.
     const trilha = page.getByRole('checkbox', { name: /^Montar também a Trilha/ });
     await expect(trilha).toBeChecked();
-    await expect(trilha).toHaveAccessibleName(/\d+ matérias, baseado no edital/);
+    await expect(trilha).toHaveAccessibleName('Montar também a Trilha');
+    await expect(trilha).toHaveAccessibleDescription(/\d+ matérias, baseado no edital/);
     await page.getByRole('button', { name: 'Adicionar e ler' }).click();
 
     // A primeira norma da lista abre no Leitor, no começo: o Art. 1º já está na tela.

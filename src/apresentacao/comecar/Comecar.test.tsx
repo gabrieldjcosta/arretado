@@ -161,7 +161,9 @@ describe('Escolher meu concurso › Para começar', () => {
     const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
     const caixa = await screen.findByRole('checkbox', { name: /^Montar também a Trilha/ });
     expect(caixa).toBeChecked();
-    expect(caixa).toHaveAccessibleName(/\d+ matérias, baseado no edital MPGO de 2023\./);
+    // O nome é o título; o apoio vai como descrição (o leitor de tela não lê tudo como nome).
+    expect(caixa).toHaveAccessibleName('Montar também a Trilha');
+    expect(caixa).toHaveAccessibleDescription(/\d+ matérias, baseado no edital MPGO de 2023\./);
 
     await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'LEI-C' })).toBeInTheDocument();
