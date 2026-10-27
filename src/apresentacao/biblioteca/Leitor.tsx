@@ -54,7 +54,6 @@ import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
-import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { BotaoDaEstrela } from './Estrela';
@@ -1880,7 +1879,6 @@ function LeitorAberto({
         <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
       ) : (
         <>
-          <FaixaDaSessao />
           <BarraDoLeitor
             titulo={norma.tituloCurto}
             tamanho={tamanho}

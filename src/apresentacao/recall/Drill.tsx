@@ -21,7 +21,6 @@ import { usePassagemDeCartao } from '../componentes/passagem';
 import { marcarEscolha } from '../componentes/traco/escolha';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
-import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
@@ -291,7 +290,6 @@ export function Drill() {
   return (
     <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar</h1>
-      <FaixaDaSessao />
       <TopoDaRevisao
         sair="/recall"
         valor={estado.indice + 1}

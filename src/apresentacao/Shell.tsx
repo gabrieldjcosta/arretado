@@ -9,6 +9,7 @@ import { useTecladoAberto } from './componentes/teclado-aberto';
 import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
 import { reabrirGuia, telaDoGuia, useGuiaMontado } from './guia/memoria';
 import { secaoDeAjuda } from './orientacoes/conteudo';
+import { CantoDaSessao } from './sessao/CantoDaSessao';
 import { Chegada } from './entrada/Chegada';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
@@ -167,6 +168,7 @@ export function Shell() {
           Backup e dados
         </Link>
       </footer>
+      <CantoDaSessao />
       {boasVindas && (
         <Chegada
           aoFechar={() => {
