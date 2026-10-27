@@ -12,6 +12,7 @@ import { VERSAO_APP } from '../versao';
 import { criarAgendador, type OpcoesDoAgendador } from './agendador';
 import { registrarDivergencias } from './divergencias';
 import { enviarPendentes, type ResultadoDoEnvio } from './envio';
+import { podarLogLocal } from './poda-local';
 import {
   lerSeqRecebido,
   receberNovidades,
@@ -101,6 +102,8 @@ export async function rodadaDeSincronizacao(
   await servidor
     .registrarSincronia(ctx.aparelhoId, await lerSeqRecebido(repo), ctx.versaoEsquema)
     .catch(() => undefined);
+  // Poda do log local (B5): no máximo uma vez por dia; também não derruba a rodada.
+  await podarLogLocal(repo.db, ctx.agora ?? repo.ctx.agora).catch(() => 0);
   return { envio, recebido };
 }
 

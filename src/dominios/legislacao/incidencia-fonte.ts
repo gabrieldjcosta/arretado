@@ -49,8 +49,11 @@ export class FonteDeIncidencia {
     return `${this.base.replace(/\/$/, '')}/${caminho}`;
   }
 
-  /** Rede primeiro (e guarda a cópia); sem rede, a cópia guardada; sem as duas, `sem_rede`. */
-  private async json(caminho: string): Promise<Carregado<unknown>> {
+  /**
+   * Um arquivo do recorte, sem validar (quem lê valida). Rede primeiro (e guarda a cópia); sem rede,
+   * a cópia guardada; sem as duas, `sem_rede`.
+   */
+  async json(caminho: string): Promise<Carregado<unknown>> {
     const endereco = this.endereco(caminho);
     let resposta: Response | undefined;
     try {

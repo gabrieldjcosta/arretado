@@ -128,6 +128,11 @@ export async function criarBancoRemoto(): Promise<BancoRemoto> {
               [aparelhoId, seq, versao],
             );
           }),
+        pontoDaPoda: () =>
+          chamar(async () => {
+            const r = await db.query<{ v: number }>('select arretado.ponto_da_poda()::float8 as v');
+            return r.rows[0]?.v ?? 0;
+          }),
         pedirPosse: (aparelhoId, forcar) =>
           chamar(async () => {
             const r = await db.query<{ v: RespostaDePosse }>(

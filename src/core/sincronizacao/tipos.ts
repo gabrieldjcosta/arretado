@@ -100,6 +100,8 @@ export interface ServidorDeSincronizacao {
   puxarRegistros(depois: ChaveDeRegistro | null, limite: number): Promise<RegistroRemoto[]>;
   /** Avisa o servidor até onde este aparelho já recebeu (base da poda, B5). */
   registrarSincronia(aparelhoId: string, seqRecebido: number, versaoEsquema: number): Promise<void>;
+  /** Maior `seq` que a poda (B5) pode ter tirado do log da conta; 0 = nada podado. */
+  pontoDaPoda(): Promise<number>;
   /** Posse de edição (D17): concede sozinha se o outro aparelho está parado; `forcar` assume de um em uso. */
   pedirPosse(aparelhoId: string, forcar: boolean): Promise<RespostaDePosse>;
   /** Devolve a posse ao fechar o app ou esconder a aba; melhor esforço (pode cair com a aba). */

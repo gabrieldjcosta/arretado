@@ -1641,6 +1641,39 @@ button.grande,
   margin: 0;
 }
 
+/* "Fixar estas": a oferta no fim das Frases e o diálogo com a lista. A lista é a parte que cede ao
+   tamanho da tela e da letra (o diálogo só rola quando nem o mínimo dela cabe), e cada enunciado
+   se corta na terceira linha. */
+.fixar-estas {
+  margin: 1.5rem 0 0;
+}
+
+.fixar-estas h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+dialog.dialogo-lista[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.fixar-estas-lista {
+  flex: 1 1 auto;
+  min-height: 4.5rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  margin: 0.75rem 0;
+}
+
+.fixar-estas-lista li > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
 .cartao-drill {
   min-height: 10rem;
 }

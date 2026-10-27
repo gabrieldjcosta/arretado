@@ -26,13 +26,31 @@ function relativo(url) {
   return url.pathname.slice(escopo.pathname.length);
 }
 
+/**
+ * O Cloudflare redireciona `/index.html` para `/`; o Chrome recusa (ERR_FAILED) responder uma navegação
+ * com resposta marcada `redirected`. Copia o corpo para uma resposta sem a marca.
+ */
+async function semRedirecionamento(resposta) {
+  if (!resposta.redirected) return resposta;
+  return new Response(await resposta.blob(), {
+    status: resposta.status,
+    statusText: resposta.statusText,
+    headers: resposta.headers,
+  });
+}
+
 self.addEventListener('install', (evento) => {
   evento.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
       // `reload`: busca na rede de verdade, sem passar pelo cache HTTP (ícones e manifesto não têm hash).
-      await cache.addAll(
-        PRECACHE.map((caminho) => new Request(new URL(caminho, escopo).href, { cache: 'reload' })),
+      await Promise.all(
+        PRECACHE.map(async (caminho) => {
+          const pedido = new Request(new URL(caminho, escopo).href, { cache: 'reload' });
+          const resposta = await fetch(pedido);
+          if (!resposta.ok) throw new Error(caminho);
+          await cache.put(pedido, await semRedirecionamento(resposta));
+        }),
       );
     })(),
   );
@@ -71,7 +89,7 @@ async function doCacheOuDaRede(pedido, guardar) {
 async function concha(pedido) {
   const cache = await caches.open(CACHE);
   const guardado = await cache.match(new URL('index.html', escopo).href);
-  return guardado ?? fetch(pedido);
+  return guardado ? semRedirecionamento(guardado) : fetch(pedido);
 }
 
 self.addEventListener('fetch', (evento) => {

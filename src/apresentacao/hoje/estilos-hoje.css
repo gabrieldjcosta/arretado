@@ -18,10 +18,20 @@
 }
 
 .lembrete-backup,
+.convite-depois-da-leitura,
 .aviso-de-atualizacao {
   margin: 0.75rem 0;
   font-size: 0.9rem;
   color: var(--texto-atenuado);
+}
+
+/* O convite é a frase e, embaixo, as duas ações (a norma e "Agora não"), cada uma com o alvo inteiro. */
+.convite-depois-da-leitura p {
+  margin: 0;
+}
+
+.convite-depois-da-leitura .linha-acoes {
+  margin-top: 0.25rem;
 }
 
 /* As duas escolhas andam juntas: quando não cabem ao lado do texto, vão as duas para a linha de baixo. */
