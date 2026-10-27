@@ -48,7 +48,7 @@ export function AbasDaBiblioteca({ atual }: { atual: AbaDaBiblioteca }) {
   if (grupo === undefined) return null;
   return (
     <>
-      <nav aria-label="Seções da Biblioteca" className="abas">
+      <nav aria-label="Seções da Biblioteca" className="abas abas-da-biblioteca">
         {ABAS.map((a) => (
           <Link
             key={a.chave}

@@ -1561,9 +1561,20 @@ th.numero {
   outline-color: var(--bloco-foco);
 }
 
+/* As três abas da Biblioteca cabem num trilho só a partir de uns 360 px. Abaixo disso, ou com o texto
+   maior, a que não cabe desce para uma segunda fileira, em vez de ficar cortada num trilho que rola. */
+.abas-da-biblioteca {
+  flex-wrap: wrap;
+}
+
+.abas-da-biblioteca a {
+  flex: 1 1 auto;
+}
+
 /* Segunda linha das abas da Biblioteca (S5): duas páginas de um mesmo grupo, em texto, sem trilho. */
 .sub-abas {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
   margin: -0.5rem 0 1rem;
 }
@@ -1579,9 +1590,12 @@ th.numero {
   border-radius: var(--raio-botao);
 }
 
+/* "Onde estou" como no trilho de cima: a folha com o contorno do controle (3:1 contra a página, WCAG
+   1.4.11) e o rótulo em negrito. O filete e o tom de superfície-2 davam 1,1:1 de dia e 1,3:1 à noite. */
 .sub-abas a[aria-current='page'] {
-  background: var(--superficie-2);
-  box-shadow: inset 0 0 0 1px var(--borda);
+  background: var(--superficie);
+  box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
+  font-weight: 700;
 }
 
 button.grande,
