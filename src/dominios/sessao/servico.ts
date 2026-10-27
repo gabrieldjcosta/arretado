@@ -70,6 +70,7 @@ export async function iniciarSessao(repo: Repositorio, entrada: EntradaDeSessao)
     ...(fronteira ? { fronteira } : {}),
     ...(entrada.origemDaAcao ? { origemDaAcao: entrada.origemDaAcao } : {}),
     ...(entrada.tarefaId ? { tarefaId: entrada.tarefaId } : {}),
+    ...(entrada.atividade ? { atividade: entrada.atividade } : {}),
     ...(entrada.cicloId && entrada.blocoOrdem !== undefined
       ? { cicloId: entrada.cicloId, blocoOrdem: entrada.blocoOrdem }
       : {}),
@@ -116,6 +117,20 @@ export function duracaoEmSegundos(s: Pick<Sessao, 'inicio' | 'pausas'>, fim: str
   return Math.max(0, Math.round((total - pausado) / 1000));
 }
 
+/** Conta uma questão da Sessão de questões; o erro é registrado à parte, pelo Recall. */
+export async function registrarQuestao(
+  repo: Repositorio,
+  id: string,
+  acertou: boolean,
+): Promise<Sessao> {
+  const s = await obterSessao(repo, id);
+  if (s.estado === 'encerrada' || s.estado === 'interrompida') return s;
+  return repo.colecao('sessoes').atualizar(id, {
+    questoesFeitas: (s.questoesFeitas ?? 0) + 1,
+    questoesAcertadas: (s.questoesAcertadas ?? 0) + (acertou ? 1 : 0),
+  });
+}
+
 /** Encerra; o próximo passo é opcional (em branco = não grava). Encerrar de novo não muda nada. */
 export async function encerrarSessao(
   repo: Repositorio,
@@ -127,8 +142,12 @@ export async function encerrarSessao(
   const fim = repo.ctx.agora().toISOString();
   const pausas = fecharUltimaPausa(s, fim);
   const proximoPasso = vazioVira(fechamento?.proximoPasso);
-  const feitas = fechamento?.questoesFeitas;
-  const acertadas = Math.min(fechamento?.questoesAcertadas ?? 0, feitas ?? 0);
+  // Sem número no fechamento, vale a contagem feita durante a Sessão (`registrarQuestao`).
+  const feitas = fechamento?.questoesFeitas ?? s.questoesFeitas;
+  const acertadas = Math.min(
+    fechamento?.questoesAcertadas ?? s.questoesAcertadas ?? 0,
+    feitas ?? 0,
+  );
   const nova = await repo.colecao('sessoes').atualizar(id, {
     estado: 'encerrada',
     fim,

@@ -17,3 +17,21 @@
 .sessao-aberta {
   margin-bottom: 1rem;
 }
+
+.comecar-sessao {
+  margin-top: 1rem;
+}
+
+.comecar-sessao h2 {
+  margin: 0 0 0.25rem;
+}
+
+.comecar-sessao__tipos {
+  flex-wrap: wrap;
+}
+
+/* A 195 px (200% de fonte em tela estreita) "Jurisprudência" não cabe inteira: parte a palavra. */
+.comecar-sessao__tipos button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}

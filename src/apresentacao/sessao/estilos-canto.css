@@ -1,0 +1,61 @@
+/* Canto da Sessão: relógio discreto e bloquinho de distração. Só tokens. Fica embaixo à esquerda,
+   acima das abas, para não encontrar o dock do Leitor (embaixo à direita). */
+.canto-sessao {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  bottom: calc(var(--abas-altura) + 1rem);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: calc(100vw - 2rem);
+}
+
+.shell[data-teclado='aberto'] .canto-sessao {
+  bottom: 1rem;
+}
+
+.canto-sessao__relogio {
+  min-height: var(--alvo);
+  min-width: var(--alvo);
+  padding: 0 0.875rem;
+  border: var(--borda-folha);
+  border-radius: var(--raio-botao);
+  background: var(--fundo-controle);
+  color: var(--texto-atenuado);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.canto-sessao__painel {
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 0.75rem;
+  border: var(--borda-folha);
+  border-radius: calc(var(--raio-botao) + 4px);
+  background: var(--fundo-controle);
+}
+
+.canto-sessao__titulo {
+  margin: 0 0 0.5rem;
+  color: var(--texto-atenuado);
+}
+
+.canto-sessao__nota {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.canto-sessao__nota input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.canto-sessao .dica {
+  min-height: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+body[data-so-estudo='true'] .canto-sessao {
+  bottom: 1rem;
+}

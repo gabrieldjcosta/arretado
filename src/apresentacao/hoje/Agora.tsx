@@ -3,6 +3,7 @@
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
 import { AgoraNoMapa } from './AgoraNoMapa';
+import { ComecarSessao } from '../sessao/ComecarSessao';
 import { SessaoAberta } from '../sessao/SessaoAberta';
 import { ROTULO_REVISAR_CARTOES } from '../../dominios/hoje/proxima-acao';
 import { EstadoVazio } from './EstadoVazio';
@@ -57,10 +58,17 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
 }
 
 export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
+  const normaLida = hoje.retrato
+    ? [
+        ...(hoje.retrato.agora.tipo === 'acao' ? [hoje.retrato.agora.acao] : []),
+        ...hoje.retrato.outras,
+      ].find((a) => a.tipo === 'leitura_salva')?.alvo.id
+    : undefined;
   return (
     <>
       <SessaoAberta />
       <ProximaAcaoDoHoje hoje={hoje} />
+      <ComecarSessao {...(normaLida === undefined ? {} : { normaLida })} />
     </>
   );
 }

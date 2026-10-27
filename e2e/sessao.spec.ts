@@ -109,3 +109,36 @@ test('A nota guardada na Sessão fica no Para lembrar do Hoje até ser marcada c
   await expect(page.getByRole('textbox', { name: 'Para lembrar' })).toBeVisible();
   await expect(lista).toHaveCount(0);
 });
+
+test('Sessão por atividade: questões no cartão do Hoje, Errei guarda o erro e o canto fica sobre as abas', async ({
+  page,
+}) => {
+  await page.goto('/#/');
+  await page.getByRole('button', { name: /Questões/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
+  await page.getByRole('button', { name: 'Acertei' }).click();
+  await page.getByRole('button', { name: 'Errei' }).click();
+  await page.getByLabel('Frase correta').fill('O prazo é de cinco dias.');
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Guardar erro' }).click();
+  await expect(page.getByText('2 feitas, 1 acertos.')).toBeVisible();
+
+  // Fora da Sessão, o relógio fica no canto, sem cobrir a barra de áreas, e o bloquinho abre sobre ele.
+  await page
+    .getByRole('navigation', { name: 'Áreas' })
+    .getByRole('link', { name: 'Biblioteca' })
+    .click();
+  const relogio = page.getByRole('button', { name: /Abrir o bloquinho/ });
+  await expect(relogio).toBeVisible();
+  const areas = await page.getByRole('navigation', { name: 'Áreas' }).boundingBox();
+  const caixa = await relogio.boundingBox();
+  expect(areas && caixa).toBeTruthy();
+  if (areas && caixa && (page.viewportSize()?.width ?? 1000) < 900) {
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(areas.y);
+  }
+  await relogio.click();
+  await page.getByLabel('Anotar uma distração').fill('comprar café');
+  await semViolacoes(page);
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.getByText('Guardado para depois.')).toBeVisible();
+});

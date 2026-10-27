@@ -54,8 +54,10 @@ function FormularioDeFechamento({
 }) {
   const [passo, setPasso] = useState(() => sugerirProximoPasso(sessao));
   const [erro, setErro] = useState(false);
-  const [feitas, setFeitas] = useState('');
-  const [acertos, setAcertos] = useState('');
+  const [feitas, setFeitas] = useState(sessao.questoesFeitas ? String(sessao.questoesFeitas) : '');
+  const [acertos, setAcertos] = useState(
+    sessao.questoesFeitas ? String(sessao.questoesAcertadas ?? 0) : '',
+  );
   const encerrar = () => {
     setErro(false);
     encerrarSessao(repo, sessao.id, {
