@@ -37,7 +37,7 @@ export function AgoraNoMapa({
         {NOME_DA_CLASSE[trecho.classe]}, cerca de {String(trecho.minutos)} min.
       </span>
       <Link
-        to={`/biblioteca/normas/${normaId}?ir=${trecho.endereco}`}
+        to={`/biblioteca/normas/${normaId}?ir=${trecho.endereco}&foco=artigo&mapa=1`}
         className="botao botao-texto"
       >
         Ler {trecho.rotulo}

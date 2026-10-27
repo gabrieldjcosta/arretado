@@ -68,7 +68,10 @@ import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remiss
 import { fraseDaEstrela, procedenciaDaVersao, rotuloTipo } from './rotulos';
 import { LegendaDestaques } from './LegendaDestaques';
 import { PendenciasDaNorma } from './PendenciasDaNorma';
+import { rotuloDoTrecho } from '../../dominios/legislacao/mapa-da-norma';
 import { ChamadaDoMapa } from './mapa/ChamadaDoMapa';
+import { registrarArtigosFeitos } from './mapa/feitos';
+import { useRoteiroDoMapa } from './mapa/useRoteiro';
 import { VerificarAtualizacao } from './VerificarAtualizacao';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota, DialogoEnviarAsFrases } from './Marcacoes';
@@ -153,6 +156,8 @@ const TOQUE_NAS_ACOES = 1500;
 const PARAMETRO_DO_FOCO = 'foco';
 /** `?foco=artigo` (11.8): o modo foco com um artigo por vez. */
 const VALOR_DO_ARTIGO = 'artigo';
+/** `?mapa=1`: "ler seguindo o mapa", no artigo por artigo: o fim de cada trecho pula ao seguinte. */
+const PARAMETRO_DO_MAPA = 'mapa';
 /** Quanto o dedo precisa andar de lado para virar o artigo, e quanto mais de lado que de cima. */
 const DESLIZE_MINIMO = 70;
 /** Linhas do vizinho que aparecem esmaecidas acima e abaixo do cartão. */
@@ -576,6 +581,8 @@ function LeitorAberto({
     () => unidadeDaLinha(linhas, unidades, linhaDoNo(linhas, artigoAtual) ?? 0),
     [linhas, unidades, artigoAtual],
   );
+  const noMapa = porArtigo && busca.get(PARAMETRO_DO_MAPA) === '1';
+  const roteiro = useRoteiroDoMapa(norma.id, noMapa);
   const cartao = useRef<HTMLElement | null>(null);
   // O dispositivo do artigo mostrado: o "alto da tela" do cartão.
   const artigoNoAlto = useRef<string | undefined>(undefined);
@@ -1140,10 +1147,54 @@ function LeitorAberto({
     }
   }
 
+  // Ler seguindo o mapa: em que trecho do roteiro está o artigo mostrado (a unidade pode começar num
+  // título; vale o primeiro artigo dela) e se é o último dele.
+  const posicaoNoMapa = (() => {
+    if (!roteiro || ordem === undefined) return -1;
+    const de = linhas[unidades[ordem] ?? -1]?.indice ?? -1;
+    const ate = linhas[fimDaUnidade(linhas, unidades, ordem) - 1]?.indice ?? -1;
+    return roteiro.quadrados.findIndex((q) => q.indice >= de && q.indice <= ate);
+  })();
+  const vezNoMapa =
+    roteiro?.trechos.findIndex((t) => posicaoNoMapa >= t.de && posicaoNoMapa <= t.ate) ?? -1;
+  const fimDoTrecho = vezNoMapa >= 0 && posicaoNoMapa === roteiro?.trechos[vezNoMapa]?.ate;
+  function pararDeSeguirOMapa() {
+    setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { replace: true, state: estadoDaRota });
+  }
+  // No último artigo do trecho, diz para onde o Próximo vai: o roteiro pode voltar na norma.
+  function avisoDoFimDoTrecho() {
+    const seguinte = roteiro?.trechos[vezNoMapa + 1];
+    return roteiro && seguinte
+      ? `Fim do trecho. Próximo: ${rotuloDoTrecho(roteiro.quadrados, seguinte)}.`
+      : 'Fim do trecho. Próximo: encerra o roteiro.';
+  }
+  // O fim do trecho: guarda o que foi lido e pula ao começo do seguinte (ou encerra o roteiro).
+  function seguirOMapa() {
+    const trecho = roteiro?.trechos[vezNoMapa];
+    if (!roteiro || !trecho) return;
+    registrarArtigosFeitos(
+      norma.id,
+      roteiro.quadrados.slice(trecho.de, trecho.ate + 1).map((q) => q.id),
+    );
+    const proximo = roteiro.trechos[vezNoMapa + 1];
+    const no = proximo && roteiro.quadrados[proximo.de]?.indice;
+    const o =
+      no === undefined ? undefined : unidadeDaLinha(linhas, unidades, linhaDoNo(linhas, no) ?? 0);
+    const linha = o === undefined ? undefined : linhas[unidades[o] ?? -1];
+    if (!proximo || !linha) {
+      setAnuncio('Fim do roteiro do mapa.');
+      pararDeSeguirOMapa();
+      return;
+    }
+    setArtigoAtual(linha.indice);
+    setAnuncio(`Próximo trecho do mapa: ${rotuloDoTrecho(roteiro.quadrados, proximo)}.`);
+  }
+
   function irParaUnidade(nova: number) {
     const linha = linhas[unidades[nova] ?? -1];
     if (!linha || ordem === undefined || nova === ordem) return;
-    if (nova > ordem) {
+    // No roteiro do mapa a leitura pula de trecho: o "lido até" (um ponto só) não anda sozinho.
+    if (nova > ordem && !noMapa) {
       // Passar ao próximo é ter lido o que ficou para trás: o "lido até" avança sozinho, e só
       // avança (voltar, ou ir a um artigo já lido, nunca o recua).
       const saindo = linhas[unidades[ordem] ?? -1]?.indice;
@@ -1159,7 +1210,8 @@ function LeitorAberto({
   }
   useEffect(() => {
     irAoProximo.current = () => {
-      if (ordem !== undefined && ordem + 1 < unidades.length) irParaUnidade(ordem + 1);
+      if (fimDoTrecho) seguirOMapa();
+      else if (ordem !== undefined && ordem + 1 < unidades.length) irParaUnidade(ordem + 1);
     };
     irAoAnterior.current = () => {
       if (ordem !== undefined && ordem > 0) irParaUnidade(ordem - 1);
@@ -2001,10 +2053,30 @@ function LeitorAberto({
                     irAoProximo.current();
                   }}
                   noPrimeiro={ordem <= 0}
-                  noUltimo={ordem + 1 >= unidades.length}
+                  noUltimo={ordem + 1 >= unidades.length && !fimDoTrecho}
                 >
                   <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
                 </SetasDoCartao>
+                {roteiro && (
+                  <p className="seguindo-mapa">
+                    <span>
+                      {vezNoMapa >= 0 && roteiro.trechos[vezNoMapa]
+                        ? `Seguindo o mapa: ${rotuloDoTrecho(roteiro.quadrados, roteiro.trechos[vezNoMapa])}, trecho ${String(vezNoMapa + 1)} de ${String(roteiro.trechos.length)}.${fimDoTrecho ? ` ${avisoDoFimDoTrecho()}` : ''}`
+                        : 'Fora do roteiro do mapa.'}
+                    </span>
+                    <button
+                      type="button"
+                      className="discreto"
+                      onClick={() => {
+                        pararDeSeguirOMapa();
+                        // A linha sai com o botão: o foco vai ao cartão, não ao começo da página.
+                        cartao.current?.focus({ preventScroll: true });
+                      }}
+                    >
+                      Parar
+                    </button>
+                  </p>
+                )}
                 {vizinho(ordem + 1, 'seguinte')}
               </>
             )}
@@ -2116,7 +2188,7 @@ function LeitorAberto({
                     irAoProximo.current();
                   }}
                   noPrimeiro={ordem === undefined || ordem <= 0}
-                  noUltimo={ordem === undefined || ordem + 1 >= unidades.length}
+                  noUltimo={ordem === undefined || (ordem + 1 >= unidades.length && !fimDoTrecho)}
                   buscar={abrirBusca}
                   filtrar={() => {
                     setFiltroAberto(true);

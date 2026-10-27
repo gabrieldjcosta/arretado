@@ -189,6 +189,26 @@ test('mapa: a chamada no Leitor, os quadrados por faixa, o próximo trecho e a v
   await expect(page.locator('[data-endereco="art2"]')).toBeVisible();
 });
 
+test('mapa: "ler seguindo o mapa" diz para onde o Próximo vai no fim do trecho, e "Parar" devolve o foco ao cartão', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await adicionarEAbrir(page);
+  await page.getByRole('link', { name: 'Mapa da norma' }).click();
+  await page.getByRole('region', { name: 'Agora' }).getByRole('link', { name: 'Começar' }).click();
+  const linha = page.locator('.seguindo-mapa');
+  // Cada trecho do roteiro tem um artigo (o 2º e o 5º "caem muito", e não são vizinhos).
+  await expect(linha).toContainText('Seguindo o mapa: art. 2º, trecho 1 de 5.');
+  await expect(linha).toContainText('Fim do trecho. Próximo: art. 5º.');
+  await page.getByRole('button', { name: 'Próximo artigo' }).click();
+  await expect(linha).toContainText('Seguindo o mapa: art. 5º, trecho 2 de 5.');
+  const parar = linha.getByRole('button', { name: 'Parar' });
+  expect((await parar.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  await parar.click();
+  await expect(linha).toHaveCount(0);
+  await expect(page.getByRole('region', { name: /^Art\. 5º,/ })).toBeFocused();
+});
+
 test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva ao Leitor', async ({
   page,
 }) => {
