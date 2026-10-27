@@ -11,7 +11,10 @@ import { cicloAtivo, posicaoDoCiclo } from '../../dominios/ciclos';
 import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
 import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
+import type { FonteDeIncidencia } from '../../dominios/legislacao/incidencia-fonte';
+import { NOME_DA_CLASSE } from '../../dominios/legislacao/mapa-da-norma';
 import { referenciaDoNo } from '../biblioteca/linhas';
+import { trechoParaLer } from '../biblioteca/mapa/cobertura-da-norma';
 
 function vencidos(repo: Repositorio, colecao: 'cartoes' | 'frases', hoje: DataCivil) {
   const u = repo.ctx.usuarioId;
@@ -42,12 +45,29 @@ interface LeituraSalva {
   lidaEm: string;
 }
 
-async function leituraSalva(repo: Repositorio): Promise<LeituraSalva | undefined> {
+/** O próximo trecho do mapa como a entrada o quer; nada sem fonte, sem mapa ou com tudo coberto. */
+async function trechoDoMapa(
+  repo: Repositorio,
+  fonte: FonteDeIncidencia | undefined,
+  normaId: string,
+): Promise<NonNullable<EntradaDaProximaAcao['leitura']>['trecho']> {
+  if (!fonte) return undefined;
+  const t = await trechoParaLer(repo, fonte, normaId).catch(() => undefined);
+  if (!t) return undefined;
+  const rotulo = t.rotulo.startsWith('Art') ? `a${t.rotulo.slice(1)}` : t.rotulo;
+  return { endereco: t.endereco, rotulo, faixa: NOME_DA_CLASSE[t.classe], minutos: t.minutos };
+}
+
+async function leituraSalva(
+  repo: Repositorio,
+  fonte?: FonteDeIncidencia,
+): Promise<LeituraSalva | undefined> {
   const [normas, leituras] = await Promise.all([normasPublicadas(repo), leiturasPorNorma(repo)]);
   const achada = ultimaLida(normas, leituras);
   if (!achada) return undefined;
   const { norma, leitura } = achada;
-  const base = { normaId: norma.id, tituloCurto: norma.tituloCurto };
+  const trecho = await trechoDoMapa(repo, fonte, norma.id);
+  const base = { normaId: norma.id, tituloCurto: norma.tituloCurto, ...(trecho ? { trecho } : {}) };
   const quando = lidaEm(leitura);
   const posicao = leitura.posicaoId ?? leitura.lidoAteId;
   if (posicao === undefined) return { leitura: base, lidaEm: quando };
@@ -91,12 +111,17 @@ export interface EntradasDoHoje {
   leituraEm?: string;
 }
 
-export async function reunirEntradas(repo: Repositorio, hoje: DataCivil): Promise<EntradasDoHoje> {
+export async function reunirEntradas(
+  repo: Repositorio,
+  hoje: DataCivil,
+  /** Os arquivos do Mapa da norma; sem ela, a leitura salva não traz o trecho. */
+  fonte?: FonteDeIncidencia,
+): Promise<EntradasDoHoje> {
   const [cartoesVencidos, frasesVencidas, salva, { fila }, ciclo, preferencias] = await Promise.all(
     [
       vencidos(repo, 'cartoes', hoje),
       vencidos(repo, 'frases', hoje),
-      leituraSalva(repo),
+      leituraSalva(repo, fonte),
       carregarFila(repo, hoje),
       blocoAtual(repo),
       obterPreferencias(repo),

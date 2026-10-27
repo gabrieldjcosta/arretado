@@ -1,8 +1,10 @@
 // Bloco "Agora" do Hoje (pacote A1; D-D7, P3): uma só ação, com o motivo, a saída "Escolher outra
 // coisa" e, acima da folha, onde a pessoa parou de ler com a caneta encostada nela.
+import { Link } from 'react-router';
+import type { ProximaAcao } from '../../dominios/hoje/contrato';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
-import { AgoraNoMapa } from './AgoraNoMapa';
+import { Icone } from '../componentes/Icone';
 import { SessaoAberta } from '../sessao/SessaoAberta';
 import { ROTULO_REVISAR_CARTOES } from '../../dominios/hoje/proxima-acao';
 import { EstadoVazio } from './EstadoVazio';
@@ -12,6 +14,31 @@ import { RevisaoPorTempo } from './RevisaoPorTempo';
 import { rotaDeInicio } from './rota-de-inicio';
 import { motivoDaAcao, rotuloDoBotao, tituloDaAcao } from './textos-da-acao';
 import './estilos-hoje.css';
+
+/** Com o Agora no trecho do mapa, "de onde parou" fica como alternativa, uma linha abaixo da folha. */
+function DeOndeParou({
+  acao,
+}: {
+  acao: ProximaAcao & { trecho: NonNullable<ProximaAcao['trecho']> };
+}) {
+  const { continuar } = acao.trecho;
+  const semTrecho: ProximaAcao = { tipo: acao.tipo, alvo: acao.alvo, razao: continuar.razao };
+  return (
+    <p className="agora-no-mapa dica">
+      <Icone nome="voltar" />
+      <span>
+        Ou de onde parou
+        {continuar.estimativaMin === undefined
+          ? ''
+          : `, cerca de ${String(continuar.estimativaMin)} min`}
+        .
+      </span>
+      <Link to={rotaDeInicio(semTrecho)} className="botao botao-texto">
+        Continuar a leitura
+      </Link>
+    </p>
+  );
+}
 
 function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
   const { retrato, dispensou, dispensar, voltar } = hoje;
@@ -26,6 +53,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
   };
   // A norma que a pessoa está lendo (a da leitura salva), esteja ela no Agora ou mais adiante.
   const normaLida = [acao, ...outras].find((a) => a.tipo === 'leitura_salva')?.alvo.id;
+  const trecho = acao.trecho;
   // Com cartão vencido, a folha deixa a pessoa dizer quanto tempo tem (AP-01).
   if (acao.tipo === 'revisao_vencida' && acao.alvo.rotulo === ROTULO_REVISAR_CARTOES) {
     return (
@@ -49,9 +77,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
         para={rotaDeInicio(acao)}
         aoEscolherOutra={escolherOutra}
       />
-      {acao.tipo === 'leitura_salva' && normaLida !== undefined && (
-        <AgoraNoMapa normaId={normaLida} />
-      )}
+      {trecho !== undefined && <DeOndeParou acao={{ ...acao, trecho }} />}
     </>
   );
 }

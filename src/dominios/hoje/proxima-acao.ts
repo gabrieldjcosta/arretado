@@ -33,7 +33,14 @@ export interface EntradaDaProximaAcao {
     volta: number;
     minutos: number;
   };
-  leitura?: { normaId: string; tituloCurto: string; onde?: string; minutos?: number };
+  leitura?: {
+    normaId: string;
+    tituloCurto: string;
+    onde?: string;
+    minutos?: number;
+    /** O próximo trecho do Mapa da norma, quando há mapa e algo que cai ainda não foi coberto. */
+    trecho?: { endereco: string; rotulo: string; faixa: string; minutos: number };
+  };
 }
 
 const plural = (n: number, um: string, varios: string) =>
@@ -88,15 +95,25 @@ function tarefaDaFila(e: EntradaDaProximaAcao): ProximaAcao | undefined {
 function leituraSalva(e: EntradaDaProximaAcao): ProximaAcao | undefined {
   const l = e.leitura;
   if (!l) return undefined;
-  return {
-    tipo: 'leitura_salva',
-    alvo: { tipo: 'leitura', id: l.normaId, rotulo: l.tituloCurto },
+  const continuar = {
     razao:
       l.onde === undefined
         ? `Continuar a leitura da ${l.tituloCurto}`
         : `Continuar a leitura no ${l.onde} da ${l.tituloCurto}`,
     ...(l.onde !== undefined && l.minutos !== undefined ? { estimativaMin: l.minutos } : {}),
   };
+  const alvo = { tipo: 'leitura' as const, id: l.normaId, rotulo: l.tituloCurto };
+  // Com Mapa, o Agora é o trecho que mais cai (minutos do trecho), e "de onde parou" é a alternativa.
+  if (l.trecho) {
+    return {
+      tipo: 'leitura_salva',
+      alvo,
+      razao: `Pelo mapa, o próximo trecho da ${l.tituloCurto} ${l.trecho.faixa}`,
+      estimativaMin: l.trecho.minutos,
+      trecho: { endereco: l.trecho.endereco, rotulo: l.trecho.rotulo, continuar },
+    };
+  }
+  return { tipo: 'leitura_salva', alvo, ...continuar };
 }
 
 /** Escolhe a Próxima ação; `excluir` é o "Escolher outra coisa" (tipos dispensados agora). */

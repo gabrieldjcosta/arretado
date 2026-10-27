@@ -64,6 +64,17 @@ describe('Sessão leve (A2)', () => {
     expect(sessoes[0]).toMatchObject({ estado: 'ativa', alvo: { tipo: 'revisao' } });
   });
 
+  it('leitura direta com o trecho do mapa (ir=) abre o Leitor no trecho, seguindo o mapa', async () => {
+    const NORMA = '11111111-1111-4111-8111-111111111111';
+    const { repo } = await abrir(
+      `/sessao/iniciar?tipo=leitura&id=${NORMA}&rotulo=LEP&ir=art3&origem=leitura_salva&direto=1`,
+    );
+    await waitFor(() => {
+      expect(window.location.hash).toBe(`#/biblioteca/normas/${NORMA}?ir=art3&foco=artigo&mapa=1`);
+    });
+    expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(1);
+  });
+
   it('direto=1 sem tela própria para o alvo mostra o início normal', async () => {
     const { repo } = await abrir('/sessao/iniciar?tipo=ponto&rotulo=CP&direto=1');
     expect(await screen.findByRole('button', { name: 'Começar' })).toBeInTheDocument();
