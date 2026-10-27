@@ -3473,6 +3473,29 @@ dialog.dialogo-previa .linha-acoes button {
   color: var(--texto-atenuado);
 }
 
+/* Biblioteca › Normas: o apoio leva a leitura, as disciplinas e a fonte. Em duas linhas cabe o que importa
+   (numa só, a 320 px e com fonte a 200%, a "Última leitura" ficava atrás das reticências). */
+.lista-de-normas .linha-lista-apoio {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+}
+
+/* Com o texto a 200%, o selo "Há versão nova" (sem quebra) tomava a linha e deixava o título numa letra por
+   linha (616 px de altura). O texto guarda ao menos 40% da linha e o selo, se preciso, quebra em duas
+   linhas, entre palavras (o `a` da linha herda `overflow-wrap: anywhere`, que partiria "versão"). */
+.lista-de-normas .linha-lista-texto {
+  min-width: 40%;
+}
+
+.lista-de-normas .selo {
+  overflow-wrap: break-word;
+  text-align: center;
+  white-space: normal;
+}
+
 .selo {
   display: inline-flex;
   align-items: center;
@@ -3693,27 +3716,6 @@ dialog.dialogo-previa .linha-acoes button {
 
 .fim-de-rodada .linha-acoes {
   justify-content: center;
-}
-
-/* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por
-   disciplina nem faixa colorida, D-D6 e D-D7): só o filete fino. */
-.grupo-de-normas {
-  margin-block: 0.75rem;
-  padding-inline-start: 0.75rem;
-  border-inline-start: 1px solid var(--borda);
-}
-
-.grupo-de-normas > summary {
-  display: flex;
-  gap: 0.5rem;
-  min-height: 44px;
-  align-items: center;
-  cursor: pointer;
-}
-
-.grupo-de-normas > summary h3 {
-  display: inline;
-  margin: 0;
 }
 
 /* Biblioteca › Normas: a linha "Retomar" no lugar da folha grande do Agora (que fica só no Hoje). */
