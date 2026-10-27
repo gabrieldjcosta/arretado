@@ -32,7 +32,8 @@ export async function trilhaOferecida(
   carreira: string,
 ): Promise<TrilhaOferecida | null> {
   const pontosQueJaTem = await repo.colecao('pontos').todosDoUsuario();
-  if (pontosQueJaTem.length > 0) return null;
+  // Pontos na lixeira (excluidoEm) não contam: quem apagou a Trilha ganha a oferta de volta.
+  if (pontosQueJaTem.some((p) => !p.excluidoEm)) return null;
   let edital: EditalDoCatalogo | undefined;
   try {
     edital = editaisOferecidos(await fonte.obter(carreira))[0];
@@ -54,6 +55,8 @@ export async function trilhaOferecida(
 export async function montarTrilha(repo: Repositorio, oferta: TrilhaOferecida): Promise<void> {
   const linhas = linhasDoEdital(oferta.edital);
   const preparado = await prepararPontos(repo, linhas, JSON.stringify(linhas));
+  // Nada novo (Trilha já montada, duplo toque): não grava snapshot nem log vazios.
+  if (!preparado.previa.escreve) return;
   await aplicar(repo, preparado.pacote, preparado.previa, new Map(), {
     descricao: `Trilha pelo catálogo (${oferta.rotulo})`,
   });
