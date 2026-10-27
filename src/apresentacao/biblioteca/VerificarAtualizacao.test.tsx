@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
@@ -66,6 +66,20 @@ describe('VerificarAtualizacao (6b)', () => {
     expect(
       (await repo.colecao('versoesNorma').todosDoUsuario()).filter((v) => v.normaId === c.norma.id),
     ).toHaveLength(1);
+  });
+
+  it('o botão fica sob o título "Da norma" (a ação é da norma, não do trecho)', async () => {
+    await montar(() => ok(pagina(ANTIGA)));
+    const bloco = screen.getByRole('region', { name: 'Da norma' });
+    expect(within(bloco).getByRole('button', { name: /^Verific/ })).toBeInTheDocument();
+  });
+
+  it('traz o resultado à vista: o painel das Ações rola por dentro em telas pequenas', async () => {
+    const rolar = vi.spyOn(Element.prototype, 'scrollIntoView');
+    await montar(() => ok(pagina(ANTIGA)));
+    await screen.findByText(/Nenhuma alteração detectada/);
+    expect(rolar).toHaveBeenCalledWith({ block: 'nearest' });
+    expect(rolar.mock.contexts[0]).toBe(screen.getByRole('status'));
   });
 
   it('sem rede: avisa e a norma segue como está', async () => {
