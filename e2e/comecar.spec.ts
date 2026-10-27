@@ -225,6 +225,37 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await comecos.getByRole('link', { name: 'Escolher meu concurso' }).click();
     await expect(page).toHaveURL(/#\/comecar$/);
   });
+
+  test('a 320 × 568 a saída "Agora não" já está na primeira tela da folha, sem rolar', async ({
+    page,
+  }) => {
+    await servirAcervo(page);
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/#/');
+    const chegada = page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await expect(chegada.getByRole('button', { name: 'Agora não' })).toBeInViewport({ ratio: 1 });
+  });
+
+  test('"Rever as boas-vindas": ao dispensar a folha, com Esc ou com "Agora não", o foco volta ao Ajuda', async ({
+    page,
+  }) => {
+    await servirAcervo(page);
+    await page.goto('/#/');
+    const chegada = page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await chegada.getByRole('button', { name: 'Agora não' }).click();
+    const ajuda = page.getByRole('button', { name: 'Ajuda', exact: true });
+    const reabrir = async () => {
+      await ajuda.click();
+      await page.getByRole('button', { name: 'Rever as boas-vindas' }).click();
+      await expect(chegada).toBeVisible();
+    };
+    await reabrir();
+    await page.keyboard.press('Escape');
+    await expect(ajuda).toBeFocused();
+    await reabrir();
+    await chegada.getByRole('button', { name: 'Agora não' }).click();
+    await expect(ajuda).toBeFocused();
+  });
 });
 
 test.describe('as duas telas novas', () => {

@@ -118,6 +118,28 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(folhas()).toBeNull();
   });
 
+  it('explica os quatro menus em uma linha cada, com os nomes das abas', async () => {
+    const { repo } = await repositorioDeTeste();
+    abrirHoje(repo);
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    for (const menu of ['Hoje', 'Trilha', 'Fixar', 'Biblioteca'])
+      expect(within(folha).getByText(menu, { selector: 'dt' })).toBeInTheDocument();
+  });
+
+  it('"Rever as boas-vindas" reabre a folha de qualquer tela, sem gravar nada, e fecha ao seguir um caminho', async () => {
+    localStorage.setItem(CHAVE_CHEGADA, '{"vista":true}');
+    localStorage.setItem(CHAVE_ENTRADA, '{"dia":"2026-09-23"}');
+    const { repo } = await repositorioDeTeste();
+    const { usuario } = abrirHoje(repo);
+    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
+    await usuario.click(screen.getByRole('button', { name: 'Rever as boas-vindas' }));
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await usuario.click(within(folha).getByRole('link', { name: 'Registrar um erro' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
+    expect(folhas()).toBeNull();
+  });
+
   it('com um aparelho que já viu a Chegada, o Hoje abre sem ela', async () => {
     localStorage.setItem(CHAVE_CHEGADA, '{"vista":true}');
     const { repo } = await repositorioDeTeste();
