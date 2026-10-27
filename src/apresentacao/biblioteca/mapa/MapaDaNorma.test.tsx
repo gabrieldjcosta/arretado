@@ -198,6 +198,25 @@ describe('Mapa da norma', () => {
     expect(quadrados[0]).toHaveFocus();
   });
 
+  it('com os dispositivos abertos, a chamada do Leitor diz quantos artigos concentram o que cai (U1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const doAcervo = await publicar(repo);
+    const aberta = await abrirNorma(repo, doAcervo.id);
+    render(
+      <ContextoRepositorio.Provider value={repo}>
+        <ContextoFonteIncidencia.Provider value={fonte(ARQUIVOS)}>
+          <MemoryRouter>
+            <ChamadaDoMapa norma={doAcervo} nos={aberta.nos} />
+          </MemoryRouter>
+        </ContextoFonteIncidencia.Provider>
+      </ContextoRepositorio.Provider>,
+    );
+    expect(
+      await screen.findByText(/\d+ de 4 artigos concentram \d+% do que caiu/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Mapa da norma' })).toBeInTheDocument();
+  });
+
   it('sem rede e sem cópia, avisa e mostra só a cobertura; norma fora do acervo também', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo);

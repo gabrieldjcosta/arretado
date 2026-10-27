@@ -1891,7 +1891,7 @@ function LeitorAberto({
       {!modoFoco && (
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
-      {!modoFoco && <ChamadaDoMapa norma={norma} />}
+      {!modoFoco && <ChamadaDoMapa norma={norma} nos={aberta.nos} />}
       {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
