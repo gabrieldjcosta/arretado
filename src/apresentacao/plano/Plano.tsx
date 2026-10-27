@@ -21,6 +21,10 @@ function porDisciplina(disciplinas: Disciplina[], pontos: Ponto[]) {
   }));
 }
 
+function resumoDosPontos(n: number) {
+  return n === 1 ? '1 ponto' : `${String(n)} pontos`;
+}
+
 /** Plano na F1: pontos importados, só para vincular erros. Edição e sugestão chegam na F3. */
 export function Plano() {
   const { dados } = useDados(pontosEDisciplinas);
@@ -78,18 +82,24 @@ export function Plano() {
           </Link>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
-              <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>
-              <ul className="lista-simples">
-                {pontos.map((p) => (
-                  <li key={p.id}>
-                    <span>
-                      {p.codigo ? `${p.codigo}. ` : ''}
-                      {p.titulo}
-                    </span>
-                    {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
-                  </li>
-                ))}
-              </ul>
+              <details className="trilha-materia" open={grupos.length === 1 || undefined}>
+                <summary>
+                  <span className="trilha-seta" aria-hidden="true" />
+                  <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>
+                  <span className="dica">{resumoDosPontos(pontos.length)}</span>
+                </summary>
+                <ul className="lista-simples">
+                  {pontos.map((p) => (
+                    <li key={p.id}>
+                      <span>
+                        {p.codigo ? `${p.codigo}. ` : ''}
+                        {p.titulo}
+                      </span>
+                      {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </section>
           ))}
           <details>
