@@ -10,6 +10,7 @@ import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESULTADO } from '../recall/rotulos';
 import { PrecedentesDoDispositivo } from './PrecedentesDoDispositivo';
+import { VerificarAtualizacao } from './VerificarAtualizacao';
 import { FormularioDaCorrecao, TextosDeAntes, type CorrecaoNoLeitor } from './CorrecaoDoTexto';
 
 /** O dispositivo sobre o qual as ações agem: o que está no alto da tela quando o botão é tocado. */
@@ -42,12 +43,15 @@ export function AcoesDoDispositivo({
   alvo,
   estrela,
   correcao,
+  normaComEnderecoOficial,
   aoFechar,
 }: {
   alvo: AlvoDasAcoes | undefined;
   estrela?: EstrelaDasAcoes;
   /** Corrigir o texto publicado (11.7): ausente, o botão não aparece. */
   correcao?: CorrecaoNoLeitor;
+  /** Id da norma, só quando ela tem endereço oficial: mostra "Verificar atualização" (S3). */
+  normaComEnderecoOficial?: string;
   aoFechar: () => void;
 }) {
   return (
@@ -57,7 +61,15 @@ export function AcoesDoDispositivo({
       titulo={alvo ? `Ações de ${alvo.nome}` : 'Ações'}
       classe="dialogo-acoes"
     >
-      {alvo && <Conteudo alvo={alvo} estrela={estrela} correcao={correcao} aoFechar={aoFechar} />}
+      {alvo && (
+        <Conteudo
+          alvo={alvo}
+          estrela={estrela}
+          correcao={correcao}
+          normaComEnderecoOficial={normaComEnderecoOficial}
+          aoFechar={aoFechar}
+        />
+      )}
     </Dialogo>
   );
 }
@@ -66,11 +78,13 @@ function Conteudo({
   alvo,
   estrela,
   correcao,
+  normaComEnderecoOficial,
   aoFechar,
 }: {
   alvo: AlvoDasAcoes;
   estrela: EstrelaDasAcoes | undefined;
   correcao: CorrecaoNoLeitor | undefined;
+  normaComEnderecoOficial: string | undefined;
   aoFechar: () => void;
 }) {
   const repo = useRepositorio();
@@ -202,6 +216,9 @@ function Conteudo({
             </button>
           )}
         </div>
+      )}
+      {normaComEnderecoOficial && !registrando && !corrigindo && (
+        <VerificarAtualizacao normaId={normaComEnderecoOficial} />
       )}
       {alvo.texto === undefined && !registrando && !corrigindo && (
         <p className="dica">Cartão só de dispositivo com texto: role até um artigo.</p>

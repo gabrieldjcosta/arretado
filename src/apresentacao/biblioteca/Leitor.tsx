@@ -73,7 +73,6 @@ import { rotuloDoTrecho } from '../../dominios/legislacao/mapa-da-norma';
 import { ChamadaDoMapa } from './mapa/ChamadaDoMapa';
 import { registrarArtigosFeitos } from './mapa/feitos';
 import { useRoteiroDoMapa } from './mapa/useRoteiro';
-import { VerificarAtualizacao } from './VerificarAtualizacao';
 import { AvisoDaCorrecao } from './CorrecaoDoTexto';
 import { AcoesDaSelecao, AcoesDoGrifo, DialogoDaNota, DialogoEnviarAsFrases } from './Marcacoes';
 import {
@@ -1894,7 +1893,6 @@ function LeitorAberto({
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>
       )}
       {!modoFoco && <ChamadaDoMapa norma={norma} />}
-      {!modoFoco && norma.urlOficial && <VerificarAtualizacao key={norma.id} normaId={norma.id} />}
       {!modoFoco && avisoDaCorrecao}
       {!modoFoco && <PendenciasDaNorma normaId={norma.id} />}
       {!modoFoco && destacar && <LegendaDestaques curta />}
@@ -2303,6 +2301,7 @@ function LeitorAberto({
       <AcoesDoDispositivo
         alvo={alvoDasAcoes}
         estrela={estrelaDasAcoes}
+        normaComEnderecoOficial={norma.urlOficial ? norma.id : undefined}
         correcao={{
           normaId: norma.id,
           versaoId: aberta.versao.id,

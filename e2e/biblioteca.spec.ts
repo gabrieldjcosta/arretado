@@ -140,6 +140,9 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
 
   // 6b: a mesma página não traz alteração; a página com lei nova dá indício e não troca o texto.
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  // S3: a verificação mora nas Ações do Leitor, não no topo do texto.
+  await expect(page.getByRole('button', { name: 'Verificar atualização' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Ações', exact: true }).click();
   const verificar = page.getByRole('button', { name: 'Verificar atualização' });
   await verificar.click();
   await expect(page.getByText(/Nenhuma alteração detectada: a página oficial é igual/)).toBeVisible(
