@@ -8,15 +8,17 @@ import {
   type ReactNode,
 } from 'react';
 
-/** Quantos blocos abaixo do Agora aparecem de uma vez (S7); o resto espera atrás de "Avisos (n)". */
+/** Quantos blocos abaixo do Agora aparecem de uma vez (S7); o resto espera atrás de "Ver mais". */
 export const ORCAMENTO_DE_BLOCOS = 2;
 
 /**
  * Orçamento de blocos do Hoje (S7, 27/10/2026). Cada filho é um bloco que decide sozinho se renderiza
  * (muitos devolvem `null` sem dados); aqui vale só o que apareceu: os `ORCAMENTO_DE_BLOCOS` primeiros,
  * na ordem dos filhos (a ordem é a prioridade), ficam à vista, e os demais ficam escondidos atrás de um
- * botão "Avisos (n)". Os blocos escondidos seguem montados, então um aviso que chega depois só entra na
- * conta. A contagem sai do DOM porque quem sabe se um bloco aparece é o próprio bloco.
+ * botão "Ver mais". Os blocos escondidos seguem montados, então um aviso que chega depois só entra na
+ * conta. A contagem sai do DOM porque quem sabe se um bloco aparece é o próprio bloco. O botão não
+ * mostra a contagem nem diz "avisos": o número soa como pendência, e o que fica atrás não é só aviso
+ * (o "Para lembrar" é nota da própria pessoa).
  */
 export function BlocosDoHoje({ children }: { children: ReactNode }) {
   const raiz = useRef<HTMLDivElement>(null);
@@ -60,14 +62,14 @@ export function BlocosDoHoje({ children }: { children: ReactNode }) {
       {escondidos > 0 && (
         <button
           type="button"
-          className="botao botao-texto avisos-do-hoje"
+          className="botao botao-texto na-margem mais-do-hoje"
           aria-expanded={aberto}
           aria-controls={idDaLista}
           onClick={() => {
             setAberto((a) => !a);
           }}
         >
-          {aberto ? 'Menos avisos' : `Avisos (${String(escondidos)})`}
+          {aberto ? 'Ver menos' : 'Ver mais'}
         </button>
       )}
     </>

@@ -7,7 +7,7 @@ const Vazio = () => null;
 const Bloco = ({ nome }: { nome: string }) => <p>{nome}</p>;
 
 describe('BlocosDoHoje (S7)', () => {
-  it('mostra os dois primeiros blocos que aparecem e guarda o resto em "Avisos (n)"', async () => {
+  it('mostra os dois primeiros blocos que aparecem e guarda o resto em "Ver mais"', async () => {
     const usuario = userEvent.setup();
     render(
       <BlocosDoHoje>
@@ -25,16 +25,16 @@ describe('BlocosDoHoje (S7)', () => {
     expect(screen.getByText('Para lembrar')).not.toBeVisible();
     expect(screen.getByText('Backup')).not.toBeVisible();
 
-    const botao = screen.getByRole('button', { name: 'Avisos (2)' });
+    const botao = screen.getByRole('button', { name: 'Ver mais' });
     expect(botao).toHaveAttribute('aria-expanded', 'false');
     await usuario.click(botao);
     expect(screen.getByText('Para lembrar')).toBeVisible();
     expect(screen.getByText('Backup')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Menos avisos' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Ver menos' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );
-    await usuario.click(screen.getByRole('button', { name: 'Menos avisos' }));
+    await usuario.click(screen.getByRole('button', { name: 'Ver menos' }));
     expect(screen.getByText('Backup')).not.toBeVisible();
   });
 
@@ -72,12 +72,12 @@ describe('BlocosDoHoje (S7)', () => {
       );
     }
     render(<Tela />);
-    expect(screen.queryByRole('button', { name: /^Avisos/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Ver / })).not.toBeInTheDocument();
     await act(async () => {
       screen.getByRole('button', { name: 'chegou' }).click();
       await Promise.resolve();
     });
-    expect(await screen.findByRole('button', { name: 'Avisos (1)' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Ver mais' })).toBeInTheDocument();
     expect(screen.getByText('C')).not.toBeVisible();
   });
 });

@@ -8,7 +8,7 @@
 //
 // Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; à direita os blocos abaixo dele, com
 // orçamento de dois à vista (S7, `BlocosDoHoje`): o "Em seguida", o Fechar o Dia, "A lei mudou", o "Para
-// lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Avisos (n)". Abaixo de
+// lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Ver mais". Abaixo de
 // 900 px as duas viram uma só, na mesma ordem.
 //
 // A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
@@ -46,7 +46,7 @@ export function Hoje() {
           {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
-          {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Avisos (n)". */}
+          {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Ver mais". */}
           <BlocosDoHoje>
             <Depois
               acoes={hoje.emSeguida}
