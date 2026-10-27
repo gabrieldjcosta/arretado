@@ -260,3 +260,20 @@ export function rotuloDoTrecho(quadrados: readonly QuadradoDoMapa[], trecho: Tre
   if (trecho.de === trecho.ate) return `art. ${numero(de)}`;
   return `arts. ${numero(de)} a ${numero(ate)}`;
 }
+
+/**
+ * O roteiro de "ler seguindo o mapa": os próximos trechos em ordem, cada um escolhido como se os
+ * anteriores já estivessem cobertos. Termina quando não resta artigo com faixa por cobrir.
+ */
+export function roteiroDoMapa(
+  quadrados: readonly QuadradoDoMapa[],
+  cobertos: readonly boolean[],
+): TrechoDoMapa[] {
+  const feitos = [...cobertos];
+  const trechos: TrechoDoMapa[] = [];
+  for (let t = proximoTrecho(quadrados, feitos); t; t = proximoTrecho(quadrados, feitos)) {
+    trechos.push(t);
+    feitos.fill(true, t.de, t.ate + 1);
+  }
+  return trechos;
+}

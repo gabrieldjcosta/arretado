@@ -1860,6 +1860,13 @@ a.item-norma strong {
   margin: 0;
 }
 
+/* "Ler seguindo o mapa": a linha sob a barra do cartão, com o trecho de agora e o "Parar". */
+.seguindo-mapa {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--texto-atenuado);
+}
+
 /* "Lido até" (9.7): a referência sob a barra, a marca na linha e o botão que acompanha a rolagem */
 .lido-ate {
   display: flex;
