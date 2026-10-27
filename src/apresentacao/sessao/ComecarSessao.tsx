@@ -1,5 +1,6 @@
-// "Começar uma Sessão" no Hoje: o tipo de atividade em um toque, com a sugestão em destaque. Sem
-// Sessão aberta, mostra o cartão; com uma aberta, o Hoje já mostra a `SessaoAberta`.
+// "Começar uma Sessão" no Hoje: o tipo de atividade em um toque, com a sugestão em primeiro. Sem
+// Sessão aberta, mostra o cartão; com uma aberta, o Hoje já mostra a `SessaoAberta`. Nenhum botão é
+// `.principal`: a ação dominante do Hoje é a do Agora (ou a escolha do estado vazio), uma por tela.
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { AtividadeDeSessao } from '../../core/modelo';
@@ -47,7 +48,6 @@ export function ComecarSessao({ normaLida }: { normaLida?: string }) {
             <button
               key={a.id}
               type="button"
-              className={a.id === sugerida ? 'principal' : undefined}
               onClick={() => {
                 comecar(a.id);
               }}

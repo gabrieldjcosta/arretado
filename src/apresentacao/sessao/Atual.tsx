@@ -59,7 +59,7 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
       <h1>Sessão</h1>
       <section className="cartao-bloco" aria-label="Sessão em andamento">
         <p className="sessao-resumo">{sessao.alvo?.rotulo ?? 'Sessão livre'}</p>
-        {sessao.atividade && (
+        {sessao.atividade && rotuloDaAtividade(sessao.atividade) !== sessao.alvo?.rotulo && (
           <p className="sessao-detalhe">{rotuloDaAtividade(sessao.atividade)}</p>
         )}
         {sessao.fronteira && <p className="sessao-detalhe">Até onde: {sessao.fronteira}</p>}

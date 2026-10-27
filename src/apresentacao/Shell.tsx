@@ -158,7 +158,6 @@ export function Shell() {
         </div>
       </header>
       <FaixaOffline />
-      <CantoDaSessao />
       <AvisoDePosse />
       <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
@@ -169,6 +168,7 @@ export function Shell() {
           Backup e dados
         </Link>
       </footer>
+      <CantoDaSessao />
       {boasVindas && (
         <Chegada
           aoFechar={() => {

@@ -61,14 +61,40 @@ describe('Sessão de questões', () => {
     const s = await iniciarSessao(repo, { atividade: 'questoes' });
     const { usuario } = await abrir('/sessao/atual', repo);
     await usuario.click(await screen.findByRole('button', { name: 'Acertei' }));
-    expect(await screen.findByText('1 feitas, 1 acertos.')).toBeInTheDocument();
+    expect(await screen.findByText('1 feita, 1 acerto.')).toBeInTheDocument();
     await usuario.click(screen.getByRole('button', { name: 'Errei' }));
     await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo é de cinco dias.');
     await usuario.click(screen.getByRole('button', { name: 'Guardar erro' }));
-    expect(await screen.findByText('2 feitas, 1 acertos.')).toBeInTheDocument();
+    expect(await screen.findByText('2 feitas, 1 acerto.')).toBeInTheDocument();
     const erros = await repo.colecao('erros').todosDoUsuario();
     expect(erros).toHaveLength(1);
     expect(erros[0]).toMatchObject({ sessaoId: s.id, resultado: 'errou' });
+  });
+
+  it('ao fechar o formulário do Errei, o foco volta ao botão Errei', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, { atividade: 'questoes' });
+    const { usuario } = await abrir('/sessao/atual', repo);
+    await usuario.click(await screen.findByRole('button', { name: 'Errei' }));
+    await usuario.click(screen.getByRole('button', { name: 'Cancelar' }));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Errei' })).toHaveFocus();
+    });
+    await usuario.click(screen.getByRole('button', { name: 'Errei' }));
+    await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo é de cinco dias.');
+    await usuario.click(screen.getByRole('button', { name: 'Guardar erro' }));
+    expect(await screen.findByText(/Já está no Fixar\./)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Errei' })).toHaveFocus();
+    });
+  });
+
+  it('Acertei e Errei têm o mesmo peso: nenhum dos dois é a ação principal', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, { atividade: 'questoes' });
+    await abrir('/sessao/atual', repo);
+    expect(await screen.findByRole('button', { name: 'Acertei' })).not.toHaveClass('principal');
+    expect(screen.getByRole('button', { name: 'Errei' })).not.toHaveClass('principal');
   });
 
   it('"Só contar" conta o erro sem criar registro', async () => {
@@ -77,7 +103,7 @@ describe('Sessão de questões', () => {
     const { usuario } = await abrir('/sessao/atual', repo);
     await usuario.click(await screen.findByRole('button', { name: 'Errei' }));
     await usuario.click(screen.getByRole('button', { name: 'Só contar' }));
-    expect(await screen.findByText('1 feitas, 0 acertos.')).toBeInTheDocument();
+    expect(await screen.findByText('1 feita, 0 acertos.')).toBeInTheDocument();
     expect(await repo.colecao('erros').todosDoUsuario()).toHaveLength(0);
   });
 
@@ -86,7 +112,7 @@ describe('Sessão de questões', () => {
     await iniciarSessao(repo, { atividade: 'questoes', temporizadorMin: undefined });
     const { usuario } = await abrir('/sessao/atual', repo);
     await usuario.click(await screen.findByRole('button', { name: 'Acertei' }));
-    await screen.findByText('1 feitas, 1 acertos.');
+    await screen.findByText('1 feita, 1 acerto.');
     await usuario.click(screen.getByRole('link', { name: 'Encerrar' }));
     await usuario.click(await screen.findByText('Fez questões? (opcional)'));
     expect(screen.getByLabelText('Questões feitas')).toHaveValue(1);
@@ -110,6 +136,19 @@ describe('Canto da Sessão', () => {
     expect(atual?.estacionamento?.[0]?.texto).toBe('comprar café');
     await usuario.keyboard('{Escape}');
     expect(screen.queryByLabelText('Anotar uma distração')).toBeNull();
+    // O foco estava dentro do bloquinho: volta ao relógio, não vai ao começo da página.
+    expect(screen.getByRole('button', { name: /Abrir o bloquinho/ })).toHaveFocus();
+  });
+
+  it('o relógio diz "Sessão" e o tempo, e o Tab do relógio entra no bloquinho', async () => {
+    const { repo } = await repositorioDeTeste();
+    await iniciarSessao(repo, { atividade: 'lei' });
+    const { usuario } = await abrir('/biblioteca', repo);
+    const relogio = await screen.findByRole('button', { name: /Abrir o bloquinho/ });
+    expect(relogio).toHaveTextContent(/^Sessão · /);
+    await usuario.click(relogio);
+    await usuario.tab();
+    expect(screen.getByLabelText('Anotar uma distração')).toHaveFocus();
   });
 
   it('pausar pelo canto muda o relógio para "Pausada"', async () => {

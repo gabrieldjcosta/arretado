@@ -26,6 +26,7 @@ export function CantoDaSessao() {
 function Canto({ sessao }: { sessao: Sessao }) {
   const repo = useRepositorio();
   const campo = useRef<HTMLInputElement>(null);
+  const relogio = useRef<HTMLButtonElement>(null);
   const [aberto, setAberto] = useState(false);
   const [texto, setTexto] = useState('');
   const [aviso, setAviso] = useState('');
@@ -68,9 +69,24 @@ function Canto({ sessao }: { sessao: Sessao }) {
     <div
       className="canto-sessao"
       onKeyDown={(e) => {
-        if (e.key === 'Escape' && aberto) setAberto(false);
+        if (e.key !== 'Escape' || !aberto) return;
+        // Só o bloquinho fecha (o modo foco do Leitor respeita o `defaultPrevented`), e o foco volta ao relógio.
+        e.preventDefault();
+        setAberto(false);
+        relogio.current?.focus();
       }}
     >
+      <button
+        ref={relogio}
+        type="button"
+        className="canto-sessao__relogio"
+        aria-expanded={aberto}
+        aria-label={`Sessão${pausada ? ' pausada' : ''}, ${tempo}. ${aberto ? 'Fechar' : 'Abrir'} o bloquinho`}
+        onClick={alternar}
+      >
+        <span className="canto-sessao__rotulo">{pausada ? 'Sessão ' : 'Sessão · '}</span>
+        {pausada ? 'pausada' : tempo}
+      </button>
       {aberto && (
         <div className="canto-sessao__painel" role="group" aria-label="Sessão em andamento">
           <p className="canto-sessao__titulo">
@@ -112,15 +128,6 @@ function Canto({ sessao }: { sessao: Sessao }) {
           </div>
         </div>
       )}
-      <button
-        type="button"
-        className="canto-sessao__relogio"
-        aria-expanded={aberto}
-        aria-label={`Sessão${pausada ? ' pausada' : ''}, ${tempo}. ${aberto ? 'Fechar' : 'Abrir'} o bloquinho`}
-        onClick={alternar}
-      >
-        {pausada ? 'Pausada' : tempo}
-      </button>
     </div>
   );
 }
