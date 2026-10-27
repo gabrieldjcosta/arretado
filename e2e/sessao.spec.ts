@@ -185,17 +185,20 @@ test('Sessão: no fim da tela o relógio assenta abaixo do rodapé, acima das ab
   const relogio = page.getByRole('button', { name: /Abrir o bloquinho/ });
   const rodape = page.getByRole('link', { name: 'Backup e dados' });
   const abas = page.getByRole('navigation', { name: 'Áreas' });
-  await page.evaluate(() => {
-    window.scrollTo(0, document.documentElement.scrollHeight);
-  });
+  // O fim da página pode crescer depois do primeiro rolar (fontes e dados chegando): rola de novo a cada leitura.
   await expect
     .poll(async () => {
+      await page.evaluate(() => {
+        window.scrollTo(0, document.documentElement.scrollHeight);
+      });
       const [r, l, a] = await Promise.all([
         relogio.boundingBox(),
         rodape.boundingBox(),
         abas.boundingBox(),
       ]);
-      return !!r && !!l && !!a && l.y + l.height <= r.y && r.y + r.height <= a.y;
+      if (!r || !l || !a) return 'sem caixa: ' + JSON.stringify({ r, l, a });
+      const ok = l.y + l.height <= r.y && r.y + r.height <= a.y;
+      return ok ? 'ok' : 'fora de ordem: ' + JSON.stringify({ r, l, a });
     })
-    .toBe(true);
+    .toBe('ok');
 });
