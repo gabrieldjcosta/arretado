@@ -171,8 +171,8 @@ export function RegistrarErro() {
             <p role="status">Cartão criado. Primeira revisão amanhã.</p>
             {depois.filaCheia && (
               <p className="aviso">
-                Há dias com mais de {LIMITE_FILA_DIARIA} revisões previstas: você está criando mais
-                cartões do que revisa.
+                Em algum dia desta semana passam de {LIMITE_FILA_DIARIA} as revisões previstas. Sem
+                pressa: revise a cota de cada vez, e o resto espera.
               </p>
             )}
           </>
