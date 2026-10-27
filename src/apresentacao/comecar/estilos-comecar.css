@@ -68,3 +68,21 @@
 .comecar > .dica {
   text-wrap: balance;
 }
+
+/* A Trilha oferecida junto (27/10/2026): a caixa marcada de saída, o apoio em duas linhas. */
+.comecar-trilha {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: var(--alvo);
+}
+
+.comecar-trilha > input {
+  margin-top: 0.25rem;
+}
+
+.comecar-trilha > span {
+  display: grid;
+  gap: 0.125rem;
+}

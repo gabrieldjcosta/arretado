@@ -5,8 +5,9 @@ import { lembrarDaChegada } from './regras';
 
 /**
  * A Chegada (D-D9): a folha de orientação da primeira vez no aparelho, sobre o Hoje. O caminho principal
- * é escolher o concurso (da folha a uma norma aberta em três toques); ler uma norma e registrar um erro
- * são os outros dois, a trilha vem em texto, e "Agora não" fecha. O nome escrito é o do cabeçalho
+ * é escolher o concurso (da folha a uma norma aberta em três toques, com a Trilha montada junto); ler
+ * uma norma e registrar um erro são os outros dois, a trilha passo a passo vem em texto, e "Agora não"
+ * fecha. O nome escrito é o do cabeçalho
  * (`Marca`, na frequência dela): aqui ele não se repete. Grava ao aparecer, e a Entrada do Dia não abre
  * no mesmo Dia.
  */
@@ -44,8 +45,8 @@ export function Chegada({ dia }: { dia: string }) {
           Registrar um erro
         </Link>
         <Link to="/plano/onboarding" className="botao botao-texto chegada-trilha">
-          <b>Montar uma trilha</b>
-          <span>com base em editais parecidos</span>
+          <b>Montar a trilha passo a passo</b>
+          <span>escolhendo edital e matérias</span>
         </Link>
       </div>
       <div className="chegada-depois">

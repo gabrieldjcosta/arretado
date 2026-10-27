@@ -1,12 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { NORMA_GRANDE } from '../../dominios/acervo/agrupar';
 import { adicionarPartida, normasDaPartida } from '../../dominios/acervo/partida';
 import type { EntradaDoIndice } from '../../dominios/acervo/esquemas';
+import { FonteEmbutida, type FonteDoCatalogo } from '../../dominios/catalogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Voltar } from '../componentes/Voltar';
 import { useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
+import { montarTrilha, trilhaOferecida, type TrilhaOferecida } from './trilha-do-edital';
 import { useCarga } from './useCarga';
 import './estilos-comecar.css';
 
@@ -16,6 +18,8 @@ interface Andamento {
   feitos: number;
   total: number;
   atual?: EntradaDoIndice;
+  /** As normas já entraram; agora é a Trilha. */
+  trilha?: true;
 }
 
 interface Falhou {
@@ -23,25 +27,38 @@ interface Falhou {
   falhas: { id: string; motivo: string }[];
   /** A norma da biblioteca com que a pessoa já pode começar, se alguma entrou. */
   normaId?: string;
+  /** As normas entraram, mas a Trilha não: a leitura segue; a Trilha fica para a tela dela. */
+  trilha?: true;
 }
 
 /**
  * `/comecar/:carreira`: "Para começar". As normas que mais aparecem nos editais da carreira, só as que
  * o acervo tem hoje, e um botão que adiciona todas e abre a primeira no Leitor. Das que o pacote cita
- * e o acervo ainda não tem, a tela diz quais são e leva ao importador.
+ * e o acervo ainda não tem, a tela diz quais são e leva ao importador. Um fluxo só (27/10/2026): a
+ * mesma tela oferece a Trilha do edital mais recente da carreira, marcada de saída, e o mesmo botão
+ * monta as duas coisas; a Trilha falhar não impede a leitura.
  */
-export function ParaComecar() {
+export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
   const { carreira: slug } = useParams<{ carreira: string }>();
   const repo = useRepositorio();
   const fonte = useFonteAcervo();
   const navegar = useNavigate();
+  const fonteDoCatalogo = useMemo(() => catalogo ?? new FonteEmbutida(), [catalogo]);
   const carregar = useCallback(async () => {
-    const [pacote, indice] = await Promise.all([fonte.pacoteDePartida(), fonte.listar()]);
-    return { pacote, indice };
-  }, [fonte]);
+    const [pacote, indice, trilha] = await Promise.all([
+      fonte.pacoteDePartida(),
+      fonte.listar(),
+      // A Trilha é um extra: sem catálogo, a tela fica como era.
+      slug === undefined ? null : trilhaOferecida(repo, fonteDoCatalogo, slug).catch(() => null),
+    ]);
+    return { pacote, indice, trilha };
+  }, [fonte, fonteDoCatalogo, repo, slug]);
   const { carga, tentarDeNovo } = useCarga(carregar);
   const [andamento, setAndamento] = useState<Andamento | null>(null);
   const [falhou, setFalhou] = useState<Falhou | null>(null);
+  const [querTrilha, setQuerTrilha] = useState(true);
+  // Tentar de novo depois de uma falha nas normas não cria a Trilha duas vezes.
+  const [trilhaMontada, setTrilhaMontada] = useState(false);
 
   // `hasOwn`: o endereço é de quem digita, e "constructor" ou "__proto__" não são carreiras.
   const carreiras = carga.estado === 'pronto' ? carga.dados.pacote.carreiras : undefined;
@@ -52,6 +69,8 @@ export function ParaComecar() {
       ? normasDaPartida(carreira, carga.dados.indice)
       : { presentes: [], faltam: [] };
   const tituloDe = new Map(presentes.map((p) => [p.entrada.id, p.norma.titulo]));
+  const trilha: TrilhaOferecida | null =
+    carga.estado === 'pronto' && carreira ? carga.dados.trilha : null;
 
   async function adicionarELer() {
     if (andamento || presentes.length === 0) return;
@@ -64,13 +83,25 @@ export function ParaComecar() {
           setAndamento({ feitos, total, ...(atual ? { atual } : {}) });
         },
       });
-      if (r.lote.falhas.length === 0 && r.normaId !== undefined) {
+      // A Trilha só depois das normas: se a rede cair no meio, o que a pessoa pediu primeiro entrou.
+      let trilhaFalhou = false;
+      if (trilha && querTrilha && r.normaId !== undefined && !trilhaMontada) {
+        setAndamento({ feitos: ids.length, total: ids.length, trilha: true });
+        try {
+          await montarTrilha(repo, trilha);
+          setTrilhaMontada(true);
+        } catch {
+          trilhaFalhou = true;
+        }
+      }
+      if (r.lote.falhas.length === 0 && r.normaId !== undefined && !trilhaFalhou) {
         void navegar(`/biblioteca/normas/${r.normaId}`);
         return;
       }
       setFalhou({
         falhas: r.lote.falhas,
         ...(r.normaId === undefined ? {} : { normaId: r.normaId }),
+        ...(trilhaFalhou ? { trilha: true } : {}),
       });
     } catch {
       setFalhou({ falhas: ids.map((id) => ({ id, motivo: 'Não foi possível adicionar.' })) });
@@ -136,11 +167,15 @@ export function ParaComecar() {
           )}
           {andamento && (
             <div role="status" className="aviso">
-              <p>
-                Adicionando {Math.min(andamento.feitos + 1, andamento.total)} de {andamento.total}
-                {andamento.atual &&
-                  `: ${tituloDe.get(andamento.atual.id) ?? andamento.atual.titulo}`}
-              </p>
+              {andamento.trilha ? (
+                <p>Montando a Trilha…</p>
+              ) : (
+                <p>
+                  Adicionando {Math.min(andamento.feitos + 1, andamento.total)} de {andamento.total}
+                  {andamento.atual &&
+                    `: ${tituloDe.get(andamento.atual.id) ?? andamento.atual.titulo}`}
+                </p>
+              )}
               <progress
                 aria-label="Andamento da adição"
                 value={andamento.feitos}
@@ -157,16 +192,29 @@ export function ParaComecar() {
           {falhou && (
             <div role="alert" className="aviso falha">
               <p>
-                <strong>Não deu para adicionar tudo.</strong>
+                <strong>
+                  {falhou.falhas.length > 0
+                    ? 'Não deu para adicionar tudo.'
+                    : 'As normas entraram; a Trilha, não.'}
+                </strong>
               </p>
-              <ul className="lista-simples">
-                {falhou.falhas.map((f) => (
-                  <li key={f.id}>
-                    {tituloDe.get(f.id) ?? f.id}: {f.motivo}
-                  </li>
-                ))}
-              </ul>
-              <p>Precisa de internet só para adicionar. O que já entrou continua no aparelho.</p>
+              {falhou.falhas.length > 0 && (
+                <ul className="lista-simples">
+                  {falhou.falhas.map((f) => (
+                    <li key={f.id}>
+                      {tituloDe.get(f.id) ?? f.id}: {f.motivo}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {falhou.trilha && (
+                <p>
+                  Dá para montar a Trilha depois, na <Link to="/plano">Trilha</Link>.
+                </p>
+              )}
+              {falhou.falhas.length > 0 && (
+                <p>Precisa de internet só para adicionar. O que já entrou continua no aparelho.</p>
+              )}
               {falhou.normaId && (
                 <Link to={`/biblioteca/normas/${falhou.normaId}`} className="botao">
                   Ler o que já entrou
@@ -182,6 +230,25 @@ export function ParaComecar() {
                     ? 'A norma entra no aparelho e abre para ler.'
                     : `As ${String(presentes.length)} normas entram no aparelho e a primeira abre para ler.`}
                 </p>
+              )}
+              {trilha && !trilhaMontada && (
+                <label className="opcao comecar-trilha">
+                  <input
+                    type="checkbox"
+                    checked={querTrilha}
+                    disabled={andamento !== null}
+                    onChange={(e) => {
+                      setQuerTrilha(e.target.checked);
+                    }}
+                  />
+                  <span>
+                    <b>Montar também a Trilha</b>
+                    <span className="dica">
+                      {trilha.materias} matérias, {trilha.rotulo}. Dá para ajustar e desfazer
+                      depois.
+                    </span>
+                  </span>
+                </label>
               )}
               <button
                 type="button"

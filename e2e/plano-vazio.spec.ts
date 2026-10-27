@@ -14,19 +14,20 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
   await expect(
     page.getByRole('heading', { level: 2, name: 'Monte seu plano do seu jeito' }),
   ).toBeVisible();
-  await expect(
-    page.getByText(
-      'Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir do nosso catálogo de concursos.',
-    ),
-  ).toBeVisible();
+  await expect(page.getByText(/Escolha o concurso e o app monta a Trilha/)).toBeVisible();
 
-  // 2. Dois caminhos lado a lado com mesmo peso visual
-  const linkCatalogo = page.getByRole('link', { name: 'Montar pelo catálogo' });
-  await expect(linkCatalogo).toBeVisible();
-  await expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
+  // 2. Um começo só: "Escolher meu concurso" é o principal; "Trazer meu edital" ao lado; o passo a
+  //    passo pelo catálogo continua, como link de texto.
+  const escolher = page.getByRole('link', { name: 'Escolher meu concurso' });
+  await expect(escolher).toBeVisible();
+  await expect(escolher).toHaveAttribute('href', '#/comecar');
+  await expect(escolher).toHaveClass(/principal/);
 
   const linkTrazer = page.getByRole('link', { name: 'Trazer meu edital' });
   await expect(linkTrazer).toBeVisible();
+
+  const linkCatalogo = page.getByRole('link', { name: 'Montar pelo catálogo' });
+  await expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
 
   // Axe nos 2 temas com o estado vazio inicial
   await semViolacoes(page);

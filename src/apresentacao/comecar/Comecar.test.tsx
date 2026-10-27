@@ -47,6 +47,12 @@ const pacote: PacoteDePartida = {
       ],
     },
     'carreira-b': { nome: 'Carreira B', editaisComTexto: 1, normas: [norma('lei-c', 'Lei C', 1)] },
+    // Está no catálogo de verdade (o menor): é a que oferece a Trilha junto.
+    'ministerio-publico': {
+      nome: 'Ministério Público',
+      editaisComTexto: 2,
+      normas: [norma('lei-c', 'Lei C', 2)],
+    },
   },
 };
 
@@ -143,6 +149,47 @@ describe('Escolher meu concurso › Para começar', () => {
   it('com uma norma só, a linha acima do botão fala no singular', async () => {
     await abrir('#/comecar/carreira-b', await fonte());
     expect(await screen.findByText('A norma entra no aparelho e abre para ler.')).toBeVisible();
+  });
+
+  it('carreira fora do catálogo: não oferece a Trilha e o botão faz o que fazia', async () => {
+    await abrir('#/comecar/carreira-a', await fonte());
+    await screen.findByRole('button', { name: 'Adicionar e ler' });
+    expect(screen.queryByRole('checkbox')).toBeNull();
+  });
+
+  it('carreira do catálogo: oferece a Trilha do edital mais recente, marcada, e monta as duas coisas', async () => {
+    const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
+    const caixa = await screen.findByRole('checkbox', { name: /^Montar também a Trilha/ });
+    expect(caixa).toBeChecked();
+    expect(caixa).toHaveAccessibleName(/\d+ matérias, baseado no edital MPGO de 2023\./);
+
+    await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'LEI-C' })).toBeInTheDocument();
+    expect(await repo.colecao('pontos').todosDoUsuario()).not.toHaveLength(0);
+    const logs = await repo.colecao('logsImportacao').todosDoUsuario();
+    expect(logs.map((l) => l.descricao)).toEqual([
+      'Trilha pelo catálogo (baseado no edital MPGO de 2023)',
+    ]);
+  });
+
+  it('desmarcada, só as normas entram', async () => {
+    const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
+    await usuario.click(await screen.findByRole('checkbox', { name: /^Montar também a Trilha/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'LEI-C' })).toBeInTheDocument();
+    expect(await repo.colecao('pontos').todosDoUsuario()).toHaveLength(0);
+  });
+
+  it('com a Trilha já montada, a caixa não aparece', async () => {
+    const f = await fonte();
+    const { repo, usuario } = await abrir('#/comecar/ministerio-publico', f);
+    await usuario.click(await screen.findByRole('button', { name: 'Adicionar e ler' }));
+    await screen.findByRole('heading', { level: 1, name: 'LEI-C' });
+    expect((await repo.colecao('pontos').todosDoUsuario()).length).toBeGreaterThan(0);
+
+    window.location.hash = '#/comecar/ministerio-publico';
+    await screen.findByRole('button', { name: 'Adicionar e ler' });
+    expect(screen.queryByRole('checkbox')).toBeNull();
   });
 
   it('"Adicionar e ler" adiciona todas, sem repetir, e abre a primeira no Leitor', async () => {

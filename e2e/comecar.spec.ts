@@ -167,6 +167,10 @@ test.describe('primeiro uso, num aparelho novo', () => {
     const inicio = Date.now();
     await chegada.getByRole('link', { name: 'Escolher meu concurso' }).click();
     await page.getByRole('link', { name: /^Defensoria Pública/ }).click();
+    // A Trilha do edital mais recente vem marcada: o mesmo toque monta as normas e a Trilha.
+    const trilha = page.getByRole('checkbox', { name: /^Montar também a Trilha/ });
+    await expect(trilha).toBeChecked();
+    await expect(trilha).toHaveAccessibleName(/\d+ matérias, baseado no edital/);
     await page.getByRole('button', { name: 'Adicionar e ler' }).click();
 
     // A primeira norma da lista abre no Leitor, no começo: o Art. 1º já está na tela.
@@ -184,6 +188,11 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await expect(page.getByRole('region', { name: 'Normas' })).toBeVisible();
     await expect(page.getByText('CDC').first()).toBeVisible();
     await expect(page.getByText('Maria da Penha')).toHaveCount(0);
+
+    // E a Trilha tem os Pontos do edital, sem nenhuma pergunta a mais.
+    await page.goto('/#/plano');
+    await expect(page.getByText(/^\d+ pontos\./)).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Ciclo de estudo' })).toBeVisible();
   });
 
   test('"Ler uma norma" e "Registrar um erro" seguem na folha, depois do caminho principal', async ({
