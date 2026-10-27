@@ -88,6 +88,6 @@ describe('Guia › visto pela janela', () => {
     expect(localStorage.getItem('arretado.guia.recall')).toBeNull();
     folha.remove();
     vi.advanceTimersByTime(1500);
-    expect(localStorage.getItem('arretado.guia.recall')).toBe('2');
+    expect(localStorage.getItem('arretado.guia.recall')).toBe('3');
   });
 });

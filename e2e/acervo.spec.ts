@@ -94,11 +94,21 @@ test('acervo: "Tudo do edital" adiciona, lista por disciplina e lê offline (3c)
   );
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
-  const execPenal = page.getByRole('group', { name: 'Execução Penal' });
-  await expect(execPenal.getByText('LEP')).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Infância' })).toBeVisible();
+  // R1: uma linha por norma, com a disciplina no apoio.
+  const normas = page.getByRole('region', { name: 'Normas' });
+  const linhaLep = normas.getByRole('link', { name: /^LEP/ });
+  await expect(linhaLep).toContainText('Execução Penal');
+  await expect(normas.getByRole('link', { name: /^ECA/ })).toContainText('Infância');
+  // A 320 px o apoio (disciplina, subtítulo, fonte) ocupa duas linhas, não uma só cortada.
+  await page.setViewportSize({ width: 320, height: 568 });
+  const linhasDoApoio = await linhaLep.locator('.linha-lista-apoio').evaluate((el) => {
+    const estilo = getComputedStyle(el);
+    const alturaDaLinha = parseFloat(estilo.lineHeight) || parseFloat(estilo.fontSize) * 1.4;
+    return Math.round(el.getBoundingClientRect().height / alturaDaLinha);
+  });
+  expect(linhasDoApoio).toBe(2);
   await semViolacoes(page);
-  await execPenal.getByRole('link', { name: /LEP/ }).click();
+  await linhaLep.click();
   await expect(page.getByText('Texto do primeiro artigo.')).toBeVisible();
 });
 
@@ -123,12 +133,12 @@ test('acervo: escolher a disciplina ao adicionar e mudá-la depois (Ajustes A)',
 
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
-  await expect(page.getByRole('group', { name: 'Outras' }).getByText('LEP')).toBeVisible();
+  await expect(page.getByRole('link', { name: /^LEP/ })).not.toContainText('Execução Penal');
   await page.getByRole('button', { name: 'Mudar disciplina de LEP' }).click();
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Execução Penal' }).getByText('LEP')).toBeVisible();
+  await expect(page.getByRole('link', { name: /^LEP/ })).toContainText('Execução Penal');
   await semViolacoes(page);
 });
 
@@ -145,6 +155,26 @@ test('acervo: versão nova avisa, mostra a prévia e atualiza (6a)', async ({ pa
   await page.reload();
   await expect(page.getByText(/Há versão nova/)).toBeVisible();
   await semViolacoes(page);
+  // Na lista de Normas, com o texto a 200%, o selo não esmaga o título (ficava uma letra por linha)
+  // nem alarga a página.
+  const tela = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('link', { name: 'Normas', exact: true }).click();
+  await abrirTodasAsNormas(page);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%';
+  });
+  const titulo = page
+    .getByRole('region', { name: 'Normas' })
+    .getByRole('link', { name: /^LEP/ })
+    .locator('.linha-lista-titulo');
+  expect((await titulo.boundingBox())?.width).toBeGreaterThan(100);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '';
+  });
+  if (tela) await page.setViewportSize(tela);
+  await page.goto('/#/biblioteca/acervo');
   await page.getByRole('button', { name: 'Atualizar', exact: true }).click();
   const dialogo = page.getByRole('dialog');
   await expect(dialogo.getByText(/1 saem da norma/)).toBeVisible();
@@ -163,10 +193,7 @@ test('acervo: a lei mudou avisa o que você guardou sobre o artigo, com antes e 
   await expect(page.getByText(/1 adicionada\./)).toBeVisible();
   await page.getByRole('link', { name: 'Normas', exact: true }).click();
   await abrirTodasAsNormas(page);
-  await page
-    .getByRole('group', { name: 'Execução Penal' })
-    .getByRole('link', { name: /LEP/ })
-    .click();
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /^LEP/ }).click();
   await expect(page.getByText('Texto do primeiro artigo.')).toBeVisible();
   await page.locator('[data-endereco="art1"]').hover();
   const estrela = page.getByRole('button', { name: 'Estrela: Art. 1º' });

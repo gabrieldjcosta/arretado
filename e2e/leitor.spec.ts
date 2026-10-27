@@ -438,13 +438,13 @@ function leituraGravada(page: Page) {
   });
 }
 
-test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": LEP compilada (9.7)', async ({
+test('sair e voltar na mesma posição, com "Retomar" e "lido até": LEP compilada (9.7)', async ({
   page,
 }) => {
   test.setTimeout(180_000);
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   const normas = page.getByRole('region', { name: 'Normas' });
-  const continuar = page.getByRole('link', { name: 'Continuar leitura: LEP' });
+  const continuar = page.getByRole('link', { name: /^Retomar: LEP/ });
   await expect(continuar).toHaveCount(0);
   await normas.getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
@@ -460,7 +460,7 @@ test('sair e voltar na mesma posição, com "Continuar leitura" e "lido até": L
   expect(await leituraGravada(page)).toEqual({ quantas: 1, posicao: 'art41', lidoAte: undefined });
   await semViolacoes(page);
 
-  // "Continuar leitura" abre no art. 41, logo abaixo da barra fixa.
+  // "Retomar" abre no art. 41, logo abaixo da barra fixa.
   const volta = await voltarMedindo(page, continuar);
   test.info().annotations.push({ type: 'volta', description: `${volta.toFixed(0)} ms` });
   expect(volta, 'do toque à lista no lugar, em ms').toBeLessThan(1500);
@@ -535,7 +535,7 @@ test('mudar o tamanho do texto fora da norma não perde a posição, e a proced�
   await expect(page.getByText(/Tamanho do texto de leitura: 20 px/)).toBeVisible();
 
   await page.goto('/#/biblioteca');
-  await page.getByRole('link', { name: 'Continuar leitura: LEP' }).click();
+  await page.getByRole('link', { name: /^Retomar: LEP/ }).click();
   await expect(art41).toContainText('Constituem direitos do preso', { timeout: 20_000 });
   await expect
     .poll(async () => Math.abs(await distanciaDoAlto(art41)), { timeout: 15_000 })
@@ -623,7 +623,7 @@ test('destaque automático: ligar a opção e ver prazos, condições, termos ab
   await expect(page.locator('.destaque')).toHaveCount(0);
 });
 
-test('régua de leitura: desligada não realça; ligada em Conta realça a linha sob o ponteiro sem mover o texto, com axe nos dois temas e a Biblioteca com o "Continuar leitura": LEP compilada (fatia 4)', async ({
+test('régua de leitura: desligada não realça; ligada em Conta realça a linha sob o ponteiro sem mover o texto, com axe nos dois temas e a Biblioteca com o "Retomar": LEP compilada (fatia 4)', async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -657,10 +657,11 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await page.waitForTimeout(1200);
   // Sair grava a posição; a Biblioteca diz onde continuar e quanto falta, no mesmo botão de sempre.
   await sairParaABiblioteca(page);
-  const agora = page.getByRole('region', { name: 'Agora' });
-  await expect(agora.getByRole('heading')).toContainText('Continuar a leitura no');
-  await expect(agora).toContainText(/cerca de \d+ min/);
-  await expect(agora.getByRole('link', { name: 'Continuar leitura: LEP' })).toBeVisible();
+  // R2: uma linha "Retomar", não a folha do Agora.
+  const retomar = page.getByRole('link', { name: /^Retomar: LEP, / });
+  await expect(retomar).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Agora' })).toHaveCount(0);
+  await expect(retomar.locator('xpath=..')).toContainText(/cerca de \d+ min/);
   await semViolacoes(page);
 
   // O Hoje diz onde retomar na linha de parada ("Retomar em", com a hora do salvamento), com a caneta

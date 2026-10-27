@@ -11,8 +11,9 @@
 // lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Ver mais". Abaixo de
 // 900 px as duas viram uma só, na mesma ordem.
 //
-// A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
-// montam aqui só porque o Hoje é onde o aplicativo abre.
+// A Chegada (`EntradaDoDia`, D-D9) é uma folha sobre o Hoje, não parte do layout; a Entrada do Dia (S4)
+// é a linha quieta logo abaixo do Agora: acima dele, a dica mais longa (4 linhas a 320 px) empurrava o
+// Começar para fora da primeira tela. Montam aqui porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
@@ -41,6 +42,8 @@ export function Hoje() {
       <div className="hoje-colunas">
         <div>
           <Agora hoje={hoje} />
+          {/* A Chegada (folha) e a linha do dia (S4): a linha vem depois do Agora, o Começar não desce. */}
+          <EntradaDoDia retrato={hoje.retrato} />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
           {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
@@ -64,7 +67,6 @@ export function Hoje() {
       </div>
       <RevisoesDoDia />
       <Captura />
-      <EntradaDoDia retrato={hoje.retrato} />
     </>
   );
 }

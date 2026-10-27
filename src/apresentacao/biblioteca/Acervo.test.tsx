@@ -98,7 +98,7 @@ describe('Biblioteca › Acervo (3c)', () => {
     ).toHaveLength(1);
   });
 
-  it('adiciona com progresso, vira "Já adicionada" e a Biblioteca agrupa por disciplina', async () => {
+  it('adiciona com progresso, vira "Já adicionada" e a Biblioteca mostra a disciplina na linha da norma', async () => {
     const f = await fonte();
     const { usuario } = await abrir('#/biblioteca/acervo', f);
     await usuario.click(await screen.findByRole('button', { name: 'Marcar todos que faltam' }));
@@ -107,9 +107,8 @@ describe('Biblioteca › Acervo (3c)', () => {
     expect((await screen.findAllByText('Já adicionada')).length).toBeGreaterThan(0);
 
     await usuario.click(screen.getByRole('link', { name: 'Normas' }));
-    const exec = await screen.findByRole('group', { name: 'Execução Penal' });
-    expect(within(exec).getByText('LEP')).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'Infância' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /^LEP/ })).toHaveTextContent('Execução Penal');
+    expect(screen.getByRole('link', { name: /^ECA/ })).toHaveTextContent('Infância');
   });
 
   it('só mostra o tamanho da norma grande: o das pequenas é ruído', async () => {

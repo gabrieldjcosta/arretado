@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import type { ItemDoAcervo } from '../src/dominios/acervo/esquemas';
 import { FonteEmMemoria } from '../src/dominios/acervo/fonte-em-memoria';
 import { abrirTodasAsNormas, expect, semViolacoes, test } from './apoio';
@@ -209,7 +209,29 @@ test('mapa: "ler seguindo o mapa" diz para onde o Próximo vai no fim do trecho,
   await expect(page.getByRole('region', { name: /^Art\. 5º,/ })).toBeFocused();
 });
 
-test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva ao Leitor', async ({
+/** As linhas como o navegador as quebrou: o texto de cada uma, medido caractere a caractere. */
+const linhasDe = (el: Locator) =>
+  el.evaluate((e) => {
+    const texto = e.firstChild as Text;
+    const faixa = document.createRange();
+    const linhas: string[] = [];
+    let atual = '';
+    let topo = Number.NaN;
+    for (let i = 0; i < texto.length; i++) {
+      faixa.setStart(texto, i);
+      faixa.setEnd(texto, i + 1);
+      const caixa = faixa.getClientRects()[0];
+      if (caixa && Math.round(caixa.top) !== topo) {
+        topo = Math.round(caixa.top);
+        linhas.push(atual);
+        atual = '';
+      }
+      atual += texto.data.charAt(i);
+    }
+    return [...linhas, atual].map((l) => l.trim()).filter(Boolean);
+  });
+
+test('mapa: no Hoje, o Agora é o trecho que mais cai e leva ao Leitor; "de onde parou" fica abaixo', async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -223,17 +245,33 @@ test('mapa: no Hoje, abaixo de "Continuar a leitura", o trecho que mais cai leva
   await page.goto('/#/');
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   const agora = page.getByRole('region', { name: 'Agora' });
-  await expect(agora.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
-  // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º.
+  // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º, e ele
+  // é o Agora (decisão F2, 27/10/2026); "de onde parou" é a alternativa, uma linha abaixo.
+  await expect(agora.getByRole('heading', { name: 'Ler art. 2º' })).toBeVisible();
+  await expect(agora).toContainText('Pelo mapa, o próximo trecho: cai muito');
+  await expect(agora).toContainText('cerca de 1 min');
   const linha = page.locator('.agora-no-mapa');
-  await expect(linha).toContainText('Pelo mapa, o próximo trecho cai muito, cerca de 1 min.');
-  const caixa = await linha.getByRole('link', { name: 'Ler art. 2º' }).boundingBox();
+  await expect(linha).toContainText('Ou de onde parou');
+  const caixa = await linha.getByRole('link', { name: 'Continuar a leitura' }).boundingBox();
   expect(caixa?.height).toBeGreaterThanOrEqual(44);
   await expect(page.getByText(/atrasad|pendente|dívida|faltam/i)).toHaveCount(0);
   await semViolacoes(page);
-  await linha.getByRole('link', { name: 'Ler art. 2º' }).click();
+  // O intervalo de quatro dígitos (CPC, Código Civil) quebra depois do "arts.": o "a" não fica pendurado
+  // no fim da primeira linha (320 px).
+  const janela = page.viewportSize();
+  await page.setViewportSize({ width: 320, height: 568 });
+  const titulo = agora.getByRole('heading').first();
+  await titulo.evaluate((el) => {
+    el.textContent = 'Ler arts. 1.059 a 1.062';
+  });
+  await page.evaluate(() => document.fonts.ready);
+  expect(await linhasDe(titulo)).toEqual(['Ler arts.', '1.059 a 1.062']);
+  if (janela) await page.setViewportSize(janela);
+  await agora.getByRole('link', { name: 'Começar' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await expect(page.locator('[data-endereco="art2"]')).toBeInViewport();
+  // Sessão aberta, no artigo por artigo e seguindo o mapa.
+  await expect(page).toHaveURL(/ir=art2&foco=artigo&mapa=1/);
 });
 
 test.describe('sem rede', () => {

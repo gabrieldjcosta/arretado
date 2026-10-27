@@ -52,7 +52,7 @@ describe('captura de erro (6.2)', () => {
     expect(screen.getByLabelText('Frase correta')).toHaveFocus();
   });
 
-  it('com "o que foi" em mais detalhes, pergunta pelo cartão sem modal', async () => {
+  it('com "o que foi" em mais detalhes, a caixa do cartão já vem marcada e salvar cria o cartão (F6)', async () => {
     const { repo, usuario } = await abrir('/recall/registrar');
     await screen.findByRole('button', { name: 'Salvar' });
     expect(screen.getByLabelText('O que foi')).not.toBeVisible();
@@ -60,10 +60,10 @@ describe('captura de erro (6.2)', () => {
     await usuario.click(screen.getByText('Mais detalhes (opcional)'));
     await usuario.click(screen.getByRole('button', { name: 'Acertei sem certeza' }));
     await usuario.type(screen.getByLabelText('O que foi'), 'Prazo de 5 dias do agravo');
+    expect(screen.getByRole('checkbox', { name: 'Criar o cartão deste erro' })).toBeChecked();
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
     await screen.findByText('Frase registrada.');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    await usuario.click(screen.getByRole('button', { name: 'Sim' }));
     expect(await screen.findByText(/Cartão criado/)).toBeInTheDocument();
     const [erro] = await repo.colecao('erros').todosDoUsuario();
     expect(erro).toMatchObject({

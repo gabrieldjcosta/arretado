@@ -56,6 +56,48 @@ describe('decidirProximaAcao (A1)', () => {
     expect(sem.tipo === 'acao' && sem.acao.estimativaMin).toBeUndefined();
   });
 
+  it('com Mapa da norma, o Agora é o trecho que mais cai, e "de onde parou" fica como alternativa', () => {
+    const trecho = { endereco: 'art3', rotulo: 'arts. 3º a 4º', faixa: 'cai muito', minutos: 2 };
+    expect(
+      decidirProximaAcao({
+        cartoesVencidos: 0,
+        frasesVencidas: 0,
+        leitura: { ...leitura, trecho },
+      }),
+    ).toEqual({
+      tipo: 'acao',
+      acao: {
+        tipo: 'leitura_salva',
+        alvo: { tipo: 'leitura', id: 'n1', rotulo: 'LEP' },
+        razao: 'Pelo mapa, o próximo trecho: cai muito',
+        estimativaMin: 2,
+        trecho: {
+          endereco: 'art3',
+          rotulo: 'arts. 3º a 4º',
+          continuar: { razao: 'Continuar a leitura no Art. 41 da LEP', estimativaMin: 5 },
+        },
+      },
+    });
+  });
+
+  it.each([
+    ['Código Penal', 'raro'],
+    ['CPP', 'cai'],
+    ['Constituição da República Federativa do Brasil de 1988', 'cai muito'],
+    ['Lei 8.069/1990 (ECA)', 'cai às vezes'],
+  ])(
+    'o motivo do trecho de %s não leva o nome da norma e fecha com a faixa "%s"',
+    (tituloCurto, faixa) => {
+      const trecho = { endereco: 'art3', rotulo: 'arts. 3º a 4º', faixa, minutos: 2 };
+      const r = decidirProximaAcao({
+        cartoesVencidos: 0,
+        frasesVencidas: 0,
+        leitura: { ...leitura, tituloCurto, trecho },
+      });
+      expect(r.tipo === 'acao' && r.acao.razao).toBe(`Pelo mapa, o próximo trecho: ${faixa}`);
+    },
+  );
+
   it('"Escolher outra coisa": dispensar passa ao seguinte e, no fim, ao vazio', () => {
     const entrada = { cartoesVencidos: 1, frasesVencidas: 0, leitura };
     expect(decidirProximaAcao(entrada, ['revisao_vencida'])).toMatchObject({

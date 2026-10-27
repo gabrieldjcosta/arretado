@@ -12,6 +12,8 @@ import { useDados } from '../dados/contexto';
 import { quandoDeParar, rotuloDaParada, type ParadaDaLeitura } from './parada-da-leitura';
 import { estadoDosPontos, type EstadosDosPontos } from './pontos';
 import { reunirEntradas } from './proxima-acao';
+import type { FonteDeIncidencia } from '../../dominios/legislacao/incidencia-fonte';
+import { useFonteIncidencia } from '../dados/fonteIncidenciaContexto';
 
 /** Quantos itens o "Em seguida" mostra. */
 export const ITENS_EM_SEGUIDA = 2;
@@ -78,10 +80,11 @@ export async function carregarRetrato(
   repo: Repositorio,
   dispensados: readonly TipoDeAcao[] = [],
   preferido?: TipoDeAcao,
+  fonte?: FonteDeIncidencia,
 ): Promise<RetratoDoHoje> {
   const data = hojeDe(repo);
   const [{ entrada, leituraEm }, resumo] = await Promise.all([
-    reunirEntradas(repo, data),
+    reunirEntradas(repo, data, fonte),
     resumoDoDia(repo),
   ]);
   const { agora, outras } = agoraEOutras(entrada, dispensados, preferido);
@@ -154,9 +157,10 @@ export function useRetratoDoHoje(): HojeEmAndamento {
   const [dispensados, setDispensados] = useState<readonly TipoDeAcao[]>([]);
   const [preferido, setPreferido] = useState<TipoDeAcao>();
   const [ordem, setOrdem] = useState<readonly TipoDeAcao[]>();
+  const fonte = useFonteIncidencia();
   const carregar = useCallback(
-    (repo: Repositorio) => carregarRetrato(repo, dispensados, preferido),
-    [dispensados, preferido],
+    (repo: Repositorio) => carregarRetrato(repo, dispensados, preferido, fonte),
+    [dispensados, preferido, fonte],
   );
   const { dados } = useDados(carregar);
   const emSeguida = emSeguidaComTrocas(dados, ordem);
