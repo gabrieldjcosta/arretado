@@ -142,7 +142,15 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   // S3: a verificação mora nas Ações do Leitor, não no topo do texto.
   await expect(page.getByRole('button', { name: 'Verificar atualização' })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Ações', exact: true }).click();
+  // No celular o Ações mora no "Mais", que fecha se a página ainda rola: tenta de novo até abrir.
+  const mais = page.getByRole('button', { name: 'Mais', exact: true });
+  await expect(async () => {
+    if (await mais.isVisible()) {
+      if ((await mais.getAttribute('aria-expanded')) !== 'true')
+        await mais.click({ timeout: 2000 });
+    }
+    await page.getByRole('button', { name: /^Ações/ }).click({ timeout: 2000 });
+  }).toPass({ timeout: 30_000 });
   const verificar = page.getByRole('button', { name: 'Verificar atualização' });
   await verificar.click();
   await expect(page.getByText(/Nenhuma alteração detectada: a página oficial é igual/)).toBeVisible(
