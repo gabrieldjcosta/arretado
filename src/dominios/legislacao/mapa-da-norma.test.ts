@@ -139,6 +139,7 @@ describe('mapa da norma: cobertura', () => {
     expect(c.artigos).toBe(4);
     expect(c.total).toBe(6);
     expect(c.parcela).toBeCloseTo(7 / 7.5);
+    expect(c.massaTotal).toBe(7.5);
   });
 });
 

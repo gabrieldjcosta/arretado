@@ -54,6 +54,16 @@ const MAPA = {
   ],
 };
 
+// A mesma norma com 24 questões por trás (o MAPA tem 6): o bastante para a chamada do Leitor dar números.
+const MAPA_COM_MASSA = {
+  ...MAPA,
+  artigos: [
+    ['1', 4, 'alta'],
+    ['2', 12, 'altissima'],
+    ['3', 8, 'altissima'],
+  ],
+};
+
 function fonte(arquivos: Record<string, unknown> | 'sem rede') {
   return new FonteDeIncidencia(
     '/incidencia',
@@ -198,7 +208,33 @@ describe('Mapa da norma', () => {
     expect(quadrados[0]).toHaveFocus();
   });
 
-  it('com os dispositivos abertos, a chamada do Leitor diz quantos artigos concentram o que cai (U1)', async () => {
+  it('com os dispositivos abertos, a chamada do Leitor diz quantos artigos concentram o que cai e em que recorte (U1)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const doAcervo = await publicar(repo);
+    const aberta = await abrirNorma(repo, doAcervo.id);
+    const comMassa = {
+      ...ARQUIVOS,
+      [`/incidencia/fcc-defensor-sp/${ACERVO}.json`]: MAPA_COM_MASSA,
+    };
+    render(
+      <ContextoRepositorio.Provider value={repo}>
+        <ContextoFonteIncidencia.Provider value={fonte(comMassa)}>
+          <MemoryRouter>
+            <ChamadaDoMapa norma={doAcervo} nos={aberta.nos} />
+          </MemoryRouter>
+        </ContextoFonteIncidencia.Provider>
+      </ContextoRepositorio.Provider>,
+    );
+    expect(
+      await screen.findByText(
+        '3 de 4 artigos concentram 100% do que caiu em FCC × Defensor Público (SP)',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Mapa da norma' })).toBeInTheDocument();
+  });
+
+  it('com poucas questões por trás, a chamada não dá número e volta ao convite (U1)', async () => {
+    window.localStorage.removeItem('arretado:mapa-visitado:v1');
     const { repo } = await repositorioDeTeste();
     const doAcervo = await publicar(repo);
     const aberta = await abrirNorma(repo, doAcervo.id);
@@ -211,10 +247,9 @@ describe('Mapa da norma', () => {
         </ContextoFonteIncidencia.Provider>
       </ContextoRepositorio.Provider>,
     );
-    expect(
-      await screen.findByText(/\d+ de 4 artigos concentram \d+% do que caiu/),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Mapa da norma' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Mapa da norma' })).toBeInTheDocument();
+    expect(screen.getByText('o que mais cai e por onde começar')).toBeInTheDocument();
+    expect(screen.queryByText(/artigos concentram/)).not.toBeInTheDocument();
   });
 
   it('sem rede e sem cópia, avisa e mostra só a cobertura; norma fora do acervo também', async () => {
