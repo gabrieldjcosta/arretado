@@ -57,11 +57,11 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
   await semViolacoes(page);
+  await expect(page.getByRole('checkbox', { name: 'Criar o cartão deste erro' })).toBeChecked();
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Frase registrada.')).toBeVisible();
   expect(Date.now() - t0).toBeLessThan(30_000);
 
-  await page.getByRole('button', { name: 'Sim' }).click();
   await expect(page.getByText(/Cartão criado/)).toBeVisible();
   await semViolacoes(page);
 
