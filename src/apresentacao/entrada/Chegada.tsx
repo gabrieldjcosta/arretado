@@ -12,6 +12,15 @@ const MENUS = [
   { nome: ROTULO_DA_AREA.biblioteca, efeito: 'Normas, Súmulas, Teses e Resumos para ler.' },
 ];
 
+/** O que há dentro de uma Norma e quase ninguém acha sozinho. */
+const NA_NORMA = [
+  {
+    nome: 'Mapa da norma',
+    efeito: 'o que mais cai e o próximo trecho a ler (normas do acervo com dados).',
+  },
+  { nome: 'Estrela', efeito: 'marca um Dispositivo para achar de novo.' },
+];
+
 /**
  * A Chegada (D-D9): a folha de orientação da primeira vez no aparelho, sobre o Hoje. O caminho principal
  * é escolher o concurso (da folha a uma norma aberta em três toques); ler uma norma e registrar um erro
@@ -63,6 +72,15 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
       <h3 className="chegada-menus-titulo">Os quatro menus</h3>
       <dl className="chegada-menus">
         {MENUS.map((m) => (
+          <div key={m.nome}>
+            <dt>{m.nome}</dt>
+            <dd>{m.efeito}</dd>
+          </div>
+        ))}
+      </dl>
+      <h3 className="chegada-menus-titulo">Dentro de uma Norma</h3>
+      <dl className="chegada-menus">
+        {NA_NORMA.map((m) => (
           <div key={m.nome}>
             <dt>{m.nome}</dt>
             <dd>{m.efeito}</dd>
