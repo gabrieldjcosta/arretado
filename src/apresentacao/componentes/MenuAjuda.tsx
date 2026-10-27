@@ -81,6 +81,7 @@ export function MenuAjuda({
               className="discreto"
               onClick={() => {
                 setAberto(false);
+                botao.current?.focus();
                 aoBoasVindas();
               }}
             >

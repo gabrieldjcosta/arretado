@@ -7,9 +7,15 @@ import { lembrarDaChegada } from './regras';
 /** Uma linha por menu, na ordem das abas: o rótulo é o da aba. */
 const MENUS = [
   { nome: ROTULO_DA_AREA.hoje, efeito: 'a próxima ação do seu Dia.' },
-  { nome: ROTULO_DA_AREA.plano, efeito: 'o edital em Pontos: monte pelo catálogo ou traga o seu.' },
-  { nome: ROTULO_DA_AREA.recall, efeito: 'seus Erros, Cartões e Revisões.' },
-  { nome: ROTULO_DA_AREA.biblioteca, efeito: 'Normas, Súmulas, Teses e Resumos para ler.' },
+  {
+    nome: ROTULO_DA_AREA.plano,
+    efeito: 'o edital em Pontos, montado pelo catálogo ou trazido por você.',
+  },
+  { nome: ROTULO_DA_AREA.recall, efeito: 'suas Frases e Cartões, com a Revisão de cada dia.' },
+  {
+    nome: ROTULO_DA_AREA.biblioteca,
+    efeito: 'Normas, Súmulas, Teses, Resumos e Precedentes, para ler.',
+  },
 ];
 
 /** O que há dentro de uma Norma e quase ninguém acha sozinho. */
@@ -34,12 +40,20 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
   const principal = useRef<HTMLElement | null>(null);
   const fechar = () => {
     setAberto(false);
+  };
+  // Seguir um caminho tira a folha já: o foco fica com a página nova, não volta ao Ajuda.
+  const seguir = () => {
+    setAberto(false);
     aoFechar?.();
   };
   useEffect(() => {
     if (dia !== undefined) lembrarDaChegada(dia);
     principal.current?.focus();
   }, [dia]);
+  // Dispensada (Esc, "Agora não"), a folha reaberta só sai depois de o <dialog> fechar: assim o foco volta ao Ajuda.
+  useEffect(() => {
+    if (!aberto) aoFechar?.();
+  }, [aberto, aoFechar]);
   return (
     <Dialogo
       aberto={aberto}
@@ -50,7 +64,7 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
       <div className="chegada-acoes">
         <Link
           to="/comecar"
-          onClick={fechar}
+          onClick={seguir}
           className="botao principal"
           ref={(el) => {
             principal.current = el;
@@ -58,16 +72,21 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
         >
           Escolher meu concurso
         </Link>
-        <Link to="/biblioteca" onClick={fechar} className="botao">
+        <Link to="/biblioteca" onClick={seguir} className="botao">
           Ler uma norma
         </Link>
-        <Link to="/recall/registrar" onClick={fechar} className="botao">
+        <Link to="/recall/registrar" onClick={seguir} className="botao">
           Registrar um erro
         </Link>
-        <Link to="/plano/onboarding" onClick={fechar} className="botao botao-texto chegada-trilha">
+        <Link to="/plano/onboarding" onClick={seguir} className="botao botao-texto chegada-trilha">
           <b>Montar uma trilha</b>
-          <span>com base no edital de concursos parecidos; ou traga o seu, na Trilha</span>
+          <span>com base nos editais de concursos parecidos; ou traga o seu, na Trilha</span>
         </Link>
+      </div>
+      <div className="chegada-depois">
+        <button type="button" className="botao botao-texto" onClick={fechar}>
+          Agora não
+        </button>
       </div>
       <h3 className="chegada-menus-titulo">Os quatro menus</h3>
       <dl className="chegada-menus">
@@ -87,11 +106,6 @@ export function Chegada({ dia, aoFechar }: { dia?: string; aoFechar?: () => void
           </div>
         ))}
       </dl>
-      <div className="chegada-depois">
-        <button type="button" className="botao botao-texto" onClick={fechar}>
-          Agora não
-        </button>
-      </div>
     </Dialogo>
   );
 }

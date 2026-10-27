@@ -83,15 +83,19 @@ describe('Ler seguindo o mapa', () => {
     );
 
     expect(await screen.findByText(/Seguindo o mapa: arts\. 3º a 4º, trecho 1 de 2/)).toBeVisible();
+    expect(screen.queryByText(/Fim do trecho/)).toBeNull();
     expect(screen.getByLabelText(/^Art\. 3º,/)).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: 'Próximo artigo' }));
     expect(screen.getByLabelText(/^Art\. 4º,/)).toBeInTheDocument();
     expect(artigosFeitos(normaId)).toEqual([]);
+    // No último artigo do trecho a linha diz para onde o Próximo vai (o roteiro volta ao art. 1º).
+    expect(screen.getByText(/Fim do trecho\. Próximo: art\. 1º\./)).toBeVisible();
 
     // Fim do trecho 1: o Próximo vai ao art. 1º, o começo do trecho 2, sem tocar no "lido até".
     await usuario.click(screen.getByRole('button', { name: 'Próximo artigo' }));
     expect(await screen.findByText(/trecho 2 de 2/)).toBeVisible();
+    expect(screen.getByText(/Fim do trecho\. Próximo: encerra o roteiro\./)).toBeVisible();
     expect(screen.getByLabelText(/^Art\. 1º,/)).toBeInTheDocument();
     expect(artigosFeitos(normaId)).toHaveLength(2);
 
@@ -117,5 +121,7 @@ describe('Ler seguindo o mapa', () => {
     await usuario.click(screen.getByRole('button', { name: 'Parar' }));
     expect(screen.queryByText(/Seguindo o mapa/)).toBeNull();
     expect(window.location.hash).toBe(`#/biblioteca/normas/${normaId}?foco=artigo`);
+    // A linha sai com o botão que tinha o foco: o foco vai ao cartão, não ao começo da página.
+    expect(screen.getByLabelText(/^Art\. 3º,/)).toHaveFocus();
   });
 });

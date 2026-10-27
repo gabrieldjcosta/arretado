@@ -1162,6 +1162,13 @@ function LeitorAberto({
   function pararDeSeguirOMapa() {
     setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { replace: true, state: estadoDaRota });
   }
+  // No último artigo do trecho, diz para onde o Próximo vai: o roteiro pode voltar na norma.
+  function avisoDoFimDoTrecho() {
+    const seguinte = roteiro?.trechos[vezNoMapa + 1];
+    return roteiro && seguinte
+      ? `Fim do trecho. Próximo: ${rotuloDoTrecho(roteiro.quadrados, seguinte)}.`
+      : 'Fim do trecho. Próximo: encerra o roteiro.';
+  }
   // O fim do trecho: guarda o que foi lido e pula ao começo do seguinte (ou encerra o roteiro).
   function seguirOMapa() {
     const trecho = roteiro?.trechos[vezNoMapa];
@@ -2054,10 +2061,20 @@ function LeitorAberto({
                 </SetasDoCartao>
                 {roteiro && (
                   <p className="seguindo-mapa">
-                    {vezNoMapa >= 0 && roteiro.trechos[vezNoMapa]
-                      ? `Seguindo o mapa: ${rotuloDoTrecho(roteiro.quadrados, roteiro.trechos[vezNoMapa])}, trecho ${String(vezNoMapa + 1)} de ${String(roteiro.trechos.length)}. No fim dele, "Próximo" pula ao seguinte.`
-                      : 'Fora do roteiro do mapa.'}{' '}
-                    <button type="button" className="discreto" onClick={pararDeSeguirOMapa}>
+                    <span>
+                      {vezNoMapa >= 0 && roteiro.trechos[vezNoMapa]
+                        ? `Seguindo o mapa: ${rotuloDoTrecho(roteiro.quadrados, roteiro.trechos[vezNoMapa])}, trecho ${String(vezNoMapa + 1)} de ${String(roteiro.trechos.length)}.${fimDoTrecho ? ` ${avisoDoFimDoTrecho()}` : ''}`
+                        : 'Fora do roteiro do mapa.'}
+                    </span>
+                    <button
+                      type="button"
+                      className="discreto"
+                      onClick={() => {
+                        pararDeSeguirOMapa();
+                        // A linha sai com o botão: o foco vai ao cartão, não ao começo da página.
+                        cartao.current?.focus({ preventScroll: true });
+                      }}
+                    >
                       Parar
                     </button>
                   </p>
