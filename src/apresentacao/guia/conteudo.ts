@@ -59,11 +59,12 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     ],
   },
   recall: {
-    versao: 2,
+    versao: 3,
     linhas: [
       {
         opcao: 'Registrar erro',
-        efeito: 'guarda a Frase correta; o Cartão só nasce se você quiser.',
+        efeito:
+          'guarda a Frase correta; se você escrever o que foi, já cria o Cartão (desmarque se não quiser).',
       },
       { opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' },
       {

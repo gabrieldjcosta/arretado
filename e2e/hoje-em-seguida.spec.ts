@@ -28,7 +28,6 @@ async function prepararOHoje(page: Page) {
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Frase registrada.')).toBeVisible();
-  await page.getByRole('button', { name: 'Sim' }).click();
   await expect(page.getByText(/Cartão criado/)).toBeVisible();
 
   await importarEPublicar(page, 'lep-compilado', 'LEP');
