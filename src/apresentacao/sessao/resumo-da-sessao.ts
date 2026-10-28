@@ -1,20 +1,25 @@
 // O resumo curto do que ficou de uma Sessão encerrada (texto de tela do fluxo de encerrar).
 import type { Sessao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import { notasPendentes } from '../../dominios/sessao/estacionamento';
 import { rotuloDaAtividade } from './atividades';
 
 const plural = (n: number, um: string, varios: string) => `${String(n)} ${n === 1 ? um : varios}`;
 
-/** Quantos erros foram guardados durante a Sessão (cada um já virou uma Frase para as revisões). */
-export async function errosDaSessao(repo: Repositorio, sessaoId: string): Promise<number> {
+/**
+ * Quantos Erros foram guardados durante a Sessão: os criados entre o começo e o fim dela, pelo "Errei"
+ * das questões ou pelo registro comum (só o "Errei" grava `sessaoId`). Lê só essa faixa do índice.
+ */
+export async function errosDaSessao(
+  repo: Repositorio,
+  sessao: Pick<Sessao, 'inicio' | 'fim'>,
+): Promise<number> {
   const pagina = await repo.colecao('erros').listarPagina({
     indice: '[usuarioId+criadoEm]',
-    de: [repo.ctx.usuarioId, ''],
-    ate: [repo.ctx.usuarioId, '￿'],
-    ordem: 'desc',
+    de: [repo.ctx.usuarioId, sessao.inicio],
+    ate: [repo.ctx.usuarioId, sessao.fim ?? '\uffff'],
     limite: 500,
     cursor: null,
-    filtro: (e) => e.sessaoId === sessaoId,
   });
   return pagina.itens.length;
 }
@@ -25,20 +30,28 @@ const tempo = (segundos: number | undefined) => {
   return min < 1 ? 'Menos de 1 min' : `${String(min)} min`;
 };
 
-/** O resumo em linhas curtas; só entra o que houve. */
-export function linhasDoResumo(sessao: Sessao, erros: number): string[] {
+/** O resumo em linhas curtas; só entra o que houve. As anotações são as que seguem por resolver. */
+export function linhasDoResumo(
+  sessao: Pick<
+    Sessao,
+    'duracaoSegundos' | 'atividade' | 'questoesFeitas' | 'questoesAcertadas' | 'estacionamento'
+  >,
+  erros: number,
+): string[] {
   const t = tempo(sessao.duracaoSegundos);
   const feitas = sessao.questoesFeitas ?? 0;
-  const notas = sessao.estacionamento?.length ?? 0;
+  const notas = notasPendentes(sessao).length;
+  const certa = feitas === 1 ? 'certa' : 'certas';
+  const entra = erros === 1 ? 'entra' : 'entram';
   return [
     [t, sessao.atividade ? rotuloDaAtividade(sessao.atividade) : undefined]
       .filter(Boolean)
       .join(' · '),
     feitas > 0
-      ? `${String(sessao.questoesAcertadas ?? 0)} de ${plural(feitas, 'questão', 'questões')} certas`
+      ? `${String(sessao.questoesAcertadas ?? 0)} de ${plural(feitas, 'questão', 'questões')} ${certa}`
       : '',
     erros > 0
-      ? `${plural(erros, 'erro guardado', 'erros guardados')}: entram nas suas revisões`
+      ? `${plural(erros, 'erro guardado', 'erros guardados')}: ${entra} nas suas revisões`
       : '',
     notas > 0 ? `${plural(notas, 'anotação guardada', 'anotações guardadas')} para depois` : '',
   ].filter(Boolean);
