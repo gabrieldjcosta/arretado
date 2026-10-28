@@ -21,13 +21,64 @@ describe('EscritaDoNome (D-D9, Q6)', () => {
 
   it('escreve os 14 traços do nome, na ordem da mão, cada um com a sua animação', () => {
     const { container } = render(<EscritaDoNome />);
-    const traços = [...container.querySelectorAll('path.tr')];
+    const traços = [...container.querySelectorAll('path.tr:not(.tn)')];
     expect(traços).toHaveLength(14);
     expect(NOME).toHaveLength(14);
     traços.forEach((traço, i) => {
       expect(traço).toHaveAttribute('d', NOME[i]![0]);
       expect(traço).toHaveAttribute('pathLength', '1');
       expect(traço).toHaveStyle({ animationName: `eb-t${String(i)}` });
+    });
+  });
+
+  describe('o néon suave (D-D10)', () => {
+    it('é uma cópia dos 14 traços e do cacto, sob o desenho, com a mesma animação de cada letra', () => {
+      const { container } = render(<EscritaDoNome />);
+      const svg = container.querySelector('svg.eb') as SVGSVGElement;
+      const grupo = svg.querySelector<SVGGElement>('g.eb-neon');
+      expect(grupo).not.toBeNull();
+      expect(grupo).toHaveClass('neon-camada', 'a');
+      expect(grupo).toHaveStyle({ animationName: 'eb-neon' });
+      // Vem antes de tudo o que é desenhado: o brilho fica por baixo das letras.
+      const filhos = [...svg.children].filter((el) => el.tagName !== 'defs');
+      expect(filhos[0]).toBe(grupo);
+
+      const gemeos = [...(grupo?.querySelectorAll('path.tn') ?? [])];
+      const letras = gemeos.filter((p) => p.classList.contains('tr'));
+      expect(letras).toHaveLength(14);
+      letras.forEach((gemeo, i) => {
+        expect(gemeo).toHaveAttribute('d', NOME[i]![0]);
+        expect(gemeo).toHaveAttribute('transform', `translate(${String(NOME[i]![1])} 0)`);
+        expect(gemeo).toHaveAttribute('pathLength', '1');
+        // A mesma curva da letra: o brilho se desenha junto com ela.
+        expect(gemeo).toHaveStyle({ animationName: `eb-t${String(i)}` });
+      });
+      const cacto = gemeos.filter((p) => !p.classList.contains('tr'));
+      expect(cacto.map((p) => p.getAttribute('d'))).toEqual([...CACTO]);
+      expect(cacto[0]?.parentElement).toHaveStyle({ animationName: 'eb-cacto' });
+    });
+
+    it('o filtro tem desvio 7 e região fixa em unidades do letreiro', () => {
+      const { container } = render(<EscritaDoNome />);
+      const grupo = container.querySelector('g.eb-neon');
+      const id = /url\(#([^)]+)\)/.exec(grupo?.getAttribute('filter') ?? '')?.[1];
+      const filtro = container.querySelector(`filter[id="${id ?? ''}"]`);
+      expect(filtro).not.toBeNull();
+      // A caixa do grupo muda a cada letra que se escreve: a região não pode ser a dela.
+      expect(filtro).toHaveAttribute('filterUnits', 'userSpaceOnUse');
+      expect(filtro).toHaveAttribute('x', '-80');
+      expect(filtro).toHaveAttribute('y', '-40');
+      expect(filtro).toHaveAttribute('width', '1140');
+      expect(filtro).toHaveAttribute('height', '260');
+      expect(filtro?.querySelector('feGaussianBlur')).toHaveAttribute('stdDeviation', '7');
+    });
+
+    it('o desenho de verdade continua sem filtro nem classe de brilho', () => {
+      const { container } = render(<EscritaDoNome />);
+      for (const letra of container.querySelectorAll('path.tr:not(.tn)')) {
+        expect(letra).not.toHaveAttribute('filter');
+        expect(letra.closest('.eb-neon')).toBeNull();
+      }
     });
   });
 

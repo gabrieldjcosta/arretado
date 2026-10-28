@@ -1,4 +1,14 @@
-import { flor, legendaDaParte, mover, PARTES, parteDoDia, REPOUSO, VIEWBOX } from './cena';
+import {
+  flor,
+  legendaDaParte,
+  mover,
+  PARTES,
+  parteDoDia,
+  REGIAO_DO_NEON,
+  REPOUSO,
+  temNeon,
+  VIEWBOX,
+} from './cena';
 
 describe('as 16 partes do quadro do cacto', () => {
   it('são 16, com ids únicos, e cada traço começa por um `M`', () => {
@@ -20,6 +30,23 @@ describe('as 16 partes do quadro do cacto', () => {
       'braco-esquerdo',
       'braco-direito',
     ]);
+  });
+
+  it('o néon (D-D10) é só do núcleo do cacto: o tronco e os dois braços', () => {
+    const comNeon = PARTES.flatMap((p) => p.fios.filter(temNeon).map(() => p.id));
+    expect(comNeon).toEqual(['tronco', 'braco-esquerdo', 'braco-direito']);
+  });
+
+  it('a região do filtro do néon cobre o núcleo do cacto, o brilho e o desfoque, dentro do quadro', () => {
+    const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
+    const { x, y, largura: w, altura: h } = REGIAO_DO_NEON;
+    // O núcleo vai de x = 100 a 200 e de y = 57 a 156; o brilho tem 34 de largura (17) e o desvio é 6 (18).
+    expect(x).toBeLessThanOrEqual(100 - 17 - 3 * 6);
+    expect(x + w).toBeGreaterThanOrEqual(200 + 17 + 3 * 6);
+    expect(y).toBeLessThanOrEqual(57 - 17 - 3 * 6);
+    expect(y + h).toBeGreaterThanOrEqual(Math.min(altura, 156 + 17 + 3 * 6));
+    expect(x).toBeGreaterThanOrEqual(0);
+    expect(x + w).toBeLessThanOrEqual(largura);
   });
 
   it('o olho é um traço de comprimento zero (um `M` sozinho não desenha nada)', () => {

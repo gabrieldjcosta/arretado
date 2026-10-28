@@ -41,14 +41,16 @@ interface Props {
  * mesmas coordenadas do `LockupParado`: o quadro final é o lockup. Decorativa (`aria-hidden`); quem
  * nomeia é o link do cabeçalho, e o app nunca espera a animação para ser usado. Os tempos e a
  * animação são do CSS gerado (`escrita-b.css`); sem `prefers-reduced-motion`, `pulou` ou `calmo` o
- * quadro final aparece na hora. Os 14 traços e os demais elementos levam o `animation-name` pelo
+ * quadro final aparece na hora. O néon suave (D-D10) é uma cópia larga e borrada dos 14 traços e do
+ * cacto, no mesmo grupo e sob o desenho: acende com cada letra e assenta quando o nome acaba (ver
+ * `escrita.css`). Os 14 traços e os demais elementos levam o `animation-name` pelo
  * `style` do React (CSSOM), que a CSP `style-src 'self'` deixa passar, ao contrário do atributo
  * `style` escrito no HTML.
  */
 export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: Props) {
   const id = useId();
-  // Duas escritas na mesma tela não podem repetir id: gradiente, filtro e máscara levam o `useId`.
-  const [tinta, halo, aro] = [`${id}-tinta`, `${id}-halo`, `${id}-aro`];
+  // Duas escritas na mesma tela não podem repetir id: gradiente, filtros e máscara levam o `useId`.
+  const [tinta, halo, aro, neon] = [`${id}-tinta`, `${id}-halo`, `${id}-aro`, `${id}-neon`];
   const classe = ['lockup', 'eb', curta && 'curta', calmo && 'calmo', pulou && 'pulou']
     .filter(Boolean)
     .join(' ');
@@ -73,6 +75,10 @@ export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: P
         <filter id={halo} x="-300%" y="-300%" width="700%" height="700%">
           <feGaussianBlur stdDeviation="5" />
         </filter>
+        {/* A região é fixa, em unidades do letreiro: a caixa do grupo muda a cada letra que se escreve. */}
+        <filter id={neon} filterUnits="userSpaceOnUse" x="-80" y="-40" width="1140" height="260">
+          <feGaussianBlur stdDeviation="7" />
+        </filter>
         {/* O aro é o que o vidro deixa de fora: branco do tamanho do vidro mais o aro, preto por cima. */}
         <mask id={aro} maskUnits="userSpaceOnUse" x="-10" y="-10" width="140" height="290">
           <g fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -85,6 +91,28 @@ export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: P
           </g>
         </mask>
       </defs>
+      {/* O néon suave (D-D10): a cópia larga e borrada das letras e do cacto, que se escreve junto. */}
+      <g
+        className="eb-neon a neon-camada"
+        filter={`url(#${neon})`}
+        style={{ animationName: 'eb-neon' }}
+      >
+        {NOME.map(([d, x], i) => (
+          <path
+            key={`${String(x)}${d}`}
+            className="tr tn a"
+            pathLength="1"
+            d={d}
+            transform={`translate(${String(x)} 0)`}
+            style={{ animationName: `eb-t${String(i)}` }}
+          />
+        ))}
+        <g className="a" style={{ animationName: 'eb-cacto' }}>
+          {CACTO.map((d) => (
+            <path key={d} className="tn" d={d} />
+          ))}
+        </g>
+      </g>
       {NOME.map(([d, x], i) => (
         <path
           key={`${String(x)}${d}`}

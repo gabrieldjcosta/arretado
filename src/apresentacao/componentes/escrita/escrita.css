@@ -63,3 +63,40 @@
 .eb .pen-tinta-1 {
   stop-color: var(--pen-tinta2);
 }
+
+/* O néon suave (D-D10, N1): uma cópia larga e borrada dos traços das letras e do cacto, que se escreve
+   junto com eles (as mesmas curvas `eb-tN`, do CSS gerado) e, quando o nome acaba, assenta: de dia some,
+   à noite fica baixo. Um filtro só, para o grupo todo. Calmo e Reduzido não têm animação (o CSS gerado a
+   tira): mostram o repouso, esmaecendo com o desenho no Calmo. */
+.eb .eb-neon {
+  opacity: var(--neon-repouso);
+}
+
+.eb .eb-neon .tn {
+  fill: none;
+  stroke: var(--neon-cor);
+  stroke-width: 30;
+}
+
+@keyframes eb-neon {
+  0% {
+    opacity: var(--neon-aceso);
+  }
+  66% {
+    opacity: var(--neon-aceso);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  84% {
+    opacity: var(--neon-repouso);
+  }
+  100% {
+    opacity: var(--neon-repouso);
+  }
+}
+
+/* Cores forçadas: o brilho é decoração e some; o traço fica com o texto do sistema. */
+@media (forced-colors: active) {
+  .eb .neon-camada {
+    display: none;
+  }
+}

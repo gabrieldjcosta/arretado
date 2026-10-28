@@ -16,6 +16,25 @@ describe('QuadroDoCacto (A caneta que desenha)', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
+  it('o néon (D-D10) é um grupo sob os traços, com filtro de região fixa e desvio 6', () => {
+    const { container } = render(<QuadroDoCacto dias={4} desenha={false} />);
+    const svg = container.querySelector('svg');
+    const grupo = svg?.querySelector('g.quadro-neon');
+    expect(grupo).toHaveClass('neon-camada');
+    // Sob os traços, para o brilho ficar atrás da linha: aguada, néon, traços, caneta.
+    const grupos = [...(svg?.children ?? [])].filter((el) => el.tagName === 'g');
+    expect(grupos).toHaveLength(4);
+    expect(grupos[1]).toBe(grupo);
+    expect(grupos[2]?.querySelector('.quadro-fio')).not.toBeNull();
+    expect(grupos[3]).toHaveClass('quadro-caneta');
+    const id = /url\(#([^)]+)\)/.exec(grupo?.getAttribute('filter') ?? '')?.[1];
+    const filtro = svg?.querySelector(`filter[id="${id ?? ''}"]`);
+    expect(filtro).toHaveAttribute('filterUnits', 'userSpaceOnUse');
+    expect(filtro?.querySelector('feGaussianBlur')).toHaveAttribute('stdDeviation', '6');
+    // Parado e pronto: o tronco e os dois braços têm o gêmeo no papel.
+    expect(grupo?.querySelectorAll('.quadro-neon-fio')).toHaveLength(3);
+  });
+
   it('já fechado: o quadro aparece pronto até a parte de hoje, com a legenda dita', () => {
     const { container } = render(<QuadroDoCacto dias={3} desenha={false} />);
     // O chão, o tronco e o braço esquerdo.
