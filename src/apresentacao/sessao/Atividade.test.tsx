@@ -48,13 +48,15 @@ describe('Atividade da Sessão no Hoje', () => {
     expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
   });
 
-  it('com Sessão aberta e uma Próxima ação, o Hoje tem um só Continuar', async () => {
+  it('com Sessão aberta e uma Próxima ação, o Hoje tem um só Continuar e não tem o Agora', async () => {
     const repo = await repoComAgora();
     await iniciarSessao(repo, { atividade: 'lei' });
     await abrir('/', repo);
     await screen.findByRole('region', { name: 'Sessão aberta' });
+    // O retrato já chegou: sem isto o Agora faltaria só por estar carregando (e o teste passaria sem a mudança).
+    await screen.findByRole('list', { name: 'Andamento do Dia' });
+    expect(screen.queryByRole('region', { name: 'Agora' })).toBeNull();
     expect(screen.getAllByRole('link', { name: /^Continuar/ })).toHaveLength(1);
-    expect(screen.queryByRole('link', { name: 'Continuar a leitura' })).toBeNull();
   });
 });
 
