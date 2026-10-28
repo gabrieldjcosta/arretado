@@ -177,3 +177,26 @@ describe('Canto da Sessão', () => {
     expect(screen.queryByRole('button', { name: /bloquinho/ })).toBeNull();
   });
 });
+
+describe('Encerrar com resumo', () => {
+  it('mostra o que ficou da Sessão e a ponte para a ação do Agora', async () => {
+    const repo = await repoComAgora();
+    await iniciarSessao(repo, { atividade: 'questoes' });
+    const { usuario } = await abrir('/sessao/atual', repo);
+    await usuario.click(await screen.findByRole('button', { name: 'Acertei' }));
+    await usuario.click(screen.getByRole('button', { name: 'Errei' }));
+    await usuario.type(screen.getByLabelText('Frase correta'), 'O prazo é de cinco dias.');
+    await usuario.click(screen.getByRole('button', { name: 'Guardar erro' }));
+    await screen.findByText('2 feitas, 1 acerto.');
+    window.location.hash = '#/sessao/fechar';
+    await usuario.click(await screen.findByRole('button', { name: /^Encerrar$/ }));
+    expect(await screen.findByRole('heading', { name: 'Sessão encerrada' })).toBeInTheDocument();
+    expect(await screen.findByText(/1 de 2 questões certas/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/1 erro guardado: entram nas suas revisões/),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /^Seguir:/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ir para o Hoje' })).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Ver os erros' })).toBeInTheDocument();
+  });
+});
