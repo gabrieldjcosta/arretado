@@ -216,4 +216,15 @@ describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
     expect(escrita()).not.toHaveClass('curta');
     await diaGuardado('2026-10-20');
   });
+
+  it('outra aba escreveu o nome enquanto a Abertura decidia: vale a decisão e o cabeçalho nasce parado', async () => {
+    // Ao montar, a frequência ainda pedia a escrita curta; antes de a decisão chegar, outra aba a gastou.
+    lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
+    const { trocar, escrita, parado } = await montarCom({ estado: 'pendente' });
+    lembrarDaEscrita(new Date(HOJE));
+    trocar({ estado: 'decidida', onde: 'cabecalho', escrita: 'parada' });
+    await new Promise((resolver) => setTimeout(resolver, 50));
+    expect(escrita()).toBeNull();
+    expect(parado()).not.toBeNull();
+  });
 });

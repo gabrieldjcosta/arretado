@@ -1,13 +1,21 @@
 import { StrictMode } from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { alterarPreferencias } from '../../../core/preferencias';
 import { simularMovimento } from '../../../testes/movimento';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { Marca } from '../../componentes/escrita/Marca';
 import { lembrarDaEscrita } from '../../componentes/escrita/frequencia';
-import { useAberturaEmCurso } from '../../componentes/escrita/vez-da-escrita';
+import { useAberturaEmCurso, type OndeEscrever } from '../../componentes/escrita/vez-da-escrita';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { ProvedorDaAbertura } from './ProvedorDaAbertura';
+import type * as Regras from './regras';
+import { decidirNaAberturaDoApp } from './regras';
+
+// A decisão de verdade, mas que um teste pode segurar: a leitura que ainda não voltou.
+vi.mock('./regras', async () => {
+  const original = await vi.importActual<typeof Regras>('./regras');
+  return { ...original, decidirNaAberturaDoApp: vi.fn(original.decidirNaAberturaDoApp) };
+});
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
 const HOJE = '2026-10-20T12:00:00.000Z';
@@ -42,7 +50,7 @@ async function montar(opcoes: { estrito?: boolean; soEstudo?: boolean } = {}) {
   // A escrita do cabeçalho (`svg.eb` dentro de `.marca`) e o lockup parado (com o ponto de luz).
   const escritaNoCabecalho = () => vista.container.querySelector('.marca svg.eb');
   const parado = () => vista.container.querySelector('.marca .lockup-ponto');
-  const sonda = () => vista.getByTestId('sonda').textContent;
+  const sonda = () => vista.queryByTestId('sonda')?.textContent ?? null;
   return { ...vista, camada, escritaNoCabecalho, parado, sonda };
 }
 
@@ -51,11 +59,11 @@ const guardado = () => JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null') 
 describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
   it('primeira vez: o cabeçalho espera, a tela cheia escreve e o cabeçalho nasce parado', async () => {
     const { camada, escritaNoCabecalho, parado, sonda, container } = await montar();
-    // Decidindo: nenhuma das duas escreve, e quem abre por cima espera.
+    // Decidindo: nenhuma das duas escreve, e o app (o cabeçalho, quem abre por cima) ainda nem montou.
     expect(camada()).toBeNull();
     expect(escritaNoCabecalho()).toBeNull();
     expect(parado()).toBeNull();
-    expect(sonda()).toBe('espera');
+    expect(sonda()).toBeNull();
 
     await waitFor(() => {
       expect(camada()).not.toBeNull();
@@ -115,7 +123,7 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
 
   it('com o "só estudo" ligado a tela cheia não abre: o cabeçalho escreve como sempre escreveu', async () => {
     const { camada, escritaNoCabecalho, parado, sonda } = await montar({ soEstudo: true });
-    expect(sonda()).toBe('espera');
+    expect(sonda()).toBeNull();
     await waitFor(() => {
       expect(escritaNoCabecalho()).not.toBeNull();
     });
@@ -135,5 +143,66 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
     expect(escritaNoCabecalho()).toBeNull();
     expect(container.querySelectorAll('.abertura')).toHaveLength(1);
     expect(container.querySelectorAll('svg.eb')).toHaveLength(1);
+  });
+
+  describe('o app espera a decisão', () => {
+    it('decidindo, o app ainda não monta; decidido, monta no mesmo quadro da camada', async () => {
+      let decidir: (d: OndeEscrever) => void = () => undefined;
+      vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(
+        new Promise<OndeEscrever>((resolver) => {
+          decidir = resolver;
+        }),
+      );
+      const { container, camada, sonda } = await montar();
+      expect(container.querySelector('.marca')).toBeNull();
+      expect(sonda()).toBeNull();
+      expect(camada()).toBeNull();
+      await act(async () => {
+        decidir({ onde: 'tela', escrita: 'completa', calmo: false });
+        await Promise.resolve();
+      });
+      expect(camada()).not.toBeNull();
+      expect(container.querySelector('.marca')).not.toBeNull();
+      expect(sonda()).toBe('espera');
+    });
+
+    it('a Abertura não abre (só estudo): o app monta quando a leitura acaba e o cabeçalho escreve', async () => {
+      const { container, camada, escritaNoCabecalho } = await montar({ soEstudo: true });
+      expect(container.querySelector('.marca')).toBeNull();
+      await waitFor(() => {
+        expect(escritaNoCabecalho()).not.toBeNull();
+      });
+      expect(camada()).toBeNull();
+    });
+
+    it('nas demais aberturas do Dia e com movimento reduzido o app monta na hora: nada a decidir', async () => {
+      lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
+      const demais = await montar();
+      expect(demais.container.querySelector('.marca')).not.toBeNull();
+      demais.unmount();
+      simularMovimento('reduzido');
+      const reduzido = await montar();
+      expect(reduzido.container.querySelector('.marca')).not.toBeNull();
+    });
+
+    it('a espera não é curta demais: com a decisão pendente, aos 0,2 s o app ainda não montou', async () => {
+      vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
+      const { container } = await montar();
+      await new Promise((resolver) => setTimeout(resolver, 200));
+      expect(container.querySelector('.marca')).toBeNull();
+    });
+
+    it('se a decisão demora, o app aparece depois de 0,4 s: a Abertura nunca atrasa o uso', async () => {
+      vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
+      const { container, sonda } = await montar();
+      expect(container.querySelector('.marca')).toBeNull();
+      await waitFor(
+        () => {
+          expect(container.querySelector('.marca')).not.toBeNull();
+        },
+        { timeout: 1500 },
+      );
+      expect(sonda()).toBe('espera');
+    });
   });
 });

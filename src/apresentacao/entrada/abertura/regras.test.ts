@@ -123,4 +123,41 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       calmo: false,
     });
   });
+
+  it('a decisão não lê o histórico, só as Sessões de hoje; uma Sessão aberta de outro Dia não pesa', async () => {
+    lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
+    const { repo, relogio } = await repositorioDeTeste({ inicio: '2026-10-19T12:00:00.000Z' });
+    await iniciarSessao(repo, {});
+    relogio.avancar(24 * 60 * 60 * 1000);
+    const lidas = [
+      vi.spyOn(repo.colecao('sessoes'), 'todosDoUsuario'),
+      vi.spyOn(repo.colecao('revisoes'), 'todosDoUsuario'),
+      vi.spyOn(repo.colecao('revisoesFrase'), 'todosDoUsuario'),
+      vi.spyOn(repo.colecao('dias'), 'todosDoUsuario'),
+    ];
+    expect(await decidirOndeEscrever(repo)).toEqual({
+      onde: 'tela',
+      escrita: 'curta',
+      calmo: false,
+    });
+    for (const lida of lidas) expect(lida).not.toHaveBeenCalled();
+  });
+
+  it('Sessão pausada hoje também impede a tela cheia', async () => {
+    lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    const sessao = await iniciarSessao(repo, {});
+    await repo.colecao('sessoes').atualizar(sessao.id, { estado: 'pausada' });
+    expect(await decidirOndeEscrever(repo)).toEqual({ onde: 'cabecalho', escrita: 'curta' });
+  });
+
+  it('outra aba gastou a escrita enquanto os dados eram lidos: vale o que ela guardou e nada abre', async () => {
+    lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    // A decisão já leu "curta" e foi aos dados; a outra aba escreve o nome neste instante.
+    const decisao = decidirOndeEscrever(repo);
+    lembrarDaEscrita(new Date(HOJE));
+    expect(await decisao).toEqual({ onde: 'cabecalho', escrita: 'parada' });
+    expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
 });
