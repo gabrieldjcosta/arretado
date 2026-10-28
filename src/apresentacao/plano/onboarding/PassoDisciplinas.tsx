@@ -146,7 +146,7 @@ export function PassoDisciplinas({
                   }}
                 >
                   <span className="onboarding-seta" aria-hidden="true" />
-                  <span>Assuntos</span>
+                  <span>Assuntos de {nome}</span>
                   <span className="selo">
                     {marcados < assuntos.length
                       ? `${String(marcados)} de ${String(assuntos.length)}`

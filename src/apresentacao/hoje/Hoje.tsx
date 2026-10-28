@@ -16,6 +16,7 @@
 // Começar para fora da primeira tela. Montam aqui porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
+import { DiasParaAProva } from './DiasParaAProva';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
 import { useDados } from '../dados/contexto';
 import { sessaoAberta } from '../sessao/carregadores';
@@ -34,9 +35,11 @@ import { PontosDoDia } from './PontosDoDia';
 import { RevisoesDoDia } from './RevisoesDoDia';
 import { BoasVindas } from './Retorno';
 import { useRetratoDoHoje } from './retrato';
+import { useCicloPadrao } from '../plano/ciclo/padrao';
 
 export function Hoje() {
   const hoje = useRetratoDoHoje();
+  useCicloPadrao();
   // Com Sessão aberta o Agora espera (Agora.tsx) e o "Em seguida", que só segue o Agora, também.
   const { dados: aberta } = useDados(sessaoAberta);
   return (
@@ -48,6 +51,7 @@ export function Hoje() {
           <Agora hoje={hoje} />
           {/* A Chegada (folha) e a linha do dia (S4): a linha vem depois do Agora, o Começar não desce. */}
           <EntradaDoDia retrato={hoje.retrato} />
+          <DiasParaAProva />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
           {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
