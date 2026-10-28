@@ -117,7 +117,8 @@ export function ProvaDoPlano() {
             />
           </div>
           <p className="dica">
-            As revisões não passam da prova, e os pontos mais cobrados voltam na última semana.
+            As revisões não passam da prova, e os pontos mais cobrados voltam na última semana. O
+            Hoje mostra em quantos dias é a prova.
           </p>
           {passou && (
             <p role="status" className="dica">

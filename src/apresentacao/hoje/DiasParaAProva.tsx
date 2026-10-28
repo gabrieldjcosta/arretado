@@ -9,6 +9,6 @@ export function DiasParaAProva() {
   const repo = useRepositorio();
   const { dados } = useDados(dataDaProvaInformada);
   if (dados === undefined) return null;
-  const frase = fraseDaProva(diferencaEmDias(hojeDe(repo), dados));
+  const frase = fraseDaProva(diferencaEmDias(hojeDe(repo), dados), dados);
   return frase ? <p className="dica dias-para-a-prova">{frase}</p> : null;
 }

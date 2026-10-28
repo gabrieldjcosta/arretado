@@ -39,6 +39,8 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
+      {dados.pontos.length > 0 && <ProximoBloco />}
       <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
@@ -79,7 +81,6 @@ export function Plano() {
         </>
       ) : (
         <>
-          <ProximoBloco />
           <p className="dica">
             {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.
           </p>

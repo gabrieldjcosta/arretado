@@ -1,14 +1,14 @@
 import { PASSADA_FINAL_DIAS } from '../../dominios/recall/agendamento';
 
-const dias = (n: number) => (n === 1 ? '1 dia' : `${String(n)} dias`);
+const dias = (n: number) => `${String(n)} dias`;
+const formatar = (d: string) => d.split('-').reverse().slice(0, 2).join('/');
 
-/** A frase do dia: quantos dias faltam e quando começa a passada final pelos Pontos mais cobrados. */
-export function fraseDaProva(faltam: number): string | undefined {
+/** A frase do dia com a data da prova (`AAAA-MM-DD`) e quantos dias faltam; nada depois da prova. */
+export function fraseDaProva(faltam: number, data: string): string | undefined {
   if (faltam < 0) return undefined;
-  if (faltam === 0) return 'A prova é hoje.';
-  const ate = faltam - PASSADA_FINAL_DIAS;
-  const falta = faltam === 1 ? 'Falta' : 'Faltam';
-  if (ate > 0)
-    return `${falta} ${dias(faltam)} para a prova. A passada final começa em ${dias(ate)}.`;
-  return `${falta} ${dias(faltam)} para a prova. A passada final está em andamento.`;
+  if (faltam === 0) return 'A prova objetiva é hoje.';
+  if (faltam === 1) return 'Prova objetiva amanhã.';
+  if (faltam <= PASSADA_FINAL_DIAS)
+    return `Prova objetiva em ${dias(faltam)}. Os pontos mais cobrados estão voltando.`;
+  return `Prova objetiva em ${formatar(data)}, daqui a ${dias(faltam)}.`;
 }

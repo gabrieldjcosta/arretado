@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import type { Repositorio } from '../../core/persistencia';
 import { cicloAtivo, posicaoDoCiclo } from '../../dominios/ciclos';
 import { useDados } from '../dados/contexto';
+import { sessaoAberta } from '../sessao/carregadores';
 
 async function carregarProximoBloco(repo: Repositorio) {
   const ciclo = await cicloAtivo(repo);
@@ -18,7 +19,9 @@ async function carregarProximoBloco(repo: Repositorio) {
 
 export function ProximoBloco() {
   const { dados } = useDados(carregarProximoBloco);
-  if (!dados) return null;
+  // Com Sessão aberta o Hoje deixa o Agora esperar; aqui o "Começar" levaria à mesma Sessão, então espera também.
+  const { dados: aberta } = useDados(sessaoAberta);
+  if (!dados || aberta !== null) return null;
   const rota = `/sessao/iniciar?tipo=ciclo&id=${dados.cicloId}&ciclo=${dados.cicloId}&bloco=${String(dados.indice)}&rotulo=${encodeURIComponent(dados.materia)}&origem=ciclo&direto=1`;
   return (
     <section className="proximo-bloco" aria-label="Próximo bloco">
