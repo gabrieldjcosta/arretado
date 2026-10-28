@@ -1,0 +1,589 @@
+/* A Chegada (D-D10): as Boas-vindas, o Passeio pelos quatro menus e o Começar, numa folha só, com o Zé.
+   O desenho é o do mockup do contrato (docs/design/referencias/2026-10-27-ze/): uma coluna de tela de
+   celular (topo, corpo que rola, rodapé), que num monitor vira um cartão de 30 rem. O <dialog> é o
+   contêiner de consulta, em `em`: a fonte ampliada e a tela baixa entram nas mesmas regras, sem
+   consulta de mídia por aparelho. Só tokens do app (as cores do botão do Google são as das diretrizes
+   dele). Movimento: 160 a 220 ms com a curva do app; o Calmo só esmaece; o reduzido não anda. */
+
+dialog.dialogo-chegada {
+  /* As cores do botão do Google não se recolorem: claro de dia, escuro à noite (nos três blocos). */
+  --g-fundo: #ffffff;
+  --g-borda: #747775;
+  --g-texto: #1f1f1f;
+  container: chegada / size;
+  width: min(30rem, 100vw);
+  height: min(46rem, 100dvh);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: var(--fundo);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) dialog.dialogo-chegada {
+    --g-fundo: #131314;
+    --g-borda: #8e918f;
+    --g-texto: #e3e3e3;
+  }
+}
+
+:root[data-tema='escuro'] dialog.dialogo-chegada {
+  --g-fundo: #131314;
+  --g-borda: #8e918f;
+  --g-texto: #e3e3e3;
+}
+
+dialog.dialogo-chegada[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* No celular a folha é a tela toda, respeitando os recortes da tela (câmera, barra de gestos). */
+@media (max-width: 30rem) {
+  dialog.dialogo-chegada {
+    width: 100vw;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+      env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  }
+}
+
+/* A tela de agora: troca de tela é um esmaecer de 200 ms (o Calmo também; o reduzido, na hora). */
+.chegada-tela {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chegada-tela {
+    animation: chegada-tela-entra 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes chegada-tela-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+.chegada-topo {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 3.25em;
+  padding: 0.25em 0.5em 0 1.25em;
+}
+
+.chegada-progresso {
+  font-size: 0.875em;
+  color: var(--texto-atenuado);
+}
+
+.chegada-corpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1em 1.25em 0.5em;
+  display: flex;
+  flex-direction: column;
+}
+
+/* As Boas-vindas e o Começar têm pouco: o conteúdo fica no meio da altura, sem esconder o começo se rolar. */
+.chegada-tela[data-tela='boas'] .chegada-corpo,
+.chegada-tela[data-tela='comecar'] .chegada-corpo {
+  justify-content: safe center;
+  padding-bottom: 2.25em;
+}
+
+.chegada-rodape {
+  flex: none;
+  padding: 0.5em 1.25em 1em;
+  display: grid;
+  gap: 0.25em;
+}
+
+.chegada-titulo {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  color: var(--titulo);
+}
+
+.chegada-titulo:focus {
+  outline: none;
+}
+
+/* O Zé das Boas-vindas e do Começar: decorativo, inteiro, acima do texto. */
+.chegada-ze {
+  width: min(10.5em, 52%);
+  margin: 0.5em auto 0.75em;
+  flex: none;
+}
+
+.chegada-texto,
+.chegada-fim-texto {
+  display: grid;
+  gap: 0.6em;
+  justify-items: center;
+  text-align: center;
+}
+
+.chegada-texto h2 {
+  font-size: 2em;
+}
+
+.chegada-texto p {
+  margin: 0;
+  max-width: 24em;
+  font-size: 1.0625em;
+}
+
+.chegada-fim-texto h2 {
+  font-size: 1.875em;
+}
+
+/* ── Os passos ─────────────────────────────────────────────────────────── */
+
+.passo-corpo {
+  gap: 0.75em;
+}
+
+.passo-ze {
+  width: min(4.5em, 26%);
+  align-self: flex-end;
+  margin: 0 0.5em -0.2em 0;
+  position: relative;
+  z-index: 1;
+}
+
+.passo-folha {
+  background: var(--superficie);
+  border: var(--borda-folha);
+  border-radius: var(--raio-folha);
+  padding: 1.25em;
+  display: grid;
+  gap: 0.75em;
+}
+
+.passo-conteudo {
+  display: grid;
+  gap: 0.75em;
+}
+
+/* Cada passo troca em 160 ms: o conteúdo sai 12 px para um lado (transição) e o seguinte entra do outro
+   (animação, que não precisa de um quadro de partida medido). O Calmo só esmaece; o reduzido troca na hora. */
+@media (prefers-reduced-motion: no-preference) {
+  .passo-conteudo {
+    transition:
+      opacity 160ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .passo-conteudo[data-fase='saindo'] {
+    opacity: 0;
+  }
+
+  .passo-conteudo[data-fase='saindo'][data-sentido='avanca'] {
+    transform: translateX(-12px);
+  }
+
+  .passo-conteudo[data-fase='saindo'][data-sentido='volta'] {
+    transform: translateX(12px);
+  }
+
+  .passo-conteudo[data-fase='entrou'] {
+    transition: none;
+    animation: passo-entra-avanca 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .passo-conteudo[data-fase='entrou'][data-sentido='volta'] {
+    animation-name: passo-entra-volta;
+  }
+
+  html[data-perfil='calmo'] .passo-conteudo[data-fase='saindo'] {
+    transform: none;
+  }
+
+  html[data-perfil='calmo'] .passo-conteudo[data-fase='entrou'] {
+    animation-name: passo-entra-calmo;
+  }
+}
+
+@keyframes passo-entra-avanca {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@keyframes passo-entra-volta {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+
+@keyframes passo-entra-calmo {
+  from {
+    opacity: 0;
+  }
+}
+
+/* O ícone se desenha em 0,42 s (o `stroke-dashoffset` anda no script) e o néon acende com ele e
+   assenta ao fechar; parado, o ícone fica limpo de dia e com o repouso baixo à noite. */
+.passo-icone {
+  width: 6em;
+  height: 6em;
+  color: var(--luz);
+}
+
+.passo-icone path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+.passo-icone .passo-neon {
+  stroke: var(--neon-cor);
+  stroke-width: 4.2;
+  opacity: var(--neon-op, var(--neon-repouso));
+  transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.passo-icone[data-acesa] {
+  --neon-op: var(--neon-aceso);
+}
+
+.passo-icone[data-acesa] .passo-neon,
+html[data-perfil='calmo'] .passo-icone .passo-neon {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passo-icone .passo-neon {
+    transition: none;
+  }
+}
+
+.passo-titulo {
+  font-size: 1.75em;
+}
+
+.passo-frase {
+  margin: 0;
+  font-size: 1.0625em;
+}
+
+.passo-itens {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4em;
+  font-size: 0.9375em;
+  color: var(--texto-atenuado);
+}
+
+.passo-itens li {
+  display: flex;
+  gap: 0.6em;
+  align-items: baseline;
+}
+
+/* O marcador é o ponto de luz da marca: o ponto com o halo de lima de dia, o âmbar à noite. */
+.passo-itens li::before {
+  content: '';
+  flex: none;
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: var(--marca-ponto);
+  box-shadow: 0 0 0 0.2em var(--marca-disco);
+  transform: translateY(-0.1em);
+}
+
+.passo-pontos {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25em 0;
+}
+
+.passo-pontos i {
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  border: 1.5px solid var(--luz);
+  display: block;
+}
+
+.passo-pontos i[data-estado='feito'] {
+  background: var(--luz);
+}
+
+.passo-pontos i[data-estado='atual'] {
+  background: var(--marca-ponto);
+  border-color: var(--marca-ponto);
+  box-shadow: 0 0 0 0.25em var(--marca-disco);
+}
+
+/* A cópia da barra de abas, só para o passo ter onde apontar: decorativa (`aria-hidden`). O traço sob a
+   aba é o da barra de verdade (mesma máscara), e salta de aba em 200 ms. */
+.passo-abas {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--borda);
+  background: var(--fundo);
+  padding: 0.25em 0.25em 0.5em;
+  position: relative;
+}
+
+.passo-aba {
+  display: grid;
+  justify-items: center;
+  gap: 0.15em;
+  min-height: var(--alvo);
+  padding: 0.35em 0 0.2em;
+  font-size: 0.75em;
+  color: var(--texto-atenuado);
+  position: relative;
+}
+
+.passo-aba svg {
+  width: 1.6em;
+  height: 1.6em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.passo-aba[data-atual] {
+  color: var(--luz);
+  font-weight: 700;
+}
+
+.passo-traco {
+  --traco-da-aba: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M2 4C9 2.6 19 4.4 28 2.2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  position: absolute;
+  left: 0;
+  bottom: 0.3em;
+  width: 25%;
+  height: 6px;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.passo-traco::after {
+  content: '';
+  width: 30px;
+  height: 6px;
+  background: var(--luz);
+  -webkit-mask: var(--traco-da-aba) center / 100% 100% no-repeat;
+  mask: var(--traco-da-aba) center / 100% 100% no-repeat;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .passo-traco {
+    transition: transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  html[data-perfil='calmo'] .passo-traco {
+    transition: none;
+  }
+}
+
+/* ── O Começar ─────────────────────────────────────────────────────────── */
+
+/* Com o seletor do <dialog> na frente: o `.botao` de estilos.css tem a mesma especificidade de uma classe só, e
+   quem vence seria a ordem em que os dois arquivos entram no pacote. */
+dialog.dialogo-chegada .botao-google {
+  background: var(--g-fundo);
+  border: 1px solid var(--g-borda);
+  color: var(--g-texto);
+  font-weight: 500;
+  gap: 0.75em;
+}
+
+@media (hover: hover) {
+  dialog.dialogo-chegada .botao-google:hover {
+    background: color-mix(in srgb, var(--g-texto) 8%, var(--g-fundo));
+  }
+}
+
+.botao-google-logo {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.chegada-nota {
+  font-size: 0.875em;
+  color: var(--texto-atenuado);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Tela baixa e fonte ampliada ───────────────────────────────────────── */
+
+/* O passo cabe sem rolar à toa. O limite é em `em`, então a fonte ampliada entra sozinha. */
+@container chegada (max-height: 41em) {
+  .chegada-texto h2 {
+    font-size: 1.6em;
+  }
+
+  .chegada-fim-texto h2 {
+    font-size: 1.5em;
+  }
+
+  .chegada-topo {
+    min-height: 2.75em;
+  }
+
+  .passo-pontos {
+    display: none;
+  }
+
+  /* Sem altura sobrando, o Zé espia por cima da folha: ela cobre os pés dele. */
+  .passo-ze {
+    width: min(3.4em, 20%);
+    margin-bottom: -1.25em;
+  }
+
+  .passo-folha {
+    position: relative;
+    z-index: 2;
+    padding: 0.875em 1em;
+    gap: 0.5em;
+  }
+
+  .passo-corpo {
+    gap: 0.5em;
+    padding-top: 0.25em;
+  }
+
+  .passo-conteudo {
+    grid-template-columns: auto 1fr;
+    column-gap: 0.75em;
+    row-gap: 0.4em;
+    align-items: center;
+  }
+
+  .passo-conteudo > :not(.passo-icone):not(.passo-titulo) {
+    grid-column: 1 / -1;
+  }
+
+  .passo-icone {
+    width: 2.75em;
+    height: 2.75em;
+  }
+
+  .passo-titulo {
+    font-size: 1.5em;
+  }
+
+  .chegada-ze {
+    width: min(6.5em, 34%);
+    margin-top: 0;
+  }
+
+  .chegada-ze[data-fim] {
+    width: min(5.5em, 29%);
+  }
+}
+
+/* Voltar e Seguir lado a lado só quando cabem: a 200% em tela estreita ficam um sobre o outro e nenhum
+   texto corta. A ordem de foco segue a do DOM (Seguir, Voltar); só a ordem visual se inverte. */
+@container chegada (max-height: 41em) and (min-width: 13em) {
+  .chegada-tela[data-tela='passo'] .chegada-rodape {
+    grid-template-columns: auto minmax(max-content, 1fr);
+    align-items: center;
+    gap: 0 0.5em;
+  }
+
+  .chegada-tela[data-tela='passo'] .chegada-rodape .principal {
+    order: 2;
+  }
+}
+
+/* Estreito (a fonte ampliada num celular): a cópia da barra de abas não cabe, e o passo já nomeia o menu. O
+   ícone passa para cima do título, porque ao lado dele o nome do menu quebraria no meio da palavra. */
+@container chegada (max-width: 16em) {
+  .passo-abas {
+    display: none;
+  }
+
+  .chegada-corpo {
+    padding-inline: 0.75em;
+  }
+
+  .passo-folha {
+    padding: 0.75em;
+  }
+
+  .passo-conteudo {
+    grid-template-columns: 1fr;
+  }
+
+  .passo-icone {
+    width: 2.25em;
+    height: 2.25em;
+  }
+
+  .passo-titulo {
+    font-size: 1.25em;
+  }
+}
+
+/* Muito apertado (a fonte ampliada em tela baixa): a tela rola inteira e o botão principal vem logo
+   depois do texto. */
+@container chegada (max-height: 24em) {
+  .chegada-tela {
+    overflow-y: auto;
+  }
+
+  .chegada-corpo {
+    flex: none;
+    overflow: visible;
+  }
+}
+
+/* Cores forçadas: o néon do ícone, a máscara do traço e a cor dos pontos usam o sistema. */
+@media (forced-colors: active) {
+  .passo-icone .passo-neon {
+    display: none;
+  }
+
+  .passo-traco::after,
+  .passo-itens li::before {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .passo-pontos i[data-estado='feito'],
+  .passo-pontos i[data-estado='atual'] {
+    background: CanvasText;
+    border-color: CanvasText;
+    forced-color-adjust: none;
+  }
+}

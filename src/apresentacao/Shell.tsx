@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
+import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
 import { Marca } from './componentes/escrita/Marca';
 import { MenuAjuda } from './componentes/MenuAjuda';
@@ -14,27 +15,7 @@ import { Chegada } from './entrada/Chegada';
 import { ProvedorDaAbertura } from './entrada/abertura/ProvedorDaAbertura';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
-import { RODAPE_CURTO, ROTULO_DA_AREA } from './textos';
-
-const AREAS = [
-  {
-    caminho: '/',
-    nome: ROTULO_DA_AREA.hoje,
-    icone: 'M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z',
-  },
-  { caminho: '/plano', nome: ROTULO_DA_AREA.plano, icone: 'M5 5h14v14H5zM5 10h14M9 3v4M15 3v4' },
-  {
-    caminho: '/recall',
-    nome: ROTULO_DA_AREA.recall,
-    icone: 'M5 8h11a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3zM8 5h11',
-  },
-  {
-    caminho: '/biblioteca',
-    nome: ROTULO_DA_AREA.biblioteca,
-    icone:
-      'M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5zM5 18.5A1.5 1.5 0 0 0 6.5 20H19',
-  },
-] as const;
+import { RODAPE_CURTO } from './textos';
 
 /** Ícone de linha da navegação: decorativo; o nome da área continua como texto. */
 function IconeDeArea({ d }: { d: string }) {

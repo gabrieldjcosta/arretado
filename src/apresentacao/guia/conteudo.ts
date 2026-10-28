@@ -14,7 +14,7 @@ export const TITULO_DO_GUIA = 'O que cada opção faz';
 
 export const GUIAS: Record<TelaComGuia, Guia> = {
   hoje: {
-    versao: 3,
+    versao: 4,
     linhas: [
       {
         opcao: 'Escolher meu concurso',
@@ -24,7 +24,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
       {
         opcao: 'Leitura · Cartões · Frases',
-        efeito: 'acendem sozinhos quando você lê, revisa ou fixa.',
+        efeito: 'ficam marcados como feitos quando você lê, revisa ou fixa.',
       },
       { opcao: 'Para lembrar', efeito: 'uma nota sobre o que fazer fora do app.' },
     ],

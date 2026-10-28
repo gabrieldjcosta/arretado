@@ -268,8 +268,8 @@ const ZE_IGUAL_NOS_DOIS_MUNDOS = [
 ];
 /**
  * Os únicos CSS que podem falar de `neon` ou `bloom`: os tokens (`estilos.css`) e os arquivos dos traços
- * que a caneta desenha: o Zé, a escrita do nome, o traço de seleção e o quadro do cacto (e, quando
- * entrar, os ícones do Passeio). Botão, texto, cartão, borda e ícone parado não brilham.
+ * que a caneta desenha: o Zé, a escrita do nome, o traço de seleção, o quadro do cacto e os ícones do
+ * Passeio, que se desenham na hora. Botão, texto, cartão, borda e ícone parado não brilham.
  */
 const CSS_COM_NEON = [
   'estilos.css',
@@ -278,6 +278,7 @@ const CSS_COM_NEON = [
   'escrita-b.css',
   'traco.css',
   'quadro.css',
+  'estilos-passeio.css',
 ];
 
 function arquivosCss(pasta: string): string[] {
