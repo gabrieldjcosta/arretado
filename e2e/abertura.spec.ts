@@ -355,7 +355,9 @@ test('perfil Calmo, com o "só estudo" desligado: a camada só esmaece, sem cane
 });
 
 test.describe('o nome cabe em tela pequena e em zoom', () => {
-  // O relógio parado: a camada fica onde está o tempo que a medição levar, em qualquer máquina.
+  // O `install()` instala o relógio falso, mas ele segue andando em tempo real: não segura a camada (a da primeira vez
+  // sai em 3,4 s, a do Calmo em 1,3 s). Estes testes medem rápido e correm contra esse tempo; o axe precisa dos
+  // temporizadores da página, então o relógio não pode ficar parado (`pauseAt` o trava).
   test.beforeEach(async ({ page }) => {
     await page.clock.install();
   });

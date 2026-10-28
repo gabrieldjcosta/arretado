@@ -31,7 +31,10 @@ export function Marca() {
     const quando = repo.ctx.agora();
     return { quando, escrita: escritaDaAbertura(quando) };
   });
-  const { quando, escrita } = abertura;
+  const { quando } = abertura;
+  // Decidida a Abertura, vale a escrita dela: outra aba pode ter escrito o nome desde que este cabeçalho montou.
+  const escrita =
+    vez.estado === 'decidida' && vez.onde === 'cabecalho' ? vez.escrita : abertura.escrita;
   const aguardando = vez.estado === 'pendente';
   const parada = escrita === 'parada' || (vez.estado === 'decidida' && vez.onde === 'tela');
   // `null`: esperando as Preferências.

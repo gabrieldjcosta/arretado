@@ -24,11 +24,6 @@
   touch-action: none;
   overscroll-behavior: contain;
   user-select: none;
-  animation: abertura-entra 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-
-.abertura[data-calmo] {
-  animation-duration: 240ms;
 }
 
 @keyframes abertura-entra {
@@ -48,6 +43,14 @@
   display: grid;
   place-items: center;
   padding: 0 1.25rem;
+}
+
+/* Só o nome da abertura do Dia entra em 160 ms (o `aparece-160` do mockup): o desenho já vem escrito e não pode
+   estourar na tela. A primeira vez se escreve do nada e o Calmo já esmaece pelo próprio desenho (`eb-calmo`,
+   0,24 s), então nenhum dos dois leva fade de entrada. O fundo nunca entra: se subisse de 0 a 1, o app de
+   baixo atravessaria a camada. */
+.abertura[data-escrita='curta']:not([data-calmo]) .abertura-palco {
+  animation: abertura-entra 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 .abertura-nome {
