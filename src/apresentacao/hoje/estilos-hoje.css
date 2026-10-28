@@ -473,3 +473,8 @@
 .lei-mudou-no-hoje .lista-simples > li:last-child {
   border-bottom: 0;
 }
+
+/* S7: o botão "Ver mais" que guarda os blocos além do orçamento do Hoje. */
+.mais-do-hoje {
+  margin-block: var(--espaco-2);
+}

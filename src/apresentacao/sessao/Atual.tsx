@@ -7,7 +7,7 @@ import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { rotuloDaAtividade } from './atividades';
 import { QuestoesDaSessao } from './QuestoesDaSessao';
-import { Alavancas } from './alavancas/Alavancas';
+import { SoEstudo } from './alavancas/SoEstudo';
 import { horaDeInicio, sessaoAberta } from './carregadores';
 import { rotaDoAlvo } from './rota-do-alvo';
 import './estilos-sessao.css';
@@ -104,7 +104,9 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
         {erro && <Falha oQue="Não foi possível salvar." oQueFazer="Tente de novo." />}
       </section>
       {sessao.atividade === 'questoes' && !pausada && <QuestoesDaSessao sessao={sessao} />}
-      <Alavancas sessao={sessao} />
+      <div className="alavancas">
+        <SoEstudo />
+      </div>
     </>
   );
 }
