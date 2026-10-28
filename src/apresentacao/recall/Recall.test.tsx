@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { alterarPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import {
@@ -8,6 +9,7 @@ import {
   criarFraseDeTrecho,
   registrarErro,
 } from '../../dominios/recall/servico';
+import { iniciarSessao, pausarSessao } from '../../dominios/sessao/servico';
 import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -25,7 +27,201 @@ async function abrir(rota: string, repo?: Repositorio) {
 const erroAntigo = (repo: Repositorio, oQueFoi: string) =>
   repo.colecao('erros').criar({ resultado: 'errou', oQueFoi, status: 'aberto' });
 
+/** Escreve a frase, salva e devolve o Erro gravado. */
+async function salvarEPegar(
+  repo: Repositorio,
+  usuario: ReturnType<typeof userEvent.setup>,
+  frase = 'Frase de teste.',
+) {
+  await usuario.type(screen.getByLabelText('Frase correta'), frase);
+  await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
+  await screen.findByText('Frase registrada.');
+  const erro = (await repo.colecao('erros').todosDoUsuario()).find((e) => e.fraseCorreta === frase);
+  if (!erro) throw new Error('O erro não foi gravado.');
+  return erro;
+}
+
 describe('captura de erro (6.2)', () => {
+  it('com uma Sessão aberta num Ponto, o erro nasce ligado à Sessão e já vem com o Ponto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    await usuario.type(
+      screen.getByLabelText('Frase correta'),
+      'Furto é subtrair coisa alheia móvel.',
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
+    await screen.findByText('Frase registrada.');
+    const [erro] = await repo.colecao('erros').todosDoUsuario();
+    expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: furto.id, disciplinaId: penal.id });
+  });
+
+  it('com uma Sessão num Ponto, a pessoa pode deixar Ponto e Disciplina em "—", e o erro sai sem eles', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    await usuario.selectOptions(screen.getByLabelText('Ponto do edital (opcional)'), '');
+    await usuario.selectOptions(screen.getByLabelText('Disciplina (opcional)'), '');
+    expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue('');
+    expect(screen.getByLabelText('Disciplina (opcional)')).toHaveValue('');
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id });
+    expect(erro).not.toHaveProperty('pontoId');
+    expect(erro).not.toHaveProperty('disciplinaId');
+    // No "Registrar outra" a Sessão também não volta a preencher.
+    await usuario.click(screen.getByRole('button', { name: 'Registrar outra' }));
+    expect(await screen.findByLabelText('Ponto do edital (opcional)')).toHaveValue('');
+    expect(screen.getByLabelText('Disciplina (opcional)')).toHaveValue('');
+  });
+
+  it('o Ponto da Sessão aberta vale mais que a escolha lembrada neste aparelho', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const civil = await repo.colecao('disciplinas').criar({ nome: 'Civil' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    localStorage.setItem('arretado.captura.vinculos', JSON.stringify({ disciplinaId: civil.id }));
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await screen.findByRole('button', { name: /bloquinho/ });
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    expect(screen.getByLabelText('Disciplina (opcional)')).toHaveValue(penal.id);
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: furto.id, disciplinaId: penal.id });
+  });
+
+  it('com a Sessão pausada o erro também nasce ligado a ela e já vem com o Ponto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    await pausarSessao(repo, sessao.id);
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: furto.id, disciplinaId: penal.id });
+    expect(screen.getByText('A próxima fica em Penal › Furto.')).toBeInTheDocument();
+  });
+
+  it('com uma Sessão que não é de um Ponto, o erro nasce ligado a ela e os campos ficam vazios', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    // O mesmo id do Ponto, de propósito: o que decide é o tipo do alvo, não o id.
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'leitura', id: furto.id, rotulo: 'LEP' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await screen.findByRole('button', { name: /bloquinho/ });
+    expect(await screen.findByLabelText('Ponto do edital (opcional)')).toHaveValue('');
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id });
+    expect(erro).not.toHaveProperty('pontoId');
+    expect(erro).not.toHaveProperty('disciplinaId');
+  });
+
+  it('Sessão que ficou aberta de outro Dia não liga o erro nem preenche o Ponto', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const antiga = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    relogio.avancar(26 * 3_600_000);
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(async () => {
+      expect((await repo.colecao('sessoes').obter(antiga.id))?.estado).toBe('interrompida');
+    });
+    expect(await screen.findByLabelText('Ponto do edital (opcional)')).toHaveValue('');
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).not.toHaveProperty('sessaoId');
+    expect(erro).not.toHaveProperty('pontoId');
+  });
+
+  it('Ponto da Sessão que já foi excluído não preenche nada, e o erro leva a Sessão', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    await repo.colecao('pontos').excluir(furto.id);
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await screen.findByRole('button', { name: /bloquinho/ });
+    expect(await screen.findByLabelText('Disciplina (opcional)')).toHaveValue('');
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id });
+    expect(erro).not.toHaveProperty('pontoId');
+  });
+
+  it('Ponto da Sessão sem Disciplina: o erro leva o Ponto e nenhuma chave de Disciplina', async () => {
+    const { repo } = await repositorioDeTeste();
+    const solto = await repo.colecao('pontos').criar({ titulo: 'Solto' });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: solto.id, rotulo: 'Solto' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(solto.id);
+    });
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: solto.id });
+    expect(erro).not.toHaveProperty('disciplinaId');
+  });
+
+  it('Ponto da Sessão numa Disciplina que já foi excluída: o erro não leva a Disciplina', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    await iniciarSessao(repo, { alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' } });
+    await repo.colecao('disciplinas').excluir(penal.id);
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    const erro = await salvarEPegar(repo, usuario);
+    expect(erro).toMatchObject({ pontoId: furto.id });
+    expect(erro).not.toHaveProperty('disciplinaId');
+  });
+
+  it('com a tela assentada o formulário não volta a ler o repositório (`carregar` estável)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    await iniciarSessao(repo, { alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' } });
+    await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    await new Promise((r) => setTimeout(r, 300));
+    const leituras = vi.spyOn(repo, 'colecao');
+    await new Promise((r) => setTimeout(r, 400));
+    // Com uma função nova a cada desenho, o `useDados` refazia a leitura sem parar (milhares por segundo).
+    expect(leituras.mock.calls.length).toBeLessThan(3);
+    leituras.mockRestore();
+  });
+
   it('só a frase correta é obrigatória (D25); sem "o que foi" não pergunta pelo cartão', async () => {
     const { repo, usuario } = await abrir('/recall/registrar');
     const salvar = await screen.findByRole('button', { name: 'Salvar' });
