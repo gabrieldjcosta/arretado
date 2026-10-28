@@ -147,3 +147,7 @@
     transition: none;
   }
 }
+
+.proximo-bloco {
+  margin-block: var(--espaco-3);
+}
