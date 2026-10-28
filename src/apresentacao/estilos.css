@@ -156,6 +156,30 @@
   --quadro-chao: var(--linha);
   --quadro-aro: var(--tinta);
   --quadro-marca: var(--marca);
+  /* O néon suave e o Zé (D-D10; contrato em docs/design/referencias/2026-10-27-ze/). O brilho existe só
+     em traço que a caneta desenha: aceso enquanto ela traça, em repouso depois que assenta (0,6 s), e
+     numa cor só, o azul piscina, nos dois mundos. O Zé tem a linha branca sobre uma faixa piscina (a
+     32 e 24 px a de dia afunda, para a silhueta manter 3:1 sobre o papel); olhos e haste são tinta de
+     dia e branco à noite. O ponto da flor é um valor só, amarelo, igual nos dois mundos: por isso não
+     entra nos blocos da noite. */
+  --neon-cor: #39caef;
+  --neon-aceso: 0.55;
+  --neon-repouso: 0;
+  --z-nucleo: #ffffff;
+  --z-banda: #39caef;
+  --z-banda-p: #0e93b4;
+  --z-miolo: #39caef;
+  --z-olho: var(--tinta);
+  --z-olho-halo: transparent;
+  --z-haste: var(--tinta);
+  --z-bochecha: #ec5675;
+  --z-bochecha-op: 0.85;
+  --z-bloom-aceso: 0.55;
+  --z-bloom-repouso: 0.16;
+  --z-dia: inline;
+  --z-noite: none;
+  --z-ponto: #ffc53d;
+  --z-ponto-brilho: #ffc53d;
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -296,6 +320,18 @@
     --quadro-chao: var(--n-borda);
     --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
     --quadro-marca: transparent;
+    --neon-aceso: 0.6;
+    --neon-repouso: 0.3;
+    --z-banda-p: #39caef;
+    --z-olho: #ffffff;
+    --z-olho-halo: #39caef;
+    --z-haste: #ffffff;
+    --z-bochecha: #ff86a6;
+    --z-bochecha-op: 1;
+    --z-bloom-aceso: 0.6;
+    --z-bloom-repouso: 0.32;
+    --z-dia: none;
+    --z-noite: inline;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
@@ -373,6 +409,18 @@
   --quadro-chao: var(--n-borda);
   --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
   --quadro-marca: transparent;
+  --neon-aceso: 0.6;
+  --neon-repouso: 0.3;
+  --z-banda-p: #39caef;
+  --z-olho: #ffffff;
+  --z-olho-halo: #39caef;
+  --z-haste: #ffffff;
+  --z-bochecha: #ff86a6;
+  --z-bochecha-op: 1;
+  --z-bloom-aceso: 0.6;
+  --z-bloom-repouso: 0.32;
+  --z-dia: none;
+  --z-noite: inline;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);

@@ -8,7 +8,8 @@ const plural = (n: number, um: string, varios: string) => `${String(n)} ${n === 
 
 /**
  * Quantos Erros foram guardados durante a Sessão: os criados entre o começo e o fim dela, pelo "Errei"
- * das questões ou pelo registro comum (só o "Errei" grava `sessaoId`). Lê só essa faixa do índice.
+ * das questões ou pelo registro comum (os dois gravam `sessaoId` com a Sessão aberta; o Leitor, "Registrar
+ * vários" e "Ache o erro" não gravam, e a faixa de tempo pega os três). Lê só essa faixa do índice.
  */
 export async function errosDaSessao(
   repo: Repositorio,
