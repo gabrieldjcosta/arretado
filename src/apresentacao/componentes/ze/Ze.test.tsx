@@ -104,6 +104,23 @@ describe('Ze (D-D10)', () => {
     expect(halos(container)).toEqual(['0', '0']);
   });
 
+  it('o filtro do halo dos olhos tem região fixa em volta do olho, e não a caixa do traço', () => {
+    // Pela caixa do traço (fina no arco, de largura zero na cápsula) o desfoque era cortado numa faixa reta
+    // ou o filtro desligava; é a diferença deliberada em relação ao mockup (revisão do #341).
+    const { container } = render(<Ze />);
+    const halo = container.querySelector('.z-oh');
+    const id = /url\(#([^)]+)\)/.exec(halo?.getAttribute('filter') ?? '')?.[1] ?? '';
+    const filtro = container.querySelector(`filter[id="${id}"]`);
+    expect(filtro).not.toBeNull();
+    expect(filtro?.getAttribute('filterUnits')).toBe('userSpaceOnUse');
+    expect(['x', 'y', 'width', 'height'].map((a) => filtro?.getAttribute(a))).toEqual([
+      '-40',
+      '-40',
+      '80',
+      '80',
+    ]);
+  });
+
   it('entrega o controle por ref e o solta ao sair', () => {
     const ref = createRef<ControleDoZe>();
     const { container, unmount } = render(<Ze ref={ref} />);
@@ -146,6 +163,7 @@ describe('o controle do Zé: o traço, a luz e as partes', () => {
   });
 
   it('o brilho acende enquanto a luz traça e assenta ao apagar', () => {
+    simularMovimento('normal');
     const { container, controle } = montar();
     const svg = container.querySelector('svg');
     controle.acender(true);
@@ -154,7 +172,18 @@ describe('o controle do Zé: o traço, a luz e as partes', () => {
     expect(svg).not.toHaveAttribute('data-acesa');
   });
 
+  it('no Calmo e no movimento reduzido o néon fica no repouso: acender não acende', () => {
+    for (const modo of ['calmo', 'reduzido'] as const) {
+      simularMovimento(modo);
+      const { container, controle, unmount } = montar();
+      controle.acender(true);
+      expect(container.querySelector('svg')).not.toHaveAttribute('data-acesa');
+      unmount();
+    }
+  });
+
   it('mostra as partes uma a uma e volta tudo ao natural', () => {
+    simularMovimento('normal');
     const { container, controle } = montar();
     controle.ocultarTudo();
     expect(container.querySelector<SVGElement>('.z-linha')?.style.opacity).toBe('0');

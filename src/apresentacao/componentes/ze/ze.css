@@ -164,6 +164,11 @@ html[data-perfil='calmo'] .ze .z-bloom {
   transition: none;
 }
 
+/* Calmo: cada passo só esmaece, então o olhar troca na hora, sem deslizar (§9 do contrato). */
+html[data-perfil='calmo'] .ze .z-olhos {
+  transition: none;
+}
+
 /* Cores forçadas: o brilho, a faixa, o miolo e as bochechas são decoração e somem; o traço, os olhos e a
    flor usam o texto do sistema. */
 @media (forced-colors: active) {

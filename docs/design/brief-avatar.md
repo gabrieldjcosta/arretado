@@ -1,10 +1,10 @@
 # Brief de design — o Zé, avatar do Arretado (D-D10)
 
-Alvo: o personagem (avatar) do app e o néon suave que o acompanha. Fontes: a D-D10 em [`decisoes-design.md`](decisoes-design.md); o contrato da Marca, com os valores do mockup, em [`referencias/2026-10-27-ze/contrato.md`](referencias/2026-10-27-ze/contrato.md) (v8, 28/10/2026); `CLAUDE.md`; `src/apresentacao/componentes/ze/`. Etiquetas: **[Fato]** do repositório, **[Gabriel]** decisão ou palavra dele, **[Marca]** hipótese de design. O nome "Zé" é codinome: nenhuma tela o diz (a decisão do nome segue aberta, §13).
+Alvo: o personagem (avatar) do app e o néon suave que o acompanha. Fontes: a D-D10 em [`decisoes-design.md`](decisoes-design.md); o contrato da Marca, com os valores do mockup, em [`referencias/2026-10-27-ze/contrato.md`](referencias/2026-10-27-ze/contrato.md) (v10, 28/10/2026); `CLAUDE.md`; `src/apresentacao/componentes/ze/`. Etiquetas: **[Fato]** do repositório, **[Gabriel]** decisão ou palavra dele, **[Marca]** hipótese de design. O nome "Zé" é codinome: nenhuma tela o diz (a decisão do nome segue aberta, §13).
 
 ## 1. Resumo
 
-Um personagem só, o **Zé**: o cacto da marca como um tubo de néon de um traço só, com dois olhos de cápsula retos, bochechas rosa e uma flor que é o ponto de luz. Aparece só na Chegada e na Ajuda, dá vida à espera nas Boas-vindas e acompanha o Passeio pelos quatro menus. O **néon suave** (o brilho azul piscina que acende quando a caneta traça) vale também para os traços que o app já tem: o nome, o traço de seleção e o quadro do cacto. O Zé é decorativo (`aria-hidden`); tudo o que ele "diz" é texto da tela.
+Um personagem só, o **Zé**: o cacto da marca como um tubo de néon de um traço só, com dois olhos de cápsula retos, bochechas rosa e uma flor que é o ponto de luz. Aparece só na Chegada, na Ajuda e na tela de carregamento do `index.html`, dá vida à espera nas Boas-vindas e acompanha o Passeio pelos quatro menus. O **néon suave** (o brilho azul piscina que acende quando a caneta traça) vale também para os traços que o app já tem: o nome, o traço de seleção e o quadro do cacto. O Zé é decorativo (`aria-hidden`); tudo o que ele "diz" é texto da tela.
 
 ## 2. Resultado do usuário
 

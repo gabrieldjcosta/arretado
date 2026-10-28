@@ -2,6 +2,7 @@ import {
   caminhoDoOlho,
   CORPO,
   contornoZe,
+  EIXOS_DOS_OLHOS,
   espessuraDoOlho,
   FLOR,
   opacidadeDoHalo,
@@ -34,6 +35,11 @@ describe('a geometria do Zé (D-D10)', () => {
     expect(CORPO.pontaL[1]).toBeLessThan(CORPO.pontaR[1]);
     expect(CORPO.pontaL).toEqual([54, 84]);
     expect(CORPO.pontaR).toEqual([184, 112]);
+  });
+
+  it('os olhos ficam a 18 do eixo (12,5 × 24 a 18, o do mockup): 102 e 138', () => {
+    expect(PARAMETROS_DO_ZE.ed).toBe(18);
+    expect([...EIXOS_DOS_OLHOS]).toEqual([102, 138]);
   });
 
   it('a flor nasce na ponta do braço direito e o ponto de luz fica acima da haste', () => {

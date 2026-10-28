@@ -78,7 +78,10 @@ export interface ControleDoZe {
   prepararTraco: () => void;
   tracar: (progresso: number) => void;
   tracoPronto: () => void;
-  /** O néon: aceso enquanto a luz traça; ao apagar, o brilho assenta (0,6 s, a transição está no CSS). */
+  /**
+   * O néon: aceso enquanto a luz traça; ao apagar, o brilho assenta (0,6 s, a transição está no CSS).
+   * No Calmo e no movimento reduzido não acende: o brilho fica no repouso.
+   */
   acender: (sim: boolean) => void;
   miolo: (opacidade: number) => void;
   bochechas: (opacidade: number) => void;
@@ -349,7 +352,8 @@ export function criarControle(humorInicial: Humor = 'neutro'): ControleDoZe {
     },
     tracoPronto,
     acender(sim) {
-      ligacao?.svg.toggleAttribute('data-acesa', sim);
+      // Só o movimento normal acende: o Calmo e o reduzido mostram o repouso (D-D10, regra 5 do néon).
+      ligacao?.svg.toggleAttribute('data-acesa', sim && movimentoAgora() === 'normal');
     },
     miolo(opacidade) {
       if (ligacao) ligacao.miolo.style.opacity = String(opacidade);
