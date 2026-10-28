@@ -1,0 +1,195 @@
+/* O Zé (D-D10). O contorno é um traço só: a linha é branca, com brilho azul piscina nos dois mundos; de
+   dia vai sobre uma faixa piscina que afunda nos tamanhos pequenos (senão a linha branca some no papel).
+   Os olhos são cápsulas retas, as bochechas são rosa e não há boca. O néon suave é o bloom: acende
+   enquanto a luz traça (`data-acesa`) e assenta em 0,6 s. Cores e opacidades vêm dos tokens `--z-*` e
+   `--neon-*` de estilos.css; as espessuras, daqui, pelo tamanho. */
+
+.ze {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  /* O tamanho grande: traço de 6 e faixa de 17 unidades do desenho; o brilho é a faixa vezes 1,9 e a
+     haste da flor, o traço vezes 0,55. */
+  --z-traco: 6;
+  --z-faixa: 17;
+  --z-brilho-w: 32.3;
+  --z-haste-w: 3.3;
+  /* O degradê do miolo do tronco: dá corpo ao tubo e some embaixo. */
+  --z-m0: 0.1;
+  --z-m1: 0.05;
+}
+
+/* Nos pequenos o traço e a faixa engrossam, para manter 1,5 a 2 px na tela. */
+.ze[data-tamanho='medio'],
+.ze[data-tamanho='pequeno'] {
+  --z-traco: 8;
+  --z-faixa: 21;
+  --z-brilho-w: 39.9;
+  --z-haste-w: 4.4;
+}
+
+/* A 32 e 24 px a faixa afunda (de dia, para a silhueta manter 3:1 sobre o papel) e as bochechas somem. */
+.ze[data-tamanho='minimo'] {
+  --z-traco: 10;
+  --z-faixa: 25;
+  --z-brilho-w: 47.5;
+  --z-haste-w: 5.5;
+  --z-banda: var(--z-banda-p);
+}
+
+.ze[data-tamanho='minimo'] .z-bochechas {
+  display: none;
+}
+
+.ze .z-miolo {
+  stroke: none;
+}
+
+.ze .z-m0 {
+  stop-color: var(--z-miolo);
+  stop-opacity: var(--z-m0);
+}
+
+.ze .z-m1 {
+  stop-color: var(--z-miolo);
+  stop-opacity: var(--z-m1);
+}
+
+.ze .z-m2 {
+  stop-color: var(--z-miolo);
+  stop-opacity: 0;
+}
+
+.ze .z-tr,
+.ze .z-haste {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ze .z-linha {
+  stroke: var(--z-nucleo);
+  stroke-width: var(--z-traco);
+}
+
+.ze .z-banda {
+  stroke: var(--z-banda);
+  stroke-width: var(--z-faixa);
+}
+
+.ze .z-banda.z-n {
+  opacity: 0.55;
+}
+
+/* O brilho: uma cópia larga do contorno, desfocada. Repouso depois de assentar; aceso enquanto a luz traça. */
+.ze .z-bloom {
+  stroke: var(--z-banda);
+  stroke-width: var(--z-brilho-w);
+  opacity: var(--z-bloom-op, var(--z-bloom-repouso));
+  transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.ze[data-acesa] {
+  --z-bloom-op: var(--z-bloom-aceso);
+}
+
+/* Acende na hora (ao traçar); só o assentar demora. */
+.ze[data-acesa] .z-bloom {
+  transition: none;
+}
+
+/* Cada mundo mostra a sua faixa: a de dia é nítida, a de noite é mais desfocada e leva o halo dos olhos. */
+.ze .z-d {
+  display: var(--z-dia, inline);
+}
+
+.ze .z-n {
+  display: var(--z-noite, none);
+}
+
+.ze .z-haste {
+  stroke: var(--z-haste);
+  stroke-width: var(--z-haste-w);
+}
+
+.ze .z-oh {
+  fill: none;
+  stroke: var(--z-olho-halo);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ze .z-pupila {
+  fill: none;
+  stroke: var(--z-olho);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ze .z-bc ellipse {
+  fill: var(--z-bochecha);
+  fill-opacity: var(--z-bochecha-op);
+}
+
+/* A flor é o ponto de luz: amarelo cheio com brilho amarelo, o mesmo de dia e de noite. */
+.ze .z-fh {
+  fill: var(--z-ponto-brilho);
+  opacity: 0.6;
+}
+
+.ze .z-fp {
+  fill: var(--z-ponto);
+}
+
+.ze .z-olhos {
+  transform-box: view-box;
+}
+
+/* O olhar desliza em 200 ms; com movimento reduzido ele nem se mexe (o controle não o move). */
+@media (prefers-reduced-motion: no-preference) {
+  .ze .z-olhos {
+    transition: transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+/* Calmo e movimento reduzido: o brilho só aparece pronto, nada assenta. */
+@media (prefers-reduced-motion: reduce) {
+  .ze .z-bloom {
+    transition: none;
+  }
+}
+
+html[data-perfil='calmo'] .ze .z-bloom {
+  transition: none;
+}
+
+/* Calmo: cada passo só esmaece, então o olhar troca na hora, sem deslizar (§9 do contrato). */
+html[data-perfil='calmo'] .ze .z-olhos {
+  transition: none;
+}
+
+/* Cores forçadas: o brilho, a faixa, o miolo e as bochechas são decoração e somem; o traço, os olhos e a
+   flor usam o texto do sistema. */
+@media (forced-colors: active) {
+  .ze .z-bloom,
+  .ze .z-banda,
+  .ze .z-miolo,
+  .ze .z-bochechas,
+  .ze .z-oh,
+  .ze .z-fh {
+    display: none;
+  }
+
+  .ze .z-linha,
+  .ze .z-haste,
+  .ze .z-pupila {
+    stroke: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .ze .z-fp {
+    fill: CanvasText;
+    forced-color-adjust: none;
+  }
+}

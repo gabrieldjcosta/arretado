@@ -125,6 +125,22 @@ export function pares(mundo = 'dia') {
   }
   if (mundo === 'dia') p.push(['pen-esfera', 'pen-halo', 3]);
   else for (const f of SUPERFICIES) p.push(['pen-halo', f, 3]);
+  // O Zé (D-D10): a linha branca se lê sobre a faixa e a faixa se separa do chão com 3:1 (WCAG 1.4.11).
+  // De dia a faixa que vale é a funda (`z-banda-p`, a dos tamanhos de 32 e 24 px); a piscina cheia, nos
+  // tamanhos grandes, dá 1,9:1 com a linha e 1,8:1 no papel, e a silhueta ali se lê pelo tamanho e pelo
+  // brilho (custo declarado no contrato, §8). À noite não há faixa funda. O olho é tinta de dia e
+  // branco à noite. A flor amarela só se separa da noite; de dia dá 1,5:1 no papel e é decoração
+  // (`aria-hidden`; a haste de tinta marca o lugar), como o halo de lima. O brilho do néon é halo.
+  if (mundo === 'dia') {
+    p.push(['z-nucleo', 'z-banda-p', 3], ['z-banda-p', 'fundo', 3], ['z-olho', 'fundo', 4.5]);
+  } else {
+    p.push(
+      ['z-nucleo', 'fundo', 3],
+      ['z-banda', 'fundo', 3],
+      ['z-olho', 'fundo', 4.5],
+      ['z-ponto', 'fundo', 3],
+    );
+  }
   p.push(
     ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.

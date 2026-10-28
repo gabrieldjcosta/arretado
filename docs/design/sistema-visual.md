@@ -2,7 +2,9 @@
 
 > **D-D9 (19/10/2026) — Tinta e noite.** Direção escolhida pelo Gabriel e construída na `integracao` em oito fases, Q1 a Q8 ([`../planos/tinta-e-noite.md`](../planos/tinta-e-noite.md); decisão em [`decisoes-design.md`](decisoes-design.md), D-D9; valores copiados das pranchas em [`referencias/2026-10-19-tinta-e-noite/contrato.md`](referencias/2026-10-19-tinta-e-noite/contrato.md)). São dois mundos, e o tema escolhe: o dia é o mundo 2, **"Tinta e marca-texto"** (papel azulado, folha branca com uma linha fina, tinta azul-noite, a lima só como halo, Schibsted Grotesk, formas angulares, o botão principal com a sombra dura); a noite é o mundo 1, **"Noite de mandacaru"** (noite azul, serra, luz, âmbar, Familjen Grotesk, formas arredondadas, nenhuma sombra). O interruptor é o de sempre (Conta › Aparência: claro, escuro ou igual ao aparelho). A D-D7 (Ponto de luz, [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md)) e as anteriores ficam como histórico.
 
-Base: as decisões D-D1 a D-D9 em [`decisoes-design.md`](decisoes-design.md); onde uma delas diverge da D-D9, vale a D-D9. Resumo no formato do Stitch: [`../../DESIGN.md`](../../DESIGN.md). Só apresentação (D-D1).
+> **D-D10 (28/10/2026) — O Zé e o néon suave.** Um personagem só, o Zé (um cacto de tubo de néon, só na Chegada, na Ajuda e na tela de carregamento), e o brilho azul piscina nos traços que a caneta desenha; os dois mundos, as paletas e as formas da D-D9 não mudam. Decisão em [`decisoes-design.md`](decisoes-design.md), D-D10; brief em [`brief-avatar.md`](brief-avatar.md); valores do mockup em [`referencias/2026-10-27-ze/contrato.md`](referencias/2026-10-27-ze/contrato.md). Está construído em fases (M1 a M4): hoje existem o componente `Ze` e os tokens (seção "O néon suave e o Zé"), e as telas vêm depois.
+
+Base: as decisões D-D1 a D-D10 em [`decisoes-design.md`](decisoes-design.md); onde uma delas diverge da D-D9 ou da D-D10, valem estas. Resumo no formato do Stitch: [`../../DESIGN.md`](../../DESIGN.md). Só apresentação (D-D1).
 
 **Fonte de verdade dos valores:** `src/apresentacao/estilos.css` (e os CSS dos pacotes). Este texto foi conferido contra eles na Q8 (20/10/2026), com a Q1 a Q7 na `integracao`. Contraste de cada par: `scripts/contraste.mjs` (e `npm run check`).
 
@@ -95,6 +97,30 @@ O anel de foco global é a luz do mundo (2 px, `outline-offset: 2px`). Dentro da
 | `--destaque-pena` | `#a5582a` · `#f09a68` | penas, quóruns e frações | pontilhado, 4 px |
 
 Contra o papel: 10,6:1 (prazo), 4,1:1 (condição), 4,9:1 (absoluto e pena); na folha, 11,2:1, 4,3:1 e 5,2:1; sob a régua, a condição fica em 3,6:1 no papel e 3,8:1 na folha. À noite, 8,3:1 · 11,1:1 · 8,4:1 na noite. O estilo da linha é o que distingue os quatro (a cor sozinha não distingue).
+
+### O néon suave e o Zé (D-D10)
+
+O brilho é azul piscina e igual nos dois mundos; o que muda por mundo é quanto brilha enquanto a caneta traça e quanto fica depois. Os tokens estão nos três blocos de tema de `estilos.css`, e o que não muda com o mundo (a cor do brilho, a linha, o miolo, a faixa e o ponto) fica só na raiz. Colunas: dia · noite.
+
+| Token | Dia · noite | O quê |
+|---|---|---|
+| `--neon-cor` | `#39caef` (igual) | a cor do brilho: o azul piscina |
+| `--neon-aceso` | `0.55` · `0.6` | a opacidade do brilho enquanto a caneta traça |
+| `--neon-repouso` | `0` · `0.30` | a opacidade depois de assentar (0,6 s); de dia o traço do app fica limpo |
+| `--z-nucleo` | `#ffffff` (igual) | a linha do Zé, branca nos dois mundos |
+| `--z-banda` | `#39caef` (igual) | a faixa piscina sob a linha |
+| `--z-banda-p` | `#0e93b4` · `#39caef` | a faixa nos tamanhos de 32 e 24 px (de dia afunda, por contraste) |
+| `--z-miolo` | `#39caef` (igual) | o degradê do miolo do tronco (10%, 5% e zero) |
+| `--z-olho`, `--z-haste` | tinta · `#ffffff` | os olhos e a haste da flor |
+| `--z-olho-halo` | transparente · `#39caef` | o halo dos olhos (só de noite) |
+| `--z-bochecha`, `--z-bochecha-op` | `#ec5675` a 0,85 · `#ff86a6` a 1 | as bochechas (decoração) |
+| `--z-bloom-aceso`, `--z-bloom-repouso` | `0.55` e `0.16` · `0.6` e `0.32` | o brilho largo do Zé, aceso e em repouso (o Zé nunca fica sem brilho de dia) |
+| `--z-dia`, `--z-noite` | `inline` e `none` · `none` e `inline` | qual das duas faixas o `<svg>` mostra |
+| `--z-ponto`, `--z-ponto-brilho` | `#ffc53d` (igual, só na raiz) | o ponto amarelo da flor e o brilho dele, iguais nos dois mundos |
+
+Contrastes medidos em `scripts/contraste.mjs`: de dia, a linha branca sobre a faixa funda mede 3,6:1, a faixa funda sobre o papel 3,4:1 e o olho 15,8:1; de noite, a linha 18,6:1, a faixa 9,6:1, o olho 18,6:1 e o ponto 11,8:1. A faixa piscina cheia de dia (1,9:1 com a linha, 1,8:1 no papel) vale só de 48 px para cima, onde a silhueta se lê pelo tamanho e pelo brilho; o ponto amarelo sobre o papel mede 1,5:1 e é decoração, como o halo de lima. O Zé e o brilho são `aria-hidden` e não carregam informação.
+
+Regras: o brilho só existe em traço que a caneta desenha, nunca em botão, texto, cartão, borda, aba nem ícone parado; é uma cópia larga e desfocada do próprio traço (`feGaussianBlur`), nunca `box-shadow` nem `drop-shadow`; em `forced-colors: active` o brilho, a faixa, o miolo e as bochechas somem e o traço usa `CanvasText`. `scripts/contraste.test.ts` confere os tokens nos três blocos e falha se `neon` ou `bloom` aparecer fora dos CSS dos traços de caneta.
 
 ### Estado (sem mudança)
 
@@ -250,11 +276,13 @@ O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Le
 | Quadro do cacto | de 520 a 1100 ms por fio (a parte inteira leva de 1,3 a 2,5 s, medido no Chromium), uma vez, ao fechar o Dia; só aqui a caneta anda |
 | Escrita do nome | completa 2,64 s (primeira abertura no aparelho), curta 1,2 s (primeira de cada Dia), parada nas demais; reduzido: parada; Calmo: esmaece em 0,24 s; um toque ou uma tecla pula |
 | Traço de seleção | normal: 240 ms desenhando, 120 ms parado, 260 ms sumindo; Calmo: contorno inteiro que esmaece em 380 ms; reduzido: nada |
+| Néon suave (D-D10) | acende junto com o traço da caneta e assenta em 0,6 s, uma vez; nunca pulsa; Calmo: só o repouso, esmaecendo; reduzido: o repouso, parado |
+| O Zé (D-D10) | o contorno se desenha de pé a pé em 1,2 s com o néon aceso; o olhar e o humor mudam em 200 ms; a piscada dura 160 ms, a piscadela 560 ms; a luz amarela da flor pisca em rodadas de 3, só nas Boas-vindas; Calmo: aparece e esmaece, sem piscar; reduzido: pronto e parado |
 | Passagem do cartão | normal: sai 190 ms (28 px à esquerda) e entra 210 ms (de 12 px à direita, dentro da calha da tela) com pausa de 150 ms; Calmo: só opacidade, 150 e 170 ms, pausa de 140 ms; reduzido: troca na hora |
 
 Ainda só em plano (não estão no código): a transição entre rotas (View Transitions de até 150 ms) e o atraso de 150 ms do `Esqueleto`, em [`../planos/transicoes-e-carregamento.md`](../planos/transicoes-e-carregamento.md). Quando entrarem, nunca animam o texto da lei nem remontam o Leitor.
 
-Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro desfocado atrás de texto, sombra com desfoque, luz que acompanha o dedo, ciclo de dia e noite, confete, som. Com `prefers-reduced-motion`, os pontos aparecem acesos, o quadro do cacto pronto, o nome parado; o traço de seleção não é desenhado e o cartão troca na hora; ordem, conteúdo e ação não mudam.
+Proibido (a única exceção é a luz amarela da mão do Zé nas Boas-vindas, em rodadas de 3 piscadas, D-D10): brilho pulsando, lens flare, parallax, superfície iridescente, vidro desfocado atrás de texto, sombra com desfoque, luz que acompanha o dedo, ciclo de dia e noite, confete, som. Com `prefers-reduced-motion`, os pontos aparecem acesos, o quadro do cacto pronto, o nome parado; o traço de seleção não é desenhado e o cartão troca na hora; ordem, conteúdo e ação não mudam.
 
 ## Acessibilidade e robustez
 
@@ -270,7 +298,7 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 
 - **Nome:** "arretado" escrito num traço só, com o cacto simplificado ao lado (a seção "A marca", acima). Sem martelo, balança nem outros clichês jurídicos.
 - **A caneta-cacto de vidro** é o objeto da marca no app: ponteiro da retomada nas três poses; no app de loja, ícone sobre o papel.
-- **Mascote:** nenhum. O cachorro do Resumo do Dia saiu em 19/10/2026 (o Gabriel não gostou) e o mascote antigo saiu na P2 da D-D7 (18/10/2026); no lugar, a caneta desenha o quadro do cacto a cada Dia fechado. Os desenhos ficam só como histórico em `docs/design/mascote/`.
+- **Mascote:** o Zé (D-D10, 28/10/2026), um cacto de tubo de néon de um traço só, com olhos de cápsula retos, bochechas e uma flor que é o ponto de luz; só na Chegada, na Ajuda e na tela de carregamento, nunca no Leitor, no Hoje nem na Revisão, e sempre `aria-hidden`. Hoje existe o componente (`componentes/ze/`, ainda sem tela que o use); a Abertura, o Passeio e o néon nos traços que já existem chegam nos PRs seguintes. O cachorro do Resumo do Dia saiu em 19/10/2026 (o Gabriel não gostou) e o mascote antigo saiu na P2 da D-D7 (18/10/2026) e não voltam; a caneta continua desenhando o quadro do cacto a cada Dia fechado. Os desenhos antigos ficam só como histórico em `docs/design/mascote/`.
 
 ## Mapa do código
 
@@ -280,6 +308,7 @@ Proibido: brilho pulsando, lens flare, parallax, superfície iridescente, vidro 
 | Fontes | `src/apresentacao/fontes/` (Schibsted Grotesk e Familjen Grotesk, licença OFL); Atkinson e Literata de `node_modules/@fontsource*` |
 | Casca (cabeçalho, navegação, "+", rodapé) | `src/apresentacao/Shell.tsx`, `componentes/TituloComMais.tsx` (o "+"), `componentes/teclado-aberto.ts` (teclado aberto), `componentes/MenuAjuda.tsx`; nomes das áreas em `textos.ts` (`ROTULO_DA_AREA`) |
 | Marca e escrita do nome | `componentes/LockupParado.tsx`, `componentes/escrita/` (`Marca.tsx`, `EscritaDoNome.tsx`, `frequencia.ts`) |
+| O Zé (D-D10) | `componentes/ze/` (`Ze.tsx`, `geometria.ts`, `humores.ts`, `controle.ts`, `ze.css`); tokens `--neon-*` e `--z-*` em `estilos.css` |
 | Caneta, quadro do cacto, traço e passagem | `componentes/Caneta.tsx`, `componentes/luz.css`, `componentes/quadro/`, `componentes/traco/`, `componentes/passagem.ts` |
 | Hoje | `src/apresentacao/hoje/*` (`Parada.tsx`, `Agora.tsx`, `Depois.tsx` = "Em seguida", `ParaLembrar.tsx`, `PontosDoDia.tsx`, `FecharDia.tsx`), `componentes/AcaoAgora.tsx`, `PontoDeLuz.tsx`, `LinhaLista.tsx`; lógica pura em `src/dominios/hoje/` |
 | Revisão e Fixar | `src/apresentacao/recall/*` (`Drill.tsx`, `RevisarFrases.tsx`, `TopoDaRevisao.tsx`, `RecallInicio.tsx`, listas); a linha "Depois: …" do Fixar é `componentes/LinhaDepois.tsx`; `componentes/DiasDaSemana.tsx` |
