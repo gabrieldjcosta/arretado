@@ -1,4 +1,5 @@
 // Próxima ação do Hoje (F3-A, pacote A1): uma só coisa para fazer agora. Ordem: revisão vencida →
+// Tarefa da fila (a que a pessoa escreveu vale mais que o Ciclo automático) → bloco do Ciclo →
 // leitura salva ("Continuar leitura") → estado vazio com três começos. Domínio puro e sem leitura
 // de dados (a camada de domínios não importa de outro módulo): `apresentacao/hoje/proxima-acao.ts`
 // reúne as entradas do Recall e da Legislação e chama `decidirProximaAcao`.
@@ -125,8 +126,8 @@ export function decidirProximaAcao(
   const dispensados = new Set(excluir);
   const ordem: [OrigemDaAcao['tipo'], (e: EntradaDaProximaAcao) => ProximaAcao | undefined][] = [
     ['revisao_vencida', revisaoVencida],
-    ['ciclo', blocoDoCiclo],
     ['tarefa', tarefaDaFila],
+    ['ciclo', blocoDoCiclo],
     ['leitura_salva', leituraSalva],
   ];
   for (const [tipo, montar] of ordem) {
