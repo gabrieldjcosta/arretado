@@ -121,6 +121,7 @@ describe('captura de erro (6.2)', () => {
     });
     const erro = await salvarEPegar(repo, usuario);
     expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: furto.id, disciplinaId: penal.id });
+    expect(screen.getByText('A próxima fica em Penal › Furto.')).toBeInTheDocument();
   });
 
   it('com uma Sessão que não é de um Ponto, o erro nasce ligado a ela e os campos ficam vazios', async () => {
