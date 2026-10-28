@@ -6,6 +6,7 @@ import { movimentoDoPerfil, type Movimento } from '../../movimento';
 import { EscritaDoNome } from './EscritaDoNome';
 import { escritaDaAbertura, lembrarDaEscrita } from './frequencia';
 import { CAIXA_DO_LOCKUP } from './geometria';
+import { useVezDaEscrita } from './vez-da-escrita';
 
 /**
  * A marca do cabeçalho (D-D9, Q6): o nome escrito pela caneta na abertura em que a frequência
@@ -17,15 +18,22 @@ import { CAIXA_DO_LOCKUP } from './geometria';
  * Preferências, que o `AplicarAparencia` só põe em `data-perfil` depois de ler; por isso a escrita
  * espera a própria leitura (milissegundos, no aparelho) em vez de começar no escuro e trocar de
  * modo no meio. Se a leitura falha, vale o mais manso (esmaecer).
+ *
+ * A escrita acontece uma vez por abertura, ou na tela cheia ou aqui, nunca nos dois: quando a Abertura
+ * (`entrada/abertura`) toma a escrita, este lockup nasce parado, com o ponto de luz onde a viagem da luz
+ * pousa; enquanto ela ainda decide, espera (como espera as Preferências) e, se ela não abre (movimento
+ * reduzido, "só estudo", Sessão aberta), escreve como sempre escreveu. Sem Abertura na árvore, decide sozinho.
  */
 export function Marca() {
   const repo = useRepositorio();
+  const vez = useVezDaEscrita();
   const [abertura] = useState(() => {
     const quando = repo.ctx.agora();
     return { quando, escrita: escritaDaAbertura(quando) };
   });
   const { quando, escrita } = abertura;
-  const parada = escrita === 'parada';
+  const aguardando = vez.estado === 'pendente';
+  const parada = escrita === 'parada' || (vez.estado === 'decidida' && vez.onde === 'tela');
   // `null`: esperando as Preferências.
   const [movimento, setMovimento] = useState<Movimento | null>(null);
   const [pulou, setPulou] = useState(false);
@@ -46,8 +54,8 @@ export function Marca() {
     };
   }, [parada, repo]);
 
-  // Só conta como vista quando a escrita de fato começa (não enquanto espera as Preferências).
-  const escrevendo = !parada && movimento !== null;
+  // Só conta como vista quando a escrita de fato começa (não enquanto espera as Preferências nem a Abertura).
+  const escrevendo = !parada && !aguardando && movimento !== null;
   useEffect(() => {
     if (!escrevendo) return;
     lembrarDaEscrita(quando);
@@ -64,7 +72,7 @@ export function Marca() {
   }, [escrevendo, quando]);
 
   if (parada) return <LockupParado />;
-  if (movimento === null) {
+  if (movimento === null || aguardando) {
     return (
       <svg className="lockup" viewBox={CAIXA_DO_LOCKUP} aria-hidden="true" focusable="false" />
     );

@@ -6,12 +6,15 @@ import { simularMovimento } from '../../../testes/movimento';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { lembrarDaEscrita } from './frequencia';
 import { Marca } from './Marca';
+import { ContextoDaAbertura, type VezDaEscrita } from './vez-da-escrita';
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
 const HOJE = '2026-10-20T12:00:00.000Z';
 
 beforeEach(() => {
   window.localStorage.clear();
+  // O setup semeia o Dia no futuro (aparelho que já viu a Abertura); aqui o nome ainda não foi escrito.
+  window.localStorage.removeItem(CHAVE);
   simularMovimento('normal');
 });
 
@@ -149,5 +152,68 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
     expect(escrita()).toBeNull();
     expect(container.querySelector('svg.lockup')).not.toBeNull();
     expect(guardado()).toBeNull();
+  });
+});
+
+describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
+  async function montarCom(vez: VezDaEscrita) {
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    const arvore = (v: VezDaEscrita) => (
+      <ContextoRepositorio.Provider value={repo}>
+        <ContextoDaAbertura.Provider value={{ vez: v, emCurso: v.estado === 'pendente' }}>
+          <Marca />
+        </ContextoDaAbertura.Provider>
+      </ContextoRepositorio.Provider>
+    );
+    const vista = render(arvore(vez));
+    return {
+      ...vista,
+      trocar: (v: VezDaEscrita) => {
+        vista.rerender(arvore(v));
+      },
+      escrita: () => vista.container.querySelector('svg.eb'),
+      parado: () => vista.container.querySelector('svg.lockup .lockup-ponto'),
+    };
+  }
+
+  it('a Abertura tomou a escrita: o cabeçalho nasce parado, mesmo na primeira vez, e não guarda nada', async () => {
+    const { escrita, parado } = await montarCom({
+      estado: 'decidida',
+      onde: 'tela',
+      escrita: 'completa',
+      calmo: false,
+    });
+    expect(escrita()).toBeNull();
+    expect(parado()).not.toBeNull();
+    expect(guardado()).toBeNull();
+  });
+
+  it('enquanto a Abertura decide, o cabeçalho espera: nem escreve nem conta como visto', async () => {
+    const { escrita, parado, container } = await montarCom({ estado: 'pendente' });
+    // Dá tempo de as Preferências lerem: ainda assim, nada de escrita.
+    await new Promise((resolver) => setTimeout(resolver, 50));
+    expect(escrita()).toBeNull();
+    expect(parado()).toBeNull();
+    expect(container.querySelector('svg.lockup')).not.toBeNull();
+    expect(guardado()).toBeNull();
+  });
+
+  it('a Abertura toma a escrita depois da espera: do vazio ao lockup parado, sem escrever nada', async () => {
+    const { trocar, escrita, parado } = await montarCom({ estado: 'pendente' });
+    await new Promise((resolver) => setTimeout(resolver, 50));
+    trocar({ estado: 'decidida', onde: 'tela', escrita: 'completa', calmo: false });
+    expect(escrita()).toBeNull();
+    expect(parado()).not.toBeNull();
+    expect(guardado()).toBeNull();
+  });
+
+  it('a Abertura não abre (só estudo, Sessão aberta): o cabeçalho escreve como sempre e guarda o Dia', async () => {
+    const { trocar, escrita } = await montarCom({ estado: 'pendente' });
+    trocar({ estado: 'decidida', onde: 'cabecalho', escrita: 'completa' });
+    await waitFor(() => {
+      expect(escrita()).not.toBeNull();
+    });
+    expect(escrita()).not.toHaveClass('curta');
+    await diaGuardado('2026-10-20');
   });
 });

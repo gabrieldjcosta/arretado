@@ -1,10 +1,11 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { alterarPreferencias } from '../../core/preferencias';
 import { fecharDia } from '../../dominios/dia/fechar';
 import { criarCartaoManual } from '../../dominios/recall/servico';
 import { encerrarSessao, iniciarSessao } from '../../dominios/sessao/servico';
+import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 import { conteudoDoDia } from './conteudo';
@@ -291,5 +292,35 @@ describe('Entrada do Dia › quando não aparece', () => {
     await decisaoTerminou();
 
     expect(linha()).toBeNull();
+  });
+});
+
+describe('Chegada › espera o nome em tela cheia (Abertura, M2 do Zé)', () => {
+  beforeEach(() => {
+    localStorage.removeItem(CHAVE_CHEGADA);
+    localStorage.removeItem(CHAVE_ENTRADA);
+    // O setup semeia o Dia no futuro; aqui o nome ainda não foi escrito, então a tela cheia abre.
+    localStorage.removeItem('arretado:escrita-do-nome:v1');
+  });
+
+  it('na primeira vez o nome escreve primeiro: a Chegada só abre depois que a Abertura sai', async () => {
+    simularMovimento('normal');
+    const { repo } = await repositorioDeTeste();
+    abrirHoje(repo);
+    await waitFor(() => {
+      expect(document.querySelector('.abertura')).not.toBeNull();
+    });
+    // A decisão da Chegada já saiu (o Hoje carregou), mas ela fica quieta: um <dialog> modal aberto agora
+    // ficaria por cima do popover do nome.
+    await decisaoTerminou();
+    expect(screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBeNull();
+    expect(chegadaJaVista()).toBe(false);
+
+    fireEvent.pointerDown(document.body);
+    expect(
+      await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' }),
+    ).toBeInTheDocument();
+    expect(document.querySelector('.abertura')).toBeNull();
+    expect(chegadaJaVista()).toBe(true);
   });
 });
