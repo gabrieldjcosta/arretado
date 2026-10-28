@@ -75,10 +75,10 @@ describe('Sessão leve (A2)', () => {
     expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(1);
   });
 
-  it('direto=1 sem tela própria para o alvo mostra o início normal', async () => {
+  it('direto=1 sem tela própria para o alvo começa e cai na Sessão, sem a tela de início', async () => {
     const { repo } = await abrir('/sessao/iniciar?tipo=ponto&rotulo=CP&direto=1');
-    expect(await screen.findByRole('button', { name: 'Começar' })).toBeInTheDocument();
-    expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(0);
+    expect(await screen.findByRole('button', { name: 'Pausar' })).toBeInTheDocument();
+    expect(await repo.colecao('sessoes').todosDoUsuario()).toHaveLength(1);
   });
 
   it('pausa sem falha e volta', async () => {

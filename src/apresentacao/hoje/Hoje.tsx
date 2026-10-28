@@ -17,6 +17,8 @@
 import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
+import { useDados } from '../dados/contexto';
+import { sessaoAberta } from '../sessao/carregadores';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
@@ -35,6 +37,8 @@ import { useRetratoDoHoje } from './retrato';
 
 export function Hoje() {
   const hoje = useRetratoDoHoje();
+  // Com Sessão aberta o Agora espera (Agora.tsx) e o "Em seguida", que só segue o Agora, também.
+  const { dados: aberta } = useDados(sessaoAberta);
   return (
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
@@ -52,7 +56,7 @@ export function Hoje() {
           {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Ver mais". */}
           <BlocosDoHoje>
             <Depois
-              acoes={hoje.emSeguida}
+              acoes={aberta === null ? hoje.emSeguida : []}
               opcoes={hoje.retrato?.outras ?? []}
               aoTrocar={hoje.trocar}
             />

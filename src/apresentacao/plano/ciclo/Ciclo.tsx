@@ -175,7 +175,7 @@ function Volta({ ciclo, dados }: { ciclo: CicloGravado; dados: DadosDoCiclo }) {
       <div className="linha-acao">
         <Link
           className="botao principal"
-          to={`/sessao/iniciar?tipo=ciclo&id=${ciclo.id}&ciclo=${ciclo.id}&bloco=${String(atual)}&rotulo=${encodeURIComponent(nomeDe(dados, ciclo.blocos[atual]?.disciplinaId ?? ''))}&origem=ciclo`}
+          to={`/sessao/iniciar?tipo=ciclo&id=${ciclo.id}&ciclo=${ciclo.id}&bloco=${String(atual)}&rotulo=${encodeURIComponent(nomeDe(dados, ciclo.blocos[atual]?.disciplinaId ?? ''))}&origem=ciclo&direto=1`}
         >
           Começar este bloco
         </Link>

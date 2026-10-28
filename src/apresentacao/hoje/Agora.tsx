@@ -6,7 +6,9 @@ import { AcaoAgora } from '../componentes/AcaoAgora';
 import { Esqueleto } from '../componentes/estados';
 import { Icone } from '../componentes/Icone';
 import { ComecarSessao } from '../sessao/ComecarSessao';
+import { sessaoAberta } from '../sessao/carregadores';
 import { SessaoAberta } from '../sessao/SessaoAberta';
+import { useDados } from '../dados/contexto';
 import { ROTULO_REVISAR_CARTOES } from '../../dominios/hoje/proxima-acao';
 import { EstadoVazio } from './EstadoVazio';
 import { Parada } from './Parada';
@@ -84,6 +86,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
 }
 
 export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
+  const { dados: aberta } = useDados(sessaoAberta);
   const normaLida = hoje.retrato
     ? [
         ...(hoje.retrato.agora.tipo === 'acao' ? [hoje.retrato.agora.acao] : []),
@@ -93,9 +96,10 @@ export function Agora({ hoje }: { hoje: HojeEmAndamento }) {
   return (
     <>
       <SessaoAberta />
-      <ProximaAcaoDoHoje hoje={hoje} />
+      {/* Com Sessão aberta o "Continuar" é um só: o da Sessão; a Próxima ação espera ela fechar. */}
+      {aberta === null && <ProximaAcaoDoHoje hoje={hoje} />}
       {/* No Hoje vazio o começo é um só ("Por onde começar?"): o cartão de Sessão espera haver o que fazer. */}
-      {hoje.retrato?.agora.tipo === 'acao' && (
+      {aberta === null && hoje.retrato?.agora.tipo === 'acao' && (
         <ComecarSessao {...(normaLida === undefined ? {} : { normaLida })} />
       )}
     </>

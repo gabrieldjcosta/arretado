@@ -16,7 +16,7 @@ test('Tarefas: adicionar, dividir, começar uma Sessão e concluir (B4)', async 
   await semViolacoes(page);
 
   await fila.getByRole('link', { name: 'Começar' }).first().click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Começar uma Sessão' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
 
   await page.goto('/#/plano/tarefas');
   await page.getByRole('button', { name: 'Feita' }).first().click();

@@ -181,7 +181,10 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     const posicao = agora.compareDocumentPosition(linha()!);
     expect(posicao & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(agora.contains(linha())).toBe(false);
-    expect(entradaJaAbriu('2026-09-24')).toBe(true);
+    // O registro da abertura sai num efeito depois da linha: espera, em vez de supor a ordem.
+    await waitFor(() => {
+      expect(entradaJaAbriu('2026-09-24')).toBe(true);
+    });
     // Fala do produto: nada que cobre.
     expect(linha()).not.toHaveTextContent(/Você parou|atrasad|pendente|Frase\b/i);
   });

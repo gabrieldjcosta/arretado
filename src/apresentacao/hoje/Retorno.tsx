@@ -36,6 +36,7 @@ export function BoasVindas() {
     ...(dados.alvoRotulo ? { rotulo: dados.alvoRotulo } : {}),
     origem: 'escolha_propria',
     razao: 'Voltando',
+    direto: '1',
   }).toString()}`;
   return (
     <section className="cartao-bloco retorno" aria-label="Bem-vindo de volta">
