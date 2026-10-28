@@ -32,7 +32,7 @@ function lerEntrada(p: URLSearchParams) {
 
 /** A tela do alvo e, numa leitura com trecho do mapa, o Leitor já no trecho. */
 function destinoDe(dada: ReturnType<typeof lerEntrada>): string | undefined {
-  const rota = dada.direto ? rotaDoAlvo(dada.alvo) : undefined;
+  const rota = dada.direto ? (rotaDoAlvo(dada.alvo) ?? '/sessao/atual') : undefined;
   if (rota === undefined || dada.ir === undefined || dada.alvo?.tipo !== 'leitura') return rota;
   return `${rota}?ir=${dada.ir}&foco=artigo&mapa=1`;
 }

@@ -58,7 +58,7 @@ test('Onboarding do plano: carreira, edital, matérias e "Comece por aqui" (B2)'
   await semViolacoes(page);
 
   await page.getByRole('link', { name: 'Começar', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Começar uma Sessão' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
 
   await page.goto('/#/plano');
   await expect(page.getByText('Matéria Inventada').first()).toBeVisible();

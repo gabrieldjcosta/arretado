@@ -47,6 +47,15 @@ describe('Atividade da Sessão no Hoje', () => {
     expect(await screen.findByRole('region', { name: 'Sessão aberta' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
   });
+
+  it('com Sessão aberta e uma Próxima ação, o Hoje tem um só Continuar', async () => {
+    const repo = await repoComAgora();
+    await iniciarSessao(repo, { atividade: 'lei' });
+    await abrir('/', repo);
+    await screen.findByRole('region', { name: 'Sessão aberta' });
+    expect(screen.getAllByRole('link', { name: /^Continuar/ })).toHaveLength(1);
+    expect(screen.queryByRole('link', { name: 'Continuar a leitura' })).toBeNull();
+  });
 });
 
 it('no Hoje vazio não há cartão de Sessão: o começo é um só', async () => {
