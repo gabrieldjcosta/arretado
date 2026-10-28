@@ -218,6 +218,68 @@ const CANETA_DA_NOITE = {
   'quadro-marca': 'transparent',
 };
 
+/**
+ * O néon suave e o Zé (D-D10): o brilho é azul piscina nos dois mundos; de dia não deixa nada em repouso
+ * (0,16 só no Zé) e à noite deixa 30% (32% no Zé). A linha do Zé é branca; a faixa de dia afunda a 32 e 24 px.
+ * O ponto da flor é amarelo e igual nos dois mundos.
+ */
+const ZE_DO_DIA = {
+  'neon-cor': '#39caef',
+  'neon-aceso': '0.55',
+  'neon-repouso': '0',
+  'z-nucleo': '#ffffff',
+  'z-banda': '#39caef',
+  'z-banda-p': '#0e93b4',
+  'z-miolo': '#39caef',
+  'z-olho': 'var(--tinta)',
+  'z-olho-halo': 'transparent',
+  'z-haste': 'var(--tinta)',
+  'z-bochecha': '#ec5675',
+  'z-bochecha-op': '0.85',
+  'z-bloom-aceso': '0.55',
+  'z-bloom-repouso': '0.16',
+  'z-dia': 'inline',
+  'z-noite': 'none',
+  'z-ponto': '#ffc53d',
+  'z-ponto-brilho': '#ffc53d',
+};
+/** O que a noite troca; o resto (a cor do brilho, a linha, o miolo, a faixa e o ponto) é o mesmo e fica só na raiz. */
+const ZE_DA_NOITE = {
+  'neon-aceso': '0.6',
+  'neon-repouso': '0.3',
+  'z-banda-p': '#39caef',
+  'z-olho': '#ffffff',
+  'z-olho-halo': '#39caef',
+  'z-haste': '#ffffff',
+  'z-bochecha': '#ff86a6',
+  'z-bochecha-op': '1',
+  'z-bloom-aceso': '0.6',
+  'z-bloom-repouso': '0.32',
+  'z-dia': 'none',
+  'z-noite': 'inline',
+};
+const ZE_IGUAL_NOS_DOIS_MUNDOS = [
+  'neon-cor',
+  'z-nucleo',
+  'z-banda',
+  'z-miolo',
+  'z-ponto',
+  'z-ponto-brilho',
+];
+/**
+ * Os únicos CSS que podem falar de `neon` ou `bloom`: os tokens (`estilos.css`) e os arquivos dos traços
+ * que a caneta desenha: o Zé, a escrita do nome, o traço de seleção e o quadro do cacto (e, quando
+ * entrar, os ícones do Passeio). Botão, texto, cartão, borda e ícone parado não brilham.
+ */
+const CSS_COM_NEON = [
+  'estilos.css',
+  'ze.css',
+  'escrita.css',
+  'escrita-b.css',
+  'traco.css',
+  'quadro.css',
+];
+
 function arquivosCss(pasta: string): string[] {
   return readdirSync(pasta, { withFileTypes: true }).flatMap((e) => {
     const caminho = path.join(pasta, e.name);
@@ -271,6 +333,19 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
   it('a caneta e o quadro do cacto têm os tokens dos dois mundos nos três blocos (Q4)', () => {
     expect(claro).toMatchObject(CANETA_DO_DIA);
     for (const bloco of [escuroSistema, escuroManual]) expect(bloco).toMatchObject(CANETA_DA_NOITE);
+  });
+
+  it('o néon suave e o Zé têm os tokens dos dois mundos nos três blocos (D-D10)', () => {
+    expect(claro).toMatchObject(ZE_DO_DIA);
+    for (const bloco of [escuroSistema, escuroManual]) expect(bloco).toMatchObject(ZE_DA_NOITE);
+  });
+
+  it('o azul do brilho e o amarelo do ponto não mudam com o mundo: um valor só, na raiz', () => {
+    for (const nome of ZE_IGUAL_NOS_DOIS_MUNDOS) {
+      expect(escuroSistema, nome).not.toHaveProperty(nome);
+      expect(escuroManual, nome).not.toHaveProperty(nome);
+    }
+    expect(claro['neon-cor']).toBe(claro['z-banda']);
   });
 
   it('a casca muda de um mundo para o outro como no contrato da D-D9 (Q2)', () => {
@@ -349,6 +424,19 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
           ),
       );
       expect(pilulas).toEqual([]);
+    });
+
+    it('o brilho do néon só existe nos traços de caneta e nos tokens (D-D10)', () => {
+      const usos = css()
+        .filter((arquivo) => !CSS_COM_NEON.includes(path.basename(arquivo)))
+        .flatMap((arquivo) =>
+          readFileSync(arquivo, 'utf8')
+            .split('\n')
+            .flatMap((linha, i) =>
+              /neon|bloom/i.test(linha) ? [`${path.basename(arquivo)}:${i + 1}`] : [],
+            ),
+        );
+      expect(usos).toEqual([]);
     });
 
     it('nenhuma sombra tem desfoque: a profundidade é só a sombra dura do botão de dia', () => {
