@@ -156,6 +156,12 @@ export function Ze({ humor = 'neutro', tamanho = 'grande', className, ref }: Pro
           <circle className="z-fp" cx={pontoX} cy={pontoY} r={FLOR.r} />
         </g>
       </g>
+      {/* A luz da caneta: o ponto que desenha o contorno antes de virar a flor (a Chegada da primeira vez a
+          leva pelo traço). Fica de fora da flor, que o controle esconde e mostra à parte. */}
+      <g className="z-pena" visibility="hidden">
+        <circle className="z-fh" r={FLOR.disco} filter={`url(#${ids.halo})`} />
+        <circle className="z-fp" r={FLOR.r} />
+      </g>
     </svg>
   );
 }

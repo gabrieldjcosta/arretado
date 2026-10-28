@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { criarEncontro } from '../../componentes/escrita/encontro';
 import { escritaDaAbertura } from '../../componentes/escrita/frequencia';
 import { ContextoDaAbertura, type VezDaEscrita } from '../../componentes/escrita/vez-da-escrita';
 import { useRepositorio } from '../../dados/contexto';
@@ -7,7 +8,9 @@ import { decidirNaAberturaDoApp } from './regras';
 
 /**
  * Decide, uma vez por abertura do aplicativo, quem escreve o nome (a camada de tela cheia ou o
- * cabeçalho), monta a camada quando é dela e diz a quem abre por cima do app (a Chegada) que espere.
+ * cabeçalho), monta a camada quando é dela e diz a quem abre por cima do app (a Chegada) que espere. Na
+ * primeira vez, com a Chegada por vir, a luz visita o Zé dela: a Chegada abre já, escondida, e o
+ * `Encontro` que este provedor guarda leva a oferta dela à Abertura.
  *
  * A abertura em que a frequência não pede o nome (as demais do Dia, ou movimento reduzido) é decidida
  * na hora, sem esperar dado nenhum: o cabeçalho nasce parado e nada muda. Nas outras, a leitura das
@@ -23,6 +26,7 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
       : { estado: 'pendente' },
   );
   const [saiu, setSaiu] = useState(false);
+  const [encontro] = useState(criarEncontro);
 
   useEffect(() => {
     if (vez.estado !== 'pendente') return;
@@ -40,14 +44,28 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   }, []);
 
   const naTela = vez.estado === 'decidida' && vez.onde === 'tela' && !saiu ? vez : null;
+  // O Calmo não tem voo: a luz não visita o Zé, e a Chegada espera a camada sair, como a do Dia.
+  const visitaOZe = naTela !== null && naTela.chegada && !naTela.calmo;
   const valor = useMemo(
-    () => ({ vez, emCurso: vez.estado === 'pendente' || naTela !== null }),
-    [vez, naTela],
+    () => ({
+      vez,
+      emCurso: vez.estado === 'pendente' || naTela !== null,
+      voaParaAChegada: visitaOZe,
+      encontro,
+    }),
+    [vez, naTela, visitaOZe, encontro],
   );
   return (
     <ContextoDaAbertura.Provider value={valor}>
       {children}
-      {naTela && <Abertura escrita={naTela.escrita} calmo={naTela.calmo} aoSair={aoSair} />}
+      {naTela && (
+        <Abertura
+          escrita={naTela.escrita}
+          calmo={naTela.calmo}
+          aoSair={aoSair}
+          encontro={visitaOZe ? encontro : undefined}
+        />
+      )}
     </ContextoDaAbertura.Provider>
   );
 }

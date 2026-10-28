@@ -1,8 +1,18 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import { EscritaDoNome } from '../../componentes/escrita/EscritaDoNome';
+import type { Encontro, PeDoZe } from '../../componentes/escrita/encontro';
 import { PONTO } from '../../componentes/escrita/geometria';
+import { FLOR } from '../../componentes/ze/geometria';
 import { documentoInativo, esperar } from '../../movimento';
-import { andar, curvaDaViagem, luzNaViagem, type Ponto, type Viagem } from './voo';
+import {
+  andar,
+  curvaDaViagem,
+  luzNaViagem,
+  pontoDeControleAoZe,
+  type Ponto,
+  type Viagem,
+} from './voo';
 import './abertura.css';
 
 /**
@@ -24,6 +34,18 @@ const LARGURA_DA_CAIXA = 1015;
 /** Quanto o toque ou a tecla que pulou ainda pode gerar de clique (ou de soltar a tecla) a engolir. */
 const JANELA_DO_GESTO_MS = 700;
 
+/**
+ * Na primeira vez a luz espera a Chegada se oferecer, depois da pausa. Ela costuma estar pronta (abre
+ * enquanto o nome se escreve); passado o prazo, a luz vai ao cabeçalho, como se ela não viesse.
+ */
+const PRAZO_DA_CHEGADA_MS = 600;
+
+/** O halo da luz, em múltiplos do raio do ponto: o da marca, e o da flor do Zé (o da caneta que ela vira). */
+const HALO_DA_MARCA = 1.35;
+const HALO_DO_ZE = FLOR.disco / FLOR.r;
+/** O desfoque da flor do Zé em unidades do desenho (`ids.halo` do `Ze.tsx`): vira pixels pela escala da luz. */
+const DESFOQUE_DO_ZE = 4.5;
+
 type Escrita = 'completa' | 'curta';
 
 interface Props {
@@ -32,6 +54,12 @@ interface Props {
   calmo: boolean;
   /** A camada acabou (ou foi pulada): quem a monta a tira da tela. Chamada mais de uma vez, não faz mal. */
   aoSair: () => void;
+  /**
+   * Por onde a Chegada se oferece à luz: só na primeira vez, com a Chegada por vir. Com ele, a luz voa até o
+   * pé esquerdo do Zé das Boas-vindas, e a Chegada se revela quando ela pousa; sem ele (ou sem oferta a
+   * tempo), a luz pousa no cabeçalho.
+   */
+  encontro?: Encontro;
 }
 
 const centro = (el: Element): Ponto => {
@@ -45,28 +73,63 @@ const centro = (el: Element): Ponto => {
  * viagem: o nome só esmaece.
  */
 function medirAViagem(camada: HTMLElement): Viagem | null {
-  const disco = camada.querySelector('.eb-disco');
-  const nome = camada.querySelector('svg.eb');
+  const saida = medirASaida(camada);
   const alvo = document.querySelector('.marca .lockup-ponto');
   const marca = alvo?.closest('svg');
-  if (!disco || !nome || !alvo || !marca) return null;
-  const [larguraDoNome, larguraDaMarca] = [nome, marca].map((s) => s.getBoundingClientRect().width);
-  if (!larguraDoNome || !larguraDaMarca) return null;
+  if (!saida || !alvo || !marca) return null;
+  const larguraDaMarca = marca.getBoundingClientRect().width;
+  if (!larguraDaMarca) return null;
   return {
-    de: centro(disco),
+    de: saida.de,
     para: centro(alvo),
-    raioDe: (PONTO.raio * larguraDoNome) / LARGURA_DA_CAIXA,
+    raioDe: saida.raioDe,
     raioPara: (PONTO.raio * larguraDaMarca) / LARGURA_DA_CAIXA,
   };
 }
 
-/** Põe a luz (halo, disco de marca-texto e ponto) em `luz`, com o raio dado ao ponto. */
-function pousarALuz(grupo: SVGGElement, luz: Ponto & { raio: number }) {
+/** Onde a luz sai (o disco atrás do ponto, no braço do cacto do nome) e o raio dela aí. */
+function medirASaida(camada: HTMLElement): Pick<Viagem, 'de' | 'raioDe'> | null {
+  const disco = camada.querySelector('.eb-disco');
+  const nome = camada.querySelector('svg.eb');
+  if (!disco || !nome) return null;
+  const larguraDoNome = nome.getBoundingClientRect().width;
+  if (!larguraDoNome) return null;
+  return { de: centro(disco), raioDe: (PONTO.raio * larguraDoNome) / LARGURA_DA_CAIXA };
+}
+
+/**
+ * A viagem até o pé esquerdo do Zé das Boas-vindas, que a Chegada mediu (`pe`): num arco que sobe
+ * acima dos dois pontos, e a luz chega do tamanho da luz da caneta do Zé.
+ */
+function medirAViagemAoZe(camada: HTMLElement, pe: PeDoZe): Viagem | null {
+  const saida = medirASaida(camada);
+  if (!saida) return null;
+  const para = { x: pe.x, y: pe.y };
+  return {
+    de: saida.de,
+    para,
+    raioDe: saida.raioDe,
+    raioPara: pe.raio,
+    controle: pontoDeControleAoZe(saida.de, para),
+  };
+}
+
+/**
+ * Põe a luz (halo, disco de marca-texto e ponto) em `luz`, com o raio dado ao ponto. Na viagem ao Zé
+ * (`aoZe`) ela já é o ponto dele: sem o disco, com o halo e o desfoque da flor dele na escala do ponto.
+ */
+function pousarALuz(grupo: SVGGElement, luz: Ponto & { raio: number }, aoZe = false) {
   const [halo, disco, ponto] = grupo.children;
   grupo.setAttribute('transform', `translate(${luz.x.toFixed(2)} ${luz.y.toFixed(2)})`);
-  halo?.setAttribute('r', (luz.raio * 1.35).toFixed(2));
-  disco?.setAttribute('r', (luz.raio * (PONTO.disco / PONTO.raio)).toFixed(2));
+  halo?.setAttribute('r', (luz.raio * (aoZe ? HALO_DO_ZE : HALO_DA_MARCA)).toFixed(2));
+  disco?.setAttribute('r', aoZe ? '0' : (luz.raio * (PONTO.disco / PONTO.raio)).toFixed(2));
   ponto?.setAttribute('r', luz.raio.toFixed(2));
+  if (aoZe) {
+    grupo.style.setProperty(
+      '--abertura-desfoque',
+      `${((luz.raio * DESFOQUE_DO_ZE) / FLOR.r).toFixed(2)}px`,
+    );
+  }
   grupo.setAttribute('visibility', 'visible');
 }
 
@@ -105,9 +168,11 @@ function engolirOQueSegue(origem: Event): void {
  * Quem usa leitor de tela lê a tela de baixo sem esperar.
  *
  * O nome em si é o `EscritaDoNome` de sempre; a luz que sai do braço do cacto e pousa no ponto do
- * cabeçalho é desenhada aqui, quadro a quadro, medindo os dois pontos na tela.
+ * cabeçalho é desenhada aqui, quadro a quadro, medindo os dois pontos na tela. Na primeira vez, com a
+ * Chegada por vir (`encontro`), ela pousa no pé esquerdo do Zé das Boas-vindas, que já está pronto por baixo,
+ * escondido: a Chegada se revela no mesmo quadro em que a luz some, e a caneta do Zé continua dali.
  */
-export function Abertura({ escrita, calmo, aoSair }: Props) {
+export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
   const camada = useRef<HTMLDivElement>(null);
   const luz = useRef<SVGGElement>(null);
   const primeira = escrita === 'completa';
@@ -139,6 +204,11 @@ export function Abertura({ escrita, calmo, aoSair }: Props) {
     const opcoes = { capture: true, once: true } as const;
     document.addEventListener('pointerdown', pular, opcoes);
     document.addEventListener('keydown', pular, opcoes);
+    // Pousada a luz no Zé, a Abertura só esmaece: o toque ou a tecla seguinte já é da Chegada.
+    const desligarOPulo = () => {
+      document.removeEventListener('pointerdown', pular, opcoes);
+      document.removeEventListener('keydown', pular, opcoes);
+    };
 
     const tempos = TEMPOS[escrita];
     // Uma função e não `sinal.aborted` direto: o TypeScript fixaria o valor da primeira checagem para as seguintes,
@@ -155,24 +225,42 @@ export function Abertura({ escrita, calmo, aoSair }: Props) {
       }
       await esperar(tempos.nome + tempos.pausa, sinal);
       if (abortado()) return;
-      const viagem = medirAViagem(raiz);
+      // Com a Chegada por vir, a luz vai ao Zé dela; sem oferta no prazo (ou sem o Zé à vista), ao cabeçalho.
+      const oferta = encontro ? await encontro.esperar(PRAZO_DA_CHEGADA_MS, sinal) : null;
+      if (abortado()) return;
+      const pe = oferta?.medirPe() ?? null;
+      const aoZe = pe ? medirAViagemAoZe(raiz, pe) : null;
+      const viagem = aoZe ?? medirAViagem(raiz);
       if (!viagem) {
         raiz.dataset.fase = 'saindo';
         await esperar(SAIDA_MS, sinal);
         return;
       }
+      if (aoZe) raiz.dataset.voo = 'ze';
       // A luz do nome passa a ser a que voa: no mesmo quadro, uma some e a outra sai do mesmo lugar.
-      pousarALuz(grupo, { ...viagem.de, raio: viagem.raioDe });
+      pousarALuz(grupo, { ...viagem.de, raio: viagem.raioDe }, !!aoZe);
       raiz.dataset.fase = 'voando';
       await andar(
         tempos.voo,
         curvaDaViagem,
         (progresso) => {
-          pousarALuz(grupo, luzNaViagem(viagem, progresso));
+          pousarALuz(grupo, luzNaViagem(viagem, progresso), !!aoZe);
         },
         sinal,
       );
       if (abortado()) return;
+      if (aoZe && oferta) {
+        // A luz pousou no pé do Zé. A Chegada se revela e a caneta dele assume, antes de qualquer
+        // quadro (`flushSync`): a luz de cá só some depois, e nunca há um quadro sem uma das duas.
+        desligarOPulo();
+        flushSync(() => {
+          oferta.receber();
+        });
+        grupo.setAttribute('visibility', 'hidden');
+        raiz.dataset.fase = 'saindo';
+        await esperar(SAIDA_MS, sinal);
+        return;
+      }
       grupo.setAttribute('visibility', 'hidden');
       await esperar(Math.max(0, SAIDA_MS - tempos.voo), sinal);
     };
@@ -189,10 +277,9 @@ export function Abertura({ escrita, calmo, aoSair }: Props) {
 
     return () => {
       controle.abort();
-      document.removeEventListener('pointerdown', pular, opcoes);
-      document.removeEventListener('keydown', pular, opcoes);
+      desligarOPulo();
     };
-  }, [escrita, calmo, aoSair]);
+  }, [escrita, calmo, aoSair, encontro]);
 
   return (
     <div
