@@ -71,6 +71,8 @@ export function RegistrarErro() {
   const [oQueFoi, setOQueFoi] = useState('');
   const [complemento, setComplemento] = useState<Complemento>({});
   const [lembrada, setEscolha] = useState<Escolha>(lerEscolha);
+  // Depois que a pessoa mexe num dos dois campos, vale o que ela deixou, inclusive "—" nos dois.
+  const [mexeu, setMexeu] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
   const [criarCartaoAoSalvar, setCriarCartaoAoSalvar] = useState(true);
@@ -86,19 +88,25 @@ export function RegistrarErro() {
       p.id === lembrada.pontoId &&
       (!disciplinaLembrada || p.disciplinaId === disciplinaLembrada.id),
   );
-  // Sem escolha lembrada, a Sessão aberta num Ponto já diz de que Ponto é o erro.
+  // A Sessão aberta num Ponto diz de que Ponto é o erro (vale mais que a escolha lembrada: é o sinal mais
+  // atual). Só até a pessoa mexer num dos campos: limpar um campo também é escolher, e a Sessão não a desfaz.
   const pontoDaSessao =
-    !disciplinaLembrada && !pontoLembrado && sessao?.alvo?.tipo === 'ponto'
+    !mexeu && sessao?.alvo?.tipo === 'ponto'
       ? pontos?.find((p) => p.id === sessao.alvo?.id)
       : undefined;
+  const disciplinaDaSessao = disciplinas?.find((d) => d.id === pontoDaSessao?.disciplinaId);
   const escolha: Escolha = pontoDaSessao
-    ? { disciplinaId: pontoDaSessao.disciplinaId, pontoId: pontoDaSessao.id }
+    ? {
+        ...(disciplinaDaSessao ? { disciplinaId: disciplinaDaSessao.id } : {}),
+        pontoId: pontoDaSessao.id,
+      }
     : {
         ...(disciplinaLembrada ? { disciplinaId: disciplinaLembrada.id } : {}),
         ...(pontoLembrado ? { pontoId: pontoLembrado.id } : {}),
       };
 
   const mudarEscolha = (m: Escolha) => {
+    setMexeu(true);
     setEscolha(() => {
       const nova = { ...escolha, ...m };
       for (const [k, v] of Object.entries(nova)) if (!v) Reflect.deleteProperty(nova, k);
@@ -118,7 +126,7 @@ export function RegistrarErro() {
       const erro = await registrarErro(repo, {
         ...complemento,
         ...escolha,
-        // Com uma Sessão aberta, o erro nasce ligado a ela, de qualquer tela (o resumo ao encerrar conta).
+        // Com uma Sessão aberta, o erro nasce ligado a ela (o resumo ao encerrar conta pela faixa de tempo).
         ...(sessao ? { sessaoId: sessao.id } : {}),
         fraseCorreta: frase,
         ...(resultado ? { resultado } : {}),
@@ -167,8 +175,8 @@ export function RegistrarErro() {
     if (!depois) campoFrase.current?.focus();
   }, [depois]);
 
-  const nomeDisciplina = disciplinaLembrada?.nome;
-  const ponto = pontoLembrado;
+  const nomeDisciplina = disciplinas?.find((d) => d.id === escolha.disciplinaId)?.nome;
+  const ponto = pontos?.find((q) => q.id === escolha.pontoId);
 
   if (depois) {
     return (
