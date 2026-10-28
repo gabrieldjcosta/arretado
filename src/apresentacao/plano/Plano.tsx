@@ -8,6 +8,8 @@ import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
 import { ProvaDoPlano } from './ProvaDoPlano';
+import { ProximoBloco } from './ProximoBloco';
+import { useCicloPadrao } from './ciclo/padrao';
 import { ROTULO_FAIXA } from './pontos/carregar';
 import './estilos-plano.css';
 
@@ -30,6 +32,7 @@ function resumoDosPontos(n: number) {
 export function Plano() {
   const { dados } = useDados(pontosEDisciplinas);
   const [confirmacao, setConfirmacao] = useState<string | null>(null);
+  useCicloPadrao();
   if (!dados) return <Esqueleto />;
   const grupos = porDisciplina(dados.disciplinas, dados.pontos);
 
@@ -76,6 +79,7 @@ export function Plano() {
         </>
       ) : (
         <>
+          <ProximoBloco />
           <p className="dica">
             {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.
           </p>
@@ -84,6 +88,9 @@ export function Plano() {
           </Link>
           <Link to="/plano/ciclo" className="botao botao-texto na-margem">
             Ciclo de estudo
+          </Link>
+          <Link to="/plano/tarefas" className="botao botao-texto na-margem">
+            Tarefas
           </Link>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>

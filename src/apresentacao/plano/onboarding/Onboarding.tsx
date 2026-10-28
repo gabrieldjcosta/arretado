@@ -14,6 +14,8 @@ import {
   type IndiceDoCatalogo,
 } from '../../../dominios/catalogo';
 import { linhasDoEdital } from '../../../integracoes/catalogo/linhas';
+import { ProvaDoPlano } from '../ProvaDoPlano';
+import { garantirCicloPadrao } from '../ciclo/padrao';
 import { prepararPontos, type PontosPreparados } from '../../../integracoes/pontos/importar';
 import { PreviaImportacao } from '../../conta/dados/PreviaImportacao';
 import { AcaoAgora } from '../../componentes/AcaoAgora';
@@ -82,6 +84,7 @@ function ComecePorAqui({ ponto, materia }: PlanoCriado) {
         <Vazio titulo="Plano criado" />
       )}
       {materia && <p className="dica">Matéria: {materia}</p>}
+      <ProvaDoPlano />
       <p className="dica">
         Para desfazer, use Conta › Dados › Importações. Na <Link to="/plano">Trilha</Link> estão
         todos os pontos.
@@ -195,6 +198,7 @@ export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
       await aplicar(repo, preparado.pacote, preparado.previa, new Map(), {
         descricao: 'Plano pelo catálogo',
       });
+      await garantirCicloPadrao(repo).catch(() => undefined);
       limparRascunho();
       setCriado(planoCriado(preparado.pacote, linhas));
     } catch {
