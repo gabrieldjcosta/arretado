@@ -1956,6 +1956,37 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **CSP: "This document requires 'TrustedScriptURL' assignment" ao registrar.** A CSP exige Trusted Types para o endereço de um script, e `navigator.serviceWorker.register` entra nisso. Solução: a política `offline` (só devolve o endereço fixo `sw.js`), listada em `trusted-types dompurify offline` (`config/seguranca.ts`).
 - **Nuvem: o Playwright 1.56 quer o Chromium 1194 e o container tem o 1243.** O download é bloqueado pela rede. Saída usada em 25/10/2026: pastas `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/` e `/opt/pw-browsers/chromium-1194/chrome-linux/` com links para os arquivos do 1243 (o `headless_shell` aponta para `chrome-headless-shell`). Serve só para rodar o E2E na nuvem; o CI instala o certo.
 - **Previsível (F4-C):** instalar na tela inicial (`beforeinstallprompt`), pré-cache de blocos do catálogo e do acervo por escolha da pessoa, e aviso de pouco espaço (`navigator.storage.estimate`) ficam para a F4-C; a atualização em segundo plano com `periodicSync` também.
+
+## Tela de carregamento (D-D10, 28/10/2026)
+
+### A tela de carregamento aparece sem estilo, ou o build não gera `carregamento.css`
+- **Sintoma:** o Zé aparece enorme e sem cor, ou o texto da espera fica à mostra; `dist/` não tem `carregamento.css`. **Causa:** um CSS de `src/` é juntado ao do app pelo Vite e não existe separado; só o que está em `public/` sai como arquivo, e o service worker só guarda o que a lista `DE_PUBLIC` do `offline()` nomeia.
+- **Solução:** o CSS fica em `public/carregamento.css`, o `index.html` o liga com `<link href="/carregamento.css">` e `'carregamento.css'` está em `DE_PUBLIC` (`vite.config.ts`). **Prevenção:** `carregamento-html.test.ts` e o E2E que abre o app sem rede.
+- **Origem:** previsto — L1 (tela de carregamento); medido em 28/10/2026.
+
+### O build falha com "arretado-carregamento: link do CSS principal não achado"
+- **Sintoma:** `npm run build` aborta com essa mensagem. **Causa:** o plugin `carregamento()` move o `<link rel="stylesheet">` do CSS principal para logo depois do fragmento da tela, para a primeira pintura não esperar o CSS grande, e procura o formato `<link rel="stylesheet" crossorigin href="./assets/index-….css">`; uma versão nova do Vite, ou uma opção de build, que mude esse formato quebra a busca.
+- **Solução:** ajustar a expressão regular do plugin ao `<link>` que o Vite passou a gerar. **Prevenção:** o próprio erro (falha alto, em vez de perder a primeira pintura mais cedo em silêncio) e o teste do HTML construído (o fragmento vem antes do `<link>` do CSS principal e este antes de `#raiz`).
+- **Origem:** previsto — L1.
+
+### A CSP barra a tela de carregamento (`style-src`)
+- **Sintoma:** o console mostra `Refused to apply inline style` ou `Refused to execute inline script`, e o E2E falha por violação de CSP. **Causa:** `style=`, `<style>`, `<script>` ou `onclick` no fragmento do `index.html`; a CSP é `script-src 'self'; style-src 'self'`.
+- **Solução:** o SVG usa atributos de apresentação (`stroke`, `fill`, `filter`) e toda a animação está no CSS externo; tirar o inline. **Prevenção:** `carregamento-html.test.ts` falha se o fragmento tiver `style`, `script`, `onload` ou `onclick`.
+- **Origem:** previsto — L1.
+
+### O Zé pisca na tela de carregamento numa abertura rápida
+- **Sintoma:** com o app em cache, o Zé aparece por um instante antes do Hoje. **Causa:** o app ficou pronto depois do silêncio do começo (`--c-t0`, 1 s). **Solução:** subir `--c-t0` em `public/carregamento.css`. Medido com CPU 4x: com cache o app fica pronto em até 0,73 s, e a 6x em até 0,98 s, no relógio da tela.
+- **Prevenção:** `node fonte/carregamento/pronto-no-relogio.cjs <porta> cache 4 14`, e num Aparelho de verdade (o do Gabriel).
+- **Origem:** previsto — L1 (a medir no Aparelho).
+
+### O teste da tela de carregamento acusa o contorno do Zé diferente do componente
+- **Sintoma:** `carregamento-html.test.ts` falha em "o contorno é o do Zé do app". **Causa:** a geometria do Zé mudou (`PARAMETROS_DO_ZE`, `contornoZe` em `componentes/ze/geometria.ts`) e o `index.html` leva o contorno copiado, em sete camadas com o mesmo `d` (a tela de carregamento não pode importar o componente: o pacote ainda não chegou). **Solução:** copiar o novo `CORPO.d` para as sete camadas do fragmento (aura, faixas do dia e da noite, linha, as duas luzes que viajam e o miolo). **Prevenção:** esse teste (critério 24 do contrato do Zé).
+- **Origem:** previsto — L1.
+
+### E2E de tempo da tela de carregamento fica instável
+- **Sintoma:** `carregamento.spec.ts` falha de vez em quando nos instantes (1,1 s, 1,8 s, 2,5 s). **Causa:** esperar com `waitForTimeout` mede o relógio da máquina, não o das animações. **Solução:** "saltar" o relógio das animações (`document.getAnimations().forEach((a) => { a.pause(); a.currentTime = t; })`). **Prevenção:** o próprio padrão do arquivo; as conferências de `verifica-carregamento.cjs` fazem o mesmo.
+- **Origem:** previsto — L1.
+
 ## Mapa da norma (AP-04, 25/10/2026)
 
 - **A norma do acervo não mostra "Mapa da norma" no Leitor.** Causa: a chamada só aparece quando `public/incidencia/indice.json` lista o `origemAcervo.id` da norma em algum recorte; norma colada ou importada por URL não tem `origemAcervo`. Solução: gerar os arquivos de novo com a norma na tabela de pesos (`node scripts/incidencia.mjs mapa <artigos.csv> public/incidencia <recorte> "<título>" [questões] [período]`; o gerador só aceita item que esteja em `public/acervo/indice.json`, e relata os que ficaram de fora). Prevenção: `scripts/incidencia/mapa.test.ts`.

@@ -5,6 +5,7 @@ import {
   type Repositorio,
 } from '../../core/persistencia';
 import { contasHabilitadas } from '../../integracoes/conta';
+import { esconderCarregamento } from '../carregamento';
 import { registrarAceitePendente } from '../conta/entrar/aceite';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
@@ -55,6 +56,11 @@ export function ProvedorRepositorio({
       desinscrever();
     };
   }, [abrir, registro]);
+
+  // A tela do index.html sai quando há o que mostrar: o app aberto ou, se não abre, a explicação.
+  useEffect(() => {
+    if (estado.tipo !== 'carregando') void esconderCarregamento();
+  }, [estado.tipo]);
 
   if (estado.tipo === 'carregando') {
     return (
