@@ -85,6 +85,17 @@
   visibility: hidden;
 }
 
+/* O "Pular" sai com o voo: com o fundo já transparente ele ficaria sozinho sobre a barra de baixo. Esmaece e,
+   no fim, o visibility o tira de vez (e do foco). */
+.abertura[data-fase='voando'] .abertura-pular,
+.abertura[data-fase='saindo'] .abertura-pular {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 160ms ease,
+    visibility 0s linear 160ms;
+}
+
 /* A luz que voa: um ponto com o disco de marca-texto e o halo, num <svg> do tamanho da tela. As medidas
    e a posição vêm do script, em pixels da tela. */
 .abertura-luz {
