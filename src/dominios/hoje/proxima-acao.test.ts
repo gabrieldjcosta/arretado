@@ -129,7 +129,7 @@ describe('decidirProximaAcao (A1)', () => {
 
 describe('bloco do ciclo na Próxima ação', () => {
   const ciclo = { id: 'c1', disciplina: 'Penal', blocoOrdem: 2, total: 8, volta: 3, minutos: 40 };
-  it('vem depois da revisão vencida e antes da tarefa e da leitura salva', () => {
+  it('vem depois da revisão vencida e da tarefa da fila, e antes da leitura salva', () => {
     const base = { cartoesVencidos: 0, frasesVencidas: 0, ciclo, leitura };
     const r = decidirProximaAcao(base);
     expect(r).toMatchObject({
@@ -146,5 +146,14 @@ describe('bloco do ciclo na Próxima ação', () => {
       acao: { tipo: 'revisao_vencida' },
     });
     expect(decidirProximaAcao(base, ['ciclo'])).toMatchObject({ acao: { tipo: 'leitura_salva' } });
+  });
+
+  it('a tarefa que a pessoa escreveu vem antes do bloco do Ciclo', () => {
+    const base = { cartoesVencidos: 0, frasesVencidas: 0, ciclo, leitura };
+    const tarefa = { id: 't1', titulo: 'Reler o art. 5º' };
+    expect(decidirProximaAcao({ ...base, tarefa })).toMatchObject({ acao: { tipo: 'tarefa' } });
+    expect(decidirProximaAcao({ ...base, tarefa }, ['tarefa'])).toMatchObject({
+      acao: { tipo: 'ciclo' },
+    });
   });
 });
