@@ -167,6 +167,8 @@ export interface Concentracao {
   total: number;
   /** A parte da massa que esses artigos concentram (0 a 1). */
   parcela: number;
+  /** A massa dos artigos em vigor (soma dos pesos): quase o número de questões que caíram na norma. */
+  massaTotal: number;
 }
 
 /** "81 dos 432 artigos concentram 70% do que a banca cobrou desta norma." */
@@ -184,7 +186,7 @@ export function concentracao(quadrados: readonly QuadradoDoMapa[]): Concentracao
       massa += q.peso;
     }
   }
-  return { artigos, total, parcela: massaTotal > 0 ? massa / massaTotal : 0 };
+  return { artigos, total, parcela: massaTotal > 0 ? massa / massaTotal : 0, massaTotal };
 }
 
 export interface TrechoDoMapa {
