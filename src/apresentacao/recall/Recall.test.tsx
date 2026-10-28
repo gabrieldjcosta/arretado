@@ -8,6 +8,7 @@ import {
   criarFraseDeTrecho,
   registrarErro,
 } from '../../dominios/recall/servico';
+import { iniciarSessao } from '../../dominios/sessao/servico';
 import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
@@ -26,6 +27,27 @@ const erroAntigo = (repo: Repositorio, oQueFoi: string) =>
   repo.colecao('erros').criar({ resultado: 'errou', oQueFoi, status: 'aberto' });
 
 describe('captura de erro (6.2)', () => {
+  it('com uma Sessão aberta num Ponto, o erro nasce ligado à Sessão e já vem com o Ponto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const penal = await repo.colecao('disciplinas').criar({ nome: 'Penal' });
+    const furto = await repo.colecao('pontos').criar({ titulo: 'Furto', disciplinaId: penal.id });
+    const sessao = await iniciarSessao(repo, {
+      alvo: { tipo: 'ponto', id: furto.id, rotulo: 'Furto' },
+    });
+    const { usuario } = await abrir('/recall/registrar', repo);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ponto do edital (opcional)')).toHaveValue(furto.id);
+    });
+    await usuario.type(
+      screen.getByLabelText('Frase correta'),
+      'Furto é subtrair coisa alheia móvel.',
+    );
+    await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
+    await screen.findByText('Frase registrada.');
+    const [erro] = await repo.colecao('erros').todosDoUsuario();
+    expect(erro).toMatchObject({ sessaoId: sessao.id, pontoId: furto.id, disciplinaId: penal.id });
+  });
+
   it('só a frase correta é obrigatória (D25); sem "o que foi" não pergunta pelo cartão', async () => {
     const { repo, usuario } = await abrir('/recall/registrar');
     const salvar = await screen.findByRole('button', { name: 'Salvar' });

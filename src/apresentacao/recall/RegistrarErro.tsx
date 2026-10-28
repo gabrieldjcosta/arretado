@@ -11,6 +11,7 @@ import {
   registrarErro,
 } from '../../dominios/recall/servico';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { sessaoAberta } from '../sessao/carregadores';
 import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro, type Complemento } from './CamposErro';
@@ -61,6 +62,7 @@ function gravarEscolha(e: Escolha) {
 export function RegistrarErro() {
   const repo = useRepositorio();
   const vinculos = useDados(pontosEDisciplinas);
+  const { dados: sessao } = useDados(sessaoAberta);
   const [frase, setFrase] = useState('');
   const [resultado, setResultado] = useState<ResultadoErro | null>(null);
   const [ocultos, setOcultos] = useState<Intervalo[]>([]);
@@ -84,10 +86,17 @@ export function RegistrarErro() {
       p.id === lembrada.pontoId &&
       (!disciplinaLembrada || p.disciplinaId === disciplinaLembrada.id),
   );
-  const escolha: Escolha = {
-    ...(disciplinaLembrada ? { disciplinaId: disciplinaLembrada.id } : {}),
-    ...(pontoLembrado ? { pontoId: pontoLembrado.id } : {}),
-  };
+  // Sem escolha lembrada, a Sessão aberta num Ponto já diz de que Ponto é o erro.
+  const pontoDaSessao =
+    !disciplinaLembrada && !pontoLembrado && sessao?.alvo?.tipo === 'ponto'
+      ? pontos?.find((p) => p.id === sessao.alvo?.id)
+      : undefined;
+  const escolha: Escolha = pontoDaSessao
+    ? { disciplinaId: pontoDaSessao.disciplinaId, pontoId: pontoDaSessao.id }
+    : {
+        ...(disciplinaLembrada ? { disciplinaId: disciplinaLembrada.id } : {}),
+        ...(pontoLembrado ? { pontoId: pontoLembrado.id } : {}),
+      };
 
   const mudarEscolha = (m: Escolha) => {
     setEscolha(() => {
@@ -109,6 +118,8 @@ export function RegistrarErro() {
       const erro = await registrarErro(repo, {
         ...complemento,
         ...escolha,
+        // Com uma Sessão aberta, o erro nasce ligado a ela, de qualquer tela (o resumo ao encerrar conta).
+        ...(sessao ? { sessaoId: sessao.id } : {}),
         fraseCorreta: frase,
         ...(resultado ? { resultado } : {}),
         ...(oQueFoi.trim() ? { oQueFoi } : {}),
