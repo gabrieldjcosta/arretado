@@ -17,8 +17,10 @@ const quadro = lerCss('quadro', 'quadro.css');
 
 describe('o néon na escrita do nome', () => {
   it('a cópia larga tem 30 de largura, na cor piscina, e o grupo repousa no token do mundo', () => {
-    expect(bloco(escrita, '.eb .eb-neon')).toBe('opacity: var(--neon-repouso);');
-    const letra = bloco(escrita, '.eb .eb-neon .tn');
+    expect(bloco(escrita, '.eb-neon')).toBe(
+      'opacity: var(--neon-repouso); visibility: var(--neon-repouso-visibilidade);',
+    );
+    const letra = bloco(escrita, '.eb-neon .tn');
     expect(letra).toContain('fill: none;');
     expect(letra).toContain('stroke: var(--neon-cor);');
     expect(letra).toContain('stroke-width: 30;');
@@ -26,17 +28,15 @@ describe('o néon na escrita do nome', () => {
 
   it('acende com a escrita (até 66%) e assenta no repouso entre 66% e 84%, uma vez', () => {
     expect(bloco(escrita, '@keyframes eb-neon')).toBe(
-      '0% { opacity: var(--neon-aceso); } ' +
-        '66% { opacity: var(--neon-aceso); animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); } ' +
-        '84% { opacity: var(--neon-repouso); } ' +
-        '100% { opacity: var(--neon-repouso); }',
+      '0% { opacity: var(--neon-aceso); visibility: visible; } ' +
+        '66% { opacity: var(--neon-aceso); visibility: visible; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); } ' +
+        '84% { opacity: var(--neon-repouso); visibility: visible; } ' +
+        '100% { opacity: var(--neon-repouso); visibility: visible; }',
     );
   });
 
   it('em cores forçadas o brilho some', () => {
-    expect(bloco(escrita, '@media (forced-colors: active)')).toBe(
-      '.eb .neon-camada { display: none; }',
-    );
+    expect(bloco(escrita, '@media (forced-colors: active)')).toBe('.eb-neon { display: none; }');
   });
 });
 

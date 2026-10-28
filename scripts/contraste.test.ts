@@ -227,6 +227,7 @@ const ZE_DO_DIA = {
   'neon-cor': '#39caef',
   'neon-aceso': '0.55',
   'neon-repouso': '0',
+  'neon-repouso-visibilidade': 'hidden',
   'z-nucleo': '#ffffff',
   'z-banda': '#39caef',
   'z-banda-p': '#0e93b4',
@@ -247,6 +248,7 @@ const ZE_DO_DIA = {
 const ZE_DA_NOITE = {
   'neon-aceso': '0.6',
   'neon-repouso': '0.3',
+  'neon-repouso-visibilidade': 'visible',
   'z-banda-p': '#39caef',
   'z-olho': '#ffffff',
   'z-olho-halo': '#39caef',
