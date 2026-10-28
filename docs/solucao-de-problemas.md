@@ -267,7 +267,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Lint do React Compiler
 - **Sintoma:** `eslint-plugin-react-hooks` 7 reprova o componente, ou a tela recarrega em laço. **Causa:** `setState` síncrono em efeito, leitura de `ref` durante a renderização ou carregador instável passado a `useDados`.
-- **Solução:** carregadores estáveis (fora do componente ou com `useCallback`); estado derivado sem efeito. **Prevenção:** a própria regra de lint.
+- **Solução:** carregadores estáveis (fora do componente ou com `useCallback`); estado derivado sem efeito. **Prevenção:** a regra pega o `setState` em efeito e a `ref` na renderização, mas não o carregador instável de `useDados` (ver "Tela relê o banco sem parar").
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
 ### Falha silenciosa ou tela travada
@@ -1483,9 +1483,9 @@ Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
 Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md).
 
 ### Tela relê o banco sem parar
-- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta.
-- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`).
-- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo.
+- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta. Na "Sessão encerrada" (#339, 28/10/2026) a tela estava certa e gastava 71 % da thread principal, com cerca de 5.000 transações do IndexedDB por segundo, sem a pessoa tocar em nada (a mesma tela antes do #339: 0,1 % e nenhuma transação).
+- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`). O lint e o `npm run check` não pegam, e como o texto sai certo nenhum teste de texto vê.
+- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo. Para pegar: com a tela assentada, `vi.spyOn(repo, 'colecao')` por 400 ms tem de contar menos de 3 chamadas (`Encerrada.test.tsx`: milhares de chamadas antes da correção); no navegador, `IDBDatabase.prototype.transaction` por segundo (zero numa tela parada) ou `Performance.getMetrics` (`TaskDuration`) pelo CDP.
 
 ### Grifo pula para outra palavra igual depois de corrigir o texto
 - **Causa:** a reancoragem só olhava as posições antigas e escolhia a ocorrência mais perto delas.
