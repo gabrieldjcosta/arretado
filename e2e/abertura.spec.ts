@@ -279,6 +279,39 @@ test('movimento reduzido: nenhuma camada, o lockup parado, e a primeira vez cont
   await expect(camada(page)).toHaveCount(0);
 });
 
+test('perfil Calmo, com o "só estudo" ligado (o preset): sem tela cheia, o cabeçalho escreve o nome', async ({
+  page,
+}) => {
+  // O perfil Calmo liga o "só estudo" e o "só estudo" mantém a tela cheia fechada (contrato §13, item 20):
+  // quem usa o preset continua vendo o nome escrito no cabeçalho, só esmaecendo.
+  await page.goto('/#/conta/perfis');
+  await pularAAbertura(page);
+  await page.getByRole('radio', { name: /^Calmo/ }).check();
+  await page.getByRole('button', { name: 'Aplicar' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Perfil Calmo aplicado.' }),
+  ).toBeVisible();
+
+  // Outro Dia: a primeira abertura dele.
+  await page.evaluate(
+    ([chave, valor]) => {
+      window.localStorage.setItem(chave as string, valor as string);
+    },
+    [CHAVE, JSON.stringify({ dia: DIA_ANTIGO })],
+  );
+  await page.goto('/#/');
+  await page.reload();
+  const nome = page.locator('.marca svg.eb');
+  await expect(nome).toHaveClass(/calmo/);
+  await expect(nome).toHaveClass(/curta/);
+  await page.waitForTimeout(600);
+  await expect(camada(page)).toHaveCount(0);
+  // O cabeçalho tomou a escrita do Dia.
+  const dia = (JSON.parse((await guardado(page)) ?? 'null') as { dia: string }).dia;
+  expect(dia).toMatch(UM_DIA);
+  expect(dia).not.toBe(DIA_ANTIGO);
+});
+
 test('perfil Calmo, com o "só estudo" desligado: a camada só esmaece, sem caneta nem voo', async ({
   page,
 }) => {

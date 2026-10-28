@@ -31,7 +31,9 @@ function diaDaUltimaEscrita(): string | null {
  * Como o nome se escreve nesta abertura. Movimento reduzido do sistema: sempre parado (e a primeira
  * vez fica guardada para quando a pessoa deixar de reduzir). Só lê; quem escreve de fato grava o Dia
  * com `lembrarDaEscrita`. O Dia é a data civil do app (T14), a mesma do Hoje. Um Dia guardado igual ou
- * posterior ao de hoje (o relógio andou para trás) vale como já escrito hoje, como na Entrada do Dia.
+ * posterior ao de hoje vale como já escrito hoje, como na Entrada do Dia: o relógio andou para trás, ou
+ * estava adiantado quando o nome foi escrito, e então a Abertura do Dia fica calada até a data passar
+ * (é decoração, inofensivo). A semente do E2E usa um Dia no futuro por isso (`e2e/apoio.ts`).
  */
 export function escritaDaAbertura(agora: Date): Escrita {
   if (movimentoAgora() === 'reduzido') return 'parada';
