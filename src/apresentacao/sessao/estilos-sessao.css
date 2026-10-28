@@ -39,3 +39,25 @@
 .comecar-sessao .dica {
   margin: 0.75rem 0 0;
 }
+
+.resumo-da-sessao {
+  margin: var(--espaco-2) 0;
+  padding-left: 1.25rem;
+  text-align: left;
+}
+
+/* O rótulo da ponte é o título da ação do Agora, e uma tarefa pode ter 200 caracteres: no máximo quatro
+   linhas, que a 390 e 360 px com texto a 200% ainda mostram inteiros os rótulos do Agora ("Revisar
+   cartões", "Continuar a leitura"). O texto inteiro segue no nome do link. */
+.linha-acoes .ponte-da-sessao {
+  padding-block: 0.5rem;
+}
+
+.ponte-da-sessao > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}

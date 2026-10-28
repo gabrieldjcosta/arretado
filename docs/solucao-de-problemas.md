@@ -267,7 +267,7 @@ Criado em 23/09/2026. Registro vivo dos problemas do Arretado: falhas da platafo
 
 ### Lint do React Compiler
 - **Sintoma:** `eslint-plugin-react-hooks` 7 reprova o componente, ou a tela recarrega em laço. **Causa:** `setState` síncrono em efeito, leitura de `ref` durante a renderização ou carregador instável passado a `useDados`.
-- **Solução:** carregadores estáveis (fora do componente ou com `useCallback`); estado derivado sem efeito. **Prevenção:** a própria regra de lint.
+- **Solução:** carregadores estáveis (fora do componente ou com `useCallback`); estado derivado sem efeito. **Prevenção:** a regra pega o `setState` em efeito e a `ref` na renderização, mas não o carregador instável de `useDados` (ver "Tela relê o banco sem parar").
 - **Origem:** ocorrido em 23/09/2026 (registrado em 8ed7e11).
 
 ### Falha silenciosa ou tela travada
@@ -1483,9 +1483,9 @@ Regras: `planos/F2.md` › "Fatos da correção do texto publicado (11.7)".
 Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.md).
 
 ### Tela relê o banco sem parar
-- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta.
-- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`).
-- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo.
+- **Sintoma:** Súmulas/Teses "carregando" para sempre; CPU alta com a tela aberta. Na "Sessão encerrada" (#339, 28/10/2026) a tela estava certa e gastava 71 % da thread principal, com cerca de 5.000 transações do IndexedDB por segundo, sem a pessoa tocar em nada (a mesma tela antes do #339: 0,1 % e nenhuma transação).
+- **Causa:** `useDados` recebeu função criada a cada render (`useDados((r) => …)`). O lint e o `npm run check` não pegam, e como o texto sai certo nenhum teste de texto vê.
+- **Solução / prevenção:** sempre `useDados(useCallback(…, [deps]))` ou função de módulo. Para pegar: com a tela assentada, `vi.spyOn(repo, 'colecao')` por 400 ms tem de contar menos de 3 chamadas (`Encerrada.test.tsx`: milhares de chamadas antes da correção); no navegador, `IDBDatabase.prototype.transaction` por segundo (zero numa tela parada) ou `Performance.getMetrics` (`TaskDuration`) pelo CDP.
 
 ### Grifo pula para outra palavra igual depois de corrigir o texto
 - **Causa:** a reancoragem só olhava as posições antigas e escolhia a ocorrência mais perto delas.
@@ -2031,3 +2031,8 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **O brilho do Zé aparece aceso e não assenta (ou assenta sem a transição).** O interruptor é o atributo `data-acesa` no `<svg>` (não uma classe): `ze.css` troca `--z-bloom-op` entre o repouso e o aceso, com 600 ms de transição só ao apagar; aceso entra sem transição. Em Calmo (`html[data-perfil='calmo']`) e em `prefers-reduced-motion` a transição do brilho some e o repouso vale direto.
 - **Previsível na M2 (Abertura):** (a) a Abertura é uma camada de tela cheia e precisa ser um `popover="manual"`: uma `div` fixa, mesmo com `z-index` máximo, fica abaixo de um `<dialog>` modal, e um popover aberto depois do diálogo o cobre; (b) com um modal aberto, o toque sobre o popover cai no diálogo, então o "toque pula" escuta o `document` em captura; (c) o harness do E2E (`e2e/apoio.ts`) só semeia `chegada` e `entrada-do-dia`: sem semear `arretado:escrita-do-nome:v1` com o Dia de hoje (Brasília), todo teste começa com a tela cheia e o primeiro toque é consumido; só `escrita-do-nome.spec.ts` e o `abertura.spec.ts` desligam isso.
 - **Previsível na M3 (Passeio):** a Chegada hoje oferece "Escolher meu concurso", "Ler uma norma", "Registrar um erro" e "Montar a trilha passo a passo"; antes de tirá-los, confirmar com os donos do #320 e do #325 (o estado vazio do Hoje já oferece os começos) e ajustar os E2E que tocam esses botões. Os textos do Passeio vivem num módulo só (`passos.ts`), e o guia da tela troca "acendem" por "ficam marcados como feitos" (sobe a `versao` do guia).
+
+## Registrar erro durante uma Sessão (fluxo 3, revisão da Marca, 28/10/2026)
+
+- **Com uma Sessão aberta num Ponto, o Ponto e a Disciplina voltam sozinhos depois de a pessoa deixá-los em "—", e o Erro sai com o Ponto da Sessão.** Causa: `escolha` é derivada a cada desenho, e "sem escolha lembrada" também vale para quem acabou de limpar os dois campos; a Sessão reaparecia (limpar o Ponto e depois a Disciplina, ou voltar de outra Disciplina para "—"). O Erro entrava na conta do Ponto da Sessão: na Trilha, "Furto" passava de "Primeira passada" para "Precisa revisar, 1 erro, 1 frase". Solução: `mexeu` (estado da visita, em `RegistrarErro.tsx`): depois do primeiro toque num dos campos a Sessão não preenche mais; a escolha lembrada vale quando não há Sessão aberta num Ponto. Previsível: todo valor que a tela preenche sozinho precisa de um jeito de a pessoa dizer "nenhum"; limpar tem de ser distinguível de "nunca escolheu".
+- **Ponto da Sessão sem Disciplina, ou numa Disciplina excluída, gravava `disciplinaId` vazio ou órfão.** Causa: a Disciplina vinha direto do Ponto. Solução: só entra se a Disciplina ainda existe (a mesma regra da escolha lembrada); sem ela o Erro leva só o Ponto. Os testes ficam em `Recall.test.tsx` ("captura de erro").
