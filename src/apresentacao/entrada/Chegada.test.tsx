@@ -231,7 +231,7 @@ describe('Chegada › o Começar', () => {
     expect(google.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     expect(google.querySelectorAll('svg path')).toHaveLength(4);
     expect(
-      within(folha).getByText('Em fase de teste: por enquanto só e-mails convidados entram.'),
+      within(folha).getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
     const semConta = within(folha).getByRole('button', {
       name: 'Experimentar sem conta e salvar seus dados manualmente',
@@ -255,6 +255,14 @@ describe('Chegada › o Começar', () => {
     await usuario.click(screen.getByRole('button', { name: 'Entrar com o Google' }));
     expect(entrar).toHaveBeenCalledTimes(1);
     expect(aceiteDoLoginPendente()).not.toBeNull();
+  });
+
+  it('o aviso do aceite descreve o botão do Google (quem usa leitor de tela o ouve antes de tocar)', async () => {
+    vi.stubEnv('VITE_CONTA', '1');
+    await ateOComecar();
+    expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toHaveAccessibleDescription(
+      /Ao entrar, você aceita o que sai do seu Aparelho/,
+    );
   });
 
   it('o aviso do que sai do Aparelho fica à vista e leva à tela Entrar', async () => {

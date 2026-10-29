@@ -23,6 +23,7 @@ interface Props {
  * Só se chega aqui pelo passeio da primeira vez: refeito, o último passo diz "Concluir" e fecha.
  */
 export function TelaComecar({ idTitulo, aoEntrar, aoSemConta }: Props) {
+  const idAceite = `${idTitulo}-aceite`;
   const titulo = useRef<HTMLHeadingElement>(null);
   const ze = useRef<ControleDoZe>(null);
   const contas = contasHabilitadas();
@@ -48,14 +49,14 @@ export function TelaComecar({ idTitulo, aoEntrar, aoSemConta }: Props) {
       <div className="chegada-rodape">
         {contas && (
           <>
-            <BotaoGoogle />
-            <p className="chegada-nota">
+            <BotaoGoogle idDoAceite={idAceite} />
+            <p className="chegada-nota" id={idAceite}>
               {ENTRADA_DIRETA.aceite}{' '}
               <Link to="/conta/entrar" onClick={aoEntrar}>
                 {ENTRADA_DIRETA.verAceite}
-              </Link>
+              </Link>{' '}
+              {COMECAR.nota}
             </p>
-            <p className="chegada-nota">{COMECAR.nota}</p>
           </>
         )}
         <button

@@ -31,7 +31,7 @@ test.describe('Começar, com a conta ligada', () => {
     await expect(google).toBeVisible();
     await expect(folha.getByText(/Ao entrar, você aceita o que sai do seu Aparelho/)).toBeVisible();
     await expect(
-      folha.getByText('Em fase de teste: por enquanto só e-mails convidados entram.'),
+      folha.getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
     const semConta = folha.getByRole('button', {
       name: 'Experimentar sem conta e salvar seus dados manualmente',

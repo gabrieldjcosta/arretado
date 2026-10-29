@@ -35,7 +35,8 @@ function LogoDoGoogle() {
  * que sai do Aparelho fica logo abaixo do botão (`ENTRADA_DIRETA.aceite`) e o toque é o aceite, gravado antes do
  * desvio como na tela Entrar. Claro de dia e escuro à noite, como pedem as diretrizes dele.
  */
-export function BotaoGoogle() {
+/** `idDoAceite`: o aviso sob o botão, lido junto com ele (o toque é o aceite: quem usa leitor de tela não pode perdê-lo). */
+export function BotaoGoogle({ idDoAceite }: { idDoAceite: string }) {
   const servico = useServicoDeConta();
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -60,7 +61,13 @@ export function BotaoGoogle() {
 
   return (
     <>
-      <button type="button" className="botao botao-google" onClick={entrar} disabled={ocupado}>
+      <button
+        type="button"
+        className="botao botao-google"
+        onClick={entrar}
+        disabled={ocupado}
+        aria-describedby={idDoAceite}
+      >
         <LogoDoGoogle />
         {COMECAR.google}
       </button>
