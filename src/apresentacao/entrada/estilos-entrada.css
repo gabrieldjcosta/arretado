@@ -1,22 +1,6 @@
-/* A Chegada (D-D9): uma folha no <dialog> do app, sobre o Hoje; e a linha quieta da Entrada do Dia (S4).
-   Só tokens, sem cor literal. O diálogo base (estilos.css) dá a largura, a linha da folha, o fundo e a
-   rolagem por dentro, que vale a 200% de zoom e com texto grande. Sem movimento. */
-dialog.dialogo-chegada h2 {
-  margin: 0 0 var(--espaco-3);
-  font-family: var(--fonte-titulo);
-  font-weight: var(--peso-titulo);
-  font-size: 1.5rem;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: var(--titulo);
-  text-wrap: balance;
-}
-
-dialog.dialogo-chegada h2 {
-  font-size: 2rem;
-}
-
-/* A linha do dia: saudação e dica, em texto atenuado, sem caixa nem botão. Vem depois do Agora. */
+/* A linha quieta da Entrada do Dia (S4): saudação e dica em texto atenuado, sem caixa nem botão, depois do
+   Agora. Só tokens, sem cor literal; sem movimento. A Chegada (D-D10) tem o seu CSS em
+   passeio/estilos-passeio.css. */
 .linha-do-dia {
   margin: var(--espaco-3) 0;
   font-size: 0.9375rem;
@@ -27,77 +11,4 @@ dialog.dialogo-chegada h2 {
 .linha-do-dia-saudacao {
   font-weight: 600;
   color: var(--texto);
-}
-
-/* A Chegada: um caminho principal, um secundário e a trilha, que ocupa a linha toda. Uma coluna no
-   celular; duas quando a folha tem largura para elas. */
-.chegada-acoes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
-  gap: var(--espaco-2);
-  margin-top: var(--espaco-4);
-}
-
-.chegada-acoes .botao {
-  width: 100%;
-  min-height: 3.25rem;
-  font-size: 1.0625rem;
-}
-
-.chegada-acoes .chegada-trilha {
-  grid-column: 1 / -1;
-  flex-direction: column;
-  gap: 2px;
-  min-height: var(--alvo);
-  padding: var(--espaco-1) var(--espaco-2);
-  font-size: 1rem;
-  line-height: 1.3;
-  text-decoration: none;
-}
-
-.chegada-trilha b {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.chegada-trilha span {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: var(--texto-atenuado);
-}
-
-.chegada-depois {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--espaco-3);
-}
-
-/* Os quatro menus, depois dos caminhos: uma linha cada, o nome em negrito. */
-.chegada-menus-titulo {
-  margin: var(--espaco-4) 0 var(--espaco-1);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.chegada-menus {
-  margin: 0;
-  display: grid;
-  gap: var(--espaco-1);
-}
-
-.chegada-menus dt {
-  display: inline;
-  font-weight: 600;
-}
-
-.chegada-menus dt::after {
-  content: ': ';
-}
-
-.chegada-menus dd {
-  display: inline;
-  margin: 0;
-  color: var(--texto-atenuado);
 }

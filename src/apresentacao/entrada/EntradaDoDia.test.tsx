@@ -67,27 +67,21 @@ describe('Chegada › primeira vez neste aparelho', () => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
 
-  it('abre a folha de boas-vindas com os caminhos reais, o foco no principal (escolher o concurso), e lembra que viu', async () => {
+  it('abre as Boas-vindas com o Zé e só dois botões, o foco no título, e lembra que viu', async () => {
     const { repo } = await repositorioDeTeste();
     abrirHoje(repo);
 
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-    const escolher = within(folha).getByRole('link', { name: 'Escolher meu concurso' });
-    expect(escolher).toHaveAttribute('href', '#/comecar');
-    expect(escolher).toHaveClass('principal');
-    expect(within(folha).getByRole('link', { name: 'Ler uma norma' })).toHaveAttribute(
-      'href',
-      '#/biblioteca',
-    );
-    const registrar = within(folha).getByRole('link', { name: 'Registrar um erro' });
-    expect(registrar).toHaveAttribute('href', '#/recall/registrar');
-    expect(registrar).not.toHaveClass('principal');
     expect(
-      within(folha).getByRole('link', { name: /^Montar a trilha passo a passo/ }),
-    ).toHaveAttribute('href', '#/plano/onboarding');
-    expect(within(folha).getByRole('button', { name: 'Agora não' })).toBeVisible();
+      within(folha)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Agora não', 'Vamos']);
+    // "Escolher meu concurso" saiu da folha: o Hoje vazio é quem o oferece.
+    expect(within(folha).queryAllByRole('link')).toEqual([]);
+    expect(folha.querySelector('svg.ze')).toBeInTheDocument();
     await waitFor(() => {
-      expect(escolher).toHaveFocus();
+      expect(within(folha).getByRole('heading', { level: 2 })).toHaveFocus();
     });
     expect(chegadaJaVista()).toBe(true);
     // A Entrada do Dia não vem junto: o Dia da Chegada já tem a sua folha.
@@ -105,29 +99,45 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   });
 
-  it.each([
-    ['Escolher meu concurso', 'Qual concurso você estuda?'],
-    ['Registrar um erro', 'Registrar erro'],
-  ])('"%s" leva à tela dele, sem a folha por cima', async (caminho, titulo) => {
+  it('dispensada a Chegada, voltar ao Hoje na mesma abertura do aplicativo não a abre de novo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const primeira = abrirHoje(repo);
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await primeira.usuario.click(within(folha).getByRole('button', { name: 'Agora não' }));
+    expect(folhas()).toBeNull();
+    primeira.unmount();
+
+    // A pessoa foi a outra tela e voltou: o Hoje monta de novo, com o mesmo repositório e sem recarregar.
+    abrirHoje(repo);
+    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(folhas()).toBeNull();
+  });
+
+  it('"Vamos" abre o passeio; "Pular o passeio" leva ao Começar, e "Experimentar sem conta" deixa o Hoje, que oferece "Escolher meu concurso"', async () => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = abrirHoje(repo);
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
 
-    await usuario.click(within(folha).getByRole('link', { name: caminho }));
+    await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
+    expect(await screen.findByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Pular o passeio' }));
+    expect(await screen.findByRole('dialog', { name: 'Vamo começar?' })).toBeInTheDocument();
+    await usuario.click(
+      screen.getByRole('button', {
+        name: 'Experimentar sem conta e salvar seus dados manualmente',
+      }),
+    );
 
-    expect(await screen.findByRole('heading', { level: 1, name: titulo })).toBeInTheDocument();
-    expect(folhas()).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const comecos = screen.getByRole('region', { name: 'Por onde começar' });
+    expect(within(comecos).getByRole('link', { name: 'Escolher meu concurso' })).toHaveAttribute(
+      'href',
+      '#/comecar',
+    );
   });
 
-  it('explica os quatro menus em uma linha cada, com os nomes das abas', async () => {
-    const { repo } = await repositorioDeTeste();
-    abrirHoje(repo);
-    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-    for (const menu of ['Hoje', 'Trilha', 'Fixar', 'Biblioteca'])
-      expect(within(folha).getByText(menu, { selector: 'dt' })).toBeInTheDocument();
-  });
-
-  it('"Rever as boas-vindas" reabre a folha de qualquer tela, sem gravar nada, e fecha ao seguir um caminho', async () => {
+  it('"Rever as boas-vindas" reabre a folha de qualquer tela, sem gravar nada; o passeio refeito termina em "Concluir"', async () => {
     localStorage.setItem(CHAVE_CHEGADA, '{"vista":true}');
     localStorage.setItem(CHAVE_ENTRADA, '{"dia":"2026-09-23"}');
     const { repo } = await repositorioDeTeste();
@@ -136,9 +146,16 @@ describe('Chegada › primeira vez neste aparelho', () => {
     await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('button', { name: 'Rever as boas-vindas' }));
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-    await usuario.click(within(folha).getByRole('link', { name: 'Registrar um erro' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
+    await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
+    for (let i = 0; i < 3; i += 1)
+      await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
+    await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
+
     expect(folhas()).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Vamo começar?' })).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    expect(localStorage.getItem(CHAVE_CHEGADA)).toBe('{"vista":true}');
+    expect(localStorage.getItem(CHAVE_ENTRADA)).toBe('{"dia":"2026-09-23"}');
   });
 
   it('com um aparelho que já viu a Chegada, o Hoje abre sem ela', async () => {
@@ -148,7 +165,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
 
     // Sem a Chegada, o que aparece neste Dia é a linha da Entrada.
     await waitFor(() => {
-      expect(document.querySelector('.linha-do-dia')).toHaveTextContent(/^Bom dia\./);
+      expect(document.querySelector('.linha-do-dia')).toHaveTextContent(/^Bom dia./);
     });
     expect(screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBeNull();
   });

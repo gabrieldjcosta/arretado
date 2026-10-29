@@ -33,3 +33,27 @@
   flex-wrap: wrap;
   gap: 0.75rem;
 }
+
+/* A linha "Passeio pelos menus" (D-D10): o texto à esquerda e o botão à direita; numa tela estreita (ou com
+   a fonte ampliada) o botão desce para baixo do texto, sem cortar nenhum dos dois. */
+.linha-do-passeio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  min-height: 64px;
+  padding: 0.5rem 0;
+}
+
+.linha-do-passeio-texto {
+  flex: 1 1 11rem;
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.linha-do-passeio-apoio {
+  color: var(--texto-atenuado);
+  font-size: 0.9rem;
+}
