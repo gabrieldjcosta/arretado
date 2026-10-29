@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/alems125/index.html",
+    "detectadoEm": "2026-10-29"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/pgmam126/index.html",
+    "detectadoEm": "2026-10-29"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/sface125/index.html",
+    "detectadoEm": "2026-10-29"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/tjuce125/index.html",
+    "detectadoEm": "2026-10-29"
+  }
+]
