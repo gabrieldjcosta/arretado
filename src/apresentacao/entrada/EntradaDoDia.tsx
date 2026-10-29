@@ -45,7 +45,15 @@ export function EntradaDoDia({ retrato }: { retrato: RetratoDoHoje | undefined }
   }, [repo, pronto]);
   if (abertura === undefined || aberturaEmCurso) return null;
   return abertura.tipo === 'chegada' ? (
-    <Chegada dia={abertura.dia} />
+    <Chegada
+      dia={abertura.dia}
+      aoFechar={() => {
+        // Dispensada, a Chegada não volta enquanto o aplicativo está aberto: voltar ao Hoje não a reabre
+        // (a Entrada do Dia, que é uma linha quieta, é que fica).
+        decididas.delete(repo);
+        setAbertura(undefined);
+      }}
+    />
   ) : (
     <Entrada abertura={abertura} />
   );

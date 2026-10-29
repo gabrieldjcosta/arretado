@@ -7,7 +7,7 @@ import { movimentoAgora } from '../../movimento';
 
 /**
  * Rajadas de piscadas dos dois olhos: a pausa que vem depois (ms) e quantas piscadas. A ordem é fixa
- * (2, 2, 3, 2, 3) e não sorteada: a tela é igual toda vez que se olha.
+ * (2, 2, 3, 2, 3 e, na sexta, volta à primeira: 2) e não sorteada: a tela é igual toda vez que se olha.
  */
 export const RAJADAS: readonly (readonly [pausa: number, piscadas: number])[] = [
   [4200, 2],
@@ -21,6 +21,12 @@ export const ESPACO_ENTRE_PISCADAS_MS = 340;
 /** Uma piscada dura 160 ms; a pausa da rajada só começa depois dela. */
 const DURACAO_DA_PISCADA_MS = 160;
 export const PRIMEIRA_RAJADA_MS = 2200;
+/**
+ * Teto de rajadas por visita à tela [Marca, 29/10, revisão do #350]: depois da sexta o Zé fica parado, de
+ * olhos abertos. Quem chega pela primeira vez ainda não escolheu o Calmo, e a tela de quem se distrai fácil
+ * não pisca sem fim (WCAG 2.2.2). Remontar a tela é outra visita e recomeça a conta.
+ */
+export const MAXIMO_DE_RAJADAS = 6;
 
 /** Sem toque, tecla nem rolagem: a luz da mão pisca aos 10 s e depois a cada 14 s, no máximo 3 rodadas. */
 export const PRIMEIRA_ESPERA_DA_LUZ_MS = 10_000;
@@ -33,8 +39,8 @@ type Piscante = Pick<ControleDoZe, 'piscar'>;
 type ComLuz = Pick<ControleDoZe, 'piscarFlor' | 'pararFlor'>;
 
 /**
- * As piscadas dos dois olhos: a primeira rajada aos 2,2 s e as outras na ordem de `RAJADAS`, para sempre
- * enquanto a tela está aberta (menos de 1 s cada, só no movimento normal; o sistema e o Calmo as
+ * As piscadas dos dois olhos: a primeira rajada aos 2,2 s e as outras na ordem de `RAJADAS`, até
+ * `MAXIMO_DE_RAJADAS` por visita (menos de 1 s cada, só no movimento normal; o sistema e o Calmo as
  * desligam). Devolve quem as cancela.
  */
 export function iniciarPiscadas(ze: () => Piscante | null): () => void {
@@ -59,7 +65,9 @@ export function iniciarPiscadas(ze: () => Piscante | null): () => void {
           ze()?.piscar();
         });
       }
-      proxima(pausa + (piscadas - 1) * ESPACO_ENTRE_PISCADAS_MS + DURACAO_DA_PISCADA_MS);
+      if (rajada < MAXIMO_DE_RAJADAS) {
+        proxima(pausa + (piscadas - 1) * ESPACO_ENTRE_PISCADAS_MS + DURACAO_DA_PISCADA_MS);
+      }
     });
   };
   proxima(PRIMEIRA_RAJADA_MS);

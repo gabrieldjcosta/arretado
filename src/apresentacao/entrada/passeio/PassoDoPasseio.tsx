@@ -68,8 +68,14 @@ export function PassoDoPasseio({
     };
   }, [fase, pedido]);
 
-  // Cada passo novo: o Zé olha para o cartão (uma vez) e o foco vai ao título.
+  // Cada passo novo: a rolagem volta ao topo (quem rolou para alcançar o "Seguir" numa tela baixa ou com letra
+  // grande não chega ao passo seguinte no meio dele, com o título fora da tela), o Zé olha para o cartão (uma
+  // vez) e o foco vai ao título.
   useEffect(() => {
+    for (const rolante of ['.chegada-tela', '.chegada-corpo']) {
+      const el = titulo.current?.closest<HTMLElement>(rolante);
+      if (el) el.scrollTop = 0;
+    }
     titulo.current?.focus({ preventScroll: true });
     ze.current?.humor('atento');
     ze.current?.olhar(-3, 2);

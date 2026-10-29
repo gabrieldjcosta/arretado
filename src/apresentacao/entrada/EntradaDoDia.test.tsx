@@ -99,6 +99,21 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   });
 
+  it('dispensada a Chegada, voltar ao Hoje na mesma abertura do aplicativo não a abre de novo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const primeira = abrirHoje(repo);
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await primeira.usuario.click(within(folha).getByRole('button', { name: 'Agora não' }));
+    expect(folhas()).toBeNull();
+    primeira.unmount();
+
+    // A pessoa foi a outra tela e voltou: o Hoje monta de novo, com o mesmo repositório e sem recarregar.
+    abrirHoje(repo);
+    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(folhas()).toBeNull();
+  });
+
   it('"Vamos" abre o passeio; "Pular o passeio" leva ao Começar, e "Experimentar sem conta" deixa o Hoje, que oferece "Escolher meu concurso"', async () => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = abrirHoje(repo);
