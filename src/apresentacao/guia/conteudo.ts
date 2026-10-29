@@ -1,21 +1,29 @@
-// Guia da primeira abertura de cada área: só o estado vazio, e cada linha começa pelo rótulo exato de
+// Dicas de cada área, uma por cartão, no estado em que a tela está (vazio ou em uso); cada dica começa pelo rótulo exato de
 // um controle que está na tela. Vocabulário canônico; nada que soe como cobrança. Mudou o texto de
 // uma tela: suba `versao` dela.
 
 export type TelaComGuia = 'hoje' | 'plano' | 'recall' | 'biblioteca';
 
+export interface Dica {
+  opcao: string;
+  efeito: string;
+}
+
 export interface Guia {
-  /** Muda quando o conteúdo muda de forma que valha mostrar de novo. */
+  /** Muda quando o conteúdo muda de forma que valha marcar como novo de novo. */
   versao: number;
-  linhas: { opcao: string; efeito: string }[];
+  /** Controles do estado vazio da tela (ainda sem dados). */
+  vazio: Dica[];
+  /** Controles do estado com dados: só o que existe em qualquer tela já em uso. */
+  uso: Dica[];
 }
 
 export const TITULO_DO_GUIA = 'O que cada opção faz';
 
 export const GUIAS: Record<TelaComGuia, Guia> = {
   hoje: {
-    versao: 4,
-    linhas: [
+    versao: 5,
+    vazio: [
       {
         opcao: 'Escolher meu concurso',
         efeito:
@@ -28,10 +36,17 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       },
       { opcao: 'Para lembrar', efeito: 'uma nota sobre o que fazer fora do app.' },
     ],
+    uso: [
+      { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
+      {
+        opcao: 'Leitura · Cartões · Frases',
+        efeito: 'ficam marcados como feitos quando você lê, revisa ou fixa.',
+      },
+    ],
   },
   plano: {
-    versao: 3,
-    linhas: [
+    versao: 4,
+    vazio: [
       {
         opcao: 'Informar a data da prova',
         efeito:
@@ -57,10 +72,25 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
         efeito: 'copia um pedido pronto para você colar numa IA junto com o texto do edital.',
       },
     ],
+    uso: [
+      {
+        opcao: 'Editar pontos e matérias',
+        efeito: 'muda ou acrescenta Pontos e matérias da Trilha.',
+      },
+      {
+        opcao: 'Ciclo de estudo',
+        efeito: 'monta o Ciclo: a ordem em que as matérias entram nos Dias.',
+      },
+      { opcao: 'Tarefas', efeito: 'suas tarefas livres, fora dos Pontos.' },
+      {
+        opcao: 'Importar outra planilha',
+        efeito: 'acrescenta Pontos de uma planilha (CSV) ou de uma tabela colada.',
+      },
+    ],
   },
   recall: {
-    versao: 3,
-    linhas: [
+    versao: 4,
+    vazio: [
       {
         opcao: 'Registrar erro',
         efeito:
@@ -72,10 +102,11 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
         efeito: 'a lista dos Erros que você registrou.',
       },
     ],
+    uso: [{ opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' }],
   },
   biblioteca: {
-    versao: 3,
-    linhas: [
+    versao: 4,
+    vazio: [
       {
         opcao: 'Escolher meu concurso',
         efeito: 'o app traz as normas com que ele começa e monta a Trilha do edital mais recente.',
@@ -87,6 +118,13 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       {
         opcao: 'Importar norma',
         efeito: 'você cola a lei do site oficial e o app separa artigos, parágrafos e incisos.',
+      },
+    ],
+    uso: [
+      { opcao: 'Buscar norma', efeito: 'procura entre as Normas da sua Biblioteca.' },
+      {
+        opcao: 'Disciplina · Ano · Tipo de norma',
+        efeito: 'afinam a lista de Normas.',
       },
     ],
   },

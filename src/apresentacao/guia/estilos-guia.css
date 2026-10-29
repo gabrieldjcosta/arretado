@@ -1,52 +1,81 @@
-/* Guia da primeira abertura: cartão quieto na própria tela (D-D9), sem sombra nem animação. */
-.guia-da-tela {
-  margin: 1rem 0;
-  padding: 0.5rem 1rem 0.75rem;
+/* Dicas da tela: cartãozinho recolhido no topo; aberto, carrossel de um cartão por dica (D-D9),
+   quieto: sem sombra nem animação além da rolagem do próprio trilho. */
+.dicas-da-tela {
+  margin: 0 0 0.5rem;
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-left: 3px solid var(--borda);
   border-radius: var(--raio-folha);
 }
 
-.guia-cabeca {
+.dicas-abrir {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0 0.5rem;
-}
-
-.guia-da-tela h2 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.guia-da-tela h2:focus-visible {
-  outline-offset: 2px;
-}
-
-/* O rótulo do botão alinha com a borda direita do texto, mantendo o alvo de 44 px. */
-.guia-cabeca .discreto {
-  margin-right: -0.75rem;
-}
-
-.guia-da-tela dl {
-  margin: 0;
-  display: grid;
-  gap: 0.4rem;
-}
-
-.guia-da-tela dt {
-  display: inline;
+  width: 100%;
+  min-height: 40px;
+  padding: 0.25rem 1rem;
+  background: none;
+  border: 0;
+  text-align: left;
+  font: inherit;
   font-weight: 600;
+  color: inherit;
+  cursor: pointer;
 }
 
-.guia-da-tela dd {
-  display: inline;
+/* O contador fica à direita; quebra de linha a 200% sem sair do cartão. */
+.dicas-abrir .dica {
+  margin-left: auto;
+  font-weight: 400;
+}
+
+.dicas-trilho {
+  display: flex;
   margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.dicas-trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.dicas-trilho li {
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: 0.25rem 1rem 0.5rem;
+  scroll-snap-align: start;
+  overflow-wrap: anywhere;
+}
+
+.dicas-trilho li span {
   color: var(--texto-atenuado);
 }
 
-.guia-da-tela dt::after {
-  content: ': ';
+.dicas-passos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.25rem 0.25rem;
+}
+
+.dicas-passos .dica,
+.dicas-passos [role='status'] {
+  color: var(--texto-atenuado);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dicas-trilho {
+    scroll-behavior: smooth;
+  }
 }
