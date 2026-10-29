@@ -6,18 +6,24 @@
 // O que a tela mostra de uma vez (os pontos do Dia, a linha de parada, o Agora e o "Em seguida") vem
 // de um só retrato dos dados (`useRetratoDoHoje`), para os blocos nunca discordarem entre si.
 //
-// Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; o "Em seguida" (um `<details>`, com o
-// "Trocar" de cada item, Q5) e o "Para lembrar" à direita. Abaixo disso as duas viram uma só, na mesma
-// ordem.
+// Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; à direita os blocos abaixo dele, com
+// orçamento de dois à vista (S7, `BlocosDoHoje`): o "Em seguida", o Fechar o Dia, "A lei mudou", o "Para
+// lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Ver mais". Abaixo de
+// 900 px as duas viram uma só, na mesma ordem.
 //
-// A Chegada e a Entrada do Dia (`EntradaDoDia`, D-D9) são folhas sobre o Hoje, não parte do layout:
-// montam aqui só porque o Hoje é onde o aplicativo abre.
+// A Chegada (`EntradaDoDia`, D-D9) é uma folha sobre o Hoje, não parte do layout; a Entrada do Dia (S4)
+// é a linha quieta logo abaixo do Agora: acima dele, a dica mais longa (4 linhas a 320 px) empurrava o
+// Começar para fora da primeira tela. Montam aqui porque o Hoje é onde o aplicativo abre.
 import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
+import { DiasParaAProva } from './DiasParaAProva';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
+import { useDados } from '../dados/contexto';
+import { sessaoAberta } from '../sessao/carregadores';
 import { ROTULO_DA_AREA } from '../textos';
 import { Agora } from './Agora';
 import { AvisoDeAtualizacao } from './AvisoDeAtualizacao';
+import { BlocosDoHoje } from './BlocosDoHoje';
 import { Captura } from './Captura';
 import { ConviteDepoisDaLeitura } from './ConviteDepoisDaLeitura';
 import { Depois } from './Depois';
@@ -29,9 +35,13 @@ import { PontosDoDia } from './PontosDoDia';
 import { RevisoesDoDia } from './RevisoesDoDia';
 import { BoasVindas } from './Retorno';
 import { useRetratoDoHoje } from './retrato';
+import { useCicloPadrao } from '../plano/ciclo/padrao';
 
 export function Hoje() {
   const hoje = useRetratoDoHoje();
+  useCicloPadrao();
+  // Com Sessão aberta o Agora espera (Agora.tsx) e o "Em seguida", que só segue o Agora, também.
+  const { dados: aberta } = useDados(sessaoAberta);
   return (
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
@@ -39,27 +49,32 @@ export function Hoje() {
       <div className="hoje-colunas">
         <div>
           <Agora hoje={hoje} />
+          {/* A Chegada (folha) e a linha do dia (S4): a linha vem depois do Agora, o Começar não desce. */}
+          <EntradaDoDia retrato={hoje.retrato} />
+          <DiasParaAProva />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
-          <LeiMudouNoHoje />
           {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
-          <Depois
-            acoes={hoje.emSeguida}
-            opcoes={hoje.retrato?.outras ?? []}
-            aoTrocar={hoje.trocar}
-          />
-          <ParaLembrar />
+          {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Ver mais". */}
+          <BlocosDoHoje>
+            <Depois
+              acoes={aberta === null ? hoje.emSeguida : []}
+              opcoes={hoje.retrato?.outras ?? []}
+              aoTrocar={hoje.trocar}
+            />
+            <FecharDia />
+            <LeiMudouNoHoje />
+            <ParaLembrar />
+            <ConviteDepoisDaLeitura />
+            <LembreteDeBackup />
+            <AvisoDeAtualizacao />
+          </BlocosDoHoje>
         </div>
       </div>
-      <FecharDia />
       <RevisoesDoDia />
       <Captura />
-      <ConviteDepoisDaLeitura />
-      <LembreteDeBackup />
-      <AvisoDeAtualizacao />
-      <EntradaDoDia retrato={hoje.retrato} />
     </>
   );
 }

@@ -8,6 +8,8 @@ import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from '../recall/carregadores';
 import { ImportarPontos } from './ImportarPontos';
 import { ProvaDoPlano } from './ProvaDoPlano';
+import { ProximoBloco } from './ProximoBloco';
+import { useCicloPadrao } from './ciclo/padrao';
 import { ROTULO_FAIXA } from './pontos/carregar';
 import './estilos-plano.css';
 
@@ -21,16 +23,24 @@ function porDisciplina(disciplinas: Disciplina[], pontos: Ponto[]) {
   }));
 }
 
+function resumoDosPontos(n: number) {
+  // Espaço sem quebra: o número não fica numa linha e "pontos" na outra.
+  return n === 1 ? '1\u00a0ponto' : `${String(n)}\u00a0pontos`;
+}
+
 /** Plano na F1: pontos importados, só para vincular erros. Edição e sugestão chegam na F3. */
 export function Plano() {
   const { dados } = useDados(pontosEDisciplinas);
   const [confirmacao, setConfirmacao] = useState<string | null>(null);
+  useCicloPadrao();
   if (!dados) return <Esqueleto />;
   const grupos = porDisciplina(dados.disciplinas, dados.pontos);
 
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
+      {dados.pontos.length > 0 && <ProximoBloco />}
       <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
@@ -41,12 +51,12 @@ export function Plano() {
         <>
           <Vazio titulo="Monte seu plano do seu jeito">
             <p>
-              Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir
-              do nosso catálogo de concursos.
+              Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas para
+              ler. Ou traga o seu edital.
             </p>
             <div className="plano-vazio-caminhos">
-              <Link to="/plano/onboarding" className="botao">
-                Montar pelo catálogo
+              <Link to="/comecar" className="botao principal">
+                Escolher meu concurso
               </Link>
               <a
                 href="#importar-edital"
@@ -61,6 +71,10 @@ export function Plano() {
                 Trazer meu edital
               </a>
             </div>
+            <p className="dica">
+              Quer escolher edital e matérias uma a uma?{' '}
+              <Link to="/plano/onboarding">Montar pelo catálogo</Link>.
+            </p>
           </Vazio>
           <GuiaDaTela tela="plano" />
           <ImportarPontos aoImportar={setConfirmacao} afastado />
@@ -76,20 +90,29 @@ export function Plano() {
           <Link to="/plano/ciclo" className="botao botao-texto na-margem">
             Ciclo de estudo
           </Link>
+          <Link to="/plano/tarefas" className="botao botao-texto na-margem">
+            Tarefas
+          </Link>
           {grupos.map(({ disciplina, pontos }) => (
             <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
-              <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>
-              <ul className="lista-simples">
-                {pontos.map((p) => (
-                  <li key={p.id}>
-                    <span>
-                      {p.codigo ? `${p.codigo}. ` : ''}
-                      {p.titulo}
-                    </span>
-                    {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
-                  </li>
-                ))}
-              </ul>
+              <details className="trilha-materia" open={grupos.length === 1 || undefined}>
+                <summary>
+                  <span className="trilha-seta" aria-hidden="true" />
+                  <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>{' '}
+                  <span className="dica">{resumoDosPontos(pontos.length)}</span>
+                </summary>
+                <ul className="lista-simples">
+                  {pontos.map((p) => (
+                    <li key={p.id}>
+                      <span>
+                        {p.codigo ? `${p.codigo}. ` : ''}
+                        {p.titulo}
+                      </span>
+                      {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </section>
           ))}
           <details>

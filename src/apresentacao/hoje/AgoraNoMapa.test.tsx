@@ -94,26 +94,52 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
     localStorage.clear();
   });
 
-  it('abaixo de "Continuar a leitura", aponta o trecho que mais cai, com a faixa e os minutos', async () => {
+  it('o Agora é o trecho que mais cai, com a faixa e os minutos; "de onde parou" fica abaixo', async () => {
     const { repo } = await repositorioDeTeste();
     const normaId = await lerALep(repo);
     abrirHoje(repo, fonte(ARQUIVOS));
-    await screen.findByRole('heading', { name: 'Continuar a leitura' });
-    // O art. 1º já está coberto; o próximo são os dois "cai muito" vizinhos.
-    const ler = await screen.findByRole('link', { name: 'Ler arts. 3º a 4º' });
-    expect(ler).toHaveAttribute('href', `#/biblioteca/normas/${normaId}?ir=art3`);
-    expect(ler.parentElement).toHaveTextContent(
-      'Pelo mapa, o próximo trecho cai muito, cerca de 2 min.',
-    );
+    // O art. 1º já está coberto; o próximo são os dois "cai muito" vizinhos (decisão F2, 27/10/2026).
+    const agora = await screen.findByRole('region', { name: 'Agora' });
+    expect(await within(agora).findByRole('heading', { name: 'Ler arts. 3º a 4º' })).toBeVisible();
+    expect(agora).toHaveTextContent('Pelo mapa, o próximo trecho: cai muito');
+    expect(agora).toHaveTextContent('cerca de 2 min');
+    const comecar = within(agora).getByRole('link', { name: 'Começar' });
+    expect(comecar).toHaveAttribute('href', expect.stringContaining(`id=${normaId}`));
+    expect(comecar).toHaveAttribute('href', expect.stringContaining('ir=art3'));
+    expect(comecar).toHaveAttribute('href', expect.stringContaining('direto=1'));
     expect(document.body.textContent).not.toMatch(/atrasad|pendente|dívida|faltam/i);
-    // O "Continuar" segue onde a pessoa parou.
-    expect(screen.getByRole('link', { name: 'Continuar' })).toHaveAttribute(
-      'href',
-      expect.stringContaining(`id=${normaId}`),
-    );
+    // A alternativa, uma linha abaixo da folha, segue onde a pessoa parou, sem o trecho.
+    const continuar = screen.getByRole('link', { name: 'Continuar a leitura' });
+    expect(continuar.parentElement).toHaveTextContent('Ou de onde parou, cerca de');
+    expect(continuar).toHaveAttribute('href', expect.stringContaining(`id=${normaId}`));
+    expect(continuar).not.toHaveAttribute('href', expect.stringContaining('ir='));
+    expect(screen.queryByRole('link', { name: 'Continuar' })).toBeNull();
   });
 
-  it('sem arquivo de incidência (norma fora do acervo, ou sem rede), a linha não existe', async () => {
+  it('com só trechos "raro" por cobrir, o Agora segue "Continuar a leitura"', async () => {
+    const { repo } = await repositorioDeTeste();
+    await lerALep(repo);
+    const soRaro = {
+      ...ARQUIVOS,
+      [`/incidencia/fcc-defensor-sp/${ACERVO}.json`]: {
+        versao: 1,
+        recorte: 'fcc-defensor-sp',
+        norma: ACERVO,
+        artigos: [
+          ['3', 1, 'baixa'],
+          ['4', 1, 'baixa'],
+        ],
+      },
+    };
+    abrirHoje(repo, fonte(soRaro));
+    await screen.findByRole('heading', { name: 'Continuar a leitura' });
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Continuar' })).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Pelo mapa/)).not.toBeInTheDocument();
+  });
+
+  it('sem arquivo de incidência (norma fora do acervo, ou sem rede), o Agora é "Continuar a leitura"', async () => {
     const { repo } = await repositorioDeTeste();
     await lerALep(repo, false);
     abrirHoje(repo, fonte('sem rede'));

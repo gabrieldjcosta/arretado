@@ -11,6 +11,7 @@ import {
   registrarErro,
 } from '../../dominios/recall/servico';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { sessaoAberta } from '../sessao/carregadores';
 import { ROTULO_DA_AREA } from '../textos';
 import { pontosEDisciplinas } from './carregadores';
 import { CamposErro, type Complemento } from './CamposErro';
@@ -19,9 +20,7 @@ import { EditorDeLacuna } from './EditorDeLacuna';
 import { ROTULO_RESULTADO } from './rotulos';
 
 type Depois =
-  | { tipo: 'perguntar'; erro: Erro }
-  | { tipo: 'cartao'; erro: Erro; filaCheia: boolean }
-  | { tipo: 'sem-cartao'; erro: Erro };
+  { tipo: 'cartao'; erro: Erro; filaCheia: boolean } | { tipo: 'sem-cartao'; erro: Erro };
 
 interface Escolha {
   disciplinaId?: string;
@@ -57,11 +56,13 @@ function gravarEscolha(e: Escolha) {
 /**
  * Captura em 1 campo (D25, R3): a frase correta. Disciplina e ponto são facultativos e ficam
  * escolhidos de um registro para o seguinte; resultado, "o que foi" e o resto ficam em "mais
- * detalhes". Depois de salvar, com "o que foi", uma linha pergunta se quer cartão — sem modal.
+ * detalhes". Com "o que foi", a caixa "Criar o cartão deste erro" já vem marcada (F6): salvar já cria o
+ * cartão, e depois de salvar há uma ação só, "Registrar outra"; o resto fica em "Mais".
  */
 export function RegistrarErro() {
   const repo = useRepositorio();
   const vinculos = useDados(pontosEDisciplinas);
+  const { dados: sessao } = useDados(sessaoAberta);
   const [frase, setFrase] = useState('');
   const [resultado, setResultado] = useState<ResultadoErro | null>(null);
   const [ocultos, setOcultos] = useState<Intervalo[]>([]);
@@ -70,8 +71,11 @@ export function RegistrarErro() {
   const [oQueFoi, setOQueFoi] = useState('');
   const [complemento, setComplemento] = useState<Complemento>({});
   const [lembrada, setEscolha] = useState<Escolha>(lerEscolha);
+  // Depois que a pessoa mexe num dos dois campos, vale o que ela deixou, inclusive "—" nos dois.
+  const [mexeu, setMexeu] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
+  const [criarCartaoAoSalvar, setCriarCartaoAoSalvar] = useState(true);
   const [depois, setDepois] = useState<Depois | null>(null);
   const campoFrase = useRef<HTMLTextAreaElement>(null);
 
@@ -84,12 +88,25 @@ export function RegistrarErro() {
       p.id === lembrada.pontoId &&
       (!disciplinaLembrada || p.disciplinaId === disciplinaLembrada.id),
   );
-  const escolha: Escolha = {
-    ...(disciplinaLembrada ? { disciplinaId: disciplinaLembrada.id } : {}),
-    ...(pontoLembrado ? { pontoId: pontoLembrado.id } : {}),
-  };
+  // A Sessão aberta num Ponto diz de que Ponto é o erro (vale mais que a escolha lembrada: é o sinal mais
+  // atual). Só até a pessoa mexer num dos campos: limpar um campo também é escolher, e a Sessão não a desfaz.
+  const pontoDaSessao =
+    !mexeu && sessao?.alvo?.tipo === 'ponto'
+      ? pontos?.find((p) => p.id === sessao.alvo?.id)
+      : undefined;
+  const disciplinaDaSessao = disciplinas?.find((d) => d.id === pontoDaSessao?.disciplinaId);
+  const escolha: Escolha = pontoDaSessao
+    ? {
+        ...(disciplinaDaSessao ? { disciplinaId: disciplinaDaSessao.id } : {}),
+        pontoId: pontoDaSessao.id,
+      }
+    : {
+        ...(disciplinaLembrada ? { disciplinaId: disciplinaLembrada.id } : {}),
+        ...(pontoLembrado ? { pontoId: pontoLembrado.id } : {}),
+      };
 
   const mudarEscolha = (m: Escolha) => {
+    setMexeu(true);
     setEscolha(() => {
       const nova = { ...escolha, ...m };
       for (const [k, v] of Object.entries(nova)) if (!v) Reflect.deleteProperty(nova, k);
@@ -109,6 +126,8 @@ export function RegistrarErro() {
       const erro = await registrarErro(repo, {
         ...complemento,
         ...escolha,
+        // Com uma Sessão aberta, o erro nasce ligado a ela (o resumo ao encerrar conta pela faixa de tempo).
+        ...(sessao ? { sessaoId: sessao.id } : {}),
         fraseCorreta: frase,
         ...(resultado ? { resultado } : {}),
         ...(oQueFoi.trim() ? { oQueFoi } : {}),
@@ -119,25 +138,20 @@ export function RegistrarErro() {
         if (f) await criarCartoesDeLacuna(repo, f.id, ocultos, separados);
         const maior = await maiorFilaProjetada(repo);
         setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
+      } else if (erro.oQueFoi && criarCartaoAoSalvar) {
+        try {
+          await criarCartaoDeErro(repo, erro.id);
+          const maior = await maiorFilaProjetada(repo);
+          setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
+        } catch {
+          setDepois({ tipo: 'sem-cartao', erro });
+          setFalha('Não foi possível criar o cartão. O erro já está salvo.');
+        }
       } else {
-        setDepois(erro.oQueFoi ? { tipo: 'perguntar', erro } : { tipo: 'sem-cartao', erro });
+        setDepois({ tipo: 'sem-cartao', erro });
       }
     } catch {
       setFalha('Não foi possível salvar. Confira os campos e tente de novo; nada foi perdido.');
-    } finally {
-      setSalvando(false);
-    }
-  };
-
-  const criarCartao = async (erro: Erro) => {
-    if (salvando) return;
-    setSalvando(true);
-    try {
-      await criarCartaoDeErro(repo, erro.id);
-      const maior = await maiorFilaProjetada(repo);
-      setDepois({ tipo: 'cartao', erro, filaCheia: maior > LIMITE_FILA_DIARIA });
-    } catch {
-      setFalha('Não foi possível criar o cartão. O erro já está salvo.');
     } finally {
       setSalvando(false);
     }
@@ -151,6 +165,7 @@ export function RegistrarErro() {
     setResultado(null);
     setOQueFoi('');
     setComplemento({});
+    setCriarCartaoAoSalvar(true);
     setDepois(null);
     setFalha(null);
   };
@@ -160,8 +175,8 @@ export function RegistrarErro() {
     if (!depois) campoFrase.current?.focus();
   }, [depois]);
 
-  const nomeDisciplina = disciplinaLembrada?.nome;
-  const ponto = pontoLembrado;
+  const nomeDisciplina = disciplinas?.find((d) => d.id === escolha.disciplinaId)?.nome;
+  const ponto = pontos?.find((q) => q.id === escolha.pontoId);
 
   if (depois) {
     return (
@@ -170,34 +185,13 @@ export function RegistrarErro() {
         <p role="status" className="sucesso">
           Frase registrada.
         </p>
-        {depois.tipo === 'perguntar' && (
-          <p>
-            Criar cartão?{' '}
-            <button
-              type="button"
-              className="principal"
-              disabled={salvando}
-              onClick={() => void criarCartao(depois.erro)}
-            >
-              Sim
-            </button>{' '}
-            <button
-              type="button"
-              onClick={() => {
-                setDepois({ tipo: 'sem-cartao', erro: depois.erro });
-              }}
-            >
-              Agora não
-            </button>
-          </p>
-        )}
         {depois.tipo === 'cartao' && (
           <>
             <p role="status">Cartão criado. Primeira revisão amanhã.</p>
             {depois.filaCheia && (
               <p className="aviso">
-                Há dias com mais de {LIMITE_FILA_DIARIA} revisões previstas: você está criando mais
-                cartões do que revisa.
+                Em algum dia desta semana passam de {LIMITE_FILA_DIARIA} as revisões previstas. Sem
+                pressa: revise a cota de cada vez, e o resto espera.
               </p>
             )}
           </>
@@ -216,13 +210,18 @@ export function RegistrarErro() {
           <button type="button" className="principal" onClick={outro}>
             Registrar outra
           </button>
-          <Link to={`/recall/erros/${depois.erro.id}`} className="botao">
-            Completar este erro
-          </Link>
-          <Link to="/recall" className="botao discreto">
-            Voltar ao {ROTULO_DA_AREA.recall}
-          </Link>
         </div>
+        <details>
+          <summary className="botao botao-texto na-margem">Mais</summary>
+          <div className="linha-acoes">
+            <Link to={`/recall/erros/${depois.erro.id}`} className="botao">
+              Completar este erro
+            </Link>
+            <Link to="/recall" className="botao discreto">
+              Voltar ao {ROTULO_DA_AREA.recall}
+            </Link>
+          </div>
+        </details>
       </>
     );
   }
@@ -368,8 +367,20 @@ export function RegistrarErro() {
               }}
             />
             <p id="erro-o-que-foi-dica" className="dica">
-              A pergunta ou o tropeço. Com ele, o erro pode virar cartão.
+              A pergunta ou o tropeço. Com ele, o erro vira cartão.
             </p>
+            {oQueFoi.trim() !== '' && (
+              <label className="opcao">
+                <input
+                  type="checkbox"
+                  checked={criarCartaoAoSalvar}
+                  onChange={(e) => {
+                    setCriarCartaoAoSalvar(e.target.checked);
+                  }}
+                />
+                Criar o cartão deste erro
+              </label>
+            )}
           </div>
           <CamposErro
             valor={complemento}

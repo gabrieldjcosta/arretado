@@ -3,6 +3,7 @@ import type { ProximaAcao } from '../../dominios/hoje/contrato';
 
 /** Título em verbo: a ação primeiro, o motivo logo abaixo. */
 export function tituloDaAcao(acao: ProximaAcao): string {
+  if (acao.trecho) return `Ler ${acao.trecho.rotulo}`;
   return acao.tipo === 'leitura_salva' ? 'Continuar a leitura' : (acao.alvo.rotulo ?? acao.razao);
 }
 
@@ -11,10 +12,10 @@ export function tituloDaAcao(acao: ProximaAcao): string {
  * repete.
  */
 export function motivoDaAcao(acao: ProximaAcao): string | undefined {
-  return acao.tipo === 'leitura_salva' ? undefined : acao.razao;
+  return acao.tipo === 'leitura_salva' && !acao.trecho ? undefined : acao.razao;
 }
 
-/** "Continuar" para quem já estava lendo; "Começar" para o resto. */
+/** "Continuar" para quem já estava lendo; "Começar" para o resto (um trecho do mapa é começo). */
 export function rotuloDoBotao(acao: ProximaAcao): string {
-  return acao.tipo === 'leitura_salva' ? 'Continuar' : 'Começar';
+  return acao.tipo === 'leitura_salva' && !acao.trecho ? 'Continuar' : 'Começar';
 }

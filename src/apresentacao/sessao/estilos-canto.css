@@ -1,0 +1,82 @@
+/* Canto da Sessão: relógio discreto e bloquinho de distração. Só tokens. Mora no fim da casca, em fluxo,
+   e fica preso (sticky) embaixo à esquerda, acima das abas, para não encontrar o dock do Leitor
+   (embaixo à direita). Enquanto a página tem mais para rolar ele flutua; no fim ele assenta na própria
+   linha, abaixo do rodapé, e nenhum controle do fim da tela fica sob ele. */
+.canto-sessao {
+  position: sticky;
+  bottom: calc(var(--abas-altura) + 1rem);
+  z-index: 4;
+  display: flex;
+  align-self: flex-start;
+  max-width: calc(100% - 2rem);
+  margin: 0.5rem 0 1rem max(1rem, env(safe-area-inset-left, 0px));
+}
+
+.canto-sessao__relogio {
+  min-height: var(--alvo);
+  min-width: var(--alvo);
+  padding: 0 0.875rem;
+  border: var(--borda-folha);
+  border-radius: var(--raio-botao);
+  background: var(--fundo-controle);
+  color: var(--texto-atenuado);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* O tempo ("12 de 25 min") é um bloco em linha: com texto ampliado desce inteiro para a linha de baixo do rótulo
+   e só se parte nos espaços quando nem sozinho cabe. */
+.canto-sessao__tempo {
+  display: inline-block;
+}
+
+/* Na tela da Sessão ele não flutua, assenta no fim da casca: lá moram Pausar, Encerrar e Acertei/Errei, que um
+   relógio preso embaixo cobriria já na primeira tela (320 px, texto a 200%). */
+.canto-sessao--na-tela {
+  position: relative;
+  bottom: auto;
+}
+
+/* Em foco só o tempo (o nome inteiro está no aria-label): o relógio não toma a largura do dock de baixo. */
+:root[data-modo-foco] .canto-sessao__rotulo {
+  display: none;
+}
+
+/* O bloquinho abre para cima do relógio sem tomar lugar no fluxo (a página não pula ao abrir) e rola
+   por dentro se a tela é baixa (celular deitado, texto ampliado). A altura máxima deixa de fora o cabeçalho
+   preso (3,75 rem; 90 px quando quebra em duas linhas, a 195 px) e o relógio com até duas linhas, para o
+   campo nunca ficar sob o cabeçalho. */
+.canto-sessao__painel {
+  position: absolute;
+  inset-block-end: calc(100% + 0.5rem);
+  inset-inline-start: 0;
+  width: min(20rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - var(--abas-altura) - 2 * var(--alvo) - 2rem - max(3.75rem, 90px));
+  overflow-y: auto;
+  padding: 0.75rem;
+  border: var(--borda-folha);
+  border-radius: calc(var(--raio-botao) + 4px);
+  background: var(--fundo-controle);
+}
+
+.canto-sessao__titulo {
+  margin: 0 0 0.5rem;
+  color: var(--texto-atenuado);
+}
+
+/* Com texto ampliado o campo não fica espremido ("Anota"): o Guardar desce para a linha de baixo. */
+.canto-sessao__nota {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.canto-sessao__nota input {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.canto-sessao .dica {
+  min-height: 1.25rem;
+  margin: 0.25rem 0;
+}

@@ -82,17 +82,19 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: 'Monte seu plano do seu jeito' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Você pode importar as disciplinas e os pontos do seu edital ou montar o plano a partir do nosso catálogo de concursos.',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Escolha o concurso e o app monta a Trilha/)).toBeInTheDocument();
 
-    const linkCatalogo = screen.getByRole('link', { name: 'Montar pelo catálogo' });
-    expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
+    // Um começo só (27/10/2026): o mesmo "Escolher meu concurso" do Hoje e da Biblioteca.
+    const escolher = screen.getByRole('link', { name: 'Escolher meu concurso' });
+    expect(escolher).toHaveAttribute('href', '#/comecar');
+    expect(escolher).toHaveClass('principal');
 
     const linkTrazer = screen.getByRole('link', { name: 'Trazer meu edital' });
     expect(linkTrazer).toHaveAttribute('href', '#importar-edital');
+
+    // O passo a passo continua, como caminho secundário.
+    const linkCatalogo = screen.getByRole('link', { name: 'Montar pelo catálogo' });
+    expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
   });
 
   it('copia o prompt exato para IA no clipboard', async () => {

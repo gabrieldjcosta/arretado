@@ -1,6 +1,12 @@
 import { useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 
 /**
+ * O título do diálogo: o texto, que o diálogo desenha num `<h2>`, ou o `id` de um título que o próprio
+ * conteúdo desenha (o passeio da Chegada troca de tela, e o título vai junto).
+ */
+type Titulo = { titulo: string; idDoTitulo?: never } | { titulo?: never; idDoTitulo: string };
+
+/**
  * Diálogo modal nativo (<dialog>): foco preso, Esc fecha, fundo inerte.
  * No máximo um por ação (Parte 2 §9.1).
  */
@@ -8,19 +14,19 @@ export function Dialogo({
   aberto,
   aoFechar,
   titulo,
+  idDoTitulo,
   classe,
   descritoPor,
   children,
 }: {
   aberto: boolean;
   aoFechar: () => void;
-  titulo: string;
   /** Classe do `<dialog>` (posição e largura próprias, como a busca na norma). */
   classe?: string;
   /** `id` do trecho que descreve o diálogo; o leitor de tela o lê depois do título. */
   descritoPor?: string;
   children: ReactNode;
-}) {
+} & Titulo) {
   const ref = useRef<HTMLDialogElement>(null);
   const idTitulo = useId();
 
@@ -43,14 +49,14 @@ export function Dialogo({
     <dialog
       ref={ref}
       className={classe}
-      aria-labelledby={idTitulo}
+      aria-labelledby={idDoTitulo ?? idTitulo}
       aria-describedby={descritoPor}
       onCancel={(e) => {
         e.preventDefault();
         aoFechar();
       }}
     >
-      <h2 id={idTitulo}>{titulo}</h2>
+      {titulo !== undefined && <h2 id={idTitulo}>{titulo}</h2>}
       {aberto && children}
     </dialog>
   );

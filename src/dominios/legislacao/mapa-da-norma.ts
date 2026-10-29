@@ -167,6 +167,8 @@ export interface Concentracao {
   total: number;
   /** A parte da massa que esses artigos concentram (0 a 1). */
   parcela: number;
+  /** A massa dos artigos em vigor (soma dos pesos): quase o número de questões que caíram na norma. */
+  massaTotal: number;
 }
 
 /** "81 dos 432 artigos concentram 70% do que a banca cobrou desta norma." */
@@ -184,7 +186,7 @@ export function concentracao(quadrados: readonly QuadradoDoMapa[]): Concentracao
       massa += q.peso;
     }
   }
-  return { artigos, total, parcela: massaTotal > 0 ? massa / massaTotal : 0 };
+  return { artigos, total, parcela: massaTotal > 0 ? massa / massaTotal : 0, massaTotal };
 }
 
 export interface TrechoDoMapa {
@@ -259,4 +261,21 @@ export function rotuloDoTrecho(quadrados: readonly QuadradoDoMapa[], trecho: Tre
   const numero = (rotulo: string) => rotulo.replace(/^Art\.\s*/i, '');
   if (trecho.de === trecho.ate) return `art. ${numero(de)}`;
   return `arts. ${numero(de)} a ${numero(ate)}`;
+}
+
+/**
+ * O roteiro de "ler seguindo o mapa": os próximos trechos em ordem, cada um escolhido como se os
+ * anteriores já estivessem cobertos. Termina quando não resta artigo com faixa por cobrir.
+ */
+export function roteiroDoMapa(
+  quadrados: readonly QuadradoDoMapa[],
+  cobertos: readonly boolean[],
+): TrechoDoMapa[] {
+  const feitos = [...cobertos];
+  const trechos: TrechoDoMapa[] = [];
+  for (let t = proximoTrecho(quadrados, feitos); t; t = proximoTrecho(quadrados, feitos)) {
+    trechos.push(t);
+    feitos.fill(true, t.de, t.ate + 1);
+  }
+  return trechos;
 }

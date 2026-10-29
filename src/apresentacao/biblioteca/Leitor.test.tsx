@@ -533,7 +533,7 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
   });
 
-  it('sair da norma grava a posição, e a Biblioteca oferece "Continuar leitura"', async () => {
+  it('sair da norma grava a posição, e a Biblioteca oferece "Retomar"', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const aberta = await abrirNorma(repo, norma.id);
@@ -544,7 +544,7 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     expect(await obterLeitura(repo, norma.id)).toBeUndefined();
 
     await usuario.click(screen.getByRole('link', { name: 'Voltar à Biblioteca' }));
-    const continuar = await screen.findByRole('link', { name: 'Continuar leitura: LEP' });
+    const continuar = await screen.findByRole('link', { name: /^Retomar: LEP/ });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${norma.id}`);
     expect(screen.getByRole('region', { name: 'Normas' })).toHaveTextContent('Última leitura:');
     // No alto da tela estava a primeira linha.
@@ -2260,8 +2260,11 @@ describe('Ponto de luz no Leitor (P4)', () => {
       const capitulo = await within(estrutura).findByRole('button', {
         name: /^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/,
       });
-      expect(capitulo).toHaveAttribute('aria-current', 'location');
-      const dentro = within(estrutura).getByRole('list', { name: 'Dentro de CAPÍTULO I' });
+      // O nome do botão chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera.
+      await waitFor(() => {
+        expect(capitulo).toHaveAttribute('aria-current', 'location');
+      });
+      const dentro = await within(estrutura).findByRole('list', { name: 'Dentro de CAPÍTULO I' });
       expect(
         await within(dentro).findByRole('button', { name: /^Seção I Disposições Gerais/ }),
       ).not.toHaveAttribute('aria-current');

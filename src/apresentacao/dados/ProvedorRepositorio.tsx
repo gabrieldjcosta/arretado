@@ -5,6 +5,7 @@ import {
   type Repositorio,
 } from '../../core/persistencia';
 import { contasHabilitadas } from '../../integracoes/conta';
+import { esconderCarregamento } from '../carregamento';
 import { registrarAceitePendente } from '../conta/entrar/aceite';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { ContextoRepositorio } from './contexto';
@@ -17,6 +18,9 @@ type Estado =
   | { tipo: 'fechadoPorOutraAba'; motivo: MotivoFechamento };
 
 const abrirPadrao = () => abrirRepositorioAtivo({ contasHabilitadas: contasHabilitadas() });
+
+/** Quanto a tela de carregamento espera a Abertura (que decide em até 0,4 s) antes de sair sozinha. */
+const ESPERA_DA_ABERTURA_MS = 600;
 
 /** Abre o banco local uma vez e o oferece às telas. */
 export function ProvedorRepositorio({
@@ -55,6 +59,23 @@ export function ProvedorRepositorio({
       desinscrever();
     };
   }, [abrir, registro]);
+
+  // A tela do index.html sai quando há o que mostrar: a explicação, se o banco não abre, ou o app aberto. Com o
+  // banco aberto quem a tira é a Abertura, no quadro em que o app monta; aqui fica a rede de segurança, para a
+  // tela nunca cobrir o app (um erro antes de a Abertura montar, uma rota fora da casca).
+  useEffect(() => {
+    if (estado.tipo === 'carregando') return;
+    if (estado.tipo !== 'pronto') {
+      void esconderCarregamento();
+      return;
+    }
+    const relogio = window.setTimeout(() => {
+      void esconderCarregamento();
+    }, ESPERA_DA_ABERTURA_MS);
+    return () => {
+      window.clearTimeout(relogio);
+    };
+  }, [estado.tipo]);
 
   if (estado.tipo === 'carregando') {
     return (

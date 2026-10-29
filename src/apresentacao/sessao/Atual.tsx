@@ -5,7 +5,9 @@ import type { Sessao } from '../../core/modelo';
 import { pausarSessao, retomarSessao } from '../../dominios/sessao/servico';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
-import { Alavancas } from './alavancas/Alavancas';
+import { rotuloDaAtividade } from './atividades';
+import { QuestoesDaSessao } from './QuestoesDaSessao';
+import { SoEstudo } from './alavancas/SoEstudo';
 import { horaDeInicio, sessaoAberta } from './carregadores';
 import { rotaDoAlvo } from './rota-do-alvo';
 import './estilos-sessao.css';
@@ -57,6 +59,9 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
       <h1>Sessão</h1>
       <section className="cartao-bloco" aria-label="Sessão em andamento">
         <p className="sessao-resumo">{sessao.alvo?.rotulo ?? 'Sessão livre'}</p>
+        {sessao.atividade && rotuloDaAtividade(sessao.atividade) !== sessao.alvo?.rotulo && (
+          <p className="sessao-detalhe">{rotuloDaAtividade(sessao.atividade)}</p>
+        )}
         {sessao.fronteira && <p className="sessao-detalhe">Até onde: {sessao.fronteira}</p>}
         <p className="sessao-detalhe">Começou às {horaDeInicio(sessao.inicio)}.</p>
         {pausada && (
@@ -98,7 +103,10 @@ function SessaoEmAndamento({ sessao }: { sessao: Sessao }) {
         </div>
         {erro && <Falha oQue="Não foi possível salvar." oQueFazer="Tente de novo." />}
       </section>
-      <Alavancas sessao={sessao} />
+      {sessao.atividade === 'questoes' && !pausada && <QuestoesDaSessao sessao={sessao} />}
+      <div className="alavancas">
+        <SoEstudo />
+      </div>
     </>
   );
 }

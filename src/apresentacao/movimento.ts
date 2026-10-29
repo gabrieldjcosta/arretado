@@ -32,30 +32,36 @@ export const movimentoAgora = (): Movimento =>
 /** Seno suave de 0 a 1: o traço do Dia sai devagar, anda e assenta. */
 export const suave = (progresso: number): number => 0.5 - 0.5 * Math.cos(Math.PI * progresso);
 
-const [X1, Y1, X2, Y2] = [0.2, 0.7, 0.2, 1] as const;
-const CX = 3 * X1;
-const BX = 3 * (X2 - X1) - CX;
-const AX = 1 - CX - BX;
-const CY = 3 * Y1;
-const BY = 3 * (Y2 - Y1) - CY;
-const AY = 1 - CY - BY;
-const emX = (t: number) => ((AX * t + BX) * t + CX) * t;
-const emY = (t: number) => ((AY * t + BY) * t + CY) * t;
-const derivadaX = (t: number) => (3 * AX * t + 2 * BX) * t + CX;
+/**
+ * Uma Bézier cúbica como a do CSS (`cubic-bezier(x1, y1, x2, y2)`) como função do progresso (0 a 1), para
+ * quem anda uma ponta quadro a quadro em vez de entregar a curva ao navegador.
+ */
+export function criarCurva(x1: number, y1: number, x2: number, y2: number) {
+  const cx = 3 * x1;
+  const bx = 3 * (x2 - x1) - cx;
+  const ax = 1 - cx - bx;
+  const cy = 3 * y1;
+  const by = 3 * (y2 - y1) - cy;
+  const ay = 1 - cy - by;
+  const emX = (t: number) => ((ax * t + bx) * t + cx) * t;
+  const emY = (t: number) => ((ay * t + by) * t + cy) * t;
+  const derivadaX = (t: number) => (3 * ax * t + 2 * bx) * t + cx;
+  return (progresso: number): number => {
+    const x = Math.min(1, Math.max(0, progresso));
+    let t = x;
+    for (let i = 0; i < 8; i += 1) {
+      const erro = emX(t) - x;
+      if (Math.abs(erro) < 1e-5) break;
+      const d = derivadaX(t);
+      if (Math.abs(d) < 1e-6) break;
+      t -= erro / d;
+    }
+    return emY(Math.min(1, Math.max(0, t)));
+  };
+}
 
 /** `CURVA` como função do progresso (0 a 1), para quem anda a ponta de um traço quadro a quadro. */
-export function curva(progresso: number): number {
-  const x = Math.min(1, Math.max(0, progresso));
-  let t = x;
-  for (let i = 0; i < 8; i += 1) {
-    const erro = emX(t) - x;
-    if (Math.abs(erro) < 1e-5) break;
-    const d = derivadaX(t);
-    if (Math.abs(d) < 1e-6) break;
-    t -= erro / d;
-  }
-  return emY(Math.min(1, Math.max(0, t)));
-}
+export const curva = criarCurva(0.2, 0.7, 0.2, 1);
 
 /**
  * A página recarregou (ou saiu) no meio de um quadro: o SVG já está num documento inativo e o

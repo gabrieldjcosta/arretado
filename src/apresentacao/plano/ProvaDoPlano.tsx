@@ -1,5 +1,5 @@
-// A data da prova objetiva (AP-03): um campo opcional. O app a usa só para não marcar Revisão depois
-// dela e para fazer uma passada final pelos Pontos mais cobrados; não mostra contagem regressiva.
+// A data da prova objetiva (AP-03): um campo opcional. O app a usa para não marcar Revisão depois
+// dela, para fazer uma passada final pelos Pontos mais cobrados e para dizer no Hoje quantos dias faltam.
 import { useEffect, useRef, useState } from 'react';
 import { dataDaProvaInformada, definirDataDaProva } from '../../dominios/recall/prova';
 import { hoje as hojeDe } from '../../dominios/recall/servico';
@@ -117,7 +117,8 @@ export function ProvaDoPlano() {
             />
           </div>
           <p className="dica">
-            As revisões não passam da prova, e os pontos mais cobrados voltam na última semana.
+            As revisões não passam da prova, e os pontos mais cobrados voltam na última semana. O
+            Hoje mostra em quantos dias é a prova.
           </p>
           {passou && (
             <p role="status" className="dica">

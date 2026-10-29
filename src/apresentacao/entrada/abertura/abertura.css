@@ -1,0 +1,131 @@
+/* A Abertura (contrato do Zé, §9): o nome em tela cheia, escrito pela caneta, e a luz que o leva ao
+   cabeçalho. Só tokens, sem cor literal: o nome segue o texto do mundo; a luz, os tokens da marca
+   (`--marca-ponto`, `--marca-disco`) e o halo da caneta (`--pen-halo`). É um `popover="manual"` (camada
+   de topo do navegador), por cima de qualquer <dialog> aberto antes; o resto do estilo do popover vem
+   do navegador e é refeito aqui para cobrir a tela inteira. Movimento reduzido: a camada nem existe. */
+.abertura {
+  /* Navegador sem popover: uma camada fixa cobre a tela (abaixo de um <dialog> modal, o que o app evita
+     fazendo a Chegada esperar). */
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  color: var(--texto);
+  background-color: var(--fundo);
+  /* Nada de rolar ou arrastar por baixo: o primeiro toque só pula. */
+  touch-action: none;
+  overscroll-behavior: contain;
+  user-select: none;
+}
+
+@keyframes abertura-entra {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* O nome fica no meio da tela, com 1,25 rem de folga de cada lado; a 200% de fonte a largura acompanha. */
+.abertura-palco {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 1.25rem;
+}
+
+/* Só o nome da abertura do Dia entra em 160 ms (o `aparece-160` do mockup): o desenho já vem escrito e não pode
+   estourar na tela. A primeira vez se escreve do nada e o Calmo já esmaece pelo próprio desenho (`eb-calmo`,
+   0,24 s), então nenhum dos dois leva fade de entrada. O fundo nunca entra: se subisse de 0 a 1, o app de
+   baixo atravessaria a camada. */
+.abertura[data-escrita='curta']:not([data-calmo]) .abertura-palco {
+  animation: abertura-entra 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.abertura-nome {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.abertura-nome .lockup {
+  width: 100%;
+  max-width: none;
+}
+
+/* Enquanto a luz voa (e no perfil Calmo, ao fim), o fundo e o nome esmaecem: o cabeçalho do app, com o
+   ponto de luz parado onde a viagem pousa, aparece por baixo. A luz do próprio nome sai de cena no mesmo
+   quadro em que a que voa sai do mesmo lugar. */
+.abertura[data-fase='voando'],
+.abertura[data-fase='saindo'] {
+  background-color: transparent;
+  transition: background-color 360ms ease;
+}
+
+.abertura[data-fase='voando'] .abertura-nome,
+.abertura[data-fase='saindo'] .abertura-nome {
+  opacity: 0;
+  transition: opacity 360ms ease;
+}
+
+.abertura[data-fase='voando'] .eb-luz,
+.abertura[data-fase='voando'] .eb-halo,
+.abertura[data-fase='voando'] .eb-disco,
+.abertura[data-fase='voando'] .eb-luzfb {
+  visibility: hidden;
+}
+
+/* O "Pular" sai com o voo: com o fundo já transparente ele ficaria sozinho sobre a barra de baixo. Esmaece e,
+   no fim, o visibility o tira de vez (e do foco). */
+.abertura[data-fase='voando'] .abertura-pular,
+.abertura[data-fase='saindo'] .abertura-pular {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 160ms ease,
+    visibility 0s linear 160ms;
+}
+
+/* A luz que voa: um ponto com o disco de marca-texto e o halo, num <svg> do tamanho da tela. As medidas
+   e a posição vêm do script, em pixels da tela. */
+.abertura-luz {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.abertura-halo {
+  fill: var(--pen-halo);
+  opacity: 0.9;
+  filter: blur(3.5px);
+}
+
+.abertura-disco {
+  fill: var(--marca-disco);
+}
+
+.abertura-ponto {
+  fill: var(--marca-ponto);
+}
+
+/* "Pular" (a sequência da primeira vez, com as Boas-vindas depois do nome, passa de 5 s: WCAG 2.2.2): um botão
+   de texto no pé da tela, num alvo de 44 px. */
+.abertura-pular {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+}

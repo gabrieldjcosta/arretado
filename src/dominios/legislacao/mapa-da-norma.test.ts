@@ -8,6 +8,7 @@ import {
   proximoTrecho,
   quadradosDoMapa,
   rotuloDoTrecho,
+  roteiroDoMapa,
 } from './mapa-da-norma';
 
 type Esboco = [
@@ -138,6 +139,7 @@ describe('mapa da norma: cobertura', () => {
     expect(c.artigos).toBe(4);
     expect(c.total).toBe(6);
     expect(c.parcela).toBeCloseTo(7 / 7.5);
+    expect(c.massaTotal).toBe(7.5);
   });
 });
 
@@ -174,5 +176,29 @@ describe('mapa da norma: próximo trecho', () => {
     expect(proximoTrecho(qq, cobertura(qq, undefined).cobertos, 3)?.artigos).toBe(3);
     expect(proximoTrecho(qq, cobertura(qq, 9).cobertos)).toBeUndefined();
     expect(proximoTrecho(quadradosDoMapa(NOS, undefined), [])).toBeUndefined();
+  });
+});
+
+describe('mapa da norma: roteiro', () => {
+  const q = quadradosDoMapa(NOS, MAPA);
+
+  it('encadeia os trechos como se cada um já estivesse lido, sem repetir artigo nem pegar o revogado', () => {
+    const roteiro = roteiroDoMapa(q, cobertura(q, undefined).cobertos);
+    expect(roteiro.map((t) => rotuloDoTrecho(q, t))).toEqual([
+      'arts. 2 a 3',
+      'art. 1',
+      'art. 5-A',
+      'art. 5',
+    ]);
+    const artigos = roteiro.flatMap((t) => q.slice(t.de, t.ate + 1).map((a) => a.id));
+    expect(new Set(artigos).size).toBe(artigos.length);
+  });
+
+  it('não inclui o que já foi coberto, e fica vazio quando tudo foi', () => {
+    expect(roteiroDoMapa(q, cobertura(q, 7).cobertos).map((t) => rotuloDoTrecho(q, t))).toEqual([
+      'art. 5-A',
+      'art. 5',
+    ]);
+    expect(roteiroDoMapa(q, cobertura(q, 12).cobertos)).toEqual([]);
   });
 });

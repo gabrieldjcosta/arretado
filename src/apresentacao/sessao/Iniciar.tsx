@@ -25,7 +25,16 @@ function lerEntrada(p: URLSearchParams) {
     cicloId: bruto('ciclo'),
     blocoOrdem: /^\d+$/.test(bruto('bloco') ?? '') ? Number(bruto('bloco')) : undefined,
     direto: bruto('direto') === '1',
+    // Endereço de um dispositivo (`art3`): a leitura direta abre nele, seguindo o mapa.
+    ir: /^[a-z0-9][a-z0-9-]{0,63}$/i.test(bruto('ir') ?? '') ? bruto('ir') : undefined,
   };
+}
+
+/** A tela do alvo e, numa leitura com trecho do mapa, o Leitor já no trecho. */
+function destinoDe(dada: ReturnType<typeof lerEntrada>): string | undefined {
+  const rota = dada.direto ? (rotaDoAlvo(dada.alvo) ?? '/sessao/atual') : undefined;
+  if (rota === undefined || dada.ir === undefined || dada.alvo?.tipo !== 'leitura') return rota;
+  return `${rota}?ir=${dada.ir}&foco=artigo&mapa=1`;
 }
 
 export function Iniciar() {
@@ -39,7 +48,7 @@ export function Iniciar() {
   const jaComecou = useRef(false);
   const dada = lerEntrada(params);
 
-  const destino = dada.direto ? rotaDoAlvo(dada.alvo) : undefined;
+  const destino = destinoDe(dada);
   const comecar = () => {
     setErro(false);
     const alvo =

@@ -1,6 +1,8 @@
-// O traço de seleção (D-D7, "A caneta que desenha"): uma linha fina que se desenha em volta do item
-// que acabou de ser escolhido, com a ponta de luz à frente, some e deixa o item como estava. Imperativo
-// de propósito: o React só dá o <svg> vazio dentro do item, e esta função enche e esvazia.
+// O traço de seleção (D-D8, "A caneta que desenha"): uma linha fina que se desenha em volta do item
+// que acabou de ser escolhido, com a ponta de luz à frente, some e deixa o item como estava. Com
+// movimento normal leva o néon suave (D-D10): uma cópia larga e borrada do contorno, que acende com ele
+// e some com ele. Imperativo de propósito: o React só dá o <svg> vazio dentro do item, e esta função
+// enche e esvazia.
 import { curva, documentoInativo, movimentoAgora, type Movimento } from '../../movimento';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -10,13 +12,39 @@ const DESENHA_MS = 240;
 const SEGURA_MS = 120;
 const SOME_MS = 260;
 const ESMAECE_MS = 380;
+/** O desfoque do néon e a folga da região do filtro (3 desvios-padrão, para a borda não cortar o brilho). */
+const DESFOQUE_DO_NEON = 2.4;
+const FOLGA_DO_NEON = 12;
+let filtros = 0;
 
 const nada = () => undefined;
 
+/** O `<defs>` com o desfoque do néon, numa região fixa que cobre o item e a folga do brilho. */
+function filtroDoNeon(id: string, largura: number, altura: number): SVGDefsElement {
+  const defs = document.createElementNS(NS, 'defs');
+  const filtro = document.createElementNS(NS, 'filter');
+  for (const [nome, valor] of Object.entries({
+    id,
+    filterUnits: 'userSpaceOnUse',
+    x: -FOLGA_DO_NEON,
+    y: -FOLGA_DO_NEON,
+    width: largura + 2 * FOLGA_DO_NEON,
+    height: altura + 2 * FOLGA_DO_NEON,
+  })) {
+    filtro.setAttribute(nome, String(valor));
+  }
+  const desfoque = document.createElementNS(NS, 'feGaussianBlur');
+  desfoque.setAttribute('stdDeviation', String(DESFOQUE_DO_NEON));
+  filtro.append(desfoque);
+  defs.append(filtro);
+  return defs;
+}
+
 /**
- * Desenha o traço em volta do item (o pai do `svg`). `normal`: o fio se desenha em 240 ms, a ponta
- * anda à frente, o conjunto espera 120 ms e some em 260 ms. `calmo`: o contorno inteiro só aparece e
- * esmaece, sem andar (380 ms). `reduzido`: nada. Devolve quem cancela e deixa o `svg` vazio.
+ * Desenha o traço em volta do item (o pai do `svg`). `normal`: o fio se desenha em 240 ms com o néon
+ * atrás, a ponta anda à frente, o conjunto espera 120 ms e some em 260 ms. `calmo`: o contorno inteiro
+ * só aparece e esmaece, sem andar e sem néon (380 ms). `reduzido`: nada. Devolve quem cancela e deixa o
+ * `svg` vazio.
  */
 export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora()): () => void {
   const item = svg.parentElement;
@@ -36,17 +64,21 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
   svg.setAttribute('height', String(altura + 2 * MARGEM));
   // Parado, o <svg> não ocupa lugar nenhum: só existe enquanto o traço se desenha.
   svg.dataset.ativo = '';
-  const fio = document.createElementNS(NS, 'rect');
-  for (const [nome, valor] of Object.entries({
-    x: MARGEM,
-    y: MARGEM,
-    width: largura,
-    height: altura,
-    rx: raio,
-    ry: raio,
-  })) {
-    fio.setAttribute(nome, String(valor));
-  }
+  const contorno = () => {
+    const rect = document.createElementNS(NS, 'rect');
+    for (const [nome, valor] of Object.entries({
+      x: MARGEM,
+      y: MARGEM,
+      width: largura,
+      height: altura,
+      rx: raio,
+      ry: raio,
+    })) {
+      rect.setAttribute(nome, String(valor));
+    }
+    return rect;
+  };
+  const fio = contorno();
   svg.replaceChildren(fio);
 
   let quadro = 0;
@@ -67,6 +99,16 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
     return limpar;
   }
 
+  // O néon (D-D10): o mesmo contorno, mais largo e desfocado, sob o fio. O filtro tem região fixa em
+  // volta do item (a caixa de um contorno fino é a do próprio item) e id próprio: dois traços podem
+  // existir ao mesmo tempo, e um `<svg>` escondido não serve de lar para um filtro compartilhado.
+  const idDoNeon = `traco-neon-${String(filtros)}`;
+  filtros += 1;
+  const neon = contorno();
+  neon.setAttribute('class', 'traco-neon');
+  neon.setAttribute('filter', `url(#${idDoNeon})`);
+  svg.prepend(filtroDoNeon(idDoNeon, largura + 2 * MARGEM, altura + 2 * MARGEM), neon);
+
   const ponta = document.createElementNS(NS, 'circle');
   ponta.setAttribute('r', '3.2');
   const pousar = (distancia: number) => {
@@ -77,8 +119,10 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
   let comprimento = 0;
   try {
     comprimento = fio.getTotalLength();
-    fio.style.strokeDasharray = String(comprimento);
-    fio.style.strokeDashoffset = String(comprimento);
+    for (const el of [fio, neon]) {
+      el.style.strokeDasharray = String(comprimento);
+      el.style.strokeDashoffset = String(comprimento);
+    }
     pousar(0);
   } catch (erro) {
     // A página recarregou entre a escolha e o primeiro quadro: o navegador não mede um documento inativo.
@@ -91,7 +135,9 @@ export function tracar(svg: SVGSVGElement, movimento: Movimento = movimentoAgora
   const inicio = performance.now();
   const passo = (agora: number) => {
     const progresso = curva(Math.min(1, (agora - inicio) / DESENHA_MS));
-    fio.style.strokeDashoffset = String(comprimento * (1 - progresso));
+    const faltando = String(comprimento * (1 - progresso));
+    fio.style.strokeDashoffset = faltando;
+    neon.style.strokeDashoffset = faltando;
     try {
       pousar(progresso * comprimento);
     } catch (erro) {

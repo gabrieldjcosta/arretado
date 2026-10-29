@@ -89,3 +89,38 @@
   margin: 0.5rem 0 0;
   font-weight: 600;
 }
+
+/* O néon suave (D-D10): o grupo gêmeo do núcleo do cacto, mais largo e desfocado (o filtro vem do
+   `QuadroDoCacto`), sob os traços. Acende na hora enquanto a caneta anda (`data-acesa`, posto pelo
+   `desenhar.ts`) e assenta em 0,6 s quando o fio fecha, para o repouso do mundo (de dia, nada; à noite,
+   baixo). No Calmo ele não acende: fica no repouso. Reduzido: o repouso, parado. */
+.quadro-neon {
+  opacity: var(--neon-repouso);
+  transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.quadro-neon[data-acesa] {
+  opacity: var(--neon-aceso);
+  transition: none;
+}
+
+.quadro-neon-fio {
+  fill: none;
+  stroke: var(--neon-cor);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quadro-neon {
+    transition: none;
+  }
+}
+
+/* Cores forçadas: o brilho é decoração e some. */
+@media (forced-colors: active) {
+  .quadro-neon {
+    display: none;
+  }
+}

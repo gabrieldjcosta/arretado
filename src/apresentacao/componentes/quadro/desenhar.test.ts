@@ -19,7 +19,7 @@ const parte = (id: string) => {
 function novasCamadas(): Camadas {
   const svg = document.createElementNS(NS, 'svg');
   const grupo = () => svg.appendChild(document.createElementNS(NS, 'g'));
-  return { lavis: grupo(), tracos: grupo(), caneta: grupo() };
+  return { lavis: grupo(), neon: grupo(), tracos: grupo(), caneta: grupo() };
 }
 
 describe('pintar o quadro parado', () => {
@@ -76,12 +76,36 @@ describe('pintar o quadro parado', () => {
     expect(hoje?.previousElementSibling).toHaveClass('quadro-marca');
   });
 
-  it('limpar esvazia o papel e larga a caneta', () => {
+  it('o néon (D-D10) é o gêmeo do núcleo do cacto, e de mais nada', () => {
+    const c = novasCamadas();
+    pintarAte(c, 4);
+    // O tronco e os dois braços: um gêmeo para cada núcleo, com o mesmo caminho.
+    const nucleos = PARTES.slice(0, 4)
+      .flatMap((p) => p.fios)
+      .filter((f) => f.cor === 'nucleo');
+    expect(nucleos).toHaveLength(3);
+    const gemeos = [...c.neon.querySelectorAll('.quadro-neon-fio')];
+    expect(gemeos.map((g) => g.getAttribute('d'))).toEqual(nucleos.map((f) => f.d));
+
+    // Flores, sol, aves, bichos e o aro de vidro não brilham.
+    const d = novasCamadas();
+    pintarAte(d, PARTES.length);
+    expect(d.neon.children).toHaveLength(3);
+    pintarParte(d, parte('sol'));
+    pintarParte(d, parte('espinhos'));
+    expect(d.neon.children).toHaveLength(3);
+  });
+
+  it('limpar esvazia o papel, apaga o néon e larga a caneta', () => {
     const c = novasCamadas();
     pintarAte(c, 5);
+    expect(c.neon.children).toHaveLength(3);
+    c.neon.dataset.acesa = '';
     c.caneta.setAttribute('transform', posicaoDaCaneta(10, 20));
     limpar(c);
     expect(c.lavis.children).toHaveLength(0);
+    expect(c.neon.children).toHaveLength(0);
+    expect(c.neon.hasAttribute('data-acesa')).toBe(false);
     expect(c.tracos.children).toHaveLength(0);
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
   });
@@ -136,6 +160,9 @@ describe('desenharParte', () => {
     expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(3);
     expect(c.tracos.querySelectorAll('.quadro-hoje')).toHaveLength(1);
     expect(c.caneta.getAttribute('transform')).toBe(REPOUSO_DA_CANETA);
+    // O néon vem pronto, no repouso: Reduzido nunca acende.
+    expect(c.neon.querySelectorAll('.quadro-neon-fio')).toHaveLength(1);
+    expect(c.neon.hasAttribute('data-acesa')).toBe(false);
   });
 
   it('a caneta anda sobre o traço enquanto ele se faz e volta a ser largada', async () => {
@@ -164,6 +191,78 @@ describe('desenharParte', () => {
     // Terminado, o traço é igual ao pintado de uma vez: um traço só, sem pontilhado nem estilo.
     expect(c.tracos.querySelectorAll('.quadro-fio')).toHaveLength(3);
     expect(c.tracos.querySelector('.quadro-fio[style]')).toBeNull();
+  });
+
+  it('o néon acende com o núcleo, anda junto com ele e assenta quando o fio fecha (D-D10)', async () => {
+    const c = novasCamadas();
+    pintarAte(c, 1);
+    const sinal = new AbortController().signal;
+    let terminou: boolean | undefined;
+    void desenharParte(c, parte('tronco'), 'normal', sinal).then((ok) => {
+      terminou = ok;
+    });
+
+    // Antes de a caneta sair do repouso e do aro (o primeiro fio do tronco) não há brilho.
+    await vi.advanceTimersByTimeAsync(100);
+    expect(c.neon.children).toHaveLength(0);
+    expect(c.neon.hasAttribute('data-acesa')).toBe(false);
+
+    // O aro (vidro) vem primeiro e não acende nada; depois o núcleo traça e acende.
+    let aceso = false;
+    let andou = false;
+    for (let i = 0; i < 60 && terminou === undefined; i += 1) {
+      await vi.advanceTimersByTimeAsync(50);
+      const gemeo = c.neon.querySelector<SVGPathElement>('.quadro-neon-fio');
+      if (!gemeo) continue;
+      aceso ||= c.neon.hasAttribute('data-acesa');
+      // O gêmeo anda com o fio dele: mesmo pontilhado, mesmo avanço e mesma visibilidade.
+      const fio = [...c.tracos.querySelectorAll<SVGPathElement>('.quadro-cor-nucleo')].at(-1);
+      if (fio?.style.strokeDashoffset) {
+        expect(gemeo.style.strokeDasharray).toBe(fio.style.strokeDasharray);
+        expect(gemeo.style.strokeDashoffset).toBe(fio.style.strokeDashoffset);
+        expect(gemeo.style.visibility).toBe(fio.style.visibility);
+        if (Number(fio.style.strokeDashoffset) < 100 && Number(fio.style.strokeDashoffset) > 0) {
+          andou = true;
+        }
+      }
+    }
+    expect(aceso).toBe(true);
+    expect(andou).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(terminou).toBe(true);
+    // Fechado o fio, o néon assenta (o CSS faz a transição) e fica um gêmeo só, sem estilo.
+    expect(c.neon.hasAttribute('data-acesa')).toBe(false);
+    expect(c.neon.querySelectorAll('.quadro-neon-fio')).toHaveLength(1);
+    expect(c.neon.querySelector('.quadro-neon-fio[style]')).toBeNull();
+  });
+
+  it('no Calmo o Dia se desenha com o néon no repouso, sem acender', async () => {
+    const c = novasCamadas();
+    pintarAte(c, 1);
+    const terminou = desenharParte(c, parte('tronco'), 'calmo', new AbortController().signal);
+    let aceso = false;
+    for (let i = 0; i < 60; i += 1) {
+      await vi.advanceTimersByTimeAsync(50);
+      aceso ||= c.neon.hasAttribute('data-acesa');
+    }
+    expect(await terminou).toBe(true);
+    expect(aceso).toBe(false);
+    expect(c.neon.querySelectorAll('.quadro-neon-fio')).toHaveLength(1);
+  });
+
+  it('uma parte sem núcleo (o sol) não acende o brilho do cacto', async () => {
+    const c = novasCamadas();
+    pintarAte(c, 4);
+    const terminou = desenharParte(c, parte('sol'), 'normal', new AbortController().signal);
+    let aceso = false;
+    for (let i = 0; i < 80; i += 1) {
+      await vi.advanceTimersByTimeAsync(50);
+      aceso ||= c.neon.hasAttribute('data-acesa');
+    }
+    expect(await terminou).toBe(true);
+    expect(aceso).toBe(false);
+    expect(c.neon.children).toHaveLength(3);
   });
 
   it('a flor brota ao fim do traço e o bicho ganha o olho', async () => {

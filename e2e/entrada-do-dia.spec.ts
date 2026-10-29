@@ -1,10 +1,11 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect, semViolacoes, test } from './apoio';
 
-// A Chegada e a Entrada do Dia (D-D9): duas folhas modais sobre o Hoje. Os testes de unidade e de
-// componente provam as regras e o texto; aqui rodam o <dialog> de verdade (foco preso, Esc, rolagem por
-// dentro com zoom e texto grandes), o axe nos dois temas, os alvos de 44 px e o conteúdo que não carrega.
-// Nenhum depende de animação: as folhas aparecem paradas. Safari e Firefox não são exercitados.
+// A Chegada (D-D10: Boas-vindas, Passeio, Começar) e a Entrada do Dia (D-D9): duas folhas modais sobre o
+// Hoje. Os testes de unidade e de componente provam as regras e o texto; aqui rodam o <dialog> de verdade
+// (foco preso, Esc, o caminho das telas) e o conteúdo que não carrega. O layout das cinco telas (axe nos
+// dois temas, alvos de 44 px, zoom e celular pequeno) está em `passeio.spec.ts`. Nenhum teste depende de
+// animação: as folhas aparecem paradas. Safari e Firefox não são exercitados.
 //
 // Este arquivo desliga a semeadura que dá a todos os outros testes um aparelho que já viu as duas folhas
 // (ver `apoio.ts`); o primeiro teste confere que, ligada, ela deixa o Hoje livre.
@@ -14,13 +15,11 @@ const CHAVE_CHEGADA = 'arretado:chegada:v1';
 const CHAVE_ENTRADA = 'arretado:entrada-do-dia:v1';
 
 // A Entrada de 21/10/2026 é a da prancha: Ricardo Reis e "Tentar lembrar vale mais que reler".
-const ONTEM = new Date('2026-10-20T21:40:00-03:00');
 const HOJE = new Date('2026-10-21T09:30:00-03:00');
 
 const hoje = (page: Page) => page.getByRole('heading', { level: 1, name: 'Hoje' });
 const folhaAberta = (page: Page) => page.locator('dialog[open]');
 const chegada = (page: Page) => page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-const entrada = (page: Page) => page.getByRole('dialog', { name: 'Bom dia' });
 
 /** O aparelho já viu a Chegada: o que abre, no Hoje, é a Entrada do Dia. */
 async function jaViuAChegada(page: Page) {
@@ -45,14 +44,6 @@ async function nadaAbre(page: Page) {
   await expect(folhaAberta(page)).toHaveCount(0);
 }
 
-/** Cria uma tarefa (no relógio de então) para a Próxima ação do Hoje não ser vazia. */
-async function criarTarefa(page: Page, titulo: string) {
-  await page.goto('/#/plano/tarefas');
-  await page.getByLabel('O que fazer?').fill(titulo);
-  await page.getByRole('button', { name: 'Adicionar tarefa' }).click();
-  await expect(page.getByRole('region', { name: 'Fila' }).getByText(titulo)).toBeVisible();
-}
-
 /**
  * Tab dá a volta só pela folha: o fundo está inerte. Depois do último botão o foco sai para o navegador
  * (`body`, no headless) e volta ao primeiro; o que nunca pode é cair num elemento do Hoje por baixo.
@@ -66,19 +57,6 @@ async function focoFicaNaFolha(page: Page, voltas = 6) {
       return dentro ? '' : a.textContent;
     });
     expect(fora, 'o foco saiu da folha para o Hoje').toBe('');
-  }
-}
-
-/** Todo botão e link da folha tem 44 px de lado, no mínimo (0,01 de folga para o arredondamento). */
-async function alvosDe44(folha: Locator) {
-  const alvos = folha.locator('a, button');
-  const quantos = await alvos.count();
-  expect(quantos).toBeGreaterThan(0);
-  for (let i = 0; i < quantos; i += 1) {
-    const caixa = await alvos.nth(i).boundingBox();
-    const nome = (await alvos.nth(i).textContent()) ?? String(i);
-    expect(caixa?.height ?? 0, nome).toBeGreaterThanOrEqual(43.99);
-    expect(caixa?.width ?? 0, nome).toBeGreaterThanOrEqual(43.99);
   }
 }
 
@@ -114,17 +92,18 @@ test.describe('Chegada', () => {
     await page.clock.setFixedTime(HOJE);
   });
 
-  test('a primeira vez no aparelho abre a folha, com o foco no primeiro caminho; Esc fecha e ela não volta', async ({
+  test('a primeira vez no aparelho abre as Boas-vindas, com o foco no título; Esc fecha e ela não volta', async ({
     page,
   }) => {
     await page.goto('/#/');
     const folha = chegada(page);
     await expect(folha).toBeVisible();
-    await expect(folha.getByRole('link', { name: 'Escolher meu concurso' })).toBeFocused();
-    await expect(folha.getByRole('link', { name: 'Ler uma norma' })).toBeVisible();
-    await expect(folha.getByRole('link', { name: 'Registrar um erro' })).toBeVisible();
-    await expect(folha.getByRole('link', { name: /^Montar uma trilha/ })).toBeVisible();
-    await expect(folha.getByRole('button', { name: 'Agora não' })).toBeVisible();
+    await expect(
+      folha.getByRole('heading', { level: 2, name: 'Boas-vindas ao Arretado!' }),
+    ).toBeFocused();
+    await expect(folha.getByRole('button')).toHaveText(['Agora não', 'Vamos']);
+    // Nenhum caminho para outra tela: o Hoje vazio é que oferece "Escolher meu concurso".
+    await expect(folha.getByRole('link')).toHaveCount(0);
     await focoFicaNaFolha(page);
 
     await page.keyboard.press('Escape');
@@ -135,22 +114,60 @@ test.describe('Chegada', () => {
     await nadaAbre(page);
   });
 
-  for (const [nome, rota, titulo] of [
-    ['Escolher meu concurso', /#\/comecar$/, 'Qual concurso você estuda?'],
-    ['Registrar um erro', /#\/recall\/registrar$/, 'Registrar erro'],
-    ['Ler uma norma', /#\/biblioteca$/, 'Biblioteca'],
-    ['Montar uma trilha', /#\/plano\/onboarding$/, 'Para qual carreira você estuda?'],
-  ] as const) {
-    test(`"${nome}" leva à tela dele, sem a folha por cima`, async ({ page }) => {
-      await page.goto('/#/');
-      await chegada(page)
-        .getByRole('link', { name: new RegExp(`^${nome}`) })
-        .click();
-      await expect(page).toHaveURL(rota);
-      await expect(page.getByRole('heading', { name: titulo })).toBeVisible();
-      await expect(folhaAberta(page)).toHaveCount(0);
-    });
-  }
+  test('"Vamos" abre o Passeio, um passo por menu; "Seguir" chega ao Começar, que fecha sem conta', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await chegada(page).getByRole('button', { name: 'Vamos' }).click();
+    const menus = ['Hoje', 'Trilha', 'Fixar', 'Biblioteca'];
+    for (const [i, menu] of menus.entries()) {
+      const passo = page.getByRole('dialog', { name: `Passo ${String(i + 1)} de 4 ${menu}` });
+      await expect(passo).toBeVisible();
+      await expect(passo.getByRole('heading', { level: 2, name: menu })).toBeFocused();
+      await expect(passo.getByRole('link')).toHaveCount(0);
+      await passo.getByRole('button', { name: 'Seguir' }).click();
+    }
+    const comecar = page.getByRole('dialog', { name: 'Vamo começar?' });
+    await expect(comecar).toBeVisible();
+    await expect(comecar.getByRole('heading', { level: 2 })).toBeFocused();
+    await comecar
+      .getByRole('button', { name: 'Experimentar sem conta e salvar seus dados manualmente' })
+      .click();
+    await expect(folhaAberta(page)).toHaveCount(0);
+    await expect(hoje(page)).toBeVisible();
+
+    await page.reload();
+    await nadaAbre(page);
+  });
+
+  test('"Voltar" desfaz um passo; do primeiro, volta às Boas-vindas, e a folha segue sem links', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await chegada(page).getByRole('button', { name: 'Vamos' }).click();
+    await page.getByRole('button', { name: 'Seguir' }).click();
+    const segundo = page.getByRole('dialog', { name: 'Passo 2 de 4 Trilha' });
+    await expect(segundo).toBeVisible();
+    await segundo.getByRole('button', { name: 'Voltar', exact: true }).click();
+    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' });
+    await expect(primeiro).toBeVisible();
+    await primeiro.getByRole('button', { name: 'Voltar às boas-vindas' }).click();
+    await expect(chegada(page)).toBeVisible();
+    await expect(chegada(page).getByRole('heading', { level: 2 })).toBeFocused();
+  });
+
+  test('Esc num passo pula o passeio e leva ao Começar; Esc no Começar fecha a folha', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await chegada(page).getByRole('button', { name: 'Vamos' }).click();
+    await expect(page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog', { name: 'Vamo começar?' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(folhaAberta(page)).toHaveCount(0);
+    await expect(hoje(page)).toBeVisible();
+  });
 
   test('"Agora não" fecha e deixa o Hoje; recarregar no mesmo Dia não abre nenhuma folha', async ({
     page,
@@ -171,154 +188,58 @@ test.describe('Chegada', () => {
     await page.reload();
     await nadaAbre(page);
   });
-
-  test('sem violações do axe, nos dois temas, com alvos de 44 px', async ({ page }) => {
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
-    await semViolacoes(page);
-    await alvosDe44(chegada(page));
-  });
-
-  test('com zoom de 200% e com texto grande, a folha rola por dentro e tudo se alcança', async ({
-    page,
-  }) => {
-    // 200% de zoom em 390 × 800 é 195 × 400 px de layout.
-    await page.setViewportSize({ width: 195, height: 400 });
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-    const agoraNao = chegada(page).getByRole('button', { name: 'Agora não' });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-
-    // Texto a 200% numa tela de celular (CSSOM: a CSP barra <style> e style="").
-    await page.setViewportSize({ width: 390, height: 800 });
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = '200%';
-    });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-  });
 });
 
-test.describe('Entrada do Dia', () => {
+test.describe('Entrada do Dia (S4: uma linha quieta abaixo do Agora)', () => {
   test.beforeEach(async ({ page }) => {
     await jaViuAChegada(page);
   });
 
-  test('abre com a saudação, a Citação e a dica do Dia; o foco vai para o botão do Agora', async ({
+  const linha = (page: Page) => page.locator('.linha-do-dia');
+
+  test('a saudação e a dica do Dia viram uma linha abaixo do Agora, sem folha por cima', async ({
     page,
   }) => {
     await page.clock.setFixedTime(HOJE);
     await page.goto('/#/');
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    await expect(folha.getByRole('blockquote')).toContainText(
-      'Sê todo em cada coisa. Põe quanto és No mínimo que fazes.',
-    );
-    await expect(folha.locator('figcaption')).toHaveText('Fernando Pessoa (Ricardo Reis), Odes');
-    // Os versos mantêm a quebra do original.
-    await expect(folha.locator('.entrada-citacao p')).toHaveCSS('white-space', 'pre-line');
-    await expect(folha.getByRole('heading', { level: 3, name: 'Dica de hoje' })).toBeVisible();
-    await expect(folha).toContainText('Tentar lembrar vale mais que reler.');
-    // Sem Agora (o Hoje vazio), o único caminho é "Continuar", com o foco.
-    await expect(folha.getByRole('button', { name: 'Continuar' })).toBeFocused();
-    await expect(folha).toHaveAccessibleDescription(/Tentar lembrar vale mais que reler\./);
-    await focoFicaNaFolha(page);
+    await expect(linha(page)).toBeVisible();
+    await expect(linha(page)).toContainText('Bom dia.');
+    await expect(linha(page)).toContainText('Tentar lembrar vale mais que reler.');
+    await expect(folhaAberta(page)).toHaveCount(0);
+    // A Citação deixou a tela; o Hoje não está inerte.
+    await expect(page.getByRole('blockquote')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: /^(Agora|Por onde começar)$/ })).toBeVisible();
+    const abaixo = await page.evaluate(() => {
+      const l = document.querySelector('.linha-do-dia')?.getBoundingClientRect();
+      const g = document.querySelector('[aria-label="Agora"], [aria-label="Por onde começar"]');
+      return l !== undefined && g ? g.getBoundingClientRect().bottom <= l.top : false;
+    });
+    expect(abaixo).toBe(true);
   });
 
-  test('no Dia seguinte o botão leva ao Agora e a folha não fica por cima', async ({ page }) => {
-    await page.clock.setFixedTime(ONTEM);
-    await criarTarefa(page, 'Ler arts. 112 a 117 da LEP');
-    await page.goto('/#/');
-    await expect(hoje(page)).toBeVisible();
-    // A Entrada de ontem (21h40): fecha, e o Dia dela acabou.
-    await page
-      .getByRole('dialog', { name: 'Boa noite' })
-      .getByRole('button', { name: 'Agora não' })
-      .click();
-    await expect(folhaAberta(page)).toHaveCount(0);
-
-    await page.clock.setFixedTime(HOJE);
-    await page.reload();
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    const comecar = folha.getByRole('link', { name: 'Começar: Ler arts. 112 a 117 da LEP' });
-    await expect(comecar).toBeFocused();
-    await expect(folha.getByRole('button', { name: 'Agora não' })).toBeVisible();
-
-    await comecar.click();
-    await expect(page).toHaveURL(/#\/sessao\/iniciar\?/);
-    await expect(folhaAberta(page)).toHaveCount(0);
-  });
-
-  test('Esc fecha; recarregar no mesmo Dia, ou fechar o aplicativo com ela aberta, não a traz de volta', async ({
-    page,
-  }) => {
+  test('recarregar no mesmo Dia não a repete; o Dia seguinte traz outra dica', async ({ page }) => {
     await page.clock.setFixedTime(HOJE);
     await page.goto('/#/');
-    await expect(entrada(page)).toBeVisible();
+    const dica = await linha(page).innerText();
 
     await page.reload();
     await nadaAbre(page);
-
-    // Outro Dia, outra Entrada; Esc a fecha.
-    await page.clock.setFixedTime(new Date(HOJE.getTime() + 24 * 60 * 60_000));
-    await page.reload();
-    await expect(entrada(page)).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(folhaAberta(page)).toHaveCount(0);
-    await expect(hoje(page)).toBeVisible();
-  });
-
-  test('o Dia seguinte traz outro par de Citação e dica', async ({ page }) => {
-    await page.clock.setFixedTime(HOJE);
-    await page.goto('/#/');
-    const primeira = await entrada(page).getByRole('blockquote').innerText();
-    const dica = await entrada(page).locator('.entrada-dica').innerText();
+    await expect(linha(page)).toHaveCount(0);
 
     await page.clock.setFixedTime(new Date(HOJE.getTime() + 24 * 60 * 60_000));
     await page.reload();
-    await expect(entrada(page)).toBeVisible();
-    expect(await entrada(page).getByRole('blockquote').innerText()).not.toBe(primeira);
-    expect(await entrada(page).locator('.entrada-dica').innerText()).not.toBe(dica);
+    await expect(linha(page)).toBeVisible();
+    expect(await linha(page).innerText()).not.toBe(dica);
   });
 
-  test('sem violações do axe, nos dois temas, com alvos de 44 px', async ({ page }) => {
-    await page.clock.setFixedTime(HOJE);
-    await page.goto('/#/');
-    await expect(entrada(page)).toBeVisible();
-    await semViolacoes(page);
-    await alvosDe44(entrada(page));
-  });
-
-  test('com zoom de 200% e com texto grande, a folha rola por dentro e tudo se alcança', async ({
-    page,
-  }) => {
-    await page.clock.setFixedTime(ONTEM);
-    await criarTarefa(page, 'Ler arts. 112 a 117 da LEP');
+  test('sem violações do axe e sem rolagem lateral a 200% de zoom', async ({ page }) => {
     await page.clock.setFixedTime(HOJE);
     await page.setViewportSize({ width: 195, height: 400 });
     await page.goto('/#/');
-    const folha = entrada(page);
-    await expect(folha).toBeVisible();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-    const agoraNao = folha.getByRole('button', { name: 'Agora não' });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
-
+    await expect(linha(page)).toBeVisible();
+    expect(await rolagemLateral(page)).toMatchObject({ pagina: 0 });
     await page.setViewportSize({ width: 390, height: 800 });
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = '200%';
-    });
-    await agoraNao.scrollIntoViewIfNeeded();
-    await expect(agoraNao).toBeInViewport();
-    await folha.getByRole('link', { name: /^Começar:/ }).scrollIntoViewIfNeeded();
-    await expect(folha.getByRole('link', { name: /^Começar:/ })).toBeInViewport();
-    expect(await rolagemLateral(page)).toEqual({ pagina: 0, folha: 0 });
+    await semViolacoes(page);
   });
 });
 
@@ -326,7 +247,7 @@ test.describe('Entrada do Dia › se o conteúdo não carregar', () => {
   // O pedido do trecho que falha é, ele mesmo, um erro de console; o que não pode haver é erro da página.
   test.use({ permitirFalhasConsole: true });
 
-  test('a folha não abre, nada é gravado e o Hoje segue usável', async ({ page }) => {
+  test('a linha não aparece, nada é gravado e o Hoje segue usável', async ({ page }) => {
     const erros: string[] = [];
     page.on('pageerror', (e) => erros.push(e.message));
     let pedidos = 0;

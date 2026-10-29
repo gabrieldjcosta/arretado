@@ -140,6 +140,17 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
 
   // 6b: a mesma página não traz alteração; a página com lei nova dá indício e não troca o texto.
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  // S3: a verificação mora nas Ações do Leitor, não no topo do texto.
+  await expect(page.getByRole('button', { name: 'Verificar atualização' })).toHaveCount(0);
+  // No celular o Ações mora no "Mais", que fecha se a página ainda rola: tenta de novo até abrir.
+  const mais = page.getByRole('button', { name: 'Mais', exact: true });
+  await expect(async () => {
+    if (await mais.isVisible()) {
+      if ((await mais.getAttribute('aria-expanded')) !== 'true')
+        await mais.click({ timeout: 2000 });
+    }
+    await page.getByRole('button', { name: /^Ações/ }).click({ timeout: 2000 });
+  }).toPass({ timeout: 30_000 });
   const verificar = page.getByRole('button', { name: 'Verificar atualização' });
   await verificar.click();
   await expect(page.getByText(/Nenhuma alteração detectada: a página oficial é igual/)).toBeVisible(
@@ -147,6 +158,8 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
       timeout: 30_000,
     },
   );
+  // O botão desabilita enquanto busca e larga o foco no <body>: ao fim, o foco volta a ele.
+  await expect(verificar).toBeFocused();
   const maisNova = Buffer.from(
     bytes
       .toString('latin1')
@@ -161,12 +174,12 @@ test('buscar a LEP pelo endereço (rota interceptada) e publicar (12.3)', async 
       headers: { 'Content-Type': 'application/octet-stream', 'X-Tipo-Origem': 'text/html' },
     }),
   );
+  // A 320×568 px o painel rola por dentro: o resultado novo aparece à vista, sem a pessoa rolar à mão.
+  await page.setViewportSize({ width: 320, height: 568 });
   await verificar.click();
-  await expect(
-    page.getByText(/Há indício de alteração: a página cita Lei nº 99.999, de 2099/),
-  ).toBeVisible({
-    timeout: 30_000,
-  });
+  const indicio = page.getByText(/Há indício de alteração: a página cita Lei nº 99.999, de 2099/);
+  await expect(indicio).toBeVisible({ timeout: 30_000 });
+  await expect(indicio).toBeInViewport({ ratio: 1 });
   await semViolacoes(page);
 });
 

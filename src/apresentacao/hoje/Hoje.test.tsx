@@ -105,6 +105,21 @@ describe('Hoje › Ponto de luz (P3)', () => {
     expect(screen.queryByRole('region', { name: 'Em seguida' })).toBeNull();
   });
 
+  it('com Sessão aberta o Continuar é o botão principal e nem o Agora nem o "Em seguida" aparecem', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
+    await lerLep(repo);
+    relogio.avancar(3 * DIA);
+    await iniciarSessao(repo, { atividade: 'lei' });
+    abrirHoje(repo);
+
+    const aberta = await screen.findByRole('region', { name: 'Sessão aberta' });
+    await screen.findByRole('list', { name: 'Andamento do Dia' });
+    expect(within(aberta).getByRole('link', { name: 'Continuar' })).toHaveClass('principal');
+    expect(screen.queryByRole('region', { name: 'Agora' })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Em seguida' })).toBeNull();
+  });
+
   it('"Trocar" reordena o "Em seguida" só nesta visita; "Escolher outra coisa" traz o que ficou primeiro', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });

@@ -1,9 +1,15 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoes, test } from './apoio';
+import { expect, pularAAbertura, semViolacoes, test } from './apoio';
 
-// A escrita do nome (D-D9, Q6): a caneta escreve "arretado" no cabeçalho, volta por baixo deixando um
-// traço de luz e vira o cacto. Os testes de unidade não têm layout, CSS nem animação; aqui roda o
-// desenho de verdade, no Chromium. Safari e Firefox não são exercitados (ver docs/planos/tinta-e-noite.md).
+// A escrita do nome (D-D9, Q6): a caneta escreve "arretado", volta por baixo deixando um traço de luz e
+// vira o cacto. Os testes de unidade não têm layout, CSS nem animação; aqui roda o desenho de verdade, no
+// Chromium. Safari e Firefox não são exercitados (ver docs/planos/tinta-e-noite.md).
+//
+// Na primeira vez no aparelho e na primeira abertura de cada Dia o nome se escreve em tela cheia (a
+// Abertura, ver `abertura.spec.ts`). O cabeçalho continua a escrevê-lo quando a tela cheia não abre: com uma
+// Sessão aberta ou com o "só estudo" ligado (o perfil Calmo o liga). É esse desenho, o mesmo componente, que
+// estes testes exercitam: o aparelho nasce sem a semeadura da escrita e é posto num desses casos.
+test.use({ semearEscrita: false });
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
 const DIA_ANTIGO = JSON.stringify({ dia: '2026-01-01' });
@@ -25,8 +31,13 @@ async function terminou(page: Page) {
   await expect.poll(() => noAr(page), { timeout: 10_000, intervals: [100] }).toEqual([]);
 }
 
-/** O lockup do cabeçalho como pixels: o quadro final tem de ser o mesmo em qualquer caminho até ele. */
+/**
+ * O lockup do cabeçalho como pixels: o quadro final tem de ser o mesmo em qualquer caminho até ele. Espera a tela de
+ * carregamento (index.html) sair: ela esmaece por 160 ms por cima do app que acabou de montar, e um recorte feito
+ * nessa saída tem uns três pontos do nome mais claros (o teste da parada aceita zero).
+ */
 async function lockup(page: Page): Promise<Buffer> {
+  await expect(page.locator('#carregamento')).toHaveCount(0);
   return page.locator('.marca').screenshot({ animations: 'allow' });
 }
 
@@ -63,6 +74,48 @@ async function pontosDiferentes(page: Page, a: Buffer, b: Buffer): Promise<numbe
 }
 
 /**
+ * A maior diferença, em níveis de 255, entre as médias de blocos de `lado` × `lado` pontos de dois recortes
+ * PNG: a serrilha que muda de lugar por meia casa de ponto some na média do bloco, e um brilho que
+ * faltasse (em volta das letras, à noite) não. -1 se os tamanhos diferem.
+ */
+async function diferencaPorBloco(page: Page, a: Buffer, b: Buffer, lado = 8): Promise<number> {
+  return page.evaluate(
+    async ({ primeiro, segundo, bloco }) => {
+      const ler = async (base64: string) => {
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const imagem = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
+        const tela = new OffscreenCanvas(imagem.width, imagem.height);
+        const contexto = tela.getContext('2d');
+        if (!contexto) throw new Error('sem canvas');
+        contexto.drawImage(imagem, 0, 0);
+        return contexto.getImageData(0, 0, imagem.width, imagem.height);
+      };
+      const [x, y] = await Promise.all([ler(primeiro), ler(segundo)]);
+      if (x.width !== y.width || x.height !== y.height) return -1;
+      let maior = 0;
+      for (let por = 0; por + bloco <= x.height; por += bloco) {
+        for (let pox = 0; pox + bloco <= x.width; pox += bloco) {
+          for (let canal = 0; canal < 3; canal += 1) {
+            let somaX = 0;
+            let somaY = 0;
+            for (let l = por; l < por + bloco; l += 1) {
+              for (let c = pox; c < pox + bloco; c += 1) {
+                const i = (l * x.width + c) * 4 + canal;
+                somaX += x.data[i] ?? 0;
+                somaY += y.data[i] ?? 0;
+              }
+            }
+            maior = Math.max(maior, Math.abs(somaX - somaY) / (bloco * bloco));
+          }
+        }
+      }
+      return maior;
+    },
+    { primeiro: a.toString('base64'), segundo: b.toString('base64'), bloco: lado },
+  );
+}
+
+/**
  * Desembrulha as regras de reserva (`@supports not (d: path(...))` e `(offset-path: ...)`) para o
  * Chromium, que as ignoraria. Pelo CSSOM: a CSP `style-src 'self'` barra um `<style>` de dentro da página.
  */
@@ -92,10 +145,35 @@ async function lembrarOutroDia(page: Page) {
   );
 }
 
-test('primeira abertura no aparelho: escreve as 8 letras em ordem e termina no lockup, nos dois mundos', async ({
+/**
+ * O aparelho no caso em que o cabeçalho escreve o nome: com uma Sessão aberta a tela cheia não abre. Começa
+ * a Sessão (pulando a Abertura da primeira vez) e recarrega o Hoje com o nome por escrever (`outroDia`
+ * falso: a primeira vez no aparelho) ou escrito em outro Dia (a primeira abertura de hoje, no modo curto).
+ */
+async function comASessaoAberta(page: Page, outroDia = false) {
+  await page.goto('/#/sessao/iniciar');
+  await pularAAbertura(page);
+  await page.getByRole('button', { name: 'Começar', exact: true }).click();
+  // `exact`: sem ele o título casa com o `h1` "Começar uma Sessão" da tela de começar, antes de a Sessão existir, e o
+  // `reload` abaixo pode chegar antes da gravação (`sessoes` vazio; a tela cheia abre e o cabeçalho nunca escreve).
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão', exact: true })).toBeVisible();
+  await page.evaluate(
+    ([chave, valor]: [string, string | null]) => {
+      if (valor === null) window.localStorage.removeItem(chave);
+      else window.localStorage.setItem(chave, valor);
+    },
+    [CHAVE, outroDia ? DIA_ANTIGO : null] as [string, string | null],
+  );
+  await page.goto('/#/');
+  await page.reload();
+  // A tela cheia não abre: o nome se escreve no cabeçalho.
+  await expect(page.locator('.abertura')).toHaveCount(0);
+}
+
+test('primeira abertura no aparelho, no cabeçalho: escreve as 8 letras em ordem e termina no lockup, nos dois mundos', async ({
   page,
 }) => {
-  await page.goto('/#/');
+  await comASessaoAberta(page);
   const svg = page.locator('.marca svg.eb');
   await expect(svg).toBeVisible();
   await expect(svg).not.toHaveClass(/curta|calmo|pulou/);
@@ -111,7 +189,9 @@ test('primeira abertura no aparelho: escreve as 8 letras em ordem e termina no l
     () =>
       new Promise<{ ordem: boolean; meio: boolean; largura: boolean; completos: boolean }>(
         (resolver) => {
-          const traços = [...document.querySelectorAll<SVGPathElement>('.marca svg.eb path.tr')];
+          const traços = [
+            ...document.querySelectorAll<SVGPathElement>('.marca svg.eb path.tr:not(.tn)'),
+          ];
           const raiz = document.documentElement;
           const fim = performance.now() + 4_500;
           let [ordem, meio, largura] = [true, false, true];
@@ -143,7 +223,15 @@ test('primeira abertura no aparelho: escreve as 8 letras em ordem e termina no l
     await page.reload();
     await expect(page.locator('.marca svg').first()).toBeVisible();
     expect(await noAr(page)).toEqual([]);
-    expect(await pontosDiferentes(page, await lockup(page), natural), `${esquema}: parada`).toBe(0);
+    const parada = await lockup(page);
+    if (esquema === 'light') {
+      expect(await pontosDiferentes(page, parada, natural), `${esquema}: parada`).toBe(0);
+    } else {
+      // À noite o brilho de repouso (o néon, D-D10) entra no desenho, e o Chromium, a 1x, refaz as bordas de
+      // algumas letras com menos de meio ponto de diferença entre a escrita acabada e o lockup parado (medido:
+      // 7 de 255 na média de um bloco de 8 pontos; sem o brilho seriam 25). Por isso aqui vale o bloco.
+      expect(await diferencaPorBloco(page, parada, natural), `${esquema}: parada`).toBeLessThan(12);
+    }
     await lembrarOutroDia(page);
     await page.reload();
     await terminou(page);
@@ -152,7 +240,7 @@ test('primeira abertura no aparelho: escreve as 8 letras em ordem e termina no l
 });
 
 test('segunda abertura do mesmo Dia: o lockup parado, sem escrita', async ({ page }) => {
-  await page.goto('/#/');
+  await comASessaoAberta(page);
   await expect(page.locator('.marca svg.eb')).toBeVisible();
   await page.reload();
   const marca = page.locator('.marca svg');
@@ -165,11 +253,10 @@ test('segunda abertura do mesmo Dia: o lockup parado, sem escrita', async ({ pag
   });
 });
 
-test('primeira abertura de outro Dia: a escrita curta, já com o nome escrito', async ({ page }) => {
-  await page.goto('/#/');
-  await terminou(page);
-  await lembrarOutroDia(page);
-  await page.reload();
+test('primeira abertura de outro Dia, no cabeçalho: a escrita curta, já com o nome escrito', async ({
+  page,
+}) => {
+  await comASessaoAberta(page, true);
   const svg = page.locator('.marca svg.eb');
   await expect(svg).toHaveClass(/curta/);
   // Entra 1,45 s adiantada: o primeiro traço já está feito no primeiro quadro, e acaba em 1,2 s.
@@ -192,8 +279,8 @@ test('primeira abertura de outro Dia: a escrita curta, já com o nome escrito', 
   });
 });
 
-test('um toque em qualquer lugar pula a escrita', async ({ page }) => {
-  await page.goto('/#/');
+test('um toque em qualquer lugar pula a escrita do cabeçalho', async ({ page }) => {
+  await comASessaoAberta(page);
   const svg = page.locator('.marca svg.eb');
   await expect(svg).not.toHaveClass(/pulou/);
   expect((await noAr(page)).length).toBeGreaterThan(0);
@@ -212,15 +299,16 @@ test('movimento reduzido: o lockup parado, e a primeira vez continua guardada', 
   expect(await page.evaluate((c) => localStorage.getItem(c), CHAVE)).toBeNull();
   await semViolacoes(page);
 
-  // Quando a pessoa deixa de reduzir, a primeira vez ainda está lá.
+  // Quando a pessoa deixa de reduzir, a primeira vez ainda está lá: o nome inteiro, em tela cheia.
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.reload();
-  await expect(page.locator('.marca svg.eb')).not.toHaveClass(/pulou|curta|calmo/);
+  await expect(page.locator('.abertura svg.eb')).not.toHaveClass(/pulou|curta|calmo/);
   expect((await noAr(page)).length).toBeGreaterThan(0);
 });
 
 test('perfil Calmo: o desenho só esmaece, sem caneta nem traço', async ({ page }) => {
   await page.goto('/#/conta/perfis');
+  await pularAAbertura(page);
   await page.getByRole('radio', { name: /^Calmo/ }).check();
   await page.getByRole('button', { name: 'Aplicar' }).click();
   await expect(
@@ -229,7 +317,9 @@ test('perfil Calmo: o desenho só esmaece, sem caneta nem traço', async ({ page
   await lembrarOutroDia(page);
   await page.reload();
 
+  // O perfil liga o "só estudo", e com ele a tela cheia não abre: o cabeçalho escreve, e só esmaece.
   // O perfil vem das Preferências, lidas de forma assíncrona: a escrita espera por elas.
+  await expect(page.locator('.abertura')).toHaveCount(0);
   const svg = page.locator('.marca svg.eb');
   await expect(svg).toHaveClass(/calmo/);
   // Só o esmaecer (a animação fica no ar com o preenchimento final): sem caneta, sem traço.
@@ -240,7 +330,7 @@ test('perfil Calmo: o desenho só esmaece, sem caneta nem traço', async ({ page
 test('sem d: path() e offset-path (Safari e Firefox): o quadro final continua sendo o lockup', async ({
   page,
 }) => {
-  await page.goto('/#/');
+  await comASessaoAberta(page);
   await terminou(page);
   const esperado = await lockup(page);
 

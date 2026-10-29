@@ -1,4 +1,4 @@
-// A cena do quadro do cacto (D-D7, "A caneta que desenha"): 16 partes, uma por Dia fechado. Cada parte
+// A cena do quadro do cacto (D-D8, "A caneta que desenha"): 16 partes, uma por Dia fechado. Cada parte
 // é uma lista de fios (path + papel de cor). Coordenadas finais no `VIEWBOX`; o chão fica em y = 156.
 // Sem cor literal: o papel de cor (`vidro`, `nucleo`, `tinta`, `tinta2`, `chao`) vira token em `quadro.css`.
 
@@ -39,7 +39,20 @@ export interface Parte {
   fios: readonly Fio[];
 }
 
+/**
+ * Quem leva o néon suave (D-D10): o núcleo de tinta do cacto (o tronco e os dois braços), o traço que
+ * corre pelo meio do tubo de vidro. As flores, o sol, as aves e os bichos ficam sem brilho: são traços
+ * finos, e o brilho é do cacto.
+ */
+export const temNeon = (fio: Fio): boolean => fio.cor === 'nucleo';
+
 export const VIEWBOX = '0 0 340 200';
+/**
+ * A região do filtro do néon, em unidades do quadro: o núcleo do cacto vai de x = 100 a 200 e de y = 57
+ * a 156; o brilho alcança 16 além do eixo do fio (a metade da largura, 7, e 3 desvios-padrão, 9) e a
+ * região dá folga sobre isso. Embaixo, até a borda do quadro.
+ */
+export const REGIAO_DO_NEON = { x: 40, y: 10, largura: 220, altura: 190 } as const;
 /**
  * Onde a caneta fica largada, como nas pranchas "Dia fechado" (D-D9, Q4): quase deitada (84°), pequena
  * (0,30) e com a ponta em (214, 183), sob o chão do desenho, à direita do cacto.

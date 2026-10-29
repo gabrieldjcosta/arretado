@@ -16,7 +16,6 @@ import { usePassagemDeCartao } from '../componentes/passagem';
 import { marcarEscolha } from '../componentes/traco/escolha';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
-import { FaixaDaSessao } from '../sessao/FaixaDaSessao';
 import { useVoz } from '../voz';
 import { TopoDaRevisao } from './TopoDaRevisao';
 
@@ -217,7 +216,6 @@ export function RevisarFrases() {
   return (
     <div className="coluna-drill">
       <h1 className="visualmente-oculto">Revisar frases</h1>
-      <FaixaDaSessao />
       <TopoDaRevisao
         sair="/recall/frases"
         valor={estado.indice + 1}

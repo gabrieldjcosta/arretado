@@ -5,6 +5,7 @@ import type { Sessao } from '../../core/modelo';
 import { encerrarSessao, sugerirProximoPasso } from '../../dominios/sessao/servico';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
+import { Encerrada } from './Encerrada';
 import { NotasDoEstacionamento } from './alavancas/NotasDoEstacionamento';
 import { sessaoAberta } from './carregadores';
 import './estilos-sessao.css';
@@ -54,8 +55,10 @@ function FormularioDeFechamento({
 }) {
   const [passo, setPasso] = useState(() => sugerirProximoPasso(sessao));
   const [erro, setErro] = useState(false);
-  const [feitas, setFeitas] = useState('');
-  const [acertos, setAcertos] = useState('');
+  const [feitas, setFeitas] = useState(sessao.questoesFeitas ? String(sessao.questoesFeitas) : '');
+  const [acertos, setAcertos] = useState(
+    sessao.questoesFeitas ? String(sessao.questoesAcertadas ?? 0) : '',
+  );
   const encerrar = () => {
     setErro(false);
     encerrarSessao(repo, sessao.id, {
@@ -129,28 +132,6 @@ function FormularioDeFechamento({
         {erro && <Falha oQue="Não foi possível encerrar." oQueFazer="Tente de novo." />}
       </section>
       <NotasDoEstacionamento sessao={sessao} />
-    </>
-  );
-}
-
-function Encerrada({ sessao }: { sessao: Sessao }) {
-  return (
-    <>
-      <h1>Encerrar a Sessão</h1>
-      <Vazio
-        titulo="Sessão encerrada"
-        acao={
-          <Link to="/" className="botao principal">
-            Ir para o Hoje
-          </Link>
-        }
-      >
-        {sessao.proximoPasso ? (
-          <p>Próximo passo guardado: {sessao.proximoPasso}</p>
-        ) : (
-          <p>Bom descanso. Você decide o que vem depois.</p>
-        )}
-      </Vazio>
     </>
   );
 }

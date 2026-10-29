@@ -134,6 +134,9 @@ describe('tracar (o traço de seleção)', () => {
     expect(svg).toHaveAttribute('height', '50');
     expect(svg.querySelectorAll('rect')).toHaveLength(1);
     expect(svg.querySelectorAll('circle')).toHaveLength(0);
+    // Calmo não tem néon (D-D10): nem o grupo gêmeo nem o filtro.
+    expect(svg.querySelector('.traco-neon')).toBeNull();
+    expect(svg.querySelector('filter')).toBeNull();
     expect(ambiente.animacoes).toHaveLength(1);
     expect(ambiente.animacoes[0]?.opcoes).toMatchObject({ duration: 380 });
 
@@ -159,7 +162,7 @@ describe('tracar (o traço de seleção)', () => {
   it('Normal: o fio se desenha em 240 ms com a ponta à frente, espera e some', async () => {
     const { svg } = itemComTraco();
     tracar(svg, 'normal');
-    const fio = svg.querySelector('rect');
+    const fio = svg.querySelector<SVGRectElement>('rect:not(.traco-neon)');
     const ponta = svg.querySelector('circle');
     expect(fio?.style.strokeDasharray).toBe('300');
     expect(fio?.style.strokeDashoffset).toBe('300');
@@ -185,6 +188,69 @@ describe('tracar (o traço de seleção)', () => {
     ambiente.animacoes[0]?.terminar();
     expect(svg.childNodes).toHaveLength(0);
     expect(svg.hasAttribute('data-ativo')).toBe(false);
+  });
+
+  it('Normal: o néon é o mesmo contorno, mais largo, sob o fio, e anda com ele (D-D10)', async () => {
+    const { svg } = itemComTraco();
+    tracar(svg, 'normal');
+    const [neon, fio] = svg.querySelectorAll<SVGRectElement>('rect');
+    expect(neon).toHaveClass('traco-neon');
+    expect(fio).not.toHaveClass('traco-neon');
+    // Mesma geometria do fio; vem antes dele no documento, então é pintado por baixo.
+    for (const atributo of ['x', 'y', 'width', 'height', 'rx', 'ry']) {
+      expect(neon?.getAttribute(atributo)).toBe(fio?.getAttribute(atributo));
+    }
+    expect(neon?.style.strokeDasharray).toBe('300');
+    expect(neon?.style.strokeDashoffset).toBe('300');
+
+    await vi.advanceTimersByTimeAsync(100);
+    expect(neon?.style.strokeDashoffset).toBe(fio?.style.strokeDashoffset);
+    expect(Number(neon?.style.strokeDashoffset)).toBeLessThan(300);
+
+    await vi.advanceTimersByTimeAsync(200);
+    expect(neon?.style.strokeDashoffset).toBe('0');
+    // O néon some com o <svg> todo (260 ms), que é o que o fio também faz: nada de animação própria.
+    expect(ambiente.animacoes).toHaveLength(1);
+  });
+
+  it('o filtro do néon tem região fixa em volta do item e desfoque de 2,4', () => {
+    const { svg } = itemComTraco();
+    tracar(svg, 'normal');
+    const neon = svg.querySelector('.traco-neon');
+    const filtro = svg.querySelector('defs > filter');
+    expect(filtro).not.toBeNull();
+    expect(neon?.getAttribute('filter')).toBe(`url(#${filtro?.id ?? ''})`);
+    // Região em unidades do <svg> (item de 80 × 44, mais 3 de margem de cada lado, mais 12 de folga):
+    // a caixa de um contorno fino é a do item e cortaria o brilho.
+    expect(filtro).toHaveAttribute('filterUnits', 'userSpaceOnUse');
+    expect(filtro).toHaveAttribute('x', '-12');
+    expect(filtro).toHaveAttribute('y', '-12');
+    expect(filtro).toHaveAttribute('width', '110');
+    expect(filtro).toHaveAttribute('height', '74');
+    expect(filtro?.querySelector('feGaussianBlur')).toHaveAttribute('stdDeviation', '2.4');
+  });
+
+  it('dois traços ao mesmo tempo não repartem o id do filtro', () => {
+    const a = itemComTraco();
+    const b = itemComTraco();
+    tracar(a.svg, 'normal');
+    tracar(b.svg, 'normal');
+    const idA = a.svg.querySelector('filter')?.id;
+    const idB = b.svg.querySelector('filter')?.id;
+    expect(idA).toBeTruthy();
+    expect(idB).toBeTruthy();
+    expect(idA).not.toBe(idB);
+  });
+
+  it('o néon e o filtro saem junto com o traço', async () => {
+    const { svg } = itemComTraco();
+    const cancelar = tracar(svg, 'normal');
+    expect(svg.querySelector('.traco-neon')).not.toBeNull();
+    await vi.advanceTimersByTimeAsync(50);
+    cancelar();
+    expect(svg.querySelector('.traco-neon')).toBeNull();
+    expect(svg.querySelector('filter')).toBeNull();
+    expect(svg.childNodes).toHaveLength(0);
   });
 
   it('quem chama pode cancelar no meio, e o <svg> volta a ficar vazio', async () => {

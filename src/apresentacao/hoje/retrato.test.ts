@@ -94,13 +94,13 @@ describe('Hoje › retrato (P3)', () => {
     it('sem preferência é a decisão: o Agora e, na ordem, todas as outras com algo a fazer', () => {
       const { agora, outras } = agoraEOutras(completo, []);
       expect(agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'revisao_vencida' } });
-      expect(tipos(outras)).toEqual(['ciclo', 'tarefa', 'leitura_salva']);
+      expect(tipos(outras)).toEqual(['tarefa', 'ciclo', 'leitura_salva']);
     });
 
     it('o tipo preferido vira o Agora, e o da decisão passa a ser uma das outras', () => {
       const { agora, outras } = agoraEOutras(completo, [], 'leitura_salva');
       expect(agora).toMatchObject({ tipo: 'acao', acao: { tipo: 'leitura_salva' } });
-      expect(tipos(outras)).toEqual(['revisao_vencida', 'ciclo', 'tarefa']);
+      expect(tipos(outras)).toEqual(['revisao_vencida', 'tarefa', 'ciclo']);
     });
 
     it('o preferido que foi dispensado, ou que não tem o que fazer, não conta', () => {
@@ -152,7 +152,7 @@ describe('Hoje › retrato (P3)', () => {
     };
 
     it('sem troca, é o "em seguida" da decisão', () => {
-      expect(tipos(emSeguidaComTrocas(retrato, undefined))).toEqual(['ciclo', 'tarefa']);
+      expect(tipos(emSeguidaComTrocas(retrato, undefined))).toEqual(['tarefa', 'ciclo']);
     });
 
     it('com troca, segue a ordem da pessoa, e pode trazer uma que ficou de fora', () => {
@@ -164,8 +164,8 @@ describe('Hoje › retrato (P3)', () => {
 
     it('uma ordem que não cabe mais nos dados é ignorada, e carregando não há nada', () => {
       expect(tipos(emSeguidaComTrocas(retrato, ['revisao_vencida', 'ciclo']))).toEqual([
-        'ciclo',
         'tarefa',
+        'ciclo',
       ]);
       expect(emSeguidaComTrocas(undefined, ['ciclo'])).toEqual([]);
     });

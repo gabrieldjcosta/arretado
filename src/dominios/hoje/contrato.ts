@@ -15,6 +15,17 @@ export interface ProximaAcao {
   estimativaMin?: number;
   /** Só no tipo `ciclo`: o bloco do Ciclo que a Sessão vai trabalhar (alvo.id = Ciclo). */
   blocoOrdem?: number;
+  /**
+   * Só em `leitura_salva` com Mapa da norma (decisão de 27/10/2026): o Agora é o próximo trecho que
+   * mais cai, não o resto da seção. `continuar` guarda a leitura de onde parou, a alternativa.
+   */
+  trecho?: {
+    /** Endereço do primeiro artigo do trecho (`?ir=` do Leitor). */
+    endereco: string;
+    /** "art. 2º" ou "arts. 3º a 4º". */
+    rotulo: string;
+    continuar: { razao: string; estimativaMin?: number };
+  };
 }
 
 /** Um dos três começos concretos do estado vazio (nenhum material ainda). */

@@ -1,10 +1,11 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import { alterarPreferencias } from '../../core/preferencias';
 import { fecharDia } from '../../dominios/dia/fechar';
 import { criarCartaoManual } from '../../dominios/recall/servico';
 import { encerrarSessao, iniciarSessao } from '../../dominios/sessao/servico';
+import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 import { conteudoDoDia } from './conteudo';
@@ -66,28 +67,21 @@ describe('Chegada › primeira vez neste aparelho', () => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
 
-  it('abre a folha de boas-vindas com os caminhos reais, o foco no principal (escolher o concurso), e lembra que viu', async () => {
+  it('abre as Boas-vindas com o Zé e só dois botões, o foco no título, e lembra que viu', async () => {
     const { repo } = await repositorioDeTeste();
     abrirHoje(repo);
 
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-    const escolher = within(folha).getByRole('link', { name: 'Escolher meu concurso' });
-    expect(escolher).toHaveAttribute('href', '#/comecar');
-    expect(escolher).toHaveClass('principal');
-    expect(within(folha).getByRole('link', { name: 'Ler uma norma' })).toHaveAttribute(
-      'href',
-      '#/biblioteca',
-    );
-    const registrar = within(folha).getByRole('link', { name: 'Registrar um erro' });
-    expect(registrar).toHaveAttribute('href', '#/recall/registrar');
-    expect(registrar).not.toHaveClass('principal');
-    expect(within(folha).getByRole('link', { name: /^Montar uma trilha/ })).toHaveAttribute(
-      'href',
-      '#/plano/onboarding',
-    );
-    expect(within(folha).getByRole('button', { name: 'Agora não' })).toBeVisible();
+    expect(
+      within(folha)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Agora não', 'Vamos']);
+    // "Escolher meu concurso" saiu da folha: o Hoje vazio é quem o oferece.
+    expect(within(folha).queryAllByRole('link')).toEqual([]);
+    expect(folha.querySelector('svg.ze')).toBeInTheDocument();
     await waitFor(() => {
-      expect(escolher).toHaveFocus();
+      expect(within(folha).getByRole('heading', { level: 2 })).toHaveFocus();
     });
     expect(chegadaJaVista()).toBe(true);
     // A Entrada do Dia não vem junto: o Dia da Chegada já tem a sua folha.
@@ -105,18 +99,63 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   });
 
-  it.each([
-    ['Escolher meu concurso', 'Qual concurso você estuda?'],
-    ['Registrar um erro', 'Registrar erro'],
-  ])('"%s" leva à tela dele, sem a folha por cima', async (caminho, titulo) => {
+  it('dispensada a Chegada, voltar ao Hoje na mesma abertura do aplicativo não a abre de novo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const primeira = abrirHoje(repo);
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await primeira.usuario.click(within(folha).getByRole('button', { name: 'Agora não' }));
+    expect(folhas()).toBeNull();
+    primeira.unmount();
+
+    // A pessoa foi a outra tela e voltou: o Hoje monta de novo, com o mesmo repositório e sem recarregar.
+    abrirHoje(repo);
+    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(folhas()).toBeNull();
+  });
+
+  it('"Vamos" abre o passeio; "Pular o passeio" leva ao Começar, e "Experimentar sem conta" deixa o Hoje, que oferece "Escolher meu concurso"', async () => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = abrirHoje(repo);
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
 
-    await usuario.click(within(folha).getByRole('link', { name: caminho }));
+    await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
+    expect(await screen.findByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Pular o passeio' }));
+    expect(await screen.findByRole('dialog', { name: 'Vamo começar?' })).toBeInTheDocument();
+    await usuario.click(
+      screen.getByRole('button', {
+        name: 'Experimentar sem conta e salvar seus dados manualmente',
+      }),
+    );
 
-    expect(await screen.findByRole('heading', { level: 1, name: titulo })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const comecos = screen.getByRole('region', { name: 'Por onde começar' });
+    expect(within(comecos).getByRole('link', { name: 'Escolher meu concurso' })).toHaveAttribute(
+      'href',
+      '#/comecar',
+    );
+  });
+
+  it('"Rever as boas-vindas" reabre a folha de qualquer tela, sem gravar nada; o passeio refeito termina em "Concluir"', async () => {
+    localStorage.setItem(CHAVE_CHEGADA, '{"vista":true}');
+    localStorage.setItem(CHAVE_ENTRADA, '{"dia":"2026-09-23"}');
+    const { repo } = await repositorioDeTeste();
+    const { usuario } = abrirHoje(repo);
+    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
+    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
+    await usuario.click(screen.getByRole('button', { name: 'Rever as boas-vindas' }));
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
+    for (let i = 0; i < 3; i += 1)
+      await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
+    await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
+
     expect(folhas()).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Vamo começar?' })).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    expect(localStorage.getItem(CHAVE_CHEGADA)).toBe('{"vista":true}');
+    expect(localStorage.getItem(CHAVE_ENTRADA)).toBe('{"dia":"2026-09-23"}');
   });
 
   it('com um aparelho que já viu a Chegada, o Hoje abre sem ela', async () => {
@@ -124,18 +163,23 @@ describe('Chegada › primeira vez neste aparelho', () => {
     const { repo } = await repositorioDeTeste();
     abrirHoje(repo);
 
-    // Sem a Chegada, o que abre neste Dia é a Entrada.
-    expect(await screen.findByRole('dialog', { name: 'Bom dia' })).toBeVisible();
+    // Sem a Chegada, o que aparece neste Dia é a linha da Entrada.
+    await waitFor(() => {
+      expect(document.querySelector('.linha-do-dia')).toHaveTextContent(/^Bom dia./);
+    });
     expect(screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBeNull();
   });
 });
+
+/** A linha quieta da Entrada do Dia (S4), abaixo do Agora. */
+const linha = () => document.querySelector('.linha-do-dia');
 
 describe('Entrada do Dia › primeira abertura de cada Dia', () => {
   beforeEach(() => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
 
-  it('abre com a saudação, a Citação, a dica e o caminho para o Agora; o foco vai para ele', async () => {
+  it('é uma linha abaixo do Agora, com a saudação e a dica; nada de folha nem de Citação', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
     relogio.avancar(DIA);
@@ -143,68 +187,35 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     const par = await conteudoDoDia('2026-09-24');
     if (par === undefined) throw new Error('o conteúdo de partida deveria carregar');
 
-    const entrada = await screen.findByRole('dialog', { name: 'Bom dia' });
-    expect(within(entrada).getByRole('blockquote')).toHaveTextContent(paraTexto(par.citacao.texto));
-    expect(entrada).toHaveTextContent(`${par.citacao.autor}, ${par.citacao.obra}`);
-    expect(within(entrada).getByRole('heading', { level: 3, name: 'Dica de hoje' })).toBeVisible();
-    expect(entrada).toHaveTextContent(paraTexto(`${par.dica.destaque} ${par.dica.texto}`));
-    // A Citação e a dica são a descrição do diálogo: o leitor de tela as lê depois da saudação.
-    expect(entrada).toHaveAccessibleDescription(
-      expect.stringContaining(paraTexto(par.dica.destaque)),
-    );
-
-    const principal = within(entrada).getByRole('link', { name: 'Começar: Revisar cartões' });
-    expect(principal).toHaveAttribute('href', expect.stringMatching(/^#\/sessao\/iniciar\?/));
-    expect(within(entrada).getByRole('button', { name: 'Agora não' })).toBeVisible();
     await waitFor(() => {
-      expect(principal).toHaveFocus();
+      expect(linha()).not.toBeNull();
     });
-    expect(entradaJaAbriu('2026-09-24')).toBe(true);
-    // Fala do produto: "Citação" na tela, nunca "Frase", e nada que cobre.
-    expect(entrada).not.toHaveTextContent(/Frase\b/);
-    expect(entrada).not.toHaveTextContent(/Você parou|atrasad|pendente/i);
+    expect(linha()).toHaveTextContent(paraTexto(`Bom dia. ${par.dica.destaque} ${par.dica.texto}`));
+    expect(linha()).not.toHaveTextContent(par.citacao.texto.slice(0, 20));
+    expect(folhas()).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    // Depois do Agora, na ordem do documento, e fora dele: o Começar não desce por causa da dica.
+    const agora = screen.getByRole('region', { name: 'Agora' });
+    const posicao = agora.compareDocumentPosition(linha()!);
+    expect(posicao & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(agora.contains(linha())).toBe(false);
+    // O registro da abertura sai num efeito depois da linha: espera, em vez de supor a ordem.
+    await waitFor(() => {
+      expect(entradaJaAbriu('2026-09-24')).toBe(true);
+    });
+    // Fala do produto: nada que cobre.
+    expect(linha()).not.toHaveTextContent(/Você parou|atrasad|pendente|Frase\b/i);
   });
 
-  it('o "Começar" leva à Sessão do Agora e a folha não fica por cima', async () => {
+  it('o Agora segue como a ação principal, sem nenhum botão da linha', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
     relogio.avancar(DIA);
-    const { usuario } = abrirHoje(repo);
-    const entrada = await screen.findByRole('dialog', { name: 'Bom dia' });
-
-    await usuario.click(within(entrada).getByRole('link', { name: 'Começar: Revisar cartões' }));
-
-    expect(folhas()).toBeNull();
-    expect(screen.queryByRole('heading', { level: 1, name: 'Hoje' })).toBeNull();
-  });
-
-  it('sem Agora (o Hoje vazio), o botão principal é "Continuar" e só fecha', async () => {
-    const { repo } = await repositorioDeTeste();
-    const { usuario } = abrirHoje(repo);
-    const entrada = await screen.findByRole('dialog', { name: 'Bom dia' });
-    const continuar = within(entrada).getByRole('button', { name: 'Continuar' });
-    expect(within(entrada).queryByRole('button', { name: 'Agora não' })).toBeNull();
+    abrirHoje(repo);
     await waitFor(() => {
-      expect(continuar).toHaveFocus();
+      expect(linha()).not.toBeNull();
     });
-
-    await usuario.click(continuar);
-
-    expect(folhas()).toBeNull();
-    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  });
-
-  it('"Agora não" só fecha: o Hoje segue como estava', async () => {
-    const { repo, relogio } = await repositorioDeTeste();
-    await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
-    relogio.avancar(DIA);
-    const { usuario } = abrirHoje(repo);
-    const entrada = await screen.findByRole('dialog', { name: 'Bom dia' });
-
-    await usuario.click(within(entrada).getByRole('button', { name: 'Agora não' }));
-
-    expect(folhas()).toBeNull();
-    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    expect(linha()?.querySelector('a, button')).toBeNull();
     expect(screen.getByRole('region', { name: 'Agora' })).toBeVisible();
   });
 
@@ -213,13 +224,17 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     relogio.avancar(8 * 60 * 60_000);
     abrirHoje(repo);
 
-    expect(await screen.findByRole('dialog', { name: 'Boa tarde' })).toBeVisible();
+    await waitFor(() => {
+      expect(linha()).toHaveTextContent(/^Boa tarde\./);
+    });
   });
 
   it('o aplicativo fechado no meio não a traz de volta no mesmo Dia', async () => {
     const { repo } = await repositorioDeTeste({ nomeBanco: 'entrada-fechada-no-meio' });
     const primeira = abrirHoje(repo);
-    await screen.findByRole('dialog', { name: 'Bom dia' });
+    await waitFor(() => {
+      expect(linha()).not.toBeNull();
+    });
     primeira.unmount();
 
     // Outra abertura a frio, sobre os mesmos dados.
@@ -227,24 +242,30 @@ describe('Entrada do Dia › primeira abertura de cada Dia', () => {
     abrirHoje(reaberto);
     await decisaoTerminou(2);
 
-    expect(folhas()).toBeNull();
+    expect(linha()).toBeNull();
   });
 
-  it('voltar ao Hoje na mesma abertura, mesmo com o Dia virado, não abre outra', async () => {
+  it('voltar ao Hoje na mesma abertura, mesmo com o Dia virado, mostra a mesma linha e não decide de novo', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     const primeira = abrirHoje(repo);
-    await screen.findByRole('dialog', { name: 'Bom dia' });
+    await waitFor(() => {
+      expect(linha()).not.toBeNull();
+    });
+    const texto = linha()?.textContent;
     primeira.unmount();
 
     relogio.avancar(DIA);
     abrirHoje(repo);
-    await decisaoTerminou(2);
 
-    expect(folhas()).toBeNull();
+    await waitFor(() => {
+      expect(linha()).not.toBeNull();
+    });
+    expect(linha()?.textContent).toBe(texto);
+    expect(decisoes.promessas).toHaveLength(1);
   });
 });
 
-describe('Entrada do Dia › quando não abre', () => {
+describe('Entrada do Dia › quando não aparece', () => {
   beforeEach(() => {
     localStorage.removeItem(CHAVE_ENTRADA);
   });
@@ -255,7 +276,7 @@ describe('Entrada do Dia › quando não abre', () => {
     abrirHoje(repo);
     await decisaoTerminou();
 
-    expect(folhas()).toBeNull();
+    expect(linha()).toBeNull();
     expect(entradaJaAbriu(HOJE)).toBe(false);
   });
 
@@ -268,6 +289,7 @@ describe('Entrada do Dia › quando não abre', () => {
     await decisaoTerminou();
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    expect(linha()).toBeNull();
     expect(folhas()).toBeNull();
   });
 
@@ -277,7 +299,7 @@ describe('Entrada do Dia › quando não abre', () => {
     abrirHoje(repo);
     await decisaoTerminou();
 
-    expect(folhas()).toBeNull();
+    expect(linha()).toBeNull();
   });
 
   it('com o Dia fechado', async () => {
@@ -286,6 +308,36 @@ describe('Entrada do Dia › quando não abre', () => {
     abrirHoje(repo);
     await decisaoTerminou();
 
-    expect(folhas()).toBeNull();
+    expect(linha()).toBeNull();
+  });
+});
+
+describe('Chegada › espera o nome em tela cheia (Abertura, M2 do Zé)', () => {
+  beforeEach(() => {
+    localStorage.removeItem(CHAVE_CHEGADA);
+    localStorage.removeItem(CHAVE_ENTRADA);
+    // O setup semeia o Dia no futuro; aqui o nome ainda não foi escrito, então a tela cheia abre.
+    localStorage.removeItem('arretado:escrita-do-nome:v1');
+  });
+
+  it('na primeira vez o nome escreve primeiro: a Chegada só abre depois que a Abertura sai', async () => {
+    simularMovimento('normal');
+    const { repo } = await repositorioDeTeste();
+    abrirHoje(repo);
+    await waitFor(() => {
+      expect(document.querySelector('.abertura')).not.toBeNull();
+    });
+    // A decisão da Chegada já saiu (o Hoje carregou), mas ela fica quieta: um <dialog> modal aberto agora
+    // ficaria por cima do popover do nome.
+    await decisaoTerminou();
+    expect(screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBeNull();
+    expect(chegadaJaVista()).toBe(false);
+
+    fireEvent.pointerDown(document.body);
+    expect(
+      await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' }),
+    ).toBeInTheDocument();
+    expect(document.querySelector('.abertura')).toBeNull();
+    expect(chegadaJaVista()).toBe(true);
   });
 });

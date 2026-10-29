@@ -14,22 +14,23 @@ export const TITULO_DO_GUIA = 'O que cada opção faz';
 
 export const GUIAS: Record<TelaComGuia, Guia> = {
   hoje: {
-    versao: 2,
+    versao: 4,
     linhas: [
       {
         opcao: 'Escolher meu concurso',
-        efeito: 'você diz qual concurso estuda e o app traz as normas com que ele começa.',
+        efeito:
+          'você diz qual concurso estuda e o app traz as normas com que ele começa e monta a Trilha do edital mais recente.',
       },
       { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
       {
         opcao: 'Leitura · Cartões · Frases',
-        efeito: 'acendem sozinhos quando você lê, revisa ou fixa.',
+        efeito: 'ficam marcados como feitos quando você lê, revisa ou fixa.',
       },
       { opcao: 'Para lembrar', efeito: 'uma nota sobre o que fazer fora do app.' },
     ],
   },
   plano: {
-    versao: 2,
+    versao: 3,
     linhas: [
       {
         opcao: 'Informar a data da prova',
@@ -37,9 +38,14 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
           'opcional. O app deixa de marcar Revisão depois dela e faz uma passada final pelos Pontos mais cobrados.',
       },
       {
+        opcao: 'Escolher meu concurso',
+        efeito:
+          'o app traz as normas com que o concurso começa e monta a Trilha do edital mais recente; dá para desfazer.',
+      },
+      {
         opcao: 'Montar pelo catálogo',
         efeito:
-          'uma pergunta por tela, da carreira às matérias; você vê a prévia antes de os Pontos entrarem e pode desfazer.',
+          'o caminho passo a passo: uma pergunta por tela, da carreira às matérias, com a prévia antes de os Pontos entrarem.',
       },
       {
         opcao: 'Trazer meu edital',
@@ -53,11 +59,12 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     ],
   },
   recall: {
-    versao: 2,
+    versao: 3,
     linhas: [
       {
         opcao: 'Registrar erro',
-        efeito: 'guarda a Frase correta; o Cartão só nasce se você quiser.',
+        efeito:
+          'guarda a Frase correta; se você escrever o que foi, já cria o Cartão (desmarque se não quiser).',
       },
       { opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' },
       {
@@ -67,11 +74,11 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     ],
   },
   biblioteca: {
-    versao: 2,
+    versao: 3,
     linhas: [
       {
         opcao: 'Escolher meu concurso',
-        efeito: 'o app traz as normas com que ele começa.',
+        efeito: 'o app traz as normas com que ele começa e monta a Trilha do edital mais recente.',
       },
       {
         opcao: 'Escolher no acervo',

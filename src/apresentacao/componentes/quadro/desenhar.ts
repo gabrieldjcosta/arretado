@@ -2,12 +2,14 @@
 // caneta sobre o traço de hoje. Imperativo de propósito: o React só dá ao <svg> três grupos vazios
 // (lavis, traços, caneta) e nunca olha dentro deles.
 import { CURVA, documentoInativo, esperar, suave, type Movimento } from '../../movimento';
-import { ANDANDO, mover, PARTES, REPOUSO, type Fio, type Parte } from './cena';
+import { ANDANDO, mover, PARTES, REPOUSO, temNeon, type Fio, type Parte } from './cena';
 
 const NS = 'http://www.w3.org/2000/svg';
 
 export interface Camadas {
   lavis: SVGGElement;
+  /** O néon suave (D-D10): a cópia larga e borrada do núcleo do cacto, sob os traços. */
+  neon: SVGGElement;
   tracos: SVGGElement;
   caneta: SVGGElement;
 }
@@ -45,6 +47,9 @@ const traco = (d: string, fio: Fio) =>
     'stroke-width': fio.largura,
   });
 
+/** O gêmeo de néon de um traço: o mesmo caminho, mais largo (a largura e o desfoque são do CSS e do filtro). */
+const neonDe = (d: string) => criar('path', { class: 'quadro-neon-fio', d });
+
 function lavisDe(fio: Fio): SVGPathElement | undefined {
   return fio.lavis
     ? criar('path', { class: `quadro-lavis-${fio.lavis.tipo}`, d: fio.lavis.area })
@@ -78,6 +83,7 @@ function pintarFio(c: Camadas, fio: Fio, hoje: boolean): void {
   const lavis = lavisDe(fio);
   if (lavis) c.lavis.append(lavis);
   c.tracos.append(traco(fio.d, fio));
+  if (temNeon(fio)) c.neon.append(neonDe(fio.d));
   if (fio.miolo) c.tracos.append(mioloDe(fio.miolo));
   if (fio.olho) c.tracos.append(olhoDe(fio.olho));
   if (fio.ponta) c.tracos.append(...pontaDe(fio.ponta, hoje));
@@ -91,6 +97,8 @@ export function pintarParte(c: Camadas, parte: Parte, hoje = false): void {
 /** Papel limpo e caneta largada. */
 export function limpar(c: Camadas): void {
   c.lavis.replaceChildren();
+  c.neon.replaceChildren();
+  delete c.neon.dataset.acesa;
   c.tracos.replaceChildren();
   c.caneta.setAttribute('transform', REPOUSO_DA_CANETA);
 }
@@ -103,6 +111,8 @@ export function pintarAte(c: Camadas, ate: number): void {
 
 interface Trecho {
   el: SVGPathElement;
+  /** O gêmeo de néon do trecho, se o fio leva néon: anda junto com ele. */
+  gemeo?: SVGPathElement;
   comprimento: number;
   /** Quanto do fio vem antes deste trecho. */
   inicio: number;
@@ -120,11 +130,15 @@ function preparar(c: Camadas, fio: Fio) {
     const el = traco(d, fio);
     c.tracos.append(el);
     const comprimento = el.getTotalLength();
-    el.style.strokeDasharray = String(comprimento);
-    el.style.strokeDashoffset = String(comprimento);
-    // Com o traço ainda por fazer, a ponta redonda do pontilhado apareceria como um ponto.
-    el.style.visibility = 'hidden';
-    const trecho = { el, comprimento, inicio };
+    const gemeo = temNeon(fio) ? neonDe(d) : undefined;
+    if (gemeo) c.neon.append(gemeo);
+    for (const parte of gemeo ? [el, gemeo] : [el]) {
+      parte.style.strokeDasharray = String(comprimento);
+      parte.style.strokeDashoffset = String(comprimento);
+      // Com o traço ainda por fazer, a ponta redonda do pontilhado apareceria como um ponto.
+      parte.style.visibility = 'hidden';
+    }
+    const trecho = { el, gemeo, comprimento, inicio };
     inicio += comprimento;
     return trecho;
   });
@@ -153,8 +167,10 @@ function correr(
       let ativo = trechos[0];
       for (const trecho of trechos) {
         const feito = Math.max(0, Math.min(trecho.comprimento, andado - trecho.inicio));
-        trecho.el.style.strokeDashoffset = String(trecho.comprimento - feito);
-        trecho.el.style.visibility = feito > 0 ? 'visible' : 'hidden';
+        for (const parte of trecho.gemeo ? [trecho.el, trecho.gemeo] : [trecho.el]) {
+          parte.style.strokeDashoffset = String(trecho.comprimento - feito);
+          parte.style.visibility = feito > 0 ? 'visible' : 'hidden';
+        }
         if (andado >= trecho.inicio) ativo = trecho;
       }
       // A aguada aparece na segunda metade do fio.
@@ -224,10 +240,19 @@ export async function desenharParte(
     }
     const { trechos, total, lavis } = preparado;
     const duracao = Math.max(520, Math.min(1100, total / 0.22));
+    // O néon acende com o traço (na hora) e, quando o fio fecha, assenta em 0,6 s (a transição é do CSS).
+    // Só com movimento normal: no Calmo o brilho fica no repouso, sem acender.
+    const acende = movimento === 'normal' && temNeon(fio);
+    if (acende) c.neon.dataset.acesa = '';
     if (!(await correr(c, trechos, total, lavis, duracao, sinal))) return false;
+    delete c.neon.dataset.acesa;
     // Pronto, o fio volta a ser um traço só, igual ao pintado de uma vez (a opacidade não se soma nos cruzamentos).
-    for (const trecho of trechos) trecho.el.remove();
+    for (const trecho of trechos) {
+      trecho.el.remove();
+      trecho.gemeo?.remove();
+    }
     c.tracos.append(traco(fio.d, fio));
+    if (temNeon(fio)) c.neon.append(neonDe(fio.d));
     lavis?.removeAttribute('opacity');
     if (fio.miolo) brotar(c.tracos, mioloDe(fio.miolo));
     if (fio.olho) c.tracos.append(olhoDe(fio.olho));

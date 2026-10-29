@@ -156,6 +156,31 @@
   --quadro-chao: var(--linha);
   --quadro-aro: var(--tinta);
   --quadro-marca: var(--marca);
+  /* O néon suave e o Zé (D-D10; contrato em docs/design/referencias/2026-10-27-ze/). O brilho existe só
+     em traço que a caneta desenha: aceso enquanto ela traça, em repouso depois que assenta (0,6 s), e
+     numa cor só, o azul piscina, nos dois mundos. O Zé tem a linha branca sobre uma faixa piscina (a
+     32 e 24 px a de dia afunda, para a silhueta manter 3:1 sobre o papel); olhos e haste são tinta de
+     dia e branco à noite. O ponto da flor é um valor só, amarelo, igual nos dois mundos: por isso não
+     entra nos blocos da noite. */
+  --neon-cor: #39caef;
+  --neon-aceso: 0.55;
+  --neon-repouso: 0;
+  --neon-repouso-visibilidade: hidden;
+  --z-nucleo: #ffffff;
+  --z-banda: #39caef;
+  --z-banda-p: #0e93b4;
+  --z-miolo: #39caef;
+  --z-olho: var(--tinta);
+  --z-olho-halo: transparent;
+  --z-haste: var(--tinta);
+  --z-bochecha: #ec5675;
+  --z-bochecha-op: 0.85;
+  --z-bloom-aceso: 0.55;
+  --z-bloom-repouso: 0.16;
+  --z-dia: inline;
+  --z-noite: none;
+  --z-ponto: #ffc53d;
+  --z-ponto-brilho: #ffc53d;
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -296,6 +321,19 @@
     --quadro-chao: var(--n-borda);
     --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
     --quadro-marca: transparent;
+    --neon-aceso: 0.6;
+    --neon-repouso: 0.3;
+    --neon-repouso-visibilidade: visible;
+    --z-banda-p: #39caef;
+    --z-olho: #ffffff;
+    --z-olho-halo: #39caef;
+    --z-haste: #ffffff;
+    --z-bochecha: #ff86a6;
+    --z-bochecha-op: 1;
+    --z-bloom-aceso: 0.6;
+    --z-bloom-repouso: 0.32;
+    --z-dia: none;
+    --z-noite: inline;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
@@ -373,6 +411,19 @@
   --quadro-chao: var(--n-borda);
   --quadro-aro: color-mix(in srgb, var(--n-vidro) 70%, var(--n-noite));
   --quadro-marca: transparent;
+  --neon-aceso: 0.6;
+  --neon-repouso: 0.3;
+  --neon-repouso-visibilidade: visible;
+  --z-banda-p: #39caef;
+  --z-olho: #ffffff;
+  --z-olho-halo: #39caef;
+  --z-haste: #ffffff;
+  --z-bochecha: #ff86a6;
+  --z-bochecha-op: 1;
+  --z-bloom-aceso: 0.6;
+  --z-bloom-repouso: 0.32;
+  --z-dia: none;
+  --z-noite: inline;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
@@ -1233,7 +1284,8 @@ input[type='range'] {
 }
 
 /* Caixa e rádio: marca própria de 22 px com contorno de 2 px na tinta (D-D4); marcada = o bloco do
-   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. */
+   item selecionado. O alvo de 44 é o rótulo inteiro (`.opcao`), não só a marca. A marca de dentro
+   também é em px: em rem crescia com a fonte e estourava a caixa a 200%. */
 input[type='checkbox'],
 input[type='radio'] {
   appearance: none;
@@ -1267,9 +1319,9 @@ input[type='radio']:checked {
 
 input[type='checkbox']:checked::after {
   content: '';
-  width: 0.7rem;
-  height: 0.38rem;
-  margin-top: -0.12rem;
+  width: 11px;
+  height: 6px;
+  margin-top: -2px;
   border-left: 2.5px solid currentcolor;
   border-bottom: 2.5px solid currentcolor;
   transform: rotate(-45deg);
@@ -1277,8 +1329,8 @@ input[type='checkbox']:checked::after {
 
 input[type='radio']:checked::after {
   content: '';
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentcolor;
 }
@@ -1559,6 +1611,43 @@ th.numero {
 
 .abas a[aria-current='page']:focus-visible {
   outline-color: var(--bloco-foco);
+}
+
+/* As três abas da Biblioteca cabem num trilho só a partir de uns 360 px. Abaixo disso, ou com o texto
+   maior, a que não cabe desce para uma segunda fileira, em vez de ficar cortada num trilho que rola. */
+.abas-da-biblioteca {
+  flex-wrap: wrap;
+}
+
+.abas-da-biblioteca a {
+  flex: 1 1 auto;
+}
+
+/* Segunda linha das abas da Biblioteca (S5): duas páginas de um mesmo grupo, em texto, sem trilho. */
+.sub-abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: -0.5rem 0 1rem;
+}
+
+.sub-abas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alvo);
+  padding: 0 0.75rem;
+  color: var(--texto);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--raio-botao);
+}
+
+/* "Onde estou" como no trilho de cima: a folha com o contorno do controle (3:1 contra a página, WCAG
+   1.4.11) e o rótulo em negrito. O filete e o tom de superfície-2 davam 1,1:1 de dia e 1,3:1 à noite. */
+.sub-abas a[aria-current='page'] {
+  background: var(--superficie);
+  box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
+  font-weight: 700;
 }
 
 button.grande,
@@ -1858,6 +1947,22 @@ a.item-norma strong {
 
 .chamada-do-mapa .dica {
   margin: 0;
+}
+
+/* "Ler seguindo o mapa": a linha sob a barra do cartão, com o trecho de agora e o "Parar". O botão de
+   44 px fica ao lado do texto, como no "Lido até", e não dentro da última linha dele. */
+.seguindo-mapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--texto-atenuado);
+}
+
+.seguindo-mapa span {
+  flex: 1 1 12rem;
 }
 
 /* "Lido até" (9.7): a referência sob a barra, a marca na linha e o botão que acompanha a rolagem */
@@ -2943,6 +3048,23 @@ dialog.dialogo-acoes {
   min-height: var(--alvo);
 }
 
+/* "Verificar atualização" nas Ações: fala da norma inteira, não do trecho. Vem sob o próprio título,
+   afastada do grupo de cima, e o botão ocupa a linha como os outros. */
+.verificar-atualizacao {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.verificar-atualizacao h3,
+.verificar-atualizacao [role='status'] p {
+  margin: 0;
+}
+
+.verificar-atualizacao button {
+  min-height: var(--alvo);
+}
+
 .erros-vinculados {
   margin: 0;
   padding-left: 1.25rem;
@@ -3006,11 +3128,15 @@ dialog.dialogo-acoes {
   line-height: 1.15;
   margin: 0 0 0.25rem;
   font-size: 1.625rem;
+  /* "Ler arts. 1.059 a 1.062" a 320 px: o intervalo inteiro na segunda linha, sem o "a" pendurado. */
+  text-wrap: balance;
 }
 
 .agora-motivo {
   margin: 0 0 0.25rem;
   color: var(--bloco-atenuado);
+  /* Sem o "muito" sozinho na segunda linha ("Pelo mapa, o próximo trecho: cai muito" a 320 px). */
+  text-wrap: balance;
 }
 
 .agora-estimativa {
@@ -3452,6 +3578,29 @@ dialog.dialogo-previa .linha-acoes button {
   color: var(--texto-atenuado);
 }
 
+/* Biblioteca › Normas: o apoio leva a leitura, as disciplinas e a fonte. Em duas linhas cabe o que importa
+   (numa só, a 320 px e com fonte a 200%, a "Última leitura" ficava atrás das reticências). */
+.lista-de-normas .linha-lista-apoio {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+}
+
+/* Com o texto a 200%, o selo "Há versão nova" (sem quebra) tomava a linha e deixava o título numa letra por
+   linha (616 px de altura). O texto guarda ao menos 40% da linha e o selo, se preciso, quebra em duas
+   linhas, entre palavras (o `a` da linha herda `overflow-wrap: anywhere`, que partiria "versão"). */
+.lista-de-normas .linha-lista-texto {
+  min-width: 40%;
+}
+
+.lista-de-normas .selo {
+  overflow-wrap: break-word;
+  text-align: center;
+  white-space: normal;
+}
+
 .selo {
   display: inline-flex;
   align-items: center;
@@ -3674,25 +3823,13 @@ dialog.dialogo-previa .linha-acoes button {
   justify-content: center;
 }
 
-/* Biblioteca › Normas: grupos retráteis por disciplina, em neutro (nome e contagem; sem cor por
-   disciplina nem faixa colorida, D-D6 e D-D7): só o filete fino. */
-.grupo-de-normas {
-  margin-block: 0.75rem;
-  padding-inline-start: 0.75rem;
-  border-inline-start: 1px solid var(--borda);
-}
-
-.grupo-de-normas > summary {
+/* Biblioteca › Normas: a linha "Retomar" no lugar da folha grande do Agora (que fica só no Hoje). */
+.retomar-leitura {
   display: flex;
-  gap: 0.5rem;
-  min-height: 44px;
+  flex-wrap: wrap;
   align-items: center;
-  cursor: pointer;
-}
-
-.grupo-de-normas > summary h3 {
-  display: inline;
-  margin: 0;
+  gap: 0.25rem 0.75rem;
+  margin-block: 0.75rem;
 }
 
 /* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */
@@ -3728,4 +3865,11 @@ dialog.dialogo-previa .linha-acoes button {
   align-items: center;
   gap: 8px;
   min-height: 44px;
+}
+
+/* Três abas da Biblioteca a 360 px: recuo menor para o trilho não rolar (S5). */
+@media (max-width: 430px) {
+  .abas a {
+    padding-inline: 0.375rem;
+  }
 }

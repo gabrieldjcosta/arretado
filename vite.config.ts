@@ -31,6 +31,33 @@ function csp(contas: boolean): Plugin {
 }
 
 /**
+ * Tela de carregamento (D-D10, Apêndice F do contrato do Zé): o Zé do index.html aparece antes de o pacote chegar.
+ * O CSS principal bloqueia a primeira pintura e é o último a chegar; posto logo depois do fragmento, a pintura não o
+ * espera (o #raiz, que vem depois, continua esperando por ele). Medido no 3G: primeira pintura de 1,3 s para 0,6 s.
+ */
+function carregamento(): Plugin {
+  return {
+    name: 'arretado-carregamento',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        const ligacao =
+          /\s*<link rel="stylesheet" crossorigin href="(\.\/assets\/index-[^"]+\.css)">/.exec(html);
+        if (!ligacao)
+          throw new Error('arretado-carregamento: link do CSS principal não achado no index.html');
+        return html
+          .replace(ligacao[0], '')
+          .replace(
+            '<div id="raiz"></div>',
+            `<link rel="stylesheet" crossorigin href="${ligacao[1]}">\n    <div id="raiz"></div>`,
+          );
+      },
+    },
+  };
+}
+
+/**
  * Abrir sem rede (AP-00, T31): publica `sw.js` com a lista do que guardar no aparelho. Roda depois dos
  * outros plugins (`enforce: 'post'`) para ver todos os arquivos do build; os de `public/` (ícones,
  * manifesto, acervo) não passam pelo bundle, então entram pela lista fixa abaixo.
@@ -49,6 +76,7 @@ function offline(): Plugin {
     'icone-512.png',
     'icone-maskable-512.png',
     'apple-touch-icon.png',
+    'carregamento.css',
   ];
   return {
     name: 'arretado-offline',
@@ -79,7 +107,7 @@ function offline(): Plugin {
 const contas = process.env.VITE_CONTA === '1';
 
 export default defineConfig({
-  plugins: [react(), csp(contas), offline()],
+  plugins: [react(), csp(contas), carregamento(), offline()],
   define: {
     __VERSAO_APP__: JSON.stringify(pacote.version),
   },
