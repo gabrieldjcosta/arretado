@@ -154,6 +154,38 @@ export async function semViolacoes(page: Page) {
   await page.emulateMedia({ colorScheme: null });
 }
 
+/**
+ * Quantos pontos diferem de verdade entre dois recortes PNG (canal a canal, além de 16 em 255): o
+ * lockup parado e o quadro final da escrita desenham os mesmos caminhos, mas um é tracejado e o outro
+ * não, e a serrilha do Chromium muda 1 ou 2 níveis nas bordas. -1 se os tamanhos diferem.
+ */
+export async function pontosDiferentes(page: Page, a: Buffer, b: Buffer): Promise<number> {
+  return page.evaluate(
+    async ({ primeiro, segundo }) => {
+      const ler = async (base64: string) => {
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const imagem = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
+        const tela = new OffscreenCanvas(imagem.width, imagem.height);
+        const contexto = tela.getContext('2d');
+        if (!contexto) throw new Error('sem canvas');
+        contexto.drawImage(imagem, 0, 0);
+        return contexto.getImageData(0, 0, imagem.width, imagem.height);
+      };
+      const [x, y] = await Promise.all([ler(primeiro), ler(segundo)]);
+      if (x.width !== y.width || x.height !== y.height) return -1;
+      let diferentes = 0;
+      for (let i = 0; i < x.data.length; i += 4) {
+        const maior = Math.max(
+          ...[0, 1, 2, 3].map((k) => Math.abs((x.data[i + k] ?? 0) - (y.data[i + k] ?? 0))),
+        );
+        if (maior > 16) diferentes += 1;
+      }
+      return diferentes;
+    },
+    { primeiro: a.toString('base64'), segundo: b.toString('base64') },
+  );
+}
+
 /** Da Biblioteca: título curto e "Publicar", com o sumário já na tela. */
 export async function publicar(page: Page, titulo: string) {
   const campo = page.getByRole('textbox', { name: 'Título curto' });

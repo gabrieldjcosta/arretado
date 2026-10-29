@@ -28,8 +28,8 @@ interface Percurso {
   fases: string[];
   /** Quadros em que o centro do nome estava sob outra coisa que não a camada. */
   cobertos: number;
-  /** Quadros em que havia uma folha modal (<dialog>) aberta com a camada na tela. */
-  folhasAbertas: number;
+  /** Quadros em que havia uma folha modal (<dialog>) à vista (opaca) com a camada ainda escrevendo ou voando. */
+  folhasVisiveis: number;
   /** O disco atrás do ponto do nome (de onde a luz sai), as posições da luz que voa e o ponto do cabeçalho. */
   disco: Ponto | null;
   primeira: Ponto | null;
@@ -51,7 +51,7 @@ function acompanhar(page: Page): Promise<Percurso> {
         const visto: Percurso = {
           fases: [],
           cobertos: 0,
-          folhasAbertas: 0,
+          folhasVisiveis: 0,
           disco: null,
           primeira: null,
           ultima: null,
@@ -73,7 +73,11 @@ function acompanhar(page: Page): Promise<Percurso> {
             const em = document.elementFromPoint(x, y);
             if (!em || !abertura.contains(em)) visto.cobertos += 1;
           }
-          if (document.querySelector('dialog[open]')) visto.folhasAbertas += 1;
+          // A folha da Chegada pode estar aberta por baixo do nome, mas escondida (sem opacidade): só conta se se vê.
+          const folha = document.querySelector('dialog[open]');
+          if (folha && getComputedStyle(folha).opacity !== '0' && fase !== 'saindo') {
+            visto.folhasVisiveis += 1;
+          }
           const disco = abertura.querySelector('.eb-disco');
           if (fase === 'escrevendo' && disco) visto.disco = centro(disco);
           const botao = abertura.querySelector('.abertura-pular');
@@ -168,7 +172,7 @@ test('primeira vez no aparelho: o nome em tela cheia, "Pular" à vista, a luz vo
   // Escreve e depois a luz voa; o nome nunca fica sob outra coisa nem sob uma folha.
   expect(percurso.fases).toEqual(['escrevendo', 'voando']);
   expect(percurso.cobertos).toBe(0);
-  expect(percurso.folhasAbertas).toBe(0);
+  expect(percurso.folhasVisiveis).toBe(0);
   // A luz sai do disco do nome, anda um bom trecho e pousa no ponto do lockup do cabeçalho.
   expect(distancia(percurso.primeira, percurso.disco)).toBeLessThan(2);
   expect(distancia(percurso.primeira, percurso.alvo)).toBeGreaterThan(100);
@@ -405,17 +409,19 @@ test.describe('o nome cabe em tela pequena e em zoom', () => {
 });
 
 test.describe('com a Chegada por abrir', () => {
-  // Sem a semeadura da Chegada: a primeira vez no aparelho abre a folha das Boas-vindas depois do nome.
+  // Sem a semeadura da Chegada: a primeira vez no aparelho abre a folha das Boas-vindas com o nome. A folha
+  // abre já, escondida por baixo dele, para a luz pousar no Zé dela (`abertura-ao-ze.spec.ts`).
   test.use({ semearAbertura: false });
 
-  test('o nome escrito nunca fica sob a folha: a Chegada espera a camada sair e então abre', async ({
+  test('o nome escrito nunca fica sob a folha: ela espera escondida e só aparece quando a luz pousa nela', async ({
     page,
   }) => {
     await page.goto('/#/');
     await expect(camada(page)).toBeVisible();
     const percurso = await acompanhar(page);
-    expect(percurso.cobertos).toBe(0);
-    expect(percurso.folhasAbertas).toBe(0);
+    // A luz voa ao Zé da folha e a camada esmaece sobre ela; até lá a folha esteve sem opacidade.
+    expect(percurso.fases).toEqual(['escrevendo', 'voando', 'saindo']);
+    expect(percurso.folhasVisiveis).toBe(0);
     await expect(chegada(page)).toBeVisible();
     await expect(camada(page)).toHaveCount(0);
   });
@@ -434,6 +440,61 @@ test.describe('com a Chegada por abrir', () => {
     await page.waitForTimeout(500);
     await expect(chegada(page)).toBeVisible();
     await expect(page).toHaveURL(/#\/$/);
+  });
+
+  test('perfil Calmo: a luz não visita o Zé, e a Chegada espera a camada sair e aparece pronta', async ({
+    page,
+  }) => {
+    // O Calmo não tem voo: a Chegada abre depois da camada, com o Zé pronto e o texto só esmaecendo.
+    await page.goto('/#/conta/perfis');
+    await pularAAbertura(page);
+    await page.getByRole('radio', { name: /^Calmo/ }).check();
+    await page.getByRole('button', { name: 'Aplicar' }).click();
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Perfil Calmo aplicado.' }),
+    ).toBeVisible();
+    // O preset liga o "só estudo", que mantém a Chegada fechada: a pessoa o desliga numa Sessão.
+    await page.goto('/#/sessao/iniciar');
+    await page.getByRole('button', { name: 'Começar', exact: true }).click();
+    const soEstudo = page.getByRole('checkbox', { name: 'Só estudo' });
+    await expect(soEstudo).toBeChecked();
+    await soEstudo.click();
+    await expect(soEstudo).not.toBeChecked();
+    await page.getByRole('link', { name: 'Encerrar' }).click();
+    await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
+
+    // Outro Dia, com a Chegada ainda por abrir, num carregamento novo: ir ao Hoje de dentro do aplicativo já
+    // a decidiria ali, e ela abriria (e se guardaria como vista) antes de o teste olhar.
+    await page.addInitScript(
+      ([escrita, dia, ...vistas]) => {
+        try {
+          window.localStorage.setItem(escrita as string, dia as string);
+          for (const chave of vistas) window.localStorage.removeItem(chave);
+        } catch {
+          /* sem armazenamento */
+        }
+      },
+      [
+        CHAVE,
+        JSON.stringify({ dia: DIA_ANTIGO }),
+        'arretado:chegada:v1',
+        'arretado:entrada-do-dia:v1',
+      ],
+    );
+    await page.goto('about:blank');
+    await page.goto('/#/');
+    const abertura = camada(page);
+    await expect(abertura).toBeVisible();
+    await expect(abertura).toHaveAttribute('data-calmo', '');
+    const percurso = await acompanhar(page);
+    expect(percurso.fases).toEqual(['escrevendo', 'saindo']);
+    expect(percurso.folhasVisiveis).toBe(0);
+    await expect(abertura).toHaveCount(0);
+
+    await expect(chegada(page)).toBeVisible();
+    await expect(page.locator('.chegada-tela')).toHaveAttribute('data-entrada', 'pronta');
+    await expect(page.locator('.chegada-texto')).toHaveCSS('opacity', '1');
   });
 });
 

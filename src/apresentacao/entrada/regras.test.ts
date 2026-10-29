@@ -7,6 +7,7 @@ import {
   CHAVE_CHEGADA,
   CHAVE_ENTRADA,
   chegadaJaVista,
+  chegadaPossivel,
   decidir,
   decidirNaAberturaAFrio,
   entradaJaAbriu,
@@ -184,5 +185,34 @@ describe('Entrada do Dia › quando abre', () => {
     // Outra carga da página (outro repositório) é outra abertura a frio.
     const { repo: outro } = await repositorioDeTeste();
     expect((await decidirNaAberturaAFrio(outro))?.tipo).toBe('entrada');
+  });
+});
+
+describe('Entrada do Dia › a Chegada pode abrir (o que a Abertura quer saber antes)', () => {
+  it('num aparelho que nasceu hoje e não viu a Chegada, pode', async () => {
+    aparelhoNovo();
+    const { repo } = await repositorioDeTeste();
+    expect(await chegadaPossivel(repo)).toBe(true);
+  });
+
+  it('com a Chegada já vista, não', async () => {
+    const { repo } = await repositorioDeTeste();
+    expect(chegadaJaVista()).toBe(true);
+    expect(await chegadaPossivel(repo)).toBe(false);
+  });
+
+  it('num aparelho de outro Dia, não: a Chegada é só do primeiro Dia dele', async () => {
+    aparelhoNovo();
+    const { repo, relogio } = await repositorioDeTeste();
+    relogio.avancar(DIA);
+    expect(await chegadaPossivel(repo)).toBe(false);
+  });
+
+  it('é só o começo da conta: o "só estudo" não a tira daqui (quem decide é o `decidir`)', async () => {
+    aparelhoNovo();
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { modoSoEstudo: true });
+    expect(await chegadaPossivel(repo)).toBe(true);
+    expect(await decidir(repo)).toBeUndefined();
   });
 });

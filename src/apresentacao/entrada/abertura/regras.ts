@@ -7,6 +7,7 @@ import { obterPreferencias } from '../../../core/preferencias';
 import { escritaDaAbertura, tomarEscrita } from '../../componentes/escrita/frequencia';
 import type { OndeEscrever } from '../../componentes/escrita/vez-da-escrita';
 import { movimentoDoPerfil } from '../../movimento';
+import { chegadaPossivel } from '../regras';
 
 /**
  * Há Sessão ativa ou pausada hoje? Lê só as Sessões de hoje, pelo índice da data, e não as quatro coleções
@@ -31,15 +32,19 @@ async function haSessaoAbertaHoje(repo: Repositorio): Promise<boolean> {
  * com movimento reduzido, com o "só estudo" ligado nem com Sessão aberta: nesses casos o cabeçalho
  * escreve (ou não) o nome como antes. Se os dados não leem, o mesmo: a Abertura nunca atrasa nem
  * derruba o uso. Quando abre, guarda o Dia (a escrita acontece uma vez, nunca nos dois lugares).
+ *
+ * Na primeira vez também diz se a Chegada vem aí (`chegada`): só então a luz espera pelo Zé dela. A
+ * Chegada e a Abertura decidem em separado, e uma falha ao ler o aparelho vale "não": a luz vai ao cabeçalho.
  */
 export async function decidirOndeEscrever(repo: Repositorio): Promise<OndeEscrever> {
   const agora = repo.ctx.agora();
   const escrita = escritaDaAbertura(agora);
   if (escrita === 'parada') return { onde: 'cabecalho', escrita };
   try {
-    const [preferencias, sessaoAberta] = await Promise.all([
+    const [preferencias, sessaoAberta, chegada] = await Promise.all([
       obterPreferencias(repo),
       haSessaoAbertaHoje(repo),
+      escrita === 'completa' ? chegadaPossivel(repo).catch(() => false) : false,
     ]);
     if (preferencias.modoSoEstudo === true || sessaoAberta) {
       return { onde: 'cabecalho', escrita };
@@ -49,7 +54,12 @@ export async function decidirOndeEscrever(repo: Repositorio): Promise<OndeEscrev
     // Outra aba pode ter escrito o nome enquanto os dados eram lidos: vale o que `tomarEscrita` devolve.
     const tomada = tomarEscrita(agora);
     if (tomada === 'parada') return { onde: 'cabecalho', escrita: tomada };
-    return { onde: 'tela', escrita: tomada, calmo: movimento === 'calmo' };
+    return {
+      onde: 'tela',
+      escrita: tomada,
+      calmo: movimento === 'calmo',
+      chegada: tomada === 'completa' && chegada,
+    };
   } catch {
     return { onde: 'cabecalho', escrita };
   }

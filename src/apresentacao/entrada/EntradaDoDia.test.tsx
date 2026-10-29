@@ -320,24 +320,46 @@ describe('Chegada › espera o nome em tela cheia (Abertura, M2 do Zé)', () => 
     localStorage.removeItem('arretado:escrita-do-nome:v1');
   });
 
-  it('na primeira vez o nome escreve primeiro: a Chegada só abre depois que a Abertura sai', async () => {
+  it('na primeira vez a Chegada abre já, escondida por baixo do nome, e só aparece quando a Abertura sai', async () => {
     simularMovimento('normal');
     const { repo } = await repositorioDeTeste();
     abrirHoje(repo);
     await waitFor(() => {
       expect(document.querySelector('.abertura')).not.toBeNull();
     });
-    // A decisão da Chegada já saiu (o Hoje carregou), mas ela fica quieta: um <dialog> modal aberto agora
-    // ficaria por cima do popover do nome.
+    // A decisão da Chegada já saiu (o Hoje carregou) e ela já está na árvore, para a luz ter para onde voar;
+    // mas invisível e sem pegar toque, e ainda não vista: fechar o aplicativo agora a traz de volta.
     await decisaoTerminou();
-    expect(screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBeNull();
+    const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
+    expect(folha).toHaveClass('dialogo-chegada-espera');
     expect(chegadaJaVista()).toBe(false);
 
     fireEvent.pointerDown(document.body);
-    expect(
-      await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' }),
-    ).toBeInTheDocument();
-    expect(document.querySelector('.abertura')).toBeNull();
+    await waitFor(() => {
+      expect(document.querySelector('.abertura')).toBeNull();
+    });
+    expect(screen.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toBe(folha);
+    expect(folha).not.toHaveClass('dialogo-chegada-espera');
     expect(chegadaJaVista()).toBe(true);
+  });
+
+  it('a Entrada do Dia não tem luz para receber: espera a Abertura sair, como antes', async () => {
+    simularMovimento('normal');
+    // Um aparelho de sempre, cujo nome foi escrito ontem: hoje abre a versão curta e depois a linha do Dia.
+    localStorage.setItem(CHAVE_CHEGADA, '{"vista":true}');
+    localStorage.setItem('arretado:escrita-do-nome:v1', '{"dia":"2026-09-22"}');
+    const { repo } = await repositorioDeTeste();
+    abrirHoje(repo);
+    await waitFor(() => {
+      expect(document.querySelector('.abertura')).not.toBeNull();
+    });
+    await decisaoTerminou();
+    expect(linha()).toBeNull();
+
+    fireEvent.pointerDown(document.body);
+    await waitFor(() => {
+      expect(linha()).not.toBeNull();
+    });
+    expect(document.querySelector('.abertura')).toBeNull();
   });
 });

@@ -1,5 +1,12 @@
 import { CAIXA_DO_LOCKUP } from '../../componentes/escrita/geometria';
-import { andar, curvaDaViagem, luzNaViagem, pontoDeControle, type Viagem } from './voo';
+import {
+  andar,
+  curvaDaViagem,
+  luzNaViagem,
+  pontoDeControle,
+  pontoDeControleAoZe,
+  type Viagem,
+} from './voo';
 
 const VIAGEM: Viagem = {
   de: { x: 200, y: 400 },
@@ -8,7 +15,7 @@ const VIAGEM: Viagem = {
   raioPara: 1.5,
 };
 
-describe('a viagem da luz (M2 do Zé)', () => {
+describe('a viagem da luz (M2 e M3b do Zé)', () => {
   it('sai do ponto do nome e pousa no ponto do cabeçalho, encolhendo do tamanho de um ao do outro', () => {
     expect(luzNaViagem(VIAGEM, 0)).toEqual({ x: 200, y: 400, raio: 4 });
     const fim = luzNaViagem(VIAGEM, 1);
@@ -31,6 +38,34 @@ describe('a viagem da luz (M2 do Zé)', () => {
   it('o ponto de controle fica ao lado do meio do caminho', () => {
     const controle = pontoDeControle({ x: 0, y: 0 }, { x: 100, y: 0 });
     expect(controle).toEqual({ x: 50, y: 25 });
+  });
+
+  it('a viagem ao Zé sobe acima dos dois pontos: o controle fica no meio, a 30% da distância acima do mais alto', () => {
+    const controle = pontoDeControleAoZe({ x: 300, y: 400 }, { x: 100, y: 200 });
+    const distancia = Math.hypot(200, 200);
+    expect(controle.x).toBe(200);
+    expect(controle.y).toBeCloseTo(200 - distancia * 0.3, 9);
+  });
+
+  it('com `controle`, o arco passa por ele e não pelo ponto ao lado do caminho', () => {
+    const de = { x: 300, y: 400 };
+    const para = { x: 100, y: 200 };
+    const aoZe: Viagem = {
+      de,
+      para,
+      raioDe: 4,
+      raioPara: 4,
+      controle: pontoDeControleAoZe(de, para),
+    };
+    const meio = luzNaViagem(aoZe, 0.5);
+    // Uma Bézier quadrática a 0,5 é (de + 2·controle + para) / 4.
+    expect(meio.x).toBeCloseTo((de.x + 2 * aoZe.controle!.x + para.x) / 4, 9);
+    expect(meio.y).toBeCloseTo((de.y + 2 * aoZe.controle!.y + para.y) / 4, 9);
+    // E a luz passa acima das duas pontas: a mais alta é y = 200.
+    expect(meio.y).toBeLessThan(300);
+    const semControle = luzNaViagem({ ...aoZe, controle: undefined }, 0.5);
+    expect(semControle.y).not.toBeCloseTo(meio.y, 0);
+    expect(luzNaViagem(aoZe, 0)).toEqual({ ...de, raio: 4 });
   });
 
   it('a curva da viagem arranca devagar e assenta: 0 e 1 nas pontas, abaixo da reta no começo', () => {

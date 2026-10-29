@@ -3,7 +3,7 @@ import { act, render } from '@testing-library/react';
 import { simularMovimento } from '../../../testes/movimento';
 import { Ze } from './Ze';
 import type { ControleDoZe } from './controle';
-import { caminhoDoOlho, CORPO } from './geometria';
+import { caminhoDoOlho, CORPO, FLOR } from './geometria';
 
 /** O jsdom não mede traços: o contorno ganha um comprimento. */
 function medirOContorno(comprimento = 800) {
@@ -219,6 +219,62 @@ describe('o controle do Zé: o traço, a luz e as partes', () => {
     expect(container.querySelector<SVGElement>('.z-olhos')?.style.transform).toBe(
       'translate(3px,0px)',
     );
+  });
+
+  it('a luz da caneta passa pelos pontos do desenho e some ao apagar; o Zé inteiro a apaga', () => {
+    const { container, controle } = montar();
+    const pena = container.querySelector('.z-pena');
+    expect(pena).toHaveAttribute('visibility', 'hidden');
+    expect(pena?.querySelectorAll('circle')).toHaveLength(2);
+    controle.pena({ x: 84.123456, y: 230 });
+    expect(pena).toHaveAttribute('visibility', 'visible');
+    expect(pena).toHaveAttribute('transform', 'translate(84.12 230)');
+    controle.pena(null);
+    expect(pena).toHaveAttribute('visibility', 'hidden');
+    controle.pena({ x: 156, y: 230 });
+    controle.tudoVisivel();
+    expect(pena).toHaveAttribute('visibility', 'hidden');
+  });
+
+  describe('onde o pé esquerdo está na tela (a luz da Abertura pousa nele)', () => {
+    const geometria = { getScreenCTM: vi.fn(), getPointAtLength: vi.fn() };
+    beforeEach(() => {
+      Object.assign(window.SVGElement.prototype, geometria);
+      geometria.getPointAtLength.mockReturnValue({ x: 84, y: 230 });
+    });
+    afterEach(() => {
+      Reflect.deleteProperty(window.SVGElement.prototype, 'getScreenCTM');
+      Reflect.deleteProperty(window.SVGElement.prototype, 'getPointAtLength');
+      geometria.getScreenCTM.mockReset();
+      geometria.getPointAtLength.mockReset();
+    });
+
+    it('é o começo do traço levado à janela, com o raio da luz da caneta na mesma escala', () => {
+      geometria.getScreenCTM.mockReturnValue({ a: 0.5, b: 0, c: 0, d: 0.5, e: 100, f: 40 });
+      const { controle } = montar();
+      expect(controle.peNaTela()).toEqual({ x: 142, y: 155, raio: FLOR.r * 0.5 });
+    });
+
+    it('sem tela (o desenho não está desenhado) ou com a página já fora do ar, não há pé a medir', () => {
+      const { controle } = montar();
+      geometria.getScreenCTM.mockReturnValue(null);
+      expect(controle.peNaTela()).toBeNull();
+      geometria.getScreenCTM.mockImplementation(() => {
+        throw new DOMException('documento inativo', 'InvalidStateError');
+      });
+      expect(controle.peNaTela()).toBeNull();
+      geometria.getScreenCTM.mockImplementation(() => {
+        throw new Error('outro erro');
+      });
+      expect(() => controle.peNaTela()).toThrow('outro erro');
+    });
+
+    it('sem svg ligado, nulo', () => {
+      geometria.getScreenCTM.mockReturnValue({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
+      const { controle, unmount } = montar();
+      unmount();
+      expect(controle.peNaTela()).toBeNull();
+    });
   });
 
   it('sem svg ligado, nada quebra', () => {

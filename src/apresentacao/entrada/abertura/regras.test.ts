@@ -4,6 +4,7 @@ import { encerrarSessao, iniciarSessao } from '../../../dominios/sessao/servico'
 import { simularMovimento } from '../../../testes/movimento';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { lembrarDaEscrita } from '../../componentes/escrita/frequencia';
+import { CHAVE_CHEGADA } from '../regras';
 import { decidirNaAberturaDoApp, decidirOndeEscrever } from './regras';
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
@@ -25,8 +26,54 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'completa',
       calmo: false,
+      chegada: false,
     });
     expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('primeira vez num aparelho que nasceu hoje e não viu a Chegada: ela vem aí (a luz pode ir ao Zé)', async () => {
+    window.localStorage.removeItem(CHAVE_CHEGADA);
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    expect(await decidirOndeEscrever(repo)).toEqual({
+      onde: 'tela',
+      escrita: 'completa',
+      calmo: false,
+      chegada: true,
+    });
+  });
+
+  it('no Calmo a Chegada também vem aí; é a Abertura que não voa (ela só esmaece)', async () => {
+    window.localStorage.removeItem(CHAVE_CHEGADA);
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    await alterarPreferencias(repo, { perfilDeEstudo: 'calmo', modoSoEstudo: false });
+    expect(await decidirOndeEscrever(repo)).toMatchObject({
+      onde: 'tela',
+      calmo: true,
+      chegada: true,
+    });
+  });
+
+  it('a Chegada só conta na primeira vez: a abertura do Dia seguinte nem pergunta por ela', async () => {
+    window.localStorage.removeItem(CHAVE_CHEGADA);
+    lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    expect(await decidirOndeEscrever(repo)).toMatchObject({ escrita: 'curta', chegada: false });
+  });
+
+  it('uma falha só ao ler o aparelho vale "sem Chegada": a luz vai ao cabeçalho e a tela cheia abre', async () => {
+    window.localStorage.removeItem(CHAVE_CHEGADA);
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    const original = repo.colecao.bind(repo);
+    vi.spyOn(repo, 'colecao').mockImplementation((nome: Parameters<typeof original>[0]) => {
+      if (nome === 'aparelhos') throw new Error('sem a coleção de aparelhos');
+      return original(nome);
+    });
+    expect(await decidirOndeEscrever(repo)).toMatchObject({
+      onde: 'tela',
+      escrita: 'completa',
+      chegada: false,
+    });
+    vi.restoreAllMocks();
   });
 
   it('primeira abertura de outro Dia: a tela cheia, no modo curto', async () => {
@@ -36,6 +83,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'curta',
       calmo: false,
+      chegada: false,
     });
     expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
   });
@@ -68,6 +116,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'completa',
       calmo: true,
+      chegada: false,
     });
   });
 
@@ -96,6 +145,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'curta',
       calmo: false,
+      chegada: false,
     });
   });
 
@@ -115,12 +165,18 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     const primeira = decidirNaAberturaDoApp(repo);
     const segunda = decidirNaAberturaDoApp(repo);
     expect(segunda).toBe(primeira);
-    expect(await primeira).toEqual({ onde: 'tela', escrita: 'completa', calmo: false });
+    expect(await primeira).toEqual({
+      onde: 'tela',
+      escrita: 'completa',
+      calmo: false,
+      chegada: false,
+    });
     // Sem a memória, esta leitura já veria o Dia guardado pela primeira e diria "parada".
     expect(await decidirNaAberturaDoApp(repo)).toEqual({
       onde: 'tela',
       escrita: 'completa',
       calmo: false,
+      chegada: false,
     });
   });
 
@@ -139,6 +195,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'curta',
       calmo: false,
+      chegada: false,
     });
     for (const lida of lidas) expect(lida).not.toHaveBeenCalled();
   });

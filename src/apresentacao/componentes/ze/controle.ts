@@ -36,6 +36,12 @@ interface Olho {
   escala: number;
 }
 
+/** Um ponto do desenho do Zé (unidades do `viewBox`). */
+export interface PontoDoZe {
+  x: number;
+  y: number;
+}
+
 interface Ligacao {
   svg: SVGSVGElement;
   corpo: SVGPathElement;
@@ -46,6 +52,8 @@ interface Ligacao {
   forca: SVGGElement;
   flor: SVGGElement;
   luz: SVGGElement;
+  /** A luz da caneta, que anda pelo contorno enquanto ele se desenha. */
+  pena: SVGGElement;
   olhosG: SVGGElement;
   olhos: readonly [Olho, Olho];
 }
@@ -69,6 +77,13 @@ export interface ControleDoZe {
   /** A luz da flor pisca `vezes` vezes (460 ms cada); no Calmo é um esmaecer só, de 0,9 s; no reduzido não pisca. */
   piscarFlor: (vezes?: number) => Promise<void>;
   pararFlor: () => void;
+  /** A luz da caneta passa por `ponto` (nas unidades do desenho); `null` a apaga. */
+  pena: (ponto: PontoDoZe | null) => void;
+  /**
+   * Onde o pé esquerdo (onde o traço começa) está na tela, em pixels da janela, e o raio que a luz da caneta
+   * tem aí; `null` se o Zé não está ligado ou não tem tela (o jsdom, o `display: none`).
+   */
+  peNaTela: () => { x: number; y: number; raio: number } | null;
   comprimento: () => number;
   esconder: (parte: ParteDoZe) => void;
   mostrar: (parte: ParteDoZe) => void;
@@ -137,6 +152,7 @@ function ligarAoSvg(svg: SVGSVGElement): Ligacao {
     forca: obrigatorio(svg.querySelector<SVGGElement>('.z-bc'), '.z-bc'),
     flor: obrigatorio(svg.querySelector<SVGGElement>('.z-flor'), '.z-flor'),
     luz: obrigatorio(svg.querySelector<SVGGElement>('.z-luz'), '.z-luz'),
+    pena: obrigatorio(svg.querySelector<SVGGElement>('.z-pena'), '.z-pena'),
     olhosG: obrigatorio(svg.querySelector<SVGGElement>('.z-olhos'), '.z-olhos'),
     olhos: [olho(esquerdo, 0), olho(direito, 1)],
   };
@@ -215,9 +231,23 @@ export function criarControle(humorInicial: Humor = 'neutro'): ControleDoZe {
     }
   };
 
+  const pena = (ponto: PontoDoZe | null) => {
+    if (!ligacao) return;
+    if (ponto === null) {
+      ligacao.pena.setAttribute('visibility', 'hidden');
+      return;
+    }
+    ligacao.pena.setAttribute(
+      'transform',
+      `translate(${arredondar(ponto.x)} ${arredondar(ponto.y)})`,
+    );
+    ligacao.pena.setAttribute('visibility', 'visible');
+  };
+
   const tudoVisivel = () => {
     pararFlor();
     tracoPronto();
+    pena(null);
     for (const parte of PARTES) definirParte(parte, false);
     if (ligacao) {
       for (const o of ligacao.olhos) o.escala = 1;
@@ -326,6 +356,24 @@ export function criarControle(humorInicial: Humor = 'neutro'): ControleDoZe {
       });
     },
     pararFlor,
+    pena,
+    peNaTela() {
+      if (!ligacao) return null;
+      try {
+        const matriz = ligacao.corpo.getScreenCTM();
+        if (!matriz) return null;
+        const { x, y } = ligacao.corpo.getPointAtLength(0);
+        return {
+          x: matriz.a * x + matriz.c * y + matriz.e,
+          y: matriz.b * x + matriz.d * y + matriz.f,
+          raio: FLOR.r * Math.hypot(matriz.a, matriz.b),
+        };
+      } catch (erro) {
+        // A página recarregou no meio do voo: o navegador não mede um documento inativo.
+        if (documentoInativo(erro)) return null;
+        throw erro;
+      }
+    },
     comprimento,
     esconder: (parte) => {
       definirParte(parte, true);

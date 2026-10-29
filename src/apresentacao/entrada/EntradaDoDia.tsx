@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Repositorio } from '../../core/persistencia';
-import { useAberturaEmCurso } from '../componentes/escrita/vez-da-escrita';
+import { useEstadoDaAbertura } from '../componentes/escrita/vez-da-escrita';
 import { useRepositorio } from '../dados/contexto';
 import type { RetratoDoHoje } from '../hoje/retrato';
 import { Chegada } from './Chegada';
@@ -17,11 +17,12 @@ const decididas = new WeakMap<Repositorio, Abertura>();
  * frio do aplicativo, depois que o Hoje carregou. Se algo falha (os dados, o conteúdo), não aparece nada e
  * o Hoje segue como está: a Entrada nunca bloqueia o uso. Enquanto a Abertura (o nome em tela cheia)
  * decide ou está na tela, nada abre: a Chegada é um `<dialog>` modal e, aberto depois dela, ficaria por
- * cima do nome.
+ * cima do nome. A exceção é a Chegada que a luz da Abertura vai visitar (a primeira vez): ela abre já,
+ * escondida (ver `Chegada`), para a luz ter para onde voar.
  */
 export function EntradaDoDia({ retrato }: { retrato: RetratoDoHoje | undefined }) {
   const repo = useRepositorio();
-  const aberturaEmCurso = useAberturaEmCurso();
+  const { emCurso: aberturaEmCurso, voaParaAChegada } = useEstadoDaAbertura();
   const [abertura, setAbertura] = useState<Abertura | undefined>(() => decididas.get(repo));
   // O StrictMode roda os efeitos duas vezes e a resposta chega depois da segunda: vale se ainda montado.
   const montado = useRef(false);
@@ -43,7 +44,8 @@ export function EntradaDoDia({ retrato }: { retrato: RetratoDoHoje | undefined }
       () => undefined,
     );
   }, [repo, pronto]);
-  if (abertura === undefined || aberturaEmCurso) return null;
+  if (abertura === undefined) return null;
+  if (aberturaEmCurso && !(abertura.tipo === 'chegada' && voaParaAChegada)) return null;
   return abertura.tipo === 'chegada' ? (
     <Chegada
       dia={abertura.dia}
