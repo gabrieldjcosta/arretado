@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-20T00:00:00Z",
+  "generatedAt": "2026-10-29T00:00:00Z",
   "title": "Design System: Arretado",
   "extensions": {
     "colorMeta": {
@@ -48,6 +48,31 @@
         "role": "tertiary",
         "displayName": "Vidro da noite",
         "canonical": "#9db7e8"
+      },
+      "piscina": {
+        "role": "tertiary",
+        "displayName": "Piscina",
+        "canonical": "#39caef"
+      },
+      "piscina-funda": {
+        "role": "tertiary",
+        "displayName": "Piscina funda",
+        "canonical": "#0e93b4"
+      },
+      "flor": {
+        "role": "tertiary",
+        "displayName": "Flor do Zé",
+        "canonical": "#ffc53d"
+      },
+      "bochecha": {
+        "role": "tertiary",
+        "displayName": "Bochecha do Zé (dia)",
+        "canonical": "#ec5675"
+      },
+      "n-bochecha": {
+        "role": "tertiary",
+        "displayName": "Bochecha do Zé (noite)",
+        "canonical": "#ff86a6"
       },
       "papel": {
         "role": "neutral",
@@ -202,17 +227,47 @@
       {
         "name": "escrita-do-nome",
         "value": "2,64 s completa · 1,2 s curta (Calmo: 0,24 s de opacidade)",
-        "purpose": "O nome \"arretado\" se escreve e a caneta vira o cacto: completa só na primeira abertura no aparelho, curta na primeira de cada Dia, parada nas demais; com movimento reduzido, parada."
+        "purpose": "O nome \"arretado\" se escreve e a caneta vira o cacto, agora numa camada de tela cheia (a Abertura), com o néon aceso em cada letra: completa só na primeira abertura no aparelho, curta na primeira de cada Dia, parada nas demais; com movimento reduzido, parada."
       },
       {
         "name": "quadro-do-cacto",
         "value": "520 a 1100ms por fio, curva senoidal (stroke-dashoffset)",
-        "purpose": "A caneta desenha a parte de hoje do quadro do cacto uma vez, ao fechar o Dia; com movimento reduzido, pronto."
+        "purpose": "A caneta desenha a parte de hoje do quadro do cacto uma vez, ao fechar o Dia; com movimento reduzido, pronto. O néon acende enquanto a caneta anda e assenta em 0,6 s."
       },
       {
         "name": "traco-de-selecao",
         "value": "240ms + 120ms + 260ms, cubic-bezier(.2, .7, .2, 1) (Calmo: 380ms de opacidade)",
-        "purpose": "Linha fina em volta do item escolhido; com movimento reduzido, nenhum."
+        "purpose": "Linha fina em volta do item escolhido, com o néon aceso junto (240 ms) e apagado com ela; com movimento reduzido, nenhum."
+      },
+      {
+        "name": "neon",
+        "value": "acende com o traço · assenta em 0,6 s · repouso 0 de dia (0,16 no Zé) e 0,30 à noite",
+        "purpose": "O brilho piscina dos cinco traços de caneta (nome, Zé, ícones do passeio, seleção e quadro): nunca pulsa, nunca repete e nenhuma animação dele é infinita. Calmo mostra só o repouso, esmaecendo em 0,24 s; Reduzido, o repouso parado; em cores forçadas o brilho some."
+      },
+      {
+        "name": "luz-visita-o-ze",
+        "value": "pausa de 0,3 s · arco de 0,45 a 0,5 s (Calmo e Reduzido: sem voo)",
+        "purpose": "Na primeira vez a luz do nome voa ao pé esquerdo do Zé das Boas-vindas e é a caneta que o desenha; se a Chegada não está pronta em 0,6 s, ou o pé não está à vista, vai ao cabeçalho."
+      },
+      {
+        "name": "o-ze-se-desenha",
+        "value": "1,2 s de pé a pé · brilho assenta em 0,6 s · rosto em 0,6 s (Calmo: 0,24 s de opacidade)",
+        "purpose": "O contorno do Zé se desenha com o néon aceso, a flor surge, o rosto aparece e a piscadela fecha a cena; com movimento reduzido ele aparece inteiro e parado."
+      },
+      {
+        "name": "piscadas-do-ze",
+        "value": "rajadas de 2 a 3 piscadas de 0,16 s, uma a cada 0,34 s · no máximo 6 rajadas por visita · luz da mão: 3 rodadas de 3 piscadas de 0,46 s",
+        "purpose": "Só nas Boas-vindas e só em movimento normal: a exceção declarada à regra de não pulsar (D-D10), finita e abaixo de 3 piscadas por segundo. Calmo: um esmaecer lento por rodada; Reduzido: nada."
+      },
+      {
+        "name": "passo-do-passeio",
+        "value": "160 ms de saída (12 px) e de entrada · o ícone se desenha em 0,42 s · o traço sob a aba salta em 200 ms",
+        "purpose": "A troca de passo da Chegada, com o néon aceso no ícone; Calmo só esmaece; Reduzido troca na hora, com o olhar do Zé parado."
+      },
+      {
+        "name": "carregamento-do-ze",
+        "value": "silêncio de 1 s · contorno de 1,15 a 2,35 s · rosto até 3,1 s · texto aos 6 s e aos 25 s · tudo para em cerca de 1 min",
+        "purpose": "A tela de carregamento do index.html; sai em 160 ms de esmaecer e 200 ms até deixar a árvore; Reduzido: o Zé inteiro e parado depois do silêncio."
       },
       {
         "name": "passagem-do-cartao",
@@ -344,13 +399,31 @@
       "description": "O \"+\" na linha do título do Hoje e do Fixar: redondo, 48 px, com o contorno e o fundo do controle de cada mundo; abre o registro de erro. Não é a ação da tela.",
       "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div></div><div class=\"ds-noite\"><div class=\"ds-titulo\"><h1>Hoje</h1><a class=\"ds-mais\" href=\"#\" aria-label=\"Novo registro de erro\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg></a></div></div></div>",
       "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-titulo h1{margin:0;font-size:30px;line-height:1.1;letter-spacing:-0.02em}.ds-mais{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%}.ds-mais svg{width:24px;height:24px}.ds-dia h1{font:800 30px/1.1 'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;color:#0f1c3a}.ds-dia .ds-mais{background:#fff;color:#0f1c3a;border:1.5px solid #6e7a96}.ds-dia .ds-mais:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite h1{font:700 30px/1.1 'Familjen Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;color:#eef2fa}.ds-noite .ds-mais{background:#1c2942;color:#eef2fa;border:1px solid #5c6b8c}.ds-noite .ds-mais:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
+    },
+    {
+      "name": "O Zé",
+      "kind": "custom",
+      "refersTo": "ze",
+      "description": "O mascote: o cacto da marca num tubo de néon de traço único, aberto, de pé a pé, sem linha do chão. Linha branca de 6 sobre a faixa piscina de 17 (de dia afunda para #0e93b4 a 32 e 24 px), olhos de cápsula retos, bochechas rosa, sem boca, e a flor amarela na ponta do braço direito. Só aparece na tela de carregamento e na Chegada; é decorativo (aria-hidden). O brilho repousa em 0,16 de dia e 0,32 à noite (o do traço do app, 0 de dia e 0,30 à noite). O miolo degradê do tronco fica de fora deste exemplo.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><svg class=\"ds-ze\" viewBox=\"22 10 196 240\" width=\"88\" height=\"108\" aria-hidden=\"true\" focusable=\"false\"><defs><filter id=\"ds-ze-a-d\" x=\"-45%\" y=\"-40%\" width=\"190%\" height=\"180%\"><feGaussianBlur stdDeviation=\"11\"/></filter><filter id=\"ds-ze-b-d\" x=\"-30%\" y=\"-25%\" width=\"160%\" height=\"150%\"><feGaussianBlur stdDeviation=\"2.4\"/></filter><filter id=\"ds-ze-h-d\" x=\"-100%\" y=\"-100%\" width=\"300%\" height=\"300%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter></defs><path class=\"ds-ze-aura\" filter=\"url(#ds-ze-a-d)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-banda\" filter=\"url(#ds-ze-b-d)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-linha\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-olho\" d=\"M102 68.25V79.75M138 68.25V79.75\"/><ellipse class=\"ds-ze-bochecha\" cx=\"99.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><ellipse class=\"ds-ze-bochecha\" cx=\"140.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><path class=\"ds-ze-haste\" d=\"M184 111V101\"/><circle class=\"ds-ze-flor-halo\" cx=\"184\" cy=\"94\" r=\"10\" filter=\"url(#ds-ze-h-d)\"/><circle class=\"ds-ze-flor\" cx=\"184\" cy=\"94\" r=\"5.5\"/></svg></div><div class=\"ds-noite\"><svg class=\"ds-ze\" viewBox=\"22 10 196 240\" width=\"88\" height=\"108\" aria-hidden=\"true\" focusable=\"false\"><defs><filter id=\"ds-ze-a-n\" x=\"-45%\" y=\"-40%\" width=\"190%\" height=\"180%\"><feGaussianBlur stdDeviation=\"11\"/></filter><filter id=\"ds-ze-b-n\" x=\"-30%\" y=\"-25%\" width=\"160%\" height=\"150%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter><filter id=\"ds-ze-h-n\" x=\"-100%\" y=\"-100%\" width=\"300%\" height=\"300%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter></defs><path class=\"ds-ze-aura\" filter=\"url(#ds-ze-a-n)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-banda\" filter=\"url(#ds-ze-b-n)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-linha\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-olho\" d=\"M102 68.25V79.75M138 68.25V79.75\"/><ellipse class=\"ds-ze-bochecha\" cx=\"99.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><ellipse class=\"ds-ze-bochecha\" cx=\"140.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><path class=\"ds-ze-haste\" d=\"M184 111V101\"/><circle class=\"ds-ze-flor-halo\" cx=\"184\" cy=\"94\" r=\"10\" filter=\"url(#ds-ze-h-n)\"/><circle class=\"ds-ze-flor\" cx=\"184\" cy=\"94\" r=\"5.5\"/></svg></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-ze{display:block;margin:0 auto;overflow:visible}.ds-ze path,.ds-ze ellipse{fill:none;stroke-linecap:round;stroke-linejoin:round}.ds-ze-aura{stroke:#39caef;stroke-width:32.3}.ds-ze-banda{stroke:#39caef;stroke-width:17}.ds-ze-linha{stroke:#fff;stroke-width:6}.ds-ze-olho{stroke-width:12.5}.ds-ze ellipse{stroke:none}.ds-ze-haste{stroke-width:4}.ds-ze circle{stroke:none;fill:#ffc53d}.ds-ze-flor-halo{opacity:.6}.ds-dia .ds-ze-aura{opacity:.16}.ds-dia .ds-ze-olho,.ds-dia .ds-ze-haste{stroke:#0f1c3a}.ds-dia .ds-ze ellipse{fill:#ec5675;opacity:.55}.ds-noite .ds-ze-aura{opacity:.32}.ds-noite .ds-ze-banda{opacity:.55}.ds-noite .ds-ze-olho,.ds-noite .ds-ze-haste{stroke:#fff}.ds-noite .ds-ze ellipse{fill:#ff86a6;opacity:.65}"
+    },
+    {
+      "name": "Boas-vindas (Chegada)",
+      "kind": "custom",
+      "refersTo": "chegada-boas-vindas",
+      "description": "A primeira tela da Chegada, um diálogo modal (no celular a tela toda): o Zé grande, o título, uma frase e só dois botões, \"Vamos\" como principal e \"Agora não\" como botão de texto. Na primeira vez a Chegada abre escondida por baixo da Abertura e o texto sobe quando a luz do nome termina de desenhar o Zé. Os quatro passos e o Começar usam o mesmo corpo, com o Zé pequeno ou contente; o botão do Google do Começar leva as cores das diretrizes do Google, a exceção à luz do mundo.",
+      "html": "<div class=\"ds-mundos\"><div class=\"ds-dia\"><section class=\"ds-bv\"><svg class=\"ds-ze\" viewBox=\"22 10 196 240\" width=\"72\" height=\"88\" aria-hidden=\"true\" focusable=\"false\"><defs><filter id=\"ds-ze-a-d2\" x=\"-45%\" y=\"-40%\" width=\"190%\" height=\"180%\"><feGaussianBlur stdDeviation=\"11\"/></filter><filter id=\"ds-ze-b-d2\" x=\"-30%\" y=\"-25%\" width=\"160%\" height=\"150%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter><filter id=\"ds-ze-h-d2\" x=\"-100%\" y=\"-100%\" width=\"300%\" height=\"300%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter></defs><path class=\"ds-ze-aura\" filter=\"url(#ds-ze-a-d2)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-banda\" filter=\"url(#ds-ze-b-d2)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-linha\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-olho\" d=\"M102 68.25V79.75M138 68.25V79.75\"/><ellipse class=\"ds-ze-bochecha\" cx=\"99.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><ellipse class=\"ds-ze-bochecha\" cx=\"140.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><path class=\"ds-ze-haste\" d=\"M184 111V101\"/><circle class=\"ds-ze-flor-halo\" cx=\"184\" cy=\"94\" r=\"10\" filter=\"url(#ds-ze-h-d2)\"/><circle class=\"ds-ze-flor\" cx=\"184\" cy=\"94\" r=\"5.5\"/></svg><h2>Boas-vindas ao Arretado!</h2><p>Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?</p><button class=\"ds-bv-vamos\">Vamos</button><button class=\"ds-bv-agora\">Agora não</button></section></div><div class=\"ds-noite\"><section class=\"ds-bv\"><svg class=\"ds-ze\" viewBox=\"22 10 196 240\" width=\"72\" height=\"88\" aria-hidden=\"true\" focusable=\"false\"><defs><filter id=\"ds-ze-a-n2\" x=\"-45%\" y=\"-40%\" width=\"190%\" height=\"180%\"><feGaussianBlur stdDeviation=\"11\"/></filter><filter id=\"ds-ze-b-n2\" x=\"-30%\" y=\"-25%\" width=\"160%\" height=\"150%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter><filter id=\"ds-ze-h-n2\" x=\"-100%\" y=\"-100%\" width=\"300%\" height=\"300%\"><feGaussianBlur stdDeviation=\"4.5\"/></filter></defs><path class=\"ds-ze-aura\" filter=\"url(#ds-ze-a-n2)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-banda\" filter=\"url(#ds-ze-b-n2)\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-linha\" d=\"M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230\"/><path class=\"ds-ze-olho\" d=\"M102 68.25V79.75M138 68.25V79.75\"/><ellipse class=\"ds-ze-bochecha\" cx=\"99.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><ellipse class=\"ds-ze-bochecha\" cx=\"140.5\" cy=\"100\" rx=\"8\" ry=\"5\"/><path class=\"ds-ze-haste\" d=\"M184 111V101\"/><circle class=\"ds-ze-flor-halo\" cx=\"184\" cy=\"94\" r=\"10\" filter=\"url(#ds-ze-h-n2)\"/><circle class=\"ds-ze-flor\" cx=\"184\" cy=\"94\" r=\"5.5\"/></svg><h2>Boas-vindas ao Arretado!</h2><p>Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?</p><button class=\"ds-bv-vamos\">Vamos</button><button class=\"ds-bv-agora\">Agora não</button></section></div></div>",
+      "css": ".ds-mundos{display:grid;gap:12px}.ds-dia{background:#f6f8fb;padding:16px;border-radius:8px}.ds-noite{background:#0b1322;padding:16px;border-radius:14px}.ds-ze{display:block;margin:0 auto 12px;overflow:visible}.ds-ze path,.ds-ze ellipse{fill:none;stroke-linecap:round;stroke-linejoin:round}.ds-ze-aura{stroke:#39caef;stroke-width:32.3}.ds-ze-banda{stroke:#39caef;stroke-width:17}.ds-ze-linha{stroke:#fff;stroke-width:6}.ds-ze-olho{stroke-width:12.5}.ds-ze ellipse{stroke:none}.ds-ze-haste{stroke-width:4}.ds-ze circle{stroke:none;fill:#ffc53d}.ds-ze-flor-halo{opacity:.6}.ds-dia .ds-ze-aura{opacity:.16}.ds-dia .ds-ze-olho,.ds-dia .ds-ze-haste{stroke:#0f1c3a}.ds-dia .ds-ze ellipse{fill:#ec5675;opacity:.55}.ds-noite .ds-ze-aura{opacity:.32}.ds-noite .ds-ze-banda{opacity:.55}.ds-noite .ds-ze-olho,.ds-noite .ds-ze-haste{stroke:#fff}.ds-noite .ds-ze ellipse{fill:#ff86a6;opacity:.65}.ds-bv{padding:24px 20px;text-align:center;font:400 16px/1.5 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-bv h2{margin:0 0 4px;font-size:26px;line-height:1.15}.ds-bv p{margin:0 0 16px}.ds-bv-vamos{display:block;width:100%;min-height:52px;padding:0 20px;border:1.5px solid transparent;font:700 17px 'Atkinson Hyperlegible Next',system-ui,sans-serif;cursor:pointer}.ds-bv-agora{display:block;margin:6px auto 0;padding:0 8px;min-height:44px;background:none;border:0;font:600 15px 'Atkinson Hyperlegible Next',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;color:inherit;cursor:pointer}.ds-dia .ds-bv{background:#fff;color:#0f1c3a;border:1px solid #838fa7;border-radius:8px}.ds-dia .ds-bv h2{font-family:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;font-weight:800;letter-spacing:-0.02em}.ds-dia .ds-bv p{color:#4a5878}.ds-dia .ds-bv-vamos{background:#0f1c3a;color:#fff;border-radius:6px;box-shadow:0 2px 0 #0a1428}.ds-dia .ds-bv-vamos:focus-visible,.ds-dia .ds-bv-agora:focus-visible{outline:2px solid #0f1c3a;outline-offset:2px}.ds-noite .ds-bv{background:#131d31;color:#eef2fa;border:1px solid #34425e;border-radius:14px}.ds-noite .ds-bv h2{font-family:'Familjen Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;font-weight:600;letter-spacing:-0.005em}.ds-noite .ds-bv p{color:#a4b1cb}.ds-noite .ds-bv-vamos{background:#f2f6ff;color:#0b1322;border-radius:12px}.ds-noite .ds-bv-vamos:focus-visible,.ds-noite .ds-bv-agora:focus-visible{outline:2px solid #f2f6ff;outline-offset:2px}"
     }
   ],
   "narrative": {
     "northStar": "Tinta e noite",
-    "overview": "Duas luzes para o mesmo estudo. De dia, tinta sobre papel: o texto, a ação e o ponto de \"onde parei\" são a mesma tinta azul-noite sobre um papel quase branco; a folha é branca, de cantos pouco arredondados e com uma linha fina em volta; o botão principal leva uma sombra baixa e dura, como um carimbo; a lima do marca-texto aparece só como halo atrás do ponto, nunca como fundo de texto. À noite, a \"Noite de mandacaru\": um azul fundo no chão, a serra um tom acima, o texto frio, as formas arredondadas, nenhuma sombra e o ponto em âmbar. O tema escolhe o mundo: o interruptor é o de sempre (Conta › Aparência: claro, escuro ou igual ao aparelho). A promessa é a mesma nos dois: voltar de onde parou e fazer uma coisa por vez.\n\nO sistema é plano e firme. O chão é liso, sem textura. A folha e o chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite), então a separação é a linha de 1 px do mundo em volta da folha, e a única profundidade do app é a sombra dura do botão principal do dia. Os títulos usam a Schibsted Grotesk de dia e a Familjen Grotesk à noite; a interface usa a Atkinson Hyperlegible, desenhada para leitura difícil; a lei fica na Literata. A cor tem papel: a luz do mundo (tinta de dia, luz à noite) é a ação, o foco, o link e o \"onde estou\"; o ponto de luz só reporta estado; o vermelho é só de excluir e de falha técnica. A caneta de vidro é o único objeto com volume e o único lugar com gradiente.\n\nA sensação-alvo é ânimo e clareza, sem barulho: nada pisca, nada acusa, nada se acumula como dívida. Em vez de uma interface que cobra, há um chão calmo onde só uma coisa sobe: a folha do que fazer agora, com um botão principal.",
+    "overview": "Duas luzes para o mesmo estudo. De dia, tinta sobre papel: o texto, a ação e o ponto de \"onde parei\" são a mesma tinta azul-noite sobre um papel quase branco; a folha é branca, de cantos pouco arredondados e com uma linha fina em volta; o botão principal leva uma sombra baixa e dura, como um carimbo; a lima do marca-texto aparece só como halo atrás do ponto, nunca como fundo de texto. À noite, a \"Noite de mandacaru\": um azul fundo no chão, a serra um tom acima, o texto frio, as formas arredondadas, nenhuma sombra e o ponto em âmbar. O tema escolhe o mundo: o interruptor é o de sempre (Conta › Aparência: claro, escuro ou igual ao aparelho). A promessa é a mesma nos dois: voltar de onde parou e fazer uma coisa por vez.\n\nO sistema é plano e firme. O chão é liso, sem textura. A folha e o chão quase não se separam pela cor (1,06:1 de dia, 1,10:1 à noite), então a separação é a linha de 1 px do mundo em volta da folha, e a única profundidade do app é a sombra dura do botão principal do dia. Os títulos usam a Schibsted Grotesk de dia e a Familjen Grotesk à noite; a interface usa a Atkinson Hyperlegible, desenhada para leitura difícil; a lei fica na Literata. A cor tem papel: a luz do mundo (tinta de dia, luz à noite) é a ação, o foco, o link e o \"onde estou\"; o ponto de luz só reporta estado; o vermelho é só de excluir e de falha técnica. A caneta de vidro é o único objeto com volume e o único lugar com gradiente, fora o miolo do tronco do Zé.\n\nSobre os dois mundos há um personagem, o Zé, e uma regra de luz, o néon suave (D-D10). O Zé é o cacto da marca expandido num traço aberto de pé a pé, com olhos de cápsula retos, bochechas rosa e uma flor que é o ponto de luz amarelo; não tem boca, não tem nome na tela e é decorativo. Ele só recebe a pessoa: na tela de carregamento do index.html enquanto o app abre, nas Boas-vindas, nos quatro passos e no Começar da Chegada e no passeio refeito (Ajuda › \"Rever as boas-vindas\" e Conta › \"Passeio pelos menus\"). Nunca no Hoje, na Trilha, no Fixar, na Biblioteca, no Leitor, na Sessão, no Resumo do Dia, em erro ou em aviso. O néon é a luz que a caneta deixa por onde passa: existe só nos cinco traços que ela desenha (o nome, o Zé, os ícones do passeio, o traço de seleção e o quadro do cacto), no azul piscina dos dois mundos, aceso enquanto o traço se faz e assentado em 0,6 s, com repouso de 0 de dia (0,16 no Zé) e 0,30 à noite. Nunca pulsa e não carrega informação.\n\nA sensação-alvo é ânimo e clareza, sem barulho: nada pisca (a exceção declarada são as piscadas do Zé nas Boas-vindas e na tela de carregamento, que acabam sozinhas), nada acusa, nada se acumula como dívida. Em vez de uma interface que cobra, há um chão calmo onde só uma coisa sobe: a folha do que fazer agora, com um botão principal.",
     "keyCharacteristics": [
       "Uma ação dominante por tela: um botão principal, e só um.",
+      "Um personagem só, e raro: o Zé, na tela de carregamento e na Chegada (Boas-vindas, passeio e Começar), nunca dentro do estudo.",
+      "Néon só em traço de caneta: acende ao ser traçado, assenta em 0,6 s e nunca pulsa.",
       "A folha, com a linha de 1 px do mundo, como lugar de foco; o resto da tela é o chão, calmo e liso.",
       "Forma por mundo: angular de dia (raios de 6 e 8 px), arredondada à noite (12 e 14 px).",
       "Calor sem pressão: sem streak, sem vermelho no estudo, sem contagem de dívida.",
@@ -394,6 +467,16 @@
         "section": "colors"
       },
       {
+        "name": "The Néon Só Em Traço De Caneta Rule",
+        "body": "O brilho piscina existe só nos cinco traços que a caneta desenha: a escrita do nome, o Zé, os ícones do passeio, o traço de seleção e o quadro do cacto. Botão, texto, cartão, borda, aba e ícone parado não brilham, e o brilho não carrega informação: o estado segue dito pela forma e pelo texto. Os seletores neon e bloom só existem nesses CSS e nos tokens (a varredura de scripts/contraste.test.ts lista arquivo:linha do que sobrar). Uma cor só, o piscina; nunca verde, rosa nem arco-íris.",
+        "section": "colors"
+      },
+      {
+        "name": "The Néon Assenta Rule",
+        "body": "O brilho acende com o traço (0,55 de dia, 0,6 à noite), assenta em 0,6 s e repousa em 0 de dia (0,16 no Zé) e 0,30 à noite. Nunca pulsa, nunca cresce, nunca repete e nenhuma animação dele é infinita. Calmo mostra só o repouso, esmaecendo em 0,24 s; Reduzido, o repouso parado; em forced-colors: active o brilho some e o traço usa o texto do sistema. A técnica é uma só: um grupo gêmeo do traço, mais largo (3 a 4 vezes a espessura do fio), com feGaussianBlur de SVG; nunca box-shadow nem drop-shadow.",
+        "section": "colors"
+      },
+      {
         "name": "The Piso De 13 Rule",
         "body": "Nenhum texto abaixo de 0.8125rem (13 px). Caixa-alta com espaçamento de letras só em etiqueta (\"Para lembrar\").",
         "section": "typography"
@@ -426,12 +509,16 @@
       "Do deixar a lima só como halo e o ponto de luz só para estado.",
       "Do mostrar onde a pessoa parou (a Norma e o Dispositivo exatos) e que está tudo salvo.",
       "Do medir todo par de cor novo em scripts/contraste.mjs nos dois temas antes de usar, e manter os três blocos de token de estilos.css iguais.",
-      "Do respeitar prefers-reduced-motion (pontos acesos e quadro do cacto pronto) e forced-colors. Movimento de 160 a 220 ms, cubic-bezier(.2, .7, .2, 1), só quando explica.",
+      "Do respeitar prefers-reduced-motion (pontos acesos, quadro do cacto pronto, o Zé inteiro e parado) e forced-colors (sem brilho, a linha e os olhos no texto do sistema). Movimento de 160 a 220 ms, cubic-bezier(.2, .7, .2, 1), só quando explica.",
+      "Do deixar o brilho acompanhar o traço: acende com ele, assenta em 0,6 s e repousa em 0 de dia (0,16 no Zé) e 0,30 à noite, sempre no azul piscina.",
+      "Do deixar o Zé só na tela de carregamento e na Chegada (e no passeio refeito), com o texto da tela dizendo tudo o que ele \"diz\", e deixar a Abertura pular com um toque ou uma tecla, mostrando tudo pronto.",
       "Do hospedar fontes e ícones no próprio app; o app funciona offline."
     ],
     "donts": [
       "Don't usar vermelho, perda de sequência, culpa ou urgência para motivar. \"Vencido\" e \"Você parou em\" soam como dívida: prefira \"para hoje\", \"Retomar em\" e \"Continuar\".",
-      "Don't pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque, gradiente em texto, brilho pulsando, lens flare, parallax, confete ou som.",
+      "Don't pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque, gradiente em texto, brilho pulsando (a exceção declarada são as piscadas finitas do Zé, só nas Boas-vindas e na tela de carregamento), lens flare, parallax, confete ou som.",
+      "Don't acender néon em botão, texto, cartão, borda, aba ou ícone parado, nem dar ao brilho outra cor que o piscina, nem animá-lo com infinite; o brilho nunca carrega informação.",
+      "Don't pôr o Zé no Hoje, na Trilha, no Fixar, na Biblioteca, no Leitor, na Sessão, na Revisão, no Resumo do Dia, em erro ou em aviso; nem dar a ele boca, olho triste, nome na tela ou fala própria; nem usá-lo para cobrar, comemorar sequência ou ensinar.",
       "Don't usar a lima como fundo ou cor de texto, a luz como texto, sem contorno, pulsando ou seguindo o dedo; nem mais de uma caneta por tela.",
       "Don't dar cor própria a uma disciplina, faixa colorida na borda de cartão, item ou aviso.",
       "Don't usar raio de pílula nem peça que dependa da folha se separar do chão pela cor.",
