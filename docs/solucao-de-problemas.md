@@ -1509,7 +1509,8 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 
 ### `Leitor.test.tsx` "no capítulo que tem seções, ele é o de agora…" falha só dentro do `npm run check`
 - **Causa:** flake de tempo sob carga (o teste leva 10 s na suíte inteira e `aria-current="location"` ainda não chegou ao capítulo); passa isolado (74 de 74) e na segunda rodada do `check`, sem mudança de código. Mesma família da lista da estrutura que troca no quadro seguinte (P4, acima). Visto na Q5 (20/10/2026).
-- **Solução:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.
+- **Solução definitiva (29/10/2026):** o teste esperava o `aria-current` do capítulo e a lista "Dentro de CAPÍTULO I" por `expect` síncrono logo depois do `findByRole`; agora usa `waitFor` e `findByRole`. Cinco rodadas seguidas com 6 laços de CPU ocupando 4 núcleos: todas verdes. O mesmo vale para "traz o resultado à vista" (`VerificarAtualizacao.test.tsx`), em que o `scrollIntoView` do efeito chega depois do texto (reprovou o `verificar` do #349): `waitFor` no `toHaveBeenCalledWith`. Se aparecer de novo em outro teste, é a mesma causa: conferência síncrona de estado que chega em outro render.
+- **Solução antiga:** rodar de novo; se persistir, `npx vitest run --project unidade src/apresentacao/biblioteca/Leitor.test.tsx`.
 
 ### `Leitor.test.tsx` "100% das redações anteriores ocultas" falha só com a suíte inteira
 - **Causa:** flake de tempo sob carga (o `waitFor` de 1 s vê 705 `.texto-carregando`); passa isolado, também com a procedência da 13.5.
