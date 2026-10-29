@@ -1,6 +1,8 @@
-import { useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { Dialogo } from '../componentes/Dialogo';
+import { useEstadoDaAbertura } from '../componentes/escrita/vez-da-escrita';
 import { BoasVindas } from './passeio/BoasVindas';
+import type { EntradaDoZe } from './passeio/entrada-do-ze';
 import {
   anuncioDaTela,
   aoEsc,
@@ -32,6 +34,13 @@ interface Props {
   aoFechar?: () => void;
 }
 
+/** A classe do `<dialog>` em cada entrada: a espera o esconde, e o desenho o mostra sem esmaecer. */
+const CLASSE_DA_ENTRADA: Record<EntradaDoZe, string> = {
+  espera: 'dialogo-chegada dialogo-chegada-espera',
+  desenhar: 'dialogo-chegada dialogo-chegada-desenha',
+  pronta: 'dialogo-chegada',
+};
+
 /**
  * A Chegada (D-D10, no lugar da folha da D-D9): a primeira coisa que o aparelho novo mostra, sobre o Hoje.
  * Três telas num `<dialog>` só: as Boas-vindas ("Vamos" e "Agora não"), o Passeio pelos quatro menus (um
@@ -40,18 +49,36 @@ interface Props {
  * Começar e, num passo, pula o passeio. O título de cada tela nomeia o diálogo, e uma região viva anuncia
  * a tela nova. As regras de para onde cada controle leva estão em `passeio/estado.ts`, e os textos, em
  * `passeio/passos.ts` (uma fonte só, a do Gabriel).
+ *
+ * Na primeira vez, se a luz da Abertura vai ao Zé (`voaParaAChegada`), a Chegada abre já, na `espera`:
+ * invisível e sem pegar toque, por cima da Abertura, para a luz ter para onde voar. Quando a luz pousa
+ * ela se revela e o Zé se desenha (`desenhar`); se a Abertura sai antes (pulada, ou a luz foi ao
+ * cabeçalho), o Zé aparece pronto, como em toda outra Chegada.
  */
 export function Chegada({ dia, inicio = 'boas', aoFechar }: Props) {
+  const { emCurso, voaParaAChegada, encontro } = useEstadoDaAbertura();
   const [aberto, setAberto] = useState(true);
+  const [entrada, setEntrada] = useState<EntradaDoZe>(() =>
+    dia !== undefined && inicio === 'boas' && emCurso && voaParaAChegada ? 'espera' : 'pronta',
+  );
+  // A Abertura saiu sem a luz pousar no Zé (pulada, ou a luz foi ao cabeçalho): o Zé aparece pronto.
+  if (entrada === 'espera' && !emCurso) setEntrada('pronta');
+  const espera = entrada === 'espera';
+  const receber = useCallback(() => {
+    setEntrada((atual) => (atual === 'espera' ? 'desenhar' : atual));
+  }, []);
   const [tela, setTela] = useState<Tela>(inicio === 'passo' ? PRIMEIRO_PASSO : TELA_BOAS);
+  // O Zé se desenha uma vez só: quem segue ("Vamos") e volta às boas-vindas o encontra pronto.
+  if (entrada === 'desenhar' && tela.tipo !== 'boas') setEntrada('pronta');
   const id = useId();
   const idTitulo = `${id}-titulo`;
   const idProgresso = `${id}-progresso`;
   const roteiro: Roteiro = { revisao: dia === undefined, origem: inicio };
 
+  // Escondida por baixo da Abertura ela ainda não foi vista: só conta como vista quando aparece.
   useEffect(() => {
-    if (dia !== undefined) lembrarDaChegada(dia);
-  }, [dia]);
+    if (dia !== undefined && !espera) lembrarDaChegada(dia);
+  }, [dia, espera]);
   // Dispensada, a folha só sai depois de o <dialog> fechar: assim o foco volta a quem a abriu.
   useEffect(() => {
     if (!aberto) aoFechar?.();
@@ -74,10 +101,10 @@ export function Chegada({ dia, inicio = 'boas', aoFechar }: Props) {
     <Dialogo
       aberto={aberto}
       aoFechar={() => {
-        ir(aoEsc(tela, roteiro));
+        if (!espera) ir(aoEsc(tela, roteiro));
       }}
       idDoTitulo={tela.tipo === 'passo' ? `${idProgresso} ${idTitulo}` : idTitulo}
-      classe="dialogo-chegada"
+      classe={CLASSE_DA_ENTRADA[entrada]}
     >
       {tela.tipo === 'boas' && (
         <BoasVindas
@@ -86,6 +113,9 @@ export function Chegada({ dia, inicio = 'boas', aoFechar }: Props) {
             ir(aoVamos());
           }}
           aoAgoraNao={fechar}
+          entrada={entrada}
+          encontro={encontro}
+          aoReceber={receber}
         />
       )}
       {tela.tipo === 'passo' && (

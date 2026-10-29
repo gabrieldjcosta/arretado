@@ -40,6 +40,36 @@ dialog.dialogo-chegada[open] {
   flex-direction: column;
 }
 
+/* A primeira vez, com a luz da Abertura a caminho (M3b): a Chegada abre já, mas escondida. O <dialog> modal
+   entra na camada de topo depois da Abertura e ficaria por cima dela; sem opacidade e sem pegar toque, ele
+   deixa a Abertura aparecer por baixo, e o véu do fundo só vem quando a luz pousa no pé do Zé. */
+dialog.dialogo-chegada.dialogo-chegada-espera {
+  opacity: 0;
+  pointer-events: none;
+}
+
+dialog.dialogo-chegada.dialogo-chegada-espera::backdrop {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Da espera à tela por inteiro sem a luz (a Abertura pulada, ou a luz foi ao cabeçalho): a Chegada
+     esmaece em 200 ms, como toda troca de tela. Quando a luz pousa (`desenha`) o <dialog> aparece na
+     hora, porque a luz da caneta do Zé assume o lugar dela; só o véu do fundo vem em 360 ms, junto do
+     fundo da Abertura que sai. */
+  dialog.dialogo-chegada {
+    transition: opacity 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  dialog.dialogo-chegada.dialogo-chegada-desenha {
+    transition: none;
+  }
+
+  dialog.dialogo-chegada::backdrop {
+    transition: background-color 360ms ease;
+  }
+}
+
 /* No celular a folha é a tela toda, respeitando os recortes da tela (câmera, barra de gestos). */
 @media (max-width: 30rem) {
   dialog.dialogo-chegada {
@@ -130,6 +160,34 @@ dialog.dialogo-chegada[open] {
   width: min(10.5em, 52%);
   margin: 0.5em auto 0.75em;
   flex: none;
+}
+
+/* Na primeira vez o texto e o botão esperam o contorno do Zé chegar à metade (`data-revelado`, posto pela
+   entrada do Zé) e então sobem 6 px e aparecem em 220 ms. O Calmo só esmaece; com movimento reduzido, e
+   sempre que o Zé aparece pronto, nada fica escondido: texto indispensável nunca depende de animação. */
+.chegada-tela[data-entrada='espera'] .revela,
+.chegada-tela[data-entrada='desenhar']:not([data-revelado]) .revela {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+html[data-perfil='calmo'] .chegada-tela[data-entrada] .revela {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chegada-tela[data-entrada='desenhar'] .revela {
+    transition:
+      opacity 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root .chegada-tela[data-entrada] .revela {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .chegada-texto,

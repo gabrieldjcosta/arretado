@@ -1,11 +1,11 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { alterarPreferencias } from '../../../core/preferencias';
 import { simularMovimento } from '../../../testes/movimento';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { Marca } from '../../componentes/escrita/Marca';
 import { lembrarDaEscrita } from '../../componentes/escrita/frequencia';
-import { useAberturaEmCurso, type OndeEscrever } from '../../componentes/escrita/vez-da-escrita';
+import { useEstadoDaAbertura, type OndeEscrever } from '../../componentes/escrita/vez-da-escrita';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { ProvedorDaAbertura } from './ProvedorDaAbertura';
 import type * as Regras from './regras';
@@ -27,12 +27,27 @@ beforeEach(() => {
   simularMovimento('normal');
 });
 
-/** Quem abre por cima do app (a Chegada) pergunta isto: aqui só mostra a resposta. */
-function Sonda() {
-  return <p data-testid="sonda">{useAberturaEmCurso() ? 'espera' : 'livre'}</p>;
+/**
+ * Quem abre por cima do app (a Chegada) pergunta isto: aqui só mostra a resposta. `voa`: a luz da Abertura vai
+ * visitar o Zé das Boas-vindas, e a Chegada que abrir agora nasce escondida, esperando ela.
+ */
+function Sonda({ aoOferecer }: { aoOferecer?: () => null }) {
+  const { emCurso, voaParaAChegada, encontro } = useEstadoDaAbertura();
+  // Como a Chegada faz: se oferece ao Encontro; a Abertura pergunta onde está o pé do Zé quando a luz parte.
+  useEffect(() => {
+    if (!aoOferecer) return;
+    return encontro.oferecer({ medirPe: aoOferecer, receber: () => undefined });
+  }, [aoOferecer, encontro]);
+  return (
+    <p data-testid="sonda" data-voa={voaParaAChegada ? 'sim' : 'nao'}>
+      {emCurso ? 'espera' : 'livre'}
+    </p>
+  );
 }
 
-async function montar(opcoes: { estrito?: boolean; soEstudo?: boolean } = {}) {
+async function montar(
+  opcoes: { estrito?: boolean; soEstudo?: boolean; aoOferecer?: () => null } = {},
+) {
   const { repo } = await repositorioDeTeste({ inicio: HOJE });
   if (opcoes.soEstudo) await alterarPreferencias(repo, { modoSoEstudo: true });
   const arvore = (
@@ -41,7 +56,7 @@ async function montar(opcoes: { estrito?: boolean; soEstudo?: boolean } = {}) {
         <a className="marca" href="#/">
           <Marca />
         </a>
-        <Sonda />
+        <Sonda aoOferecer={opcoes.aoOferecer} />
       </ProvedorDaAbertura>
     </ContextoRepositorio.Provider>
   );
@@ -51,7 +66,8 @@ async function montar(opcoes: { estrito?: boolean; soEstudo?: boolean } = {}) {
   const escritaNoCabecalho = () => vista.container.querySelector('.marca svg.eb');
   const parado = () => vista.container.querySelector('.marca .lockup-ponto');
   const sonda = () => vista.queryByTestId('sonda')?.textContent ?? null;
-  return { ...vista, camada, escritaNoCabecalho, parado, sonda };
+  const voa = () => vista.queryByTestId('sonda')?.getAttribute('data-voa') ?? null;
+  return { ...vista, camada, escritaNoCabecalho, parado, sonda, voa };
 }
 
 const guardado = () => JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null') as unknown;
@@ -203,6 +219,96 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
         { timeout: 1500 },
       );
       expect(sonda()).toBe('espera');
+    });
+  });
+});
+
+describe('ProvedorDaAbertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
+  const decidir = (decisao: OndeEscrever) =>
+    vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(Promise.resolve(decisao));
+  const tela = (chegada: boolean, calmo = false): OndeEscrever => ({
+    onde: 'tela',
+    escrita: 'completa',
+    calmo,
+    chegada,
+  });
+
+  it('na primeira vez com a Chegada por vir, quem abre por cima fica sabendo que a luz vai ao Zé', async () => {
+    decidir(tela(true));
+    const { camada, voa, sonda } = await montar();
+    await waitFor(() => {
+      expect(camada()).not.toBeNull();
+    });
+    expect(sonda()).toBe('espera');
+    expect(voa()).toBe('sim');
+  });
+
+  it('sem Chegada por vir, ou no Calmo (que não tem voo), a luz não visita o Zé', async () => {
+    decidir(tela(false));
+    const semChegada = await montar();
+    await waitFor(() => {
+      expect(semChegada.camada()).not.toBeNull();
+    });
+    expect(semChegada.voa()).toBe('nao');
+    semChegada.unmount();
+
+    decidir(tela(true, true));
+    const calmo = await montar();
+    await waitFor(() => {
+      expect(calmo.camada()).not.toBeNull();
+    });
+    expect(calmo.voa()).toBe('nao');
+  });
+
+  it('pulada a camada, a espera acaba junto: a Chegada não fica escondida para sempre', async () => {
+    decidir(tela(true));
+    const { camada, voa, sonda } = await montar();
+    await waitFor(() => {
+      expect(camada()).not.toBeNull();
+    });
+    fireEvent.pointerDown(document.body);
+    await waitFor(() => {
+      expect(camada()).toBeNull();
+    });
+    expect(voa()).toBe('nao');
+    expect(sonda()).toBe('livre');
+  });
+
+  describe('o Encontro chega à Abertura só quando há Zé para visitar', () => {
+    beforeEach(() => {
+      vi.useFakeTimers({
+        toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'],
+      });
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    async function nomeEscrito(chegada: boolean) {
+      decidir(tela(chegada));
+      const medirPe = vi.fn(() => null);
+      const { unmount, camada } = await montar({ aoOferecer: medirPe });
+      // A decisão chega e a camada monta primeiro; só então o relógio do nome começa a contar.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(50);
+      });
+      expect(camada()).not.toBeNull();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2640 + 300 + 100);
+      });
+      return { medirPe, unmount };
+    }
+
+    it('com a Chegada por vir, depois do nome a luz pergunta onde está o pé do Zé', async () => {
+      const { medirPe, unmount } = await nomeEscrito(true);
+      expect(medirPe).toHaveBeenCalledTimes(1);
+      unmount();
+    });
+
+    it('sem Chegada por vir, a luz nem pergunta: vai direto ao cabeçalho', async () => {
+      const { medirPe, unmount } = await nomeEscrito(false);
+      expect(medirPe).not.toHaveBeenCalled();
+      unmount();
     });
   });
 });

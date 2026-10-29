@@ -1,7 +1,9 @@
 import type { ComponentProps } from 'react';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
+import { criarEncontro, type OfertaDaChegada } from '../componentes/escrita/encontro';
+import { ContextoDaAbertura } from '../componentes/escrita/vez-da-escrita';
 import { caminhoDoOlho } from '../componentes/ze/geometria';
 import { Chegada } from './Chegada';
 import { PASSOS } from './passeio/passos';
@@ -333,5 +335,150 @@ describe('Chegada › o passeio refeito (sem `dia`: Ajuda e Conta)', () => {
     passo(2, 'Trilha');
     await usuario.click(botao('Voltar'));
     passo(1, 'Hoje');
+  });
+});
+
+describe('Chegada › a primeira vez com a luz da Abertura a caminho (M3b)', () => {
+  /** O que a Abertura diz a quem abre por cima: a luz vai ao Zé (`voa`), ou a camada só está na tela (`emCurso`). */
+  const abertura = (emCurso: boolean, voaParaAChegada: boolean, encontro = criarEncontro()) => ({
+    vez: { estado: 'decidida', onde: 'tela', escrita: 'completa', calmo: false, chegada: true },
+    emCurso,
+    voaParaAChegada,
+    encontro,
+  });
+
+  function abrirComAbertura(
+    estado: ReturnType<typeof abertura>,
+    props: ComponentProps<typeof Chegada> = { dia: DIA },
+  ) {
+    const aoFechar = vi.fn();
+    const tela = render(
+      <ContextoDaAbertura.Provider value={estado as never}>
+        <MemoryRouter>
+          <Chegada aoFechar={aoFechar} {...props} />
+        </MemoryRouter>
+      </ContextoDaAbertura.Provider>,
+    );
+    const janela = () => screen.getByRole('dialog', { hidden: true });
+    const zona = () => tela.container.querySelector('.chegada-tela');
+    /** A oferta que a Chegada fez à luz. */
+    const oferta = async (): Promise<OfertaDaChegada | null> => {
+      const pedido = estado.encontro.esperar(50, new AbortController().signal);
+      return pedido;
+    };
+    /** A Abertura saiu: o contexto passa a dizer que nada está em curso. */
+    const abrirCaminho = () => {
+      tela.rerender(
+        <ContextoDaAbertura.Provider value={abertura(false, false, estado.encontro) as never}>
+          <MemoryRouter>
+            <Chegada aoFechar={aoFechar} {...props} />
+          </MemoryRouter>
+        </ContextoDaAbertura.Provider>,
+      );
+    };
+    return { ...tela, aoFechar, janela, zona, oferta, abrirCaminho };
+  }
+
+  it('nasce na espera: escondida, parada, e ainda não conta como vista', () => {
+    esvaziar();
+    const { janela, zona } = abrirComAbertura(abertura(true, true));
+    expect(janela()).toHaveClass('dialogo-chegada', 'dialogo-chegada-espera');
+    expect(zona()).toHaveAttribute('data-entrada', 'espera');
+    // Escondida por baixo do nome, ela ainda não foi vista: fechar o aplicativo agora a traz de volta.
+    expect(guardado()).toEqual({});
+    // A tela existe e o foco já está nela, para quem usa leitor de tela não esperar a luz.
+    expect(within(janela()).getByRole('heading', { level: 2 })).toHaveFocus();
+  });
+
+  it('se oferece à luz; quando ela pousa, a classe muda, o Zé se desenha e só então a Chegada conta como vista', async () => {
+    esvaziar();
+    const { janela, zona, oferta } = abrirComAbertura(abertura(true, true));
+    const recebida = await oferta();
+    expect(recebida).not.toBeNull();
+    act(() => {
+      recebida?.receber();
+    });
+    expect(janela()).toHaveClass('dialogo-chegada', 'dialogo-chegada-desenha');
+    expect(janela()).not.toHaveClass('dialogo-chegada-espera');
+    expect(zona()).toHaveAttribute('data-entrada', 'desenhar');
+    expect(guardado()).toEqual({
+      [CHAVE_CHEGADA]: '{"vista":true}',
+      [CHAVE_ENTRADA]: `{"dia":"${DIA}"}`,
+    });
+    // Receber duas vezes é inofensivo: nada recomeça.
+    act(() => {
+      recebida?.receber();
+    });
+    expect(zona()).toHaveAttribute('data-entrada', 'desenhar');
+  });
+
+  it('o Zé se desenha uma vez só: quem segue e volta às boas-vindas o encontra pronto', async () => {
+    const usuario = userEvent.setup();
+    const { janela, zona, oferta } = abrirComAbertura(abertura(true, true));
+    const recebida = await oferta();
+    act(() => {
+      recebida?.receber();
+    });
+    expect(zona()).toHaveAttribute('data-entrada', 'desenhar');
+    await usuario.click(botao('Vamos'));
+    expect(passo(1, 'Hoje')).toBeInTheDocument();
+    await usuario.click(botao('Voltar às boas-vindas'));
+    expect(zona()).toHaveAttribute('data-entrada', 'pronta');
+    expect(janela()).not.toHaveClass('dialogo-chegada-desenha');
+  });
+
+  it('Esc na espera não faz nada: a camada que está por cima é dela', () => {
+    const { janela, aoFechar } = abrirComAbertura(abertura(true, true));
+    fireEvent(janela(), new Event('cancel', { cancelable: true }));
+    expect(janela()).toBeInTheDocument();
+    expect(aoFechar).not.toHaveBeenCalled();
+    expect(janela()).toHaveClass('dialogo-chegada-espera');
+  });
+
+  it('a Abertura sai sem a luz pousar (pulada, ou a luz foi ao cabeçalho): o Zé aparece pronto e a Chegada conta como vista', () => {
+    esvaziar();
+    const { janela, zona, abrirCaminho } = abrirComAbertura(abertura(true, true));
+    expect(zona()).toHaveAttribute('data-entrada', 'espera');
+    abrirCaminho();
+    expect(janela()).toHaveClass('dialogo-chegada');
+    expect(janela()).not.toHaveClass('dialogo-chegada-espera', 'dialogo-chegada-desenha');
+    expect(zona()).toHaveAttribute('data-entrada', 'pronta');
+    expect(guardado()[CHAVE_CHEGADA]).toBe('{"vista":true}');
+  });
+
+  it('depois de pronta, Esc volta a valer, como em toda Chegada', () => {
+    const { janela, abrirCaminho } = abrirComAbertura(abertura(true, true));
+    abrirCaminho();
+    fireEvent(janela(), new Event('cancel', { cancelable: true }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('a luz que chega depois de a Abertura sair não encontra a oferta', async () => {
+    const encontro = criarEncontro();
+    const { abrirCaminho } = abrirComAbertura(abertura(true, true, encontro));
+    abrirCaminho();
+    expect(await encontro.esperar(1, AbortSignal.abort())).toBeNull();
+  });
+
+  it.each([
+    [
+      'sem luz a caminho (a camada do Dia, o Calmo, sem Zé à vista)',
+      abertura(true, false),
+      { dia: DIA },
+    ],
+    ['com a Abertura já fora', abertura(false, false), { dia: DIA }],
+    ['passeio refeito, sem `dia` (Ajuda)', abertura(true, true), {}],
+  ])('%s: nasce pronta, sem se esconder', (_nome, estado, props) => {
+    const { janela, zona } = abrirComAbertura(estado, props);
+    expect(janela()).toHaveClass('dialogo-chegada');
+    expect(janela()).not.toHaveClass('dialogo-chegada-espera');
+    expect(zona()).toHaveAttribute('data-entrada', 'pronta');
+  });
+
+  it('aberta direto num passo (a Conta), com a luz a caminho ou não, nunca se esconde', () => {
+    const { janela } = abrirComAbertura(abertura(true, true), { inicio: 'passo' });
+    expect(janela()).toHaveClass('dialogo-chegada');
+    expect(janela()).not.toHaveClass('dialogo-chegada-espera');
+    expect(screen.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeInTheDocument();
   });
 });

@@ -54,8 +54,9 @@ export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): 
   // e é justamente depois de cada espera que o sinal pode ter mudado.
   const abortado = () => sinal.aborted;
   const corpo = ze.corpo;
-  const total = ze.comprimento();
-  if (movimentoAgora() !== 'normal' || !corpo || total === 0) {
+  // Só o movimento normal desenha: nos outros não há o que medir.
+  const total = movimentoAgora() === 'normal' ? ze.comprimento() : 0;
+  if (!corpo || total === 0) {
     ze.tudoVisivel();
     aoMeio();
     return;
