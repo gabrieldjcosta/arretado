@@ -22,7 +22,7 @@ describe('Provedor do repositório e a tela de carregamento do index.html', () =
     expect(document.getElementById('carregamento')).not.toHaveAttribute('data-saindo');
   });
 
-  it('quando o banco abre, a tela sai', async () => {
+  it('quando o banco abre, a tela fica por conta da Abertura e, se ninguém a tira, sai sozinha aos 0,6 s', async () => {
     montarTela();
     const repo = await Repositorio.abrir({ nomeBanco: `carregamento-${String(Math.random())}` });
     render(
@@ -31,9 +31,15 @@ describe('Provedor do repositório e a tela de carregamento do index.html', () =
       </ProvedorRepositorio>,
     );
     expect(await screen.findByText('app')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(document.getElementById('carregamento')).toBeNull();
-    });
+    // A rede de segurança espera a Abertura (que decide em até 0,4 s): não sai na hora.
+    await new Promise((resolver) => setTimeout(resolver, 250));
+    expect(document.getElementById('carregamento')).not.toHaveAttribute('data-saindo');
+    await waitFor(
+      () => {
+        expect(document.getElementById('carregamento')).toBeNull();
+      },
+      { timeout: 2000 },
+    );
   });
 
   it('se o banco não abre, a tela sai e a explicação aparece', async () => {

@@ -60,3 +60,46 @@ test('quando o app abre, a tela sai da árvore e o Hoje fica sozinho', async ({ 
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   await expect(page.locator('#carregamento')).toHaveCount(0);
 });
+
+/** Anota, a cada quadro e sem repetir, o que está à vista: a camada da Abertura, o app, a tela ou nada (um branco). */
+function sondarOsQuadros() {
+  const quadros: string[] = [];
+  (window as unknown as { __quadros: string[] }).__quadros = quadros;
+  const classe = () => {
+    if (document.querySelector('.abertura')) return 'camada';
+    if (document.querySelector('.marca')) return 'app';
+    const tela = document.getElementById('carregamento');
+    return tela && !tela.hasAttribute('data-saindo') ? 'carregamento' : 'branco';
+  };
+  const quadro = () => {
+    const atual = classe();
+    if (quadros[quadros.length - 1] !== atual) quadros.push(atual);
+    requestAnimationFrame(quadro);
+  };
+  requestAnimationFrame(quadro);
+}
+
+test.describe('com a Abertura (a primeira vez no aparelho)', () => {
+  test.use({ semearEscrita: false });
+
+  test('a Abertura cobre a tela: a tela só sai quando o app monta, e nunca deixa um branco entre as duas', async ({
+    page,
+  }) => {
+    // Uma CPU lenta alonga a leitura que decide a Abertura; é nesse intervalo que a tela, saindo cedo, deixava um branco.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await page.addInitScript(sondarOsQuadros);
+    await page.goto('/');
+    await expect(page.locator('.abertura')).toBeVisible();
+    // A tela esmaece por baixo da camada (200 ms); esperar que saia da árvore deixa a sequência inteira à vista.
+    await expect(page.locator('#carregamento')).toHaveCount(0);
+    const quadros = await page.evaluate(
+      () => (window as unknown as { __quadros: string[] }).__quadros,
+    );
+    // Os primeiros quadros podem vir antes de o HTML pintar a tela; o que conta é o que vem depois.
+    const vistos = quadros.slice(quadros.findIndex((q) => q !== 'branco'));
+    expect(vistos).toContain('carregamento');
+    expect(vistos).toContain('camada');
+    expect(vistos).not.toContain('branco');
+  });
+});
