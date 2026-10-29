@@ -61,7 +61,11 @@ test('quando o app abre, a tela sai da árvore e o Hoje fica sozinho', async ({ 
   await expect(page.locator('#carregamento')).toHaveCount(0);
 });
 
-/** Anota, a cada quadro e sem repetir, o que está à vista: a camada da Abertura, o app, a tela ou nada (um branco). */
+/**
+ * Anota, sem repetir, o que está à vista: a camada da Abertura, o app, a tela ou nada (um branco). Anota a cada mudança da
+ * árvore (`MutationObserver`, que roda antes do próximo quadro) e a cada quadro: um intervalo mais curto que um quadro
+ * também aparece, e o teste não depende de a CPU estar lenta para ver o defeito.
+ */
 function sondarOsQuadros() {
   const quadros: string[] = [];
   (window as unknown as { __quadros: string[] }).__quadros = quadros;
@@ -71,9 +75,18 @@ function sondarOsQuadros() {
     const tela = document.getElementById('carregamento');
     return tela && !tela.hasAttribute('data-saindo') ? 'carregamento' : 'branco';
   };
-  const quadro = () => {
+  const anotar = () => {
     const atual = classe();
     if (quadros[quadros.length - 1] !== atual) quadros.push(atual);
+  };
+  new MutationObserver(anotar).observe(document, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['data-saindo'],
+  });
+  const quadro = () => {
+    anotar();
     requestAnimationFrame(quadro);
   };
   requestAnimationFrame(quadro);
@@ -85,9 +98,6 @@ test.describe('com a Abertura (a primeira vez no aparelho)', () => {
   test('a Abertura cobre a tela: a tela só sai quando o app monta, e nunca deixa um branco entre as duas', async ({
     page,
   }) => {
-    // Uma CPU lenta alonga a leitura que decide a Abertura; é nesse intervalo que a tela, saindo cedo, deixava um branco.
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
     await page.addInitScript(sondarOsQuadros);
     await page.goto('/');
     await expect(page.locator('.abertura')).toBeVisible();
