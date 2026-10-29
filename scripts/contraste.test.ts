@@ -441,6 +441,24 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
       expect(usos).toEqual([]);
     });
 
+    it('em estilos.css, neon e bloom só aparecem como declaração de token (D-D10)', () => {
+      // `estilos.css` está na lista dos arquivos que podem falar de brilho (guarda os tokens), então o teste de cima
+      // não o olha: aqui só passam as linhas que declaram `--neon-*` ou `--z-bloom-*`.
+      const arquivo = css().find((a) => path.basename(a) === 'estilos.css');
+      if (arquivo === undefined) throw new Error('estilos.css não achado');
+      const semComentarios = readFileSync(arquivo, 'utf8').replace(/\/\*[\s\S]*?\*\//g, (c) =>
+        c.replace(/[^\n]/g, ' '),
+      );
+      const fora = semComentarios
+        .split('\n')
+        .flatMap((linha, i) =>
+          /neon|bloom/i.test(linha) && !/^\s*--(?:neon|z-bloom)-[a-z-]+:\s*[^;{}]+;\s*$/.test(linha)
+            ? [`estilos.css:${String(i + 1)}`]
+            : [],
+        );
+      expect(fora).toEqual([]);
+    });
+
     it('nenhuma sombra tem desfoque: a profundidade é só a sombra dura do botão de dia', () => {
       // Cada `box-shadow` e cada `--sombra*` com um comprimento de desfoque (o terceiro) acima de zero.
       const comDesfoque = css().flatMap((arquivo) => {

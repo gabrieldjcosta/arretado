@@ -68,11 +68,14 @@ describe('o néon no quadro do cacto', () => {
     );
   });
 
-  it('o gêmeo do núcleo tem 34 de largura, na cor piscina', () => {
+  it('o gêmeo do núcleo tem 14 de largura, na cor piscina', () => {
     const fio = bloco(quadro, '.quadro-neon-fio');
     expect(fio).toContain('fill: none;');
     expect(fio).toContain('stroke: var(--neon-cor);');
-    expect(fio).toContain('stroke-width: 34;');
+    expect(fio).toContain('stroke-width: 14;');
+    // A ponta e a quina redondas: sem elas o brilho de cada trecho acaba em corte reto onde a caneta começa e termina.
+    expect(fio).toContain('stroke-linecap: round;');
+    expect(fio).toContain('stroke-linejoin: round;');
   });
 
   it('com movimento reduzido não assenta, e em cores forçadas o brilho some', () => {

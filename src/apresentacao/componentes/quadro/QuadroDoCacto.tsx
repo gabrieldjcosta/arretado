@@ -67,7 +67,7 @@ export function QuadroDoCacto({ dias, desenha }: { dias: number; desenha: boolea
               width={REGIAO_DO_NEON.largura}
               height={REGIAO_DO_NEON.altura}
             >
-              <feGaussianBlur stdDeviation="6" />
+              <feGaussianBlur stdDeviation="3" />
             </filter>
           </defs>
           <g ref={lavis} />

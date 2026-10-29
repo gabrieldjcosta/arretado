@@ -40,11 +40,11 @@ describe('as 16 partes do quadro do cacto', () => {
   it('a região do filtro do néon cobre o núcleo do cacto, o brilho e o desfoque, dentro do quadro', () => {
     const [, , largura = 0, altura = 0] = VIEWBOX.split(' ').map(Number);
     const { x, y, largura: w, altura: h } = REGIAO_DO_NEON;
-    // O núcleo vai de x = 100 a 200 e de y = 57 a 156; o brilho tem 34 de largura (17) e o desvio é 6 (18).
-    expect(x).toBeLessThanOrEqual(100 - 17 - 3 * 6);
-    expect(x + w).toBeGreaterThanOrEqual(200 + 17 + 3 * 6);
-    expect(y).toBeLessThanOrEqual(57 - 17 - 3 * 6);
-    expect(y + h).toBeGreaterThanOrEqual(Math.min(altura, 156 + 17 + 3 * 6));
+    // O núcleo vai de x = 100 a 200 e de y = 57 a 156; o brilho tem 14 de largura (7) e o desvio é 3 (9).
+    expect(x).toBeLessThanOrEqual(100 - 7 - 3 * 3);
+    expect(x + w).toBeGreaterThanOrEqual(200 + 7 + 3 * 3);
+    expect(y).toBeLessThanOrEqual(57 - 7 - 3 * 3);
+    expect(y + h).toBeGreaterThanOrEqual(Math.min(altura, 156 + 7 + 3 * 3));
     expect(x).toBeGreaterThanOrEqual(0);
     expect(x + w).toBeLessThanOrEqual(largura);
   });

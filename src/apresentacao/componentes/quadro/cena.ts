@@ -49,8 +49,8 @@ export const temNeon = (fio: Fio): boolean => fio.cor === 'nucleo';
 export const VIEWBOX = '0 0 340 200';
 /**
  * A região do filtro do néon, em unidades do quadro: o núcleo do cacto vai de x = 100 a 200 e de y = 57
- * a 156; soma-se a metade da largura do brilho (17) e 3 desvios-padrão (18) de cada lado. Embaixo,
- * até a borda do quadro.
+ * a 156; o brilho alcança 16 além do eixo do fio (a metade da largura, 7, e 3 desvios-padrão, 9) e a
+ * região dá folga sobre isso. Embaixo, até a borda do quadro.
  */
 export const REGIAO_DO_NEON = { x: 40, y: 10, largura: 220, altura: 190 } as const;
 /**

@@ -107,7 +107,7 @@
 .quadro-neon-fio {
   fill: none;
   stroke: var(--neon-cor);
-  stroke-width: 34;
+  stroke-width: 14;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
