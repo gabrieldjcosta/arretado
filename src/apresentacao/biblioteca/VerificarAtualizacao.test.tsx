@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
@@ -78,7 +78,10 @@ describe('VerificarAtualizacao (6b)', () => {
     const rolar = vi.spyOn(Element.prototype, 'scrollIntoView');
     await montar(() => ok(pagina(ANTIGA)));
     await screen.findByText(/Nenhuma alteração detectada/);
-    expect(rolar).toHaveBeenCalledWith({ block: 'nearest' });
+    // O texto chega num render e o efeito que rola vem depois: sob carga pode atrasar.
+    await waitFor(() => {
+      expect(rolar).toHaveBeenCalledWith({ block: 'nearest' });
+    });
     expect(rolar.mock.contexts[0]).toBe(screen.getByRole('status'));
   });
 
