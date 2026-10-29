@@ -19,7 +19,10 @@ test('Onboarding do plano: carreira, edital, matérias e "Comece por aqui" (B2)'
   await expect(
     page.getByRole('heading', { name: 'Quais matérias entram no plano?' }),
   ).toBeVisible();
-  await page.getByText('Assuntos', { exact: true }).first().click();
+  await page
+    .getByText(/^Assuntos de /)
+    .first()
+    .click();
   await semViolacoes(page);
 
   // Desmarcar um assunto troca o selo para "N de M"; desmarcar a matéria esmaece o galho.

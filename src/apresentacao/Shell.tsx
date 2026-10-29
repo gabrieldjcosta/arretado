@@ -11,6 +11,7 @@ import { reabrirGuia, telaDoGuia, useGuiaMontado } from './guia/memoria';
 import { secaoDeAjuda } from './orientacoes/conteudo';
 import { CantoDaSessao } from './sessao/CantoDaSessao';
 import { Chegada } from './entrada/Chegada';
+import { ProvedorDaAbertura } from './entrada/abertura/ProvedorDaAbertura';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
 import { RODAPE_CURTO, ROTULO_DA_AREA } from './textos';
@@ -59,9 +60,18 @@ function IconeDeArea({ d }: { d: string }) {
  * as quatro áreas em abas sobre o chão, a atual com o traço de caneta embaixo (no CSS), embaixo até
  * 899 px e no cabeçalho a partir de 900 (com "Registrar erro" e a tecla E); rodapé no fim do
  * conteúdo. O "+" mora no título das telas que registram (`TituloComMais`). Com o teclado aberto, as
- * abas saem da frente.
+ * abas saem da frente. Tudo fica dentro da Abertura (`ProvedorDaAbertura`): ela decide se o nome se
+ * escreve em tela cheia ou no cabeçalho, e a Chegada espera por ela.
  */
 export function Shell() {
+  return (
+    <ProvedorDaAbertura>
+      <CascaDoApp />
+    </ProvedorDaAbertura>
+  );
+}
+
+function CascaDoApp() {
   const { pathname } = useLocation();
   const navegar = useNavigate();
   const [relatando, setRelatando] = useState(false);

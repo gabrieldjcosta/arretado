@@ -11,6 +11,7 @@ import {
   type FonteDoCatalogo,
 } from '../../dominios/catalogo';
 import { linhasDoEdital } from '../../integracoes/catalogo/linhas';
+import { garantirCicloPadrao } from '../plano/ciclo/padrao';
 import { prepararPontos } from '../../integracoes/pontos/importar';
 
 export interface TrilhaOferecida {
@@ -60,4 +61,5 @@ export async function montarTrilha(repo: Repositorio, oferta: TrilhaOferecida): 
   await aplicar(repo, preparado.pacote, preparado.previa, new Map(), {
     descricao: `Trilha pelo catálogo (${oferta.rotulo})`,
   });
+  await garantirCicloPadrao(repo).catch(() => undefined);
 }

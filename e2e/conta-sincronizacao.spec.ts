@@ -19,6 +19,7 @@ async function novoAparelho(
     try {
       localStorage.setItem('arretado:chegada:v1', '{"vista":true}');
       localStorage.setItem('arretado:entrada-do-dia:v1', '{"dia":"9999-12-31"}');
+      localStorage.setItem('arretado:escrita-do-nome:v1', '{"dia":"9999-12-31"}');
     } catch {
       /* sem armazenamento */
     }

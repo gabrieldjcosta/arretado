@@ -1,11 +1,13 @@
 import { simularMovimento } from '../../../testes/movimento';
-import { escritaDaAbertura, FREQUENCIA, lembrarDaEscrita } from './frequencia';
+import { escritaDaAbertura, FREQUENCIA, lembrarDaEscrita, tomarEscrita } from './frequencia';
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
 const em = (iso: string) => new Date(iso);
 
 beforeEach(() => {
   window.localStorage.clear();
+  // O setup semeia o Dia no futuro (aparelho que já viu a Abertura); aqui o nome ainda não foi escrito.
+  window.localStorage.removeItem(CHAVE);
   simularMovimento('normal');
 });
 
@@ -36,6 +38,13 @@ describe('frequência da escrita do nome (D-D9, Q6)', () => {
   it('primeira abertura de outro Dia: curta', () => {
     lembrarDaEscrita(em('2026-10-19T12:00:00Z'));
     expect(escritaDaAbertura(em('2026-10-20T12:00:00Z'))).toBe('curta');
+  });
+
+  it('um Dia guardado igual ou posterior ao de hoje (o relógio andou para trás) vale como já escrito', () => {
+    lembrarDaEscrita(em('2026-10-21T12:00:00Z'));
+    expect(escritaDaAbertura(em('2026-10-20T12:00:00Z'))).toBe('parada');
+    window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
+    expect(escritaDaAbertura(em('2026-10-20T12:00:00Z'))).toBe('parada');
   });
 
   it('o Dia é o de Brasília (T14): 23h59 e 0h00 do horário de Brasília são Dias diferentes', () => {
@@ -75,5 +84,40 @@ describe('frequência da escrita do nome (D-D9, Q6)', () => {
     expect(() => {
       lembrarDaEscrita(em('2026-10-20T12:00:00Z'));
     }).not.toThrow();
+  });
+});
+
+describe('tomarEscrita (a Abertura toma a escrita, M2 do Zé)', () => {
+  it('na primeira vez toma a escrita inteira e guarda o Dia', () => {
+    expect(tomarEscrita(em('2026-10-20T12:00:00Z'))).toBe('completa');
+    expect(JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('na primeira abertura de outro Dia toma a escrita curta e guarda o Dia novo', () => {
+    lembrarDaEscrita(em('2026-10-19T12:00:00Z'));
+    expect(tomarEscrita(em('2026-10-20T12:00:00Z'))).toBe('curta');
+    expect(JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('depois de tomada, o cabeçalho já não escreve: a abertura seguinte do Dia é parada', () => {
+    tomarEscrita(em('2026-10-20T12:00:00Z'));
+    expect(escritaDaAbertura(em('2026-10-20T12:00:30Z'))).toBe('parada');
+    // E tomar de novo não toma nada: o nome não se escreve duas vezes no mesmo Dia.
+    expect(tomarEscrita(em('2026-10-20T12:00:30Z'))).toBe('parada');
+  });
+
+  it('nas demais aberturas não toma nem grava nada', () => {
+    lembrarDaEscrita(em('2026-10-20T08:00:00Z'));
+    const antes = window.localStorage.getItem(CHAVE);
+    expect(tomarEscrita(em('2026-10-20T12:00:00Z'))).toBe('parada');
+    expect(window.localStorage.getItem(CHAVE)).toBe(antes);
+  });
+
+  it('movimento reduzido do sistema: não toma nada, e a primeira vez continua guardada', () => {
+    simularMovimento('reduzido');
+    expect(tomarEscrita(em('2026-10-20T12:00:00Z'))).toBe('parada');
+    expect(window.localStorage.getItem(CHAVE)).toBeNull();
+    simularMovimento('normal');
+    expect(tomarEscrita(em('2026-10-20T12:00:00Z'))).toBe('completa');
   });
 });
