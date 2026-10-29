@@ -2008,6 +2008,10 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Sintoma:** `carregamento.spec.ts` falha de vez em quando nos instantes (1,1 s, 1,8 s, 2,5 s). **Causa:** esperar com `waitForTimeout` mede o relógio da máquina, não o das animações. **Solução:** "saltar" o relógio das animações (`document.getAnimations().forEach((a) => { a.pause(); a.currentTime = t; })`). **Prevenção:** o próprio padrão do arquivo; as conferências de `verifica-carregamento.cjs` fazem o mesmo.
 - **Origem:** previsto — L1.
 
+### Um teste que mede pixels logo depois de carregar acusa uns pontos diferentes
+- **Sintoma:** `escrita-do-nome.spec.ts` ("primeira abertura no aparelho, no cabeçalho…", `light: parada`) recebe 3 pontos diferentes onde esperava 0, nas duas tentativas do CI; na nuvem passa quase sempre (com o recorte logo depois do `toBeVisible()` deu 3 uma vez em quatro; esperando 20 ms ou mais, quase sempre 0). **Causa:** desde a costura a tela de carregamento começa a sair no quadro em que o app monta (esmaece 160 ms e sai da árvore aos 200 ms), e o `toBeVisible()` já vale nesse quadro; um recorte feito na saída pega a tela nos últimos quadros do esmaecer, o bastante para clarear os pontos mais escuros do nome (o limite é 16 em 255). **Solução:** esperar `#carregamento` sair (`await expect(page.locator('#carregamento')).toHaveCount(0)`) antes de medir pixels; o `lockup()` desse spec já espera. Vale para qualquer E2E novo que compare imagem logo depois de `goto` ou `reload`.
+- **Origem:** encontrado no CI do #347 (29/10/2026).
+
 ## Mapa da norma (AP-04, 25/10/2026)
 
 - **A norma do acervo não mostra "Mapa da norma" no Leitor.** Causa: a chamada só aparece quando `public/incidencia/indice.json` lista o `origemAcervo.id` da norma em algum recorte; norma colada ou importada por URL não tem `origemAcervo`. Solução: gerar os arquivos de novo com a norma na tabela de pesos (`node scripts/incidencia.mjs mapa <artigos.csv> public/incidencia <recorte> "<título>" [questões] [período]`; o gerador só aceita item que esteja em `public/acervo/indice.json`, e relata os que ficaram de fora). Prevenção: `scripts/incidencia/mapa.test.ts`.
