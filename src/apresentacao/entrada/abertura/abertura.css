@@ -121,6 +121,30 @@
   fill: var(--marca-ponto);
 }
 
+/* Na primeira vez, com a Chegada por vir, a luz voa ao pé do Zé e já é o ponto dele: amarelo cheio com brilho
+   amarelo, o mesmo de dia e de noite, sem o disco de marca-texto. O desfoque vem do script, na escala do ponto
+   (o do halo da flor do Zé). O fundo fica liso durante o voo: o Hoje, por baixo, só aparece quando a luz
+   pousa e a Chegada se revela; aí o fundo esmaece como sempre, e o que a Chegada não cobre (num monitor) vai
+   do liso ao Hoje escurecido. */
+.abertura[data-voo='ze'] .abertura-halo {
+  fill: var(--z-ponto-brilho);
+  opacity: 0.6;
+  filter: blur(var(--abertura-desfoque, 3.9px));
+}
+
+.abertura[data-voo='ze'] .abertura-disco {
+  fill: none;
+}
+
+.abertura[data-voo='ze'] .abertura-ponto {
+  fill: var(--z-ponto);
+}
+
+.abertura[data-voo='ze'][data-fase='voando'] {
+  background-color: var(--fundo);
+  transition: none;
+}
+
 /* "Pular" (a sequência da primeira vez, com as Boas-vindas depois do nome, passa de 5 s: WCAG 2.2.2): um botão
    de texto no pé da tela, num alvo de 44 px. */
 .abertura-pular {

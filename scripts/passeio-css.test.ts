@@ -234,3 +234,63 @@ describe('o CSS da Chegada: o botão do Google (as cores são as das diretrizes 
     expect(botao).not.toMatch(/#[0-9a-f]{3,8}\b/i);
   });
 });
+
+describe('o CSS da Chegada: a primeira vez, com a luz da Abertura a caminho (M3b)', () => {
+  /** O corpo do primeiro `@media (prefers-reduced-motion: no-preference)` que contém `trecho`. */
+  function liberado(trecho: string): string {
+    const achado = [
+      ...semComentarios.matchAll(/@media \(prefers-reduced-motion: no-preference\) \{/g),
+    ]
+      .map((m) => interior(semComentarios, m.index))
+      .find((corpo) => corpo.includes(trecho));
+    if (achado === undefined) throw new Error(`nenhum movimento liberado traz: ${trecho}`);
+    return achado;
+  }
+
+  it('na espera o <dialog> é invisível e não pega toque, e o véu do fundo só vem quando a luz pousa', () => {
+    expect(bloco('dialog.dialogo-chegada.dialogo-chegada-espera')).toBe(
+      'opacity: 0; pointer-events: none;',
+    );
+    expect(bloco('dialog.dialogo-chegada.dialogo-chegada-espera::backdrop')).toBe(
+      'background: transparent;',
+    );
+  });
+
+  it('da espera à tela pronta ele esmaece em 200 ms; ao pousar a luz aparece na hora, e o véu vem em 360 ms', () => {
+    const solto = liberado('dialogo-chegada-desenha');
+    expect(bloco('dialog.dialogo-chegada', solto)).toBe(
+      'transition: opacity 200ms cubic-bezier(0.2, 0.7, 0.2, 1);',
+    );
+    expect(bloco('dialog.dialogo-chegada.dialogo-chegada-desenha', solto)).toBe(
+      'transition: none;',
+    );
+    expect(bloco('dialog.dialogo-chegada::backdrop', solto)).toBe(
+      'transition: background-color 360ms ease;',
+    );
+  });
+
+  it('o texto e o botão esperam o contorno chegar à metade e então sobem 6 px em 220 ms', () => {
+    expect(semComentarios).toMatch(
+      /\.chegada-tela\[data-entrada='espera'\] \.revela,\s*\.chegada-tela\[data-entrada='desenhar'\]:not\(\[data-revelado\]\) \.revela \{\s*opacity: 0;\s*transform: translateY\(6px\);\s*\}/,
+    );
+    const subida = bloco(".chegada-tela[data-entrada='desenhar'] .revela", liberado('.revela'));
+    expect(subida).toContain('opacity 220ms cubic-bezier(0.2, 0.7, 0.2, 1)');
+    expect(subida).toContain('transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1)');
+  });
+
+  it('escondidos, o texto e o botão não pegam toque (o "Vamos" invisível não leva ao passeio)', () => {
+    expect(semComentarios).toMatch(
+      /\.chegada-tela\[data-entrada='espera'\] \.revela,\s*\.chegada-tela\[data-entrada='desenhar'\]:not\(\[data-revelado\]\) \.revela \{\s*pointer-events: none;\s*\}/,
+    );
+  });
+
+  it('o Calmo só esmaece; com movimento reduzido nada fica escondido: texto indispensável não depende de animação', () => {
+    expect(bloco("html[data-perfil='calmo'] .chegada-tela[data-entrada] .revela")).toBe(
+      'transform: none;',
+    );
+    const reduzido = dentroDe('@media (prefers-reduced-motion: reduce)');
+    expect(bloco(':root .chegada-tela[data-entrada] .revela', reduzido)).toBe(
+      'opacity: 1; transform: none;',
+    );
+  });
+});

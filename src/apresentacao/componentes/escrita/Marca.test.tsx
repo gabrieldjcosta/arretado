@@ -6,6 +6,7 @@ import { simularMovimento } from '../../../testes/movimento';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { lembrarDaEscrita } from './frequencia';
 import { Marca } from './Marca';
+import { criarEncontro } from './encontro';
 import { ContextoDaAbertura, type VezDaEscrita } from './vez-da-escrita';
 
 const CHAVE = 'arretado:escrita-do-nome:v1';
@@ -158,9 +159,17 @@ describe('Marca do cabeçalho (D-D9, Q6)', () => {
 describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
   async function montarCom(vez: VezDaEscrita) {
     const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    const encontro = criarEncontro();
     const arvore = (v: VezDaEscrita) => (
       <ContextoRepositorio.Provider value={repo}>
-        <ContextoDaAbertura.Provider value={{ vez: v, emCurso: v.estado === 'pendente' }}>
+        <ContextoDaAbertura.Provider
+          value={{
+            vez: v,
+            emCurso: v.estado === 'pendente',
+            voaParaAChegada: false,
+            encontro,
+          }}
+        >
           <Marca />
         </ContextoDaAbertura.Provider>
       </ContextoRepositorio.Provider>
@@ -182,6 +191,7 @@ describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
       onde: 'tela',
       escrita: 'completa',
       calmo: false,
+      chegada: false,
     });
     expect(escrita()).toBeNull();
     expect(parado()).not.toBeNull();
@@ -201,7 +211,13 @@ describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
   it('a Abertura toma a escrita depois da espera: do vazio ao lockup parado, sem escrever nada', async () => {
     const { trocar, escrita, parado } = await montarCom({ estado: 'pendente' });
     await new Promise((resolver) => setTimeout(resolver, 50));
-    trocar({ estado: 'decidida', onde: 'tela', escrita: 'completa', calmo: false });
+    trocar({
+      estado: 'decidida',
+      onde: 'tela',
+      escrita: 'completa',
+      calmo: false,
+      chegada: false,
+    });
     expect(escrita()).toBeNull();
     expect(parado()).not.toBeNull();
     expect(guardado()).toBeNull();

@@ -1,5 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { LockupParado } from '../../componentes/LockupParado';
+import {
+  criarEncontro,
+  type Encontro,
+  type OfertaDaChegada,
+} from '../../componentes/escrita/encontro';
 import { simularMovimento } from '../../../testes/movimento';
 import { Abertura } from './Abertura';
 
@@ -41,7 +46,12 @@ function simularOLayout() {
 }
 
 function montar(
-  props: { escrita?: 'completa' | 'curta'; calmo?: boolean; cabecalho?: boolean } = {},
+  props: {
+    escrita?: 'completa' | 'curta';
+    calmo?: boolean;
+    cabecalho?: boolean;
+    encontro?: Encontro;
+  } = {},
 ) {
   const aoSair = vi.fn();
   const { cabecalho = true } = props;
@@ -56,6 +66,7 @@ function montar(
         escrita={props.escrita ?? 'completa'}
         calmo={props.calmo ?? false}
         aoSair={aoSair}
+        encontro={props.encontro}
       />
     </>,
   );
@@ -296,5 +307,182 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
     const toque = new Event('pointerdown', { bubbles: true, cancelable: true });
     document.body.dispatchEvent(toque);
     expect(toque.defaultPrevented).toBe(false);
+  });
+});
+
+describe('Abertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
+  /** A Chegada que se oferece: o pé esquerdo do Zé está em (300, 500) e a luz dele mede 4 px de raio. */
+  function oferta(pe: OfertaDaChegada['medirPe'] = () => ({ x: 300, y: 500, raio: 4 })) {
+    return { medirPe: vi.fn(pe), receber: vi.fn() } satisfies OfertaDaChegada;
+  }
+  const transformada = (g: Element | null) => g?.getAttribute('transform');
+
+  it('com a oferta pronta a luz voa ao pé do Zé, do tamanho da luz dele, e a Chegada recebe ao pousar', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    encontro.oferecer(chegada);
+    const { camada, luz, aoSair } = montar({ encontro });
+
+    await passar(2640 + 300 - 20);
+    expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
+    expect(chegada.medirPe).not.toHaveBeenCalled();
+
+    // Sai do disco do nome (200, 400) já como a luz do Zé: sem disco de marca-texto, com o halo e o desfoque da flor.
+    await passar(20);
+    expect(camada()).toHaveAttribute('data-fase', 'voando');
+    expect(camada()).toHaveAttribute('data-voo', 'ze');
+    expect(transformada(luz())).toBe('translate(200.00 400.00)');
+    const [halo, disco, ponto] = Array.from(luz()?.children ?? []);
+    expect(disco).toHaveAttribute('r', '0');
+    const raioDoNome = (11 * 320) / 1015;
+    expect(Number(halo?.getAttribute('r'))).toBeCloseTo(raioDoNome * (10 / 5.5), 1);
+    expect(luz()?.style.getPropertyValue('--abertura-desfoque')).toMatch(/px$/);
+    expect(chegada.receber).not.toHaveBeenCalled();
+
+    // O arco sobe acima dos dois pontos: em algum quadro a luz fica mais alta que a saída (y = 400) e que o pé (y = 500).
+    const alturas: number[] = [];
+    for (let i = 0; i < 8; i += 1) {
+      await passar(50);
+      alturas.push(Number(/translate\([\d.]+ ([\d.]+)\)/.exec(transformada(luz()) ?? '')?.[1]));
+    }
+    expect(Math.min(...alturas)).toBeLessThan(400);
+    expect(chegada.receber).not.toHaveBeenCalled();
+
+    // Pousa no pé (300, 500) com o raio da luz do Zé; a Chegada se revela e a luz de cá sai de cena.
+    await passar(200);
+    expect(transformada(luz())).toBe('translate(300.00 500.00)');
+    expect(Number(ponto?.getAttribute('r'))).toBeCloseTo(4, 5);
+    expect(Number(halo?.getAttribute('r'))).toBeCloseTo(4 * (10 / 5.5), 1);
+    expect(chegada.receber).toHaveBeenCalledTimes(1);
+    expect(luz()).toHaveAttribute('visibility', 'hidden');
+    expect(camada()).toHaveAttribute('data-fase', 'saindo');
+    expect(aoSair).not.toHaveBeenCalled();
+
+    // A camada ainda sai em 0,36 s (o fundo esmaece), e só então chama quem a montou.
+    await passar(360);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+    expect(chegada.receber).toHaveBeenCalledTimes(1);
+  });
+
+  it('pousada a luz, o toque seguinte já é da Chegada: a Abertura soltou os ouvintes de pular', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    encontro.oferecer(chegada);
+    const { aoSair } = montar({ encontro });
+    await passar(2640 + 300 + 600);
+    expect(chegada.receber).toHaveBeenCalledTimes(1);
+
+    const toque = new Event('pointerdown', { bubbles: true, cancelable: true });
+    document.body.dispatchEvent(toque);
+    const tecla = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    document.body.dispatchEvent(tecla);
+    expect(toque.defaultPrevented).toBe(false);
+    expect(tecla.defaultPrevented).toBe(false);
+    // Nenhum gesto desses pulou a camada, que sai pelo próprio relógio.
+    expect(aoSair).not.toHaveBeenCalled();
+    await passar(400);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+  });
+
+  it('a oferta que chega depois da pausa, dentro dos 0,6 s, vale: a luz parte quando ela chega', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    const { camada } = montar({ encontro });
+    await passar(2640 + 300 + 400);
+    expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
+    act(() => {
+      encontro.oferecer(chegada);
+    });
+    await passar(20);
+    expect(camada()).toHaveAttribute('data-fase', 'voando');
+    expect(camada()).toHaveAttribute('data-voo', 'ze');
+    await passar(600);
+    expect(chegada.receber).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem oferta em 0,6 s a luz vai ao cabeçalho, como na M2, e a que chega tarde não é usada', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    const { camada, luz, aoSair } = montar({ encontro });
+    await passar(2640 + 300 + 600 - 20);
+    expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
+    await passar(20);
+    expect(camada()).toHaveAttribute('data-fase', 'voando');
+    expect(camada()).not.toHaveAttribute('data-voo');
+    act(() => {
+      encontro.oferecer(chegada);
+    });
+    await passar(600);
+    expect(transformada(luz())).toBe('translate(60.00 30.00)');
+    expect(chegada.medirPe).not.toHaveBeenCalled();
+    expect(chegada.receber).not.toHaveBeenCalled();
+    expect(aoSair).toHaveBeenCalledTimes(1);
+  });
+
+  it('o Zé fora da área à vista (o pé que não se mede): a luz vai ao cabeçalho e a Chegada não recebe', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta(() => null);
+    encontro.oferecer(chegada);
+    const { camada, luz, aoSair } = montar({ encontro });
+    await passar(2640 + 300 + 20);
+    expect(chegada.medirPe).toHaveBeenCalledTimes(1);
+    expect(camada()).toHaveAttribute('data-fase', 'voando');
+    expect(camada()).not.toHaveAttribute('data-voo');
+    await passar(600);
+    expect(transformada(luz())).toBe('translate(60.00 30.00)');
+    expect(chegada.receber).not.toHaveBeenCalled();
+    expect(aoSair).toHaveBeenCalledTimes(1);
+  });
+
+  it('um toque durante a espera da oferta pula: a camada sai e a Chegada não recebe nada', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const { aoSair } = montar({ encontro });
+    await passar(2640 + 300 + 100);
+    fireEvent.pointerDown(document.body);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+    const chegada = oferta();
+    act(() => {
+      encontro.oferecer(chegada);
+    });
+    await passar(5000);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+    expect(chegada.medirPe).not.toHaveBeenCalled();
+    expect(chegada.receber).not.toHaveBeenCalled();
+  });
+
+  it('um toque durante o voo ao Zé pula: o Zé aparece pronto, sem a luz ter pousado', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    encontro.oferecer(chegada);
+    const { aoSair } = montar({ encontro });
+    await passar(2640 + 300 + 200);
+    fireEvent.pointerDown(document.body);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+    await passar(5000);
+    expect(chegada.receber).not.toHaveBeenCalled();
+    expect(aoSair).toHaveBeenCalledTimes(1);
+  });
+
+  it('no Calmo e na abertura do Dia o encontro é ignorado: nada voa ao Zé', async () => {
+    simularOLayout();
+    const encontro = criarEncontro();
+    const chegada = oferta();
+    encontro.oferecer(chegada);
+    const calmo = montar({ calmo: true, encontro });
+    await passar(240 + 900 + 400);
+    expect(calmo.aoSair).toHaveBeenCalledTimes(1);
+    calmo.unmount();
+    const doDia = montar({ escrita: 'curta', calmo: true, encontro });
+    await passar(240 + 700 + 400);
+    expect(doDia.aoSair).toHaveBeenCalledTimes(1);
+    expect(chegada.medirPe).not.toHaveBeenCalled();
+    expect(chegada.receber).not.toHaveBeenCalled();
   });
 });

@@ -53,6 +53,15 @@ async function aparelhoNasceuHoje(repo: Repositorio, dia: string): Promise<boole
 }
 
 /**
+ * A Chegada pode abrir nesta abertura: o aparelho nasceu hoje e ainda não a viu. É só o começo da conta de
+ * `decidir` (que ainda olha o Dia, a Sessão, o Retorno e o "só estudo"): serve à Abertura para saber, antes
+ * de a Chegada decidir, se a luz da primeira vez pode ir ao Zé dela.
+ */
+export async function chegadaPossivel(repo: Repositorio): Promise<boolean> {
+  return !chegadaJaVista() && (await aparelhoNasceuHoje(repo, hoje(repo)));
+}
+
+/**
  * O que abre agora, se algo abre. A ordem é a das regras: nunca duas vezes no mesmo Dia; nunca com o
  * Dia fechado, com Sessão aberta, com o Retorno à vista ou com o "só estudo" ligado; então a Chegada,
  * só no aparelho que nasceu hoje e ainda não a viu, ou a Entrada, e só se o conteúdo carregar.

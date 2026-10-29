@@ -1,6 +1,6 @@
 // A viagem da luz (contrato do Zé, §9): o ponto do nome sai do braço do cacto e pousa no ponto de luz
-// do cabeçalho, num arco curto (0,45 s a 0,5 s). Aqui só a conta e o relógio de quadros; a Abertura mede
-// os dois pontos na tela.
+// do cabeçalho ou, na primeira vez, no pé esquerdo do Zé das Boas-vindas, num arco curto (0,45 s a 0,5 s).
+// Aqui só a conta e o relógio de quadros; a Abertura mede os dois pontos na tela.
 import { criarCurva } from '../../movimento';
 
 export interface Ponto {
@@ -14,6 +14,8 @@ export interface Viagem {
   /** O raio da luz na saída e na chegada: acompanha o tamanho do nome e o da marca do cabeçalho. */
   raioDe: number;
   raioPara: number;
+  /** O ponto de controle do arco; sem ele, o arco curva ao lado do caminho (`pontoDeControle`). */
+  controle?: Ponto;
 }
 
 /** A curva da viagem do kit da marca: arranca devagar, corre no meio e assenta no ponto. */
@@ -26,10 +28,21 @@ export function pontoDeControle(de: Ponto, para: Ponto): Ponto {
   return { x: (de.x + para.x) / 2 - dy * 0.25, y: (de.y + para.y) / 2 + dx * 0.25 };
 }
 
+/**
+ * O arco da viagem ao Zé (a maquete): a luz sobe acima dos dois pontos e desce ao pé, num arco que
+ * se ergue 30% da distância. Serve a quem põe o `controle` de uma `Viagem`.
+ */
+export function pontoDeControleAoZe(de: Ponto, para: Ponto): Ponto {
+  return {
+    x: (de.x + para.x) / 2,
+    y: Math.min(de.y, para.y) - Math.hypot(para.x - de.x, para.y - de.y) * 0.3,
+  };
+}
+
 /** Onde a luz está e o quanto ela mede em `progresso` (0 a 1, já na curva da viagem): uma Bézier quadrática. */
 export function luzNaViagem(viagem: Viagem, progresso: number): Ponto & { raio: number } {
   const { de, para } = viagem;
-  const meio = pontoDeControle(de, para);
+  const meio = viagem.controle ?? pontoDeControle(de, para);
   const a = (1 - progresso) * (1 - progresso);
   const b = 2 * (1 - progresso) * progresso;
   const c = progresso * progresso;
