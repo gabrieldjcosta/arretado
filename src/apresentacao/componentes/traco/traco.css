@@ -31,3 +31,19 @@
   stroke: var(--ponto-contorno);
   stroke-width: 1.2;
 }
+
+/* O néon suave (D-D10): o mesmo contorno, mais largo e desfocado (o filtro vem do `tracar.ts`), que
+   acende com o fio, na cor piscina dos dois mundos, e some com ele: não tem repouso. Só existe com
+   movimento normal; no Calmo o contorno só esmaece, sem néon. */
+.traco-sel .traco-neon {
+  stroke: var(--neon-cor);
+  stroke-width: 7;
+  opacity: var(--neon-aceso);
+}
+
+/* Cores forçadas: o brilho é decoração e some; o fio fica com o texto do sistema. */
+@media (forced-colors: active) {
+  .traco-sel .traco-neon {
+    display: none;
+  }
+}
