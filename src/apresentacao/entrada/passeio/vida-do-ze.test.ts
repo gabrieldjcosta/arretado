@@ -4,6 +4,7 @@ import {
   ESPERA_SEGUINTE_DA_LUZ_MS,
   iniciarLuzDaMao,
   iniciarPiscadas,
+  MAXIMO_DE_RAJADAS,
   PRIMEIRA_ESPERA_DA_LUZ_MS,
   PRIMEIRA_RAJADA_MS,
   RAJADAS,
@@ -52,8 +53,21 @@ describe('as piscadas dos dois olhos (contrato §9)', () => {
         rajadas.push([instante]);
       }
     }
-    expect(rajadas.slice(0, 6).map((r) => r.length)).toEqual([2, 2, 3, 2, 3, 2]);
+    // Seis rajadas por visita, e só: a sexta volta à ordem da primeira (2).
+    expect(rajadas.map((r) => r.length)).toEqual([2, 2, 3, 2, 3, 2]);
     expect(rajadas[0]?.[0]).toBe(2200);
+  });
+
+  it('depois da sexta rajada o Zé fica parado, e remontar a tela (outra visita) recomeça a conta', () => {
+    simularMovimento('normal');
+    expect(MAXIMO_DE_RAJADAS).toBe(6);
+    const primeira = instantesDasPiscadas(600_000);
+    // 2 + 2 + 3 + 2 + 3 + 2 piscadas, todas nos primeiros 40 s; a sétima rajada (que viria cerca de 5 s depois da
+    // sexta) não acontece em 10 minutos.
+    expect(primeira).toHaveLength(14);
+    expect(primeira.at(-1) ?? Infinity).toBeLessThan(40_000);
+    const segunda = instantesDasPiscadas(600_000);
+    expect(segunda).toEqual(primeira);
   });
 
   it('nunca passa de 3 piscadas por segundo (WCAG 2.3.1)', () => {

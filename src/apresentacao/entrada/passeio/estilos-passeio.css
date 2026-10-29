@@ -489,6 +489,22 @@ dialog.dialogo-chegada .botao-google {
   }
 }
 
+/* Um toque duplo no último "Seguir" cairia no botão que ocupa o mesmo lugar no Começar (o do Google, com a conta
+   ligada): nos primeiros 400 ms da tela, o rodapé dela não recebe toque. Não é movimento: vale também no reduzido. */
+.chegada-tela[data-tela='comecar'] .chegada-rodape {
+  animation: chegada-libera-toque 0s linear 400ms both;
+}
+
+@keyframes chegada-libera-toque {
+  from {
+    pointer-events: none;
+  }
+
+  to {
+    pointer-events: auto;
+  }
+}
+
 .botao-google-logo {
   flex: none;
   width: 1.25em;

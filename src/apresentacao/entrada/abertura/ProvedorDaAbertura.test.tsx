@@ -220,6 +220,60 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
       );
       expect(sonda()).toBe('espera');
     });
+
+    describe('a tela de carregamento do index.html', () => {
+      const tela = () => document.getElementById('carregamento');
+      beforeEach(() => {
+        document.body.insertAdjacentHTML(
+          'afterbegin',
+          '<div id="carregamento" role="status"></div>',
+        );
+      });
+      afterEach(() => {
+        tela()?.remove();
+      });
+
+      it('fica enquanto a Abertura decide e sai por baixo da camada, no quadro em que o app monta', async () => {
+        const { camada, container } = await montar();
+        expect(container.querySelector('.marca')).toBeNull();
+        expect(tela()).not.toHaveAttribute('data-saindo');
+
+        await waitFor(() => {
+          expect(camada()).not.toBeNull();
+        });
+        expect(container.querySelector('.marca')).not.toBeNull();
+        await waitFor(() => {
+          expect(tela()).toHaveAttribute('data-saindo');
+        });
+      });
+
+      it('sai quando o app monta sem a camada (o "só estudo" veta)', async () => {
+        const { camada, container } = await montar({ soEstudo: true });
+        expect(tela()).not.toHaveAttribute('data-saindo');
+        await waitFor(() => {
+          expect(container.querySelector('.marca')).not.toBeNull();
+        });
+        await waitFor(() => {
+          expect(tela()).toHaveAttribute('data-saindo');
+        });
+        expect(camada()).toBeNull();
+      });
+
+      it('se a decisão demora, sai quando o app aparece no teto de 0,4 s', async () => {
+        vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
+        const { container } = await montar();
+        expect(tela()).not.toHaveAttribute('data-saindo');
+        await waitFor(
+          () => {
+            expect(container.querySelector('.marca')).not.toBeNull();
+          },
+          { timeout: 1500 },
+        );
+        await waitFor(() => {
+          expect(tela()).toHaveAttribute('data-saindo');
+        });
+      });
+    });
   });
 });
 

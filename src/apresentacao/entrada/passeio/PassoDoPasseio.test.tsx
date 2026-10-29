@@ -132,6 +132,23 @@ describe('um passo do Passeio (D-D10)', () => {
     expect(screen.getByRole('heading', { level: 2 })).toHaveFocus();
   });
 
+  it('cada passo novo volta ao topo: quem rolou para alcançar o "Seguir" não chega ao passo seguinte no meio dele', () => {
+    simularMovimento('calmo');
+    const { ir, container } = montar(0);
+    const tela = container.querySelector<HTMLElement>('.chegada-tela');
+    const corpo = container.querySelector<HTMLElement>('.chegada-corpo');
+    if (tela === null || corpo === null)
+      throw new Error('as duas áreas que rolam não foram achadas');
+    tela.scrollTop = 400;
+    corpo.scrollTop = 300;
+    ir(1);
+    act(() => {
+      vi.advanceTimersByTime(160);
+    });
+    expect(tela.scrollTop).toBe(0);
+    expect(corpo.scrollTop).toBe(0);
+  });
+
   it('o Zé do reduzido não se mexe', () => {
     simularMovimento('reduzido');
     const { container } = montar(0);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { esconderCarregamento } from '../../carregamento';
 import { criarEncontro } from '../../componentes/escrita/encontro';
 import { escritaDaAbertura } from '../../componentes/escrita/frequencia';
 import { ContextoDaAbertura, type VezDaEscrita } from '../../componentes/escrita/vez-da-escrita';
@@ -63,6 +64,13 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
     setSaiu(true);
   }, []);
 
+  // O app monta quando a decisão chega (ou no teto). É nesse quadro que a tela de carregamento do index.html
+  // sai, por baixo da camada quando ela abre: nem um branco entre as duas, nem o Hoje à mostra.
+  const montado = vez.estado !== 'pendente' || cansou;
+  useEffect(() => {
+    if (montado) void esconderCarregamento();
+  }, [montado]);
+
   const naTela = vez.estado === 'decidida' && vez.onde === 'tela' && !saiu ? vez : null;
   // O Calmo não tem voo: a luz não visita o Zé, e a Chegada espera a camada sair, como a do Dia.
   const visitaOZe = naTela !== null && naTela.chegada && !naTela.calmo;
@@ -77,7 +85,7 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   );
   return (
     <ContextoDaAbertura.Provider value={valor}>
-      {vez.estado === 'pendente' && !cansou ? null : children}
+      {montado ? children : null}
       {naTela && (
         <Abertura
           escrita={naTela.escrita}

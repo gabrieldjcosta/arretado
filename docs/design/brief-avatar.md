@@ -56,7 +56,7 @@ Nada de preço, "grátis", depoimento ou estatística: não existem. A frase de 
 |---|---|---|---|
 | Contorno do Zé | desenha de pé a pé em 1,2 s, com o néon aceso; o brilho assenta em 0,6 s | o Zé inteiro esmaece em 0,24 s | inteiro e parado |
 | Rosto | olho esquerdo 0,14 s, o direito logo depois, bochechas 0,24 s, piscadela 0,56 s | aparece pronto | pronto |
-| Piscar | só nas Boas-vindas: rajadas de 2 ou 3 piscadas dos dois olhos (0,16 s cada, no máximo 3 por segundo), a primeira aos 2,2 s e depois a cada 3,8 a 6,2 s | não pisca | não pisca |
+| Piscar | só nas Boas-vindas: rajadas de 2 ou 3 piscadas dos dois olhos (0,16 s cada, no máximo 3 por segundo), a primeira aos 2,2 s e depois a cada 3,8 a 6,2 s, no máximo 6 rajadas por visita à tela (depois da sexta o Zé fica parado, de olhos abertos) | não pisca | não pisca |
 | Luz amarela da mão | só nas Boas-vindas, 10 s sem toque, tecla nem rolagem, depois a cada 14 s, no máximo 3 rodadas de 3 piscadas | um esmaecer lento por rodada | não pisca |
 | Cada passo | 0,16 s; o ícone se desenha em 0,42 s com o néon aceso | só esmaece | troca na hora |
 | Fim do passeio | o Zé fica contente; o botão tocado leva o traço de seleção com néon | contorno que esmaece | sem traço |

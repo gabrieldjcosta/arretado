@@ -194,6 +194,23 @@ describe('o CSS da Chegada: o movimento (160 ms, o Calmo esmaece, o reduzido nã
   });
 });
 
+describe('o CSS da Chegada: o Começar não recebe o toque que sobrou do "Seguir"', () => {
+  it('o rodapé do Começar fica sem toque por 400 ms e depois libera, também no movimento reduzido', () => {
+    const rodape = bloco(".chegada-tela[data-tela='comecar'] .chegada-rodape");
+    expect(rodape).toContain('animation: chegada-libera-toque 0s linear 400ms both;');
+    const quadros = bloco('@keyframes chegada-libera-toque');
+    expect(quadros).toContain('from { pointer-events: none; }');
+    expect(quadros).toContain('to { pointer-events: auto; }');
+    // Fora de qualquer consulta de movimento: quem pede menos movimento também dá toque duplo.
+    const antes = semComentarios.slice(
+      0,
+      semComentarios.indexOf(".chegada-tela[data-tela='comecar'] .chegada-rodape"),
+    );
+    const abertas = (antes.match(/\{/g) ?? []).length - (antes.match(/\}/g) ?? []).length;
+    expect(abertas).toBe(0);
+  });
+});
+
 describe('o CSS da Chegada: o botão do Google (as cores são as das diretrizes dele)', () => {
   const claro = ['--g-fundo: #ffffff;', '--g-borda: #747775;', '--g-texto: #1f1f1f;'];
   const escuro = ['--g-fundo: #131314;', '--g-borda: #8e918f;', '--g-texto: #e3e3e3;'];

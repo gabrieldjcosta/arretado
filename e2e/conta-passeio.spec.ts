@@ -83,6 +83,32 @@ test.describe('Começar, com a conta ligada', () => {
     await expect(page.getByText('google@exemplo.com')).toHaveCount(0);
   });
 
+  test('o toque que sobra do último "Seguir" não cai no Google: o Começar só recebe toque depois de 400 ms', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await page
+      .getByRole('dialog', { name: 'Boas-vindas ao Arretado!' })
+      .getByRole('button', { name: 'Vamos' })
+      .click();
+    for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
+    await page.getByRole('button', { name: 'Seguir' }).click();
+    await expect(comecar(page)).toBeVisible();
+
+    // Um segundo toque logo depois (o toque duplo) acerta o que estiver no lugar: com a conta ligada, o Google.
+    const google = comecar(page).getByRole('link', { name: 'Entrar com o Google' });
+    const caixa = await google.boundingBox();
+    await page.mouse.click((caixa?.x ?? 0) + (caixa?.width ?? 0) / 2, (caixa?.y ?? 0) + 20);
+    await page.waitForTimeout(150);
+    await expect(comecar(page)).toBeVisible();
+    await expect(page).toHaveURL(/#\/$/);
+
+    // Passados os 400 ms, o botão responde.
+    await page.waitForTimeout(400);
+    await google.click();
+    await expect(page).toHaveURL(/#\/conta\/entrar$/);
+  });
+
   test('"Experimentar sem conta" fecha a folha e deixa o Hoje', async ({ page }) => {
     await chegarAoComecar(page);
     await comecar(page)
