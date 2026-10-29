@@ -278,6 +278,12 @@ describe('o CSS da Chegada: a primeira vez, com a luz da Abertura a caminho (M3b
     expect(subida).toContain('transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1)');
   });
 
+  it('escondidos, o texto e o botão não pegam toque (o "Vamos" invisível não leva ao passeio)', () => {
+    expect(semComentarios).toMatch(
+      /\.chegada-tela\[data-entrada='espera'\] \.revela,\s*\.chegada-tela\[data-entrada='desenhar'\]:not\(\[data-revelado\]\) \.revela \{\s*pointer-events: none;\s*\}/,
+    );
+  });
+
   it('o Calmo só esmaece; com movimento reduzido nada fica escondido: texto indispensável não depende de animação', () => {
     expect(bloco("html[data-perfil='calmo'] .chegada-tela[data-entrada] .revela")).toBe(
       'transform: none;',

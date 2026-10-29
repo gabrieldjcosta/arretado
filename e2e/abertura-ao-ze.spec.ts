@@ -60,6 +60,11 @@ interface Visita {
   /** A folha no último quadro antes de a luz pousar e no último quadro visto. */
   antes: EstadoDaFolha | null;
   depois: EstadoDaFolha | null;
+  /**
+   * Quadros, depois do pouso e antes de o texto subir, em que o toque no centro do "Vamos" ainda cairia
+   * nele (invisível, ele não pode pegar o toque de quem tocava em "Pular").
+   */
+  tocavaEscondido: number;
   /** Ms depois do pouso: o texto começa a subir, o texto e o "Vamos" ficam inteiros, a caneta some. */
   textoSobe: number | null;
   textoInteiro: number | null;
@@ -118,6 +123,7 @@ function acompanharAVisita(page: Page): Promise<Visita> {
           folhaVisivelAntes: 0,
           antes: null,
           depois: null,
+          tocavaEscondido: 0,
           textoSobe: null,
           textoInteiro: null,
           rodapeInteiro: null,
@@ -207,6 +213,19 @@ function acompanharAVisita(page: Page): Promise<Visita> {
             }
             if (rodape !== null && visto.rodapeInteiro === null && rodape >= 0.99) {
               visto.rodapeInteiro = dentro;
+            }
+          }
+          const botao = document.querySelector('.chegada-rodape button');
+          const folhaDaChegada = document.querySelector('.chegada-tela');
+          if (
+            pouso !== null &&
+            botao &&
+            folhaDaChegada?.getAttribute('data-entrada') === 'desenhar' &&
+            !folhaDaChegada.hasAttribute('data-revelado')
+          ) {
+            const lugar = centro(botao);
+            if (document.elementFromPoint(lugar.x, lugar.y)?.closest('.revela')) {
+              visto.tocavaEscondido += 1;
             }
           }
           const ponto = document.querySelector('.marca .lockup-ponto');
@@ -312,6 +331,9 @@ test('a luz pousa no pé esquerdo do Zé e a caneta dele continua dali; o texto 
   // O contorno leva 1,2 s e a luz ainda salta à flor (0,24 s): a caneta fica na tela cerca de 1,4 s.
   expect(visita.penaDuracao).toBeGreaterThan(1_200);
   expect(visita.penaDuracao).toBeLessThan(2_500);
+  // Enquanto esperam, o texto e o "Vamos" não pegam toque: um toque no pé da tela logo depois do pouso
+  // (quem tocava em "Pular") não pode levar ao passeio sem a pessoa ter visto o botão.
+  expect(visita.tocavaEscondido).toBe(0);
   // O texto e o "Vamos" esperam a metade do contorno e sobem juntos.
   expect(visita.textoSobe).toBeGreaterThan(250);
   expect(visita.textoSobe).toBeLessThan(1_100);

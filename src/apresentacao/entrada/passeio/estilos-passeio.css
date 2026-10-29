@@ -171,6 +171,13 @@ dialog.dialogo-chegada.dialogo-chegada-espera::backdrop {
   transform: translateY(6px);
 }
 
+/* Invisível, o texto e o botão também não pegam toque: um toque no pé da tela logo depois do pouso (quem tocava
+   em "Pular") não pode levar ao passeio sem a pessoa ter visto o "Vamos". Voltam com o texto, na metade. */
+.chegada-tela[data-entrada='espera'] .revela,
+.chegada-tela[data-entrada='desenhar']:not([data-revelado]) .revela {
+  pointer-events: none;
+}
+
 html[data-perfil='calmo'] .chegada-tela[data-entrada] .revela {
   transform: none;
 }
