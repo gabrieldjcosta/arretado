@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { bloco } from './css-bloco';
 
 const css = readFileSync(
   path.join(import.meta.dirname, '..', 'src', 'apresentacao', 'componentes', 'ze', 'ze.css'),
@@ -9,26 +10,6 @@ const css = readFileSync(
 // O jsdom não aplica o CSS do Zé (nem o filtro do halo): estas são as regras de que o contraste, as cores
 // forçadas e o movimento dependem. Cada uma foi achada por mutação (revisão do #341): trocar uma linha
 // dessas passava sem teste nenhum. Quem muda uma delas muda também o par de `scripts/contraste.mjs` ou o contrato.
-
-/** O texto entre as chaves da regra que começa por `seletor` (sem os comentários), em uma linha só. */
-function bloco(origem: string, seletor: string): string {
-  const semComentarios = origem.replace(/\/\*[\s\S]*?\*\//g, '');
-  const inicio = semComentarios.search(
-    new RegExp(`(^|\\})\\s*${seletor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{`),
-  );
-  if (inicio < 0) throw new Error(`regra não achada: ${seletor}`);
-  const abre = semComentarios.indexOf('{', inicio);
-  let fundo = 1;
-  let i = abre + 1;
-  for (; i < semComentarios.length && fundo > 0; i += 1) {
-    if (semComentarios[i] === '{') fundo += 1;
-    if (semComentarios[i] === '}') fundo -= 1;
-  }
-  return semComentarios
-    .slice(abre + 1, i - 1)
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 describe('o CSS do Zé: as regras que o jsdom não vê (D-D10)', () => {
   it('a linha usa o núcleo branco e a faixa usa a cor da faixa: a linha não some dentro dela', () => {

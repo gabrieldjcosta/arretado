@@ -74,6 +74,48 @@ async function pontosDiferentes(page: Page, a: Buffer, b: Buffer): Promise<numbe
 }
 
 /**
+ * A maior diferença, em níveis de 255, entre as médias de blocos de `lado` × `lado` pontos de dois recortes
+ * PNG: a serrilha que muda de lugar por meia casa de ponto some na média do bloco, e um brilho que
+ * faltasse (em volta das letras, à noite) não. -1 se os tamanhos diferem.
+ */
+async function diferencaPorBloco(page: Page, a: Buffer, b: Buffer, lado = 8): Promise<number> {
+  return page.evaluate(
+    async ({ primeiro, segundo, bloco }) => {
+      const ler = async (base64: string) => {
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const imagem = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
+        const tela = new OffscreenCanvas(imagem.width, imagem.height);
+        const contexto = tela.getContext('2d');
+        if (!contexto) throw new Error('sem canvas');
+        contexto.drawImage(imagem, 0, 0);
+        return contexto.getImageData(0, 0, imagem.width, imagem.height);
+      };
+      const [x, y] = await Promise.all([ler(primeiro), ler(segundo)]);
+      if (x.width !== y.width || x.height !== y.height) return -1;
+      let maior = 0;
+      for (let por = 0; por + bloco <= x.height; por += bloco) {
+        for (let pox = 0; pox + bloco <= x.width; pox += bloco) {
+          for (let canal = 0; canal < 3; canal += 1) {
+            let somaX = 0;
+            let somaY = 0;
+            for (let l = por; l < por + bloco; l += 1) {
+              for (let c = pox; c < pox + bloco; c += 1) {
+                const i = (l * x.width + c) * 4 + canal;
+                somaX += x.data[i] ?? 0;
+                somaY += y.data[i] ?? 0;
+              }
+            }
+            maior = Math.max(maior, Math.abs(somaX - somaY) / (bloco * bloco));
+          }
+        }
+      }
+      return maior;
+    },
+    { primeiro: a.toString('base64'), segundo: b.toString('base64'), bloco: lado },
+  );
+}
+
+/**
  * Desembrulha as regras de reserva (`@supports not (d: path(...))` e `(offset-path: ...)`) para o
  * Chromium, que as ignoraria. Pelo CSSOM: a CSP `style-src 'self'` barra um `<style>` de dentro da página.
  */
@@ -147,7 +189,9 @@ test('primeira abertura no aparelho, no cabeçalho: escreve as 8 letras em ordem
     () =>
       new Promise<{ ordem: boolean; meio: boolean; largura: boolean; completos: boolean }>(
         (resolver) => {
-          const traços = [...document.querySelectorAll<SVGPathElement>('.marca svg.eb path.tr')];
+          const traços = [
+            ...document.querySelectorAll<SVGPathElement>('.marca svg.eb path.tr:not(.tn)'),
+          ];
           const raiz = document.documentElement;
           const fim = performance.now() + 4_500;
           let [ordem, meio, largura] = [true, false, true];
@@ -179,7 +223,15 @@ test('primeira abertura no aparelho, no cabeçalho: escreve as 8 letras em ordem
     await page.reload();
     await expect(page.locator('.marca svg').first()).toBeVisible();
     expect(await noAr(page)).toEqual([]);
-    expect(await pontosDiferentes(page, await lockup(page), natural), `${esquema}: parada`).toBe(0);
+    const parada = await lockup(page);
+    if (esquema === 'light') {
+      expect(await pontosDiferentes(page, parada, natural), `${esquema}: parada`).toBe(0);
+    } else {
+      // À noite o brilho de repouso (o néon, D-D10) entra no desenho, e o Chromium, a 1x, refaz as bordas de
+      // algumas letras com menos de meio ponto de diferença entre a escrita acabada e o lockup parado (medido:
+      // 7 de 255 na média de um bloco de 8 pontos; sem o brilho seriam 25). Por isso aqui vale o bloco.
+      expect(await diferencaPorBloco(page, parada, natural), `${esquema}: parada`).toBeLessThan(12);
+    }
     await lembrarOutroDia(page);
     await page.reload();
     await terminou(page);

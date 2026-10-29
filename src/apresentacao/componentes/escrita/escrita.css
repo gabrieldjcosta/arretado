@@ -63,3 +63,49 @@
 .eb .pen-tinta-1 {
   stop-color: var(--pen-tinta2);
 }
+
+/* O néon suave (D-D10, N1): uma cópia larga e borrada dos traços das letras e do cacto (`NeonDoNome`), que se
+   escreve junto com eles (as mesmas curvas `eb-tN`, do CSS gerado) e, quando o nome acaba, assenta no repouso do
+   mundo: de dia some, à noite fica baixo. Um filtro só, para o grupo todo. O lockup parado leva o mesmo grupo,
+   sem animação, porque é o quadro final da escrita. Calmo e Reduzido não têm animação (o CSS gerado a tira):
+   mostram o repouso, esmaecendo com o desenho no Calmo. De dia o repouso não é só opacidade 0: o grupo sai do
+   desenho (`visibility`), porque com as cópias das letras presentes, mesmo invisíveis, o Chromium refaz o
+   lockup meia casa de pixel mais baixo e o quadro final deixa de ser o do lockup de antes do néon. À noite o
+   repouso é baixo e fica à vista (os tokens vêm do mundo, em estilos.css). */
+.eb-neon {
+  opacity: var(--neon-repouso);
+  visibility: var(--neon-repouso-visibilidade);
+}
+
+.eb-neon .tn {
+  fill: none;
+  stroke: var(--neon-cor);
+  stroke-width: 30;
+}
+
+@keyframes eb-neon {
+  0% {
+    opacity: var(--neon-aceso);
+    visibility: visible;
+  }
+  66% {
+    opacity: var(--neon-aceso);
+    visibility: visible;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  84% {
+    opacity: var(--neon-repouso);
+    visibility: visible;
+  }
+  100% {
+    opacity: var(--neon-repouso);
+    visibility: visible;
+  }
+}
+
+/* Cores forçadas: o brilho é decoração e some; o traço fica com o texto do sistema. */
+@media (forced-colors: active) {
+  .eb-neon {
+    display: none;
+  }
+}

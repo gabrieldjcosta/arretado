@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { CACTO, CAIXA_DO_LOCKUP, CAMINHO_DA_LUZ, NOME, PONTO } from './geometria';
+import { NeonDoNome } from './NeonDoNome';
 import './escrita-b.css';
 import './escrita.css';
 
@@ -41,13 +42,15 @@ interface Props {
  * mesmas coordenadas do `LockupParado`: o quadro final é o lockup. Decorativa (`aria-hidden`); quem
  * nomeia é o link do cabeçalho, e o app nunca espera a animação para ser usado. Os tempos e a
  * animação são do CSS gerado (`escrita-b.css`); sem `prefers-reduced-motion`, `pulou` ou `calmo` o
- * quadro final aparece na hora. Os 14 traços e os demais elementos levam o `animation-name` pelo
+ * quadro final aparece na hora. O néon suave (D-D10) é uma cópia larga e borrada dos 14 traços e do
+ * cacto (`NeonDoNome`), sob o desenho: acende com cada letra e assenta quando o nome acaba (ver
+ * `escrita.css`). Os 14 traços e os demais elementos levam o `animation-name` pelo
  * `style` do React (CSSOM), que a CSP `style-src 'self'` deixa passar, ao contrário do atributo
  * `style` escrito no HTML.
  */
 export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: Props) {
   const id = useId();
-  // Duas escritas na mesma tela não podem repetir id: gradiente, filtro e máscara levam o `useId`.
+  // Duas escritas na mesma tela não podem repetir id: gradiente, filtros e máscara levam o `useId`.
   const [tinta, halo, aro] = [`${id}-tinta`, `${id}-halo`, `${id}-aro`];
   const classe = ['lockup', 'eb', curta && 'curta', calmo && 'calmo', pulou && 'pulou']
     .filter(Boolean)
@@ -85,6 +88,8 @@ export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: P
           </g>
         </mask>
       </defs>
+      {/* O néon suave (D-D10): a cópia larga e borrada das letras e do cacto, que se escreve junto. */}
+      <NeonDoNome animado />
       {NOME.map(([d, x], i) => (
         <path
           key={`${String(x)}${d}`}
