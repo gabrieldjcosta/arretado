@@ -16,7 +16,7 @@ Cinco folhas em `m4/` mostram o que o Zé (D-D10) e o néon suave mudaram. **Ant
 
 - Chromium do Playwright (com `--font-render-hinting=full`, que dá o texto do CI) sobre o `vite preview` de cada build, com o mesmo script nos dois lados (o de agora, apontado por `--url`). O "antes" saiu de um `git worktree` em `ad3a2a2`, com o `node_modules` ligado por link simbólico.
 - `scripts/capturas-ui.mjs --medir`: 15 rotas × 3 Aparelhos (celular, tablet, desktop) × 2 temas, 90 telas, relógio fixo e a Chegada e a Abertura semeadas como vistas.
-- `scripts/capturas-ze.mjs`: as cenas novas (primeira vez, passeio, carregamento, traço, quadro), cada uma num Aparelho novo, a 390×844 (2×) e 1280×800, claro e escuro. A primeira vez é fotografada pelo `performance.now()` (cerca de 50 ms de tolerância). A tela de carregamento "salta" o relógio das animações CSS (`document.getAnimations()`) e sai pelo protocolo (CDP), porque o pacote barrado deixa o documento carregando e o `page.screenshot` fica esperando as fontes. O quadro do cacto fecha três Dias (o relógio anda 24 h a cada um) e fotografa o quarto, que é quando a caneta desenha um braço e o brilho aparece.
+- `scripts/capturas-ze.mjs`: as cenas novas (primeira vez, passeio, carregamento, traço, quadro), cada uma num Aparelho novo, a 390×844 (2×) e 1280×800, claro e escuro. A primeira vez é fotografada pelo `performance.now()` lido antes da foto; a foto a 2× demora, e a imagem sai mais adiantada que o rótulo, em até cerca de 0,6 s (no celular o contorno aparece completo no quadro de "4,6 s", e a medida quadro a quadro dá 1,2 s de contorno depois do pouso). A tela de carregamento "salta" o relógio das animações CSS (`document.getAnimations()`) e sai pelo protocolo (CDP), porque o pacote barrado deixa o documento carregando e o `page.screenshot` fica esperando as fontes. O quadro do cacto fecha três Dias (o relógio anda 24 h a cada um) e fotografa o quarto, que é quando a caneta desenha um braço e o brilho aparece.
 - As folhas são JPEG (qualidade 58, progressivo), compostas a partir desses quadros com um script de uso único que não está no repositório. O `--folhas` do `capturas-ze.mjs` gera folhas de contato equivalentes para qualquer build.
 
 ## Medidas
@@ -71,7 +71,7 @@ Evidência por critério. "E2E" são os arquivos em `e2e/`; os demais ficam em `
 - **Safari e Firefox.** Nada rodou fora do Chromium. O E2E "sem `d: path()` e `offset-path`" simula a falta desses recursos e confere que o quadro final é o nome parado; o Zé nunca rodou num WebKit nem num Gecko.
 - **Leitor de tela.** O Zé é `aria-hidden` e o foco vai ao título (testado em unidade e no axe), mas ninguém ouviu a Chegada num leitor de verdade.
 - **Pessoas de fora (V1).** O "fantasminha" do juiz cego (contrato §13, item 5) segue sem teste com gente.
-- **Quadros da primeira vez.** Os instantes saem do `performance.now()`, não de quadros exatos; os tempos do critério 1 são os dos E2E.
+- **Quadros da primeira vez.** Os rótulos de tempo (1,0 a 8,0 s) são o pedido da foto, não o instante da imagem: ela sai até cerca de 0,6 s mais adiantada. As folhas mostram a ordem e o estado final, não os tempos; os tempos do critério 1 são os dos E2E.
 
 ## Como refazer
 
