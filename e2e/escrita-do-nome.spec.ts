@@ -31,8 +31,13 @@ async function terminou(page: Page) {
   await expect.poll(() => noAr(page), { timeout: 10_000, intervals: [100] }).toEqual([]);
 }
 
-/** O lockup do cabeçalho como pixels: o quadro final tem de ser o mesmo em qualquer caminho até ele. */
+/**
+ * O lockup do cabeçalho como pixels: o quadro final tem de ser o mesmo em qualquer caminho até ele. Espera a tela de
+ * carregamento (index.html) sair: ela esmaece por 160 ms por cima do app que acabou de montar, e um recorte feito
+ * nessa saída tem uns três pontos do nome mais claros (o teste da parada aceita zero).
+ */
 async function lockup(page: Page): Promise<Buffer> {
+  await expect(page.locator('#carregamento')).toHaveCount(0);
   return page.locator('.marca').screenshot({ animations: 'allow' });
 }
 
