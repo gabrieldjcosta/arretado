@@ -464,15 +464,26 @@ test.describe('com a Chegada por abrir', () => {
     await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
 
-    // Outro Dia: a primeira abertura dele, com a Chegada ainda por abrir.
-    await page.evaluate(
-      ([chave, valor]) => {
-        window.localStorage.setItem(chave as string, valor as string);
+    // Outro Dia, com a Chegada ainda por abrir, num carregamento novo: ir ao Hoje de dentro do aplicativo já
+    // a decidiria ali, e ela abriria (e se guardaria como vista) antes de o teste olhar.
+    await page.addInitScript(
+      ([escrita, dia, ...vistas]) => {
+        try {
+          window.localStorage.setItem(escrita as string, dia as string);
+          for (const chave of vistas) window.localStorage.removeItem(chave);
+        } catch {
+          /* sem armazenamento */
+        }
       },
-      [CHAVE, JSON.stringify({ dia: DIA_ANTIGO })],
+      [
+        CHAVE,
+        JSON.stringify({ dia: DIA_ANTIGO }),
+        'arretado:chegada:v1',
+        'arretado:entrada-do-dia:v1',
+      ],
     );
+    await page.goto('about:blank');
     await page.goto('/#/');
-    await page.reload();
     const abertura = camada(page);
     await expect(abertura).toBeVisible();
     await expect(abertura).toHaveAttribute('data-calmo', '');
