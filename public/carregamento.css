@@ -1,0 +1,460 @@
+/* Tela de carregamento do Zé (D-D10, Apêndice F do contrato do Zé).
+   Vive no index.html: HTML, SVG e este CSS, sem JavaScript e sem o pacote do app. É só do tempo: o app a tira quando está pronto.
+   Sem estilo nem script inline (a CSP é estrita): este arquivo é um <link>, o desenho é SVG com atributos de apresentação.
+   O estado de repouso (sem animação) é o Zé pronto: quem não anima, ou não entende a animação, vê a mesma coisa que no fim. */
+
+#carregamento {
+  --c-fundo: #f6f8fb; /* --papel */
+  --c-texto: #0f1c3a; /* --tinta */
+  --c-apoio: #4a5878; /* --tinta-2 */
+  --c-banda: #39caef; /* azul piscina, o brilho do Zé nos dois mundos */
+  --c-ponto: #ffc53d; /* o ponto de luz: amarelo cheio nos dois mundos */
+  --c-aura-aceso: 0.55;
+  --c-aura-repouso: 0.16;
+  --c-olho: #0f1c3a;
+  --c-bochecha: #ec5675;
+  --c-bochecha-op: 0.85;
+  --c-haste: #0f1c3a;
+  --c-fade: 400ms;
+  --c-t0: 1000ms; /* o silêncio do começo: nada aparece antes disso, e o traço só começa 0,15 s depois e só tem tinta visível ~0,3 s mais tarde. Abertura com cache (pronta em até 0,73 s a 4x e 0,98 s a 6x) não mostra nada */
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0)
+    env(safe-area-inset-left, 0);
+  background: var(--c-fundo);
+  color: var(--c-texto);
+  font:
+    0.9375rem/1.45 system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif; /* rem: o texto acompanha o tamanho de letra do navegador */
+  transition: opacity 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  #carregamento {
+    --c-fundo: #0b1322; /* --n-noite */
+    --c-texto: #eef2fa; /* --n-texto */
+    --c-apoio: #a4b1cb; /* --n-texto-2 */
+    --c-aura-aceso: 0.6;
+    --c-aura-repouso: 0.32;
+    --c-olho: #fff;
+    --c-bochecha: #ff86a6;
+    --c-bochecha-op: 1;
+    --c-haste: #fff;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #carregamento {
+    --c-fade: 1ms;
+    transition: none;
+  }
+}
+/* O app tira a tela assim que o primeiro Hoje está pronto: some em 160 ms e deixa passar o toque. */
+#carregamento[data-saindo] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.carr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* O Zé. Mesmo desenho do componente do app (viewBox 22 10 196 240), sem boca; a linha é branca, a faixa é piscina. */
+#carregamento .carr-ze {
+  grid-row: 2;
+  width: clamp(96px, 34vmin, 168px);
+  height: auto;
+  overflow: visible;
+  /* Nada antes de --c-t0: carga rápida (do cache) não pisca uma tela que ninguém chegou a ver. */
+  animation: carr-entra calc(var(--c-fade) * 0.75) cubic-bezier(0.2, 0.7, 0.2, 1) var(--c-t0) both;
+}
+#carregamento
+  :is(.carr-aura, .carr-banda, .carr-linha, .carr-haste, .carr-viaja, .carr-olho, .carr-halo) {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#carregamento :is(.carr-aura, .carr-banda, .carr-linha, .carr-haste) {
+  stroke-dasharray: 1 2;
+}
+#carregamento .carr-aura {
+  stroke: var(--c-banda);
+  stroke-width: 32.3;
+  opacity: var(--c-aura-repouso);
+}
+#carregamento .carr-banda {
+  stroke: var(--c-banda);
+  stroke-width: 17;
+}
+#carregamento .carr-miolo {
+  stroke: none;
+}
+#carregamento .carr-m0 {
+  stop-color: var(--c-banda);
+  stop-opacity: 0.1;
+}
+#carregamento .carr-m1 {
+  stop-color: var(--c-banda);
+  stop-opacity: 0.05;
+}
+#carregamento .carr-m2 {
+  stop-color: var(--c-banda);
+  stop-opacity: 0;
+}
+#carregamento .carr-banda.carr-noite {
+  opacity: 0.55;
+}
+#carregamento .carr-linha {
+  stroke: #fff;
+  stroke-width: 6;
+}
+#carregamento .carr-noite {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  #carregamento .carr-dia {
+    display: none;
+  }
+  #carregamento .carr-noite {
+    display: inline;
+  }
+}
+#carregamento .carr-bochechas ellipse {
+  fill: var(--c-bochecha);
+  fill-opacity: var(--c-bochecha-op);
+}
+#carregamento .carr-olho {
+  stroke: var(--c-olho);
+  stroke-width: 12.5;
+}
+#carregamento .carr-halo {
+  stroke: var(--c-banda);
+  stroke-width: 20.5;
+  opacity: 0.5;
+}
+#carregamento .carr-haste {
+  stroke: var(--c-haste);
+  stroke-width: 3.3;
+}
+#carregamento .carr-fh {
+  fill: var(--c-ponto);
+  opacity: 0.6;
+}
+#carregamento .carr-fp {
+  fill: var(--c-ponto);
+}
+/* A luz que viaja pelo contorno: um ponto de traço de comprimento zero com ponta redonda. Só existe animada. */
+#carregamento .carr-viaja {
+  display: none;
+  stroke: var(--c-ponto);
+  stroke-dasharray: 0 2;
+  stroke-dashoffset: -1;
+}
+#carregamento .carr-viaja-h {
+  stroke-width: 22;
+  stroke-opacity: 0.3;
+}
+#carregamento .carr-viaja-p {
+  stroke-width: 11;
+}
+#carregamento :is(.carr-olho, .carr-halo, .carr-olhos, .carr-flor) {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* O texto. O primeiro bloco chega aos 6 s (espera longa); aos 25 s ele cede ao segundo, que oferece tentar de novo. */
+#carregamento .carr-textos {
+  grid-row: 3;
+  align-self: start;
+  display: grid;
+  justify-items: center;
+  box-sizing: border-box;
+  width: min(100%, 34ch);
+  padding: 28px 16px 0;
+  text-align: center;
+}
+#carregamento .carr-textos p {
+  margin: 0;
+  max-width: none;
+}
+#carregamento .carr-a,
+#carregamento .carr-b {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  opacity: 0;
+}
+#carregamento .carr-apoio {
+  margin-top: 4px;
+  color: var(--c-apoio);
+  font-size: 0.8125rem;
+}
+#carregamento .carr-link {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 12px 16px;
+  color: var(--c-texto);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#carregamento .carr-link:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+#carregamento .carr-textos noscript {
+  grid-area: 2 / 1;
+}
+#carregamento .carr-a {
+  animation:
+    carr-texto var(--c-fade) ease-out 6000ms both,
+    carr-some var(--c-fade) ease-out 25000ms forwards;
+}
+#carregamento .carr-b {
+  animation: carr-texto var(--c-fade) ease-out 25000ms both;
+}
+@keyframes carr-texto {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+@keyframes carr-some {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes carr-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+/* O movimento. A linha do tempo (em segundos depois de --c-t0, o silêncio do começo, 1 s desde a primeira pintura):
+   0 o Zé aparece · 0,15 a 1,35 a luz desenha o contorno e o brilho acende · 1,4 a haste sobe e a luz vira a flor (o miolo acende) · 1,65 os olhos acendem,
+   1,85 as bochechas esquentam · 2,55 uma piscadela · 3,75 piscadas a cada 4,7 s · 5,05 o olhar passeia a cada 7,9 s · 6,05 rajadas de duas piscadas
+   a cada 11,3 s · 7,55 a luz da flor pisca (3 rodadas, a cada 14 s). O texto vai pelo relógio da página: 6 s o primeiro bloco, 25 s o aviso com
+   "Tentar de novo". Tudo acaba em cerca de 1 min: depois disso o Zé fica parado. Os períodos 4,7, 7,9 e 11,3 não se repetem juntos, para o
+   conjunto não virar um laço visível. */
+@media (prefers-reduced-motion: no-preference) {
+  #carregamento .carr-aura,
+  #carregamento .carr-banda,
+  #carregamento .carr-linha {
+    animation: carr-traco 1200ms cubic-bezier(0.4, 0, 0.3, 1) calc(var(--c-t0) + 150ms) both;
+  }
+  #carregamento .carr-aura {
+    animation:
+      carr-traco 1200ms cubic-bezier(0.4, 0, 0.3, 1) calc(var(--c-t0) + 150ms) both,
+      carr-aura 1800ms linear calc(var(--c-t0) + 150ms) both;
+  }
+  #carregamento .carr-viaja {
+    display: inline;
+    animation:
+      carr-luz 1200ms cubic-bezier(0.4, 0, 0.3, 1) calc(var(--c-t0) + 150ms) both,
+      carr-luz-vida 1500ms linear calc(var(--c-t0) + 90ms) both;
+  }
+  #carregamento .carr-haste {
+    animation: carr-traco 250ms cubic-bezier(0.4, 0, 0.3, 1) calc(var(--c-t0) + 1400ms) both;
+  }
+  #carregamento .carr-flor {
+    animation:
+      carr-brota 300ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--c-t0) + 1600ms) both,
+      carr-luz-pisca 14000ms ease-in-out calc(var(--c-t0) + 7550ms) 3;
+  }
+  #carregamento .carr-o1 {
+    animation: carr-entra 160ms ease-out calc(var(--c-t0) + 1650ms) both;
+  }
+  #carregamento .carr-o2 {
+    animation: carr-entra 160ms ease-out calc(var(--c-t0) + 1770ms) both;
+  }
+  #carregamento .carr-bochechas {
+    animation: carr-entra 240ms ease-out calc(var(--c-t0) + 1850ms) both;
+  }
+  #carregamento .carr-miolo {
+    animation: carr-entra 240ms ease-out calc(var(--c-t0) + 1600ms) both;
+  }
+  #carregamento .carr-o2 :is(.carr-olho, .carr-halo) {
+    animation:
+      carr-piscadela 500ms ease-in-out calc(var(--c-t0) + 2550ms),
+      carr-rajada 11300ms ease-in-out calc(var(--c-t0) + 6050ms) 5;
+  }
+  #carregamento .carr-o1 :is(.carr-olho, .carr-halo) {
+    animation: carr-rajada 11300ms ease-in-out calc(var(--c-t0) + 6050ms) 5;
+  }
+  #carregamento .carr-olhos {
+    animation:
+      carr-pisca 4700ms ease-in-out calc(var(--c-t0) + 3750ms) 12,
+      carr-olha 7900ms ease-in-out calc(var(--c-t0) + 5050ms) 7;
+  }
+}
+@keyframes carr-traco {
+  from {
+    stroke-dashoffset: 1.02;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes carr-aura {
+  0% {
+    opacity: 0;
+  }
+  66.6% {
+    opacity: var(--c-aura-aceso);
+  }
+  100% {
+    opacity: var(--c-aura-repouso);
+  }
+}
+@keyframes carr-luz {
+  from {
+    stroke-dashoffset: 0.02;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+@keyframes carr-luz-vida {
+  0% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes carr-brota {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+@keyframes carr-luz-pisca {
+  0%,
+  3.3%,
+  4.3%,
+  7.6%,
+  8.6%,
+  11.9%,
+  100% {
+    opacity: 1;
+  }
+  1.6%,
+  5.9%,
+  10.2% {
+    opacity: 0.12;
+  }
+}
+@keyframes carr-pisca {
+  0%,
+  3.5%,
+  100% {
+    scale: 1;
+  }
+  1.75% {
+    scale: 1 0.12;
+  }
+}
+@keyframes carr-piscadela {
+  0%,
+  100% {
+    scale: 1;
+  }
+  45%,
+  55% {
+    scale: 1 0.12;
+  }
+}
+@keyframes carr-rajada {
+  0%,
+  1.4%,
+  3%,
+  4.4%,
+  100% {
+    scale: 1;
+  }
+  0.7%,
+  3.7% {
+    scale: 1 0.12;
+  }
+}
+@keyframes carr-olha {
+  0%,
+  32%,
+  100% {
+    translate: 0 0;
+  }
+  4%,
+  14% {
+    translate: -2.6px 0;
+  }
+  18%,
+  28% {
+    translate: 2.6px 0;
+  }
+}
+
+/* Na saída o Zé congela onde está: nada novo aparece durante o esmaecer (e a pintura do SVG para). */
+#carregamento[data-saindo],
+#carregamento[data-saindo] * {
+  animation-play-state: paused !important;
+}
+
+/* Sem JavaScript o app nunca abre: nada de "Abrindo…" nem de "Tentar de novo"; fica o aviso do noscript. */
+@media (scripting: none) {
+  #carregamento .carr-a,
+  #carregamento .carr-b {
+    display: none;
+  }
+  #carregamento .carr-textos noscript {
+    grid-area: 1 / 1;
+  }
+}
+
+/* Cores forçadas: brilho, faixa, bochechas e halos são decoração e somem; traço, olhos e flor usam o texto do sistema. */
+@media (forced-colors: active) {
+  #carregamento .carr-aura,
+  #carregamento .carr-banda,
+  #carregamento .carr-halo,
+  #carregamento .carr-miolo,
+  #carregamento .carr-bochechas,
+  #carregamento .carr-fh,
+  #carregamento .carr-viaja-h {
+    display: none;
+  }
+  #carregamento .carr-linha,
+  #carregamento .carr-olho,
+  #carregamento .carr-haste {
+    stroke: CanvasText;
+    forced-color-adjust: none;
+  }
+  #carregamento .carr-fp {
+    fill: CanvasText;
+    forced-color-adjust: none;
+  }
+}

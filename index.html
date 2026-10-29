@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#f6f8fb" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b1322" media="(prefers-color-scheme: dark)" />
     <title>Arretado</title>
+    <link rel="stylesheet" href="/carregamento.css" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icone.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -29,6 +30,103 @@
     />
   </head>
   <body>
+    <div id="carregamento" role="status">
+      <span class="carr-sr">Abrindo o Arretado</span>
+      <svg class="carr-ze" viewBox="22 10 196 240" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="carr-fa" x="-45%" y="-40%" width="190%" height="180%">
+            <feGaussianBlur stdDeviation="11" />
+          </filter>
+          <filter id="carr-fd" x="-30%" y="-25%" width="160%" height="150%">
+            <feGaussianBlur stdDeviation="2.4" />
+          </filter>
+          <filter id="carr-fn" x="-30%" y="-25%" width="160%" height="150%">
+            <feGaussianBlur stdDeviation="4.5" />
+          </filter>
+          <filter id="carr-fb" x="-60%" y="-120%" width="220%" height="340%">
+            <feGaussianBlur stdDeviation="1.8" />
+          </filter>
+          <filter id="carr-fo" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="4.5" />
+          </filter>
+          <linearGradient id="carr-gm" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" class="carr-m0" />
+            <stop offset=".55" class="carr-m1" />
+            <stop offset="1" class="carr-m2" />
+          </linearGradient>
+        </defs>
+        <path
+          class="carr-miolo"
+          fill="url(#carr-gm)"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <g class="carr-bochechas" filter="url(#carr-fb)">
+          <ellipse cx="99.5" cy="100" rx="7.9" ry="5" />
+          <ellipse cx="140.5" cy="100" rx="7.9" ry="5" />
+        </g>
+        <path
+          class="carr-aura"
+          pathLength="1"
+          filter="url(#carr-fa)"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <path
+          class="carr-banda carr-dia"
+          pathLength="1"
+          filter="url(#carr-fd)"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <path
+          class="carr-banda carr-noite"
+          pathLength="1"
+          filter="url(#carr-fn)"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <path
+          class="carr-linha"
+          pathLength="1"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <g class="carr-olhos">
+          <g class="carr-o1" transform="translate(102 74)">
+            <path class="carr-halo carr-noite" filter="url(#carr-fo)" d="M0-5.75V5.75" />
+            <path class="carr-olho" d="M0-5.75V5.75" />
+          </g>
+          <g class="carr-o2" transform="translate(138 74)">
+            <path class="carr-halo carr-noite" filter="url(#carr-fo)" d="M0-5.75V5.75" />
+            <path class="carr-olho" d="M0-5.75V5.75" />
+          </g>
+        </g>
+        <path class="carr-haste" pathLength="1" d="M184 111V101" />
+        <g class="carr-flor">
+          <circle class="carr-fh" cx="184" cy="94" r="10" filter="url(#carr-fo)" />
+          <circle class="carr-fp" cx="184" cy="94" r="5.5" />
+        </g>
+        <path
+          class="carr-viaja carr-viaja-h"
+          pathLength="1"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+        <path
+          class="carr-viaja carr-viaja-p"
+          pathLength="1"
+          d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"
+        />
+      </svg>
+      <div class="carr-textos">
+        <div class="carr-a">
+          <p>Abrindo o Arretado…</p>
+          <p class="carr-apoio">A primeira abertura, com internet lenta, demora mais.</p>
+        </div>
+        <div class="carr-b">
+          <p>Está demorando mais do que o normal.</p>
+          <a class="carr-link" href="">Tentar de novo</a>
+        </div>
+        <noscript
+          ><p class="carr-sem-js">O Arretado precisa do JavaScript ligado para abrir.</p></noscript
+        >
+      </div>
+    </div>
     <div id="raiz"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
