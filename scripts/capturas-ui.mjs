@@ -304,7 +304,9 @@ async function semear(browser, o, url) {
       await page.getByLabel('O que foi').fill(oQueFoi);
       await page.getByRole('button', { name: 'Salvar' }).click();
       await page.getByText('Frase registrada.').waitFor();
-      await page.getByRole('button', { name: 'Sim' }).click();
+      // O cartão já nasce com a frase; o "Sim" só existia na pergunta que saiu (30 s de espera perdidos por erro).
+      const sim = page.getByRole('button', { name: 'Sim' });
+      if ((await sim.count()) > 0) await sim.click();
       await page.getByText(/Cartão criado/).waitFor();
     });
   }
