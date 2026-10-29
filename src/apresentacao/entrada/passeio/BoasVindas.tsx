@@ -73,7 +73,8 @@ export function BoasVindas({
       const pe = ze.current?.peNaTela();
       const area = corpo.current?.getBoundingClientRect();
       if (!pe || !area) return null;
-      const aVista = pe.x >= area.left && pe.x <= area.right && pe.y >= area.top && pe.y <= area.bottom;
+      const aVista =
+        pe.x >= area.left && pe.x <= area.right && pe.y >= area.top && pe.y <= area.bottom;
       return aVista ? pe : null;
     };
     return encontro.oferecer({ medirPe, receber: aoReceber });

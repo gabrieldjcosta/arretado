@@ -107,7 +107,9 @@ async function comASessaoAberta(page: Page, outroDia = false) {
   await page.goto('/#/sessao/iniciar');
   await pularAAbertura(page);
   await page.getByRole('button', { name: 'Começar', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
+  // `exact`: sem ele o título casa com o `h1` "Começar uma Sessão" da tela de começar, antes de a Sessão existir, e o
+  // `reload` abaixo pode chegar antes da gravação (`sessoes` vazio; a tela cheia abre e o cabeçalho nunca escreve).
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão', exact: true })).toBeVisible();
   await page.evaluate(
     ([chave, valor]: [string, string | null]) => {
       if (valor === null) window.localStorage.removeItem(chave);

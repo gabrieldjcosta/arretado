@@ -7,6 +7,13 @@ import { Abertura } from './Abertura';
 import { decidirNaAberturaDoApp } from './regras';
 
 /**
+ * Quanto o app espera a decisão antes de aparecer. A leitura é curta (as Preferências e as Sessões de
+ * hoje); se ainda assim demorar, o app aparece e a camada, se vier, entra por cima: a Abertura nunca
+ * atrasa o uso.
+ */
+const ESPERA_MAXIMA_MS = 400;
+
+/**
  * Decide, uma vez por abertura do aplicativo, quem escreve o nome (a camada de tela cheia ou o
  * cabeçalho), monta a camada quando é dela e diz a quem abre por cima do app (a Chegada) que espere. Na
  * primeira vez, com a Chegada por vir, a luz visita o Zé dela: a Chegada abre já, escondida, e o
@@ -14,9 +21,11 @@ import { decidirNaAberturaDoApp } from './regras';
  *
  * A abertura em que a frequência não pede o nome (as demais do Dia, ou movimento reduzido) é decidida
  * na hora, sem esperar dado nenhum: o cabeçalho nasce parado e nada muda. Nas outras, a leitura das
- * Preferências e da Sessão (ver `decidirOndeEscrever`) diz se a tela cheia abre; até lá o cabeçalho
- * espera, para os dois nunca escreverem juntos. Fica por dentro do repositório (Preferências e Sessão
- * moram nele) e por fora de tudo o que escreve ou abre por cima.
+ * Preferências e da Sessão (ver `decidirOndeEscrever`) diz se a tela cheia abre. Até lá o app não
+ * monta: nem o Hoje aparece antes da tela cheia, nem o cabeçalho fica sem nome, e a camada entra no
+ * mesmo quadro em que o app monta. Montar o app antes só faria a decisão esperar a carga dele. Fica por
+ * dentro do repositório (Preferências e Sessão moram nele) e por fora de tudo o que escreve ou abre por
+ * cima.
  */
 export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   const repo = useRepositorio();
@@ -26,6 +35,7 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
       : { estado: 'pendente' },
   );
   const [saiu, setSaiu] = useState(false);
+  const [cansou, setCansou] = useState(false);
   const [encontro] = useState(criarEncontro);
 
   useEffect(() => {
@@ -38,6 +48,16 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
       ativo = false;
     };
   }, [repo, vez.estado]);
+
+  useEffect(() => {
+    if (vez.estado !== 'pendente') return;
+    const relogio = window.setTimeout(() => {
+      setCansou(true);
+    }, ESPERA_MAXIMA_MS);
+    return () => {
+      window.clearTimeout(relogio);
+    };
+  }, [vez.estado]);
 
   const aoSair = useCallback(() => {
     setSaiu(true);
@@ -57,7 +77,7 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   );
   return (
     <ContextoDaAbertura.Provider value={valor}>
-      {children}
+      {vez.estado === 'pendente' && !cansou ? null : children}
       {naTela && (
         <Abertura
           escrita={naTela.escrita}

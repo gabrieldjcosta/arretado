@@ -136,13 +136,16 @@ function pousarALuz(grupo: SVGGElement, luz: Ponto & { raio: number }, aoZe = fa
 /**
  * O toque ou a tecla que pulou a Abertura é só isso: não aciona o que estiver embaixo. O próprio
  * evento já foi barrado na captura; aqui se engole o que ele ainda gera (o clique depois do toque, o
- * soltar da tecla), uma vez, dentro de uma janela curta.
+ * soltar da tecla), uma vez, dentro de uma janela curta. Com o mouse o navegador não gera o `click` (o
+ * alvo do `pointerdown`, a camada, saiu da árvore): o gesto seguinte desarma a espera por ele, para o
+ * clique legítimo de logo depois não ser engolido no lugar.
  */
 function engolirOQueSegue(origem: Event): void {
   const seguinte = origem.type === 'keydown' ? 'keyup' : 'click';
   const tecla = origem instanceof KeyboardEvent ? origem.key : null;
   const desligar = () => {
     document.removeEventListener(seguinte, engolir, true);
+    document.removeEventListener('pointerdown', desligar, true);
     window.clearTimeout(relogio);
   };
   function engolir(e: Event) {
@@ -153,6 +156,7 @@ function engolirOQueSegue(origem: Event): void {
   }
   const relogio = window.setTimeout(desligar, JANELA_DO_GESTO_MS);
   document.addEventListener(seguinte, engolir, true);
+  if (origem.type === 'pointerdown') document.addEventListener('pointerdown', desligar, true);
 }
 
 /**
@@ -209,6 +213,14 @@ export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
       document.removeEventListener('pointerdown', pular, opcoes);
       document.removeEventListener('keydown', pular, opcoes);
     };
+    // A roda do mouse não pula (só o toque e a tecla), mas também não rola a tela de baixo. Fora do zoom por pinça.
+    document.addEventListener(
+      'wheel',
+      (e) => {
+        if (!e.ctrlKey) e.preventDefault();
+      },
+      { capture: true, passive: false, signal: sinal },
+    );
 
     const tempos = TEMPOS[escrita];
     // Uma função e não `sinal.aborted` direto: o TypeScript fixaria o valor da primeira checagem para as seguintes,

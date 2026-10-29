@@ -50,6 +50,9 @@ async function surgirOlho(ze: ControleDoZe, olho: 0 | 1, sinal: AbortSignal) {
  * (então não mexe mais em nada: quem o abortou cuida do que vem depois).
  */
 export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): Promise<void> {
+  // Uma função e não `sinal.aborted` direto: o TypeScript fixaria o valor da primeira checagem para as seguintes,
+  // e é justamente depois de cada espera que o sinal pode ter mudado.
+  const abortado = () => sinal.aborted;
   const corpo = ze.corpo;
   const total = ze.comprimento();
   if (movimentoAgora() !== 'normal' || !corpo || total === 0) {
@@ -78,7 +81,7 @@ export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): 
     },
     sinal,
   );
-  if (sinal.aborted) return;
+  if (abortado()) return;
   ze.tracoPronto();
 
   // 2. A luz salta do pé direito ao braço, o miolo acende e o néon assenta; ela vira a flor.
@@ -97,7 +100,7 @@ export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): 
     },
     sinal,
   );
-  if (sinal.aborted) return;
+  if (abortado()) return;
   ze.mostrar('miolo');
   ze.pena(null);
   ze.florEscala(ESCALA_INICIAL);
@@ -110,17 +113,17 @@ export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): 
     },
     sinal,
   );
-  if (sinal.aborted) return;
+  if (abortado()) return;
   ze.florEscala(1);
 
   // 3. Os olhos surgem, um depois do outro; as bochechas esquentam e o olho direito dá uma piscadela.
   await esperar(80, sinal);
-  if (sinal.aborted) return;
+  if (abortado()) return;
   void surgirOlho(ze, 0, sinal);
   await esperar(120, sinal);
-  if (sinal.aborted) return;
+  if (abortado()) return;
   await surgirOlho(ze, 1, sinal);
-  if (sinal.aborted) return;
+  if (abortado()) return;
   await andar(
     240,
     curva,
@@ -129,11 +132,11 @@ export async function desenharOZe(ze: ControleDoZe, { sinal, aoMeio }: Opcoes): 
     },
     sinal,
   );
-  if (sinal.aborted) return;
+  if (abortado()) return;
   ze.mostrar('bochechas');
   await esperar(260, sinal);
-  if (sinal.aborted) return;
+  if (abortado()) return;
   await ze.piscadela(1);
-  if (sinal.aborted) return;
+  if (abortado()) return;
   ze.tudoVisivel();
 }

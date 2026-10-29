@@ -50,7 +50,13 @@ describe('a viagem da luz (M2 e M3b do Zé)', () => {
   it('com `controle`, o arco passa por ele e não pelo ponto ao lado do caminho', () => {
     const de = { x: 300, y: 400 };
     const para = { x: 100, y: 200 };
-    const aoZe: Viagem = { de, para, raioDe: 4, raioPara: 4, controle: pontoDeControleAoZe(de, para) };
+    const aoZe: Viagem = {
+      de,
+      para,
+      raioDe: 4,
+      raioPara: 4,
+      controle: pontoDeControleAoZe(de, para),
+    };
     const meio = luzNaViagem(aoZe, 0.5);
     // Uma Bézier quadrática a 0,5 é (de + 2·controle + para) / 4.
     expect(meio.x).toBeCloseTo((de.x + 2 * aoZe.controle!.x + para.x) / 4, 9);

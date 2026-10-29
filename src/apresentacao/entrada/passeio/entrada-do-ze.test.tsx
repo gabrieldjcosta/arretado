@@ -19,7 +19,13 @@ beforeEach(() => {
   simularMovimento('normal');
   medirOContorno();
   vi.useFakeTimers({
-    toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance'],
+    toFake: [
+      'setTimeout',
+      'clearTimeout',
+      'requestAnimationFrame',
+      'cancelAnimationFrame',
+      'performance',
+    ],
   });
 });
 
@@ -50,7 +56,9 @@ describe('a entrada do Zé: a luz desenha o contorno, a flor brota e o rosto ace
     const { ze, el, opacidade, pena } = montar();
     void desenharOZe(ze, { sinal: new AbortController().signal, aoMeio: vi.fn() });
     expect(opacidade('.z-linha')).toBe('');
-    expect(el('.z-linha')?.style.strokeDasharray).toBe(`${String(COMPRIMENTO)} ${String(COMPRIMENTO)}`);
+    expect(el('.z-linha')?.style.strokeDasharray).toBe(
+      `${String(COMPRIMENTO)} ${String(COMPRIMENTO)}`,
+    );
     expect(el('.z-linha')?.style.strokeDashoffset).toBe(String(COMPRIMENTO));
     for (const escondida of ['.z-miolo', '.z-flor', '.z-bochechas']) {
       expect(opacidade(escondida)).toBe('0');
@@ -157,11 +165,17 @@ describe('a entrada do Zé: a luz desenha o contorno, a flor brota e o rosto ace
     controle.abort();
     await andar(0);
     expect(acabou).toBe(true);
-    const parado = [el('.z-linha')?.style.strokeDashoffset, pena().lugar, el('.z-flor')?.style.opacity];
+    const parado = [
+      el('.z-linha')?.style.strokeDashoffset,
+      pena().lugar,
+      el('.z-flor')?.style.opacity,
+    ];
     await andar(4000);
-    expect([el('.z-linha')?.style.strokeDashoffset, pena().lugar, el('.z-flor')?.style.opacity]).toEqual(
-      parado,
-    );
+    expect([
+      el('.z-linha')?.style.strokeDashoffset,
+      pena().lugar,
+      el('.z-flor')?.style.opacity,
+    ]).toEqual(parado);
     expect(aoMeio).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });

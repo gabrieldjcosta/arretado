@@ -202,6 +202,64 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
     document.body.removeEventListener('click', aoClicar);
   });
 
+  it('o clique de um dedo de verdade, 150 ms depois do toque, ainda é engolido', async () => {
+    montar();
+    const aoClicar = vi.fn();
+    document.body.addEventListener('click', aoClicar);
+    // O navegador só gera o clique quando o dedo sobe: a janela tem de cobrir o tempo de um toque.
+    fireEvent.pointerDown(document.body);
+    await passar(150);
+    fireEvent.click(document.body);
+    expect(aoClicar).not.toHaveBeenCalled();
+    document.body.removeEventListener('click', aoClicar);
+  });
+
+  it('com o mouse o gesto que pulou não gera clique: o clique do gesto seguinte não é engolido', () => {
+    montar();
+    const aoClicar = vi.fn();
+    document.body.addEventListener('click', aoClicar);
+    // O Chromium não gera o `click` do mouse que pulou (o alvo do `pointerdown` saiu da árvore).
+    fireEvent.pointerDown(document.body);
+    // Outro gesto: o clique dele é legítimo, mesmo logo depois.
+    fireEvent.pointerDown(document.body);
+    fireEvent.click(document.body);
+    expect(aoClicar).toHaveBeenCalledTimes(1);
+    document.body.removeEventListener('click', aoClicar);
+  });
+
+  it('passada a janela do gesto, o documento não guarda o ouvinte que desarma a espera pelo clique', async () => {
+    const adicionados = vi.spyOn(document, 'addEventListener');
+    const removidos = vi.spyOn(document, 'removeEventListener');
+    montar();
+    fireEvent.pointerDown(document.body);
+    await passar(800);
+    // O desarme é o único ouvinte de `pointerdown` registrado com `true` (o do gesto que pula leva um objeto).
+    const desarmes = adicionados.mock.calls.filter(
+      ([tipo, , opcao]) => tipo === 'pointerdown' && opcao === true,
+    );
+    expect(desarmes).toHaveLength(1);
+    expect(removidos).toHaveBeenCalledWith('pointerdown', desarmes[0]?.[1], true);
+  });
+
+  it('a roda do mouse não rola a tela de baixo enquanto a camada está na frente (a pinça segue livre)', async () => {
+    montar();
+    const roda = (ctrlKey = false) =>
+      new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 120, ctrlKey });
+    const durante = roda();
+    document.body.dispatchEvent(durante);
+    expect(durante.defaultPrevented).toBe(true);
+    const pinca = roda(true);
+    document.body.dispatchEvent(pinca);
+    expect(pinca.defaultPrevented).toBe(false);
+    // Pulada a camada, a roda volta ao normal.
+    fireEvent.pointerDown(document.body);
+    const depois = roda();
+    document.body.dispatchEvent(depois);
+    expect(depois.defaultPrevented).toBe(false);
+    // O clique que o toque geraria já não vem: desarma a espera por ele antes do teste seguinte.
+    await passar(800);
+  });
+
   it('a primeira tecla também pula, e é só isso: nem a tecla nem o soltar dela chegam embaixo', () => {
     const { aoSair } = montar();
     const aoTeclar = vi.fn();

@@ -35,6 +35,8 @@ interface Percurso {
   primeira: Ponto | null;
   ultima: Ponto | null;
   alvo: Ponto | null;
+  /** O "Pular" no último quadro do voo (a camada da primeira vez): o botão já saiu de cena? */
+  pularNoVoo: { opacidade: string; visibilidade: string } | null;
 }
 
 /** Espera a camada sair, olhando a cada quadro (a camada já tem de estar na tela). */
@@ -54,6 +56,7 @@ function acompanhar(page: Page): Promise<Percurso> {
           primeira: null,
           ultima: null,
           alvo: null,
+          pularNoVoo: null,
         };
         const fim = performance.now() + 15_000;
         const quadro = () => {
@@ -73,6 +76,11 @@ function acompanhar(page: Page): Promise<Percurso> {
           if (document.querySelector('dialog[open]')) visto.folhasAbertas += 1;
           const disco = abertura.querySelector('.eb-disco');
           if (fase === 'escrevendo' && disco) visto.disco = centro(disco);
+          const botao = abertura.querySelector('.abertura-pular');
+          if (fase === 'voando' && botao) {
+            const { opacity, visibility } = getComputedStyle(botao);
+            visto.pularNoVoo = { opacidade: opacity, visibilidade: visibility };
+          }
           const luz = abertura.querySelector('.abertura-luz g');
           if (luz?.getAttribute('visibility') === 'visible') {
             const lugar = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(
@@ -165,6 +173,8 @@ test('primeira vez no aparelho: o nome em tela cheia, "Pular" à vista, a luz vo
   expect(distancia(percurso.primeira, percurso.disco)).toBeLessThan(2);
   expect(distancia(percurso.primeira, percurso.alvo)).toBeGreaterThan(100);
   expect(distancia(percurso.ultima, percurso.alvo)).toBeLessThan(8);
+  // O "Pular" não fica sozinho sobre a barra de baixo quando o fundo já é transparente.
+  expect(percurso.pularNoVoo).toEqual({ opacidade: '0', visibilidade: 'hidden' });
 
   await expect(abertura).toHaveCount(0);
   await expect(page.locator('.marca .lockup-ponto')).toBeVisible();
@@ -355,7 +365,9 @@ test('perfil Calmo, com o "só estudo" desligado: a camada só esmaece, sem cane
 });
 
 test.describe('o nome cabe em tela pequena e em zoom', () => {
-  // O relógio parado: a camada fica onde está o tempo que a medição levar, em qualquer máquina.
+  // O `install()` instala o relógio falso, mas ele segue andando em tempo real: não segura a camada (a da primeira vez
+  // sai em 3,4 s, a do Calmo em 1,3 s). Estes testes medem rápido e correm contra esse tempo; o axe precisa dos
+  // temporizadores da página, então o relógio não pode ficar parado (`pauseAt` o trava).
   test.beforeEach(async ({ page }) => {
     await page.clock.install();
   });
