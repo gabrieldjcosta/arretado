@@ -1,5 +1,6 @@
 import { restaurarMovimento, simularMovimento } from '../testes/movimento';
 import {
+  criarCurva,
   curva,
   documentoInativo,
   esperar,
@@ -91,6 +92,17 @@ describe('curvas', () => {
     }
     expect(curva(0.25)).toBeGreaterThan(0.25);
     expect(curva(0.5)).toBeGreaterThan(0.5);
+  });
+
+  it('criarCurva faz qualquer cubic-bezier do CSS: a do app é a (0,2; 0,7; 0,2; 1) e a linear é a identidade', () => {
+    const doApp = criarCurva(0.2, 0.7, 0.2, 1);
+    for (const p of [0, 0.1, 0.5, 0.9, 1]) expect(doApp(p)).toBeCloseTo(curva(p), 9);
+    const linear = criarCurva(0, 0, 1, 1);
+    for (const p of [0, 0.25, 0.5, 0.75, 1]) expect(linear(p)).toBeCloseTo(p, 4);
+    // A da viagem da luz (kit da marca) arranca devagar e assenta: abaixo da reta no começo.
+    const viagem = criarCurva(0.45, 0, 0.2, 1);
+    expect(viagem(0.1)).toBeLessThan(0.1);
+    expect(viagem(0.9)).toBeGreaterThan(0.9);
   });
 });
 

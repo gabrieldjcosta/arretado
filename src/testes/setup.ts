@@ -42,13 +42,15 @@ if (typeof window !== 'undefined') window.scrollTo = () => undefined;
 instalarMatchMedia();
 afterEach(restaurarMovimento);
 
-// A Chegada e a Entrada do Dia abrem na primeira abertura do aparelho e na primeira de cada Dia, e um
-// <dialog> modal deixa o resto da tela inerte. Por isso todo teste começa como um aparelho que já viu as
-// duas (as mesmas chaves de `entrada/regras.ts`, conferidas em `regras.test.ts`); quem testa a abertura
-// apaga as chaves. `localStorage.clear()`, que vários testes chamam, semeia de novo.
+// A Chegada, a Entrada do Dia e a Abertura (a escrita do nome em tela cheia) abrem na primeira abertura do
+// aparelho e na primeira de cada Dia; um <dialog> modal deixa o resto da tela inerte, e a Abertura engole o
+// primeiro toque ou tecla. Por isso todo teste começa como um aparelho que já viu as três (as mesmas chaves de
+// `entrada/regras.ts` e de `componentes/escrita/frequencia.ts`, conferidas nos testes de cada um); quem testa a
+// abertura apaga as chaves. `localStorage.clear()`, que vários testes chamam, semeia de novo.
 const ABERTURA_JA_VISTA: Record<string, string> = {
   'arretado:chegada:v1': '{"vista":true}',
   'arretado:entrada-do-dia:v1': '{"dia":"9999-12-31"}',
+  'arretado:escrita-do-nome:v1': '{"dia":"9999-12-31"}',
 };
 function semearAberturaJaVista() {
   try {

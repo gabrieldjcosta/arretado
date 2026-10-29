@@ -193,11 +193,13 @@ const TAREFAS = [
   'Revisar o resumo de prisões cautelares',
 ];
 
-// A Chegada e a Entrada do Dia são um <dialog> modal sobre o Hoje (src/apresentacao/entrada/regras.ts):
-// a captura quer as telas, então parte de um aparelho que já viu as duas.
+// A Chegada e a Entrada do Dia são um <dialog> modal sobre o Hoje (src/apresentacao/entrada/regras.ts) e
+// a Abertura é o nome em tela cheia, por cima de tudo: a captura quer as telas, então parte de um
+// aparelho que já viu as duas e já viu o nome escrito hoje.
 const ABERTURA_JA_VISTA = {
   'arretado:chegada:v1': '{"vista":true}',
   'arretado:entrada-do-dia:v1': '{"dia":"9999-12-31"}',
+  'arretado:escrita-do-nome:v1': '{"dia":"9999-12-31"}',
 };
 async function aberturaJaVista(ctx) {
   await ctx.addInitScript((chaves) => {
