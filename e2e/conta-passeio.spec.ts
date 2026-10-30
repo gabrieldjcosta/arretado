@@ -29,7 +29,9 @@ test.describe('Começar, com a conta ligada', () => {
     const folha = comecar(page);
     const google = folha.getByRole('button', { name: 'Entrar com o Google' });
     await expect(google).toBeVisible();
-    await expect(folha.getByText(/Ao entrar, seu estudo passa a ser guardado na sua conta/)).toBeVisible();
+    await expect(
+      folha.getByText(/Ao entrar, seu estudo passa a ser guardado na sua conta/),
+    ).toBeVisible();
     await expect(
       folha.getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
