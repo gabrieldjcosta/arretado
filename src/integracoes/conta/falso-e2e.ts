@@ -41,6 +41,16 @@ export function uidDoEmail(email: string): string {
   return `00000000-0000-4000-8000-${h.toString(16).padStart(8, '0')}0000`;
 }
 
+const MARCA_DO_SERVIDOR = 'arretado:e2e-servidor-sync';
+
+function servidorFalsoInstalado(): boolean {
+  try {
+    return localStorage.getItem(MARCA_DO_SERVIDOR) === '1';
+  } catch {
+    return false;
+  }
+}
+
 /** Chama o servidor falso do teste; a sessão vai no corpo (o servidor é por conta). */
 async function chamarServidor<T>(
   funcao: string,
@@ -113,6 +123,11 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
     return Promise.resolve();
   }
   aceitarSincronizacao(versao: string): Promise<void> {
+    // A sincronização liga sozinha após o login: sem servidor falso no teste (`instalar` deixa a
+    // marca), recusa de pronto, sem tocar a rede (um 404 sujaria o console de todo teste de conta).
+    if (!servidorFalsoInstalado()) {
+      return Promise.reject(new FalhaDeSincronizacao('Sem servidor de teste.', false));
+    }
     return chamarServidor('aceitar_sincronizacao', { versao }).then(() => undefined);
   }
   /**
