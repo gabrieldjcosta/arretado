@@ -31,6 +31,8 @@ export interface ControleDeSincronizacao {
   sincronizarAgora(): void;
   /** Registra o aceite v4 (servidor primeiro) e liga. Rejeita com `FalhaDeConta` se a conta não foi liberada. */
   ligar(): Promise<void>;
+  /** Para de enviar e receber neste Aparelho; o que já subiu fica na conta. Religa em "Ligar". */
+  desligar(): void;
   /** "Passar a editar aqui": assume a posse de um aparelho em uso. */
   editarAqui(): Promise<void>;
 }

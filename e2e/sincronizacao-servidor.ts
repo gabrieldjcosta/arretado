@@ -69,6 +69,13 @@ export class ServidorDeSincronizacaoFalso {
 
   /** `nome` identifica o aparelho para `cortarRede`/`religarRede` (o `setOffline` do Playwright não barra rotas). */
   async instalar(context: BrowserContext, nome: string): Promise<void> {
+    await context.addInitScript(() => {
+      try {
+        localStorage.setItem('arretado:e2e-servidor-sync', '1');
+      } catch {
+        /* sem armazenamento */
+      }
+    });
     await context.route('**/__sync/*', (route) => this.atender(route, nome));
   }
   cortarRede(nome: string): void {
