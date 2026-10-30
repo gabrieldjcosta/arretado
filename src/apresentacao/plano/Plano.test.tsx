@@ -92,9 +92,8 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     const linkTrazer = screen.getByRole('link', { name: 'Trazer meu edital' });
     expect(linkTrazer).toHaveAttribute('href', '#importar-edital');
 
-    // O passo a passo continua, como caminho secundário.
-    const linkCatalogo = screen.getByRole('link', { name: 'Montar pelo catálogo' });
-    expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
+    // O catálogo não é mais uma terceira porta: vive dentro de "Escolher meu concurso".
+    expect(screen.queryByRole('link', { name: 'Montar pelo catálogo' })).not.toBeInTheDocument();
   });
 
   it('copia o prompt exato para IA no clipboard', async () => {
