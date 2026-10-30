@@ -41,7 +41,8 @@ export function Comecar() {
       {carga.estado === 'pronto' && (
         <>
           <p className="dica">
-            Cada carreira começa pelas normas que mais aparecem nos editais dela.
+            Cada carreira começa pelas normas que mais aparecem nos editais dela. Seu concurso não
+            está aqui, ou ainda não saiu o edital? Escolha o mais parecido; dá para ajustar depois.
           </p>
           <ul className="comecar-escolhas">
             {Object.entries(carga.dados.carreiras).map(([slug, c]) => (

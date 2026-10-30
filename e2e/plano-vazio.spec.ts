@@ -16,8 +16,8 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
   ).toBeVisible();
   await expect(page.getByText(/Escolha o concurso e o app monta a Trilha/)).toBeVisible();
 
-  // 2. Um começo só: "Escolher meu concurso" é o principal; "Trazer meu edital" ao lado; o passo a
-  //    passo pelo catálogo continua, como link de texto.
+  // 2. Um começo só: "Escolher meu concurso" é o principal; "Trazer meu edital" ao lado; o catálogo
+  //    vive dentro de "Escolher meu concurso".
   const escolher = page.getByRole('link', { name: 'Escolher meu concurso' });
   await expect(escolher).toBeVisible();
   await expect(escolher).toHaveAttribute('href', '#/comecar');
@@ -26,8 +26,7 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
   const linkTrazer = page.getByRole('link', { name: 'Trazer meu edital' });
   await expect(linkTrazer).toBeVisible();
 
-  const linkCatalogo = page.getByRole('link', { name: 'Montar pelo catálogo' });
-  await expect(linkCatalogo).toHaveAttribute('href', '#/plano/onboarding');
+  await expect(page.getByRole('link', { name: 'Montar pelo catálogo' })).toHaveCount(0);
 
   // Axe nos 2 temas com o estado vazio inicial
   await semViolacoes(page);
