@@ -212,8 +212,18 @@ describe('o CSS da Chegada: o Começar não recebe o toque que sobrou do "Seguir
 });
 
 describe('o CSS da Chegada: o botão do Google (as cores são as das diretrizes dele)', () => {
-  const claro = ['--g-fundo: #ffffff;', '--g-borda: #747775;', '--g-texto: #1f1f1f;'];
-  const escuro = ['--g-fundo: #131314;', '--g-borda: #8e918f;', '--g-texto: #e3e3e3;'];
+  const claro = [
+    '--g-fundo: #ffffff;',
+    '--g-borda: #747775;',
+    '--g-texto: #1f1f1f;',
+    '--g-apoio: #444746;',
+  ];
+  const escuro = [
+    '--g-fundo: #131314;',
+    '--g-borda: #8e918f;',
+    '--g-texto: #e3e3e3;',
+    '--g-apoio: #c4c7c5;',
+  ];
 
   it('claro de dia, escuro à noite, nos três blocos de tema (o do sistema e o forçado)', () => {
     const base = bloco('dialog.dialogo-chegada');
@@ -232,6 +242,40 @@ describe('o CSS da Chegada: o botão do Google (as cores são as das diretrizes 
     expect(botao).toContain('border: 1px solid var(--g-borda);');
     expect(botao).toContain('color: var(--g-texto);');
     expect(botao).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    // A linha de baixo ("e ter sincronização automática") lê a cor de apoio do Google, que tem contraste nos dois mundos.
+    expect(bloco('dialog.dialogo-chegada .botao-google .chegada-opcao-apoio')).toBe(
+      'color: var(--g-apoio);',
+    );
+  });
+});
+
+describe('o CSS da Chegada: os dois botões de conta do Começar (Gabriel, 30/10)', () => {
+  it('os dois levam a mesma regra, com o seletor do <dialog> na frente (o .botao do app tem a mesma especificidade)', () => {
+    const opcao = bloco('dialog.dialogo-chegada .chegada-opcao');
+    expect(opcao).toContain('flex-direction: column;');
+    expect(opcao).toContain('min-height: 3.5rem;');
+    // Sem a frente, o `.botao` global ganharia pela ordem do pacote: o espaço, o recuo e a altura sumiriam.
+    expect(semComentarios).not.toMatch(/(^|[{}])\s*\.chegada-opcao\s*\{/);
+  });
+
+  it('a ação é a linha em negrito e a de baixo é texto comum, de no mínimo 14 px', () => {
+    expect(bloco('.chegada-opcao-apoio')).toContain('font-size: 0.875rem;');
+    expect(bloco('.chegada-opcao-apoio')).toContain('font-weight: 400;');
+    expect(bloco('.chegada-opcao-apoio')).toContain('color: var(--texto-atenuado);');
+    // O botão cheio (a única saída do Começar sem a conta) leva a cor do texto dele também embaixo.
+    expect(bloco('.principal .chegada-opcao-apoio')).toBe('color: inherit;');
+  });
+
+  it('com a conta ligada a folha inteira rola e o corpo ocupa o que sobra (tela baixa e fonte ampliada)', () => {
+    expect(bloco('.chegada-tela[data-conta]')).toContain('overflow-y: auto;');
+    const corpo = bloco('.chegada-tela[data-conta] .chegada-corpo');
+    expect(corpo).toContain('flex: 1 0 auto;');
+    expect(corpo).toContain('overflow: visible;');
+  });
+
+  it('o aviso do aceite e a nota do convite são parágrafos separados, e a nota quebra equilibrada', () => {
+    expect(bloco('.chegada-notas')).toContain('display: grid;');
+    expect(bloco('.chegada-nota')).toContain('text-wrap: balance;');
   });
 });
 

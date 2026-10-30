@@ -39,6 +39,9 @@ const esc = () => {
 };
 const aberta = () => screen.queryByRole('dialog');
 const botao = (nome: string) => screen.getByRole('button', { name: nome });
+/** Os dois botões de conta: o nome é a ação e a linha de baixo, lidas como uma frase só (Gabriel, 30/10). */
+const GOOGLE = 'Entrar com o Google e ter sincronização automática';
+const SEM_CONTA = 'Continuar sem conta e salvar meus dados manualmente';
 /** Tudo o que há guardado, por chave. */
 const guardado = () =>
   Object.fromEntries(
@@ -107,6 +110,70 @@ describe('Chegada › Boas-vindas (primeira vez neste aparelho)', () => {
   it('Esc fecha as Boas-vindas', () => {
     const { aoFechar } = abrir();
     esc();
+    expect(aberta()).toBeNull();
+    expect(aoFechar).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Chegada › pular o passeio leva aos dois botões de conta (Gabriel, 30/10)', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_CONTA', '1');
+  });
+
+  it('as Boas-vindas seguem como eram: "Vamos" e "Agora não", sem botão de conta nem link', () => {
+    abrir();
+    const folha = boasVindas();
+    expect(
+      within(folha)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Agora não', 'Vamos']);
+    expect(within(folha).queryAllByRole('link')).toEqual([]);
+  });
+
+  it('"Agora não" também pula o passeio: com a conta ligada leva ao Começar, onde estão os dois botões', async () => {
+    const { usuario, aoFechar } = abrir();
+    await usuario.click(botao('Agora não'));
+    expect(aoFechar).not.toHaveBeenCalled();
+    const folha = comecar();
+    expect(within(folha).getByRole('button', { name: GOOGLE })).toBeVisible();
+    expect(within(folha).getByRole('button', { name: SEM_CONTA })).toBeVisible();
+  });
+
+  it('"Pular o passeio" e o fim do passeio chegam ao mesmo Começar, com os mesmos dois botões', async () => {
+    const pulado = abrir();
+    await pulado.usuario.click(botao('Vamos'));
+    await pulado.usuario.click(botao('Pular o passeio'));
+    expect(within(comecar()).getByRole('button', { name: GOOGLE })).toBeVisible();
+    expect(within(comecar()).getByRole('button', { name: SEM_CONTA })).toBeVisible();
+    pulado.unmount();
+
+    const inteiro = abrir();
+    await inteiro.usuario.click(botao('Vamos'));
+    for (let i = 0; i < PASSOS.length; i += 1) await inteiro.usuario.click(botao('Seguir'));
+    expect(within(comecar()).getByRole('button', { name: GOOGLE })).toBeVisible();
+    expect(within(comecar()).getByRole('button', { name: SEM_CONTA })).toBeVisible();
+  });
+
+  it('Esc num passo também pula o passeio e leva ao Começar; Esc nas Boas-vindas fecha a folha', async () => {
+    const { usuario, aoFechar } = abrir();
+    await usuario.click(botao('Vamos'));
+    esc();
+    expect(within(comecar()).getByRole('button', { name: GOOGLE })).toBeVisible();
+    expect(aoFechar).not.toHaveBeenCalled();
+  });
+
+  it('refeito (sem `dia`: Ajuda e Conta) "Agora não" fecha a folha: o Começar nunca aparece', async () => {
+    const { usuario, aoFechar } = abrir({});
+    await usuario.click(botao('Agora não'));
+    expect(aberta()).toBeNull();
+    expect(aoFechar).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem a conta ligada (a compilação de teste) "Agora não" continua fechando a folha', async () => {
+    vi.stubEnv('VITE_CONTA', '0');
+    const { usuario, aoFechar } = abrir();
+    await usuario.click(botao('Agora não'));
     expect(aberta()).toBeNull();
     expect(aoFechar).toHaveBeenCalledTimes(1);
   });
@@ -223,20 +290,19 @@ describe('Chegada › o Começar', () => {
     return utilidades;
   }
 
-  it('com a conta ligada: o Google (para a tela Entrar), a nota do convite e a saída sem conta', async () => {
+  it('com a conta ligada: os mesmos dois botões de conta das Boas-vindas, a nota do convite, e nenhum é cheio', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     await ateOComecar();
     const folha = comecar();
-    const google = within(folha).getByRole('button', { name: 'Entrar com o Google' });
+    const google = within(folha).getByRole('button', { name: GOOGLE });
     expect(google.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     expect(google.querySelectorAll('svg path')).toHaveLength(4);
     expect(
       within(folha).getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
-    const semConta = within(folha).getByRole('button', {
-      name: 'Experimentar sem conta e salvar seus dados manualmente',
-    });
+    const semConta = within(folha).getByRole('button', { name: SEM_CONTA });
     expect(semConta).not.toHaveClass('principal');
+    expect(semConta).not.toHaveClass('botao-texto');
   });
 
   it('o Zé do Começar fica contente: os dois olhos viram arcos', async () => {
@@ -252,7 +318,7 @@ describe('Chegada › o Começar', () => {
     const entrar = vi.spyOn(conta, 'entrarComGoogle');
     const { usuario } = await ateOComecar(conta);
     expect(aceiteDoLoginPendente()).toBeNull();
-    await usuario.click(screen.getByRole('button', { name: 'Entrar com o Google' }));
+    await usuario.click(screen.getByRole('button', { name: GOOGLE }));
     expect(entrar).toHaveBeenCalledTimes(1);
     expect(aceiteDoLoginPendente()).not.toBeNull();
   });
@@ -260,7 +326,7 @@ describe('Chegada › o Começar', () => {
   it('o aviso do aceite descreve o botão do Google (quem usa leitor de tela o ouve antes de tocar)', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     await ateOComecar();
-    expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toHaveAccessibleDescription(
+    expect(screen.getByRole('button', { name: GOOGLE })).toHaveAccessibleDescription(
       /Ao entrar, seu estudo passa a ser guardado na sua conta/,
     );
   });
@@ -277,19 +343,15 @@ describe('Chegada › o Começar', () => {
   it('o Google que falha (sem rede) avisa na folha e deixa tentar de novo', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     const { usuario } = await ateOComecar(new ServicoDeContaFalso({ semRede: true }));
-    await usuario.click(screen.getByRole('button', { name: 'Entrar com o Google' }));
+    await usuario.click(screen.getByRole('button', { name: GOOGLE }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível entrar agora');
-    expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: GOOGLE })).toBeEnabled();
   });
 
-  it('"Experimentar sem conta" fecha a folha: o Hoje vazio já oferece "Escolher meu concurso"', async () => {
+  it('"Continuar sem conta" fecha a folha: o Hoje vazio já oferece "Escolher meu concurso"', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     const { usuario, aoFechar } = await ateOComecar();
-    await usuario.click(
-      screen.getByRole('button', {
-        name: 'Experimentar sem conta e salvar seus dados manualmente',
-      }),
-    );
+    await usuario.click(screen.getByRole('button', { name: SEM_CONTA }));
     expect(aberta()).toBeNull();
     expect(aoFechar).toHaveBeenCalledTimes(1);
   });
@@ -300,11 +362,7 @@ describe('Chegada › o Começar', () => {
     const folha = comecar();
     expect(within(folha).queryByRole('link')).not.toBeInTheDocument();
     expect(within(folha).queryByText(/e-mails convidados/)).not.toBeInTheDocument();
-    expect(
-      within(folha).getByRole('button', {
-        name: 'Experimentar sem conta e salvar seus dados manualmente',
-      }),
-    ).toHaveClass('principal');
+    expect(within(folha).getByRole('button', { name: SEM_CONTA })).toHaveClass('principal');
   });
 
   it('Esc no Começar fecha a folha', async () => {

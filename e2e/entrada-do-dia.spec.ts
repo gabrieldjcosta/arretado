@@ -131,7 +131,7 @@ test.describe('Chegada', () => {
     await expect(comecar).toBeVisible();
     await expect(comecar.getByRole('heading', { level: 2 })).toBeFocused();
     await comecar
-      .getByRole('button', { name: 'Experimentar sem conta e salvar seus dados manualmente' })
+      .getByRole('button', { name: 'Continuar sem conta e salvar meus dados manualmente' })
       .click();
     await expect(folhaAberta(page)).toHaveCount(0);
     await expect(hoje(page)).toBeVisible();

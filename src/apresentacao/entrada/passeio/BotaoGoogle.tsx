@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { aceiteDoLoginPendente, marcarAceiteDoLogin } from '../../conta/entrar/aceite';
 import { useServicoDeConta } from '../../conta/entrar/ContextoConta';
-import { COMECAR, ENTRADA_DIRETA } from './passos';
+import { CONTA, ENTRADA_DIRETA } from './passos';
 
 /**
  * O "G" de quatro cores das diretrizes de marca do Google: decorativo, o botão tem o nome em texto, e
@@ -30,29 +30,35 @@ function LogoDoGoogle() {
   );
 }
 
+interface Props {
+  /** O aviso sob os botões, lido junto com este (o toque é o aceite: quem usa leitor de tela não pode perdê-lo). */
+  idDoAceite: string;
+  /** Uma falha ao abrir o login (ou ao guardar o aceite): quem monta decide onde o aviso aparece. `null` o limpa. */
+  aoAvisar: (aviso: string | null) => void;
+}
+
 /**
- * "Entrar com o Google" do Começar: abre o login do Google direto, sem passar pela tela Entrar. O aviso do
- * que sai do Aparelho fica logo abaixo do botão (`ENTRADA_DIRETA.aceite`) e o toque é o aceite, gravado antes do
- * desvio como na tela Entrar. Claro de dia e escuro à noite, como pedem as diretrizes dele.
+ * "Entrar com o Google e ter sincronização automática" na Chegada: abre o login do Google direto, sem passar pela
+ * tela Entrar. O aviso do aceite fica logo abaixo dos botões de conta (`ENTRADA_DIRETA.aceite`) e o toque é o aceite,
+ * gravado antes do desvio como na tela Entrar. Claro de dia e escuro à noite, como pedem as diretrizes do Google;
+ * a primeira linha é o texto da marca, e a segunda é nossa.
  */
-/** `idDoAceite`: o aviso sob o botão, lido junto com ele (o toque é o aceite: quem usa leitor de tela não pode perdê-lo). */
-export function BotaoGoogle({ idDoAceite }: { idDoAceite: string }) {
+export function BotaoGoogle({ idDoAceite, aoAvisar }: Props) {
   const servico = useServicoDeConta();
   const [ocupado, setOcupado] = useState(false);
-  const [aviso, setAviso] = useState<string | null>(null);
 
   const entrar = () => {
     marcarAceiteDoLogin();
     if (aceiteDoLoginPendente() === null) {
-      setAviso(ENTRADA_DIRETA.avisoSemArmazenamento);
+      aoAvisar(ENTRADA_DIRETA.avisoSemArmazenamento);
       return;
     }
     setOcupado(true);
-    setAviso(null);
+    aoAvisar(null);
     servico
       .entrarComGoogle()
       .catch(() => {
-        setAviso(ENTRADA_DIRETA.avisoDeFalha);
+        aoAvisar(ENTRADA_DIRETA.avisoDeFalha);
       })
       .finally(() => {
         setOcupado(false);
@@ -60,22 +66,18 @@ export function BotaoGoogle({ idDoAceite }: { idDoAceite: string }) {
   };
 
   return (
-    <>
-      <button
-        type="button"
-        className="botao botao-google"
-        onClick={entrar}
-        disabled={ocupado}
-        aria-describedby={idDoAceite}
-      >
+    <button
+      type="button"
+      className="botao botao-google chegada-opcao"
+      onClick={entrar}
+      disabled={ocupado}
+      aria-describedby={idDoAceite}
+    >
+      <span className="chegada-opcao-acao">
         <LogoDoGoogle />
-        {COMECAR.google}
-      </button>
-      {aviso && (
-        <p className="chegada-nota" role="alert">
-          {aviso}
-        </p>
-      )}
-    </>
+        {CONTA.google}
+      </span>{' '}
+      <span className="chegada-opcao-apoio">{CONTA.googleApoio}</span>
+    </button>
   );
 }

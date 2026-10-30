@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useId, useState } from 'react';
+import { contasHabilitadas } from '../../integracoes/conta';
 import { Dialogo } from '../componentes/Dialogo';
 import { useEstadoDaAbertura } from '../componentes/escrita/vez-da-escrita';
 import { BoasVindas } from './passeio/BoasVindas';
 import type { EntradaDoZe } from './passeio/entrada-do-ze';
 import {
   anuncioDaTela,
+  aoAgoraNao,
   aoEsc,
   aoPular,
   aoSeguir,
@@ -43,12 +45,12 @@ const CLASSE_DA_ENTRADA: Record<EntradaDoZe, string> = {
 
 /**
  * A Chegada (D-D10, no lugar da folha da D-D9): a primeira coisa que o aparelho novo mostra, sobre o Hoje.
- * Três telas num `<dialog>` só: as Boas-vindas ("Vamos" e "Agora não"), o Passeio pelos quatro menus (um
- * passo por menu, sem atalho para outra tela) e o Começar (entrar com o Google ou experimentar sem
- * conta). "Escolher meu concurso" saiu daqui: o Hoje vazio já o oferece. Esc fecha as Boas-vindas e o
- * Começar e, num passo, pula o passeio. O título de cada tela nomeia o diálogo, e uma região viva anuncia
- * a tela nova. As regras de para onde cada controle leva estão em `passeio/estado.ts`, e os textos, em
- * `passeio/passos.ts` (uma fonte só, a do Gabriel).
+ * Três telas num `<dialog>` só: as Boas-vindas ("Vamos" e "Agora não", que com a conta ligada também leva
+ * ao Começar), o Passeio pelos quatro menus (um passo por menu, sem atalho para outra tela) e o Começar (os
+ * dois botões de conta: entrar com o Google ou continuar sem conta). "Escolher meu concurso" saiu daqui: o
+ * Hoje vazio já o oferece. Esc fecha as Boas-vindas e o Começar e, num passo, pula o passeio. O título de
+ * cada tela nomeia o diálogo, e uma região viva anuncia a tela nova. As regras de para onde cada controle
+ * leva estão em `passeio/estado.ts`, e os textos, em `passeio/passos.ts` (uma fonte só, a do Gabriel).
  *
  * Na primeira vez, se a luz da Abertura vai ao Zé (`voaParaAChegada`), a Chegada abre já, na `espera`:
  * invisível e sem pegar toque, por cima da Abertura, para a luz ter para onde voar. Quando a luz pousa
@@ -112,7 +114,9 @@ export function Chegada({ dia, inicio = 'boas', aoFechar }: Props) {
           aoVamos={() => {
             ir(aoVamos());
           }}
-          aoAgoraNao={fechar}
+          aoAgoraNao={() => {
+            ir(aoAgoraNao(roteiro, contasHabilitadas()));
+          }}
           entrada={entrada}
           encontro={encontro}
           aoReceber={receber}
