@@ -30,7 +30,7 @@ Mensagem [Gabriel, 28/10]: "Bora conhecer a ferramenta que vai facilitar de verd
 2. **Boas-vindas:** o Zé se desenha (1,2 s), o rosto acende (0,6 s) e ele dá uma piscadela. Depois pisca os dois olhos em rajadas curtas; se a pessoa demora, a luz amarela da mão pisca (§9).
 3. **Passeio** (um passo por toque, sem atalho para outra tela): Hoje, Trilha, Fixar e Biblioteca. O Zé olha para o texto do passo, uma vez por passo.
 4. **Começar:** "Vamo começar?", o botão do Google (que abre a tela Entrar, onde o aceite vem antes do login) e "Experimentar sem conta e salvar seus dados manualmente", que leva ao Hoje.
-5. **Refazer:** Conta › "Passeio pelos menus" (abre os passos direto) e Ajuda › "Rever as boas-vindas". Nos dois casos é uma revisão: o último passo diz "Concluir", a tela Começar não aparece e nada se grava.
+5. **Refazer:** Conta › "Passeio pelos menus" (abre os passos direto) e Ajuda › "Rever as boas-vindas". Nos dois casos é uma revisão: o último passo diz "Concluir", a tela Começar não aparece e nada se grava (no Começar da primeira vez, o toque em "Entrar com o Google" grava o aceite do login).
 
 Pular: toque, tecla ou "Pular" mostram tudo pronto; "Pular o passeio" leva ao Começar.
 

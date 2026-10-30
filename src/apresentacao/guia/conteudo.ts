@@ -45,7 +45,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     ],
   },
   plano: {
-    versao: 4,
+    versao: 5,
     vazio: [
       {
         opcao: 'Informar a data da prova',
@@ -55,12 +55,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       {
         opcao: 'Escolher meu concurso',
         efeito:
-          'o app traz as normas com que o concurso começa e monta a Trilha do edital mais recente; dá para desfazer.',
-      },
-      {
-        opcao: 'Montar pelo catálogo',
-        efeito:
-          'o caminho passo a passo: uma pergunta por tela, da carreira às matérias, com a prévia antes de os Pontos entrarem.',
+          'o app traz as normas com que o concurso começa e monta a Trilha do edital mais recente; dá para trocar o edital e as matérias, e desfazer.',
       },
       {
         opcao: 'Trazer meu edital',

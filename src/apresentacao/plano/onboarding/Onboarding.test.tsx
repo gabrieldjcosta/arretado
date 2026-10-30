@@ -110,3 +110,13 @@ describe('Plano: onboarding pelo catálogo (B2)', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('Plano: onboarding vindo de "Escolher meu concurso"', () => {
+  it('com ?carreira= pula a pergunta da carreira e abre direto o edital', async () => {
+    const { repo } = await repositorioDeTeste();
+    window.location.hash = '#/plano/onboarding?carreira=ministerio-publico';
+    render(<App abrir={() => Promise.resolve(repo)} />);
+    expect(await screen.findByRole('radio', { name: /edital MPGO de 2023/ })).toBeChecked();
+    expect(screen.queryByText('Para qual carreira você estuda?')).not.toBeInTheDocument();
+  });
+});

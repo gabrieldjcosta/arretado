@@ -53,7 +53,7 @@ export function Plano() {
           <Vazio titulo="Monte seu plano do seu jeito">
             <p>
               Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas para
-              ler. Ou traga o seu edital.
+              ler; lá dá para trocar o edital e as matérias. Ou traga o seu edital.
             </p>
             <div className="plano-vazio-caminhos">
               <Link to="/comecar" className="botao principal">
@@ -72,10 +72,6 @@ export function Plano() {
                 Trazer meu edital
               </a>
             </div>
-            <p className="dica">
-              Quer escolher edital e matérias uma a uma?{' '}
-              <Link to="/plano/onboarding">Montar pelo catálogo</Link>.
-            </p>
           </Vazio>
           <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
