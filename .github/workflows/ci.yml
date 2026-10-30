@@ -32,7 +32,7 @@ jobs:
 
   # Um job por aparelho, em paralelo: a suíte inteira numa fila só passou de 20 minutos.
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false
