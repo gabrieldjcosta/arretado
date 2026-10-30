@@ -39,6 +39,7 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      <GuiaDaTela tela="plano" vazio={dados.pontos.length === 0} />
       {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
       {dados.pontos.length > 0 && <ProximoBloco />}
       <ProvaDoPlano />
@@ -72,7 +73,6 @@ export function Plano() {
               </a>
             </div>
           </Vazio>
-          <GuiaDaTela tela="plano" />
           <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
       ) : (

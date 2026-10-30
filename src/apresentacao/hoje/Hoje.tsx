@@ -45,6 +45,7 @@ export function Hoje() {
   return (
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
+      <GuiaDaTela tela="hoje" vazio={hoje.retrato?.agora.tipo === 'vazio'} />
       <PontosDoDia retrato={hoje.retrato} />
       <div className="hoje-colunas">
         <div>
@@ -54,7 +55,6 @@ export function Hoje() {
           <DiasParaAProva />
           {/* Depois da folha: o cartão de volta de pausa não empurra o Começar para baixo da barra. */}
           <BoasVindas />
-          {hoje.retrato?.agora.tipo === 'vazio' && <GuiaDaTela tela="hoje" />}
         </div>
         <div>
           {/* S7: no máximo dois blocos à vista abaixo do Agora, na ordem de prioridade; o resto em "Ver mais". */}

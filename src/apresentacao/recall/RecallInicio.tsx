@@ -46,6 +46,7 @@ export function RecallInicio() {
   return (
     <>
       <TituloComMais>{ROTULO_DA_AREA.recall}</TituloComMais>
+      <GuiaDaTela tela="recall" vazio={dados?.primeiroUso === true} />
       {dados && <DiasDaSemana dias={dados.dias} />}
       {vencidos > 0 ? (
         <AcaoAgora
@@ -71,7 +72,6 @@ export function RecallInicio() {
           para="/recall/registrar"
         />
       )}
-      {dados?.primeiroUso && <GuiaDaTela tela="recall" />}
       <p className="dica">
         <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no texto
         da lei (piloto).
