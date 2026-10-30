@@ -104,14 +104,14 @@ export function ProvedorSincronizacao({
       const desligada = pessoaDesligou(repo.ctx.usuarioId);
       if (!desligada && !(await temConsentimento(repo, 'sincronizar'))) {
         // Padrão de quem entrou (o aviso do login já diz que o estudo vai para a conta): tenta ligar
-        // sozinho. Sem conta liberada ou sem rede, fica como estava e a tela Sincronização oferece.
-        if (await temConsentimento(repo, 'login')) {
-          try {
-            await servico.aceitarSincronizacao(`${VERSAO_POLITICA_SINCRONIZACAO}:sincronizar`);
-            await registrarConsentimento(repo, 'sincronizar');
-          } catch {
-            // Segue para o estado parado abaixo.
-          }
+        // sozinho. Ter sessão basta, porque entrar exige o aceite; o aceite do login só é gravado
+        // no banco da conta depois, então checá-lo aqui perderia a corrida. Sem conta liberada ou sem
+        // rede, fica como estava e a tela Sincronização oferece.
+        try {
+          await servico.aceitarSincronizacao(`${VERSAO_POLITICA_SINCRONIZACAO}:sincronizar`);
+          await registrarConsentimento(repo, 'sincronizar');
+        } catch {
+          // Segue para o estado parado abaixo.
         }
       }
       if (desligada || !(await temConsentimento(repo, 'sincronizar'))) {
