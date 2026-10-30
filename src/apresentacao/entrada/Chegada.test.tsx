@@ -5,21 +5,29 @@ import { MemoryRouter } from 'react-router';
 import { criarEncontro, type OfertaDaChegada } from '../componentes/escrita/encontro';
 import { ContextoDaAbertura } from '../componentes/escrita/vez-da-escrita';
 import { caminhoDoOlho } from '../componentes/ze/geometria';
+import { ProvedorConta } from '../conta/entrar/ContextoConta';
+import { aceiteDoLoginPendente } from '../conta/entrar/aceite';
+import { ServicoDeContaFalso } from '../../integracoes/conta';
 import { Chegada } from './Chegada';
 import { PASSOS } from './passeio/passos';
 import { CHAVE_CHEGADA, CHAVE_ENTRADA } from './regras';
 
 const DIA = '2026-09-23';
 
-function abrir(props: ComponentProps<typeof Chegada> = { dia: DIA }) {
+function abrir(
+  props: ComponentProps<typeof Chegada> = { dia: DIA },
+  conta = new ServicoDeContaFalso(),
+) {
   const usuario = userEvent.setup();
   const aoFechar = vi.fn();
   const tela = render(
-    <MemoryRouter>
-      <Chegada aoFechar={aoFechar} {...props} />
-    </MemoryRouter>,
+    <ProvedorConta servico={conta}>
+      <MemoryRouter>
+        <Chegada aoFechar={aoFechar} {...props} />
+      </MemoryRouter>
+    </ProvedorConta>,
   );
-  return { usuario, aoFechar, ...tela };
+  return { usuario, aoFechar, conta, ...tela };
 }
 
 const boasVindas = () => screen.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
@@ -208,8 +216,8 @@ describe('Chegada › o Passeio', () => {
 });
 
 describe('Chegada › o Começar', () => {
-  async function ateOComecar() {
-    const utilidades = abrir();
+  async function ateOComecar(conta?: ServicoDeContaFalso) {
+    const utilidades = abrir({ dia: DIA }, conta);
     await utilidades.usuario.click(botao('Vamos'));
     await utilidades.usuario.click(botao('Pular o passeio'));
     return utilidades;
@@ -219,12 +227,11 @@ describe('Chegada › o Começar', () => {
     vi.stubEnv('VITE_CONTA', '1');
     await ateOComecar();
     const folha = comecar();
-    const google = within(folha).getByRole('link', { name: 'Entrar com o Google' });
-    expect(google).toHaveAttribute('href', '/conta/entrar');
+    const google = within(folha).getByRole('button', { name: 'Entrar com o Google' });
     expect(google.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     expect(google.querySelectorAll('svg path')).toHaveLength(4);
     expect(
-      within(folha).getByText('Em fase de teste: por enquanto só e-mails convidados entram.'),
+      within(folha).getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
     const semConta = within(folha).getByRole('button', {
       name: 'Experimentar sem conta e salvar seus dados manualmente',
@@ -239,12 +246,40 @@ describe('Chegada › o Começar', () => {
     expect(olhos).toEqual([caminhoDoOlho(1), caminhoDoOlho(1)]);
   });
 
-  it('"Entrar com o Google" tira a folha do caminho e deixa a tela Entrar abrir', async () => {
+  it('"Entrar com o Google" grava o aceite e abre o login direto, sem passar pela tela Entrar', async () => {
+    vi.stubEnv('VITE_CONTA', '1');
+    const conta = new ServicoDeContaFalso();
+    const entrar = vi.spyOn(conta, 'entrarComGoogle');
+    const { usuario } = await ateOComecar(conta);
+    expect(aceiteDoLoginPendente()).toBeNull();
+    await usuario.click(screen.getByRole('button', { name: 'Entrar com o Google' }));
+    expect(entrar).toHaveBeenCalledTimes(1);
+    expect(aceiteDoLoginPendente()).not.toBeNull();
+  });
+
+  it('o aviso do aceite descreve o botão do Google (quem usa leitor de tela o ouve antes de tocar)', async () => {
+    vi.stubEnv('VITE_CONTA', '1');
+    await ateOComecar();
+    expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toHaveAccessibleDescription(
+      /Ao entrar, você aceita o que sai do seu Aparelho/,
+    );
+  });
+
+  it('o aviso do que sai do Aparelho fica à vista e leva à tela Entrar', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     const { usuario, aoFechar } = await ateOComecar();
-    await usuario.click(screen.getByRole('link', { name: 'Entrar com o Google' }));
+    expect(within(comecar()).getByText(/Ao entrar, você aceita/)).toBeVisible();
+    await usuario.click(screen.getByRole('link', { name: 'Ver o que sai do Aparelho' }));
     expect(aberta()).toBeNull();
     expect(aoFechar).toHaveBeenCalled();
+  });
+
+  it('o Google que falha (sem rede) avisa na folha e deixa tentar de novo', async () => {
+    vi.stubEnv('VITE_CONTA', '1');
+    const { usuario } = await ateOComecar(new ServicoDeContaFalso({ semRede: true }));
+    await usuario.click(screen.getByRole('button', { name: 'Entrar com o Google' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível entrar agora');
+    expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toBeEnabled();
   });
 
   it('"Experimentar sem conta" fecha a folha: o Hoje vazio já oferece "Escolher meu concurso"', async () => {

@@ -27,11 +27,11 @@ test.describe('Começar, com a conta ligada', () => {
   }) => {
     await chegarAoComecar(page);
     const folha = comecar(page);
-    const google = folha.getByRole('link', { name: 'Entrar com o Google' });
+    const google = folha.getByRole('button', { name: 'Entrar com o Google' });
     await expect(google).toBeVisible();
-    await expect(google).toHaveAttribute('href', /#\/conta\/entrar$/);
+    await expect(folha.getByText(/Ao entrar, você aceita o que sai do seu Aparelho/)).toBeVisible();
     await expect(
-      folha.getByText('Em fase de teste: por enquanto só e-mails convidados entram.'),
+      folha.getByText(/Em fase de teste: por enquanto só e-mails convidados entram\./),
     ).toBeVisible();
     const semConta = folha.getByRole('button', {
       name: 'Experimentar sem conta e salvar seus dados manualmente',
@@ -39,10 +39,12 @@ test.describe('Começar, com a conta ligada', () => {
     await expect(semConta).toBeVisible();
     await expect(semConta).toHaveClass(/botao-texto/);
 
-    // A ordem de foco é a visual: o Google, e depois o "sem conta".
+    // A ordem de foco é a visual: o Google, o link do aviso e depois o "sem conta".
     await expect(folha.getByRole('heading', { level: 2 })).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(google).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(folha.getByRole('link', { name: 'Ver o que sai do Aparelho' })).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(semConta).toBeFocused();
 
@@ -57,7 +59,7 @@ test.describe('Começar, com a conta ligada', () => {
     page,
   }) => {
     await chegarAoComecar(page);
-    const google = comecar(page).getByRole('link', { name: 'Entrar com o Google' });
+    const google = comecar(page).getByRole('button', { name: 'Entrar com o Google' });
     const cores = () =>
       google.evaluate((el) => {
         const c = getComputedStyle(el);
@@ -71,16 +73,22 @@ test.describe('Começar, com a conta ligada', () => {
     expect(await cores()).toEqual(['rgb(19, 19, 20)', 'rgb(227, 227, 227)', 'rgb(142, 145, 143)']);
   });
 
-  test('o Google leva à tela Entrar (onde está o aceite) e tira a folha do caminho', async ({
+  test('o Google abre o login direto (sem a tela Entrar) e volta já dentro da conta', async ({
     page,
   }) => {
     await chegarAoComecar(page);
-    await comecar(page).getByRole('link', { name: 'Entrar com o Google' }).click();
+    await comecar(page).getByRole('button', { name: 'Entrar com o Google' }).click();
+    await expect(page).not.toHaveURL(/conta\/entrar/);
+    await expect(page.getByText('google@exemplo.com')).toBeVisible();
+  });
+
+  test('"Ver o que sai do Aparelho" leva à tela Entrar e tira a folha do caminho', async ({
+    page,
+  }) => {
+    await chegarAoComecar(page);
+    await comecar(page).getByRole('link', { name: 'Ver o que sai do Aparelho' }).click();
     await expect(page).toHaveURL(/#\/conta\/entrar$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Entrar' })).toBeVisible();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
-    // A pessoa ainda não entrou em conta nenhuma: o toque levou ao aceite, não passou por cima dele.
-    await expect(page.getByText('google@exemplo.com')).toHaveCount(0);
   });
 
   test('o toque que sobra do último "Seguir" não cai no Google: o Começar só recebe toque depois de 400 ms', async ({
@@ -96,7 +104,7 @@ test.describe('Começar, com a conta ligada', () => {
     await expect(comecar(page)).toBeVisible();
 
     // Um segundo toque logo depois (o toque duplo) acerta o que estiver no lugar: com a conta ligada, o Google.
-    const google = comecar(page).getByRole('link', { name: 'Entrar com o Google' });
+    const google = comecar(page).getByRole('button', { name: 'Entrar com o Google' });
     const caixa = await google.boundingBox();
     await page.mouse.click((caixa?.x ?? 0) + (caixa?.width ?? 0) / 2, (caixa?.y ?? 0) + 20);
     await page.waitForTimeout(150);
@@ -106,7 +114,7 @@ test.describe('Começar, com a conta ligada', () => {
     // Passados os 400 ms, o botão responde.
     await page.waitForTimeout(400);
     await google.click();
-    await expect(page).toHaveURL(/#\/conta\/entrar$/);
+    await expect(page.getByText('google@exemplo.com')).toBeVisible();
   });
 
   test('"Experimentar sem conta" fecha a folha e deixa o Hoje', async ({ page }) => {
