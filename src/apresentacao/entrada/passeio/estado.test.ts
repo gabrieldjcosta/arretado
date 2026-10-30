@@ -1,6 +1,5 @@
 import {
   anuncioDaTela,
-  aoAgoraNao,
   aoEsc,
   aoPular,
   aoSeguir,
@@ -58,13 +57,6 @@ describe('o Passeio (D-D10): para onde cada controle leva', () => {
   it('"Pular o passeio" leva ao Começar na primeira vez e fecha quando refeito', () => {
     expect(aoPular(primeira)).toEqual(TELA_COMECAR);
     expect(aoPular(refeito)).toBe('fechar');
-  });
-
-  it('"Agora não" também pula o passeio: com a conta ligada leva ao Começar; sem ela, ou refeito, fecha', () => {
-    expect(aoAgoraNao(primeira, true)).toEqual(TELA_COMECAR);
-    expect(aoAgoraNao(primeira, false)).toBe('fechar');
-    expect(aoAgoraNao(refeito, true)).toBe('fechar');
-    expect(aoAgoraNao(daConta, true)).toBe('fechar');
   });
 
   it('Esc: num passo é "Pular o passeio"; nas Boas-vindas e no Começar fecha a folha', () => {

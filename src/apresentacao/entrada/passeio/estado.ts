@@ -42,13 +42,6 @@ export function aoVoltar(tela: Tela, { origem }: Roteiro): Destino {
 /** "Pular o passeio": na primeira vez vai ao Começar; refeito, fecha. */
 export const aoPular = ({ revisao }: Roteiro): Destino => (revisao ? 'fechar' : TELA_COMECAR);
 
-/**
- * "Agora não" nas Boas-vindas é um jeito de pular o passeio: com a conta ligada leva ao Começar, onde se escolhe entre
- * entrar e continuar sem conta (Gabriel, 30/10); sem ela (a compilação de teste) e refeito, fecha, como sempre.
- */
-export const aoAgoraNao = ({ revisao }: Roteiro, contas: boolean): Destino =>
-  contas && !revisao ? TELA_COMECAR : 'fechar';
-
 /** Esc: num passo é "Pular o passeio"; nas Boas-vindas e no Começar fecha a folha. */
 export function aoEsc(tela: Tela, roteiro: Roteiro): Destino {
   return tela.tipo === 'passo' ? aoPular(roteiro) : 'fechar';

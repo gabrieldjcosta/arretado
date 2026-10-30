@@ -4,9 +4,9 @@ import { expect, semViolacoes, test } from './apoio';
 // Os dois botões de conta do Começar da Chegada (D-D10; Gabriel, 30/10): "Entrar com o Google e ter sincronização
 // automática" e "Continuar sem conta e salvar meus dados manualmente", do mesmo peso, com o aviso do aceite e a nota de
 // que por ora só e-mails convidados entram. A primeira tela segue só com o "Vamos" (e o "Agora não" no alto): os botões
-// vêm depois do passeio ou de qualquer jeito de pulá-lo. Roda no build do E2E da conta (`--mode e2e-conta`, T30;
-// `VITE_CONTA=1`, serviço falso, sem rede). Sem a conta ligada o Começar tem uma saída só, e quem a prova é a
-// `comecar.spec.ts`.
+// vêm ao fim do passeio ou ao pulá-lo ("Pular o passeio" e Esc num passo); o "Agora não" é uma recusa e fecha a folha.
+// Roda no build do E2E da conta (`--mode e2e-conta`, T30; `VITE_CONTA=1`, serviço falso, sem rede). Sem a conta ligada
+// o Começar tem uma saída só, e quem a prova é a `comecar.spec.ts`.
 //
 // Como a `entrada-do-dia.spec.ts`, desliga a semeadura que deixa o aparelho "já visto": a Chegada precisa abrir.
 test.use({ semearAbertura: false });
@@ -170,7 +170,7 @@ test.describe('Começar, com a conta ligada', () => {
   });
 });
 
-test.describe('Os dois botões chegam por qualquer caminho que acaba ou pula o passeio', () => {
+test.describe('Os dois botões chegam ao fim do passeio e ao pulá-lo; o "Agora não" só recusa', () => {
   test('a primeira tela só tem o "Vamos" e o "Agora não", sem botão de conta', async ({ page }) => {
     await page.goto('/#/');
     await expect(boasVindas(page).getByRole('button')).toHaveText(['Agora não', 'Vamos']);
@@ -202,12 +202,12 @@ test.describe('Os dois botões chegam por qualquer caminho que acaba ou pula o p
     await expect(comecar(page).getByRole('button', { name: SEM_CONTA })).toBeVisible();
   });
 
-  test('"Agora não", na primeira tela, também pula o passeio e leva aos dois botões', async ({
+  test('"Agora não" recusa o passeio: fecha a folha e deixa o Hoje, sem passar pelos dois botões', async ({
     page,
   }) => {
     await page.goto('/#/');
     await boasVindas(page).getByRole('button', { name: 'Agora não' }).click();
-    await expect(comecar(page).getByRole('button', { name: GOOGLE })).toBeVisible();
-    await expect(comecar(page).getByRole('button', { name: SEM_CONTA })).toBeVisible();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   });
 });

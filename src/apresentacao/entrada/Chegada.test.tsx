@@ -115,7 +115,7 @@ describe('Chegada › Boas-vindas (primeira vez neste aparelho)', () => {
   });
 });
 
-describe('Chegada › pular o passeio leva aos dois botões de conta (Gabriel, 30/10)', () => {
+describe('Chegada › os dois botões de conta chegam ao fim do passeio ou ao pulá-lo (Gabriel, 30/10)', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_CONTA', '1');
   });
@@ -131,13 +131,11 @@ describe('Chegada › pular o passeio leva aos dois botões de conta (Gabriel, 3
     expect(within(folha).queryAllByRole('link')).toEqual([]);
   });
 
-  it('"Agora não" também pula o passeio: com a conta ligada leva ao Começar, onde estão os dois botões', async () => {
+  it('"Agora não" é uma recusa: fecha a folha, também com a conta ligada, sem passar pelo Começar', async () => {
     const { usuario, aoFechar } = abrir();
     await usuario.click(botao('Agora não'));
-    expect(aoFechar).not.toHaveBeenCalled();
-    const folha = comecar();
-    expect(within(folha).getByRole('button', { name: GOOGLE })).toBeVisible();
-    expect(within(folha).getByRole('button', { name: SEM_CONTA })).toBeVisible();
+    expect(aberta()).toBeNull();
+    expect(aoFechar).toHaveBeenCalledTimes(1);
   });
 
   it('"Pular o passeio" e o fim do passeio chegam ao mesmo Começar, com os mesmos dois botões', async () => {
@@ -161,21 +159,6 @@ describe('Chegada › pular o passeio leva aos dois botões de conta (Gabriel, 3
     esc();
     expect(within(comecar()).getByRole('button', { name: GOOGLE })).toBeVisible();
     expect(aoFechar).not.toHaveBeenCalled();
-  });
-
-  it('refeito (sem `dia`: Ajuda e Conta) "Agora não" fecha a folha: o Começar nunca aparece', async () => {
-    const { usuario, aoFechar } = abrir({});
-    await usuario.click(botao('Agora não'));
-    expect(aberta()).toBeNull();
-    expect(aoFechar).toHaveBeenCalledTimes(1);
-  });
-
-  it('sem a conta ligada (a compilação de teste) "Agora não" continua fechando a folha', async () => {
-    vi.stubEnv('VITE_CONTA', '0');
-    const { usuario, aoFechar } = abrir();
-    await usuario.click(botao('Agora não'));
-    expect(aberta()).toBeNull();
-    expect(aoFechar).toHaveBeenCalledTimes(1);
   });
 });
 
