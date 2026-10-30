@@ -114,7 +114,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(folhas()).toBeNull();
   });
 
-  it('"Vamos" abre o passeio; "Pular o passeio" leva ao Começar, e "Experimentar sem conta" deixa o Hoje, que oferece "Escolher meu concurso"', async () => {
+  it('"Vamos" abre o passeio; "Pular o passeio" leva ao Começar, e "Continuar sem conta" deixa o Hoje, que oferece "Escolher meu concurso"', async () => {
     const { repo } = await repositorioDeTeste();
     const { usuario } = abrirHoje(repo);
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
@@ -125,7 +125,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
     expect(await screen.findByRole('dialog', { name: 'Vamo começar?' })).toBeInTheDocument();
     await usuario.click(
       screen.getByRole('button', {
-        name: 'Experimentar sem conta e salvar seus dados manualmente',
+        name: 'Continuar sem conta e salvar meus dados manualmente',
       }),
     );
 

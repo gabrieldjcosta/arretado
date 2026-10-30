@@ -2,6 +2,7 @@ import { AREAS } from '../../areas';
 import {
   BOAS_VINDAS,
   COMECAR,
+  CONTA,
   CONTROLES,
   ENTRADA_DIRETA,
   PASSEIO_NA_CONTA,
@@ -49,11 +50,13 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
         ],
       ],
     ]);
-    expect(COMECAR).toEqual({
-      titulo: 'Vamo começar?',
+    expect(COMECAR).toEqual({ titulo: 'Vamo começar?' });
+    expect(CONTA).toEqual({
       google: 'Entrar com o Google',
+      googleApoio: 'e ter sincronização automática',
+      semConta: 'Continuar sem conta',
+      semContaApoio: 'e salvar meus dados manualmente',
       nota: 'Em fase de teste: por enquanto só e-mails convidados entram.',
-      semConta: 'Experimentar sem conta e salvar seus dados manualmente',
     });
     expect(PASSEIO_NA_CONTA).toEqual({
       titulo: 'Passeio pelos menus',
@@ -105,9 +108,7 @@ describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
     BOAS_VINDAS.titulo,
     BOAS_VINDAS.frase,
     COMECAR.titulo,
-    COMECAR.nota,
-    COMECAR.semConta,
-    COMECAR.google,
+    ...Object.values(CONTA),
     ...Object.values(ENTRADA_DIRETA),
     PASSEIO_NA_CONTA.titulo,
     PASSEIO_NA_CONTA.apoio,
@@ -119,12 +120,13 @@ describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
     .filter((frase) => frase.length >= 12);
   const componentes = Object.entries(COMPONENTES);
 
-  it('há os sete componentes a conferir', () => {
+  it('há os oito componentes a conferir', () => {
     expect(componentes.map(([nome]) => nome).sort()).toEqual([
       '../../conta/LinhaDoPasseio.tsx',
       '../Chegada.tsx',
       './BoasVindas.tsx',
       './BotaoGoogle.tsx',
+      './BotoesDaConta.tsx',
       './IconeDoPasso.tsx',
       './PassoDoPasseio.tsx',
       './TelaComecar.tsx',
