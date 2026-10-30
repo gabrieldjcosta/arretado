@@ -65,6 +65,9 @@ test('volta de pausa: o Começar vem antes do cartão de boas-vindas e cabe acim
   await page.goto('/#/recall/revisar');
   await page.getByRole('button', { name: 'Mostrar resposta' }).click();
   await page.getByRole('button', { name: 'Fácil' }).click();
+  // A Revisão grava com a data do relógio na hora: só anda o relógio depois do próximo cartão aparecer,
+  // senão num runner lento ela ganha a data de 10 Dias depois e não há pausa para dar boas-vindas.
+  await expect(page.getByText('2 de 3')).toBeVisible();
   await page.clock.setFixedTime(new Date(inicio.getTime() + 10 * DIA));
   await page.goto('/#/');
   await page.reload();
