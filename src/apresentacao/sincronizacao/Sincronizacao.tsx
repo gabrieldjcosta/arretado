@@ -18,7 +18,7 @@ const O_QUE_MUDA: readonly { abertura: string; texto: string }[] = [
   {
     abertura: 'O que vai',
     texto:
-      'O que você estuda passa a ser guardado também na sua conta e aparece em todos os seus Aparelhos: Erros, Cartões, Normas, grifos, notas, Revisões, Sessões e Dias.',
+      'Ao entrar, o que você estuda passa a ser guardado também na sua conta e aparece em todos os seus Aparelhos: Erros, Cartões, Normas, grifos, notas, Revisões, Sessões e Dias.',
   },
   {
     abertura: 'Quem pode ler',
@@ -302,6 +302,15 @@ export function Sincronizacao() {
             }}
           >
             Sincronizar agora
+          </button>
+          <button
+            type="button"
+            className="botao secundario"
+            onClick={() => {
+              sync.desligar();
+            }}
+          >
+            Desligar neste Aparelho
           </button>
         </div>
       </section>

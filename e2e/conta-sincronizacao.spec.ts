@@ -34,9 +34,9 @@ async function novoAparelho(
 }
 
 async function ligarSincronizacao(page: Page) {
+  // Liga sozinha após o login; o botão só aparece se a pessoa desligou.
   await page.goto('/#/conta/sincronizacao');
-  await page.getByRole('button', { name: 'Ligar a sincronização' }).click();
-  await expect(page.getByRole('heading', { name: 'Estado' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Estado' })).toBeVisible({ timeout: 20_000 });
 }
 
 async function escolherPerfil(page: Page, nome: string) {
@@ -67,6 +67,10 @@ test.describe('Sincronização entre aparelhos (F4-B, B4)', () => {
     await entrarPorCodigo(page, EMAIL);
     await ligarSincronizacao(page);
     expect(servidor.aceites).toEqual(['v4:sincronizar']);
+    // Desligar neste Aparelho para o envio; "Ligar" religa.
+    await page.getByRole('button', { name: 'Desligar neste Aparelho' }).click();
+    await page.getByRole('button', { name: 'Ligar a sincronização' }).click();
+    await expect(page.getByRole('heading', { name: 'Estado' })).toBeVisible();
     await expect(page.getByText('Este Aparelho.', { exact: true })).toBeVisible();
     await semViolacoes(page);
     await registrarFrase(page, FRASE_A);

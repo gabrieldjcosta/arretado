@@ -53,13 +53,20 @@ describe('Conta › Sincronização (F4-B, B4)', () => {
     expect(await screen.findByText(/pede uma conta/)).toBeInTheDocument();
   });
 
-  it('sem o aceite v4, explica o que muda e liga com um toque (servidor primeiro, depois o Aparelho)', async () => {
-    const { repo, servico, usuario } = await montar();
-    await usuario.click(await screen.findByRole('button', { name: 'Ligar a sincronização' }));
+  it('quem entrou liga sozinho (servidor primeiro, depois o Aparelho), sem tocar em nada', async () => {
+    const { repo, servico } = await montar();
     expect(await screen.findByRole('heading', { name: 'Estado' })).toBeInTheDocument();
     expect(servico.aceitesDeSincronizacao).toEqual(['v4:sincronizar']);
     expect(await temConsentimento(repo, 'sincronizar')).toBe(true);
     expect(screen.getByText('Este Aparelho.')).toBeInTheDocument();
+  });
+
+  it('desligar neste Aparelho para a sincronização e oferece ligar de novo', async () => {
+    const { usuario } = await montar();
+    await usuario.click(await screen.findByRole('button', { name: 'Desligar neste Aparelho' }));
+    const ligar = await screen.findByRole('button', { name: 'Ligar a sincronização' });
+    await usuario.click(ligar);
+    expect(await screen.findByRole('heading', { name: 'Estado' })).toBeInTheDocument();
   });
 
   it('conta não liberada: o servidor recusa e nada fica marcado no Aparelho', async () => {

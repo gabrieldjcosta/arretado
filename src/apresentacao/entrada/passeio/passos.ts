@@ -70,7 +70,8 @@ export const COMECAR = {
 
 /** Fora do contrato do Gabriel (D-D10): o aviso do aceite sob o botão do Google (o toque nele é o aceite) e as falhas. */
 export const ENTRADA_DIRETA = {
-  aceite: 'Ao entrar, você aceita o que sai do seu Aparelho e a política de privacidade.',
+  aceite:
+    'Ao entrar, seu estudo passa a ser guardado na sua conta (dá para desligar) e você aceita a política de privacidade.',
   verAceite: 'Ver o que sai do Aparelho',
   avisoDeFalha: 'Não foi possível entrar agora. Você continua usando o Arretado sem conta.',
   avisoSemArmazenamento: 'Não foi possível guardar o seu aceite neste navegador.',

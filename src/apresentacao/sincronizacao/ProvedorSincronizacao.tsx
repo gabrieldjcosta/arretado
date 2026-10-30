@@ -3,6 +3,7 @@
 // aceite. O estado que as telas mostram (os três estados, posse, Conflitos, Problemas) mora aqui.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { registrarConsentimento, temConsentimento } from '../../core/preferencias';
+import { pessoaDesligou, registrarDesligada } from './desligada';
 import {
   contarConflitos,
   contarPendentes,
@@ -100,7 +101,20 @@ export function ProvedorSincronizacao({
         setEstado({ ...INICIAL, ligada: false, parada: 'sem-conta' });
         return;
       }
-      if (!(await temConsentimento(repo, 'sincronizar'))) {
+      const desligada = pessoaDesligou(repo.ctx.usuarioId);
+      if (!desligada && !(await temConsentimento(repo, 'sincronizar'))) {
+        // Padrão de quem entrou (o aviso do login já diz que o estudo vai para a conta): tenta ligar
+        // sozinho. Ter sessão basta, porque entrar exige o aceite; o aceite do login só é gravado
+        // no banco da conta depois, então checá-lo aqui perderia a corrida. Sem conta liberada ou sem
+        // rede, fica como estava e a tela Sincronização oferece.
+        try {
+          await servico.aceitarSincronizacao(`${VERSAO_POLITICA_SINCRONIZACAO}:sincronizar`);
+          await registrarConsentimento(repo, 'sincronizar');
+        } catch {
+          // Segue para o estado parado abaixo.
+        }
+      }
+      if (desligada || !(await temConsentimento(repo, 'sincronizar'))) {
         if (vivo()) setEstado({ ...INICIAL, ligada: false, parada: 'sem-aceite' });
         return;
       }
@@ -181,6 +195,11 @@ export function ProvedorSincronizacao({
         // Servidor primeiro: sem conta liberada ele recusa e nada fica marcado aqui.
         await servico.aceitarSincronizacao(`${VERSAO_POLITICA_SINCRONIZACAO}:sincronizar`);
         await registrarConsentimento(repo, 'sincronizar');
+        registrarDesligada(repo.ctx.usuarioId, false);
+        setGeracao((g) => g + 1);
+      },
+      desligar: () => {
+        registrarDesligada(repo.ctx.usuarioId, true);
         setGeracao((g) => g + 1);
       },
       editarAqui: async () => {
