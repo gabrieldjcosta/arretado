@@ -261,14 +261,14 @@ describe('Chegada › o Começar', () => {
     vi.stubEnv('VITE_CONTA', '1');
     await ateOComecar();
     expect(screen.getByRole('button', { name: 'Entrar com o Google' })).toHaveAccessibleDescription(
-      /Ao entrar, você aceita o que sai do seu Aparelho/,
+      /Ao entrar, seu estudo passa a ser guardado na sua conta/,
     );
   });
 
   it('o aviso do que sai do Aparelho fica à vista e leva à tela Entrar', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     const { usuario, aoFechar } = await ateOComecar();
-    expect(within(comecar()).getByText(/Ao entrar, você aceita/)).toBeVisible();
+    expect(within(comecar()).getByText(/Ao entrar, seu estudo passa a ser guardado/)).toBeVisible();
     await usuario.click(screen.getByRole('link', { name: 'Ver o que sai do Aparelho' }));
     expect(aberta()).toBeNull();
     expect(aoFechar).toHaveBeenCalled();

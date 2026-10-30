@@ -112,7 +112,9 @@ export function Entrar({
             (nome e foto, se você entrar com Google). Só isso sai do Aparelho.
           </li>
           <li>
-            Nada do seu estudo sai: Erros, Cartões, Normas, grifos e notas ficam neste Aparelho.
+            Seu estudo (Erros, Cartões, Normas, grifos e notas) passa a ser guardado também na sua
+            conta, para aparecer em todos os seus Aparelhos. Você pode desligar em Conta ›
+            Sincronização.
           </li>
           <li>
             Só se você pedir, uma cópia cifrada dos seus dados vai para a nuvem. A frase de cifra
@@ -129,7 +131,7 @@ export function Entrar({
         </ol>
         <p className="dica">
           Ao entrar (com o Google ou pelo código) você aceita este texto e a política de privacidade
-          versão 3. Leia a política inteira em{' '}
+          versão 4. Leia a política inteira em{' '}
           <Link to="/conta/privacidade">Conta › Privacidade</Link>.
         </p>
       </section>
