@@ -5,7 +5,7 @@
 import { AREAS } from '../../areas';
 
 /**
- * As Boas-vindas (Gabriel, 31/10; D-D11). O `titulo` e a `frase` são as duas partes da fala do Zé e vão sempre
+ * As Boas-vindas (Gabriel, 31/10; D-D11). O `titulo` e a `frase` são as duas partes da saudação e vão sempre
  * inteiras. O `nome` não se vê: é o nome do diálogo para o leitor de tela, porque a Abertura é `aria-hidden`
  * e sem ele ninguém ouviria o nome do app.
  */

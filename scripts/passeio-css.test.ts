@@ -304,7 +304,7 @@ function regrasFolha(origem = semComentarios): Array<{ seletor: string; corpo: s
   return regras;
 }
 
-describe('o CSS da Chegada: a fala do Zé nas Boas-vindas vai sempre inteira (D-D11)', () => {
+describe('o CSS da Chegada: a saudação das Boas-vindas vai sempre inteira (D-D11)', () => {
   it('nenhuma regra do título e da frase os esconde, corta ou limita em linhas', () => {
     const doTexto = regrasFolha().filter(({ seletor }) =>
       /\.chegada-texto|\.chegada-titulo/.test(seletor),
@@ -330,7 +330,7 @@ describe('o CSS da Chegada: a fala do Zé nas Boas-vindas vai sempre inteira (D-
     expect(frase).toContain('text-wrap: balance;');
   });
 
-  it('o corpo da tela rola por dentro: se a fala não cabe, a tela rola antes de perder uma palavra', () => {
+  it('o corpo da tela rola por dentro: se a saudação não cabe, a tela rola antes de perder uma palavra', () => {
     expect(bloco('.chegada-corpo')).toContain('overflow-y: auto;');
     expect(bloco('.chegada-corpo')).toContain('min-height: 0;');
     // E o texto nunca fica fora dele: sem posição fixa nem absoluta no título e na frase.

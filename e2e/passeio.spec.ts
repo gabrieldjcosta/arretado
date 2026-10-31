@@ -150,7 +150,7 @@ test.describe('as cinco telas da Chegada', () => {
   }
 });
 
-test.describe('a fala do Zé nas Boas-vindas (D-D11)', () => {
+test.describe('a saudação das Boas-vindas (D-D11)', () => {
   test('o provérbio e a frase aparecem inteiros, sem corte, em qualquer tamanho; o nome do app fica no nome do diálogo', async ({
     page,
   }) => {

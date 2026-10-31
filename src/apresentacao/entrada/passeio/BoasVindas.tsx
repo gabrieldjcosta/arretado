@@ -26,7 +26,7 @@ interface Props {
 }
 
 /**
- * As Boas-vindas (D-D10): o Zé inteiro, a fala dele (o provérbio e a frase, sempre inteiros: D-D11) e só
+ * As Boas-vindas (D-D10): o Zé inteiro, a saudação (o provérbio e a frase, sempre inteiros: D-D11) e só
  * dois botões, "Vamos" e "Agora não". O Zé dá vida à espera, e só aqui, onde a pessoa escolhe: pisca os
  * dois olhos em rajadas curtas e, se ela demora, a luz amarela da mão dele pisca (3 rodadas, no máximo;
  * `vida-do-ze.ts`). Nos passos e no Começar ele fica quieto. Tudo é decorativo e nenhum botão espera por
