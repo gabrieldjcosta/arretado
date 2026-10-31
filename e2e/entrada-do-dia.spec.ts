@@ -99,7 +99,7 @@ test.describe('Chegada', () => {
     const folha = chegada(page);
     await expect(folha).toBeVisible();
     await expect(
-      folha.getByRole('heading', { level: 2, name: 'Boas-vindas ao Arretado!' }),
+      folha.getByRole('heading', { level: 2, name: 'Rapadura é doce, mas não é mole.' }),
     ).toBeFocused();
     await expect(folha.getByRole('button')).toHaveText(['Agora não', 'Vamos']);
     // Nenhum caminho para outra tela: o Hoje vazio é que oferece "Escolher meu concurso".

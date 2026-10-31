@@ -216,6 +216,8 @@ html[data-perfil='calmo'] .chegada-tela[data-entrada] .revela {
   margin: 0;
   max-width: 24em;
   font-size: 1.0625em;
+  /* Duas linhas parelhas, e não uma comprida e um "como!" sozinho (a frase de 31/10 numa tela larga). */
+  text-wrap: balance;
 }
 
 .chegada-fim-texto h2 {

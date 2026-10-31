@@ -63,17 +63,20 @@ afterEach(() => {
 });
 
 describe('Chegada › Boas-vindas (primeira vez neste aparelho)', () => {
-  it('mostra o Zé, a frase e só dois botões, "Vamos" e "Agora não", sem nenhum link', () => {
+  it('mostra o Zé, o provérbio e a frase, e só dois botões, "Vamos" e "Agora não", sem nenhum link', () => {
     abrir();
     const folha = boasVindas();
     expect(within(folha).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'Boas-vindas ao Arretado!',
+      'Rapadura é doce, mas não é mole.',
     );
     expect(
-      within(folha).getByText(
+      within(folha).getByText('A gente quebra em pedaços pra você. Vou te mostrar como!'),
+    ).toBeVisible();
+    expect(
+      within(folha).queryByText(
         'Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?',
       ),
-    ).toBeVisible();
+    ).not.toBeInTheDocument();
     expect(folha.querySelector('svg.ze')).toBeInTheDocument();
     expect(
       within(folha)
@@ -89,8 +92,24 @@ describe('Chegada › Boas-vindas (primeira vez neste aparelho)', () => {
     const folha = boasVindas();
     expect(within(folha).getByRole('heading', { level: 2 })).toHaveFocus();
     expect(botao('Vamos')).toHaveAccessibleDescription(
-      'Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?',
+      'A gente quebra em pedaços pra você. Vou te mostrar como!',
     );
+  });
+
+  it('o nome do app segue no nome do diálogo, num texto à parte do título que se vê (a Abertura é aria-hidden)', () => {
+    abrir();
+    const folha = boasVindas();
+    expect(folha).toHaveAccessibleName('Boas-vindas ao Arretado!');
+    // Quem dá o nome ao diálogo é um texto que não se vê, e não o título (o provérbio) que se vê.
+    const nome = document.getElementById(folha.getAttribute('aria-labelledby') ?? '');
+    const titulo = within(folha).getByRole('heading', { level: 2 });
+    expect(nome).toHaveTextContent('Boas-vindas ao Arretado!');
+    expect(nome).toHaveClass('visualmente-oculto');
+    expect(nome).not.toBe(titulo);
+    expect(titulo).not.toHaveTextContent('Arretado');
+    // A região viva diz o nome do diálogo; o provérbio, o foco já o lê.
+    expect(screen.getByRole('status')).toHaveTextContent('Boas-vindas ao Arretado!');
+    expect(screen.getByRole('status')).not.toHaveTextContent('Rapadura');
   });
 
   it('grava ao aparecer (a Chegada vista e o Dia da Entrada) e o Zé é decorativo', () => {

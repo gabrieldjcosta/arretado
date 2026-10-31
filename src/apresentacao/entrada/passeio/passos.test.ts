@@ -13,8 +13,9 @@ import {
 describe('os textos do Passeio (D-D10, contrato §7)', () => {
   it('são os do Gabriel, palavra por palavra', () => {
     expect(BOAS_VINDAS).toEqual({
-      titulo: 'Boas-vindas ao Arretado!',
-      frase: 'Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?',
+      nome: 'Boas-vindas ao Arretado!',
+      titulo: 'Rapadura é doce, mas não é mole.',
+      frase: 'A gente quebra em pedaços pra você. Vou te mostrar como!',
       vamos: 'Vamos',
       agoraNao: 'Agora não',
     });
@@ -105,6 +106,7 @@ const COMPONENTES = import.meta.glob<string>(
 
 describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
   const frases = [
+    BOAS_VINDAS.nome,
     BOAS_VINDAS.titulo,
     BOAS_VINDAS.frase,
     COMECAR.titulo,
