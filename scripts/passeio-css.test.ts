@@ -279,6 +279,66 @@ describe('o CSS da Chegada: os dois botões de conta do Começar (Gabriel, 30/10
   });
 });
 
+/** As regras sem regra dentro (de qualquer nível: dentro de `@media` e `@container` também). */
+function regrasFolha(origem = semComentarios): Array<{ seletor: string; corpo: string }> {
+  const regras: Array<{ seletor: string; corpo: string }> = [];
+  let inicio = 0;
+  for (let i = 0; i < origem.length; i += 1) {
+    if (origem[i] === '{') {
+      const fim = origem.indexOf('}', i);
+      const meio = origem.slice(i + 1, fim);
+      if (meio.includes('{')) {
+        inicio = i + 1;
+      } else {
+        regras.push({
+          seletor: origem.slice(inicio, i).replace(/\s+/g, ' ').trim(),
+          corpo: meio.replace(/\s+/g, ' ').trim(),
+        });
+        i = fim;
+        inicio = fim + 1;
+      }
+    } else if (origem[i] === '}') {
+      inicio = i + 1;
+    }
+  }
+  return regras;
+}
+
+describe('o CSS da Chegada: a fala do Zé nas Boas-vindas vai sempre inteira (D-D11)', () => {
+  it('nenhuma regra do título e da frase os esconde, corta ou limita em linhas', () => {
+    const doTexto = regrasFolha().filter(({ seletor }) =>
+      /\.chegada-texto|\.chegada-titulo/.test(seletor),
+    );
+    // Acha as regras de verdade: o título, o texto, a frase e o título da tela baixa.
+    expect(doTexto.map(({ seletor }) => seletor)).toEqual(
+      expect.arrayContaining(['.chegada-titulo', '.chegada-texto h2', '.chegada-texto p']),
+    );
+    for (const { seletor, corpo } of doTexto) {
+      expect(corpo, seletor).not.toMatch(
+        /display:\s*none|visibility:\s*hidden|line-clamp|text-overflow|overflow(-[xy])?:\s*(hidden|clip)|max-height|max-block-size|clip-path|(^|;)\s*clip:/,
+      );
+    }
+  });
+
+  it('o título e a frase quebram equilibrados, a palavra comprida quebra em vez de vazar e a frase tem largura de leitura', () => {
+    const titulo = bloco('.chegada-titulo');
+    expect(titulo).toContain('text-wrap: balance;');
+    expect(titulo).toContain('overflow-wrap: anywhere;');
+    const frase = bloco('.chegada-texto p');
+    expect(frase).toContain('max-width: 24em;');
+    // Sem isso a frase de 31/10 deixava um "como!" sozinho na segunda linha, numa tela larga.
+    expect(frase).toContain('text-wrap: balance;');
+  });
+
+  it('o corpo da tela rola por dentro: se a fala não cabe, a tela rola antes de perder uma palavra', () => {
+    expect(bloco('.chegada-corpo')).toContain('overflow-y: auto;');
+    expect(bloco('.chegada-corpo')).toContain('min-height: 0;');
+    // E o texto nunca fica fora dele: sem posição fixa nem absoluta no título e na frase.
+    expect(bloco('.chegada-titulo')).not.toMatch(/position:/);
+    expect(bloco('.chegada-texto p')).not.toMatch(/position:/);
+  });
+});
+
 describe('o CSS da Chegada: a primeira vez, com a luz da Abertura a caminho (M3b)', () => {
   /** O corpo do primeiro `@media (prefers-reduced-motion: no-preference)` que contém `trecho`. */
   function liberado(trecho: string): string {

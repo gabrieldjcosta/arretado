@@ -49,7 +49,7 @@ export function aoEsc(tela: Tela, roteiro: Roteiro): Destino {
 
 /** O que o leitor de tela ouve a cada tela nova (a região `role="status"` da Chegada). */
 export function anuncioDaTela(tela: Tela): string {
-  if (tela.tipo === 'boas') return BOAS_VINDAS.titulo;
+  if (tela.tipo === 'boas') return BOAS_VINDAS.nome;
   if (tela.tipo === 'comecar') return COMECAR.titulo;
   const passo = PASSOS[tela.indice];
   return passo === undefined ? '' : `${progressoDoPasso(tela.indice)}: ${passo.nome}`;
