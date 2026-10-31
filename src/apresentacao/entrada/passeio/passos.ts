@@ -62,10 +62,27 @@ export const PASSOS: readonly Passo[] = AREAS.map((area, i) => {
 
 export const COMECAR = {
   titulo: 'Vamo começar?',
-  /** O mesmo texto do botão de `conta/entrar/Entrar.tsx`, a tela que ele abre. */
+} as const;
+
+/**
+ * Os dois botões de conta do Começar (Gabriel, 30/10): a ação e, na linha de baixo, o que ela traz. O texto de
+ * `google` é o do botão de `conta/entrar/Entrar.tsx`.
+ */
+export const CONTA = {
   google: 'Entrar com o Google',
+  googleApoio: 'e ter sincronização automática',
+  semConta: 'Continuar sem conta',
+  semContaApoio: 'e salvar meus dados manualmente',
   nota: 'Em fase de teste: por enquanto só e-mails convidados entram.',
-  semConta: 'Experimentar sem conta e salvar seus dados manualmente',
+} as const;
+
+/** Fora do contrato do Gabriel (D-D10): o aviso do aceite sob os botões (o toque no do Google é o aceite) e as falhas. */
+export const ENTRADA_DIRETA = {
+  aceite:
+    'Ao entrar, seu estudo passa a ser guardado na sua conta (dá para desligar) e você aceita a política de privacidade.',
+  verAceite: 'Ver o que sai do Aparelho',
+  avisoDeFalha: 'Não foi possível entrar agora. Tente de novo ou continue sem conta.',
+  avisoSemArmazenamento: 'Não foi possível guardar o seu aceite neste navegador.',
 } as const;
 
 export const CONTROLES = {

@@ -266,6 +266,14 @@ export function ParaComecar({ catalogo }: { catalogo?: FonteDoCatalogo } = {}) {
           ) : (
             <p>Nenhuma dessas normas está no acervo ainda.</p>
           )}
+          {trilha && !trilhaMontada && slug !== undefined && (
+            <Link
+              to={`/plano/onboarding?carreira=${encodeURIComponent(slug)}`}
+              className="botao botao-texto comecar-acervo"
+            >
+              Escolher outro edital ou as matérias
+            </Link>
+          )}
           <Link to="/biblioteca/acervo" className="botao botao-texto comecar-acervo">
             Ver todo o acervo
           </Link>

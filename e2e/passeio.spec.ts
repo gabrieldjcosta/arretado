@@ -32,7 +32,7 @@ const TELAS: ReadonlyArray<{ tela: Tela; nome: string; botoes: string[] }> = [
   {
     tela: 'comecar',
     nome: 'Vamo começar?',
-    botoes: ['Experimentar sem conta e salvar seus dados manualmente'],
+    botoes: ['Continuar sem conta e salvar meus dados manualmente'],
   },
 ];
 

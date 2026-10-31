@@ -39,6 +39,7 @@ export function Plano() {
   return (
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
+      <GuiaDaTela tela="plano" vazio={dados.pontos.length === 0} />
       {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
       {dados.pontos.length > 0 && <ProximoBloco />}
       <ProvaDoPlano />
@@ -52,7 +53,7 @@ export function Plano() {
           <Vazio titulo="Monte seu plano do seu jeito">
             <p>
               Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas para
-              ler. Ou traga o seu edital.
+              ler; lá dá para trocar o edital e as matérias. Ou traga o seu edital.
             </p>
             <div className="plano-vazio-caminhos">
               <Link to="/comecar" className="botao principal">
@@ -71,12 +72,7 @@ export function Plano() {
                 Trazer meu edital
               </a>
             </div>
-            <p className="dica">
-              Quer escolher edital e matérias uma a uma?{' '}
-              <Link to="/plano/onboarding">Montar pelo catálogo</Link>.
-            </p>
           </Vazio>
-          <GuiaDaTela tela="plano" />
           <ImportarPontos aoImportar={setConfirmacao} afastado />
         </>
       ) : (

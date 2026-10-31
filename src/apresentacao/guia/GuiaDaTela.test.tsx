@@ -1,8 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
-import { GuiaDaTela } from './GuiaDaTela';
 import { telaDoGuia } from './memoria';
 
 async function abrir(rota: string) {
@@ -19,30 +18,36 @@ describe('Guia da primeira abertura', () => {
     localStorage.clear();
   });
 
-  it('aparece na primeira abertura do Hoje e "Entendi" o fecha', async () => {
+  it('fica recolhido no topo, marcado como novo; abrir mostra uma dica por cartão', async () => {
     const usuario = await abrir('#/');
-    expect(
-      await screen.findByRole('heading', { name: 'O que cada opção faz' }),
-    ).toBeInTheDocument();
-    await usuario.click(screen.getByRole('button', { name: 'Entendi' }));
-    expect(screen.queryByRole('heading', { name: 'O que cada opção faz' })).toBeNull();
+    const abrirDicas = await screen.findByRole('button', { name: /O que cada opção faz/ });
+    expect(abrirDicas).toHaveAttribute('aria-expanded', 'false');
+    expect(abrirDicas).toHaveTextContent('Novo');
+    await usuario.click(abrirDicas);
+    expect(abrirDicas).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('list', { name: /Dicas/ })).toBeInTheDocument();
+    const cartao = within(screen.getByRole('region', { name: 'O que cada opção faz' }));
+    expect(cartao.getByRole('status')).toHaveTextContent(/^1 de \d/);
+    await usuario.click(screen.getByRole('button', { name: 'Próxima' }));
+    expect(cartao.getByRole('status')).toHaveTextContent(/^2 de \d/);
+    expect(localStorage.getItem('arretado.guia.hoje')).not.toBeNull();
   });
 
-  it('não volta depois de visto e reabre pelo menu Ajuda', async () => {
-    localStorage.setItem('arretado.guia.hoje', '2');
+  it('depois de aberto some a marca "Novo", mas o cartão continua para reler', async () => {
+    localStorage.setItem('arretado.guia.hoje', '5');
     const usuario = await abrir('#/');
-    await screen.findByRole('heading', { name: 'Hoje' });
-    expect(screen.queryByRole('heading', { name: 'O que cada opção faz' })).toBeNull();
+    const abrirDicas = await screen.findByRole('button', { name: /O que cada opção faz/ });
+    expect(abrirDicas).not.toHaveTextContent('Novo');
     await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
     await usuario.click(screen.getByRole('button', { name: 'O que cada opção faz' }));
     expect(
-      await screen.findByRole('heading', { name: 'O que cada opção faz' }),
+      await screen.findByRole('button', { name: /O que cada opção faz/, expanded: true }),
     ).toBeInTheDocument();
   });
 
-  it('sair da tela sem o cartão ter sido visto não gasta o guia', async () => {
+  it('sair da tela sem abrir o cartão não gasta o "Novo"', async () => {
     const usuario = await abrir('#/');
-    await screen.findByRole('heading', { name: 'O que cada opção faz' });
+    await screen.findByRole('button', { name: /O que cada opção faz/ });
     await usuario.click(screen.getByRole('link', { name: /Biblioteca/ }));
     await screen.findByRole('heading', { name: 'Biblioteca' });
     expect(localStorage.getItem('arretado.guia.hoje')).toBeNull();
@@ -55,39 +60,5 @@ describe('Guia da primeira abertura', () => {
     expect(telaDoGuia('/biblioteca')).toBe('biblioteca');
     expect(telaDoGuia('/biblioteca/normas/x')).toBeUndefined();
     expect(telaDoGuia('/recall/revisar')).toBeUndefined();
-  });
-});
-
-describe('Guia › visto pela janela', () => {
-  afterEach(() => {
-    vi.useRealTimers();
-    vi.unstubAllGlobals();
-    document.querySelectorAll('dialog').forEach((d) => {
-      d.remove();
-    });
-    localStorage.clear();
-  });
-
-  it('com um diálogo aberto por cima, só vale como visto depois que ele fecha', () => {
-    vi.useFakeTimers();
-    vi.stubGlobal(
-      'IntersectionObserver',
-      class {
-        constructor(private fn: (e: { isIntersecting: boolean }[]) => void) {}
-        observe() {
-          this.fn([{ isIntersecting: true }]);
-        }
-        disconnect() {}
-      },
-    );
-    const folha = document.createElement('dialog');
-    folha.setAttribute('open', '');
-    document.body.append(folha);
-    render(<GuiaDaTela tela="recall" />);
-    vi.advanceTimersByTime(3500);
-    expect(localStorage.getItem('arretado.guia.recall')).toBeNull();
-    folha.remove();
-    vi.advanceTimersByTime(1500);
-    expect(localStorage.getItem('arretado.guia.recall')).toBe('3');
   });
 });

@@ -373,6 +373,11 @@ export function Normas() {
   return (
     <>
       <h1>Biblioteca</h1>
+      <GuiaDaTela
+        tela="biblioteca"
+        vazio={dados?.normas.length === 0}
+        omitir={edital ? ['Escolher meu concurso'] : []}
+      />
       <AbasDaBiblioteca atual="norma" />
       {aviso && (
         <p role="status" className="sucesso">
@@ -448,7 +453,6 @@ export function Normas() {
                   ler e marcar.
                 </p>
               </Vazio>
-              <GuiaDaTela tela="biblioteca" omitir={edital ? ['Escolher meu concurso'] : []} />
             </>
           ) : (
             <>

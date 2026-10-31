@@ -1,7 +1,7 @@
 // `/plano/onboarding` (pacote B2): da carreira ao "Comece por aqui", uma pergunta por tela, tudo
 // reversível (os pontos entram pelo mesmo caminho da importação: prévia, snapshot, log e desfazer).
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { aplicar } from '../../../core/pacote';
 import {
   CatalogoIndisponivel,
@@ -26,7 +26,14 @@ import { ACRESCENTOS_VAZIOS, linhasDosAcrescentos, validarNome } from './acresce
 import { planoCriado, type PlanoCriado } from './plano-criado';
 import { PassoDisciplinas } from './PassoDisciplinas';
 import { Moldura, PassoCarreira, PassoEdital } from './Passos';
-import { gravarRascunho, lerRascunho, limparRascunho, type Passo, type Rascunho } from './rascunho';
+import {
+  gravarRascunho,
+  lerRascunho,
+  limparRascunho,
+  RASCUNHO_VAZIO,
+  type Passo,
+  type Rascunho,
+} from './rascunho';
 
 const ORDEM: readonly Passo[] = ['carreira', 'edital', 'disciplinas', 'revisar'];
 const TITULOS: Record<Passo, string> = {
@@ -96,7 +103,17 @@ function ComecePorAqui({ ponto, materia }: PlanoCriado) {
 export function Onboarding({ fonte }: { fonte?: FonteDoCatalogo }) {
   const repo = useRepositorio();
   const origem = useMemo(() => fonte ?? new FonteEmbutida(), [fonte]);
-  const [rascunho, setRascunho] = useState<Rascunho>(lerRascunho);
+  // Vindo de "Escolher meu concurso" (`?carreira=`): a carreira já foi dita, a pergunta é o edital.
+  // Slug que o catálogo não conhece cai no caminho de sempre (volta a perguntar a carreira).
+  const [busca] = useSearchParams();
+  const [rascunho, setRascunho] = useState<Rascunho>(() => {
+    const pedida = busca.get('carreira');
+    if (!pedida) return lerRascunho();
+    const atual = lerRascunho();
+    return atual.carreira === pedida
+      ? { ...atual, passo: atual.passo === 'carreira' ? 'edital' : atual.passo }
+      : { ...RASCUNHO_VAZIO, passo: 'edital', carreira: pedida };
+  });
   const [indice, setIndice] = useState<IndiceDoCatalogo | null>(null);
   const [carreira, setCarreira] = useState<CarreiraDoCatalogo | null>(null);
   const [falhou, setFalhou] = useState(false);

@@ -214,7 +214,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await expect(page.getByRole('link', { name: 'Ciclo de estudo' })).toBeVisible();
   });
 
-  test('"Vamos", "Pular o passeio" e "Experimentar sem conta": seis toques até o Art. 1º', async ({
+  test('"Vamos", "Pular o passeio" e "Continuar sem conta": seis toques até o Art. 1º', async ({
     page,
   }) => {
     await servirAcervo(page);
@@ -227,7 +227,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await page.getByRole('button', { name: 'Pular o passeio' }).click();
     await page
       .getByRole('dialog', { name: 'Vamo começar?' })
-      .getByRole('button', { name: 'Experimentar sem conta e salvar seus dados manualmente' })
+      .getByRole('button', { name: 'Continuar sem conta e salvar meus dados manualmente' })
       .click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await doHojeAoArtigo1(page);
@@ -251,7 +251,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     }
     await page
       .getByRole('dialog', { name: 'Vamo começar?' })
-      .getByRole('button', { name: 'Experimentar sem conta e salvar seus dados manualmente' })
+      .getByRole('button', { name: 'Continuar sem conta e salvar meus dados manualmente' })
       .click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await doHojeAoArtigo1(page);

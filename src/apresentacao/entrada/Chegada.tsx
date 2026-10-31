@@ -44,9 +44,10 @@ const CLASSE_DA_ENTRADA: Record<EntradaDoZe, string> = {
 /**
  * A Chegada (D-D10, no lugar da folha da D-D9): a primeira coisa que o aparelho novo mostra, sobre o Hoje.
  * Três telas num `<dialog>` só: as Boas-vindas ("Vamos" e "Agora não"), o Passeio pelos quatro menus (um
- * passo por menu, sem atalho para outra tela) e o Começar (entrar com o Google ou experimentar sem
- * conta). "Escolher meu concurso" saiu daqui: o Hoje vazio já o oferece. Esc fecha as Boas-vindas e o
- * Começar e, num passo, pula o passeio. O título de cada tela nomeia o diálogo, e uma região viva anuncia
+ * passo por menu, sem atalho para outra tela) e o Começar (os dois botões de conta: entrar com o Google ou
+ * continuar sem conta, que a pessoa vê ao fim do passeio ou ao pulá-lo). "Escolher meu concurso" saiu daqui:
+ * o Hoje vazio já o oferece. "Agora não" recusa o passeio e fecha a folha, como Esc nas Boas-vindas e no
+ * Começar; Esc num passo pula o passeio. O título de cada tela nomeia o diálogo, e uma região viva anuncia
  * a tela nova. As regras de para onde cada controle leva estão em `passeio/estado.ts`, e os textos, em
  * `passeio/passos.ts` (uma fonte só, a do Gabriel).
  *
