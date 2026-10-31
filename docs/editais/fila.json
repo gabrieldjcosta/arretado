@@ -30,5 +30,37 @@
     "tipo": "novo",
     "url": "https://www.concursosfcc.com.br/concursos/tjuce125/index.html",
     "detectadoEm": "2026-10-30"
+  },
+  {
+    "fonte": "fcc-dpeba-125",
+    "orgao": "DPE-BA",
+    "banca": "FCC",
+    "tipo": "retificado",
+    "url": "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_resultado_preliminar_comissao_de_heteroidentificacao_29_10_2026.pdf",
+    "detectadoEm": "2026-10-31"
+  },
+  {
+    "fonte": "fcc-dpeba-125",
+    "orgao": "DPE-BA",
+    "banca": "FCC",
+    "tipo": "retificado",
+    "url": "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_resultado_preliminar_prova_oral_29_10_2026.pdf",
+    "detectadoEm": "2026-10-31"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/dpeba125/index.html",
+    "detectadoEm": "2026-10-31"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/pomsp326/index.html",
+    "detectadoEm": "2026-10-31"
   }
 ]
