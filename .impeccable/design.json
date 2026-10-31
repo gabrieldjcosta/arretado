@@ -500,6 +500,11 @@
         "name": "The Sem Vidro Desfocado Rule",
         "body": "O vidro é objeto (a caneta) e nunca superfície desfocada atrás de texto. Só os botões do modo foco têm transparência (a camada a 90%, sem desfoque), e é função, não enfeite; o dock do Leitor é uma barra sólida.",
         "section": "elevation"
+      },
+      {
+        "name": "The Três Materiais Rule",
+        "body": "Cacto, caneta e Zé são uma coisa só em três formas: a caneta escreve o cacto (o miolo dela, escrito), o Zé é o tubo dela aceso, com rosto, e o ponto de luz é a ponta. Cada forma é feita de um destes três materiais. O vidro é só da caneta: o único objeto com volume e gradiente, fora o miolo do tronco do Zé. O traço é tudo o que a caneta escreve (o nome, o cacto da marca, os pontos de luz, o quadro do cacto, o traço de seleção): tinta de dia, luz à noite. O néon é o brilho do traço novo e segue as regras Néon Só Em Traço De Caneta e Néon Assenta (em Colors); o Zé é feito só dele.",
+        "section": "elevation"
       }
     ],
     "dos": [
