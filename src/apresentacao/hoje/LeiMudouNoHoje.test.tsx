@@ -61,4 +61,23 @@ describe('A lei mudou no Hoje (AP-05)', () => {
       expect(screen.queryByRole('region', { name: 'A lei mudou' })).not.toBeInTheDocument();
     });
   });
+
+  it('mostra uma linha para a norma com versão nova no acervo, sem texto de dívida', async () => {
+    const { repo } = await repositorioDeTeste();
+    const f1 = await FonteEmMemoria.criar([{ item: item(1, 'Reclusão de um a quatro anos.') }]);
+    const f2 = await FonteEmMemoria.criar([{ item: item(2, 'Reclusão de 2 a 6 anos.') }]);
+    const [e1] = (await f1.listar()).itens;
+    if (!e1) throw new Error('índice vazio');
+    await aderirAoItem(repo, f1, e1);
+
+    window.location.hash = '#/';
+    render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f2} />);
+    const aviso = await screen.findByRole('region', { name: 'A lei mudou' });
+    expect(aviso).toHaveTextContent('o acervo tem texto novo');
+    expect(aviso.textContent).not.toMatch(/atrasad|pendente|dívida|desatualizad/i);
+    expect(within(aviso).getByRole('link', { name: /Ver a atualização de/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('#/biblioteca/acervo?tipo=norma&q='),
+    );
+  });
 });

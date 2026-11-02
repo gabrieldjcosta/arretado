@@ -156,3 +156,10 @@
   width: 100%;
   min-height: 6rem;
 }
+
+.mais-do-acervo {
+  margin-block: 1.5rem 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
