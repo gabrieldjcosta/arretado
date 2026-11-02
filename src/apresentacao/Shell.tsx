@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
+import { PuxarEssenciais } from './biblioteca/PuxarEssenciais';
 import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
 import { Marca } from './componentes/escrita/Marca';
@@ -77,6 +78,7 @@ function CascaDoApp() {
   return (
     <div className="shell" data-teclado={tecladoAberto ? 'aberto' : undefined}>
       <AplicarAparencia />
+      <PuxarEssenciais />
       <a
         className="pular"
         href="#conteudo"
