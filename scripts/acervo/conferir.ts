@@ -7,7 +7,7 @@
 // Uso: `node scripts/acervo/conferir.ts` (Node 22.18+). Variáveis: CONFERIR_SO=id1,id2 (só estes),
 // CONFERIR_ATRASO_MS (entre requisições, padrão 1000), CONFERIR_SECO=1 (não grava arquivo).
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 export interface BaseDeConferencia {
   /** id do acervo → última conferência. */
@@ -82,7 +82,18 @@ export function julgar(
   })();
 }
 
+/** Só https no Planalto: o endereço vem do índice do acervo, mas a conferência não confia nele. */
+export function enderecoPermitido(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && u.host === 'www.planalto.gov.br';
+  } catch {
+    return false;
+  }
+}
+
 async function ler(url: string): Promise<string> {
+  if (!enderecoPermitido(url)) throw new Error('endereço fora do Planalto');
   const r = await fetch(url, {
     headers: {
       'User-Agent': 'arretado-conferencia/1 (+https://github.com/gabrieldjcosta/arretado)',
@@ -165,9 +176,12 @@ export function relatorio(
 async function principal(): Promise<void> {
   const raiz = process.env['ACERVO_RAIZ'] ?? process.cwd();
   const caminhoBase = `${raiz}/acervo/fontes-hash.json`;
-  const base: BaseDeConferencia = existsSync(caminhoBase)
-    ? (JSON.parse(readFileSync(caminhoBase, 'utf8')) as BaseDeConferencia)
-    : {};
+  let base: BaseDeConferencia = {};
+  try {
+    base = JSON.parse(readFileSync(caminhoBase, 'utf8')) as BaseDeConferencia;
+  } catch {
+    /* primeira conferência: sem base */
+  }
   const so = process.env['CONFERIR_SO']?.split(',').filter(Boolean);
   const todas = entradasDoPlanalto(readFileSync(`${raiz}/public/acervo/indice.json`, 'utf8'));
   const entradas = so ? todas.filter((e) => so.includes(e.id)) : todas;
@@ -186,7 +200,8 @@ async function principal(): Promise<void> {
       veredictos.push({
         id: e.id,
         estado: 'falhou',
-        motivo: erro instanceof Error ? erro.message : 'falha',
+        motivo:
+          erro instanceof Error ? erro.message.replace(/[^\w .:/-]/g, '').slice(0, 120) : 'falha',
       });
     }
     await dormir(atraso);

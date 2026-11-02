@@ -1,5 +1,6 @@
 import {
   decodificar,
+  enderecoPermitido,
   entradasDoPlanalto,
   hashDoTexto,
   julgar,
@@ -35,6 +36,17 @@ describe('conferência das fontes oficiais', () => {
       id: 'x',
       estado: 'instavel',
     });
+  });
+
+  it('só aceita https no Planalto', () => {
+    expect(enderecoPermitido('https://www.planalto.gov.br/x.htm')).toBe(true);
+    for (const url of [
+      'http://www.planalto.gov.br/x',
+      'https://planalto.gov.br.exemplo.com/x',
+      'file:///etc/passwd',
+      'x',
+    ])
+      expect(enderecoPermitido(url)).toBe(false);
   });
 
   it('só confere normas do Planalto', () => {
