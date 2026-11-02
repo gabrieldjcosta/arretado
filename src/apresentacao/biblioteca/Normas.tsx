@@ -262,7 +262,7 @@ const doAcervo = (rotulo: string, principal = false) => (
 function MaisDoAcervo({ total }: { total: number }) {
   if (total === 0) return null;
   return (
-    <section className="mais-do-acervo" aria-label="Mais normas">
+    <section className="mais-do-acervo" aria-label="Convite do acervo">
       <p className="dica">
         O acervo tem {total} {total === 1 ? 'norma' : 'normas'}.
       </p>
