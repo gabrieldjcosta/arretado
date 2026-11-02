@@ -82,15 +82,16 @@ export function LeiMudouNoHoje() {
           </li>
         ))}
       </ul>
-      {linhas.length > LINHAS_A_VISTA && !todas && (
+      {linhas.length > LINHAS_A_VISTA && (
         <button
           type="button"
           className="discreto"
+          aria-expanded={todas}
           onClick={() => {
-            setTodas(true);
+            setTodas(!todas);
           }}
         >
-          Ver todas ({linhas.length})
+          {todas ? 'Ver menos' : `Ver todas (${linhas.length})`}
         </button>
       )}
     </section>

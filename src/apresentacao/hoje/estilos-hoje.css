@@ -478,3 +478,7 @@
 .mais-do-hoje {
   margin-block: var(--espaco-2);
 }
+
+.lei-mudou-no-hoje > .discreto {
+  min-height: 44px;
+}

@@ -263,7 +263,9 @@ function MaisDoAcervo({ total }: { total: number }) {
   if (total === 0) return null;
   return (
     <section className="mais-do-acervo" aria-label="Mais normas">
-      <p className="dica">O acervo tem {total} normas, de leis federais a atos da Defensoria.</p>
+      <p className="dica">
+        O acervo tem {total} {total === 1 ? 'norma' : 'normas'}.
+      </p>
       {doAcervo('Puxar mais normas do acervo')}
     </section>
   );
