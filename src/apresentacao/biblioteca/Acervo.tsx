@@ -128,7 +128,7 @@ export function Acervo() {
   const adicionadas = minhas?.adicionadas;
 
   const [modo, setModo] = useState<ModoDeAgrupar>('disciplina');
-  const [busca, setBusca] = useState('');
+  const [busca, setBusca] = useState(params.get('q') ?? '');
   // `null`: ainda sem escolha do usuário (com `?tudo`, valem todas as normas do edital que faltam).
   const [escolha, setMarcados] = useState<Set<string> | null>(null);
   const [progresso, setProgresso] = useState<{
