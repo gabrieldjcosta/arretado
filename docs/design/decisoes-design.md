@@ -366,3 +366,21 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Custo.** +2,3 kB de CSS (0,5 kB gzip), nenhum de JavaScript (496 e 328 kB). Com a CPU 4× mais lenta, 126 quadros em 2 s, o maior de 18,4 ms contra 18,2 ms sem o anel, nenhum acima de 33 ms.
 
 **Em aberto.** A leitura do Modo foco de noite por 5 minutos (se cansar, o halo do Leitor cai) é do Gabriel. O apagar de 0,24 s do elemento anterior (contrato §8c, item 2) não foi construído: hoje há um só elemento em evidência por tela e ele não troca de lugar.
+
+## D-D14 — A Abertura escreve o nome em toda abertura (03/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D9 (Q6, suposição 2) e ao contrato do Zé (§9, v10h).** A frequência da escrita do nome na tela cheia, que era "inteira na primeira vez, curta na primeira de cada Dia, parada nas demais", passa a ser "toda abertura escreve". A D-D13 (o anel de evidência) entra em outro PR.
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "decidi que, em todas as vezes que a pessoa abrir o site, a animação (nome sendo escrito e virando cacto) deve carregar por tempo suficiente pra ser apreciada pelo usuário, mas sem cansá-lo." Os tempos e a regra dos pulos são da Marca (contrato v10h, §9 e critério 28), de partida: o Gabriel confirma depois de uma semana de uso.
+
+**O que muda.**
+1. Na tela cheia, toda abertura do aplicativo escreve o mesmo desenho do nome em três tempos: inteiro em 2,64 s na primeira vez no aparelho (com "Pular" e, se a Chegada vem, o voo ao Zé), em 2,4 s na primeira abertura de cada Dia e em 1,6 s nas demais. São cerca de 3,2 s e 2,2 s de camada com a pausa e a luz de 0,45 s ao cabeçalho. A escolha de tempo é uma só (`NOME_NA_TELA_MS`); o CSS do kit escala toda a linha do tempo por `--k`.
+2. "Abertura" é carregar a página ou abrir o PWA; voltar de segundo plano sem recarregar não conta.
+3. Três aberturas seguidas puladas no mesmo Dia calam a tela cheia até o Dia seguinte: o cansaço dita o corte, não o relógio. A conta mora na chave que já existe (`{ dia, puladas }`), e uma abertura que vai até o fim a zera.
+4. `escritaNaTela` (nova) decide a tela cheia; `escritaDaAbertura` e `FREQUENCIA` seguem como a frequência do cabeçalho, para quando a tela cheia não abre. Um Dia guardado no futuro deixa a tela cheia calada: a semente do E2E e dos testes (`9999-12-31`) continua valendo.
+
+**O que continua como está.** Os vetos da tela cheia: movimento reduzido, "só estudo" (o preset Calmo), Sessão aberta e falha ao ler os dados; nesses casos o cabeçalho escreve como antes, uma vez por Dia. O Calmo só esmaece (0,24 s, fica 0,7 s). Um toque ou uma tecla pula, e esse toque é consumido; só a primeira vez leva o botão "Pular" (as outras ficam abaixo de 5 s, WCAG 2.2.2). O desenho, o néon do nome e a regra dos três materiais. O app só monta depois da decisão (no máximo 0,4 s) e o tempo até a tela útil não cresceu: medido, o app monta aos 0,36 s (0,37 s antes) e aos 1,05 s com a CPU 4× mais lenta (1,08 s antes).
+
+**Custo.** A camada passa a ser o preço de abrir o app, sempre. Quem tem pressa pula com um toque, e três pulos a calam por hoje.
+
+**Em aberto.** Se cansar, a primeira alternativa é encurtar as demais para 1,2 s, não tirar a tela (contrato §13, item 26).

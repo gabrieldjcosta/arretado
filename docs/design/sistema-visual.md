@@ -293,7 +293,7 @@ O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Le
 | Carregando | `Esqueleto`: a opacidade das linhas pulsa até 50% em 0,6 s, duas vezes; com movimento reduzido, parado |
 | Caneta | muda de lugar por salto; nunca gira nem desliza |
 | Quadro do cacto | de 520 a 1100 ms por fio (a parte inteira leva de 1,3 a 2,5 s, medido no Chromium), uma vez, ao fechar o Dia; só aqui a caneta anda |
-| Escrita do nome | completa 2,64 s (primeira abertura no aparelho), curta 1,2 s (primeira de cada Dia), parada nas demais; reduzido: parada; Calmo: esmaece em 0,24 s; um toque ou uma tecla pula |
+| Escrita do nome | na tela cheia, em toda abertura (D-D14): completa 2,64 s (primeira no aparelho), 2,4 s (primeira de cada Dia) e 1,6 s (as demais), três pulos seguidos calam até o Dia seguinte; no cabeçalho, quando a tela cheia não abre: curta 1,2 s na primeira de cada Dia, parada nas demais; reduzido: parada; Calmo: esmaece em 0,24 s; um toque ou uma tecla pula |
 | Traço de seleção | normal: 240 ms desenhando, 120 ms parado, 260 ms sumindo; Calmo: contorno inteiro que esmaece em 380 ms; reduzido: nada |
 | Néon suave (D-D10) | acende junto com o traço da caneta e assenta em 0,6 s, uma vez; nunca pulsa; Calmo: só o repouso, esmaecendo; reduzido: o repouso, parado |
 | O Zé (D-D10) | o contorno se desenha de pé a pé em 1,2 s com o néon aceso; o olhar e o humor mudam em 200 ms; a piscada dura 160 ms, a piscadela 560 ms; a luz amarela da flor pisca em rodadas de 3, só nas Boas-vindas; Calmo: aparece e esmaece, sem piscar; reduzido: pronto e parado |
