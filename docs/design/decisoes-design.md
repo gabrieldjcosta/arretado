@@ -383,4 +383,4 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 **O que continua como está.** A largura do cartão (62 ch, a medida de leitura); o texto corrido; a bandeja e o fechamento em 5 s; o palco (penumbra e luz do cartão); a borda do vizinho; os atalhos e o deslizar.
 
-**Custo.** Duas regras de pilha a mais para quem mexer nela: toda linha nova de `.area-artigo` é `flex: none`, e a que ficar embaixo guarda `--reserva-da-bandeja`. O E2E `foco-tamanho.spec.ts` mede a altura, a página no lugar e o ⋯ separado da seta nos três aparelhos.
+**Custo.** Duas regras de pilha a mais para quem mexer nela: toda linha nova de `.area-artigo` é `flex: none`, e a que ficar embaixo guarda `--reserva-da-bandeja`. Todo envoltório novo entre a pilha e o cartão entra na cadeia flex (o do contorno de evidência, `.evidencia-foco` da D-D13, já tem a regra; sem ela o cartão perde o limite e a página rola). O E2E `foco-tamanho.spec.ts` mede a altura, a página no lugar e o ⋯ separado da seta nos três aparelhos.
