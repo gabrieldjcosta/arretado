@@ -139,6 +139,15 @@ export async function pularAAbertura(page: Page) {
   await expect(page.locator('.abertura')).toHaveCount(0);
 }
 
+/**
+ * Registra um erro pelo "+" do título (Hoje e Fixar): abre o painel e toca em "Registrar erro". O link do
+ * painel é o único com esse nome dentro dele; o do cabeçalho (a partir de 900 px) fica fora.
+ */
+export async function irAoRegistroPeloMais(page: Page) {
+  await page.getByRole('button', { name: 'Novo registro' }).click();
+  await page.locator('.mais-itens').getByRole('link', { name: 'Registrar erro' }).click();
+}
+
 /** axe (WCAG AA) nos dois temas, na tela como está. */
 export async function semViolacoes(page: Page) {
   for (const colorScheme of ['light', 'dark'] as const) {

@@ -362,7 +362,7 @@ Angular de dia, arredondado à noite, e o que está dentro tem raio menor que o 
 
 - **Abas das áreas:** até 899 px, presas embaixo, no chão, com a divisória em cima, ícone de 24 px sobre o rótulo de 13 px, barra de 80 px (no tablet em pé, juntas no meio, em até 35 rem); a partir de 900, no centro do cabeçalho, só o rótulo, com o traço 3 px acima da base. Com o teclado aberto, as abas de baixo saem da frente (`data-teclado` na casca). Os nomes vêm de um mapa só (`ROTULO_DA_AREA`); as rotas seguem `/plano` e `/recall`.
 - **Cabeçalho:** o lockup da marca, Ajuda (texto) e Conta (ícone de pessoa num alvo de 44); a partir de 900 px, "Registrar erro" neutro com a tecla E ao lado. Uma divisória de 1 px o separa do texto que rola por baixo.
-- **"+" no título:** redondo, 48 px, com o contorno e o fundo do controle de cada mundo, na linha do título do Hoje e do Fixar; abre o registro de erro. Não é a ação da tela. A tecla E registra de qualquer tela.
+- **"+" no título:** redondo, 48 px, com o contorno e o fundo do controle de cada mundo, na linha do título do Hoje e do Fixar; abre um painel com "Registrar erro" e "Lembrete" (uma nota rápida, sem hora nem aviso; D-D15). Não é a ação da tela. A tecla E registra de qualquer tela.
 - **Rodapé:** o aviso curto e "Backup e dados" como botão de texto de 44 px, no fim do conteúdo.
 
 ### A marca (signature)

@@ -306,6 +306,12 @@
   }
 }
 
+/* O "Lembrete" do "+" (DialogoDoLembrete): a mesma nota do bloco do Hoje, num diálogo. O bloco tem margem
+   embaixo para o que vem depois; aqui o que vem depois é o "Fechar", mais perto. */
+dialog.dialogo-lembrete .para-lembrar {
+  margin-bottom: 0.75rem;
+}
+
 .para-lembrar-titulo {
   margin: 0 0 0.375rem;
   font-size: 0.8125rem;

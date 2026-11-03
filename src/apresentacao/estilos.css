@@ -874,8 +874,10 @@ button,
 
 /* Título com o "+" na mesma linha (TituloComMais, D-D9, Q2): o "+" é redondo, de 48 px, com o contorno
    do controle (1,5 px em --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de
-   dia, a serra 2 à noite), e registra um erro. Não é a ação da tela: essa é a `.principal`. */
+   dia, a serra 2 à noite), e abre o painel com "Registrar erro" e "Lembrete". Não é a ação da tela:
+   essa é a `.principal`. */
 .titulo-com-mais {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -908,6 +910,56 @@ button,
   width: 1.5rem;
   height: 1.5rem;
   flex: none;
+}
+
+/* Painel do "+": duas opções, abre para baixo a partir do botão e alinhado à direita, como o menu Ajuda
+   (linha da folha, nenhuma sombra). Cada opção é uma linha de 44 px ou mais: o nome e, embaixo, uma frase
+   que diz o que acontece. O link e o botão têm o mesmo aspecto; zeram o contorno e o fundo do botão. */
+.mais-itens {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 10;
+  display: grid;
+  gap: 0.25rem;
+  width: min(18rem, calc(100vw - 2 * var(--gutter)));
+  padding: 0.5rem;
+  background: var(--superficie);
+  border: var(--borda-folha);
+  border-radius: var(--raio-cartao);
+}
+
+.mais-item {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 0.125rem;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: var(--raio-campo);
+  background: transparent;
+  color: var(--texto);
+  text-align: left;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .mais-item:hover {
+    background: color-mix(in srgb, var(--texto) 6%, transparent);
+  }
+}
+
+.mais-item-titulo {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.mais-item-apoio {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
 }
 
 /* Rodapé legal no fim do conteúdo, acima da reserva das abas: o aviso curto e "Backup e dados" como
