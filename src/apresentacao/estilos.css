@@ -938,6 +938,9 @@ button,
 .mais-item {
   display: grid;
   justify-items: start;
+  /* O botão herda `justify-content: center` da regra de `button`: numa grade isso encolhe a coluna ao texto
+     mais largo e a centra, e o "Lembrete" ficava mais recuado que o link do "Registrar erro". */
+  justify-content: start;
   align-content: center;
   gap: 0.125rem;
   width: 100%;
