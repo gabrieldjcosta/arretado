@@ -3215,10 +3215,21 @@ dialog.dialogo-acoes {
 
 /* Artigo por artigo (11.8): um cartão iluminado com o artigo inteiro e, acima e abaixo, a espiada
    esmaecida dos vizinhos. O cartão rola por dentro quando o artigo é longo (a página fica no lugar);
-   sem animação nenhuma, então nada a desligar com prefers-reduced-motion. */
+   sem animação nenhuma, então nada a desligar com prefers-reduced-motion.
+   Altura (D-D22): a pilha toma a altura que a tela deixa e só o cartão encolhe (e rola por dentro);
+   artigo curto fica do tamanho do texto, no meio. Os demais elos da pilha não encolhem. */
 .area-artigo {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+  /* O ⋯ do foco mora no canto de baixo (4 rem de largura, a 1 rem da borda). Onde o cartão passa da
+     margem dele (celular, tablet em pé), a última linha da pilha recua essa faixa e divide o fim da
+     tela com ele; onde sobra margem dos lados (computador), a conta dá zero. 100% é a largura da
+     pilha, a mesma do cartão. */
+  --reserva-da-bandeja: max(
+    0px,
+    calc(4rem + max(1rem, env(safe-area-inset-right, 0px)) + 0.5rem - (100vw - 100%) / 2)
+  );
 }
 
 /* Palco do modo foco: a página escurece um passo (penumbra) e o cartão acende (luz). A entrada leva
@@ -3236,9 +3247,11 @@ dialog.dialogo-acoes {
    alvo inteiro; no primeiro e no último artigo ficam esmaecidas, e o foco do teclado não some. */
 .pe-do-cartao {
   display: grid;
+  flex: none;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.5rem;
+  padding-right: var(--reserva-da-bandeja);
 }
 
 .pe-do-cartao .barra-fina {
@@ -3282,7 +3295,9 @@ dialog.dialogo-acoes {
 }
 
 .cartao-artigo {
-  max-height: max(16rem, calc(100dvh - 22rem));
+  /* Encolhe com a altura que sobra (não passa dela) e rola por dentro; o texto curto não estica. */
+  flex: 0 1 auto;
+  min-height: 0;
   padding: 1rem;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3298,21 +3313,86 @@ dialog.dialogo-acoes {
   --estrela-folga: 1rem;
 }
 
-/* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o
-   cartão na vertical (a largura já centra em .area-artigo). O respiro de cima iguala o de baixo,
-   que reserva o canto dos botões fixos; o cartão só rola por dentro quando o artigo não cabe. */
+/* Artigo na tela inteira (D-D22): sem a moldura do Shell, o leitor tem exatamente a altura da tela (o
+   .conteudo tem 1 rem embaixo e, em cima, o maior entre 1 rem e a área segura; ver
+   `:root[data-modo-foco] .conteudo`) e a página não rola. A altura desce pela cadeia (leitor, corpo,
+   pilha) até o cartão, que toma o que sobra e rola por dentro; o artigo curto fica do tamanho do
+   texto, no meio. Embaixo, a área segura do aparelho (o ⋯ sobe por ela) entra no recuo. */
 :root[data-modo-foco='artigo'] .leitor.em-foco {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  /* O .conteudo tem 1rem embaixo e, em cima, o maior entre 1rem e a área segura (ver
-     `:root[data-modo-foco] .conteudo`): a página não passa da tela. */
-  min-height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
-  padding-top: calc(var(--alvo) + 2rem);
+  height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
+  padding-top: 0;
+  padding-bottom: max(0px, calc(env(safe-area-inset-bottom, 0px) - 1rem));
 }
 
-:root[data-modo-foco='artigo'] .cartao-artigo {
-  max-height: max(16rem, calc(100dvh - 16rem));
+:root[data-modo-foco='artigo'] .leitor.em-foco .leitor-corpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:root[data-modo-foco='artigo'] .area-artigo {
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-block: auto;
+}
+
+/* "Nenhum artigo para ler por aqui" fica no meio, não no alto. */
+:root[data-modo-foco='artigo'] .area-artigo > .aviso {
+  margin-block: auto;
+}
+
+/* Celular e tablet em pé: o ⋯ divide a última linha da tela com o pé do cartão (setas e fio), então o
+   pé desce ao fim da tela (e não anda com o tamanho do artigo, o que o deixaria saltar de um artigo
+   ao outro) e o cartão fica no meio do que sobra acima dele, com a borda do vizinho de cima colada. */
+@media (max-width: 52rem) {
+  :root[data-modo-foco='artigo'] .area-artigo {
+    flex: 1 1 auto;
+    margin-block: 0;
+  }
+
+  :root[data-modo-foco='artigo'] .area-artigo > .vizinho-anterior,
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo:first-child {
+    margin-top: auto;
+  }
+
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo {
+    margin-bottom: auto;
+  }
+}
+
+/* A borda do vizinho de baixo cola no pé (sem o respiro da pilha): a linha do pé e a do ⋯ ficam alinhadas. */
+.area-artigo:not(.com-espiada) > .vizinho-seguinte {
+  margin-top: -0.75rem;
+}
+
+/* Última linha da pilha: ela guarda a faixa do ⋯ (o pé; a linha do mapa, quando se segue o mapa; a
+   espiada do vizinho de baixo, quando ligada). As de cima, não. */
+.area-artigo:has(.seguindo-mapa) .pe-do-cartao,
+.area-artigo.com-espiada .pe-do-cartao,
+.area-artigo.com-espiada .seguindo-mapa {
+  padding-right: 0;
+}
+
+.area-artigo .seguindo-mapa {
+  flex: none;
+  padding-right: var(--reserva-da-bandeja);
+}
+
+.area-artigo.com-espiada > .vizinho-seguinte {
+  padding-right: calc(1rem + var(--reserva-da-bandeja));
+}
+
+/* Com o relógio da Sessão (embaixo à esquerda) o ⋯ e ele moram numa faixa só deles, abaixo da pilha:
+   nada de dividir a linha. */
+:root[data-modo-foco='artigo']:has(.canto-sessao) .leitor-corpo {
+  padding-bottom: calc(var(--alvo) + 1rem);
+}
+
+:root[data-modo-foco='artigo']:has(.canto-sessao) .area-artigo {
+  --reserva-da-bandeja: 0px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3348,6 +3428,7 @@ dialog.dialogo-acoes {
 /* A espiada do vizinho: só as primeiras linhas, apagando para o lado de fora do cartão. Todo texto
    no tom atenuado (AA nos dois temas; o !important vence as cores próprias de rótulo e rubrica). */
 .vizinho {
+  flex: none;
   max-height: 6.5rem;
   padding: 0 1rem;
   overflow: hidden;
