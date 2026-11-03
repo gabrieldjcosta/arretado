@@ -3,7 +3,11 @@ import type { Repositorio } from '../../../core/persistencia';
 import { encerrarSessao, iniciarSessao } from '../../../dominios/sessao/servico';
 import { simularMovimento } from '../../../testes/movimento';
 import { repositorioDeTeste } from '../../../testes/repositorio';
-import { lembrarDaEscrita } from '../../componentes/escrita/frequencia';
+import {
+  lembrarDaEscrita,
+  PULOS_PARA_CALAR,
+  registrarPulo,
+} from '../../componentes/escrita/frequencia';
 import { CHAVE_CHEGADA } from '../regras';
 import { decidirNaAberturaDoApp, decidirOndeEscrever } from './regras';
 
@@ -57,7 +61,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     window.localStorage.removeItem(CHAVE_CHEGADA);
     lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
     const { repo } = await repositorioDeTeste({ inicio: HOJE });
-    expect(await decidirOndeEscrever(repo)).toMatchObject({ escrita: 'curta', chegada: false });
+    expect(await decidirOndeEscrever(repo)).toMatchObject({ escrita: 'doDia', chegada: false });
   });
 
   it('uma falha só ao ler o aparelho vale "sem Chegada": a luz vai ao cabeçalho e a tela cheia abre', async () => {
@@ -76,20 +80,32 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     vi.restoreAllMocks();
   });
 
-  it('primeira abertura de outro Dia: a tela cheia, no modo curto', async () => {
+  it('primeira abertura de outro Dia: a tela cheia, escrita em 2,4 s (a do Dia)', async () => {
     lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
     const { repo } = await repositorioDeTeste({ inicio: HOJE });
     expect(await decidirOndeEscrever(repo)).toEqual({
       onde: 'tela',
-      escrita: 'curta',
+      escrita: 'doDia',
       calmo: false,
       chegada: false,
     });
     expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
   });
 
-  it('demais aberturas do Dia: o cabeçalho, parado, sem nem ler os dados', async () => {
+  it('demais aberturas do Dia: a tela cheia, escrita em 1,6 s (D-D14)', async () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    expect(await decidirOndeEscrever(repo)).toEqual({
+      onde: 'tela',
+      escrita: 'depressa',
+      calmo: false,
+      chegada: false,
+    });
+    expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('um Dia guardado no futuro (a semente dos testes): o cabeçalho, parado, sem nem ler os dados', async () => {
+    window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
     const antes = guardado();
     // Um repositório que não lê nada: se a decisão tocasse nos dados, quebraria.
     const repo = {
@@ -143,7 +159,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     await encerrarSessao(repo, sessao.id);
     expect(await decidirOndeEscrever(repo)).toEqual({
       onde: 'tela',
-      escrita: 'curta',
+      escrita: 'doDia',
       calmo: false,
       chegada: false,
     });
@@ -193,7 +209,7 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     ];
     expect(await decidirOndeEscrever(repo)).toEqual({
       onde: 'tela',
-      escrita: 'curta',
+      escrita: 'doDia',
       calmo: false,
       chegada: false,
     });
@@ -208,13 +224,37 @@ describe('onde o nome se escreve nesta abertura (M2 do Zé)', () => {
     expect(await decidirOndeEscrever(repo)).toEqual({ onde: 'cabecalho', escrita: 'curta' });
   });
 
-  it('outra aba gastou a escrita enquanto os dados eram lidos: vale o que ela guardou e nada abre', async () => {
+  it('outra aba escreveu o nome enquanto os dados eram lidos: a tela cheia abre do mesmo jeito, agora como uma das demais', async () => {
     lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
     const { repo } = await repositorioDeTeste({ inicio: HOJE });
     // A decisão já leu "curta" e foi aos dados; a outra aba escreve o nome neste instante.
     const decisao = decidirOndeEscrever(repo);
     lembrarDaEscrita(new Date(HOJE));
-    expect(await decisao).toEqual({ onde: 'cabecalho', escrita: 'parada' });
+    expect(await decisao).toMatchObject({ onde: 'tela', escrita: 'depressa' });
     expect(JSON.parse(guardado() ?? 'null')).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('três aberturas seguidas puladas no Dia: o cabeçalho, parado, sem nem ler os dados; no Dia seguinte a tela volta', async () => {
+    const dia = new Date(HOJE);
+    lembrarDaEscrita(dia);
+    for (let i = 0; i < PULOS_PARA_CALAR; i++) registrarPulo(dia);
+    const antes = guardado();
+    const semDados = {
+      ctx: { agora: () => dia },
+      colecao: () => {
+        throw new Error('não era para ler');
+      },
+    } as unknown as Repositorio;
+    expect(await decidirOndeEscrever(semDados)).toEqual({ onde: 'cabecalho', escrita: 'parada' });
+    expect(guardado()).toBe(antes);
+    const { repo } = await repositorioDeTeste({ inicio: '2026-10-21T12:00:00.000Z' });
+    expect(await decidirOndeEscrever(repo)).toMatchObject({ onde: 'tela', escrita: 'doDia' });
+  });
+
+  it('"só estudo" e Sessão aberta nas demais aberturas do Dia: o cabeçalho segue parado (a frequência dele não mudou)', async () => {
+    lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    await alterarPreferencias(repo, { modoSoEstudo: true });
+    expect(await decidirOndeEscrever(repo)).toEqual({ onde: 'cabecalho', escrita: 'parada' });
   });
 });
