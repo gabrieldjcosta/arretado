@@ -79,6 +79,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
         rotuloBotao={rotuloDoBotao(acao)}
         para={rotaDeInicio(acao)}
         aoEscolherOutra={escolherOutra}
+        emEvidencia
       />
       {trecho !== undefined && <DeOndeParou acao={{ ...acao, trecho }} />}
     </>

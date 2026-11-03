@@ -346,3 +346,23 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
+
+## D-D13 — O contorno de evidência: um anel no Agora e no artigo do foco (03/11/2026, decisão do Gabriel)
+
+> **Emenda ao contrato do Zé (§8b, regras 4 e 5, v10h) e à D-D10.** O brilho piscina deixa de ser só o traço novo da caneta e passa a marcar também o único elemento que a pessoa deve olhar agora. A D-D12 tirou a caneta do Hoje; o anel é o que fica no lugar dela.
+
+**Origem.** Gabriel em 03/11/2026: "a coisa que tiver em evidência (cartão do hoje/o que fazer agora, artigo na leitura em modo foco) precisa ficar com um outline branco com brilho azul, tipo o néon que usamos pra o mascote." Às 16:23Z, diante de três desenhos, escolheu a opção **B, "branco com faixa suave"**; a recomendada era a C (faixa de dia `#0b7f9c`, 4,36:1), que fica como troca de um token.
+
+**O que muda.**
+1. Um anel em CSS, de lista fechada: o cartão do Agora no Hoje (`.acao-agora.evidencia`, pedido por `emEvidencia` em `AcaoAgora`; só `Agora.tsx` e `RevisaoPorTempo.tsx` o ligam) e o artigo único do Modo foco (`.evidencia-foco`, um envoltório do `.cartao-artigo`, que rola por dentro e cortaria o halo). O Agora de Fixar, do mapa da norma e do plano fica sem anel. Entrar na lista exige nova decisão do Gabriel.
+2. O desenho: linha branca de 2 px por fora do cartão, faixa piscina de 5 px (50% de dia, 35% à noite) e halo piscina (20 px de raio com 6 de espalhamento; 14 e 4 no Leitor) com um tom de 14 px por dentro. Dois pseudoelementos sem fundo, sob o texto e o foco do teclado: `::before` é o halo e `::after` é a linha com a faixa. Dez tokens `--ev-*` em `estilos.css`.
+3. O movimento: o halo sobe ao pico em 0,3 s (0,7 de dia, 0,75 à noite) e assenta no repouso até 0,9 s (0,45 e 0,5), uma vez. Só a opacidade anima, nunca pulsa e trocar de artigo no foco não reacende. Calmo: só esmaece em 0,24 s. Movimento reduzido: o repouso, parado. Cores forçadas: o halo e a faixa somem e o cartão ganha borda de 2 px `Highlight`.
+4. As regras do sistema ganham uma exceção só: o halo é a única sombra desfocada do app e o único brilho que não é traço de caneta. Sem `filter`, sem `backdrop-filter`, sem transição.
+
+**Contraste.** De dia a faixa mede 1,8:1 e a linha 1,06:1 sobre o papel, então o anel é decoração e não o contorno do WCAG 1.4.11: o Agora e o artigo do foco mantêm a borda da folha, que cumpre o 3:1, e o anel nunca a substitui (guarda no CSS). À noite a linha branca passa de 3:1 sobre o chão, a folha e a penumbra do foco (par `ev-linha` em `scripts/contraste.mjs`).
+
+**O que continua como está.** O Zé só na Chegada, na Ajuda e na tela de carregamento; a regra dos três materiais (D-D11); o anel de foco do teclado, que fica por cima do anel de evidência; a leitura do Agora e do artigo, ditas pelo texto, pela posição e pelo nome acessível, nunca pelo brilho.
+
+**Custo.** +2,3 kB de CSS (0,5 kB gzip), nenhum de JavaScript (496 e 328 kB). Com a CPU 4× mais lenta, 126 quadros em 2 s, o maior de 18,4 ms contra 18,2 ms sem o anel, nenhum acima de 33 ms.
+
+**Em aberto.** A leitura do Modo foco de noite por 5 minutos (se cansar, o halo do Leitor cai) é do Gabriel. O apagar de 0,24 s do elemento anterior (contrato §8c, item 2) não foi construído: hoje há um só elemento em evidência por tela e ele não troca de lugar.

@@ -1862,6 +1862,8 @@ describe('palco do modo foco (F entra no cartão)', () => {
     });
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=artigo`);
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'artigo');
+    // O contorno de evidência (D-D13) é do envoltório do cartão do artigo, que rola por dentro.
+    expect(document.querySelector('.cartao-artigo')?.parentElement).toHaveClass('evidencia-foco');
     expect(screen.getByText('Modo foco.')).toHaveAttribute('role', 'status');
     // Só o ⋯ e o fio de progresso: nenhum controle da bandeja à vista.
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
