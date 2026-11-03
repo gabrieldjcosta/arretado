@@ -1,11 +1,13 @@
-// "Para lembrar" do Hoje (P7b; D-D5, resposta 6): uma nota livre sobre o que fazer fora do app. Não é
-// a Frase correta (essa entra pelo "+"). Fica em `Preferencias.lembrete`: "Salvar" grava, sair do campo
-// também (o que se escreve e não se salva não some ao tocar em "Começar"), e esvaziar o campo apaga.
-// Sem data, hora nem aviso; fora do Recall e do cálculo do Agora. Acima do campo ficam as notas que a
-// pessoa guardou no Estacionamento da Sessão (as mais recentes ainda por resolver), cada uma com uma caixa.
+// A nota "Para lembrar" (P7b; D-D5, resposta 6): uma nota livre sobre o que fazer fora do app. Não é a
+// Frase correta (essa entra pelo "+"). Fica em `Preferencias.lembrete`: "Salvar" grava, sair do campo
+// também (o que se escreve e não se salva não some ao fechar), e esvaziar o campo apaga. Sem data, hora
+// nem aviso; fora do Recall e do cálculo do Agora. Acima do campo ficam as notas que a pessoa guardou no
+// Estacionamento da Sessão (as mais recentes ainda por resolver), cada uma com uma caixa. Desde a D-D16 o
+// bloco não está mais no Hoje: a nota vive no "Lembrete" do "+" (`DialogoDoLembrete`), que monta estas
+// duas peças.
 import { useCallback, useEffect, useId, useRef, useState, type SubmitEvent } from 'react';
 import { LEMBRETE_MAX } from '../../core/modelo';
-import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
+import { alterarPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
 import {
   chaveDeNota,
@@ -65,7 +67,7 @@ export function NotasDasSessoes() {
 
 /**
  * O campo da nota, com o "Salvar": parte do que está salvo ao abrir e, daí em diante, vale o que a pessoa
- * escreve. `idDoRotulo` é o `id` do título que o nomeia: o do bloco do Hoje ou o do diálogo do "+".
+ * escreve. `idDoRotulo` é o `id` do título que o nomeia.
  */
 export function CampoDoLembrete({
   inicial,
@@ -74,7 +76,7 @@ export function CampoDoLembrete({
 }: {
   inicial: string;
   idDoRotulo: string;
-  /** Leva o foco ao campo ao montar (o diálogo do "+" sim, o bloco do Hoje não: a página não rouba o foco). */
+  /** Leva o foco ao campo ao montar (o diálogo do "+" abre com o cursor no campo). */
   foco?: boolean;
 }) {
   const repo = useRepositorio();
@@ -90,8 +92,8 @@ export function CampoDoLembrete({
   useEffect(() => {
     if (foco) campo.current?.focus();
   }, [foco]);
-  // Fechar o diálogo do "+" com a tecla Esc, ou sair do Hoje sem tirar o foco do campo, desmonta o campo
-  // sem o `blur`: o que foi escrito e não salvo se grava aqui, na saída, com o que valia por último.
+  // Fechar o diálogo do "+" com a tecla Esc desmonta o campo sem o `blur`: o que foi escrito e não salvo
+  // se grava aqui, na saída, com o que valia por último.
   const ultimo = useRef({ texto, guardado });
   useEffect(() => {
     ultimo.current = { texto, guardado };
@@ -166,23 +168,4 @@ export function CampoDoLembrete({
       )}
     </form>
   );
-}
-
-/** O bloco do Hoje: o título, as notas guardadas nas Sessões e o campo. */
-function Campo({ inicial }: { inicial: string }) {
-  const titulo = useId();
-  return (
-    <section className="para-lembrar" aria-labelledby={titulo}>
-      <h2 id={titulo} className="para-lembrar-titulo">
-        Para lembrar
-      </h2>
-      <NotasDasSessoes />
-      <CampoDoLembrete inicial={inicial} idDoRotulo={titulo} />
-    </section>
-  );
-}
-
-export function ParaLembrar() {
-  const { dados } = useDados(useCallback((r) => obterPreferencias(r), []));
-  return dados ? <Campo inicial={dados.lembrete ?? ''} /> : null;
 }

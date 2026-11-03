@@ -148,6 +148,18 @@ export async function irAoRegistroPeloMais(page: Page) {
   await page.locator('.mais-itens').getByRole('link', { name: 'Registrar erro' }).click();
 }
 
+/**
+ * Abre o diálogo do Lembrete pelo "+" do título (Hoje e Fixar) e o devolve. O botão do painel é o único com
+ * esse nome dentro dele.
+ */
+export async function abrirOLembrete(page: Page) {
+  await page.getByRole('button', { name: 'Novo registro' }).click();
+  await page.locator('.mais-itens').getByRole('button', { name: 'Lembrete' }).click();
+  const dialogo = page.getByRole('dialog', { name: 'Lembrete' });
+  await expect(dialogo).toBeVisible();
+  return dialogo;
+}
+
 /** axe (WCAG AA) nos dois temas, na tela como está. */
 export async function semViolacoes(page: Page) {
   for (const colorScheme of ['light', 'dark'] as const) {

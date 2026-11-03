@@ -7,9 +7,14 @@
 // de um só retrato dos dados (`useRetratoDoHoje`), para os blocos nunca discordarem entre si.
 //
 // Em duas colunas (P7b) a partir de 900 px: o Agora à esquerda; à direita os blocos abaixo dele, com
-// orçamento de dois à vista (S7, `BlocosDoHoje`): o "Em seguida", o Fechar o Dia, "A lei mudou", o "Para
-// lembrar" e os avisos, nessa prioridade; o que passa do orçamento fica em "Ver mais". Abaixo de
-// 900 px as duas viram uma só, na mesma ordem.
+// orçamento de dois à vista (S7, `BlocosDoHoje`): o "Em seguida", o Fechar o Dia, "A lei mudou" e os
+// avisos, nessa prioridade; o que passa do orçamento fica em "Ver mais". Abaixo de 900 px as duas viram
+// uma só, na mesma ordem.
+//
+// A dieta (D-D16): o Hoje abre com um cartão e um botão. As dicas só aparecem se a pessoa pede na Ajuda,
+// os pontos do Dia só depois do primeiro aceso, os minutos ficam atrás do link "tenho outro tempo" do
+// cartão, o "Começar uma Sessão" é uma linha recolhida, a linha de parada é uma linha só e o "Para
+// lembrar" mora no "+" (Lembrete).
 //
 // A Chegada (`EntradaDoDia`, D-D9) é uma folha sobre o Hoje, não parte do layout; a Entrada do Dia (S4)
 // é a linha quieta logo abaixo do Agora: acima dele, a dica mais longa (4 linhas a 320 px) empurrava o
@@ -30,7 +35,6 @@ import { Depois } from './Depois';
 import { FecharDia } from './FecharDia';
 import { LeiMudouNoHoje } from './LeiMudouNoHoje';
 import { LembreteDeBackup } from './LembreteDeBackup';
-import { ParaLembrar } from './ParaLembrar';
 import { PontosDoDia } from './PontosDoDia';
 import { RevisoesDoDia } from './RevisoesDoDia';
 import { BoasVindas } from './Retorno';
@@ -45,7 +49,7 @@ export function Hoje() {
   return (
     <>
       <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
-      <GuiaDaTela tela="hoje" vazio={hoje.retrato?.agora.tipo === 'vazio'} />
+      <GuiaDaTela tela="hoje" vazio={hoje.retrato?.agora.tipo === 'vazio'} soPelaAjuda />
       <PontosDoDia retrato={hoje.retrato} />
       <div className="hoje-colunas">
         <div>
@@ -66,7 +70,6 @@ export function Hoje() {
             />
             <FecharDia />
             <LeiMudouNoHoje />
-            <ParaLembrar />
             <ConviteDepoisDaLeitura />
             <LembreteDeBackup />
             <AvisoDeAtualizacao />

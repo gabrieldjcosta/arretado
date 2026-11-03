@@ -1,5 +1,5 @@
 // Bloco "Agora" do Hoje (pacote A1; D-D7, P3): uma só ação, com o motivo, a saída "Escolher outra
-// coisa" e, acima da folha, onde a pessoa parou de ler.
+// coisa" e, numa linha quieta logo abaixo da folha, onde a pessoa parou de ler (D-D16).
 import { Link } from 'react-router';
 import type { ProximaAcao } from '../../dominios/hoje/contrato';
 import { AcaoAgora } from '../componentes/AcaoAgora';
@@ -62,7 +62,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
     return (
       <RevisaoPorTempo
         acao={acao}
-        antes={<Parada {...(parada === undefined ? {} : { parada })} />}
+        parada={<Parada {...(parada === undefined ? {} : { parada })} />}
         aoEscolherOutra={escolherOutra}
         {...(normaLida === undefined ? {} : { normaLida })}
       />
@@ -71,7 +71,6 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
   const motivo = motivoDaAcao(acao);
   return (
     <>
-      <Parada {...(parada === undefined ? {} : { parada })} />
       <AcaoAgora
         titulo={tituloDaAcao(acao)}
         {...(motivo === undefined ? {} : { motivo })}
@@ -81,6 +80,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
         aoEscolherOutra={escolherOutra}
         emEvidencia
       />
+      <Parada {...(parada === undefined ? {} : { parada })} />
       {trecho !== undefined && <DeOndeParou acao={{ ...acao, trecho }} />}
     </>
   );

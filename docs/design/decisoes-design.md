@@ -382,3 +382,23 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O "+" só nas telas que registram (Hoje e Fixar); o "Registrar erro" do cabeçalho a partir de 900 px; a Frase correta como único campo obrigatório (D25). Nenhum texto promete data, hora nem aviso: o app não tem alarme.
 
 **Custo.** Um toque a mais para registrar um erro pelo "+" (abrir o painel, depois "Registrar erro"), em troca de um lugar para a nota rápida em qualquer tela que tem "+". O bloco "Para lembrar" do Hoje continua na tela até a dieta do Hoje decidir se sai; até lá a mesma nota aparece nos dois lugares, e o bloco só mostra o que foi gravado no diálogo depois de recarregar.
+
+## D-D16 — O Hoje mais quieto: um cartão e um botão (03/11/2026, recomendada no cartão de 17:37Z)
+
+> **Emenda à D-D7 (P3 e P7b) e à D-D9 (Q5).** O Hoje abre com o cartão do Agora e uma linha de parada; o que era sempre visível passa a aparecer só quando serve. Nada sai do app: cada coisa segue a um toque, no lugar onde a pessoa a procura.
+
+**Origem.** Gabriel em 03/11/2026: "o hoje (e os outros menus) estão muito noisy/bagunçados". A prancha das críticas consolidadas (genjutsu e impeccable) mostrou o que disputava o cartão do Agora, e o cartão de 17:37Z propôs a lista abaixo ("Sim, a lista da prancha", a opção recomendada). **Ainda sem resposta do Gabriel:** ajustar esta seção se ele escolher outra ("Os chips de tempo ficam" ou a lista que ele escrever).
+
+**O que muda.**
+1. A faixa de dicas ("O que cada opção faz") sai do topo: só vem pela Ajuda. `GuiaDaTela` ganha `soPelaAjuda`; o guia segue montado, então a Ajuda o oferece, e abrir por lá tira o "Novo".
+2. Os pontos do Dia só aparecem depois do primeiro aceso (feito hoje). Três pontos apagados sobre o cartão eram ruído; a fileira passa a ser o momento de ver o primeiro acender.
+3. Os quatro tempos (5, 10, 25 e 45 min) ficam atrás do link "tenho outro tempo", ao lado da estimativa ("cerca de 5 min · tenho outro tempo"). Abre dentro da folha, com `aria-expanded`; escolher um tempo continua montando o lote, e tocar de novo no mesmo desfaz.
+4. "Começar uma Sessão" deixa de ser um cartão e vira uma linha recolhida (`<details>`, o mesmo desenho do "Em seguida"): o rótulo, a seta e uma divisória de 1 px. Aberta, mostra os quatro tipos, a sugestão primeiro; nenhum é o botão principal.
+5. A linha de parada vira uma linha só, quieta, logo abaixo da folha: "Retomar em LEP, art. 112, § 2º, salvo ontem, 22h10", em 14 px atenuado. Saem a faixa de caneta sob o lugar e o ponto de luz (e o token `--marca-da-parada`).
+6. O "Para lembrar" sai do Hoje: a nota mora no "Lembrete" do "+" (D-D15), a mesma `Preferencias.lembrete`.
+
+**O que continua como está.** O cartão do Agora, o anel de evidência (D-D13), "Escolher outra coisa", o "Em seguida" e o "Trocar", o Fechar o Dia, os avisos com o orçamento de dois blocos e o "Ver mais" (S7), a Chegada e a Entrada do Dia, o "+" (D-D15) e o botão Começar como a única ação principal da tela.
+
+**Medido** (Hoje semeado, `scripts` do scratchpad; 03/11/2026). A 390 × 844 o Começar fica entre 279 e 331 px do alto e o "Em seguida" termina a 542 px, tudo acima das abas (764 px); a 320 × 568 o Começar termina a 355 px, com as abas a 488 px; nada rola de lado a 390, 320 nem 1280 px. O alvo do "tenho outro tempo" e o da linha "Começar uma Sessão" medem 44 px ou mais.
+
+**Custo.** Um toque a mais para escolher o tempo (o link) e outro para começar uma Sessão por tipo (abrir a linha); a nota rápida fica a dois toques ("+" e "Lembrete") e as dicas, em "Ajuda" › "O que cada opção faz". A Marca pode pedir de volta a faixa de caneta da linha de parada, o único traço "marca-texto" que sobrava no Hoje.

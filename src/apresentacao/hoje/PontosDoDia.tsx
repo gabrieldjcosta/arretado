@@ -46,7 +46,8 @@ function gravarVistos(vistos: PontosVistos) {
 /**
  * O andamento de hoje, em três pontos com nome. O estado também vem em texto para o leitor de tela. Um
  * ponto que acendeu desde a última visita ao Hoje (no mesmo dia) acende uma vez; no resto, o Hoje abre
- * quieto. Só informa: nenhum ponto cobra.
+ * quieto. Só informa: nenhum ponto cobra. Enquanto nada foi feito hoje não há o que informar, e os três
+ * apagados são só ruído sobre o cartão do Agora: a fileira só aparece depois do primeiro ponto aceso.
  */
 export function PontosDoDia({ retrato }: { retrato: RetratoDoHoje | undefined }) {
   const [visto] = useState(lerVistos);
@@ -54,7 +55,8 @@ export function PontosDoDia({ retrato }: { retrato: RetratoDoHoje | undefined })
     if (retrato !== undefined) gravarVistos({ data: retrato.data, estados: retrato.pontos });
   }, [retrato]);
 
-  if (retrato === undefined) return <div className="pontos-do-dia" aria-hidden="true" />;
+  if (retrato === undefined) return null;
+  if (!FAMILIAS_DO_DIA.some((f) => retrato.pontos[f] === 'feito')) return null;
   const acendem =
     visto?.data === retrato.data ? pontosQueAcenderam(retrato.pontos, visto.estados) : [];
   return (

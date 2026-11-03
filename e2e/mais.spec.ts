@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoes, test } from './apoio';
+import { abrirOLembrete, expect, semViolacoes, test } from './apoio';
 
 // O "+" do título (Hoje e Fixar) abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
 // nem tem <dialog> de verdade; aqui o navegador mede o painel (dentro da tela, alvos de 44 px), roda o foco
@@ -62,11 +62,7 @@ test.describe('"+" do título', () => {
     page,
   }) => {
     await page.goto('/');
-    await mais(page).click();
-    await painel(page).getByRole('button', { name: 'Lembrete' }).click();
-
-    const dialogo = page.getByRole('dialog', { name: 'Lembrete' });
-    await expect(dialogo).toBeVisible();
+    const dialogo = await abrirOLembrete(page);
     await expect(painel(page)).toHaveCount(0);
     const campo = dialogo.getByRole('textbox', { name: 'Lembrete' });
     await expect(campo).toBeFocused();
@@ -80,31 +76,42 @@ test.describe('"+" do título', () => {
     await expect(dialogo).toBeHidden();
     await expect(mais(page)).toBeFocused();
 
-    // A nota é a mesma do "Para lembrar" do Hoje e dura além da página.
+    // A nota dura além da página.
     await page.reload();
-    await mais(page).click();
-    await painel(page).getByRole('button', { name: 'Lembrete' }).click();
-    await expect(
-      page.getByRole('dialog', { name: 'Lembrete' }).getByRole('textbox', { name: 'Lembrete' }),
-    ).toHaveValue('Levar o diploma ao cartório');
+    const outra = await abrirOLembrete(page);
+    await expect(outra.getByRole('textbox', { name: 'Lembrete' })).toHaveValue(
+      'Levar o diploma ao cartório',
+    );
   });
 
   test('o texto escrito e não salvo se guarda ao fechar com Esc', async ({ page }) => {
     await page.goto('/');
-    await mais(page).click();
-    await painel(page).getByRole('button', { name: 'Lembrete' }).click();
-    const dialogo = page.getByRole('dialog', { name: 'Lembrete' });
+    const dialogo = await abrirOLembrete(page);
     await dialogo.getByRole('textbox', { name: 'Lembrete' }).fill('Pedir a certidão');
     await expect(dialogo.getByText('Ainda não salvo.')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialogo).toBeHidden();
 
     await page.reload();
-    await mais(page).click();
-    await painel(page).getByRole('button', { name: 'Lembrete' }).click();
-    await expect(
-      page.getByRole('dialog', { name: 'Lembrete' }).getByRole('textbox', { name: 'Lembrete' }),
-    ).toHaveValue('Pedir a certidão');
+    const outra = await abrirOLembrete(page);
+    await expect(outra.getByRole('textbox', { name: 'Lembrete' })).toHaveValue('Pedir a certidão');
+  });
+
+  test('o Lembrete grava ao sair do campo, sem apertar Salvar', async ({ page }) => {
+    await page.goto('/');
+    const dialogo = await abrirOLembrete(page);
+    await dialogo
+      .getByRole('textbox', { name: 'Lembrete' })
+      .fill('Pedir o livro de Processo Penal');
+    await dialogo.getByRole('heading', { level: 2, name: 'Lembrete' }).click();
+    // O aviso "Salvo.", e só ele: `hasText: 'Salvo.'` casaria também "Ainda não salvo." (sem diferenciar maiúscula).
+    await expect(dialogo.getByRole('status').filter({ hasText: /^Salvo\.$/ })).toBeVisible();
+
+    await page.reload();
+    const outra = await abrirOLembrete(page);
+    await expect(outra.getByRole('textbox', { name: 'Lembrete' })).toHaveValue(
+      'Pedir o livro de Processo Penal',
+    );
   });
 
   test('o Fixar tem o mesmo "+", com as duas opções', async ({ page }) => {
