@@ -15,13 +15,14 @@ import {
   type TouchEvent as ReactTouchEvent,
 } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import type {
-  Dispositivo as DispositivoDoModelo,
-  Intervalo,
-  Leitura,
-  Marcacao,
-  TextoDeDispositivo,
-  TipoDispositivo,
+import {
+  DESTAQUES_LIGADOS_PADRAO,
+  type Dispositivo as DispositivoDoModelo,
+  type Intervalo,
+  type Leitura,
+  type Marcacao,
+  type TextoDeDispositivo,
+  type TipoDispositivo,
 } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
@@ -431,9 +432,11 @@ function LeitorAberto({
   // seguidos partem do valor pedido, não do gravado (que ainda pode ser o antigo).
   const [pedido, setPedido] = useState<number | null>(null);
   const tamanho = pedido ?? preferencias?.tamanhoFonte ?? TAMANHO_PADRAO;
-  // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é desligado.
+  // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é o padrão do app,
+  // ligado (D-D17). Até a preferência chegar, vale o padrão: quase todo mundo o mantém.
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
-  const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
+  const destacar =
+    destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO;
   // Linha ativa (peça 1): a que está sob o dedo, o cursor ou o foco. Mostra o botão da estrela e,
   // com a régua de leitura ligada (fatia 4), recebe o realce.
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;

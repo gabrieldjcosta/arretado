@@ -346,3 +346,21 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
+
+## D-D17 — Os destaques abrem ligados (03/11/2026, recomendada no cartão "Ligar os grifos automáticos por padrão")
+
+> **Emenda à decisão de 24/09/2026 (destaque automático, 9.8) e ao Passeio.** O destaque automático de prazos, exceções, termos absolutos e penas passa a abrir ligado no Leitor. Quem desligou continua desligado.
+
+**Origem.** Gabriel em 03/11/2026: as melhores ferramentas ficaram escondidas para quem viu o app pela primeira vez. O Passeio já dizia "Termos-chave de cada lei já destacados pra você", mas o Leitor abria desligado, então a promessa só valia para quem achasse o botão "Destaques". O cartão propôs a opção recomendada ("Sim, ligados por padrão"). **Ainda sem resposta do Gabriel:** ajustar esta seção se ele escolher "Não, o Passeio ensina a ligar" (voltar o padrão a desligado e trocar a frase do Passeio por "toque em Destaques para marcar prazos, exceções, absolutos e penas") ou a regra que ele escrever.
+
+**O que muda.**
+1. `DESTAQUES_LIGADOS_PADRAO = true` (`src/core/modelo/sistema.ts`): o campo ausente de `Preferencias.destacarCondicionantesEPrazos` vale ligado no Leitor, em Conta › Aparência e na prévia dos perfis. Sem migração e sem subir o esquema: quem tocou no botão ou na caixa gravou `true` ou `false`, e o valor gravado vence. Quem nunca mexeu passa a ver os destaques e a legenda de uma linha sob a barra do leitor.
+2. Perfis: o Calmo continua desligando os destaques ("menos coisas na tela"); o Guiado e a Leitura os deixam ligados. O Guiado gravava `false` como "padrão do app" e passou a gravar a constante, para a prévia "O que muda com o Guiado" seguir mostrando só o temporizador.
+3. Até a preferência chegar do banco, o Leitor usa o padrão (ligado): quem desligou pode ver um quadro com o sublinhado antes de ele sumir.
+4. Os testes e o E2E: "Destaques" e a caixa de Conta abrem marcados; o E2E que ligava passou a desligar e conferir que o `false` persiste depois de recarregar.
+
+**O que continua como está.** O detector (`detectarDestaques`) e o dicionário; os sublinhados sem fundo (duplo, tracejado, ondulado e pontilhado, o traço diz a categoria sem a cor); a legenda de uma linha; o botão "Destaques" na barra do leitor; a preferência única e global; o modo foco, que mantém os destaques no texto e deixa a legenda de fora.
+
+**Custo.** Mais sublinhados na tela de quem nunca mexeu: de 3% (LEP) a 12% (CP) dos caracteres e de 25% a 58% das linhas (medido em 06/10/2026, `docs/planos/F2.md` › "Fatos do destaque"). O cálculo é só do que está desenhado (menos de 80 linhas), uma vez por texto; a norma inteira leva de 0,03 a 0,25 s no corpus e `desempenho.test.ts` guarda o teto. Nenhum JavaScript a mais (496 e 328 kB gzip). Quem se cansar desliga com um toque em "Destaques" ou escolhe o perfil Calmo.
+
+**Em aberto.** A resposta do Gabriel ao cartão. A leitura do CP com 58% das linhas acesas por uns 10 minutos é dele: se cansar, voltar o padrão a desligado é trocar uma constante.

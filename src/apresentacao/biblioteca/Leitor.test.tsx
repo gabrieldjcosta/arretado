@@ -424,7 +424,7 @@ describe('destaque automático (9.8)', () => {
       el.className,
     ]);
 
-  it('desligado por padrão; o botão "Destaques" liga, grava a preferência global e mostra a legenda', async () => {
+  it('ligado por padrão, sem gravar nada; o botão "Destaques" desliga e liga, grava a preferência global e mostra a legenda (D-D17)', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI_COM_DESTAQUES);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -433,12 +433,6 @@ describe('destaque automático (9.8)', () => {
       expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
     });
     const botao = screen.getByRole('button', { name: 'Destaques' });
-    expect(botao).toHaveAttribute('aria-pressed', 'false');
-    expect(document.querySelector('.destaque')).toBeNull();
-    expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
-    const textoAntes = dispositivo('art1').textContent;
-
-    await usuario.click(botao);
     expect(botao).toHaveAttribute('aria-pressed', 'true');
     expect(destaques('art1')).toEqual([
       ['prazo de 5 (cinco) dias', 'destaque destaque-prazo'],
@@ -449,24 +443,51 @@ describe('destaque automático (9.8)', () => {
       ['reclusão, de 2 (dois) a 8 (oito) anos', 'destaque destaque-pena'],
       ['e multa', 'destaque destaque-pena'],
     ]);
-    // O texto não muda: o destaque só parte os trechos.
-    expect(dispositivo('art1').textContent).toBe(textoAntes);
     expect(screen.getByRole('list', { name: 'Legenda dos destaques' })).toBeInTheDocument();
-    await waitFor(async () => {
-      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
-    });
+    // Abrir o leitor não grava o padrão: o campo só existe depois de a pessoa mexer.
+    expect(await obterPreferencias(repo)).not.toHaveProperty('destacarCondicionantesEPrazos');
+    const textoLigado = dispositivo('art1').textContent;
 
     await usuario.click(botao);
     expect(botao).toHaveAttribute('aria-pressed', 'false');
     expect(document.querySelector('.destaque')).toBeNull();
+    expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
+    // O texto não muda: o destaque só parte os trechos.
+    expect(dispositivo('art1').textContent).toBe(textoLigado);
     await waitFor(async () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
     });
+
+    await usuario.click(botao);
+    expect(botao).toHaveAttribute('aria-pressed', 'true');
+    expect(destaques('art1')).toHaveLength(2);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
+    });
   });
 
-  it('com a preferência ligada, abre aceso; só o texto vigente acende (a redação anterior não)', async () => {
+  it('quem desligou os destaques continua com eles desligados, sem destaque nem legenda (D-D17)', async () => {
     const { repo } = await repositorioDeTeste();
-    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: true });
+    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: false });
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
+    });
+    // Até a preferência chegar vale o padrão (ligado); depois a escolha da pessoa vence.
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+    });
+    expect(document.querySelector('.destaque')).toBeNull();
+    expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
+  });
+
+  it('abre aceso sem a pessoa ter mexido; só o texto vigente acende (a redação anterior não)', async () => {
+    const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI_COM_DESTAQUES);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByRole('heading', { level: 1, name: 'LEP' });
@@ -512,7 +533,8 @@ describe('régua de leitura (fatia 4)', () => {
       expect(comRegua()).toHaveLength(1);
     });
     expect(dispositivo('art1').closest('.linha-leitor')).toHaveAttribute('data-regua');
-    await usuario.hover(within(dispositivo('art2')).getByText(/Qualquer condenado/));
+    // Com os destaques ligados por padrão, "Qualquer" é um trecho à parte: o texto do meio é o da linha.
+    await usuario.hover(within(dispositivo('art2')).getByText(/condenado poderá requerer/));
     await waitFor(() => {
       expect(dispositivo('art2').closest('.linha-leitor')).toHaveAttribute('data-regua');
     });
