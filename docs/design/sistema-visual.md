@@ -122,6 +122,25 @@ Contrastes medidos em `scripts/contraste.mjs`: de dia, a linha branca sobre a fa
 
 Regras: o brilho só existe em traço que a caneta desenha, nunca em botão, texto, cartão, borda, aba nem ícone parado; é uma cópia larga e desfocada do próprio traço (`feGaussianBlur`), nunca `box-shadow` nem `drop-shadow`; em `forced-colors: active` o brilho, a faixa, o miolo e as bochechas somem e o traço usa `CanvasText`. `scripts/contraste.test.ts` confere os tokens nos três blocos e falha se `neon` ou `bloom` aparecer fora dos CSS dos traços de caneta.
 
+### O anel de evidência (D-D13)
+
+O único elemento que a pessoa deve olhar agora leva um anel: o cartão do **Agora** no Hoje (`.acao-agora.evidencia`, pedido por `emEvidencia`) e o **artigo único do Modo foco** (`.evidencia-foco`, o envoltório do `.cartao-artigo`, que rola por dentro e cortaria o halo). Lista fechada: nenhum botão, lista, aba, linha, aviso, Estrela nem o cartão de Fixar; o Agora de Fixar, do mapa da norma e do plano fica sem anel. Entrar na lista exige nova decisão do Gabriel. É a opção B do Gabriel, "branco com faixa suave" (03/11/2026): uma linha branca de 2 px por fora do cartão, a faixa piscina de 5 px por fora da linha e o halo piscina. Dois pseudoelementos sem fundo, sob o texto e sob o foco do teclado (`z-index` negativo num contexto próprio): `::before` é o halo (uma sombra de 20 px com 6 de espalhamento e, por dentro, um tom de 14 px) e `::after` é a linha com a faixa (duas sombras duras, sem desfoque). Os tokens estão em `estilos.css` e o CSS em `componentes/evidencia/evidencia.css`. Colunas: dia · noite.
+
+| Token | Dia · noite | O quê |
+|---|---|---|
+| `--ev-linha`, `--ev-linha-larg` | `#ffffff`, `2px` (igual, só na raiz) | a linha branca por fora do cartão |
+| `--ev-faixa` | `rgb(57 202 239 / 0.5)` · `rgb(57 202 239 / 0.35)` | a faixa piscina por fora da linha |
+| `--ev-faixa-fim` | `5px` (igual) | onde a faixa termina (a partir do cartão) |
+| `--ev-halo-cor` | `57 202 239` (igual) | o azul piscina do brilho (`--neon-cor`) em canais, para o `rgb()` |
+| `--ev-halo-aceso` | `0.7` · `0.75` | a opacidade do halo no pico, a 0,3 s |
+| `--ev-halo-repouso` | `0.45` · `0.5` | a opacidade depois de assentar, até 0,9 s |
+| `--ev-halo-raio`, `--ev-halo-espalha` | `20px`, `6px` (igual) · no Modo foco `14px`, `4px` | o raio e o espalhamento do halo por tela |
+| `--ev-interno` | `0.4` (igual) | a fração do halo que tinge a borda por dentro |
+
+Movimento: o halo acende uma vez ao entrar (0,9 s: sobe ao pico em 0,3 s e assenta no repouso), só a opacidade anima, nunca pulsa e trocar de artigo no foco não reacende (o envoltório não é recriado). Perfil Calmo: o halo só esmaece em 0,24 s. Movimento reduzido: o repouso, parado. Cores forçadas: o halo e a faixa somem e o cartão ganha uma borda de 2 px `Highlight`. Sem `filter`, sem `backdrop-filter` e sem transição; a página não ganha rolagem lateral a 320 px.
+
+Contraste: de dia a faixa mede 1,8:1 e a linha 1,06:1 sobre o papel, então o anel é decoração e não o contorno que o WCAG 1.4.11 pede: o cartão do Agora e o artigo do foco mantêm a borda da folha (`--borda-folha`) e é ela que cumpre o 3:1; o anel nunca a substitui (guarda em `scripts/evidencia-css.test.ts`). À noite a linha branca passa de 3:1 sobre o chão, a folha e a penumbra do Modo foco (par `ev-linha` em `scripts/contraste.mjs`). Trocar a faixa de dia por uma de 4,36:1 (a opção C, `#0b7f9c`) é a troca de um token. Custo: +2,3 kB de CSS (0,5 kB gzip) e nenhum de JavaScript; com a CPU 4× mais lenta os quadros ficam iguais (o maior, 18,4 ms contra 18,2 ms sem o anel).
+
 ### Estado (sem mudança)
 
 `--perigo` (e `--perigo-texto`), `--aviso-fundo/-texto` e os grifos (`--grifo-1` a `-3`, os marca-textos do aluno) ficam como estavam. `--perigo` mede 6,8:1 no papel e 8,2:1 na noite.
@@ -132,7 +151,7 @@ Regras: o brilho só existe em traço que a caneta desenha, nunca em botão, tex
 |---|---|
 | Raios | `--raio-botao` (botão, campo) 6 · 12 px; `--raio-folha` (`--raio-heroi`, `--raio-cartao`, `--raio`: folha do Agora, cartão, diálogo) 8 · 14; `--raio-chip` (chip, selo, marcador, tecla de atalho) 6 · 10. O trilho das abas de página e o dock do Leitor somam 4 px ao raio do botão (10 · 16), para as curvas de dentro e de fora serem concêntricas; a caixa de marcar tem metade do raio do botão. Redondos (50%): o "+", os pontos e a caneta. Não há pílula: a guarda da Q7 recusa `border-radius` de três dígitos em px. Ficam de propósito, dentro do texto, quatro raios de 2 a 4 px (grifo, foco da remissão, tarja da lacuna e "carregando"). O que está dentro tem raio menor que o que o contém. |
 | Contorno | `--espessura-contorno` 1,5 px · 1 px (o Chromium arredonda o de 1,5 px para 1); em tinta cheia só no que está marcado |
-| Sombras | `--sombra-botao` `0 2px 0 var(--tinta-funda)` · nenhuma (só no botão primário); `--sombra-botao-aperto` `0 1px 0` · nenhuma; `--sombra` e o resto: nenhuma. A única "sombra" a mais é `--sombra-folha`, a mesma linha de 1 px por dentro (`inset 0 0 0 1px`), que pinta a faixa do lido no Leitor. Nenhum `box-shadow` leva desfoque (guarda em `scripts/contraste.test.ts`). |
+| Sombras | `--sombra-botao` `0 2px 0 var(--tinta-funda)` · nenhuma (só no botão primário); `--sombra-botao-aperto` `0 1px 0` · nenhuma; `--sombra` e o resto: nenhuma. A única "sombra" a mais é `--sombra-folha`, a mesma linha de 1 px por dentro (`inset 0 0 0 1px`), que pinta a faixa do lido no Leitor. Nenhum `box-shadow` leva desfoque, salvo o halo do anel de evidência (D-D13; guardas em `scripts/contraste.test.ts` e `scripts/evidencia-css.test.ts`). |
 | Aperto | `--aperto-botao` `translateY(1px)` · `scale(0.975)` |
 | Fundo | Liso, sem textura. |
 | Espaço | `--espaco-1` 0,25 rem · `-2` 0,5 · `-3` 1 · `-4` 1,5 · `-5` 2 · `-6` 3 |
@@ -274,7 +293,7 @@ O texto da lei nunca é animado e o Leitor nunca é remontado; sem mascote no Le
 | Carregando | `Esqueleto`: a opacidade das linhas pulsa até 50% em 0,6 s, duas vezes; com movimento reduzido, parado |
 | Caneta | muda de lugar por salto; nunca gira nem desliza |
 | Quadro do cacto | de 520 a 1100 ms por fio (a parte inteira leva de 1,3 a 2,5 s, medido no Chromium), uma vez, ao fechar o Dia; só aqui a caneta anda |
-| Escrita do nome | completa 2,64 s (primeira abertura no aparelho), curta 1,2 s (primeira de cada Dia), parada nas demais; reduzido: parada; Calmo: esmaece em 0,24 s; um toque ou uma tecla pula |
+| Escrita do nome | na tela cheia, em toda abertura (D-D14): completa 2,64 s (primeira no aparelho), 2,4 s (primeira de cada Dia) e 1,6 s (as demais), três pulos seguidos calam até o Dia seguinte; no cabeçalho, quando a tela cheia não abre: curta 1,2 s na primeira de cada Dia, parada nas demais; reduzido: parada; Calmo: esmaece em 0,24 s; um toque ou uma tecla pula |
 | Traço de seleção | normal: 240 ms desenhando, 120 ms parado, 260 ms sumindo; Calmo: contorno inteiro que esmaece em 380 ms; reduzido: nada |
 | Néon suave (D-D10) | acende junto com o traço da caneta e assenta em 0,6 s, uma vez; nunca pulsa; Calmo: só o repouso, esmaecendo; reduzido: o repouso, parado |
 | O Zé (D-D10) | o contorno se desenha de pé a pé em 1,2 s com o néon aceso; o olhar e o humor mudam em 200 ms; a piscada dura 160 ms, a piscadela 560 ms; a luz amarela da flor pisca em rodadas de 3, só nas Boas-vindas; Calmo: aparece e esmaece, sem piscar; reduzido: pronto e parado |

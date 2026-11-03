@@ -199,28 +199,45 @@ test('"Pular" tira a camada na hora, e o cabeçalho segue com o nome parado', as
   await expect(page).toHaveURL(/#\/$/);
 });
 
-test('a segunda abertura do mesmo Dia: nenhuma camada, o lockup parado na hora', async ({
+test('a segunda abertura do mesmo Dia: a camada escreve de novo, o nome em 1,6 s, sem "Pular" (D-D14)', async ({
   page,
 }) => {
   await page.goto('/#/');
   await pularAAbertura(page);
   await page.reload();
+  const abertura = camada(page);
+  await expect(abertura).toBeVisible();
+  await expect(abertura).toHaveAttribute('data-escrita', 'depressa');
+  await expect(pular(page)).toHaveCount(0);
+  // O mesmo desenho do nome inteiro, na escala de 1,6/2,64: a linha do tempo de 4 s do kit escala por `--k`.
+  const duracao = await page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .flatMap((a) =>
+          a instanceof CSSAnimation && a.animationName === 'eb-t0'
+            ? [a.effect?.getComputedTiming().duration]
+            : [],
+        )[0],
+  );
+  expect(duracao).toBeCloseTo((4000 * 1600) / 2640, 0);
+  const percurso = await acompanhar(page);
+  expect(percurso.fases).toEqual(['escrevendo', 'voando']);
+  await expect(abertura).toHaveCount(0);
   await expect(page.locator('.marca .lockup-ponto')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  // A decisão é de milissegundos: dado um respiro, nada abriu.
-  await page.waitForTimeout(600);
-  await expect(camada(page)).toHaveCount(0);
+  // O nome se escreveu na camada, não no cabeçalho.
   await expect(page.locator('.marca svg.eb')).toHaveCount(0);
 });
 
-test('primeira abertura de outro Dia: o modo curto, sem "Pular", e o Dia fica guardado', async ({
+test('primeira abertura de outro Dia: o nome em 2,4 s, sem "Pular", e o Dia fica guardado', async ({
   page,
 }) => {
   await escreveuEmOutroDia(page);
   await page.goto('/#/');
   const abertura = camada(page);
   await expect(abertura).toBeVisible();
-  await expect(abertura.locator('svg.eb')).toHaveClass(/curta/);
+  await expect(abertura).toHaveAttribute('data-escrita', 'doDia');
   await expect(pular(page)).toHaveCount(0);
 
   const percurso = await acompanhar(page);
@@ -232,11 +249,48 @@ test('primeira abertura de outro Dia: o modo curto, sem "Pular", e o Dia fica gu
   const dia = (JSON.parse((await guardado(page)) ?? 'null') as { dia: string }).dia;
   expect(dia).toMatch(UM_DIA);
   expect(dia).not.toBe(DIA_ANTIGO);
-  // A seguinte, no mesmo Dia, já é a parada.
+});
+
+test('três aberturas seguidas puladas calam a tela cheia até o Dia seguinte (a conta mora no aparelho)', async ({
+  page,
+}) => {
+  await page.goto('/#/');
+  // A primeira vez e mais duas, cada uma pulada com a primeira tecla.
+  await pularAAbertura(page);
+  for (let i = 0; i < 2; i += 1) {
+    await page.reload();
+    await pularAAbertura(page);
+  }
+  expect(JSON.parse((await guardado(page)) ?? 'null')).toMatchObject({ puladas: 3 });
+  // A quarta já nasce no cabeçalho: nenhuma camada, o lockup parado na hora, o Hoje à vista.
   await page.reload();
   await expect(page.locator('.marca .lockup-ponto')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   await page.waitForTimeout(600);
   await expect(camada(page)).toHaveCount(0);
+  await expect(page.locator('.marca svg.eb')).toHaveCount(0);
+  // No Dia seguinte a tela cheia volta, na abertura do Dia, e a conta recomeça.
+  await page.evaluate(
+    ([chave, valor]) => {
+      window.localStorage.setItem(chave as string, valor as string);
+    },
+    [CHAVE, JSON.stringify({ dia: DIA_ANTIGO, puladas: 3 })],
+  );
+  await page.reload();
+  await expect(camada(page)).toHaveAttribute('data-escrita', 'doDia');
+});
+
+test('uma abertura que vai até o fim zera a conta de pulos seguidos', async ({ page }) => {
+  await escreveuEmOutroDia(page);
+  await page.goto('/#/');
+  await pularAAbertura(page);
+  await page.reload();
+  await expect(camada(page)).toBeVisible();
+  await acompanhar(page);
+  await expect(camada(page)).toHaveCount(0);
+  expect(JSON.parse((await guardado(page)) ?? 'null')).toEqual({
+    dia: expect.stringMatching(UM_DIA),
+  });
 });
 
 test('um toque pula, e é só isso: o que está embaixo dele não é acionado', async ({

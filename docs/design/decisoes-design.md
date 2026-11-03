@@ -347,6 +347,44 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
 
+## D-D13 — O contorno de evidência: um anel no Agora e no artigo do foco (03/11/2026, decisão do Gabriel)
+
+> **Emenda ao contrato do Zé (§8b, regras 4 e 5, v10h) e à D-D10.** O brilho piscina deixa de ser só o traço novo da caneta e passa a marcar também o único elemento que a pessoa deve olhar agora. A D-D12 tirou a caneta do Hoje; o anel é o que fica no lugar dela.
+
+**Origem.** Gabriel em 03/11/2026: "a coisa que tiver em evidência (cartão do hoje/o que fazer agora, artigo na leitura em modo foco) precisa ficar com um outline branco com brilho azul, tipo o néon que usamos pra o mascote." Às 16:23Z, diante de três desenhos, escolheu a opção **B, "branco com faixa suave"**; a recomendada era a C (faixa de dia `#0b7f9c`, 4,36:1), que fica como troca de um token.
+
+**O que muda.**
+1. Um anel em CSS, de lista fechada: o cartão do Agora no Hoje (`.acao-agora.evidencia`, pedido por `emEvidencia` em `AcaoAgora`; só `Agora.tsx` e `RevisaoPorTempo.tsx` o ligam) e o artigo único do Modo foco (`.evidencia-foco`, um envoltório do `.cartao-artigo`, que rola por dentro e cortaria o halo). O Agora de Fixar, do mapa da norma e do plano fica sem anel. Entrar na lista exige nova decisão do Gabriel.
+2. O desenho: linha branca de 2 px por fora do cartão, faixa piscina de 5 px (50% de dia, 35% à noite) e halo piscina (20 px de raio com 6 de espalhamento; 14 e 4 no Leitor) com um tom de 14 px por dentro. Dois pseudoelementos sem fundo, sob o texto e o foco do teclado: `::before` é o halo e `::after` é a linha com a faixa. Dez tokens `--ev-*` em `estilos.css`.
+3. O movimento: o halo sobe ao pico em 0,3 s (0,7 de dia, 0,75 à noite) e assenta no repouso até 0,9 s (0,45 e 0,5), uma vez. Só a opacidade anima, nunca pulsa e trocar de artigo no foco não reacende. Calmo: só esmaece em 0,24 s. Movimento reduzido: o repouso, parado. Cores forçadas: o halo e a faixa somem e o cartão ganha borda de 2 px `Highlight`.
+4. As regras do sistema ganham uma exceção só: o halo é a única sombra desfocada do app e o único brilho que não é traço de caneta. Sem `filter`, sem `backdrop-filter`, sem transição.
+
+**Contraste.** De dia a faixa mede 1,8:1 e a linha 1,06:1 sobre o papel, então o anel é decoração e não o contorno do WCAG 1.4.11: o Agora e o artigo do foco mantêm a borda da folha, que cumpre o 3:1, e o anel nunca a substitui (guarda no CSS). À noite a linha branca passa de 3:1 sobre o chão, a folha e a penumbra do foco (par `ev-linha` em `scripts/contraste.mjs`).
+
+**O que continua como está.** O Zé só na Chegada, na Ajuda e na tela de carregamento; a regra dos três materiais (D-D11); o anel de foco do teclado, que fica por cima do anel de evidência; a leitura do Agora e do artigo, ditas pelo texto, pela posição e pelo nome acessível, nunca pelo brilho.
+
+**Custo.** +2,3 kB de CSS (0,5 kB gzip), nenhum de JavaScript (496 e 328 kB). Com a CPU 4× mais lenta, 126 quadros em 2 s, o maior de 18,4 ms contra 18,2 ms sem o anel, nenhum acima de 33 ms.
+
+**Em aberto.** A leitura do Modo foco de noite por 5 minutos (se cansar, o halo do Leitor cai) é do Gabriel. O apagar de 0,24 s do elemento anterior (contrato §8c, item 2) não foi construído: hoje há um só elemento em evidência por tela e ele não troca de lugar.
+
+## D-D14 — A Abertura escreve o nome em toda abertura (03/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D9 (Q6, suposição 2) e ao contrato do Zé (§9, v10h).** A frequência da escrita do nome na tela cheia, que era "inteira na primeira vez, curta na primeira de cada Dia, parada nas demais", passa a ser "toda abertura escreve". A D-D13 (o anel de evidência) entra em outro PR.
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "decidi que, em todas as vezes que a pessoa abrir o site, a animação (nome sendo escrito e virando cacto) deve carregar por tempo suficiente pra ser apreciada pelo usuário, mas sem cansá-lo." Os tempos e a regra dos pulos são da Marca (contrato v10h, §9 e critério 28), de partida: o Gabriel confirma depois de uma semana de uso.
+
+**O que muda.**
+1. Na tela cheia, toda abertura do aplicativo escreve o mesmo desenho do nome em três tempos: inteiro em 2,64 s na primeira vez no aparelho (com "Pular" e, se a Chegada vem, o voo ao Zé), em 2,4 s na primeira abertura de cada Dia e em 1,6 s nas demais. São cerca de 3,2 s e 2,2 s de camada com a pausa e a luz de 0,45 s ao cabeçalho. A escolha de tempo é uma só (`NOME_NA_TELA_MS`); o CSS do kit escala toda a linha do tempo por `--k`.
+2. "Abertura" é carregar a página ou abrir o PWA; voltar de segundo plano sem recarregar não conta.
+3. Três aberturas seguidas puladas no mesmo Dia calam a tela cheia até o Dia seguinte: o cansaço dita o corte, não o relógio. A conta mora na chave que já existe (`{ dia, puladas }`), e uma abertura que vai até o fim a zera.
+4. `escritaNaTela` (nova) decide a tela cheia; `escritaDaAbertura` e `FREQUENCIA` seguem como a frequência do cabeçalho, para quando a tela cheia não abre. Um Dia guardado no futuro deixa a tela cheia calada: a semente do E2E e dos testes (`9999-12-31`) continua valendo.
+
+**O que continua como está.** Os vetos da tela cheia: movimento reduzido, "só estudo" (o preset Calmo), Sessão aberta e falha ao ler os dados; nesses casos o cabeçalho escreve como antes, uma vez por Dia. O Calmo só esmaece (0,24 s, fica 0,7 s). Um toque ou uma tecla pula, e esse toque é consumido; só a primeira vez leva o botão "Pular" (as outras ficam abaixo de 5 s, WCAG 2.2.2). O desenho, o néon do nome e a regra dos três materiais. O app só monta depois da decisão (no máximo 0,4 s) e o tempo até a tela útil não cresceu: medido, o app monta aos 0,36 s (0,37 s antes) e aos 1,05 s com a CPU 4× mais lenta (1,08 s antes).
+
+**Custo.** A camada passa a ser o preço de abrir o app, sempre. Quem tem pressa pula com um toque, e três pulos a calam por hoje.
+
+**Em aberto.** Se cansar, a primeira alternativa é encurtar as demais para 1,2 s, não tirar a tela (contrato §13, item 26).
+
 ## D-D15 — O "+" abre duas opções: Registrar erro e Lembrete (03/11/2026, decisão do Gabriel)
 
 > **Emenda à D-D9 (Q2) e à P2 da D-D7.** O "+" do título deixa de ser um link para o registro de erro e passa a abrir um painel com duas opções; o registro de erro fica a um toque do painel.
