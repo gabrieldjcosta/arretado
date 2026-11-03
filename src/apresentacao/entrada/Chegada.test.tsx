@@ -192,7 +192,15 @@ describe('Chegada › o Passeio', () => {
     expect(
       within(folha).getByText('Aqui você vê o que tem pra fazer, sem agonia pra decidir.'),
     ).toBeVisible();
-    expect(within(folha).getAllByRole('listitem')).toHaveLength(PASSOS[0]?.itens.length ?? -1);
+    // As ferramentas em evidência vêm primeiro, com a frase em negrito; depois, as linhas simples.
+    const hoje = PASSOS[0];
+    expect(within(folha).getAllByRole('listitem')).toHaveLength(
+      hoje ? hoje.ferramentas.length + hoje.itens.length : -1,
+    );
+    expect(within(folha).getAllByRole('listitem')[0]).toHaveClass('passo-ferramenta');
+    expect(within(folha).getByText('Aqui seus erros viram acertos e Cartões.').tagName).toBe(
+      'STRONG',
+    );
     expect(
       within(folha)
         .getAllByRole('button')

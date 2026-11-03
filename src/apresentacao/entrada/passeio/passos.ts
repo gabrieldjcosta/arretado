@@ -1,7 +1,7 @@
 // Os textos do Passeio (D-D10, contrato §7): uma fonte só. A Chegada, o passeio refeito (Conta e Ajuda) e
 // os testes leem daqui; nenhum componente repete uma frase literal (`passos.test.ts` confere). Os nomes
-// e os ícones dos quatro menus vêm de `areas.ts`, os mesmos das abas. Os textos são do Gabriel (28/10 e
-// 31/10).
+// e os ícones dos quatro menus vêm de `areas.ts`, os mesmos das abas. Os textos são do Gabriel (28/10,
+// 31/10 e 03/11, as seis ferramentas em evidência).
 import { AREAS } from '../../areas';
 
 /**
@@ -19,6 +19,12 @@ export const BOAS_VINDAS = {
 
 export type IdDoPasso = 'hoje' | 'plano' | 'recall' | 'biblioteca';
 
+/** Uma das seis ferramentas que o Passeio põe em evidência (Gabriel, 03/11): a frase em negrito e, se couber, uma linha de apoio. */
+export interface Ferramenta {
+  destaque: string;
+  apoio?: string;
+}
+
 export interface Passo {
   id: IdDoPasso;
   /** O nome da aba (Hoje, Trilha, Fixar, Biblioteca). */
@@ -26,23 +32,40 @@ export interface Passo {
   /** O ícone de linha da aba, 24 × 24: o mesmo que o passo desenha. */
   icone: string;
   frase: string;
+  /** As ferramentas deste menu em evidência: vêm primeiro na lista, com a frase em negrito. */
+  ferramentas: readonly Ferramenta[];
+  /** O resto do que o menu faz, em linhas simples. */
   itens: readonly string[];
 }
 
-const TEXTOS_DOS_PASSOS: Record<IdDoPasso, Pick<Passo, 'frase' | 'itens'>> = {
+const TEXTOS_DOS_PASSOS: Record<IdDoPasso, Pick<Passo, 'frase' | 'ferramentas' | 'itens'>> = {
   hoje: {
     frase: 'Aqui você vê o que tem pra fazer, sem agonia pra decidir.',
-    itens: [
-      'No botão + você monta seu caderno de erros. Errou? Traga a Frase correta pra revisar e lembrar depois.',
-      'Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.',
+    ferramentas: [
+      {
+        destaque: 'Aqui seus erros viram acertos e Cartões.',
+        apoio: 'No botão +, traga a Frase correta pra revisar e lembrar depois.',
+      },
     ],
+    itens: ['Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.'],
   },
   plano: {
     frase: 'O edital em Pontos, montado pelo catálogo ou trazido por você.',
-    itens: ['Você também pode definir ciclos de estudo aqui na Trilha.'],
+    ferramentas: [
+      {
+        destaque: 'Ciclos de estudo facilitados.',
+        apoio: 'Você define os seus aqui na Trilha.',
+      },
+    ],
+    itens: [],
   },
   recall: {
     frase: 'Suas Frases e Cartões, com a Revisão de cada dia.',
+    ferramentas: [
+      {
+        destaque: 'Transforme rapidamente um artigo em cartão.',
+      },
+    ],
     itens: [
       'Gosta de cartões de revisão? Aqui você pode montar os seus para se testar.',
       'Dica: depois do passeio, faça cinco questões e registre o que precisa lembrar.',
@@ -50,11 +73,18 @@ const TEXTOS_DOS_PASSOS: Record<IdDoPasso, Pick<Passo, 'frase' | 'itens'>> = {
   },
   biblioteca: {
     frase: 'Onde ficam as normas pra ler e os seus resumos.',
-    itens: [
-      'Termos-chave de cada lei já destacados pra você.',
-      'Modo foco para ver só o artigo que está lendo.',
-      'O Mapa da norma mostra o que mais cai e te guia pela leitura.',
+    ferramentas: [
+      {
+        destaque: 'Destaques automáticos contra as pegadinhas.',
+      },
+      {
+        destaque: 'As leis que você estuda, atualizadas e mapeadas.',
+      },
+      {
+        destaque: 'Link entre leis e súmulas pra entender melhor.',
+      },
     ],
+    itens: ['Modo foco para ver só o artigo que está lendo.'],
   },
 };
 

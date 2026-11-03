@@ -2167,3 +2167,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 
 - **Dois Ciclos "Equilibrado" ou nenhum ativo.** Causa: duas abas abertas juntas criavam o Ciclo padrão, e a trava por módulo não vale entre abas. Solução: conferir de novo e criar dentro de `repo.transacao`.
 - **Previsível:** `garantirCicloPadrao` chama `carregarCiclo`, que tenta ler `/incidencia/` só para montar as matérias; o "Equilibrado" não usa incidência. Só pega quem tem Edital ligado a Concurso (nenhum fluxo grava isso hoje). Se aparecer lentidão no fim do onboarding, montar as matérias só com Disciplinas e Pontos.
+
+## A folha do Passeio tem altura fixa: texto novo se mede (D-D18, 03/11/2026)
+
+- **Sintoma:** com as seis ferramentas e as frases inteiras do Gabriel, a Biblioteca passou de 333 para 406 px e a folha passou a rolar no monitor (a área útil mede 354 px) e no 320 × 568 (cerca de 327 px), com o cartão cortado embaixo.
+- **Causa:** o `<dialog>` tem `height: min(46rem, 100dvh)` (fixo, e pinado em `scripts/passeio-css.test.ts`), então todo passo cabe no mesmo espaço, e cada linha a mais custa de 22 a 28 px.
+- **Solução:** frases curtas (as de negrito, até uns 48 caracteres, cabem numa linha no monitor e em duas no 320 px), apoio só onde diz *onde* (o botão +), e medir cada passo. Não mexer na altura da folha nem criar consulta de contêiner nova: o teste pina as quatro consultas.
+- **Previsível:** qualquer linha nova no Passeio repete o problema. Medir com um script que abre a Chegada, toca em "Vamos" e em "Seguir" e imprime `scrollHeight - clientHeight` de `.chegada-corpo` por passo, a 390 × 844, 320 × 568 e 1280 × 800.
+- **Origem:** D-D18 (03/11/2026).
