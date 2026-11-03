@@ -141,6 +141,11 @@ export function pares(mundo = 'dia') {
       ['z-ponto', 'fundo', 3],
     );
   }
+  // O anel de evidência (D-D13): à noite a linha branca de 2 px se separa do chão, da folha e da
+  // penumbra do Modo foco com 3:1. De dia ela é branca sobre o papel e a faixa piscina a 50% fecha em
+  // 1,8:1; o anel é decoração (o Agora e o artigo em foco se dizem pelo texto, pela posição e pelo nome
+  // acessível), então não há par de dia. O contrato (§8c) declara o custo.
+  if (mundo !== 'dia') for (const f of [...SUPERFICIES, 'penumbra']) p.push(['ev-linha', f, 3]);
   p.push(
     ['sucesso', 'superficie-2', 4.5],
     // O trilho da barra de progresso é a superfície 2.

@@ -91,7 +91,10 @@ describe('Hoje › Ponto de luz (P3)', () => {
 
     const agora = await screen.findByRole('region', { name: 'Agora' });
     expect(within(agora).getByRole('heading')).toHaveTextContent('Revisar cartões');
+    // O cartão do Agora é o elemento em evidência do Hoje (D-D13); "Em seguida" não leva o anel.
+    expect(agora).toHaveClass('evidencia');
     const seguinte = screen.getByRole('region', { name: 'Em seguida' });
+    expect(seguinte).not.toHaveClass('evidencia');
     expect(seguinte).toHaveTextContent('Continuar a leitura');
     await usuario.click(within(seguinte).getByText('Em seguida'));
     expect(within(seguinte).getAllByRole('listitem')).toHaveLength(1);

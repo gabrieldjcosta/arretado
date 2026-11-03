@@ -37,6 +37,8 @@ import { ProvedorSincronizacao } from './sincronizacao/ProvedorSincronizacao';
 import { LimiteDeErro } from './componentes/LimiteDeErro';
 import { Orientacoes } from './orientacoes/Orientacoes';
 import './estilos.css';
+// O anel de evidência (D-D13) vale no Agora do Hoje e no Leitor (sob demanda): o CSS dele vai com o do início.
+import './componentes/evidencia/evidencia.css';
 
 // Telas pesadas (leitor, importador, backup) saem do pacote inicial: o Hoje abre sem
 // baixar o estruturador nem o código de pacote. Offline continua igual (arquivos do mesmo site).
