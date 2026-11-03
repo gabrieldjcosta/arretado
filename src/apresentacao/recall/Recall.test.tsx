@@ -755,16 +755,13 @@ describe('Fixar na P5 do Ponto de luz', () => {
     expect(estado.querySelector('svg.icone-svg')).not.toBeNull();
   });
 
-  it('cartões: uma caneta encostada fora do cartão, respostas com desenho e, no fim, a deitada', async () => {
+  it('cartões: sem caneta (D-D12), respostas com desenho e, no fim, só o texto', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
     relogio.avancar(86_400_000);
     const { usuario } = await abrir('/recall/revisar', repo);
     expect(await screen.findByText('Frente 1')).toBeInTheDocument();
-    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
-    expect(screen.getByRole('article', { name: 'Cartão' }).contains(canetas()[0] ?? null)).toBe(
-      false,
-    );
+    expect(canetas()).toHaveLength(0);
     await usuario.keyboard(' ');
     const respostas = within(await screen.findByRole('group', { name: 'Como foi?' })).getAllByRole(
       'button',
@@ -773,16 +770,16 @@ describe('Fixar na P5 do Ponto de luz', () => {
     for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
     await usuario.keyboard('3');
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
-    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
+    expect(canetas()).toHaveLength(0);
   });
 
-  it('frases: a mesma caneta encostada, respostas com desenho e a deitada no fim', async () => {
+  it('frases: sem caneta, respostas com desenho e, no fim, só o texto', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await registrarErro(repo, { fraseCorreta: 'Frase do dia.' });
     relogio.avancar(86_400_000);
     const { usuario } = await abrir('/recall/frases/revisar', repo);
     expect(await screen.findByText('Frase do dia.')).toBeInTheDocument();
-    expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+    expect(canetas()).toHaveLength(0);
     const respostas = within(screen.getByRole('group', { name: 'Como foi?' })).getAllByRole(
       'button',
     );
@@ -790,6 +787,6 @@ describe('Fixar na P5 do Ponto de luz', () => {
     for (const b of respostas) expect(b.querySelector('svg.icone-svg')).not.toBeNull();
     await usuario.keyboard('1');
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
-    expect(canetas().map((c) => c.dataset.pose)).toEqual(['deitada']);
+    expect(canetas()).toHaveLength(0);
   });
 });

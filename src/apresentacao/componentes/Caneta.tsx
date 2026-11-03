@@ -1,20 +1,6 @@
-import { useId } from 'react';
+// A caneta de vidro (D-D9, Q4), só como desenho dentro do quadro do cacto (A caneta que desenha). Ela deixou o
+// Hoje, o "Retomar em", o "Lido até aqui" e a Revisão (D-D12): fora do quadro é só o ícone do app.
 import './luz.css';
-
-/**
- * As duas poses desenhadas da caneta (D-D7, P3). A deitada também é a da caneta largada no quadro
- * do cacto, que a desenha por dentro (`CanetaDefs` e `CanetaDesenho`).
- */
-export type PoseDaCaneta = 'encostada' | 'deitada';
-
-/**
- * Onde a ponta cai na caixa da vista (a 16 unidades do canto de baixo e da esquerda, para o halo
- * caber), o giro em torno dela e a caixa. Medidas na caneta v5 do kit da marca, com o halo.
- */
-const POSES: Record<PoseDaCaneta, { giro: number; ponta: string; caixa: string }> = {
-  encostada: { giro: 35, ponta: '16 210', caixa: '0 0 170 228' },
-  deitada: { giro: 65, ponta: '16 124', caixa: '0 0 246 140' },
-};
 
 /** A largura do aro de vidro, em unidades do desenho (120 × 270): 1,5 a 2 px nos tamanhos do app. */
 const ARO = 5;
@@ -136,36 +122,5 @@ export function CanetaDesenho({ id }: { id: string }) {
       <circle className="caneta-faisca" cx="26" cy="73" r="2.2" />
       <circle className="caneta-faisca" cx="94" cy="99" r="2.2" />
     </>
-  );
-}
-
-/**
- * A caneta-cacto de vidro: o ponteiro da retomada. É o único objeto com volume e o único gradiente
- * do app: nunca é botão, painel nem fundo de texto, e só há uma por tela. Decorativa
- * (`aria-hidden`); muda de lugar por salto, nunca gira nem desliza.
- *
- * Desenhada em pé, com a ponta em (60, 262), e girada: 35° encostada (na folha do Agora, no Cartão
- * atual) e 65° deitada (ao fim de "Lido até aqui"). No quadro do cacto, depois de fechar o Dia, a
- * caneta é a deitada: anda a 65° sobre o traço e fica largada quase deitada, a 84° (`quadro/cena.ts`).
- * Toda de vidro, ponta incluída, com o miolo de tinta à vista (D-D9, Q4). As cores vêm dos tokens
- * `--pen-*`: cada mundo troca o vidro, a tinta e o halo da ponta (lima de dia, âmbar à noite) sem que
- * o componente saiba.
- */
-export function Caneta({ pose, className }: { pose: PoseDaCaneta; className?: string }) {
-  const id = useId();
-  const { giro, ponta, caixa } = POSES[pose];
-  return (
-    <svg
-      className={className === undefined ? 'caneta' : `caneta ${className}`}
-      data-pose={pose}
-      viewBox={caixa}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <CanetaDefs id={id} />
-      <g transform={`translate(${ponta}) rotate(${String(giro)}) translate(-60 -262)`}>
-        <CanetaDesenho id={id} />
-      </g>
-    </svg>
   );
 }

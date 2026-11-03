@@ -331,3 +331,18 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Boas-vindas.** Em 31/10 (12:33Z) o Gabriel escolheu o texto "Rapadura é doce, mas não é mole. A gente quebra em pedaços pra você. Vou te mostrar como!", com o botão "Vamos" abaixo, no lugar de "Boas-vindas ao Arretado!" e da frase de hoje. Na tela, a primeira frase é o título e o resto fica no parágrafo. O contrato do Zé ganhou a v10g (só o texto das Boas-vindas), e o código entra em PR próprio, da thread do cartão inicial. Regras da Marca (v10g): as duas frases da rapadura vão sempre juntas; "Vou te mostrar como!" é a voz do app, sem balão, aspas, atribuição ao Zé nem o nome dele em tela; o nome do app fica no nome acessível do diálogo, exatamente "Boas-vindas ao Arretado!" (a Abertura é `aria-hidden`, e sem isso quem usa leitor de tela nunca o ouviria), com o foco no título visível; o "Vamos" leva `aria-describedby` para o parágrafo. O carregamento não muda. O nome do Zé segue sem aparecer em tela.
 
 **Em aberto.** O nome do Zé (D-D10). O estudo de uma marca compacta, com o cacto na proporção da caneta e do Zé, não foi pedido.
+
+## D-D12 — A caneta sai das telas de trabalho e fica só como ícone do app (03/11/2026, decisão do Gabriel)
+
+> **Emenda a D-D7, a D-D8 e a D-D9 (Q4 e Q5).** A caneta de vidro deixa de ser objeto de tela: ela fica no ícone do app e, dentro do quadro do cacto, como a ponta que desenha.
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "a caneta vai sair do hoje e do parei aqui. Essa caneta/cacto fica muito grande e desengonçada. Vamos usar só como ícone pra o app mesmo." Alcance adotado: todas as telas de trabalho, sem tocar no quadro do cacto (a opção recomendada no cartão de 03/11, ainda sem resposta; ajustar esta seção se ele escolher outra).
+
+**O que muda.**
+1. Saem a caneta encostada do Hoje (ao lado do "Retomar em"), a do topo da Revisão, a deitada do fim de rodada da Revisão e a deitada do "Lido até aqui" do Leitor.
+2. O "Retomar em" fica só o texto. O "Lido até aqui" leva o ponto de luz de "onde parei" (8 px com o halo, `--marca-ponto` e `--marca-disco`) no lugar da caneta.
+3. O componente `Caneta` e as poses `encostada` e `deitada` saem do código. `CanetaDefs` e `CanetaDesenho` ficam, porque o quadro do cacto desenha a caneta por dentro do próprio `<svg>`.
+
+**O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
+
+**Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).

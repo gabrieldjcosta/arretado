@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, importarEPublicar, semViolacoes, test } from './apoio';
 
-// O Hoje da Q5 (D-D9): a linha "Retomar em" com a caneta sobre a borda da folha do Agora e o "Em seguida"
+// O Hoje da Q5 (D-D9): a linha "Retomar em" (sem caneta, D-D12) e o "Em seguida"
 // em <details> com "Trocar". Os testes de componente provam o texto e a troca; aqui rodam o teclado (que o
-// jsdom não tem), o axe nos dois temas, os alvos de 44 px, a geometria da caneta e a cara de cada mundo.
+// jsdom não tem), o axe nos dois temas, os alvos de 44 px e a cara de cada mundo.
 
 const ONTEM = new Date('2026-10-14T21:40:00-03:00');
 const HOJE = new Date('2026-10-15T09:30:00-03:00');
@@ -73,9 +73,7 @@ const caixa = (el: Locator) =>
     return { esquerda: r.left, direita: r.right, topo: r.top, base: r.bottom, h: r.height };
   });
 
-test('Hoje: "Retomar em", a caneta com a ponta na borda da folha e o "Em seguida" pelo teclado', async ({
-  page,
-}) => {
+test('Hoje: "Retomar em", sem caneta, e o "Em seguida" pelo teclado', async ({ page }) => {
   test.setTimeout(120_000);
   await prepararOHoje(page);
 
@@ -84,18 +82,8 @@ test('Hoje: "Retomar em", a caneta com a ponta na borda da folha e o "Em seguida
   await expect(parada).toContainText('Retomar em LEP');
   await expect(parada).toContainText('salvo ontem, 21h40');
   await expect(parada).not.toContainText('Você parou');
-  await expect(page.locator('svg.caneta')).toHaveCount(1);
-
-  // A ponta da caneta (16, 210 de 170 × 228, em 68 × 91) toca a borda de cima da folha, e a caneta fica
-  // rente à borda da direita.
-  const folha = await caixa(page.getByRole('region', { name: 'Agora' }));
-  const caneta = await caixa(page.locator('svg.caneta'));
-  const pontaY = caneta.base - (caneta.h * (228 - 210)) / 228;
-  expect(Math.abs(pontaY - folha.topo), 'a ponta sobre a borda de cima da folha').toBeLessThan(2);
-  expect(
-    Math.abs(caneta.direita - folha.direita),
-    'a caneta rente à borda da direita',
-  ).toBeLessThan(2);
+  // A caneta saiu do Hoje (D-D12): nenhuma caneta na tela.
+  await expect(page.locator('svg.caneta')).toHaveCount(0);
 
   // Fechado: o rótulo, a primeira atividade e quantas vêm depois; a lista só aparece aberta.
   await expect(resumo(page)).toContainText('Em seguida');

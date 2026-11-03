@@ -1,5 +1,5 @@
 // Bloco "Agora" do Hoje (pacote A1; D-D7, P3): uma só ação, com o motivo, a saída "Escolher outra
-// coisa" e, acima da folha, onde a pessoa parou de ler com a caneta encostada nela.
+// coisa" e, acima da folha, onde a pessoa parou de ler.
 import { Link } from 'react-router';
 import type { ProximaAcao } from '../../dominios/hoje/contrato';
 import { AcaoAgora } from '../componentes/AcaoAgora';
@@ -46,7 +46,7 @@ function DeOndeParou({
 function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
   const { retrato, dispensou, dispensar, voltar } = hoje;
   if (retrato === undefined) return <Esqueleto linhas={2} />;
-  const { agora, parada, diaFechado, outras } = retrato;
+  const { agora, parada, outras } = retrato;
   if (agora.tipo === 'vazio') {
     return <EstadoVazio comecos={agora.comecos} {...(dispensou ? { aoVoltar: voltar } : {})} />;
   }
@@ -62,7 +62,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
     return (
       <RevisaoPorTempo
         acao={acao}
-        antes={<Parada {...(parada === undefined ? {} : { parada })} comCaneta={!diaFechado} />}
+        antes={<Parada {...(parada === undefined ? {} : { parada })} />}
         aoEscolherOutra={escolherOutra}
         {...(normaLida === undefined ? {} : { normaLida })}
       />
@@ -71,7 +71,7 @@ function ProximaAcaoDoHoje({ hoje }: { hoje: HojeEmAndamento }) {
   const motivo = motivoDaAcao(acao);
   return (
     <>
-      <Parada {...(parada === undefined ? {} : { parada })} comCaneta={!diaFechado} />
+      <Parada {...(parada === undefined ? {} : { parada })} />
       <AcaoAgora
         titulo={tituloDaAcao(acao)}
         {...(motivo === undefined ? {} : { motivo })}

@@ -66,11 +66,9 @@
 }
 
 /* A linha de parada (D-D9, Q5; antes D-D7, P3): "Retomar em", o lugar exato em negrito e "salvo hoje,
-   22h10", à esquerda; a caneta de pé (de vidro, Q4) à direita, a 35°, com a ponta sobre a borda de
-   cima da folha do Agora: a folha sobe 7,5 px por baixo dela, a altura da caixa da caneta abaixo da
-   ponta. De dia o lugar leva uma faixa de caneta embaixo e, no fim dela, o ponto de luz do cabeçalho;
-   à noite, só o texto (`--marca-da-parada` é 1 de dia e 0 à noite). Só a linha, sem a caneta, quando o
-   Dia está fechado (a caneta fica no Resumo do Dia). */
+   22h10". De dia o lugar leva uma faixa de caneta embaixo e, no fim dela, o ponto de luz do cabeçalho;
+   à noite, só o texto (`--marca-da-parada` é 1 de dia e 0 à noite). A caneta que ficava ao lado saiu
+   (D-D12). */
 .parada {
   margin: 0 0 0.75rem;
 }
@@ -133,27 +131,6 @@
   border-radius: 50%;
   background: var(--marca-ponto);
   box-shadow: 0 0 0 5px var(--marca-disco);
-}
-
-.parada.com-caneta {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  gap: 0.375rem;
-  margin: 0 0 -7.5px;
-}
-
-.parada.com-caneta .parada-texto {
-  flex: 1;
-  min-width: 0;
-  padding-bottom: 1.375rem;
-}
-
-.parada-caneta {
-  width: 68px;
-  height: 91px;
-  margin-left: auto;
 }
 
 /* "Em seguida" (D-D9, Q5): um <details> nativo sobre o chão, subordinado ao Agora (sem fundo, sombra

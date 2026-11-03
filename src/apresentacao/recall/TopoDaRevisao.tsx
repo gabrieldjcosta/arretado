@@ -1,11 +1,9 @@
 import { Link } from 'react-router';
 import { BarraFina } from '../componentes/BarraFina';
-import { Caneta } from '../componentes/Caneta';
 
 /**
- * O topo das duas revisões (cartões e frases): "Sair", o andamento da rodada e, no canto, a caneta
- * encostada na borda do cartão atual (D-D7, P5). É a única caneta da tela e fica fora do cartão: a
- * passagem de um cartão ao seguinte não a move.
+ * O topo das duas revisões (cartões e frases): "Sair" e o andamento da rodada (D-D7, P5). A caneta
+ * encostada que ficava no canto saiu (D-D12).
  */
 export function TopoDaRevisao({
   sair,
@@ -24,7 +22,6 @@ export function TopoDaRevisao({
         Sair
       </Link>
       <BarraFina valor={valor} max={max} rotulo={rotulo} />
-      <Caneta pose="encostada" className="topo-caneta" />
     </div>
   );
 }

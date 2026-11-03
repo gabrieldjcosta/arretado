@@ -47,7 +47,6 @@ import { criarCartoesDeLacuna, criarFraseDeTrecho } from '../../dominios/recall/
 import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
-import { Caneta } from '../componentes/Caneta';
 import { Icone } from '../componentes/Icone';
 import { Voltar } from '../componentes/Voltar';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
@@ -1753,12 +1752,7 @@ function LeitorAberto({
             )
           }
         />
-        {id === lidoAte && (
-          <p className="marca-lido-ate">
-            Lido até aqui
-            <Caneta pose="deitada" className="caneta-do-lido" />
-          </p>
-        )}
+        {id === lidoAte && <p className="marca-lido-ate">Lido até aqui</p>}
       </>
     );
   }
