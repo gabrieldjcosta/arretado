@@ -2092,7 +2092,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
   const linhaDoDispositivo = (endereco: string) =>
     Number(dispositivo(endereco).closest('[data-index]')?.getAttribute('data-index'));
 
-  it('o lido vai sobre a faixa da folha, até o "lido até"; a marca ganha a caneta deitada', async () => {
+  it('o lido vai sobre a faixa da folha, até o "lido até"; a marca é só o rótulo, sem caneta (D-D12)', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -2113,13 +2113,11 @@ describe('Ponto de luz no Leitor (P4)', () => {
     expect(lido('art1.incII')).not.toHaveAttribute('data-lido');
     expect(lido('art2')).not.toHaveAttribute('data-lido');
 
-    // A marca continua dizendo "Lido até aqui" e leva a caneta deitada, só desenho (aria-hidden).
+    // A marca continua dizendo "Lido até aqui"; o ponto de luz é do CSS e a caneta saiu.
     const marca = document.querySelector('.marca-lido-ate');
     expect(marca).toHaveTextContent(/^Lido até aqui$/);
-    const caneta = marca?.querySelector('svg.caneta-do-lido');
-    expect(caneta).toHaveAttribute('data-pose', 'deitada');
-    expect(caneta).toHaveAttribute('aria-hidden', 'true');
-    expect(document.querySelectorAll('svg.caneta')).toHaveLength(1);
+    expect(marca?.querySelector('svg')).toBeNull();
+    expect(document.querySelectorAll('svg.caneta')).toHaveLength(0);
   });
 
   it('a Estrela de luz tem quatro pontas e o aro que a separa da faixa', async () => {

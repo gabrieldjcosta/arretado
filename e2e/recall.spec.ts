@@ -263,8 +263,8 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   await expect(page.getByRole('link', { name: /^Revisar frases/ })).toHaveCount(0);
   await page.getByRole('link', { name: 'Começar' }).click();
   await expect(page.getByText('Livramento exige requisitos do […] do CP.')).toBeVisible();
-  // P5: uma caneta por tela, encostada no cartão atual e deitada no fim da rodada.
-  await expect(page.locator('svg.caneta')).toHaveAttribute('data-pose', 'encostada');
+  // D-D12: nenhuma caneta na revisão (antes, P5, uma encostada no cartão e outra deitada no fim da rodada).
+  await expect(page.locator('svg.caneta')).toHaveCount(0);
   await page.keyboard.press('Space');
   await expect(page.getByText('Frase completa')).toBeVisible();
   // P5: as três respostas cabem a 320 px e com a fonte ampliada (o terceiro desce de linha).
@@ -284,7 +284,7 @@ test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', as
   await semViolacoes(page);
   await page.keyboard.press('3');
   await expect(page.getByRole('heading', { name: 'Feito.' })).toBeVisible();
-  await expect(page.locator('svg.caneta')).toHaveAttribute('data-pose', 'deitada');
+  await expect(page.locator('svg.caneta')).toHaveCount(0);
   await page.getByRole('link', { name: /^Seguir para as frases \(1\)$/ }).click();
   await expect(page.getByText('Livramento exige requisitos do art. 83 do CP.')).toBeVisible();
   await semViolacoes(page);

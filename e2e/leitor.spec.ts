@@ -664,14 +664,14 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await expect(retomar.locator('xpath=..')).toContainText(/cerca de \d+ min/);
   await semViolacoes(page);
 
-  // O Hoje diz onde retomar na linha de parada ("Retomar em", com a hora do salvamento), com a caneta
-  // encostada na folha; a folha não repete o motivo, e os três pontos do Dia estão lá, com o estado também
-  // em palavras (D-D7, P3; D-D9, Q5).
+  // O Hoje diz onde retomar na linha de parada ("Retomar em", com a hora do salvamento), sem caneta
+  // (D-D12); a folha não repete o motivo, e os três pontos do Dia estão lá, com o estado também em
+  // palavras (D-D7, P3; D-D9, Q5).
   await page.getByRole('link', { name: 'Hoje' }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
   await expect(page.locator('.parada')).toContainText(/Retomar em LEP, art\. \d/);
   await expect(page.locator('.parada')).toContainText(/salvo (hoje|ontem), \d{2}h\d{2}/);
-  await expect(page.locator('svg.caneta')).toHaveCount(1);
+  await expect(page.locator('svg.caneta')).toHaveCount(0);
   const folhaDoHoje = page.getByRole('region', { name: 'Agora' });
   await expect(folhaDoHoje.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
   await expect(folhaDoHoje).not.toContainText('Retomar em');
@@ -1814,7 +1814,7 @@ test('corrigir o texto publicado: versão nova, o grifo sobrevive, a estrela seg
   expect(sobra).toBe(0);
 });
 
-test('Ponto de luz no Leitor: o lido sobre a faixa da folha com a caneta deitada, a Estrela de quatro pontas, o dock sólido e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
+test('Ponto de luz no Leitor: o lido sobre a faixa da folha com o ponto de luz no fim, a Estrela de quatro pontas, o dock sólido e a estrutura da norma de 700 px para cima, com axe nos dois temas: LEP compilada (P4)', async ({
   page,
 }, info) => {
   test.setTimeout(180_000);
@@ -1837,9 +1837,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com a caneta deitada
   const marca = page.locator('.marca-lido-ate');
   await expect(marca).toHaveCount(1);
   await expect(marca).toHaveText('Lido até aqui');
-  // A caneta deitada ao fim do rótulo é desenho (aria-hidden), e só há uma por tela.
-  await expect(marca.locator('svg.caneta[data-pose="deitada"][aria-hidden="true"]')).toHaveCount(1);
-  await expect(page.locator('svg.caneta')).toHaveCount(1);
+  // A caneta saiu (D-D12): o ponto de luz de "onde parei" é do CSS, e não há desenho de caneta na tela.
+  await expect(page.locator('svg.caneta')).toHaveCount(0);
   const aposOLido = page.locator('[data-endereco="art3.parUnico"]');
   await expect(aposOLido).toBeVisible();
   const faixa = (alvo: Locator) =>

@@ -172,7 +172,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
     );
   });
 
-  it('uma caneta por tela: encostada na folha do Agora e, fechado o Dia, largada no Resumo', async () => {
+  it('sem caneta no Hoje (D-D12): só a largada no quadro do Resumo, com o Dia fechado', async () => {
     const { repo } = await repositorioDeTeste();
     const s = await iniciarSessao(repo, {});
     await encerrarSessao(repo, s.id);
@@ -180,10 +180,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
     const { usuario } = abrirHoje(repo);
 
     await screen.findByRole('region', { name: 'Fechar o Dia' });
-    await waitFor(() => {
-      expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
-    });
-    expect(canetas()[0]?.closest('.parada')).not.toBeNull();
+    expect(canetas()).toHaveLength(0);
 
     await usuario.click(screen.getByRole('button', { name: 'Fechar o Dia' }));
     const resumo = await screen.findByRole('region', { name: 'Fechar o Dia' });
@@ -198,7 +195,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
     await usuario.click(screen.getByRole('button', { name: 'Reabrir o Dia' }));
     await screen.findByRole('button', { name: 'Fechar o Dia' });
     await waitFor(() => {
-      expect(canetas().map((c) => c.dataset.pose)).toEqual(['encostada']);
+      expect(canetas()).toHaveLength(0);
     });
   });
 

@@ -8,7 +8,6 @@ import {
   filaDeFrases,
   revisarFrase,
 } from '../../dominios/recall/servico';
-import { Caneta } from '../componentes/Caneta';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
@@ -169,7 +168,6 @@ export function RevisarFrases() {
         <h1>Revisar frases</h1>
         <Vazio
           titulo={texto('fimDeRodada')}
-          marca={<Caneta pose="deitada" className="fim-caneta" />}
           acao={
             estado.cartoes > 0 ? (
               <>
