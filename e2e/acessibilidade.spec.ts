@@ -171,7 +171,7 @@ test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px
   }
 
   // O "+" fica na linha do título, à direita dele, em qualquer largura.
-  const mais = page.getByRole('link', { name: 'Novo registro de erro' });
+  const mais = page.getByRole('button', { name: 'Novo registro' });
   await expect(mais).toBeVisible();
   const t = await titulo.boundingBox();
   const m = await mais.boundingBox();
@@ -214,7 +214,7 @@ for (const [esquema, cor] of [
         .locator('svg.lockup')
         .boundingBox();
       expect(Math.round(lockup?.width ?? 0)).toBe(144);
-      const mais = await page.getByRole('link', { name: 'Novo registro de erro' }).boundingBox();
+      const mais = await page.getByRole('button', { name: 'Novo registro' }).boundingBox();
       expect([Math.round(mais?.width ?? 0), Math.round(mais?.height ?? 0)]).toEqual([48, 48]);
 
       const areas = page.getByRole('navigation', { name: 'Áreas' });

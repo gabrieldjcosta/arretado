@@ -1,15 +1,16 @@
 import { createContext, useContext } from 'react';
 import { criarEncontro, type Encontro } from './encontro';
-import type { Escrita } from './frequencia';
+import type { Escrita, EscritaNaTela } from './frequencia';
 
 /** Onde o nome se escreve nesta abertura do aplicativo (contrato do Zé, §9): na tela cheia ou no cabeçalho. */
 export type OndeEscrever =
   /**
-   * A camada de tela cheia escreve (completa na primeira vez, curta na primeira do Dia); o cabeçalho nasce
-   * parado. `chegada`: a Chegada vai abrir nesta mesma abertura (aparelho que nasceu hoje e ainda não a
-   * viu), e a luz da primeira vez pode voar até o Zé dela em vez de ir ao cabeçalho.
+   * A camada de tela cheia escreve (toda abertura, D-D14: completa na primeira vez, `doDia` na primeira do
+   * Dia e `depressa` nas demais); o cabeçalho nasce parado. `chegada`: a Chegada vai abrir nesta mesma
+   * abertura (aparelho que nasceu hoje e ainda não a viu), e a luz da primeira vez pode voar até o Zé dela
+   * em vez de ir ao cabeçalho.
    */
-  | { onde: 'tela'; escrita: Exclude<Escrita, 'parada'>; calmo: boolean; chegada: boolean }
+  | { onde: 'tela'; escrita: EscritaNaTela; calmo: boolean; chegada: boolean }
   /** O cabeçalho escreve como sempre escreveu: o que a frequência pede, ou nada (`parada`). */
   | { onde: 'cabecalho'; escrita: Escrita };
 

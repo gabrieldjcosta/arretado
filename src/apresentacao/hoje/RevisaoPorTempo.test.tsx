@@ -14,6 +14,16 @@ function abrirHoje(repo: Repositorio) {
   return usuario;
 }
 
+/** Os quatro tempos ficam atrás do link "tenho outro tempo" (D-D16): fechado, o grupo nem está na tela. */
+async function abrirOsTempos(usuario: ReturnType<typeof userEvent.setup>) {
+  const link = await screen.findByRole('button', { name: 'tenho outro tempo' });
+  expect(link).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.queryByRole('group', { name: 'Quanto tempo você tem?' })).not.toBeInTheDocument();
+  await usuario.click(link);
+  expect(link).toHaveAttribute('aria-expanded', 'true');
+  return screen.getByRole('group', { name: 'Quanto tempo você tem?' });
+}
+
 async function cartoes(repo: Repositorio, n: number) {
   for (let i = 1; i <= n; i += 1)
     await criarCartaoManual(repo, { frente: `P${String(i)}`, verso: 'v' });
@@ -29,7 +39,7 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     await cartoes(repo, 12);
     relogio.avancar(DIA);
     const usuario = abrirHoje(repo);
-    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    const quatro = await abrirOsTempos(usuario);
     expect(screen.getByText('cerca de 5 min')).toBeInTheDocument();
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
     expect(await screen.findByText(/10 cartões, os mais perto de esquecer/)).toBeInTheDocument();
@@ -53,7 +63,7 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     await revisar(repo, primeiro.id, 'facil', { duracaoMs: 1000 });
     relogio.avancar(5 * DIA);
     const usuario = abrirHoje(repo);
-    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    const quatro = await abrirOsTempos(usuario);
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
     expect(await screen.findByText(/5 cartões, os mais perto de esquecer/)).toBeInTheDocument();
     expect(screen.getByText(/Depois de uma pausa o lote vem mais curto/)).toBeInTheDocument();
@@ -68,7 +78,7 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     await cartoes(repo, 11);
     relogio.avancar(DIA);
     const usuario = abrirHoje(repo);
-    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    const quatro = await abrirOsTempos(usuario);
     await usuario.click(within(quatro).getByRole('button', { name: '5 min' }));
     expect(
       await screen.findByText(/O outro 1 cartão continua na fila e entra nos próximos dias/),
@@ -80,7 +90,7 @@ describe('Hoje › do tamanho do seu tempo (AP-01)', () => {
     await cartoes(repo, 30);
     relogio.avancar(DIA);
     const usuario = abrirHoje(repo);
-    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    const quatro = await abrirOsTempos(usuario);
     await usuario.click(within(quatro).getByRole('button', { name: '25 min' }));
     await screen.findByText(/30 cartões, os mais perto de esquecer/);
     expect(document.querySelectorAll('.tempo-do-hoje-porque li')).toHaveLength(10);

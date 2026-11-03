@@ -2,6 +2,11 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { EscritaDoNome } from '../../componentes/escrita/EscritaDoNome';
 import type { Encontro, PeDoZe } from '../../componentes/escrita/encontro';
+import {
+  escalaDaEscrita,
+  NOME_NA_TELA_MS,
+  type EscritaNaTela,
+} from '../../componentes/escrita/frequencia';
 import { PONTO } from '../../componentes/escrita/geometria';
 import { FLOR } from '../../componentes/ze/geometria';
 import { documentoInativo, esperar } from '../../movimento';
@@ -16,14 +21,16 @@ import {
 import './abertura.css';
 
 /**
- * Os tempos de cada abertura (ms), do contrato do Zé (§9). `nome`: até o nome estar escrito e a luz
- * parada no braço do cacto; `pausa`: o respiro antes de a luz sair; `voo`: a viagem até o cabeçalho;
- * `calmo`: o esmaecer de 0,24 s mais o tempo com o nome à vista.
+ * Os tempos de cada abertura (ms), do contrato do Zé (§9, v10h). `nome`: até o nome estar escrito e a luz
+ * parada no braço do cacto (o mesmo desenho em três escalas, `NOME_NA_TELA_MS`); `pausa`: o respiro antes
+ * de a luz sair; `voo`: a viagem até o cabeçalho; `calmo`: o esmaecer de 0,24 s mais o tempo com o nome
+ * à vista.
  */
-const TEMPOS = {
-  completa: { nome: 2640, pausa: 300, voo: 500, calmo: 240 + 900 },
-  curta: { nome: 1200, pausa: 150, voo: 450, calmo: 240 + 700 },
-} as const;
+const TEMPOS: Record<EscritaNaTela, { nome: number; pausa: number; voo: number; calmo: number }> = {
+  completa: { nome: NOME_NA_TELA_MS.completa, pausa: 300, voo: 500, calmo: 240 + 900 },
+  doDia: { nome: NOME_NA_TELA_MS.doDia, pausa: 300, voo: 450, calmo: 240 + 700 },
+  depressa: { nome: NOME_NA_TELA_MS.depressa, pausa: 150, voo: 450, calmo: 240 + 700 },
+};
 
 /** O nome e o fundo esmaecem enquanto a luz voa (e no perfil Calmo, depois de o nome ficar à vista). */
 const SAIDA_MS = 360;
@@ -46,14 +53,15 @@ const HALO_DO_ZE = FLOR.disco / FLOR.r;
 /** O desfoque da flor do Zé em unidades do desenho (`ids.halo` do `Ze.tsx`): vira pixels pela escala da luz. */
 const DESFOQUE_DO_ZE = 4.5;
 
-type Escrita = 'completa' | 'curta';
-
 interface Props {
-  escrita: Escrita;
+  escrita: EscritaNaTela;
   /** Perfil Calmo: o nome só esmaece, sem caneta, sem voo da luz. */
   calmo: boolean;
-  /** A camada acabou (ou foi pulada): quem a monta a tira da tela. Chamada mais de uma vez, não faz mal. */
-  aoSair: () => void;
+  /**
+   * A camada acabou (`fim`) ou foi pulada (`pulou`): quem a monta a tira da tela e conta o pulo. Chamada
+   * mais de uma vez, não faz mal.
+   */
+  aoSair: (como: 'fim' | 'pulou') => void;
   /**
    * Por onde a Chegada se oferece à luz: só na primeira vez, com a Chegada por vir. Com ele, a luz voa até o
    * pé esquerdo do Zé das Boas-vindas, e a Chegada se revela quando ela pousa; sem ele (ou sem oferta a
@@ -161,8 +169,10 @@ function engolirOQueSegue(origem: Event): void {
 
 /**
  * A Abertura (contrato do Zé, §9): o nome em tela cheia, escrito pela caneta, e a luz que o leva ao
- * cabeçalho. Na primeira vez no aparelho escreve o nome inteiro (2,64 s) e leva o botão "Pular"; na
- * primeira abertura de cada Dia seguinte, o modo curto (1,2 s), sem botão. Perfil Calmo: só esmaece.
+ * cabeçalho. Abre em toda abertura do aplicativo (D-D14). Na primeira vez no aparelho escreve o nome
+ * inteiro (2,64 s) e leva o botão "Pular"; na primeira abertura de cada Dia seguinte, o mesmo desenho em
+ * 2,4 s; nas demais, em 1,6 s, sem botão: um toque ou uma tecla em qualquer lugar a pula. Perfil Calmo:
+ * só esmaece.
  *
  * É uma camada decorativa que nunca atrasa nada: o nome e a luz são `aria-hidden`, o foco não vai
  * para ela, e um toque ou a primeira tecla em qualquer lugar a pula (esse primeiro gesto é só isso, não
@@ -203,7 +213,7 @@ export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
       e.preventDefault();
       engolirOQueSegue(e);
       controle.abort();
-      aoSair();
+      aoSair('pulou');
     };
     const opcoes = { capture: true, once: true } as const;
     document.addEventListener('pointerdown', pular, opcoes);
@@ -278,12 +288,12 @@ export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
     };
     roteiro().then(
       () => {
-        if (!abortado()) aoSair();
+        if (!abortado()) aoSair('fim');
       },
       (erro: unknown) => {
         // Uma página que recarrega no meio do voo não tem mais o que medir; o resto nunca derruba o uso.
         if (!documentoInativo(erro)) console.error(erro);
-        aoSair();
+        aoSair('fim');
       },
     );
 
@@ -304,7 +314,7 @@ export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
     >
       <div className="abertura-palco" aria-hidden="true">
         <div className="abertura-nome">
-          <EscritaDoNome curta={escrita === 'curta'} calmo={calmo} />
+          <EscritaDoNome escala={escalaDaEscrita(escrita)} calmo={calmo} />
         </div>
       </div>
       <svg className="abertura-luz" aria-hidden="true" focusable="false">
@@ -315,7 +325,13 @@ export function Abertura({ escrita, calmo, aoSair, encontro }: Props) {
         </g>
       </svg>
       {primeira && (
-        <button type="button" className="botao botao-texto abertura-pular" onClick={aoSair}>
+        <button
+          type="button"
+          className="botao botao-texto abertura-pular"
+          onClick={() => {
+            aoSair('pulou');
+          }}
+        >
           Pular
         </button>
       )}

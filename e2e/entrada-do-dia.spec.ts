@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoes, test } from './apoio';
+import { expect, irAoRegistroPeloMais, semViolacoes, test } from './apoio';
 
 // A Chegada (D-D10: Boas-vindas, Passeio, Começar) e a Entrada do Dia (D-D9): duas folhas modais sobre o
 // Hoje. Os testes de unidade e de componente provam as regras e o texto; aqui rodam o <dialog> de verdade
@@ -264,7 +264,7 @@ test.describe('Entrada do Dia › se o conteúdo não carregar', () => {
     await expect.poll(() => pedidos).toBeGreaterThan(0);
     expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_ENTRADA)).toBeNull();
     // O Hoje responde.
-    await page.getByRole('link', { name: 'Novo registro de erro' }).click();
+    await irAoRegistroPeloMais(page);
     await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
     expect(erros).toEqual([]);
   });

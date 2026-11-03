@@ -1,5 +1,11 @@
 import { useCallback, useState } from 'react';
-import { COTA_DIARIA_MAX, COTA_DIARIA_MIN, type Preferencias, type Tema } from '../../core/modelo';
+import {
+  COTA_DIARIA_MAX,
+  COTA_DIARIA_MIN,
+  DESTAQUES_LIGADOS_PADRAO,
+  type Preferencias,
+  type Tema,
+} from '../../core/modelo';
 import { alterarPreferencias, cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
@@ -120,7 +126,7 @@ export function AparenciaConta() {
         <label className="opcao">
           <input
             type="checkbox"
-            checked={dados.destacarCondicionantesEPrazos ?? false}
+            checked={dados.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO}
             aria-describedby="destaques-dica"
             onChange={(e) => {
               alterar({ destacarCondicionantesEPrazos: e.target.checked });

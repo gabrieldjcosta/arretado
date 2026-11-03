@@ -1,4 +1,9 @@
-import { COTA_DIARIA_PADRAO, type PerfilDeEstudo, type Preferencias } from '../modelo';
+import {
+  COTA_DIARIA_PADRAO,
+  DESTAQUES_LIGADOS_PADRAO,
+  type PerfilDeEstudo,
+  type Preferencias,
+} from '../modelo';
 
 /** Preferências que um perfil pode mexer; nada além disso (só padrões da interface). */
 export type CamposDePerfil = Pick<
@@ -39,6 +44,7 @@ const PREDEFINICOES: Record<
   calmo: {
     fonteLeitura: 'serifa',
     tamanhoFonte: 18,
+    // Menos coisas na tela: o Calmo desliga os destaques, que abrem ligados (D-D17).
     destacarCondicionantesEPrazos: false,
     reguaDeLeitura: false,
     espiadaDosVizinhos: false,
@@ -49,7 +55,8 @@ const PREDEFINICOES: Record<
   guiado: {
     fonteLeitura: 'serifa',
     tamanhoFonte: 18,
-    destacarCondicionantesEPrazos: false,
+    // O Guiado não mexe na leitura: fica no padrão do app (os destaques abrem ligados, D-D17).
+    destacarCondicionantesEPrazos: DESTAQUES_LIGADOS_PADRAO,
     reguaDeLeitura: false,
     espiadaDosVizinhos: false,
     cotaDiaria: COTA_DIARIA_PADRAO,
@@ -90,6 +97,8 @@ function efetivo(prefs: Partial<CamposDePerfil>, campo: keyof CamposDePerfil): V
       return prefs.tamanhoFonte ?? 18;
     case 'cotaDiaria':
       return prefs.cotaDiaria ?? COTA_DIARIA_PADRAO;
+    case 'destacarCondicionantesEPrazos':
+      return prefs.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO;
     case 'temporizadorPadraoMin':
       return prefs.temporizadorPadraoMin;
     default:

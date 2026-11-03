@@ -93,9 +93,11 @@ test.describe('payload malicioso no fluxo completo de colar', () => {
       const raiz = document.querySelector('main') ?? document.body;
       return {
         executou: w.__executou === true,
-        // Os ícones do app (`svg.icone-svg`) não são do payload: o sanitizador só admite `href`.
+        // Os ícones do app (`svg.icone-svg`) e a estrela da calha (`button.estrela svg`, que aparece
+        // na linha sob o ponteiro, onde a pessoa tocou na lista) não são do payload: o sanitizador
+        // só admite `href`.
         perigosos: raiz.querySelectorAll(
-          'script, iframe, object, embed, form, input, style, base, meta, svg:not(.icone-svg), img',
+          'script, iframe, object, embed, form, input, style, base, meta, svg:not(.icone-svg):not(button.estrela svg), img',
         ).length,
         manipuladores: Array.from(raiz.querySelectorAll('*')).filter((e) =>
           e.getAttributeNames().some((n) => n.startsWith('on')),

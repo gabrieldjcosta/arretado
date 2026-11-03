@@ -139,6 +139,12 @@ export const COTA_DIARIA_PADRAO = 10;
 export const COTA_DIARIA_MIN = 5;
 export const COTA_DIARIA_MAX = 100;
 
+/**
+ * O destaque automático abre ligado (D-D17): quem nunca mexeu vê prazos, exceções, termos absolutos e
+ * penas sublinhados. Quem desligou gravou `false` e o mantém; só o campo ausente vale este padrão.
+ */
+export const DESTAQUES_LIGADOS_PADRAO = true;
+
 /** Tamanho máximo do "Para lembrar" do Hoje (P7b): uma nota curta, não um caderno. */
 export const LEMBRETE_MAX = 500;
 
@@ -152,8 +158,9 @@ export const Preferencias = z.strictObject({
   tamanhoFonte: z.int().min(12).max(32),
   mostrarRedacoesAnteriores: z.boolean(),
   /**
-   * Destaque automático de condicionantes e prazos no leitor (F2, 9.8). Opcional: ausente é
-   * desligado, e o registro e o pacote anteriores à 9.8 continuam válidos (sem migração).
+   * Destaque automático de condicionantes e prazos no leitor (F2, 9.8). Opcional: ausente é o padrão
+   * do app, ligado (`DESTAQUES_LIGADOS_PADRAO`, D-D17; até a D-D17 era desligado); quem desligou grava
+   * `false` e o mantém. O registro e o pacote anteriores à 9.8 continuam válidos (sem migração).
    */
   destacarCondicionantesEPrazos: z.boolean().optional(),
   /**

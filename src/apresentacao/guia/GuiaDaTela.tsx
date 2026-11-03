@@ -9,17 +9,21 @@ import './estilos-guia.css';
  * o lado, ou "Anterior"/"Próxima"). Abrir uma vez vale como visto: a marca "Novo" some e o cartão
  * segue lá, recolhido, para quando a pessoa quiser reler. Reabre também pelo menu Ajuda.
  * `vazio` escolhe as dicas do estado em que a tela está; cada uma começa pelo rótulo exato de um
- * controle que está à vista.
+ * controle que está à vista. `soPelaAjuda` esconde o cartãozinho até a pessoa pedir "O que cada opção
+ * faz" no menu Ajuda (o Hoje abre sem a faixa, D-D16); o guia fica montado, então a Ajuda o oferece.
  */
 export function GuiaDaTela({
   tela,
   vazio = false,
   omitir = [],
+  soPelaAjuda = false,
 }: {
   tela: TelaComGuia;
   vazio?: boolean;
   omitir?: string[];
+  soPelaAjuda?: boolean;
 }) {
+  const [pedido, setPedido] = useState(!soPelaAjuda);
   const [aberto, setAberto] = useState(false);
   const [novo, setNovo] = useState(() => !guiaJaVisto(tela));
   const [indice, setIndice] = useState(0);
@@ -42,6 +46,7 @@ export function GuiaDaTela({
       aoReabrirGuia(tela, () => {
         marcarGuiaVisto(tela);
         setNovo(false);
+        setPedido(true);
         setAberto(true);
         setIndice(0);
         setReaberturas((n) => n + 1);
@@ -59,7 +64,7 @@ export function GuiaDaTela({
   const dicas = (vazio ? GUIAS[tela].vazio : GUIAS[tela].uso).filter(
     (d) => !omitir.includes(d.opcao),
   );
-  if (dicas.length === 0) return null;
+  if (!pedido || dicas.length === 0) return null;
   const ultima = dicas.length - 1;
 
   const irPara = (i: number) => {

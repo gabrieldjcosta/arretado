@@ -36,6 +36,15 @@ describe('AcaoAgora', () => {
     expect(screen.getByRole('link', { name: 'Ir' })).toHaveAttribute('href', '/recall/revisar');
     expect(screen.getByRole('link', { name: 'Ir' })).toHaveClass('botao');
   });
+
+  it('só leva o anel de evidência (D-D13) quando a tela pede', () => {
+    const { rerender } = render(
+      <AcaoAgora titulo="X" rotuloBotao="Ir" aoClicar={() => undefined} />,
+    );
+    expect(screen.getByRole('region', { name: 'Agora' })).not.toHaveClass('evidencia');
+    rerender(<AcaoAgora titulo="X" rotuloBotao="Ir" aoClicar={() => undefined} emEvidencia />);
+    expect(screen.getByRole('region', { name: 'Agora' })).toHaveClass('acao-agora', 'evidencia');
+  });
 });
 
 describe('LinhaDepois', () => {

@@ -25,7 +25,15 @@ test('escolher 5 min: o Hoje mostra 10 cartões, o Drill entrega 10 e o resto fi
   const agora = page.getByRole('region', { name: 'Agora' });
   await expect(agora.getByText('cerca de 5 min')).toBeVisible();
 
+  // Os quatro tempos ficam atrás do link "tenho outro tempo" (D-D16): fechados, nem estão na tela.
+  const outroTempo = agora.getByRole('button', { name: 'tenho outro tempo' });
   const quatro = page.getByRole('group', { name: 'Quanto tempo você tem?' });
+  await expect(outroTempo).toHaveAttribute('aria-expanded', 'false');
+  await expect(quatro).toBeHidden();
+  expect((await outroTempo.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  await outroTempo.click();
+  await expect(outroTempo).toHaveAttribute('aria-expanded', 'true');
+  await expect(quatro).toBeVisible();
   for (const m of ['5 min', '10 min', '25 min', '45 min']) {
     const caixa = await quatro.getByRole('button', { name: m, exact: true }).boundingBox();
     expect(caixa?.height).toBeGreaterThanOrEqual(44);
@@ -43,6 +51,7 @@ test('escolher 5 min: o Hoje mostra 10 cartões, o Drill entrega 10 e o resto fi
 
   // Escolher 10 min leva os 12 que há (20 caberiam).
   await page.goto('/#/');
+  await page.getByRole('button', { name: 'tenho outro tempo' }).click();
   await page.getByRole('button', { name: '10 min', exact: true }).click();
   await expect(page.getByText(/12 cartões, os mais perto de esquecer/)).toBeVisible();
   await page.getByRole('link', { name: 'Começar' }).click();

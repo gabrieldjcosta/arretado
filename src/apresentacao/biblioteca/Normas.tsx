@@ -15,6 +15,7 @@ import {
 import { itensComVersaoNova } from '../../dominios/acervo/atualizacao';
 import { Dialogo } from '../componentes/Dialogo';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
+import { Icone } from '../componentes/Icone';
 import { LinhaLista } from '../componentes/LinhaLista';
 import { Selo } from '../componentes/Selo';
 import { useDados, useRepositorio } from '../dados/contexto';
@@ -244,7 +245,7 @@ function avisoDaNavegacao(estado: unknown): string | null {
   return typeof estado.aviso === 'string' ? estado.aviso : null;
 }
 
-/** "Importar norma" é a ação principal enquanto não há leitura para continuar. */
+/** "Importar norma": no fim da lista (D-D19); no estado vazio, ao lado do acervo. */
 const importar = (principal: boolean) => (
   <Link to="/biblioteca/importar" className={principal ? 'botao principal' : 'botao'}>
     Importar norma
@@ -258,15 +259,25 @@ const doAcervo = (rotulo: string, principal = false) => (
   </Link>
 );
 
-/** Convite no fim da lista: o acervo é maior que o que a pessoa já puxou. Sem rede (índice vazio), não aparece. */
-function MaisDoAcervo({ total }: { total: number }) {
-  if (total === 0) return null;
+/**
+ * O que fecha a lista (D-D19): o acervo é maior que o que a pessoa já puxou, e o convite diz de quanto,
+ * com o número do índice (sem rede ele vem vazio e a conta some, o botão fica). O atalho do edital e a
+ * importação da lei colada moram aqui embaixo: a lista vem primeiro.
+ */
+function FechoDaLista({ total, edital }: { total: number; edital: Edital | undefined }) {
   return (
     <section className="mais-do-acervo" aria-label="Convite do acervo">
-      <p className="dica">
-        O acervo tem {total} {total === 1 ? 'norma' : 'normas'}.
-      </p>
-      {doAcervo('Puxar mais normas do acervo')}
+      {total > 0 && (
+        <p className="mais-do-acervo-conta">
+          <strong className="mais-do-acervo-numero">{total}</strong>{' '}
+          {total === 1 ? 'norma no acervo, a um toque.' : 'normas no acervo, a um toque.'}
+        </p>
+      )}
+      {doAcervo('Puxar mais normas do acervo', true)}
+      <div className="linha-acoes mais-do-acervo-outras">
+        {doEdital(edital, false)}
+        {importar(false)}
+      </div>
     </section>
   );
 }
@@ -302,6 +313,16 @@ export function Normas() {
     const novo = new URLSearchParams(params);
     if (valor) novo.set(nome, valor);
     else novo.delete(nome);
+    setParams(novo, { replace: true });
+  };
+  // Os filtros ficam atrás do chip "Filtrar" (D-D19); abrem sozinhos se o endereço já traz algum.
+  const filtrosAtivos = [criterios.disciplina, criterios.ano, criterios.tipo].filter(
+    (c) => c !== '',
+  ).length;
+  const [filtrosAbertos, setFiltrosAbertos] = useState(filtrosAtivos > 0);
+  const limparFiltros = () => {
+    const novo = new URLSearchParams(params);
+    for (const nome of ['disciplina', 'ano', 'tipo']) novo.delete(nome);
     setParams(novo, { replace: true });
   };
   const [mudando, setMudando] = useState<{ norma: Norma; atuais: string[] } | null>(null);
@@ -385,7 +406,8 @@ export function Normas() {
 
   return (
     <>
-      <h1>Biblioteca</h1>
+      {/* O nome da área já está na navegação: o título fica para quem lê a tela em voz alta (D-D19). */}
+      <h1 className="visualmente-oculto">Biblioteca</h1>
       <GuiaDaTela
         tela="biblioteca"
         vazio={dados?.normas.length === 0}
@@ -470,92 +492,122 @@ export function Normas() {
           ) : (
             <>
               {dados.continuar && (
-                <p className="retomar-leitura">
-                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="botao principal">
-                    Retomar: {dados.continuar.tituloCurto}
-                    {dados.ponto ? `, ${dados.ponto.referencia}` : ''}
+                <p className="retomar-linha">
+                  <Link to={`/biblioteca/normas/${dados.continuar.id}`} className="retomar-link">
+                    <span className="retomar-texto">
+                      Retomar: {dados.continuar.tituloCurto}
+                      {dados.ponto ? `, ${dados.ponto.referencia}` : ''}
+                    </span>
+                    {dados.ponto?.minutos !== undefined && (
+                      <span className="dica retomar-tempo">cerca de {dados.ponto.minutos} min</span>
+                    )}
+                    <Icone nome="seta" className="linha-lista-seta" />
                   </Link>
-                  {dados.ponto?.minutos !== undefined && (
-                    <span className="dica"> cerca de {dados.ponto.minutos} min</span>
-                  )}
                 </p>
               )}
               <section aria-labelledby="titulo-normas">
-                <div className="cabecalho-secao">
-                  <h2 id="titulo-normas">Normas</h2>
-                  <div className="acoes-item">
-                    {doAcervo('Adicionar do acervo')}
-                    {importar(!dados.continuar)}
-                  </div>
-                </div>
-                {edital && (
-                  <Link to="/biblioteca/acervo?tudo=1" className="botao botao-texto na-margem">
-                    Tudo do edital de {edital.titulo}
-                  </Link>
-                )}
-                <label className="busca-campo">
-                  <span>Buscar norma</span>
-                  <input
-                    type="search"
-                    value={busca}
-                    placeholder="Título ou assunto"
-                    onChange={(e) => {
-                      mudarCriterio('q', e.target.value);
+                <h2 id="titulo-normas" className="visualmente-oculto">
+                  Normas
+                </h2>
+                <div className="barra-de-normas">
+                  <label className="busca-campo">
+                    <span className="visualmente-oculto">Buscar norma</span>
+                    <input
+                      type="search"
+                      value={busca}
+                      placeholder="Buscar norma"
+                      onChange={(e) => {
+                        mudarCriterio('q', e.target.value);
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="chip-filtrar"
+                    aria-expanded={filtrosAbertos}
+                    aria-controls="filtros-normas"
+                    // O nome inteiro num aria-label: um texto escondido dentro do botão (flex) ganharia
+                    // um espaço antes da vírgula no nome acessível. O texto à vista ("Filtrar 1") tem de
+                    // caber nele (axe: label-content-name-mismatch), por isso o espaço antes do número.
+                    aria-label={
+                      filtrosAtivos > 0
+                        ? `Filtrar, ${String(filtrosAtivos)} ${filtrosAtivos === 1 ? 'ativo' : 'ativos'}`
+                        : undefined
+                    }
+                    onClick={() => {
+                      setFiltrosAbertos((aberto) => !aberto);
                     }}
-                  />
-                </label>
-                <div className="filtros">
-                  <div className="campo">
-                    <label htmlFor="filtro-disciplina">Disciplina</label>
-                    <select
-                      id="filtro-disciplina"
-                      value={criterios.disciplina}
-                      onChange={(e) => {
-                        mudarCriterio('disciplina', e.target.value);
-                      }}
-                    >
-                      <option value="">Todas</option>
-                      {dados.porDisciplina.map((d) => (
-                        <option key={d.titulo} value={d.titulo}>
-                          {d.titulo} ({d.itens.length})
-                        </option>
-                      ))}
-                    </select>
+                  >
+                    Filtrar
+                    {filtrosAtivos > 0 && (
+                      <>
+                        {' '}
+                        <span className="chip-contagem" aria-hidden="true">
+                          {filtrosAtivos}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div id="filtros-normas" hidden={!filtrosAbertos}>
+                  <div className="filtros">
+                    <div className="campo">
+                      <label htmlFor="filtro-disciplina">Disciplina</label>
+                      <select
+                        id="filtro-disciplina"
+                        value={criterios.disciplina}
+                        onChange={(e) => {
+                          mudarCriterio('disciplina', e.target.value);
+                        }}
+                      >
+                        <option value="">Todas</option>
+                        {dados.porDisciplina.map((d) => (
+                          <option key={d.titulo} value={d.titulo}>
+                            {d.titulo} ({d.itens.length})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="campo">
+                      <label htmlFor="filtro-ano">Ano</label>
+                      <select
+                        id="filtro-ano"
+                        value={criterios.ano}
+                        onChange={(e) => {
+                          mudarCriterio('ano', e.target.value);
+                        }}
+                      >
+                        <option value="">Todos</option>
+                        {opcoes.anos.map((a) => (
+                          <option key={a} value={a}>
+                            {a}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="campo">
+                      <label htmlFor="filtro-tipo">Tipo de norma</label>
+                      <select
+                        id="filtro-tipo"
+                        value={criterios.tipo}
+                        onChange={(e) => {
+                          mudarCriterio('tipo', e.target.value);
+                        }}
+                      >
+                        <option value="">Todos</option>
+                        {opcoes.tipos.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="campo">
-                    <label htmlFor="filtro-ano">Ano</label>
-                    <select
-                      id="filtro-ano"
-                      value={criterios.ano}
-                      onChange={(e) => {
-                        mudarCriterio('ano', e.target.value);
-                      }}
-                    >
-                      <option value="">Todos</option>
-                      {opcoes.anos.map((a) => (
-                        <option key={a} value={a}>
-                          {a}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="campo">
-                    <label htmlFor="filtro-tipo">Tipo de norma</label>
-                    <select
-                      id="filtro-tipo"
-                      value={criterios.tipo}
-                      onChange={(e) => {
-                        mudarCriterio('tipo', e.target.value);
-                      }}
-                    >
-                      <option value="">Todos</option>
-                      {opcoes.tipos.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {filtrosAtivos > 0 && (
+                    <button type="button" className="botao-texto" onClick={limparFiltros}>
+                      Limpar filtros
+                    </button>
+                  )}
                 </div>
                 {filtrando && total > 0 && (
                   <p role="status" className="dica">
@@ -617,8 +669,11 @@ export function Normas() {
                     );
                   })}
                 </ul>
+                <FechoDaLista
+                  total={itensDoIndice.filter((i) => i.tipo === 'norma').length}
+                  edital={edital}
+                />
               </section>
-              <MaisDoAcervo total={itensDoIndice.filter((i) => i.tipo === 'norma').length} />
             </>
           )}
         </>
