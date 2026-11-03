@@ -53,6 +53,7 @@ export function RevisaoPorTempo({
       rotuloBotao={rotuloDoBotao(acao)}
       para={rotaDeInicio(acao)}
       aoEscolherOutra={aoEscolherOutra}
+      emEvidencia
     />
   );
   // Seletor, linha de parada e folha ficam sempre nas mesmas posições e o seletor aparece junto com
@@ -107,6 +108,7 @@ export function RevisaoPorTempo({
         rotuloBotao="Começar"
         para={`/recall/revisar?itens=${String(lote)}`}
         aoEscolherOutra={aoEscolherOutra}
+        emEvidencia
       />
       <details className="tempo-do-hoje-porque">
         <summary className="botao botao-texto na-margem">Por que estes?</summary>

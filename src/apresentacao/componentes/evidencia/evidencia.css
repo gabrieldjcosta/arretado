@@ -1,0 +1,133 @@
+/* O contorno de evidência (D-D13; contrato do Zé, §8c): o único elemento que a pessoa deve olhar
+   agora. Lista fechada: o cartão do Agora no Hoje (`.acao-agora.evidencia`) e o artigo do Modo foco
+   (`.evidencia-foco`, o envoltório do `.cartao-artigo`). Nenhum botão, lista, aba, linha, aviso,
+   Estrela nem o cartão de Fixar leva este anel; entrar na lista exige nova decisão do Gabriel.
+
+   O desenho é a escolha "B" do Gabriel (03/11/2026): a linha branca por fora do cartão, a faixa
+   piscina suave por fora da linha e o halo (por fora, mais um tom por dentro). São dois
+   pseudoelementos sem fundo, sob o texto e sob o foco do teclado (`z-index` negativo num contexto
+   próprio): `::before` é o halo e `::after` é a linha com a faixa, por cima dele. Só a opacidade do
+   halo anima (animar o raio repintaria a cada quadro); sem `filter` nem `backdrop-filter`. A exceção
+   ao "sem sombra desfocada" vale só aqui, e `scripts/evidencia-css.test.ts` guarda a lista e a animação.
+
+   É decoração: o contorno do cartão (`--borda-folha`) continua ali e o anel não carrega informação.
+   "Agora" e "artigo em foco" seguem ditos pelo texto, pela posição e pelo nome acessível; por isso a
+   faixa de dia, que mede 1,8:1 sobre o papel, não é par de contraste (WCAG 1.4.11 não pede nada de
+   quem não identifica nem informa estado). Acende uma vez ao entrar; trocar de artigo no foco não
+   reacende (o envoltório não é recriado), e nunca pulsa. */
+
+/* O Agora é o próprio cartão; no Modo foco o cartão do artigo rola por dentro (`overflow`) e cortaria
+   o halo, então o anel vai num envoltório. Fora do foco o envoltório some do layout. */
+.evidencia-foco {
+  display: contents;
+}
+
+.acao-agora.evidencia,
+:root[data-modo-foco='artigo'] .evidencia-foco {
+  position: relative;
+  /* Contexto próprio: o anel (z-index negativo) fica sob o conteúdo e o foco do teclado, e acima do
+     fundo do cartão. */
+  isolation: isolate;
+}
+
+.acao-agora.evidencia {
+  /* O anel parte da borda de fora do cartão: a linha de 1 px dele fica por dentro. */
+  --ev-recuo: -1px;
+  /* O respiro de 1 rem cobre o halo visível: ele não passa sobre o texto vizinho (a margem de baixo, de 1 rem, já cobre). */
+  margin-top: 1rem;
+}
+
+:root[data-modo-foco='artigo'] .evidencia-foco {
+  display: block;
+  /* Item da grade `.area-artigo`: sem isto o envoltório (que não rola) alargaria a coluna. */
+  min-width: 0;
+  /* O halo do Leitor é menor: o texto é longo e o halo não pode cansar nem cobrir os vizinhos
+     (o vão da grade é de 0,75 rem; a folga de 2 px fecha 14 px de respiro). */
+  --ev-halo-raio: 14px;
+  --ev-halo-espalha: 4px;
+  margin-block: 0.125rem;
+  border-radius: var(--raio-cartao);
+}
+
+.acao-agora.evidencia::before,
+.acao-agora.evidencia::after,
+:root[data-modo-foco='artigo'] .evidencia-foco::before,
+:root[data-modo-foco='artigo'] .evidencia-foco::after {
+  content: '';
+  position: absolute;
+  inset: var(--ev-recuo, 0);
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* O halo: azul piscina por fora e, mais fraco, por dentro; em repouso depois de assentar. */
+.acao-agora.evidencia::before,
+:root[data-modo-foco='artigo'] .evidencia-foco::before {
+  box-shadow:
+    0 0 var(--ev-halo-raio) var(--ev-halo-espalha) rgb(var(--ev-halo-cor)),
+    inset 0 0 14px 0 rgb(var(--ev-halo-cor) / var(--ev-interno));
+  opacity: var(--ev-halo-repouso);
+}
+
+/* A linha branca e a faixa: duas sombras duras, sem desfoque, sempre iguais. */
+.acao-agora.evidencia::after,
+:root[data-modo-foco='artigo'] .evidencia-foco::after {
+  box-shadow:
+    0 0 0 var(--ev-linha-larg) var(--ev-linha),
+    0 0 0 var(--ev-faixa-fim) var(--ev-faixa);
+}
+
+/* O artigo é opaco e fica por cima do pseudoelemento: o tom de dentro vai na borda do próprio cartão. */
+:root[data-modo-foco='artigo'] .evidencia-foco .cartao-artigo {
+  box-shadow: inset 0 0 14px 0
+    rgb(var(--ev-halo-cor) / calc(var(--ev-halo-repouso) * var(--ev-interno)));
+}
+
+@keyframes ev-acende {
+  from {
+    opacity: 0;
+  }
+  33% {
+    opacity: var(--ev-halo-aceso);
+  }
+  to {
+    opacity: var(--ev-halo-repouso);
+  }
+}
+
+@keyframes ev-esmaece {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Normal: o halo sobe ao pico em 0,3 s e assenta no repouso até 0,9 s, uma vez. Reduzido (o sistema
+   pede menos movimento): sem animação, o repouso parado. */
+@media (prefers-reduced-motion: no-preference) {
+  .acao-agora.evidencia::before,
+  :root[data-modo-foco='artigo'] .evidencia-foco::before {
+    animation: ev-acende 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  /* Calmo: o halo não acende, só aparece no repouso, esmaecendo em 0,24 s. */
+  html[data-perfil='calmo'] .acao-agora.evidencia::before,
+  html[data-perfil='calmo'][data-modo-foco='artigo'] .evidencia-foco::before {
+    animation: ev-esmaece 240ms ease-out;
+  }
+}
+
+/* Cores forçadas: o halo e a faixa somem e o cartão fica com borda de 2 px na cor do sistema. */
+@media (forced-colors: active) {
+  .acao-agora.evidencia::before,
+  .acao-agora.evidencia::after,
+  :root[data-modo-foco='artigo'] .evidencia-foco::before,
+  :root[data-modo-foco='artigo'] .evidencia-foco::after {
+    display: none;
+  }
+
+  .acao-agora.evidencia,
+  :root[data-modo-foco='artigo'] .evidencia-foco .cartao-artigo {
+    border: 2px solid Highlight;
+  }
+}

@@ -295,7 +295,7 @@ Alvos de toque de pelo menos 44 px (campos em 48). Nenhuma tela rola na horizont
 
 ## Elevation & Depth
 
-Plano. O chão é liso e a folha sobe dele pela linha de 1 px do mundo, não pela sombra. A única sombra do app é a sombra dura e baixa do botão principal do dia, como um carimbo; à noite não há sombra nenhuma e a folha sai do chão pelo tom. As camadas que flutuam (diálogo, bandeja do modo foco, menu Ajuda, dock do Leitor) levam a linha da folha e o fundo opaco, sem sombra, e o diálogo ainda tem o véu. O brilho é o halo da ponta da caneta e o néon suave dos traços que ela desenha (azul piscina, sem `box-shadow`: um filtro de desfoque do SVG). O gradiente é só dentro da caneta (e o miolo do tronco do Zé, um degradê do piscina de 10% a zero). Sem textura, sem vidro desfocado, sem iridescência.
+Plano. O chão é liso e a folha sobe dele pela linha de 1 px do mundo, não pela sombra. A única sombra do app é a sombra dura e baixa do botão principal do dia, como um carimbo; à noite não há sombra nenhuma e a folha sai do chão pelo tom. As camadas que flutuam (diálogo, bandeja do modo foco, menu Ajuda, dock do Leitor) levam a linha da folha e o fundo opaco, sem sombra, e o diálogo ainda tem o véu. O brilho é o halo da ponta da caneta e o néon suave dos traços que ela desenha (azul piscina, sem `box-shadow`: um filtro de desfoque do SVG). A única exceção é o anel de evidência (D-D13): o cartão do Agora no Hoje e o artigo do Modo foco levam uma linha branca, uma faixa e um halo piscina em CSS, e só ali o `box-shadow` desfoca. O gradiente é só dentro da caneta (e o miolo do tronco do Zé, um degradê do piscina de 10% a zero). Sem textura, sem vidro desfocado, sem iridescência.
 
 ### Shadow Vocabulary
 
@@ -305,7 +305,7 @@ Plano. O chão é liso e a folha sobe dele pela linha de 1 px do mundo, não pel
 
 ### Named Rules
 
-**The Sombra Só No Botão Do Dia Rule.** Nenhum `box-shadow` ou `--sombra*` leva desfoque; a profundidade é só a sombra dura do botão principal do dia (guarda em `scripts/contraste.test.ts`).
+**The Sombra Só No Botão Do Dia Rule.** Nenhum `box-shadow` ou `--sombra*` leva desfoque; a profundidade é só a sombra dura do botão principal do dia (guarda em `scripts/contraste.test.ts`). O halo do anel de evidência (D-D13) é a única sombra desfocada: não é profundidade, mora em `componentes/evidencia/evidencia.css` e tem guarda própria em `scripts/evidencia-css.test.ts`.
 
 **The Sem Vidro Desfocado Rule.** O vidro é objeto (a caneta) e nunca superfície desfocada atrás de texto. Só os botões do modo foco têm transparência (a camada a 90%, sem desfoque), e é função, não enfeite; o dock do Leitor é uma barra sólida.
 
@@ -423,7 +423,7 @@ Antes de o pacote chegar, o `index.html` já traz o Zé (`#carregamento`, um `ro
 ### Don't:
 
 - **Don't** usar vermelho, perda de sequência, culpa ou urgência para motivar. "Vencido" e "Você parou em" soam como dívida: prefira "para hoje", "Retomar em" e "Continuar".
-- **Don't** pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque, gradiente em texto, brilho pulsando (a exceção declarada são as piscadas finitas do Zé, só nas Boas-vindas e na tela de carregamento), lens flare, parallax, confete ou som.
+- **Don't** pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque (salvo o halo do anel de evidência, D-D13), gradiente em texto, brilho pulsando (a exceção declarada são as piscadas finitas do Zé, só nas Boas-vindas e na tela de carregamento), lens flare, parallax, confete ou som.
 - **Don't** acender néon em botão, texto, cartão, borda, aba ou ícone parado, nem dar ao brilho de um traço outra cor que o piscina (o ponto amarelo do Zé tem o seu), nem animá-lo com `infinite`; o brilho nunca carrega informação.
 - **Don't** pôr o Zé no Hoje, na Trilha, no Fixar, na Biblioteca, no Leitor, na Sessão, na Revisão, no Resumo do Dia, em erro ou em aviso; nem dar a ele boca, olho triste, nome na tela ou fala própria; nem usá-lo para cobrar, comemorar sequência ou ensinar.
 - **Don't** usar a lima como fundo ou cor de texto, a luz como texto, sem contorno, pulsando ou seguindo o dedo; nem mais de uma caneta por tela.

@@ -9,6 +9,7 @@ export function AcaoAgora({
   para,
   aoClicar,
   aoEscolherOutra,
+  emEvidencia,
 }: {
   titulo: string;
   /** Por que esta ação, em linha secundária (o título fica no verbo). */
@@ -21,9 +22,17 @@ export function AcaoAgora({
   aoClicar?: () => void;
   /** "Escolher outra coisa": o botão-texto ao lado do botão de vidro, dentro da folha (Hoje). */
   aoEscolherOutra?: () => void;
+  /**
+   * Leva o contorno de evidência (D-D13): só o Agora do Hoje, o único elemento que a pessoa deve olhar
+   * agora. O Agora das outras telas (Fixar, mapa da norma, plano) fica sem o anel.
+   */
+  emEvidencia?: boolean;
 }) {
   return (
-    <section className="acao-agora" aria-label="Agora">
+    <section
+      className={emEvidencia === true ? 'acao-agora evidencia' : 'acao-agora'}
+      aria-label="Agora"
+    >
       <h2 className="agora-titulo">{titulo}</h2>
       {motivo !== undefined && <p className="agora-motivo">{motivo}</p>}
       {estimativa !== undefined && <p className="agora-estimativa">cerca de {estimativa} min</p>}

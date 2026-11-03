@@ -181,6 +181,22 @@
   --z-noite: none;
   --z-ponto: #ffc53d;
   --z-ponto-brilho: #ffc53d;
+  /* O contorno de evidência (D-D13; contrato do Zé, §8c): o anel do cartão do Agora e do artigo do
+     Modo foco, o único elemento que a pessoa deve olhar agora. Escolha "B" do Gabriel (03/11/2026):
+     a linha branca de 2 px por fora do cartão, a faixa azul piscina suave até 5 px (a opacidade da
+     faixa é a do mundo) e o halo piscina (raio e espalhamento por tela), aceso em 0,3 s e assentado até
+     0,9 s. O interno é a fração do halo que tinge a borda por dentro. Tudo decoração: o contorno do
+     cartão (`--borda-folha`) segue ali e o anel não carrega informação (`scripts/evidencia-css.test.ts`). */
+  --ev-linha: #ffffff;
+  --ev-linha-larg: 2px;
+  --ev-faixa: rgb(57 202 239 / 0.5);
+  --ev-faixa-fim: 5px;
+  --ev-halo-cor: 57 202 239;
+  --ev-halo-aceso: 0.7;
+  --ev-halo-repouso: 0.45;
+  --ev-halo-raio: 20px;
+  --ev-halo-espalha: 6px;
+  --ev-interno: 0.4;
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -334,6 +350,9 @@
     --z-bloom-repouso: 0.32;
     --z-dia: none;
     --z-noite: inline;
+    --ev-faixa: rgb(57 202 239 / 0.35);
+    --ev-halo-aceso: 0.75;
+    --ev-halo-repouso: 0.5;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
@@ -424,6 +443,9 @@
   --z-bloom-repouso: 0.32;
   --z-dia: none;
   --z-noite: inline;
+  --ev-faixa: rgb(57 202 239 / 0.35);
+  --ev-halo-aceso: 0.75;
+  --ev-halo-repouso: 0.5;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
