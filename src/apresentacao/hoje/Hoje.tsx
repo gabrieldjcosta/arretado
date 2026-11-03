@@ -19,7 +19,6 @@
 // A Chegada (`EntradaDoDia`, D-D9) é uma folha sobre o Hoje, não parte do layout; a Entrada do Dia (S4)
 // é a linha quieta logo abaixo do Agora: acima dele, a dica mais longa (4 linhas a 320 px) empurrava o
 // Começar para fora da primeira tela. Montam aqui porque o Hoje é onde o aplicativo abre.
-import { TituloComMais } from '../componentes/TituloComMais';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { DiasParaAProva } from './DiasParaAProva';
 import { EntradaDoDia } from '../entrada/EntradaDoDia';
@@ -48,7 +47,7 @@ export function Hoje() {
   const { dados: aberta } = useDados(sessaoAberta);
   return (
     <>
-      <TituloComMais>{ROTULO_DA_AREA.hoje}</TituloComMais>
+      <h1>{ROTULO_DA_AREA.hoje}</h1>
       <GuiaDaTela tela="hoje" vazio={hoje.retrato?.agora.tipo === 'vazio'} soPelaAjuda />
       <PontosDoDia retrato={hoje.retrato} />
       <div className="hoje-colunas">

@@ -52,29 +52,33 @@ describe('shell (5.1, 5.5)', () => {
 
   it.each([
     ['/', 'Hoje'],
+    ['/plano', 'Trilha'],
     ['/recall', 'Fixar'],
-  ])(
-    '%s: o "+" fica na linha do título %s e leva ao registro de erro (P2)',
-    async (rota, titulo) => {
-      const { usuario } = await abrirApp(rota);
-      const h1 = await screen.findByRole('heading', { level: 1, name: titulo });
-      const linha = h1.parentElement ?? document.body;
-      await usuario.click(within(linha).getByRole('button', { name: 'Novo registro' }));
-      await usuario.click(within(linha).getByRole('link', { name: /^Registrar erro\b/ }));
-      expect(
-        await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
-      ).toBeInTheDocument();
-    },
-  );
-
-  it.each(['/plano', '/biblioteca'])(
-    '%s não tem o "+" (só as telas que registram)',
-    async (rota) => {
-      await abrirApp(rota);
-      await screen.findByRole('heading', { level: 1 });
-      expect(screen.queryByRole('button', { name: 'Novo registro' })).not.toBeInTheDocument();
-    },
-  );
+    ['/biblioteca', 'Biblioteca'],
+  ])('%s (%s): o "+" da casca leva ao registro de erro (P2, D-D23)', async (rota, titulo) => {
+    const { usuario } = await abrirApp(rota);
+    await screen.findByRole('heading', { level: 1, name: titulo });
+    const mais = screen.getByRole('button', { name: 'Novo registro' });
+    // O "+" é da casca: não está no título da tela nem dentro do conteúdo dela.
+    expect(
+      within(screen.getByRole('main')).queryByRole('button', { name: 'Novo registro' }),
+    ).toBeNull();
+    // `/recall` redireciona para `/recall/frases` logo depois de montar, e trocar de rota fecha o painel.
+    // Sob carga o clique pode cair um instante antes da troca: abre de novo até o painel ficar aberto.
+    const painel = await waitFor(
+      async () => {
+        if (mais.getAttribute('aria-expanded') !== 'true') await usuario.click(mais);
+        const aberto = document.getElementById(mais.getAttribute('aria-controls') ?? '');
+        if (!aberto) throw new Error('o "+" abriu, mas o painel não existe');
+        return aberto;
+      },
+      { timeout: 5000 },
+    );
+    await usuario.click(within(painel).getByRole('link', { name: /^Registrar erro\b/ }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
+    ).toBeInTheDocument();
+  });
 
   it('com o teclado aberto, a casca se marca para as abas saírem da frente (P2)', async () => {
     const janela = simularJanelaVisual(window.innerHeight);

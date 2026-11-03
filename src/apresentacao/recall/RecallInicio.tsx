@@ -6,7 +6,6 @@ import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
-import { TituloComMais } from '../componentes/TituloComMais';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
@@ -46,7 +45,7 @@ export function RecallInicio() {
 
   return (
     <>
-      <TituloComMais>{ROTULO_DA_AREA.recall}</TituloComMais>
+      <h1>{ROTULO_DA_AREA.recall}</h1>
       <GuiaDaTela tela="recall" vazio={dados?.primeiroUso === true} />
       {dados && <DiasDaSemana dias={dados.dias} />}
       {vencidos > 0 ? (

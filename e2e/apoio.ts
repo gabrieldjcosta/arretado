@@ -140,8 +140,8 @@ export async function pularAAbertura(page: Page) {
 }
 
 /**
- * Registra um erro pelo "+" do título (Hoje e Fixar): abre o painel e toca em "Registrar erro". O link do
- * painel é o único com esse nome dentro dele; o do cabeçalho (a partir de 900 px) fica fora.
+ * Registra um erro pelo "+" da casca (está em toda tela): abre o painel e toca em "Registrar erro". O link do
+ * painel é o único com esse nome dentro dele.
  */
 export async function irAoRegistroPeloMais(page: Page) {
   await page.getByRole('button', { name: 'Novo registro' }).click();
@@ -149,8 +149,8 @@ export async function irAoRegistroPeloMais(page: Page) {
 }
 
 /**
- * Abre o diálogo do Lembrete pelo "+" do título (Hoje e Fixar) e o devolve. O botão do painel é o único com
- * esse nome dentro dele.
+ * Abre o diálogo do Lembrete pelo "+" da casca (de qualquer tela, sem trocar de rota) e o devolve. O botão do
+ * painel é o único com esse nome dentro dele.
  */
 export async function abrirOLembrete(page: Page) {
   await page.getByRole('button', { name: 'Novo registro' }).click();

@@ -71,7 +71,8 @@ describe('Plano: importar pontos (6.10)', () => {
       expect(ciclo.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     }
 
-    await usuario.click(screen.getByRole('link', { name: 'Registrar erro' }));
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    await usuario.click(await screen.findByRole('link', { name: /^Registrar erro\b/ }));
     // Ponto fora de "mais detalhes" (D25): opcional e lembrado.
     const ponto = await screen.findByLabelText('Ponto do edital (opcional)');
     expect(within(ponto).getByRole('option', { name: '2 Remição' })).toBeInTheDocument();
