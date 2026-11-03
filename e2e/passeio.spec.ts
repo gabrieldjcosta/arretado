@@ -150,6 +150,65 @@ test.describe('as cinco telas da Chegada', () => {
   }
 });
 
+test.describe('a saudação das Boas-vindas (D-D11)', () => {
+  test('o provérbio e a frase aparecem inteiros, sem corte, em qualquer tamanho; o nome do app fica no nome do diálogo', async ({
+    page,
+  }) => {
+    const folha = await irAte(page, 'boas');
+    // O nome do app não se vê, mas é o nome do diálogo: a Abertura é aria-hidden, e sem ele ninguém o ouviria.
+    await expect(folha).toHaveAccessibleName('Boas-vindas ao Arretado!');
+    const partes = [
+      {
+        nome: 'o provérbio',
+        alvo: folha.getByRole('heading', { level: 2, name: 'Rapadura é doce, mas não é mole.' }),
+      },
+      {
+        nome: 'a frase',
+        alvo: folha.getByText('A gente quebra em pedaços pra você. Vou te mostrar como!'),
+      },
+    ];
+
+    /** As duas partes à vista e sem corte: cabem na própria caixa, ficam dentro da janela e nada rola de lado. */
+    async function inteira(tamanho: string) {
+      for (const { nome, alvo } of partes) {
+        await alvo.scrollIntoViewIfNeeded();
+        await expect(alvo, `${tamanho}: ${nome}`).toBeInViewport({ ratio: 1 });
+        // O que passa da caixa é só a tinta das letras além da linha apertada (1,12 no título): uns 6% da
+        // fonte. Uma linha cortada ou escondida passaria de uma fonte inteira.
+        const sobra = await alvo.evaluate((el) => ({
+          altura: (el.scrollHeight - el.clientHeight) / parseFloat(getComputedStyle(el).fontSize),
+          largura: el.scrollWidth - el.clientWidth,
+        }));
+        expect(sobra.altura, `${tamanho}: ${nome} cortado na altura`).toBeLessThan(0.25);
+        expect(sobra.largura, `${tamanho}: ${nome} cortado na largura`).toBeLessThanOrEqual(1);
+      }
+      expect(await rolagemLateral(page), `${tamanho}: rolagem lateral`).toEqual({
+        pagina: 0,
+        folha: 0,
+      });
+    }
+
+    await test.step('o tamanho do teste', async () => {
+      await inteira('padrão');
+    });
+    await test.step('320 × 568', async () => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await inteira('320 × 568');
+    });
+    await test.step('200% de zoom em 390 × 800 (195 × 400 px de layout)', async () => {
+      await page.setViewportSize({ width: 195, height: 400 });
+      await inteira('200% de zoom');
+    });
+    await test.step('texto a 200% numa tela de celular', async () => {
+      await page.setViewportSize({ width: 390, height: 800 });
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = '200%';
+      });
+      await inteira('texto a 200%');
+    });
+  });
+});
+
 test.describe('o passeio refeito na Conta', () => {
   // Aqui a Chegada não abre sozinha: o aparelho já a viu.
   test.use({ semearAbertura: true });

@@ -258,6 +258,19 @@ const doAcervo = (rotulo: string, principal = false) => (
   </Link>
 );
 
+/** Convite no fim da lista: o acervo é maior que o que a pessoa já puxou. Sem rede (índice vazio), não aparece. */
+function MaisDoAcervo({ total }: { total: number }) {
+  if (total === 0) return null;
+  return (
+    <section className="mais-do-acervo" aria-label="Convite do acervo">
+      <p className="dica">
+        O acervo tem {total} {total === 1 ? 'norma' : 'normas'}.
+      </p>
+      {doAcervo('Puxar mais normas do acervo')}
+    </section>
+  );
+}
+
 /** Atalho: as normas do edital do plano de uma vez; só existe se o acervo conhece esse edital. */
 const doEdital = (edital: Edital | undefined, principal: boolean) =>
   edital && (
@@ -605,6 +618,7 @@ export function Normas() {
                   })}
                 </ul>
               </section>
+              <MaisDoAcervo total={itensDoIndice.filter((i) => i.tipo === 'norma').length} />
             </>
           )}
         </>

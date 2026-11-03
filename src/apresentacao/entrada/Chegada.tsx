@@ -47,9 +47,10 @@ const CLASSE_DA_ENTRADA: Record<EntradaDoZe, string> = {
  * passo por menu, sem atalho para outra tela) e o Começar (os dois botões de conta: entrar com o Google ou
  * continuar sem conta, que a pessoa vê ao fim do passeio ou ao pulá-lo). "Escolher meu concurso" saiu daqui:
  * o Hoje vazio já o oferece. "Agora não" recusa o passeio e fecha a folha, como Esc nas Boas-vindas e no
- * Começar; Esc num passo pula o passeio. O título de cada tela nomeia o diálogo, e uma região viva anuncia
- * a tela nova. As regras de para onde cada controle leva estão em `passeio/estado.ts`, e os textos, em
- * `passeio/passos.ts` (uma fonte só, a do Gabriel).
+ * Começar; Esc num passo pula o passeio. O título de cada tela nomeia o diálogo (nas Boas-vindas, um texto
+ * só para o leitor de tela, com o nome do app), e uma região viva anuncia a tela nova. As regras de para
+ * onde cada controle leva estão em `passeio/estado.ts`, e os textos, em `passeio/passos.ts` (uma fonte só,
+ * a do Gabriel).
  *
  * Na primeira vez, se a luz da Abertura vai ao Zé (`voaParaAChegada`), a Chegada abre já, na `espera`:
  * invisível e sem pegar toque, por cima da Abertura, para a luz ter para onde voar. Quando a luz pousa

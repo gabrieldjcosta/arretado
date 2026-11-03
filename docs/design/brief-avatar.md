@@ -22,7 +22,7 @@ Quem tem dificuldade de concentração e "não sabe por onde começar", abrindo 
 
 ## 5. Mensagem e CTA
 
-Mensagem [Gabriel, 28/10]: "Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?" A tela deixa de dizer o nome do Zé. Um só botão, **"Vamos"**, começa o passeio; "Agora não" fica no alto da tela e leva ao Hoje. "Escolher meu concurso" e "Passear pelos menus" saem da Chegada: o primeiro passa a ser o estado vazio do Hoje.
+Mensagem [Gabriel, 28/10, trocada em 31/10 pelo título "Rapadura é doce, mas não é mole." e pela frase "A gente quebra em pedaços pra você. Vou te mostrar como!", D-D11]: "Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?" A tela deixa de dizer o nome do Zé. Um só botão, **"Vamos"**, começa o passeio; "Agora não" fica no alto da tela e leva ao Hoje. "Escolher meu concurso" e "Passear pelos menus" saem da Chegada: o primeiro passa a ser o estado vazio do Hoje.
 
 ## 6. História/fluxo em etapas
 

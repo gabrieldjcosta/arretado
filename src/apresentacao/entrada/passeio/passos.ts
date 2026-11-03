@@ -1,11 +1,18 @@
 // Os textos do Passeio (D-D10, contrato §7): uma fonte só. A Chegada, o passeio refeito (Conta e Ajuda) e
 // os testes leem daqui; nenhum componente repete uma frase literal (`passos.test.ts` confere). Os nomes
-// e os ícones dos quatro menus vêm de `areas.ts`, os mesmos das abas. Os textos são do Gabriel (28/10).
+// e os ícones dos quatro menus vêm de `areas.ts`, os mesmos das abas. Os textos são do Gabriel (28/10 e
+// 31/10).
 import { AREAS } from '../../areas';
 
+/**
+ * As Boas-vindas (Gabriel, 31/10; D-D11). O `titulo` e a `frase` são as duas partes da saudação e vão sempre
+ * inteiras. O `nome` não se vê: é o nome do diálogo para o leitor de tela, porque a Abertura é `aria-hidden`
+ * e sem ele ninguém ouviria o nome do app.
+ */
 export const BOAS_VINDAS = {
-  titulo: 'Boas-vindas ao Arretado!',
-  frase: 'Bora conhecer a ferramenta que vai facilitar de verdade seus estudos?',
+  nome: 'Boas-vindas ao Arretado!',
+  titulo: 'Rapadura é doce, mas não é mole.',
+  frase: 'A gente quebra em pedaços pra você. Vou te mostrar como!',
   vamos: 'Vamos',
   agoraNao: 'Agora não',
 } as const;

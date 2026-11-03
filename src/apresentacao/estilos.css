@@ -1975,23 +1975,29 @@ a.item-norma strong {
   color: var(--texto-atenuado);
 }
 
-/* A marca na linha (P4): o rótulo em tinta e, logo ao lado, a caneta deitada com a ponta no fim da
-   frase. Altura da caneta, no mínimo: o corpo sobe da ponta, e o texto de cima não pode ficar sob ele. */
+/* A marca na linha (P4): o rótulo em tinta e, antes dele, o ponto de luz de "onde parei" (D-D12: a caneta
+   deitada que ficava ao lado saiu). */
 .marca-lido-ate {
   display: flex;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.875rem;
   margin: 0.25rem 0 0;
-  min-height: 3.75rem;
+  min-height: 2rem;
   font-family: var(--fonte-interface);
   font-size: 0.8125rem;
   font-weight: 700;
   color: var(--texto);
 }
 
-.caneta-do-lido {
-  width: 104px;
-  height: 59px;
+.marca-lido-ate::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-left: 0.3125rem;
+  border-radius: 50%;
+  background: var(--marca-ponto);
+  box-shadow: 0 0 0 5px var(--marca-disco);
 }
 
 /* O dock fica acima das abas de baixo (--abas-altura: as abas e a área segura; a partir de 900 px é só
@@ -3685,13 +3691,6 @@ dialog.dialogo-previa .linha-acoes button {
   margin-bottom: 0;
 }
 
-.topo-caneta {
-  align-self: flex-end;
-  width: 58px;
-  height: 78px;
-  margin: 0 -8px -13px 0;
-}
-
 .cartao-drill {
   display: grid;
   align-content: center;
@@ -3811,14 +3810,8 @@ dialog.dialogo-previa .linha-acoes button {
   }
 }
 
-/* O fim da rodada (D-D7, P5): a caneta deitada, em repouso, acima do título, e as ações ao centro.
-   Sem cachorro nem desenho próprio: quem desenha é o Resumo do Dia, uma vez por Dia fechado. */
-.fim-de-rodada .fim-caneta {
-  width: 104px;
-  height: 59px;
-  margin: 0 auto 0.75rem;
-}
-
+/* O fim da rodada (D-D7, P5): o título e as ações ao centro. Sem caneta, cachorro nem desenho próprio (D-D12):
+   quem desenha é o Resumo do Dia, uma vez por Dia fechado. */
 .fim-de-rodada .linha-acoes {
   justify-content: center;
 }

@@ -7,7 +7,10 @@ import { BOAS_VINDAS } from './passos';
 import { iniciarLuzDaMao, iniciarPiscadas } from './vida-do-ze';
 
 interface Props {
-  /** O título da tela é também o nome do diálogo (a Chegada o aponta em `aria-labelledby`). */
+  /**
+   * O nome do diálogo (a Chegada o aponta em `aria-labelledby`): um texto só para o leitor de tela, com o nome do
+   * app. O título que se vê é o provérbio, e é ele que recebe o foco.
+   */
   idTitulo: string;
   aoVamos: () => void;
   aoAgoraNao: () => void;
@@ -23,10 +26,11 @@ interface Props {
 }
 
 /**
- * As Boas-vindas (D-D10): o Zé inteiro, a frase do Gabriel e só dois botões, "Vamos" e "Agora não". O
- * Zé dá vida à espera, e só aqui, onde a pessoa escolhe: pisca os dois olhos em rajadas curtas e, se ela
- * demora, a luz amarela da mão dele pisca (3 rodadas, no máximo; `vida-do-ze.ts`). Nos passos e no
- * Começar ele fica quieto. Tudo é decorativo e nenhum botão espera por ele.
+ * As Boas-vindas (D-D10): o Zé inteiro, a saudação (o provérbio e a frase, sempre inteiros: D-D11) e só
+ * dois botões, "Vamos" e "Agora não". O Zé dá vida à espera, e só aqui, onde a pessoa escolhe: pisca os
+ * dois olhos em rajadas curtas e, se ela demora, a luz amarela da mão dele pisca (3 rodadas, no máximo;
+ * `vida-do-ze.ts`). Nos passos e no Começar ele fica quieto. Tudo é decorativo e nenhum botão espera por
+ * ele.
  *
  * Na primeira vez (M3b) a tela é montada antes, escondida, para a luz da Abertura ter para onde voar: ela
  * mede o pé esquerdo do Zé aqui. Quando a luz pousa, o Zé se desenha (`entrada-do-ze.ts`) e a vida dele
@@ -44,6 +48,7 @@ export function BoasVindas({
   const corpo = useRef<HTMLDivElement>(null);
   const ze = useRef<ControleDoZe>(null);
   const titulo = useRef<HTMLHeadingElement>(null);
+  const idProverbio = `${idTitulo}-proverbio`;
   const idFrase = `${idTitulo}-frase`;
   // A entrada acabou. Quando o Zé nasce pronto, a vida dele começa já.
   const [terminou, setTerminou] = useState(false);
@@ -111,7 +116,10 @@ export function BoasVindas({
           <Ze ref={ze} humor="neutro" tamanho="grande" />
         </div>
         <div className="chegada-texto revela">
-          <h2 id={idTitulo} ref={titulo} tabIndex={-1} className="chegada-titulo">
+          <span id={idTitulo} className="visualmente-oculto">
+            {BOAS_VINDAS.nome}
+          </span>
+          <h2 id={idProverbio} ref={titulo} tabIndex={-1} className="chegada-titulo">
             {BOAS_VINDAS.titulo}
           </h2>
           <p id={idFrase}>{BOAS_VINDAS.frase}</p>
