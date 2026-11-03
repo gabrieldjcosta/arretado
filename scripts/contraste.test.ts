@@ -159,16 +159,14 @@ const CASCA_DA_NOITE = {
   'fundo-controle': 'var(--superficie-2)',
 };
 /**
- * O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 e 0), e o rótulo do "Em
- * seguida" é o título de dia (Schibsted, 15 px) e a interface à noite (Atkinson, 14 px), como no contrato.
+ * O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título de dia (Schibsted, 15 px) e a interface à noite
+ * (Atkinson, 14 px), como no contrato. A faixa e o ponto da linha de parada saíram na D-D16.
  */
 const HOJE_DO_DIA = {
-  'marca-da-parada': '1',
   'fonte-rotulo': 'var(--fonte-titulo)',
   'tamanho-rotulo': '0.9375rem',
 };
 const HOJE_DA_NOITE = {
-  'marca-da-parada': '0',
   'fonte-rotulo': 'var(--fonte-interface)',
   'tamanho-rotulo': '0.875rem',
 };
@@ -269,6 +267,40 @@ const ZE_IGUAL_NOS_DOIS_MUNDOS = [
   'z-ponto-brilho',
 ];
 /**
+ * O anel de evidência (D-D13, contorno B do Gabriel): linha branca de 2 px, faixa piscina de 5 px e halo
+ * da mesma cor. De dia a faixa fica a 50% e o halo acende a 0,7 e repousa a 0,45; à noite a faixa cai a
+ * 35% e o halo vai a 0,75 e 0,5. A linha, a espessura, a cor e o raio do halo são iguais nos dois mundos
+ * e ficam só na raiz.
+ */
+const EVIDENCIA_DO_DIA = {
+  'ev-linha': '#ffffff',
+  'ev-linha-larg': '2px',
+  'ev-faixa': 'rgb(57 202 239 / 0.5)',
+  'ev-faixa-fim': '5px',
+  'ev-halo-cor': '57 202 239',
+  'ev-halo-aceso': '0.7',
+  'ev-halo-repouso': '0.45',
+  'ev-halo-raio': '20px',
+  'ev-halo-espalha': '6px',
+  'ev-interno': '0.4',
+};
+const EVIDENCIA_DA_NOITE = {
+  'ev-faixa': 'rgb(57 202 239 / 0.35)',
+  'ev-halo-aceso': '0.75',
+  'ev-halo-repouso': '0.5',
+};
+const EVIDENCIA_SO_NA_RAIZ = [
+  'ev-linha',
+  'ev-linha-larg',
+  'ev-faixa-fim',
+  'ev-halo-cor',
+  'ev-halo-raio',
+  'ev-halo-espalha',
+  'ev-interno',
+];
+/** O único CSS do anel de evidência, e a única exceção ao "nenhuma sombra tem desfoque". */
+const CSS_DO_ANEL = 'evidencia.css';
+/**
  * Os únicos CSS que podem falar de `neon` ou `bloom`: os tokens (`estilos.css`) e os arquivos dos traços
  * que a caneta desenha: o Zé, a escrita do nome, o traço de seleção, o quadro do cacto e os ícones do
  * Passeio, que se desenham na hora. Botão, texto, cartão, borda e ícone parado não brilham.
@@ -349,6 +381,18 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
       expect(escuroManual, nome).not.toHaveProperty(nome);
     }
     expect(claro['neon-cor']).toBe(claro['z-banda']);
+  });
+
+  it('o anel de evidência tem os tokens dos dois mundos; o que não muda fica só na raiz (D-D13)', () => {
+    expect(claro).toMatchObject(EVIDENCIA_DO_DIA);
+    for (const bloco of [escuroSistema, escuroManual]) {
+      expect(bloco).toMatchObject(EVIDENCIA_DA_NOITE);
+      for (const nome of EVIDENCIA_SO_NA_RAIZ) expect(bloco, nome).not.toHaveProperty(nome);
+    }
+    // O halo é o azul piscina do brilho do Zé, em canais para entrar no `rgb()` com a opacidade do token.
+    const hex = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(claro['neon-cor'] ?? '');
+    const canais = (hex ?? []).slice(1).map((c) => parseInt(c, 16));
+    expect(claro['ev-halo-cor']).toBe(canais.join(' '));
   });
 
   it('a casca muda de um mundo para o outro como no contrato da D-D9 (Q2)', () => {
@@ -462,20 +506,23 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
 
     it('nenhuma sombra tem desfoque: a profundidade é só a sombra dura do botão de dia', () => {
       // Cada `box-shadow` e cada `--sombra*` com um comprimento de desfoque (o terceiro) acima de zero.
-      const comDesfoque = css().flatMap((arquivo) => {
-        const texto = readFileSync(arquivo, 'utf8');
-        return [...texto.matchAll(/(box-shadow|--sombra[\w-]*):\s*([^;]+);/g)].flatMap(
-          ([, nome, valor]) =>
-            (valor ?? '')
-              .replace(/(rgb|rgba|color-mix|var)\([^)]*(\([^)]*\))?[^)]*\)/g, '')
-              .split(',')
-              .filter((camada) => {
-                const medidas = camada.match(/-?[\d.]+(px|rem|em)?(?![\w%])/g) ?? [];
-                return medidas.length >= 3 && parseFloat(medidas[2] ?? '0') > 0;
-              })
-              .map((camada) => `${path.basename(arquivo)} ${nome ?? ''}:${camada.trim()}`),
-        );
-      });
+      // A exceção é o halo do anel de evidência (D-D13): `evidencia-css.test.ts` guarda a lista e a animação.
+      const comDesfoque = css()
+        .filter((arquivo) => path.basename(arquivo) !== CSS_DO_ANEL)
+        .flatMap((arquivo) => {
+          const texto = readFileSync(arquivo, 'utf8');
+          return [...texto.matchAll(/(box-shadow|--sombra[\w-]*):\s*([^;]+);/g)].flatMap(
+            ([, nome, valor]) =>
+              (valor ?? '')
+                .replace(/(rgb|rgba|color-mix|var)\([^)]*(\([^)]*\))?[^)]*\)/g, '')
+                .split(',')
+                .filter((camada) => {
+                  const medidas = camada.match(/-?[\d.]+(px|rem|em)?(?![\w%])/g) ?? [];
+                  return medidas.length >= 3 && parseFloat(medidas[2] ?? '0') > 0;
+                })
+                .map((camada) => `${path.basename(arquivo)} ${nome ?? ''}:${camada.trim()}`),
+          );
+        });
       expect(comDesfoque).toEqual([]);
     });
   });

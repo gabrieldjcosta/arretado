@@ -54,14 +54,13 @@ describe('shell (5.1, 5.5)', () => {
     ['/', 'Hoje'],
     ['/recall', 'Fixar'],
   ])(
-    '%s: o "+" fica na linha do título %s e abre o registro de erro (P2)',
+    '%s: o "+" fica na linha do título %s e leva ao registro de erro (P2)',
     async (rota, titulo) => {
       const { usuario } = await abrirApp(rota);
       const h1 = await screen.findByRole('heading', { level: 1, name: titulo });
-      const mais = within(h1.parentElement ?? document.body).getByRole('link', {
-        name: 'Novo registro de erro',
-      });
-      await usuario.click(mais);
+      const linha = h1.parentElement ?? document.body;
+      await usuario.click(within(linha).getByRole('button', { name: 'Novo registro' }));
+      await usuario.click(within(linha).getByRole('link', { name: /^Registrar erro\b/ }));
       expect(
         await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
       ).toBeInTheDocument();
@@ -73,7 +72,7 @@ describe('shell (5.1, 5.5)', () => {
     async (rota) => {
       await abrirApp(rota);
       await screen.findByRole('heading', { level: 1 });
-      expect(screen.queryByRole('link', { name: 'Novo registro de erro' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Novo registro' })).not.toBeInTheDocument();
     },
   );
 
@@ -219,8 +218,8 @@ describe('Conta › Aparência (5.2)', () => {
     const caixa = await screen.findByRole('checkbox', {
       name: 'Destacar prazos, condições, termos absolutos e penas',
     });
-    // Sem o campo (preferência anterior à 9.8): desligado.
-    expect(caixa).not.toBeChecked();
+    // Sem o campo (preferência anterior à 9.8, ou nunca mexida): ligado, o padrão do app (D-D17).
+    expect(caixa).toBeChecked();
     const legenda = screen.getByRole('list', { name: 'Legenda dos destaques' });
     expect(
       within(legenda)
@@ -232,15 +231,18 @@ describe('Conta › Aparência (5.2)', () => {
       'Termos absolutos (sublinhado ondulado)',
       'Penas, quóruns e frações (sublinhado pontilhado)',
     ]);
+    // O padrão não grava nada: só quem muda a caixa guarda o valor (desligar grava `false`).
+    expect(await obterPreferencias(repo)).not.toHaveProperty('destacarCondicionantesEPrazos');
+    await usuario.click(caixa);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
+    });
+    expect(caixa).not.toBeChecked();
     await usuario.click(caixa);
     await waitFor(async () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
     });
     expect(caixa).toBeChecked();
-    await usuario.click(caixa);
-    await waitFor(async () => {
-      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
-    });
     // Régua de leitura (fatia 4): desligada por padrão, grava ao ligar.
     const regua = screen.getByRole('checkbox', { name: 'Régua de leitura' });
     expect(regua).not.toBeChecked();

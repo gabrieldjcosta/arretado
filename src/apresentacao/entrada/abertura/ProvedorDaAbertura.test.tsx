@@ -96,6 +96,29 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 
+  it('o pulo entra na conta do Dia', async () => {
+    lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
+    const { camada } = await montar();
+    await waitFor(() => {
+      expect(camada()).not.toBeNull();
+    });
+    // Com a máquina cheia os ouvintes do pulo podem chegar depois da camada: toca até a camada sair.
+    await waitFor(() => {
+      fireEvent.pointerDown(document.body);
+      expect(camada()).toBeNull();
+    });
+    expect(guardado()).toEqual({ dia: '2026-10-20', puladas: 1 });
+  });
+
+  it('três aberturas seguidas puladas calam a tela cheia até o Dia seguinte: a quarta nasce no cabeçalho, parado, na hora', async () => {
+    window.localStorage.setItem(CHAVE, '{"dia":"2026-10-20","puladas":3}');
+    const { camada, escritaNoCabecalho, parado, sonda } = await montar();
+    expect(camada()).toBeNull();
+    expect(escritaNoCabecalho()).toBeNull();
+    expect(parado()).not.toBeNull();
+    expect(sonda()).toBe('livre');
+  });
+
   it('um toque pula: a camada sai, a espera acaba e o cabeçalho segue parado', async () => {
     const { camada, escritaNoCabecalho, parado, sonda } = await montar();
     await waitFor(() => {
@@ -110,17 +133,31 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
     expect(parado()).not.toBeNull();
   });
 
-  it('primeira abertura do Dia seguinte: a tela cheia escreve no modo curto', async () => {
+  it('primeira abertura do Dia seguinte: a tela cheia escreve o nome em 2,4 s', async () => {
     lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
     const { camada } = await montar();
     await waitFor(() => {
-      expect(camada()?.querySelector('svg.eb')).toHaveClass('curta');
+      expect(camada()).toHaveAttribute('data-escrita', 'doDia');
     });
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 
-  it('demais aberturas do Dia: nada de camada nem de espera, o cabeçalho parado na hora', async () => {
+  it('demais aberturas do Dia: a tela cheia escreve o nome em 1,6 s (D-D14)', async () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
+    const { camada, escritaNoCabecalho, parado } = await montar();
+    await waitFor(() => {
+      expect(camada()).toHaveAttribute('data-escrita', 'depressa');
+    });
+    // O nome não se escreve nos dois lugares, e o Dia segue guardado.
+    expect(escritaNoCabecalho()).toBeNull();
+    await waitFor(() => {
+      expect(parado()).not.toBeNull();
+    });
+    expect(guardado()).toEqual({ dia: '2026-10-20' });
+  });
+
+  it('um Dia guardado no futuro (a semente dos testes): nada de camada nem de espera, o cabeçalho parado na hora', async () => {
+    window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
     const { camada, escritaNoCabecalho, parado, sonda } = await montar();
     expect(camada()).toBeNull();
     expect(escritaNoCabecalho()).toBeNull();
@@ -191,11 +228,11 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
       expect(camada()).toBeNull();
     });
 
-    it('nas demais aberturas do Dia e com movimento reduzido o app monta na hora: nada a decidir', async () => {
-      lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
-      const demais = await montar();
-      expect(demais.container.querySelector('.marca')).not.toBeNull();
-      demais.unmount();
+    it('com o Dia guardado no futuro e com movimento reduzido o app monta na hora: nada a decidir', async () => {
+      window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
+      const semente = await montar();
+      expect(semente.container.querySelector('.marca')).not.toBeNull();
+      semente.unmount();
       simularMovimento('reduzido');
       const reduzido = await montar();
       expect(reduzido.container.querySelector('.marca')).not.toBeNull();

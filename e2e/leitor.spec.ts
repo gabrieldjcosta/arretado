@@ -551,7 +551,7 @@ test('mudar o tamanho do texto fora da norma não perde a posição, e a proced�
     .toBeLessThan(2);
 });
 
-test('destaque automático: ligar a opção e ver prazos, condições, termos absolutos e penas na LEP compilada (9.8)', async ({
+test('destaque automático: abre ligado, com prazos, condições, termos absolutos e penas na LEP compilada; desligar vale depois de recarregar (9.8, D-D17)', async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -559,14 +559,10 @@ test('destaque automático: ligar a opção e ver prazos, condições, termos ab
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
 
-  // Desligado por padrão: nada aceso, sem legenda.
+  // Ligado por padrão (D-D17): a legenda e os trechos acesos já estão na tela, sem tocar em nada.
   const botao = page.getByRole('button', { name: 'Destaques' });
-  await expect(botao).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('[data-endereco="art3.parUnico"]')).toContainText('qualquer distinção');
-  await expect(page.locator('.destaque')).toHaveCount(0);
-
-  await botao.click();
   await expect(botao).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-endereco="art3.parUnico"]')).toContainText('qualquer distinção');
   await expect(page.getByRole('list', { name: 'Legenda dos destaques' })).toBeVisible();
 
   /** O trecho aceso de cada categoria e o traço dele (o destaque não depende só da cor). */
@@ -602,25 +598,31 @@ test('destaque automático: ligar a opção e ver prazos, condições, termos ab
   expect(await traco(pena)).toEqual({ linha: 'underline', estilo: 'dotted' });
   await semViolacoes(page);
 
-  // A preferência é global: continua depois de recarregar e aparece em Conta › Aparência.
+  // Desligar vale depois de recarregar (grava `false`, que vence o padrão) e aparece em Conta ›
+  // Aparência; ligar de lá volta o destaque ao leitor.
+  await botao.click();
+  await expect(botao).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.destaque')).toHaveCount(0);
+  await expect(page.getByRole('list', { name: 'Legenda dos destaques' })).toBeHidden();
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  await page.goto('/#/conta/aparencia');
-  const caixa = page.getByRole('checkbox', {
-    name: 'Destacar prazos, condições, termos absolutos e penas',
-  });
-  await expect(caixa).toBeChecked();
-  await semViolacoes(page);
-  await caixa.uncheck();
-  await page.goBack();
   await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
     'aria-pressed',
     'false',
   );
   await expect(page.locator('.destaque')).toHaveCount(0);
+  await page.goto('/#/conta/aparencia');
+  const caixa = page.getByRole('checkbox', {
+    name: 'Destacar prazos, condições, termos absolutos e penas',
+  });
+  await expect(caixa).not.toBeChecked();
+  await semViolacoes(page);
+  await caixa.check();
+  await page.goBack();
+  await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('.destaque').first()).toBeVisible();
 });
 
 test('régua de leitura: desligada não realça; ligada em Conta realça a linha sob o ponteiro sem mover o texto, com axe nos dois temas e a Biblioteca com o "Retomar": LEP compilada (fatia 4)', async ({
@@ -1062,7 +1064,11 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await fixarLenteCorrida(page);
-  await page.getByRole('button', { name: 'Destaques' }).click();
+  // Os destaques abrem ligados (D-D17): o termo aceso já está na tela, sem tocar no botão.
+  await expect(page.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 
   // Um termo aceso pelo destaque automático: o grifo convive com ele, por fora.
   const destaque = page.locator('.texto-vigente .destaque');
