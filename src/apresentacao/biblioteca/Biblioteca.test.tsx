@@ -148,11 +148,10 @@ describe('Biblioteca › Normas (9.5)', () => {
     ).toBeInTheDocument();
     expect(within(lista).queryByText('ECA')).not.toBeInTheDocument();
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).toBeInTheDocument();
-    // Com normas, o caminho até o acervo continua à vista.
-    expect(within(lista).getByRole('link', { name: 'Adicionar do acervo' })).toHaveAttribute(
-      'href',
-      '#/biblioteca/acervo?tipo=norma',
-    );
+    // Com normas, o caminho até o acervo fecha a lista (D-D19).
+    expect(
+      within(lista).getByRole('link', { name: 'Puxar mais normas do acervo' }),
+    ).toHaveAttribute('href', '#/biblioteca/acervo?tipo=norma');
     expect(within(lista).queryByRole('link', { name: /^Tudo do edital/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Nenhuma norma ainda' })).not.toBeInTheDocument();
 
@@ -244,12 +243,14 @@ describe('Biblioteca › Normas (9.5)', () => {
     const continuar = await screen.findByRole('link', { name: /^Retomar: LEP, / });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${lep.id}`);
     expect(screen.queryByRole('region', { name: 'Agora' })).not.toBeInTheDocument();
-    expect(continuar.closest('p')).toHaveTextContent(/cerca de \d+ min/);
-    // Uma ação dominante por tela: "Retomar" é a principal, e só ela.
-    expect(continuar).toHaveClass('principal');
-    expect([...screen.getByRole('main').querySelectorAll('.principal')]).toEqual([continuar]);
+    expect(continuar).toHaveTextContent(/cerca de \d+ min/);
+    // D-D19: a linha é quieta (não é o botão escuro); a ação dominante da tela é o convite do acervo.
+    expect(continuar).toHaveClass('retomar-link');
+    expect(continuar).not.toHaveClass('principal');
     const lista = screen.getByRole('region', { name: 'Normas' });
-    // "Importar norma" deixa de ser a ação principal.
+    const convite = within(lista).getByRole('link', { name: 'Puxar mais normas do acervo' });
+    expect([...screen.getByRole('main').querySelectorAll('.principal')]).toEqual([convite]);
+    // "Importar norma" nunca é a ação principal.
     expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
       'principal',
     );
@@ -264,14 +265,134 @@ describe('Biblioteca › Normas (9.5)', () => {
     );
   });
 
-  it('sem leitura, não há "Retomar" e "Importar norma" é a ação principal (9.7)', async () => {
+  it('sem leitura, não há "Retomar"; o convite do acervo é a ação principal e "Importar norma", não (9.7, D-D19)', async () => {
     const { repo } = await repositorioDeTeste();
     await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
     await abrirBiblioteca(repo);
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
-    expect(within(lista).getByRole('link', { name: 'Importar norma' })).toHaveClass('principal');
+    expect(within(lista).getByRole('link', { name: 'Puxar mais normas do acervo' })).toHaveClass(
+      'principal',
+    );
+    expect(within(lista).getByRole('link', { name: 'Importar norma' })).not.toHaveClass(
+      'principal',
+    );
     expect(screen.queryByRole('link', { name: /^Retomar/ })).not.toBeInTheDocument();
+  });
+
+  it('a lista vem primeiro: o título da área só para leitor de tela, e a busca com o chip "Filtrar" na mesma linha (D-D19)', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'LEP')).id);
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    // O nome da área já está na navegação: o título não repete a aba, mas segue no documento.
+    expect(screen.getByRole('heading', { level: 1, name: 'Biblioteca' })).toHaveClass(
+      'visualmente-oculto',
+    );
+    const barra = lista.querySelector('.barra-de-normas');
+    expect(barra).not.toBeNull();
+    expect(within(barra as HTMLElement).getByLabelText('Buscar norma')).toBeInTheDocument();
+    expect(within(barra as HTMLElement).getByRole('button', { name: 'Filtrar' })).toBeVisible();
+    // A lista vem antes de qualquer ação de acrescentar normas.
+    const ordem = [
+      ...lista.querySelectorAll('.lista-de-normas, .mais-do-acervo, .barra-de-normas'),
+    ];
+    expect(ordem.map((e) => e.className.split(' ')[0])).toEqual([
+      'barra-de-normas',
+      'lista-simples',
+      'mais-do-acervo',
+    ]);
+  });
+
+  it('os três filtros ficam atrás do chip "Filtrar"; o chip conta os ligados e "Limpar filtros" os desliga (D-D19)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    await vincular(repo, lep.id, 'Execução Penal');
+    const usuario = await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    await within(lista).findByRole('link', { name: /^CP/ });
+    const chip = within(lista).getByRole('button', { name: 'Filtrar' });
+    expect(chip).toHaveAttribute('aria-expanded', 'false');
+    expect(within(lista).getByLabelText('Disciplina')).not.toBeVisible();
+
+    await usuario.click(chip);
+    expect(chip).toHaveAttribute('aria-expanded', 'true');
+    expect(within(lista).getByLabelText('Disciplina')).toBeVisible();
+    expect(within(lista).getByLabelText('Ano')).toBeVisible();
+    expect(within(lista).getByLabelText('Tipo de norma')).toBeVisible();
+
+    await usuario.selectOptions(within(lista).getByLabelText('Disciplina'), 'Execução Penal');
+    expect(await within(lista).findByRole('button', { name: 'Filtrar, 1 ativo' })).toBeVisible();
+    expect(within(lista).queryByRole('link', { name: /^CP/ })).not.toBeInTheDocument();
+
+    // Recolhido, o chip segue dizendo que a lista está afinada.
+    await usuario.click(chip);
+    expect(within(lista).getByLabelText('Disciplina')).not.toBeVisible();
+    expect(within(lista).getByRole('button', { name: 'Filtrar, 1 ativo' })).toBeVisible();
+
+    await usuario.click(chip);
+    await usuario.click(within(lista).getByRole('button', { name: 'Limpar filtros' }));
+    expect(await within(lista).findByRole('link', { name: /^CP/ })).toBeInTheDocument();
+    expect(within(lista).getByRole('button', { name: 'Filtrar' })).toBeVisible();
+    expect(within(lista).queryByRole('button', { name: 'Limpar filtros' })).not.toBeInTheDocument();
+  });
+
+  it('o endereço que já traz um filtro abre a lista com o painel aberto (voltar do leitor reencontra a lista) (D-D19)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const lep = (await publicarVersao(repo, (await rascunho(repo, 'LEP')).id)).norma;
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    await vincular(repo, lep.id, 'Execução Penal');
+    window.location.hash = `#/biblioteca?disciplina=${encodeURIComponent('Execução Penal')}`;
+    render(<App abrir={() => Promise.resolve(repo)} />);
+    await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    expect(await within(lista).findByRole('link', { name: /^LEP/ })).toBeInTheDocument();
+    expect(within(lista).queryByRole('link', { name: /^CP/ })).not.toBeInTheDocument();
+    expect(within(lista).getByRole('button', { name: 'Filtrar, 1 ativo' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(within(lista).getByLabelText('Disciplina')).toBeVisible();
+  });
+
+  it('o fecho da lista: o tamanho do acervo à vista, o convite, o atalho do edital e a importação (D-D19)', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    await plano(repo, 'DPE-SP', 'Execução Penal');
+    await abrirComAcervo(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    const convite = await within(lista).findByRole('region', { name: 'Convite do acervo' });
+    expect(await within(convite).findByText('1')).toHaveClass('mais-do-acervo-numero');
+    expect(convite).toHaveTextContent('1 norma no acervo, a um toque.');
+    expect(within(convite).getByRole('link', { name: 'Puxar mais normas do acervo' })).toHaveClass(
+      'principal',
+    );
+    expect(within(convite).getByRole('link', { name: 'Tudo do edital de DPE-SP' })).toHaveAttribute(
+      'href',
+      '#/biblioteca/acervo?tudo=1',
+    );
+    expect(within(convite).getByRole('link', { name: 'Importar norma' })).toHaveAttribute(
+      'href',
+      '#/biblioteca/importar',
+    );
+  });
+
+  it('sem o índice do acervo (sem rede), o fecho não mostra conta e o botão fica', async () => {
+    const { repo } = await repositorioDeTeste();
+    await publicarVersao(repo, (await rascunho(repo, 'CP')).id);
+    await abrirBiblioteca(repo);
+
+    const lista = await screen.findByRole('region', { name: 'Normas' });
+    const convite = await within(lista).findByRole('region', { name: 'Convite do acervo' });
+    expect(convite).not.toHaveTextContent(/no acervo, a um toque/);
+    expect(
+      within(convite).getByRole('link', { name: 'Puxar mais normas do acervo' }),
+    ).toBeVisible();
   });
 
   it('uma linha por norma, com as disciplinas no apoio; sem disciplina não diz nada (R1)', async () => {
@@ -335,6 +456,7 @@ describe('Biblioteca › Normas (9.5)', () => {
 
     const lista = await screen.findByRole('region', { name: 'Normas' });
     await within(lista).findByRole('link', { name: /^CP/ });
+    await usuario.click(within(lista).getByRole('button', { name: 'Filtrar' }));
     await usuario.selectOptions(within(lista).getByLabelText('Disciplina'), 'Execução Penal');
     expect(await within(lista).findByRole('link', { name: /^LEP/ })).toBeInTheDocument();
     expect(within(lista).queryByRole('link', { name: /^CP/ })).not.toBeInTheDocument();
@@ -363,7 +485,8 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(await within(lista).findByText('1 norma')).toBeInTheDocument();
     expect(within(lista).queryByRole('link', { name: /^ECA/ })).not.toBeInTheDocument();
 
-    // O filtro por disciplina combina com a busca.
+    // O filtro por disciplina (atrás do chip "Filtrar") combina com a busca.
+    await usuario.click(within(lista).getByRole('button', { name: 'Filtrar' }));
     await usuario.selectOptions(within(lista).getByLabelText('Disciplina'), 'Infância');
     expect(await within(lista).findByText('Nenhuma norma com esse nome.')).toBeInTheDocument();
     await usuario.click(within(lista).getByRole('button', { name: 'Limpar busca' }));

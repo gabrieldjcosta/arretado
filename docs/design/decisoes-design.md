@@ -346,3 +346,24 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
+
+## D-D19 — A Biblioteca abre pela lista: filtros atrás do "Filtrar", "Retomar" em uma linha e o acervo fecha a lista (03/11/2026)
+
+> **Emenda a D-D7 (P6).** A lista de Normas continua sendo linhas sobre o fundo; muda o que vem antes dela e onde moram as ações de acrescentar normas.
+
+**Origem.** A análise de Genjutsu e Impeccable consolidada em 03/11/2026 (tema 12): a Biblioteca "abre como formulário" (a primeira norma ficava a 754 de 844 px), o título repetia a aba, o "Retomar" era um botão escuro e os três filtros abriam abertos. O harmonizado pediu "lista primeiro, filtros atrás do chip Filtrar, Retomar numa linha e sem título repetindo a aba; o convite Puxar mais normas do acervo fecha a lista". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. O título "Biblioteca" e o "Normas" da seção ficam só para leitor de tela (`.visualmente-oculto`): a navegação já diz onde a pessoa está, e a região segue se chamando "Normas".
+2. "Retomar" vira uma linha de 44 px (`.retomar-linha`, `.retomar-link`): o lugar, os minutos e a seta, com o contorno da folha. Deixa de ser o botão escuro e de ser a `.principal` da tela.
+3. A busca e o chip "Filtrar" dividem a linha (`.barra-de-normas`). Disciplina, Ano e Tipo de norma ficam atrás do chip (`#filtros-normas`, `aria-expanded`); o painel abre sozinho se o endereço já traz algum filtro (voltar do leitor reencontra a lista como estava), o chip mostra quantos estão ligados ("Filtrar, 2 ativos") e "Limpar filtros" os desliga sem apagar a busca.
+4. O fecho da lista (`FechoDaLista`, `.mais-do-acervo`) é um cartão: "N normas no acervo, a um toque." (o número do índice; sem rede a conta some e o botão fica), "Puxar mais normas do acervo" (a única `.principal` da tela), "Tudo do edital de X" (quando o acervo conhece o edital do plano) e "Importar norma". Saem do alto o "Adicionar do acervo" (era o mesmo destino do "Puxar mais normas do acervo") e o "Importar norma".
+5. O Guia da tela troca a dica dos filtros por "Filtrar" e ganha a de "Puxar mais normas do acervo" (versão 5: a marca "Novo" volta uma vez).
+
+**Medidas** (390 × 844, três normas e uma leitura): a primeira norma sobe de y=754 para y=316; a 320 × 568 aparece na primeira tela, em y=374 (as três abas quebram em duas linhas a 320 px, como já quebravam).
+
+**O que continua como está.** O estado vazio (com "Escolher meu concurso"); a faixa de importações pendentes; a faixa de dicas (a do Hoje some pela D-D16, se o Gabriel confirmar; aqui continua); a ordem, o apoio e o selo "Há versão nova" das linhas.
+
+**Em aberto.** O "Mudar disciplina" de cada linha continua: é o maior ruído que sobra na lista (uma ação sublinhada por norma). Movê-lo para o Leitor (Ações) tira uma linha de cada Norma, mas muda um fluxo que o E2E do acervo cobre; fica para decisão do Gabriel.
+
+**Custo.** Um toque a mais para filtrar. "Importar norma" desce para o fim da lista.
