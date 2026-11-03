@@ -1,0 +1,52 @@
+name: Conferir fontes das leis
+
+# Toda segunda de manhã, confere no Planalto se alguma norma do acervo ganhou texto novo (hash do
+# texto da página, sem LLM e sem gasto). Se sim, abre um PR de rascunho para a `integracao` com a base
+# de hashes e o relatório. O PR não altera o acervo: a regeração do item e a revisão são humanas.
+# Pré-requisito do repositório: Settings › Actions › "Allow GitHub Actions to create and approve pull requests".
+on:
+  schedule:
+    - cron: '23 10 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: conferir-fontes
+  cancel-in-progress: false
+
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: integracao
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Conferir as páginas do Planalto
+        run: node scripts/acervo/conferir.ts
+      - name: Abrir PR de rascunho se houver novidade
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- acervo/fontes-hash.json && [ -z "$(git ls-files --others --exclude-standard -- acervo/fontes-hash.json)" ]; then
+            echo "Nenhuma mudança na base: nada a abrir."
+            exit 0
+          fi
+          dia=$(date -u +%F)
+          ramo="acervo/conferencia-$dia"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$ramo"
+          git add acervo/fontes-hash.json acervo/conferencia.md
+          git commit -m "chore(acervo): conferência das fontes de $dia"
+          git push origin "$ramo"
+          gh pr create --draft --base integracao --head "$ramo" \
+            --title "Acervo: conferência das fontes de $dia" \
+            --body-file acervo/conferencia.md
