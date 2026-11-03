@@ -348,7 +348,7 @@
       "name": "Lido na faixa da folha",
       "kind": "custom",
       "refersTo": "lido-na-faixa",
-      "description": "No Leitor, do começo da norma ao \"lido até\", o texto vai sobre a faixa da folha (raio 8, a linha de 1 px do mundo por dentro, 12 px de folga de cada lado); o que falta ler fica no chão. \"Lido até aqui\" fecha o lido, em 13 px peso 700, com a caneta deitada ao lado.",
+      "description": "No Leitor, do começo da norma ao \"lido até\", o texto vai sobre a faixa da folha (raio 8, a linha de 1 px do mundo por dentro, 12 px de folga de cada lado); o que falta ler fica no chão. \"Lido até aqui\" fecha o lido, em 13 px peso 700, com o ponto de luz de \"onde parei\" (a caneta deitada saiu na D-D12).",
       "html": "<div class=\"ds-chao\"><div class=\"ds-lido\"><p>Art. 112. A pena privativa de liberdade será executada em forma progressiva.</p><p class=\"marca\">Lido até aqui</p></div><p class=\"ds-falta\">§ 1º A transferência para regime menos rigoroso será determinada pelo juiz.</p></div>",
       "css": ".ds-chao{background:#f6f8fb;padding:12px;border-radius:8px}.ds-lido{background:#fff;color:#0f1c3a;border-radius:8px;box-shadow:inset 0 0 0 1px #838fa7;padding:6px 12px;font:400 18px/1.6 'Literata',Georgia,serif}.ds-lido p{margin:0}.ds-lido .marca{margin-top:4px;font:700 13px 'Atkinson Hyperlegible Next',system-ui,sans-serif}.ds-falta{margin:6px 0 0;padding:0 12px;color:#0f1c3a;font:400 18px/1.6 'Literata',Georgia,serif}"
     },
