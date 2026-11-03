@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { registrarErro } from '../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 import { telaDoGuia } from './memoria';
@@ -43,6 +44,15 @@ describe('Guia da primeira abertura', () => {
     expect(
       await screen.findByRole('button', { name: /O que cada opção faz/, expanded: true }),
     ).toBeInTheDocument();
+  });
+
+  it('com uma dica só, o botão diz "1 dica" e não "1 dicas" (D-D21)', async () => {
+    const { repo } = await repositorioDeTeste();
+    await registrarErro(repo, { fraseCorreta: 'Frase correta.' });
+    window.location.hash = '#/recall/frases';
+    render(<App abrir={() => Promise.resolve(repo)} />);
+    const abrirDicas = await screen.findByRole('button', { name: /O que cada opção faz/ });
+    expect(abrirDicas).toHaveTextContent(/1 dica$/);
   });
 
   it('sair da tela sem abrir o cartão não gasta o "Novo"', async () => {

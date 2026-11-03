@@ -2167,3 +2167,9 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 
 - **Dois Ciclos "Equilibrado" ou nenhum ativo.** Causa: duas abas abertas juntas criavam o Ciclo padrão, e a trava por módulo não vale entre abas. Solução: conferir de novo e criar dentro de `repo.transacao`.
 - **Previsível:** `garantirCicloPadrao` chama `carregarCiclo`, que tenta ler `/incidencia/` só para montar as matérias; o "Equilibrado" não usa incidência. Só pega quem tem Edital ligado a Concurso (nenhum fluxo grava isso hoje). Se aparecer lentidão no fim do onboarding, montar as matérias só com Disciplinas e Pontos.
+
+## O Fixar abre sem cobrança (D-D21, 03/11/2026)
+
+- **Teste ou E2E procura "Nenhum dia nos últimos 7" ou "1 dos últimos 7 dias" à vista e não acha (ou acha escondido).** Causa: a semana só existe depois do primeiro Dia com revisão, e a conta virou texto só para leitor de tela. Solução: sem Dia, `queryByText(/últimos 7/)` vazio; com Dia, conferir as sete marcas (`.dias-marcas .ponto-de-luz`) e o nome "Últimos 7 dias"; a conta está em `.visualmente-oculto` (o `getByText` acha, e o `toBeVisible` do Playwright também, por causa do 1×1 px).
+- **Estimativa do Fixar diferente da do Hoje.** Causa: duas contas, uma só de Cartões e outra de Cartões e Frases. Solução: as duas usam `minutosDaRodada`; não calcular minutos de rodada com `minutosDoLote` direto (ele é a conta do lote de um tipo, ou da Sessão por tempo do Hoje).
+- **Previsível:** (a) o plural do Guia ("1 dica") não vale para outras contagens do app: `cartoes()` e `frases()` do `RecallInicio` já tratam o singular, mas cada texto novo com número precisa do mesmo cuidado; (b) a primeira revisão faz a tela ganhar a linha das marcas e o conteúdo desce uns 40 px, então teste de posição na primeira revisão tem de contar com isso.

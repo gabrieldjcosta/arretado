@@ -91,7 +91,9 @@ export function GuiaDaTela({
       >
         <span>{TITULO_DO_GUIA}</span>
         {novo && <span className="marcador">Novo</span>}
-        <span className="dica">{aberto ? 'Recolher' : `${String(dicas.length)} dicas`}</span>
+        <span className="dica">
+          {aberto ? 'Recolher' : dicas.length === 1 ? '1 dica' : `${String(dicas.length)} dicas`}
+        </span>
       </button>
       <div id={painel} hidden={!aberto}>
         <ul
