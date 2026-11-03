@@ -55,8 +55,10 @@ describe('Hoje › Ponto de luz (P3)', () => {
   it('os pontos do Dia dizem o estado também em palavras', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
-    await lerLep(repo);
+    const normaId = await lerLep(repo);
     relogio.avancar(3 * DIA);
+    // A leitura de hoje acende o primeiro ponto, e é só então que a fileira aparece (D-D16).
+    await lerLep(repo, normaId);
     abrirHoje(repo);
 
     const pontos = await screen.findByRole('list', { name: 'Andamento do Dia' });
@@ -64,7 +66,28 @@ describe('Hoje › Ponto de luz (P3)', () => {
       within(pontos)
         .getAllByRole('listitem')
         .map((li) => li.textContent),
-    ).toEqual(['Leitura, ainda não', 'Cartões, para agora', 'Frases, ainda não']);
+    ).toEqual(['Leitura, feito hoje', 'Cartões, para agora', 'Frases, ainda não']);
+  });
+
+  it('o Hoje abre com um cartão e um botão: sem os pontos do Dia, sem faixa de dicas, com os minutos recolhidos', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
+    await lerLep(repo);
+    relogio.avancar(3 * DIA);
+    abrirHoje(repo);
+
+    const agora = await screen.findByRole('region', { name: 'Agora' });
+    // Nada foi feito hoje: os três pontos apagados seriam só ruído sobre o cartão.
+    expect(screen.queryByRole('list', { name: 'Andamento do Dia' })).toBeNull();
+    // As dicas vêm pela Ajuda; os minutos, pelo link ao lado da estimativa; o "Para lembrar" mora no "+".
+    expect(screen.queryByRole('button', { name: /O que cada opção faz/ })).toBeNull();
+    expect(within(agora).getByRole('button', { name: 'tenho outro tempo' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(screen.queryByRole('group', { name: 'Quanto tempo você tem?' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Para lembrar' })).toBeNull();
+    expect(within(agora).getByRole('link', { name: 'Começar' })).toBeVisible();
   });
 
   it('a linha de parada diz onde retomar e quando foi salvo; a folha não repete o motivo', async () => {
@@ -74,7 +97,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
     abrirHoje(repo);
 
     const parada = (await screen.findByText(/Retomar em/)).closest('.parada');
-    expect(parada).toHaveTextContent('Retomar em LEP, art. 1ºsalvo ontem, 09h00');
+    expect(parada).toHaveTextContent('Retomar em LEP, art. 1º, salvo ontem, 09h00');
     expect(screen.queryByText(/Você parou/)).toBeNull();
     const folha = screen.getByRole('region', { name: 'Agora' });
     expect(within(folha).getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
@@ -91,7 +114,10 @@ describe('Hoje › Ponto de luz (P3)', () => {
 
     const agora = await screen.findByRole('region', { name: 'Agora' });
     expect(within(agora).getByRole('heading')).toHaveTextContent('Revisar cartões');
+    // O cartão do Agora é o elemento em evidência do Hoje (D-D13); "Em seguida" não leva o anel.
+    expect(agora).toHaveClass('evidencia');
     const seguinte = screen.getByRole('region', { name: 'Em seguida' });
+    expect(seguinte).not.toHaveClass('evidencia');
     expect(seguinte).toHaveTextContent('Continuar a leitura');
     await usuario.click(within(seguinte).getByText('Em seguida'));
     expect(within(seguinte).getAllByRole('listitem')).toHaveLength(1);
@@ -108,8 +134,10 @@ describe('Hoje › Ponto de luz (P3)', () => {
   it('com Sessão aberta o Continuar é o botão principal e nem o Agora nem o "Em seguida" aparecem', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
-    await lerLep(repo);
+    const normaId = await lerLep(repo);
     relogio.avancar(3 * DIA);
+    // A leitura de hoje acende um ponto; a fileira dos pontos aparece quando o retrato do Hoje já carregou.
+    await lerLep(repo, normaId);
     await iniciarSessao(repo, { atividade: 'lei' });
     abrirHoje(repo);
 
@@ -217,15 +245,15 @@ describe('Hoje › Ponto de luz (P3)', () => {
     expect(within(resumo).getByRole('status')).toHaveTextContent('Hoje a caneta desenhou o chão.');
   });
 
-  it('o ponto acende uma vez, na visita em que ficou aceso; a primeira abre quieta', async () => {
+  it('o ponto acende uma vez, na visita em que ficou aceso; antes dele a fileira nem aparece', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     const normaId = await lerLep(repo);
     relogio.avancar(DIA);
 
     const primeira = abrirHoje(repo);
-    const lista1 = await screen.findByRole('list', { name: 'Andamento do Dia' });
-    expect(lista1.querySelectorAll('.acende')).toHaveLength(0);
-    expect(within(lista1).getAllByRole('listitem')[0]).toHaveAttribute('data-estado', 'atual');
+    await screen.findByRole('region', { name: 'Agora' });
+    // A primeira visita abre quieta: nada aceso, nem a fileira aparece.
+    expect(screen.queryByRole('list', { name: 'Andamento do Dia' })).toBeNull();
     primeira.unmount();
 
     await lerLep(repo, normaId);
@@ -243,6 +271,7 @@ describe('Hoje › Ponto de luz (P3)', () => {
   it('um registro quebrado em localStorage não derruba o Hoje', async () => {
     localStorage.setItem('arretado.pontos-vistos', '{"data": 3, "estados": "x"}');
     const { repo } = await repositorioDeTeste();
+    await lerLep(repo);
     abrirHoje(repo);
     const pontos = await screen.findByRole('list', { name: 'Andamento do Dia' });
     expect(within(pontos).getAllByRole('listitem')).toHaveLength(3);

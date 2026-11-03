@@ -15,13 +15,14 @@ import {
   type TouchEvent as ReactTouchEvent,
 } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import type {
-  Dispositivo as DispositivoDoModelo,
-  Intervalo,
-  Leitura,
-  Marcacao,
-  TextoDeDispositivo,
-  TipoDispositivo,
+import {
+  DESTAQUES_LIGADOS_PADRAO,
+  type Dispositivo as DispositivoDoModelo,
+  type Intervalo,
+  type Leitura,
+  type Marcacao,
+  type TextoDeDispositivo,
+  type TipoDispositivo,
 } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
@@ -431,9 +432,11 @@ function LeitorAberto({
   // seguidos partem do valor pedido, não do gravado (que ainda pode ser o antigo).
   const [pedido, setPedido] = useState<number | null>(null);
   const tamanho = pedido ?? preferencias?.tamanhoFonte ?? TAMANHO_PADRAO;
-  // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é desligado.
+  // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é o padrão do app,
+  // ligado (D-D17). Até a preferência chegar, vale o padrão: quase todo mundo o mantém.
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
-  const destacar = destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? false;
+  const destacar =
+    destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO;
   // Linha ativa (peça 1): a que está sob o dedo, o cursor ou o foco. Mostra o botão da estrela e,
   // com a régua de leitura ligada (fatia 4), recebe o realce.
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;
@@ -2002,41 +2005,46 @@ function LeitorAberto({
             ) : (
               <>
                 {vizinho(ordem - 1, 'anterior')}
-                <section
-                  ref={cartao}
-                  className="cartao-artigo"
-                  aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
-                  tabIndex={0}
-                >
-                  {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
-                  {linhas
-                    .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
-                    .map((linha) => (
-                      <div key={linha.indice} {...propriedadesDaLinha(linha)}>
-                        {conteudoDaLinha(linha)}
+                {/* O contorno de evidência (D-D13) mora neste envoltório, que só existe de fato no Modo
+                    foco (fora dele é `display: contents`) e não é recriado ao trocar de artigo: a luz
+                    acende uma vez. O cartão rola por dentro e cortaria o halo. */}
+                <div className="evidencia-foco">
+                  <section
+                    ref={cartao}
+                    className="cartao-artigo"
+                    aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
+                    tabIndex={0}
+                  >
+                    {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
+                    {linhas
+                      .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
+                      .map((linha) => (
+                        <div key={linha.indice} {...propriedadesDaLinha(linha)}>
+                          {conteudoDaLinha(linha)}
+                        </div>
+                      ))}
+                    {remissoesDoCartao.length > 0 && (
+                      <div className="remissoes-do-artigo">
+                        <h3>Remissões deste artigo</h3>
+                        <ul>
+                          {remissoesDoCartao.map(({ alvo, origem }) => (
+                            <li key={alvo}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDadosDaPrevia(undefined);
+                                  setPrevia({ origem, alvo });
+                                }}
+                              >
+                                {referenciaDaBusca(alvo)}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    ))}
-                  {remissoesDoCartao.length > 0 && (
-                    <div className="remissoes-do-artigo">
-                      <h3>Remissões deste artigo</h3>
-                      <ul>
-                        {remissoesDoCartao.map(({ alvo, origem }) => (
-                          <li key={alvo}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setDadosDaPrevia(undefined);
-                                setPrevia({ origem, alvo });
-                              }}
-                            >
-                              {referenciaDaBusca(alvo)}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </section>
+                    )}
+                  </section>
+                </div>
                 <SetasDoCartao
                   anterior={() => {
                     irAoAnterior.current();

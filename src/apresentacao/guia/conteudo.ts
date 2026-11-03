@@ -22,14 +22,18 @@ export const TITULO_DO_GUIA = 'O que cada opção faz';
 
 export const GUIAS: Record<TelaComGuia, Guia> = {
   hoje: {
-    versao: 5,
+    versao: 6,
     vazio: [
       {
         opcao: 'Escolher meu concurso',
         efeito:
           'você diz qual concurso estuda e o app traz as normas com que ele começa e monta a Trilha do edital mais recente.',
       },
-      { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
+      {
+        opcao: 'Botão +',
+        efeito:
+          'abre "Registrar erro" (só a Frase correta é obrigatória) e "Lembrete" (uma nota rápida, sem hora nem aviso).',
+      },
       {
         opcao: 'Leitura · Cartões · Frases',
         efeito: 'ficam marcados como feitos quando você lê, revisa ou fixa.',
@@ -37,7 +41,11 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       { opcao: 'Para lembrar', efeito: 'uma nota sobre o que fazer fora do app.' },
     ],
     uso: [
-      { opcao: 'Botão +', efeito: 'registra um Erro. Só a Frase correta é obrigatória.' },
+      {
+        opcao: 'Botão +',
+        efeito:
+          'abre "Registrar erro" (só a Frase correta é obrigatória) e "Lembrete" (uma nota rápida, sem hora nem aviso).',
+      },
       {
         opcao: 'Leitura · Cartões · Frases',
         efeito: 'ficam marcados como feitos quando você lê, revisa ou fixa.',
@@ -96,7 +104,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     uso: [{ opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' }],
   },
   biblioteca: {
-    versao: 4,
+    versao: 5,
     vazio: [
       {
         opcao: 'Escolher meu concurso',
@@ -114,8 +122,12 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     uso: [
       { opcao: 'Buscar norma', efeito: 'procura entre as Normas da sua Biblioteca.' },
       {
-        opcao: 'Disciplina · Ano · Tipo de norma',
-        efeito: 'afinam a lista de Normas.',
+        opcao: 'Filtrar',
+        efeito: 'afina a lista por Disciplina, Ano e Tipo de norma.',
+      },
+      {
+        opcao: 'Puxar mais normas do acervo',
+        efeito: 'fecha a lista: traz do acervo as normas que ainda não estão na sua Biblioteca.',
       },
     ],
   },

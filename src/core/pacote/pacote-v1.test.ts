@@ -143,7 +143,7 @@ describe('pacote v1 no app v2 (9.1)', () => {
     destino.repo.fechar();
   });
 
-  it('preferências sem `destacarCondicionantesEPrazos` (anteriores à 9.8) restauram, com os destaques desligados', async () => {
+  it('preferências sem `destacarCondicionantesEPrazos` (anteriores à 9.8) restauram sem o campo, e vale o padrão do app (destaques ligados)', async () => {
     const origem = await comLeitura();
     await alterarPreferencias(origem.repo, { tamanhoFonte: 22 });
     const { bytes } = await exportarPacote(origem.repo);
@@ -154,7 +154,7 @@ describe('pacote v1 no app v2 (9.1)', () => {
       destino.repo.comUsuario(origem.repo.ctx.usuarioId),
     );
     expect(preferencias.tamanhoFonte).toBe(22);
-    // Ausente é desligado (o leitor lê `?? false`), sem migração.
+    // Ausente vale o padrão do app (o leitor lê `?? DESTAQUES_LIGADOS_PADRAO`, D-D17), sem migração.
     expect(preferencias).not.toHaveProperty('destacarCondicionantesEPrazos');
     origem.repo.fechar();
     destino.repo.fechar();

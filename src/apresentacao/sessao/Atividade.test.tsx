@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
+import { abrirNorma } from '../../dominios/legislacao/leitor';
+import { gravarPosicao } from '../../dominios/legislacao/leituras';
+import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { criarCartaoManual } from '../../dominios/recall/servico';
 import { iniciarSessao } from '../../dominios/sessao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -23,6 +26,27 @@ async function repoComAgora() {
   return repo;
 }
 
+/**
+ * Uma leitura salva hoje acende o ponto da Leitura. Desde a D-D16 a fileira dos pontos só aparece depois
+ * do primeiro ponto aceso, e ela é o sinal de que o retrato do Hoje já chegou.
+ */
+async function lerHoje(repo: Repositorio) {
+  const { versao } = await criarRascunho(repo, {
+    blocos: [
+      { trechos: [{ texto: 'Art. 1º A execução penal tem por objetivo efetivar a sentença.' }] },
+    ],
+    origemEntrada: 'html',
+    tituloCurto: 'LEP',
+  });
+  const { norma } = await publicarVersao(repo, versao.id);
+  const { nos } = await abrirNorma(repo, norma.id);
+  await gravarPosicao(
+    repo,
+    norma.id,
+    nos.find((n) => n.dispositivo.tipo === 'artigo')!.dispositivo.id,
+  );
+}
+
 describe('Atividade da Sessão no Hoje', () => {
   it('um toque no tipo começa a Sessão com a atividade e leva à tela dela', async () => {
     const { repo, usuario } = await abrir('/', await repoComAgora());
@@ -38,6 +62,8 @@ describe('Atividade da Sessão no Hoje', () => {
     await abrir('/', await repoComAgora());
     const sugerido = await screen.findByRole('button', { name: /Questões/ });
     expect(sugerido).toHaveTextContent('(sugerido)');
+    // A linha abre recolhida (D-D16): um segundo cartão não disputa o Começar do Agora.
+    expect(sugerido.closest('details')).not.toHaveAttribute('open');
   });
 
   it('com Sessão aberta, o cartão de começar some', async () => {
@@ -50,6 +76,7 @@ describe('Atividade da Sessão no Hoje', () => {
 
   it('com Sessão aberta e uma Próxima ação, o Hoje tem um só Continuar e não tem o Agora', async () => {
     const repo = await repoComAgora();
+    await lerHoje(repo);
     await iniciarSessao(repo, { atividade: 'lei' });
     await abrir('/', repo);
     await screen.findByRole('region', { name: 'Sessão aberta' });

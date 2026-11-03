@@ -18,12 +18,45 @@
   margin-bottom: 1rem;
 }
 
+/* "Começar uma Sessão" (D-D16): uma linha quieta e recolhida, do mesmo desenho do "Em seguida" (o rótulo,
+   a seta e uma divisória de 1 px por cima); aberta, mostra os tipos de atividade. */
 .comecar-sessao {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--borda);
 }
 
-.comecar-sessao h2 {
-  margin: 0 0 0.25rem;
+.comecar-sessao > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.comecar-sessao > summary::-webkit-details-marker {
+  display: none;
+}
+
+.comecar-sessao__resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  min-height: 3rem;
+}
+
+.comecar-sessao__rotulo {
+  font-family: var(--fonte-rotulo);
+  font-size: var(--tamanho-rotulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--texto-atenuado);
+}
+
+.comecar-sessao[open] > .comecar-sessao__resumo .em-seguida-seta {
+  transform: rotate(180deg);
+}
+
+.comecar-sessao[open] {
+  padding-bottom: 0.5rem;
 }
 
 .comecar-sessao__tipos {

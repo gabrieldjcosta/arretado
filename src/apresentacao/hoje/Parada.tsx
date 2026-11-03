@@ -1,5 +1,6 @@
 // A linha de parada do Hoje (D-D7, P3): onde retomar a leitura. A caneta que ficava encostada na folha
-// do Agora saiu (D-D12): ela é só o ícone do app.
+// do Agora saiu (D-D12): ela é só o ícone do app. Desde a D-D16 é uma linha só, quieta, logo abaixo da
+// folha: "Retomar em LEP, art. 112, § 2º, salvo ontem, 22h10".
 import type { ParadaDaLeitura } from './parada-da-leitura';
 
 /**
@@ -12,7 +13,7 @@ export function Parada({ parada }: { parada?: ParadaDaLeitura }) {
     <div className="parada">
       <p className="parada-texto">
         Retomar em <strong className="parada-onde">{parada.rotulo}</strong>
-        <span className="parada-quando">{parada.quando}</span>
+        <span className="parada-quando">, {parada.quando}</span>
       </p>
     </div>
   );

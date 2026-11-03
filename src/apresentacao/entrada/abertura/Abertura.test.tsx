@@ -47,7 +47,7 @@ function simularOLayout() {
 
 function montar(
   props: {
-    escrita?: 'completa' | 'curta';
+    escrita?: 'completa' | 'doDia' | 'depressa';
     calmo?: boolean;
     cabecalho?: boolean;
     encontro?: Encontro;
@@ -95,13 +95,35 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
     expect(document.body).toHaveFocus();
   });
 
-  it('a primeira vez leva "Pular" (a sequência dela passa de 5 s); a do Dia, não', () => {
+  it('a primeira vez leva "Pular" (a sequência dela passa de 5 s); as do Dia, não', () => {
     const primeira = montar({ escrita: 'completa' });
     expect(screen.getByRole('button', { name: 'Pular', hidden: true })).toBeInTheDocument();
     primeira.unmount();
-    const doDia = montar({ escrita: 'curta' });
+    const doDia = montar({ escrita: 'doDia' });
     expect(screen.queryByRole('button', { name: 'Pular', hidden: true })).toBeNull();
-    expect(doDia.container.querySelector('svg.eb')).toHaveClass('curta');
+    doDia.unmount();
+    montar({ escrita: 'depressa' });
+    expect(screen.queryByRole('button', { name: 'Pular', hidden: true })).toBeNull();
+  });
+
+  it('o mesmo desenho nos três tempos, só em outra escala da linha do tempo do kit (--k)', () => {
+    const escalas = (['completa', 'doDia', 'depressa'] as const).map((escrita) => {
+      const { container, camada, unmount } = montar({ escrita });
+      const nome = container.querySelector<SVGElement>('svg.eb');
+      const resultado = {
+        atributo: camada()?.getAttribute('data-escrita'),
+        k: nome?.style.getPropertyValue('--k') ?? null,
+        curta: nome?.classList.contains('curta') ?? null,
+      };
+      unmount();
+      return resultado;
+    });
+    // O 2,64 s é o do kit (sem --k); as outras escalam por 2,4/2,64 e 1,6/2,64. Nenhuma é a `curta` do cabeçalho.
+    expect(escalas).toEqual([
+      { atributo: 'completa', k: '', curta: false },
+      { atributo: 'doDia', k: '0.9091', curta: false },
+      { atributo: 'depressa', k: '0.6061', curta: false },
+    ]);
   });
 
   it('perfil Calmo: o desenho só esmaece', () => {
@@ -146,10 +168,25 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
     expect(aoSair).toHaveBeenCalledTimes(1);
   });
 
-  it('primeira abertura do Dia: o nome curto (1,2 s), a pausa de 0,15 s e a luz voa 0,45 s', async () => {
+  it('primeira abertura do Dia: o nome em 2,4 s, a pausa de 0,3 s e a luz voa 0,45 s', async () => {
     simularOLayout();
-    const { camada, aoSair } = montar({ escrita: 'curta' });
-    await passar(1200 + 150 - 10);
+    const { camada, aoSair } = montar({ escrita: 'doDia' });
+    await passar(2400 + 300 - 10);
+    expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
+    await passar(10);
+    expect(camada()).toHaveAttribute('data-fase', 'voando');
+    await passar(400);
+    expect(aoSair).not.toHaveBeenCalled();
+    // A conta dos quadros começa no primeiro quadro: um respiro a mais depois dos 0,45 s.
+    await passar(100);
+    expect(aoSair).toHaveBeenCalledTimes(1);
+    expect(aoSair).toHaveBeenCalledWith('fim');
+  });
+
+  it('as demais aberturas: o nome em 1,6 s, a pausa de 0,15 s e a luz voa 0,45 s', async () => {
+    simularOLayout();
+    const { camada, aoSair } = montar({ escrita: 'depressa' });
+    await passar(1600 + 150 - 10);
     expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
     await passar(10);
     expect(camada()).toHaveAttribute('data-fase', 'voando');
@@ -162,7 +199,7 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
 
   it('Calmo: sem voo; o nome fica à vista e a camada esmaece', async () => {
     simularOLayout();
-    const { camada, luz, aoSair } = montar({ escrita: 'curta', calmo: true });
+    const { camada, luz, aoSair } = montar({ escrita: 'depressa', calmo: true });
     await passar(240 + 700 - 10);
     expect(camada()).toHaveAttribute('data-fase', 'escrevendo');
     await passar(10);
@@ -294,7 +331,19 @@ describe('Abertura: a camada de tela cheia (M2 do Zé)', () => {
   it('"Pular" sai na hora (também para quem o aciona sem tecla nem toque, como um leitor de tela)', () => {
     const { aoSair } = montar();
     fireEvent.click(screen.getByRole('button', { name: 'Pular', hidden: true }));
-    expect(aoSair).toHaveBeenCalled();
+    expect(aoSair).toHaveBeenCalledWith('pulou');
+  });
+
+  it('o toque que pula avisa "pulou"; a camada que vai até o fim avisa "fim"', async () => {
+    const pulada = montar();
+    fireEvent.pointerDown(document.body);
+    expect(pulada.aoSair).toHaveBeenCalledWith('pulou');
+    pulada.unmount();
+    simularOLayout();
+    const inteira = montar({ escrita: 'depressa' });
+    await passar(1600 + 150 + 450 + 200);
+    expect(inteira.aoSair).toHaveBeenCalledTimes(1);
+    expect(inteira.aoSair).toHaveBeenCalledWith('fim');
   });
 
   it('desmontada no meio, não chama ninguém depois e solta os ouvintes de toque e tecla', async () => {
@@ -479,7 +528,7 @@ describe('Abertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
     await passar(240 + 900 + 400);
     expect(calmo.aoSair).toHaveBeenCalledTimes(1);
     calmo.unmount();
-    const doDia = montar({ escrita: 'curta', calmo: true, encontro });
+    const doDia = montar({ escrita: 'depressa', calmo: true, encontro });
     await passar(240 + 700 + 400);
     expect(doDia.aoSair).toHaveBeenCalledTimes(1);
     expect(chegada.medirPe).not.toHaveBeenCalled();
