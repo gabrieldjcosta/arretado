@@ -3344,6 +3344,15 @@ dialog.dialogo-acoes {
   margin-block: auto;
 }
 
+/* O envoltório do contorno de evidência (D-D13), quando existe, entra na pilha no lugar do cartão: é ele
+   que leva a conta da altura, e o cartão encolhe e rola dentro dele. */
+:root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
 /* Celular e tablet em pé: o ⋯ divide a última linha da tela com o pé do cartão (setas e fio), então o
    pé desce ao fim da tela (e não anda com o tamanho do artigo, o que o deixaria saltar de um artigo
    ao outro) e o cartão fica no meio do que sobra acima dele, com a borda do vizinho de cima colada. */
@@ -3354,11 +3363,13 @@ dialog.dialogo-acoes {
   }
 
   :root[data-modo-foco='artigo'] .area-artigo > .vizinho-anterior,
-  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo:first-child {
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo:first-child,
+  :root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco:first-child {
     margin-top: auto;
   }
 
-  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo {
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo,
+  :root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco {
     margin-bottom: auto;
   }
 }
