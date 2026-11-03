@@ -3,7 +3,7 @@
 // também (o que se escreve e não se salva não some ao tocar em "Começar"), e esvaziar o campo apaga.
 // Sem data, hora nem aviso; fora do Recall e do cálculo do Agora. Acima do campo ficam as notas que a
 // pessoa guardou no Estacionamento da Sessão (as mais recentes ainda por resolver), cada uma com uma caixa.
-import { useCallback, useId, useRef, useState, type SubmitEvent } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type SubmitEvent } from 'react';
 import { LEMBRETE_MAX } from '../../core/modelo';
 import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
 import type { Repositorio } from '../../core/persistencia';
@@ -23,7 +23,7 @@ const AVISO_DO_TETO = LEMBRETE_MAX - 50;
  * As notas do Estacionamento ainda por resolver, de todas as Sessões; a caixa chama `resolverNota`.
  * A nota que a pessoa toca continua na lista, marcada ou não, até ela sair do Hoje: dá para desfazer.
  */
-function NotasDasSessoes() {
+export function NotasDasSessoes() {
   const repo = useRepositorio();
   const [tocadas, setTocadas] = useState<readonly EnderecoDeNota[]>([]);
   const [falhou, setFalhou] = useState(false);
@@ -63,11 +63,23 @@ function NotasDasSessoes() {
   );
 }
 
-/** O campo parte do que está salvo ao abrir o Hoje e, daí em diante, vale o que a pessoa escreve. */
-function Campo({ inicial }: { inicial: string }) {
+/**
+ * O campo da nota, com o "Salvar": parte do que está salvo ao abrir e, daí em diante, vale o que a pessoa
+ * escreve. `idDoRotulo` é o `id` do título que o nomeia: o do bloco do Hoje ou o do diálogo do "+".
+ */
+export function CampoDoLembrete({
+  inicial,
+  idDoRotulo,
+  foco = false,
+}: {
+  inicial: string;
+  idDoRotulo: string;
+  /** Leva o foco ao campo ao montar (o diálogo do "+" sim, o bloco do Hoje não: a página não rouba o foco). */
+  foco?: boolean;
+}) {
   const repo = useRepositorio();
-  const titulo = useId();
   const contador = useId();
+  const campo = useRef<HTMLTextAreaElement>(null);
   const gravando = useRef(false);
   const [guardado, setGuardado] = useState(inicial);
   const [texto, setTexto] = useState(inicial);
@@ -75,6 +87,24 @@ function Campo({ inicial }: { inicial: string }) {
   const [falhou, setFalhou] = useState(false);
   const mudou = texto.trim() !== guardado;
   const perto = texto.length >= AVISO_DO_TETO;
+  useEffect(() => {
+    if (foco) campo.current?.focus();
+  }, [foco]);
+  // Fechar o diálogo do "+" com a tecla Esc, ou sair do Hoje sem tirar o foco do campo, desmonta o campo
+  // sem o `blur`: o que foi escrito e não salvo se grava aqui, na saída, com o que valia por último.
+  const ultimo = useRef({ texto, guardado });
+  useEffect(() => {
+    ultimo.current = { texto, guardado };
+  });
+  useEffect(
+    () => () => {
+      const { texto: escrito, guardado: gravado } = ultimo.current;
+      if (escrito.trim() !== gravado) {
+        alterarPreferencias(repo, { lembrete: escrito.trim() }).catch(() => undefined);
+      }
+    },
+    [repo],
+  );
 
   async function salvar(e?: SubmitEvent) {
     e?.preventDefault();
@@ -97,48 +127,57 @@ function Campo({ inicial }: { inicial: string }) {
   }
 
   return (
+    <form
+      onSubmit={(e) => {
+        void salvar(e);
+      }}
+    >
+      <textarea
+        ref={campo}
+        aria-labelledby={idDoRotulo}
+        aria-describedby={perto ? contador : undefined}
+        rows={3}
+        maxLength={LEMBRETE_MAX}
+        placeholder="O que fazer fora do app"
+        value={texto}
+        onChange={(e) => {
+          setTexto(e.target.value);
+          setSalvo(false);
+        }}
+        onBlur={() => {
+          if (mudou) void salvar();
+        }}
+      />
+      <div className="linha-acoes">
+        <button type="submit">Salvar</button>
+        <p role="status" className="dica para-lembrar-estado">
+          {mudou ? 'Ainda não salvo.' : salvo ? 'Salvo.' : ''}
+        </p>
+        {perto && (
+          <p id={contador} className="dica para-lembrar-contador">
+            {texto.length}/{LEMBRETE_MAX}
+          </p>
+        )}
+      </div>
+      {falhou && (
+        <p role="alert" className="aviso falha">
+          Problema ao salvar. O que você escreveu continua aqui; tente de novo.
+        </p>
+      )}
+    </form>
+  );
+}
+
+/** O bloco do Hoje: o título, as notas guardadas nas Sessões e o campo. */
+function Campo({ inicial }: { inicial: string }) {
+  const titulo = useId();
+  return (
     <section className="para-lembrar" aria-labelledby={titulo}>
       <h2 id={titulo} className="para-lembrar-titulo">
         Para lembrar
       </h2>
       <NotasDasSessoes />
-      <form
-        onSubmit={(e) => {
-          void salvar(e);
-        }}
-      >
-        <textarea
-          aria-labelledby={titulo}
-          aria-describedby={perto ? contador : undefined}
-          rows={3}
-          maxLength={LEMBRETE_MAX}
-          placeholder="O que fazer fora do app"
-          value={texto}
-          onChange={(e) => {
-            setTexto(e.target.value);
-            setSalvo(false);
-          }}
-          onBlur={() => {
-            if (mudou) void salvar();
-          }}
-        />
-        <div className="linha-acoes">
-          <button type="submit">Salvar</button>
-          <p role="status" className="dica para-lembrar-estado">
-            {mudou ? 'Ainda não salvo.' : salvo ? 'Salvo.' : ''}
-          </p>
-          {perto && (
-            <p id={contador} className="dica para-lembrar-contador">
-              {texto.length}/{LEMBRETE_MAX}
-            </p>
-          )}
-        </div>
-        {falhou && (
-          <p role="alert" className="aviso falha">
-            Problema ao salvar. O que você escreveu continua aqui; tente de novo.
-          </p>
-        )}
-      </form>
+      <CampoDoLembrete inicial={inicial} idDoRotulo={titulo} />
     </section>
   );
 }

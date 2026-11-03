@@ -54,14 +54,13 @@ describe('shell (5.1, 5.5)', () => {
     ['/', 'Hoje'],
     ['/recall', 'Fixar'],
   ])(
-    '%s: o "+" fica na linha do título %s e abre o registro de erro (P2)',
+    '%s: o "+" fica na linha do título %s e leva ao registro de erro (P2)',
     async (rota, titulo) => {
       const { usuario } = await abrirApp(rota);
       const h1 = await screen.findByRole('heading', { level: 1, name: titulo });
-      const mais = within(h1.parentElement ?? document.body).getByRole('link', {
-        name: 'Novo registro de erro',
-      });
-      await usuario.click(mais);
+      const linha = h1.parentElement ?? document.body;
+      await usuario.click(within(linha).getByRole('button', { name: 'Novo registro' }));
+      await usuario.click(within(linha).getByRole('link', { name: /^Registrar erro\b/ }));
       expect(
         await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
       ).toBeInTheDocument();
@@ -73,7 +72,7 @@ describe('shell (5.1, 5.5)', () => {
     async (rota) => {
       await abrirApp(rota);
       await screen.findByRole('heading', { level: 1 });
-      expect(screen.queryByRole('link', { name: 'Novo registro de erro' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Novo registro' })).not.toBeInTheDocument();
     },
   );
 

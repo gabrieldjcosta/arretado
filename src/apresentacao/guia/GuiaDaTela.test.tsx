@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
+import { GUIAS } from './conteudo';
 import { telaDoGuia } from './memoria';
 
 async function abrir(rota: string) {
@@ -34,7 +35,7 @@ describe('Guia da primeira abertura', () => {
   });
 
   it('depois de aberto some a marca "Novo", mas o cartão continua para reler', async () => {
-    localStorage.setItem('arretado.guia.hoje', '5');
+    localStorage.setItem('arretado.guia.hoje', String(GUIAS.hoje.versao));
     const usuario = await abrir('#/');
     const abrirDicas = await screen.findByRole('button', { name: /O que cada opção faz/ });
     expect(abrirDicas).not.toHaveTextContent('Novo');

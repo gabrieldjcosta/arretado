@@ -346,3 +346,19 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
+
+## D-D15 — O "+" abre duas opções: Registrar erro e Lembrete (03/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D9 (Q2) e à P2 da D-D7.** O "+" do título deixa de ser um link para o registro de erro e passa a abrir um painel com duas opções; o registro de erro fica a um toque do painel.
+
+**Origem.** Gabriel em 03/11/2026: "o '+' deve apresentar as opções de registrar erro e de lembrete." No cartão de 17:35Z ele escolheu o nome **"Lembrete"** para a segunda opção; a Marca e esta thread tinham recomendado "Anotar para lembrar", porque "lembrete" costuma prometer hora e aviso. O subtítulo cobre isso: "sem hora nem aviso".
+
+**O que muda.**
+1. `TituloComMais` vira um botão que mostra e esconde um painel, como o menu Ajuda: toque fora e Esc fecham, e o Esc devolve o foco ao "+". O nome acessível passa a ser "Novo registro" (era o do link, "Novo registro de erro"); o atalho E segue abrindo o registro de erro em qualquer tela.
+2. O painel (`.mais-itens`, camada flutuante: linha da folha, nenhuma sombra) tem duas linhas de 44 px ou mais, cada uma com o nome e uma frase de apoio, que entram juntos no nome acessível (o texto visível dentro do nome, WCAG 2.5.3; o axe exige): "Registrar erro" ("A frase certa vira cartão", leva a `#/recall/registrar`) e "Lembrete" ("Uma nota rápida, sem hora nem aviso").
+3. "Lembrete" abre o `DialogoDoLembrete` com a mesma nota do "Para lembrar" do Hoje (`Preferencias.lembrete`, uma só) e as notas que a pessoa guardou nas Sessões. O campo (`CampoDoLembrete`, tirado de `ParaLembrar`) vem em foco; "Salvar" e sair do campo gravam; fechar o diálogo, com Esc inclusive, grava o que não foi salvo e devolve o foco ao "+".
+4. O guia do Hoje sobe para a versão 6 e a Ajuda (Fixar) diz o que o "+" faz.
+
+**O que continua como está.** O "+" só nas telas que registram (Hoje e Fixar); o "Registrar erro" do cabeçalho a partir de 900 px; a Frase correta como único campo obrigatório (D25). Nenhum texto promete data, hora nem aviso: o app não tem alarme.
+
+**Custo.** Um toque a mais para registrar um erro pelo "+" (abrir o painel, depois "Registrar erro"), em troca de um lugar para a nota rápida em qualquer tela que tem "+". O bloco "Para lembrar" do Hoje continua na tela até a dieta do Hoje decidir se sai; até lá a mesma nota aparece nos dois lugares, e o bloco só mostra o que foi gravado no diálogo depois de recarregar.
