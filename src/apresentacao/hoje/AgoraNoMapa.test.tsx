@@ -89,6 +89,15 @@ function abrirHoje(repo: Repositorio, f: FonteDeIncidencia) {
   return usuario;
 }
 
+/** Os quatro tempos ficam atrás do link "tenho outro tempo" (D-D16): fechado, o grupo nem está na tela. */
+async function abrirOsTempos(usuario: ReturnType<typeof userEvent.setup>) {
+  const link = await screen.findByRole('button', { name: 'tenho outro tempo' });
+  expect(link).toHaveAttribute('aria-expanded', 'false');
+  await usuario.click(link);
+  expect(link).toHaveAttribute('aria-expanded', 'true');
+  return screen.getByRole('group', { name: 'Quanto tempo você tem?' });
+}
+
 describe('Hoje › Agora no mapa (AP-04)', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -157,7 +166,7 @@ describe('Hoje › Agora no mapa (AP-04)', () => {
       await criarCartaoManual(repo, { frente: `P${String(i)}`, verso: 'v' });
     relogio.avancar(DIA);
     const usuario = abrirHoje(repo, fonte(ARQUIVOS));
-    const quatro = await screen.findByRole('group', { name: 'Quanto tempo você tem?' });
+    const quatro = await abrirOsTempos(usuario);
     // Sem escolher o tempo, a folha dos cartões não traz o mapa.
     expect(screen.queryByText(/do mapa|Pelo mapa/)).not.toBeInTheDocument();
     // 5 min: 10 cartões levam os 5 min; o trecho de 2 min não cabe.

@@ -181,6 +181,22 @@
   --z-noite: none;
   --z-ponto: #ffc53d;
   --z-ponto-brilho: #ffc53d;
+  /* O contorno de evidência (D-D13; contrato do Zé, §8c): o anel do cartão do Agora e do artigo do
+     Modo foco, o único elemento que a pessoa deve olhar agora. Escolha "B" do Gabriel (03/11/2026):
+     a linha branca de 2 px por fora do cartão, a faixa azul piscina suave até 5 px (a opacidade da
+     faixa é a do mundo) e o halo piscina (raio e espalhamento por tela), aceso em 0,3 s e assentado até
+     0,9 s. O interno é a fração do halo que tinge a borda por dentro. Tudo decoração: o contorno do
+     cartão (`--borda-folha`) segue ali e o anel não carrega informação (`scripts/evidencia-css.test.ts`). */
+  --ev-linha: #ffffff;
+  --ev-linha-larg: 2px;
+  --ev-faixa: rgb(57 202 239 / 0.5);
+  --ev-faixa-fim: 5px;
+  --ev-halo-cor: 57 202 239;
+  --ev-halo-aceso: 0.7;
+  --ev-halo-repouso: 0.45;
+  --ev-halo-raio: 20px;
+  --ev-halo-espalha: 6px;
+  --ev-interno: 0.4;
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -209,9 +225,8 @@
      2 à noite. */
   --marca-ponto: var(--ponto-luz);
   --marca-disco: var(--ponto-halo);
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 1;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-titulo);
   --tamanho-rotulo: 0.9375rem;
   --espessura-contorno: 1.5px;
@@ -334,14 +349,16 @@
     --z-bloom-repouso: 0.32;
     --z-dia: none;
     --z-noite: inline;
+    --ev-faixa: rgb(57 202 239 / 0.35);
+    --ev-halo-aceso: 0.75;
+    --ev-halo-repouso: 0.5;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
     --marca-ponto: var(--ponto-halo);
     --marca-disco: transparent;
-    /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-       seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-    --marca-da-parada: 0;
+    /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+       14 px. O peso é o `--peso-titulo`. */
     --fonte-rotulo: var(--fonte-interface);
     --tamanho-rotulo: 0.875rem;
     --espessura-contorno: 1px;
@@ -424,14 +441,16 @@
   --z-bloom-repouso: 0.32;
   --z-dia: none;
   --z-noite: inline;
+  --ev-faixa: rgb(57 202 239 / 0.35);
+  --ev-halo-aceso: 0.75;
+  --ev-halo-repouso: 0.5;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
   --marca-ponto: var(--ponto-halo);
   --marca-disco: transparent;
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 0;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-interface);
   --tamanho-rotulo: 0.875rem;
   --espessura-contorno: 1px;
@@ -852,8 +871,10 @@ button,
 
 /* Título com o "+" na mesma linha (TituloComMais, D-D9, Q2): o "+" é redondo, de 48 px, com o contorno
    do controle (1,5 px em --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de
-   dia, a serra 2 à noite), e registra um erro. Não é a ação da tela: essa é a `.principal`. */
+   dia, a serra 2 à noite), e abre o painel com "Registrar erro" e "Lembrete". Não é a ação da tela:
+   essa é a `.principal`. */
 .titulo-com-mais {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -886,6 +907,56 @@ button,
   width: 1.5rem;
   height: 1.5rem;
   flex: none;
+}
+
+/* Painel do "+": duas opções, abre para baixo a partir do botão e alinhado à direita, como o menu Ajuda
+   (linha da folha, nenhuma sombra). Cada opção é uma linha de 44 px ou mais: o nome e, embaixo, uma frase
+   que diz o que acontece. O link e o botão têm o mesmo aspecto; zeram o contorno e o fundo do botão. */
+.mais-itens {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 10;
+  display: grid;
+  gap: 0.25rem;
+  width: min(18rem, calc(100vw - 2 * var(--gutter)));
+  padding: 0.5rem;
+  background: var(--superficie);
+  border: var(--borda-folha);
+  border-radius: var(--raio-cartao);
+}
+
+.mais-item {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 0.125rem;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: var(--raio-campo);
+  background: transparent;
+  color: var(--texto);
+  text-align: left;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .mais-item:hover {
+    background: color-mix(in srgb, var(--texto) 6%, transparent);
+  }
+}
+
+.mais-item-titulo {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.mais-item-apoio {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
 }
 
 /* Rodapé legal no fim do conteúdo, acima da reserva das abas: o aviso curto e "Backup e dados" como
@@ -3146,8 +3217,22 @@ dialog.dialogo-acoes {
 }
 
 .agora-estimativa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
   margin: 0 0 0.75rem;
   color: var(--bloco-atenuado);
+}
+
+/* "tenho outro tempo" (D-D16): o link ao lado da estimativa, na cor dela e sublinhado; o alvo de 44 px do
+   botão-texto sai pelas margens de cima e de baixo, e o recuo de 12 px, pela margem da esquerda, para a
+   letra ficar a 12 px da estimativa. */
+.acao-agora .agora-tempo {
+  margin-block: -0.5rem;
+  margin-inline: -0.25rem 0;
+  padding-inline: 0.5rem;
+  text-align: left;
 }
 
 /* O botão primário e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */

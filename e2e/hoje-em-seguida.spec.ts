@@ -170,24 +170,21 @@ test('Hoje: "Trocar" muda a ordem só nesta visita e não grava nada', async ({ 
   await expect(resumo(page)).toContainText('Ler arts. 112 a 117 da LEP, mais 1');
 });
 
-test('Hoje: a faixa e a letra do rótulo mudam de mundo, o movimento respeita o Calmo e nada vaza a 320 e 195 px', async ({
+test('Hoje: a letra do rótulo muda de mundo, o movimento respeita o Calmo e nada vaza a 320 e 195 px', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'desktop', 'o tamanho da janela é do teste; basta um projeto');
   test.setTimeout(120_000);
   await prepararOHoje(page);
 
-  const faixa = () =>
-    page.locator('.parada-onde').evaluate((el) => getComputedStyle(el, '::before').opacity);
   const letra = () =>
     page.locator('.em-seguida-rotulo').evaluate((el) => getComputedStyle(el).fontFamily);
 
-  // De dia: a faixa de marca-texto sob o lugar e o rótulo na letra de título. À noite: sem faixa, na da interface.
+  // De dia o rótulo vem na letra de título; à noite, na da interface. A faixa de caneta sob o lugar da linha
+  // de parada saiu na D-D16: a linha é só texto, igual nos dois mundos.
   await page.emulateMedia({ colorScheme: 'light' });
-  expect(await faixa()).toBe('1');
   expect(await letra()).toMatch(/^"?Schibsted Grotesk/);
   await page.emulateMedia({ colorScheme: 'dark' });
-  expect(await faixa()).toBe('0');
   expect(await letra()).toMatch(/^"?Atkinson Hyperlegible Next/);
   await page.emulateMedia({ colorScheme: null });
 
@@ -196,8 +193,9 @@ test('Hoje: a faixa e a letra do rótulo mudam de mundo, o movimento respeita o 
 
   // Movimento: a seta gira e a lista desce em 180 ms; no perfil Calmo e com movimento reduzido, nada anda.
   const movimento = async () => [
+    // A seta do "Começar uma Sessão" é a mesma (D-D16): aqui interessa a do bloco "Em seguida".
     await page
-      .locator('.em-seguida-seta')
+      .locator('.em-seguida-bloco .em-seguida-seta')
       .evaluate((el) => getComputedStyle(el).transitionDuration),
     await page.locator('.em-seguida-lista').evaluate((el) => getComputedStyle(el).animationName),
   ];

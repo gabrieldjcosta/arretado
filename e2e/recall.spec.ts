@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, importarEPublicar, semViolacoes, test } from './apoio';
+import { expect, importarEPublicar, irAoRegistroPeloMais, semViolacoes, test } from './apoio';
 
 const DIA = 86_400_000;
 
@@ -52,7 +52,7 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   // Captura em menos de 30 s (Parte 2 §17), pelo "+" do título do Hoje (P2 do Ponto de luz).
   const t0 = Date.now();
   // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
-  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
+  await irAoRegistroPeloMais(page);
   await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
   await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
@@ -139,7 +139,7 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
     .getByRole('navigation', { name: 'Áreas' })
     .getByRole('link', { name: 'Fixar', exact: true })
     .click();
-  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
+  await irAoRegistroPeloMais(page);
   await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
   await page
     .getByLabel('Ponto do edital (opcional)')

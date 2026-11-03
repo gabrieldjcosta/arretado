@@ -2005,41 +2005,46 @@ function LeitorAberto({
             ) : (
               <>
                 {vizinho(ordem - 1, 'anterior')}
-                <section
-                  ref={cartao}
-                  className="cartao-artigo"
-                  aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
-                  tabIndex={0}
-                >
-                  {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
-                  {linhas
-                    .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
-                    .map((linha) => (
-                      <div key={linha.indice} {...propriedadesDaLinha(linha)}>
-                        {conteudoDaLinha(linha)}
+                {/* O contorno de evidência (D-D13) mora neste envoltório, que só existe de fato no Modo
+                    foco (fora dele é `display: contents`) e não é recriado ao trocar de artigo: a luz
+                    acende uma vez. O cartão rola por dentro e cortaria o halo. */}
+                <div className="evidencia-foco">
+                  <section
+                    ref={cartao}
+                    className="cartao-artigo"
+                    aria-label={`${rotuloDoCartao}, ${String(ordem + 1)} de ${String(unidades.length)}`}
+                    tabIndex={0}
+                  >
+                    {contextoDoCartao && <p className="contexto-artigo">{contextoDoCartao}</p>}
+                    {linhas
+                      .slice(unidades[ordem], fimDaUnidade(linhas, unidades, ordem))
+                      .map((linha) => (
+                        <div key={linha.indice} {...propriedadesDaLinha(linha)}>
+                          {conteudoDaLinha(linha)}
+                        </div>
+                      ))}
+                    {remissoesDoCartao.length > 0 && (
+                      <div className="remissoes-do-artigo">
+                        <h3>Remissões deste artigo</h3>
+                        <ul>
+                          {remissoesDoCartao.map(({ alvo, origem }) => (
+                            <li key={alvo}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDadosDaPrevia(undefined);
+                                  setPrevia({ origem, alvo });
+                                }}
+                              >
+                                {referenciaDaBusca(alvo)}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    ))}
-                  {remissoesDoCartao.length > 0 && (
-                    <div className="remissoes-do-artigo">
-                      <h3>Remissões deste artigo</h3>
-                      <ul>
-                        {remissoesDoCartao.map(({ alvo, origem }) => (
-                          <li key={alvo}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setDadosDaPrevia(undefined);
-                                setPrevia({ origem, alvo });
-                              }}
-                            >
-                              {referenciaDaBusca(alvo)}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </section>
+                    )}
+                  </section>
+                </div>
                 <SetasDoCartao
                   anterior={() => {
                     irAoAnterior.current();

@@ -1,8 +1,9 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from './apoio';
 
-// O Hoje em duas colunas e o "Para lembrar" (P7b). O teste de componente prova o que o campo grava;
-// aqui se mede onde cada coluna fica e que o texto sobrevive a recarregar a página.
+// O Hoje em duas colunas (P7b): aqui se mede onde cada coluna fica. A nota que era o "Para lembrar" do Hoje
+// mora no "Lembrete" do "+" desde a D-D16; o que ela grava e que o texto sobrevive a recarregar a página
+// está em mais.spec.ts.
 
 interface Caixa {
   esquerda: number;
@@ -19,7 +20,7 @@ const caixa = (page: Page, n: 0 | 1) =>
     return { esquerda: r.left, direita: r.right, topo: r.top, base: r.bottom };
   });
 
-test('a partir de 900 px o Agora fica à esquerda e o Para lembrar à direita; abaixo, uma coluna só', async ({
+test('a partir de 900 px o Agora fica à esquerda e os avisos à direita; abaixo, uma coluna só', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'desktop', 'o tamanho da janela é do teste; basta um projeto');
@@ -28,7 +29,6 @@ test('a partir de 900 px o Agora fica à esquerda e o Para lembrar à direita; a
   await expect(
     coluna(page, 0).getByRole('heading', { level: 2, name: 'Por onde começar?' }),
   ).toBeVisible();
-  await expect(coluna(page, 1).getByRole('textbox', { name: 'Para lembrar' })).toBeVisible();
 
   await page.setViewportSize({ width: 899, height: 800 });
   await expect
@@ -45,12 +45,12 @@ test('a partir de 900 px o Agora fica à esquerda e o Para lembrar à direita; a
         message: `duas colunas a ${String(largura)} px`,
       })
       .toBe(true);
-    const [agora, lembrar] = [await caixa(page, 0), await caixa(page, 1)];
-    expect(lembrar.topo, `as duas começam no mesmo alto a ${String(largura)}`).toBeCloseTo(
+    const [agora, avisos] = [await caixa(page, 0), await caixa(page, 1)];
+    expect(avisos.topo, `as duas começam no mesmo alto a ${String(largura)}`).toBeCloseTo(
       agora.topo,
       0,
     );
-    const proporcao = (agora.direita - agora.esquerda) / (lembrar.direita - lembrar.esquerda);
+    const proporcao = (agora.direita - agora.esquerda) / (avisos.direita - avisos.esquerda);
     expect(proporcao, `7 para 5 a ${String(largura)}`).toBeGreaterThan(1.38);
     expect(proporcao, `7 para 5 a ${String(largura)}`).toBeLessThan(1.42);
     const rolaDeLado = await page.evaluate(
@@ -58,32 +58,4 @@ test('a partir de 900 px o Agora fica à esquerda e o Para lembrar à direita; a
     );
     expect(rolaDeLado, `sem rolagem lateral a ${String(largura)}`).toBe(false);
   }
-});
-
-// O aviso "Salvo.", e só ele: `hasText: 'Salvo.'` casa por texto contido e sem diferenciar maiúscula,
-// então também acertaria "Ainda não salvo." e o teste recarregaria antes de a gravação terminar.
-const salvo = (page: Page) => page.getByRole('status').filter({ hasText: /^Salvo\.$/ });
-
-test('o Para lembrar: escrever, salvar e ainda estar lá depois de recarregar', async ({ page }) => {
-  await page.goto('/');
-  const campo = page.getByRole('textbox', { name: 'Para lembrar' });
-  await campo.fill('Ligar para o cartório');
-  await expect(page.getByRole('status').filter({ hasText: 'Ainda não salvo.' })).toBeVisible();
-  await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(salvo(page)).toBeVisible();
-
-  await page.reload();
-  await expect(campo).toHaveValue('Ligar para o cartório');
-  await expect(page.getByText('Ainda não salvo.')).toBeHidden();
-});
-
-test('o Para lembrar grava ao sair do campo, sem apertar Salvar', async ({ page }) => {
-  await page.goto('/');
-  const campo = page.getByRole('textbox', { name: 'Para lembrar' });
-  await campo.fill('Pedir o livro de Processo Penal');
-  await page.getByRole('heading', { level: 1, name: 'Hoje' }).click();
-  await expect(salvo(page)).toBeVisible();
-
-  await page.reload();
-  await expect(campo).toHaveValue('Pedir o livro de Processo Penal');
 });
