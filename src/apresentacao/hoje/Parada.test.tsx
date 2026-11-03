@@ -7,7 +7,7 @@ describe('Hoje › Parada (P3)', () => {
   it('diz onde retomar e quando salvou, sem caneta (D-D12)', () => {
     const { container } = render(<Parada parada={parada} />);
     const linha = screen.getByText(/Retomar em/);
-    expect(linha).toHaveTextContent('Retomar em LEP, art. 112, § 2ºsalvo ontem, 22h10');
+    expect(linha).toHaveTextContent('Retomar em LEP, art. 112, § 2º, salvo ontem, 22h10');
     expect(linha.querySelector('strong.parada-onde')).toHaveTextContent('LEP, art. 112, § 2º');
     expect(linha.querySelector('.parada-quando')).toHaveTextContent('salvo ontem, 22h10');
     expect(container.querySelector('svg')).toBeNull();

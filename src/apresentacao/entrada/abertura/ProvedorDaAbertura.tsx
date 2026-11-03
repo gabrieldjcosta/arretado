@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { esconderCarregamento } from '../../carregamento';
 import { criarEncontro } from '../../componentes/escrita/encontro';
-import { escritaDaAbertura } from '../../componentes/escrita/frequencia';
+import {
+  escritaNaTela,
+  registrarAberturaVista,
+  registrarPulo,
+} from '../../componentes/escrita/frequencia';
 import { ContextoDaAbertura, type VezDaEscrita } from '../../componentes/escrita/vez-da-escrita';
 import { useRepositorio } from '../../dados/contexto';
 import { Abertura } from './Abertura';
@@ -20,9 +24,10 @@ const ESPERA_MAXIMA_MS = 400;
  * primeira vez, com a Chegada por vir, a luz visita o Zé dela: a Chegada abre já, escondida, e o
  * `Encontro` que este provedor guarda leva a oferta dela à Abertura.
  *
- * A abertura em que a frequência não pede o nome (as demais do Dia, ou movimento reduzido) é decidida
- * na hora, sem esperar dado nenhum: o cabeçalho nasce parado e nada muda. Nas outras, a leitura das
- * Preferências e da Sessão (ver `decidirOndeEscrever`) diz se a tela cheia abre. Até lá o app não
+ * A abertura em que a frequência não pede o nome (movimento reduzido, três aberturas puladas no Dia ou o
+ * Dia guardado no futuro das sementes de teste) é decidida na hora, sem esperar dado nenhum: o cabeçalho
+ * nasce parado e nada muda. Nas outras, que são as demais (D-D14), a leitura das Preferências e da Sessão
+ * (ver `decidirOndeEscrever`) diz se a tela cheia abre. Até lá o app não
  * monta: nem o Hoje aparece antes da tela cheia, nem o cabeçalho fica sem nome, e a camada entra no
  * mesmo quadro em que o app monta. Montar o app antes só faria a decisão esperar a carga dele. Fica por
  * dentro do repositório (Preferências e Sessão moram nele) e por fora de tudo o que escreve ou abre por
@@ -31,7 +36,7 @@ const ESPERA_MAXIMA_MS = 400;
 export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   const repo = useRepositorio();
   const [vez, setVez] = useState<VezDaEscrita>(() =>
-    escritaDaAbertura(repo.ctx.agora()) === 'parada'
+    escritaNaTela(repo.ctx.agora()) === 'parada'
       ? { estado: 'decidida', onde: 'cabecalho', escrita: 'parada' }
       : { estado: 'pendente' },
   );
@@ -60,9 +65,20 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
     };
   }, [vez.estado]);
 
-  const aoSair = useCallback(() => {
-    setSaiu(true);
-  }, []);
+  // Como a camada saiu conta uma vez só: um pulo é mais um na conta dos que calam a tela cheia até o Dia
+  // seguinte; ir até o fim zera essa conta.
+  const contou = useRef(false);
+  const aoSair = useCallback(
+    (como: 'fim' | 'pulou') => {
+      if (!contou.current) {
+        contou.current = true;
+        if (como === 'pulou') registrarPulo(repo.ctx.agora());
+        else registrarAberturaVista(repo.ctx.agora());
+      }
+      setSaiu(true);
+    },
+    [repo],
+  );
 
   // O app monta quando a decisão chega (ou no teto). É nesse quadro que a tela de carregamento do index.html
   // sai, por baixo da camada quando ela abre: nem um branco entre as duas, nem o Hoje à mostra.

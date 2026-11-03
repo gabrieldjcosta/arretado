@@ -139,6 +139,8 @@ describe('Mapa da norma', () => {
     ).toBeInTheDocument();
     // O próximo trecho: os dois "cai muito" vizinhos, mesmo cruzando o capítulo.
     const agora = screen.getByRole('region', { name: 'Agora' });
+    // O anel de evidência é só do Agora do Hoje (D-D13): o do mapa da norma fica sem ele.
+    expect(agora).not.toHaveClass('evidencia');
     expect(within(agora).getByRole('heading', { name: 'Ler arts. 2º a 3º' })).toBeInTheDocument();
     expect(agora).toHaveTextContent('cai muito');
     expect(agora).toHaveTextContent('cerca de 2 min');
