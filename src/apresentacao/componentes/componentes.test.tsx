@@ -36,6 +36,15 @@ describe('AcaoAgora', () => {
     expect(screen.getByRole('link', { name: 'Ir' })).toHaveAttribute('href', '/recall/revisar');
     expect(screen.getByRole('link', { name: 'Ir' })).toHaveClass('botao');
   });
+
+  it('só leva o anel de evidência (D-D13) quando a tela pede', () => {
+    const { rerender } = render(
+      <AcaoAgora titulo="X" rotuloBotao="Ir" aoClicar={() => undefined} />,
+    );
+    expect(screen.getByRole('region', { name: 'Agora' })).not.toHaveClass('evidencia');
+    rerender(<AcaoAgora titulo="X" rotuloBotao="Ir" aoClicar={() => undefined} emEvidencia />);
+    expect(screen.getByRole('region', { name: 'Agora' })).toHaveClass('acao-agora', 'evidencia');
+  });
 });
 
 describe('LinhaDepois', () => {
@@ -69,14 +78,25 @@ describe('BarraFina', () => {
 });
 
 describe('DiasDaSemana', () => {
-  it('conta os dias no texto', () => {
+  it('a conta fica só para o leitor de tela: à vista há as marcas e um nome sem número (D-D21)', () => {
     render(<DiasDaSemana dias={[true, false, true, true, false, true, false]} />);
-    expect(screen.getByText('4 dos últimos 7 dias')).toBeInTheDocument();
+    expect(screen.getByText('4 dos últimos 7 dias')).toHaveClass('visualmente-oculto');
+    // O nome à vista diz o tamanho da janela ("7 dias"), nunca quantos dias a pessoa fez.
+    const nome = screen.getByText('Últimos 7 dias');
+    expect(nome).toHaveAttribute('aria-hidden', 'true');
+    expect(nome).not.toHaveTextContent(/\bdos\b|\b4\b/);
   });
 
-  it('sem nenhum dia, sem tom de cobrança', () => {
-    render(<DiasDaSemana dias={[false, false, false, false, false, false, false]} />);
-    expect(screen.getByText('Nenhum dia nos últimos 7')).toBeInTheDocument();
+  it('com um dia só, o texto do leitor de tela fica no singular', () => {
+    render(<DiasDaSemana dias={[false, false, false, false, false, false, true]} />);
+    expect(screen.getByText('1 dos últimos 7 dias')).toBeInTheDocument();
+  });
+
+  it('sem nenhum dia, a semana não aparece: o vazio não vira cobrança (D-D21)', () => {
+    const { container } = render(
+      <DiasDaSemana dias={[false, false, false, false, false, false, false]} />,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('as marcas são decorativas', () => {

@@ -7,12 +7,15 @@ import {
   criarCartaoDeErro,
   criarCartaoManual,
   criarFraseDeTrecho,
+  hoje,
   registrarErro,
+  revisar,
 } from '../../dominios/recall/servico';
 import { iniciarSessao, pausarSessao } from '../../dominios/sessao/servico';
 import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
+import { reunirEntradas } from '../hoje/proxima-acao';
 
 async function abrir(rota: string, repo?: Repositorio) {
   const r = repo ?? (await repositorioDeTeste()).repo;
@@ -481,11 +484,48 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(await screen.findByRole('heading', { name: 'Revisar 10 cartões' })).toBeInTheDocument();
     expect(screen.getByText('cerca de 5 min')).toBeInTheDocument();
     expect(screen.getByText(/Hoje: 10 de 25/)).toBeInTheDocument();
-    expect(screen.getByText('Nenhum dia nos últimos 7')).toBeInTheDocument();
+    // Sem nenhum Dia com revisão, a semana não aparece (D-D21): nem o vazio nem um contador.
+    expect(screen.queryByText(/últimos 7/)).not.toBeInTheDocument();
     expect(screen.getByText(/Depois:/)).toHaveTextContent('registrar um erro');
     // Da abertura ao primeiro cartão: 1 toque.
     await usuario.click(screen.getByRole('link', { name: 'Começar' }));
     expect(await screen.findByText('1 de 10')).toBeInTheDocument();
+  });
+
+  it('depois do primeiro Dia com revisão a semana aparece, sem número à vista (D-D21)', async () => {
+    const { repo } = await repositorioDeTeste();
+    const cartao = await criarCartaoManual(repo, { frente: 'Frente 1', verso: 'v' });
+    await revisar(repo, cartao.id, 'errei');
+    await abrir('/recall', repo);
+    expect(await screen.findByText('Últimos 7 dias')).toBeInTheDocument();
+    expect(screen.getByText('1 dos últimos 7 dias')).toHaveClass('visualmente-oculto');
+  });
+
+  it('a estimativa do Fixar é a do Hoje: Cartões e Frases da rodada, não só os Cartões (D-D21)', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    for (const n of ['1', '2', '3']) {
+      await criarCartaoManual(repo, { frente: `Frente ${n}`, verso: 'v' });
+    }
+    await registrarErro(repo, { fraseCorreta: 'Frase correta A.' });
+    await registrarErro(repo, { fraseCorreta: 'Frase correta B.' });
+    relogio.avancar(86_400_000);
+    await abrir('/recall', repo);
+    expect(
+      await screen.findByRole('heading', { name: 'Revisar 3 cartões e 2 frases' }),
+    ).toBeInTheDocument();
+    // 5 itens de 30 s: 3 min (contando só os Cartões seriam 2).
+    expect(screen.getByText('cerca de 3 min')).toBeInTheDocument();
+    const { entrada } = await reunirEntradas(repo, hoje(repo));
+    expect(entrada.minutosDaRodada).toBe(3);
+  });
+
+  it('só com Frases vencidas, a ação também traz a estimativa', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    await registrarErro(repo, { fraseCorreta: 'Frase correta A.' });
+    relogio.avancar(86_400_000);
+    await abrir('/recall', repo);
+    expect(await screen.findByRole('heading', { name: 'Revisar 1 frase' })).toBeInTheDocument();
+    expect(screen.getByText('cerca de 1 min')).toBeInTheDocument();
   });
 
   it('com cartões e frases vencidos: uma só ação, e o fim dos cartões segue para as frases', async () => {

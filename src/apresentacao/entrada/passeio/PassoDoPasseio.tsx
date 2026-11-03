@@ -113,6 +113,14 @@ export function PassoDoPasseio({
             </h2>
             <p className="passo-frase">{passo.frase}</p>
             <ul className="passo-itens">
+              {passo.ferramentas.map((ferramenta) => (
+                <li key={ferramenta.destaque} className="passo-ferramenta">
+                  <span>
+                    <strong>{ferramenta.destaque}</strong>
+                    {ferramenta.apoio !== undefined && ` ${ferramenta.apoio}`}
+                  </span>
+                </li>
+              ))}
               {passo.itens.map((item) => (
                 <li key={item}>{item}</li>
               ))}

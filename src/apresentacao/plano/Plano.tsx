@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link } from 'react-router';
 import type { Disciplina, Ponto } from '../../core/modelo';
@@ -32,7 +32,16 @@ function resumoDosPontos(n: number) {
 export function Plano() {
   const { dados } = useDados(pontosEDisciplinas);
   const [confirmacao, setConfirmacao] = useState<string | null>(null);
+  // O formulário de importação (CSV ou tabela da IA) fica dobrado sob "Trazer meu edital" (D-D20).
+  const [trazendo, setTrazendo] = useState(false);
   useCicloPadrao();
+  useEffect(() => {
+    if (!trazendo) return;
+    const secao = document.getElementById('importar-edital');
+    if (secao && typeof secao.scrollIntoView === 'function') {
+      secao.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [trazendo]);
   if (!dados) return <Esqueleto />;
   const grupos = porDisciplina(dados.disciplinas, dados.pontos);
 
@@ -41,7 +50,17 @@ export function Plano() {
       <h1>{ROTULO_DA_AREA.plano}</h1>
       <GuiaDaTela tela="plano" vazio={dados.pontos.length === 0} />
       {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
-      {dados.pontos.length > 0 && <ProximoBloco />}
+      {dados.pontos.length > 0 && (
+        <>
+          <ProximoBloco />
+          {/* O Ciclo é uma ação à vista, não um link entre outros (D-D20). */}
+          <p className="plano-ciclo">
+            <Link to="/plano/ciclo" className="botao">
+              Ciclo de estudo
+            </Link>
+          </p>
+        </>
+      )}
       <ProvaDoPlano />
       {confirmacao && (
         <p role="status" className="sucesso">
@@ -50,30 +69,32 @@ export function Plano() {
       )}
       {dados.pontos.length === 0 ? (
         <>
-          <Vazio titulo="Monte seu plano do seu jeito">
+          <Vazio titulo="Sua Trilha, montada pelo edital">
             <p>
               Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas para
-              ler; lá dá para trocar o edital e as matérias. Ou traga o seu edital.
+              ler; lá dá para trocar o edital e as matérias.
             </p>
             <div className="plano-vazio-caminhos">
               <Link to="/comecar" className="botao principal">
                 Escolher meu concurso
               </Link>
-              <a
-                href="#importar-edital"
+              <button
+                type="button"
                 className="botao"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById('importar-edital')
-                    ?.scrollIntoView({ behavior: 'smooth' });
+                aria-expanded={trazendo}
+                aria-controls="importar-edital"
+                onClick={() => {
+                  setTrazendo((aberto) => !aberto);
                 }}
               >
                 Trazer meu edital
-              </a>
+              </button>
             </div>
           </Vazio>
-          <ImportarPontos aoImportar={setConfirmacao} afastado />
+          {/* Montado e escondido, não desmontado: quem recolhe sem querer não perde o que colou. */}
+          <div hidden={!trazendo}>
+            <ImportarPontos aoImportar={setConfirmacao} afastado />
+          </div>
         </>
       ) : (
         <>
@@ -82,9 +103,6 @@ export function Plano() {
           </p>
           <Link to="/plano/pontos" className="botao botao-texto na-margem">
             Editar pontos e matérias
-          </Link>
-          <Link to="/plano/ciclo" className="botao botao-texto na-margem">
-            Ciclo de estudo
           </Link>
           <Link to="/plano/tarefas" className="botao botao-texto na-margem">
             Tarefas

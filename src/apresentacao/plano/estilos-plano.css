@@ -151,3 +151,8 @@
 .proximo-bloco {
   margin-block: var(--espaco-3);
 }
+
+/* O Ciclo de estudo (D-D20): um botão à vista logo abaixo do "Começar este bloco", não um link entre outros. */
+.plano-ciclo {
+  margin: 0 0 var(--espaco-3);
+}

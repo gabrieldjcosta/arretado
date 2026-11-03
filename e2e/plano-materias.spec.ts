@@ -5,6 +5,7 @@ const CSV =
 
 test('Trilha: matérias recolhidas; tocar no nome abre e fecha os assuntos', async ({ page }) => {
   await page.goto('/#/plano');
+  await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',
     mimeType: 'text/csv',
@@ -33,6 +34,7 @@ test('Trilha: nome longo quebra ao lado da seta, e a contagem não desce para ba
 }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto('/#/plano');
+  await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',
     mimeType: 'text/csv',

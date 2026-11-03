@@ -20,6 +20,13 @@ export const minutosDoLote = (itens: number) =>
   Math.max(1, Math.ceil((itens * SEGUNDOS_POR_ITEM) / 60));
 
 /**
+ * Minutos da rodada do dia: os Cartões e as Frases vencidos, cada tipo até a cota. A mesma conta no
+ * Hoje e no Fixar, para a estimativa não mudar de uma tela para a outra (D-D21).
+ */
+export const minutosDaRodada = (cartoesVencidos: number, frasesVencidas: number, cota: number) =>
+  minutosDoLote(Math.min(cartoesVencidos, cota) + Math.min(frasesVencidas, cota));
+
+/**
  * Quantos itens entram na Sessão: o que cabe no tempo, limitado ao que há na fila. Quem volta de
  * uma pausa começa com metade (arredondada para cima, ao menos 1): pilha grande é o que faz desistir.
  */

@@ -12,29 +12,34 @@ test('Plano vazio: acolhimento, dois caminhos, prompt IA e colar resultado', asy
 
   // 1. Vazio acolhedor com título e texto base
   await expect(
-    page.getByRole('heading', { level: 2, name: 'Monte seu plano do seu jeito' }),
+    page.getByRole('heading', { level: 2, name: 'Sua Trilha, montada pelo edital' }),
   ).toBeVisible();
   await expect(page.getByText(/Escolha o concurso e o app monta a Trilha/)).toBeVisible();
 
-  // 2. Um começo só: "Escolher meu concurso" é o principal; "Trazer meu edital" ao lado; o catálogo
-  //    vive dentro de "Escolher meu concurso".
+  // 2. Um começo só: "Escolher meu concurso" é o principal; "Trazer meu edital" ao lado (abre o formulário,
+  //    dobrado até então); o catálogo vive dentro de "Escolher meu concurso".
   const escolher = page.getByRole('link', { name: 'Escolher meu concurso' });
   await expect(escolher).toBeVisible();
   await expect(escolher).toHaveAttribute('href', '#/comecar');
   await expect(escolher).toHaveClass(/principal/);
 
-  const linkTrazer = page.getByRole('link', { name: 'Trazer meu edital' });
-  await expect(linkTrazer).toBeVisible();
+  const trazer = page.getByRole('button', { name: 'Trazer meu edital' });
+  await expect(trazer).toBeVisible();
+  await expect(trazer).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#importar-edital')).toBeHidden();
+  await expect(page.getByLabel('Arquivo CSV')).toBeHidden();
 
   await expect(page.getByRole('link', { name: 'Montar pelo catálogo' })).toHaveCount(0);
 
   // Axe nos 2 temas com o estado vazio inicial
   await semViolacoes(page);
 
-  // 3. Rola até a importação
-  await linkTrazer.click();
+  // 3. O formulário abre sob o botão
+  await trazer.click();
+  await expect(trazer).toHaveAttribute('aria-expanded', 'true');
   const secaoImportar = page.locator('#importar-edital');
   await expect(secaoImportar).toBeVisible();
+  await expect(page.getByLabel('Arquivo CSV')).toBeVisible();
 
   // 4. Detalhes de orientação para IA e prompt com botão copiar
   const detalhesIa = page.locator('summary', { hasText: 'Não sabe montar a planilha?' });

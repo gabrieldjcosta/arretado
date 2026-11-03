@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, importarEPublicar, semViolacoes, test } from './apoio';
+import { expect, importarEPublicar, irAoRegistroPeloMais, semViolacoes, test } from './apoio';
 
 const DIA = 86_400_000;
 
@@ -52,7 +52,7 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   // Captura em menos de 30 s (Parte 2 §17), pelo "+" do título do Hoje (P2 do Ponto de luz).
   const t0 = Date.now();
   // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
-  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
+  await irAoRegistroPeloMais(page);
   await page.getByLabel('Frase correta').fill('Livramento exige requisitos do art. 83 do CP.');
   await page.getByText('Mais detalhes (opcional)').click();
   await page.getByLabel('O que foi').fill('Confundi livramento condicional com progressão');
@@ -122,6 +122,7 @@ test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page })
 
 test('importar pontos do edital por CSV e vincular um erro', async ({ page }) => {
   await page.goto('/#/plano');
+  await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',
     mimeType: 'text/csv',
@@ -139,7 +140,7 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
     .getByRole('navigation', { name: 'Áreas' })
     .getByRole('link', { name: 'Fixar', exact: true })
     .click();
-  await page.getByRole('link', { name: 'Novo registro de erro' }).click();
+  await irAoRegistroPeloMais(page);
   await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
   await page
     .getByLabel('Ponto do edital (opcional)')
@@ -188,7 +189,8 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
   await expect(page.getByRole('heading', { name: 'Revisar 10 cartões' })).toBeVisible();
   await expect(page.getByText('cerca de 5 min')).toBeVisible();
   await expect(page.getByText(/Hoje: 10 de 25/)).toBeVisible();
-  await expect(page.getByText('Nenhum dia nos últimos 7')).toBeVisible();
+  // Sem nenhum Dia com revisão a semana não aparece (D-D21).
+  await expect(page.getByText(/últimos 7/)).toHaveCount(0);
 
   await semViolacoes(page);
 
@@ -216,7 +218,11 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
 
   await page.goto('/#/recall');
   await page.reload();
-  await expect(page.getByText('1 dos últimos 7 dias')).toBeVisible();
+  // Depois do primeiro Dia a semana aparece: sete marcas e um nome sem número (a conta é do leitor de tela).
+  const semana = page.locator('.dias-da-semana');
+  await expect(semana.locator('.dias-marcas .ponto-de-luz')).toHaveCount(7);
+  await expect(semana.getByText('Últimos 7 dias', { exact: true })).toBeVisible();
+  await expect(semana).toContainText('1 dos últimos 7 dias');
 });
 
 test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', async ({ page }) => {
