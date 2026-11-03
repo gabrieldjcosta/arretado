@@ -218,8 +218,8 @@ describe('Conta › Aparência (5.2)', () => {
     const caixa = await screen.findByRole('checkbox', {
       name: 'Destacar prazos, condições, termos absolutos e penas',
     });
-    // Sem o campo (preferência anterior à 9.8): desligado.
-    expect(caixa).not.toBeChecked();
+    // Sem o campo (preferência anterior à 9.8, ou nunca mexida): ligado, o padrão do app (D-D17).
+    expect(caixa).toBeChecked();
     const legenda = screen.getByRole('list', { name: 'Legenda dos destaques' });
     expect(
       within(legenda)
@@ -231,15 +231,18 @@ describe('Conta › Aparência (5.2)', () => {
       'Termos absolutos (sublinhado ondulado)',
       'Penas, quóruns e frações (sublinhado pontilhado)',
     ]);
+    // O padrão não grava nada: só quem muda a caixa guarda o valor (desligar grava `false`).
+    expect(await obterPreferencias(repo)).not.toHaveProperty('destacarCondicionantesEPrazos');
+    await usuario.click(caixa);
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
+    });
+    expect(caixa).not.toBeChecked();
     await usuario.click(caixa);
     await waitFor(async () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
     });
     expect(caixa).toBeChecked();
-    await usuario.click(caixa);
-    await waitFor(async () => {
-      expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
-    });
     // Régua de leitura (fatia 4): desligada por padrão, grava ao ligar.
     const regua = screen.getByRole('checkbox', { name: 'Régua de leitura' });
     expect(regua).not.toBeChecked();
