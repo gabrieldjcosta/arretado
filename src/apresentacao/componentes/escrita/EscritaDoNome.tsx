@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, type CSSProperties } from 'react';
 import { CACTO, CAIXA_DO_LOCKUP, CAMINHO_DA_LUZ, NOME, PONTO } from './geometria';
 import { NeonDoNome } from './NeonDoNome';
 import './escrita-b.css';
@@ -28,8 +28,13 @@ function Tubo({ larguras, cone }: { larguras: readonly [number, number]; cone: s
 }
 
 interface Props {
-  /** Modo curto: o nome já aparece escrito e a caneta chega junto do "o" (1,2 s em vez de 2,64 s). */
+  /** Modo curto do cabeçalho: o nome já aparece escrito e a caneta chega junto do "o" (1,2 s em vez de 2,64 s). */
   curta?: boolean;
+  /**
+   * A escala da linha do tempo do kit (`--k`): 1 escreve o nome em 2,64 s; menos, mais depressa (a tela
+   * cheia, D-D14: 2,4 s e 1,6 s). Calmo não anima o desenho, então ignora.
+   */
+  escala?: number;
   /** Perfil Calmo: o desenho todo só esmaece (0,24 s), sem caneta nem traço. */
   calmo?: boolean;
   /** Pulou: vai direto ao quadro final (um toque, ou sem animação nenhuma). */
@@ -48,7 +53,7 @@ interface Props {
  * `style` do React (CSSOM), que a CSP `style-src 'self'` deixa passar, ao contrário do atributo
  * `style` escrito no HTML.
  */
-export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: Props) {
+export function EscritaDoNome({ curta = false, escala = 1, calmo = false, pulou = false }: Props) {
   const id = useId();
   // Duas escritas na mesma tela não podem repetir id: gradiente, filtros e máscara levam o `useId`.
   const [tinta, halo, aro] = [`${id}-tinta`, `${id}-halo`, `${id}-aro`];
@@ -67,6 +72,7 @@ export function EscritaDoNome({ curta = false, calmo = false, pulou = false }: P
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
+      style={escala !== 1 && !calmo ? ({ '--k': escala.toFixed(4) } as CSSProperties) : undefined}
     >
       <defs>
         <linearGradient id={tinta} gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="190">
