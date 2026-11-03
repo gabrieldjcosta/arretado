@@ -225,9 +225,8 @@
      2 à noite. */
   --marca-ponto: var(--ponto-luz);
   --marca-disco: var(--ponto-halo);
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 1;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-titulo);
   --tamanho-rotulo: 0.9375rem;
   --espessura-contorno: 1.5px;
@@ -358,9 +357,8 @@
     --bloco-acao-texto: var(--n-noite);
     --marca-ponto: var(--ponto-halo);
     --marca-disco: transparent;
-    /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-       seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-    --marca-da-parada: 0;
+    /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+       14 px. O peso é o `--peso-titulo`. */
     --fonte-rotulo: var(--fonte-interface);
     --tamanho-rotulo: 0.875rem;
     --espessura-contorno: 1px;
@@ -451,9 +449,8 @@
   --bloco-acao-texto: var(--n-noite);
   --marca-ponto: var(--ponto-halo);
   --marca-disco: transparent;
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 0;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-interface);
   --tamanho-rotulo: 0.875rem;
   --espessura-contorno: 1px;
@@ -3220,8 +3217,22 @@ dialog.dialogo-acoes {
 }
 
 .agora-estimativa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
   margin: 0 0 0.75rem;
   color: var(--bloco-atenuado);
+}
+
+/* "tenho outro tempo" (D-D16): o link ao lado da estimativa, na cor dela e sublinhado; o alvo de 44 px do
+   botão-texto sai pelas margens de cima e de baixo, e o recuo de 12 px, pela margem da esquerda, para a
+   letra ficar a 12 px da estimativa. */
+.acao-agora .agora-tempo {
+  margin-block: -0.5rem;
+  margin-inline: -0.25rem 0;
+  padding-inline: 0.5rem;
+  text-align: left;
 }
 
 /* O botão primário e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */

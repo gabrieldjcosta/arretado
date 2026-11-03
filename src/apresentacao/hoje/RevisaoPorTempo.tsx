@@ -1,7 +1,9 @@
 // "Hoje do tamanho do seu tempo" (AP-01; figura d-hoje): a pessoa toca 5, 10, 25 ou 45 min e o Hoje
 // monta o lote de Cartões pelo valor, diz por que escolheu cada um e deixa o resto na fila. Sem
-// escolha, a folha do Agora fica como era (cota diária). A escolha é só estado da tela.
-import { useState, type ReactNode } from 'react';
+// escolha, a folha do Agora fica como era (cota diária). A escolha é só estado da tela. Os quatro tempos
+// ficam recolhidos dentro da folha, atrás do link "tenho outro tempo" ao lado da estimativa (D-D16): o
+// Hoje abre com um cartão e um botão, e quem tem outro tempo abre os minutos ali mesmo.
+import { useId, useState, type ReactNode } from 'react';
 import {
   MINUTOS_DA_SESSAO,
   minutosDoLote,
@@ -31,36 +33,33 @@ const resumo = (texto: string) => (texto.length > 70 ? `${texto.slice(0, 69)}…
 
 export function RevisaoPorTempo({
   acao,
-  antes,
+  parada,
   aoEscolherOutra,
   normaLida,
 }: {
   acao: ProximaAcao;
-  /** A linha de parada: fica entre o seletor e a folha, onde a caneta encosta na borda dela. */
-  antes: ReactNode;
+  /** A linha de parada: uma linha quieta logo abaixo da folha. */
+  parada: ReactNode;
   aoEscolherOutra: () => void;
   /** A norma da leitura salva: com tempo sobrando depois do lote, o Hoje aponta o trecho do mapa. */
   normaLida?: string;
 }) {
   const { dados } = useDados(carregarFila);
   const [minutos, setMinutos] = useState<number | null>(null);
+  const [mostrando, setMostrando] = useState(false);
+  const idDoPainel = useId();
   const motivo = motivoDaAcao(acao);
-  const padrao = (
-    <AcaoAgora
-      titulo={tituloDaAcao(acao)}
-      {...(motivo === undefined ? {} : { motivo })}
-      {...(acao.estimativaMin === undefined ? {} : { estimativa: acao.estimativaMin })}
-      rotuloBotao={rotuloDoBotao(acao)}
-      para={rotaDeInicio(acao)}
-      aoEscolherOutra={aoEscolherOutra}
-      emEvidencia
-    />
-  );
-  // Seletor, linha de parada e folha ficam sempre nas mesmas posições e o seletor aparece junto com
-  // a folha: nada se move quando os dados chegam, e o botão não é recriado (um toque durante a carga
-  // não se perde).
-  const seletor = (
-    <div className="tempo-do-hoje" role="group" aria-labelledby="tempo-do-hoje-rotulo">
+  // Os minutos e a folha ficam sempre nas mesmas posições e o painel dos minutos está sempre no DOM
+  // (escondido, quando recolhido): nada se move quando os dados chegam, e o botão não é recriado (um
+  // toque durante a carga não se perde).
+  const painel = (
+    <div
+      id={idDoPainel}
+      className="tempo-do-hoje"
+      role="group"
+      aria-labelledby="tempo-do-hoje-rotulo"
+      hidden={!mostrando}
+    >
       <p id="tempo-do-hoje-rotulo" className="tempo-do-hoje-rotulo">
         Quanto tempo você tem?
       </p>
@@ -81,13 +80,30 @@ export function RevisaoPorTempo({
       </div>
     </div>
   );
+  const tempo = {
+    aberto: mostrando,
+    idDoPainel,
+    aoAlternar: () => {
+      setMostrando((m) => !m);
+    },
+  };
   const fila = dados?.fila ?? [];
   if (minutos === null || !dados || fila.length === 0) {
     return (
       <>
-        {seletor}
-        {antes}
-        {padrao}
+        <AcaoAgora
+          titulo={tituloDaAcao(acao)}
+          {...(motivo === undefined ? {} : { motivo })}
+          {...(acao.estimativaMin === undefined ? {} : { estimativa: acao.estimativaMin })}
+          rotuloBotao={rotuloDoBotao(acao)}
+          para={rotaDeInicio(acao)}
+          aoEscolherOutra={aoEscolherOutra}
+          emEvidencia
+          tempo={tempo}
+        >
+          {painel}
+        </AcaoAgora>
+        {parada}
       </>
     );
   }
@@ -99,8 +115,6 @@ export function RevisaoPorTempo({
   const comFaixa = escolhidos.some((c) => c.faixa !== undefined);
   return (
     <>
-      {seletor}
-      {antes}
       <AcaoAgora
         titulo="Rever o que mais vale agora"
         motivo={`${cartoes(lote)}, ${comFaixa ? 'pelo que mais cai e está perto de esquecer' : 'os mais perto de esquecer'}.${diasFora >= 2 ? ' Depois de uma pausa o lote vem mais curto.' : ''}`}
@@ -109,7 +123,10 @@ export function RevisaoPorTempo({
         para={`/recall/revisar?itens=${String(lote)}`}
         aoEscolherOutra={aoEscolherOutra}
         emEvidencia
-      />
+        tempo={tempo}
+      >
+        {painel}
+      </AcaoAgora>
       <details className="tempo-do-hoje-porque">
         <summary className="botao botao-texto na-margem">Por que estes?</summary>
         <ol>
@@ -135,6 +152,7 @@ export function RevisaoPorTempo({
       {normaLida !== undefined && (
         <AgoraNoMapa normaId={normaLida} sobra={minutos - minutosDoLote(lote)} />
       )}
+      {parada}
     </>
   );
 }

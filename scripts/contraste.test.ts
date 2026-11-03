@@ -159,16 +159,14 @@ const CASCA_DA_NOITE = {
   'fundo-controle': 'var(--superficie-2)',
 };
 /**
- * O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 e 0), e o rótulo do "Em
- * seguida" é o título de dia (Schibsted, 15 px) e a interface à noite (Atkinson, 14 px), como no contrato.
+ * O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título de dia (Schibsted, 15 px) e a interface à noite
+ * (Atkinson, 14 px), como no contrato. A faixa e o ponto da linha de parada saíram na D-D16.
  */
 const HOJE_DO_DIA = {
-  'marca-da-parada': '1',
   'fonte-rotulo': 'var(--fonte-titulo)',
   'tamanho-rotulo': '0.9375rem',
 };
 const HOJE_DA_NOITE = {
-  'marca-da-parada': '0',
   'fonte-rotulo': 'var(--fonte-interface)',
   'tamanho-rotulo': '0.875rem',
 };
