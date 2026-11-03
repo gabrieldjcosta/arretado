@@ -122,6 +122,7 @@ test('relato de problema não leva conteúdo de estudo (6.12)', async ({ page })
 
 test('importar pontos do edital por CSV e vincular um erro', async ({ page }) => {
   await page.goto('/#/plano');
+  await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',
     mimeType: 'text/csv',

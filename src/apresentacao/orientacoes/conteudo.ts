@@ -59,7 +59,7 @@ export const SECOES: Secao[] = [
     id: 'pontos',
     titulo: 'Importar os pontos do edital',
     paragrafos: [
-      'Na Trilha, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
+      'Na Trilha, o botão "Trazer meu edital" abre o formulário "Importar pontos do edital", que lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV). Com a Trilha já montada, é o "Importar outra planilha".',
       'A primeira linha precisa ter as colunas Disciplina e Ponto. Opcionais: Faixa (Altíssima, Alta, Média ou Extra) e Código. Exemplo de linha: Execução Penal; 3; Progressão de regime; Alta.',
       'Importar a mesma planilha de novo não duplica nada: só entram os pontos novos. Como toda importação, dá para desfazer em Conta › Dados.',
       'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com a Trilha completa.',
