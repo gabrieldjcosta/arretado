@@ -3,9 +3,12 @@ import { Navigate } from 'react-router';
 import type { Pouso } from '../../../dominios/fio';
 import { marcarPausa } from '../dados/pausa';
 import { useFio, type FioNaTela } from '../dados/useFio';
+import { useCargaDoPasso } from '../passos/carregar';
+import { pontosDaEtapa } from '../passos/pontos-da-etapa';
 import { pousoNaVereda, pousosDaVolta, type PousoNaVereda } from '../pouso/lugares';
 import { animar, aCadaQuadro, cancelarAnimacoes, modoAgora, MOLA, useSinal } from './anima';
 import { CenaM } from './CenaM';
+import { ConferirOResumoM, EvocacaoM } from './EvocacaoM';
 import { TelaM } from './TelaM';
 
 /**
@@ -161,6 +164,11 @@ function PuxaPousoM({ aoPuxar }: { aoPuxar: () => void }) {
 function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   const numero = pouso.etapa + 1;
   const [escolhido, setEscolhido] = useState(numero);
+  // O pouso em branco: com fatos na etapa, a pessoa escreve o que lembra antes de ver o resumo. Sem fatos (tudo
+  // pulado) não há o que lembrar e vai direto à frase de sempre.
+  const [momento, setMomento] = useState<'branco' | 'lista' | 'frase'>(
+    pouso.fatos.length > 0 ? 'branco' : 'frase',
+  );
   const faixa = useRef<HTMLDivElement>(null);
   // As pílulas rolam de lado em tela estreita: a da vez, a última, já abre à vista.
   useLayoutEffect(() => {
@@ -170,9 +178,23 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   const volta = pousosDaVolta(numero);
   const visto = volta.find((p) => p.numero === escolhido) ?? pousoNaVereda(numero);
   const fatos = fatosDoPousoVisto(visto, pouso, fio.fio.estado.pousos);
+  const noAtual = visto.numero === numero;
+  const emBranco = noAtual && momento === 'branco';
+  const comoLista = noAtual && momento === 'lista';
+  // O conteúdo da etapa, para marcar o que se lembrou: só depois do branco (e a lei do app já está no aparelho).
+  const etapa = fio.fio.estado.etapa;
+  const pontos = useCargaDoPasso(
+    `pontos|${String(pouso.etapa)}|${momento === 'lista' ? 'v' : 'x'}`,
+    async (r) => (momento === 'lista' && etapa ? pontosDaEtapa(r, etapa) : []),
+  );
+  const listaDePontos = comoLista && pontos.estado === 'pronto' ? pontos.dados : [];
+  // O céu fica curto enquanto houver o que preencher a tela (o campo, depois a lista), para o fio de seguir caber;
+  // só volta cheio no resumo de sempre, sem lista.
+  const ceuCurto =
+    emBranco || (comoLista && (pontos.estado === 'carregando' || listaDePontos.length > 0));
 
   return (
-    <TelaM nome="pouso" className="m-pouso" rotulo="Pouso">
+    <TelaM nome="pouso" className={ceuCurto ? 'm-pouso m-em-branco' : 'm-pouso'} rotulo="Pouso">
       <div className="m-ceu">
         <span className="m-olho">
           Pouso {String(visto.numero)} · {visto.lugar.nome}
@@ -181,12 +203,32 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
       </div>
       <div className="m-corpo">
         <h2 aria-live="polite">{visto.lugar.titulo}</h2>
-        {fatos !== undefined && (
-          <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
-            {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
-          </p>
+        {emBranco ? (
+          <EvocacaoM
+            aoMostrar={() => {
+              setMomento('lista');
+            }}
+            aoPular={() => {
+              setMomento('frase');
+            }}
+          />
+        ) : (
+          <>
+            {fatos !== undefined && (
+              <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
+                {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
+              </p>
+            )}
+            {listaDePontos.length > 0 && <ConferirOResumoM pontos={listaDePontos} />}
+          </>
         )}
-        <div className="m-lugares" role="group" aria-label="Pousos da vereda" ref={faixa}>
+        <div
+          className="m-lugares"
+          hidden={ceuCurto}
+          role="group"
+          aria-label="Pousos da vereda"
+          ref={faixa}
+        >
           {volta.map((p) => (
             <button
               key={p.numero}
