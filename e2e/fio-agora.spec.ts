@@ -70,7 +70,7 @@ test('sem prova escolhida, o cartão "Para começar" tem uma coluna só e o bot�
 
   /**
    * O cartão leva o `.m-proximo` do mockup, uma grade de duas colunas (texto | min) feita para o "Na ponta do fio".
-   * Sem a coluna única do desvio 22, o título se espremia, o texto ia para a segunda coluna e o botão virava um
+   * Sem a coluna única do desvio 23, o título se espremia, o texto ia para a segunda coluna e o botão virava um
    * quadrado cortado ("Escol"), em 360 e em 1280, de dia e de noite.
    */
   const medidas = () =>

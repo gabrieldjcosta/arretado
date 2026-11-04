@@ -81,7 +81,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
   it('sem nenhuma matéria, pergunta a prova em vez de listar começos', async () => {
     await abrir();
     const convite = await screen.findByRole('group', { name: 'Para começar' });
-    // O `.m-proximo` do mockup é uma grade de duas colunas; este cartão leva a classe que o põe em uma (desvio 22).
+    // O `.m-proximo` do mockup é uma grade de duas colunas; este cartão leva a classe que o põe em uma (desvio 23).
     expect(convite).toHaveClass('m-proximo', 'm-sem-prova');
     expect(within(convite).getByText('Qual é a sua prova?')).toBeInTheDocument();
     expect(within(convite).getByRole('link', { name: /Escolher minha prova/ })).toHaveAttribute(

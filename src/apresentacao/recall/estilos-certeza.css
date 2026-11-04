@@ -27,7 +27,13 @@
    o cartão encolhe o que a pergunta ocupa a mais. */
 @media (max-height: 640px) {
   .coluna-drill .cartao-drill {
-    min-height: 30dvh;
+    min-height: 22dvh;
+    padding-block: 1rem;
+  }
+
+  .palpite,
+  .certeza {
+    margin-bottom: 0.375rem;
   }
 }
 
@@ -67,4 +73,23 @@ main:has(.coluna-drill) {
 .pilha-do-cartao.com-pilha::after {
   inset: 20px 16px -16px;
   opacity: 0.6;
+}
+
+/* Escrever antes de virar (pré-teste): um campo de uma linha, 44 px, acima da certeza; em branco vale e o
+   que a pessoa escreveu volta no verso, ao lado da frase correta. Só tokens. */
+.palpite {
+  width: min(100%, 26rem);
+  min-height: var(--alvo, 44px);
+  margin-bottom: 0.5rem;
+}
+
+.palpite-da-pessoa {
+  margin: 0 0 0.5rem;
+  color: var(--texto-atenuado);
+  overflow-wrap: anywhere;
+}
+
+.palpite-rotulo {
+  font-size: 0.8125rem;
+  font-weight: 600;
 }

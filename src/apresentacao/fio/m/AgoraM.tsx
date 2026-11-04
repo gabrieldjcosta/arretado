@@ -15,7 +15,7 @@ const formatar = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigit
 /**
  * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). O cartão é
  * o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do fio": aqui ele
- * leva `m-sem-prova`, que o põe em uma coluna só (desvio 22 de `ajustes.css`).
+ * leva `m-sem-prova`, que o põe em uma coluna só (desvio 23 de `ajustes.css`).
  */
 function SemProva() {
   return (

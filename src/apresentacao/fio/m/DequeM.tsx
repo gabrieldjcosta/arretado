@@ -180,6 +180,11 @@ export function DequeM({
   const restantes = cartoes.slice(indice);
   return (
     <div data-sem-arrasto ref={raiz}>
+      {indice === 0 && !fim && cartoes.length > 1 && (
+        <div className="m-dica-gesto m-dica-mistura">
+          Artigos próximos, misturados de propósito: decidir qual é qual fixa mais.
+        </div>
+      )}
       <div className="m-deque">
         {[...restantes].reverse().map((cartao, k) => {
           const i = indice + restantes.length - 1 - k;
