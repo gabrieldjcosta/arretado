@@ -50,6 +50,7 @@ import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
 import { MarcadorDePagina } from './MarcadorDePagina';
+import { useLeituraFunda } from './leitura-funda';
 import { useItensDoMais } from '../componentes/ItensDoMais';
 import { Voltar } from '../componentes/Voltar';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
@@ -468,6 +469,7 @@ function LeitorAberto({
   const chaveDaRota = rota.key;
   const navegar = useNavigate();
   const modoFoco = busca.has(PARAMETRO_DO_FOCO);
+  useLeituraFunda(true);
   // Artigo por artigo (11.8): o modo foco com o cartão de um artigo no lugar da lista.
   const porArtigo = busca.get(PARAMETRO_DO_FOCO) === VALOR_DO_ARTIGO;
   const porArtigoAgora = useRef(porArtigo);

@@ -614,3 +614,27 @@
     radial-gradient(120% 48% at 50% 108%, rgb(255 160 90 / 30%) 0%, transparent 66%),
     radial-gradient(120% 50% at 50% -8%, #e4def0 0%, transparent 70%);
 }
+
+/* Leitura funda (Leitor): rolando a lei para baixo a pílula se recolhe; subindo, volta. Só opacidade e
+   um pequeno deslocamento (nada de layout). Com foco do teclado dentro dela, fica. No Calmo só esmaece. */
+.shell-fio .fio-nav {
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s;
+}
+
+:root[data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(14px);
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s 0.34s;
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-nav,
+:root[data-perfil='calmo'][data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  transform: translateX(-50%);
+}
