@@ -160,6 +160,36 @@ export async function abrirOLembrete(page: Page) {
   return dialogo;
 }
 
+/**
+ * A nota do Lembrete como está gravada no IndexedDB (vazia se não há). Fechar o diálogo com Esc grava ao
+ * desmontar o campo, em segundo plano e sem aviso na tela: recarregar a página antes disso perde a nota.
+ * Quem recarrega logo depois do Esc espera por aqui (`expect.poll`), não por um tempo fixo.
+ */
+export function lembreteGravado(page: Page) {
+  return page.evaluate(async () => {
+    const pedir = <T>(pedido: IDBRequest<T>) =>
+      new Promise<T>((resolver, rejeitar) => {
+        pedido.onsuccess = () => {
+          resolver(pedido.result);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+    const banco = await pedir(indexedDB.open('arretado'));
+    try {
+      const todas = await pedir(
+        banco.transaction('preferencias').objectStore('preferencias').getAll() as IDBRequest<
+          { lembrete?: string }[]
+        >,
+      );
+      return todas[0]?.lembrete ?? '';
+    } finally {
+      banco.close();
+    }
+  });
+}
+
 /** axe (WCAG AA) nos dois temas, na tela como está. */
 export async function semViolacoes(page: Page) {
   for (const colorScheme of ['light', 'dark'] as const) {

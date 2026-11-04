@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { abrirOLembrete, expect, semViolacoes, test } from './apoio';
+import { abrirOLembrete, expect, lembreteGravado, semViolacoes, test } from './apoio';
 
 // O "+" da casca (D-D23; está em toda tela) abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
 // nem tem <dialog> de verdade; aqui o navegador mede o painel (dentro da tela, alvos de 44 px), roda o foco
@@ -91,6 +91,9 @@ test.describe('"+" da casca › painel', () => {
     await expect(dialogo.getByText('Ainda não salvo.')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialogo).toBeHidden();
+    // A gravação ao fechar é em segundo plano: recarregar antes de ela chegar ao banco perderia a nota (era a
+    // intermitência deste teste no celular do CI, dois erros seguidos), então espera ver a nota gravada.
+    await expect.poll(() => lembreteGravado(page)).toBe('Pedir a certidão');
 
     await page.reload();
     const outra = await abrirOLembrete(page);
