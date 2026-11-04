@@ -15,20 +15,27 @@ export const Varal = lazy(() => import('./varal/Varal').then((m) => ({ default: 
 export const PassoDoFio = lazy(() => import('./m/PassoM').then((m) => ({ default: m.PassoM })));
 export const PousoDoFio = lazy(() => import('./m/PousoM').then((m) => ({ default: m.PousoM })));
 
-/** Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. */
-export function TelaDoFio({ children }: { children: ReactNode }) {
+/**
+ * Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. As telas que moram no quadro do
+ * mockup (`noQuadro`) esperam na fronteira do próprio quadro (`CascaM`), que não pisca: o esqueleto cinza de antes
+ * ficaria fora do desenho aprovado, e uma fronteira nova a cada tela faria o React segurar a revelação por 300 ms.
+ */
+export function TelaDoFio({
+  children,
+  noQuadro = false,
+}: {
+  children: ReactNode;
+  noQuadro?: boolean;
+}) {
   if (useInterface() !== 'fio') return <Navigate to="/" replace />;
+  if (noQuadro) return children;
   return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
 }
 
-/** O começo do app: o Agora na prévia, o Hoje de sempre fora dela. */
+/** O começo do app: o Agora na prévia (no quadro, que cuida da espera), o Hoje de sempre fora dela. */
 export function PaginaInicial() {
   if (useInterface() !== 'fio') return <Hoje />;
-  return (
-    <Suspense fallback={<Esqueleto linhas={4} />}>
-      <AgoraDoFio />
-    </Suspense>
-  );
+  return <AgoraDoFio />;
 }
 
 /** `#/fio/ligar` e `#/fio/desligar`: o atalho para quem recebe o link da prévia. */

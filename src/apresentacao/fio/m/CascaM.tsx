@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { AplicarAparencia } from '../../Aparencia';
 import { PuxarEssenciais } from '../../biblioteca/PuxarEssenciais';
@@ -8,10 +8,13 @@ import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
 import { lugarDaRota } from '../lugares';
 import { FiltrosM } from './FiltrosM';
+import { aparelhoLeve } from './leve';
 import { MaisM } from './MaisM';
 import { NavM } from './NavM';
 import { ToastM } from './ToastM';
+import { useMovimentoDoFio } from './movimento';
 import { useMundo } from './mundo';
+import { ligarOndaDeLuz } from './onda';
 import { esquecerTelas } from './transicao';
 import '../mockup/reset.css';
 import '../mockup/fontes.css';
@@ -29,11 +32,17 @@ const COM_NAV = new Set(['/']);
 export function CascaM() {
   const { pathname } = useLocation();
   const mundo = useMundo();
+  // Vivo ou Calmo: dele depende a cara do botão de ação (o Sol ou o Só contorno; desvio 17 em `ajustes.css`).
+  const movimento = useMovimentoDoFio();
+  // Aparelho fraco: sem as camadas de brilho, como o modo leve do mockup (lido uma vez; o aparelho não muda no meio).
+  const [leve] = useState(aparelhoLeve);
   useAtalhoDeRegistrarErro();
   useEffect(() => esquecerTelas, []);
+  // A onda de luz em todo botão de ação, como no mockup (um ouvinte do documento, ligado enquanto o quadro vive).
+  useEffect(() => ligarOndaDeLuz(), []);
 
   return (
-    <div className="m-fio" data-mundo={mundo}>
+    <div className={leve ? 'm-fio m-leve' : 'm-fio'} data-mundo={mundo} data-movimento={movimento}>
       <AplicarAparencia />
       <PuxarEssenciais />
       <a
@@ -49,7 +58,12 @@ export function CascaM() {
       </a>
       <FiltrosM />
       <main id="conteudo" className="m-app" tabIndex={-1}>
-        <Outlet />
+        {/* A fronteira fica no quadro, não em cada tela: a tela que chega pela primeira vez (um pedaço à parte do
+            pacote) é esperada com a atual ainda à vista, porque a troca de rota é uma transição e o React só
+            revela a nova pronta. Uma fronteira nova por tela mostraria o vão e o React o seguraria 300 ms. */}
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
         {COM_NAV.has(pathname) && <NavM ativo={lugarDaRota(pathname)} />}
         <MaisM />
         <ToastM />

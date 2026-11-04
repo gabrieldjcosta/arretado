@@ -58,6 +58,32 @@ test('o Agora mostra a marca, o fio, o que vem na ponta e os três lugares embai
   await semViolacoesNoFio(page);
 });
 
+test('o ponto repousa onde o mockup o põe, também quando o app abre já no Agora', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await comMateriaNaPrevia(page);
+  // A primeira carga: a leitura ainda não está na memória do app, então o cartão de baixo chega depois do ponto.
+  await page.reload();
+  await expect(puxador(page)).toBeVisible();
+
+  // O ponto repousa a 55% da altura da área (no máximo 230 px), medida com o cartão de baixo já cheio, como no
+  // mockup. Medir antes de a leitura chegar o deixava 22 px abaixo (a área ainda era mais alta).
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const area = document.querySelector('.m-puxar-area');
+        const ponto = document.querySelector('.m-puxador');
+        if (!area || !ponto) return false;
+        const a = area.getBoundingClientRect();
+        const p = ponto.getBoundingClientRect();
+        const base = Math.min(a.height * 0.55, 230);
+        return Math.abs(p.top - a.top - (base - 42)) <= 1;
+      }),
+    )
+    .toBe(true);
+});
+
 test('com zoom de 200% (195 px de layout), a nav cabe sem rolar de lado', async ({ page }) => {
   await page.setViewportSize({ width: 195, height: 400 });
   await comMateriaNaPrevia(page);

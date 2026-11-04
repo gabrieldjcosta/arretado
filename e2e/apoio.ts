@@ -236,6 +236,82 @@ export async function semViolacoesNoFio(page: Page) {
   await semViolacoes(page);
 }
 
+/** Uma `Element.animate` que a página recebeu: o alvo (tag e classes sem o prefixo `m-`) e o que se pediu dela. */
+export interface AnimacaoVista {
+  tag: string;
+  classes: string[];
+  props: string;
+  duracao: number | null;
+  atraso: number;
+  easing: string;
+}
+
+/**
+ * Anota toda `Element.animate` da página, para conferir que o app move o que o mockup aprovado move, com a mesma
+ * duração, o mesmo atraso e a mesma curva (`fio-passos.spec.ts`). Chamar antes do primeiro `goto`.
+ */
+export async function registrarAnimacoes(page: Page) {
+  await page.addInitScript(() => {
+    const vistas: AnimacaoVista[] = [];
+    (window as unknown as { __animacoesVistas: AnimacaoVista[] }).__animacoesVistas = vistas;
+    const original = Reflect.get(Element.prototype, 'animate');
+    Element.prototype.animate = function (quadros, opcoes) {
+      const o = typeof opcoes === 'number' ? { duration: opcoes } : (opcoes ?? {});
+      const props = new Set<string>();
+      if (Array.isArray(quadros))
+        for (const q of quadros) Object.keys(q).forEach((k) => props.add(k));
+      vistas.push({
+        tag: this.tagName.toLowerCase(),
+        classes: [...this.classList].map((c) => c.replace(/^m-/, '')),
+        props: [...props].sort().join(','),
+        duracao: typeof o.duration === 'number' ? o.duration : null,
+        atraso: typeof o.delay === 'number' ? o.delay : 0,
+        easing: o.easing ?? 'linear',
+      });
+      return original.call(this, quadros, opcoes);
+    };
+  });
+}
+
+/**
+ * Anota, a cada quadro, quanto do quadro as telas do Fio cobrem (as opacidades compostas: 1 com uma tela firme, perto de
+ * 0,8 no meio do cruzamento de duas, 0 se o quadro ficasse vazio). A troca de tela do mockup cruza a que sai com a
+ * que entra sem deixar vão; um vão aparece aqui como 0 (`terminarCoberturaDasTelas`).
+ */
+export async function comecarCoberturaDasTelas(page: Page) {
+  await page.evaluate(() => {
+    const w = window as unknown as { __cobertura: number[]; __coberturaViva: boolean };
+    w.__cobertura = [];
+    w.__coberturaViva = true;
+    const quadro = () => {
+      const telas = [...document.querySelectorAll<HTMLElement>('.m-app .m-tela')];
+      const vazio = telas.reduce(
+        (resto, t) => resto * (1 - Number(getComputedStyle(t).opacity)),
+        1,
+      );
+      w.__cobertura.push(telas.length === 0 ? 0 : 1 - vazio);
+      if (w.__coberturaViva) requestAnimationFrame(quadro);
+    };
+    requestAnimationFrame(quadro);
+  });
+}
+
+/** Para de anotar e devolve a cobertura de cada quadro desde `comecarCoberturaDasTelas`. */
+export function terminarCoberturaDasTelas(page: Page): Promise<number[]> {
+  return page.evaluate(() => {
+    const w = window as unknown as { __cobertura: number[]; __coberturaViva: boolean };
+    w.__coberturaViva = false;
+    return w.__cobertura;
+  });
+}
+
+/** O que `registrarAnimacoes` anotou até agora. */
+export function animacoesVistas(page: Page): Promise<AnimacaoVista[]> {
+  return page.evaluate(
+    () => (window as unknown as { __animacoesVistas: AnimacaoVista[] }).__animacoesVistas,
+  );
+}
+
 /**
  * Quantos pontos diferem de verdade entre dois recortes PNG (canal a canal, além de 16 em 255): o
  * lockup parado e o quadro final da escrita desenham os mesmos caminhos, mas um é tracejado e o outro

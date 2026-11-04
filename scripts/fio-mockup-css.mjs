@@ -5,6 +5,7 @@
 //   - classes ganham o prefixo `m-` (`.acao` vira `.m-acao`), ids também, e as propriedades
 //     personalizadas ganham `--m-` (`--ponto` vira `--m-ponto`), para nada colidir com o CSS do resto do app;
 //   - `:root` vira `.m-fio` (a raiz do Arretado novo) e `:root[data-mundo="dia"]` vira `.m-fio[data-mundo="dia"]`;
+//   - `.leve` (a classe que o mockup põe na página, o <html>, em aparelho fraco) vira `.m-fio.m-leve`: quem a leva no app é a raiz;
 //   - seletor que começa por elemento (`button`, `h1`, `*`, `[hidden]`) fica dentro de `.m-fio`;
 //   - `html`/`body` (a página do protótipo), `.controles` e `.nota` (a barra e a nota do protótipo) não entram.
 // Desvio do mockup NUNCA se faz aqui nem no arquivo gerado: vai em `ajustes.css`, com o motivo ao lado.
@@ -70,9 +71,11 @@ function lerRegras(css) {
 export function trocarSeletor(seletor) {
   const s = seletor.trim();
   if (NAO_ENTRAM.some((re) => re.test(s))) return null;
-  // :root é a raiz do Arretado novo, e a raiz é ancestral de tudo (como no protótipo).
+  // :root é a raiz do Arretado novo, e a raiz é ancestral de tudo (como no protótipo). O mesmo vale para `.leve`, que o
+  // mockup põe no <html> em aparelho fraco: no app a raiz do Fio leva `m-leve`.
   const daRaiz = /^:root(?![\w-])/.test(s);
-  let r = s.replace(/^:root(?![\w-])/, '.m-fio');
+  const daLeve = /^\.leve(?![\w-])/.test(s);
+  let r = s.replace(/^:root(?![\w-])/, '.m-fio').replace(/^\.leve(?![\w-])/, '');
   // Classes e ids ganham o prefixo (não mexe no que está entre colchetes: `[data-mundo="dia"]`).
   r = r.replace(
     /(\[[^\]]*\])|\.([A-Za-z_][\w-]*)|#([A-Za-z_][\w-]*)/g,
@@ -85,6 +88,7 @@ export function trocarSeletor(seletor) {
   // TODA regra fica dentro da raiz e ganha um `.m-fio` a mais (uma classe de especificidade, para todas por igual:
   // a ordem entre as regras do mockup não muda). Assim o CSS global do app (`button:disabled`, `button:active`...)
   // não passa por cima do que o mockup declara, e o do mockup não vaza para o resto do app.
+  if (daLeve) return `.m-fio.m-leve${r}`;
   return daRaiz ? `.m-fio${r}` : `.m-fio ${r}`;
 }
 

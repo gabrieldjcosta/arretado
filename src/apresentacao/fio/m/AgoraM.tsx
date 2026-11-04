@@ -47,6 +47,16 @@ export function AgoraM() {
     avisar('Tudo salvo. O fio te espera aqui.');
   }, [pausou]);
 
+  // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a
+  // troca de tela não espera rede nem disco (o mockup troca sem vão).
+  useEffect(() => {
+    void import('./PassoM').catch(() => undefined);
+    void import('./PousoM').catch(() => undefined);
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
+    }
+  }, []);
+
   const percentual = resumoDoMapa(entrada)?.percentual ?? 0;
   const proximo = avanco?.proximo;
   const materia = avanco?.estado.etapa?.materia ?? '';
@@ -91,6 +101,7 @@ export function AgoraM() {
             titulo={retomar ? 'Puxe para continuar' : 'Puxe o fio'}
             apoio="ou toque no ponto"
             aoPuxar={fio.puxar}
+            pronta={proximo !== undefined || fio.falhou}
           />
           {fio.falhou ? (
             <p className="m-quieto" role="alert">

@@ -12,7 +12,7 @@ import {
   type Pouso,
   type ResultadoDoPasso,
 } from '../../../dominios/fio';
-import { useRepositorio, useDados } from '../../dados/contexto';
+import { useRepositorio } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
 import { ROTA_DO_PASSO, ROTA_DO_POUSO } from '../lugares';
 import { avancar, entrarNoPasso, type Avanco } from './avancar';
@@ -25,6 +25,7 @@ import {
 } from './desfazer';
 import { montarEntradaDoFio } from './entrada';
 import { useFioGuardado, type FioGuardado } from './guardado';
+import { useDadosDoFio } from './sem-vazio';
 
 export interface FioNaTela {
   /** Ainda lendo o que o app sabe (primeira carga). */
@@ -67,7 +68,7 @@ export function useFio(): FioNaTela {
       }),
     [fonte, etapasFeitas, materiaAberta],
   );
-  const { dados: entrada, falha } = useDados(carregar);
+  const { dados: entrada, falha } = useDadosDoFio('fio', carregar);
   const avanco = useMemo(() => (entrada ? avancar(fio, entrada) : undefined), [fio, entrada]);
 
   /** Grava o estado depois de uma ação e leva a pessoa ao que vem em seguida. */

@@ -3632,11 +3632,11 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.m-fio .m-leve .m-brilho,
-.m-fio .m-leve .m-fio-pendurado-b,
-.m-fio .m-leve .m-cacto-b,
-.m-fio .m-leve .m-lugar-b,
-.m-fio .m-leve .m-petala-b {
+.m-fio.m-leve .m-brilho,
+.m-fio.m-leve .m-fio-pendurado-b,
+.m-fio.m-leve .m-cacto-b,
+.m-fio.m-leve .m-lugar-b,
+.m-fio.m-leve .m-petala-b {
   display: none;
 }
 @media (prefers-reduced-motion: reduce) {

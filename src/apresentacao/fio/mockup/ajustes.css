@@ -1,6 +1,6 @@
 /* Desvios do mockup aprovado, um por um, cada qual com o motivo. É o único lugar onde o app se afasta do
    mockup (mockup.css é gerado e não se edita). Sem motivo escrito aqui, não é desvio: é erro. A lista também
-   está em docs/design/fio/README.md. */
+   está em docs/design/desvios.md. */
 
 /* 1. A raiz do Fio faz o papel do <body> do protótipo (a página que o centrava e lhe dava o fundo).
       Motivo: no protótipo havia uma página; no app, quem faz isso é a raiz do Fio. A área segura entra
@@ -220,4 +220,57 @@
       mesmo mundo (--m-erro-selo). */
 .m-fio.m-fio[data-mundo='dia'] .m-proximo .m-min {
   color: var(--m-erro-selo);
+}
+
+/* 17. O botão de ação: o "Sol" no Vivo e o "Só contorno" no Calmo. Motivo: o degradê do mockup (creme à noite, do
+      amarelo ao âmbar de dia) não conversava com o sol do ponto de "Puxe o fio". Escolha do Gabriel (04/11/2026,
+      13:31Z) entre as caras das pranchas da Marca: o Sol, do mesmo material do ponto, no Vivo (que também é o
+      padrão de quem não configurou nada) e o Só contorno no Calmo, sem a bolinha amarela ao lado da palavra: o sol
+      fica só no brilho que aparece ao tocar. Vivo ou Calmo vem de `data-movimento` na raiz (`m/movimento.ts`): o
+      perfil Calmo em uso ou o sistema pedindo menos movimento. Só a cara muda (fundo, cor do texto e sombras); o
+      formato, o tamanho, a seta e o afundar ao tocar seguem os do mockup. Sem `--m-ambar` na noite: o valor de
+      reserva é o mesmo âmbar do dia. */
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao {
+  background: radial-gradient(
+    130% 170% at 50% 0%,
+    #fff7da 0%,
+    #ffd96e 34%,
+    var(--m-ponto) 68%,
+    #f2b228 100%
+  );
+  color: #3a2700;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(211, 146, 0, 0.55),
+    0 0 0 5px rgba(255, 197, 61, 0.14),
+    0 10px 26px -12px rgba(255, 190, 50, 0.8);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:hover,
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(211, 146, 0, 0.7),
+    0 0 0 6px rgba(255, 197, 61, 0.2),
+    0 0 26px rgba(255, 197, 61, 0.55);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgba(211, 146, 0, 0.55);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao {
+  background: transparent;
+  color: var(--m-texto);
+  box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao:hover,
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ambar, #d39200),
+    0 0 0 5px rgba(255, 197, 61, 0.18),
+    0 0 24px rgba(255, 197, 61, 0.35);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
 }

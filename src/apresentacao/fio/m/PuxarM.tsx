@@ -6,15 +6,23 @@ import { animar, aCadaQuadro, cancelarAnimacoes, modoAgora, MOLA, TROCAR, useSin
  * ponto para baixo estica o fio; solto antes do limite, ele volta balançando; passando dele, ou num toque,
  * ou com Enter e Espaço, o fio é puxado de vez e `aoPuxar` leva ao passo. O desenho e a física são os do
  * mockup, linha por linha (montarFio, desenharFio, puxar).
+ *
+ * O ponto repousa a 55% da altura da área (no máximo 230 px), e a área é o que sobra entre a marca e o cartão
+ * "Na ponta do fio". No mockup o cartão já nasce cheio; no app ele chega com a leitura, e medir antes disso deixa o
+ * ponto mais baixo do que o desenho (a área ainda é mais alta). Por isso `pronta` segura o ponto e a dica até o
+ * cartão ter o tamanho de verdade, e a área é medida de novo se mudar de tamanho depois.
  */
 export function PuxarM({
   titulo,
   apoio,
   aoPuxar,
+  pronta = true,
 }: {
   titulo: string;
   apoio: string;
   aoPuxar: () => void;
+  /** O resto da tela já tem o tamanho que terá: só então o ponto é posto e cai do alto. */
+  pronta?: boolean;
 }) {
   const area = useRef<HTMLDivElement>(null);
   const puxador = useRef<HTMLButtonElement>(null);
@@ -24,6 +32,7 @@ export function PuxarM({
   const sinal = useSinal();
   // `base` é onde o ponto repousa; `fioY` é onde ele está agora (a base mais o arrasto).
   const geo = useRef({ base: 0, fioY: 0, puxando: false });
+  const arrasto = useRef<{ y0: number; movido: boolean } | null>(null);
   const aoPuxarRef = useRef(aoPuxar);
   useEffect(() => {
     aoPuxarRef.current = aoPuxar;
@@ -69,6 +78,15 @@ export function PuxarM({
   );
 
   useLayoutEffect(() => {
+    const p = puxador.current;
+    const d = dica.current;
+    if (!pronta) {
+      if (p) p.style.visibility = 'hidden';
+      if (d) d.style.visibility = 'hidden';
+      return;
+    }
+    if (p) p.style.visibility = '';
+    if (d) d.style.visibility = '';
     montar(true);
     const aoRedimensionar = () => {
       montar(false);
@@ -77,7 +95,26 @@ export function PuxarM({
     return () => {
       window.removeEventListener('resize', aoRedimensionar);
     };
-  }, [montar]);
+  }, [montar, pronta]);
+
+  // A área também muda sem a janela mudar (o cartão de baixo ganha uma linha): o ponto acompanha, menos no meio
+  // de um puxão.
+  useEffect(() => {
+    const a = area.current;
+    if (!a || !pronta || typeof ResizeObserver === 'undefined') return;
+    const medir = () => `${String(a.clientWidth)}x${String(a.clientHeight)}`;
+    let medida = medir();
+    const olho = new ResizeObserver(() => {
+      const agora = medir();
+      if (agora === medida) return;
+      medida = agora;
+      if (!geo.current.puxando && !arrasto.current) montar(false);
+    });
+    olho.observe(a);
+    return () => {
+      olho.disconnect();
+    };
+  }, [montar, pronta]);
 
   async function puxar() {
     const p = puxador.current;
@@ -110,8 +147,6 @@ export function PuxarM({
   }
 
   // O arrasto: o ponto segue o dedo até 140 px; o fio acompanha.
-  const arrasto = useRef<{ y0: number; movido: boolean } | null>(null);
-
   function soltar() {
     const a = arrasto.current;
     if (!a) return;

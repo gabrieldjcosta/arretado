@@ -74,6 +74,12 @@ describe('a troca de seletores e de corpo', () => {
     );
   });
 
+  it('o .leve da página do protótipo (aparelho fraco) vira classe da raiz do Fio', () => {
+    expect(trocarSeletor('.leve .brilho')).toBe('.m-fio.m-leve .m-brilho');
+    expect(trocarSeletor('.leve')).toBe('.m-fio.m-leve');
+    expect(trocarSeletor('.levemente')).toBe('.m-fio .m-levemente');
+  });
+
   it('não mexe no que está entre colchetes', () => {
     expect(trocarSeletor('[data-tela="ler"]')).toBe('.m-fio [data-tela="ler"]');
   });
