@@ -1,0 +1,39 @@
+/* O Fio, passos Lembrar, Guardar e porteira (fatia 2). Reaproveita as classes do Ache o erro
+   (estilos-ache-o-erro.css, importado pelos componentes: a folha, a troca riscada e as respostas);
+   só o que é do Fio mora neste arquivo. Só tokens. */
+
+.fio-passo {
+  text-align: left;
+}
+
+.fio-titulo {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+/* A tarja da lacuna: um espaço de largura aproximada ao trecho escondido, sublinhado. */
+.fio-tarja {
+  display: inline-block;
+  min-width: 3rem;
+  border-bottom: 2px solid currentColor;
+  white-space: pre;
+  vertical-align: baseline;
+}
+
+.fio-lista {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.fio-guardar,
+.fio-guardada {
+  margin: 0.75rem 0 0;
+}
+
+.fio-guardada {
+  font-size: 0.9375rem;
+  color: var(--texto-atenuado);
+}
