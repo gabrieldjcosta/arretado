@@ -3,9 +3,16 @@
 // nem tela. A camada de tela (fatia 3) junta o que o app sabe numa `EntradaDoFio` e guarda o
 // `EstadoDoFio` no aparelho, sem esquema (entidade sincronizada só se o Gabriel pedir, F4-B).
 
-/** Os sete tipos de passo. */
+/** Os oito tipos de passo. */
 export type TipoDePasso =
-  'ler' | 'lembrar' | 'guardar' | 'revisar' | 'fixar_sumula' | 'praticar' | 'seu_passo';
+  | 'ler'
+  | 'lembrar'
+  | 'guardar'
+  | 'revisar'
+  | 'fixar_sumula'
+  | 'praticar'
+  | 'ache_a_diferenca'
+  | 'seu_passo';
 
 /** Um artigo (Dispositivo de topo) visto pelo gerador. */
 export interface ArtigoDoFio {
@@ -21,12 +28,20 @@ export interface ArtigoDoFio {
   posicaoNoMapa?: number;
 }
 
+/** Dois artigos parecidos, que a banca cobra e confunde (furto e roubo): o par do "Ache a diferença". */
+export interface ParDoFio {
+  a: ArtigoNoPasso;
+  b: ArtigoNoPasso;
+}
+
 export interface NormaDoFio {
   id: string;
   /** "LEP", "CP", "Constituição". */
   tituloCurto: string;
   /** Na ordem do código. */
   artigos: readonly ArtigoDoFio[];
+  /** Pares de artigos parecidos, dos que mais caem (`sugerirPares`). Ausente: a norma não tem par. */
+  pares?: readonly ParDoFio[];
 }
 
 export interface SumulaDoFio {
@@ -114,6 +129,15 @@ export type Passo =
       quantidade: number;
       porque: PorQuePraticar;
     }
+  /** Dois artigos já lidos, lado a lado: tocar nas palavras que os separam. Não conta como Ler nem pede Lembrar. */
+  | {
+      tipo: 'ache_a_diferenca';
+      materiaId: string;
+      normaId: string;
+      tituloCurto: string;
+      a: ArtigoNoPasso;
+      b: ArtigoNoPasso;
+    }
   | { tipo: 'seu_passo'; materiaId: string; tarefaId: string; titulo: string };
 
 /** O que a pessoa fez no passo, contado pela tela. */
@@ -133,6 +157,8 @@ export type ResultadoDoPasso =
   | { tipo: 'revisar'; revisados: number; voltamAmanha: number }
   | { tipo: 'fixar_sumula' }
   | { tipo: 'praticar'; acertos: number; total: number }
+  /** `achadas`: as diferenças que a pessoa tocou; `total`: as que o par tem (a tela mostra as outras). */
+  | { tipo: 'ache_a_diferenca'; achadas: number; total: number }
   | { tipo: 'seu_passo'; questoes?: number };
 
 /** Como o passo fechou. "ja_feito": a leitura fora do Fio já cobria o passo. */

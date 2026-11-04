@@ -19,6 +19,7 @@ export const desfazivel = (resultado: ResultadoDoPasso): boolean => {
   switch (resultado.tipo) {
     case 'ler':
     case 'praticar':
+    case 'ache_a_diferenca':
     case 'revisar':
       return true;
     case 'lembrar':

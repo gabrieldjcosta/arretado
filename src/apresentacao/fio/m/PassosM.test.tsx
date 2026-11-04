@@ -10,6 +10,7 @@ import { criarTarefa } from '../../../dominios/tarefas';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { lerCausas } from '../dados/causas';
+import { AcheADiferencaM } from './AcheADiferencaM';
 import { ToastM } from './ToastM';
 import { LembrarM } from './LembrarM';
 import { GuardarM, PraticarM, RevisarM, SeuPassoM } from './OutrosPassosM';
@@ -393,5 +394,75 @@ describe('RevisarM e SeuPassoM', () => {
     });
     const feita = await repo.colecao('tarefasDeEstudo').obter(tarefa.id);
     expect(feita?.estado).toBe('feita');
+  });
+});
+
+describe('AcheADiferencaM', () => {
+  const passo = (normaId: string): Extract<Passo, { tipo: 'ache_a_diferenca' }> => ({
+    tipo: 'ache_a_diferenca',
+    materiaId: 'm',
+    normaId,
+    tituloCurto: 'Lei',
+    a: { endereco: 'art1', rotulo: 'Art. 1' },
+    b: { endereco: 'art3', rotulo: 'Art. 3' },
+  });
+
+  it('põe os dois artigos lado a lado; tocar em palavra igual não custa nada e só as diferentes se grifam', async () => {
+    const { repo, normaId } = await montar();
+    const usuario = userEvent.setup();
+    const p = props(passo(normaId));
+    const { container } = com(repo, <AcheADiferencaM {...p} />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Os dois se parecem. O que muda?' }),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-lado]')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: 'Seguir' })).not.toBeInTheDocument();
+
+    // "será" está nos dois artigos: tocar nele só o apaga um pouco, sem punição.
+    await usuario.click(screen.getAllByText('será')[0] as HTMLElement);
+    expect(screen.getAllByText('será')[0]).toHaveClass('m-tentou');
+    expect(
+      await screen.findByText('Essa está igual nos dois. Procure de novo.'),
+    ).toBeInTheDocument();
+
+    const diferentes = Array.from(container.querySelectorAll<HTMLElement>('.m-diverge'));
+    expect(diferentes.length).toBeGreaterThan(1);
+    for (const d of diferentes) await usuario.click(d);
+    expect(container.querySelectorAll('.m-achada')).toHaveLength(diferentes.length);
+    await usuario.click(await screen.findByRole('button', { name: 'Seguir' }));
+    await waitFor(() => {
+      expect(p.aoConcluir).toHaveBeenCalledWith({
+        tipo: 'ache_a_diferenca',
+        achadas: diferentes.length,
+        total: diferentes.length,
+      });
+    });
+  });
+
+  it('"Mostrar a diferença" grifa o que faltou e deixa seguir, sem contar como achado', async () => {
+    const { repo, normaId } = await montar();
+    const usuario = userEvent.setup();
+    const p = props(passo(normaId));
+    const { container } = com(repo, <AcheADiferencaM {...p} />);
+
+    await usuario.click(await screen.findByRole('button', { name: 'Mostrar a diferença' }));
+    expect(container.querySelectorAll('.m-mostrada').length).toBeGreaterThan(0);
+    expect(screen.getByText('A diferença está grifada.')).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
+    await waitFor(() => {
+      expect(p.aoConcluir).toHaveBeenCalledWith(
+        expect.objectContaining({ tipo: 'ache_a_diferenca', achadas: 0 }),
+      );
+    });
+  });
+
+  it('artigo que sumiu da norma: diz isso e deixa seguir', async () => {
+    const { repo, normaId } = await montar();
+    const p = props({ ...passo(normaId), b: { endereco: 'art99', rotulo: 'Art. 99' } });
+    com(repo, <AcheADiferencaM {...p} />);
+    expect(
+      await screen.findByText('Não deu para pôr estes dois artigos lado a lado.'),
+    ).toBeInTheDocument();
   });
 });

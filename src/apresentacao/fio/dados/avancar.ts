@@ -23,6 +23,7 @@ export const PASSOS_COM_TELA: ReadonlySet<TipoDePasso> = new Set<TipoDePasso>([
   'guardar',
   'revisar',
   'praticar',
+  'ache_a_diferenca',
   'seu_passo',
 ]);
 
