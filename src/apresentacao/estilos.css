@@ -2479,6 +2479,91 @@ dialog.dialogo-busca {
   margin-top: 0.75rem;
 }
 
+.barra-de-normas .busca-com-painel {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Últimas buscas: o painel sobe quando o campo ganha foco (:focus-within, sem JS para abrir). Entra em 200 ms,
+   8 px de subida; sem movimento (reduzido), só aparece. Ref.: shaggy-cheetah-22, do uiverse (adaptado). */
+.busca-painel {
+  position: absolute;
+  inset: calc(100% + 0.25rem) 0 auto 0;
+  z-index: 5;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.45);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out,
+    visibility 0s linear 0.2s;
+}
+
+.busca-com-painel:focus-within .busca-painel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busca-painel {
+    transform: none;
+    transition: none;
+  }
+}
+
+.busca-painel-titulo {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+}
+
+.busca-painel ul {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.busca-painel button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.busca-painel button:hover,
+.busca-painel button:focus-visible {
+  background: var(--superficie-2);
+}
+
+.busca-painel-limpar {
+  color: var(--texto-atenuado);
+  font-size: 0.875rem;
+}
+
 .barra-de-normas .busca-campo {
   flex: 1 1 auto;
   min-width: 0;
