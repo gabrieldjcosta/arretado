@@ -434,10 +434,17 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
   it('os folhetos que ainda não têm folheto novo abrem a tela de antes', async () => {
     const { usuario } = await abrir({ rota: '#/varal' });
-    await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
+    await usuario.click(await screen.findByText('Cartões', { selector: 'strong' }));
     await waitFor(() => {
-      expect(window.location.hash).toBe('#/recall/frases');
+      expect(window.location.hash).toBe('#/recall/cartoes');
     });
+  });
+
+  it('o folheto das Frases abre o Caderno em folha, sem sair do Varal', async () => {
+    const { usuario } = await abrir({ rota: '#/varal' });
+    await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
+    expect(await screen.findByRole('dialog', { name: 'Suas Frases certas' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/varal');
   });
 
   it('a Conta liga e desliga a prévia', async () => {

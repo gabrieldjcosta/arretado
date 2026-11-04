@@ -2,6 +2,7 @@ import { aderirAoItem } from '../../../dominios/acervo/adesao';
 import type { ItemDoAcervo } from '../../../dominios/acervo/esquemas';
 import { FonteEmMemoria } from '../../../dominios/acervo/fonte-em-memoria';
 import { repositorioDeTeste } from '../../../testes/repositorio';
+import { registrarErro } from '../../../dominios/recall/servico';
 import { acharNoVaral } from './varal-busca';
 
 const no = (endereco: string, rotulo: string, tipo: 'artigo' | 'sumula') => ({
@@ -56,6 +57,7 @@ describe('a busca única do Varal', () => {
     expect(achados[0]).toMatchObject({
       nome: 'LEP, art. 112',
       detalhe: 'abre no Leitor',
+      tipo: 'rota',
       para: `/biblioteca/normas/${ids['lep'] ?? ''}?ir=art112`,
     });
   });
@@ -63,7 +65,10 @@ describe('a busca única do Varal', () => {
   it('entende "art. 121 do Código Penal", "LEP art 112" e a ordem trocada', async () => {
     const { repo, ids } = await cenario();
     const a = await acharNoVaral(repo, 'art. 121 do código penal', nenhum);
-    expect(a[0]?.para).toBe(`/biblioteca/normas/${ids['codigo-penal'] ?? ''}?ir=art121`);
+    expect(a[0]).toMatchObject({
+      tipo: 'rota',
+      para: `/biblioteca/normas/${ids['codigo-penal'] ?? ''}?ir=art121`,
+    });
     const b = await acharNoVaral(repo, 'LEP art 112', nenhum);
     expect(b[0]?.nome).toBe('LEP, art. 112');
     const c = await acharNoVaral(repo, 'art. 112 da LEP', nenhum);
@@ -97,6 +102,39 @@ describe('a busca única do Varal', () => {
     expect((await acharNoVaral(repo, 'sumulas', nenhum)).map((a) => a.nome)).toEqual([
       'Súmulas STF',
     ]);
+  });
+
+  it('uma palavra da Frase achá-la: o achado abre o Caderno nela, com o texto numa linha só', async () => {
+    const { repo } = await cenario();
+    const erro = await registrarErro(repo, {
+      fraseCorreta: 'Reincidente em crime sem violência progride com 20% da pena.',
+    });
+    const frase = await repo.colecao('frases').todosDoUsuario();
+    const achados = await acharNoVaral(repo, 'REINCIDENTE progride', nenhum);
+    expect(achados).toEqual([
+      {
+        chave: `frase:${frase[0]?.id ?? ''}`,
+        nome: 'Reincidente em crime sem violência progride com 20% da pena.',
+        detalhe: 'Frase',
+        tipo: 'frase',
+        fraseId: frase[0]?.id,
+      },
+    ]);
+    expect(erro.id).toBeTruthy();
+    // Todas as palavras têm de estar na Frase.
+    expect(await acharNoVaral(repo, 'reincidente homicidio', nenhum)).toEqual([]);
+  });
+
+  it('as Frases vêm depois das normas e o nome da longa é cortado', async () => {
+    const { repo } = await cenario();
+    await registrarErro(repo, {
+      fraseCorreta: `A LEP trata da execução ${'penal '.repeat(30)}no Brasil.`,
+    });
+    const achados = await acharNoVaral(repo, 'lep', nenhum);
+    expect(achados.map((a) => a.tipo)).toEqual(['rota', 'frase']);
+    const frase = achados[1];
+    expect(frase?.nome.length).toBeLessThanOrEqual(80);
+    expect(frase?.nome.endsWith('…')).toBe(true);
   });
 
   it('não acha o que a pessoa tirou do varal, e o texto curto demais não busca', async () => {

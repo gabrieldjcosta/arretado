@@ -772,3 +772,15 @@
   flex-wrap: wrap;
   row-gap: 4px;
 }
+
+/* 41. O Caderno de Frases: o pé. Motivo: o pé do Caderno (`.m-fim-folha`, que no mockup divide a linha entre dois botões) leva
+      "Mostrar mais" (quando há mais Frases) e "Abrir a lista completa", que o mockup não tem. Em 360 px de largura os dois lado a
+      lado partem o texto de "Abrir a lista completa" em duas linhas. Cada botão fica na largura do texto e eles quebram de linha
+      se não couberem juntos (cada um ocupa a linha inteira); onde cabem, dividem a linha como no mockup. */
+.m-fio .m-fim-folha.m-fim-do-caderno {
+  flex-wrap: wrap;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-acao {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}

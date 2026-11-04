@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { OUTROS } from '../../../dominios/acervo/vinculos';
 import { useRepositorio } from '../../dados/contexto';
+import { CONTORNO } from './contorno';
 import { FolhaM } from './FolhaM';
 import {
   mudarOrganizacao,
@@ -13,14 +14,6 @@ import {
   VISTAS,
 } from './organizar';
 import type { LinhaDoFolheto } from './varal-lista';
-
-/** O botão de "Escolher vários" é de contorno, não o de ação cheio (o `style` do mockup, com os tokens do app). */
-const CONTORNO = {
-  background: 'none',
-  color: 'var(--m-texto)',
-  boxShadow: '0 0 0 1px var(--m-borda)',
-  justifyContent: 'center',
-} as const;
 
 /** Organizar: a ordem, o que fica à vista em cada linha, o agrupamento e "Escolher vários" (a `folha-organizar` do mockup). */
 export function OrganizarM({
