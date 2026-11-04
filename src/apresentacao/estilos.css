@@ -2497,7 +2497,7 @@ dialog.dialogo-busca {
   border: 1px solid var(--borda);
   border-radius: var(--raio);
   background: var(--superficie);
-  box-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.45);
+  box-shadow: 0 3px 0 var(--penumbra);
   visibility: hidden;
   opacity: 0;
   transform: translateY(-8px);
