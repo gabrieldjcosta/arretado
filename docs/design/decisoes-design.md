@@ -438,3 +438,28 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Custo.** Mais sublinhados na tela de quem nunca mexeu: de 3% (LEP) a 12% (CP) dos caracteres e de 25% a 58% das linhas (medido em 06/10/2026, `docs/planos/F2.md` › "Fatos do destaque"). O cálculo é só do que está desenhado (menos de 80 linhas), uma vez por texto; a norma inteira leva de 0,03 a 0,25 s no corpus e `desempenho.test.ts` guarda o teto. Nenhum JavaScript a mais (496 e 328 kB gzip). Quem se cansar desliga com um toque em "Destaques" ou escolhe o perfil Calmo.
 
 **Em aberto.** A resposta do Gabriel ao cartão. A leitura do CP com 58% das linhas acesas por uns 10 minutos é dele: se cansar, voltar o padrão a desligado é trocar uma constante.
+
+## D-D18 — O Passeio põe as seis ferramentas em evidência (03/11/2026, pedido do Gabriel)
+
+> **Emenda à D-D10 (textos do Passeio).** Os quatro passos seguem um por menu; em cada um, as ferramentas que o Gabriel quer em destaque abrem a lista, em negrito. Os textos continuam vindo de uma fonte só (`passos.ts`).
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "no passeio, as ferramentas mais úteis e inovadoras devem ser destacadas", com seis frases (grifos automáticos pra você não cair nas pegadinhas da sua banca; as leis que você precisa estudar, atualizadas e mapeadas; link entre leis e súmulas para facilitar o entendimento; transforme rapidamente um artigo em um cartão pra revisão; aqui seus erros viram acertos e cards; ciclos de estudo facilitados). **Ainda sem resposta do Gabriel sobre o texto:** o PR fica em rascunho, e as frases abaixo são as dele, ajustadas como se explica adiante.
+
+**O que muda.**
+1. `Passo.ferramentas` (`passos.ts`): cada passo ganha as ferramentas do seu menu, antes das linhas simples. Hoje: "Aqui seus erros viram acertos e Cartões." e "No botão +, traga a Frase correta pra revisar e lembrar depois." Trilha: "Ciclos de estudo facilitados." e "Você define os seus aqui na Trilha." Fixar: "Transforme rapidamente um artigo em cartão." Biblioteca: "Destaques automáticos contra as pegadinhas.", "As leis que você estuda, atualizadas e mapeadas." e "Link entre leis e súmulas pra entender melhor."
+2. A lista do passo desenha as ferramentas com a frase em negrito na cor do texto (`.passo-ferramenta strong`, peso 700) e o apoio, quando há, no tom atenuado; as linhas simples seguem como estavam.
+3. Saem "Termos-chave de cada lei já destacados pra você." (o Destaque vem ligado, D-D17) e "O Mapa da norma mostra o que mais cai e te guia pela leitura." (o Mapa entra em "mapeadas"). Da frase do Hoje saem "você monta seu caderno de erros" e "Errou?", que a frase em negrito já diz.
+
+**O que mudei nas frases dele, e por quê** (ele aprova ou volta atrás no cartão):
+- "grifos automáticos" vira "Destaques automáticos": no app, grifo é a marca que a pessoa faz, e o botão se chama Destaques.
+- "da sua banca" saiu: o Destaque não olha a banca (o Perfil da Banca é backlog); o teste do Passeio proíbe "banca" e "grifo".
+- "cards" vira "Cartões", o nome no app (vocabulário obrigatório).
+- Encurtei para a folha não rolar: "as leis que você precisa estudar" vira "as leis que você estuda"; "para facilitar o entendimento", "pra entender melhor"; "um artigo em um cartão pra revisão", "um artigo em cartão"; "pra você não cair nas pegadinhas", "contra as pegadinhas". A folha tem altura fixa (46 rem, pinada no teste de CSS) e cada linha a mais custa de 22 a 28 px.
+
+**O que continua como está.** Um passo por menu, "Passo N de 4", nenhum atalho para outra tela; o ícone desenhado pela caneta; o Zé; a altura da folha e as quatro consultas de contêiner; a linha "Os quatro menus, um por vez" da Conta.
+
+**Verdade dos textos.** "Link entre leis e súmulas": os vínculos precedente–dispositivo vêm da curadoria do acervo e aparecem nas Ações do artigo quando existem. "Atualizadas": a data da coleta aparece na norma e o aviso "A lei mudou" cobre o que a pessoa guardou. "Artigo em cartão": de 2 a 3 toques, sem digitar, nas Ações do Leitor (lido no código; não cronometrado num aparelho).
+
+**Custo.** Nenhum JavaScript novo (496 e 328 kB) e uma regra de CSS. Medido: nenhum passo rola a 390 × 844; a 1280 × 800 o Fixar passa 1 px da área; a 320 × 568 o Fixar e a Biblioteca passam 3 e 9 px, sem cortar o cartão.
+
+**Em aberto.** A resposta do Gabriel ao cartão do texto. Depende da D-D17: se ele escolher que os Destaques abrem desligados, a primeira linha da Biblioteca vira uma frase como "Destaques automáticos: toque em Destaques pra ligar."

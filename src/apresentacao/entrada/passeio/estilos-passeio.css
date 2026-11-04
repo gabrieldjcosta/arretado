@@ -388,6 +388,13 @@ html[data-perfil='calmo'] .passo-icone .passo-neon {
   transform: translateY(-0.1em);
 }
 
+/* As ferramentas em evidência (D-D18): a frase em negrito na cor do texto, e a linha de apoio logo depois,
+   no tom das outras linhas. */
+.passo-ferramenta strong {
+  color: var(--texto);
+  font-weight: 700;
+}
+
 .passo-pontos {
   display: flex;
   gap: 0.6em;
