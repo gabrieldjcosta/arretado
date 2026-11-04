@@ -114,6 +114,21 @@
   }
 }
 
+/* No perfil Calmo o fio não encolhe, só esmaece. */
+:root[data-perfil='calmo'] .fio-agora[data-fim='dia'] .fio-puxar {
+  animation-name: fio-esmaece;
+}
+
+@keyframes fio-esmaece {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.45;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fio-agora[data-fim='dia'] .fio-puxar {
     animation: none;

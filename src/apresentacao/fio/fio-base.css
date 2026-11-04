@@ -54,8 +54,8 @@
   --f-trocar: cubic-bezier(0.45, 0, 0.25, 1);
   --f-nav-altura: 4.75rem;
 
-  background: var(--f-grao), var(--f-aurora), var(--f-ceu);
-  background-attachment: fixed, scroll, scroll;
+  background: var(--f-aurora), var(--f-ceu);
+  isolation: isolate;
   color: var(--texto);
   --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
 }
@@ -220,11 +220,19 @@
 /* A florzinha de quem voltou depois de uns dias: brota no topo do cacto com a mola do app; no Calmo só
    aparece, em movimento reduzido já está lá. */
 .fio-cacto .fio-cacto-flor {
-  fill: var(--f-flor);
-  stroke: none;
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: fio-flor 0.7s var(--f-mola) 0.5s backwards;
+  animation: fio-flor 0.55s var(--f-mola) 0.4s backwards;
+}
+
+.fio-cacto .fio-cacto-petala {
+  fill: var(--f-flor);
+  stroke: none;
+}
+
+.fio-cacto .fio-cacto-miolo {
+  fill: var(--f-ponto);
+  stroke: none;
 }
 
 :root[data-perfil='calmo'] .fio-cacto .fio-cacto-flor {
@@ -647,23 +655,23 @@
   box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
 }
 
-/* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): o brilho de baixo e o céu de cima esquentam de leve. */
+/* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): só o brilho de baixo esquenta; o céu de cima fica. */
 .shell-fio[data-luz='manha'] {
   --f-aurora:
     radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 12%) 0%, transparent 62%),
-    radial-gradient(120% 50% at 50% -8%, #dcebf7 0%, transparent 70%);
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
 }
 
 .shell-fio[data-luz='tarde'] {
   --f-aurora:
-    radial-gradient(120% 44% at 50% 108%, rgb(255 190 80 / 24%) 0%, transparent 64%),
-    radial-gradient(120% 50% at 50% -8%, #e6e6f4 0%, transparent 70%);
+    radial-gradient(120% 44% at 50% 108%, rgb(255 197 61 / 24%) 0%, transparent 64%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
 }
 
 .shell-fio[data-luz='entardecer'] {
   --f-aurora:
-    radial-gradient(120% 48% at 50% 108%, rgb(255 160 90 / 30%) 0%, transparent 66%),
-    radial-gradient(120% 50% at 50% -8%, #e4def0 0%, transparent 70%);
+    radial-gradient(120% 48% at 50% 108%, rgb(255 170 80 / 30%) 0%, transparent 66%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
 }
 
 /* Leitura funda (Leitor): rolando a lei para baixo a pílula se recolhe; subindo, volta. Só opacidade e
@@ -688,4 +696,14 @@
 :root[data-perfil='calmo'] .shell-fio .fio-nav,
 :root[data-perfil='calmo'][data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
   transform: translateX(-50%);
+}
+
+/* Grão e estrelas: uma camada fixa e parada, atrás do conteúdo e à frente do céu. */
+.shell-fio::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--f-grao);
 }

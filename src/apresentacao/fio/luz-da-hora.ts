@@ -12,18 +12,16 @@ export function luzDaHora(agora: Date): LuzDaHora {
   return 'entardecer';
 }
 
-/** Reavalia a cada 15 min; a troca é suave no CSS (e nenhuma em movimento reduzido). */
+/** Decide ao abrir e ao voltar à aba (nunca no meio da leitura: a troca de variável CSS não transiciona). */
 export function useLuzDaHora(): LuzDaHora {
   const [luz, setLuz] = useState<LuzDaHora>(() => luzDaHora(new Date()));
   useEffect(() => {
-    const id = window.setInterval(
-      () => {
-        setLuz(luzDaHora(new Date()));
-      },
-      15 * 60 * 1000,
-    );
+    const aoVoltar = () => {
+      if (document.visibilityState === 'visible') setLuz(luzDaHora(new Date()));
+    };
+    document.addEventListener('visibilitychange', aoVoltar);
     return () => {
-      window.clearInterval(id);
+      document.removeEventListener('visibilitychange', aoVoltar);
     };
   }, []);
   return luz;
