@@ -13,6 +13,7 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
+import { frenteDaRevisao, lacunaCresceu } from '../../dominios/recall/lacuna-progressiva';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
@@ -320,7 +321,10 @@ export function Drill() {
       />
       <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
         <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
-          <p className="drill-frente texto-leitura">{atual.frente}</p>
+          <p className="drill-frente texto-leitura">{frenteDaRevisao(atual)}</p>
+          {!estado.virado && lacunaCresceu(atual) && (
+            <p className="dica">A lacuna cresce a cada acerto.</p>
+          )}
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
               {palpite.trim() && (
