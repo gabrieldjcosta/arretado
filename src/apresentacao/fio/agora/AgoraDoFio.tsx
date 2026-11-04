@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { LinkDoFio } from '../LinkDoFio';
 import { Esqueleto } from '../../componentes/estados';
 import { descreverPasso } from '../dados/descrever';
-import { limparPausa, veioDeUmaPausa } from '../dados/pausa';
+import { limparPausa, tipoDaPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { FioQueSePuxa } from './FioQueSePuxa';
 import './fio-agora.css';
@@ -32,18 +32,22 @@ function SemMateria() {
 export function AgoraDoFio() {
   const fio = useFio();
   const { avanco } = fio;
-  // Vindo de uma pausa, o Agora diz uma vez que está tudo salvo e some sozinho.
-  const [pausou, setPausou] = useState(veioDeUmaPausa);
+  // Vindo de uma pausa, o Agora diz uma vez que está tudo salvo e some sozinho. Vindo do "descansar por
+  // hoje", fecha o dia em voz baixa: o fio se recolhe e vem uma frase gentil, por mais tempo.
+  const [pausa, setPausa] = useState(tipoDaPausa);
   useEffect(() => {
-    if (!pausou) return;
+    if (!pausa) return;
     limparPausa();
-    const id = window.setTimeout(() => {
-      setPausou(false);
-    }, 5000);
+    const id = window.setTimeout(
+      () => {
+        setPausa(undefined);
+      },
+      pausa === 'descanso' ? 12_000 : 5000,
+    );
     return () => {
       window.clearTimeout(id);
     };
-  }, [pausou]);
+  }, [pausa]);
 
   if (fio.falhou) {
     return (
@@ -68,12 +72,22 @@ export function AgoraDoFio() {
         };
 
   return (
-    <section className="fio-agora" aria-label="Agora">
+    <section
+      className="fio-agora"
+      aria-label="Agora"
+      data-fim={pausa === 'descanso' ? 'dia' : undefined}
+    >
       <h1 className="visualmente-oculto">Agora</h1>
-      {pausou && (
+      {pausa === 'passo' && (
         <p className="fio-aviso" role="status">
           Tudo salvo. O fio te espera aqui.
         </p>
+      )}
+      {pausa === 'descanso' && (
+        <div className="fio-aviso fio-fim-do-dia" role="status">
+          <p>É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.</p>
+          <p>Tudo salvo. O fio te espera aqui.</p>
+        </div>
       )}
       <FioQueSePuxa
         aoPuxar={fio.puxar}

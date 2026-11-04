@@ -110,7 +110,7 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
           aria-label="Descansar por hoje"
           onClick={() => {
             // A etapa conta e o Agora diz, uma vez, que está tudo salvo.
-            marcarPausa();
+            marcarPausa('descanso');
             fio.pousarEtapa();
           }}
         >

@@ -245,6 +245,10 @@ describe('o Arretado novo (prévia do Fio)', () => {
     await usuario.click(await screen.findByRole('button', { name: 'Descansar por hoje' }));
 
     expect(await screen.findByText('Tudo salvo. O fio te espera aqui.')).toBeInTheDocument();
+    // Descansar por hoje fecha o dia em voz baixa, com uma frase gentil.
+    expect(
+      screen.getByText('É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.'),
+    ).toBeInTheDocument();
     await screen.findByRole('group', { name: 'Na ponta do fio' });
     await usuario.click(screen.getByRole('link', { name: 'Destino' }));
     expect(await screen.findByText(/1 etapa pousada/)).toBeInTheDocument();
@@ -258,6 +262,8 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
     const aviso = await screen.findByText('Tudo salvo. O fio te espera aqui.');
     expect(aviso).toHaveAttribute('role', 'status');
+    // Pausar um passo não fecha o dia: sem a frase do descansar.
+    expect(screen.queryByText(/É caminhando que se faz o caminho/)).not.toBeInTheDocument();
     // O passo continua aberto: o fio convida a continuar, sem cobrar nada.
     expect(screen.getByRole('button', { name: /Puxe para continuar/ })).toBeInTheDocument();
     expect(screen.queryByText(/parou/i)).not.toBeInTheDocument();
