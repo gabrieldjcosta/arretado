@@ -4,7 +4,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useRepositorio } from '../../dados/contexto';
-import { animarEDeixar, modoAgora, SAIR } from './anima';
+import { animarEDeixar, animarEDeixarSo, modoAgora, SAIR } from './anima';
 import {
   carregarCaderno,
   carregarPrimeiras,
@@ -46,7 +46,7 @@ function TextoDaLei({ lei }: { lei: LeiDaFrase }) {
   );
 }
 
-/** "Ler na lei": o botão que abre o artigo de onde a Frase veio (o `lerJunto` do mockup; abre com 320 ms, só no Vivo). */
+/** "Ler na lei": o botão que abre o artigo de onde a Frase veio (o `lerJunto` do mockup; abre com 320 ms, só no Vivo; rola até ele se ficar fora da vista). */
 function LerNaLei({ lei, idDoTexto }: { lei: LeiDaFrase; idDoTexto: string }) {
   const [aberta, setAberta] = useState(false);
   const idDaLei = useId();
@@ -59,7 +59,11 @@ function LerNaLei({ lei, idDoTexto }: { lei: LeiDaFrase; idDoTexto: string }) {
       jaMontou.current = true;
       return;
     }
-    if (!aberta || modoAgora() !== 'normal') return;
+    if (!aberta) return;
+    const normal = modoAgora() === 'normal';
+    // A folha tem altura fixa (desvio 41): o artigo que abre embaixo da Frase pode cair fora da vista, e então a folha rola até ele.
+    caixa.current?.scrollIntoView({ block: 'nearest', behavior: normal ? 'smooth' : 'auto' });
+    if (!normal) return;
     void animarEDeixar(
       caixa.current,
       [
@@ -170,7 +174,8 @@ function ConteudoDoCaderno({
       if (jaEntraram.current.has(id)) return;
       jaEntraram.current.add(id);
       if (modoAgora() !== 'normal' || k >= ENTRADAS_ESCALONADAS) return;
-      void animarEDeixar(
+      // Solta só a descida: a Frase achada pela busca ganha o brilho no mesmo elemento, e ele não pode sumir com ela.
+      void animarEDeixarSo(
         el,
         [
           { opacity: 0, transform: 'translateY(12px)' },
@@ -194,7 +199,7 @@ function ConteudoDoCaderno({
       el.scrollIntoView({ block: 'center' });
       el.focus({ preventScroll: true });
       if (modoAgora() === 'reduzido') return;
-      void animarEDeixar(
+      void animarEDeixarSo(
         el,
         [
           { boxShadow: '0 0 0 0 rgba(255,197,61,0)' },
@@ -282,13 +287,15 @@ function ConteudoDoCaderno({
           )}
           <button
             type="button"
-            className="m-acao"
-            style={CONTORNO}
+            className="m-lista-completa"
             onClick={() => {
               ir('/recall/frases');
             }}
           >
             Abrir a lista completa
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
           </button>
         </div>
       )}
@@ -303,7 +310,7 @@ function ConteudoDoCaderno({
 export function CadernoM({ aoFechar, foco }: { aoFechar: () => void; foco?: string | undefined }) {
   const idDoTitulo = useId();
   return (
-    <FolhaM aberta aoFechar={aoFechar} idDoTitulo={idDoTitulo}>
+    <FolhaM aberta aoFechar={aoFechar} idDoTitulo={idDoTitulo} classeDoCorpo="m-caderno">
       {(fechar) => <ConteudoDoCaderno idDoTitulo={idDoTitulo} foco={foco} fechar={fechar} />}
     </FolhaM>
   );

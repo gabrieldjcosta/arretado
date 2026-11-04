@@ -149,6 +149,8 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     render(<Cena repo={repo} />);
     const caderno = await abrirCaderno();
     expect(caderno).toHaveAttribute('aria-modal', 'true');
+    // O corpo da folha leva a classe que lhe dá a altura fixa do mockup (a folha não cresce, o conteúdo rola dentro).
+    expect(caderno.querySelector('.m-corpo')).toHaveClass('m-caderno');
     expect(within(caderno).getByText('Varal · Frases')).toHaveClass('m-olho');
     expect(within(caderno).getByRole('heading', { level: 2 })).toHaveTextContent(
       'Suas Frases certas',
@@ -193,6 +195,7 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     const { repo, daLei } = await cenario();
     await daLei('Primário progride com 30 dias.');
     const usuario = userEvent.setup();
+    const rolar = vi.spyOn(Element.prototype, 'scrollIntoView');
     render(<Cena repo={repo} />);
     const caderno = await abrirCaderno();
     const botao = await within(caderno).findByRole('button', { name: 'Ler na lei' });
@@ -205,9 +208,15 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     const descricao = botao.getAttribute('aria-describedby') ?? '';
     expect(document.getElementById(descricao)).toHaveTextContent('Primário progride com 30 dias.');
 
+    expect(rolar).not.toHaveBeenCalled();
+
     await usuario.click(botao);
     expect(botao).toHaveAttribute('aria-expanded', 'true');
     expect(lei).not.toHaveAttribute('hidden');
+    // A folha tem altura fixa: o artigo que abre embaixo da Frase rola até a vista (sem suavidade, no padrão dos testes).
+    expect(rolar).toHaveBeenCalledTimes(1);
+    expect(rolar).toHaveBeenCalledWith({ block: 'nearest', behavior: 'auto' });
+    expect(rolar.mock.contexts[0]).toBe(lei);
     expect(within(lei as HTMLElement).getByText('LEP, art. 112.')).toHaveClass('m-art');
     const grifos = [...(lei as HTMLElement).querySelectorAll('.m-grifo')].map((g) => g.textContent);
     expect(grifos.join(' ')).toMatch(/30 dias/);
@@ -217,6 +226,8 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     await usuario.click(botao);
     expect(botao).toHaveAttribute('aria-expanded', 'false');
     expect(lei).toHaveAttribute('hidden');
+    // Fechar não rola.
+    expect(rolar).toHaveBeenCalledTimes(1);
   });
 
   it('sem Frase nenhuma, diz como elas nascem e leva a uma norma, depois de a folha descer', async () => {
@@ -408,12 +419,15 @@ describe('o movimento do Caderno no Vivo', () => {
     const { repo, daLei } = await cenario();
     await daLei('Primário progride com 30 dias.');
     const chamadas = animarDeMentira();
+    const rolar = vi.spyOn(Element.prototype, 'scrollIntoView');
     const usuario = userEvent.setup();
     render(<Cena repo={repo} />);
     const caderno = await abrirCaderno();
     const botao = await within(caderno).findByRole('button', { name: 'Ler na lei' });
     expect(chamadas().filter(([, opc]) => opc?.duration === 320)).toHaveLength(0);
     await usuario.click(botao);
+    // No Vivo a folha rola até o artigo com suavidade, junto com a descida dele.
+    expect(rolar).toHaveBeenCalledWith({ block: 'nearest', behavior: 'smooth' });
     const abrindo = chamadas().filter(([, opc]) => opc?.duration === 320);
     expect(abrindo).toHaveLength(1);
     expect(abrindo[0]?.[0]).toEqual([

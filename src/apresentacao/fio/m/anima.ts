@@ -77,6 +77,32 @@ export function animarEDeixar(
   });
 }
 
+/**
+ * Como `animarEDeixar`, mas solta só a animação que ele mesmo criou. O `animarEDeixar` cancela todas as do elemento (é o que o
+ * mockup faz, onde nada mais anima o mesmo elemento); no app, uma que corre junto some no meio: o brilho da Frase achada pela
+ * busca era cortado quando a descida dela acabava.
+ */
+export function animarEDeixarSo(
+  el: Element | null | undefined,
+  quadros: Keyframe[],
+  opc?: KeyframeAnimationOptions,
+): Promise<void> {
+  if (!el) return Promise.resolve();
+  if (modoAgora() === 'reduzido' || typeof el.animate !== 'function') {
+    aplicarQuadro(el, quadros[quadros.length - 1]);
+    return Promise.resolve();
+  }
+  const animacao = el.animate(quadros, { fill: 'both', ...opc });
+  return animacao.finished
+    .then(
+      () => undefined,
+      () => undefined,
+    )
+    .then(() => {
+      animacao.cancel();
+    });
+}
+
 /** Espera `ms`; resolve também se o sinal abortar (quem chama confere `sinal.aborted`). */
 export function espera(ms: number, sinal?: AbortSignal): Promise<void> {
   return new Promise((resolver) => {

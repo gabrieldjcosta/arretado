@@ -773,14 +773,51 @@
   row-gap: 4px;
 }
 
-/* 41. O Caderno de Frases: o pé. Motivo: o pé do Caderno (`.m-fim-folha`, que no mockup divide a linha entre dois botões) leva
-      "Mostrar mais" (quando há mais Frases) e "Abrir a lista completa", que o mockup não tem. Em 360 px de largura os dois lado a
-      lado partem o texto de "Abrir a lista completa" em duas linhas. Cada botão fica na largura do texto e eles quebram de linha
-      se não couberem juntos (cada um ocupa a linha inteira); onde cabem, dividem a linha como no mockup. */
+/* 41. O Caderno de Frases: a altura da folha e o pé. Motivo: (a) no mockup a folha tem a altura do que há nela (até 90% do quadro):
+      sobe com as duas Frases de exemplo (456 px em 390 px de largura, 436 px de 412 em diante) e cresce com o "Ler na lei" aberto.
+      Com as Frases da pessoa (até 50 por página) e o artigo inteiro da lei, ela passa a chegar sempre ao teto, e o topo cobre o
+      título do Varal, que fica cortado ao meio (a Marca, na revisão do #423). A folha do Caderno tem altura fixa, a do mockup
+      parado, o conteúdo rola dentro dela e ela nunca sobe a ponto de passar do título do Varal (que termina a 100 px do alto do
+      quadro; 12 px de folga). (b) o pé leva "Mostrar mais" (quando há mais Frases) e "Abrir a lista completa", que o mockup não
+      tem. "Abrir a lista completa" é caminho secundário: um link com seta, no estilo do "Ler na lei", à esquerda; "Mostrar mais"
+      fica como o botão de contorno do mockup, ao lado dele. Em 360 px os dois não cabem juntos e quebram de linha. (c) O "Ler na lei"
+      aberto rola até a vista (a folha não cresce mais para abrigá-lo), e deixa embaixo o respiro da Frase e da folha. (d) De dia o
+      âmbar do "Ler na lei" (`--m-neon`, #b25f00) tem 4,64:1 sobre o branco do cartão, mas só 4,36:1 sobre o fim do degradê da
+      folha (#f6f8fb), onde o link do pé fica (medido nos pixels; o mínimo é 4,5:1, WCAG 1.4.3): o link usa #a35700, 5,03:1. */
+.m-fio .m-folha .m-corpo.m-caderno {
+  height: min(456px, calc(100% - 112px));
+}
+.m-fio .m-frase-item .m-lei {
+  scroll-margin-bottom: 36px;
+}
 .m-fio .m-fim-folha.m-fim-do-caderno {
   flex-wrap: wrap;
+  row-gap: 4px;
 }
 .m-fio .m-fim-folha.m-fim-do-caderno .m-acao {
   flex: 1 1 auto;
   white-space: nowrap;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: var(--m-neon);
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 40px;
+  padding: 8px 2px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+}
+.m-fio.m-fio[data-mundo='dia'] .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  color: #a35700;
 }

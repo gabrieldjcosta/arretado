@@ -672,7 +672,11 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
   ] as const) {
     await page.setViewportSize({ width: w, height: h });
     await expect(itens.first()).toBeVisible();
-    await dentroDaLargura(page, '.m-folha .m-corpo, .m-frase-item, .m-fim-folha .m-acao', w);
+    await dentroDaLargura(
+      page,
+      '.m-folha .m-corpo, .m-frase-item, .m-fim-folha .m-lista-completa',
+      w,
+    );
     await semRolagemLateral(page);
     // O corpo da folha cabe na tela, embaixo.
     const corpo = await caderno.locator('.m-corpo').boundingBox();
@@ -688,6 +692,8 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
   await expect(ler).toHaveAttribute('aria-expanded', 'true');
   const lei = itens.nth(1).locator('.m-lei');
   await expect(lei).toBeVisible();
+  // A folha tem altura fixa: o artigo que abre embaixo da Frase rola até a vista, inteiro.
+  await expect(lei).toBeInViewport({ ratio: 1 });
   await expect(lei.locator('.m-art')).toContainText('LEP, ');
   expect(await lei.locator('.m-grifo').count()).toBeGreaterThan(0);
   for (const [w, h] of [
@@ -716,6 +722,72 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
   await caderno.getByRole('button', { name: 'Abrir a lista completa' }).click();
   await expect(page).toHaveURL(/#\/recall\/frases$/);
   await expect(page.getByRole('link', { name: FRASE_DO_ERRO, exact: true })).toBeVisible();
+});
+
+/** A altura da folha parada do mockup com as duas Frases dele, em 390 px de largura (`ajustes.css`, desvio 41). */
+const ALTURA_DA_FOLHA_DO_CADERNO = 456;
+/** Onde termina o título do Varal, medido do alto do quadro, mais a folga que a folha deixa. */
+const FOLGA_ATE_O_TITULO = 112;
+
+test('a folha do Caderno tem a altura do mockup, não cresce com o "Ler na lei", não corta o título do Varal e o conteúdo rola dentro dela', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const caderno = await abrirOCaderno(page);
+  const corpo = caderno.locator('.m-corpo');
+  const titulo = page.locator('.m-app h2', { hasText: /pendurado no fio/ });
+
+  // A mesma altura em qualquer tela, até onde o título do Varal deixa: o topo da folha nunca passa do título.
+  for (const [w, h] of [
+    [390, 844],
+    [360, 740],
+    [1280, 800],
+    [360, 520],
+  ] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    const quadro = await caderno.boundingBox();
+    const folha = await corpo.boundingBox();
+    const dele = await titulo.boundingBox();
+    if (!quadro || !folha || !dele) throw new Error('faltou uma caixa para medir');
+    const esperada = Math.min(ALTURA_DA_FOLHA_DO_CADERNO, quadro.height - FOLGA_ATE_O_TITULO);
+    expect(Math.abs(folha.height - esperada), `${String(w)}×${String(h)}`).toBeLessThan(1.5);
+    expect(
+      dele.y + dele.height,
+      `${String(w)}×${String(h)}: o título do Varal`,
+    ).toBeLessThanOrEqual(folha.y + 0.5);
+  }
+
+  // O conteúdo (a lista inteira e o pé) é maior que a folha e rola dentro dela.
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await corpo.evaluate((el) => el.scrollHeight > el.clientHeight + 1)).toBe(true);
+
+  // "Ler na lei" aberto não faz a folha crescer nem subir: o corpo fica onde estava e o artigo rola até a vista.
+  const antes = await corpo.boundingBox();
+  const ler = caderno.locator('.m-frase-item').nth(1).getByRole('button', { name: 'Ler na lei' });
+  await ler.click();
+  const lei = caderno.locator('.m-lei');
+  await expect(lei).toBeVisible();
+  await expect(lei).toBeInViewport({ ratio: 1 });
+  const depois = await corpo.boundingBox();
+  expect(depois?.height).toBeCloseTo(antes?.height ?? -1, 0);
+  expect(depois?.y).toBeCloseTo(antes?.y ?? -1, 0);
+  await ler.click();
+  await expect(lei).toBeHidden();
+
+  // O pé: "Abrir a lista completa" é um link com seta, pequeno e à esquerda, não um botão largo (o "Mostrar mais" só entra com mais de 50).
+  const lista = caderno.getByRole('button', { name: 'Abrir a lista completa' });
+  await lista.scrollIntoViewIfNeeded();
+  await expect(lista).toBeInViewport({ ratio: 1 });
+  const caixaDoLink = await lista.boundingBox();
+  const frase = await caderno.locator('.m-frase-item').first().boundingBox();
+  if (!caixaDoLink || !frase) throw new Error('faltou uma caixa para medir');
+  expect(caixaDoLink.height).toBeLessThanOrEqual(48);
+  expect(caixaDoLink.width).toBeLessThan(frase.width * 0.7);
+  expect(caixaDoLink.x - frase.x).toBeLessThan(24);
+  await semViolacoesNoFio(page);
 });
 
 test('a busca do Varal acha uma Frase e abre o Caderno nela: a folha sobe, a Frase fica no meio, focada', async ({
@@ -755,6 +827,45 @@ test('a busca do Varal acha uma Frase e abre o Caderno nela: a folha sobe, a Fra
   await page.keyboard.press('Enter');
   await expect(caderno).toBeVisible();
   await expect(caderno.locator('.m-frase-item', { hasText: FRASE_DO_ERRO })).toBeFocused();
+});
+
+test('o brilho da Frase achada pela busca passa inteiro (1400 ms), sem ser cortado quando a descida dela acaba', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await irAoVaral(page);
+  // Anota até onde o brilho (a animação de 1400 ms da Frase) chega: a descida da Frase (420 ms, com espera) acaba no meio dele,
+  // e quem soltasse `todas` as animações do elemento ao fim da descida cortaria o brilho antes do pico.
+  await page.evaluate(() => {
+    const w = window as unknown as { __brilho: number };
+    w.__brilho = 0;
+    const olhar = () => {
+      for (const a of document.getAnimations()) {
+        const alvo = a.effect instanceof KeyframeEffect ? a.effect.target : null;
+        if (
+          alvo instanceof Element &&
+          alvo.classList.contains('m-frase-item') &&
+          a.effect?.getTiming().duration === 1400
+        ) {
+          w.__brilho = Math.max(w.__brilho, Number(a.currentTime ?? 0));
+        }
+      }
+      requestAnimationFrame(olhar);
+    };
+    requestAnimationFrame(olhar);
+  });
+  await page.getByRole('searchbox', { name: 'Buscar no Varal' }).fill('livramento');
+  const achado = page
+    .getByRole('region', { name: 'O que o Varal achou' })
+    .getByRole('button', { name: new RegExp(FRASE_DO_ERRO.slice(0, 20)) });
+  await achado.click();
+  await expect(page.getByRole('dialog', { name: 'Suas Frases certas' })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __brilho: number }).__brilho), {
+      timeout: 6000,
+    })
+    .toBeGreaterThan(1300);
 });
 
 test('o Caderno de Frases se mexe como o mockup: a folha sobe em 460 ms, as Frases descem uma a uma em 420 ms e "Ler na lei" abre em 320 ms', async ({
