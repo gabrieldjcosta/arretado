@@ -2529,6 +2529,8 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
 
       const mais = screen.getByRole('button', { name: 'Mais' });
       expect(mais).toHaveAttribute('aria-expanded', 'false');
+      // O desenho é do app (`svg.icone-svg`): o E2E de segurança só deixa passar SVG com essa classe.
+      expect(mais.querySelector('svg.icone-svg')).not.toBeNull();
       await usuario.click(mais);
       expect(mais).toHaveAttribute('aria-expanded', 'true');
       const menu = screen.getByRole('group', { name: 'Mais ferramentas da leitura' });

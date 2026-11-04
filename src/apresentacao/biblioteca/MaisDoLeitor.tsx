@@ -64,7 +64,8 @@ export function MaisDoLeitor({
           setAberto((a) => !a);
         }}
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        {/* `icone-svg`: é ícone do app, não de conteúdo colado (o E2E de segurança só admite `svg.icone-svg`). */}
+        <svg className="icone-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="5" cy="12" r="1.9" />
           <circle cx="12" cy="12" r="1.9" />
           <circle cx="19" cy="12" r="1.9" />
