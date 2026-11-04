@@ -138,6 +138,17 @@ test('Ler e Lembrar com a LEP: cada cartão cabe, passa no axe, os grifos acende
 
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
   await expect(page.getByRole('heading', { level: 2, name: /Pode descansar\.$/ })).toBeVisible();
+  // O pouso abre em branco (ideia 8): a página para escrever, sem os fatos nem as pílulas, e o resumo só depois.
+  await expect(page.getByRole('textbox', { name: /O que você lembra desta etapa/ })).toBeVisible();
+  await expect(page.getByText(/^Leu /)).toHaveCount(0);
+  await expect(page.getByRole('group', { name: 'Pousos da vereda' })).toHaveCount(0);
+  await botaoAlcancavel(page, 'Mostrar o resumo');
+  await semRolagemLateral(page);
+  await semViolacoesNoFio(page);
+  await page
+    .getByRole('textbox', { name: /O que você lembra desta etapa/ })
+    .fill('a pena do art. 2');
+  await page.getByRole('button', { name: 'Mostrar o resumo' }).click();
   await expect(page.getByText(/^Leu /)).toBeVisible();
   await expect(page.getByText(/Lembrou /)).toBeVisible();
   if (!acertou) await expect(page.getByText(/guardou 1 Frase/)).toBeVisible();
@@ -697,5 +708,101 @@ for (const [largura, altura] of [
       .toBe(true);
     expect(await textoPorBaixoDoMais(page)).toEqual({ achados: [], comecaAbaixo: true });
     await semViolacoesNoFio(page);
+  });
+}
+
+/** Ler, Lembrar e seguir até o pouso de uma etapa com fatos. */
+async function ateOPousoComFatos(page: Page) {
+  await comALeiNaPrevia(page);
+  await puxador(page).focus();
+  await page.keyboard.press('Enter');
+  const ler = cartaoDa(page, 'ler');
+  await expect(ler).toBeVisible();
+  await ler.getByRole('button', { name: 'Pronto, li' }).click();
+  const lembrar = cartaoDa(page, 'lembrar');
+  await lembrar
+    .getByRole('group', { name: /Escolha o que a lei diz|Esta frase está como na lei\?/ })
+    .getByRole('button')
+    .first()
+    .click();
+  await lembrar.getByRole('button', { name: /^(Seguir|Guardar e seguir)$/ }).click();
+  await expect(page).toHaveURL(/#\/fio\/pouso$/);
+}
+
+/** O texto fica inteiro dentro do quadro (`.m-app`), que recorta o que passa da borda. */
+async function dentroDoQuadro(page: Page, alvo: Locator) {
+  const [quadro, caixa] = await Promise.all([
+    page.locator('.m-app').boundingBox(),
+    alvo.boundingBox(),
+  ]);
+  if (!quadro || !caixa) throw new Error('sem caixa');
+  expect(caixa.y + caixa.height).toBeLessThanOrEqual(quadro.y + quadro.height);
+}
+
+/** A razão de contraste (WCAG) entre duas cores `rgb(...)` ou `rgba(...)`; a segunda é o fundo, opaco. */
+const contraste = (a: string, b: string): number => {
+  const canais = (c: string) => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+  const luz = (c: string) => {
+    const [r = 0, g = 0, bl = 0] = canais(c).map((v) => {
+      const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [x, y] = [luz(a), luz(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+};
+
+for (const [largura, altura] of [
+  [360, 640],
+  [1280, 800],
+] as const) {
+  test(`o pouso em branco cabe em ${String(largura)}×${String(altura)}, de noite e de dia: o campo, os dois botões e o fio ficam à vista`, async ({
+    page,
+  }) => {
+    test.setTimeout(240_000);
+    await page.setViewportSize({ width: largura, height: altura });
+    await ateOPousoComFatos(page);
+    const campo = page.getByRole('textbox', { name: /O que você lembra desta etapa/ });
+    await expect(campo).toBeVisible();
+    for (const esquema of ['dark', 'light'] as const) {
+      await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+      // O céu encolhe enquanto o campo está aberto e o resto cabe sem rolar.
+      await botaoAlcancavel(page, 'Mostrar o resumo');
+      await botaoAlcancavel(page, 'Pular');
+      await botaoAlcancavel(page, /Puxar o fio: seguir/);
+      await expect(campo).toBeInViewport({ ratio: 1 });
+      // O quadro pode passar da janela: o que a pessoa toca tem de estar dentro dela, sem rolar.
+      for (const nome of ['Mostrar o resumo', 'Pular', /Puxar o fio: seguir/]) {
+        await expect(page.getByRole('button', { name: nome })).toBeInViewport({ ratio: 1 });
+      }
+      await expect(page.getByText('puxe para seguir')).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('puxe para seguir'));
+      await expect(page.getByText('descansar', { exact: true })).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('descansar', { exact: true }));
+      await semRolagemLateral(page);
+      await semViolacoesNoFio(page);
+      // O placeholder também se lê: 4,5:1 contra o fundo do campo.
+      const { cor, fundo } = await campo.evaluate((el) => {
+        const estilo = getComputedStyle(el);
+        return { cor: getComputedStyle(el, '::placeholder').color, fundo: estilo.backgroundColor };
+      });
+      expect(contraste(cor, fundo)).toBeGreaterThanOrEqual(4.5);
+    }
+
+    // Com a lista de assuntos o céu segue curto, e o fio de seguir continua à vista (a Marca, 04/11).
+    await campo.fill('a execução penal');
+    await page.getByRole('button', { name: 'Mostrar o resumo' }).click();
+    await expect(page.locator('.m-evoca-item').first()).toBeVisible();
+    for (const esquema of ['dark', 'light'] as const) {
+      await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+      await expect(page.getByRole('button', { name: /Puxar o fio: seguir/ })).toBeInViewport({
+        ratio: 1,
+      });
+      await expect(page.getByText('descansar', { exact: true })).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('descansar', { exact: true }));
+      await semRolagemLateral(page);
+      await semViolacoesNoFio(page);
+    }
   });
 }

@@ -1,7 +1,7 @@
 ---
 name: design-fidelity
 description: >-
-  Fidelidade visual ao portar um mockup HTML/CSS aprovado (hoje: docs/design/mockups/fio-v16.html)
+  Fidelidade visual ao portar um mockup HTML/CSS aprovado (hoje: docs/design/fio/mockup-aprovado.html)
   para componentes React do Arretado. Use SEMPRE que a tarefa traduzir, portar ou refatorar tela,
   animação, transição, hover/focus ou layout que já existe num mockup. NÃO use para design do zero
   (use arretado-design-brief) nem para lógica pura (estado, rotas, dados).
@@ -47,6 +47,9 @@ estado de botão ou de espaçamento é bug, com a gravidade de um bug funcional.
 - Movimento não aparece em foto: gravar o app e o mockup lado a lado (Playwright `recordVideo`) ou conferir
   `getAnimations()` por elemento (nome, duração, easing) contra o mockup.
 - Diff do CSS lido linha a linha atrás de remoção silenciosa; `npm run tamanho` informado no PR.
+- Tabela de movimento do mockup no E2E (`e2e/fio-passos.spec.ts`, `scripts/fio-animacoes-do-mockup.mjs`, com guarda de cobertura): animação nova do mockup entra na tabela.
+- Contraste de texto sobre degradê: `textoLegivelNoFio` (`e2e/apoio.ts`, dentro de `semViolacoesNoFio`), porque o axe não decide ali.
+- Medir geometria só com o conteúdo pronto, e o mundo dia/noite só depois de `data-mundo` trocar. Tela do quadro não leva Suspense próprio.
 - Revisão da Marca contra o arquivo aprovado. Teste verde não prova fidelidade.
 
 ## Checklist do PR (responder cada linha, dizendo como verificou)

@@ -601,7 +601,7 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(screen.getByText('(em branco)')).toBeInTheDocument();
   });
 
-  it('lacuna que cresce: na caixa 3 esconde mais; a dica aparece e some no nível máximo', async () => {
+  it('lacuna que cresce: na caixa 3 esconde mais; a dica aparece em todo nível acima de 0', async () => {
     const { repo, relogio } = await repositorioDeTeste();
     const texto = 'A pena é de reclusão, de seis a vinte anos, conforme regulamento.';
     const base = [{ inicio: texto.indexOf('reclusão'), fim: texto.indexOf('reclusão') + 8 }];
@@ -621,7 +621,7 @@ describe('cota e início do Recall (fatia 3)', () => {
     await repo.colecao('cartoes').atualizar(c.id, { caixa: 4 });
     await abrir('/recall/revisar', repo);
     await screen.findByText(/A pena é de/);
-    expect(screen.queryByText('A lacuna cresce a cada acerto.')).not.toBeInTheDocument();
+    expect(screen.getByText('A lacuna cresce a cada acerto.')).toBeInTheDocument();
   });
 
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {

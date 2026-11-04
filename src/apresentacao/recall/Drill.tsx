@@ -16,7 +16,6 @@ import {
 import {
   frenteDaRevisao,
   lacunaCresceu,
-  nivelDaLacuna,
   temIrmaoDeLacuna,
 } from '../../dominios/recall/lacuna-progressiva';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
@@ -337,11 +336,9 @@ export function Drill() {
       <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
         <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
           <p className="drill-frente texto-leitura">{frenteDaRevisao(atual, temIrmao)}</p>
-          {!estado.virado &&
-            lacunaCresceu(atual, temIrmao) &&
-            nivelDaLacuna(atual.caixa, temIrmao) < nivelDaLacuna(6, temIrmao) && (
-              <p className="dica">A lacuna cresce a cada acerto.</p>
-            )}
+          {!estado.virado && lacunaCresceu(atual, temIrmao) && (
+            <p className="dica">A lacuna cresce a cada acerto.</p>
+          )}
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
               <p className="palpite-da-pessoa">
