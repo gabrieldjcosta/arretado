@@ -294,14 +294,6 @@
   padding-top: 0.25rem;
 }
 
-/* As telas do Fio que ainda moram nesta casca (o Varal; o Agora, o Destino, os passos e o pouso moram no quadro do
-   mockup) são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura de sempre. */
-.shell-fio .fio-varal {
-  width: 100%;
-  max-width: 34rem;
-  margin-inline: auto;
-}
-
 @media (min-width: 900px) {
   .shell-fio .fio-topo {
     padding-left: calc(

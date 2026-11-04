@@ -728,3 +728,47 @@
     #000 104px
   );
 }
+
+/* 39. O Varal e o folheto: contraste, o folheto vazio e o pé. Motivo: (a) alguns textos do mockup usam tintas que, medidas nos
+      pixels, ficam abaixo de 4,5:1 (WCAG 1.4.3). "Ordem" e "À vista em cada linha" das folhas (`.m-opcoes-org h3`) usam a
+      terciária (`--m-texto-3`) e dão 3,94:1 e 4,04:1 à noite; o rótulo de cada fio do Varal, 4,45:1; o grupo do folheto e o
+      lembrete da busca usam a mesma tinta. Passam à secundária, a mesma da dica do cartão (desvio 19). Nos folhetos de papel
+      (o mesmo `#e9e1cf` nos dois mundos) a linha de estado (`#7a6f58`, 3,80:1) vai a `#685d46` (4,98:1) e o número miúdo
+      (`rgba(60,52,38,.5)`, 2,59:1), que no app é dado real e o leitor de tela lê, a `#5a5242` (5,93:1, a tinta do texto miúdo
+      do folheto). (b) O mockup não tem o folheto vazio (só avisa "Folheto vazio…"): o app diz uma frase e oferece um botão,
+      em uma coluna, com o botão na largura do conteúdo. (c) Os botões do pé do folheto (`.m-pe-folheto`) quebram de linha
+      se não couberem lado a lado (texto maior, tela estreita). (d) O "⋯" de cada linha (`.m-linha-item .m-mais`) herda do "+" do
+      quadro (`.m-mais`) o `position: absolute; right: 22px; top: 18px`, e por isso o botão de abrir a linha, que é a linha toda
+      (`flex: 1`), passa por baixo dele: um nome comprido corria sob o "⋯" (em 360 de largura, a linha tem 282 px e o "⋯"
+      ocupa de 259 a 299). A cara fica a do mockup (o "⋯" no mesmo lugar); a linha só reserva o lugar dele (62 px do canto da
+      direita e mais 8 de folga) para o texto não passar de lá. */
+.m-fio .m-opcoes-org h3,
+.m-fio .m-grupo-folheto,
+.m-fio .m-varal-rotulo {
+  color: var(--m-texto-2);
+}
+.m-fio .m-busca-varal input::placeholder {
+  color: var(--m-texto-2);
+}
+.m-fio .m-folheto .m-estado {
+  color: #685d46;
+}
+.m-fio .m-varal-linha .m-folheto .m-conta-f {
+  color: #5a5242;
+}
+.m-fio .m-linha-item.m-com-mais .m-abre {
+  padding-right: 70px;
+}
+.m-fio .m-vazio-folheto {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 2px 0;
+}
+.m-fio .m-vazio-folheto p {
+  margin: 0;
+}
+.m-fio .m-pe-folheto {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}

@@ -384,17 +384,60 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(screen.queryByText(/parou/i)).not.toBeInTheDocument();
   });
 
-  it('o Varal tem dois varais de folhetos e leva às coisas da pessoa', async () => {
-    const { usuario } = await abrir();
+  it('o Varal é o do mockup: dois fios de folhetos, e "Normas" abre o folheto com a lei da pessoa', async () => {
+    const { usuario } = await abrir({ comLei: true });
     await usuario.click(await screen.findByRole('button', { name: 'Varal' }));
-    expect(await screen.findByRole('heading', { name: /pendurado no fio/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 2, name: /pendurado no fio/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'O que você estuda' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'O que você guarda' })).toBeInTheDocument();
+    // A nav continua embaixo, com o Varal aceso.
+    expect(screen.getByRole('button', { name: 'Varal' })).toHaveAttribute('aria-current', 'page');
+
+    await usuario.click(await screen.findByText('Normas', { selector: 'strong' }));
     await waitFor(() => {
-      expect(screen.getByRole('link', { name: /^Normas/ })).toHaveAttribute('href', '#/biblioteca');
+      expect(window.location.hash).toBe('#/varal/normas');
     });
-    expect(screen.getByRole('link', { name: /^Frases/ })).toHaveAttribute(
-      'href',
-      '#/recall/frases',
-    );
+    expect(await screen.findByRole('heading', { level: 2, name: 'Normas' })).toBeInTheDocument();
+    // A lei da pessoa é a única linha (o nome é o que o importador tirou da epígrafe).
+    await waitFor(() => {
+      expect(document.querySelectorAll('.m-linha-item .m-nome')).toHaveLength(1);
+    });
+    expect(screen.getByRole('button', { name: 'Varal' })).toHaveAttribute('aria-current', 'page');
+
+    // O Varal aceso, de dentro do folheto, leva de volta ao Varal (no mockup só a tela de agora é ignorada).
+    await usuario.click(screen.getByRole('button', { name: 'Varal' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal');
+    });
+    // Voltar também leva ao Varal.
+    await usuario.click(await screen.findByText('Normas', { selector: 'strong' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal/normas');
+    });
+    await usuario.click(await screen.findByRole('button', { name: 'Voltar ao Varal' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal');
+    });
+  });
+
+  it('um folheto do Varal que não existe volta ao Varal', async () => {
+    await abrir({ rota: '#/varal/nao-existe' });
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal');
+    });
+    expect(
+      await screen.findByRole('heading', { level: 2, name: /pendurado no fio/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('os folhetos que ainda não têm folheto novo abrem a tela de antes', async () => {
+    const { usuario } = await abrir({ rota: '#/varal' });
+    await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/recall/frases');
+    });
   });
 
   it('a Conta liga e desliga a prévia', async () => {

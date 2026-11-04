@@ -57,12 +57,13 @@ export function AgoraM() {
     );
   }, [pausou]);
 
-  // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a
-  // troca de tela não espera rede nem disco (o mockup troca sem vão).
+  // O passo, o pouso, o Destino, o Varal e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é
+  // puxado ou a aba é trocada, e a troca de tela não espera rede nem disco (o mockup troca sem vão).
   useEffect(() => {
     void import('./PassoM').catch(() => undefined);
     void import('./PousoM').catch(() => undefined);
     void import('./DestinoM').catch(() => undefined);
+    void import('./VaralM').catch(() => undefined);
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
     }
