@@ -185,6 +185,45 @@ test('no celular e no monitor o Destino cabe, de noite e de dia, e o monitor gan
   }
 });
 
+test('rolado, o Destino esmaece no alto, onde fica o "+", e não deixa o texto passar por baixo dele (desvio 36)', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await prepararAPrevia(page, false);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await nav(page).getByRole('button', { name: 'Destino' }).click();
+  await expect(mapa(page)).toBeVisible();
+  const tela = page.locator('[data-tela="mapa"]');
+  const mascara = () => tela.evaluate((el) => getComputedStyle(el).maskImage);
+
+  // Em repouso o Destino é o do mockup: sem classe e sem máscara.
+  await expect(tela).not.toHaveClass(/m-rolada/);
+  expect(await mascara()).toBe('none');
+
+  // Em 360 de largura a tela passa do quadro; rolada até o fim, o alto esmaece.
+  expect(await tela.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+  await tela.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect(tela).toHaveClass(/m-rolada/);
+  expect(await tela.evaluate((el) => el.style.getPropertyValue('--m-rolado'))).toBe('1.00');
+  expect(await mascara()).toContain('linear-gradient');
+  // O "+" fica dentro da faixa do alto da tela que some por inteiro (até os 64 px).
+  const mais = await page.locator('.m-mais').boundingBox();
+  const caixaDaTela = await tela.boundingBox();
+  expect(mais).not.toBeNull();
+  expect(caixaDaTela).not.toBeNull();
+  expect((mais?.y ?? 0) + (mais?.height ?? 0) - (caixaDaTela?.y ?? 0)).toBeLessThanOrEqual(64);
+
+  // De volta ao topo, o repouso é o de antes.
+  await tela.evaluate((el) => {
+    el.scrollTop = 0;
+  });
+  await expect(tela).not.toHaveClass(/m-rolada/);
+  expect(await mascara()).toBe('none');
+});
+
 test('a ficha de um lugar abre dentro da tela, passa no axe e fecha com Escape devolvendo o foco', async ({
   page,
 }) => {

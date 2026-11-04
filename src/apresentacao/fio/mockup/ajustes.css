@@ -697,3 +697,34 @@
 .m-fio.m-fio .m-ne-ficha em {
   color: var(--m-texto-2);
 }
+
+/* 36. A tela que rola esmaece no alto, onde fica o "+". Motivo: o "+" (46 px, a 18 do alto, então até os 64 px) é fixo e
+      as telas do Destino e do Varal rolam por baixo dele; em 360 de largura o texto passava debaixo dele ("os ma +",
+      "já é seu"). Como o desvio 9 faz nos passos (a área que rola começa abaixo do "+"), mas sem mexer no repouso: aqui
+      o mockup começa o texto a 22 px do alto e o repouso fica onde ele o põe; só depois que a tela rola é que o alto
+      some até os 64 px, e o texto volta inteiro aos 104 px. O esmaecimento entra aos poucos nos primeiros 40 px de
+      rolagem (`TelaM` escreve `--m-rolado`, de 0 a 1, e a classe `m-rolada`). Os passos do desvio 9 já começam
+      abaixo do "+" e ficam de fora. */
+.m-fio
+  .m-tela.m-rolada:not(
+    :is(
+      [data-tela='ler'],
+      [data-tela='lembrar'],
+      [data-tela='achar'],
+      [data-tela='guardar'],
+      [data-tela='revisar'],
+      [data-tela='seu_passo'],
+      [data-tela='praticar']
+    )
+  ) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+}

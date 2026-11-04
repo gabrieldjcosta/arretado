@@ -58,6 +58,9 @@ export function sairDaTela(el: HTMLElement, nome: string): void {
   copia.setAttribute('inert', '');
   copia.removeAttribute('data-foco');
   copia.classList.add('m-saindo');
+  // A cópia nasce no topo da tela: sem o esmaecimento de quem estava rolado (desvio 36).
+  copia.classList.remove('m-rolada');
+  copia.style.removeProperty('--m-rolado');
   quadro.appendChild(copia);
   pendente = { copia, de: nome };
   // Se nenhuma tela chegar neste mesmo quadro (a próxima é outra casca), a cópia só esmaece.
