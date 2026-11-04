@@ -14,7 +14,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
 } from 'react';
-import { Link } from 'react-router';
+import { LinkDoFio } from '../LinkDoFio';
 import {
   LARGURA_DE_LONGE,
   enquadrar,
@@ -351,7 +351,7 @@ export function MapaDoNordeste({ entrada }: { entrada: EntradaDaJornada }) {
         })}
 
         {jornada.estrelas.map((s) => (
-          <Link
+          <LinkDoFio
             key={`${s.artigo.normaId}-${s.artigo.endereco}`}
             to={hrefDoLeitor(s.artigo.normaId, s.artigo.endereco)}
             className={s.artigo.lido ? 'estrela-art lido' : 'estrela-art'}

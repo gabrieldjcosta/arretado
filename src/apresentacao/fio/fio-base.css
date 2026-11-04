@@ -25,6 +25,10 @@
   /* O folheto do Varal: de dia a sombra é curta e macia; à noite, funda. */
   --f-folheto-sombra: 0 6px 12px -6px rgb(15 28 58 / 28%);
   --f-chip: rgb(255 186 64 / 22%);
+  /* Três degraus de sombra, os mesmos em todo o Fio: chão, cartão, folha (prancha 8 da Marca). */
+  --s1: 0 1px 0 rgb(15 28 58 / 6%);
+  --s2: 0 8px 20px -14px rgb(15 28 58 / 35%);
+  --s3: 0 24px 48px -24px rgb(15 28 58 / 45%);
   --f-acao-fundo: linear-gradient(180deg, #ffd56b 0%, #ffab3d 100%);
   --f-acao-texto: #4a2a00;
   --f-acao-sombra: 0 3px 0 rgb(196 118 0 / 42%), 0 10px 22px -12px rgb(255 140 30 / 70%);
@@ -72,6 +76,9 @@
     --f-tempo: #ffc53d;
     --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
     --f-chip: rgb(255 197 61 / 12%);
+    --s1: 0 1px 0 rgb(255 255 255 / 4%);
+    --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+    --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
     --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
     --f-acao-texto: #0b1322;
     --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -101,6 +108,9 @@
   --f-tempo: #ffc53d;
   --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
   --f-chip: rgb(255 197 61 / 12%);
+  --s1: 0 1px 0 rgb(255 255 255 / 4%);
+  --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+  --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
   --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
   --f-acao-texto: #0b1322;
   --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -400,7 +410,7 @@
 }
 
 .fio-acao:active {
-  transform: translateY(2px) scale(0.985);
+  transform: translateY(2px) scale(0.95);
   box-shadow: var(--f-acao-aperto);
 }
 
@@ -460,4 +470,61 @@
     transition-duration: 0s !important;
     animation-duration: 0s !important;
   }
+}
+
+/* ---------- Troca de tela com View Transitions (porte literal do mockup v17) ---------- */
+/* Só a tela tem nome: a casca, o cabeçalho e a pílula ficam quietos no instantâneo da raiz. */
+.shell-fio .fio-conteudo {
+  view-transition-name: tela;
+}
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(tela) {
+  animation: none;
+}
+::view-transition-old(tela) {
+  animation: vt-sai 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(tela) {
+  animation: vt-entra 0.48s cubic-bezier(0.2, 0.7, 0.2, 1) 0.09s both;
+}
+:root[data-vt='calmo']::view-transition-old(tela) {
+  animation-duration: 0.36s;
+}
+:root[data-vt='calmo']::view-transition-new(tela) {
+  animation-duration: 0.62s;
+  animation-delay: 0.14s;
+}
+@keyframes vt-sai {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--vt-dx, 0px) * -0.6), calc(var(--vt-dy, 0px) * -0.4));
+  }
+}
+@keyframes vt-entra {
+  from {
+    opacity: 0;
+    transform: translate(var(--vt-dx, 0px), var(--vt-dy, 14px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(tela),
+  ::view-transition-new(tela) {
+    animation-duration: 0.2s;
+    transform: none;
+  }
+}
+
+/* ---------- Polimento: números fixos, foco e sombras ---------- */
+.shell-fio :is(.numero, .fio-numero, .estado, .varal-rotulo, time, output) {
+  font-variant-numeric: tabular-nums;
+}
+.shell-fio :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--f-foco, #4dd0e1);
+  outline-offset: 3px;
+  border-radius: inherit;
 }

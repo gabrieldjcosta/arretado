@@ -1,0 +1,91 @@
+/* A busca ⌘K do Fio. Porte da prancha 7 da Marca; sombras pelos três degraus fixos (--s1 a --s3). */
+.fio-veu {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: 12vh 16px 16px;
+  background: rgb(8 12 24 / 48%);
+}
+
+.fio-paleta {
+  width: min(100%, 520px);
+  overflow: hidden;
+  border: 1px solid var(--f-cartao-borda, var(--borda));
+  border-radius: 16px;
+  background: var(--f-cartao, var(--superficie));
+  box-shadow: var(--s3);
+  color: var(--texto);
+}
+
+.fio-paleta input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--f-cartao-borda, var(--borda));
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.fio-paleta input:focus-visible {
+  box-shadow: inset 0 -2px 0 var(--f-acento);
+}
+
+.fio-paleta ul {
+  margin: 0;
+  padding: 6px;
+  max-height: min(46vh, 320px);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.fio-paleta li {
+  display: grid;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+
+.fio-paleta li em {
+  color: var(--texto-atenuado);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fio-paleta li.sel {
+  background: var(--f-chip);
+}
+
+.fio-paleta .nada {
+  color: var(--texto-atenuado);
+  cursor: default;
+}
+
+.fio-paleta .atalhos {
+  margin: 0;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--f-cartao-borda, var(--borda));
+  color: var(--texto-atenuado);
+  font-size: 12px;
+}
+
+.fio-paleta kbd {
+  margin-right: 3px;
+  padding: 1px 6px;
+  border: 1px solid var(--f-cartao-borda, var(--borda));
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  font:
+    700 12px ui-monospace,
+    Menlo,
+    monospace;
+}

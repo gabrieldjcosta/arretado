@@ -3,7 +3,7 @@
 // rotas novas levam de volta a ele.
 import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { Navigate, useNavigate } from 'react-router';
-import { Esqueleto } from '../componentes/estados';
+import { EsqueletoDoFio } from './avisos/EsqueletoDoFio';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
@@ -29,7 +29,7 @@ export function TelaDoFio({
 }) {
   if (useInterface() !== 'fio') return <Navigate to="/" replace />;
   if (noQuadro) return children;
-  return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
+  return <Suspense fallback={<EsqueletoDoFio />}>{children}</Suspense>;
 }
 
 /** O começo do app: o Agora na prévia (no quadro, que cuida da espera), o Hoje de sempre fora dela. */

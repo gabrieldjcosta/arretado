@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { Link } from 'react-router';
+import { LinkDoFio } from '../LinkDoFio';
 import { useLarguraMinima } from '../../componentes/largura';
 import { ORDEM_UF } from './nordeste';
 import { materiaAtual, resumoDoMapa } from './resumo';
@@ -72,12 +72,12 @@ export function DestinoDoFio() {
             <p className="fio-quieto">
               Cada etapa que pousa abre um lugar no caminho. Puxe o fio no Agora para o primeiro.
             </p>
-            <Link to="/" className="fio-acao">
+            <LinkDoFio to="/" className="fio-acao">
               Ir ao Agora
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
-            </Link>
+            </LinkDoFio>
           </>
         ) : (
           !contaEtapas && (
