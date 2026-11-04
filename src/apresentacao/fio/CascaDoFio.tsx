@@ -13,6 +13,7 @@ import { secaoDeAjuda } from '../orientacoes/conteudo';
 import { AvisoDePosse } from '../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../sessao/CantoDaSessao';
 import { RelatarProblema } from '../suporte/RelatarProblema';
+import { AvisosDoFio } from './avisos/AvisosDoFio';
 import { semPilulaDosLugares } from './lugares';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
@@ -39,68 +40,70 @@ export function CascaDoFio() {
   useAtalhoDeRegistrarErro();
 
   return (
-    <div
-      className="shell shell-fio"
-      data-teclado={tecladoAberto ? 'aberto' : undefined}
-      data-largo={pathname === '/destino' ? 'sim' : undefined}
-      data-sem-pilula={semPilula ? 'sim' : undefined}
-    >
-      <AplicarAparencia />
-      <PuxarEssenciais />
-      <a
-        className="pular"
-        href="#conteudo"
-        onClick={(e) => {
-          // Com roteamento por hash, a âncora mudaria de rota: só move o foco.
-          e.preventDefault();
-          document.getElementById('conteudo')?.focus();
-        }}
+    <AvisosDoFio>
+      <div
+        className="shell shell-fio"
+        data-teclado={tecladoAberto ? 'aberto' : undefined}
+        data-largo={pathname === '/destino' ? 'sim' : undefined}
+        data-sem-pilula={semPilula ? 'sim' : undefined}
       >
-        Pular para o conteúdo
-      </a>
-      <header className="fio-topo">
-        <LinkDoFio to="/conta" className="fio-marca" aria-label="Arretado: sua conta e ajustes">
-          <MarcaDoFio />
-        </LinkDoFio>
-        <div className="acoes-globais">
-          <MenuAjuda
-            paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
-            {...(telaComGuia &&
-              guiaMontado && {
-                aoGuia: () => {
-                  reabrirGuia(telaComGuia);
-                },
-              })}
-            aoBoasVindas={() => {
-              setBoasVindas(true);
-            }}
-            aoRelatar={() => {
-              setRelatando(true);
+        <AplicarAparencia />
+        <PuxarEssenciais />
+        <a
+          className="pular"
+          href="#conteudo"
+          onClick={(e) => {
+            // Com roteamento por hash, a âncora mudaria de rota: só move o foco.
+            e.preventDefault();
+            document.getElementById('conteudo')?.focus();
+          }}
+        >
+          Pular para o conteúdo
+        </a>
+        <header className="fio-topo">
+          <LinkDoFio to="/conta" className="fio-marca" aria-label="Arretado: sua conta e ajustes">
+            <MarcaDoFio />
+          </LinkDoFio>
+          <div className="acoes-globais">
+            <MenuAjuda
+              paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
+              {...(telaComGuia &&
+                guiaMontado && {
+                  aoGuia: () => {
+                    reabrirGuia(telaComGuia);
+                  },
+                })}
+              aoBoasVindas={() => {
+                setBoasVindas(true);
+              }}
+              aoRelatar={() => {
+                setRelatando(true);
+              }}
+            />
+          </div>
+        </header>
+        <MaisGlobal />
+        <FaixaOffline />
+        <AvisoDePosse />
+        <main id="conteudo" className="conteudo fio-conteudo" tabIndex={-1}>
+          <Outlet />
+        </main>
+        {!semPilula && <NavDosLugares />}
+        <CantoDaSessao />
+        {boasVindas && (
+          <Chegada
+            aoFechar={() => {
+              setBoasVindas(false);
             }}
           />
-        </div>
-      </header>
-      <MaisGlobal />
-      <FaixaOffline />
-      <AvisoDePosse />
-      <main id="conteudo" className="conteudo fio-conteudo" tabIndex={-1}>
-        <Outlet />
-      </main>
-      {!semPilula && <NavDosLugares />}
-      <CantoDaSessao />
-      {boasVindas && (
-        <Chegada
+        )}
+        <RelatarProblema
+          aberto={relatando}
           aoFechar={() => {
-            setBoasVindas(false);
+            setRelatando(false);
           }}
         />
-      )}
-      <RelatarProblema
-        aberto={relatando}
-        aoFechar={() => {
-          setRelatando(false);
-        }}
-      />
-    </div>
+      </div>
+    </AvisosDoFio>
   );
 }
