@@ -133,15 +133,14 @@ describe('o Arretado novo (prévia do Fio)', () => {
         name: 'Destino',
       }),
     );
-    expect(
-      await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/1 etapa pousada/)).toBeInTheDocument();
-    // O mapa vem num pedaço à parte; a lista dos pousos fica à mão, em palavras.
+    expect(await screen.findByRole('heading', { name: 'Destino' })).toBeInTheDocument();
+    // O mapa mora na caixa do mockup; os pousos ficam à mão, em palavras, para o leitor de tela.
     expect(
       await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Seus pousos, em palavras')).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: /Seus pousos/ })).toHaveTextContent(
+      /Etapa 1, Execução Penal/,
+    );
   });
 
   it('"Pronto, li" avisa "Feito" e o "Desfazer" devolve o cartão', async () => {
@@ -180,18 +179,25 @@ describe('o Arretado novo (prévia do Fio)', () => {
     });
   });
 
-  it('o Destino sem etapa pousada mostra o mapa e convida a puxar o fio no Agora', async () => {
+  it('o Destino é o do mockup: a caixa do mapa, o número, a legenda e a nav com o Destino aceso', async () => {
     await abrir({ comLei: true, rota: '#/destino' });
+    expect(await screen.findByRole('heading', { name: 'Destino' })).toBeInTheDocument();
+    const mapa = await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' });
+    // O `#destino.destino.ne` do mockup, com o prefixo `m-` das classes (o id é o que a grade larga procura).
+    expect(mapa).toHaveClass('m-destino', 'm-ne');
+    expect(mapa).toHaveAttribute('id', 'm-destino');
+    expect(document.querySelector('.m-olho')).toHaveTextContent('Linha do destino · sua prova');
+    expect(document.querySelector('.m-numero')).toHaveTextContent('0%');
+    expect(document.querySelector('.m-legenda-mapa')).toHaveTextContent('pela frente');
+    expect(document.querySelector('.m-legenda-mapa')).toHaveTextContent('já é seu');
     expect(
-      await screen.findByRole('heading', { name: 'O caminho começa aqui' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Ir ao Agora/ })).toHaveAttribute('href', '#/');
-    expect(
-      await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Legenda do mapa' })).toBeInTheDocument();
-    // Sem pouso nenhum, não há lista de pousos para abrir.
-    expect(screen.queryByText('Seus pousos, em palavras')).not.toBeInTheDocument();
+      within(screen.getByRole('navigation', { name: 'Lugares' })).getByRole('button', {
+        name: 'Destino',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+    // No monitor o quadro alarga (`m-largo`) e sem pouso nenhum não há lista de pousos.
+    expect(document.querySelector('main.m-app')).toHaveClass('m-largo');
+    expect(screen.queryByRole('list', { name: /Seus pousos/ })).not.toBeInTheDocument();
   });
 
   it('sem a lei da matéria, o Destino mantém o número, agora das etapas, e diz o que falta', async () => {
@@ -200,11 +206,12 @@ describe('o Arretado novo (prévia do Fio)', () => {
       estado: { ...estadoInicial(), etapasFeitas: 20, passosDados: 61 },
       marcas: {},
     });
-    expect(
-      await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Destino' })).toBeInTheDocument();
     await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' });
-    expect(document.querySelector('.fio-numero')).toHaveTextContent('20 etapas');
+    // A leitura do que o Fio guardou chega depois da tela: o número passa de 0% a 20 etapas.
+    await waitFor(() => {
+      expect(document.querySelector('.m-numero')).toHaveTextContent('20 etapas');
+    });
     expect(screen.getByText(/pousadas no caminho, com 61 passos dados\./)).toBeInTheDocument();
     expect(screen.getByText(/Quando Execução Penal tiver a lei no app/)).toBeInTheDocument();
   });
@@ -362,7 +369,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
         name: 'Destino',
       }),
     );
-    expect(await screen.findByText(/1 etapa pousada/)).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: /Seus pousos/ })).toHaveTextContent(/Etapa 1/);
   });
 
   it('pausar volta ao Agora, diz que está tudo salvo e o passo espera', async () => {
