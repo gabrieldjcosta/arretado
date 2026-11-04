@@ -1,6 +1,6 @@
 /* O Destino do Arretado novo (D-D25): o texto do caminho, o mapa do Nordeste e, embaixo, a legenda e os
    pousos em palavras. No celular é uma coluna só; de 980 px em diante a casca alarga (`data-largo`, em
-   fio-base.css), o texto fica à esquerda e o mapa ganha a coluna maior, com a legenda embaixo dele. */
+   fio-base.css), o texto e a legenda ficam à esquerda e o mapa ganha a coluna maior. */
 .fio-destino {
   display: flex;
   flex-direction: column;
@@ -156,32 +156,32 @@
   line-height: 1.4;
 }
 
-/* ---------- Tela larga: texto à esquerda, mapa grande à direita ---------- */
+/* ---------- Tela larga: o texto e a legenda à esquerda, o mapa grande à direita ---------- */
 @media (min-width: 980px) {
   .shell-fio .fio-destino {
     display: grid;
     grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+    /* O que sobra da altura do mapa vai para a linha de baixo, e a legenda fica logo abaixo do texto. */
+    grid-template-rows: auto 1fr;
     column-gap: 2.5rem;
-    row-gap: 0.875rem;
+    row-gap: 1.25rem;
     align-items: start;
     padding-top: 1rem;
   }
 
   .fio-destino-texto {
     grid-column: 1;
-    grid-row: 1 / span 2;
-    position: sticky;
-    top: 4.5rem;
+    grid-row: 1;
     gap: 0.625rem;
   }
 
   .fio-destino-mapa {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 2;
   }
 
   .fio-destino-pe {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
   }
 
