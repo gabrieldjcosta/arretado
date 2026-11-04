@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { LinkDoFio } from '../LinkDoFio';
 import { Esqueleto } from '../../componentes/estados';
 import { descreverPasso } from '../dados/descrever';
 import { limparPausa, veioDeUmaPausa } from '../dados/pausa';
@@ -15,12 +15,12 @@ function SemMateria() {
         Qual é a sua prova?
       </h1>
       <p className="fio-quieto">Sem conta, sem edital. Isso fica para depois, se você quiser.</p>
-      <Link to="/comecar" className="fio-acao">
+      <LinkDoFio to="/comecar" className="fio-acao">
         Escolher minha prova
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
-      </Link>
+      </LinkDoFio>
     </section>
   );
 }
