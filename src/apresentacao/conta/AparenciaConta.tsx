@@ -11,6 +11,8 @@ import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
+import { useMundo } from '../fio/m/mundo';
+import { SeletorDeMundo } from './SeletorDeMundo';
 import { ToquesConta } from './ToquesConta';
 
 const TEMAS: { valor: Tema; nome: string }[] = [
@@ -21,6 +23,7 @@ const TEMAS: { valor: Tema; nome: string }[] = [
 
 export function AparenciaConta() {
   const repo = useRepositorio();
+  const mundo = useMundo();
   const { dados: salvas } = useDados(useCallback((r) => obterPreferencias(r), []));
   // Resposta imediata ao toque; a gravação confirma logo depois.
   const [pendentes, setPendentes] = useState<Partial<Preferencias>>({});
@@ -63,6 +66,12 @@ export function AparenciaConta() {
       )}
       <fieldset>
         <legend>Tema</legend>
+        <SeletorDeMundo
+          mundo={mundo}
+          aoTrocar={() => {
+            alterar({ tema: mundo === 'noite' ? 'claro' : 'escuro' });
+          }}
+        />
         {TEMAS.map((t) => (
           <label key={t.valor} className="opcao">
             <input
