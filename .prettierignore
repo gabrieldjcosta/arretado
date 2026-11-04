@@ -26,3 +26,4 @@ src/apresentacao/componentes/escrita/escrita-b.css
 # (`npm run fio:css`); desvio vai em ajustes.css, nunca no gerado.
 docs/design/fio/mockup-aprovado.html
 src/apresentacao/fio/mockup/mockup.css
+docs/design/mockups/
