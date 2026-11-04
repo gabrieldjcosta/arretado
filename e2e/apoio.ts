@@ -140,8 +140,8 @@ export async function pularAAbertura(page: Page) {
 }
 
 /**
- * Registra um erro pelo "+" do título (Hoje e Fixar): abre o painel e toca em "Registrar erro". O link do
- * painel é o único com esse nome dentro dele; o do cabeçalho (a partir de 900 px) fica fora.
+ * Registra um erro pelo "+" da casca (está em toda tela): abre o painel e toca em "Registrar erro". O link do
+ * painel é o único com esse nome dentro dele.
  */
 export async function irAoRegistroPeloMais(page: Page) {
   await page.getByRole('button', { name: 'Novo registro' }).click();
@@ -149,8 +149,8 @@ export async function irAoRegistroPeloMais(page: Page) {
 }
 
 /**
- * Abre o diálogo do Lembrete pelo "+" do título (Hoje e Fixar) e o devolve. O botão do painel é o único com
- * esse nome dentro dele.
+ * Abre o diálogo do Lembrete pelo "+" da casca (de qualquer tela, sem trocar de rota) e o devolve. O botão do
+ * painel é o único com esse nome dentro dele.
  */
 export async function abrirOLembrete(page: Page) {
   await page.getByRole('button', { name: 'Novo registro' }).click();
@@ -158,6 +158,36 @@ export async function abrirOLembrete(page: Page) {
   const dialogo = page.getByRole('dialog', { name: 'Lembrete' });
   await expect(dialogo).toBeVisible();
   return dialogo;
+}
+
+/**
+ * A nota do Lembrete como está gravada no IndexedDB (vazia se não há). Fechar o diálogo com Esc grava ao
+ * desmontar o campo, em segundo plano e sem aviso na tela: recarregar a página antes disso perde a nota.
+ * Quem recarrega logo depois do Esc espera por aqui (`expect.poll`), não por um tempo fixo.
+ */
+export function lembreteGravado(page: Page) {
+  return page.evaluate(async () => {
+    const pedir = <T>(pedido: IDBRequest<T>) =>
+      new Promise<T>((resolver, rejeitar) => {
+        pedido.onsuccess = () => {
+          resolver(pedido.result);
+        };
+        pedido.onerror = () => {
+          rejeitar(new Error(String(pedido.error)));
+        };
+      });
+    const banco = await pedir(indexedDB.open('arretado'));
+    try {
+      const todas = await pedir(
+        banco.transaction('preferencias').objectStore('preferencias').getAll() as IDBRequest<
+          { lembrete?: string }[]
+        >,
+      );
+      return todas[0]?.lembrete ?? '';
+    } finally {
+      banco.close();
+    }
+  });
 }
 
 /** axe (WCAG AA) nos dois temas, na tela como está. */

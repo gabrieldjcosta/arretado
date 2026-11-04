@@ -149,7 +149,7 @@ test('as fontes embutidas carregam (T19)', async ({ page }) => {
   expect(carregadas).toEqual([true, true, true, true, true, true, true, false]);
 });
 
-test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px e atalho E (P2)', async ({
+test('casca: abas por teclado, "+" no canto do cabeçalho, sem Registrar erro repetido e atalho E (P2, D-D23)', async ({
   page,
 }) => {
   await page.goto('/');
@@ -170,22 +170,19 @@ test('casca: abas por teclado, "+" no título, Registrar erro a partir de 900 px
     expect(caixa?.y ?? 0).toBeLessThan(altura / 2);
   }
 
-  // O "+" fica na linha do título, à direita dele, em qualquer largura.
+  // O "+" (D-D23) fica no canto do cabeçalho, à direita da Conta, em qualquer largura; o cabeçalho não
+  // repete o "Registrar erro" (ele mora no painel do "+" e na tecla E); Conta e Ajuda em qualquer largura.
+  const topo = page.getByRole('banner');
   const mais = page.getByRole('button', { name: 'Novo registro' });
   await expect(mais).toBeVisible();
-  const t = await titulo.boundingBox();
-  const m = await mais.boundingBox();
-  if (!t || !m) throw new Error('sem caixa do título ou do +');
-  expect(Math.abs(t.y + t.height / 2 - (m.y + m.height / 2))).toBeLessThan(12);
-  expect(m.x).toBeGreaterThan(t.x + t.width);
-
-  // "Registrar erro" no cabeçalho só a partir de 900 px; Conta e Ajuda em qualquer largura.
-  const topo = page.getByRole('banner');
-  const noCabecalho = topo.getByRole('link', { name: 'Registrar erro' });
-  if (largura < 900) await expect(noCabecalho).toBeHidden();
-  else await expect(noCabecalho).toBeVisible();
-  await expect(topo.getByRole('link', { name: 'Conta e ajustes' })).toBeVisible();
+  const conta = topo.getByRole('link', { name: 'Conta e ajustes' });
+  await expect(conta).toBeVisible();
   await expect(topo.getByRole('button', { name: 'Ajuda', exact: true })).toBeVisible();
+  const c = await conta.boundingBox();
+  const m = await mais.boundingBox();
+  if (!c || !m) throw new Error('sem caixa da Conta ou do +');
+  expect(m.x).toBeGreaterThanOrEqual(c.x + c.width);
+  await expect(topo.getByRole('link', { name: 'Registrar erro' })).toHaveCount(0);
 
   // Foco visível nas abas.
   await areas.getByRole('link', { name: 'Fixar' }).focus();

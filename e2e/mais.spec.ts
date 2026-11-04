@@ -1,14 +1,14 @@
 import type { Page } from '@playwright/test';
-import { abrirOLembrete, expect, semViolacoes, test } from './apoio';
+import { abrirOLembrete, expect, lembreteGravado, semViolacoes, test } from './apoio';
 
-// O "+" do título (Hoje e Fixar) abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
+// O "+" da casca (D-D23; está em toda tela) abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
 // nem tem <dialog> de verdade; aqui o navegador mede o painel (dentro da tela, alvos de 44 px), roda o foco
 // do diálogo modal (o foco volta ao "+" ao fechar) e o axe nos dois temas com o painel e o diálogo abertos.
 
 const mais = (page: Page) => page.getByRole('button', { name: 'Novo registro' });
 const painel = (page: Page) => page.locator('.mais-itens');
 
-test.describe('"+" do título', () => {
+test.describe('"+" da casca › painel', () => {
   test('o painel cabe na tela, tem alvos de 44 px e passa no axe nos dois temas', async ({
     page,
   }) => {
@@ -91,6 +91,9 @@ test.describe('"+" do título', () => {
     await expect(dialogo.getByText('Ainda não salvo.')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialogo).toBeHidden();
+    // A gravação ao fechar é em segundo plano: recarregar antes de ela chegar ao banco perderia a nota (era a
+    // intermitência deste teste no celular do CI, dois erros seguidos), então espera ver a nota gravada.
+    await expect.poll(() => lembreteGravado(page)).toBe('Pedir a certidão');
 
     await page.reload();
     const outra = await abrirOLembrete(page);
@@ -114,7 +117,9 @@ test.describe('"+" do título', () => {
     );
   });
 
-  test('o Fixar tem o mesmo "+", com as duas opções', async ({ page }) => {
+  test('o Fixar tem o mesmo "+" e as duas opções (é o da casca, igual ao do Hoje)', async ({
+    page,
+  }) => {
     await page.goto('/#/recall');
     await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
     await mais(page).click();

@@ -6,10 +6,11 @@ import { App } from '../App';
 
 async function abrirHoje(
   antes?: (repo: Awaited<ReturnType<typeof repositorioDeTeste>>['repo']) => Promise<void>,
+  rota = '/',
 ) {
   const { repo } = await repositorioDeTeste();
   await antes?.(repo);
-  window.location.hash = '#/';
+  window.location.hash = `#${rota}`;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
   const mais = await screen.findByRole('button', { name: 'Novo registro' });
@@ -23,9 +24,34 @@ function painelDe(mais: HTMLElement) {
   return painel;
 }
 
-describe('"+" do título › Registrar erro e Lembrete', () => {
+describe('"+" da casca › Registrar erro e Lembrete', () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it.each(['/', '/plano', '/recall', '/biblioteca', '/conta', '/orientacoes'])(
+    '%s tem o "+", um só, depois do cabeçalho e fora do conteúdo da tela',
+    async (rota) => {
+      await abrirHoje(undefined, rota);
+      await screen.findByRole('heading', { level: 1 });
+      expect(screen.getAllByRole('button', { name: 'Novo registro' })).toHaveLength(1);
+      const mais = screen.getByRole('button', { name: 'Novo registro' });
+      // Não é do cabeçalho (que some no modo foco) nem da tela: o "+" não vai embora com nenhum dos dois.
+      expect(
+        within(screen.getByRole('banner')).queryByRole('button', { name: 'Novo registro' }),
+      ).toBeNull();
+      expect(
+        within(screen.getByRole('main')).queryByRole('button', { name: 'Novo registro' }),
+      ).toBeNull();
+      expect(mais.closest('.mais-global')).not.toBeNull();
+    },
+  );
+
+  it('o cabeçalho não repete o "Registrar erro": ele mora no painel do "+" (e na tecla E)', async () => {
+    await abrirHoje();
+    expect(
+      within(screen.getByRole('banner')).queryByRole('link', { name: /Registrar erro/ }),
+    ).toBeNull();
   });
 
   it('fechado, não mostra opção alguma; aberto, mostra as duas, cada uma com a sua frase de apoio', async () => {
@@ -41,6 +67,8 @@ describe('"+" do título › Registrar erro e Lembrete', () => {
       name: 'Registrar erro A frase certa vira cartão',
     });
     expect(registrar).toHaveAttribute('href', '#/recall/registrar');
+    // A tecla E é dica: o link a declara, e o nome acessível não a repete.
+    expect(registrar).toHaveAttribute('aria-keyshortcuts', 'E');
     within(painel).getByRole('button', { name: 'Lembrete Uma nota rápida, sem hora nem aviso' });
 
     // Tocar no "+" de novo recolhe o painel.
@@ -67,9 +95,36 @@ describe('"+" do título › Registrar erro e Lembrete', () => {
 
     await usuario.click(mais);
     expect(mais).toHaveAttribute('aria-expanded', 'true');
-    // O título é da mesma linha do "+": tocar nele não é tocar fora.
     await usuario.click(screen.getByRole('navigation', { name: 'Áreas' }));
     expect(mais).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('mudar de tela fecha o painel: o "+" fica montado entre as telas e não leva o painel junto', async () => {
+    const { usuario, mais } = await abrirHoje();
+    await usuario.click(mais);
+    expect(mais).toHaveAttribute('aria-expanded', 'true');
+    // A tecla E leva ao registro de qualquer tela, com o painel aberto ou não.
+    await usuario.keyboard('e');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Registrar erro' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Novo registro' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(document.querySelector('.mais-itens')).toBeNull();
+  });
+
+  it('"Lembrete" abre de qualquer tela, sem trocar de rota nem perder o lugar', async () => {
+    const { usuario, mais } = await abrirHoje(undefined, '/plano');
+    await usuario.click(mais);
+    await usuario.click(within(painelDe(mais)).getByRole('button', { name: /^Lembrete\b/ }));
+    const dialogo = await screen.findByRole('dialog', { name: 'Lembrete' });
+    expect(window.location.hash).toBe('#/plano');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Fechar' }));
+    expect(screen.queryByRole('dialog', { name: 'Lembrete' })).not.toBeInTheDocument();
+    expect(window.location.hash).toBe('#/plano');
+    expect(mais).toHaveFocus();
   });
 
   it('"Lembrete" abre o diálogo com o campo em foco, mostra o que já estava guardado e guarda a nota', async () => {

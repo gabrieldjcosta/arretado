@@ -539,3 +539,24 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** A largura do cartão (62 ch, a medida de leitura); o texto corrido; a bandeja e o fechamento em 5 s; o palco (penumbra e luz do cartão); a borda do vizinho; os atalhos e o deslizar.
 
 **Custo.** Duas regras de pilha a mais para quem mexer nela: toda linha nova de `.area-artigo` é `flex: none`, e a que ficar embaixo guarda `--reserva-da-bandeja`. Todo envoltório novo entre a pilha e o cartão entra na cadeia flex (o do contorno de evidência, `.evidencia-foco` da D-D13, já tem a regra; sem ela o cartão perde o limite e a página rola). O E2E `foco-tamanho.spec.ts` mede a altura, a página no lugar e o ⋯ separado da seta nos três aparelhos.
+
+## D-D23 — O "+" é um só, fixo no canto de cima à direita de toda tela (03/11/2026, pedido do Gabriel)
+
+> **Emenda à D-D15 ("+" com Registrar erro e Lembrete).** O "+" deixa de morar no título do Hoje e do Fixar e passa a ser da casca: um botão só, no mesmo ponto de toda tela, também no modo foco.
+
+**Origem.** Gabriel em 03/11/2026 (21:32Z): "minha preocupação é se a pessoa tiver um lembrete pra acrescentar na hora da lei, ou na parte da trilha, ou até nas configurações, ela ter que sair de onde está só pra acrescentar um lembrete, tipo bloco de notas". E às 21:40Z: "quero uma solução pro + que deixe ele no mesmo lugar em todas as telas (pra facilitar pra a pessoa) sem prejudicar a leitura do modo foco, a leitura normal, ou a revisão de cartões/frases".
+
+**Medido antes.** O "+" existia só no título do Hoje e do Fixar (`TituloComMais`). O "Registrar erro" tinha um link no cabeçalho a partir de 900 px (e a tecla E em toda tela), e o Lembrete só se alcançava por aquele "+". No modo foco o cabeçalho some, então não havia nem link nem "+".
+
+**O que muda.**
+1. `MaisGlobal` (casca, ao lado do cabeçalho) substitui `TituloComMais`. É o mesmo botão "Novo registro" e o mesmo painel (Registrar erro e Lembrete, cada um com a sua frase de apoio), agora `position: fixed` a 6 px do alto (mais a área segura) e à direita, alinhado com a margem do cabeçalho. Redondo, 48 px (em px, não em rem: só tem ícone, e a 300% de fonte um botão em rem tomava a largura de Ajuda e Conta), o contorno do controle da D-D15.
+2. O cabeçalho reserva o lugar dele no recuo da direita (o recuo da página, os 48 px do botão e 4 px de respiro) e perde o link "Registrar erro": ele mora no painel e na tecla E. Como a reserva é recuo e não um item da linha, Ajuda e Conta nunca passam por baixo do botão: com a fonte ampliada o cabeçalho quebra em linhas e a página não rola de lado. Abaixo de 360 px a marca encolhe (7 rem) e o Ajuda aperta o recuo, para tudo caber numa linha.
+3. "Lembrete" abre o diálogo por cima da tela em que a pessoa está, sem trocar de rota, e devolve o foco ao "+" ao fechar. Esc fecha só o painel (e não sai do modo foco); mudar de tela e tocar fora também o fecham.
+4. Modo foco: o "+" fica no mesmo ponto, translúcido (a superfície translúcida do palco) e opaco ao receber foco, ao passar o mouse ou aberto. Até 52 rem (celular e tablet em pé) o conteúdo ganha uma faixa de cima de 58 px (`--topo-do-foco`) para o cartão não ficar sob o botão; acima disso o canto da tela já está livre, ao lado dos 62 ch do cartão. A faixa de posse (`.faixa-posse`) guarda a mesma largura à direita.
+5. As Orientações e o Guia dizem onde fica o "+" ("no canto de cima à direita, em toda tela, até no modo foco").
+
+**Medido depois** (LEP, art. 112; cartão em % da altura da tela, antes → depois): 390×844, 88% → 83%; 360×740, 86% → 80%; 320×568, 82% → 74%; tablet 768×1024, 90% → 86%; computador 1280×800, 87% → 87%; 1440×900, 89% → 88%. Nenhum deles rola a página. O "+" está no mesmo retângulo (x, y, 48 × 48) em Hoje, Trilha, Recall, Biblioteca, Conta e Orientações, e no Leitor em modo normal e em foco, nos três aparelhos do E2E. O tamanho do pacote ficou em 497 kB no total e 329 kB no início (tetos de 600 e 360).
+
+**O que continua como está.** O nome "Novo registro", o painel e as duas opções; a tecla E; o diálogo do Lembrete (nota rápida, sem hora nem aviso); o dock e o menu "Mais" do Leitor (a reorganização deles vem num PR à parte); a faixa e o palco do foco (D-D22); o modo "só estudo", que esconde Ajuda e Conta mas deixa o "+" onde está, como já deixava o link "Registrar erro" do cabeçalho.
+
+**Custo.** Um elemento fixo no canto de cima à direita de toda tela: quem puser outro elemento fixo ou preso ali (um aviso, um botão de fechar) bate nele. A regra é ler `--mais-direita`, `--mais-lado` e `--topo-do-foco`, como a faixa de posse faz. No celular em foco o cartão perde de 5 a 8 pontos de altura para a faixa; no computador, no máximo 1. O título do Hoje e o do Fixar perdem a linha de 48 px do "+", e o conteúdo sobe uns 15 px. A tela de revisão (cartões e Frases) não tem nada fixo no canto de cima, então o "+" não cobre nada ali.

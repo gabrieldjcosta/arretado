@@ -630,6 +630,16 @@ button,
 :root {
   --gutter: 1rem;
   --largura-casca: 900px;
+  /* O "+" (MaisGlobal, D-D23): um botão redondo, fixo no canto de cima à direita. A conta do recuo é a do
+     cabeçalho (`.topo`), que reserva o lugar dele, e no modo foco, onde o cabeçalho some, ele fica no
+     mesmo ponto. O 100% de --mais-direita (adiante, de 900 px em diante) é a largura do bloco que contém
+     quem a usa: a tela, no `right` do elemento fixo, e o Shell (que tem a largura da tela), no recuo do
+     `.topo` e da `.faixa-posse`. Em qualquer outro lugar a conta não vale. O lado é em px, não em rem: o
+     botão só tem um ícone, não há rótulo que peça mais espaço com a fonte ampliada, e a 300% um "+" de
+     144 px tomava a largura de Ajuda e Conta e passava por cima delas. */
+  --mais-lado: 48px;
+  --mais-topo: calc(env(safe-area-inset-top, 0px) + 0.375rem);
+  --mais-direita: max(var(--gutter), env(safe-area-inset-right, 0px));
   --abas-altura: env(safe-area-inset-bottom, 0px);
   /* O foco por Tab ou por script não pode parar sob o cabeçalho preso nem sob as abas de baixo
      (WCAG 2.4.11). O Leitor tem a folga dele embaixo (mais específica, adiante). */
@@ -653,6 +663,9 @@ button,
 @media (min-width: 900px) {
   :root {
     --gutter: 2rem;
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
   }
 }
 
@@ -664,9 +677,11 @@ button,
 }
 
 /* Cabeçalho (D-D9, Q2): o lockup da marca à esquerda; Ajuda e Conta à direita; de 900 px em diante, as
-   áreas ao centro e "Registrar erro" com a tecla E. Altura de 60 px. O filete de baixo separa o
-   cabeçalho preso do texto que rola por baixo. Os recuos somam a área segura (entalhe), que só existe
-   com viewport-fit=cover (P7). */
+   áreas ao centro. Altura de 60 px. O filete de baixo separa o cabeçalho preso do texto que rola por
+   baixo. Os recuos somam a área segura (entalhe), que só existe com viewport-fit=cover (P7). O recuo da
+   direita é o do "+" (D-D23): o botão é fixo no canto, e a reserva é a largura dele mais um respiro de
+   4 px, então Ajuda e Conta nunca passam por baixo dele, nem rolam de lado quando a fonte ampliada
+   quebra o cabeçalho em linhas. O 100% de --mais-direita é a largura do cabeçalho, que é a da tela. */
 .topo {
   position: sticky;
   top: 0;
@@ -678,7 +693,7 @@ button,
   align-items: center;
   column-gap: 0.5rem;
   min-height: calc(3.75rem + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) max(var(--gutter), env(safe-area-inset-right, 0px)) 0
+  padding: env(safe-area-inset-top, 0px) calc(var(--mais-direita) + var(--mais-lado) + 0.25rem) 0
     max(var(--gutter), env(safe-area-inset-left, 0px));
   background: var(--fundo);
   border-bottom: 1px solid var(--borda);
@@ -716,15 +731,19 @@ button,
   fill: var(--marca-ponto);
 }
 
+/* Com a fonte muito ampliada Ajuda e Conta não cabem lado a lado na largura que o "+" deixa: o grupo
+   quebra em duas linhas, à direita, em vez de passar da tela. */
 .acoes-globais {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 0.25rem;
 }
 
-/* Ajuda em texto e Conta num alvo de 44 com o ícone de 24 (traço de 1,8); o ícone encosta no recuo da
-   página (o alvo avança 10 px sobre ele). As regras dos botões da casca levam o pai no seletor: `button, .botao`
-   vem depois no arquivo e, com a mesma especificidade, venceria (display, recuo e raio). */
+/* Ajuda em texto e Conta num alvo de 44 com o ícone de 24 (traço de 1,8). As regras dos botões da casca
+   levam o pai no seletor: `button, .botao` vem depois no arquivo e, com a mesma especificidade,
+   venceria (display, recuo e raio). */
 .acoes-globais .ajuda-botao {
   padding: 0 0.75rem;
 }
@@ -745,7 +764,6 @@ button,
 .acoes-globais .conta-botao {
   width: var(--alvo);
   padding: 0;
-  margin-right: -0.625rem;
 }
 
 .conta-botao svg {
@@ -754,22 +772,17 @@ button,
   flex: none;
 }
 
-/* Registrar erro no cabeçalho só a partir de 900 px, neutro (a ação da tela é o botão primário), com a
-   tecla E ao lado. Até 899 px o registro é o "+" do título (Hoje e Fixar) e a tecla E. */
-.acoes-globais .registrar-global {
-  display: none;
-  padding: 0 0.875rem 0 1rem;
-}
+/* Com a tela estreita (menos de 360 px) o lockup e o recuo de Ajuda encolhem para o cabeçalho caber numa
+   linha ao lado do "+": sem isso ele quebrava em duas e o "+", fixo no alto, ficava no canto da primeira
+   linha, longe do centro do cabeçalho. */
+@media (max-width: 22.5rem) {
+  .lockup {
+    width: 7rem;
+  }
 
-.registrar-global .atalho {
-  font: inherit;
-  font-size: 0.8125rem;
-  line-height: 1;
-  padding: 0.2rem 0.4rem;
-  border: 1px solid var(--borda-botao);
-  border-radius: var(--raio-chip);
-  background: var(--superficie-2);
-  color: var(--texto-atenuado);
+  .acoes-globais .ajuda-botao {
+    padding-inline: 0.5rem;
+  }
 }
 
 /* Abas das áreas (D-D9, Q2): o rótulo atenuado; a atual vai na luz do mundo, em negrito, com o traço de
@@ -869,28 +882,24 @@ button,
     max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 
-/* Título com o "+" na mesma linha (TituloComMais, D-D9, Q2): o "+" é redondo, de 48 px, com o contorno
-   do controle (1,5 px em --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de
-   dia, a serra 2 à noite), e abre o painel com "Registrar erro" e "Lembrete". Não é a ação da tela:
-   essa é a `.principal`. */
-.titulo-com-mais {
-  position: relative;
+/* O "+" da casca (MaisGlobal, D-D23): redondo, de 48 px, com o contorno do controle (1,5 px em
+   --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de dia, a serra 2 à noite). É
+   fixo no canto de cima à direita, sobre a reserva que o cabeçalho guarda no recuo (`.topo`) e, no modo
+   foco, no mesmo ponto da tela. Fica acima do cabeçalho (5) e das abas (5), abaixo do que cobre a tela toda (a
+   Abertura, 100; os diálogos, na camada do topo). Não é a ação da tela: essa é a `.principal`. */
+.mais-global {
+  position: fixed;
+  top: var(--mais-topo);
+  right: var(--mais-direita);
+  z-index: 6;
+}
+
+.mais-global .mais {
+  /* Em bloco: sem a linha de texto do `inline-flex`, a caixa do fixo tem os 48 px do botão e o painel
+     abre colado nele. */
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 0 0 1rem;
-}
-
-.titulo-com-mais h1 {
-  margin: 0;
-  min-width: 0;
-}
-
-.titulo-com-mais .mais {
-  flex: none;
-  width: 3rem;
-  height: 3rem;
+  width: var(--mais-lado);
+  height: var(--mais-lado);
   padding: 0;
   border: var(--espessura-contorno) solid var(--borda-campo);
   border-radius: 50%;
@@ -898,7 +907,7 @@ button,
 }
 
 @media (hover: hover) {
-  .titulo-com-mais .mais:hover {
+  .mais-global .mais:hover {
     --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--fundo-controle));
   }
 }
@@ -929,6 +938,9 @@ button,
 .mais-item {
   display: grid;
   justify-items: start;
+  /* O botão herda `justify-content: center` da regra de `button`: numa grade isso encolhe a coluna ao texto
+     mais largo e a centra, e o "Lembrete" ficava mais recuado que o link do "Registrar erro". */
+  justify-content: start;
   align-content: center;
   gap: 0.125rem;
   width: 100%;
@@ -951,6 +963,26 @@ button,
 .mais-item-titulo {
   font-size: 0.9375rem;
   font-weight: 700;
+}
+
+/* A tecla de atalho vem ao lado do nome, só como dica: onde há mouse (no toque não há tecla E). */
+.mais-item .atalho {
+  margin-left: 0.5rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-chip);
+  background: var(--superficie-2);
+  color: var(--texto-atenuado);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mais-item .atalho {
+    display: none;
+  }
 }
 
 .mais-item-apoio {
@@ -1038,14 +1070,12 @@ button,
 }
 
 /* A partir de 900 px: o cabeçalho na largura do conteúdo; as áreas ao centro, só com o rótulo (para
-   caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
+   caber com Ajuda, Conta e a reserva do "+"). O recuo da direita já vem do `.topo`, por --mais-direita,
+   que de 900 px em diante soma a mesma folga lateral. */
 @media (min-width: 900px) {
   .topo {
     padding-left: calc(
       max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
-    );
-    padding-right: calc(
-      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
     );
   }
 
@@ -1059,10 +1089,6 @@ button,
 
   .areas a[aria-current='page']::after {
     bottom: 3px;
-  }
-
-  .acoes-globais .registrar-global {
-    display: inline-flex;
   }
 }
 
@@ -2300,9 +2326,45 @@ a.item-norma strong {
   --abas-altura: 0px;
 }
 
-/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. */
+/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. Em tela
+   estreita (até 52 rem, o mesmo corte do cartão do foco) tem também o "+" (D-D23), que não sai com o
+   cabeçalho e fica no alto, à direita: o conteúdo começa abaixo dele, senão ele cobriria o fim das
+   primeiras linhas (e o alto do cartão). Acima disso o "+" cai fora da pilha do artigo, na margem.
+   --topo-do-foco é esse recuo, e a altura do cartão do foco desconta ele. */
+:root[data-modo-foco] {
+  --topo-do-foco: max(1rem, env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 52rem) {
+  :root[data-modo-foco] {
+    --topo-do-foco: calc(var(--mais-topo) + var(--mais-lado) + 0.25rem);
+  }
+}
+
 :root[data-modo-foco] .conteudo {
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-top: var(--topo-do-foco);
+}
+
+/* O "+" no foco: semitransparente como o ⋯ (o texto de trás aparece) e opaco com o foco do teclado, com o
+   painel aberto ou com o mouse em cima. */
+:root[data-modo-foco] .mais-global .mais {
+  --botao-fundo: var(--superficie-translucida);
+}
+
+:root[data-modo-foco] .mais-global .mais:focus-visible,
+:root[data-modo-foco] .mais-global .mais[aria-expanded='true'] {
+  --botao-fundo: var(--superficie);
+}
+
+@media (hover: hover) {
+  :root[data-modo-foco] .mais-global .mais:hover {
+    --botao-fundo: var(--superficie);
+  }
+}
+
+/* O aviso de escrita travada fica no foco e começa no alto, onde está o "+": o texto dele não passa por baixo. */
+:root[data-modo-foco] .faixa-posse {
+  padding-right: calc(var(--mais-direita) + var(--mais-lado) + 0.5rem);
 }
 
 .em-foco .acoes-leitor {
@@ -3440,14 +3502,15 @@ dialog.dialogo-acoes {
 }
 
 /* Artigo na tela inteira (D-D22): sem a moldura do Shell, o leitor tem exatamente a altura da tela (o
-   .conteudo tem 1 rem embaixo e, em cima, o maior entre 1 rem e a área segura; ver
-   `:root[data-modo-foco] .conteudo`) e a página não rola. A altura desce pela cadeia (leitor, corpo,
-   pilha) até o cartão, que toma o que sobra e rola por dentro; o artigo curto fica do tamanho do
-   texto, no meio. Embaixo, a área segura do aparelho (o ⋯ sobe por ela) entra no recuo. */
+   .conteudo tem 1 rem embaixo e, em cima, --topo-do-foco: o maior entre 1 rem e a área segura, ou, em
+   tela estreita, a faixa do "+"; ver `:root[data-modo-foco] .conteudo`) e a página não rola. A altura
+   desce pela cadeia (leitor, corpo, pilha) até o cartão, que toma o que sobra e rola por dentro; o
+   artigo curto fica do tamanho do texto, no meio. Embaixo, a área segura do aparelho (o ⋯ sobe por ela)
+   entra no recuo. */
 :root[data-modo-foco='artigo'] .leitor.em-foco {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
+  height: calc(100dvh - 1rem - var(--topo-do-foco));
   padding-top: 0;
   padding-bottom: max(0px, calc(env(safe-area-inset-bottom, 0px) - 1rem));
 }

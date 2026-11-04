@@ -5,6 +5,7 @@ import { PuxarEssenciais } from './biblioteca/PuxarEssenciais';
 import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
 import { Marca } from './componentes/escrita/Marca';
+import { MaisGlobal } from './componentes/MaisGlobal';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
@@ -40,10 +41,11 @@ function IconeDeArea({ d }: { d: string }) {
 /**
  * Moldura de todas as telas (D6; casca da D-D9, Q2): cabeçalho com o lockup da marca, Ajuda e Conta;
  * as quatro áreas em abas sobre o chão, a atual com o traço de caneta embaixo (no CSS), embaixo até
- * 899 px e no cabeçalho a partir de 900 (com "Registrar erro" e a tecla E); rodapé no fim do
- * conteúdo. O "+" mora no título das telas que registram (`TituloComMais`). Com o teclado aberto, as
- * abas saem da frente. Tudo fica dentro da Abertura (`ProvedorDaAbertura`): ela decide se o nome se
- * escreve em tela cheia ou no cabeçalho, e a Chegada espera por ela.
+ * 899 px e no cabeçalho a partir de 900; rodapé no fim do conteúdo. O "+" (`MaisGlobal`, D-D23) é um só,
+ * fixo no canto de cima à direita de toda tela, e o cabeçalho reserva o lugar dele no recuo; a tecla E
+ * registra um erro de qualquer tela. Com o teclado aberto, as abas saem da frente. Tudo fica dentro da Abertura
+ * (`ProvedorDaAbertura`): ela decide se o nome se escreve em tela cheia ou no cabeçalho, e a Chegada
+ * espera por ela.
  */
 export function Shell() {
   return (
@@ -108,17 +110,6 @@ function CascaDoApp() {
           ))}
         </nav>
         <div className="acoes-globais">
-          <Link
-            to="/recall/registrar"
-            className="botao registrar-global"
-            aria-keyshortcuts="E"
-            title="Registrar erro (atalho: E)"
-          >
-            Registrar erro
-            <kbd className="atalho" aria-hidden="true">
-              E
-            </kbd>
-          </Link>
           <MenuAjuda
             paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}
             {...(telaComGuia &&
@@ -150,6 +141,7 @@ function CascaDoApp() {
           </Link>
         </div>
       </header>
+      <MaisGlobal />
       <FaixaOffline />
       <AvisoDePosse />
       <main id="conteudo" className="conteudo" tabIndex={-1}>

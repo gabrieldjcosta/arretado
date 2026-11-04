@@ -1569,15 +1569,19 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await expect(areas).toBeHidden();
   await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeHidden();
   expect(await sobra()).toBe(0);
-  // O cartão fica no centro da tela, na vertical e na horizontal (rola por dentro só se exceder).
+  // O cartão fica no centro da tela, na horizontal, e na vertical no centro do que sobra da tela (rola
+  // por dentro só se exceder). Até 52 rem o "+" (D-D23) toma uma faixa no alto, e o cartão começa
+  // abaixo dela; acima disso o canto está livre e a conta é a da tela inteira.
   const caixaDoCartao = await page.locator('.area-artigo').boundingBox();
+  const caixaDoMais = await page.getByRole('button', { name: 'Novo registro' }).boundingBox();
   const tela = page.viewportSize();
-  if (!caixaDoCartao || !tela) throw new Error('sem medidas do cartão ou da tela');
+  if (!caixaDoCartao || !caixaDoMais || !tela) throw new Error('sem medidas do cartão ou da tela');
   expect(Math.abs(caixaDoCartao.x + caixaDoCartao.width / 2 - tela.width / 2)).toBeLessThanOrEqual(
     8,
   );
+  const topoLivre = tela.width <= 832 ? caixaDoMais.y + caixaDoMais.height : 0;
   expect(
-    Math.abs(caixaDoCartao.y + caixaDoCartao.height / 2 - tela.height / 2),
+    Math.abs(caixaDoCartao.y + caixaDoCartao.height / 2 - (topoLivre + tela.height) / 2),
   ).toBeLessThanOrEqual(12);
   // O palco: a página na penumbra (mais escura que o fundo de antes) e o cartão aceso. A entrada
   // leva 200 ms, e prefers-reduced-motion a desliga.
