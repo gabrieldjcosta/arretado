@@ -1,4 +1,5 @@
 import {
+  CEU_POR_CIMA_DA_CAIXA,
   desenhoDoJuazeiro,
   estrelasDoCeu,
   FLORES_DO_JARDIM,
@@ -76,10 +77,23 @@ describe('a vereda do pouso', () => {
       expect(e.x).toBeGreaterThanOrEqual(0);
       expect(e.x).toBeLessThanOrEqual(320);
       expect(e.y).toBeLessThanOrEqual(130);
+      // O céu que passa do topo da caixa fica por trás do rótulo do pouso: sem estrela ali.
+      expect(e.y).toBeGreaterThan(CEU_POR_CIMA_DA_CAIXA);
       expect(e.r).toBeGreaterThan(0.2);
       expect(e.opacidade).toBeGreaterThan(0.1);
       expect(e.opacidade).toBeLessThanOrEqual(0.7);
     }
+  });
+
+  it('a faixa de céu por trás do rótulo não tem lua em nenhum lugar', () => {
+    expect(CEU_POR_CIMA_DA_CAIXA).toBeCloseTo(22.67, 2);
+    for (let i = 0; i < LUGARES_POR_VOLTA; i += 1) {
+      const [, y] = lugarDaVereda(i).lua;
+      // A ponta de cima do crescente fica 16 unidades acima do ponto dado.
+      expect(y - 16).toBeGreaterThanOrEqual(CEU_POR_CIMA_DA_CAIXA);
+    }
+    // O juazeiro, com a lua à esquerda, é o que ficaria sob o texto do rótulo: ela desce da faixa.
+    expect(lugarDaVereda(0).lua[1] - 16).toBeGreaterThanOrEqual(CEU_POR_CIMA_DA_CAIXA + 8);
   });
 
   it('a lua é um arco fechado a partir do ponto dado', () => {

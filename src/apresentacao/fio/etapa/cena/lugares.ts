@@ -17,6 +17,12 @@ export const LARGURA_DA_CENA = 320;
 export const ALTURA_DA_CENA = 236;
 export const CHAO_DA_CENA = 226;
 
+/**
+ * A caixa da cena é de 3 por 2 e o desenho tem 236 de altura: as 22,7 unidades de cima passam do topo da caixa e ficam
+ * por trás do rótulo do pouso. Nessa faixa não entra estrela nem lua, para nada cair em cima do texto.
+ */
+export const CEU_POR_CIMA_DA_CAIXA = ALTURA_DA_CENA - (LARGURA_DA_CENA * 2) / 3;
+
 /** Quantos lugares a vereda tem; o jardim do Zé tem uma flor por pouso, até cinco. */
 export const LUGARES_POR_VOLTA = 5;
 
@@ -141,7 +147,7 @@ const LUGARES_DA_VEREDA: readonly BaseDoLugar[] = [
   {
     nome: 'Juazeiro',
     titulo: 'Sombra de juazeiro. Pode descansar.',
-    lua: [44, 36],
+    lua: [44, 52],
     desenho: desenhoDoJuazeiro,
   },
   {
@@ -213,7 +219,7 @@ export function pousosDaVolta(numero: number): PousoNaVereda[] {
   return Array.from({ length: atual.flores }, (_, i) => pousoNaVereda(primeiro + i));
 }
 
-/** O céu: estrelas miúdas na metade de cima, sempre as mesmas para o mesmo lugar. */
+/** O céu: estrelas miúdas na metade de cima, sempre as mesmas para o mesmo lugar, sempre abaixo da faixa do rótulo. */
 export interface Estrela {
   x: number;
   y: number;
@@ -221,11 +227,14 @@ export interface Estrela {
   opacidade: number;
 }
 
+/** A primeira estrela fica um pouco abaixo do topo da caixa: o rótulo do pouso nunca tem estrela por trás. */
+const TOPO_DAS_ESTRELAS = Math.ceil(CEU_POR_CIMA_DA_CAIXA) + 4;
+
 export function estrelasDoCeu(indiceDoLugar: number, quantidade = 28): Estrela[] {
   const rnd = sorteio(Math.max(0, Math.trunc(indiceDoLugar)) + 4);
   return Array.from({ length: quantidade }, () => ({
     x: Number(casas(rnd() * LARGURA_DA_CENA, 0)),
-    y: Number(casas(rnd() * 130, 0)),
+    y: Number(casas(TOPO_DAS_ESTRELAS + rnd() * (130 - TOPO_DAS_ESTRELAS), 0)),
     r: Number(casas(rnd() * 1.1 + 0.3, 1)),
     opacidade: Number(casas(rnd() * 0.5 + 0.2, 2)),
   }));
