@@ -1,15 +1,7 @@
 import { animate } from 'motion/mini';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { movimentoAgora } from '../../movimento';
+import { ContextoDeAvisos, type Aviso } from './contexto';
 import './fio-avisos.css';
 
 /**
@@ -17,21 +9,10 @@ import './fio-avisos.css';
  * reversível). Sem modal: não interrompe o estudo. Entrada e saída com Motion (`motion/mini`).
  * Tudo vive na casca do Fio; fora dela `useAvisos` devolve um `avisar` que não faz nada.
  */
-export interface Aviso {
-  texto: string;
-  /** Aparece o botão "Desfazer"; roda ao tocar e fecha o aviso. */
-  desfazer?: () => void;
-  /** Padrão 5 000 ms. */
-  duracaoMs?: number;
-}
 
 interface Item extends Aviso {
   id: number;
 }
-
-const Contexto = createContext<(aviso: Aviso) => void>(() => undefined);
-
-export const useAvisos = () => useContext(Contexto);
 
 const MAXIMO = 3;
 
@@ -90,13 +71,13 @@ export function AvisosDoFio({ children }: { children: ReactNode }) {
   }, []);
   const valor = useMemo(() => avisar, [avisar]);
   return (
-    <Contexto.Provider value={valor}>
+    <ContextoDeAvisos.Provider value={valor}>
       {children}
       <ul className="fio-avisos" role="status" aria-live="polite" aria-label="Avisos">
         {itens.map((i) => (
           <AvisoNaTela key={i.id} item={i} fechar={fechar} />
         ))}
       </ul>
-    </Contexto.Provider>
+    </ContextoDeAvisos.Provider>
   );
 }

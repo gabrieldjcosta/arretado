@@ -1,7 +1,8 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { AvisosDoFio, useAvisos } from './AvisosDoFio';
+import { AvisosDoFio } from './AvisosDoFio';
+import { useAvisos } from './contexto';
 
 function Gatilho({ desfazer }: { desfazer: () => void }) {
   const avisar = useAvisos();
