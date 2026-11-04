@@ -16,8 +16,15 @@ export function luzDaHora(agora: Date): LuzDaHora {
 export function useLuzDaHora(): LuzDaHora {
   const [luz, setLuz] = useState<LuzDaHora>(() => luzDaHora(new Date()));
   useEffect(() => {
-    const id = window.setInterval(() => setLuz(luzDaHora(new Date())), 15 * 60 * 1000);
-    return () => window.clearInterval(id);
+    const id = window.setInterval(
+      () => {
+        setLuz(luzDaHora(new Date()));
+      },
+      15 * 60 * 1000,
+    );
+    return () => {
+      window.clearInterval(id);
+    };
   }, []);
   return luz;
 }
