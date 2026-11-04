@@ -23,7 +23,7 @@ const cartao = (caixa: number, extra: Partial<Cartao> = {}): Cartao =>
 
 describe('nivelDaLacuna', () => {
   it('caixa 1 é o que a pessoa escolheu; cada caixa a mais sobe um nível, até o último', () => {
-    expect([1, 2, 3, 4, 5, 6].map(nivelDaLacuna)).toEqual([0, 1, 2, 3, 3, 3]);
+    expect([1, 2, 3, 4, 5, 6].map((c) => nivelDaLacuna(c))).toEqual([0, 1, 2, 3, 3, 3]);
   });
 });
 
@@ -53,6 +53,14 @@ describe('ocultosDoNivel', () => {
     expect(ocultosDoNivel('de seis a', [{ inicio: 0, fim: 2 }], 3)).toEqual([
       { inicio: 0, fim: 2 },
     ]);
+  });
+});
+
+describe('cartão com irmão', () => {
+  it('para um nível antes do máximo, e o nível 3 só existe sem irmão', () => {
+    expect([1, 2, 3, 4, 6].map((c) => nivelDaLacuna(c, true))).toEqual([0, 1, 2, 2, 2]);
+    expect(frenteDaRevisao(cartao(6), true)).not.toBe(frenteDaRevisao(cartao(6), false));
+    expect(frenteDaRevisao(cartao(3), true)).toBe(frenteDaRevisao(cartao(3), false));
   });
 });
 

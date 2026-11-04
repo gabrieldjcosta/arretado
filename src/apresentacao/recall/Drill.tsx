@@ -17,7 +17,7 @@ import {
   frenteDaRevisao,
   lacunaCresceu,
   nivelDaLacuna,
-  NIVEL_MAXIMO_DA_LACUNA,
+  temIrmaoDeLacuna,
 } from '../../dominios/recall/lacuna-progressiva';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
@@ -77,6 +77,8 @@ export function Drill() {
   const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
   /** O que a pessoa escreveu antes de virar (pré-teste); só vive na tela, nunca é gravado. */
+  /** Se o cartão de lacuna tem irmão (outro trecho da mesma Frase); até saber, supõe que tem. */
+  const [irmao, setIrmao] = useState<{ id: string; tem: boolean } | null>(null);
   const [escrito, setEscrito] = useState<{ id: string; texto: string } | null>(null);
   const inicio = useRef(0);
   /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
@@ -155,6 +157,12 @@ export function Drill() {
     certeza.current = undefined;
     botaoVirar.current?.focus();
     let ativo = true;
+    temIrmaoDeLacuna(repo, atual).then(
+      (tem) => {
+        if (ativo) setIrmao({ id: atual.id, tem });
+      },
+      () => undefined,
+    );
     carregarVerso(repo, atual).then(
       (v) => {
         if (ativo) setVerso({ id: atual.id, texto: v });
@@ -314,6 +322,7 @@ export function Drill() {
   }
 
   if (!atual) return null;
+  const temIrmao = irmao?.id === atual.id ? irmao.tem : atual.fraseId !== undefined;
   const palpite = escrito?.id === atual.id ? escrito.texto : '';
   const restam = estado.fila.length - estado.indice - 1;
   return (
@@ -327,10 +336,10 @@ export function Drill() {
       />
       <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
         <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
-          <p className="drill-frente texto-leitura">{frenteDaRevisao(atual)}</p>
+          <p className="drill-frente texto-leitura">{frenteDaRevisao(atual, temIrmao)}</p>
           {!estado.virado &&
-            lacunaCresceu(atual) &&
-            nivelDaLacuna(atual.caixa) < NIVEL_MAXIMO_DA_LACUNA && (
+            lacunaCresceu(atual, temIrmao) &&
+            nivelDaLacuna(atual.caixa, temIrmao) < nivelDaLacuna(6, temIrmao) && (
               <p className="dica">A lacuna cresce a cada acerto.</p>
             )}
           {estado.virado && (
