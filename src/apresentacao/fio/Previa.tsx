@@ -3,7 +3,7 @@
 // rotas novas levam de volta a ele.
 import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { Navigate, useNavigate } from 'react-router';
-import { Esqueleto } from '../componentes/estados';
+import { EsqueletoDoFio } from './avisos/EsqueletoDoFio';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
@@ -24,14 +24,14 @@ export const PousoDoFio = lazy(() =>
 /** Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. */
 export function TelaDoFio({ children }: { children: ReactNode }) {
   if (useInterface() !== 'fio') return <Navigate to="/" replace />;
-  return <Suspense fallback={<Esqueleto linhas={4} />}>{children}</Suspense>;
+  return <Suspense fallback={<EsqueletoDoFio />}>{children}</Suspense>;
 }
 
 /** O começo do app: o Agora na prévia, o Hoje de sempre fora dela. */
 export function PaginaInicial() {
   if (useInterface() !== 'fio') return <Hoje />;
   return (
-    <Suspense fallback={<Esqueleto linhas={4} />}>
+    <Suspense fallback={<EsqueletoDoFio />}>
       <AgoraDoFio />
     </Suspense>
   );
