@@ -81,11 +81,11 @@ test('Ler, Lembrar e Guardar com a LEP: cada cartão cabe, passa no axe e o pous
   }
 
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Pode descansar.' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Pode descansar\.$/ })).toBeVisible();
   await expect(page.getByText(/^Leu /)).toBeVisible();
   await expect(page.getByText(/^Lembrou /)).toBeVisible();
   await semViolacoes(page);
-  await page.getByRole('button', { name: 'Seguir' }).click();
+  await page.getByRole('button', { name: /seguir para o próximo passo/ }).click();
   await expect(page).toHaveURL(/#\/$/);
 });
 
