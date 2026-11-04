@@ -502,3 +502,20 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** "Escolher meu concurso" como único botão principal; a data da prova (opcional); a lista de matérias; "Importar outra planilha" (já era dobrado); o formulário em si.
 
 **Custo.** Um toque a mais para quem vem com planilha. O formulário deixa de aparecer sem ser pedido.
+
+## D-D21 — O Fixar abre sem cobrança: a semana só depois do primeiro Dia, uma estimativa só e o plural certo (03/11/2026)
+
+> **Emenda a D-D7 (Fixar).** O que abre o Fixar deixa de contar o que a pessoa não fez e passa a dizer o mesmo que o Hoje.
+
+**Origem.** O consolidado de 03/11/2026, tema 13: "nenhum dia nos últimos 7 conta o vazio como dívida; 1 dicas; 2 min aqui e 3 min no Hoje" (Genjutsu); "sete blocos antes do conteúdo; o contador é contagem de culpa" (Impeccable). Harmonizado: "some o contador; a semana só aparece depois do 1º dia; uma estimativa só, a mesma no Hoje e no Fixar, e o plural certo". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. `DiasDaSemana` não aparece sem nenhum Dia com revisão: some o "Nenhum dia nos últimos 7" e some a fileira de sete anéis vazios. Depois do primeiro Dia aparecem as sete marcas e o nome "Últimos 7 dias", sem número. A conta ("4 dos últimos 7 dias") fica só para leitor de tela (`.visualmente-oculto`), porque as marcas são decorativas.
+2. A estimativa da ação do Fixar é a do Hoje: `minutosDaRodada(cartões, frases, cota)` (em `dominios/recall/ordem-de-valor.ts`) soma Cartões e Frases da rodada, cada tipo até a cota. Antes o Fixar contava só os Cartões (3 Cartões e 2 Frases: 2 min aqui, 3 min no Hoje). Com só Frases vencidas, a ação também passa a trazer a estimativa.
+3. O botão do Guia da tela diz "1 dica" quando há uma só (o Fixar em uso tem uma).
+
+**O que continua como está.** A ação única da tela (Revisar, Registrar); "Hoje: N de V. Os outros esperam; nada é apagado." (a única linha que acalma quem tem fila grande); "Ache o erro"; a linha "Depois: …"; o aviso de semana pesada; as três abas.
+
+**Em aberto.** A faixa de dicas do Fixar (versão 4) fica como está: o que acontece com ela em todas as telas depende da D-D16.
+
+**Custo.** Quem gosta de ver o "4 dos últimos 7" não o vê mais; o número continua para leitor de tela. A fileira de marcas só nasce no primeiro Dia, então a primeira revisão faz a tela ganhar uma linha.

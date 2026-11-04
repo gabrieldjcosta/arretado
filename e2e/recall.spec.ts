@@ -189,7 +189,8 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
   await expect(page.getByRole('heading', { name: 'Revisar 10 cartões' })).toBeVisible();
   await expect(page.getByText('cerca de 5 min')).toBeVisible();
   await expect(page.getByText(/Hoje: 10 de 25/)).toBeVisible();
-  await expect(page.getByText('Nenhum dia nos últimos 7')).toBeVisible();
+  // Sem nenhum Dia com revisão a semana não aparece (D-D21).
+  await expect(page.getByText(/últimos 7/)).toHaveCount(0);
 
   await semViolacoes(page);
 
@@ -217,7 +218,11 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
 
   await page.goto('/#/recall');
   await page.reload();
-  await expect(page.getByText('1 dos últimos 7 dias')).toBeVisible();
+  // Depois do primeiro Dia a semana aparece: sete marcas e um nome sem número (a conta é do leitor de tela).
+  const semana = page.locator('.dias-da-semana');
+  await expect(semana.locator('.dias-marcas .ponto-de-luz')).toHaveCount(7);
+  await expect(semana.getByText('Últimos 7 dias', { exact: true })).toBeVisible();
+  await expect(semana).toContainText('1 dos últimos 7 dias');
 });
 
 test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', async ({ page }) => {

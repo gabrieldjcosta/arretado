@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   itensQueCabem,
+  minutosDaRodada,
   minutosDoLote,
   motivoDoItem,
   ordenarPorValor,
@@ -77,6 +78,17 @@ describe('minutos e itens', () => {
     expect([5, 10, 25, 45].map(itensQueCabem)).toEqual([10, 20, 50, 90]);
     expect(minutosDoLote(20)).toBe(10);
     expect(minutosDoLote(1)).toBe(1);
+  });
+
+  it('a rodada soma Cartões e Frases, cada tipo até a cota (a conta do Hoje e do Fixar)', () => {
+    // 3 Cartões e 2 Frases: 5 itens, 3 min (só os Cartões dariam 2).
+    expect(minutosDaRodada(3, 2, 10)).toBe(3);
+    expect(minutosDoLote(3)).toBe(2);
+    // A cota vale por tipo: 25 Cartões e 12 Frases com cota 10 são 20 itens.
+    expect(minutosDaRodada(25, 12, 10)).toBe(10);
+    // Só um tipo, ou nenhum: no mínimo 1 min.
+    expect(minutosDaRodada(0, 4, 10)).toBe(2);
+    expect(minutosDaRodada(0, 0, 10)).toBe(1);
   });
 
   it('o lote não passa da fila e minutos × itens fecham', () => {

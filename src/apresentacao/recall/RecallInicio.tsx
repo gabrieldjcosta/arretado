@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
-import { minutosDoLote } from '../../dominios/recall/ordem-de-valor';
+import { minutosDaRodada } from '../../dominios/recall/ordem-de-valor';
 import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
@@ -41,7 +41,8 @@ export function RecallInicio() {
   const frasesVencidas = dados?.frasesVencidas ?? 0;
   const cota = dados?.cota ?? 10;
   const lote = Math.min(cota, vencidos);
-  const minutos = minutosDoLote(lote);
+  // A mesma estimativa do Hoje: Cartões e Frases da rodada, não só os Cartões (D-D21).
+  const minutos = minutosDaRodada(vencidos, frasesVencidas, cota);
 
   return (
     <>
@@ -62,6 +63,7 @@ export function RecallInicio() {
       ) : frasesVencidas > 0 ? (
         <AcaoAgora
           titulo={`Revisar ${frases(Math.min(cota, frasesVencidas))}`}
+          estimativa={minutos}
           rotuloBotao="Começar"
           para="/recall/frases/revisar"
         />
