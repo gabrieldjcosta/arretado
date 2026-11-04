@@ -217,6 +217,33 @@
   stroke: none;
 }
 
+/* A florzinha de quem voltou depois de uns dias: brota no topo do cacto com a mola do app; no Calmo só
+   aparece, em movimento reduzido já está lá. */
+.fio-cacto .fio-cacto-flor {
+  fill: var(--f-flor);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fio-flor 0.7s var(--f-mola) 0.5s backwards;
+}
+
+:root[data-perfil='calmo'] .fio-cacto .fio-cacto-flor {
+  animation-name: fio-flor-calma;
+}
+
+@keyframes fio-flor {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes fio-flor-calma {
+  from {
+    opacity: 0;
+  }
+}
+
 /* O "+" da casca (MaisGlobal, D-D23): amarelo sobre o vidro, como o ponto de luz, e o contorno acende no
    hover. O ciano é só do foco e da seleção; o "+" nunca é ciano. */
 .shell-fio .mais-global .mais {
