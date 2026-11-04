@@ -248,14 +248,13 @@ test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ p
     .getByRole('navigation', { name: 'Lugares' })
     .getByRole('button', { name: 'Destino' })
     .click();
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'O caminho começa aqui' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Destino' })).toBeAttached();
+  await expect(page.getByRole('group', { name: 'Mapa do caminho pelo Nordeste' })).toBeVisible();
   await semViolacoesNoFio(page);
 
   await page
     .getByRole('navigation', { name: 'Lugares' })
-    .getByRole('link', { name: 'Varal' })
+    .getByRole('button', { name: 'Varal' })
     .click();
   await expect(page.getByRole('heading', { level: 1, name: /pendurado no fio/ })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você estuda' })).toBeVisible();

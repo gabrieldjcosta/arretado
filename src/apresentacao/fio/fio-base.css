@@ -294,9 +294,9 @@
   padding-top: 0.25rem;
 }
 
-/* As telas do Fio que ainda moram nesta casca (o Destino e o Varal; o Agora, os passos e o pouso moram no quadro do
+/* As telas do Fio que ainda moram nesta casca (o Varal; o Agora, o Destino, os passos e o pouso moram no quadro do
    mockup) são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura de sempre. */
-.shell-fio :is(.fio-destino, .fio-varal) {
+.shell-fio .fio-varal {
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;
@@ -307,22 +307,6 @@
     padding-left: calc(
       max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
     );
-  }
-}
-
-/* O Destino é a tela do mapa: num monitor ele ganha mais chão (o mapa é a coluna da direita). A largura da casca
-   vem de --largura-casca, e --mais-direita já a trouxe assada na raiz, então a conta se refaz aqui, na casca,
-   para o "+" e o cabeçalho acompanharem o conteúdo. */
-@media (min-width: 980px) {
-  .shell-fio[data-largo] {
-    --largura-casca: 1180px;
-    --mais-direita: calc(
-      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
-    );
-  }
-
-  .shell-fio[data-largo] .fio-destino {
-    max-width: none;
   }
 }
 

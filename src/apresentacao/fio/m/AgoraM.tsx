@@ -62,6 +62,7 @@ export function AgoraM() {
   useEffect(() => {
     void import('./PassoM').catch(() => undefined);
     void import('./PousoM').catch(() => undefined);
+    void import('./DestinoM').catch(() => undefined);
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
     }

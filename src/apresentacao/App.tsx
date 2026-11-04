@@ -139,7 +139,7 @@ export function App({
                 <Route
                   path="destino"
                   element={
-                    <TelaDoFio>
+                    <TelaDoFio noQuadro>
                       <DestinoDoFio />
                     </TelaDoFio>
                   }

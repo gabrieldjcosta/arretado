@@ -1,10 +1,18 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { LUGARES, type IdDoLugar } from '../lugares';
+import { LUGARES, noQuadroDoFio, type IdDoLugar } from '../lugares';
+import { trocarDeAba } from './aba';
+
+/** A tela do quadro que cada lugar da nav abre (o `data-tela` do mockup). */
+const TELA_DO_LUGAR: Readonly<Record<IdDoLugar, string>> = {
+  agora: 'inicio',
+  destino: 'mapa',
+  varal: 'varal',
+};
 
 /**
  * A nav do mockup (`<nav class="nav">`): três lugares e um indicador que desliza até o aceso. Os lugares
- * são irmãos: trocar de um para outro nunca empilha tela.
+ * são irmãos: trocar de um para outro nunca empilha tela, e o fio de uma voa até o lugar do fio da outra (`aba.ts`).
  */
 export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
   const navegar = useNavigate();
@@ -35,7 +43,13 @@ export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
           data-nav={l.id}
           aria-current={l.id === ativo ? 'page' : 'false'}
           onClick={() => {
-            if (l.id !== ativo) void navegar(l.caminho);
+            if (l.id === ativo) return;
+            const ir = () => {
+              void navegar(l.caminho);
+            };
+            // O fio só voa entre telas do quadro; um lugar que ainda mora na casca de antes só troca.
+            if (noQuadroDoFio(l.caminho)) void trocarDeAba(TELA_DO_LUGAR[l.id], ir);
+            else ir();
           }}
         >
           {l.nome}
