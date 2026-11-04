@@ -38,6 +38,25 @@ const mapa = (page: Page) => page.getByRole('group', { name: 'Mapa do caminho pe
 const escala = (page: Page) =>
   mapa(page).evaluate((el) => Number(el.style.getPropertyValue('--cam-k')));
 
+/** Rótulos visíveis que passam da borda da caixa do mapa: o que não cabe some (o ponto fica). Deve ser vazio. */
+const rotulosCortados = (page: Page) =>
+  mapa(page).evaluate((el) => {
+    const caixa = el.getBoundingClientRect();
+    return [...el.querySelectorAll<HTMLElement>('.ne-marcas [data-rot]')]
+      .filter((n) => {
+        const css = getComputedStyle(n);
+        if (css.visibility === 'hidden' || Number(css.opacity) < 0.05) return false;
+        const r = n.getBoundingClientRect();
+        return (
+          r.left < caixa.left - 1 ||
+          r.right > caixa.right + 1 ||
+          r.top < caixa.top - 1 ||
+          r.bottom > caixa.bottom + 1
+        );
+      })
+      .map((n) => `${n.getAttribute('data-rot') ?? '?'}: ${n.textContent.trim()}`);
+  });
+
 /** Nada pode rolar de lado nem passar da largura da tela. */
 async function semRolagemLateral(page: Page) {
   expect(
@@ -72,6 +91,18 @@ test('o mapa cabe na tela, passa no axe e a câmera responde aos botões e ao te
   expect(caixa?.height ?? 0).toBeGreaterThan(300);
   await semRolagemLateral(page);
   await semViolacoes(page);
+  await expect.poll(() => rotulosCortados(page)).toEqual([]);
+
+  // Os botões de aproximar e afastar ficam no canto de cima, na linha de "Ver o Nordeste": embaixo o polegar
+  // esbarraria na pílula dos lugares.
+  for (const nome of ['Aproximar', 'Afastar']) {
+    const botao = await page.getByRole('button', { name: nome }).boundingBox();
+    expect(botao).not.toBeNull();
+    expect((botao?.y ?? 999) - (caixa?.y ?? 0)).toBeLessThan(24);
+    expect((botao?.x ?? 0) + (botao?.width ?? 0)).toBeLessThanOrEqual(
+      (caixa?.x ?? 0) + (caixa?.width ?? 0),
+    );
+  }
 
   // Aproximar e afastar soltam a câmera (o botão passa a dizer "Voltar para você"); ele a traz de volta, e
   // "Ver o Nordeste" abre o mapa todo.
@@ -87,6 +118,7 @@ test('o mapa cabe na tela, passa no axe e a câmera responde aos botões e ao te
   await page.getByRole('button', { name: 'Ver o Nordeste' }).click();
   await expect(page.getByRole('button', { name: 'Voltar para você' })).toBeVisible();
   await expect.poll(() => escala(page)).toBeLessThan(perto * 0.7);
+  await expect.poll(() => rotulosCortados(page)).toEqual([]);
   await semViolacoes(page);
   await page.getByRole('button', { name: 'Voltar para você' }).click();
   await expect.poll(() => escala(page)).toBeCloseTo(perto, 1);

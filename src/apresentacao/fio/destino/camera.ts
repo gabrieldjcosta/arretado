@@ -133,19 +133,25 @@ export interface RotuloEmTela {
 
 /**
  * Quais rótulos ficam escondidos para nenhum cobrir outro: os de menor prioridade cedem. Guloso, na ordem
- * de prioridade; um rótulo fora da caixa também cede (não há o que ler nele).
+ * de prioridade. Um rótulo que passa da borda da caixa (com `margem` de folga) também cede: texto cortado
+ * não se lê, e o ponto dele continua no mapa.
  */
 export function esconderSobrepostos(
   rotulos: readonly RotuloEmTela[],
   caixa: Caixa,
   folgaX = 3,
   folgaY = 1,
+  margem = 8,
 ): Set<string> {
   const escondidos = new Set<string>();
   const aceitos: RotuloEmTela[] = [];
   const ordenados = [...rotulos].sort((a, b) => a.prioridade - b.prioridade);
   for (const r of ordenados) {
-    const fora = r.dir < 0 || r.base < 0 || r.esq > caixa.largura || r.topo > caixa.altura;
+    const fora =
+      r.esq < margem ||
+      r.topo < margem ||
+      r.dir > caixa.largura - margem ||
+      r.base > caixa.altura - margem;
     const bate = aceitos.some(
       (o) =>
         r.esq < o.dir + folgaX &&

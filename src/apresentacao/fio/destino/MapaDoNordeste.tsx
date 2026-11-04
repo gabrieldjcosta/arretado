@@ -110,18 +110,21 @@ function rotulosDoMapa(jornada: Jornada, lugares: readonly LugarDoMapa[]): Rotul
       estimarLargura(e.materia?.nome ?? '', 11, 0.82),
       estimarLargura(subtituloDoEstado(e, jornada), 11, 0.52),
     );
+    // Longe, todos os nomes aparecem; perto, só os dos estados de sombra e livres (o CSS os deixa de marca-d'água).
+    const fraco = e.situacao === 'sombra' || e.situacao === 'livre';
     rotulos.push({
       id: `uf-${e.uf}`,
       x: cx + dx,
       y: cy + dy,
-      prioridade: e.situacao === 'agora' ? 3 : e.situacao === 'seguinte' ? 4 : 5,
-      regimes: ['longe'],
+      prioridade: e.situacao === 'agora' ? 3 : e.situacao === 'seguinte' ? 4 : 6,
+      regimes: fraco ? ambos : ['longe'],
       forma: (sx, sy) => ({ esq: sx - larg / 2, dir: sx + larg / 2, topo: sy - 16, base: sy + 16 }),
     });
   }
 
   const fim = lugares[ultimo];
   if (fim) {
+    // O elemento (estrela e texto) fica centrado no ponto; só o texto some quando não cabe, e a estrela fica.
     const larg = 34 + 8 + estimarLargura('A aprovação na sua prova', 11.5, 0.5);
     rotulos.push({
       id: 'fim',
@@ -129,7 +132,12 @@ function rotulosDoMapa(jornada: Jornada, lugares: readonly LugarDoMapa[]): Rotul
       y: fim.y,
       prioridade: 1,
       regimes: ambos,
-      forma: (sx, sy) => ({ esq: sx - larg / 2, dir: sx + larg / 2, topo: sy - 20, base: sy + 20 }),
+      forma: (sx, sy) => ({
+        esq: sx - larg / 2 + 42,
+        dir: sx + larg / 2,
+        topo: sy - 16,
+        base: sy + 16,
+      }),
     });
   }
   return rotulos.sort((a, b) => a.prioridade - b.prioridade);
@@ -437,7 +445,6 @@ export function MapaDoNordeste({ entrada }: { entrada: EntradaDaJornada }) {
           <button
             type="button"
             className="ne-fim"
-            data-rot="fim"
             style={ponto(ultimoLugar.x, ultimoLugar.y)}
             onClick={() => {
               setFicha(undefined);
@@ -451,7 +458,7 @@ export function MapaDoNordeste({ entrada }: { entrada: EntradaDaJornada }) {
                 <path d="M12 2.5l2.6 6.2 6.7.6-5.1 4.4 1.6 6.6L12 16.8l-5.8 3.5 1.6-6.6-5.1-4.4 6.7-.6z" />
               </svg>
             </i>
-            <span>
+            <span data-rot="fim">
               <b>Seu destino</b>A aprovação na sua prova
             </span>
           </button>
@@ -462,14 +469,14 @@ export function MapaDoNordeste({ entrada }: { entrada: EntradaDaJornada }) {
         {vista === 'voce' ? 'Ver o Nordeste' : 'Voltar para você'}
       </button>
       <div className="ne-zoom">
-        <button type="button" aria-label="Aproximar" onClick={aproximar}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
         <button type="button" aria-label="Afastar" onClick={afastar}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 12h14" />
+          </svg>
+        </button>
+        <button type="button" aria-label="Aproximar" onClick={aproximar}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
           </svg>
         </button>
       </div>

@@ -21,6 +21,7 @@
   --m-fim-fundo: #fffaf0;
   --m-fim-cor: #8a5200;
   --m-fim-halo: rgb(255 197 61 / 32%);
+  --m-andado-brilho: var(--f-fio-halo);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,6 +42,7 @@
     --m-fim-fundo: #0b1322;
     --m-fim-cor: #fff7da;
     --m-fim-halo: rgb(255 197 61 / 14%);
+    --m-andado-brilho: rgb(255 255 255 / 8%);
   }
 }
 
@@ -61,6 +63,7 @@
   --m-fim-fundo: #0b1322;
   --m-fim-cor: #fff7da;
   --m-fim-halo: rgb(255 197 61 / 14%);
+  --m-andado-brilho: rgb(255 255 255 / 8%);
 }
 
 /* ---------- A caixa: arrastar passeia, a roda e o beliscão aproximam ---------- */
@@ -184,7 +187,7 @@
 }
 
 .ne-andado-brilho {
-  stroke: var(--f-fio-halo);
+  stroke: var(--m-andado-brilho);
   stroke-width: 9;
 }
 
@@ -211,6 +214,12 @@
 
 .ne-marcas [data-oculto] {
   visibility: hidden;
+}
+
+/* O texto do destino some sem sair da árvore de acessibilidade: é dele que o botão tira o nome. */
+.ne-marcas .ne-fim span[data-oculto] {
+  visibility: visible;
+  opacity: 0;
 }
 
 .ne-rotulo {
@@ -521,13 +530,13 @@
   font: 700 13px var(--fonte-interface);
 }
 
+/* No canto de cima, na mesma linha de "Ver o Nordeste": embaixo o polegar esbarra na pílula dos lugares. */
 .ne-zoom {
   position: absolute;
+  top: 12px;
   right: 12px;
-  bottom: 12px;
   z-index: 3;
   display: flex;
-  flex-direction: column;
   gap: 8px;
 }
 
@@ -555,7 +564,7 @@
   bottom: 12px;
   z-index: 3;
   width: max-content;
-  max-width: calc(100% - 7.5rem);
+  max-width: calc(100% - 1.5rem);
   margin: 0;
   padding: 0.5rem 1rem;
   border: 1px solid var(--f-cartao-borda);

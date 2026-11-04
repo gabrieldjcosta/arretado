@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Link } from 'react-router';
+import { useLarguraMinima } from '../../componentes/largura';
 import type { EntradaDaJornada } from './jornada';
 import { ORDEM_UF } from './nordeste';
 import { useJornadaDoFio } from './useJornadaDoFio';
@@ -12,10 +13,17 @@ const MapaDoNordeste = lazy(() =>
 
 const plural = (n: number, um: string, varios: string) => `${String(n)} ${n === 1 ? um : varios}`;
 
+/** A tela larga (a casca alarga a partir daqui, em fio-base.css): a lista dos pousos já vem aberta. */
+const LARGURA_DO_MONITOR = 980;
+
+/** A matéria em que a pessoa está, a do último pouso (ou a da vez). */
+const materiaAtual = (entrada: EntradaDaJornada | undefined) =>
+  entrada?.materias.find((m) => m.id === entrada.atualId);
+
 /** Quanto do que mais cai na matéria atual a pessoa já leu (artigos que o Fio conhece dela). */
 function resumoDoMapa(entrada: EntradaDaJornada | undefined) {
   const artigos = entrada?.artigos ?? [];
-  const materia = entrada?.materias.find((m) => m.id === entrada.atualId);
+  const materia = materiaAtual(entrada);
   if (!entrada || !materia || artigos.length === 0) return undefined;
   const lidos = artigos.filter((a) => a.lido).length;
   return { nome: materia.nome, percentual: Math.round((100 * lidos) / artigos.length) };
@@ -30,7 +38,14 @@ export function DestinoDoFio() {
   const { entrada, falhou, fio } = useJornadaDoFio();
   const { etapasFeitas, passosDados, pousos } = fio.estado;
   const resumo = resumoDoMapa(entrada);
+  const atual = materiaAtual(entrada);
   const foraDoMapa = entrada ? Math.max(0, entrada.materias.length - ORDEM_UF.length) : 0;
+  // O número do Destino não some: com a lei da matéria no app ele é a fração que já é da pessoa; sem a lei
+  // (ou sem artigo que caia nela), conta as etapas, que é o que o app sabe do caminho.
+  const contaEtapas = resumo === undefined && entrada !== undefined && etapasFeitas > 0;
+  // Os pousos vêm abertos no monitor, onde a coluna da esquerda tem sobra de altura; a pessoa decide depois.
+  const larga = useLarguraMinima(LARGURA_DO_MONITOR);
+  const [pousosAbertos, setPousosAbertos] = useState<boolean | undefined>(undefined);
 
   return (
     <section className="fio-destino" aria-labelledby="fio-destino-titulo">
@@ -51,6 +66,20 @@ export function DestinoDoFio() {
             </p>
           </>
         )}
+        {contaEtapas && (
+          <>
+            <p className="fio-numero">
+              {String(etapasFeitas)}
+              <small> {etapasFeitas === 1 ? 'etapa' : 'etapas'}</small>
+            </p>
+            <p className="fio-quieto">
+              {etapasFeitas === 1 ? 'pousada' : 'pousadas'} no caminho, com{' '}
+              {plural(passosDados, 'passo dado', 'passos dados')}.
+              {atual &&
+                ` Quando ${atual.nome} tiver a lei no app, o mapa passa a contar quanto do que mais cai já é seu.`}
+            </p>
+          </>
+        )}
         {etapasFeitas === 0 ? (
           <>
             <p className="fio-quieto">
@@ -64,10 +93,12 @@ export function DestinoDoFio() {
             </Link>
           </>
         ) : (
-          <p className="fio-quieto">
-            {plural(etapasFeitas, 'etapa pousada', 'etapas pousadas')} ·{' '}
-            {plural(passosDados, 'passo dado', 'passos dados')}
-          </p>
+          !contaEtapas && (
+            <p className="fio-quieto">
+              {plural(etapasFeitas, 'etapa pousada', 'etapas pousadas')} ·{' '}
+              {plural(passosDados, 'passo dado', 'passos dados')}
+            </p>
+          )
         )}
         {entrada?.materias.length === 0 && (
           <p className="fio-quieto">
@@ -109,7 +140,13 @@ export function DestinoDoFio() {
           <p className="fio-quieto">O mapa mostra as nove primeiras matérias do seu Ciclo.</p>
         )}
         {pousos.length > 0 && (
-          <details className="fio-pousos">
+          <details
+            className="fio-pousos"
+            open={pousosAbertos ?? larga}
+            onToggle={(e) => {
+              setPousosAbertos(e.currentTarget.open);
+            }}
+          >
             <summary>Seus pousos, em palavras</summary>
             <ol className="fio-caminho" aria-label="Pousos, do mais recente ao mais antigo">
               {pousos.map((p) => (
