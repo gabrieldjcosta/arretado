@@ -18,7 +18,7 @@ O app funciona, é legível e acessível nos pontos que a suíte mede, mas **par
 | Medição | DOM em cada tela: rolagem horizontal (largura da página contra a do aparelho), alvos < 44 px, texto sob o "+" no início e no fim da página |
 | Ferramenta | `npm run build && node scripts/capturas-ui.mjs --rotas todas --medir --folhas` (semeia pela interface, fotografa e mede; saída em `test-results/capturas/`) |
 
-Não coberto: zoom de 200%, teclado e axe nos estados novos (a suíte E2E existente segue verde e cobre axe nas rotas principais), Sessão aberta, retorno após dias, estados de erro e offline, modo foco do Leitor, aparelho físico, pessoas. Entram a cada fatia (ver [`../planos/redesign-v2.md`](../planos/redesign-v2.md)).
+Não coberto: zoom de 200%, teclado e axe nos estados novos (a suíte E2E existente segue verde e cobre axe nas rotas principais), Sessão aberta, retorno após dias, estados de erro e offline, modo foco do Leitor, aparelho físico, pessoas. Entram a cada fatia (ver [`../planos/redesign-v2.md`](../planos/arquivo/redesign-v2.md)).
 
 ## Evidência
 
@@ -26,7 +26,7 @@ Folhas de contato (JPEG) em [`../redesign/auditoria-2026-10-14/`](../redesign/au
 
 ## Achados
 
-Formato: **id · prioridade · onde · evidência · regra · correção mínima (fatia)**. Fatias = PRs do plano [`redesign-v2.md`](../planos/redesign-v2.md) (F1 fundação, F2 casca, F3 Hoje, F4 Revisão, F5 Recall, F6 Leitor, F7 Biblioteca, F8 Plano, F9 Conta e Sessão, F10 transições, F11 plataformas).
+Formato: **id · prioridade · onde · evidência · regra · correção mínima (fatia)**. Fatias = PRs do plano [`redesign-v2.md`](../planos/arquivo/redesign-v2.md) (F1 fundação, F2 casca, F3 Hoje, F4 Revisão, F5 Recall, F6 Leitor, F7 Biblioteca, F8 Plano, F9 Conta e Sessão, F10 transições, F11 plataformas).
 
 ### P1
 

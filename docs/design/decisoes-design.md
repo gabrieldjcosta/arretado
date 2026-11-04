@@ -81,7 +81,7 @@ Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, pa
 
 **O Gabriel pode vetar** (se não houver resposta, vale o padrão): (a) o "+" vira satélite ao lado da pílula, em vez de canto flutuante; (b) o "Depois" mostra até 2 itens; (c) títulos de página em serifa; (d) links em argila, não em verde; (e) seis tons de disciplina.
 
-**Efeitos.** Muda tokens, botões, campos, abas e navegação (`estilos.css` e CSS dos pacotes) em 11 fatias ([`../planos/redesign-v2.md`](../planos/redesign-v2.md)), cada uma com E2E, axe nos dois temas e contraste medido. Não toca esquema, dados nem regra de domínio (D-D1).
+**Efeitos.** Muda tokens, botões, campos, abas e navegação (`estilos.css` e CSS dos pacotes) em 11 fatias ([`../planos/redesign-v2.md`](../planos/arquivo/redesign-v2.md)), cada uma com E2E, axe nos dois temas e contraste medido. Não toca esquema, dados nem regra de domínio (D-D1).
 
 > **A conferir depois:** (1) grifos do leitor (amarelo, verde, rosa) contra verde-cacto e caramelo, e `--estrela`; (2) o "+" ao lado da pílula em aparelho real com o teclado aberto; (3) os seis tons de disciplina contra a lista real de matérias (hoje o catálogo tem 4 carreiras; mais 5 vêm do Gabriel).
 
@@ -120,7 +120,7 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 
 **O Gabriel pode vetar** (vale o padrão se não houver resposta): (a) o Agora do Hoje em Caatinga, porque o mockup do Hoje o mostra em Areia (a troca é um token); (b) "Prazos" em `#173F52`, como o texto da especificação, e não em Acqua, como diz a imagem; (c) cacto mantido ao lado do nome, ausente em três dos quatro mockups; (d) barra de baixo reta, sem a pílula flutuante da D-D3; (e) as quatro cores de estado dos cartões; (f) Calmo sem View Transitions (pergunta da D-D3, sem resposta).
 
-**Efeitos.** A F1 (tokens, botões, campos, abas, links, linhas, diálogos) já usa esta paleta. O plano ([`../planos/redesign-v2.md`](../planos/redesign-v2.md)) muda em: F2 (barra reta, "+" simples, cabeçalho), F3 (cartões por estado, captura inline, elementos vetoriais), F6 (Leitor pela especificação) e F9 (Sessão pela especificação). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
+**Efeitos.** A F1 (tokens, botões, campos, abas, links, linhas, diálogos) já usa esta paleta. O plano ([`../planos/redesign-v2.md`](../planos/arquivo/redesign-v2.md)) muda em: F2 (barra reta, "+" simples, cabeçalho), F3 (cartões por estado, captura inline, elementos vetoriais), F6 (Leitor pela especificação) e F9 (Sessão pela especificação). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
 
 > **A conferir depois:** (1) o Agora em Caatinga ou Areia (a); (2) o dock do Leitor com o teclado aberto e em tablet; (3) grifos do leitor contra Areia e Caatinga; (4) a arte do mascote nas poses novas (Determinado) e a origem dos SVGs de cacto, lâmpada e distração; (5) o selo de Acqua com texto branco só passa no passo `#416a63`.
 
@@ -153,7 +153,7 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 | Creme a 60% e 70% sobre Marinho | 6,3 · 8,1:1 | passa |
 | Marinho sobre Sol · Marinho sobre Creme | 9,1 · 15,1:1 | passa |
 
-**O que isto muda nos planos:** [`../planos/redesign-v2.md`](../planos/redesign-v2.md) ganha a **F1b** (tokens e fontes D-D5), antes da F2, e a **F12** (harmonização de todas as telas contra o padrão). A F2 passa a ter a pílula flutuante, o "+" ao lado do título e os rótulos novos; a F3 segue o cartão Agora do Stitch. **Reverte o veto (d) da D-D4** (barra reta, sem pílula), pois o Stitch traz a pílula de volta.
+**O que isto muda nos planos:** [`../planos/redesign-v2.md`](../planos/arquivo/redesign-v2.md) ganha a **F1b** (tokens e fontes D-D5), antes da F2, e a **F12** (harmonização de todas as telas contra o padrão). A F2 passa a ter a pílula flutuante, o "+" ao lado do título e os rótulos novos; a F3 segue o cartão Agora do Stitch. **Reverte o veto (d) da D-D4** (barra reta, sem pílula), pois o Stitch traz a pílula de volta.
 
 **Respostas do Gabriel (16/10/2026)** às cinco perguntas da D-D5:
 1. **Fontes:** Playfair Display hospedada só em títulos e marca; interface em Atkinson. Confirmado.
@@ -182,7 +182,7 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 > **Superada em 19/10/2026 pela D-D9 onde diverge:** a paleta (areia, cal, vidro, luz, traço), a Gabarito nos títulos, os raios de 16 e 12, a sombra fresca da folha, a aba e a área atuais em cal, o botão de vidro, a caneta verde, a marca "Arretado" com o cacto de vidro, o "Você parou em" do Hoje e o "Em seguida" sem botão. Ficam as regras de comportamento (uma ação por tela, a luz só reporta estado, sem textura, matéria em neutro, destaques da lei sublinhados), o movimento, o vocabulário e o que a seção "Mantido" lista. O que cada coisa virou está na D-D9, mais abaixo neste arquivo.
 
-**Origem.** Nas rodadas de direção visual de 18/10/2026 (genjutsu:bunshin, nível "só a direção"; página https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb), o Gabriel escolheu a direção **"Ponto de luz, segunda versão"** no cartão da rodada 3 (15:46Z). Às 17:23Z ele autorizou a construção no app ("leve o contrato dessa thread a uma nova thread para continuar o desenvolvimento do bushin. tem minha autorização"). A direção troca a paleta da D-D5, e esta autorização é a decisão de design nova que o contrato pedia. Contrato da direção: [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md). Execução: [`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio. **Substitui a D-D5 e a D-D6 onde divergem.**
+**Origem.** Nas rodadas de direção visual de 18/10/2026 (genjutsu:bunshin, nível "só a direção"; página https://claude.ai/artifact/5YB1iau1HZuaV9LAwkCDMb), o Gabriel escolheu a direção **"Ponto de luz, segunda versão"** no cartão da rodada 3 (15:46Z). Às 17:23Z ele autorizou a construção no app ("leve o contrato dessa thread a uma nova thread para continuar o desenvolvimento do bushin. tem minha autorização"). A direção troca a paleta da D-D5, e esta autorização é a decisão de design nova que o contrato pedia. Contrato da direção: [`referencias/2026-10-18-ponto-de-luz/contrato.md`](referencias/2026-10-18-ponto-de-luz/contrato.md). Execução: [`../planos/ponto-de-luz.md`](../planos/arquivo/ponto-de-luz.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio. **Substitui a D-D5 e a D-D6 onde divergem.**
 
 **Paleta (troca a da D-D5).** Contraste medido com `scripts/contraste.mjs`, nos dois temas.
 
@@ -220,7 +220,7 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 
 **Revogado da D-D5 e da D-D6.** A paleta (Creme, Marinho, Sol, Argila, Verde-foco, Azul-céu), o fundo com pontinhos, o bloco-herói Marinho, o botão Sol com borda Marinho, a Playfair Display, os raios de 14 (botão) e de 28 (bloco-herói), a etiqueta de matéria em Argila, o verde como "salvo", o azul como Cartões, a pílula flutuante Marinho (a navegação vira abas sobre a areia, com a atual em cal) e o mascote sentado na borda do cartão Agora. Da D-D4, sai a opacidade de 82% do botão fantasma: dentro de uma dica, a cor herdada já é a atenuada e cairia para 3,8:1 na areia (o axe reprovou no E2E).
 
-**Construção em fases**, cada uma num PR para a `integracao` ([`../planos/ponto-de-luz.md`](../planos/ponto-de-luz.md)): P1 fundação (tokens, letras, componentes base, contraste) → P2 casca → P3 Hoje → P4 Leitor → P5 Fixar e revisão → P6 demais telas → P7 plataformas. Os documentos `DESIGN.md`, `sistema-visual.md`, `glossario.md` e `.impeccable/design.json` passam a descrever esta decisão; a skill `arretado-design-principles` (caminho protegido) é atualizada no PR da P2, com o rótulo `aprovado-gabriel`. Os registros D-D2 a D-D6 acima ficam como histórico.
+**Construção em fases**, cada uma num PR para a `integracao` ([`../planos/ponto-de-luz.md`](../planos/arquivo/ponto-de-luz.md)): P1 fundação (tokens, letras, componentes base, contraste) → P2 casca → P3 Hoje → P4 Leitor → P5 Fixar e revisão → P6 demais telas → P7 plataformas. Os documentos `DESIGN.md`, `sistema-visual.md`, `glossario.md` e `.impeccable/design.json` passam a descrever esta decisão; a skill `arretado-design-principles` (caminho protegido) é atualizada no PR da P2, com o rótulo `aprovado-gabriel`. Os registros D-D2 a D-D6 acima ficam como histórico.
 
 ## D-D8 — A caneta que desenha: o quadro do cacto no lugar do cachorro, e a caneta no traço de seleção e na passagem do cartão (19/10/2026, decisão do Gabriel)
 
