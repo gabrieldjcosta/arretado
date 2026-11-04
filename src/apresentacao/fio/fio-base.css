@@ -595,4 +595,22 @@
 
 :root[data-perfil='calmo'] .shell-fio .fio-acao[disabled] {
   box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
+
+/* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): o brilho de baixo e o céu de cima esquentam de leve. */
+.shell-fio[data-luz='manha'] {
+  --f-aurora:
+    radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 12%) 0%, transparent 62%),
+    radial-gradient(120% 50% at 50% -8%, #dcebf7 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='tarde'] {
+  --f-aurora:
+    radial-gradient(120% 44% at 50% 108%, rgb(255 190 80 / 24%) 0%, transparent 64%),
+    radial-gradient(120% 50% at 50% -8%, #e6e6f4 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='entardecer'] {
+  --f-aurora:
+    radial-gradient(120% 48% at 50% 108%, rgb(255 160 90 / 30%) 0%, transparent 66%),
+    radial-gradient(120% 50% at 50% -8%, #e4def0 0%, transparent 70%);
 }
