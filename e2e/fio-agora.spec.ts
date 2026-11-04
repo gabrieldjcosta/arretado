@@ -208,29 +208,36 @@ test('o fio acende em neon amarelo: solto, puxando e além dos 70 px, de noite e
 
   const area = page.locator('.m-puxar-area');
   const fio = page.locator('.m-puxar-area .m-fio-pendurado');
-  const brilhoDoFio = () => fio.evaluate((el) => getComputedStyle(el).filter);
+  const filtroDoFio = () => fio.evaluate((el) => getComputedStyle(el).filter);
   const brilhoDoPonto = () => puxador(page).evaluate((el) => getComputedStyle(el).boxShadow);
-  /** A cor 4 px ao lado do fio, a 70% do caminho dele (acima do ponto): onde o neon cai. */
-  const ladoDoFio = () =>
-    fio.evaluate((el: Element) => {
+  /**
+   * Quanto amarelo há ao lado do fio: vermelho menos azul do pixel 4 px à esquerda dele, a 45% do caminho (acima do
+   * ponto e fora do texto), onde o halo cai. O fundo é azul, de noite e de dia, e dá negativo (-31 a -12); o halo
+   * amarelo sobe isso: 24 a 31 solto, 50 a 57 puxando e 83 a 89 além dos 70 px.
+   */
+  const amareloAoLado = async () => {
+    const lugar = await fio.evaluate((el: Element) => {
       const linha = el as SVGPathElement;
       const caixa = linha.ownerSVGElement?.getBoundingClientRect();
       if (!caixa) throw new Error('sem o desenho do fio');
-      const ponto = linha.getPointAtLength(linha.getTotalLength() * 0.7);
+      const ponto = linha.getPointAtLength(linha.getTotalLength() * 0.45);
       return [caixa.left + ponto.x - 4, caixa.top + ponto.y] as [number, number];
     });
-  const corAoLado = async () => {
-    const [cor] = await coresNosPixels(page, [await ladoDoFio()]);
+    const [cor] = await coresNosPixels(page, [lugar]);
     if (!cor) throw new Error('sem pixel');
-    return cor;
+    return cor[0] - cor[2];
   };
 
-  const REPOUSO =
-    'drop-shadow(rgba(255, 197, 61, 0.55) 0px 0px 4px) drop-shadow(rgba(255, 197, 61, 0.32) 0px 0px 14px)';
-  const PUXANDO =
-    'drop-shadow(rgba(255, 197, 61, 0.7) 0px 0px 5px) drop-shadow(rgba(255, 197, 61, 0.42) 0px 0px 20px)';
-  const PASSOU =
-    'drop-shadow(rgba(255, 214, 110, 0.95) 0px 0px 6px) drop-shadow(rgba(255, 197, 61, 0.6) 0px 0px 28px)';
+  /**
+   * Soltar o ponto antes do limite o devolve ao lugar com uma mola de 420 ms (`PuxarM.soltar`, a do mockup): quem
+   * pega o ponto de novo no meio dela vê a mola vencer o dedo, e o fio não acende. Esperar o fim dela é o que a pessoa
+   * faz sem pensar.
+   */
+  const esperarAMola = () => page.waitForTimeout(500);
+
+  const SOLTO = 'url("#m-neon-solto")';
+  const PUXANDO = 'url("#m-neon-puxando")';
+  const PASSOU = 'url("#m-neon-passou")';
 
   // A faixa ciano e desfocada do mockup (`.m-fio-pendurado-b`) sai: o neon é amarelo (desvio 20).
   await expect(page.locator('.m-fio-pendurado-b')).toBeHidden();
@@ -239,8 +246,10 @@ test('o fio acende em neon amarelo: solto, puxando e além dos 70 px, de noite e
     await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
     await expect(page.locator('.m-fio')).toHaveAttribute('data-movimento', 'vivo');
     await expect(area).toHaveAttribute('data-puxe', 'solto');
-    await expect.poll(brilhoDoFio).toBe(REPOUSO);
-    const repouso = await corAoLado();
+    await expect.poll(filtroDoFio).toBe(SOLTO);
+    const solto = await amareloAoLado();
+    // O halo de repouso já se vê: o fundo, sem ele, dá negativo.
+    expect(solto).toBeGreaterThan(10);
 
     const caixa = await puxador(page).boundingBox();
     if (!caixa) throw new Error('sem caixa');
@@ -249,33 +258,34 @@ test('o fio acende em neon amarelo: solto, puxando e além dos 70 px, de noite e
     await page.mouse.move(x, y);
     await page.mouse.down();
     try {
-      // Puxando (de 4 a 70 px): o brilho sobe.
+      // Puxando (de 4 a 70 px): o halo sobe.
       await page.mouse.move(x, y + 40, { steps: 5 });
       await expect(area).toHaveAttribute('data-puxe', 'puxando');
-      await expect.poll(brilhoDoFio).toBe(PUXANDO);
+      await expect.poll(filtroDoFio).toBe(PUXANDO);
+      const puxando = await amareloAoLado();
+      expect(puxando).toBeGreaterThanOrEqual(solto + 15);
       // Além dos 70 px: o fio estoura e o ponto ganha o brilho dele.
       await page.mouse.move(x, y + 100, { steps: 5 });
       await expect(area).toHaveAttribute('data-puxe', 'passou');
-      await expect.poll(brilhoDoFio).toBe(PASSOU);
+      await expect.poll(filtroDoFio).toBe(PASSOU);
       await expect.poll(brilhoDoPonto).toContain('rgba(255, 197, 61, 0.8) 0px 0px 46px 6px');
-      // O pixel ao lado do fio é amarelo de verdade (o ciano do mockup daria vermelho abaixo do azul) e bem mais
-      // aceso do que em repouso.
-      const passou = await corAoLado();
-      expect(passou[0] - passou[2]).toBeGreaterThanOrEqual(80);
-      expect(passou[1] - passou[2]).toBeGreaterThanOrEqual(50);
-      expect(passou[0] - passou[2]).toBeGreaterThan(repouso[0] - repouso[2] + 60);
+      const passou = await amareloAoLado();
+      expect(passou).toBeGreaterThanOrEqual(puxando + 15);
+      expect(passou).toBeGreaterThanOrEqual(70);
     } finally {
       // Volta antes de soltar: soltar além do limite puxaria o fio de vez.
       await page.mouse.move(x, y, { steps: 5 });
       await page.mouse.up();
+      await esperarAMola();
     }
     await expect(area).toHaveAttribute('data-puxe', 'solto');
-    await expect.poll(brilhoDoFio).toBe(REPOUSO);
+    await expect.poll(filtroDoFio).toBe(SOLTO);
   }
 
-  // Calmo: o brilho fica parado no valor de repouso, mesmo puxando.
+  // Calmo: o halo fica parado no valor de repouso, mesmo puxando.
   await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
   await expect(page.locator('.m-fio')).toHaveAttribute('data-movimento', 'calmo');
+  const parado = await amareloAoLado();
   const caixa = await puxador(page).boundingBox();
   if (!caixa) throw new Error('sem caixa');
   const x = caixa.x + caixa.width / 2;
@@ -285,7 +295,41 @@ test('o fio acende em neon amarelo: solto, puxando e além dos 70 px, de noite e
   try {
     await page.mouse.move(x, y + 100, { steps: 5 });
     await expect(area).toHaveAttribute('data-puxe', 'passou');
-    await expect.poll(brilhoDoFio).toBe(REPOUSO);
+    await expect.poll(filtroDoFio).toBe(SOLTO);
+    expect(await amareloAoLado()).toBeLessThanOrEqual(parado + 12);
+  } finally {
+    await page.mouse.move(x, y, { steps: 5 });
+    await page.mouse.up();
+    await esperarAMola();
+  }
+});
+
+test('em aparelho leve o fio não leva o halo, nem puxado além dos 70 px', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  // A mesma conta do mockup: dois núcleos ou menos é aparelho leve (`m/leve.ts`).
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 2, configurable: true });
+  });
+  await comMateriaNaPrevia(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('.m-fio')).toHaveClass(/\bm-leve\b/);
+
+  const area = page.locator('.m-puxar-area');
+  const filtroDoFio = () =>
+    page.locator('.m-puxar-area .m-fio-pendurado').evaluate((el) => getComputedStyle(el).filter);
+  await expect(area).toHaveAttribute('data-puxe', 'solto');
+  expect(await filtroDoFio()).toBe('none');
+
+  const caixa = await puxador(page).boundingBox();
+  if (!caixa) throw new Error('sem caixa');
+  const x = caixa.x + caixa.width / 2;
+  const y = caixa.y + caixa.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  try {
+    await page.mouse.move(x, y + 100, { steps: 5 });
+    await expect(area).toHaveAttribute('data-puxe', 'passou');
+    expect(await filtroDoFio()).toBe('none');
   } finally {
     await page.mouse.move(x, y, { steps: 5 });
     await page.mouse.up();

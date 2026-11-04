@@ -74,7 +74,10 @@ export function Drill() {
   /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
   const certeza = useRef<1 | 2 | 3 | undefined>(undefined);
   const botaoVirar = useRef<HTMLButtonElement>(null);
-  const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
+  const { cartao: cartaoDaRevisao, passar, virar: virarOCartao } = usePassagemDeCartao();
+  const virando = useRef(false);
+  /** A resposta (1, 2, 3) digitada enquanto o cartão ainda gira: vale assim que ele termina de virar. */
+  const pendente = useRef<RespostaRevisao | null>(null);
 
   const cota = useRef(0);
   // `?itens=N`: o lote que o Hoje montou pelo valor (AP-01). Só vale na primeira rodada; "Revisar
@@ -158,8 +161,15 @@ export function Drill() {
   }, [repo, atual]);
 
   const virar = useCallback(() => {
-    setEstado((e) => (e.tipo === 'revisando' ? { ...e, virado: true } : e));
-  }, []);
+    // O cartão vira de verdade (meia volta, troca, meia volta); um segundo toque no meio do giro não conta.
+    if (virando.current) return;
+    virando.current = true;
+    void virarOCartao(() => {
+      setEstado((e) => (e.tipo === 'revisando' ? { ...e, virado: true } : e));
+    }).finally(() => {
+      virando.current = false;
+    });
+  }, [virarOCartao]);
 
   const avancar = useCallback(() => {
     if (estado.tipo !== 'revisando') return;
@@ -185,7 +195,7 @@ export function Drill() {
           await gravada;
           avancar();
         } else {
-          await passar(gravada, avancar);
+          await passar(gravada, avancar, resposta === 'facil' ? 1 : -1);
         }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
@@ -197,6 +207,13 @@ export function Drill() {
     [atual, estado, ocupado, repo, avancar, passar],
   );
 
+  useEffect(() => {
+    if (estado.tipo !== 'revisando' || !estado.virado || !pendente.current) return;
+    const resposta = pendente.current;
+    pendente.current = null;
+    void responder(resposta);
+  }, [estado, responder]);
+
   // Atalhos: espaço/Enter vira; 1, 2, 3 respondem (Parte 2 §11).
   useEffect(() => {
     if (estado.tipo !== 'revisando') return;
@@ -206,7 +223,11 @@ export function Drill() {
       const alvo = e.target as HTMLElement | null;
       const controle = alvo?.closest('a, button, summary, input, textarea, select');
       if (controle && controle !== botaoVirar.current) return;
-      if (!estado.virado && (e.key === ' ' || e.key === 'Enter')) {
+      if (!estado.virado && virando.current && ['1', '2', '3'].includes(e.key)) {
+        // Espaço e 1, 2 ou 3 seguidos: o cartão ainda gira, e a resposta espera ele terminar.
+        e.preventDefault();
+        pendente.current = (['errei', 'dificil', 'facil'] as const)[Number(e.key) - 1] ?? null;
+      } else if (!estado.virado && (e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
         virar();
       } else if (estado.virado && ['1', '2', '3'].includes(e.key)) {
@@ -294,29 +315,31 @@ export function Drill() {
         max={estado.fila.length}
         rotulo="Cartão"
       />
-      <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
-        <p className="drill-frente texto-leitura">{atual.frente}</p>
-        {estado.virado && (
-          <div className="frase-correta" aria-live="polite">
-            <p className="frase-correta-titulo">
-              {atual.tipo === 'lacuna'
-                ? 'Frase completa'
-                : atual.erroId
-                  ? 'Frase correta'
-                  : 'Resposta'}
-            </p>
-            <p className="texto-leitura">
-              {verso?.id !== atual.id ? (
-                <span className="dica">Carregando…</span>
-              ) : verso.texto ? (
-                verso.texto
-              ) : (
-                <span className="dica">(sem verso — edite o cartão para completar)</span>
-              )}
-            </p>
-          </div>
-        )}
-      </article>
+      <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
+        <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
+          <p className="drill-frente texto-leitura">{atual.frente}</p>
+          {estado.virado && (
+            <div className="frase-correta" aria-live="polite">
+              <p className="frase-correta-titulo">
+                {atual.tipo === 'lacuna'
+                  ? 'Frase completa'
+                  : atual.erroId
+                    ? 'Frase correta'
+                    : 'Resposta'}
+              </p>
+              <p className="texto-leitura">
+                {verso?.id !== atual.id ? (
+                  <span className="dica">Carregando…</span>
+                ) : verso.texto ? (
+                  verso.texto
+                ) : (
+                  <span className="dica">(sem verso — edite o cartão para completar)</span>
+                )}
+              </p>
+            </div>
+          )}
+        </article>
+      </div>
       {falha && (
         <p role="alert" className="aviso falha">
           {falha}

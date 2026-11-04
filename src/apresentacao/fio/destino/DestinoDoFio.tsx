@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react';
 import { LinkDoFio } from '../LinkDoFio';
 import { useLarguraMinima } from '../../componentes/largura';
 import { ORDEM_UF } from './nordeste';
+import { NumeroQueRola } from './NumeroQueRola';
 import { materiaAtual, resumoDoMapa } from './resumo';
 import { useJornadaDoFio } from './useJornadaDoFio';
 import './fio-destino.css';
@@ -44,7 +45,7 @@ export function DestinoDoFio() {
         {resumo && (
           <>
             <p className="fio-numero">
-              {String(resumo.percentual)}
+              <NumeroQueRola valor={resumo.percentual} chave="destino-percentual" />
               <small>%</small>
             </p>
             <p className="fio-quieto">
@@ -56,7 +57,7 @@ export function DestinoDoFio() {
         {contaEtapas && (
           <>
             <p className="fio-numero">
-              {String(etapasFeitas)}
+              <NumeroQueRola valor={etapasFeitas} chave="destino-etapas" />
               <small> {etapasFeitas === 1 ? 'etapa' : 'etapas'}</small>
             </p>
             <p className="fio-quieto">
