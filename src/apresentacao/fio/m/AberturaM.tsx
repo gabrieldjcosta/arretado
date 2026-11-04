@@ -16,6 +16,8 @@ const LETRAS = ['a', 'r', 'r', 'e', 't', 'a', 'd', 'o'];
 
 /** Quanto a abertura espera o Fio saber se há prova antes de seguir para o Agora. */
 const ESPERA_DO_FIO_MS = 1500;
+/** As aberturas de rotina (a primeira do Dia e as demais) são a mesma coreografia em 40% do tempo (uns 3,5 s). */
+const RITMO_DE_ROTINA = 0.4;
 /** Quanto um pulo espera o Fio saber se há prova (os dados leem em poucos quadros). */
 const ESPERA_DO_PULO_MS = 600;
 /** Quanto espera a tela seguinte (a prova é um pedaço à parte do pacote) aparecer no quadro. */
@@ -154,6 +156,7 @@ export function AberturaM({ camada }: { camada: CamadaDoFio }) {
         frase: frase.current as HTMLElement,
         pular: pular.current as HTMLElement,
         calmo: camada.calmo,
+        ritmo: camada.escrita === 'completa' ? 1 : RITMO_DE_ROTINA,
         dia: mundoAgora() === 'dia',
         sinal: signal,
         preparar,
@@ -193,7 +196,7 @@ export function AberturaM({ camada }: { camada: CamadaDoFio }) {
       // Depois do pouso o ponto e o fio ainda têm o que fazer (esperar a tela seguinte chegar); o voo os tira.
       if (!pousou) voo?.limpar();
     };
-  }, [camada.calmo]);
+  }, [camada.calmo, camada.escrita]);
 
   return (
     <section

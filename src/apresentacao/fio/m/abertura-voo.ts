@@ -3,7 +3,7 @@
 // ergue até o canto e o leva, como um pêndulo, até onde a tela seguinte o espera. Os números (alturas dos pulos,
 // pausas, tempos, a física do pêndulo) são os do arquivo. O que o React pede: o alvo e a tela seguinte vêm de fora
 // (`preparar`), e tudo o que a abertura põe no quadro é recolhido por `limpar`.
-import { animar, espera } from './anima';
+import { animar as animarBase, espera as esperaBase } from './anima';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -34,6 +34,8 @@ export interface PedidoDaAbertura {
   frase: HTMLElement;
   pular: HTMLElement;
   calmo: boolean;
+  /** O ritmo: 1 é o do mockup; abaixo de 1 é a mesma coreografia mais depressa (as aberturas de rotina). */
+  ritmo: number;
   dia: boolean;
   /** Aborta quando a tela sai (pulo, rota, desmontagem): como `viva()` no mockup. */
   sinal: AbortSignal;
@@ -61,7 +63,23 @@ function criarSvg<K extends 'svg' | 'g' | 'path'>(nome: K): SVGElementTagNameMap
 
 /** Roda a abertura. Devolve `limpar`, que tira do quadro o que ela pôs (o ponto, o fio, o rastro). */
 export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: Promise<void> } {
-  const { app, tela, rastro, nome, frase, pular, calmo, dia: diaM, sinal } = p;
+  const { app, tela, rastro, nome, frase, pular, calmo, dia: diaM, sinal, ritmo } = p;
+  // Todo tempo da coreografia passa por aqui: durações, atrasos, esperas e o pêndulo andam no mesmo ritmo.
+  const animar = (
+    el: Element | null | undefined,
+    quadros: Keyframe[],
+    opc?: KeyframeAnimationOptions,
+  ) =>
+    animarBase(
+      el,
+      quadros,
+      opc && {
+        ...opc,
+        ...(typeof opc.duration === 'number' ? { duration: opc.duration * ritmo } : {}),
+        ...(opc.delay === undefined ? {} : { delay: opc.delay * ritmo }),
+      },
+    );
+  const espera = (ms: number, s?: AbortSignal) => esperaBase(ms * ritmo, s);
   const criados: Element[] = [];
   const limpar = () => {
     for (const el of criados) el.remove();
@@ -498,7 +516,7 @@ export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: P
           fim();
           return;
         }
-        let dt = Math.min(0.05, (tt - tAnt) / 1000);
+        let dt = Math.min(0.05, (tt - tAnt) / 1000 / ritmo);
         tAnt = tt;
         while (dt > 0) {
           const h = Math.min(dt, 1 / 240);

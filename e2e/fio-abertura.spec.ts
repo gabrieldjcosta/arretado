@@ -129,3 +129,21 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   await expect(pergunta(page)).toHaveCount(0);
   await semViolacoesNoFio(page);
 });
+
+test('nas aberturas de rotina a mesma coreografia vai mais depressa (uns 4 s), legível até o fim', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  // Um aparelho que já viu a abertura inteira em outro Dia: a primeira de hoje é a de rotina.
+  await page.addInitScript((chave) => {
+    localStorage.setItem(chave, '{"dia":"2026-01-01"}');
+  }, CHAVE_DA_ESCRITA);
+  await abrirNoFio(page);
+  await expect(abertura(page)).toBeVisible();
+  const comeco = Date.now();
+  await expect(page.getByText('Tecendo seu destino,')).toBeVisible({ timeout: 6_000 });
+  await expect(pergunta(page)).toBeVisible({ timeout: 9_000 });
+  expect(Date.now() - comeco).toBeLessThan(9_000);
+  await expect(abertura(page)).toHaveCount(0);
+  await expect(page.locator('.m-voo-ponto')).toHaveCount(0, { timeout: 3_000 });
+});
