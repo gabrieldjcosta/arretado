@@ -14,7 +14,7 @@ const TELA_DO_LUGAR: Readonly<Record<IdDoLugar, string>> = {
  * A nav do mockup (`<nav class="nav">`): três lugares e um indicador que desliza até o aceso. Os lugares
  * são irmãos: trocar de um para outro nunca empilha tela, e o fio de uma voa até o lugar do fio da outra (`aba.ts`).
  */
-export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
+export function NavM({ ativo, caminho }: { ativo: IdDoLugar | undefined; caminho: string }) {
   const navegar = useNavigate();
   const nav = useRef<HTMLElement>(null);
   const indicador = useRef<HTMLSpanElement>(null);
@@ -43,7 +43,9 @@ export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
           data-nav={l.id}
           aria-current={l.id === ativo ? 'page' : 'false'}
           onClick={() => {
-            if (l.id === ativo) return;
+            // Na tela do próprio lugar não há o que trocar. Num folheto (que mora no Varal) o Varal aceso leva de volta
+            // ao Varal, como no mockup: lá o toque só é ignorado quando a tela de agora é a do lugar.
+            if (l.caminho === caminho) return;
             const ir = () => {
               void navegar(l.caminho);
             };

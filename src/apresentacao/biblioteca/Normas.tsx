@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
-import type { Edital, Leitura, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
+import type { Edital, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import type { EntradaDoIndice } from '../../dominios/acervo/esquemas';
-import { minutosAteOFimDaSecao } from '../../dominios/legislacao/continuar';
-import { abrirNorma, normasPublicadas } from '../../dominios/legislacao/leitor';
+import { normasPublicadas } from '../../dominios/legislacao/leitor';
 import { leiturasPorNorma, lidaEm } from '../../dominios/legislacao/leituras';
 import {
   descartarRascunho,
@@ -32,7 +31,7 @@ import {
   type CriteriosDeNormas,
 } from './filtroDeNormas';
 import { editalComNormasNoAcervo } from './editalDoPlano';
-import { referenciaDoNo } from './linhas';
+import { pontoDaLeitura, ultimaLida } from './ponto-da-leitura';
 
 interface ItemDaDisciplina {
   norma: Norma;
@@ -125,43 +124,6 @@ async function carregarBiblioteca(repo: Repositorio) {
     continuar,
     ponto: continuar && (await pontoDaLeitura(repo, continuar.id, leituras)),
   };
-}
-
-/**
- * Onde a leitura parou e quanto falta da seção: "Art. 41" e os minutos. Sem o ponto (norma sem
- * posição guardada, ou que não abre), o "Retomar" aparece sem eles.
- */
-async function pontoDaLeitura(
-  repo: Repositorio,
-  normaId: string,
-  leituras: ReadonlyMap<string, Leitura>,
-): Promise<{ referencia: string; minutos: number } | undefined> {
-  const leitura = leituras.get(normaId);
-  const alvo = leitura?.posicaoId ?? leitura?.lidoAteId;
-  if (alvo === undefined) return undefined;
-  try {
-    const { nos, indiceDe } = await abrirNorma(repo, normaId);
-    const indice = indiceDe.get(alvo);
-    if (indice === undefined) return undefined;
-    const referencia = referenciaDoNo(nos, indiceDe, indice);
-    return referencia === ''
-      ? undefined
-      : { referencia, minutos: minutosAteOFimDaSecao(nos, indice) };
-  } catch {
-    return undefined;
-  }
-}
-
-/** A norma publicada lida por último: a do "Retomar" (Parte 2 §9.2). */
-function ultimaLida(normas: readonly Norma[], leituras: ReadonlyMap<string, Leitura>) {
-  let ultima: { norma: Norma; leitura: Leitura } | undefined;
-  for (const norma of normas) {
-    const leitura = leituras.get(norma.id);
-    if (leitura && (!ultima || lidaEm(leitura) > lidaEm(ultima.leitura))) {
-      ultima = { norma, leitura };
-    }
-  }
-  return ultima?.norma;
 }
 
 /** "Lei nº 7.210/1984 · Institui a Lei de Execução Penal.": o que o título curto não diz. */

@@ -6,7 +6,7 @@ import { useAtalhoDeRegistrarErro } from '../../componentes/atalho-de-erro';
 import { FaixaOffline } from '../../componentes/estados';
 import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
-import { ROTA_DO_DESTINO, lugarDaRota } from '../lugares';
+import { ROTA_DO_DESTINO, comNavDoFio, lugarDaRota } from '../lugares';
 import { useLuzDaHora } from '../luz-da-hora';
 import { FiltrosM } from './FiltrosM';
 import { aparelhoLeve } from './leve';
@@ -21,9 +21,6 @@ import '../mockup/reset.css';
 import '../mockup/fontes.css';
 import '../mockup/mockup.css';
 import '../mockup/ajustes.css';
-
-/** As rotas com nav embaixo: o Agora e o Destino (e, na fatia seguinte, o Varal). */
-const COM_NAV = new Set(['/', ROTA_DO_DESTINO]);
 
 /**
  * O quadro do Fio: o `<main class="app">` do mockup aprovado, com a nav, o "+" e o aviso dentro dele. A raiz
@@ -77,7 +74,7 @@ export function CascaM() {
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        {COM_NAV.has(pathname) && <NavM ativo={lugarDaRota(pathname)} />}
+        {comNavDoFio(pathname) && <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />}
         <MaisM />
         <ToastM />
       </main>

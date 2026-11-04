@@ -30,12 +30,13 @@ import { RegistrarVarios } from './recall/RegistrarVarios';
 import { RevisarFrases } from './recall/RevisarFrases';
 import {
   DestinoDoFio,
+  FolhetoDoFio,
   PaginaInicial,
   PassoDoFio,
   PousoDoFio,
   TelaDoFio,
   TrocarInterface,
-  Varal,
+  VaralDoFio,
 } from './fio/Previa';
 import { RotasDoPlano } from './plano/Rotas';
 import { RotasDaSessao } from './sessao/Rotas';
@@ -147,8 +148,16 @@ export function App({
                 <Route
                   path="varal"
                   element={
-                    <TelaDoFio>
-                      <Varal />
+                    <TelaDoFio noQuadro>
+                      <VaralDoFio />
+                    </TelaDoFio>
+                  }
+                />
+                <Route
+                  path="varal/:folheto"
+                  element={
+                    <TelaDoFio noQuadro>
+                      <FolhetoDoFio />
                     </TelaDoFio>
                   }
                 />
