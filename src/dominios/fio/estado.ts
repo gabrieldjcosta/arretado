@@ -102,7 +102,12 @@ export function puxar(
         estado: atual,
         proximo: {
           tipo: 'pouso',
-          pouso: { etapa: e.numero, materia: e.materia, fatos: fatosDoPouso(e) },
+          pouso: {
+            etapa: e.numero,
+            materia: e.materia,
+            materiaId: e.materiaId,
+            fatos: fatosDoPouso(e),
+          },
         },
       };
     }
@@ -192,7 +197,12 @@ export function pularPasso(estado: EstadoDoFio): EstadoDoFio {
 export function pousar(estado: EstadoDoFio): { estado: EstadoDoFio; pouso?: Pouso } {
   const e = estado.etapa;
   if (!e || pendente(e) >= 0) return { estado };
-  const pouso: Pouso = { etapa: e.numero, materia: e.materia, fatos: fatosDoPouso(e) };
+  const pouso: Pouso = {
+    etapa: e.numero,
+    materia: e.materia,
+    materiaId: e.materiaId,
+    fatos: fatosDoPouso(e),
+  };
   const passouAPorteira =
     e.porteiraDoFim === true &&
     e.passos.some(
@@ -321,6 +331,11 @@ export function lerEstadoDoFio(guardado: unknown): EstadoDoFio {
           (p): p is Pouso =>
             ehObj(p) && ehInteiro(p.etapa) && ehTexto(p.materia) && ehListaDe(p.fatos, ehTexto),
         )
+        // `materiaId` é opcional (pousos antigos não têm); se vier estragado, some.
+        .map((p): Pouso => {
+          const { materiaId, ...resto } = p;
+          return ehTexto(materiaId) ? { ...resto, materiaId } : resto;
+        })
         .slice(0, POUSOS_GUARDADOS)
     : [];
   const etapa = etapaValida(guardado.etapa);

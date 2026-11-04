@@ -35,7 +35,11 @@ export function CascaDoFio() {
   useAtalhoDeRegistrarErro();
 
   return (
-    <div className="shell shell-fio" data-teclado={tecladoAberto ? 'aberto' : undefined}>
+    <div
+      className="shell shell-fio"
+      data-teclado={tecladoAberto ? 'aberto' : undefined}
+      data-largo={pathname === '/destino' ? 'sim' : undefined}
+    >
       <AplicarAparencia />
       <PuxarEssenciais />
       <a

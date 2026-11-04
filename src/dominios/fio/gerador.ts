@@ -87,10 +87,11 @@ export function escolherMateria(entrada: EntradaDoFio): MateriaDoFio | undefined
 }
 
 const chave = (normaId: string, endereco: string) => `${normaId}\u0000${endereco}`;
-const temMapa = (n: NormaDoFio) => n.artigos.some((a) => a.posicaoNoMapa !== undefined);
+/** A norma tem Mapa: algum artigo tem posição nele. */
+export const temMapa = (n: NormaDoFio) => n.artigos.some((a) => a.posicaoNoMapa !== undefined);
 
 /** Regra 3: o que a norma considera relevante, na ordem de leitura. Sem Mapa, tudo, na ordem do código. */
-function relevantes(n: NormaDoFio): ArtigoDoFio[] {
+export function relevantes(n: NormaDoFio): ArtigoDoFio[] {
   if (!temMapa(n)) return [...n.artigos];
   return n.artigos
     .filter((a) => a.posicaoNoMapa !== undefined)

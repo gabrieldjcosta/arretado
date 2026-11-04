@@ -98,6 +98,25 @@ describe('o Arretado novo (prévia do Fio)', () => {
       await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/1 etapa pousada/)).toBeInTheDocument();
+    // O mapa vem num pedaço à parte; a lista dos pousos fica à mão, em palavras.
+    expect(
+      await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Seus pousos, em palavras')).toBeInTheDocument();
+  });
+
+  it('o Destino sem etapa pousada mostra o mapa e convida a puxar o fio no Agora', async () => {
+    await abrir({ comLei: true, rota: '#/destino' });
+    expect(
+      await screen.findByRole('heading', { name: 'O caminho começa aqui' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Ir ao Agora/ })).toHaveAttribute('href', '#/');
+    expect(
+      await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Legenda do mapa' })).toBeInTheDocument();
+    // Sem pouso nenhum, não há lista de pousos para abrir.
+    expect(screen.queryByText('Seus pousos, em palavras')).not.toBeInTheDocument();
   });
 
   it('pular um passo não custa nada e não deixa fato', async () => {
