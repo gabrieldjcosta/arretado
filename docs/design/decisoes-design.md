@@ -519,3 +519,23 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Em aberto.** A faixa de dicas do Fixar (versão 4) fica como está: o que acontece com ela em todas as telas depende da D-D16.
 
 **Custo.** Quem gosta de ver o "4 dos últimos 7" não o vê mais; o número continua para leitor de tela. A fileira de marcas só nasce no primeiro Dia, então a primeira revisão faz a tela ganhar uma linha.
+
+## D-D22 — O modo foco por artigo ocupa a altura da tela (03/11/2026, pedido do Gabriel)
+
+> **Emenda ao palco do foco (11.8, Ajustes A).** O cartão deixa de ser uma caixa de uns 70% da altura, centrada com o respiro do ⋯ em cima e embaixo, e passa a tomar a altura que a tela deixa.
+
+**Origem.** Gabriel em 03/11/2026 (16:59Z): "o modo foco só ocupa uma parte da tela, quando o ideal seria que, no celular, ele ocupasse toda a tela (ou adaptasse de acordo com o tamanho do artigo) e no pc ele ocupasse uma parte maior, verticalmente."
+
+**Medido antes** (LEP, art. 112, tela cheia de texto): o cartão ocupava 70% da altura no celular (358×588 em 390×844) e 68% no computador (643×544 em 1280×800), com 107 px vazios no alto; a página passava 14 px da tela, porque a altura máxima do cartão (`100dvh − 16 rem`) reservava menos que a pilha usa (uns 270 px).
+
+**O que muda.**
+1. A altura da tela desce pela cadeia (leitor, corpo, pilha) até o cartão. Artigo longo toma tudo o que sobra e rola por dentro; artigo curto fica do tamanho do texto, no meio. A página passa a ter exatamente a altura da tela.
+2. O recuo de cima (76 px, que espelhava o do ⋯ embaixo) sai: o cartão começa 29 px abaixo do alto (16 do recuo da página, a borda do vizinho de cima e o respiro). A área segura de baixo do aparelho entra no recuo de baixo, onde o ⋯ já a respeitava.
+3. Celular e tablet em pé (até 52 rem): o pé do cartão (setas e fio) desce ao fim da tela e divide a linha com o ⋯, que é fixo no canto. O pé guarda 72 px à direita para ele, não salta de um artigo ao outro e o ⋯ nunca cobre a seta. Computador: o pé acompanha o cartão e o ⋯ fica no canto, longe dele. Uma conta só (`--reserva-da-bandeja`) dá zero quando a margem dos lados comporta o ⋯ e só recua quando não comporta, então vale também para o texto ampliado.
+4. Com a espiada dos vizinhos ou com "Seguindo o mapa", a última linha da pilha (a espiada de baixo, a linha do mapa) é a que divide a linha com o ⋯, e o pé não recua. Com o relógio da Sessão aberto (embaixo à esquerda), ele e o ⋯ ficam numa faixa só deles (`--alvo` + 1 rem) abaixo da pilha, como antes.
+
+**Medido depois** (mesmo artigo; cartão em % da altura da tela): 390×844, 70% → 88%; 360×740, 65% → 86%; 320×568, 55% → 82%; tablet 768×1024, 75% → 90%; computador 1280×800, 68% → 87%; 1440×900, 72% → 89%. A página não passa da tela em nenhum deles.
+
+**O que continua como está.** A largura do cartão (62 ch, a medida de leitura); o texto corrido; a bandeja e o fechamento em 5 s; o palco (penumbra e luz do cartão); a borda do vizinho; os atalhos e o deslizar.
+
+**Custo.** Duas regras de pilha a mais para quem mexer nela: toda linha nova de `.area-artigo` é `flex: none`, e a que ficar embaixo guarda `--reserva-da-bandeja`. Todo envoltório novo entre a pilha e o cartão entra na cadeia flex (o do contorno de evidência, `.evidencia-foco` da D-D13, já tem a regra; sem ela o cartão perde o limite e a página rola). O E2E `foco-tamanho.spec.ts` mede a altura, a página no lugar e o ⋯ separado da seta nos três aparelhos.
