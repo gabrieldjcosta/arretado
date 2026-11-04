@@ -19,7 +19,10 @@ import type { FioGuardado, MarcasDoFio } from './guardado';
  */
 export const PASSOS_COM_TELA: ReadonlySet<TipoDePasso> = new Set<TipoDePasso>([
   'ler',
+  'lembrar',
+  'guardar',
   'revisar',
+  'praticar',
   'seu_passo',
 ]);
 

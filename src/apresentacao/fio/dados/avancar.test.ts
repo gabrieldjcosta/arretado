@@ -25,20 +25,39 @@ describe('o puxão com o que a tela hospeda', () => {
     expect(r.proximo.posicao).toBe(1);
   });
 
-  it('pula sozinho o passo sem tela (Lembrar) depois de um Ler concluído, sem custo', () => {
+  it('o Lembrar tem tela: depois de um Ler concluído, o puxão para nele', () => {
     const e = entrada({ ciclo: { blocos: ['penal'], indice: 0 } });
     const primeiro = avancar(vazio(), e);
     const concluido = concluirPasso(primeiro.estado, { tipo: 'ler', lidos: 5 });
     const depois = avancar({ estado: concluido, marcas: {} }, e);
-    // O Lembrar não tem tela: o Fio o fecha como pulado e segue ao que vem (outro passo ou o pouso).
-    if (depois.proximo.tipo === 'passo') {
-      expect(PASSOS_COM_TELA.has(depois.proximo.passo.tipo)).toBe(true);
-    } else {
-      expect(depois.proximo.tipo).toBe('pouso');
-    }
+    if (depois.proximo.tipo !== 'passo') throw new Error('esperava o Lembrar');
+    expect(depois.proximo.passo.tipo).toBe('lembrar');
     const lembrar = depois.estado.etapa?.passos.findIndex((p) => p.tipo === 'lembrar') ?? -1;
     expect(lembrar).toBeGreaterThan(-1);
-    expect(depois.estado.etapa?.fechados[lembrar]).toEqual({ como: 'pulado' });
+    expect(depois.estado.etapa?.fechados[lembrar]).toBeUndefined();
+  });
+
+  it('pula sozinho o passo sem tela (Fixar súmula), sem custo', () => {
+    const lidoTudo = norma('cp', 6, { mapa: [1, 2], lidos: [1, 2] });
+    const e = entrada({
+      materias: [
+        materia('penal', {
+          normas: [lidoTudo],
+          sumulas: [{ id: 's', rotulo: 'Súmula 711 do STF', fixada: false }],
+        }),
+      ],
+      ciclo: { blocos: ['penal'], indice: 0 },
+    });
+    const r = avancar(vazio(), e);
+    const etapa = r.estado.etapa;
+    expect(etapa?.passos[0]?.tipo).toBe('fixar_sumula');
+    // O Fixar súmula não tem tela: o Fio o fecha como pulado e segue ao que vem (outro passo ou o pouso).
+    expect(etapa?.fechados[0]).toEqual({ como: 'pulado' });
+    if (r.proximo.tipo === 'passo') {
+      expect(PASSOS_COM_TELA.has(r.proximo.passo.tipo)).toBe(true);
+    } else {
+      expect(r.proximo.tipo).toBe('pouso');
+    }
   });
 
   it('a leitura feita fora do Fio nasce "Já feito"', () => {

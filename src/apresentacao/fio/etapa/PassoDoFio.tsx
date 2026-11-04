@@ -1,18 +1,24 @@
 import type { ReactNode } from 'react';
-import { Link, Navigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 import type { Passo, ResultadoDoPasso } from '../../../dominios/fio';
 import { useRepositorio } from '../../dados/contexto';
 import { abrirNorma } from '../../../dominios/legislacao/leitor';
 import { registrarArtigosFeitos } from '../../biblioteca/mapa/feitos';
 import { concluirTarefa } from '../../../dominios/tarefas';
 import { Esqueleto } from '../../componentes/estados';
+import { alvoDaPorteira } from '../dados/alvo';
 import { PASSOS_COM_TELA } from '../dados/avancar';
 import { descreverPasso } from '../dados/descrever';
+import { marcarPausa } from '../dados/pausa';
 import { ROTA_DO_POUSO, useFio } from '../dados/useFio';
+import { GuardarDoPasso, LembrarDoPasso, PraticarDoPasso, type AlvoDaPorteira } from '../passos';
 import './fio-etapa.css';
 
 type Ler = Extract<Passo, { tipo: 'ler'; normaId: string }>;
 type LerSemLei = Extract<Passo, { tipo: 'ler'; adicionarNorma: true }>;
+type Lembrar = Extract<Passo, { tipo: 'lembrar' }>;
+type Guardar = Extract<Passo, { tipo: 'guardar' }>;
+type Praticar = Extract<Passo, { tipo: 'praticar' }>;
 type Revisar = Extract<Passo, { tipo: 'revisar' }>;
 type SeuPasso = Extract<Passo, { tipo: 'seu_passo' }>;
 
@@ -21,6 +27,7 @@ interface PropsDaTela<P> {
   materia: string;
   aoConcluir: (resultado: ResultadoDoPasso) => void;
   aoPular: () => void;
+  aoPausar: () => void;
 }
 
 const Seta = () => (
@@ -36,6 +43,7 @@ function CartaoDoPasso({
   minutos,
   children,
   aoPular,
+  aoPausar,
 }: {
   etiqueta: string;
   titulo: string;
@@ -43,13 +51,26 @@ function CartaoDoPasso({
   minutos?: number | undefined;
   children: ReactNode;
   aoPular: () => void;
+  aoPausar: () => void;
 }) {
   return (
-    <article className="fio-passo">
-      <span className="fio-olho">
-        {etiqueta}
-        {minutos !== undefined && ` · ${String(minutos)} min`}
-      </span>
+    <article className="fio-cartao-do-passo">
+      <div className="fio-topo-do-cartao">
+        <span className="fio-olho">
+          {etiqueta}
+          {minutos !== undefined && ` · ${String(minutos)} min`}
+        </span>
+        <button
+          type="button"
+          className="fio-icone"
+          aria-label="Pausar: tudo fica salvo"
+          onClick={aoPausar}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 6v12M15 6v12" />
+          </svg>
+        </button>
+      </div>
       <h1 className="fio-titulo fio-titulo-passo">{titulo}</h1>
       <p className="fio-quieto">{apoio}</p>
       {children}
@@ -63,7 +84,7 @@ function CartaoDoPasso({
   );
 }
 
-function LerDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Ler>) {
+function LerDoPasso({ passo, materia, aoConcluir, aoPular, aoPausar }: PropsDaTela<Ler>) {
   const repo = useRepositorio();
   const d = descreverPasso(passo, materia);
   const primeiro = passo.artigos[0];
@@ -90,6 +111,7 @@ function LerDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Ler>) {
       apoio={d.apoio}
       minutos={d.minutos}
       aoPular={aoPular}
+      aoPausar={aoPausar}
     >
       <ul className="fio-chips" aria-label="Artigos deste passo">
         {passo.artigos.map((a) => (
@@ -120,10 +142,22 @@ function LerDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Ler>) {
   );
 }
 
-function LerSemLeiDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<LerSemLei>) {
+function LerSemLeiDoPasso({
+  passo,
+  materia,
+  aoConcluir,
+  aoPular,
+  aoPausar,
+}: PropsDaTela<LerSemLei>) {
   const d = descreverPasso(passo, materia);
   return (
-    <CartaoDoPasso etiqueta="Ler" titulo={d.titulo} apoio={d.apoio} aoPular={aoPular}>
+    <CartaoDoPasso
+      etiqueta="Ler"
+      titulo={d.titulo}
+      apoio={d.apoio}
+      aoPular={aoPular}
+      aoPausar={aoPausar}
+    >
       <div className="fio-passo-acoes">
         <Link to="/biblioteca/acervo" className="fio-acao">
           Escolher a lei
@@ -143,7 +177,88 @@ function LerSemLeiDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<L
   );
 }
 
-function RevisarDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Revisar>) {
+/** Estável para o mesmo passo: sair e voltar refaz as mesmas perguntas. */
+interface ComSemente {
+  semente: number;
+}
+
+function LembrarDaTela({
+  passo,
+  materia,
+  semente,
+  aoConcluir,
+  aoPular,
+  aoPausar,
+}: PropsDaTela<Lembrar> & ComSemente) {
+  const d = descreverPasso(passo, materia);
+  return (
+    <CartaoDoPasso
+      etiqueta="Lembrar"
+      titulo={d.titulo}
+      apoio={d.apoio}
+      minutos={d.minutos}
+      aoPular={aoPular}
+      aoPausar={aoPausar}
+    >
+      <LembrarDoPasso passo={passo} semente={semente} aoConcluir={aoConcluir} aoPular={aoPular} />
+    </CartaoDoPasso>
+  );
+}
+
+function GuardarDaTela({
+  passo,
+  materia,
+  semente,
+  aoConcluir,
+  aoPular,
+  aoPausar,
+}: PropsDaTela<Guardar> & ComSemente) {
+  const d = descreverPasso(passo, materia);
+  return (
+    <CartaoDoPasso
+      etiqueta="Guardar"
+      titulo={d.titulo}
+      apoio={d.apoio}
+      minutos={d.minutos}
+      aoPular={aoPular}
+      aoPausar={aoPausar}
+    >
+      <GuardarDoPasso passo={passo} semente={semente} aoConcluir={aoConcluir} aoPular={aoPular} />
+    </CartaoDoPasso>
+  );
+}
+
+function PraticarDaTela({
+  passo,
+  materia,
+  semente,
+  alvo,
+  aoConcluir,
+  aoPular,
+  aoPausar,
+}: PropsDaTela<Praticar> & ComSemente & { alvo: AlvoDaPorteira }) {
+  const d = descreverPasso(passo, materia);
+  return (
+    <CartaoDoPasso
+      etiqueta="Praticar"
+      titulo={d.titulo}
+      apoio={d.apoio}
+      minutos={d.minutos}
+      aoPular={aoPular}
+      aoPausar={aoPausar}
+    >
+      <PraticarDoPasso
+        passo={passo}
+        alvo={alvo}
+        semente={semente}
+        aoConcluir={aoConcluir}
+        aoPular={aoPular}
+      />
+    </CartaoDoPasso>
+  );
+}
+
+function RevisarDoPasso({ passo, materia, aoConcluir, aoPular, aoPausar }: PropsDaTela<Revisar>) {
   const d = descreverPasso(passo, materia);
   return (
     <CartaoDoPasso
@@ -152,6 +267,7 @@ function RevisarDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Rev
       apoio={d.apoio}
       minutos={d.minutos}
       aoPular={aoPular}
+      aoPausar={aoPausar}
     >
       <div className="fio-passo-acoes">
         <Link to={`/recall/revisar?itens=${String(passo.quantidade)}`} className="fio-acao">
@@ -172,11 +288,17 @@ function RevisarDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<Rev
   );
 }
 
-function SeuPassoDoPasso({ passo, materia, aoConcluir, aoPular }: PropsDaTela<SeuPasso>) {
+function SeuPassoDoPasso({ passo, materia, aoConcluir, aoPular, aoPausar }: PropsDaTela<SeuPasso>) {
   const repo = useRepositorio();
   const d = descreverPasso(passo, materia);
   return (
-    <CartaoDoPasso etiqueta="Seu passo" titulo={d.titulo} apoio={d.apoio} aoPular={aoPular}>
+    <CartaoDoPasso
+      etiqueta="Seu passo"
+      titulo={d.titulo}
+      apoio={d.apoio}
+      aoPular={aoPular}
+      aoPausar={aoPausar}
+    >
       <div className="fio-passo-acoes">
         <button
           type="button"
@@ -228,11 +350,12 @@ function Fileira({
 }
 
 /**
- * O passo da vez (D-D25): um cartão por passo, com o que fazer e a saída sempre à mão. Os passos
- * Lembrar, Guardar e Praticar entram quando as telas deles chegarem; até lá o Fio os pula.
+ * O passo da vez (D-D25): um cartão por passo, com o que fazer e a saída sempre à mão. Só o Fixar
+ * súmula ainda não tem tela (a entrada do Fio não traz súmulas); o Fio o pula sozinho.
  */
 export function PassoDoFio() {
   const fio = useFio();
+  const navegar = useNavigate();
   const { avanco } = fio;
   if (fio.falhou) {
     return (
@@ -248,12 +371,29 @@ export function PassoDoFio() {
 
   const { passo } = proximo;
   const materia = avanco.estado.etapa?.materia ?? '';
-  const comum = { materia, aoConcluir: fio.concluir, aoPular: fio.pular };
+  // Pausar não grava nada (o passo aberto já está guardado): marca a pausa e volta ao Agora.
+  const pausar = () => {
+    marcarPausa();
+    void navegar('/');
+  };
+  const comum = { materia, aoConcluir: fio.concluir, aoPular: fio.pular, aoPausar: pausar };
+  const semente = (avanco.estado.etapa?.numero ?? 0) * 100 + proximo.posicao;
   let tela: ReactNode = null;
   if (passo.tipo === 'ler' && 'adicionarNorma' in passo) {
     tela = <LerSemLeiDoPasso passo={passo} {...comum} />;
   } else if (passo.tipo === 'ler') {
     tela = <LerDoPasso passo={passo} {...comum} />;
+  } else if (passo.tipo === 'lembrar') {
+    tela = <LembrarDaTela passo={passo} semente={semente} {...comum} />;
+  } else if (passo.tipo === 'guardar') {
+    tela = <GuardarDaTela passo={passo} semente={semente} {...comum} />;
+  } else if (passo.tipo === 'praticar') {
+    // Sem leitura na matéria a porteira não tem o que perguntar: o passo diz isso e deixa seguir.
+    const alvo = (fio.entrada && alvoDaPorteira(fio.entrada, avanco.estado, passo.materiaId)) ?? {
+      normaId: '',
+      artigos: [],
+    };
+    tela = <PraticarDaTela passo={passo} alvo={alvo} semente={semente} {...comum} />;
   } else if (passo.tipo === 'revisar') {
     tela = <RevisarDoPasso passo={passo} {...comum} />;
   } else if (passo.tipo === 'seu_passo') {
