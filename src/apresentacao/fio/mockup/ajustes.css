@@ -548,3 +548,9 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+/* 22. A porteira ganha uma linha acima do deque: "Artigos próximos, misturados de propósito: decidir qual é qual
+      fixa mais." (`.m-dica-mistura`, só no primeiro cartão). Motivo: os cartões vêm de artigos próximos entre os já
+      lidos, um de cada por volta (ideia 4 de "Fio que ensina", escolhida pelo Gabriel em 04/11/2026), e a linha diz por
+      que estão misturados. Usa a classe da dica do cartão (`.m-dica-gesto`, com a tinta do desvio 19) e nenhuma regra
+      nova. A ordem sai de `gerarPorteira`, em `dominios/legislacao/lembrar.ts`. */
