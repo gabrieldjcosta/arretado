@@ -1,9 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Bloco } from '../../core/seguranca/sanitizador';
+import { estadoInicial } from '../../dominios/fio';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
+import { gravarFio } from './dados/guardado';
 import { CHAVE_DA_INTERFACE } from './interface';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
@@ -17,15 +19,20 @@ const LEI: Bloco[] = [
   linha('Art. 2º O prazo de recurso é de 30 (trinta) dias.'),
 ];
 
-async function abrir(opcoes: { comLei?: boolean; previa?: boolean; rota?: string } = {}) {
+/** `comLei`: a disciplina com a lei ligada; `semLei`: só a disciplina, sem norma nenhuma. */
+async function abrir(
+  opcoes: { comLei?: boolean; semLei?: boolean; previa?: boolean; rota?: string } = {},
+) {
   const { repo } = await repositorioDeTeste();
-  if (opcoes.comLei) {
+  if (opcoes.comLei || opcoes.semLei) {
     const disciplina = await repo.colecao('disciplinas').criar({ nome: 'Execução Penal' });
-    const { versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
-    const { norma } = await publicarVersao(repo, versao.id);
-    await repo
-      .colecao('vinculosDisciplina')
-      .criar({ normaId: norma.id, disciplinaId: disciplina.id });
+    if (opcoes.comLei) {
+      const { versao } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
+      const { norma } = await publicarVersao(repo, versao.id);
+      await repo
+        .colecao('vinculosDisciplina')
+        .criar({ normaId: norma.id, disciplinaId: disciplina.id });
+    }
   }
   if (opcoes.previa !== false) window.localStorage.setItem(CHAVE_DA_INTERFACE, 'fio');
   window.location.hash = opcoes.rota ?? '#/';
@@ -98,6 +105,40 @@ describe('o Arretado novo (prévia do Fio)', () => {
       await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/1 etapa pousada/)).toBeInTheDocument();
+    // O mapa vem num pedaço à parte; a lista dos pousos fica à mão, em palavras.
+    expect(
+      await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Seus pousos, em palavras')).toBeInTheDocument();
+  });
+
+  it('o Destino sem etapa pousada mostra o mapa e convida a puxar o fio no Agora', async () => {
+    await abrir({ comLei: true, rota: '#/destino' });
+    expect(
+      await screen.findByRole('heading', { name: 'O caminho começa aqui' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Ir ao Agora/ })).toHaveAttribute('href', '#/');
+    expect(
+      await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Legenda do mapa' })).toBeInTheDocument();
+    // Sem pouso nenhum, não há lista de pousos para abrir.
+    expect(screen.queryByText('Seus pousos, em palavras')).not.toBeInTheDocument();
+  });
+
+  it('sem a lei da matéria, o Destino mantém o número, agora das etapas, e diz o que falta', async () => {
+    const { repo } = await abrir({ semLei: true, rota: '#/destino' });
+    gravarFio(repo.ctx.usuarioId, {
+      estado: { ...estadoInicial(), etapasFeitas: 20, passosDados: 61 },
+      marcas: {},
+    });
+    expect(
+      await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
+    ).toBeInTheDocument();
+    await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' });
+    expect(document.querySelector('.fio-numero')).toHaveTextContent('20 etapas');
+    expect(screen.getByText(/pousadas no caminho, com 61 passos dados\./)).toBeInTheDocument();
+    expect(screen.getByText(/Quando Execução Penal tiver a lei no app/)).toBeInTheDocument();
   });
 
   it('pular um passo não custa nada e não deixa fato', async () => {

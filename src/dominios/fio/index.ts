@@ -8,7 +8,9 @@ export {
   naRetaFinal,
   planejarEtapa,
   RAZAO_DE_CRESCIMENTO,
+  relevantes as artigosRelevantes,
   tamanhoDaEtapa,
+  temMapa as normaTemMapa,
   TETO,
 } from './gerador';
 export {
