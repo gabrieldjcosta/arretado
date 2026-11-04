@@ -435,3 +435,15 @@ Antes de o pacote chegar, o `index.html` já traz o Zé (`#carregamento`, um `ro
 - **Don't** usar texto abaixo de 13 px nem alvo abaixo de 44 px.
 - **Don't** carregar fonte ou ícone de CDN (quebra o offline e envia o IP da pessoa a terceiros).
 - **Don't** renderizar HTML colado sem sanitizar, nem aplicar rótulo clínico ou de diagnóstico em qualquer tela.
+
+## O Fio (protótipo v16, fonte da verdade da cara nova)
+
+Arquivo aprovado: `docs/design/mockups/fio-v16.html` (abrir no navegador; botões no topo trocam movimento e mundo). Em divergência entre o app e esse arquivo, vale o arquivo, salvo desvio registrado em `docs/design/desvios.md`. Telas do mockup (`data-tela`): abertura, prova, inicio (Agora), ler, lembrar, achar, pouso, mapa (Destino), varal, folheto.
+
+**Tokens do mockup (noite; o dia redefine sob `:root[data-mundo="dia"]`):** `--chao #060b16`, `--noite #0b1322`, `--serra #121c31`, `--serra-2 #1a2742`, `--linha #2a3858`, `--texto #eef2fa`, `--texto-2 #9aa8c4`, `--luz #fff`, `--neon #39caef`, `--ponto #ffc53d`, `--flor #ff7eb6`, `--certo #7ee2b0`. Fontes: títulos `Schibsted Grotesk`, UI `Atkinson Hyperlegible Next`, lei `Literata`. Curvas: `--mola cubic-bezier(.34,1.56,.64,1)`, `--sair cubic-bezier(.2,.7,.2,1)`, `--trocar cubic-bezier(.45,0,.25,1)`.
+
+**Botões:** o principal (`.acao`) é pílula de 60 px, fundo `--luz`, sombra neon, seta que desliza 4 px no hover (`--mola`, 0,3 s), afunda em `scale(.96)` no `:active` e solta uma onda ciano ao toque. O puxador é uma esfera de 84 px em gradiente âmbar com halo. De dia o botão vira tinta com sombra de 3 px.
+
+**Movimento (três modos):** `normal` (deslize, mola, rotação do "+", voos do ponto e do fio), `calmo` (sem deslocamento horizontal, fades de 200 a 620 ms) e `reduzido` (estado final direto, sem animar). `prefers-reduced-motion: reduce` liga o calmo. Troca de tela: a velha sai em 260 ms (`cubic-bezier(.4,0,1,1)`), a nova entra em 480 ms com atraso de 90 ms (`--sair`), com 22 px de deslize lateral entre as abas e 14 px vertical nas demais; o indicador da pílula de lugares anda de uma aba à outra.
+
+**Prova:** `node scripts/fidelidade-fio.mjs` (ver skill `design-fidelity`).
