@@ -1,6 +1,6 @@
 # Próximos passos — resumo para o Gabriel
 
-Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (que vale em divergência). Linguagem simples; detalhes técnicos em `docs/proxima-sessao.md`.
+Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](../plano-mestre.md) (que vale em divergência). Linguagem simples; detalhes técnicos em `docs/proxima-sessao.md`.
 
 ## 1. Feito até agora
 - **F0 e F1** (Recall) prontas; o portão da F1 (14 dias com revisão em pelo menos 10) segue sendo medido.
@@ -27,7 +27,7 @@ Atualizado em 13/10/2026, ao consolidar o [`plano-mestre.md`](plano-mestre.md) (
 | ✔ 6b | Verificar atualização pelo aparelho (feita em 13/10/2026, sem mexer no esquema; só lê e avisa, nunca troca o texto; testada só com mocks, falta o seu teste real com rede) | — | — |
 | ✔ 7 | 13.4 Documento do portão da F2 (feito em 13/10/2026 em `docs/portoes/F2.md`; critérios ligados a teste, pendências suas listadas, o que depende de uso real ou rede está como "não medido") | — | — |
 | — | ~~2 semanas lendo lei no Arretado~~: passou para o teste com outras pessoas (V1), depois das contas; não bloqueia nada | — | — |
-| 9 | F3-A em pacotes paralelos + preparação da F3-B ([`f3-pacotes.md`](f3-pacotes.md)) | **Opus** | Nuvem, liberado |
+| 9 | F3-A em pacotes paralelos + preparação da F3-B ([`f3-pacotes.md`](../f3-pacotes.md)) | **Opus** | Nuvem, liberado |
 | 10 | Agente de verificação diário (rotina) | — | Nuvem |
 
 Biblioteca guarda o que os outros escreveram (leis, súmulas, teses; depois resumos e jurisprudência); Frases guardam o que você quer lembrar. Você testa esse fluxo no uso do dia a dia.

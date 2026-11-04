@@ -3,6 +3,7 @@ import { relatosAguardando } from '../../suporte/relatos';
 import { contasHabilitadas } from '../../integracoes/conta';
 import { LinhaLista } from '../componentes/LinhaLista';
 import { useDados } from '../dados/contexto';
+import { LinhaDaPrevia } from '../fio/LinhaDaPrevia';
 import { LinhaDeSincronizacao } from './LinhaDeSincronizacao';
 import { LinhaDoPasseio } from './LinhaDoPasseio';
 import { RegistrarAceite } from './entrar/RegistrarAceite';
@@ -44,6 +45,9 @@ export function Conta() {
         ))}
         <li>
           <LinhaDoPasseio />
+        </li>
+        <li>
+          <LinhaDaPrevia />
         </li>
         {contasHabilitadas() && (
           <li>

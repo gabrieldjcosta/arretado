@@ -319,7 +319,7 @@ Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) 
 |---|---|
 | `docs/proxima-sessao.md` | Estado atual, próxima atividade e pendências; a referência operacional (Cloudflare, Supabase, comandos, mapa do código) fica em `docs/referencia.md` |
 | `docs/planos/plano-mestre.md` | **Este**: ordem, fases, regras, decisões abertas |
-| `docs/planos/proximos-passos.md` | Resumo em linguagem simples para o Gabriel |
+| `docs/planos/arquivo/proximos-passos.md` | Resumo em linguagem simples para o Gabriel |
 | `docs/planos/agente-verificacao.md` | Regras do agente de verificação diário (rotina) |
 | `docs/planos/f3-pacotes.md` | Partição da F3-A e preparação da F3-B em pacotes paralelos |
 | `docs/planos/F2.md` | Detalhe técnico da F2: fatos das fontes, atividades, rotina de pronto, critérios do portão |
