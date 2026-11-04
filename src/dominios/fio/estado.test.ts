@@ -221,7 +221,7 @@ describe('pousar', () => {
   it('fecha a etapa, conta na matéria e guarda o pouso', () => {
     const s = etapaToda(estadoInicial(), entrada());
     const r = pousar(s);
-    expect(r.pouso).toMatchObject({ etapa: 0, materia: 'Matéria penal' });
+    expect(r.pouso).toMatchObject({ etapa: 0, materia: 'Matéria penal', materiaId: 'penal' });
     expect(r.estado).toMatchObject({
       etapasFeitas: 1,
       etapasPorMateria: { penal: 1 },
@@ -368,6 +368,26 @@ describe('lerEstadoDoFio', () => {
       porteirasDoFim: ['penal'],
       pousos: [{ etapa: 3, materia: 'Penal', fatos: ['Leu o art. 1 (CP)'] }],
     });
+  });
+
+  it('o pouso guarda a matéria pelo id; pousos antigos, sem ele, seguem valendo, e id estragado some', () => {
+    const lido = lerEstadoDoFio({
+      versao: 1,
+      etapasFeitas: 3,
+      passosDados: 0,
+      etapasPorMateria: {},
+      porteirasDoFim: [],
+      pousos: [
+        { etapa: 2, materia: 'Penal', materiaId: 'penal', fatos: [] },
+        { etapa: 1, materia: 'Civil', fatos: [] },
+        { etapa: 0, materia: 'Eca', materiaId: 7, fatos: [] },
+      ],
+    });
+    expect(lido.pousos).toEqual([
+      { etapa: 2, materia: 'Penal', materiaId: 'penal', fatos: [] },
+      { etapa: 1, materia: 'Civil', fatos: [] },
+      { etapa: 0, materia: 'Eca', fatos: [] },
+    ]);
   });
 
   it('recusa fechamento que não bate com o passo e aberto fora do lugar', () => {

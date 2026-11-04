@@ -1,4 +1,4 @@
-import { LUGARES, lugarDaRota } from './lugares';
+import { LUGARES, lugarDaRota, ROTA_DO_PASSO, ROTA_DO_POUSO, semPilulaDosLugares } from './lugares';
 
 describe('os três lugares do Arretado novo', () => {
   it('são Agora, Destino e Varal, nessa ordem', () => {
@@ -23,5 +23,14 @@ describe('os três lugares do Arretado novo', () => {
   it('a Conta e as Orientações não acendem nenhum lugar', () => {
     expect(lugarDaRota('/conta')).toBeUndefined();
     expect(lugarDaRota('/orientacoes/ler')).toBeUndefined();
+  });
+
+  it('só o pouso esconde a pílula dos lugares', () => {
+    expect(ROTA_DO_POUSO).toBe('/fio/pouso');
+    expect(ROTA_DO_PASSO).toBe('/fio/passo');
+    expect(semPilulaDosLugares(ROTA_DO_POUSO)).toBe(true);
+    expect(semPilulaDosLugares(ROTA_DO_PASSO)).toBe(false);
+    expect(semPilulaDosLugares('/')).toBe(false);
+    expect(semPilulaDosLugares('/destino')).toBe(false);
   });
 });

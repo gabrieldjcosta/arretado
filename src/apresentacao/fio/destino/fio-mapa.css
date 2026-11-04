@@ -1,0 +1,702 @@
+/* O mapa do Destino (D-D25): o Nordeste de verdade, em papel, com o caminho que a pessoa anda. Valores do
+   protótipo v16 da Marca. Duas distâncias: de longe (a câmera abre o Nordeste inteiro) aparecem as matérias
+   nos estados; de perto, os lugares, os artigos e as porteiras. A câmera mexe só em três variáveis
+   (--cam-x, --cam-y, --cam-k) e no viewBox do desenho; cada marca guarda o seu lugar em --x e --y. */
+
+.shell-fio :is(.fio-mapa, .fio-legenda) {
+  /* Dia: papel de mapa em luz de manhã. */
+  --m-mar-a: #dbe7f0;
+  --m-mar-b: #eef2f5;
+  --m-resto: #e2dac6;
+  --m-papel: #efe6d0;
+  --m-papel-atual: #ebdfc1;
+  --m-papel-borda: #b39f74;
+  --m-papel-tinta: #66532f;
+  --m-trilha: #8a5200;
+  --m-trilha-halo: rgb(255 251 240 / 92%);
+  --m-ponto-fundo: #fbf6ea;
+  --m-ponto-aberto: #d39200;
+  --m-grao: 0.1;
+  --m-sombra-texto: #f6efdd;
+  --m-fim-fundo: #fffaf0;
+  --m-fim-cor: #8a5200;
+  --m-fim-halo: rgb(255 197 61 / 32%);
+  --m-andado-brilho: var(--f-fio-halo);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) .shell-fio :is(.fio-mapa, .fio-legenda) {
+    --m-mar-a: rgb(16 30 60 / 55%);
+    --m-mar-b: rgb(4 9 20 / 50%);
+    --m-resto: rgb(150 175 225 / 7%);
+    --m-papel: rgb(150 178 230 / 13%);
+    --m-papel-atual: rgb(170 198 245 / 21%);
+    --m-papel-borda: rgb(255 222 160 / 32%);
+    --m-papel-tinta: #d9c597;
+    --m-trilha: #f4ead0;
+    --m-trilha-halo: rgb(6 12 28 / 62%);
+    --m-ponto-fundo: #0b1322;
+    --m-ponto-aberto: #d39200;
+    --m-grao: 0.04;
+    --m-sombra-texto: #0b1322;
+    --m-fim-fundo: #0b1322;
+    --m-fim-cor: #fff7da;
+    --m-fim-halo: rgb(255 197 61 / 14%);
+    --m-andado-brilho: rgb(255 255 255 / 8%);
+  }
+}
+
+:root[data-tema='escuro'] .shell-fio :is(.fio-mapa, .fio-legenda) {
+  --m-mar-a: rgb(16 30 60 / 55%);
+  --m-mar-b: rgb(4 9 20 / 50%);
+  --m-resto: rgb(150 175 225 / 7%);
+  --m-papel: rgb(150 178 230 / 13%);
+  --m-papel-atual: rgb(170 198 245 / 21%);
+  --m-papel-borda: rgb(255 222 160 / 32%);
+  --m-papel-tinta: #d9c597;
+  --m-trilha: #f4ead0;
+  --m-trilha-halo: rgb(6 12 28 / 62%);
+  --m-ponto-fundo: #0b1322;
+  --m-ponto-aberto: #d39200;
+  --m-grao: 0.04;
+  --m-sombra-texto: #0b1322;
+  --m-fim-fundo: #0b1322;
+  --m-fim-cor: #fff7da;
+  --m-fim-halo: rgb(255 197 61 / 14%);
+  --m-andado-brilho: rgb(255 255 255 / 8%);
+}
+
+/* ---------- A caixa: arrastar passeia, a roda e o beliscão aproximam ---------- */
+.fio-mapa {
+  --cam-x: 0;
+  --cam-y: 0;
+  --cam-k: 0.3;
+  position: relative;
+  height: clamp(22rem, 62dvh, 34rem);
+  overflow: hidden;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 22px;
+  background: radial-gradient(120% 90% at 70% 30%, var(--m-mar-a), var(--m-mar-b));
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.fio-mapa[data-arrastando] {
+  cursor: grabbing;
+}
+
+.fio-mapa:focus-visible {
+  outline: 2px solid var(--f-acento);
+  outline-offset: 2px;
+}
+
+.fio-mapa-vazio {
+  height: clamp(22rem, 62dvh, 34rem);
+  border-radius: 22px;
+  background: var(--f-fantasma);
+}
+
+/* O grão do papel: um ladrilho pequeno e parado, em vez de um filtro que o navegador refaria a cada quadro. */
+.ne-grao {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--m-grao);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .33 0 0 0 0 .18 0 0 0 1.4 -.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* ---------- O desenho: o resto do Brasil esmaecendo, os nove estados e o caminho ---------- */
+.ne-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ne-svg path {
+  vector-effect: non-scaling-stroke;
+}
+
+.ne-resto path {
+  fill: var(--m-resto);
+  stroke: var(--m-papel-borda);
+  stroke-width: 0.8;
+  stroke-opacity: 0.28;
+}
+
+.ne-uf {
+  fill: var(--m-papel);
+  stroke: var(--m-papel-borda);
+  stroke-width: 1;
+  stroke-opacity: 0.6;
+  stroke-linejoin: round;
+}
+
+.ne-uf.uf-agora {
+  fill: var(--m-papel-atual);
+  stroke-width: 1.3;
+  stroke-opacity: 0.8;
+}
+
+/* A matéria que ainda não começou (e o estado sem matéria) fica de sombra: mais fraco e pontilhado. */
+.ne-uf.uf-sombra,
+.ne-uf.uf-livre {
+  fill-opacity: 0.55;
+  stroke-dasharray: 3 4;
+  stroke-opacity: 0.7;
+}
+
+.ne-trilha-halo {
+  fill: none;
+  stroke: var(--m-trilha-halo);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ne-tracejado {
+  fill: none;
+  stroke: var(--m-trilha);
+  stroke-width: 3.2;
+  stroke-dasharray: 8 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ne-tracejado.longe {
+  opacity: 0.35;
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+}
+
+/* O que a pessoa já andou: um traço cheio, de luz, por cima do tracejado. */
+.ne-andado,
+.ne-andado-brilho {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ne-andado {
+  stroke: var(--f-ponto);
+  stroke-width: 2.8;
+}
+
+.ne-andado-brilho {
+  stroke: var(--m-andado-brilho);
+  stroke-width: 9;
+}
+
+/* ---------- As marcas: ficam do mesmo tamanho em qualquer distância ---------- */
+.ne-marcas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ne-marcas > * {
+  position: absolute;
+  left: calc((var(--x) - var(--cam-x)) * var(--cam-k) * 1px);
+  top: calc((var(--y) - var(--cam-y)) * var(--cam-k) * 1px);
+  pointer-events: auto;
+}
+
+/* O botão de sempre afunda ao toque trocando o `transform`. As marcas se posicionam por `translate` (que não
+   é trocado) e ficam paradas sob o dedo: se pulassem, o toque soltaria em cima do vizinho e o clique se perderia. */
+.ne-marcas button:not(:disabled):active {
+  transform: none;
+}
+
+.ne-marcas [data-oculto] {
+  visibility: hidden;
+}
+
+/* O texto do destino some sem sair da árvore de acessibilidade: é dele que o botão tira o nome. */
+.ne-marcas .ne-fim span[data-oculto] {
+  visibility: visible;
+  opacity: 0;
+}
+
+.ne-rotulo {
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none !important;
+  transition: opacity 0.4s;
+}
+
+.ne-rotulo b {
+  display: block;
+  font: 800 11px var(--fonte-titulo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+}
+
+.ne-rotulo span {
+  display: block;
+  margin-top: 2px;
+  font: italic 500 11px var(--fonte-interface);
+  color: var(--m-papel-tinta);
+}
+
+.ne-rotulo.uf-agora b {
+  color: var(--texto);
+}
+
+.ne-rotulo.uf-sombra,
+.ne-rotulo.uf-livre {
+  opacity: 0.55;
+}
+
+/* Perto, os nomes dos estados saem (sobram os dos estados de sombra, bem fracos); longe, saem os artigos. */
+.fio-mapa:not([data-longe]) .ne-rotulo:not(.uf-sombra, .uf-livre) {
+  opacity: 0;
+}
+
+.fio-mapa:not([data-longe]) .ne-rotulo:is(.uf-sombra, .uf-livre) {
+  opacity: 0.4;
+}
+
+.fio-mapa[data-longe] :is(.estrela-art, .ne-lugar span, .rotulo-porteira) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.estrela-art,
+.ne-lugar span,
+.rotulo-porteira {
+  transition:
+    opacity 0.35s,
+    visibility 0.35s;
+}
+
+/* Os pontos dos artigos: um link para o Leitor, maior quanto mais cai. A área de toque passa de 24 px. */
+.estrela-art {
+  display: block;
+  border-radius: 50%;
+  background: var(--m-papel-borda);
+  transform: translate(-50%, -50%);
+  transition:
+    transform 0.25s var(--f-mola),
+    opacity 0.35s,
+    visibility 0.35s;
+}
+
+.estrela-art::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
+.estrela-art.lido {
+  background: var(--f-ponto);
+  box-shadow: 0 0 10px var(--f-fio-halo);
+}
+
+@media (hover: hover) {
+  .estrela-art:hover {
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+}
+
+.estrela-art:focus-visible,
+.ne-lugar:focus-visible,
+.porteira:focus-visible,
+.ne-fim:focus-visible,
+.ne-vista:focus-visible,
+.ne-zoom button:focus-visible,
+.ne-ficha button:focus-visible {
+  outline: 2px solid var(--f-acento);
+  outline-offset: 3px;
+}
+
+/* A porteira: um losango na divisa. Fechada, vazada; pronta, acesa; aberta, cheia. */
+.porteira {
+  /* O botão de sempre pede 44 px; o losango é miúdo e a área de toque vem do ::before. */
+  min-width: 0;
+  min-height: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid var(--m-papel-borda);
+  border-radius: 5px;
+  background: var(--m-ponto-fundo);
+  translate: -50% -50%;
+  rotate: 45deg;
+  z-index: 1;
+}
+
+.porteira::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.porteira.pronta {
+  border-color: var(--f-ponto);
+  box-shadow:
+    0 0 0 5px var(--f-fio-halo),
+    0 0 18px rgb(255 197 61 / 45%);
+}
+
+.porteira.aberta {
+  border-color: var(--f-ponto);
+  background: var(--f-ponto);
+  box-shadow: 0 0 22px rgb(255 197 61 / 70%);
+}
+
+.rotulo-porteira {
+  transform: translate(18px, -50%);
+  font: 600 12px var(--fonte-interface);
+  color: var(--m-papel-tinta);
+  white-space: nowrap;
+  pointer-events: none !important;
+}
+
+.rotulo-porteira.pronta {
+  color: var(--f-tempo);
+  font-weight: 700;
+}
+
+/* Os lugares: o ponto e o nome. Aberto, aceso e com ficha; fechado, vazado; longe, miúdo e sem nome. */
+.ne-lugar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-width: 24px;
+  min-height: 28px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--m-papel-tinta);
+  translate: -7px -50%;
+  cursor: pointer;
+}
+
+.ne-lugar.esq {
+  flex-direction: row-reverse;
+  translate: calc(-100% + 7px) -50%;
+}
+
+.ne-lugar i {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--m-papel-borda);
+  border-radius: 50%;
+  background: var(--m-ponto-fundo);
+  transition: transform 0.3s var(--f-mola);
+}
+
+.ne-lugar span {
+  font: italic 600 12px var(--fonte-interface);
+  white-space: nowrap;
+  text-shadow:
+    0 0 6px var(--m-sombra-texto),
+    0 0 2px var(--m-sombra-texto);
+}
+
+/* Quando dois lugares se cobrem, o toque é de quem está aberto, e o mais forte é o de onde a pessoa está. */
+.ne-lugar.aberto {
+  z-index: 1;
+}
+
+.ne-lugar.com-voce {
+  z-index: 2;
+}
+
+.ne-lugar.aberto i {
+  background: radial-gradient(circle at 50% 40%, #fff7da 0%, var(--f-ponto) 55%, #d99a0e 100%);
+  border-color: var(--m-ponto-aberto);
+  box-shadow: 0 0 12px rgb(255 197 61 / 60%);
+}
+
+.ne-lugar.aberto span {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.ne-lugar.fechado {
+  opacity: 0.8;
+}
+
+.ne-lugar.longe i {
+  width: 9px;
+  height: 9px;
+  opacity: 0.6;
+}
+
+.ne-lugar.com-voce span {
+  margin-left: 8px;
+}
+
+.ne-lugar.esq.com-voce span {
+  margin: 0 8px 0 0;
+}
+
+@media (hover: hover) {
+  .ne-lugar:hover i {
+    transform: scale(1.25);
+  }
+}
+
+/* Onde a pessoa está: um anel de luz em volta do lugar, que respira. */
+.no-aqui {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 0 2px var(--f-ponto),
+    0 0 0 7px var(--f-fio-halo),
+    0 0 22px rgb(255 197 61 / 55%);
+  pointer-events: none !important;
+}
+
+/* O destino: a estrela na chegada. */
+.ne-fim {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--m-fim-cor);
+  translate: -50% -50%;
+  cursor: pointer;
+}
+
+.ne-fim i {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--f-ponto);
+  border-radius: 50%;
+  background: var(--m-fim-fundo);
+  box-shadow: 0 0 0 6px var(--m-fim-halo);
+}
+
+.ne-fim svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.ne-fim span {
+  font: 400 11.5px/1.25 var(--fonte-interface);
+  color: var(--texto-atenuado);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ne-fim b {
+  display: block;
+  font: 900 14px var(--fonte-titulo);
+  color: var(--m-fim-cor);
+}
+
+/* ---------- Os controles e as respostas ---------- */
+.ne-vista,
+.ne-zoom button {
+  border: 1px solid var(--f-cartao-borda);
+  background: var(--f-vidro);
+  color: var(--texto);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.ne-vista {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font: 700 13px var(--fonte-interface);
+}
+
+/* No canto de cima, na mesma linha de "Ver o Nordeste": embaixo o polegar esbarra na pílula dos lugares. */
+.ne-zoom {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.ne-zoom button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.ne-zoom svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.ne-aviso {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  width: max-content;
+  max-width: calc(100% - 1.5rem);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 18px;
+  background: var(--f-vidro);
+  color: var(--titulo);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  text-align: center;
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ne-aviso:empty {
+  display: none;
+}
+
+.ne-ficha {
+  position: absolute;
+  top: 64px;
+  right: 12px;
+  left: 12px;
+  z-index: 4;
+  max-height: calc(100% - 76px);
+  padding: 14px 44px 12px 16px;
+  overflow: auto;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 18px;
+  background: var(--f-cartao);
+  box-shadow: 0 20px 40px -20px rgb(0 0 0 / 45%);
+  cursor: auto;
+}
+
+.ne-ficha:focus-visible {
+  outline: 2px solid var(--f-acento);
+  outline-offset: 2px;
+}
+
+.ne-ficha .olho {
+  display: block;
+  font: 800 11px var(--fonte-titulo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--f-tempo);
+}
+
+.ne-ficha p {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--texto);
+}
+
+.ne-ficha small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--texto-atenuado);
+}
+
+.ne-ficha em {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  font-style: normal;
+  color: var(--texto-atenuado);
+}
+
+.ne-ficha .fecha {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--texto-atenuado);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------- Movimento ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* O que a pessoa andou se desenha, devagar, a partir do começo; o anel de onde ela está respira. */
+  :root:not([data-perfil='calmo']) .ne-andado,
+  :root:not([data-perfil='calmo']) .ne-andado-brilho {
+    stroke-dasharray: 1 1;
+    animation: ne-andar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.5s both;
+  }
+
+  :root:not([data-perfil='calmo']) .no-aqui {
+    animation: ne-chegar 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+  }
+
+  :root:not([data-perfil='calmo']) .ne-ficha {
+    animation: ne-subir 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes ne-andar {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ne-chegar {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes ne-subir {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

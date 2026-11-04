@@ -107,9 +107,9 @@ test('arrastar o nó para baixo e soltar puxa o fio e abre o passo', async ({ pa
   // Pular não custa nada: a etapa fecha sem fato e o pouso deixa a pessoa descansar.
   await passo.getByRole('button', { name: 'Pular este passo' }).click();
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Pode descansar.' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Pode descansar\.$/ })).toBeVisible();
   await semViolacoes(page);
-  await page.getByRole('button', { name: 'Seguir' }).click();
+  await page.getByRole('button', { name: /seguir para o próximo passo/ }).click();
   await expect(page).toHaveURL(/#\/$/);
 });
 

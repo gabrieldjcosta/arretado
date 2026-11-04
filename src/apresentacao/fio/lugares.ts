@@ -10,6 +10,16 @@ export const LUGARES = [
 
 export type IdDoLugar = (typeof LUGARES)[number]['id'];
 
+/** As telas do Fio que têm rota própria: o passo aberto e o pouso que fecha a etapa. */
+export const ROTA_DO_PASSO = '/fio/passo';
+export const ROTA_DO_POUSO = '/fio/pouso';
+
+/**
+ * O pouso é um momento: a pílula dos três lugares some enquanto ele dura, e a saída é o fio ou "descansar"
+ * (a pílula volta quando a pessoa sai). Assim a saída do pouso fica à vista, sem a pílula por cima.
+ */
+export const semPilulaDosLugares = (caminho: string): boolean => caminho === ROTA_DO_POUSO;
+
 /**
  * Em que lugar a rota mora. As telas de hoje que ainda não têm casa nova ficam no lugar delas (D-D25): a
  * Trilha e o plano no Destino; a Biblioteca e o Fixar (Recall) no Varal; a Sessão e o começo no Agora. A Conta,
