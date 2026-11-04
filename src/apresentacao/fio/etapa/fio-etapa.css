@@ -50,6 +50,16 @@
   font-size: 1.75rem;
 }
 
+@media (max-width: 260px) {
+  .fio-passo {
+    padding: 1rem;
+  }
+
+  .fio-titulo-passo {
+    font-size: 1.375rem;
+  }
+}
+
 .fio-chips {
   display: flex;
   flex-wrap: wrap;

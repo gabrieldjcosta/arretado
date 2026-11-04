@@ -97,6 +97,8 @@
   top: 0;
   z-index: 5;
   display: flex;
+  /* Como o cabeçalho de sempre: em tela estreita ou com fonte grande, quebra em duas linhas. */
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
@@ -107,6 +109,7 @@
 }
 
 .fio-marca {
+  white-space: nowrap;
   display: inline-flex;
   align-items: flex-end;
   gap: 3px;
@@ -168,8 +171,23 @@
 }
 
 .shell-fio .fio-conteudo {
-  max-width: 34rem;
   padding-top: 0.25rem;
+}
+
+/* As telas do Fio são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura
+   de sempre, também com a prévia ligada. */
+.shell-fio :is(.fio-agora, .fio-comeco, .fio-etapa, .fio-destino, .fio-varal) {
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 900px) {
+  .shell-fio .fio-topo {
+    padding-left: calc(
+      max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+  }
 }
 
 /* ---------- Os três lugares: Agora, Destino e Varal numa pílula só ---------- */
@@ -194,6 +212,7 @@
 }
 
 .fio-nav a {
+  white-space: nowrap;
   position: relative;
   z-index: 1;
   display: grid;
@@ -227,6 +246,18 @@
   z-index: 0;
 }
 
+@media (max-width: 260px) {
+  .fio-nav {
+    max-width: calc(100% - 0.5rem);
+    padding: 3px;
+  }
+
+  .fio-nav a {
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
 /* Teclado aberto: a pílula sai da frente, como as abas de hoje. */
 .shell-fio[data-teclado='aberto'] .fio-nav {
   display: none;
@@ -250,6 +281,12 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
   color: var(--titulo);
+}
+
+@media (max-width: 260px) {
+  .fio-titulo {
+    font-size: 1.75rem;
+  }
 }
 
 .fio-quieto {

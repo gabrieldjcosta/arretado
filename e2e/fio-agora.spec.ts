@@ -51,6 +51,28 @@ test('o Agora mostra o fio, o que vem na ponta e os três lugares embaixo', asyn
   await semViolacoes(page);
 });
 
+test('com zoom de 200% (195 px de layout), o cabeçalho e a pílula cabem sem rolar de lado', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 195, height: 400 });
+  await comMateriaNaPrevia(page);
+
+  // A pílula fica numa linha só (rótulo quebrado em letras a deixaria com mais de 100 px) e a página não rola de lado.
+  const nav = page.getByRole('navigation', { name: 'Lugares' });
+  await expect(nav).toBeVisible();
+  const caixa = await nav.boundingBox();
+  if (!caixa) throw new Error('sem caixa');
+  expect(caixa.height).toBeLessThan(70);
+  expect(caixa.x).toBeGreaterThanOrEqual(0);
+  expect(caixa.x + caixa.width).toBeLessThanOrEqual(195);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+  await semViolacoes(page);
+});
+
 test('arrastar o nó para baixo e soltar puxa o fio e abre o passo', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await comMateriaNaPrevia(page);
