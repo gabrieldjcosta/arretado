@@ -1,0 +1,223 @@
+/* Desvios do mockup aprovado, um por um, cada qual com o motivo. É o único lugar onde o app se afasta do
+   mockup (mockup.css é gerado e não se edita). Sem motivo escrito aqui, não é desvio: é erro. A lista também
+   está em docs/design/fio/README.md. */
+
+/* 1. A raiz do Fio faz o papel do <body> do protótipo (a página que o centrava e lhe dava o fundo).
+      Motivo: no protótipo havia uma página; no app, quem faz isso é a raiz do Fio. A área segura entra
+      nos paddings (entalhe e barra de gestos do aparelho), que a página do protótipo não tinha. */
+.m-fio {
+  position: relative;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 440px) {
+  .m-fio {
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* 2. O quadro usa a altura que sobra. Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
+      Noite/Dia, Recomeçar) e a nota de rodapé, 64 px (52 no celular); o app não tem nenhuma das duas. */
+.m-fio .m-app {
+  height: min(830px, 100%);
+}
+
+@media (max-width: 440px) {
+  .m-fio .m-app {
+    height: 100%;
+  }
+}
+
+/* 3. As fontes do mockup, com os nomes próprios de fontes.css. Motivo: o protótipo as pedia ao Google
+      Fonts; o app as serve do próprio site (T19) e não pode trocar a Atkinson e a Literata dos outros
+      mundos do app. */
+.m-fio.m-fio {
+  --m-f-ui:
+    'Atkinson Hyperlegible Next Fio', 'Atkinson Hyperlegible Next', system-ui, -apple-system,
+    sans-serif;
+  --m-f-lei: 'Literata Fio', 'Literata', Georgia, 'Times New Roman', serif;
+  --m-f-titulo: 'Schibsted Grotesk', 'Atkinson Hyperlegible Next Fio', system-ui, sans-serif;
+}
+
+/* 4. Um link com a cara do botão de ação. Motivo: o protótipo só tinha <button>; no app o mesmo gesto
+      às vezes leva a outra rota e tem de ser <a>, sem o sublinhado do navegador. */
+.m-fio a.m-acao {
+  text-decoration: none;
+}
+
+/* 5. "Pular para o conteúdo" (acessibilidade). Motivo: o protótipo não tinha teclado nem leitor de tela
+      no escopo; o app tem de ter (WCAG 2.4.1). Fica fora da tela até receber o foco. */
+.m-fio .m-pular-ao-conteudo {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 20;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--m-luz);
+  color: var(--m-noite);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.m-fio .m-pular-ao-conteudo:focus {
+  left: 12px;
+}
+
+/* 6. Texto só para leitor de tela, dentro do quadro. Motivo: o protótipo não tinha esses textos. */
+.m-fio .m-so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 7. Os avisos da casca do app (sem rede, outro aparelho com a conta, sessão em curso). Motivo: o protótipo
+      não tinha nenhum; o app tem de mostrá-los, e eles não podem empurrar o quadro. Ficam por cima, no alto. */
+.m-fio .m-avisos {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.m-fio .m-avisos > * {
+  pointer-events: auto;
+}
+
+/* 8. O link "Abrir no Leitor" com a cara de um chip. Motivo: o Ler do mockup não leva ao Leitor; o do app
+      leva, para quem quer o artigo inteiro com as ferramentas do Leitor. */
+.m-fio a.m-chip {
+  text-decoration: none;
+}
+
+/* 9. Os outros passos do app usam o mesmo cartão. Motivo: o mockup só tem os passos ler, lembrar e achar; o app tem
+      também guardar, revisar, o passo da própria pessoa e a porteira, e todos precisam do mesmo respiro no alto
+      para o "+" não ficar por cima do botão de pausa. */
+.m-fio [data-tela='guardar'],
+.m-fio [data-tela='revisar'],
+.m-fio [data-tela='seu_passo'],
+.m-fio [data-tela='praticar'] {
+  padding-top: 68px;
+}
+
+/* 10. Respostas longas na lacuna e nas contas. Motivo: o mockup só tinha "16%", "25%" e "30%"; a lei do app responde
+      "30 (trinta) dias", "dois terços", "violência ou grave ameaça". A conta redonda de 78 px não cabe nelas: vira
+      pílula, e as contas descem num fio vertical (o mesmo fio, de pé). A lacuna vazia ganha a largura de uma frase
+      curta e, cheia, vira texto corrido com o grifo, que quebra de linha como o resto da lei. */
+.m-fio .m-lacuna.m-longa {
+  min-width: 7em;
+}
+
+.m-fio .m-lacuna.m-longa.m-cheia {
+  display: inline;
+  height: auto;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.m-fio .m-contas.m-longas {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.m-fio .m-contas.m-longas::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: auto;
+  width: 2px;
+  height: auto;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--m-linha) 12%,
+    var(--m-linha) 88%,
+    transparent
+  );
+}
+
+.m-fio .m-bolinha.m-longa {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  min-height: 56px;
+  padding: 10px 22px;
+  border-radius: 28px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+/* 11. O deque da porteira cresce com a afirmação. Motivo: o mockup tinha afirmações de uma ou duas linhas e o deque
+      media 270 px; a lei do app passa de quatro linhas. O deque vai de 270 a 400 px e o texto rola dentro do cartão
+      (com `pan-y`, para o dedo rolar na vertical e arrastar na horizontal). */
+.m-fio .m-deque {
+  height: clamp(270px, 44dvh, 400px);
+}
+
+.m-fio .m-deque .m-cd {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+/* 12. "Pular este passo" por teclado e leitor de tela, no Lembrar. Motivo: no mockup o Lembrar só se pula arrastando
+      o cartão para a esquerda e o rodapé só chega com a resposta; sem o gesto, a pessoa ficaria presa até responder.
+      O botão fica fora da vista e aparece, no pé do cartão, quando recebe o foco. */
+.m-fio .m-pular-teclado:not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.m-fio .m-pular-teclado:focus-visible {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 2;
+}
+
+/* 13. Em tela muito estreita (zoom de 200% num celular: 195 px de layout), a nav encolhe. Motivo: no mockup cada lugar
+      leva 18 px de respiro dos lados e a nav tem uns 245 px, que passam da borda de uma tela dessas. */
+@media (max-width: 280px) {
+  .m-fio .m-nav {
+    max-width: calc(100% - 12px);
+  }
+
+  .m-fio .m-nav button {
+    min-width: 0;
+    padding: 0 6px;
+    font-size: 13px;
+  }
+}
+
+/* 14. Os "min" do Agora, no mundo do dia, em âmbar escuro. Motivo: o mockup os pinta com o dourado do ponto
+      (#ffc53d), que sobre o branco dá 1,57:1 (o mínimo é 4,5:1, WCAG 1.4.3). O âmbar escuro é o do carimbo do
+      mesmo mundo (--m-erro-selo). */
+.m-fio.m-fio[data-mundo='dia'] .m-proximo .m-min {
+  color: var(--m-erro-selo);
+}

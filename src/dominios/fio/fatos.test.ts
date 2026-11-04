@@ -46,6 +46,18 @@ describe('fatoDoPasso', () => {
         resultado: { tipo: 'lembrar', acertos: 2, erros: ['x'] },
       }),
     ).toBe('Lembrou 2 de 3');
+    expect(
+      fatoDoPasso(lembrar, {
+        como: 'feito',
+        resultado: { tipo: 'lembrar', acertos: 1, erros: ['x', 'y'], guardados: ['x', 'y'] },
+      }),
+    ).toBe('Lembrou 1 de 3, guardou 2 Frases');
+    expect(
+      fatoDoPasso(lembrar, {
+        como: 'feito',
+        resultado: { tipo: 'lembrar', acertos: 2, erros: ['x'], guardados: ['x'] },
+      }),
+    ).toBe('Lembrou 2 de 3, guardou 1 Frase');
     const guardar: Passo = { tipo: 'guardar', materiaId: 'm', normaId: 'n', enderecos: ['x'] };
     expect(
       fatoDoPasso(guardar, { como: 'feito', resultado: { tipo: 'guardar', guardadas: 1 } }),

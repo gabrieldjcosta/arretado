@@ -17,6 +17,13 @@ if (prototipo && typeof prototipo.scrollIntoView !== 'function') {
   prototipo.scrollIntoView = () => undefined;
 }
 
+// O jsdom não implementa a captura de ponteiro (o Fio a usa ao arrastar o fio e o cartão); no navegador é nativa.
+if (prototipo && typeof prototipo.setPointerCapture !== 'function') {
+  prototipo.setPointerCapture = () => undefined;
+  prototipo.releasePointerCapture = () => undefined;
+  prototipo.hasPointerCapture = () => false;
+}
+
 // O jsdom não implementa showModal(). Desde o 30.1.3 ele também nega foco a quem está dentro de um
 // <dialog> fechado, e o autoFocus do React roda antes de o <dialog> abrir. Aqui o showModal() faz o que
 // o navegador faz: abre e foca o primeiro controle (nos diálogos do app, o campo com autoFocus).

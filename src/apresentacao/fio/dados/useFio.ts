@@ -1,7 +1,7 @@
 // O Fio na tela: junta o que o app sabe (a `EntradaDoFio`), o que o aparelho guardou (o estado do
 // gerador) e as ações que mexem nos dois. Agora, passo e pouso usam o mesmo hook, então o que uma
 // tela grava a outra lê no mesmo instante.
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import type { Repositorio } from '../../../core/persistencia';
 import {
@@ -16,6 +16,13 @@ import { useRepositorio, useDados } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
 import { ROTA_DO_PASSO, ROTA_DO_POUSO } from '../lugares';
 import { avancar, entrarNoPasso, type Avanco } from './avancar';
+import {
+  desfazivel,
+  esquecerDesfazer,
+  lembrarParaDesfazer,
+  podeDesfazer,
+  tomarParaDesfazer,
+} from './desfazer';
 import { montarEntradaDoFio } from './entrada';
 import { useFioGuardado, type FioGuardado } from './guardado';
 
@@ -34,6 +41,10 @@ export interface FioNaTela {
   concluir: (resultado: ResultadoDoPasso) => void;
   /** Pular não custa nada (regra 10). */
   pular: () => void;
+  /** Volta ao passo que acabou de ser dado ou pulado (a toast "Desfazer"); `false` se não há o que voltar. */
+  desfazer: () => boolean;
+  /** Ainda dá para voltar atrás (o aviso com "Desfazer" vale poucos segundos)? */
+  podeDesfazer: () => boolean;
   /** O pouso: a etapa conta e o Agora volta com o fio solto. */
   pousarEtapa: () => Pouso | undefined;
 }
@@ -71,24 +82,46 @@ export function useFio(): FioNaTela {
     [entrada, gravar, navegar],
   );
 
+  // Um puxão antes de o Fio carregar não se perde: espera os dados chegarem e então puxa.
+  const puxaoPendente = useRef(false);
   const puxar = useCallback(() => {
-    if (!entrada || !avanco) return;
+    if (!entrada || !avanco) {
+      puxaoPendente.current = true;
+      return;
+    }
+    puxaoPendente.current = false;
     gravar(entrarNoPasso(avanco, entrada));
     if (avanco.proximo.tipo === 'passo') void navegar(ROTA_DO_PASSO);
     else if (avanco.proximo.tipo === 'pouso') void navegar(ROTA_DO_POUSO);
     else void navegar('/comecar');
   }, [avanco, entrada, gravar, navegar]);
+  useEffect(() => {
+    if (puxaoPendente.current && entrada && avanco) puxar();
+  }, [avanco, entrada, puxar]);
 
   const concluir = useCallback(
     (resultado: ResultadoDoPasso) => {
+      if (desfazivel(resultado)) lembrarParaDesfazer(usuarioId, fio);
+      else esquecerDesfazer();
       seguir(concluirPasso(fio.estado, resultado));
     },
-    [fio.estado, seguir],
+    [fio, seguir, usuarioId],
   );
 
   const pular = useCallback(() => {
+    lembrarParaDesfazer(usuarioId, fio);
     seguir(pularPasso(fio.estado));
-  }, [fio.estado, seguir]);
+  }, [fio, seguir, usuarioId]);
+
+  const desfazer = useCallback((): boolean => {
+    const antes = tomarParaDesfazer(usuarioId);
+    if (!antes) return false;
+    gravar(antes);
+    void navegar(ROTA_DO_PASSO, { replace: true });
+    return true;
+  }, [gravar, navegar, usuarioId]);
+
+  const aindaPodeDesfazer = useCallback(() => podeDesfazer(usuarioId), [usuarioId]);
 
   const pousarEtapa = useCallback((): Pouso | undefined => {
     const { estado, pouso } = pousar(fio.estado);
@@ -106,6 +139,8 @@ export function useFio(): FioNaTela {
     puxar,
     concluir,
     pular,
+    desfazer,
+    podeDesfazer: aindaPodeDesfazer,
     pousarEtapa,
   };
 }

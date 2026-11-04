@@ -7,19 +7,13 @@ import { Esqueleto } from '../componentes/estados';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
-export const AgoraDoFio = lazy(() =>
-  import('./agora/AgoraDoFio').then((m) => ({ default: m.AgoraDoFio })),
-);
+export const AgoraDoFio = lazy(() => import('./m/AgoraM').then((m) => ({ default: m.AgoraM })));
 export const DestinoDoFio = lazy(() =>
   import('./destino/DestinoDoFio').then((m) => ({ default: m.DestinoDoFio })),
 );
 export const Varal = lazy(() => import('./varal/Varal').then((m) => ({ default: m.Varal })));
-export const PassoDoFio = lazy(() =>
-  import('./etapa/PassoDoFio').then((m) => ({ default: m.PassoDoFio })),
-);
-export const PousoDoFio = lazy(() =>
-  import('./etapa/PousoDoFio').then((m) => ({ default: m.PousoDoFio })),
-);
+export const PassoDoFio = lazy(() => import('./m/PassoM').then((m) => ({ default: m.PassoM })));
+export const PousoDoFio = lazy(() => import('./m/PousoM').then((m) => ({ default: m.PousoM })));
 
 /** Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. */
 export function TelaDoFio({ children }: { children: ReactNode }) {

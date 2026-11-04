@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoes, test } from './apoio';
+import { expect, semViolacoesNoFio, test } from './apoio';
 
-// O Arretado novo (prévia do Fio, D-D25): o Agora com o fio que se puxa, o passo, o Destino e o Varal. O
-// jsdom não tem layout nem ponteiro de verdade; aqui o navegador confere o arrasto, que a pílula dos
-// lugares não cobre o que a tela mostra e que as quatro telas passam no axe em tema claro e escuro.
+// O Arretado novo (prévia do Fio, D-D25): o Agora do mockup aprovado (docs/design/fio/mockup-aprovado.html) com o
+// fio que se puxa, o passo, o Destino e o Varal. O jsdom não tem layout, ponteiro nem animação de verdade; aqui o
+// navegador confere o arrasto, que a nav não cobre o que a tela mostra, que há movimento (a tela que sai deixa
+// um fantasma, o ponto cai) e que as telas passam no axe em tema claro e escuro.
 
 const CSV = 'Disciplina;Código;Ponto;Faixa\nExecução Penal;1;Progressão de regime;Alta\n';
 
@@ -22,68 +23,65 @@ async function comMateriaNaPrevia(page: Page) {
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
 }
 
-test('o Agora mostra o fio, o que vem na ponta e os três lugares embaixo', async ({ page }) => {
+const puxador = (page: Page) => page.getByRole('button', { name: /Puxar o fio/ });
+
+/** Nada pode rolar de lado nem passar da largura da tela. */
+const semRolagemLateral = (page: Page) =>
+  page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+
+test('o Agora mostra a marca, o fio, o que vem na ponta e os três lugares embaixo', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await comMateriaNaPrevia(page);
 
-  const puxador = page.getByRole('button', { name: /Puxe o fio/ });
   const ponta = page.getByRole('group', { name: 'Na ponta do fio' });
-  await expect(puxador).toBeVisible();
+  await expect(puxador(page)).toBeVisible();
   await expect(ponta).toContainText('Adicionar a lei de Execução Penal');
+  await expect(page.getByRole('button', { name: 'arretado: sua conta e ajustes' })).toBeVisible();
+  await expect(page.getByText('da prova é seu')).toBeVisible();
 
   const nav = page.getByRole('navigation', { name: 'Lugares' });
-  await expect(nav.getByRole('link')).toHaveText(['Agora', 'Destino', 'Varal']);
-  await expect(nav.getByRole('link', { name: 'Agora' })).toHaveAttribute('aria-current', 'page');
+  await expect(nav.getByRole('button')).toHaveText(['Agora', 'Destino', 'Varal']);
+  await expect(nav.getByRole('button', { name: 'Agora' })).toHaveAttribute('aria-current', 'page');
 
-  // A pílula não cobre o cartão da ponta do fio, nem a página ganha rolagem lateral.
+  // A nav não cobre o cartão da ponta do fio, nem a página ganha rolagem lateral.
   const [caixaNav, caixaPonta] = await Promise.all([nav.boundingBox(), ponta.boundingBox()]);
   if (!caixaNav || !caixaPonta) throw new Error('sem caixa');
   expect(caixaPonta.y + caixaPonta.height).toBeLessThanOrEqual(caixaNav.y);
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  // O nó que se puxa é um alvo de toque de verdade (84 px).
-  const caixaNo = await puxador.boundingBox();
-  expect(caixaNo?.width).toBeGreaterThanOrEqual(80);
+  expect(await semRolagemLateral(page)).toBe(true);
+  // O ponto que se puxa é um alvo de toque de verdade.
+  const caixaNo = await puxador(page).boundingBox();
+  expect(caixaNo?.width).toBeGreaterThanOrEqual(44);
+  expect(caixaNo?.height).toBeGreaterThanOrEqual(44);
 
-  await semViolacoes(page);
+  await semViolacoesNoFio(page);
 });
 
-test('com zoom de 200% (195 px de layout), o cabeçalho e a pílula cabem sem rolar de lado', async ({
-  page,
-}) => {
+test('com zoom de 200% (195 px de layout), a nav cabe sem rolar de lado', async ({ page }) => {
   await page.setViewportSize({ width: 195, height: 400 });
   await comMateriaNaPrevia(page);
 
-  // A pílula fica numa linha só (rótulo quebrado em letras a deixaria com mais de 100 px) e a página não rola de lado.
   const nav = page.getByRole('navigation', { name: 'Lugares' });
   await expect(nav).toBeVisible();
   const caixa = await nav.boundingBox();
   if (!caixa) throw new Error('sem caixa');
-  expect(caixa.height).toBeLessThan(70);
   expect(caixa.x).toBeGreaterThanOrEqual(0);
   expect(caixa.x + caixa.width).toBeLessThanOrEqual(195);
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  await semViolacoes(page);
+  expect(await semRolagemLateral(page)).toBe(true);
+  await semViolacoesNoFio(page);
 });
 
-test('arrastar o nó para baixo e soltar puxa o fio e abre o passo', async ({ page }) => {
+test('arrastar o ponto para baixo e soltar puxa o fio e abre o passo', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await comMateriaNaPrevia(page);
 
-  const puxador = page.getByRole('button', { name: /Puxe o fio/ });
-  const caixa = await puxador.boundingBox();
+  const caixa = await puxador(page).boundingBox();
   if (!caixa) throw new Error('sem caixa');
   const x = caixa.x + caixa.width / 2;
   const y = caixa.y + caixa.height / 2;
 
-  // Soltar antes do limite devolve o nó ao lugar e não puxa nada.
+  // Soltar antes do limite devolve o ponto ao lugar (balançando) e não puxa nada.
   await page.mouse.move(x, y);
   await page.mouse.down();
   await page.mouse.move(x, y + 30, { steps: 5 });
@@ -97,36 +95,65 @@ test('arrastar o nó para baixo e soltar puxa o fio e abre o passo', async ({ pa
   await page.mouse.move(x, y + 110, { steps: 8 });
   await page.mouse.up();
   await expect(page).toHaveURL(/#\/fio\/passo$/);
-  const passo = page.getByRole('region', { name: 'Passo do Fio' });
-  await expect(passo.getByRole('heading', { level: 1 })).toHaveText(
+  const cartao = page.locator('.m-tela:not(.m-saindo) .m-cartao[data-cartao="ler"]');
+  await expect(cartao.getByRole('heading', { level: 2 })).toHaveText(
     'Adicionar a lei de Execução Penal',
   );
-  await expect(passo.getByRole('link', { name: 'Escolher a lei' })).toBeVisible();
-  await semViolacoes(page);
+  await expect(cartao.getByRole('link', { name: 'Escolher a lei' })).toBeVisible();
+  await semViolacoesNoFio(page);
 
   // Pular não custa nada: a etapa fecha sem fato e o pouso deixa a pessoa descansar.
-  await passo.getByRole('button', { name: 'Pular este passo' }).click();
+  await cartao.getByRole('button', { name: 'Pular este passo' }).click();
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
-  await expect(page.getByRole('heading', { level: 1, name: /Pode descansar\.$/ })).toBeVisible();
-  await semViolacoes(page);
-  await page.getByRole('button', { name: /seguir para o próximo passo/ }).click();
+  await expect(page.getByRole('heading', { level: 2, name: /Pode descansar\.$/ })).toBeVisible();
+  await semViolacoesNoFio(page);
+  await page.getByRole('button', { name: /Puxar o fio: seguir/ }).click();
   await expect(page).toHaveURL(/#\/$/);
+});
+
+test('a tela que sai deixa um fantasma que esmaece, como na troca de telas do mockup', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await comMateriaNaPrevia(page);
+  await page.evaluate(() => {
+    const w = window as unknown as { __viuFantasma: boolean };
+    w.__viuFantasma = false;
+    new MutationObserver((registros) => {
+      for (const r of registros) {
+        r.addedNodes.forEach((n) => {
+          if (n instanceof HTMLElement && n.classList.contains('m-saindo')) w.__viuFantasma = true;
+        });
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+
+  await puxador(page).focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#\/fio\/passo$/);
+  expect(
+    await page.evaluate(() => (window as unknown as { __viuFantasma: boolean }).__viuFantasma),
+  ).toBe(true);
+  // O fantasma não fica: passada a troca, só a tela nova está no quadro.
+  await expect(page.locator('.m-saindo')).toHaveCount(0);
+  await expect(page.locator('.m-tela')).toHaveCount(1);
 });
 
 test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ page }) => {
   await comMateriaNaPrevia(page);
-  await page.getByRole('button', { name: /Puxe o fio/ }).focus();
+  await puxador(page).focus();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#\/fio\/passo$/);
 
+  await page.goto('/#/');
   await page
     .getByRole('navigation', { name: 'Lugares' })
-    .getByRole('link', { name: 'Destino' })
+    .getByRole('button', { name: 'Destino' })
     .click();
   await expect(
     page.getByRole('heading', { level: 1, name: 'O caminho começa aqui' }),
   ).toBeVisible();
-  await semViolacoes(page);
+  await semViolacoesNoFio(page);
 
   await page
     .getByRole('navigation', { name: 'Lugares' })
@@ -135,7 +162,7 @@ test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ p
   await expect(page.getByRole('heading', { level: 1, name: /pendurado no fio/ })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você estuda' })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você guarda' })).toBeVisible();
-  await semViolacoes(page);
+  await semViolacoesNoFio(page);
 });
 
 test('sem ligar a prévia, a casca de sempre continua igual', async ({ page }) => {

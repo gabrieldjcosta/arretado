@@ -226,9 +226,9 @@
   padding-top: 0.25rem;
 }
 
-/* As telas do Fio são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura
-   de sempre, também com a prévia ligada. */
-.shell-fio :is(.fio-agora, .fio-comeco, .fio-etapa, .fio-destino, .fio-varal) {
+/* As telas do Fio que ainda moram nesta casca (o Destino e o Varal; o Agora, os passos e o pouso moram no quadro do
+   mockup) são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura de sempre. */
+.shell-fio :is(.fio-destino, .fio-varal) {
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;

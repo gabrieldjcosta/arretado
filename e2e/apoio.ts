@@ -228,6 +228,15 @@ export async function semViolacoes(page: Page) {
 }
 
 /**
+ * O aviso do quadro do Fio (`.m-toast`) sobe e some sozinho (2,3 s; 3,2 s com "Desfazer"). O axe espera ele sumir,
+ * para não medir a cor de um aviso a meio da transição, e então confere os dois mundos.
+ */
+export async function semViolacoesNoFio(page: Page) {
+  await expect(page.locator('.m-toast.m-on')).toHaveCount(0, { timeout: 10_000 });
+  await semViolacoes(page);
+}
+
+/**
  * Quantos pontos diferem de verdade entre dois recortes PNG (canal a canal, além de 16 em 255): o
  * lockup parado e o quadro final da escrita desenham os mesmos caminhos, mas um é tracejado e o outro
  * não, e a serrilha do Chromium muda 1 ou 2 níveis nas bordas. -1 se os tamanhos diferem.
