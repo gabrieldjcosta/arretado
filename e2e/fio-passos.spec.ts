@@ -142,6 +142,14 @@ test('Ler e Lembrar com a LEP: cada cartão cabe, passa no axe, os grifos acende
   await expect(page.getByRole('textbox', { name: /O que você lembra desta etapa/ })).toBeVisible();
   await expect(page.getByText(/^Leu /)).toHaveCount(0);
   await expect(page.getByRole('group', { name: 'Pousos da vereda' })).toHaveCount(0);
+  // Quem errou e guardou a Frase vê o "errei porque…" (ideia 7): três respostas, opcionais, que somem sozinhas.
+  if (!acertou) {
+    const porque = page.getByRole('group', { name: 'Errei porque' });
+    await expect(porque.getByRole('button')).toHaveCount(3);
+    await semViolacoesNoFio(page);
+    await porque.getByRole('button', { name: 'não lembrava' }).click();
+    await expect(page.getByText('Anotado')).toBeVisible();
+  }
   await botaoAlcancavel(page, 'Mostrar o resumo');
   await semRolagemLateral(page);
   await semViolacoesNoFio(page);
@@ -152,6 +160,7 @@ test('Ler e Lembrar com a LEP: cada cartão cabe, passa no axe, os grifos acende
   await expect(page.getByText(/^Leu /)).toBeVisible();
   await expect(page.getByText(/Lembrou /)).toBeVisible();
   if (!acertou) await expect(page.getByText(/guardou 1 Frase/)).toBeVisible();
+
   await semViolacoesNoFio(page);
   await page.getByRole('button', { name: /Puxar o fio: seguir/ }).click();
   await expect(page).toHaveURL(/#\/$/);

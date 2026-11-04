@@ -1,14 +1,36 @@
+import { PORQUES } from '../dados/causas';
 import { esconderAviso, useToast } from './toast';
 
 /** O aviso do quadro: o `#toast` do mockup, com "Desfazer" quando a ação pode voltar atrás. */
 export function ToastM() {
   const t = useToast();
-  const classe = ['m-toast', t.ligado && 'm-on', t.desfazer && 'm-compacto', t.baixo && 'm-baixo']
+  const classe = [
+    'm-toast',
+    t.ligado && 'm-on',
+    (t.desfazer || t.porque) && 'm-compacto',
+    t.baixo && 'm-baixo',
+    t.porque && 'm-porque',
+  ]
     .filter(Boolean)
     .join(' ');
   return (
     <div className={classe} role="status">
       {t.texto && <span key={t.id}>{t.texto}</span>}
+      {t.porque && (
+        <div className="m-porque-opcoes" role="group" aria-label="Errei porque">
+          {PORQUES.map(({ causa, texto }) => (
+            <button
+              key={causa}
+              type="button"
+              onClick={() => {
+                t.porque?.(causa);
+              }}
+            >
+              {texto}
+            </button>
+          ))}
+        </div>
+      )}
       {t.desfazer && (
         <button
           type="button"

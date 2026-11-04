@@ -88,6 +88,8 @@ export function PassoM() {
 
   const concluir = (resultado: ResultadoDoPasso) => {
     fio.concluir(resultado);
+    // O Lembrar que guardou Frase já deixou o aviso dele ("Errei porque…"), que não se troca por outro.
+    if (resultado.tipo === 'lembrar' && (resultado.guardados?.length ?? 0) > 0) return;
     avisar(avisoDoFeito(resultado), desfazivel(resultado) ? voltar : undefined);
   };
   const pular = () => {

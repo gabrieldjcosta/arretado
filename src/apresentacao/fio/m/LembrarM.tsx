@@ -11,6 +11,7 @@ import {
 } from '../../../dominios/legislacao/lembrar';
 import { useRepositorio } from '../../dados/contexto';
 import { referenciaDe, useCargaDoPasso } from '../passos/carregar';
+import { anotarPorQue } from '../dados/causas';
 import { guardarFraseDaFonte } from '../passos/guardar-frase';
 import { citacaoDaFonte, rotuloSemNorma } from '../passos/lei-do-passo';
 import { animar, modoAgora, SAIR, MOLA, TROCAR, useSinal } from './anima';
@@ -18,7 +19,7 @@ import { BotaoSeguir, PassoSemNada, PularPorTeclado } from './BotoesM';
 import { CartaoM } from './CartaoM';
 import { GestoM } from './IconesM';
 import type { PropsDoPassoM, Variante } from './passo-tipos';
-import { avisar } from './toast';
+import { avisar, avisarComPorQue } from './toast';
 
 const fonteDe = (item: LembrarDoArtigo): FonteDoItem =>
   item.pergunta.tipo === 'lacuna' ? item.pergunta.lacuna.fonte : item.pergunta.cartao.fonte;
@@ -346,9 +347,13 @@ export function LembrarM({
     if (!atual) return;
     if (acertou === false) {
       try {
-        await guardarFraseDaFonte(repo, fonteDe(atual));
+        const frase = await guardarFraseDaFonte(repo, fonteDe(atual));
         soma.current.guardados.push(atual.artigoEndereco);
-        if (!ultima) avisar('Frase guardada');
+        // "Errei porque...": três toques opcionais; o aviso some sozinho e não responder não custa nada.
+        avisarComPorQue('Frase guardada. Errei porque…', (causa) => {
+          anotarPorQue(repo.ctx.usuarioId, frase.id, causa);
+          avisar('Anotado');
+        });
       } catch {
         avisar('Não deu para guardar a Frase agora. Nada foi perdido.');
       }
