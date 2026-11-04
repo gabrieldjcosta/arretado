@@ -141,7 +141,8 @@ export async function pularAAbertura(page: Page) {
 
 /**
  * Registra um erro pelo "+" da casca (está em toda tela): abre o painel e toca em "Registrar erro". O link do
- * painel é o único com esse nome dentro dele.
+ * painel é o único com esse nome dentro dele, fora do Leitor: na lei o item é um botão ligado ao artigo e abre
+ * o formulário sem sair dela (D-D24).
  */
 export async function irAoRegistroPeloMais(page: Page) {
   await page.getByRole('button', { name: 'Novo registro' }).click();

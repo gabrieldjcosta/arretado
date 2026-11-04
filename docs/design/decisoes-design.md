@@ -560,3 +560,37 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O nome "Novo registro", o painel e as duas opções; a tecla E; o diálogo do Lembrete (nota rápida, sem hora nem aviso); o dock e o menu "Mais" do Leitor (a reorganização deles vem num PR à parte); a faixa e o palco do foco (D-D22); o modo "só estudo", que esconde Ajuda e Conta mas deixa o "+" onde está, como já deixava o link "Registrar erro" do cabeçalho.
 
 **Custo.** Um elemento fixo no canto de cima à direita de toda tela: quem puser outro elemento fixo ou preso ali (um aviso, um botão de fechar) bate nele. A regra é ler `--mais-direita`, `--mais-lado` e `--topo-do-foco`, como a faixa de posse faz. No celular em foco o cartão perde de 5 a 8 pontos de altura para a faixa; no computador, no máximo 1. O título do Hoje e o do Fixar perdem a linha de 48 px do "+", e o conteúdo sobe uns 15 px. A tela de revisão (cartões e Frases) não tem nada fixo no canto de cima, então o "+" não cobre nada ali.
+
+## D-D24 — O "+" cria e o "⋯" lê, no Leitor (03/11/2026, pedido do Gabriel)
+
+> **Complementa a D-D23 e a D-D15.** No Leitor o "+" ganha o que nasce do trecho (o erro ligado ao artigo e o cartão dele), e o dock fica em Buscar, Modo foco e o "⋯", que lê e organiza. A regra, para quem mexer depois: **"+" cria, "⋯" lê.**
+
+**Origem.** Gabriel em 03/11/2026 (21:40Z): "pra os outros menus da leitura, pensei em ter algo como um botão com '...' ou algo que simbolize as opções ali. Ver se não tem sobreposição entre + e os menus da leitura, como criar card e frase com base no trecho da norma. Resolver eventuais conflitos/sobreposições. Preservar atenção e energia. Mínimo de cliques possível."
+
+**Medido antes (a sobreposição).** Criar a partir da lei morava em quatro lugares, com dois comportamentos: o "+" e a tecla E levavam à tela de registro (saíam da lei, sem ligar o erro ao artigo); "Registrar erro" ligado ao artigo estava no "Mais" do celular e nas Ações; o cartão do trecho, só nas Ações. O dock tinha quatro botões a partir de 700 px (Buscar, Filtrar, Ações, Modo foco) e três no celular (Buscar, Modo foco, Mais), e o "⋯" do modo foco era outro menu, com o mesmo propósito. Toques até o cartão do trecho: 2 no computador (Ações, Criar cartão) e 3 no celular (Mais, Ações, Criar cartão), sempre dentro de um diálogo.
+
+**O que muda.**
+1. **Itens da tela no "+".** A casca guarda um registro de itens (`ItensDoMais`) e o Leitor se inscreve nele (`useItensDoMais`). O painel lê os itens uma vez, ao abrir. No Leitor entram **"Registrar erro"** (ligado ao artigo no alto da tela, "Ligado ao Art. 112"; toma o lugar do link genérico) e **"Cartão deste trecho"** ("Do Art. 112"), antes do "Lembrete". O alvo é medido ao abrir o painel e levado até a ação, então o apoio e a ação falam do mesmo artigo mesmo que a página role com o painel aberto.
+2. **Registrar erro sem sair da lei.** Abre só o formulário (a Frase correta é o único campo obrigatório, D25; "o que foi" já traz a referência) num diálogo por cima do texto. Salvar fecha o diálogo, avisa "Erro registrado, ligado ao art. …" por 4 s (o mesmo aviso rápido da origem da Estrela) e devolve o foco ao "+". A tecla E faz o mesmo na lei; fora dela segue indo à tela de registro, e fecha o painel do "+" se ele estiver aberto.
+3. **Cartão deste trecho sem diálogo.** Cria o cartão (frente "O que diz o art. …?", verso com o texto vigente), avisa "Cartão criado: … Primeira revisão amanhã." e passa a dizer "Já criado" (apagado, ainda no caminho do teclado). Uma vez por dispositivo por visita: tocar de novo não duplica; se a criação falha, o aviso diz e dá para tentar de novo.
+4. **"⋯" do dock, em toda largura.** `MaisDoLeitor` vira o "⋯" (três pontos de um traço só, o mesmo desenho do "⋯" do modo foco) com **Filtrar** e **Ações**, cada um com a sua frase de apoio. O dock é Buscar, Modo foco e o "⋯" do celular ao computador, e com um filtro ligado o "⋯" ganha o anel do filtro e diz qual é. O painel abre para cima do grupo (canto de baixo e barra do celular) e, no trilho de 1200 px, logo abaixo do dock, na largura dele.
+5. **As Ações ficam só com ler e organizar:** Estrelar, Copiar referência, Corrigir o texto, Verificar atualização, os erros vinculados e os precedentes. Saem delas "Registrar erro" e "Criar cartão deste trecho".
+6. **Não se sobrepõem:** o "+" e o "⋯" fecham um ao outro (o toque fora de um fecha o outro), e o Esc fecha só o que está aberto.
+
+**O que fica onde, depois.**
+
+| Ação | Antes | Depois |
+|---|---|---|
+| Registrar erro ligado ao artigo | Mais (celular) ou Ações; o "+" e a tecla E saíam da lei | "+" e tecla E, na própria lei |
+| Cartão deste trecho | Ações › Criar cartão deste trecho | "+" › Cartão deste trecho |
+| Frase do trecho marcado ("Enviar às frases") e cartão dos grifos | barra que aparece ao marcar o texto | igual: nascem da seleção, e só existem com texto marcado |
+| Filtrar, Ações | botões do dock (700 px ou mais) ou "Mais" (celular) | "⋯", em toda largura |
+| Lembrete | "+" | igual (D-D23) |
+
+**Toques, antes → depois.** Registrar erro ligado ao artigo: 2 → 2 (e 1 com a tecla E), sem sair da lei. Cartão do trecho: 3 (celular) ou 2 (computador) → 2 em toda largura, sem diálogo. Filtrar e Ações: 1 (700 px ou mais) → 2, e 2 no celular, como já era. O custo é o toque a mais no computador para o que se faz pouco; o ganho é um lugar só para criar e um só para ler.
+
+**Medido depois.** O painel do "⋯" cabe na tela a 390, 768, 1280 e 1440 px (a 390, abre à esquerda da barra, 278 × 118; a 768, à direita, 290 × 118; no trilho, 206 × 145, na largura dele). O painel do "+" no Leitor tem 288 × 206 e cabe a 390 px. O dock cabe numa linha a 320 px e quebra em duas a 320 px com a fonte a 130% e a 390 px a 300%, sem cortar rótulo nem rolar de lado. O tamanho do pacote ficou em 498 kB no total e 329 kB no início (tetos de 600 e 360).
+
+**O que continua como está.** O "+" no mesmo lugar (D-D23); a bandeja do modo foco (a mesma lista, com o "⋯" dela); "Lido até aqui"; a barra da seleção e a do grifo; o Lembrete; o registro completo em `/recall/registrar`, que é o que o "+" abre fora do Leitor.
+
+**Custo.** Duas peças a mais para manter em dia: o registro de itens (uma tela de cada vez tem a vez; a última a montar vence) e a regra "+ cria, ⋯ lê", que vale também para tela nova: quem acrescentar um botão de criar ao Leitor entrega um `ItemDoMais` em vez de pôr o botão no dock. O dock perde duas palavras (Filtrar e Ações) a partir de 700 px, e quem as usava a todo instante paga um toque.

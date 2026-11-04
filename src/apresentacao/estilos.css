@@ -2146,6 +2146,43 @@ a.item-norma strong {
   box-shadow: inset 0 0 0 2px var(--cacto);
 }
 
+/* O painel do ⋯ do dock (MaisDoLeitor, D-D24): abre para cima do grupo fixo, encostado à direita, onde o
+   dock mora a partir de 700 px; o celular o ancora à esquerda (adiante), e o trilho de 1200 px, que põe o
+   grupo em pé na margem, o abre para baixo. O visual é o da bandeja do foco (`.bandeja-itens`), com a
+   frase de apoio de cada item embaixo do nome. */
+.mais-do-leitor-itens {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 1;
+  min-width: min(16rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+}
+
+.mais-do-leitor-itens button {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 3rem;
+  padding-block: 0.375rem;
+}
+
+.mais-do-leitor-itens small {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--texto-atenuado);
+  white-space: normal;
+}
+
+.mais-do-leitor-itens button.filtro-ligado {
+  text-decoration: none;
+}
+
+.mais-do-leitor-itens button.filtro-ligado span {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 /* Em 320 px os quatro botões só cabem numa linha com o respiro menor (o alvo continua com 44 px de
    altura); sem isso o dock quebra e deixa um vazio ao lado de "Modo foco". */
 @media (max-width: 349px) {
@@ -2169,7 +2206,28 @@ a.item-norma strong {
   }
 
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
+    position: relative;
     flex-direction: column;
+  }
+
+  /* No trilho o dock está em pé: o ⋯ ocupa a largura da coluna, como Buscar e Modo foco, e o painel dele
+     abre logo abaixo do dock, na largura do trilho (cobre o "Lido até aqui" enquanto está aberto). */
+  .leitor:not(.em-foco) .mais-do-leitor {
+    display: flex;
+  }
+
+  .leitor:not(.em-foco) .mais-do-leitor-botao {
+    flex: 1;
+  }
+
+  .leitor:not(.em-foco) .mais-do-leitor-itens {
+    top: calc(100% + 8px);
+    right: auto;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 
   /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
@@ -2269,38 +2327,12 @@ a.item-norma strong {
     right: max(8px, env(safe-area-inset-right, 0px));
   }
 
-  /* O Mais abre para cima, a partir da borda da esquerda; o painel é o da bandeja do foco. */
+  /* No celular o painel do ⋯ abre para cima a partir da borda da esquerda, onde a barra mora. */
   .mais-do-leitor-itens {
-    position: absolute;
-    bottom: calc(100% + 8px);
+    right: auto;
     left: max(8px, env(safe-area-inset-left, 0px));
-    z-index: 1;
     min-width: min(16rem, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
-  }
-
-  .mais-do-leitor-itens button {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    min-height: 3rem;
-    padding-block: 0.375rem;
-  }
-
-  .mais-do-leitor-itens small {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--texto-atenuado);
-    white-space: normal;
-  }
-
-  .mais-do-leitor-itens button.filtro-ligado {
-    text-decoration: none;
-  }
-
-  .mais-do-leitor-itens button.filtro-ligado span {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
   }
 }
 
@@ -3446,15 +3478,18 @@ dialog.dialogo-acoes {
   margin-bottom: 0;
 }
 
-/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. */
+/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. O "⋯" do dock do
+   Leitor (D-D24) é o mesmo desenho. */
 .bandeja-botao svg,
+.mais-do-leitor-botao svg,
 .seta-do-cartao svg {
   width: 22px;
   height: 22px;
   flex: none;
 }
 
-.bandeja-botao svg {
+.bandeja-botao svg,
+.mais-do-leitor-botao svg {
   fill: currentcolor;
 }
 

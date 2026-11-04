@@ -3,8 +3,9 @@ import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from 
 
 // A barra do Leitor no celular (Onda 1 da crítica externa, A + B). Dentro da norma, menos de 700 px:
 // as abas das áreas saem (A), e as ferramentas viram uma barra de uma linha, encostada no fundo, com
-// Filtrar e Ações a dois toques, no "Mais" (B). Aqui se mede onde cada coisa fica, no estilo do
-// `trilho-do-leitor.spec.ts`; o E2E do Leitor só pergunta se os botões estão à vista.
+// Filtrar e Ações a dois toques, no "⋯" (B; o "⋯" é o mesmo em toda largura desde a D-D24, e criar erro e
+// cartão é com o "+" da casca). Aqui se mede onde cada coisa fica, no estilo do `trilho-do-leitor.spec.ts`;
+// o E2E do Leitor só pergunta se os botões estão à vista.
 
 // O CI desenha o texto com hinting inteiro, uns 3% mais largo que o do computador de quem escreve o
 // teste: a barra de 360 px passava aqui e quebrava lá. Com a flag o E2E mede o mesmo texto nos dois.
@@ -65,7 +66,7 @@ const medir = (page: Page) =>
       barra,
       cabecalho: caixa(document.querySelector('.topo')),
       botoes: [...document.querySelectorAll<HTMLElement>('.acoes-leitor button')].map((b) => ({
-        nome: b.textContent.trim(),
+        nome: (b.getAttribute('aria-label') ?? b.textContent).trim(),
         ...caixa(b),
         fonte: parseFloat(getComputedStyle(b).fontSize),
       })),
@@ -121,7 +122,7 @@ for (const { largura, altura } of TELAS) {
   });
 }
 
-test('Filtrar, Registrar erro e Ações ficam a dois toques, no "Mais", e o foco volta a ele ao fechar o diálogo', async ({
+test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartão, no "+"; o foco volta ao botão de onde se partiu', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
@@ -135,7 +136,7 @@ test('Filtrar, Registrar erro e Ações ficam a dois toques, no "Mais", e o foco
   // O menu abre para cima, dentro da tela, com itens de 48 px; aberto e fechado passa no axe.
   await mais.tap();
   await expect(mais).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu.getByRole('button')).toHaveText([/^Filtrar/, /^Registrar erro/, /^Ações/]);
+  await expect(menu.getByRole('button')).toHaveText([/^Filtrar/, /^Ações/]);
   const caixas = await menu.evaluate((el) => {
     const r = el.getBoundingClientRect();
     const barra = document.querySelector('.acoes-leitor')?.getBoundingClientRect();
@@ -196,16 +197,29 @@ test('Filtrar, Registrar erro e Ações ficam a dois toques, no "Mais", e o foco
   await expect(acoes).toBeHidden();
   await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
 
-  // Registrar erro: o painel abre direto no formulário (a frase correta), sem a lista de ações.
+  // Registrar erro é com o "+": o painel abre direto no formulário (a frase correta), sem a lista de
+  // ações e sem sair da lei; o "⋯" e o "+" não ficam abertos juntos.
+  const novo = page.getByRole('button', { name: 'Novo registro' });
   await page.getByRole('button', { name: 'Mais', exact: true }).tap();
-  await menu.getByRole('button', { name: /^Registrar erro/ }).tap();
-  await expect(acoes).toBeVisible();
-  await expect(acoes.getByLabel('Frase correta')).toBeVisible();
-  await expect(acoes.getByRole('button', { name: 'Criar cartão deste trecho' })).toHaveCount(0);
+  await expect(menu).toBeVisible();
+  await novo.tap();
+  await expect(menu).toBeHidden();
+  const itens = page.locator('.mais-itens');
+  await expect(itens.getByRole('button')).toHaveText([
+    /^Registrar erro/,
+    /^Cartão deste trecho/,
+    /^Lembrete/,
+  ]);
+  await semViolacoes(page);
+  await itens.getByRole('button', { name: /^Registrar erro/ }).tap();
+  const registro = page.getByRole('dialog', { name: /^Registrar erro em / });
+  await expect(registro).toBeVisible();
+  await expect(registro.getByLabel('Frase correta')).toBeVisible();
+  await expect(registro.getByRole('button', { name: 'Copiar referência' })).toHaveCount(0);
   await semViolacoes(page);
   await page.keyboard.press('Escape');
-  await expect(acoes).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
+  await expect(registro).toBeHidden();
+  await expect(novo).toBeFocused();
 });
 
 /** Tira o filtro: "Mostrar tudo" aparece na linha do filtro ligado. */
@@ -267,7 +281,7 @@ test('com o texto a 300% o dock quebra em linhas e nenhum rótulo passa da caixa
       const t = texto.getBoundingClientRect();
       const b = botao.getBoundingClientRect();
       return {
-        nome: botao.textContent.trim(),
+        nome: (botao.getAttribute('aria-label') ?? botao.textContent).trim(),
         foraAEsquerda: b.left - t.left,
         foraADireita: t.right - b.right,
       };
