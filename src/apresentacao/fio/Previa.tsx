@@ -7,6 +7,7 @@ import { EsqueletoDoFio } from './avisos/EsqueletoDoFio';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
+export const ProvaDoFio = lazy(() => import('./m/ProvaM').then((m) => ({ default: m.ProvaM })));
 export const AgoraDoFio = lazy(() => import('./m/AgoraM').then((m) => ({ default: m.AgoraM })));
 export const DestinoDoFio = lazy(() =>
   import('./destino/DestinoDoFio').then((m) => ({ default: m.DestinoDoFio })),

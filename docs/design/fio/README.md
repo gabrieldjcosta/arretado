@@ -91,4 +91,5 @@ aprovado não usa nenhuma. Quando uma entrar (Motion, View Transitions, Auto-Ani
 | porteira (deque) | `m/DequeM.tsx` |
 | guardar, revisar, o passo da pessoa | `m/OutrosPassosM.tsx` |
 | trilho, toast, "+" e mundo | `m/TrilhoM.tsx`, `m/ToastM.tsx`, `m/MaisM.tsx`, `m/mundo.ts` |
-| abertura, prova, achar, mapa, varal, folheto e as folhas | ainda não portados (próximos PRs) |
+| abertura (`m/AberturaM`, `m/abertura-voo.ts`) e prova (`m/ProvaM`) | portadas na fatia C1 (desvio 40); `e2e/fio-abertura.spec.ts` |
+| achar, mapa, varal, folheto e as folhas | ainda não portados (próximos PRs) |

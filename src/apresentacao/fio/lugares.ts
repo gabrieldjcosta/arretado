@@ -13,6 +13,8 @@ export type IdDoLugar = (typeof LUGARES)[number]['id'];
 /** As telas do Fio que têm rota própria: o passo aberto e o pouso que fecha a etapa. */
 export const ROTA_DO_PASSO = '/fio/passo';
 export const ROTA_DO_POUSO = '/fio/pouso';
+/** A pergunta de quem ainda não escolheu a prova (a tela `prova` do mockup). */
+export const ROTA_DA_PROVA = '/fio/prova';
 
 /**
  * O pouso é um momento: a pílula dos três lugares some enquanto ele dura, e a saída é o fio ou "descansar"
@@ -50,4 +52,7 @@ export function lugarDaRota(caminho: string): IdDoLugar | undefined {
  * Varal entram; as demais telas do app seguem na casca de antes.
  */
 export const noQuadroDoFio = (caminho: string): boolean =>
-  caminho === '/' || caminho === ROTA_DO_PASSO || caminho === ROTA_DO_POUSO;
+  caminho === '/' ||
+  caminho === ROTA_DO_PASSO ||
+  caminho === ROTA_DO_POUSO ||
+  caminho === ROTA_DA_PROVA;

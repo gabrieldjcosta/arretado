@@ -86,7 +86,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(within(convite).getByText('Qual é a sua prova?')).toBeInTheDocument();
     expect(within(convite).getByRole('link', { name: /Escolher minha prova/ })).toHaveAttribute(
       'href',
-      '#/comecar',
+      '#/fio/prova',
     );
   });
 

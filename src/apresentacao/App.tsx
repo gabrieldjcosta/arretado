@@ -33,6 +33,7 @@ import {
   PaginaInicial,
   PassoDoFio,
   PousoDoFio,
+  ProvaDoFio,
   TelaDoFio,
   TrocarInterface,
   Varal,
@@ -165,6 +166,14 @@ export function App({
                   element={
                     <TelaDoFio noQuadro>
                       <PousoDoFio />
+                    </TelaDoFio>
+                  }
+                />
+                <Route
+                  path="fio/prova"
+                  element={
+                    <TelaDoFio noQuadro>
+                      <ProvaDoFio />
                     </TelaDoFio>
                   }
                 />
