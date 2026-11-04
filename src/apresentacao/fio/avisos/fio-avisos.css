@@ -23,7 +23,7 @@
   border: 1px solid var(--f-cartao-borda, rgb(255 255 255 / 14%));
   border-radius: 14px;
   background: var(--f-vidro, rgb(20 24 32 / 92%));
-  box-shadow: 0 10px 28px rgb(0 0 0 / 28%);
+  box-shadow: var(--s3);
   backdrop-filter: blur(10px);
   color: var(--texto);
   font-size: 14px;

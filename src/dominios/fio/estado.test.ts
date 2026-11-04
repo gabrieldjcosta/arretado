@@ -174,6 +174,24 @@ describe('concluir e o Guardar (regra 4)', () => {
     expect(nada.etapa?.passos.map((p) => p.tipo)).not.toContain('guardar');
   });
 
+  it('a Frase que o próprio Lembrar já guardou não puxa o Guardar', () => {
+    const { s } = comLembrar();
+    const tudo = concluirPasso(s, {
+      tipo: 'lembrar',
+      acertos: 0,
+      erros: ['art-1', 'art-2'],
+      guardados: ['art-1', 'art-2'],
+    });
+    expect(tudo.etapa?.passos.map((p) => p.tipo)).not.toContain('guardar');
+    const metade = concluirPasso(s, {
+      tipo: 'lembrar',
+      acertos: 0,
+      erros: ['art-1', 'art-2'],
+      guardados: ['art-1'],
+    });
+    expect(metade.etapa?.passos[2]).toMatchObject({ tipo: 'guardar', enderecos: ['art-2'] });
+  });
+
   it('um resultado de outro tipo é ignorado', () => {
     const { s } = comLembrar();
     expect(concluirPasso(s, { tipo: 'revisar', revisados: 3, voltamAmanha: 0 })).toBe(s);

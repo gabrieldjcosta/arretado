@@ -2,7 +2,7 @@
 // grava nele, e o "Já li" grava no aparelho (o Mapa), então o "lido" da entrada fica um passo atrás:
 // aqui ele se soma ao que fechou no Ler desta etapa.
 import type { EntradaDoFio, EstadoDoFio } from '../../../dominios/fio';
-import type { AlvoDaPorteira } from '../passos';
+import type { AlvoDaPorteira } from '../passos/alvo-da-porteira';
 
 /** Na norma da matéria com mais artigos lidos; `undefined` se a pessoa ainda não leu nenhum. */
 export function alvoDaPorteira(
