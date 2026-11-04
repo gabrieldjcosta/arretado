@@ -47,12 +47,15 @@
   --f-aurora:
     radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 16%) 0%, transparent 62%),
     radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+  /* Grão de papel (Dia) e estrelas fixas (Noite): uma camada só, parada, por cima do céu. */
+  --f-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --f-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
   --f-sair: cubic-bezier(0.2, 0.7, 0.2, 1);
   --f-trocar: cubic-bezier(0.45, 0, 0.25, 1);
   --f-nav-altura: 4.75rem;
 
-  background: var(--f-aurora), var(--f-ceu);
+  background: var(--f-grao), var(--f-aurora), var(--f-ceu);
+  background-attachment: fixed, scroll, scroll;
   color: var(--texto);
   --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
 }
@@ -94,6 +97,16 @@
     --f-certo: #7ee2b0;
     --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
     --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+    --f-grao:
+      radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
   }
 }
 
@@ -126,6 +139,16 @@
   --f-certo: #7ee2b0;
   --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
   --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+  --f-grao:
+    radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
 }
 
 /* ---------- Cabeçalho: o nome com o cacto é o nó da pessoa (abre a Conta) ---------- */
