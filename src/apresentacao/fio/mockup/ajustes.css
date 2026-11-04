@@ -325,28 +325,28 @@
 /* 20. O neon do fio é amarelo. Pedido do Gabriel em 04/11/2026 (13:08Z: "nos movimentos do fio só faltou o brilho
       do neon (no caso, amarelo)"; 13:31Z: "toca pra o desenvolvimento"). Motivo: o mockup acende o fio do Agora em
       ciano (a faixa desfocada `.m-fio-pendurado-b`, na cor `--m-neon`), e o ponto de "Puxe o fio" é um sol. Valores
-      das pranchas da Marca (os mesmos do #408): a linha leva dois halos amarelos (4 e 14 px) em repouso; puxando,
-      eles sobem; passando dos 70 px, o fio estoura e a bola ganha o brilho dela. O `data-puxe` (solto, puxando,
-      passou) vem de `m/PuxarM.tsx`. No Calmo o brilho fica parado, no valor de repouso; em aparelho leve não há
-      halo (como o mockup, que tira as camadas de brilho). O ponto do trilho e a faísca ficam como no arquivo. */
+      das pranchas da Marca (os mesmos do #408), onde o fio é uma linha de 2,4 px com `box-shadow`: dois halos
+      amarelos em repouso (4 px e 1 de espalhamento a 55%; 14 px e 2 a 32%); puxando, eles sobem; passando dos 70 px, o
+      fio estoura e a bola ganha o brilho dela. O `box-shadow` espalha e o `drop-shadow()` não (sem o espalhamento o
+      halo num fio fino sai um quarto do da prancha), então os halos são filtros do SVG (`m/FiltrosM.tsx`, os três
+      `m-neon-*`: `feMorphology` para o espalhamento e `feGaussianBlur` para o raio). Um filtro com `url()` não
+      transita: o brilho muda de estado de uma vez, nos 4 e nos 70 px. O `data-puxe` (solto, puxando, passou) vem de
+      `m/PuxarM.tsx`. No Calmo o brilho fica parado, no valor de repouso; em aparelho leve não há halo (como o
+      mockup, que tira as camadas de brilho). O ponto do trilho e a faísca ficam como no arquivo. */
 .m-fio.m-fio .m-fio-pendurado-b {
   display: none;
 }
 
 .m-fio.m-fio .m-fio-pendurado {
-  filter: drop-shadow(0 0 4px rgba(255, 197, 61, 0.55))
-    drop-shadow(0 0 14px rgba(255, 197, 61, 0.32));
-  transition: filter 0.25s;
+  filter: url('#m-neon-solto');
 }
 
 .m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='puxando'] .m-fio-pendurado {
-  filter: drop-shadow(0 0 5px rgba(255, 197, 61, 0.7))
-    drop-shadow(0 0 20px rgba(255, 197, 61, 0.42));
+  filter: url('#m-neon-puxando');
 }
 
 .m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-fio-pendurado {
-  filter: drop-shadow(0 0 6px rgba(255, 214, 110, 0.95))
-    drop-shadow(0 0 28px rgba(255, 197, 61, 0.6));
+  filter: url('#m-neon-passou');
 }
 
 .m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-puxador {
@@ -364,6 +364,8 @@
     0 0 46px 6px rgba(255, 197, 61, 0.8);
 }
 
+/* Em aparelho leve nenhum estado leva o halo: o seletor tem a força dos três de cima e vem depois deles. */
+.m-fio.m-fio.m-leve .m-puxar-area[data-puxe] .m-fio-pendurado,
 .m-fio.m-fio.m-leve .m-fio-pendurado {
   filter: none;
 }
