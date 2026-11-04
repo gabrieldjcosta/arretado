@@ -44,3 +44,10 @@ export function lugarDaRota(caminho: string): IdDoLugar | undefined {
       return undefined;
   }
 }
+
+/**
+ * As rotas que moram no quadro do Fio (o `<main class="app">` do mockup aprovado). Nas fatias seguintes o Destino e o
+ * Varal entram; as demais telas do app seguem na casca de antes.
+ */
+export const noQuadroDoFio = (caminho: string): boolean =>
+  caminho === '/' || caminho === ROTA_DO_PASSO || caminho === ROTA_DO_POUSO;

@@ -1,0 +1,56 @@
+/* O CSS global do app não vale dentro do Fio.
+
+   O mockup que o Gabriel aprovou foi desenhado numa página limpa: o padrão do navegador mais o CSS dele.
+   O app tem regras globais de elemento (`button`, `h1`, `p`, `label`...) que, sem isto, passariam por baixo
+   do CSS gerado e mudariam tudo o que o mockup não declara (o padding do botão, a margem do parágrafo, a
+   quebra de palavra...). Aqui os elementos voltam ao padrão do navegador, com a menor especificidade
+   possível (`:where`): o CSS gerado (mockup.css, carregado depois) vence sempre.
+
+   Não é lugar de desvio do mockup. Desvio vai em ajustes.css, com o motivo ao lado. */
+
+/* A raiz faz o papel do <body> do protótipo. */
+.m-fio {
+  box-sizing: border-box;
+  margin: 0;
+  background: var(--m-chao);
+  color: var(--m-texto);
+  font-family: var(--m-f-ui);
+  font-size: 16px;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: start;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Os elementos com regra global no app voltam ao padrão do navegador. Fora o SVG, de propósito:
+   `all: revert` passaria por cima dos atributos de apresentação (`fill`, `stroke`). */
+.m-fio :where(button, input, textarea, select, label, fieldset, legend, h1, h2, h3, p) {
+  all: revert;
+}
+
+.m-fio :where(h4, li, a, dt, dd, summary, th, td, code, figcaption, blockquote) {
+  overflow-wrap: revert;
+}
+
+.m-fio :where(a) {
+  color: revert;
+  text-decoration-thickness: revert;
+  text-underline-offset: revert;
+}
+
+/* `button:disabled` do app (0,1,1) vence o `all: revert`: desfaz aqui, com empate de especificidade que o
+   CSS gerado ganha por vir depois. */
+.m-fio :where(button, input, textarea, select):disabled {
+  opacity: revert;
+  cursor: revert;
+}
+
+.m-fio input[type='search'] {
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+/* No protótipo é a regra da página; aqui é a da raiz do Fio. */
+.m-fio [hidden]:not([hidden='until-found' i]) {
+  display: none !important;
+}
