@@ -10,6 +10,12 @@ export const LUGARES = [
 
 export type IdDoLugar = (typeof LUGARES)[number]['id'];
 
+/** O Destino é um dos três lugares; a rota dele é a que alarga o quadro (`m-largo`) nos monitores. */
+export const ROTA_DO_DESTINO = '/destino';
+
+/** O Varal e os folhetos dele (`/varal/normas`, `/varal/sumulas`) moram no quadro do mockup. */
+export const ROTA_DO_VARAL = '/varal';
+
 /** As telas do Fio que têm rota própria: o passo aberto e o pouso que fecha a etapa. */
 export const ROTA_DO_PASSO = '/fio/passo';
 export const ROTA_DO_POUSO = '/fio/pouso';
@@ -46,8 +52,17 @@ export function lugarDaRota(caminho: string): IdDoLugar | undefined {
 }
 
 /**
- * As rotas que moram no quadro do Fio (o `<main class="app">` do mockup aprovado). Nas fatias seguintes o Destino e o
- * Varal entram; as demais telas do app seguem na casca de antes.
+ * As rotas que moram no quadro do Fio (o `<main class="app">` do mockup aprovado): o Agora, o Destino, o Varal e os folhetos
+ * dele, o passo e o pouso. As demais telas do app (o Leitor, a Biblioteca, o Fixar) seguem na casca de antes.
  */
 export const noQuadroDoFio = (caminho: string): boolean =>
-  caminho === '/' || caminho === ROTA_DO_PASSO || caminho === ROTA_DO_POUSO;
+  caminho === '/' ||
+  caminho === ROTA_DO_DESTINO ||
+  caminho === ROTA_DO_VARAL ||
+  caminho.startsWith(`${ROTA_DO_VARAL}/`) ||
+  caminho === ROTA_DO_PASSO ||
+  caminho === ROTA_DO_POUSO;
+
+/** As rotas do quadro que levam a nav embaixo: todas, menos o passo e o pouso (cada um é um momento, sem nav). */
+export const comNavDoFio = (caminho: string): boolean =>
+  noQuadroDoFio(caminho) && caminho !== ROTA_DO_PASSO && caminho !== ROTA_DO_POUSO;

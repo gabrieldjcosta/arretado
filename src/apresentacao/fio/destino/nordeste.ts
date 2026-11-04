@@ -2,7 +2,7 @@
 // direita, y para baixo, projeção equiretangular a 9° de latitude). Fonte: malha estadual do IBGE (via
 // click_that_hood), simplificada e projetada pela Marca; os lugares e as fichas vêm da pesquisa dela
 // (`nordeste-lugares.md`), que ainda precisa da conferência do Gabriel. O JSON (66 kB, 26 kB comprimido)
-// só entra no pedaço do pacote que desenha o mapa (`MapaDoNordeste`), carregado quando a pessoa abre o Destino.
+// só entra no pedaço do pacote que desenha o mapa (`m/MapaM`, dentro de `m/DestinoM`), carregado quando a pessoa abre o Destino.
 
 /** Os nove estados do Nordeste, na ordem da jornada: uma matéria do Ciclo para cada um. */
 export const ORDEM_UF = ['MA', 'PI', 'CE', 'RN', 'PB', 'PE', 'AL', 'SE', 'BA'] as const;

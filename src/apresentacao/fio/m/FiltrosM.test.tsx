@@ -94,3 +94,52 @@ describe('os filtros do neon do fio (desvio 20)', () => {
     }
   });
 });
+
+describe('o que o mapa do Destino pede emprestado ao quadro (desvio 20 e o Destino do mockup)', () => {
+  it('traz o desfoque do brilho dos fios (`m-desfoque`) com o desvio-padrão do mockup', () => {
+    const f = filtro('m-desfoque');
+    expect(f.querySelector('feGaussianBlur')).toHaveAttribute('stdDeviation', '3.2');
+  });
+
+  it('traz a máscara que apaga o resto do Brasil com a distância: o gradiente vai do branco ao preto', () => {
+    const { container } = render(<FiltrosM />);
+    const gradiente = container.querySelector('radialGradient#m-ne-some');
+    expect(gradiente).toHaveAttribute('gradientUnits', 'userSpaceOnUse');
+    const paradas = [...(gradiente?.querySelectorAll('stop') ?? [])].map((p) => [
+      p.getAttribute('offset'),
+      p.getAttribute('stop-color'),
+    ]);
+    expect(paradas).toEqual([
+      ['.5', '#fff'],
+      ['1', '#000'],
+    ]);
+    const mascara = container.querySelector('mask#m-ne-longe');
+    expect(mascara).toHaveAttribute('maskUnits', 'userSpaceOnUse');
+    expect(mascara?.querySelector('rect')).toHaveAttribute('fill', 'url(#m-ne-some)');
+  });
+
+  it('traz o grão do papel (`m-envelhece`): ruído fino pintado na cor do mundo e recortado pelo desenho', () => {
+    const f = filtro('m-envelhece');
+    expect([...f.children].map((c) => c.localName)).toEqual([
+      'feTurbulence',
+      'feColorMatrix',
+      'feComposite',
+    ]);
+    expect(f.querySelector('feTurbulence')).toHaveAttribute('baseFrequency', '.9');
+    expect(f.querySelector('feComposite')).toHaveAttribute('operator', 'in');
+    expect(f.querySelector('feComposite')).toHaveAttribute('in2', 'SourceGraphic');
+  });
+
+  it('o grão é areia clara à noite e marrom de dia, e é refeito quando o mundo muda', () => {
+    const matriz = (mundo?: 'noite' | 'dia') => {
+      const { container, unmount } = render(mundo ? <FiltrosM mundo={mundo} /> : <FiltrosM />);
+      const valores = container.querySelector('#m-envelhece feColorMatrix')?.getAttribute('values');
+      unmount();
+      return valores;
+    };
+    expect(matriz('noite')).toContain('.96  0 0 0 0 .9  0 0 0 0 .78');
+    expect(matriz('dia')).toContain('.42  0 0 0 0 .33  0 0 0 0 .18');
+    // Sem dizer o mundo, o padrão é a noite (o do app sem configuração).
+    expect(matriz()).toBe(matriz('noite'));
+  });
+});

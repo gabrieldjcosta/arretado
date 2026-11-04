@@ -3,10 +3,11 @@
 // em 1 dia: o artigo volta amanhã.
 import type { Repositorio } from '../../../core/persistencia';
 import type { FonteDoItem } from '../../../dominios/legislacao/ache-o-erro';
+import type { Frase } from '../../../core/modelo';
 import { criarFraseDeTrecho } from '../../../dominios/recall/servico';
 
-export async function guardarFraseDaFonte(repo: Repositorio, fonte: FonteDoItem): Promise<void> {
-  await criarFraseDeTrecho(repo, {
+export async function guardarFraseDaFonte(repo: Repositorio, fonte: FonteDoItem): Promise<Frase> {
+  return criarFraseDeTrecho(repo, {
     texto: fonte.texto,
     trecho: {
       dispositivoId: fonte.dispositivoId,

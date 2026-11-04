@@ -6,7 +6,7 @@ import { useAtalhoDeRegistrarErro } from '../../componentes/atalho-de-erro';
 import { FaixaOffline } from '../../componentes/estados';
 import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
-import { lugarDaRota } from '../lugares';
+import { ROTA_DO_DESTINO, comNavDoFio, lugarDaRota } from '../lugares';
 import { useLuzDaHora } from '../luz-da-hora';
 import { FiltrosM } from './FiltrosM';
 import { aparelhoLeve } from './leve';
@@ -21,9 +21,6 @@ import '../mockup/reset.css';
 import '../mockup/fontes.css';
 import '../mockup/mockup.css';
 import '../mockup/ajustes.css';
-
-/** As rotas com nav embaixo: o Agora (e, nas fatias seguintes, o Destino e o Varal). */
-const COM_NAV = new Set(['/']);
 
 /**
  * O quadro do Fio: o `<main class="app">` do mockup aprovado, com a nav, o "+" e o aviso dentro dele. A raiz
@@ -64,15 +61,20 @@ export function CascaM() {
       >
         Pular para o conteúdo
       </a>
-      <FiltrosM />
-      <main id="conteudo" className="m-app" tabIndex={-1}>
+      <FiltrosM mundo={mundo} />
+      {/* No monitor o Destino alarga o quadro (`m-largo`, do mockup): o texto à esquerda e o mapa à direita. */}
+      <main
+        id="conteudo"
+        className={pathname === ROTA_DO_DESTINO ? 'm-app m-largo' : 'm-app'}
+        tabIndex={-1}
+      >
         {/* A fronteira fica no quadro, não em cada tela: a tela que chega pela primeira vez (um pedaço à parte do
             pacote) é esperada com a atual ainda à vista, porque a troca de rota é uma transição e o React só
             revela a nova pronta. Uma fronteira nova por tela mostraria o vão e o React o seguraria 300 ms. */}
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        {COM_NAV.has(pathname) && <NavM ativo={lugarDaRota(pathname)} />}
+        {comNavDoFio(pathname) && <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />}
         <MaisM />
         <ToastM />
       </main>

@@ -58,6 +58,78 @@ test('o Agora mostra a marca, o fio, o que vem na ponta e os três lugares embai
   await semViolacoesNoFio(page);
 });
 
+test('sem prova escolhida, o cartão "Para começar" tem uma coluna só e o botão cabe inteiro', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  // Sem importar edital: o app abre na prévia sem matéria e o Agora pergunta a prova no lugar do fio.
+  await page.goto('/#/fio/ligar');
+  const cartao = page.getByRole('group', { name: 'Para começar' });
+  await expect(cartao).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
+
+  /**
+   * O cartão leva o `.m-proximo` do mockup, uma grade de duas colunas (texto | min) feita para o "Na ponta do fio".
+   * Sem a coluna única do desvio 23, o título se espremia, o texto ia para a segunda coluna e o botão virava um
+   * quadrado cortado ("Escol"), em 360 e em 1280, de dia e de noite.
+   */
+  const medidas = () =>
+    cartao.evaluate((el) => {
+      const caixa = (e: Element) => {
+        const c = e.getBoundingClientRect();
+        return { x: c.left, y: c.top, w: c.width, h: c.height };
+      };
+      const estilo = getComputedStyle(el);
+      const titulo = el.querySelector('strong');
+      const apoio = titulo?.nextElementSibling;
+      const botao = el.querySelector<HTMLElement>('a.m-acao');
+      if (!titulo || !apoio || !botao) throw new Error('faltou uma parte do cartão');
+      return {
+        colunas: estilo.gridTemplateColumns.split(' ').length,
+        miolo: el.clientWidth - parseFloat(estilo.paddingLeft) - parseFloat(estilo.paddingRight),
+        cartao: caixa(el),
+        titulo: caixa(titulo),
+        apoio: caixa(apoio),
+        botao: caixa(botao),
+        // O botão do mockup esconde o que passa dele (`overflow: hidden`): rótulo cortado é rótulo mais largo que
+        // a caixa.
+        botaoCortado: botao.scrollWidth > botao.clientWidth,
+      };
+    });
+
+  for (const [largura, altura] of [
+    [360, 640],
+    [1280, 800],
+  ] as const) {
+    await page.setViewportSize({ width: largura, height: altura });
+    for (const esquema of ['dark', 'light'] as const) {
+      await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+      await expect(page.locator('.m-fio')).toHaveAttribute(
+        'data-mundo',
+        esquema === 'dark' ? 'noite' : 'dia',
+      );
+      const rotulo = `${String(largura)} px, ${esquema}`;
+      const m = await medidas();
+
+      // Uma coluna só: o título ocupa o miolo do cartão e o texto fica embaixo dele, na mesma coluna.
+      expect(m.colunas, rotulo).toBe(1);
+      expect(m.titulo.w, rotulo).toBeGreaterThanOrEqual(m.miolo - 1);
+      expect(Math.abs(m.apoio.x - m.titulo.x), rotulo).toBeLessThanOrEqual(1);
+      expect(m.apoio.y, rotulo).toBeGreaterThanOrEqual(m.titulo.y + m.titulo.h - 1);
+      expect(m.botao.y, rotulo).toBeGreaterThanOrEqual(m.apoio.y + m.apoio.h - 1);
+
+      // O botão cabe no cartão, na largura do conteúdo (uma pílula, não o quadrado de antes) e com o rótulo inteiro.
+      expect(m.botao.x, rotulo).toBeGreaterThanOrEqual(m.cartao.x);
+      expect(m.botao.x + m.botao.w, rotulo).toBeLessThanOrEqual(m.cartao.x + m.cartao.w + 0.5);
+      expect(m.botao.w, rotulo).toBeGreaterThan(m.botao.h * 2);
+      expect(m.botaoCortado, rotulo).toBe(false);
+      await expect(cartao.getByRole('link', { name: /Escolher minha prova/ })).toBeVisible();
+    }
+    expect(await semRolagemLateral(page), `${String(largura)} px`).toBe(true);
+    await semViolacoesNoFio(page);
+  }
+});
+
 test('o ponto repousa onde o mockup o põe, também quando o app abre já no Agora', async ({
   page,
 }) => {
@@ -176,16 +248,16 @@ test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ p
     .getByRole('navigation', { name: 'Lugares' })
     .getByRole('button', { name: 'Destino' })
     .click();
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'O caminho começa aqui' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Destino' })).toBeAttached();
+  await expect(page.getByRole('group', { name: 'Mapa do caminho pelo Nordeste' })).toBeVisible();
   await semViolacoesNoFio(page);
 
   await page
     .getByRole('navigation', { name: 'Lugares' })
-    .getByRole('link', { name: 'Varal' })
+    .getByRole('button', { name: 'Varal' })
     .click();
-  await expect(page.getByRole('heading', { level: 1, name: /pendurado no fio/ })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Varal' })).toBeAttached();
+  await expect(page.getByRole('heading', { level: 2, name: /pendurado no fio/ })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você estuda' })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você guarda' })).toBeVisible();
   await semViolacoesNoFio(page);

@@ -12,14 +12,18 @@ import { avisar } from './toast';
 
 const formatar = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 
-/** O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). */
+/**
+ * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). O cartão é
+ * o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do fio": aqui ele
+ * leva `m-sem-prova`, que o põe em uma coluna só (desvio 23 de `ajustes.css`).
+ */
 function SemProva() {
   return (
-    <div className="m-proximo" role="group" aria-label="Para começar">
+    <div className="m-proximo m-sem-prova" role="group" aria-label="Para começar">
       <span className="m-olho">Para começar</span>
       <strong>Qual é a sua prova?</strong>
       <span>Sem conta, sem edital. Isso fica para depois, se você quiser.</span>
-      <Link to="/comecar" className="m-acao" style={{ marginTop: 14, alignSelf: 'flex-start' }}>
+      <Link to="/comecar" className="m-acao">
         Escolher minha prova
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
@@ -53,11 +57,13 @@ export function AgoraM() {
     );
   }, [pausou]);
 
-  // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a
-  // troca de tela não espera rede nem disco (o mockup troca sem vão).
+  // O passo, o pouso, o Destino, o Varal e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é
+  // puxado ou a aba é trocada, e a troca de tela não espera rede nem disco (o mockup troca sem vão).
   useEffect(() => {
     void import('./PassoM').catch(() => undefined);
     void import('./PousoM').catch(() => undefined);
+    void import('./DestinoM').catch(() => undefined);
+    void import('./VaralM').catch(() => undefined);
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
     }

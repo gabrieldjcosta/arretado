@@ -371,8 +371,17 @@
 }
 
 /* O traço que anda no mapa do Destino (`.m-andado-b`, a faixa de baixo): amarelo do ponto, largura 10, opacidade
-   .38 e o desfoque do mockup. Só passa a valer quando o Destino entrar no quadro. */
+   .38 e o desfoque do mockup. */
 .m-fio.m-fio.m-fio .m-destino .m-andado-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
+}
+
+/* O fio que voa de uma aba à outra (`.m-voo-fio .m-b`, a faixa de baixo) também é um traço que anda: a mesma faixa
+   amarela, nos dois mundos (o mockup a acende em ciano à noite). Revisão da Marca no #419. O voo ao Destino apaga a
+   faixa a partir dos .38 (`m/aba.ts`), e não de 1. */
+.m-fio.m-fio.m-fio .m-voo-fio .m-b {
   stroke: var(--m-ponto);
   stroke-width: 10;
   opacity: 0.38;
@@ -598,8 +607,168 @@
   color: var(--m-texto-2);
 }
 
+/* 28. "Errei porque…" (ideia 7 da prancha "Fio que ensina", Gabriel 04/11): depois de guardar a Frase, o aviso
+      oferece três respostas de um toque, opcionais, e some sozinho em 10 s (e para enquanto se toca ou aponta). É o aviso compacto do mockup (o vidro, os
+      botões claros) em duas linhas: o texto e, abaixo, as respostas, que quebram de linha em tela estreita. Fica no
+      alto, mas deixa livre o canto do "+" (à direita), para não cobri-lo. */
+.m-fio.m-fio .m-toast.m-compacto.m-porque {
+  left: 18px;
+  right: 76px;
+  width: auto;
+  max-width: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px 12px 14px;
+  border-radius: 18px;
+  transform: translateY(8px);
+}
+
+.m-fio.m-fio .m-toast.m-compacto.m-porque.m-on {
+  transform: none;
+}
+
+.m-fio.m-fio .m-porque-opcoes {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 /* 22. A porteira ganha uma linha acima do deque: "Artigos próximos, misturados de propósito: decidir qual é qual
       fixa mais." (`.m-dica-mistura`, só no primeiro cartão). Motivo: os cartões vêm de artigos próximos entre os já
       lidos, um de cada por volta (ideia 4 de "Fio que ensina", escolhida pelo Gabriel em 04/11/2026), e a linha diz por
       que estão misturados. Usa a classe da dica do cartão (`.m-dica-gesto`, com a tinta do desvio 19) e nenhuma regra
       nova. A ordem sai de `gerarPorteira`, em `dominios/legislacao/lembrar.ts`. */
+
+/* Desvio 23: o cartão "Para começar" do Agora sem prova (`SemProva`, em `m/AgoraM.tsx`) tem uma coluna só. Motivo: o
+   app o monta com o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do
+   fio". Com título, texto e botão, o título se espremia numa coluna estreita, o texto ia para a segunda coluna e o
+   botão virava um quadrado cortado ("Escol"), em 360 e em 1280, de dia e de noite. A tela "prova" do mockup, que é
+   a que esse estado vai ganhar, ainda não foi portada. O botão fica na largura do conteúdo (o `.m-acao` do mockup
+   ocupa a largura toda) e, numa tela estreita, o texto dele quebra em vez de passar do cartão. */
+.m-fio.m-fio .m-proximo.m-sem-prova {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.m-fio.m-fio .m-proximo.m-sem-prova .m-acao {
+  width: auto;
+  max-width: 100%;
+  justify-self: start;
+  margin-top: 14px;
+  white-space: normal;
+  text-align: left;
+}
+
+/* 29. Cada marca do mapa do Destino acha o seu lugar pela câmera, em CSS. Motivo: o mockup escreve `left` e `top`, em px,
+      marca por marca, a cada quadro do voo da câmera. No app a câmera (`m/useCameraM.ts`) escreve só três variáveis na
+      caixa (`--cam-x`, `--cam-y` e `--cam-k`, o canto e a escala) e cada marca guarda o seu ponto no desenho (`--x` e
+      `--y`): são dezenas de marcas que o React não precisa reescrever a cada quadro. O resultado na tela é o mesmo. */
+.m-fio .m-ne-marcas > * {
+  left: calc((var(--x) - var(--cam-x)) * var(--cam-k) * 1px);
+  top: calc((var(--y) - var(--cam-y)) * var(--cam-k) * 1px);
+}
+
+/* 33. Os lugares abertos ficam por cima dos fechados, e o de onde a pessoa está por cima de todos. Motivo: no mockup as
+      marcas se empilham na ordem do caminho, e a que vem depois cobre a anterior. Com a câmera de perto, São Luís e
+      Alcântara ficam a uns 12 px um do outro; o São Luís, que ainda está fechado e vem depois, cobria o lugar onde a
+      pessoa está, e o toque ia para o vizinho ("São Luís se abre num pouso") em vez de abrir a ficha. O Playwright
+      acusava "intercepts pointer events" no clique. O "você está aqui" (`.m-no-aqui`, z-index 2 no mockup) não recebe
+      toque (`pointer-events: none`) e fica como está. */
+.m-fio.m-fio .m-ne-lugar.m-aberto {
+  z-index: 1;
+}
+
+.m-fio.m-fio .m-ne-lugar.m-com-voce {
+  z-index: 2;
+}
+
+/* 34. O nome do estado no mapa do Destino, de dia, e a nota da ficha ("Rascunho da pesquisa, a conferir…") ganham tinta
+      mais escura. Motivo: medido nos pixels, o nome do estado ("Maranhão") dá 3,98:1 de dia, com a tinta do papel
+      (`--m-papel-tinta`, #7b6845), e a nota da ficha dá 4,22:1 à noite, com a tinta terciária (`--m-texto-3`, #6f7ea0);
+      o mínimo é 4,5:1 (WCAG 1.4.3). De dia o nome do estado usa #6a5836 (o mesmo marrom, mais escuro). A nota da ficha
+      usa, nos dois mundos, a tinta secundária (`--m-texto-2`), a mesma do "small" da ficha e da dica do cartão (desvio
+      19). Medido de novo nos pixels: "Maranhão" 5,08:1 de dia (6,65:1 à noite, que já passava) e a nota da ficha 7,17:1 à
+      noite e 6,73:1 de dia. O resto do mapa fica como no mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-ne-rotulo span {
+  color: #6a5836;
+}
+
+.m-fio.m-fio .m-ne-ficha em {
+  color: var(--m-texto-2);
+}
+
+/* 36. A tela que rola esmaece no alto, onde fica o "+". Motivo: o "+" (46 px, a 18 do alto, então até os 64 px) é fixo e
+      as telas do Destino e do Varal rolam por baixo dele; em 360 de largura o texto passava debaixo dele ("os ma +",
+      "já é seu"). Como o desvio 9 faz nos passos (a área que rola começa abaixo do "+"), mas sem mexer no repouso: aqui
+      o mockup começa o texto a 22 px do alto e o repouso fica onde ele o põe; só depois que a tela rola é que o alto
+      some até os 64 px, e o texto volta inteiro aos 104 px. O esmaecimento entra aos poucos nos primeiros 40 px de
+      rolagem (`TelaM` escreve `--m-rolado`, de 0 a 1, e a classe `m-rolada`). Os passos do desvio 9 já começam
+      abaixo do "+" e ficam de fora. */
+.m-fio
+  .m-tela.m-rolada:not(
+    :is(
+      [data-tela='ler'],
+      [data-tela='lembrar'],
+      [data-tela='achar'],
+      [data-tela='guardar'],
+      [data-tela='revisar'],
+      [data-tela='seu_passo'],
+      [data-tela='praticar']
+    )
+  ) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+}
+
+/* 39. O Varal e o folheto: contraste, o folheto vazio e o pé. Motivo: (a) alguns textos do mockup usam tintas que, medidas nos
+      pixels, ficam abaixo de 4,5:1 (WCAG 1.4.3). "Ordem" e "À vista em cada linha" das folhas (`.m-opcoes-org h3`) usam a
+      terciária (`--m-texto-3`) e dão 3,94:1 e 4,04:1 à noite; o rótulo de cada fio do Varal, 4,45:1; o grupo do folheto e o
+      lembrete da busca usam a mesma tinta. Passam à secundária, a mesma da dica do cartão (desvio 19). Nos folhetos de papel
+      (o mesmo `#e9e1cf` nos dois mundos) a linha de estado (`#7a6f58`, 3,80:1) vai a `#685d46` (4,98:1) e o número miúdo
+      (`rgba(60,52,38,.5)`, 2,59:1), que no app é dado real e o leitor de tela lê, a `#5a5242` (5,93:1, a tinta do texto miúdo
+      do folheto). (b) O mockup não tem o folheto vazio (só avisa "Folheto vazio…"): o app diz uma frase e oferece um botão,
+      em uma coluna, com o botão na largura do conteúdo. (c) Os botões do pé do folheto (`.m-pe-folheto`) quebram de linha
+      se não couberem lado a lado (texto maior, tela estreita). (d) O "⋯" de cada linha (`.m-linha-item .m-mais`) herda do "+" do
+      quadro (`.m-mais`) o `position: absolute; right: 22px; top: 18px`, e por isso o botão de abrir a linha, que é a linha toda
+      (`flex: 1`), passa por baixo dele: um nome comprido corria sob o "⋯" (em 360 de largura, a linha tem 282 px e o "⋯"
+      ocupa de 259 a 299). A cara fica a do mockup (o "⋯" no mesmo lugar); a linha só reserva o lugar dele (62 px do canto da
+      direita e mais 8 de folga) para o texto não passar de lá. */
+.m-fio .m-opcoes-org h3,
+.m-fio .m-grupo-folheto,
+.m-fio .m-varal-rotulo {
+  color: var(--m-texto-2);
+}
+.m-fio .m-busca-varal input::placeholder {
+  color: var(--m-texto-2);
+}
+.m-fio .m-folheto .m-estado {
+  color: #685d46;
+}
+.m-fio .m-varal-linha .m-folheto .m-conta-f {
+  color: #5a5242;
+}
+.m-fio .m-linha-item.m-com-mais .m-abre {
+  padding-right: 70px;
+}
+.m-fio .m-vazio-folheto {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 2px 0;
+}
+.m-fio .m-vazio-folheto p {
+  margin: 0;
+}
+.m-fio .m-pe-folheto {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
