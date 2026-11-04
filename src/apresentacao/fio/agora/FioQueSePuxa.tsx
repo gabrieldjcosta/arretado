@@ -112,6 +112,9 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio, forma = 'agora', rotuloDo
       linha.current?.setAttribute('d', d);
       brilho.current?.setAttribute('d', d);
       if (no.current) no.current.style.transform = `translateY(${String(dy)}px)`;
+      // O neon sobe com o puxão: em repouso, puxando e depois do limite (a CSS lê o `data-puxe`).
+      const puxe = dy > g.puxaA ? 'passou' : dy > 4 ? 'puxando' : 'solto';
+      if (area.current && area.current.dataset.puxe !== puxe) area.current.dataset.puxe = puxe;
       // A dica sai da frente do nó que desce.
       if (dica.current) dica.current.style.opacity = String(Math.max(0, 1 - dy / 60));
     },
