@@ -83,6 +83,36 @@ export function oQueFoi(item: ItemDoAcheOErro, resposta: RespostaDoItem): string
   return `Não achei a troca ${onde}`;
 }
 
+/**
+ * A fonte do dispositivo na posição `indice` da árvore aberta: só o normativo vigente, sem tachado e
+ * com até `MAXIMO_DE_TEXTO` caracteres; qualquer outro dá `undefined`.
+ */
+export async function fonteDoNo(
+  repo: Repositorio,
+  aberta: Awaited<ReturnType<typeof abrirNorma>>,
+  indice: number,
+  referenciaDe: (aberta: Awaited<ReturnType<typeof abrirNorma>>, indice: number) => string,
+): Promise<FonteDoItem | undefined> {
+  const [item] = await lerJanela(repo, aberta, { inicio: indice, quantidade: 1 });
+  if (!item?.texto || item.dispositivo.categoria !== 'normativo') return undefined;
+  if (item.dispositivo.status !== 'vigente' || item.texto.trechos.some((t) => t.tachado)) {
+    return undefined;
+  }
+  const gravado = item.texto.trechos.map((t) => t.texto).join('');
+  const texto = gravado.trim();
+  if (texto.length === 0 || texto.length > MAXIMO_DE_TEXTO) return undefined;
+  return {
+    normaId: aberta.norma.id,
+    dispositivoId: item.dispositivo.id,
+    versaoId: aberta.versao.id,
+    referencia: [aberta.norma.tituloCurto, referenciaDe(aberta, indice)]
+      .filter(Boolean)
+      .join(' · '),
+    texto,
+    deslocamento: gravado.length - gravado.trimStart().length,
+  };
+}
+
 const aleatorio = () => Math.floor(Math.random() * 2 ** 31);
 
 /**
@@ -110,27 +140,8 @@ export async function montarRodada(
     }
     return aberta;
   };
-  const fonteDe = async (normaId: string, indice: number): Promise<FonteDoItem | undefined> => {
-    const aberta = await abrir(normaId);
-    const [item] = await lerJanela(repo, aberta, { inicio: indice, quantidade: 1 });
-    if (!item?.texto || item.dispositivo.categoria !== 'normativo') return undefined;
-    if (item.dispositivo.status !== 'vigente' || item.texto.trechos.some((t) => t.tachado)) {
-      return undefined;
-    }
-    const gravado = item.texto.trechos.map((t) => t.texto).join('');
-    const texto = gravado.trim();
-    if (texto.length === 0 || texto.length > MAXIMO_DE_TEXTO) return undefined;
-    return {
-      normaId,
-      dispositivoId: item.dispositivo.id,
-      versaoId: aberta.versao.id,
-      referencia: [aberta.norma.tituloCurto, referenciaDe(aberta, indice)]
-        .filter(Boolean)
-        .join(' · '),
-      texto,
-      deslocamento: gravado.length - gravado.trimStart().length,
-    };
-  };
+  const fonteDe = async (normaId: string, indice: number): Promise<FonteDoItem | undefined> =>
+    fonteDoNo(repo, await abrir(normaId), indice, referenciaDe);
 
   for (const dispositivoId of revisitar) {
     if (itens.length >= tamanho) break;
