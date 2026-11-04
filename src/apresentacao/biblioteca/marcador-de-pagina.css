@@ -1,0 +1,24 @@
+/* A fita do marcador de página, presa ao canto de cima do artigo onde a pessoa estava. */
+.marcador-de-pagina {
+  position: absolute;
+  top: 0;
+  right: 0.75rem;
+  z-index: 2;
+  width: 0.875rem;
+  height: 1.875rem;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+.marcador-de-pagina.some {
+  opacity: 0;
+}
+
+.marcador-de-pagina svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--acento, #b25f00);
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 25%));
+}

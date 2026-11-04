@@ -49,6 +49,7 @@ import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
+import { MarcadorDePagina } from './MarcadorDePagina';
 import { useItensDoMais } from '../componentes/ItensDoMais';
 import { Voltar } from '../componentes/Voltar';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
@@ -184,6 +185,8 @@ interface Aberta {
   alvo: number | undefined;
   /** O "lido até" guardado, se o dispositivo existe na versão aberta. */
   lidoAteId: string | undefined;
+  /** A Norma abriu na posição que a pessoa tinha deixado (e não num trecho pedido): a fita cai nele. */
+  retomou?: boolean;
 }
 
 /** O filtro do leitor (11.3) aplicado: o critério, a frase da tela e os nós, guardados na hora. */
@@ -260,7 +263,8 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
           }),
         ),
       );
-      return { aberta, primeira: lidas.flat(), janelas, alvo, lidoAteId };
+      const retomou = indiceDoTrecho < 0 && alvo !== undefined && alvo > 0;
+      return { aberta, primeira: lidas.flat(), janelas, alvo, lidoAteId, retomou };
     })().then(
       (lida) => {
         if (ativo) setCarga({ tipo: 'pronta', ...lida });
@@ -410,6 +414,7 @@ function LeitorAberto({
   janelas,
   alvo,
   lidoAteId,
+  retomou,
   aoCorrigir,
   avisoDaCorrecao,
 }: {
@@ -474,6 +479,7 @@ function LeitorAberto({
     return { linha: linha === 0 ? undefined : linha, vez: 0 };
   });
   const linhaInicial = retorno.linha;
+  const linhaDaFita = alvo === undefined ? undefined : linhaDoNo(linhasTodas, alvo);
   const [voltando, setVoltando] = useState(linhaInicial !== undefined && !porArtigo);
   const voltandoAgora = useRef(voltando);
 
@@ -2158,6 +2164,7 @@ function LeitorAberto({
                   {...propriedadesDaLinha(linha)}
                   style={{ transform: `translateY(${String(virtual.start - margem)}px)` }}
                 >
+                  {retomou === true && virtual.index === linhaDaFita && <MarcadorDePagina />}
                   {conteudoDaLinha(linha)}
                 </div>
               );
