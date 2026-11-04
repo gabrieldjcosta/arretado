@@ -53,6 +53,11 @@
   --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
 }
 
+/* No pouso a pílula dos lugares some: a folga embaixo é só a área segura. */
+.shell-fio[data-sem-pilula] {
+  --abas-altura: env(safe-area-inset-bottom, 0px);
+}
+
 /* Luar (noite): mesmos nomes, outros valores. Dois seletores, como o resto do app: o mundo do sistema
    (quando a pessoa não escolheu) e o escolhido à mão. */
 @media (prefers-color-scheme: dark) {

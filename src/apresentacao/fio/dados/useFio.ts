@@ -14,12 +14,10 @@ import {
 } from '../../../dominios/fio';
 import { useRepositorio, useDados } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
+import { ROTA_DO_PASSO, ROTA_DO_POUSO } from '../lugares';
 import { avancar, entrarNoPasso, type Avanco } from './avancar';
 import { montarEntradaDoFio } from './entrada';
 import { useFioGuardado, type FioGuardado } from './guardado';
-
-export const ROTA_DO_PASSO = '/fio/passo';
-export const ROTA_DO_POUSO = '/fio/pouso';
 
 export interface FioNaTela {
   /** Ainda lendo o que o app sabe (primeira carga). */
