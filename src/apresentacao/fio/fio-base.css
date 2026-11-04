@@ -47,12 +47,15 @@
   --f-aurora:
     radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 16%) 0%, transparent 62%),
     radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+  /* Grão de papel (Dia) e estrelas fixas (Noite): uma camada só, parada, por cima do céu. */
+  --f-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --f-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
   --f-sair: cubic-bezier(0.2, 0.7, 0.2, 1);
   --f-trocar: cubic-bezier(0.45, 0, 0.25, 1);
   --f-nav-altura: 4.75rem;
 
   background: var(--f-aurora), var(--f-ceu);
+  isolation: isolate;
   color: var(--texto);
   --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
 }
@@ -94,6 +97,16 @@
     --f-certo: #7ee2b0;
     --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
     --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+    --f-grao:
+      radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
   }
 }
 
@@ -126,6 +139,16 @@
   --f-certo: #7ee2b0;
   --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
   --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+  --f-grao:
+    radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
 }
 
 /* ---------- Cabeçalho: o nome com o cacto é o nó da pessoa (abre a Conta) ---------- */
@@ -192,6 +215,41 @@
 .fio-cacto .fio-cacto-ponto {
   fill: var(--f-ponto);
   stroke: none;
+}
+
+/* A florzinha de quem voltou depois de uns dias: brota no topo do cacto com a mola do app; no Calmo só
+   aparece, em movimento reduzido já está lá. */
+.fio-cacto .fio-cacto-flor {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fio-flor 0.55s var(--f-mola) 0.4s backwards;
+}
+
+.fio-cacto .fio-cacto-petala {
+  fill: var(--f-flor);
+  stroke: none;
+}
+
+.fio-cacto .fio-cacto-miolo {
+  fill: var(--f-ponto);
+  stroke: none;
+}
+
+:root[data-perfil='calmo'] .fio-cacto .fio-cacto-flor {
+  animation-name: fio-flor-calma;
+}
+
+@keyframes fio-flor {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes fio-flor-calma {
+  from {
+    opacity: 0;
+  }
 }
 
 /* O "+" da casca (MaisGlobal, D-D23): amarelo sobre o vidro, como o ponto de luz, e o contorno acende no
@@ -595,4 +653,57 @@
 
 :root[data-perfil='calmo'] .shell-fio .fio-acao[disabled] {
   box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
+}
+
+/* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): só o brilho de baixo esquenta; o céu de cima fica. */
+.shell-fio[data-luz='manha'] {
+  --f-aurora:
+    radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 12%) 0%, transparent 62%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='tarde'] {
+  --f-aurora:
+    radial-gradient(120% 44% at 50% 108%, rgb(255 197 61 / 24%) 0%, transparent 64%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='entardecer'] {
+  --f-aurora:
+    radial-gradient(120% 48% at 50% 108%, rgb(255 170 80 / 30%) 0%, transparent 66%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+/* Leitura funda (Leitor): rolando a lei para baixo a pílula se recolhe; subindo, volta. Só opacidade e
+   um pequeno deslocamento (nada de layout). Com foco do teclado dentro dela, fica. No Calmo só esmaece. */
+.shell-fio .fio-nav {
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s;
+}
+
+:root[data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(14px);
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s 0.34s;
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-nav,
+:root[data-perfil='calmo'][data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  transform: translateX(-50%);
+}
+
+/* Grão e estrelas: uma camada fixa e parada, atrás do conteúdo e à frente do céu. */
+.shell-fio::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--f-grao);
 }

@@ -20,6 +20,7 @@ import { PaletaDoFio } from './paleta/PaletaDoFio';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
 import { LinkDoFio } from './LinkDoFio';
+import { useLuzDaHora } from './luz-da-hora';
 import './fio-base.css';
 
 /**
@@ -37,6 +38,8 @@ function CascaLegada() {
   const semPilula = semPilulaDosLugares(pathname);
   const guiaMontado = useGuiaMontado(telaComGuia);
 
+  const luz = useLuzDaHora();
+
   useAtalhoDeRegistrarErro();
 
   return (
@@ -46,6 +49,7 @@ function CascaLegada() {
         data-teclado={tecladoAberto ? 'aberto' : undefined}
         data-largo={pathname === '/destino' ? 'sim' : undefined}
         data-sem-pilula={semPilula ? 'sim' : undefined}
+        data-luz={luz}
       >
         <AplicarAparencia />
         <PaletaDoFio />

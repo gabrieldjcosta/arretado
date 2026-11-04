@@ -142,11 +142,13 @@ test('arrastar o ponto além de 28 px segue para o Agora; um arrasto curto o dev
   await expect(page.getByRole('button', { name: /Puxar o fio: começar/ })).toBeVisible();
 });
 
-test('descansar volta ao Agora, que diz que está tudo salvo', async ({ page }) => {
+test('descansar volta ao Agora, que fecha o dia com a frase gentil', async ({ page }) => {
   await noPrimeiroPouso(page);
   await page.getByRole('button', { name: 'Descansar por hoje' }).click();
   await expect(page).toHaveURL(/#\/$/);
-  await expect(page.getByText('Tudo salvo. O fio te espera aqui.')).toBeVisible();
+  await expect(
+    page.getByText('É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.'),
+  ).toBeVisible();
   // Fora do pouso a nav dos três lugares volta.
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await semViolacoesNoFio(page);

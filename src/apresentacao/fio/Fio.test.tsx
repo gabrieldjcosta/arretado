@@ -343,13 +343,17 @@ describe('o Arretado novo (prévia do Fio)', () => {
     );
   });
 
-  it('"descansar" conta a etapa e o Agora diz que está tudo salvo', async () => {
+  it('"descansar" conta a etapa e o Agora fecha o dia com a frase gentil', async () => {
     const { usuario } = await abrir({ comLei: true });
     await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
     await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     await usuario.click(await screen.findByRole('button', { name: 'Descansar por hoje' }));
 
-    expect(await screen.findByText('Tudo salvo. O fio te espera aqui.')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.',
+      ),
+    ).toBeInTheDocument();
     await screen.findByRole('group', { name: 'Na ponta do fio' });
     await usuario.click(
       within(screen.getByRole('navigation', { name: 'Lugares' })).getByRole('button', {

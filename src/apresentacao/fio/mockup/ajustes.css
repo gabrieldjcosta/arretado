@@ -378,6 +378,83 @@
   opacity: 0.38;
 }
 
+/* Desvio 24 (luz da hora): de dia, só o brilho de baixo do quadro esquenta (âmbar de 12% de manhã, 24% à tarde, 30%
+   no entardecer); o céu de cima fica. A noite não muda. Decidida ao abrir e ao voltar à aba (`data-luz`, em CascaM). */
+.m-fio.m-fio[data-mundo='dia'][data-luz='manha'] {
+  --m-calor: rgba(255, 197, 61, 0.12);
+}
+
+.m-fio.m-fio[data-mundo='dia'][data-luz='tarde'] {
+  --m-calor: rgba(255, 197, 61, 0.24);
+}
+
+.m-fio.m-fio[data-mundo='dia'][data-luz='entardecer'] {
+  --m-calor: rgba(255, 170, 80, 0.3);
+}
+
+/* Desvio 25 (grão e estrelas): uma camada parada atrás do conteúdo do quadro: grão de papel de dia, poucas estrelas à
+   noite. Quase invisível de propósito. */
+.m-fio.m-fio {
+  --m-grao:
+    radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
+}
+
+.m-fio.m-fio[data-mundo='dia'] {
+  --m-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+.m-fio.m-fio .m-app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--m-grao);
+}
+
+/* Desvio 26 (flor no cacto): quem volta depois de três dias ou mais vê uma florzinha de pétalas (as do pouso) no topo
+   do cacto da marca, menor que o ponto (que é a pessoa). Brota em 0,55 s com a mola; no Calmo só aparece. */
+.m-fio .m-cacto-marca .m-cm-flor {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: m-flor-brota 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+}
+
+.m-fio .m-cacto-marca .m-cm-petala {
+  fill: var(--m-flor);
+  stroke: none;
+}
+
+.m-fio .m-cacto-marca .m-cm-miolo {
+  fill: var(--m-ponto);
+  stroke: none;
+}
+
+.m-fio[data-movimento='calmo'] .m-cacto-marca .m-cm-flor {
+  animation-name: m-flor-calma;
+}
+
+@keyframes m-flor-brota {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes m-flor-calma {
+  from {
+    opacity: 0;
+  }
+}
+
 /* Desvio 21: o pouso em branco (ideia 8 da prancha "Fio que ensina", Gabriel 04/11; ajustes da Marca, 04/11).
    Antes do resumo, a tela do pouso abre uma página em branco (o `.campo` do mockup, o mesmo do Guardar), uma barra
    de 30 s e dois botões; depois, o resumo traz o assunto de cada artigo lido como chips para marcar. Só reaproveita

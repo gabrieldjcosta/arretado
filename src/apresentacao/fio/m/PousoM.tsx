@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router';
 import type { Pouso } from '../../../dominios/fio';
 import { marcarPausa } from '../dados/pausa';
+import { tocar } from '../../toques';
 import { useFio, type FioNaTela } from '../dados/useFio';
 import { useCargaDoPasso } from '../passos/carregar';
 import { pontosDaEtapa } from '../passos/pontos-da-etapa';
@@ -175,6 +176,10 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
     const atual = faixa.current?.querySelector<HTMLElement>('[aria-pressed="true"]');
     if (faixa.current && atual) faixa.current.scrollLeft = Math.max(0, atual.offsetLeft - 8);
   }, []);
+  // O pouso chega com uma vibração curta, se a pessoa ligou (Conta › Aparência).
+  useEffect(() => {
+    tocar('pousar');
+  }, []);
   const volta = pousosDaVolta(numero);
   const visto = volta.find((p) => p.numero === escolhido) ?? pousoNaVereda(numero);
   const fatos = fatosDoPousoVisto(visto, pouso, fio.fio.estado.pousos);
@@ -255,7 +260,7 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
             aria-label="Descansar por hoje"
             onClick={() => {
               // A etapa conta e o Agora diz, uma vez, que está tudo salvo.
-              marcarPausa();
+              marcarPausa('descanso');
               fio.pousarEtapa();
             }}
           >
