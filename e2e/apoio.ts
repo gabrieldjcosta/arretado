@@ -192,18 +192,21 @@ export function lembreteGravado(page: Page) {
 }
 
 /**
- * Espera as transições de CSS acabarem. Virar o tema anima a cor de alguns controles (o link aceso da pílula dos
- * lugares vai de claro a escuro em 0,2 s) enquanto o fundo do indicador vira de uma vez: o axe, medindo no meio
- * do caminho, via texto claro sobre fundo claro e acusava `color-contrast` no CI, onde os quadros saem devagar.
- * Medir só depois de acomodar é medir o que a pessoa vê.
+ * Termina na hora as transições de CSS em curso. Virar o tema anima a cor de alguns controles (o link aceso da
+ * pílula dos lugares vai de claro a escuro em 0,2 s) enquanto o fundo do indicador vira de uma vez: o axe, medindo
+ * no meio do caminho, via texto claro sobre fundo claro e acusava `color-contrast` no CI, onde os quadros saem
+ * devagar. Medir o estado já assentado é medir o que a pessoa vê. Não se espera a transição acabar (`finished`):
+ * uma que o navegador não faz andar (um botão fora da tela, parada em 0) seguraria o teste até o tempo limite.
  */
-async function esperarAsTransicoes(page: Page) {
-  await page.evaluate(async () => {
-    // Uma transição pode puxar outra; poucas voltas bastam.
-    for (let volta = 0; volta < 5; volta += 1) {
-      const transicoes = document.getAnimations().filter((a) => a instanceof CSSTransition);
-      if (transicoes.length === 0) return;
-      await Promise.allSettled(transicoes.map((a) => a.finished));
+async function assentarAsTransicoes(page: Page) {
+  await page.evaluate(() => {
+    for (const animacao of document.getAnimations()) {
+      if (!(animacao instanceof CSSTransition)) continue;
+      try {
+        animacao.finish();
+      } catch {
+        /* a transição acabou ou foi cancelada no mesmo instante: já está assentada */
+      }
     }
   });
 }
@@ -212,7 +215,7 @@ async function esperarAsTransicoes(page: Page) {
 export async function semViolacoes(page: Page) {
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme });
-    await esperarAsTransicoes(page);
+    await assentarAsTransicoes(page);
     const r = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();
