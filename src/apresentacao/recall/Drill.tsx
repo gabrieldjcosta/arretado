@@ -74,7 +74,8 @@ export function Drill() {
   /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
   const certeza = useRef<1 | 2 | 3 | undefined>(undefined);
   const botaoVirar = useRef<HTMLButtonElement>(null);
-  const { cartao: cartaoDaRevisao, passar } = usePassagemDeCartao();
+  const { cartao: cartaoDaRevisao, passar, virar: virarOCartao } = usePassagemDeCartao();
+  const virando = useRef(false);
 
   const cota = useRef(0);
   // `?itens=N`: o lote que o Hoje montou pelo valor (AP-01). Só vale na primeira rodada; "Revisar
@@ -158,8 +159,15 @@ export function Drill() {
   }, [repo, atual]);
 
   const virar = useCallback(() => {
-    setEstado((e) => (e.tipo === 'revisando' ? { ...e, virado: true } : e));
-  }, []);
+    // O cartão vira de verdade (meia volta, troca, meia volta); um segundo toque no meio do giro não conta.
+    if (virando.current) return;
+    virando.current = true;
+    void virarOCartao(() => {
+      setEstado((e) => (e.tipo === 'revisando' ? { ...e, virado: true } : e));
+    }).finally(() => {
+      virando.current = false;
+    });
+  }, [virarOCartao]);
 
   const avancar = useCallback(() => {
     if (estado.tipo !== 'revisando') return;

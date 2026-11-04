@@ -625,6 +625,8 @@ describe('a passagem do cartão (A caneta que desenha)', () => {
   /** O jsdom não anima: cada `animate` vira uma animação já terminada e o teste vê o que foi pedido. */
   const pedidos: Keyframe[][] = [];
   const saidas = () => pedidos.filter((q) => q.some((f) => f.transform === 'translateX(-28px)'));
+  const viradas = () =>
+    pedidos.filter((q) => q.some((f) => String(f.transform).includes('rotateY')));
 
   beforeEach(() => {
     pedidos.length = 0;
@@ -657,9 +659,10 @@ describe('a passagem do cartão (A caneta que desenha)', () => {
     await screen.findByRole('group', { name: 'Como foi?' });
     await usuario.keyboard('3');
     expect(await screen.findByText('2 de 2')).toBeInTheDocument();
-    // Saiu 190 ms para a esquerda e o novo entrou 210 ms pela direita.
+    // O cartão virou (meia volta para ir, meia para voltar), saiu 190 ms para a esquerda e o novo entrou 210 ms.
+    expect(viradas()).toHaveLength(2);
     expect(saidas()).toHaveLength(1);
-    expect(pedidos).toHaveLength(2);
+    expect(pedidos).toHaveLength(4);
     expect(await repo.colecao('revisoes').contar()).toBe(1);
 
     await usuario.keyboard(' ');
