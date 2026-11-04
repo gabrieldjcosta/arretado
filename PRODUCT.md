@@ -20,7 +20,7 @@ Dois diferenciais, com a retomada como núcleo: (1) a próxima ação única e a
 
 ## Operating Context
 
-Estudo diário em celular e desktop, em Sessões curtas e retomadas. Local-first: os dados vivem no aparelho (IndexedDB com log de alterações) e nenhuma funcionalidade depende de rede; o remoto (Supabase) é só espelho. Legislação entra por HTML colado ou URL, e todo HTML colado é sanitizado. As quatro áreas são Hoje, Plano, Recall e Biblioteca; Conta e Ajustes ficam fora da navegação principal.
+Estudo diário em celular e desktop, em Sessões curtas e retomadas. Local-first: os dados vivem no aparelho (IndexedDB com log de alterações) e nenhuma funcionalidade depende de rede; o remoto (Supabase) é só espelho. Legislação entra por HTML colado ou URL, e todo HTML colado é sanitizado. As quatro áreas de hoje são Hoje, Plano, Recall e Biblioteca; pela D-D25 (04/11/2026, ainda não construída) viram Agora, Destino e Varal, conduzidas pelo Fio; Conta e Ajustes ficam fora da navegação principal.
 
 ## Capabilities and Constraints
 
