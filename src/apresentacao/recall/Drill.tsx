@@ -70,6 +70,8 @@ export function Drill() {
   /** A resposta tocada, enquanto o cartão passa: é a que ganha o traço de seleção. */
   const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
+  /** O que a pessoa escreveu antes de virar (pré-teste); só vive na tela, nunca é gravado. */
+  const [escrito, setEscrito] = useState<{ id: string; texto: string } | null>(null);
   const inicio = useRef(0);
   /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
   const certeza = useRef<1 | 2 | 3 | undefined>(undefined);
@@ -305,6 +307,7 @@ export function Drill() {
   }
 
   if (!atual) return null;
+  const palpite = escrito?.id === atual.id ? escrito.texto : '';
   const restam = estado.fila.length - estado.indice - 1;
   return (
     <div className="coluna-drill">
@@ -320,6 +323,11 @@ export function Drill() {
           <p className="drill-frente texto-leitura">{atual.frente}</p>
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
+              {palpite.trim() && (
+                <p className="palpite-da-pessoa">
+                  <span className="palpite-rotulo">Você escreveu</span> {palpite.trim()}
+                </p>
+              )}
               <p className="frase-correta-titulo">
                 {atual.tipo === 'lacuna'
                   ? 'Frase completa'
@@ -347,6 +355,25 @@ export function Drill() {
       )}
       {!estado.virado ? (
         <div className="linha-acoes acoes-drill">
+          <input
+            type="text"
+            className="palpite"
+            value={palpite}
+            maxLength={280}
+            autoComplete="off"
+            enterKeyHint="done"
+            aria-label="Escreva o que lembra. Em branco vale."
+            placeholder="Escreva o que lembra (em branco vale)"
+            onChange={(e) => {
+              setEscrito({ id: atual.id, texto: e.target.value });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                virar();
+              }
+            }}
+          />
           <div className="certeza" role="group" aria-labelledby="certeza-rotulo">
             <p id="certeza-rotulo" className="certeza-rotulo">
               Quanta certeza?

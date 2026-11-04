@@ -584,6 +584,22 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(revisoes.map((r) => r.certeza).sort()).toEqual([3, undefined]);
   });
 
+  it('escrever antes de virar: o palpite volta no verso; em branco vale e nada é gravado', async () => {
+    const repo = await comVencidos(2);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    const campo = await screen.findByRole('textbox', { name: /Escreva o que lembra/ });
+    await usuario.type(campo, 'um a quatro anos');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar resposta' }));
+    expect(await screen.findByText('um a quatro anos')).toBeInTheDocument();
+    await usuario.keyboard('3');
+    // Segundo cartão: o campo volta vazio e, em branco, a resposta abre sem o "Você escreveu".
+    const campo2 = await screen.findByRole('textbox', { name: /Escreva o que lembra/ });
+    expect(campo2).toHaveValue('');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar resposta' }));
+    await screen.findByRole('group', { name: 'Como foi?' });
+    expect(screen.queryByText('Você escreveu')).not.toBeInTheDocument();
+  });
+
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir('/recall', repo);

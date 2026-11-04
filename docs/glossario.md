@@ -559,3 +559,5 @@ Situação: **existe** (no código), **plano** (nomeado em `planos/F2.md` ou na 
 | Caderno de erros (D-D25, planejado) | folheto Frases do Varal | As Frases com os Erros (causa, convicção, resolver) dentro, não numa lista separada. Mesma entidade do esquema v6. |
 | Pôr no fio (D-D25, planejado) | terceiro item do "+" | Cria uma tarefa da pessoa que vira um Passo "Seu passo". Substitui Tarefas como tela. |
 | Cobertura (D-D25, planejado) | Destino | Incidência dos artigos lidos sobre a incidência total do que o Mapa da norma tem; um número por matéria e um geral; nunca cai. Sem Mapa, só "lido N artigos". |
+
+| Palpite (pré-teste da Revisão, 04/11/2026) | **Palpite:** o que a pessoa escreve no campo `.palpite` do `Drill` antes de mostrar a resposta ("Escreva o que lembra"; em branco vale). Fica só no estado da tela, por cartão (`escrito`), volta no verso como "Você escreveu" e nunca é gravado. | `src/apresentacao/recall/Drill.tsx`, `estilos-certeza.css` |
