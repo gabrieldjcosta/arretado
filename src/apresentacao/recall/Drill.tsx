@@ -76,6 +76,8 @@ export function Drill() {
   const botaoVirar = useRef<HTMLButtonElement>(null);
   const { cartao: cartaoDaRevisao, passar, virar: virarOCartao } = usePassagemDeCartao();
   const virando = useRef(false);
+  /** A resposta (1, 2, 3) digitada enquanto o cartão ainda gira: vale assim que ele termina de virar. */
+  const pendente = useRef<RespostaRevisao | null>(null);
 
   const cota = useRef(0);
   // `?itens=N`: o lote que o Hoje montou pelo valor (AP-01). Só vale na primeira rodada; "Revisar
@@ -205,6 +207,13 @@ export function Drill() {
     [atual, estado, ocupado, repo, avancar, passar],
   );
 
+  useEffect(() => {
+    if (estado.tipo !== 'revisando' || !estado.virado || !pendente.current) return;
+    const resposta = pendente.current;
+    pendente.current = null;
+    void responder(resposta);
+  }, [estado, responder]);
+
   // Atalhos: espaço/Enter vira; 1, 2, 3 respondem (Parte 2 §11).
   useEffect(() => {
     if (estado.tipo !== 'revisando') return;
@@ -214,7 +223,11 @@ export function Drill() {
       const alvo = e.target as HTMLElement | null;
       const controle = alvo?.closest('a, button, summary, input, textarea, select');
       if (controle && controle !== botaoVirar.current) return;
-      if (!estado.virado && (e.key === ' ' || e.key === 'Enter')) {
+      if (!estado.virado && virando.current && ['1', '2', '3'].includes(e.key)) {
+        // Espaço e 1, 2 ou 3 seguidos: o cartão ainda gira, e a resposta espera ele terminar.
+        e.preventDefault();
+        pendente.current = (['errei', 'dificil', 'facil'] as const)[Number(e.key) - 1] ?? null;
+      } else if (!estado.virado && (e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
         virar();
       } else if (estado.virado && ['1', '2', '3'].includes(e.key)) {

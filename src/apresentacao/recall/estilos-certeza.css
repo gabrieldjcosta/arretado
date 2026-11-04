@@ -32,8 +32,8 @@
 }
 
 /* A pilha de cartões (ideia "Cartão que vira"): atrás do cartão da vez, mais dois, um pouco menores, para a
-   pessoa ver que há mais por vir. O cartão sai de lado em 130% da largura; o corte evita rolagem lateral. */
-.coluna-drill {
+   pessoa ver que há mais por vir. O cartão sai de lado em 130% da largura; o corte fica no `main`, na largura da tela, para o cartão sumir na borda do aparelho e os anéis de foco ficarem inteiros. */
+main:has(.coluna-drill) {
   overflow-x: clip;
 }
 
