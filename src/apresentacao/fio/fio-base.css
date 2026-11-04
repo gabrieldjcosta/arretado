@@ -25,6 +25,10 @@
   /* O folheto do Varal: de dia a sombra é curta e macia; à noite, funda. */
   --f-folheto-sombra: 0 6px 12px -6px rgb(15 28 58 / 28%);
   --f-chip: rgb(255 186 64 / 22%);
+  /* Três degraus de sombra, os mesmos em todo o Fio: chão, cartão, folha (prancha 8 da Marca). */
+  --s1: 0 1px 0 rgb(15 28 58 / 6%);
+  --s2: 0 8px 20px -14px rgb(15 28 58 / 35%);
+  --s3: 0 24px 48px -24px rgb(15 28 58 / 45%);
   --f-acao-fundo: linear-gradient(180deg, #ffd56b 0%, #ffab3d 100%);
   --f-acao-texto: #4a2a00;
   --f-acao-sombra: 0 3px 0 rgb(196 118 0 / 42%), 0 10px 22px -12px rgb(255 140 30 / 70%);
@@ -72,6 +76,9 @@
     --f-tempo: #ffc53d;
     --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
     --f-chip: rgb(255 197 61 / 12%);
+    --s1: 0 1px 0 rgb(255 255 255 / 4%);
+    --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+    --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
     --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
     --f-acao-texto: #0b1322;
     --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -101,6 +108,9 @@
   --f-tempo: #ffc53d;
   --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
   --f-chip: rgb(255 197 61 / 12%);
+  --s1: 0 1px 0 rgb(255 255 255 / 4%);
+  --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+  --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
   --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
   --f-acao-texto: #0b1322;
   --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -400,7 +410,7 @@
 }
 
 .fio-acao:active {
-  transform: translateY(2px) scale(0.985);
+  transform: translateY(2px) scale(0.95);
   box-shadow: var(--f-acao-aperto);
 }
 

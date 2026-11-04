@@ -15,6 +15,7 @@ import { CantoDaSessao } from '../sessao/CantoDaSessao';
 import { RelatarProblema } from '../suporte/RelatarProblema';
 import { AvisosDoFio } from './avisos/AvisosDoFio';
 import { semPilulaDosLugares } from './lugares';
+import { PaletaDoFio } from './paleta/PaletaDoFio';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
 import { LinkDoFio } from './LinkDoFio';
@@ -48,6 +49,7 @@ export function CascaDoFio() {
         data-sem-pilula={semPilula ? 'sim' : undefined}
       >
         <AplicarAparencia />
+        <PaletaDoFio />
         <PuxarEssenciais />
         <a
           className="pular"
