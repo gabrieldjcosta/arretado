@@ -378,7 +378,7 @@
   opacity: 0.38;
 }
 
-/* Desvio 22 (luz da hora): de dia, só o brilho de baixo do quadro esquenta (âmbar de 12% de manhã, 24% à tarde, 30%
+/* Desvio 24 (luz da hora): de dia, só o brilho de baixo do quadro esquenta (âmbar de 12% de manhã, 24% à tarde, 30%
    no entardecer); o céu de cima fica. A noite não muda. Decidida ao abrir e ao voltar à aba (`data-luz`, em CascaM). */
 .m-fio.m-fio[data-mundo='dia'][data-luz='manha'] {
   --m-calor: rgba(255, 197, 61, 0.12);
@@ -392,7 +392,7 @@
   --m-calor: rgba(255, 170, 80, 0.3);
 }
 
-/* Desvio 23 (grão e estrelas): uma camada parada atrás do conteúdo do quadro: grão de papel de dia, poucas estrelas à
+/* Desvio 25 (grão e estrelas): uma camada parada atrás do conteúdo do quadro: grão de papel de dia, poucas estrelas à
    noite. Quase invisível de propósito. */
 .m-fio.m-fio {
   --m-grao:
@@ -420,7 +420,7 @@
   background: var(--m-grao);
 }
 
-/* Desvio 24 (flor no cacto): quem volta depois de três dias ou mais vê uma florzinha de pétalas (as do pouso) no topo
+/* Desvio 26 (flor no cacto): quem volta depois de três dias ou mais vê uma florzinha de pétalas (as do pouso) no topo
    do cacto da marca, menor que o ponto (que é a pessoa). Brota em 0,55 s com a mola; no Calmo só aparece. */
 .m-fio .m-cacto-marca .m-cm-flor {
   transform-box: fill-box;
@@ -597,3 +597,9 @@
 .m-fio.m-fio .m-evoca .m-campo::placeholder {
   color: var(--m-texto-2);
 }
+
+/* 22. A porteira ganha uma linha acima do deque: "Artigos próximos, misturados de propósito: decidir qual é qual
+      fixa mais." (`.m-dica-mistura`, só no primeiro cartão). Motivo: os cartões vêm de artigos próximos entre os já
+      lidos, um de cada por volta (ideia 4 de "Fio que ensina", escolhida pelo Gabriel em 04/11/2026), e a linha diz por
+      que estão misturados. Usa a classe da dica do cartão (`.m-dica-gesto`, com a tinta do desvio 19) e nenhuma regra
+      nova. A ordem sai de `gerarPorteira`, em `dominios/legislacao/lembrar.ts`. */

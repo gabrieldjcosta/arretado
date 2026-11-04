@@ -14,6 +14,11 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
+import {
+  frenteDaRevisao,
+  lacunaCresceu,
+  temIrmaoDeLacuna,
+} from '../../dominios/recall/lacuna-progressiva';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
@@ -71,6 +76,10 @@ export function Drill() {
   /** A resposta tocada, enquanto o cartão passa: é a que ganha o traço de seleção. */
   const [escolhida, setEscolhida] = useState<RespostaRevisao | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
+  /** O que a pessoa escreveu antes de virar (pré-teste); só vive na tela, nunca é gravado. */
+  /** Se o cartão de lacuna tem irmão (outro trecho da mesma Frase); até saber, supõe que tem. */
+  const [irmao, setIrmao] = useState<{ id: string; tem: boolean } | null>(null);
+  const [escrito, setEscrito] = useState<{ id: string; texto: string } | null>(null);
   const inicio = useRef(0);
   /** Quanta certeza a pessoa disse ter antes de ver a resposta (AP-02); pular deixa vazio. */
   const certeza = useRef<1 | 2 | 3 | undefined>(undefined);
@@ -148,6 +157,12 @@ export function Drill() {
     certeza.current = undefined;
     botaoVirar.current?.focus();
     let ativo = true;
+    temIrmaoDeLacuna(repo, atual).then(
+      (tem) => {
+        if (ativo) setIrmao({ id: atual.id, tem });
+      },
+      () => undefined,
+    );
     carregarVerso(repo, atual).then(
       (v) => {
         if (ativo) setVerso({ id: atual.id, texto: v });
@@ -184,6 +199,7 @@ export function Drill() {
       if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      setEscrito(null);
       // Pelo clique ou pela tecla (1, 2, 3), a resposta ganha o traço de seleção.
       marcarEscolha(`resposta:${resposta}`);
       setEscolhida(resposta);
@@ -307,6 +323,8 @@ export function Drill() {
   }
 
   if (!atual) return null;
+  const temIrmao = irmao?.id === atual.id ? irmao.tem : atual.fraseId !== undefined;
+  const palpite = escrito?.id === atual.id ? escrito.texto : '';
   const restam = estado.fila.length - estado.indice - 1;
   return (
     <div className="coluna-drill">
@@ -319,9 +337,16 @@ export function Drill() {
       />
       <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
         <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
-          <p className="drill-frente texto-leitura">{atual.frente}</p>
+          <p className="drill-frente texto-leitura">{frenteDaRevisao(atual, temIrmao)}</p>
+          {!estado.virado && lacunaCresceu(atual, temIrmao) && (
+            <p className="dica">A lacuna cresce a cada acerto.</p>
+          )}
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
+              <p className="palpite-da-pessoa">
+                <span className="palpite-rotulo">Você escreveu:</span>{' '}
+                {palpite.trim() || '(em branco)'}
+              </p>
               <p className="frase-correta-titulo">
                 {atual.tipo === 'lacuna'
                   ? 'Frase completa'
@@ -349,6 +374,25 @@ export function Drill() {
       )}
       {!estado.virado ? (
         <div className="linha-acoes acoes-drill">
+          <input
+            type="text"
+            className="palpite"
+            value={palpite}
+            maxLength={280}
+            autoComplete="off"
+            enterKeyHint="done"
+            aria-label="Escreva o que lembra. Em branco vale."
+            placeholder="Escreva o que lembra (em branco vale)"
+            onChange={(e) => {
+              setEscrito({ id: atual.id, texto: e.target.value });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                virar();
+              }
+            }}
+          />
           <div className="certeza" role="group" aria-labelledby="certeza-rotulo">
             <p id="certeza-rotulo" className="certeza-rotulo">
               Quanta certeza?
