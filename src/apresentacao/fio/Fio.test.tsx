@@ -147,7 +147,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
     await usuario.click(within(passo).getByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
-    expect(screen.getByText('Você passou por aqui. O fio fica onde está.')).toBeInTheDocument();
+    expect(screen.getByText('Você deu esse passo. Amanhã tem mais.')).toBeInTheDocument();
     // Sem fato, o pouso não fala em falha nem em pendência.
     expect(screen.queryByText(/sem deixar fato|não fez|faltou/i)).not.toBeInTheDocument();
   });
@@ -171,6 +171,8 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(pilulas[0]).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Descansar por hoje' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /seguir para o próximo passo/ })).toBeInTheDocument();
+    // A saída é o fio ou descansar: a pílula dos três lugares some enquanto o pouso dura.
+    expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
   });
 
   it('as pílulas mostram só os pousos da volta e trocam a cena, o título e os fatos', async () => {

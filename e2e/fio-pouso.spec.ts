@@ -35,53 +35,55 @@ async function noPrimeiroPouso(page: Page) {
 
 const noDePuxar = (page: Page) => page.getByRole('button', { name: /seguir para o próximo passo/ });
 
-test('a cena do pouso cabe na tela, o nó é um alvo de toque e a tela passa no axe', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 360, height: 640 });
-  await noPrimeiroPouso(page);
+/** A cena é de 3 por 2 e tem de 200 a 420 px de altura (40% da tela); a saída fica à vista, sem rolar e sem a pílula. */
+async function conferirACenaEASaida(page: Page, largura: number, altura: number) {
+  await page.setViewportSize({ width: largura, height: altura });
+  // A pílula dos três lugares some no pouso: a saída é o fio ou descansar.
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toHaveCount(0);
 
   const cena = page.locator('.fio-cena');
   const caixaDaCena = await cena.boundingBox();
   if (!caixaDaCena) throw new Error('sem caixa da cena');
   expect(caixaDaCena.x).toBeGreaterThanOrEqual(0);
-  expect(caixaDaCena.x + caixaDaCena.width).toBeLessThanOrEqual(360);
-  // O desenho tem 320 por 236 unidades e o Zé fica de pé no chão da cena.
-  expect(Math.abs(caixaDaCena.width / caixaDaCena.height - 320 / 236)).toBeLessThan(0.02);
+  expect(caixaDaCena.x + caixaDaCena.width).toBeLessThanOrEqual(largura);
+  expect(Math.abs(caixaDaCena.width / caixaDaCena.height - 1.5)).toBeLessThan(0.02);
+  expect(caixaDaCena.height).toBeLessThanOrEqual(Math.min(Math.max(200, 0.4 * altura), 420) + 1);
+  // O Zé fica de pé no chão da cena.
   const caixaDoZe = await cena.locator('.fio-cena-ze').boundingBox();
   if (!caixaDoZe) throw new Error('sem caixa do Zé');
   expect(caixaDoZe.y + caixaDoZe.height).toBeLessThanOrEqual(
     caixaDaCena.y + caixaDaCena.height + 1,
   );
   expect(caixaDoZe.y).toBeGreaterThanOrEqual(caixaDaCena.y);
-
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     ),
   ).toBe(true);
 
-  // A saída fica à mão: depois de rolar até o fim, ela está acima da pílula dos três lugares.
-  await page.evaluate(() => {
-    window.scrollTo(0, document.documentElement.scrollHeight);
-  });
-  const saida = page.locator('.fio-pouso-saida');
-  const [caixaDaSaida, caixaDoNav] = await Promise.all([
-    saida.boundingBox(),
-    page.getByRole('navigation', { name: 'Lugares' }).boundingBox(),
-  ]);
-  if (!caixaDaSaida || !caixaDoNav) throw new Error('sem caixa');
-  expect(caixaDaSaida.y + caixaDaSaida.height).toBeLessThanOrEqual(caixaDoNav.y);
-
-  // Os dois botões têm 44 px ou mais de lado.
+  // O nó, a lua e a dica ficam à vista sem rolar; o nó e a lua são alvos de toque de 44 px ou mais.
   const caixaDoNo = await noDePuxar(page).boundingBox();
   const caixaDaLua = await page.getByRole('button', { name: 'Descansar por hoje' }).boundingBox();
-  expect(caixaDoNo?.width).toBeGreaterThanOrEqual(44);
-  expect(caixaDoNo?.height).toBeGreaterThanOrEqual(44);
-  expect(caixaDaLua?.width).toBeGreaterThanOrEqual(44);
-  expect(caixaDaLua?.height).toBeGreaterThanOrEqual(44);
+  const caixaDaDica = await page.getByText('Puxe para seguir').boundingBox();
+  if (!caixaDoNo || !caixaDaLua || !caixaDaDica) throw new Error('sem caixa da saída');
+  expect(caixaDoNo.y + caixaDoNo.height).toBeLessThanOrEqual(altura);
+  expect(caixaDaLua.y + caixaDaLua.height).toBeLessThanOrEqual(altura);
+  expect(caixaDaDica.y + caixaDaDica.height).toBeLessThanOrEqual(altura);
+  expect(caixaDoNo.width).toBeGreaterThanOrEqual(44);
+  expect(caixaDoNo.height).toBeGreaterThanOrEqual(44);
+  expect(caixaDaLua.width).toBeGreaterThanOrEqual(44);
+  expect(caixaDaLua.height).toBeGreaterThanOrEqual(44);
+}
 
+test('a cena do pouso cabe, a saída fica à vista sem a pílula e a tela passa no axe', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await noPrimeiroPouso(page);
+
+  await conferirACenaEASaida(page, 360, 640);
   await semViolacoes(page);
+  await conferirACenaEASaida(page, 1280, 800);
 });
 
 test('arrastar o nó além de 28 px segue para o Agora; um arrasto curto o devolve', async ({
@@ -121,6 +123,8 @@ test('descansar volta ao Agora, que diz que está tudo salvo', async ({ page }) 
   await page.getByRole('button', { name: 'Descansar por hoje' }).click();
   await expect(page).toHaveURL(/#\/$/);
   await expect(page.getByText('Tudo salvo. O fio te espera aqui.')).toBeVisible();
+  // Fora do pouso a pílula dos três lugares volta.
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await semViolacoes(page);
 });
 

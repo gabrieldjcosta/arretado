@@ -33,9 +33,15 @@ export const FLORES_DO_JARDIM: readonly (readonly [number, number])[] = [
 export const luaEm = (x: number, y: number): string =>
   `M${String(x)} ${String(y - 16)} a17 17 0 1 0 15 25 a13 13 0 1 1 -15 -25 z`;
 
-/** A serra ao fundo. */
+/**
+ * O quanto a serra e o chão passam das bordas do desenho (320 por 236) para cada lado: quando a caixa da cena é mais
+ * estreita que o céu em volta (monitor), o chão segue até a borda do céu.
+ */
+export const FOLGA_DA_CENA = 160;
+
+/** A serra ao fundo (e, além das bordas, plana, para chegar à borda do céu). */
 export const SERRA =
-  'M0 236 V196 C40 186 70 192 100 184 C140 174 170 188 210 182 C250 176 280 186 320 178 V236 Z';
+  'M-160 236 V196 H0 C40 186 70 192 100 184 C140 174 170 188 210 182 C250 176 280 186 320 178 H480 V236 Z';
 
 /** O gerador do protótipo: sempre a mesma sequência para a mesma semente. */
 function sorteio(semente: number): () => number {

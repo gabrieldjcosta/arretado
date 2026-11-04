@@ -120,7 +120,7 @@
 /* A forma do pouso: compacta, no pé da tela. O nó tem 50 px (o do Agora, 84) e a dica fica embaixo, miúda. */
 .fio-puxar[data-forma='pouso'] {
   flex: none;
-  height: 150px;
+  height: 140px;
   min-height: 0;
 }
 

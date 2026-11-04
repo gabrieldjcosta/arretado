@@ -8,6 +8,7 @@ import {
   CHAO_DA_CENA,
   estrelasDoCeu,
   FLORES_DO_JARDIM,
+  FOLGA_DA_CENA,
   LARGURA_DA_CENA,
   luaEm,
   SERRA,
@@ -116,6 +117,7 @@ export function CenaDoPouso({ pouso }: { pouso: PousoNaVereda }) {
       <svg
         className="fio-cena-desenho"
         viewBox={`0 0 ${String(LARGURA_DA_CENA)} ${String(ALTURA_DA_CENA)}`}
+        preserveAspectRatio="xMidYMax slice"
         aria-hidden="true"
         focusable="false"
       >
@@ -139,7 +141,10 @@ export function CenaDoPouso({ pouso }: { pouso: PousoNaVereda }) {
         <path className="cena-serra" d={SERRA} />
         <path className="cena-lugar-brilho" data-brilho="" d={lugar.desenho} filter={filtro} />
         <path className="cena-lugar" d={lugar.desenho} />
-        <path className="cena-chao" d={`M0 ${String(CHAO_DA_CENA)} H${String(LARGURA_DA_CENA)}`} />
+        <path
+          className="cena-chao"
+          d={`M${String(-FOLGA_DA_CENA)} ${String(CHAO_DA_CENA)} H${String(LARGURA_DA_CENA + FOLGA_DA_CENA)}`}
+        />
         {FLORES_DO_JARDIM.slice(0, flores).map(([x, y], i) => (
           <Flor key={i} x={x} y={y} filtro={filtro} nova={i === flores - 1} />
         ))}

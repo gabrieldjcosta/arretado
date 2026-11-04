@@ -84,7 +84,7 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
             ))}
           </ul>
         ) : (
-          <p className="fio-quieto">Você passou por aqui. O fio fica onde está.</p>
+          <p className="fio-quieto">Você deu esse passo. Amanhã tem mais.</p>
         ))}
       <div className="fio-pouso-lugares" role="group" aria-label="Pousos da vereda" ref={faixa}>
         {volta.map((p) => (

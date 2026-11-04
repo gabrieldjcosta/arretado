@@ -1,5 +1,7 @@
 /* A cena do pouso (D-D25, protótipo v16): o céu é de noite nos dois mundos, então as cores são as da noite do
-   protótipo e não mudam com o tema. O desenho tem 320 por 236 unidades; o Zé fica por cima, ancorado no chão. */
+   protótipo e não mudam com o tema. O desenho tem 320 por 236 unidades; o Zé fica por cima, ancorado no chão. A caixa
+   é de 3 por 2 e tem de 200 a 420 px de altura (40% da tela), para a saída do pouso ficar à vista em 360 por 640 e em
+   1280 por 800; o céu que sobra em cima (o desenho tem 22 unidades a mais) passa por baixo do rótulo do pouso. */
 .fio-cena {
   --cena-lua: #fff4d6;
   --cena-neon: #39caef;
@@ -7,8 +9,9 @@
   --cena-ponto: #ffc53d;
 
   position: relative;
-  width: 100%;
-  aspect-ratio: 320 / 236;
+  width: min(100%, calc(clamp(200px, 40dvh, 420px) * 1.5));
+  aspect-ratio: 3 / 2;
+  margin-inline: auto;
 }
 
 .fio-cena-desenho {
