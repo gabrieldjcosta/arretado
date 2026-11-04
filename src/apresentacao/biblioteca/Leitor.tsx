@@ -49,6 +49,7 @@ import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
+import { useItensDoMais } from '../componentes/ItensDoMais';
 import { Voltar } from '../componentes/Voltar';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
@@ -56,6 +57,7 @@ import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco'
 import { useDados, useRepositorio } from '../dados/contexto';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
 import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
+import { criarCartaoDoTrecho } from './cartao-do-trecho';
 import { BotaoDaEstrela } from './Estrela';
 import { MaisDoLeitor } from './MaisDoLeitor';
 import { EstruturaDaNorma } from './EstruturaDaNorma';
@@ -108,10 +110,13 @@ const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
 /** A partir daqui (tablet em pé) a estrutura da norma fica ao lado do texto (P4). */
 const LARGURA_DA_ESTRUTURA = 700;
-/** Até aqui (celular) o grupo fixo é a barra de uma linha com o "Mais"; o CSS usa o mesmo corte. */
+/** Até aqui (celular) o grupo fixo é a barra de uma linha com o "⋯"; o CSS usa o mesmo corte. */
 const LARGURA_DO_CELULAR = LARGURA_DA_ESTRUTURA - 1;
-/** Quanto tempo a origem da estrela fica por extenso acima do grupo fixo, depois do toque. */
-const AVISO_DA_ESTRELA = 4_000;
+/**
+ * Quanto tempo o aviso rápido (a origem da estrela, o cartão criado) fica por extenso acima do grupo
+ * fixo, depois do toque.
+ */
+const AVISO_RAPIDO = 4_000;
 
 /**
  * O quanto da linha precisa aparecer abaixo da barra fixa para ela ser a "do alto da tela": a que
@@ -1531,23 +1536,23 @@ function LeitorAberto({
   // por um instante, acima do grupo fixo (e é anunciada), e fica no nome acessível do botão.
   const arvore = useMemo(() => arvoreDaEstrela(norma.id, nos), [norma.id, nos]);
   const estrelas = useEstrelas(repo, arvore, vivo);
-  const [avisoDaEstrela, setAvisoDaEstrela] = useState<string | undefined>(undefined);
+  const [avisoRapido, setAvisoRapido] = useState<string | undefined>(undefined);
   useEffect(() => {
-    if (avisoDaEstrela === undefined) return;
+    if (avisoRapido === undefined) return;
     const tempo = window.setTimeout(() => {
-      setAvisoDaEstrela(undefined);
-    }, AVISO_DA_ESTRELA);
+      setAvisoRapido(undefined);
+    }, AVISO_RAPIDO);
     return () => {
       window.clearTimeout(tempo);
     };
-  }, [avisoDaEstrela]);
+  }, [avisoRapido]);
   function alternarEstrelaDe(alvoId: string) {
     void estrelas.alternar(alvoId).then((estado) => {
       if (!estado) return;
       const frase = fraseDaEstrela(referenciaDoDispositivo(alvoId), estado, (id) =>
         referenciaDoDispositivo(id),
       );
-      setAvisoDaEstrela(frase);
+      setAvisoRapido(frase);
       setAnuncio(frase);
     });
   }
@@ -1581,15 +1586,14 @@ function LeitorAberto({
         }
       : undefined;
   function abrirAcoes() {
-    abrirAcoesDe(false);
+    const alvo = alvoDoAlto();
+    if (alvo) setAlvoDasAcoes(alvo);
   }
-  function abrirRegistro() {
-    abrirAcoesDe(true);
-  }
-  function abrirAcoesDe(comecarRegistrando: boolean) {
+  /** O dispositivo que as ações agem agora (o do alto da tela, ou o primeiro com texto logo abaixo). */
+  function alvoDoAlto(): AlvoDasAcoes | undefined {
     const id = noDoAlto() ?? posicao.current;
     const indice = id === undefined ? undefined : aberta.indiceDe.get(id);
-    if (indice === undefined) return;
+    if (indice === undefined) return undefined;
     // As linhas à vista (com o filtro, só as que ficaram), não todos os nós: o de baixo é o de baixo na tela.
     let alvo = indice;
     for (let i = linhaDoNo(linhas, indice) ?? linhas.length; i < linhas.length; i++) {
@@ -1600,7 +1604,7 @@ function LeitorAberto({
       }
     }
     const no = nos[alvo];
-    if (!no) return;
+    if (!no) return undefined;
     const trechos = textos.get(alvo)?.texto?.trechos;
     const texto =
       no.dispositivo.categoria === 'estrutural' || trechos === undefined
@@ -1612,7 +1616,7 @@ function LeitorAberto({
             .trim() || undefined;
     const referencia = referenciaDe(nos, aberta.indiceDe, alvo, norma.tituloCurto);
     const rotulo = referenciaDoNo(nos, aberta.indiceDe, alvo);
-    setAlvoDasAcoes({
+    return {
       dispositivoId: no.dispositivo.id,
       nome: rotulo || rotuloTipo(no.dispositivo.tipo, 1),
       referencia,
@@ -1621,9 +1625,59 @@ function LeitorAberto({
         texto === undefined || trechos === undefined
           ? undefined
           : trechos.map((t) => t.texto).join(''),
-      ...(comecarRegistrando ? { comecarRegistrando } : {}),
-    });
+    };
   }
+
+  // O "+" da casca (D-D24): no Leitor, "Registrar erro" e "Cartão deste trecho" agem no dispositivo que está
+  // no alto da tela. O alvo é medido quando o painel abre (ou a tecla E é apertada) e levado até a ação, então
+  // o que o apoio diz ("Ligado ao Art. 112") é o que a ação usa, mesmo que a página role com o painel aberto.
+  // O cartão sai uma vez por dispositivo nesta visita: tocar de novo no mesmo artigo não duplica.
+  const cartoesCriados = useRef(new Set<string>());
+  async function criarCartaoDe(alvo: AlvoDasAcoes) {
+    if (cartoesCriados.current.has(alvo.dispositivoId)) return;
+    cartoesCriados.current.add(alvo.dispositivoId);
+    let frase: string;
+    try {
+      await criarCartaoDoTrecho(repo, alvo);
+      frase = `Cartão criado: ${alvo.referencia}. Primeira revisão amanhã.`;
+    } catch {
+      cartoesCriados.current.delete(alvo.dispositivoId);
+      frase = 'Não foi possível criar o cartão. Tente de novo; nada foi perdido.';
+    }
+    if (!vivo.current) return;
+    setAvisoRapido(frase);
+    setAnuncio(frase);
+  }
+  useItensDoMais(() => {
+    const alvo = alvoDoAlto();
+    if (!alvo) return [];
+    const feito = cartoesCriados.current.has(alvo.dispositivoId);
+    const semTexto = alvo.texto === undefined;
+    return [
+      {
+        id: 'registrar-erro',
+        nome: 'Registrar erro',
+        apoio: `Ligado ao ${alvo.nome}`,
+        atalho: 'E',
+        aoEscolher: () => {
+          setAlvoDasAcoes({ ...alvo, comecarRegistrando: true });
+        },
+      },
+      {
+        id: 'cartao-do-trecho',
+        nome: 'Cartão deste trecho',
+        apoio: feito
+          ? `Já criado: ${alvo.nome}`
+          : semTexto
+            ? 'Role até um artigo'
+            : `Do ${alvo.nome}`,
+        indisponivel: feito || semTexto,
+        aoEscolher: () => {
+          void criarCartaoDe(alvo);
+        },
+      },
+    ];
+  });
   const [falhaDoFiltro, setFalhaDoFiltro] = useState<string | undefined>(undefined);
   const blocos = useMemo(() => blocosDaNorma(nos), [nos]);
   function trocarFiltro(novo: FiltroAplicado | undefined) {
@@ -2163,10 +2217,10 @@ function LeitorAberto({
           />
         ) : (
           <>
-            {avisoDaEstrela && (
+            {avisoRapido && (
               // Visível por um instante; quem anuncia é o `role="status"` abaixo.
               <p className="aviso-da-estrela" aria-hidden="true">
-                <span>{avisoDaEstrela}</span>
+                <span>{avisoRapido}</span>
               </p>
             )}
             {modoFoco ? (
@@ -2214,7 +2268,6 @@ function LeitorAberto({
               </>
             ) : (
               <AcoesDaLeitura
-                compacto={celular}
                 modoFoco={modoFoco}
                 botaoDoFoco={botaoDoFoco}
                 lenteDoFoco={lenteDoFoco}
@@ -2222,7 +2275,6 @@ function LeitorAberto({
                 abrirFiltro={() => {
                   setFiltroAberto(true);
                 }}
-                abrirRegistro={abrirRegistro}
                 abrirAcoes={abrirAcoes}
                 filtro={filtro?.descricao}
                 alternarFoco={alternarFoco}
@@ -2313,6 +2365,11 @@ function LeitorAberto({
         aoFechar={() => {
           setAlvoDasAcoes(undefined);
         }}
+        aoRegistrar={(alvo) => {
+          const frase = `Erro registrado, ligado ao ${alvo.referencia}.`;
+          setAvisoRapido(frase);
+          setAnuncio(frase);
+        }}
       />
       <FiltroDaNorma
         aberto={filtroAberto}
@@ -2352,30 +2409,28 @@ function LeitorAberto({
   );
 }
 
-/** O grupo fixo sem marcação em curso: buscar, modo foco e "lido até" (no celular, Filtrar, Registrar erro e Ações moram no Mais). */
+/**
+ * O grupo fixo sem marcação em curso (D-D24): buscar, modo foco e o "⋯" (filtrar e as ações do
+ * dispositivo), mais o "lido até". É o mesmo em toda largura: criar (registrar erro, cartão) é com o "+" da
+ * casca, e o "⋯" é para ler e organizar, como o do modo foco.
+ */
 function AcoesDaLeitura({
-  compacto,
   modoFoco,
   botaoDoFoco,
   lenteDoFoco,
   abrirBusca,
   abrirFiltro,
-  abrirRegistro,
   abrirAcoes,
   filtro,
   alternarFoco,
   marcarAqui,
   voltarDaRemissao,
 }: {
-  /** Celular (menos de 700 px): Filtrar, Registrar erro e Ações moram no "Mais", e a barra cabe numa linha. */
-  compacto: boolean;
   modoFoco: boolean;
   botaoDoFoco: RefObject<HTMLButtonElement | null>;
   lenteDoFoco: string;
   abrirBusca: () => void;
   abrirFiltro: () => void;
-  /** Só no celular: o Registrar erro do Mais, que abre o painel de Ações já no formulário. */
-  abrirRegistro: () => void;
   abrirAcoes: () => void;
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
@@ -2385,29 +2440,6 @@ function AcoesDaLeitura({
   /** Depois de "ir para" uma remissão (11.9): de onde se veio, e a volta. */
   voltarDaRemissao: { para: string; voltar: () => void } | undefined;
 }) {
-  const buscar = (
-    <button
-      type="button"
-      aria-haspopup="dialog"
-      aria-keyshortcuts={TECLA_DA_BUSCA}
-      title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
-      onClick={abrirBusca}
-    >
-      Buscar
-    </button>
-  );
-  const foco = (
-    <button
-      ref={botaoDoFoco}
-      type="button"
-      aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
-      data-lente={lenteDoFoco}
-      title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
-      onClick={alternarFoco}
-    >
-      {modoFoco ? 'Sair do foco' : 'Modo foco'}
-    </button>
-  );
   return (
     <>
       {voltarDaRemissao && (
@@ -2422,44 +2454,26 @@ function AcoesDaLeitura({
         </button>
       )}
       <div role="group" aria-label="Ferramentas da leitura" className="dock-do-leitor">
-        {buscar}
-        {compacto ? (
-          <>
-            {foco}
-            <MaisDoLeitor
-              filtro={filtro}
-              abrirFiltro={abrirFiltro}
-              abrirRegistro={abrirRegistro}
-              abrirAcoes={abrirAcoes}
-            />
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              className={filtro === undefined ? undefined : 'filtro-ligado'}
-              aria-haspopup="dialog"
-              aria-label={filtro === undefined ? 'Filtrar' : `Filtrado: ${filtro}. Mudar o filtro`}
-              title={
-                filtro === undefined
-                  ? 'Filtrar a norma: estrelados, com grifo ou nota, com erro, um trecho'
-                  : `Mostrando só: ${filtro}. Toque para mudar o filtro`
-              }
-              onClick={abrirFiltro}
-            >
-              {filtro === undefined ? 'Filtrar' : 'Filtrado'}
-            </button>
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              title="Ações do dispositivo no alto da tela: registrar erro, criar cartão, copiar a referência"
-              onClick={abrirAcoes}
-            >
-              Ações
-            </button>
-            {foco}
-          </>
-        )}
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-keyshortcuts={TECLA_DA_BUSCA}
+          title={`Buscar na norma, por texto ou endereço (atalho: ${TECLA_DA_BUSCA})`}
+          onClick={abrirBusca}
+        >
+          Buscar
+        </button>
+        <button
+          ref={botaoDoFoco}
+          type="button"
+          aria-keyshortcuts={modoFoco ? 'F Escape' : 'F'}
+          data-lente={lenteDoFoco}
+          title={modoFoco ? 'Sair do modo foco (atalho: F ou Esc)' : 'Modo foco (atalho: F)'}
+          onClick={alternarFoco}
+        >
+          {modoFoco ? 'Sair do foco' : 'Modo foco'}
+        </button>
+        <MaisDoLeitor filtro={filtro} abrirFiltro={abrirFiltro} abrirAcoes={abrirAcoes} />
       </div>
       <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui

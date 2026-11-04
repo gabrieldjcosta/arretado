@@ -5,6 +5,11 @@ import { PuxarEssenciais } from './biblioteca/PuxarEssenciais';
 import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
 import { Marca } from './componentes/escrita/Marca';
+import {
+  criarRegistroDeItens,
+  ProvedorDeItensDoMais,
+  useRegistroDeItens,
+} from './componentes/ItensDoMais';
 import { MaisGlobal } from './componentes/MaisGlobal';
 import { MenuAjuda } from './componentes/MenuAjuda';
 import { teclaForaDosAtalhos } from './componentes/teclado';
@@ -48,9 +53,13 @@ function IconeDeArea({ d }: { d: string }) {
  * espera por ela.
  */
 export function Shell() {
+  // Os itens que a tela acrescenta ao "+" (D-D24): o registro nasce com a casca e a tela se inscreve nele.
+  const [registro] = useState(criarRegistroDeItens);
   return (
     <ProvedorDaAbertura>
-      <CascaDoApp />
+      <ProvedorDeItensDoMais value={registro}>
+        <CascaDoApp />
+      </ProvedorDeItensDoMais>
     </ProvedorDaAbertura>
   );
 }
@@ -63,19 +72,23 @@ function CascaDoApp() {
   const tecladoAberto = useTecladoAberto();
   const telaComGuia = telaDoGuia(pathname);
   const guiaMontado = useGuiaMontado(telaComGuia);
+  const registro = useRegistroDeItens();
 
-  // Atalho global "E": registrar erro (fora de campos de texto).
+  // Atalho global "E": registrar erro (fora de campos de texto). A tela pode ter o registro dela, ligado ao
+  // que está à vista (no Leitor, o dispositivo no alto da tela, sem sair da lei); sem ele, vai ao registro.
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== 'e' || teclaForaDosAtalhos(e)) return;
       e.preventDefault();
-      void navegar('/recall/registrar');
+      const daTela = registro?.itens().find((item) => item.id === 'registrar-erro');
+      if (daTela && daTela.indisponivel !== true) daTela.aoEscolher();
+      else void navegar('/recall/registrar');
     };
     window.addEventListener('keydown', tecla);
     return () => {
       window.removeEventListener('keydown', tecla);
     };
-  }, [navegar]);
+  }, [navegar, registro]);
 
   return (
     <div className="shell" data-teclado={tecladoAberto ? 'aberto' : undefined}>

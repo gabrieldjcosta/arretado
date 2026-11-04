@@ -37,7 +37,7 @@ const linhasNaTela = (page: Page) => page.locator('.dispositivo');
 /** O ⋯ do modo foco: a única coisa à vista além do texto. */
 const maisDoFoco = (page: Page) => page.getByRole('button', { name: 'Mais ações do foco' });
 
-/** O "Mais" da barra do celular (menos de 700 px), onde moram Filtrar e Ações fora do modo foco. */
+/** O "⋯" do grupo fixo, em toda largura (D-D24), onde moram Filtrar e Ações fora do modo foco. */
 const maisDoLeitor = (page: Page) => page.getByRole('button', { name: /^Mais(\.|$)/ });
 
 /** O celular (menos de 700 px): a barra do Leitor é a de uma linha, e as abas das áreas saem da norma. */
@@ -57,8 +57,8 @@ async function sairParaABiblioteca(page: Page) {
 }
 
 /**
- * Um controle da bandeja do foco; abre a bandeja (o ⋯) se ele ainda não está à vista. Fora do modo foco
- * no celular, Filtrar e Ações moram no "Mais" da barra, que abre no lugar do ⋯.
+ * Um controle da bandeja do foco; abre a bandeja (o ⋯) se ele ainda não está à vista. Fora do modo foco,
+ * Filtrar e Ações moram no "⋯" do grupo fixo, que abre no lugar da bandeja.
  */
 async function naBandejaDoFoco(page: Page, nome: string | RegExp) {
   const botao = page.getByRole('button', { name: nome, exact: typeof nome === 'string' });
@@ -1376,13 +1376,9 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
   await apertar(await estrelaDe(page, 'tit2.cap2.sec1', 'Estrela: Seção I'), toque);
   await estrelaDe(page, 'art11', 'Estrela: Art. 11 (herdada de Seção I)');
 
-  // O grupo fixo ganhou um botão: com quatro, cabe na tela (quebra em duas linhas, se preciso).
+  // O grupo fixo é Buscar, Modo foco e o ⋯, em qualquer largura: cabe na tela.
   const grupo = page.locator('.acoes-leitor');
-  await expect(
-    noCelular(page)
-      ? maisDoLeitor(page)
-      : page.getByRole('button', { name: 'Filtrar', exact: true }),
-  ).toBeVisible();
+  await expect(maisDoLeitor(page)).toBeVisible();
   const caixa = await grupo.boundingBox();
   const largura = page.viewportSize()?.width ?? 0;
   expect(caixa).not.toBeNull();
@@ -1417,12 +1413,8 @@ test('filtros: só os estrelados, só um trecho e "mostrar tudo", com o contexto
       return noFim || Math.abs((await distanciaDoAlto(secao)) - antes) < 2;
     })
     .toBe(true);
-  // No celular o filtro ligado se mostra no anel do "Mais" (o item "Filtrado" está dentro dele).
-  await expect(
-    noCelular(page)
-      ? page.getByRole('button', { name: 'Mais. Filtrado: estrelados' })
-      : page.getByRole('button', { name: /^Filtrado: estrelados/ }),
-  ).toBeVisible();
+  // O filtro ligado se mostra no anel do ⋯ (o item "Filtrado" está dentro dele).
+  await expect(page.getByRole('button', { name: 'Mais. Filtrado: estrelados' })).toBeVisible();
   await semViolacoes(page);
   await naoTemLargura();
 
@@ -1472,37 +1464,73 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
     expect(sobra).toBe(0);
   };
 
-  // O art. 9º-A no alto da tela: as ações agem nele.
+  // O art. 9º-A no alto da tela: o que o "+" cria nasce ligado a ele, e as ações do "⋯" agem nele.
   const artigo = page.locator('[data-endereco="art9A"]');
   await rolarAteExistir(page, artigo);
   await alinharNoAlto(page, artigo);
   const alturaAntes = await distanciaDoAlto(artigo);
+  const mais = page.getByRole('button', { name: 'Novo registro' });
+  const painelDoMais = page.locator('.mais-itens');
   await apertar(await naBandejaDoFoco(page, /^Ações/), toque);
   const dialogo = page.getByRole('dialog', { name: 'Ações de Art. 9º-A' });
   await expect(dialogo).toBeVisible();
   await expect(dialogo.getByText('art. 9º-A, LEP', { exact: true })).toBeVisible();
   await expect(dialogo.getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
+  // Criar não mora nas Ações: erro e cartão são do "+".
+  await expect(dialogo.getByRole('button', { name: 'Registrar erro' })).toHaveCount(0);
+  await expect(dialogo.getByRole('button', { name: 'Criar cartão deste trecho' })).toHaveCount(0);
   await semViolacoes(page);
+  await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
 
-  // Registrar erro: só a frase correta (D25); "o que foi" já com a referência, opcional.
-  await apertar(dialogo.getByRole('button', { name: 'Registrar erro' }), toque);
-  const campo = dialogo.getByLabel('O que foi (opcional)');
+  // Registrar erro, pelo "+": só o formulário (a frase correta, D25), com "o que foi" já com a referência,
+  // opcional. Salvar fecha o diálogo e a leitura fica onde estava.
+  await apertar(mais, toque);
+  await expect(
+    painelDoMais.getByRole('button', { name: /^Registrar erro Ligado ao Art\. 9º-A/ }),
+  ).toBeVisible();
+  await semViolacoes(page);
+  await apertar(painelDoMais.getByRole('button', { name: /^Registrar erro/ }), toque);
+  const registro = page.getByRole('dialog', { name: 'Registrar erro em Art. 9º-A' });
+  await expect(registro).toBeVisible();
+  await expect(registro.getByText('art. 9º-A, LEP', { exact: true })).toBeVisible();
+  await expect(registro.getByRole('button', { name: 'Copiar referência' })).toHaveCount(0);
+  const campo = registro.getByLabel('O que foi (opcional)');
   await expect(campo).toHaveValue('art. 9º-A, LEP: ');
-  await dialogo
+  await registro
     .getByLabel('Frase correta')
     .fill('A identificação do perfil genético é obrigatória.');
-  await apertar(dialogo.getByRole('button', { name: 'Errei' }), toque);
+  await apertar(registro.getByRole('button', { name: 'Errei' }), toque);
   await campo.pressSequentially('confundi o prazo da identificação');
   await semViolacoes(page);
-  await apertar(dialogo.getByRole('button', { name: 'Salvar' }), toque);
-  await expect(dialogo.getByText(/Erro registrado e vinculado/)).toBeVisible();
-  await expect(dialogo.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
+  await apertar(registro.getByRole('button', { name: 'Salvar' }), toque);
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.locator('.aviso-da-estrela')).toContainText(
+    'Erro registrado, ligado ao art. 9º-A, LEP.',
+  );
+  // O foco volta ao "+", de onde a pessoa partiu.
+  await expect(mais).toBeFocused();
 
-  // Cartão deste trecho (uma vez só) e copiar a referência.
-  const cartao = dialogo.getByRole('button', { name: 'Criar cartão deste trecho' });
-  await apertar(cartao, toque);
-  await expect(dialogo.getByText(/Cartão criado/)).toBeVisible();
-  await expect(cartao).toBeDisabled();
+  // Cartão deste trecho, pelo "+" (uma vez só): sai sem diálogo, com um aviso rápido, e o item passa a
+  // dizer que já foi criado.
+  await apertar(mais, toque);
+  await apertar(painelDoMais.getByRole('button', { name: /^Cartão deste trecho/ }), toque);
+  await expect(page.locator('.aviso-da-estrela')).toContainText(
+    'Cartão criado: art. 9º-A, LEP. Primeira revisão amanhã.',
+  );
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await apertar(mais, toque);
+  const feito = painelDoMais.getByRole('button', { name: /^Cartão deste trecho/ });
+  await expect(feito).toHaveAttribute('aria-disabled', 'true');
+  await expect(feito).toContainText('Já criado');
+  await semViolacoes(page);
+  await apertar(mais, toque);
+  await expect(painelDoMais).toHaveCount(0);
+
+  // O "⋯" mostra o erro novo na lista dos vinculados; copiar a referência.
+  await apertar(await naBandejaDoFoco(page, /^Ações/), toque);
+  await expect(dialogo).toBeVisible();
+  await expect(dialogo.getByRole('link', { name: /perfil genético é obrigatória/ })).toBeVisible();
   await apertar(dialogo.getByRole('button', { name: 'Copiar referência' }), toque);
   await expect(dialogo.getByText('Copiado: art. 9º-A, LEP.')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('art. 9º-A, LEP');
@@ -1510,7 +1538,7 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await apertar(dialogo.getByRole('button', { name: 'Fechar' }), toque);
   await expect(page.getByRole('dialog')).toBeHidden();
 
-  // A posição não mexeu, e o grupo com 5 botões cabe na tela.
+  // A posição não mexeu, e o grupo com 3 botões cabe na tela.
   expect(Math.abs((await distanciaDoAlto(artigo)) - alturaAntes)).toBeLessThan(2);
   const caixa = await page.locator('.acoes-leitor').boundingBox();
   const largura = page.viewportSize()?.width ?? 0;
@@ -1534,6 +1562,13 @@ test('ações por dispositivo: registrar erro já vinculado, cartão deste trech
   await semViolacoes(page);
   await apertar(emFoco.getByRole('button', { name: 'Fechar' }), toque);
   await expect(page).toHaveURL(/[?&]foco=texto/);
+  // O "+" fica no mesmo canto no modo foco e também nasce ligado ao artigo à vista.
+  await apertar(mais, toque);
+  await expect(
+    painelDoMais.getByRole('button', { name: /^Registrar erro Ligado ao Art\. 9º-A/ }),
+  ).toBeVisible();
+  await apertar(mais, toque);
+  await expect(painelDoMais).toHaveCount(0);
   await naoTemLargura();
 });
 
@@ -1926,12 +1961,14 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com o ponto de luz n
     await expect(art3).toBeVisible();
   }
 
-  // O dock: Buscar, Filtrar, Ações e Modo foco numa só barra sólida (o contrato proíbe vidro desfocado
-  // atrás de texto); "Lido até aqui" fica fora. No celular, Filtrar e Ações moram no "Mais".
+  // O dock: Buscar, Modo foco e o ⋯ numa só barra sólida (o contrato proíbe vidro desfocado atrás de
+  // texto), em toda largura; "Lido até aqui" fica fora. Filtrar e Ações moram no ⋯ (D-D24).
   const dock = page.getByRole('group', { name: 'Ferramentas da leitura' });
-  await expect(dock.getByRole('button')).toHaveText(
-    noCelular(page) ? ['Buscar', 'Modo foco', 'Mais'] : ['Buscar', 'Filtrar', 'Ações', 'Modo foco'],
-  );
+  expect(
+    await dock
+      .getByRole('button')
+      .evaluateAll((botoes) => botoes.map((b) => b.getAttribute('aria-label') ?? b.textContent)),
+  ).toEqual(['Buscar', 'Modo foco', 'Mais']);
   await expect(dock.getByRole('button', { name: 'Lido até aqui' })).toHaveCount(0);
   const barra = await dock.evaluate((el) => {
     const s = getComputedStyle(el);

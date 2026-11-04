@@ -111,13 +111,23 @@ function abrirLeitor(repo: Repositorio, caminho: string) {
   return usuario;
 }
 
-/** Um controle da bandeja do modo foco: abre a bandeja (o ⋯) se ele ainda não está à vista. */
+/**
+ * Um controle do "⋯": o da bandeja do modo foco ("Mais ações do foco") ou o do Leitor ("Mais"). Abre o
+ * que estiver na tela se o controle ainda não está à vista.
+ */
 async function naBandeja(usuario: UserEvent, nome: string | RegExp) {
   if (!screen.queryByRole('button', { name: nome })) {
-    await usuario.click(screen.getByRole('button', { name: 'Mais ações do foco' }));
+    const doFoco = screen.queryByRole('button', { name: 'Mais ações do foco' });
+    await usuario.click(doFoco ?? screen.getByRole('button', { name: /^Mais(\.|$)/ }));
   }
   return screen.findByRole('button', { name: nome });
 }
+
+/** Os nomes dos botões de um grupo: o rótulo, quando o botão é só um ícone (o ⋯), e senão o texto. */
+const nomesDosBotoes = (grupo: HTMLElement) =>
+  within(grupo)
+    .getAllByRole('button')
+    .map((b) => b.getAttribute('aria-label') ?? b.textContent);
 
 /** Sai do modo foco pela bandeja. */
 async function sairDoFoco(usuario: UserEvent) {
@@ -839,9 +849,10 @@ describe('modo foco (11.1)', () => {
     await screen.findByRole('button', { name: 'Mais ações do foco' });
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
 
-    // O atalho "E" do Shell (registrar erro) continua valendo e leva para fora do leitor.
-    await usuario.keyboard('e');
-    expect(await screen.findByRole('heading', { level: 1, name: /Registrar erro/ })).toBeVisible();
+    // Sair da norma por outra tela (a casca segue montada, escondida só pelo CSS). O "E" não serve mais para
+    // isto: na lei ele registra o erro do artigo, sem sair dela (D-D24).
+    await usuario.click(screen.getByRole('link', { name: 'Trilha' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
     expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
   });
@@ -1333,8 +1344,8 @@ describe('filtros (11.3)', () => {
     expect(document.querySelector('.acoes-leitor [role="status"]')).toHaveTextContent(
       'Mostrando só: estrelados, 1 dispositivo.',
     );
-    // O botão do grupo fixo diz que o filtro está ligado.
-    const botao = screen.getByRole('button', { name: 'Filtrado: estrelados. Mudar o filtro' });
+    // O "⋯" do grupo fixo diz que o filtro está ligado.
+    const botao = screen.getByRole('button', { name: 'Mais. Filtrado: estrelados' });
     expect(botao).toHaveClass('filtro-ligado');
 
     // Tirar a estrela de um artigo à vista não o tira da tela: a linha fica até "Atualizar".
@@ -1349,7 +1360,7 @@ describe('filtros (11.3)', () => {
     expect(naTela('art1')).toBe(true);
     expect(naTela('art3')).toBe(true);
     expect(linhaDe('tit1')).not.toHaveAttribute('data-contexto');
-    expect(screen.getByRole('button', { name: 'Filtrar' })).not.toHaveClass('filtro-ligado');
+    expect(screen.getByRole('button', { name: 'Mais' })).not.toHaveClass('filtro-ligado');
   });
 
   it('com grifo ou nota: o dispositivo marcado e o que está acima dele', async () => {
@@ -1437,7 +1448,7 @@ describe('filtros (11.3)', () => {
     );
 
     // Por bloco: o capítulo e tudo o que está dentro dele.
-    await usuario.click(screen.getByRole('button', { name: /^Filtrado/ }));
+    await usuario.click(await naBandeja(usuario, /^Filtrado/));
     const outro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
     await usuario.selectOptions(within(outro).getByLabelText('Ou um bloco da norma'), [
       'TÍTULO I › CAPÍTULO I',
@@ -1486,7 +1497,7 @@ describe('filtros (11.3)', () => {
     expect(await screen.findByText(/Filtro desligado para mostrar o achado/)).toBeInTheDocument();
     expect(naTela('art3')).toBe(true);
     expect(naTela('art1')).toBe(true);
-    expect(screen.getByRole('button', { name: 'Filtrar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mais' })).not.toHaveClass('filtro-ligado');
   });
 });
 
@@ -1500,7 +1511,7 @@ describe('ações por dispositivo (11.5)', () => {
   async function abrirAcoes(usuario: ReturnType<typeof userEvent.setup>) {
     // Alto da tela num artigo (no jsdom, 60 px por linha).
     rolarPara(60 * 8);
-    await usuario.click(await naBandeja(usuario, 'Ações'));
+    await usuario.click(await naBandeja(usuario, /^Ações/));
     const dialogo = await screen.findByRole('dialog', { name: /^Ações de / });
     // A referência de citar, no alto do diálogo: "art. 1º, LEP".
     const referencia = dialogo.querySelector('p.dica')?.textContent ?? '';
@@ -1521,15 +1532,34 @@ describe('ações por dispositivo (11.5)', () => {
     expect(await within(dialogo).findByRole('button', { name: 'Estrelar' })).toBeVisible();
   });
 
-  it('registrar erro: só a frase correta (D25), "o que foi" já com a referência, vinculado ao dispositivo; depois aparece nos vinculados', async () => {
+  /** Abre o "+" e escolhe o item do Leitor, que age no dispositivo no alto da tela (D-D24). */
+  async function pelaMais(usuario: ReturnType<typeof userEvent.setup>, item: RegExp) {
+    // Alto da tela num artigo (no jsdom, 60 px por linha).
+    rolarPara(60 * 8);
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    await usuario.click(await screen.findByRole('button', { name: item }));
+  }
+
+  /** O "Registrar erro" do "+": só o formulário do erro, ligado ao dispositivo, sem sair da lei. */
+  async function registrarPelaMais(usuario: ReturnType<typeof userEvent.setup>) {
+    await pelaMais(usuario, /^Registrar erro/);
+    const dialogo = await screen.findByRole('dialog', { name: /^Registrar erro em / });
+    // A referência de citar, no alto do diálogo: "art. 1º, LEP".
+    const referencia = dialogo.querySelector('p.dica')?.textContent ?? '';
+    expect(referencia).toMatch(/^art\. \d+º, LEP$/);
+    return { dialogo, referencia };
+  }
+
+  it('registrar erro, pelo "+": só a frase correta (D25), "o que foi" já com a referência, vinculado ao dispositivo, sem sair da lei; depois aparece nos vinculados', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
+    const endereco = window.location.hash;
 
-    const { dialogo, referencia } = await abrirAcoes(usuario);
-    expect(within(dialogo).getByText('Nenhum erro vinculado a este dispositivo.')).toBeVisible();
-    await usuario.click(within(dialogo).getByRole('button', { name: 'Registrar erro' }));
+    const { dialogo, referencia } = await registrarPelaMais(usuario);
+    // Só o formulário: a lista de ações do dispositivo fica no "⋯".
+    expect(within(dialogo).queryByRole('button', { name: 'Copiar referência' })).toBeNull();
     const frase = within(dialogo).getByLabelText('Frase correta');
     expect(frase).toHaveFocus();
     expect(within(dialogo).getByLabelText('O que foi (opcional)')).toHaveValue(`${referencia}: `);
@@ -1540,7 +1570,14 @@ describe('ações por dispositivo (11.5)', () => {
     await usuario.type(within(dialogo).getByLabelText('O que foi (opcional)'), 'troquei o prazo');
     await usuario.click(salvar);
 
-    expect(await within(dialogo).findByText(/Erro registrado e vinculado/)).toBeInTheDocument();
+    // Salvou: o diálogo fecha, a lei fica onde estava e um aviso rápido diz que deu certo.
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /^Registrar erro em / })).toBeNull();
+    });
+    expect(window.location.hash).toBe(endereco);
+    expect(
+      await screen.findByText(`Erro registrado, ligado ao ${referencia}.`),
+    ).toBeInTheDocument();
     const erros = (await repo.colecao('erros').listarPagina({ limite: 10 })).itens;
     expect(erros).toHaveLength(1);
     expect(erros[0]).toMatchObject({
@@ -1551,8 +1588,9 @@ describe('ações por dispositivo (11.5)', () => {
     });
     expect(erros[0]?.dispositivoId).toBeDefined();
     expect(await repo.colecao('frases').contar()).toBe(1);
-    // A lista dos vinculados recarrega com o erro novo (pela frase), com o link para o erro.
-    const link = await within(dialogo).findByRole('link', { name: /cinco dias/ });
+    // A lista dos vinculados (nas Ações, pelo "⋯") mostra o erro novo, com o link para ele.
+    const { dialogo: acoes } = await abrirAcoes(usuario);
+    const link = await within(acoes).findByRole('link', { name: /cinco dias/ });
     expect(link).toHaveAttribute('href', `#/recall/erros/${erros[0]?.id ?? ''}`);
   });
 
@@ -1561,38 +1599,65 @@ describe('ações por dispositivo (11.5)', () => {
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
-    const { dialogo } = await abrirAcoes(usuario);
-    await usuario.click(within(dialogo).getByRole('button', { name: 'Registrar erro' }));
+    const { dialogo } = await registrarPelaMais(usuario);
     await usuario.type(within(dialogo).getByLabelText('Frase correta'), 'Só a frase.');
     await usuario.click(within(dialogo).getByRole('button', { name: 'Salvar' }));
-    await within(dialogo).findByText(/Erro registrado e vinculado/);
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /^Registrar erro em / })).toBeNull();
+    });
     const [erro] = (await repo.colecao('erros').listarPagina({ limite: 10 })).itens;
     expect(erro).toMatchObject({ resultado: 'errou', fraseCorreta: 'Só a frase.' });
     expect(erro?.oQueFoi).toBeUndefined();
   });
 
-  it('cartão deste trecho: frente com a referência, verso com o texto vigente, uma vez só', async () => {
+  it('"Voltar", no registro do "+", fecha o diálogo sem registrar nada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const { dialogo } = await registrarPelaMais(usuario);
+    await usuario.type(within(dialogo).getByLabelText('Frase correta'), 'Rascunho.');
+    await usuario.click(within(dialogo).getByRole('button', { name: 'Voltar' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /^Registrar erro em / })).toBeNull();
+    });
+    expect(await repo.colecao('erros').contar()).toBe(0);
+    expect(document.querySelector('.aviso-da-estrela')).toBeNull();
+  });
+
+  it('cartão deste trecho, pelo "+": frente com a referência, verso com o texto vigente, uma vez só', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
 
-    const { dialogo, referencia } = await abrirAcoes(usuario);
-    const criar = within(dialogo).getByRole('button', { name: 'Criar cartão deste trecho' });
-    await usuario.dblClick(criar);
-
-    expect(await within(dialogo).findByText(/Cartão criado/)).toBeInTheDocument();
-    expect(criar).toBeDisabled();
+    await pelaMais(usuario, /^Cartão deste trecho/);
+    // O aviso rápido (o outro, o de leitor de tela, repete a frase): a referência vem dele.
+    const aviso = await screen.findByText(/^Cartão criado: .+\. Primeira revisão amanhã\.$/, {
+      selector: '.aviso-da-estrela span',
+    });
+    const referencia = /^Cartão criado: (.+)\. Primeira revisão amanhã\.$/.exec(
+      aviso.textContent,
+    )?.[1];
+    expect(referencia).toMatch(/^art\. \d+º, LEP$/);
     const cartoes = (await repo.colecao('cartoes').listarPagina({ limite: 10 })).itens;
     expect(cartoes).toHaveLength(1);
     expect(cartoes[0]).toMatchObject({
-      frente: `O que diz o ${referencia}?`,
+      frente: `O que diz o ${referencia ?? ''}?`,
       origemTipo: 'dispositivo',
       estado: 'ativo',
       caixa: 1,
     });
     expect(cartoes[0]?.origemId).toBeDefined();
     expect(cartoes[0]?.verso?.length).toBeGreaterThan(0);
+
+    // Uma vez só: o item agora diz que já foi criado, fica apagado e não age de novo.
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    const feito = await screen.findByRole('button', { name: /^Cartão deste trecho/ });
+    expect(feito).toHaveAttribute('aria-disabled', 'true');
+    expect(feito).toHaveTextContent(/Já criado/);
+    await usuario.click(feito);
+    expect(await repo.colecao('cartoes').contar()).toBe(1);
   });
 
   it('copiar a referência e fechar, também no modo foco', async () => {
@@ -1931,7 +1996,7 @@ describe('palco do modo foco (F entra no cartão)', () => {
     const norma = await publicar(repo, LEI);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
-    await usuario.click(screen.getByRole('button', { name: /^(Filtrar|Filtrado)/ }));
+    await usuario.click(await naBandeja(usuario, /^(Filtrar|Filtrado)/));
     const filtro = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
     await usuario.click(within(filtro).getByRole('radio', { name: /Só os estrelados/ }));
     await usuario.click(within(filtro).getByRole('button', { name: 'Mostrar' }));
@@ -2163,11 +2228,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByRole('heading', { level: 1, name: 'LEP' });
     const ferramentas = screen.getByRole('group', { name: 'Ferramentas da leitura' });
-    expect(
-      within(ferramentas)
-        .getAllByRole('button')
-        .map((botao) => botao.textContent),
-    ).toEqual(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
+    expect(nomesDosBotoes(ferramentas)).toEqual(['Buscar', 'Modo foco', 'Mais']);
     const principal = screen.getByRole('button', { name: 'Lido até aqui' });
     expect(ferramentas).not.toContainElement(principal);
     expect(principal).toHaveClass('principal');
@@ -2376,7 +2437,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
       const estrutura = await screen.findByRole('navigation', { name: 'Estrutura da norma' });
       await screen.findByText(/A jurisdição penal será exercida/);
 
-      await usuario.click(screen.getByRole('button', { name: 'Filtrar' }));
+      await usuario.click(await naBandeja(usuario, /^Filtrar/));
       const dialogo = await screen.findByRole('dialog', { name: 'Filtrar a norma' });
       await usuario.click(within(dialogo).getByRole('radio', { name: /Só com grifo ou nota/ }));
       await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
@@ -2392,9 +2453,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
         'role',
         'status',
       );
-      expect(await screen.findByRole('button', { name: 'Filtrar' })).not.toHaveClass(
-        'filtro-ligado',
-      );
+      expect(await screen.findByRole('button', { name: 'Mais' })).not.toHaveClass('filtro-ligado');
     });
 
     it('não aparece no celular: lá a estrutura continua no filtro por bloco', async () => {
@@ -2426,7 +2485,7 @@ describe('Ponto de luz no Leitor (P4)', () => {
   });
 });
 
-describe('barra do leitor no celular (menos de 700 px)', () => {
+describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
   afterEach(() => {
     instalarMatchMedia();
     delete document.documentElement.dataset.leitor;
@@ -2451,41 +2510,43 @@ describe('barra do leitor no celular (menos de 700 px)', () => {
   }
 
   const nomesDoDock = () =>
-    within(screen.getByRole('group', { name: 'Ferramentas da leitura' }))
-      .getAllByRole('button')
-      .map((b) => b.textContent);
+    nomesDosBotoes(screen.getByRole('group', { name: 'Ferramentas da leitura' }));
 
-  it('a barra tem Buscar, Modo foco e Mais; Filtrar, Registrar erro e Ações moram no Mais, a dois toques', async () => {
-    janelaDe(390);
-    const { repo } = await repositorioDeTeste();
-    const norma = await publicar(repo, LEI);
-    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
-    await screen.findByText(/A jurisdição penal/);
+  it.each([390, 768, 1280])(
+    'a barra tem Buscar, Modo foco e o ⋯ em %i px; Filtrar e Ações moram no ⋯, a dois toques; criar é com o "+"',
+    async (largura) => {
+      janelaDe(largura);
+      const { repo } = await repositorioDeTeste();
+      const norma = await publicar(repo, LEI);
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await screen.findByText(/A jurisdição penal/);
 
-    expect(nomesDoDock()).toEqual(['Buscar', 'Modo foco', 'Mais']);
-    expect(screen.getByRole('button', { name: 'Lido até aqui' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Filtrar' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Ações' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Registrar erro' })).toBeNull();
+      expect(nomesDoDock()).toEqual(['Buscar', 'Modo foco', 'Mais']);
+      expect(screen.getByRole('button', { name: 'Lido até aqui' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Filtrar' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Ações' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Registrar erro' })).toBeNull();
 
-    const mais = screen.getByRole('button', { name: 'Mais' });
-    expect(mais).toHaveAttribute('aria-expanded', 'false');
-    await usuario.click(mais);
-    expect(mais).toHaveAttribute('aria-expanded', 'true');
-    const menu = screen.getByRole('group', { name: 'Mais ferramentas da leitura' });
-    expect(
-      within(menu)
-        .getAllByRole('button')
-        .map((b) => b.firstElementChild?.textContent),
-    ).toEqual(['Filtrar', 'Registrar erro', 'Ações']);
+      const mais = screen.getByRole('button', { name: 'Mais' });
+      expect(mais).toHaveAttribute('aria-expanded', 'false');
+      await usuario.click(mais);
+      expect(mais).toHaveAttribute('aria-expanded', 'true');
+      const menu = screen.getByRole('group', { name: 'Mais ferramentas da leitura' });
+      // O ⋯ lê e organiza: criar (erro, cartão) não mora nele.
+      expect(
+        within(menu)
+          .getAllByRole('button')
+          .map((b) => b.firstElementChild?.textContent),
+      ).toEqual(['Filtrar', 'Ações']);
 
-    // Filtrar: o diálogo abre e o menu fecha (a volta do foco ao Mais, ao fechar o diálogo, é do E2E:
-    // o jsdom não tem <dialog> modal).
-    await usuario.click(within(menu).getByRole('button', { name: /^Filtrar/ }));
-    expect(await screen.findByRole('dialog', { name: 'Filtrar a norma' })).toBeInTheDocument();
-    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
-    expect(mais).toHaveAttribute('aria-expanded', 'false');
-  });
+      // Filtrar: o diálogo abre e o menu fecha (a volta do foco ao ⋯, ao fechar o diálogo, é do E2E:
+      // o jsdom não tem <dialog> modal).
+      await usuario.click(within(menu).getByRole('button', { name: /^Filtrar/ }));
+      expect(await screen.findByRole('dialog', { name: 'Filtrar a norma' })).toBeInTheDocument();
+      expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+      expect(mais).toHaveAttribute('aria-expanded', 'false');
+    },
+  );
 
   it('Ações abre as ações do dispositivo no alto da tela', async () => {
     janelaDe(390);
@@ -2501,7 +2562,7 @@ describe('barra do leitor no celular (menos de 700 px)', () => {
     expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
   });
 
-  it('Registrar erro, no Mais, abre as ações já no formulário do erro, sem a lista de ações', async () => {
+  it('o "+" traz Registrar erro e Cartão deste trecho, ligados ao artigo no alto, e o Lembrete', async () => {
     janelaDe(390);
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
@@ -2509,15 +2570,62 @@ describe('barra do leitor no celular (menos de 700 px)', () => {
     await screen.findByText(/A jurisdição penal/);
     rolarPara(60 * 8);
 
-    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
-    await usuario.click(screen.getByRole('button', { name: /^Registrar erro/ }));
-    const painel = await screen.findByRole('dialog', { name: /^Ações de / });
-    expect(within(painel).getByLabelText('Frase correta')).toBeInTheDocument();
-    expect(within(painel).queryByRole('button', { name: 'Criar cartão deste trecho' })).toBeNull();
-    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    const erro = screen.getByRole('button', { name: /^Registrar erro Ligado ao Art\. \d+º$/ });
+    expect(erro).toHaveAttribute('aria-keyshortcuts', 'E');
+    expect(
+      screen.getByRole('button', { name: /^Cartão deste trecho Do Art\. \d+º$/ }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: /^Lembrete/ })).toBeVisible();
+    // Na lei o registro é do artigo: o link genérico da casca sai do painel.
+    expect(screen.queryByRole('link', { name: /^Registrar erro/ })).toBeNull();
+    // Os itens do Leitor, e só eles, saem com a tela: em outra, o "+" volta ao registro genérico.
+    await usuario.click(erro);
+    const registro = await screen.findByRole('dialog', { name: /^Registrar erro em / });
+    await usuario.click(within(registro).getByRole('button', { name: 'Voltar' }));
+    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    expect(screen.getByRole('link', { name: /^Registrar erro/ })).toHaveAttribute(
+      'href',
+      '#/recall/registrar',
+    );
+    expect(screen.queryByRole('button', { name: /^Cartão deste trecho/ })).toBeNull();
   });
 
-  it('o Esc fecha o menu e devolve o foco ao Mais; tocar fora também fecha', async () => {
+  it('a tecla E, na lei, abre o registro do erro ligado ao artigo e não troca de tela', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const endereco = window.location.hash;
+    rolarPara(60 * 8);
+
+    await usuario.keyboard('e');
+    const dialogo = await screen.findByRole('dialog', { name: /^Registrar erro em / });
+    expect(within(dialogo).getByLabelText('Frase correta')).toBeInTheDocument();
+    expect(window.location.hash).toBe(endereco);
+  });
+
+  it('o "+" e o ⋯ não ficam abertos juntos: abrir um fecha o outro', async () => {
+    janelaDe(390);
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    rolarPara(60 * 8);
+
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    expect(screen.getByRole('button', { name: /^Registrar erro/ })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+    expect(screen.queryByRole('button', { name: /^Registrar erro/ })).toBeNull();
+    expect(screen.getByRole('group', { name: 'Mais ferramentas da leitura' })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    expect(screen.getByRole('button', { name: /^Registrar erro/ })).toBeInTheDocument();
+  });
+
+  it('o Esc fecha o menu e devolve o foco ao ⋯; tocar fora também fecha', async () => {
     janelaDe(390);
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
@@ -2534,13 +2642,13 @@ describe('barra do leitor no celular (menos de 700 px)', () => {
     expect(screen.getByRole('group', { name: 'Mais ferramentas da leitura' })).toBeInTheDocument();
     await usuario.click(screen.getByText(/A jurisdição penal/));
     expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
-    // Tocar no próprio Mais abre e fecha.
+    // Tocar no próprio ⋯ abre e fecha.
     await usuario.click(mais);
     await usuario.click(mais);
     expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
   });
 
-  it('com o filtro ligado, o Mais ganha o anel e o menu diz o que está filtrado', async () => {
+  it('com o filtro ligado, o ⋯ ganha o anel e o menu diz o que está filtrado', async () => {
     janelaDe(390);
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
@@ -2574,15 +2682,5 @@ describe('barra do leitor no celular (menos de 700 px)', () => {
     await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
     await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
     expect(document.documentElement).not.toHaveAttribute('data-leitor');
-  });
-
-  it('a partir de 700 px (e sem matchMedia) a barra segue com os quatro botões do dock', async () => {
-    janelaDe(768);
-    const { repo } = await repositorioDeTeste();
-    const norma = await publicar(repo, LEI);
-    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
-    await screen.findByText(/A jurisdição penal/);
-    expect(nomesDoDock()).toEqual(['Buscar', 'Filtrar', 'Ações', 'Modo foco']);
-    expect(screen.queryByRole('button', { name: 'Mais' })).toBeNull();
   });
 });

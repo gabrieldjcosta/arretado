@@ -1,24 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * O "Mais" da barra do Leitor no celular (menos de 700 px): Filtrar, Registrar erro e Ações saem da
- * linha das ferramentas para ela caber em uma linha só, e ficam a dois toques (o registro do erro abre
- * direto no formulário, sem passar pelo painel de Ações). Abre para cima, no padrão do
- * `MenuAjuda`: fecha ao tocar fora e no Esc, e devolve o foco ao botão. A bandeja do modo foco dá o
- * visual do painel (`.bandeja-itens`). Cada item leva uma linha de apoio (no celular, o `title` do dock
- * não aparece): ela faz parte do nome do botão, que é o que o axe pede do texto visível.
+ * O "⋯" do grupo fixo do Leitor (D-D24), em toda largura: Filtrar e Ações saem da linha das ferramentas e
+ * ficam a dois toques, e o grupo fica em Buscar, Modo foco e o "⋯", como a bandeja do modo foco. Criar
+ * (registrar um erro, fazer um cartão do trecho) não mora aqui: é com o "+" da casca, em toda tela. O "⋯"
+ * lê e organiza; o "+" cria. Abre para cima, no padrão do `MenuAjuda`: fecha ao tocar fora e no Esc, e
+ * devolve o foco ao botão. A bandeja do modo foco dá o visual do painel (`.bandeja-itens`). Cada item leva
+ * uma linha de apoio (o `title` do dock não aparece no celular): ela faz parte do nome do botão, que é o
+ * que o axe pede do texto visível. Com um filtro ligado o botão ganha o anel do filtro e diz qual é.
  */
 export function MaisDoLeitor({
   filtro,
   abrirFiltro,
-  abrirRegistro,
   abrirAcoes,
 }: {
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   abrirFiltro: () => void;
-  /** Abre o painel de Ações já no formulário do erro. */
-  abrirRegistro: () => void;
   abrirAcoes: () => void;
 }) {
   const [aberto, setAberto] = useState(false);
@@ -43,7 +41,7 @@ export function MaisDoLeitor({
     };
   }, [aberto]);
 
-  // O item sai da tela ao fechar o menu: o foco vai antes para o "Mais", que é onde o diálogo o devolve.
+  // O item sai da tela ao fechar o menu: o foco vai antes para o "⋯", que é onde o diálogo o devolve.
   function abrir(acao: () => void) {
     botao.current?.focus({ preventScroll: true });
     setAberto(false);
@@ -55,15 +53,22 @@ export function MaisDoLeitor({
       <button
         ref={botao}
         type="button"
-        className={filtro === undefined ? undefined : 'filtro-ligado'}
+        className={
+          filtro === undefined ? 'mais-do-leitor-botao' : 'mais-do-leitor-botao filtro-ligado'
+        }
         aria-expanded={aberto}
         aria-controls="mais-do-leitor-itens"
         aria-label={filtro === undefined ? 'Mais' : `Mais. Filtrado: ${filtro}`}
+        title="Mais da leitura: filtrar e ações do dispositivo no alto da tela"
         onClick={() => {
           setAberto((a) => !a);
         }}
       >
-        Mais
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="5" cy="12" r="1.9" />
+          <circle cx="12" cy="12" r="1.9" />
+          <circle cx="19" cy="12" r="1.9" />
+        </svg>
       </button>
       {aberto && (
         <div
@@ -91,21 +96,11 @@ export function MaisDoLeitor({
             type="button"
             aria-haspopup="dialog"
             onClick={() => {
-              abrir(abrirRegistro);
-            }}
-          >
-            <span>Registrar erro</span>
-            <small>Vinculado ao dispositivo no alto da tela</small>
-          </button>
-          <button
-            type="button"
-            aria-haspopup="dialog"
-            onClick={() => {
               abrir(abrirAcoes);
             }}
           >
             <span>Ações</span>
-            <small>Cartão e referência do dispositivo</small>
+            <small>Estrela, referência, correção e erros ligados</small>
           </button>
         </div>
       )}
