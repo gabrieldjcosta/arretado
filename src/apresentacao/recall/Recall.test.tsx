@@ -1,4 +1,5 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
+import { textoComLacunas } from '../../dominios/recall/servico';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { alterarPreferencias } from '../../core/preferencias';
@@ -584,6 +585,45 @@ describe('cota e início do Recall (fatia 3)', () => {
     expect(revisoes.map((r) => r.certeza).sort()).toEqual([3, undefined]);
   });
 
+  it('escrever antes de virar: o palpite volta no verso; em branco vale e nada é gravado', async () => {
+    const repo = await comVencidos(2);
+    const { usuario } = await abrir('/recall/revisar', repo);
+    const campo = await screen.findByRole('textbox', { name: /Escreva o que lembra/ });
+    await usuario.type(campo, 'um a quatro anos');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar resposta' }));
+    expect(await screen.findByText('um a quatro anos')).toBeInTheDocument();
+    await usuario.keyboard('3');
+    // Segundo cartão: o campo volta vazio e, em branco, o verso mostra "(em branco)" ao lado da lei.
+    const campo2 = await screen.findByRole('textbox', { name: /Escreva o que lembra/ });
+    expect(campo2).toHaveValue('');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar resposta' }));
+    await screen.findByRole('group', { name: 'Como foi?' });
+    expect(screen.getByText('(em branco)')).toBeInTheDocument();
+  });
+
+  it('lacuna que cresce: na caixa 3 esconde mais; a dica aparece em todo nível acima de 0', async () => {
+    const { repo, relogio } = await repositorioDeTeste();
+    const texto = 'A pena é de reclusão, de seis a vinte anos, conforme regulamento.';
+    const base = [{ inicio: texto.indexOf('reclusão'), fim: texto.indexOf('reclusão') + 8 }];
+    const c = await criarCartaoManual(repo, { frente: 'x', verso: texto });
+    await repo.colecao('cartoes').atualizar(c.id, {
+      tipo: 'lacuna',
+      ocultos: base,
+      frente: textoComLacunas(texto, base),
+      caixa: 3,
+    });
+    relogio.avancar(10 * 86_400_000);
+    await abrir('/recall/revisar', repo);
+    const frente = await screen.findByText(/A pena é de/);
+    expect(frente.textContent).not.toMatch(/regulamento|reclusão/);
+    expect(screen.getByText('A lacuna cresce a cada acerto.')).toBeInTheDocument();
+    cleanup();
+    await repo.colecao('cartoes').atualizar(c.id, { caixa: 4 });
+    await abrir('/recall/revisar', repo);
+    await screen.findByText(/A pena é de/);
+    expect(screen.getByText('A lacuna cresce a cada acerto.')).toBeInTheDocument();
+  });
+
   it('sem fila: convida a registrar e diz o que vence amanhã', async () => {
     const { repo } = await repositorioDeTeste();
     await abrir('/recall', repo);
@@ -625,6 +665,12 @@ describe('a passagem do cartão (A caneta que desenha)', () => {
   /** O jsdom não anima: cada `animate` vira uma animação já terminada e o teste vê o que foi pedido. */
   const pedidos: Keyframe[][] = [];
   const saidas = () => pedidos.filter((q) => q.some((f) => f.transform === 'translateX(-28px)'));
+  const saidasDeLado = () =>
+    pedidos.filter((q) =>
+      q.some((f) => String(f.transform).includes('translateX(130%) rotate(12deg)')),
+    );
+  const viradas = () =>
+    pedidos.filter((q) => q.some((f) => String(f.transform).includes('rotateY')));
 
   beforeEach(() => {
     pedidos.length = 0;
@@ -657,16 +703,17 @@ describe('a passagem do cartão (A caneta que desenha)', () => {
     await screen.findByRole('group', { name: 'Como foi?' });
     await usuario.keyboard('3');
     expect(await screen.findByText('2 de 2')).toBeInTheDocument();
-    // Saiu 190 ms para a esquerda e o novo entrou 210 ms pela direita.
-    expect(saidas()).toHaveLength(1);
-    expect(pedidos).toHaveLength(2);
+    // O cartão virou (meia volta para ir, meia para voltar), saiu de lado (Fácil, à direita) e o seguinte subiu da pilha.
+    expect(viradas()).toHaveLength(2);
+    expect(saidasDeLado()).toHaveLength(1);
+    expect(pedidos).toHaveLength(4);
     expect(await repo.colecao('revisoes').contar()).toBe(1);
 
     await usuario.keyboard(' ');
     await screen.findByRole('group', { name: 'Como foi?' });
     await usuario.keyboard('3');
     expect(await screen.findByRole('heading', { name: 'Feito.' })).toBeInTheDocument();
-    expect(saidas()).toHaveLength(1);
+    expect(saidasDeLado()).toHaveLength(1);
     expect(await repo.colecao('revisoes').contar()).toBe(2);
   });
 

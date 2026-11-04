@@ -14,22 +14,22 @@ import { AvisoDePosse } from '../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../sessao/CantoDaSessao';
 import { RelatarProblema } from '../suporte/RelatarProblema';
 import { AvisosDoFio } from './avisos/AvisosDoFio';
-import { semPilulaDosLugares } from './lugares';
+import { noQuadroDoFio, semPilulaDosLugares } from './lugares';
+import { CascaM } from './m/CascaM';
 import { PaletaDoFio } from './paleta/PaletaDoFio';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
 import { LinkDoFio } from './LinkDoFio';
+import { useLuzDaHora } from './luz-da-hora';
 import './fio-base.css';
 
 /**
- * A casca do Arretado novo (prévia do Fio, D-D25): o nome com o cacto à esquerda (o nó da pessoa, que
- * abre a Conta), a Ajuda, o "+" de sempre (D-D23) e a pílula com os três lugares embaixo (que some no pouso, onde a
- * saída é o fio ou "descansar"). O que vem por
- * dentro (`Outlet`) é o de sempre: o Agora, o Destino e o Varal são as telas novas; o Leitor, a Biblioteca
- * e o Fixar seguem como estão até as fatias seguintes darem casa nova a cada um. Sem rodapé: o backup e os
- * dados moram na Conta. Os provedores (Abertura, itens do "+") vêm do `Shell`.
+ * A casca de antes do quadro do mockup, que ainda serve as telas que não moram nele (Destino, Varal, Leitor,
+ * Biblioteca, Fixar, Conta...): o nome com o cacto à esquerda (o nó da pessoa, que abre a Conta), a Ajuda, o "+"
+ * de sempre (D-D23) e a pílula com os três lugares embaixo. Sem rodapé: o backup e os dados moram na Conta. Os
+ * provedores (Abertura, itens do "+") vêm do `Shell`. Some quando as fatias seguintes derem casa nova a cada tela.
  */
-export function CascaDoFio() {
+function CascaLegada() {
   const { pathname } = useLocation();
   const [relatando, setRelatando] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
@@ -37,6 +37,8 @@ export function CascaDoFio() {
   const telaComGuia = telaDoGuia(pathname);
   const semPilula = semPilulaDosLugares(pathname);
   const guiaMontado = useGuiaMontado(telaComGuia);
+
+  const luz = useLuzDaHora();
 
   useAtalhoDeRegistrarErro();
 
@@ -47,6 +49,7 @@ export function CascaDoFio() {
         data-teclado={tecladoAberto ? 'aberto' : undefined}
         data-largo={pathname === '/destino' ? 'sim' : undefined}
         data-sem-pilula={semPilula ? 'sim' : undefined}
+        data-luz={luz}
       >
         <AplicarAparencia />
         <PaletaDoFio />
@@ -108,4 +111,13 @@ export function CascaDoFio() {
       </div>
     </AvisosDoFio>
   );
+}
+
+/**
+ * A casca do Arretado novo (prévia do Fio, D-D25). As telas que já moram no quadro do mockup aprovado (o
+ * Agora, o passo e o pouso) ficam na `CascaM`; as outras seguem na casca de antes até a fatia delas.
+ */
+export function CascaDoFio() {
+  const { pathname } = useLocation();
+  return noQuadroDoFio(pathname) ? <CascaM /> : <CascaLegada />;
 }

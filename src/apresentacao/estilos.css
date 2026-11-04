@@ -1142,7 +1142,8 @@ button:disabled,
 
 /* O aperto é o do mundo: de dia o botão desce 1 px e a sombra baixa junto (o botão afunda no papel);
    à noite ele encolhe um pouco (a luz cede ao toque). */
-button:not(:disabled):active,
+/* O Fio (.m-fio) traz o aperto de cada botão no CSS do mockup aprovado: o global não vale lá dentro. */
+button:not(:disabled, .m-fio *):active,
 .botao:active {
   transform: var(--aperto-botao);
 }

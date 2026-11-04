@@ -182,6 +182,25 @@ describe('gerarPorteira', () => {
     expect(artigos.size).toBe(3);
   });
 
+  it('intercala artigos vizinhos: três seguidos no código, um cartão de cada, nunca de longe', () => {
+    // Seis artigos (um dispositivo cada), em ordem; a janela é de três vizinhos.
+    const seis = fontes([A, B, C, D, A, B], 6);
+    const numeroDo = (id: string) => Number(id.slice(1));
+    for (const semente of [0, 1, 2, 3, 4, 5, 6, 7]) {
+      const nums = gerarPorteira(seis, semente)
+        .map((c) => numeroDo(c.fonte.dispositivoId))
+        .sort((x, y) => x - y);
+      expect(nums).toHaveLength(3);
+      expect(nums[2]! - nums[0]!).toBe(2);
+    }
+    const inicios = new Set(
+      [0, 1, 2, 3].map((s) =>
+        Math.min(...gerarPorteira(seis, s).map((c) => numeroDo(c.fonte.dispositivoId))),
+      ),
+    );
+    expect(inicios.size).toBeGreaterThan(1);
+  });
+
   it('com menos texto bom, devolve menos cartões; com um só, ele vem trocado', () => {
     expect(gerarPorteira(fontes([A, 'O juiz decidirá.', B]), 1)).toHaveLength(2);
     const um = gerarPorteira(fontes([A]), 1);

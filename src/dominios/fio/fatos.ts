@@ -37,7 +37,10 @@ export function fatoDoPasso(passo: Passo, f: Fechamento): string | undefined {
   switch (r.tipo) {
     case 'lembrar': {
       const total = r.acertos + new Set(r.erros).size;
-      return total > 0 ? `Lembrou ${String(r.acertos)} de ${String(total)}` : undefined;
+      if (total <= 0) return undefined;
+      const guardou = new Set(r.guardados ?? []).size;
+      const lembrou = `Lembrou ${String(r.acertos)} de ${String(total)}`;
+      return guardou > 0 ? `${lembrou}, guardou ${plural(guardou, 'Frase', 'Frases')}` : lembrou;
     }
     case 'guardar':
       return r.guardadas > 0 ? `Guardou ${plural(r.guardadas, 'Frase', 'Frases')}` : undefined;

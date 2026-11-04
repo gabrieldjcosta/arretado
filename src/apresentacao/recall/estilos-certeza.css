@@ -27,6 +27,69 @@
    o cartão encolhe o que a pergunta ocupa a mais. */
 @media (max-height: 640px) {
   .coluna-drill .cartao-drill {
-    min-height: 30dvh;
+    min-height: 22dvh;
+    padding-block: 1rem;
   }
+
+  .palpite,
+  .certeza {
+    margin-bottom: 0.375rem;
+  }
+}
+
+/* A pilha de cartões (ideia "Cartão que vira"): atrás do cartão da vez, mais dois, um pouco menores, para a
+   pessoa ver que há mais por vir. O cartão sai de lado em 130% da largura; o corte fica no `main`, na largura da tela, para o cartão sumir na borda do aparelho e os anéis de foco ficarem inteiros. */
+main:has(.coluna-drill) {
+  overflow-x: clip;
+}
+
+.pilha-do-cartao {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.pilha-do-cartao > .cartao-drill {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+}
+
+.pilha-do-cartao.com-pilha {
+  margin-bottom: 1.75rem;
+}
+
+.pilha-do-cartao.com-pilha::before,
+.pilha-do-cartao.com-pilha::after {
+  content: '';
+  position: absolute;
+  inset: 10px 8px -8px;
+  z-index: 0;
+  border: var(--borda-folha);
+  border-radius: var(--raio-cartao);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+
+.pilha-do-cartao.com-pilha::after {
+  inset: 20px 16px -16px;
+  opacity: 0.6;
+}
+
+/* Escrever antes de virar (pré-teste): um campo de uma linha, 44 px, acima da certeza; em branco vale e o
+   que a pessoa escreveu volta no verso, ao lado da frase correta. Só tokens. */
+.palpite {
+  width: min(100%, 26rem);
+  min-height: var(--alvo, 44px);
+  margin-bottom: 0.5rem;
+}
+
+.palpite-da-pessoa {
+  margin: 0 0 0.5rem;
+  color: var(--texto-atenuado);
+  overflow-wrap: anywhere;
+}
+
+.palpite-rotulo {
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
