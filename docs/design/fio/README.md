@@ -55,9 +55,10 @@ aprovado não usa nenhuma. Quando uma entrar (Motion, View Transitions, Auto-Ani
 - `e2e/apoio.ts`, `textoLegivelNoFio` (chamado por `semViolacoesNoFio`, então por todo teste de tela do quadro):
   mede nos pixels o contraste de todo texto do quadro, nos dois mundos (4,5:1; 3:1 em texto grande). O axe não
   decide nada sobre texto em cima de degradê (responde "incompleto") e o mockup é todo degradê: de dia, as
-  respostas do Lembrar tinham 1,3:1 e passavam no axe (desvio 18). Ficam de fora, em `TEXTO_PENDENTE_DA_MARCA`, o
-  que o mockup já faz assim e a Marca decide se clareia: "acertou? passe o cartão pro lado" (2,9:1 de dia),
-  "descansar" no pouso (4,1:1 de dia) e as flores do pouso (enfeite).
+  respostas do Lembrar tinham 1,3:1 e passavam no axe (desvio 18). A dica do cartão
+  ("arraste o cartão pro lado" e "acertou? passe o cartão pro lado": 2,9:1 de dia e 4,0 a 4,2:1 de noite no arquivo)
+  usa a tinta secundária do arquivo nos dois mundos, e o "descansar" do pouso (4,1:1 de dia) a usa de dia (desvio 19). Fica de fora, em `ENFEITE_FORA_DA_MEDIDA`, só o enfeite (as flores do pouso, que
+  também são `aria-hidden`).
 - O teste verde não prova fidelidade: a Marca revisa contra o arquivo antes do merge.
 
 ## Como acrescentar um desvio

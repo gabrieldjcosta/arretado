@@ -16,6 +16,9 @@ const prototipo = (globalThis as unknown as { Element?: { prototype: Record<stri
 if (prototipo && typeof prototipo.scrollIntoView !== 'function') {
   prototipo.scrollIntoView = () => undefined;
 }
+if (prototipo && typeof prototipo.scrollTo !== 'function') {
+  prototipo.scrollTo = () => undefined;
+}
 
 // O jsdom não implementa a captura de ponteiro (o Fio a usa ao arrastar o fio e o cartão); no navegador é nativa.
 if (prototipo && typeof prototipo.setPointerCapture !== 'function') {

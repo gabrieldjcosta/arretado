@@ -82,6 +82,9 @@ export function CartaoM({
     cancelarAnimacoes(c);
     c.style.transform = '';
     c.style.opacity = '';
+    // A pergunta nova começa do alto: a tela tinha rolado até o fim do cartão anterior (como o `scrollTop = 0` do mockup).
+    const tela = c.closest<HTMLElement>('.m-tela');
+    if (tela) tela.scrollTop = 0;
     const modo = modoAgora();
     if (modo === 'reduzido') return;
     void animar(

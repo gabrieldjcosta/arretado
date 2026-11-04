@@ -56,11 +56,14 @@ function useChegadaDoRetorno(chegou: boolean) {
         { duration: 380, delay: 120, easing: MOLA },
       );
     }
-    // O botão da vez chega com o foco e, se o cartão passa da tela, a tela rola até ele (sem pulo no modo reduzido).
+    // O botão da vez chega com o foco. Se o cartão passa da tela, a tela rola até o fim dele (sem pulo no modo
+    // reduzido), e não só até o botão: embaixo do botão vem a dica "acertou? passe o cartão pro lado", e o fim do
+    // cartão, que o mockup mostra por inteiro, ficava fora do recorte.
     const botao = rodape.current?.querySelector<HTMLElement>('button');
     botao?.focus({ preventScroll: true });
-    botao?.scrollIntoView({
-      block: 'nearest',
+    const tela = rodape.current?.closest<HTMLElement>('.m-tela');
+    tela?.scrollTo({
+      top: tela.scrollHeight,
       behavior: modoAgora() === 'reduzido' ? 'auto' : 'smooth',
     });
   }, [chegou]);

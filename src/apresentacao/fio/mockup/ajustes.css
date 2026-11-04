@@ -109,14 +109,25 @@
   text-decoration: none;
 }
 
-/* 9. Os outros passos do app usam o mesmo cartão. Motivo: o mockup só tem os passos ler, lembrar e achar; o app tem
-      também guardar, revisar, o passo da própria pessoa e a porteira, e todos precisam do mesmo respiro no alto
-      para o "+" não ficar por cima do botão de pausa. */
-.m-fio [data-tela='guardar'],
-.m-fio [data-tela='revisar'],
-.m-fio [data-tela='seu_passo'],
-.m-fio [data-tela='praticar'] {
-  padding-top: 68px;
+/* 9. Os outros passos do app usam o mesmo cartão, e o respiro de 68 px no alto não rola. Motivo: o mockup só tem os
+      passos ler, lembrar e achar; o app tem também guardar, revisar, o passo da própria pessoa e a porteira, e todos
+      precisam do mesmo respiro no alto para o "+" não ficar por cima do botão de pausa. Além disso, a lei do app é
+      mais longa que a do mockup: o cartão passa do quadro, a tela rola e o texto passava por baixo do "+" (em 360 e
+      em 1280 px). No mockup o respiro é um recuo da tela (`padding-top`), que rola junto com o texto; aqui ele é o
+      começo da área que rola (`top`): o texto some na linha do respiro, sempre abaixo do "+". Em repouso nada
+      muda: o cartão fica onde o mockup o põe. */
+.m-fio
+  .m-tela:is(
+    [data-tela='ler'],
+    [data-tela='lembrar'],
+    [data-tela='achar'],
+    [data-tela='guardar'],
+    [data-tela='revisar'],
+    [data-tela='seu_passo'],
+    [data-tela='praticar']
+  ) {
+  top: 68px;
+  padding-top: 0;
 }
 
 /* 10. Respostas longas na lacuna e nas contas. Motivo: o mockup só tinha "16%", "25%" e "30%"; a lei do app responde
@@ -275,6 +286,19 @@
   box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
 }
 
+/* (17, no toque do Só contorno, de noite; revisão da Marca em 04/11/2026.) O halo de 5 px a 18% e o brilho de 24 px
+   a 35% que a prancha dá ao toque, sobre o azul-escuro do cartão, viram um anel de lama em volta do botão, e o
+   interior, que é transparente e não muda (tem a cor do cartão, em repouso e ao tocar), parece um buraco preto ao
+   lado dele. De noite o anel acende (do âmbar ao dourado do ponto) e o halo vira brilho de verdade, um forte e perto
+   e outro suave e longe, da mesma família do neon do fio (desvio 20). O fundo continua transparente. */
+.m-fio.m-fio.m-fio[data-movimento='calmo'][data-mundo='noite'] .m-acao:hover,
+.m-fio.m-fio.m-fio[data-movimento='calmo'][data-mundo='noite'] .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ponto),
+    0 0 6px 1px rgba(255, 197, 61, 0.6),
+    0 0 24px 3px rgba(255, 197, 61, 0.34);
+}
+
 /* 18. As respostas do Lembrar (`.m-bolinha`), no mundo do dia. Motivo: o fundo delas é azul-escuro nos dois mundos,
       mas o texto usa `--m-luz`, que de dia é a tinta (#0f1c3a): texto escuro sobre fundo escuro, com 1,3:1 de
       contraste, ilegível (o mockup tem o mesmo defeito: `docs/design/fio/mockup-aprovado.html` linha 471, e a
@@ -286,4 +310,68 @@
 
 .m-fio.m-fio[data-mundo='dia'] .m-bolinha.m-certa {
   color: var(--m-texto);
+}
+
+/* 19. Dois textos usam a tinta secundária do arquivo (`--m-texto-2`, a mesma de "da prova é seu"). Motivo: o mockup
+      os pinta com `--m-texto-3`, que não chega ao mínimo de 4,5:1 (WCAG 1.4.3). A dica do cartão ("arraste o cartão
+      pro lado", no Ler; "acertou? passe o cartão pro lado", no Lembrar) dá 2,9:1 de dia (#6b7690) e 4,0 a 4,2:1 de
+      noite (#6f7ea0), medidos nos pixels, nos dois mundos; "descansar", no pouso, dá 4,1:1 de dia. A tinta
+      secundária passa nos dois (#4a5878 de dia, #9aa8c4 de noite). */
+.m-fio.m-fio .m-dica-gesto,
+.m-fio.m-fio[data-mundo='dia'] .m-lua-btn span {
+  color: var(--m-texto-2);
+}
+
+/* 20. O neon do fio é amarelo. Pedido do Gabriel em 04/11/2026 (13:08Z: "nos movimentos do fio só faltou o brilho
+      do neon (no caso, amarelo)"; 13:31Z: "toca pra o desenvolvimento"). Motivo: o mockup acende o fio do Agora em
+      ciano (a faixa desfocada `.m-fio-pendurado-b`, na cor `--m-neon`), e o ponto de "Puxe o fio" é um sol. Valores
+      das pranchas da Marca (os mesmos do #408): a linha leva dois halos amarelos (4 e 14 px) em repouso; puxando,
+      eles sobem; passando dos 70 px, o fio estoura e a bola ganha o brilho dela. O `data-puxe` (solto, puxando,
+      passou) vem de `m/PuxarM.tsx`. No Calmo o brilho fica parado, no valor de repouso; em aparelho leve não há
+      halo (como o mockup, que tira as camadas de brilho). O ponto do trilho e a faísca ficam como no arquivo. */
+.m-fio.m-fio .m-fio-pendurado-b {
+  display: none;
+}
+
+.m-fio.m-fio .m-fio-pendurado {
+  filter: drop-shadow(0 0 4px rgba(255, 197, 61, 0.55))
+    drop-shadow(0 0 14px rgba(255, 197, 61, 0.32));
+  transition: filter 0.25s;
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='puxando'] .m-fio-pendurado {
+  filter: drop-shadow(0 0 5px rgba(255, 197, 61, 0.7))
+    drop-shadow(0 0 20px rgba(255, 197, 61, 0.42));
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-fio-pendurado {
+  filter: drop-shadow(0 0 6px rgba(255, 214, 110, 0.95))
+    drop-shadow(0 0 28px rgba(255, 197, 61, 0.6));
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-puxador {
+  box-shadow:
+    0 0 0 8px rgba(255, 197, 61, 0.22),
+    0 0 46px 6px rgba(255, 197, 61, 0.8);
+}
+
+.m-fio.m-fio:not([data-movimento='calmo'])[data-mundo='dia']
+  .m-puxar-area[data-puxe='passou']
+  .m-puxador {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(168, 108, 0, 0.55),
+    0 0 0 8px rgba(255, 197, 61, 0.22),
+    0 0 46px 6px rgba(255, 197, 61, 0.8);
+}
+
+.m-fio.m-fio.m-leve .m-fio-pendurado {
+  filter: none;
+}
+
+/* O traço que anda no mapa do Destino (`.m-andado-b`, a faixa de baixo): amarelo do ponto, largura 10, opacidade
+   .38 e o desfoque do mockup. Só passa a valer quando o Destino entrar no quadro. */
+.m-fio.m-fio.m-fio .m-destino .m-andado-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
 }

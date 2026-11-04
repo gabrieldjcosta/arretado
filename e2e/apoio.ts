@@ -238,14 +238,12 @@ export async function semViolacoesNoFio(page: Page) {
 }
 
 /**
- * Texto do quadro do Fio que a Marca ainda decide se clareia (WCAG 1.4.3). Não reprova; o relatório de cada um está
- * em `docs/design/fio/README.md`. Entra aqui só o que o mockup aprovado já faz assim.
+ * Enfeite puro do quadro do Fio: não leva contraste (WCAG 1.4.3 não o pede) e fica fora da medida, mas só se o
+ * leitor de tela também o ignora (`aria-hidden`). As flores do pouso são enfeite; o nome do lugar está ao lado.
+ * Texto que se lê não entra aqui: a dica do cartão e o "descansar" do pouso passaram a ler-se (desvio 19 de
+ * `ajustes.css`) e são medidos.
  */
-const TEXTO_PENDENTE_DA_MARCA = [
-  '.m-dica-gesto', // "acertou? passe o cartão pro lado": o tom --texto-3 do mockup; de dia dá 2,9:1
-  '.m-lua-btn > span', // "descansar": o tom --texto-3 do mockup; de dia dá 4,1:1
-  '.m-flores', // as flores do pouso são enfeite, e o nome do lugar está ao lado
-];
+const ENFEITE_FORA_DA_MEDIDA = ['.m-flores'];
 
 /** Um texto visível do quadro: o que diz, de que cor é e a caixa que ocupa na tela (px de CSS). */
 interface TextoDoQuadro {
@@ -262,13 +260,15 @@ interface TextoDoQuadro {
  * escondido, coberto por outra coisa, esmaecendo (opacidade abaixo de 0,99) ou sem tamanho para ler.
  */
 function textosDoQuadro(page: Page): Promise<TextoDoQuadro[]> {
-  return page.evaluate((pendentes) => {
+  return page.evaluate((enfeites) => {
     const achados: TextoDoQuadro[] = [];
     for (const el of document.querySelectorAll('.m-app *')) {
       const temTexto = [...el.childNodes].some(
         (no) => no.nodeType === Node.TEXT_NODE && (no.textContent ?? '').trim() !== '',
       );
-      if (!temTexto || pendentes.some((seletor) => el.matches(seletor))) continue;
+      if (!temTexto) continue;
+      if (enfeites.some((seletor) => el.matches(seletor)) && el.closest('[aria-hidden="true"]'))
+        continue;
       const estilo = getComputedStyle(el);
       if (estilo.visibility === 'hidden' || estilo.display === 'none') continue;
       const caixa = el.getBoundingClientRect();
@@ -301,7 +301,7 @@ function textosDoQuadro(page: Page): Promise<TextoDoQuadro[]> {
       });
     }
     return achados;
-  }, TEXTO_PENDENTE_DA_MARCA);
+  }, ENFEITE_FORA_DA_MEDIDA);
 }
 
 /** Para cada texto, a razão de contraste entre a cor dele e o fundo (a mediana dos pixels da caixa, sem o texto). */
@@ -404,6 +404,37 @@ export async function textoLegivelNoFio(page: Page) {
     ).toEqual([]);
   }
   await page.emulateMedia({ colorScheme: null });
+}
+
+/**
+ * A cor que o navegador desenha em cada um dos pontos da tela (px de CSS), lida na fotografia da página. O CSS
+ * declarado não diz o que o olho vê: um fundo "transparente" com um halo por cima pode parecer escuro ao lado dele, e
+ * só o pixel mostra se o interior de um botão mudou ao tocá-lo. As transições são levadas ao fim antes de fotografar.
+ */
+export async function coresNosPixels(
+  page: Page,
+  pontos: Array<[number, number]>,
+): Promise<Array<[number, number, number]>> {
+  await assentarAsTransicoes(page);
+  const foto = await page.screenshot({ animations: 'disabled', scale: 'css' });
+  return page.evaluate(
+    async ({ png, lugares }: { png: string; lugares: Array<[number, number]> }) => {
+      const imagem = await createImageBitmap(
+        new Blob([Uint8Array.from(atob(png), (c) => c.charCodeAt(0))], { type: 'image/png' }),
+      );
+      const tela = document.createElement('canvas');
+      tela.width = imagem.width;
+      tela.height = imagem.height;
+      const ctx = tela.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('sem canvas para medir o pixel');
+      ctx.drawImage(imagem, 0, 0);
+      return lugares.map(([x, y]): [number, number, number] => {
+        const [r = 0, g = 0, b = 0] = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data;
+        return [r, g, b];
+      });
+    },
+    { png: foto.toString('base64'), lugares: pontos },
+  );
 }
 
 /** Uma `Element.animate` que a página recebeu: o alvo (tag e classes sem o prefixo `m-`) e o que se pediu dela. */

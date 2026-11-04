@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { animar, aCadaQuadro, cancelarAnimacoes, modoAgora, MOLA, TROCAR, useSinal } from './anima';
 
+/** Até onde o ponto se arrasta, e a partir de onde o fio é puxado de vez (o mockup: 140 e 70 px). */
+const ARRASTO_MAXIMO = 140;
+const LIMITE_DO_PUXAO = 70;
+/** Abaixo disto o toque ainda não é um arrasto. */
+const TOQUE = 4;
+
 /**
  * O fio que se puxa (`#puxar-area` do mockup): um fio de luz pendurado, o ponto na ponta e a dica. Arrastar o
  * ponto para baixo estica o fio; solto antes do limite, ele volta balançando; passando dele, ou num toque,
@@ -48,6 +54,9 @@ export function PuxarM({
     linha.current.setAttribute('d', d);
     brilho.current.setAttribute('d', d);
     puxador.current.style.transform = `translateY(${String(puxao)}px)`;
+    // O neon amarelo sobe com o puxão: solto, puxando e depois do limite (desvio 20 de ajustes.css lê o `data-puxe`).
+    const puxe = puxao > LIMITE_DO_PUXAO ? 'passou' : puxao > TOQUE ? 'puxando' : 'solto';
+    if (a.dataset.puxe !== puxe) a.dataset.puxe = puxe;
   }, []);
 
   /** Mede a área, põe o ponto e a dica no lugar e, na primeira vez, o faz cair do alto. */
@@ -152,7 +161,7 @@ export function PuxarM({
     if (!a) return;
     arrasto.current = null;
     const dy = geo.current.fioY - geo.current.base;
-    if (!a.movido || dy > 70) {
+    if (!a.movido || dy > LIMITE_DO_PUXAO) {
       void puxar();
       return;
     }
@@ -192,8 +201,8 @@ export function PuxarM({
         onPointerMove={(e) => {
           const a = arrasto.current;
           if (!a) return;
-          const dy = Math.max(0, Math.min(140, e.clientY - a.y0));
-          if (dy > 4) a.movido = true;
+          const dy = Math.max(0, Math.min(ARRASTO_MAXIMO, e.clientY - a.y0));
+          if (dy > TOQUE) a.movido = true;
           geo.current.fioY = geo.current.base + dy;
           desenhar(dy);
         }}

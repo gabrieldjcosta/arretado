@@ -1,7 +1,8 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import {
   animacoesVistas,
   comecarCoberturaDasTelas,
+  coresNosPixels,
   expect,
   importarEPublicar,
   registrarAnimacoes,
@@ -47,6 +48,29 @@ const cartaoDa = (page: Page, nome: string) =>
   page.locator(`.m-tela:not(.m-saindo) .m-cartao[data-cartao="${nome}"]`);
 
 const puxador = (page: Page) => page.getByRole('button', { name: /Puxar o fio/ });
+
+/**
+ * A caixa do elemento depois de parar de mexer: o cartão do passo cresce enquanto chega (os grifos acendem, a tela
+ * rola), e medir no meio disso devolve um lugar que o botão já deixou.
+ */
+async function caixaParada(alvo: Locator) {
+  let anterior = '';
+  let iguais = 0;
+  await expect
+    .poll(
+      async () => {
+        const atual = JSON.stringify(await alvo.boundingBox());
+        iguais = atual === anterior ? iguais + 1 : 0;
+        anterior = atual;
+        return iguais;
+      },
+      { intervals: [100], timeout: 10_000 },
+    )
+    .toBeGreaterThanOrEqual(5);
+  const caixa = await alvo.boundingBox();
+  if (!caixa) throw new Error('sem caixa');
+  return caixa;
+}
 
 /** Nada pode rolar de lado nem passar da largura da tela. */
 async function semRolagemLateral(page: Page) {
@@ -496,9 +520,73 @@ test('o botão de ação é o Sol no Vivo e o Só contorno no Calmo, de noite e 
     await expect.poll(traco('sombra')).toBe('rgb(211, 146, 0) 0px 0px 0px 1.5px inset');
     expect(await traco('antes')()).toBe('none');
     await botao.hover();
-    await expect.poll(traco('sombra')).toContain('rgba(255, 197, 61, 0.35)');
+    // O brilho ao tocar: de dia o halo suave da prancha; de noite o anel acende e o brilho é de neon (desvio 17).
+    await expect
+      .poll(traco('sombra'))
+      .toContain(
+        esquema === 'dark' ? 'rgba(255, 197, 61, 0.6) 0px 0px 6px 1px' : 'rgba(255, 197, 61, 0.35)',
+      );
     await page.mouse.move(0, 0);
     await semViolacoesNoFio(page);
+  }
+});
+
+test('no Só contorno, de noite, tocar o botão acende o anel e o brilho sem escurecer o que há dentro dele', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await comALeiNaPrevia(page);
+  await puxador(page).focus();
+  await page.keyboard.press('Enter');
+  await expect(cartaoDa(page, 'ler')).toBeVisible();
+  const botao = page.getByRole('button', { name: 'Pronto, li' });
+  await botao.scrollIntoViewIfNeeded();
+  await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
+  await expect(page.locator('.m-fio')).toHaveAttribute('data-movimento', 'calmo');
+  await expect(page.locator('.m-fio')).toHaveAttribute('data-mundo', 'noite');
+
+  const fundo = () => botao.evaluate((el) => getComputedStyle(el).backgroundColor);
+  const sombra = () => botao.evaluate((el) => getComputedStyle(el).boxShadow);
+  const caixa = await caixaParada(botao);
+  const meio = caixa.y + caixa.height / 2;
+  /**
+   * Três pixels: dentro do botão, antes e depois da palavra (e ainda dentro dele depois de ele afundar 3% ao ser
+   * tocado), e fora dele, 4 px acima da borda, onde o brilho do toque cai.
+   */
+  const pixels = async () => {
+    const [esquerda, direita, acima] = await coresNosPixels(page, [
+      [caixa.x + 9, meio],
+      [caixa.x + caixa.width - 9, meio],
+      [caixa.x + caixa.width / 2, caixa.y - 4],
+    ]);
+    if (!esquerda || !direita || !acima) throw new Error('faltou um pixel');
+    return { esquerda, direita, acima };
+  };
+  const diferenca = (a: number[], b: number[]) =>
+    Math.max(...a.map((v, i) => Math.abs(v - (b[i] ?? 0))));
+
+  await expect.poll(fundo).toBe('rgba(0, 0, 0, 0)');
+  const repouso = await pixels();
+
+  // Aperta o botão e segura, sem soltar nele (soltar dentro dele seguiria o passo).
+  await page.mouse.move(caixa.x + caixa.width / 2, meio);
+  await page.mouse.down();
+  try {
+    await expect.poll(sombra).toContain('rgba(255, 197, 61, 0.6) 0px 0px 6px 1px');
+    expect(await sombra()).toContain('rgba(255, 197, 61, 0.34) 0px 0px 24px 3px');
+    // O fundo segue transparente (o do cartão atrás) e o pixel de dentro não muda: o que parecia um "buraco preto"
+    // era o brilho de lama em volta, e não um fundo que escurece.
+    expect(await fundo()).toBe('rgba(0, 0, 0, 0)');
+    const apertado = await pixels();
+    expect(diferenca(apertado.esquerda, repouso.esquerda)).toBeLessThanOrEqual(3);
+    expect(diferenca(apertado.direita, repouso.direita)).toBeLessThanOrEqual(3);
+    // O brilho aparece do lado de fora, e amarelo: o vermelho sobe bem além do azul-escuro do cartão.
+    expect(apertado.acima[0] - repouso.acima[0]).toBeGreaterThanOrEqual(25);
+    expect(apertado.acima[0]).toBeGreaterThan(apertado.acima[2]);
+  } finally {
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
   }
 });
 
@@ -530,3 +618,84 @@ test('as respostas do Lembrar têm texto claro sobre o azul-escuro, de noite e d
     );
   }
 });
+
+/**
+ * O "+" mora no canto do quadro e a tela do passo rola abaixo dele (o respiro de 68 px é a margem da caixa que rola,
+ * e não um recuo que rola junto: desvio 9). Rolada do começo ao meio e ao fim, nenhum texto da tela passa por baixo
+ * do "+". Devolve o que passaria (vazio quando está tudo bem) e se a caixa que rola começa abaixo do "+".
+ */
+async function textoPorBaixoDoMais(page: Page) {
+  const achados: string[] = [];
+  let comecaAbaixo = true;
+  for (const fracao of [0, 0.5, 1]) {
+    const medida = await page.evaluate((f) => {
+      const tela = document.querySelector<HTMLElement>('.m-app .m-tela:not(.m-saindo)');
+      const mais = document.querySelector('.m-app .m-mais')?.getBoundingClientRect();
+      if (!tela || !mais) throw new Error('sem a tela do passo ou sem o "+"');
+      tela.scrollTop = (tela.scrollHeight - tela.clientHeight) * f;
+      const t = tela.getBoundingClientRect();
+      const por: string[] = [];
+      for (const el of tela.querySelectorAll('*')) {
+        const temTexto = [...el.childNodes].some(
+          (no) => no.nodeType === Node.TEXT_NODE && (no.textContent ?? '').trim() !== '',
+        );
+        if (!temTexto) continue;
+        const r = el.getBoundingClientRect();
+        // O que a caixa que rola corta (acima ou abaixo dela) não se vê.
+        const esquerda = Math.max(r.left, t.left, mais.left);
+        const direita = Math.min(r.right, t.right, mais.right);
+        const topo = Math.max(r.top, t.top, mais.top);
+        const base = Math.min(r.bottom, t.bottom, mais.bottom);
+        if (direita > esquerda && base > topo) por.push(el.textContent.trim().slice(0, 30));
+      }
+      return { por, comecaAbaixo: t.top >= mais.bottom };
+    }, fracao);
+    achados.push(...medida.por);
+    comecaAbaixo &&= medida.comecaAbaixo;
+  }
+  return { achados, comecaAbaixo };
+}
+
+for (const [largura, altura] of [
+  [360, 640],
+  [1280, 800],
+] as const) {
+  test(`Lembrar respondido em ${String(largura)}×${String(altura)}: o "+" não cobre texto e a dica do cartão fica à vista`, async ({
+    page,
+  }) => {
+    test.setTimeout(240_000);
+    await page.setViewportSize({ width: largura, height: altura });
+    await comALeiNaPrevia(page);
+    await puxador(page).focus();
+    await page.keyboard.press('Enter');
+    const ler = cartaoDa(page, 'ler');
+    await expect(ler).toBeVisible();
+    await expect(ler.locator('.m-lei .m-aceso').first()).toBeVisible({ timeout: 10_000 });
+    expect(await textoPorBaixoDoMais(page)).toEqual({ achados: [], comecaAbaixo: true });
+
+    await ler.getByRole('button', { name: 'Pronto, li' }).click();
+    const lembrar = cartaoDa(page, 'lembrar');
+    const respostas = lembrar.getByRole('group', {
+      name: /Escolha o que a lei diz|Esta frase está como na lei\?/,
+    });
+    await expect(respostas.getByRole('button').first()).toBeVisible();
+    await respostas.getByRole('button').first().click();
+    await expect(lembrar.locator('.m-retorno')).toHaveText(/Isso\.|a Frase certa, tirada da lei/);
+
+    // Respondida a pergunta, a tela rola até o fim do cartão: o botão da vez e, embaixo dele, a dica ficam inteiros
+    // dentro da caixa que rola (no 1280 ela cabe de saída; no 360 a tela rola sozinha).
+    const dica = lembrar.locator('.m-dica-gesto');
+    await expect(dica).toHaveText('acertou? passe o cartão pro lado');
+    await expect
+      .poll(() =>
+        dica.evaluate((el) => {
+          const tela = el.closest('.m-tela')?.getBoundingClientRect();
+          const d = el.getBoundingClientRect();
+          return tela !== undefined && d.top >= tela.top && d.bottom <= tela.bottom + 1;
+        }),
+      )
+      .toBe(true);
+    expect(await textoPorBaixoDoMais(page)).toEqual({ achados: [], comecaAbaixo: true });
+    await semViolacoesNoFio(page);
+  });
+}
