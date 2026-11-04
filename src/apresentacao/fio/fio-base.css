@@ -1,0 +1,358 @@
+/* O Arretado novo (prévia do Fio, D-D25): casca, tokens e peças comuns. Só vale dentro de `.shell-fio`
+   (a casca que `CascaDoFio` monta quando a pessoa liga a prévia), então a interface de hoje não muda um
+   pixel. Origem visual: o protótipo v14 da Marca (https://claude.ai/artifact/EG9XZoJY1eW7zDuPykg7xA).
+   Regra de cor (Gabriel, 04/11/2026): a noite é luar (botão creme), o dia é sol da manhã (botão âmbar);
+   amarelo é o brilho, âmbar é o contorno e o traço. Os papéis de fundo, texto e borda são os do app
+   (`--fundo`, `--superficie`, `--texto`, `--borda`...): quem muda de mundo é o tema, como sempre. */
+
+.shell-fio {
+  /* Sol da manhã (dia). */
+  --f-ponto: #ffc53d;
+  --f-ponto-fundo: #d99a0e;
+  --f-ponto-nucleo: #fff7da;
+  --f-fio: #d39200;
+  --f-fio-halo: rgb(255 197 61 / 32%);
+  --f-fio-halo-largura: 10;
+  --f-acento: #8a5200;
+  --f-chip: rgb(255 186 64 / 22%);
+  --f-acao-fundo: linear-gradient(180deg, #ffd56b 0%, #ffab3d 100%);
+  --f-acao-texto: #4a2a00;
+  --f-acao-sombra: 0 3px 0 rgb(196 118 0 / 42%), 0 10px 22px -12px rgb(255 140 30 / 70%);
+  --f-acao-aperto: 0 1px 0 rgb(196 118 0 / 42%), 0 6px 14px -10px rgb(255 140 30 / 70%);
+  --f-acao-raio: 10px;
+  --f-cartao: #ffffff;
+  --f-cartao-borda: var(--linha);
+  --f-cartao-raio: 12px;
+  --f-cartao-sombra: none;
+  --f-fantasma: #e3e8f0;
+  --f-vidro: rgb(255 255 255 / 92%);
+  --f-halo-do-ponto: 0 3px 10px -2px rgb(168 108 0 / 50%), 0 0 0 5px rgb(255 197 61 / 18%);
+  --f-certo: #1f7a4d;
+  --f-flor: #ff7eb6;
+  --f-ceu: linear-gradient(180deg, #e4edfa 0%, #f1f5fb 40%, #f9f7f1 100%);
+  --f-aurora:
+    radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 16%) 0%, transparent 62%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+  --f-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --f-sair: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --f-trocar: cubic-bezier(0.45, 0, 0.25, 1);
+  --f-nav-altura: 4.75rem;
+
+  background: var(--f-aurora), var(--f-ceu);
+  color: var(--texto);
+  --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Luar (noite): mesmos nomes, outros valores. Dois seletores, como o resto do app: o mundo do sistema
+   (quando a pessoa não escolheu) e o escolhido à mão. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) .shell-fio {
+    --f-fio: #f2f6ff;
+    --f-fio-halo: rgb(57 202 239 / 45%);
+    --f-acento: #39caef;
+    --f-chip: rgb(57 202 239 / 10%);
+    --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
+    --f-acao-texto: #0b1322;
+    --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
+    --f-acao-aperto: 0 0 0 1px rgb(255 230 160 / 50%), 0 4px 14px -8px rgb(255 210 110 / 55%);
+    --f-acao-raio: 30px;
+    --f-cartao: linear-gradient(180deg, #16223b 0%, #111a2e 100%);
+    --f-cartao-borda: #22304d;
+    --f-cartao-raio: 26px;
+    --f-cartao-sombra: inset 0 1px 0 rgb(255 255 255 / 5%), 0 24px 40px -28px #000;
+    --f-fantasma: rgb(26 39 66 / 55%);
+    --f-vidro: rgb(18 28 49 / 86%);
+    --f-halo-do-ponto: 0 0 0 6px rgb(255 197 61 / 12%), 0 0 40px rgb(255 197 61 / 45%);
+    --f-certo: #7ee2b0;
+    --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
+    --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+  }
+}
+
+:root[data-tema='escuro'] .shell-fio {
+  --f-fio: #f2f6ff;
+  --f-fio-halo: rgb(57 202 239 / 45%);
+  --f-acento: #39caef;
+  --f-chip: rgb(57 202 239 / 10%);
+  --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
+  --f-acao-texto: #0b1322;
+  --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
+  --f-acao-aperto: 0 0 0 1px rgb(255 230 160 / 50%), 0 4px 14px -8px rgb(255 210 110 / 55%);
+  --f-acao-raio: 30px;
+  --f-cartao: linear-gradient(180deg, #16223b 0%, #111a2e 100%);
+  --f-cartao-borda: #22304d;
+  --f-cartao-raio: 26px;
+  --f-cartao-sombra: inset 0 1px 0 rgb(255 255 255 / 5%), 0 24px 40px -28px #000;
+  --f-fantasma: rgb(26 39 66 / 55%);
+  --f-vidro: rgb(18 28 49 / 86%);
+  --f-halo-do-ponto: 0 0 0 6px rgb(255 197 61 / 12%), 0 0 40px rgb(255 197 61 / 45%);
+  --f-certo: #7ee2b0;
+  --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
+  --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+}
+
+/* ---------- Cabeçalho: o nome com o cacto é o nó da pessoa (abre a Conta) ---------- */
+.shell-fio .fio-topo {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: calc(3.5rem + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) calc(var(--mais-direita) + var(--mais-lado) + 0.25rem) 0
+    max(var(--gutter), env(safe-area-inset-left, 0px));
+  background: transparent;
+}
+
+.fio-marca {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  min-height: var(--alvo);
+  padding: 0 0.5rem;
+  margin-left: -0.5rem;
+  border-radius: 14px;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--luz);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.fio-marca > span {
+  align-self: center;
+}
+
+@media (hover: hover) {
+  .fio-marca:hover {
+    background: var(--f-vidro);
+  }
+}
+
+.fio-cacto {
+  width: 1.375rem;
+  height: 1.375rem;
+  overflow: visible;
+  margin: 0 0 0.45rem 0.1875rem;
+  flex: none;
+}
+
+.fio-cacto path {
+  fill: none;
+  stroke: var(--luz);
+  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fio-cacto .fio-cacto-ponto {
+  fill: var(--f-ponto);
+  stroke: none;
+}
+
+/* O "+" da casca (MaisGlobal, D-D23) na luz do mundo: âmbar sobre o vidro. */
+.shell-fio .mais-global .mais {
+  background: var(--f-vidro);
+  border: 1px solid var(--f-cartao-borda);
+  color: var(--f-acento);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.shell-fio .mais-global .mais svg {
+  stroke-width: 2.4;
+}
+
+.shell-fio .fio-conteudo {
+  max-width: 34rem;
+  padding-top: 0.25rem;
+}
+
+/* ---------- Os três lugares: Agora, Destino e Varal numa pílula só ---------- */
+.fio-nav {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  display: flex;
+  gap: 2px;
+  /* Largura própria: com `left: 50%` e largura automática a caixa só teria metade da tela e a pílula
+     quebraria em duas linhas nos celulares estreitos. */
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  padding: 5px;
+  transform: translateX(-50%);
+  background: var(--f-vidro);
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.fio-nav a {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  padding: 0 1.125rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--texto-atenuado);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.fio-nav a[aria-current='page'] {
+  color: var(--fundo);
+}
+
+/* O indicador desliza de um lugar ao outro; sem JS ele some e a aba atual leva o fundo dela. */
+.fio-nav .fio-indicador {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: var(--luz);
+  transition:
+    left 0.35s var(--f-mola),
+    width 0.35s var(--f-mola);
+  z-index: 0;
+}
+
+/* Teclado aberto: a pílula sai da frente, como as abas de hoje. */
+.shell-fio[data-teclado='aberto'] .fio-nav {
+  display: none;
+}
+
+/* ---------- Peças comuns ---------- */
+.fio-olho {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+  font-weight: 600;
+}
+
+.fio-titulo {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 2.125rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--titulo);
+}
+
+.fio-quieto {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--texto-atenuado);
+}
+
+/* A ação principal: a luz do céu (luar à noite, sol de manhã). Uma por tela. */
+.fio-acao {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 60px;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: var(--f-acao-raio);
+  background: var(--f-acao-fundo);
+  color: var(--f-acao-texto);
+  box-shadow: var(--f-acao-sombra);
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 1.125rem;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s var(--f-mola);
+}
+
+.fio-acao svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fio-acao:active {
+  transform: translateY(2px) scale(0.985);
+  box-shadow: var(--f-acao-aperto);
+}
+
+.fio-acao[disabled] {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.fio-icone {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 50%;
+  background: var(--f-vidro);
+  color: var(--texto-atenuado);
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--f-mola),
+    color 0.2s;
+}
+
+.fio-icone:active {
+  transform: scale(0.9);
+}
+
+.fio-icone svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* O ponto de luz: o nó que se puxa, o nó da pessoa, o nó do pouso. */
+.fio-ponto {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 40%,
+    var(--f-ponto-nucleo) 0%,
+    var(--f-ponto) 42%,
+    var(--f-ponto-fundo) 100%
+  );
+  box-shadow: var(--f-halo-do-ponto);
+}
+
+/* Movimento reduzido e perfil Calmo: sem balanço, sem mola. O app diz isso por `data-movimento`. */
+@media (prefers-reduced-motion: reduce) {
+  .shell-fio *,
+  .shell-fio *::before,
+  .shell-fio *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

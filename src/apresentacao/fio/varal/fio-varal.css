@@ -1,0 +1,193 @@
+/* O Varal do Arretado novo (D-D25): folhetos de papel pendurados num fio, em duas linhas. Valores do
+   protótipo v14 da Marca. O papel e a tinta dos folhetos são os mesmos nos dois mundos (papel de cordel
+   sobre o céu); o fio é a luz do mundo. A tinta do estado é a escura (6:1 sobre o papel). */
+.fio-varal {
+  --f-papel: #e9e1cf;
+  --f-papel-tinta: #1d1a14;
+  --f-papel-tinta-2: #5a5242;
+  --f-pino: #b98a4e;
+  padding-bottom: 1rem;
+}
+
+.fio-varal > .fio-olho {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.fio-titulo-2 {
+  margin-top: 0.5rem;
+  font-size: 1.4375rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.varal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin: 2rem 0 0;
+}
+
+.varal-linha {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.625rem;
+  padding-top: 1.75rem;
+}
+
+.varal-fio {
+  position: absolute;
+  left: -0.875rem;
+  top: 0.25rem;
+  width: calc(100% + 1.75rem);
+  height: 34px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.varal-fio-linha {
+  fill: none;
+  stroke: var(--f-fio);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.varal-fio-brilho {
+  fill: none;
+  stroke: var(--f-fio-halo);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.varal-rotulo {
+  position: absolute;
+  left: 0.125rem;
+  top: -0.875rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+}
+
+.folheto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-height: 9.25rem;
+  padding: 0.75rem 0.5625rem 1.5rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--f-papel);
+  color: var(--f-papel-tinta);
+  box-shadow: 0 16px 30px -16px rgb(0 0 0 / 55%);
+  text-align: left;
+  text-decoration: none;
+  transform: rotate(var(--rot, 0deg));
+  transform-origin: 50% -18px;
+  cursor: pointer;
+  transition: transform 0.35s var(--f-mola);
+}
+
+/* O pregador. */
+.folheto::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  width: 8px;
+  height: 22px;
+  margin-left: -4px;
+  border-radius: 2px;
+  background: var(--f-pino);
+}
+
+@media (hover: hover) {
+  .folheto:hover {
+    transform: rotate(calc(var(--rot, 0deg) + 2.5deg));
+  }
+}
+
+.folheto:active {
+  transform: rotate(calc(var(--rot, 0deg) - 3deg));
+}
+
+.folheto:focus-visible {
+  outline: 3px solid var(--f-acento);
+  outline-offset: 3px;
+}
+
+.folheto .xilo {
+  display: grid;
+  place-items: center;
+  height: 50px;
+  border: 1.5px solid var(--f-papel-tinta);
+}
+
+.folheto .xilo svg {
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--f-papel-tinta);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.folheto strong {
+  font-family: var(--fonte-titulo);
+  font-weight: 900;
+  font-size: 0.8125rem;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.folheto .estado {
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  color: var(--f-papel-tinta-2);
+}
+
+/* O número é miúdo e fica no pé, como a página de um folheto de cordel; passa de 99, vira 99+. */
+.folheto .conta-f {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.375rem;
+  font: 700 0.6875rem var(--fonte-titulo);
+  letter-spacing: 0.02em;
+  color: var(--f-papel-tinta-2);
+}
+
+@media (max-width: 380px) {
+  .folheto {
+    padding-inline: 0.4375rem;
+  }
+
+  .folheto strong {
+    text-transform: none;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Os folhetos descem no fio, um depois do outro, só com o movimento inteiro (nem o Calmo, nem o reduzido). */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-perfil='calmo']) .folheto {
+    animation: fio-pendura 0.6s var(--f-mola) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+@keyframes fio-pendura {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(0deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg));
+  }
+}

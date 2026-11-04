@@ -460,7 +460,11 @@ describe('contraste dos tokens (AA nos dois temas)', () => {
   });
 
   describe('varredura das telas (D-D9, Q7)', () => {
-    const css = () => arquivosCss(path.join(import.meta.dirname, '..', 'src'));
+    // O Arretado novo (D-D25, `src/apresentacao/fio/`) fala a linguagem da Marca (pílula, halo de luz). Esta
+    // varredura guarda o app de sempre, que o Fio substitui por fatias; ela não olha a pasta dele.
+    const DO_FIO = `${path.join('apresentacao', 'fio')}${path.sep}`;
+    const css = () =>
+      arquivosCss(path.join(import.meta.dirname, '..', 'src')).filter((a) => !a.includes(DO_FIO));
 
     it('nenhum CSS usa raio de pílula: a forma vem dos tokens de raio de cada mundo', () => {
       const pilulas = css().flatMap((arquivo) =>

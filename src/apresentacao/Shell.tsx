@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { AplicarAparencia } from './Aparencia';
 import { PuxarEssenciais } from './biblioteca/PuxarEssenciais';
 import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
+import { useInterface } from './fio/interface';
 import { Marca } from './componentes/escrita/Marca';
-import {
-  criarRegistroDeItens,
-  ProvedorDeItensDoMais,
-  useRegistroDeItens,
-} from './componentes/ItensDoMais';
+import { useAtalhoDeRegistrarErro } from './componentes/atalho-de-erro';
+import { criarRegistroDeItens, ProvedorDeItensDoMais } from './componentes/ItensDoMais';
 import { MaisGlobal } from './componentes/MaisGlobal';
 import { MenuAjuda } from './componentes/MenuAjuda';
-import { teclaForaDosAtalhos } from './componentes/teclado';
 import { useTecladoAberto } from './componentes/teclado-aberto';
 import { TracoDeSelecao } from './componentes/traco/TracoDeSelecao';
 import { reabrirGuia, telaDoGuia, useGuiaMontado } from './guia/memoria';
@@ -23,6 +20,12 @@ import { ProvedorDaAbertura } from './entrada/abertura/ProvedorDaAbertura';
 import { AvisoDePosse } from './sincronizacao/AvisoDePosse';
 import { RelatarProblema } from './suporte/RelatarProblema';
 import { RODAPE_CURTO } from './textos';
+
+// O Arretado novo (prévia do Fio, D-D25): a casca dele é outro pedaço de código, baixado só por quem liga a
+// prévia. Quem não liga não paga nem um byte (o pacote do início fica como está).
+const carregarCascaDoFio = () =>
+  import('./fio/CascaDoFio').then((m) => ({ default: m.CascaDoFio }));
+const CascaDoFio = lazy(carregarCascaDoFio);
 
 /** Ícone de linha da navegação: decorativo; o nome da área continua como texto. */
 function IconeDeArea({ d }: { d: string }) {
@@ -53,12 +56,23 @@ function IconeDeArea({ d }: { d: string }) {
  * espera por ela.
  */
 export function Shell() {
+  const fio = useInterface() === 'fio';
+  // A casca nova começa a baixar já, em paralelo com a decisão da Abertura.
+  useEffect(() => {
+    if (fio) void carregarCascaDoFio();
+  }, [fio]);
   // Os itens que a tela acrescenta ao "+" (D-D24): o registro nasce com a casca e a tela se inscreve nele.
   const [registro] = useState(criarRegistroDeItens);
   return (
     <ProvedorDaAbertura>
       <ProvedorDeItensDoMais value={registro}>
-        <CascaDoApp />
+        {fio ? (
+          <Suspense fallback={<div className="shell" />}>
+            <CascaDoFio />
+          </Suspense>
+        ) : (
+          <CascaDoApp />
+        )}
       </ProvedorDeItensDoMais>
     </ProvedorDaAbertura>
   );
@@ -66,29 +80,12 @@ export function Shell() {
 
 function CascaDoApp() {
   const { pathname } = useLocation();
-  const navegar = useNavigate();
   const [relatando, setRelatando] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
   const tecladoAberto = useTecladoAberto();
   const telaComGuia = telaDoGuia(pathname);
   const guiaMontado = useGuiaMontado(telaComGuia);
-  const registro = useRegistroDeItens();
-
-  // Atalho global "E": registrar erro (fora de campos de texto). A tela pode ter o registro dela, ligado ao
-  // que está à vista (no Leitor, o dispositivo no alto da tela, sem sair da lei); sem ele, vai ao registro.
-  useEffect(() => {
-    const tecla = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() !== 'e' || teclaForaDosAtalhos(e)) return;
-      e.preventDefault();
-      const daTela = registro?.itens().find((item) => item.id === 'registrar-erro');
-      if (daTela && daTela.indisponivel !== true) daTela.aoEscolher();
-      else void navegar('/recall/registrar');
-    };
-    window.addEventListener('keydown', tecla);
-    return () => {
-      window.removeEventListener('keydown', tecla);
-    };
-  }, [navegar, registro]);
+  useAtalhoDeRegistrarErro();
 
   return (
     <div className="shell" data-teclado={tecladoAberto ? 'aberto' : undefined}>
