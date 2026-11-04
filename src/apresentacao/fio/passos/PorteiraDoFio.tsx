@@ -61,7 +61,7 @@ export function PorteiraDoFio({
       )}
       {indice === 0 && cartoes.length > 1 && (
         <p className="dica">
-          Artigos vizinhos, misturados de propósito: decidir qual é qual fixa mais.
+          Artigos próximos, misturados de propósito: decidir qual é qual fixa mais.
         </p>
       )}
       <article className="cartao-bloco ache-folha" aria-label="Porteira">

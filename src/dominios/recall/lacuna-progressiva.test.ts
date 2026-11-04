@@ -5,6 +5,7 @@ import {
   nivelDaLacuna,
   ocultosDoNivel,
 } from './lacuna-progressiva';
+import { agendar } from './agendamento';
 import { textoComLacunas } from './servico';
 
 const TEXTO = 'Matar alguém: pena de reclusão, de seis a vinte anos.';
@@ -74,8 +75,15 @@ describe('frenteDaRevisao', () => {
     expect(lacunaCresceu(tres)).toBe(true);
   });
 
-  it('errar derruba a caixa e a lacuna encolhe de volta', () => {
-    expect(frenteDaRevisao(cartao(1))).toBe(cartao(1).frente);
+  it('errar derruba a caixa (pelo agendamento) e a lacuna encolhe de volta', () => {
+    const { caixaDepois } = agendar(
+      { caixa: 4, proximaRevisao: '2026-09-23' },
+      'errei',
+      '2026-09-23',
+    );
+    expect(caixaDepois).toBe(1);
+    expect(frenteDaRevisao(cartao(4))).not.toBe(cartao(4).frente);
+    expect(frenteDaRevisao(cartao(caixaDepois))).toBe(cartao(1).frente);
   });
 
   it('cartão que não é lacuna, ou com a frente editada, fica como está', () => {

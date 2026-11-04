@@ -13,7 +13,12 @@ import {
   vencemAmanha,
   versoEfetivo,
 } from '../../dominios/recall/servico';
-import { frenteDaRevisao, lacunaCresceu } from '../../dominios/recall/lacuna-progressiva';
+import {
+  frenteDaRevisao,
+  lacunaCresceu,
+  nivelDaLacuna,
+  NIVEL_MAXIMO_DA_LACUNA,
+} from '../../dominios/recall/lacuna-progressiva';
 import { Esqueleto, Falha, Vazio } from '../componentes/estados';
 import { Icone, type NomeDoIcone } from '../componentes/Icone';
 import { LinhaDepois } from '../componentes/LinhaDepois';
@@ -185,6 +190,7 @@ export function Drill() {
       if (estado.tipo !== 'revisando' || !atual || ocupado) return;
       setOcupado(true);
       setFalha(null);
+      setEscrito(null);
       // Pelo clique ou pela tecla (1, 2, 3), a resposta ganha o traço de seleção.
       marcarEscolha(`resposta:${resposta}`);
       setEscolhida(resposta);
@@ -322,9 +328,11 @@ export function Drill() {
       <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
         <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
           <p className="drill-frente texto-leitura">{frenteDaRevisao(atual)}</p>
-          {!estado.virado && lacunaCresceu(atual) && (
-            <p className="dica">A lacuna cresce a cada acerto.</p>
-          )}
+          {!estado.virado &&
+            lacunaCresceu(atual) &&
+            nivelDaLacuna(atual.caixa) < NIVEL_MAXIMO_DA_LACUNA && (
+              <p className="dica">A lacuna cresce a cada acerto.</p>
+            )}
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
               <p className="palpite-da-pessoa">
@@ -371,7 +379,7 @@ export function Drill() {
               setEscrito({ id: atual.id, texto: e.target.value });
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 virar();
               }
