@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router';
 import type { Pouso } from '../../../dominios/fio';
 import { Esqueleto } from '../../componentes/estados';
+import { tocar } from '../../toques';
 import { FioQueSePuxa } from '../agora/FioQueSePuxa';
 import { marcarPausa } from '../dados/pausa';
 import { useFio, type FioNaTela } from '../dados/useFio';
@@ -60,6 +61,10 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   useLayoutEffect(() => {
     const atual = faixa.current?.querySelector<HTMLElement>('[aria-pressed="true"]');
     if (faixa.current && atual) faixa.current.scrollLeft = Math.max(0, atual.offsetLeft - 8);
+  }, []);
+  // O pouso chega com uma vibração curta, se a pessoa ligou (Conta › Aparência).
+  useEffect(() => {
+    tocar('pousar');
   }, []);
   const volta = pousosDaVolta(numero);
   const visto = volta.find((p) => p.numero === escolhido) ?? pousoNaVereda(numero);
