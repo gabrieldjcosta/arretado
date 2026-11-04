@@ -14,7 +14,7 @@ export interface PontoDaEtapa {
 }
 
 const LIMITE_DE_PONTOS = 6;
-const TAMANHO_DO_ASSUNTO = 64;
+const TAMANHO_DO_ASSUNTO = 46;
 const CAPUT = /^Art\.\s*\S+$/i;
 
 /** O começo do texto, até `max` letras e sem partir palavra; reticências só quando cortou. */

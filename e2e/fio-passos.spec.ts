@@ -729,6 +729,16 @@ async function ateOPousoComFatos(page: Page) {
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
 }
 
+/** O texto fica inteiro dentro do quadro (`.m-app`), que recorta o que passa da borda. */
+async function dentroDoQuadro(page: Page, alvo: Locator) {
+  const [quadro, caixa] = await Promise.all([
+    page.locator('.m-app').boundingBox(),
+    alvo.boundingBox(),
+  ]);
+  if (!quadro || !caixa) throw new Error('sem caixa');
+  expect(caixa.y + caixa.height).toBeLessThanOrEqual(quadro.y + quadro.height);
+}
+
 /** A razão de contraste (WCAG) entre duas cores `rgb(...)` ou `rgba(...)`; a segunda é o fundo, opaco. */
 const contraste = (a: string, b: string): number => {
   const canais = (c: string) => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
@@ -767,7 +777,9 @@ for (const [largura, altura] of [
         await expect(page.getByRole('button', { name: nome })).toBeInViewport({ ratio: 1 });
       }
       await expect(page.getByText('puxe para seguir')).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('puxe para seguir'));
       await expect(page.getByText('descansar', { exact: true })).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('descansar', { exact: true }));
       await semRolagemLateral(page);
       await semViolacoesNoFio(page);
       // O placeholder também se lê: 4,5:1 contra o fundo do campo.
@@ -776,6 +788,21 @@ for (const [largura, altura] of [
         return { cor: getComputedStyle(el, '::placeholder').color, fundo: estilo.backgroundColor };
       });
       expect(contraste(cor, fundo)).toBeGreaterThanOrEqual(4.5);
+    }
+
+    // Com a lista de assuntos o céu segue curto, e o fio de seguir continua à vista (a Marca, 04/11).
+    await campo.fill('a execução penal');
+    await page.getByRole('button', { name: 'Mostrar o resumo' }).click();
+    await expect(page.locator('.m-evoca-item').first()).toBeVisible();
+    for (const esquema of ['dark', 'light'] as const) {
+      await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+      await expect(page.getByRole('button', { name: /Puxar o fio: seguir/ })).toBeInViewport({
+        ratio: 1,
+      });
+      await expect(page.getByText('descansar', { exact: true })).toBeInViewport({ ratio: 1 });
+      await dentroDoQuadro(page, page.getByText('descansar', { exact: true }));
+      await semRolagemLateral(page);
+      await semViolacoesNoFio(page);
     }
   });
 }

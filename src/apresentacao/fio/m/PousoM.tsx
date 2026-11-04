@@ -188,9 +188,13 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
     async (r) => (momento === 'lista' && etapa ? pontosDaEtapa(r, etapa) : []),
   );
   const listaDePontos = comoLista && pontos.estado === 'pronto' ? pontos.dados : [];
+  // O céu fica curto enquanto houver o que preencher a tela (o campo, depois a lista), para o fio de seguir caber;
+  // só volta cheio no resumo de sempre, sem lista.
+  const ceuCurto =
+    emBranco || (comoLista && (pontos.estado === 'carregando' || listaDePontos.length > 0));
 
   return (
-    <TelaM nome="pouso" className={emBranco ? 'm-pouso m-em-branco' : 'm-pouso'} rotulo="Pouso">
+    <TelaM nome="pouso" className={ceuCurto ? 'm-pouso m-em-branco' : 'm-pouso'} rotulo="Pouso">
       <div className="m-ceu">
         <span className="m-olho">
           Pouso {String(visto.numero)} · {visto.lugar.nome}
@@ -220,7 +224,7 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
         )}
         <div
           className="m-lugares"
-          hidden={emBranco}
+          hidden={ceuCurto}
           role="group"
           aria-label="Pousos da vereda"
           ref={faixa}

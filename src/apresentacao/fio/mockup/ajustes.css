@@ -395,6 +395,11 @@
   padding: 46px 30% 0;
 }
 
+.m-fio.m-fio .m-pouso.m-em-branco .m-corpo {
+  /* Sobe a saída: no pé do quadro de 624 px a dica "puxe para seguir" ficava rente à borda. */
+  padding-bottom: 12px;
+}
+
 .m-fio.m-fio .m-pouso.m-em-branco .m-ceu .m-olho {
   display: block;
   margin-inline: -26%;
@@ -487,8 +492,20 @@
   text-align: left;
   max-width: 100%;
   min-height: 44px;
+  padding-block: 6px;
   border-radius: 14px;
-  line-height: 1.35;
+  line-height: 1.3;
+}
+
+.m-fio.m-fio .m-evoca-item span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.m-fio.m-fio .m-evoca-lista {
+  gap: 4px;
 }
 
 .m-fio.m-fio .m-evoca-item b {
