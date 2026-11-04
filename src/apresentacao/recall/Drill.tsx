@@ -327,11 +327,10 @@ export function Drill() {
           )}
           {estado.virado && (
             <div className="frase-correta" aria-live="polite">
-              {palpite.trim() && (
-                <p className="palpite-da-pessoa">
-                  <span className="palpite-rotulo">Você escreveu</span> {palpite.trim()}
-                </p>
-              )}
+              <p className="palpite-da-pessoa">
+                <span className="palpite-rotulo">Você escreveu:</span>{' '}
+                {palpite.trim() || '(em branco)'}
+              </p>
               <p className="frase-correta-titulo">
                 {atual.tipo === 'lacuna'
                   ? 'Frase completa'

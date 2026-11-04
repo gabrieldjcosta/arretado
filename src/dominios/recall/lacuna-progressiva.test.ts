@@ -55,6 +55,15 @@ describe('ocultosDoNivel', () => {
   });
 });
 
+describe('números primeiro', () => {
+  it('o número, de qualquer tamanho, some no primeiro nível, antes das palavras longas', () => {
+    const t = 'A pena aumenta de 16% e o prazo é de 30 dias, conforme regulamento posterior.';
+    const frente = textoComLacunas(t, ocultosDoNivel(t, [{ inicio: 0, fim: 1 }], 1));
+    expect(frente).not.toMatch(/16|30/);
+    expect(frente).toContain('regulamento');
+  });
+});
+
 describe('frenteDaRevisao', () => {
   it('na caixa 1 é a frente guardada; nas seguintes, a lacuna cresce', () => {
     const um = cartao(1);

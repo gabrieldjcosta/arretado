@@ -8,8 +8,10 @@ import { normalizarOcultos, textoComLacunas } from './servico';
 
 /** O último nível: todas as palavras de conteúdo escondidas. */
 export const NIVEL_MAXIMO_DA_LACUNA = 3;
-/** Palavra de conteúdo: pelo menos cinco letras ou algarismos. */
-const PALAVRA = /[\p{L}\p{N}]{5,}/gu;
+/** Número de qualquer tamanho ("16", "30", "1.001"): na lei é o que mais cai, então some primeiro. */
+const NUMERO = /\p{N}+(?:[.,]\p{N}+)*/gu;
+/** Palavra de conteúdo: pelo menos cinco letras. */
+const PALAVRA = /\p{L}{5,}/gu;
 
 /** O nível da lacuna na caixa 1 a 6: caixa 1 = o que a pessoa escolheu; até o nível máximo. */
 export function nivelDaLacuna(caixa: number): number {
@@ -18,7 +20,8 @@ export function nivelDaLacuna(caixa: number): number {
 
 /**
  * Os trechos escondidos no nível: os da pessoa mais uma fatia das palavras de conteúdo que sobram
- * (um terço, dois terços, todas), as mais longas primeiro e, no empate, as primeiras do texto.
+ * (um terço, dois terços, todas): os números de qualquer tamanho primeiro, depois as palavras mais
+ * longas, e no empate as primeiras do texto.
  */
 export function ocultosDoNivel(
   texto: string,
@@ -28,12 +31,16 @@ export function ocultosDoNivel(
   const escolhidos = normalizarOcultos(texto, base);
   const n = Math.max(0, Math.min(NIVEL_MAXIMO_DA_LACUNA, Math.floor(nivel)));
   if (n === 0) return escolhidos;
-  const livres = [...texto.matchAll(PALAVRA)]
-    .map((m) => ({ inicio: m.index, fim: m.index + m[0].length }))
-    .filter((p) => !escolhidos.some((o) => p.inicio < o.fim && p.fim > o.inicio));
-  const ordem = [...livres].sort(
+  const achar = (re: RegExp) =>
+    [...texto.matchAll(re)]
+      .map((m) => ({ inicio: m.index, fim: m.index + m[0].length }))
+      .filter((p) => !escolhidos.some((o) => p.inicio < o.fim && p.fim > o.inicio));
+  // Primeiro os números, na ordem do texto; depois as palavras, das mais longas às mais curtas.
+  const numeros = achar(NUMERO);
+  const palavras = achar(PALAVRA).sort(
     (a, b) => b.fim - b.inicio - (a.fim - a.inicio) || a.inicio - b.inicio,
   );
+  const ordem = [...numeros, ...palavras];
   const quantas = Math.min(
     ordem.length,
     Math.max(1, Math.round((ordem.length * n) / NIVEL_MAXIMO_DA_LACUNA)),
