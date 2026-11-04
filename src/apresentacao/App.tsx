@@ -28,7 +28,15 @@ import { RecallInicio } from './recall/RecallInicio';
 import { RegistrarErro } from './recall/RegistrarErro';
 import { RegistrarVarios } from './recall/RegistrarVarios';
 import { RevisarFrases } from './recall/RevisarFrases';
-import { Hoje } from './hoje/Hoje';
+import {
+  DestinoDoFio,
+  PaginaInicial,
+  PassoDoFio,
+  PousoDoFio,
+  TelaDoFio,
+  TrocarInterface,
+  Varal,
+} from './fio/Previa';
 import { RotasDoPlano } from './plano/Rotas';
 import { RotasDaSessao } from './sessao/Rotas';
 import { NaoEncontrada } from './telas/Areas';
@@ -127,7 +135,41 @@ export function App({
                   </ProvedorRepositorio>
                 }
               >
-                <Route index element={<Hoje />} />
+                <Route index element={<PaginaInicial />} />
+                <Route
+                  path="destino"
+                  element={
+                    <TelaDoFio>
+                      <DestinoDoFio />
+                    </TelaDoFio>
+                  }
+                />
+                <Route
+                  path="varal"
+                  element={
+                    <TelaDoFio>
+                      <Varal />
+                    </TelaDoFio>
+                  }
+                />
+                <Route
+                  path="fio/passo"
+                  element={
+                    <TelaDoFio>
+                      <PassoDoFio />
+                    </TelaDoFio>
+                  }
+                />
+                <Route
+                  path="fio/pouso"
+                  element={
+                    <TelaDoFio>
+                      <PousoDoFio />
+                    </TelaDoFio>
+                  }
+                />
+                <Route path="fio/ligar" element={<TrocarInterface para="fio" />} />
+                <Route path="fio/desligar" element={<TrocarInterface para="atual" />} />
                 <Route
                   path="comecar"
                   element={

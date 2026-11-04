@@ -1,0 +1,174 @@
+/* O Agora do Arretado novo (D-D25): o fio que se puxa e a ponta dele. Valores do protótipo v14 da Marca. */
+.fio-agora {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: calc(100dvh - 3.5rem - var(--abas-altura) - 1.5rem);
+}
+
+.fio-puxar {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  /* O fio, o nó e a dica cabem em 17,5 rem; o cartão da ponta e a pílula ficam à vista em 360 × 640. */
+  min-height: 17.5rem;
+}
+
+/* Celular curto (568 px de altura, o iPhone SE): o fio encolhe um pouco para o cartão não encostar na pílula. */
+@media (max-height: 600px) {
+  .fio-puxar {
+    min-height: 15.5rem;
+  }
+}
+
+.fio-puxar svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fio-fio-linha {
+  fill: none;
+  stroke: var(--f-fio);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.fio-fio-brilho {
+  fill: none;
+  stroke: var(--f-fio-halo);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+/* O nó que se puxa: 84 px, o ponto de luz com a seta. Arrasta para baixo ou toca. */
+.fio-puxador {
+  position: absolute;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin-left: -42px;
+  padding: 0;
+  border: 0;
+  color: #3a2700;
+  touch-action: none;
+  cursor: grab;
+}
+
+.fio-puxador:active {
+  cursor: grabbing;
+}
+
+.fio-puxador:focus-visible {
+  outline: 3px solid var(--f-acento);
+  outline-offset: 6px;
+}
+
+.fio-puxador svg {
+  position: static;
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fio-dica {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+  color: var(--titulo);
+  pointer-events: none;
+}
+
+.fio-dica small {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--fonte-interface);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  color: var(--texto-atenuado);
+}
+
+/* Na ponta do fio: o que vem no próximo puxão. */
+.fio-proximo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 20px;
+  background: var(--f-vidro);
+  margin-bottom: 0.5rem;
+}
+
+.fio-proximo .fio-olho {
+  grid-column: 1 / -1;
+}
+
+.fio-proximo strong {
+  font-family: var(--fonte-titulo);
+  font-size: 1.125rem;
+  color: var(--titulo);
+}
+
+.fio-proximo strong,
+.fio-proximo > span:not(.fio-olho, .fio-min) {
+  grid-column: 1;
+}
+
+.fio-proximo > span:not(.fio-olho, .fio-min) {
+  font-size: 0.8125rem;
+  color: var(--texto-atenuado);
+}
+
+.fio-proximo .fio-min {
+  grid-row: 2 / 4;
+  grid-column: 2;
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 0.9375rem;
+  color: var(--f-tempo);
+}
+
+/* O Agora sem nenhuma matéria: uma pergunta e um botão, nunca uma lista de começos. */
+.fio-comeco {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-perfil='calmo']) .fio-puxador {
+    /* Só "backwards": com "both" o último quadro (transform: none) seguraria o nó e o arrasto não o moveria. */
+    animation: fio-desce 0.7s var(--f-mola) backwards;
+  }
+}
+
+@keyframes fio-desce {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

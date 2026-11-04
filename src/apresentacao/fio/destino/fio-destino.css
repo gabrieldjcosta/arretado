@@ -1,0 +1,48 @@
+/* O Destino do Arretado novo (D-D25). Primeira versão: o caminho em pousos; o mapa vem nas próximas fatias. */
+.fio-destino {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding-top: 0.5rem;
+}
+
+.fio-caminho {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0.75rem 0 0 0.5rem;
+  padding: 0 0 0 1.5rem;
+  list-style: none;
+  border-left: 2px solid var(--f-fio);
+}
+
+.fio-caminho li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fio-caminho li::before {
+  content: '';
+  position: absolute;
+  left: calc(-1.5rem - 7px);
+  top: 0.3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--f-ponto);
+  box-shadow: var(--f-halo-do-ponto);
+}
+
+.fio-caminho strong {
+  color: var(--titulo);
+  font-family: var(--fonte-titulo);
+  font-size: 1.0625rem;
+}
+
+.fio-caminho span {
+  color: var(--texto-atenuado);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
