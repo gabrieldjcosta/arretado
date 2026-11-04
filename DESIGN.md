@@ -291,6 +291,8 @@ A casca: cabeçalho preso no alto, de 60 px, no chão, com o nome "arretado" esc
 
 No Hoje a ordem é: título com "+", a folha do Agora (com a estimativa e o link "tenho outro tempo"), a linha de parada ("Retomar em"), a linha recolhida "Começar uma Sessão" e o "Em seguida" (um menu expansível). As dicas da tela só vêm pela Ajuda ("O que cada opção faz") e os pontos do Dia só depois do primeiro aceso: o Hoje abre com um cartão e um botão (D-D16). Quando houve algo hoje vem o Resumo do Dia; a Sessão aberta, quando há, toma o lugar do Agora, e o aviso de volta de pausa vem depois da folha. A tela inteira sai de um só retrato dos dados (`useRetratoDoHoje`), para os pontos, a linha de parada, o Agora e o "Em seguida" nunca discordarem entre si. A partir de 900 px, a parte do meio vira duas colunas, 7fr · 5fr, dentro da coluna de 900 px: à esquerda a folha do Agora e a linha de parada; à direita o "Em seguida" e os avisos (a coluna fica vazia quando não há nenhum). O Resumo do Dia, as revisões, a captura e o aviso de backup seguem em largura inteira, embaixo.
 
+Na Biblioteca (Normas) a ordem é: as abas, a linha "Retomar" (quando há leitura), a busca com o chip "Filtrar", a lista de Normas e o fecho (o tamanho do acervo, "Puxar mais normas do acervo", o atalho do edital e "Importar norma"). O título da área e o "Normas" da seção existem só para leitor de tela (D-D19).
+
 Alvos de toque de pelo menos 44 px (campos em 48). Nenhuma tela rola na horizontal a 390 px, a 200% de zoom nem com a fonte a 200%; palavras longas quebram (`overflow-wrap: anywhere`). Limite conhecido: com a fonte a 300% no celular o dock do Leitor e o "Lido até aqui" não cabem entre o cabeçalho e as abas.
 
 ## Elevation & Depth

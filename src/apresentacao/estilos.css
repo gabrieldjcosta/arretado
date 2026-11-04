@@ -2376,6 +2376,47 @@ dialog.dialogo-busca {
   min-height: var(--alvo);
 }
 
+/* Biblioteca › Normas (D-D19): a busca e o chip "Filtrar" na mesma linha; os três filtros ficam atrás do chip. */
+.barra-de-normas {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.barra-de-normas .busca-campo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chip-filtrar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--alvo);
+  padding: 0 0.9rem;
+}
+
+/* O número de filtros ligados: a marca da cor de ação, para o chip dizer que a lista está afinada. */
+.chip-contagem {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: var(--raio-chip);
+  background: var(--acao);
+  color: var(--acao-texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#filtros-normas {
+  margin-top: 0.5rem;
+}
+
 .busca-endereco {
   margin-top: 0.75rem;
 }
@@ -3901,13 +3942,34 @@ dialog.dialogo-previa .linha-acoes button {
   justify-content: center;
 }
 
-/* Biblioteca › Normas: a linha "Retomar" no lugar da folha grande do Agora (que fica só no Hoje). */
-.retomar-leitura {
+/* Biblioteca › Normas (D-D19): a linha "Retomar", uma linha de 44 px com o lugar, os minutos e a seta, no
+   lugar do botão escuro (a folha grande do Agora fica só no Hoje). O texto quebra se for longo ou se a
+   fonte estiver grande: nada fica atrás de reticências. */
+.retomar-linha {
+  margin: 0.75rem 0 0;
+}
+
+.retomar-link {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.25rem 0.75rem;
-  margin-block: 0.75rem;
+  gap: 0.75rem;
+  min-height: var(--alvo);
+  padding: 0.25rem 0.75rem;
+  border: var(--borda-folha);
+  border-radius: var(--raio-botao);
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.retomar-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.retomar-tempo {
+  flex: none;
 }
 
 /* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */

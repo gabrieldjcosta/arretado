@@ -55,9 +55,9 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   await expect(faixa).toHaveCount(0);
   await semViolacoes(page);
 
-  // Com normas, o caminho até o acervo continua à vista.
+  // Com normas, o caminho até o acervo fecha a lista (D-D19).
   await expect(normas.getByRole('link', { name: /^Tudo do edital/ })).toHaveCount(0);
-  await normas.getByRole('link', { name: 'Adicionar do acervo' }).click();
+  await normas.getByRole('link', { name: 'Puxar mais normas do acervo' }).click();
   await expect(page.getByRole('heading', { name: 'Acervo: normas' })).toBeVisible();
   await semViolacoes(page);
   await page.getByRole('link', { name: 'Voltar à Biblioteca' }).click();
@@ -82,6 +82,16 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   });
   await page.getByRole('link', { name: 'Ver na Biblioteca' }).click();
   await abrirTodasAsNormas(page);
+  await expect(normas.locator('li')).toHaveCount(2);
+
+  // Os filtros ficam atrás do chip "Filtrar" (D-D19): fechados, não ocupam a tela; abertos, afinam a lista.
+  await expect(normas.getByLabel('Ano')).toBeHidden();
+  await normas.getByRole('button', { name: 'Filtrar' }).click();
+  await normas.getByLabel('Ano').selectOption('1984');
+  await expect(normas.locator('li')).toHaveCount(1);
+  await expect(normas.getByRole('button', { name: 'Filtrar, 1 ativo' })).toBeVisible();
+  await semViolacoes(page);
+  await normas.getByRole('button', { name: 'Limpar filtros' }).click();
   await expect(normas.locator('li')).toHaveCount(2);
 });
 

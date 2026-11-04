@@ -2169,6 +2169,13 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Dois Ciclos "Equilibrado" ou nenhum ativo.** Causa: duas abas abertas juntas criavam o Ciclo padrão, e a trava por módulo não vale entre abas. Solução: conferir de novo e criar dentro de `repo.transacao`.
 - **Previsível:** `garantirCicloPadrao` chama `carregarCiclo`, que tenta ler `/incidencia/` só para montar as matérias; o "Equilibrado" não usa incidência. Só pega quem tem Edital ligado a Concurso (nenhum fluxo grava isso hoje). Se aparecer lentidão no fim do onboarding, montar as matérias só com Disciplinas e Pontos.
 
+## A Biblioteca abre pela lista (D-D19, 03/11/2026)
+
+- **Teste que muda Disciplina, Ano ou Tipo de norma passa no jsdom e falha no navegador.** Causa: os três filtros ficam atrás do chip "Filtrar" (`hidden`); o `getByLabelText` do jsdom acha o campo mesmo escondido, o Playwright não o deixa selecionar. Solução: clicar em "Filtrar" antes (nos dois), e conferir a visibilidade com `toBeVisible`/`toBeHidden`.
+- **O painel dos filtros abre sozinho ao voltar do leitor.** Não é defeito: os critérios vivem no endereço (`?disciplina=`, `?ano=`, `?tipo=`) e o painel começa aberto se algum está ligado; `?q=` (a busca) não abre nada, porque o campo já está à vista.
+- **O "Retomar" não é mais `.principal`.** Quem procurar a ação dominante da Biblioteca com `.principal` encontra o "Puxar mais normas do acervo", no fim da lista; o "Retomar" é o link `.retomar-link`.
+- **O chip "Filtrar" com número falhava no axe (`label-content-name-mismatch`) e o nome vinha com espaço antes da vírgula.** Causa: um texto escondido (`.visualmente-oculto`) dentro de um botão `inline-flex` vira outro item flex, e o nome acessível ganha espaço ("Filtrar , 1 ativo"); com o nome só em `aria-label`, o número à vista ("Filtrar 1") deixava de caber nele. Solução: `aria-label="Filtrar, N ativos"` e um espaço de texto entre "Filtrar" e o número (o axe tira a pontuação e compara "filtrar 1" com "filtrar 1 ativos"). Vale para qualquer botão com contagem.
+- **Previsível:** (a) com fonte a 200% o "Retomar: <norma>, <artigo>" e os minutos quebram em duas ou três linhas dentro da linha (de propósito: nada fica atrás de reticências); (b) o número do fecho vem de `fonte.listar()`, então sem rede e sem cache do índice o cartão fica só com os botões.
 ## A folha do Passeio tem altura fixa: texto novo se mede (D-D18, 03/11/2026)
 
 - **Sintoma:** com as seis ferramentas e as frases inteiras do Gabriel, a Biblioteca passou de 333 para 406 px e a folha passou a rolar no monitor (a área útil mede 354 px) e no 320 × 568 (cerca de 327 px), com o cartão cortado embaixo.

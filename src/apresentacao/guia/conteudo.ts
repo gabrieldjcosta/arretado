@@ -108,7 +108,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     uso: [{ opcao: 'Frases · Cartões · Histórico', efeito: 'o que você guardou, em três listas.' }],
   },
   biblioteca: {
-    versao: 4,
+    versao: 5,
     vazio: [
       {
         opcao: 'Escolher meu concurso',
@@ -126,8 +126,12 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     uso: [
       { opcao: 'Buscar norma', efeito: 'procura entre as Normas da sua Biblioteca.' },
       {
-        opcao: 'Disciplina · Ano · Tipo de norma',
-        efeito: 'afinam a lista de Normas.',
+        opcao: 'Filtrar',
+        efeito: 'afina a lista por Disciplina, Ano e Tipo de norma.',
+      },
+      {
+        opcao: 'Puxar mais normas do acervo',
+        efeito: 'fecha a lista: traz do acervo as normas que ainda não estão na sua Biblioteca.',
       },
     ],
   },
