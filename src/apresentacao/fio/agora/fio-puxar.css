@@ -151,3 +151,21 @@
     animation-delay: 0.9s;
   }
 }
+
+/* O neon amarelo do fio (prancha das oito ideias, v2 da Marca): um halo duplo na linha que sobe com o puxão e
+   estoura depois do limite; o nó ganha o seu quando passa. */
+.fio-fio-linha {
+  filter: drop-shadow(0 0 4px rgb(255 197 61 / 55%)) drop-shadow(0 0 14px rgb(255 197 61 / 32%));
+}
+
+.fio-puxar[data-puxe='puxando'] .fio-fio-linha {
+  filter: drop-shadow(0 0 6px rgb(255 197 61 / 70%)) drop-shadow(0 0 20px rgb(255 197 61 / 42%));
+}
+
+.fio-puxar[data-puxe='passou'] .fio-fio-linha {
+  filter: drop-shadow(0 0 6px rgb(255 214 110 / 95%)) drop-shadow(0 0 28px rgb(255 197 61 / 60%));
+}
+
+.fio-puxar[data-puxe='passou'] .fio-puxador {
+  filter: drop-shadow(0 0 22px rgb(255 197 61 / 80%));
+}

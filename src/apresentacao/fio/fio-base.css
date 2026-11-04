@@ -528,3 +528,71 @@
   outline-offset: 3px;
   border-radius: inherit;
 }
+
+/* ---------- Botão de ação: "Sol" no Vivo (padrão) e "Só contorno" no Calmo (Gabriel, 04/11/2026) ---------- */
+/* Sol: o botão é o próprio sol de manhã; igual de dia e de noite. O afundar ao toque fica (scale .95, mola). */
+.shell-fio .fio-acao {
+  background: radial-gradient(
+    130% 170% at 50% 0%,
+    #fff7da 0%,
+    #ffd96e 34%,
+    #ffc53d 68%,
+    #f2b228 100%
+  );
+  color: #3a2700;
+  box-shadow:
+    inset 0 0 0 1.5px rgb(211 146 0 / 55%),
+    0 0 0 5px rgb(255 197 61 / 14%),
+    0 10px 26px -12px rgb(255 190 50 / 80%);
+  transition:
+    transform 0.3s var(--f-mola),
+    box-shadow 0.25s var(--f-sair);
+}
+
+@media (hover: hover) {
+  .shell-fio .fio-acao:hover:not([disabled]) {
+    box-shadow:
+      inset 0 0 0 1.5px rgb(211 146 0 / 70%),
+      0 0 0 6px rgb(255 197 61 / 20%),
+      0 0 26px rgb(255 197 61 / 55%);
+  }
+}
+
+.shell-fio .fio-acao:active:not([disabled]) {
+  box-shadow:
+    inset 0 0 0 1.5px rgb(211 146 0 / 70%),
+    0 0 0 6px rgb(255 197 61 / 20%),
+    0 0 26px rgb(255 197 61 / 55%);
+}
+
+.shell-fio .fio-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 35%);
+}
+
+/* Só contorno (perfil Calmo): sem preenchimento; o sol só aparece no brilho ao tocar. Sem escala. */
+:root[data-perfil='calmo'] .shell-fio .fio-acao {
+  background: transparent;
+  color: var(--texto);
+  box-shadow: inset 0 0 0 1.5px #d39200;
+}
+
+@media (hover: hover) {
+  :root[data-perfil='calmo'] .shell-fio .fio-acao:hover:not([disabled]) {
+    box-shadow:
+      inset 0 0 0 1.5px #d39200,
+      0 0 0 5px rgb(255 197 61 / 18%),
+      0 0 24px rgb(255 197 61 / 35%);
+  }
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-acao:active:not([disabled]) {
+  transform: none;
+  box-shadow:
+    inset 0 0 0 1.5px #d39200,
+    0 0 0 5px rgb(255 197 61 / 18%),
+    0 0 24px rgb(255 197 61 / 35%);
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
+}
