@@ -34,6 +34,11 @@ const NS = 'http://www.w3.org/2000/svg';
 /** Os pontos do fio no quadro: tantos quanto o mockup, para a curva ser a mesma. */
 const PONTOS = 96;
 const AMOSTRAS = 480;
+/**
+ * A faixa de baixo do fio que voa é o neon amarelo do ponto, a .38 (desvio 20 de `ajustes.css`). Ao chegar ao mapa ela se
+ * apaga a partir desse valor: o mockup a levava a 1 antes de apagar, e em amarelo isso estoura.
+ */
+const OPACIDADE_DA_FAIXA = 0.38;
 
 const quadroDoFio = () => document.getElementById('conteudo');
 
@@ -168,7 +173,7 @@ export async function trocarDeAba(para: string, navegar: () => void): Promise<vo
       if (tracejar && k > 0.55) {
         const q = (k - 0.55) / 0.45;
         linha.style.strokeDasharray = `${(300 * (1 - q) + 7 * q).toFixed(1)} ${(8 * q).toFixed(1)}`;
-        brilho.style.opacity = String(1 - q);
+        brilho.style.opacity = String(OPACIDADE_DA_FAIXA * (1 - q));
       }
       if (k < 1) requestAnimationFrame(passo);
       else fim();

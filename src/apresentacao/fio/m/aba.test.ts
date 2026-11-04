@@ -84,6 +84,60 @@ describe('a troca de aba do mockup (o fio que voa de uma tela à outra)', () => 
     expect(document.querySelector('.m-voo-fio')).toBeNull();
   });
 
+  it('o voo ao Destino apaga a faixa de baixo a partir dos .38 do neon amarelo (desvio 20), sem passar por 1', async () => {
+    vi.useFakeTimers({ toFake: ['performance', 'requestAnimationFrame', 'cancelAnimationFrame'] });
+    try {
+      // O que o voo pede ao fim: animações que acabam na hora e `getAnimations` (o jsdom não tem nenhum dos dois).
+      (Element.prototype as ComAnimate).animate = vi.fn(() => ({ finished: Promise.resolve() }));
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [];
+      simularMovimento('normal');
+      vi.stubGlobal(
+        'DOMMatrix',
+        class {
+          m41 = 0;
+          m42 = 0;
+        },
+      );
+      montarOAgoraComFio();
+      marcarDestinoVisto();
+      // A tela do mapa entra: o tracejado dela é outra reta de 300 px, mais à esquerda e mais abaixo.
+      const navegar = vi.fn(() => {
+        const quadro = document.getElementById('conteudo');
+        const tela = document.createElement('section');
+        tela.dataset.tela = 'mapa';
+        const tracejado = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        tracejado.setAttribute('class', 'm-tracejado');
+        const caminho = tracejado as unknown as {
+          getTotalLength: () => number;
+          getPointAtLength: (n: number) => { x: number; y: number };
+          getScreenCTM: () => object;
+        };
+        caminho.getTotalLength = () => 300;
+        caminho.getPointAtLength = (n) => ({ x: 80, y: 120 + n });
+        caminho.getScreenCTM = () => ({});
+        tela.appendChild(tracejado);
+        quadro?.appendChild(tela);
+        definirTela('mapa');
+      });
+      const fim = trocarDeAba('mapa', navegar);
+      const faixas: number[] = [];
+      for (let t = 0; t < 1400; t += 16) {
+        await vi.advanceTimersByTimeAsync(16);
+        const faixa = document.querySelector<SVGPathElement>('.m-voo-fio .m-brilho');
+        if (faixa?.style.opacity) faixas.push(Number(faixa.style.opacity));
+      }
+      await fim;
+      // Só a segunda metade do voo mexe na faixa (a partir de 55%); ela nunca passa dos .38 e acaba apagada.
+      expect(faixas.length).toBeGreaterThan(5);
+      expect(Math.max(...faixas)).toBeLessThanOrEqual(0.38 + 1e-9);
+      expect(Math.min(...faixas)).toBeLessThan(0.05);
+      expect(document.querySelector('.m-voo-fio')).toBeNull();
+    } finally {
+      delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      vi.useRealTimers();
+    }
+  });
+
   it('depois da primeira visita o fio voa: espera a tela nova, e se ela não chega, desiste sem deixar nada no quadro', async () => {
     vi.useFakeTimers({ toFake: ['performance', 'requestAnimationFrame', 'cancelAnimationFrame'] });
     try {

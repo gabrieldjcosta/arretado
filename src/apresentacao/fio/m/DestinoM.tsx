@@ -204,13 +204,7 @@ export function DestinoM() {
       <p className="m-quieto" style={{ marginTop: 6 }}>
         {texto}
       </p>
-      {falhou ? (
-        <p className="m-quieto" role="alert">
-          Não deu para abrir o mapa agora. Tente de novo em instantes.
-        </p>
-      ) : (
-        <MapaM entrada={entrada} intro={intro} atraso={atraso} />
-      )}
+      {/* A legenda explica os pontos, então vem antes do mapa (desvio 35): depois dele, em 360 de largura, caía no pé do quadro, atrás da pílula. */}
       <div className="m-legenda-mapa">
         <span>
           <i />
@@ -222,6 +216,13 @@ export function DestinoM() {
         </span>
         {foraDoMapa > 0 && <span>O mapa mostra as nove primeiras matérias do seu Ciclo.</span>}
       </div>
+      {falhou ? (
+        <p className="m-quieto" role="alert">
+          Não deu para abrir o mapa agora. Tente de novo em instantes.
+        </p>
+      ) : (
+        <MapaM entrada={entrada} intro={intro} atraso={atraso} />
+      )}
       {pousos.length > 0 && (
         <ol className="m-so-leitor" aria-label="Seus pousos, do mais recente ao mais antigo">
           {pousos.map((p) => (

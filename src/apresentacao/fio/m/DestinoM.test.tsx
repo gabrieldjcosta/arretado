@@ -162,6 +162,19 @@ describe('o Destino no quadro do mockup', () => {
     );
   });
 
+  it('a legenda vem entre o texto e o mapa (desvio 35): depois dele, em 360 de largura, ficava atrás da pílula', () => {
+    const { container } = abrir(jornada(entrada()));
+    const legenda = container.querySelector('.m-legenda-mapa');
+    const texto = container.querySelector('p.m-quieto');
+    const mapa = container.querySelector('#m-destino');
+    expect(legenda).not.toBeNull();
+    expect(texto).not.toBeNull();
+    expect(mapa).not.toBeNull();
+    // `compareDocumentPosition` com FOLLOWING (4): o segundo nó vem depois do primeiro.
+    expect(texto?.compareDocumentPosition(legenda as Node)).toBe(4);
+    expect(legenda?.compareDocumentPosition(mapa as Node)).toBe(4);
+  });
+
   it('os pousos vão para o leitor de tela numa lista, do mais recente ao mais antigo', () => {
     abrir(
       jornada(entrada({ pousosPorMateria: { exec: 2 } }), {

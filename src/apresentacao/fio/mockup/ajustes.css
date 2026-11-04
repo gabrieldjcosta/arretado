@@ -371,8 +371,17 @@
 }
 
 /* O traço que anda no mapa do Destino (`.m-andado-b`, a faixa de baixo): amarelo do ponto, largura 10, opacidade
-   .38 e o desfoque do mockup. Só passa a valer quando o Destino entrar no quadro. */
+   .38 e o desfoque do mockup. */
 .m-fio.m-fio.m-fio .m-destino .m-andado-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
+}
+
+/* O fio que voa de uma aba à outra (`.m-voo-fio .m-b`, a faixa de baixo) também é um traço que anda: a mesma faixa
+   amarela, nos dois mundos (o mockup a acende em ciano à noite). Revisão da Marca no #419. O voo ao Destino apaga a
+   faixa a partir dos .38 (`m/aba.ts`), e não de 1. */
+.m-fio.m-fio.m-fio .m-voo-fio .m-b {
   stroke: var(--m-ponto);
   stroke-width: 10;
   opacity: 0.38;

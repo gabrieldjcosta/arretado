@@ -172,6 +172,15 @@ test('no celular e no monitor o Destino cabe, de noite e de dia, e o monitor gan
         document.querySelector('main.m-app')?.classList.contains('m-largo'),
       ),
     ).toBe(true);
+    if (w < 500) {
+      // Desvio 35: no celular a legenda vem entre o texto e o mapa, e não cai atrás da pílula dos três lugares.
+      const legenda = await page.locator('.m-legenda-mapa').boundingBox();
+      const pilula = await nav(page).boundingBox();
+      expect(legenda).not.toBeNull();
+      expect(pilula).not.toBeNull();
+      expect((legenda?.y ?? 0) + (legenda?.height ?? 0)).toBeLessThanOrEqual(caixa?.y ?? 0);
+      expect((legenda?.y ?? 0) + (legenda?.height ?? 0)).toBeLessThanOrEqual(pilula?.y ?? 0);
+    }
     await semViolacoesNoFio(page);
   }
 });
@@ -438,3 +447,38 @@ test('depois da primeira visita o fio voa de uma aba à outra e não deixa fio n
   await expect.poll(() => pendurado.evaluate((el) => getComputedStyle(el).opacity)).not.toBe('0');
   await semViolacoesNoFio(page);
 });
+
+for (const [esquema, mundo] of [
+  ['dark', 'de noite'],
+  ['light', 'de dia'],
+] as const) {
+  test(`o fio que voa leva a faixa amarela do neon e não a ciana (desvio 20), ${mundo}`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await page.emulateMedia({ colorScheme: esquema });
+    await page.addInitScript((chave) => {
+      localStorage.setItem(chave, '1');
+    }, CHAVE_DA_VISITA);
+    await prepararAPrevia(page, false);
+    await page.evaluate(() => {
+      const w = window as unknown as { __faixa?: { cor: string; largura: string } };
+      new MutationObserver((registros) => {
+        for (const r of registros) {
+          for (const n of r.addedNodes) {
+            if (!(n instanceof Element) || !n.classList.contains('m-voo-fio')) continue;
+            const faixa = n.querySelector('.m-b');
+            if (!faixa) continue;
+            const estilo = getComputedStyle(faixa);
+            w.__faixa = { cor: estilo.stroke, largura: estilo.strokeWidth };
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    });
+    await nav(page).getByRole('button', { name: 'Destino' }).click();
+    // `--m-ponto` (#ffc53d) e a largura 10 do desvio 20; o ciano (#39caef) era o do mockup à noite.
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __faixa?: unknown }).__faixa ?? null))
+      .toEqual({ cor: 'rgb(255, 197, 61)', largura: '10px' });
+  });
+}
