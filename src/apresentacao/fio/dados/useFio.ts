@@ -2,7 +2,7 @@
 // gerador) e as ações que mexem nos dois. Agora, passo e pouso usam o mesmo hook, então o que uma
 // tela grava a outra lê no mesmo instante.
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavegarComTransicao } from '../transicao';
 import type { Repositorio } from '../../../core/persistencia';
 import {
   concluirPasso,
@@ -41,7 +41,7 @@ export interface FioNaTela {
 export function useFio(): FioNaTela {
   const repo = useRepositorio();
   const fonte = useFonteIncidencia();
-  const navegar = useNavigate();
+  const navegar = useNavegarComTransicao();
   const usuarioId = repo.ctx.usuarioId;
   const { fio, gravar } = useFioGuardado(usuarioId);
   const etapasFeitas = fio.estado.etapasFeitas;
@@ -65,8 +65,8 @@ export function useFio(): FioNaTela {
       if (!entrada) return;
       const depois = avancar({ estado, marcas: {} }, entrada);
       gravar(entrarNoPasso(depois, entrada));
-      if (depois.proximo.tipo === 'pouso') void navegar(ROTA_DO_POUSO, { replace: true });
-      else if (depois.proximo.tipo === 'sem_materia') void navegar('/', { replace: true });
+      if (depois.proximo.tipo === 'pouso') navegar(ROTA_DO_POUSO, { replace: true });
+      else if (depois.proximo.tipo === 'sem_materia') navegar('/', { replace: true });
     },
     [entrada, gravar, navegar],
   );
@@ -74,9 +74,9 @@ export function useFio(): FioNaTela {
   const puxar = useCallback(() => {
     if (!entrada || !avanco) return;
     gravar(entrarNoPasso(avanco, entrada));
-    if (avanco.proximo.tipo === 'passo') void navegar(ROTA_DO_PASSO);
-    else if (avanco.proximo.tipo === 'pouso') void navegar(ROTA_DO_POUSO);
-    else void navegar('/comecar');
+    if (avanco.proximo.tipo === 'passo') navegar(ROTA_DO_PASSO);
+    else if (avanco.proximo.tipo === 'pouso') navegar(ROTA_DO_POUSO);
+    else navegar('/comecar');
   }, [avanco, entrada, gravar, navegar]);
 
   const concluir = useCallback(
@@ -93,7 +93,7 @@ export function useFio(): FioNaTela {
   const pousarEtapa = useCallback((): Pouso | undefined => {
     const { estado, pouso } = pousar(fio.estado);
     gravar({ estado, marcas: {} });
-    void navegar('/', { replace: true });
+    navegar('/', { replace: true });
     return pouso;
   }, [fio.estado, gravar, navegar]);
 

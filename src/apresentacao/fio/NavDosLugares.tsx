@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { LinkDoFio } from './LinkDoFio';
 import { LUGARES, lugarDaRota } from './lugares';
 
 /**
@@ -30,13 +31,13 @@ export function NavDosLugares() {
     <nav className="fio-nav" aria-label="Lugares" ref={caixa}>
       <span className="fio-indicador" ref={indicador} aria-hidden="true" />
       {LUGARES.map((l) => (
-        <Link
+        <LinkDoFio
           key={l.id}
           to={l.caminho}
           {...(atual === l.id ? { 'aria-current': 'page' as const } : {})}
         >
           {l.nome}
-        </Link>
+        </LinkDoFio>
       ))}
     </nav>
   );

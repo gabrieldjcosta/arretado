@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { AplicarAparencia } from '../Aparencia';
 import { PuxarEssenciais } from '../biblioteca/PuxarEssenciais';
 import { useAtalhoDeRegistrarErro } from '../componentes/atalho-de-erro';
@@ -16,6 +16,7 @@ import { RelatarProblema } from '../suporte/RelatarProblema';
 import { semPilulaDosLugares } from './lugares';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
+import { LinkDoFio } from './LinkDoFio';
 import './fio-base.css';
 
 /**
@@ -58,9 +59,9 @@ export function CascaDoFio() {
         Pular para o conteúdo
       </a>
       <header className="fio-topo">
-        <Link to="/conta" className="fio-marca" aria-label="Arretado: sua conta e ajustes">
+        <LinkDoFio to="/conta" className="fio-marca" aria-label="Arretado: sua conta e ajustes">
           <MarcaDoFio />
-        </Link>
+        </LinkDoFio>
         <div className="acoes-globais">
           <MenuAjuda
             paraAjuda={`/orientacoes/${secaoDeAjuda(pathname)}`}

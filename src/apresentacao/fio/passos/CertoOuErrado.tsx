@@ -1,10 +1,12 @@
 // Um cartão de certo ou errado do Fio (a porteira e a queda da lacuna): a frase como a tela a
 // mostra, duas respostas e, depois de responder, o que a lei diz. A frase falsa nunca é gravada.
+import { useEffect, useRef } from 'react';
 import type {
   CartaoCertoOuErrado,
   RespostaCertoOuErrado,
 } from '../../../dominios/legislacao/lembrar';
 import { conferirCartao } from '../../../dominios/legislacao/lembrar';
+import { tic } from '../toque';
 
 /** O texto depois de responder: a troca riscada ao lado do que a lei diz. */
 function TextoDepois({ cartao }: { cartao: CartaoCertoOuErrado }) {
@@ -30,6 +32,11 @@ export function CertoOuErrado({
   resposta?: RespostaCertoOuErrado;
   aoResponder: (resposta: RespostaCertoOuErrado, acertou: boolean) => void;
 }) {
+  const aviso = useRef<HTMLParagraphElement>(null);
+  const acertouAgora = resposta !== undefined && conferirCartao(cartao, resposta);
+  useEffect(() => {
+    if (acertouAgora) tic(aviso.current);
+  }, [acertouAgora]);
   const responder = (r: RespostaCertoOuErrado) => {
     aoResponder(r, conferirCartao(cartao, r));
   };
@@ -64,7 +71,7 @@ export function CertoOuErrado({
   const acertou = conferirCartao(cartao, resposta);
   return (
     <div aria-live="polite">
-      <p className="ache-instrucao" role="status">
+      <p className="ache-instrucao" role="status" ref={aviso}>
         {acertou
           ? cartao.troca
             ? 'Isso. Havia uma troca.'

@@ -1,10 +1,12 @@
-import { useId, useState, type CSSProperties } from 'react';
-import { Link } from 'react-router';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import type { Repositorio } from '../../../core/persistencia';
 import { listarResumos } from '../../../dominios/notas/resumos';
 import { contarFrasesVencidas, contarVencidos } from '../../../dominios/recall/servico';
 import { useDados } from '../../dados/contexto';
 import { DialogoDoLembrete } from '../../hoje/DialogoDoLembrete';
+import { movimentoAgora } from '../../movimento';
+import { LinkDoFio } from '../LinkDoFio';
 import './fio-varal.css';
 
 /** O que cada folheto mostra no pé: um número miúdo e uma linha de estado (D-D25, "Dentro do Varal"). */
@@ -159,13 +161,35 @@ function Corpo({
     '--rot': `${String(INCLINACAO[posicao] ?? 0)}deg`,
   } as CSSProperties;
   return folheto.caminho ? (
-    <Link className="folheto" to={folheto.caminho} style={estilo}>
+    <LinkDoFio className="folheto" to={folheto.caminho} style={estilo}>
       {conteudo}
-    </Link>
+    </LinkDoFio>
   ) : (
     <button type="button" className="folheto" style={estilo} onClick={aoLembrete}>
       {conteudo}
     </button>
+  );
+}
+
+/**
+ * Uma linha do varal. Os folhetos têm chave estável: quando um muda de lugar, entra ou sai (a lista de cada
+ * linha cresce com o uso), ele desliza para a vaga em vez de pular (Auto-Animate, ~3 kB). Com movimento
+ * reduzido do sistema a biblioteca já não anima; no Calmo a duração é só um fade.
+ */
+function LinhaDoVaral({ rotulo, children }: { rotulo: string; children: ReactNode }) {
+  const [ref] = useAutoAnimate<HTMLDivElement>({
+    duration: movimentoAgora() === 'calmo' ? 160 : 320,
+    easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+  });
+  return (
+    <div className="varal-linha" ref={ref} role="group" aria-label={rotulo}>
+      <svg className="varal-fio" viewBox="0 0 900 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 6 Q450 34 900 6" className="varal-fio-linha" />
+        <path d="M0 6 Q450 34 900 6" className="varal-fio-brilho" />
+      </svg>
+      <span className="varal-rotulo">{rotulo}</span>
+      {children}
+    </div>
   );
 }
 
@@ -188,17 +212,7 @@ export function Varal() {
       </h1>
       <div className="varal">
         {linhas.map((linha) => (
-          <div className="varal-linha" key={linha.rotulo} role="group" aria-label={linha.rotulo}>
-            <svg
-              className="varal-fio"
-              viewBox="0 0 900 40"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path d="M0 6 Q450 34 900 6" className="varal-fio-linha" />
-              <path d="M0 6 Q450 34 900 6" className="varal-fio-brilho" />
-            </svg>
-            <span className="varal-rotulo">{linha.rotulo}</span>
+          <LinhaDoVaral key={linha.rotulo} rotulo={linha.rotulo}>
             {linha.itens.map((f) => (
               <Corpo
                 key={f.id}
@@ -209,7 +223,7 @@ export function Varal() {
                 }}
               />
             ))}
-          </div>
+          </LinhaDoVaral>
         ))}
       </div>
       <DialogoDoLembrete

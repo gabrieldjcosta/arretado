@@ -461,3 +461,60 @@
     animation-duration: 0s !important;
   }
 }
+
+/* ---------- Troca de tela com View Transitions (porte literal do mockup v17) ---------- */
+/* Só a tela tem nome: a casca, o cabeçalho e a pílula ficam quietos no instantâneo da raiz. */
+.shell-fio .fio-conteudo {
+  view-transition-name: tela;
+}
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(tela) {
+  animation: none;
+}
+::view-transition-old(tela) {
+  animation: vt-sai 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(tela) {
+  animation: vt-entra 0.48s cubic-bezier(0.2, 0.7, 0.2, 1) 0.09s both;
+}
+:root[data-vt='calmo']::view-transition-old(tela) {
+  animation-duration: 0.36s;
+}
+:root[data-vt='calmo']::view-transition-new(tela) {
+  animation-duration: 0.62s;
+  animation-delay: 0.14s;
+}
+@keyframes vt-sai {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--vt-dx, 0px) * -0.6), calc(var(--vt-dy, 0px) * -0.4));
+  }
+}
+@keyframes vt-entra {
+  from {
+    opacity: 0;
+    transform: translate(var(--vt-dx, 0px), var(--vt-dy, 14px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(tela),
+  ::view-transition-new(tela) {
+    animation-duration: 0.2s;
+    transform: none;
+  }
+}
+
+/* ---------- Polimento: números fixos, foco e sombras ---------- */
+.shell-fio :is(.numero, .fio-numero, .estado, .varal-rotulo, time, output) {
+  font-variant-numeric: tabular-nums;
+}
+.shell-fio :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--f-foco, #4dd0e1);
+  outline-offset: 3px;
+  border-radius: inherit;
+}

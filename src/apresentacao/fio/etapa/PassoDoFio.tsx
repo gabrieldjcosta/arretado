@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router';
+import { Navigate } from 'react-router';
+import { LinkDoFio } from '../LinkDoFio';
+import { useNavegarComTransicao } from '../transicao';
 import type { Passo, ResultadoDoPasso } from '../../../dominios/fio';
 import { useRepositorio } from '../../dados/contexto';
 import { abrirNorma } from '../../../dominios/legislacao/leitor';
@@ -121,13 +123,13 @@ function LerDoPasso({ passo, materia, aoConcluir, aoPular, aoPausar }: PropsDaTe
       </ul>
       <div className="fio-passo-acoes">
         {primeiro && (
-          <Link
+          <LinkDoFio
             to={`/biblioteca/normas/${passo.normaId}?ir=${encodeURIComponent(primeiro.endereco)}&foco=artigo&mapa=1`}
             className="fio-acao"
           >
             Abrir no Leitor
             <Seta />
-          </Link>
+          </LinkDoFio>
         )}
         <button
           type="button"
@@ -160,10 +162,10 @@ function LerSemLeiDoPasso({
       aoPausar={aoPausar}
     >
       <div className="fio-passo-acoes">
-        <Link to="/biblioteca/acervo" className="fio-acao">
+        <LinkDoFio to="/biblioteca/acervo" className="fio-acao">
           Escolher a lei
           <Seta />
-        </Link>
+        </LinkDoFio>
         <button
           type="button"
           className="fio-secundario"
@@ -271,10 +273,10 @@ function RevisarDoPasso({ passo, materia, aoConcluir, aoPular, aoPausar }: Props
       aoPausar={aoPausar}
     >
       <div className="fio-passo-acoes">
-        <Link to={`/recall/revisar?itens=${String(passo.quantidade)}`} className="fio-acao">
+        <LinkDoFio to={`/recall/revisar?itens=${String(passo.quantidade)}`} className="fio-acao">
           Revisar agora
           <Seta />
-        </Link>
+        </LinkDoFio>
         <button
           type="button"
           className="fio-secundario"
@@ -356,7 +358,7 @@ function Fileira({
  */
 export function PassoDoFio() {
   const fio = useFio();
-  const navegar = useNavigate();
+  const navegar = useNavegarComTransicao();
   const { avanco } = fio;
   if (fio.falhou) {
     return (
@@ -375,7 +377,7 @@ export function PassoDoFio() {
   // Pausar não grava nada (o passo aberto já está guardado): marca a pausa e volta ao Agora.
   const pausar = () => {
     marcarPausa();
-    void navegar('/');
+    navegar('/');
   };
   const comum = { materia, aoConcluir: fio.concluir, aoPular: fio.pular, aoPausar: pausar };
   const semente = (avanco.estado.etapa?.numero ?? 0) * 100 + proximo.posicao;
