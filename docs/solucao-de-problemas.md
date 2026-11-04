@@ -2169,6 +2169,11 @@ Relatório completo: [`revisoes/f2-etapas-8-9-11.md`](revisoes/f2-etapas-8-9-11.
 - **Dois Ciclos "Equilibrado" ou nenhum ativo.** Causa: duas abas abertas juntas criavam o Ciclo padrão, e a trava por módulo não vale entre abas. Solução: conferir de novo e criar dentro de `repo.transacao`.
 - **Previsível:** `garantirCicloPadrao` chama `carregarCiclo`, que tenta ler `/incidencia/` só para montar as matérias; o "Equilibrado" não usa incidência. Só pega quem tem Edital ligado a Concurso (nenhum fluxo grava isso hoje). Se aparecer lentidão no fim do onboarding, montar as matérias só com Disciplinas e Pontos.
 
+## A Trilha vazia dobra a importação (D-D20, 03/11/2026)
+
+- **Teste da Trilha vazia não acha o campo do CSV ou da IA.** Causa: o formulário fica atrás do botão "Trazer meu edital" (`hidden`). O `getByLabelText` do jsdom acha o campo mesmo escondido, mas o Playwright e a pessoa não. Solução: clicar em "Trazer meu edital" antes (`abrirOFormulario` em `Plano.test.tsx`; no E2E, `getByRole('button', { name: 'Trazer meu edital' })`, como em `plano-materias.spec.ts` e `recall.spec.ts`, que importam por CSV na Trilha vazia).
+- **"Trazer meu edital" não é mais link.** Quem procurar `getByRole('link', { name: 'Trazer meu edital' })` não acha; é um `button` com `aria-expanded`.
+- **Previsível:** (a) `scrollIntoView` não existe no jsdom: o efeito que leva o formulário à vista confere `typeof secao.scrollIntoView === 'function'` antes de chamar; (b) o Guia da Trilha (versão 6) trocou duas dicas por uma; quem leu a versão 5 vê a marca "Novo" de novo, uma vez.
 ## A Biblioteca abre pela lista (D-D19, 03/11/2026)
 
 - **Teste que muda Disciplina, Ano ou Tipo de norma passa no jsdom e falha no navegador.** Causa: os três filtros ficam atrás do chip "Filtrar" (`hidden`); o `getByLabelText` do jsdom acha o campo mesmo escondido, o Playwright não o deixa selecionar. Solução: clicar em "Filtrar" antes (nos dois), e conferir a visibilidade com `toBeVisible`/`toBeHidden`.

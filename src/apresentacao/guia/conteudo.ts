@@ -53,7 +53,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
     ],
   },
   plano: {
-    versao: 5,
+    versao: 6,
     vazio: [
       {
         opcao: 'Informar a data da prova',
@@ -68,11 +68,7 @@ export const GUIAS: Record<TelaComGuia, Guia> = {
       {
         opcao: 'Trazer meu edital',
         efeito:
-          'leva ao formulário abaixo, para importar disciplinas e Pontos por planilha (CSV) ou colando a tabela que uma IA gerou.',
-      },
-      {
-        opcao: 'Não sabe montar a planilha?',
-        efeito: 'copia um pedido pronto para você colar numa IA junto com o texto do edital.',
+          'abre, logo abaixo, o formulário para importar disciplinas e Pontos por planilha (CSV) ou colando a tabela que uma IA gerou; “Não sabe montar a planilha?” copia um pedido pronto para a IA.',
       },
     ],
     uso: [

@@ -484,3 +484,21 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Em aberto.** O "Mudar disciplina" de cada linha continua: é o maior ruído que sobra na lista (uma ação sublinhada por norma). Movê-lo para o Leitor (Ações) tira uma linha de cada Norma, mas muda um fluxo que o E2E do acervo cobre; fica para decisão do Gabriel.
 
 **Custo.** Um toque a mais para filtrar. "Importar norma" desce para o fim da lista.
+
+## D-D20 — A Trilha promete o edital, dobra a importação e põe o Ciclo à vista (03/11/2026)
+
+> **Emenda a D-D7 (Trilha).** O estado vazio deixa de ser uma caixa genérica seguida de um formulário, e o Ciclo deixa de ser um link entre outros.
+
+**Origem.** O consolidado de 03/11/2026, tema 14: "caixa vazia de qualquer SaaS, título sem promessa e CSV na primeira dobra" (Genjutsu); "o link de Ciclos está escondido na Trilha" (Impeccable). Harmonizado: "título com a promessa (a Trilha montada pelo edital), CSV dobrado sob Trazer meu edital e o Ciclo como ação à vista". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. Sem Pontos, o título do estado vazio passa de "Monte seu plano do seu jeito" a "Sua Trilha, montada pelo edital", e o texto perde o "Ou traga o seu edital." (o segundo botão já diz isso).
+2. "Trazer meu edital" vira botão (`aria-expanded`, `aria-controls="importar-edital"`) que abre, logo abaixo, o formulário de importação (CSV ou tabela da IA). O formulário fica montado e escondido (`hidden`), então quem recolhe sem querer não perde o que colou. Antes ele ocupava a primeira dobra inteira, num cartão de quatro blocos.
+3. Com Pontos, "Ciclo de estudo" sai da fila de três links e vira um botão com contorno logo abaixo do "Começar este bloco" (`.plano-ciclo`); "Editar pontos e matérias" e "Tarefas" seguem como links.
+4. O Guia da tela absorve o "Não sabe montar a planilha?" na dica do "Trazer meu edital" (esse controle só aparece depois de abrir o formulário) e sobe para a versão 6.
+
+**Medidas** (390 × 844, Trilha vazia): a página caiu de 1349 para 844 px de altura, ou seja, deixou de rolar; o formulário de importação, que começava em y≈646, só aparece depois do toque. Com Pontos, o "Ciclo de estudo" ocupa uma linha própria de 44 px logo abaixo do "Começar este bloco" (a fila de links segue com "Editar pontos e matérias" e "Tarefas").
+
+**O que continua como está.** "Escolher meu concurso" como único botão principal; a data da prova (opcional); a lista de matérias; "Importar outra planilha" (já era dobrado); o formulário em si.
+
+**Custo.** Um toque a mais para quem vem com planilha. O formulário deixa de aparecer sem ser pedido.
