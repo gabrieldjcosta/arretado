@@ -1,0 +1,40 @@
+/* As fontes do mockup aprovado, como o protótipo as carregava (Google Fonts), mas servidas do próprio site
+   (T19: nada de CDN, o app funciona sem rede). Duas diferenças do que o resto do app usa, as duas do
+   mockup: o corpo vai de 400, 600 e 700 (o app tem 400, 500 e 700) e a Literata, que lê a lei, tem o eixo de
+   tamanho óptico (`opsz`). Por isso têm nome próprio e não mexem em nenhuma outra tela.
+   O Schibsted Grotesk já vem de estilos.css (variável, 400 a 900). */
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next Fio';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-400-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next Fio';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-600-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next Fio';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../../../node_modules/@fontsource/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-700-normal.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Literata Fio';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../../../../node_modules/@fontsource-variable/literata/files/literata-latin-opsz-normal.woff2')
+    format('woff2-variations');
+}

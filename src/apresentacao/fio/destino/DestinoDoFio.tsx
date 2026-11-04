@@ -1,8 +1,9 @@
 import { lazy, Suspense, useState } from 'react';
 import { LinkDoFio } from '../LinkDoFio';
 import { useLarguraMinima } from '../../componentes/largura';
-import type { EntradaDaJornada } from './jornada';
 import { ORDEM_UF } from './nordeste';
+import { NumeroQueRola } from './NumeroQueRola';
+import { materiaAtual, resumoDoMapa } from './resumo';
 import { useJornadaDoFio } from './useJornadaDoFio';
 import './fio-destino.css';
 
@@ -15,19 +16,6 @@ const plural = (n: number, um: string, varios: string) => `${String(n)} ${n === 
 
 /** A tela larga (a casca alarga a partir daqui, em fio-base.css): a lista dos pousos já vem aberta. */
 const LARGURA_DO_MONITOR = 980;
-
-/** A matéria em que a pessoa está, a do último pouso (ou a da vez). */
-const materiaAtual = (entrada: EntradaDaJornada | undefined) =>
-  entrada?.materias.find((m) => m.id === entrada.atualId);
-
-/** Quanto do que mais cai na matéria atual a pessoa já leu (artigos que o Fio conhece dela). */
-function resumoDoMapa(entrada: EntradaDaJornada | undefined) {
-  const artigos = entrada?.artigos ?? [];
-  const materia = materiaAtual(entrada);
-  if (!entrada || !materia || artigos.length === 0) return undefined;
-  const lidos = artigos.filter((a) => a.lido).length;
-  return { nome: materia.nome, percentual: Math.round((100 * lidos) / artigos.length) };
-}
 
 /**
  * O Destino do Arretado novo (D-D25): o Nordeste de verdade, uma matéria do Ciclo em cada estado, e o
@@ -57,7 +45,7 @@ export function DestinoDoFio() {
         {resumo && (
           <>
             <p className="fio-numero">
-              {String(resumo.percentual)}
+              <NumeroQueRola valor={resumo.percentual} chave="destino-percentual" />
               <small>%</small>
             </p>
             <p className="fio-quieto">
@@ -69,7 +57,7 @@ export function DestinoDoFio() {
         {contaEtapas && (
           <>
             <p className="fio-numero">
-              {String(etapasFeitas)}
+              <NumeroQueRola valor={etapasFeitas} chave="destino-etapas" />
               <small> {etapasFeitas === 1 ? 'etapa' : 'etapas'}</small>
             </p>
             <p className="fio-quieto">

@@ -155,7 +155,7 @@ export function App({
                 <Route
                   path="fio/passo"
                   element={
-                    <TelaDoFio>
+                    <TelaDoFio noQuadro>
                       <PassoDoFio />
                     </TelaDoFio>
                   }
@@ -163,7 +163,7 @@ export function App({
                 <Route
                   path="fio/pouso"
                   element={
-                    <TelaDoFio>
+                    <TelaDoFio noQuadro>
                       <PousoDoFio />
                     </TelaDoFio>
                   }
