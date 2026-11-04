@@ -120,6 +120,20 @@ describe('LembrarM', () => {
     expect(p.aoPular).not.toHaveBeenCalled();
   });
 
+  it('o título "Agora sem olhar." é o mesmo nó enquanto a pergunta chega: não é refeito', async () => {
+    const { repo, normaId } = await montar();
+    const p = props(passo(ARTIGOS.slice(0, 1), normaId));
+    com(repo, <LembrarM {...p} />);
+
+    // O título é do cartão, e não de cada pergunta: já está na tela quando a lei ainda carrega e fica o mesmo quando a
+    // pergunta chega. Se fosse refeito, quem o achasse antes do fim da carga (um leitor de tela, um teste) ficaria com um
+    // nó solto: `toBeInTheDocument` reprovava no CI, que carrega mais devagar, e passava aqui.
+    const titulo = screen.getByRole('heading', { name: 'Agora sem olhar.' });
+    await grupoDaPergunta();
+    expect(titulo).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Agora sem olhar.' })).toBe(titulo);
+  });
+
   it('na lacuna, a conta certa fecha a lei e a errada mostra a Frase certa, tirada da lei', async () => {
     const { repo, normaId } = await montar();
     const usuario = userEvent.setup();

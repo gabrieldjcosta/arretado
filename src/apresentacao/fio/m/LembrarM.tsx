@@ -140,7 +140,6 @@ function PerguntaDaLacuna({ lacuna, ultima, aoResponder }: PropsDaPergunta & { l
 
   return (
     <>
-      <h2 style={{ margin: '4px 0 14px' }}>Agora sem olhar.</h2>
       <div className="m-lei">
         <p>
           <span className="m-art">{rotuloSemNorma(fonte.referencia)}.</span>{' '}
@@ -252,7 +251,6 @@ function PerguntaDoCartao({
 
   return (
     <>
-      <h2 style={{ margin: '4px 0 14px' }}>Agora sem olhar.</h2>
       <div className="m-lei">
         <p>
           <span className="m-art">{rotuloSemNorma(fonte.referencia)}.</span>{' '}
@@ -373,18 +371,12 @@ export function LembrarM({
       ? `Lembrar · ${String(indice + 1)} de ${String(perguntas.length)}`
       : 'Lembrar';
 
-  let conteudo: ReactNode;
+  let corpo: ReactNode;
   if (vazio) {
-    conteudo = (
-      <>
-        <h2 style={{ margin: '4px 0 14px' }}>Agora sem olhar.</h2>
-        <PassoSemNada texto="Nada para lembrar neste passo." />
-      </>
-    );
+    corpo = <PassoSemNada texto="Nada para lembrar neste passo." />;
   } else if (!atual) {
-    conteudo = (
+    corpo = (
       <>
-        <h2 style={{ margin: '4px 0 14px' }}>Agora sem olhar.</h2>
         <div className="m-lei">
           <p>…</p>
         </div>
@@ -392,7 +384,7 @@ export function LembrarM({
       </>
     );
   } else if (atual.pergunta.tipo === 'lacuna') {
-    conteudo = (
+    corpo = (
       <PerguntaDaLacuna
         key={indice}
         lacuna={atual.pergunta.lacuna}
@@ -403,7 +395,7 @@ export function LembrarM({
       />
     );
   } else {
-    conteudo = (
+    corpo = (
       <PerguntaDoCartao
         key={indice}
         cartao={atual.pergunta.cartao}
@@ -427,7 +419,9 @@ export function LembrarM({
       trilho={trilho}
       entrada={indice}
     >
-      {conteudo}
+      {/* O título é do cartão: o mesmo nó enquanto a lei carrega e depois, com as perguntas trocando por baixo dele. */}
+      <h2 style={{ margin: '4px 0 14px' }}>Agora sem olhar.</h2>
+      {corpo}
     </CartaoM>
   );
 }
