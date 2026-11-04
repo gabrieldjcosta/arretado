@@ -119,7 +119,16 @@ export type Passo =
 /** O que a pessoa fez no passo, contado pela tela. */
 export type ResultadoDoPasso =
   | { tipo: 'ler'; lidos: number }
-  | { tipo: 'lembrar'; acertos: number; erros: readonly string[] }
+  | {
+      tipo: 'lembrar';
+      acertos: number;
+      erros: readonly string[];
+      /**
+       * Endereços dos artigos cuja Frase certa o próprio Lembrar já guardou ("Guardar e seguir" do cartão):
+       * o Guardar não os pede de novo.
+       */
+      guardados?: readonly string[];
+    }
   | { tipo: 'guardar'; guardadas: number }
   | { tipo: 'revisar'; revisados: number; voltamAmanha: number }
   | { tipo: 'fixar_sumula' }

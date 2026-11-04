@@ -41,6 +41,9 @@ async function abrir(
   return { repo, usuario };
 }
 
+/** O texto do Art. 2º na lei do teste: a conta certa do Lembrar é a que ele traz. */
+const ART_2 = 'O prazo de recurso é de 30 (trinta) dias.';
+
 afterEach(() => {
   window.localStorage.removeItem(CHAVE_DA_INTERFACE);
 });
@@ -57,18 +60,29 @@ describe('o Arretado novo (prévia do Fio)', () => {
   it('ligada, mostra os três lugares embaixo, com o Agora aceso', async () => {
     await abrir();
     const nav = await screen.findByRole('navigation', { name: 'Lugares' });
-    const links = within(nav).getAllByRole('link');
-    expect(links.map((l) => l.textContent)).toEqual(['Agora', 'Destino', 'Varal']);
-    expect(within(nav).getByRole('link', { name: 'Agora' })).toHaveAttribute(
+    const lugares = within(nav).getAllByRole('button');
+    expect(lugares.map((l) => l.textContent)).toEqual(['Agora', 'Destino', 'Varal']);
+    expect(within(nav).getByRole('button', { name: 'Agora' })).toHaveAttribute(
       'aria-current',
       'page',
     );
   });
 
+  it('o Agora é o do mockup: a marca leva à Conta e diz quanto da prova já é da pessoa', async () => {
+    const { usuario } = await abrir({ comLei: true });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Agora' })).toBeInTheDocument();
+    expect(screen.getByText(/da prova é seu/)).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'arretado: sua conta e ajustes' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/conta');
+    });
+  });
+
   it('sem nenhuma matéria, pergunta a prova em vez de listar começos', async () => {
     await abrir();
-    expect(await screen.findByRole('heading', { name: 'Qual é a sua prova?' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Escolher minha prova/ })).toHaveAttribute(
+    const convite = await screen.findByRole('group', { name: 'Para começar' });
+    expect(within(convite).getByText('Qual é a sua prova?')).toBeInTheDocument();
+    expect(within(convite).getByRole('link', { name: /Escolher minha prova/ })).toHaveAttribute(
       'href',
       '#/comecar',
     );
@@ -78,29 +92,33 @@ describe('o Arretado novo (prévia do Fio)', () => {
     const { usuario } = await abrir({ comLei: true });
 
     const ponta = await screen.findByRole('group', { name: 'Na ponta do fio' });
-    expect(within(ponta).getByText(/Art/)).toBeInTheDocument();
+    expect(await within(ponta).findByText(/Art/)).toBeInTheDocument();
 
-    await usuario.click(screen.getByRole('button', { name: /Puxe o fio/ }));
-    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    // O Art. 2 tem destaque, então a etapa é Ler e Lembrar: a fileira mostra os dois pontos.
-    expect(within(passo).getByRole('list', { name: 'Passo 1 de 2' })).toBeInTheDocument();
-    expect(within(passo).getByRole('link', { name: /Abrir no Leitor/ })).toHaveAttribute(
+    await usuario.click(screen.getByRole('button', { name: /Puxar o fio/ }));
+    const cartao = await screen.findByRole('button', { name: 'Pronto, li' });
+    // O Art. 2 tem destaque, então a etapa é Ler e Lembrar: o cartão diz em que passo está.
+    expect(screen.getByText('Passo 1 de 2')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Abrir no Leitor/ })).toHaveAttribute(
       'href',
       expect.stringContaining('/biblioteca/normas/'),
     );
 
-    await usuario.click(within(passo).getByRole('button', { name: 'Já li' }));
-    expect(await screen.findByRole('heading', { level: 1, name: /^Lembrar / })).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Passo 2 de 2' })).toBeInTheDocument();
+    await usuario.click(cartao);
+    expect(await screen.findByRole('heading', { name: 'Agora sem olhar.' })).toBeInTheDocument();
+    expect(screen.getByText('Passo 2 de 2')).toBeInTheDocument();
     // Pular o Lembrar não custa nada: a etapa pousa com o que foi lido.
-    await usuario.click(screen.getByRole('button', { name: 'Pular este passo' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
     expect(screen.getByText(/^Leu /)).toBeInTheDocument();
 
-    await usuario.click(screen.getByRole('button', { name: /seguir para o próximo passo/ }));
+    await usuario.click(screen.getByRole('button', { name: /Puxar o fio: seguir/ }));
     await screen.findByRole('group', { name: 'Na ponta do fio' });
 
-    await usuario.click(screen.getByRole('link', { name: 'Destino' }));
+    await usuario.click(
+      within(screen.getByRole('navigation', { name: 'Lugares' })).getByRole('button', {
+        name: 'Destino',
+      }),
+    );
     expect(
       await screen.findByRole('heading', { name: 'Seu caminho até aqui' }),
     ).toBeInTheDocument();
@@ -110,6 +128,41 @@ describe('o Arretado novo (prévia do Fio)', () => {
       await screen.findByRole('group', { name: 'Mapa do caminho pelo Nordeste' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Seus pousos, em palavras')).toBeInTheDocument();
+  });
+
+  it('"Pronto, li" avisa "Feito" e o "Desfazer" devolve o cartão', async () => {
+    const { usuario } = await abrir({ comLei: true });
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pronto, li' }));
+    expect(await screen.findByRole('heading', { name: 'Agora sem olhar.' })).toBeInTheDocument();
+    expect(screen.getByText('Feito')).toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Desfazer' }));
+    expect(await screen.findByRole('button', { name: 'Pronto, li' })).toBeInTheDocument();
+    expect(screen.getByText('Passo 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Desfeito')).toBeInTheDocument();
+  });
+
+  it('errar o Lembrar mostra a Frase certa e guarda com um toque, sem passo Guardar depois', async () => {
+    const { repo, usuario } = await abrir({ comLei: true });
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pronto, li' }));
+
+    const contas = within(await screen.findByRole('group', { name: 'Escolha o que a lei diz' }));
+    // A conta certa é a que a lei traz; qualquer outra erra.
+    const errada = contas.getAllByRole('button').find((b) => !ART_2.includes(b.textContent));
+    expect(errada).toBeDefined();
+    await usuario.click(errada as HTMLElement);
+    expect(await screen.findByText(/a Frase certa, tirada da lei/)).toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Guardar e seguir' }));
+    expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
+    expect(screen.getByText(/Lembrou 0 de 1, guardou 1 Frase/)).toBeInTheDocument();
+    // A Frase já foi guardada pelo cartão: o aviso não oferece desfazer e nenhum passo Guardar vem depois.
+    expect(screen.queryByRole('button', { name: 'Desfazer' })).not.toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await repo.colecao('frases').todosDoUsuario()).toHaveLength(1);
+    });
   });
 
   it('o Destino sem etapa pousada mostra o mapa e convida a puxar o fio no Agora', async () => {
@@ -143,9 +196,8 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
   it('pular um passo não custa nada e não deixa fato', async () => {
     const { usuario } = await abrir({ comLei: true });
-    await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
-    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    await usuario.click(within(passo).getByRole('button', { name: 'Pular este passo' }));
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
     expect(screen.getByText('Você deu esse passo. Amanhã tem mais.')).toBeInTheDocument();
     // Sem fato, o pouso não fala em falha nem em pendência.
@@ -154,14 +206,16 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
   it('o pouso é uma cena: o lugar da vereda, a pílula do pouso e as duas saídas', async () => {
     const { usuario } = await abrir({ comLei: true });
-    await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
-    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    await usuario.click(within(passo).getByRole('button', { name: 'Pular este passo' }));
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
 
     expect(
       await screen.findByRole('heading', { name: 'Sombra de juazeiro. Pode descansar.' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Pouso 1 · Juazeiro')).toBeInTheDocument();
+    // A cena é desenho (some para o leitor de tela) e leva o nome do lugar.
+    expect(document.querySelector('svg.m-cena')).toHaveAttribute('data-lugar', 'Juazeiro');
+    expect(document.querySelector('svg.m-cena')).toHaveAttribute('aria-hidden', 'true');
     const pilulas = within(screen.getByRole('group', { name: 'Pousos da vereda' })).getAllByRole(
       'button',
     );
@@ -170,7 +224,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     ]);
     expect(pilulas[0]).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Descansar por hoje' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /seguir para o próximo passo/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Puxar o fio: seguir/ })).toBeInTheDocument();
     // A saída é o fio ou descansar: a pílula dos três lugares some enquanto o pouso dura.
     expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
   });
@@ -204,7 +258,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(
       await screen.findByRole('heading', { name: 'Água no açude. Pode descansar.' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Lembrou 2 de 3')).toBeInTheDocument();
+    expect(screen.getByText('Lembrou 2 de 3.')).toBeInTheDocument();
     const grupo = screen.getByRole('group', { name: 'Pousos da vereda' });
     expect(
       within(grupo)
@@ -225,8 +279,9 @@ describe('o Arretado novo (prévia do Fio)', () => {
       screen.getByRole('heading', { name: 'O carcará passou. Pode descansar.' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Pouso 2 · Carcará')).toBeInTheDocument();
-    expect(screen.getByText('Guardou 1 Frase')).toBeInTheDocument();
-    expect(screen.queryByText('Lembrou 2 de 3')).not.toBeInTheDocument();
+    expect(screen.getByText('Guardou 1 Frase.')).toBeInTheDocument();
+    expect(screen.queryByText('Lembrou 2 de 3.')).not.toBeInTheDocument();
+    expect(document.querySelector('svg.m-cena')).toHaveAttribute('data-lugar', 'Carcará');
     expect(within(grupo).getByRole('button', { name: /^Carcará/ })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -237,41 +292,41 @@ describe('o Arretado novo (prévia do Fio)', () => {
     );
   });
 
-  it('"descansar" conta a etapa e o Agora diz que está tudo salvo', async () => {
+  it('"descansar" conta a etapa e o Agora fecha o dia com a frase gentil', async () => {
     const { usuario } = await abrir({ comLei: true });
-    await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
-    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    await usuario.click(within(passo).getByRole('button', { name: 'Pular este passo' }));
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     await usuario.click(await screen.findByRole('button', { name: 'Descansar por hoje' }));
 
-    expect(await screen.findByText('Tudo salvo. O fio te espera aqui.')).toBeInTheDocument();
-    // Descansar por hoje fecha o dia em voz baixa, com uma frase gentil.
     expect(
-      screen.getByText('É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.'),
+      await screen.findByText(
+        'É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.',
+      ),
     ).toBeInTheDocument();
     await screen.findByRole('group', { name: 'Na ponta do fio' });
-    await usuario.click(screen.getByRole('link', { name: 'Destino' }));
+    await usuario.click(
+      within(screen.getByRole('navigation', { name: 'Lugares' })).getByRole('button', {
+        name: 'Destino',
+      }),
+    );
     expect(await screen.findByText(/1 etapa pousada/)).toBeInTheDocument();
   });
 
   it('pausar volta ao Agora, diz que está tudo salvo e o passo espera', async () => {
     const { usuario } = await abrir({ comLei: true });
-    await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
-    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    await usuario.click(within(passo).getByRole('button', { name: 'Pausar: tudo fica salvo' }));
+    await usuario.click(await screen.findByRole('button', { name: /Puxar o fio/ }));
+    await usuario.click(await screen.findByRole('button', { name: 'Pausar: tudo fica salvo' }));
 
     const aviso = await screen.findByText('Tudo salvo. O fio te espera aqui.');
-    expect(aviso).toHaveAttribute('role', 'status');
-    // Pausar um passo não fecha o dia: sem a frase do descansar.
-    expect(screen.queryByText(/É caminhando que se faz o caminho/)).not.toBeInTheDocument();
+    expect(aviso.closest('[role="status"]')).not.toBeNull();
     // O passo continua aberto: o fio convida a continuar, sem cobrar nada.
-    expect(screen.getByRole('button', { name: /Puxe para continuar/ })).toBeInTheDocument();
+    expect(screen.getByText('Puxe para continuar')).toBeInTheDocument();
     expect(screen.queryByText(/parou/i)).not.toBeInTheDocument();
   });
 
   it('o Varal tem dois varais de folhetos e leva às coisas da pessoa', async () => {
     const { usuario } = await abrir();
-    await usuario.click(await screen.findByRole('link', { name: 'Varal' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Varal' }));
     expect(await screen.findByRole('heading', { name: /pendurado no fio/ })).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByRole('link', { name: /^Normas/ })).toHaveAttribute('href', '#/biblioteca');

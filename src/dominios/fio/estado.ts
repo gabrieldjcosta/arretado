@@ -150,8 +150,9 @@ export function concluirPasso(estado: EstadoDoFio, resultado: ResultadoDoPasso):
   // Regra 4: Lembrar com erro puxa Guardar logo depois, só com os artigos do próprio Lembrar.
   if (passo.tipo === 'lembrar' && resultado.tipo === 'lembrar') {
     const doLembrar = new Set(passo.artigos.map((a) => a.endereco));
+    const jaGuardados = new Set(resultado.guardados ?? []);
     const enderecos = [...new Set(resultado.erros)]
-      .filter((x) => doLembrar.has(x))
+      .filter((x) => doLembrar.has(x) && !jaGuardados.has(x))
       .slice(0, cota('frases', e.numero));
     if (enderecos.length > 0) {
       const de = depois.etapa as Etapa;
