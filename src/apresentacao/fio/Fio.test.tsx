@@ -67,7 +67,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     );
   });
 
-  it('puxa o fio, lê, pousa e o Destino guarda o caminho', async () => {
+  it('puxa o fio, lê, lembra, pousa e o Destino guarda o caminho', async () => {
     const { usuario } = await abrir({ comLei: true });
 
     const ponta = await screen.findByRole('group', { name: 'Na ponta do fio' });
@@ -75,15 +75,18 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
     await usuario.click(screen.getByRole('button', { name: /Puxe o fio/ }));
     const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
-    // Com um passo só na tela (os outros o Fio pula), a fileira de pontos não diz nada e não aparece.
-    expect(within(passo).queryByRole('list', { name: /^Passo \d de \d/ })).not.toBeInTheDocument();
+    // O Art. 2 tem destaque, então a etapa é Ler e Lembrar: a fileira mostra os dois pontos.
+    expect(within(passo).getByRole('list', { name: 'Passo 1 de 2' })).toBeInTheDocument();
     expect(within(passo).getByRole('link', { name: /Abrir no Leitor/ })).toHaveAttribute(
       'href',
       expect.stringContaining('/biblioteca/normas/'),
     );
 
     await usuario.click(within(passo).getByRole('button', { name: 'Já li' }));
-    // O Lembrar ainda não tem tela: o Fio o pula sozinho e a etapa pousa.
+    expect(await screen.findByRole('heading', { level: 1, name: /^Lembrar / })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Passo 2 de 2' })).toBeInTheDocument();
+    // Pular o Lembrar não custa nada: a etapa pousa com o que foi lido.
+    await usuario.click(screen.getByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: 'Pode descansar.' })).toBeInTheDocument();
     expect(screen.getByText(/^Leu /)).toBeInTheDocument();
 
@@ -106,6 +109,19 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(screen.getByText('Você passou por aqui. O fio fica onde está.')).toBeInTheDocument();
     // Sem fato, o pouso não fala em falha nem em pendência.
     expect(screen.queryByText(/sem deixar fato|não fez|faltou/i)).not.toBeInTheDocument();
+  });
+
+  it('pausar volta ao Agora, diz que está tudo salvo e o passo espera', async () => {
+    const { usuario } = await abrir({ comLei: true });
+    await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
+    const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
+    await usuario.click(within(passo).getByRole('button', { name: 'Pausar: tudo fica salvo' }));
+
+    const aviso = await screen.findByText('Tudo salvo. O fio te espera aqui.');
+    expect(aviso).toHaveAttribute('role', 'status');
+    // O passo continua aberto: o fio convida a continuar, sem cobrar nada.
+    expect(screen.getByRole('button', { name: /Puxe para continuar/ })).toBeInTheDocument();
+    expect(screen.queryByText(/parou/i)).not.toBeInTheDocument();
   });
 
   it('o Varal tem dois varais de folhetos e leva às coisas da pessoa', async () => {

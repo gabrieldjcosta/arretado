@@ -1,9 +1,29 @@
 /* O Agora do Arretado novo (D-D25): o fio que se puxa e a ponta dele. Valores do protótipo v14 da Marca. */
 .fio-agora {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   min-height: calc(100dvh - 3.5rem - var(--abas-altura) - 1.5rem);
+}
+
+/* O aviso de quem acaba de pausar: uma pílula de vidro no alto, que não empurra nada e some sozinha. */
+.fio-aviso {
+  position: absolute;
+  top: 0.25rem;
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: calc(100% - 1rem);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--f-cartao-borda);
+  border-radius: 999px;
+  background: var(--f-vidro);
+  color: var(--titulo);
+  font-size: 0.875rem;
+  text-align: center;
+  transform: translateX(-50%);
 }
 
 .fio-puxar {

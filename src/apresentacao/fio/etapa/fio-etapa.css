@@ -35,7 +35,7 @@
   box-shadow: var(--f-halo-do-ponto);
 }
 
-.fio-passo {
+.fio-cartao-do-passo {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
@@ -46,12 +46,25 @@
   box-shadow: var(--f-cartao-sombra);
 }
 
+/* A linha de cima do cartão: o rótulo e o "Pausar" redondo. O botão tem 44 px e o rótulo 16: as margens
+   negativas deixam a linha do tamanho do rótulo, e o botão sobe e desce sobre o respiro do cartão. */
+.fio-topo-do-cartao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.fio-topo-do-cartao .fio-icone {
+  margin-block: -1.125rem;
+}
+
 .fio-titulo-passo {
   font-size: 1.75rem;
 }
 
 @media (max-width: 260px) {
-  .fio-passo {
+  .fio-cartao-do-passo {
     padding: 1rem;
   }
 
@@ -73,7 +86,7 @@
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
   background: var(--f-chip);
-  color: var(--f-acento);
+  color: var(--f-tempo);
   font-size: 0.8125rem;
   font-weight: 700;
 }

@@ -86,9 +86,11 @@ export function LembrarDoFio({
 
   return (
     <div className="coluna-drill fio-passo">
-      <p className="dica" aria-live="polite">
-        {indice + 1} de {perguntas.length}
-      </p>
+      {perguntas.length > 1 && (
+        <p className="dica" aria-live="polite">
+          {indice + 1} de {perguntas.length}
+        </p>
+      )}
       <article className="cartao-bloco ache-folha" aria-label="Lembrar">
         <p className="ache-referencia">{fonte.referencia}</p>
         {p.tipo === 'lacuna' ? (

@@ -20,7 +20,7 @@
   --f-mais-borda: #d39200;
   --f-mais-borda-largura: 1.5px;
   --f-mais-traco: 2.8;
-  /* O tempo ("3 min") é texto pequeno: 4,5:1 sobre o vidro, então de dia é o âmbar fundo e à noite o amarelo. */
+  /* O tempo ("3 min") e os rótulos de artigo são texto pequeno: 4,5:1 sobre o vidro, então de dia é o âmbar fundo e à noite o amarelo. */
   --f-tempo: #8a5200;
   /* O folheto do Varal: de dia a sombra é curta e macia; à noite, funda. */
   --f-folheto-sombra: 0 6px 12px -6px rgb(15 28 58 / 28%);
@@ -66,7 +66,7 @@
     --f-mais-traco: 2.4;
     --f-tempo: #ffc53d;
     --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
-    --f-chip: rgb(57 202 239 / 10%);
+    --f-chip: rgb(255 197 61 / 12%);
     --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
     --f-acao-texto: #0b1322;
     --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -95,7 +95,7 @@
   --f-mais-traco: 2.4;
   --f-tempo: #ffc53d;
   --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
-  --f-chip: rgb(57 202 239 / 10%);
+  --f-chip: rgb(255 197 61 / 12%);
   --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
   --f-acao-texto: #0b1322;
   --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);

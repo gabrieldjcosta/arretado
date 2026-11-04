@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Esqueleto } from '../../componentes/estados';
 import { descreverPasso } from '../dados/descrever';
+import { limparPausa, veioDeUmaPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { FioQueSePuxa } from './FioQueSePuxa';
 import './fio-agora.css';
@@ -30,6 +32,18 @@ function SemMateria() {
 export function AgoraDoFio() {
   const fio = useFio();
   const { avanco } = fio;
+  // Vindo de uma pausa, o Agora diz uma vez que está tudo salvo e some sozinho.
+  const [pausou, setPausou] = useState(veioDeUmaPausa);
+  useEffect(() => {
+    if (!pausou) return;
+    limparPausa();
+    const id = window.setTimeout(() => {
+      setPausou(false);
+    }, 5000);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [pausou]);
 
   if (fio.falhou) {
     return (
@@ -56,13 +70,18 @@ export function AgoraDoFio() {
   return (
     <section className="fio-agora" aria-label="Agora">
       <h1 className="visualmente-oculto">Agora</h1>
+      {pausou && (
+        <p className="fio-aviso" role="status">
+          Tudo salvo. O fio te espera aqui.
+        </p>
+      )}
       <FioQueSePuxa
         aoPuxar={fio.puxar}
         titulo={retomar ? 'Puxe para continuar' : 'Puxe o fio'}
         apoio="ou toque no ponto"
       />
       <div className="fio-proximo" role="group" aria-label="Na ponta do fio">
-        <span className="fio-olho">{retomar ? 'De onde você parou' : 'Na ponta do fio'}</span>
+        <span className="fio-olho">Na ponta do fio</span>
         <strong>{ponta.titulo}</strong>
         <span>{ponta.apoio}</span>
         {'minutos' in ponta && ponta.minutos !== undefined && (

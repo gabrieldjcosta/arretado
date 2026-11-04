@@ -17,7 +17,6 @@ export function GuardarDoFio({
   const [guardadas, setGuardadas] = useState(0);
   return (
     <div className="coluna-drill fio-passo">
-      <h2 className="fio-titulo">Guardar</h2>
       <p className="ache-instrucao">
         {itens.length === 1 ? 'Esta frase vale guardar.' : 'Estas frases valem guardar.'}
       </p>
