@@ -645,6 +645,7 @@
 
 :root[data-perfil='calmo'] .shell-fio .fio-acao[disabled] {
   box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
+}
 
 /* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): o brilho de baixo e o céu de cima esquentam de leve. */
 .shell-fio[data-luz='manha'] {
