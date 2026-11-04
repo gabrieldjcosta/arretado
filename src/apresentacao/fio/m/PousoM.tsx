@@ -6,6 +6,7 @@ import { useFio, type FioNaTela } from '../dados/useFio';
 import { pousoNaVereda, pousosDaVolta, type PousoNaVereda } from '../pouso/lugares';
 import { animar, aCadaQuadro, cancelarAnimacoes, modoAgora, MOLA, useSinal } from './anima';
 import { CenaM } from './CenaM';
+import { ConferirOResumoM, EvocacaoM } from './EvocacaoM';
 import { TelaM } from './TelaM';
 
 /**
@@ -161,6 +162,11 @@ function PuxaPousoM({ aoPuxar }: { aoPuxar: () => void }) {
 function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   const numero = pouso.etapa + 1;
   const [escolhido, setEscolhido] = useState(numero);
+  // O pouso em branco: com fatos na etapa, a pessoa escreve o que lembra antes de ver o resumo. Sem fatos (tudo
+  // pulado) não há o que lembrar e vai direto à frase de sempre.
+  const [momento, setMomento] = useState<'branco' | 'lista' | 'frase'>(
+    pouso.fatos.length > 0 ? 'branco' : 'frase',
+  );
   const faixa = useRef<HTMLDivElement>(null);
   // As pílulas rolam de lado em tela estreita: a da vez, a última, já abre à vista.
   useLayoutEffect(() => {
@@ -170,6 +176,9 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   const volta = pousosDaVolta(numero);
   const visto = volta.find((p) => p.numero === escolhido) ?? pousoNaVereda(numero);
   const fatos = fatosDoPousoVisto(visto, pouso, fio.fio.estado.pousos);
+  const noAtual = visto.numero === numero;
+  const emBranco = noAtual && momento === 'branco';
+  const comoLista = noAtual && momento === 'lista' && fatos !== undefined && fatos.length > 0;
 
   return (
     <TelaM nome="pouso" className="m-pouso" rotulo="Pouso">
@@ -181,12 +190,31 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
       </div>
       <div className="m-corpo">
         <h2 aria-live="polite">{visto.lugar.titulo}</h2>
-        {fatos !== undefined && (
-          <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
-            {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
-          </p>
+        {emBranco ? (
+          <EvocacaoM
+            aoMostrar={() => {
+              setMomento('lista');
+            }}
+            aoPular={() => {
+              setMomento('frase');
+            }}
+          />
+        ) : comoLista ? (
+          <ConferirOResumoM fatos={fatos} />
+        ) : (
+          fatos !== undefined && (
+            <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
+              {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
+            </p>
+          )
         )}
-        <div className="m-lugares" role="group" aria-label="Pousos da vereda" ref={faixa}>
+        <div
+          className="m-lugares"
+          hidden={emBranco}
+          role="group"
+          aria-label="Pousos da vereda"
+          ref={faixa}
+        >
           {volta.map((p) => (
             <button
               key={p.numero}

@@ -375,3 +375,77 @@
   stroke-width: 10;
   opacity: 0.38;
 }
+
+/* Desvio 21: o pouso em branco (ideia 8 da prancha "Fio que ensina", Gabriel 04/11). Antes do resumo, a tela do
+   pouso abre uma página em branco (o `.campo` do mockup, o mesmo do Guardar), a barra de 30 s e dois botões; depois,
+   o resumo vira lista que se marca. Só reaproveita peças do arquivo (campo, chip, ação, tintas). */
+.m-fio.m-fio .m-lugares[hidden] {
+  display: none;
+}
+
+.m-fio.m-fio .m-evoca {
+  display: grid;
+  gap: 10px;
+}
+
+.m-fio.m-fio .m-evoca .m-rotulo-campo {
+  margin: 0 2px;
+}
+
+.m-fio.m-fio .m-evoca .m-campo {
+  min-height: 84px;
+}
+
+.m-fio.m-fio .m-evoca-barra {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--m-borda);
+  overflow: hidden;
+}
+
+.m-fio.m-fio .m-evoca-barra i {
+  display: block;
+  height: 100%;
+  background: var(--m-ponto);
+  transform-origin: left;
+}
+
+.m-fio.m-fio .m-evoca-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.m-fio.m-fio .m-evoca-lista {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.m-fio.m-fio .m-evoca-lista legend {
+  padding: 0;
+  margin-bottom: 4px;
+  color: var(--m-texto-2);
+}
+
+.m-fio.m-fio .m-evoca-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-height: 44px;
+  padding: 8px 0;
+  color: var(--m-texto);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.m-fio.m-fio .m-evoca-item input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--m-neon-fundo, var(--m-neon));
+}

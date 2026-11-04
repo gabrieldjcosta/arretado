@@ -109,6 +109,8 @@ describe('o Arretado novo (prévia do Fio)', () => {
     // Pular o Lembrar não custa nada: a etapa pousa com o que foi lido.
     await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
+    // O pouso abre em branco; "Pular" leva ao resumo de sempre.
+    await usuario.click(screen.getByRole('button', { name: 'Pular' }));
     expect(screen.getByText(/^Leu /)).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: /Puxar o fio: seguir/ }));
@@ -157,6 +159,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
     await usuario.click(screen.getByRole('button', { name: 'Guardar e seguir' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Pular' }));
     expect(screen.getByText(/Lembrou 0 de 1, guardou 1 Frase/)).toBeInTheDocument();
     // A Frase já foi guardada pelo cartão: o aviso não oferece desfazer e nenhum passo Guardar vem depois.
     expect(screen.queryByRole('button', { name: 'Desfazer' })).not.toBeInTheDocument();
@@ -229,6 +232,43 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
   });
 
+  it('o pouso abre em branco: escreve, mostra o resumo e marca o que lembrou; pular vai direto', async () => {
+    const { repo, usuario } = await abrir({ comLei: true });
+    gravarFio(repo.ctx.usuarioId, {
+      estado: {
+        ...estadoInicial(),
+        etapasFeitas: 1,
+        passosDados: 2,
+        etapa: {
+          numero: 1,
+          materiaId: 'm',
+          materia: 'Execução Penal',
+          passos: [
+            { tipo: 'lembrar', materiaId: 'm', normaId: 'n', tituloCurto: 'LEP', artigos: [] },
+          ],
+          fechados: [{ como: 'feito', resultado: { tipo: 'lembrar', acertos: 2, erros: ['x'] } }],
+        },
+        pousos: [{ etapa: 0, materia: 'Execução Penal', fatos: ['Lembrou 2 de 3'] }],
+      },
+      marcas: {},
+    });
+    window.location.hash = '#/fio/pouso';
+
+    // Antes do resumo: a página em branco. Os fatos e as pílulas ainda não aparecem.
+    const campo = await screen.findByRole('textbox', { name: /O que você lembra desta etapa/ });
+    expect(screen.queryByText('Lembrou 2 de 3.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Pousos da vereda' })).not.toBeInTheDocument();
+    await usuario.type(campo, 'a pena e o regime');
+    await usuario.click(screen.getByRole('button', { name: /Mostrar o resumo/ }));
+
+    // O resumo vira lista para marcar; o texto escrito sai da tela e não fica guardado.
+    const item = await screen.findByRole('checkbox', { name: 'Lembrou 2 de 3.' });
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByText(/de memória/)).not.toBeInTheDocument();
+    await usuario.click(item);
+    expect(await screen.findByText('Você trouxe 1 de 1 de memória.')).toBeInTheDocument();
+  });
+
   it('as pílulas mostram só os pousos da volta e trocam a cena, o título e os fatos', async () => {
     const { repo, usuario } = await abrir({ comLei: true });
     // Três pousos: o de agora (o açude, 3 flores) e os dois que vieram antes na mesma volta.
@@ -258,6 +298,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(
       await screen.findByRole('heading', { name: 'Água no açude. Pode descansar.' }),
     ).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: 'Pular' }));
     expect(screen.getByText('Lembrou 2 de 3.')).toBeInTheDocument();
     const grupo = screen.getByRole('group', { name: 'Pousos da vereda' });
     expect(

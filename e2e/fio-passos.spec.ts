@@ -138,6 +138,17 @@ test('Ler e Lembrar com a LEP: cada cartão cabe, passa no axe, os grifos acende
 
   await expect(page).toHaveURL(/#\/fio\/pouso$/);
   await expect(page.getByRole('heading', { level: 2, name: /Pode descansar\.$/ })).toBeVisible();
+  // O pouso abre em branco (ideia 8): a página para escrever, sem os fatos nem as pílulas, e o resumo só depois.
+  await expect(page.getByRole('textbox', { name: /O que você lembra desta etapa/ })).toBeVisible();
+  await expect(page.getByText(/^Leu /)).toHaveCount(0);
+  await expect(page.getByRole('group', { name: 'Pousos da vereda' })).toHaveCount(0);
+  await botaoAlcancavel(page, 'Mostrar o resumo');
+  await semRolagemLateral(page);
+  await semViolacoesNoFio(page);
+  await page
+    .getByRole('textbox', { name: /O que você lembra desta etapa/ })
+    .fill('a pena do art. 2');
+  await page.getByRole('button', { name: 'Mostrar o resumo' }).click();
   await expect(page.getByText(/^Leu /)).toBeVisible();
   await expect(page.getByText(/Lembrou /)).toBeVisible();
   if (!acertou) await expect(page.getByText(/guardou 1 Frase/)).toBeVisible();
