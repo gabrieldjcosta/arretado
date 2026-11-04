@@ -11,6 +11,7 @@ import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
+import { ToquesConta } from './ToquesConta';
 
 const TEMAS: { valor: Tema; nome: string }[] = [
   { valor: 'sistema', nome: 'Igual ao aparelho' },
@@ -76,6 +77,7 @@ export function AparenciaConta() {
           </label>
         ))}
       </fieldset>
+      <ToquesConta />
       <fieldset>
         <legend>Fonte de leitura</legend>
         <label className="opcao">

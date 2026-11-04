@@ -1691,6 +1691,29 @@ describe('leitura artigo por artigo (11.8)', () => {
     (await abrirNorma(repo, normaId)).nos.find((n) => n.dispositivo.endereco === endereco)!
       .dispositivo.id;
 
+  it('reabrir onde a pessoa estava põe a fita do marcador de página; abrir do começo não', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    expect(document.querySelector('[data-marcador-de-pagina]')).toBeNull();
+  });
+
+  it('com uma posição guardada, a fita do marcador de página cai no artigo e não tem texto', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art3'));
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    const fita = await waitFor(() => {
+      const el = document.querySelector('[data-marcador-de-pagina]');
+      if (!el) throw new Error('sem fita');
+      return el;
+    });
+    expect(fita).toHaveAttribute('aria-hidden', 'true');
+    expect(fita).toHaveTextContent('');
+  });
+
   it('"Por artigo" mostra o artigo inteiro no cartão e os vizinhos esmaecidos, sem interação', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
