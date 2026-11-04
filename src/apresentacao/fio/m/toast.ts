@@ -17,7 +17,9 @@ export interface EstadoDoToast {
 }
 
 /** Quanto o "errei porque" fica à vista: o de um aviso com ação, e mais um respiro. */
-const PORQUE_FICA_MS = 7000;
+const PORQUE_FICA_MS = 10_000;
+/** Depois de tirar o dedo, o mouse ou o foco do aviso, ele ainda fica um pouco (WCAG 2.2.1: dá para pausar). */
+const PORQUE_RESTA_MS = 4000;
 
 let estado: EstadoDoToast = {
   id: 0,
@@ -74,6 +76,19 @@ export function avisarComPorQue(texto: string, aoEscolher: (causa: CausaErro) =>
   relogio = window.setTimeout(() => {
     mudar({ ...estado, ligado: false });
   }, PORQUE_FICA_MS);
+}
+
+/** O aviso com respostas para enquanto a pessoa o toca, aponta ou o foco está nele. */
+export function pausarAviso(): void {
+  if (estado.porque) window.clearTimeout(relogio);
+}
+
+export function retomarAviso(): void {
+  if (!estado.porque || !estado.ligado) return;
+  window.clearTimeout(relogio);
+  relogio = window.setTimeout(() => {
+    mudar({ ...estado, ligado: false });
+  }, PORQUE_RESTA_MS);
 }
 
 export function esconderAviso(): void {

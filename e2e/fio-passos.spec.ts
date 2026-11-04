@@ -815,3 +815,56 @@ for (const [largura, altura] of [
     }
   });
 }
+
+test('o aviso "errei porque…" para com o mouse em cima, se lê nos pixels e anota a causa', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 360, height: 640 });
+  await comALeiNaPrevia(page);
+  await puxador(page).focus();
+  await page.keyboard.press('Enter');
+  await cartaoDa(page, 'ler').getByRole('button', { name: 'Pronto, li' }).click();
+  const lembrar = cartaoDa(page, 'lembrar');
+  // A primeira resposta é a certa; a segunda erra, e o erro guarda a Frase.
+  await lembrar
+    .getByRole('group', { name: /Escolha o que a lei diz|Esta frase está como na lei\?/ })
+    .getByRole('button')
+    .nth(1)
+    .click();
+  await expect(lembrar.locator('.m-retorno')).toHaveText(/a Frase certa, tirada da lei/);
+  await lembrar.getByRole('button', { name: 'Guardar e seguir' }).click();
+
+  const aviso = page.locator('.m-toast.m-porque');
+  const grupo = page.getByRole('group', { name: 'Errei porque' });
+  await expect(grupo.getByRole('button')).toHaveCount(3);
+  // Com o mouse em cima o relógio para: passam mais que os 10 s e o aviso segue lá.
+  await grupo.getByRole('button').nth(2).hover();
+  await page.waitForTimeout(11_000);
+  await expect(aviso).toBeVisible();
+
+  // O texto e as respostas se leem nos dois mundos (o vidro é translúcido: o pixel decide, e não o axe).
+  for (const esquema of ['dark', 'light'] as const) {
+    await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+    const [caixa, texto, resposta] = await Promise.all([
+      aviso.boundingBox(),
+      aviso.locator('> span').evaluate((el) => getComputedStyle(el).color),
+      grupo
+        .getByRole('button')
+        .first()
+        .evaluate((el) => {
+          const e = getComputedStyle(el);
+          return { cor: e.color, fundo: e.backgroundColor };
+        }),
+    ]);
+    if (!caixa) throw new Error('sem caixa do aviso');
+    // O pixel do vidro, no canto de cima do aviso, à esquerda do texto.
+    const [vidro] = await coresNosPixels(page, [[caixa.x + 6, caixa.y + 6]]);
+    expect(contraste(texto, `rgb(${(vidro ?? [0, 0, 0]).join(',')})`)).toBeGreaterThanOrEqual(4.5);
+    expect(contraste(resposta.cor, resposta.fundo)).toBeGreaterThanOrEqual(4.5);
+  }
+
+  await grupo.getByRole('button', { name: 'li rápido demais' }).click();
+  await expect(page.getByText('Anotado')).toBeVisible();
+  await expect(page.locator('.m-toast.m-on')).toHaveCount(0, { timeout: 6000 });
+});

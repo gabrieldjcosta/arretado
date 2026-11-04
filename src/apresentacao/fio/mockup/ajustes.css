@@ -521,8 +521,8 @@
   color: var(--m-texto-2);
 }
 
-/* 22. "Errei porque…" (ideia 7 da prancha "Fio que ensina", Gabriel 04/11): depois de guardar a Frase, o aviso
-      oferece três respostas de um toque, opcionais, e some sozinho em 7 s. É o aviso compacto do mockup (o vidro, os
+/* 28. "Errei porque…" (ideia 7 da prancha "Fio que ensina", Gabriel 04/11): depois de guardar a Frase, o aviso
+      oferece três respostas de um toque, opcionais, e some sozinho em 10 s (e para enquanto se toca ou aponta). É o aviso compacto do mockup (o vidro, os
       botões claros) em duas linhas: o texto e, abaixo, as respostas, que quebram de linha em tela estreita. Fica no
       alto, mas deixa livre o canto do "+" (à direita), para não cobri-lo. */
 .m-fio.m-fio .m-toast.m-compacto.m-porque {
@@ -543,6 +543,7 @@
 }
 
 .m-fio.m-fio .m-porque-opcoes {
+  pointer-events: auto;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;

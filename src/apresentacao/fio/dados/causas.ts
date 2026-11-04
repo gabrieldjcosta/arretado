@@ -5,10 +5,10 @@
 import type { CausaErro } from '../../../core/modelo';
 
 /** As três respostas do toque: o que a pessoa diz, e a causa do Erro que ela nomeia. */
-export const PORQUES: readonly { causa: CausaErro; texto: string }[] = [
-  { causa: 'confusao', texto: 'confundi com outro artigo' },
-  { causa: 'lacuna', texto: 'não lembrava' },
-  { causa: 'leitura', texto: 'li rápido demais' },
+export const PORQUES: readonly { causa: CausaErro; texto: string; completo: string }[] = [
+  { causa: 'confusao', texto: 'confundi', completo: 'confundi com outro artigo' },
+  { causa: 'lacuna', texto: 'não lembrava', completo: 'não lembrava' },
+  { causa: 'leitura', texto: 'li rápido', completo: 'li rápido demais' },
 ];
 
 const chave = (usuarioId: string) => `arretado:fio:causas:v1:${usuarioId}`;
