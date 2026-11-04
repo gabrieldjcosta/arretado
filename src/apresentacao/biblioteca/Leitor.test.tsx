@@ -2279,12 +2279,17 @@ describe('Ponto de luz no Leitor (P4)', () => {
 
       // No cabeçalho do capítulo I, que tem duas seções.
       rolarPara(linhaDoDispositivo('tit1.cap1') * 60);
-      const capitulo = await within(estrutura).findByRole('button', {
+      await within(estrutura).findByRole('button', {
         name: /^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/,
       });
-      // O nome do botão chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera.
+      // O nome do botão chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera, e
+      // busca o botão de novo a cada tentativa (a lista pode montar outro elemento no lugar do guardado).
       await waitFor(() => {
-        expect(capitulo).toHaveAttribute('aria-current', 'location');
+        expect(
+          within(estrutura).getByRole('button', {
+            name: /^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/,
+          }),
+        ).toHaveAttribute('aria-current', 'location');
       });
       const dentro = await within(estrutura).findByRole('list', { name: 'Dentro de CAPÍTULO I' });
       expect(
@@ -2301,12 +2306,15 @@ describe('Ponto de luz no Leitor (P4)', () => {
       rolarPara(linhaDoDispositivo('art1') * 60);
       await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
       // A leitura está na seção I: a lista passa a ser a das seções, e a seção I é a de agora.
-      const secao1 = await within(estrutura).findByRole('button', {
-        name: /^Seção I Disposições Gerais, lida$/,
-      });
-      // O "lido" chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera.
+      await within(estrutura).findByRole('button', { name: /^Seção I Disposições Gerais, lida$/ });
+      // O "lido" chega antes do "de agora" (a linha de leitura é lida depois da rolagem): espera, e busca
+      // o botão de novo a cada tentativa. Ao passar a leitura para a seção, a lista troca de nível: o botão
+      // que estava dentro do capítulo sai e outro, no alto da lista, toma o lugar dele. Um elemento guardado
+      // antes ficaria solto e nunca ganharia o `aria-current` (era a intermitência do CI do #382).
       await waitFor(() => {
-        expect(secao1).toHaveAttribute('aria-current', 'location');
+        expect(
+          within(estrutura).getByRole('button', { name: /^Seção I Disposições Gerais, lida$/ }),
+        ).toHaveAttribute('aria-current', 'location');
       });
       expect(within(estrutura).queryByRole('list', { name: /^Dentro de/ })).toBeNull();
       expect(
