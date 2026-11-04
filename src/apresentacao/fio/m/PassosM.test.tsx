@@ -9,6 +9,8 @@ import { criarRascunho, publicarVersao } from '../../../dominios/legislacao/serv
 import { criarTarefa } from '../../../dominios/tarefas';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { ContextoRepositorio } from '../../dados/contexto';
+import { lerCausas } from '../dados/causas';
+import { ToastM } from './ToastM';
 import { LembrarM } from './LembrarM';
 import { GuardarM, PraticarM, RevisarM, SeuPassoM } from './OutrosPassosM';
 import type { PropsDoPassoM } from './passo-tipos';
@@ -47,7 +49,10 @@ async function montar(): Promise<{ repo: Repositorio; normaId: string }> {
 function com(repo: Repositorio, filho: ReactNode) {
   return render(
     <MemoryRouter>
-      <ContextoRepositorio.Provider value={repo}>{filho}</ContextoRepositorio.Provider>
+      <ContextoRepositorio.Provider value={repo}>
+        {filho}
+        <ToastM />
+      </ContextoRepositorio.Provider>
     </MemoryRouter>,
   );
 }
@@ -163,6 +168,12 @@ describe('LembrarM', () => {
     });
     const [frase] = await repo.colecao('frases').todosDoUsuario();
     expect(TEXTO_DA_LEI).toContain(frase?.texto ?? '#');
+
+    // Depois de guardar, o aviso oferece "errei porque…"; um toque anota a causa neste aparelho, sem obrigar nada.
+    const porque = await screen.findByRole('group', { name: 'Errei porque' });
+    await usuario.click(within(porque).getByRole('button', { name: 'confundi com outro artigo' }));
+    expect(await screen.findByText('Anotado')).toBeInTheDocument();
+    expect(lerCausas(repo.ctx.usuarioId)).toEqual({ [frase?.id ?? '#']: 'confusao' });
   });
 
   it('na lacuna, acertar não guarda nada e o resultado não leva `guardados`', async () => {
