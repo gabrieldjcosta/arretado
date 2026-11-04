@@ -211,3 +211,33 @@
     font-size: 4.5rem;
   }
 }
+
+/* O número que rola (NumeroQueRola): cada dígito é uma coluna de 0 a 9 vista por uma janela de 1em. */
+.rola {
+  display: inline-flex;
+  vertical-align: top;
+}
+
+.rola-digito {
+  display: inline-block;
+  height: 1em;
+  width: 0.62em;
+  overflow: hidden;
+  text-align: center;
+}
+
+.rola-coluna {
+  display: block;
+  will-change: transform;
+}
+
+.rola-coluna > i {
+  display: block;
+  height: 1em;
+  font-style: normal;
+  line-height: 1;
+}
+
+.rola-coluna > i::before {
+  content: attr(data-n);
+}
