@@ -1,6 +1,6 @@
 /* GERADO de docs/design/fio/mockup-aprovado.html por scripts/fio-mockup-css.mjs. NÃO EDITE.
    O mockup que o Gabriel aprovou é a fonte da cara do Arretado novo; para mudar algo aqui, mude o
-   mockup (a Marca) e rode `npm run fio:css`. Desvio do mockup vai em ajustes.css, com o motivo. */
+   mockup (a Marca) e rode `node scripts/fio-mockup-css.mjs`. Desvio do mockup vai em ajustes.css, com o motivo. */
 
 .m-fio.m-fio {
   --m-chao: #060b16;

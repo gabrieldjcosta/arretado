@@ -501,3 +501,32 @@ test('o botão de ação é o Sol no Vivo e o Só contorno no Calmo, de noite e 
     await semViolacoesNoFio(page);
   }
 });
+
+test('as respostas do Lembrar têm texto claro sobre o azul-escuro, de noite e de dia', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await comALeiNaPrevia(page);
+  await puxador(page).focus();
+  await page.keyboard.press('Enter');
+  const ler = cartaoDa(page, 'ler');
+  await expect(ler).toBeVisible();
+  await ler.getByRole('button', { name: 'Pronto, li' }).click();
+  const resposta = cartaoDa(page, 'lembrar')
+    .getByRole('group', { name: /Escolha o que a lei diz|Esta frase está como na lei\?/ })
+    .getByRole('button')
+    .first();
+  await expect(resposta).toBeVisible();
+
+  // O fundo das respostas é um degradê azul-escuro nos dois mundos, e o axe não decide nada sobre degradê:
+  // o texto se confere na cor. De dia a tinta (`--m-luz`) dava texto escuro sobre azul-escuro (desvio 18).
+  for (const esquema of ['dark', 'light'] as const) {
+    await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
+    await expect
+      .poll(() => resposta.evaluate((el) => getComputedStyle(el).color))
+      .toBe('rgb(255, 255, 255)');
+    expect(await resposta.evaluate((el) => getComputedStyle(el).backgroundImage)).toContain(
+      'rgb(42, 58, 95)',
+    );
+  }
+});

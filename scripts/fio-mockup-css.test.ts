@@ -19,12 +19,12 @@ describe('o mockup aprovado do Fio', () => {
     const atual = createHash('sha256')
       .update(readFileSync(path.join(raiz, ORIGEM)))
       .digest('hex');
-    // Se a Marca entregou uma versão nova aprovada: troque o arquivo, rode `npm run fio:css` e atualize
+    // Se a Marca entregou uma versão nova aprovada: troque o arquivo, rode `node scripts/fio-mockup-css.mjs` e atualize
     // o hash aqui junto, citando a aprovação no PR.
     expect(atual).toBe(SHA256_APROVADO);
   });
 
-  it('o CSS do app é exatamente o gerado dele (`npm run fio:css`)', () => {
+  it('o CSS do app é exatamente o gerado dele (`node scripts/fio-mockup-css.mjs`)', () => {
     expect(ler(DESTINO)).toBe(gerarCss(ler(ORIGEM)));
   });
 });

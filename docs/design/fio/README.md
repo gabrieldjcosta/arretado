@@ -16,10 +16,10 @@ Tudo mora em `src/apresentacao/fio/mockup/` e `src/apresentacao/fio/m/`. O prefi
 (`.cartao` do mockup é `.m-cartao` no app, `#puxador` é `#m-puxador`, `--mola` é `--m-mola`).
 
 1. `reset.css` (antes): o que o protótipo supunha da página (caixa, margens, fonte).
-2. `mockup.css` (gerado, **não se edita**): `npm run fio:css` lê o `<style>` do mockup e escreve este arquivo,
+2. `mockup.css` (gerado, **não se edita**): `node scripts/fio-mockup-css.mjs` lê o `<style>` do mockup e escreve este arquivo,
    trocando `.x` por `.m-x`, ids e propriedades personalizadas pelo mesmo prefixo, `:root` pela raiz do Fio
    (`.m-fio`) e pondo todo seletor dentro dela, para nada vazar para o resto do app. Tira o que só existe no
-   protótipo (a página, a barra de controles, a nota). `npm run fio:css:check` confere (o teste faz o mesmo).
+   protótipo (a página, a barra de controles, a nota). `node scripts/fio-mockup-css.mjs --check` confere (o teste faz o mesmo).
 3. `fontes.css`: as fontes do mockup servidas do próprio site (T19), com nomes só do Fio.
 4. `ajustes.css` (depois): os desvios, numerados, cada um com o motivo. É o único lugar onde o app se afasta do
    mockup. Cada desvio também tem uma linha em `docs/design/desvios.md`. Sem motivo escrito, não é desvio: é erro.
@@ -52,6 +52,12 @@ aprovado não usa nenhuma. Quando uma entrar (Motion, View Transitions, Auto-Ani
 - `node scripts/fidelidade-fio.mjs`: o par mockup | app | diferença (medidor, não portão: o conteúdo semeado
   difere). O que vale é olhar o par, nos quatro cantos: 360 e 1280 de largura, dia e noite, e uma foto no meio
   de uma troca de tela.
+- `e2e/apoio.ts`, `textoLegivelNoFio` (chamado por `semViolacoesNoFio`, então por todo teste de tela do quadro):
+  mede nos pixels o contraste de todo texto do quadro, nos dois mundos (4,5:1; 3:1 em texto grande). O axe não
+  decide nada sobre texto em cima de degradê (responde "incompleto") e o mockup é todo degradê: de dia, as
+  respostas do Lembrar tinham 1,3:1 e passavam no axe (desvio 18). Ficam de fora, em `TEXTO_PENDENTE_DA_MARCA`, o
+  que o mockup já faz assim e a Marca decide se clareia: "acertou? passe o cartão pro lado" (2,9:1 de dia),
+  "descansar" no pouso (4,1:1 de dia) e as flores do pouso (enfeite).
 - O teste verde não prova fidelidade: a Marca revisa contra o arquivo antes do merge.
 
 ## Como acrescentar um desvio

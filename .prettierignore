@@ -23,7 +23,7 @@ src/apresentacao/componentes/escrita/escrita-b.css
 /.claude-plugin
 
 # Cara do Fio: o mockup que o Gabriel aprovou é a fonte (não se reformata) e o CSS do app é gerado dele
-# (`npm run fio:css`); desvio vai em ajustes.css, nunca no gerado.
+# (`node scripts/fio-mockup-css.mjs`); desvio vai em ajustes.css, nunca no gerado.
 docs/design/fio/mockup-aprovado.html
 src/apresentacao/fio/mockup/mockup.css
 docs/design/mockups/

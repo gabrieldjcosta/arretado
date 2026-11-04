@@ -234,6 +234,176 @@ export async function semViolacoes(page: Page) {
 export async function semViolacoesNoFio(page: Page) {
   await expect(page.locator('.m-toast.m-on')).toHaveCount(0, { timeout: 10_000 });
   await semViolacoes(page);
+  await textoLegivelNoFio(page);
+}
+
+/**
+ * Texto do quadro do Fio que a Marca ainda decide se clareia (WCAG 1.4.3). Não reprova; o relatório de cada um está
+ * em `docs/design/fio/README.md`. Entra aqui só o que o mockup aprovado já faz assim.
+ */
+const TEXTO_PENDENTE_DA_MARCA = [
+  '.m-dica-gesto', // "acertou? passe o cartão pro lado": o tom --texto-3 do mockup; de dia dá 2,9:1
+  '.m-lua-btn > span', // "descansar": o tom --texto-3 do mockup; de dia dá 4,1:1
+  '.m-flores', // as flores do pouso são enfeite, e o nome do lugar está ao lado
+];
+
+/** Um texto visível do quadro: o que diz, de que cor é e a caixa que ocupa na tela (px de CSS). */
+interface TextoDoQuadro {
+  quem: string;
+  texto: string;
+  cor: [number, number, number];
+  alfa: number;
+  grande: boolean;
+  caixa: { x: number; y: number; w: number; h: number };
+}
+
+/**
+ * Os textos do quadro que se veem inteiros e parados: com a cor, o tamanho e a caixa. Fica de fora o que está
+ * escondido, coberto por outra coisa, esmaecendo (opacidade abaixo de 0,99) ou sem tamanho para ler.
+ */
+function textosDoQuadro(page: Page): Promise<TextoDoQuadro[]> {
+  return page.evaluate((pendentes) => {
+    const achados: TextoDoQuadro[] = [];
+    for (const el of document.querySelectorAll('.m-app *')) {
+      const temTexto = [...el.childNodes].some(
+        (no) => no.nodeType === Node.TEXT_NODE && (no.textContent ?? '').trim() !== '',
+      );
+      if (!temTexto || pendentes.some((seletor) => el.matches(seletor))) continue;
+      const estilo = getComputedStyle(el);
+      if (estilo.visibility === 'hidden' || estilo.display === 'none') continue;
+      const caixa = el.getBoundingClientRect();
+      const x0 = Math.max(0, caixa.left);
+      const y0 = Math.max(0, caixa.top);
+      const x1 = Math.min(window.innerWidth, caixa.right);
+      const y1 = Math.min(window.innerHeight, caixa.bottom);
+      if (x1 - x0 < 4 || y1 - y0 < 4) continue;
+      const alvo = document.elementFromPoint((x0 + x1) / 2, (y0 + y1) / 2);
+      if (!alvo || !(el === alvo || el.contains(alvo) || alvo.contains(el))) continue;
+      let opacidade = 1;
+      for (let pai: Element | null = el; pai; pai = pai.parentElement) {
+        opacidade *= Number(getComputedStyle(pai).opacity);
+      }
+      if (opacidade < 0.99) continue;
+      const [r = 0, g = 0, b = 0, a = 1] = (estilo.color.match(/[\d.]+/g) ?? []).map(Number);
+      const escala = estilo.color.startsWith('color(') ? 255 : 1;
+      const tamanho = parseFloat(estilo.fontSize);
+      achados.push({
+        quem:
+          el.tagName.toLowerCase() +
+          (typeof el.className === 'string' && el.className.trim() !== ''
+            ? `.${el.className.trim().split(/\s+/).join('.')}`
+            : ''),
+        texto: el.textContent.trim().replace(/\s+/g, ' ').slice(0, 28),
+        cor: [r * escala, g * escala, b * escala],
+        alfa: a,
+        grande: tamanho >= 24 || (tamanho >= 18.66 && Number(estilo.fontWeight) >= 700),
+        caixa: { x: x0, y: y0, w: x1 - x0, h: y1 - y0 },
+      });
+    }
+    return achados;
+  }, TEXTO_PENDENTE_DA_MARCA);
+}
+
+/** Para cada texto, a razão de contraste entre a cor dele e o fundo (a mediana dos pixels da caixa, sem o texto). */
+async function contrasteDosTextos(page: Page, textos: TextoDoQuadro[]) {
+  // A folha construída pelo CSSOM passa pelo CSP (`style-src 'self'`); `page.screenshot({ style })` não passa.
+  await page.evaluate(() => {
+    const folha = new CSSStyleSheet();
+    folha.replaceSync(
+      '*, *::before, *::after { color: transparent !important; text-shadow: none !important; -webkit-text-fill-color: transparent !important; }',
+    );
+    (window as unknown as { __folhaSemTexto: CSSStyleSheet }).__folhaSemTexto = folha;
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, folha];
+  });
+  let foto: Buffer;
+  try {
+    foto = await page.screenshot({ animations: 'disabled', scale: 'css' });
+  } finally {
+    await page.evaluate(() => {
+      const { __folhaSemTexto: folha } = window as unknown as { __folhaSemTexto: CSSStyleSheet };
+      document.adoptedStyleSheets = document.adoptedStyleSheets.filter((f) => f !== folha);
+    });
+  }
+  return page.evaluate(
+    async ({ png, itens }: { png: string; itens: TextoDoQuadro[] }) => {
+      const imagem = await createImageBitmap(
+        new Blob([Uint8Array.from(atob(png), (c) => c.charCodeAt(0))], { type: 'image/png' }),
+      );
+      const tela = document.createElement('canvas');
+      tela.width = imagem.width;
+      tela.height = imagem.height;
+      const ctx = tela.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('sem canvas para medir o fundo');
+      ctx.drawImage(imagem, 0, 0);
+      const linear = (c: number) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      const luz = (r: number, g: number, b: number) =>
+        0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+      return itens.map((item) => {
+        const { x, y, w, h } = item.caixa;
+        const dados = ctx.getImageData(
+          Math.floor(x),
+          Math.floor(y),
+          Math.max(1, Math.ceil(w)),
+          Math.max(1, Math.ceil(h)),
+        ).data;
+        const mediana = [0, 1, 2].map((canal) => {
+          const valores: number[] = [];
+          for (let i = canal; i < dados.length; i += 4) valores.push(dados[i] ?? 0);
+          valores.sort((a, b) => a - b);
+          return valores[Math.floor(valores.length / 2)] ?? 0;
+        });
+        const [fr = 0, fg = 0, fb = 0] = item.cor.map(
+          (v, canal) => v * item.alfa + (mediana[canal] ?? 0) * (1 - item.alfa),
+        );
+        const [mr = 0, mg = 0, mb = 0] = mediana;
+        const [clara = 0, escura = 0] = [luz(fr, fg, fb), luz(mr, mg, mb)].sort((a, b) => b - a);
+        return {
+          quem: item.quem,
+          texto: item.texto,
+          razao: (clara + 0.05) / (escura + 0.05),
+          minimo: item.grande ? 3 : 4.5,
+        };
+      });
+    },
+    { png: foto.toString('base64'), itens: textos },
+  );
+}
+
+/**
+ * Todo texto do quadro do Fio se lê, nos dois mundos (WCAG 1.4.3: 4,5:1; 3:1 em texto grande). O axe não decide nada
+ * sobre texto em cima de degradê (responde "incompleto"), e o mockup é todo degradê: "passa no axe" não prova que dá
+ * para ler (de dia, as respostas do Lembrar tinham 1,3:1 e passavam). Aqui se mede nos pixels: tira-se o texto,
+ * fotografa-se e compara-se a cor dele com o fundo de trás da caixa. Só vale para o quadro (`.m-app`).
+ */
+export async function textoLegivelNoFio(page: Page) {
+  if ((await page.locator('.m-app').count()) === 0) return;
+  for (const colorScheme of ['dark', 'light'] as const) {
+    await page.emulateMedia({ colorScheme });
+    // O mundo do Fio troca um instante depois (matchMedia, React, `data-mundo`). Medir antes é medir as cores de um
+    // mundo sobre o fundo do outro: texto claro da noite sobre o branco do dia dava 1,1:1 num botão que se lê bem.
+    await expect(page.locator('.m-fio')).toHaveAttribute(
+      'data-mundo',
+      colorScheme === 'dark' ? 'noite' : 'dia',
+    );
+    await assentarAsTransicoes(page);
+    // O que esmaece (uma tela que acabou de entrar) só conta depois de parado; sem nenhum texto parado, não se mediu nada.
+    await expect
+      .poll(async () => (await textosDoQuadro(page)).length, { timeout: 8_000 })
+      .toBeGreaterThan(2);
+    const medidas = await contrasteDosTextos(page, await textosDoQuadro(page));
+    expect(
+      medidas
+        .filter((m) => m.razao < m.minimo)
+        .map(
+          (m) => `"${m.texto}" ${m.quem}: ${m.razao.toFixed(2)}:1 (mínimo ${String(m.minimo)}:1)`,
+        ),
+      colorScheme,
+    ).toEqual([]);
+  }
+  await page.emulateMedia({ colorScheme: null });
 }
 
 /** Uma `Element.animate` que a página recebeu: o alvo (tag e classes sem o prefixo `m-`) e o que se pediu dela. */

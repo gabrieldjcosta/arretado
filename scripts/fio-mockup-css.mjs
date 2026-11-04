@@ -127,7 +127,7 @@ export function gerarCss(html) {
   const cabeca =
     '/* GERADO de docs/design/fio/mockup-aprovado.html por scripts/fio-mockup-css.mjs. NÃO EDITE.\n' +
     '   O mockup que o Gabriel aprovou é a fonte da cara do Arretado novo; para mudar algo aqui, mude o\n' +
-    '   mockup (a Marca) e rode `npm run fio:css`. Desvio do mockup vai em ajustes.css, com o motivo. */\n\n';
+    '   mockup (a Marca) e rode `node scripts/fio-mockup-css.mjs`. Desvio do mockup vai em ajustes.css, com o motivo. */\n\n';
   return cabeca + escrever(lerRegras(limpo));
 }
 
@@ -135,7 +135,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const css = gerarCss(readFileSync(ORIGEM, 'utf8'));
   if (process.argv.includes('--check')) {
     if (readFileSync(DESTINO, 'utf8') !== css) {
-      console.error(`${DESTINO} não bate com ${ORIGEM}. Rode: npm run fio:css`);
+      console.error(`${DESTINO} não bate com ${ORIGEM}. Rode: node scripts/fio-mockup-css.mjs`);
       process.exit(1);
     }
     console.log('CSS do Fio bate com o mockup aprovado.');

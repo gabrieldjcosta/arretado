@@ -274,3 +274,16 @@
 .m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao[disabled] {
   box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
 }
+
+/* 18. As respostas do Lembrar (`.m-bolinha`), no mundo do dia. Motivo: o fundo delas é azul-escuro nos dois mundos,
+      mas o texto usa `--m-luz`, que de dia é a tinta (#0f1c3a): texto escuro sobre fundo escuro, com 1,3:1 de
+      contraste, ilegível (o mockup tem o mesmo defeito: `docs/design/fio/mockup-aprovado.html` linha 471, e a
+      folha lado a lado de dia o mostra). De dia o texto das respostas passa a ser branco, como à noite; e o da
+      resposta certa, que usa `--m-noite` (quase branco de dia) sobre o âmbar da banda, passa à tinta. */
+.m-fio.m-fio[data-mundo='dia'] .m-bolinha:not(.m-certa) {
+  color: #fff;
+}
+
+.m-fio.m-fio[data-mundo='dia'] .m-bolinha.m-certa {
+  color: var(--m-texto);
+}
