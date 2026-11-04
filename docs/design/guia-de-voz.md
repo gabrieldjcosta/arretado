@@ -38,3 +38,5 @@ Em nenhum outro lugar. Revisão em andamento e leitor ficam sem recompensa, para
 ## Implementação (14/10/2026)
 
 `src/apresentacao/voz.ts` guarda os textos e o sorteio (1 em 3; uma vez por tela; desligado quando o perfil de estudo é Calmo **ou ausente**, que é o padrão). Aplicado em: fim de rodada dos cartões e das frases ("Danado de bom! Rodada feita." no lugar de "Feito.") e "Dia fechado, danado de bom.". Ainda não aplicado: fim de leitura da Norma, primeiro Erro, estado vazio, "Bora", retorno e pausa (botões e títulos que testes e leitores de tela usam pelo nome entram numa fatia própria, junto do redesenho). Para ver o sotaque, escolha o perfil Guiado ou Leitura em Conta › Perfis.
+
+**Palavras neutras que se revezam (04/11/2026, Gabriel):** fora do Calmo, a parte das conclusões sem sotaque reparte-se entre palavras neutras (fim de rodada: Feito. / Pronto. / Rodada fechada.; Dia: Dia fechado / Dia encerrado / Por hoje, fechado). Sem humor forçado e sem emoji. No Calmo e sem perfil escolhido, só o neutro de sempre.
