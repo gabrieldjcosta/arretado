@@ -59,6 +59,11 @@ export function PorteiraDoFio({
           {indice + 1} de {cartoes.length}
         </p>
       )}
+      {indice === 0 && cartoes.length > 1 && (
+        <p className="dica">
+          Artigos vizinhos, misturados de propósito: decidir qual é qual fixa mais.
+        </p>
+      )}
       <article className="cartao-bloco ache-folha" aria-label="Porteira">
         <p className="ache-referencia">{atual.fonte.referencia}</p>
         <CertoOuErrado
