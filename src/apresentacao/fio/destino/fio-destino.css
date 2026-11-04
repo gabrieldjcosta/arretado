@@ -28,10 +28,12 @@
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   color: var(--titulo);
+  display: flex;
+  align-items: flex-end;
 }
 
 .fio-numero small {
-  margin-left: 0.125rem;
+  margin: 0 0 0.12em 0.5rem;
   font-size: 1.5rem;
   letter-spacing: 0;
   color: var(--texto-atenuado);

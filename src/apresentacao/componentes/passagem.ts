@@ -8,6 +8,8 @@ import { CURVA, esperar, movimentoAgora } from '../movimento';
 /** A entrada parte de dentro da calha lateral (16 px no celular): de mais longe, a página rolaria de lado. */
 const ENTRADA_PX = 12;
 const SEM_SINAL = new AbortController().signal;
+/** Para onde o cartão sai: -1 à esquerda (Errei, Difícil), 1 à direita (Fácil). */
+export type Lado = -1 | 1;
 const semErro = () => undefined;
 /** A mola do mockup (`--f-mola`): passa um pouco do ponto e assenta. */
 const MOLA = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
@@ -24,40 +26,66 @@ const PAUSA_MS = { calmo: 140, normal: 150 } as const;
 export function usePassagemDeCartao() {
   const cartao = useRef<HTMLElement>(null);
 
-  const passar = useCallback(async (trabalho: Promise<unknown>, avancar: () => void) => {
-    const movimento = movimentoAgora();
-    const el = cartao.current;
-    if (movimento === 'reduzido' || !el || typeof el.animate !== 'function') {
-      await trabalho;
-      avancar();
-      return;
-    }
-    await Promise.all([trabalho, esperar(PAUSA_MS[movimento], SEM_SINAL)]);
-    const anda = movimento === 'normal';
-    const saida = el.animate(
-      anda
-        ? [
-            { transform: 'none', opacity: 1 },
-            { transform: 'translateX(-28px)', opacity: 0 },
-          ]
-        : [{ opacity: 1 }, { opacity: 0 }],
-      { duration: anda ? 190 : 150, easing: anda ? CURVA : 'linear', fill: 'forwards' },
-    );
-    await saida.finished.catch(semErro);
-    if (!el.isConnected) return;
-    // O conteúdo novo já está no lugar quando o cartão volta a aparecer, só que ainda invisível.
-    flushSync(avancar);
-    saida.cancel();
-    el.animate(
-      anda
-        ? [
-            { transform: `translateX(${String(ENTRADA_PX)}px)`, opacity: 0 },
-            { transform: 'none', opacity: 1 },
-          ]
-        : [{ opacity: 0 }, { opacity: 1 }],
-      { duration: anda ? 210 : 170, easing: anda ? CURVA : 'linear', fill: 'backwards' },
-    );
-  }, []);
+  const passar = useCallback(
+    async (trabalho: Promise<unknown>, avancar: () => void, lado?: Lado) => {
+      const movimento = movimentoAgora();
+      const el = cartao.current;
+      if (movimento === 'reduzido' || !el || typeof el.animate !== 'function') {
+        await trabalho;
+        avancar();
+        return;
+      }
+      await Promise.all([trabalho, esperar(PAUSA_MS[movimento], SEM_SINAL)]);
+      const anda = movimento === 'normal';
+      // Com `lado` (a Revisão): o cartão sai de lado, girando, e o seguinte sobe da pilha de trás.
+      const daPilha = anda && lado !== undefined;
+      const saida = el.animate(
+        daPilha
+          ? [
+              { transform: 'none', opacity: 1 },
+              {
+                transform: `translateX(${String(lado * 130)}%) rotate(${String(lado * 12)}deg)`,
+                opacity: 0,
+              },
+            ]
+          : anda
+            ? [
+                { transform: 'none', opacity: 1 },
+                { transform: 'translateX(-28px)', opacity: 0 },
+              ]
+            : [{ opacity: 1 }, { opacity: 0 }],
+        {
+          duration: daPilha ? 380 : anda ? 190 : 150,
+          easing: daPilha ? 'cubic-bezier(0.5, 0, 0.9, 0.5)' : anda ? CURVA : 'linear',
+          fill: 'forwards',
+        },
+      );
+      await saida.finished.catch(semErro);
+      if (!el.isConnected) return;
+      // O conteúdo novo já está no lugar quando o cartão volta a aparecer, só que ainda invisível.
+      flushSync(avancar);
+      saida.cancel();
+      el.animate(
+        daPilha
+          ? [
+              { transform: 'scale(0.94) translateY(10px)', opacity: 0.4 },
+              { transform: 'none', opacity: 1 },
+            ]
+          : anda
+            ? [
+                { transform: `translateX(${String(ENTRADA_PX)}px)`, opacity: 0 },
+                { transform: 'none', opacity: 1 },
+              ]
+            : [{ opacity: 0 }, { opacity: 1 }],
+        {
+          duration: daPilha ? 400 : anda ? 210 : 170,
+          easing: anda ? CURVA : 'linear',
+          fill: 'backwards',
+        },
+      );
+    },
+    [],
+  );
 
   /**
    * Virar o cartão (Motion não é preciso: é a Web Animations nativa, como a passagem): meia volta em Y até

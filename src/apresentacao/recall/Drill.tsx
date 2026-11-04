@@ -193,7 +193,7 @@ export function Drill() {
           await gravada;
           avancar();
         } else {
-          await passar(gravada, avancar);
+          await passar(gravada, avancar, resposta === 'facil' ? 1 : -1);
         }
       } catch {
         setFalha('Não foi possível registrar a revisão. Tente de novo; nada foi perdido.');
@@ -302,29 +302,31 @@ export function Drill() {
         max={estado.fila.length}
         rotulo="Cartão"
       />
-      <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
-        <p className="drill-frente texto-leitura">{atual.frente}</p>
-        {estado.virado && (
-          <div className="frase-correta" aria-live="polite">
-            <p className="frase-correta-titulo">
-              {atual.tipo === 'lacuna'
-                ? 'Frase completa'
-                : atual.erroId
-                  ? 'Frase correta'
-                  : 'Resposta'}
-            </p>
-            <p className="texto-leitura">
-              {verso?.id !== atual.id ? (
-                <span className="dica">Carregando…</span>
-              ) : verso.texto ? (
-                verso.texto
-              ) : (
-                <span className="dica">(sem verso — edite o cartão para completar)</span>
-              )}
-            </p>
-          </div>
-        )}
-      </article>
+      <div className={restam > 0 ? 'pilha-do-cartao com-pilha' : 'pilha-do-cartao'}>
+        <article ref={cartaoDaRevisao} className="cartao-bloco cartao-drill" aria-label="Cartão">
+          <p className="drill-frente texto-leitura">{atual.frente}</p>
+          {estado.virado && (
+            <div className="frase-correta" aria-live="polite">
+              <p className="frase-correta-titulo">
+                {atual.tipo === 'lacuna'
+                  ? 'Frase completa'
+                  : atual.erroId
+                    ? 'Frase correta'
+                    : 'Resposta'}
+              </p>
+              <p className="texto-leitura">
+                {verso?.id !== atual.id ? (
+                  <span className="dica">Carregando…</span>
+                ) : verso.texto ? (
+                  verso.texto
+                ) : (
+                  <span className="dica">(sem verso — edite o cartão para completar)</span>
+                )}
+              </p>
+            </div>
+          )}
+        </article>
+      </div>
       {falha && (
         <p role="alert" className="aviso falha">
           {falha}

@@ -30,3 +30,41 @@
     min-height: 30dvh;
   }
 }
+
+/* A pilha de cartões (ideia "Cartão que vira"): atrás do cartão da vez, mais dois, um pouco menores, para a
+   pessoa ver que há mais por vir. O cartão sai de lado em 130% da largura; o corte evita rolagem lateral. */
+.coluna-drill {
+  overflow-x: clip;
+}
+
+.pilha-do-cartao {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.pilha-do-cartao > .cartao-drill {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+}
+
+.pilha-do-cartao.com-pilha {
+  margin-bottom: 1.75rem;
+}
+
+.pilha-do-cartao.com-pilha::before,
+.pilha-do-cartao.com-pilha::after {
+  content: '';
+  position: absolute;
+  inset: 10px 8px -8px;
+  z-index: 0;
+  border: var(--borda-folha);
+  border-radius: var(--raio-cartao);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+
+.pilha-do-cartao.com-pilha::after {
+  inset: 20px 16px -16px;
+  opacity: 0.6;
+}
