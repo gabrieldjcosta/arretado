@@ -181,6 +181,22 @@
   --z-noite: none;
   --z-ponto: #ffc53d;
   --z-ponto-brilho: #ffc53d;
+  /* O contorno de evidência (D-D13; contrato do Zé, §8c): o anel do cartão do Agora e do artigo do
+     Modo foco, o único elemento que a pessoa deve olhar agora. Escolha "B" do Gabriel (03/11/2026):
+     a linha branca de 2 px por fora do cartão, a faixa azul piscina suave até 5 px (a opacidade da
+     faixa é a do mundo) e o halo piscina (raio e espalhamento por tela), aceso em 0,3 s e assentado até
+     0,9 s. O interno é a fração do halo que tinge a borda por dentro. Tudo decoração: o contorno do
+     cartão (`--borda-folha`) segue ali e o anel não carrega informação (`scripts/evidencia-css.test.ts`). */
+  --ev-linha: #ffffff;
+  --ev-linha-larg: 2px;
+  --ev-faixa: rgb(57 202 239 / 0.5);
+  --ev-faixa-fim: 5px;
+  --ev-halo-cor: 57 202 239;
+  --ev-halo-aceso: 0.7;
+  --ev-halo-repouso: 0.45;
+  --ev-halo-raio: 20px;
+  --ev-halo-espalha: 6px;
+  --ev-interno: 0.4;
 
   /* A ação é a luz do mundo: tinta cheia com texto branco de dia, luz cheia com o texto da noite à
      noite, um botão por tela; o caminho (link) é a mesma luz, sublinhada. */
@@ -209,9 +225,8 @@
      2 à noite. */
   --marca-ponto: var(--ponto-luz);
   --marca-disco: var(--ponto-halo);
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 1;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-titulo);
   --tamanho-rotulo: 0.9375rem;
   --espessura-contorno: 1.5px;
@@ -334,14 +349,16 @@
     --z-bloom-repouso: 0.32;
     --z-dia: none;
     --z-noite: inline;
+    --ev-faixa: rgb(57 202 239 / 0.35);
+    --ev-halo-aceso: 0.75;
+    --ev-halo-repouso: 0.5;
     --acao-texto: var(--n-noite);
     --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
     --bloco-acao-texto: var(--n-noite);
     --marca-ponto: var(--ponto-halo);
     --marca-disco: transparent;
-    /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-       seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-    --marca-da-parada: 0;
+    /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+       14 px. O peso é o `--peso-titulo`. */
     --fonte-rotulo: var(--fonte-interface);
     --tamanho-rotulo: 0.875rem;
     --espessura-contorno: 1px;
@@ -424,14 +441,16 @@
   --z-bloom-repouso: 0.32;
   --z-dia: none;
   --z-noite: inline;
+  --ev-faixa: rgb(57 202 239 / 0.35);
+  --ev-halo-aceso: 0.75;
+  --ev-halo-repouso: 0.5;
   --acao-texto: var(--n-noite);
   --acao-hover: color-mix(in srgb, var(--n-luz) 88%, var(--n-vidro));
   --bloco-acao-texto: var(--n-noite);
   --marca-ponto: var(--ponto-halo);
   --marca-disco: transparent;
-  /* O Hoje (D-D9, Q5): a faixa e o ponto da linha de parada só existem de dia (1 ou 0). O rótulo do "Em
-     seguida" é o título, em 15 px, de dia; à noite é a interface, em 14 px. O peso é o `--peso-titulo`. */
-  --marca-da-parada: 0;
+  /* O Hoje (D-D9, Q5): o rótulo do "Em seguida" é o título, em 15 px, de dia; à noite é a interface, em
+     14 px. O peso é o `--peso-titulo`. */
   --fonte-rotulo: var(--fonte-interface);
   --tamanho-rotulo: 0.875rem;
   --espessura-contorno: 1px;
@@ -611,6 +630,16 @@ button,
 :root {
   --gutter: 1rem;
   --largura-casca: 900px;
+  /* O "+" (MaisGlobal, D-D23): um botão redondo, fixo no canto de cima à direita. A conta do recuo é a do
+     cabeçalho (`.topo`), que reserva o lugar dele, e no modo foco, onde o cabeçalho some, ele fica no
+     mesmo ponto. O 100% de --mais-direita (adiante, de 900 px em diante) é a largura do bloco que contém
+     quem a usa: a tela, no `right` do elemento fixo, e o Shell (que tem a largura da tela), no recuo do
+     `.topo` e da `.faixa-posse`. Em qualquer outro lugar a conta não vale. O lado é em px, não em rem: o
+     botão só tem um ícone, não há rótulo que peça mais espaço com a fonte ampliada, e a 300% um "+" de
+     144 px tomava a largura de Ajuda e Conta e passava por cima delas. */
+  --mais-lado: 48px;
+  --mais-topo: calc(env(safe-area-inset-top, 0px) + 0.375rem);
+  --mais-direita: max(var(--gutter), env(safe-area-inset-right, 0px));
   --abas-altura: env(safe-area-inset-bottom, 0px);
   /* O foco por Tab ou por script não pode parar sob o cabeçalho preso nem sob as abas de baixo
      (WCAG 2.4.11). O Leitor tem a folga dele embaixo (mais específica, adiante). */
@@ -634,6 +663,9 @@ button,
 @media (min-width: 900px) {
   :root {
     --gutter: 2rem;
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
   }
 }
 
@@ -645,9 +677,11 @@ button,
 }
 
 /* Cabeçalho (D-D9, Q2): o lockup da marca à esquerda; Ajuda e Conta à direita; de 900 px em diante, as
-   áreas ao centro e "Registrar erro" com a tecla E. Altura de 60 px. O filete de baixo separa o
-   cabeçalho preso do texto que rola por baixo. Os recuos somam a área segura (entalhe), que só existe
-   com viewport-fit=cover (P7). */
+   áreas ao centro. Altura de 60 px. O filete de baixo separa o cabeçalho preso do texto que rola por
+   baixo. Os recuos somam a área segura (entalhe), que só existe com viewport-fit=cover (P7). O recuo da
+   direita é o do "+" (D-D23): o botão é fixo no canto, e a reserva é a largura dele mais um respiro de
+   4 px, então Ajuda e Conta nunca passam por baixo dele, nem rolam de lado quando a fonte ampliada
+   quebra o cabeçalho em linhas. O 100% de --mais-direita é a largura do cabeçalho, que é a da tela. */
 .topo {
   position: sticky;
   top: 0;
@@ -659,7 +693,7 @@ button,
   align-items: center;
   column-gap: 0.5rem;
   min-height: calc(3.75rem + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) max(var(--gutter), env(safe-area-inset-right, 0px)) 0
+  padding: env(safe-area-inset-top, 0px) calc(var(--mais-direita) + var(--mais-lado) + 0.25rem) 0
     max(var(--gutter), env(safe-area-inset-left, 0px));
   background: var(--fundo);
   border-bottom: 1px solid var(--borda);
@@ -697,15 +731,19 @@ button,
   fill: var(--marca-ponto);
 }
 
+/* Com a fonte muito ampliada Ajuda e Conta não cabem lado a lado na largura que o "+" deixa: o grupo
+   quebra em duas linhas, à direita, em vez de passar da tela. */
 .acoes-globais {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 0.25rem;
 }
 
-/* Ajuda em texto e Conta num alvo de 44 com o ícone de 24 (traço de 1,8); o ícone encosta no recuo da
-   página (o alvo avança 10 px sobre ele). As regras dos botões da casca levam o pai no seletor: `button, .botao`
-   vem depois no arquivo e, com a mesma especificidade, venceria (display, recuo e raio). */
+/* Ajuda em texto e Conta num alvo de 44 com o ícone de 24 (traço de 1,8). As regras dos botões da casca
+   levam o pai no seletor: `button, .botao` vem depois no arquivo e, com a mesma especificidade,
+   venceria (display, recuo e raio). */
 .acoes-globais .ajuda-botao {
   padding: 0 0.75rem;
 }
@@ -726,7 +764,6 @@ button,
 .acoes-globais .conta-botao {
   width: var(--alvo);
   padding: 0;
-  margin-right: -0.625rem;
 }
 
 .conta-botao svg {
@@ -735,22 +772,17 @@ button,
   flex: none;
 }
 
-/* Registrar erro no cabeçalho só a partir de 900 px, neutro (a ação da tela é o botão primário), com a
-   tecla E ao lado. Até 899 px o registro é o "+" do título (Hoje e Fixar) e a tecla E. */
-.acoes-globais .registrar-global {
-  display: none;
-  padding: 0 0.875rem 0 1rem;
-}
+/* Com a tela estreita (menos de 360 px) o lockup e o recuo de Ajuda encolhem para o cabeçalho caber numa
+   linha ao lado do "+": sem isso ele quebrava em duas e o "+", fixo no alto, ficava no canto da primeira
+   linha, longe do centro do cabeçalho. */
+@media (max-width: 22.5rem) {
+  .lockup {
+    width: 7rem;
+  }
 
-.registrar-global .atalho {
-  font: inherit;
-  font-size: 0.8125rem;
-  line-height: 1;
-  padding: 0.2rem 0.4rem;
-  border: 1px solid var(--borda-botao);
-  border-radius: var(--raio-chip);
-  background: var(--superficie-2);
-  color: var(--texto-atenuado);
+  .acoes-globais .ajuda-botao {
+    padding-inline: 0.5rem;
+  }
 }
 
 /* Abas das áreas (D-D9, Q2): o rótulo atenuado; a atual vai na luz do mundo, em negrito, com o traço de
@@ -850,26 +882,24 @@ button,
     max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 
-/* Título com o "+" na mesma linha (TituloComMais, D-D9, Q2): o "+" é redondo, de 48 px, com o contorno
-   do controle (1,5 px em --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de
-   dia, a serra 2 à noite), e registra um erro. Não é a ação da tela: essa é a `.principal`. */
-.titulo-com-mais {
+/* O "+" da casca (MaisGlobal, D-D23): redondo, de 48 px, com o contorno do controle (1,5 px em
+   --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de dia, a serra 2 à noite). É
+   fixo no canto de cima à direita, sobre a reserva que o cabeçalho guarda no recuo (`.topo`) e, no modo
+   foco, no mesmo ponto da tela. Fica acima do cabeçalho (5) e das abas (5), abaixo do que cobre a tela toda (a
+   Abertura, 100; os diálogos, na camada do topo). Não é a ação da tela: essa é a `.principal`. */
+.mais-global {
+  position: fixed;
+  top: var(--mais-topo);
+  right: var(--mais-direita);
+  z-index: 6;
+}
+
+.mais-global .mais {
+  /* Em bloco: sem a linha de texto do `inline-flex`, a caixa do fixo tem os 48 px do botão e o painel
+     abre colado nele. */
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 0 0 1rem;
-}
-
-.titulo-com-mais h1 {
-  margin: 0;
-  min-width: 0;
-}
-
-.titulo-com-mais .mais {
-  flex: none;
-  width: 3rem;
-  height: 3rem;
+  width: var(--mais-lado);
+  height: var(--mais-lado);
   padding: 0;
   border: var(--espessura-contorno) solid var(--borda-campo);
   border-radius: 50%;
@@ -877,7 +907,7 @@ button,
 }
 
 @media (hover: hover) {
-  .titulo-com-mais .mais:hover {
+  .mais-global .mais:hover {
     --botao-fundo: color-mix(in srgb, var(--texto) 6%, var(--fundo-controle));
   }
 }
@@ -886,6 +916,79 @@ button,
   width: 1.5rem;
   height: 1.5rem;
   flex: none;
+}
+
+/* Painel do "+": duas opções, abre para baixo a partir do botão e alinhado à direita, como o menu Ajuda
+   (linha da folha, nenhuma sombra). Cada opção é uma linha de 44 px ou mais: o nome e, embaixo, uma frase
+   que diz o que acontece. O link e o botão têm o mesmo aspecto; zeram o contorno e o fundo do botão. */
+.mais-itens {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 10;
+  display: grid;
+  gap: 0.25rem;
+  width: min(18rem, calc(100vw - 2 * var(--gutter)));
+  padding: 0.5rem;
+  background: var(--superficie);
+  border: var(--borda-folha);
+  border-radius: var(--raio-cartao);
+}
+
+.mais-item {
+  display: grid;
+  justify-items: start;
+  /* O botão herda `justify-content: center` da regra de `button`: numa grade isso encolhe a coluna ao texto
+     mais largo e a centra, e o "Lembrete" ficava mais recuado que o link do "Registrar erro". */
+  justify-content: start;
+  align-content: center;
+  gap: 0.125rem;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: var(--raio-campo);
+  background: transparent;
+  color: var(--texto);
+  text-align: left;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .mais-item:hover {
+    background: color-mix(in srgb, var(--texto) 6%, transparent);
+  }
+}
+
+.mais-item-titulo {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+/* A tecla de atalho vem ao lado do nome, só como dica: onde há mouse (no toque não há tecla E). */
+.mais-item .atalho {
+  margin-left: 0.5rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--borda-botao);
+  border-radius: var(--raio-chip);
+  background: var(--superficie-2);
+  color: var(--texto-atenuado);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mais-item .atalho {
+    display: none;
+  }
+}
+
+.mais-item-apoio {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--texto-atenuado);
 }
 
 /* Rodapé legal no fim do conteúdo, acima da reserva das abas: o aviso curto e "Backup e dados" como
@@ -967,14 +1070,12 @@ button,
 }
 
 /* A partir de 900 px: o cabeçalho na largura do conteúdo; as áreas ao centro, só com o rótulo (para
-   caber com "Registrar erro", Ajuda e Conta); "Registrar erro" com a tecla E. */
+   caber com Ajuda, Conta e a reserva do "+"). O recuo da direita já vem do `.topo`, por --mais-direita,
+   que de 900 px em diante soma a mesma folga lateral. */
 @media (min-width: 900px) {
   .topo {
     padding-left: calc(
       max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
-    );
-    padding-right: calc(
-      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
     );
   }
 
@@ -988,10 +1089,6 @@ button,
 
   .areas a[aria-current='page']::after {
     bottom: 3px;
-  }
-
-  .acoes-globais .registrar-global {
-    display: inline-flex;
   }
 }
 
@@ -2049,6 +2146,43 @@ a.item-norma strong {
   box-shadow: inset 0 0 0 2px var(--cacto);
 }
 
+/* O painel do ⋯ do dock (MaisDoLeitor, D-D24): abre para cima do grupo fixo, encostado à direita, onde o
+   dock mora a partir de 700 px; o celular o ancora à esquerda (adiante), e o trilho de 1200 px, que põe o
+   grupo em pé na margem, o abre para baixo. O visual é o da bandeja do foco (`.bandeja-itens`), com a
+   frase de apoio de cada item embaixo do nome. */
+.mais-do-leitor-itens {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 1;
+  min-width: min(16rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+}
+
+.mais-do-leitor-itens button {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 3rem;
+  padding-block: 0.375rem;
+}
+
+.mais-do-leitor-itens small {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--texto-atenuado);
+  white-space: normal;
+}
+
+.mais-do-leitor-itens button.filtro-ligado {
+  text-decoration: none;
+}
+
+.mais-do-leitor-itens button.filtro-ligado span {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 /* Em 320 px os quatro botões só cabem numa linha com o respiro menor (o alvo continua com 44 px de
    altura); sem isso o dock quebra e deixa um vazio ao lado de "Modo foco". */
 @media (max-width: 349px) {
@@ -2072,7 +2206,28 @@ a.item-norma strong {
   }
 
   .leitor:not(.em-foco) .acoes-leitor .dock-do-leitor {
+    position: relative;
     flex-direction: column;
+  }
+
+  /* No trilho o dock está em pé: o ⋯ ocupa a largura da coluna, como Buscar e Modo foco, e o painel dele
+     abre logo abaixo do dock, na largura do trilho (cobre o "Lido até aqui" enquanto está aberto). */
+  .leitor:not(.em-foco) .mais-do-leitor {
+    display: flex;
+  }
+
+  .leitor:not(.em-foco) .mais-do-leitor-botao {
+    flex: 1;
+  }
+
+  .leitor:not(.em-foco) .mais-do-leitor-itens {
+    top: calc(100% + 8px);
+    right: auto;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 
   /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
@@ -2172,38 +2327,12 @@ a.item-norma strong {
     right: max(8px, env(safe-area-inset-right, 0px));
   }
 
-  /* O Mais abre para cima, a partir da borda da esquerda; o painel é o da bandeja do foco. */
+  /* No celular o painel do ⋯ abre para cima a partir da borda da esquerda, onde a barra mora. */
   .mais-do-leitor-itens {
-    position: absolute;
-    bottom: calc(100% + 8px);
+    right: auto;
     left: max(8px, env(safe-area-inset-left, 0px));
-    z-index: 1;
     min-width: min(16rem, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
-  }
-
-  .mais-do-leitor-itens button {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    min-height: 3rem;
-    padding-block: 0.375rem;
-  }
-
-  .mais-do-leitor-itens small {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--texto-atenuado);
-    white-space: normal;
-  }
-
-  .mais-do-leitor-itens button.filtro-ligado {
-    text-decoration: none;
-  }
-
-  .mais-do-leitor-itens button.filtro-ligado span {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
   }
 }
 
@@ -2229,9 +2358,45 @@ a.item-norma strong {
   --abas-altura: 0px;
 }
 
-/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. */
+/* Sem o cabeçalho, que reserva a área segura de cima, a primeira linha começaria sob a ilha. Em tela
+   estreita (até 52 rem, o mesmo corte do cartão do foco) tem também o "+" (D-D23), que não sai com o
+   cabeçalho e fica no alto, à direita: o conteúdo começa abaixo dele, senão ele cobriria o fim das
+   primeiras linhas (e o alto do cartão). Acima disso o "+" cai fora da pilha do artigo, na margem.
+   --topo-do-foco é esse recuo, e a altura do cartão do foco desconta ele. */
+:root[data-modo-foco] {
+  --topo-do-foco: max(1rem, env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 52rem) {
+  :root[data-modo-foco] {
+    --topo-do-foco: calc(var(--mais-topo) + var(--mais-lado) + 0.25rem);
+  }
+}
+
 :root[data-modo-foco] .conteudo {
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-top: var(--topo-do-foco);
+}
+
+/* O "+" no foco: semitransparente como o ⋯ (o texto de trás aparece) e opaco com o foco do teclado, com o
+   painel aberto ou com o mouse em cima. */
+:root[data-modo-foco] .mais-global .mais {
+  --botao-fundo: var(--superficie-translucida);
+}
+
+:root[data-modo-foco] .mais-global .mais:focus-visible,
+:root[data-modo-foco] .mais-global .mais[aria-expanded='true'] {
+  --botao-fundo: var(--superficie);
+}
+
+@media (hover: hover) {
+  :root[data-modo-foco] .mais-global .mais:hover {
+    --botao-fundo: var(--superficie);
+  }
+}
+
+/* O aviso de escrita travada fica no foco e começa no alto, onde está o "+": o texto dele não passa por baixo. */
+:root[data-modo-foco] .faixa-posse {
+  padding-right: calc(var(--mais-direita) + var(--mais-lado) + 0.5rem);
 }
 
 .em-foco .acoes-leitor {
@@ -2303,6 +2468,47 @@ dialog.dialogo-busca {
 .busca-campo input {
   width: 100%;
   min-height: var(--alvo);
+}
+
+/* Biblioteca › Normas (D-D19): a busca e o chip "Filtrar" na mesma linha; os três filtros ficam atrás do chip. */
+.barra-de-normas {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.barra-de-normas .busca-campo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chip-filtrar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--alvo);
+  padding: 0 0.9rem;
+}
+
+/* O número de filtros ligados: a marca da cor de ação, para o chip dizer que a lista está afinada. */
+.chip-contagem {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: var(--raio-chip);
+  background: var(--acao);
+  color: var(--acao-texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#filtros-normas {
+  margin-top: 0.5rem;
 }
 
 .busca-endereco {
@@ -3146,8 +3352,22 @@ dialog.dialogo-acoes {
 }
 
 .agora-estimativa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
   margin: 0 0 0.75rem;
   color: var(--bloco-atenuado);
+}
+
+/* "tenho outro tempo" (D-D16): o link ao lado da estimativa, na cor dela e sublinhado; o alvo de 44 px do
+   botão-texto sai pelas margens de cima e de baixo, e o recuo de 12 px, pela margem da esquerda, para a
+   letra ficar a 12 px da estimativa. */
+.acao-agora .agora-tempo {
+  margin-block: -0.5rem;
+  margin-inline: -0.25rem 0;
+  padding-inline: 0.5rem;
+  text-align: left;
 }
 
 /* O botão primário e, no Hoje, o botão-texto "Escolher outra coisa" centrado logo abaixo dele. */
@@ -3215,10 +3435,21 @@ dialog.dialogo-acoes {
 
 /* Artigo por artigo (11.8): um cartão iluminado com o artigo inteiro e, acima e abaixo, a espiada
    esmaecida dos vizinhos. O cartão rola por dentro quando o artigo é longo (a página fica no lugar);
-   sem animação nenhuma, então nada a desligar com prefers-reduced-motion. */
+   sem animação nenhuma, então nada a desligar com prefers-reduced-motion.
+   Altura (D-D22): a pilha toma a altura que a tela deixa e só o cartão encolhe (e rola por dentro);
+   artigo curto fica do tamanho do texto, no meio. Os demais elos da pilha não encolhem. */
 .area-artigo {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+  /* O ⋯ do foco mora no canto de baixo (4 rem de largura, a 1 rem da borda). Onde o cartão passa da
+     margem dele (celular, tablet em pé), a última linha da pilha recua essa faixa e divide o fim da
+     tela com ele; onde sobra margem dos lados (computador), a conta dá zero. 100% é a largura da
+     pilha, a mesma do cartão. */
+  --reserva-da-bandeja: max(
+    0px,
+    calc(4rem + max(1rem, env(safe-area-inset-right, 0px)) + 0.5rem - (100vw - 100%) / 2)
+  );
 }
 
 /* Palco do modo foco: a página escurece um passo (penumbra) e o cartão acende (luz). A entrada leva
@@ -3236,24 +3467,29 @@ dialog.dialogo-acoes {
    alvo inteiro; no primeiro e no último artigo ficam esmaecidas, e o foco do teclado não some. */
 .pe-do-cartao {
   display: grid;
+  flex: none;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.5rem;
+  padding-right: var(--reserva-da-bandeja);
 }
 
 .pe-do-cartao .barra-fina {
   margin-bottom: 0;
 }
 
-/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. */
+/* Ícones do foco (P4): o "⋯" e as setas do cartão são SVG de um traço só, nunca glifo. O "⋯" do dock do
+   Leitor (D-D24) é o mesmo desenho. */
 .bandeja-botao svg,
+.mais-do-leitor-botao svg,
 .seta-do-cartao svg {
   width: 22px;
   height: 22px;
   flex: none;
 }
 
-.bandeja-botao svg {
+.bandeja-botao svg,
+.mais-do-leitor-botao svg {
   fill: currentcolor;
 }
 
@@ -3282,7 +3518,9 @@ dialog.dialogo-acoes {
 }
 
 .cartao-artigo {
-  max-height: max(16rem, calc(100dvh - 22rem));
+  /* Encolhe com a altura que sobra (não passa dela) e rola por dentro; o texto curto não estica. */
+  flex: 0 1 auto;
+  min-height: 0;
   padding: 1rem;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3298,21 +3536,98 @@ dialog.dialogo-acoes {
   --estrela-folga: 1rem;
 }
 
-/* Artigo no centro da tela (Ajustes A): sem a moldura do Shell, o leitor ocupa a tela e centra o
-   cartão na vertical (a largura já centra em .area-artigo). O respiro de cima iguala o de baixo,
-   que reserva o canto dos botões fixos; o cartão só rola por dentro quando o artigo não cabe. */
+/* Artigo na tela inteira (D-D22): sem a moldura do Shell, o leitor tem exatamente a altura da tela (o
+   .conteudo tem 1 rem embaixo e, em cima, --topo-do-foco: o maior entre 1 rem e a área segura, ou, em
+   tela estreita, a faixa do "+"; ver `:root[data-modo-foco] .conteudo`) e a página não rola. A altura
+   desce pela cadeia (leitor, corpo, pilha) até o cartão, que toma o que sobra e rola por dentro; o
+   artigo curto fica do tamanho do texto, no meio. Embaixo, a área segura do aparelho (o ⋯ sobe por ela)
+   entra no recuo. */
 :root[data-modo-foco='artigo'] .leitor.em-foco {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  /* O .conteudo tem 1rem embaixo e, em cima, o maior entre 1rem e a área segura (ver
-     `:root[data-modo-foco] .conteudo`): a página não passa da tela. */
-  min-height: calc(100dvh - 1rem - max(1rem, env(safe-area-inset-top, 0px)));
-  padding-top: calc(var(--alvo) + 2rem);
+  height: calc(100dvh - 1rem - var(--topo-do-foco));
+  padding-top: 0;
+  padding-bottom: max(0px, calc(env(safe-area-inset-bottom, 0px) - 1rem));
 }
 
-:root[data-modo-foco='artigo'] .cartao-artigo {
-  max-height: max(16rem, calc(100dvh - 16rem));
+:root[data-modo-foco='artigo'] .leitor.em-foco .leitor-corpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:root[data-modo-foco='artigo'] .area-artigo {
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-block: auto;
+}
+
+/* "Nenhum artigo para ler por aqui" fica no meio, não no alto. */
+:root[data-modo-foco='artigo'] .area-artigo > .aviso {
+  margin-block: auto;
+}
+
+/* O envoltório do contorno de evidência (D-D13), quando existe, entra na pilha no lugar do cartão: é ele
+   que leva a conta da altura, e o cartão encolhe e rola dentro dele. */
+:root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Celular e tablet em pé: o ⋯ divide a última linha da tela com o pé do cartão (setas e fio), então o
+   pé desce ao fim da tela (e não anda com o tamanho do artigo, o que o deixaria saltar de um artigo
+   ao outro) e o cartão fica no meio do que sobra acima dele, com a borda do vizinho de cima colada. */
+@media (max-width: 52rem) {
+  :root[data-modo-foco='artigo'] .area-artigo {
+    flex: 1 1 auto;
+    margin-block: 0;
+  }
+
+  :root[data-modo-foco='artigo'] .area-artigo > .vizinho-anterior,
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo:first-child,
+  :root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco:first-child {
+    margin-top: auto;
+  }
+
+  :root[data-modo-foco='artigo'] .area-artigo > .cartao-artigo,
+  :root[data-modo-foco='artigo'] .area-artigo > .evidencia-foco {
+    margin-bottom: auto;
+  }
+}
+
+/* A borda do vizinho de baixo cola no pé (sem o respiro da pilha): a linha do pé e a do ⋯ ficam alinhadas. */
+.area-artigo:not(.com-espiada) > .vizinho-seguinte {
+  margin-top: -0.75rem;
+}
+
+/* Última linha da pilha: ela guarda a faixa do ⋯ (o pé; a linha do mapa, quando se segue o mapa; a
+   espiada do vizinho de baixo, quando ligada). As de cima, não. */
+.area-artigo:has(.seguindo-mapa) .pe-do-cartao,
+.area-artigo.com-espiada .pe-do-cartao,
+.area-artigo.com-espiada .seguindo-mapa {
+  padding-right: 0;
+}
+
+.area-artigo .seguindo-mapa {
+  flex: none;
+  padding-right: var(--reserva-da-bandeja);
+}
+
+.area-artigo.com-espiada > .vizinho-seguinte {
+  padding-right: calc(1rem + var(--reserva-da-bandeja));
+}
+
+/* Com o relógio da Sessão (embaixo à esquerda) o ⋯ e ele moram numa faixa só deles, abaixo da pilha:
+   nada de dividir a linha. */
+:root[data-modo-foco='artigo']:has(.canto-sessao) .leitor-corpo {
+  padding-bottom: calc(var(--alvo) + 1rem);
+}
+
+:root[data-modo-foco='artigo']:has(.canto-sessao) .area-artigo {
+  --reserva-da-bandeja: 0px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3348,6 +3663,7 @@ dialog.dialogo-acoes {
 /* A espiada do vizinho: só as primeiras linhas, apagando para o lado de fora do cartão. Todo texto
    no tom atenuado (AA nos dois temas; o !important vence as cores próprias de rótulo e rubrica). */
 .vizinho {
+  flex: none;
   max-height: 6.5rem;
   padding: 0 1rem;
   overflow: hidden;
@@ -3816,13 +4132,34 @@ dialog.dialogo-previa .linha-acoes button {
   justify-content: center;
 }
 
-/* Biblioteca › Normas: a linha "Retomar" no lugar da folha grande do Agora (que fica só no Hoje). */
-.retomar-leitura {
+/* Biblioteca › Normas (D-D19): a linha "Retomar", uma linha de 44 px com o lugar, os minutos e a seta, no
+   lugar do botão escuro (a folha grande do Agora fica só no Hoje). O texto quebra se for longo ou se a
+   fonte estiver grande: nada fica atrás de reticências. */
+.retomar-linha {
+  margin: 0.75rem 0 0;
+}
+
+.retomar-link {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.25rem 0.75rem;
-  margin-block: 0.75rem;
+  gap: 0.75rem;
+  min-height: var(--alvo);
+  padding: 0.25rem 0.75rem;
+  border: var(--borda-folha);
+  border-radius: var(--raio-botao);
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.retomar-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.retomar-tempo {
+  flex: none;
 }
 
 /* Editor de lacuna: o trecho escondido é uma tarja de tinta; o texto segue no DOM para a seleção. */

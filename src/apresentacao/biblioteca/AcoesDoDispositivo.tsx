@@ -1,11 +1,13 @@
-// Ações por dispositivo no leitor (F2, 11.5): copiar a referência, registrar um erro já vinculado,
-// criar um cartão deste trecho e ver os erros vinculados. A composição entre a Legislação e o
-// Recall fica aqui, na apresentação (o domínio não importa domínio, CLAUDE.md).
+// Ações por dispositivo no leitor (F2, 11.5): estrelar, copiar a referência, corrigir o texto e ver os
+// erros vinculados e os precedentes. Criar (registrar um erro já vinculado, fazer o cartão do trecho)
+// é com o "+" da casca (D-D24): o painel das Ações abre no formulário do erro quando o "+" o pede. A
+// composição entre a Legislação e o Recall fica aqui, na apresentação (o domínio não importa domínio,
+// CLAUDE.md).
 import { useEffect, useId, useRef, useState, type SubmitEvent } from 'react';
 import { Link } from 'react-router';
 import type { Erro, ResultadoErro } from '../../core/modelo';
 import { todos } from '../../dominios/legislacao/consultas';
-import { criarCartaoDeDispositivo, registrarErro } from '../../dominios/recall/servico';
+import { registrarErro } from '../../dominios/recall/servico';
 import { Dialogo } from '../componentes/Dialogo';
 import { useRepositorio } from '../dados/contexto';
 import { ROTULO_RESULTADO } from '../recall/rotulos';
@@ -24,12 +26,10 @@ export interface AlvoDasAcoes {
   texto: string | undefined;
   /** O texto gravado inteiro (o tachado inclusive), o que a correção edita (11.7); ausente como `texto`. */
   textoGravado?: string | undefined;
-  /** Abre já no formulário do erro (o "Registrar erro" do Mais, no celular), sem a lista de ações. */
+  /** Abre só o formulário do erro (o "Registrar erro" do "+", D-D24), sem a lista de ações. */
   comecarRegistrando?: boolean;
 }
 
-/** Cabe no verso do cartão (20.000 no modelo). */
-const VERSO_MAXIMO = 20_000;
 /** O resumo de cada erro na lista. */
 const RESUMO_DO_ERRO = 140;
 
@@ -45,6 +45,7 @@ export function AcoesDoDispositivo({
   correcao,
   normaComEnderecoOficial,
   aoFechar,
+  aoRegistrar,
 }: {
   alvo: AlvoDasAcoes | undefined;
   estrela?: EstrelaDasAcoes;
@@ -53,24 +54,60 @@ export function AcoesDoDispositivo({
   /** Id da norma, só quando ela tem endereço oficial: mostra "Verificar atualização" (S3). */
   normaComEnderecoOficial?: string;
   aoFechar: () => void;
+  /** Depois de salvar o erro (modo de registro): o diálogo fecha e quem abriu avisa que deu certo. */
+  aoRegistrar?: (alvo: AlvoDasAcoes) => void;
 }) {
+  const registrando = alvo?.comecarRegistrando === true;
   return (
     <Dialogo
       aberto={alvo !== undefined}
       aoFechar={aoFechar}
-      titulo={alvo ? `Ações de ${alvo.nome}` : 'Ações'}
+      titulo={
+        alvo ? (registrando ? `Registrar erro em ${alvo.nome}` : `Ações de ${alvo.nome}`) : 'Ações'
+      }
       classe="dialogo-acoes"
     >
-      {alvo && (
-        <Conteudo
-          alvo={alvo}
-          estrela={estrela}
-          correcao={correcao}
-          normaComEnderecoOficial={normaComEnderecoOficial}
-          aoFechar={aoFechar}
-        />
-      )}
+      {alvo &&
+        (registrando ? (
+          <RegistroDoErro alvo={alvo} aoFechar={aoFechar} aoRegistrar={aoRegistrar} />
+        ) : (
+          <Conteudo
+            alvo={alvo}
+            estrela={estrela}
+            correcao={correcao}
+            normaComEnderecoOficial={normaComEnderecoOficial}
+            aoFechar={aoFechar}
+          />
+        ))}
     </Dialogo>
+  );
+}
+
+/**
+ * O registro do erro ligado ao dispositivo (o "Registrar erro" do "+" no Leitor, D-D24): só o formulário.
+ * Salvar fecha o diálogo e devolve a pessoa à leitura; "Voltar" também.
+ */
+function RegistroDoErro({
+  alvo,
+  aoFechar,
+  aoRegistrar,
+}: {
+  alvo: AlvoDasAcoes;
+  aoFechar: () => void;
+  aoRegistrar: ((alvo: AlvoDasAcoes) => void) | undefined;
+}) {
+  return (
+    <div className="acoes-dispositivo">
+      <p className="dica">{alvo.referencia}</p>
+      <FormularioDoErro
+        alvo={alvo}
+        cancelar={aoFechar}
+        registrado={() => {
+          aoRegistrar?.(alvo);
+          aoFechar();
+        }}
+      />
+    </div>
   );
 }
 
@@ -88,15 +125,10 @@ function Conteudo({
   aoFechar: () => void;
 }) {
   const repo = useRepositorio();
-  const [registrando, setRegistrando] = useState(alvo.comecarRegistrando === true);
   const [corrigindo, setCorrigindo] = useState(false);
   const textoGravado = alvo.textoGravado;
   const [aviso, setAviso] = useState('');
   const [falha, setFalha] = useState('');
-  const [ocupado, setOcupado] = useState(false);
-  const [cartaoCriado, setCartaoCriado] = useState(false);
-  // O estado só muda no próximo render: a trava impede o cartão duplo no clique duplo.
-  const trava = useRef(false);
   const [erros, setErros] = useState<Erro[] | 'falha' | undefined>(undefined);
   const [versao, setVersao] = useState(0);
 
@@ -130,27 +162,6 @@ function Conteudo({
     }
   }
 
-  async function criarCartao() {
-    if (trava.current || alvo.texto === undefined) return;
-    trava.current = true;
-    setOcupado(true);
-    setFalha('');
-    try {
-      await criarCartaoDeDispositivo(repo, {
-        dispositivoId: alvo.dispositivoId,
-        frente: `O que diz o ${alvo.referencia}?`,
-        verso: alvo.texto.slice(0, VERSO_MAXIMO),
-      });
-      setCartaoCriado(true);
-      setAviso('Cartão criado. Primeira revisão amanhã.');
-    } catch {
-      setFalha('Não foi possível criar o cartão. Tente de novo; nada foi perdido.');
-      trava.current = false;
-    } finally {
-      setOcupado(false);
-    }
-  }
-
   return (
     <div className="acoes-dispositivo">
       <p className="dica">{alvo.referencia}</p>
@@ -163,38 +174,8 @@ function Conteudo({
             setCorrigindo(false);
           }}
         />
-      ) : registrando ? (
-        <FormularioDoErro
-          alvo={alvo}
-          cancelar={() => {
-            setRegistrando(false);
-          }}
-          registrado={() => {
-            setRegistrando(false);
-            setAviso('Erro registrado e vinculado a este dispositivo.');
-            setVersao((v) => v + 1);
-          }}
-        />
       ) : (
         <div className="linha-acoes acoes-do-dispositivo">
-          <button
-            type="button"
-            className="principal"
-            onClick={() => {
-              setAviso('');
-              setFalha('');
-              setRegistrando(true);
-            }}
-          >
-            Registrar erro
-          </button>
-          <button
-            type="button"
-            disabled={ocupado || cartaoCriado || alvo.texto === undefined}
-            onClick={() => void criarCartao()}
-          >
-            Criar cartão deste trecho
-          </button>
           {estrela && (
             <button type="button" onClick={estrela.alternar}>
               {estrela.estrelado ? 'Tirar a estrela' : 'Estrelar'}
@@ -217,11 +198,8 @@ function Conteudo({
           )}
         </div>
       )}
-      {normaComEnderecoOficial && !registrando && !corrigindo && (
+      {normaComEnderecoOficial && !corrigindo && (
         <VerificarAtualizacao normaId={normaComEnderecoOficial} />
-      )}
-      {alvo.texto === undefined && !registrando && !corrigindo && (
-        <p className="dica">Cartão só de dispositivo com texto: role até um artigo.</p>
       )}
       <p role="status" className="sucesso">
         {aviso}

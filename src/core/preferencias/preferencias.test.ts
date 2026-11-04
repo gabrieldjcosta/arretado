@@ -32,7 +32,7 @@ describe('preferências (1.7)', () => {
   it('a preferência anterior à 9.8, sem `destacarCondicionantesEPrazos`, continua válida e muda sem migração', async () => {
     const { repo } = await repositorioDeTeste();
     const antiga = await obterPreferencias(repo);
-    // O registro que já existe no aparelho não tem o campo: ausente é desligado.
+    // O registro que já existe no aparelho não tem o campo: ausente vale o padrão do app (ligado, D-D17).
     expect(antiga).not.toHaveProperty('destacarCondicionantesEPrazos');
     expect(Preferencias.safeParse(antiga).success).toBe(true);
     expect((await alterarPreferencias(repo, { tamanhoFonte: 20 })).tamanhoFonte).toBe(20);

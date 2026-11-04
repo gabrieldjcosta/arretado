@@ -36,12 +36,18 @@ Regras:
 Conteúdo programático do edital:
 [cole aqui]`;
 
+/** O formulário de importação mora atrás do "Trazer meu edital" (D-D20): abre como a pessoa faria. */
+async function abrirOFormulario(usuario: ReturnType<typeof userEvent.setup>) {
+  await usuario.click(await screen.findByRole('button', { name: 'Trazer meu edital' }));
+}
+
 describe('Plano: importar pontos (6.10)', () => {
   it('importa com prévia, lista por disciplina e oferece o vínculo no erro', async () => {
     const { repo } = await repositorioDeTeste();
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     await usuario.upload(
       await screen.findByLabelText('Arquivo CSV'),
@@ -54,7 +60,19 @@ describe('Plano: importar pontos (6.10)', () => {
     expect(within(secao).getByText('1. Progressão de regime')).toBeInTheDocument();
     expect(within(secao).getByText('Alta')).toBeInTheDocument();
 
-    await usuario.click(screen.getByRole('link', { name: 'Registrar erro' }));
+    // Com Pontos, o Ciclo é uma ação à vista (botão com contorno), antes dos links de apoio (D-D20).
+    const ciclo = screen.getByRole('link', { name: 'Ciclo de estudo' });
+    expect(ciclo).toHaveAttribute('href', '#/plano/ciclo');
+    expect(ciclo).toHaveClass('botao');
+    expect(ciclo).not.toHaveClass('botao-texto');
+    for (const apoio of ['Editar pontos e matérias', 'Tarefas']) {
+      const link = screen.getByRole('link', { name: apoio });
+      expect(link).toHaveClass('botao-texto');
+      expect(ciclo.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    }
+
+    await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
+    await usuario.click(await screen.findByRole('link', { name: /^Registrar erro\b/ }));
     // Ponto fora de "mais detalhes" (D25): opcional e lembrado.
     const ponto = await screen.findByLabelText('Ponto do edital (opcional)');
     expect(within(ponto).getByRole('option', { name: '2 Remição' })).toBeInTheDocument();
@@ -65,6 +83,7 @@ describe('Plano: importar pontos (6.10)', () => {
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
     await usuario.upload(
       await screen.findByLabelText('Arquivo CSV'),
       new File(['a;b\n1;2'], 'x.csv'),
@@ -74,14 +93,16 @@ describe('Plano: importar pontos (6.10)', () => {
 });
 
 describe('Plano vazio e importação com IA (UI-C)', () => {
-  it('mostra título acolhedor e os dois caminhos lado a lado', async () => {
+  it('o título tem a promessa, os dois caminhos ficam lado a lado e a importação fica dobrada (D-D20)', async () => {
     const { repo } = await repositorioDeTeste();
     window.location.hash = '#/plano';
+    const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
 
     expect(
-      await screen.findByRole('heading', { level: 2, name: 'Monte seu plano do seu jeito' }),
+      await screen.findByRole('heading', { level: 2, name: 'Sua Trilha, montada pelo edital' }),
     ).toBeInTheDocument();
+    expect(screen.queryByText('Monte seu plano do seu jeito')).not.toBeInTheDocument();
     expect(screen.getByText(/Escolha o concurso e o app monta a Trilha/)).toBeInTheDocument();
 
     // Um começo só (27/10/2026): o mesmo "Escolher meu concurso" do Hoje e da Biblioteca.
@@ -89,8 +110,21 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     expect(escolher).toHaveAttribute('href', '#/comecar');
     expect(escolher).toHaveClass('principal');
 
-    const linkTrazer = screen.getByRole('link', { name: 'Trazer meu edital' });
-    expect(linkTrazer).toHaveAttribute('href', '#importar-edital');
+    // "Trazer meu edital" abre o formulário (CSV ou tabela da IA); fechado, ele não aparece na tela.
+    const trazer = screen.getByRole('button', { name: 'Trazer meu edital' });
+    expect(trazer).toHaveAttribute('aria-expanded', 'false');
+    expect(trazer).toHaveAttribute('aria-controls', 'importar-edital');
+    expect(screen.getByLabelText('Arquivo CSV')).not.toBeVisible();
+    await usuario.click(trazer);
+    expect(trazer).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByLabelText('Arquivo CSV')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Importar pontos do edital' })).toBeVisible();
+    // Fechar não apaga o que a pessoa colou.
+    await usuario.type(screen.getByLabelText('Ou cole o resultado da IA'), 'Disciplina;Ponto');
+    await usuario.click(trazer);
+    expect(screen.getByLabelText('Arquivo CSV')).not.toBeVisible();
+    await usuario.click(trazer);
+    expect(screen.getByLabelText('Ou cole o resultado da IA')).toHaveValue('Disciplina;Ponto');
 
     // O catálogo não é mais uma terceira porta: vive dentro de "Escolher meu concurso".
     expect(screen.queryByRole('link', { name: 'Montar pelo catálogo' })).not.toBeInTheDocument();
@@ -103,6 +137,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     const spy = vi.spyOn(navigator.clipboard, 'writeText');
 
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const sumario = await screen.findByText('Não sabe montar a planilha?', { selector: 'summary' });
     await usuario.click(sumario);
@@ -122,6 +157,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const campoColar = await screen.findByLabelText('Ou cole o resultado da IA');
     await usuario.click(campoColar);
@@ -142,6 +178,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const campoColar = await screen.findByLabelText('Ou cole o resultado da IA');
     await usuario.click(campoColar);
@@ -157,6 +194,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const campoColar = await screen.findByLabelText('Ou cole o resultado da IA');
     await usuario.click(campoColar);
@@ -171,6 +209,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
     window.location.hash = '#/plano';
     const usuario = userEvent.setup();
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const botao = await screen.findByRole('button', { name: 'Ler o texto colado' });
     await usuario.click(botao);
@@ -186,6 +225,7 @@ describe('Plano vazio e importação com IA (UI-C)', () => {
       .mockRejectedValue(new Error('Permissão negada'));
 
     render(<App abrir={() => Promise.resolve(repo)} />);
+    await abrirOFormulario(usuario);
 
     const sumario = await screen.findByText('Não sabe montar a planilha?', { selector: 'summary' });
     await usuario.click(sumario);

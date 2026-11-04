@@ -10,6 +10,14 @@ import {
   progressoDoPasso,
 } from './passos';
 
+/** Tudo o que os passos dizem, numa linha só. */
+const textoDosPassos = PASSOS.flatMap((p) => [
+  p.nome,
+  p.frase,
+  ...p.ferramentas.flatMap((f) => [f.destaque, f.apoio ?? '']),
+  ...p.itens,
+]).join(' ');
+
 describe('os textos do Passeio (D-D10, contrato §7)', () => {
   it('são os do Gabriel, palavra por palavra', () => {
     expect(BOAS_VINDAS).toEqual({
@@ -19,23 +27,33 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
       vamos: 'Vamos',
       agoraNao: 'Agora não',
     });
-    expect(PASSOS.map((p) => [p.nome, p.frase, p.itens])).toEqual([
+    expect(PASSOS.map((p) => [p.nome, p.frase, p.ferramentas, p.itens])).toEqual([
       [
         'Hoje',
         'Aqui você vê o que tem pra fazer, sem agonia pra decidir.',
         [
-          'No botão + você monta seu caderno de erros. Errou? Traga a Frase correta pra revisar e lembrar depois.',
-          'Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.',
+          {
+            destaque: 'Aqui seus erros viram acertos e Cartões.',
+            apoio: 'No botão +, traga a Frase correta pra revisar e lembrar depois.',
+          },
         ],
+        ['Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.'],
       ],
       [
         'Trilha',
         'O edital em Pontos, montado pelo catálogo ou trazido por você.',
-        ['Você também pode definir ciclos de estudo aqui na Trilha.'],
+        [
+          {
+            destaque: 'Ciclos de estudo facilitados.',
+            apoio: 'Você define os seus aqui na Trilha.',
+          },
+        ],
+        [],
       ],
       [
         'Fixar',
         'Suas Frases e Cartões, com a Revisão de cada dia.',
+        [{ destaque: 'Transforme rapidamente um artigo em cartão.' }],
         [
           'Gosta de cartões de revisão? Aqui você pode montar os seus para se testar.',
           'Dica: depois do passeio, faça cinco questões e registre o que precisa lembrar.',
@@ -45,10 +63,11 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
         'Biblioteca',
         'Onde ficam as normas pra ler e os seus resumos.',
         [
-          'Termos-chave de cada lei já destacados pra você.',
-          'Modo foco para ver só o artigo que está lendo.',
-          'O Mapa da norma mostra o que mais cai e te guia pela leitura.',
+          { destaque: 'Destaques automáticos contra as pegadinhas.' },
+          { destaque: 'As leis que você estuda, atualizadas e mapeadas.' },
+          { destaque: 'Link entre leis e súmulas pra entender melhor.' },
         ],
+        ['Modo foco para ver só o artigo que está lendo.'],
       ],
     ]);
     expect(COMECAR).toEqual({ titulo: 'Vamo começar?' });
@@ -83,9 +102,26 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
   });
 
   it('os passos não têm atalho para outra tela e não chamam Cartões de passo', () => {
-    const todos = PASSOS.flatMap((p) => [p.nome, p.frase, ...p.itens]).join(' ');
-    expect(todos).not.toMatch(/https?:|#\/|href/);
+    expect(textoDosPassos).not.toMatch(/https?:|#\/|href/);
     expect(PASSOS.map((p) => p.nome)).not.toContain('Cartões');
+  });
+
+  it('as seis ferramentas que o Gabriel pediu (03/11) estão em evidência, cada uma no seu menu', () => {
+    const onde = (trecho: string) =>
+      PASSOS.filter((p) => p.ferramentas.some((f) => f.destaque.includes(trecho))).map(
+        (p) => p.nome,
+      );
+    expect(onde('erros viram acertos')).toEqual(['Hoje']);
+    expect(onde('Ciclos de estudo')).toEqual(['Trilha']);
+    expect(onde('artigo em cartão')).toEqual(['Fixar']);
+    expect(onde('Destaques automáticos')).toEqual(['Biblioteca']);
+    expect(onde('atualizadas e mapeadas')).toEqual(['Biblioteca']);
+    expect(onde('leis e súmulas')).toEqual(['Biblioteca']);
+    expect(PASSOS.flatMap((p) => p.ferramentas)).toHaveLength(6);
+  });
+
+  it('não promete o que o app não faz: sem "banca" (o destaque não olha a banca) e sem "grifo" (é a marca da pessoa)', () => {
+    expect(textoDosPassos).not.toMatch(/banca|grifo/i);
   });
 
   it('o progresso conta de 1 e usa o total de passos', () => {
@@ -115,7 +151,11 @@ describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
     PASSEIO_NA_CONTA.titulo,
     PASSEIO_NA_CONTA.apoio,
     PASSEIO_NA_CONTA.acao,
-    ...PASSOS.flatMap((p) => [p.frase, ...p.itens]),
+    ...PASSOS.flatMap((p) => [
+      p.frase,
+      ...p.ferramentas.flatMap((f) => [f.destaque, ...(f.apoio === undefined ? [] : [f.apoio])]),
+      ...p.itens,
+    ]),
     ...Object.values(CONTROLES),
   ]
     // As palavras soltas ("Seguir", "Voltar") moram em nomes de função, como `aoSeguir`: só as frases contam.

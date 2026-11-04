@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
-import { minutosDoLote } from '../../dominios/recall/ordem-de-valor';
+import { minutosDaRodada } from '../../dominios/recall/ordem-de-valor';
 import { LIMITE_FILA_DIARIA } from '../../dominios/recall/servico';
 import { AcaoAgora } from '../componentes/AcaoAgora';
 import { DiasDaSemana } from '../componentes/DiasDaSemana';
 import { LinhaDepois } from '../componentes/LinhaDepois';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
-import { TituloComMais } from '../componentes/TituloComMais';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useDados } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
@@ -41,11 +40,12 @@ export function RecallInicio() {
   const frasesVencidas = dados?.frasesVencidas ?? 0;
   const cota = dados?.cota ?? 10;
   const lote = Math.min(cota, vencidos);
-  const minutos = minutosDoLote(lote);
+  // A mesma estimativa do Hoje: Cartões e Frases da rodada, não só os Cartões (D-D21).
+  const minutos = minutosDaRodada(vencidos, frasesVencidas, cota);
 
   return (
     <>
-      <TituloComMais>{ROTULO_DA_AREA.recall}</TituloComMais>
+      <h1>{ROTULO_DA_AREA.recall}</h1>
       <GuiaDaTela tela="recall" vazio={dados?.primeiroUso === true} />
       {dados && <DiasDaSemana dias={dados.dias} />}
       {vencidos > 0 ? (
@@ -62,6 +62,7 @@ export function RecallInicio() {
       ) : frasesVencidas > 0 ? (
         <AcaoAgora
           titulo={`Revisar ${frases(Math.min(cota, frasesVencidas))}`}
+          estimativa={minutos}
           rotuloBotao="Começar"
           para="/recall/frases/revisar"
         />

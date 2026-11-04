@@ -1,5 +1,6 @@
 // "Começar uma Sessão" no Hoje: o tipo de atividade em um toque, com a sugestão em primeiro. Sem
-// Sessão aberta, mostra o cartão; com uma aberta, o Hoje já mostra a `SessaoAberta`. Nenhum botão é
+// Sessão aberta, mostra uma linha quieta, recolhida, que abre os tipos (D-D16: o segundo cartão do Hoje
+// disputava o Começar do Agora); com uma aberta, o Hoje já mostra a `SessaoAberta`. Nenhum botão é
 // `.principal`: a ação dominante do Hoje é a do Agora (ou a escolha do estado vazio), uma por tela.
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -38,8 +39,11 @@ export function ComecarSessao({ normaLida }: { normaLida?: string }) {
     );
   };
   return (
-    <section className="cartao-bloco comecar-sessao" aria-labelledby="comecar-sessao-titulo">
-      <h2 id="comecar-sessao-titulo">Começar uma Sessão</h2>
+    <details className="comecar-sessao">
+      <summary className="comecar-sessao__resumo">
+        <span className="comecar-sessao__rotulo">Começar uma Sessão</span>
+        <span className="em-seguida-seta" aria-hidden="true" />
+      </summary>
       <p className="sessao-detalhe">O que você vai fazer agora?</p>
       <div className="linha-acoes comecar-sessao__tipos">
         {[...ATIVIDADES]
@@ -59,6 +63,6 @@ export function ComecarSessao({ normaLida }: { normaLida?: string }) {
       </div>
       <p className="dica">O primeiro é a sugestão. Um toque e a Sessão começa.</p>
       {erro && <Falha oQue="Não foi possível começar." oQueFazer="Tente de novo em instantes." />}
-    </section>
+    </details>
   );
 }

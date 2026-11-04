@@ -49,11 +49,14 @@ async function abrirHoje(repo: Awaited<ReturnType<typeof repositorioDeTeste>>['r
   window.location.hash = '#/';
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
-  const campo = await screen.findByRole('textbox', { name: 'Para lembrar' });
+  // Desde a D-D16 a nota vive no "Lembrete" do "+", não mais num bloco do Hoje.
+  await usuario.click(await screen.findByRole('button', { name: 'Novo registro' }));
+  await usuario.click(await screen.findByRole('button', { name: /^Lembrete\b/ }));
+  const campo = await screen.findByRole('textbox', { name: 'Lembrete' });
   return { usuario, campo };
 }
 
-describe('Hoje › Para lembrar (P7b)', () => {
+describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
   beforeEach(() => {
     localStorage.clear();
     gravacao.chamadas = 0;
@@ -67,7 +70,7 @@ describe('Hoje › Para lembrar (P7b)', () => {
     const { campo } = await abrirHoje(repo);
     expect(campo).toHaveValue('');
     expect(campo).toHaveAttribute('placeholder', 'O que fazer fora do app');
-    expect(screen.getByRole('heading', { name: 'Para lembrar' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Lembrete' })).toBeVisible();
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
@@ -222,7 +225,7 @@ async function comNotasGuardadas() {
   return { repo, a };
 }
 
-describe('Hoje › Para lembrar › notas guardadas na Sessão', () => {
+describe('Lembrete do "+" › notas guardadas na Sessão', () => {
   beforeEach(() => {
     localStorage.clear();
     marcacao.falharUmaVez = false;

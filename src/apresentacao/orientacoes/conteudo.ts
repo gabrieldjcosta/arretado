@@ -23,7 +23,7 @@ export const SECOES: Secao[] = [
     id: 'recall',
     titulo: 'Fixar: erros, cartões e revisões',
     paragrafos: [
-      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. Para registrar, toque no "+" ao lado do título do Hoje ou do Fixar; no computador, "Registrar erro" fica no alto de toda tela. No teclado, a tecla E abre o registro de qualquer tela.',
+      'Registrar um erro leva um passo: escreva a frase correta, o certo em uma linha. Disciplina e ponto do edital são opcionais e ficam escolhidos para o registro seguinte. Para registrar, toque no "+" do canto de cima, à direita: ele está em toda tela, até no modo foco, e abre "Registrar erro". No teclado, a tecla E abre o registro de qualquer tela. O mesmo "+" abre o "Lembrete", uma nota rápida sobre o que fazer fora do app, sem hora nem aviso, que aparece por cima da tela em que você está.',
       'O resto é opcional, em "Mais detalhes" ou depois: se errou ou acertou sem certeza, o que foi, a causa, a convicção, a fonte da questão. Quando o texto dá pistas, o Arretado sugere uma causa — ela só vale quando você confirma.',
       'Se você escreveu o que foi, a caixa "Criar o cartão deste erro" já vem marcada: ao salvar, o cartão nasce com o que foi na frente e a frase correta no verso. Desmarque a caixa se não quiser o cartão. Só com a frase correta, não nasce cartão.',
       'Os cartões voltam em 1, 3, 7, 15, 30 e 60 dias. Na revisão, mostre a resposta e diga como foi: "De novo" volta ao começo, "Difícil" repete o intervalo, "Fácil" avança. No teclado: espaço mostra a resposta; 1, 2 e 3 respondem.',
@@ -59,7 +59,7 @@ export const SECOES: Secao[] = [
     id: 'pontos',
     titulo: 'Importar os pontos do edital',
     paragrafos: [
-      'Na Trilha, "Importar pontos do edital" lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV).',
+      'Na Trilha, o botão "Trazer meu edital" abre o formulário "Importar pontos do edital", que lê uma planilha salva como CSV (no Excel ou no Google Planilhas: Arquivo › Salvar como / Fazer download › CSV). Com a Trilha já montada, é o "Importar outra planilha".',
       'A primeira linha precisa ter as colunas Disciplina e Ponto. Opcionais: Faixa (Altíssima, Alta, Média ou Extra) e Código. Exemplo de linha: Execução Penal; 3; Progressão de regime; Alta.',
       'Importar a mesma planilha de novo não duplica nada: só entram os pontos novos. Como toda importação, dá para desfazer em Conta › Dados.',
       'Nesta fase os pontos servem para vincular erros. Mudar faixas e receber a sugestão do próximo ponto chegam com a Trilha completa.',

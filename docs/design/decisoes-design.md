@@ -346,3 +346,251 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **O que continua como está.** O ícone do app (a caneta a 35° sobre o papel); o quadro do cacto e a caneta que o desenha (D-D8, #349); a escrita do nome; o traço de seleção; o Zé e a regra dos três materiais (D-D11). O vidro continua sendo o material da caneta e só dela.
 
 **Custo.** Menos código: ~250 linhas e três usos do componente. O Hoje perde o único objeto com volume que tinha; o que ocupa o lugar é decidido na D-D13 em diante (o que fica em evidência).
+
+## D-D13 — O contorno de evidência: um anel no Agora e no artigo do foco (03/11/2026, decisão do Gabriel)
+
+> **Emenda ao contrato do Zé (§8b, regras 4 e 5, v10h) e à D-D10.** O brilho piscina deixa de ser só o traço novo da caneta e passa a marcar também o único elemento que a pessoa deve olhar agora. A D-D12 tirou a caneta do Hoje; o anel é o que fica no lugar dela.
+
+**Origem.** Gabriel em 03/11/2026: "a coisa que tiver em evidência (cartão do hoje/o que fazer agora, artigo na leitura em modo foco) precisa ficar com um outline branco com brilho azul, tipo o néon que usamos pra o mascote." Às 16:23Z, diante de três desenhos, escolheu a opção **B, "branco com faixa suave"**; a recomendada era a C (faixa de dia `#0b7f9c`, 4,36:1), que fica como troca de um token.
+
+**O que muda.**
+1. Um anel em CSS, de lista fechada: o cartão do Agora no Hoje (`.acao-agora.evidencia`, pedido por `emEvidencia` em `AcaoAgora`; só `Agora.tsx` e `RevisaoPorTempo.tsx` o ligam) e o artigo único do Modo foco (`.evidencia-foco`, um envoltório do `.cartao-artigo`, que rola por dentro e cortaria o halo). O Agora de Fixar, do mapa da norma e do plano fica sem anel. Entrar na lista exige nova decisão do Gabriel.
+2. O desenho: linha branca de 2 px por fora do cartão, faixa piscina de 5 px (50% de dia, 35% à noite) e halo piscina (20 px de raio com 6 de espalhamento; 14 e 4 no Leitor) com um tom de 14 px por dentro. Dois pseudoelementos sem fundo, sob o texto e o foco do teclado: `::before` é o halo e `::after` é a linha com a faixa. Dez tokens `--ev-*` em `estilos.css`.
+3. O movimento: o halo sobe ao pico em 0,3 s (0,7 de dia, 0,75 à noite) e assenta no repouso até 0,9 s (0,45 e 0,5), uma vez. Só a opacidade anima, nunca pulsa e trocar de artigo no foco não reacende. Calmo: só esmaece em 0,24 s. Movimento reduzido: o repouso, parado. Cores forçadas: o halo e a faixa somem e o cartão ganha borda de 2 px `Highlight`.
+4. As regras do sistema ganham uma exceção só: o halo é a única sombra desfocada do app e o único brilho que não é traço de caneta. Sem `filter`, sem `backdrop-filter`, sem transição.
+
+**Contraste.** De dia a faixa mede 1,8:1 e a linha 1,06:1 sobre o papel, então o anel é decoração e não o contorno do WCAG 1.4.11: o Agora e o artigo do foco mantêm a borda da folha, que cumpre o 3:1, e o anel nunca a substitui (guarda no CSS). À noite a linha branca passa de 3:1 sobre o chão, a folha e a penumbra do foco (par `ev-linha` em `scripts/contraste.mjs`).
+
+**O que continua como está.** O Zé só na Chegada, na Ajuda e na tela de carregamento; a regra dos três materiais (D-D11); o anel de foco do teclado, que fica por cima do anel de evidência; a leitura do Agora e do artigo, ditas pelo texto, pela posição e pelo nome acessível, nunca pelo brilho.
+
+**Custo.** +2,3 kB de CSS (0,5 kB gzip), nenhum de JavaScript (496 e 328 kB). Com a CPU 4× mais lenta, 126 quadros em 2 s, o maior de 18,4 ms contra 18,2 ms sem o anel, nenhum acima de 33 ms.
+
+**Em aberto.** A leitura do Modo foco de noite por 5 minutos (se cansar, o halo do Leitor cai) é do Gabriel. O apagar de 0,24 s do elemento anterior (contrato §8c, item 2) não foi construído: hoje há um só elemento em evidência por tela e ele não troca de lugar.
+
+## D-D14 — A Abertura escreve o nome em toda abertura (03/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D9 (Q6, suposição 2) e ao contrato do Zé (§9, v10h).** A frequência da escrita do nome na tela cheia, que era "inteira na primeira vez, curta na primeira de cada Dia, parada nas demais", passa a ser "toda abertura escreve". A D-D13 (o anel de evidência) entra em outro PR.
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "decidi que, em todas as vezes que a pessoa abrir o site, a animação (nome sendo escrito e virando cacto) deve carregar por tempo suficiente pra ser apreciada pelo usuário, mas sem cansá-lo." Os tempos e a regra dos pulos são da Marca (contrato v10h, §9 e critério 28), de partida: o Gabriel confirma depois de uma semana de uso.
+
+**O que muda.**
+1. Na tela cheia, toda abertura do aplicativo escreve o mesmo desenho do nome em três tempos: inteiro em 2,64 s na primeira vez no aparelho (com "Pular" e, se a Chegada vem, o voo ao Zé), em 2,4 s na primeira abertura de cada Dia e em 1,6 s nas demais. São cerca de 3,2 s e 2,2 s de camada com a pausa e a luz de 0,45 s ao cabeçalho. A escolha de tempo é uma só (`NOME_NA_TELA_MS`); o CSS do kit escala toda a linha do tempo por `--k`.
+2. "Abertura" é carregar a página ou abrir o PWA; voltar de segundo plano sem recarregar não conta.
+3. Três aberturas seguidas puladas no mesmo Dia calam a tela cheia até o Dia seguinte: o cansaço dita o corte, não o relógio. A conta mora na chave que já existe (`{ dia, puladas }`), e uma abertura que vai até o fim a zera.
+4. `escritaNaTela` (nova) decide a tela cheia; `escritaDaAbertura` e `FREQUENCIA` seguem como a frequência do cabeçalho, para quando a tela cheia não abre. Um Dia guardado no futuro deixa a tela cheia calada: a semente do E2E e dos testes (`9999-12-31`) continua valendo.
+
+**O que continua como está.** Os vetos da tela cheia: movimento reduzido, "só estudo" (o preset Calmo), Sessão aberta e falha ao ler os dados; nesses casos o cabeçalho escreve como antes, uma vez por Dia. O Calmo só esmaece (0,24 s, fica 0,7 s). Um toque ou uma tecla pula, e esse toque é consumido; só a primeira vez leva o botão "Pular" (as outras ficam abaixo de 5 s, WCAG 2.2.2). O desenho, o néon do nome e a regra dos três materiais. O app só monta depois da decisão (no máximo 0,4 s) e o tempo até a tela útil não cresceu: medido, o app monta aos 0,36 s (0,37 s antes) e aos 1,05 s com a CPU 4× mais lenta (1,08 s antes).
+
+**Custo.** A camada passa a ser o preço de abrir o app, sempre. Quem tem pressa pula com um toque, e três pulos a calam por hoje.
+
+**Em aberto.** Se cansar, a primeira alternativa é encurtar as demais para 1,2 s, não tirar a tela (contrato §13, item 26).
+
+## D-D15 — O "+" abre duas opções: Registrar erro e Lembrete (03/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D9 (Q2) e à P2 da D-D7.** O "+" do título deixa de ser um link para o registro de erro e passa a abrir um painel com duas opções; o registro de erro fica a um toque do painel.
+
+**Origem.** Gabriel em 03/11/2026: "o '+' deve apresentar as opções de registrar erro e de lembrete." No cartão de 17:35Z ele escolheu o nome **"Lembrete"** para a segunda opção; a Marca e esta thread tinham recomendado "Anotar para lembrar", porque "lembrete" costuma prometer hora e aviso. O subtítulo cobre isso: "sem hora nem aviso".
+
+**O que muda.**
+1. `TituloComMais` vira um botão que mostra e esconde um painel, como o menu Ajuda: toque fora e Esc fecham, e o Esc devolve o foco ao "+". O nome acessível passa a ser "Novo registro" (era o do link, "Novo registro de erro"); o atalho E segue abrindo o registro de erro em qualquer tela.
+2. O painel (`.mais-itens`, camada flutuante: linha da folha, nenhuma sombra) tem duas linhas de 44 px ou mais, cada uma com o nome e uma frase de apoio, que entram juntos no nome acessível (o texto visível dentro do nome, WCAG 2.5.3; o axe exige): "Registrar erro" ("A frase certa vira cartão", leva a `#/recall/registrar`) e "Lembrete" ("Uma nota rápida, sem hora nem aviso").
+3. "Lembrete" abre o `DialogoDoLembrete` com a mesma nota do "Para lembrar" do Hoje (`Preferencias.lembrete`, uma só) e as notas que a pessoa guardou nas Sessões. O campo (`CampoDoLembrete`, tirado de `ParaLembrar`) vem em foco; "Salvar" e sair do campo gravam; fechar o diálogo, com Esc inclusive, grava o que não foi salvo e devolve o foco ao "+".
+4. O guia do Hoje sobe para a versão 6 e a Ajuda (Fixar) diz o que o "+" faz.
+
+**O que continua como está.** O "+" só nas telas que registram (Hoje e Fixar); o "Registrar erro" do cabeçalho a partir de 900 px; a Frase correta como único campo obrigatório (D25). Nenhum texto promete data, hora nem aviso: o app não tem alarme.
+
+**Custo.** Um toque a mais para registrar um erro pelo "+" (abrir o painel, depois "Registrar erro"), em troca de um lugar para a nota rápida em qualquer tela que tem "+". O bloco "Para lembrar" do Hoje continua na tela até a dieta do Hoje decidir se sai; até lá a mesma nota aparece nos dois lugares, e o bloco só mostra o que foi gravado no diálogo depois de recarregar.
+
+## D-D16 — O Hoje mais quieto: um cartão e um botão (03/11/2026, recomendada no cartão de 17:37Z)
+
+> **Emenda à D-D7 (P3 e P7b) e à D-D9 (Q5).** O Hoje abre com o cartão do Agora e uma linha de parada; o que era sempre visível passa a aparecer só quando serve. Nada sai do app: cada coisa segue a um toque, no lugar onde a pessoa a procura.
+
+**Origem.** Gabriel em 03/11/2026: "o hoje (e os outros menus) estão muito noisy/bagunçados". A prancha das críticas consolidadas (genjutsu e impeccable) mostrou o que disputava o cartão do Agora, e o cartão de 17:37Z propôs a lista abaixo ("Sim, a lista da prancha", a opção recomendada). **Ainda sem resposta do Gabriel:** ajustar esta seção se ele escolher outra ("Os chips de tempo ficam" ou a lista que ele escrever).
+
+**O que muda.**
+1. A faixa de dicas ("O que cada opção faz") sai do topo: só vem pela Ajuda. `GuiaDaTela` ganha `soPelaAjuda`; o guia segue montado, então a Ajuda o oferece, e abrir por lá tira o "Novo".
+2. Os pontos do Dia só aparecem depois do primeiro aceso (feito hoje). Três pontos apagados sobre o cartão eram ruído; a fileira passa a ser o momento de ver o primeiro acender.
+3. Os quatro tempos (5, 10, 25 e 45 min) ficam atrás do link "tenho outro tempo", ao lado da estimativa ("cerca de 5 min · tenho outro tempo"). Abre dentro da folha, com `aria-expanded`; escolher um tempo continua montando o lote, e tocar de novo no mesmo desfaz.
+4. "Começar uma Sessão" deixa de ser um cartão e vira uma linha recolhida (`<details>`, o mesmo desenho do "Em seguida"): o rótulo, a seta e uma divisória de 1 px. Aberta, mostra os quatro tipos, a sugestão primeiro; nenhum é o botão principal.
+5. A linha de parada vira uma linha só, quieta, logo abaixo da folha: "Retomar em LEP, art. 112, § 2º, salvo ontem, 22h10", em 14 px atenuado. Saem a faixa de caneta sob o lugar e o ponto de luz (e o token `--marca-da-parada`).
+6. O "Para lembrar" sai do Hoje: a nota mora no "Lembrete" do "+" (D-D15), a mesma `Preferencias.lembrete`.
+
+**O que continua como está.** O cartão do Agora, o anel de evidência (D-D13), "Escolher outra coisa", o "Em seguida" e o "Trocar", o Fechar o Dia, os avisos com o orçamento de dois blocos e o "Ver mais" (S7), a Chegada e a Entrada do Dia, o "+" (D-D15) e o botão Começar como a única ação principal da tela.
+
+**Medido** (Hoje semeado, `scripts` do scratchpad; 03/11/2026). A 390 × 844 o Começar fica entre 279 e 331 px do alto e o "Em seguida" termina a 542 px, tudo acima das abas (764 px); a 320 × 568 o Começar termina a 355 px, com as abas a 488 px; nada rola de lado a 390, 320 nem 1280 px. O alvo do "tenho outro tempo" e o da linha "Começar uma Sessão" medem 44 px ou mais.
+
+**Custo.** Um toque a mais para escolher o tempo (o link) e outro para começar uma Sessão por tipo (abrir a linha); a nota rápida fica a dois toques ("+" e "Lembrete") e as dicas, em "Ajuda" › "O que cada opção faz". A Marca pode pedir de volta a faixa de caneta da linha de parada, o único traço "marca-texto" que sobrava no Hoje.
+
+## D-D17 — Os destaques abrem ligados (03/11/2026, recomendada no cartão "Ligar os grifos automáticos por padrão")
+
+> **Emenda à decisão de 24/09/2026 (destaque automático, 9.8) e ao Passeio.** O destaque automático de prazos, exceções, termos absolutos e penas passa a abrir ligado no Leitor. Quem desligou continua desligado.
+
+**Origem.** Gabriel em 03/11/2026: as melhores ferramentas ficaram escondidas para quem viu o app pela primeira vez. O Passeio já dizia "Termos-chave de cada lei já destacados pra você", mas o Leitor abria desligado, então a promessa só valia para quem achasse o botão "Destaques". O cartão propôs a opção recomendada ("Sim, ligados por padrão"). **Ainda sem resposta do Gabriel:** ajustar esta seção se ele escolher "Não, o Passeio ensina a ligar" (voltar o padrão a desligado e trocar a frase do Passeio por "toque em Destaques para marcar prazos, exceções, absolutos e penas") ou a regra que ele escrever.
+
+**O que muda.**
+1. `DESTAQUES_LIGADOS_PADRAO = true` (`src/core/modelo/sistema.ts`): o campo ausente de `Preferencias.destacarCondicionantesEPrazos` vale ligado no Leitor, em Conta › Aparência e na prévia dos perfis. Sem migração e sem subir o esquema: quem tocou no botão ou na caixa gravou `true` ou `false`, e o valor gravado vence. Quem nunca mexeu passa a ver os destaques e a legenda de uma linha sob a barra do leitor.
+2. Perfis: o Calmo continua desligando os destaques ("menos coisas na tela"); o Guiado e a Leitura os deixam ligados. O Guiado gravava `false` como "padrão do app" e passou a gravar a constante, para a prévia "O que muda com o Guiado" seguir mostrando só o temporizador.
+3. Até a preferência chegar do banco, o Leitor usa o padrão (ligado): quem desligou pode ver um quadro com o sublinhado antes de ele sumir.
+4. Os testes e o E2E: "Destaques" e a caixa de Conta abrem marcados; o E2E que ligava passou a desligar e conferir que o `false` persiste depois de recarregar.
+
+**O que continua como está.** O detector (`detectarDestaques`) e o dicionário; os sublinhados sem fundo (duplo, tracejado, ondulado e pontilhado, o traço diz a categoria sem a cor); a legenda de uma linha; o botão "Destaques" na barra do leitor; a preferência única e global; o modo foco, que mantém os destaques no texto e deixa a legenda de fora.
+
+**Custo.** Mais sublinhados na tela de quem nunca mexeu: de 3% (LEP) a 12% (CP) dos caracteres e de 25% a 58% das linhas (medido em 06/10/2026, `docs/planos/F2.md` › "Fatos do destaque"). O cálculo é só do que está desenhado (menos de 80 linhas), uma vez por texto; a norma inteira leva de 0,03 a 0,25 s no corpus e `desempenho.test.ts` guarda o teto. Nenhum JavaScript a mais (496 e 328 kB gzip). Quem se cansar desliga com um toque em "Destaques" ou escolhe o perfil Calmo.
+
+**Em aberto.** A resposta do Gabriel ao cartão. A leitura do CP com 58% das linhas acesas por uns 10 minutos é dele: se cansar, voltar o padrão a desligado é trocar uma constante.
+
+## D-D18 — O Passeio põe as seis ferramentas em evidência (03/11/2026, pedido do Gabriel)
+
+> **Emenda à D-D10 (textos do Passeio).** Os quatro passos seguem um por menu; em cada um, as ferramentas que o Gabriel quer em destaque abrem a lista, em negrito. Os textos continuam vindo de uma fonte só (`passos.ts`).
+
+**Origem.** Gabriel em 03/11/2026, depois de mostrar o app a duas colegas: "no passeio, as ferramentas mais úteis e inovadoras devem ser destacadas", com seis frases (grifos automáticos pra você não cair nas pegadinhas da sua banca; as leis que você precisa estudar, atualizadas e mapeadas; link entre leis e súmulas para facilitar o entendimento; transforme rapidamente um artigo em um cartão pra revisão; aqui seus erros viram acertos e cards; ciclos de estudo facilitados). **Ainda sem resposta do Gabriel sobre o texto:** o PR fica em rascunho, e as frases abaixo são as dele, ajustadas como se explica adiante.
+
+**O que muda.**
+1. `Passo.ferramentas` (`passos.ts`): cada passo ganha as ferramentas do seu menu, antes das linhas simples. Hoje: "Aqui seus erros viram acertos e Cartões." e "No botão +, traga a Frase correta pra revisar e lembrar depois." Trilha: "Ciclos de estudo facilitados." e "Você define os seus aqui na Trilha." Fixar: "Transforme rapidamente um artigo em cartão." Biblioteca: "Destaques automáticos contra as pegadinhas.", "As leis que você estuda, atualizadas e mapeadas." e "Link entre leis e súmulas pra entender melhor."
+2. A lista do passo desenha as ferramentas com a frase em negrito na cor do texto (`.passo-ferramenta strong`, peso 700) e o apoio, quando há, no tom atenuado; as linhas simples seguem como estavam.
+3. Saem "Termos-chave de cada lei já destacados pra você." (o Destaque vem ligado, D-D17) e "O Mapa da norma mostra o que mais cai e te guia pela leitura." (o Mapa entra em "mapeadas"). Da frase do Hoje saem "você monta seu caderno de erros" e "Errou?", que a frase em negrito já diz.
+
+**O que mudei nas frases dele, e por quê** (ele aprova ou volta atrás no cartão):
+- "grifos automáticos" vira "Destaques automáticos": no app, grifo é a marca que a pessoa faz, e o botão se chama Destaques.
+- "da sua banca" saiu: o Destaque não olha a banca (o Perfil da Banca é backlog); o teste do Passeio proíbe "banca" e "grifo".
+- "cards" vira "Cartões", o nome no app (vocabulário obrigatório).
+- Encurtei para a folha não rolar: "as leis que você precisa estudar" vira "as leis que você estuda"; "para facilitar o entendimento", "pra entender melhor"; "um artigo em um cartão pra revisão", "um artigo em cartão"; "pra você não cair nas pegadinhas", "contra as pegadinhas". A folha tem altura fixa (46 rem, pinada no teste de CSS) e cada linha a mais custa de 22 a 28 px.
+
+**O que continua como está.** Um passo por menu, "Passo N de 4", nenhum atalho para outra tela; o ícone desenhado pela caneta; o Zé; a altura da folha e as quatro consultas de contêiner; a linha "Os quatro menus, um por vez" da Conta.
+
+**Verdade dos textos.** "Link entre leis e súmulas": os vínculos precedente–dispositivo vêm da curadoria do acervo e aparecem nas Ações do artigo quando existem. "Atualizadas": a data da coleta aparece na norma e o aviso "A lei mudou" cobre o que a pessoa guardou. "Artigo em cartão": de 2 a 3 toques, sem digitar, nas Ações do Leitor (lido no código; não cronometrado num aparelho).
+
+**Custo.** Nenhum JavaScript novo (496 e 328 kB) e uma regra de CSS. Medido: nenhum passo rola a 390 × 844; a 1280 × 800 o Fixar passa 1 px da área; a 320 × 568 o Fixar e a Biblioteca passam 3 e 9 px, sem cortar o cartão.
+
+**Em aberto.** A resposta do Gabriel ao cartão do texto. Depende da D-D17: se ele escolher que os Destaques abrem desligados, a primeira linha da Biblioteca vira uma frase como "Destaques automáticos: toque em Destaques pra ligar."
+
+## D-D19 — A Biblioteca abre pela lista: filtros atrás do "Filtrar", "Retomar" em uma linha e o acervo fecha a lista (03/11/2026)
+
+> **Emenda a D-D7 (P6).** A lista de Normas continua sendo linhas sobre o fundo; muda o que vem antes dela e onde moram as ações de acrescentar normas.
+
+**Origem.** A análise de Genjutsu e Impeccable consolidada em 03/11/2026 (tema 12): a Biblioteca "abre como formulário" (a primeira norma ficava a 754 de 844 px), o título repetia a aba, o "Retomar" era um botão escuro e os três filtros abriam abertos. O harmonizado pediu "lista primeiro, filtros atrás do chip Filtrar, Retomar numa linha e sem título repetindo a aba; o convite Puxar mais normas do acervo fecha a lista". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. O título "Biblioteca" e o "Normas" da seção ficam só para leitor de tela (`.visualmente-oculto`): a navegação já diz onde a pessoa está, e a região segue se chamando "Normas".
+2. "Retomar" vira uma linha de 44 px (`.retomar-linha`, `.retomar-link`): o lugar, os minutos e a seta, com o contorno da folha. Deixa de ser o botão escuro e de ser a `.principal` da tela.
+3. A busca e o chip "Filtrar" dividem a linha (`.barra-de-normas`). Disciplina, Ano e Tipo de norma ficam atrás do chip (`#filtros-normas`, `aria-expanded`); o painel abre sozinho se o endereço já traz algum filtro (voltar do leitor reencontra a lista como estava), o chip mostra quantos estão ligados ("Filtrar, 2 ativos") e "Limpar filtros" os desliga sem apagar a busca.
+4. O fecho da lista (`FechoDaLista`, `.mais-do-acervo`) é um cartão: "N normas no acervo, a um toque." (o número do índice; sem rede a conta some e o botão fica), "Puxar mais normas do acervo" (a única `.principal` da tela), "Tudo do edital de X" (quando o acervo conhece o edital do plano) e "Importar norma". Saem do alto o "Adicionar do acervo" (era o mesmo destino do "Puxar mais normas do acervo") e o "Importar norma".
+5. O Guia da tela troca a dica dos filtros por "Filtrar" e ganha a de "Puxar mais normas do acervo" (versão 5: a marca "Novo" volta uma vez).
+
+**Medidas** (390 × 844, três normas e uma leitura): a primeira norma sobe de y=754 para y=316; a 320 × 568 aparece na primeira tela, em y=374 (as três abas quebram em duas linhas a 320 px, como já quebravam).
+
+**O que continua como está.** O estado vazio (com "Escolher meu concurso"); a faixa de importações pendentes; a faixa de dicas (a do Hoje some pela D-D16, se o Gabriel confirmar; aqui continua); a ordem, o apoio e o selo "Há versão nova" das linhas.
+
+**Em aberto.** O "Mudar disciplina" de cada linha continua: é o maior ruído que sobra na lista (uma ação sublinhada por norma). Movê-lo para o Leitor (Ações) tira uma linha de cada Norma, mas muda um fluxo que o E2E do acervo cobre; fica para decisão do Gabriel.
+
+**Custo.** Um toque a mais para filtrar. "Importar norma" desce para o fim da lista.
+
+## D-D20 — A Trilha promete o edital, dobra a importação e põe o Ciclo à vista (03/11/2026)
+
+> **Emenda a D-D7 (Trilha).** O estado vazio deixa de ser uma caixa genérica seguida de um formulário, e o Ciclo deixa de ser um link entre outros.
+
+**Origem.** O consolidado de 03/11/2026, tema 14: "caixa vazia de qualquer SaaS, título sem promessa e CSV na primeira dobra" (Genjutsu); "o link de Ciclos está escondido na Trilha" (Impeccable). Harmonizado: "título com a promessa (a Trilha montada pelo edital), CSV dobrado sob Trazer meu edital e o Ciclo como ação à vista". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. Sem Pontos, o título do estado vazio passa de "Monte seu plano do seu jeito" a "Sua Trilha, montada pelo edital", e o texto perde o "Ou traga o seu edital." (o segundo botão já diz isso).
+2. "Trazer meu edital" vira botão (`aria-expanded`, `aria-controls="importar-edital"`) que abre, logo abaixo, o formulário de importação (CSV ou tabela da IA). O formulário fica montado e escondido (`hidden`), então quem recolhe sem querer não perde o que colou. Antes ele ocupava a primeira dobra inteira, num cartão de quatro blocos.
+3. Com Pontos, "Ciclo de estudo" sai da fila de três links e vira um botão com contorno logo abaixo do "Começar este bloco" (`.plano-ciclo`); "Editar pontos e matérias" e "Tarefas" seguem como links.
+4. O Guia da tela absorve o "Não sabe montar a planilha?" na dica do "Trazer meu edital" (esse controle só aparece depois de abrir o formulário) e sobe para a versão 6.
+
+**Medidas** (390 × 844, Trilha vazia): a página caiu de 1349 para 844 px de altura, ou seja, deixou de rolar; o formulário de importação, que começava em y≈646, só aparece depois do toque. Com Pontos, o "Ciclo de estudo" ocupa uma linha própria de 44 px logo abaixo do "Começar este bloco" (a fila de links segue com "Editar pontos e matérias" e "Tarefas").
+
+**O que continua como está.** "Escolher meu concurso" como único botão principal; a data da prova (opcional); a lista de matérias; "Importar outra planilha" (já era dobrado); o formulário em si.
+
+**Custo.** Um toque a mais para quem vem com planilha. O formulário deixa de aparecer sem ser pedido.
+
+## D-D21 — O Fixar abre sem cobrança: a semana só depois do primeiro Dia, uma estimativa só e o plural certo (03/11/2026)
+
+> **Emenda a D-D7 (Fixar).** O que abre o Fixar deixa de contar o que a pessoa não fez e passa a dizer o mesmo que o Hoje.
+
+**Origem.** O consolidado de 03/11/2026, tema 13: "nenhum dia nos últimos 7 conta o vazio como dívida; 1 dicas; 2 min aqui e 3 min no Hoje" (Genjutsu); "sete blocos antes do conteúdo; o contador é contagem de culpa" (Impeccable). Harmonizado: "some o contador; a semana só aparece depois do 1º dia; uma estimativa só, a mesma no Hoje e no Fixar, e o plural certo". Segue o consolidado, sem cartão próprio.
+
+**O que muda.**
+1. `DiasDaSemana` não aparece sem nenhum Dia com revisão: some o "Nenhum dia nos últimos 7" e some a fileira de sete anéis vazios. Depois do primeiro Dia aparecem as sete marcas e o nome "Últimos 7 dias", sem número. A conta ("4 dos últimos 7 dias") fica só para leitor de tela (`.visualmente-oculto`), porque as marcas são decorativas.
+2. A estimativa da ação do Fixar é a do Hoje: `minutosDaRodada(cartões, frases, cota)` (em `dominios/recall/ordem-de-valor.ts`) soma Cartões e Frases da rodada, cada tipo até a cota. Antes o Fixar contava só os Cartões (3 Cartões e 2 Frases: 2 min aqui, 3 min no Hoje). Com só Frases vencidas, a ação também passa a trazer a estimativa.
+3. O botão do Guia da tela diz "1 dica" quando há uma só (o Fixar em uso tem uma).
+
+**O que continua como está.** A ação única da tela (Revisar, Registrar); "Hoje: N de V. Os outros esperam; nada é apagado." (a única linha que acalma quem tem fila grande); "Ache o erro"; a linha "Depois: …"; o aviso de semana pesada; as três abas.
+
+**Em aberto.** A faixa de dicas do Fixar (versão 4) fica como está: o que acontece com ela em todas as telas depende da D-D16.
+
+**Custo.** Quem gosta de ver o "4 dos últimos 7" não o vê mais; o número continua para leitor de tela. A fileira de marcas só nasce no primeiro Dia, então a primeira revisão faz a tela ganhar uma linha.
+
+## D-D22 — O modo foco por artigo ocupa a altura da tela (03/11/2026, pedido do Gabriel)
+
+> **Emenda ao palco do foco (11.8, Ajustes A).** O cartão deixa de ser uma caixa de uns 70% da altura, centrada com o respiro do ⋯ em cima e embaixo, e passa a tomar a altura que a tela deixa.
+
+**Origem.** Gabriel em 03/11/2026 (16:59Z): "o modo foco só ocupa uma parte da tela, quando o ideal seria que, no celular, ele ocupasse toda a tela (ou adaptasse de acordo com o tamanho do artigo) e no pc ele ocupasse uma parte maior, verticalmente."
+
+**Medido antes** (LEP, art. 112, tela cheia de texto): o cartão ocupava 70% da altura no celular (358×588 em 390×844) e 68% no computador (643×544 em 1280×800), com 107 px vazios no alto; a página passava 14 px da tela, porque a altura máxima do cartão (`100dvh − 16 rem`) reservava menos que a pilha usa (uns 270 px).
+
+**O que muda.**
+1. A altura da tela desce pela cadeia (leitor, corpo, pilha) até o cartão. Artigo longo toma tudo o que sobra e rola por dentro; artigo curto fica do tamanho do texto, no meio. A página passa a ter exatamente a altura da tela.
+2. O recuo de cima (76 px, que espelhava o do ⋯ embaixo) sai: o cartão começa 29 px abaixo do alto (16 do recuo da página, a borda do vizinho de cima e o respiro). A área segura de baixo do aparelho entra no recuo de baixo, onde o ⋯ já a respeitava.
+3. Celular e tablet em pé (até 52 rem): o pé do cartão (setas e fio) desce ao fim da tela e divide a linha com o ⋯, que é fixo no canto. O pé guarda 72 px à direita para ele, não salta de um artigo ao outro e o ⋯ nunca cobre a seta. Computador: o pé acompanha o cartão e o ⋯ fica no canto, longe dele. Uma conta só (`--reserva-da-bandeja`) dá zero quando a margem dos lados comporta o ⋯ e só recua quando não comporta, então vale também para o texto ampliado.
+4. Com a espiada dos vizinhos ou com "Seguindo o mapa", a última linha da pilha (a espiada de baixo, a linha do mapa) é a que divide a linha com o ⋯, e o pé não recua. Com o relógio da Sessão aberto (embaixo à esquerda), ele e o ⋯ ficam numa faixa só deles (`--alvo` + 1 rem) abaixo da pilha, como antes.
+
+**Medido depois** (mesmo artigo; cartão em % da altura da tela): 390×844, 70% → 88%; 360×740, 65% → 86%; 320×568, 55% → 82%; tablet 768×1024, 75% → 90%; computador 1280×800, 68% → 87%; 1440×900, 72% → 89%. A página não passa da tela em nenhum deles.
+
+**O que continua como está.** A largura do cartão (62 ch, a medida de leitura); o texto corrido; a bandeja e o fechamento em 5 s; o palco (penumbra e luz do cartão); a borda do vizinho; os atalhos e o deslizar.
+
+**Custo.** Duas regras de pilha a mais para quem mexer nela: toda linha nova de `.area-artigo` é `flex: none`, e a que ficar embaixo guarda `--reserva-da-bandeja`. Todo envoltório novo entre a pilha e o cartão entra na cadeia flex (o do contorno de evidência, `.evidencia-foco` da D-D13, já tem a regra; sem ela o cartão perde o limite e a página rola). O E2E `foco-tamanho.spec.ts` mede a altura, a página no lugar e o ⋯ separado da seta nos três aparelhos.
+
+## D-D23 — O "+" é um só, fixo no canto de cima à direita de toda tela (03/11/2026, pedido do Gabriel)
+
+> **Emenda à D-D15 ("+" com Registrar erro e Lembrete).** O "+" deixa de morar no título do Hoje e do Fixar e passa a ser da casca: um botão só, no mesmo ponto de toda tela, também no modo foco.
+
+**Origem.** Gabriel em 03/11/2026 (21:32Z): "minha preocupação é se a pessoa tiver um lembrete pra acrescentar na hora da lei, ou na parte da trilha, ou até nas configurações, ela ter que sair de onde está só pra acrescentar um lembrete, tipo bloco de notas". E às 21:40Z: "quero uma solução pro + que deixe ele no mesmo lugar em todas as telas (pra facilitar pra a pessoa) sem prejudicar a leitura do modo foco, a leitura normal, ou a revisão de cartões/frases".
+
+**Medido antes.** O "+" existia só no título do Hoje e do Fixar (`TituloComMais`). O "Registrar erro" tinha um link no cabeçalho a partir de 900 px (e a tecla E em toda tela), e o Lembrete só se alcançava por aquele "+". No modo foco o cabeçalho some, então não havia nem link nem "+".
+
+**O que muda.**
+1. `MaisGlobal` (casca, ao lado do cabeçalho) substitui `TituloComMais`. É o mesmo botão "Novo registro" e o mesmo painel (Registrar erro e Lembrete, cada um com a sua frase de apoio), agora `position: fixed` a 6 px do alto (mais a área segura) e à direita, alinhado com a margem do cabeçalho. Redondo, 48 px (em px, não em rem: só tem ícone, e a 300% de fonte um botão em rem tomava a largura de Ajuda e Conta), o contorno do controle da D-D15.
+2. O cabeçalho reserva o lugar dele no recuo da direita (o recuo da página, os 48 px do botão e 4 px de respiro) e perde o link "Registrar erro": ele mora no painel e na tecla E. Como a reserva é recuo e não um item da linha, Ajuda e Conta nunca passam por baixo do botão: com a fonte ampliada o cabeçalho quebra em linhas e a página não rola de lado. Abaixo de 360 px a marca encolhe (7 rem) e o Ajuda aperta o recuo, para tudo caber numa linha.
+3. "Lembrete" abre o diálogo por cima da tela em que a pessoa está, sem trocar de rota, e devolve o foco ao "+" ao fechar. Esc fecha só o painel (e não sai do modo foco); mudar de tela e tocar fora também o fecham.
+4. Modo foco: o "+" fica no mesmo ponto, translúcido (a superfície translúcida do palco) e opaco ao receber foco, ao passar o mouse ou aberto. Até 52 rem (celular e tablet em pé) o conteúdo ganha uma faixa de cima de 58 px (`--topo-do-foco`) para o cartão não ficar sob o botão; acima disso o canto da tela já está livre, ao lado dos 62 ch do cartão. A faixa de posse (`.faixa-posse`) guarda a mesma largura à direita.
+5. As Orientações e o Guia dizem onde fica o "+" ("no canto de cima à direita, em toda tela, até no modo foco").
+
+**Medido depois** (LEP, art. 112; cartão em % da altura da tela, antes → depois): 390×844, 88% → 83%; 360×740, 86% → 80%; 320×568, 82% → 74%; tablet 768×1024, 90% → 86%; computador 1280×800, 87% → 87%; 1440×900, 89% → 88%. Nenhum deles rola a página. O "+" está no mesmo retângulo (x, y, 48 × 48) em Hoje, Trilha, Recall, Biblioteca, Conta e Orientações, e no Leitor em modo normal e em foco, nos três aparelhos do E2E. O tamanho do pacote ficou em 497 kB no total e 329 kB no início (tetos de 600 e 360).
+
+**O que continua como está.** O nome "Novo registro", o painel e as duas opções; a tecla E; o diálogo do Lembrete (nota rápida, sem hora nem aviso); o dock e o menu "Mais" do Leitor (a reorganização deles vem num PR à parte); a faixa e o palco do foco (D-D22); o modo "só estudo", que esconde Ajuda e Conta mas deixa o "+" onde está, como já deixava o link "Registrar erro" do cabeçalho.
+
+**Custo.** Um elemento fixo no canto de cima à direita de toda tela: quem puser outro elemento fixo ou preso ali (um aviso, um botão de fechar) bate nele. A regra é ler `--mais-direita`, `--mais-lado` e `--topo-do-foco`, como a faixa de posse faz. No celular em foco o cartão perde de 5 a 8 pontos de altura para a faixa; no computador, no máximo 1. O título do Hoje e o do Fixar perdem a linha de 48 px do "+", e o conteúdo sobe uns 15 px. A tela de revisão (cartões e Frases) não tem nada fixo no canto de cima, então o "+" não cobre nada ali.
+
+## D-D24 — O "+" cria e o "⋯" lê, no Leitor (03/11/2026, pedido do Gabriel)
+
+> **Complementa a D-D23 e a D-D15.** No Leitor o "+" ganha o que nasce do trecho (o erro ligado ao artigo e o cartão dele), e o dock fica em Buscar, Modo foco e o "⋯", que lê e organiza. A regra, para quem mexer depois: **"+" cria, "⋯" lê.**
+
+**Origem.** Gabriel em 03/11/2026 (21:40Z): "pra os outros menus da leitura, pensei em ter algo como um botão com '...' ou algo que simbolize as opções ali. Ver se não tem sobreposição entre + e os menus da leitura, como criar card e frase com base no trecho da norma. Resolver eventuais conflitos/sobreposições. Preservar atenção e energia. Mínimo de cliques possível."
+
+**Medido antes (a sobreposição).** Criar a partir da lei morava em quatro lugares, com dois comportamentos: o "+" e a tecla E levavam à tela de registro (saíam da lei, sem ligar o erro ao artigo); "Registrar erro" ligado ao artigo estava no "Mais" do celular e nas Ações; o cartão do trecho, só nas Ações. O dock tinha quatro botões a partir de 700 px (Buscar, Filtrar, Ações, Modo foco) e três no celular (Buscar, Modo foco, Mais), e o "⋯" do modo foco era outro menu, com o mesmo propósito. Toques até o cartão do trecho: 2 no computador (Ações, Criar cartão) e 3 no celular (Mais, Ações, Criar cartão), sempre dentro de um diálogo.
+
+**O que muda.**
+1. **Itens da tela no "+".** A casca guarda um registro de itens (`ItensDoMais`) e o Leitor se inscreve nele (`useItensDoMais`). O painel lê os itens uma vez, ao abrir. No Leitor entram **"Registrar erro"** (ligado ao artigo no alto da tela, "Ligado ao Art. 112"; toma o lugar do link genérico) e **"Cartão deste trecho"** ("Do Art. 112"), antes do "Lembrete". O alvo é medido ao abrir o painel e levado até a ação, então o apoio e a ação falam do mesmo artigo mesmo que a página role com o painel aberto.
+2. **Registrar erro sem sair da lei.** Abre só o formulário (a Frase correta é o único campo obrigatório, D25; "o que foi" já traz a referência) num diálogo por cima do texto. Salvar fecha o diálogo, avisa "Erro registrado, ligado ao art. …" por 4 s (o mesmo aviso rápido da origem da Estrela) e devolve o foco ao "+". A tecla E faz o mesmo na lei; fora dela segue indo à tela de registro, e fecha o painel do "+" se ele estiver aberto.
+3. **Cartão deste trecho sem diálogo.** Cria o cartão (frente "O que diz o art. …?", verso com o texto vigente), avisa "Cartão criado: … Primeira revisão amanhã." e passa a dizer "Já criado" (apagado, ainda no caminho do teclado). Uma vez por dispositivo por visita: tocar de novo não duplica; se a criação falha, o aviso diz e dá para tentar de novo.
+4. **"⋯" do dock, em toda largura.** `MaisDoLeitor` vira o "⋯" (três pontos de um traço só, o mesmo desenho do "⋯" do modo foco) com **Filtrar** e **Ações**, cada um com a sua frase de apoio. O dock é Buscar, Modo foco e o "⋯" do celular ao computador, e com um filtro ligado o "⋯" ganha o anel do filtro e diz qual é. O painel abre para cima do grupo (canto de baixo e barra do celular) e, no trilho de 1200 px, logo abaixo do dock, na largura dele.
+5. **As Ações ficam só com ler e organizar:** Estrelar, Copiar referência, Corrigir o texto, Verificar atualização, os erros vinculados e os precedentes. Saem delas "Registrar erro" e "Criar cartão deste trecho".
+6. **Não se sobrepõem:** o "+" e o "⋯" fecham um ao outro (o toque fora de um fecha o outro), e o Esc fecha só o que está aberto.
+
+**O que fica onde, depois.**
+
+| Ação | Antes | Depois |
+|---|---|---|
+| Registrar erro ligado ao artigo | Mais (celular) ou Ações; o "+" e a tecla E saíam da lei | "+" e tecla E, na própria lei |
+| Cartão deste trecho | Ações › Criar cartão deste trecho | "+" › Cartão deste trecho |
+| Frase do trecho marcado ("Enviar às frases") e cartão dos grifos | barra que aparece ao marcar o texto | igual: nascem da seleção, e só existem com texto marcado |
+| Filtrar, Ações | botões do dock (700 px ou mais) ou "Mais" (celular) | "⋯", em toda largura |
+| Lembrete | "+" | igual (D-D23) |
+
+**Toques, antes → depois.** Registrar erro ligado ao artigo: 2 → 2 (e 1 com a tecla E), sem sair da lei. Cartão do trecho: 3 (celular) ou 2 (computador) → 2 em toda largura, sem diálogo. Filtrar e Ações: 1 (700 px ou mais) → 2, e 2 no celular, como já era. O custo é o toque a mais no computador para o que se faz pouco; o ganho é um lugar só para criar e um só para ler.
+
+**Medido depois.** O painel do "⋯" cabe na tela a 390, 768, 1280 e 1440 px (a 390, abre à esquerda da barra, 278 × 118; a 768, à direita, 290 × 118; no trilho, 206 × 145, na largura dele). O painel do "+" no Leitor tem 288 × 206 e cabe a 390 px. O dock cabe numa linha a 320 px e quebra em duas a 320 px com a fonte a 130% e a 390 px a 300%, sem cortar rótulo nem rolar de lado. O tamanho do pacote ficou em 498 kB no total e 329 kB no início (tetos de 600 e 360).
+
+**O que continua como está.** O "+" no mesmo lugar (D-D23); a bandeja do modo foco (a mesma lista, com o "⋯" dela); "Lido até aqui"; a barra da seleção e a do grifo; o Lembrete; o registro completo em `/recall/registrar`, que é o que o "+" abre fora do Leitor.
+
+**Custo.** Duas peças a mais para manter em dia: o registro de itens (uma tela de cada vez tem a vez; a última a montar vence) e a regra "+ cria, ⋯ lê", que vale também para tela nova: quem acrescentar um botão de criar ao Leitor entrega um `ItemDoMais` em vez de pôr o botão no dock. O dock perde duas palavras (Filtrar e Ações) a partir de 700 px, e quem as usava a todo instante paga um toque.
