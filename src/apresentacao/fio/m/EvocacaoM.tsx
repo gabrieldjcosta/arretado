@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { animar, cancelarAnimacoes, modoAgora } from './anima';
+import type { PontoDaEtapa } from '../passos/pontos-da-etapa';
 import { SetaM } from './IconesM';
 
 /** Quanto a barra leva para esvaziar: um convite, não um prazo. Passar dela não faz nada. */
@@ -27,7 +28,7 @@ export function EvocacaoM({ aoMostrar, aoPular }: { aoMostrar: () => void; aoPul
   return (
     <div className="m-evoca" data-pouso-em-branco="">
       <label className="m-rotulo-campo" htmlFor="m-evoca-texto">
-        <b>O que você lembra desta etapa?</b> Escreva sem olhar. Palavras soltas bastam.
+        <b>O que você lembra desta etapa?</b> Sem olhar.
       </label>
       <textarea
         id="m-evoca-texto"
@@ -43,7 +44,7 @@ export function EvocacaoM({ aoMostrar, aoPular }: { aoMostrar: () => void; aoPul
         </div>
       )}
       <div className="m-evoca-botoes">
-        <button type="button" className="m-acao" onClick={aoMostrar}>
+        <button type="button" className="m-acao m-contorno" onClick={aoMostrar}>
           Mostrar o resumo
           <SetaM />
         </button>
@@ -56,35 +57,37 @@ export function EvocacaoM({ aoMostrar, aoPular }: { aoMostrar: () => void; aoPul
 }
 
 /**
- * O resumo como lista, depois do branco: a pessoa marca o que já tinha escrito ou lembrado. É só dela; nada
- * disso é guardado nem vira nota.
+/**
+ * O resumo como lista, depois do branco: o assunto de cada artigo lido, para marcar o que já tinha escrito ou
+ * lembrado. É só da pessoa; nada disso é guardado nem vira nota. Os contadores da etapa ficam na frase de cima.
  */
-export function ConferirOResumoM({ fatos }: { fatos: readonly string[] }) {
-  const [marcados, setMarcados] = useState<ReadonlySet<number>>(new Set());
+export function ConferirOResumoM({ pontos }: { pontos: readonly PontoDaEtapa[] }) {
+  const [marcados, setMarcados] = useState<ReadonlySet<string>>(new Set());
   const trouxe = marcados.size;
   return (
-    <fieldset className="m-evoca-lista">
-      <legend className="m-quieto">Marque o que você lembrou.</legend>
-      {fatos.map((fato, i) => (
-        <label key={fato} className="m-evoca-item">
-          <input
-            type="checkbox"
-            checked={marcados.has(i)}
-            onChange={(e) => {
-              setMarcados((antes) => {
-                const depois = new Set(antes);
-                if (e.target.checked) depois.add(i);
-                else depois.delete(i);
-                return depois;
-              });
-            }}
-          />
-          <span>{fato.replace(/[.\s]+$/, '')}.</span>
-        </label>
+    <div className="m-evoca-lista" role="group" aria-label="Marque o que você lembrou">
+      <p className="m-quieto">Marque o que você lembrou.</p>
+      {pontos.map((ponto) => (
+        <button
+          key={ponto.chave}
+          type="button"
+          className="m-chip m-evoca-item"
+          aria-pressed={marcados.has(ponto.chave)}
+          onClick={() => {
+            setMarcados((antes) => {
+              const depois = new Set(antes);
+              if (!depois.delete(ponto.chave)) depois.add(ponto.chave);
+              return depois;
+            });
+          }}
+        >
+          <b>{ponto.rotulo}</b>
+          <span>{ponto.assunto}</span>
+        </button>
       ))}
       <p className="m-quieto" role="status" aria-live="polite">
-        {trouxe > 0 ? `Você trouxe ${String(trouxe)} de ${String(fatos.length)} de memória.` : ''}
+        {trouxe > 0 ? `Você trouxe ${String(trouxe)} de ${String(pontos.length)} de memória.` : ''}
       </p>
-    </fieldset>
+    </div>
   );
 }

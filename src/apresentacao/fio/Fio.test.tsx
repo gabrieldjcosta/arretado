@@ -109,9 +109,19 @@ describe('o Arretado novo (prévia do Fio)', () => {
     // Pular o Lembrar não custa nada: a etapa pousa com o que foi lido.
     await usuario.click(await screen.findByRole('button', { name: 'Pular este passo' }));
     expect(await screen.findByRole('heading', { name: /Pode descansar\.$/ })).toBeInTheDocument();
-    // O pouso abre em branco; "Pular" leva ao resumo de sempre.
-    await usuario.click(screen.getByRole('button', { name: 'Pular' }));
-    expect(screen.getByText(/^Leu /)).toBeInTheDocument();
+    // O pouso abre em branco; depois dele o resumo traz o assunto de cada artigo lido, para marcar.
+    await usuario.type(
+      screen.getByRole('textbox', { name: /O que você lembra/ }),
+      'a lei do art. 2',
+    );
+    await usuario.click(screen.getByRole('button', { name: /Mostrar o resumo/ }));
+    expect(await screen.findByText(/^Leu /)).toBeInTheDocument();
+    const lista = await screen.findByRole('group', { name: 'Marque o que você lembrou' });
+    const ponto = within(lista).getAllByRole('button')[0] as HTMLElement;
+    expect(ponto).toHaveAttribute('aria-pressed', 'false');
+    await usuario.click(ponto);
+    expect(ponto).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText(/Você trouxe 1 de \d+ de memória\./)).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: /Puxar o fio: seguir/ }));
     await screen.findByRole('group', { name: 'Na ponta do fio' });
@@ -232,7 +242,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
   });
 
-  it('o pouso abre em branco: escreve, mostra o resumo e marca o que lembrou; pular vai direto', async () => {
+  it('o pouso abre em branco: escreve e mostra o resumo, sem lista quando a etapa não leu artigo', async () => {
     const { repo, usuario } = await abrir({ comLei: true });
     gravarFio(repo.ctx.usuarioId, {
       estado: {
@@ -261,12 +271,12 @@ describe('o Arretado novo (prévia do Fio)', () => {
     await usuario.type(campo, 'a pena e o regime');
     await usuario.click(screen.getByRole('button', { name: /Mostrar o resumo/ }));
 
-    // O resumo vira lista para marcar; o texto escrito sai da tela e não fica guardado.
-    const item = await screen.findByRole('checkbox', { name: 'Lembrou 2 de 3.' });
+    // O resumo chega com a frase de sempre; esta etapa não leu artigo, então não há o que marcar.
+    expect(await screen.findByText('Lembrou 2 de 3.')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    expect(screen.queryByText(/de memória/)).not.toBeInTheDocument();
-    await usuario.click(item);
-    expect(await screen.findByText('Você trouxe 1 de 1 de memória.')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('group', { name: 'Marque o que você lembrou' }),
+    ).not.toBeInTheDocument();
   });
 
   it('as pílulas mostram só os pousos da volta e trocam a cena, o título e os fatos', async () => {

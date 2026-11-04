@@ -3,6 +3,8 @@ import { Navigate } from 'react-router';
 import type { Pouso } from '../../../dominios/fio';
 import { marcarPausa } from '../dados/pausa';
 import { useFio, type FioNaTela } from '../dados/useFio';
+import { useCargaDoPasso } from '../passos/carregar';
+import { pontosDaEtapa } from '../passos/pontos-da-etapa';
 import { pousoNaVereda, pousosDaVolta, type PousoNaVereda } from '../pouso/lugares';
 import { animar, aCadaQuadro, cancelarAnimacoes, modoAgora, MOLA, useSinal } from './anima';
 import { CenaM } from './CenaM';
@@ -178,10 +180,17 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
   const fatos = fatosDoPousoVisto(visto, pouso, fio.fio.estado.pousos);
   const noAtual = visto.numero === numero;
   const emBranco = noAtual && momento === 'branco';
-  const comoLista = noAtual && momento === 'lista' && fatos !== undefined && fatos.length > 0;
+  const comoLista = noAtual && momento === 'lista';
+  // O conteúdo da etapa, para marcar o que se lembrou: só depois do branco (e a lei do app já está no aparelho).
+  const etapa = fio.fio.estado.etapa;
+  const pontos = useCargaDoPasso(
+    `pontos|${String(pouso.etapa)}|${momento === 'lista' ? 'v' : 'x'}`,
+    async (r) => (momento === 'lista' && etapa ? pontosDaEtapa(r, etapa) : []),
+  );
+  const listaDePontos = comoLista && pontos.estado === 'pronto' ? pontos.dados : [];
 
   return (
-    <TelaM nome="pouso" className="m-pouso" rotulo="Pouso">
+    <TelaM nome="pouso" className={emBranco ? 'm-pouso m-em-branco' : 'm-pouso'} rotulo="Pouso">
       <div className="m-ceu">
         <span className="m-olho">
           Pouso {String(visto.numero)} · {visto.lugar.nome}
@@ -199,14 +208,15 @@ function PousoEmCena({ pouso, fio }: { pouso: Pouso; fio: FioNaTela }) {
               setMomento('frase');
             }}
           />
-        ) : comoLista ? (
-          <ConferirOResumoM fatos={fatos} />
         ) : (
-          fatos !== undefined && (
-            <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
-              {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
-            </p>
-          )
+          <>
+            {fatos !== undefined && (
+              <p className="m-quieto" style={{ color: 'var(--m-texto)', fontSize: 15 }}>
+                {fatos.length > 0 ? fraseDosFatos(fatos) : 'Você deu esse passo. Amanhã tem mais.'}
+              </p>
+            )}
+            {listaDePontos.length > 0 && <ConferirOResumoM pontos={listaDePontos} />}
+          </>
         )}
         <div
           className="m-lugares"
