@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { descreverPasso } from '../dados/descrever';
-import { limparPausa, veioDeUmaPausa } from '../dados/pausa';
+import { limparPausa, tipoDaPausa, veioDeUmaPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
@@ -47,8 +47,14 @@ export function AgoraM() {
   const [pausou] = useState(veioDeUmaPausa);
   useEffect(() => {
     if (!pausou) return;
+    // Ao descansar por hoje, o aviso é a frase gentil do fim do dia; numa pausa de passo, só o "tudo salvo".
+    const descansou = tipoDaPausa() === 'descanso';
     limparPausa();
-    avisar('Tudo salvo. O fio te espera aqui.');
+    avisar(
+      descansou
+        ? 'É caminhando que se faz o caminho. Parabéns pelos passos que deu hoje.'
+        : 'Tudo salvo. O fio te espera aqui.',
+    );
   }, [pausou]);
 
   // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a

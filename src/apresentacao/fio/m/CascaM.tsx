@@ -7,6 +7,7 @@ import { FaixaOffline } from '../../componentes/estados';
 import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
 import { lugarDaRota } from '../lugares';
+import { useLuzDaHora } from '../luz-da-hora';
 import { FiltrosM } from './FiltrosM';
 import { aparelhoLeve } from './leve';
 import { MaisM } from './MaisM';
@@ -34,6 +35,8 @@ export function CascaM() {
   const mundo = useMundo();
   // Vivo ou Calmo: dele depende a cara do botão de ação (o Sol ou o Só contorno; desvio 17 em `ajustes.css`).
   const movimento = useMovimentoDoFio();
+  // A luz da hora esquenta só o brilho de baixo do dia (desvio 21 em `ajustes.css`).
+  const luz = useLuzDaHora();
   // Aparelho fraco: sem as camadas de brilho, como o modo leve do mockup (lido uma vez; o aparelho não muda no meio).
   const [leve] = useState(aparelhoLeve);
   useAtalhoDeRegistrarErro();
@@ -42,7 +45,12 @@ export function CascaM() {
   useEffect(() => ligarOndaDeLuz(), []);
 
   return (
-    <div className={leve ? 'm-fio m-leve' : 'm-fio'} data-mundo={mundo} data-movimento={movimento}>
+    <div
+      className={leve ? 'm-fio m-leve' : 'm-fio'}
+      data-mundo={mundo}
+      data-movimento={movimento}
+      data-luz={luz}
+    >
       <AplicarAparencia />
       <PuxarEssenciais />
       <a

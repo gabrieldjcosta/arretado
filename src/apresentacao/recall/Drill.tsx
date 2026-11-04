@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router';
 import { cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import type { Cartao, Erro, RespostaRevisao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
+import { tocar } from '../toques';
 import {
   contarFrasesVencidas,
   contarVencidos,
@@ -179,6 +180,7 @@ export function Drill() {
     // O cartão vira de verdade (meia volta, troca, meia volta); um segundo toque no meio do giro não conta.
     if (virando.current) return;
     virando.current = true;
+    tocar('virar');
     void virarOCartao(() => {
       setEstado((e) => (e.tipo === 'revisando' ? { ...e, virado: true } : e));
     }).finally(() => {
