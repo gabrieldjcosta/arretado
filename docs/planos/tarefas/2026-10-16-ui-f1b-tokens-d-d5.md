@@ -1,5 +1,5 @@
 # Tarefa: F1b — tokens, fontes e fundo da D-D5 (padrão do Stitch)
-Atividade: fatia F1b de [`docs/planos/redesign-v2.md`](../redesign-v2.md) · Decisão: D-D5 em [`docs/design/decisoes-design.md`](../../design/decisoes-design.md) (respostas do Gabriel de 16/10/2026) · Referência: [`leia-me` do Stitch](../../design/referencias/2026-10-16-stitch-hoje/leia-me.md)
+Atividade: fatia F1b de [`docs/planos/arquivo/redesign-v2.md`](../arquivo/redesign-v2.md) · Decisão: D-D5 em [`docs/design/decisoes-design.md`](../../design/decisoes-design.md) (respostas do Gabriel de 16/10/2026) · Referência: [`leia-me` do Stitch](../../design/referencias/2026-10-16-stitch-hoje/leia-me.md)
 Nível **B** · Construtor: Antigravity (ou Sonnet) · Revisor: Gemini (muda o sistema de design) + Claude no diff de `estilos.css`
 Branch: `claude/ui-f1b-tokens` · Base: `integracao` · PR para a `integracao` com auto-merge (CI verde).
 **Antes de começar:** avisar a thread de UI (mexe em `estilos.css`). Rodar depois dos PRs A e D de 16/10, se estiverem abertos, para não brigar por CSS.

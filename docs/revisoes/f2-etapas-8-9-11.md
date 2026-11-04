@@ -35,6 +35,6 @@ Escopo: `src/dominios/legislacao`, `src/dominios/acervo` (reancoragem, versões)
 - **Duplicações** (`textoDosTrechos`, `todos`, `segmentoDe`, `trechosSimples` repetidos entre arquivos): qualidade, sem defeito; ficam para quando um deles mudar.
 - **`status_erro` e `{ erro }` na resposta do Worker:** contrato da rota já publicado; renomear quebraria o cliente sem ganho.
 
-## Grandes demais para esta sessão (em `planos/proximos-passos.md`)
+## Grandes demais para esta sessão (em `planos/arquivo/proximos-passos.md`)
 - **Correção copia todos os textos da norma** (`corrigirTextoPublicado`): cada correção (e cada desfazer) grava a norma inteira de novo (CF: ~5 mil textos). Versões imutáveis por desenho; reduzir pede texto por dispositivo compartilhado entre versões (mexe no modelo, F4).
 - **`acharNasColecoes` abre a árvore de cada coleção a cada busca:** trocar por consulta no índice `[normaId+endereco]`.
