@@ -84,10 +84,10 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
     await usuario.click(within(passo).getByRole('button', { name: 'Já li' }));
     // O Lembrar ainda não tem tela: o Fio o pula sozinho e a etapa pousa.
-    expect(await screen.findByRole('heading', { name: 'Pousou.' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Pode descansar.' })).toBeInTheDocument();
     expect(screen.getByText(/^Leu /)).toBeInTheDocument();
 
-    await usuario.click(screen.getByRole('button', { name: 'Pousar' }));
+    await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
     await screen.findByRole('group', { name: 'Na ponta do fio' });
 
     await usuario.click(screen.getByRole('link', { name: 'Destino' }));
@@ -102,8 +102,10 @@ describe('o Arretado novo (prévia do Fio)', () => {
     await usuario.click(await screen.findByRole('button', { name: /Puxe o fio/ }));
     const passo = await screen.findByRole('region', { name: 'Passo do Fio' });
     await usuario.click(within(passo).getByRole('button', { name: 'Pular este passo' }));
-    expect(await screen.findByRole('heading', { name: 'Pousou.' })).toBeInTheDocument();
-    expect(screen.getByText(/passou sem deixar fato/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Pode descansar.' })).toBeInTheDocument();
+    expect(screen.getByText('Você passou por aqui. O fio fica onde está.')).toBeInTheDocument();
+    // Sem fato, o pouso não fala em falha nem em pendência.
+    expect(screen.queryByText(/sem deixar fato|não fez|faltou/i)).not.toBeInTheDocument();
   });
 
   it('o Varal tem dois varais de folhetos e leva às coisas da pessoa', async () => {

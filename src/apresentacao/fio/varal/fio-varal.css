@@ -28,19 +28,21 @@
   margin: 2rem 0 0;
 }
 
+/* Os folhetos não encostam na borda: 8 px de respiro de cada lado, que somados ao recuo da página dão uns
+   20 px; o fio passa por trás deles e vai até o recuo da página, sem estourar a largura. */
 .varal-linha {
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.625rem;
-  padding-top: 1.75rem;
+  padding: 1.75rem 0.5rem 0;
 }
 
 .varal-fio {
   position: absolute;
-  left: -0.875rem;
+  left: -1rem;
   top: 0.25rem;
-  width: calc(100% + 1.75rem);
+  width: calc(100% + 2rem);
   height: 34px;
   pointer-events: none;
   overflow: visible;
@@ -62,7 +64,7 @@
 
 .varal-rotulo {
   position: absolute;
-  left: 0.125rem;
+  left: 0.5rem;
   top: -0.875rem;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -75,6 +77,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  /* Um molde só para o link e para o botão (o Lembrete): o `button` centra o que tem dentro, o link não. */
+  align-items: stretch;
+  justify-content: flex-start;
   gap: 0.375rem;
   min-height: 9.25rem;
   padding: 0.75rem 0.5625rem 1.5rem;
@@ -82,7 +87,8 @@
   border-radius: 4px;
   background: var(--f-papel);
   color: var(--f-papel-tinta);
-  box-shadow: 0 16px 30px -16px rgb(0 0 0 / 55%);
+  box-shadow: var(--f-folheto-sombra);
+  font: inherit;
   text-align: left;
   text-decoration: none;
   transform: rotate(var(--rot, 0deg));

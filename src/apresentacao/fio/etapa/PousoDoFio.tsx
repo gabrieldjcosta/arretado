@@ -5,7 +5,9 @@ import './fio-etapa.css';
 
 /**
  * O pouso (D-D25): a etapa fecha com os fatos do que foi feito, em frases curtas e sem placar. Passo
- * pulado não deixa fato. Pousar conta a etapa; o próximo puxão planeja a seguinte.
+ * pulado não deixa fato, e a falta dele não vira aviso. "Seguir" conta a etapa e volta ao Agora; o próximo
+ * puxão planeja a seguinte. A cena do pouso (cacto, lua, juazeiro) vem no PR do pouso em cena; até lá o
+ * texto é o provisório que a Marca indicou.
  */
 export function PousoDoFio() {
   const fio = useFio();
@@ -27,7 +29,7 @@ export function PousoDoFio() {
         Etapa {String(pouso.etapa + 1)} · {pouso.materia}
       </span>
       <h1 className="fio-titulo" id="fio-pouso-titulo">
-        Pousou.
+        Pode descansar.
       </h1>
       {pouso.fatos.length > 0 ? (
         <ul className="fio-fatos">
@@ -36,7 +38,7 @@ export function PousoDoFio() {
           ))}
         </ul>
       ) : (
-        <p className="fio-quieto">Esta etapa passou sem deixar fato. Tudo bem: o fio segue.</p>
+        <p className="fio-quieto">Você passou por aqui. O fio fica onde está.</p>
       )}
       <button
         type="button"
@@ -45,7 +47,7 @@ export function PousoDoFio() {
           fio.pousarEtapa();
         }}
       >
-        Pousar
+        Seguir
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>

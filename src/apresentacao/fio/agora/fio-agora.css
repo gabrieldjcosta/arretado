@@ -143,7 +143,7 @@
   font-family: var(--fonte-titulo);
   font-weight: 800;
   font-size: 0.9375rem;
-  color: var(--f-acento);
+  color: var(--f-tempo);
 }
 
 /* O Agora sem nenhuma matéria: uma pergunta e um botão, nunca uma lista de começos. */

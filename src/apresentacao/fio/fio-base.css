@@ -2,7 +2,8 @@
    (a casca que `CascaDoFio` monta quando a pessoa liga a prévia), então a interface de hoje não muda um
    pixel. Origem visual: o protótipo v14 da Marca (https://claude.ai/artifact/EG9XZoJY1eW7zDuPykg7xA).
    Regra de cor (Gabriel, 04/11/2026): a noite é luar (botão creme), o dia é sol da manhã (botão âmbar);
-   amarelo é o brilho, âmbar é o contorno e o traço. Os papéis de fundo, texto e borda são os do app
+   amarelo é o brilho, âmbar é o contorno e o traço. O fio da noite é de luar (`--luz`, com um halo branco
+   fraco), nunca ciano: o ciano é só do foco e da seleção. Os papéis de fundo, texto e borda são os do app
    (`--fundo`, `--superficie`, `--texto`, `--borda`...): quem muda de mundo é o tema, como sempre. */
 
 .shell-fio {
@@ -14,6 +15,15 @@
   --f-fio-halo: rgb(255 197 61 / 32%);
   --f-fio-halo-largura: 10;
   --f-acento: #8a5200;
+  /* O "+": o ícone precisa de 3:1 sobre o vidro (WCAG 1.4.11), então de dia é um âmbar mais fundo que o ponto. */
+  --f-mais: #b87800;
+  --f-mais-borda: #d39200;
+  --f-mais-borda-largura: 1.5px;
+  --f-mais-traco: 2.8;
+  /* O tempo ("3 min") é texto pequeno: 4,5:1 sobre o vidro, então de dia é o âmbar fundo e à noite o amarelo. */
+  --f-tempo: #8a5200;
+  /* O folheto do Varal: de dia a sombra é curta e macia; à noite, funda. */
+  --f-folheto-sombra: 0 6px 12px -6px rgb(15 28 58 / 28%);
   --f-chip: rgb(255 186 64 / 22%);
   --f-acao-fundo: linear-gradient(180deg, #ffd56b 0%, #ffab3d 100%);
   --f-acao-texto: #4a2a00;
@@ -47,9 +57,15 @@
    (quando a pessoa não escolheu) e o escolhido à mão. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='claro']) .shell-fio {
-    --f-fio: #f2f6ff;
-    --f-fio-halo: rgb(57 202 239 / 45%);
+    --f-fio: var(--luz);
+    --f-fio-halo: rgb(255 255 255 / 14%);
     --f-acento: #39caef;
+    --f-mais: #ffc53d;
+    --f-mais-borda: #22304d;
+    --f-mais-borda-largura: 1px;
+    --f-mais-traco: 2.4;
+    --f-tempo: #ffc53d;
+    --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
     --f-chip: rgb(57 202 239 / 10%);
     --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
     --f-acao-texto: #0b1322;
@@ -70,9 +86,15 @@
 }
 
 :root[data-tema='escuro'] .shell-fio {
-  --f-fio: #f2f6ff;
-  --f-fio-halo: rgb(57 202 239 / 45%);
+  --f-fio: var(--luz);
+  --f-fio-halo: rgb(255 255 255 / 14%);
   --f-acento: #39caef;
+  --f-mais: #ffc53d;
+  --f-mais-borda: #22304d;
+  --f-mais-borda-largura: 1px;
+  --f-mais-traco: 2.4;
+  --f-tempo: #ffc53d;
+  --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
   --f-chip: rgb(57 202 239 / 10%);
   --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
   --f-acao-texto: #0b1322;
@@ -157,17 +179,42 @@
   stroke: none;
 }
 
-/* O "+" da casca (MaisGlobal, D-D23) na luz do mundo: âmbar sobre o vidro. */
+/* O "+" da casca (MaisGlobal, D-D23): amarelo sobre o vidro, como o ponto de luz, e o contorno acende no
+   hover. O ciano é só do foco e da seleção; o "+" nunca é ciano. */
 .shell-fio .mais-global .mais {
   background: var(--f-vidro);
-  border: 1px solid var(--f-cartao-borda);
-  color: var(--f-acento);
+  border: var(--f-mais-borda-largura) solid var(--f-mais-borda);
+  color: var(--f-mais);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
 }
 
 .shell-fio .mais-global .mais svg {
-  stroke-width: 2.4;
+  stroke-width: var(--f-mais-traco);
+}
+
+@media (hover: hover) {
+  .shell-fio .mais-global .mais:hover {
+    border-color: var(--f-ponto);
+  }
+}
+
+.shell-fio .mais-global .mais:active {
+  transform: scale(0.94);
+}
+
+/* Ao apertar, o "+" encolhe e gira um quarto de volta na mola; no Calmo e com movimento reduzido, só encolhe. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-perfil='calmo']) .shell-fio .mais-global .mais {
+    transition:
+      transform 0.35s var(--f-mola),
+      border-color 0.2s;
+  }
+
+  :root:not([data-perfil='calmo']) .shell-fio .mais-global .mais:active {
+    transform: scale(0.9) rotate(90deg);
+  }
 }
 
 .shell-fio .fio-conteudo {
