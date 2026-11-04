@@ -150,6 +150,8 @@ export interface Etapa {
 export interface Pouso {
   etapa: number;
   materia: string;
+  /** A matéria da etapa (o Destino acha nela o estado do mapa). Pousos guardados antes não têm. */
+  materiaId?: string;
   fatos: readonly string[];
 }
 

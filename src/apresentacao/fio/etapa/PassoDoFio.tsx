@@ -10,7 +10,8 @@ import { alvoDaPorteira } from '../dados/alvo';
 import { PASSOS_COM_TELA } from '../dados/avancar';
 import { descreverPasso } from '../dados/descrever';
 import { marcarPausa } from '../dados/pausa';
-import { ROTA_DO_POUSO, useFio } from '../dados/useFio';
+import { useFio } from '../dados/useFio';
+import { ROTA_DO_POUSO } from '../lugares';
 import { GuardarDoPasso, LembrarDoPasso, PraticarDoPasso, type AlvoDaPorteira } from '../passos';
 import './fio-etapa.css';
 

@@ -1,19 +1,74 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, type PointerEvent } from 'react';
 import { movimentoAgora } from '../../movimento';
+import './fio-puxar.css';
 
-/** Quanto o fio estica (px) e a partir de quanto o solto vira puxão. */
-const ESTICA_ATE = 140;
-const PUXA_A_PARTIR_DE = 70;
-/** O nó do puxão sai 42 px acima do fim do fio (metade do diâmetro de 84 px). */
-const RAIO_DO_NO = 42;
 const MOLA = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+export type FormaDoFio = 'agora' | 'pouso';
+
+interface Geometria {
+  estica: number;
+  puxaA: number;
+  raio: number;
+  inicio: number;
+  mergulho: number;
+  sobe: number;
+  descida: number;
+  volta: number;
+  onda: number;
+  balanco: number;
+  base: (altura: number) => number;
+  /** Quanto a dica fica abaixo do nó (px); sem isso, a folha de estilo a põe. */
+  dicaAbaixoDoNo?: number;
+}
+
+/**
+ * As medidas de cada forma do fio (protótipo v16 da Marca). O Agora é o fio grande, no meio da tela; o pouso, o
+ * compacto, no pé dela. `estica` é quanto o fio estica (px); `puxaA`, a partir de quanto o solto vira puxão;
+ * `raio`, metade do diâmetro do nó; `inicio`, onde o fio nasce (acima da área); `mergulho` e `sobe`, a descida
+ * e a sobra da mola do puxão; `onda` e `balanco`, o quanto o fio se curva ao esticar.
+ */
+const GEOMETRIA: Record<FormaDoFio, Geometria> = {
+  agora: {
+    estica: 140,
+    puxaA: 70,
+    raio: 42,
+    inicio: -40,
+    mergulho: 90,
+    sobe: -20,
+    descida: 180,
+    volta: 420,
+    onda: 30,
+    balanco: 6,
+    base: (altura) => Math.min(altura * 0.55, 230),
+    dicaAbaixoDoNo: 58,
+  },
+  pouso: {
+    estica: 70,
+    puxaA: 28,
+    raio: 25,
+    inicio: -6,
+    mergulho: 46,
+    sobe: -10,
+    descida: 150,
+    volta: 370,
+    onda: 20,
+    balanco: 5,
+    base: () => 83,
+  },
+};
 
 interface Props {
   /** O puxão valeu (arrasto largado além do limite, toque, Enter ou Espaço). */
   aoPuxar: () => void;
-  /** "Puxe o fio" ou, com um passo aberto, "Puxe para continuar". */
+  /** "Puxe o fio", "Puxe para continuar" ou, no pouso, "Puxe para seguir". */
   titulo: string;
-  apoio: string;
+  /** A linha miúda sob o título; no pouso não há. */
+  apoio?: string;
+  /** Qual forma: a grande do Agora (padrão) ou a compacta do pouso. */
+  forma?: FormaDoFio;
+  /** O nome do nó para quem não o vê; sem ele, "<título>: ir ao próximo passo". */
+  rotuloDoNo?: string;
 }
 
 function terminou(animacao: Animation): Promise<void> {
@@ -25,11 +80,12 @@ function terminou(animacao: Animation): Promise<void> {
 
 /**
  * O fio que se puxa (D-D25): um fio âmbar pendurado do alto e o nó na ponta. Arrastar para baixo e soltar
- * além de 70 px, tocar ou usar o teclado puxa; o fio dá um tranco e a mola devolve o nó ao lugar. Em
- * Movimento reduzido e no perfil Calmo o puxão é instantâneo. Desenha direto no DOM (sem estado do React)
- * para o arrasto acompanhar o dedo.
+ * além do limite da forma (70 px no Agora, 28 no pouso), tocar ou usar o teclado puxa; o fio dá um tranco e a
+ * mola devolve o nó ao lugar. Em Movimento reduzido e no perfil Calmo o puxão é instantâneo. Desenha direto no
+ * DOM (sem estado do React) para o arrasto acompanhar o dedo.
  */
-export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
+export function FioQueSePuxa({ aoPuxar, titulo, apoio, forma = 'agora', rotuloDoNo }: Props) {
+  const g = GEOMETRIA[forma];
   const area = useRef<HTMLDivElement>(null);
   const linha = useRef<SVGPathElement>(null);
   const brilho = useRef<SVGPathElement>(null);
@@ -44,27 +100,33 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
   /** Cada volta da mola ganha um número; apertar o nó de novo invalida a que ainda corre. */
   const geracao = useRef(0);
 
-  const desenhar = useCallback((dy: number) => {
-    puxao.current = dy;
-    const largura = area.current?.clientWidth ?? 0;
-    const meio = largura / 2;
-    const fim = base.current + dy;
-    const balanco = Math.sin(dy / 30) * 6;
-    const d = `M${String(meio)} -40 Q${String(meio + balanco)} ${String(fim / 2)} ${String(meio)} ${String(fim - 40)}`;
-    linha.current?.setAttribute('d', d);
-    brilho.current?.setAttribute('d', d);
-    if (no.current) no.current.style.transform = `translateY(${String(dy)}px)`;
-    // A dica sai da frente do nó que desce.
-    if (dica.current) dica.current.style.opacity = String(Math.max(0, 1 - dy / 60));
-  }, []);
+  const desenhar = useCallback(
+    (dy: number) => {
+      puxao.current = dy;
+      const largura = area.current?.clientWidth ?? 0;
+      const meio = largura / 2;
+      const fim = base.current + dy;
+      const balanco = Math.sin(dy / g.onda) * g.balanco;
+      // O fio entra 2 px no nó, para a ponta não aparecer por baixo dele.
+      const d = `M${String(meio)} ${String(g.inicio)} Q${String(meio + balanco)} ${String(fim / 2)} ${String(meio)} ${String(fim - (g.raio - 2))}`;
+      linha.current?.setAttribute('d', d);
+      brilho.current?.setAttribute('d', d);
+      if (no.current) no.current.style.transform = `translateY(${String(dy)}px)`;
+      // A dica sai da frente do nó que desce.
+      if (dica.current) dica.current.style.opacity = String(Math.max(0, 1 - dy / 60));
+    },
+    [g],
+  );
 
   const medir = useCallback(() => {
     const altura = area.current?.clientHeight ?? 0;
-    base.current = Math.min(altura * 0.55, 230);
-    if (no.current) no.current.style.top = `${String(base.current - RAIO_DO_NO)}px`;
-    if (dica.current) dica.current.style.top = `${String(base.current + 58)}px`;
+    base.current = g.base(altura);
+    if (no.current) no.current.style.top = `${String(base.current - g.raio)}px`;
+    if (dica.current && g.dicaAbaixoDoNo !== undefined) {
+      dica.current.style.top = `${String(base.current + g.dicaAbaixoDoNo)}px`;
+    }
     desenhar(puxao.current);
-  }, [desenhar]);
+  }, [desenhar, g]);
 
   useLayoutEffect(() => {
     medir();
@@ -93,20 +155,20 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
         el.animate(
           [
             { transform: `translateY(${String(puxao.current)}px)` },
-            { transform: 'translateY(90px)' },
+            { transform: `translateY(${String(g.mergulho)}px)` },
           ],
-          { duration: 180, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' },
+          { duration: g.descida, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' },
         ),
       );
-      desenhar(90);
+      desenhar(g.mergulho);
       await terminou(
         el.animate(
           [
-            { transform: 'translateY(90px)' },
-            { transform: 'translateY(-20px)' },
+            { transform: `translateY(${String(g.mergulho)}px)` },
+            { transform: `translateY(${String(g.sobe)}px)` },
             { transform: 'translateY(0px)' },
           ],
-          { duration: 420, easing: MOLA },
+          { duration: g.volta, easing: MOLA },
         ),
       );
       el.getAnimations().forEach((animacao) => {
@@ -116,7 +178,7 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
     desenhar(0);
     ocupado.current = false;
     if (vivo.current) aoPuxar();
-  }, [aoPuxar, desenhar]);
+  }, [aoPuxar, desenhar, g]);
 
   // Volta o nó ao lugar em quadros, com uma sobra que assenta (a mola do protótipo).
   const soltarSemPuxar = useCallback(() => {
@@ -130,12 +192,12 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
     const minha = geracao.current;
     const quadro = (agora: number) => {
       if (minha !== geracao.current) return;
-      const k = Math.min(1, (agora - inicio) / 420);
+      const k = Math.min(1, (agora - inicio) / g.volta);
       desenhar(de * Math.cos(k * Math.PI * 1.5) * (1 - k));
       if (k < 1 && vivo.current) requestAnimationFrame(quadro);
     };
     requestAnimationFrame(quadro);
-  }, [desenhar]);
+  }, [desenhar, g]);
 
   const aoApertar = (e: PointerEvent<HTMLButtonElement>) => {
     if (ocupado.current) return;
@@ -151,7 +213,7 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
   const aoMover = (e: PointerEvent<HTMLButtonElement>) => {
     const t = toque.current;
     if (!t) return;
-    const dy = Math.max(0, Math.min(ESTICA_ATE, e.clientY - t.y0));
+    const dy = Math.max(0, Math.min(g.estica, e.clientY - t.y0));
     if (dy > 4) t.moveu = true;
     desenhar(dy);
   };
@@ -161,25 +223,25 @@ export function FioQueSePuxa({ aoPuxar, titulo, apoio }: Props) {
     // O toque simples vira `click`; só o arrasto decide aqui, e o `click` que vem depois não vale.
     if (!t?.moveu) return;
     ignorarClique.current = true;
-    if (puxao.current > PUXA_A_PARTIR_DE) void puxar();
+    if (puxao.current > g.puxaA) void puxar();
     else soltarSemPuxar();
   };
 
   return (
-    <div className="fio-puxar" ref={area}>
+    <div className="fio-puxar" data-forma={forma} ref={area}>
       <svg aria-hidden="true">
         <path className="fio-fio-brilho" ref={brilho} />
         <path className="fio-fio-linha" ref={linha} />
       </svg>
       <div className="fio-dica" ref={dica}>
         {titulo}
-        <small>{apoio}</small>
+        {apoio !== undefined && <small>{apoio}</small>}
       </div>
       <button
         type="button"
         className="fio-puxador fio-ponto"
         ref={no}
-        aria-label={`${titulo}: ir ao próximo passo`}
+        aria-label={rotuloDoNo ?? `${titulo}: ir ao próximo passo`}
         onPointerDown={aoApertar}
         onPointerMove={aoMover}
         onPointerUp={aoSoltar}

@@ -1,0 +1,153 @@
+/* O fio que se puxa (D-D25): o fio pendurado, o nó e a dica. Duas formas: a do Agora (grande, no meio da tela) e a do pouso
+   (compacta, no pé da tela, `data-forma="pouso"`). Valores do protótipo v14 da Marca. */
+.fio-puxar {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  /* O fio, o nó e a dica cabem em 17,5 rem; o cartão da ponta e a pílula ficam à vista em 360 × 640. */
+  min-height: 17.5rem;
+}
+
+/* Celular curto (568 px de altura, o iPhone SE): o fio encolhe um pouco para o cartão não encostar na pílula. */
+@media (max-height: 600px) {
+  .fio-puxar {
+    min-height: 15.5rem;
+  }
+}
+
+.fio-puxar svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fio-fio-linha {
+  fill: none;
+  stroke: var(--f-fio);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.fio-fio-brilho {
+  fill: none;
+  stroke: var(--f-fio-halo);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+/* O nó que se puxa: 84 px, o ponto de luz com a seta. Arrasta para baixo ou toca. */
+.fio-puxador {
+  position: absolute;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin-left: -42px;
+  padding: 0;
+  border: 0;
+  color: #3a2700;
+  touch-action: none;
+  cursor: grab;
+}
+
+.fio-puxador:active {
+  cursor: grabbing;
+}
+
+.fio-puxador:focus-visible {
+  outline: 3px solid var(--f-acento);
+  outline-offset: 6px;
+}
+
+.fio-puxador svg {
+  position: static;
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fio-dica {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+  color: var(--titulo);
+  pointer-events: none;
+}
+
+.fio-dica small {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--fonte-interface);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  color: var(--texto-atenuado);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-perfil='calmo']) .fio-puxador {
+    /* Só "backwards": com "both" o último quadro (transform: none) seguraria o nó e o arrasto não o moveria. */
+    animation: fio-desce 0.7s var(--f-mola) backwards;
+  }
+}
+
+@keyframes fio-desce {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A forma do pouso: compacta, no pé da tela. O nó tem 50 px (o do Agora, 84) e a dica fica embaixo, miúda. */
+.fio-puxar[data-forma='pouso'] {
+  flex: none;
+  height: 140px;
+  min-height: 0;
+}
+
+.fio-puxar[data-forma='pouso'] .fio-puxador {
+  width: 50px;
+  height: 50px;
+  margin-left: -25px;
+}
+
+.fio-puxar[data-forma='pouso'] .fio-puxador svg {
+  width: 22px;
+  height: 22px;
+}
+
+.fio-puxar[data-forma='pouso'] .fio-dica {
+  top: auto;
+  bottom: 0;
+  font-family: var(--fonte-interface);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  color: var(--texto-atenuado);
+}
+
+/* No pouso o nó chega depois da cena (o Zé leva 1,1 s para se desenhar e a flor nova brota por último). */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-perfil='calmo']) .fio-puxar[data-forma='pouso'] .fio-puxador {
+    animation-delay: 0.9s;
+  }
+}

@@ -13,13 +13,15 @@ import { secaoDeAjuda } from '../orientacoes/conteudo';
 import { AvisoDePosse } from '../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../sessao/CantoDaSessao';
 import { RelatarProblema } from '../suporte/RelatarProblema';
+import { semPilulaDosLugares } from './lugares';
 import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
 import './fio-base.css';
 
 /**
  * A casca do Arretado novo (prévia do Fio, D-D25): o nome com o cacto à esquerda (o nó da pessoa, que
- * abre a Conta), a Ajuda, o "+" de sempre (D-D23) e a pílula com os três lugares embaixo. O que vem por
+ * abre a Conta), a Ajuda, o "+" de sempre (D-D23) e a pílula com os três lugares embaixo (que some no pouso, onde a
+ * saída é o fio ou "descansar"). O que vem por
  * dentro (`Outlet`) é o de sempre: o Agora, o Destino e o Varal são as telas novas; o Leitor, a Biblioteca
  * e o Fixar seguem como estão até as fatias seguintes darem casa nova a cada um. Sem rodapé: o backup e os
  * dados moram na Conta. Os provedores (Abertura, itens do "+") vêm do `Shell`.
@@ -30,12 +32,18 @@ export function CascaDoFio() {
   const [boasVindas, setBoasVindas] = useState(false);
   const tecladoAberto = useTecladoAberto();
   const telaComGuia = telaDoGuia(pathname);
+  const semPilula = semPilulaDosLugares(pathname);
   const guiaMontado = useGuiaMontado(telaComGuia);
 
   useAtalhoDeRegistrarErro();
 
   return (
-    <div className="shell shell-fio" data-teclado={tecladoAberto ? 'aberto' : undefined}>
+    <div
+      className="shell shell-fio"
+      data-teclado={tecladoAberto ? 'aberto' : undefined}
+      data-largo={pathname === '/destino' ? 'sim' : undefined}
+      data-sem-pilula={semPilula ? 'sim' : undefined}
+    >
       <AplicarAparencia />
       <PuxarEssenciais />
       <a
@@ -77,7 +85,7 @@ export function CascaDoFio() {
       <main id="conteudo" className="conteudo fio-conteudo" tabIndex={-1}>
         <Outlet />
       </main>
-      <NavDosLugares />
+      {!semPilula && <NavDosLugares />}
       <CantoDaSessao />
       {boasVindas && (
         <Chegada
