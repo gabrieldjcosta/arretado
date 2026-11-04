@@ -12,14 +12,18 @@ import { avisar } from './toast';
 
 const formatar = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 
-/** O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). */
+/**
+ * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). O cartão é
+ * o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do fio": aqui ele
+ * leva `m-sem-prova`, que o põe em uma coluna só (desvio 23 de `ajustes.css`).
+ */
 function SemProva() {
   return (
-    <div className="m-proximo" role="group" aria-label="Para começar">
+    <div className="m-proximo m-sem-prova" role="group" aria-label="Para começar">
       <span className="m-olho">Para começar</span>
       <strong>Qual é a sua prova?</strong>
       <span>Sem conta, sem edital. Isso fica para depois, se você quiser.</span>
-      <Link to="/comecar" className="m-acao" style={{ marginTop: 14, alignSelf: 'flex-start' }}>
+      <Link to="/comecar" className="m-acao">
         Escolher minha prova
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
