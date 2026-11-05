@@ -71,6 +71,21 @@ async function ateOAche(page: Page): Promise<string[]> {
   return vistos;
 }
 
+/** Só com CAPTURA=<pasta>: as fotos do cartão, de noite e de dia, para pôr ao lado do mockup. */
+async function capturar(page: Page, nome: string) {
+  const pasta = process.env.CAPTURA;
+  if (!pasta) return;
+  for (const [tema, rotulo] of [
+    ['dark', 'noite'],
+    ['light', 'dia'],
+  ] as const) {
+    await page.emulateMedia({ colorScheme: tema });
+    await page.waitForTimeout(600);
+    await page.locator('#conteudo').screenshot({ path: `${pasta}/app-${rotulo}-${nome}.png` });
+  }
+  await page.emulateMedia({ colorScheme: 'dark' });
+}
+
 test('Ache o erro: o cartão cabe, passa no axe, a troca aparece e o Seguir leva adiante', async ({
   page,
 }) => {
@@ -82,6 +97,7 @@ test('Ache o erro: o cartão cabe, passa no axe, a troca aparece e o Seguir leva
   await expect(
     cartao.getByRole('heading', { name: 'Uma palavra está trocada. Toque nela.' }),
   ).toBeVisible();
+  await capturar(page, '1-achar');
   await semViolacoesNoFio(page);
   const palavras = cartao.locator('.m-palavra');
   const n = await palavras.count();
@@ -91,6 +107,7 @@ test('Ache o erro: o cartão cabe, passa no axe, a troca aparece e o Seguir leva
   }
   await expect(cartao.locator('.m-troca')).toBeVisible();
   await expect(cartao.locator('.m-palavra.m-errada').first()).toBeVisible();
+  await capturar(page, '2-achou');
   await semViolacoesNoFio(page);
   await cartao.getByRole('button', { name: 'Seguir' }).click();
 });
