@@ -4384,3 +4384,41 @@ html[data-perfil='calmo'] .seletor-mundo-noite .seletor-mundo-disco,
 html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
   animation: none;
 }
+
+/* ---------- Leitor: o fio que se desenha na rolagem (Biblioteca visual, 05/11) ---------- */
+/* Preso logo abaixo do cabeçalho fixo (--barra-fixa, medida pelo Leitor). Só orienta: o texto não
+   muda e o toque passa por ele. */
+.fio-da-rolagem {
+  position: fixed;
+  inset: var(--barra-fixa, 0px) 0 auto 0;
+  z-index: 6;
+  height: 3px;
+  pointer-events: none;
+}
+.fio-da-rolagem-traco {
+  display: block;
+  height: 100%;
+  border-radius: 0 3px 3px 0;
+  background: var(--luz);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+}
+/* Vivo: o traço sai suave atrás do dedo (sem sombra com desfoque: a profundidade do app é dura). Sumido no começo, para não haver um fio
+   parado antes de a pessoa ler. */
+.fio-da-rolagem[data-movimento='vivo'] .fio-da-rolagem-traco {
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.2s;
+}
+.fio-da-rolagem[data-comeco='sim'] .fio-da-rolagem-traco {
+  opacity: 0;
+}
+/* Calmo e movimento reduzido: o comprimento segue a rolagem sem suavizar. */
+.fio-da-rolagem[data-movimento='calmo'] .fio-da-rolagem-traco {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fio-da-rolagem-traco {
+    transition: none !important;
+  }
+}

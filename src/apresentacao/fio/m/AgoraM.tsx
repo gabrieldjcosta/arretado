@@ -8,6 +8,7 @@ import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
 import { CactoMarca } from './CactoMarca';
+import { DiasDoFioM } from './DiasDoFioM';
 import { ContaM } from './ContaM';
 import { PuxarM } from './PuxarM';
 import { TelaM } from './TelaM';
@@ -134,6 +135,7 @@ export function AgoraM() {
           )}
         </>
       )}
+      <DiasDoFioM />
       <ContaM
         aberta={contaAberta}
         aoFechar={() => {

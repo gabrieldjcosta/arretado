@@ -36,14 +36,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 .acao{background:linear-gradient(180deg,var(--astro-a),var(--astro-b));color:var(--astro-tx);border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;box-shadow:0 3px 0 rgba(196,118,0,.35),0 10px 22px -12px var(--astro-sombra);transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
 .acao:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(196,118,0,.35),0 6px 14px -10px var(--astro-sombra)}
 /* seletor dia/noite */
-.pal[data-mundo=dia]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color:var(--tx)}
-.pal[data-mundo=noite]{--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;color:var(--tx)}
+.pal[data-mundo=dia]{--brilho:255,197,61;--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color:var(--tx)}
+.pal[data-mundo=noite]{--brilho:157,183,232;--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;color:var(--tx)}
 .mundo{width:84px;height:44px;border-radius:99px;border:1px solid var(--linha);background:var(--serra2);position:relative;padding:0}
-.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#ffd56b,#ffab3d);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px rgba(255,197,61,.32),0 0 0 12px rgba(255,171,61,.14),0 6px 16px -4px rgba(255,140,30,.7)}
-.mundo[aria-pressed=true] i{transform:translateX(40px);background:#fff4d6;box-shadow:inset -9px -3px 0 0 #d9c690,0 0 0 6px rgba(255,230,160,.18),0 0 0 12px rgba(255,230,160,.07),0 6px 16px -4px rgba(255,210,110,.5)}
+.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe08a,#ffc53d 60%,#e8a50f);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px rgba(255,197,61,.30),0 0 0 12px rgba(255,197,61,.12)}
+.mundo[aria-pressed=true] i{transform:translateX(40px);background:#fff4d6;box-shadow:inset -9px -3px 0 0 #d9c690,0 0 0 6px rgba(157,183,232,.20),0 0 0 12px rgba(157,183,232,.08)}
 .mundo[aria-pressed=false] i{animation:calor 3.2s ease-in-out infinite}
-@keyframes calor{50%{box-shadow:0 0 0 9px rgba(255,197,61,.28),0 0 0 17px rgba(255,171,61,.1),0 6px 16px -4px rgba(255,140,30,.7)}}
-.minicartao{margin-top:12px;background:var(--serra);border:1px solid var(--linha);border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
+@keyframes calor{50%{box-shadow:0 0 0 9px rgba(255,197,61,.26),0 0 0 17px rgba(255,197,61,.09)}}
+.minicartao{margin-top:12px;background:var(--serra);border:1px solid rgba(var(--brilho,170,182,211),.55);box-shadow:0 0 0 3px rgba(var(--brilho,170,182,211),.14),0 0 0 7px rgba(var(--brilho,170,182,211),.06);transition:border-color .3s,box-shadow .3s;border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
 /* interruptor */
 .sw{display:flex;align-items:center;gap:12px}
 .sw button{width:52px;height:30px;border-radius:99px;border:1px solid var(--forte);background:var(--serra2);position:relative;padding:0;transition:background .25s}
@@ -118,21 +118,110 @@ tr:last-child td{border-bottom:0}
 
 /* ideias novas */
 .regua{font-family:var(--f-lei);font-size:.95rem;line-height:1.7;max-width:34ch;margin:0}
-.regua span{opacity:.3;transition:opacity .25s;cursor:pointer;border-radius:4px}.regua span.on{opacity:1;background:color-mix(in srgb,var(--ponto) 18%,transparent)}
+.regua span{opacity:.3;transition:opacity .25s;cursor:pointer;border-radius:4px}.regua mark{background:none;color:inherit;border-bottom:2px solid var(--ponto);font-weight:600}.chp{border:1px solid var(--linha);background:var(--serra2);border-radius:99px;padding:4px 12px;min-height:36px;font-size:.82rem}.chp[aria-pressed=true]{border-color:var(--ponto);color:var(--ponto)}
+.regua span.on{opacity:1;background:color-mix(in srgb,var(--ponto) 18%,transparent)}
 .disco{width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--neon) calc(var(--p,1)*360deg),var(--serra2) 0);display:grid;place-items:center;border:1px solid var(--linha)}
 .disco div{width:76px;height:76px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--tx2)}
 .rol{height:120px;overflow:auto;border:1px solid var(--linha);border-radius:10px;padding:0 10px 0;width:100%;position:relative;font-family:var(--f-lei);font-size:.85rem;color:var(--tx2)}
 .rol-fio{height:4px;background:var(--serra2);border-radius:9px;overflow:hidden;width:100%;margin-bottom:8px}.rol-fio i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--astro-b),var(--astro-a));box-shadow:0 0 10px var(--astro-sombra)}
 .dias{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:260px}
-.dia{width:30px;height:30px;border-radius:50%;border:1.5px dashed var(--forte);background:none;padding:0;color:var(--tx3);font-size:.7rem}
-.dia[data-s=e]{background:linear-gradient(180deg,var(--astro-a),var(--astro-b));border:0;color:var(--astro-tx);font-weight:700}
+.dia{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(157,183,232,.6);background:rgba(157,183,232,.14);box-shadow:0 0 0 3px rgba(157,183,232,.08);padding:0;color:var(--tx2);font-size:.7rem;transition:background .25s,box-shadow .25s}
+.dia[data-s=e]{background:linear-gradient(180deg,#ffd56b,#ffab3d);border:0;color:#4a2a00;font-weight:700;box-shadow:0 0 0 3px rgba(255,197,61,.28),0 0 0 7px rgba(255,197,61,.1)}
+.regraUso{margin:6px 0 0;padding:6px 10px;border-radius:8px;background:var(--serra2);font-size:.8rem;text-align:center;color:var(--tx2)}.regraUso b{color:var(--tx)}
 .so{text-align:center;font-size:.85rem;color:var(--tx2);margin-top:8px;min-height:2.6em}
-.ze{width:64px;height:76px;transform-origin:50% 100%}.ze.on{animation:respira 4.5s ease-in-out infinite}
-@keyframes respira{50%{transform:scaleY(1.04) scaleX(.98)}}
-.ze path{fill:none;stroke:var(--certo);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ze{width:110px;height:auto;overflow:visible;transform-origin:50% 100%;--zl:#fff;--zbanda:#39caef;--zolho:#0f1c3a;--zbo:#ec5675;--zdia:inline;--zn:none;--zmiolo:#39caef;--zpets:#b8c7e3}
+.ze .zm{fill:var(--zmiolo);fill-opacity:.1}
+.ze .zl{fill:none;stroke:var(--zl);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.ze .zbd,.ze .zbn{fill:none;stroke:var(--zbanda);stroke-linecap:round;stroke-linejoin:round}
+.ze .zbd{stroke-width:17;display:var(--zdia)}.ze .zbn{stroke-width:17;display:var(--zn)}
+.ze .zb{fill:var(--zbo);fill-opacity:.85}
+.ze .zo,.ze .za{fill:none;stroke:var(--zolho);stroke-linecap:round;transition:opacity .35s}
+.ze .zo{stroke-width:12.5}.ze .za{stroke-width:7;opacity:0}
+.ze .zh{fill:none;stroke:var(--zolho);stroke-width:3.3;stroke-linecap:round}
+.ze .zhaste,.ze .zhaste2{transform-box:view-box;transform-origin:162px 101px}
+.ze .zflor{opacity:1}
+.ze .zpet{fill:#fff;stroke:var(--zpets);stroke-width:.8;transform:scale(.62);transform-box:fill-box;transform-origin:50% 100%}
+.ze .zc{fill:#ffc53d}
+.ze .zfl{opacity:0}
+.ze .zban{fill:#ffc53d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ze{--zolho:#fff;--zdia:none;--zn:inline;--zbo:#ff86a6;--zpets:transparent}}
+:root[data-theme="dark"] .ze{--zolho:#fff;--zdia:none;--zn:inline;--zbo:#ff86a6;--zpets:transparent}
+.ze .zlv ellipse{fill:#a4e6b8;stroke:var(--zolho);stroke-width:.8;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+.ze .zes path{fill:none;stroke:var(--zolho);stroke-width:2.4;stroke-linecap:round;opacity:0}
+.ze.on{animation:vida 18s ease-in-out infinite}
+.ze.on .zo{animation:ocap 18s ease-in-out infinite}.ze.on .za{animation:oarco 18s ease-in-out infinite}
+.ze.on .zhaste{animation:haste 6s ease-in-out infinite alternate}
+.ze.on .zpet{animation:petala 18s ease-in-out infinite}
+.ze.on .zflor{animation:flor 18s ease-in-out infinite}
+.ze.on .zfl{animation:flag 18s ease-in-out infinite}
+.ze.on .zhaste2{animation:haste2 2s ease-in-out infinite alternate}
+.ze.on .zban{animation:pano .9s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:0% 50%}
+.ze.on .zl1{animation:folha 18s ease-in-out infinite}.ze.on .zl2{animation:folha 18s ease-in-out infinite .5s}.ze.on .zl3{animation:folha 18s ease-in-out infinite 1s}
+.ze.on .zes path{animation:espinho 18s ease-in-out infinite}
+@keyframes vida{0%,16%,40%,100%{transform:none}20%{transform:rotate(-2.6deg)}24%{transform:rotate(2.2deg)}28%{transform:rotate(-1.6deg)}32%{transform:rotate(1deg)}36%{transform:rotate(-.4deg)}}
+@keyframes ocap{0%,46%{opacity:1}48%,60%{opacity:0}62%,100%{opacity:1}}
+@keyframes oarco{0%,46%{opacity:0}48%,60%{opacity:1}62%,100%{opacity:0}}
+@keyframes haste{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+@keyframes haste2{from{transform:rotate(-18deg)}to{transform:rotate(15deg)}}
+@keyframes petala{0%,47%{transform:scale(.62)}52%,57%{transform:scale(1.12)}62%,100%{transform:scale(.62)}}
+@keyframes flor{0%,74%{opacity:1}77%,92%{opacity:0}95%,100%{opacity:1}}
+@keyframes flag{0%,74%{opacity:0}77%,92%{opacity:1}95%,100%{opacity:0}}
+@keyframes folha{0%,17%{opacity:0;transform:translate(14px,8px) rotate(0)}22%{opacity:1}34%{opacity:1}40%,100%{opacity:0;transform:translate(-30px,-14px) rotate(160deg)}}
+@keyframes espinho{0%,62%{opacity:0}67%,71%{opacity:1}76%,100%{opacity:0}}
+@keyframes pano{from{transform:skewY(-9deg) scaleX(.92)}to{transform:skewY(9deg) scaleX(1.04)}}
 .anel{position:relative}.anel::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 var(--certo);opacity:0}
 .anel.bate::after{animation:anel .55s var(--sair)}
 @keyframes anel{from{opacity:.9;box-shadow:0 0 0 0 var(--certo)}to{opacity:0;box-shadow:0 0 0 16px var(--certo)}}
+
+/* botão do dia: três versões ao lado do luar */
+.bd{border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;color:#0f1c3a;transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
+.bd:active{transform:translateY(2px)}
+.bd.a{background:linear-gradient(180deg,#fffdf2,#ffefb8);box-shadow:0 0 0 1.5px #e8b43c,0 10px 28px -10px rgba(255,190,60,.75),0 0 22px rgba(255,214,110,.45)}
+.bd.a:active{box-shadow:0 0 0 1.5px #e8b43c,0 4px 14px -8px rgba(255,190,60,.7),0 0 14px rgba(255,214,110,.35)}
+.bd.b{background:linear-gradient(180deg,#ffd23f,#ffb000);box-shadow:0 3px 0 #c98200,0 10px 22px -12px rgba(255,150,0,.7)}
+.bd.b:active{box-shadow:0 1px 0 #c98200,0 5px 12px -10px rgba(255,150,0,.7)}
+.bd.c{background:#fff;box-shadow:inset 0 0 0 2px #d39200,0 0 0 5px rgba(255,197,61,.28),0 8px 20px -10px rgba(211,146,0,.6)}
+.bd.c:active{box-shadow:inset 0 0 0 2px #d39200,0 0 0 3px rgba(255,197,61,.25)}
+.bd.lua{background:linear-gradient(180deg,#fff7e0,#ffe6a3);color:#0b1322;box-shadow:0 0 0 1px rgba(255,230,160,.5),0 10px 30px -10px rgba(255,210,110,.55)}
+.bdl{display:grid;gap:4px;justify-items:center;font-size:.72rem;color:var(--tx3)}
+.bdlinha{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.faixa{width:100%;border-radius:10px;padding:14px 8px;display:grid;gap:10px}
+.faixa.fdia{background:linear-gradient(180deg,#e4edfa,#f6f8fb)}.faixa.fnoite{background:#0b1322}
+.fdia .bdl{color:#4a5878}.fnoite .bdl{color:#aab6d3}.faixa small{color:#4a5878;font-size:.72rem;text-align:center}.faixa.fnoite small{color:#aab6d3}
+
+/* galeria de formatos de botão */
+.gb{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
+.gbc{background:var(--serra);border:1px solid var(--linha);border-radius:14px;padding:12px 14px;min-width:0}
+.gbc h3{display:flex;gap:8px;align-items:baseline}.gbc h3 b{color:var(--ponto);font-variant-numeric:tabular-nums}
+.gbc p{margin:2px 0 10px;color:var(--tx2);font-size:.85rem}
+.gbm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gbm>div{border-radius:10px;padding:18px 6px;display:grid;justify-items:center;gap:8px;font-size:.68rem}
+.gbm .gd{background:linear-gradient(180deg,#e4edfa,#f6f8fb);color:#4a5878;--ac:#d39200;--glow:rgba(255,197,61,.42);--ink:#0f1c3a;--fb:linear-gradient(180deg,#fffdf2,#ffefb8);--ft:#0f1c3a;--fc:#fffdf2;--hor:#ffd56b;--bg:#f6f8fb;--sol:radial-gradient(circle at 35% 30%,#ffe08a,#ffc53d 60%,#e8a50f);--vid:rgba(255,255,255,.55)}
+.gbm .gn{background:#0b1322;color:#aab6d3;--ac:#cfd9f0;--glow:rgba(190,205,235,.3);--ink:#eef2fa;--fb:linear-gradient(180deg,#fff7e0,#ffe6a3);--ft:#0b1322;--fc:#fff7e0;--hor:#9db7e8;--bg:#0b1322;--sol:radial-gradient(circle at 35% 30%,#fff,#fff4d6 60%,#d9c690);--vid:rgba(255,255,255,.08)}
+.gbb{font:inherit;font-weight:700;font-size:.95rem;min-height:46px;padding:10px 22px;border:0;cursor:pointer;transition:transform .12s var(--sair),box-shadow .12s var(--sair);display:inline-flex;gap:8px;align-items:center}
+.gbb:active{transform:translateY(2px)}
+.gbb .s{width:11px;height:11px;border-radius:50%;background:var(--sol);box-shadow:0 0 0 3px var(--glow)}
+.g1{border-radius:999px;background:var(--fb);color:var(--ft);box-shadow:inset 0 0 0 2px var(--ac),0 0 0 5px var(--glow)}
+.g2{border-radius:10px;background:var(--fb);color:var(--ft);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ac)}
+.g2:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ac)}
+.g3{border-radius:14px;background:linear-gradient(180deg,var(--fc) 50%,var(--hor));color:var(--ft);box-shadow:0 0 0 1.5px var(--ac),0 10px 24px -12px var(--glow)}
+.g4{border-radius:999px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);outline:2px dotted var(--ac);outline-offset:5px}
+.g5{position:relative;overflow:hidden;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 55%),radial-gradient(120% 90% at 50% 130%,var(--glow),transparent 70%),var(--vid);color:var(--ink);box-shadow:inset 0 0 0 1px var(--ac),inset 0 0 9px 1px var(--glow),0 0 5px 0 var(--ac),0 0 20px 3px var(--glow);backdrop-filter:blur(6px)}
+.gbm .gd .g5a{color:#a86500}.gbm .gn .g5a{color:var(--ink)}
+.g5::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:radial-gradient(90% 120% at 50% 130%,var(--hor),var(--glow) 45%,transparent 75%)}
+.g5.alv::after{animation:alvorada .9s var(--sair)}
+.g7::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0;box-shadow:0 0 0 2px var(--aro),0 0 18px 4px var(--glow)}
+.g7.alv::after{animation:onda 1.1s cubic-bezier(.25,.1,.25,1)}
+@keyframes onda{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes alvorada{0%{opacity:0;transform:translateY(60%)}35%{opacity:1}100%{opacity:0;transform:translateY(-10%)}}
+.g6{border-radius:999px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink),0 0 0 4px var(--bg),0 0 0 6px var(--ac)}
+.g7{position:relative;width:58px;height:58px;padding:0;border-radius:50%;justify-content:center;background:var(--fb);color:var(--seta);box-shadow:inset 0 0 0 1px var(--aro),inset 0 0 9px 1px var(--glow),0 0 5px 0 var(--aro),0 0 20px 3px var(--glow)}
+.gbm .gd .g7{--seta:#c27b00;--aro:#d39200}
+.gbm .gn .g7{--seta:#cfd9f0;--aro:#cfd9f0;background:linear-gradient(180deg,#1b2742,#0f1a30)}
+.g7 svg{position:relative;z-index:1;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.g8{border-radius:10px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink),inset 6px 0 0 var(--ac)}
+.g8{padding-left:26px}
+.arq{margin-top:14px}.arq summary{cursor:pointer;font-weight:600;padding:10px 0;min-height:44px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
 </style>
 
@@ -145,12 +234,16 @@ tr:last-child td{border-bottom:0}
 <div class="grade">
 
 <section class="demo"><header><h3>Trocar dia e noite</h3><p>Sol que vira lua. O botão, o fio e o halo trocam de cor junto, como no mockup (“a noite é luar, o dia é sol da manhã”).</p></header>
-<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="linha" style="margin-top:12px"><button class="acao" style="min-height:40px;padding:8px 18px">Continuar</button><svg width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-halo)" stroke-width="8" stroke-linecap="round"/><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-b)" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="minicartao" id="mini">Noite: luar. Botão claro, fio e halo dourado-pálido.</div></div></div>
+<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="linha" style="margin-top:12px"><button class="acao" style="min-height:40px;padding:8px 18px">Continuar</button><svg width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-halo)" stroke-width="8" stroke-linecap="round"/><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-b)" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="minicartao" id="mini">Noite: luar. O brilho do app inteiro fica azul-prata, em anéis.</div></div></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> Conta › Aparência (#424)</div></section>
 
 <section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta. A cor segue o tema da página: luar no escuro, sol no claro.</p></header>
 <div class="pal"><button class="acao">Continuar</button></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> ação principal de cada tela</div></section>
+
+<section class="demo" id="botoes-dia"><header><h3>Botão do dia: três versões</h3><p>A luz clara do luar é agradável porque o botão é claro e o texto é azul-marinho. As versões do dia seguem o mesmo princípio. A é a recomendada.</p></header>
+<div class="pal" style="display:block;padding:8px;overflow:visible"><div style="display:grid;gap:8px"><div class="faixa fdia"><div class="bdlinha"><div class="bdl"><button class="bd a">Continuar</button>A · manhã clara</div><div class="bdl"><button class="bd b">Continuar</button>B · ouro cheio</div><div class="bdl"><button class="bd c">Continuar</button>C · contorno de sol</div></div></div><div class="faixa fnoite"><div class="bdlinha"><div class="bdl"><button class="bd lua">Continuar</button>luar (já aprovado)</div></div></div></div></div>
+<div class="pe"><span class="sel av">sol</span><b>mudança:</b> o texto sai do marrom e vai para o azul-marinho do Fio; <b>A</b> é clara e brilha como o luar, <b>B</b> é dourado vivo, <b>C</b> é papel com contorno âmbar</div></section>
 
 <section class="demo"><header><h3>Interruptor</h3><p>Teclado (Espaço) e leitor de tela funcionam.</p></header>
 <div class="pal"><div class="sw"><button role="switch" aria-checked="false" id="sw1" aria-labelledby="swl"></button><span id="swl">Lembrete diário</span></div></div>
@@ -199,19 +292,24 @@ tr:last-child td{border-bottom:0}
 </div>
 
 
+<h2>Formatos de botão</h2>
+<p class="sub">Decisão de 05/11 (Gabriel): os dois referenciais abaixo dão a linguagem de todos os botões e menus do app. Os outros formatos ficam arquivados, para quando uma situação específica pedir; busque neles antes de buscar em outros lugares.</p>
+<div class="gb"><section class="gbc"><h3><b>★</b>Referencial 1 · Vidro (ação principal)</h3><p>Vidro com contorno em neon suave. Texto âmbar de dia, prateado de noite. Ao tocar, a alvorada sobe pelo botão.</p><div class="gbm"><div class="gd"><button class="gbb g5 g5a" aria-label="Vidro âmbar, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g5 g5a" aria-label="Vidro âmbar, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>★</b>Referencial 2 · Botão-sol redondo</h3><p>Redondo, com seta, para o passo seguinte. Contorno neon suave, seta e anel da mesma cor (âmbar de dia, prateado de noite); ao tocar, uma onda de luz sai dele.</p><div class="gbm"><div class="gd"><button class="gbb g7" aria-label="Botão-sol redondo, dia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>dia</div><div class="gn"><button class="gbb g7" aria-label="Botão-sol redondo, noite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>noite</div></div></section></div>
+<details class="arq"><summary>Arquivo de formatos (7): consultar antes de buscar fora</summary><div class="gb"><section class="gbc"><h3><b>1</b>Anel de sol</h3><p>Pílula clara com anel dourado (luar: anel prateado) e a bolinha que vira sol ou lua.</p><div class="gbm"><div class="gd"><button class="gbb g1" aria-label="Anel de sol, dia"><i class="s"></i>Continuar</button>dia</div><div class="gn"><button class="gbb g1" aria-label="Anel de sol, noite"><i class="s"></i>Continuar</button>noite</div></div></section><section class="gbc"><h3><b>2</b>Papel e ouro</h3><p>Chapa de papel com contorno firme e sombra dura dourada. Afunda ao tocar.</p><div class="gbm"><div class="gd"><button class="gbb g2" aria-label="Papel e ouro, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g2" aria-label="Papel e ouro, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>3</b>Alvorada</h3><p>O botão acende por baixo, como o horizonte: claro em cima, ouro (ou azul-luar) na base.</p><div class="gbm"><div class="gd"><button class="gbb g3" aria-label="Alvorada, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g3" aria-label="Alvorada, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>4</b>Raios</h3><p>Contorno limpo com um segundo anel pontilhado ao redor, como raios de sol.</p><div class="gbm"><div class="gd"><button class="gbb g4" aria-label="Raios, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g4" aria-label="Raios, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>5</b>Vidro</h3><p>Padrão enxuto do app: vidro com brilho. Toque e a alvorada sobe pelo botão.</p><div class="gbm"><div class="gd"><button class="gbb g5" aria-label="Vidro, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g5" aria-label="Vidro, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>6</b>Duplo contorno</h3><p>Dois anéis: o firme e, afastado, o de sol. Sem preenchimento.</p><div class="gbm"><div class="gd"><button class="gbb g6" aria-label="Duplo contorno, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g6" aria-label="Duplo contorno, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>8</b>Fita</h3><p>Contorno com uma fita de sol na lateral. Discreto, serve para ações secundárias.</p><div class="gbm"><div class="gd"><button class="gbb g8" aria-label="Fita, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g8" aria-label="Fita, noite">Continuar</button>noite</div></div></section></div></details>
+
 <h2>Ideias novas para o Arretado</h2>
 <p class="sub">Pesquisa de 05/11 sobre foco, tempo, retomada e presença. Cada ideia tem demo, fonte e o risco que precisa de decisão. As fontes de estudo com TDAH são em parte blogs de fornecedores e um piloto pequeno: servem de direção, não de prova.</p>
 <div class="grade" id="ideias">
-<section class="demo" data-ideia="regua"><header><h3>Régua de foco</h3><p>Passe o dedo ou use as setas: só a frase em leitura fica acesa.</p></header>
-<div class="pal"><p class="regua" id="regua" tabindex="0" aria-label="Texto com régua de foco; use as setas para mudar de frase"><span>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. </span><span>Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. </span><span>Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. </span></p></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="regua"><header><h3>Régua de foco</h3><p>Passe o dedo ou use as setas: só a frase em leitura fica acesa. Marque palavras para destacá-las e pular entre as frases que as contêm.</p></header>
+<div class="pal" style="align-content:center;gap:10px"><div class="linha" id="rpal" role="group" aria-label="Palavras a destacar"></div><label class="rng" style="margin:0"><input type="checkbox" id="rso" style="flex:none;width:18px;height:18px"> Ir só às frases com palavra marcada</label><p class="regua" id="regua" tabindex="0" aria-label="Texto com régua de foco; use as setas para mudar de frase"><span>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. </span><span>Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. </span><span>Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. </span></p></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="disco"><header><h3>Disco de tempo</h3><p>O tempo encolhe em vez de contar. Na demo, 1 minuto passa em 6 segundos.</p></header>
 <div class="pal"><div style="display:grid;gap:10px;justify-items:center"><div class="disco" id="disco" role="img" aria-label="Disco de tempo"><div id="dtx">25 min</div></div><button class="btn" id="dgo">Começar 25 min</button></div></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="progresso"><header><h3>Rolagem que desenha o caminho</h3><p>Role o texto: o fio no topo se desenha.</p></header>
 <div class="pal"><div style="width:100%"><div class="rol-fio"><i id="rfio"></i></div><div class="rol" id="rol" tabindex="0" aria-label="Texto rolável"><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p></div></div></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="dobra"><header><h3>Sequência que dobra</h3><p>Toque nos dias. Dia sem estudo vira descanso e o total nunca cai.</p></header>
-<div class="pal"><div><div class="dias" id="dias"></div><p class="so" id="so"></p></div></div><div class="pe ficha"></div></section>
-<section class="demo" data-ideia="companhia"><header><h3>Estudar junto</h3><p>O Zé respira ao seu lado enquanto estiver ligado.</p></header>
-<div class="pal"><div style="display:grid;gap:10px;justify-items:center"><svg class="ze" id="ze" viewBox="0 0 64 76" aria-hidden="true"><path d="M32 72V22M32 50c-12 0-14-6-14-16M32 40c12 0 14-6 14-14"/></svg><div class="sw"><button role="switch" aria-checked="false" id="sw2" aria-labelledby="swl2"></button><span id="swl2">Estudar junto</span></div></div></div><div class="pe ficha"></div></section>
+<div class="pal"><div><div class="dias" id="dias"></div><p class="so" id="so"></p><p class="regraUso">Dia sem estudo vira <b>descanso</b>. O total de dias de estudo <b>nunca diminui</b>.</p></div></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="companhia"><header><h3>Estudar junto</h3><p>Ligue o interruptor: o Zé fica calmo quase o tempo todo. Em espaços longos, passa um ventinho (ele balança e folhas sobem no canto), sorri com os olhos, mostram-se espinhos e a camomila vira bandeirinha que acena na haste. Com “reduzir movimento”, fica parado. Catálogo completo de movimentos do Zé: <a href="https://claude.ai/artifact/TF5FHob2Yxk171KHwt4XZ9" target="_blank" rel="noopener">acervo do Zé</a>.</p></header>
+<div class="pal"><div style="display:grid;gap:10px;justify-items:center"><svg class="ze" id="ze" viewBox="22 10 196 240" aria-hidden="true"><defs><filter id="zfd" x="-30%" y="-25%" width="160%" height="150%"><feGaussianBlur stdDeviation="2.4"/></filter><filter id="zfn" x="-30%" y="-25%" width="160%" height="150%"><feGaussianBlur stdDeviation="4.5"/></filter></defs><path class="zm" d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"/><g class="z-b"><ellipse class="zb" cx="99.5" cy="100" rx="7.9" ry="5"/><ellipse class="zb" cx="140.5" cy="100" rx="7.9" ry="5"/></g><path class="zbd" d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230" filter="url(#zfd)"/><path class="zbn" d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230" filter="url(#zfn)"/><path class="zl" d="M84 230V189A7 7 0 0 0 77 182A39 39 0 0 1 38 143V100A16 16 0 0 1 70 100V143A7 7 0 0 0 77 150A7 7 0 0 0 84 143V62A36 36 0 0 1 156 62V169A7 7 0 0 0 163 176A7 7 0 0 0 170 169V126A14 14 0 0 1 198 126V169A35 35 0 0 1 163 204A7 7 0 0 0 156 211V230"/><g class="zlv"><ellipse class="zl1" cx="58" cy="44" rx="3.2" ry="6" transform="rotate(-35 58 44)"/><ellipse class="zl2" cx="46" cy="62" rx="2.8" ry="5.2" transform="rotate(25 46 62)"/><ellipse class="zl3" cx="68" cy="26" rx="2.6" ry="4.8" transform="rotate(-60 68 26)"/></g><g class="zes"><path d="M84 50l-8-3M84 80l-8-2M84 110l-8-2M156 50l8-3M156 80l8-2M156 110l8-2M38 120l-8-2M198 140l8-2M44 108l-7-4"/></g><g transform="translate(102 74)"><path class="zo" d="M0 -5.75Q0 0 0 5.75"/><path class="za" d="M-10 5Q0 -12 10 5"/></g><g transform="translate(138 74)"><path class="zo" d="M0 -5.75Q0 0 0 5.75"/><path class="za" d="M-10 5Q0 -12 10 5"/></g><g class="zhaste"><g class="zflor"><path class="zh" d="M184 111V96"/><g transform="translate(184 93) rotate(0)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(45)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(90)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(135)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(180)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(225)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(270)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><g transform="translate(184 93) rotate(315)"><ellipse class="zpet" cx="0" cy="-7.2" rx="2.8" ry="5.6"/></g><circle class="zc" cx="184" cy="93" r="3.9"/></g><g class="zfl"><g class="zhaste2"><path class="zh" d="M184 111V80"/><path class="zban" d="M184 80L212 90L184 100Z"/></g></g></g></svg><div class="sw"><button role="switch" aria-checked="false" id="sw2" aria-labelledby="swl2"></button><span id="swl2">Estudar junto</span></div></div></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="vibra"><header><h3>Vibração suave</h3><p>Toque: anel de luz e 12 ms de vibração, onde o aparelho aceitar.</p></header>
 <div class="pal"><div style="text-align:center"><button class="acao anel" id="vb">Acertei</button><p class="so" id="vbt">Vibração: verificando suporte…</p></div></div><div class="pe ficha"></div></section>
 </div>
@@ -225,7 +323,8 @@ tr:last-child td{border-bottom:0}
 <div class="f" id="f"></div>
 <div class="refs" id="refs"></div>
 
-<script>
+<script>document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.g5,.g7');if(!b)return;b.classList.remove('alv');void b.offsetWidth;b.classList.add('alv')});
+
 const D=/*__DADOS__*/null;
 const $=(s)=>document.querySelector(s),el=(t,a={},h='')=>{const e=document.createElement(t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));e.innerHTML=h;return e};
 const esc=(s)=>String(s??'').replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -234,7 +333,7 @@ $('#regra').textContent=D.regra+' Atualizado em '+D.atualizado+'.';
 
 // dia e noite
 const mundo=$('#mundo'),palco=$('#palco'),mini=$('#mini');
-mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: luar. Botão claro, fio e halo dourado-pálido.':'Dia: sol da manhã. Botão âmbar, fio e halo laranja.'};
+mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: luar. O brilho do app inteiro fica azul-prata, em anéis.':'Dia: sol. O brilho do app inteiro fica dourado, como o Sol do Fio.'};
 // interruptor
 const sw=$('#sw1');sw.onclick=()=>sw.setAttribute('aria-checked',sw.getAttribute('aria-checked')!=='true');
 // menu
@@ -273,9 +372,16 @@ chk.onchange=()=>{$('#prog').style.width=(chk.querySelectorAll(':checked').lengt
 
 // ideias novas
 document.querySelectorAll('[data-ideia]').forEach((sec)=>{const i=D.ideias.find((x)=>x.id===sec.dataset.ideia);if(!i)return;sec.querySelector('.ficha').innerHTML='<span class="sel av">'+esc(i.tipo)+'</span><b>por quê:</b> '+esc(i.porque)+'<br><b>fonte:</b> <a href="'+esc(i.fonte_url)+'">'+esc(i.fonte)+'</a><br><b>custo:</b> '+esc(i.custo)+' · <b>risco:</b> '+esc(i.risco)});
-const fr=[...$('#regua').children];const foco=(n)=>fr.forEach((x,k)=>x.classList.toggle('on',k===n));let fi=0;foco(0);
-fr.forEach((x,k)=>{x.onmouseenter=()=>{fi=k;foco(k)};x.onclick=()=>{fi=k;foco(k)}});
-$('#regua').onkeydown=(e)=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();fi=Math.min(fr.length-1,fi+1);foco(fi)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();fi=Math.max(0,fi-1);foco(fi)}};
+const FR=['A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. ','Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. ','Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. '];
+const PAL=['progressiva','regime','juiz','conduta'];const ativas=new Set(['progressiva']);let fi=0;
+const rg=$('#regua'),temPal=(t)=>[...ativas].some((w)=>t.toLowerCase().includes(w));
+const marca=(t)=>{let h=esc(t);ativas.forEach((w)=>{h=h.replace(new RegExp('('+w+'\\w*)','gi'),'<mark>$1</mark>')});return h};
+const desenha=()=>{rg.replaceChildren(...FR.map((t,k)=>{const sp=el('span',{},marca(t));sp.onmouseenter=()=>{fi=k;foco()};sp.onclick=()=>{fi=k;foco()};return sp}));foco()};
+const foco=()=>[...rg.children].forEach((x,k)=>x.classList.toggle('on',k===fi));
+const passo=(d)=>{let k=fi;const so=$('#rso').checked&&ativas.size;do{k+=d}while(k>=0&&k<FR.length&&so&&!temPal(FR[k]));if(k>=0&&k<FR.length){fi=k;foco()}};
+PAL.forEach((w)=>{const b=el('button',{class:'chp','aria-pressed':ativas.has(w)},esc(w));b.onclick=()=>{ativas.has(w)?ativas.delete(w):ativas.add(w);b.setAttribute('aria-pressed',ativas.has(w));desenha()};$('#rpal').append(b)});
+desenha();
+rg.onkeydown=(e)=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();passo(1)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();passo(-1)}};
 let dt=null;$('#dgo').onclick=()=>{if(dt){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',1);$('#dtx').textContent='25 min';$('#dgo').textContent='Começar 25 min';return}let t=25*60;$('#dgo').textContent='Parar';dt=setInterval(()=>{t-=10;if(t<=0){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',0);$('#dtx').textContent='Pronto';$('#dgo').textContent='Começar 25 min';return}$('#disco').style.setProperty('--p',t/1500);$('#dtx').textContent=Math.ceil(t/60)+' min'},250)};
 $('#rol').onscroll=(e)=>{const r=e.target;$('#rfio').style.width=(r.scrollTop/Math.max(1,r.scrollHeight-r.clientHeight)*100)+'%'};
 const dias=Array.from({length:14},(_,i)=>i<4||i===5||i===6?'e':'d');const dd=$('#dias');
