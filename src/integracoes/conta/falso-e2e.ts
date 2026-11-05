@@ -5,6 +5,7 @@ import { FalhaDeSincronizacao, type ServidorDeSincronizacao } from '../../core/s
 import {
   FalhaDeConta,
   type CopiaNaNuvem,
+  type ProvedorDeLogin,
   type ServicoDeConta,
   type SessaoDeConta,
 } from './interface';
@@ -92,7 +93,10 @@ export class ServicoDeContaFalsoE2E implements ServicoDeConta {
     return Promise.resolve(lerEstado().sessao);
   }
   /** Simula o desvio pelo Google: guarda quem vai voltar e recarrega com `?code=`, como o retorno real. */
-  entrarComGoogle(): Promise<void> {
+  entrarCom(provedor: ProvedorDeLogin): Promise<void> {
+    if (provedor === 'apple') {
+      return Promise.reject(new FalhaDeConta('indisponivel', 'Apple ainda não ligada.'));
+    }
     gravarEstado({
       ...lerEstado(),
       googlePendente: { uid: uidDoEmail(EMAIL_GOOGLE), email: EMAIL_GOOGLE },
