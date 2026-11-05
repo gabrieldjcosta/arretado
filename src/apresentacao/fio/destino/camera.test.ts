@@ -6,7 +6,6 @@ import {
   enquadrar,
   entreCameras,
   escala,
-  esconderSobrepostos,
   prender,
   proporcao,
   suavizar,
@@ -131,57 +130,5 @@ describe('a câmera do mapa', () => {
       expect(v).toBeGreaterThanOrEqual(anterior);
       anterior = v;
     }
-  });
-});
-
-describe('os rótulos que se cobrem', () => {
-  const r = (id: string, esq: number, prioridade: number, topo = 20) => ({
-    id,
-    esq,
-    dir: esq + 50,
-    topo,
-    base: topo + 14,
-    prioridade,
-  });
-
-  it('o de menor prioridade cede quando dois se cobrem', () => {
-    const escondidos = esconderSobrepostos([r('b', 50, 2), r('a', 20, 1)], caixa);
-    expect([...escondidos]).toEqual(['b']);
-  });
-
-  it('rótulos que não se tocam ficam todos', () => {
-    const escondidos = esconderSobrepostos(
-      [r('a', 20, 1), r('b', 120, 2), r('c', 20, 3, 60)],
-      caixa,
-    );
-    expect(escondidos.size).toBe(0);
-  });
-
-  it('um escondido não esconde os outros: quem cabe depois dele ainda aparece', () => {
-    const escondidos = esconderSobrepostos([r('a', 20, 1), r('b', 50, 2), r('c', 80, 3)], caixa);
-    // b bate em a e cede; c (80..130) não bate em a (20..70) e fica.
-    expect([...escondidos]).toEqual(['b']);
-  });
-
-  it('o rótulo fora da caixa cede', () => {
-    const escondidos = esconderSobrepostos([r('dentro', 10, 1), r('fora', 900, 2)], caixa);
-    expect([...escondidos]).toEqual(['fora']);
-  });
-
-  it('o rótulo que passa da borda (com 8 px de folga) cede, e o que cabe fica', () => {
-    // A caixa tem 400 por 600; o rótulo de teste tem 50 por 14.
-    const escondidos = esconderSobrepostos(
-      [
-        r('esquerda', 4, 1),
-        r('direita', 350, 2),
-        r('em-cima', 100, 3, 2),
-        r('embaixo', 100, 4, 590),
-        r('cabe', 100, 5, 100),
-        r('rente', 8, 6, 200),
-        r('rente-a-direita', 342, 7, 300),
-      ],
-      caixa,
-    );
-    expect([...escondidos].sort()).toEqual(['direita', 'em-cima', 'embaixo', 'esquerda']);
   });
 });

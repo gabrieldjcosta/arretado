@@ -167,6 +167,7 @@ describe('Marca com a Abertura em tela cheia (M2 do Zé)', () => {
             vez: v,
             emCurso: v.estado === 'pendente',
             voaParaAChegada: false,
+            camadaDoFio: null,
             encontro,
           }}
         >

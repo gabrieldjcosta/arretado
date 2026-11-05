@@ -272,10 +272,29 @@ function textosDoQuadro(page: Page): Promise<TextoDoQuadro[]> {
       const estilo = getComputedStyle(el);
       if (estilo.visibility === 'hidden' || estilo.display === 'none') continue;
       const caixa = el.getBoundingClientRect();
-      const x0 = Math.max(0, caixa.left);
-      const y0 = Math.max(0, caixa.top);
-      const x1 = Math.min(window.innerWidth, caixa.right);
-      const y1 = Math.min(window.innerHeight, caixa.bottom);
+      let x0 = Math.max(0, caixa.left);
+      let y0 = Math.max(0, caixa.top);
+      let x1 = Math.min(window.innerWidth, caixa.right);
+      let y1 = Math.min(window.innerHeight, caixa.bottom);
+      // O que um pai com rolagem ou recorte esconde não se vê (o corpo de uma folha rola): mede-se só a parte que aparece,
+      // para os pixels do fundo não serem os de trás da folha. Um filho `fixed` escapa do recorte dos pais; um `absolute`,
+      // do recorte dos que estão entre ele e o bloco que o contém.
+      if (estilo.position !== 'fixed') {
+        let pai: Element | null = el.parentElement;
+        if (estilo.position === 'absolute') {
+          const bloco = (el as HTMLElement).offsetParent;
+          while (pai && pai !== bloco) pai = pai.parentElement;
+        }
+        for (; pai; pai = pai.parentElement) {
+          const recorte = getComputedStyle(pai);
+          if (recorte.overflowX === 'visible' && recorte.overflowY === 'visible') continue;
+          const area = pai.getBoundingClientRect();
+          x0 = Math.max(x0, area.left);
+          y0 = Math.max(y0, area.top);
+          x1 = Math.min(x1, area.right);
+          y1 = Math.min(y1, area.bottom);
+        }
+      }
       if (x1 - x0 < 4 || y1 - y0 < 4) continue;
       const alvo = document.elementFromPoint((x0 + x1) / 2, (y0 + y1) / 2);
       if (!alvo || !(el === alvo || el.contains(alvo) || alvo.contains(el))) continue;

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
+import { useContaAtiva } from '../dados/conta-ativa';
 import { descreverPasso } from '../dados/descrever';
+import { ROTA_DA_PROVA } from '../lugares';
 import { limparPausa, tipoDaPausa, veioDeUmaPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
 import { CactoMarca } from './CactoMarca';
+import { ContaM } from './ContaM';
 import { PuxarM } from './PuxarM';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
@@ -13,7 +16,7 @@ import { avisar } from './toast';
 const formatar = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 
 /**
- * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). O cartão é
+ * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup é a que o botão abre). O cartão é
  * o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do fio": aqui ele
  * leva `m-sem-prova`, que o põe em uma coluna só (desvio 23 de `ajustes.css`).
  */
@@ -23,7 +26,7 @@ function SemProva() {
       <span className="m-olho">Para começar</span>
       <strong>Qual é a sua prova?</strong>
       <span>Sem conta, sem edital. Isso fica para depois, se você quiser.</span>
-      <Link to="/comecar" className="m-acao">
+      <Link to={ROTA_DA_PROVA} className="m-acao">
         Escolher minha prova
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
@@ -41,7 +44,8 @@ function SemProva() {
 export function AgoraM() {
   const fio = useFio();
   const { entrada } = useJornadaDoFio();
-  const navegar = useNavigate();
+  const [contaAberta, setContaAberta] = useState(false);
+  const conta = useContaAtiva();
   const { avanco } = fio;
   // Vindo de uma pausa, o Agora diz uma vez que está tudo salvo (o aviso do mockup).
   const [pausou] = useState(veioDeUmaPausa);
@@ -57,11 +61,13 @@ export function AgoraM() {
     );
   }, [pausou]);
 
-  // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a
-  // troca de tela não espera rede nem disco (o mockup troca sem vão).
+  // O passo, o pouso, o Destino, o Varal e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é
+  // puxado ou a aba é trocada, e a troca de tela não espera rede nem disco (o mockup troca sem vão).
   useEffect(() => {
     void import('./PassoM').catch(() => undefined);
     void import('./PousoM').catch(() => undefined);
+    void import('./DestinoM').catch(() => undefined);
+    void import('./VaralM').catch(() => undefined);
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
     }
@@ -90,12 +96,13 @@ export function AgoraM() {
           type="button"
           className="m-marca"
           aria-label="arretado: sua conta e ajustes"
+          aria-haspopup="dialog"
           onClick={() => {
-            void navegar('/conta');
+            setContaAberta(true);
           }}
         >
           arretado
-          <CactoMarca />
+          <CactoMarca preso={!!conta} />
         </button>
         <span className="m-cobre">
           <b>{formatar(percentual)}%</b>
@@ -127,6 +134,12 @@ export function AgoraM() {
           )}
         </>
       )}
+      <ContaM
+        aberta={contaAberta}
+        aoFechar={() => {
+          setContaAberta(false);
+        }}
+      />
     </TelaM>
   );
 }

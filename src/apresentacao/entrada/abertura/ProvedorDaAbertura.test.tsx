@@ -1,4 +1,5 @@
 import { StrictMode, useEffect } from 'react';
+import { MemoryRouter } from 'react-router';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { alterarPreferencias } from '../../../core/preferencias';
 import { simularMovimento } from '../../../testes/movimento';
@@ -401,5 +402,51 @@ describe('ProvedorDaAbertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
       expect(medirPe).not.toHaveBeenCalled();
       unmount();
     });
+  });
+});
+
+describe('ProvedorDaAbertura: no Fio a abertura é uma tela do quadro', () => {
+  afterEach(() => {
+    window.localStorage.removeItem('arretado:interface');
+  });
+
+  function SondaDoFio() {
+    const { camadaDoFio, emCurso } = useEstadoDaAbertura();
+    return (
+      <p data-testid="fio" data-camada={camadaDoFio ? camadaDoFio.escrita : 'nenhuma'}>
+        {emCurso ? 'espera' : 'livre'}
+      </p>
+    );
+  }
+
+  async function montarNoFio(rota: string) {
+    window.localStorage.setItem('arretado:interface', 'fio');
+    const { repo } = await repositorioDeTeste({ inicio: HOJE });
+    const vista = render(
+      <MemoryRouter initialEntries={[rota]}>
+        <ContextoRepositorio.Provider value={repo}>
+          <ProvedorDaAbertura>
+            <SondaDoFio />
+          </ProvedorDaAbertura>
+        </ContextoRepositorio.Provider>
+      </MemoryRouter>,
+    );
+    return { ...vista, camada: () => vista.container.querySelector('.abertura') };
+  }
+
+  it('entrega a abertura ao quadro (sem montar a camada de tela cheia de antes)', async () => {
+    const { findByTestId, camada } = await montarNoFio('/');
+    const sonda = await findByTestId('fio');
+    expect(sonda.getAttribute('data-camada')).toBe('completa');
+    expect(sonda.textContent).toBe('espera');
+    expect(camada()).toBeNull();
+  });
+
+  it('numa rota da casca de antes ela sai quieta, sem contar pulo, e a espera acaba', async () => {
+    const { findByTestId } = await montarNoFio('/biblioteca');
+    await waitFor(async () => {
+      expect((await findByTestId('fio')).textContent).toBe('livre');
+    });
+    expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 });

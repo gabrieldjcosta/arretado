@@ -28,6 +28,24 @@ describe('fatoDoPasso', () => {
     ).toBe('Adicionou a lei da matéria');
   });
 
+  it('Ache a diferença diz o par, e "comparou" quando a pessoa pediu para ver', () => {
+    const passo: Passo = {
+      tipo: 'ache_a_diferenca',
+      materiaId: 'm',
+      normaId: 'cp',
+      tituloCurto: 'CP',
+      a: { endereco: 'art155', rotulo: 'Art. 155' },
+      b: { endereco: 'art157', rotulo: 'Art. 157' },
+    };
+    const feito = (achadas: number) => ({
+      como: 'feito' as const,
+      resultado: { tipo: 'ache_a_diferenca' as const, achadas, total: 2 },
+    });
+    expect(fatoDoPasso(passo, feito(2))).toBe('Achou a diferença entre os arts. 155 e 157 (CP)');
+    expect(fatoDoPasso(passo, feito(0))).toBe('Comparou os arts. 155 e 157 (CP)');
+    expect(fatoDoPasso(passo, { como: 'pulado' })).toBeUndefined();
+  });
+
   it('pulado não deixa fato', () => {
     expect(fatoDoPasso(ler(['Art. 1']), { como: 'pulado' })).toBeUndefined();
   });

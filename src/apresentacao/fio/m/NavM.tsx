@@ -1,12 +1,20 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { LUGARES, type IdDoLugar } from '../lugares';
+import { LUGARES, noQuadroDoFio, type IdDoLugar } from '../lugares';
+import { trocarDeAba } from './aba';
+
+/** A tela do quadro que cada lugar da nav abre (o `data-tela` do mockup). */
+const TELA_DO_LUGAR: Readonly<Record<IdDoLugar, string>> = {
+  agora: 'inicio',
+  destino: 'mapa',
+  varal: 'varal',
+};
 
 /**
  * A nav do mockup (`<nav class="nav">`): três lugares e um indicador que desliza até o aceso. Os lugares
- * são irmãos: trocar de um para outro nunca empilha tela.
+ * são irmãos: trocar de um para outro nunca empilha tela, e o fio de uma voa até o lugar do fio da outra (`aba.ts`).
  */
-export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
+export function NavM({ ativo, caminho }: { ativo: IdDoLugar | undefined; caminho: string }) {
   const navegar = useNavigate();
   const nav = useRef<HTMLElement>(null);
   const indicador = useRef<HTMLSpanElement>(null);
@@ -35,7 +43,15 @@ export function NavM({ ativo }: { ativo: IdDoLugar | undefined }) {
           data-nav={l.id}
           aria-current={l.id === ativo ? 'page' : 'false'}
           onClick={() => {
-            if (l.id !== ativo) void navegar(l.caminho);
+            // Na tela do próprio lugar não há o que trocar. Num folheto (que mora no Varal) o Varal aceso leva de volta
+            // ao Varal, como no mockup: lá o toque só é ignorado quando a tela de agora é a do lugar.
+            if (l.caminho === caminho) return;
+            const ir = () => {
+              void navegar(l.caminho);
+            };
+            // O fio só voa entre telas do quadro; um lugar que ainda mora na casca de antes só troca.
+            if (noQuadroDoFio(l.caminho)) void trocarDeAba(TELA_DO_LUGAR[l.id], ir);
+            else ir();
           }}
         >
           {l.nome}

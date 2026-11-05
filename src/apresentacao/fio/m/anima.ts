@@ -2,6 +2,7 @@
 // Web Animations API com `fill: 'both'`, três modos de movimento e esperas que se cancelam com a tela.
 // O mockup é a fonte; aqui só mudou o que o React pede (cancelar ao desmontar, sem `innerHTML`).
 import { useEffect, useRef } from 'react';
+import { movimentoEscolhidoAgora } from '../../movimento-escolhido';
 
 /**
  * `normal`: tudo se mexe. `calmo`: o mesmo, sem mola nem deslocamento (o que o mockup faz quando o sistema
@@ -17,6 +18,9 @@ export function modoAgora(): Modo {
   }
   const janela: Partial<Pick<Window, 'matchMedia'>> = window;
   if (janela.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false) return 'calmo';
+  // O "Movimento" escolhido na Conta vale sobre o perfil (o sistema pedindo menos movimento já venceu acima).
+  const escolhido = movimentoEscolhidoAgora();
+  if (escolhido) return escolhido === 'calmo' ? 'calmo' : 'normal';
   return document.documentElement.dataset.perfil === 'calmo' ? 'calmo' : 'normal';
 }
 
@@ -75,6 +79,32 @@ export function animarEDeixar(
   return animar(el, quadros, opc).then(() => {
     cancelarAnimacoes(el);
   });
+}
+
+/**
+ * Como `animarEDeixar`, mas solta só a animação que ele mesmo criou. O `animarEDeixar` cancela todas as do elemento (é o que o
+ * mockup faz, onde nada mais anima o mesmo elemento); no app, uma que corre junto some no meio: o brilho da Frase achada pela
+ * busca era cortado quando a descida dela acabava.
+ */
+export function animarEDeixarSo(
+  el: Element | null | undefined,
+  quadros: Keyframe[],
+  opc?: KeyframeAnimationOptions,
+): Promise<void> {
+  if (!el) return Promise.resolve();
+  if (modoAgora() === 'reduzido' || typeof el.animate !== 'function') {
+    aplicarQuadro(el, quadros[quadros.length - 1]);
+    return Promise.resolve();
+  }
+  const animacao = el.animate(quadros, { fill: 'both', ...opc });
+  return animacao.finished
+    .then(
+      () => undefined,
+      () => undefined,
+    )
+    .then(() => {
+      animacao.cancel();
+    });
 }
 
 /** Espera `ms`; resolve também se o sinal abortar (quem chama confere `sinal.aborted`). */

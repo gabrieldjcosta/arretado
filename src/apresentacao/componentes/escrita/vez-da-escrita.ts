@@ -22,6 +22,16 @@ export type OndeEscrever =
 export type VezDaEscrita =
   { estado: 'livre' } | { estado: 'pendente' } | ({ estado: 'decidida' } & OndeEscrever);
 
+/**
+ * A abertura do Arretado novo (o Fio): em vez da camada de tela cheia, o quadro dele a mostra como a tela
+ * `abertura` do mockup. O provedor decide e conta como ela saiu; o quadro a monta.
+ */
+export interface CamadaDoFio {
+  escrita: EscritaNaTela;
+  calmo: boolean;
+  aoSair: (como: 'fim' | 'pulou') => void;
+}
+
 export interface EstadoDaAbertura {
   vez: VezDaEscrita;
   /**
@@ -38,6 +48,8 @@ export interface EstadoDaAbertura {
   voaParaAChegada: boolean;
   /** Por onde a Chegada se oferece à luz e a Abertura a recebe. */
   encontro: Encontro;
+  /** Só no Fio: a abertura que o quadro dele deve mostrar agora, ou `null`. */
+  camadaDoFio: CamadaDoFio | null;
 }
 
 export const ContextoDaAbertura = createContext<EstadoDaAbertura>({
@@ -45,6 +57,7 @@ export const ContextoDaAbertura = createContext<EstadoDaAbertura>({
   emCurso: false,
   voaParaAChegada: false,
   encontro: criarEncontro(),
+  camadaDoFio: null,
 });
 
 export const useVezDaEscrita = (): VezDaEscrita => useContext(ContextoDaAbertura).vez;

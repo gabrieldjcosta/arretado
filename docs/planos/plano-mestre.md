@@ -156,6 +156,9 @@ Cada item vira teste ou E2E quando ainda não houver; o que já está coberto é
 | Busca de súmula por consulta no índice, em vez de abrir a coleção inteira | Sonnet 5.5 médio | nuvem |
 | Correção do texto grava a norma inteira de novo (CF: ~5 mil textos); reduzir pede mudar o modelo, junto da F4 | — | F4 |
 | Capturas "antes/depois" do redesign (6.4–6.7) | Sonnet 5.5 médio | nuvem |
+| Fio · "Ache a diferença" (#422): tratar o token de contraste do `.m-ok` de dia (hoje `--m-certo` #1f7a4d dá 3,48:1 no pé do cartão; o desvio 47 pôs #14603a só neste retorno; o do cartão `achar` provavelmente falha igual) | Sonnet 5.5 médio | nuvem |
+| Fio · "Ache a diferença": trocar "É assim que a FCC cobra" pela banca do plano quando houver segunda banca (copy igual à do mockup; amarra a FCC) | Sonnet 5.5 médio | nuvem |
+| Fio · "Ache a diferença": capturas a 390×844, dia e noite, com par de artigos longos; se o cartão passar da tela, limitar o tamanho do artigo no gerador de pares ou rolar por dentro do cartão | Sonnet 5.5 médio | nuvem |
 | Backlog de 24/09/2026 (editar termos do destaque, "ignorar este destaque", remissões para outra norma, "citado por") | — | depois do portão da F2, ver `F2.md` › "Ordem e paralelismo" |
 
 ### D. Ajustes e Frases (decidido em 13/10/2026; entram depois da 13.5 e antes da 13.4 e do uso real, para as 2 semanas já testarem o fluxo novo)

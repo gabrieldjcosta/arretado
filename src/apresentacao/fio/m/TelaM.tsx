@@ -22,7 +22,15 @@ export function TelaM({
     const el = ref.current;
     if (!el) return;
     entrarNaTela(el, nome);
+    // A tela que rola esmaece no alto, onde mora o "+": o texto não passa por baixo dele (desvio 36).
+    const aoRolar = () => {
+      const k = Math.min(1, el.scrollTop / 40);
+      el.classList.toggle('m-rolada', k > 0);
+      el.style.setProperty('--m-rolado', k.toFixed(2));
+    };
+    el.addEventListener('scroll', aoRolar, { passive: true });
     return () => {
+      el.removeEventListener('scroll', aoRolar);
       sairDaTela(el, nome);
     };
   }, [nome]);
