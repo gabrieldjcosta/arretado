@@ -18,6 +18,7 @@ export {
   concluirPasso,
   estadoInicial,
   lerEstadoDoFio,
+  passarPorteira,
   POUSOS_GUARDADOS,
   pousar,
   pularPasso,

@@ -5,9 +5,11 @@ import { simularMovimento } from '../../../testes/movimento';
 import type { EntradaDaJornada } from '../destino/jornada';
 import { MapaM } from './MapaM';
 import { ToastM } from './ToastM';
+import { esconderAviso } from './toast';
 
 afterEach(() => {
   cleanup();
+  esconderAviso();
   vi.restoreAllMocks();
 });
 
@@ -170,6 +172,28 @@ describe('o mapa do Destino no quadro do mockup', () => {
       screen.getByRole('button', { name: 'Porteira de Execução Penal: pronta para você' }),
     );
     await aviso('Porteira pronta. Ela aparece num passo seu de Execução Penal.');
+  });
+
+  it('com a folha da porteira disponível, tocar na pronta a abre em vez de avisar', async () => {
+    const lidos = entrada().artigos?.map((a) => ({ ...a, lido: true }));
+    const aoAbrir = vi.fn();
+    const usuario = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <MapaM
+          entrada={entrada({ ...(lidos ? { artigos: lidos } : {}) })}
+          intro={false}
+          atraso={0}
+          aoAbrirPorteira={aoAbrir}
+        />
+        <ToastM />
+      </MemoryRouter>,
+    );
+    await usuario.click(
+      screen.getByRole('button', { name: 'Porteira de Execução Penal: pronta para você' }),
+    );
+    expect(aoAbrir).toHaveBeenCalledWith({ id: 'exec', nome: 'Execução Penal' });
+    expect(document.querySelector('.m-toast.m-on')).toBeNull();
   });
 
   it('a porteira aberta mostra o nome do estado para onde o caminho segue', async () => {
