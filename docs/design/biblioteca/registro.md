@@ -21,3 +21,5 @@ Só se acrescenta. Formato: `AAAA-MM-DD · fonte · achado · caso de uso · lic
 - 2026-11-05 · Zé (Estudar junto): ciclo de 18 s, ventinho com folhas no canto superior esquerdo, espinhos que aparecem, olhos em arco e camomila que vira bandeira, espaçados. Botão 7: seta e anel da mesma cor, com alvorada ao tocar (pedido do Gabriel). Pesquisa de referências do mascote vai para a thread "Montar acervo de movimentos do Zé".
 
 - 2026-11-05 · Ação principal: Gabriel prefere o vidro (5) à alvorada; pediu teste com texto âmbar (galeria 5b).
+
+- 2026-11-05 · Vidro: texto âmbar só de dia, prateado de noite; contorno em neon suave (pedido do Gabriel).
