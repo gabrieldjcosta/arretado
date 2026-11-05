@@ -238,6 +238,7 @@ const TIPOS: readonly TipoDePasso[] = [
   'revisar',
   'fixar_sumula',
   'praticar',
+  'ache_a_diferenca',
   'seu_passo',
 ];
 type Obj = Record<string, unknown>;
@@ -278,6 +279,8 @@ function passoValido(x: unknown): x is Passo {
         ehInteiro(x.quantidade) &&
         ['fim_do_mapa', 'quarta_etapa', 'reta_final', 'complemento'].includes(x.porque as string)
       );
+    case 'ache_a_diferenca':
+      return ehTexto(x.normaId) && ehTexto(x.tituloCurto) && ehArtigo(x.a) && ehArtigo(x.b);
     default:
       return ehTexto(x.tarefaId) && ehTexto(x.titulo);
   }

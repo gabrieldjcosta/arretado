@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GuiaDaTela } from '../guia/GuiaDaTela';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import type { Edital, Norma, VersaoDeNorma, VinculoDeDisciplina } from '../../core/modelo';
@@ -21,6 +21,7 @@ import { useDados, useRepositorio } from '../dados/contexto';
 import { useFonteAcervo } from '../dados/fonteAcervoContexto';
 import { formatarQuando } from '../recall/rotulos';
 import { procedenciaDaVersao } from './rotulos';
+import { esquecerBuscas, lembrarBusca, ultimasBuscas } from './ultimas-buscas';
 import { disciplinasDaNorma, mudarDisciplinas } from '../../dominios/acervo/vinculos';
 import { AbasDaBiblioteca } from './AbasDaBiblioteca';
 import { EscolherDisciplinas } from './EscolherDisciplinas';
@@ -258,6 +259,10 @@ export function Normas() {
   const { dados, falha, recarregar } = useDados(carregarBiblioteca);
   const [descartando, setDescartando] = useState<Pendente | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const campoDeBusca = useRef<HTMLInputElement>(null);
+  // Esc esconde o painel sem tirar o foco do campo (WCAG 1.4.13); digitar ou sair do campo o liberam de novo.
+  const [painelFechado, setPainelFechado] = useState(false);
+  const [buscasLembradas, setBuscasLembradas] = useState<readonly string[]>(() => ultimasBuscas());
   const [falhaDescarte, setFalhaDescarte] = useState<string | null>(null);
   const estadoNavegacao: unknown = useLocation().state;
   const navegar = useNavigate();
@@ -472,17 +477,68 @@ export function Normas() {
                   Normas
                 </h2>
                 <div className="barra-de-normas">
-                  <label className="busca-campo">
-                    <span className="visualmente-oculto">Buscar norma</span>
-                    <input
-                      type="search"
-                      value={busca}
-                      placeholder="Buscar norma"
-                      onChange={(e) => {
-                        mudarCriterio('q', e.target.value);
-                      }}
-                    />
-                  </label>
+                  <div className="busca-com-painel" data-fechado={painelFechado ? '' : undefined}>
+                    <label className="busca-campo">
+                      <span className="visualmente-oculto">Buscar norma</span>
+                      <input
+                        ref={campoDeBusca}
+                        type="search"
+                        value={busca}
+                        placeholder="Buscar norma"
+                        onChange={(e) => {
+                          setPainelFechado(false);
+                          mudarCriterio('q', e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') setBuscasLembradas(lembrarBusca(busca));
+                          if (e.key === 'Escape') setPainelFechado(true);
+                        }}
+                        onBlur={() => {
+                          setPainelFechado(false);
+                          setBuscasLembradas(lembrarBusca(busca));
+                        }}
+                      />
+                    </label>
+                    {busca === '' && buscasLembradas.length > 0 && (
+                      <div
+                        className="busca-painel"
+                        // Tocar num botão do painel não tira o foco do campo (no WebKit o toque nem o daria): o
+                        // painel não some antes do clique.
+                        onPointerDown={(e) => {
+                          e.preventDefault();
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <p className="busca-painel-titulo">Últimas buscas</p>
+                        <ul>
+                          {buscasLembradas.map((b) => (
+                            <li key={b}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  mudarCriterio('q', b);
+                                  campoDeBusca.current?.blur();
+                                }}
+                              >
+                                {b}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          type="button"
+                          className="busca-painel-limpar"
+                          onClick={() => {
+                            setBuscasLembradas(esquecerBuscas());
+                          }}
+                        >
+                          Esquecer estas buscas
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <button
                     type="button"
                     className="chip-filtrar"

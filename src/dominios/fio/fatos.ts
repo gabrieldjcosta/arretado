@@ -57,6 +57,17 @@ export function fatoDoPasso(passo: Passo, f: Fechamento): string | undefined {
       if (passo.modo === 'ache_o_erro') return `Achou o erro em ${conta}`;
       return r.acertos >= r.total ? `Passou a porteira (${conta})` : `Fez a porteira (${conta})`;
     }
+    case 'ache_a_diferenca': {
+      if (passo.tipo !== 'ache_a_diferenca') return undefined;
+      const [a, b] = [passo.a.rotulo, passo.b.rotulo];
+      const entre =
+        ROTULO_DE_ARTIGO.test(a) && ROTULO_DE_ARTIGO.test(b)
+          ? `os arts. ${a.replace(ROTULO_DE_ARTIGO, '')} e ${b.replace(ROTULO_DE_ARTIGO, '')}`
+          : `${a} e ${b}`;
+      return r.achadas > 0
+        ? `Achou a diferença entre ${entre} (${passo.tituloCurto})`
+        : `Comparou ${entre} (${passo.tituloCurto})`;
+    }
     case 'seu_passo': {
       if (passo.tipo !== 'seu_passo') return undefined;
       const questoes =

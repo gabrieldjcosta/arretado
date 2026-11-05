@@ -34,6 +34,7 @@ import { carregarFila } from '../../../dominios/tarefas';
 import { textoParaDestacar } from '../../biblioteca/destacar';
 import { trechosDoAche } from '../passos/ache';
 import { artigosFeitos } from '../../biblioteca/mapa/feitos';
+import { paresDaNorma } from './pares-da-norma';
 
 /** Quanto esperar o arquivo do Mapa da norma antes de seguir sem ele (o Hoje espera o mesmo). */
 const ESPERA_DO_MAPA_MS = 1500;
@@ -131,12 +132,12 @@ async function artigosDaNorma(
   repo: Repositorio,
   fonte: FonteDeIncidencia,
   item: NormaDaMateria,
-): Promise<ArtigoDoFio[]> {
+): Promise<{ artigos: ArtigoDoFio[]; pares: NormaDoFio['pares'] }> {
   let aberta: NormaAberta;
   try {
     aberta = await abrirNorma(repo, item.norma.id);
   } catch {
-    return [];
+    return { artigos: [], pares: [] };
   }
   const [mapa, leitura] = await Promise.all([
     mapaDaNorma(fonte, item.norma),
@@ -163,7 +164,8 @@ async function artigosDaNorma(
     );
   const posicao = new Map(ranqueados.map((q, i) => [q.id, i] as const));
 
-  return quadrados.map((q) => {
+  const pares = await paresDaNorma(repo, aberta, quadrados).catch(() => []);
+  const artigos = quadrados.map((q) => {
     let grifosDoArtigo = 0;
     for (let i = q.indice; i < q.fim; i++) grifosDoArtigo += grifos.get(i) ?? 0;
     const naPosicao = posicao.get(q.id);
@@ -175,6 +177,7 @@ async function artigosDaNorma(
       ...(naPosicao === undefined ? {} : { posicaoNoMapa: naPosicao }),
     };
   });
+  return { artigos, pares };
 }
 
 /** As normas publicadas de cada disciplina, pelos vínculos, na ordem das normas (título curto). */
@@ -296,11 +299,15 @@ export async function montarEntradaDoFio(
       if (!abrir.has(m.id)) return m;
       const itens = dasMaterias.get(m.id) ?? [];
       const preenchidas: NormaDoFio[] = await Promise.all(
-        itens.map(async (item) => ({
-          id: item.norma.id,
-          tituloCurto: item.norma.tituloCurto,
-          artigos: await artigosDaNorma(repo, opcoes.fonte, item),
-        })),
+        itens.map(async (item): Promise<NormaDoFio> => {
+          const { artigos, pares } = await artigosDaNorma(repo, opcoes.fonte, item);
+          return {
+            id: item.norma.id,
+            tituloCurto: item.norma.tituloCurto,
+            artigos,
+            ...(pares && pares.length > 0 ? { pares } : {}),
+          };
+        }),
       );
       // Trechos de "Ache o erro": dos artigos já lidos com grifo, os que têm uma troca segura.
       let acheOErro = 0;
