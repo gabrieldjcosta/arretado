@@ -6,6 +6,7 @@ import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
 import { CactoMarca } from './CactoMarca';
+import { DiasDoFioM } from './DiasDoFioM';
 import { PuxarM } from './PuxarM';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
@@ -127,6 +128,7 @@ export function AgoraM() {
           )}
         </>
       )}
+      <DiasDoFioM />
     </TelaM>
   );
 }

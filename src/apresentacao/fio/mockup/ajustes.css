@@ -650,3 +650,45 @@
   white-space: normal;
   text-align: left;
 }
+
+/* Desvio 48: a sequência que dobra (`DiasDoFioM`, em `m/`) não existe no mockup; é a ideia "Sequência que dobra" da
+   Biblioteca visual, aprovada pelo Gabriel em 05/11/2026. Só usa tokens do mockup: estudo é o ponto dourado
+   (`--m-ponto`), descanso é um contorno tracejado azul (`--m-neon`); nenhum verde e nenhuma cor de alerta (o verde
+   da demo foi vetado pelo Gabriel). Sem animação perpétua. */
+.m-fio.m-fio .m-dias-fio {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.m-fio.m-fio .m-dias-fio-fila {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.m-fio.m-fio .m-dia-fio {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.m-fio.m-fio .m-dia-fio[data-estado='estudo'] {
+  background: var(--m-ponto);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--m-ponto) 55%, transparent);
+}
+.m-fio.m-fio .m-dia-fio[data-estado='descanso'] {
+  border: 1.5px dashed var(--m-neon);
+  opacity: 0.7;
+}
+.m-fio.m-fio .m-dias-fio-regra {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--m-texto-2);
+}
+.m-fio.m-fio .m-dias-fio-regra b {
+  color: var(--m-texto);
+  font-weight: 700;
+}
