@@ -1,4 +1,4 @@
-// A alvorada do botão de ação e a onda do botão redondo (desvio 48 de `mockup/ajustes.css`): ao toque, o
+// A alvorada do botão de ação e a onda do botão redondo (desvio 49 de `mockup/ajustes.css`): ao toque, o
 // botão de ação (5b) ganha um degradê que sobe por ele em 900 ms e o botão redondo (7) solta um anel que cresce
 // 1,5x e some em 1,1 s. Só no modo normal; no Calmo o botão de ação fica "Só contorno" e o redondo só muda de
 // tom. Um ouvinte do documento, como o da onda de luz.
