@@ -165,7 +165,7 @@ export function AparenciaConta() {
         <p id="regua-dica" className="dica">
           Realça a linha sob o dedo, o cursor ou o foco. O texto não se move.
         </p>
-        <label htmlFor="regua-de-foco">Régua de foco</label>{' '}
+        <label htmlFor="regua-de-foco">Foco na frase</label>{' '}
         <select
           id="regua-de-foco"
           aria-describedby="regua-foco-dica"

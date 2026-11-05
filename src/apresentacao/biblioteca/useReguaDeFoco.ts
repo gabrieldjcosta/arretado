@@ -20,6 +20,7 @@ interface Foco {
 }
 
 const SELETOR = `.${CLASSE_DO_TEXTO}[data-dispositivo]`;
+const CAMPOS = 'select, input, textarea, [contenteditable]';
 
 function pontoSob(x: number, y: number): { no: Node; offset: number } | undefined {
   const d = document as Document & {
@@ -64,30 +65,56 @@ export function useReguaDeFoco(raiz: RefObject<HTMLElement | null>, ligada: bool
     if (!ligada || !caixa || !temRealce()) return;
     let foco: Foco | null = null;
     let quadro = 0;
+    let parada = 0;
+    // Sem a API de mídia (jsdom) segue como se não houvesse cores forçadas.
+    const forcadas =
+      typeof matchMedia === 'function' ? matchMedia('(forced-colors: active)') : null;
 
-    const containers = () => [...caixa.querySelectorAll<HTMLElement>(SELETOR)];
+    // Só o que aparece: no modo foco por artigo os vizinhos ficam em `display: none` e não podem receber a frase.
+    const containers = () =>
+      [...caixa.querySelectorAll<HTMLElement>(SELETOR)].filter(
+        (el) => typeof el.checkVisibility !== 'function' || el.checkVisibility(),
+      );
     const frasesDe = (el: Element) => {
       const textos = textosDe(el);
       return { textos, frases: frasesDoTexto(textos.map((t) => t.data).join('')) };
     };
+
+    const naTela = (faixa: Range | undefined) => {
+      // jsdom não mede faixas.
+      if (!faixa || typeof faixa.getBoundingClientRect !== 'function') return false;
+      const c = faixa.getBoundingClientRect();
+      return c.bottom > 0 && c.top < innerHeight;
+    };
+    // A primeira frase à vista: depois de rolar, a régua acende uma que o leitor está vendo.
+    function primeiraNaTela(todos: readonly HTMLElement[]): Foco | null {
+      for (const el of todos) {
+        const { textos, frases } = frasesDe(el);
+        const indice = frases.findIndex((f) => naTela(faixaDe(textos, f.inicio, f.fim)));
+        if (indice >= 0 && el.dataset.dispositivo) return { id: el.dataset.dispositivo, indice };
+      }
+      return null;
+    }
 
     function pintar() {
       const acesa: Range[] = [];
       const apagada: Range[] = [];
       const todos = containers();
       if (!foco || !todos.some((el) => el.dataset.dispositivo === foco?.id)) {
-        const primeiro = todos.find((el) => el.getBoundingClientRect().bottom > 0) ?? todos[0];
-        foco = primeiro?.dataset.dispositivo
-          ? { id: primeiro.dataset.dispositivo, indice: 0 }
-          : null;
+        const primeiro = todos[0];
+        foco =
+          primeiraNaTela(todos) ??
+          (primeiro?.dataset.dispositivo ? { id: primeiro.dataset.dispositivo, indice: 0 } : null);
       }
+      // Em cores forçadas todo realce vira "seleção": esmaecer não se distingue, então só a frase acende.
+      const esmaecer = !forcadas?.matches;
       for (const el of todos) {
         const { textos, frases } = frasesDe(el);
         const ativo = foco && el.dataset.dispositivo === foco.id ? frases[foco.indice] : undefined;
         if (!ativo) {
           const toda = document.createRange();
           toda.selectNodeContents(el);
-          apagada.push(toda);
+          if (esmaecer) apagada.push(toda);
           continue;
         }
         const total = textos.reduce((s, t) => s + t.length, 0);
@@ -96,7 +123,7 @@ export function useReguaDeFoco(raiz: RefObject<HTMLElement | null>, ligada: bool
           [ativo.fim, total],
         ] as const) {
           const r = i < f ? faixaDe(textos, i, f) : undefined;
-          if (r) apagada.push(r);
+          if (r && esmaecer) apagada.push(r);
         }
         const r = faixaDe(textos, ativo.inicio, ativo.fim);
         if (r) acesa.push(r);
@@ -126,8 +153,24 @@ export function useReguaDeFoco(raiz: RefObject<HTMLElement | null>, ligada: bool
       escolher(el, deslocamento(textosDe(el), ponto.no, ponto.offset));
     };
 
+    // Rolou e a frase acesa saiu da tela: a régua volta para a primeira que aparece.
+    const aoRolar = () => {
+      window.clearTimeout(parada);
+      parada = window.setTimeout(() => {
+        const el = containers().find((c) => c.dataset.dispositivo === foco?.id);
+        const { textos, frases } = el ? frasesDe(el) : { textos: [], frases: [] };
+        const ativo = foco ? frases[foco.indice] : undefined;
+        if (foco && !(ativo && naTela(faixaDe(textos, ativo.inicio, ativo.fim)))) {
+          foco = null;
+          agendar();
+        }
+      }, 150);
+    };
+
     const aoTeclado = (e: KeyboardEvent) => {
       if (!e.altKey || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') || !foco) return;
+      // Alt+↓ abre a lista de um <select> (a barra do Leitor tem um): ali a tecla é dele.
+      if (e.target instanceof Element && e.target.closest(CAMPOS)) return;
       const todos = containers();
       let i = todos.findIndex((el) => el.dataset.dispositivo === foco?.id);
       if (i < 0) return;
@@ -152,12 +195,17 @@ export function useReguaDeFoco(raiz: RefObject<HTMLElement | null>, ligada: bool
     observador.observe(caixa, { childList: true, subtree: true });
     caixa.addEventListener('click', aoToque);
     document.addEventListener('keydown', aoTeclado);
+    document.addEventListener('scroll', aoRolar, { capture: true, passive: true });
+    forcadas?.addEventListener('change', agendar);
     agendar();
     return () => {
       cancelAnimationFrame(quadro);
+      window.clearTimeout(parada);
       observador.disconnect();
       caixa.removeEventListener('click', aoToque);
       document.removeEventListener('keydown', aoTeclado);
+      document.removeEventListener('scroll', aoRolar, { capture: true });
+      forcadas?.removeEventListener('change', agendar);
       CSS.highlights.delete(ACESA);
       CSS.highlights.delete(APAGADA);
     };

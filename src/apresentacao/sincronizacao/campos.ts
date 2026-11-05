@@ -25,7 +25,7 @@ const ROTULOS: Record<string, string> = {
   fonteLeitura: 'Letra da leitura',
   tamanhoFonte: 'Tamanho da letra',
   reguaDeLeitura: 'Régua de leitura',
-  reguaDeFoco: 'Régua de foco',
+  reguaDeFoco: 'Foco na frase',
   cotaDiaria: 'Cota diária',
   modulosDesabilitados: 'Módulos desligados',
   mostrarRedacoesAnteriores: 'Mostrar redações anteriores',

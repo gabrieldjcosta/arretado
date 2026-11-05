@@ -84,7 +84,7 @@ const ROTULOS: Record<keyof CamposDePerfil, string> = {
   tamanhoFonte: 'Tamanho do texto de leitura',
   destacarCondicionantesEPrazos: 'Destacar prazos, condições e penas',
   reguaDeLeitura: 'Régua de leitura',
-  reguaDeFoco: 'Régua de foco',
+  reguaDeFoco: 'Foco na frase',
   espiadaDosVizinhos: 'Espiada dos vizinhos no foco',
   cotaDiaria: 'Cartões por vez',
   modoSoEstudo: 'Modo só estudo na Sessão',

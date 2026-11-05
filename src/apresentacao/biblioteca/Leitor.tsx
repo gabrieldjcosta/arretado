@@ -2577,7 +2577,7 @@ function BarraDoLeitor({
         Destaques
       </button>
       <label className="regua-de-foco">
-        Régua de foco
+        Foco na frase
         <select
           value={regua}
           onChange={(e) => {
