@@ -160,19 +160,20 @@ describe('enviarPendentes', () => {
   it('não envia entradas de outro usuário e repassa as divergências do servidor', async () => {
     const { repo, ctx, novoErro } = await preparar();
     await novoErro();
+    const idDeOutro = '0199a6c4-0000-7000-8000-0000000000fe';
     await repo.db.alteracoes.add({
       ts: '1790000000000-000000-0000000a',
       aparelhoId: ctx.aparelhoId,
       usuarioId: '0199a6c4-0000-7000-8000-0000000000ff',
       colecao: 'erros',
-      registroId: '0199a6c4-0000-7000-8000-0000000000fe',
+      registroId: idDeOutro,
       operacao: 'gravar',
-      dados: { id: '0199a6c4-0000-7000-8000-0000000000fe' },
+      dados: { id: idDeOutro },
     });
     const servidor = new ServidorFalso();
     servidor.divergentes = [{ colecao: 'erros', registro_id: 'x', ts_servidor: null }];
     const r = await enviarPendentes(repo.db, servidor, ctx);
-    expect([...servidor.recebidas.values()].some((e) => e.registro_id.endsWith('fe'))).toBe(false);
+    expect([...servidor.recebidas.values()].some((e) => e.registro_id === idDeOutro)).toBe(false);
     expect(r.divergentes).toEqual(servidor.divergentes);
     expect(await contarPendentes(repo.db, ctx.usuarioId, ctx.aparelhoId)).toBe(0);
     repo.fechar();
