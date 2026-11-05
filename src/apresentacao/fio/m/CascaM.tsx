@@ -19,6 +19,7 @@ import { ToastM } from './ToastM';
 import { useMovimentoDoFio } from './movimento';
 import { useMundo } from './mundo';
 import { ligarOndaDeLuz } from './onda';
+import { ligarBrilhoAoToque } from './brilho-ao-toque';
 import { esquecerTelas } from './transicao';
 import '../mockup/reset.css';
 import '../mockup/fontes.css';
@@ -53,6 +54,8 @@ export function CascaM() {
   useEffect(() => esquecerTelas, []);
   // A onda de luz em todo botão de ação, como no mockup (um ouvinte do documento, ligado enquanto o quadro vive).
   useEffect(() => ligarOndaDeLuz(), []);
+  // A alvorada do botão de ação e a onda do botão redondo (desvio 48 em `ajustes.css`).
+  useEffect(() => ligarBrilhoAoToque(), []);
 
   return (
     <div
