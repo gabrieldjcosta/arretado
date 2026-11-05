@@ -7,13 +7,15 @@
       "nome": "Base UI",
       "url": "https://base-ui.com/",
       "tipo": "componentes",
-      "licenca": "MIT",
+      "licenca": "MIT (Copyright MUI/Material-UI SAS)",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "avaliar",
       "pegar": "Comportamento e acessibilidade de menu, select, diálogo e popover sem estilo, para vestir com o CSS do Fio.",
       "nao_pegar": "Estilos padrão; segunda biblioteca de primitivos ao lado de outra (escolher uma).",
-      "estado": "Hoje usamos <dialog>/popover nativo (movimento-e-bibliotecas.md). Só entra onde o nativo falhar."
+      "estado": "Hoje usamos <dialog>/popover nativo. Só entra onde o nativo falhar (Select com busca, Combobox, Toast com fila).",
+      "exemplo": "Pacote @base-ui/react 1.9.0. Componentes lidos no site: Dialog, Drawer, Menu, Popover, Select, Combobox, Tabs, Toast, Tooltip, Switch, Slider, Progress, Meter, Scroll Area, Number Field. Drawer e Toast cobrem a folha e o aviso do Fio; Switch cobre o interruptor da Conta.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "uiverse",
@@ -22,24 +24,28 @@
       "tipo": "detalhes de UI",
       "licenca": "MIT (código de cada autor)",
       "custo": "grátis",
-      "nuvem": "bloqueado (403)",
+      "nuvem": "403 mesmo liberado (proteção anti-robô; não contornar)",
       "veredito": "usar",
       "pegar": "CSS de botão, interruptor, loader e acabamento; reescrever em tokens do app.",
       "nao_pegar": "Tailwind do código de origem; animação perpétua em área de estudo.",
-      "estado": "Lua do bad-parrot no seletor dia/noite (#424). Seis links esperam o código colado."
+      "estado": "Lua do bad-parrot no seletor dia/noite (#424). Seis links esperam o código colado.",
+      "exemplo": "Lua do bad-parrot no seletor dia/noite (#424). Seis links ainda esperam o código colado: yellow-rattlesnake-26, white-newt-65, red-duck-82, quiet-bulldog-16, odd-cobra-82, dull-walrus-66.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "motion",
       "nome": "Motion",
       "url": "https://motion.dev/",
       "tipo": "animação",
-      "licenca": "MIT (Motion+ é pago, não usar)",
+      "licenca": "MIT (Copyright Motion B.V.; Motion+ é pago, não usar)",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "usar",
       "pegar": "LazyMotion + m: sheet arrastável, layout animado, saída de elemento desmontado, useReducedMotion.",
       "nao_pegar": "Motion+ e exemplos premium; Motion e Auto-Animate no mesmo elemento.",
-      "estado": "Regra de uso em movimento-e-bibliotecas.md."
+      "estado": "Regra de uso em movimento-e-bibliotecas.md.",
+      "exemplo": "Pacote motion 14.9.1. Já no app: LazyMotion + m. Uso previsto: sheet arrastável (drag + dragConstraints), layout animado da lista, AnimatePresence na saída, useReducedMotion.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "auto-animate",
@@ -48,37 +54,43 @@
       "tipo": "animação",
       "licenca": "MIT",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "avaliar",
       "pegar": "Lista que entra, sai ou reordena (Varal, Caderno) onde o mockup não define coreografia.",
       "nao_pegar": "Uso junto com Motion no mesmo nó.",
-      "estado": "Nenhum uso ainda."
+      "estado": "Nenhum uso ainda.",
+      "exemplo": "Pacote @formkit/auto-animate 0.10.0: uma linha em um contêiner anima entrada, saída e reordenação. Candidato ao Varal e à lista de normas, no lugar de código manual.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "react-bits",
       "nome": "React Bits",
       "url": "https://github.com/DavidHDev/react-bits",
       "tipo": "efeitos",
-      "licenca": "MIT + Commons Clause (não revender nem redistribuir os componentes)",
+      "licenca": "MIT + Commons Clause (Copyright David Haz; não revender nem redistribuir os componentes)",
       "custo": "grátis",
-      "nuvem": "github.com acessível, site reactbits.dev bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "referência",
       "pegar": "Poucos detalhes de marca; variante CSS, sem Tailwind.",
       "nao_pegar": "Fundos animados em leitura; republicar os componentes.",
-      "estado": "Nenhum uso ainda."
+      "estado": "Nenhum uso ainda.",
+      "exemplo": "Site descreve \"Free Animated React Components\". Serve de vitrine de ideias de texto e fundo animados; copiar componente só reescrito, nunca o arquivo.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "lucide",
       "nome": "Lucide",
       "url": "https://lucide.dev/",
       "tipo": "ícones",
-      "licenca": "ISC (+ MIT nos herdados do Feather; manter avisos)",
+      "licenca": "ISC (Copyright Lucide Icons and Contributors) + MIT nos herdados do Feather; manter avisos",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "avaliar",
       "pegar": "Ícones de traço consistentes.",
       "nao_pegar": "Misturar com outra família; trocar os ícones de traço único e néon do Zé/caneta.",
-      "estado": "O app tem ícones próprios (IconesM.tsx). Lucide só para o que faltar."
+      "estado": "O app tem ícones próprios (IconesM.tsx). Lucide só para o que faltar.",
+      "exemplo": "Pacote lucide-react 1.69.0, ícones em SVG de traço, importação por ícone (tree-shaking). Traço combina com o contorno do Fio; conferir peso do bundle antes de adotar.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "realtime-colors",
@@ -87,11 +99,12 @@
       "tipo": "cor",
       "licenca": "uso livre, inclusive comercial",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "referência",
       "pegar": "Prévia de paleta e fonte sobre página de exemplo.",
       "nao_pegar": "Trocar a paleta aprovada (sertão em neon).",
-      "estado": "Só para experimento; contraste final vai em scripts/contraste.test.ts."
+      "estado": "Só para experimento; contraste final vai em scripts/contraste.test.ts.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "playwright",
@@ -104,7 +117,8 @@
       "veredito": "usar",
       "pegar": "Comparativo mockup × app; foto de cada tela.",
       "nao_pegar": "Aceitar baseline sem aval da Marca.",
-      "estado": "Em uso (e2e/, folhas lado a lado)."
+      "estado": "Em uso (e2e/, folhas lado a lado).",
+      "verificado": "2026-11-05"
     },
     {
       "id": "godly",
@@ -113,11 +127,13 @@
       "tipo": "galeria",
       "licenca": "sem licença de reuso dos ativos",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "referência",
       "pegar": "Direção de arte, tipografia, acabamento.",
       "nao_pegar": "Copiar ativos; imitar site de marketing no leitor.",
-      "estado": "Galeria de humor para a Marca."
+      "estado": "Galeria de humor para a Marca.",
+      "exemplo": "Galeria curada de sites; abre sem login. Só inspiração de composição e movimento.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "land-book",
@@ -126,11 +142,12 @@
       "tipo": "galeria",
       "licenca": "sem licença de reuso",
       "custo": "grátis limitado (3 pranchas)",
-      "nuvem": "bloqueado",
+      "nuvem": "403 mesmo liberado (anti-robô; não contornar). Navegar no PC.",
       "veredito": "referência",
       "pegar": "Seções de página (landing futura).",
       "nao_pegar": "Layouts de app.",
-      "estado": "Para a página pública, não para o app."
+      "estado": "Para a página pública, não para o app.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "mobbin",
@@ -139,11 +156,13 @@
       "tipo": "telas de produtos reais",
       "licenca": "sem licença de reuso; referência",
       "custo": "Pro ≈ US$10/mês (conector exige Pro)",
-      "nuvem": "bloqueado",
+      "nuvem": "abre a página pública (HTTP 200); conteúdo completo exige login Pro, sem assinatura",
       "veredito": "1 mês de teste, só com aval",
       "pegar": "Onboarding, estado vazio, retomada, revisão em apps de estudo e hábito.",
       "nao_pegar": "Copiar telas; qualquer gasto sem aval do Gabriel.",
-      "estado": "Conector desconectado; ver guia, seção 13."
+      "estado": "Conector desconectado; ver guia, seção 13.",
+      "exemplo": "Sem Pro, só a vitrine pública. Estados vazios e onboarding seguem a pesquisar em Kombai ou UX Archive.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "laws-of-ux",
@@ -152,11 +171,12 @@
       "tipo": "princípios",
       "licenca": "leitura livre",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "usar",
       "pegar": "Vocabulário para justificar decisão (carga cognitiva, escolha, agrupamento).",
       "nao_pegar": "Tratar como teste com usuário.",
-      "estado": "Citar a lei no desvio ou no PR."
+      "estado": "Citar a lei no desvio ou no PR.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "checklist-design",
@@ -165,11 +185,13 @@
       "tipo": "checklist",
       "licenca": "leitura livre; revisão por IA não verificada",
       "custo": "grátis (leitura)",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "usar",
       "pegar": "Lista de conferência de tela, estado e fluxo.",
       "nao_pegar": "Assumir que o serviço de IA é grátis.",
-      "estado": "Conferir ao fechar cada tela."
+      "estado": "Conferir ao fechar cada tela.",
+      "exemplo": "Listas de verificação por componente (formulário, navegação, tabela). Usar na revisão de \"Guardar um erro\".",
+      "verificado": "2026-11-05"
     },
     {
       "id": "penpot",
@@ -178,11 +200,12 @@
       "tipo": "design",
       "licenca": "MPL-2.0",
       "custo": "grátis (nuvem e auto-hospedado)",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "adiar",
       "pegar": "Nada agora: o fluxo é mockup em HTML aprovado e porte literal.",
       "nao_pegar": "Segunda fonte de verdade ao lado do mockup.",
-      "estado": "Só se o Gabriel quiser desenhar fora do HTML."
+      "estado": "Só se o Gabriel quiser desenhar fora do HTML.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "figma",
@@ -195,7 +218,8 @@
       "veredito": "adiar",
       "pegar": "Nada agora.",
       "nao_pegar": "Upgrade automático.",
-      "estado": "Mesmo critério do Penpot."
+      "estado": "Mesmo critério do Penpot.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "material-3",
@@ -204,11 +228,12 @@
       "tipo": "princípios",
       "licenca": "documentação; só princípios",
       "custo": "grátis",
-      "nuvem": "bloqueado",
+      "nuvem": "abre (HTTP 200, 05/11)",
       "veredito": "usar (princípios)",
       "pegar": "Classes de largura e painel de apoio para o desktop em duas colunas.",
       "nao_pegar": "Componentes, cores e formas do M3.",
-      "estado": "Desktop em duas colunas: sim, depois do celular (Gabriel, 05/11)."
+      "estado": "Desktop em duas colunas: sim, depois do celular (Gabriel, 05/11).",
+      "verificado": "2026-11-05"
     },
     {
       "id": "awesome-design-md",
@@ -221,7 +246,8 @@
       "veredito": "referência",
       "pegar": "Formato de seções; contraponto calmo (Notion, Runway).",
       "nao_pegar": "Paleta de terceiros.",
-      "estado": "Avaliação em /mnt/project-files/design/avaliacao-referencias-design-systems.md."
+      "estado": "Avaliação em /mnt/project-files/design/avaliacao-referencias-design-systems.md.",
+      "verificado": "2026-11-05"
     },
     {
       "id": "undraw",
@@ -234,7 +260,8 @@
       "veredito": "evitar",
       "pegar": "Nada: o Zé e o cacto são a ilustração do produto.",
       "nao_pegar": "Raspar com agente.",
-      "estado": "Só se faltar estado vazio e o Zé não couber."
+      "estado": "Só se faltar estado vazio e o Zé não couber.",
+      "verificado": "2026-11-05"
     }
   ],
   "casos": [
@@ -243,7 +270,10 @@
       "nome": "Agora (tela inicial do Fio)",
       "onde": "src/apresentacao/fio/m/AgoraM.tsx",
       "mockup": "data-tela=inicio",
-      "refs": ["laws-of-ux", "motion"],
+      "refs": [
+        "laws-of-ux",
+        "motion"
+      ],
       "estado": "no app"
     },
     {
@@ -251,7 +281,9 @@
       "nome": "Destino (mapa do Nordeste)",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "data-tela=mapa",
-      "refs": ["awesome-design-md"],
+      "refs": [
+        "awesome-design-md"
+      ],
       "estado": "no app (#419)"
     },
     {
@@ -259,7 +291,10 @@
       "nome": "Varal e Caderno de Frases",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "data-tela=varal",
-      "refs": ["auto-animate", "motion"],
+      "refs": [
+        "auto-animate",
+        "motion"
+      ],
       "estado": "no app (#420, #423)"
     },
     {
@@ -267,7 +302,10 @@
       "nome": "Cartão que vira / lembrar",
       "onde": "LembrarM.tsx, CartaoM.tsx",
       "mockup": "data-tela=lembrar",
-      "refs": ["motion", "uiverse"],
+      "refs": [
+        "motion",
+        "uiverse"
+      ],
       "estado": "no app"
     },
     {
@@ -275,7 +313,9 @@
       "nome": "Porteira (deque misturado)",
       "onde": "DequeM.tsx",
       "mockup": "folha porteira",
-      "refs": ["laws-of-ux"],
+      "refs": [
+        "laws-of-ux"
+      ],
       "estado": "folha-porteira aguarda cartão do Gabriel"
     },
     {
@@ -283,7 +323,9 @@
       "nome": "Guardar um erro / Ache o erro",
       "onde": "m/AcheOErroM.tsx",
       "mockup": "folha erro",
-      "refs": ["checklist-design"],
+      "refs": [
+        "checklist-design"
+      ],
       "estado": "no app (#426, #428)"
     },
     {
@@ -291,7 +333,9 @@
       "nome": "Conta em folha",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "folha conta",
-      "refs": ["base-ui"],
+      "refs": [
+        "base-ui"
+      ],
       "estado": "no app (#427, #430)"
     },
     {
@@ -299,7 +343,9 @@
       "nome": "Seletor dia/noite (lua e sol)",
       "onde": "Conta › Aparência",
       "mockup": "prancha uiverse v4",
-      "refs": ["uiverse"],
+      "refs": [
+        "uiverse"
+      ],
       "estado": "PR #424 em rascunho"
     },
     {
@@ -307,7 +353,10 @@
       "nome": "Abertura com cacto e prova",
       "onde": "thread C1",
       "mockup": "data-tela=abertura, prova",
-      "refs": ["motion", "uiverse"],
+      "refs": [
+        "motion",
+        "uiverse"
+      ],
       "estado": "em outra thread"
     },
     {
@@ -315,7 +364,9 @@
       "nome": "Aviso curto (Desfazer, Salvo)",
       "onde": "m/ToastM.tsx",
       "mockup": "toast do mockup",
-      "refs": ["uiverse"],
+      "refs": [
+        "uiverse"
+      ],
       "estado": "no app; Sonner só se precisar de fila"
     },
     {
@@ -323,7 +374,10 @@
       "nome": "Fecho do Dia / conquista",
       "onde": "PousoM.tsx",
       "mockup": "data-tela=pouso",
-      "refs": ["motion", "laws-of-ux"],
+      "refs": [
+        "motion",
+        "laws-of-ux"
+      ],
       "estado": "no app; confete só no modo Vivo, sem perda de sequência"
     },
     {
@@ -331,7 +385,10 @@
       "nome": "Estado vazio e retomada",
       "onde": "várias telas",
       "mockup": "sem",
-      "refs": ["mobbin", "checklist-design"],
+      "refs": [
+        "mobbin",
+        "checklist-design"
+      ],
       "estado": "a pesquisar (Mobbin ou Kombai)"
     },
     {
@@ -339,7 +396,9 @@
       "nome": "Desktop em duas colunas",
       "onde": "Fio, a partir de ~840 px",
       "mockup": "sem",
-      "refs": ["material-3"],
+      "refs": [
+        "material-3"
+      ],
       "estado": "depois do celular (Gabriel, 05/11)"
     },
     {
@@ -347,7 +406,10 @@
       "nome": "Leitor de norma",
       "onde": "src/apresentacao/leitor",
       "mockup": "sem",
-      "refs": ["laws-of-ux", "checklist-design"],
+      "refs": [
+        "laws-of-ux",
+        "checklist-design"
+      ],
       "estado": "no app"
     }
   ]

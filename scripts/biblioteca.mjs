@@ -41,7 +41,7 @@ const cartaoRef = (r) => `<article class="c" data-v="${esc(r.veredito)}">
 <p class="tag"><span>${esc(r.tipo)}</span><span class="v">${esc(r.veredito)}</span></p>
 <dl><dt>Pegar</dt><dd>${esc(r.pegar)}</dd><dt>Não pegar</dt><dd>${esc(r.nao_pegar)}</dd>
 <dt>Licença</dt><dd>${esc(r.licenca)}</dd><dt>Custo</dt><dd>${esc(r.custo)}</dd>
-<dt>Na nuvem</dt><dd>${esc(r.nuvem)}</dd><dt>No Arretado</dt><dd>${esc(r.estado)}</dd></dl></article>`;
+<dt>Exemplo real</dt><dd>${esc(r.exemplo ?? '—')}</dd><dt>Na nuvem</dt><dd>${esc(r.nuvem)} · verificado ${esc(r.verificado ?? '—')}</dd><dt>No Arretado</dt><dd>${esc(r.estado)}</dd></dl></article>`;
 const linhaCaso = (c) =>
   `<tr><td>${esc(c.nome)}</td><td><code>${esc(c.onde)}</code></td><td>${esc(c.mockup)}</td><td>${esc(nomes(c).join(', '))}</td><td>${esc(c.estado)}</td></tr>`;
 
