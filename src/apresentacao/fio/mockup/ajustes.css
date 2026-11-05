@@ -937,13 +937,15 @@ html[data-texto-fio] .m-fio .m-proximo {
   --m-brilho: 255 197 61;
   --m-brilho-anel: 211 146 0;
   --m-brilho-tinta: #8a5200;
+  --m-brilho-fundo: 42%;
   --m-vidro: rgb(255 255 255 / 55%);
 }
 
 .m-fio.m-fio[data-mundo='noite'] {
   --m-brilho: 157 183 232;
   --m-brilho-anel: 207 217 240;
-  --m-brilho-tinta: #cfd9f0;
+  --m-brilho-tinta: #e6ecfa;
+  --m-brilho-fundo: 26%;
   --m-vidro: rgb(255 255 255 / 8%);
 }
 
@@ -955,16 +957,16 @@ html[data-texto-fio] .m-fio .m-proximo {
   color: var(--m-brilho-tinta);
   box-shadow:
     inset 0 0 0 1px rgb(var(--m-brilho-anel) / 90%),
-    0 0 0 3px rgb(var(--m-brilho) / 28%),
-    0 0 0 7px rgb(var(--m-brilho) / 11%);
+    0 0 0 2px rgb(var(--m-brilho) / 22%),
+    0 0 0 5px rgb(var(--m-brilho) / 8%);
 }
 
 .m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:hover,
 .m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:active {
   box-shadow:
     inset 0 0 0 1px rgb(var(--m-brilho-anel)),
-    0 0 0 4px rgb(var(--m-brilho) / 36%),
-    0 0 0 9px rgb(var(--m-brilho) / 14%);
+    0 0 0 3px rgb(var(--m-brilho) / 32%),
+    0 0 0 7px rgb(var(--m-brilho) / 12%);
 }
 
 .m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao[disabled] {
