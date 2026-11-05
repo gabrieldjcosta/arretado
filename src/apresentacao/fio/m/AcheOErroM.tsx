@@ -107,7 +107,7 @@ export function AcheOErroM({
     >
       <h2 style={{ margin: '4px 0 4px' }}>Uma palavra está trocada. Toque nela.</h2>
       <p className="m-porque">
-        <span className="m-ponto-azul" />É assim que a FCC cobra: a lei quase igual.
+        <span className="m-ponto-azul" />É assim que a banca cobra: a lei quase igual.
       </p>
       {vazio && <PassoSemNada texto="Nada para praticar aqui." />}
       {carga.estado === 'carregando' && <p className="m-quieto">…</p>}

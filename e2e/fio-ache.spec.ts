@@ -109,5 +109,19 @@ test('Ache o erro: o cartão cabe, passa no axe, a troca aparece e o Seguir leva
   await expect(cartao.locator('.m-palavra.m-errada').first()).toBeVisible();
   await capturar(page, '2-achou');
   await semViolacoesNoFio(page);
-  await cartao.getByRole('button', { name: 'Seguir' }).click();
+
+  // O acerto: a mesma carta de novo (a etapa guarda o passo), tocando de primeira na palavra trocada.
+  const indice = await palavras.evaluateAll((ps) =>
+    ps.findIndex((p) => p.classList.contains('m-errada')),
+  );
+  expect(indice).toBeGreaterThanOrEqual(0);
+  await page.reload();
+  const de_novo = page.locator('.m-tela:not(.m-saindo) .m-cartao[data-cartao="achar"]');
+  await expect(de_novo.locator('.m-palavra').first()).toBeVisible();
+  await de_novo.locator('.m-palavra').nth(indice).click();
+  await expect(de_novo.locator('.m-troca')).toBeVisible();
+  await expect(de_novo.getByText(/^Achou\. A lei diz/)).toBeVisible();
+  await capturar(page, '3-acertou');
+  await semViolacoesNoFio(page);
+  await de_novo.getByRole('button', { name: 'Seguir' }).click();
 });
