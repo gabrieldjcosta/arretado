@@ -71,7 +71,7 @@ describe('Conta em folha', () => {
     });
   });
 
-  it('o Texto muda o tamanho da letra de leitura e avisa', async () => {
+  it('o Texto muda o tamanho do texto do Fio e da leitura e avisa', async () => {
     const { repo, usuario, folha } = await abrir();
     await usuario.click(within(folha).getByRole('button', { name: 'Texto maior' }));
     await waitFor(async () => {
@@ -81,7 +81,7 @@ describe('Conta em folha', () => {
       'aria-pressed',
       'true',
     );
-    expect(await screen.findByText('O texto de leitura ficou maior.')).toBeInTheDocument();
+    expect(await screen.findByText('O texto ficou maior.')).toBeInTheDocument();
   });
 
   it('o Movimento é deste aparelho: o Calmo acalma o Fio e o Vivo o solta, sobre o perfil', async () => {

@@ -18,7 +18,7 @@ import { useMovimentoDoFio } from './movimento';
 import { useMundo } from './mundo';
 import { avisar } from './toast';
 
-/** O tamanho da letra de leitura de cada "A" (o "Texto" do mockup): o normal do app, maior e bem maior. */
+/** O tamanho do texto de cada "A" (o "Texto" do mockup): o normal, maior e bem maior; vale para o Fio todo e para a leitura. */
 const TEXTOS = [
   { v: 1, px: 18, rotulo: 'Texto normal', tamanho: undefined },
   { v: 2, px: 22, rotulo: 'Texto maior', tamanho: 15 },
@@ -254,11 +254,7 @@ function Conteudo({
                     { tamanhoFonte: t.px },
                     'Não deu para guardar o tamanho. Nada foi alterado.',
                   );
-                  avisar(
-                    t.v === 1
-                      ? 'Texto de leitura no tamanho normal.'
-                      : 'O texto de leitura ficou maior.',
-                  );
+                  avisar(t.v === 1 ? 'Texto no tamanho normal.' : 'O texto ficou maior.');
                 }}
               >
                 A

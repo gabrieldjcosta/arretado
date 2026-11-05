@@ -24,6 +24,10 @@ export function AplicarAparencia() {
     raiz.dataset.fonte = dados.fonteLeitura;
     if (dados.perfilDeEstudo) raiz.dataset.perfil = dados.perfilDeEstudo;
     else delete raiz.dataset.perfil;
+    // O "Texto" da Conta do Fio faz o Fio todo crescer (cartões, folhas e pouso), não só a leitura.
+    if (dados.tamanhoFonte >= 24) raiz.dataset.textoFio = 'bem-maior';
+    else if (dados.tamanhoFonte >= 20) raiz.dataset.textoFio = 'maior';
+    else delete raiz.dataset.textoFio;
     raiz.style.setProperty('--tamanho-leitura', `${String(dados.tamanhoFonte)}px`);
   }, [dados]);
 
