@@ -856,3 +856,15 @@
 .m-fio.m-fio[data-mundo='dia'] .m-linha-conta.m-sair {
   color: #b3261e;
 }
+
+/* Desvio 44 (Texto da Conta): o texto cresce o Fio todo. `zoom` nos blocos de dentro dos cartões, folhas e pouso; a largura
+   automática continua cabendo no quadro. O mapa e o puxador ficam como estão. */
+html[data-texto-fio] .m-fio {
+  --m-texto-fio: 1.12;
+}
+html[data-texto-fio='bem-maior'] .m-fio {
+  --m-texto-fio: 1.25;
+}
+html[data-texto-fio] .m-fio :is(.m-cartao, .m-folha .m-corpo, .m-pouso .m-corpo) > :not(.m-alca) {
+  zoom: var(--m-texto-fio);
+}

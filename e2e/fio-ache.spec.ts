@@ -97,6 +97,25 @@ test('Ache o erro: o cartão cabe, passa no axe, a troca aparece e o Seguir leva
   await expect(
     cartao.getByRole('heading', { name: 'Uma palavra está trocada. Toque nela.' }),
   ).toBeVisible();
+  // Texto bem maior (Conta): o cartão cresce e nada passa da borda nem do axe.
+  await page.evaluate(() => {
+    document.documentElement.dataset.textoFio = 'bem-maior';
+  });
+  const antes = await cartao.locator('h2').boundingBox();
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.textoFio;
+  });
+  const normal = await cartao.locator('h2').boundingBox();
+  expect((antes?.height ?? 0) > (normal?.height ?? 0)).toBe(true);
+  await page.evaluate(() => {
+    document.documentElement.dataset.textoFio = 'bem-maior';
+  });
+  await expect.poll(() => cartao.evaluate((c) => c.scrollWidth <= c.clientWidth)).toBe(true);
+  await semViolacoesNoFio(page);
+  await capturar(page, '4-bem-maior');
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.textoFio;
+  });
   await capturar(page, '1-achar');
   await semViolacoesNoFio(page);
   const palavras = cartao.locator('.m-palavra');
