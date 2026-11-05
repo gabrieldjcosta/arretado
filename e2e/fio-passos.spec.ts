@@ -493,7 +493,7 @@ test('o movimento do mockup está todo no app: cada animação da jornada, com a
   expect(faltam).toEqual([]);
 });
 
-test('o botão de ação é o Sol no Vivo e o Só contorno no Calmo, de noite e de dia', async ({
+test('o botão de ação é o vidro do brilho do mundo no Vivo e o Só contorno no Calmo, de noite e de dia', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 640 });
@@ -524,11 +524,19 @@ test('o botão de ação é o Sol no Vivo e o Só contorno no Calmo, de noite e 
 
   for (const esquema of ['dark', 'light'] as const) {
     await page.emulateMedia({ colorScheme: esquema, reducedMotion: 'no-preference' });
-    // Vivo, o padrão: o Sol, do mesmo material do ponto (fundo dourado radial, anel âmbar, halo).
+    // Vivo, o padrão: o vidro do brilho do mundo (desvio 49): texto âmbar de dia e prateado à noite, anel no tom do mundo.
     await expect.poll(async () => (await cara()).movimento).toBe('vivo');
     expect((await cara()).fundo).toContain('radial-gradient');
-    await expect.poll(traco('texto')).toBe('rgb(58, 39, 0)');
-    await expect.poll(traco('sombra')).toContain('rgba(211, 146, 0, 0.55) 0px 0px 0px 1.5px inset');
+    await expect
+      .poll(traco('texto'))
+      .toBe(esquema === 'dark' ? 'rgb(230, 236, 250)' : 'rgb(138, 82, 0)');
+    await expect
+      .poll(traco('sombra'))
+      .toContain(
+        esquema === 'dark'
+          ? 'rgba(207, 217, 240, 0.9) 0px 0px 0px 1px inset'
+          : 'rgba(211, 146, 0, 0.9) 0px 0px 0px 1px inset',
+      );
     expect(await traco('antes')()).toBe('none');
     await semViolacoesNoFio(page);
 
