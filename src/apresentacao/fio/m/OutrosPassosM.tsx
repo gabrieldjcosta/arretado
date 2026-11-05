@@ -12,6 +12,7 @@ import type { AlvoDaPorteira } from '../passos/alvo-da-porteira';
 import { referenciaDe, useCargaDoPasso } from '../passos/carregar';
 import { guardarFraseDaFonte } from '../passos/guardar-frase';
 import { BotaoPular, BotaoSeguir, ChipSeguir, PassoSemNada } from './BotoesM';
+import { AcheOErroM } from './AcheOErroM';
 import { CartaoM } from './CartaoM';
 import { DequeM } from './DequeM';
 import { SetaM } from './IconesM';
@@ -248,9 +249,13 @@ function GuardarFrasesDaPorteira({ erros }: { erros: readonly { fonte: FonteDoIt
 
 /**
  * O passo Praticar em modo porteira, com o deque do mockup (`#deque`): três afirmações de certo ou errado,
- * só do que a pessoa já leu. O modo `ache_o_erro` ainda não tem tela no quadro: o passo diz isso e deixa seguir.
+ * só do que a pessoa já leu. O modo `ache_o_erro` tem a sua tela (`AcheOErroM`).
  */
-export function PraticarM({
+export function PraticarM(props: PropsDoPassoM<Variante<'praticar'>> & { alvo: AlvoDaPorteira }) {
+  return props.passo.modo === 'ache_o_erro' ? <AcheOErroM {...props} /> : <PorteiraM {...props} />;
+}
+
+function PorteiraM({
   passo,
   alvo,
   semente,
