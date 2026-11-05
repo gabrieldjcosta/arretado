@@ -271,7 +271,8 @@ export function avaliarTrocas(texto: string): { aprovadas: Troca[]; rejeitadas: 
     const regra = SUBSTITUTO.get(chave);
     if (!regra) continue;
     // "sempre que" é locução ("quando"): trocar a primeira palavra dá "nunca que", que não é português.
-    if (regra.tipo === 'absoluto' && SEGUIDA_DE_QUE.test(texto.slice(m.index + m[0].length))) continue;
+    if (regra.tipo === 'absoluto' && SEGUIDA_DE_QUE.test(texto.slice(m.index + m[0].length)))
+      continue;
     candidatas.push({
       inicio: m.index,
       fim: m.index + m[0].length,
