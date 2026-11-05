@@ -29,3 +29,5 @@ Só se acrescenta. Formato: `AAAA-MM-DD · fonte · achado · caso de uso · lic
 - 2026-11-05 · Onda do botão 7 mais curta (até 1,5x) e some mais rápido.
 
 - 2026-11-05 · DECISÃO (Gabriel): botões ficam com dois referenciais, vidro com texto âmbar de dia (5b) e botão-sol redondo (7), que harmonizam botões e menus do app. Os demais formatos (1 a 8) arquivados na galeria, para consulta antes de buscar fora.
+
+- 2026-11-05 · Acervo de movimentos do Zé (17 movimentos, thread própria): https://claude.ai/artifact/TF5FHob2Yxk171KHwt4XZ9, fonte em /mnt/project-files/mascote/acervo/. Biblioteca linka o acervo; o palco ao vivo com o "Zé para qualquer fundo" pode ser trazido depois, se o Gabriel pedir.
