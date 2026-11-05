@@ -6,11 +6,11 @@
 :root{
   --bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--forte:#4b5d82;
   --tx:#eef2fa;--tx2:#aab6d3;--tx3:#8a98ba;--neon:#39caef;--ponto:#ffc53d;--flor:#ff7eb6;--certo:#7ee2b0;--sombra:rgba(0,0,0,.45);
-  --on-ponto:#1a1300;--f-tit:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;--f-ui:'Atkinson Hyperlegible Next',system-ui,-apple-system,sans-serif;--f-lei:'Literata',Georgia,serif;
+  --on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;--f-tit:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;--f-ui:'Atkinson Hyperlegible Next',system-ui,-apple-system,sans-serif;--f-lei:'Literata',Georgia,serif;
   --mola:cubic-bezier(.34,1.56,.64,1);--sair:cubic-bezier(.2,.7,.2,1);color-scheme:dark;
 }
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;color-scheme:light}}
-:root[data-theme="light"]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;color-scheme:light}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0 auto;max-width:1120px;background:var(--bg);color:var(--tx);font:16px/1.55 var(--f-ui);padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1,h2,h3{font-family:var(--f-tit);text-wrap:balance;margin:0}
@@ -33,16 +33,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn{background:var(--serra2);border:1px solid var(--linha);border-radius:10px;padding:8px 14px;min-height:44px}
 .btn:hover{border-color:var(--forte)}
 /* acao: botão que cede (Uiverse, reescrito nos tokens) */
-.acao{background:var(--ponto);color:var(--on-ponto);border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;box-shadow:0 4px 0 color-mix(in srgb,var(--ponto) 55%,#000);transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
-.acao:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--ponto) 55%,#000)}
+.acao{background:linear-gradient(180deg,var(--astro-a),var(--astro-b));color:var(--astro-tx);border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;box-shadow:0 3px 0 rgba(196,118,0,.35),0 10px 22px -12px var(--astro-sombra);transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
+.acao:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(196,118,0,.35),0 6px 14px -10px var(--astro-sombra)}
 /* seletor dia/noite */
-.pal[data-mundo=dia]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;color:var(--tx)}
-.pal[data-mundo=noite]{--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;color:var(--tx)}
+.pal[data-mundo=dia]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color:var(--tx)}
+.pal[data-mundo=noite]{--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;color:var(--tx)}
 .mundo{width:84px;height:44px;border-radius:99px;border:1px solid var(--linha);background:var(--serra2);position:relative;padding:0}
-.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:var(--ponto);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px color-mix(in srgb,var(--ponto) 22%,transparent),0 0 0 12px color-mix(in srgb,var(--ponto) 10%,transparent)}
-.mundo[aria-pressed=true] i{transform:translateX(40px);background:#dfe7f7;box-shadow:inset -9px -3px 0 0 #8fa0c4,0 0 0 6px rgba(223,231,247,.14)}
+.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#ffd56b,#ffab3d);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px rgba(255,197,61,.32),0 0 0 12px rgba(255,171,61,.14),0 6px 16px -4px rgba(255,140,30,.7)}
+.mundo[aria-pressed=true] i{transform:translateX(40px);background:#fff4d6;box-shadow:inset -9px -3px 0 0 #d9c690,0 0 0 6px rgba(255,230,160,.18),0 0 0 12px rgba(255,230,160,.07),0 6px 16px -4px rgba(255,210,110,.5)}
 .mundo[aria-pressed=false] i{animation:calor 3.2s ease-in-out infinite}
-@keyframes calor{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--ponto) 20%,transparent),0 0 0 16px color-mix(in srgb,var(--ponto) 8%,transparent)}}
+@keyframes calor{50%{box-shadow:0 0 0 9px rgba(255,197,61,.28),0 0 0 17px rgba(255,171,61,.1),0 6px 16px -4px rgba(255,140,30,.7)}}
 .minicartao{margin-top:12px;background:var(--serra);border:1px solid var(--linha);border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
 /* interruptor */
 .sw{display:flex;align-items:center;gap:12px}
@@ -126,11 +126,11 @@ tr:last-child td{border-bottom:0}
 <p class="sub">Toque, arraste e aperte. As demonstrações usam as cores do Fio e foram reescritas para esta página; nada foi copiado de terceiros.</p>
 <div class="grade">
 
-<section class="demo"><header><h3>Trocar dia e noite</h3><p>Sol que vira lua, com o palco mudando junto.</p></header>
-<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="minicartao" id="mini">Noite: fundo azul fundo, luz amarela.</div></div></div>
+<section class="demo"><header><h3>Trocar dia e noite</h3><p>Sol que vira lua. O botão, o fio e o halo trocam de cor junto, como no mockup (“a noite é luar, o dia é sol da manhã”).</p></header>
+<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="linha" style="margin-top:12px"><button class="acao" style="min-height:40px;padding:8px 18px">Continuar</button><svg width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-halo)" stroke-width="8" stroke-linecap="round"/><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-b)" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="minicartao" id="mini">Noite: luar. Botão claro, fio e halo dourado-pálido.</div></div></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> Conta › Aparência (#424)</div></section>
 
-<section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta, volta com mola.</p></header>
+<section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta. A cor segue o tema da página: luar no escuro, sol no claro.</p></header>
 <div class="pal"><button class="acao">Continuar</button></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> ação principal de cada tela</div></section>
 
@@ -198,7 +198,7 @@ $('#regra').textContent=D.regra+' Atualizado em '+D.atualizado+'.';
 
 // dia e noite
 const mundo=$('#mundo'),palco=$('#palco'),mini=$('#mini');
-mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: fundo azul fundo, luz amarela.':'Dia: fundo claro, texto azul-marinho.'};
+mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: luar. Botão claro, fio e halo dourado-pálido.':'Dia: sol da manhã. Botão âmbar, fio e halo laranja.'};
 // interruptor
 const sw=$('#sw1');sw.onclick=()=>sw.setAttribute('aria-checked',sw.getAttribute('aria-checked')!=='true');
 // menu
