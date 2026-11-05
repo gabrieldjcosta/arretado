@@ -435,11 +435,11 @@
       "id": "companhia",
       "nome": "Estudar junto (body doubling)",
       "tipo": "presença",
-      "porque": "O Zé (olhos retos e bochechas rosadas, do contrato da marca) lê com a pessoa, em silêncio, só enquanto ela estuda. Por ser o rosto humano da marca, é ele, e não um cacto de linhas, que faz a companhia. Sem pergunta nem cobrança.",
+      "porque": "O Zé (olhos retos, bochechas rosadas, flor amarela) lê com a pessoa, em silêncio, só enquanto ela estuda. De tempos em tempos sorri com os olhos em arco, abre pétalas na flor e a flor vira bandeirinha que agita, como quem torce. Sutil, sem som, sem pergunta nem cobrança.",
       "fonte": "AttentionGuard propõe \"companheiro de estudo\" que simula body doubling (piloto, 11 pessoas; preliminar)",
       "fonte_url": "https://www.arxiv.org/pdf/2602.07865",
       "custo": "baixo: animação do Zé em loop lento",
-      "risco": "sem animação perpétua em área de estudo; só com opção ligada",
+      "risco": "sem animação perpétua em área de estudo: só com a opção ligada, em ciclos curtos, e parado com \"reduzir movimento\". O Zé não usa fundo escuro: de dia leva a faixa piscina, de noite o brilho.",
       "estado": "proposta"
     },
     {
