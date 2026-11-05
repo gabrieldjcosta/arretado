@@ -2479,6 +2479,95 @@ dialog.dialogo-busca {
   margin-top: 0.75rem;
 }
 
+.barra-de-normas .busca-com-painel {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Últimas buscas: o painel sobe quando o campo ganha foco (:focus-within, sem JS para abrir). Entra em 200 ms,
+   8 px de subida; sem movimento (reduzido), só aparece. Ref.: shaggy-cheetah-22, do uiverse (adaptado). */
+.busca-painel {
+  position: absolute;
+  inset: calc(100% + 0.25rem) 0 auto 0;
+  z-index: 5;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: var(--borda-folha);
+  border-radius: var(--raio-folha);
+  background: var(--superficie);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out,
+    visibility 0s linear 0.2s;
+}
+
+.busca-com-painel:not([data-fechado]):focus-within .busca-painel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busca-painel {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Calmo: o painel só esmaece, sem a subida de 8 px. */
+html[data-perfil='calmo'] .busca-painel {
+  transform: none;
+}
+
+.busca-painel-titulo {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-atenuado);
+}
+
+.busca-painel ul {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.busca-painel button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.busca-painel button:hover,
+.busca-painel button:focus-visible {
+  background: var(--superficie-2);
+}
+
+.busca-painel-limpar {
+  color: var(--texto-atenuado);
+  font-size: 0.875rem;
+}
+
 .barra-de-normas .busca-campo {
   flex: 1 1 auto;
   min-width: 0;
@@ -4203,4 +4292,95 @@ dialog.dialogo-previa .linha-acoes button {
   .abas a {
     padding-inline: 0.375rem;
   }
+}
+
+/* Troca entre noite e dia (Conta › Aparência): a lua do uiverse bad-parrot-46 (disco claro com a sombra que balança,
+   feita com máscara para não depender da cor do fundo) vira o sol, com a emanação de calor do weak-bobcat-68 e o halo
+   de duas cores do lucky-falcon-75 (em degradê). Só CSS; 52 px, para não ocupar a tela. */
+@property --sombra-dx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 6px;
+}
+
+.seletor-mundo {
+  position: relative;
+  display: block;
+  width: 3.25rem;
+  height: 3.25rem;
+  min-height: var(--alvo);
+  margin: 0.25rem 0 0.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.seletor-mundo-disco,
+.seletor-mundo-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* O brilho é um degradê radial maior que o disco (sem `box-shadow` com desfoque: a regra "nenhuma sombra tem
+   desfoque" do D-D9 vale; o brilho só mora nos arquivos dos traços). */
+.seletor-mundo-halo {
+  inset: -20%;
+  background: radial-gradient(circle, rgb(157 183 232 / 0.4) 32%, rgb(157 183 232 / 0) 70%);
+}
+
+.seletor-mundo-noite .seletor-mundo-disco {
+  background: #d8d8d8;
+  mask: radial-gradient(
+    circle at calc(50% + var(--sombra-dx)) calc(50% - var(--sombra-dx)),
+    transparent 49%,
+    #000 50%
+  );
+  animation: lua-balanca 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes lua-balanca {
+  to {
+    --sombra-dx: 24px;
+  }
+}
+
+.seletor-mundo-dia .seletor-mundo-disco {
+  background: radial-gradient(circle at 35% 30%, #ffe08a, #ffc53d 60%, #e8a50f);
+}
+
+.seletor-mundo-dia .seletor-mundo-halo {
+  background: radial-gradient(circle, rgb(255 197 61 / 0.6) 30%, rgb(255 150 40 / 0) 70%);
+  animation: sol-calor 2.4s ease-out infinite;
+}
+
+@keyframes sol-calor {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+.seletor-mundo:focus-visible {
+  outline: 2px solid var(--borda-forte);
+  outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seletor-mundo-noite .seletor-mundo-disco,
+  .seletor-mundo-dia .seletor-mundo-halo {
+    animation: none;
+  }
+}
+
+/* Calmo: a sombra da lua e o halo do sol param, como no movimento reduzido (exceção declarada no DESIGN.md). */
+html[data-perfil='calmo'] .seletor-mundo-noite .seletor-mundo-disco,
+html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
+  animation: none;
 }

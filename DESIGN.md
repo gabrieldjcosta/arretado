@@ -425,7 +425,7 @@ Antes de o pacote chegar, o `index.html` já traz o Zé (`#carregamento`, um `ro
 ### Don't:
 
 - **Don't** usar vermelho, perda de sequência, culpa ou urgência para motivar. "Vencido" e "Você parou em" soam como dívida: prefira "para hoje", "Retomar em" e "Continuar".
-- **Don't** pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque (salvo o halo do anel de evidência, D-D13), gradiente em texto, brilho pulsando (a exceção declarada são as piscadas finitas do Zé, só nas Boas-vindas e na tela de carregamento), lens flare, parallax, confete ou som.
+- **Don't** pôr textura, foto, 3D, vidro desfocado, iridescência, sombra com desfoque (salvo o halo do anel de evidência, D-D13), gradiente em texto, brilho pulsando (as exceções declaradas são as piscadas finitas do Zé, só nas Boas-vindas e na tela de carregamento, e o halo do sol e a sombra da lua do seletor de mundo em Conta › Aparência, que param no Calmo e no reduzido), lens flare, parallax, confete ou som.
 - **Don't** acender néon em botão, texto, cartão, borda, aba ou ícone parado, nem dar ao brilho de um traço outra cor que o piscina (o ponto amarelo do Zé tem o seu), nem animá-lo com `infinite`; o brilho nunca carrega informação.
 - **Don't** pôr o Zé no Hoje, na Trilha, no Fixar, na Biblioteca, no Leitor, na Sessão, na Revisão, no Resumo do Dia, em erro ou em aviso; nem dar a ele boca, olho triste, nome na tela ou fala própria; nem usá-lo para cobrar, comemorar sequência ou ensinar.
 - **Don't** usar a lima como fundo ou cor de texto, a luz como texto, sem contorno, pulsando ou seguindo o dedo; nem mais de uma caneta por tela.
