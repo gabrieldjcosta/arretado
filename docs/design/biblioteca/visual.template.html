@@ -36,14 +36,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 .acao{background:linear-gradient(180deg,var(--astro-a),var(--astro-b));color:var(--astro-tx);border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;box-shadow:0 3px 0 rgba(196,118,0,.35),0 10px 22px -12px var(--astro-sombra);transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
 .acao:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(196,118,0,.35),0 6px 14px -10px var(--astro-sombra)}
 /* seletor dia/noite */
-.pal[data-mundo=dia]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color:var(--tx)}
-.pal[data-mundo=noite]{--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;color:var(--tx)}
+.pal[data-mundo=dia]{--brilho:255,197,61;--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;--astro-a:#ffd56b;--astro-b:#ffab3d;--astro-sombra:rgba(255,140,30,.7);--astro-halo:rgba(255,197,61,.32);--astro-tx:#4a2a00;color:var(--tx)}
+.pal[data-mundo=noite]{--brilho:157,183,232;--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;--astro-a:#fff7e0;--astro-b:#ffe6a3;--astro-sombra:rgba(255,210,110,.55);--astro-halo:rgba(255,230,160,.22);--astro-tx:#0b1322;color:var(--tx)}
 .mundo{width:84px;height:44px;border-radius:99px;border:1px solid var(--linha);background:var(--serra2);position:relative;padding:0}
-.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#ffd56b,#ffab3d);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px rgba(255,197,61,.32),0 0 0 12px rgba(255,171,61,.14),0 6px 16px -4px rgba(255,140,30,.7)}
-.mundo[aria-pressed=true] i{transform:translateX(40px);background:#fff4d6;box-shadow:inset -9px -3px 0 0 #d9c690,0 0 0 6px rgba(255,230,160,.18),0 0 0 12px rgba(255,230,160,.07),0 6px 16px -4px rgba(255,210,110,.5)}
+.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe08a,#ffc53d 60%,#e8a50f);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px rgba(255,197,61,.30),0 0 0 12px rgba(255,197,61,.12)}
+.mundo[aria-pressed=true] i{transform:translateX(40px);background:#fff4d6;box-shadow:inset -9px -3px 0 0 #d9c690,0 0 0 6px rgba(157,183,232,.20),0 0 0 12px rgba(157,183,232,.08)}
 .mundo[aria-pressed=false] i{animation:calor 3.2s ease-in-out infinite}
-@keyframes calor{50%{box-shadow:0 0 0 9px rgba(255,197,61,.28),0 0 0 17px rgba(255,171,61,.1),0 6px 16px -4px rgba(255,140,30,.7)}}
-.minicartao{margin-top:12px;background:var(--serra);border:1px solid var(--linha);border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
+@keyframes calor{50%{box-shadow:0 0 0 9px rgba(255,197,61,.26),0 0 0 17px rgba(255,197,61,.09)}}
+.minicartao{margin-top:12px;background:var(--serra);border:1px solid rgba(var(--brilho,170,182,211),.55);box-shadow:0 0 0 3px rgba(var(--brilho,170,182,211),.14),0 0 0 7px rgba(var(--brilho,170,182,211),.06);transition:border-color .3s,box-shadow .3s;border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
 /* interruptor */
 .sw{display:flex;align-items:center;gap:12px}
 .sw button{width:52px;height:30px;border-radius:99px;border:1px solid var(--forte);background:var(--serra2);position:relative;padding:0;transition:background .25s}
@@ -118,7 +118,8 @@ tr:last-child td{border-bottom:0}
 
 /* ideias novas */
 .regua{font-family:var(--f-lei);font-size:.95rem;line-height:1.7;max-width:34ch;margin:0}
-.regua span{opacity:.3;transition:opacity .25s;cursor:pointer;border-radius:4px}.regua span.on{opacity:1;background:color-mix(in srgb,var(--ponto) 18%,transparent)}
+.regua span{opacity:.3;transition:opacity .25s;cursor:pointer;border-radius:4px}.regua mark{background:none;color:inherit;border-bottom:2px solid var(--ponto);font-weight:600}.chp{border:1px solid var(--linha);background:var(--serra2);border-radius:99px;padding:4px 12px;min-height:36px;font-size:.82rem}.chp[aria-pressed=true]{border-color:var(--ponto);color:var(--ponto)}
+.regua span.on{opacity:1;background:color-mix(in srgb,var(--ponto) 18%,transparent)}
 .disco{width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--neon) calc(var(--p,1)*360deg),var(--serra2) 0);display:grid;place-items:center;border:1px solid var(--linha)}
 .disco div{width:76px;height:76px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--tx2)}
 .rol{height:120px;overflow:auto;border:1px solid var(--linha);border-radius:10px;padding:0 10px 0;width:100%;position:relative;font-family:var(--f-lei);font-size:.85rem;color:var(--tx2)}
@@ -145,7 +146,7 @@ tr:last-child td{border-bottom:0}
 <div class="grade">
 
 <section class="demo"><header><h3>Trocar dia e noite</h3><p>Sol que vira lua. O botão, o fio e o halo trocam de cor junto, como no mockup (“a noite é luar, o dia é sol da manhã”).</p></header>
-<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="linha" style="margin-top:12px"><button class="acao" style="min-height:40px;padding:8px 18px">Continuar</button><svg width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-halo)" stroke-width="8" stroke-linecap="round"/><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-b)" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="minicartao" id="mini">Noite: luar. Botão claro, fio e halo dourado-pálido.</div></div></div>
+<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="linha" style="margin-top:12px"><button class="acao" style="min-height:40px;padding:8px 18px">Continuar</button><svg width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-halo)" stroke-width="8" stroke-linecap="round"/><path d="M2 26C20 4 44 4 68 24" fill="none" stroke="var(--astro-b)" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="minicartao" id="mini">Noite: luar. O brilho do app inteiro fica azul-prata, em anéis.</div></div></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> Conta › Aparência (#424)</div></section>
 
 <section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta. A cor segue o tema da página: luar no escuro, sol no claro.</p></header>
@@ -202,8 +203,8 @@ tr:last-child td{border-bottom:0}
 <h2>Ideias novas para o Arretado</h2>
 <p class="sub">Pesquisa de 05/11 sobre foco, tempo, retomada e presença. Cada ideia tem demo, fonte e o risco que precisa de decisão. As fontes de estudo com TDAH são em parte blogs de fornecedores e um piloto pequeno: servem de direção, não de prova.</p>
 <div class="grade" id="ideias">
-<section class="demo" data-ideia="regua"><header><h3>Régua de foco</h3><p>Passe o dedo ou use as setas: só a frase em leitura fica acesa.</p></header>
-<div class="pal"><p class="regua" id="regua" tabindex="0" aria-label="Texto com régua de foco; use as setas para mudar de frase"><span>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. </span><span>Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. </span><span>Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. </span></p></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="regua"><header><h3>Régua de foco</h3><p>Passe o dedo ou use as setas: só a frase em leitura fica acesa. Marque palavras para destacá-las e pular entre as frases que as contêm.</p></header>
+<div class="pal" style="align-content:center;gap:10px"><div class="linha" id="rpal" role="group" aria-label="Palavras a destacar"></div><label class="rng" style="margin:0"><input type="checkbox" id="rso" style="flex:none;width:18px;height:18px"> Ir só às frases com palavra marcada</label><p class="regua" id="regua" tabindex="0" aria-label="Texto com régua de foco; use as setas para mudar de frase"><span>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. </span><span>Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. </span><span>Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. </span></p></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="disco"><header><h3>Disco de tempo</h3><p>O tempo encolhe em vez de contar. Na demo, 1 minuto passa em 6 segundos.</p></header>
 <div class="pal"><div style="display:grid;gap:10px;justify-items:center"><div class="disco" id="disco" role="img" aria-label="Disco de tempo"><div id="dtx">25 min</div></div><button class="btn" id="dgo">Começar 25 min</button></div></div><div class="pe ficha"></div></section>
 <section class="demo" data-ideia="progresso"><header><h3>Rolagem que desenha o caminho</h3><p>Role o texto: o fio no topo se desenha.</p></header>
@@ -234,7 +235,7 @@ $('#regra').textContent=D.regra+' Atualizado em '+D.atualizado+'.';
 
 // dia e noite
 const mundo=$('#mundo'),palco=$('#palco'),mini=$('#mini');
-mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: luar. Botão claro, fio e halo dourado-pálido.':'Dia: sol da manhã. Botão âmbar, fio e halo laranja.'};
+mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: luar. O brilho do app inteiro fica azul-prata, em anéis.':'Dia: sol. O brilho do app inteiro fica dourado, como o Sol do Fio.'};
 // interruptor
 const sw=$('#sw1');sw.onclick=()=>sw.setAttribute('aria-checked',sw.getAttribute('aria-checked')!=='true');
 // menu
@@ -273,9 +274,16 @@ chk.onchange=()=>{$('#prog').style.width=(chk.querySelectorAll(':checked').lengt
 
 // ideias novas
 document.querySelectorAll('[data-ideia]').forEach((sec)=>{const i=D.ideias.find((x)=>x.id===sec.dataset.ideia);if(!i)return;sec.querySelector('.ficha').innerHTML='<span class="sel av">'+esc(i.tipo)+'</span><b>por quê:</b> '+esc(i.porque)+'<br><b>fonte:</b> <a href="'+esc(i.fonte_url)+'">'+esc(i.fonte)+'</a><br><b>custo:</b> '+esc(i.custo)+' · <b>risco:</b> '+esc(i.risco)});
-const fr=[...$('#regua').children];const foco=(n)=>fr.forEach((x,k)=>x.classList.toggle('on',k===n));let fi=0;foco(0);
-fr.forEach((x,k)=>{x.onmouseenter=()=>{fi=k;foco(k)};x.onclick=()=>{fi=k;foco(k)}});
-$('#regua').onkeydown=(e)=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();fi=Math.min(fr.length-1,fi+1);foco(fi)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();fi=Math.max(0,fi-1);foco(fi)}};
+const FR=['A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. ','Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. ','Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. '];
+const PAL=['progressiva','regime','juiz','conduta'];const ativas=new Set(['progressiva']);let fi=0;
+const rg=$('#regua'),temPal=(t)=>[...ativas].some((w)=>t.toLowerCase().includes(w));
+const marca=(t)=>{let h=esc(t);ativas.forEach((w)=>{h=h.replace(new RegExp('('+w+'\\w*)','gi'),'<mark>$1</mark>')});return h};
+const desenha=()=>{rg.replaceChildren(...FR.map((t,k)=>{const sp=el('span',{},marca(t));sp.onmouseenter=()=>{fi=k;foco()};sp.onclick=()=>{fi=k;foco()};return sp}));foco()};
+const foco=()=>[...rg.children].forEach((x,k)=>x.classList.toggle('on',k===fi));
+const passo=(d)=>{let k=fi;const so=$('#rso').checked&&ativas.size;do{k+=d}while(k>=0&&k<FR.length&&so&&!temPal(FR[k]));if(k>=0&&k<FR.length){fi=k;foco()}};
+PAL.forEach((w)=>{const b=el('button',{class:'chp','aria-pressed':ativas.has(w)},esc(w));b.onclick=()=>{ativas.has(w)?ativas.delete(w):ativas.add(w);b.setAttribute('aria-pressed',ativas.has(w));desenha()};$('#rpal').append(b)});
+desenha();
+rg.onkeydown=(e)=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();passo(1)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();passo(-1)}};
 let dt=null;$('#dgo').onclick=()=>{if(dt){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',1);$('#dtx').textContent='25 min';$('#dgo').textContent='Começar 25 min';return}let t=25*60;$('#dgo').textContent='Parar';dt=setInterval(()=>{t-=10;if(t<=0){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',0);$('#dtx').textContent='Pronto';$('#dgo').textContent='Começar 25 min';return}$('#disco').style.setProperty('--p',t/1500);$('#dtx').textContent=Math.ceil(t/60)+' min'},250)};
 $('#rol').onscroll=(e)=>{const r=e.target;$('#rfio').style.width=(r.scrollTop/Math.max(1,r.scrollHeight-r.clientHeight)*100)+'%'};
 const dias=Array.from({length:14},(_,i)=>i<4||i===5||i===6?'e':'d');const dd=$('#dias');
