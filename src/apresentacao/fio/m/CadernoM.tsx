@@ -47,7 +47,7 @@ function TextoDaLei({ lei }: { lei: LeiDaFrase }) {
 }
 
 /** "Ler na lei": o botão que abre o artigo de onde a Frase veio (o `lerJunto` do mockup; abre com 320 ms, só no Vivo; rola até ele se ficar fora da vista). */
-function LerNaLei({ lei, idDoTexto }: { lei: LeiDaFrase; idDoTexto: string }) {
+export function LerNaLei({ lei, idDoTexto }: { lei: LeiDaFrase; idDoTexto: string }) {
   const [aberta, setAberta] = useState(false);
   const idDaLei = useId();
   const caixa = useRef<HTMLDivElement>(null);
