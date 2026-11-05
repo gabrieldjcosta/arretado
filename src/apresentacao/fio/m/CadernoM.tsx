@@ -61,7 +61,7 @@ function LerNaLei({ lei, idDoTexto }: { lei: LeiDaFrase; idDoTexto: string }) {
     }
     if (!aberta) return;
     const normal = modoAgora() === 'normal';
-    // A folha tem altura fixa (desvio 41): o artigo que abre embaixo da Frase pode cair fora da vista, e então a folha rola até ele.
+    // A folha cresce até o teto (desvio 41); no teto o artigo que abre embaixo da Frase pode cair fora da vista, e então a folha rola até ele.
     caixa.current?.scrollIntoView({ block: 'nearest', behavior: normal ? 'smooth' : 'auto' });
     if (!normal) return;
     void animarEDeixar(

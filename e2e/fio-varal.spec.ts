@@ -724,12 +724,10 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
   await expect(page.getByRole('link', { name: FRASE_DO_ERRO, exact: true })).toBeVisible();
 });
 
-/** A altura da folha parada do mockup com as duas Frases dele, em 390 px de largura (`ajustes.css`, desvio 41). */
-const ALTURA_DA_FOLHA_DO_CADERNO = 456;
-/** Onde termina o título do Varal, medido do alto do quadro, mais a folga que a folha deixa. */
+/** Onde termina o título do Varal, medido do alto do quadro (100 px), mais a folga que o teto da folha deixa (`ajustes.css`, desvio 41). */
 const FOLGA_ATE_O_TITULO = 112;
 
-test('a folha do Caderno tem a altura do mockup, não cresce com o "Ler na lei", não corta o título do Varal e o conteúdo rola dentro dela', async ({
+test('a folha do Caderno cresce como a do mockup, mas nunca passa do título do Varal; no teto o conteúdo rola dentro dela', async ({
   page,
 }) => {
   test.setTimeout(300_000);
@@ -739,45 +737,85 @@ test('a folha do Caderno tem a altura do mockup, não cresce com o "Ler na lei",
   const caderno = await abrirOCaderno(page);
   const corpo = caderno.locator('.m-corpo');
   const titulo = page.locator('.m-app h2', { hasText: /pendurado no fio/ });
+  const ler = caderno.locator('.m-frase-item').nth(1).getByRole('button', { name: 'Ler na lei' });
+  const lei = caderno.locator('.m-lei');
 
-  // A mesma altura em qualquer tela, até onde o título do Varal deixa: o topo da folha nunca passa do título.
-  for (const [w, h] of [
-    [390, 844],
-    [360, 740],
-    [1280, 800],
-    [360, 520],
+  // Com espaço (390×844, 1280×800) o artigo aberto faz a folha crescer, como no mockup (de 456 para 587 px em 390 px de largura).
+  // Sem espaço (360×520) ela fica no teto e o conteúdo rola dentro dela, com o artigo aberto rolado até a vista.
+  for (const [w, h, comEspaco] of [
+    [390, 844, true],
+    [1280, 800, true],
+    [360, 520, false],
   ] as const) {
     await page.setViewportSize({ width: w, height: h });
-    const quadro = await caderno.boundingBox();
-    const folha = await corpo.boundingBox();
-    const dele = await titulo.boundingBox();
-    if (!quadro || !folha || !dele) throw new Error('faltou uma caixa para medir');
-    const esperada = Math.min(ALTURA_DA_FOLHA_DO_CADERNO, quadro.height - FOLGA_ATE_O_TITULO);
-    expect(Math.abs(folha.height - esperada), `${String(w)}×${String(h)}`).toBeLessThan(1.5);
-    expect(
-      dele.y + dele.height,
-      `${String(w)}×${String(h)}: o título do Varal`,
-    ).toBeLessThanOrEqual(folha.y + 0.5);
+    const onde = `${String(w)}×${String(h)}`;
+    const primeiro = await caderno.boundingBox();
+    if (!primeiro) throw new Error(`${onde}: faltou a caixa do quadro`);
+    const teto = Math.min(primeiro.height * 0.9, primeiro.height - FOLGA_ATE_O_TITULO);
+    // A folha fica encostada no fundo do quadro; mede-se o corpo só depois que ele chega lá (a subida de 400 ms do Calmo acaba antes).
+    // O quadro e o título são medidos junto: em janela mais baixa que o quadro a página rola e tudo sobe de uma vez.
+    const medir = async (estado: string) => {
+      type Caixa = { y: number; height: number };
+      const achada: { folha: Caixa | null; quadro: Caixa | null; titulo: Caixa | null } = {
+        folha: null,
+        quadro: null,
+        titulo: null,
+      };
+      await expect
+        .poll(
+          async () => {
+            achada.folha = await corpo.boundingBox();
+            achada.quadro = await caderno.boundingBox();
+            achada.titulo = await titulo.boundingBox();
+            return achada.folha && achada.quadro
+              ? Math.abs(
+                  achada.folha.y + achada.folha.height - (achada.quadro.y + achada.quadro.height),
+                )
+              : Number.POSITIVE_INFINITY;
+          },
+          { message: `${onde}, ${estado}: a folha chega ao fundo do quadro` },
+        )
+        .toBeLessThan(1.5);
+      if (!achada.folha || !achada.titulo) throw new Error(`${onde}, ${estado}: faltou uma caixa`);
+      return { folha: achada.folha, titulo: achada.titulo };
+    };
+    const parada = await medir('parada');
+
+    await ler.click();
+    await expect(lei).toBeVisible();
+    await expect(lei).toBeInViewport({ ratio: 1 });
+    const aberta = await medir('aberta');
+
+    // Parada ou com o artigo aberto, a folha não passa do teto: o topo dela fica abaixo do título do Varal.
+    for (const [estado, medida] of [
+      ['parada', parada],
+      ['aberta', aberta],
+    ] as const) {
+      expect(medida.folha.height, `${onde}, ${estado}: a altura da folha`).toBeLessThanOrEqual(
+        teto + 1,
+      );
+      expect(
+        medida.titulo.y + medida.titulo.height,
+        `${onde}, ${estado}: o título do Varal`,
+      ).toBeLessThanOrEqual(medida.folha.y + 0.5);
+    }
+    if (comEspaco) {
+      expect(aberta.folha.height, `${onde}: a folha cresce com o artigo`).toBeGreaterThan(
+        parada.folha.height + 60,
+      );
+    } else {
+      expect(Math.abs(aberta.folha.height - teto), `${onde}: no teto`).toBeLessThan(1.5);
+      expect(
+        await corpo.evaluate((el) => el.scrollHeight > el.clientHeight + 1),
+        `${onde}: o conteúdo rola dentro da folha`,
+      ).toBe(true);
+    }
+    await ler.click();
+    await expect(lei).toBeHidden();
   }
 
-  // O conteúdo (a lista inteira e o pé) é maior que a folha e rola dentro dela.
-  await page.setViewportSize({ width: 390, height: 844 });
-  expect(await corpo.evaluate((el) => el.scrollHeight > el.clientHeight + 1)).toBe(true);
-
-  // "Ler na lei" aberto não faz a folha crescer nem subir: o corpo fica onde estava e o artigo rola até a vista.
-  const antes = await corpo.boundingBox();
-  const ler = caderno.locator('.m-frase-item').nth(1).getByRole('button', { name: 'Ler na lei' });
-  await ler.click();
-  const lei = caderno.locator('.m-lei');
-  await expect(lei).toBeVisible();
-  await expect(lei).toBeInViewport({ ratio: 1 });
-  const depois = await corpo.boundingBox();
-  expect(depois?.height).toBeCloseTo(antes?.height ?? -1, 0);
-  expect(depois?.y).toBeCloseTo(antes?.y ?? -1, 0);
-  await ler.click();
-  await expect(lei).toBeHidden();
-
   // O pé: "Abrir a lista completa" é um link com seta, pequeno e à esquerda, não um botão largo (o "Mostrar mais" só entra com mais de 50).
+  await page.setViewportSize({ width: 390, height: 844 });
   const lista = caderno.getByRole('button', { name: 'Abrir a lista completa' });
   await lista.scrollIntoViewIfNeeded();
   await expect(lista).toBeInViewport({ ratio: 1 });

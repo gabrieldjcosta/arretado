@@ -149,7 +149,7 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     render(<Cena repo={repo} />);
     const caderno = await abrirCaderno();
     expect(caderno).toHaveAttribute('aria-modal', 'true');
-    // O corpo da folha leva a classe que lhe dá a altura fixa do mockup (a folha não cresce, o conteúdo rola dentro).
+    // O corpo da folha leva a classe que lhe põe o teto abaixo do título do Varal (cresce como a do mockup até lá; dali em diante o conteúdo rola dentro).
     expect(caderno.querySelector('.m-corpo')).toHaveClass('m-caderno');
     expect(within(caderno).getByText('Varal · Frases')).toHaveClass('m-olho');
     expect(within(caderno).getByRole('heading', { level: 2 })).toHaveTextContent(
@@ -213,7 +213,7 @@ describe('o Caderno de Frases no quadro do mockup', () => {
     await usuario.click(botao);
     expect(botao).toHaveAttribute('aria-expanded', 'true');
     expect(lei).not.toHaveAttribute('hidden');
-    // A folha tem altura fixa: o artigo que abre embaixo da Frase rola até a vista (sem suavidade, no padrão dos testes).
+    // No teto da folha o artigo que abre embaixo da Frase pode ficar fora da vista: ele rola até lá (sem suavidade, no padrão dos testes).
     expect(rolar).toHaveBeenCalledTimes(1);
     expect(rolar).toHaveBeenCalledWith({ block: 'nearest', behavior: 'auto' });
     expect(rolar.mock.contexts[0]).toBe(lei);
