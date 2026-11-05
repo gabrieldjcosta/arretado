@@ -1,5 +1,6 @@
 // O quanto a interface se mexe (D-D7, "A caneta que desenha"). Lido na hora de usar e nunca guardado:
 // o sistema pode mudar a preferência com o app aberto, e o perfil de estudo muda em Conta.
+import { movimentoEscolhidoAgora } from './movimento-escolhido';
 
 /**
  * `reduzido`: nada anda (o quadro já aparece pronto, o cartão troca sem passar). `calmo`: o Dia se
@@ -26,8 +27,15 @@ export function movimentoDoPerfil(perfil: string | undefined): Movimento {
  * perfil). Quem decide logo ao montar, antes de o `AplicarAparencia` ter lido as Preferências, lê o
  * perfil delas e usa `movimentoDoPerfil`.
  */
-export const movimentoAgora = (): Movimento =>
-  movimentoDoPerfil(document.documentElement.dataset.perfil);
+/** O "Movimento" escolhido na Conta do Fio vale sobre o perfil: "vivo" tira o Calmo de quem o tem, "calmo" o põe. */
+const perfilEfetivo = (): string | undefined => {
+  const escolhido = movimentoEscolhidoAgora();
+  if (escolhido === 'vivo') return undefined;
+  if (escolhido === 'calmo') return 'calmo';
+  return document.documentElement.dataset.perfil;
+};
+
+export const movimentoAgora = (): Movimento => movimentoDoPerfil(perfilEfetivo());
 
 /** Seno suave de 0 a 1: o traço do Dia sai devagar, anda e assenta. */
 export const suave = (progresso: number): number => 0.5 - 0.5 * Math.cos(Math.PI * progresso);

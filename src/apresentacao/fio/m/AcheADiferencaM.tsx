@@ -29,7 +29,7 @@ function palavras(texto: string): string[] {
  * O passo "Ache a diferença": dois artigos parecidos, um sobre o outro (lado a lado em tela larga), e a
  * pessoa toca nas palavras que os separam. Tocar numa palavra igual nos dois não custa nada; "Mostrar a
  * diferença" grifa o que faltou. Peças do cartão "Ache o erro" do mockup (`data-cartao="achar"`): a palavra
- * que se toca, o grifo que chega na mola, o retorno e o rodapé que entra depois (desvio 45).
+ * que se toca, o grifo que chega na mola, o retorno e o rodapé que entra depois (desvio 47).
  */
 export function AcheADiferencaM({
   passo,

@@ -4,6 +4,7 @@ import { useRepositorio } from '../../dados/contexto';
 import { DialogoDoLembrete } from '../../hoje/DialogoDoLembrete';
 import { useDadosDoFio } from '../dados/sem-vazio';
 import { animar, espera, modoAgora, MOLA, useSinal } from './anima';
+import { CadernoM } from './CadernoM';
 import { useOrganizacao, type Organizacao } from './organizar';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
@@ -13,8 +14,8 @@ import { contar } from './varal-lista';
 
 /**
  * O Varal, a tela `varal` do mockup aprovado: o que a pessoa guardou, pendurado em dois fios, seis folhetos com um número
- * miúdo e uma linha de estado, e uma busca única no alto. Cada folheto abre o seu (`/varal/normas`, `/varal/sumulas`); os que
- * ainda não têm folheto novo abrem a tela de antes, e o Lembrete abre a nota.
+ * miúdo e uma linha de estado, e uma busca única no alto. Cada folheto abre o seu (`/varal/normas`, `/varal/sumulas`); as Frases
+ * abrem o Caderno, uma folha que sobe; os que ainda não têm folheto novo abrem a tela de antes, e o Lembrete abre a nota.
  */
 
 type IdDoFolheto = 'normas' | 'sumulas' | 'textos' | 'frases' | 'cartoes' | 'lembretes';
@@ -24,7 +25,7 @@ interface Folheto {
   nome: string;
   /** O desenho de xilogravura: um traço só, numa grade de 48 por 48 (o do mockup). */
   desenho: string;
-  /** Para onde abre; sem isso o folheto abre o Lembrete, que é uma nota. */
+  /** Para onde abre; sem isso o folheto abre uma folha: o Caderno de Frases ou, no Lembrete, a nota. */
   para?: string;
 }
 
@@ -59,7 +60,6 @@ const LINHAS: readonly { rotulo: string; folhetos: readonly Folheto[] }[] = [
         id: 'frases',
         nome: 'Frases',
         desenho: 'M10 14 h28 M10 24 h28 M10 34 h18 M34 34 l4 4',
-        para: '/recall/frases',
       },
       {
         id: 'cartoes',
@@ -147,7 +147,7 @@ function Busca({
   aoAbrir,
   aoBuscar,
 }: {
-  aoAbrir: (para: string) => void;
+  aoAbrir: (achado: Achado) => void;
   /** Avisa quando há (ou deixa de haver) algo digitado: com ele, a lista de achados toma o lugar dos fios. */
   aoBuscar: (buscando: boolean) => void;
 }) {
@@ -188,7 +188,7 @@ function Busca({
     if (e.key !== 'Enter') return;
     e.preventDefault();
     const primeiro = consulta === '' ? undefined : achados?.[0];
-    if (primeiro) aoAbrir(primeiro.para);
+    if (primeiro) aoAbrir(primeiro);
     else if (consulta === '') avisar('Digite um artigo, uma súmula ou uma palavra.');
   };
 
@@ -233,7 +233,7 @@ function Busca({
                 type="button"
                 className="m-abre"
                 onClick={() => {
-                  aoAbrir(a.para);
+                  aoAbrir(a);
                 }}
               >
                 <span className="m-nome">{a.nome}</span>
@@ -255,8 +255,11 @@ export function VaralM() {
   const varal = useRef<HTMLDivElement>(null);
   const [lembrando, setLembrando] = useState(false);
   const [buscando, setBuscando] = useState(false);
+  /** O Caderno de Frases aberto; `foco` é a Frase que a busca achou. */
+  const [caderno, setCaderno] = useState<{ foco?: string } | null>(null);
 
-  // O folheto é um pedaço à parte: pedido já aqui, abre sem esperar quando a pessoa toca num folheto.
+  // O folheto é um pedaço à parte: pedido já aqui, abre sem esperar quando a pessoa toca num folheto. O Caderno vem junto com o
+  // Varal (um `lazy` com `Suspense` faria a folha esperar 300 ms para subir: o React segura a revelação do que suspendeu).
   useEffect(() => {
     void import('./FolhetoM').catch(() => undefined);
   }, []);
@@ -290,6 +293,11 @@ export function VaralM() {
         { duration: 700, easing: 'ease-out' },
       );
     }
+    // As Frases abrem o Caderno logo que o folheto começa a balançar (o mockup não espera os 220 ms).
+    if (f.id === 'frases') {
+      setCaderno({});
+      return;
+    }
     if (f.para === undefined) {
       setLembrando(true);
       return;
@@ -309,8 +317,9 @@ export function VaralM() {
       <span className="m-olho">Varal</span>
       <h2 style={{ marginTop: 8 }}>O que você guardou, pendurado no fio.</h2>
       <Busca
-        aoAbrir={(para) => {
-          void navegar(para);
+        aoAbrir={(achado) => {
+          if (achado.tipo === 'frase') setCaderno({ foco: achado.fraseId });
+          else void navegar(achado.para);
         }}
         aoBuscar={setBuscando}
       />
@@ -350,6 +359,14 @@ export function VaralM() {
           </div>
         ))}
       </div>
+      {caderno && (
+        <CadernoM
+          foco={caderno.foco}
+          aoFechar={() => {
+            setCaderno(null);
+          }}
+        />
+      )}
       <DialogoDoLembrete
         aberto={lembrando}
         aoFechar={() => {

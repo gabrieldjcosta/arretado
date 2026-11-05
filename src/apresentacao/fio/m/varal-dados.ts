@@ -53,7 +53,8 @@ export async function carregarDadosDoVaral(repo: Repositorio): Promise<DadosDoVa
     leiturasPorNorma(repo),
     listarResumos(repo),
     repo.colecao('precedentes').contar(),
-    repo.colecao('frases').contar(),
+    // As arquivadas não estão no Caderno: o número do folheto é o das Frases que ele mostra.
+    repo.colecao('frases').contar({ filtro: (f) => f.estado === 'ativa' }),
     contarFrasesVencidas(repo),
     repo.colecao('cartoes').contar(),
     contarVencidos(repo),

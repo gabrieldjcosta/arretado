@@ -1,5 +1,6 @@
 // A busca única do alto do Varal (plano, "Dentro do Varal"): "112 LEP" abre o artigo, "711" lista a súmula, uma palavra lista
-// as normas que a têm no nome. Só olha o que a pessoa guardou e não tirou do varal. As Frases entram com o folheto delas.
+// as normas que a têm no nome, e uma frase das que a pessoa guardou abre o Caderno de Frases nela. Só olha o que a pessoa guardou
+// e não tirou do varal.
 import type { Norma } from '../../../core/modelo';
 import type { Repositorio } from '../../../core/persistencia';
 import {
@@ -9,18 +10,37 @@ import {
 } from '../../../dominios/legislacao/busca';
 import { abrirNorma, normasPublicadas } from '../../../dominios/legislacao/leitor';
 import { analisarSumula, analisarTese } from '../../../dominios/legislacao/sumulas';
+import { listarFrases } from '../../../dominios/recall/servico';
 import { referenciaDoNo } from '../../biblioteca/linhas';
 
-export interface Achado {
+export type Achado = {
   chave: string;
   nome: string;
   detalhe: string;
-  /** A rota que abre (o Leitor, no artigo ou na súmula quando houver). */
-  para: string;
-}
+} & (
+  | {
+      tipo: 'rota';
+      /** A rota que abre (o Leitor, no artigo ou na súmula quando houver). */
+      para: string;
+    }
+  | {
+      /** Uma Frase: abre o Caderno de Frases, rolado até ela. */
+      tipo: 'frase';
+      fraseId: string;
+    }
+);
 
 /** O máximo de achados na lista: ela é um atalho, não um relatório. */
 const LIMITE = 12;
+
+/** Quantas Frases se leem para a busca (as mais novas): a página cheia do banco, como a lista de antes. */
+const FRASES_LIDAS = 200;
+
+/** A Frase como nome do achado: numa linha só, até 80 letras. */
+function aparar(texto: string): string {
+  const linha = texto.replace(/\s+/gu, ' ').trim();
+  return linha.length <= 80 ? linha : `${linha.slice(0, 79).trimEnd()}…`;
+}
 
 const ehColecao = (n: Norma) => n.especie === 'sumulas' || n.especie === 'teses';
 
@@ -83,6 +103,7 @@ export async function acharNoVaral(
       chave: `${n.id}#${achado.endereco}`,
       nome: rotulo === '' ? n.tituloCurto : `${n.tituloCurto}, ${comoSeCita(rotulo)}`,
       detalhe: 'abre no Leitor',
+      tipo: 'rota',
       para: `/biblioteca/normas/${n.id}?ir=${achado.endereco}`,
     });
   }
@@ -102,6 +123,7 @@ export async function acharNoVaral(
         chave: `${c.id}#${endereco}`,
         nome: no.dispositivo.rotulo ?? endereco,
         detalhe: c.tituloCurto,
+        tipo: 'rota',
         para: `/biblioteca/normas/${c.id}?ir=${endereco}`,
       });
     }
@@ -114,7 +136,23 @@ export async function acharNoVaral(
       chave: n.id,
       nome: n.tituloCurto,
       detalhe: n.especie === 'teses' ? 'teses' : n.especie === 'sumulas' ? 'súmulas' : 'norma',
+      tipo: 'rota',
       para: `/biblioteca/normas/${n.id}`,
+    });
+  }
+
+  // As Frases que a pessoa guardou: todas as palavras da busca no texto (sem caixa nem acento), da mais nova à mais velha.
+  const palavras = consulta.split(' ');
+  const frases = await listarFrases(repo, {}, null, FRASES_LIDAS).catch(() => undefined);
+  for (const f of frases?.itens ?? []) {
+    const alvo = consultaDeBusca(f.texto);
+    if (!palavras.every((p) => alvo.includes(p))) continue;
+    pôr({
+      chave: `frase:${f.id}`,
+      nome: aparar(f.texto),
+      detalhe: 'Frase',
+      tipo: 'frase',
+      fraseId: f.id,
     });
   }
   return achados.slice(0, LIMITE);

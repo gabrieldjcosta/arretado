@@ -3,21 +3,67 @@ import {
   animacoesVistas,
   expect,
   importarEPublicar,
+  irAoRegistroPeloMais,
   registrarAnimacoes,
   semViolacoesNoFio,
   test,
 } from './apoio';
 
-// O Varal e o folheto do Arretado novo (prévia do Fio): as telas `varal` e `folheto` do mockup aprovado, com as folhas que
-// sobem (Organizar e o que fazer com a linha). O jsdom não mede layout, cor nem tempo; aqui o navegador confere que as
-// duas telas cabem (360 e 1280), passam no axe e na medida de contraste dos pixels nos dois mundos, que as folhas sobem,
-// prendem o foco e fecham de todo jeito (Escape, alça, véu, arrasto), que segurar a linha abre a folha sem abrir a norma,
-// que "Escolher vários" tira em lote com "Desfazer", e que o Varal se mexe como o mockup (folhetos, linhas, folhas, fio).
+// O Varal, o folheto e o Caderno de Frases do Arretado novo (prévia do Fio): as telas `varal` e `folheto` do mockup aprovado
+// e a folha `folha-caderno`, com as folhas que sobem (Organizar, o que fazer com a linha, o Caderno). O jsdom não mede
+// layout, cor nem tempo; aqui o navegador confere que as telas cabem (360 e 1280), passam no axe e na medida de contraste
+// dos pixels nos dois mundos, que as folhas sobem, prendem o foco e fecham de todo jeito (Escape, alça, véu, arrasto), que
+// segurar a linha abre a folha sem abrir a norma, que "Escolher vários" tira em lote com "Desfazer", que a busca acha
+// norma, artigo e Frase, e que o Varal se mexe como o mockup (folhetos, linhas, folhas, fio, Frases).
 
 const CSV = 'Disciplina;Código;Ponto;Faixa\nExecução Penal;1;Progressão de regime;Alta\n';
 
-/** A LEP e a ECA importadas e guardadas, e a prévia ligada. Com `comEdital`, a prova pelo CSV (o Agora ganha o fio). */
-async function prepararOVaral(page: Page, opcoes: { comEdital?: boolean; soLep?: boolean } = {}) {
+/**
+ * Duas Frases pelos caminhos do app de antes: uma tirada da lei (o Leitor, "Enviar às frases") e, depois, uma de um erro (o
+ * "+", "Registrar erro"). O trecho da lei é selecionado pelo DOM, como o toque longo do Android o faria. A do erro é a mais
+ * nova; a da lei tem o "Ler na lei". Começa na lista da Biblioteca com a LEP guardada.
+ */
+const FRASE_DA_LEI = 'A pena só avança no prazo que a lei marca.';
+const FRASE_DO_ERRO = 'Livramento exige os requisitos do art. 83 do CP.';
+async function guardarAsFrases(page: Page) {
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  // O primeiro termo que o app acende na lei (um prazo, uma condição) e o dispositivo onde ele está.
+  const termo = page.locator('.texto-vigente .destaque').first();
+  await expect(termo).toBeVisible();
+  await termo.evaluate((el) => {
+    const no = document.createTreeWalker(el, NodeFilter.SHOW_TEXT).nextNode();
+    if (!no) throw new Error('o termo aceso não tem texto');
+    const faixa = document.createRange();
+    faixa.selectNodeContents(no);
+    const selecao = document.getSelection();
+    selecao?.removeAllRanges();
+    selecao?.addRange(faixa);
+  });
+  const acoes = page.getByRole('group', { name: 'Marcar o trecho selecionado' });
+  await acoes.getByRole('button', { name: 'Enviar às frases' }).click();
+  const envio = page.getByRole('dialog', { name: 'Enviar às frases' });
+  await expect(envio).toBeVisible();
+  await envio.getByRole('textbox', { name: 'Frase' }).fill(FRASE_DA_LEI);
+  await envio.getByRole('button', { name: 'Enviar' }).click();
+  await expect(envio).toBeHidden();
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await irAoRegistroPeloMais(page);
+  await page.getByLabel('Frase correta').fill(FRASE_DO_ERRO);
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Frase registrada.')).toBeVisible();
+}
+
+/**
+ * A LEP e a ECA importadas e guardadas, e a prévia ligada. Com `comEdital`, a prova pelo CSV (o Agora ganha o fio); com
+ * `comFrases`, as duas Frases de `guardarAsFrases`.
+ */
+async function prepararOVaral(
+  page: Page,
+  opcoes: { comEdital?: boolean; soLep?: boolean; comFrases?: boolean } = {},
+) {
   if (opcoes.comEdital) {
     await page.goto('/#/plano');
     await page.getByRole('button', { name: 'Trazer meu edital' }).click();
@@ -31,6 +77,7 @@ async function prepararOVaral(page: Page, opcoes: { comEdital?: boolean; soLep?:
   }
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   if (!opcoes.soLep) await importarEPublicar(page, 'eca-compilado', 'ECA');
+  if (opcoes.comFrases) await guardarAsFrases(page);
   await page.goto('/#/fio/ligar');
   await expect(nav(page)).toBeVisible();
 }
@@ -541,6 +588,360 @@ test('o Varal se mexe como o mockup: os folhetos descem do fio com a mola, as li
   await expect(page.getByRole('dialog')).toHaveCount(0);
   const depois = await animacoesVistas(page);
   const desce = depois.filter(
+    (a) =>
+      a.classes.includes('corpo') && a.duracao === 300 && a.easing === 'cubic-bezier(.4,0,1,1)',
+  );
+  expect(desce).toHaveLength(1);
+});
+
+interface Subida {
+  toque?: number;
+  folha?: number;
+}
+
+/** O Caderno de Frases aberto pelo folheto "Frases" (o Varal, com as duas Frases guardadas). */
+async function abrirOCaderno(page: Page) {
+  await irAoVaral(page);
+  await expect(folheto(page, 'Frases').locator('.m-conta-f')).toHaveText('2');
+  // Anota quando o toque chega e quando a folha entra no quadro (`msAteAFolhaSubir`).
+  await page.evaluate(() => {
+    const w = window as unknown as { __subida: Subida };
+    w.__subida = {};
+    document.addEventListener(
+      'click',
+      () => {
+        w.__subida.toque = performance.now();
+      },
+      { capture: true, once: true },
+    );
+    new MutationObserver((registros) => {
+      for (const r of registros) {
+        for (const n of r.addedNodes) {
+          if (n instanceof Element && n.matches('[role="dialog"]'))
+            w.__subida.folha ??= performance.now();
+        }
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+  await folheto(page, 'Frases').click();
+  const caderno = page.getByRole('dialog', { name: 'Suas Frases certas' });
+  await expect(caderno).toBeVisible();
+  await expect(caderno.getByRole('listitem')).toHaveCount(2);
+  return caderno;
+}
+
+/**
+ * Quantos ms passam do toque até a folha entrar no quadro. Com um `lazy` e um `Suspense` no caminho, o React segura a
+ * revelação por 300 ms (o jsdom não vê isso: lá tudo resolve no mesmo tique); sem eles, é na hora.
+ */
+async function msAteAFolhaSubir(page: Page): Promise<number> {
+  const { toque, folha } = await page.evaluate(
+    () => (window as unknown as { __subida: Subida }).__subida,
+  );
+  if (toque === undefined || folha === undefined) throw new Error('a folha não entrou no quadro');
+  return folha - toque;
+}
+
+test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e no contraste dos pixels nos dois mundos, e "Ler na lei" abre o artigo', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await page.setViewportSize({ width: 360, height: 740 });
+  const caderno = await abrirOCaderno(page);
+  // Sem sair do Varal; o foco entra na folha; o resto do quadro fica trancado.
+  await expect(page).toHaveURL(/#\/varal$/);
+  await expect.poll(() => focoNaFolha(page)).toBe(true);
+  await expect(page.locator('.m-nav')).toHaveAttribute('inert', '');
+
+  // A mais nova primeiro: a do erro (sem artigo, sem "Ler na lei"), depois a da lei.
+  const itens = caderno.locator('.m-frase-item');
+  await expect(itens.nth(0).locator('.m-texto')).toHaveText(FRASE_DO_ERRO);
+  // Só a mais nova acende a borda (a que acabou de entrar), mesmo que a outra também seja de hoje.
+  await expect(itens.nth(0)).toHaveClass(/m-nova/);
+  await expect(itens.nth(1)).not.toHaveClass(/m-nova/);
+  await expect(itens.nth(0).locator('.m-meta')).toHaveText(/^De um erro · volta amanhã$/);
+  await expect(itens.nth(0).getByRole('button')).toHaveCount(0);
+  await expect(itens.nth(1).locator('.m-texto')).toHaveText(FRASE_DA_LEI);
+  await expect(itens.nth(1).locator('.m-meta')).toHaveText(/^Da lei · LEP, .+ · volta amanhã$/);
+
+  for (const [w, h] of [
+    [360, 740],
+    [1280, 800],
+  ] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await expect(itens.first()).toBeVisible();
+    await dentroDaLargura(
+      page,
+      '.m-folha .m-corpo, .m-frase-item, .m-fim-folha .m-lista-completa',
+      w,
+    );
+    await semRolagemLateral(page);
+    // O corpo da folha cabe na tela, embaixo.
+    const corpo = await caderno.locator('.m-corpo').boundingBox();
+    expect((corpo?.y ?? -1) + (corpo?.height ?? 0)).toBeLessThanOrEqual(h + 1);
+    await semViolacoesNoFio(page);
+  }
+
+  // "Ler na lei": abre o artigo com os trechos que o app grifa, e ele também passa no axe e no contraste.
+  const ler = itens.nth(1).getByRole('button', { name: 'Ler na lei' });
+  await expect(ler).toHaveAttribute('aria-expanded', 'false');
+  await expect(caderno.locator('.m-lei')).toBeHidden();
+  await ler.click();
+  await expect(ler).toHaveAttribute('aria-expanded', 'true');
+  const lei = itens.nth(1).locator('.m-lei');
+  await expect(lei).toBeVisible();
+  // A folha tem altura fixa: o artigo que abre embaixo da Frase rola até a vista, inteiro.
+  await expect(lei).toBeInViewport({ ratio: 1 });
+  await expect(lei.locator('.m-art')).toContainText('LEP, ');
+  expect(await lei.locator('.m-grifo').count()).toBeGreaterThan(0);
+  for (const [w, h] of [
+    [360, 740],
+    [1280, 800],
+  ] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await expect(lei).toBeVisible();
+    await dentroDaLargura(page, '.m-frase-item .m-lei, .m-frase-item .m-lei p', w);
+    await semRolagemLateral(page);
+    await semViolacoesNoFio(page);
+  }
+  await ler.click();
+  await expect(lei).toBeHidden();
+
+  // Escape fecha a folha, o fundo destranca e o foco volta ao folheto de onde ela subiu.
+  await page.keyboard.press('Escape');
+  await expect(caderno).toBeHidden();
+  await expect(page.locator('.m-nav')).not.toHaveAttribute('inert', '');
+  await expect(folheto(page, 'Frases')).toBeFocused();
+  await expect(page).toHaveURL(/#\/varal$/);
+
+  // A lista de antes está a um toque: "Abrir a lista completa" desce a folha e leva a ela.
+  await folheto(page, 'Frases').click();
+  await expect(caderno).toBeVisible();
+  await caderno.getByRole('button', { name: 'Abrir a lista completa' }).click();
+  await expect(page).toHaveURL(/#\/recall\/frases$/);
+  await expect(page.getByRole('link', { name: FRASE_DO_ERRO, exact: true })).toBeVisible();
+});
+
+/** Onde termina o título do Varal, medido do alto do quadro (100 px), mais a folga que o teto da folha deixa (`ajustes.css`, desvio 41). */
+const FOLGA_ATE_O_TITULO = 112;
+
+test('a folha do Caderno cresce como a do mockup, mas nunca passa do título do Varal; no teto o conteúdo rola dentro dela', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const caderno = await abrirOCaderno(page);
+  const corpo = caderno.locator('.m-corpo');
+  const titulo = page.locator('.m-app h2', { hasText: /pendurado no fio/ });
+  const ler = caderno.locator('.m-frase-item').nth(1).getByRole('button', { name: 'Ler na lei' });
+  const lei = caderno.locator('.m-lei');
+
+  // Com espaço (390×844, 1280×800) o artigo aberto faz a folha crescer, como no mockup (de 456 para 587 px em 390 px de largura).
+  // Sem espaço (360×520) ela fica no teto e o conteúdo rola dentro dela, com o artigo aberto rolado até a vista.
+  for (const [w, h, comEspaco] of [
+    [390, 844, true],
+    [1280, 800, true],
+    [360, 520, false],
+  ] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    const onde = `${String(w)}×${String(h)}`;
+    const primeiro = await caderno.boundingBox();
+    if (!primeiro) throw new Error(`${onde}: faltou a caixa do quadro`);
+    const teto = Math.min(primeiro.height * 0.9, primeiro.height - FOLGA_ATE_O_TITULO);
+    // A folha fica encostada no fundo do quadro; mede-se o corpo só depois que ele chega lá (a subida de 400 ms do Calmo acaba antes).
+    // O quadro e o título são medidos junto: em janela mais baixa que o quadro a página rola e tudo sobe de uma vez.
+    const medir = async (estado: string) => {
+      type Caixa = { y: number; height: number };
+      const achada: { folha: Caixa | null; quadro: Caixa | null; titulo: Caixa | null } = {
+        folha: null,
+        quadro: null,
+        titulo: null,
+      };
+      await expect
+        .poll(
+          async () => {
+            achada.folha = await corpo.boundingBox();
+            achada.quadro = await caderno.boundingBox();
+            achada.titulo = await titulo.boundingBox();
+            return achada.folha && achada.quadro
+              ? Math.abs(
+                  achada.folha.y + achada.folha.height - (achada.quadro.y + achada.quadro.height),
+                )
+              : Number.POSITIVE_INFINITY;
+          },
+          { message: `${onde}, ${estado}: a folha chega ao fundo do quadro` },
+        )
+        .toBeLessThan(1.5);
+      if (!achada.folha || !achada.titulo) throw new Error(`${onde}, ${estado}: faltou uma caixa`);
+      return { folha: achada.folha, titulo: achada.titulo };
+    };
+    const parada = await medir('parada');
+
+    await ler.click();
+    await expect(lei).toBeVisible();
+    await expect(lei).toBeInViewport({ ratio: 1 });
+    const aberta = await medir('aberta');
+
+    // Parada ou com o artigo aberto, a folha não passa do teto: o topo dela fica abaixo do título do Varal.
+    for (const [estado, medida] of [
+      ['parada', parada],
+      ['aberta', aberta],
+    ] as const) {
+      expect(medida.folha.height, `${onde}, ${estado}: a altura da folha`).toBeLessThanOrEqual(
+        teto + 1,
+      );
+      expect(
+        medida.titulo.y + medida.titulo.height,
+        `${onde}, ${estado}: o título do Varal`,
+      ).toBeLessThanOrEqual(medida.folha.y + 0.5);
+    }
+    if (comEspaco) {
+      expect(aberta.folha.height, `${onde}: a folha cresce com o artigo`).toBeGreaterThan(
+        parada.folha.height + 60,
+      );
+    } else {
+      expect(Math.abs(aberta.folha.height - teto), `${onde}: no teto`).toBeLessThan(1.5);
+      expect(
+        await corpo.evaluate((el) => el.scrollHeight > el.clientHeight + 1),
+        `${onde}: o conteúdo rola dentro da folha`,
+      ).toBe(true);
+    }
+    await ler.click();
+    await expect(lei).toBeHidden();
+  }
+
+  // O pé: "Abrir a lista completa" é um link com seta, pequeno e à esquerda, não um botão largo (o "Mostrar mais" só entra com mais de 50).
+  await page.setViewportSize({ width: 390, height: 844 });
+  const lista = caderno.getByRole('button', { name: 'Abrir a lista completa' });
+  await lista.scrollIntoViewIfNeeded();
+  await expect(lista).toBeInViewport({ ratio: 1 });
+  const caixaDoLink = await lista.boundingBox();
+  const frase = await caderno.locator('.m-frase-item').first().boundingBox();
+  if (!caixaDoLink || !frase) throw new Error('faltou uma caixa para medir');
+  expect(caixaDoLink.height).toBeLessThanOrEqual(48);
+  expect(caixaDoLink.width).toBeLessThan(frase.width * 0.7);
+  expect(caixaDoLink.x - frase.x).toBeLessThan(24);
+  await semViolacoesNoFio(page);
+});
+
+test('a busca do Varal acha uma Frase e abre o Caderno nela: a folha sobe, a Frase fica no meio, focada', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await irAoVaral(page);
+  const busca = page.getByRole('searchbox', { name: 'Buscar no Varal' });
+
+  // Uma palavra da Frase do erro: o achado diz "Frase"; as normas e os artigos não entram.
+  await busca.fill('livramento');
+  const achados = page.getByRole('region', { name: 'O que o Varal achou' });
+  const achado = achados.getByRole('button', { name: new RegExp(FRASE_DO_ERRO.slice(0, 20)) });
+  await expect(achado).toBeVisible();
+  await expect(achado).toContainText('Frase');
+  await expect(achados.getByRole('button')).toHaveCount(1);
+  await semViolacoesNoFio(page);
+
+  await achado.click();
+  const caderno = page.getByRole('dialog', { name: 'Suas Frases certas' });
+  await expect(caderno).toBeVisible();
+  await expect(page).toHaveURL(/#\/varal$/);
+  // A Frase achada é a focada (depois de o foco inicial da folha passar) e está à vista.
+  const achada = caderno.locator('.m-frase-item', { hasText: FRASE_DO_ERRO });
+  await expect(achada).toBeFocused();
+  await expect(achada).toBeInViewport();
+
+  // Fechar volta ao Varal com a busca onde estava.
+  await page.keyboard.press('Escape');
+  await expect(caderno).toBeHidden();
+  await expect(busca).toHaveValue('livramento');
+
+  // O Enter com a Frase como primeiro achado abre o Caderno do mesmo jeito.
+  await busca.focus();
+  await page.keyboard.press('Enter');
+  await expect(caderno).toBeVisible();
+  await expect(caderno.locator('.m-frase-item', { hasText: FRASE_DO_ERRO })).toBeFocused();
+});
+
+test('o brilho da Frase achada pela busca passa inteiro (1400 ms), sem ser cortado quando a descida dela acaba', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  await irAoVaral(page);
+  // Anota até onde o brilho (a animação de 1400 ms da Frase) chega: a descida da Frase (420 ms, com espera) acaba no meio dele,
+  // e quem soltasse `todas` as animações do elemento ao fim da descida cortaria o brilho antes do pico.
+  await page.evaluate(() => {
+    const w = window as unknown as { __brilho: number };
+    w.__brilho = 0;
+    const olhar = () => {
+      for (const a of document.getAnimations()) {
+        const alvo = a.effect instanceof KeyframeEffect ? a.effect.target : null;
+        if (
+          alvo instanceof Element &&
+          alvo.classList.contains('m-frase-item') &&
+          a.effect?.getTiming().duration === 1400
+        ) {
+          w.__brilho = Math.max(w.__brilho, Number(a.currentTime ?? 0));
+        }
+      }
+      requestAnimationFrame(olhar);
+    };
+    requestAnimationFrame(olhar);
+  });
+  await page.getByRole('searchbox', { name: 'Buscar no Varal' }).fill('livramento');
+  const achado = page
+    .getByRole('region', { name: 'O que o Varal achou' })
+    .getByRole('button', { name: new RegExp(FRASE_DO_ERRO.slice(0, 20)) });
+  await achado.click();
+  await expect(page.getByRole('dialog', { name: 'Suas Frases certas' })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __brilho: number }).__brilho), {
+      timeout: 6000,
+    })
+    .toBeGreaterThan(1300);
+});
+
+test('o Caderno de Frases se mexe como o mockup: a folha sobe em 460 ms, as Frases descem uma a uma em 420 ms e "Ler na lei" abre em 320 ms', async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await registrarAnimacoes(page);
+  await prepararOVaral(page, { soLep: true, comFrases: true });
+  const caderno = await abrirOCaderno(page);
+
+  // A folha sobe logo ao toque, sem esperar nada (o mockup também não espera).
+  expect(await msAteAFolhaSubir(page)).toBeLessThan(150);
+
+  const vistas = await animacoesVistas(page);
+  // A folha sobe com o repique em 460 ms (o véu em 300 ms), como as outras folhas.
+  const corpo = vistas.filter((a) => a.classes.includes('corpo') && a.duracao === 460);
+  expect(corpo).toHaveLength(1);
+  expect(corpo[0]?.easing).toBe('cubic-bezier(.2,.7,.2,1)');
+  // As Frases descem 12 px, 420 ms, 120 ms de espera e 60 a mais por Frase (o `abrirCaderno` do mockup).
+  const dasFrases = vistas.filter((a) => a.classes.includes('frase-item') && a.duracao === 420);
+  expect(dasFrases.map((a) => a.atraso)).toEqual([120, 180]);
+  expect(new Set(dasFrases.map((a) => a.easing))).toEqual(new Set(['cubic-bezier(.2,.7,.2,1)']));
+  expect(dasFrases[0]?.props).toBe('opacity,transform');
+
+  // "Ler na lei" abre em 320 ms (o `lerJunto` do mockup); fechar não anima.
+  expect(vistas.filter((a) => a.classes.includes('lei') && a.duracao === 320)).toHaveLength(0);
+  await caderno.getByRole('button', { name: 'Ler na lei' }).click();
+  await expect(caderno.locator('.m-lei')).toBeVisible();
+  const abrindo = (await animacoesVistas(page)).filter(
+    (a) => a.classes.includes('lei') && a.duracao === 320,
+  );
+  expect(abrindo).toHaveLength(1);
+  expect(abrindo[0]?.easing).toBe('cubic-bezier(.2,.7,.2,1)');
+
+  // A folha desce em 300 ms ao fechar.
+  await page.keyboard.press('Escape');
+  await expect(caderno).toBeHidden();
+  const desce = (await animacoesVistas(page)).filter(
     (a) =>
       a.classes.includes('corpo') && a.duracao === 300 && a.easing === 'cubic-bezier(.4,0,1,1)',
   );
