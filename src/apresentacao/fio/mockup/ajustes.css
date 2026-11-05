@@ -715,6 +715,7 @@
 .m-fio.m-fio .m-dias-fio-regra b {
   color: var(--m-texto);
   font-weight: 700;
+}
 
 /* Desvio 40: enquanto a abertura roda, as telas do quadro esperam por baixo, escondidas (`data-entrada` no quadro). Motivo:
    no mockup todas as telas já existem e a abertura mede onde o ponto vai pousar na seguinte (`medir()`); no app a tela
