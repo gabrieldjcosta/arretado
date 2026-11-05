@@ -37,7 +37,8 @@ Quem retoma confere branch, commit e alterações locais antes de editar; se nã
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
 - Escolhas técnicas: seguir T1–T24 (`docs/decisoes-tecnicas.md`); nova escolha técnica relevante é decidida com o Gabriel e registrada lá.
-- Definição de pronto: `npm run check` verde (lint, tipos, testes, auditoria); E2E verde quando houver tela; problemas encontrados (e os previsíveis da próxima etapa) registrados em `docs/solucao-de-problemas.md`; termo ou identificador novo registrado em `docs/glossario.md`.
+- Definição de pronto: `npm run check` verde (lint, tipos, testes, auditoria); E2E verde quando houver tela; problemas encontrados (e os previsíveis da próxima etapa) registrados em `docs/solucao-de-problemas.md`; termo ou identificador novo registrado em `docs/glossario.md`. Entrada nova desses registros (e de desvios e decisões de design) vai em `docs/entradas/`, não no fim do arquivo.
+- **Estratégia de desenvolvimento (05/11/2026):** regras de branch, revisão, arquivo quente, modelo e memória em `docs/planos/estrategia-de-desenvolvimento.md`. Antes de editar arquivo que outra thread mexeu: `npm run licoes -- <arquivo>`. Os hooks do `.claude/` não são garantidos nas threads da nuvem: lá o check é à mão.
 
 ## Git
 Identidade global configurada (Gabriel Costa <gabrieldjcosta@gmail.com>). Remoto **público** (decisão de 15/10/2026: a cota de repositório privado acabou; nada de segredo, chave ou dado de estudo no código): https://github.com/gabrieldjcosta/arretado (origin, branch main). GitHub CLI autenticado como gabrieldjcosta.

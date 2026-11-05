@@ -47,3 +47,23 @@ describe('origensDoBuild (F4-A)', () => {
     expect(cabecalhosHospedagem(csp)).toContain(`Content-Security-Policy: ${csp};`);
   });
 });
+
+describe('CSP em <meta> (casca nativa, Fase 0 do plano de apps)', () => {
+  const IGNORADAS_NA_META = ['frame-ancestors', 'report-uri', 'sandbox'];
+
+  it('não traz diretiva que a meta ignora, para valer igual dentro da casca', () => {
+    const nomes = CSP.split(';').map((d) => d.trim().split(' ')[0]);
+    for (const ignorada of IGNORADAS_NA_META) expect(nomes).not.toContain(ignorada);
+  });
+
+  it('com contas, o único acréscimo é a origem do Supabase no connect-src', () => {
+    const csp = montarCSP(origensDoBuild(true));
+    const diretivas = csp.split('; ').filter((d) => !d.startsWith('connect-src'));
+    expect(diretivas).toEqual(CSP.split('; ').filter((d) => !d.startsWith('connect-src')));
+    expect(csp).not.toMatch(/localhost|capacitor:|tauri:/);
+  });
+
+  it('o conteúdo cabe num atributo HTML sem aspas duplas', () => {
+    expect(CSP).not.toContain('"');
+  });
+});

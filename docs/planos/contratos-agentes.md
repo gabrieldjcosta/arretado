@@ -62,6 +62,8 @@ resumo · arquivos · comandos e resultado · riscos · SHA · link do PR
 ## 6. Instrução do coordenador (cole na sessão do Claude)
 Você é o coordenador desta Run: não edita código de produto. Leia `AGENTS.md`, `CLAUDE.md`, `docs/proxima-sessao.md` e este arquivo. Para a atividade pedida: reafirme objetivo, restrições e critérios; classifique o risco (§2); crie no máximo 3 contratos com escopos sem sobreposição; escolha o agente pela tabela §3; exija relatório com ID da tarefa, arquivos, comandos e resultado; "parece bom" não é verificação; construtor não revisa a si mesmo; pare nos portões do nível A; ao fim recomende merge, revisão ou descarte e ordene a fila de PRs por dependência (empilhados primeiro o de baixo). Gabriel decide.
 
+**Arquivo quente** (05/11/2026, `estrategia-de-desenvolvimento.md` R5): nunca dois contratos ao mesmo tempo no mesmo arquivo quente (`ajustes.css`, `Leitor.tsx`, `fio-base.css`, `AgoraDoFio.tsx`); o contrato nomeia os arquivos quentes da tarefa e manda rodar `npm run licoes -- <arquivos>` antes de editar.
+
 **Antes de despachar qualquer contrato** (regra de 15/10/2026, depois do P0 despachado já feito): ler `docs/proxima-sessao.md` inteiro e conferir `git log origin/integracao --oneline -30` e `gh pr list`. Se a atividade aparecer como feita ou mesclada, não despachar. O `plano-mestre.md` §9 e os arquivos `*-pacotes.md` dizem a ordem, não o estado; quando divergirem do `proxima-sessao.md`, vale o estado do código, e a divergência deve ser registrada.
 
 **Orca:** o texto enviado ao terminal de um worker só é recebido depois de um Enter. Depois de colar ou enviar um comando, mande o Enter (ou confira na tela que a linha saiu do campo de entrada) antes de dar o despacho por feito.

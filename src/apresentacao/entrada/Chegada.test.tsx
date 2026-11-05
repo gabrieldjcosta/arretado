@@ -325,7 +325,7 @@ describe('Chegada › o Começar', () => {
   it('"Entrar com o Google" grava o aceite e abre o login direto, sem passar pela tela Entrar', async () => {
     vi.stubEnv('VITE_CONTA', '1');
     const conta = new ServicoDeContaFalso();
-    const entrar = vi.spyOn(conta, 'entrarComGoogle');
+    const entrar = vi.spyOn(conta, 'entrarCom');
     const { usuario } = await ateOComecar(conta);
     expect(aceiteDoLoginPendente()).toBeNull();
     await usuario.click(screen.getByRole('button', { name: GOOGLE }));

@@ -169,6 +169,12 @@ export const Preferencias = z.strictObject({
    */
   reguaDeLeitura: z.boolean().optional(),
   /**
+   * Régua de foco no Leitor: 'frase' deixa acesa só a frase em leitura; 'palavras' deixa acesas só
+   * as palavras dos destaques (prazos, condições, absolutos e penas, o mesmo detector). Ausente é
+   * 'desligada'; o registro e o pacote anteriores continuam válidos (sem migração).
+   */
+  reguaDeFoco: z.enum(['desligada', 'frase', 'palavras']).optional(),
+  /**
    * Lente do modo foco (palco): 'cartao' (um artigo por vez) ou 'corrido'. Opcional: ausente é
    * 'cartao'; grava ao escolher no foco. Registro e pacote anteriores continuam válidos.
    */

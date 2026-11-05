@@ -98,7 +98,7 @@ async function ler(url: string): Promise<string> {
     headers: {
       'User-Agent': 'arretado-conferencia/1 (+https://github.com/gabrieldjcosta/arretado)',
     },
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(15_000),
     redirect: 'follow',
   });
   if (!r.ok) throw new Error(`HTTP ${String(r.status)}`);
@@ -109,7 +109,7 @@ const dormir = (ms: number) => new Promise<void>((ok) => setTimeout(ok, ms));
 
 async function lerComTentativas(url: string): Promise<string> {
   let ultima: unknown;
-  for (let t = 1; t <= 3; t++) {
+  for (let t = 1; t <= 2; t++) {
     try {
       return await ler(url);
     } catch (e) {
@@ -189,14 +189,31 @@ async function principal(): Promise<void> {
   const hoje = new Date().toISOString().slice(0, 10);
   const veredictos: Veredito[] = [];
   const novaBase: BaseDeConferencia = { ...base };
+  const prazo = Date.now() + Number(process.env['CONFERIR_PRAZO_MIN'] ?? 18) * 60_000;
+  let seguidas = 0;
+  let interrompida = '';
   for (const e of entradas) {
+    if (Date.now() > prazo) {
+      interrompida = 'prazo de 18 minutos esgotado';
+      break;
+    }
+    if (seguidas >= 8) {
+      interrompida = '8 páginas seguidas sem abrir (bloqueio do Planalto?)';
+      break;
+    }
     try {
       const hash = await lerComTentativas(e.urlOficial);
       const v = await julgar(e.id, base, hash, () => lerComTentativas(e.urlOficial));
       veredictos.push(v);
+      seguidas = 0;
+      console.log(`${e.id}: ${v.estado}`);
       if (v.estado === 'base_nova' || v.estado === 'mudou')
         novaBase[e.id] = { hash, conferidoEm: hoje };
     } catch (erro) {
+      seguidas++;
+      console.log(
+        `${e.id}: falhou (${erro instanceof Error ? erro.message.replace(/[^\w .:/-]/g, '').slice(0, 60) : 'falha'})`,
+      );
       veredictos.push({
         id: e.id,
         estado: 'falhou',
@@ -206,6 +223,7 @@ async function principal(): Promise<void> {
     }
     await dormir(atraso);
   }
+  if (interrompida) console.error(`Conferência interrompida: ${interrompida}.`);
   const falhou = veredictos.filter((v) => v.estado === 'falhou').length;
   const texto = relatorio(veredictos, entradas, hoje);
   console.log(texto);
@@ -217,7 +235,7 @@ async function principal(): Promise<void> {
     writeFileSync(`${raiz}/acervo/conferencia.md`, texto);
   }
   // Mais da metade falhou: provável bloqueio do Planalto ao servidor; que o job fique vermelho.
-  if (entradas.length > 0 && falhou * 2 > entradas.length) {
+  if (interrompida || (entradas.length > 0 && falhou * 2 > entradas.length)) {
     console.error('Mais da metade das páginas não abriu (bloqueio do Planalto?).');
     process.exitCode = 1;
   }

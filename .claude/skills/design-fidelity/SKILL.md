@@ -37,7 +37,7 @@ estado de botão ou de espaçamento é bug, com a gravidade de um bug funcional.
    e `data-movimento`/`data-perfil='calmo'` do app: trocar deslize e mola por fade curto, manter o feedback
    de estado (foco, progresso, acerto). Só `transform` e `opacity`.
 9. **Divergência intencional** (o mockup contradiz uma regra do projeto) vai para
-   `docs/design/desvios.md` antes de mudar. Cortar algo do mockup só com cartão de opções ao Gabriel.
+   `docs/entradas/desvios/` antes de mudar (desvio com o número do PR; `docs/entradas/README.md`). Cortar algo do mockup só com cartão de opções ao Gabriel.
 10. **Usar as bibliotecas de verdade.** Para cada tipo de elemento (botão, sobreposição, menu, troca de tela, lista, conquista, aviso) consultar `docs/design/movimento-e-bibliotecas.md` e usar a biblioteca ou referência indicada, medindo o JS. O mockup manda na aparência; a biblioteca dá o comportamento. **O PR cita qual foi usada** por elemento, ou diz "nenhuma, porque ...".
 11. **Um PR de tela = tela inteira, com animação e acabamento.** Nunca "funcional agora, polimento depois".
 

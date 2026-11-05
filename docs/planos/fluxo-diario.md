@@ -11,7 +11,7 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 1. Início da sessão: o hook cria a branch `backup/AAAA-MM-DD` no `origin/main` (uma vez por dia).
 2. Atividade: branch a partir da `integracao`; se depende de outra ainda não mergeada, a partir do branch dela.
 3. Commit só passa se `npm run check` estiver verde (hook `check-antes-do-commit`); o hook de parada barra encerrar com alteração pendente e check vermelho.
-4. Push, PR para a `integracao` e **auto-merge** ligado no PR (método "Create a merge commit"): a regra de proteção da `integracao` exige `verificar` e os três `e2e` verdes, então o GitHub mergeia sozinho quando passarem. Se o auto-merge for recusado, esperar o CI e mergear à mão. Cada atividade vira **um** merge commit na `integracao`. Auto-merge nunca em PR para o `main`.
+4. Push, PR para a `integracao` (rascunho cedo, para ter o número) e **auto-merge** ligado quando o PR sai do rascunho; PR de tela só sai do rascunho com a revisão aprovando um SHA. Trazer a integracao para o branch só se o GitHub mostrar conflito (o GitHub não exige branch atualizado). Depois do merge, o mesmo branch continua com `git merge --ff-only origin/integracao`, sem force push. Auto-merge pelo método "Create a merge commit": a regra de proteção da `integracao` exige `verificar` e os três `e2e` verdes, então o GitHub mergeia sozinho quando passarem. Se o auto-merge for recusado, esperar o CI e mergear à mão. Cada atividade vira **um** merge commit na `integracao`. Auto-merge nunca em PR para o `main`. Detalhe em `estrategia-de-desenvolvimento.md`.
 5. Atualizar `docs/proxima-sessao.md` no próprio branch da atividade.
 
 ## Interrupção por limite de uso e retomada
@@ -21,6 +21,7 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 - Portões: valem para todos os agentes (hooks em `.githooks`, proteção de branch e job `guarda` no GitHub). Ver `contratos-agentes.md` §8.
 
 ## Fim do dia (Gabriel)
+0. Antes de levar a integracao ao `main`: `npm run entradas:consolidar` num PR próprio para a `integracao` (junta as entradas de `docs/entradas/` aos registros).
 1. `npm run fim-do-dia`: lista os merges da `integracao` ainda fora do `main`.
 2. Validar no app (checklist de cada atividade em "Pronto quando").
 3. Uma atividade errada? Na `integracao`: `git revert -m 1 <sha do merge>`. As demais seguem. Se outra dependia da revertida, ela é revertida junto (o Claude avisa no PR quais dependem de quais).
@@ -28,6 +29,8 @@ Objetivo: o Claude trabalha o dia todo sem pedir autorização a cada passo; o G
 5. Desastre: restaurar o `main` a partir da branch `backup/AAAA-MM-DD` do dia.
 
 ## Garantias por hook (`.claude/settings.json`)
+Valem nas sessões locais do Claude Code. **Nas threads da nuvem (claude.ai) estes hooks não são garantidos** (em 05/11/2026 não rodaram; em 20/10 rodaram): lá os portões são os do GitHub (proteção de branch, `verificar`, `e2e`, `guarda`) e o check é à mão.
+
 | Hook | O que garante |
 |---|---|
 | SessionStart `backup-diario` | branch de backup diária (só código; dados de estudo seguem o backup do app) |

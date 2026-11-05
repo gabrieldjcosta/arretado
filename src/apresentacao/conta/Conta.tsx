@@ -5,6 +5,7 @@ import { LinhaLista } from '../componentes/LinhaLista';
 import { useDados } from '../dados/contexto';
 import { LinhaDaPrevia } from '../fio/LinhaDaPrevia';
 import { LinhaDeSincronizacao } from './LinhaDeSincronizacao';
+import { LinhaDeInstalacao } from './LinhaDeInstalacao';
 import { LinhaDoPasseio } from './LinhaDoPasseio';
 import { RegistrarAceite } from './entrar/RegistrarAceite';
 import { ContaDoAparelhoSecao } from './sair/ContaDoAparelho';
@@ -46,6 +47,7 @@ export function Conta() {
         <li>
           <LinhaDoPasseio />
         </li>
+        <LinhaDeInstalacao />
         <li>
           <LinhaDaPrevia />
         </li>
