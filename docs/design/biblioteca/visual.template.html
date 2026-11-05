@@ -173,6 +173,30 @@ tr:last-child td{border-bottom:0}
 .faixa{width:100%;border-radius:10px;padding:14px 8px;display:grid;gap:10px}
 .faixa.fdia{background:linear-gradient(180deg,#e4edfa,#f6f8fb)}.faixa.fnoite{background:#0b1322}
 .fdia .bdl{color:#4a5878}.fnoite .bdl{color:#aab6d3}.faixa small{color:#4a5878;font-size:.72rem;text-align:center}.faixa.fnoite small{color:#aab6d3}
+
+/* galeria de formatos de botão */
+.gb{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr))}
+.gbc{background:var(--serra);border:1px solid var(--linha);border-radius:14px;padding:12px 14px;min-width:0}
+.gbc h3{display:flex;gap:8px;align-items:baseline}.gbc h3 b{color:var(--ponto);font-variant-numeric:tabular-nums}
+.gbc p{margin:2px 0 10px;color:var(--tx2);font-size:.85rem}
+.gbm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gbm>div{border-radius:10px;padding:18px 6px;display:grid;justify-items:center;gap:8px;font-size:.68rem}
+.gbm .gd{background:linear-gradient(180deg,#e4edfa,#f6f8fb);color:#4a5878;--ac:#d39200;--glow:rgba(255,197,61,.42);--ink:#0f1c3a;--fb:linear-gradient(180deg,#fffdf2,#ffefb8);--ft:#0f1c3a;--fc:#fffdf2;--hor:#ffd56b;--bg:#f6f8fb;--sol:radial-gradient(circle at 35% 30%,#ffe08a,#ffc53d 60%,#e8a50f);--vid:rgba(255,255,255,.55)}
+.gbm .gn{background:#0b1322;color:#aab6d3;--ac:#cfd9f0;--glow:rgba(190,205,235,.3);--ink:#eef2fa;--fb:linear-gradient(180deg,#fff7e0,#ffe6a3);--ft:#0b1322;--fc:#fff7e0;--hor:#9db7e8;--bg:#0b1322;--sol:radial-gradient(circle at 35% 30%,#fff,#fff4d6 60%,#d9c690);--vid:rgba(255,255,255,.08)}
+.gbb{font:inherit;font-weight:700;font-size:.95rem;min-height:46px;padding:10px 22px;border:0;cursor:pointer;transition:transform .12s var(--sair),box-shadow .12s var(--sair);display:inline-flex;gap:8px;align-items:center}
+.gbb:active{transform:translateY(2px)}
+.gbb .s{width:11px;height:11px;border-radius:50%;background:var(--sol);box-shadow:0 0 0 3px var(--glow)}
+.g1{border-radius:999px;background:var(--fb);color:var(--ft);box-shadow:inset 0 0 0 2px var(--ac),0 0 0 5px var(--glow)}
+.g2{border-radius:10px;background:var(--fb);color:var(--ft);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ac)}
+.g2:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ac)}
+.g3{border-radius:14px;background:linear-gradient(180deg,var(--fc) 50%,var(--hor));color:var(--ft);box-shadow:0 0 0 1.5px var(--ac),0 10px 24px -12px var(--glow)}
+.g4{border-radius:999px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);outline:2px dotted var(--ac);outline-offset:5px}
+.g5{border-radius:16px;background:var(--vid);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ac),inset 0 1px 0 rgba(255,255,255,.7),0 8px 22px -12px var(--glow);backdrop-filter:blur(6px)}
+.g6{border-radius:999px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink),0 0 0 4px var(--bg),0 0 0 6px var(--ac)}
+.g7{width:58px;height:58px;padding:0;border-radius:50%;justify-content:center;background:var(--fb);color:var(--ft);box-shadow:inset 0 0 0 2px var(--ac),0 0 0 6px var(--glow),0 10px 24px -10px var(--glow)}
+.g7 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.g8{border-radius:10px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink),inset 6px 0 0 var(--ac)}
+.g8{padding-left:26px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
 </style>
 
@@ -242,6 +266,10 @@ tr:last-child td{border-bottom:0}
 
 </div>
 
+
+<h2>Formatos de botão</h2>
+<p class="sub">Oito formatos, cada um no dia (à esquerda) e na noite (à direita), para a conexão com o sol e a lua ficar no contorno e na forma, e a cor poder flexibilizar. Diga o número do que clicou.</p>
+<div class="gb"><section class="gbc"><h3><b>1</b>Anel de sol</h3><p>Pílula clara com anel dourado (luar: anel prateado) e a bolinha que vira sol ou lua.</p><div class="gbm"><div class="gd"><button class="gbb g1" aria-label="Anel de sol, dia"><i class="s"></i>Continuar</button>dia</div><div class="gn"><button class="gbb g1" aria-label="Anel de sol, noite"><i class="s"></i>Continuar</button>noite</div></div></section><section class="gbc"><h3><b>2</b>Papel e ouro</h3><p>Chapa de papel com contorno firme e sombra dura dourada. Afunda ao tocar.</p><div class="gbm"><div class="gd"><button class="gbb g2" aria-label="Papel e ouro, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g2" aria-label="Papel e ouro, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>3</b>Alvorada</h3><p>O botão acende por baixo, como o horizonte: claro em cima, ouro (ou azul-luar) na base.</p><div class="gbm"><div class="gd"><button class="gbb g3" aria-label="Alvorada, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g3" aria-label="Alvorada, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>4</b>Raios</h3><p>Contorno limpo com um segundo anel pontilhado ao redor, como raios de sol.</p><div class="gbm"><div class="gd"><button class="gbb g4" aria-label="Raios, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g4" aria-label="Raios, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>5</b>Vidro</h3><p>Painel translúcido com borda dourada e brilho no topo.</p><div class="gbm"><div class="gd"><button class="gbb g5" aria-label="Vidro, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g5" aria-label="Vidro, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>6</b>Duplo contorno</h3><p>Dois anéis: o firme e, afastado, o de sol. Sem preenchimento.</p><div class="gbm"><div class="gd"><button class="gbb g6" aria-label="Duplo contorno, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g6" aria-label="Duplo contorno, noite">Continuar</button>noite</div></div></section><section class="gbc"><h3><b>7</b>Botão-sol redondo</h3><p>Redondo, com seta, para o passo seguinte. Anel e halo de sol.</p><div class="gbm"><div class="gd"><button class="gbb g7" aria-label="Botão-sol redondo, dia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>dia</div><div class="gn"><button class="gbb g7" aria-label="Botão-sol redondo, noite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>noite</div></div></section><section class="gbc"><h3><b>8</b>Fita</h3><p>Contorno com uma fita de sol na lateral. Discreto, serve para ações secundárias.</p><div class="gbm"><div class="gd"><button class="gbb g8" aria-label="Fita, dia">Continuar</button>dia</div><div class="gn"><button class="gbb g8" aria-label="Fita, noite">Continuar</button>noite</div></div></section></div>
 
 <h2>Ideias novas para o Arretado</h2>
 <p class="sub">Pesquisa de 05/11 sobre foco, tempo, retomada e presença. Cada ideia tem demo, fonte e o risco que precisa de decisão. As fontes de estudo com TDAH são em parte blogs de fornecedores e um piloto pequeno: servem de direção, não de prova.</p>
