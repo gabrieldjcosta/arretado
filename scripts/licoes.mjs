@@ -6,7 +6,7 @@
 // Uso:  npm run licoes -- <arquivo> [<arquivo> ...]   (o nome basta: ajustes.css, Leitor.tsx)
 //       npm run licoes                                (sem nome: os arquivos que o branch muda)
 //       npm run licoes -- --tudo <arquivo>            (sem o corte de 8 achados por fonte)
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -80,9 +80,14 @@ export function pastaDaMemoria(env = process.env) {
 
 const descricao = (texto) => /^description:\s*(.+)$/m.exec(texto)?.[1] ?? '';
 
-function sh(cmd, raiz) {
+// git sem shell: os argumentos vão como lista, nada do nome do arquivo vira comando.
+function git(args, raiz) {
   try {
-    return execSync(cmd, { cwd: raiz, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return execFileSync('git', args, {
+      cwd: raiz,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
   } catch {
     return '';
   }
@@ -116,7 +121,10 @@ export function relatorio(caminho, { raiz, tudo = false, memoria = pastaDaMemori
         if (hits.length > corte) saida.push(`    … mais ${hits.length - corte} (use --tudo)`);
       }
     }
-    const log = sh(`git log --no-merges -n 5 --format="%h %as %s" -- "*${termo}"`, raiz).trim();
+    const log = git(
+      ['log', '--no-merges', '-n', '5', '--format=%h %as %s', '--', `*${termo}`],
+      raiz,
+    ).trim();
     if (log) {
       algum = true;
       saida.push('  últimos commits');
@@ -133,10 +141,13 @@ function principal() {
   const tudo = args.includes('--tudo');
   let alvos = args.filter((a) => a !== '--tudo');
   if (!alvos.length) {
-    const base = sh('git merge-base HEAD origin/integracao', raiz).trim() || 'HEAD';
+    const base = git(['merge-base', 'HEAD', 'origin/integracao'], raiz).trim() || 'HEAD';
     alvos = [
       ...new Set(
-        [sh(`git diff --name-only ${base}`, raiz), sh('git ls-files -o --exclude-standard', raiz)]
+        [
+          git(['diff', '--name-only', base], raiz),
+          git(['ls-files', '-o', '--exclude-standard'], raiz),
+        ]
           .join('\n')
           .split('\n')
           .filter(Boolean),
