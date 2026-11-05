@@ -178,6 +178,8 @@ const PADRAO_DO_DICIONARIO = new RegExp(
   `${INICIO}(?:${alternativas([...new Set(PARES.flatMap(([, de, para]) => [de, para]))])})${FIM}`,
   'giu',
 );
+/** Depois do advérbio vem "que": a locução ("sempre que") não se troca por uma palavra só. */
+const SEGUIDA_DE_QUE = /^[^\S\n]+que(?![\p{L}\p{N}])/iu;
 const SUBSTITUTO = new Map(PARES.map(([tipo, de, para]) => [de, { tipo, para }]));
 
 /** A troca de palavra guarda a maiúscula inicial ("Salvo" → "Inclusive"). */
@@ -268,6 +270,8 @@ export function avaliarTrocas(texto: string): { aprovadas: Troca[]; rejeitadas: 
     const chave = m[0].toLowerCase().replace(/\s+/g, ' ');
     const regra = SUBSTITUTO.get(chave);
     if (!regra) continue;
+    // "sempre que" é locução ("quando"): trocar a primeira palavra dá "nunca que", que não é português.
+    if (regra.tipo === 'absoluto' && SEGUIDA_DE_QUE.test(texto.slice(m.index + m[0].length))) continue;
     candidatas.push({
       inicio: m.index,
       fim: m.index + m[0].length,
