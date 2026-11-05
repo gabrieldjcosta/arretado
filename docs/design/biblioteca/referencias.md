@@ -41,3 +41,4 @@ Atualizado em 2026-11-05. Referência é fonte de ideia, não de código. O mock
 | Estado vazio e retomada | `várias telas` | sem | Mobbin, Checklist Design | a pesquisar (Mobbin ou Kombai) |
 | Desktop em duas colunas | `Fio, a partir de ~840 px` | sem | Material 3 (layout adaptativo) | depois do celular (Gabriel, 05/11) |
 | Leitor de norma | `src/apresentacao/leitor` | sem | Laws of UX, Checklist Design | no app |
+| Sequência que dobra (descanso) | `Dia / Agora; Pouso` | sem | Laws of UX | aprovada (Gabriel, 05/11); falta implementar |

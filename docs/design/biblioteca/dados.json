@@ -376,6 +376,14 @@
       "mockup": "sem",
       "refs": ["laws-of-ux", "checklist-design"],
       "estado": "no app"
+    },
+    {
+      "id": "sequencia-dobra",
+      "nome": "Sequência que dobra (descanso)",
+      "onde": "Dia / Agora; Pouso",
+      "mockup": "sem",
+      "refs": ["laws-of-ux"],
+      "estado": "aprovada (Gabriel, 05/11); falta implementar"
     }
   ],
   "ideias": [
@@ -420,8 +428,8 @@
       "fonte": "Guias de design anti-vergonha para TDAH (streak freeze, \"life happens\"); fontes secundárias, conferir com pesquisa primária",
       "fonte_url": "https://dev.to/wellnestapp/why-most-medication-apps-fail-adhd-brains-3hea",
       "custo": "médio: regra no domínio de Dia",
-      "risco": "a regra de produto é \"sem perda de sequência\"; combinar copy com a Marca",
-      "estado": "proposta"
+      "risco": "a tela precisa dizer com todas as letras: dia sem estudo vira descanso e o total de dias de estudo nunca diminui. Combinar a copy com a Marca; sem cor de alerta no descanso.",
+      "estado": "aprovada (Gabriel, 05/11); falta implementar"
     },
     {
       "id": "companhia",
