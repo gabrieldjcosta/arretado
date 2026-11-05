@@ -14,7 +14,7 @@ export const COLECOES_SO_LOCAIS: readonly NomeColecao[] = ['usuarios', 'snapshot
 
 /** Campos de aparência que cada aparelho guarda só para si (Q3). Metas e perfil de estudo sincronizam. */
 export const CAMPOS_DO_APARELHO: Partial<Record<NomeColecao, readonly string[]>> = {
-  preferencias: ['tema', 'fonteLeitura', 'tamanhoFonte', 'reguaDeLeitura'],
+  preferencias: ['tema', 'fonteLeitura', 'tamanhoFonte', 'reguaDeLeitura', 'reguaDeFoco'],
 };
 
 /** Carimbos que toda edição troca; sozinhos não são mudança de conteúdo. */

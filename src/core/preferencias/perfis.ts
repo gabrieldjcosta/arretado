@@ -12,6 +12,7 @@ export type CamposDePerfil = Pick<
   | 'tamanhoFonte'
   | 'destacarCondicionantesEPrazos'
   | 'reguaDeLeitura'
+  | 'reguaDeFoco'
   | 'espiadaDosVizinhos'
   | 'cotaDiaria'
   | 'modoSoEstudo'
@@ -47,6 +48,7 @@ const PREDEFINICOES: Record<
     // Menos coisas na tela: o Calmo desliga os destaques, que abrem ligados (D-D17).
     destacarCondicionantesEPrazos: false,
     reguaDeLeitura: false,
+    reguaDeFoco: 'desligada',
     espiadaDosVizinhos: false,
     cotaDiaria: 5,
     modoSoEstudo: true,
@@ -58,6 +60,7 @@ const PREDEFINICOES: Record<
     // O Guiado não mexe na leitura: fica no padrão do app (os destaques abrem ligados, D-D17).
     destacarCondicionantesEPrazos: DESTAQUES_LIGADOS_PADRAO,
     reguaDeLeitura: false,
+    reguaDeFoco: 'desligada',
     espiadaDosVizinhos: false,
     cotaDiaria: COTA_DIARIA_PADRAO,
     modoSoEstudo: false,
@@ -68,6 +71,7 @@ const PREDEFINICOES: Record<
     tamanhoFonte: 20,
     destacarCondicionantesEPrazos: true,
     reguaDeLeitura: true,
+    reguaDeFoco: 'desligada',
     espiadaDosVizinhos: true,
     cotaDiaria: COTA_DIARIA_PADRAO,
     modoSoEstudo: false,
@@ -80,6 +84,7 @@ const ROTULOS: Record<keyof CamposDePerfil, string> = {
   tamanhoFonte: 'Tamanho do texto de leitura',
   destacarCondicionantesEPrazos: 'Destacar prazos, condições e penas',
   reguaDeLeitura: 'Régua de leitura',
+  reguaDeFoco: 'Régua de foco',
   espiadaDosVizinhos: 'Espiada dos vizinhos no foco',
   cotaDiaria: 'Cartões por vez',
   modoSoEstudo: 'Modo só estudo na Sessão',
@@ -99,6 +104,8 @@ function efetivo(prefs: Partial<CamposDePerfil>, campo: keyof CamposDePerfil): V
       return prefs.cotaDiaria ?? COTA_DIARIA_PADRAO;
     case 'destacarCondicionantesEPrazos':
       return prefs.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO;
+    case 'reguaDeFoco':
+      return prefs.reguaDeFoco ?? 'desligada';
     case 'temporizadorPadraoMin':
       return prefs.temporizadorPadraoMin;
     default:

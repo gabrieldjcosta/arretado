@@ -42,6 +42,7 @@ export function AparenciaConta() {
         | 'tamanhoFonte'
         | 'destacarCondicionantesEPrazos'
         | 'reguaDeLeitura'
+        | 'reguaDeFoco'
         | 'espiadaDosVizinhos'
         | 'cotaDiaria'
       >
@@ -163,6 +164,22 @@ export function AparenciaConta() {
         </label>
         <p id="regua-dica" className="dica">
           Realça a linha sob o dedo, o cursor ou o foco. O texto não se move.
+        </p>
+        <label htmlFor="regua-de-foco">Régua de foco</label>{' '}
+        <select
+          id="regua-de-foco"
+          aria-describedby="regua-foco-dica"
+          value={dados.reguaDeFoco ?? 'desligada'}
+          onChange={(e) => {
+            alterar({ reguaDeFoco: e.target.value as NonNullable<Preferencias['reguaDeFoco']> });
+          }}
+        >
+          <option value="desligada">Desligada</option>
+          <option value="frase">Só a frase em leitura</option>
+          <option value="palavras">Só as palavras de destaque</option>
+        </select>
+        <p id="regua-foco-dica" className="dica">
+          No Leitor, apaga o resto do texto sem escondê-lo nem mexer nos grifos. Sem movimento.
         </p>
         <label className="opcao">
           <input

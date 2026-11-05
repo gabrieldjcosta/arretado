@@ -21,6 +21,7 @@ import {
   type Intervalo,
   type Leitura,
   type Marcacao,
+  type Preferencias,
   type TextoDeDispositivo,
   type TipoDispositivo,
 } from '../../core/modelo';
@@ -66,6 +67,7 @@ import { EstruturaDaNorma } from './EstruturaDaNorma';
 import { dispositivosComErro } from './errosVinculados';
 import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
+import { useReguaDeFoco, temRealce } from './useReguaDeFoco';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
 import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
@@ -446,8 +448,13 @@ function LeitorAberto({
   // Destaque automático (9.8): a mesma preferência de Conta › Aparência; ausente é o padrão do app,
   // ligado (D-D17). Até a preferência chegar, vale o padrão: quase todo mundo o mantém.
   const [destaquePedido, setDestaquePedido] = useState<boolean | null>(null);
+  // Régua de foco: 'palavras' precisa dos destaques acesos (o mesmo detector); 'frase' pinta pela API
+  // de realce do navegador e, sem ela, fica desligada.
+  const [reguaPedida, setReguaPedida] = useState<ReguaDeFoco | null>(null);
+  const reguaDeFoco = reguaPedida ?? preferencias?.reguaDeFoco ?? 'desligada';
   const destacar =
-    destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO;
+    reguaDeFoco === 'palavras' ||
+    (destaquePedido ?? preferencias?.destacarCondicionantesEPrazos ?? DESTAQUES_LIGADOS_PADRAO);
   // Linha ativa (peça 1): a que está sob o dedo, o cursor ou o foco. Mostra o botão da estrela e,
   // com a régua de leitura ligada (fatia 4), recebe o realce.
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;
@@ -678,6 +685,7 @@ function LeitorAberto({
   const devolverFoco = useRef(false);
   const botaoDoFoco = useRef<HTMLButtonElement | null>(null);
   const caixaDoLeitor = useRef<HTMLDivElement | null>(null);
+  useReguaDeFoco(caixaDoLeitor, reguaDeFoco === 'frase');
   useLayoutEffect(() => {
     const raiz = document.documentElement;
     // `data-modo-foco` na raiz esconde a moldura do Shell (barra fixa, navegação, rodapé).
@@ -1762,6 +1770,14 @@ function LeitorAberto({
     });
   }
 
+  function mudarRegua(nova: ReguaDeFoco) {
+    setReguaPedida(nova);
+    // Se não gravar, volta ao que está gravado.
+    alterarPreferencias(repo, { reguaDeFoco: nova }).catch(() => {
+      setReguaPedida(null);
+    });
+  }
+
   function alternarDestaques() {
     const novo = !destacar;
     setDestaquePedido(novo);
@@ -1930,6 +1946,7 @@ function LeitorAberto({
     <div
       ref={caixaDoLeitor}
       className={modoFoco ? 'leitor em-foco' : 'leitor'}
+      data-regua-foco={reguaDeFoco === 'desligada' ? undefined : reguaDeFoco}
       // A estrutura da norma e o trilho de ferramentas se alinham pelo fim do cabeçalho preso.
       style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
     >
@@ -1943,6 +1960,8 @@ function LeitorAberto({
             mudarTamanho={mudarTamanho}
             destacar={destacar}
             alternarDestaques={alternarDestaques}
+            regua={reguaDeFoco}
+            mudarRegua={mudarRegua}
           />
         </>
       )}
@@ -2498,6 +2517,8 @@ function AcoesDaLeitura({
  */
 const TITULO_LONGO = 30;
 
+type ReguaDeFoco = NonNullable<Preferencias['reguaDeFoco']>;
+
 /** A barra do leitor (fora do modo foco): voltar, título, tamanho do texto e destaques. */
 function BarraDoLeitor({
   titulo,
@@ -2505,7 +2526,11 @@ function BarraDoLeitor({
   mudarTamanho,
   destacar,
   alternarDestaques,
+  regua,
+  mudarRegua,
 }: {
+  regua: ReguaDeFoco;
+  mudarRegua: (nova: ReguaDeFoco) => void;
   titulo: string;
   tamanho: number;
   mudarTamanho: (passo: number) => void;
@@ -2549,6 +2574,19 @@ function BarraDoLeitor({
       >
         Destaques
       </button>
+      <label className="regua-de-foco">
+        Régua de foco
+        <select
+          value={regua}
+          onChange={(e) => {
+            mudarRegua(e.target.value as ReguaDeFoco);
+          }}
+        >
+          <option value="desligada">Desligada</option>
+          {temRealce() && <option value="frase">Só a frase</option>}
+          <option value="palavras">Só as palavras de destaque</option>
+        </select>
+      </label>
     </div>
   );
 }
