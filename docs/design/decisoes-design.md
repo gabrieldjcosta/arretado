@@ -627,3 +627,13 @@ Fecha as divergências achadas ao documentar o sistema (`DESIGN.md` e `PRODUCT.m
 **Como saber se ficou bom.** Cada fatia com tela passa pelo teste das cinco perguntas (onde estou, o que faço, por que importa, o que aconteceu, posso parar e voltar); medição com outras pessoas continua na V1.
 
 **Custo.** Quem usa o app hoje perde rotas conhecidas: cada rota antiga redireciona ao lugar novo por uma versão. Até as fatias 3, 5 e 6 chegarem, a navegação de hoje (D-D6, D-D16, D-D18) continua valendo.
+
+## D-D26 — O brilho do mundo e a linguagem dos botões do Fio (05/11/2026, decisão do Gabriel)
+
+> **Emenda à D-D10 (néon só em traço de caneta) e à D-D25, só nos botões do Fio.** Pedido da Marca: o número D-D15 já é do "+"; esta decisão é a D-D26. Desvio 49 de `docs/design/desvios.md`.
+
+**Origem.** Gabriel em 05/11/2026, na Biblioteca visual: o sol e o luar devem valer no app todo (não só no seletor), e os referenciais **5b** (vidro) e **7** (botão-sol redondo) dão a linguagem dos botões e menus.
+
+**O que muda.** (1) O brilho tem a cor do mundo: sol dourado (`255 197 61`) de dia, luar azul-prata (`157 183 232`) à noite, em anéis e degradês, sem sombra borrada e sem pulsar. (2) Ação principal no Vivo (5b): fundo de vidro translúcido, texto âmbar de dia (#8a5200) e prateado à noite (#e6ecfa), contorno suave e a alvorada que sobe ao toque (900 ms); substitui o Sol do desvio 17 no Vivo; o Calmo ("Só contorno") e o desligado ficam como estavam. (3) Botão redondo (7): anel e seta na mesma cor e uma onda de 1,5x que some em 1,1 s ao toque. (4) Chips e folhas levam o contorno no brilho do mundo.
+
+**O que não muda.** Sem `backdrop-filter` (sem vidro desfocado). O ponto continua sendo o único sol dourado à noite. O anel de foco segue ciano e distinto do anel de repouso.

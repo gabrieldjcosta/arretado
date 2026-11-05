@@ -73,7 +73,7 @@ export function Entrar({
 
   const google = () => {
     if (!aceitar()) return;
-    void executar(() => servico.entrarComGoogle());
+    void executar(() => servico.entrarCom('google'));
   };
 
   const pedirCodigo = (e: SyntheticEvent) => {

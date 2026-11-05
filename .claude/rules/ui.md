@@ -16,4 +16,4 @@ paths:
 - "Reduzir movimento" reduz: fade curto no lugar de deslize e mola, feedback de estado mantido. Não zerar.
 - Tela nova de PR sai com animação e acabamento no mesmo PR.
 - Antes do merge: `npm run build`, `node scripts/fidelidade-fio.mjs --telas <tela>`, olhar o par, `npm run tamanho`.
-- Divergência do mockup: registrar em `docs/design/desvios.md`.
+- Divergência do mockup: registrar em `docs/entradas/desvios/` (uma linha por arquivo, desvio com o número do PR; ver `docs/entradas/README.md`); a tabela inteira fica em `docs/design/desvios.md`.

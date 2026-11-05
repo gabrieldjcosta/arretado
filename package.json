@@ -29,7 +29,10 @@
     "hooks:instalar": "node scripts/instalar-hooks.mjs",
     "acervo:gerar": "node scripts/acervo.mjs gerar",
     "acervo:verificar": "node scripts/acervo.mjs verificar",
-    "catalogo": "node scripts/catalogo.mjs"
+    "catalogo": "node scripts/catalogo.mjs",
+    "licoes": "node scripts/licoes.mjs",
+    "entradas:consolidar": "node scripts/entradas.mjs",
+    "revisao:cobre": "node scripts/revisao-cobre.mjs"
   },
   "dependencies": {
     "@fontsource-variable/literata": "^5.3.0",

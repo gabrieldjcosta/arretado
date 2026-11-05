@@ -22,15 +22,14 @@ import {
 import {
   FalhaDeConta,
   type CopiaNaNuvem,
+  type ProvedorDeLogin,
   type ServicoDeConta,
   type SessaoDeConta,
 } from './interface';
-import {
-  CHAVE_PUBLICAVEL,
-  RETORNO_DESENVOLVIMENTO,
-  RETORNO_PRODUCAO,
-  URL_SUPABASE,
-} from './projeto';
+import { CHAVE_PUBLICAVEL, URL_SUPABASE, enderecoDeRetorno } from './projeto';
+
+/** Provedores com conta criada no painel. Apple entra aqui só na Fase 3 do plano de apps (conta paga). */
+const PROVEDORES_LIGADOS: readonly ProvedorDeLogin[] = ['google'];
 
 const CHAVE_DE_ARMAZENAMENTO = 'arretado-auth';
 /** Bucket privado do esquema A2 (`supabase/migrations/20261014020000_f4a_contas.sql`): uma pasta por `uid`. */
@@ -56,10 +55,6 @@ function paraSessao(sessao: Session | null): SessaoDeConta | null {
 }
 
 /** Endereço de retorno do OAuth: precisa estar na lista permitida do painel (plano §4.2). */
-function enderecoDeRetorno(): string {
-  const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  return local ? RETORNO_DESENVOLVIMENTO : RETORNO_PRODUCAO;
-}
 
 /**
  * Falha de `enviar_lote`: só 4xx de conteúdo (400, 409, 422) é definitiva e leva à quarentena.
@@ -171,10 +166,13 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
     }
   }
 
-  async entrarComGoogle(): Promise<void> {
+  async entrarCom(provedor: ProvedorDeLogin): Promise<void> {
+    if (!PROVEDORES_LIGADOS.includes(provedor)) {
+      throw new FalhaDeConta('indisponivel', 'Este método de entrada ainda não está disponível.');
+    }
     const { error } = await this.cliente.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: enderecoDeRetorno() },
+      provider: provedor,
+      options: { redirectTo: enderecoDeRetorno(window.location.hostname) },
     });
     if (error) throw traduzirErro(error);
   }

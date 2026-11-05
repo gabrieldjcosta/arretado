@@ -7,6 +7,7 @@ import {
 import {
   FalhaDeConta,
   type CopiaNaNuvem,
+  type ProvedorDeLogin,
   type ServicoDeConta,
   type SessaoDeConta,
 } from './interface';
@@ -73,9 +74,10 @@ export class ServicoDeContaFalso implements ServicoDeConta {
   sessao() {
     return Promise.resolve(this.atual);
   }
-  entrarComGoogle(): Promise<void> {
+  entrarCom(provedor: ProvedorDeLogin): Promise<void> {
     return Promise.resolve().then(() => {
       this.checarRede();
+      if (provedor === 'apple') throw new FalhaDeConta('indisponivel', 'Apple ainda não ligada.');
     });
   }
   pedirCodigoPorEmail(email: string): Promise<void> {

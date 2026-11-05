@@ -684,6 +684,57 @@
   text-align: left;
 }
 
+/* Desvio 48: a sequência que dobra (`DiasDoFioM`, em `m/`) não existe no mockup; é a ideia "Sequência que dobra" da
+   Biblioteca visual, aprovada pelo Gabriel em 05/11/2026. Só usa tokens do mockup: estudo é o ponto dourado
+   (`--m-ponto`), descanso é um contorno tracejado azul (`--m-neon`); nenhum verde e nenhuma cor de alerta (o verde
+   da demo foi vetado pelo Gabriel). Sem animação perpétua. */
+.m-fio.m-fio .m-dias-fio {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.m-fio.m-fio .m-dias-fio-fila {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.m-fio.m-fio .m-dia-fio {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.m-fio.m-fio .m-dia-fio[data-estado='estudo'] {
+  background: var(--m-ponto);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--m-ponto) 55%, transparent);
+}
+.m-fio.m-fio .m-dia-fio[data-estado='descanso'] {
+  border: 1.5px dashed var(--m-neon);
+  opacity: 0.7;
+}
+/* De dia o ponto dourado dá 1,4:1 e o contorno a 70% dá 2,6:1 sobre o fundo (WCAG 1.4.11 pede 3:1): os dois ganham o
+   mesmo aro do `--m-neon` do dia (#b25f00, 4:1) e o contorno deixa de esmaecer. À noite já passam (12:1 e 5,3:1). */
+.m-fio.m-fio[data-mundo='dia'] .m-dia-fio[data-estado='estudo'] {
+  border: 1.5px solid var(--m-neon);
+  box-shadow: none;
+}
+.m-fio.m-fio[data-mundo='dia'] .m-dia-fio[data-estado='descanso'] {
+  opacity: 1;
+}
+.m-fio.m-fio .m-dias-fio-regra {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--m-texto-2);
+}
+.m-fio.m-fio .m-dias-fio-regra b {
+  color: var(--m-texto);
+  font-weight: 700;
+}
+
 /* Desvio 40: enquanto a abertura roda, as telas do quadro esperam por baixo, escondidas (`data-entrada` no quadro). Motivo:
    no mockup todas as telas já existem e a abertura mede onde o ponto vai pousar na seguinte (`medir()`); no app a tela
    seguinte é uma rota que precisa estar montada, com o Agora a ler os dados, para ser medida. `visibility` (e não
@@ -931,4 +982,104 @@ html[data-texto-fio='bem-maior'] .m-fio {
 html[data-texto-fio] .m-fio :is(.m-cartao, .m-folha .m-corpo, .m-pouso .m-corpo) > :not(.m-alca),
 html[data-texto-fio] .m-fio .m-proximo {
   zoom: var(--m-texto-fio);
+}
+
+/* 49. O brilho do mundo e a linguagem dos botões (Gabriel, 05/11/2026, referenciais 5b e 7 da Biblioteca visual).
+      Motivo: o brilho do Fio era sempre âmbar. O céu muda de dia e de noite, e o brilho acompanha: de dia o sol (dourado
+      `255 197 61`), à noite o luar (azul-prata `157 183 232`), em anéis e degradês, sem sombra borrada. Dois
+      referenciais dão a cara do resto: (5b) a ação principal é de vidro, com texto âmbar de dia e prateado à noite,
+      contorno suave no brilho do mundo e a alvorada que sobe ao toque; (7) o botão redondo (`.m-icone`) leva o anel e a
+      seta na mesma cor e solta uma onda curta (1,5x, some suave) ao toque. O vidro é o fundo translúcido do mundo, sem
+      `backdrop-filter` (o DESIGN.md veta vidro desfocado). O Calmo segue como estava ("Só contorno", sem movimento) e o
+      desligado também. A alvorada e a onda nascem em `m/brilho-ao-toque.ts`. O texto âmbar do dia é #8a5200 (5,1:1 sobre
+      o fim do degradê, onde o #a86500 do protótipo dava 3,7:1). */
+.m-fio.m-fio[data-mundo='dia'] {
+  --m-brilho: 255 197 61;
+  --m-brilho-anel: 211 146 0;
+  --m-brilho-tinta: #8a5200;
+  --m-brilho-fundo: 42%;
+  --m-brilho-vidro: rgb(255 255 255 / 55%);
+}
+
+.m-fio.m-fio[data-mundo='noite'] {
+  --m-brilho: 157 183 232;
+  --m-brilho-anel: 207 217 240;
+  --m-brilho-tinta: #e6ecfa;
+  --m-brilho-fundo: 26%;
+  --m-brilho-vidro: rgb(255 255 255 / 8%);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 35%), transparent 55%),
+    radial-gradient(120% 90% at 50% 130%, rgb(var(--m-brilho) / 42%), transparent 70%),
+    var(--m-brilho-vidro);
+  color: var(--m-brilho-tinta);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--m-brilho-anel) / 90%),
+    0 0 0 2px rgb(var(--m-brilho) / 22%),
+    0 0 0 5px rgb(var(--m-brilho) / 8%);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:hover,
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--m-brilho-anel)),
+    0 0 0 3px rgb(var(--m-brilho) / 32%),
+    0 0 0 7px rgb(var(--m-brilho) / 12%);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao[disabled] {
+  box-shadow: inset 0 0 0 1px rgb(var(--m-brilho-anel) / 45%);
+}
+
+/* A alvorada: um degradê que sobe pelo botão ao toque; ela toma o lugar da onda ciana do mockup no Vivo. */
+.m-fio .m-alvorada {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    90% 120% at 50% 130%,
+    var(--m-ponto),
+    rgb(var(--m-brilho) / 60%) 45%,
+    transparent 75%
+  );
+}
+
+.m-fio:not([data-movimento='calmo']) .m-acao .m-onda {
+  display: none;
+}
+
+/* O botão redondo: o anel e a seta na mesma cor; a onda de luz curta sai do anel. */
+.m-fio.m-fio .m-icone {
+  position: relative;
+  color: var(--m-brilho-tinta);
+  border-color: rgb(var(--m-brilho-anel) / 70%);
+  box-shadow: 0 0 0 3px rgb(var(--m-brilho) / 16%);
+}
+
+.m-fio.m-fio .m-icone:hover {
+  color: var(--m-brilho-tinta);
+  border-color: rgb(var(--m-brilho-anel));
+}
+
+.m-fio .m-aro-onda {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  border: 2px solid rgb(var(--m-brilho-anel));
+  box-shadow: 0 0 0 5px rgb(var(--m-brilho) / 22%);
+}
+
+/* Escolhas e folhas: o contorno no brilho do mundo, para as opções falarem a mesma língua dos botões. */
+.m-fio.m-fio .m-chip {
+  border-color: rgb(var(--m-brilho-anel) / 45%);
+}
+
+.m-fio.m-fio .m-folha {
+  box-shadow: 0 -1px 0 rgb(var(--m-brilho-anel) / 40%);
 }
