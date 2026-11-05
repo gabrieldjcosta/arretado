@@ -857,7 +857,7 @@
   color: #b3261e;
 }
 
-/* Desvio 44 (Texto da Conta): o texto cresce o Fio todo. `zoom` nos blocos de dentro dos cartões, folhas e pouso; a largura
+/* Desvio 44 (Texto da Conta): o texto cresce o Fio todo. `zoom` nos blocos de dentro dos cartões, folhas e pouso e no cartão da ponta do Agora; a largura
    automática continua cabendo no quadro. O mapa e o puxador ficam como estão. */
 html[data-texto-fio] .m-fio {
   --m-texto-fio: 1.12;
@@ -865,6 +865,7 @@ html[data-texto-fio] .m-fio {
 html[data-texto-fio='bem-maior'] .m-fio {
   --m-texto-fio: 1.25;
 }
-html[data-texto-fio] .m-fio :is(.m-cartao, .m-folha .m-corpo, .m-pouso .m-corpo) > :not(.m-alca) {
+html[data-texto-fio] .m-fio :is(.m-cartao, .m-folha .m-corpo, .m-pouso .m-corpo) > :not(.m-alca),
+html[data-texto-fio] .m-fio .m-proximo {
   zoom: var(--m-texto-fio);
 }
