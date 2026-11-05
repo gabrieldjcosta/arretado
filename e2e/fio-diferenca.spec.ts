@@ -107,6 +107,8 @@ test('Ache a diferença: tocar nas palavras grifa a diferença e o rodapé só v
   // Palavra igual nos dois: balança, apaga um pouco, avisa uma vez e não tranca nada.
   const igual = cartao.locator('.m-palavra:not(.m-diverge)').first();
   await igual.click();
+  // O balanço roda de verdade (`transform` só vale na palavra solta, que é caixa própria).
+  expect(await igual.evaluate((el) => el.getAnimations().length)).toBeGreaterThan(0);
   await expect(igual).toHaveClass(/m-tentou/);
   await expect(page.getByText('Essa está igual nos dois. Procure de novo.')).toBeVisible();
 
@@ -114,7 +116,9 @@ test('Ache a diferença: tocar nas palavras grifa a diferença e o rodapé só v
   const diferentes = cartao.locator('.m-diverge');
   const quantas = await diferentes.count();
   expect(quantas).toBeGreaterThan(1);
-  for (let i = 0; i < quantas; i++) await diferentes.nth(i).click();
+  await diferentes.nth(0).click();
+  expect(await diferentes.nth(0).evaluate((el) => el.getAnimations().length)).toBeGreaterThan(0);
+  for (let i = 1; i < quantas; i++) await diferentes.nth(i).click();
   await expect(cartao.locator('.m-diverge.m-achada')).toHaveCount(quantas);
   await expect(cartao.locator('.m-retorno')).toContainText(`Achou as ${String(quantas)}.`);
   // O grifo se lê: fundo e letra com contraste (o axe não decide nada sobre fundo translúcido).

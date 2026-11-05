@@ -68,16 +68,9 @@ export function AcheADiferencaM({
     if (resolvido) return;
     if (difere) {
       setAchadas((s) => new Set(s).add(chaveDaPalavra));
-      // O grifo chega na mola (o `troca` do mockup).
+      // O grifo chega por opacidade: o trecho é uma caixa em linha, onde `transform` não vale (a mola do mockup fica para a palavra solta).
       if (modoAgora() !== 'reduzido') {
-        void animar(
-          alvo,
-          [
-            { transform: 'scale(.82)', opacity: 0.4 },
-            { transform: 'scale(1)', opacity: 1 },
-          ],
-          { duration: 420, easing: MOLA },
-        );
+        void animar(alvo, [{ opacity: 0.4 }, { opacity: 1 }], { duration: 420, easing: MOLA });
       }
       return;
     }

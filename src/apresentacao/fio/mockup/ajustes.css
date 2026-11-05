@@ -809,6 +809,10 @@
     align-items: start;
   }
 }
+.m-fio .m-lado-da-diferenca .m-palavra:not(.m-diverge) {
+  /* A palavra solta é uma caixa própria (como o `button` do mockup), para o balanço de `transform` valer. */
+  display: inline-block;
+}
 .m-fio .m-lado-da-diferenca .m-palavra {
   cursor: pointer;
   -webkit-box-decoration-break: clone;
