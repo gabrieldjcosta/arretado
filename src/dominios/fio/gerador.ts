@@ -18,6 +18,8 @@
 //  8. Seu passo é o quarto passo das etapas de cinco, se houver tarefa; senão, o ponto que mais
 //     pesou nos erros vira uma leitura curta.
 //  9. Com data da prova, nos últimos 30 dias metade das etapas troca o Ler por Revisar e Praticar.
+// 11. O "Ache a diferença" só ocupa lugar que ficaria vazio (etapas de 4 passos ou mais): um par de
+//     artigos parecidos, dos que mais caem, já lidos ou lidos nesta etapa, um par por etapa.
 // 10. Pular não custa nada e não volta na mesma etapa; parar salva o passo aberto (`estado.ts`).
 import { diferencaEmDias } from '../../core/datas';
 import type {
@@ -157,6 +159,7 @@ export function planejarEtapa(entrada: EntradaDoFio, estado: EstadoDoFio): Etapa
   let revisarUsado = false;
   let acheUsado = false;
   let fixarComoComplemento = false;
+  let diferencaUsada = false;
   const sumulasUsadas = new Set<string>();
 
   const revisar = (): Passo | undefined => {
@@ -185,6 +188,33 @@ export function planejarEtapa(entrada: EntradaDoFio, estado: EstadoDoFio): Etapa
       quantidade: Math.min(cota('porteira', numero), prontos),
       porque,
     };
+  };
+  // Regra 11: o par cujos dois artigos a pessoa já leu e em que um deles é desta etapa (assim o par chega
+  // quando o segundo artigo é lido, uma vez só). Nunca aumenta a etapa: só ocupa lugar vazio.
+  const diferenca = (): Passo | undefined => {
+    if (diferencaUsada || tamanho < 4) return undefined;
+    for (const n of m.normas) {
+      const porEndereco = new Map(n.artigos.map((a) => [a.endereco, a] as const));
+      const lido = (e: string) => {
+        const a = porEndereco.get(e);
+        return a !== undefined && (a.lido || lendo.has(chave(n.id, e)));
+      };
+      for (const par of n.pares ?? []) {
+        const daEtapa =
+          lendo.has(chave(n.id, par.a.endereco)) || lendo.has(chave(n.id, par.b.endereco));
+        if (!daEtapa || !lido(par.a.endereco) || !lido(par.b.endereco)) continue;
+        diferencaUsada = true;
+        return {
+          tipo: 'ache_a_diferenca',
+          materiaId: m.id,
+          normaId: n.id,
+          tituloCurto: n.tituloCurto,
+          a: par.a,
+          b: par.b,
+        };
+      }
+    }
+    return undefined;
   };
   // A porteira tira certo/errado dos grifos do que a pessoa já leu (ou vai ler nesta etapa).
   const temGrifoLido = () =>
@@ -247,6 +277,8 @@ export function planejarEtapa(entrada: EntradaDoFio, estado: EstadoDoFio): Etapa
     }
     const a = acheOErro('complemento');
     if (a) return [a];
+    const d = diferenca();
+    if (d) return [d];
     // A leitura extra só entra com lugar para o Lembrar dela (regra 4).
     if (!semLeituraExtra && passos.length + 2 <= alvo && m.normas.length > 0) {
       const l = proximaLeitura(m, cota('ler', numero), lendo, true);

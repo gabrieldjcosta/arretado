@@ -8,6 +8,7 @@ import { descreverPasso } from '../dados/descrever';
 import { marcarPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { ROTA_DO_POUSO } from '../lugares';
+import { AcheADiferencaM } from './AcheADiferencaM';
 import { LembrarM } from './LembrarM';
 import { LerM, LerSemLeiM } from './LerM';
 import { GuardarM, PraticarM, RevisarM, SeuPassoM } from './OutrosPassosM';
@@ -130,6 +131,8 @@ export function PassoM() {
       artigos: [],
     };
     tela = <PraticarM passo={passo} alvo={alvo} {...comum} />;
+  } else if (passo.tipo === 'ache_a_diferenca') {
+    tela = <AcheADiferencaM passo={passo} {...comum} />;
   } else if (passo.tipo === 'revisar') {
     tela = <RevisarM passo={passo} {...comum} />;
   } else if (passo.tipo === 'seu_passo') {

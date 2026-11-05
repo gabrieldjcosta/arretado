@@ -85,6 +85,12 @@ export function descreverPasso(passo: Passo, materia: string): DescricaoDoPasso 
         apoio: `${materia} · ${PORQUE_DE_PRATICAR[passo.porque]}`,
         minutos: Math.max(1, Math.ceil(passo.quantidade / 2)),
       };
+    case 'ache_a_diferenca':
+      return {
+        titulo: `Ache a diferença: ${passo.tituloCurto}, ${rotuloDosArtigos([passo.a, passo.b])}`,
+        apoio: `${materia} · dois artigos que a banca confunde`,
+        minutos: 2,
+      };
     case 'seu_passo':
       return { titulo: passo.titulo, apoio: 'Do seu fio' };
   }
