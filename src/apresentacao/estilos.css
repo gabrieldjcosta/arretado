@@ -4389,7 +4389,7 @@ html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
    sem criar nó nem mexer nas âncoras dos grifos. Palavras: só os destaques automáticos (o mesmo
    detector) ficam na cor cheia. Nada se move nem anima: vale igual no Calmo e com reduzir movimento. */
 .leitor {
-  --regua-apagado: color-mix(in srgb, var(--texto) 64%, var(--superficie));
+  --regua-apagado: color-mix(in srgb, var(--texto) 70%, var(--superficie));
   --regua-acesa: color-mix(in srgb, var(--texto) 9%, transparent);
 }
 ::highlight(regua-apagada) {
