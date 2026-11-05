@@ -4,6 +4,7 @@ import type { CamadaDoFio } from '../../componentes/escrita/vez-da-escrita';
 import { useFio } from '../dados/useFio';
 import { ROTA_DA_PROVA } from '../lugares';
 import {
+  focarATela,
   rodarAbertura,
   type Alvo,
   type DestinoDaAbertura,
@@ -182,6 +183,9 @@ export function AberturaM({ camada }: { camada: CamadaDoFio }) {
         while (semProva.current === undefined && performance.now() < fim) await umQuadro();
         if (semProva.current === true) irParaAProva();
         aoSair.current('pulou');
+        // O foco vai ao título da tela que ficou à vista (o mockup faz o mesmo ao trocar de tela).
+        await umQuadro();
+        focarATela(app.querySelector(':scope > [data-tela]:not(.m-abertura)'));
       })();
     };
     const aoTeclar = (e: KeyboardEvent) => {

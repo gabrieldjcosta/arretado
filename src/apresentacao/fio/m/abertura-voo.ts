@@ -7,6 +7,14 @@ import { animar as animarBase, espera as esperaBase } from './anima';
 
 const NS = 'http://www.w3.org/2000/svg';
 
+/** O mockup leva o foco ao título da tela que chegou (`ir()`); quem usa teclado ou leitor de tela segue dali. */
+export function focarATela(tela: Element | null | undefined): void {
+  const titulo = tela?.querySelector<HTMLElement>('h1, h2');
+  if (!titulo) return;
+  titulo.setAttribute('tabindex', '-1');
+  titulo.focus({ preventScroll: true });
+}
+
 export type DestinoDaAbertura = 'inicio' | 'prova';
 
 /** Onde o ponto pousa na tela seguinte, em coordenadas do quadro. */
@@ -380,7 +388,10 @@ export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: P
         ],
         { duration: 260, easing: 'ease-in' },
       );
-      if (viva()) p.aoPousar(destino);
+      if (viva()) {
+        p.aoPousar(destino);
+        focarATela(seguinte.tela);
+      }
       return;
     }
     // Um fio sobe do ponto até o canto de cima, à direita, e o leva como um pêndulo
@@ -540,6 +551,7 @@ export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: P
     });
     if (!viva()) return;
     p.aoPousar(destino);
+    focarATela(seguinte.tela);
     // a marca já está no lugar (foi o nome que subiu): só o resto da tela aparece
     const nova = seguinte.tela;
     const chegam: Element[] =

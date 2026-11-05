@@ -32,6 +32,7 @@ import { dataDaProvaInformada } from '../../../dominios/recall/prova';
 import { contarFrasesVencidas, contarVencidos, hoje } from '../../../dominios/recall/servico';
 import { carregarFila } from '../../../dominios/tarefas';
 import { textoParaDestacar } from '../../biblioteca/destacar';
+import { trechosDoAche } from '../passos/ache';
 import { artigosFeitos } from '../../biblioteca/mapa/feitos';
 
 /** Quanto esperar o arquivo do Mapa da norma antes de seguir sem ele (o Hoje espera o mesmo). */
@@ -301,7 +302,13 @@ export async function montarEntradaDoFio(
           artigos: await artigosDaNorma(repo, opcoes.fonte, item),
         })),
       );
-      return { ...m, normas: preenchidas };
+      // Trechos de "Ache o erro": dos artigos já lidos com grifo, os que têm uma troca segura.
+      let acheOErro = 0;
+      for (const n of preenchidas) {
+        const lidos = n.artigos.filter((a) => a.lido && a.grifos > 0);
+        if (lidos.length > 0) acheOErro += await trechosDoAche(repo, n.id, lidos);
+      }
+      return { ...m, normas: preenchidas, acheOErro };
     }),
   );
   return { ...base, materias };

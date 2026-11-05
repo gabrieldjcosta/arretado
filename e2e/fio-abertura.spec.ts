@@ -50,6 +50,9 @@ test('a abertura roda sobre o quadro, sem nav nem "+", e leva a quem não tem pr
   await expect(page.locator('.m-voo-ponto')).toHaveCount(0, { timeout: 5_000 });
   await expect(page.locator('.m-voo-fio')).toHaveCount(0, { timeout: 5_000 });
   await expect(page).toHaveURL(/#\/fio\/prova$/);
+  // A prova não leva a nav (cobriria o fim dela) e o foco vai ao título, como no mockup.
+  await expect(page.locator('.m-nav')).toHaveCount(0);
+  await expect(pergunta(page)).toBeFocused();
   await expect(page.getByRole('button')).toHaveText([
     'DefensoriaSP, banca FCC',
     'Magistraturaestadual e federal',

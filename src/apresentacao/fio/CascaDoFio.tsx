@@ -24,8 +24,8 @@ import { useLuzDaHora } from './luz-da-hora';
 import './fio-base.css';
 
 /**
- * A casca de antes do quadro do mockup, que ainda serve as telas que não moram nele (Destino, Varal, Leitor,
- * Biblioteca, Fixar, Conta...): o nome com o cacto à esquerda (o nó da pessoa, que abre a Conta), a Ajuda, o "+"
+ * A casca de antes do quadro do mockup, que ainda serve as telas que não moram nele (Leitor, Biblioteca,
+ * Fixar, Conta...): o nome com o cacto à esquerda (o nó da pessoa, que abre a Conta), a Ajuda, o "+"
  * de sempre (D-D23) e a pílula com os três lugares embaixo. Sem rodapé: o backup e os dados moram na Conta. Os
  * provedores (Abertura, itens do "+") vêm do `Shell`. Some quando as fatias seguintes derem casa nova a cada tela.
  */
@@ -47,7 +47,6 @@ function CascaLegada() {
       <div
         className="shell shell-fio"
         data-teclado={tecladoAberto ? 'aberto' : undefined}
-        data-largo={pathname === '/destino' ? 'sim' : undefined}
         data-sem-pilula={semPilula ? 'sim' : undefined}
         data-luz={luz}
       >
@@ -115,7 +114,7 @@ function CascaLegada() {
 
 /**
  * A casca do Arretado novo (prévia do Fio, D-D25). As telas que já moram no quadro do mockup aprovado (o
- * Agora, o passo e o pouso) ficam na `CascaM`; as outras seguem na casca de antes até a fatia delas.
+ * Agora, o Destino, o passo e o pouso) ficam na `CascaM`; as outras seguem na casca de antes até a fatia delas.
  */
 export function CascaDoFio() {
   const { pathname } = useLocation();

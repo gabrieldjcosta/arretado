@@ -8,7 +8,7 @@ import { FaixaOffline } from '../../componentes/estados';
 import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
 import { useEstadoDaAbertura } from '../../componentes/escrita/vez-da-escrita';
-import { lugarDaRota, ROTA_DA_PROVA } from '../lugares';
+import { ROTA_DA_PROVA, ROTA_DO_DESTINO, comNavDoFio, lugarDaRota } from '../lugares';
 import { useLuzDaHora } from '../luz-da-hora';
 import { AberturaM } from './AberturaM';
 import { FiltrosM } from './FiltrosM';
@@ -24,9 +24,6 @@ import '../mockup/reset.css';
 import '../mockup/fontes.css';
 import '../mockup/mockup.css';
 import '../mockup/ajustes.css';
-
-/** As rotas com nav embaixo: o Agora (e, nas fatias seguintes, o Destino e o Varal). */
-const COM_NAV = new Set(['/']);
 
 /**
  * O quadro do Fio: o `<main class="app">` do mockup aprovado, com a nav, o "+" e o aviso dentro dele. A raiz
@@ -77,10 +74,11 @@ export function CascaM() {
       >
         Pular para o conteúdo
       </a>
-      <FiltrosM />
+      <FiltrosM mundo={mundo} />
+      {/* No monitor o Destino alarga o quadro (`m-largo`, do mockup): o texto à esquerda e o mapa à direita. */}
       <main
         id="conteudo"
-        className="m-app"
+        className={pathname === ROTA_DO_DESTINO ? 'm-app m-largo' : 'm-app'}
         tabIndex={-1}
         data-entrada={naAbertura ? 'abertura' : undefined}
       >
@@ -103,7 +101,9 @@ export function CascaM() {
             }}
           />
         )}
-        {COM_NAV.has(pathname) && !naAbertura && <NavM ativo={lugarDaRota(pathname)} />}
+        {comNavDoFio(pathname) && !naAbertura && (
+          <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />
+        )}
         {!naAbertura && pathname !== ROTA_DA_PROVA && <MaisM />}
         <ToastM />
       </main>

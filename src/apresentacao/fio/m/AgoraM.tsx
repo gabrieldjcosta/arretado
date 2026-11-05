@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
+import { useContaAtiva } from '../dados/conta-ativa';
 import { descreverPasso } from '../dados/descrever';
 import { ROTA_DA_PROVA } from '../lugares';
 import { limparPausa, tipoDaPausa, veioDeUmaPausa } from '../dados/pausa';
@@ -7,6 +8,7 @@ import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
 import { CactoMarca } from './CactoMarca';
+import { ContaM } from './ContaM';
 import { PuxarM } from './PuxarM';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
@@ -42,7 +44,8 @@ function SemProva() {
 export function AgoraM() {
   const fio = useFio();
   const { entrada } = useJornadaDoFio();
-  const navegar = useNavigate();
+  const [contaAberta, setContaAberta] = useState(false);
+  const conta = useContaAtiva();
   const { avanco } = fio;
   // Vindo de uma pausa, o Agora diz uma vez que está tudo salvo (o aviso do mockup).
   const [pausou] = useState(veioDeUmaPausa);
@@ -58,11 +61,13 @@ export function AgoraM() {
     );
   }, [pausou]);
 
-  // O passo, o pouso e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é puxado, e a
-  // troca de tela não espera rede nem disco (o mockup troca sem vão).
+  // O passo, o pouso, o Destino, o Varal e a fonte da lei são pedaços à parte: pedidos já aqui, ficam à mão quando o fio é
+  // puxado ou a aba é trocada, e a troca de tela não espera rede nem disco (o mockup troca sem vão).
   useEffect(() => {
     void import('./PassoM').catch(() => undefined);
     void import('./PousoM').catch(() => undefined);
+    void import('./DestinoM').catch(() => undefined);
+    void import('./VaralM').catch(() => undefined);
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.load('400 16px "Literata Fio"').catch(() => undefined);
     }
@@ -91,12 +96,13 @@ export function AgoraM() {
           type="button"
           className="m-marca"
           aria-label="arretado: sua conta e ajustes"
+          aria-haspopup="dialog"
           onClick={() => {
-            void navegar('/conta');
+            setContaAberta(true);
           }}
         >
           arretado
-          <CactoMarca />
+          <CactoMarca preso={!!conta} />
         </button>
         <span className="m-cobre">
           <b>{formatar(percentual)}%</b>
@@ -128,6 +134,12 @@ export function AgoraM() {
           )}
         </>
       )}
+      <ContaM
+        aberta={contaAberta}
+        aoFechar={() => {
+          setContaAberta(false);
+        }}
+      />
     </TelaM>
   );
 }

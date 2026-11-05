@@ -286,6 +286,21 @@
   box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
 }
 
+/* (17, o Sol desligado, de noite; revisão da Marca em 05/11/2026.) A opacidade de 45% do botão desligado, sobre o azul da
+   noite, faz do amarelo do Sol um verde-oliva de lama, e o anel âmbar o põe em destaque. De noite o Sol desligado perde a
+   cor (`saturate(.3)`, junto da opacidade do mockup, e sem anel): fica perto do bege do mockup e continua evidente que não
+   se toca. Vale para todo botão do Sol desligado; o de dia volta ao do mockup (#e9edf3, o degradê do Sol o cobria). */
+.m-fio.m-fio.m-fio[data-mundo='noite']:not([data-movimento='calmo']) .m-acao[disabled] {
+  filter: saturate(0.3);
+  box-shadow: none;
+}
+
+.m-fio.m-fio.m-fio[data-mundo='dia']:not([data-movimento='calmo']) .m-acao[disabled] {
+  background: #e9edf3;
+  color: #8a93a6;
+  box-shadow: none;
+}
+
 /* (17, no toque do Só contorno, de noite; revisão da Marca em 04/11/2026.) O halo de 5 px a 18% e o brilho de 24 px
    a 35% que a prancha dá ao toque, sobre o azul-escuro do cartão, viram um anel de lama em volta do botão, e o
    interior, que é transparente e não muda (tem a cor do cartão, em repouso e ao tocar), parece um buraco preto ao
@@ -371,8 +386,17 @@
 }
 
 /* O traço que anda no mapa do Destino (`.m-andado-b`, a faixa de baixo): amarelo do ponto, largura 10, opacidade
-   .38 e o desfoque do mockup. Só passa a valer quando o Destino entrar no quadro. */
+   .38 e o desfoque do mockup. */
 .m-fio.m-fio.m-fio .m-destino .m-andado-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
+}
+
+/* O fio que voa de uma aba à outra (`.m-voo-fio .m-b`, a faixa de baixo) também é um traço que anda: a mesma faixa
+   amarela, nos dois mundos (o mockup a acende em ciano à noite). Revisão da Marca no #419. O voo ao Destino apaga a
+   faixa a partir dos .38 (`m/aba.ts`), e não de 1. */
+.m-fio.m-fio.m-fio .m-voo-fio .m-b {
   stroke: var(--m-ponto);
   stroke-width: 10;
   opacity: 0.38;
@@ -657,4 +681,186 @@
    `hidden`) deixa a caixa medível e tira o foco e o toque. A nav e o "+" só aparecem depois, como no mockup. */
 .m-fio .m-app[data-entrada] > .m-tela:not(.m-abertura) {
   visibility: hidden;
+}
+
+/* 29. Cada marca do mapa do Destino acha o seu lugar pela câmera, em CSS. Motivo: o mockup escreve `left` e `top`, em px,
+      marca por marca, a cada quadro do voo da câmera. No app a câmera (`m/useCameraM.ts`) escreve só três variáveis na
+      caixa (`--cam-x`, `--cam-y` e `--cam-k`, o canto e a escala) e cada marca guarda o seu ponto no desenho (`--x` e
+      `--y`): são dezenas de marcas que o React não precisa reescrever a cada quadro. O resultado na tela é o mesmo. */
+.m-fio .m-ne-marcas > * {
+  left: calc((var(--x) - var(--cam-x)) * var(--cam-k) * 1px);
+  top: calc((var(--y) - var(--cam-y)) * var(--cam-k) * 1px);
+}
+
+/* 33. Os lugares abertos ficam por cima dos fechados, e o de onde a pessoa está por cima de todos. Motivo: no mockup as
+      marcas se empilham na ordem do caminho, e a que vem depois cobre a anterior. Com a câmera de perto, São Luís e
+      Alcântara ficam a uns 12 px um do outro; o São Luís, que ainda está fechado e vem depois, cobria o lugar onde a
+      pessoa está, e o toque ia para o vizinho ("São Luís se abre num pouso") em vez de abrir a ficha. O Playwright
+      acusava "intercepts pointer events" no clique. O "você está aqui" (`.m-no-aqui`, z-index 2 no mockup) não recebe
+      toque (`pointer-events: none`) e fica como está. */
+.m-fio.m-fio .m-ne-lugar.m-aberto {
+  z-index: 1;
+}
+
+.m-fio.m-fio .m-ne-lugar.m-com-voce {
+  z-index: 2;
+}
+
+/* 34. O nome do estado no mapa do Destino, de dia, e a nota da ficha ("Rascunho da pesquisa, a conferir…") ganham tinta
+      mais escura. Motivo: medido nos pixels, o nome do estado ("Maranhão") dá 3,98:1 de dia, com a tinta do papel
+      (`--m-papel-tinta`, #7b6845), e a nota da ficha dá 4,22:1 à noite, com a tinta terciária (`--m-texto-3`, #6f7ea0);
+      o mínimo é 4,5:1 (WCAG 1.4.3). De dia o nome do estado usa #6a5836 (o mesmo marrom, mais escuro). A nota da ficha
+      usa, nos dois mundos, a tinta secundária (`--m-texto-2`), a mesma do "small" da ficha e da dica do cartão (desvio
+      19). Medido de novo nos pixels: "Maranhão" 5,08:1 de dia (6,65:1 à noite, que já passava) e a nota da ficha 7,17:1 à
+      noite e 6,73:1 de dia. O resto do mapa fica como no mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-ne-rotulo span {
+  color: #6a5836;
+}
+
+.m-fio.m-fio .m-ne-ficha em {
+  color: var(--m-texto-2);
+}
+
+/* 36. A tela que rola esmaece no alto, onde fica o "+". Motivo: o "+" (46 px, a 18 do alto, então até os 64 px) é fixo e
+      as telas do Destino e do Varal rolam por baixo dele; em 360 de largura o texto passava debaixo dele ("os ma +",
+      "já é seu"). Como o desvio 9 faz nos passos (a área que rola começa abaixo do "+"), mas sem mexer no repouso: aqui
+      o mockup começa o texto a 22 px do alto e o repouso fica onde ele o põe; só depois que a tela rola é que o alto
+      some até os 64 px, e o texto volta inteiro aos 104 px. O esmaecimento entra aos poucos nos primeiros 40 px de
+      rolagem (`TelaM` escreve `--m-rolado`, de 0 a 1, e a classe `m-rolada`). Os passos do desvio 9 já começam
+      abaixo do "+" e ficam de fora. */
+.m-fio
+  .m-tela.m-rolada:not(
+    :is(
+      [data-tela='ler'],
+      [data-tela='lembrar'],
+      [data-tela='achar'],
+      [data-tela='guardar'],
+      [data-tela='revisar'],
+      [data-tela='seu_passo'],
+      [data-tela='praticar']
+    )
+  ) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+}
+
+/* 39. O Varal e o folheto: contraste, o folheto vazio e o pé. Motivo: (a) alguns textos do mockup usam tintas que, medidas nos
+      pixels, ficam abaixo de 4,5:1 (WCAG 1.4.3). "Ordem" e "À vista em cada linha" das folhas (`.m-opcoes-org h3`) usam a
+      terciária (`--m-texto-3`) e dão 3,94:1 e 4,04:1 à noite; o rótulo de cada fio do Varal, 4,45:1; o grupo do folheto e o
+      lembrete da busca usam a mesma tinta. Passam à secundária, a mesma da dica do cartão (desvio 19). Nos folhetos de papel
+      (o mesmo `#e9e1cf` nos dois mundos) a linha de estado (`#7a6f58`, 3,80:1) vai a `#685d46` (4,98:1) e o número miúdo
+      (`rgba(60,52,38,.5)`, 2,59:1), que no app é dado real e o leitor de tela lê, a `#5a5242` (5,93:1, a tinta do texto miúdo
+      do folheto). (b) O mockup não tem o folheto vazio (só avisa "Folheto vazio…"): o app diz uma frase e oferece um botão,
+      em uma coluna, com o botão na largura do conteúdo. (c) Os botões do pé do folheto (`.m-pe-folheto`) quebram de linha
+      se não couberem lado a lado (texto maior, tela estreita). (d) O "⋯" de cada linha (`.m-linha-item .m-mais`) herda do "+" do
+      quadro (`.m-mais`) o `position: absolute; right: 22px; top: 18px`, e por isso o botão de abrir a linha, que é a linha toda
+      (`flex: 1`), passa por baixo dele: um nome comprido corria sob o "⋯" (em 360 de largura, a linha tem 282 px e o "⋯"
+      ocupa de 259 a 299). A cara fica a do mockup (o "⋯" no mesmo lugar); a linha só reserva o lugar dele (62 px do canto da
+      direita e mais 8 de folga) para o texto não passar de lá. */
+.m-fio .m-opcoes-org h3,
+.m-fio .m-grupo-folheto,
+.m-fio .m-varal-rotulo {
+  color: var(--m-texto-2);
+}
+.m-fio .m-busca-varal input::placeholder {
+  color: var(--m-texto-2);
+}
+.m-fio .m-folheto .m-estado {
+  color: #685d46;
+}
+.m-fio .m-varal-linha .m-folheto .m-conta-f {
+  color: #5a5242;
+}
+.m-fio .m-linha-item.m-com-mais .m-abre {
+  padding-right: 70px;
+}
+.m-fio .m-vazio-folheto {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 2px 0;
+}
+.m-fio .m-vazio-folheto p {
+  margin: 0;
+}
+.m-fio .m-pe-folheto {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+/* 41. O Caderno de Frases: o teto da folha e o pé. Motivo: (a) no mockup a folha tem a altura do que há nela (até 90% do quadro):
+      sobe com as duas Frases de exemplo (456 px em 390 px de largura, 436 px de 412 em diante) e cresce com o "Ler na lei" aberto
+      (587 px em 390 px de largura, 567 de 412 em diante). O app faz igual, mas com as Frases da pessoa (até 50 por página) e o
+      artigo inteiro da lei a folha chega ao teto, e o teto do mockup (90%) deixava o topo cobrir o título do Varal, que ficava
+      cortado ao meio (a Marca, na revisão do #423). O teto do Caderno é o menor entre os 90% do mockup e o que deixa o título do
+      Varal inteiro à vista (ele termina a 100 px do alto do quadro; 12 px de folga): o conteúdo rola dentro da folha dali em diante.
+      (b) o pé leva "Mostrar mais" (quando há mais Frases) e "Abrir a lista completa", que o mockup não tem. "Abrir a lista completa"
+      é caminho secundário: um link com seta, no estilo do "Ler na lei", à esquerda; "Mostrar mais" fica como o botão de contorno
+      do mockup, ao lado dele. Em 360 px os dois não cabem juntos e quebram de linha. (c) O "Ler na lei" aberto, quando a folha
+      já está no teto, rola até a vista e deixa embaixo o respiro da Frase e da folha. (d) De dia o âmbar do "Ler na lei"
+      (`--m-neon`, #b25f00) tem 4,64:1 sobre o branco do cartão, mas só 4,36:1 sobre o fim do degradê da folha (#f6f8fb), onde o
+      link do pé fica (medido nos pixels; o mínimo é 4,5:1, WCAG 1.4.3): o link usa #a35700, 5,03:1. */
+.m-fio .m-folha .m-corpo.m-caderno {
+  max-height: min(90%, calc(100% - 112px));
+}
+.m-fio .m-frase-item .m-lei {
+  scroll-margin-bottom: 36px;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-acao {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: var(--m-neon);
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 40px;
+  padding: 8px 2px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+}
+.m-fio.m-fio[data-mundo='dia'] .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  color: #a35700;
+}
+
+/* (43, o "Ler na lei" de dia.) O âmbar do botão no mockup dá 4,43:1 sobre o fim do degradê da folha, abaixo do mínimo de
+   4,5:1 (WCAG 1.4.3); de dia o texto do botão passa ao mesmo #a35700 do link "Abrir a lista completa" do Caderno
+   (desvio 41). De noite segue o mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-ler-junto button.m-abrir {
+  color: #a35700;
+}
+
+/* (44, os títulos dos grupos da Conta.) "Aparência", "Prova" e "O resto" em 11 px na cor 3 do mockup dão de 3,95 a 4,17:1
+   sobre a folha à noite, abaixo do mínimo de 4,5:1 (WCAG 1.4.3). Passam à cor 2, a do texto de apoio da mesma folha. */
+.m-fio.m-fio .m-conta-folha .m-grupo-conta h3 {
+  color: var(--m-texto-2);
+}
+
+/* (44, "Sair desta conta" de dia.) O #e0735f do mockup dá 2,91:1 sobre a folha clara. De dia passa ao vermelho #b3261e
+   (mais de 6:1); de noite segue o mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-linha-conta.m-sair {
+  color: #b3261e;
 }
