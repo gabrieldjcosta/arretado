@@ -270,10 +270,7 @@
       "nome": "Agora (tela inicial do Fio)",
       "onde": "src/apresentacao/fio/m/AgoraM.tsx",
       "mockup": "data-tela=inicio",
-      "refs": [
-        "laws-of-ux",
-        "motion"
-      ],
+      "refs": ["laws-of-ux", "motion"],
       "estado": "no app"
     },
     {
@@ -281,9 +278,7 @@
       "nome": "Destino (mapa do Nordeste)",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "data-tela=mapa",
-      "refs": [
-        "awesome-design-md"
-      ],
+      "refs": ["awesome-design-md"],
       "estado": "no app (#419)"
     },
     {
@@ -291,10 +286,7 @@
       "nome": "Varal e Caderno de Frases",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "data-tela=varal",
-      "refs": [
-        "auto-animate",
-        "motion"
-      ],
+      "refs": ["auto-animate", "motion"],
       "estado": "no app (#420, #423)"
     },
     {
@@ -302,10 +294,7 @@
       "nome": "Cartão que vira / lembrar",
       "onde": "LembrarM.tsx, CartaoM.tsx",
       "mockup": "data-tela=lembrar",
-      "refs": [
-        "motion",
-        "uiverse"
-      ],
+      "refs": ["motion", "uiverse"],
       "estado": "no app"
     },
     {
@@ -313,9 +302,7 @@
       "nome": "Porteira (deque misturado)",
       "onde": "DequeM.tsx",
       "mockup": "folha porteira",
-      "refs": [
-        "laws-of-ux"
-      ],
+      "refs": ["laws-of-ux"],
       "estado": "folha-porteira aguarda cartão do Gabriel"
     },
     {
@@ -323,9 +310,7 @@
       "nome": "Guardar um erro / Ache o erro",
       "onde": "m/AcheOErroM.tsx",
       "mockup": "folha erro",
-      "refs": [
-        "checklist-design"
-      ],
+      "refs": ["checklist-design"],
       "estado": "no app (#426, #428)"
     },
     {
@@ -333,9 +318,7 @@
       "nome": "Conta em folha",
       "onde": "src/apresentacao/fio/m/",
       "mockup": "folha conta",
-      "refs": [
-        "base-ui"
-      ],
+      "refs": ["base-ui"],
       "estado": "no app (#427, #430)"
     },
     {
@@ -343,9 +326,7 @@
       "nome": "Seletor dia/noite (lua e sol)",
       "onde": "Conta › Aparência",
       "mockup": "prancha uiverse v4",
-      "refs": [
-        "uiverse"
-      ],
+      "refs": ["uiverse"],
       "estado": "PR #424 em rascunho"
     },
     {
@@ -353,10 +334,7 @@
       "nome": "Abertura com cacto e prova",
       "onde": "thread C1",
       "mockup": "data-tela=abertura, prova",
-      "refs": [
-        "motion",
-        "uiverse"
-      ],
+      "refs": ["motion", "uiverse"],
       "estado": "em outra thread"
     },
     {
@@ -364,9 +342,7 @@
       "nome": "Aviso curto (Desfazer, Salvo)",
       "onde": "m/ToastM.tsx",
       "mockup": "toast do mockup",
-      "refs": [
-        "uiverse"
-      ],
+      "refs": ["uiverse"],
       "estado": "no app; Sonner só se precisar de fila"
     },
     {
@@ -374,10 +350,7 @@
       "nome": "Fecho do Dia / conquista",
       "onde": "PousoM.tsx",
       "mockup": "data-tela=pouso",
-      "refs": [
-        "motion",
-        "laws-of-ux"
-      ],
+      "refs": ["motion", "laws-of-ux"],
       "estado": "no app; confete só no modo Vivo, sem perda de sequência"
     },
     {
@@ -385,10 +358,7 @@
       "nome": "Estado vazio e retomada",
       "onde": "várias telas",
       "mockup": "sem",
-      "refs": [
-        "mobbin",
-        "checklist-design"
-      ],
+      "refs": ["mobbin", "checklist-design"],
       "estado": "a pesquisar (Mobbin ou Kombai)"
     },
     {
@@ -396,9 +366,7 @@
       "nome": "Desktop em duas colunas",
       "onde": "Fio, a partir de ~840 px",
       "mockup": "sem",
-      "refs": [
-        "material-3"
-      ],
+      "refs": ["material-3"],
       "estado": "depois do celular (Gabriel, 05/11)"
     },
     {
@@ -406,10 +374,7 @@
       "nome": "Leitor de norma",
       "onde": "src/apresentacao/leitor",
       "mockup": "sem",
-      "refs": [
-        "laws-of-ux",
-        "checklist-design"
-      ],
+      "refs": ["laws-of-ux", "checklist-design"],
       "estado": "no app"
     }
   ]
