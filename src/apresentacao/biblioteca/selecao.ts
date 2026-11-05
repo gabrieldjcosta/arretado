@@ -15,7 +15,7 @@ export interface SelecaoNoTexto {
 export const CLASSE_DO_TEXTO = 'texto-vigente';
 export const ATRIBUTO_FORA_DO_TEXTO = 'data-fora-do-texto';
 
-function textosDe(raiz: Element): Text[] {
+export function textosDe(raiz: Element): Text[] {
   const textos: Text[] = [];
   const andar = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
   for (let no = andar.nextNode(); no; no = andar.nextNode()) {
@@ -27,7 +27,7 @@ function textosDe(raiz: Element): Text[] {
 }
 
 /** O offset do ponto (nó, offset) dentro do texto do dispositivo, contando só o texto da lei. */
-function deslocamento(textos: readonly Text[], no: Node, offset: number): number {
+export function deslocamento(textos: readonly Text[], no: Node, offset: number): number {
   const ponto = document.createRange();
   ponto.setStart(no, offset);
   let total = 0;

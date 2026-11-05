@@ -4385,6 +4385,43 @@ html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
   animation: none;
 }
 
+/* Régua de foco (05/11/2026). Frase: a API de realce do navegador esmaece o resto e acende a frase
+   sem criar nó nem mexer nas âncoras dos grifos. Palavras: só os destaques automáticos (o mesmo
+   detector) ficam na cor cheia. Nada se move nem anima: vale igual no Calmo e com reduzir movimento. */
+.leitor {
+  --regua-apagado: color-mix(in srgb, var(--texto) 70%, var(--superficie));
+  --regua-acesa: color-mix(in srgb, var(--texto) 9%, transparent);
+}
+::highlight(regua-apagada) {
+  color: var(--regua-apagado);
+}
+::highlight(regua-acesa) {
+  background-color: var(--regua-acesa);
+}
+.leitor[data-regua-foco='palavras'] .texto-vigente {
+  color: var(--regua-apagado);
+}
+.leitor[data-regua-foco='palavras'] .texto-vigente .destaque,
+.leitor[data-regua-foco='palavras'] .texto-vigente .grifo {
+  color: var(--texto);
+  font-weight: 600;
+}
+.regua-de-foco {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+}
+@media (forced-colors: active) {
+  ::highlight(regua-apagada) {
+    color: GrayText;
+  }
+  ::highlight(regua-acesa) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}
+
 /* ---------- Leitor: o fio que se desenha na rolagem (Biblioteca visual, 05/11) ---------- */
 /* Preso logo abaixo do cabeçalho fixo (--barra-fixa, medida pelo Leitor). Só orienta: o texto não
    muda e o toque passa por ele. */
