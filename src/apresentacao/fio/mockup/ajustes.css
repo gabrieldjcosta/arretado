@@ -1,0 +1,858 @@
+/* Desvios do mockup aprovado, um por um, cada qual com o motivo. É o único lugar onde o app se afasta do
+   mockup (mockup.css é gerado e não se edita). Sem motivo escrito aqui, não é desvio: é erro. A lista também
+   está em docs/design/desvios.md. */
+
+/* 1. A raiz do Fio faz o papel do <body> do protótipo (a página que o centrava e lhe dava o fundo).
+      Motivo: no protótipo havia uma página; no app, quem faz isso é a raiz do Fio. A área segura entra
+      nos paddings (entalhe e barra de gestos do aparelho), que a página do protótipo não tinha. */
+.m-fio {
+  position: relative;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 440px) {
+  .m-fio {
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* 2. O quadro usa a altura que sobra. Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
+      Noite/Dia, Recomeçar) e a nota de rodapé, 64 px (52 no celular); o app não tem nenhuma das duas. */
+.m-fio .m-app {
+  height: min(830px, 100%);
+}
+
+@media (max-width: 440px) {
+  .m-fio .m-app {
+    height: 100%;
+  }
+}
+
+/* 3. As fontes do mockup, com os nomes próprios de fontes.css. Motivo: o protótipo as pedia ao Google
+      Fonts; o app as serve do próprio site (T19) e não pode trocar a Atkinson e a Literata dos outros
+      mundos do app. */
+.m-fio.m-fio {
+  --m-f-ui:
+    'Atkinson Hyperlegible Next Fio', 'Atkinson Hyperlegible Next', system-ui, -apple-system,
+    sans-serif;
+  --m-f-lei: 'Literata Fio', 'Literata', Georgia, 'Times New Roman', serif;
+  --m-f-titulo: 'Schibsted Grotesk', 'Atkinson Hyperlegible Next Fio', system-ui, sans-serif;
+}
+
+/* 4. Um link com a cara do botão de ação. Motivo: o protótipo só tinha <button>; no app o mesmo gesto
+      às vezes leva a outra rota e tem de ser <a>, sem o sublinhado do navegador. */
+.m-fio a.m-acao {
+  text-decoration: none;
+}
+
+/* 5. "Pular para o conteúdo" (acessibilidade). Motivo: o protótipo não tinha teclado nem leitor de tela
+      no escopo; o app tem de ter (WCAG 2.4.1). Fica fora da tela até receber o foco. */
+.m-fio .m-pular-ao-conteudo {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 20;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--m-luz);
+  color: var(--m-noite);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.m-fio .m-pular-ao-conteudo:focus {
+  left: 12px;
+}
+
+/* 6. Texto só para leitor de tela, dentro do quadro. Motivo: o protótipo não tinha esses textos. */
+.m-fio .m-so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 7. Os avisos da casca do app (sem rede, outro aparelho com a conta, sessão em curso). Motivo: o protótipo
+      não tinha nenhum; o app tem de mostrá-los, e eles não podem empurrar o quadro. Ficam por cima, no alto. */
+.m-fio .m-avisos {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.m-fio .m-avisos > * {
+  pointer-events: auto;
+}
+
+/* 8. O link "Abrir no Leitor" com a cara de um chip. Motivo: o Ler do mockup não leva ao Leitor; o do app
+      leva, para quem quer o artigo inteiro com as ferramentas do Leitor. */
+.m-fio a.m-chip {
+  text-decoration: none;
+}
+
+/* 9. Os outros passos do app usam o mesmo cartão, e o respiro de 68 px no alto não rola. Motivo: o mockup só tem os
+      passos ler, lembrar e achar; o app tem também guardar, revisar, o passo da própria pessoa e a porteira, e todos
+      precisam do mesmo respiro no alto para o "+" não ficar por cima do botão de pausa. Além disso, a lei do app é
+      mais longa que a do mockup: o cartão passa do quadro, a tela rola e o texto passava por baixo do "+" (em 360 e
+      em 1280 px). No mockup o respiro é um recuo da tela (`padding-top`), que rola junto com o texto; aqui ele é o
+      começo da área que rola (`top`): o texto some na linha do respiro, sempre abaixo do "+". Em repouso nada
+      muda: o cartão fica onde o mockup o põe. */
+.m-fio
+  .m-tela:is(
+    [data-tela='ler'],
+    [data-tela='lembrar'],
+    [data-tela='achar'],
+    [data-tela='guardar'],
+    [data-tela='revisar'],
+    [data-tela='seu_passo'],
+    [data-tela='praticar']
+  ) {
+  top: 68px;
+  padding-top: 0;
+}
+
+/* 10. Respostas longas na lacuna e nas contas. Motivo: o mockup só tinha "16%", "25%" e "30%"; a lei do app responde
+      "30 (trinta) dias", "dois terços", "violência ou grave ameaça". A conta redonda de 78 px não cabe nelas: vira
+      pílula, e as contas descem num fio vertical (o mesmo fio, de pé). A lacuna vazia ganha a largura de uma frase
+      curta e, cheia, vira texto corrido com o grifo, que quebra de linha como o resto da lei. */
+.m-fio .m-lacuna.m-longa {
+  min-width: 7em;
+}
+
+.m-fio .m-lacuna.m-longa.m-cheia {
+  display: inline;
+  height: auto;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.m-fio .m-contas.m-longas {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.m-fio .m-contas.m-longas::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: auto;
+  width: 2px;
+  height: auto;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--m-linha) 12%,
+    var(--m-linha) 88%,
+    transparent
+  );
+}
+
+.m-fio .m-bolinha.m-longa {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  min-height: 56px;
+  padding: 10px 22px;
+  border-radius: 28px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+/* 11. O deque da porteira cresce com a afirmação. Motivo: o mockup tinha afirmações de uma ou duas linhas e o deque
+      media 270 px; a lei do app passa de quatro linhas. O deque vai de 270 a 400 px e o texto rola dentro do cartão
+      (com `pan-y`, para o dedo rolar na vertical e arrastar na horizontal). */
+.m-fio .m-deque {
+  height: clamp(270px, 44dvh, 400px);
+}
+
+.m-fio .m-deque .m-cd {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+/* 12. "Pular este passo" por teclado e leitor de tela, no Lembrar. Motivo: no mockup o Lembrar só se pula arrastando
+      o cartão para a esquerda e o rodapé só chega com a resposta; sem o gesto, a pessoa ficaria presa até responder.
+      O botão fica fora da vista e aparece, no pé do cartão, quando recebe o foco. */
+.m-fio .m-pular-teclado:not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.m-fio .m-pular-teclado:focus-visible {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 2;
+}
+
+/* 13. Em tela muito estreita (zoom de 200% num celular: 195 px de layout), a nav encolhe. Motivo: no mockup cada lugar
+      leva 18 px de respiro dos lados e a nav tem uns 245 px, que passam da borda de uma tela dessas. */
+@media (max-width: 280px) {
+  .m-fio .m-nav {
+    max-width: calc(100% - 12px);
+  }
+
+  .m-fio .m-nav button {
+    min-width: 0;
+    padding: 0 6px;
+    font-size: 13px;
+  }
+}
+
+/* 14. Os "min" do Agora, no mundo do dia, em âmbar escuro. Motivo: o mockup os pinta com o dourado do ponto
+      (#ffc53d), que sobre o branco dá 1,57:1 (o mínimo é 4,5:1, WCAG 1.4.3). O âmbar escuro é o do carimbo do
+      mesmo mundo (--m-erro-selo). */
+.m-fio.m-fio[data-mundo='dia'] .m-proximo .m-min {
+  color: var(--m-erro-selo);
+}
+
+/* 17. O botão de ação: o "Sol" no Vivo e o "Só contorno" no Calmo. Motivo: o degradê do mockup (creme à noite, do
+      amarelo ao âmbar de dia) não conversava com o sol do ponto de "Puxe o fio". Escolha do Gabriel (04/11/2026,
+      13:31Z) entre as caras das pranchas da Marca: o Sol, do mesmo material do ponto, no Vivo (que também é o
+      padrão de quem não configurou nada) e o Só contorno no Calmo, sem a bolinha amarela ao lado da palavra: o sol
+      fica só no brilho que aparece ao tocar. Vivo ou Calmo vem de `data-movimento` na raiz (`m/movimento.ts`): o
+      perfil Calmo em uso ou o sistema pedindo menos movimento. Só a cara muda (fundo, cor do texto e sombras); o
+      formato, o tamanho, a seta e o afundar ao tocar seguem os do mockup. Sem `--m-ambar` na noite: o valor de
+      reserva é o mesmo âmbar do dia. */
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao {
+  background: radial-gradient(
+    130% 170% at 50% 0%,
+    #fff7da 0%,
+    #ffd96e 34%,
+    var(--m-ponto) 68%,
+    #f2b228 100%
+  );
+  color: #3a2700;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(211, 146, 0, 0.55),
+    0 0 0 5px rgba(255, 197, 61, 0.14),
+    0 10px 26px -12px rgba(255, 190, 50, 0.8);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:hover,
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(211, 146, 0, 0.7),
+    0 0 0 6px rgba(255, 197, 61, 0.2),
+    0 0 26px rgba(255, 197, 61, 0.55);
+}
+
+.m-fio.m-fio.m-fio:not([data-movimento='calmo']) .m-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgba(211, 146, 0, 0.55);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao {
+  background: transparent;
+  color: var(--m-texto);
+  box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao:hover,
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ambar, #d39200),
+    0 0 0 5px rgba(255, 197, 61, 0.18),
+    0 0 24px rgba(255, 197, 61, 0.35);
+}
+
+.m-fio.m-fio.m-fio[data-movimento='calmo'] .m-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
+}
+
+/* (17, o Sol desligado, de noite; revisão da Marca em 05/11/2026.) A opacidade de 45% do botão desligado, sobre o azul da
+   noite, faz do amarelo do Sol um verde-oliva de lama, e o anel âmbar o põe em destaque. De noite o Sol desligado perde a
+   cor (`saturate(.3)`, junto da opacidade do mockup, e sem anel): fica perto do bege do mockup e continua evidente que não
+   se toca. Vale para todo botão do Sol desligado; o de dia volta ao do mockup (#e9edf3, o degradê do Sol o cobria). */
+.m-fio.m-fio.m-fio[data-mundo='noite']:not([data-movimento='calmo']) .m-acao[disabled] {
+  filter: saturate(0.3);
+  box-shadow: none;
+}
+
+.m-fio.m-fio.m-fio[data-mundo='dia']:not([data-movimento='calmo']) .m-acao[disabled] {
+  background: #e9edf3;
+  color: #8a93a6;
+  box-shadow: none;
+}
+
+/* (17, no toque do Só contorno, de noite; revisão da Marca em 04/11/2026.) O halo de 5 px a 18% e o brilho de 24 px
+   a 35% que a prancha dá ao toque, sobre o azul-escuro do cartão, viram um anel de lama em volta do botão, e o
+   interior, que é transparente e não muda (tem a cor do cartão, em repouso e ao tocar), parece um buraco preto ao
+   lado dele. De noite o anel acende (do âmbar ao dourado do ponto) e o halo vira brilho de verdade, um forte e perto
+   e outro suave e longe, da mesma família do neon do fio (desvio 20). O fundo continua transparente. */
+.m-fio.m-fio.m-fio[data-movimento='calmo'][data-mundo='noite'] .m-acao:hover,
+.m-fio.m-fio.m-fio[data-movimento='calmo'][data-mundo='noite'] .m-acao:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ponto),
+    0 0 6px 1px rgba(255, 197, 61, 0.6),
+    0 0 24px 3px rgba(255, 197, 61, 0.34);
+}
+
+/* 18. As respostas do Lembrar (`.m-bolinha`), no mundo do dia. Motivo: o fundo delas é azul-escuro nos dois mundos,
+      mas o texto usa `--m-luz`, que de dia é a tinta (#0f1c3a): texto escuro sobre fundo escuro, com 1,3:1 de
+      contraste, ilegível (o mockup tem o mesmo defeito: `docs/design/fio/mockup-aprovado.html` linha 471, e a
+      folha lado a lado de dia o mostra). De dia o texto das respostas passa a ser branco, como à noite; e o da
+      resposta certa, que usa `--m-noite` (quase branco de dia) sobre o âmbar da banda, passa à tinta. */
+.m-fio.m-fio[data-mundo='dia'] .m-bolinha:not(.m-certa) {
+  color: #fff;
+}
+
+.m-fio.m-fio[data-mundo='dia'] .m-bolinha.m-certa {
+  color: var(--m-texto);
+}
+
+/* 19. Dois textos usam a tinta secundária do arquivo (`--m-texto-2`, a mesma de "da prova é seu"). Motivo: o mockup
+      os pinta com `--m-texto-3`, que não chega ao mínimo de 4,5:1 (WCAG 1.4.3). A dica do cartão ("arraste o cartão
+      pro lado", no Ler; "acertou? passe o cartão pro lado", no Lembrar) dá 2,9:1 de dia (#6b7690) e 4,0 a 4,2:1 de
+      noite (#6f7ea0), medidos nos pixels, nos dois mundos; "descansar", no pouso, dá 4,1:1 de dia. A tinta
+      secundária passa nos dois (#4a5878 de dia, #9aa8c4 de noite). */
+.m-fio.m-fio .m-dica-gesto,
+.m-fio.m-fio[data-mundo='dia'] .m-lua-btn span {
+  color: var(--m-texto-2);
+}
+
+/* 20. O neon do fio é amarelo. Pedido do Gabriel em 04/11/2026 (13:08Z: "nos movimentos do fio só faltou o brilho
+      do neon (no caso, amarelo)"; 13:31Z: "toca pra o desenvolvimento"). Motivo: o mockup acende o fio do Agora em
+      ciano (a faixa desfocada `.m-fio-pendurado-b`, na cor `--m-neon`), e o ponto de "Puxe o fio" é um sol. Valores
+      das pranchas da Marca (os mesmos do #408), onde o fio é uma linha de 2,4 px com `box-shadow`: dois halos
+      amarelos em repouso (4 px e 1 de espalhamento a 55%; 14 px e 2 a 32%); puxando, eles sobem; passando dos 70 px, o
+      fio estoura e a bola ganha o brilho dela. O `box-shadow` espalha e o `drop-shadow()` não (sem o espalhamento o
+      halo num fio fino sai um quarto do da prancha), então os halos são filtros do SVG (`m/FiltrosM.tsx`, os três
+      `m-neon-*`: `feMorphology` para o espalhamento e `feGaussianBlur` para o raio). Um filtro com `url()` não
+      transita: o brilho muda de estado de uma vez, nos 4 e nos 70 px. O `data-puxe` (solto, puxando, passou) vem de
+      `m/PuxarM.tsx`. No Calmo o brilho fica parado, no valor de repouso; em aparelho leve não há halo (como o
+      mockup, que tira as camadas de brilho). O ponto do trilho e a faísca ficam como no arquivo. */
+.m-fio.m-fio .m-fio-pendurado-b {
+  display: none;
+}
+
+.m-fio.m-fio .m-fio-pendurado {
+  filter: url('#m-neon-solto');
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='puxando'] .m-fio-pendurado {
+  filter: url('#m-neon-puxando');
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-fio-pendurado {
+  filter: url('#m-neon-passou');
+}
+
+.m-fio.m-fio:not([data-movimento='calmo']) .m-puxar-area[data-puxe='passou'] .m-puxador {
+  box-shadow:
+    0 0 0 8px rgba(255, 197, 61, 0.22),
+    0 0 46px 6px rgba(255, 197, 61, 0.8);
+}
+
+.m-fio.m-fio:not([data-movimento='calmo'])[data-mundo='dia']
+  .m-puxar-area[data-puxe='passou']
+  .m-puxador {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(168, 108, 0, 0.55),
+    0 0 0 8px rgba(255, 197, 61, 0.22),
+    0 0 46px 6px rgba(255, 197, 61, 0.8);
+}
+
+/* Em aparelho leve nenhum estado leva o halo: o seletor tem a força dos três de cima e vem depois deles. */
+.m-fio.m-fio.m-leve .m-puxar-area[data-puxe] .m-fio-pendurado,
+.m-fio.m-fio.m-leve .m-fio-pendurado {
+  filter: none;
+}
+
+/* O traço que anda no mapa do Destino (`.m-andado-b`, a faixa de baixo): amarelo do ponto, largura 10, opacidade
+   .38 e o desfoque do mockup. */
+.m-fio.m-fio.m-fio .m-destino .m-andado-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
+}
+
+/* O fio que voa de uma aba à outra (`.m-voo-fio .m-b`, a faixa de baixo) também é um traço que anda: a mesma faixa
+   amarela, nos dois mundos (o mockup a acende em ciano à noite). Revisão da Marca no #419. O voo ao Destino apaga a
+   faixa a partir dos .38 (`m/aba.ts`), e não de 1. */
+.m-fio.m-fio.m-fio .m-voo-fio .m-b {
+  stroke: var(--m-ponto);
+  stroke-width: 10;
+  opacity: 0.38;
+}
+
+/* Desvio 24 (luz da hora): de dia, só o brilho de baixo do quadro esquenta (âmbar de 12% de manhã, 24% à tarde, 30%
+   no entardecer); o céu de cima fica. A noite não muda. Decidida ao abrir e ao voltar à aba (`data-luz`, em CascaM). */
+.m-fio.m-fio[data-mundo='dia'][data-luz='manha'] {
+  --m-calor: rgba(255, 197, 61, 0.12);
+}
+
+.m-fio.m-fio[data-mundo='dia'][data-luz='tarde'] {
+  --m-calor: rgba(255, 197, 61, 0.24);
+}
+
+.m-fio.m-fio[data-mundo='dia'][data-luz='entardecer'] {
+  --m-calor: rgba(255, 170, 80, 0.3);
+}
+
+/* Desvio 25 (grão e estrelas): uma camada parada atrás do conteúdo do quadro: grão de papel de dia, poucas estrelas à
+   noite. Quase invisível de propósito. */
+.m-fio.m-fio {
+  --m-grao:
+    radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
+}
+
+.m-fio.m-fio[data-mundo='dia'] {
+  --m-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+.m-fio.m-fio .m-app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--m-grao);
+}
+
+/* Desvio 26 (flor no cacto): quem volta depois de três dias ou mais vê uma florzinha de pétalas (as do pouso) no topo
+   do cacto da marca, menor que o ponto (que é a pessoa). Brota em 0,55 s com a mola; no Calmo só aparece. */
+.m-fio .m-cacto-marca .m-cm-flor {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: m-flor-brota 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+}
+
+.m-fio .m-cacto-marca .m-cm-petala {
+  fill: var(--m-flor);
+  stroke: none;
+}
+
+.m-fio .m-cacto-marca .m-cm-miolo {
+  fill: var(--m-ponto);
+  stroke: none;
+}
+
+.m-fio[data-movimento='calmo'] .m-cacto-marca .m-cm-flor {
+  animation-name: m-flor-calma;
+}
+
+@keyframes m-flor-brota {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes m-flor-calma {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Desvio 21: o pouso em branco (ideia 8 da prancha "Fio que ensina", Gabriel 04/11; ajustes da Marca, 04/11).
+   Antes do resumo, a tela do pouso abre uma página em branco (o `.campo` do mockup, o mesmo do Guardar), uma barra
+   de 30 s e dois botões; depois, o resumo traz o assunto de cada artigo lido como chips para marcar. Só reaproveita
+   peças do arquivo (campo, chip, ação, tintas). Três cuidados: (a) o "Mostrar o resumo" é Só contorno nos dois
+   modos, porque o sol da tela é o do fio de seguir; (b) a barra é um fio de 2 px na tinta secundária a 35%, sem
+   amarelo e sem efeito ao esvaziar: não é cronômetro; (c) enquanto o campo está aberto, a céu encolhe (uns 55% da
+   altura) para o campo, os botões e o fio caberem em 360×640. */
+.m-fio.m-fio .m-lugares[hidden] {
+  display: none;
+}
+
+.m-fio.m-fio .m-pouso .m-ceu {
+  transition: padding 0.4s var(--m-sair);
+}
+
+.m-fio.m-fio .m-pouso.m-em-branco .m-ceu {
+  padding: 46px 30% 0;
+}
+
+.m-fio.m-fio .m-pouso.m-em-branco .m-corpo {
+  /* Sobe a saída: no pé do quadro de 624 px a dica "puxe para seguir" ficava rente à borda. */
+  padding-bottom: 12px;
+}
+
+.m-fio.m-fio .m-pouso.m-em-branco .m-ceu .m-olho {
+  display: block;
+  margin-inline: -26%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-fio.m-fio .m-pouso .m-ceu {
+    transition: none;
+  }
+}
+
+.m-fio.m-fio .m-evoca {
+  display: grid;
+  gap: 10px;
+}
+
+.m-fio.m-fio .m-evoca .m-rotulo-campo {
+  margin: 0 2px;
+}
+
+.m-fio.m-fio .m-evoca .m-campo {
+  min-height: 0;
+  padding: 10px 14px;
+}
+
+.m-fio.m-fio .m-evoca-barra {
+  height: 2px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--m-texto-2) 12%, transparent);
+  overflow: hidden;
+}
+
+.m-fio.m-fio .m-evoca-barra i {
+  display: block;
+  height: 100%;
+  background: color-mix(in srgb, var(--m-texto-2) 35%, transparent);
+  transform-origin: left;
+}
+
+.m-fio.m-fio .m-evoca-botoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.m-fio.m-fio .m-evoca-botoes .m-acao {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.m-fio.m-fio .m-evoca-botoes .m-chip {
+  flex: none;
+}
+
+/* O "Só contorno" fixo, igual ao do Calmo (17), nos dois modos. */
+.m-fio.m-fio.m-fio.m-fio .m-acao.m-contorno {
+  background: transparent;
+  color: var(--m-texto);
+  box-shadow: inset 0 0 0 1.5px var(--m-ambar, #d39200);
+}
+
+.m-fio.m-fio.m-fio.m-fio .m-acao.m-contorno:hover,
+.m-fio.m-fio.m-fio.m-fio .m-acao.m-contorno:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ambar, #d39200),
+    0 0 0 5px rgba(255, 197, 61, 0.18),
+    0 0 24px rgba(255, 197, 61, 0.35);
+}
+
+.m-fio.m-fio.m-fio.m-fio[data-mundo='noite'] .m-acao.m-contorno:hover,
+.m-fio.m-fio.m-fio.m-fio[data-mundo='noite'] .m-acao.m-contorno:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--m-ponto),
+    0 0 6px 1px rgba(255, 197, 61, 0.6),
+    0 0 24px 3px rgba(255, 197, 61, 0.34);
+}
+
+.m-fio.m-fio .m-evoca-lista {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.m-fio.m-fio .m-evoca-item {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  text-align: left;
+  max-width: 100%;
+  min-height: 44px;
+  padding-block: 6px;
+  border-radius: 14px;
+  line-height: 1.3;
+}
+
+.m-fio.m-fio .m-evoca-item span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.m-fio.m-fio .m-evoca-lista {
+  gap: 4px;
+}
+
+.m-fio.m-fio .m-evoca-item b {
+  flex: none;
+  color: var(--m-texto);
+}
+
+/* (21) O placeholder do campo usa a tinta secundária (como a dica do cartão, desvio 19): a terciária dá uns 4,0:1
+   sobre o fundo do campo à noite (o fundo é translúcido). */
+.m-fio.m-fio .m-evoca .m-campo::placeholder {
+  color: var(--m-texto-2);
+}
+
+/* 28. "Errei porque…" (ideia 7 da prancha "Fio que ensina", Gabriel 04/11): depois de guardar a Frase, o aviso
+      oferece três respostas de um toque, opcionais, e some sozinho em 10 s (e para enquanto se toca ou aponta). É o aviso compacto do mockup (o vidro, os
+      botões claros) em duas linhas: o texto e, abaixo, as respostas, que quebram de linha em tela estreita. Fica no
+      alto, mas deixa livre o canto do "+" (à direita), para não cobri-lo. */
+.m-fio.m-fio .m-toast.m-compacto.m-porque {
+  left: 18px;
+  right: 76px;
+  width: auto;
+  max-width: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px 12px 14px;
+  border-radius: 18px;
+  transform: translateY(8px);
+}
+
+.m-fio.m-fio .m-toast.m-compacto.m-porque.m-on {
+  transform: none;
+}
+
+.m-fio.m-fio .m-porque-opcoes {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 22. A porteira ganha uma linha acima do deque: "Artigos próximos, misturados de propósito: decidir qual é qual
+      fixa mais." (`.m-dica-mistura`, só no primeiro cartão). Motivo: os cartões vêm de artigos próximos entre os já
+      lidos, um de cada por volta (ideia 4 de "Fio que ensina", escolhida pelo Gabriel em 04/11/2026), e a linha diz por
+      que estão misturados. Usa a classe da dica do cartão (`.m-dica-gesto`, com a tinta do desvio 19) e nenhuma regra
+      nova. A ordem sai de `gerarPorteira`, em `dominios/legislacao/lembrar.ts`. */
+
+/* Desvio 23: o cartão "Para começar" do Agora sem prova (`SemProva`, em `m/AgoraM.tsx`) tem uma coluna só. Motivo: o
+   app o monta com o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do
+   fio". Com título, texto e botão, o título se espremia numa coluna estreita, o texto ia para a segunda coluna e o
+   botão virava um quadrado cortado ("Escol"), em 360 e em 1280, de dia e de noite. A tela "prova" do mockup, que é
+   a que esse estado vai ganhar, ainda não foi portada. O botão fica na largura do conteúdo (o `.m-acao` do mockup
+   ocupa a largura toda) e, numa tela estreita, o texto dele quebra em vez de passar do cartão. */
+.m-fio.m-fio .m-proximo.m-sem-prova {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.m-fio.m-fio .m-proximo.m-sem-prova .m-acao {
+  width: auto;
+  max-width: 100%;
+  justify-self: start;
+  margin-top: 14px;
+  white-space: normal;
+  text-align: left;
+}
+
+/* 29. Cada marca do mapa do Destino acha o seu lugar pela câmera, em CSS. Motivo: o mockup escreve `left` e `top`, em px,
+      marca por marca, a cada quadro do voo da câmera. No app a câmera (`m/useCameraM.ts`) escreve só três variáveis na
+      caixa (`--cam-x`, `--cam-y` e `--cam-k`, o canto e a escala) e cada marca guarda o seu ponto no desenho (`--x` e
+      `--y`): são dezenas de marcas que o React não precisa reescrever a cada quadro. O resultado na tela é o mesmo. */
+.m-fio .m-ne-marcas > * {
+  left: calc((var(--x) - var(--cam-x)) * var(--cam-k) * 1px);
+  top: calc((var(--y) - var(--cam-y)) * var(--cam-k) * 1px);
+}
+
+/* 33. Os lugares abertos ficam por cima dos fechados, e o de onde a pessoa está por cima de todos. Motivo: no mockup as
+      marcas se empilham na ordem do caminho, e a que vem depois cobre a anterior. Com a câmera de perto, São Luís e
+      Alcântara ficam a uns 12 px um do outro; o São Luís, que ainda está fechado e vem depois, cobria o lugar onde a
+      pessoa está, e o toque ia para o vizinho ("São Luís se abre num pouso") em vez de abrir a ficha. O Playwright
+      acusava "intercepts pointer events" no clique. O "você está aqui" (`.m-no-aqui`, z-index 2 no mockup) não recebe
+      toque (`pointer-events: none`) e fica como está. */
+.m-fio.m-fio .m-ne-lugar.m-aberto {
+  z-index: 1;
+}
+
+.m-fio.m-fio .m-ne-lugar.m-com-voce {
+  z-index: 2;
+}
+
+/* 34. O nome do estado no mapa do Destino, de dia, e a nota da ficha ("Rascunho da pesquisa, a conferir…") ganham tinta
+      mais escura. Motivo: medido nos pixels, o nome do estado ("Maranhão") dá 3,98:1 de dia, com a tinta do papel
+      (`--m-papel-tinta`, #7b6845), e a nota da ficha dá 4,22:1 à noite, com a tinta terciária (`--m-texto-3`, #6f7ea0);
+      o mínimo é 4,5:1 (WCAG 1.4.3). De dia o nome do estado usa #6a5836 (o mesmo marrom, mais escuro). A nota da ficha
+      usa, nos dois mundos, a tinta secundária (`--m-texto-2`), a mesma do "small" da ficha e da dica do cartão (desvio
+      19). Medido de novo nos pixels: "Maranhão" 5,08:1 de dia (6,65:1 à noite, que já passava) e a nota da ficha 7,17:1 à
+      noite e 6,73:1 de dia. O resto do mapa fica como no mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-ne-rotulo span {
+  color: #6a5836;
+}
+
+.m-fio.m-fio .m-ne-ficha em {
+  color: var(--m-texto-2);
+}
+
+/* 36. A tela que rola esmaece no alto, onde fica o "+". Motivo: o "+" (46 px, a 18 do alto, então até os 64 px) é fixo e
+      as telas do Destino e do Varal rolam por baixo dele; em 360 de largura o texto passava debaixo dele ("os ma +",
+      "já é seu"). Como o desvio 9 faz nos passos (a área que rola começa abaixo do "+"), mas sem mexer no repouso: aqui
+      o mockup começa o texto a 22 px do alto e o repouso fica onde ele o põe; só depois que a tela rola é que o alto
+      some até os 64 px, e o texto volta inteiro aos 104 px. O esmaecimento entra aos poucos nos primeiros 40 px de
+      rolagem (`TelaM` escreve `--m-rolado`, de 0 a 1, e a classe `m-rolada`). Os passos do desvio 9 já começam
+      abaixo do "+" e ficam de fora. */
+.m-fio
+  .m-tela.m-rolada:not(
+    :is(
+      [data-tela='ler'],
+      [data-tela='lembrar'],
+      [data-tela='achar'],
+      [data-tela='guardar'],
+      [data-tela='revisar'],
+      [data-tela='seu_passo'],
+      [data-tela='praticar']
+    )
+  ) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, calc(1 - var(--m-rolado, 0))) 64px,
+    #000 104px
+  );
+}
+
+/* 39. O Varal e o folheto: contraste, o folheto vazio e o pé. Motivo: (a) alguns textos do mockup usam tintas que, medidas nos
+      pixels, ficam abaixo de 4,5:1 (WCAG 1.4.3). "Ordem" e "À vista em cada linha" das folhas (`.m-opcoes-org h3`) usam a
+      terciária (`--m-texto-3`) e dão 3,94:1 e 4,04:1 à noite; o rótulo de cada fio do Varal, 4,45:1; o grupo do folheto e o
+      lembrete da busca usam a mesma tinta. Passam à secundária, a mesma da dica do cartão (desvio 19). Nos folhetos de papel
+      (o mesmo `#e9e1cf` nos dois mundos) a linha de estado (`#7a6f58`, 3,80:1) vai a `#685d46` (4,98:1) e o número miúdo
+      (`rgba(60,52,38,.5)`, 2,59:1), que no app é dado real e o leitor de tela lê, a `#5a5242` (5,93:1, a tinta do texto miúdo
+      do folheto). (b) O mockup não tem o folheto vazio (só avisa "Folheto vazio…"): o app diz uma frase e oferece um botão,
+      em uma coluna, com o botão na largura do conteúdo. (c) Os botões do pé do folheto (`.m-pe-folheto`) quebram de linha
+      se não couberem lado a lado (texto maior, tela estreita). (d) O "⋯" de cada linha (`.m-linha-item .m-mais`) herda do "+" do
+      quadro (`.m-mais`) o `position: absolute; right: 22px; top: 18px`, e por isso o botão de abrir a linha, que é a linha toda
+      (`flex: 1`), passa por baixo dele: um nome comprido corria sob o "⋯" (em 360 de largura, a linha tem 282 px e o "⋯"
+      ocupa de 259 a 299). A cara fica a do mockup (o "⋯" no mesmo lugar); a linha só reserva o lugar dele (62 px do canto da
+      direita e mais 8 de folga) para o texto não passar de lá. */
+.m-fio .m-opcoes-org h3,
+.m-fio .m-grupo-folheto,
+.m-fio .m-varal-rotulo {
+  color: var(--m-texto-2);
+}
+.m-fio .m-busca-varal input::placeholder {
+  color: var(--m-texto-2);
+}
+.m-fio .m-folheto .m-estado {
+  color: #685d46;
+}
+.m-fio .m-varal-linha .m-folheto .m-conta-f {
+  color: #5a5242;
+}
+.m-fio .m-linha-item.m-com-mais .m-abre {
+  padding-right: 70px;
+}
+.m-fio .m-vazio-folheto {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 2px 0;
+}
+.m-fio .m-vazio-folheto p {
+  margin: 0;
+}
+.m-fio .m-pe-folheto {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+/* 41. O Caderno de Frases: o teto da folha e o pé. Motivo: (a) no mockup a folha tem a altura do que há nela (até 90% do quadro):
+      sobe com as duas Frases de exemplo (456 px em 390 px de largura, 436 px de 412 em diante) e cresce com o "Ler na lei" aberto
+      (587 px em 390 px de largura, 567 de 412 em diante). O app faz igual, mas com as Frases da pessoa (até 50 por página) e o
+      artigo inteiro da lei a folha chega ao teto, e o teto do mockup (90%) deixava o topo cobrir o título do Varal, que ficava
+      cortado ao meio (a Marca, na revisão do #423). O teto do Caderno é o menor entre os 90% do mockup e o que deixa o título do
+      Varal inteiro à vista (ele termina a 100 px do alto do quadro; 12 px de folga): o conteúdo rola dentro da folha dali em diante.
+      (b) o pé leva "Mostrar mais" (quando há mais Frases) e "Abrir a lista completa", que o mockup não tem. "Abrir a lista completa"
+      é caminho secundário: um link com seta, no estilo do "Ler na lei", à esquerda; "Mostrar mais" fica como o botão de contorno
+      do mockup, ao lado dele. Em 360 px os dois não cabem juntos e quebram de linha. (c) O "Ler na lei" aberto, quando a folha
+      já está no teto, rola até a vista e deixa embaixo o respiro da Frase e da folha. (d) De dia o âmbar do "Ler na lei"
+      (`--m-neon`, #b25f00) tem 4,64:1 sobre o branco do cartão, mas só 4,36:1 sobre o fim do degradê da folha (#f6f8fb), onde o
+      link do pé fica (medido nos pixels; o mínimo é 4,5:1, WCAG 1.4.3): o link usa #a35700, 5,03:1. */
+.m-fio .m-folha .m-corpo.m-caderno {
+  max-height: min(90%, calc(100% - 112px));
+}
+.m-fio .m-frase-item .m-lei {
+  scroll-margin-bottom: 36px;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-acao {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: var(--m-neon);
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 40px;
+  padding: 8px 2px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.m-fio .m-fim-folha.m-fim-do-caderno .m-lista-completa svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.4;
+}
+.m-fio.m-fio[data-mundo='dia'] .m-fim-folha.m-fim-do-caderno .m-lista-completa {
+  color: #a35700;
+}
+
+/* (43, o "Ler na lei" de dia.) O âmbar do botão no mockup dá 4,43:1 sobre o fim do degradê da folha, abaixo do mínimo de
+   4,5:1 (WCAG 1.4.3); de dia o texto do botão passa ao mesmo #a35700 do link "Abrir a lista completa" do Caderno
+   (desvio 41). De noite segue o mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-ler-junto button.m-abrir {
+  color: #a35700;
+}
+
+/* (44, os títulos dos grupos da Conta.) "Aparência", "Prova" e "O resto" em 11 px na cor 3 do mockup dão de 3,95 a 4,17:1
+   sobre a folha à noite, abaixo do mínimo de 4,5:1 (WCAG 1.4.3). Passam à cor 2, a do texto de apoio da mesma folha. */
+.m-fio.m-fio .m-conta-folha .m-grupo-conta h3 {
+  color: var(--m-texto-2);
+}
+
+/* (44, "Sair desta conta" de dia.) O #e0735f do mockup dá 2,91:1 sobre a folha clara. De dia passa ao vermelho #b3261e
+   (mais de 6:1); de noite segue o mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-linha-conta.m-sair {
+  color: #b3261e;
+}

@@ -2,10 +2,11 @@
 // pessoa está) junto com o que o Fio guardou no aparelho (pousos, porteiras), já na forma do mapa.
 import { useCallback, useMemo } from 'react';
 import type { Repositorio } from '../../../core/persistencia';
-import { useDados, useRepositorio } from '../../dados/contexto';
+import { useRepositorio } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
 import { montarEntradaDoFio } from '../dados/entrada';
 import { useFioGuardado, type FioGuardado } from '../dados/guardado';
+import { useDadosDoFio } from '../dados/sem-vazio';
 import { entradaDaJornada } from './entrada-da-jornada';
 import type { EntradaDaJornada } from './jornada';
 
@@ -34,7 +35,7 @@ export function useJornadaDoFio(): JornadaDoFio {
       }),
     [fonte, etapasFeitas, materiaAberta],
   );
-  const { dados, falha } = useDados(carregar);
+  const { dados, falha } = useDadosDoFio('jornada', carregar);
   const entrada = useMemo(
     () => (dados ? entradaDaJornada(dados, fio.estado) : undefined),
     [dados, fio.estado],

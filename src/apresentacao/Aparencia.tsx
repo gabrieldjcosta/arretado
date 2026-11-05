@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { obterPreferencias } from '../core/preferencias';
 import { aplicarCorDaBarra } from './cor-da-barra';
+import { aplicarMovimentoEscolhido } from './movimento-escolhido';
 import { useDados } from './dados/contexto';
 
 /**
@@ -10,6 +11,9 @@ import { useDados } from './dados/contexto';
  */
 export function AplicarAparencia() {
   const { dados } = useDados(useCallback((r) => obterPreferencias(r), []));
+
+  // O "Movimento" escolhido na Conta do Fio é deste aparelho, não das Preferências: vai para a raiz na abertura.
+  useEffect(aplicarMovimentoEscolhido, []);
 
   useEffect(() => {
     if (!dados) return;

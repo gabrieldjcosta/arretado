@@ -240,26 +240,35 @@ export interface LembrarDoArtigo {
 }
 
 /**
- * A porteira: três cartões (menos, se a norma não der) de dispositivos diferentes, espalhados entre
- * os artigos. Um em três vem certo e os outros trocados, na posição que a semente sorteia; com
- * menos de dois cartões, o único vem trocado. Nunca repete o dispositivo.
+ * A porteira: três cartões (menos, se a norma não der) de dispositivos diferentes. É o passo que
+ * intercala (ideia 4, "Fio que ensina"): só entra artigo já lido, e os cartões vêm de artigos
+ * vizinhos entre os lidos, na ordem do código (furto, roubo, extorsão), um dispositivo de cada por volta, para a pessoa ter de
+ * decidir qual é qual a cada cartão, não responder três vezes o mesmo assunto. A janela de vizinhos
+ * muda com a semente. Um em três vem certo e os outros trocados, na posição que a semente sorteia;
+ * com menos de dois cartões, o único vem trocado. Nunca repete o dispositivo.
  */
 export function gerarPorteira(
   fontes: readonly FonteDoArtigo[],
   semente: number,
   quantidade = CARTOES_DA_PORTEIRA,
 ): CartaoCertoOuErrado[] {
+  // Os artigos na ordem do código (a ordem em que a fonte os traz); os dispositivos de cada um,
+  // embaralhados pela semente.
   const porArtigo = new Map<string, FonteDoArtigo[]>();
   const vistos = new Set<string>();
-  for (const f of embaralhar(fontes, semente)) {
+  for (const f of fontes) {
     if (vistos.has(f.dispositivoId) || gerarTrocas(f.texto).length === 0) continue;
     vistos.add(f.dispositivoId);
     const grupo = porArtigo.get(f.artigoEndereco) ?? [];
     porArtigo.set(f.artigoEndereco, grupo);
     grupo.push(f);
   }
+  const todos = [...porArtigo.values()].map((g) => embaralhar(g, semente));
+  // A janela de artigos vizinhos: `quantidade` seguidos, começando onde a semente cair.
+  const janela = Math.min(quantidade, todos.length);
+  const inicio = janela === 0 ? 0 : Math.abs(Math.floor(semente)) % (todos.length - janela + 1);
+  const grupos = todos.slice(inicio, inicio + janela);
   // Um dispositivo de cada artigo por volta, até completar.
-  const grupos = [...porArtigo.values()];
   const escolhidas: FonteDoArtigo[] = [];
   for (let volta = 0; escolhidas.length < quantidade; volta++) {
     let achou = false;

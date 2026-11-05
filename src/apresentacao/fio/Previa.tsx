@@ -7,34 +7,38 @@ import { EsqueletoDoFio } from './avisos/EsqueletoDoFio';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
-export const AgoraDoFio = lazy(() =>
-  import('./agora/AgoraDoFio').then((m) => ({ default: m.AgoraDoFio })),
-);
+export const AgoraDoFio = lazy(() => import('./m/AgoraM').then((m) => ({ default: m.AgoraM })));
 export const DestinoDoFio = lazy(() =>
-  import('./destino/DestinoDoFio').then((m) => ({ default: m.DestinoDoFio })),
+  import('./m/DestinoM').then((m) => ({ default: m.DestinoM })),
 );
-export const Varal = lazy(() => import('./varal/Varal').then((m) => ({ default: m.Varal })));
-export const PassoDoFio = lazy(() =>
-  import('./etapa/PassoDoFio').then((m) => ({ default: m.PassoDoFio })),
+export const VaralDoFio = lazy(() => import('./m/VaralM').then((m) => ({ default: m.VaralM })));
+export const FolhetoDoFio = lazy(() =>
+  import('./m/FolhetoM').then((m) => ({ default: m.FolhetoM })),
 );
-export const PousoDoFio = lazy(() =>
-  import('./etapa/PousoDoFio').then((m) => ({ default: m.PousoDoFio })),
-);
+export const PassoDoFio = lazy(() => import('./m/PassoM').then((m) => ({ default: m.PassoM })));
+export const PousoDoFio = lazy(() => import('./m/PousoM').then((m) => ({ default: m.PousoM })));
 
-/** Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. */
-export function TelaDoFio({ children }: { children: ReactNode }) {
+/**
+ * Uma tela do Arretado novo: só abre com a prévia ligada; sem ela, volta ao Hoje. As telas que moram no quadro do
+ * mockup (`noQuadro`) esperam na fronteira do próprio quadro (`CascaM`), que não pisca: o esqueleto cinza de antes
+ * ficaria fora do desenho aprovado, e uma fronteira nova a cada tela faria o React segurar a revelação por 300 ms.
+ */
+export function TelaDoFio({
+  children,
+  noQuadro = false,
+}: {
+  children: ReactNode;
+  noQuadro?: boolean;
+}) {
   if (useInterface() !== 'fio') return <Navigate to="/" replace />;
+  if (noQuadro) return children;
   return <Suspense fallback={<EsqueletoDoFio />}>{children}</Suspense>;
 }
 
-/** O começo do app: o Agora na prévia, o Hoje de sempre fora dela. */
+/** O começo do app: o Agora na prévia (no quadro, que cuida da espera), o Hoje de sempre fora dela. */
 export function PaginaInicial() {
   if (useInterface() !== 'fio') return <Hoje />;
-  return (
-    <Suspense fallback={<EsqueletoDoFio />}>
-      <AgoraDoFio />
-    </Suspense>
-  );
+  return <AgoraDoFio />;
 }
 
 /** `#/fio/ligar` e `#/fio/desligar`: o atalho para quem recebe o link da prévia. */

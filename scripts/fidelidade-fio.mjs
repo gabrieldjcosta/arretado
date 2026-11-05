@@ -1,4 +1,4 @@
-// Fidelidade visual: fotografa o mockup aprovado (docs/design/mockups/fio-v16.html) e a tela
+// Fidelidade visual: fotografa o mockup aprovado (docs/design/fio/mockup-aprovado.html) e a tela
 // equivalente do app no mesmo tamanho, monta o par lado a lado + diferença e imprime a razão de
 // pixels diferentes. É medidor, não portão: o mockup é um quadro (sem barra do Aparelho), então
 // a conferência final continua sendo olhar o par. Saída em test-results/fidelidade/ (fora do git).
@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 
 const { PNG } = createRequire(import.meta.url)('playwright-core/lib/utilsBundle');
 const RAIZ = path.join(import.meta.dirname, '..');
-const MOCKUP = pathToFileURL(path.join(RAIZ, 'docs/design/mockups/fio-v16.html')).href;
+const MOCKUP = pathToFileURL(path.join(RAIZ, 'docs/design/fio/mockup-aprovado.html')).href;
 const args = process.argv.slice(2);
 const opt = (n, p) => {
   const i = args.indexOf(`--${n}`);

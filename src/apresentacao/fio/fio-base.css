@@ -25,6 +25,10 @@
   /* O folheto do Varal: de dia a sombra é curta e macia; à noite, funda. */
   --f-folheto-sombra: 0 6px 12px -6px rgb(15 28 58 / 28%);
   --f-chip: rgb(255 186 64 / 22%);
+  /* Três degraus de sombra, os mesmos em todo o Fio: chão, cartão, folha (prancha 8 da Marca). */
+  --s1: 0 1px 0 rgb(15 28 58 / 6%);
+  --s2: 0 8px 20px -14px rgb(15 28 58 / 35%);
+  --s3: 0 24px 48px -24px rgb(15 28 58 / 45%);
   --f-acao-fundo: linear-gradient(180deg, #ffd56b 0%, #ffab3d 100%);
   --f-acao-texto: #4a2a00;
   --f-acao-sombra: 0 3px 0 rgb(196 118 0 / 42%), 0 10px 22px -12px rgb(255 140 30 / 70%);
@@ -43,12 +47,15 @@
   --f-aurora:
     radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 16%) 0%, transparent 62%),
     radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+  /* Grão de papel (Dia) e estrelas fixas (Noite): uma camada só, parada, por cima do céu. */
+  --f-grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --f-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
   --f-sair: cubic-bezier(0.2, 0.7, 0.2, 1);
   --f-trocar: cubic-bezier(0.45, 0, 0.25, 1);
   --f-nav-altura: 4.75rem;
 
   background: var(--f-aurora), var(--f-ceu);
+  isolation: isolate;
   color: var(--texto);
   --abas-altura: calc(var(--f-nav-altura) + env(safe-area-inset-bottom, 0px));
 }
@@ -72,6 +79,9 @@
     --f-tempo: #ffc53d;
     --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
     --f-chip: rgb(255 197 61 / 12%);
+    --s1: 0 1px 0 rgb(255 255 255 / 4%);
+    --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+    --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
     --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
     --f-acao-texto: #0b1322;
     --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -87,6 +97,16 @@
     --f-certo: #7ee2b0;
     --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
     --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+    --f-grao:
+      radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
   }
 }
 
@@ -101,6 +121,9 @@
   --f-tempo: #ffc53d;
   --f-folheto-sombra: 0 16px 30px -16px rgb(0 0 0 / 55%);
   --f-chip: rgb(255 197 61 / 12%);
+  --s1: 0 1px 0 rgb(255 255 255 / 4%);
+  --s2: 0 10px 24px -14px rgb(0 0 0 / 70%);
+  --s3: 0 28px 56px -24px rgb(0 0 0 / 85%);
   --f-acao-fundo: linear-gradient(180deg, #fff7e0 0%, #ffe6a3 100%);
   --f-acao-texto: #0b1322;
   --f-acao-sombra: 0 0 0 1px rgb(255 230 160 / 50%), 0 10px 30px -10px rgb(255 210 110 / 55%);
@@ -116,6 +139,16 @@
   --f-certo: #7ee2b0;
   --f-ceu: radial-gradient(140% 60% at 50% 0%, #13213d 0%, #0b1322 55%, #080f1c 100%);
   --f-aurora: radial-gradient(120% 45% at 50% 108%, rgb(255 170 70 / 7%) 0%, transparent 60%);
+  --f-grao:
+    radial-gradient(1.2px 1.2px at 12% 16%, rgb(235 242 255 / 60%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 27% 7%, rgb(235 242 255 / 45%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 41% 22%, rgb(235 242 255 / 35%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 10%, rgb(235 242 255 / 55%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 73% 19%, rgb(235 242 255 / 40%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 8%, rgb(235 242 255 / 50%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 19% 36%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 64% 33%, rgb(235 242 255 / 30%) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 93% 29%, rgb(235 242 255 / 35%) 0%, transparent 100%);
 }
 
 /* ---------- Cabeçalho: o nome com o cacto é o nó da pessoa (abre a Conta) ---------- */
@@ -184,6 +217,41 @@
   stroke: none;
 }
 
+/* A florzinha de quem voltou depois de uns dias: brota no topo do cacto com a mola do app; no Calmo só
+   aparece, em movimento reduzido já está lá. */
+.fio-cacto .fio-cacto-flor {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fio-flor 0.55s var(--f-mola) 0.4s backwards;
+}
+
+.fio-cacto .fio-cacto-petala {
+  fill: var(--f-flor);
+  stroke: none;
+}
+
+.fio-cacto .fio-cacto-miolo {
+  fill: var(--f-ponto);
+  stroke: none;
+}
+
+:root[data-perfil='calmo'] .fio-cacto .fio-cacto-flor {
+  animation-name: fio-flor-calma;
+}
+
+@keyframes fio-flor {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes fio-flor-calma {
+  from {
+    opacity: 0;
+  }
+}
+
 /* O "+" da casca (MaisGlobal, D-D23): amarelo sobre o vidro, como o ponto de luz, e o contorno acende no
    hover. O ciano é só do foco e da seleção; o "+" nunca é ciano. */
 .shell-fio .mais-global .mais {
@@ -226,35 +294,11 @@
   padding-top: 0.25rem;
 }
 
-/* As telas do Fio são uma coluna de leitura; o Leitor, a Biblioteca, o Plano e o resto seguem na largura
-   de sempre, também com a prévia ligada. */
-.shell-fio :is(.fio-agora, .fio-comeco, .fio-etapa, .fio-destino, .fio-varal) {
-  width: 100%;
-  max-width: 34rem;
-  margin-inline: auto;
-}
-
 @media (min-width: 900px) {
   .shell-fio .fio-topo {
     padding-left: calc(
       max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
     );
-  }
-}
-
-/* O Destino é a tela do mapa: num monitor ele ganha mais chão (o mapa é a coluna da direita). A largura da casca
-   vem de --largura-casca, e --mais-direita já a trouxe assada na raiz, então a conta se refaz aqui, na casca,
-   para o "+" e o cabeçalho acompanharem o conteúdo. */
-@media (min-width: 980px) {
-  .shell-fio[data-largo] {
-    --largura-casca: 1180px;
-    --mais-direita: calc(
-      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
-    );
-  }
-
-  .shell-fio[data-largo] .fio-destino {
-    max-width: none;
   }
 }
 
@@ -400,7 +444,7 @@
 }
 
 .fio-acao:active {
-  transform: translateY(2px) scale(0.985);
+  transform: translateY(2px) scale(0.95);
   box-shadow: var(--f-acao-aperto);
 }
 
@@ -517,4 +561,125 @@
   outline: 2px solid var(--f-foco, #4dd0e1);
   outline-offset: 3px;
   border-radius: inherit;
+}
+
+/* ---------- Botão de ação: "Sol" no Vivo (padrão) e "Só contorno" no Calmo (Gabriel, 04/11/2026) ---------- */
+/* Sol: o botão é o próprio sol de manhã; igual de dia e de noite. O afundar ao toque fica (scale .95, mola). */
+.shell-fio .fio-acao {
+  background: radial-gradient(
+    130% 170% at 50% 0%,
+    #fff7da 0%,
+    #ffd96e 34%,
+    #ffc53d 68%,
+    #f2b228 100%
+  );
+  color: #3a2700;
+  box-shadow:
+    inset 0 0 0 1.5px rgb(211 146 0 / 55%),
+    0 0 0 5px rgb(255 197 61 / 14%),
+    0 10px 26px -12px rgb(255 190 50 / 80%);
+  transition:
+    transform 0.3s var(--f-mola),
+    box-shadow 0.25s var(--f-sair);
+}
+
+@media (hover: hover) {
+  .shell-fio .fio-acao:hover:not([disabled]) {
+    box-shadow:
+      inset 0 0 0 1.5px rgb(211 146 0 / 70%),
+      0 0 0 6px rgb(255 197 61 / 20%),
+      0 0 26px rgb(255 197 61 / 55%);
+  }
+}
+
+.shell-fio .fio-acao:active:not([disabled]) {
+  box-shadow:
+    inset 0 0 0 1.5px rgb(211 146 0 / 70%),
+    0 0 0 6px rgb(255 197 61 / 20%),
+    0 0 26px rgb(255 197 61 / 55%);
+}
+
+.shell-fio .fio-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 35%);
+}
+
+/* Só contorno (perfil Calmo): sem preenchimento; o sol só aparece no brilho ao tocar. Sem escala. */
+:root[data-perfil='calmo'] .shell-fio .fio-acao {
+  background: transparent;
+  color: var(--texto);
+  box-shadow: inset 0 0 0 1.5px #d39200;
+}
+
+@media (hover: hover) {
+  :root[data-perfil='calmo'] .shell-fio .fio-acao:hover:not([disabled]) {
+    box-shadow:
+      inset 0 0 0 1.5px #d39200,
+      0 0 0 5px rgb(255 197 61 / 18%),
+      0 0 24px rgb(255 197 61 / 35%);
+  }
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-acao:active:not([disabled]) {
+  transform: none;
+  box-shadow:
+    inset 0 0 0 1.5px #d39200,
+    0 0 0 5px rgb(255 197 61 / 18%),
+    0 0 24px rgb(255 197 61 / 35%);
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-acao[disabled] {
+  box-shadow: inset 0 0 0 1.5px rgb(211 146 0 / 40%);
+}
+
+/* Luz da hora (só no Dia; a Noite tem especificidade maior e segue como está): só o brilho de baixo esquenta; o céu de cima fica. */
+.shell-fio[data-luz='manha'] {
+  --f-aurora:
+    radial-gradient(120% 40% at 50% 108%, rgb(255 197 61 / 12%) 0%, transparent 62%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='tarde'] {
+  --f-aurora:
+    radial-gradient(120% 44% at 50% 108%, rgb(255 197 61 / 24%) 0%, transparent 64%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+.shell-fio[data-luz='entardecer'] {
+  --f-aurora:
+    radial-gradient(120% 48% at 50% 108%, rgb(255 170 80 / 30%) 0%, transparent 66%),
+    radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
+}
+
+/* Leitura funda (Leitor): rolando a lei para baixo a pílula se recolhe; subindo, volta. Só opacidade e
+   um pequeno deslocamento (nada de layout). Com foco do teclado dentro dela, fica. No Calmo só esmaece. */
+.shell-fio .fio-nav {
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s;
+}
+
+:root[data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(14px);
+  transition:
+    opacity 0.28s var(--f-sair),
+    transform 0.34s var(--f-sair),
+    visibility 0s 0.34s;
+}
+
+:root[data-perfil='calmo'] .shell-fio .fio-nav,
+:root[data-perfil='calmo'][data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
+  transform: translateX(-50%);
+}
+
+/* Grão e estrelas: uma camada fixa e parada, atrás do conteúdo e à frente do céu. */
+.shell-fio::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--f-grao);
 }
