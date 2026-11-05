@@ -49,6 +49,7 @@ import { ocultosDosGrifos } from '../../dominios/recall/sugestao';
 import { Esqueleto, Falha } from '../componentes/estados';
 import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
+import { FioDaRolagem } from './FioDaRolagem';
 import { MarcadorDePagina } from './MarcadorDePagina';
 import { useLeituraFunda } from './leitura-funda';
 import { useItensDoMais } from '../componentes/ItensDoMais';
@@ -1933,6 +1934,7 @@ function LeitorAberto({
       // A estrutura da norma e o trilho de ferramentas se alinham pelo fim do cabeçalho preso.
       style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
     >
+      {!porArtigo && <FioDaRolagem />}
       {modoFoco ? (
         <h1 className="visualmente-oculto">{norma.tituloCurto}</h1>
       ) : (
