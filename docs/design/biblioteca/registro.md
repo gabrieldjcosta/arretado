@@ -17,3 +17,5 @@ Só se acrescenta. Formato: `AAAA-MM-DD · fonte · achado · caso de uso · lic
 - 2026-11-05 · Gabriel · nenhum dos 3 botões do dia clicou; A (manhã clara) agrada mas parece o do luar e perde a conexão com o sol; quer outros formatos e contornos, com cor flexível · galeria de 8 formatos (anel de sol, papel e ouro, alvorada, raios, vidro, duplo contorno, botão-sol redondo, fita), cada um em dia e noite · botão · aguardando o número escolhido.
 
 - 2026-11-05 · Botões: Gabriel prefere 3, 5 e 7. 5 (vidro, com brilho e alvorada ao tocar) vira o padrão enxuto do app; 7 com seta âmbar e anel prateado (invertido de noite). Escolha a passar à thread do brilho sol/lua no app.
+
+- 2026-11-05 · Zé (Estudar junto): ciclo de 18 s, ventinho com folhas no canto superior esquerdo, espinhos que aparecem, olhos em arco e camomila que vira bandeira, espaçados. Botão 7: seta e anel da mesma cor, com alvorada ao tocar (pedido do Gabriel). Pesquisa de referências do mascote vai para a thread "Montar acervo de movimentos do Zé".
