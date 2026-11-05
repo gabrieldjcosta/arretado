@@ -27,3 +27,5 @@ Só se acrescenta. Formato: `AAAA-MM-DD · fonte · achado · caso de uso · lic
 - 2026-11-05 · Botão 7: contorno neon suave igual ao vidro e onda de luz que sai dele ao tocar (pedido do Gabriel).
 
 - 2026-11-05 · Onda do botão 7 mais curta (até 1,5x) e some mais rápido.
+
+- 2026-11-05 · DECISÃO (Gabriel): botões ficam com dois referenciais, vidro com texto âmbar de dia (5b) e botão-sol redondo (7), que harmonizam botões e menus do app. Os demais formatos (1 a 8) arquivados na galeria, para consulta antes de buscar fora.
