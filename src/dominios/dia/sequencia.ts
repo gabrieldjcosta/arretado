@@ -29,8 +29,9 @@ export async function sequenciaDoFio(repo: Repositorio): Promise<SequenciaDoFio 
     repo.colecao('revisoesFrase').todosDoUsuario(),
   ]);
   const estudou = new Set<string>();
-  for (const r of [...sessoes, ...revisoes, ...revisoesFrase])
-    if (!r.excluidoEm) estudou.add(r.data);
+  // Registro excluído também conta: apagar uma Sessão ou uma Revisão não desfaz o dia que a pessoa estudou, e é isso
+  // que sustenta a promessa de que o total nunca diminui.
+  for (const r of [...sessoes, ...revisoes, ...revisoesFrase]) estudou.add(r.data);
   if (estudou.size === 0) return undefined;
   const hoje = dataCivil(repo.ctx.agora());
   const dias = Array.from({ length: DIAS_NO_FIO }, (_, i) => {

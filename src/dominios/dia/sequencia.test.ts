@@ -39,6 +39,14 @@ describe('Sequência que dobra', () => {
     expect(depois?.dias.filter((d) => d.estado === 'estudo')).toHaveLength(2);
   });
 
+  it('excluir uma Sessão não diminui o total', async () => {
+    const { repo } = await repositorioDeTeste();
+    await estudar(repo);
+    const [s] = await repo.colecao('sessoes').todosDoUsuario();
+    await repo.colecao('sessoes').excluir(s!.id);
+    expect((await sequenciaDoFio(repo))?.total).toBe(1);
+  });
+
   it('a frase diz o total e, em descanso, que o fio espera, sem dívida', () => {
     expect(fraseDaSequencia({ total: 7, hojeEmDescanso: true })).toBe(
       '7 dias de estudo no caminho. O fio te espera, sem pressa.',
