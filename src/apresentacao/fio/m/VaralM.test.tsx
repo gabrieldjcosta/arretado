@@ -54,6 +54,17 @@ async function abrir(opcoes: { vazio?: boolean; antes?: (c: Cenario) => Promise<
   return { repo, ids, usuario: userEvent.setup() };
 }
 
+/** Uma Frase ativa que a pessoa escreveu; devolve o id. */
+async function guardarFrase(repo: Repositorio, texto: string): Promise<string> {
+  const f = await repo.colecao('frases').criar({
+    texto,
+    origemTipo: 'manual',
+    estado: 'ativa',
+    proximaRevisao: '2026-12-01',
+  });
+  return f.id;
+}
+
 const rota = () => screen.getByTestId('rota').textContent;
 /** O folheto de um nome: o botão com esse nome em letra grossa (o nome acessível vem do texto visível, sem `aria-label`: desvio 38). */
 const folheto = (nome: string): HTMLElement => {
@@ -161,7 +172,6 @@ describe('o Varal no quadro do mockup', () => {
     ['Normas', '/varal/normas'],
     ['Súmulas e teses', '/varal/sumulas'],
     ['Meus textos', '/biblioteca/resumos'],
-    ['Frases', '/recall/frases'],
     ['Cartões', '/recall/cartoes'],
   ])('o folheto %s abre %s', async (nome, destino) => {
     const { usuario } = await abrir();
@@ -174,6 +184,41 @@ describe('o Varal no quadro do mockup', () => {
     await usuario.click(folheto('Lembretes'));
     expect(await screen.findByRole('dialog', { name: 'Lembrete' })).toBeInTheDocument();
     expect(rota()).toBe('/varal');
+  });
+
+  it('"Frases" abre o Caderno, uma folha que sobe, sem sair do Varal', async () => {
+    const { usuario } = await abrir({
+      antes: async ({ repo }) => {
+        await guardarFrase(repo, 'A progressão depende do bom comportamento.');
+      },
+    });
+    await waitFor(() => {
+      expect(resumo('Frases').quantos).toBe('1');
+    });
+    await usuario.click(folheto('Frases'));
+    const caderno = await screen.findByRole('dialog', { name: 'Suas Frases certas' });
+    expect(
+      await within(caderno).findByText('A progressão depende do bom comportamento.'),
+    ).toBeInTheDocument();
+    expect(rota()).toBe('/varal');
+    // "Abrir a lista completa" leva à tela de antes (onde a Frase vira cartão com lacuna), depois de a folha descer.
+    await usuario.click(within(caderno).getByRole('button', { name: 'Abrir a lista completa' }));
+    await waitFor(() => {
+      expect(rota()).toBe('/recall/frases');
+    });
+  });
+
+  it('o número do folheto "Frases" é o das ativas: as arquivadas não contam', async () => {
+    await abrir({
+      antes: async ({ repo }) => {
+        await guardarFrase(repo, 'Uma Frase ativa.');
+        const arquivada = await guardarFrase(repo, 'Uma Frase arquivada.');
+        await repo.colecao('frases').atualizar(arquivada, { estado: 'arquivada' });
+      },
+    });
+    await waitFor(() => {
+      expect(resumo('Frases').quantos).toBe('1');
+    });
   });
 
   it('no Vivo os folhetos descem do fio um a um, com a mola e 70 ms entre um e outro', async () => {
@@ -207,8 +252,8 @@ describe('o Varal no quadro do mockup', () => {
 });
 
 describe('a busca única do alto', () => {
-  async function digitar(texto: string) {
-    const c = await abrir();
+  async function digitar(texto: string, antes?: (c: Cenario) => Promise<void>) {
+    const c = await abrir(antes ? { antes } : {});
     const campo = screen.getByRole('searchbox', { name: 'Buscar no Varal' });
     await c.usuario.type(campo, texto);
     return { ...c, campo };
@@ -257,6 +302,43 @@ describe('a busca única do alto', () => {
     expect(
       await screen.findByText('Digite um artigo, uma súmula ou uma palavra.'),
     ).toBeInTheDocument();
+  });
+
+  it('uma palavra de uma Frase guardada acha a Frase, e tocar nela abre o Caderno nessa Frase', async () => {
+    let achada = '';
+    const { usuario } = await digitar('reincidente', async ({ repo }) => {
+      await guardarFrase(repo, 'A progressão decidida pelo juiz.');
+      achada = await guardarFrase(repo, 'O reincidente progride com 20% da pena.');
+    });
+    const lista = await screen.findByRole('region', { name: 'O que o Varal achou' });
+    const achado = await within(lista).findByRole('button', {
+      name: /O reincidente progride com 20% da pena\./,
+    });
+    expect(achado).toHaveTextContent('Frase');
+    // Só a Frase que tem a palavra entra na lista.
+    expect(within(lista).queryByText(/decidida pelo juiz/)).not.toBeInTheDocument();
+    await usuario.click(achado);
+    const caderno = await screen.findByRole('dialog', { name: 'Suas Frases certas' });
+    expect(rota()).toBe('/varal');
+    // A folha rola até a Frase e a foca (depois de o foco inicial da folha passar).
+    await waitFor(() => {
+      expect(
+        within(caderno)
+          .getByText(/O reincidente progride/)
+          .closest('.m-frase-item'),
+      ).toBe(document.activeElement);
+    });
+    expect(document.activeElement).toHaveAttribute('data-frase', achada);
+  });
+
+  it('o Enter na busca abre o Caderno quando o primeiro achado é uma Frase', async () => {
+    const { usuario, campo } = await digitar('prescrição', async ({ repo }) => {
+      await guardarFrase(repo, 'A prescrição não corre durante o sursis.');
+    });
+    await screen.findByRole('button', { name: /A prescrição não corre/ });
+    await usuario.type(campo, '{Enter}');
+    expect(await screen.findByRole('dialog', { name: 'Suas Frases certas' })).toBeInTheDocument();
+    expect(rota()).toBe('/varal');
   });
 
   it('a norma que a pessoa tirou do varal não aparece na busca', async () => {

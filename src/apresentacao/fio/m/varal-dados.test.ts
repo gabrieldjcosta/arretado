@@ -99,6 +99,22 @@ describe('o que o Varal conta', () => {
     });
   });
 
+  it('as Frases contadas são as do Caderno: as ativas, e as vencidas entre elas', async () => {
+    const { repo } = await repositorioDeTeste();
+    const nova = (texto: string, proximaRevisao: string) =>
+      repo.colecao('frases').criar({
+        texto,
+        origemTipo: 'manual',
+        estado: 'ativa',
+        proximaRevisao,
+      });
+    await nova('Uma que vence hoje.', '2026-09-23');
+    await nova('Uma que volta depois.', '2026-10-30');
+    const arquivada = await nova('Uma que a pessoa arquivou.', '2026-09-20');
+    await repo.colecao('frases').atualizar(arquivada.id, { estado: 'arquivada' });
+    expect(await carregarDadosDoVaral(repo)).toMatchObject({ frases: 2, frasesVencidas: 1 });
+  });
+
   it('separa as normas das coleções de súmulas e de teses', async () => {
     const { repo, ids } = await cenario();
     const d = await carregarDadosDoVaral(repo);

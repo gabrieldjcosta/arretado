@@ -68,11 +68,17 @@ describe('o Arretado novo (prévia do Fio)', () => {
     );
   });
 
-  it('o Agora é o do mockup: a marca leva à Conta e diz quanto da prova já é da pessoa', async () => {
+  it('o Agora é o do mockup: a marca abre a Conta em folha e diz quanto da prova já é da pessoa', async () => {
     const { usuario } = await abrir({ comLei: true });
     expect(await screen.findByRole('heading', { level: 1, name: 'Agora' })).toBeInTheDocument();
     expect(screen.getByText(/da prova é seu/)).toBeInTheDocument();
     await usuario.click(screen.getByRole('button', { name: 'arretado: sua conta e ajustes' }));
+    const folha = await screen.findByRole('dialog');
+    expect(within(folha).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Seu fio mora neste aparelho',
+    );
+    // O que é longo ou perigoso segue nas telas de antes: a folha leva até elas.
+    await usuario.click(within(folha).getByRole('button', { name: /Todos os ajustes/ }));
     await waitFor(() => {
       expect(window.location.hash).toBe('#/conta');
     });
@@ -434,10 +440,17 @@ describe('o Arretado novo (prévia do Fio)', () => {
 
   it('os folhetos que ainda não têm folheto novo abrem a tela de antes', async () => {
     const { usuario } = await abrir({ rota: '#/varal' });
-    await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
+    await usuario.click(await screen.findByText('Cartões', { selector: 'strong' }));
     await waitFor(() => {
-      expect(window.location.hash).toBe('#/recall/frases');
+      expect(window.location.hash).toBe('#/recall/cartoes');
     });
+  });
+
+  it('o folheto das Frases abre o Caderno em folha, sem sair do Varal', async () => {
+    const { usuario } = await abrir({ rota: '#/varal' });
+    await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
+    expect(await screen.findByRole('dialog', { name: 'Suas Frases certas' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/varal');
   });
 
   it('a Conta liga e desliga a prévia', async () => {
