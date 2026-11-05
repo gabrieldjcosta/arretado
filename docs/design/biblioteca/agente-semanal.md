@@ -1,6 +1,6 @@
 # Agente semanal de referências
 
-Rotina agendada que procura, nas fontes da biblioteca, o que serve ao Arretado e abre um PR de rascunho. **Pronta, desligada** até o Gabriel autorizar (consome uso) e liberar os domínios (ver `guia/ORIENTACOES.md`, seção 13).
+Rotina agendada que procura, nas fontes da biblioteca, o que serve ao Arretado e abre um PR de rascunho. **Ligada em 05/11/2026** (rotina "Agente semanal da biblioteca visual", id trig_016MXLVR6yg2ymzr4FATqmXR; Gabriel liberou os domínios).
 
 Agenda sugerida: segunda-feira, 09:07 BRT (`CRON_TZ=America/Sao_Paulo 7 9 * * 1`), sessão nova a cada disparo.
 
@@ -15,5 +15,8 @@ Saída: (1) acrescente linhas em registro.md (data, fonte, achado, caso, licenç
 Se nada servir, não abra PR: diga "sem novidades" em uma linha.
 ```
 
-## Para ligar
+## Para desligar ou mudar
+Peça ao coordenador para pausar ou editar a rotina acima. Para recriar, use o prompt acima com `create_new_session_on_fire`.
+
+## (histórico) Para ligar
 Peça ao coordenador: "ligar o agente semanal da biblioteca". Ele cria a rotina com o prompt acima (`create_new_session_on_fire`) e confirma o próximo disparo.
