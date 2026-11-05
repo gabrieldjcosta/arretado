@@ -844,3 +844,15 @@
 .m-fio.m-fio[data-mundo='dia'] .m-ler-junto button.m-abrir {
   color: #a35700;
 }
+
+/* (44, os títulos dos grupos da Conta.) "Aparência", "Prova" e "O resto" em 11 px na cor 3 do mockup dão de 3,95 a 4,17:1
+   sobre a folha à noite, abaixo do mínimo de 4,5:1 (WCAG 1.4.3). Passam à cor 2, a do texto de apoio da mesma folha. */
+.m-fio.m-fio .m-conta-folha .m-grupo-conta h3 {
+  color: var(--m-texto-2);
+}
+
+/* (44, "Sair desta conta" de dia.) O #e0735f do mockup dá 2,91:1 sobre a folha clara. De dia passa ao vermelho #b3261e
+   (mais de 6:1); de noite segue o mockup. */
+.m-fio.m-fio[data-mundo='dia'] .m-linha-conta.m-sair {
+  color: #b3261e;
+}

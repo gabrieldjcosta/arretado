@@ -17,7 +17,10 @@ function assinar(avisar: () => void): () => void {
   const consulta = janela.matchMedia?.('(prefers-reduced-motion: reduce)');
   consulta?.addEventListener('change', avisar);
   const olho = new MutationObserver(avisar);
-  olho.observe(document.documentElement, { attributes: true, attributeFilter: ['data-perfil'] });
+  olho.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-perfil', 'data-movimento-escolhido'],
+  });
   return () => {
     consulta?.removeEventListener('change', avisar);
     olho.disconnect();
