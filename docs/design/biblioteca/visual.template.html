@@ -115,6 +115,24 @@ tr:last-child td{border-bottom:0}
 .ref dl{margin:8px 0 0;font-size:.85rem}.ref dt{font-weight:600;margin-top:6px}.ref dd{margin:0;color:var(--tx2)}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0;font-size:.78rem}
 .regra{border-left:3px solid var(--ponto);padding:2px 0 2px 12px;color:var(--tx2);max-width:70ch;margin:18px 0 0}
+
+/* ideias novas */
+.regua{font-family:var(--f-lei);font-size:.95rem;line-height:1.7;max-width:34ch;margin:0}
+.regua span{opacity:.3;transition:opacity .25s;cursor:pointer;border-radius:4px}.regua span.on{opacity:1;background:color-mix(in srgb,var(--ponto) 18%,transparent)}
+.disco{width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--neon) calc(var(--p,1)*360deg),var(--serra2) 0);display:grid;place-items:center;border:1px solid var(--linha)}
+.disco div{width:76px;height:76px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--tx2)}
+.rol{height:120px;overflow:auto;border:1px solid var(--linha);border-radius:10px;padding:0 10px 0;width:100%;position:relative;font-family:var(--f-lei);font-size:.85rem;color:var(--tx2)}
+.rol-fio{height:4px;background:var(--serra2);border-radius:9px;overflow:hidden;width:100%;margin-bottom:8px}.rol-fio i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--astro-b),var(--astro-a));box-shadow:0 0 10px var(--astro-sombra)}
+.dias{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:260px}
+.dia{width:30px;height:30px;border-radius:50%;border:1.5px dashed var(--forte);background:none;padding:0;color:var(--tx3);font-size:.7rem}
+.dia[data-s=e]{background:linear-gradient(180deg,var(--astro-a),var(--astro-b));border:0;color:var(--astro-tx);font-weight:700}
+.so{text-align:center;font-size:.85rem;color:var(--tx2);margin-top:8px;min-height:2.6em}
+.ze{width:64px;height:76px;transform-origin:50% 100%}.ze.on{animation:respira 4.5s ease-in-out infinite}
+@keyframes respira{50%{transform:scaleY(1.04) scaleX(.98)}}
+.ze path{fill:none;stroke:var(--certo);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.anel{position:relative}.anel::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 var(--certo);opacity:0}
+.anel.bate::after{animation:anel .55s var(--sair)}
+@keyframes anel{from{opacity:.9;box-shadow:0 0 0 0 var(--certo)}to{opacity:0;box-shadow:0 0 0 16px var(--certo)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
 </style>
 
@@ -180,6 +198,24 @@ tr:last-child td{border-bottom:0}
 
 </div>
 
+
+<h2>Ideias novas para o Arretado</h2>
+<p class="sub">Pesquisa de 05/11 sobre foco, tempo, retomada e presença. Cada ideia tem demo, fonte e o risco que precisa de decisão. As fontes de estudo com TDAH são em parte blogs de fornecedores e um piloto pequeno: servem de direção, não de prova.</p>
+<div class="grade" id="ideias">
+<section class="demo" data-ideia="regua"><header><h3>Régua de foco</h3><p>Passe o dedo ou use as setas: só a frase em leitura fica acesa.</p></header>
+<div class="pal"><p class="regua" id="regua" tabindex="0" aria-label="Texto com régua de foco; use as setas para mudar de frase"><span>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. </span><span>Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. </span><span>Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento. </span></p></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="disco"><header><h3>Disco de tempo</h3><p>O tempo encolhe em vez de contar. Na demo, 1 minuto passa em 6 segundos.</p></header>
+<div class="pal"><div style="display:grid;gap:10px;justify-items:center"><div class="disco" id="disco" role="img" aria-label="Disco de tempo"><div id="dtx">25 min</div></div><button class="btn" id="dgo">Começar 25 min</button></div></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="progresso"><header><h3>Rolagem que desenha o caminho</h3><p>Role o texto: o fio no topo se desenha.</p></header>
+<div class="pal"><div style="width:100%"><div class="rol-fio"><i id="rfio"></i></div><div class="rol" id="rol" tabindex="0" aria-label="Texto rolável"><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p><p>A pena privativa de liberdade será executada em forma progressiva, com a transferência para regime menos rigoroso, a ser determinada pelo juiz. Isso ocorre quando o preso tiver cumprido ao menos uma fração da pena. Também se exige boa conduta carcerária, comprovada pelo diretor do estabelecimento.</p></div></div></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="dobra"><header><h3>Sequência que dobra</h3><p>Toque nos dias. Dia sem estudo vira descanso e o total nunca cai.</p></header>
+<div class="pal"><div><div class="dias" id="dias"></div><p class="so" id="so"></p></div></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="companhia"><header><h3>Estudar junto</h3><p>O Zé respira ao seu lado enquanto estiver ligado.</p></header>
+<div class="pal"><div style="display:grid;gap:10px;justify-items:center"><svg class="ze" id="ze" viewBox="0 0 64 76" aria-hidden="true"><path d="M32 72V22M32 50c-12 0-14-6-14-16M32 40c12 0 14-6 14-14"/></svg><div class="sw"><button role="switch" aria-checked="false" id="sw2" aria-labelledby="swl2"></button><span id="swl2">Estudar junto</span></div></div></div><div class="pe ficha"></div></section>
+<section class="demo" data-ideia="vibra"><header><h3>Vibração suave</h3><p>Toque: anel de luz e 12 ms de vibração, onde o aparelho aceitar.</p></header>
+<div class="pal"><div style="text-align:center"><button class="acao anel" id="vb">Acertei</button><p class="so" id="vbt">Vibração: verificando suporte…</p></div></div><div class="pe ficha"></div></section>
+</div>
+
 <h2>Casos de uso previstos</h2>
 <p class="sub">Cada tela ou componente, a referência que o governa e em que pé está.</p>
 <div class="t"><table><thead><tr><th>Caso</th><th>Referências</th><th>Estado</th></tr></thead><tbody id="casos"></tbody></table></div>
@@ -234,6 +270,19 @@ const noiteBg='#0b1322';
 const itens=['Vocabulário certo (Erro, Aparelho, Problema)','Alvos de toque de 44 px ou mais','Funciona só com teclado','Contraste de texto 4,5:1','Sem copy de dívida (“Você parou em…”)','Estado vazio escrito','Respeita movimento reduzido'];
 const chk=$('#chk');itens.forEach((t,i)=>chk.append(el('li',{},`<label><input type="checkbox" id="c${i}"><span>${esc(t)}</span></label>`)));
 chk.onchange=()=>{$('#prog').style.width=(chk.querySelectorAll(':checked').length/itens.length*100)+'%'};
+
+// ideias novas
+document.querySelectorAll('[data-ideia]').forEach((sec)=>{const i=D.ideias.find((x)=>x.id===sec.dataset.ideia);if(!i)return;sec.querySelector('.ficha').innerHTML='<span class="sel av">'+esc(i.tipo)+'</span><b>por quê:</b> '+esc(i.porque)+'<br><b>fonte:</b> <a href="'+esc(i.fonte_url)+'">'+esc(i.fonte)+'</a><br><b>custo:</b> '+esc(i.custo)+' · <b>risco:</b> '+esc(i.risco)});
+const fr=[...$('#regua').children];const foco=(n)=>fr.forEach((x,k)=>x.classList.toggle('on',k===n));let fi=0;foco(0);
+fr.forEach((x,k)=>{x.onmouseenter=()=>{fi=k;foco(k)};x.onclick=()=>{fi=k;foco(k)}});
+$('#regua').onkeydown=(e)=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();fi=Math.min(fr.length-1,fi+1);foco(fi)}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();fi=Math.max(0,fi-1);foco(fi)}};
+let dt=null;$('#dgo').onclick=()=>{if(dt){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',1);$('#dtx').textContent='25 min';$('#dgo').textContent='Começar 25 min';return}let t=25*60;$('#dgo').textContent='Parar';dt=setInterval(()=>{t-=10;if(t<=0){clearInterval(dt);dt=null;$('#disco').style.setProperty('--p',0);$('#dtx').textContent='Pronto';$('#dgo').textContent='Começar 25 min';return}$('#disco').style.setProperty('--p',t/1500);$('#dtx').textContent=Math.ceil(t/60)+' min'},250)};
+$('#rol').onscroll=(e)=>{const r=e.target;$('#rfio').style.width=(r.scrollTop/Math.max(1,r.scrollHeight-r.clientHeight)*100)+'%'};
+const dias=Array.from({length:14},(_,i)=>i<4||i===5||i===6?'e':'d');const dd=$('#dias');
+const pdias=()=>{dd.replaceChildren(...dias.map((st,i)=>{const b=el('button',{class:'dia','data-s':st,'aria-label':'Dia '+(i+1)+': '+(st==='e'?'estudou':'descanso')+'. Toque para trocar'},i+1);b.onclick=()=>{dias[i]=dias[i]==='e'?'d':'e';pdias()};return b}));const n=dias.filter((x)=>x==='e').length;const ult=dias[dias.length-1];$('#so').textContent=ult==='d'?n+' dias de estudo no caminho. O fio te espera, sem pressa.':n+' dias de estudo no caminho.'};pdias();
+const sw2=$('#sw2');sw2.onclick=()=>{const on=sw2.getAttribute('aria-checked')!=='true';sw2.setAttribute('aria-checked',on);$('#ze').classList.toggle('on',on)};
+const vb=$('#vb');$('#vbt').textContent=navigator.vibrate?'Este aparelho vibra.':'Este aparelho não vibra (iOS Safari e computador); só o anel aparece.';
+vb.onclick=()=>{try{navigator.vibrate?.(12)}catch(_){}vb.classList.remove('bate');void vb.offsetWidth;vb.classList.add('bate')};
 // casos
 const ref=(id)=>D.referencias.find((r)=>r.id===id)?.nome??id;
 const cls=(e)=>/^no app/.test(e)?'app':/rascunho|outra thread|aguarda/.test(e)?'wip':'fut';

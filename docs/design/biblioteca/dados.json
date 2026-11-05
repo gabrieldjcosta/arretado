@@ -377,5 +377,73 @@
       "refs": ["laws-of-ux", "checklist-design"],
       "estado": "no app"
     }
+  ],
+  "ideias": [
+    {
+      "id": "regua",
+      "nome": "Régua de foco no Leitor",
+      "tipo": "concentração",
+      "porque": "Escurece o resto do artigo e deixa só a frase em leitura. Reduz o que disputa atenção sem esconder a lei.",
+      "fonte": "Padrão de \"chunking\" e atenção responsiva, AttentionGuard (arXiv 2602.07865, piloto com 11 pessoas; preliminar)",
+      "fonte_url": "https://www.arxiv.org/pdf/2602.07865",
+      "custo": "baixo: CSS + um índice de frase",
+      "risco": "não pode esconder texto nem mexer na âncora de grifo",
+      "estado": "proposta"
+    },
+    {
+      "id": "disco",
+      "nome": "Disco de tempo",
+      "tipo": "tempo",
+      "porque": "Relógio que encolhe em vez de número correndo. Ajuda quem não sente o tempo passar e não vira cobrança.",
+      "fonte": "Padrão de temporizador visual (Time Timer); guias de UI para TDAH (vp0.com, blog de fornecedor)",
+      "fonte_url": "https://vp0.com/blogs/adhd-friendly-mobile-app-ui-guidelines.md",
+      "custo": "baixo: conic-gradient + intervalo",
+      "risco": "sem alarme alto; fim com luz suave; nada de contagem regressiva vermelha",
+      "estado": "proposta"
+    },
+    {
+      "id": "progresso",
+      "nome": "Rolagem que desenha o caminho",
+      "tipo": "orientação",
+      "porque": "O fio no topo do Leitor se desenha conforme a pessoa desce o artigo. Responde \"onde estou\" sem texto.",
+      "fonte": "CSS scroll-driven animations (animation-timeline); suporte varia entre navegadores, usar como melhoria progressiva",
+      "fonte_url": "https://blog.codercops.com/blog/css-view-transitions-scroll-animations-2026",
+      "custo": "baixo, sem JS onde houver suporte",
+      "risco": "verificar suporte no MDN antes; fallback com JS leve",
+      "estado": "proposta"
+    },
+    {
+      "id": "dobra",
+      "nome": "Sequência que dobra, não quebra",
+      "tipo": "retomada",
+      "porque": "Dia sem estudo vira trecho de descanso no fio e o total de dias de estudo nunca diminui. Volta sem culpa.",
+      "fonte": "Guias de design anti-vergonha para TDAH (streak freeze, \"life happens\"); fontes secundárias, conferir com pesquisa primária",
+      "fonte_url": "https://dev.to/wellnestapp/why-most-medication-apps-fail-adhd-brains-3hea",
+      "custo": "médio: regra no domínio de Dia",
+      "risco": "a regra de produto é \"sem perda de sequência\"; combinar copy com a Marca",
+      "estado": "proposta"
+    },
+    {
+      "id": "companhia",
+      "nome": "Estudar junto (body doubling)",
+      "tipo": "presença",
+      "porque": "O Zé lê com a pessoa, em silêncio, só enquanto ela estuda. Companhia sem pergunta nem cobrança.",
+      "fonte": "AttentionGuard propõe \"companheiro de estudo\" que simula body doubling (piloto, 11 pessoas; preliminar)",
+      "fonte_url": "https://www.arxiv.org/pdf/2602.07865",
+      "custo": "baixo: animação do Zé em loop lento",
+      "risco": "sem animação perpétua em área de estudo; só com opção ligada",
+      "estado": "proposta"
+    },
+    {
+      "id": "vibra",
+      "nome": "Vibração suave ao acertar",
+      "tipo": "resposta",
+      "porque": "Um toque de 12 ms confirma o acerto sem som nem confete. Opcional e desligável.",
+      "fonte": "API de vibração do navegador (Android); iOS Safari não suporta",
+      "fonte_url": "https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API",
+      "custo": "mínimo: uma chamada",
+      "risco": "só no modo Vivo; respeitar reduzir movimento; não fazer nada onde não há suporte",
+      "estado": "proposta"
+    }
   ]
 }
