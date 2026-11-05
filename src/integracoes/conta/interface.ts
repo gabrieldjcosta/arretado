@@ -11,6 +11,9 @@ export interface SessaoDeConta {
 /** Por que uma operação de conta não aconteceu (nunca bloqueia o estudo local). */
 export type MotivoDeFalha = 'indisponivel' | 'sem-rede' | 'sem-convite' | 'recusado' | 'invalido';
 
+/** Métodos de login por desvio. `apple` só liga quando a conta Apple existir (Fase 3 do plano de apps). */
+export type ProvedorDeLogin = 'google' | 'apple';
+
 export class FalhaDeConta extends Error {
   constructor(
     readonly motivo: MotivoDeFalha,
@@ -31,7 +34,8 @@ export interface CopiaNaNuvem {
 export interface ServicoDeConta {
   /** Sessão conhecida agora, ou `null` (sem conta ou sessão expirada). Não exige rede. */
   sessao(): Promise<SessaoDeConta | null>;
-  entrarComGoogle(): Promise<void>;
+  /** Começa o login por um provedor externo (desvio pelo navegador e volta com `?code=`). */
+  entrarCom(provedor: ProvedorDeLogin): Promise<void>;
   pedirCodigoPorEmail(email: string): Promise<void>;
   confirmarCodigo(email: string, codigo: string): Promise<SessaoDeConta>;
   /** Termina o retorno do login pelo Google (PKCE): troca o `?code=` da URL por sessão. `null` se a URL não traz código. */

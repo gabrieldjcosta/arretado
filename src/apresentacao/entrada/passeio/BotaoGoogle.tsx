@@ -56,7 +56,7 @@ export function BotaoGoogle({ idDoAceite, aoAvisar }: Props) {
     setOcupado(true);
     aoAvisar(null);
     servico
-      .entrarComGoogle()
+      .entrarCom('google')
       .catch(() => {
         aoAvisar(ENTRADA_DIRETA.avisoDeFalha);
       })
