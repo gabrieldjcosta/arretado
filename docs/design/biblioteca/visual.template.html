@@ -1,0 +1,246 @@
+<title>Biblioteca visual do Arretado</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Literata:wght@400;600&family=Schibsted+Grotesk:wght@600;700&display=swap">
+<style>
+/* Layout: cabeçalho curto, uma grade de demos vivas, depois casos de uso e lista completa. Dark-first, tokens do Fio. */
+:root{
+  --bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--forte:#4b5d82;
+  --tx:#eef2fa;--tx2:#aab6d3;--tx3:#8a98ba;--neon:#39caef;--ponto:#ffc53d;--flor:#ff7eb6;--certo:#7ee2b0;--sombra:rgba(0,0,0,.45);
+  --on-ponto:#1a1300;--f-tit:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;--f-ui:'Atkinson Hyperlegible Next',system-ui,-apple-system,sans-serif;--f-lei:'Literata',Georgia,serif;
+  --mola:cubic-bezier(.34,1.56,.64,1);--sair:cubic-bezier(.2,.7,.2,1);color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--forte:#838fa7;--tx:#0f1c3a;--tx2:#4a5878;--tx3:#5b6682;--neon:#0b7a96;--ponto:#b87800;--flor:#c2306f;--certo:#1f7a4d;--sombra:rgba(15,28,58,.22);--on-ponto:#fff;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:1120px;background:var(--bg);color:var(--tx);font:16px/1.55 var(--f-ui);padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-tit);text-wrap:balance;margin:0}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;letter-spacing:-.01em}
+h2{font-size:1.45rem;margin-top:44px}h3{font-size:1.05rem}
+.lead{color:var(--tx2);max-width:62ch;margin:10px 0 0}
+a{color:var(--neon)}
+:focus-visible{outline:2px solid var(--ponto);outline-offset:2px}
+.sub{color:var(--tx2);margin:6px 0 16px;max-width:64ch}
+.grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))}
+.demo{background:var(--serra);border:1px solid var(--linha);border-radius:14px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.demo>header{padding:12px 14px 0}
+.demo>header p{margin:2px 0 0;color:var(--tx2);font-size:.88rem}
+.pal{margin:12px 14px;border:1px dashed var(--linha);border-radius:10px;min-height:150px;display:grid;place-items:center;padding:14px;position:relative;background:var(--bg);overflow:hidden}
+.pe{padding:0 14px 14px;margin-top:auto;font-size:.8rem;color:var(--tx3);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pe b{color:var(--tx2);font-weight:600}
+.sel{border:1px solid var(--linha);border-radius:99px;padding:1px 9px;font-size:.78rem;color:var(--tx2)}
+.sel.ok{color:var(--certo);border-color:currentColor}.sel.av{color:var(--ponto);border-color:currentColor}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{background:var(--serra2);border:1px solid var(--linha);border-radius:10px;padding:8px 14px;min-height:44px}
+.btn:hover{border-color:var(--forte)}
+/* acao: botão que cede (Uiverse, reescrito nos tokens) */
+.acao{background:var(--ponto);color:var(--on-ponto);border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;box-shadow:0 4px 0 color-mix(in srgb,var(--ponto) 55%,#000);transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
+.acao:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--ponto) 55%,#000)}
+/* seletor dia/noite */
+.pal[data-mundo=dia]{--bg:#f6f8fb;--serra:#fff;--serra2:#eef2f7;--linha:#c9d1df;--tx:#0f1c3a;--tx2:#4a5878;--neon:#0b7a96;--ponto:#b87800;--on-ponto:#fff;color:var(--tx)}
+.pal[data-mundo=noite]{--bg:#0b1322;--serra:#121c31;--serra2:#17233d;--linha:#2a3858;--tx:#eef2fa;--tx2:#aab6d3;--neon:#39caef;--ponto:#ffc53d;--on-ponto:#1a1300;color:var(--tx)}
+.mundo{width:84px;height:44px;border-radius:99px;border:1px solid var(--linha);background:var(--serra2);position:relative;padding:0}
+.mundo i{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:var(--ponto);transition:transform .45s var(--mola),background .3s,box-shadow .45s;box-shadow:0 0 0 6px color-mix(in srgb,var(--ponto) 22%,transparent),0 0 0 12px color-mix(in srgb,var(--ponto) 10%,transparent)}
+.mundo[aria-pressed=true] i{transform:translateX(40px);background:#dfe7f7;box-shadow:inset -9px -3px 0 0 #8fa0c4,0 0 0 6px rgba(223,231,247,.14)}
+.mundo[aria-pressed=false] i{animation:calor 3.2s ease-in-out infinite}
+@keyframes calor{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--ponto) 20%,transparent),0 0 0 16px color-mix(in srgb,var(--ponto) 8%,transparent)}}
+.minicartao{margin-top:12px;background:var(--serra);border:1px solid var(--linha);border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center}
+/* interruptor */
+.sw{display:flex;align-items:center;gap:12px}
+.sw button{width:52px;height:30px;border-radius:99px;border:1px solid var(--forte);background:var(--serra2);position:relative;padding:0;transition:background .25s}
+.sw button::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--tx2);transition:transform .3s var(--mola),background .25s}
+.sw button[aria-checked=true]{background:var(--neon);border-color:var(--neon)}
+.sw button[aria-checked=true]::after{transform:translateX(22px);background:var(--bg)}
+/* menu */
+.menuw{position:relative}
+.menu{position:absolute;top:calc(100% + 6px);left:0;min-width:190px;background:var(--serra);border:1px solid var(--forte);border-radius:12px;padding:6px;box-shadow:0 14px 30px -12px var(--sombra);z-index:3;transform-origin:top left;animation:abre .18s var(--sair)}
+@keyframes abre{from{opacity:0;transform:scale(.94) translateY(-4px)}}
+.menu button{white-space:nowrap;display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:10px 12px;min-height:44px}
+.menu button:hover,.menu button:focus-visible{background:var(--serra2)}
+/* folha */
+.tel{width:190px;height:180px;border:1px solid var(--forte);border-radius:18px;position:relative;overflow:hidden;background:var(--serra)}
+.tel p{margin:0;padding:12px;font-size:.8rem;color:var(--tx2)}
+.folha{position:absolute;left:0;right:0;bottom:0;height:110px;background:var(--serra2);border-top:1px solid var(--forte);border-radius:16px 16px 0 0;padding:8px 12px;transform:translateY(105%);transition:transform .42s var(--sair);font-size:.82rem}
+.folha.on{transform:none}.folha::before{content:"";display:block;width:34px;height:4px;border-radius:9px;background:var(--forte);margin:0 auto 8px}
+/* lista */
+.lista{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px;width:100%}
+.lista li{background:var(--serra);border:1px solid var(--linha);border-radius:10px;padding:8px 12px;font-size:.9rem;display:flex;justify-content:space-between;gap:8px}
+.lista button{background:none;border:0;color:var(--tx3);padding:0 6px;min-height:24px}
+.linha{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+/* cartão que vira */
+.vira{width:220px;height:110px;perspective:700px;background:none;border:0;padding:0}
+.vira span{position:absolute;inset:0;border:1px solid var(--forte);border-radius:12px;background:var(--serra2);display:grid;place-items:center;padding:10px;font-family:var(--f-lei);backface-visibility:hidden;transition:transform .4s var(--sair);font-size:.92rem}
+.vira span+span{transform:rotateY(180deg);color:var(--certo)}
+.vira[aria-pressed=true] span:first-child{transform:rotateY(-180deg)}.vira[aria-pressed=true] span+span{transform:none}
+/* ícones */
+.icones{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;width:100%}
+.icones div{display:grid;gap:3px;justify-items:center;font-size:.64rem;color:var(--tx3);padding:6px 0;border-radius:8px}
+.icones div:hover{background:var(--serra2);color:var(--tx)}
+.icones svg{width:24px;height:24px;stroke:var(--tx);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.rng{display:flex;gap:8px;align-items:center;font-size:.8rem;color:var(--tx2);margin-top:8px}.rng input{accent-color:var(--neon);flex:1}
+/* cores */
+.cores{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;width:100%}
+.cor{border:1px solid var(--linha);border-radius:10px;overflow:hidden;font-size:.72rem;background:var(--serra)}
+.cor i{display:block;height:34px}.cor span{display:block;padding:4px 7px;color:var(--tx2)}.cor b{color:var(--tx)}
+/* leis */
+.leis{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;text-align:center;font-size:.76rem;color:var(--tx2)}
+.leis>div{display:grid;gap:8px;justify-items:center;align-content:start}
+.alvo{border-radius:50%;background:var(--neon);color:var(--bg);display:grid;place-items:center;font-weight:700;border:0;padding:0}
+/* checklist */
+.chk{list-style:none;margin:0;padding:0;display:grid;gap:4px;width:100%;font-size:.88rem}
+.chk label{display:flex;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;min-height:36px;cursor:pointer}
+.chk label:hover{background:var(--serra2)}.chk input{accent-color:var(--certo);width:18px;height:18px}
+.chk input:checked+span{color:var(--tx3);text-decoration:line-through}
+.prog{height:6px;border-radius:9px;background:var(--serra2);overflow:hidden;margin-top:8px;width:100%}.prog i{display:block;height:100%;width:0;background:var(--certo);transition:width .3s var(--sair)}
+/* layout */
+.wf{display:grid;gap:10px;width:100%}
+.wf>div{display:flex;align-items:flex-end;gap:6px;height:64px}
+.wf em{display:block;border:1px solid var(--forte);border-radius:6px;background:var(--serra2);height:100%}
+.wf small{display:block;font-size:.7rem;color:var(--tx3)}
+/* galerias */
+.mural{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
+.mural div{aspect-ratio:3/4;border-radius:8px;border:1px solid var(--linha);display:grid;place-items:center;font-size:.7rem;color:var(--tx3);background:repeating-linear-gradient(135deg,var(--serra2) 0 8px,var(--serra) 8px 16px);text-align:center;padding:4px}
+/* tabelas */
+.f{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.f button{background:var(--serra);border:1px solid var(--linha);border-radius:99px;padding:6px 14px;min-height:40px}
+.f button[aria-pressed=true]{border-color:var(--neon);color:var(--neon)}
+.t{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:640px}
+th,td{border-bottom:1px solid var(--linha);padding:9px 10px;text-align:left;vertical-align:top}
+th{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);font-weight:600}
+tr:last-child td{border-bottom:0}
+.chip{display:inline-block;border:1px solid var(--linha);border-radius:99px;padding:0 9px;font-size:.78rem;color:var(--tx2);white-space:nowrap}
+.chip.app{color:var(--certo);border-color:currentColor}.chip.wip{color:var(--ponto);border-color:currentColor}.chip.fut{color:var(--tx3)}
+.refs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
+.ref{background:var(--serra);border:1px solid var(--linha);border-radius:12px;padding:12px 14px;min-width:0}
+.ref dl{margin:8px 0 0;font-size:.85rem}.ref dt{font-weight:600;margin-top:6px}.ref dd{margin:0;color:var(--tx2)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0;font-size:.78rem}
+.regra{border-left:3px solid var(--ponto);padding:2px 0 2px 12px;color:var(--tx2);max-width:70ch;margin:18px 0 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style>
+
+<h1>Biblioteca visual do Arretado</h1>
+<p class="lead">As referências que escolhemos, funcionando. Cada quadro abaixo é uma demonstração para mexer, com o nome da fonte, a licença e onde entra no app. O que está aqui é ideia; o mockup aprovado do Fio continua mandando na aparência.</p>
+<p class="regra" id="regra"></p>
+
+<h2>Veja funcionando</h2>
+<p class="sub">Toque, arraste e aperte. As demonstrações usam as cores do Fio e foram reescritas para esta página; nada foi copiado de terceiros.</p>
+<div class="grade">
+
+<section class="demo"><header><h3>Trocar dia e noite</h3><p>Sol que vira lua, com o palco mudando junto.</p></header>
+<div class="pal" id="palco" data-mundo="noite"><div style="text-align:center"><button class="mundo" id="mundo" aria-pressed="true" aria-label="Trocar para o mundo do dia"><i></i></button><div class="minicartao" id="mini">Noite: fundo azul fundo, luz amarela.</div></div></div>
+<div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> Conta › Aparência (#424)</div></section>
+
+<section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta, volta com mola.</p></header>
+<div class="pal"><button class="acao">Continuar</button></div>
+<div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> ação principal de cada tela</div></section>
+
+<section class="demo"><header><h3>Interruptor</h3><p>Teclado (Espaço) e leitor de tela funcionam.</p></header>
+<div class="pal"><div class="sw"><button role="switch" aria-checked="false" id="sw1" aria-labelledby="swl"></button><span id="swl">Lembrete diário</span></div></div>
+<div class="pe"><span class="sel av">Base UI</span><b>onde:</b> Conta</div></section>
+
+<section class="demo"><header><h3>Menu do cartão</h3><p>Abre ao toque, fecha com Esc ou ao clicar fora.</p></header>
+<div class="pal" style="align-content:start;justify-items:start;min-height:220px;overflow:visible"><div class="menuw"><button class="btn" id="mbtn" aria-haspopup="menu" aria-expanded="false">Mais ações ⋯</button><div class="menu" id="menu" role="menu" hidden><button role="menuitem">Guardar como Estrela</button><button role="menuitem">Pular por hoje</button><button role="menuitem">Editar frase</button></div></div></div>
+<div class="pe"><span class="sel av">Base UI</span><b>onde:</b> cartão, Varal</div></section>
+
+<section class="demo"><header><h3>Folha que sobe</h3><p>Painel de baixo para cima dentro do aparelho.</p></header>
+<div class="pal"><div class="tel"><p>Tela do Fio</p><div class="linha"><button class="btn" id="fbtn" aria-expanded="false">Abrir folha</button></div><div class="folha" id="folha" aria-hidden="true">Guardar um erro<br><small style="color:var(--tx3)">Só a frase correta é obrigatória.</small><br><button class="btn" id="fclose" style="margin-top:6px;min-height:34px">Fechar</button></div></div></div>
+<div class="pe"><span class="sel ok">Motion</span><b>onde:</b> Conta, Guardar um erro, porteira</div></section>
+
+<section class="demo"><header><h3>Lista que se arruma</h3><p>Entrada, saída e troca de lugar animadas.</p></header>
+<div class="pal" style="align-content:start"><div style="width:100%"><ul class="lista" id="lista"></ul><div class="linha"><button class="btn" id="add">Adicionar</button><button class="btn" id="emb">Embaralhar</button></div></div></div>
+<div class="pe"><span class="sel av">AutoAnimate</span><b>onde:</b> Varal, Caderno de Frases</div></section>
+
+<section class="demo"><header><h3>Cartão que vira</h3><p>Toque no cartão para ver a frase correta.</p></header>
+<div class="pal"><button class="vira" id="vira" aria-pressed="false" aria-label="Virar o cartão"><span>O prazo para o recurso é de quanto tempo?</span><span>15 dias, contados em dias úteis.</span></button></div>
+<div class="pe"><span class="sel ok">Motion</span><span class="sel ok">Uiverse</span><b>onde:</b> Lembrar, Cartão</div></section>
+
+<section class="demo"><header><h3>Ícones de traço</h3><p>Família única, traço ajustável.</p></header>
+<div class="pal" style="align-content:start"><div style="width:100%"><div class="icones" id="icones"></div><label class="rng">Traço <input type="range" id="tr" min="1" max="3" step=".25" value="1.75" aria-label="Espessura do traço"></label></div></div>
+<div class="pe"><span class="sel av">Lucide</span><b>onde:</b> só onde faltar ícone próprio</div></section>
+
+<section class="demo"><header><h3>Cores e contraste</h3><p>Paleta do Fio com a razão de contraste de cada texto sobre o fundo.</p></header>
+<div class="pal"><div class="cores" id="cores"></div></div>
+<div class="pe"><span class="sel">Realtime Colors</span><b>onde:</b> experimentos; a conta final fica em scripts/contraste.test.ts</div></section>
+
+<section class="demo"><header><h3>Alvo de toque</h3><p>Lei de Fitts: quanto menor o alvo, mais difícil acertar com o polegar.</p></header>
+<div class="pal"><div class="leis"><div><button class="alvo" style="width:24px;height:24px" aria-label="Alvo de 24 pixels"></button>24 px<br>mínimo do Leitor</div><div><button class="alvo" style="width:48px;height:48px" aria-label="Alvo de 48 pixels"></button>48 px<br>botões do Fio</div></div></div>
+<div class="pe"><span class="sel ok">Laws of UX</span><b>onde:</b> citar a lei no PR ou no desvio</div></section>
+
+<section class="demo"><header><h3>Conferir antes de entregar</h3><p>Lista de uma tela, do tipo que o Checklist Design organiza.</p></header>
+<div class="pal"><div style="width:100%"><ul class="chk" id="chk"></ul><div class="prog"><i id="prog"></i></div></div></div>
+<div class="pe"><span class="sel ok">Checklist Design</span><b>onde:</b> fechar cada tela</div></section>
+
+<section class="demo"><header><h3>Desktop em duas colunas</h3><p>Largura do aparelho decide: uma coluna, painel de apoio, duas colunas fixas.</p></header>
+<div class="pal"><div class="wf"><div><em style="flex:1"></em></div><small>até 600 px · uma coluna (celular)</small><div><em style="flex:2"></em><em style="flex:1"></em></div><small>600 a 840 px · conteúdo + painel de apoio</small><div><em style="flex:1"></em><em style="flex:2"></em></div><small>a partir de 840 px · duas colunas (depois do celular)</small></div></div>
+<div class="pe"><span class="sel ok">Material 3</span><b>onde:</b> Fio a partir de ~840 px (Gabriel, 05/11)</div></section>
+
+<section class="demo"><header><h3>Galerias de inspiração</h3><p>Godly, Land-book e Mobbin mostram sites e telas de produtos reais. Sem licença de reuso: só olhar.</p></header>
+<div class="pal"><div class="mural"><div>direção de arte</div><div>tipografia</div><div>onboarding</div><div>estado vazio</div><div>retomada</div><div>revisão</div></div></div>
+<div class="pe"><span class="sel">Godly</span><span class="sel">Land-book</span><span class="sel">Mobbin</span><b>nuvem:</b> Godly e Mobbin abrem; Land-book não</div></section>
+
+</div>
+
+<h2>Casos de uso previstos</h2>
+<p class="sub">Cada tela ou componente, a referência que o governa e em que pé está.</p>
+<div class="t"><table><thead><tr><th>Caso</th><th>Referências</th><th>Estado</th></tr></thead><tbody id="casos"></tbody></table></div>
+
+<h2>Todas as referências</h2>
+<p class="sub">Licença, custo, acesso pela nuvem e o que pegar ou não pegar de cada uma.</p>
+<div class="f" id="f"></div>
+<div class="refs" id="refs"></div>
+
+<script>
+const D=/*__DADOS__*/null;
+const $=(s)=>document.querySelector(s),el=(t,a={},h='')=>{const e=document.createElement(t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));e.innerHTML=h;return e};
+const esc=(s)=>String(s??'').replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+$('#regra').textContent=D.regra+' Atualizado em '+D.atualizado+'.';
+
+// dia e noite
+const mundo=$('#mundo'),palco=$('#palco'),mini=$('#mini');
+mundo.onclick=()=>{const noite=mundo.getAttribute('aria-pressed')!=='true';mundo.setAttribute('aria-pressed',noite);mundo.setAttribute('aria-label',noite?'Trocar para o mundo do dia':'Trocar para o mundo da noite');palco.dataset.mundo=noite?'noite':'dia';mini.textContent=noite?'Noite: fundo azul fundo, luz amarela.':'Dia: fundo claro, texto azul-marinho.'};
+// interruptor
+const sw=$('#sw1');sw.onclick=()=>sw.setAttribute('aria-checked',sw.getAttribute('aria-checked')!=='true');
+// menu
+const mb=$('#mbtn'),mn=$('#menu');
+const fechaMenu=()=>{mn.hidden=true;mb.setAttribute('aria-expanded','false')};
+mb.onclick=(e)=>{e.stopPropagation();const abre=mn.hidden;mn.hidden=!abre;mb.setAttribute('aria-expanded',abre);if(abre)mn.querySelector('button').focus()};
+mn.onclick=(e)=>{if(e.target.closest('button'))fechaMenu()};
+document.addEventListener('click',(e)=>{if(!mn.hidden&&!e.target.closest('.menuw'))fechaMenu()});
+mn.onkeydown=(e)=>{const b=[...mn.querySelectorAll('button')],i=b.indexOf(document.activeElement);if(e.key==='Escape'){fechaMenu();mb.focus()}if(e.key==='ArrowDown'){e.preventDefault();b[(i+1)%b.length].focus()}if(e.key==='ArrowUp'){e.preventDefault();b[(i-1+b.length)%b.length].focus()}};
+// folha
+const fo=$('#folha'),fb=$('#fbtn');
+const folha=(on)=>{fo.classList.toggle('on',on);fo.setAttribute('aria-hidden',!on);fb.setAttribute('aria-expanded',on)};
+fb.onclick=()=>folha(true);$('#fclose').onclick=()=>folha(false);
+// lista com movimento (FLIP)
+const ul=$('#lista');let n=0;const frases=['Habeas corpus','Prazo recursal','Prisão em flagrante','Coisa julgada','Súmula vinculante','Litispendência'];
+const flip=(fn)=>{const antes=new Map([...ul.children].map((li)=>[li,li.getBoundingClientRect().top]));fn();if(rm)return;[...ul.children].forEach((li)=>{const a=antes.get(li);if(a==null){li.animate([{opacity:0,transform:'translateY(-8px) scale(.96)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.7,.2,1)'});return}const d=a-li.getBoundingClientRect().top;if(d)li.animate([{transform:`translateY(${d}px)`},{transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.7,.2,1)'})})};
+const item=(t)=>{const li=el('li',{},`<span>${esc(t)}</span>`);const b=el('button',{'aria-label':'Remover '+t},'✕');b.onclick=()=>{const fim=()=>flip(()=>li.remove());if(rm)return fim();li.animate([{opacity:1},{opacity:0,transform:'translateX(20px)'}],{duration:180}).onfinish=fim};li.append(b);return li};
+frases.slice(0,3).forEach((t)=>ul.append(item(t)));n=3;
+$('#add').onclick=()=>flip(()=>ul.append(item(frases[n++%frases.length]+(n>frases.length?' '+n:''))));
+$('#emb').onclick=()=>flip(()=>{const l=[...ul.children];for(let i=l.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[l[i],l[j]]=[l[j],l[i]]}l.forEach((x)=>ul.append(x))});
+// cartão
+const v=$('#vira');v.onclick=()=>v.setAttribute('aria-pressed',v.getAttribute('aria-pressed')!=='true');
+// ícones (desenho no estilo Lucide; os arquivos reais vêm do pacote lucide-react)
+const IC={'book-open':'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z','search':'M21 21l-4.3-4.3M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z','check':'M20 6 9 17l-5-5','x':'M18 6 6 18M6 6l12 12','plus':'M5 12h14M12 5v14','star':'m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z','bookmark':'m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z','bell':'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0','moon':'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z','sun':'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41','menu':'M4 12h16M4 6h16M4 18h16','arrow-left':'m12 19-7-7 7-7M19 12H5','chevron-right':'m9 18 6-6-6-6'};
+const ic=$('#icones');Object.entries(IC).forEach(([k,d])=>ic.append(el('div',{},`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>${k}`)));
+$('#tr').oninput=(e)=>ic.querySelectorAll('svg').forEach((s)=>s.style.strokeWidth=e.target.value);
+// cores
+const lum=(h)=>{const c=[1,3,5].map((i)=>parseInt(h.slice(i,i+2),16)/255).map((x)=>x<=.03928?x/12.92:((x+.055)/1.055)**2.4);return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const cr=(a,b)=>{const x=lum(a),y=lum(b),[h,l]=x>y?[x,y]:[y,x];return(h+.05)/(l+.05)};
+const noiteBg='#0b1322';
+[['Texto','#eef2fa'],['Texto 2','#aab6d3'],['Neon','#39caef'],['Ponto','#ffc53d'],['Flor','#ff7eb6'],['Certo','#7ee2b0'],['Linha','#2a3858']].forEach(([n,h])=>{const r=cr(h,noiteBg);$('#cores').append(el('div',{class:'cor'},`<i style="background:${h}"></i><span><b>${n}</b><br>${h}<br>${r.toFixed(1)}:1 ${r>=4.5?'✓':r>=3?'só grande':'só traço'}</span>`))});
+// checklist
+const itens=['Vocabulário certo (Erro, Aparelho, Problema)','Alvos de toque de 44 px ou mais','Funciona só com teclado','Contraste de texto 4,5:1','Sem copy de dívida (“Você parou em…”)','Estado vazio escrito','Respeita movimento reduzido'];
+const chk=$('#chk');itens.forEach((t,i)=>chk.append(el('li',{},`<label><input type="checkbox" id="c${i}"><span>${esc(t)}</span></label>`)));
+chk.onchange=()=>{$('#prog').style.width=(chk.querySelectorAll(':checked').length/itens.length*100)+'%'};
+// casos
+const ref=(id)=>D.referencias.find((r)=>r.id===id)?.nome??id;
+const cls=(e)=>/^no app/.test(e)?'app':/rascunho|outra thread|aguarda/.test(e)?'wip':'fut';
+D.casos.forEach((c)=>$('#casos').append(el('tr',{},`<td><b>${esc(c.nome)}</b><br><small style="color:var(--tx3)">${esc(c.onde)}</small></td><td>${c.refs.map((r)=>esc(ref(r))).join(', ')}</td><td><span class="chip ${cls(c.estado)}">${esc(c.estado)}</span></td>`)));
+// referências
+const vs=['todos',...new Set(D.referencias.map((r)=>r.veredito))];
+const pinta=(f)=>{$('#refs').replaceChildren(...D.referencias.filter((r)=>f==='todos'||r.veredito===f).map((r)=>el('article',{class:'ref'},`<h3><a href="${esc(r.url)}">${esc(r.nome)}</a></h3><p class="tags"><span class="chip">${esc(r.tipo)}</span><span class="chip ${/^usar/.test(r.veredito)?'app':r.veredito==='avaliar'?'wip':'fut'}">${esc(r.veredito)}</span></p><dl><dt>Pegar</dt><dd>${esc(r.pegar)}</dd><dt>Não pegar</dt><dd>${esc(r.nao_pegar)}</dd>${r.exemplo?`<dt>Exemplo real</dt><dd>${esc(r.exemplo)}</dd>`:''}<dt>Licença · custo</dt><dd>${esc(r.licenca)} · ${esc(r.custo)}</dd><dt>Na nuvem</dt><dd>${esc(r.nuvem)}</dd><dt>No Arretado</dt><dd>${esc(r.estado)}</dd></dl>`)))};
+vs.forEach((x,i)=>{const b=el('button',{'aria-pressed':i===0},esc(x));b.onclick=()=>{[...$('#f').children].forEach((y)=>y.setAttribute('aria-pressed',y===b));pinta(x)};$('#f').append(b)});
+pinta('todos');
+</script>

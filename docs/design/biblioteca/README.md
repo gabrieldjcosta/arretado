@@ -3,7 +3,7 @@
 Fonte única das referências de UX/UI: o que cada uma dá, o que não pegar, licença, custo, se abre na nuvem e onde entra no app.
 
 - `dados.json`: **a única coisa que se edita**. Referências e casos de uso.
-- `referencias.md` e `index.html`: gerados por `node scripts/biblioteca.mjs`. Não editar à mão.
+- `visual.template.html` (editável: demos vivas) e `referencias.md` + `index.html` (gerados por `node scripts/biblioteca.mjs`; `index.html` é a página publicada, não editar à mão).
 - `registro.md`: achados datados do agente semanal e das pessoas (só se acrescenta).
 - `agente-semanal.md`: instrução da rotina que procura novidades.
 
