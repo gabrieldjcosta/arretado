@@ -788,6 +788,52 @@
   row-gap: 4px;
 }
 
+/* 47. O passo "Ache a diferença" (dois artigos parecidos, a pessoa toca nas palavras que os separam) não existe
+      no mockup aprovado. Ele reusa as peças do cartão "Ache o erro" (`data-cartao="achar"`): a `.lei`, a `.palavra`
+      que se toca, o `.troca` grifado que chega na mola, o `.retorno` e o rodapé. O que é novo é só a
+      disposição: os dois artigos um sobre o outro (a palavra é um `span` em linha, e não o `button` do mockup, para o trecho que difere quebrar de linha como o texto da lei) e, em tela larga, lado a lado. A palavra achada leva o grifo da
+      `.troca`; a que a pessoa pediu para ver (e não tocou) leva o mesmo grifo com sublinhado tracejado, para a
+      diferença não depender só da cor. Motivo: o plano "Fio que ensina" (ideia 6) pediu o passo; o mockup não o
+      desenhou. A Marca revisa contra o cartão `achar`. */
+.m-fio .m-lados-da-diferenca {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.m-fio .m-lados-da-diferenca .m-lei {
+  margin: 0;
+}
+@media (min-width: 640px) {
+  .m-fio .m-lados-da-diferenca {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+.m-fio .m-lado-da-diferenca .m-palavra:not(.m-diverge) {
+  /* A palavra solta é uma caixa própria (como o `button` do mockup), para o balanço de `transform` valer. */
+  display: inline-block;
+}
+.m-fio .m-lado-da-diferenca .m-palavra {
+  cursor: pointer;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.m-fio .m-palavra.m-achada {
+  font-family: var(--m-f-titulo);
+  font-weight: 800;
+  color: var(--m-grifo-texto);
+  background: var(--m-grifo);
+}
+.m-fio .m-palavra.m-mostrada {
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+}
+/* (47, contraste) De dia, o "Achou…" do retorno fica embaixo do cartão, onde o vidro já escureceu (medido: 3,48:1 com
+   o verde de `--m-certo`, #1f7a4d; o mínimo é 4,5:1, WCAG 1.4.3). Um verde mais fundo, só neste retorno. */
+.m-fio.m-fio[data-mundo='dia'] .m-lados-da-diferenca ~ .m-retorno .m-ok {
+  color: #14603a;
+}
+
 /* 41. O Caderno de Frases: o teto da folha e o pé. Motivo: (a) no mockup a folha tem a altura do que há nela (até 90% do quadro):
       sobe com as duas Frases de exemplo (456 px em 390 px de largura, 436 px de 412 em diante) e cresce com o "Ler na lei" aberto
       (587 px em 390 px de largura, 567 de 412 em diante). O app faz igual, mas com as Frases da pessoa (até 50 por página) e o
