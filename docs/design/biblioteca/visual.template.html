@@ -142,6 +142,22 @@ tr:last-child td{border-bottom:0}
 .anel{position:relative}.anel::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 var(--certo);opacity:0}
 .anel.bate::after{animation:anel .55s var(--sair)}
 @keyframes anel{from{opacity:.9;box-shadow:0 0 0 0 var(--certo)}to{opacity:0;box-shadow:0 0 0 16px var(--certo)}}
+
+/* botão do dia: três versões ao lado do luar */
+.bd{border:0;border-radius:12px;padding:12px 22px;min-height:48px;font-weight:700;color:#0f1c3a;transition:transform .12s var(--sair),box-shadow .12s var(--sair)}
+.bd:active{transform:translateY(2px)}
+.bd.a{background:linear-gradient(180deg,#fffdf2,#ffefb8);box-shadow:0 0 0 1.5px #e8b43c,0 10px 28px -10px rgba(255,190,60,.75),0 0 22px rgba(255,214,110,.45)}
+.bd.a:active{box-shadow:0 0 0 1.5px #e8b43c,0 4px 14px -8px rgba(255,190,60,.7),0 0 14px rgba(255,214,110,.35)}
+.bd.b{background:linear-gradient(180deg,#ffd23f,#ffb000);box-shadow:0 3px 0 #c98200,0 10px 22px -12px rgba(255,150,0,.7)}
+.bd.b:active{box-shadow:0 1px 0 #c98200,0 5px 12px -10px rgba(255,150,0,.7)}
+.bd.c{background:#fff;box-shadow:inset 0 0 0 2px #d39200,0 0 0 5px rgba(255,197,61,.28),0 8px 20px -10px rgba(211,146,0,.6)}
+.bd.c:active{box-shadow:inset 0 0 0 2px #d39200,0 0 0 3px rgba(255,197,61,.25)}
+.bd.lua{background:linear-gradient(180deg,#fff7e0,#ffe6a3);color:#0b1322;box-shadow:0 0 0 1px rgba(255,230,160,.5),0 10px 30px -10px rgba(255,210,110,.55)}
+.bdl{display:grid;gap:4px;justify-items:center;font-size:.72rem;color:var(--tx3)}
+.bdlinha{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.faixa{width:100%;border-radius:10px;padding:14px 8px;display:grid;gap:10px}
+.faixa.fdia{background:linear-gradient(180deg,#e4edfa,#f6f8fb)}.faixa.fnoite{background:#0b1322}
+.fdia .bdl{color:#4a5878}.fnoite .bdl{color:#aab6d3}.faixa small{color:#4a5878;font-size:.72rem;text-align:center}.faixa.fnoite small{color:#aab6d3}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
 </style>
 
@@ -160,6 +176,10 @@ tr:last-child td{border-bottom:0}
 <section class="demo"><header><h3>Botão que cede</h3><p>Afunda quando você aperta. A cor segue o tema da página: luar no escuro, sol no claro.</p></header>
 <div class="pal"><button class="acao">Continuar</button></div>
 <div class="pe"><span class="sel ok">Uiverse</span><b>onde:</b> ação principal de cada tela</div></section>
+
+<section class="demo" id="botoes-dia"><header><h3>Botão do dia: três versões</h3><p>A luz clara do luar é agradável porque o botão é claro e o texto é azul-marinho. As versões do dia seguem o mesmo princípio. A é a recomendada.</p></header>
+<div class="pal" style="display:block;padding:8px;overflow:visible"><div style="display:grid;gap:8px"><div class="faixa fdia"><div class="bdlinha"><div class="bdl"><button class="bd a">Continuar</button>A · manhã clara</div><div class="bdl"><button class="bd b">Continuar</button>B · ouro cheio</div><div class="bdl"><button class="bd c">Continuar</button>C · contorno de sol</div></div></div><div class="faixa fnoite"><div class="bdlinha"><div class="bdl"><button class="bd lua">Continuar</button>luar (já aprovado)</div></div></div></div></div>
+<div class="pe"><span class="sel av">sol</span><b>mudança:</b> o texto sai do marrom e vai para o azul-marinho do Fio; <b>A</b> é clara e brilha como o luar, <b>B</b> é dourado vivo, <b>C</b> é papel com contorno âmbar</div></section>
 
 <section class="demo"><header><h3>Interruptor</h3><p>Teclado (Espaço) e leitor de tela funcionam.</p></header>
 <div class="pal"><div class="sw"><button role="switch" aria-checked="false" id="sw1" aria-labelledby="swl"></button><span id="swl">Lembrete diário</span></div></div>
