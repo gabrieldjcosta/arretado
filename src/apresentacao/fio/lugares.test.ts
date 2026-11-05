@@ -43,6 +43,7 @@ describe('os três lugares do Arretado novo', () => {
     ['/varal/sumulas', true, true],
     ['/fio/passo', true, false],
     ['/fio/pouso', true, false],
+    ['/fio/prova', true, false],
     // O que ainda mora na casca de antes: nem quadro, nem nav do quadro.
     ['/biblioteca/normas/n1', false, false],
     ['/recall/frases', false, false],

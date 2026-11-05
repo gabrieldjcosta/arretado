@@ -675,6 +675,14 @@
   text-align: left;
 }
 
+/* Desvio 40: enquanto a abertura roda, as telas do quadro esperam por baixo, escondidas (`data-entrada` no quadro). Motivo:
+   no mockup todas as telas já existem e a abertura mede onde o ponto vai pousar na seguinte (`medir()`); no app a tela
+   seguinte é uma rota que precisa estar montada, com o Agora a ler os dados, para ser medida. `visibility` (e não
+   `hidden`) deixa a caixa medível e tira o foco e o toque. A nav e o "+" só aparecem depois, como no mockup. */
+.m-fio .m-app[data-entrada] > .m-tela:not(.m-abertura) {
+  visibility: hidden;
+}
+
 /* 29. Cada marca do mapa do Destino acha o seu lugar pela câmera, em CSS. Motivo: o mockup escreve `left` e `top`, em px,
       marca por marca, a cada quadro do voo da câmera. No app a câmera (`m/useCameraM.ts`) escreve só três variáveis na
       caixa (`--cam-x`, `--cam-y` e `--cam-k`, o canto e a escala) e cada marca guarda o seu ponto no desenho (`--x` e
