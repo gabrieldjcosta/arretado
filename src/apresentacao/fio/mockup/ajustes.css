@@ -655,7 +655,7 @@
       lidos, um de cada por volta (ideia 4 de "Fio que ensina", escolhida pelo Gabriel em 04/11/2026), e a linha diz por
       que estão misturados. Usa a classe da dica do cartão (`.m-dica-gesto`, com a tinta do desvio 19) e nenhuma regra
       nova. A ordem sai de `gerarPorteira`, em `dominios/legislacao/lembrar.ts`. */
-/* Revisão da Marca (desvio 48): a linha alinha à esquerda, como o parágrafo de cima, na tinta 2 do texto (não a da dica de gesto,
+/* Revisão da Marca (desvio 50): a linha alinha à esquerda, como o parágrafo de cima, na tinta 2 do texto (não a da dica de gesto,
    centrada e apagada). */
 .m-fio .m-dica-gesto.m-dica-mistura {
   text-align: left;
