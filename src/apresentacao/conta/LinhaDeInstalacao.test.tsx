@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LinhaDeInstalacao } from './LinhaDeInstalacao';
 
@@ -14,17 +14,28 @@ describe('LinhaDeInstalacao', () => {
 
   it('com o convite do navegador, mostra o botão e dispara o prompt', async () => {
     const prompt = vi.fn().mockResolvedValue(undefined);
-    render(<LinhaDeInstalacao />);
+    render(
+      <>
+        <h1>Conta e ajustes</h1>
+        <ul>
+          <LinhaDeInstalacao />
+        </ul>
+      </>,
+    );
     const evento = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
       prompt,
       userChoice: Promise.resolve({ outcome: 'accepted' as const }),
     });
     window.dispatchEvent(evento);
     const botao = await screen.findByRole('button', { name: 'Instalar' });
+    expect(botao).toHaveAccessibleDescription('Instalar no aparelho');
     await userEvent.setup().click(botao);
     expect(prompt).toHaveBeenCalledOnce();
     expect(evento.defaultPrevented).toBe(true);
-    expect(screen.queryByRole('button', { name: 'Instalar' })).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Instalar' })).toBeNull();
+    });
+    expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
   });
 
   it('no iOS, mostra o passo a passo e nenhum botão', () => {
