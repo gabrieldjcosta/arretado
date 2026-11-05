@@ -675,7 +675,7 @@
   text-align: left;
 }
 
-/* Desvio 48: a sequência que dobra (`DiasDoFioM`, em `m/`) não existe no mockup; é a ideia "Sequência que dobra" da
+/* Desvio 50: a sequência que dobra (`DiasDoFioM`, em `m/`) não existe no mockup; é a ideia "Sequência que dobra" da
    Biblioteca visual, aprovada pelo Gabriel em 05/11/2026. Só usa tokens do mockup: estudo é o ponto dourado
    (`--m-ponto`), descanso é um contorno tracejado azul (`--m-neon`); nenhum verde e nenhuma cor de alerta (o verde
    da demo foi vetado pelo Gabriel). Sem animação perpétua. */
