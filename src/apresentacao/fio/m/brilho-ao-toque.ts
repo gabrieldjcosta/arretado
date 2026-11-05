@@ -61,3 +61,32 @@ export function ligarBrilhoAoToque(): () => void {
     document.removeEventListener('pointerdown', ouvir);
   };
 }
+
+/**
+ * A mesma alvorada no botão principal do app antigo (`.principal`; ver o desvio do PR em
+ * `docs/entradas/desvios`): um ouvinte à parte, porque o do Fio só atende `.m-acao`. Só no modo normal.
+ */
+export function ligarAlvoradaDoPrincipal(): () => void {
+  const ouvir = (e: PointerEvent) => {
+    if (modoAgora() !== 'normal') return;
+    const alvo = e.target instanceof Element ? e.target : null;
+    const principal = alvo?.closest<HTMLElement>('.principal');
+    if (!principal || principal.hasAttribute('disabled')) return;
+    if (principal.getAttribute('aria-pressed') === 'true' || principal.closest('.m-fio')) return;
+    soltar(
+      principal,
+      'alvorada-principal',
+      [
+        { opacity: 0, transform: 'translateY(60%)', offset: 0 },
+        { opacity: 1, offset: 0.35 },
+        { opacity: 0, transform: 'translateY(-10%)', offset: 1 },
+      ],
+      900,
+      SAIR,
+    );
+  };
+  document.addEventListener('pointerdown', ouvir);
+  return () => {
+    document.removeEventListener('pointerdown', ouvir);
+  };
+}
