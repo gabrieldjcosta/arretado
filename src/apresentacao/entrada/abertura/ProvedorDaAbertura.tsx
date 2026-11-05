@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router';
 import { esconderCarregamento } from '../../carregamento';
 import { criarEncontro } from '../../componentes/escrita/encontro';
 import {
@@ -8,6 +9,8 @@ import {
 } from '../../componentes/escrita/frequencia';
 import { ContextoDaAbertura, type VezDaEscrita } from '../../componentes/escrita/vez-da-escrita';
 import { useRepositorio } from '../../dados/contexto';
+import { noQuadroDoFio } from '../../fio/lugares';
+import { useInterface } from '../../fio/interface';
 import { Abertura } from './Abertura';
 import { decidirNaAberturaDoApp } from './regras';
 
@@ -17,6 +20,19 @@ import { decidirNaAberturaDoApp } from './regras';
  * atrasa o uso.
  */
 const ESPERA_MAXIMA_MS = 400;
+
+/**
+ * No Fio, a abertura é uma tela do quadro dele. Se o app abriu numa rota da casca de antes (fora do quadro), não há onde
+ * mostrá-la: sai quieta, sem contar pulo, e não volta se a pessoa chegar ao Agora depois.
+ */
+function SaidaForaDoQuadro({ aoSair }: { aoSair: (como: 'fim' | 'pulou') => void }) {
+  const { pathname } = useLocation();
+  const fora = !noQuadroDoFio(pathname);
+  useEffect(() => {
+    if (fora) aoSair('fim');
+  }, [fora, aoSair]);
+  return null;
+}
 
 /**
  * Decide, uma vez por abertura do aplicativo, quem escreve o nome (a camada de tela cheia ou o
@@ -88,21 +104,26 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
   }, [montado]);
 
   const naTela = vez.estado === 'decidida' && vez.onde === 'tela' && !saiu ? vez : null;
-  // O Calmo não tem voo: a luz não visita o Zé, e a Chegada espera a camada sair, como a do Dia.
-  const visitaOZe = naTela !== null && naTela.chegada && !naTela.calmo;
+  const fio = useInterface() === 'fio';
+  // O Calmo não tem voo: a luz não visita o Zé, e a Chegada espera a camada sair, como a do Dia. No Fio a abertura é
+  // uma tela do quadro dele (`AberturaM`), não esta camada, e a Chegada não vem: a luz não a visita.
+  const visitaOZe = !fio && naTela !== null && naTela.chegada && !naTela.calmo;
   const valor = useMemo(
     () => ({
       vez,
       emCurso: vez.estado === 'pendente' || naTela !== null,
       voaParaAChegada: visitaOZe,
       encontro,
+      camadaDoFio:
+        fio && naTela !== null ? { escrita: naTela.escrita, calmo: naTela.calmo, aoSair } : null,
     }),
-    [vez, naTela, visitaOZe, encontro],
+    [vez, naTela, visitaOZe, encontro, fio, aoSair],
   );
   return (
     <ContextoDaAbertura.Provider value={valor}>
       {montado ? children : null}
-      {naTela && (
+      {naTela && fio && <SaidaForaDoQuadro aoSair={aoSair} />}
+      {naTela && !fio && (
         <Abertura
           escrita={naTela.escrita}
           calmo={naTela.calmo}

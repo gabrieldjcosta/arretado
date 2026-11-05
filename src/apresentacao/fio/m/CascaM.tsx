@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { Outlet, useLocation } from 'react-router';
 import { AplicarAparencia } from '../../Aparencia';
 import { PuxarEssenciais } from '../../biblioteca/PuxarEssenciais';
@@ -6,8 +7,10 @@ import { useAtalhoDeRegistrarErro } from '../../componentes/atalho-de-erro';
 import { FaixaOffline } from '../../componentes/estados';
 import { AvisoDePosse } from '../../sincronizacao/AvisoDePosse';
 import { CantoDaSessao } from '../../sessao/CantoDaSessao';
-import { lugarDaRota } from '../lugares';
+import { useEstadoDaAbertura } from '../../componentes/escrita/vez-da-escrita';
+import { ROTA_DA_PROVA, ROTA_DO_DESTINO, comNavDoFio, lugarDaRota } from '../lugares';
 import { useLuzDaHora } from '../luz-da-hora';
+import { AberturaM } from './AberturaM';
 import { FiltrosM } from './FiltrosM';
 import { aparelhoLeve } from './leve';
 import { MaisM } from './MaisM';
@@ -21,9 +24,6 @@ import '../mockup/reset.css';
 import '../mockup/fontes.css';
 import '../mockup/mockup.css';
 import '../mockup/ajustes.css';
-
-/** As rotas com nav embaixo: o Agora (e, nas fatias seguintes, o Destino e o Varal). */
-const COM_NAV = new Set(['/']);
 
 /**
  * O quadro do Fio: o `<main class="app">` do mockup aprovado, com a nav, o "+" e o aviso dentro dele. A raiz
@@ -40,6 +40,16 @@ export function CascaM() {
   // Aparelho fraco: sem as camadas de brilho, como o modo leve do mockup (lido uma vez; o aparelho não muda no meio).
   const [leve] = useState(aparelhoLeve);
   useAtalhoDeRegistrarErro();
+  // A abertura do mockup: só quando o app abriu no Agora (de outra rota, ela sai quieta) e enquanto o provedor a quer.
+  const { camadaDoFio } = useEstadoDaAbertura();
+  const [abriuNoAgora, setAbriuNoAgora] = useState<boolean | null>(null);
+  if (camadaDoFio && abriuNoAgora === null) setAbriuNoAgora(pathname === '/');
+  const naAbertura = camadaDoFio !== null && abriuNoAgora === true;
+  const saiuQuieta = camadaDoFio !== null && abriuNoAgora === false;
+  const aoSairDaCamada = camadaDoFio?.aoSair;
+  useEffect(() => {
+    if (saiuQuieta) aoSairDaCamada?.('fim');
+  }, [saiuQuieta, aoSairDaCamada]);
   useEffect(() => esquecerTelas, []);
   // A onda de luz em todo botão de ação, como no mockup (um ouvinte do documento, ligado enquanto o quadro vive).
   useEffect(() => ligarOndaDeLuz(), []);
@@ -64,16 +74,37 @@ export function CascaM() {
       >
         Pular para o conteúdo
       </a>
-      <FiltrosM />
-      <main id="conteudo" className="m-app" tabIndex={-1}>
+      <FiltrosM mundo={mundo} />
+      {/* No monitor o Destino alarga o quadro (`m-largo`, do mockup): o texto à esquerda e o mapa à direita. */}
+      <main
+        id="conteudo"
+        className={pathname === ROTA_DO_DESTINO ? 'm-app m-largo' : 'm-app'}
+        tabIndex={-1}
+        data-entrada={naAbertura ? 'abertura' : undefined}
+      >
         {/* A fronteira fica no quadro, não em cada tela: a tela que chega pela primeira vez (um pedaço à parte do
             pacote) é esperada com a atual ainda à vista, porque a troca de rota é uma transição e o React só
             revela a nova pronta. Uma fronteira nova por tela mostraria o vão e o React o seguraria 300 ms. */}
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        {COM_NAV.has(pathname) && <NavM ativo={lugarDaRota(pathname)} />}
-        <MaisM />
+        {naAbertura && (
+          <AberturaM
+            camada={{
+              ...camadaDoFio,
+              // O ponto pousou: a abertura sai e a tela seguinte aparece no mesmo quadro.
+              aoSair: (como) => {
+                flushSync(() => {
+                  camadaDoFio.aoSair(como);
+                });
+              },
+            }}
+          />
+        )}
+        {comNavDoFio(pathname) && !naAbertura && (
+          <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />
+        )}
+        {!naAbertura && pathname !== ROTA_DA_PROVA && <MaisM />}
         <ToastM />
       </main>
       <div className="m-avisos">

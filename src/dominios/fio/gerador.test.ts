@@ -370,6 +370,69 @@ describe('reta final (regra 9)', () => {
   });
 });
 
+describe('o Ache a diferença (regra 11)', () => {
+  const par = {
+    a: { endereco: 'art-1', rotulo: 'Art. 1' },
+    b: { endereco: 'art-2', rotulo: 'Art. 2' },
+  };
+  const comPar = (lidos: number[] = [], semVencidos = true) => {
+    const n = norma('cp', 20, { mapa: [1, 2, 3, 4, 5, 6], lidos });
+    return entrada({
+      vencidos: semVencidos ? 0 : 3,
+      materias: [materia('penal', { normas: [{ ...n, pares: [par] }] })],
+    });
+  };
+  const diferenca = (e: Etapa) => e.passos.find((p) => p.tipo === 'ache_a_diferenca');
+
+  it('entra num lugar vazio quando os dois artigos do par são lidos na etapa', () => {
+    const e = plano(comPar(), noNumero(1));
+    expect(tipos(e)).toEqual(['ler', 'lembrar', 'ache_a_diferenca']);
+    expect(diferenca(e)).toMatchObject({ normaId: 'cp', tituloCurto: 'CP', ...par });
+  });
+
+  it('nunca aumenta a etapa: a de 3 passos não o recebe', () => {
+    expect(tipos(plano(comPar(), noNumero(0)))).not.toContain('ache_a_diferenca');
+  });
+
+  it('chega quando o segundo artigo é lido, não antes nem de novo', () => {
+    // Só o Art. 2 é desta etapa e o Art. 1 já estava lido: o par vale.
+    const doPar = plano(comPar([1]), noNumero(1));
+    expect(diferenca(doPar)).toBeDefined();
+    // O Art. 9 não é lido nem está nesta etapa: sem o segundo artigo, não há par.
+    const longe = { ...par, b: { endereco: 'art-9', rotulo: 'Art. 9' } };
+    const n = norma('cp', 20, { mapa: [1, 2, 3, 4, 5, 6], lidos: [1] });
+    const semSegundo = entrada({
+      materias: [materia('penal', { normas: [{ ...n, pares: [longe] }] })],
+    });
+    expect(diferenca(plano(semSegundo, noNumero(1)))).toBeUndefined();
+    // Os dois já lidos antes da etapa: o par já passou.
+    expect(diferenca(plano(comPar([1, 2]), noNumero(1)))).toBeUndefined();
+  });
+
+  it('não tira o lugar de quem já estava na etapa: Revisar e a porteira ficam', () => {
+    const e = plano(comPar([], false), noNumero(1));
+    expect(tipos(e)).toContain('revisar');
+    const doFim = plano(
+      entrada({
+        materias: [
+          materia('penal', {
+            normas: [{ ...norma('cp', 10, { mapa: [1, 2, 3, 4], lidos: [] }), pares: [par] }],
+          }),
+        ],
+      }),
+      noNumero(3),
+    );
+    expect(tipos(doFim).length).toBeLessThanOrEqual(tamanhoDaEtapa(3));
+  });
+
+  it('sem pares na norma, a etapa é a de sempre', () => {
+    const sem = entrada({
+      materias: [materia('penal', { normas: [norma('cp', 20, { mapa: [1, 2, 3] })] })],
+    });
+    expect(tipos(plano(sem, noNumero(1)))).not.toContain('ache_a_diferenca');
+  });
+});
+
 describe('determinismo', () => {
   it('a mesma entrada e o mesmo estado dão sempre a mesma etapa', () => {
     const e = entrada({ materias: [farta], vencidos: 9, tarefas: [{ id: 't', titulo: 'Aula' }] });

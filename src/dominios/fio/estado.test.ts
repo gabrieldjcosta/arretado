@@ -39,6 +39,8 @@ function fazer(p: Passo): ResultadoDoPasso {
       return { tipo: 'fixar_sumula' };
     case 'praticar':
       return { tipo: 'praticar', acertos: p.quantidade, total: p.quantidade };
+    case 'ache_a_diferenca':
+      return { tipo: 'ache_a_diferenca', achadas: 1, total: 1 };
     case 'seu_passo':
       return { tipo: 'seu_passo', questoes: 10 };
   }

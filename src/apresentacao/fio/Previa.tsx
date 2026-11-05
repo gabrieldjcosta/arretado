@@ -7,11 +7,15 @@ import { EsqueletoDoFio } from './avisos/EsqueletoDoFio';
 import { Hoje } from '../hoje/Hoje';
 import { escolherInterface, useInterface, type InterfaceDoApp } from './interface';
 
+export const ProvaDoFio = lazy(() => import('./m/ProvaM').then((m) => ({ default: m.ProvaM })));
 export const AgoraDoFio = lazy(() => import('./m/AgoraM').then((m) => ({ default: m.AgoraM })));
 export const DestinoDoFio = lazy(() =>
-  import('./destino/DestinoDoFio').then((m) => ({ default: m.DestinoDoFio })),
+  import('./m/DestinoM').then((m) => ({ default: m.DestinoM })),
 );
-export const Varal = lazy(() => import('./varal/Varal').then((m) => ({ default: m.Varal })));
+export const VaralDoFio = lazy(() => import('./m/VaralM').then((m) => ({ default: m.VaralM })));
+export const FolhetoDoFio = lazy(() =>
+  import('./m/FolhetoM').then((m) => ({ default: m.FolhetoM })),
+);
 export const PassoDoFio = lazy(() => import('./m/PassoM').then((m) => ({ default: m.PassoM })));
 export const PousoDoFio = lazy(() => import('./m/PousoM').then((m) => ({ default: m.PousoM })));
 

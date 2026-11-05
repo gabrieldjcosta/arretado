@@ -1,6 +1,6 @@
 // A câmera do mapa do Destino: onde ela olha (um retângulo do desenho) e como se move. Tudo em
 // coordenadas do desenho (`Camera`) e em pixels da caixa que mostra o mapa (`Caixa`). Funções puras, sem
-// DOM: quem escuta o toque e desenha (`useCamera`) só chama estas e põe o resultado na tela.
+// DOM: quem escuta o toque e desenha (`m/useCameraM`) só chama estas e põe o resultado na tela.
 import type { Ponto } from './trilha';
 
 /** Onde a câmera olha: o canto de cima à esquerda e a largura do que cabe na caixa (a altura vem da caixa). */
@@ -119,53 +119,4 @@ export function entreCameras(de: Camera, ate: Camera, caixa: Caixa, k: number): 
   const c1 = centroDaCamera(ate, caixa);
   const w = Math.exp(Math.log(de.w) + (Math.log(ate.w) - Math.log(de.w)) * k);
   return cameraNoCentro({ x: c0.x + (c1.x - c0.x) * k, y: c0.y + (c1.y - c0.y) * k }, w, caixa);
-}
-
-/** O retângulo de um rótulo na tela, em pixels da caixa; `prioridade` menor ganha o lugar. */
-export interface RotuloEmTela {
-  id: string;
-  esq: number;
-  topo: number;
-  dir: number;
-  base: number;
-  prioridade: number;
-}
-
-/**
- * Quais rótulos ficam escondidos para nenhum cobrir outro: os de menor prioridade cedem. Guloso, na ordem
- * de prioridade. Um rótulo que passa da borda da caixa (com `margem` de folga) também cede: texto cortado
- * não se lê, e o ponto dele continua no mapa.
- */
-export function esconderSobrepostos(
-  rotulos: readonly RotuloEmTela[],
-  caixa: Caixa,
-  folgaX = 3,
-  folgaY = 1,
-  margem = 8,
-): Set<string> {
-  const escondidos = new Set<string>();
-  const aceitos: RotuloEmTela[] = [];
-  const ordenados = [...rotulos].sort((a, b) => a.prioridade - b.prioridade);
-  for (const r of ordenados) {
-    const fora =
-      r.esq < margem ||
-      r.topo < margem ||
-      r.dir > caixa.largura - margem ||
-      r.base > caixa.altura - margem;
-    const bate = aceitos.some(
-      (o) =>
-        r.esq < o.dir + folgaX &&
-        r.dir > o.esq - folgaX &&
-        r.topo < o.base + folgaY &&
-        r.base > o.topo - folgaY,
-    );
-    if (fora || bate) escondidos.add(r.id);
-    else aceitos.push(r);
-  }
-  return escondidos;
-}
-
-/** A largura que um texto ocupa, por estimativa: bem perto o bastante para o rótulo não bater no vizinho. */
-export function estimarLargura(texto: string, tamanho: number, folga = 0.58): number {
-  return texto.length * tamanho * folga;
 }
