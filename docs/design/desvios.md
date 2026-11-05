@@ -3,6 +3,8 @@
 Toda divergência intencional entre o app e um mockup aprovado entra aqui antes da mudança: tela, o que o
 mockup faz, o que o app faz, motivo e quem aprovou. Cortar algo do mockup exige cartão de opções ao Gabriel.
 
+**Desvio novo (desde 05/11/2026):** a linha vai em `docs/entradas/desvios/AAAA-MM-DD-<nome>.md`, não no fim desta tabela, e o desvio leva o número do PR que o traz ("desvio 440", "desvio 440b"). Os desvios 1 a 49 ficam com o número que têm. Regras: `docs/entradas/README.md`.
+
 | Data | Tela | Mockup | App | Motivo | Aprovado por |
 | ---- | ---- | ------ | --- | ------ | ------------ |
 | 04/11/2026 | Todas | A página do protótipo centra o quadro e lhe dá o fundo. | A raiz do Fio (`.m-fio`) faz o papel da página e soma a área segura (entalhe e barra de gestos) aos recuos. (desvio 1) | No app não há a página do protótipo, e os aparelhos têm entalhe e barra de gestos. | Marca, 04/11/2026 |
