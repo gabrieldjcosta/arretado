@@ -19,6 +19,8 @@ export const ROTA_DO_VARAL = '/varal';
 /** As telas do Fio que têm rota própria: o passo aberto e o pouso que fecha a etapa. */
 export const ROTA_DO_PASSO = '/fio/passo';
 export const ROTA_DO_POUSO = '/fio/pouso';
+/** A pergunta de quem ainda não escolheu a prova (a tela `prova` do mockup). */
+export const ROTA_DA_PROVA = '/fio/prova';
 
 /**
  * O pouso é um momento: a pílula dos três lugares some enquanto ele dura, e a saída é o fio ou "descansar"
@@ -61,8 +63,12 @@ export const noQuadroDoFio = (caminho: string): boolean =>
   caminho === ROTA_DO_VARAL ||
   caminho.startsWith(`${ROTA_DO_VARAL}/`) ||
   caminho === ROTA_DO_PASSO ||
-  caminho === ROTA_DO_POUSO;
+  caminho === ROTA_DO_POUSO ||
+  caminho === ROTA_DA_PROVA;
 
-/** As rotas do quadro que levam a nav embaixo: todas, menos o passo e o pouso (cada um é um momento, sem nav). */
+/** As rotas do quadro que levam a nav embaixo: todas, menos o passo, o pouso e a prova (cada um é um momento, sem nav). */
 export const comNavDoFio = (caminho: string): boolean =>
-  noQuadroDoFio(caminho) && caminho !== ROTA_DO_PASSO && caminho !== ROTA_DO_POUSO;
+  noQuadroDoFio(caminho) &&
+  caminho !== ROTA_DO_PASSO &&
+  caminho !== ROTA_DO_POUSO &&
+  caminho !== ROTA_DA_PROVA;

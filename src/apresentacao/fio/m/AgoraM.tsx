@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useContaAtiva } from '../dados/conta-ativa';
 import { descreverPasso } from '../dados/descrever';
+import { ROTA_DA_PROVA } from '../lugares';
 import { limparPausa, tipoDaPausa, veioDeUmaPausa } from '../dados/pausa';
 import { useFio } from '../dados/useFio';
 import { resumoDoMapa } from '../destino/resumo';
@@ -15,7 +16,7 @@ import { avisar } from './toast';
 const formatar = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 
 /**
- * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup chega numa fatia seguinte). O cartão é
+ * O que a pessoa vê quando ainda não escolheu a prova (a tela "prova" do mockup é a que o botão abre). O cartão é
  * o `.m-proximo` do mockup, que é uma grade de duas colunas (texto | min) feita para o "Na ponta do fio": aqui ele
  * leva `m-sem-prova`, que o põe em uma coluna só (desvio 23 de `ajustes.css`).
  */
@@ -25,7 +26,7 @@ function SemProva() {
       <span className="m-olho">Para começar</span>
       <strong>Qual é a sua prova?</strong>
       <span>Sem conta, sem edital. Isso fica para depois, se você quiser.</span>
-      <Link to="/comecar" className="m-acao">
+      <Link to={ROTA_DA_PROVA} className="m-acao">
         Escolher minha prova
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
