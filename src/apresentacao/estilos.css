@@ -2494,10 +2494,9 @@ dialog.dialogo-busca {
   display: grid;
   gap: 0.25rem;
   padding: 0.5rem;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  border: var(--borda-folha);
+  border-radius: var(--raio-folha);
   background: var(--superficie);
-  box-shadow: 0 3px 0 var(--penumbra);
   visibility: hidden;
   opacity: 0;
   transform: translateY(-8px);
@@ -2507,7 +2506,7 @@ dialog.dialogo-busca {
     visibility 0s linear 0.2s;
 }
 
-.busca-com-painel:focus-within .busca-painel {
+.busca-com-painel:not([data-fechado]):focus-within .busca-painel {
   visibility: visible;
   opacity: 1;
   transform: none;
@@ -2519,6 +2518,11 @@ dialog.dialogo-busca {
     transform: none;
     transition: none;
   }
+}
+
+/* Calmo: o painel só esmaece, sem a subida de 8 px. */
+html[data-perfil='calmo'] .busca-painel {
+  transform: none;
 }
 
 .busca-painel-titulo {
@@ -4373,4 +4377,10 @@ dialog.dialogo-previa .linha-acoes button {
   .seletor-mundo-dia .seletor-mundo-halo {
     animation: none;
   }
+}
+
+/* Calmo: a sombra da lua e o halo do sol param, como no movimento reduzido (exceção declarada no DESIGN.md). */
+html[data-perfil='calmo'] .seletor-mundo-noite .seletor-mundo-disco,
+html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
+  animation: none;
 }

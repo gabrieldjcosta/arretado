@@ -23,6 +23,14 @@ test('Biblioteca: as últimas buscas sobem quando o campo ganha foco e voltam ao
   await expect(painel.getByText('Últimas buscas')).toBeVisible();
   await semViolacoes(page);
 
+  // Esc esconde o painel e o foco fica no campo (WCAG 1.4.13); sair e voltar o abre de novo.
+  await campo.press('Escape');
+  await expect(painel).toBeHidden();
+  await expect(campo).toBeFocused();
+  await campo.blur();
+  await campo.focus();
+  await expect(painel).toBeVisible();
+
   await painel.getByRole('button', { name: 'LEP', exact: true }).click();
   await expect(campo).toHaveValue('LEP');
   await expect(painel).toHaveCount(0);

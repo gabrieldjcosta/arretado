@@ -260,6 +260,8 @@ export function Normas() {
   const [descartando, setDescartando] = useState<Pendente | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const campoDeBusca = useRef<HTMLInputElement>(null);
+  // Esc esconde o painel sem tirar o foco do campo (WCAG 1.4.13); digitar ou sair do campo o liberam de novo.
+  const [painelFechado, setPainelFechado] = useState(false);
   const [buscasLembradas, setBuscasLembradas] = useState<readonly string[]>(() => ultimasBuscas());
   const [falhaDescarte, setFalhaDescarte] = useState<string | null>(null);
   const estadoNavegacao: unknown = useLocation().state;
@@ -475,7 +477,7 @@ export function Normas() {
                   Normas
                 </h2>
                 <div className="barra-de-normas">
-                  <div className="busca-com-painel">
+                  <div className="busca-com-painel" data-fechado={painelFechado ? '' : undefined}>
                     <label className="busca-campo">
                       <span className="visualmente-oculto">Buscar norma</span>
                       <input
@@ -484,18 +486,31 @@ export function Normas() {
                         value={busca}
                         placeholder="Buscar norma"
                         onChange={(e) => {
+                          setPainelFechado(false);
                           mudarCriterio('q', e.target.value);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') setBuscasLembradas(lembrarBusca(busca));
+                          if (e.key === 'Escape') setPainelFechado(true);
                         }}
                         onBlur={() => {
+                          setPainelFechado(false);
                           setBuscasLembradas(lembrarBusca(busca));
                         }}
                       />
                     </label>
                     {busca === '' && buscasLembradas.length > 0 && (
-                      <div className="busca-painel">
+                      <div
+                        className="busca-painel"
+                        // Tocar num botão do painel não tira o foco do campo (no WebKit o toque nem o daria): o
+                        // painel não some antes do clique.
+                        onPointerDown={(e) => {
+                          e.preventDefault();
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
                         <p className="busca-painel-titulo">Últimas buscas</p>
                         <ul>
                           {buscasLembradas.map((b) => (
