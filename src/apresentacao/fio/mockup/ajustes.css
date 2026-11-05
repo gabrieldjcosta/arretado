@@ -706,6 +706,15 @@
   border: 1.5px dashed var(--m-neon);
   opacity: 0.7;
 }
+/* De dia o ponto dourado dá 1,4:1 e o contorno a 70% dá 2,6:1 sobre o fundo (WCAG 1.4.11 pede 3:1): os dois ganham o
+   mesmo aro do `--m-neon` do dia (#b25f00, 4:1) e o contorno deixa de esmaecer. À noite já passam (12:1 e 5,3:1). */
+.m-fio.m-fio[data-mundo='dia'] .m-dia-fio[data-estado='estudo'] {
+  border: 1.5px solid var(--m-neon);
+  box-shadow: none;
+}
+.m-fio.m-fio[data-mundo='dia'] .m-dia-fio[data-estado='descanso'] {
+  opacity: 1;
+}
 .m-fio.m-fio .m-dias-fio-regra {
   margin: 0;
   font-size: 13px;
