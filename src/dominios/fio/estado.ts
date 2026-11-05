@@ -229,6 +229,15 @@ export function pousar(estado: EstadoDoFio): { estado: EstadoDoFio; pouso?: Pous
   };
 }
 
+/**
+ * A porteira do Destino, passada pela folha da porteira (o "Ver no meu fio" do mockup): a matéria entra nas porteiras
+ * passadas, como quando a etapa do fim a passa. Sem efeito se já estava.
+ */
+export function passarPorteira(estado: EstadoDoFio, materiaId: string): EstadoDoFio {
+  if (estado.porteirasDoFim.includes(materiaId)) return estado;
+  return { ...estado, porteirasDoFim: [...estado.porteirasDoFim, materiaId] };
+}
+
 // ---- Leitura do que o aparelho guardou: qualquer coisa vira um estado válido. ----
 
 const TIPOS: readonly TipoDePasso[] = [

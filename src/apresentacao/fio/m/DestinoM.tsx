@@ -5,12 +5,14 @@
 // exemplo do mockup.
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
+import { alvoDaPorteira } from '../dados/alvo';
 import { ORDEM_UF } from '../destino/nordeste';
 import { materiaAtual, resumoDoMapa } from '../destino/resumo';
 import { useJornadaDoFio } from '../destino/useJornadaDoFio';
 import { animar, animarEDeixar, modoAgora, MOLA, SAIR } from './anima';
 import { destinoJaVisto, marcarDestinoVisto } from './destino-visto';
 import { MapaM } from './MapaM';
+import { PorteiraM } from './PorteiraM';
 import { TelaM } from './TelaM';
 
 /** O tempo que a entrada segura o mapa, na primeira visita (o `D0` do mockup). */
@@ -136,8 +138,30 @@ function SobreposicaoDoDestino() {
   );
 }
 
+/** A porteira que acabou de abrir gira na mola (45° a 405°, 900 ms), como o `ok` da folha da porteira no mockup. */
+function girarAPorteira(nome: string) {
+  if (modoAgora() !== 'normal') return;
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const g = document.querySelector<HTMLElement>(
+        `.m-destino [aria-label^="Porteira de ${nome}"].m-aberta`,
+      );
+      void animarEDeixar(
+        g,
+        [
+          { transform: 'translate(-50%,-50%) rotate(45deg) scale(.4)' },
+          { transform: 'translate(-50%,-50%) rotate(225deg) scale(1.5)' },
+          { transform: 'translate(-50%,-50%) rotate(405deg) scale(1)' },
+        ],
+        { duration: 900, easing: MOLA },
+      );
+    });
+  });
+}
+
 export function DestinoM() {
-  const { entrada, falhou, fio } = useJornadaDoFio();
+  const { entrada, entradaDoFio, falhou, fio, passarPorteira } = useJornadaDoFio();
+  const [porteira, setPorteira] = useState<{ id: string; nome: string }>();
   const { etapasFeitas, passosDados, pousos } = fio.estado;
   const resumo = resumoDoMapa(entrada);
   const atual = materiaAtual(entrada);
@@ -221,7 +245,7 @@ export function DestinoM() {
           Não deu para abrir o mapa agora. Tente de novo em instantes.
         </p>
       ) : (
-        <MapaM entrada={entrada} intro={intro} atraso={atraso} />
+        <MapaM entrada={entrada} intro={intro} atraso={atraso} aoAbrirPorteira={setPorteira} />
       )}
       {pousos.length > 0 && (
         <ol className="m-so-leitor" aria-label="Seus pousos, do mais recente ao mais antigo">
@@ -234,6 +258,24 @@ export function DestinoM() {
         </ol>
       )}
       {intro && <IntroDoDestino />}
+      <PorteiraM
+        aberta={porteira !== undefined}
+        aoFechar={() => {
+          setPorteira(undefined);
+        }}
+        aoPassar={() => {
+          if (!porteira) return;
+          passarPorteira(porteira.id);
+          girarAPorteira(porteira.nome);
+        }}
+        materia={porteira?.nome ?? ''}
+        alvo={
+          porteira && entradaDoFio
+            ? alvoDaPorteira(entradaDoFio, fio.estado, porteira.id)
+            : undefined
+        }
+        semente={etapasFeitas + 7}
+      />
     </TelaM>
   );
 }

@@ -5,6 +5,7 @@ import {
   concluirPasso,
   estadoInicial,
   lerEstadoDoFio,
+  passarPorteira,
   POUSOS_GUARDADOS,
   pousar,
   pularPasso,
@@ -438,5 +439,17 @@ describe('lerEstadoDoFio', () => {
         etapa: { numero: 0, materiaId: 'penal', materia: 'P', passos, fechados: [null], aberto: 7 },
       }).etapa,
     ).toEqual({ numero: 0, materiaId: 'penal', materia: 'P', passos, fechados: [undefined] });
+  });
+});
+
+describe('passarPorteira (a folha da porteira do Destino)', () => {
+  it('guarda a matéria entre as porteiras passadas, uma vez só, sem mexer no resto', () => {
+    const inicio = estadoInicial();
+    const uma = passarPorteira(inicio, 'm1');
+    expect(uma.porteirasDoFim).toEqual(['m1']);
+    expect(uma.etapasFeitas).toBe(inicio.etapasFeitas);
+    expect(passarPorteira(uma, 'm1')).toBe(uma);
+    expect(passarPorteira(uma, 'm2').porteirasDoFim).toEqual(['m1', 'm2']);
+    expect(inicio.porteirasDoFim).toEqual([]);
   });
 });

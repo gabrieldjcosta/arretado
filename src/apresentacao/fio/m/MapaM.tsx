@@ -73,6 +73,7 @@ export function MapaM({
   entrada,
   intro,
   atraso,
+  aoAbrirPorteira,
 }: {
   /** O que o app sabe do estudo; sem ele a caixa mostra só o mar. */
   entrada: EntradaDaJornada | undefined;
@@ -80,6 +81,8 @@ export function MapaM({
   intro: boolean;
   /** Quanto a entrada segura o mapa, em ms (o `D0` do mockup: 2350 na primeira visita, 0 depois). */
   atraso: number;
+  /** Tocar numa porteira pronta abre a folha da porteira (o Destino a hospeda); sem isso, só avisa. */
+  aoAbrirPorteira?: (materia: { id: string; nome: string }) => void;
 }) {
   const jornada = useMemo(() => (entrada ? montarJornada(dados, entrada) : undefined), [entrada]);
   const lugares = dados.ordem;
@@ -327,6 +330,10 @@ export function MapaM({
                   y={p.y}
                   rotulo={`Porteira de ${nome}${quando}`}
                   aoTocar={() => {
+                    if (p.situacao === 'pronta' && p.materia && aoAbrirPorteira) {
+                      aoAbrirPorteira({ id: p.materia.id, nome: p.materia.nome });
+                      return;
+                    }
                     avisar(
                       p.situacao === 'aberta'
                         ? `Porteira aberta. O caminho segue para ${dados.estados[p.para].nome}.`

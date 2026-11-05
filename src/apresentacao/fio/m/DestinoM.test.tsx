@@ -48,7 +48,9 @@ function jornada(
     carregando: false,
     falhou: false,
     entrada: e,
+    entradaDoFio: undefined,
     fio: { estado: estado(fio), marcas: {} },
+    passarPorteira: () => undefined,
     ...extra,
   };
 }
