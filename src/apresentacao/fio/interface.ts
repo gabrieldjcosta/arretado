@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from 'react';
 
 /**
- * Qual interface a pessoa vê neste Aparelho: a de hoje ou a prévia do Fio (D-D25, "o Arretado novo").
- * Fica só neste Aparelho (`localStorage`), sem esquema e sem sincronizar: é um interruptor de teste, e a
- * pessoa volta à interface de hoje quando quiser. Sem `localStorage` (navegação privada, bloqueio), a escolha vale
+ * Qual interface a pessoa vê neste Aparelho: o Fio (D-D25, "o Arretado novo", o padrão desde 06/11/2026) ou a de antes.
+ * Fica só neste Aparelho (`localStorage`), sem esquema e sem sincronizar: é só a escolha de voltar à interface de antes, e a
+ * pessoa muda quando quiser. Sem `localStorage` (navegação privada, bloqueio), a escolha vale
  * na memória da página, até recarregar.
  */
 export type InterfaceDoApp = 'atual' | 'fio';
@@ -13,12 +13,12 @@ const EVENTO = 'arretado:interface';
 
 /** Sem armazenamento a escolha vale na memória da página. */
 let semArmazenamento = false;
-let emMemoria: InterfaceDoApp = 'atual';
+let emMemoria: InterfaceDoApp = 'fio';
 
 export function interfaceEscolhida(): InterfaceDoApp {
   if (semArmazenamento) return emMemoria;
   try {
-    return localStorage.getItem(CHAVE_DA_INTERFACE) === 'fio' ? 'fio' : 'atual';
+    return localStorage.getItem(CHAVE_DA_INTERFACE) === 'atual' ? 'atual' : 'fio';
   } catch {
     return emMemoria;
   }
@@ -27,8 +27,7 @@ export function interfaceEscolhida(): InterfaceDoApp {
 export function escolherInterface(qual: InterfaceDoApp): void {
   emMemoria = qual;
   try {
-    if (qual === 'fio') localStorage.setItem(CHAVE_DA_INTERFACE, 'fio');
-    else localStorage.removeItem(CHAVE_DA_INTERFACE);
+    localStorage.setItem(CHAVE_DA_INTERFACE, qual);
   } catch {
     semArmazenamento = true;
   }
@@ -46,5 +45,5 @@ function assinar(avisar: () => void): () => void {
 
 /** A interface escolhida, que muda na hora quando a pessoa liga ou desliga a prévia (e entre abas). */
 export function useInterface(): InterfaceDoApp {
-  return useSyncExternalStore(assinar, interfaceEscolhida, () => 'atual');
+  return useSyncExternalStore(assinar, interfaceEscolhida, () => 'fio');
 }
