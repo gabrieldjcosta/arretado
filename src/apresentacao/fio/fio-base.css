@@ -740,3 +740,13 @@
     top: 4.5rem;
   }
 }
+
+/* A Conta no monitor: as linhas de ajustes em duas colunas, com as mesmas linhas e a mesma ordem do celular. */
+@media (min-width: 1000px) {
+  .shell-fio .lista-de-linhas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    align-items: start;
+  }
+}
