@@ -73,6 +73,8 @@ export function PuxarM({
       p.style.top = `${String(base - 42)}px`;
       d.style.top = `${String(base + 58)}px`;
       if (entrada && modoAgora() === 'normal') {
+        // Solta a animação no fim: com `fill: both` ela segurava o `transform: none` por cima do arrasto, e o ponto
+        // não saía do lugar (o fio, desenhado à parte, ficava descolado dele).
         void animar(
           p,
           [
@@ -80,7 +82,9 @@ export function PuxarM({
             { transform: 'none', opacity: 1 },
           ],
           { duration: 700, easing: MOLA },
-        );
+        ).then(() => {
+          if (!geo.current.puxando) cancelarAnimacoes(p);
+        });
       }
     },
     [desenhar],
@@ -195,6 +199,7 @@ export function PuxarM({
         ref={puxador}
         aria-label="Puxar o fio: começar o próximo passo"
         onPointerDown={(e) => {
+          cancelarAnimacoes(e.currentTarget);
           arrasto.current = { y0: e.clientY, movido: false };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}

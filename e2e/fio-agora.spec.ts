@@ -170,6 +170,29 @@ test('com zoom de 200% (195 px de layout), a nav cabe sem rolar de lado', async 
   await semViolacoesNoFio(page);
 });
 
+test('com movimento vivo, o ponto desce junto com o mouse e o fio o acompanha', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await comMateriaNaPrevia(page);
+  // Espera a queda do ponto (700 ms) acabar: antes o fim dela segurava o ponto no lugar.
+  await page.waitForTimeout(1200);
+  const caixa = await puxador(page).boundingBox();
+  if (!caixa) throw new Error('sem caixa');
+  const x = caixa.x + caixa.width / 2;
+  const y = caixa.y + caixa.height / 2;
+  const fioAntes = await page.locator('.m-fio-pendurado').getAttribute('d');
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + 50, { steps: 5 });
+  const depois = await puxador(page).boundingBox();
+  const fio = await page.locator('.m-fio-pendurado').getAttribute('d');
+  expect(fio).not.toBe(fioAntes);
+  await page.mouse.up();
+  expect(depois?.y ?? 0).toBeGreaterThan(caixa.y + 40);
+});
+
 test('arrastar o ponto para baixo e soltar puxa o fio e abre o passo', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await comMateriaNaPrevia(page);
@@ -187,7 +210,8 @@ test('arrastar o ponto para baixo e soltar puxa o fio e abre o passo', async ({ 
   await expect(page.getByRole('group', { name: 'Na ponta do fio' })).toBeVisible();
   expect(page.url()).not.toContain('/fio/passo');
 
-  // Além de 70 px, puxa.
+  // Além de 70 px, puxa. (Espera a mola da volta acabar: agora o ponto de fato se mexe.)
+  await page.waitForTimeout(700);
   await page.mouse.move(x, y);
   await page.mouse.down();
   await page.mouse.move(x, y + 110, { steps: 8 });
