@@ -5,6 +5,7 @@ import { PuxarEssenciais } from './biblioteca/PuxarEssenciais';
 import { AREAS } from './areas';
 import { FaixaOffline } from './componentes/estados';
 import { useInterface } from './fio/interface';
+import { ligarAlvoradaDoPrincipal } from './fio/m/brilho-ao-toque';
 import { Marca } from './componentes/escrita/Marca';
 import { useAtalhoDeRegistrarErro } from './componentes/atalho-de-erro';
 import { criarRegistroDeItens, ProvedorDeItensDoMais } from './componentes/ItensDoMais';
@@ -56,6 +57,7 @@ function IconeDeArea({ d }: { d: string }) {
  * espera por ela.
  */
 export function Shell() {
+  useEffect(() => ligarAlvoradaDoPrincipal(), []);
   const fio = useInterface() === 'fio';
   // A casca nova começa a baixar já, em paralelo com a decisão da Abertura.
   useEffect(() => {

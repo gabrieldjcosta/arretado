@@ -28,8 +28,8 @@
       "veredito": "usar",
       "pegar": "CSS de botão, interruptor, loader e acabamento; reescrever em tokens do app.",
       "nao_pegar": "Tailwind do código de origem; animação perpétua em área de estudo.",
-      "estado": "Lua do bad-parrot no seletor dia/noite (#424). Seis links esperam o código colado.",
-      "exemplo": "Lua do bad-parrot no seletor dia/noite (#424). Seis links ainda esperam o código colado: yellow-rattlesnake-26, white-newt-65, red-duck-82, quiet-bulldog-16, odd-cobra-82, dull-walrus-66.",
+      "estado": "Lua do bad-parrot no seletor dia/noite (#424). Os seis links pendentes foram descartados (Gabriel, 05/11).",
+      "exemplo": "Lua do bad-parrot no seletor dia/noite (#424). Sol e lua usam as cores do mockup; brilho por mundo (dourado de dia, azul-prata à noite).",
       "verificado": "2026-11-05"
     },
     {
@@ -376,6 +376,14 @@
       "mockup": "sem",
       "refs": ["laws-of-ux", "checklist-design"],
       "estado": "no app"
+    },
+    {
+      "id": "sequencia-dobra",
+      "nome": "Sequência que dobra (descanso)",
+      "onde": "Dia / Agora; Pouso",
+      "mockup": "sem",
+      "refs": ["laws-of-ux"],
+      "estado": "aprovada (Gabriel, 05/11); falta implementar"
     }
   ],
   "ideias": [
@@ -383,12 +391,12 @@
       "id": "regua",
       "nome": "Régua de foco no Leitor",
       "tipo": "concentração",
-      "porque": "Escurece o resto do artigo e deixa só a frase em leitura. Reduz o que disputa atenção sem esconder a lei.",
+      "porque": "Escurece o resto do artigo e deixa só a frase em leitura. Reduz o que disputa atenção sem esconder a lei. Com filtro de palavras (o mesmo princípio do grifo automático da lei), a régua pula para as frases que contêm o termo marcado.",
       "fonte": "Padrão de \"chunking\" e atenção responsiva, AttentionGuard (arXiv 2602.07865, piloto com 11 pessoas; preliminar)",
       "fonte_url": "https://www.arxiv.org/pdf/2602.07865",
       "custo": "baixo: CSS + um índice de frase",
-      "risco": "não pode esconder texto nem mexer na âncora de grifo",
-      "estado": "proposta"
+      "risco": "não pode esconder texto nem mexer na âncora de grifo; reaproveitar o filtro do grifo automático em vez de criar outro",
+      "estado": "aprovada (Gabriel, 05/11); em implementação (thread própria)"
     },
     {
       "id": "disco",
@@ -410,7 +418,7 @@
       "fonte_url": "https://blog.codercops.com/blog/css-view-transitions-scroll-animations-2026",
       "custo": "baixo, sem JS onde houver suporte",
       "risco": "verificar suporte no MDN antes; fallback com JS leve",
-      "estado": "proposta"
+      "estado": "aprovada (Gabriel, 05/11); em implementação (thread própria)"
     },
     {
       "id": "dobra",
@@ -420,18 +428,18 @@
       "fonte": "Guias de design anti-vergonha para TDAH (streak freeze, \"life happens\"); fontes secundárias, conferir com pesquisa primária",
       "fonte_url": "https://dev.to/wellnestapp/why-most-medication-apps-fail-adhd-brains-3hea",
       "custo": "médio: regra no domínio de Dia",
-      "risco": "a regra de produto é \"sem perda de sequência\"; combinar copy com a Marca",
-      "estado": "proposta"
+      "risco": "a tela precisa dizer com todas as letras: dia sem estudo vira descanso e o total de dias de estudo nunca diminui. Combinar a copy com a Marca; sem cor de alerta no descanso.",
+      "estado": "aprovada (Gabriel, 05/11); em implementação (thread própria)"
     },
     {
       "id": "companhia",
       "nome": "Estudar junto (body doubling)",
       "tipo": "presença",
-      "porque": "O Zé lê com a pessoa, em silêncio, só enquanto ela estuda. Companhia sem pergunta nem cobrança.",
+      "porque": "O Zé (olhos retos, bochechas rosadas) lê com a pessoa, em silêncio, só enquanto ela estuda. Balança como se o vento batesse, segura uma camomila (pétalas brancas, miolo amarelo) e, de tempos em tempos, sorri com os olhos em arco, abre as pétalas e troca a flor por uma bandeirinha agitada na haste, como quem torce. Sutil, sem som, sem pergunta nem cobrança.",
       "fonte": "AttentionGuard propõe \"companheiro de estudo\" que simula body doubling (piloto, 11 pessoas; preliminar)",
       "fonte_url": "https://www.arxiv.org/pdf/2602.07865",
       "custo": "baixo: animação do Zé em loop lento",
-      "risco": "sem animação perpétua em área de estudo; só com opção ligada",
+      "risco": "sem animação perpétua em área de estudo: só com a opção ligada, em ciclos curtos, e parado com \"reduzir movimento\". O Zé não usa fundo escuro: de dia leva a faixa piscina, de noite o brilho.",
       "estado": "proposta"
     },
     {

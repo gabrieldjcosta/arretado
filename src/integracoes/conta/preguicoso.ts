@@ -1,6 +1,6 @@
 // Serviço de conta que só carrega o Supabase quando alguém o usa (fora do pacote inicial, plano §4.4).
 import type { ServidorDeSincronizacao } from '../../core/sincronizacao';
-import type { ServicoDeConta, SessaoDeConta } from './interface';
+import type { ProvedorDeLogin, ServicoDeConta, SessaoDeConta } from './interface';
 
 type Carregador = () => Promise<ServicoDeConta>;
 
@@ -17,8 +17,8 @@ export class ServicoDeContaPreguicoso implements ServicoDeConta {
   async sessao() {
     return (await this.servico()).sessao();
   }
-  async entrarComGoogle() {
-    await (await this.servico()).entrarComGoogle();
+  async entrarCom(provedor: ProvedorDeLogin) {
+    await (await this.servico()).entrarCom(provedor);
   }
   async pedirCodigoPorEmail(email: string) {
     await (await this.servico()).pedirCodigoPorEmail(email);

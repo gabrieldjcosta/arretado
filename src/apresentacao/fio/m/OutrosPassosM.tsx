@@ -212,7 +212,7 @@ export function SeuPassoM({
 }
 
 /** "Guardar a Frase" depois da porteira: as que escaparam vão ao varal com um toque. */
-function GuardarFrasesDaPorteira({ erros }: { erros: readonly { fonte: FonteDoItem }[] }) {
+export function GuardarFrasesDaPorteira({ erros }: { erros: readonly { fonte: FonteDoItem }[] }) {
   const repo = useRepositorio();
   const [estado, setEstado] = useState<EstadoDoGuardar>('parada');
   if (erros.length === 0) return null;

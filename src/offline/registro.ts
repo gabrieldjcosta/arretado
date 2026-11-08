@@ -2,6 +2,7 @@
 // O service worker em si é `service-worker.js`, publicado como `sw.js` pelo build.
 
 import { useSyncExternalStore } from 'react';
+import { ambienteAtual, usaServiceWorker } from '../suporte/plataforma';
 
 type Ouvinte = () => void;
 
@@ -78,6 +79,8 @@ function conferirAtualizacao() {
  */
 export async function registrarServiceWorker(): Promise<void> {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+  // Na casca nativa os arquivos já estão no aparelho: nada de service worker.
+  if (!usaServiceWorker(ambienteAtual())) return;
   try {
     // `sw.js` relativo à página, como o `base: './'` do build; o escopo é a pasta do app.
     registro = await navigator.serviceWorker.register(enderecoDoServiceWorker(), {

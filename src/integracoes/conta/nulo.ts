@@ -8,7 +8,7 @@ export class ServicoDeContaNulo implements ServicoDeConta {
   sessao() {
     return Promise.resolve(null);
   }
-  entrarComGoogle(): Promise<void> {
+  entrarCom(): Promise<void> {
     return Promise.reject(new FalhaDeConta('indisponivel', INDISPONIVEL));
   }
   pedirCodigoPorEmail(): Promise<void> {

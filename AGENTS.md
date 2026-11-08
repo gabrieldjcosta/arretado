@@ -13,6 +13,10 @@ Vale para Claude Code, Gemini, Antigravity, OpenCode, DeepSeek Harness, Hermes e
 7. Pronto = `npm run check` verde (e E2E quando houver tela). "Parece certo" não é verificação: anexe o comando e a saída relevante.
 8. Quem constrói não é o único revisor do próprio diff.
 9. Mesma falha duas vezes: pare de editar, diagnostique e relate.
+10. Antes de editar um arquivo que outro agente já mexeu, rode `npm run licoes -- <arquivo>` e leia as seções que importam (lições de outras tarefas). Rode de novo, sem argumento, antes de tirar o PR do rascunho.
+11. Entrada nova de desvio, decisão de design, glossário ou solução de problema vai em `docs/entradas/<destino>/AAAA-MM-DD-<nome>.md`, nunca no fim do registro; desvio novo leva o número do PR (`docs/entradas/README.md`).
+
+Detalhe e motivo destas regras e das de branch: [`docs/planos/estrategia-de-desenvolvimento.md`](docs/planos/estrategia-de-desenvolvimento.md).
 
 ## Regras do produto (resumo; detalhe no `CLAUDE.md`)
 

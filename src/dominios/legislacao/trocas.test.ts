@@ -63,6 +63,12 @@ describe('gerarTrocas', () => {
     expect(trocas.map((t) => t.substituto)).toEqual(['Inclusive', 'sempre']);
   });
 
+  it('não troca "sempre que" (daria "nunca que"), mas troca o advérbio sozinho', () => {
+    const locucao = 'A jurisdição será exercida, sempre que possível, por 3 (três) juízes.';
+    expect(gerarTrocas(locucao).map((t) => t.substituto)).not.toContain('nunca');
+    expect(gerarTrocas('O juiz sempre decidirá.').map((t) => t.substituto)).toEqual(['nunca']);
+  });
+
   it('é determinístico e sem troca segura devolve vazio', () => {
     expect(gerarTrocas(ECA_121_2)).toEqual(gerarTrocas(ECA_121_2));
     expect(gerarTrocas('O juiz decidirá.')).toEqual([]);

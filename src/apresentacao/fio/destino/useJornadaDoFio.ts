@@ -2,6 +2,7 @@
 // pessoa está) junto com o que o Fio guardou no aparelho (pousos, porteiras), já na forma do mapa.
 import { useCallback, useMemo } from 'react';
 import type { Repositorio } from '../../../core/persistencia';
+import { passarPorteira, type EntradaDoFio } from '../../../dominios/fio';
 import { useRepositorio } from '../../dados/contexto';
 import { useFonteIncidencia } from '../../dados/fonteIncidenciaContexto';
 import { montarEntradaDoFio } from '../dados/entrada';
@@ -15,13 +16,23 @@ export interface JornadaDoFio {
   carregando: boolean;
   falhou: boolean;
   entrada: EntradaDaJornada | undefined;
+  /** O que o Fio sabe, sem passar pelo mapa (a folha da porteira escolhe os artigos por ele). */
+  entradaDoFio: EntradaDoFio | undefined;
   fio: FioGuardado;
+  /** A porteira da matéria passou (a folha da porteira, "Ver no meu fio"): o Fio guarda e o mapa a mostra aberta. */
+  passarPorteira: (materiaId: string) => void;
 }
 
 export function useJornadaDoFio(): JornadaDoFio {
   const repo = useRepositorio();
   const fonte = useFonteIncidencia();
-  const { fio } = useFioGuardado(repo.ctx.usuarioId);
+  const { fio, gravar } = useFioGuardado(repo.ctx.usuarioId);
+  const passar = useCallback(
+    (materiaId: string) => {
+      gravar({ estado: passarPorteira(fio.estado, materiaId), marcas: fio.marcas });
+    },
+    [fio, gravar],
+  );
   const etapasFeitas = fio.estado.etapasFeitas;
   // A matéria em que a pessoa está tem de vir com os artigos: o Fio abre a da vez, e aqui também a do último pouso.
   const materiaAberta = fio.estado.pousos[0]?.materiaId ?? fio.estado.etapa?.materiaId;
@@ -44,6 +55,8 @@ export function useJornadaDoFio(): JornadaDoFio {
     carregando: dados === undefined && falha === undefined,
     falhou: dados === undefined && falha !== undefined,
     entrada,
+    entradaDoFio: dados,
     fio,
+    passarPorteira: passar,
   };
 }
