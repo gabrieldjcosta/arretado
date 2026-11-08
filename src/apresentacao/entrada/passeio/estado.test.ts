@@ -25,8 +25,8 @@ describe('o Passeio (D-D10): para onde cada controle leva', () => {
     expect(PRIMEIRO_PASSO).toEqual(passo(0));
   });
 
-  it('"Seguir" anda um passo por menu, na ordem das abas', () => {
-    expect(PASSOS.map((p) => p.nome)).toEqual(['Hoje', 'Trilha', 'Fixar', 'Biblioteca']);
+  it('"Seguir" anda um passo por lugar, na ordem da pílula', () => {
+    expect(PASSOS.map((p) => p.nome)).toEqual(['Agora', 'Destino', 'Varal']);
     for (let i = 0; i < ULTIMO; i += 1) expect(aoSeguir(passo(i), primeira)).toEqual(passo(i + 1));
   });
 
@@ -73,10 +73,10 @@ describe('o Passeio (D-D10): para onde cada controle leva', () => {
     expect(aoVoltar(TELA_COMECAR, primeira)).toBe('fechar');
   });
 
-  it('o leitor de tela ouve o título da tela e, nos passos, "Passo N de 4: Nome"', () => {
+  it('o leitor de tela ouve o título da tela e, nos passos, "Passo N de 3: Nome"', () => {
     expect(anuncioDaTela(TELA_BOAS)).toBe('Boas-vindas ao Arretado!');
     expect(anuncioDaTela(TELA_COMECAR)).toBe('Vamo começar?');
-    expect(anuncioDaTela(passo(0))).toBe('Passo 1 de 4: Hoje');
-    expect(anuncioDaTela(passo(3))).toBe('Passo 4 de 4: Biblioteca');
+    expect(anuncioDaTela(passo(0))).toBe('Passo 1 de 3: Agora');
+    expect(anuncioDaTela(passo(2))).toBe('Passo 3 de 3: Varal');
   });
 });

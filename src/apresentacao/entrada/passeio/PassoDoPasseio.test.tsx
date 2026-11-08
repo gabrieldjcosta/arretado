@@ -47,37 +47,38 @@ describe('um passo do Passeio (D-D10)', () => {
     ir(1);
     expect(conteudo()).toHaveAttribute('data-fase', 'saindo');
     expect(conteudo()).toHaveAttribute('data-sentido', 'avanca');
-    expect(titulo()).toBe('Hoje');
+    expect(titulo()).toBe('Agora');
     act(() => {
       vi.advanceTimersByTime(159);
     });
-    expect(titulo()).toBe('Hoje');
+    expect(titulo()).toBe('Agora');
     act(() => {
       vi.advanceTimersByTime(1);
     });
-    expect(titulo()).toBe('Trilha');
+    expect(titulo()).toBe('Destino');
     expect(conteudo()).toHaveAttribute('data-fase', 'entrou');
     ir(0);
     expect(conteudo()).toHaveAttribute('data-sentido', 'volta');
     act(() => {
       vi.advanceTimersByTime(160);
     });
-    expect(titulo()).toBe('Hoje');
+    expect(titulo()).toBe('Agora');
   });
 
   it('o texto de progresso, o rótulo do botão, os pontos e o traço sob a aba trocam junto com o conteúdo', () => {
     simularMovimento('normal');
-    const { ir, container } = montar(2);
-    ir(3);
-    expect(screen.getByText('Passo 3 de 4')).toBeInTheDocument();
+    const { ir, container } = montar(1);
+    expect(screen.getByText('Passo 2 de 3')).toBeInTheDocument();
+    ir(2);
+    expect(screen.getByText('Passo 2 de 3')).toBeInTheDocument();
     act(() => {
       vi.advanceTimersByTime(160);
     });
-    expect(screen.getByText('Passo 4 de 4')).toBeInTheDocument();
+    expect(screen.getByText('Passo 3 de 3')).toBeInTheDocument();
     expect(container.querySelector<HTMLElement>('.passo-traco')?.style.transform).toBe(
-      'translateX(300%)',
+      'translateX(200%)',
     );
-    expect(container.querySelectorAll('.passo-pontos i[data-estado="feito"]')).toHaveLength(3);
+    expect(container.querySelectorAll('.passo-pontos i[data-estado="feito"]')).toHaveLength(2);
   });
 
   it('dois pedidos seguidos antes dos 160 ms mostram só o último', () => {
@@ -91,11 +92,11 @@ describe('um passo do Passeio (D-D10)', () => {
     act(() => {
       vi.advanceTimersByTime(159);
     });
-    expect(titulo()).toBe('Hoje');
+    expect(titulo()).toBe('Agora');
     act(() => {
       vi.advanceTimersByTime(1);
     });
-    expect(titulo()).toBe('Fixar');
+    expect(titulo()).toBe('Varal');
   });
 
   it('o Calmo também espera os 160 ms (o deslocamento é do CSS, que no Calmo só esmaece)', () => {
@@ -106,14 +107,14 @@ describe('um passo do Passeio (D-D10)', () => {
     act(() => {
       vi.advanceTimersByTime(160);
     });
-    expect(titulo()).toBe('Trilha');
+    expect(titulo()).toBe('Destino');
   });
 
   it('com movimento reduzido o passo troca na hora', () => {
     simularMovimento('reduzido');
     const { ir, conteudo, titulo } = montar(0);
     ir(1);
-    expect(titulo()).toBe('Trilha');
+    expect(titulo()).toBe('Destino');
     expect(conteudo()).toHaveAttribute('data-fase', 'parado');
   });
 
@@ -128,7 +129,7 @@ describe('um passo do Passeio (D-D10)', () => {
     act(() => {
       vi.advanceTimersByTime(160);
     });
-    expect(titulo()).toBe('Trilha');
+    expect(titulo()).toBe('Destino');
     expect(screen.getByRole('heading', { level: 2 })).toHaveFocus();
   });
 
@@ -191,7 +192,7 @@ describe('um passo do Passeio (D-D10)', () => {
     expect(props.aoVoltar).toHaveBeenCalledTimes(1);
   });
 
-  it('um índice fora dos quatro menus não desenha nada', () => {
+  it('um índice fora dos três lugares não desenha nada', () => {
     simularMovimento('reduzido');
     const { container } = montar(9);
     expect(container).toBeEmptyDOMElement();
