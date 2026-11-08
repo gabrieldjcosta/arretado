@@ -48,6 +48,7 @@ it('normas ok + Trilha falha: leitura preservada; tentar de novo cria a Trilha u
   window.location.hash = '#/comecar/ministerio-publico';
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} fonteAcervo={f} />);
+  await usuario.click((await screen.findAllByRole('radio', { name: /MPGO/ }))[0] as HTMLElement);
   await usuario.click(await screen.findByRole('button', { name: 'Adicionar e ler' }));
   expect(await screen.findByText('As normas entraram; a Trilha, não.')).toBeVisible();
   expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(1);
