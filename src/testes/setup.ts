@@ -61,6 +61,8 @@ const ABERTURA_JA_VISTA: Record<string, string> = {
   'arretado:chegada:v1': '{"vista":true}',
   'arretado:entrada-do-dia:v1': '{"dia":"9999-12-31"}',
   'arretado:escrita-do-nome:v1': '{"dia":"9999-12-31"}',
+  // O Fio é o padrão do app (06/11/2026); os testes de tela existentes partem da interface de antes, e os do Fio ligam a deles.
+  'arretado:interface': 'atual',
 };
 function semearAberturaJaVista() {
   try {

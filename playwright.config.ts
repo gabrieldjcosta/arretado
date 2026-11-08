@@ -6,6 +6,17 @@ const PORTA_CONTA = 4174;
 const SAIDA_CONTA = 'node_modules/.arretado-e2e-conta';
 const SPECS_DA_CONTA = /conta-.*\.spec\.ts$/;
 
+// O Fio é o padrão (06/11/2026); os specs que não são do Fio partem da interface de antes. Os do Fio abrem `#/fio/ligar`.
+const deAntes = (porta: number) => ({
+  cookies: [],
+  origins: [
+    {
+      origin: `http://localhost:${String(porta)}`,
+      localStorage: [{ name: 'arretado:interface', value: 'atual' }],
+    },
+  ],
+});
+
 // Tablet Android em retrato (712 × 1138, Chromium como os outros): logo acima do corte de
 // 700 px, com a barra de cima do desktop e a coluna de leitura quase da largura da tela (11.1).
 const APARELHOS = [
@@ -33,12 +44,20 @@ export default defineConfig({
     ...APARELHOS.map(([name, aparelho]) => ({
       name,
       testIgnore: SPECS_DA_CONTA,
-      use: { ...aparelho, baseURL: `http://localhost:${String(PORTA)}` },
+      use: {
+        ...aparelho,
+        baseURL: `http://localhost:${String(PORTA)}`,
+        storageState: deAntes(PORTA),
+      },
     })),
     ...APARELHOS.map(([name, aparelho]) => ({
       name: `conta-${name}`,
       testMatch: SPECS_DA_CONTA,
-      use: { ...aparelho, baseURL: `http://localhost:${String(PORTA_CONTA)}` },
+      use: {
+        ...aparelho,
+        baseURL: `http://localhost:${String(PORTA_CONTA)}`,
+        storageState: deAntes(PORTA_CONTA),
+      },
     })),
   ],
   webServer: [
