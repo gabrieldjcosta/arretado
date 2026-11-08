@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, semViolacoes, test } from './apoio';
 
-// As cinco telas da Chegada (D-D10): as Boas-vindas, os quatro passos do Passeio e o Começar. Os testes de
+// As cinco telas da Chegada (D-D10): as Boas-vindas, os três passos do Passeio e o Começar. Os testes de
 // unidade provam as regras, os textos e o ritmo da troca; aqui rodam o <dialog> e o CSS de verdade: o axe
 // nos dois temas, os alvos de 44 px, nenhuma rolagem lateral, e todo botão ao alcance no celular
 // pequeno, a 200% de zoom e com o texto a 200%. A Conta refaz o passeio sem as Boas-vindas e sem o Começar.
@@ -13,22 +13,21 @@ test.use({ semearAbertura: false });
 
 const CHAVE_CHEGADA = 'arretado:chegada:v1';
 
-type Tela = 'boas' | 'passo-1' | 'passo-2' | 'passo-3' | 'passo-4' | 'comecar';
+type Tela = 'boas' | 'passo-1' | 'passo-2' | 'passo-3' | 'comecar';
 
 const TELAS: ReadonlyArray<{ tela: Tela; nome: string; botoes: string[] }> = [
   { tela: 'boas', nome: 'Boas-vindas ao Arretado!', botoes: ['Agora não', 'Vamos'] },
   {
     tela: 'passo-1',
-    nome: 'Passo 1 de 4 Hoje',
+    nome: 'Passo 1 de 3 Agora',
     botoes: ['Pular o passeio', 'Seguir', 'Voltar às boas-vindas'],
   },
-  { tela: 'passo-2', nome: 'Passo 2 de 4 Trilha', botoes: ['Pular o passeio', 'Seguir', 'Voltar'] },
-  { tela: 'passo-3', nome: 'Passo 3 de 4 Fixar', botoes: ['Pular o passeio', 'Seguir', 'Voltar'] },
   {
-    tela: 'passo-4',
-    nome: 'Passo 4 de 4 Biblioteca',
+    tela: 'passo-2',
+    nome: 'Passo 2 de 3 Destino',
     botoes: ['Pular o passeio', 'Seguir', 'Voltar'],
   },
+  { tela: 'passo-3', nome: 'Passo 3 de 3 Varal', botoes: ['Pular o passeio', 'Seguir', 'Voltar'] },
   {
     tela: 'comecar',
     nome: 'Vamo começar?',
@@ -57,6 +56,14 @@ async function irAte(page: Page, tela: Tela): Promise<Locator> {
   const folha = page.getByRole('dialog', { name: alvo?.nome ?? '' });
   await expect(folha).toBeVisible();
   await expect(folha.getByRole('heading', { level: 2 })).toBeFocused();
+  // As frases entram uma a uma (08/11): o axe só lê o contraste depois da última, com a opacidade em 1.
+  await page.evaluate(() =>
+    Promise.all(
+      [...document.querySelectorAll('.passo-frase, .passo-itens li')].flatMap((el) =>
+        el.getAnimations().map((a) => a.finished),
+      ),
+    ),
+  );
   return folha;
 }
 
@@ -213,21 +220,21 @@ test.describe('o passeio refeito na Conta', () => {
   // Aqui a Chegada não abre sozinha: o aparelho já a viu.
   test.use({ semearAbertura: true });
 
-  test('"Fazer o passeio" abre os quatro passos direto; "Concluir" fecha, devolve o foco e nada é gravado', async ({
+  test('"Fazer o passeio" abre os três passos direto; "Concluir" fecha, devolve o foco e nada é gravado', async ({
     page,
   }) => {
     await page.goto('/#/conta');
     const abrir = page.getByRole('button', { name: 'Fazer o passeio' });
     await abrir.click();
-    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' });
+    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' });
     await expect(primeiro).toBeVisible();
     await expect(primeiro.getByRole('button', { name: 'Voltar ao app' })).toBeVisible();
     await expect(page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toHaveCount(0);
 
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 2; i += 1) {
       await page.getByRole('button', { name: 'Seguir' }).click();
     }
-    await expect(page.getByRole('dialog', { name: 'Passo 4 de 4 Biblioteca' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Passo 3 de 3 Varal' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Seguir' })).toHaveCount(0);
     await page.getByRole('button', { name: 'Concluir' }).click();
 
@@ -257,7 +264,7 @@ test.describe('o passeio refeito na Conta', () => {
     await expect(abrir).toBeFocused();
 
     await abrir.click();
-    await expect(page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(abrir).toBeFocused();

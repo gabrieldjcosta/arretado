@@ -424,7 +424,7 @@ test('"Vamos" no meio do desenho: a folha segue para o passeio, e voltar às boa
   await expect(page.locator('.chegada-tela[data-revelado]')).toBeAttached({ timeout: 10_000 });
   expect(await zeInteiro(page)).toBe(false);
   await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-  const passo = page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' });
+  const passo = page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' });
   await expect(passo).toBeVisible();
   await passo.getByRole('button', { name: 'Voltar às boas-vindas' }).click();
   await expect(chegada(page)).toBeVisible();
