@@ -170,7 +170,9 @@ test('com zoom de 200% (195 px de layout), a nav cabe sem rolar de lado', async 
   await semViolacoesNoFio(page);
 });
 
-test('com movimento vivo, o ponto desce junto com o mouse e o fio o acompanha', async ({ page }) => {
+test('com movimento vivo, o ponto desce junto com o mouse e o fio o acompanha', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await comMateriaNaPrevia(page);
