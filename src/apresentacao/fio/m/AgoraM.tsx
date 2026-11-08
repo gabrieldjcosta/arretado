@@ -95,16 +95,21 @@ export function AgoraM() {
       <div className="m-cabeca">
         <button
           type="button"
-          className="m-marca"
-          aria-label="arretado: sua conta e ajustes"
+          className="m-menu"
+          aria-label="Menu: sua conta e ajustes"
           aria-haspopup="dialog"
           onClick={() => {
             setContaAberta(true);
           }}
         >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+        <span className="m-marca">
           arretado
           <CactoMarca preso={!!conta} />
-        </button>
+        </span>
         <span className="m-cobre">
           <b>{formatar(percentual)}%</b>
           <br />

@@ -126,7 +126,7 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   await expect(page.getByRole('button', { name: /Puxar o fio/ })).toBeVisible({ timeout: 25_000 });
   await expect(abertura(page)).toHaveCount(0);
   await expect(page.locator('.m-voo-ponto')).toHaveCount(0, { timeout: 5_000 });
-  await expect(page.getByRole('button', { name: 'arretado: sua conta e ajustes' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menu: sua conta e ajustes' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await expect(page.getByText('da prova é seu')).toBeVisible();
   await expect(pergunta(page)).toHaveCount(0);
