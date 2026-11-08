@@ -72,7 +72,7 @@ describe('o Arretado novo (prévia do Fio)', () => {
     const { usuario } = await abrir({ comLei: true });
     expect(await screen.findByRole('heading', { level: 1, name: 'Agora' })).toBeInTheDocument();
     expect(screen.getByText(/da prova é seu/)).toBeInTheDocument();
-    await usuario.click(screen.getByRole('button', { name: 'arretado: sua conta e ajustes' }));
+    await usuario.click(screen.getByRole('button', { name: 'Menu: sua conta e ajustes' }));
     const folha = await screen.findByRole('dialog');
     expect(within(folha).getByRole('heading', { level: 2 })).toHaveTextContent(
       'Seu fio mora neste aparelho',

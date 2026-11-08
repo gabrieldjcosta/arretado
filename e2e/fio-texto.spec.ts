@@ -64,7 +64,7 @@ test('com o Texto bem maior, a 360 px, o Agora, a folha de erro e a Conta cabem 
   await comALeiNaPrevia(page);
 
   // A pessoa escolhe o Texto bem maior na Conta, como de verdade.
-  await page.getByRole('button', { name: 'arretado: sua conta e ajustes' }).click();
+  await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   const conta = page.getByRole('dialog');
   await conta.getByRole('button', { name: 'Texto bem maior' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-texto-fio', 'bem-maior');

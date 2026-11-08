@@ -38,7 +38,7 @@ test('o Agora mostra a marca, o fio, o que vem na ponta e os três lugares embai
   const ponta = page.getByRole('group', { name: 'Na ponta do fio' });
   await expect(puxador(page)).toBeVisible();
   await expect(ponta).toContainText('Adicionar a lei de Execução Penal');
-  await expect(page.getByRole('button', { name: 'arretado: sua conta e ajustes' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menu: sua conta e ajustes' })).toBeVisible();
   await expect(page.getByText('da prova é seu')).toBeVisible();
 
   const nav = page.getByRole('navigation', { name: 'Lugares' });

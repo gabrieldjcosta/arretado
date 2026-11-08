@@ -7,7 +7,7 @@ test('a Conta abre em folha e os ajustes valem', async ({ page }) => {
   await page.goto('/#/fio/ligar');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
-  await page.getByRole('button', { name: 'arretado: sua conta e ajustes' }).click();
+  await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   const folha = page.getByRole('dialog');
   await expect(
     folha.getByRole('heading', { level: 2, name: 'Seu fio mora neste aparelho' }),
@@ -47,7 +47,7 @@ test('"Todos os ajustes" leva à Conta de antes', async ({ page }) => {
   await page.goto('/#/fio/ligar');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
-  await page.getByRole('button', { name: 'arretado: sua conta e ajustes' }).click();
+  await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   await page
     .getByRole('dialog')
     .getByRole('button', { name: /Todos os ajustes/ })

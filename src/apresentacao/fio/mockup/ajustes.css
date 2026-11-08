@@ -1083,3 +1083,81 @@ html[data-texto-fio] .m-fio .m-proximo {
 .m-fio.m-fio .m-folha {
   box-shadow: 0 -1px 0 rgb(var(--m-brilho-anel) / 40%);
 }
+
+/* 48. O cabeçalho do Agora tem o nome ao centro e um botão de três tracinhos no canto (abre a Conta).
+       Motivo: abrir a Conta pelo nome não era intuitivo (Gabriel, 08/11/2026). O nome vira texto parado, o
+       "0% da prova é seu" desce para baixo dele, e o "+" fixo segue no canto de cima à direita. */
+.m-fio .m-cabeca {
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-right: 0;
+}
+.m-fio .m-cabeca .m-marca {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+.m-fio .m-cabeca .m-cobre {
+  text-align: center;
+  font-size: 12px;
+}
+.m-fio .m-cabeca .m-cobre br {
+  display: none;
+}
+.m-fio .m-cabeca .m-cobre b {
+  font-size: 14px;
+}
+.m-fio .m-cabeca .m-menu {
+  position: absolute;
+  left: -8px;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 14px;
+  color: var(--m-luz);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.m-fio .m-cabeca .m-menu svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.m-fio .m-cabeca .m-menu:hover {
+  background: var(--m-sup);
+}
+.m-fio .m-cabeca .m-menu:focus-visible {
+  outline: 2px solid var(--m-neon);
+  outline-offset: 2px;
+}
+
+/* 49. No monitor o quadro do Fio é mais largo que o do celular. Motivo: o app abria no PC com o quadro de
+       400 px (visualização de celular, Gabriel 08/11/2026). A partir de 900 px o quadro vai a 720 px e usa a
+       altura toda; o Destino mantém o próprio quadro largo (desvio do mockup, acima). */
+@media (min-width: 900px) {
+  .m-fio .m-app:not(.m-largo) {
+    max-width: min(720px, calc(100vw - 64px));
+    height: 100%;
+  }
+}
+
+/* 50. O fio pendurado nasce logo abaixo do cabeçalho, não por trás dele. Motivo: com o nome e o "0% da prova
+       é seu" no centro (desvio 48), o fio, que começava acima da área, cruzava os dois. O que passa do alto da
+       área é cortado e o começo some em degradê. */
+.m-fio .m-puxar-area svg {
+  clip-path: inset(0 -100% -100% -100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+}
+.m-fio .m-cabeca .m-cobre b {
+  margin-right: 0.25em;
+}
