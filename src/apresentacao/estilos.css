@@ -928,6 +928,44 @@ button,
   }
 }
 
+/* O "+" no referencial 7 (D-D26): o aro e o sinal na mesma tinta do brilho do mundo, um anel suave em volta e
+   a onda curta que cresce 1,5x e some ao toque (`ligarAlvoradaDoPrincipal`). O fundo segue opaco: o botão
+   fica sobre o texto que rola. */
+.mais-global .mais {
+  position: relative;
+  color: var(--brilho-tinta);
+  border-color: var(--brilho-tinta);
+  background:
+    radial-gradient(
+      120% 90% at 50% 130%,
+      rgb(var(--brilho) / var(--brilho-fundo)),
+      transparent 70%
+    ),
+    var(--botao-fundo, var(--fundo-controle));
+  box-shadow: 0 0 0 2px rgb(var(--brilho) / 22%);
+}
+
+.aro-onda-mais {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  border: 2px solid rgb(var(--brilho-anel));
+  box-shadow: 0 0 0 5px rgb(var(--brilho) / 22%);
+}
+
+@media (forced-colors: active) {
+  .mais-global .mais {
+    background-image: none;
+    box-shadow: none;
+  }
+
+  .aro-onda-mais {
+    display: none;
+  }
+}
+
 .mais svg {
   width: 1.5rem;
   height: 1.5rem;
@@ -949,6 +987,7 @@ button,
   background: var(--superficie);
   border: var(--borda-folha);
   border-radius: var(--raio-cartao);
+  box-shadow: 0 0 0 3px rgb(var(--brilho) / 12%);
 }
 
 .mais-item {
@@ -1307,6 +1346,11 @@ dialog .perigoso {
   padding: 0 0.875rem;
   border-radius: var(--raio-chip);
   font-size: 0.875rem;
+}
+
+/* Ligado, o chip ganha o anel do brilho do mundo (D-D26), como as escolhas do Fio. */
+.chip[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px rgb(var(--brilho) / 22%);
 }
 
 /* Ação silenciosa ao lado da primária (D-D4): sem caixa, sublinhada, peso 500; herda a cor do lugar
@@ -4149,6 +4193,7 @@ dialog.dialogo-previa .linha-acoes button {
   background: var(--superficie);
   border: var(--borda-folha);
   border-radius: var(--raio-cartao);
+  box-shadow: 0 0 0 3px rgb(var(--brilho) / 12%);
 }
 
 .menu-ajuda-itens .botao,

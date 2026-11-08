@@ -34,7 +34,7 @@ async function abrir(
         .criar({ normaId: norma.id, disciplinaId: disciplina.id });
     }
   }
-  if (opcoes.previa !== false) window.localStorage.setItem(CHAVE_DA_INTERFACE, 'fio');
+  window.localStorage.setItem(CHAVE_DA_INTERFACE, opcoes.previa === false ? 'atual' : 'fio');
   window.location.hash = opcoes.rota ?? '#/';
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
@@ -453,13 +453,13 @@ describe('o Arretado novo (prévia do Fio)', () => {
     expect(window.location.hash).toBe('#/varal');
   });
 
-  it('a Conta liga e desliga a prévia', async () => {
-    const { usuario } = await abrir({ previa: false, rota: '#/conta' });
-    await usuario.click(await screen.findByRole('button', { name: 'Experimentar' }));
-    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
+  it('a Conta volta à interface de antes e à cara nova', async () => {
+    const { usuario } = await abrir({ rota: '#/conta' });
     await usuario.click(await screen.findByRole('button', { name: 'Voltar ao de sempre' }));
     await waitFor(() => {
       expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
     });
+    await usuario.click(await screen.findByRole('button', { name: 'Voltar à cara nova' }));
+    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
   });
 });
