@@ -70,6 +70,20 @@ export function ligarAlvoradaDoPrincipal(): () => void {
   const ouvir = (e: PointerEvent) => {
     if (modoAgora() !== 'normal') return;
     const alvo = e.target instanceof Element ? e.target : null;
+    const redondo = alvo?.closest<HTMLElement>('.mais-global .mais');
+    if (redondo && !redondo.hasAttribute('disabled')) {
+      soltar(
+        redondo,
+        'aro-onda-mais',
+        [
+          { opacity: 0.8, transform: 'scale(1)' },
+          { opacity: 0, transform: 'scale(1.5)' },
+        ],
+        1100,
+        ONDA,
+      );
+      return;
+    }
     const principal = alvo?.closest<HTMLElement>('.principal');
     if (!principal || principal.hasAttribute('disabled')) return;
     if (principal.getAttribute('aria-pressed') === 'true' || principal.closest('.m-fio')) return;
