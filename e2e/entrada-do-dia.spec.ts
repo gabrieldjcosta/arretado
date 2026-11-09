@@ -119,9 +119,9 @@ test.describe('Chegada', () => {
   }) => {
     await page.goto('/#/');
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    const menus = ['Hoje', 'Trilha', 'Fixar', 'Biblioteca'];
+    const menus = ['Agora', 'Destino', 'Varal'];
     for (const [i, menu] of menus.entries()) {
-      const passo = page.getByRole('dialog', { name: `Passo ${String(i + 1)} de 4 ${menu}` });
+      const passo = page.getByRole('dialog', { name: `Passo ${String(i + 1)} de 3 ${menu}` });
       await expect(passo).toBeVisible();
       await expect(passo.getByRole('heading', { level: 2, name: menu })).toBeFocused();
       await expect(passo.getByRole('link')).toHaveCount(0);
@@ -146,10 +146,10 @@ test.describe('Chegada', () => {
     await page.goto('/#/');
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
     await page.getByRole('button', { name: 'Seguir' }).click();
-    const segundo = page.getByRole('dialog', { name: 'Passo 2 de 4 Trilha' });
+    const segundo = page.getByRole('dialog', { name: 'Passo 2 de 3 Destino' });
     await expect(segundo).toBeVisible();
     await segundo.getByRole('button', { name: 'Voltar', exact: true }).click();
-    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' });
+    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' });
     await expect(primeiro).toBeVisible();
     await primeiro.getByRole('button', { name: 'Voltar às boas-vindas' }).click();
     await expect(chegada(page)).toBeVisible();
@@ -161,7 +161,7 @@ test.describe('Chegada', () => {
   }) => {
     await page.goto('/#/');
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    await expect(page.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog', { name: 'Vamo começar?' })).toBeVisible();
     await page.keyboard.press('Escape');

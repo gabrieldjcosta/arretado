@@ -235,7 +235,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     expect((await gestos(page)).teclas).toBe(0);
   });
 
-  test('o passeio inteiro, os quatro passos até o fim: nove toques até o Art. 1º', async ({
+  test('o passeio inteiro, os três passos até o fim: oito toques até o Art. 1º', async ({
     page,
   }) => {
     await servirAcervo(page);
@@ -245,7 +245,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
 
     const inicio = Date.now();
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    for (const menu of ['Hoje', 'Trilha', 'Fixar', 'Biblioteca']) {
+    for (const menu of ['Agora', 'Destino', 'Varal']) {
       await expect(page.getByRole('heading', { level: 2, name: menu })).toBeVisible();
       await page.getByRole('button', { name: 'Seguir' }).click();
     }
@@ -255,7 +255,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
       .click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await doHojeAoArtigo1(page);
-    expect(await marcar(page, 'toques (passeio inteiro)', inicio)).toBe(9);
+    expect(await marcar(page, 'toques (passeio inteiro)', inicio)).toBe(8);
     expect((await gestos(page)).teclas).toBe(0);
   });
 
@@ -317,7 +317,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     // E depois do passeio refeito: "Concluir" também devolve o foco ao Ajuda.
     await reabrir();
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
+    for (let i = 0; i < 2; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
     await page.getByRole('button', { name: 'Concluir' }).click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(ajuda).toBeFocused();

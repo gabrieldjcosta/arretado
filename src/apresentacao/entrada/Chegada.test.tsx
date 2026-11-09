@@ -32,7 +32,7 @@ function abrir(
 
 const boasVindas = () => screen.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
 const passo = (n: number, nome: string) =>
-  screen.getByRole('dialog', { name: `Passo ${String(n)} de 4 ${nome}` });
+  screen.getByRole('dialog', { name: `Passo ${String(n)} de 3 ${nome}` });
 const comecar = () => screen.getByRole('dialog', { name: 'Vamo começar?' });
 const esc = () => {
   fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }));
@@ -185,22 +185,20 @@ describe('Chegada › o Passeio', () => {
   it('"Vamos" abre o primeiro passo: nome, frase e itens do menu, e o diálogo diz o passo', async () => {
     const { usuario } = abrir();
     await usuario.click(botao('Vamos'));
-    const folha = passo(1, 'Hoje');
-    expect(within(folha).getByRole('heading', { level: 2 })).toHaveTextContent('Hoje');
+    const folha = passo(1, 'Agora');
+    expect(within(folha).getByRole('heading', { level: 2 })).toHaveTextContent('Agora');
     expect(within(folha).getByRole('heading', { level: 2 })).toHaveFocus();
-    expect(within(folha).getByText('Passo 1 de 4')).toBeVisible();
+    expect(within(folha).getByText('Passo 1 de 3')).toBeVisible();
     expect(
-      within(folha).getByText('Aqui você vê o que tem pra fazer, sem agonia pra decidir.'),
+      within(folha).getByText('Aqui você vê o que fazer agora, sem agonia pra decidir.'),
     ).toBeVisible();
     // As ferramentas em evidência vêm primeiro, com a frase em negrito; depois, as linhas simples.
-    const hoje = PASSOS[0];
+    const agora = PASSOS[0];
     expect(within(folha).getAllByRole('listitem')).toHaveLength(
-      hoje ? hoje.ferramentas.length + hoje.itens.length : -1,
+      agora ? agora.ferramentas.length + agora.itens.length : -1,
     );
     expect(within(folha).getAllByRole('listitem')[0]).toHaveClass('passo-ferramenta');
-    expect(within(folha).getByText('Aqui seus erros viram acertos e Cartões.').tagName).toBe(
-      'STRONG',
-    );
+    expect(within(folha).getByText('Seus erros viram acertos e Cartões.').tagName).toBe('STRONG');
     expect(
       within(folha)
         .getAllByRole('button')
@@ -208,10 +206,10 @@ describe('Chegada › o Passeio', () => {
     ).toEqual(['Pular o passeio', 'Seguir', 'Voltar às boas-vindas']);
     // O passo só explica: nenhum link nem atalho para outra tela.
     expect(within(folha).queryAllByRole('link')).toEqual([]);
-    expect(screen.getByRole('status')).toHaveTextContent('Passo 1 de 4: Hoje');
+    expect(screen.getByRole('status')).toHaveTextContent('Passo 1 de 3: Agora');
   });
 
-  it('"Seguir" anda pelos quatro menus, na ordem das abas, com o ícone da aba de cada um', async () => {
+  it('"Seguir" anda pelos três lugares, na ordem da pílula, com o ícone de cada um', async () => {
     const { usuario } = abrir();
     await usuario.click(botao('Vamos'));
     for (const [i, menu] of PASSOS.entries()) {
@@ -222,23 +220,23 @@ describe('Chegada › o Passeio', () => {
         menu.icone,
       );
       expect(screen.getByRole('status')).toHaveTextContent(
-        `Passo ${String(i + 1)} de 4: ${menu.nome}`,
+        `Passo ${String(i + 1)} de 3: ${menu.nome}`,
       );
       if (i < PASSOS.length - 1) await usuario.click(botao('Seguir'));
     }
   });
 
-  it('a cópia da barra de abas e os pontos são decorativos e marcam o passo de agora', async () => {
+  it('a cópia da pílula dos lugares e os pontos são decorativos e marcam o passo de agora', async () => {
     const { usuario } = abrir();
     await usuario.click(botao('Vamos'));
     await usuario.click(botao('Seguir'));
-    const folha = passo(2, 'Trilha');
+    const folha = passo(2, 'Destino');
     const abas = folha.querySelector('.passo-abas');
     expect(abas).toHaveAttribute('aria-hidden', 'true');
-    expect(abas?.querySelectorAll('.passo-aba')).toHaveLength(4);
+    expect(abas?.querySelectorAll('.passo-aba')).toHaveLength(3);
     expect(
       [...(abas?.querySelectorAll('.passo-aba[data-atual]') ?? [])].map((a) => a.textContent),
-    ).toEqual(['Trilha']);
+    ).toEqual(['Destino']);
     expect(abas?.querySelector<HTMLElement>('.passo-traco')?.style.transform).toBe(
       'translateX(100%)',
     );
@@ -248,7 +246,6 @@ describe('Chegada › o Passeio', () => {
       'feito',
       'atual',
       undefined,
-      undefined,
     ]);
   });
 
@@ -257,7 +254,7 @@ describe('Chegada › o Passeio', () => {
     await usuario.click(botao('Vamos'));
     await usuario.click(botao('Seguir'));
     await usuario.click(botao('Voltar'));
-    passo(1, 'Hoje');
+    passo(1, 'Agora');
     await usuario.click(botao('Voltar às boas-vindas'));
     expect(boasVindas()).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('Boas-vindas ao Arretado!');
@@ -267,7 +264,7 @@ describe('Chegada › o Passeio', () => {
     const { usuario } = abrir();
     await usuario.click(botao('Vamos'));
     for (let i = 0; i < PASSOS.length - 1; i += 1) await usuario.click(botao('Seguir'));
-    passo(4, 'Biblioteca');
+    passo(3, 'Varal');
     expect(screen.queryByRole('button', { name: 'Concluir' })).not.toBeInTheDocument();
     await usuario.click(botao('Seguir'));
     expect(comecar()).toBeVisible();
@@ -421,7 +418,7 @@ describe('Chegada › o passeio refeito (sem `dia`: Ajuda e Conta)', () => {
   it('Conta › "Passeio pelos menus": abre direto no primeiro passo e "Voltar ao app" fecha', async () => {
     esvaziar();
     const { usuario, aoFechar } = abrir({ dia: undefined, inicio: 'passo' });
-    passo(1, 'Hoje');
+    passo(1, 'Agora');
     expect(
       screen.queryByRole('dialog', { name: 'Boas-vindas ao Arretado!' }),
     ).not.toBeInTheDocument();
@@ -435,9 +432,9 @@ describe('Chegada › o passeio refeito (sem `dia`: Ajuda e Conta)', () => {
   it('do segundo passo em diante o botão é "Voltar" também na Conta', async () => {
     const { usuario } = abrir({ dia: undefined, inicio: 'passo' });
     await usuario.click(botao('Seguir'));
-    passo(2, 'Trilha');
+    passo(2, 'Destino');
     await usuario.click(botao('Voltar'));
-    passo(1, 'Hoje');
+    passo(1, 'Agora');
   });
 });
 
@@ -524,7 +521,7 @@ describe('Chegada › a primeira vez com a luz da Abertura a caminho (M3b)', () 
     });
     expect(zona()).toHaveAttribute('data-entrada', 'desenhar');
     await usuario.click(botao('Vamos'));
-    expect(passo(1, 'Hoje')).toBeInTheDocument();
+    expect(passo(1, 'Agora')).toBeInTheDocument();
     await usuario.click(botao('Voltar às boas-vindas'));
     expect(zona()).toHaveAttribute('data-entrada', 'pronta');
     expect(janela()).not.toHaveClass('dialogo-chegada-desenha');
@@ -582,6 +579,6 @@ describe('Chegada › a primeira vez com a luz da Abertura a caminho (M3b)', () 
     const { janela } = abrirComAbertura(abertura(true, true), { inicio: 'passo' });
     expect(janela()).toHaveClass('dialogo-chegada');
     expect(janela()).not.toHaveClass('dialogo-chegada-espera');
-    expect(screen.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Passo 1 de 3 Agora' })).toBeInTheDocument();
   });
 });
