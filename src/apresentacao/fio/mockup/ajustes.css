@@ -494,6 +494,13 @@
   transition: padding 0.4s var(--m-sair);
 }
 
+/* No quadro largo (720 px) a cena de 3 por 2 ficava mais alta que a folga da tela e empurrava o ponto e a lua
+   para fora do quadro: a largura da cena acompanha a altura útil (44% da janela). */
+.m-fio.m-fio .m-pouso .m-cena {
+  width: min(100%, calc(44dvh * 1.5));
+  margin-inline: auto;
+}
+
 .m-fio.m-fio .m-pouso.m-em-branco .m-ceu {
   padding: 46px 30% 0;
 }
