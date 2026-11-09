@@ -741,9 +741,10 @@
   }
 }
 
-/* A Conta no monitor: as linhas de ajustes em duas colunas, com as mesmas linhas e a mesma ordem do celular. */
+/* A Conta e as listas da Biblioteca no monitor: as linhas em duas colunas, na mesma ordem do celular. Só quando
+   há quatro ou mais: com uma ou duas linhas, meia largura vazia ao lado parece erro. */
 @media (min-width: 1000px) {
-  .shell-fio .lista-de-linhas {
+  .shell-fio .lista-de-linhas:has(> li:nth-child(4)) {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 2rem;
