@@ -120,7 +120,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
 
     await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
-    expect(await screen.findByRole('dialog', { name: 'Passo 1 de 4 Hoje' })).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: 'Passo 1 de 3 Agora' })).toBeInTheDocument();
     await usuario.click(screen.getByRole('button', { name: 'Pular o passeio' }));
     expect(await screen.findByRole('dialog', { name: 'Vamo começar?' })).toBeInTheDocument();
     await usuario.click(
@@ -147,7 +147,7 @@ describe('Chegada › primeira vez neste aparelho', () => {
     await usuario.click(screen.getByRole('button', { name: 'Rever as boas-vindas' }));
     const folha = await screen.findByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
     await usuario.click(within(folha).getByRole('button', { name: 'Vamos' }));
-    for (let i = 0; i < 3; i += 1)
+    for (let i = 0; i < 2; i += 1)
       await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
 

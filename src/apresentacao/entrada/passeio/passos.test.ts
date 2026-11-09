@@ -1,4 +1,5 @@
 import { AREAS } from '../../areas';
+import { LUGARES } from '../../fio/lugares';
 import {
   BOAS_VINDAS,
   COMECAR,
@@ -29,45 +30,32 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
     });
     expect(PASSOS.map((p) => [p.nome, p.frase, p.ferramentas, p.itens])).toEqual([
       [
-        'Hoje',
-        'Aqui você vê o que tem pra fazer, sem agonia pra decidir.',
+        'Agora',
+        'Aqui você vê o que fazer agora, sem agonia pra decidir.',
         [
           {
-            destaque: 'Aqui seus erros viram acertos e Cartões.',
-            apoio: 'No botão +, traga a Frase correta pra revisar e lembrar depois.',
+            destaque: 'Seus erros viram acertos e Cartões.',
+            apoio: 'No botão +, traga a Frase correta pra lembrar depois.',
           },
         ],
         ['Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.'],
       ],
       [
-        'Trilha',
-        'O edital em Pontos, montado pelo catálogo ou trazido por você.',
-        [
-          {
-            destaque: 'Ciclos de estudo facilitados.',
-            apoio: 'Você define os seus aqui na Trilha.',
-          },
-        ],
+        'Destino',
+        'Quanto da prova já é seu, com o edital em Pontos.',
+        [{ destaque: 'Ciclos de estudo facilitados.', apoio: 'Você define os seus aqui.' }],
         [],
       ],
       [
-        'Fixar',
-        'Suas Frases e Cartões, com a Revisão de cada dia.',
-        [{ destaque: 'Transforme rapidamente um artigo em cartão.' }],
+        'Varal',
+        'Suas normas, súmulas, Frases e Cartões.',
         [
-          'Gosta de cartões de revisão? Aqui você pode montar os seus para se testar.',
-          'Dica: depois do passeio, faça cinco questões e registre o que precisa lembrar.',
+          { destaque: 'Destaques automáticos contra pegadinhas.' },
+          { destaque: 'Leis atualizadas e mapeadas.' },
+          { destaque: 'Link entre leis e súmulas.' },
+          { destaque: 'Transforme rapidamente um artigo em cartão.' },
         ],
-      ],
-      [
-        'Biblioteca',
-        'Onde ficam as normas pra ler e os seus resumos.',
-        [
-          { destaque: 'Destaques automáticos contra as pegadinhas.' },
-          { destaque: 'As leis que você estuda, atualizadas e mapeadas.' },
-          { destaque: 'Link entre leis e súmulas pra entender melhor.' },
-        ],
-        ['Modo foco para ver só o artigo que está lendo.'],
+        [],
       ],
     ]);
     expect(COMECAR).toEqual({ titulo: 'Vamo começar?' });
@@ -80,7 +68,7 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
     });
     expect(PASSEIO_NA_CONTA).toEqual({
       titulo: 'Passeio pelos menus',
-      apoio: 'Os quatro menus, um por vez, quando você quiser.',
+      apoio: 'Os três lugares, um por vez, quando você quiser.',
       acao: 'Fazer o passeio',
     });
     expect(Object.values(CONTROLES)).toEqual([
@@ -93,11 +81,12 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
     ]);
   });
 
-  it('um passo por menu, com o nome e o ícone da aba (a mesma fonte da navegação)', () => {
-    expect(PASSOS).toHaveLength(AREAS.length);
+  it('um passo por lugar, com o nome da pílula do Fio e um ícone de linha cada', () => {
+    expect(PASSOS).toHaveLength(LUGARES.length);
     PASSOS.forEach((passo, i) => {
-      expect(passo.nome).toBe(AREAS[i]?.nome);
-      expect(passo.icone).toBe(AREAS[i]?.icone);
+      expect(passo.nome).toBe(LUGARES[i]?.nome);
+      expect(passo.icone).toMatch(/^M[\d. -]/);
+      expect(AREAS.map((a) => a.icone)).not.toContain(passo.icone);
     });
   });
 
@@ -111,12 +100,12 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
       PASSOS.filter((p) => p.ferramentas.some((f) => f.destaque.includes(trecho))).map(
         (p) => p.nome,
       );
-    expect(onde('erros viram acertos')).toEqual(['Hoje']);
-    expect(onde('Ciclos de estudo')).toEqual(['Trilha']);
-    expect(onde('artigo em cartão')).toEqual(['Fixar']);
-    expect(onde('Destaques automáticos')).toEqual(['Biblioteca']);
-    expect(onde('atualizadas e mapeadas')).toEqual(['Biblioteca']);
-    expect(onde('leis e súmulas')).toEqual(['Biblioteca']);
+    expect(onde('erros viram acertos')).toEqual(['Agora']);
+    expect(onde('Ciclos de estudo')).toEqual(['Destino']);
+    expect(onde('artigo em cartão')).toEqual(['Varal']);
+    expect(onde('Destaques automáticos')).toEqual(['Varal']);
+    expect(onde('atualizadas e mapeadas')).toEqual(['Varal']);
+    expect(onde('leis e súmulas')).toEqual(['Varal']);
     expect(PASSOS.flatMap((p) => p.ferramentas)).toHaveLength(6);
   });
 
@@ -125,8 +114,8 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
   });
 
   it('o progresso conta de 1 e usa o total de passos', () => {
-    expect(progressoDoPasso(0)).toBe('Passo 1 de 4');
-    expect(progressoDoPasso(3)).toBe('Passo 4 de 4');
+    expect(progressoDoPasso(0)).toBe('Passo 1 de 3');
+    expect(progressoDoPasso(2)).toBe('Passo 3 de 3');
   });
 });
 

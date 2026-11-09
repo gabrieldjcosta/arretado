@@ -156,8 +156,9 @@
   position: sticky;
   top: 0;
   z-index: 5;
+  /* Três cantos (08/11/2026): o menu (três tracinhos, abre a Conta) à esquerda, o nome ao centro, a Ajuda à
+     direita (o "+" fixo fica por cima da reserva do recuo). Em tela estreita ou com fonte grande a Ajuda quebra para a linha de baixo. */
   display: flex;
-  /* Como o cabeçalho de sempre: em tela estreita ou com fonte grande, quebra em duas linhas. */
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
@@ -165,7 +166,39 @@
   min-height: calc(3.5rem + env(safe-area-inset-top, 0px));
   padding: env(safe-area-inset-top, 0px) calc(var(--mais-direita) + var(--mais-lado) + 0.25rem) 0
     max(var(--gutter), env(safe-area-inset-left, 0px));
-  background: transparent;
+  /* Quase opaco (vidro sobre o fundo), não transparente: o cabeçalho fica preso no topo e o conteúdo rola por baixo; sem fundo, o
+     texto das abas e dos cartões aparecia por cima do nome, da Ajuda e do "+" (08/11/2026). */
+  background: linear-gradient(var(--f-vidro), var(--f-vidro)), var(--fundo);
+}
+
+.shell-fio .fio-topo .fio-marca {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.fio-menu {
+  display: inline-grid;
+  place-items: center;
+  width: var(--alvo);
+  height: var(--alvo);
+  margin-left: -0.5rem;
+  border-radius: 14px;
+  color: var(--luz);
+}
+
+.fio-menu svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+@media (hover: hover) {
+  .fio-menu:hover {
+    background: var(--f-vidro);
+  }
 }
 
 .fio-marca {
@@ -175,7 +208,6 @@
   gap: 3px;
   min-height: var(--alvo);
   padding: 0 0.5rem;
-  margin-left: -0.5rem;
   border-radius: 14px;
   font-family: var(--fonte-titulo);
   font-weight: 900;
@@ -682,4 +714,40 @@
   z-index: -1;
   pointer-events: none;
   background: var(--f-grao);
+}
+
+/* ---------- No monitor: duas colunas nas telas de lista (Trilha, Fixar) ----------
+   Mesmas funções e menus do celular; só muda a organização (Gabriel, 08/11/2026). A ação e o contexto ficam
+   numa coluna do lado, a lista e as abas na do corpo, e o cabeçalho acompanha a largura. Abaixo de 1000 px
+   os três blocos são caixas comuns, uma sobre a outra, como no celular. */
+@media (min-width: 1000px) {
+  .shell-fio:has(.pc-colunas) {
+    --largura-casca: 1120px;
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+  }
+
+  .shell-fio .pc-colunas {
+    display: grid;
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    column-gap: 2rem;
+    align-items: start;
+  }
+
+  .shell-fio .pc-lado {
+    position: sticky;
+    top: 4.5rem;
+  }
+}
+
+/* A Conta e as listas da Biblioteca no monitor: as linhas em duas colunas, na mesma ordem do celular. Só quando
+   há quatro ou mais: com uma ou duas linhas, meia largura vazia ao lado parece erro. */
+@media (min-width: 1000px) {
+  .shell-fio .lista-de-linhas:has(> li:nth-child(4)) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    align-items: start;
+  }
 }

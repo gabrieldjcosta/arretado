@@ -51,6 +51,9 @@ const assentar = (page: Page) => expect.poll(() => rodando(page), { timeout: 15_
 /** A cena cabe na largura; a saída (descansar, o ponto e a dica) fica à vista, sem rolar e sem a nav. */
 async function conferirACenaEASaida(page: Page, largura: number, altura: number) {
   await page.setViewportSize({ width: largura, height: altura });
+  // O quadro muda de largura numa transição de 550 ms (400 px no celular, 720 no monitor): medir no meio dela
+  // pega o Zé já no tamanho novo e a cena ainda no velho.
+  await assentar(page);
   // A nav dos três lugares não existe no pouso: a saída é o fio ou descansar.
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toHaveCount(0);
 

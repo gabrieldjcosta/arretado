@@ -58,9 +58,15 @@ const estaAberto = (el: Locator) => el.evaluate((d) => (d as HTMLDetailsElement)
  */
 const emRepouso = (page: Page) =>
   page.evaluate(async () => {
-    const animacoes =
-      document.querySelector('.em-seguida-bloco')?.getAnimations({ subtree: true }) ?? [];
-    await Promise.allSettled(animacoes.map((a) => a.finished));
+    // Só as que terminam: uma animação infinita (um brilho, o Zé respirando) nunca resolve `finished` e
+    // travava o teste até o tempo limite no CI.
+    const animacoes = (
+      document.querySelector('.em-seguida-bloco')?.getAnimations({ subtree: true }) ?? []
+    ).filter((a) => Number.isFinite(a.effect?.getComputedTiming().endTime ?? 0));
+    await Promise.race([
+      Promise.allSettled(animacoes.map((a) => a.finished)),
+      new Promise((resolver) => setTimeout(resolver, 3000)),
+    ]);
   });
 
 /** Quanto a página passa da largura da janela (0 = nada rola de lado). */
