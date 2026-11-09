@@ -36,6 +36,7 @@
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_39_convocacao_para_comissao_heteroidentificacao_sub_judice.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_40_de_convocacao_oral_e_titulos_sub_judice.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_41_de_convocacao_oral_e_titulos_sub_judice.pdf",
+      "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_44_convocacao_para_comissao_heteroidentificacao_sub_judice.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital__retificacao_cronograma_da_prova_oral_respostas_novas_recurso_peca.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_abertura_dpeba_23_02_2026.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_convocacao_oral_e_titulos.pdf",
@@ -59,26 +60,23 @@
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/prova_e_condicoes_especificas_deferidas_apos_recursos_dpeba125.pdf",
       "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/prova_e_condicoes_especificas_deferidas_dpeba125.pdf"
     ],
-    "lidoEm": "2026-11-05"
+    "lidoEm": "2026-11-09"
   },
   "fcc-lista": {
     "links": [
-      "https://www.concursosfcc.com.br/concursos/alems125/index.html",
       "https://www.concursosfcc.com.br/concursos/banes126/index.html",
       "https://www.concursosfcc.com.br/concursos/dpeba125/index.html",
+      "https://www.concursosfcc.com.br/concursos/dpema125/index.html",
       "https://www.concursosfcc.com.br/concursos/dpepb126/index.html",
       "https://www.concursosfcc.com.br/concursos/dpesp126/index.html",
       "https://www.concursosfcc.com.br/concursos/fazsp126/index.html",
       "https://www.concursosfcc.com.br/concursos/pomsp326/index.html",
-      "https://www.concursosfcc.com.br/concursos/scmsp126/index.html",
-      "https://www.concursosfcc.com.br/concursos/scmsp226/index.html",
       "https://www.concursosfcc.com.br/concursos/semef125/index.html",
       "https://www.concursosfcc.com.br/concursos/tcego125/index.html",
       "https://www.concursosfcc.com.br/concursos/tjuce125/index.html",
-      "https://www.concursosfcc.com.br/concursos/trt4r125/index.html",
-      "https://www.concursosfcc.com.br/concursos/trt8r126/index.html"
+      "https://www.concursosfcc.com.br/concursos/trt4r125/index.html"
     ],
-    "lidoEm": "2026-11-05"
+    "lidoEm": "2026-11-09"
   },
   "fgv-lista": {
     "links": [
@@ -86,6 +84,6 @@
       "https://conhecimento.fgv.br/sites/default/files/2026.01.27-aviso-de-cookies-fgv-conhecimento.pdf",
       "https://conhecimento.fgv.br/sites/default/files/2026.06.24-aviso-de-privacidade-fgv-conhecimento.pdf"
     ],
-    "lidoEm": "2026-11-05"
+    "lidoEm": "2026-11-09"
   }
 }
