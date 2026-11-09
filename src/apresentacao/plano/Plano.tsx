@@ -49,92 +49,99 @@ export function Plano() {
     <>
       <h1>{ROTULO_DA_AREA.plano}</h1>
       <GuiaDaTela tela="plano" vazio={dados.pontos.length === 0} />
-      {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
-      {dados.pontos.length > 0 && (
-        <>
-          <ProximoBloco />
-          {/* O Ciclo é uma ação à vista, não um link entre outros (D-D20). */}
-          <p className="plano-ciclo">
-            <Link to="/plano/ciclo" className="botao">
-              Ciclo de estudo
-            </Link>
-          </p>
-        </>
-      )}
-      <ProvaDoPlano />
-      {confirmacao && (
-        <p role="status" className="sucesso">
-          {confirmacao}
-        </p>
-      )}
-      {dados.pontos.length === 0 ? (
-        <>
-          <Vazio titulo="Sua Trilha, montada pelo edital">
-            <p>
-              Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas para
-              ler; lá dá para trocar o edital e as matérias.
+      <div className="pc-colunas">
+        <div className="pc-lado">
+          {/* A ação principal vem antes do campo opcional: o Começar não desce e é o primeiro foco. */}
+          {dados.pontos.length > 0 && (
+            <>
+              <ProximoBloco />
+              {/* O Ciclo é uma ação à vista, não um link entre outros (D-D20). */}
+              <p className="plano-ciclo">
+                <Link to="/plano/ciclo" className="botao">
+                  Ciclo de estudo
+                </Link>
+              </p>
+            </>
+          )}
+          <ProvaDoPlano />
+          {confirmacao && (
+            <p role="status" className="sucesso">
+              {confirmacao}
             </p>
-            <div className="plano-vazio-caminhos">
-              <Link to="/comecar" className="botao principal">
-                Escolher meu concurso
+          )}
+        </div>
+        <div className="pc-corpo">
+          {dados.pontos.length === 0 ? (
+            <>
+              <Vazio titulo="Sua Trilha, montada pelo edital">
+                <p>
+                  Escolha o concurso e o app monta a Trilha pelo edital mais recente, com as normas
+                  para ler; lá dá para trocar o edital e as matérias.
+                </p>
+                <div className="plano-vazio-caminhos">
+                  <Link to="/comecar" className="botao principal">
+                    Escolher meu concurso
+                  </Link>
+                  <button
+                    type="button"
+                    className="botao"
+                    aria-expanded={trazendo}
+                    aria-controls="importar-edital"
+                    onClick={() => {
+                      setTrazendo((aberto) => !aberto);
+                    }}
+                  >
+                    Trazer meu edital
+                  </button>
+                </div>
+              </Vazio>
+              {/* Montado e escondido, não desmontado: quem recolhe sem querer não perde o que colou. */}
+              <div hidden={!trazendo}>
+                <ImportarPontos aoImportar={setConfirmacao} afastado />
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="dica">
+                {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já
+                fez.
+              </p>
+              <Link to="/plano/pontos" className="botao botao-texto na-margem">
+                Editar pontos e matérias
               </Link>
-              <button
-                type="button"
-                className="botao"
-                aria-expanded={trazendo}
-                aria-controls="importar-edital"
-                onClick={() => {
-                  setTrazendo((aberto) => !aberto);
-                }}
-              >
-                Trazer meu edital
-              </button>
-            </div>
-          </Vazio>
-          {/* Montado e escondido, não desmontado: quem recolhe sem querer não perde o que colou. */}
-          <div hidden={!trazendo}>
-            <ImportarPontos aoImportar={setConfirmacao} afastado />
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="dica">
-            {dados.pontos.length} pontos. Servem para vincular erros e acompanhar o que você já fez.
-          </p>
-          <Link to="/plano/pontos" className="botao botao-texto na-margem">
-            Editar pontos e matérias
-          </Link>
-          <Link to="/plano/tarefas" className="botao botao-texto na-margem">
-            Tarefas
-          </Link>
-          {grupos.map(({ disciplina, pontos }) => (
-            <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
-              <details className="trilha-materia" open={grupos.length === 1 || undefined}>
-                <summary>
-                  <span className="trilha-seta" aria-hidden="true" />
-                  <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>{' '}
-                  <span className="dica">{resumoDosPontos(pontos.length)}</span>
-                </summary>
-                <ul className="lista-simples">
-                  {pontos.map((p) => (
-                    <li key={p.id}>
-                      <span>
-                        {p.codigo ? `${p.codigo}. ` : ''}
-                        {p.titulo}
-                      </span>
-                      {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
-                    </li>
-                  ))}
-                </ul>
+              <Link to="/plano/tarefas" className="botao botao-texto na-margem">
+                Tarefas
+              </Link>
+              {grupos.map(({ disciplina, pontos }) => (
+                <section key={disciplina.id} aria-labelledby={`d-${disciplina.id}`}>
+                  <details className="trilha-materia" open={grupos.length === 1 || undefined}>
+                    <summary>
+                      <span className="trilha-seta" aria-hidden="true" />
+                      <h2 id={`d-${disciplina.id}`}>{disciplina.nome}</h2>{' '}
+                      <span className="dica">{resumoDosPontos(pontos.length)}</span>
+                    </summary>
+                    <ul className="lista-simples">
+                      {pontos.map((p) => (
+                        <li key={p.id}>
+                          <span>
+                            {p.codigo ? `${p.codigo}. ` : ''}
+                            {p.titulo}
+                          </span>
+                          {p.faixa && <span className="marcador">{ROTULO_FAIXA[p.faixa]}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                </section>
+              ))}
+              <details>
+                <summary className="botao botao-texto na-margem">Importar outra planilha</summary>
+                <ImportarPontos aoImportar={setConfirmacao} />
               </details>
-            </section>
-          ))}
-          <details>
-            <summary className="botao botao-texto na-margem">Importar outra planilha</summary>
-            <ImportarPontos aoImportar={setConfirmacao} />
-          </details>
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </div>
     </>
   );
 }

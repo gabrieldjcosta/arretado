@@ -715,3 +715,28 @@
   pointer-events: none;
   background: var(--f-grao);
 }
+
+/* ---------- No monitor: duas colunas nas telas de lista (Trilha, Fixar) ----------
+   Mesmas funções e menus do celular; só muda a organização (Gabriel, 08/11/2026). A ação e o contexto ficam
+   numa coluna do lado, a lista e as abas na do corpo, e o cabeçalho acompanha a largura. Abaixo de 1000 px
+   os três blocos são caixas comuns, uma sobre a outra, como no celular. */
+@media (min-width: 1000px) {
+  .shell-fio:has(.pc-colunas) {
+    --largura-casca: 1120px;
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
+    );
+  }
+
+  .shell-fio .pc-colunas {
+    display: grid;
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    column-gap: 2rem;
+    align-items: start;
+  }
+
+  .shell-fio .pc-lado {
+    position: sticky;
+    top: 4.5rem;
+  }
+}
