@@ -35,16 +35,16 @@ describe('Conta › "Passeio pelos menus" (D-D10)', () => {
     montar();
     expect(screen.getByText('Passeio pelos menus')).toBeInTheDocument();
     expect(
-      screen.getByText('Os quatro menus, um por vez, quando você quiser.'),
+      screen.getByText('Os três lugares, um por vez, quando você quiser.'),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Fazer o passeio' })).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('abre os quatro passos direto, sem as Boas-vindas, com "Voltar ao app" no primeiro', async () => {
+  it('abre os três passos direto, sem as Boas-vindas, com "Voltar ao app" no primeiro', async () => {
     const usuario = montar();
     await usuario.click(screen.getByRole('button', { name: 'Fazer o passeio' }));
-    const folha = screen.getByRole('dialog', { name: 'Passo 1 de 4 Hoje' });
+    const folha = screen.getByRole('dialog', { name: 'Passo 1 de 3 Agora' });
     expect(within(folha).getByRole('button', { name: 'Voltar ao app' })).toBeInTheDocument();
     expect(screen.queryByText('Boas-vindas ao Arretado!')).not.toBeInTheDocument();
   });
@@ -63,7 +63,7 @@ describe('Conta › "Passeio pelos menus" (D-D10)', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     await abrir();
-    for (let i = 0; i < 3; i += 1)
+    for (let i = 0; i < 2; i += 1)
       await usuario.click(screen.getByRole('button', { name: 'Seguir' }));
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

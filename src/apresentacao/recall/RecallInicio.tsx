@@ -48,70 +48,76 @@ export function RecallInicio() {
       <h1>{ROTULO_DA_AREA.recall}</h1>
       <GuiaDaTela tela="recall" vazio={dados?.primeiroUso === true} />
       {dados && <DiasDaSemana dias={dados.dias} />}
-      {vencidos > 0 ? (
-        <AcaoAgora
-          titulo={
-            frasesVencidas > 0
-              ? `Revisar ${cartoes(lote)} e ${frases(Math.min(cota, frasesVencidas))}`
-              : `Revisar ${cartoes(lote)}`
-          }
-          estimativa={minutos}
-          rotuloBotao="Começar"
-          para="/recall/revisar"
-        />
-      ) : frasesVencidas > 0 ? (
-        <AcaoAgora
-          titulo={`Revisar ${frases(Math.min(cota, frasesVencidas))}`}
-          estimativa={minutos}
-          rotuloBotao="Começar"
-          para="/recall/frases/revisar"
-        />
-      ) : (
-        <AcaoAgora
-          titulo={dados?.primeiroUso ? 'Registre seu primeiro erro' : 'Registrar um erro'}
-          rotuloBotao="Registrar erro"
-          para="/recall/registrar"
-        />
-      )}
-      <p className="dica">
-        <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no texto
-        da lei (piloto).
-      </p>
-      {vencidos > cota && (
-        <p className="dica">
-          Hoje: {lote} de {vencidos}. Os outros esperam; nada é apagado.
-        </p>
-      )}
-      <LinhaDepois>
-        {vencidos > 0 ? (
-          <Link to="/recall/registrar">registrar um erro</Link>
-        ) : dados?.primeiroUso ? (
-          'seu primeiro cartão aparece amanhã'
-        ) : dados && dados.amanha > 0 ? (
-          `revisar ${cartoes(dados.amanha)} amanhã`
-        ) : undefined}
-      </LinhaDepois>
-      {dados && dados.maiorFila > LIMITE_FILA_DIARIA && !avisoDispensado && (
-        <p className="aviso">
-          Em algum dia desta semana passam de {LIMITE_FILA_DIARIA} as revisões previstas. Sem
-          pressa: revise a cota de cada vez, e o resto espera.{' '}
-          <button
-            type="button"
-            className="discreto"
-            onClick={() => {
-              setAvisoDispensado(true);
-            }}
-          >
-            Dispensar
-          </button>
-        </p>
-      )}
-      <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
-        <AbaDoRecall para="/recall/frases" rotulo="Frases" />
-        <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />
-        <AbaDoRecall para="/recall/historico" rotulo="Histórico" />
-      </nav>
-      <Outlet />
+      <div className="pc-colunas">
+        <div className="pc-lado">
+          {vencidos > 0 ? (
+            <AcaoAgora
+              titulo={
+                frasesVencidas > 0
+                  ? `Revisar ${cartoes(lote)} e ${frases(Math.min(cota, frasesVencidas))}`
+                  : `Revisar ${cartoes(lote)}`
+              }
+              estimativa={minutos}
+              rotuloBotao="Começar"
+              para="/recall/revisar"
+            />
+          ) : frasesVencidas > 0 ? (
+            <AcaoAgora
+              titulo={`Revisar ${frases(Math.min(cota, frasesVencidas))}`}
+              estimativa={minutos}
+              rotuloBotao="Começar"
+              para="/recall/frases/revisar"
+            />
+          ) : (
+            <AcaoAgora
+              titulo={dados?.primeiroUso ? 'Registre seu primeiro erro' : 'Registrar um erro'}
+              rotuloBotao="Registrar erro"
+              para="/recall/registrar"
+            />
+          )}
+          <p className="dica">
+            <Link to="/recall/ache-o-erro">Ache o erro</Link>: uma rodada com trechos trocados no
+            texto da lei (piloto).
+          </p>
+          {vencidos > cota && (
+            <p className="dica">
+              Hoje: {lote} de {vencidos}. Os outros esperam; nada é apagado.
+            </p>
+          )}
+          <LinhaDepois>
+            {vencidos > 0 ? (
+              <Link to="/recall/registrar">registrar um erro</Link>
+            ) : dados?.primeiroUso ? (
+              'seu primeiro cartão aparece amanhã'
+            ) : dados && dados.amanha > 0 ? (
+              `revisar ${cartoes(dados.amanha)} amanhã`
+            ) : undefined}
+          </LinhaDepois>
+          {dados && dados.maiorFila > LIMITE_FILA_DIARIA && !avisoDispensado && (
+            <p className="aviso">
+              Em algum dia desta semana passam de {LIMITE_FILA_DIARIA} as revisões previstas. Sem
+              pressa: revise a cota de cada vez, e o resto espera.{' '}
+              <button
+                type="button"
+                className="discreto"
+                onClick={() => {
+                  setAvisoDispensado(true);
+                }}
+              >
+                Dispensar
+              </button>
+            </p>
+          )}
+        </div>
+        <div className="pc-corpo">
+          <nav aria-label={`Seções do ${ROTULO_DA_AREA.recall}`} className="abas">
+            <AbaDoRecall para="/recall/frases" rotulo="Frases" />
+            <AbaDoRecall para="/recall/cartoes" rotulo="Cartões" />
+            <AbaDoRecall para="/recall/historico" rotulo="Histórico" />
+          </nav>
+          <Outlet />
+        </div>
+      </div>
     </>
   );
 }
