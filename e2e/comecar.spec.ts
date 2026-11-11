@@ -164,11 +164,11 @@ test.describe('primeiro uso, num aparelho novo', () => {
   async function doHojeAoArtigo1(page: Page) {
     await comecos(page).getByRole('link', { name: 'Escolher meu concurso' }).click();
     await page.getByRole('link', { name: /^Defensoria Pública/ }).click();
-    // A Trilha do edital mais recente vem marcada: o mesmo toque monta as normas e a Trilha.
-    const trilha = page.getByRole('checkbox', { name: /^Montar também a Trilha/ });
-    await expect(trilha).toBeChecked();
-    await expect(trilha).toHaveAccessibleName('Montar também a Trilha');
-    await expect(trilha).toHaveAccessibleDescription(/\d+ matérias, baseado no edital/);
+    // Nenhum edital vem marcado (08/11/2026): a pessoa escolhe o primeiro da lista, o que custa um toque.
+    const grupo = page.getByRole('group', { name: 'Qual edital serve de base para o seu plano?' });
+    await expect(grupo.getByRole('radio', { checked: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Adicionar e ler' })).toBeDisabled();
+    await grupo.getByRole('radio').first().check();
     await page.getByRole('button', { name: 'Adicionar e ler' }).click();
 
     // A primeira norma da lista abre no Leitor, no começo: o Art. 1º já está na tela.
@@ -186,7 +186,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     return toques;
   }
 
-  test('"Agora não" e o Hoje vazio: da Chegada ao Art. 1º em quatro toques, sem digitar', async ({
+  test('"Agora não" e o Hoje vazio: da Chegada ao Art. 1º em cinco toques, sem digitar', async ({
     page,
   }) => {
     await servirAcervo(page);
@@ -197,9 +197,9 @@ test.describe('primeiro uso, num aparelho novo', () => {
     const inicio = Date.now();
     await chegada(page).getByRole('button', { name: 'Agora não' }).click();
     await doHojeAoArtigo1(page);
-    // Eram três toques com "Escolher meu concurso" dentro da folha; agora é o Hoje vazio que o oferece
+    // (O quinto toque é a escolha do edital, 08/11.) Eram três toques com "Escolher meu concurso" dentro da folha; agora é o Hoje vazio que o oferece
     // (decisão do Gabriel, 28/10): um toque a mais, o de dispensar a folha.
-    expect(await marcar(page, 'toques (Agora não)', inicio)).toBe(4);
+    expect(await marcar(page, 'toques (Agora não)', inicio)).toBe(5);
     expect((await gestos(page)).teclas).toBe(0);
 
     // As duas que o acervo tem entraram; a que falta no acervo não travou nada.
@@ -214,7 +214,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await expect(page.getByRole('link', { name: 'Ciclo de estudo' })).toBeVisible();
   });
 
-  test('"Vamos", "Pular o passeio" e "Continuar sem conta": seis toques até o Art. 1º', async ({
+  test('"Vamos", "Pular o passeio" e "Continuar sem conta": sete toques até o Art. 1º', async ({
     page,
   }) => {
     await servirAcervo(page);
@@ -231,11 +231,11 @@ test.describe('primeiro uso, num aparelho novo', () => {
       .click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await doHojeAoArtigo1(page);
-    expect(await marcar(page, 'toques (Pular o passeio)', inicio)).toBe(6);
+    expect(await marcar(page, 'toques (Pular o passeio)', inicio)).toBe(7);
     expect((await gestos(page)).teclas).toBe(0);
   });
 
-  test('o passeio inteiro, os quatro passos até o fim: nove toques até o Art. 1º', async ({
+  test('o passeio inteiro, os três passos até o fim: nove toques até o Art. 1º', async ({
     page,
   }) => {
     await servirAcervo(page);
@@ -245,7 +245,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
 
     const inicio = Date.now();
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    for (const menu of ['Hoje', 'Trilha', 'Fixar', 'Biblioteca']) {
+    for (const menu of ['Agora', 'Destino', 'Varal']) {
       await expect(page.getByRole('heading', { level: 2, name: menu })).toBeVisible();
       await page.getByRole('button', { name: 'Seguir' }).click();
     }
@@ -317,7 +317,7 @@ test.describe('primeiro uso, num aparelho novo', () => {
     // E depois do passeio refeito: "Concluir" também devolve o foco ao Ajuda.
     await reabrir();
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
+    for (let i = 0; i < 2; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
     await page.getByRole('button', { name: 'Concluir' }).click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(ajuda).toBeFocused();

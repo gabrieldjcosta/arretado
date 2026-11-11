@@ -65,7 +65,12 @@ function CascaLegada() {
           Pular para o conteúdo
         </a>
         <header className="fio-topo">
-          <LinkDoFio to="/conta" className="fio-marca" aria-label="Arretado: sua conta e ajustes">
+          <LinkDoFio to="/conta" className="fio-menu" aria-label="Menu: sua conta e ajustes">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </LinkDoFio>
+          <LinkDoFio to="/" className="fio-marca" aria-label="Arretado: ir para o Agora">
             <MarcaDoFio />
           </LinkDoFio>
           <div className="acoes-globais">

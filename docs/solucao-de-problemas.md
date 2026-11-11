@@ -2373,3 +2373,10 @@ O Destino de hoje é a tela `mapa` do mockup aprovado (`m/DestinoM` e `m/MapaM`)
 - **Branch atrás da integracao não é motivo para trazê-la.** A proteção da `integracao` não exige branch atualizado (o #436 estava atrás e `clean`). Trazer só com conflito (`dirty`) ou dependência.
 - **Continuar no branch depois do merge do PR.** `git fetch origin integracao && git merge --ff-only origin/integracao`: o branch é ancestral da integracao, então é avanço simples, sem force push. Se o `--ff-only` recusar, há commit local fora do PR: confira antes de seguir.
 - **Revisão de tela sobre SHA velho (#424).** Solução: o revisor escreve o SHA; antes do merge, `npm run revisao:cobre -- <sha> origin/<branch>` diz se mudou tela depois. Só conta arquivo do próprio PR (o que veio da integracao não pede revisão nova).
+
+## O Passeio revela as linhas uma a uma (08/11/2026)
+
+- **Sintoma:** o axe do E2E acusava `color-contrast: .passo-frase` no passo 2 do Passeio.
+- **Causa:** a frase e as linhas entram com animação de opacidade (0,35 s + 1,1 s por linha); o axe lê no meio dela.
+- **Solução:** a função que abre cada tela em `e2e/passeio.spec.ts` espera `getAnimations().finished` das linhas antes de medir. Teste novo sobre o passo faz o mesmo.
+- **Previsível:** linha nova no Passeio ganha `--n` (a ordem) e atrasa a última em 1,1 s; a altura da folha continua a de antes, então medir como em "A folha do Passeio tem altura fixa". A pílula do Fio some (`visibility`) com `dialog.dialogo-chegada[open]`: outro diálogo com essa classe também a esconde.

@@ -144,9 +144,13 @@ export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: P
     const ALTURAS = calmo
       ? [0, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14]
       : [0, 30, 16, 42, 22, 70, 18, 28, 40, 26, 16];
-    const PAUSAS: Record<number, number> = calmo ? {} : { 4: 420, 7: 220, 9: 170 };
-    const duracao = (h: number) => (calmo ? 360 : Math.round(150 + Math.sqrt(h) * 34));
-    const ENTRADA = calmo ? 900 : 820;
+    const PAUSAS: Record<number, number> = calmo ? {} : { 2: 90, 4: 520, 6: 150, 7: 280, 9: 230 };
+    // Cada pulo tem o seu tempo (uns apressados, outros demorados), como quem quica de verdade: fixo, sem sorteio,
+    // para a abertura ser a mesma toda vez. Base 30% mais lenta que a do mockup.
+    const ELASTICO = [1, 1.2, 0.9, 1.4, 1, 1.55, 0.85, 1.25, 1.45, 1.1, 0.95];
+    const duracao = (h: number, i: number) =>
+      calmo ? 360 : Math.round((150 + Math.sqrt(h) * 34) * 1.3 * (ELASTICO[i] ?? 1));
+    const ENTRADA = calmo ? 900 : 1050;
     const pts = [
       { x: -24, y: pouso - 70 },
       ...caixas.map((c) => ({ x: c.x, y: pouso })),
@@ -165,7 +169,7 @@ export function rodarAbertura(p: PedidoDaAbertura): { limpar: () => void; fim: P
       trechos.push({
         d: `M${String(a.x)} ${String(a.y)} Q${String(cx)} ${String(cy)} ${String(b.x)} ${String(b.y)}`,
         q: ` Q${String(cx)} ${String(cy)} ${String(b.x)} ${String(b.y)}`,
-        dur: i === 1 ? ENTRADA : duracao(h),
+        dur: i === 1 ? ENTRADA : duracao(h, i - 1),
         pausa: PAUSAS[i - 1] ?? 0,
         inicio: 0,
       });

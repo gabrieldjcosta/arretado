@@ -151,20 +151,33 @@ describe('Escolher meu concurso › Para começar', () => {
     expect(await screen.findByText('A norma entra no aparelho e abre para ler.')).toBeVisible();
   });
 
-  it('carreira fora do catálogo: não oferece a Trilha e o botão faz o que fazia', async () => {
+  it('carreira fora do catálogo: não pergunta o edital e o botão faz o que fazia', async () => {
     await abrir('#/comecar/carreira-a', await fonte());
     await screen.findByRole('button', { name: 'Adicionar e ler' });
-    expect(screen.queryByRole('checkbox')).toBeNull();
+    expect(screen.queryByRole('radio')).toBeNull();
   });
 
-  it('carreira do catálogo: oferece a Trilha do edital mais recente, marcada, e monta as duas coisas', async () => {
+  it('carreira do catálogo: pergunta o edital, nenhum marcado, e o botão espera a escolha', async () => {
     const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
-    const caixa = await screen.findByRole('checkbox', { name: /^Montar também a Trilha/ });
-    expect(caixa).toBeChecked();
-    // O nome é o título; o apoio vai como descrição (o leitor de tela não lê tudo como nome).
-    expect(caixa).toHaveAccessibleName('Montar também a Trilha');
-    expect(caixa).toHaveAccessibleDescription(/\d+ matérias, baseado no edital MPGO de 2023\./);
+    const botao = await screen.findByRole('button', { name: 'Adicionar e ler' });
+    const grupo = screen.getByRole('group', {
+      name: 'Qual edital serve de base para o seu plano?',
+    });
+    const opcoes = within(grupo).getAllByRole('radio');
+    expect(opcoes.length).toBeGreaterThanOrEqual(3);
+    for (const o of opcoes) expect(o).not.toBeChecked();
+    expect(within(grupo).getByRole('radio', { name: /Trazer o meu edital/ })).toBeVisible();
+    expect(within(grupo).getByRole('radio', { name: /Escolher depois/ })).toBeVisible();
+    expect(botao).toBeDisabled();
+    await usuario.click(botao);
+    expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(0);
+  });
 
+  it('escolhido um edital, monta as normas e a Trilha dele', async () => {
+    const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
+    const edital = (await screen.findAllByRole('radio', { name: /MPGO/ }))[0];
+    if (!edital) throw new Error('sem edital na lista');
+    await usuario.click(edital);
     await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'LEI-C' })).toBeInTheDocument();
     expect(await repo.colecao('pontos').todosDoUsuario()).not.toHaveLength(0);
@@ -174,24 +187,36 @@ describe('Escolher meu concurso › Para começar', () => {
     ]);
   });
 
-  it('desmarcada, só as normas entram', async () => {
+  it('"Escolher depois": só as normas entram', async () => {
     const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
-    await usuario.click(await screen.findByRole('checkbox', { name: /^Montar também a Trilha/ }));
+    await usuario.click(await screen.findByRole('radio', { name: /Escolher depois/ }));
     await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'LEI-C' })).toBeInTheDocument();
     expect(await repo.colecao('pontos').todosDoUsuario()).toHaveLength(0);
   });
 
-  it('com a Trilha já montada, a caixa não aparece', async () => {
+  it('"Trazer o meu edital": as normas entram e segue para o Plano importar os pontos', async () => {
+    const { repo, usuario } = await abrir('#/comecar/ministerio-publico', await fonte());
+    await usuario.click(await screen.findByRole('radio', { name: /Trazer o meu edital/ }));
+    await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
+    await vi.waitFor(() => {
+      expect(window.location.hash).toBe('#/plano');
+    });
+    expect(await repo.colecao('normas').todosDoUsuario()).toHaveLength(1);
+    expect(await repo.colecao('pontos').todosDoUsuario()).toHaveLength(0);
+  });
+
+  it('com a Trilha já montada, a pergunta não aparece', async () => {
     const f = await fonte();
     const { repo, usuario } = await abrir('#/comecar/ministerio-publico', f);
-    await usuario.click(await screen.findByRole('button', { name: 'Adicionar e ler' }));
+    await usuario.click((await screen.findAllByRole('radio', { name: /MPGO/ }))[0] as HTMLElement);
+    await usuario.click(screen.getByRole('button', { name: 'Adicionar e ler' }));
     await screen.findByRole('heading', { level: 1, name: 'LEI-C' });
     expect((await repo.colecao('pontos').todosDoUsuario()).length).toBeGreaterThan(0);
 
     window.location.hash = '#/comecar/ministerio-publico';
     await screen.findByRole('button', { name: 'Adicionar e ler' });
-    expect(screen.queryByRole('checkbox')).toBeNull();
+    expect(screen.queryByRole('radio')).toBeNull();
   });
 
   it('"Adicionar e ler" adiciona todas, sem repetir, e abre a primeira no Leitor', async () => {

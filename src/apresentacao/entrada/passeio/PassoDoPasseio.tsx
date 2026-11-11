@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { ControleDoZe } from '../../componentes/ze/controle';
 import { Ze } from '../../componentes/ze/Ze';
 import { movimentoAgora } from '../../movimento';
@@ -25,7 +25,7 @@ interface Props {
 }
 
 /**
- * Um passo do Passeio (D-D10): o menu em quatro linhas (o nome, a frase, os itens), o ícone da aba
+ * Um passo do Passeio (D-D10): o lugar em quatro linhas (o nome, a frase, os itens), o ícone da aba
  * desenhado pela caneta e o Zé olhando para o cartão. Os botões não têm atalho para outra tela: o passo
  * só explica. Passar de um passo a outro não remonta a tela: o conteúdo sai (transição) e o seguinte
  * entra (animação), e o foco vai ao título para o leitor de tela ler o passo novo (a região viva da
@@ -111,18 +111,26 @@ export function PassoDoPasseio({
             <h2 id={idTitulo} ref={titulo} tabIndex={-1} className="chegada-titulo passo-titulo">
               {passo.nome}
             </h2>
-            <p className="passo-frase">{passo.frase}</p>
+            <p key={passo.id} className="passo-frase">
+              {passo.frase}
+            </p>
             <ul className="passo-itens">
-              {passo.ferramentas.map((ferramenta) => (
-                <li key={ferramenta.destaque} className="passo-ferramenta">
+              {passo.ferramentas.map((ferramenta, i) => (
+                <li
+                  key={ferramenta.destaque}
+                  className="passo-ferramenta"
+                  style={{ '--n': i + 1 } as CSSProperties}
+                >
                   <span>
                     <strong>{ferramenta.destaque}</strong>
                     {ferramenta.apoio !== undefined && ` ${ferramenta.apoio}`}
                   </span>
                 </li>
               ))}
-              {passo.itens.map((item) => (
-                <li key={item}>{item}</li>
+              {passo.itens.map((item, i) => (
+                <li key={item} style={{ '--n': passo.ferramentas.length + i + 1 } as CSSProperties}>
+                  {item}
+                </li>
               ))}
             </ul>
           </div>

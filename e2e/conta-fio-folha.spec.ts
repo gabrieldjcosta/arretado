@@ -8,7 +8,7 @@ async function abrirAConta(page: import('@playwright/test').Page) {
   await page.goto('/#/fio/ligar');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
-  await page.getByRole('button', { name: 'arretado: sua conta e ajustes' }).click();
+  await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   return page.getByRole('dialog');
 }
 

@@ -1,8 +1,8 @@
 // Os textos do Passeio (D-D10, contrato §7): uma fonte só. A Chegada, o passeio refeito (Conta e Ajuda) e
 // os testes leem daqui; nenhum componente repete uma frase literal (`passos.test.ts` confere). Os nomes
-// e os ícones dos quatro menus vêm de `areas.ts`, os mesmos das abas. Os textos são do Gabriel (28/10,
+// dos três lugares vêm de `fio/lugares.ts`, os mesmos da pílula do Fio. Os textos são do Gabriel (28/10,
 // 31/10 e 03/11, as seis ferramentas em evidência).
-import { AREAS } from '../../areas';
+import { LUGARES } from '../../fio/lugares';
 
 /**
  * As Boas-vindas (Gabriel, 31/10; D-D11). O `titulo` e a `frase` são as duas partes da saudação e vão sempre
@@ -17,9 +17,9 @@ export const BOAS_VINDAS = {
   agoraNao: 'Agora não',
 } as const;
 
-export type IdDoPasso = 'hoje' | 'plano' | 'recall' | 'biblioteca';
+export type IdDoPasso = 'agora' | 'destino' | 'varal';
 
-/** Uma das seis ferramentas que o Passeio põe em evidência (Gabriel, 03/11): a frase em negrito e, se couber, uma linha de apoio. */
+/** Uma das ferramentas que o Passeio põe em evidência (Gabriel, 03/11): a frase em negrito e, se couber, uma linha de apoio. */
 export interface Ferramenta {
   destaque: string;
   apoio?: string;
@@ -27,75 +27,67 @@ export interface Ferramenta {
 
 export interface Passo {
   id: IdDoPasso;
-  /** O nome da aba (Hoje, Trilha, Fixar, Biblioteca). */
+  /** O nome do lugar na pílula do Fio (Agora, Destino, Varal). */
   nome: string;
-  /** O ícone de linha da aba, 24 × 24: o mesmo que o passo desenha. */
+  /** O ícone de linha do lugar, 24 × 24: o que o passo desenha. */
   icone: string;
   frase: string;
-  /** As ferramentas deste menu em evidência: vêm primeiro na lista, com a frase em negrito. */
+  /** As ferramentas deste lugar em evidência: vêm primeiro na lista, com a frase em negrito. */
   ferramentas: readonly Ferramenta[];
-  /** O resto do que o menu faz, em linhas simples. */
+  /** O resto do que o lugar faz, em linhas simples. */
   itens: readonly string[];
 }
 
+/**
+ * Os ícones dos três lugares (Gabriel, 08/11): o fio com a conta (Agora), a estrela do Destino e o varal com as
+ * duas peças. De linha, 24 × 24, como os de antes, mas do Fio: a casa, o calendário, as cartas e o livro saíram.
+ */
+const ICONES: Record<IdDoPasso, string> = {
+  agora: 'M3 14c3.5-6 7 6 11 0 2-3 4-3 7-1M12 8.5v.01',
+  destino: 'M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.8z',
+  varal: 'M3 6c6 3 12 3 18 0M8 8.5v6.5h4V9.2M14.5 9.6V15H18V9.9',
+};
+
 const TEXTOS_DOS_PASSOS: Record<IdDoPasso, Pick<Passo, 'frase' | 'ferramentas' | 'itens'>> = {
-  hoje: {
-    frase: 'Aqui você vê o que tem pra fazer, sem agonia pra decidir.',
+  agora: {
+    frase: 'Aqui você vê o que fazer agora, sem agonia pra decidir.',
     ferramentas: [
       {
-        destaque: 'Aqui seus erros viram acertos e Cartões.',
-        apoio: 'No botão +, traga a Frase correta pra revisar e lembrar depois.',
+        destaque: 'Seus erros viram acertos e Cartões.',
+        apoio: 'No botão +, traga a Frase correta pra lembrar depois.',
       },
     ],
     itens: ['Leitura, Cartões e Frases ficam marcados como feitos quando você lê, revisa ou fixa.'],
   },
-  plano: {
-    frase: 'O edital em Pontos, montado pelo catálogo ou trazido por você.',
+  destino: {
+    frase: 'Quanto da prova já é seu, com o edital em Pontos.',
     ferramentas: [
       {
         destaque: 'Ciclos de estudo facilitados.',
-        apoio: 'Você define os seus aqui na Trilha.',
+        apoio: 'Você define os seus aqui.',
       },
     ],
     itens: [],
   },
-  recall: {
-    frase: 'Suas Frases e Cartões, com a Revisão de cada dia.',
+  varal: {
+    frase: 'Suas normas, súmulas, Frases e Cartões.',
     ferramentas: [
-      {
-        destaque: 'Transforme rapidamente um artigo em cartão.',
-      },
+      { destaque: 'Destaques automáticos contra pegadinhas.' },
+      { destaque: 'Leis atualizadas e mapeadas.' },
+      { destaque: 'Link entre leis e súmulas.' },
+      { destaque: 'Transforme rapidamente um artigo em cartão.' },
     ],
-    itens: [
-      'Gosta de cartões de revisão? Aqui você pode montar os seus para se testar.',
-      'Dica: depois do passeio, faça cinco questões e registre o que precisa lembrar.',
-    ],
-  },
-  biblioteca: {
-    frase: 'Onde ficam as normas pra ler e os seus resumos.',
-    ferramentas: [
-      {
-        destaque: 'Destaques automáticos contra as pegadinhas.',
-      },
-      {
-        destaque: 'As leis que você estuda, atualizadas e mapeadas.',
-      },
-      {
-        destaque: 'Link entre leis e súmulas pra entender melhor.',
-      },
-    ],
-    itens: ['Modo foco para ver só o artigo que está lendo.'],
+    itens: [],
   },
 };
 
-const IDS_NA_ORDEM_DAS_ABAS: readonly IdDoPasso[] = ['hoje', 'plano', 'recall', 'biblioteca'];
-
-/** Um passo por menu, na ordem das abas. Sem atalho para outra tela (Gabriel, 28/10). */
-export const PASSOS: readonly Passo[] = AREAS.map((area, i) => {
-  const id = IDS_NA_ORDEM_DAS_ABAS[i];
-  if (id === undefined) throw new Error('Há mais áreas que passos.');
-  return { id, nome: area.nome, icone: area.icone, ...TEXTOS_DOS_PASSOS[id] };
-});
+/** Um passo por lugar, na ordem da pílula do Fio. Sem atalho para outra tela (Gabriel, 28/10). */
+export const PASSOS: readonly Passo[] = LUGARES.map((lugar) => ({
+  id: lugar.id,
+  nome: lugar.nome,
+  icone: ICONES[lugar.id],
+  ...TEXTOS_DOS_PASSOS[lugar.id],
+}));
 
 export const COMECAR = {
   titulo: 'Vamo começar?',
@@ -135,9 +127,9 @@ export const CONTROLES = {
 export const progressoDoPasso = (indice: number): string =>
   `Passo ${String(indice + 1)} de ${String(PASSOS.length)}`;
 
-/** A linha do passeio em Conta (a fonte do que ela diz, e do botão que abre os quatro passos). */
+/** A linha do passeio em Conta (a fonte do que ela diz, e do botão que abre os três passos). */
 export const PASSEIO_NA_CONTA = {
   titulo: 'Passeio pelos menus',
-  apoio: 'Os quatro menus, um por vez, quando você quiser.',
+  apoio: 'Os três lugares, um por vez, quando você quiser.',
   acao: 'Fazer o passeio',
 } as const;

@@ -127,7 +127,7 @@ test.describe('Começar, com a conta ligada', () => {
   }) => {
     await page.goto('/#/');
     await boasVindas(page).getByRole('button', { name: 'Vamos' }).click();
-    for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
+    for (let i = 0; i < 2; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
     await page.getByRole('button', { name: 'Seguir' }).click();
     await expect(comecar(page)).toBeVisible();
 
@@ -177,10 +177,10 @@ test.describe('Os dois botões chegam ao fim do passeio e ao pulá-lo; o "Agora 
     await expect(boasVindas(page).getByRole('link')).toHaveCount(0);
   });
 
-  test('o passeio inteiro (Vamos e quatro "Seguir") termina nos dois botões', async ({ page }) => {
+  test('o passeio inteiro (Vamos e três "Seguir") termina nos dois botões', async ({ page }) => {
     await page.goto('/#/');
     await boasVindas(page).getByRole('button', { name: 'Vamos' }).click();
-    for (let i = 0; i < 4; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
+    for (let i = 0; i < 3; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
     await expect(comecar(page).getByRole('button', { name: GOOGLE })).toBeVisible();
     await expect(comecar(page).getByRole('button', { name: SEM_CONTA })).toBeVisible();
   });
