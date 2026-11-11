@@ -3719,17 +3719,18 @@ dialog.dialogo-acoes {
   fill: currentcolor;
 }
 
-/* O "⋯" do dock e o da bandeja do foco no referencial 7 (D-D26): o sinal na tinta do brilho do mundo e o
-   anel suave em volta, sem desfoque. O contorno do botão segue o do controle. */
-.bandeja-botao,
-.mais-do-leitor-botao {
+/* O "⋯" no referencial 7 (D-D26): o sinal na tinta do brilho do mundo e o anel suave em volta, sem desfoque. As
+   regras do dock e dos botões do foco são mais específicas e mandam na cor e na sombra: por isso os seletores
+   levam o mesmo caminho delas. O filtro ligado do dock segue trocando o anel pelo de dentro. */
+.acoes-leitor .dock-do-leitor .mais-do-leitor-botao,
+.em-foco .acoes-leitor .bandeja-botao {
   color: var(--brilho-tinta);
   box-shadow: 0 0 0 2px rgb(var(--brilho) / 22%);
 }
 
 @media (forced-colors: active) {
-  .bandeja-botao,
-  .mais-do-leitor-botao {
+  .acoes-leitor .dock-do-leitor .mais-do-leitor-botao,
+  .em-foco .acoes-leitor .bandeja-botao {
     box-shadow: none;
   }
 }
@@ -4203,7 +4204,7 @@ dialog.dialogo-previa .linha-acoes button {
   z-index: 10;
   display: grid;
   gap: 0.25rem;
-  min-width: 15rem;
+  width: max-content;
   padding: 0.5rem;
   background: var(--superficie);
   border: var(--borda-folha);
