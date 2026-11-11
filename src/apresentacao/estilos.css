@@ -3719,6 +3719,21 @@ dialog.dialogo-acoes {
   fill: currentcolor;
 }
 
+/* O "⋯" do dock e o da bandeja do foco no referencial 7 (D-D26): o sinal na tinta do brilho do mundo e o
+   anel suave em volta, sem desfoque. O contorno do botão segue o do controle. */
+.bandeja-botao,
+.mais-do-leitor-botao {
+  color: var(--brilho-tinta);
+  box-shadow: 0 0 0 2px rgb(var(--brilho) / 22%);
+}
+
+@media (forced-colors: active) {
+  .bandeja-botao,
+  .mais-do-leitor-botao {
+    box-shadow: none;
+  }
+}
+
 .seta-do-cartao svg {
   fill: none;
   stroke: currentcolor;
@@ -4188,7 +4203,7 @@ dialog.dialogo-previa .linha-acoes button {
   z-index: 10;
   display: grid;
   gap: 0.25rem;
-  min-width: 13rem;
+  min-width: 15rem;
   padding: 0.5rem;
   background: var(--superficie);
   border: var(--borda-folha);
@@ -4200,6 +4215,7 @@ dialog.dialogo-previa .linha-acoes button {
 .menu-ajuda-itens button {
   justify-content: flex-start;
   width: 100%;
+  text-align: left;
 }
 
 /* ── Fatia 6 (6.4 a 6.7): Biblioteca em lista, drill centrado, estado por texto ─ */
@@ -4465,7 +4481,7 @@ dialog.dialogo-previa .linha-acoes button {
    desfoque" do D-D9 vale; o brilho só mora nos arquivos dos traços). */
 .seletor-mundo-halo {
   inset: -20%;
-  background: radial-gradient(circle, rgb(157 183 232 / 0.4) 32%, rgb(157 183 232 / 0) 70%);
+  background: radial-gradient(circle, rgb(var(--brilho) / 0.4) 32%, rgb(var(--brilho) / 0) 70%);
 }
 
 .seletor-mundo-noite .seletor-mundo-disco {
@@ -4489,7 +4505,7 @@ dialog.dialogo-previa .linha-acoes button {
 }
 
 .seletor-mundo-dia .seletor-mundo-halo {
-  background: radial-gradient(circle, rgb(255 197 61 / 0.6) 30%, rgb(255 150 40 / 0) 70%);
+  background: radial-gradient(circle, rgb(var(--brilho) / 0.6) 30%, rgb(var(--brilho) / 0) 70%);
   animation: sol-calor 2.4s ease-out infinite;
 }
 
