@@ -22,27 +22,7 @@ export interface TrilhaOferecida {
   pontos: number;
 }
 
-/**
- * A Trilha que "Para começar" oferece para a carreira: o edital mais recente do catálogo, inteiro.
- * `null` quando a carreira não está no catálogo, quando ele não abre ou quando a Trilha já tem Pontos
- * (aí a pessoa monta pelo onboarding, que mostra a prévia).
- */
-export async function trilhaOferecida(
-  repo: Repositorio,
-  fonte: FonteDoCatalogo,
-  carreira: string,
-): Promise<TrilhaOferecida | null> {
-  const pontosQueJaTem = await repo.colecao('pontos').todosDoUsuario();
-  // Pontos na lixeira (excluidoEm) não contam: quem apagou a Trilha ganha a oferta de volta.
-  if (pontosQueJaTem.some((p) => !p.excluidoEm)) return null;
-  let edital: EditalDoCatalogo | undefined;
-  try {
-    edital = editaisOferecidos(await fonte.obter(carreira))[0];
-  } catch (e) {
-    if (e instanceof CatalogoIndisponivel) return null;
-    throw e;
-  }
-  if (!edital) return null;
+function ofertaDe(edital: EditalDoCatalogo): TrilhaOferecida {
   const linhas = linhasDoEdital(edital);
   return {
     edital,
@@ -50,6 +30,37 @@ export async function trilhaOferecida(
     materias: new Set(linhas.map((l) => l.disciplina)).size,
     pontos: linhas.length,
   };
+}
+
+/**
+ * Os editais do catálogo que "Para começar" deixa a pessoa escolher para a carreira, o mais recente
+ * primeiro (nenhum vem marcado: a escolha é dela). Lista vazia quando a carreira não está no catálogo,
+ * quando ele não abre ou quando a Trilha já tem Pontos (aí a pessoa monta pelo onboarding, que mostra
+ * a prévia).
+ */
+export async function editaisOferecidosDaCarreira(
+  repo: Repositorio,
+  fonte: FonteDoCatalogo,
+  carreira: string,
+): Promise<TrilhaOferecida[]> {
+  const pontosQueJaTem = await repo.colecao('pontos').todosDoUsuario();
+  // Pontos na lixeira (excluidoEm) não contam: quem apagou a Trilha ganha a oferta de volta.
+  if (pontosQueJaTem.some((p) => !p.excluidoEm)) return [];
+  try {
+    return editaisOferecidos(await fonte.obter(carreira)).map(ofertaDe);
+  } catch (e) {
+    if (e instanceof CatalogoIndisponivel) return [];
+    throw e;
+  }
+}
+
+/** O edital mais recente da carreira, inteiro; `null` nas mesmas condições da lista acima. */
+export async function trilhaOferecida(
+  repo: Repositorio,
+  fonte: FonteDoCatalogo,
+  carreira: string,
+): Promise<TrilhaOferecida | null> {
+  return (await editaisOferecidosDaCarreira(repo, fonte, carreira))[0] ?? null;
 }
 
 /** Grava a Trilha oferecida: os Pontos entram como uma importação, que dá para desfazer. */
