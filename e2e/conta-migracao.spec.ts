@@ -43,9 +43,9 @@ test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
     });
     await semViolacoes(page);
 
-    // "Ir para o Hoje" recarrega e abre o banco da conta (T26).
+    // "Ir para o Hoje" (o texto do link ainda diz Hoje) recarrega no Agora e abre o banco da conta (T26).
     await page.getByRole('link', { name: 'Ir para o Hoje' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    await expect(page.locator('[data-tela="inicio"]:not(.m-saindo)')).toBeVisible();
 
     // 4. Ver a cópia em Dados
     await page.goto('/#/conta/dados');
