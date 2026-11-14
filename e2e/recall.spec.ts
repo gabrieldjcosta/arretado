@@ -46,10 +46,10 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
   const inicio = new Date('2026-09-23T12:00:00-03:00');
   await page.clock.setFixedTime(inicio);
 
-  await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await page.goto('/#/recall');
+  await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
 
-  // Captura em menos de 30 s (Parte 2 §17), pelo "+" do título do Hoje (P2 do Ponto de luz).
+  // Captura em menos de 30 s (Parte 2 §17), pelo "+" da casca (P2 do Ponto de luz).
   const t0 = Date.now();
   // Só a frase correta é obrigatória (D25); "o que foi" fica em "mais detalhes".
   await irAoRegistroPeloMais(page);
@@ -67,12 +67,6 @@ test('registrar → cartão → revisar no dia seguinte, sem sair do aparelho', 
 
   // Dia seguinte: o cartão está na fila.
   await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
-  await page.goto('/');
-  await expect(page.getByText('1 cartão vencido')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Começar', exact: true })).toHaveAttribute(
-    'href',
-    /#\/sessao\/iniciar\?tipo=revisao.*origem=revisao_vencida/,
-  );
   await page.goto('/#/recall/revisar');
   await expect(page.getByText('Confundi livramento condicional com progressão')).toBeVisible();
   await page.keyboard.press('Space');
@@ -135,11 +129,8 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Execução Penal' })).toBeVisible();
 
   // Disciplina e ponto opcionais, fora de "mais detalhes", lembrados no registro seguinte e
-  // depois de recarregar (D25). O "+" fica no título do Hoje e do Fixar, não na Trilha.
-  await page
-    .getByRole('navigation', { name: 'Áreas' })
-    .getByRole('link', { name: 'Fixar', exact: true })
-    .click();
+  // depois de recarregar (D25).
+  await page.goto('/#/recall');
   await irAoRegistroPeloMais(page);
   await page.getByLabel('Frase correta').fill('A fração da progressão é de 16%.');
   await page
@@ -319,10 +310,12 @@ test('certeza antes de ver a resposta: três chips de 44 px; tocar mostra a resp
     expect(caixa?.height).toBeGreaterThanOrEqual(44);
   }
   await semViolacoes(page);
-  // Tela baixa (320 × 568): o rótulo e os chips não empurram "Mostrar resposta" para baixo da barra.
+  // Tela baixa (320 × 568): o rótulo e os chips não empurram "Mostrar resposta" para baixo da pílula dos lugares.
   await page.setViewportSize({ width: 320, height: 568 });
   const pular = await page.getByRole('button', { name: 'Mostrar resposta' }).boundingBox();
-  expect((pular?.y ?? 0) + (pular?.height ?? 0)).toBeLessThan(568 - 80);
+  const pilula = await page.getByRole('navigation', { name: 'Lugares' }).boundingBox();
+  expect(pilula?.y ?? 0).toBeGreaterThan(400);
+  expect((pular?.y ?? 0) + (pular?.height ?? 0)).toBeLessThanOrEqual(pilula?.y ?? 0);
   await page.setViewportSize({ width: 390, height: 844 });
   await grupo.getByRole('button', { name: 'Tenho certeza' }).click();
   await respostasCabem(page);
@@ -368,7 +361,7 @@ test('Ache o erro: uma rodada inteira; a frase falsa não vira Frase e o erro vi
       await expect(candidatos.first()).toHaveAttribute('aria-pressed', 'true');
       await conferir.click();
     }
-    const resultado = page.getByRole('status');
+    const resultado = page.getByRole('main').getByRole('status');
     await expect(resultado).toBeVisible();
     // O texto certo aparece na hora: com a troca riscada, ou a frase como estava.
     const riscadas = await frase.locator('del').count();

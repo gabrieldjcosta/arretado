@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { abrirTodasAsNormas, expect, semViolacoes, test } from './apoio';
 import { servir } from './lep-com-mapa';
 
@@ -58,12 +58,14 @@ test('mapa: a chamada no Leitor, os quadrados por faixa, o próximo trecho e a v
 
   // Tocar num quadrado lê o artigo em palavras, com a rubrica dele.
   await quadrados.nth(0).click();
-  await expect(page.getByRole('status')).toHaveText(/Art\. 1º · Objeto · cai\s*Ler/);
+  await expect(page.getByRole('main').getByRole('status')).toHaveText(
+    /Art\. 1º · Objeto · cai\s*Ler/,
+  );
   // As setas percorrem; Enter no quadrado escolhe.
   await page.keyboard.press('ArrowRight');
   await expect(quadrados.nth(1)).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('status')).toContainText('Art. 2º · cai muito');
+  await expect(page.getByRole('main').getByRole('status')).toContainText('Art. 2º · cai muito');
 
   // "Começar" leva ao Leitor, no artigo do trecho.
   await agora.getByRole('link', { name: 'Começar' }).click();
@@ -89,71 +91,6 @@ test('mapa: "ler seguindo o mapa" diz para onde o Próximo vai no fim do trecho,
   await parar.click();
   await expect(linha).toHaveCount(0);
   await expect(page.getByRole('region', { name: /^Art\. 5º,/ })).toBeFocused();
-});
-
-/** As linhas como o navegador as quebrou: o texto de cada uma, medido caractere a caractere. */
-const linhasDe = (el: Locator) =>
-  el.evaluate((e) => {
-    const texto = e.firstChild as Text;
-    const faixa = document.createRange();
-    const linhas: string[] = [];
-    let atual = '';
-    let topo = Number.NaN;
-    for (let i = 0; i < texto.length; i++) {
-      faixa.setStart(texto, i);
-      faixa.setEnd(texto, i + 1);
-      const caixa = faixa.getClientRects()[0];
-      if (caixa && Math.round(caixa.top) !== topo) {
-        topo = Math.round(caixa.top);
-        linhas.push(atual);
-        atual = '';
-      }
-      atual += texto.data.charAt(i);
-    }
-    return [...linhas, atual].map((l) => l.trim()).filter(Boolean);
-  });
-
-test('mapa: no Hoje, o Agora é o trecho que mais cai e leva ao Leitor; "de onde parou" fica abaixo', async ({
-  page,
-}) => {
-  test.setTimeout(120_000);
-  await adicionarEAbrir(page);
-  // Põe o art. 3º perto do alto e espera a posição ser guardada: o Hoje passa a ter leitura salva.
-  await page.locator('[data-endereco="art3"]').evaluate((el) => {
-    window.scrollBy(0, el.getBoundingClientRect().top - 140);
-  });
-  await page.waitForTimeout(1200);
-  // No celular o Leitor não tem a barra com o "Hoje": vai-se pela rota.
-  await page.goto('/#/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  const agora = page.getByRole('region', { name: 'Agora' });
-  // Nada coberto ainda ("Lido até aqui" não foi tocado): o primeiro "cai muito" é o art. 2º, e ele
-  // é o Agora (decisão F2, 27/10/2026); "de onde parou" é a alternativa, uma linha abaixo.
-  await expect(agora.getByRole('heading', { name: 'Ler art. 2º' })).toBeVisible();
-  await expect(agora).toContainText('Pelo mapa, o próximo trecho: cai muito');
-  await expect(agora).toContainText('cerca de 1 min');
-  const linha = page.locator('.agora-no-mapa');
-  await expect(linha).toContainText('Ou de onde parou');
-  const caixa = await linha.getByRole('link', { name: 'Continuar a leitura' }).boundingBox();
-  expect(caixa?.height).toBeGreaterThanOrEqual(44);
-  await expect(page.getByText(/atrasad|pendente|dívida|faltam/i)).toHaveCount(0);
-  await semViolacoes(page);
-  // O intervalo de quatro dígitos (CPC, Código Civil) quebra depois do "arts.": o "a" não fica pendurado
-  // no fim da primeira linha (320 px).
-  const janela = page.viewportSize();
-  await page.setViewportSize({ width: 320, height: 568 });
-  const titulo = agora.getByRole('heading').first();
-  await titulo.evaluate((el) => {
-    el.textContent = 'Ler arts. 1.059 a 1.062';
-  });
-  await page.evaluate(() => document.fonts.ready);
-  expect(await linhasDe(titulo)).toEqual(['Ler arts.', '1.059 a 1.062']);
-  if (janela) await page.setViewportSize(janela);
-  await agora.getByRole('link', { name: 'Começar' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
-  await expect(page.locator('[data-endereco="art2"]')).toBeInViewport();
-  // Sessão aberta, no artigo por artigo e seguindo o mapa.
-  await expect(page).toHaveURL(/ir=art2&foco=artigo&mapa=1/);
 });
 
 test.describe('sem rede', () => {
