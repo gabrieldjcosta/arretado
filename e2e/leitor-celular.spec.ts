@@ -126,7 +126,7 @@ for (const { largura, altura } of TELAS) {
   });
 }
 
-test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartão, no "+"; o foco volta ao botão de onde se partiu', async ({
+test('Filtrar, Ações e os ajustes de leitura ficam a dois toques, no "⋯"; Registrar erro e o cartão, no "+"; o foco volta ao botão de onde se partiu', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
@@ -140,7 +140,7 @@ test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartã
   // O menu abre para cima, dentro da tela, com itens de 48 px; aberto e fechado passa no axe.
   await mais.tap();
   await expect(mais).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu.getByRole('button')).toHaveText([/^Filtrar/, /^Ações/]);
+  await expect(menu.getByRole('button')).toHaveText([/^Filtrar/, /^Ações/, /^Ajustes de leitura/]);
   const caixas = await menu.evaluate((el) => {
     const r = el.getBoundingClientRect();
     const barra = document.querySelector('.acoes-leitor')?.getBoundingClientRect();
@@ -199,6 +199,17 @@ test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartã
   await expect(acoes).toBeVisible();
   await acoes.getByRole('button', { name: 'Fechar' }).tap();
   await expect(acoes).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
+
+  // Ajustes de leitura: a folha abre embaixo, o menu fecha e o foco volta ao Mais ao fechar a folha.
+  await page.getByRole('button', { name: 'Mais', exact: true }).tap();
+  await menu.getByRole('button', { name: /^Ajustes de leitura/ }).tap();
+  const ajustes = page.getByRole('dialog', { name: 'Ajustes de leitura' });
+  await expect(ajustes).toBeVisible();
+  await expect(menu).toBeHidden();
+  await semViolacoes(page);
+  await ajustes.getByRole('button', { name: 'Fechar' }).tap();
+  await expect(ajustes).toBeHidden();
   await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
 
   // Registrar erro é com o "+": o painel abre direto no formulário (a frase correta), sem a lista de

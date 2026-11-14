@@ -140,6 +140,8 @@ test('o "Voltar" da norma leva ao lugar de onde ela foi aberta; aberta direto pe
   // O modo foco e o que mais mexe no endereço dentro da norma não mudam o destino.
   await page.keyboard.press('f');
   await expect(page).toHaveURL(/[?&]foco=/);
+  // O endereço muda antes de a bandeja do foco montar, e é ela que ouve o Esc.
+  await expect(page.getByRole('button', { name: 'Mais ações do foco' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page).not.toHaveURL(/foco=/);
   await expect(voltar(page)).toHaveAttribute('href', '#/varal/normas');

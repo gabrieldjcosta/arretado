@@ -135,6 +135,21 @@ async function sairDoFoco(usuario: UserEvent) {
   await usuario.click(await naBandeja(usuario, 'Sair do foco'));
 }
 
+/** O "Aa" da barra do Leitor, que abre a folha dos ajustes de leitura. Só a barra o tem: no modo foco ele sai. */
+const botaoDosAjustes = () => screen.queryByRole('button', { name: 'Aa, ajustes de leitura' });
+
+/** A folha dos ajustes de leitura (tamanho do texto, destaques, foco na frase), aberta pelo "Aa" se preciso. */
+async function folhaDosAjustes(usuario: UserEvent) {
+  if (!screen.queryByRole('dialog', { name: 'Ajustes de leitura' })) {
+    await usuario.click(screen.getByRole('button', { name: 'Aa, ajustes de leitura' }));
+  }
+  return within(await screen.findByRole('dialog', { name: 'Ajustes de leitura' }));
+}
+
+/** A caixa dos destaques, na folha dos ajustes. */
+const caixaDosDestaques = async (usuario: UserEvent) =>
+  (await folhaDosAjustes(usuario)).getByRole('checkbox', { name: /^Destacar prazos/ });
+
 /** O dispositivo (por endereço) na tela. */
 const dispositivo = (endereco: string) => {
   const el = document.querySelector<HTMLElement>(`[data-endereco="${endereco}"]`);
@@ -364,8 +379,11 @@ describe('leitor da norma (9.6)', () => {
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByRole('heading', { level: 1, name: 'LEP' });
 
-    expect(await screen.findByLabelText('Tamanho atual do texto')).toHaveTextContent('18 px');
-    await usuario.click(screen.getByRole('button', { name: /aumentar o texto/ }));
+    // O tamanho mora na folha dos ajustes, que o "Aa" da barra abre.
+    const folha = await folhaDosAjustes(usuario);
+    expect(folha.getByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(folha.getByLabelText('Tamanho atual do texto')).toHaveTextContent('18 px');
+    await usuario.click(folha.getByRole('button', { name: /aumentar o texto/ }));
     await waitFor(() => {
       expect(screen.getByLabelText('Tamanho atual do texto')).toHaveTextContent('20 px');
     });
@@ -437,7 +455,7 @@ describe('destaque automático (9.8)', () => {
       el.className,
     ]);
 
-  it('ligado por padrão, sem gravar nada; o botão "Destaques" desliga e liga, grava a preferência global e mostra a legenda (D-D17)', async () => {
+  it('ligado por padrão, sem gravar nada; a caixa dos destaques, na folha dos ajustes, desliga e liga, grava a preferência global e mostra a legenda (D-D17)', async () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI_COM_DESTAQUES);
     const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
@@ -445,8 +463,8 @@ describe('destaque automático (9.8)', () => {
     await waitFor(() => {
       expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
     });
-    const botao = screen.getByRole('button', { name: 'Destaques' });
-    expect(botao).toHaveAttribute('aria-pressed', 'true');
+    const caixa = await caixaDosDestaques(usuario);
+    expect(caixa).toBeChecked();
     expect(destaques('art1')).toEqual([
       ['prazo de 5 (cinco) dias', 'destaque destaque-prazo'],
       ['salvo', 'destaque destaque-condicao'],
@@ -461,8 +479,8 @@ describe('destaque automático (9.8)', () => {
     expect(await obterPreferencias(repo)).not.toHaveProperty('destacarCondicionantesEPrazos');
     const textoLigado = dispositivo('art1').textContent;
 
-    await usuario.click(botao);
-    expect(botao).toHaveAttribute('aria-pressed', 'false');
+    await usuario.click(caixa);
+    expect(caixa).not.toBeChecked();
     expect(document.querySelector('.destaque')).toBeNull();
     expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
     // O texto não muda: o destaque só parte os trechos.
@@ -471,8 +489,8 @@ describe('destaque automático (9.8)', () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
     });
 
-    await usuario.click(botao);
-    expect(botao).toHaveAttribute('aria-pressed', 'true');
+    await usuario.click(caixa);
+    expect(caixa).toBeChecked();
     expect(destaques('art1')).toHaveLength(2);
     await waitFor(async () => {
       expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(true);
@@ -483,20 +501,57 @@ describe('destaque automático (9.8)', () => {
     const { repo } = await repositorioDeTeste();
     await alterarPreferencias(repo, { destacarCondicionantesEPrazos: false });
     const norma = await publicar(repo, LEI_COM_DESTAQUES);
-    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByRole('heading', { level: 1, name: 'LEP' });
     await waitFor(() => {
       expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
     });
     // Até a preferência chegar vale o padrão (ligado); depois a escolha da pessoa vence.
+    const caixa = await caixaDosDestaques(usuario);
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
-        'aria-pressed',
-        'false',
-      );
+      expect(caixa).not.toBeChecked();
     });
     expect(document.querySelector('.destaque')).toBeNull();
     expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).toBeNull();
+  });
+
+  it('com o foco nas palavras de destaque a caixa fica marcada e parada; desligado o foco, vale a escolha gravada, que não mudou por baixo', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { destacarCondicionantesEPrazos: false });
+    const norma = await publicar(repo, LEI_COM_DESTAQUES);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByRole('heading', { level: 1, name: 'LEP' });
+    await waitFor(() => {
+      expect(dispositivo('art1')).toHaveTextContent('salvo motivo justificado');
+    });
+    const folha = await folhaDosAjustes(usuario);
+    const caixa = folha.getByRole('checkbox', { name: /^Destacar prazos/ });
+    await waitFor(() => {
+      expect(caixa).not.toBeChecked();
+    });
+    expect(caixa).toBeEnabled();
+
+    // O foco nas palavras de destaque acende os destaques por conta própria.
+    const foco = folha.getByRole('combobox', { name: 'Foco na frase' });
+    await usuario.selectOptions(foco, 'Só as palavras de destaque');
+    expect(document.querySelector('.leitor')).toHaveAttribute('data-regua-foco', 'palavras');
+    expect(destaques('art1')).toHaveLength(2);
+    expect(caixa).toBeChecked();
+    expect(caixa).toBeDisabled();
+    expect(caixa).toHaveAccessibleDescription('Fica ligado com o foco nas palavras de destaque.');
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).reguaDeFoco).toBe('palavras');
+    });
+
+    await usuario.selectOptions(foco, 'Desligado');
+    expect(document.querySelector('.leitor')).not.toHaveAttribute('data-regua-foco');
+    expect(caixa).not.toBeChecked();
+    expect(caixa).toBeEnabled();
+    expect(document.querySelector('.destaque')).toBeNull();
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).reguaDeFoco).toBe('desligada');
+    });
+    expect((await obterPreferencias(repo)).destacarCondicionantesEPrazos).toBe(false);
   });
 
   it('abre aceso sem a pessoa ter mexido; só o texto vigente acende (a redação anterior não)', async () => {
@@ -507,10 +562,10 @@ describe('destaque automático (9.8)', () => {
     await waitFor(() => {
       expect(destaques('art3')).toEqual([['60 (sessenta) dias', 'destaque destaque-prazo']]);
     });
-    expect(screen.getByRole('button', { name: 'Destaques' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const folha = await folhaDosAjustes(usuario);
+    expect(folha.getByRole('checkbox', { name: /^Destacar prazos/ })).toBeChecked();
+    await usuario.click(folha.getByRole('button', { name: 'Fechar' }));
+    expect(screen.queryByRole('dialog', { name: 'Ajustes de leitura' })).toBeNull();
     await usuario.click(
       within(dispositivo('art3')).getByRole('button', { name: /Mostrar 1 redação/ }),
     );
@@ -706,7 +761,8 @@ describe('modo foco (11.1)', () => {
     delete document.documentElement.dataset.modoFoco;
   });
 
-  const barraDoLeitor = () => screen.queryByRole('group', { name: 'Tamanho do texto' });
+  // A barra do Leitor se reconhece pelo "Aa", que só ela tem.
+  const barraDoLeitor = botaoDosAjustes;
 
   it('"Modo foco" deixa só o texto (rota ?foco=texto, moldura escondida) e "Sair do foco" desfaz a entrada do histórico', async () => {
     const { repo } = await repositorioDeTeste();
@@ -737,7 +793,6 @@ describe('modo foco (11.1)', () => {
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}?foco=texto`);
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
     expect(barraDoLeitor()).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Destaques' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Voltar' })).not.toBeInTheDocument();
     expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Ir ao lido até' })).not.toBeInTheDocument();
@@ -755,7 +810,9 @@ describe('modo foco (11.1)', () => {
     await waitFor(() => {
       expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     });
-    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Aa, ajustes de leitura' }),
+    ).toBeInTheDocument();
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
     expect(screen.getByRole('button', { name: 'Modo foco' })).toHaveFocus();
     // Voltou à entrada de antes (navigate(-1)), sem empilhar nem trocar uma nova.
@@ -791,7 +848,7 @@ describe('modo foco (11.1)', () => {
 
     // Com o foco num controle da barra do leitor, que sai: o foco vai para o botão do canto.
     act(() => {
-      screen.getByRole('button', { name: 'Destaques' }).focus();
+      screen.getByRole('button', { name: 'Aa, ajustes de leitura' }).focus();
     });
     await usuario.keyboard('f');
     expect(await screen.findByRole('button', { name: 'Mais ações do foco' })).toHaveFocus();
@@ -838,7 +895,9 @@ describe('modo foco (11.1)', () => {
     const entradas = window.history.length;
 
     await sairDoFoco(usuario);
-    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Aa, ajustes de leitura' }),
+    ).toBeInTheDocument();
     expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     expect(window.history.length).toBe(entradas);
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
@@ -1751,7 +1810,28 @@ describe('leitura artigo por artigo (11.8)', () => {
     expect(document.querySelector('.area-artigo')).not.toHaveClass('com-espiada');
     expect(screen.queryByRole('button', { name: 'Por artigo' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mais ações do foco' })).toBeInTheDocument();
-    expect(screen.queryByRole('group', { name: 'Tamanho do texto' })).not.toBeInTheDocument();
+    expect(botaoDosAjustes()).not.toBeInTheDocument();
+  });
+
+  it('J e K passam o artigo como as setas (é o que a bandeja anuncia); com Ctrl a tecla é do navegador', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    await gravarPosicao(repo, norma.id, await idDe(repo, norma.id, 'art1'));
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    rolarPara(3 * 60);
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
+    await cartao(/^Art\. 1º, /);
+
+    await usuario.keyboard('j');
+    await cartao(/^Art\. 2º, /);
+    await usuario.keyboard('J');
+    await cartao(/^Art\. 3º, /);
+    await usuario.keyboard('k');
+    await cartao(/^Art\. 2º, /);
+    await usuario.keyboard('{Control>}j{/Control}');
+    await usuario.keyboard('{Control>}k{/Control}');
+    expect(await cartao(/^Art\. 2º, /)).toBeInTheDocument();
   });
 
   it('anterior e próximo por botão e por seta; o "lido até" avança ao passar e nunca recua sozinho', async () => {
@@ -1900,7 +1980,9 @@ describe('leitura artigo por artigo (11.8)', () => {
     await waitFor(() => {
       expect(window.location.hash).toBe(`#/biblioteca/normas/${norma.id}`);
     });
-    expect(await screen.findByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Aa, ajustes de leitura' }),
+    ).toBeInTheDocument();
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
     // Uma entrada só no histórico para o modo foco inteiro (do artigo ao texto e de volta).
     expect((window.history.state as { idx?: number } | null)?.idx).toBe(entrada);
@@ -2521,6 +2603,166 @@ describe('Ponto de luz no Leitor (P4)', () => {
   });
 });
 
+describe('ajustes de leitura (a folha do "Aa")', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    delete document.documentElement.dataset.modoFoco;
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  it('a barra do alto fica em "Voltar", o título e o "Aa"; a folha traz o tamanho, os destaques e o foco na frase, e "Fechar" fecha', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    // Nada dos ajustes fica solto na barra.
+    expect(screen.queryByRole('group', { name: 'Tamanho do texto' })).toBeNull();
+    expect(screen.queryByRole('checkbox', { name: /^Destacar prazos/ })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: 'Foco na frase' })).toBeNull();
+    expect(botaoDosAjustes()).toHaveAttribute('aria-haspopup', 'dialog');
+
+    const folha = await folhaDosAjustes(usuario);
+    expect(folha.getByRole('group', { name: 'Tamanho do texto' })).toBeInTheDocument();
+    expect(folha.getByRole('checkbox', { name: /^Destacar prazos/ })).toBeChecked();
+    // O jsdom não tem a API de realce do navegador: "Só a frase em leitura" não se oferece.
+    const foco = folha.getByRole('combobox', { name: 'Foco na frase' });
+    expect(
+      within(foco)
+        .getAllByRole('option')
+        .map((o) => o.textContent),
+    ).toEqual(['Desligado', 'Só as palavras de destaque']);
+    expect(foco).toHaveValue('desligada');
+    expect(folha.getByRole('link', { name: 'Conta › Aparência' })).toHaveAttribute(
+      'href',
+      '#/conta/aparencia',
+    );
+
+    await usuario.click(folha.getByRole('button', { name: 'Fechar' }));
+    expect(screen.queryByRole('dialog', { name: 'Ajustes de leitura' })).toBeNull();
+  });
+
+  it('um toque no véu, fora da folha, fecha; o toque que começa num controle e termina fora, não', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await folhaDosAjustes(usuario);
+    const folha = screen.getByRole('dialog', { name: 'Ajustes de leitura' });
+    // O jsdom não tem layout (a caixa mede 0 por 0): qualquer ponto com o <dialog> de alvo cai fora dela.
+    const fora = { clientX: 5, clientY: 5 };
+
+    // Apertou "A+" e soltou fora: desistiu do toque, não da folha.
+    fireEvent.pointerDown(within(folha).getByRole('button', { name: /aumentar o texto/ }), fora);
+    fireEvent.click(folha, fora);
+    expect(screen.getByRole('dialog', { name: 'Ajustes de leitura' })).toBeInTheDocument();
+    // Tocar dentro da folha, num controle, não fecha.
+    await usuario.click(within(folha).getByRole('checkbox', { name: /^Destacar prazos/ }));
+    expect(screen.getByRole('dialog', { name: 'Ajustes de leitura' })).toBeInTheDocument();
+
+    fireEvent.pointerDown(folha, fora);
+    fireEvent.click(folha, fora);
+    expect(screen.queryByRole('dialog', { name: 'Ajustes de leitura' })).toBeNull();
+  });
+
+  it('abre também pelo "⋯" do dock e pela bandeja do modo foco, onde a barra não está: o tamanho muda sem sair do foco', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { lenteDoFoco: 'corrido' });
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+
+    await usuario.click(await naBandeja(usuario, /^Ajustes de leitura/));
+    const doDock = await screen.findByRole('dialog', { name: 'Ajustes de leitura' });
+    expect(screen.queryByRole('group', { name: 'Mais ferramentas da leitura' })).toBeNull();
+    await usuario.click(within(doDock).getByRole('button', { name: 'Fechar' }));
+    expect(screen.queryByRole('dialog', { name: 'Ajustes de leitura' })).toBeNull();
+
+    await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
+    await screen.findByRole('button', { name: 'Mais ações do foco' });
+    expect(botaoDosAjustes()).toBeNull();
+    await usuario.click(await naBandeja(usuario, 'Ajustes de leitura'));
+    const doFoco = within(await screen.findByRole('dialog', { name: 'Ajustes de leitura' }));
+    await usuario.click(doFoco.getByRole('button', { name: /aumentar o texto/ }));
+    expect(doFoco.getByLabelText('Tamanho atual do texto')).toHaveTextContent('20 px');
+    await waitFor(async () => {
+      expect((await obterPreferencias(repo)).tamanhoFonte).toBe(20);
+    });
+    expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
+  });
+
+  it('mudar o tamanho no meio da norma devolve ao alto a linha que estava lá; no começo dela a página não se mexe', async () => {
+    const { repo } = await repositorioDeTeste();
+    const norma = await publicar(repo, blocosDeNormaSintetica(200), 'Sintética');
+    // O jsdom não rola nem tem altura de página: a rolagem pedida vira a posição da janela, como no navegador.
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      value: 1_000_000,
+      configurable: true,
+    });
+    const rolagem = vi.spyOn(window, 'scrollTo').mockImplementation(((opcoes: ScrollToOptions) => {
+      Object.defineProperty(window, 'scrollY', { value: opcoes.top ?? 0, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+    }) as typeof window.scrollTo);
+    try {
+      const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+      await screen.findByRole('heading', { level: 1, name: 'Sintética' });
+      await waitFor(() => {
+        expect(document.querySelector('.lista-leitor [data-index="0"]')).not.toBeNull();
+      });
+      /** A linha desenhada que está no alto da janela (a última que começa até ali, com a folga do Leitor). */
+      const linhaNoAlto = () => {
+        let indice = -1;
+        for (const el of document.querySelectorAll<HTMLElement>('.lista-leitor [data-index]')) {
+          const inicio = Number(/translateY\(([\d.]+)px\)/.exec(el.style.transform)?.[1]);
+          if (inicio <= window.scrollY + 8) indice = Math.max(indice, Number(el.dataset.index));
+        }
+        return indice;
+      };
+
+      // No começo da norma: a barra fica à vista e nada rola.
+      rolagem.mockClear();
+      const folha = await folhaDosAjustes(usuario);
+      await usuario.click(folha.getByRole('button', { name: /aumentar o texto/ }));
+      expect(folha.getByLabelText('Tamanho atual do texto')).toHaveTextContent('20 px');
+      await waitFor(async () => {
+        expect((await obterPreferencias(repo)).tamanhoFonte).toBe(20);
+      });
+      expect(rolagem).not.toHaveBeenCalled();
+
+      // No meio dela: o tamanho novo muda a altura de todas as linhas de cima, e a que estava no alto volta ao alto.
+      rolarPara(2400);
+      await waitFor(() => {
+        expect(linhaNoAlto()).toBeGreaterThan(5);
+      });
+      const antes = linhaNoAlto();
+      await usuario.click(folha.getByRole('button', { name: /aumentar o texto/ }));
+      expect(folha.getByLabelText('Tamanho atual do texto')).toHaveTextContent('22 px');
+      await waitFor(() => {
+        expect(rolagem).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(linhaNoAlto()).toBe(antes);
+      });
+      expect(window.scrollY).not.toBe(2400);
+    } finally {
+      Reflect.deleteProperty(document.documentElement, 'scrollHeight');
+    }
+  });
+
+  it('sem a API de realce do navegador, "Só a frase" gravada antes aparece como desligado', async () => {
+    const { repo } = await repositorioDeTeste();
+    await alterarPreferencias(repo, { reguaDeFoco: 'frase' });
+    const norma = await publicar(repo, LEI);
+    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    await screen.findByText(/A jurisdição penal/);
+    await waitFor(() => {
+      expect(document.querySelector('.leitor')).toHaveAttribute('data-regua-foco', 'frase');
+    });
+    const foco = (await folhaDosAjustes(usuario)).getByRole('combobox', { name: 'Foco na frase' });
+    expect(within(foco).queryByRole('option', { name: 'Só a frase em leitura' })).toBeNull();
+    expect(foco).toHaveValue('desligada');
+  });
+});
+
 describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
   afterEach(() => {
     instalarMatchMedia();
@@ -2549,7 +2791,7 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     nomesDosBotoes(screen.getByRole('group', { name: 'Ferramentas da leitura' }));
 
   it.each([390, 768, 1280])(
-    'a barra tem Buscar, Modo foco e o ⋯ em %i px; Filtrar e Ações moram no ⋯, a dois toques; criar é com o "+"',
+    'a barra tem Buscar, Modo foco e o ⋯ em %i px; Filtrar, Ações e os ajustes de leitura moram no ⋯, a dois toques; criar é com o "+"',
     async (largura) => {
       janelaDe(largura);
       const { repo } = await repositorioDeTeste();
@@ -2575,7 +2817,7 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
         within(menu)
           .getAllByRole('button')
           .map((b) => b.firstElementChild?.textContent),
-      ).toEqual(['Filtrar', 'Ações']);
+      ).toEqual(['Filtrar', 'Ações', 'Ajustes de leitura']);
 
       // Filtrar: o diálogo abre e o menu fecha (a volta do foco ao ⋯, ao fechar o diálogo, é do E2E:
       // o jsdom não tem <dialog> modal).

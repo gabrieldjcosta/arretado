@@ -11,6 +11,7 @@ function montar(extra: Partial<Parameters<typeof BandejaDoFoco>[0]> = {}) {
     buscar: vi.fn(),
     filtrar: vi.fn(),
     acoes: vi.fn(),
+    ajustes: vi.fn(),
     estrelar: vi.fn(),
     lidoAteAqui: vi.fn(),
     sair: vi.fn(),
@@ -107,6 +108,7 @@ describe('BandejaDoFoco', () => {
       ['Ações', f.acoes],
       ['Estrelar', f.estrelar],
       ['Lido até aqui', f.lidoAteAqui],
+      ['Ajustes de leitura', f.ajustes],
       ['Sair do foco', f.sair],
     ] as const) {
       await abrir();

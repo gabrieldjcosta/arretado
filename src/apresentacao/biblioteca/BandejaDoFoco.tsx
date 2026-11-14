@@ -22,6 +22,7 @@ export function BandejaDoFoco({
   filtrar,
   filtro,
   acoes,
+  ajustes,
   estrelar,
   lidoAteAqui,
   sair,
@@ -42,6 +43,8 @@ export function BandejaDoFoco({
   /** A frase do filtro ligado, se há um. */
   filtro?: string | undefined;
   acoes: () => void;
+  /** Abre a folha dos ajustes de leitura (tamanho do texto, destaques, foco na frase). */
+  ajustes: () => void;
   estrelar: () => void;
   lidoAteAqui: () => void;
   sair: () => void;
@@ -176,6 +179,9 @@ export function BandejaDoFoco({
               </button>
             </>
           )}
+          <button type="button" aria-haspopup="dialog" onClick={agir(ajustes)}>
+            Ajustes de leitura
+          </button>
           <button
             type="button"
             aria-disabled={lente === 'corrido' && !podeCartao}
