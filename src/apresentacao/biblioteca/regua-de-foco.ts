@@ -37,11 +37,12 @@ const ABREVIACOES = new Set([
   'seç',
   'sec',
   'dec',
-  'lei',
   'obs',
+  'res',
 ]);
 
 const FECHA = /["'”’)\]]/;
+const ABRE = /["“'‘([]/;
 const COMECA_FRASE = /[\p{Lu}\p{N}"“'‘(§[]/u;
 
 function palavraAntes(texto: string, ponto: number): string {
@@ -51,14 +52,53 @@ function palavraAntes(texto: string, ponto: number): string {
 }
 
 /**
+ * O que está entre parênteses que abrem e fecham na mesma linha: lá dentro nada fecha a frase
+ * ("(salvo se houver recurso; nesse caso, 60 dias)", "(art. 66, III; art. 68)"). O parêntese sem par
+ * não segura nada: a alínea "a)" e o que abre e não fecha ficam como texto comum.
+ */
+function entreParenteses(texto: string): boolean[] {
+  const dentro = new Array<boolean>(texto.length).fill(false);
+  const abertos: number[] = [];
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (c === '\n') abertos.length = 0;
+    else if (c === '(') abertos.push(i);
+    else if (c === ')') {
+      const abre = abertos.pop();
+      // Só o de fora marca: cada posição é marcada uma vez, e a conta segue linear.
+      if (abre !== undefined && abertos.length === 0) dentro.fill(true, abre + 1, i);
+    }
+  }
+  return dentro;
+}
+
+/**
  * Parte o texto em frases. Fecha a frase o ponto final, de interrogação ou de exclamação seguido de
  * espaço e de começo de frase (maiúscula, número, aspas ou §), o ponto e vírgula e a quebra de
- * linha. Não fecha em abreviação ("Art. 5º"), nem em número com ponto ("1.000") ou em letra
- * sozinha ("I."). Puro e linear; os espaços das pontas ficam de fora.
+ * linha. Não fecha em abreviação ("Art. 5º"), nem em número com ponto ("1.000"), em letra sozinha
+ * ("I.") ou dentro de parênteses. O número antes do ponto só segura a frase quando é rótulo: o item
+ * numerado ("1. Primeiro") e o artigo citado no começo ("Art. 121. Matar alguém"); no fim da frase
+ * ("de 1984. O juiz decidirá.") ele fecha. Puro e linear; os espaços das pontas ficam de fora.
  */
 export function frasesDoTexto(texto: string): Frase[] {
   const frases: Frase[] = [];
+  const dentro = entreParenteses(texto);
   let inicio = 0;
+  /** A posição é a primeira da frase em aberto, fora os espaços e o que abre (aspas, parêntese). */
+  const comecoDaFrase = (posicao: number) => {
+    let i = inicio;
+    while (i < posicao && (/\s/.test(texto[i] ?? '') || ABRE.test(texto[i] ?? ''))) i++;
+    return i === posicao;
+  };
+  /** O número que começa em `comeco` é rótulo (item numerado ou artigo citado), não o fim da frase. */
+  const numeroDeRotulo = (comeco: number) => {
+    if (comecoDaFrase(comeco)) return true;
+    let antes = comeco;
+    while (antes > inicio && /[^\S\n]/.test(texto[antes - 1] ?? '')) antes--;
+    if (texto[antes - 1] !== '.') return false;
+    const palavra = palavraAntes(texto, antes - 1);
+    return ABREVIACOES.has(palavra) && comecoDaFrase(antes - 1 - palavra.length);
+  };
   const fechar = (fim: number) => {
     let i = inicio;
     let f = fim;
@@ -73,6 +113,7 @@ export function frasesDoTexto(texto: string): Frase[] {
       fechar(i);
       continue;
     }
+    if (dentro[i]) continue;
     if (c === ';') {
       let fim = i + 1;
       while (FECHA.test(texto[fim] ?? '')) fim++;
@@ -99,8 +140,8 @@ export function frasesDoTexto(texto: string): Frase[] {
     }
     if (c === '.') {
       const palavra = palavraAntes(texto, i);
-      if (ABREVIACOES.has(palavra) || /^\p{L}$/u.test(palavra) || /^[\p{N}]+$/u.test(palavra))
-        continue;
+      if (ABREVIACOES.has(palavra) || /^\p{L}$/u.test(palavra)) continue;
+      if (/^[\p{N}]+$/u.test(palavra) && numeroDeRotulo(i - palavra.length)) continue;
     }
     if (!COMECA_FRASE.test(inicial)) continue;
     fechar(fim);
