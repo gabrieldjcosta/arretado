@@ -1168,3 +1168,39 @@ html[data-texto-fio] .m-fio .m-proximo {
 .m-fio .m-cabeca .m-cobre b {
   margin-right: 0.25em;
 }
+
+/* Desvio 476: a linha de retorno do Agora (`RetornoM`) não existe no mockup. É o que a D-D25 (itens 6 e 11) manda
+   recolher dos avisos do Hoje: versão nova, backup, a lei mudou e o Lembrete, uma linha por vez, no fim da tela.
+   Só usa o que o mockup já tem: o texto é o `.m-quieto` e as ações são o botão de texto da folha da Conta
+   (`.m-entrar-codigo`), aqui em linha e com 44 px de alvo; a primeira leva a tinta do texto. Sem animação de entrada. */
+.m-fio .m-retorno {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  margin-top: 14px;
+}
+.m-fio .m-retorno > span:first-child {
+  flex: 1 1 12em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.m-fio .m-retorno-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -10px;
+}
+.m-fio .m-retorno .m-entrar-codigo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 10px;
+}
+.m-fio .m-retorno-acoes > :first-child,
+.m-fio .m-retorno .m-entrar-codigo:hover {
+  color: var(--m-texto);
+}
+.m-fio .m-retorno .m-entrar-codigo:active {
+  opacity: 0.7;
+}

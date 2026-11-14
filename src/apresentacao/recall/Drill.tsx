@@ -26,7 +26,6 @@ import { usePassagemDeCartao } from '../componentes/passagem';
 import { marcarEscolha } from '../componentes/traco/escolha';
 import { TracoDeSelecao } from '../componentes/traco/TracoDeSelecao';
 import { useRepositorio } from '../dados/contexto';
-import { ROTULO_DA_AREA } from '../textos';
 import { useVoz } from '../voz';
 import { ROTULO_RESPOSTA } from './rotulos';
 import { TopoDaRevisao } from './TopoDaRevisao';
@@ -286,13 +285,13 @@ export function Drill() {
                 <Link to="/recall/frases/revisar" className="botao principal">
                   Seguir para as frases ({estado.frases})
                 </Link>
-                <Link to="/recall" className="botao botao-texto">
-                  Voltar ao {ROTULO_DA_AREA.recall}
+                <Link to="/" className="botao botao-texto">
+                  Voltar ao Agora
                 </Link>
               </>
             ) : (
-              <Link to="/recall" className="botao principal">
-                Voltar ao {ROTULO_DA_AREA.recall}
+              <Link to="/" className="botao principal">
+                Voltar ao Agora
               </Link>
             )
           }

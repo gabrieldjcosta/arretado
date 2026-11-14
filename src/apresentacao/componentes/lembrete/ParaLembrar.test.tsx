@@ -1,11 +1,11 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { LEMBRETE_MAX } from '../../core/modelo';
-import { alterarPreferencias, obterPreferencias } from '../../core/preferencias';
-import { estacionar, resolverNota } from '../../dominios/sessao/estacionamento';
-import { encerrarSessao, iniciarSessao } from '../../dominios/sessao/servico';
-import { repositorioDeTeste } from '../../testes/repositorio';
-import { App } from '../App';
+import { LEMBRETE_MAX } from '../../../core/modelo';
+import { alterarPreferencias, obterPreferencias } from '../../../core/preferencias';
+import { estacionar, resolverNota } from '../../../dominios/sessao/estacionamento';
+import { encerrarSessao, iniciarSessao } from '../../../dominios/sessao/servico';
+import { repositorioDeTeste } from '../../../testes/repositorio';
+import { App } from '../../App';
 
 /** Deixa um teste contar, segurar ou fazer falhar a gravação do "Para lembrar". */
 const gravacao = vi.hoisted(() => ({
@@ -13,8 +13,8 @@ const gravacao = vi.hoisted(() => ({
   segurar: undefined as Promise<void> | undefined,
   falharUmaVez: false,
 }));
-vi.mock('../../core/preferencias', async (original) => {
-  const real = await original<typeof import('../../core/preferencias')>();
+vi.mock('../../../core/preferencias', async (original) => {
+  const real = await original<typeof import('../../../core/preferencias')>();
   return {
     ...real,
     alterarPreferencias: async (...args: Parameters<typeof real.alterarPreferencias>) => {
@@ -31,8 +31,8 @@ vi.mock('../../core/preferencias', async (original) => {
 
 /** Deixa um teste fazer falhar a marcação de uma nota do Estacionamento. */
 const marcacao = vi.hoisted(() => ({ falharUmaVez: false }));
-vi.mock('../../dominios/sessao/estacionamento', async (original) => {
-  const real = await original<typeof import('../../dominios/sessao/estacionamento')>();
+vi.mock('../../../dominios/sessao/estacionamento', async (original) => {
+  const real = await original<typeof import('../../../dominios/sessao/estacionamento')>();
   return {
     ...real,
     resolverNota: async (...args: Parameters<typeof real.resolverNota>) => {

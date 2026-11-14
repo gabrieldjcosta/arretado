@@ -2,11 +2,11 @@
 // (`Preferencias.lembrete`, uma só), num diálogo que abre de qualquer tela com o "+". O nome é dele e o
 // subtítulo diz o que o app não faz: sem data, hora nem aviso, então nada promete notificação.
 import { useCallback, useId } from 'react';
-import { obterPreferencias } from '../../core/preferencias';
-import { Dialogo } from '../componentes/Dialogo';
-import { useDados } from '../dados/contexto';
+import { obterPreferencias } from '../../../core/preferencias';
+import { Dialogo } from '../Dialogo';
+import { useDados } from '../../dados/contexto';
 import { CampoDoLembrete, NotasDasSessoes } from './ParaLembrar';
-import './estilos-hoje.css';
+import './lembrete.css';
 
 function Conteudo({
   idDoTitulo,

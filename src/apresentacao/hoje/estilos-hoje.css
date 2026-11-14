@@ -259,12 +259,6 @@
   }
 }
 
-/* O "Lembrete" do "+" (DialogoDoLembrete), a nota que era o "Para lembrar" do Hoje, num diálogo. A nota tem
-   margem embaixo para o que vem depois; aqui o que vem depois é o "Fechar", mais perto. */
-dialog.dialogo-lembrete .para-lembrar {
-  margin-bottom: 0.75rem;
-}
-
 /* O Hoje em duas colunas (P7b): a partir de 900 px o Agora, com a linha de parada, à esquerda; o
    "Em seguida" e os avisos à direita (a coluna fica vazia quando não há nenhum). Abaixo disso é uma coluna
    só, na mesma ordem. */
@@ -278,51 +272,6 @@ dialog.dialogo-lembrete .para-lembrar {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: start;
   }
-}
-
-/* A nota do Lembrete (P7b; desde a D-D15 num diálogo aberto pelo "+"): um campo curto e o "Salvar" ao
-   lado do estado, sobre o fundo. O botão é o secundário: a ação do Hoje é a do Agora. */
-.para-lembrar {
-  margin: 0 0 1rem;
-}
-
-.para-lembrar textarea {
-  min-height: 5.5rem;
-}
-
-/* As notas do Estacionamento acima do campo: linhas de 44 px com a caixa do app. A marcada fica
-   riscada até a pessoa sair do Hoje, para dar para desfazer um toque sem querer. */
-.para-lembrar-notas {
-  margin: 0 0 0.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-.para-lembrar-notas .opcao {
-  margin: 0;
-}
-
-.para-lembrar-notas span {
-  overflow-wrap: anywhere;
-}
-
-.para-lembrar-notas input:checked + span {
-  color: var(--texto-atenuado);
-  text-decoration: line-through;
-}
-
-.para-lembrar .linha-acoes {
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.para-lembrar-estado {
-  margin: 0;
-}
-
-/* Perto do teto de caracteres o contador aparece, no canto da linha. */
-.para-lembrar-contador {
-  margin: 0 0 0 auto;
 }
 
 /* Hoje do tamanho do seu tempo (AP-01): quatro chips de 44 px e a lista do "Por que estes?". */

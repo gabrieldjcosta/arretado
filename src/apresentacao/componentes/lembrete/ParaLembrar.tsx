@@ -6,17 +6,17 @@
 // bloco não está mais no Hoje: a nota vive no "Lembrete" do "+" (`DialogoDoLembrete`), que monta estas
 // duas peças.
 import { useCallback, useEffect, useId, useRef, useState, type SubmitEvent } from 'react';
-import { LEMBRETE_MAX } from '../../core/modelo';
-import { alterarPreferencias } from '../../core/preferencias';
-import type { Repositorio } from '../../core/persistencia';
+import { LEMBRETE_MAX } from '../../../core/modelo';
+import { alterarPreferencias } from '../../../core/preferencias';
+import type { Repositorio } from '../../../core/persistencia';
 import {
   chaveDeNota,
   notasParaLembrar,
   resolverNota,
   type EnderecoDeNota,
-} from '../../dominios/sessao/estacionamento';
-import { useDados, useRepositorio } from '../dados/contexto';
-import './estilos-hoje.css';
+} from '../../../dominios/sessao/estacionamento';
+import { useDados, useRepositorio } from '../../dados/contexto';
+import './lembrete.css';
 
 /** Daqui até o teto o campo mostra quantos caracteres já tem: colar mais que o teto corta sem dizer. */
 const AVISO_DO_TETO = LEMBRETE_MAX - 50;
