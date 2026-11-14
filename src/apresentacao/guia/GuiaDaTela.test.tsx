@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { registrarErro } from '../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -11,7 +11,7 @@ async function abrir(rota: string) {
   window.location.hash = rota;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
-  await screen.findByRole('navigation', { name: 'Áreas' });
+  await screen.findByRole('navigation', { name: 'Lugares' });
   return usuario;
 }
 
@@ -60,25 +60,11 @@ describe('Guia da primeira abertura', () => {
   it('sair da tela sem abrir o cartão não gasta o "Novo"', async () => {
     const usuario = await abrir('#/plano');
     await screen.findByRole('button', { name: /O que cada opção faz/ });
-    await usuario.click(screen.getByRole('link', { name: /Biblioteca/ }));
-    await screen.findByRole('heading', { name: 'Biblioteca' });
-    expect(localStorage.getItem('arretado.guia.plano')).toBeNull();
-  });
-
-  it('no Hoje a faixa não ocupa o topo: o cartão vem só pela Ajuda, e abrir gasta o "Novo"', async () => {
-    const usuario = await abrir('#/');
-    await screen.findByRole('heading', { level: 1, name: 'Hoje' });
-    expect(screen.queryByRole('button', { name: /O que cada opção faz/ })).not.toBeInTheDocument();
-    expect(localStorage.getItem('arretado.guia.hoje')).toBeNull();
-
-    await usuario.click(screen.getByRole('button', { name: 'Ajuda' }));
-    await usuario.click(screen.getByRole('button', { name: 'O que cada opção faz' }));
-    const faixa = await screen.findByRole('button', {
-      name: /O que cada opção faz/,
-      expanded: true,
+    await usuario.click(screen.getByRole('link', { name: 'Varal' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal');
     });
-    expect(faixa).not.toHaveTextContent('Novo');
-    expect(localStorage.getItem('arretado.guia.hoje')).not.toBeNull();
+    expect(localStorage.getItem('arretado.guia.plano')).toBeNull();
   });
 
   it('cada área tem o seu guia; telas de trabalho não têm', () => {

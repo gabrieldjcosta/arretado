@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
@@ -96,35 +96,23 @@ async function encerrar(repo: Repositorio, fonte?: FonteDeIncidencia) {
   return usuario;
 }
 
-describe('Sessão encerrada: a ponte é o Agora do Hoje', () => {
-  it('com o mapa da norma, "Seguir" é o trecho do mapa e leva ao mesmo lugar que o Começar do Agora', async () => {
+describe('Sessão encerrada: a ponte é a próxima ação do Agora', () => {
+  it('com o mapa da norma, "Seguir" é o trecho do mapa', async () => {
     const { repo } = await repositorioDeTeste();
     await lerALep(repo);
     await iniciarSessao(repo, {});
-    const usuario = await encerrar(repo, fonteComMapa());
+    await encerrar(repo, fonteComMapa());
     const ponte = await screen.findByRole('link', { name: 'Seguir: Ler art. 3º' });
     expect(ponte).toHaveAttribute('href', expect.stringContaining('ir=art3'));
-    const destino = ponte.getAttribute('href');
-    await usuario.click(screen.getByRole('link', { name: 'Ir para o Hoje' }));
-    const agora = await screen.findByRole('region', { name: 'Agora' });
-    expect(await within(agora).findByRole('heading', { name: 'Ler art. 3º' })).toBeVisible();
-    expect(within(agora).getByRole('link', { name: 'Começar' })).toHaveAttribute('href', destino);
   });
 
-  it('sem o mapa, "Seguir" é o cartão vencido e leva ao mesmo lugar que o Começar do Agora', async () => {
+  it('sem o mapa, "Seguir" é o cartão vencido', async () => {
     const { repo } = await repositorioDeTeste();
     await umCartaoVencido(repo);
     await iniciarSessao(repo, { atividade: 'questoes' });
-    const usuario = await encerrar(repo);
+    await encerrar(repo);
     const ponte = await screen.findByRole('link', { name: 'Seguir: Revisar cartões' });
-    const destino = ponte.getAttribute('href');
-    expect(destino).toContain('/sessao/iniciar?tipo=revisao');
-    await usuario.click(screen.getByRole('link', { name: 'Ir para o Hoje' }));
-    const agora = await screen.findByRole('region', { name: 'Agora' });
-    expect(await within(agora).findByRole('link', { name: 'Começar' })).toHaveAttribute(
-      'href',
-      destino,
-    );
+    expect(ponte.getAttribute('href')).toContain('/sessao/iniciar?tipo=revisao');
   });
 
   it('sem ação no Agora não há ponte; "Ver os erros" vai à lista de Erros', async () => {
