@@ -302,18 +302,10 @@ const EVIDENCIA_SO_NA_RAIZ = [
 const CSS_DO_ANEL = 'evidencia.css';
 /**
  * Os únicos CSS que podem falar de `neon` ou `bloom`: os tokens (`estilos.css`) e os arquivos dos traços
- * que a caneta desenha: o Zé, a escrita do nome, o traço de seleção, o quadro do cacto e os ícones do
+ * que a caneta desenha: o Zé, o traço de seleção e os ícones do
  * Passeio, que se desenham na hora. Botão, texto, cartão, borda e ícone parado não brilham.
  */
-const CSS_COM_NEON = [
-  'estilos.css',
-  'ze.css',
-  'escrita.css',
-  'escrita-b.css',
-  'traco.css',
-  'quadro.css',
-  'estilos-passeio.css',
-];
+const CSS_COM_NEON = ['estilos.css', 'ze.css', 'traco.css', 'estilos-passeio.css'];
 
 function arquivosCss(pasta: string): string[] {
   return readdirSync(pasta, { withFileTypes: true }).flatMap((e) => {

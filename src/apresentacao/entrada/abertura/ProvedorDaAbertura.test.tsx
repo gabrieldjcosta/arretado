@@ -1,10 +1,9 @@
-import { StrictMode, useEffect } from 'react';
+import { StrictMode } from 'react';
 import { MemoryRouter } from 'react-router';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import { alterarPreferencias } from '../../../core/preferencias';
 import { simularMovimento } from '../../../testes/movimento';
 import { repositorioDeTeste } from '../../../testes/repositorio';
-import { Marca } from '../../componentes/escrita/Marca';
 import { lembrarDaEscrita } from '../../componentes/escrita/frequencia';
 import { useEstadoDaAbertura, type OndeEscrever } from '../../componentes/escrita/vez-da-escrita';
 import { ContextoRepositorio } from '../../dados/contexto';
@@ -29,174 +28,164 @@ beforeEach(() => {
 });
 
 /**
- * Quem abre por cima do app (a Chegada) pergunta isto: aqui só mostra a resposta. `voa`: a luz da Abertura vai
- * visitar o Zé das Boas-vindas, e a Chegada que abrir agora nasce escondida, esperando ela.
+ * O que o quadro do Fio e a Chegada perguntam à Abertura: aqui só mostra a resposta. `data-camada`: a escrita que o
+ * quadro mostra (`camadaDoFio`), ou "nenhuma"; `data-voa`: a luz visita o Zé das Boas-vindas; o botão pula a abertura,
+ * como o quadro faz ao toque.
  */
-function Sonda({ aoOferecer }: { aoOferecer?: () => null }) {
-  const { emCurso, voaParaAChegada, encontro } = useEstadoDaAbertura();
-  // Como a Chegada faz: se oferece ao Encontro; a Abertura pergunta onde está o pé do Zé quando a luz parte.
-  useEffect(() => {
-    if (!aoOferecer) return;
-    return encontro.oferecer({ medirPe: aoOferecer, receber: () => undefined });
-  }, [aoOferecer, encontro]);
+function Sonda() {
+  const { camadaDoFio, emCurso, voaParaAChegada } = useEstadoDaAbertura();
   return (
-    <p data-testid="sonda" data-voa={voaParaAChegada ? 'sim' : 'nao'}>
-      {emCurso ? 'espera' : 'livre'}
-    </p>
+    <div>
+      <p
+        data-testid="sonda"
+        data-camada={camadaDoFio ? camadaDoFio.escrita : 'nenhuma'}
+        data-voa={voaParaAChegada ? 'sim' : 'nao'}
+      >
+        {emCurso ? 'espera' : 'livre'}
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          camadaDoFio?.aoSair('pulou');
+        }}
+      >
+        pular
+      </button>
+    </div>
   );
 }
 
-async function montar(
-  opcoes: { estrito?: boolean; soEstudo?: boolean; aoOferecer?: () => null } = {},
-) {
+async function montar(opcoes: { estrito?: boolean; soEstudo?: boolean; rota?: string } = {}) {
   const { repo } = await repositorioDeTeste({ inicio: HOJE });
   if (opcoes.soEstudo) await alterarPreferencias(repo, { modoSoEstudo: true });
   const arvore = (
-    <ContextoRepositorio.Provider value={repo}>
-      <ProvedorDaAbertura>
-        <a className="marca" href="#/">
-          <Marca />
-        </a>
-        <Sonda aoOferecer={opcoes.aoOferecer} />
-      </ProvedorDaAbertura>
-    </ContextoRepositorio.Provider>
+    <MemoryRouter initialEntries={[opcoes.rota ?? '/']}>
+      <ContextoRepositorio.Provider value={repo}>
+        <ProvedorDaAbertura>
+          <p data-testid="app">o app</p>
+          <Sonda />
+        </ProvedorDaAbertura>
+      </ContextoRepositorio.Provider>
+    </MemoryRouter>
   );
   const vista = render(opcoes.estrito ? <StrictMode>{arvore}</StrictMode> : arvore);
-  const camada = () => vista.container.querySelector('.abertura');
-  // A escrita do cabeçalho (`svg.eb` dentro de `.marca`) e o lockup parado (com o ponto de luz).
-  const escritaNoCabecalho = () => vista.container.querySelector('.marca svg.eb');
-  const parado = () => vista.container.querySelector('.marca .lockup-ponto');
-  const sonda = () => vista.queryByTestId('sonda')?.textContent ?? null;
-  const voa = () => vista.queryByTestId('sonda')?.getAttribute('data-voa') ?? null;
-  return { ...vista, camada, escritaNoCabecalho, parado, sonda, voa };
+  const lido = (atributo: string) => vista.queryByTestId('sonda')?.getAttribute(atributo) ?? null;
+  return {
+    ...vista,
+    camada: () => lido('data-camada'),
+    voa: () => lido('data-voa'),
+    sonda: () => vista.queryByTestId('sonda')?.textContent ?? null,
+    app: () => vista.queryByTestId('app'),
+    pular: () => {
+      fireEvent.click(vista.getByRole('button', { name: 'pular' }));
+    },
+  };
 }
 
 const guardado = () => JSON.parse(window.localStorage.getItem(CHAVE) ?? 'null') as unknown;
 
-describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
-  it('primeira vez: o cabeçalho espera, a tela cheia escreve e o cabeçalho nasce parado', async () => {
-    const { camada, escritaNoCabecalho, parado, sonda, container } = await montar();
-    // Decidindo: nenhuma das duas escreve, e o app (o cabeçalho, quem abre por cima) ainda nem montou.
-    expect(camada()).toBeNull();
-    expect(escritaNoCabecalho()).toBeNull();
-    expect(parado()).toBeNull();
+describe('ProvedorDaAbertura: quem escreve o nome', () => {
+  it('primeira vez: o app espera e o quadro do Fio escreve o nome completo', async () => {
+    const { camada, sonda, app } = await montar();
+    // Decidindo: o app ainda nem montou.
+    expect(app()).toBeNull();
     expect(sonda()).toBeNull();
 
     await waitFor(() => {
-      expect(camada()).not.toBeNull();
+      expect(camada()).toBe('completa');
     });
-    expect(camada()?.querySelector('svg.eb')).not.toBeNull();
-    expect(camada()?.querySelector('svg.eb')).not.toHaveClass('curta');
-    // O nome não se escreve nos dois lugares: o cabeçalho tem o lockup parado, com o ponto de luz.
-    expect(escritaNoCabecalho()).toBeNull();
-    await waitFor(() => {
-      expect(parado()).not.toBeNull();
-    });
-    expect(container.querySelectorAll('svg.eb')).toHaveLength(1);
     expect(sonda()).toBe('espera');
+    expect(app()).not.toBeNull();
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 
   it('o pulo entra na conta do Dia', async () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
-    const { camada } = await montar();
+    const { camada, pular } = await montar();
     await waitFor(() => {
-      expect(camada()).not.toBeNull();
+      expect(camada()).not.toBe('nenhuma');
     });
-    // Com a máquina cheia os ouvintes do pulo podem chegar depois da camada: toca até a camada sair.
+    pular();
     await waitFor(() => {
-      fireEvent.pointerDown(document.body);
-      expect(camada()).toBeNull();
+      expect(camada()).toBe('nenhuma');
     });
     expect(guardado()).toEqual({ dia: '2026-10-20', puladas: 1 });
   });
 
-  it('três aberturas seguidas puladas calam a tela cheia até o Dia seguinte: a quarta nasce no cabeçalho, parado, na hora', async () => {
+  it('três aberturas seguidas puladas calam a escrita até o Dia seguinte: a quarta não abre, na hora', async () => {
     window.localStorage.setItem(CHAVE, '{"dia":"2026-10-20","puladas":3}');
-    const { camada, escritaNoCabecalho, parado, sonda } = await montar();
-    expect(camada()).toBeNull();
-    expect(escritaNoCabecalho()).toBeNull();
-    expect(parado()).not.toBeNull();
+    const { camada, sonda } = await montar();
+    expect(camada()).toBe('nenhuma');
     expect(sonda()).toBe('livre');
   });
 
-  it('um toque pula: a camada sai, a espera acaba e o cabeçalho segue parado', async () => {
-    const { camada, escritaNoCabecalho, parado, sonda } = await montar();
+  it('um toque pula: a camada sai e a espera acaba', async () => {
+    const { camada, sonda, pular } = await montar();
     await waitFor(() => {
-      expect(camada()).not.toBeNull();
+      expect(camada()).toBe('completa');
     });
-    fireEvent.pointerDown(document.body);
+    pular();
     await waitFor(() => {
-      expect(camada()).toBeNull();
+      expect(camada()).toBe('nenhuma');
     });
     expect(sonda()).toBe('livre');
-    expect(escritaNoCabecalho()).toBeNull();
-    expect(parado()).not.toBeNull();
   });
 
-  it('primeira abertura do Dia seguinte: a tela cheia escreve o nome em 2,4 s', async () => {
+  it('primeira abertura do Dia seguinte: o nome se escreve em 2,4 s', async () => {
     lembrarDaEscrita(new Date('2026-10-19T12:00:00Z'));
     const { camada } = await montar();
     await waitFor(() => {
-      expect(camada()).toHaveAttribute('data-escrita', 'doDia');
+      expect(camada()).toBe('doDia');
     });
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 
-  it('demais aberturas do Dia: a tela cheia escreve o nome em 1,6 s (D-D14)', async () => {
+  it('demais aberturas do Dia: o nome se escreve em 1,6 s (D-D14)', async () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
-    const { camada, escritaNoCabecalho, parado } = await montar();
+    const { camada } = await montar();
     await waitFor(() => {
-      expect(camada()).toHaveAttribute('data-escrita', 'depressa');
-    });
-    // O nome não se escreve nos dois lugares, e o Dia segue guardado.
-    expect(escritaNoCabecalho()).toBeNull();
-    await waitFor(() => {
-      expect(parado()).not.toBeNull();
+      expect(camada()).toBe('depressa');
     });
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
 
-  it('um Dia guardado no futuro (a semente dos testes): nada de camada nem de espera, o cabeçalho parado na hora', async () => {
+  it('um Dia guardado no futuro (a semente dos testes): nada de camada nem de espera', async () => {
     window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
-    const { camada, escritaNoCabecalho, parado, sonda } = await montar();
-    expect(camada()).toBeNull();
-    expect(escritaNoCabecalho()).toBeNull();
-    expect(parado()).not.toBeNull();
+    const { camada, sonda } = await montar();
+    expect(camada()).toBe('nenhuma');
     expect(sonda()).toBe('livre');
   });
 
-  it('movimento reduzido do sistema: nenhuma camada, o cabeçalho parado, a primeira vez guardada', async () => {
+  it('movimento reduzido do sistema: nenhuma camada e a primeira vez não é guardada', async () => {
     simularMovimento('reduzido');
-    const { camada, parado, sonda } = await montar();
-    expect(camada()).toBeNull();
-    expect(parado()).not.toBeNull();
+    const { camada, sonda } = await montar();
+    expect(camada()).toBe('nenhuma');
     expect(sonda()).toBe('livre');
     expect(window.localStorage.getItem(CHAVE)).toBeNull();
   });
 
-  it('com o "só estudo" ligado a tela cheia não abre: o cabeçalho escreve como sempre escreveu', async () => {
-    const { camada, escritaNoCabecalho, parado, sonda } = await montar({ soEstudo: true });
+  it('com o "só estudo" ligado a escrita completa não abre', async () => {
+    const { camada, sonda } = await montar({ soEstudo: true });
     expect(sonda()).toBeNull();
     await waitFor(() => {
-      expect(escritaNoCabecalho()).not.toBeNull();
+      expect(sonda()).toBe('livre');
     });
-    expect(camada()).toBeNull();
-    expect(parado()).toBeNull();
-    expect(sonda()).toBe('livre');
+    expect(camada()).toBe('nenhuma');
     await waitFor(() => {
       expect(guardado()).toEqual({ dia: '2026-10-20' });
     });
   });
 
-  it('no StrictMode (efeitos em dobro) a escrita é de um lugar só', async () => {
-    const { camada, escritaNoCabecalho, container } = await montar({ estrito: true });
+  it('no StrictMode (efeitos em dobro) a decisão e a camada são de um lugar só', async () => {
+    const { camada, pular } = await montar({ estrito: true });
     await waitFor(() => {
-      expect(camada()).not.toBeNull();
+      expect(camada()).toBe('completa');
     });
-    expect(escritaNoCabecalho()).toBeNull();
-    expect(container.querySelectorAll('.abertura')).toHaveLength(1);
-    expect(container.querySelectorAll('svg.eb')).toHaveLength(1);
+    pular();
+    await waitFor(() => {
+      expect(camada()).toBe('nenhuma');
+    });
+    expect(guardado()).toEqual({ dia: '2026-10-20', puladas: 1 });
   });
 
   describe('o app espera a decisão', () => {
@@ -207,52 +196,51 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
           decidir = resolver;
         }),
       );
-      const { container, camada, sonda } = await montar();
-      expect(container.querySelector('.marca')).toBeNull();
+      const { camada, sonda, app } = await montar();
+      expect(app()).toBeNull();
       expect(sonda()).toBeNull();
-      expect(camada()).toBeNull();
       await act(async () => {
         decidir({ onde: 'tela', escrita: 'completa', calmo: false, chegada: false });
         await Promise.resolve();
       });
-      expect(camada()).not.toBeNull();
-      expect(container.querySelector('.marca')).not.toBeNull();
+      expect(camada()).toBe('completa');
+      expect(app()).not.toBeNull();
       expect(sonda()).toBe('espera');
     });
 
-    it('a Abertura não abre (só estudo): o app monta quando a leitura acaba e o cabeçalho escreve', async () => {
-      const { container, camada, escritaNoCabecalho } = await montar({ soEstudo: true });
-      expect(container.querySelector('.marca')).toBeNull();
+    it('a Abertura não abre (só estudo): o app monta quando a leitura acaba', async () => {
+      const { app, camada } = await montar({ soEstudo: true });
+      expect(app()).toBeNull();
       await waitFor(() => {
-        expect(escritaNoCabecalho()).not.toBeNull();
+        expect(app()).not.toBeNull();
       });
-      expect(camada()).toBeNull();
+      expect(camada()).toBe('nenhuma');
     });
 
     it('com o Dia guardado no futuro e com movimento reduzido o app monta na hora: nada a decidir', async () => {
       window.localStorage.setItem(CHAVE, '{"dia":"9999-12-31"}');
       const semente = await montar();
-      expect(semente.container.querySelector('.marca')).not.toBeNull();
+      expect(semente.app()).not.toBeNull();
       semente.unmount();
       simularMovimento('reduzido');
       const reduzido = await montar();
-      expect(reduzido.container.querySelector('.marca')).not.toBeNull();
+      expect(reduzido.app()).not.toBeNull();
     });
 
     it('a espera não é curta demais: com a decisão pendente, aos 0,2 s o app ainda não montou', async () => {
       vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
-      const { container } = await montar();
+      const { app } = await montar();
       await new Promise((resolver) => setTimeout(resolver, 200));
-      expect(container.querySelector('.marca')).toBeNull();
+      expect(app()).toBeNull();
     });
 
     it('se a decisão demora, o app aparece depois de 0,4 s: a Abertura nunca atrasa o uso', async () => {
       vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
-      const { container, sonda } = await montar();
-      expect(container.querySelector('.marca')).toBeNull();
+      const { app, sonda } = await montar();
+      expect(app()).toBeNull();
       await waitFor(
         () => {
-          expect(container.querySelector('.marca')).not.toBeNull();
+          expect(app()).not.toBeNull();
         },
         { timeout: 1500 },
       );
@@ -271,39 +259,38 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
         tela()?.remove();
       });
 
-      it('fica enquanto a Abertura decide e sai por baixo da camada, no quadro em que o app monta', async () => {
-        const { camada, container } = await montar();
-        expect(container.querySelector('.marca')).toBeNull();
+      it('fica enquanto a Abertura decide e sai no quadro em que o app monta', async () => {
+        const { app } = await montar();
+        expect(app()).toBeNull();
         expect(tela()).not.toHaveAttribute('data-saindo');
 
         await waitFor(() => {
-          expect(camada()).not.toBeNull();
+          expect(app()).not.toBeNull();
         });
-        expect(container.querySelector('.marca')).not.toBeNull();
         await waitFor(() => {
           expect(tela()).toHaveAttribute('data-saindo');
         });
       });
 
       it('sai quando o app monta sem a camada (o "só estudo" veta)', async () => {
-        const { camada, container } = await montar({ soEstudo: true });
+        const { app, camada } = await montar({ soEstudo: true });
         expect(tela()).not.toHaveAttribute('data-saindo');
         await waitFor(() => {
-          expect(container.querySelector('.marca')).not.toBeNull();
+          expect(app()).not.toBeNull();
         });
         await waitFor(() => {
           expect(tela()).toHaveAttribute('data-saindo');
         });
-        expect(camada()).toBeNull();
+        expect(camada()).toBe('nenhuma');
       });
 
       it('se a decisão demora, sai quando o app aparece no teto de 0,4 s', async () => {
         vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
-        const { container } = await montar();
+        const { app } = await montar();
         expect(tela()).not.toHaveAttribute('data-saindo');
         await waitFor(
           () => {
-            expect(container.querySelector('.marca')).not.toBeNull();
+            expect(app()).not.toBeNull();
           },
           { timeout: 1500 },
         );
@@ -315,132 +302,38 @@ describe('ProvedorDaAbertura: quem escreve o nome (M2 do Zé)', () => {
   });
 });
 
-describe('ProvedorDaAbertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
-  const decidir = (decisao: OndeEscrever) =>
-    vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(Promise.resolve(decisao));
-  const tela = (chegada: boolean, calmo = false): OndeEscrever => ({
-    onde: 'tela',
-    escrita: 'completa',
-    calmo,
-    chegada,
-  });
-
-  it('na primeira vez com a Chegada por vir, quem abre por cima fica sabendo que a luz vai ao Zé', async () => {
-    decidir(tela(true));
-    const { camada, voa, sonda } = await montar();
+describe('ProvedorDaAbertura: a luz não visita o Zé das Boas-vindas', () => {
+  it('no Fio a Chegada não espera a luz, nem na primeira vez com a Chegada por vir', async () => {
+    vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(
+      Promise.resolve<OndeEscrever>({
+        onde: 'tela',
+        escrita: 'completa',
+        calmo: false,
+        chegada: true,
+      }),
+    );
+    const { camada, voa } = await montar();
     await waitFor(() => {
-      expect(camada()).not.toBeNull();
-    });
-    expect(sonda()).toBe('espera');
-    expect(voa()).toBe('sim');
-  });
-
-  it('sem Chegada por vir, ou no Calmo (que não tem voo), a luz não visita o Zé', async () => {
-    decidir(tela(false));
-    const semChegada = await montar();
-    await waitFor(() => {
-      expect(semChegada.camada()).not.toBeNull();
-    });
-    expect(semChegada.voa()).toBe('nao');
-    semChegada.unmount();
-
-    decidir(tela(true, true));
-    const calmo = await montar();
-    await waitFor(() => {
-      expect(calmo.camada()).not.toBeNull();
-    });
-    expect(calmo.voa()).toBe('nao');
-  });
-
-  it('pulada a camada, a espera acaba junto: a Chegada não fica escondida para sempre', async () => {
-    decidir(tela(true));
-    const { camada, voa, sonda } = await montar();
-    await waitFor(() => {
-      expect(camada()).not.toBeNull();
-    });
-    fireEvent.pointerDown(document.body);
-    await waitFor(() => {
-      expect(camada()).toBeNull();
+      expect(camada()).toBe('completa');
     });
     expect(voa()).toBe('nao');
-    expect(sonda()).toBe('livre');
-  });
-
-  describe('o Encontro chega à Abertura só quando há Zé para visitar', () => {
-    beforeEach(() => {
-      vi.useFakeTimers({
-        toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'],
-      });
-    });
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    async function nomeEscrito(chegada: boolean) {
-      decidir(tela(chegada));
-      const medirPe = vi.fn(() => null);
-      const { unmount, camada } = await montar({ aoOferecer: medirPe });
-      // A decisão chega e a camada monta primeiro; só então o relógio do nome começa a contar.
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(50);
-      });
-      expect(camada()).not.toBeNull();
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(2640 + 300 + 100);
-      });
-      return { medirPe, unmount };
-    }
-
-    it('com a Chegada por vir, depois do nome a luz pergunta onde está o pé do Zé', async () => {
-      const { medirPe, unmount } = await nomeEscrito(true);
-      expect(medirPe).toHaveBeenCalledTimes(1);
-      unmount();
-    });
-
-    it('sem Chegada por vir, a luz nem pergunta: vai direto ao cabeçalho', async () => {
-      const { medirPe, unmount } = await nomeEscrito(false);
-      expect(medirPe).not.toHaveBeenCalled();
-      unmount();
-    });
   });
 });
 
-describe('ProvedorDaAbertura: no Fio a abertura é uma tela do quadro', () => {
-  function SondaDoFio() {
-    const { camadaDoFio, emCurso } = useEstadoDaAbertura();
-    return (
-      <p data-testid="fio" data-camada={camadaDoFio ? camadaDoFio.escrita : 'nenhuma'}>
-        {emCurso ? 'espera' : 'livre'}
-      </p>
-    );
-  }
-
-  async function montarNoFio(rota: string) {
-    const { repo } = await repositorioDeTeste({ inicio: HOJE });
-    const vista = render(
-      <MemoryRouter initialEntries={[rota]}>
-        <ContextoRepositorio.Provider value={repo}>
-          <ProvedorDaAbertura>
-            <SondaDoFio />
-          </ProvedorDaAbertura>
-        </ContextoRepositorio.Provider>
-      </MemoryRouter>,
-    );
-    return { ...vista, camada: () => vista.container.querySelector('.abertura') };
-  }
-
-  it('entrega a abertura ao quadro (sem montar a camada de tela cheia de antes)', async () => {
-    const { findByTestId, camada } = await montarNoFio('/');
-    const sonda = await findByTestId('fio');
-    expect(sonda.getAttribute('data-camada')).toBe('completa');
-    expect(sonda.textContent).toBe('espera');
-    expect(camada()).toBeNull();
+describe('ProvedorDaAbertura: a abertura é uma tela do quadro do Fio', () => {
+  it('entrega a abertura ao quadro (sem camada de tela cheia)', async () => {
+    const { camada, sonda, container } = await montar();
+    await waitFor(() => {
+      expect(camada()).toBe('completa');
+    });
+    expect(sonda()).toBe('espera');
+    expect(container.querySelector('.abertura')).toBeNull();
   });
 
-  it('numa rota da casca de antes ela sai quieta, sem contar pulo, e a espera acaba', async () => {
-    const { findByTestId } = await montarNoFio('/biblioteca');
-    await waitFor(async () => {
-      expect((await findByTestId('fio')).textContent).toBe('livre');
+  it('numa rota fora do quadro ela sai quieta, sem contar pulo, e a espera acaba', async () => {
+    const { sonda } = await montar({ rota: '/biblioteca' });
+    await waitFor(() => {
+      expect(sonda()).toBe('livre');
     });
     expect(guardado()).toEqual({ dia: '2026-10-20' });
   });
