@@ -607,7 +607,6 @@ blockquote {
 button,
 .botao,
 .abas a,
-.areas a,
 .marca {
   overflow-wrap: normal;
 }
@@ -730,23 +729,6 @@ button,
   align-items: center;
 }
 
-.lockup {
-  display: block;
-  flex: 0 1 auto;
-  width: 9rem;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.lockup-disco {
-  fill: var(--marca-disco);
-}
-
-.lockup-ponto {
-  fill: var(--marca-ponto);
-}
-
 /* Com a fonte muito ampliada Ajuda e Conta não cabem lado a lado na largura que o "+" deixa: o grupo
    quebra em duas linhas, à direita, em vez de passar da tela. */
 .acoes-globais {
@@ -777,103 +759,18 @@ button,
   padding: 0 1.25rem;
 }
 
-.acoes-globais .conta-botao {
-  width: var(--alvo);
-  padding: 0;
-}
-
-.conta-botao svg {
-  width: 1.5rem;
-  height: 1.5rem;
-  flex: none;
-}
-
 /* Com a tela estreita (menos de 360 px) o lockup e o recuo de Ajuda encolhem para o cabeçalho caber numa
    linha ao lado do "+": sem isso ele quebrava em duas e o "+", fixo no alto, ficava no canto da primeira
    linha, longe do centro do cabeçalho. */
 @media (max-width: 22.5rem) {
-  .lockup {
-    width: 7rem;
-  }
-
   .acoes-globais .ajuda-botao {
     padding-inline: 0.5rem;
   }
 }
 
-/* Abas das áreas (D-D9, Q2): o rótulo atenuado; a atual vai na luz do mundo, em negrito, com o traço de
-   caneta embaixo (o estado não depende só da cor). O ícone aparece nas abas de baixo. */
-.areas {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.areas a {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--alvo);
-  min-width: var(--alvo);
-  padding: 0 0.875rem;
-  border-radius: var(--raio-botao);
-  color: var(--texto-atenuado);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-@media (hover: hover) {
-  .areas a:not([aria-current='page']):hover {
-    background: color-mix(in srgb, var(--texto) 6%, transparent);
-    color: var(--texto);
-  }
-}
-
-.area-icone {
-  display: none;
-  width: 1.5rem;
-  height: 1.5rem;
-  flex: none;
-}
-
-/* Onde estou: a luz do mundo e o traço de caneta embaixo da aba (30 × 6 px, a 5 px da base; a 3 px no
-   cabeçalho de 900 px em diante). Persistente, ao contrário do traço de seleção (componentes/traco),
-   que só se desenha em volta de quem acabou de ser tocado. O traço é a máscara de um SVG de 2 px com
-   ponta redonda, pintada na luz do mundo: a cor é a do tema e não pesa no JS. Só decora (a máscara
-   é imagem de dados, que a CSP libera em `img-src`). */
-.areas a[aria-current='page'] {
-  color: var(--luz);
-  font-weight: 700;
-}
-
-.areas a[aria-current='page']::after {
-  --traco-da-aba: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M2 4C9 2.6 19 4.4 28 2.2' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 5px;
-  width: 30px;
-  height: 6px;
-  margin-left: -15px;
-  background: var(--luz);
-  -webkit-mask: var(--traco-da-aba) center / 100% 100% no-repeat;
-  mask: var(--traco-da-aba) center / 100% 100% no-repeat;
-  pointer-events: none;
-}
-
-/* Cores forçadas pintam o fundo com a cor do sistema, e a máscara ficaria da cor da página: o traço
-   pede o texto do sistema e sai do ajuste automático. */
-@media (forced-colors: active) {
-  .areas a[aria-current='page']::after {
-    background: CanvasText;
-    forced-color-adjust: none;
-  }
-}
-
 /* "Onde estou" das abas de página (Biblioteca e outras; D-D9, Q7): a folha sobre o trilho, com o
    contorno do controle por dentro (o 1,5 px que o `border` perderia) e o rótulo em negrito. O traço
-   de caneta fica nas abas de área (`.areas`): lá é a casca, aqui é um seletor de dentro da tela. */
+   de caneta fica no traço de seleção: aqui é um seletor de dentro da tela. */
 .abas a[aria-current='page'] {
   background: var(--superficie);
   color: var(--texto);
@@ -1046,86 +943,19 @@ button,
   color: var(--texto-atenuado);
 }
 
-/* Rodapé legal no fim do conteúdo, acima da reserva das abas: o aviso curto e "Backup e dados" como
-   botão de texto de 44 px. */
-.rodape {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  column-gap: 0.25rem;
-  width: 100%;
-  max-width: var(--largura-casca);
-  margin: 0 auto;
-  padding: 0.5rem max(var(--gutter), env(safe-area-inset-right, 0px)) 1rem
-    max(var(--gutter), env(safe-area-inset-left, 0px));
-  font-size: 0.8125rem;
-  color: var(--texto-atenuado);
-}
-
-.rodape p {
-  margin: 0;
-}
-
-.rodape .botao-texto {
-  padding: 0 0.5rem;
-  font-size: inherit;
-}
-
-/* Até 899 px (celular e tablet em pé): as abas ficam embaixo, presas à borda, sobre o chão, com o
-   filete de cima separando-as do texto que rola; barra de 80 px (8 de folga embaixo, ou a área
-   segura), quatro colunas sem vão, cada aba com o ícone de 24 sobre o rótulo de 13 px e folga embaixo
-   para o traço de caneta da atual. No tablet em pé ficam juntas no meio, em até 560 px. Com o teclado
-   aberto saem da frente. */
+/* Até 899 px (celular e tablet em pé): a reserva de 80 px embaixo para a barra dos lugares (8 de folga, ou a
+   área segura). Com o teclado aberto ela sai da frente. */
 @media (max-width: 899px) {
   :root {
     --abas-altura: calc(1px + 4.4375rem + max(0.5rem, env(safe-area-inset-bottom, 0px)));
   }
 
-  .areas {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 5;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    padding: 0 env(safe-area-inset-right, 0px) max(0.5rem, env(safe-area-inset-bottom, 0px))
-      env(safe-area-inset-left, 0px);
-    background: var(--fundo);
-    border-top: 1px solid var(--borda);
-  }
-
-  .areas a {
-    flex-direction: column;
-    gap: 0.25rem;
-    min-height: 4.4375rem;
-    padding: 0 0.25rem;
-    font-size: min(0.8125rem, 4.4vw);
-    line-height: 1.4;
-  }
-
-  .area-icone {
-    display: block;
-  }
-
   .shell[data-teclado] {
     --abas-altura: 0px;
   }
-
-  .shell[data-teclado] .areas {
-    display: none;
-  }
 }
 
-@media (min-width: 700px) and (max-width: 899px) {
-  .areas {
-    padding-left: max(env(safe-area-inset-left, 0px), calc((100% - 35rem) / 2));
-    padding-right: max(env(safe-area-inset-right, 0px), calc((100% - 35rem) / 2));
-  }
-}
-
-/* A partir de 900 px: o cabeçalho na largura do conteúdo; as áreas ao centro, só com o rótulo (para
-   caber com Ajuda, Conta e a reserva do "+"). O recuo da direita já vem do `.topo`, por --mais-direita,
+/* A partir de 900 px: o cabeçalho na largura do conteúdo. O recuo da direita já vem do `.topo`, por --mais-direita,
    que de 900 px em diante soma a mesma folga lateral. */
 @media (min-width: 900px) {
   .topo {
@@ -1136,14 +966,6 @@ button,
 
   .marca {
     margin-right: 0;
-  }
-
-  .areas {
-    margin-inline: auto;
-  }
-
-  .areas a[aria-current='page']::after {
-    bottom: 3px;
   }
 }
 
@@ -1391,17 +1213,6 @@ dialog .perigoso {
   width: 1.125rem;
   height: 1.125rem;
   flex: none;
-}
-
-/* Botão de ícone: quadrado de 44 com o contorno do secundário; sempre com aria-label. */
-.botao-icone {
-  width: var(--alvo);
-  padding: 0;
-}
-
-.icone {
-  padding: 0;
-  font-weight: 700;
 }
 
 /* Linha de ação (D-D4): a opção que vira uma linha inteira de toque ("Por onde começar?", folhas e
@@ -1905,12 +1716,6 @@ button.grande,
   width: 100%;
   color: var(--texto);
   text-decoration: none;
-}
-
-.rotulo-discreto {
-  font-size: 0.8125rem;
-  color: var(--texto-atenuado);
-  min-width: 9rem;
 }
 
 .marcador {
