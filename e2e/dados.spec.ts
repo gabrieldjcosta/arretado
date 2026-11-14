@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { expect, test } from './apoio';
+import { expect, irAoAgora, test } from './apoio';
 
 test('exportar → apagar tudo → restaurar integral, pela interface', async ({ page }) => {
   // Dado de referência: tema escuro nas preferências.
@@ -59,11 +59,27 @@ test('pacote com senha: pede a senha e recusa a errada', async ({ page }) => {
 });
 
 test('funciona sem rede depois de carregado', async ({ page, context }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  // As duas telas e o diálogo de relato já viram a rede (as fontes e o ícone de cada um vêm na primeira visita); sem o
+  // service worker neste teste, o que só abrisse depois de a rede cair pediria o arquivo dele e falharia.
+  await irAoAgora(page);
+  await page.goto('/#/recall');
+  await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
+  await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
+  await page.getByRole('button', { name: 'Relatar problema' }).click();
+  await expect(page.getByLabel('O que aconteceu?')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByLabel('O que aconteceu?')).toBeHidden();
+  await irAoAgora(page);
+  // Sem o service worker, o Chromium pede o ícone da aba a cada troca de rota, e sem rede o pedido falha no console.
+  await page.route('**/icone.svg', (rota) =>
+    rota.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg"/>',
+    }),
+  );
   await context.setOffline(true);
   await expect(page.getByText('Sem conexão. Tudo continua funcionando.')).toBeVisible();
-  await page.getByRole('link', { name: 'Fixar', exact: true }).click();
+  await page.goto('/#/recall');
   await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
   await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
   await page.getByRole('button', { name: 'Relatar problema' }).click();

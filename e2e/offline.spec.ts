@@ -46,15 +46,15 @@ function vigiarErros(page: Page) {
   return erros;
 }
 
-test('depois da primeira abertura, Hoje e Fixar abrem sem rede', async ({ page, context }) => {
+test('depois da primeira abertura, o Agora e o Fixar abrem sem rede', async ({ page, context }) => {
   const erros = vigiarErros(page);
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await esperarServiceWorker(page);
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   // A página veio do service worker, não do cache HTTP do navegador.
   expect(await page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
   await expect(page.getByRole('status').filter({ hasText: 'Sem conexão' })).toBeVisible();
