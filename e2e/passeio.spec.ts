@@ -235,9 +235,7 @@ test.describe('o passeio refeito na Conta', () => {
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(page.getByRole('dialog', { name: 'Vamo começar?' })).toHaveCount(0);
     await expect(abrir).toBeFocused();
-    expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_CHEGADA)).toBe(
-      '{"vista":true}',
-    );
+    expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_CHEGADA)).toBeNull();
   });
 
   test('"Voltar ao app", "Pular o passeio" e Esc fecham a folha e devolvem o foco ao botão', async ({
