@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoesNoFio, test } from './apoio';
+import { expect, irAoAgora, semViolacoesNoFio, test } from './apoio';
 import { servir } from './lep-com-mapa';
 
 // A folha da porteira (C2e): tocar numa porteira pronta do Destino abre a folha com o deque de certo ou errado; ao fim,
@@ -35,9 +35,7 @@ async function comALeiLida(page: Page) {
   await page.keyboard.press('End');
   await page.waitForTimeout(800);
   await page.getByRole('button', { name: 'Lido até aqui' }).click();
-  await page.goto('/#/');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
 }
 
 // CAPTURA=<pasta> guarda as fotos da folha (inicio e fim) para pôr ao lado do mockup.

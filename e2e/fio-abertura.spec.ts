@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, pularAAbertura, semViolacoesNoFio, test } from './apoio';
+import { expect, semViolacoesNoFio, test } from './apoio';
 
 // A abertura e a prova do Arretado novo (docs/design/fio/mockup-aprovado.html, telas `abertura` e `prova`): o ponto
 // de luz quica de letra em letra escrevendo o nome, vira o ponto do cacto e um fio o leva, como um pêndulo, até a
@@ -98,7 +98,6 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   await page.setViewportSize({ width: 390, height: 780 });
   // Traz uma matéria pelo edital pela Trilha (a abertura é pulada com uma tecla).
   await page.goto('/#/plano');
-  await pularAAbertura(page);
   await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',

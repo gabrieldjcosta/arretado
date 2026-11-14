@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, semViolacoesNoFio, test } from './apoio';
+import { expect, irAoAgora, semViolacoesNoFio, test } from './apoio';
 
 // O pouso em cena do Arretado novo (prévia do Fio, D-D25), o do mockup aprovado: o Zé diante de um lugar da vereda,
 // as pílulas dos pousos da volta e a saída (descansar ou puxar o fio). O jsdom não mede layout nem cor e não
@@ -20,9 +20,7 @@ async function noPrimeiroPouso(page: Page) {
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  await page.goto('/#/');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
   await page.getByRole('button', { name: /Puxar o fio/ }).click();
   await page.getByRole('button', { name: 'Pular este passo' }).click();
   await expect(page).toHaveURL(/#\/fio\/pouso$/);

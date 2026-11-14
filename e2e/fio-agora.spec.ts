@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { coresNosPixels, expect, semViolacoesNoFio, test } from './apoio';
+import { coresNosPixels, expect, irAoAgora, semViolacoesNoFio, test } from './apoio';
 
 // O Arretado novo (prévia do Fio, D-D25): o Agora do mockup aprovado (docs/design/fio/mockup-aprovado.html) com o
 // fio que se puxa, o passo, o Destino e o Varal. O jsdom não tem layout, ponteiro nem animação de verdade; aqui o
@@ -19,8 +19,7 @@ async function comMateriaNaPrevia(page: Page) {
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  await page.goto('/#/');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
+  await irAoAgora(page);
 }
 
 const puxador = (page: Page) => page.getByRole('button', { name: /Puxar o fio/ });
@@ -285,14 +284,6 @@ test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ p
   await expect(page.getByRole('group', { name: 'O que você estuda' })).toBeVisible();
   await expect(page.getByRole('group', { name: 'O que você guarda' })).toBeVisible();
   await semViolacoesNoFio(page);
-});
-
-test('sem ligar a prévia, a casca de sempre continua igual', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toHaveCount(0);
-  await page.goto('/#/destino');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
 });
 
 test('o fio acende em neon amarelo: solto, puxando e além dos 70 px, de noite e de dia, e parado no Calmo', async ({

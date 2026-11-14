@@ -130,13 +130,12 @@ export async function colar(page: Page, id: string) {
 }
 
 /**
- * Pula a Abertura (a camada de tela cheia de toda abertura do aplicativo, D-D14) como a pessoa faria: com a primeira tecla, que só pula. Para os testes que desligam a semeadura da
- * escrita (`semearEscrita: false`) e não são sobre ela.
+ * Abre o Agora e espera a tela dele montar. A nav "Lugares" não serve de sinal: as telas que ainda moram na casca
+ * legada (a Trilha, o Fixar, a Biblioteca) já a mostram, e o Agora, num pedaço à parte do pacote, chega depois.
  */
-export async function pularAAbertura(page: Page) {
-  await expect(page.locator('.abertura')).toBeVisible();
-  await page.keyboard.press('Shift');
-  await expect(page.locator('.abertura')).toHaveCount(0);
+export async function irAoAgora(page: Page) {
+  await page.goto('/#/');
+  await expect(page.locator('[data-tela="inicio"]:not(.m-saindo)')).toBeVisible();
 }
 
 /**
