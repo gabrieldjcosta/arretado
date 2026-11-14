@@ -2,10 +2,10 @@ import type { Page } from '@playwright/test';
 import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from './apoio';
 
 // A barra do Leitor no celular (Onda 1 da crítica externa, A + B). Dentro da norma, menos de 700 px:
-// as abas das áreas saem (A), e as ferramentas viram uma barra de uma linha, encostada no fundo, com
-// Filtrar e Ações a dois toques, no "⋯" (B; o "⋯" é o mesmo em toda largura desde a D-D24, e criar erro e
-// cartão é com o "+" da casca). Aqui se mede onde cada coisa fica, no estilo do `trilho-do-leitor.spec.ts`;
-// o E2E do Leitor só pergunta se os botões estão à vista.
+// a pílula dos lugares fica de fora (D-D25: o Leitor abre sem barra de abas), e as ferramentas viram uma
+// barra de uma linha, encostada no fundo, com Filtrar e Ações a dois toques, no "⋯" (B; o "⋯" é o mesmo em
+// toda largura desde a D-D24, e criar erro e cartão é com o "+" da casca). Aqui se mede onde cada coisa
+// fica, no estilo do `trilho-do-leitor.spec.ts`; o E2E do Leitor só pergunta se os botões estão à vista.
 
 // O CI desenha o texto com hinting inteiro, uns 3% mais largo que o do computador de quem escreve o
 // teste: a barra de 360 px passava aqui e quebrava lá. Com a flag o E2E mede o mesmo texto nos dois.
@@ -64,7 +64,7 @@ const medir = (page: Page) =>
       largura: document.documentElement.clientWidth,
       sobraDeLado: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       barra,
-      cabecalho: caixa(document.querySelector('.topo')),
+      cabecalho: caixa(document.querySelector('.fio-topo')),
       botoes: [...document.querySelectorAll<HTMLElement>('.acoes-leitor button')].map((b) => ({
         nome: (b.getAttribute('aria-label') ?? b.textContent).trim(),
         ...caixa(b),
@@ -73,17 +73,26 @@ const medir = (page: Page) =>
     };
   });
 
+/** No fim da norma: onde começa a barra de baixo, onde termina a última linha e onde termina o Leitor. */
+const fimDaNorma = (page: Page) =>
+  page.evaluate(() => ({
+    barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
+    ultimaLinha:
+      document.querySelector('[data-endereco="art204"]')?.getBoundingClientRect().bottom ?? 0,
+    leitor: document.querySelector('.leitor')?.getBoundingClientRect().bottom ?? Infinity,
+  }));
+
 const SO_NO_CELULAR = 'o tamanho da janela é do teste; basta um projeto';
 
 for (const { largura, altura } of TELAS) {
-  test(`${String(largura)}×${String(altura)}: a barra de baixo é uma linha só, sem as abas, e o fim da norma fica acima dela`, async ({
+  test(`${String(largura)}×${String(altura)}: a barra de baixo é uma linha só, sem a pílula dos lugares, e o fim da norma fica acima dela`, async ({
     page,
   }, info) => {
     test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
     test.setTimeout(120_000);
     await abrirALep(page);
     await page.setViewportSize({ width: largura, height: altura });
-    await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeHidden();
+    await expect(page.getByRole('navigation', { name: 'Lugares' })).toHaveCount(0);
 
     const m = await medir(page);
     expect(m.altura - m.barra.topo, 'o que a barra cobre').toBeLessThanOrEqual(COBERTURA_MAXIMA);
@@ -107,17 +116,12 @@ for (const { largura, altura } of TELAS) {
     // Uma linha: os quatro botões na mesma altura.
     expect(new Set(m.botoes.map((b) => Math.round(b.topo))).size, 'uma linha').toBe(1);
 
-    // No fim da norma a última linha, e o rodapé com "Backup e dados", terminam acima da barra.
+    // No fim da norma a última linha, e tudo o que o Leitor põe depois dela, terminam acima da barra.
     await irAoFim(page);
-    const fim = await page.evaluate(() => ({
-      barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
-      ultimaLinha:
-        document.querySelector('[data-endereco="art204"]')?.getBoundingClientRect().bottom ?? 0,
-      rodape: document.querySelector('.rodape')?.getBoundingClientRect().bottom ?? 0,
-    }));
+    const fim = await fimDaNorma(page);
+    expect(fim.ultimaLinha, 'a última linha na tela').toBeGreaterThan(0);
     expect(fim.ultimaLinha, 'a última linha acima da barra').toBeLessThanOrEqual(fim.barra);
-    expect(fim.rodape, 'o rodapé acima da barra').toBeLessThanOrEqual(fim.barra + 1);
-    await expect(page.getByRole('link', { name: 'Backup e dados' })).toBeInViewport();
+    expect(fim.leitor, 'o fim do Leitor acima da barra').toBeLessThanOrEqual(fim.barra + 1);
     await semViolacoes(page);
   });
 }
@@ -253,11 +257,14 @@ test('numa tela estreita ou com texto grande a barra quebra em duas linhas, sem 
     expect(new Set(m.botoes.map((b) => Math.round(b.topo))).size, `${rotulo}: duas linhas`).toBe(2);
 
     await irAoFim(page);
-    const fim = await page.evaluate(() => ({
-      barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
-      rodape: document.querySelector('.rodape')?.getBoundingClientRect().bottom ?? 0,
-    }));
-    expect(fim.rodape, `${rotulo}: o rodapé acima da barra`).toBeLessThanOrEqual(fim.barra + 1);
+    const fim = await fimDaNorma(page);
+    expect(fim.ultimaLinha, `${rotulo}: a última linha na tela`).toBeGreaterThan(0);
+    expect(fim.ultimaLinha, `${rotulo}: a última linha acima da barra`).toBeLessThanOrEqual(
+      fim.barra,
+    );
+    expect(fim.leitor, `${rotulo}: o fim do Leitor acima da barra`).toBeLessThanOrEqual(
+      fim.barra + 1,
+    );
     await page.evaluate(() => {
       window.scrollTo(0, 0);
     });

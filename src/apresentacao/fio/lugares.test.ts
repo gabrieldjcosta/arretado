@@ -2,6 +2,7 @@ import {
   comNavDoFio,
   LUGARES,
   lugarDaRota,
+  noLeitor,
   noQuadroDoFio,
   ROTA_DO_PASSO,
   ROTA_DO_POUSO,
@@ -59,12 +60,25 @@ describe('os três lugares do Arretado novo', () => {
     expect(LUGARES.find((l) => l.id === 'varal')?.caminho).toBe(ROTA_DO_VARAL);
   });
 
-  it('só o pouso esconde a pílula dos lugares', () => {
+  it('o pouso e a norma aberta escondem a pílula dos lugares; o resto a mostra', () => {
     expect(ROTA_DO_POUSO).toBe('/fio/pouso');
     expect(ROTA_DO_PASSO).toBe('/fio/passo');
     expect(semPilulaDosLugares(ROTA_DO_POUSO)).toBe(true);
     expect(semPilulaDosLugares(ROTA_DO_PASSO)).toBe(false);
     expect(semPilulaDosLugares('/')).toBe(false);
     expect(semPilulaDosLugares('/destino')).toBe(false);
+    // O Leitor abre por dentro do lugar de onde a pessoa veio, sem barra de abas (D-D25).
+    expect(semPilulaDosLugares('/biblioteca/normas/n1')).toBe(true);
+    expect(semPilulaDosLugares('/biblioteca/normas/n1/')).toBe(true);
+    // As telas vizinhas da norma e a lista seguem com a pílula.
+    expect(semPilulaDosLugares('/biblioteca/normas/n1/mapa')).toBe(false);
+    expect(semPilulaDosLugares('/biblioteca/normas')).toBe(false);
+    expect(semPilulaDosLugares('/biblioteca')).toBe(false);
+  });
+
+  it('noLeitor: só a norma aberta', () => {
+    expect(noLeitor('/biblioteca/normas/n1')).toBe(true);
+    expect(noLeitor('/biblioteca/normas/n1/mapa')).toBe(false);
+    expect(noLeitor('/biblioteca/acervo')).toBe(false);
   });
 });

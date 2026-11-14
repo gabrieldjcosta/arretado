@@ -2404,8 +2404,10 @@ a.item-norma strong {
     scroll-padding-bottom: calc(var(--barra-do-leitor) + 1rem);
   }
 
-  :root[data-leitor]:not([data-modo-foco]) .areas {
-    display: none;
+  /* A casca põe a sua folga de baixo em --abas-altura (na norma, sem a pílula dos lugares, só a área segura):
+     dentro dela vale a barra do Leitor. */
+  :root[data-leitor]:not([data-modo-foco]) .shell {
+    --abas-altura: var(--barra-do-leitor);
   }
 
   .leitor:not(.em-foco) {
@@ -2484,10 +2486,8 @@ a.item-norma strong {
    ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
    da folga dela, e o grupo fixo desce ao canto. A `.faixa-posse` fica de propósito: é o único aviso de
    escrita travada (outro Aparelho editando), e agora cabe em uma linha. */
-:root[data-modo-foco] .topo,
-:root[data-modo-foco] .areas,
-:root[data-modo-foco] .faixa-offline,
-:root[data-modo-foco] .rodape {
+:root[data-modo-foco] .fio-topo,
+:root[data-modo-foco] .faixa-offline {
   display: none;
 }
 

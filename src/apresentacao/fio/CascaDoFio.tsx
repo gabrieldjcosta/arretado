@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { AplicarAparencia } from '../Aparencia';
 import { PuxarEssenciais } from '../biblioteca/PuxarEssenciais';
@@ -21,12 +21,14 @@ import { MarcaDoFio } from './MarcaDoFio';
 import { NavDosLugares } from './NavDosLugares';
 import { LinkDoFio } from './LinkDoFio';
 import { useLuzDaHora } from './luz-da-hora';
+import { lembrarDeOndeVeio } from './volta-do-leitor';
 import './fio-base.css';
 
 /**
  * A casca de antes do quadro do mockup, que ainda serve as telas que não moram nele (Leitor, Biblioteca,
  * Fixar, Conta...): o nome com o cacto à esquerda (o nó da pessoa, que abre a Conta), a Ajuda, o "+"
- * de sempre (D-D23) e a pílula com os três lugares embaixo. Sem rodapé: o backup e os dados moram na Conta. Os
+ * de sempre (D-D23) e a pílula com os três lugares embaixo (menos dentro de uma norma e no pouso: lá o que fica
+ * embaixo é da tela). Sem rodapé: o backup e os dados moram na Conta. Os
  * provedores (Abertura, itens do "+") vêm do `Shell`. Some quando as fatias seguintes derem casa nova a cada tela.
  */
 function CascaLegada() {
@@ -122,6 +124,10 @@ function CascaLegada() {
  * Agora, o Destino, o passo e o pouso) ficam na `CascaM`; as outras seguem na casca de antes até a fatia delas.
  */
 export function CascaDoFio() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  // O "Voltar" do Leitor leva ao último endereço fora da norma.
+  useEffect(() => {
+    lembrarDeOndeVeio(pathname, search);
+  }, [pathname, search]);
   return noQuadroDoFio(pathname) ? <CascaM /> : <CascaLegada />;
 }

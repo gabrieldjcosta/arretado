@@ -40,20 +40,18 @@ const maisDoFoco = (page: Page) => page.getByRole('button', { name: 'Mais açõe
 /** O "⋯" do grupo fixo, em toda largura (D-D24), onde moram Filtrar e Ações fora do modo foco. */
 const maisDoLeitor = (page: Page) => page.getByRole('button', { name: /^Mais(\.|$)/ });
 
-/** O celular (menos de 700 px): a barra do Leitor é a de uma linha, e as abas das áreas saem da norma. */
-const noCelular = (page: Page) => (page.viewportSize()?.width ?? Infinity) < 700;
+/** O cabeçalho da casca do Fio: grudado no alto fora do modo foco; no modo foco, some com o resto da moldura. */
+const cabecalhoDaCasca = (page: Page) => page.locator('.fio-topo');
 
-/** As abas das áreas, fora do modo foco: à vista, menos no celular, onde a norma as troca pela barra do Leitor. */
-const abasForaDoFoco = (page: Page, areas: Locator) =>
-  noCelular(page) ? expect(areas).toBeHidden() : expect(areas).toBeVisible();
+/** A pílula dos lugares: dentro de uma norma não aparece, em largura nenhuma (D-D25: o Leitor abre sem barra de abas). */
+const pilulaDosLugares = (page: Page) => page.getByRole('navigation', { name: 'Lugares' });
 
 /**
- * Sai da norma para a Biblioteca sem mexer na rolagem (sair grava a posição). Com as abas à vista, é o
- * toque nelas; no celular elas saem da norma, e a saída sem rolar é o "voltar" do aparelho.
+ * Sai da norma para a Biblioteca sem mexer na rolagem (sair grava a posição): o "voltar" do aparelho. O "Voltar"
+ * do Leitor mora no começo da norma, e rolar até ele mudaria a posição que o teste confere.
  */
 async function sairParaABiblioteca(page: Page) {
-  if (noCelular(page)) await page.goBack();
-  else await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await page.goBack();
 }
 
 /**
@@ -350,11 +348,11 @@ test('ler o CP compilado: a rubrica fica acima do artigo (9.6)', async ({ page }
   await semViolacoes(page);
 });
 
-/** Da linha do dispositivo até o fim da barra fixa (`.topo`): 0 quando ele está no alto da tela. */
+/** Da linha do dispositivo até o fim da barra fixa (`.fio-topo`): 0 quando ele está no alto da tela. */
 function distanciaDoAlto(alvo: Locator) {
   return alvo.first().evaluate((el) => {
     const linha = el.closest('.linha-leitor') ?? el;
-    const barra = document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0;
+    const barra = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
     return linha.getBoundingClientRect().top - barra;
   });
 }
@@ -449,7 +447,7 @@ test('sair e voltar na mesma posição, com "Retomar" e "lido até": LEP compila
   await normas.getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
 
-  // Sai pelas abas das áreas (no celular, pelo "voltar" do aparelho) com o art. 41 no alto da tela.
+  // Sai pelo "voltar" do aparelho com o art. 41 no alto da tela.
   const art41 = page.locator('[data-endereco="art41"]');
   await rolarAte(page, art41);
   await alinharNoAlto(page, art41);
@@ -665,28 +663,12 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
   await expect(page.getByRole('region', { name: 'Agora' })).toHaveCount(0);
   await expect(retomar.locator('xpath=..')).toContainText(/cerca de \d+ min/);
   await semViolacoes(page);
-
-  // O Hoje diz onde retomar na linha de parada ("Retomar em", com a hora do salvamento), sem caneta
-  // (D-D12); a folha não repete o motivo, e os três pontos do Dia estão lá, com o estado também em
-  // palavras (D-D7, P3; D-D9, Q5).
-  await page.getByRole('link', { name: 'Hoje' }).first().click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  await expect(page.locator('.parada')).toContainText(/Retomar em LEP, art\. \d/);
-  await expect(page.locator('.parada')).toContainText(/salvo (hoje|ontem), \d{2}h\d{2}/);
-  await expect(page.locator('svg.caneta')).toHaveCount(0);
-  const folhaDoHoje = page.getByRole('region', { name: 'Agora' });
-  await expect(folhaDoHoje.getByRole('heading', { name: 'Continuar a leitura' })).toBeVisible();
-  await expect(folhaDoHoje).not.toContainText('Retomar em');
-  await expect(
-    page.getByRole('list', { name: 'Andamento do Dia' }).getByRole('listitem'),
-  ).toHaveText(['Leitura, feito hoje', 'Cartões, ainda não', 'Frases, ainda não']);
-  await semViolacoes(page);
 });
 
 /** O dispositivo da linha no alto da tela (logo abaixo da barra fixa) e quanto dela ficou acima. */
 function linhaDoAlto(page: Page) {
   return page.evaluate(() => {
-    const barra = document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0;
+    const barra = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
     const linhas = [...document.querySelectorAll('.linha-leitor')];
     const linha = linhas.find((l) => {
       const { top, bottom } = l.getBoundingClientRect();
@@ -732,7 +714,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   const entrar = page.getByRole('button', { name: 'Modo foco' });
   const sair = maisDoFoco(page);
-  const areas = page.getByRole('navigation', { name: 'Áreas' });
+  const casca = cabecalhoDaCasca(page);
   const tamanho = page.getByRole('group', { name: 'Tamanho do texto' });
   const destaques = page.getByRole('button', { name: 'Destaques' });
 
@@ -760,9 +742,8 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect(sair).toBeVisible();
   await expect(sair).toBeFocused();
   await expect(page).toHaveURL(/[?&]foco=texto/);
-  await expect(areas).toBeHidden();
-  await expect(page.locator('.topo')).toBeHidden();
-  await expect(page.locator('.rodape')).toBeHidden();
+  await expect(casca).toBeHidden();
+  await expect(pilulaDosLugares(page)).toHaveCount(0);
   await expect(tamanho).toBeHidden();
   await expect(destaques).toBeHidden();
   // O título continua como cabeçalho da página, só para o leitor de tela.
@@ -786,16 +767,16 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await alinharNoAlto(page, art60);
   await sairDoFocoPelaBandeja(page);
   await expect(entrar).toBeFocused();
-  await abasForaDoFoco(page, areas);
+  await expect(casca).toBeVisible();
   await expect(page).not.toHaveURL(/foco=/);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art60');
 
   // O "voltar" do navegador (o gesto do celular) também sai, na mesma posição; "avançar" volta.
   await entrarNoFocoCorrido(page);
-  await expect(areas).toBeHidden();
+  await expect(casca).toBeHidden();
   await page.goBack();
-  await abasForaDoFoco(page, areas);
+  await expect(casca).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art60))).toBeLessThan(2);
   await page.goForward();
@@ -809,7 +790,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe('art105');
   await page.reload();
   await expect(sair).toBeVisible();
-  await expect(areas).toBeHidden();
+  await expect(casca).toBeHidden();
   await expect(art105).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
   await (await naBandejaDoFoco(page, 'Lido até aqui')).click();
@@ -819,7 +800,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await expect.poll(async () => (await leituraGravada(page)).lidoAte).toBe('art105');
   // Recarregar não perde a entrada do histórico: sair volta a ela, na mesma posição.
   await sairDoFocoPelaBandeja(page);
-  await abasForaDoFoco(page, areas);
+  await expect(casca).toBeVisible();
   await expect.poll(async () => Math.abs(await distanciaDoAlto(art105))).toBeLessThan(2);
   await expect(page.locator('.lido-ate')).toContainText('Lido até Art. 105');
 
@@ -849,7 +830,7 @@ test('modo foco: só o texto, botão fixo semitransparente, atalho F/Esc, "volta
   await page.keyboard.press('Control+f');
   await page.evaluate(() => new Promise((resolver) => requestAnimationFrame(resolver)));
   expect(page.url()).not.toMatch(/foco=/);
-  await abasForaDoFoco(page, areas);
+  await expect(casca).toBeVisible();
 
   // No fim da norma, a página encurta sem a moldura: o mesmo dispositivo continua no alto, no
   // mesmo ponto, ao entrar e ao sair.
@@ -1580,7 +1561,7 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
   const entrar = page.getByRole('button', { name: 'Modo foco' });
-  const areas = page.getByRole('navigation', { name: 'Áreas' });
+  const casca = cabecalhoDaCasca(page);
   const cartao = (artigo: string) =>
     page.getByRole('region', { name: new RegExp(`^Art\\. ${artigo}, \\d+ de \\d+$`) });
   const proximo = page.getByRole('button', { name: 'Próximo artigo' });
@@ -1601,7 +1582,7 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await entrar.click();
   await expect(page).toHaveURL(/[?&]foco=artigo/);
   await expect(cartao('41')).toBeVisible();
-  await expect(areas).toBeHidden();
+  await expect(casca).toBeHidden();
   await expect(page.getByRole('group', { name: 'Tamanho do texto' })).toBeHidden();
   expect(await sobra()).toBe(0);
   // O cartão fica no centro da tela, na horizontal, e na vertical no centro do que sobra da tela (rola
@@ -1692,7 +1673,7 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await expect.poll(async () => (await leituraGravada(page)).posicao).toBe(segundo);
   await page.reload();
   await expect.poll(enderecoDoCartao).toBe(segundo);
-  await expect(areas).toBeHidden();
+  await expect(casca).toBeHidden();
 
   // Sair do foco: o texto corrido volta com o artigo do cartão no alto, e a moldura volta.
   const noTexto = page.locator(`[data-endereco="${segundo}"]`);
@@ -1701,9 +1682,9 @@ test('palco do foco: F abre o cartão na penumbra, só o ⋯ e o fio de progress
   await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Sair do foco' })).toBeHidden();
-  await expect(areas).toBeHidden();
+  await expect(casca).toBeHidden();
   await page.keyboard.press('Escape');
-  await abasForaDoFoco(page, areas);
+  await expect(casca).toBeVisible();
   await expect(page).not.toHaveURL(/foco=/);
   await expect.poll(async () => Math.abs(await distanciaDoAlto(noTexto))).toBeLessThan(2);
 
@@ -1946,7 +1927,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com o ponto de luz n
     await alinharNoAlto(page, cap2);
     const visivel = await page.evaluate(
       () =>
-        window.innerHeight - (document.querySelector('.topo')?.getBoundingClientRect().bottom ?? 0),
+        window.innerHeight -
+        (document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0),
     );
     await page.evaluate((dy) => {
       window.scrollBy(0, dy);

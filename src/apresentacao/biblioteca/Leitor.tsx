@@ -52,9 +52,9 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
 import { FioDaRolagem } from './FioDaRolagem';
 import { MarcadorDePagina } from './MarcadorDePagina';
-import { useLeituraFunda } from './leitura-funda';
 import { useItensDoMais } from '../componentes/ItensDoMais';
 import { Voltar } from '../componentes/Voltar';
+import { deOndeVeio } from '../fio/volta-do-leitor';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
@@ -317,9 +317,7 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
   }
   return (
     <>
-      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
-        Biblioteca
-      </Voltar>
+      <Voltar para={deOndeVeio()}>Voltar</Voltar>
       {carga.tipo === 'carregando' ? (
         <Esqueleto />
       ) : carga.excecao instanceof NormaIndisponivel ? (
@@ -331,7 +329,7 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
       ) : (
         <Falha
           oQue="Não foi possível abrir a norma."
-          oQueFazer="Volte à Biblioteca e tente de novo. Se continuar, feche as outras abas do Arretado."
+          oQueFazer="Volte e tente de novo. Se continuar, feche as outras abas do Arretado."
         />
       )}
     </>
@@ -405,9 +403,9 @@ function useTextos(
   return { textos, pedir, emVoo, falhou, tentarDeNovo, tentativa };
 }
 
-/** Onde termina a barra fixa do Shell (`.topo`, sticky): o que fica abaixo dela é o alto da tela. */
+/** Onde termina o cabeçalho preso da casca (`.fio-topo`, sticky): o que fica abaixo dele é o alto da tela. */
 function fimDaBarraFixa(): number {
-  const barra = document.querySelector('.topo');
+  const barra = document.querySelector('.fio-topo');
   return barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
 }
 
@@ -477,7 +475,6 @@ function LeitorAberto({
   const chaveDaRota = rota.key;
   const navegar = useNavigate();
   const modoFoco = busca.has(PARAMETRO_DO_FOCO);
-  useLeituraFunda(true);
   // Artigo por artigo (11.8): o modo foco com o cartão de um artigo no lugar da lista.
   const porArtigo = busca.get(PARAMETRO_DO_FOCO) === VALOR_DO_ARTIGO;
   const porArtigoAgora = useRef(porArtigo);
@@ -2541,9 +2538,7 @@ function BarraDoLeitor({
 }) {
   return (
     <div className="barra-leitor">
-      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
-        Biblioteca
-      </Voltar>
+      <Voltar para={deOndeVeio()}>Voltar</Voltar>
       <h1 className={titulo.length > TITULO_LONGO ? 'titulo-longo' : undefined}>{titulo}</h1>
       <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
         <button

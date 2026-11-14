@@ -15,6 +15,7 @@ import { instalarMatchMedia } from '../../testes/movimento';
 import { blocosDeNormaSintetica } from '../../testes/norma-sintetica';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
+import { esquecerDeOndeVeio } from '../fio/volta-do-leitor';
 
 /** Deixa um teste segurar a leitura de uma janela de textos (o IndexedDB responde fora de hora). */
 const leitura = vi.hoisted(() => ({
@@ -203,8 +204,8 @@ describe('leitor da norma (9.6)', () => {
       within(paragrafo).getByText('(Incluído pela Lei nº 12.000, de 2009)'),
     ).toBeInTheDocument();
     expect(within(paragrafo).getByRole('list', { name: 'Notas de vigência' })).toBeInTheDocument();
-    // O "Voltar" leva à Biblioteca.
-    await usuario.click(screen.getByRole('link', { name: 'Voltar à Biblioteca' }));
+    // O "Voltar" leva de volta ao lugar de onde a pessoa veio: aqui, a Biblioteca.
+    await usuario.click(screen.getByRole('link', { name: 'Voltar' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Biblioteca' }),
     ).toBeInTheDocument();
@@ -379,11 +380,13 @@ describe('leitor da norma (9.6)', () => {
   });
 
   it('norma sem versão vigente ou inexistente não abre e diz o motivo', async () => {
+    esquecerDeOndeVeio();
     const { repo } = await repositorioDeTeste();
     const { norma } = await criarRascunho(repo, { blocos: LEI, origemEntrada: 'html' });
     abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     expect(await screen.findByText(/ainda não foi publicada/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Voltar à Biblioteca' })).toBeInTheDocument();
+    // Aberta pelo endereço, sem lugar de origem: o "Voltar" leva à lista de normas do Varal.
+    expect(screen.getByRole('link', { name: 'Voltar' })).toHaveAttribute('href', '#/varal/normas');
 
     act(() => {
       window.location.hash = '#/biblioteca/normas/nao-existe';
@@ -575,7 +578,7 @@ describe('posição lembrada e "lido até" (9.7)', () => {
     // Abrir sem rolar não grava nada ainda.
     expect(await obterLeitura(repo, norma.id)).toBeUndefined();
 
-    await usuario.click(screen.getByRole('link', { name: 'Voltar à Biblioteca' }));
+    await usuario.click(screen.getByRole('link', { name: 'Voltar' }));
     const continuar = await screen.findByRole('link', { name: /^Retomar: LEP/ });
     expect(continuar).toHaveAttribute('href', `#/biblioteca/normas/${norma.id}`);
     expect(screen.getByRole('region', { name: 'Normas' })).toHaveTextContent('Última leitura:');
@@ -735,7 +738,7 @@ describe('modo foco (11.1)', () => {
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
     expect(barraDoLeitor()).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Destaques' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Voltar à Biblioteca' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Voltar' })).not.toBeInTheDocument();
     expect(screen.queryByRole('list', { name: 'Legenda dos destaques' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Ir ao lido até' })).not.toBeInTheDocument();
     // A marca do "lido até" é do texto: continua na linha.
@@ -845,13 +848,15 @@ describe('modo foco (11.1)', () => {
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
     const aberta = await abrirNorma(repo, norma.id);
-    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}?foco=texto`);
     await screen.findByRole('button', { name: 'Mais ações do foco' });
     expect(document.documentElement).toHaveAttribute('data-modo-foco', 'texto');
 
-    // Sair da norma por outra tela (a casca segue montada, escondida só pelo CSS). O "E" não serve mais para
-    // isto: na lei ele registra o erro do artigo, sem sair dela (D-D24).
-    await usuario.click(screen.getByRole('link', { name: 'Trilha' }));
+    // Sair da norma por outra tela, pelo endereço: no modo foco a casca não mostra outra saída, e o "E" não serve
+    // mais para isto (na lei ele registra o erro do artigo, sem sair dela, D-D24).
+    act(() => {
+      window.location.hash = '#/plano';
+    });
     expect(await screen.findByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
     expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
@@ -2616,7 +2621,9 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     await usuario.click(erro);
     const registro = await screen.findByRole('dialog', { name: /^Registrar erro em / });
     await usuario.click(within(registro).getByRole('button', { name: 'Voltar' }));
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    act(() => {
+      window.location.hash = '#/biblioteca';
+    });
     await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
     await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
     expect(screen.getByRole('link', { name: /^Registrar erro/ })).toHaveAttribute(
@@ -2704,15 +2711,17 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     expect(item).toHaveTextContent('Mostrando só: estrelados');
   });
 
-  it('o atributo da raiz que tira as abas vale enquanto a norma está aberta', async () => {
+  it('o atributo da raiz que dá a barra do Leitor no celular vale enquanto a norma está aberta', async () => {
     janelaDe(390);
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
-    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
     expect(document.documentElement).toHaveAttribute('data-leitor');
 
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    act(() => {
+      window.location.hash = '#/biblioteca';
+    });
     await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
     expect(document.documentElement).not.toHaveAttribute('data-leitor');
   });
