@@ -43,8 +43,6 @@ const rolagemLateral = (page: Page) =>
 
 const LINHA_E_FAIXA_DE_DIA =
   /^rgb\(255, 255, 255\) 0px 0px 0px 2px, rgba\(57, 202, 239, 0\.5\) 0px 0px 0px 5px$/;
-const LINHA_E_FAIXA_DE_NOITE =
-  /^rgb\(255, 255, 255\) 0px 0px 0px 2px, rgba\(57, 202, 239, 0\.35\) 0px 0px 0px 5px$/;
 
 test('Modo foco: o artigo leva o anel por fora do cartão que rola, e trocar de artigo não o reacende', async ({
   page,
