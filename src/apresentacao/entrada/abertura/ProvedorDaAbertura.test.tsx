@@ -406,10 +406,6 @@ describe('ProvedorDaAbertura: a luz visita o Zé das Boas-vindas (M3b)', () => {
 });
 
 describe('ProvedorDaAbertura: no Fio a abertura é uma tela do quadro', () => {
-  afterEach(() => {
-    window.localStorage.removeItem('arretado:interface');
-  });
-
   function SondaDoFio() {
     const { camadaDoFio, emCurso } = useEstadoDaAbertura();
     return (
@@ -420,7 +416,6 @@ describe('ProvedorDaAbertura: no Fio a abertura é uma tela do quadro', () => {
   }
 
   async function montarNoFio(rota: string) {
-    window.localStorage.setItem('arretado:interface', 'fio');
     const { repo } = await repositorioDeTeste({ inicio: HOJE });
     const vista = render(
       <MemoryRouter initialEntries={[rota]}>
