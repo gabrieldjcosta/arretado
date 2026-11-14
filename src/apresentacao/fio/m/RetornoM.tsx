@@ -136,9 +136,9 @@ export function RetornoM() {
   return (
     <>
       {texto !== undefined && !semLinha && (
-        <p className="m-quieto m-retorno" role="status">
+        <p className="m-quieto m-linha-de-retorno" role="status">
           <span>{texto}</span>
-          <span className="m-retorno-acoes">
+          <span className="m-linha-de-retorno-acoes">
             {acao}
             {depois && (
               <button type="button" className="m-entrar-codigo" onClick={depois}>

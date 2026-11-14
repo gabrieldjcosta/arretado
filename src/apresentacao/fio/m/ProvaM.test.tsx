@@ -60,4 +60,11 @@ describe('ProvaM: a tela prova do mockup', () => {
       expect(screen.getByTestId('onde')).toBeInTheDocument();
     });
   });
+
+  it('quem já usa o Arretado tem a porta dos dados sem responder à pergunta (desvio 476c)', () => {
+    montar();
+    expect(
+      screen.getByRole('link', { name: 'Já uso o Arretado: restaurar um backup' }),
+    ).toHaveAttribute('href', '/conta/dados');
+  });
 });
