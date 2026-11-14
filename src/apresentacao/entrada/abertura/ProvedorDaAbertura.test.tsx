@@ -103,7 +103,7 @@ describe('ProvedorDaAbertura: quem escreve o nome', () => {
     lembrarDaEscrita(new Date('2026-10-20T08:00:00Z'));
     const { camada, pular } = await montar();
     await waitFor(() => {
-      expect(camada()).not.toBe('nenhuma');
+      expect(camada()).toBe('depressa');
     });
     pular();
     await waitFor(() => {
@@ -171,9 +171,8 @@ describe('ProvedorDaAbertura: quem escreve o nome', () => {
       expect(sonda()).toBe('livre');
     });
     expect(camada()).toBe('nenhuma');
-    await waitFor(() => {
-      expect(guardado()).toEqual({ dia: '2026-10-20' });
-    });
+    // Sem camada, ninguém escreve o nome: o Dia não é guardado (o cabeçalho de antes é que o guardava).
+    expect(guardado()).toBeNull();
   });
 
   it('no StrictMode (efeitos em dobro) a decisão e a camada são de um lugar só', async () => {

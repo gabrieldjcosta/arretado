@@ -45,11 +45,18 @@ vi.mock('../../../dominios/sessao/estacionamento', async (original) => {
   };
 });
 
-async function abrirHoje(repo: Awaited<ReturnType<typeof repositorioDeTeste>>['repo']) {
-  window.location.hash = '#/';
+/** A linha de estado da nota (o quadro do Fio tem outra região `status`, a dos avisos). */
+const estado = () => {
+  const linha = document.querySelector<HTMLElement>('.para-lembrar-estado');
+  if (!linha) throw new Error('sem a linha de estado do Lembrete');
+  return linha;
+};
+
+async function abrirComLembrete(repo: Awaited<ReturnType<typeof repositorioDeTeste>>['repo']) {
+  window.location.hash = '#/plano';
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
-  // Desde a D-D16 a nota vive no "Lembrete" do "+", não mais num bloco do Hoje.
+  // A nota vive no "Lembrete" do "+" (D-D16); a Trilha é uma tela da casca com o "+".
   await usuario.click(await screen.findByRole('button', { name: 'Novo registro' }));
   await usuario.click(await screen.findByRole('button', { name: /^Lembrete\b/ }));
   const campo = await screen.findByRole('textbox', { name: 'Lembrete' });
@@ -67,19 +74,19 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('nasce vazio, com o rótulo à vista', async () => {
     const { repo } = await repositorioDeTeste();
-    const { campo } = await abrirHoje(repo);
+    const { campo } = await abrirComLembrete(repo);
     expect(campo).toHaveValue('');
     expect(campo).toHaveAttribute('placeholder', 'O que fazer fora do app');
     expect(screen.getByRole('heading', { name: 'Lembrete' })).toBeVisible();
-    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(estado()).toBeEmptyDOMElement();
   });
 
   it('escrever avisa que falta salvar; Salvar grava o texto aparado e diz que salvou', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
 
     await usuario.type(campo, '  Pedir o livro de Processo Penal  ');
-    expect(screen.getByRole('status')).toHaveTextContent('Ainda não salvo.');
+    expect(estado()).toHaveTextContent('Ainda não salvo.');
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
 
     expect(await screen.findByText('Salvo.')).toBeInTheDocument();
@@ -89,7 +96,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('tirar o foco do campo para clicar em Salvar grava uma vez só', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
     let soltar = () => {};
     gravacao.segurar = new Promise<void>((resolver) => {
       soltar = resolver;
@@ -105,7 +112,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('sair do campo sem apertar Salvar também grava, para o texto não sumir', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
 
     await usuario.type(campo, 'Ligar para o cartório');
     await usuario.tab();
@@ -117,7 +124,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('Salvar sem nada novo diz que está salvo e não grava', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario } = await abrirHoje(repo);
+    const { usuario } = await abrirComLembrete(repo);
 
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
 
@@ -129,7 +136,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
     const { repo } = await repositorioDeTeste();
     await alterarPreferencias(repo, { lembrete: 'Pedir o livro de Processo Penal' });
     gravacao.chamadas = 0;
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
     expect(campo).toHaveValue('Pedir o livro de Processo Penal');
 
     await usuario.clear(campo);
@@ -142,7 +149,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('o que a pessoa escreve enquanto grava fica no campo, ainda por salvar', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
     let soltar = () => {};
     gravacao.segurar = new Promise<void>((resolver) => {
       soltar = resolver;
@@ -157,20 +164,20 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
       expect((await obterPreferencias(repo)).lembrete).toBe('a');
     });
     expect(campo).toHaveValue('ab');
-    expect(screen.getByRole('status')).toHaveTextContent('Ainda não salvo.');
+    expect(estado()).toHaveTextContent('Ainda não salvo.');
   });
 
   it('a tecla E dentro do campo escreve, não abre o Registrar erro', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
     await usuario.type(campo, 'e');
     expect(campo).toHaveValue('e');
-    expect(window.location.hash).toBe('#/');
+    expect(window.location.hash).toBe('#/plano');
   });
 
   it('perto do teto mostra quantos caracteres já tem; antes disso, nada', async () => {
     const { repo } = await repositorioDeTeste();
-    const { campo } = await abrirHoje(repo);
+    const { campo } = await abrirComLembrete(repo);
     const aviso = LEMBRETE_MAX - 50;
 
     fireEvent.change(campo, { target: { value: 'a'.repeat(aviso - 1) } });
@@ -186,7 +193,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
   it('se a gravação falha, avisa, mantém o texto e deixa tentar de novo', async () => {
     const { repo } = await repositorioDeTeste();
-    const { usuario, campo } = await abrirHoje(repo);
+    const { usuario, campo } = await abrirComLembrete(repo);
     gravacao.falharUmaVez = true;
 
     await usuario.type(campo, 'Ligar para o cartório');
@@ -194,7 +201,7 @@ describe('Lembrete do "+" › a nota do Para lembrar (P7b, D-D15)', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Problema ao salvar.');
     expect(campo).toHaveValue('Ligar para o cartório');
-    expect(screen.getByRole('status')).toHaveTextContent('Ainda não salvo.');
+    expect(estado()).toHaveTextContent('Ainda não salvo.');
 
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }));
 
@@ -234,13 +241,13 @@ describe('Lembrete do "+" › notas guardadas na Sessão', () => {
   it('sem nota guardada, só o campo: nenhuma lista', async () => {
     const { repo } = await repositorioDeTeste();
     await iniciarSessao(repo, {});
-    await abrirHoje(repo);
+    await abrirComLembrete(repo);
     expect(screen.queryByRole('list', LISTA)).toBeNull();
   });
 
   it('lista as notas ainda por resolver de todas as Sessões, a mais recente primeiro, acima do campo', async () => {
     const { repo } = await comNotasGuardadas();
-    const { campo } = await abrirHoje(repo);
+    const { campo } = await abrirComLembrete(repo);
 
     const lista = await screen.findByRole('list', LISTA);
     expect(
@@ -262,7 +269,7 @@ describe('Lembrete do "+" › notas guardadas na Sessão', () => {
 
   it('marcar resolve a nota na Sessão; ela continua à vista, marcada, e desmarcar a devolve', async () => {
     const { repo, a } = await comNotasGuardadas();
-    const { usuario } = await abrirHoje(repo);
+    const { usuario } = await abrirComLembrete(repo);
     const caixa = () => screen.getByRole('checkbox', { name: 'Ligar para o cartório' });
     await screen.findByRole('list', LISTA);
     const resolvidaEm = async () =>
@@ -283,7 +290,7 @@ describe('Lembrete do "+" › notas guardadas na Sessão', () => {
 
   it('se marcar falha, avisa, deixa a nota sem marca e deixa tentar de novo', async () => {
     const { repo } = await comNotasGuardadas();
-    const { usuario } = await abrirHoje(repo);
+    const { usuario } = await abrirComLembrete(repo);
     const caixa = await screen.findByRole('checkbox', { name: 'Ligar para o cartório' });
     marcacao.falharUmaVez = true;
 

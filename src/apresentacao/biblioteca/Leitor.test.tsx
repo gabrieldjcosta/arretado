@@ -851,8 +851,10 @@ describe('modo foco (11.1)', () => {
 
     // Sair da norma por outra tela (a casca segue montada, escondida só pelo CSS). O "E" não serve mais para
     // isto: na lei ele registra o erro do artigo, sem sair dela (D-D24).
-    await usuario.click(screen.getByRole('link', { name: 'Trilha' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
+    await usuario.click(screen.getByRole('link', { name: 'Destino' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/destino');
+    });
     expect(document.documentElement).not.toHaveAttribute('data-modo-foco');
     expect((await obterLeitura(repo, norma.id))?.posicaoId).toBe(aberta.nos[0]!.dispositivo.id);
   });
@@ -2616,7 +2618,7 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     await usuario.click(erro);
     const registro = await screen.findByRole('dialog', { name: /^Registrar erro em / });
     await usuario.click(within(registro).getByRole('button', { name: 'Voltar' }));
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    window.location.hash = '#/biblioteca';
     await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
     await usuario.click(screen.getByRole('button', { name: 'Novo registro' }));
     expect(screen.getByRole('link', { name: /^Registrar erro/ })).toHaveAttribute(
@@ -2708,11 +2710,11 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     janelaDe(390);
     const { repo } = await repositorioDeTeste();
     const norma = await publicar(repo, LEI);
-    const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+    abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
     await screen.findByText(/A jurisdição penal/);
     expect(document.documentElement).toHaveAttribute('data-leitor');
 
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    window.location.hash = '#/biblioteca';
     await screen.findByRole('heading', { level: 1, name: 'Biblioteca' });
     expect(document.documentElement).not.toHaveAttribute('data-leitor');
   });
