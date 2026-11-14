@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { abrirOLembrete, expect, importarEPublicar, test } from './apoio';
 
-// D-D23: o "+" é um só, da casca, fixo no canto de cima à direita. O jsdom não tem layout; aqui o
+// D-D23: o "+" é um só, da casca das telas legadas (o Agora tem o dele, "Guardar um erro"), fixo no canto de cima à direita. O jsdom não tem layout; aqui o
 // navegador confere que ele fica no mesmo ponto em toda tela (cabeçalho e modo foco), cai na reserva
 // do cabeçalho sem cobrir nada (nem com a fonte ampliada), que o cartão do foco não passa por baixo
 // dele e que o Lembrete abre por cima da tela em que a pessoa está.
@@ -30,7 +30,6 @@ const sobrepoe = (a: Caixa, b: Caixa) =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 
 const TELAS = [
-  ['/', 'Hoje'],
   ['/#/plano', 'Trilha'],
   ['/#/recall', 'Fixar'],
   ['/#/biblioteca', 'Biblioteca'],
@@ -39,10 +38,11 @@ const TELAS = [
 ] as const;
 
 test.describe('"+" da casca', () => {
-  test('fica no mesmo ponto, com 48 px, em toda tela', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-    const referencia = await caixaDe(mais(page), 'Hoje');
+  test('fica no mesmo ponto, com 48 px, em toda tela da casca legada', async ({ page }) => {
+    const [primeira, titulo1] = TELAS[0];
+    await page.goto(primeira);
+    await expect(page.getByRole('heading', { level: 1, name: titulo1 })).toBeVisible();
+    const referencia = await caixaDe(mais(page), titulo1);
     expect([Math.round(referencia.width), Math.round(referencia.height)]).toEqual([48, 48]);
     for (const [rota, titulo] of TELAS.slice(1)) {
       await page.goto(rota);
@@ -53,28 +53,31 @@ test.describe('"+" da casca', () => {
     }
   });
 
-  test('cai na reserva do cabeçalho: à direita da Conta, centrado, no recuo da página e sem cobrir nada', async ({
+  test('cai na reserva do cabeçalho: à direita da Ajuda, no recuo da página e sem cobrir nada', async ({
     page,
   }) => {
-    await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    await page.goto('/#/plano');
+    await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
     const topo = page.getByRole('banner');
     const caixaTopo = await caixaDe(topo, 'cabeçalho');
     const m = await caixaDe(mais(page), '+');
-    const marca = await caixaDe(topo.getByRole('link', { name: 'Arretado, início' }), 'marca');
-    const ajuda = await caixaDe(topo.getByRole('button', { name: 'Ajuda', exact: true }), 'Ajuda');
-    const conta = await caixaDe(topo.getByRole('link', { name: 'Conta e ajustes' }), 'Conta');
-
-    // Uma linha só, e o "+" no meio dela.
-    expect(caixaTopo.height).toBeLessThanOrEqual(64);
-    expect(Math.abs(m.y + m.height / 2 - (caixaTopo.y + caixaTopo.height / 2))).toBeLessThanOrEqual(
-      1,
+    const menu = await caixaDe(
+      topo.getByRole('link', { name: 'Menu: sua conta e ajustes' }),
+      'Menu',
     );
-    // Ordem e distância: marca, Ajuda, Conta, "+", sem que nenhum cubra o vizinho.
+    const marca = await caixaDe(
+      topo.getByRole('link', { name: 'Arretado: ir para o Agora' }),
+      'marca',
+    );
+    const ajuda = await caixaDe(topo.getByRole('button', { name: 'Ajuda', exact: true }), 'Ajuda');
+
+    // Uma linha só.
+    expect(caixaTopo.height).toBeLessThanOrEqual(64);
+    // Ordem e distância: Menu, marca, Ajuda, "+", sem que nenhum cubra o vizinho.
+    expect(menu.x + menu.width).toBeLessThanOrEqual(marca.x);
     expect(marca.x + marca.width).toBeLessThanOrEqual(ajuda.x);
-    expect(ajuda.x + ajuda.width).toBeLessThanOrEqual(conta.x);
-    expect(conta.x + conta.width).toBeLessThanOrEqual(m.x);
-    for (const outro of [marca, ajuda, conta]) expect(sobrepoe(m, outro)).toBe(false);
+    expect(ajuda.x + ajuda.width).toBeLessThanOrEqual(m.x);
+    for (const outro of [menu, marca, ajuda]) expect(sobrepoe(m, outro)).toBe(false);
     // O cabeçalho reserva à direita o recuo da página, os 48 px do "+" e 4 px de respiro (a mesma conta
     // do CSS, em celular, tablet e computador): o que sobra à direita do "+" é o recuo da página.
     const reserva = await topo.evaluate((el) => parseFloat(getComputedStyle(el).paddingRight));
@@ -82,6 +85,16 @@ test.describe('"+" da casca', () => {
     expect(Math.abs(margem + m.width + 4 - reserva)).toBeLessThanOrEqual(1);
     // Os links da casca não repetem o "Registrar erro" (ele mora no painel do "+" e na tecla E).
     await expect(topo.getByRole('link', { name: /Registrar erro/ })).toHaveCount(0);
+  });
+
+  test('fica no meio da linha do cabeçalho', async ({ page }) => {
+    await page.goto('/#/plano');
+    await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
+    const caixaTopo = await caixaDe(page.getByRole('banner'), 'cabeçalho');
+    const m = await caixaDe(mais(page), '+');
+    expect(Math.abs(m.y + m.height / 2 - (caixaTopo.y + caixaTopo.height / 2))).toBeLessThanOrEqual(
+      1,
+    );
   });
 
   test('com a fonte ampliada o cabeçalho quebra em linhas e nada fica sob o "+" nem passa da tela', async ({
@@ -92,9 +105,9 @@ test.describe('"+" da casca', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Orientações' })).toBeVisible();
     const topo = page.getByRole('banner');
     const filhos = [
-      ['marca', topo.getByRole('link', { name: 'Arretado, início' })],
+      ['Menu', topo.getByRole('link', { name: 'Menu: sua conta e ajustes' })],
+      ['marca', topo.getByRole('link', { name: 'Arretado: ir para o Agora' })],
       ['Ajuda', topo.getByRole('button', { name: 'Ajuda', exact: true })],
-      ['Conta', topo.getByRole('link', { name: 'Conta e ajustes' })],
     ] as const;
     for (const fonte of [200, 300]) {
       await page.evaluate((f) => {
