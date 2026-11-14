@@ -35,7 +35,7 @@ async function comALeiLida(page: Page) {
   await page.keyboard.press('End');
   await page.waitForTimeout(800);
   await page.getByRole('button', { name: 'Lido até aqui' }).click();
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
 }

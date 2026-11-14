@@ -16,15 +16,8 @@ const abertura = (page: Page) => page.locator('.m-abertura');
 const pergunta = (page: Page) =>
   page.getByRole('heading', { level: 1, name: 'Pra qual prova você estuda?' });
 
-/** Abre o app já com o Arretado novo ligado, como quem recebeu o link da prévia. */
+/** Abre o app pela raiz, como quem chega pela primeira vez. */
 async function abrirNoFio(page: Page) {
-  await page.addInitScript(() => {
-    try {
-      window.localStorage.setItem('arretado:interface', 'fio');
-    } catch {
-      /* sem armazenamento */
-    }
-  });
   await page.goto('/');
 }
 
@@ -103,7 +96,7 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 780 });
-  // Traz uma matéria pelo edital com a interface de sempre (a abertura de antes é pulada com uma tecla).
+  // Traz uma matéria pelo edital pela Trilha (a abertura é pulada com uma tecla).
   await page.goto('/#/plano');
   await pularAAbertura(page);
   await page.getByRole('button', { name: 'Trazer meu edital' }).click();
@@ -114,10 +107,9 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  // Um aparelho em que o nome ainda não foi escrito, agora no Arretado novo.
+  // Um aparelho em que o nome ainda não foi escrito.
   await page.evaluate((chave) => {
     localStorage.removeItem(chave);
-    localStorage.setItem('arretado:interface', 'fio');
   }, CHAVE_DA_ESCRITA);
   await page.goto('/');
   await page.reload();

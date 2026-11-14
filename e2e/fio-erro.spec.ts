@@ -22,7 +22,7 @@ async function comALeiNaPrevia(page: Page) {
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
   await expect(page.getByRole('button', { name: /Puxar o fio/ })).toBeVisible();

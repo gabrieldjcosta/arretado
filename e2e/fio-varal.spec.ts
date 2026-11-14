@@ -78,7 +78,7 @@ async function prepararOVaral(
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   if (!opcoes.soLep) await importarEPublicar(page, 'eca-compilado', 'ECA');
   if (opcoes.comFrases) await guardarAsFrases(page);
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(nav(page)).toBeVisible();
 }
 

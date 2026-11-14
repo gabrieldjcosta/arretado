@@ -38,7 +38,7 @@ async function prepararAPrevia(page: Page, comLei: boolean) {
     await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
   }
 
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
 }
 

@@ -19,7 +19,7 @@ async function comMateriaNaPrevia(page: Page) {
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
 }
 
@@ -63,7 +63,7 @@ test('sem prova escolhida, o cartão "Para começar" tem uma coluna só e o bot�
 }) => {
   test.setTimeout(120_000);
   // Sem importar edital: o app abre na prévia sem matéria e o Agora pergunta a prova no lugar do fio.
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   const cartao = page.getByRole('group', { name: 'Para começar' });
   await expect(cartao).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();

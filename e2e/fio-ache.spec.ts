@@ -20,9 +20,8 @@ async function comALei(page: Page) {
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
 }
 
 /** Anda pelos passos, olhando o que a tela oferece a cada volta, até o cartão `achar`; devolve o que viu. */

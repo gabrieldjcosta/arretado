@@ -20,7 +20,7 @@ async function noPrimeiroPouso(page: Page) {
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  await page.goto('/#/fio/ligar');
+  await page.goto('/#/');
   await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
   await page.getByRole('button', { name: /Puxar o fio/ }).click();

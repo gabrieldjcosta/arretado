@@ -5,9 +5,8 @@ import { entrarPorCodigo } from './conta-apoio';
 // conta mostra quem é, o anel se fecha e "Sair desta conta" leva à tela que confirma.
 
 async function abrirAConta(page: import('@playwright/test').Page) {
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.goto('/#/');
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   return page.getByRole('dialog');
 }
