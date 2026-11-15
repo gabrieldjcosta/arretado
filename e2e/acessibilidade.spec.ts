@@ -185,6 +185,9 @@ for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/o
   test(`${rota}: a pílula dos lugares não cobre texto no fim da página`, async ({ page }) => {
     await page.goto(`/#${rota}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // A tela de carregamento sai no quadro em que a casca aparece, mas esmaece 200 ms ainda na árvore: o texto
+    // dela ("Tentar de novo") contaria como coberto.
+    await expect(page.locator('#carregamento')).toHaveCount(0);
     const cobertos = await page.evaluate(() => {
       window.scrollTo(0, document.documentElement.scrollHeight);
       const abas = document.querySelector('nav[aria-label="Lugares"]');
