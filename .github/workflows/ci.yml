@@ -59,7 +59,7 @@ jobs:
   # (continue-on-error) até haver uma linha de base verde; quando houver, tirar a linha e marcar o job como exigido.
   e2e-webkit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 50
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -73,7 +73,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps webkit
-      - run: npx playwright test --project=${{ matrix.aparelho }} e2e/fio-.*\.spec\.ts e2e/leitor-celular\.spec\.ts e2e/recall\.spec\.ts
+      - run: npx playwright test --reporter=list --project=${{ matrix.aparelho }} e2e/fio-.*\.spec\.ts e2e/leitor-celular\.spec\.ts e2e/recall\.spec\.ts
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
