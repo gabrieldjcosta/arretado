@@ -6,7 +6,7 @@ Plataforma pessoal de preparação para concursos jurídicos de qualquer carreir
 Nome provisório "Arretado" (antes "Acumen"; "Acumen v2" = protótipo anterior em Firestore). Decisão de 23/09/2026: nada do Acervo nem do Acumen v2 é importado; conteúdo recomeça do zero.
 
 ## Estado
-Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T24); **F0 e F1 implementadas** (portões em `docs/portoes/`); **F2 em execução** (plano e andamento em `docs/planos/F2.md`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, próxima atividade e pendências).
+Especificação concluída; decisões técnicas em `docs/decisoes-tecnicas.md` (T1–T24); **F0 e F1 implementadas** (portões em `docs/portoes/`); **F2 fechada** (portão em 13/10/2026; histórico em `docs/planos/F2.md`); **o Fio é a única casca** (14/11/2026: Agora, Destino e Varal; sem as quatro áreas de antes; D-D25 em `docs/design/decisoes-design.md`). **Começar toda sessão por `docs/proxima-sessao.md`** (estado, próxima atividade e pendências).
 
 Leitura sempre: `docs/proxima-sessao.md` e `README.md` (uma página). Ordem das etapas: `docs/planos/plano-mestre.md` (§9, próximas atividades; a fase da atividade, sob demanda). Leitura sob demanda, só a seção que a tarefa pede:
 1. `docs/especificacao-parte1.md` §19 — decisões D1–D25 (não reabrir sem motivo explícito do Gabriel); §5 e §15 — modelo de dados e fases.
@@ -30,9 +30,9 @@ Registrar no fim de `docs/proxima-sessao.md` (ou no PR), separando "feito" de "v
 Quem retoma confere branch, commit e alterações locais antes de editar; se não bater com o resumo, para e avisa o Gabriel. Mesma falha duas vezes: parar de editar e diagnosticar. Risco alto (migração, reancoragem, sincronização, sanitização): revisão independente em outra sessão antes do merge.
 
 ## Regras de trabalho neste projeto
-- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 Hoje/Plano → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); o portão da F2 foi fechado em 13/10/2026 e a F3 está liberada; medições em uso real e testes com outras pessoas ficam na V1 (depois das contas), sem bloquear fase.
+- Fases são sequenciais: F0 fundamentos → F1 Recall (MVP) → F2 Legislação → F3 (Hoje/Plano, absorvida pelo Fio) → F4 sync. Não antecipar funcionalidade de fase posterior. Exceção decidida pelo Gabriel em 23/09/2026: a F2 roda em paralelo ao uso real da F1 (o portão da F1 continua sendo medido); o portão da F2 foi fechado em 13/10/2026 e a F3 está liberada; medições em uso real e testes com outras pessoas ficam na V1 (depois das contas), sem bloquear fase.
 - Toda entrega de fase inclui o item de segurança/LGPD descrito na Parte 1 §15.
-- Vocabulário obrigatório na interface e no código: Aparelho (equipamento), Problema (falha da plataforma), Erro (só estudo), Dispositivo (só unidade da lei), Norma, Ponto, Dia, Sessão, Cartão, Revisão, Estrela, Frase correta.
+- Vocabulário obrigatório na interface e no código: Aparelho (equipamento), Problema (falha da plataforma), Erro (só estudo), Dispositivo (só unidade da lei), Norma, Ponto, Dia, Sessão, Fio, Agora, Destino, Varal, Passo, Pouso, Cartão, Revisão, Estrela, Frase correta.
 - Nada obrigatório além do mínimo nos formulários; na captura de erro só a frase correta é obrigatória (D25; implementado nas Frases 1, esquema v6).
 - Local-first: nenhuma funcionalidade pode depender de rede; o remoto (Supabase) é espelho.
 - Nunca renderizar HTML colado sem sanitizar.
