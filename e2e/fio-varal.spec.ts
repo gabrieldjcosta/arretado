@@ -676,9 +676,14 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
       w,
     );
     await semRolagemLateral(page);
-    // O corpo da folha cabe na tela, embaixo.
-    const corpo = await caderno.locator('.m-corpo').boundingBox();
-    expect((corpo?.y ?? -1) + (corpo?.height ?? 0)).toBeLessThanOrEqual(h + 1);
+    // O corpo da folha cabe na tela, embaixo. A folha reassenta depois de trocar o tamanho da janela (no iPhone do
+    // CI a primeira leitura pegou o tamanho de antes: 771 contra 741), então a medida espera ela parar.
+    await expect
+      .poll(async () => {
+        const corpo = await caderno.locator('.m-corpo').boundingBox();
+        return (corpo?.y ?? -1) + (corpo?.height ?? 0);
+      })
+      .toBeLessThanOrEqual(h + 1);
     await semViolacoesNoFio(page);
   }
 
