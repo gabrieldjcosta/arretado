@@ -126,6 +126,16 @@ describe('Conta em folha', () => {
     });
   });
 
+  it('a Trilha tem porta na folha: a data da prova, o Ciclo e as Tarefas ficam a um toque', async () => {
+    const { usuario, folha } = await abrir();
+    const linha = within(folha).getByRole('button', { name: /^Trilha/ });
+    expect(linha).toHaveTextContent('a data da prova, o ciclo e as tarefas');
+    await usuario.click(linha);
+    await waitFor(() => {
+      expect(screen.getByTestId('rota')).toHaveTextContent('/plano');
+    });
+  });
+
   it('"Relatar um problema" abre o relato depois que a folha desce', async () => {
     const { usuario, folha } = await abrir();
     await usuario.click(within(folha).getByRole('button', { name: /Relatar um problema/ }));

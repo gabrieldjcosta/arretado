@@ -14,6 +14,7 @@ import { useDados, useRepositorio } from '../../dados/contexto';
 import { escolherMovimento } from '../../movimento-escolhido';
 import { useSincronizacao } from '../../sincronizacao/contexto';
 import { RelatarProblema } from '../../suporte/RelatarProblema';
+import { ROTULO_DA_AREA } from '../../textos';
 import { useContaAtiva, type ContaAtiva } from '../dados/conta-ativa';
 import { animar, modoAgora } from './anima';
 import { FolhaM } from './FolhaM';
@@ -281,6 +282,15 @@ function Conteudo({
           }}
         >
           Ajustar o destino
+        </Linha>
+        {/* A Trilha não é um dos três lugares do Fio: a porta dela (data da prova, Ciclo, Tarefas, Pontos) é aqui. */}
+        <Linha
+          pequeno="a data da prova, o ciclo e as tarefas"
+          aoToque={() => {
+            ir('/plano');
+          }}
+        >
+          {ROTULO_DA_AREA.plano}
         </Linha>
       </div>
       <div className="m-grupo-conta">

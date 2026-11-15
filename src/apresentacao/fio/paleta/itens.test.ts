@@ -11,6 +11,11 @@ describe('filtrarItens', () => {
   it('acha pelas palavras-chave', () => {
     expect(filtrarItens(ITENS_FIXOS, 'mapa').map((i) => i.id)).toEqual(['destino']);
   });
+  it('a Trilha, que não é lugar do Fio, se acha pelo nome e pelo que guarda', () => {
+    expect(filtrarItens(ITENS_FIXOS, 'ciclo').map((i) => i.para)).toEqual(['/plano']);
+    expect(filtrarItens(ITENS_FIXOS, 'data da prova').map((i) => i.para)).toEqual(['/plano']);
+    expect(filtrarItens(ITENS_FIXOS, 'trilha').map((i) => i.id)).toEqual(['destino', 'trilha']);
+  });
   it('sem achado, vazio', () => {
     expect(filtrarItens(ITENS_FIXOS, 'zzzz')).toEqual([]);
   });

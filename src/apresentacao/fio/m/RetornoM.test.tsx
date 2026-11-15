@@ -144,6 +144,46 @@ describe('RetornoM: a linha de retorno do Agora (desvio 476)', () => {
     );
   });
 
+  it('a lei que mudou também tem "Depois": passa a vez ao Lembrete nesta visita', async () => {
+    const { repo } = await repositorioDeTeste();
+    const f1 = await FonteEmMemoria.criar([{ item: item(1, 'Reclusão de um a quatro anos.') }]);
+    const f2 = await FonteEmMemoria.criar([{ item: item(2, 'Reclusão de 2 a 6 anos.') }]);
+    const [e1] = (await f1.listar()).itens;
+    if (!e1) throw new Error('índice vazio');
+    const adesao = await aderirAoItem(repo, f1, e1);
+    if (adesao.estado !== 'adicionada') throw new Error('não adicionou');
+    await alterarPreferencias(repo, { lembrete: 'Ligar para a secretaria.' });
+
+    // O acervo tem texto novo de uma norma da pessoa, e ela não quer atualizar agora.
+    const usuario = await montar(repo, f2);
+    const linha = await screen.findByRole('status');
+    await waitFor(() => {
+      expect(linha).toHaveTextContent('CP: o acervo tem texto novo.');
+    });
+    expect(screen.queryByText(/Ligar para a secretaria/)).toBeNull();
+    await usuario.click(within(linha).getByRole('button', { name: 'Depois' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Lembrete: Ligar para a secretaria.');
+  });
+
+  it('o Lembrete escrito fora do Agora aparece já na volta: a leitura guardada da visita anterior não trava a linha', async () => {
+    const { repo } = await repositorioDeTeste();
+    await montar(repo);
+    await lido(repo);
+    // A leitura desta visita chegou sem nada a dizer e ficou guardada.
+    await waitFor(() => {
+      expect(screen.queryByRole('status')).toBeNull();
+    });
+    await new Promise((resolver) => setTimeout(resolver, 50));
+    cleanup();
+
+    // No Varal a pessoa escreve o Lembrete e volta ao Agora, que monta de novo.
+    await alterarPreferencias(repo, { lembrete: 'Ligar para a secretaria.' });
+    await montar(repo);
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Lembrete: Ligar para a secretaria.',
+    );
+  });
+
   it('o Lembrete aparece por último, só com o começo, e "Abrir" mostra a nota inteira', async () => {
     const { repo } = await repositorioDeTeste();
     const nota = `Comprar o vade-mécum novo antes da prova de sábado ${'e conferir a lista. '.repeat(3)}`;

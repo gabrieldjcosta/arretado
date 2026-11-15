@@ -50,7 +50,7 @@ export function RetornoM() {
   const repo = useRepositorio();
   const fonte = useFonteAcervo();
   const versaoNova = useAtualizacaoPronta();
-  const { dados } = useDadosDoFio('retorno', doAparelho);
+  const { dados, deAntes } = useDadosDoFio('retorno', doAparelho);
   const { dados: novas } = useDadosDoFio(
     'retorno-acervo',
     useCallback(
@@ -63,6 +63,7 @@ export function RetornoM() {
     ),
   );
   const [versaoAdiada, setVersaoAdiada] = useState(false);
+  const [leiAdiada, setLeiAdiada] = useState(false);
   const [dispensadoAte, setDispensadoAte] = useState(lerDispensa);
   const [lembrando, setLembrando] = useState(false);
   const [semLinha, setSemLinha] = useState(false);
@@ -97,7 +98,7 @@ export function RetornoM() {
       gravarDispensa(ate);
       setDispensadoAte(ate);
     };
-  } else if (lei) {
+  } else if (lei && !leiAdiada) {
     texto =
       outrasLeis.length > 0
         ? `${lei.texto} E mais ${String(outrasLeis.length)} ${outrasLeis.length === 1 ? 'norma' : 'normas'}.`
@@ -107,6 +108,10 @@ export function RetornoM() {
         {lei.rotulo}
       </Link>
     );
+    // Como a versão nova: passa a vez nesta visita, e volta na próxima enquanto a lei estiver por ver.
+    depois = () => {
+      setLeiAdiada(true);
+    };
   } else if (dados?.lembrete) {
     const comeco = dados.lembrete.split('\n', 1)[0] ?? '';
     texto = `Lembrete: ${
@@ -130,8 +135,9 @@ export function RetornoM() {
 
   // A área do fio estica até o fim da tela: uma linha que chegasse com a pessoa já no Agora a encolheria e subiria o
   // que ela está para tocar. Depois que os dados do Aparelho chegam sem linha, a tela fica sem linha; o que chegar
-  // mais tarde (o índice do acervo pela rede, uma versão nova) aparece na próxima vez que o Agora montar.
-  if (dados && texto === undefined && !semLinha) setSemLinha(true);
+  // mais tarde (o índice do acervo pela rede, uma versão nova) aparece na próxima vez que o Agora montar. Só a
+  // leitura desta visita trava: a guardada da visita anterior não sabe do Lembrete escrito no Varal nesse meio-tempo.
+  if (dados && !deAntes && texto === undefined && !semLinha) setSemLinha(true);
 
   return (
     <>
