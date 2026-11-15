@@ -12,7 +12,9 @@ const visita = (suite) => {
       const ultimo = teste.results?.at(-1);
       if (!ultimo || ['passed', 'skipped'].includes(ultimo.status)) continue;
       const erro = limpa(ultimo.error?.message ?? ultimo.status);
-      const chave = erro.split('\n').slice(0, 3).join(' | ').slice(0, 300);
+      const linhas = erro.split('\n');
+      const diff = linhas.filter((l) => /^\s*[+-]\s+\S/.test(l)).slice(0, 4);
+      const chave = [...linhas.slice(0, 3), ...diff].join(' | ').slice(0, 500);
       const g = grupos.get(chave) ?? [];
       g.push(`${spec.file}:${String(spec.line)} ${spec.title.slice(0, 60)}`);
       grupos.set(chave, g);
