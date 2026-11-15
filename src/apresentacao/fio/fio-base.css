@@ -729,9 +729,9 @@
    Mesmas funções e menus do celular; só muda a organização (Gabriel, 08/11/2026). A ação e o contexto ficam
    numa coluna do lado, a lista e as abas na do corpo, e o cabeçalho acompanha a largura. Abaixo de 1000 px
    os três blocos são caixas comuns, uma sobre a outra, como no celular. */
-@media (min-width: 1000px) {
+@media (min-width: 800px) {
   .shell-fio:has(.pc-colunas) {
-    --largura-casca: 1120px;
+    --largura-casca: min(1120px, 100%);
     --mais-direita: calc(
       max(var(--gutter), env(safe-area-inset-right, 0px)) + (100% - var(--largura-casca)) / 2
     );
@@ -752,7 +752,7 @@
 
 /* A Conta e as listas da Biblioteca no monitor: as linhas em duas colunas, na mesma ordem do celular. Só quando
    há quatro ou mais: com uma ou duas linhas, meia largura vazia ao lado parece erro. */
-@media (min-width: 1000px) {
+@media (min-width: 800px) {
   .shell-fio .lista-de-linhas:has(> li:nth-child(4)) {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
