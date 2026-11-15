@@ -127,7 +127,7 @@ describe('Sessão encerrada: a ponte é a próxima ação do Agora', () => {
       'href',
       '#/recall/erros',
     );
-    expect(screen.getByRole('link', { name: 'Ir para o Hoje' })).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Ir para o Agora' })).toHaveClass('principal');
   });
 
   it('a ponte vem depois do botão principal e não é a ação principal', async () => {

@@ -14,7 +14,7 @@ export const SECOES: Secao[] = [
     id: 'como-funciona',
     titulo: 'Como o Arretado funciona',
     paragrafos: [
-      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Trilha (onde você está no edital), Fixar (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
+      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São três lugares: Agora (o que fazer agora), Destino (a sua prova vista de cima e o plano) e Varal (o que é seu: normas, frases, cartões e lembretes).',
       'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Fixar (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
       'Nada é obrigatório além do mínimo: você completa os detalhes quando quiser.',
     ],

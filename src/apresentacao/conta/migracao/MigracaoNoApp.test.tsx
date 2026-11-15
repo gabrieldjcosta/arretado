@@ -42,7 +42,7 @@ describe('Migração no app (ProvedorRepositorio real)', () => {
     }
   });
 
-  it('copiar para a conta conclui sem derrubar o app, e "Ir para o Hoje" recarrega (T26)', async () => {
+  it('copiar para a conta conclui sem derrubar o app, e "Ir para o Agora" recarrega (T26)', async () => {
     window.location.hash = '#/conta/migracao';
     const u = userEvent.setup();
     render(<App />);
@@ -54,7 +54,7 @@ describe('Migração no app (ProvedorRepositorio real)', () => {
     expect(await estadoDaMigracao(UID)).toBe('concluida');
     expect((await new RegistroDeContas().contaAtiva())?.uid).toBe(UID);
 
-    await u.click(screen.getByRole('link', { name: 'Ir para o Hoje' }));
+    await u.click(screen.getByRole('link', { name: 'Ir para o Agora' }));
     expect(recarregarEm).toHaveBeenCalledWith('#/');
   });
 });

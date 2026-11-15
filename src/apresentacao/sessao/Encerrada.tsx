@@ -41,7 +41,7 @@ export function Encerrada({ sessao }: { sessao: Sessao }) {
         acao={
           <>
             <Link to="/" className="botao principal">
-              Ir para o Hoje
+              Ir para o Agora
             </Link>
             {proxima && (
               // `replace`: o Voltar da Sessão nova não cai num "Encerrar a Sessão" dela.

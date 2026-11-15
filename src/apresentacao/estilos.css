@@ -606,8 +606,7 @@ blockquote {
 
 button,
 .botao,
-.abas a,
-.marca {
+.abas a {
   overflow-wrap: normal;
 }
 
@@ -646,10 +645,10 @@ button,
   --gutter: 1rem;
   --largura-casca: 900px;
   /* O "+" (MaisGlobal, D-D23): um botão redondo, fixo no canto de cima à direita. A conta do recuo é a do
-     cabeçalho (`.topo`), que reserva o lugar dele, e no modo foco, onde o cabeçalho some, ele fica no
+     cabeçalho (`.fio-topo`, em `fio-base.css`), que reserva o lugar dele, e no modo foco, onde o cabeçalho some, ele fica no
      mesmo ponto. O 100% de --mais-direita (adiante, de 900 px em diante) é a largura do bloco que contém
      quem a usa: a tela, no `right` do elemento fixo, e o Shell (que tem a largura da tela), no recuo do
-     `.topo` e da `.faixa-posse`. Em qualquer outro lugar a conta não vale. O lado é em px, não em rem: o
+     `.fio-topo` e da `.faixa-posse`. Em qualquer outro lugar a conta não vale. O lado é em px, não em rem: o
      botão só tem um ícone, não há rótulo que peça mais espaço com a fonte ampliada, e a 300% um "+" de
      144 px tomava a largura de Ajuda e Conta e passava por cima delas. */
   --mais-lado: 48px;
@@ -689,44 +688,6 @@ button,
   flex-direction: column;
   min-height: 100dvh;
   padding-bottom: var(--abas-altura);
-}
-
-/* Cabeçalho (D-D9, Q2): o lockup da marca à esquerda; Ajuda e Conta à direita; de 900 px em diante, as
-   áreas ao centro. Altura de 60 px. O filete de baixo separa o cabeçalho preso do texto que rola por
-   baixo. Os recuos somam a área segura (entalhe), que só existe com viewport-fit=cover (P7). O recuo da
-   direita é o do "+" (D-D23): o botão é fixo no canto, e a reserva é a largura dele mais um respiro de
-   4 px, então Ajuda e Conta nunca passam por baixo dele, nem rolam de lado quando a fonte ampliada
-   quebra o cabeçalho em linhas. O 100% de --mais-direita é a largura do cabeçalho, que é a da tela. */
-.topo {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  display: flex;
-  /* Nunca mais larga que a tela: com fonte mais larga (Linux, fonte do sistema maior), quebra em
-     duas linhas em vez de alargar a página (no tablet, a página larga desalinha os botões fixos). */
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 0.5rem;
-  min-height: calc(3.75rem + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) calc(var(--mais-direita) + var(--mais-lado) + 0.25rem) 0
-    max(var(--gutter), env(safe-area-inset-left, 0px));
-  background: var(--fundo);
-  border-bottom: 1px solid var(--borda);
-}
-
-/* A marca é o link do lockup (componentes/LockupParado.tsx), num alvo de 44 px de altura. O lockup tem
-   144 px de largura (em rem, para acompanhar a fonte ampliada); o traço segue o texto do mundo, e o
-   ponto de luz e o halo vêm dos tokens `--marca-ponto` e `--marca-disco` (tinta com halo de lima de
-   dia, só o âmbar à noite). */
-.marca {
-  color: var(--texto);
-  text-decoration: none;
-  margin-right: auto;
-  min-height: var(--alvo);
-  /* Com a fonte muito ampliada os 9 rem passam da tela: a marca encolhe com ela em vez de rolar. */
-  max-width: 100%;
-  display: inline-flex;
-  align-items: center;
 }
 
 /* Com a fonte muito ampliada Ajuda e Conta não cabem lado a lado na largura que o "+" deixa: o grupo
@@ -789,7 +750,7 @@ button,
 
 /* O "+" da casca (MaisGlobal, D-D23): redondo, de 48 px, com o contorno do controle (1,5 px em
    --borda-campo de dia, 1 px à noite) sobre o fundo do controle (a folha de dia, a serra 2 à noite). É
-   fixo no canto de cima à direita, sobre a reserva que o cabeçalho guarda no recuo (`.topo`) e, no modo
+   fixo no canto de cima à direita, sobre a reserva que o cabeçalho guarda no recuo (`.fio-topo`) e, no modo
    foco, no mesmo ponto da tela. Fica acima do cabeçalho (5) e das abas (5), abaixo do que cobre a tela toda (a
    Abertura, 100; os diálogos, na camada do topo). Não é a ação da tela: essa é a `.principal`. */
 .mais-global {
@@ -944,20 +905,6 @@ button,
 
   .shell[data-teclado] {
     --abas-altura: 0px;
-  }
-}
-
-/* A partir de 900 px: o cabeçalho na largura do conteúdo. O recuo da direita já vem do `.topo`, por --mais-direita,
-   que de 900 px em diante soma a mesma folga lateral. */
-@media (min-width: 900px) {
-  .topo {
-    padding-left: calc(
-      max(var(--gutter), env(safe-area-inset-left, 0px)) + (100% - var(--largura-casca)) / 2
-    );
-  }
-
-  .marca {
-    margin-right: 0;
   }
 }
 

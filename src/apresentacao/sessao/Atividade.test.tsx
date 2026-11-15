@@ -151,7 +151,7 @@ describe('Encerrar com resumo', () => {
     expect(await screen.findByText(/1 de 2 questões certas/)).toBeInTheDocument();
     expect(await screen.findByText(/1 erro guardado: entra nas suas revisões/)).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: /^Seguir:/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ir para o Hoje' })).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Ir para o Agora' })).toHaveClass('principal');
     expect(screen.getByRole('link', { name: 'Ver os erros' })).toBeInTheDocument();
   });
 });

@@ -19,7 +19,7 @@ export function Comecar() {
   const { carga, tentarDeNovo } = useCarga(carregar);
   return (
     <section className="comecar" aria-labelledby="comecar-titulo">
-      <Voltar para="/">Voltar ao Hoje</Voltar>
+      <Voltar para="/">Voltar ao Agora</Voltar>
       <h1 id="comecar-titulo">Qual concurso você estuda?</h1>
       {carga.estado === 'carregando' && <Esqueleto />}
       {carga.estado === 'falha' && (

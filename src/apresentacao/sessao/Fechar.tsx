@@ -32,7 +32,7 @@ export function Fechar() {
           titulo="Nenhuma Sessão aberta"
           acao={
             <Link to="/" className="botao principal">
-              Ir para o Hoje
+              Ir para o Agora
             </Link>
           }
         >
