@@ -62,12 +62,14 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
           return;
         // Recarregar ou navegar no meio da carga aborta o CSS que o app puxa à parte; o WebKit o conta como erro.
         // Um CSS que faltasse de verdade quebraria a tela, e o teste dela falharia.
-        if (browserName === 'webkit' && m.text().startsWith('Error: Unable to preload CSS')) return;
+        if (browserName === 'webkit' && m.text().includes('Unable to preload CSS')) return;
         if (m.type() === 'error') falhas.push(m.text());
       });
       page.on('pageerror', (e) => {
         // Aviso do navegador, sem efeito (o WebKit o entrega como erro de página; o Chromium, só em alguns casos).
         if (browserName === 'webkit' && e.message.startsWith('ResizeObserver loop')) return;
+        // Mesma carga de CSS abortada (ver acima), agora como rejeição sem tratamento da página.
+        if (browserName === 'webkit' && e.message.includes('Unable to preload CSS')) return;
         falhas.push(e.message);
       });
 
