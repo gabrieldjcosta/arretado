@@ -37,7 +37,7 @@ Nome provisório "Arretado" (antes "Acumen"), escrito num traço só com o peque
 
 ## Evidence on Hand
 
-Especificação em duas partes, plano-mestre, brief de design (`docs/design/brief-app.md`), auditoria de UI de 14/10/2026 e uso real pelo autor. Não há usuários externos, depoimentos, métricas de mercado nem preços definidos: nada disso deve ser inventado. A oferta prevista é um plano único para todas as carreiras, e o preço só se discute depois do teste com pessoas e da V1 (`docs/planos/plano-mestre.md`, §1). Nada do Acervo antigo nem do Acumen v2 foi importado; o conteúdo recomeça do zero.
+Especificação em duas partes, plano-mestre, brief de design (`docs/design/arquivo/brief-app.md`), auditoria de UI de 14/10/2026 e uso real pelo autor. Não há usuários externos, depoimentos, métricas de mercado nem preços definidos: nada disso deve ser inventado. A oferta prevista é um plano único para todas as carreiras, e o preço só se discute depois do teste com pessoas e da V1 (`docs/planos/plano-mestre.md`, §1). Nada do Acervo antigo nem do Acumen v2 foi importado; o conteúdo recomeça do zero.
 
 ## Product Principles
 
