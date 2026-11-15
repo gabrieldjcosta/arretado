@@ -5,7 +5,7 @@
 //   icone-192.png, icone-512.png   ícone "any": quadrado arredondado, cantos transparentes
 //   icone-maskable-512.png  ícone "maskable": papel até a borda; a caneta cabe no círculo seguro
 //   apple-touch-icon.png    180 px, papel até a borda (o iOS arredonda e não aceita transparência)
-// Sem dependência nova: a caneta é o desenho de componentes/Caneta.tsx em cores fixas do dia (o
+// Sem dependência nova: a caneta é um desenho em cores fixas do dia (o
 // ícone não lê os tokens do tema) e o Chromium do Playwright rasteriza. O vidro claro some sobre o
 // papel em 16 a 48 px, então o favicon é a silhueta cheia (tronco, braços e bico, em tinta) com a lima
 // atrás da ponta; do 180 ao 512 é a caneta inteira, com o furo de tinta. Se uma cor ou a geometria da
@@ -29,7 +29,7 @@ const MARCA = '#eefa4b';
 const BRANCO = '#ffffff';
 
 const LADO = 512;
-// A geometria é a de Caneta.tsx (120 × 270, ponta em (60, 262)); config/plataformas.test.ts confere.
+// A geometria da caneta (120 × 270, ponta em (60, 262)) mora só aqui desde que Caneta.tsx saiu.
 const ARO = 5;
 const TRONCO = 'M60 34 V184';
 const BRACOS = 'M60 128 H42 A16 16 0 0 1 26 112 V82 M60 152 H78 A16 16 0 0 0 94 136 V108';
@@ -44,7 +44,7 @@ const CONE_SOMBRA = 'M45.96 184 V186 C48.3 218 56.1 248 60 258 C63.9 248 71.7 21
 const CENTRO_DA_CANETA = [73, -101];
 const CENTRO_DA_SILHUETA = [81, -112];
 
-/** A caneta de Caneta.tsx, no dia. `id` separa filtros e máscara de outro desenho na página. */
+/** A caneta de vidro, no dia. `id` separa filtros e máscara de outro desenho na página. */
 function canetaDeVidro(id) {
   const tubo = (larguras, cone) =>
     `<path d="${TRONCO}" fill="none" stroke-width="${larguras[0]}"/><path d="${BRACOS}" fill="none" stroke-width="${larguras[1]}"/><path d="${cone}" stroke="none"/>`;

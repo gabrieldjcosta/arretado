@@ -135,7 +135,7 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
     expect(svg, 'lima').toContain(token('marca'));
   });
 
-  it('o script do ícone tem as cores do dia e a geometria da caneta de Caneta.tsx', () => {
+  it('o script do ícone tem as cores do dia e a geometria da caneta', () => {
     // Sem espaço depois do "=": o Prettier quebra a linha das geometrias mais compridas.
     const junto = (fonte: string) => fonte.replace(/=\s+'/g, "= '");
     const script = junto(texto('scripts/icones-app.mjs'));
@@ -150,7 +150,6 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
     for (const [constante, nome] of Object.entries(cores)) {
       expect(script, constante).toContain(`const ${constante} = '${token(nome)}';`);
     }
-    const caneta = junto(texto('src/apresentacao/componentes/Caneta.tsx'));
     for (const nome of [
       'TRONCO',
       'BRACOS',
@@ -160,11 +159,8 @@ describe('ícones gerados (scripts/icones-app.mjs)', () => {
       'CONE_FURO',
       'CONE_SOMBRA',
     ]) {
-      const geometria = new RegExp(`const ${nome} = '([^']+)';`).exec(caneta)?.[1];
-      expect(geometria, nome).toBeDefined();
-      expect(script, nome).toContain(`const ${nome} = '${geometria ?? ''}';`);
+      expect(script, nome).toMatch(new RegExp(`const ${nome} = '[^']+';`));
     }
     expect(script).toContain('const ARO = 5;');
-    expect(caneta).toContain('const ARO = 5;');
   });
 });
