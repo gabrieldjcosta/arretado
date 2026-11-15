@@ -73,7 +73,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps webkit
-      - run: PLAYWRIGHT_JSON_OUTPUT_NAME=resumo.json npx playwright test --reporter=list,json --project=${{ matrix.aparelho }} e2e/fio-agora\.spec\.ts
+      - run: PLAYWRIGHT_JSON_OUTPUT_NAME=resumo.json npx playwright test --reporter=list,json --project=${{ matrix.aparelho }} e2e/fio-.*\.spec\.ts e2e/leitor-celular\.spec\.ts e2e/recall\.spec\.ts
       # Resumo curto das falhas (primeira linha do erro, com a contagem): o relatório inteiro tem 600 MB.
       - if: failure()
         run: node scripts/resumo-falhas-e2e.mjs resumo.json

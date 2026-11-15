@@ -56,6 +56,10 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
       }
       const falhas: string[] = [];
       page.on('console', (m) => {
+        // O mesmo <style> do screenshot no WebKit (ver acima) vira esta mensagem; a violação real do app continua
+        // pega pelo `securitypolicyviolation`, que guarda a origem.
+        if (browserName === 'webkit' && m.text().startsWith('Refused to apply a stylesheet'))
+          return;
         if (m.type() === 'error') falhas.push(m.text());
       });
       page.on('pageerror', (e) => falhas.push(e.message));
