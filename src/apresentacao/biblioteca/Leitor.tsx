@@ -1093,12 +1093,18 @@ function LeitorAberto({
   // Rolar entre dois toques solta o alto que o toque anterior segurou: o toque seguinte segura o que está na tela.
   useEffect(() => {
     const soltar = (e: Event) => {
-      if (!noAltoNaTroca.current) return;
+      const seguro = noAltoNaTroca.current;
+      if (!seguro) return;
+      // Vencido o prazo, o toque já não segura nada: a rolagem de agora não corta outra ida (filtro, "ir para").
+      if (performance.now() >= seguro.ate) {
+        noAltoNaTroca.current = undefined;
+        return;
+      }
       const alvo = e.target instanceof Element ? e.target : null;
       if (e instanceof KeyboardEvent) {
         if (!TECLAS_DE_ROLAGEM.has(e.key)) return;
-        // No campo a tecla age nele; no botão o espaço aperta (o A− e o A+ da folha).
-        if (alvo?.closest('input, select, textarea')) return;
+        // No campo a tecla age nele; na folha ("Aa") ela não rola a lei; no botão o espaço aperta.
+        if (alvo?.closest('input, select, textarea, dialog')) return;
         if (e.key === ' ' && alvo?.closest('button, a')) return;
       } else if (e.type === 'touchmove' && alvo?.closest('button')) {
         // O dedo que escorrega no toque de um botão não é rolagem.
