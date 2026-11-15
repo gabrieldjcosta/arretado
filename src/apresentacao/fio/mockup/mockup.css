@@ -927,23 +927,6 @@
   font-size: 12.5px;
   margin-top: 2px;
 }
-/* Horário do lembrete (desvio 484): o campo de hora segue o campo do Fio, com alvo de 44 px. */
-.m-fio .m-linha-conta input {
-  font: inherit;
-  color: var(--m-texto);
-  min-height: 44px;
-  min-width: 44px;
-  padding: 6px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--m-borda);
-  background: var(--m-sup);
-  flex: none;
-}
-.m-fio .m-linha-conta input:focus-visible {
-  outline: none;
-  border-color: var(--m-neon);
-  box-shadow: 0 0 0 3px rgba(57,202,239,.18);
-}
 .m-fio .m-linha-conta svg {
   width: 18px;
   height: 18px;
