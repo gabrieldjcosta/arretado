@@ -1,6 +1,7 @@
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import {
   Fragment,
+  memo,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -2718,7 +2719,9 @@ const AVISO_DE_STATUS: Partial<Record<DispositivoDoModelo['status'], string>> = 
  * notas (11.4). Uma partição só, aninhada sempre na mesma ordem: link, tachado, ênfase, grifo e
  * destaque (por dentro); o marcador da nota vem depois do pedaço onde a nota termina.
  */
-function TrechosDoTexto({
+// Na rolagem a lista se redesenha a cada quadro; o texto de cada linha só muda quando muda o que ele recebe
+// (todas as props são estáveis: os trechos vêm da janela, as marcas e as remissões ficam guardadas por eles).
+const TrechosDoTexto = memo(function TrechosDoTexto({
   trechos,
   destacar = false,
   marcas,
@@ -2789,7 +2792,7 @@ function TrechosDoTexto({
       </Fragment>
     );
   });
-}
+});
 
 const textoDe = (texto: ItemDaJanela | undefined) =>
   texto?.texto?.trechos.map((t) => t.texto).join('') ?? '';
