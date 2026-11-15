@@ -4,6 +4,7 @@ import { pedirArmazenamentoPersistente } from './core/persistencia';
 import { App } from './apresentacao/App';
 import { contasHabilitadas, criarServicoDeConta, tratarRetornoDoLogin } from './integracoes/conta';
 import { registrarServiceWorker } from './offline/registro';
+import { ouvirRetornoDoLogin } from './suporte/casca';
 
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Elemento #raiz ausente em index.html');
@@ -16,7 +17,9 @@ void registrarServiceWorker();
 async function iniciar(elemento: HTMLElement) {
   if (contasHabilitadas()) {
     try {
-      await tratarRetornoDoLogin({ servico: criarServicoDeConta() });
+      const servico = criarServicoDeConta();
+      await tratarRetornoDoLogin({ servico });
+      void ouvirRetornoDoLogin(servico).catch(() => undefined);
     } catch {
       // Nunca impede o estudo: sem conta o app abre como sempre.
     }
