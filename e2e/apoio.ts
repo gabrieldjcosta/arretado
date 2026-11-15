@@ -25,16 +25,20 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
   permitirFalhasConsole: [false, { option: true }],
   semearEscrita: [true, { option: true }],
   vigiar: [
-    async ({ page, permitirViolacoes, permitirFalhasConsole, semearEscrita }, use) => {
-      await page.addInitScript(() => {
+    async ({ page, browserName, permitirViolacoes, permitirFalhasConsole, semearEscrita }, use) => {
+      await page.addInitScript((navegador) => {
         const w = window as unknown as { __violacoes: string[] };
         w.__violacoes = [];
         document.addEventListener('securitypolicyviolation', (e) => {
+          // `page.screenshot({ animations: 'disabled' })` põe um <style> no WebKit, que a CSP barra sem arquivo de
+          // origem; o app nunca fica sem origem (o script dele tem URL). Só o WebKit, só esse caso.
+          if (navegador === 'webkit' && e.violatedDirective === 'style-src-elem' && !e.sourceFile)
+            return;
           w.__violacoes.push(
             `${e.violatedDirective}: ${e.blockedURI} ${e.sample} @ ${e.sourceFile}:${String(e.lineNumber)}:${String(e.columnNumber)}`,
           );
         });
-      });
+      }, browserName);
       if (semearEscrita) {
         // A chave de `componentes/escrita/frequencia.ts`. Um Dia que não chega nunca:
         // a Abertura fica calada (`escritaNaTela`: Dia guardado no futuro), com qualquer relógio, também os
@@ -52,9 +56,22 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
       }
       const falhas: string[] = [];
       page.on('console', (m) => {
+        // O mesmo <style> do screenshot no WebKit (ver acima) vira esta mensagem; a violação real do app continua
+        // pega pelo `securitypolicyviolation`, que guarda a origem.
+        if (browserName === 'webkit' && m.text().startsWith('Refused to apply a stylesheet'))
+          return;
+        // Recarregar ou navegar no meio da carga aborta o CSS que o app puxa à parte; o WebKit o conta como erro.
+        // Um CSS que faltasse de verdade quebraria a tela, e o teste dela falharia.
+        if (browserName === 'webkit' && m.text().includes('Unable to preload CSS')) return;
         if (m.type() === 'error') falhas.push(m.text());
       });
-      page.on('pageerror', (e) => falhas.push(e.message));
+      page.on('pageerror', (e) => {
+        // Aviso do navegador, sem efeito (o WebKit o entrega como erro de página; o Chromium, só em alguns casos).
+        if (browserName === 'webkit' && e.message.startsWith('ResizeObserver loop')) return;
+        // Mesma carga de CSS abortada (ver acima), agora como rejeição sem tratamento da página.
+        if (browserName === 'webkit' && e.message.includes('Unable to preload CSS')) return;
+        falhas.push(e.message);
+      });
 
       await use(undefined);
 

@@ -70,6 +70,8 @@ async function semRolagemLateral(page: Page) {
 
 test('o Destino cabe na tela, passa no axe e a câmera responde ao botão, ao teclado, à roda e ao arrasto', async ({
   page,
+  browserName,
+  isMobile,
 }) => {
   test.setTimeout(120_000);
   // Sem movimento, a câmera já nasce em torno da pessoa: os números não dependem de um voo.
@@ -132,10 +134,13 @@ test('o Destino cabe na tela, passa no axe e a câmera responde ao botão, ao te
     y: (caixa?.y ?? 0) + (caixa?.height ?? 0) / 2,
   };
   await page.mouse.move(meio.x, meio.y);
-  await page.mouse.wheel(0, -400);
-  await expect.poll(() => escala(page)).toBeGreaterThan(perto * 1.1);
-  await page.keyboard.press('0');
-  await expect.poll(() => escala(page)).toBeCloseTo(perto, 1);
+  // O iPhone não tem roda: o Playwright nega `mouse.wheel` no WebKit móvel.
+  if (!(browserName === 'webkit' && isMobile)) {
+    await page.mouse.wheel(0, -400);
+    await expect.poll(() => escala(page)).toBeGreaterThan(perto * 1.1);
+    await page.keyboard.press('0');
+    await expect.poll(() => escala(page)).toBeCloseTo(perto, 1);
+  }
   const parado = await canto(page);
   await page.mouse.move((caixa?.x ?? 0) + 12, (caixa?.y ?? 0) + 12);
   await page.mouse.down();

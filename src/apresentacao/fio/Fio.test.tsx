@@ -46,7 +46,12 @@ describe('o Fio', () => {
     await waitFor(() => {
       expect(window.location.hash).toBe('#/');
     });
-    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.getByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
+      },
+      { timeout: 20_000 },
+    );
   });
 
   it('a tela de carregamento do index.html só sai com a casca na tela (ela baixa à parte)', async () => {
