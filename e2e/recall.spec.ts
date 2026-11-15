@@ -161,7 +161,10 @@ test('importar pontos do edital por CSV e vincular um erro', async ({ page }) =>
 
 test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisar mais 10" + 5 (fatia 3)', async ({
   page,
+  browserName,
 }) => {
+  // 25 cartões criados e 25 passagens: o WebKit do CI leva mais que os 30 s.
+  test.slow(browserName === 'webkit', 'WebKit é mais lento nesta conta de 50 telas');
   // São 25 passagens de cartão: a conta é de toques, não de movimento.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const inicio = new Date('2026-09-23T12:00:00-03:00');

@@ -1,5 +1,5 @@
-import type { Page } from '@playwright/test';
-import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from './apoio';
+import type { LaunchOptions, Page } from '@playwright/test';
+import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test as testeBase } from './apoio';
 
 // A barra do Leitor no celular (Onda 1 da crítica externa, A + B). Dentro da norma, menos de 700 px:
 // a pílula dos lugares fica de fora (D-D25: o Leitor abre sem barra de abas), e as ferramentas viram uma
@@ -9,7 +9,16 @@ import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from 
 
 // O CI desenha o texto com hinting inteiro, uns 3% mais largo que o do computador de quem escreve o
 // teste: a barra de 360 px passava aqui e quebrava lá. Com a flag o E2E mede o mesmo texto nos dois.
-test.use({ launchOptions: { args: ['--font-render-hinting=full'] } });
+// A flag é do Chromium: o WebKit não a aceita e nem abre. Por isso o argumento entra por um fixture que olha o navegador.
+const test = testeBase.extend<object, { launchOptions: LaunchOptions }>({
+  launchOptions: [
+    async ({ browserName, launchOptions }, use) => {
+      const args = browserName === 'chromium' ? ['--font-render-hinting=full'] : [];
+      await use({ ...launchOptions, args: [...(launchOptions.args ?? []), ...args] });
+    },
+    { scope: 'worker' },
+  ],
+});
 
 const TELAS = [
   { largura: 390, altura: 844 },
