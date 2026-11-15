@@ -15,7 +15,7 @@ async function abrir(rota: string, repo?: Repositorio) {
   return { repo: r, usuario };
 }
 
-/** Um cartão vencido faz o Agora ser uma ação, e a ponte do encerramento aparecer. */
+/** Um cartão vencido à espera: há o que fazer depois da Sessão, e quem escolhe o quê é o Agora. */
 async function repoComAgora() {
   const { repo } = await repositorioDeTeste();
   const c = await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
@@ -136,7 +136,7 @@ describe('Canto da Sessão', () => {
 });
 
 describe('Encerrar com resumo', () => {
-  it('mostra o que ficou da Sessão e a ponte para a ação do Agora', async () => {
+  it('mostra o que ficou da Sessão e um caminho só, de volta ao Agora', async () => {
     const repo = await repoComAgora();
     await iniciarSessao(repo, { atividade: 'questoes' });
     const { usuario } = await abrir('/sessao/atual', repo);
@@ -150,8 +150,8 @@ describe('Encerrar com resumo', () => {
     expect(await screen.findByRole('heading', { name: 'Sessão encerrada' })).toBeInTheDocument();
     expect(await screen.findByText(/1 de 2 questões certas/)).toBeInTheDocument();
     expect(await screen.findByText(/1 erro guardado: entra nas suas revisões/)).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /^Seguir:/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Ir para o Agora' })).toHaveClass('principal');
+    expect(screen.queryByRole('link', { name: /^Seguir/ })).toBeNull();
     expect(screen.getByRole('link', { name: 'Ver os erros' })).toBeInTheDocument();
   });
 });

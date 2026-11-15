@@ -1,38 +1,20 @@
-// O que a pessoa vê ao encerrar a Sessão (fluxo 2): um resumo curto do que ficou e uma ponte de um
-// toque para a próxima coisa, que é a do Agora (sem calcular nada em paralelo).
+// O que a pessoa vê ao encerrar a Sessão (fluxo 2): um resumo curto do que ficou e um caminho só, de volta ao
+// Agora. O que vem depois quem escolhe é o Agora do Fio: esta tela não calcula um passo em paralelo (a ponte
+// "Seguir" saiu com o Hoje, que era quem a decidia).
 import { useCallback } from 'react';
 import { Link } from 'react-router';
 import type { Sessao } from '../../core/modelo';
 import type { Repositorio } from '../../core/persistencia';
 import { Vazio } from '../componentes/estados';
 import { useDados } from '../dados/contexto';
-import { useFonteIncidencia } from '../dados/fonteIncidenciaContexto';
-import { carregarRetrato } from '../hoje/retrato';
-import { rotaDeInicio } from '../hoje/rota-de-inicio';
-import { tituloDaAcao } from '../hoje/textos-da-acao';
 import { errosDaSessao, linhasDoResumo } from './resumo-da-sessao';
 import './estilos-sessao.css';
 
 export function Encerrada({ sessao }: { sessao: Sessao }) {
-  const fonte = useFonteIncidencia();
-  // `useDados` pede um `carregar` estável: uma seta nova a cada desenho o refaria sem parar. O Agora vem
-  // com a fonte do Mapa da norma, como no Hoje, para a ponte ser a mesma (o trecho do mapa, não só
-  // "Continuar a leitura"). É uma leitura só para o resumo e os botões chegarem juntos, e a folha não
-  // se rearranjar duas vezes.
-  const carregar = useCallback(
-    async (repo: Repositorio) => {
-      const [erros, retrato] = await Promise.all([
-        errosDaSessao(repo, sessao),
-        carregarRetrato(repo, [], undefined, fonte),
-      ]);
-      return { erros, retrato };
-    },
-    [sessao, fonte],
-  );
-  const { dados } = useDados(carregar);
-  const erros = dados?.erros ?? 0;
+  // `useDados` pede um `carregar` estável: uma seta nova a cada desenho o refaria sem parar.
+  const carregar = useCallback((repo: Repositorio) => errosDaSessao(repo, sessao), [sessao]);
+  const { dados: erros = 0 } = useDados(carregar);
   const linhas = linhasDoResumo(sessao, erros);
-  const proxima = dados?.retrato.agora.tipo === 'acao' ? dados.retrato.agora.acao : undefined;
   return (
     <>
       <h1>Encerrar a Sessão</h1>
@@ -43,12 +25,6 @@ export function Encerrada({ sessao }: { sessao: Sessao }) {
             <Link to="/" className="botao principal">
               Ir para o Agora
             </Link>
-            {proxima && (
-              // `replace`: o Voltar da Sessão nova não cai num "Encerrar a Sessão" dela.
-              <Link to={rotaDeInicio(proxima)} replace className="botao ponte-da-sessao">
-                <span>{`Seguir: ${tituloDaAcao(proxima)}`}</span>
-              </Link>
-            )}
             {erros > 0 && (
               <Link to="/recall/erros" className="botao botao-texto">
                 Ver os erros

@@ -4,6 +4,21 @@
   gap: var(--espaco-3, 1rem);
 }
 
+/* "Tudo bem começar sem edital": os três começos, um por linha (a regra morava no CSS do Hoje, que saiu). */
+.comecos {
+  display: grid;
+  gap: var(--espaco-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comecos .botao {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .onboarding-opcoes {
   display: grid;
   gap: var(--espaco-2, 0.5rem);
