@@ -17,6 +17,19 @@ describe('LimiteDeErro', () => {
     expect(screen.getByRole('button', { name: 'Recarregar' })).toBeInTheDocument();
   });
 
+  it('tira a tela de carregamento do index.html, para o aviso não ficar por baixo dela', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    document.body.insertAdjacentHTML('afterbegin', '<div id="carregamento" role="status"></div>');
+    const tela = document.getElementById('carregamento');
+    render(
+      <LimiteDeErro>
+        <Quebra />
+      </LimiteDeErro>,
+    );
+    expect(tela).toHaveAttribute('data-saindo');
+    tela?.remove();
+  });
+
   it('não interfere quando não há erro', () => {
     render(
       <LimiteDeErro>

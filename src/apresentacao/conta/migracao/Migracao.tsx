@@ -51,7 +51,7 @@ type EstadoTela =
 export interface MigracaoProps {
   origem?: Repositorio;
   abrirOrigem?: () => Promise<Repositorio>;
-  /** Padrão: recarrega no Hoje para abrir o banco da conta, agora ativa (T26). */
+  /** Padrão: recarrega no Agora para abrir o banco da conta, que passou a ser a ativa (T26). */
   aoConcluir?: () => void;
   aoAgoraNao?: () => void;
   registro?: RegistroDeContas;
@@ -305,7 +305,7 @@ export function Migracao({
                 aoConcluir();
               }}
             >
-              Ir para o Hoje
+              Ir para o Agora
             </Link>
           </div>
         </div>

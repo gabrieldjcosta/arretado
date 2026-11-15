@@ -1,7 +1,9 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
+import { registrarBackup } from '../../../core/persistencia';
 import { obterPreferencias } from '../../../core/preferencias';
+import { registrarErro } from '../../../dominios/recall/servico';
 import { repositorioDeTeste } from '../../../testes/repositorio';
 import { ContextoRepositorio } from '../../dados/contexto';
 import { ToastM } from './ToastM';
@@ -9,8 +11,19 @@ import { esconderAviso } from './toast';
 import { ContaM } from './ContaM';
 import { movimentoAgora } from '../../movimento';
 
+const versao = vi.hoisted(() => ({ pronta: false, aplicar: vi.fn() }));
+vi.mock('../../../offline/registro', () => ({
+  useAtualizacaoPronta: () => versao.pronta,
+  aplicarAtualizacao: versao.aplicar,
+}));
+
+const DIA = 24 * 60 * 60_000;
+type Teste = Awaited<ReturnType<typeof repositorioDeTeste>>;
+
 afterEach(() => {
   cleanup();
+  versao.pronta = false;
+  versao.aplicar.mockClear();
   // O jsdom não tem `matchMedia`; o teste do Movimento põe um.
   Reflect.deleteProperty(window, 'matchMedia');
   esconderAviso();
@@ -28,8 +41,10 @@ function Aqui() {
   return <output data-testid="rota">{l.pathname}</output>;
 }
 
-async function abrir() {
-  const { repo } = await repositorioDeTeste();
+async function abrir(preparar?: (teste: Teste) => Promise<void>) {
+  const teste = await repositorioDeTeste();
+  const { repo } = teste;
+  await preparar?.(teste);
   const usuario = userEvent.setup();
   render(
     <ContextoRepositorio.Provider value={repo}>
@@ -111,9 +126,59 @@ describe('Conta em folha', () => {
     });
   });
 
+  it('a Trilha tem porta na folha: a data da prova, o Ciclo e as Tarefas ficam a um toque', async () => {
+    const { usuario, folha } = await abrir();
+    const linha = within(folha).getByRole('button', { name: /^Trilha/ });
+    expect(linha).toHaveTextContent('a data da prova, o ciclo e as tarefas');
+    await usuario.click(linha);
+    await waitFor(() => {
+      expect(screen.getByTestId('rota')).toHaveTextContent('/plano');
+    });
+  });
+
   it('"Relatar um problema" abre o relato depois que a folha desce', async () => {
     const { usuario, folha } = await abrir();
     await usuario.click(within(folha).getByRole('button', { name: /Relatar um problema/ }));
     expect(await screen.findByRole('dialog', { name: /problema/i })).toBeInTheDocument();
+  });
+
+  it('"Seus dados" diz a idade do backup quando há o que guardar (desvio 476b)', async () => {
+    const semDados = await abrir();
+    expect(within(semDados.folha).getByRole('button', { name: /^Seus dados/ })).toHaveTextContent(
+      'Seus dadosbaixar ou apagar',
+    );
+    cleanup();
+
+    const semBackup = await abrir(async ({ repo }) => {
+      await registrarErro(repo, { fraseCorreta: 'O prazo é de 10 dias.' });
+    });
+    await waitFor(() => {
+      expect(
+        within(semBackup.folha).getByRole('button', { name: /^Seus dados/ }),
+      ).toHaveTextContent('baixar ou apagar · ainda sem backup');
+    });
+    cleanup();
+
+    const antigo = await abrir(async ({ repo, relogio }) => {
+      await registrarErro(repo, { fraseCorreta: 'O prazo é de 10 dias.' });
+      await registrarBackup(repo);
+      relogio.avancar(9 * DIA);
+    });
+    await waitFor(() => {
+      expect(within(antigo.folha).getByRole('button', { name: /^Seus dados/ })).toHaveTextContent(
+        'baixar ou apagar · último backup há 9 dias',
+      );
+    });
+  });
+
+  it('com versão nova pronta, a folha oferece "Atualizar o Arretado"; sem ela, não', async () => {
+    const sem = await abrir();
+    expect(within(sem.folha).queryByRole('button', { name: /Atualizar o Arretado/ })).toBeNull();
+    cleanup();
+
+    versao.pronta = true;
+    const { usuario, folha } = await abrir();
+    await usuario.click(within(folha).getByRole('button', { name: /^Atualizar o Arretado/ }));
+    expect(versao.aplicar).toHaveBeenCalledOnce();
   });
 });

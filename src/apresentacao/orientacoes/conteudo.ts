@@ -14,8 +14,8 @@ export const SECOES: Secao[] = [
     id: 'como-funciona',
     titulo: 'Como o Arretado funciona',
     paragrafos: [
-      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São quatro áreas: Hoje (o que fazer agora), Trilha (onde você está no edital), Fixar (seus erros e revisões) e Biblioteca (normas e demais conteúdos).',
-      'As áreas ganham funções aos poucos, em fases. Nesta versão estão prontos o Fixar (erros, cartões e revisões), a leitura e a importação de leis na Biblioteca, o backup e a restauração, as Orientações e o relato de problemas.',
+      'O Arretado transforma erros, questões e leitura de lei em uma próxima ação de estudo. São três lugares: Agora (o que fazer agora), Destino (a sua prova vista de cima e o plano) e Varal (o que é seu: normas, frases, cartões e lembretes).',
+      'O Arretado ganha funções aos poucos. Nesta versão estão prontos os erros, os cartões e as revisões, a leitura e a importação de leis, o backup e a restauração, as Orientações e o relato de problemas.',
       'Nada é obrigatório além do mínimo: você completa os detalhes quando quiser.',
     ],
   },
@@ -36,7 +36,7 @@ export const SECOES: Secao[] = [
     paragrafos: [
       'Em Biblioteca ficam as Normas. Abra uma Norma para lê-la por Dispositivo (artigo, parágrafo, inciso, alínea). O Arretado lembra até onde você leu.',
       'A Estrela marca um Dispositivo para voltar depois. Marcar um trecho do texto (grifo ou anotação) é opcional e fica só neste aparelho.',
-      'Dentro da Norma, use a busca para achar um artigo ou uma palavra e o filtro para ver só o que importa (por exemplo, só os marcados com Estrela). Os botões A− e A+ mudam o tamanho do texto.',
+      'Dentro da Norma, use a busca para achar um artigo ou uma palavra e o filtro para ver só o que importa (por exemplo, só os marcados com Estrela). O "Aa" abre os ajustes de leitura: tamanho do texto, destaques e foco na frase. O sumário lista os títulos, capítulos e seções da Norma e leva a cada um: no computador e no tablet ele fica ao lado do texto; no celular e no modo foco, abre pelo "⋯".',
       'Notas de vigência (revogado, redação dada por outra lei) aparecem à parte e podem ser mostradas ou escondidas. O texto anterior de um Dispositivo alterado continua disponível.',
       'Para registrar um Erro sobre um Dispositivo, use a ação dele: o vínculo fica guardado e o artigo mostra os Erros ligados a ele.',
       "Achou um erro de digitação no texto da lei? Use 'Corrigir o texto' no Dispositivo. A correção cria uma versão nova; o texto de antes fica guardado e dá para voltar a ele.",

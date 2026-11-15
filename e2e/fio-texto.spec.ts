@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, importarEPublicar, semViolacoesNoFio, test } from './apoio';
+import { expect, importarEPublicar, irAoAgora, semViolacoesNoFio, test } from './apoio';
 
 // O "Texto bem maior" da Conta cresce o Fio inteiro (desvio 44). Onde o aperto é maior, a 360 px e de noite: o Agora, a
 // folha de guardar um erro e a própria Conta. Nada rola de lado, nenhum chip ou botão sai da folha, e o "Pendurar"
@@ -22,9 +22,7 @@ async function comALeiNaPrevia(page: Page) {
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
   await expect(page.getByRole('button', { name: /Puxar o fio/ })).toBeVisible();
 }
 

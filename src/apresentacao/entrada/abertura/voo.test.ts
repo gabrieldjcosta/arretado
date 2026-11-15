@@ -1,4 +1,3 @@
-import { CAIXA_DO_LOCKUP } from '../../componentes/escrita/geometria';
 import {
   andar,
   curvaDaViagem,
@@ -73,11 +72,6 @@ describe('a viagem da luz (M2 e M3b do Zé)', () => {
     expect(curvaDaViagem(1)).toBeCloseTo(1, 4);
     expect(curvaDaViagem(0.1)).toBeLessThan(0.1);
     expect(curvaDaViagem(0.9)).toBeGreaterThan(0.9);
-  });
-
-  it('a largura da caixa do lockup, de que a Abertura tira a escala da luz, é a de CAIXA_DO_LOCKUP', () => {
-    const largura = Number(CAIXA_DO_LOCKUP.split(' ')[2]);
-    expect(largura).toBe(1015);
   });
 });
 

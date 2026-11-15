@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, importarEPublicar, semViolacoesNoFio, test } from './apoio';
+import { expect, importarEPublicar, irAoAgora, semViolacoesNoFio, test } from './apoio';
 
 // O passo "Ache a diferença" (ideia 6 do Fio que ensina): dois artigos parecidos da LEP lado a lado (o Art. 120,
 // permissão de saída, e o Art. 122, saída temporária), e a pessoa toca nas palavras que os separam. O gerador só o
@@ -28,9 +28,7 @@ async function comALeiNaPrevia(page: Page) {
   await page.getByRole('dialog').getByRole('checkbox', { name: 'Execução Penal' }).check();
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
   await expect(puxador(page)).toBeVisible();
 }
 

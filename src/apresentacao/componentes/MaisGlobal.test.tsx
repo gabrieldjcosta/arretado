@@ -4,9 +4,9 @@ import { alterarPreferencias, obterPreferencias } from '../../core/preferencias'
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 
-async function abrirHoje(
+async function abrir(
   antes?: (repo: Awaited<ReturnType<typeof repositorioDeTeste>>['repo']) => Promise<void>,
-  rota = '/',
+  rota = '/plano',
 ) {
   const { repo } = await repositorioDeTeste();
   await antes?.(repo);
@@ -29,10 +29,10 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
     localStorage.clear();
   });
 
-  it.each(['/', '/plano', '/recall', '/biblioteca', '/conta', '/orientacoes'])(
+  it.each(['/plano', '/recall', '/biblioteca', '/conta', '/orientacoes'])(
     '%s tem o "+", um só, depois do cabeçalho e fora do conteúdo da tela',
     async (rota) => {
-      await abrirHoje(undefined, rota);
+      await abrir(undefined, rota);
       await screen.findByRole('heading', { level: 1 });
       expect(screen.getAllByRole('button', { name: 'Novo registro' })).toHaveLength(1);
       const mais = screen.getByRole('button', { name: 'Novo registro' });
@@ -48,14 +48,14 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   );
 
   it('o cabeçalho não repete o "Registrar erro": ele mora no painel do "+" (e na tecla E)', async () => {
-    await abrirHoje();
+    await abrir();
     expect(
       within(screen.getByRole('banner')).queryByRole('link', { name: /Registrar erro/ }),
     ).toBeNull();
   });
 
   it('fechado, não mostra opção alguma; aberto, mostra as duas, cada uma com a sua frase de apoio', async () => {
-    const { usuario, mais } = await abrirHoje();
+    const { usuario, mais } = await abrir();
     expect(mais).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('button', { name: /^Lembrete\b/ })).not.toBeInTheDocument();
 
@@ -78,7 +78,7 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   });
 
   it('"Registrar erro" leva ao registro', async () => {
-    const { usuario, mais } = await abrirHoje();
+    const { usuario, mais } = await abrir();
     await usuario.click(mais);
     await usuario.click(within(painelDe(mais)).getByRole('link', { name: /^Registrar erro\b/ }));
     expect(
@@ -87,7 +87,7 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   });
 
   it('Esc fecha o painel e devolve o foco ao "+"; tocar fora também fecha', async () => {
-    const { usuario, mais } = await abrirHoje();
+    const { usuario, mais } = await abrir();
     await usuario.click(mais);
     await usuario.keyboard('{Escape}');
     expect(mais).toHaveAttribute('aria-expanded', 'false');
@@ -95,12 +95,12 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
 
     await usuario.click(mais);
     expect(mais).toHaveAttribute('aria-expanded', 'true');
-    await usuario.click(screen.getByRole('navigation', { name: 'Áreas' }));
+    await usuario.click(screen.getByRole('navigation', { name: 'Lugares' }));
     expect(mais).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('mudar de tela fecha o painel: o "+" fica montado entre as telas e não leva o painel junto', async () => {
-    const { usuario, mais } = await abrirHoje();
+    const { usuario, mais } = await abrir();
     await usuario.click(mais);
     expect(mais).toHaveAttribute('aria-expanded', 'true');
     // A tecla E leva ao registro de qualquer tela, com o painel aberto ou não.
@@ -116,7 +116,7 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   });
 
   it('"Lembrete" abre de qualquer tela, sem trocar de rota nem perder o lugar', async () => {
-    const { usuario, mais } = await abrirHoje(undefined, '/plano');
+    const { usuario, mais } = await abrir(undefined, '/plano');
     await usuario.click(mais);
     await usuario.click(within(painelDe(mais)).getByRole('button', { name: /^Lembrete\b/ }));
     const dialogo = await screen.findByRole('dialog', { name: 'Lembrete' });
@@ -128,7 +128,7 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   });
 
   it('"Lembrete" abre o diálogo com o campo em foco, mostra o que já estava guardado e guarda a nota', async () => {
-    const { repo, usuario, mais } = await abrirHoje((r) =>
+    const { repo, usuario, mais } = await abrir((r) =>
       alterarPreferencias(r, { lembrete: 'Renovar o passaporte' }).then(() => undefined),
     );
     await usuario.click(mais);
@@ -159,7 +159,7 @@ describe('"+" da casca › Registrar erro e Lembrete', () => {
   });
 
   it('fechar o diálogo com Esc guarda o que foi escrito e não salvo, e devolve o foco ao "+"', async () => {
-    const { repo, usuario, mais } = await abrirHoje();
+    const { repo, usuario, mais } = await abrir();
     await usuario.click(mais);
     await usuario.click(within(painelDe(mais)).getByRole('button', { name: /^Lembrete\b/ }));
     const dialogo = await screen.findByRole('dialog', { name: 'Lembrete' });

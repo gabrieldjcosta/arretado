@@ -10,7 +10,7 @@ async function abrir(rota: string, repo?: Repositorio) {
   window.location.hash = `#${rota}`;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(r)} />);
-  await screen.findByRole('navigation', { name: 'Áreas' });
+  await screen.findByRole('navigation', { name: 'Lugares' });
   return { repo: r, usuario };
 }
 

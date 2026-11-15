@@ -6,11 +6,15 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { alterarPreferencias, obterPreferencias } from '../../../core/preferencias';
 import { estadoDaSincronizacao, ROTULO_DO_ESTADO } from '../../../core/sincronizacao/estado';
+import { lembreteDeBackup } from '../../../dominios/dados/lembrete-de-backup';
 import { contasHabilitadas } from '../../../integracoes/conta';
+import { aplicarAtualizacao, useAtualizacaoPronta } from '../../../offline/registro';
+import { carregarBackup } from '../../componentes/backup-pendente';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { escolherMovimento } from '../../movimento-escolhido';
 import { useSincronizacao } from '../../sincronizacao/contexto';
 import { RelatarProblema } from '../../suporte/RelatarProblema';
+import { ROTULO_DA_AREA } from '../../textos';
 import { useContaAtiva, type ContaAtiva } from '../dados/conta-ativa';
 import { animar, modoAgora } from './anima';
 import { FolhaM } from './FolhaM';
@@ -71,6 +75,12 @@ function Conteudo({
   const sync = useSincronizacao();
   const preferencias = useDados(useCallback((r) => obterPreferencias(r), [])).dados;
   const [texto, setTexto] = useState<1 | 2 | 3>();
+  // Os dois avisos da linha de retorno do Agora ficam também aqui, sem depender do "Depois" de lá (desvio 476b).
+  const versaoNova = useAtualizacaoPronta();
+  const guardado = useDados(carregarBackup).dados;
+  const backup = guardado
+    ? lembreteDeBackup({ ...guardado, agora: repo.ctx.agora(), dispensadoAte: null })
+    : { mostrar: false as const };
   const anel = useRef<SVGCircleElement>(null);
   const miolo = useRef<SVGCircleElement>(null);
   const comConta = contasHabilitadas() && !!conta;
@@ -273,11 +283,31 @@ function Conteudo({
         >
           Ajustar o destino
         </Linha>
+        {/* A Trilha não é um dos três lugares do Fio: a porta dela (data da prova, Ciclo, Tarefas, Pontos) é aqui. */}
+        <Linha
+          pequeno="a data da prova, o ciclo e as tarefas"
+          aoToque={() => {
+            ir('/plano');
+          }}
+        >
+          {ROTULO_DA_AREA.plano}
+        </Linha>
       </div>
       <div className="m-grupo-conta">
         <h3>O resto</h3>
+        {versaoNova && (
+          <Linha pequeno="uma versão nova está pronta" aoToque={aplicarAtualizacao}>
+            Atualizar o Arretado
+          </Linha>
+        )}
         <Linha
-          pequeno="baixar ou apagar"
+          pequeno={
+            !backup.mostrar
+              ? 'baixar ou apagar'
+              : backup.dias === null
+                ? 'baixar ou apagar · ainda sem backup'
+                : `baixar ou apagar · último backup há ${String(backup.dias)} dias`
+          }
           aoToque={() => {
             ir('/conta/dados');
           }}

@@ -1,4 +1,3 @@
-import { AREAS } from '../../areas';
 import { LUGARES } from '../../fio/lugares';
 import {
   BOAS_VINDAS,
@@ -86,7 +85,6 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
     PASSOS.forEach((passo, i) => {
       expect(passo.nome).toBe(LUGARES[i]?.nome);
       expect(passo.icone).toMatch(/^M[\d. -]/);
-      expect(AREAS.map((a) => a.icone)).not.toContain(passo.icone);
     });
   });
 

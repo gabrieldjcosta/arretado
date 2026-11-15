@@ -71,7 +71,7 @@ for (const rota of ROTAS) {
     const pequenos = await page.evaluate(() =>
       Array.from(
         document.querySelectorAll(
-          'button, a.botao, summary.botao, a.linha-lista, .areas a, input[type="file"]',
+          'button, a.botao, summary.botao, a.linha-lista, input[type="file"]',
         ),
       )
         .map((el) => {
@@ -105,13 +105,13 @@ for (const rota of ROTAS) {
 
 test('navegação por teclado: foco visível e pular para o conteúdo', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.locator('#conteudo')).toBeFocused();
   expect(page.url()).not.toContain('conteudo');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
 });
 
 test('as fontes embutidas carregam (T19)', async ({ page }) => {
@@ -149,108 +149,49 @@ test('as fontes embutidas carregam (T19)', async ({ page }) => {
   expect(carregadas).toEqual([true, true, true, true, true, true, true, false]);
 });
 
-test('casca: abas por teclado, "+" no canto do cabeçalho, sem Registrar erro repetido e atalho E (P2, D-D23)', async ({
+test('casca do Fio: pílula dos lugares por teclado, "+" no canto do cabeçalho, sem Registrar erro repetido e atalho E (P2, D-D23)', async ({
   page,
 }) => {
-  await page.goto('/');
-  const titulo = page.getByRole('heading', { level: 1, name: 'Hoje' });
-  await expect(titulo).toBeVisible();
-  const largura = page.viewportSize()?.width ?? 1280;
-  const altura = page.viewportSize()?.height ?? 0;
-  const areas = page.getByRole('navigation', { name: 'Áreas' });
-  await expect(areas.getByRole('link')).toHaveText(['Hoje', 'Trilha', 'Fixar', 'Biblioteca']);
+  // Numa tela que ainda mora na casca de antes do quadro (o Fixar): o cabeçalho leva o Menu, a marca, a Ajuda e o "+".
+  await page.goto('/#/recall');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  const lugares = page.getByRole('navigation', { name: 'Lugares' });
+  await expect(lugares.getByRole('link')).toHaveText(['Agora', 'Destino', 'Varal']);
 
-  const caixa = await areas.boundingBox();
-  if (largura < 900) {
-    // Abas embaixo (celular e tablet em pé), presas à borda, com os 80 px da prancha (D-D9, Q2).
-    expect(caixa?.y ?? 0).toBeGreaterThan(altura / 2);
-    expect(Math.round((caixa?.y ?? 0) + (caixa?.height ?? 0))).toBe(altura);
-    expect(Math.round(caixa?.height ?? 0)).toBe(80);
-  } else {
-    expect(caixa?.y ?? 0).toBeLessThan(altura / 2);
-  }
-
-  // O "+" (D-D23) fica no canto do cabeçalho, à direita da Conta, em qualquer largura; o cabeçalho não
-  // repete o "Registrar erro" (ele mora no painel do "+" e na tecla E); Conta e Ajuda em qualquer largura.
+  // O "+" (D-D23) fica no canto do cabeçalho, à direita do Menu, em qualquer largura; o cabeçalho não repete o
+  // "Registrar erro" (ele mora no painel do "+" e na tecla E); Menu e Ajuda em qualquer largura.
   const topo = page.getByRole('banner');
   const mais = page.getByRole('button', { name: 'Novo registro' });
   await expect(mais).toBeVisible();
-  const conta = topo.getByRole('link', { name: 'Conta e ajustes' });
-  await expect(conta).toBeVisible();
+  const menu = topo.getByRole('link', { name: 'Menu: sua conta e ajustes' });
+  await expect(menu).toBeVisible();
   await expect(topo.getByRole('button', { name: 'Ajuda', exact: true })).toBeVisible();
-  const c = await conta.boundingBox();
+  const c = await menu.boundingBox();
   const m = await mais.boundingBox();
-  if (!c || !m) throw new Error('sem caixa da Conta ou do +');
+  if (!c || !m) throw new Error('sem caixa do Menu ou do +');
   expect(m.x).toBeGreaterThanOrEqual(c.x + c.width);
   await expect(topo.getByRole('link', { name: 'Registrar erro' })).toHaveCount(0);
 
-  // Foco visível nas abas.
-  await areas.getByRole('link', { name: 'Fixar' }).focus();
-  await expect(areas.getByRole('link', { name: 'Fixar' })).toBeFocused();
+  // Foco visível nos lugares.
+  await lugares.getByRole('link', { name: 'Varal' }).focus();
+  await expect(lugares.getByRole('link', { name: 'Varal' })).toBeFocused();
 
   await page.keyboard.press('e');
   await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
 });
 
-// Casca da D-D9 (Q2): o lockup parado no cabeçalho (144 px), o "+" de 48 px e o traço de caneta embaixo da
-// aba atual. O traço é só CSS (máscara colorida pelo token `--luz` do mundo): vive na aba da rota atual,
-// na cor da tinta de dia e da luz de noite, e muda de aba junto com a rota.
-for (const [esquema, cor] of [
-  ['light', 'rgb(15, 28, 58)'],
-  ['dark', 'rgb(242, 246, 255)'],
-] as const) {
-  test.describe(`casca da D-D9 (Q2) — tema ${esquema === 'light' ? 'claro' : 'escuro'}`, () => {
-    test.use({ colorScheme: esquema });
-    test('lockup, "+" de 48 px e traço da aba atual', async ({ page }) => {
-      await page.goto('/');
-      await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-
-      const lockup = await page
-        .getByRole('banner')
-        .getByRole('link', { name: 'Arretado, início' })
-        .locator('svg.lockup')
-        .boundingBox();
-      expect(Math.round(lockup?.width ?? 0)).toBe(144);
-      const mais = await page.getByRole('button', { name: 'Novo registro' }).boundingBox();
-      expect([Math.round(mais?.width ?? 0), Math.round(mais?.height ?? 0)]).toEqual([48, 48]);
-
-      const areas = page.getByRole('navigation', { name: 'Áreas' });
-      const traco = (aba: string) =>
-        areas.getByRole('link', { name: aba }).evaluate((a) => {
-          const c = getComputedStyle(a, '::after');
-          return {
-            conteudo: c.content,
-            largura: c.width,
-            altura: c.height,
-            cor: c.backgroundColor,
-            mascara: c.maskImage,
-          };
-        });
-      const atual = await traco('Hoje');
-      expect(atual).toMatchObject({ conteudo: '""', largura: '30px', altura: '6px', cor });
-      expect(atual.mascara).toContain('data:image/svg+xml');
-      for (const outra of ['Trilha', 'Fixar', 'Biblioteca']) {
-        expect(['none', 'normal']).toContain((await traco(outra)).conteudo);
-      }
-
-      await areas.getByRole('link', { name: 'Trilha' }).click();
-      await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
-      expect((await traco('Trilha')).largura).toBe('30px');
-      expect(['none', 'normal']).toContain((await traco('Hoje')).conteudo);
-    });
-  });
-}
-
-// As abas de baixo (até 899 px) nunca cobrem texto no fim da página: a rolagem reserva a altura delas.
+// A pílula dos lugares nunca cobre texto no fim da página: a rolagem reserva a altura dela.
 for (const rota of ['/', '/plano', '/recall', '/biblioteca', '/conta/dados', '/orientacoes']) {
-  test(`${rota}: as abas não cobrem texto no fim da página`, async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 1280) >= 900, 'as abas só ficam embaixo até 899 px');
+  test(`${rota}: a pílula dos lugares não cobre texto no fim da página`, async ({ page }) => {
     await page.goto(`/#${rota}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // A tela de carregamento sai no quadro em que a casca aparece, mas esmaece 200 ms ainda na árvore: o texto
+    // dela ("Tentar de novo") contaria como coberto.
+    await expect(page.locator('#carregamento')).toHaveCount(0);
     const cobertos = await page.evaluate(() => {
       window.scrollTo(0, document.documentElement.scrollHeight);
-      const abas = document.querySelector('nav.areas');
-      if (!abas) return ['(sem abas)'];
+      const abas = document.querySelector('nav[aria-label="Lugares"]');
+      if (!abas) return ['(sem pílula)'];
       const a = abas.getBoundingClientRect();
       // O conteúdo de um `<details>` fechado não é desenhado (só o `<summary>` dele), mas ainda tem
       // caixa; vale para cada `<details>` fechado em volta (o prompt da IA, na Trilha vazia).

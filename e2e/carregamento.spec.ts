@@ -55,9 +55,9 @@ test('com movimento reduzido o Zé aparece pronto: só a entrada e os textos ani
   expect(nomes.every((n) => ['carr-entra', 'carr-texto', 'carr-some'].includes(n))).toBe(true);
 });
 
-test('quando o app abre, a tela sai da árvore e o Hoje fica sozinho', async ({ page }) => {
+test('quando o app abre, a tela sai da árvore e o Agora fica sozinho', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await expect(page.locator('#carregamento')).toHaveCount(0);
 });
 
@@ -70,8 +70,8 @@ function sondarOsQuadros() {
   const quadros: string[] = [];
   (window as unknown as { __quadros: string[] }).__quadros = quadros;
   const classe = () => {
-    if (document.querySelector('.abertura')) return 'camada';
-    if (document.querySelector('.marca')) return 'app';
+    if (document.querySelector('.m-abertura')) return 'camada';
+    if (document.querySelector('.m-app')) return 'app';
     const tela = document.getElementById('carregamento');
     return tela && !tela.hasAttribute('data-saindo') ? 'carregamento' : 'branco';
   };
@@ -100,7 +100,7 @@ test.describe('com a Abertura (a primeira vez no aparelho)', () => {
   }) => {
     await page.addInitScript(sondarOsQuadros);
     await page.goto('/');
-    await expect(page.locator('.abertura')).toBeVisible();
+    await expect(page.locator('.m-abertura')).toBeVisible();
     // A tela esmaece por baixo da camada (200 ms); esperar que saia da árvore deixa a sequência inteira à vista.
     await expect(page.locator('#carregamento')).toHaveCount(0);
     const quadros = await page.evaluate(

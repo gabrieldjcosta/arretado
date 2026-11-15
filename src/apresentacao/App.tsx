@@ -36,7 +36,6 @@ import {
   PousoDoFio,
   ProvaDoFio,
   TelaDoFio,
-  TrocarInterface,
   VaralDoFio,
 } from './fio/Previa';
 import { RotasDoPlano } from './plano/Rotas';
@@ -186,8 +185,9 @@ export function App({
                     </TelaDoFio>
                   }
                 />
-                <Route path="fio/ligar" element={<TrocarInterface para="fio" />} />
-                <Route path="fio/desligar" element={<TrocarInterface para="atual" />} />
+                {/* Links antigos da prévia: o Fio é o único app. */}
+                <Route path="fio/ligar" element={<Navigate to="/" replace />} />
+                <Route path="fio/desligar" element={<Navigate to="/" replace />} />
                 <Route
                   path="comecar"
                   element={

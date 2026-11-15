@@ -1,19 +1,18 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, semViolacoes, test } from './apoio';
 
-// As cinco telas da Chegada (D-D10): as Boas-vindas, os três passos do Passeio e o Começar. Os testes de
+// As telas da Chegada (D-D10): as Boas-vindas e os três passos do Passeio. Os testes de
 // unidade provam as regras, os textos e o ritmo da troca; aqui rodam o <dialog> e o CSS de verdade: o axe
 // nos dois temas, os alvos de 44 px, nenhuma rolagem lateral, e todo botão ao alcance no celular
-// pequeno, a 200% de zoom e com o texto a 200%. A Conta refaz o passeio sem as Boas-vindas e sem o Começar.
+// pequeno, a 200% de zoom e com o texto a 200%. A Conta refaz o passeio sem as Boas-vindas.
 // Nenhum teste depende de animação (as telas só precisam estar paradas para medir). Safari e Firefox não
 // são exercitados.
 //
-// Como a `entrada-do-dia.spec.ts`, desliga a semeadura que deixa o aparelho "já visto": a Chegada precisa abrir.
-test.use({ semearAbertura: false });
+// A Chegada não abre mais sozinha: aqui ela vem pelo "Rever as boas-vindas" do menu Ajuda de uma tela da casca legada.
 
 const CHAVE_CHEGADA = 'arretado:chegada:v1';
 
-type Tela = 'boas' | 'passo-1' | 'passo-2' | 'passo-3' | 'comecar';
+type Tela = 'boas' | 'passo-1' | 'passo-2' | 'passo-3';
 
 const TELAS: ReadonlyArray<{ tela: Tela; nome: string; botoes: string[] }> = [
   { tela: 'boas', nome: 'Boas-vindas ao Arretado!', botoes: ['Agora não', 'Vamos'] },
@@ -27,29 +26,27 @@ const TELAS: ReadonlyArray<{ tela: Tela; nome: string; botoes: string[] }> = [
     nome: 'Passo 2 de 3 Destino',
     botoes: ['Pular o passeio', 'Seguir', 'Voltar'],
   },
-  { tela: 'passo-3', nome: 'Passo 3 de 3 Varal', botoes: ['Pular o passeio', 'Seguir', 'Voltar'] },
+  // Pelo "Rever as boas-vindas" o passeio é refeito: o último passo diz "Concluir" e o Começar não aparece.
   {
-    tela: 'comecar',
-    nome: 'Vamo começar?',
-    botoes: ['Continuar sem conta e salvar meus dados manualmente'],
+    tela: 'passo-3',
+    nome: 'Passo 3 de 3 Varal',
+    botoes: ['Pular o passeio', 'Concluir', 'Voltar'],
   },
 ];
 
-/** Abre a Chegada num aparelho novo e anda até a tela pedida; devolve o <dialog> dela. */
+/** Abre a Chegada pela Ajuda e anda até a tela pedida; devolve o <dialog> dela. */
 async function irAte(page: Page, tela: Tela): Promise<Locator> {
   await page.clock.setFixedTime(new Date('2026-10-21T09:30:00-03:00'));
-  await page.goto('/#/');
+  await page.goto('/#/recall');
+  await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
+  await page.getByRole('button', { name: 'Rever as boas-vindas' }).click();
   const boas = page.getByRole('dialog', { name: TELAS[0]?.nome ?? '' });
   await expect(boas).toBeVisible();
   if (tela !== 'boas') {
     await boas.getByRole('button', { name: 'Vamos' }).click();
-    if (tela === 'comecar') {
-      await page.getByRole('button', { name: 'Pular o passeio' }).click();
-    } else {
-      const passo = Number(tela.slice(-1));
-      for (let i = 1; i < passo; i += 1) {
-        await page.getByRole('button', { name: 'Seguir' }).click();
-      }
+    const passo = Number(tela.slice(-1));
+    for (let i = 1; i < passo; i += 1) {
+      await page.getByRole('button', { name: 'Seguir' }).click();
     }
   }
   const alvo = TELAS.find((t) => t.tela === tela);
@@ -109,7 +106,7 @@ async function botoesAoAlcance(page: Page, folha: Locator, botoes: string[]) {
   expect(await rolagemLateral(page), 'rolagem lateral').toEqual({ pagina: 0, folha: 0 });
 }
 
-test.describe('as cinco telas da Chegada', () => {
+test.describe('as telas da Chegada', () => {
   for (const { tela, nome, botoes } of TELAS) {
     test(`${nome}: axe nos dois temas, alvos de 44 px e o Zé inteiro dentro da folha`, async ({
       page,
@@ -217,9 +214,6 @@ test.describe('a saudação das Boas-vindas (D-D11)', () => {
 });
 
 test.describe('o passeio refeito na Conta', () => {
-  // Aqui a Chegada não abre sozinha: o aparelho já a viu.
-  test.use({ semearAbertura: true });
-
   test('"Fazer o passeio" abre os três passos direto; "Concluir" fecha, devolve o foco e nada é gravado', async ({
     page,
   }) => {
@@ -241,9 +235,7 @@ test.describe('o passeio refeito na Conta', () => {
     await expect(page.locator('dialog[open]')).toHaveCount(0);
     await expect(page.getByRole('dialog', { name: 'Vamo começar?' })).toHaveCount(0);
     await expect(abrir).toBeFocused();
-    expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_CHEGADA)).toBe(
-      '{"vista":true}',
-    );
+    expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_CHEGADA)).toBeNull();
   });
 
   test('"Voltar ao app", "Pular o passeio" e Esc fecham a folha e devolvem o foco ao botão', async ({

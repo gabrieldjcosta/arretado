@@ -2,7 +2,6 @@
    escolhido. Só tokens: a tinta de dia, a luz à noite, e a ponta é o ponto de luz com o contorno. */
 
 /* O traço é filho do item e se posiciona sobre ele. */
-.areas a,
 .abas a,
 .respostas button {
   position: relative;

@@ -1,4 +1,5 @@
 import { consultaDeBusca } from '../../../dominios/legislacao/busca';
+import { ROTULO_DA_AREA } from '../../textos';
 
 /** Um destino da busca ⌘K: onde ele mora (grupo), o que se lê e para onde leva. */
 export interface ItemDaPaleta {
@@ -28,6 +29,13 @@ export const ITENS_FIXOS: readonly ItemDaPaleta[] = [
     chaves: 'frase correta',
   },
   { id: 'comecar', grupo: 'Fazer', texto: 'Começar', para: '/comecar', chaves: 'sessao' },
+  {
+    id: 'trilha',
+    grupo: 'Fazer',
+    texto: ROTULO_DA_AREA.plano,
+    para: '/plano',
+    chaves: 'plano ciclo tarefas pontos data da prova',
+  },
   {
     id: 'conta',
     grupo: 'Fazer',

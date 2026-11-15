@@ -101,7 +101,7 @@ async function fotoApp(browser, base, tela) {
     .setInputFiles({ name: 'ciclo.csv', mimeType: 'text/csv', buffer: Buffer.from(CSV, 'utf8') });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await page.getByRole('heading', { level: 2, name: 'Execução Penal' }).waitFor();
-  await page.goto(`${base}/#/fio/ligar`);
+  await page.goto(`${base}/#/`);
   await page.getByRole('navigation', { name: 'Lugares' }).waitFor();
   if (tela.rota !== '/') await page.goto(`${base}/#${tela.rota}`);
   await page.waitForTimeout(900);

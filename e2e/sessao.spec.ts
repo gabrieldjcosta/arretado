@@ -1,23 +1,11 @@
 import type { Page } from '@playwright/test';
 import { abrirOLembrete, expect, semViolacoes, test } from './apoio';
 
-/** No Hoje o "Começar uma Sessão" abre recolhido (D-D16): abre a linha e toca no tipo "Questões". */
-async function comecarQuestoes(page: Page) {
-  await page.locator('.comecar-sessao > summary').click();
-  await page.getByRole('button', { name: /Questões/ }).click();
-}
-
-/** Com um cartão vencido o Hoje tem uma ação; no Hoje vazio o começo é um só e não há cartão de Sessão. */
-async function abrirHojeComAgora(page: Page) {
-  const inicio = new Date('2026-09-23T12:00:00-03:00');
-  await page.clock.setFixedTime(inicio);
-  await page.goto('/#/recall/cartoes/novo');
-  await page.getByLabel('Frente (pergunta)').fill('Pergunta');
-  await page.getByRole('button', { name: 'Salvar' }).click();
-  await expect(page).toHaveURL(/#\/recall\/cartoes$/);
-  await page.clock.setFixedTime(new Date(inicio.getTime() + 86_400_000));
-  await page.goto('/#/');
-  await page.reload();
+/** Começa uma Sessão leve pela tela de começar e espera a tela da Sessão. */
+async function iniciarSessao(page: Page) {
+  await page.goto('/#/sessao/iniciar');
+  await page.getByRole('button', { name: 'Começar', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
 }
 
 test('Sessão leve: começa, pausa, volta ao reabrir, fecha com próximo passo (A2)', async ({
@@ -53,24 +41,6 @@ test('Sessão leve: começa, pausa, volta ao reabrir, fecha com próximo passo (
   await semViolacoes(page);
 });
 
-test('Hoje: fechar o Dia depois de uma Sessão e reabrir (A3b)', async ({ page }) => {
-  await page.goto('/#/sessao/iniciar');
-  await page.getByRole('button', { name: 'Começar', exact: true }).click();
-  await page.getByRole('link', { name: 'Encerrar' }).click();
-  await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
-
-  await page.goto('/#/');
-  const bloco = page.getByRole('region', { name: 'Fechar o Dia' });
-  await expect(bloco).toContainText('1 Sessão');
-  await semViolacoes(page);
-  await bloco.getByRole('button', { name: 'Fechar o Dia' }).click();
-  await expect(bloco.getByRole('heading', { name: 'Dia fechado' })).toBeVisible();
-  await semViolacoes(page);
-  await bloco.getByRole('button', { name: 'Reabrir o Dia' }).click();
-  await expect(bloco.getByRole('button', { name: 'Fechar o Dia' })).toBeVisible();
-});
-
 test('Sessão: bloquinho de distrações e só estudo (A3a)', async ({ page }) => {
   await page.goto('/#/sessao/iniciar');
   await page.getByRole('button', { name: 'Começar', exact: true }).click();
@@ -84,10 +54,10 @@ test('Sessão: bloquinho de distrações e só estudo (A3a)', async ({ page }) =
   await page.keyboard.press('Escape');
 
   await page.getByRole('checkbox', { name: 'Só estudo' }).click();
-  await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeHidden();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeHidden();
   await semViolacoes(page);
   await page.getByRole('checkbox', { name: 'Só estudo' }).click();
-  await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
   await semViolacoes(page);
 
   // Recarregar não perde nada; ao fechar, a nota aparece para marcar.
@@ -113,7 +83,7 @@ test('A nota guardada na Sessão fica no Lembrete do "+" até ser marcada como r
   await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Sessão encerrada' })).toBeVisible();
 
-  await page.goto('/#/');
+  await page.goto('/#/recall');
   const dialogo = await abrirOLembrete(page);
   const lista = dialogo.getByRole('list', { name: 'Guardado nas Sessões' });
   const caixa = lista.getByRole('checkbox', { name: 'ligar para o cartório' });
@@ -131,34 +101,17 @@ test('A nota guardada na Sessão fica no Lembrete do "+" até ser marcada como r
   await expect(outra.getByRole('list', { name: 'Guardado nas Sessões' })).toHaveCount(0);
 });
 
-test('Sessão por atividade: questões no cartão do Hoje, Errei guarda o erro e o canto fica sobre as abas', async ({
+test('Fora da Sessão, o relógio fica no canto, sem cobrir a pílula dos lugares, e o bloquinho abre sobre ele', async ({
   page,
 }) => {
-  await abrirHojeComAgora(page);
-  await comecarQuestoes(page);
-  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
-  await page.getByRole('button', { name: 'Acertei' }).click();
-  await page.getByRole('button', { name: 'Errei' }).click();
-  await page.getByLabel('Frase correta').fill('O prazo é de cinco dias.');
-  await semViolacoes(page);
-  await page.getByRole('button', { name: 'Guardar erro' }).click();
-  await expect(page.getByText('2 feitas, 1 acerto.')).toBeVisible();
-  // O formulário fechou com o foco dentro dele: o foco volta ao Errei (no navegador, a gravação é uma promessa).
-  await expect(page.getByRole('button', { name: 'Errei' })).toBeFocused();
-
-  // Fora da Sessão, o relógio fica no canto, sem cobrir a barra de áreas, e o bloquinho abre sobre ele.
-  await page
-    .getByRole('navigation', { name: 'Áreas' })
-    .getByRole('link', { name: 'Biblioteca' })
-    .click();
+  await iniciarSessao(page);
+  await page.goto('/#/biblioteca');
   const relogio = page.getByRole('button', { name: /Abrir o bloquinho/ });
   await expect(relogio).toBeVisible();
-  const areas = await page.getByRole('navigation', { name: 'Áreas' }).boundingBox();
+  const pilula = await page.getByRole('navigation', { name: 'Lugares' }).boundingBox();
   const caixa = await relogio.boundingBox();
-  expect(areas && caixa).toBeTruthy();
-  if (areas && caixa && (page.viewportSize()?.width ?? 1000) < 900) {
-    expect(caixa.y + caixa.height).toBeLessThanOrEqual(areas.y);
-  }
+  expect(pilula && caixa).toBeTruthy();
+  if (pilula && caixa) expect(caixa.y + caixa.height).toBeLessThanOrEqual(pilula.y);
   await relogio.click();
   await page.getByLabel('Anotar uma distração').fill('comprar café');
   await semViolacoes(page);
@@ -166,40 +119,36 @@ test('Sessão por atividade: questões no cartão do Hoje, Errei guarda o erro e
   await expect(page.getByText('Guardado para depois.')).toBeVisible();
 });
 
-test('Hoje: a linha "Começar uma Sessão" abre recolhida e não disputa a ação principal da tela', async ({
+test('Sessão: no fim da tela o relógio assenta abaixo do fim do texto e acima da pílula dos lugares (texto a 200%)', async ({
   page,
 }) => {
-  await abrirHojeComAgora(page);
-  const resumo = page.locator('.comecar-sessao > summary');
-  await expect(resumo).toContainText('Começar uma Sessão');
-  // Recolhida: os tipos de atividade nem estão na tela, e a linha tem alvo de 44 px.
-  await expect(page.getByRole('button', { name: /Questões/ })).toBeHidden();
-  expect((await resumo.boundingBox())?.height).toBeGreaterThanOrEqual(44);
-  await expect(page.locator('main .principal')).toHaveCount(1);
-  await resumo.click();
-  await expect(page.getByRole('button', { name: /Questões/ })).toBeVisible();
-  await expect(page.locator('main .principal')).toHaveCount(1);
-  await semViolacoes(page);
-});
-
-test('Sessão: no fim da tela o relógio assenta abaixo do rodapé, acima das abas, sem cobrir "Backup e dados" (texto a 200%)', async ({
-  page,
-}) => {
-  await abrirHojeComAgora(page);
-  await comecarQuestoes(page);
-  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
-  await page
-    .getByRole('navigation', { name: 'Áreas' })
-    .getByRole('link', { name: 'Biblioteca' })
-    .click();
-  // Celular com o texto ampliado: a tela passa de duas alturas e o rodapé desce até o canto do relógio.
+  await iniciarSessao(page);
+  await page.goto('/#/biblioteca');
+  // Celular com o texto ampliado: a tela passa de duas alturas e o fim do texto desce até o canto do relógio.
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => {
     document.documentElement.style.fontSize = '200%';
   });
   const relogio = page.getByRole('button', { name: /Abrir o bloquinho/ });
-  const rodape = page.getByRole('link', { name: 'Backup e dados' });
-  const abas = page.getByRole('navigation', { name: 'Áreas' });
+  /** O fim do último texto à vista da tela (a caixa de cada linha, não a do bloco). */
+  const fimDoTexto = () =>
+    page.evaluate(() => {
+      const raiz = document.getElementById('conteudo');
+      if (!raiz) return null;
+      let fim: number | null = null;
+      // 4 = NodeFilter.SHOW_TEXT
+      const passeio = document.createTreeWalker(raiz, 4);
+      for (let no = passeio.nextNode(); no; no = passeio.nextNode()) {
+        if (!(no.textContent ?? '').trim() || !no.parentElement?.checkVisibility()) continue;
+        const faixa = document.createRange();
+        faixa.selectNodeContents(no);
+        for (const c of faixa.getClientRects()) {
+          if (c.width > 1 && c.height > 1) fim = Math.max(fim ?? c.bottom, c.bottom);
+        }
+      }
+      return fim;
+    });
+  const pilula = page.getByRole('navigation', { name: 'Lugares' });
   // O fim da página pode crescer depois do primeiro rolar (fontes e dados chegando): rola de novo a cada leitura.
   await expect
     .poll(async () => {
@@ -208,22 +157,20 @@ test('Sessão: no fim da tela o relógio assenta abaixo do rodapé, acima das ab
       });
       const [r, l, a] = await Promise.all([
         relogio.boundingBox(),
-        rodape.boundingBox(),
-        abas.boundingBox(),
+        fimDoTexto(),
+        pilula.boundingBox(),
       ]);
-      if (!r || !l || !a) return 'sem caixa: ' + JSON.stringify({ r, l, a });
-      const ok = l.y + l.height <= r.y && r.y + r.height <= a.y;
+      if (!r || l === null || !a) return 'sem caixa: ' + JSON.stringify({ r, l, a });
+      const ok = l <= r.y && r.y + r.height <= a.y;
       return ok ? 'ok' : 'fora de ordem: ' + JSON.stringify({ r, l, a });
     })
     .toBe('ok');
 });
 
-test('Sessão: na própria tela o relógio não cobre Pausar, Encerrar, Acertei nem Errei (tela baixa e texto a 200%)', async ({
+test('Sessão: na própria tela o relógio não cobre Pausar nem Encerrar (tela baixa e texto a 200%)', async ({
   page,
 }) => {
-  await abrirHojeComAgora(page);
-  await comecarQuestoes(page);
-  await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
+  await iniciarSessao(page);
   const medidas = [
     { largura: 320, altura: 460, fonte: '100%' },
     { largura: 360, altura: 740, fonte: '200%' },
@@ -238,8 +185,6 @@ test('Sessão: na própria tela o relógio não cobre Pausar, Encerrar, Acertei 
     const controles = [
       page.getByRole('button', { name: 'Pausar', exact: true }),
       page.getByRole('link', { name: 'Encerrar' }).first(),
-      page.getByRole('button', { name: 'Acertei', exact: true }),
-      page.getByRole('button', { name: 'Errei', exact: true }),
     ];
     const relogio = await page.getByRole('button', { name: /Abrir o bloquinho/ }).boundingBox();
     expect(relogio).toBeTruthy();

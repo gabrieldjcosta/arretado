@@ -22,6 +22,8 @@ export function BandejaDoFoco({
   filtrar,
   filtro,
   acoes,
+  sumario,
+  ajustes,
   estrelar,
   lidoAteAqui,
   sair,
@@ -42,6 +44,10 @@ export function BandejaDoFoco({
   /** A frase do filtro ligado, se há um. */
   filtro?: string | undefined;
   acoes: () => void;
+  /** Abre o sumário da norma; ausente quando a norma não tem blocos. */
+  sumario?: (() => void) | undefined;
+  /** Abre a folha dos ajustes de leitura (tamanho do texto, destaques, foco na frase). */
+  ajustes: () => void;
   estrelar: () => void;
   lidoAteAqui: () => void;
   sair: () => void;
@@ -176,6 +182,14 @@ export function BandejaDoFoco({
               </button>
             </>
           )}
+          {sumario && (
+            <button type="button" aria-haspopup="dialog" onClick={agir(sumario)}>
+              Sumário
+            </button>
+          )}
+          <button type="button" aria-haspopup="dialog" onClick={agir(ajustes)}>
+            Ajustes de leitura
+          </button>
           <button
             type="button"
             aria-disabled={lente === 'corrido' && !podeCartao}

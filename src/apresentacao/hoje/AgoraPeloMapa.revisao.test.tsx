@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import type { Repositorio } from '../../core/persistencia';
 import type { Bloco } from '../../core/seguranca/sanitizador';
 import { FonteDeIncidencia } from '../../dominios/legislacao/incidencia-fonte';
@@ -7,7 +7,7 @@ import { marcarLidoAte } from '../../dominios/legislacao/leituras';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
-import { ContextoFonteIncidencia } from '../dados/fonteIncidenciaContexto';
+import { montarEntradaDoFio } from '../fio/dados/entrada';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
 const LEI: Bloco[] = [
@@ -33,32 +33,27 @@ async function lerALep(repo: Repositorio) {
   const art1 = nos.find((n) => n.dispositivo.endereco === 'art1');
   if (!art1) throw new Error('sem art. 1º');
   await marcarLidoAte(repo, norma.id, art1.dispositivo.id);
+  return norma;
 }
 
-describe('revisão #326: o Hoje não espera a rede do mapa', () => {
-  it('rede que não responde (lie-fi): o Agora cai em "Continuar a leitura" em vez de ficar no esqueleto', async () => {
+describe('revisão #326: o Fio não espera a rede do mapa', () => {
+  it('rede que não responde (lie-fi): a entrada do Fio chega sem o mapa em vez de ficar esperando', async () => {
     const { repo } = await repositorioDeTeste();
-    await lerALep(repo);
+    const norma = await lerALep(repo);
+    const disciplina = await repo.colecao('disciplinas').criar({ nome: 'Execução Penal' });
+    await repo
+      .colecao('vinculosDisciplina')
+      .criar({ normaId: norma.id, disciplinaId: disciplina.id });
     // fetch que nunca resolve nem rejeita: sinal fraco, portal cativo.
     const pendurada = new FonteDeIncidencia(
       '/incidencia',
       () => new Promise<Response>(() => undefined),
       () => Promise.resolve(undefined),
     );
-    window.location.hash = '#/';
-    render(
-      <ContextoFonteIncidencia.Provider value={pendurada}>
-        <App abrir={() => Promise.resolve(repo)} />
-      </ContextoFonteIncidencia.Provider>,
-    );
-    await screen.findByRole('navigation', { name: 'Áreas' });
-    await waitFor(
-      () => {
-        expect(screen.getByRole('heading', { name: 'Continuar a leitura' })).toBeInTheDocument();
-      },
-      { timeout: 2500 },
-    );
-  });
+    const entrada = await montarEntradaDoFio(repo, { fonte: pendurada, etapasFeitas: 0 });
+    expect(entrada.materias).toHaveLength(1);
+    expect(entrada.materias[0]?.normas[0]?.id).toBe(norma.id);
+  }, 5000);
 });
 
 describe('revisão #326: ir= no Iniciar é entrada não confiável', () => {

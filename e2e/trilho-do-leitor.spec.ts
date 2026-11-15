@@ -48,7 +48,7 @@ test('o trilho: a partir de 1200 px as ferramentas ficam ao lado do texto; abaix
       )
       .toBe(true);
     const trilho = await caixa(page, '.acoes-leitor');
-    const cabecalho = await caixa(page, '.topo');
+    const cabecalho = await caixa(page, '.fio-topo');
     expect(trilho.direita, `dentro da tela a ${String(largura)}`).toBeLessThanOrEqual(largura);
     expect(trilho.topo, `abaixo do cabeçalho a ${String(largura)}`).toBeGreaterThanOrEqual(
       cabecalho.base,

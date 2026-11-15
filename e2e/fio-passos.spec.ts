@@ -5,6 +5,7 @@ import {
   coresNosPixels,
   expect,
   importarEPublicar,
+  irAoAgora,
   registrarAnimacoes,
   semViolacoesNoFio,
   terminarCoberturaDasTelas,
@@ -37,9 +38,7 @@ async function comALeiNaPrevia(page: Page) {
   await page.getByRole('dialog').getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
 
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
   await expect(puxador(page)).toBeVisible();
 }
 

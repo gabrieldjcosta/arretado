@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { esconderCarregamento } from '../carregamento';
 import { Falha } from './estados';
 
 interface Props {
@@ -18,6 +19,8 @@ export class LimiteDeErro extends Component<Props, { falhou: boolean }> {
 
   override componentDidCatch(erro: unknown, info: ErrorInfo) {
     console.error('Falha de renderização', erro, info.componentStack);
+    // O aviso aparece já: a tela de carregamento do index.html não fica por cima dele.
+    void esconderCarregamento();
   }
 
   override render() {

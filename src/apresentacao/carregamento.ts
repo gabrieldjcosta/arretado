@@ -8,6 +8,28 @@ const SAIDA_MS = 200;
 
 const saidas = new WeakMap<HTMLElement, Promise<void>>();
 
+let segurando = 0;
+
+/**
+ * Segura a tela enquanto o app ainda está para chegar (a casca, que baixa à parte): a rede de segurança do
+ * `ProvedorRepositorio` não a tira nesse meio-tempo. Devolve o soltar. Quem chega (a casca) ou quem falha (o
+ * `LimiteDeErro`) tira a tela por conta própria, com `esconderCarregamento`.
+ */
+export function segurarCarregamento(): () => void {
+  segurando += 1;
+  let solto = false;
+  return () => {
+    if (solto) return;
+    solto = true;
+    segurando -= 1;
+  };
+}
+
+/** Alguém ainda segura a tela (`segurarCarregamento`). */
+export function carregamentoSeguro(): boolean {
+  return segurando > 0;
+}
+
 /**
  * Tira a tela de carregamento: esmaece, deixa passar o toque e sai da árvore. Idempotente (a mesma
  * promessa) e sempre resolve, inclusive sem a tela (testes, `dev`). Com movimento reduzido sai na hora.

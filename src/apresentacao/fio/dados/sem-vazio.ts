@@ -11,12 +11,13 @@ const ultimas = new WeakMap<Repositorio, Map<string, unknown>>();
 
 /**
  * `useDados` que, numa tela que acaba de montar, parte da última leitura do mesmo `nome` em vez de começar vazio.
- * `carregar` deve ser estável, como em `useDados`.
+ * `carregar` deve ser estável, como em `useDados`. `deAntes` diz que os dados ainda são os guardados: a leitura
+ * desta montagem não chegou, e o que só vale para o que está no Aparelho agora espera por ela.
  */
 export function useDadosDoFio<T>(
   nome: string,
   carregar: (repo: Repositorio) => Promise<T>,
-): { dados: T | undefined; falha: unknown } {
+): { dados: T | undefined; falha: unknown; deAntes: boolean } {
   const repo = useRepositorio();
   const { dados, falha } = useDados(carregar);
   useEffect(() => {
@@ -28,5 +29,9 @@ export function useDadosDoFio<T>(
     }
     lidas.set(nome, dados);
   }, [repo, nome, dados]);
-  return { dados: dados ?? (ultimas.get(repo)?.get(nome) as T | undefined), falha };
+  return {
+    dados: dados ?? (ultimas.get(repo)?.get(nome) as T | undefined),
+    falha,
+    deAntes: dados === undefined,
+  };
 }

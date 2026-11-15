@@ -8,6 +8,7 @@ import {
 } from '../../core/modelo';
 import { alterarPreferencias, cotaDiaria, obterPreferencias } from '../../core/preferencias';
 import { LegendaDestaques } from '../biblioteca/LegendaDestaques';
+import { temRealce } from '../biblioteca/useReguaDeFoco';
 import { Esqueleto } from '../componentes/estados';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { ROTULO_DA_AREA } from '../textos';
@@ -32,6 +33,11 @@ export function AparenciaConta() {
   const [cotaTexto, setCotaTexto] = useState<string | null>(null);
   if (!salvas) return <Esqueleto />;
   const dados = { ...salvas, ...pendentes };
+  // "Só a frase" pinta pela API de realce do navegador: sem ela a opção não aparece e, se era a escolhida, o que
+  // o Leitor faz é o mesmo que desligado (igual à folha dos ajustes de leitura).
+  const comFrase = temRealce();
+  const reguaDeFoco =
+    dados.reguaDeFoco === 'frase' && !comFrase ? 'desligada' : (dados.reguaDeFoco ?? 'desligada');
 
   const alterar = (
     mudanca: Partial<
@@ -147,8 +153,8 @@ export function AparenciaConta() {
           Destacar prazos, condições, termos absolutos e penas
         </label>
         <p id="destaques-dica" className="dica">
-          Calculado na leitura, nunca gravado como grifo. Também liga e desliga no botão "Destaques"
-          do leitor.
+          Calculado na leitura, nunca gravado como grifo. Também liga e desliga nos ajustes de
+          leitura do Leitor, o "Aa".
         </p>
         <LegendaDestaques comTraco />
         <label className="opcao">
@@ -169,13 +175,13 @@ export function AparenciaConta() {
         <select
           id="regua-de-foco"
           aria-describedby="regua-foco-dica"
-          value={dados.reguaDeFoco ?? 'desligada'}
+          value={reguaDeFoco}
           onChange={(e) => {
             alterar({ reguaDeFoco: e.target.value as NonNullable<Preferencias['reguaDeFoco']> });
           }}
         >
-          <option value="desligada">Desligada</option>
-          <option value="frase">Só a frase em leitura</option>
+          <option value="desligada">Desligado</option>
+          {comFrase && <option value="frase">Só a frase em leitura</option>}
           <option value="palavras">Só as palavras de destaque</option>
         </select>
         <p id="regua-foco-dica" className="dica">

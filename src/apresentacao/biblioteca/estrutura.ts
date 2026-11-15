@@ -1,6 +1,7 @@
 // A estrutura da norma (Ponto de luz, P4): os blocos (parte, livro, título, capítulo, seção…) como
 // um sumário que acompanha a leitura. Contas puras sobre a árvore em ordem de leitura (`nos`); o
 // painel (`EstruturaDaNorma`) só desenha o que sai daqui.
+import type { TextoDeDispositivo } from '../../core/modelo';
 import type { NoDaLeitura } from '../../dominios/legislacao/leitor';
 import type { EstadoDoPonto } from '../componentes/PontoDeLuz';
 
@@ -12,6 +13,13 @@ export function ehBloco(no: NoDaLeitura): boolean {
   const { categoria, tipo, rotulo } = no.dispositivo;
   return categoria === 'estrutural' && tipo !== 'nome' && !!rotulo;
 }
+
+/** O estado do bloco em palavras, para o leitor de tela (o ponto é só desenho). */
+export const ESTADO_POR_EXTENSO: Record<EstadoDoPonto, string> = {
+  feito: 'lida',
+  atual: 'em leitura',
+  falta: 'ainda não lida',
+};
 
 /** `-1` guarda a raiz: os blocos que não estão dentro de outro. */
 export const RAIZ = -1;
@@ -73,6 +81,49 @@ export function indiceDaEstrutura(nos: readonly NoDaLeitura[]): IndiceDaEstrutur
   });
   const ultimo = Int32Array.from(fim, (f, i) => (dentroDe[i] === i ? ultimoMarcavel(nos, f) : i));
   return { dentroDe, fim, ultimo, pai, filhos };
+}
+
+/**
+ * O nó que guarda o nome do bloco: a rubrica dobrada nele (o `nome` logo depois) ou, no anexo e no
+ * bloco solto, ele mesmo.
+ */
+export function noDoNome(nos: readonly NoDaLeitura[], bloco: number): number {
+  const proximo = nos[bloco + 1]?.dispositivo;
+  return proximo?.tipo === 'nome' && proximo.paiId === nos[bloco]?.dispositivo.id
+    ? bloco + 1
+    : bloco;
+}
+
+/** O nome do bloco, em texto corrido, a partir do texto do nó que o guarda; vazio se ele não chegou. */
+export function nomeDoTexto(texto: TextoDeDispositivo | undefined): string {
+  return (
+    texto?.trechos
+      .map((t) => t.texto)
+      .join('')
+      .trim() ?? ''
+  );
+}
+
+/** Um bloco do sumário inteiro: o índice do nó e quantos blocos há acima dele. */
+export interface BlocoDoSumario {
+  bloco: number;
+  nivel: number;
+}
+
+/**
+ * Todos os blocos da norma, na ordem de leitura, cada um com a sua profundidade: o sumário inteiro,
+ * que o celular abre numa folha (lá não cabe o painel ao lado do texto).
+ */
+export function blocosEmOrdem(indice: IndiceDaEstrutura): BlocoDoSumario[] {
+  const blocos: BlocoDoSumario[] = [];
+  const descer = (pai: number, nivel: number) => {
+    for (const bloco of indice.filhos.get(pai) ?? []) {
+      blocos.push({ bloco, nivel });
+      descer(bloco, nivel + 1);
+    }
+  };
+  descer(RAIZ, 0);
+  return blocos;
 }
 
 /** A norma tem estrutura para mostrar (ao menos um bloco). */

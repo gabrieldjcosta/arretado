@@ -1,4 +1,4 @@
-import { test, expect, semViolacoes } from './apoio';
+import { test, expect, semViolacoes, telaDoAgora } from './apoio';
 
 test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
   // Roda no build do E2E da conta (`--mode e2e-conta`, T30): serviço de conta falso, sem rede.
@@ -43,9 +43,10 @@ test.describe('Migração do uso local para a conta (F4-A, A4b)', () => {
     });
     await semViolacoes(page);
 
-    // "Ir para o Hoje" recarrega e abre o banco da conta (T26).
-    await page.getByRole('link', { name: 'Ir para o Hoje' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    // "Ir para o Agora" recarrega no Agora e abre o banco da conta (T26).
+    // O nome exato: a marca do cabeçalho do Fio também é um link "Arretado: ir para o Agora".
+    await page.getByRole('link', { name: 'Ir para o Agora', exact: true }).click();
+    await expect(telaDoAgora(page)).toBeVisible();
 
     // 4. Ver a cópia em Dados
     await page.goto('/#/conta/dados');

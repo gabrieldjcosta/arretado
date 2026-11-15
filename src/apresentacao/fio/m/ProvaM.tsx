@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { contasHabilitadas } from '../../../integracoes/conta';
 import { espera, modoAgora } from './anima';
 import { TelaM } from './TelaM';
 
@@ -57,6 +58,13 @@ export function ProvaM() {
           </button>
         ))}
       </div>
+      {/* Quem instalou num Aparelho novo para restaurar um backup ou entrar na conta não precisa responder antes
+          (desvio 476c). Só se chega a esta tela sem prova escolhida, então a porta aparece sempre. */}
+      <Link to={contasHabilitadas() ? '/conta' : '/conta/dados'} className="m-entrar-codigo">
+        {contasHabilitadas()
+          ? 'Já uso o Arretado: entrar ou restaurar um backup'
+          : 'Já uso o Arretado: restaurar um backup'}
+      </Link>
       <div className="m-vazio" />
       <p className="m-quieto">Sem conta, sem edital. Isso fica para depois, se você quiser.</p>
     </TelaM>

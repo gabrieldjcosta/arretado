@@ -394,7 +394,8 @@ function medirTela(larguraDoAparelho) {
     .filter(({ r }) => r.width < 44 || r.height < 44)
     .sort((a, b) => Math.min(a.r.width, a.r.height) - Math.min(b.r.width, b.r.height));
 
-  const abas = document.querySelector('nav.areas');
+  // A pílula dos lugares do Fio, presa embaixo nas telas da casca legada (a do quadro do Fio não é fixa).
+  const abas = document.querySelector('nav.fio-nav');
   const textoSob = () => {
     if (!abas || !visivel(abas) || window.getComputedStyle(abas).position !== 'fixed') return [];
     const f = abas.getBoundingClientRect();
