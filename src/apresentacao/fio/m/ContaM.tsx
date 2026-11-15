@@ -9,6 +9,7 @@ import { estadoDaSincronizacao, ROTULO_DO_ESTADO } from '../../../core/sincroniz
 import { lembreteDeBackup } from '../../../dominios/dados/lembrete-de-backup';
 import { contasHabilitadas } from '../../../integracoes/conta';
 import { aplicarAtualizacao, useAtualizacaoPronta } from '../../../offline/registro';
+import { useInstalacao } from '../../../suporte/instalacao';
 import { carregarBackup } from '../../componentes/backup-pendente';
 import { useDados, useRepositorio } from '../../dados/contexto';
 import { escolherMovimento } from '../../movimento-escolhido';
@@ -54,6 +55,36 @@ function Linha({
       </span>
       <Seta />
     </button>
+  );
+}
+
+/** Convite para instalar o app (Android, Windows) ou o passo a passo (iOS). Some onde não se aplica. Instalado, o foco volta ao título da folha. */
+function LinhaDeInstalacao({ idDoTitulo }: { idDoTitulo: string }) {
+  const { estado, instalar } = useInstalacao();
+  if (estado === 'passo-a-passo-ios') {
+    return (
+      <div className="m-linha-conta">
+        <span>
+          Instalar no aparelho
+          <small>No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.</small>
+        </span>
+      </div>
+    );
+  }
+  if (estado !== 'convite') return null;
+  return (
+    <Linha
+      pequeno="abre em janela própria e funciona sem internet"
+      aoToque={() => {
+        void instalar().then(() => {
+          const titulo = document.getElementById(idDoTitulo);
+          titulo?.setAttribute('tabindex', '-1');
+          titulo?.focus();
+        });
+      }}
+    >
+      Instalar no aparelho
+    </Linha>
   );
 }
 
@@ -295,6 +326,7 @@ function Conteudo({
       </div>
       <div className="m-grupo-conta">
         <h3>O resto</h3>
+        <LinhaDeInstalacao idDoTitulo={idDoTitulo} />
         {versaoNova && (
           <Linha pequeno="uma versão nova está pronta" aoToque={aplicarAtualizacao}>
             Atualizar o Arretado
@@ -336,7 +368,7 @@ function Conteudo({
           Relatar um problema
         </Linha>
         <Linha
-          pequeno="perfis de estudo, passeio e sincronização"
+          pequeno="perfis de estudo e sincronização"
           aoToque={() => {
             ir('/conta');
           }}

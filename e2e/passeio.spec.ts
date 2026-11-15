@@ -10,8 +10,6 @@ import { expect, semViolacoes, test } from './apoio';
 //
 // A Chegada não abre mais sozinha: aqui ela vem pelo "Rever as boas-vindas" do menu Ajuda de uma tela da casca legada.
 
-const CHAVE_CHEGADA = 'arretado:chegada:v1';
-
 type Tela = 'boas' | 'passo-1' | 'passo-2' | 'passo-3';
 
 const TELAS: ReadonlyArray<{ tela: Tela; nome: string; botoes: string[] }> = [
@@ -210,64 +208,5 @@ test.describe('a saudação das Boas-vindas (D-D11)', () => {
       });
       await inteira('texto a 200%');
     });
-  });
-});
-
-test.describe('o passeio refeito na Conta', () => {
-  test('"Fazer o passeio" abre os três passos direto; "Concluir" fecha, devolve o foco e nada é gravado', async ({
-    page,
-  }) => {
-    await page.goto('/#/conta');
-    const abrir = page.getByRole('button', { name: 'Fazer o passeio' });
-    await abrir.click();
-    const primeiro = page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' });
-    await expect(primeiro).toBeVisible();
-    await expect(primeiro.getByRole('button', { name: 'Voltar ao app' })).toBeVisible();
-    await expect(page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' })).toHaveCount(0);
-
-    for (let i = 0; i < 2; i += 1) {
-      await page.getByRole('button', { name: 'Seguir' }).click();
-    }
-    await expect(page.getByRole('dialog', { name: 'Passo 3 de 3 Varal' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Seguir' })).toHaveCount(0);
-    await page.getByRole('button', { name: 'Concluir' }).click();
-
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(page.getByRole('dialog', { name: 'Vamo começar?' })).toHaveCount(0);
-    await expect(abrir).toBeFocused();
-    expect(await page.evaluate((chave) => localStorage.getItem(chave), CHAVE_CHEGADA)).toBeNull();
-  });
-
-  test('"Voltar ao app", "Pular o passeio" e Esc fecham a folha e devolvem o foco ao botão', async ({
-    page,
-  }) => {
-    await page.goto('/#/conta');
-    const abrir = page.getByRole('button', { name: 'Fazer o passeio' });
-
-    await abrir.click();
-    await page.getByRole('button', { name: 'Voltar ao app' }).click();
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(abrir).toBeFocused();
-
-    await abrir.click();
-    await page.getByRole('button', { name: 'Seguir' }).click();
-    await page.getByRole('button', { name: 'Pular o passeio' }).click();
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(abrir).toBeFocused();
-
-    await abrir.click();
-    await expect(page.getByRole('dialog', { name: 'Passo 1 de 3 Agora' })).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(abrir).toBeFocused();
-  });
-
-  test('a linha da Conta passa no axe nos dois temas e o botão tem 44 px', async ({ page }) => {
-    await page.goto('/#/conta');
-    const abrir = page.getByRole('button', { name: 'Fazer o passeio' });
-    await expect(abrir).toBeVisible();
-    const caixa = await abrir.boundingBox();
-    expect(caixa?.height ?? 0).toBeGreaterThanOrEqual(43.99);
-    await semViolacoes(page);
   });
 });

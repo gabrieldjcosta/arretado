@@ -5,7 +5,6 @@ import {
   CONTA,
   CONTROLES,
   ENTRADA_DIRETA,
-  PASSEIO_NA_CONTA,
   PASSOS,
   progressoDoPasso,
 } from './passos';
@@ -65,11 +64,6 @@ describe('os textos do Passeio (D-D10, contrato §7)', () => {
       semContaApoio: 'e salvar meus dados manualmente',
       nota: 'Em fase de teste: por enquanto só e-mails convidados entram.',
     });
-    expect(PASSEIO_NA_CONTA).toEqual({
-      titulo: 'Passeio pelos menus',
-      apoio: 'Os três lugares, um por vez, quando você quiser.',
-      acao: 'Fazer o passeio',
-    });
     expect(Object.values(CONTROLES)).toEqual([
       'Seguir',
       'Concluir',
@@ -122,10 +116,11 @@ const semComentarios = (codigo: string) =>
   codigo.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 /** Os componentes do Passeio como texto (o `?raw` do Vite: src/ não tem os tipos do Node). */
-const COMPONENTES = import.meta.glob<string>(
-  ['./*.tsx', '!./*.test.tsx', '../Chegada.tsx', '../../conta/LinhaDoPasseio.tsx'],
-  { query: '?raw', import: 'default', eager: true },
-);
+const COMPONENTES = import.meta.glob<string>(['./*.tsx', '!./*.test.tsx', '../Chegada.tsx'], {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 
 describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
   const frases = [
@@ -135,9 +130,6 @@ describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
     COMECAR.titulo,
     ...Object.values(CONTA),
     ...Object.values(ENTRADA_DIRETA),
-    PASSEIO_NA_CONTA.titulo,
-    PASSEIO_NA_CONTA.apoio,
-    PASSEIO_NA_CONTA.acao,
     ...PASSOS.flatMap((p) => [
       p.frase,
       ...p.ferramentas.flatMap((f) => [f.destaque, ...(f.apoio === undefined ? [] : [f.apoio])]),
@@ -149,9 +141,8 @@ describe('uma fonte só: nenhum componente repete uma frase do Passeio', () => {
     .filter((frase) => frase.length >= 12);
   const componentes = Object.entries(COMPONENTES);
 
-  it('há os oito componentes a conferir', () => {
+  it('há os sete componentes a conferir', () => {
     expect(componentes.map(([nome]) => nome).sort()).toEqual([
-      '../../conta/LinhaDoPasseio.tsx',
       '../Chegada.tsx',
       './BoasVindas.tsx',
       './BotaoGoogle.tsx',

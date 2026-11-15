@@ -264,46 +264,34 @@ Pacotes de fontes compartilhados sem histórico pessoal (D12, F7), painel de men
 
 ## 9. Próximas atividades, em ordem
 
+Estado em 15/11/2026. As tabelas anteriores (F2 13.x, Frases 2/3, F3-A em pacotes, F4-A T1 a T6) estão no histórico ([`arquivo/proxima-sessao-ate-2026-11-15.md`](arquivo/proxima-sessao-ate-2026-11-15.md)); a F3 (Hoje, Sessão, Perfis, Tarefas) foi absorvida pelo Fio (D-D25) e saiu do app.
+
 | # | Atividade | Modelo | Onde roda |
 |---|---|---|---|
-| ~~1~~ | ~~**13.1** Segurança e LGPD da F2~~ ✔ 13/10/2026 | — | — |
-| 2 | **13.3** Backup com normas | Sonnet 5.5 médio | nuvem, sem rede |
-| ~~3~~ | ~~**13.2** Orientações › Legislação e ajuda contextual~~ ✔ 13/10/2026 | — | — |
-| ~~4~~ | ~~**13.5** Verificação de fechamento (§3 B)~~ ✔ 13/10/2026 | — | — |
-| 4a | **Ajustes A**: foco centralizado; disciplina ao trazer do acervo (§3 D) | Sonnet 5.5 médio | nuvem, sem rede |
-| ✔ 4b | **Frases 1**: modelo e captura (esquema v6), feita em 13/10/2026; **revisão independente e backup antes do merge** | **Opus 5.5** | nuvem |
-| 4c | **Frases 2**: Revisar frases e Revisar cartões, oclusão | Sonnet 5.5 médio | nuvem |
-| 4d | **Frases 3**: Enviar às frases a partir do leitor | Sonnet 5.5 médio | nuvem |
-| 5 | **12.2** Worker com chamada real | Sonnet 5.5 médio (alto se estourar) | **Gabriel, com rede** |
-| 6 | **12.3** Campo URL, depois **6b** | Sonnet 5.5 médio | nuvem, depois da 12.2 |
-| ✔ 7 | **13.4** Portão da F2 (documento) feito em 13/10/2026; portão fechado, medições → V1 | — | — |
-| ~~8~~ | ~~Uso real: 2 semanas~~ → V1 (§6); não bloqueia | — | Gabriel, na V1 |
-| 9 | Planejamento e execução da F3-A em pacotes verticais paralelos; F3-B prep ([`f3-pacotes.md`](f3-pacotes.md)) | **Opus 5.5** | nuvem, liberado |
+| 1 | **Religar o Supabase** (projeto `arretado` pausado em 15/11), conferir login, sincronização e exclusão, rodar os advisors | Sonnet 5.5 médio | nuvem + painel |
+| 2 | **Limpar o código sem uso do Hoje** (`apresentacao/hoje/`, `entrada/regras.ts`, `fecharDia`, `Caneta`, `scripts/capturas-ze.mjs` e os 9 arquivos inalcançáveis do relatório de 15/11) | Sonnet 5.5 médio | nuvem, sem rede |
+| 3 | **Docs do Fio** (esta limpeza); depois `CLAUDE.md` e a skill `arretado-design-principles` em PR próprio com `aprovado-gabriel` | Sonnet 5.5 médio | nuvem |
+| 4 | **Apps, Fase 1: casca Android** (Capacitor) para o Galaxy A56 e o Tab S10 FE; revisão independente antes do merge (toca no login) | Sonnet 5.5 médio; revisão em Opus | nuvem |
+| 5 | **Apps, Fase 2: Google Play** (~US$ 25, conta pessoal) e **Fase 4a: Windows** (PWA/Microsoft Store) | — | **Gabriel autoriza o gasto** |
+| 6 | **Fio:** o Praticar cobrir a Sessão de questões; Leitor (gesto, ferramentas); "só estudo" contar o Dia na abertura | Sonnet 5.5 médio | nuvem |
+| 7 | **12.2** Worker com chamada real e **12.3** (campo URL, depois 6b) | Sonnet 5.5 médio | Gabriel, com rede |
+| 8 | **F4-A:** T4 (E2E da conta com serviço falso e axe), T6 (revisão independente) e fumaça A8 | Sonnet 5.5 médio | nuvem; A8 com o Gabriel |
+| 9 | **V1** (depois das contas): 2 semanas de uso real, gabaritos conferidos, teste com três pessoas de fora | — | Gabriel |
 | 10 | Agente de verificação diário ([`agente-verificacao.md`](agente-verificacao.md)) | — | rotina na nuvem |
+| 11 | **iOS + Sign in with Apple** (Fase 3, ~US$ 99/ano) | — | só quando houver quem teste |
 
-Em paralelo, sem bloquear: lotes com rede (§3 C, Gabriel ou ambiente com rede) e a busca de súmula pelo índice (Sonnet 5.5 médio). Relato de problema do uso real fura a fila.
-
-### F4-A e V1 — estado em 19/10/2026
-
-| Etapa | Estado | Evidência / próxima ação |
-|---|---|---|
-| T1 — fila A7 | Feito | #188 · `3640f9b` (código), #185 · `47524fc` (consulta diária), conferidos em `origin/integracao` |
-| T2 — consentimento | Feito | #193 · `b30c02b`, conferido em `origin/integracao`; aceite v3 fica no Aparelho conforme D2 |
-| T3 — ajustes do A6 e §5.7 | **Em andamento** | Não declarar feito até o merge conferido em `origin/integracao` |
-| T4 — E2E da conta com serviço falso e axe | **Pendente** | Não iniciado conforme despacho; depende da decisão D1 |
-| T5 — portão e fumaça documentados | Em andamento | `docs/portoes/F4A.md`; aguarda revisão do coordenador no PR |
-| T6 — revisão independente do conjunto | Pendente | Depois dos T1–T5 mesclados |
-| Fumaça A8 | Pendente | Gabriel executa os SQLs remotos e os fluxos A/B; portão permanece aberto |
-| V1 | Não iniciada | Depois da F3 e da F4-A; não preencher marcadores nem adiantar convites |
+Em paralelo, sem bloquear: lotes com rede (§3 C) e a busca de súmula pelo índice. Relato de problema do uso real fura a fila.
 
 ## 10. Decisões que esperam o Gabriel
 
-1. **14 teses com número repetido** entre áreas (146 a 154): manter fora ou mudar o modelo para aceitar número por área (`acervo/relatorio-teses.md`).
-2. **Sumário da importação** refletir a edição (hoje mostra a estrutura da fonte; ver `solucao-de-problemas.md`).
-3. **Critério dos gabaritos no portão:** `F2.md` exige os gabaritos `conferida`, mas o programa do acervo (decisão D9 de 10/10/2026) transformou a reconferência em rotina de estudo; CP, ECA, CDC e CF seguem `pendente`. Decidir na 13.4 se o critério vira "medido com os gabaritos conferidos até a data" ou se a reconferência volta a ser etapa.
-4. As suposições reversíveis das atividades 8.7 a 11.6 (lista no histórico: [`arquivo/proxima-sessao-ate-2026-10-13.md`](arquivo/proxima-sessao-ate-2026-10-13.md) › "Decisões pequenas"), sem pressa.
-5. **Nomes e oclusão (Frases):** conferir na V1 se "Frases", "Revisar frases" e "Revisar cartões" ficam claros e se Biblioteca × Frases não confunde; oclusão com um trecho por cartão ou todos de uma vez (decidir nas Frases 2).
-6. Merge da `integracao` no `main` (contém o PR #83 e este plano; sem backup necessário).
+1. **Restaurar o Supabase**, se ninguém o fez: sem isso a conta e a sincronização ficam fora.
+2. **Gastos dos apps** (Play, Microsoft Store, Apple): cada fase pede o OK dele.
+3. **14 teses com número repetido** entre áreas (146 a 154): manter fora ou mudar o modelo para aceitar número por área (`acervo/relatorio-teses.md`).
+4. **Sumário da importação** refletir a edição (hoje mostra a estrutura da fonte; ver `solucao-de-problemas.md`).
+5. **Critério dos gabaritos no portão:** a reconferência virou rotina de estudo (D9 de 10/10). Decidir se o critério vira "medido com os gabaritos conferidos até a data" ou se ela volta a ser etapa. CP, ECA, CDC e CF seguem `pendente`.
+6. **Nome do Zé** (nenhuma tela o diz) e a leitura do brilho do néon num Aparelho real.
+7. **Sessão de questões:** fica pela Trilha por ora (15/11); volta quando o Praticar do Fio cobrir o mesmo uso.
+8. Merge diário da `integracao` no `main`; backup manual antes quando o esquema mudar.
 
 ## 11. Dependências críticas
 

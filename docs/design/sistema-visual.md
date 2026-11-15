@@ -263,7 +263,7 @@ A barra do navegador e a moldura do app instalado leem `theme-color`: o `index.h
 
 ## Leitor e Sessão
 
-Fonte da especificação de comportamento: [`referencias/2026-10-14-gemini/especificacao-leitor-sessao.md`](referencias/2026-10-14-gemini/especificacao-leitor-sessao.md) (D-D4). As cores e as formas de lá leem-se pelos tokens deste arquivo: onde divergirem, vale este texto.
+Fonte da especificação de comportamento: [`referencias/arquivo/2026-10-14-gemini/especificacao-leitor-sessao.md`](referencias/arquivo/2026-10-14-gemini/especificacao-leitor-sessao.md) (D-D4). As cores e as formas de lá leem-se pelos tokens deste arquivo: onde divergirem, vale este texto.
 
 **Leitor.**
 
