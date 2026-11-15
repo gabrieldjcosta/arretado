@@ -145,6 +145,19 @@ test('o "Voltar" da norma leva ao lugar de onde ela foi aberta; aberta direto pe
   await page.keyboard.press('Escape');
   await expect(page).not.toHaveURL(/foco=/);
   await expect(voltar(page)).toHaveAttribute('href', '#/varal/normas');
+  // Um desvio para fora da norma e a volta pelo navegador também não: o "Voltar" segue sendo o lugar de onde ela
+  // foi aberta, não a tela do desvio.
+  await page.getByRole('button', { name: 'Aa, ajustes de leitura' }).click();
+  await page
+    .getByRole('dialog', { name: 'Ajustes de leitura' })
+    .getByRole('link', { name: 'Conta › Aparência' })
+    .click();
+  // A tela do desvio na tela, e não só o endereço: ela baixa à parte, e voltar antes disso deixaria a norma como
+  // estava, com a folha dos ajustes ainda aberta por cima do "Voltar".
+  await expect(page.getByRole('heading', { level: 1, name: 'Aparência' })).toBeVisible();
+  await page.goBack();
+  await expect(tituloDaLep(page)).toBeVisible();
+  await expect(voltar(page)).toHaveAttribute('href', '#/varal/normas');
   await voltar(page).click();
   await expect(page).toHaveURL(/#\/varal\/normas$/);
   await expect(linha).toHaveCount(1);

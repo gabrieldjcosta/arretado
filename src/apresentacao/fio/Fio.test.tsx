@@ -49,6 +49,30 @@ describe('o Fio', () => {
     expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
   });
 
+  it('a tela de carregamento do index.html só sai com a casca na tela (ela baixa à parte)', async () => {
+    document.body.insertAdjacentHTML('afterbegin', '<div id="carregamento" role="status"></div>');
+    const tela = document.getElementById('carregamento');
+    if (!tela) throw new Error('a tela de teste não foi montada');
+    // O que havia na página no instante em que a tela começou a sair.
+    let cascaNaSaida: boolean | null = null;
+    const olho = new MutationObserver(() => {
+      if (cascaNaSaida === null && tela.hasAttribute('data-saindo'))
+        cascaNaSaida = document.querySelector('.m-app') !== null;
+    });
+    olho.observe(tela, { attributes: true, attributeFilter: ['data-saindo'] });
+    try {
+      await abrir();
+      await screen.findByRole('navigation', { name: 'Lugares' });
+      await waitFor(() => {
+        expect(tela).toHaveAttribute('data-saindo');
+      });
+      expect(cascaNaSaida).toBe(true);
+    } finally {
+      olho.disconnect();
+      tela.remove();
+    }
+  });
+
   it('mostra os três lugares embaixo, com o Agora aceso', async () => {
     await abrir();
     const nav = await screen.findByRole('navigation', { name: 'Lugares' });

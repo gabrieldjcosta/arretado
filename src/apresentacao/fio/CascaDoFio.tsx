@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { useLayoutEffect, useState } from 'react';
+import { NavigationType, Outlet, useLocation, useNavigationType } from 'react-router';
 import { AplicarAparencia } from '../Aparencia';
 import { PuxarEssenciais } from '../biblioteca/PuxarEssenciais';
+import { esconderCarregamento } from '../carregamento';
 import { useAtalhoDeRegistrarErro } from '../componentes/atalho-de-erro';
 import { FaixaOffline } from '../componentes/estados';
 import { MaisGlobal } from '../componentes/MaisGlobal';
@@ -125,9 +126,14 @@ function CascaLegada() {
  */
 export function CascaDoFio() {
   const { pathname, search } = useLocation();
-  // O "Voltar" do Leitor leva ao último endereço fora da norma.
-  useEffect(() => {
-    lembrarDeOndeVeio(pathname, search);
-  }, [pathname, search]);
+  // A tela de carregamento do index.html sai no quadro em que a casca aparece (por baixo da abertura, quando ela
+  // abre): nem um branco entre as duas, nem o app coberto. A casca baixa à parte e pode chegar depois da decisão
+  // da Abertura; tirar a tela antes disso deixava o céu vazio à mostra.
+  useLayoutEffect(() => {
+    void esconderCarregamento();
+  }, []);
+  // O "Voltar" do Leitor leva ao endereço de onde a pessoa entrou na norma. Anotado ao desenhar, e não num efeito:
+  // o Leitor lê a origem neste mesmo desenho, antes de qualquer efeito da casca. Repetir a rota não muda nada.
+  lembrarDeOndeVeio(pathname, search, useNavigationType() === NavigationType.Pop);
   return noQuadroDoFio(pathname) ? <CascaM /> : <CascaLegada />;
 }

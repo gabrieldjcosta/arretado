@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { segurarCarregamento } from './carregamento';
 import { ligarAlvoradaDoPrincipal } from './fio/m/brilho-ao-toque';
 import { criarRegistroDeItens, ProvedorDeItensDoMais } from './componentes/ItensDoMais';
 import { ProvedorDaAbertura } from './entrada/abertura/ProvedorDaAbertura';
@@ -7,6 +8,12 @@ import { ProvedorDaAbertura } from './entrada/abertura/ProvedorDaAbertura';
 const carregarCascaDoFio = () =>
   import('./fio/CascaDoFio').then((m) => ({ default: m.CascaDoFio }));
 const CascaDoFio = lazy(carregarCascaDoFio);
+
+/** Enquanto a casca baixa, a tela de carregamento do index.html fica: quem a tira é a casca, quando aparece. */
+function CascaACaminho() {
+  useEffect(() => segurarCarregamento(), []);
+  return <div className="shell" />;
+}
 
 /**
  * Moldura de todas as telas: a casca do Fio. Tudo fica dentro da Abertura (`ProvedorDaAbertura`): ela decide se o
@@ -23,7 +30,7 @@ export function Shell() {
   return (
     <ProvedorDaAbertura>
       <ProvedorDeItensDoMais value={registro}>
-        <Suspense fallback={<div className="shell" />}>
+        <Suspense fallback={<CascaACaminho />}>
           <CascaDoFio />
         </Suspense>
       </ProvedorDeItensDoMais>

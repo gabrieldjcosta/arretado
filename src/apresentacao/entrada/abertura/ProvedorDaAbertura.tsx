@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
-import { esconderCarregamento } from '../../carregamento';
 import { criarEncontro } from '../../componentes/escrita/encontro';
 import {
   escritaNaTela,
@@ -94,12 +93,9 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
     [repo],
   );
 
-  // O app monta quando a decisão chega (ou no teto). É nesse quadro que a tela de carregamento do index.html
-  // sai, por baixo da camada quando ela abre: nem um branco entre as duas, nem o app à mostra.
+  // O app monta quando a decisão chega (ou no teto). A tela de carregamento do index.html sai quando a casca
+  // aparece (`CascaDoFio`), por baixo da abertura quando ela abre.
   const montado = vez.estado !== 'pendente' || cansou;
-  useEffect(() => {
-    if (montado) void esconderCarregamento();
-  }, [montado]);
 
   const naTela = vez.estado === 'decidida' && vez.onde === 'tela' && !saiu ? vez : null;
   // A abertura é uma tela do quadro do Fio (`AberturaM`), não uma camada de tela cheia, e a Chegada não vem: a luz não a

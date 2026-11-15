@@ -246,57 +246,20 @@ describe('ProvedorDaAbertura: quem escreve o nome', () => {
       expect(sonda()).toBe('espera');
     });
 
-    describe('a tela de carregamento do index.html', () => {
-      const tela = () => document.getElementById('carregamento');
-      beforeEach(() => {
-        document.body.insertAdjacentHTML(
-          'afterbegin',
-          '<div id="carregamento" role="status"></div>',
-        );
-      });
-      afterEach(() => {
-        tela()?.remove();
-      });
-
-      it('fica enquanto a Abertura decide e sai no quadro em que o app monta', async () => {
+    it('não tira a tela de carregamento do index.html: quem tira é a casca, quando aparece', async () => {
+      document.body.insertAdjacentHTML('afterbegin', '<div id="carregamento" role="status"></div>');
+      const tela = document.getElementById('carregamento');
+      try {
         const { app } = await montar();
-        expect(app()).toBeNull();
-        expect(tela()).not.toHaveAttribute('data-saindo');
-
         await waitFor(() => {
           expect(app()).not.toBeNull();
         });
-        await waitFor(() => {
-          expect(tela()).toHaveAttribute('data-saindo');
-        });
-      });
-
-      it('sai quando o app monta sem a camada (o "só estudo" veta)', async () => {
-        const { app, camada } = await montar({ soEstudo: true });
-        expect(tela()).not.toHaveAttribute('data-saindo');
-        await waitFor(() => {
-          expect(app()).not.toBeNull();
-        });
-        await waitFor(() => {
-          expect(tela()).toHaveAttribute('data-saindo');
-        });
-        expect(camada()).toBe('nenhuma');
-      });
-
-      it('se a decisão demora, sai quando o app aparece no teto de 0,4 s', async () => {
-        vi.mocked(decidirNaAberturaDoApp).mockReturnValueOnce(new Promise(() => undefined));
-        const { app } = await montar();
-        expect(tela()).not.toHaveAttribute('data-saindo');
-        await waitFor(
-          () => {
-            expect(app()).not.toBeNull();
-          },
-          { timeout: 1500 },
-        );
-        await waitFor(() => {
-          expect(tela()).toHaveAttribute('data-saindo');
-        });
-      });
+        // A casca baixa à parte e pode chegar depois: se o provedor tirasse a tela aqui, ficava um branco.
+        expect(tela).toBeInTheDocument();
+        expect(tela).not.toHaveAttribute('data-saindo');
+      } finally {
+        tela?.remove();
+      }
     });
   });
 });

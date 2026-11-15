@@ -652,7 +652,8 @@ button,
      botão só tem um ícone, não há rótulo que peça mais espaço com a fonte ampliada, e a 300% um "+" de
      144 px tomava a largura de Ajuda e Conta e passava por cima delas. */
   --mais-lado: 48px;
-  --mais-topo: calc(env(safe-area-inset-top, 0px) + 0.375rem);
+  /* No meio da linha do cabeçalho do Fio (3,5 rem de altura, 48 px de botão). */
+  --mais-topo: calc(env(safe-area-inset-top, 0px) + 0.25rem);
   --mais-direita: max(var(--gutter), env(safe-area-inset-right, 0px));
   --abas-altura: env(safe-area-inset-bottom, 0px);
   /* O foco por Tab ou por script não pode parar sob o cabeçalho preso nem sob as abas de baixo

@@ -1,5 +1,5 @@
 import { simularMovimento } from '../testes/movimento';
-import { esconderCarregamento } from './carregamento';
+import { carregamentoSeguro, esconderCarregamento, segurarCarregamento } from './carregamento';
 
 function montarTela(): HTMLElement {
   document.body.innerHTML = '<div id="carregamento" role="status"></div>';
@@ -36,6 +36,18 @@ describe('esconderCarregamento (a tela do Zé no index.html)', () => {
     vi.advanceTimersByTime(1);
     expect(tela.isConnected).toBe(false);
     await expect(saida).resolves.toBeUndefined();
+  });
+
+  it('quem ainda vai trazer o app segura a tela, e soltar duas vezes conta uma só', () => {
+    expect(carregamentoSeguro()).toBe(false);
+    const soltarUm = segurarCarregamento();
+    const soltarOutro = segurarCarregamento();
+    expect(carregamentoSeguro()).toBe(true);
+    soltarUm();
+    soltarUm();
+    expect(carregamentoSeguro()).toBe(true);
+    soltarOutro();
+    expect(carregamentoSeguro()).toBe(false);
   });
 
   it('é idempotente: chamar de novo devolve a mesma promessa e não reinicia a saída', () => {

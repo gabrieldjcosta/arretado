@@ -2,9 +2,10 @@ import type { Locator, Page } from '@playwright/test';
 import { abrirOLembrete, expect, importarEPublicar, test } from './apoio';
 
 // D-D23: o "+" é um só, da casca das telas legadas (o Agora tem o dele, "Guardar um erro"), fixo no canto de cima à direita. O jsdom não tem layout; aqui o
-// navegador confere que ele fica no mesmo ponto em toda tela (cabeçalho e modo foco), cai na reserva
-// do cabeçalho sem cobrir nada (nem com a fonte ampliada), que o cartão do foco não passa por baixo
-// dele e que o Lembrete abre por cima da tela em que a pessoa está.
+// navegador confere que ele fica na mesma altura e na beirada direita do conteúdo em toda tela (no monitor a
+// Trilha e o Fixar têm duas colunas e são mais largos: o cabeçalho e o "+" acompanham, Gabriel em 08/11/2026),
+// no mesmo ponto no modo foco, que cai na reserva do cabeçalho sem cobrir nada (nem com a fonte ampliada), que o
+// cartão do foco não passa por baixo dele e que o Lembrete abre por cima da tela em que a pessoa está.
 
 const mais = (page: Page) => page.getByRole('button', { name: 'Novo registro' });
 
@@ -26,6 +27,16 @@ function igual(a: Caixa, b: Caixa) {
   expect(Math.abs(a.height - b.height)).toBeLessThanOrEqual(0.5);
 }
 
+/** A beirada direita do conteúdo da tela, por dentro do recuo da página: é com ela que o "+" alinha. */
+const beiradaDoConteudo = (page: Page) =>
+  page.evaluate(() => {
+    const conteudo = document.querySelector('main#conteudo');
+    if (!conteudo) throw new Error('sem o conteúdo da casca');
+    return (
+      conteudo.getBoundingClientRect().right - parseFloat(getComputedStyle(conteudo).paddingRight)
+    );
+  });
+
 const sobrepoe = (a: Caixa, b: Caixa) =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 
@@ -38,19 +49,34 @@ const TELAS = [
 ] as const;
 
 test.describe('"+" da casca', () => {
-  test('fica no mesmo ponto, com 48 px, em toda tela da casca legada', async ({ page }) => {
-    const [primeira, titulo1] = TELAS[0];
-    await page.goto(primeira);
-    await expect(page.getByRole('heading', { level: 1, name: titulo1 })).toBeVisible();
-    const referencia = await caixaDe(mais(page), titulo1);
-    expect([Math.round(referencia.width), Math.round(referencia.height)]).toEqual([48, 48]);
-    for (const [rota, titulo] of TELAS.slice(1)) {
+  test('tem 48 px, a mesma altura e fica na beirada direita do conteúdo em toda tela da casca legada', async ({
+    page,
+  }) => {
+    const pontos = new Map<string, Caixa>();
+    for (const [rota, titulo] of TELAS) {
       await page.goto(rota);
       await expect(
         page.getByRole('heading', { level: 1, name: new RegExp(`^${titulo}`) }),
       ).toBeVisible();
-      igual(await caixaDe(mais(page), titulo), referencia);
+      const m = await caixaDe(mais(page), titulo);
+      pontos.set(titulo, m);
+      expect([Math.round(m.width), Math.round(m.height)], titulo).toEqual([48, 48]);
+      expect(
+        Math.abs(m.x + m.width - (await beiradaDoConteudo(page))),
+        `${titulo}: na beirada do conteúdo`,
+      ).toBeLessThanOrEqual(0.5);
     }
+    const ponto = (titulo: string) => {
+      const caixa = pontos.get(titulo);
+      if (!caixa) throw new Error(`sem o ponto: ${titulo}`);
+      return caixa;
+    };
+    // As telas de uma coluna só têm a mesma largura: o mesmo ponto. A Trilha e o Fixar só diferem delas para o
+    // lado (no monitor, com as duas colunas), nunca na altura.
+    igual(ponto('Conta e ajustes'), ponto('Biblioteca'));
+    igual(ponto('Orientações'), ponto('Biblioteca'));
+    for (const larga of ['Trilha', 'Fixar'])
+      expect(Math.abs(ponto(larga).y - ponto('Biblioteca').y), larga).toBeLessThanOrEqual(0.5);
   });
 
   test('cai na reserva do cabeçalho: à direita da Ajuda, no recuo da página e sem cobrir nada', async ({
