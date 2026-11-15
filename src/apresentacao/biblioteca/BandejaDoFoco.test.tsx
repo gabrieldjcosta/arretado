@@ -11,6 +11,8 @@ function montar(extra: Partial<Parameters<typeof BandejaDoFoco>[0]> = {}) {
     buscar: vi.fn(),
     filtrar: vi.fn(),
     acoes: vi.fn(),
+    sumario: vi.fn(),
+    ajustes: vi.fn(),
     estrelar: vi.fn(),
     lidoAteAqui: vi.fn(),
     sair: vi.fn(),
@@ -107,6 +109,8 @@ describe('BandejaDoFoco', () => {
       ['Ações', f.acoes],
       ['Estrelar', f.estrelar],
       ['Lido até aqui', f.lidoAteAqui],
+      ['Sumário', f.sumario],
+      ['Ajustes de leitura', f.ajustes],
       ['Sair do foco', f.sair],
     ] as const) {
       await abrir();
@@ -134,6 +138,13 @@ describe('BandejaDoFoco', () => {
     expect(screen.queryByRole('button', { name: 'Próximo artigo' })).toBeNull();
     await f.usuario.click(screen.getByRole('button', { name: 'Um artigo por vez' }));
     expect(f.trocarLente).toHaveBeenCalledWith('cartao');
+  });
+
+  it('sem blocos na norma, a bandeja não oferece o sumário', async () => {
+    const f = montar({ sumario: undefined });
+    await f.usuario.click(mais());
+    expect(screen.getByRole('button', { name: 'Ajustes de leitura' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sumário' })).toBeNull();
   });
 
   it('sem artigos, o corrido não troca para o cartão', async () => {

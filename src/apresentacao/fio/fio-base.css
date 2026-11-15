@@ -176,6 +176,27 @@
   justify-content: center;
 }
 
+/* O nome é a marca, não texto de leitura: abaixo de 900 px ele cresce com a letra da pessoa só até onde a linha dele
+   deixa (a tela menos os recuos do cabeçalho; o 7 é a largura do nome com o cacto, em letras dele, com folga). Com a
+   letra a 300% num celular o nome passava 46 px da tela e a página inteira rolava de lado, com o Leitor junto. O recuo
+   e o cacto passam a seguir a letra do nome, para encolherem com ele; na letra padrão dão os mesmos pixels de antes.
+   De 900 px para cima cabe sempre, e --mais-direita leva um 100% que aqui não seria a largura. */
+@media (max-width: 899px) {
+  .shell-fio .fio-topo .fio-marca {
+    padding: 0 0.4em;
+    font-size: min(
+      1.25rem,
+      (100vw - var(--gutter) - var(--mais-direita) - var(--mais-lado) - 0.25rem) / 7
+    );
+  }
+
+  .shell-fio .fio-topo .fio-marca .fio-cacto {
+    width: 1.1em;
+    height: 1.1em;
+    margin: 0 0 0.36em 0.15em;
+  }
+}
+
 .fio-menu {
   display: inline-grid;
   place-items: center;
@@ -680,30 +701,6 @@
   --f-aurora:
     radial-gradient(120% 48% at 50% 108%, rgb(255 170 80 / 30%) 0%, transparent 66%),
     radial-gradient(120% 50% at 50% -8%, #d6e4fa 0%, transparent 70%);
-}
-
-/* Leitura funda (Leitor): rolando a lei para baixo a pílula se recolhe; subindo, volta. Só opacidade e
-   um pequeno deslocamento (nada de layout). Com foco do teclado dentro dela, fica. No Calmo só esmaece. */
-.shell-fio .fio-nav {
-  transition:
-    opacity 0.28s var(--f-sair),
-    transform 0.34s var(--f-sair),
-    visibility 0s;
-}
-
-:root[data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(-50%) translateY(14px);
-  transition:
-    opacity 0.28s var(--f-sair),
-    transform 0.34s var(--f-sair),
-    visibility 0s 0.34s;
-}
-
-:root[data-perfil='calmo'] .shell-fio .fio-nav,
-:root[data-perfil='calmo'][data-leitura-funda] .shell-fio .fio-nav:not(:focus-within) {
-  transform: translateX(-50%);
 }
 
 /* Grão e estrelas: uma camada fixa e parada, atrás do conteúdo e à frente do céu. */

@@ -1,6 +1,7 @@
 /* A estrutura da norma ao lado do texto (Ponto de luz, P4). O Leitor só a desenha de 700 px para
-   cima (tablet e desktop); no celular a estrutura continua no filtro por bloco. Os valores vêm dos
-   tokens de estilos.css: o ponto de luz, a folha de "onde estou" e a tinta do texto. */
+   cima (tablet e desktop) e fora do modo foco; no celular e no modo foco ela abre numa folha, o
+   sumário da norma (no fim deste arquivo). Os valores vêm dos tokens de estilos.css: o ponto de luz,
+   a folha de "onde estou" e a tinta do texto. */
 
 /* A lista e o painel lado a lado. O corpo do Leitor não é posicionado: o virtualizador mede o
    deslocamento da lista contra a página, e um ancestral posicionado o mudaria. */
@@ -40,8 +41,10 @@
   font-size: 0.8125rem;
 }
 
+/* A coluna única não cresce com a palavra mais larga da lista: quem não cabe quebra (letra do aparelho grande). */
 .estrutura-da-norma ol {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2px;
   margin: 0;
   padding: 0;
@@ -71,7 +74,7 @@
 /* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai na
    folha com o contorno do controle, como a aba de página atual: o estado dela não é só a cor (negrito
    e aria-current). */
-.estrutura-da-norma .estrutura-item {
+:is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item {
   width: 100%;
   justify-content: flex-start;
   gap: 0.625rem;
@@ -85,37 +88,39 @@
   text-align: left;
 }
 
-.estrutura-da-norma .estrutura-item[data-aqui] {
+:is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item[data-aqui] {
   background: var(--superficie);
   box-shadow: inset 0 0 0 var(--espessura-contorno) var(--borda-campo);
 }
 
 /* Cores forçadas tiram o fundo e a sombra: o contorno do sistema leva a seção de agora. */
 @media (forced-colors: active) {
-  .estrutura-da-norma .estrutura-item[data-aqui] {
+  :is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item[data-aqui] {
     outline: 2px solid Highlight;
     outline-offset: -2px;
   }
 }
 
-.estrutura-da-norma .estrutura-item:focus-visible,
+:is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item:focus-visible,
 .estrutura-da-norma .estrutura-acima button:focus-visible {
   outline-offset: -2px;
 }
 
-.estrutura-da-norma .ponto-de-luz {
+:is(.estrutura-da-norma, .sumario-da-norma) .ponto-de-luz {
   width: 20px;
   height: 20px;
 }
 
 .estrutura-nome {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   line-height: 1.3;
 }
 
 .estrutura-rotulo {
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .estrutura-titulo {
@@ -134,4 +139,61 @@
   margin: 2px 0 6px 1.25rem;
   padding-inline-start: 0.375rem;
   border-inline-start: 1px solid var(--borda);
+}
+
+/* O sumário da norma numa folha de baixo (celular e modo foco, onde o painel não está na tela): a lista
+   inteira dos blocos, na ordem da lei. A folha é mais alta que a dos ajustes e só a lista rola; o título e
+   o "Fechar" ficam no lugar, e uma linha os separa da lista, que abre já rolada até o bloco de agora. */
+dialog.dialogo-sumario[open] {
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, calc(100vw - 2 * var(--margem-da-folha)));
+  max-height: min(72dvh, 36rem);
+  overflow: hidden;
+}
+
+.sumario-da-norma {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 2px;
+  min-height: 0;
+  margin: 0.25rem 0 0;
+  padding: 0.25rem 0 0;
+  border-top: 1px solid var(--borda);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  list-style: none;
+  font-family: var(--fonte-interface);
+}
+
+/* Alvo de toque de 44 px e letra de 15 px: aqui o dedo escolhe, não o cursor. O de agora vai no chão, com o
+   contorno do controle (a folha já é da cor que o painel usa para ele). */
+.sumario-da-norma .estrutura-item {
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.sumario-da-norma .estrutura-item[data-aqui] {
+  background: var(--fundo);
+}
+
+/* Um degrau por nível: o capítulo dentro do título, a seção dentro do capítulo. Em px com teto, para o recuo
+   não tomar a largura do nome com a letra do aparelho grande. */
+.sumario-da-norma .estrutura-item[data-nivel='1'] {
+  padding-inline-start: calc(0.625rem + min(1rem, 16px));
+}
+
+.sumario-da-norma .estrutura-item[data-nivel='2'] {
+  padding-inline-start: calc(0.625rem + min(2rem, 32px));
+}
+
+.sumario-da-norma .estrutura-item[data-nivel='3'] {
+  padding-inline-start: calc(0.625rem + min(3rem, 48px));
+}
+
+.sumario-da-norma .estrutura-item[data-nivel='4'] {
+  padding-inline-start: calc(0.625rem + min(4rem, 64px));
 }

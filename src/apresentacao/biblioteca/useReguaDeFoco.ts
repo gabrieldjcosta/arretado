@@ -2,7 +2,7 @@
 // navegador (`CSS.highlights`): nenhum nó novo na lista, então os grifos, as notas e as remissões
 // não se mexem, e os offsets seguem sendo os do texto gravado. O realce só muda cor e fundo; não
 // há transição nem movimento, então vale igual no Calmo e com "reduzir movimento". Onde o navegador
-// não tem a API, a régua não aparece (e a Conta avisa).
+// não tem a API, a régua não aparece nem é oferecida (nos ajustes de leitura do Leitor e na Conta).
 import { useEffect, type RefObject } from 'react';
 import { frasesDoTexto, indiceDaFrase, type Frase } from './regua-de-foco';
 import { CLASSE_DO_TEXTO, deslocamento, textosDe } from './selecao';

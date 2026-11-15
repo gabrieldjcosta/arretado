@@ -778,14 +778,6 @@ button,
   font-weight: 700;
 }
 
-/* Ligado (alternância): cheio na luz do mundo, com o texto invertido, como a caixa marcada. */
-.alternar-destaques[aria-pressed='true'] {
-  background: var(--selecionado-fundo);
-  color: var(--selecionado-texto);
-  box-shadow: inset 0 0 0 2px var(--selecionado-anel);
-  font-weight: 700;
-}
-
 .conteudo {
   flex: 1;
   width: 100%;
@@ -1922,16 +1914,99 @@ a.item-norma strong {
 }
 
 /* No celular o título longo (o nome oficial das normas do acervo: a metade passa de 55 caracteres) desce
-   para uma linha inteira sob o "Biblioteca", em 24 px e equilibrado, em vez de virar quatro linhas ou mais
-   numa coluna estreita ao lado dele (a 320 px a palavra chegava a quebrar no meio). shortcut: acima de uns
+   para uma linha inteira sob o "Voltar" e o "Aa", em 24 px e equilibrado, em vez de virar quatro linhas ou mais
+   numa coluna estreita entre os dois (a 320 px a palavra chegava a quebrar no meio). shortcut: acima de uns
    120 caracteres ainda passa de cinco linhas; reduzir a letra de novo se isso incomodar. */
 @media (max-width: 699px) {
   .barra-leitor h1.titulo-longo {
+    order: 1;
     flex-basis: 100%;
     margin-bottom: 0.25rem;
     font-size: 1.5rem;
     text-wrap: balance;
   }
+
+  .barra-leitor:has(h1.titulo-longo) .abrir-ajustes {
+    margin-left: auto;
+  }
+}
+
+/* O "Aa" abre a folha dos ajustes de leitura. Vai na letra da lei, que é o que ele ajusta. */
+.barra-leitor .abrir-ajustes {
+  padding: 0 0.75rem;
+  font-family: var(--fonte-leitura);
+  font-size: 1.0625rem;
+  letter-spacing: 0;
+}
+
+/* A folha de baixo (os ajustes de leitura e o sumário da norma): fica embaixo, com a lei à vista em cima, e o
+   véu é mais leve que o dos outros diálogos. Nos ajustes cada mudança vale na hora, e é no texto de trás que a
+   pessoa confere o resultado. No computador ela vai para o canto de baixo, do lado das ferramentas, e deixa a
+   coluna do texto livre. */
+dialog.folha-de-baixo {
+  /* A margem e o recuo não crescem com a letra do aparelho: a 300% eles tomavam a largura dos controles (e a
+     largura máxima do navegador para o <dialog>, que é em `em`, tirava mais 100 px). */
+  --margem-da-folha: min(1rem, 16px);
+  width: min(24rem, calc(100vw - 2 * var(--margem-da-folha)));
+  max-width: none;
+  margin: auto auto max(var(--margem-da-folha), env(safe-area-inset-bottom, 0px));
+  padding: min(0.75rem, 12px) min(1.25rem, 20px) min(1rem, 16px);
+  overflow-y: auto;
+}
+
+dialog.folha-de-baixo::backdrop {
+  background: rgb(0 0 0 / 14%);
+}
+
+@media (min-width: 900px) {
+  dialog.folha-de-baixo {
+    --margem-da-folha: min(1.5rem, 24px);
+    margin-right: max(var(--margem-da-folha), env(safe-area-inset-right, 0px));
+  }
+}
+
+/* O título e o "Fechar" na mesma linha: a folha fica uma linha mais baixa, e a lei ganha essa linha. */
+.cabeca-da-folha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.cabeca-da-folha h2 {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+/* O texto do "Fechar" alinha com a borda de dentro da folha: o recuo do botão sai para a margem. */
+.cabeca-da-folha .botao-texto {
+  margin-left: auto;
+  margin-right: calc(-1 * min(0.75rem, 12px));
+}
+
+dialog.dialogo-ajustes .dica {
+  margin: 0.25rem 0 0;
+}
+
+/* O nome do ajuste de um lado, o controle do outro; em tela estreita ou com a letra grande o controle desce. */
+.ajuste-de-leitura {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin: 0.25rem 0;
+  font-weight: 600;
+}
+
+/* O seletor ocupa a linha de baixo inteira: o nome da opção mais longa não cabe ao lado do rótulo no celular. */
+.ajuste-de-leitura select {
+  flex: 1 1 14rem;
+  width: auto;
+  min-width: 0;
 }
 
 /* O seletor de fonte é um controle só (P4): A−, o tamanho e A+ como segmentos, no contorno, no fundo e
@@ -2101,6 +2176,14 @@ a.item-norma strong {
   max-width: calc(100vw - 2rem);
 }
 
+/* A altura cabe entre o cabeçalho preso (--barra-fixa, medida pelo Leitor) e o grupo de onde o painel abre: o
+   `100%` é a altura do grupo, que quebra em linhas com a letra grande. O que não cabe rola por dentro, em vez
+   de o primeiro item sumir sob o cabeçalho. O seletor composto vence o teto da bandeja do foco, que não tem
+   cabeçalho acima e é declarado adiante. */
+.bandeja-itens.mais-do-leitor-itens {
+  max-height: calc(100dvh - var(--barra-fixa, 4rem) - 100% - var(--abas-altura, 0px) - 1rem - 16px);
+}
+
 .mais-do-leitor-itens button {
   flex-direction: column;
   align-items: flex-start;
@@ -2170,6 +2253,8 @@ a.item-norma strong {
     width: 100%;
     min-width: 0;
     max-width: none;
+    /* Para baixo, o que sobra é da base do dock em pé (o `100%`) ao fim da tela. */
+    max-height: calc(100dvh - var(--barra-fixa, 4rem) - 0.75rem - 100% - 8px - 1rem);
   }
 
   /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
@@ -2209,8 +2294,10 @@ a.item-norma strong {
     scroll-padding-bottom: calc(var(--barra-do-leitor) + 1rem);
   }
 
-  :root[data-leitor]:not([data-modo-foco]) .areas {
-    display: none;
+  /* A casca põe a sua folga de baixo em --abas-altura (na norma, sem a pílula dos lugares, só a área segura):
+     dentro dela vale a barra do Leitor. */
+  :root[data-leitor]:not([data-modo-foco]) .shell {
+    --abas-altura: var(--barra-do-leitor);
   }
 
   .leitor:not(.em-foco) {
@@ -2276,6 +2363,11 @@ a.item-norma strong {
     min-width: min(16rem, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
   }
+
+  /* A barra encosta no fim da tela: o painel tem dela até o cabeçalho. */
+  .bandeja-itens.mais-do-leitor-itens {
+    max-height: calc(100dvh - var(--barra-fixa, 4rem) - 100% - 16px);
+  }
 }
 
 @media (forced-colors: active) {
@@ -2289,10 +2381,8 @@ a.item-norma strong {
    ao sair da norma); o leitor tira a barra dele. Sem a navegação do rodapé, o celular não precisa
    da folga dela, e o grupo fixo desce ao canto. A `.faixa-posse` fica de propósito: é o único aviso de
    escrita travada (outro Aparelho editando), e agora cabe em uma linha. */
-:root[data-modo-foco] .topo,
-:root[data-modo-foco] .areas,
-:root[data-modo-foco] .faixa-offline,
-:root[data-modo-foco] .rodape {
+:root[data-modo-foco] .fio-topo,
+:root[data-modo-foco] .faixa-offline {
   display: none;
 }
 
@@ -3854,7 +3944,10 @@ dialog.dialogo-previa .linha-acoes button {
   }
 }
 
+/* Os itens não encolhem quando a pilha bate no teto: é ela que rola (encolhido, o texto de um item passava por
+   cima do seguinte com a letra grande). */
 .bandeja-itens button {
+  flex: none;
   justify-content: flex-start;
   text-align: left;
   white-space: nowrap;
@@ -4364,12 +4457,6 @@ html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
 .leitor[data-regua-foco='palavras'] .texto-vigente .grifo {
   color: var(--texto);
   font-weight: 600;
-}
-.regua-de-foco {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.875rem;
 }
 @media (forced-colors: active) {
   ::highlight(regua-apagada) {
