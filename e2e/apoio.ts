@@ -60,6 +60,9 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
         // pega pelo `securitypolicyviolation`, que guarda a origem.
         if (browserName === 'webkit' && m.text().startsWith('Refused to apply a stylesheet'))
           return;
+        // Recarregar ou navegar no meio da carga aborta o CSS que o app puxa à parte; o WebKit o conta como erro.
+        // Um CSS que faltasse de verdade quebraria a tela, e o teste dela falharia.
+        if (browserName === 'webkit' && m.text().startsWith('Error: Unable to preload CSS')) return;
         if (m.type() === 'error') falhas.push(m.text());
       });
       page.on('pageerror', (e) => {

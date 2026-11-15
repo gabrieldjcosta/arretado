@@ -59,7 +59,7 @@ jobs:
   # (continue-on-error) até haver uma linha de base verde; quando houver, tirar a linha e marcar o job como exigido.
   e2e-webkit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 30
     continue-on-error: true
     strategy:
       fail-fast: false
