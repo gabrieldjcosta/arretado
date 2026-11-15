@@ -52,6 +52,10 @@ describe('frasesDoTexto', () => {
       'b) segundo item (sem fechar;',
       'terceiro.',
     ]);
+    // O parêntese sem par mais cedo na linha não tira a proteção do par que vem depois.
+    expect(partes('Abre (e não fecha, e segue (art. 66, III; art. 68) até o fim.')).toEqual([
+      'Abre (e não fecha, e segue (art. 66, III; art. 68) até o fim.',
+    ]);
     // O parêntese aberto numa linha não segura a seguinte.
     expect(partes('Abre (e não fecha;\nsegunda linha; fim.')).toEqual([
       'Abre (e não fecha;',
@@ -74,6 +78,18 @@ describe('frasesDoTexto', () => {
     expect(partes('1. Primeiro item; 2. Segundo item.')).toEqual([
       '1. Primeiro item;',
       '2. Segundo item.',
+    ]);
+    // O rótulo com ponto no meio é um número só.
+    expect(partes('"Art. 1.036. Selecionados os recursos, o relator decidirá."')).toEqual([
+      '"Art. 1.036. Selecionados os recursos, o relator decidirá."',
+    ]);
+    expect(partes('1.1. Para os fins desta resolução, considera-se preso provisório.')).toEqual([
+      '1.1. Para os fins desta resolução, considera-se preso provisório.',
+    ]);
+    // E no fim da frase ele fecha, como o de um grupo só.
+    expect(partes('A multa é de 1.000. O juiz decidirá.')).toEqual([
+      'A multa é de 1.000.',
+      'O juiz decidirá.',
     ]);
   });
   it('"lei" no fim fecha a frase', () => {

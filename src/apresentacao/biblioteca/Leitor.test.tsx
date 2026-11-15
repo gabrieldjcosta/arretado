@@ -1829,7 +1829,9 @@ describe('leitura artigo por artigo (11.8)', () => {
     await cartao(/^Art\. 3º, /);
     await usuario.keyboard('k');
     await cartao(/^Art\. 2º, /);
+    // Conferido depois de cada tecla: um passo errado para a frente e outro para trás dariam no mesmo artigo.
     await usuario.keyboard('{Control>}j{/Control}');
+    expect(await cartao(/^Art\. 2º, /)).toBeInTheDocument();
     await usuario.keyboard('{Control>}k{/Control}');
     expect(await cartao(/^Art\. 2º, /)).toBeInTheDocument();
   });
@@ -2841,6 +2843,24 @@ describe('ajustes de leitura (a folha do "Aa")', () => {
         expect(linhaNoAlto()).toBe(antes);
       });
       expect(window.scrollY).not.toBe(2400);
+
+      // A pessoa rola a lei por trás da folha e toca de novo logo em seguida: vale o que está na tela agora, não
+      // a linha que o toque anterior segurou. A rolagem dela também não é desfeita pela volta que ainda assentava.
+      fireEvent.wheel(window, { deltaY: 600 });
+      rolarPara(window.scrollY + 3000);
+      await act(async () => {
+        await new Promise((resolver) => setTimeout(resolver, 200));
+      });
+      const depois = linhaNoAlto();
+      expect(depois).toBeGreaterThan(antes + 5);
+      await usuario.click(folha.getByRole('button', { name: /aumentar o texto/ }));
+      expect(folha.getByLabelText('Tamanho atual do texto')).toHaveTextContent('24 px');
+      await waitFor(async () => {
+        expect((await obterPreferencias(repo)).tamanhoFonte).toBe(24);
+      });
+      await waitFor(() => {
+        expect(linhaNoAlto()).toBe(depois);
+      });
     } finally {
       Reflect.deleteProperty(document.documentElement, 'scrollHeight');
     }

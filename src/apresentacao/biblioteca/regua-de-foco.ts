@@ -54,7 +54,8 @@ function palavraAntes(texto: string, ponto: number): string {
 /**
  * O que está entre parênteses que abrem e fecham na mesma linha: lá dentro nada fecha a frase
  * ("(salvo se houver recurso; nesse caso, 60 dias)", "(art. 66, III; art. 68)"). O parêntese sem par
- * não segura nada: a alínea "a)" e o que abre e não fecha ficam como texto comum.
+ * não segura nada: a alínea "a)" e o que abre e não fecha ficam como texto comum, e não tiram a proteção
+ * do par que vem depois na mesma linha.
  */
 function entreParenteses(texto: string): boolean[] {
   const dentro = new Array<boolean>(texto.length).fill(false);
@@ -65,8 +66,8 @@ function entreParenteses(texto: string): boolean[] {
     else if (c === '(') abertos.push(i);
     else if (c === ')') {
       const abre = abertos.pop();
-      // Só o de fora marca: cada posição é marcada uma vez, e a conta segue linear.
-      if (abre !== undefined && abertos.length === 0) dentro.fill(true, abre + 1, i);
+      // Todo par marca (o de dentro e o de fora): o custo cresce com a profundidade, pequena em texto de lei.
+      if (abre !== undefined) dentro.fill(true, abre + 1, i);
     }
   }
   return dentro;
@@ -90,8 +91,21 @@ export function frasesDoTexto(texto: string): Frase[] {
     while (i < posicao && (/\s/.test(texto[i] ?? '') || ABRE.test(texto[i] ?? ''))) i++;
     return i === posicao;
   };
-  /** O número que começa em `comeco` é rótulo (item numerado ou artigo citado), não o fim da frase. */
-  const numeroDeRotulo = (comeco: number) => {
+  /**
+   * O número cujo último grupo de dígitos começa em `comecoDoUltimoGrupo` é rótulo (item numerado ou artigo
+   * citado), não o fim da frase. O que tem ponto no meio ("Art. 1.036.", "1.1.") é um número só: conta desde o
+   * primeiro grupo.
+   */
+  const numeroDeRotulo = (comecoDoUltimoGrupo: number) => {
+    let comeco = comecoDoUltimoGrupo;
+    while (
+      comeco - 2 >= inicio &&
+      texto[comeco - 1] === '.' &&
+      /\p{N}/u.test(texto[comeco - 2] ?? '')
+    ) {
+      comeco -= 2;
+      while (comeco > inicio && /\p{N}/u.test(texto[comeco - 1] ?? '')) comeco--;
+    }
     if (comecoDaFrase(comeco)) return true;
     let antes = comeco;
     while (antes > inicio && /[^\S\n]/.test(texto[antes - 1] ?? '')) antes--;

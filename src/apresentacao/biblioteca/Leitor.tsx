@@ -1090,6 +1090,31 @@ function LeitorAberto({
     const linha = linhaDoNo(linhas, seguro.indice);
     if (linha !== undefined && linha > 0) irParaLinha(linha);
   }, [tamanho, tamanhoGravado, linhas, irParaLinha]);
+  // Rolar entre dois toques solta o alto que o toque anterior segurou: o toque seguinte segura o que está na tela.
+  useEffect(() => {
+    const soltar = (e: Event) => {
+      if (!noAltoNaTroca.current) return;
+      const alvo = e.target instanceof Element ? e.target : null;
+      if (e instanceof KeyboardEvent) {
+        if (!TECLAS_DE_ROLAGEM.has(e.key)) return;
+        // No campo a tecla age nele; no botão o espaço aperta (o A− e o A+ da folha).
+        if (alvo?.closest('input, select, textarea')) return;
+        if (e.key === ' ' && alvo?.closest('button, a')) return;
+      } else if (e.type === 'touchmove' && alvo?.closest('button')) {
+        // O dedo que escorrega no toque de um botão não é rolagem.
+        return;
+      }
+      noAltoNaTroca.current = undefined;
+      cancelAnimationFrame(indo.current);
+    };
+    const encerrar = new AbortController();
+    for (const gesto of ['wheel', 'touchmove', 'keydown']) {
+      window.addEventListener(gesto, soltar, { passive: true, signal: encerrar.signal });
+    }
+    return () => {
+      encerrar.abort();
+    };
+  }, []);
   /** O nó tem linha na lista de agora (o filtro não o escondeu; a rubrica vale a linha do pai). */
   const visivelNoFiltro = (indice: number) => {
     if (!filtro) return true;
