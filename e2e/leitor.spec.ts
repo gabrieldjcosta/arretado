@@ -1880,7 +1880,8 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com o ponto de luz n
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
 
-  // A estrutura: só de 700 px para cima, fora do modo foco; no celular o filtro por bloco faz o papel.
+  // A estrutura: ao lado do texto só de 700 px para cima, fora do modo foco; no celular e no modo foco ela abre
+  // numa folha, o sumário (teste próprio, adiante).
   const estrutura = page.getByRole('navigation', { name: 'Estrutura da norma' });
   if (largo) await expect(estrutura).toBeVisible();
   else await expect(estrutura).toHaveCount(0);
@@ -2285,4 +2286,105 @@ test('ajustes de leitura com a letra do aparelho a 300%: a folha cabe na tela, r
   await expect(foco).toBeInViewport();
   await folhaDosAjustes(page).getByRole('button', { name: 'Fechar' }).click();
   await expect(folhaDosAjustes(page)).toBeHidden();
+});
+
+/** A folha do sumário da norma: a estrutura inteira onde o painel não está ao lado do texto (celular e modo foco). */
+const folhaDoSumario = (page: Page) => page.getByRole('dialog', { name: 'Sumário' });
+
+test('sumário da norma: no celular o "⋯" abre a folha com todos os blocos, o de agora marcado e com o foco, e tocar num bloco fecha a folha e leva a ele; de 700 px para cima o painel já está ao lado e só o modo foco o oferece, na bandeja: LEP compilada', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  const toque = info.project.name !== 'desktop';
+  const largo = (page.viewportSize()?.width ?? 0) >= 700;
+  await importarEPublicar(page, 'lep-compilado', 'LEP');
+  await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'LEP' })).toBeVisible();
+  const folha = folhaDoSumario(page);
+  const menu = page.getByRole('group', { name: 'Mais ferramentas da leitura' });
+
+  // No meio da norma: o art. 41 (os direitos do preso, uma lista longa) no alto da tela. A linha de leitura cai
+  // dentro dele, na Seção II (Dos Direitos) do Capítulo IV do Título II.
+  const art41 = page.locator('[data-endereco="art41"]');
+  await rolarAte(page, art41);
+  await alinharNoAlto(page, art41);
+
+  if (largo) {
+    // O painel da estrutura está ao lado do texto: o "⋯" não repete o sumário.
+    await apertar(maisDoLeitor(page), toque);
+    await expect(menu.getByRole('button')).toHaveText([
+      /^Filtrar/,
+      /^Ações/,
+      /^Ajustes de leitura/,
+    ]);
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    // No modo foco o painel sai da tela, e a bandeja oferece o sumário.
+    await entrarNoFocoCorrido(page, toque);
+  }
+  const reticencias = largo ? maisDoFoco(page) : maisDoLeitor(page);
+  await apertar(await naBandejaDoFoco(page, /^Sumário/), toque);
+  await expect(folha).toBeVisible();
+  if (!largo) await expect(menu).toBeHidden();
+
+  // A lista inteira, na ordem da lei, com o nome de cada bloco e o estado em palavras.
+  const blocos = folha.getByRole('listitem');
+  await expect(blocos.first()).toContainText('TÍTULO I');
+  await expect(blocos.first()).toContainText('Do Objeto e da Aplicação da Lei de Execução Penal');
+  await expect(blocos.last()).toContainText('Das Disposições Finais e Transitórias');
+  expect(await blocos.count(), 'títulos, capítulos e seções da lei inteira').toBeGreaterThan(60);
+  // O de agora: marcado em palavras e no atributo, à vista sem rolar a lista e com o foco, para o teclado
+  // e o leitor de tela partirem dele.
+  const agora = folha.locator('[aria-current="location"]');
+  await expect(agora).toHaveCount(1);
+  await expect(agora).toContainText('Seção II');
+  await expect(agora).toContainText('Dos Direitos');
+  await expect(agora).toBeInViewport({ ratio: 1 });
+  await expect(agora).toBeFocused();
+  const medida = await folha.evaluate((el) => {
+    const caixa = el.getBoundingClientRect();
+    const raiz = document.documentElement;
+    const lista = el.querySelector('.sumario-da-norma');
+    const itens = [...el.querySelectorAll('.estrutura-item')];
+    return {
+      naTela:
+        caixa.top >= 0 &&
+        caixa.left >= 0 &&
+        caixa.bottom <= window.innerHeight &&
+        caixa.right <= raiz.clientWidth,
+      sobraDeLado: raiz.scrollWidth - raiz.clientWidth,
+      sobraDaLista: (lista?.scrollWidth ?? 0) - (lista?.clientWidth ?? 0),
+      menorAlvo: Math.min(...itens.map((i) => i.getBoundingClientRect().height)),
+      semNome: itens.filter((i) => !i.querySelector('.estrutura-titulo')).length,
+    };
+  });
+  expect(medida.naTela, 'a folha cabe na tela').toBe(true);
+  expect(medida.sobraDeLado, 'a página não rola de lado').toBeLessThanOrEqual(0);
+  expect(medida.sobraDaLista, 'a lista não rola de lado').toBeLessThanOrEqual(0);
+  expect(medida.menorAlvo, 'cada bloco é um alvo de toque').toBeGreaterThanOrEqual(44);
+  expect(medida.semNome, 'todo bloco da LEP tem nome').toBe(0);
+  await semViolacoes(page);
+
+  // Esc fecha sem sair do lugar (nem do modo foco) e devolve o foco ao "⋯".
+  await page.keyboard.press('Escape');
+  await expect(folha).toBeHidden();
+  await expect(reticencias).toBeFocused();
+  if (largo) await expect(page).toHaveURL(/[?&]foco=texto/);
+  await expect(art41).toBeVisible();
+
+  // Tocar num bloco fecha a folha e põe o cabeçalho dele no alto da tela.
+  await apertar(await naBandejaDoFoco(page, /^Sumário/), toque);
+  await expect(folha).toBeVisible();
+  const cap3 = folha.getByRole('button', { name: /^CAPÍTULO III Do Trabalho/ });
+  await cap3.scrollIntoViewIfNeeded();
+  await apertar(cap3, toque);
+  await expect(folha).toBeHidden();
+  const cabecalho = page.locator('[data-endereco="tit2.cap3"]');
+  await expect(cabecalho).toBeVisible();
+  await expect(cabecalho).toContainText('CAPÍTULO III');
+  await rolagemAssentada(page);
+  await expect.poll(async () => Math.abs(await distanciaDoAlto(cabecalho))).toBeLessThan(2);
+  await expect(reticencias).toBeFocused();
+  if (largo) await expect(page).toHaveURL(/[?&]foco=texto/);
+  await semViolacoes(page);
 });

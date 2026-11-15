@@ -70,6 +70,7 @@ import { criarCartaoDoTrecho } from './cartao-do-trecho';
 import { BotaoDaEstrela } from './Estrela';
 import { MaisDoLeitor } from './MaisDoLeitor';
 import { EstruturaDaNorma } from './EstruturaDaNorma';
+import { SumarioDaNorma } from './SumarioDaNorma';
 import { dispositivosComErro } from './errosVinculados';
 import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
@@ -466,6 +467,8 @@ function LeitorAberto({
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;
   // A folha dos ajustes de leitura (tamanho, destaques, foco na frase): abre pelo "Aa" da barra, pelo "⋯" e pela bandeja.
   const [ajustesAbertos, setAjustesAbertos] = useState(false);
+  // O sumário da norma numa folha: onde o painel da estrutura não está ao lado do texto (celular e modo foco).
+  const [sumarioAberto, setSumarioAberto] = useState(false);
   const [linhaAtivaId, setLinhaAtivaId] = useState<string | null>(null);
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   // O que o leitor de tela ouve (role=status): o "lido até" marcado e a troca do modo foco.
@@ -1115,6 +1118,13 @@ function LeitorAberto({
   const estrutura = useMemo(() => indiceDaEstrutura(nos), [nos]);
   const larguraDeTablet = useLarguraMinima(LARGURA_DA_ESTRUTURA);
   const comEstrutura = larguraDeTablet && !modoFoco && temEstrutura(estrutura);
+  // Sem o painel na tela (celular, modo foco), o sumário abre numa folha, pelo "⋯" e pela bandeja.
+  const abrirSumario =
+    temEstrutura(estrutura) && !comEstrutura
+      ? () => {
+          setSumarioAberto(true);
+        }
+      : undefined;
   // O nó da leitura, para a estrutura: o primeiro cabeçalho de bloco entre o alto da tela e a linha de
   // leitura (um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho,
   // o nó do alto. O olho chega ao cabeçalho antes de ele chegar ao alto, e tocar numa seção da
@@ -2311,6 +2321,7 @@ function LeitorAberto({
                   }}
                   filtro={filtro?.descricao}
                   acoes={abrirAcoes}
+                  sumario={abrirSumario}
                   ajustes={() => {
                     setAjustesAbertos(true);
                   }}
@@ -2325,6 +2336,7 @@ function LeitorAberto({
                     buscaAberta ||
                     filtroAberto ||
                     ajustesAbertos ||
+                    sumarioAberto ||
                     alvoDasAcoes !== undefined ||
                     notaAberta !== undefined ||
                     previa !== undefined
@@ -2345,6 +2357,7 @@ function LeitorAberto({
                 abrirAjustes={() => {
                   setAjustesAbertos(true);
                 }}
+                abrirSumario={abrirSumario}
                 filtro={filtro?.descricao}
                 alternarFoco={alternarFoco}
                 marcarAqui={marcarAqui}
@@ -2372,6 +2385,21 @@ function LeitorAberto({
         alternarDestaques={alternarDestaques}
         regua={reguaDeFoco}
         mudarRegua={mudarRegua}
+      />
+      <SumarioDaNorma
+        aberto={sumarioAberto}
+        aoFechar={() => {
+          setSumarioAberto(false);
+        }}
+        repo={repo}
+        aberta={aberta}
+        estrutura={estrutura}
+        lidoAte={indiceLidoAte}
+        noDaLeitura={noDaLeitura}
+        ir={(indice) => {
+          setSumarioAberto(false);
+          irAoBloco(indice);
+        }}
       />
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
@@ -2503,6 +2531,7 @@ function AcoesDaLeitura({
   abrirFiltro,
   abrirAcoes,
   abrirAjustes,
+  abrirSumario,
   filtro,
   alternarFoco,
   marcarAqui,
@@ -2515,6 +2544,7 @@ function AcoesDaLeitura({
   abrirFiltro: () => void;
   abrirAcoes: () => void;
   abrirAjustes: () => void;
+  abrirSumario: (() => void) | undefined;
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   alternarFoco: () => void;
@@ -2561,6 +2591,7 @@ function AcoesDaLeitura({
           abrirFiltro={abrirFiltro}
           abrirAcoes={abrirAcoes}
           abrirAjustes={abrirAjustes}
+          abrirSumario={abrirSumario}
         />
       </div>
       <button type="button" className="principal" onClick={marcarAqui}>

@@ -3,9 +3,11 @@ import { abrirNorma, type NormaAberta } from '../../dominios/legislacao/leitor';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
+  blocosEmOrdem,
   ehBloco,
   estadoDoBloco,
   indiceDaEstrutura,
+  noDoNome,
   RAIZ,
   temEstrutura,
   vistaDaEstrutura,
@@ -115,6 +117,26 @@ describe('estrutura da norma (P4 do Ponto de luz)', () => {
     expect(e.filhos.get(ix('TÍTULO I'))).toEqual([ix('CAPÍTULO I'), ix('CAPÍTULO II')]);
     expect(e.filhos.get(ix('CAPÍTULO I'))).toEqual([ix('Seção I'), ix('Seção II')]);
     expect(e.filhos.get(ix('Seção I'))).toBeUndefined();
+  });
+
+  it('o sumário inteiro: todos os blocos na ordem de leitura, cada um com a profundidade e o nó do nome', async () => {
+    const aberta = await abrir(LEI);
+    const e = indiceDaEstrutura(aberta.nos);
+    const rotulo = (indice: number) => aberta.nos[indice]?.dispositivo.rotulo;
+    expect(blocosEmOrdem(e).map(({ bloco, nivel }) => [rotulo(bloco), nivel])).toEqual([
+      ['TÍTULO I', 0],
+      ['CAPÍTULO I', 1],
+      ['Seção I', 2],
+      ['Seção II', 2],
+      ['CAPÍTULO II', 1],
+      ['TÍTULO II', 0],
+    ]);
+    // O nome é a rubrica logo depois do bloco; o artigo não tem (o nó dele mesmo responde).
+    const ix = (r: string) => aberta.nos.findIndex((n) => n.dispositivo.rotulo === r);
+    expect(noDoNome(aberta.nos, ix('Seção II'))).toBe(ix('Seção II') + 1);
+    expect(aberta.nos[ix('Seção II') + 1]?.dispositivo.tipo).toBe('nome');
+    expect(noDoNome(aberta.nos, ix('Art. 3º'))).toBe(ix('Art. 3º'));
+    expect(blocosEmOrdem(indiceDaEstrutura((await abrir(SEM_ESTRUTURA)).nos))).toEqual([]);
   });
 
   it('a vista lista o bloco de agora e os irmãos dele, com os blocos de dentro dele e o caminho acima', async () => {

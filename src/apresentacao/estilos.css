@@ -2134,10 +2134,11 @@ a.item-norma strong {
   letter-spacing: 0;
 }
 
-/* Os ajustes de leitura: a folha fica embaixo, com a lei à vista em cima, e o véu é mais leve que o dos outros
-   diálogos, porque cada ajuste vale na hora e é no texto de trás que a pessoa confere o resultado. No computador
-   ela vai para o canto de baixo, do lado das ferramentas, e deixa a coluna do texto livre. */
-dialog.dialogo-ajustes {
+/* A folha de baixo (os ajustes de leitura e o sumário da norma): fica embaixo, com a lei à vista em cima, e o
+   véu é mais leve que o dos outros diálogos. Nos ajustes cada mudança vale na hora, e é no texto de trás que a
+   pessoa confere o resultado. No computador ela vai para o canto de baixo, do lado das ferramentas, e deixa a
+   coluna do texto livre. */
+dialog.folha-de-baixo {
   /* A margem e o recuo não crescem com a letra do aparelho: a 300% eles tomavam a largura dos controles (e a
      largura máxima do navegador para o <dialog>, que é em `em`, tirava mais 100 px). */
   --margem-da-folha: min(1rem, 16px);
@@ -2148,19 +2149,19 @@ dialog.dialogo-ajustes {
   overflow-y: auto;
 }
 
-dialog.dialogo-ajustes::backdrop {
+dialog.folha-de-baixo::backdrop {
   background: rgb(0 0 0 / 14%);
 }
 
 @media (min-width: 900px) {
-  dialog.dialogo-ajustes {
+  dialog.folha-de-baixo {
     --margem-da-folha: min(1.5rem, 24px);
     margin-right: max(var(--margem-da-folha), env(safe-area-inset-right, 0px));
   }
 }
 
 /* O título e o "Fechar" na mesma linha: a folha fica uma linha mais baixa, e a lei ganha essa linha. */
-.cabeca-dos-ajustes {
+.cabeca-da-folha {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2169,14 +2170,14 @@ dialog.dialogo-ajustes::backdrop {
   margin-bottom: 0.25rem;
 }
 
-.cabeca-dos-ajustes h2 {
+.cabeca-da-folha h2 {
   min-width: 0;
   margin: 0;
   font-size: 1.125rem;
 }
 
 /* O texto do "Fechar" alinha com a borda de dentro da folha: o recuo do botão sai para a margem. */
-.cabeca-dos-ajustes .botao-texto {
+.cabeca-da-folha .botao-texto {
   margin-left: auto;
   margin-right: calc(-1 * min(0.75rem, 12px));
 }
@@ -2370,6 +2371,14 @@ dialog.dialogo-ajustes .dica {
   max-width: calc(100vw - 2rem);
 }
 
+/* A altura cabe entre o cabeçalho preso (--barra-fixa, medida pelo Leitor) e o grupo de onde o painel abre: o
+   `100%` é a altura do grupo, que quebra em linhas com a letra grande. O que não cabe rola por dentro, em vez
+   de o primeiro item sumir sob o cabeçalho. O seletor composto vence o teto da bandeja do foco, que não tem
+   cabeçalho acima e é declarado adiante. */
+.bandeja-itens.mais-do-leitor-itens {
+  max-height: calc(100dvh - var(--barra-fixa, 4rem) - 100% - var(--abas-altura, 0px) - 1rem - 16px);
+}
+
 .mais-do-leitor-itens button {
   flex-direction: column;
   align-items: flex-start;
@@ -2439,6 +2448,8 @@ dialog.dialogo-ajustes .dica {
     width: 100%;
     min-width: 0;
     max-width: none;
+    /* Para baixo, o que sobra é da base do dock em pé (o `100%`) ao fim da tela. */
+    max-height: calc(100dvh - var(--barra-fixa, 4rem) - 0.75rem - 100% - 8px - 1rem);
   }
 
   /* A frase de origem da Estrela é longa e não quebra por si: no trilho ela cabe nos 13 rem. */
@@ -2546,6 +2557,11 @@ dialog.dialogo-ajustes .dica {
     left: max(8px, env(safe-area-inset-left, 0px));
     min-width: min(16rem, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
+  }
+
+  /* A barra encosta no fim da tela: o painel tem dela até o cabeçalho. */
+  .bandeja-itens.mais-do-leitor-itens {
+    max-height: calc(100dvh - var(--barra-fixa, 4rem) - 100% - 16px);
   }
 }
 
@@ -4123,7 +4139,10 @@ dialog.dialogo-previa .linha-acoes button {
   }
 }
 
+/* Os itens não encolhem quando a pilha bate no teto: é ela que rola (encolhido, o texto de um item passava por
+   cima do seguinte com a letra grande). */
 .bandeja-itens button {
+  flex: none;
   justify-content: flex-start;
   text-align: left;
   white-space: nowrap;

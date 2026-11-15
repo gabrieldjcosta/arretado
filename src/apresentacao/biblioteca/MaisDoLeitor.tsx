@@ -9,18 +9,22 @@ import { useEffect, useRef, useState } from 'react';
  * uma linha de apoio (o `title` do dock não aparece no celular): ela faz parte do nome do botão, que é o
  * que o axe pede do texto visível. Com um filtro ligado o botão ganha o anel do filtro e diz qual é. Os ajustes de
  * leitura (o "Aa" da barra do alto) também se abrem daqui: a barra fica no começo da norma, e o "⋯" a acompanha.
+ * O sumário entra na lista onde o painel da estrutura não está ao lado do texto (o celular).
  */
 export function MaisDoLeitor({
   filtro,
   abrirFiltro,
   abrirAcoes,
   abrirAjustes,
+  abrirSumario,
 }: {
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   abrirFiltro: () => void;
   abrirAcoes: () => void;
   abrirAjustes: () => void;
+  /** Abre o sumário da norma; ausente quando a norma não tem blocos ou o painel já está ao lado do texto. */
+  abrirSumario: (() => void) | undefined;
 }) {
   const [aberto, setAberto] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
@@ -62,7 +66,7 @@ export function MaisDoLeitor({
         aria-expanded={aberto}
         aria-controls="mais-do-leitor-itens"
         aria-label={filtro === undefined ? 'Mais' : `Mais. Filtrado: ${filtro}`}
-        title="Mais da leitura: filtrar, ações do dispositivo no alto da tela e ajustes de leitura"
+        title="Mais da leitura: sumário, filtrar, ações do dispositivo no alto da tela e ajustes de leitura"
         onClick={() => {
           setAberto((a) => !a);
         }}
@@ -81,6 +85,18 @@ export function MaisDoLeitor({
           aria-label="Mais ferramentas da leitura"
           className="bandeja-itens mais-do-leitor-itens"
         >
+          {abrirSumario && (
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              onClick={() => {
+                abrir(abrirSumario);
+              }}
+            >
+              <span>Sumário</span>
+              <small>Títulos, capítulos e seções da norma</small>
+            </button>
+          )}
           <button
             type="button"
             className={filtro === undefined ? undefined : 'filtro-ligado'}

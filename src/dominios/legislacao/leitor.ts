@@ -117,3 +117,27 @@ export async function lerJanela(
   );
   return nos.map((no, i) => ({ ...no, indice: inicio + i, texto: textos[i] }));
 }
+
+/**
+ * Os textos de nós avulsos, numa leitura só e na ordem pedida: os nomes dos blocos, para o sumário da
+ * norma (um por título, capítulo ou seção, espalhados pela árvore: ler a janela de cada um traria a
+ * norma inteira). Índice fora da árvore fica de fora; no máximo `LIMITE_MAXIMO_PAGINA` por chamada.
+ */
+export async function lerNos(
+  repo: Repositorio,
+  aberta: NormaAberta,
+  indices: readonly number[],
+): Promise<ItemDaJanela[]> {
+  const pedidos = indices
+    .filter((indice) => Number.isInteger(indice) && indice >= 0 && indice < aberta.nos.length)
+    .slice(0, LIMITE_MAXIMO_PAGINA);
+  const nos = pedidos.flatMap((indice) => {
+    const no = aberta.nos[indice];
+    return no ? [{ no, indice }] : [];
+  });
+  const textos = await repo.colecao('textosDispositivo').obterPorChaves(
+    '[versaoId+dispositivoId]',
+    nos.map(({ no }) => [aberta.versao.id, no.dispositivo.id]),
+  );
+  return nos.map(({ no, indice }, i) => ({ ...no, indice, texto: textos[i] }));
+}

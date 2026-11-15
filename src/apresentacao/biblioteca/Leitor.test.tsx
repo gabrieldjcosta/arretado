@@ -2574,7 +2574,105 @@ describe('Ponto de luz no Leitor (P4)', () => {
       expect(await screen.findByRole('button', { name: 'Mais' })).not.toHaveClass('filtro-ligado');
     });
 
-    it('não aparece no celular: lá a estrutura continua no filtro por bloco', async () => {
+    describe('o sumário, na folha (celular e modo foco)', () => {
+      const sumario = () => screen.findByRole('dialog', { name: 'Sumário' });
+
+      it('no celular, o "⋯" abre o sumário inteiro: cada bloco com o nome, o estado e o degrau, e o de agora marcado e com o foco', async () => {
+        larguraDaJanela(390);
+        const { repo } = await repositorioDeTeste();
+        const norma = await publicar(repo, LEI_COM_SECOES);
+        const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+        await waitFor(() => {
+          expect(dispositivo('art3')).toBeInTheDocument();
+        });
+        // A leitura na Seção II, com o "lido até" no art. 1º (o último da Seção I).
+        rolarPara(linhaDoDispositivo('art1') * 60);
+        await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+        rolarPara(linhaDoDispositivo('art2') * 60);
+
+        await usuario.click(await naBandeja(usuario, /^Sumário/));
+        const folha = within(await sumario());
+        // Os nomes chegam numa leitura só, depois de a folha abrir.
+        await folha.findByRole('button', { name: /^TÍTULO I DO OBJETO/ });
+        const itens = folha
+          .getAllByRole('button')
+          .filter((botao) => botao.classList.contains('estrutura-item'));
+        expect(itens.map((botao) => [botao.textContent, botao.dataset.nivel])).toEqual([
+          ['TÍTULO I DO OBJETO, em leitura', '0'],
+          ['CAPÍTULO I DA EXECUÇÃO, em leitura', '1'],
+          ['Seção I Disposições Gerais, lida', '2'],
+          ['Seção II Dos Regimes, ainda não lida', '2'],
+          ['CAPÍTULO II DO CONDENADO, ainda não lida', '1'],
+        ]);
+        const deAgora = folha.getByRole('button', { name: /^Seção II Dos Regimes/ });
+        expect(deAgora).toHaveAttribute('aria-current', 'location');
+        expect(deAgora).toHaveFocus();
+        expect(folha.getAllByRole('button', { current: 'location' })).toHaveLength(1);
+
+        // "Fechar" fecha (a volta do foco ao "⋯" e o Esc são do E2E: o jsdom não tem <dialog> modal).
+        await usuario.click(folha.getByRole('button', { name: 'Fechar' }));
+        expect(screen.queryByRole('dialog', { name: 'Sumário' })).toBeNull();
+      });
+
+      it('tocar num bloco fecha a folha e leva o texto até ele', async () => {
+        larguraDaJanela(390);
+        const { repo } = await repositorioDeTeste();
+        const norma = await publicar(repo, LEI_DE_BLOCOS);
+        const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+        await waitFor(() => {
+          expect(dispositivo('art5')).toBeInTheDocument();
+        });
+        const rolagem = vi.spyOn(window, 'scrollTo');
+        await usuario.click(await naBandeja(usuario, /^Sumário/));
+        // Antes do primeiro bloco (no preâmbulo) nenhum é o de agora.
+        const folha = within(await sumario());
+        expect(folha.queryByRole('button', { current: 'location' })).toBeNull();
+        await usuario.click(await folha.findByRole('button', { name: /^TÍTULO II DO FIM/ }));
+        expect(screen.queryByRole('dialog', { name: 'Sumário' })).toBeNull();
+        await waitFor(() => {
+          expect(rolagem).toHaveBeenCalledWith(
+            expect.objectContaining({ top: linhaDoDispositivo('tit2') * 60 }),
+          );
+        });
+      });
+
+      it('com o painel ao lado do texto o "⋯" não oferece o sumário; no modo foco, sem o painel, a bandeja oferece', async () => {
+        larguraDaJanela(1024);
+        const { repo } = await repositorioDeTeste();
+        const norma = await publicar(repo, LEI_DE_BLOCOS);
+        const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+        await screen.findByRole('navigation', { name: 'Estrutura da norma' });
+        await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+        expect(screen.getByRole('button', { name: /^Ajustes de leitura/ })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /^Sumário/ })).toBeNull();
+        await usuario.keyboard('{Escape}');
+
+        await usuario.click(screen.getByRole('button', { name: 'Modo foco' }));
+        await waitFor(() => {
+          expect(estruturaNaTela()).toBeNull();
+        });
+        await usuario.click(await naBandeja(usuario, 'Sumário'));
+        const folha = within(await sumario());
+        expect(await folha.findByRole('button', { name: /^TÍTULO I DO OBJETO/ })).toBeVisible();
+        // Fechar a folha não tira do modo foco.
+        await usuario.click(folha.getByRole('button', { name: 'Fechar' }));
+        expect(screen.queryByRole('dialog', { name: 'Sumário' })).toBeNull();
+        expect(document.documentElement.dataset.modoFoco).toBeDefined();
+      });
+
+      it('a norma sem títulos nem capítulos não oferece o sumário', async () => {
+        larguraDaJanela(390);
+        const { repo } = await repositorioDeTeste();
+        const norma = await publicar(repo, LEI_SEM_BLOCOS);
+        const usuario = abrirLeitor(repo, `#/biblioteca/normas/${norma.id}`);
+        await screen.findByText(/Segundo artigo/);
+        await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+        expect(screen.getByRole('button', { name: /^Ajustes de leitura/ })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /^Sumário/ })).toBeNull();
+      });
+    });
+
+    it('o painel não aparece no celular: lá a estrutura abre numa folha, o sumário', async () => {
       larguraDaJanela(390);
       const { repo } = await repositorioDeTeste();
       const norma = await publicar(repo, LEI_DE_BLOCOS);
@@ -2791,7 +2889,7 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
     nomesDosBotoes(screen.getByRole('group', { name: 'Ferramentas da leitura' }));
 
   it.each([390, 768, 1280])(
-    'a barra tem Buscar, Modo foco e o ⋯ em %i px; Filtrar, Ações e os ajustes de leitura moram no ⋯, a dois toques; criar é com o "+"',
+    'a barra tem Buscar, Modo foco e o ⋯ em %i px; Filtrar, Ações e os ajustes de leitura moram no ⋯, a dois toques (no celular, o sumário também); criar é com o "+"',
     async (largura) => {
       janelaDe(largura);
       const { repo } = await repositorioDeTeste();
@@ -2817,7 +2915,8 @@ describe('o "⋯" que lê e o "+" que cria, no Leitor (D-D24)', () => {
         within(menu)
           .getAllByRole('button')
           .map((b) => b.firstElementChild?.textContent),
-      ).toEqual(['Filtrar', 'Ações', 'Ajustes de leitura']);
+        // No celular o sumário abre a lista; de 700 px para cima o painel da estrutura já está ao lado do texto.
+      ).toEqual([...(largura < 700 ? ['Sumário'] : []), 'Filtrar', 'Ações', 'Ajustes de leitura']);
 
       // Filtrar: o diálogo abre e o menu fecha (a volta do foco ao ⋯, ao fechar o diálogo, é do E2E:
       // o jsdom não tem <dialog> modal).

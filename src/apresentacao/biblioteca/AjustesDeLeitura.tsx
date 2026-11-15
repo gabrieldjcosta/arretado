@@ -51,10 +51,10 @@ export function AjustesDeLeitura({
       aberto={aberto}
       aoFechar={aoFechar}
       idDoTitulo={idDoTitulo}
-      classe="dialogo-ajustes"
+      classe="folha-de-baixo dialogo-ajustes"
       tocarForaFecha
     >
-      <div className="cabeca-dos-ajustes">
+      <div className="cabeca-da-folha">
         <h2 id={idDoTitulo}>Ajustes de leitura</h2>
         <button type="button" className="botao-texto" onClick={aoFechar}>
           Fechar
