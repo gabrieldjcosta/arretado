@@ -45,7 +45,7 @@ Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, pa
 - **Cacto verde ao lado do nome** no cabeçalho.
 - **Mascote** (cachorro caramelo com chapéu e lenço) em aparições estratégicas, **só o personagem, sem elementos de fundo**.
 - **Botões com transparências sutis** (vidro), com texto sólido e contraste preservado.
-- Detalhes, tokens e regras de uso: [`sistema-visual.md`](sistema-visual.md); protótipo: [`prototipo/hoje.html`](prototipo/hoje.html).
+- Detalhes, tokens e regras de uso: [`sistema-visual.md`](sistema-visual.md); protótipo: [`prototipo/arquivo/hoje.html`](prototipo/arquivo/hoje.html).
 
 > **A conferir depois:** (1) `CLAUDE.md` e a skill `arretado-design-principles` ainda descrevem a identidade sálvia; atualizar ao implementar. (2) Contraste das combinações reais com axe e `scripts/contraste.mjs`. (3) Colisão com cores de grifo e estrela. (4) SVGs do mascote são redesenho próprio e precisam de revisão de proporções e mãos. (5) A arte do mascote foi gerada por IA a pedido do Gabriel; registrar a origem e confirmar que o uso comercial futuro está coberto antes de cobrar pelo produto.
 
@@ -53,7 +53,7 @@ Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, pa
 
 > **Parcialmente substituída pela D-D4 (mais abaixo)** (paleta, botões, vidro, navegação, seis tons de matéria, raios). O que a D-D4 não toca segue valendo.
 
-**Motivo.** Pedido do Gabriel em 14/10/2026: adaptar as decisões de design, porque a tentativa anterior manteve o plano original em verde e reduziu a qualidade das interfaces e dos blocos de cor do Stitch. A [auditoria](auditoria-ui-2026-10-14.md) confirma: a D-D2 só chegou ao cartão Agora e ao botão do Hoje. No resto do app o verde-oliva da identidade anterior segue como cor de interface (links, aba ativa, "Mostrar resposta", "Continuar", "Salvar"), os campos são nativos e a navegação é chapada.
+**Motivo.** Pedido do Gabriel em 14/10/2026: adaptar as decisões de design, porque a tentativa anterior manteve o plano original em verde e reduziu a qualidade das interfaces e dos blocos de cor do Stitch. A [auditoria](arquivo/auditoria-ui-2026-10-14.md) confirma: a D-D2 só chegou ao cartão Agora e ao botão do Hoje. No resto do app o verde-oliva da identidade anterior segue como cor de interface (links, aba ativa, "Mostrar resposta", "Continuar", "Salvar"), os campos são nativos e a navegação é chapada.
 
 **A D-D2 não muda** (areia, espresso, cacto, caramelo/sol, mascote em pontos estratégicos, vidro). **A D-D3 dá a cada cor um papel e diz onde há bloco de cor**, para o app inteiro falar a língua do protótipo:
 
@@ -87,7 +87,7 @@ Substitui a identidade "papel esverdeado, tinta e sálvia" dos tokens atuais, pa
 
 ## D-D4 — Paleta, botões e cartões por estado do Gabriel; Leitor e Sessão (14/10/2026, material do Gabriel; vale como padrão até ele vetar; substitui a D-D3 onde divergem)
 
-**Origem.** Às 11:18 e 11:28 UTC o Gabriel mandou quatro mockups (Gemini), a paleta com o sistema de botões e a especificação estruturada do Leitor e da Sessão. Guardados, com a leitura de cada imagem e as divergências entre imagem e texto, em [`referencias/2026-10-14-gemini/`](referencias/2026-10-14-gemini/leia-me.md). O link do Gemini não abre do ambiente do Claude.
+**Origem.** Às 11:18 e 11:28 UTC o Gabriel mandou quatro mockups (Gemini), a paleta com o sistema de botões e a especificação estruturada do Leitor e da Sessão. Guardados, com a leitura de cada imagem e as divergências entre imagem e texto, em [`referencias/arquivo/2026-10-14-gemini/`](referencias/arquivo/2026-10-14-gemini/leia-me.md). O link do Gemini não abre do ambiente do Claude.
 
 **Paleta e papéis.** Substitui o caramelo, o verde-cacto de interface, a argila e o âmbar da D-D3 (a D-D2 muda de nome, não de espírito: areia, espresso, cacto, mascote).
 
@@ -112,7 +112,7 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 
 **Navegação.** Barra de baixo reta, com ícone e rótulo nas quatro áreas e o item atual em destaque (sem pílula flutuante); "+" simples de Terracota (Solace no escuro) nas telas sem captura inline; no Hoje a captura é o campo "Anote a frase correta" com "Guardar". Cabeçalho: "Arretado." com o ponto final em Terracota e o cacto, "Conta" e "?".
 
-**Leitor e Sessão.** Valores da [especificação](referencias/2026-10-14-gemini/especificacao-leitor-sessao.md) tal como vieram: controles (A-, 18px, A+ e Destaques), legenda recolhível dos quatro sublinhados (duplo, tracejado, ondulado, pontilhado), régua em Areia a 45% com filete de Caatinga, dock com Buscar, Filtrar, Foco e "Lido até aqui", reserva de 156 px sob o artigo, foco em retrato e paisagem com painel de 220 px, modal "Ações" em folha (celular) e diálogo de 420 px (desktop); Sessão com Modo Só Estudo, chips de 15, 25, 45 e 60 min (o tempo só informa), bloco de Caatinga com o mascote Estudando, estacionamento em Areia e fechamento com o mascote Sorrindo. Mascote continua **fora do Leitor** e da Revisão em curso.
+**Leitor e Sessão.** Valores da [especificação](referencias/arquivo/2026-10-14-gemini/especificacao-leitor-sessao.md) tal como vieram: controles (A-, 18px, A+ e Destaques), legenda recolhível dos quatro sublinhados (duplo, tracejado, ondulado, pontilhado), régua em Areia a 45% com filete de Caatinga, dock com Buscar, Filtrar, Foco e "Lido até aqui", reserva de 156 px sob o artigo, foco em retrato e paisagem com painel de 220 px, modal "Ações" em folha (celular) e diálogo de 420 px (desktop); Sessão com Modo Só Estudo, chips de 15, 25, 45 e 60 min (o tempo só informa), bloco de Caatinga com o mascote Estudando, estacionamento em Areia e fechamento com o mascote Sorrindo. Mascote continua **fora do Leitor** e da Revisão em curso.
 
 **O que cai da D-D3:** vidro nos botões e na navegação; pílula flutuante com "+" satélite; seis tons de matéria; régua azul; raios 28, 20 e 14; nomes caramelo, argila e âmbar. **O que continua:** cor tem função; um bloco-herói por tela de orientação; Leitor e Revisão calmos; plataformas por largura (celular < 700, tablet em pé 700 a 899, desktop e tablet deitado ≥ 900); "Depois" com até 2 itens; mascote só em pontos estratégicos; vermelho nunca no estudo.
 
@@ -126,7 +126,7 @@ Vermelho continua só em excluir e falha técnica. Os três realces do leitor (a
 
 ## D-D5 — Padrão do Stitch (projeto 9953616237194891956): marinho, creme e sol, em todas as telas (16/10/2026, material do Gabriel; vale como padrão até ele vetar; substitui a D-D4 onde divergem)
 
-**Origem.** Em 16/10/2026 o Gabriel mandou o HTML da tela Hoje (celular, 390 px) do projeto Stitch `9953616237194891956` e pediu que **todas as outras telas** sigam o mesmo padrão, compatíveis e harmônicas entre si. O link do Stitch não abre do ambiente do Claude (exige login); a leitura vem do HTML colado. Valores e leitura tela a tela: [`referencias/2026-10-16-stitch-hoje/leia-me.md`](referencias/2026-10-16-stitch-hoje/leia-me.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
+**Origem.** Em 16/10/2026 o Gabriel mandou o HTML da tela Hoje (celular, 390 px) do projeto Stitch `9953616237194891956` e pediu que **todas as outras telas** sigam o mesmo padrão, compatíveis e harmônicas entre si. O link do Stitch não abre do ambiente do Claude (exige login); a leitura vem do HTML colado. Valores e leitura tela a tela: [`referencias/arquivo/2026-10-16-stitch-hoje/leia-me.md`](referencias/arquivo/2026-10-16-stitch-hoje/leia-me.md). Só apresentação (D-D1): nada de esquema, dado nem regra de domínio.
 
 **Adotado (vem do Stitch):**
 - **Rótulos do menu:** Hoje · **Trilha** (antes Plano) · **Fixar** (antes Recall) · Biblioteca. "Em seguida" no lugar de "Depois". Só texto de tela: rotas, identificadores (`plano`, `recall`, `Depois`) e dados gravados não mudam.
