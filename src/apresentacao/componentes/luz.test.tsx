@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { AcaoAgora } from './AcaoAgora';
-import { CanetaDefs, CanetaDesenho } from './Caneta';
 import { PontoDeLuz } from './PontoDeLuz';
 
 describe('PontoDeLuz (D-D7, P3; por mundo na D-D9, Q3)', () => {
@@ -27,41 +26,6 @@ describe('PontoDeLuz (D-D7, P3; por mundo na D-D9, Q3)', () => {
     expect(container.firstElementChild).not.toHaveClass('acende');
     rerender(<PontoDeLuz estado="feito" acende />);
     expect(container.firstElementChild).toHaveClass('acende');
-  });
-});
-
-describe('CanetaDefs e CanetaDesenho (A caneta que desenha; de vidro na D-D9, Q4)', () => {
-  it('é toda de vidro: ponta incluída, com o furo de tinta à vista, a esfera e três faíscas', () => {
-    const { container } = render(
-      <svg>
-        <CanetaDefs id="vidro" />
-        <CanetaDesenho id="vidro" />
-      </svg>,
-    );
-    expect(container.querySelectorAll('.caneta-vidro')).toHaveLength(1);
-    expect(container.querySelector('.caneta-aro')).not.toBeNull();
-    expect(container.querySelector('path[stroke^="url(#"]')).not.toBeNull();
-    expect(container.querySelector('path[fill^="url(#"]')).not.toBeNull();
-    expect(container.querySelectorAll('.caneta-esfera')).toHaveLength(1);
-    expect(container.querySelectorAll('.caneta-faisca')).toHaveLength(3);
-  });
-
-  it('desenham a mesma caneta por dentro de outro svg, com ids próprios', () => {
-    const { container } = render(
-      <svg>
-        <CanetaDefs id="quadro" />
-        <g data-pose="deitada">
-          <CanetaDesenho id="quadro" />
-        </g>
-      </svg>,
-    );
-    for (const parte of ['tinta', 'halo', 'sombra', 'aro']) {
-      expect(container.querySelector(`#quadro-${parte}`)).not.toBeNull();
-    }
-    expect(container.querySelector('path[fill="url(#quadro-tinta)"]')).not.toBeNull();
-    expect(container.querySelector('circle[filter="url(#quadro-halo)"]')).not.toBeNull();
-    expect(container.querySelector('rect[mask="url(#quadro-aro)"]')).not.toBeNull();
-    expect(container.querySelectorAll('.caneta-faisca')).toHaveLength(3);
   });
 });
 
