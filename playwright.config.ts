@@ -48,6 +48,8 @@ export default defineConfig({
     ...SAFARI.map(([name, aparelho]) => ({
       name,
       testIgnore: SPECS_DA_CONTA,
+      // O WebKit do CI desenha mais devagar (no iPhone, 3 pixels por ponto, sem placa de vídeo): o dobro dos 30 s.
+      timeout: 60_000,
       use: {
         ...aparelho,
         baseURL: `http://localhost:${String(PORTA)}`,
