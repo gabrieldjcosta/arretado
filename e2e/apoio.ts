@@ -8,16 +8,10 @@ interface Opcoes {
   /** Para testes que provocam falha no console de propósito. */
   permitirFalhasConsole: boolean;
   /**
-   * Todo teste abre o app como um aparelho que já viu a Chegada e a Entrada do Dia, porque as duas são
-   * um <dialog> modal (o resto da tela fica inerte) e todo teste começa num aparelho novo. Só a
-   * `entrada-do-dia.spec.ts` desliga isto (`test.use({ semearAbertura: false })`).
-   */
-  semearAbertura: boolean;
-  /**
    * Todo teste abre o app como um aparelho em que o nome já foi escrito (D-D14: a Abertura, a camada de tela
    * cheia, um popover, abre em toda abertura, cobre a tela e consome o primeiro toque; só um Dia guardado no
-   * futuro a deixa calada), então sem isto todo teste começaria por ela. Só a `escrita-do-nome.spec.ts` e a `abertura.spec.ts` desligam isto (`semearEscrita: false`);
-   * a `entrada-do-dia.spec.ts` desliga a anterior e continua com esta.
+   * futuro a deixa calada), então sem isto todo teste começaria por ela. Só quem testa a abertura do Fio
+   * (`fio-abertura.spec.ts`, `comecar.spec.ts`, `carregamento.spec.ts`) desliga isto (`semearEscrita: false`).
    */
   semearEscrita: boolean;
 }
@@ -29,13 +23,9 @@ interface Opcoes {
 export const test = base.extend<Opcoes & { vigiar: undefined }>({
   permitirViolacoes: [false, { option: true }],
   permitirFalhasConsole: [false, { option: true }],
-  semearAbertura: [true, { option: true }],
   semearEscrita: [true, { option: true }],
   vigiar: [
-    async (
-      { page, permitirViolacoes, permitirFalhasConsole, semearAbertura, semearEscrita },
-      use,
-    ) => {
+    async ({ page, permitirViolacoes, permitirFalhasConsole, semearEscrita }, use) => {
       await page.addInitScript(() => {
         const w = window as unknown as { __violacoes: string[] };
         w.__violacoes = [];
@@ -45,25 +35,8 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
           );
         });
       });
-      if (semearAbertura) {
-        // As mesmas chaves de `src/apresentacao/entrada/regras.ts`; só põe o que falta, então um teste
-        // que apague as chaves e recarregue as recebe de volta (a `entrada-do-dia.spec.ts` confere o resultado).
-        await page.addInitScript(() => {
-          try {
-            const guardado = window.localStorage;
-            if (guardado.getItem('arretado:chegada:v1') === null) {
-              guardado.setItem('arretado:chegada:v1', '{"vista":true}');
-            }
-            if (guardado.getItem('arretado:entrada-do-dia:v1') === null) {
-              guardado.setItem('arretado:entrada-do-dia:v1', '{"dia":"9999-12-31"}');
-            }
-          } catch {
-            /* sem armazenamento */
-          }
-        });
-      }
       if (semearEscrita) {
-        // A chave de `componentes/escrita/frequencia.ts`. Um Dia que não chega nunca (como na Entrada do Dia):
+        // A chave de `componentes/escrita/frequencia.ts`. Um Dia que não chega nunca:
         // a Abertura fica calada (`escritaNaTela`: Dia guardado no futuro), com qualquer relógio, também os
         // que os testes põem em Dias de antes ou de depois.
         await page.addInitScript(() => {
@@ -130,13 +103,12 @@ export async function colar(page: Page, id: string) {
 }
 
 /**
- * Pula a Abertura (a camada de tela cheia de toda abertura do aplicativo, D-D14) como a pessoa faria: com a primeira tecla, que só pula. Para os testes que desligam a semeadura da
- * escrita (`semearEscrita: false`) e não são sobre ela.
+ * Abre o Agora e espera a tela dele montar. A nav "Lugares" não serve de sinal: as telas que ainda moram na casca
+ * legada (a Trilha, o Fixar, a Biblioteca) já a mostram, e o Agora, num pedaço à parte do pacote, chega depois.
  */
-export async function pularAAbertura(page: Page) {
-  await expect(page.locator('.abertura')).toBeVisible();
-  await page.keyboard.press('Shift');
-  await expect(page.locator('.abertura')).toHaveCount(0);
+export async function irAoAgora(page: Page) {
+  await page.goto('/#/');
+  await expect(page.locator('[data-tela="inicio"]:not(.m-saindo)')).toBeVisible();
 }
 
 /**

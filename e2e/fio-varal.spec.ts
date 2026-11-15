@@ -3,7 +3,7 @@ import {
   animacoesVistas,
   expect,
   importarEPublicar,
-  irAoRegistroPeloMais,
+  irAoAgora,
   registrarAnimacoes,
   semViolacoesNoFio,
   test,
@@ -48,9 +48,8 @@ async function guardarAsFrases(page: Page) {
   await envio.getByRole('button', { name: 'Enviar' }).click();
   await expect(envio).toBeHidden();
 
-  await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
-  await irAoRegistroPeloMais(page);
+  // O registro de um erro pela tela do Fixar: não abre folha, então não entra na medida das animações do Caderno.
+  await page.goto('/#/recall/registrar');
   await page.getByLabel('Frase correta').fill(FRASE_DO_ERRO);
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Frase registrada.')).toBeVisible();
@@ -78,8 +77,7 @@ async function prepararOVaral(
   await importarEPublicar(page, 'lep-compilado', 'LEP');
   if (!opcoes.soLep) await importarEPublicar(page, 'eca-compilado', 'ECA');
   if (opcoes.comFrases) await guardarAsFrases(page);
-  await page.goto('/#/fio/ligar');
-  await expect(nav(page)).toBeVisible();
+  await irAoAgora(page);
 }
 
 const nav = (page: Page) => page.getByRole('navigation', { name: 'Lugares' });
