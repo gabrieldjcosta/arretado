@@ -36,9 +36,8 @@ export function comTransicao(de: string, para: string, trocar: () => void): void
   const mov = movimentoAgora();
   const { dx, dy } = vetorDaTroca(de, para, mov === 'calmo');
   const raiz = document.documentElement;
-  // Atributos, não `style.setProperty`: o WebKit conta o estilo posto por script como violação de `style-src-attr`.
-  raiz.dataset.vtDx = String(dx);
-  raiz.dataset.vtDy = String(dy);
+  raiz.style.setProperty('--vt-dx', `${String(dx)}px`);
+  raiz.style.setProperty('--vt-dy', `${String(dy)}px`);
   raiz.dataset.vt = mov === 'calmo' ? 'calmo' : 'normal';
   doc.startViewTransition(() => {
     flushSync(trocar);

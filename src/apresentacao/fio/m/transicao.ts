@@ -35,19 +35,35 @@ function animarSaida(copia: HTMLElement, de: string | null, para: string) {
   });
 }
 
+const FORA_DA_PROPRIEDADE = new Set(['offset', 'easing', 'composite', 'computedOffset']);
+const kebab = (nome: string) => nome.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+
+/**
+ * O que a Web Animations deixou valendo (opacidade, transformações) vai para o estilo do alvo, que a cópia leva.
+ * Não é `commitStyles()`: o WebKit o conta como estilo inline posto por script (`style-src-attr` da CSP).
+ * A propriedade pelo CSSOM, com o valor calculado agora, dá o mesmo resultado e a CSP deixa.
+ */
+function guardarEstiloDaAnimacao(a: Animation) {
+  const efeito = a.effect;
+  if (!(efeito instanceof KeyframeEffect)) return;
+  const alvo = efeito.target;
+  if (!(alvo instanceof HTMLElement || alvo instanceof SVGElement) || !alvo.isConnected) return;
+  const calculado = getComputedStyle(alvo);
+  for (const quadro of efeito.getKeyframes()) {
+    for (const nome of Object.keys(quadro)) {
+      if (FORA_DA_PROPRIEDADE.has(nome)) continue;
+      alvo.style.setProperty(kebab(nome), calculado.getPropertyValue(kebab(nome)));
+    }
+  }
+}
+
 /** A tela `el` vai sair: guarda uma cópia estática dela, no mesmo quadro, para esmaecer. */
 export function sairDaTela(el: HTMLElement, nome: string): void {
   const quadro = el.parentElement;
   if (!quadro || !el.isConnected || modoAgora() === 'reduzido') return;
   // O que a Web Animations deixou valendo (opacidade, transformações) passa para o estilo, que a cópia leva.
   if (typeof el.getAnimations === 'function') {
-    el.getAnimations({ subtree: true }).forEach((a) => {
-      try {
-        a.commitStyles();
-      } catch {
-        /* alvo fora da tela: nada a guardar */
-      }
-    });
+    el.getAnimations({ subtree: true }).forEach(guardarEstiloDaAnimacao);
   }
   const copia = el.cloneNode(true) as HTMLElement;
   copia.removeAttribute('id');
