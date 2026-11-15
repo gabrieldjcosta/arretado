@@ -173,7 +173,7 @@ describe('Importar por colagem (9.5)', () => {
     const usuario = await abrir(repo);
     colar({ html: LEP_HTML });
     await sumario();
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
+    window.location.hash = '#/biblioteca';
     await usuario.click(await screen.findByRole('link', { name: 'Importar norma' }));
 
     colar({ html: LEP_HTML });

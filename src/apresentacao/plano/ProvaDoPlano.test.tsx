@@ -20,7 +20,7 @@ describe('Plano › data da prova (AP-03)', () => {
     expect(screen.queryByRole('button', { name: 'Guardar a data' })).not.toBeInTheDocument();
 
     await usuario.type(campo, '2000-01-10');
-    expect(screen.getByRole('status')).toHaveTextContent('Escolha uma data depois de hoje.');
+    expect(screen.getByText('Escolha uma data depois de hoje.')).toHaveAttribute('role', 'status');
     expect(screen.queryByRole('button', { name: 'Guardar a data' })).not.toBeInTheDocument();
 
     await usuario.clear(campo);

@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, pularAAbertura, semViolacoesNoFio, test } from './apoio';
+import { expect, semViolacoesNoFio, test } from './apoio';
 
 // A abertura e a prova do Arretado novo (docs/design/fio/mockup-aprovado.html, telas `abertura` e `prova`): o ponto
 // de luz quica de letra em letra escrevendo o nome, vira o ponto do cacto e um fio o leva, como um pêndulo, até a
@@ -16,15 +16,8 @@ const abertura = (page: Page) => page.locator('.m-abertura');
 const pergunta = (page: Page) =>
   page.getByRole('heading', { level: 1, name: 'Pra qual prova você estuda?' });
 
-/** Abre o app já com o Arretado novo ligado, como quem recebeu o link da prévia. */
+/** Abre o app pela raiz, como quem chega pela primeira vez. */
 async function abrirNoFio(page: Page) {
-  await page.addInitScript(() => {
-    try {
-      window.localStorage.setItem('arretado:interface', 'fio');
-    } catch {
-      /* sem armazenamento */
-    }
-  });
   await page.goto('/');
 }
 
@@ -103,9 +96,8 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 780 });
-  // Traz uma matéria pelo edital com a interface de sempre (a abertura de antes é pulada com uma tecla).
+  // Traz uma matéria pelo edital pela Trilha (a abertura é pulada com uma tecla).
   await page.goto('/#/plano');
-  await pularAAbertura(page);
   await page.getByRole('button', { name: 'Trazer meu edital' }).click();
   await page.getByLabel('Arquivo CSV').setInputFiles({
     name: 'ciclo.csv',
@@ -114,10 +106,9 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
   });
   await page.getByRole('button', { name: 'Importar pontos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Execução Penal' })).toBeVisible();
-  // Um aparelho em que o nome ainda não foi escrito, agora no Arretado novo.
+  // Um aparelho em que o nome ainda não foi escrito.
   await page.evaluate((chave) => {
     localStorage.removeItem(chave);
-    localStorage.setItem('arretado:interface', 'fio');
   }, CHAVE_DA_ESCRITA);
   await page.goto('/');
   await page.reload();
@@ -149,4 +140,83 @@ test('nas aberturas de rotina a mesma coreografia vai mais depressa (uns 4 s), l
   expect(Date.now() - comeco).toBeLessThan(9_000);
   await expect(abertura(page)).toHaveCount(0);
   await expect(page.locator('.m-voo-ponto')).toHaveCount(0, { timeout: 3_000 });
+});
+
+const paraComecar = (page: Page) => page.getByRole('group', { name: 'Para começar' });
+const guardado = (page: Page) => page.evaluate((c) => localStorage.getItem(c), CHAVE_DA_ESCRITA);
+
+/** Abre o app de novo pela raiz, como quem volta ao aparelho (a recarga refaz a decisão da abertura). */
+async function reabrir(page: Page) {
+  await page.goto('/#/');
+  await page.reload();
+}
+
+test('três aberturas seguidas puladas calam a abertura até o Dia seguinte (a conta mora no aparelho)', async ({
+  page,
+}) => {
+  await abrirNoFio(page);
+  // A primeira vez e mais duas, cada uma pulada com a primeira tecla.
+  for (let i = 0; i < 3; i += 1) {
+    if (i > 0) await reabrir(page);
+    await expect(abertura(page)).toBeVisible();
+    await page.keyboard.press('Shift');
+    await expect(abertura(page)).toHaveCount(0);
+  }
+  expect(JSON.parse((await guardado(page)) ?? 'null')).toMatchObject({ puladas: 3 });
+  // A quarta já nasce no Agora (sem prova escolhida, ele pergunta): nenhuma abertura.
+  await reabrir(page);
+  await expect(paraComecar(page)).toBeVisible();
+  await page.waitForTimeout(600);
+  await expect(abertura(page)).toHaveCount(0);
+  // No Dia seguinte a abertura volta, e a conta recomeça.
+  await page.evaluate(
+    ([chave, valor]) => {
+      window.localStorage.setItem(chave as string, valor as string);
+    },
+    [CHAVE_DA_ESCRITA, JSON.stringify({ dia: '2026-01-01', puladas: 3 })],
+  );
+  await reabrir(page);
+  await expect(abertura(page)).toBeVisible();
+});
+
+test('uma abertura que vai até o fim zera a conta de pulos seguidos', async ({ page }) => {
+  await page.addInitScript(
+    ([chave, valor]) => {
+      // Só se falta: recarregar na mesma sessão de teste não desfaz o que o app guardou.
+      if (window.localStorage.getItem(chave as string) === null) {
+        window.localStorage.setItem(chave as string, valor as string);
+      }
+    },
+    [CHAVE_DA_ESCRITA, JSON.stringify({ dia: '2026-01-01' })],
+  );
+  await abrirNoFio(page);
+  await expect(abertura(page)).toBeVisible();
+  await page.keyboard.press('Shift');
+  await expect(abertura(page)).toHaveCount(0);
+  expect(JSON.parse((await guardado(page)) ?? 'null')).toMatchObject({ puladas: 1 });
+  await reabrir(page);
+  await expect(abertura(page)).toBeVisible();
+  await expect(pergunta(page)).toBeVisible({ timeout: 25_000 });
+  await expect(abertura(page)).toHaveCount(0);
+  expect(JSON.parse((await guardado(page)) ?? 'null')).toEqual({
+    dia: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+  });
+});
+
+test('movimento reduzido: nenhuma abertura, e a primeira vez continua guardada', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await abrirNoFio(page);
+  await expect(paraComecar(page)).toBeVisible();
+  await page.waitForTimeout(600);
+  await expect(abertura(page)).toHaveCount(0);
+  expect(await guardado(page)).toBeNull();
+
+  // Quando a pessoa deixa de reduzir, a primeira vez ainda está lá.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await reabrir(page);
+  await expect(abertura(page)).toBeVisible();
+  await abertura(page).click();
+  await expect(abertura(page)).toHaveCount(0);
 });

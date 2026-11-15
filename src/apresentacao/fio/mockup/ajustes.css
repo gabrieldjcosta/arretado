@@ -1168,3 +1168,49 @@ html[data-texto-fio] .m-fio .m-proximo {
 .m-fio .m-cabeca .m-cobre b {
   margin-right: 0.25em;
 }
+
+/* Desvio 476: a linha de retorno do Agora (`RetornoM`) não existe no mockup. É o que a D-D25 (itens 6 e 11) manda
+   recolher dos avisos do Hoje: versão nova, backup, a lei mudou e o Lembrete, uma linha por vez, no fim da tela.
+   Só usa o que o mockup já tem: o texto é o `.m-quieto` e as ações são o botão de texto da folha da Conta
+   (`.m-entrar-codigo`), aqui em linha e com 44 px de alvo; a primeira leva a tinta do texto. Sem animação de entrada.
+   A classe não é `.m-retorno`: essa já é do mockup (o retorno dos passos, com 96 px de altura mínima). */
+.m-fio .m-linha-de-retorno {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  margin-top: 14px;
+}
+.m-fio .m-linha-de-retorno > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.m-fio .m-linha-de-retorno-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -10px;
+}
+.m-fio .m-linha-de-retorno .m-entrar-codigo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 10px;
+}
+.m-fio .m-linha-de-retorno-acoes > :first-child,
+.m-fio .m-linha-de-retorno .m-entrar-codigo:hover {
+  color: var(--m-texto);
+}
+.m-fio .m-linha-de-retorno .m-entrar-codigo:active {
+  opacity: 0.7;
+}
+
+/* Desvio 476c: a porta de quem já usa o Arretado, na tela da prova. O `.m-entrar-codigo` do mockup é um botão, que
+   encolhe sozinho e se centra pela margem; aqui é um link, que precisa ser dito: encolhe, centra e tem 44 px de alvo. */
+.m-fio a.m-entrar-codigo {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  text-align: center;
+}

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
-import { esconderCarregamento } from '../../carregamento';
 import { criarEncontro } from '../../componentes/escrita/encontro';
 import {
   escritaNaTela,
@@ -10,8 +9,6 @@ import {
 import { ContextoDaAbertura, type VezDaEscrita } from '../../componentes/escrita/vez-da-escrita';
 import { useRepositorio } from '../../dados/contexto';
 import { noQuadroDoFio } from '../../fio/lugares';
-import { useInterface } from '../../fio/interface';
-import { Abertura } from './Abertura';
 import { decidirNaAberturaDoApp } from './regras';
 
 /**
@@ -44,7 +41,7 @@ function SaidaForaDoQuadro({ aoSair }: { aoSair: (como: 'fim' | 'pulou') => void
  * Dia guardado no futuro das sementes de teste) é decidida na hora, sem esperar dado nenhum: o cabeçalho
  * nasce parado e nada muda. Nas outras, que são as demais (D-D14), a leitura das Preferências e da Sessão
  * (ver `decidirOndeEscrever`) diz se a tela cheia abre. Até lá o app não
- * monta: nem o Hoje aparece antes da tela cheia, nem o cabeçalho fica sem nome, e a camada entra no
+ * monta: nem o app aparece antes da tela cheia, nem o cabeçalho fica sem nome, e a camada entra no
  * mesmo quadro em que o app monta. Montar o app antes só faria a decisão esperar a carga dele. Fica por
  * dentro do repositório (Preferências e Sessão moram nele) e por fora de tudo o que escreve ou abre por
  * cima.
@@ -96,41 +93,28 @@ export function ProvedorDaAbertura({ children }: { children: ReactNode }) {
     [repo],
   );
 
-  // O app monta quando a decisão chega (ou no teto). É nesse quadro que a tela de carregamento do index.html
-  // sai, por baixo da camada quando ela abre: nem um branco entre as duas, nem o Hoje à mostra.
+  // O app monta quando a decisão chega (ou no teto). A tela de carregamento do index.html sai quando a casca
+  // aparece (`CascaDoFio`), por baixo da abertura quando ela abre.
   const montado = vez.estado !== 'pendente' || cansou;
-  useEffect(() => {
-    if (montado) void esconderCarregamento();
-  }, [montado]);
 
   const naTela = vez.estado === 'decidida' && vez.onde === 'tela' && !saiu ? vez : null;
-  const fio = useInterface() === 'fio';
-  // O Calmo não tem voo: a luz não visita o Zé, e a Chegada espera a camada sair, como a do Dia. No Fio a abertura é
-  // uma tela do quadro dele (`AberturaM`), não esta camada, e a Chegada não vem: a luz não a visita.
-  const visitaOZe = !fio && naTela !== null && naTela.chegada && !naTela.calmo;
+  // A abertura é uma tela do quadro do Fio (`AberturaM`), não uma camada de tela cheia, e a Chegada não vem: a luz não a
+  // visita.
   const valor = useMemo(
     () => ({
       vez,
       emCurso: vez.estado === 'pendente' || naTela !== null,
-      voaParaAChegada: visitaOZe,
+      voaParaAChegada: false,
       encontro,
       camadaDoFio:
-        fio && naTela !== null ? { escrita: naTela.escrita, calmo: naTela.calmo, aoSair } : null,
+        naTela !== null ? { escrita: naTela.escrita, calmo: naTela.calmo, aoSair } : null,
     }),
-    [vez, naTela, visitaOZe, encontro, fio, aoSair],
+    [vez, naTela, encontro, aoSair],
   );
   return (
     <ContextoDaAbertura.Provider value={valor}>
       {montado ? children : null}
-      {naTela && fio && <SaidaForaDoQuadro aoSair={aoSair} />}
-      {naTela && !fio && (
-        <Abertura
-          escrita={naTela.escrita}
-          calmo={naTela.calmo}
-          aoSair={aoSair}
-          encontro={visitaOZe ? encontro : undefined}
-        />
-      )}
+      {naTela && <SaidaForaDoQuadro aoSair={aoSair} />}
     </ContextoDaAbertura.Provider>
   );
 }

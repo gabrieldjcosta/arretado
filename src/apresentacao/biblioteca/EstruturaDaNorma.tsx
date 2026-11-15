@@ -1,33 +1,62 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ItemDaJanela, NoDaLeitura } from '../../dominios/legislacao/leitor';
 import { PontoDeLuz, type EstadoDoPonto } from '../componentes/PontoDeLuz';
-import { estadoDoBloco, RAIZ, vistaDaEstrutura, type IndiceDaEstrutura } from './estrutura';
+import {
+  ESTADO_POR_EXTENSO,
+  estadoDoBloco,
+  noDoNome,
+  nomeDoTexto,
+  RAIZ,
+  vistaDaEstrutura,
+  type IndiceDaEstrutura,
+} from './estrutura';
 import './estrutura.css';
 
-/** O estado do bloco em palavras, para o leitor de tela (o ponto é só desenho). */
-const ESTADO_POR_EXTENSO: Record<EstadoDoPonto, string> = {
-  feito: 'lida',
-  atual: 'em leitura',
-  falta: 'ainda não lida',
-};
-
-/**
- * O nome do bloco: a rubrica dobrada nele (o `nome` logo depois) ou, no anexo e no bloco solto, o
- * próprio texto. Vazio enquanto o texto não chegou.
- */
+/** O nome do bloco (ver `noDoNome`). Vazio enquanto o texto não chegou. */
 function nomeDoBloco(
   nos: readonly NoDaLeitura[],
   textos: ReadonlyMap<number, ItemDaJanela>,
   indice: number,
 ): string {
-  const proximo = nos[indice + 1]?.dispositivo;
-  const rubrica = proximo?.tipo === 'nome' && proximo.paiId === nos[indice]?.dispositivo.id;
-  const texto = textos.get(rubrica ? indice + 1 : indice)?.texto;
+  return nomeDoTexto(textos.get(noDoNome(nos, indice))?.texto);
+}
+
+/**
+ * Um bloco na lista (no painel ao lado do texto e no sumário do celular): o ponto de luz do estado, o
+ * rótulo, o nome por baixo e o estado por extenso para o leitor de tela. O de agora leva `aria-current`.
+ */
+export function ItemDaEstrutura({
+  rotulo,
+  nome,
+  estado,
+  aqui,
+  nivel,
+  aoIr,
+}: {
+  rotulo: string | undefined;
+  nome: string;
+  estado: EstadoDoPonto;
+  aqui: boolean;
+  /** Quantos blocos há acima dele: o recuo na lista do sumário (o painel não o usa). */
+  nivel?: number;
+  aoIr: () => void;
+}) {
   return (
-    texto?.trechos
-      .map((t) => t.texto)
-      .join('')
-      .trim() ?? ''
+    <button
+      type="button"
+      className="estrutura-item"
+      aria-current={aqui ? 'location' : undefined}
+      data-aqui={aqui ? '' : undefined}
+      data-nivel={nivel}
+      onClick={aoIr}
+    >
+      <PontoDeLuz estado={estado} />
+      <span className="estrutura-nome">
+        <span className="estrutura-rotulo">{rotulo}</span>{' '}
+        {nome && <span className="estrutura-titulo">{nome}</span>}
+      </span>
+      <span className="visualmente-oculto">, {ESTADO_POR_EXTENSO[estado]}</span>
+    </button>
   );
 }
 
@@ -111,28 +140,17 @@ export function EstruturaDaNorma({
     }
   }, [vista, textos]);
 
-  const item = (bloco: number, aqui: boolean) => {
-    const estado = estadoDoBloco(estrutura, bloco, lidoAte);
-    const nome = nomeDoBloco(nos, textos, bloco);
-    return (
-      <button
-        type="button"
-        className="estrutura-item"
-        aria-current={aqui ? 'location' : undefined}
-        data-aqui={aqui ? '' : undefined}
-        onClick={() => {
-          ir(bloco);
-        }}
-      >
-        <PontoDeLuz estado={estado} />
-        <span className="estrutura-nome">
-          <span className="estrutura-rotulo">{nos[bloco]?.dispositivo.rotulo}</span>{' '}
-          {nome && <span className="estrutura-titulo">{nome}</span>}
-        </span>
-        <span className="visualmente-oculto">, {ESTADO_POR_EXTENSO[estado]}</span>
-      </button>
-    );
-  };
+  const item = (bloco: number, aqui: boolean) => (
+    <ItemDaEstrutura
+      rotulo={nos[bloco]?.dispositivo.rotulo}
+      nome={nomeDoBloco(nos, textos, bloco)}
+      estado={estadoDoBloco(estrutura, bloco, lidoAte)}
+      aqui={aqui}
+      aoIr={() => {
+        ir(bloco);
+      }}
+    />
+  );
 
   return (
     <nav ref={painel} className="estrutura-da-norma" aria-label="Estrutura da norma">

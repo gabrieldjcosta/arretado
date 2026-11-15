@@ -5,6 +5,7 @@ import { repositorioDeTeste } from '../../testes/repositorio';
 import {
   abrirNorma,
   lerJanela,
+  lerNos,
   NormaIndisponivel,
   normasPublicadas,
   type MotivoNormaIndisponivel,
@@ -215,6 +216,33 @@ describe('ler os textos por janela (9.4)', () => {
     expect(
       (await lerJanela(outro, aberta, { inicio: 1, quantidade: 2 })).map((i) => i.texto),
     ).toEqual([undefined, undefined]);
+  });
+});
+
+describe('ler nós avulsos (os nomes dos blocos, para o sumário)', () => {
+  it('traz os textos dos índices pedidos, na ordem pedida, e ignora o que está fora da árvore', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma } = await publicada(repo);
+    const aberta = await abrirNorma(repo, norma.id);
+
+    const nos = await lerNos(repo, aberta, [7, 2, -1, 99, 1.5, 4]);
+    expect(nos.map((i) => [i.indice, i.dispositivo.endereco, texto(i.texto)])).toEqual([
+      [7, 'art2.incI', 'estudar;'],
+      [2, 'tit1.nome', 'DAS DISPOSIÇÕES GERAIS'],
+      [4, 'art1.nome', 'Objeto'],
+    ]);
+    expect(await lerNos(repo, aberta, [])).toEqual([]);
+  });
+
+  it('lê no máximo 200 por chamada', async () => {
+    const { repo } = await repositorioDeTeste();
+    const { norma } = await publicada(repo, blocosDeNormaSintetica(300));
+    const aberta = await abrirNorma(repo, norma.id);
+    const todos = aberta.nos.map((_, indice) => indice);
+    expect(todos.length).toBeGreaterThan(LIMITE_MAXIMO_PAGINA);
+    const nos = await lerNos(repo, aberta, todos);
+    expect(nos).toHaveLength(LIMITE_MAXIMO_PAGINA);
+    expect(nos.every((i) => i.texto !== undefined)).toBe(true);
   });
 });
 

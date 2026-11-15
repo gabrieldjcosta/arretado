@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { abrirOLembrete, expect, lembreteGravado, semViolacoes, test } from './apoio';
 
-// O "+" da casca (D-D23; está em toda tela) abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
+// O "+" da casca das telas legadas (D-D23; o Agora tem o dele, "Guardar um erro") abre um painel com "Registrar erro" e "Lembrete". O jsdom não aplica CSS
 // nem tem <dialog> de verdade; aqui o navegador mede o painel (dentro da tela, alvos de 44 px), roda o foco
 // do diálogo modal (o foco volta ao "+" ao fechar) e o axe nos dois temas com o painel e o diálogo abertos.
 
@@ -12,8 +12,8 @@ test.describe('"+" da casca › painel', () => {
   test('o painel cabe na tela, tem alvos de 44 px e passa no axe nos dois temas', async ({
     page,
   }) => {
-    await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Hoje' })).toBeVisible();
+    await page.goto('/#/recall');
+    await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
     await expect(painel(page)).toHaveCount(0);
 
     await mais(page).click();
@@ -43,7 +43,7 @@ test.describe('"+" da casca › painel', () => {
   });
 
   test('Esc fecha o painel e devolve o foco ao "+"', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/recall');
     await mais(page).click();
     await expect(painel(page)).toBeVisible();
     await page.keyboard.press('Escape');
@@ -52,7 +52,7 @@ test.describe('"+" da casca › painel', () => {
   });
 
   test('"Registrar erro" abre o registro', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/recall');
     await mais(page).click();
     await painel(page).getByRole('link', { name: 'Registrar erro' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Registrar erro' })).toBeVisible();
@@ -61,7 +61,7 @@ test.describe('"+" da casca › painel', () => {
   test('"Lembrete" guarda a nota, que continua depois de recarregar, e o foco volta ao "+"', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/#/recall');
     const dialogo = await abrirOLembrete(page);
     await expect(painel(page)).toHaveCount(0);
     const campo = dialogo.getByRole('textbox', { name: 'Lembrete' });
@@ -69,7 +69,9 @@ test.describe('"+" da casca › painel', () => {
     await campo.fill('Levar o diploma ao cartório');
     await semViolacoes(page);
     await dialogo.getByRole('button', { name: 'Salvar' }).click();
-    await expect(dialogo.getByText('Salvo.')).toBeVisible();
+    // O aviso "Salvo.", e só ele: `getByText('Salvo.')` casa também "Ainda não salvo." (por trecho, sem
+    // diferenciar maiúscula) e deixava recarregar com a gravação a caminho. Era a nota vazia no celular.
+    await expect(dialogo.getByRole('status').filter({ hasText: /^Salvo\.$/ })).toBeVisible();
 
     // Esc fecha o diálogo modal e o foco volta ao "+".
     await page.keyboard.press('Escape');
@@ -85,7 +87,7 @@ test.describe('"+" da casca › painel', () => {
   });
 
   test('o texto escrito e não salvo se guarda ao fechar com Esc', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/recall');
     const dialogo = await abrirOLembrete(page);
     await dialogo.getByRole('textbox', { name: 'Lembrete' }).fill('Pedir a certidão');
     await expect(dialogo.getByText('Ainda não salvo.')).toBeVisible();
@@ -101,7 +103,7 @@ test.describe('"+" da casca › painel', () => {
   });
 
   test('o Lembrete grava ao sair do campo, sem apertar Salvar', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/recall');
     const dialogo = await abrirOLembrete(page);
     await dialogo
       .getByRole('textbox', { name: 'Lembrete' })
@@ -117,11 +119,11 @@ test.describe('"+" da casca › painel', () => {
     );
   });
 
-  test('o Fixar tem o mesmo "+" e as duas opções (é o da casca, igual ao do Hoje)', async ({
+  test('a Trilha tem o mesmo "+" e as duas opções (é o da casca, igual ao do Fixar)', async ({
     page,
   }) => {
-    await page.goto('/#/recall');
-    await expect(page.getByRole('heading', { level: 1, name: 'Fixar' })).toBeVisible();
+    await page.goto('/#/plano');
+    await expect(page.getByRole('heading', { level: 1, name: 'Trilha' })).toBeVisible();
     await mais(page).click();
     await expect(painel(page).getByRole('link', { name: 'Registrar erro' })).toBeVisible();
     await expect(painel(page).getByRole('button', { name: 'Lembrete' })).toBeVisible();

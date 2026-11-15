@@ -2,10 +2,10 @@ import type { Page } from '@playwright/test';
 import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test } from './apoio';
 
 // A barra do Leitor no celular (Onda 1 da crítica externa, A + B). Dentro da norma, menos de 700 px:
-// as abas das áreas saem (A), e as ferramentas viram uma barra de uma linha, encostada no fundo, com
-// Filtrar e Ações a dois toques, no "⋯" (B; o "⋯" é o mesmo em toda largura desde a D-D24, e criar erro e
-// cartão é com o "+" da casca). Aqui se mede onde cada coisa fica, no estilo do `trilho-do-leitor.spec.ts`;
-// o E2E do Leitor só pergunta se os botões estão à vista.
+// a pílula dos lugares fica de fora (D-D25: o Leitor abre sem barra de abas), e as ferramentas viram uma
+// barra de uma linha, encostada no fundo, com Filtrar e Ações a dois toques, no "⋯" (B; o "⋯" é o mesmo em
+// toda largura desde a D-D24, e criar erro e cartão é com o "+" da casca). Aqui se mede onde cada coisa
+// fica, no estilo do `trilho-do-leitor.spec.ts`; o E2E do Leitor só pergunta se os botões estão à vista.
 
 // O CI desenha o texto com hinting inteiro, uns 3% mais largo que o do computador de quem escreve o
 // teste: a barra de 360 px passava aqui e quebrava lá. Com a flag o E2E mede o mesmo texto nos dois.
@@ -64,7 +64,7 @@ const medir = (page: Page) =>
       largura: document.documentElement.clientWidth,
       sobraDeLado: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       barra,
-      cabecalho: caixa(document.querySelector('.topo')),
+      cabecalho: caixa(document.querySelector('.fio-topo')),
       botoes: [...document.querySelectorAll<HTMLElement>('.acoes-leitor button')].map((b) => ({
         nome: (b.getAttribute('aria-label') ?? b.textContent).trim(),
         ...caixa(b),
@@ -73,17 +73,26 @@ const medir = (page: Page) =>
     };
   });
 
+/** No fim da norma: onde começa a barra de baixo, onde termina a última linha e onde termina o Leitor. */
+const fimDaNorma = (page: Page) =>
+  page.evaluate(() => ({
+    barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
+    ultimaLinha:
+      document.querySelector('[data-endereco="art204"]')?.getBoundingClientRect().bottom ?? 0,
+    leitor: document.querySelector('.leitor')?.getBoundingClientRect().bottom ?? Infinity,
+  }));
+
 const SO_NO_CELULAR = 'o tamanho da janela é do teste; basta um projeto';
 
 for (const { largura, altura } of TELAS) {
-  test(`${String(largura)}×${String(altura)}: a barra de baixo é uma linha só, sem as abas, e o fim da norma fica acima dela`, async ({
+  test(`${String(largura)}×${String(altura)}: a barra de baixo é uma linha só, sem a pílula dos lugares, e o fim da norma fica acima dela`, async ({
     page,
   }, info) => {
     test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
     test.setTimeout(120_000);
     await abrirALep(page);
     await page.setViewportSize({ width: largura, height: altura });
-    await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeHidden();
+    await expect(page.getByRole('navigation', { name: 'Lugares' })).toHaveCount(0);
 
     const m = await medir(page);
     expect(m.altura - m.barra.topo, 'o que a barra cobre').toBeLessThanOrEqual(COBERTURA_MAXIMA);
@@ -107,22 +116,17 @@ for (const { largura, altura } of TELAS) {
     // Uma linha: os quatro botões na mesma altura.
     expect(new Set(m.botoes.map((b) => Math.round(b.topo))).size, 'uma linha').toBe(1);
 
-    // No fim da norma a última linha, e o rodapé com "Backup e dados", terminam acima da barra.
+    // No fim da norma a última linha, e tudo o que o Leitor põe depois dela, terminam acima da barra.
     await irAoFim(page);
-    const fim = await page.evaluate(() => ({
-      barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
-      ultimaLinha:
-        document.querySelector('[data-endereco="art204"]')?.getBoundingClientRect().bottom ?? 0,
-      rodape: document.querySelector('.rodape')?.getBoundingClientRect().bottom ?? 0,
-    }));
+    const fim = await fimDaNorma(page);
+    expect(fim.ultimaLinha, 'a última linha na tela').toBeGreaterThan(0);
     expect(fim.ultimaLinha, 'a última linha acima da barra').toBeLessThanOrEqual(fim.barra);
-    expect(fim.rodape, 'o rodapé acima da barra').toBeLessThanOrEqual(fim.barra + 1);
-    await expect(page.getByRole('link', { name: 'Backup e dados' })).toBeInViewport();
+    expect(fim.leitor, 'o fim do Leitor acima da barra').toBeLessThanOrEqual(fim.barra + 1);
     await semViolacoes(page);
   });
 }
 
-test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartão, no "+"; o foco volta ao botão de onde se partiu', async ({
+test('o sumário, Filtrar, Ações e os ajustes de leitura ficam a dois toques, no "⋯"; Registrar erro e o cartão, no "+"; o foco volta ao botão de onde se partiu', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
@@ -133,10 +137,16 @@ test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartã
   const menu = page.getByRole('group', { name: 'Mais ferramentas da leitura' });
   await expect(page.getByRole('button', { name: 'Filtrar', exact: true })).toHaveCount(0);
 
-  // O menu abre para cima, dentro da tela, com itens de 48 px; aberto e fechado passa no axe.
+  // O menu abre para cima, dentro da tela, com itens de 48 px; aberto e fechado passa no axe. O sumário vem
+  // primeiro: no celular o painel da estrutura não está ao lado do texto (a folha dele tem teste no `leitor.spec.ts`).
   await mais.tap();
   await expect(mais).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu.getByRole('button')).toHaveText([/^Filtrar/, /^Ações/]);
+  await expect(menu.getByRole('button')).toHaveText([
+    /^Sumário/,
+    /^Filtrar/,
+    /^Ações/,
+    /^Ajustes de leitura/,
+  ]);
   const caixas = await menu.evaluate((el) => {
     const r = el.getBoundingClientRect();
     const barra = document.querySelector('.acoes-leitor')?.getBoundingClientRect();
@@ -144,12 +154,14 @@ test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartã
       esquerda: r.left,
       direita: r.right,
       folga: (barra?.top ?? 0) - r.bottom,
+      rola: el.scrollHeight - el.clientHeight,
       itens: [...el.querySelectorAll('button')].map((b) => b.getBoundingClientRect().height),
     };
   });
   expect(caixas.esquerda).toBeGreaterThanOrEqual(0);
   expect(caixas.direita).toBeLessThanOrEqual(390);
   expect(caixas.folga, 'acima da barra, sem encostar').toBeGreaterThan(0);
+  expect(caixas.rola, 'na letra padrão os quatro itens cabem sem rolar').toBeLessThanOrEqual(0);
   for (const item of caixas.itens) expect(item).toBeGreaterThanOrEqual(44);
   await semViolacoes(page);
 
@@ -195,6 +207,17 @@ test('Filtrar e Ações ficam a dois toques, no "⋯"; Registrar erro e o cartã
   await expect(acoes).toBeVisible();
   await acoes.getByRole('button', { name: 'Fechar' }).tap();
   await expect(acoes).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
+
+  // Ajustes de leitura: a folha abre embaixo, o menu fecha e o foco volta ao Mais ao fechar a folha.
+  await page.getByRole('button', { name: 'Mais', exact: true }).tap();
+  await menu.getByRole('button', { name: /^Ajustes de leitura/ }).tap();
+  const ajustes = page.getByRole('dialog', { name: 'Ajustes de leitura' });
+  await expect(ajustes).toBeVisible();
+  await expect(menu).toBeHidden();
+  await semViolacoes(page);
+  await ajustes.getByRole('button', { name: 'Fechar' }).tap();
+  await expect(ajustes).toBeHidden();
   await expect(page.getByRole('button', { name: 'Mais', exact: true })).toBeFocused();
 
   // Registrar erro é com o "+": o painel abre direto no formulário (a frase correta), sem a lista de
@@ -253,11 +276,14 @@ test('numa tela estreita ou com texto grande a barra quebra em duas linhas, sem 
     expect(new Set(m.botoes.map((b) => Math.round(b.topo))).size, `${rotulo}: duas linhas`).toBe(2);
 
     await irAoFim(page);
-    const fim = await page.evaluate(() => ({
-      barra: document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0,
-      rodape: document.querySelector('.rodape')?.getBoundingClientRect().bottom ?? 0,
-    }));
-    expect(fim.rodape, `${rotulo}: o rodapé acima da barra`).toBeLessThanOrEqual(fim.barra + 1);
+    const fim = await fimDaNorma(page);
+    expect(fim.ultimaLinha, `${rotulo}: a última linha na tela`).toBeGreaterThan(0);
+    expect(fim.ultimaLinha, `${rotulo}: a última linha acima da barra`).toBeLessThanOrEqual(
+      fim.barra,
+    );
+    expect(fim.leitor, `${rotulo}: o fim do Leitor acima da barra`).toBeLessThanOrEqual(
+      fim.barra + 1,
+    );
     await page.evaluate(() => {
       window.scrollTo(0, 0);
     });
@@ -294,4 +320,87 @@ test('com o texto a 300% o dock quebra em linhas e nenhum rótulo passa da caixa
   }
   const m = await medir(page);
   expect(m.sobraDeLado, 'nada rola de lado').toBeLessThanOrEqual(0);
+});
+
+test('com o texto a 300% o menu do "⋯" cabe entre o cabeçalho e a barra e rola por dentro, sem um item passar por cima do outro; o sumário abre dele e nada passa da largura', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'celular', SO_NO_CELULAR);
+  test.setTimeout(120_000);
+  await abrirALep(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '300%';
+  });
+  const mais = page.getByRole('button', { name: 'Mais', exact: true });
+  const menu = page.getByRole('group', { name: 'Mais ferramentas da leitura' });
+  await mais.tap();
+  await expect(menu).toBeVisible();
+
+  // Antes o menu subia por baixo do cabeçalho preso (o primeiro item ficava fora do alcance) e os itens
+  // encolhiam: o texto de um passava por cima do seguinte.
+  const m = await menu.evaluate((el) => {
+    const caixa = el.getBoundingClientRect();
+    const cabecalho = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
+    const barra = document.querySelector('.acoes-leitor')?.getBoundingClientRect().top ?? 0;
+    const raiz = document.documentElement;
+    return {
+      abaixoDoCabecalho: caixa.top - cabecalho,
+      acimaDaBarra: barra - caixa.bottom,
+      rola: el.scrollHeight - el.clientHeight,
+      itens: [...el.querySelectorAll('button')].map((b) => {
+        const c = b.getBoundingClientRect();
+        return { topo: c.top, base: c.bottom, cortado: b.scrollHeight - b.clientHeight };
+      }),
+      sobraDeLado: raiz.scrollWidth - raiz.clientWidth,
+    };
+  });
+  expect(m.abaixoDoCabecalho, 'o menu começa abaixo do cabeçalho').toBeGreaterThanOrEqual(0);
+  expect(m.acimaDaBarra, 'o menu termina acima da barra').toBeGreaterThan(0);
+  expect(m.rola, 'o que não cabe rola por dentro do menu').toBeGreaterThan(0);
+  expect(m.itens).toHaveLength(4);
+  for (const [i, item] of m.itens.entries()) {
+    expect(item.cortado, `item ${String(i + 1)}: o texto cabe na caixa`).toBeLessThanOrEqual(1);
+    const seguinte = m.itens[i + 1];
+    if (seguinte) {
+      expect(seguinte.topo, `item ${String(i + 2)}: abaixo do anterior`).toBeGreaterThanOrEqual(
+        item.base,
+      );
+    }
+  }
+  expect(m.sobraDeLado, 'nada rola de lado').toBeLessThanOrEqual(0);
+
+  // O último item se alcança rolando o menu, e o primeiro continua ao alcance do dedo.
+  const ultimo = menu.getByRole('button', { name: /^Ajustes de leitura/ });
+  await ultimo.scrollIntoViewIfNeeded();
+  await expect(ultimo).toBeInViewport();
+  const sumario = menu.getByRole('button', { name: /^Sumário/ });
+  await sumario.scrollIntoViewIfNeeded();
+  await sumario.tap();
+
+  // A folha do sumário com a letra grande: cabe na tela, só a lista rola, e os nomes quebram em vez de passar.
+  const folha = page.getByRole('dialog', { name: 'Sumário' });
+  await expect(folha).toBeVisible();
+  const f = await folha.evaluate((el) => {
+    const caixa = el.getBoundingClientRect();
+    const raiz = document.documentElement;
+    const lista = el.querySelector('.sumario-da-norma');
+    return {
+      naTela:
+        caixa.top >= 0 &&
+        caixa.left >= 0 &&
+        caixa.bottom <= window.innerHeight &&
+        caixa.right <= raiz.clientWidth,
+      sobraDeLado: raiz.scrollWidth - raiz.clientWidth,
+      sobraDaFolha: el.scrollWidth - el.clientWidth,
+      sobraDaLista: (lista?.scrollWidth ?? 0) - (lista?.clientWidth ?? 0),
+    };
+  });
+  expect(f.naTela, 'a folha cabe na tela').toBe(true);
+  expect(f.sobraDeLado, 'a página não rola de lado').toBeLessThanOrEqual(0);
+  expect(f.sobraDaFolha, 'a folha não rola de lado').toBeLessThanOrEqual(0);
+  expect(f.sobraDaLista, 'a lista não rola de lado').toBeLessThanOrEqual(0);
+  await folha.getByRole('button', { name: 'Fechar' }).tap();
+  await expect(folha).toBeHidden();
+  await expect(mais).toBeFocused();
 });

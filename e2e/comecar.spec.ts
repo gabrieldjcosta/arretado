@@ -154,16 +154,16 @@ const semRolagemLateral = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
 test.describe('primeiro uso, num aparelho novo', () => {
-  // A Chegada precisa abrir: é de onde a contagem de toques parte.
-  test.use({ semearAbertura: false });
+  // A abertura precisa tocar: é de onde a contagem de toques parte (todo teste aqui abre um aparelho em que o nome
+  // ainda não foi escrito).
+  test.use({ semearEscrita: false });
 
   const chegada = (page: Page) => page.getByRole('dialog', { name: 'Boas-vindas ao Arretado!' });
-  const comecos = (page: Page) => page.getByRole('region', { name: 'Por onde começar' });
 
-  /** Do Hoje vazio à primeira norma aberta: "Escolher meu concurso", Defensoria e "Adicionar e ler". */
-  async function doHojeAoArtigo1(page: Page) {
-    await comecos(page).getByRole('link', { name: 'Escolher meu concurso' }).click();
-    await page.getByRole('link', { name: /^Defensoria Pública/ }).click();
+  /** Da pergunta da prova (Defensoria) à primeira norma aberta: o edital da lista e "Adicionar e ler". */
+  async function daProvaAoArtigo1(page: Page) {
+    await page.getByRole('button', { name: /^Defensoria/ }).click();
+    await expect(page).toHaveURL(/#\/comecar\/defensoria-publica$/);
     // Nenhum edital vem marcado (08/11/2026): a pessoa escolhe o primeiro da lista, o que custa um toque.
     const grupo = page.getByRole('group', { name: 'Qual edital serve de base para o seu plano?' });
     await expect(grupo.getByRole('radio', { checked: true })).toHaveCount(0);
@@ -177,29 +177,26 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await expect(page.getByText('Texto do primeiro artigo de CF/88.')).toBeVisible();
   }
 
-  async function marcar(page: Page, rotulo: string, inicio: number) {
-    const toques = (await gestos(page)).toques;
-    test.info().annotations.push({
-      type: rotulo,
-      description: `${String(toques)} toques, ${String(Date.now() - inicio)} ms`,
-    });
-    return toques;
-  }
-
-  test('"Agora não" e o Hoje vazio: da Chegada ao Art. 1º em cinco toques, sem digitar', async ({
-    page,
-  }) => {
+  test('da abertura ao Art. 1º em quatro toques, sem digitar', async ({ page }) => {
     await servirAcervo(page);
     await contarGestos(page);
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
+    await page.goto('/');
+    await expect(page.locator('.m-abertura')).toBeVisible();
 
     const inicio = Date.now();
-    await chegada(page).getByRole('button', { name: 'Agora não' }).click();
-    await doHojeAoArtigo1(page);
-    // (O quinto toque é a escolha do edital, 08/11.) Eram três toques com "Escolher meu concurso" dentro da folha; agora é o Hoje vazio que o oferece
-    // (decisão do Gabriel, 28/10): um toque a mais, o de dispensar a folha.
-    expect(await marcar(page, 'toques (Agora não)', inicio)).toBe(5);
+    // O primeiro toque pula a abertura e leva à pergunta da prova; nenhuma folha de boas-vindas abre sozinha.
+    await page.locator('.m-abertura').click();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Pra qual prova você estuda?' }),
+    ).toBeVisible();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await daProvaAoArtigo1(page);
+    const toques = (await gestos(page)).toques;
+    test.info().annotations.push({
+      type: 'toques (abertura)',
+      description: `${String(toques)} toques, ${String(Date.now() - inicio)} ms`,
+    });
+    expect(toques).toBe(4);
     expect((await gestos(page)).teclas).toBe(0);
 
     // As duas que o acervo tem entraram; a que falta no acervo não travou nada.
@@ -214,71 +211,22 @@ test.describe('primeiro uso, num aparelho novo', () => {
     await expect(page.getByRole('link', { name: 'Ciclo de estudo' })).toBeVisible();
   });
 
-  test('"Vamos", "Pular o passeio" e "Continuar sem conta": sete toques até o Art. 1º', async ({
+  /** Abre as Boas-vindas pelo "Rever as boas-vindas" da Ajuda (numa tela da casca legada, que tem o menu). */
+  async function reverAsBoasVindas(page: Page) {
+    await page.getByRole('button', { name: 'Ajuda', exact: true }).click();
+    await page.getByRole('button', { name: 'Rever as boas-vindas' }).click();
+    await expect(chegada(page)).toBeVisible();
+  }
+
+  test('a folha das boas-vindas tem só "Vamos" e "Agora não", sem nenhum caminho para outra tela', async ({
     page,
   }) => {
     await servirAcervo(page);
-    await contarGestos(page);
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
-
-    const inicio = Date.now();
-    await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    await page.getByRole('button', { name: 'Pular o passeio' }).click();
-    await page
-      .getByRole('dialog', { name: 'Vamo começar?' })
-      .getByRole('button', { name: 'Continuar sem conta e salvar meus dados manualmente' })
-      .click();
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await doHojeAoArtigo1(page);
-    expect(await marcar(page, 'toques (Pular o passeio)', inicio)).toBe(7);
-    expect((await gestos(page)).teclas).toBe(0);
-  });
-
-  test('o passeio inteiro, os três passos até o fim: nove toques até o Art. 1º', async ({
-    page,
-  }) => {
-    await servirAcervo(page);
-    await contarGestos(page);
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
-
-    const inicio = Date.now();
-    await chegada(page).getByRole('button', { name: 'Vamos' }).click();
-    for (const menu of ['Agora', 'Destino', 'Varal']) {
-      await expect(page.getByRole('heading', { level: 2, name: menu })).toBeVisible();
-      await page.getByRole('button', { name: 'Seguir' }).click();
-    }
-    await page
-      .getByRole('dialog', { name: 'Vamo começar?' })
-      .getByRole('button', { name: 'Continuar sem conta e salvar meus dados manualmente' })
-      .click();
-    await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await doHojeAoArtigo1(page);
-    expect(await marcar(page, 'toques (passeio inteiro)', inicio)).toBe(9);
-    expect((await gestos(page)).teclas).toBe(0);
-  });
-
-  test('a folha tem só "Vamos" e "Agora não", sem nenhum caminho para outra tela', async ({
-    page,
-  }) => {
-    await servirAcervo(page);
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
+    await page.goto('/#/recall');
+    await reverAsBoasVindas(page);
     await expect(chegada(page).getByRole('button')).toHaveText(['Agora não', 'Vamos']);
     await expect(chegada(page).getByRole('link')).toHaveCount(0);
     await expect(chegada(page).getByRole('heading', { level: 2 })).toBeFocused();
-  });
-
-  test('o Hoje vazio também começa por "Escolher meu concurso"', async ({ page }) => {
-    await servirAcervo(page);
-    await page.goto('/#/');
-    await chegada(page).getByRole('button', { name: 'Agora não' }).click();
-    await expect(comecos(page).getByRole('link', { name: 'Escolher meu concurso' })).toHaveClass(
-      /principal/,
-    );
-    await comecos(page).getByRole('link', { name: 'Escolher meu concurso' }).click();
-    await expect(page).toHaveURL(/#\/comecar$/);
   });
 
   test('a 320 × 568 "Agora não" e "Vamos" já estão na primeira tela da folha, sem rolar', async ({
@@ -286,8 +234,8 @@ test.describe('primeiro uso, num aparelho novo', () => {
   }) => {
     await servirAcervo(page);
     await page.setViewportSize({ width: 320, height: 568 });
-    await page.goto('/#/');
-    await expect(chegada(page)).toBeVisible();
+    await page.goto('/#/recall');
+    await reverAsBoasVindas(page);
     await expect(chegada(page).getByRole('button', { name: 'Agora não' })).toBeInViewport({
       ratio: 1,
     });
@@ -300,22 +248,16 @@ test.describe('primeiro uso, num aparelho novo', () => {
     page,
   }) => {
     await servirAcervo(page);
-    await page.goto('/#/');
-    await chegada(page).getByRole('button', { name: 'Agora não' }).click();
+    await page.goto('/#/recall');
     const ajuda = page.getByRole('button', { name: 'Ajuda', exact: true });
-    const reabrir = async () => {
-      await ajuda.click();
-      await page.getByRole('button', { name: 'Rever as boas-vindas' }).click();
-      await expect(chegada(page)).toBeVisible();
-    };
-    await reabrir();
+    await reverAsBoasVindas(page);
     await page.keyboard.press('Escape');
     await expect(ajuda).toBeFocused();
-    await reabrir();
+    await reverAsBoasVindas(page);
     await chegada(page).getByRole('button', { name: 'Agora não' }).click();
     await expect(ajuda).toBeFocused();
     // E depois do passeio refeito: "Concluir" também devolve o foco ao Ajuda.
-    await reabrir();
+    await reverAsBoasVindas(page);
     await chegada(page).getByRole('button', { name: 'Vamos' }).click();
     for (let i = 0; i < 2; i += 1) await page.getByRole('button', { name: 'Seguir' }).click();
     await page.getByRole('button', { name: 'Concluir' }).click();

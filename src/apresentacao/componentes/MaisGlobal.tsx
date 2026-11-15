@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
-import { DialogoDoLembrete } from '../hoje/DialogoDoLembrete';
+import { DialogoDoLembrete } from './lembrete/DialogoDoLembrete';
 import { useRegistroDeItens, type ItemDoMais } from './ItensDoMais';
 import { teclaForaDosAtalhos } from './teclado';
 

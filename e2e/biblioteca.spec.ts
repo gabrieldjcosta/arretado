@@ -10,10 +10,9 @@ test('Biblioteca vazia: "Importar norma" leva à importação e volta (9.5)', as
   await page.getByRole('link', { name: 'Importar norma' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Importar norma' })).toBeVisible();
   await expect(page).toHaveURL(/#\/biblioteca\/importar$/);
-  await expect(page.getByRole('link', { name: 'Biblioteca', exact: true })).toHaveAttribute(
-    'aria-current',
-    'page',
-  );
+  await expect(
+    page.getByRole('navigation', { name: 'Lugares' }).getByRole('link', { name: 'Varal' }),
+  ).toHaveAttribute('aria-current', 'page');
 
   await page.getByRole('link', { name: 'Voltar à Biblioteca' }).click();
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();
@@ -41,7 +40,7 @@ test('colar a LEP e o ECA compilados e publicar: as normas aparecem na Bibliotec
   await semViolacoes(page);
 
   // A faixa do rascunho pendente, e retomar por ela.
-  await page.getByRole('link', { name: 'Biblioteca', exact: true }).click();
+  await page.goto('/#/biblioteca');
   const faixa = page.getByRole('region', { name: 'Importações pendentes' });
   await expect(faixa).toContainText('Lei nº 7.210/1984: importação pendente de revisão');
   await expect(page.getByRole('heading', { name: 'Nenhuma norma ainda' })).toBeVisible();

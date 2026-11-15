@@ -6,7 +6,6 @@ import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
 import { gravarFio } from './dados/guardado';
-import { CHAVE_DA_INTERFACE } from './interface';
 
 const linha = (texto: string): Bloco => ({ trechos: [{ texto }] });
 const LEI: Bloco[] = [
@@ -20,9 +19,7 @@ const LEI: Bloco[] = [
 ];
 
 /** `comLei`: a disciplina com a lei ligada; `semLei`: só a disciplina, sem norma nenhuma. */
-async function abrir(
-  opcoes: { comLei?: boolean; semLei?: boolean; previa?: boolean; rota?: string } = {},
-) {
+async function abrir(opcoes: { comLei?: boolean; semLei?: boolean; rota?: string } = {}) {
   const { repo } = await repositorioDeTeste();
   if (opcoes.comLei || opcoes.semLei) {
     const disciplina = await repo.colecao('disciplinas').criar({ nome: 'Execução Penal' });
@@ -34,7 +31,6 @@ async function abrir(
         .criar({ normaId: norma.id, disciplinaId: disciplina.id });
     }
   }
-  window.localStorage.setItem(CHAVE_DA_INTERFACE, opcoes.previa === false ? 'atual' : 'fio');
   window.location.hash = opcoes.rota ?? '#/';
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(repo)} />);
@@ -44,20 +40,40 @@ async function abrir(
 /** O texto do Art. 2º na lei do teste: a conta certa do Lembrar é a que ele traz. */
 const ART_2 = 'O prazo de recurso é de 30 (trinta) dias.';
 
-afterEach(() => {
-  window.localStorage.removeItem(CHAVE_DA_INTERFACE);
-});
-
-describe('o Arretado novo (prévia do Fio)', () => {
-  it('desligada, abre o Hoje de sempre e as rotas novas voltam a ele', async () => {
-    await abrir({ previa: false, rota: '#/destino' });
+describe('o Fio', () => {
+  it('os links antigos da prévia levam ao Agora', async () => {
+    await abrir({ rota: '#/fio/desligar' });
     await waitFor(() => {
       expect(window.location.hash).toBe('#/');
     });
-    expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
   });
 
-  it('ligada, mostra os três lugares embaixo, com o Agora aceso', async () => {
+  it('a tela de carregamento do index.html só sai com a casca na tela (ela baixa à parte)', async () => {
+    document.body.insertAdjacentHTML('afterbegin', '<div id="carregamento" role="status"></div>');
+    const tela = document.getElementById('carregamento');
+    if (!tela) throw new Error('a tela de teste não foi montada');
+    // O que havia na página no instante em que a tela começou a sair.
+    let cascaNaSaida: boolean | null = null;
+    const olho = new MutationObserver(() => {
+      if (cascaNaSaida === null && tela.hasAttribute('data-saindo'))
+        cascaNaSaida = document.querySelector('.m-app') !== null;
+    });
+    olho.observe(tela, { attributes: true, attributeFilter: ['data-saindo'] });
+    try {
+      await abrir();
+      await screen.findByRole('navigation', { name: 'Lugares' });
+      await waitFor(() => {
+        expect(tela).toHaveAttribute('data-saindo');
+      });
+      expect(cascaNaSaida).toBe(true);
+    } finally {
+      olho.disconnect();
+      tela.remove();
+    }
+  });
+
+  it('mostra os três lugares embaixo, com o Agora aceso', async () => {
     await abrir();
     const nav = await screen.findByRole('navigation', { name: 'Lugares' });
     const lugares = within(nav).getAllByRole('button');
@@ -451,15 +467,5 @@ describe('o Arretado novo (prévia do Fio)', () => {
     await usuario.click(await screen.findByText('Frases', { selector: 'strong' }));
     expect(await screen.findByRole('dialog', { name: 'Suas Frases certas' })).toBeInTheDocument();
     expect(window.location.hash).toBe('#/varal');
-  });
-
-  it('a Conta volta à interface de antes e à cara nova', async () => {
-    const { usuario } = await abrir({ rota: '#/conta' });
-    await usuario.click(await screen.findByRole('button', { name: 'Voltar ao de sempre' }));
-    await waitFor(() => {
-      expect(screen.queryByRole('navigation', { name: 'Lugares' })).not.toBeInTheDocument();
-    });
-    await usuario.click(await screen.findByRole('button', { name: 'Voltar à cara nova' }));
-    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
   });
 });

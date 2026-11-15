@@ -3,6 +3,7 @@ import {
   animacoesVistas,
   expect,
   importarEPublicar,
+  irAoAgora,
   registrarAnimacoes,
   semViolacoesNoFio,
   test,
@@ -38,8 +39,7 @@ async function prepararAPrevia(page: Page, comLei: boolean) {
     await expect(page.getByText('Disciplina de LEP atualizada.')).toBeVisible();
   }
 
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
+  await irAoAgora(page);
 }
 
 const mapa = (page: Page) => page.getByRole('group', { name: 'Mapa do caminho pelo Nordeste' });

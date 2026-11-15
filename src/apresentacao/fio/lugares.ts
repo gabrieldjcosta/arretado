@@ -22,11 +22,18 @@ export const ROTA_DO_POUSO = '/fio/pouso';
 /** A pergunta de quem ainda não escolheu a prova (a tela `prova` do mockup). */
 export const ROTA_DA_PROVA = '/fio/prova';
 
+/** A norma aberta no Leitor (`/biblioteca/normas/:id`); o mapa da norma é outra tela. */
+export const noLeitor = (caminho: string): boolean =>
+  /^\/biblioteca\/normas\/[^/]+\/?$/.test(caminho);
+
 /**
  * O pouso é um momento: a pílula dos três lugares some enquanto ele dura, e a saída é o fio ou "descansar"
  * (a pílula volta quando a pessoa sai). Assim a saída do pouso fica à vista, sem a pílula por cima.
+ * A norma aberta também não leva a pílula (D-D25: o Leitor abre por dentro do lugar de onde a pessoa veio, sem barra
+ * de abas): ela cobria a barra do Leitor no celular e o texto no monitor, e a saída é o "Voltar".
  */
-export const semPilulaDosLugares = (caminho: string): boolean => caminho === ROTA_DO_POUSO;
+export const semPilulaDosLugares = (caminho: string): boolean =>
+  caminho === ROTA_DO_POUSO || noLeitor(caminho);
 
 /**
  * Em que lugar a rota mora. As telas de hoje que ainda não têm casa nova ficam no lugar delas (D-D25): a

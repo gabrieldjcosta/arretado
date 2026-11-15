@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { Repositorio } from '../../core/persistencia';
+import { segurarCarregamento } from '../carregamento';
 import { ProvedorRepositorio } from './ProvedorRepositorio';
 
 function montarTela() {
@@ -40,6 +41,25 @@ describe('Provedor do repositório e a tela de carregamento do index.html', () =
       },
       { timeout: 2000 },
     );
+  });
+
+  it('com a casca ainda baixando (ela segura a tela), a rede de segurança não a tira', async () => {
+    montarTela();
+    const soltar = segurarCarregamento();
+    try {
+      const repo = await Repositorio.abrir({ nomeBanco: `carregamento-${String(Math.random())}` });
+      render(
+        <ProvedorRepositorio abrir={() => Promise.resolve(repo)}>
+          <p>app</p>
+        </ProvedorRepositorio>,
+      );
+      expect(await screen.findByText('app')).toBeInTheDocument();
+      await new Promise((resolver) => setTimeout(resolver, 900));
+      expect(document.getElementById('carregamento')).toBeInTheDocument();
+      expect(document.getElementById('carregamento')).not.toHaveAttribute('data-saindo');
+    } finally {
+      soltar();
+    }
   });
 
   it('se o banco não abre, a tela sai e a explicação aparece', async () => {

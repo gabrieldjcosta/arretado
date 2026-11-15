@@ -11,6 +11,7 @@ import { CactoMarca } from './CactoMarca';
 import { DiasDoFioM } from './DiasDoFioM';
 import { ContaM } from './ContaM';
 import { PuxarM } from './PuxarM';
+import { RetornoM } from './RetornoM';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
 
@@ -141,6 +142,7 @@ export function AgoraM() {
         </>
       )}
       <DiasDoFioM />
+      <RetornoM />
       <ContaM
         aberta={contaAberta}
         aoFechar={() => {

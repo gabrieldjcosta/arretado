@@ -1,9 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Repositorio } from '../../core/persistencia';
-import { abrirNorma } from '../../dominios/legislacao/leitor';
-import { gravarPosicao } from '../../dominios/legislacao/leituras';
-import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { criarCartaoManual } from '../../dominios/recall/servico';
 import { iniciarSessao } from '../../dominios/sessao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
@@ -14,84 +11,17 @@ async function abrir(rota: string, repo?: Repositorio) {
   window.location.hash = `#${rota}`;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(r)} />);
-  await screen.findByRole('navigation', { name: 'Áreas' });
+  await screen.findByRole('navigation', { name: 'Lugares' });
   return { repo: r, usuario };
 }
 
-/** Um cartão vencido faz o Agora ser uma ação (no Hoje vazio o cartão de Sessão não aparece). */
+/** Um cartão vencido à espera: há o que fazer depois da Sessão, e quem escolhe o quê é o Agora. */
 async function repoComAgora() {
   const { repo } = await repositorioDeTeste();
   const c = await criarCartaoManual(repo, { frente: 'a', verso: 'b' });
   await repo.colecao('cartoes').atualizar(c.id, { proximaRevisao: '2000-01-01' });
   return repo;
 }
-
-/**
- * Uma leitura salva hoje acende o ponto da Leitura. Desde a D-D16 a fileira dos pontos só aparece depois
- * do primeiro ponto aceso, e ela é o sinal de que o retrato do Hoje já chegou.
- */
-async function lerHoje(repo: Repositorio) {
-  const { versao } = await criarRascunho(repo, {
-    blocos: [
-      { trechos: [{ texto: 'Art. 1º A execução penal tem por objetivo efetivar a sentença.' }] },
-    ],
-    origemEntrada: 'html',
-    tituloCurto: 'LEP',
-  });
-  const { norma } = await publicarVersao(repo, versao.id);
-  const { nos } = await abrirNorma(repo, norma.id);
-  await gravarPosicao(
-    repo,
-    norma.id,
-    nos.find((n) => n.dispositivo.tipo === 'artigo')!.dispositivo.id,
-  );
-}
-
-describe('Atividade da Sessão no Hoje', () => {
-  it('um toque no tipo começa a Sessão com a atividade e leva à tela dela', async () => {
-    const { repo, usuario } = await abrir('/', await repoComAgora());
-    await usuario.click(await screen.findByRole('button', { name: /Jurisprudência/ }));
-    await waitFor(() => {
-      expect(window.location.hash).toBe('#/biblioteca/precedentes');
-    });
-    const [s] = await repo.colecao('sessoes').todosDoUsuario();
-    expect(s).toMatchObject({ estado: 'ativa', atividade: 'jurisprudencia' });
-  });
-
-  it('sugere questões quando não há leitura nem escolha anterior', async () => {
-    await abrir('/', await repoComAgora());
-    const sugerido = await screen.findByRole('button', { name: /Questões/ });
-    expect(sugerido).toHaveTextContent('(sugerido)');
-    // A linha abre recolhida (D-D16): um segundo cartão não disputa o Começar do Agora.
-    expect(sugerido.closest('details')).not.toHaveAttribute('open');
-  });
-
-  it('com Sessão aberta, o cartão de começar some', async () => {
-    const { repo } = await repositorioDeTeste();
-    await iniciarSessao(repo, { atividade: 'lei' });
-    await abrir('/', repo);
-    expect(await screen.findByRole('region', { name: 'Sessão aberta' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
-  });
-
-  it('com Sessão aberta e uma Próxima ação, o Hoje tem um só Continuar e não tem o Agora', async () => {
-    const repo = await repoComAgora();
-    await lerHoje(repo);
-    await iniciarSessao(repo, { atividade: 'lei' });
-    await abrir('/', repo);
-    await screen.findByRole('region', { name: 'Sessão aberta' });
-    // O retrato já chegou: sem isto o Agora faltaria só por estar carregando (e o teste passaria sem a mudança).
-    await screen.findByRole('list', { name: 'Andamento do Dia' });
-    expect(screen.queryByRole('region', { name: 'Agora' })).toBeNull();
-    expect(screen.getAllByRole('link', { name: /^Continuar/ })).toHaveLength(1);
-  });
-});
-
-it('no Hoje vazio não há cartão de Sessão: o começo é um só', async () => {
-  await abrir('/');
-  await screen.findByRole('heading', { name: 'Por onde começar?' });
-  expect(screen.queryByRole('heading', { name: 'Começar uma Sessão' })).toBeNull();
-});
 
 describe('Sessão de questões', () => {
   it('Acertei e Errei contam; Errei guarda o erro ligado à Sessão com só a frase correta', async () => {
@@ -206,7 +136,7 @@ describe('Canto da Sessão', () => {
 });
 
 describe('Encerrar com resumo', () => {
-  it('mostra o que ficou da Sessão e a ponte para a ação do Agora', async () => {
+  it('mostra o que ficou da Sessão e um caminho só, de volta ao Agora', async () => {
     const repo = await repoComAgora();
     await iniciarSessao(repo, { atividade: 'questoes' });
     const { usuario } = await abrir('/sessao/atual', repo);
@@ -220,8 +150,8 @@ describe('Encerrar com resumo', () => {
     expect(await screen.findByRole('heading', { name: 'Sessão encerrada' })).toBeInTheDocument();
     expect(await screen.findByText(/1 de 2 questões certas/)).toBeInTheDocument();
     expect(await screen.findByText(/1 erro guardado: entra nas suas revisões/)).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /^Seguir:/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ir para o Hoje' })).toHaveClass('principal');
+    expect(screen.getByRole('link', { name: 'Ir para o Agora' })).toHaveClass('principal');
+    expect(screen.queryByRole('link', { name: /^Seguir/ })).toBeNull();
     expect(screen.getByRole('link', { name: 'Ver os erros' })).toBeInTheDocument();
   });
 });

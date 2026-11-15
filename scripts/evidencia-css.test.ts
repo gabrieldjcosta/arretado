@@ -125,12 +125,8 @@ describe('o anel de evidência: o contorno do cartão continua (WCAG 1.4.11)', (
 });
 
 describe('o anel de evidência: onde vale (lista fechada, D-D13)', () => {
-  it('só o Agora do Hoje pede o anel: `emEvidencia` mora no cartão e em dois usos do Hoje', () => {
-    expect(quem(/\bemEvidencia\b/, '.tsx')).toEqual([
-      'AcaoAgora.tsx',
-      'Agora.tsx',
-      'RevisaoPorTempo.tsx',
-    ]);
+  it('só a ação do Agora pede o anel: `emEvidencia` mora no cartão', () => {
+    expect(quem(/\bemEvidencia\b/, '.tsx')).toEqual(['AcaoAgora.tsx']);
     expect(quem(/acao-agora evidencia/, '.tsx')).toEqual(['AcaoAgora.tsx']);
   });
 

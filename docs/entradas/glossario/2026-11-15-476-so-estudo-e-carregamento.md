@@ -1,0 +1,3 @@
+**Só estudo na casca do Fio** (15/11/2026; troca o que a linha "Só estudo (UI)" diz que some): com `document.body.dataset.soEstudo`, `estilos-alavancas.css` esconde a pílula dos lugares (`.fio-nav`, sem reservar a altura dela) e deixa invisíveis, sem tirá-los do lugar, o menu da conta (`.fio-menu`) e a Ajuda. O nome, o "+" e o interruptor ficam.
+
+**Segurar a tela de carregamento** (15/11/2026): `segurarCarregamento()` e `carregamentoSeguro()`, em `apresentacao/carregamento.ts`. Enquanto a casca do Fio baixa (ela é um pedaço `lazy`), o `fallback` do `Shell` (`CascaACaminho`) segura a tela do `index.html`, e a rede de segurança do `ProvedorRepositorio` não a tira. Quem tira é a casca ao aparecer (`CascaDoFio`) ou, se ela não baixa, o `LimiteDeErro`.

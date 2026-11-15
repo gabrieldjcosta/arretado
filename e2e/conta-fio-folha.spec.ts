@@ -1,13 +1,11 @@
-import { expect, semViolacoesNoFio, test } from './apoio';
+import { expect, irAoAgora, semViolacoesNoFio, test } from './apoio';
 import { entrarPorCodigo } from './conta-apoio';
 
 // A folha da Conta do Fio com a chave de contas ligada (o build do serviço falso, T30): sem conta oferece entrar; com
 // conta mostra quem é, o anel se fecha e "Sair desta conta" leva à tela que confirma.
 
 async function abrirAConta(page: import('@playwright/test').Page) {
-  await page.goto('/#/fio/ligar');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
-  await page.goto('/#/');
+  await irAoAgora(page);
   await page.getByRole('button', { name: 'Menu: sua conta e ajustes' }).click();
   return page.getByRole('dialog');
 }

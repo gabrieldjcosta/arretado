@@ -23,7 +23,7 @@ async function abrir(rota: string, repo?: Repositorio) {
   window.location.hash = `#${rota}`;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(r)} />);
-  await screen.findByRole('navigation', { name: 'Áreas' });
+  await screen.findByRole('navigation', { name: 'Lugares' });
   return { repo: r, usuario };
 }
 
@@ -542,6 +542,11 @@ describe('cota e início do Recall (fatia 3)', () => {
     await usuario.click(screen.getByRole('link', { name: 'Começar' }));
     await usuario.keyboard(' ');
     await usuario.keyboard('3');
+    // O fim da rodada volta ao Agora: é de lá que o passo "Revisar" do Fio abre esta tela.
+    expect(await screen.findByRole('link', { name: 'Voltar ao Agora' })).toHaveAttribute(
+      'href',
+      '#/',
+    );
     await usuario.click(await screen.findByRole('link', { name: 'Seguir para as frases (1)' }));
     expect(await screen.findByText('Frase correta do dia.')).toBeInTheDocument();
   });

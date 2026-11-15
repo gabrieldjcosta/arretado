@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useRepositorio } from '../../dados/contexto';
-import { DialogoDoLembrete } from '../../hoje/DialogoDoLembrete';
+import { DialogoDoLembrete } from '../../componentes/lembrete/DialogoDoLembrete';
 import { useDadosDoFio } from '../dados/sem-vazio';
 import { animar, espera, modoAgora, MOLA, useSinal } from './anima';
 import { CadernoM } from './CadernoM';

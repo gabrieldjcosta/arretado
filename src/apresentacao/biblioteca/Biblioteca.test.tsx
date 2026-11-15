@@ -87,11 +87,6 @@ describe('Biblioteca › Normas (9.5)', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Importar norma' }),
     ).toBeInTheDocument();
-    // A Biblioteca continua marcada na navegação.
-    expect(screen.getByRole('link', { name: 'Biblioteca' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
   });
 
   it('vazio sem plano: "Escolher meu concurso" é o principal, com o acervo e a importação ao lado, sem botão de edital', async () => {
@@ -191,7 +186,9 @@ describe('Biblioteca › Normas (9.5)', () => {
     await usuario.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Descartar' }),
     );
-    expect(await screen.findByRole('status')).toHaveTextContent('Importação de ECA descartada.');
+    expect(
+      (await screen.findByText('Importação de ECA descartada.')).closest('[role="status"]'),
+    ).not.toBeNull();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     const faixa = screen.getByRole('region', { name: 'Importações pendentes' });
     await waitFor(() => {

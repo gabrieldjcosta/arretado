@@ -24,6 +24,80 @@ describe('frasesDoTexto', () => {
       'e III - detenção.',
     ]);
   });
+  it('não parte dentro de parênteses; o parêntese sem par não segura a frase', () => {
+    expect(
+      partes(
+        'O prazo é de 30 dias (salvo se houver recurso; nesse caso, 60 dias). Depois, arquiva-se.',
+      ),
+    ).toEqual([
+      'O prazo é de 30 dias (salvo se houver recurso; nesse caso, 60 dias).',
+      'Depois, arquiva-se.',
+    ]);
+    expect(
+      partes(
+        'Compete ao juiz (art. 66, III; art. 68) decidir; e ao Ministério Público, fiscalizar.',
+      ),
+    ).toEqual([
+      'Compete ao juiz (art. 66, III; art. 68) decidir;',
+      'e ao Ministério Público, fiscalizar.',
+    ]);
+    expect(partes('Segue a regra (Res. CNJ nº 113, de 2010. Ver o anexo) do tribunal.')).toEqual([
+      'Segue a regra (Res. CNJ nº 113, de 2010. Ver o anexo) do tribunal.',
+    ]);
+    expect(partes('Aplica-se a Res. CNJ nº 113 ao caso.')).toEqual([
+      'Aplica-se a Res. CNJ nº 113 ao caso.',
+    ]);
+    expect(partes('a) primeiro item; b) segundo item (sem fechar; terceiro.')).toEqual([
+      'a) primeiro item;',
+      'b) segundo item (sem fechar;',
+      'terceiro.',
+    ]);
+    // O parêntese sem par mais cedo na linha não tira a proteção do par que vem depois.
+    expect(partes('Abre (e não fecha, e segue (art. 66, III; art. 68) até o fim.')).toEqual([
+      'Abre (e não fecha, e segue (art. 66, III; art. 68) até o fim.',
+    ]);
+    // O parêntese aberto numa linha não segura a seguinte.
+    expect(partes('Abre (e não fecha;\nsegunda linha; fim.')).toEqual([
+      'Abre (e não fecha;',
+      'segunda linha;',
+      'fim.',
+    ]);
+  });
+  it('o número no fim da frase fecha; o do artigo citado e o do item numerado, não', () => {
+    expect(partes('Vale a Lei nº 7.210, de 1984. O juiz decidirá.')).toEqual([
+      'Vale a Lei nº 7.210, de 1984.',
+      'O juiz decidirá.',
+    ]);
+    expect(partes('Aplica-se o disposto no art. 11. O juiz decidirá.')).toEqual([
+      'Aplica-se o disposto no art. 11.',
+      'O juiz decidirá.',
+    ]);
+    expect(partes('"Art. 83. O juiz poderá conceder o livramento."')).toEqual([
+      '"Art. 83. O juiz poderá conceder o livramento."',
+    ]);
+    expect(partes('1. Primeiro item; 2. Segundo item.')).toEqual([
+      '1. Primeiro item;',
+      '2. Segundo item.',
+    ]);
+    // O rótulo com ponto no meio é um número só.
+    expect(partes('"Art. 1.036. Selecionados os recursos, o relator decidirá."')).toEqual([
+      '"Art. 1.036. Selecionados os recursos, o relator decidirá."',
+    ]);
+    expect(partes('1.1. Para os fins desta resolução, considera-se preso provisório.')).toEqual([
+      '1.1. Para os fins desta resolução, considera-se preso provisório.',
+    ]);
+    // E no fim da frase ele fecha, como o de um grupo só.
+    expect(partes('A multa é de 1.000. O juiz decidirá.')).toEqual([
+      'A multa é de 1.000.',
+      'O juiz decidirá.',
+    ]);
+  });
+  it('"lei" no fim fecha a frase', () => {
+    expect(partes('O preso tem os direitos previstos em lei. O juiz decide.')).toEqual([
+      'O preso tem os direitos previstos em lei.',
+      'O juiz decide.',
+    ]);
+  });
   it('não perde nem repete texto e cobre texto sem pontuação', () => {
     expect(partes('sem ponto algum')).toEqual(['sem ponto algum']);
     expect(frasesDoTexto('   ')).toEqual([]);

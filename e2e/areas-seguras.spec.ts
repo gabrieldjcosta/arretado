@@ -24,7 +24,7 @@ interface Aparelho {
 }
 
 const APARELHOS: Aparelho[] = [
-  // Ilha dinâmica no alto, indicador de início embaixo: o telefone em pé (abas embaixo).
+  // Ilha dinâmica no alto, indicador de início embaixo: o telefone em pé (pílula embaixo).
   {
     nome: 'iPhone em pé',
     largura: 393,
@@ -32,14 +32,14 @@ const APARELHOS: Aparelho[] = [
     area: { top: 59, bottom: 34, left: 0, right: 0 },
   },
   // Deitado, a ilha vai para um lado (59 px nos dois, para valer virado para qualquer um): 852 px
-  // ainda é o desenho de tablet em pé, com as abas embaixo.
+  // ainda é o desenho de tablet em pé, com a pílula embaixo.
   {
     nome: 'iPhone deitado',
     largura: 852,
     altura: 393,
     area: { top: 0, bottom: 21, left: 59, right: 59 },
   },
-  // O Pro Max deitado passa de 900 px: as abas sobem para o cabeçalho.
+  // O Pro Max deitado passa de 900 px: o quadro e o cabeçalho ganham as margens largas do monitor.
   {
     nome: 'iPhone Pro Max deitado',
     largura: 932,
@@ -49,7 +49,7 @@ const APARELHOS: Aparelho[] = [
 ];
 
 const TELAS = [
-  ['/', 'Hoje'],
+  ['/', 'Agora'],
   ['/plano', 'Trilha'],
   ['/recall/frases', 'Fixar'],
   ['/biblioteca', 'Biblioteca'],
@@ -249,14 +249,6 @@ for (const aparelho of APARELHOS) {
       await page.goto(`/#${rota}`);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       await semInvasoes(page, aparelho.area);
-      if (aparelho.largura >= 900) {
-        // A partir de 900 px o cabeçalho segue a coluna do conteúdo, também com a área segura dos lados.
-        const [marca, titulo] = await page.evaluate(() => [
-          document.querySelector('.marca')?.getBoundingClientRect().left ?? -1,
-          document.querySelector('main h1')?.getBoundingClientRect().left ?? -2,
-        ]);
-        expect(Math.abs(marca - titulo), 'a marca alinha com o título').toBeLessThanOrEqual(1);
-      }
     });
   }
 
@@ -314,9 +306,9 @@ for (const aparelho of APARELHOS) {
     await expect(page.getByRole('heading', { level: 1, name: 'Sessão' })).toBeVisible();
     await semInvasoes(page, aparelho.area);
 
-    // Sem as abas nem o rodapé, o que a casca reserva embaixo é só a área segura do aparelho.
+    // Sem a pílula dos lugares, o que a casca reserva embaixo é só a área segura do aparelho.
     await page.getByRole('checkbox', { name: 'Só estudo' }).click();
-    await expect(page.getByRole('navigation', { name: 'Áreas' })).toBeHidden();
+    await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeHidden();
     await semInvasoes(page, aparelho.area);
   });
 }

@@ -88,7 +88,7 @@ describe('Escolher meu concurso › Qual concurso você estuda?', () => {
 
     const outro = screen.getByRole('link', { name: /^Outro concurso, ou ainda não sei/ });
     expect(outro).toHaveAttribute('href', '#/biblioteca/acervo');
-    expect(screen.getByRole('link', { name: 'Voltar ao Hoje' })).toHaveAttribute('href', '#/');
+    expect(screen.getByRole('link', { name: 'Voltar ao Agora' })).toHaveAttribute('href', '#/');
   });
 
   it('sem o pacote (sem internet, por exemplo) diz o que fazer, e tentar de novo funciona', async () => {

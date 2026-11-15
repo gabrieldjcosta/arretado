@@ -21,7 +21,6 @@ import {
   type Intervalo,
   type Leitura,
   type Marcacao,
-  type Preferencias,
   type TextoDeDispositivo,
   type TipoDispositivo,
 } from '../../core/modelo';
@@ -52,11 +51,17 @@ import { BarraFina } from '../componentes/BarraFina';
 import { Icone } from '../componentes/Icone';
 import { FioDaRolagem } from './FioDaRolagem';
 import { MarcadorDePagina } from './MarcadorDePagina';
-import { useLeituraFunda } from './leitura-funda';
 import { useItensDoMais } from '../componentes/ItensDoMais';
 import { Voltar } from '../componentes/Voltar';
+import { deOndeVeio } from '../fio/volta-do-leitor';
 import { useLarguraMaxima, useLarguraMinima } from '../componentes/largura';
 import { teclaForaDosAtalhos } from '../componentes/teclado';
+import {
+  AjustesDeLeitura,
+  TAMANHO_MAXIMO,
+  TAMANHO_MINIMO,
+  type ReguaDeFoco,
+} from './AjustesDeLeitura';
 import { BandejaDoFoco, SetasDoCartao, type LenteDoFoco } from './BandejaDoFoco';
 import { useDados, useRepositorio } from '../dados/contexto';
 import { AcoesDoDispositivo, type AlvoDasAcoes } from './AcoesDoDispositivo';
@@ -65,10 +70,11 @@ import { criarCartaoDoTrecho } from './cartao-do-trecho';
 import { BotaoDaEstrela } from './Estrela';
 import { MaisDoLeitor } from './MaisDoLeitor';
 import { EstruturaDaNorma } from './EstruturaDaNorma';
+import { SumarioDaNorma } from './SumarioDaNorma';
 import { dispositivosComErro } from './errosVinculados';
 import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
 import { FiltroDaNorma, type OpcaoDeBloco } from './FiltroDaNorma';
-import { useReguaDeFoco, temRealce } from './useReguaDeFoco';
+import { useReguaDeFoco } from './useReguaDeFoco';
 import { pedacosDoTexto, type MarcasDoTexto, type RemissaoNoTexto } from './destacar';
 import { PreviaDaRemissao, type EstadoDaPrevia } from './PreviaDaRemissao';
 import { criarResolvedorDeRemissoes, type ResolvedorDeRemissoes } from './remissoes';
@@ -108,9 +114,6 @@ import {
 const MARGEM_DE_TEXTOS = 60;
 /** Linhas desenhadas além da borda da tela. */
 const LINHAS_DE_MARGEM = 8;
-const TAMANHO_MINIMO = 12;
-const TAMANHO_MAXIMO = 32;
-const PASSO_DO_TAMANHO = 2;
 const TAMANHO_PADRAO = 18;
 const MAXIMO_DE_RECUO = 4;
 /** A partir daqui (tablet em pé) a estrutura da norma fica ao lado do texto (P4). */
@@ -139,6 +142,11 @@ const ESPERA_PARA_GRAVAR = 800;
 const QUADROS_NO_LUGAR = 3;
 /** Depois disto, a tela aparece onde estiver, mesmo sem ter chegado à posição guardada. */
 const LIMITE_PARA_VOLTAR = 2000;
+/**
+ * Por quanto tempo, depois de um toque no tamanho do texto, o dispositivo do alto fica seguro: cobre os toques
+ * seguidos e a chegada do tamanho gravado, que é quando a letra muda de verdade na tela.
+ */
+const SEGURA_O_ALTO = 1500;
 /** Quadros em que o alto da tela é reconferido depois de trocar o modo foco (as linhas se remedem). */
 const QUADROS_DA_TROCA = 12;
 /** As teclas que rolam a página: a pessoa rolando encerra a conferência do alto (F e Esc, não). */
@@ -317,9 +325,7 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
   }
   return (
     <>
-      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
-        Biblioteca
-      </Voltar>
+      <Voltar para={deOndeVeio()}>Voltar</Voltar>
       {carga.tipo === 'carregando' ? (
         <Esqueleto />
       ) : carga.excecao instanceof NormaIndisponivel ? (
@@ -331,7 +337,7 @@ function LeitorDaNorma({ normaId }: { normaId: string }) {
       ) : (
         <Falha
           oQue="Não foi possível abrir a norma."
-          oQueFazer="Volte à Biblioteca e tente de novo. Se continuar, feche as outras abas do Arretado."
+          oQueFazer="Volte e tente de novo. Se continuar, feche as outras abas do Arretado."
         />
       )}
     </>
@@ -405,9 +411,9 @@ function useTextos(
   return { textos, pedir, emVoo, falhou, tentarDeNovo, tentativa };
 }
 
-/** Onde termina a barra fixa do Shell (`.topo`, sticky): o que fica abaixo dela é o alto da tela. */
+/** Onde termina o cabeçalho preso da casca (`.fio-topo`, sticky): o que fica abaixo dele é o alto da tela. */
 function fimDaBarraFixa(): number {
-  const barra = document.querySelector('.topo');
+  const barra = document.querySelector('.fio-topo');
   return barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
 }
 
@@ -459,6 +465,10 @@ function LeitorAberto({
   // Linha ativa (peça 1): a que está sob o dedo, o cursor ou o foco. Mostra o botão da estrela e,
   // com a régua de leitura ligada (fatia 4), recebe o realce.
   const reguaLigada = preferencias?.reguaDeLeitura ?? false;
+  // A folha dos ajustes de leitura (tamanho, destaques, foco na frase): abre pelo "Aa" da barra, pelo "⋯" e pela bandeja.
+  const [ajustesAbertos, setAjustesAbertos] = useState(false);
+  // O sumário da norma numa folha: onde o painel da estrutura não está ao lado do texto (celular e modo foco).
+  const [sumarioAberto, setSumarioAberto] = useState(false);
   const [linhaAtivaId, setLinhaAtivaId] = useState<string | null>(null);
   const [abertos, setAbertos] = useState<ReadonlySet<string>>(new Set());
   // O que o leitor de tela ouve (role=status): o "lido até" marcado e a troca do modo foco.
@@ -477,7 +487,6 @@ function LeitorAberto({
   const chaveDaRota = rota.key;
   const navegar = useNavigate();
   const modoFoco = busca.has(PARAMETRO_DO_FOCO);
-  useLeituraFunda(true);
   // Artigo por artigo (11.8): o modo foco com o cartão de um artigo no lugar da lista.
   const porArtigo = busca.get(PARAMETRO_DO_FOCO) === VALOR_DO_ARTIGO;
   const porArtigoAgora = useRef(porArtigo);
@@ -824,14 +833,17 @@ function LeitorAberto({
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.repeat || teclaForaDosAtalhos(e)) return;
-      if (
-        porArtigo &&
-        (e.key === 'ArrowRight' || e.key === 'ArrowLeft') &&
-        !e.shiftKey &&
-        document.getSelection()?.isCollapsed !== false
-      ) {
+      // No cartão: as setas e, como nos leitores de lista, J (próximo) e K (anterior).
+      const letra = e.key.toLowerCase();
+      const passo =
+        e.key === 'ArrowRight' || letra === 'j'
+          ? irAoProximo
+          : e.key === 'ArrowLeft' || letra === 'k'
+            ? irAoAnterior
+            : undefined;
+      if (porArtigo && passo && !e.shiftKey && document.getSelection()?.isCollapsed !== false) {
         e.preventDefault();
-        (e.key === 'ArrowRight' ? irAoProximo : irAoAnterior).current();
+        passo.current();
         return;
       }
       if (e.key === TECLA_DA_BUSCA) {
@@ -1066,6 +1078,49 @@ function LeitorAberto({
     if (linha === undefined || linha === 0) window.scrollTo(0, 0);
     else irParaLinha(linha);
   }, [linhas, irParaLinha]);
+  // Outro tamanho de texto muda a altura de todas as linhas, as de cima também: sem isto, quem o ajusta no meio da
+  // norma (a folha dos ajustes abre de qualquer ponto) ficava com outro trecho no alto da tela. A posição é o
+  // dispositivo, nunca os pixels: o que estava no alto volta ao alto. Vale de novo quando o tamanho gravado chega,
+  // que é quando a letra muda de verdade (a preferência grava antes de a tela se redesenhar).
+  const noAltoNaTroca = useRef<{ indice: number; ate: number } | undefined>(undefined);
+  const tamanhoGravado = preferencias?.tamanhoFonte;
+  useEffect(() => {
+    const seguro = noAltoNaTroca.current;
+    if (!seguro || performance.now() >= seguro.ate || porArtigoAgora.current) return;
+    const linha = linhaDoNo(linhas, seguro.indice);
+    if (linha !== undefined && linha > 0) irParaLinha(linha);
+  }, [tamanho, tamanhoGravado, linhas, irParaLinha]);
+  // Rolar entre dois toques solta o alto que o toque anterior segurou: o toque seguinte segura o que está na tela.
+  useEffect(() => {
+    const soltar = (e: Event) => {
+      const seguro = noAltoNaTroca.current;
+      if (!seguro) return;
+      // Vencido o prazo, o toque já não segura nada: a rolagem de agora não corta outra ida (filtro, "ir para").
+      if (performance.now() >= seguro.ate) {
+        noAltoNaTroca.current = undefined;
+        return;
+      }
+      const alvo = e.target instanceof Element ? e.target : null;
+      if (e instanceof KeyboardEvent) {
+        if (!TECLAS_DE_ROLAGEM.has(e.key)) return;
+        // No campo a tecla age nele; na folha ("Aa") ela não rola a lei; no botão o espaço aperta.
+        if (alvo?.closest('input, select, textarea, dialog')) return;
+        if (e.key === ' ' && alvo?.closest('button, a')) return;
+      } else if (e.type === 'touchmove' && alvo?.closest('button')) {
+        // O dedo que escorrega no toque de um botão não é rolagem.
+        return;
+      }
+      noAltoNaTroca.current = undefined;
+      cancelAnimationFrame(indo.current);
+    };
+    const encerrar = new AbortController();
+    for (const gesto of ['wheel', 'touchmove', 'keydown']) {
+      window.addEventListener(gesto, soltar, { passive: true, signal: encerrar.signal });
+    }
+    return () => {
+      encerrar.abort();
+    };
+  }, []);
   /** O nó tem linha na lista de agora (o filtro não o escondeu; a rubrica vale a linha do pai). */
   const visivelNoFiltro = (indice: number) => {
     if (!filtro) return true;
@@ -1094,6 +1149,13 @@ function LeitorAberto({
   const estrutura = useMemo(() => indiceDaEstrutura(nos), [nos]);
   const larguraDeTablet = useLarguraMinima(LARGURA_DA_ESTRUTURA);
   const comEstrutura = larguraDeTablet && !modoFoco && temEstrutura(estrutura);
+  // Sem o painel na tela (celular, modo foco), o sumário abre numa folha, pelo "⋯" e pela bandeja.
+  const abrirSumario =
+    temEstrutura(estrutura) && !comEstrutura
+      ? () => {
+          setSumarioAberto(true);
+        }
+      : undefined;
   // O nó da leitura, para a estrutura: o primeiro cabeçalho de bloco entre o alto da tela e a linha de
   // leitura (um quarto da tela abaixo da barra fixa; o pé da tela no fim da página) ou, sem cabeçalho,
   // o nó do alto. O olho chega ao cabeçalho antes de ele chegar ao alto, e tocar numa seção da
@@ -1764,6 +1826,17 @@ function LeitorAberto({
   function mudarTamanho(passo: number) {
     const novo = Math.min(TAMANHO_MAXIMO, Math.max(TAMANHO_MINIMO, tamanho + passo));
     if (novo === tamanho) return;
+    // No começo da norma não há o que segurar: a página fica onde está, com a barra à vista. Em toques seguidos
+    // a lista ainda está assentando do toque anterior, e o alto da tela é o dispositivo que ele segurou.
+    const agora = performance.now();
+    const seguro = noAltoNaTroca.current;
+    if (window.scrollY <= 0) noAltoNaTroca.current = undefined;
+    else if (seguro && agora < seguro.ate) seguro.ate = agora + SEGURA_O_ALTO;
+    else {
+      const indice = aberta.indiceDe.get(noDoAlto() ?? '');
+      noAltoNaTroca.current =
+        indice === undefined ? undefined : { indice, ate: agora + SEGURA_O_ALTO };
+    }
     setPedido(novo);
     // Se não gravar, volta ao que está gravado.
     alterarPreferencias(repo, { tamanhoFonte: novo }).catch(() => {
@@ -1780,6 +1853,9 @@ function LeitorAberto({
   }
 
   function alternarDestaques() {
+    // O foco nas palavras de destaque acende os destaques por conta própria: a preferência dos destaques não muda
+    // por baixo dele (antes gravava "desligado" com a tela mostrando ligado).
+    if (reguaDeFoco === 'palavras') return;
     const novo = !destacar;
     setDestaquePedido(novo);
     // Se não gravar, volta ao que está gravado.
@@ -1958,12 +2034,9 @@ function LeitorAberto({
         <>
           <BarraDoLeitor
             titulo={norma.tituloCurto}
-            tamanho={tamanho}
-            mudarTamanho={mudarTamanho}
-            destacar={destacar}
-            alternarDestaques={alternarDestaques}
-            regua={reguaDeFoco}
-            mudarRegua={mudarRegua}
+            abrirAjustes={() => {
+              setAjustesAbertos(true);
+            }}
           />
         </>
       )}
@@ -2279,6 +2352,10 @@ function LeitorAberto({
                   }}
                   filtro={filtro?.descricao}
                   acoes={abrirAcoes}
+                  sumario={abrirSumario}
+                  ajustes={() => {
+                    setAjustesAbertos(true);
+                  }}
                   estrelar={() => {
                     if (!estrelarAtivaAgora.current()) {
                       setAnuncio('Toque num dispositivo para estrelar.');
@@ -2289,6 +2366,8 @@ function LeitorAberto({
                   ocupada={
                     buscaAberta ||
                     filtroAberto ||
+                    ajustesAbertos ||
+                    sumarioAberto ||
                     alvoDasAcoes !== undefined ||
                     notaAberta !== undefined ||
                     previa !== undefined
@@ -2306,6 +2385,10 @@ function LeitorAberto({
                   setFiltroAberto(true);
                 }}
                 abrirAcoes={abrirAcoes}
+                abrirAjustes={() => {
+                  setAjustesAbertos(true);
+                }}
+                abrirSumario={abrirSumario}
                 filtro={filtro?.descricao}
                 alternarFoco={alternarFoco}
                 marcarAqui={marcarAqui}
@@ -2322,6 +2405,33 @@ function LeitorAberto({
           {anuncio}
         </p>
       </div>
+      <AjustesDeLeitura
+        aberto={ajustesAbertos}
+        aoFechar={() => {
+          setAjustesAbertos(false);
+        }}
+        tamanho={tamanho}
+        mudarTamanho={mudarTamanho}
+        destacar={destacar}
+        alternarDestaques={alternarDestaques}
+        regua={reguaDeFoco}
+        mudarRegua={mudarRegua}
+      />
+      <SumarioDaNorma
+        aberto={sumarioAberto}
+        aoFechar={() => {
+          setSumarioAberto(false);
+        }}
+        repo={repo}
+        aberta={aberta}
+        estrutura={estrutura}
+        lidoAte={indiceLidoAte}
+        noDaLeitura={noDaLeitura}
+        ir={(indice) => {
+          setSumarioAberto(false);
+          irAoBloco(indice);
+        }}
+      />
       <DialogoEnviarAsFrases
         aberto={fraseAberta !== undefined}
         trecho={fraseAberta?.texto ?? ''}
@@ -2451,6 +2561,8 @@ function AcoesDaLeitura({
   abrirBusca,
   abrirFiltro,
   abrirAcoes,
+  abrirAjustes,
+  abrirSumario,
   filtro,
   alternarFoco,
   marcarAqui,
@@ -2462,6 +2574,8 @@ function AcoesDaLeitura({
   abrirBusca: () => void;
   abrirFiltro: () => void;
   abrirAcoes: () => void;
+  abrirAjustes: () => void;
+  abrirSumario: (() => void) | undefined;
   /** A frase do filtro ligado ("estrelados"), se há um. */
   filtro: string | undefined;
   alternarFoco: () => void;
@@ -2503,7 +2617,13 @@ function AcoesDaLeitura({
         >
           {modoFoco ? 'Sair do foco' : 'Modo foco'}
         </button>
-        <MaisDoLeitor filtro={filtro} abrirFiltro={abrirFiltro} abrirAcoes={abrirAcoes} />
+        <MaisDoLeitor
+          filtro={filtro}
+          abrirFiltro={abrirFiltro}
+          abrirAcoes={abrirAcoes}
+          abrirAjustes={abrirAjustes}
+          abrirSumario={abrirSumario}
+        />
       </div>
       <button type="button" className="principal" onClick={marcarAqui}>
         Lido até aqui
@@ -2519,76 +2639,25 @@ function AcoesDaLeitura({
  */
 const TITULO_LONGO = 30;
 
-type ReguaDeFoco = NonNullable<Preferencias['reguaDeFoco']>;
-
-/** A barra do leitor (fora do modo foco): voltar, título, tamanho do texto e destaques. */
-function BarraDoLeitor({
-  titulo,
-  tamanho,
-  mudarTamanho,
-  destacar,
-  alternarDestaques,
-  regua,
-  mudarRegua,
-}: {
-  regua: ReguaDeFoco;
-  mudarRegua: (nova: ReguaDeFoco) => void;
-  titulo: string;
-  tamanho: number;
-  mudarTamanho: (passo: number) => void;
-  destacar: boolean;
-  alternarDestaques: () => void;
-}) {
+/**
+ * A barra do leitor (fora do modo foco): voltar, o título e o "Aa", que abre os ajustes de leitura. O tamanho do
+ * texto, os destaques e o foco na frase moram na folha (`AjustesDeLeitura`), não soltos aqui.
+ */
+function BarraDoLeitor({ titulo, abrirAjustes }: { titulo: string; abrirAjustes: () => void }) {
   return (
     <div className="barra-leitor">
-      <Voltar para="/biblioteca" nome="Voltar à Biblioteca">
-        Biblioteca
-      </Voltar>
+      <Voltar para={deOndeVeio()}>Voltar</Voltar>
       <h1 className={titulo.length > TITULO_LONGO ? 'titulo-longo' : undefined}>{titulo}</h1>
-      <div role="group" aria-label="Tamanho do texto" className="tamanho-texto">
-        <button
-          type="button"
-          aria-label="A−, diminuir o texto"
-          disabled={tamanho <= TAMANHO_MINIMO}
-          onClick={() => {
-            mudarTamanho(-PASSO_DO_TAMANHO);
-          }}
-        >
-          A−
-        </button>
-        <output aria-label="Tamanho atual do texto">{tamanho} px</output>
-        <button
-          type="button"
-          aria-label="A+, aumentar o texto"
-          disabled={tamanho >= TAMANHO_MAXIMO}
-          onClick={() => {
-            mudarTamanho(PASSO_DO_TAMANHO);
-          }}
-        >
-          A+
-        </button>
-      </div>
       <button
         type="button"
-        className="alternar-destaques"
-        aria-pressed={destacar}
-        onClick={alternarDestaques}
+        className="abrir-ajustes"
+        aria-haspopup="dialog"
+        aria-label="Aa, ajustes de leitura"
+        title="Ajustes de leitura: tamanho do texto, destaques e foco na frase"
+        onClick={abrirAjustes}
       >
-        Destaques
+        Aa
       </button>
-      <label className="regua-de-foco">
-        Foco na frase
-        <select
-          value={regua}
-          onChange={(e) => {
-            mudarRegua(e.target.value as ReguaDeFoco);
-          }}
-        >
-          <option value="desligada">Desligada</option>
-          {temRealce() && <option value="frase">Só a frase</option>}
-          <option value="palavras">Só as palavras de destaque</option>
-        </select>
-      </label>
     </div>
   );
 }

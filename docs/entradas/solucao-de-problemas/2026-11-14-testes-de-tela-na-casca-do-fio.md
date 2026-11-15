@@ -1,0 +1,5 @@
+### Teste de tela monta o App e não acha a navegação "Áreas", o título "Hoje" ou um único `role="status"`
+
+- **Sintoma:** depois que o Fio virou a única casca, testes que montam `<App />` falham esperando `navigation` "Áreas", o título "Hoje", o botão "Novo registro" em "/" ou um só `getByRole('status')`.
+- **Causa:** a casca de antes saiu. A "/" é o Agora (`CascaM`, sem "+" nem Ajuda); as telas antigas (Leitor, Biblioteca, Fixar, Trilha, Sessão, Conta) ficam na `CascaLegada`, cuja navegação se chama "Lugares" (links, não botões; na `CascaM` são botões) e que traz uma região `ul.fio-avisos` com `role="status"`, ao lado dos `status` das telas.
+- **Solução:** esperar `findByRole('navigation', { name: 'Lugares' })`; abrir a rota direto (`window.location.hash = '#/biblioteca'`) em vez de clicar numa aba de área; testar o "+" e a Ajuda numa rota da casca legada (ex.: "/plano"), não em "/"; para a linha de estado de uma tela, buscar pelo elemento dela (`.para-lembrar-estado`, `getByText(...)` com `toHaveAttribute('role', 'status')`) e não por `getByRole('status')`.

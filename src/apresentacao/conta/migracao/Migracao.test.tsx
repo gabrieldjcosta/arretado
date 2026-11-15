@@ -150,7 +150,7 @@ describe('Telas de migração (F4-A, A4b)', () => {
   });
 
   describe('Tela 3: Resultado', () => {
-    it('concluída: mostra "Tudo copiado" e o caminho para o Hoje', async () => {
+    it('concluída: mostra "Tudo copiado" e o caminho para o Agora', async () => {
       vi.mocked(moduloMigracao.preverMigracao).mockResolvedValue({
         colecoes: 3,
         registros: 50,
@@ -183,9 +183,9 @@ describe('Telas de migração (F4-A, A4b)', () => {
       await u.click(botaoCopiar);
 
       expect(await screen.findByRole('heading', { name: 'Tudo copiado' })).toBeInTheDocument();
-      const linkHoje = screen.getByRole('link', { name: 'Ir para o Hoje' });
-      expect(linkHoje).toBeInTheDocument();
-      await u.click(linkHoje);
+      const linkAgora = screen.getByRole('link', { name: 'Ir para o Agora' });
+      expect(linkAgora).toBeInTheDocument();
+      await u.click(linkAgora);
       expect(aoConcluir).toHaveBeenCalled();
     });
 

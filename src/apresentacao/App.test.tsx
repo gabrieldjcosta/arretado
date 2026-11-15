@@ -7,14 +7,13 @@ import { simularJanelaVisual } from '../testes/janela-visual';
 import { repositorioDeTeste } from '../testes/repositorio';
 import { App } from './App';
 import { SECOES, secaoDeAjuda } from './orientacoes/conteudo';
-import { RODAPE_CURTO } from './textos';
 
 async function abrirApp(rota = '/', repo?: Repositorio) {
   const r = repo ?? (await repositorioDeTeste()).repo;
   window.location.hash = `#${rota}`;
   const usuario = userEvent.setup();
   render(<App abrir={() => Promise.resolve(r)} />);
-  await screen.findByRole('navigation', { name: 'Áreas' });
+  await screen.findByRole('navigation', { name: 'Lugares' });
   return { repo: r, usuario };
 }
 
@@ -23,35 +22,30 @@ afterEach(() => {
 });
 
 describe('shell (5.1, 5.5)', () => {
-  it('mostra as 4 áreas, o menu Ajuda, Conta e o rodapé', async () => {
-    await abrirApp();
-    const areas = screen.getByRole('navigation', { name: 'Áreas' });
+  it('mostra os três lugares, o menu Ajuda e o menu da Conta', async () => {
+    await abrirApp('/biblioteca');
+    const lugares = screen.getByRole('navigation', { name: 'Lugares' });
     expect(
-      within(areas)
+      within(lugares)
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Hoje', 'Trilha', 'Fixar', 'Biblioteca']);
+    ).toEqual(['Agora', 'Destino', 'Varal']);
     expect(screen.getByRole('button', { name: 'Ajuda' })).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('button', { name: 'Relatar problema' })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Conta e ajustes' })).toBeInTheDocument();
-    expect(screen.getByText(RODAPE_CURTO, { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Menu: sua conta e ajustes' })).toBeInTheDocument();
   });
 
-  it('o cabeçalho traz Conta e Ajuda, e o rodapé leva a Backup e dados (P2)', async () => {
-    await abrirApp();
+  it('o cabeçalho traz o menu da Conta e a Ajuda', async () => {
+    await abrirApp('/biblioteca');
     const topo = screen.getByRole('banner');
-    expect(within(topo).getByRole('link', { name: 'Conta e ajustes' })).toHaveAttribute(
+    expect(within(topo).getByRole('link', { name: 'Menu: sua conta e ajustes' })).toHaveAttribute(
       'href',
       '#/conta',
     );
     expect(within(topo).getByRole('button', { name: 'Ajuda' })).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('contentinfo')).getByRole('link', { name: 'Backup e dados' }),
-    ).toHaveAttribute('href', '#/conta/dados');
   });
 
   it.each([
-    ['/', 'Hoje'],
     ['/plano', 'Trilha'],
     ['/recall', 'Fixar'],
     ['/biblioteca', 'Biblioteca'],
@@ -80,7 +74,7 @@ describe('shell (5.1, 5.5)', () => {
     ).toBeInTheDocument();
   });
 
-  it('com o teclado aberto, a casca se marca para as abas saírem da frente (P2)', async () => {
+  it('com o teclado aberto, a casca se marca para a pílula dos lugares sair da frente (P2)', async () => {
     const janela = simularJanelaVisual(window.innerHeight);
     try {
       await abrirApp('/recall/registrar');
@@ -101,30 +95,25 @@ describe('shell (5.1, 5.5)', () => {
     }
   });
 
-  it('navega entre as áreas e marca a atual', async () => {
-    const { usuario } = await abrirApp();
-    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
-    await usuario.click(screen.getByRole('link', { name: 'Biblioteca' }));
-    expect(screen.getByRole('heading', { level: 1, name: 'Biblioteca' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Biblioteca' })).toHaveAttribute(
+  it('navega entre os lugares e marca o atual', async () => {
+    const { usuario } = await abrirApp('/biblioteca');
+    await usuario.click(screen.getByRole('link', { name: 'Varal' }));
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#/varal');
+    });
+    expect(await screen.findByRole('button', { name: 'Varal' })).toHaveAttribute(
       'aria-current',
       'page',
     );
   });
 
-  it('rota desconhecida mostra saída para o Hoje', async () => {
+  it('rota desconhecida mostra a tela de não encontrada', async () => {
     await abrirApp('/nao-existe');
     expect(screen.getByRole('heading', { name: 'Tela não encontrada' })).toBeInTheDocument();
   });
 });
 
 describe('encaixes da F3 (P0 Fundação)', () => {
-  it('Hoje compõe os blocos e mantém a revisão vencida e o vazio de antes', async () => {
-    await abrirApp('/');
-    expect(screen.getByRole('heading', { level: 1, name: 'Hoje' })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Por onde começar?' })).toBeInTheDocument();
-  });
-
   it.each([
     ['/sessao/iniciar', 'Começar uma Sessão'],
     ['/plano/onboarding', 'Para qual carreira você estuda?'],
