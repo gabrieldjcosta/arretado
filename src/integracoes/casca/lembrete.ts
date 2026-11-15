@@ -61,7 +61,9 @@ export async function ligarLembrete(hora: string): Promise<boolean> {
         id: ID_DA_NOTIFICACAO,
         title: 'Arretado',
         body: 'Seu estudo está esperando onde você parou.',
+        // Sem alarme exato: o lembrete diário não precisa dele, e o exato abriria a tela de "Alarmes e lembretes".
         schedule: { on: { hour: h, minute: m }, allowWhileIdle: true },
+        isExactNotification: false,
       },
     ],
   });

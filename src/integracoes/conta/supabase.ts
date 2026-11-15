@@ -27,7 +27,7 @@ import {
   type ServicoDeConta,
   type SessaoDeConta,
 } from './interface';
-import { CHAVE_PUBLICAVEL, URL_SUPABASE, enderecoDeRetorno } from './projeto';
+import { CHAVE_PUBLICAVEL, RETORNO_PRODUCAO, URL_SUPABASE, enderecoDeRetorno } from './projeto';
 
 /** Provedores com conta criada no painel. Apple entra aqui só na Fase 3 do plano de apps (conta paga). */
 const PROVEDORES_LIGADOS: readonly ProvedorDeLogin[] = ['google'];
@@ -176,7 +176,8 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
       provider: provedor,
       // Na casca o login abre no navegador do sistema; a volta chega por link verificado (conta/casca.ts).
       options: {
-        redirectTo: enderecoDeRetorno(window.location.hostname),
+        // O WebView da casca roda em https://localhost, que `enderecoDeRetorno` trataria como desenvolvimento.
+        redirectTo: nativo ? RETORNO_PRODUCAO : enderecoDeRetorno(window.location.hostname),
         skipBrowserRedirect: nativo,
       },
     });

@@ -100,10 +100,16 @@ function LinhaDoLembrete() {
   const [negado, setNegado] = useState(false);
   if (!naCasca()) return null;
   const ligar = (hora: string) => {
-    void ligarLembrete(hora).then((ok) => {
-      setNegado(!ok);
-      setEstado(lerLembrete());
-    });
+    ligarLembrete(hora)
+      .then((ok) => {
+        setNegado(!ok);
+      })
+      .catch(() => {
+        setNegado(true);
+      })
+      .finally(() => {
+        setEstado(lerLembrete());
+      });
   };
   return (
     <>

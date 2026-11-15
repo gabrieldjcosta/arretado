@@ -23,19 +23,34 @@ export async function abrirNoNavegador(url: string): Promise<void> {
   await Browser.open({ url });
 }
 
+const CHAVE_TRATADA = 'arretado:retorno-tratado';
+
 /**
- * Trata a volta do login (link `https://arretado.cc/?code=…`, capturado pelo app) e recarrega no destino.
- * Cobre o app já aberto (`appUrlOpen`) e o app aberto pelo próprio link (`getLaunchUrl`).
+ * Trata a volta do login (link `https://arretado.cc/?code=…`, capturado pelo app) e recarrega só se entrou.
+ * Cobre o app já aberto (`appUrlOpen`) e o app aberto pelo próprio link (`getLaunchUrl`). O link de abertura
+ * volta igual depois de recarregar (a ponte o guarda), então cada URL é tratada uma vez por sessão do app.
  */
 export async function ouvirRetornoDoLogin(servico: ServicoDeConta): Promise<void> {
   if (!naCasca()) return;
   const { App } = await import('@capacitor/app');
   const { Browser } = await import('@capacitor/browser');
   const tratar = async (url: string) => {
-    if (!new URL(url).searchParams.has('code') && !new URL(url).searchParams.has('error')) return;
+    let busca: URLSearchParams;
+    try {
+      busca = new URL(url).searchParams;
+    } catch {
+      return;
+    }
+    if (!busca.has('code') && !busca.has('error')) return;
+    try {
+      if (sessionStorage.getItem(CHAVE_TRATADA) === url) return;
+      sessionStorage.setItem(CHAVE_TRATADA, url);
+    } catch {
+      // Sem sessionStorage a deduplicação não vale; o pior caso é uma troca repetida, que falha sem laço.
+    }
     await Browser.close().catch(() => undefined);
     const resultado = await tratarRetornoDoLogin({ servico, url, substituirUrl: trocarHash });
-    if (resultado !== 'sem-codigo') window.location.reload();
+    if (resultado === 'entrou') window.location.reload();
   };
   await App.addListener('appUrlOpen', ({ url }) => void tratar(url));
   const aberto = await App.getLaunchUrl();

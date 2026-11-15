@@ -37,6 +37,7 @@ describe('lembrete diário da casca', () => {
       notifications: [
         expect.objectContaining({
           schedule: { on: { hour: 6, minute: 45 }, allowWhileIdle: true },
+          isExactNotification: false,
         }),
       ],
     });

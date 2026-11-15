@@ -739,7 +739,7 @@
 
   .shell-fio .pc-colunas {
     display: grid;
-    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    grid-template-columns: minmax(min(18rem, 40%), 24rem) minmax(0, 1fr);
     column-gap: 2rem;
     align-items: start;
   }
