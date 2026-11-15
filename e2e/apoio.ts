@@ -103,12 +103,15 @@ export async function colar(page: Page, id: string) {
 }
 
 /**
- * Abre o Agora e espera a tela dele montar. A nav "Lugares" não serve de sinal: as telas que ainda moram na casca
- * legada (a Trilha, o Fixar, a Biblioteca) já a mostram, e o Agora, num pedaço à parte do pacote, chega depois.
+ * A tela do Agora montada. A nav "Lugares" não serve de sinal: as telas que ainda moram na casca legada (a Trilha,
+ * o Fixar, a Biblioteca) já a mostram, e o Agora, num pedaço à parte do pacote, chega depois.
  */
+export const telaDoAgora = (page: Page) => page.locator('[data-tela="inicio"]:not(.m-saindo)');
+
+/** Abre o Agora e espera a tela dele montar. */
 export async function irAoAgora(page: Page) {
   await page.goto('/#/');
-  await expect(page.locator('[data-tela="inicio"]:not(.m-saindo)')).toBeVisible();
+  await expect(telaDoAgora(page)).toBeVisible();
 }
 
 /**

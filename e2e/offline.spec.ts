@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, importarEPublicar, test } from './apoio';
+import { expect, importarEPublicar, telaDoAgora, test } from './apoio';
 
 /**
  * Abrir sem rede (AP-00): o service worker guarda o app na primeira abertura com internet; depois, o
@@ -49,12 +49,13 @@ function vigiarErros(page: Page) {
 test('depois da primeira abertura, o Agora e o Fixar abrem sem rede', async ({ page, context }) => {
   const erros = vigiarErros(page);
   await page.goto('/');
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
+  await expect(telaDoAgora(page)).toBeVisible();
   await esperarServiceWorker(page);
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('navigation', { name: 'Lugares' })).toBeVisible();
+  // A tela do Agora, que é um pedaço à parte do pacote: sem rede, ela também vem do service worker.
+  await expect(telaDoAgora(page)).toBeVisible();
   // A página veio do service worker, não do cache HTTP do navegador.
   expect(await page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
   await expect(page.getByRole('status').filter({ hasText: 'Sem conexão' })).toBeVisible();

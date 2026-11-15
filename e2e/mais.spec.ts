@@ -69,7 +69,9 @@ test.describe('"+" da casca › painel', () => {
     await campo.fill('Levar o diploma ao cartório');
     await semViolacoes(page);
     await dialogo.getByRole('button', { name: 'Salvar' }).click();
-    await expect(dialogo.getByText('Salvo.')).toBeVisible();
+    // O aviso "Salvo.", e só ele: `getByText('Salvo.')` casa também "Ainda não salvo." (por trecho, sem
+    // diferenciar maiúscula) e deixava recarregar com a gravação a caminho. Era a nota vazia no celular.
+    await expect(dialogo.getByRole('status').filter({ hasText: /^Salvo\.$/ })).toBeVisible();
 
     // Esc fecha o diálogo modal e o foco volta ao "+".
     await page.keyboard.press('Escape');

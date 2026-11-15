@@ -216,6 +216,31 @@ test('cota: do Recall ao primeiro cartão em 1 toque; 25 vencidos = 10 + "Revisa
   await expect(semana).toContainText('1 dos últimos 7 dias');
 });
 
+test('o lote do passo "Revisar" do Fio (`?itens=N`): com mais cartões vencidos que N, a revisão entrega N e o resto espera', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const inicio = new Date('2026-09-23T12:00:00-03:00');
+  await page.clock.setFixedTime(inicio);
+  for (let i = 1; i <= 4; i += 1) {
+    await page.goto('/#/recall/cartoes/novo');
+    await page.getByLabel('Frente (pergunta)').fill(`Pergunta ${String(i)}`);
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page).toHaveURL(/#\/recall\/cartoes$/);
+  }
+  await page.clock.setFixedTime(new Date(inicio.getTime() + DIA));
+
+  // O endereço que o "Revisar agora" do passo monta: N é a quantidade que o passo anunciou.
+  await page.goto('/#/recall/revisar?itens=3');
+  await expect(page.getByText('1 de 3')).toBeVisible();
+  for (let i = 0; i < 3; i += 1) {
+    await page.getByRole('button', { name: 'Mostrar resposta' }).click();
+    await page.getByRole('button', { name: 'Fácil' }).click();
+  }
+  // O que não coube no lote continua na fila: nada some, e a rodada seguinte volta à cota de sempre.
+  await expect(page.getByRole('button', { name: 'Revisar mais 1' })).toBeVisible();
+});
+
 test('Revisar frases e cartão com lacuna: esconder selecionando (Frases 2)', async ({ page }) => {
   const inicio = new Date('2026-09-23T12:00:00-03:00');
   await page.clock.setFixedTime(inicio);
