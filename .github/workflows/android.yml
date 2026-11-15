@@ -5,6 +5,8 @@ name: Android
 # depuração do runner, que serve para testar uma vez mas não atualiza por cima de outro APK.
 on:
   workflow_dispatch:
+  push:
+    branches: [claude/project-thread-rd819m] # TESTE: sai antes do merge
 
 permissions:
   contents: write
