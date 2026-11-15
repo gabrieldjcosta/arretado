@@ -4,7 +4,7 @@ import { pedirArmazenamentoPersistente } from './core/persistencia';
 import { App } from './apresentacao/App';
 import { contasHabilitadas, criarServicoDeConta, tratarRetornoDoLogin } from './integracoes/conta';
 import { registrarServiceWorker } from './offline/registro';
-import { ouvirRetornoDoLogin } from './suporte/casca';
+import { ouvirRetornoDoLogin } from './integracoes/conta/casca';
 
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Elemento #raiz ausente em index.html');

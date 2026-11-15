@@ -1,6 +1,6 @@
 # Apps · casca Android (Fase 1)
 
-Casca Capacitor em `android/`, com o mesmo `dist/` do site. Nada de regra de negócio ali; ponte nativa só em `src/suporte/casca.ts`. Plano geral: `/mnt/project-files/planos-apps/plano-apps-windows-android-ios-2026-11-05.md`.
+Casca Capacitor em `android/`, com o mesmo `dist/` do site. Nada de regra de negócio ali; ponte nativa só em `src/integracoes/conta/casca.ts`. Plano geral: `/mnt/project-files/planos-apps/plano-apps-windows-android-ios-2026-11-05.md`.
 
 ## Gerar o APK
 

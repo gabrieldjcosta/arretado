@@ -1,8 +1,16 @@
 // Ponte da casca nativa (Capacitor, Fase 1 do plano de apps). Só roda dentro do app instalado; no navegador
 // nada daqui é chamado e os plugins nem são baixados (importação dinâmica). Regra de negócio fica fora.
-import { ambienteAtual, emCasca } from './plataforma';
-import { tratarRetornoDoLogin } from '../integracoes/conta/retorno';
-import type { ServicoDeConta } from '../integracoes/conta/interface';
+import { tratarRetornoDoLogin } from './retorno';
+import type { ServicoDeConta } from './interface';
+
+/** Dentro do app instalado (Capacitor)? Mesma checagem de `suporte/plataforma.ts`, que esta camada não pode importar. */
+export function naCasca(): boolean {
+  return (
+    (
+      window as { Capacitor?: { isNativePlatform?: () => boolean } }
+    ).Capacitor?.isNativePlatform?.() === true
+  );
+}
 
 /** Dentro da casca, o link de volta é de https://arretado.cc: só o hash vale na origem local do WebView. */
 const trocarHash = (novo: string) => {
@@ -20,7 +28,7 @@ export async function abrirNoNavegador(url: string): Promise<void> {
  * Cobre o app já aberto (`appUrlOpen`) e o app aberto pelo próprio link (`getLaunchUrl`).
  */
 export async function ouvirRetornoDoLogin(servico: ServicoDeConta): Promise<void> {
-  if (!emCasca(ambienteAtual())) return;
+  if (!naCasca()) return;
   const { App } = await import('@capacitor/app');
   const { Browser } = await import('@capacitor/browser');
   const tratar = async (url: string) => {

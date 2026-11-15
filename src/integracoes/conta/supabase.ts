@@ -10,8 +10,7 @@ import {
   type Session,
   type SupabaseClient,
 } from '@supabase/supabase-js';
-import { ambienteAtual, emCasca } from '../../suporte/plataforma';
-import { abrirNoNavegador } from '../../suporte/casca';
+import { abrirNoNavegador, naCasca } from './casca';
 import {
   FalhaDeSincronizacao,
   type ChaveDeRegistro,
@@ -172,10 +171,10 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
     if (!PROVEDORES_LIGADOS.includes(provedor)) {
       throw new FalhaDeConta('indisponivel', 'Este método de entrada ainda não está disponível.');
     }
-    const nativo = emCasca(ambienteAtual());
+    const nativo = naCasca();
     const { data, error } = await this.cliente.auth.signInWithOAuth({
       provider: provedor,
-      // Na casca o login abre no navegador do sistema; a volta chega por link verificado (suporte/casca.ts).
+      // Na casca o login abre no navegador do sistema; a volta chega por link verificado (conta/casca.ts).
       options: {
         redirectTo: enderecoDeRetorno(window.location.hostname),
         skipBrowserRedirect: nativo,
