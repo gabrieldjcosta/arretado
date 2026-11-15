@@ -22,9 +22,9 @@ Em Settings › Secrets and variables › Actions, criar: `ANDROID_KEYSTORE_BASE
 
 O login abre no navegador do sistema (o Google bloqueia WebView). A volta é o link `https://arretado.cc/?code=…`, que o app captura se o domínio estiver ligado ao Worker e `https://arretado.cc/.well-known/assetlinks.json` listar o pacote `cc.arretado.app` com o SHA-256 da chave de assinatura. Sem isso o link abre no navegador e o login não conclui (e-mail com código continua valendo).
 
-## Decisão aberta: caminho do link de volta
+## Link de volta do login (decidido)
 
-O filtro do Manifest captura `https://arretado.cc/` inteiro (o retorno do Supabase é a raiz). Com o link verificado, qualquer link do site abre o app. Para limitar a um caminho próprio (ex.: `/retorno-app`) é preciso incluí-lo na lista de URLs permitidas do painel do Supabase e conferir que o Worker o serve; é decisão do Gabriel.
+Gabriel (15/11/2026, cartão): o app captura `https://arretado.cc/` inteiro, como está. Com o link verificado, qualquer link do site abre o app. O Supabase não muda por isso.
 
 ## Pendente nesta fase
 
