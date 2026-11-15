@@ -586,16 +586,16 @@
   animation-duration: 0.62s;
   animation-delay: 0.14s;
 }
-:root[data-vt-dx=22] {
+:root[data-vt-dx='22'] {
   --vt-dx: 22px;
 }
-:root[data-vt-dx=-22] {
+:root[data-vt-dx='-22'] {
   --vt-dx: -22px;
 }
-:root[data-vt-dy=6] {
+:root[data-vt-dy='6'] {
   --vt-dy: 6px;
 }
-:root[data-vt-dy=14] {
+:root[data-vt-dy='14'] {
   --vt-dy: 14px;
 }
 @keyframes vt-sai {

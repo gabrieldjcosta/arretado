@@ -1,5 +1,11 @@
 import type { LaunchOptions, Page } from '@playwright/test';
-import { expect, importarEPublicar, rolagemAssentada, semViolacoes, test as testeBase } from './apoio';
+import {
+  expect,
+  importarEPublicar,
+  rolagemAssentada,
+  semViolacoes,
+  test as testeBase,
+} from './apoio';
 
 // A barra do Leitor no celular (Onda 1 da crítica externa, A + B). Dentro da norma, menos de 700 px:
 // a pílula dos lugares fica de fora (D-D25: o Leitor abre sem barra de abas), e as ferramentas viram uma
