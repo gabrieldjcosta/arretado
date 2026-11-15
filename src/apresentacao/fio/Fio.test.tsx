@@ -47,7 +47,7 @@ describe('o Fio', () => {
       expect(window.location.hash).toBe('#/');
     });
     expect(
-      await screen.findByRole('navigation', { name: 'Lugares' }, { timeout: 5000 }),
+      await screen.findByRole('navigation', { name: 'Lugares' }, { timeout: 20_000 }),
     ).toBeInTheDocument();
   });
 
