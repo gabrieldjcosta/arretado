@@ -111,6 +111,8 @@ test('quem já tem prova vê a abertura terminar no Agora, com a marca no lugar 
     localStorage.removeItem(chave);
   }, CHAVE_DA_ESCRITA);
   await page.goto('/');
+  // A recarga no meio da carga aborta o CSS que o app puxa à parte, e o WebKit conta isso como erro.
+  await page.waitForLoadState('networkidle');
   await page.reload();
 
   await expect(abertura(page)).toBeVisible();

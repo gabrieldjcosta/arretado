@@ -62,7 +62,11 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
           return;
         if (m.type() === 'error') falhas.push(m.text());
       });
-      page.on('pageerror', (e) => falhas.push(e.message));
+      page.on('pageerror', (e) => {
+        // Aviso do navegador, sem efeito (o WebKit o entrega como erro de página; o Chromium, só em alguns casos).
+        if (browserName === 'webkit' && e.message.startsWith('ResizeObserver loop')) return;
+        falhas.push(e.message);
+      });
 
       await use(undefined);
 

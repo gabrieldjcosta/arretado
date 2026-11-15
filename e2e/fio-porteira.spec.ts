@@ -71,7 +71,9 @@ test('a porteira pronta abre a folha e passa', async ({ page }, info) => {
   const ver = folha.getByRole('button', { name: 'Ver no meu fio' });
   for (let i = 0; i < 12 && !(await ver.isVisible()); i += 1) {
     const certo = folha.getByRole('button', { name: 'Certo', exact: true });
-    if (await certo.isVisible()) await certo.click();
+    // O "Certo" some quando o deque acaba; no WebKit ele ainda está à vista, esmaecendo, na hora do clique, e o
+    // clique esperaria um botão que não volta. A volta do laço confere o "Ver no meu fio".
+    if (await certo.isVisible()) await certo.click({ timeout: 3_000 }).catch(() => undefined);
     else await page.waitForTimeout(250);
     await page.waitForTimeout(400);
   }
