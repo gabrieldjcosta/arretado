@@ -25,16 +25,20 @@ export const test = base.extend<Opcoes & { vigiar: undefined }>({
   permitirFalhasConsole: [false, { option: true }],
   semearEscrita: [true, { option: true }],
   vigiar: [
-    async ({ page, permitirViolacoes, permitirFalhasConsole, semearEscrita }, use) => {
-      await page.addInitScript(() => {
+    async ({ page, browserName, permitirViolacoes, permitirFalhasConsole, semearEscrita }, use) => {
+      await page.addInitScript((navegador) => {
         const w = window as unknown as { __violacoes: string[] };
         w.__violacoes = [];
         document.addEventListener('securitypolicyviolation', (e) => {
+          // `page.screenshot({ animations: 'disabled' })` põe um <style> no WebKit, que a CSP barra sem arquivo de
+          // origem; o app nunca fica sem origem (o script dele tem URL). Só o WebKit, só esse caso.
+          if (navegador === 'webkit' && e.violatedDirective === 'style-src-elem' && !e.sourceFile)
+            return;
           w.__violacoes.push(
             `${e.violatedDirective}: ${e.blockedURI} ${e.sample} @ ${e.sourceFile}:${String(e.lineNumber)}:${String(e.columnNumber)}`,
           );
         });
-      });
+      }, browserName);
       if (semearEscrita) {
         // A chave de `componentes/escrita/frequencia.ts`. Um Dia que não chega nunca:
         // a Abertura fica calada (`escritaNaTela`: Dia guardado no futuro), com qualquer relógio, também os
