@@ -82,6 +82,8 @@ async function prepararOVaral(
 
 const nav = (page: Page) => page.getByRole('navigation', { name: 'Lugares' });
 /** O folheto do Varal com esse nome (o nome acessível vem do texto visível: o número, o nome e a linha de estado; desvio 38). */
+/** Um folheto do Varal. No Vivo ele balança ao vento sem parar (layout B, 17/11) e nunca fica "estável" para o Playwright:
+ * os toques nele usam `force`, como a pessoa que toca num folheto que balança. */
 const folheto = (page: Page, nome: string) =>
   page
     .locator('.m-folheto')
@@ -98,7 +100,7 @@ async function irAoVaral(page: Page) {
 
 async function irAoFolhetoDasNormas(page: Page, quantas = 2) {
   await irAoVaral(page);
-  await folheto(page, 'Normas').click();
+  await folheto(page, 'Normas').click({ force: true });
   await expect(page).toHaveURL(/#\/varal\/normas$/);
   await expect(linhas(page)).toHaveCount(quantas);
 }
@@ -184,7 +186,7 @@ test('o Varal e o folheto das Normas cabem em 360 e em 1280, passam no axe e na 
   // O número miúdo e a linha de estado vêm do que a pessoa guardou: duas normas.
   await expect(folheto(page, 'Normas').locator('.m-conta-f')).toHaveText('2');
 
-  await folheto(page, 'Normas').click();
+  await folheto(page, 'Normas').click({ force: true });
   await expect(page).toHaveURL(/#\/varal\/normas$/);
   await expect(linhas(page)).toHaveCount(2);
   await expect(page.getByRole('heading', { level: 2, name: 'Normas' })).toBeVisible();
@@ -226,7 +228,7 @@ test('o folheto vazio das Súmulas e teses diz uma frase, oferece um botão e pa
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await prepararOVaral(page, { soLep: true });
   await irAoVaral(page);
-  await folheto(page, 'Súmulas e teses').click();
+  await folheto(page, 'Súmulas e teses').click({ force: true });
   await expect(page).toHaveURL(/#\/varal\/sumulas$/);
   await expect(page.getByRole('heading', { level: 2, name: 'Súmulas e teses' })).toBeVisible();
   await expect(
@@ -273,7 +275,13 @@ test('as folhas sobem, prendem o foco, trancam o fundo, passam no axe e fecham c
   const corpo = await folha.locator('.m-corpo').boundingBox();
   expect(corpo).not.toBeNull();
   expect((corpo?.x ?? -1) + (corpo?.width ?? 0)).toBeLessThanOrEqual(360);
-  expect((corpo?.y ?? -1) + (corpo?.height ?? 0)).toBeLessThanOrEqual(740 + 1);
+  // Sem a moldura (layout B, 17/11) o quadro encosta no fim da tela: espera a subida da folha assentar.
+  await expect
+    .poll(async () => {
+      const c = await folha.locator('.m-corpo').boundingBox();
+      return (c?.y ?? -1) + (c?.height ?? 0);
+    })
+    .toBeLessThanOrEqual(740 + 1);
   await semViolacoesNoFio(page);
 
   // Os chips mexem na lista e acendem a bolinha do "Organizar".
@@ -563,7 +571,7 @@ test('o Varal se mexe como o mockup: os folhetos descem do fio com a mola, as li
   expect(doVaral.map((a) => a.atraso)).toEqual([0, 70, 140, 210, 280, 350]);
   expect(new Set(doVaral.map((a) => a.easing))).toEqual(new Set(['cubic-bezier(.34,1.56,.64,1)']));
 
-  await folheto(page, 'Normas').click();
+  await folheto(page, 'Normas').click({ force: true });
   await expect(linhas(page)).toHaveCount(2);
   const dasLinhas = (await animacoesVistas(page)).filter(
     (a) => a.classes.includes('linha-item') && a.duracao === 380,
@@ -722,7 +730,7 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
   await expect(page).toHaveURL(/#\/varal$/);
 
   // A lista de antes está a um toque: "Abrir a lista completa" desce a folha e leva a ela.
-  await folheto(page, 'Frases').click();
+  await folheto(page, 'Frases').click({ force: true });
   await expect(caderno).toBeVisible();
   await caderno.getByRole('button', { name: 'Abrir a lista completa' }).click();
   await expect(page).toHaveURL(/#\/recall\/frases$/);
