@@ -111,7 +111,12 @@ test('Fora da Sessão, o relógio fica no canto, sem cobrir a pílula dos lugare
   const pilula = await page.getByRole('navigation', { name: 'Lugares' }).boundingBox();
   const caixa = await relogio.boundingBox();
   expect(pilula && caixa).toBeTruthy();
-  if (pilula && caixa) expect(caixa.y + caixa.height).toBeLessThanOrEqual(pilula.y);
+  if (pilula && caixa) {
+    // Do tablet em pé (768 px) para cima os lugares ficam no menu lateral, à esquerda (layout B, 17/11): o relógio não o cobre.
+    if ((page.viewportSize()?.width ?? 0) >= 768) {
+      expect(caixa.x).toBeGreaterThanOrEqual(pilula.x + pilula.width);
+    } else expect(caixa.y + caixa.height).toBeLessThanOrEqual(pilula.y);
+  }
   await relogio.click();
   await page.getByLabel('Anotar uma distração').fill('comprar café');
   await semViolacoes(page);

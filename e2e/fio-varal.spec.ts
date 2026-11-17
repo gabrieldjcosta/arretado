@@ -621,7 +621,9 @@ async function abrirOCaderno(page: Page) {
       }
     }).observe(document.body, { childList: true, subtree: true });
   });
-  await folheto(page, 'Frases').click();
+  // No Vivo os folhetos balançam ao vento sem parar (layout B, 17/11): nunca ficam "estáveis" para o Playwright, que então não
+  // clicaria. A pessoa toca num folheto que balança; o teste também.
+  await folheto(page, 'Frases').click({ force: true });
   const caderno = page.getByRole('dialog', { name: 'Suas Frases certas' });
   await expect(caderno).toBeVisible();
   await expect(caderno.getByRole('listitem')).toHaveCount(2);

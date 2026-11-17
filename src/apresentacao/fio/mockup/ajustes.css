@@ -1158,7 +1158,7 @@ html[data-texto-fio] .m-fio .m-proximo {
 }
 
 @media (min-width: 768px) {
-  .m-fio {
+  :root[data-menu-mudando] .m-fio {
     transition: padding-left 0.45s var(--m-sair);
   }
 }
@@ -1251,4 +1251,132 @@ html[data-texto-fio] .m-fio .m-proximo {
   width: fit-content;
   min-height: 44px;
   text-align: center;
+}
+
+/* 487 (b). O Varal ao vento, e em três fios de dois do tablet em pé para cima (layout B, Gabriel 17/11/2026; mockups em
+      /mnt/project-files/fio-moldura-17-11/v2). Motivo: no quadro largo os seis folhetos esticados ficavam feios; cada fio leva
+      dois folhetos estreitos (188 px no tablet, 200 no PC) com um vão entre eles (64 e 84 px). No celular continuam os dois fios
+      de três do mockup. No Vivo, os folhetos parecem pendurados ao vento: cada um gira no pregador (`rotate`) com uma rajada
+      irregular que corre da esquerda para a direita e de cima para baixo, e o papel tremula na rajada (`transform`); a corda
+      balança junto (o `<animate>` do VaralM). O vento fica num invólucro (`.m-pendurado`), para não brigar com a inclinação,
+      o toque e o mouse do folheto, que seguem os do mockup. No Calmo, e com o sistema pedindo menos movimento, nada balança. */
+.m-fio .m-pendurado {
+  display: flex;
+  min-width: 0;
+  transform-origin: 50% -18px;
+}
+.m-fio .m-pendurado > .m-folheto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.m-fio:not([data-movimento='calmo']) .m-pendurado {
+  --vento: calc(7.4s + var(--r, 0) * 0.9s);
+  animation:
+    m-vento var(--vento) ease-in-out infinite,
+    m-tremula var(--vento) ease-in-out infinite;
+  animation-delay: calc(-2.6s + var(--c, 0) * 0.42s + var(--r, 0) * 0.7s);
+}
+@keyframes m-vento {
+  0% {
+    rotate: -0.7deg;
+  }
+  12% {
+    rotate: 0.5deg;
+  }
+  22% {
+    rotate: -0.3deg;
+  }
+  33% {
+    rotate: 3.4deg;
+  }
+  41% {
+    rotate: -1.8deg;
+  }
+  49% {
+    rotate: 1.5deg;
+  }
+  57% {
+    rotate: -0.7deg;
+  }
+  66% {
+    rotate: 0.8deg;
+  }
+  76% {
+    rotate: -0.2deg;
+  }
+  86% {
+    rotate: 1.1deg;
+  }
+  100% {
+    rotate: -0.7deg;
+  }
+}
+@keyframes m-tremula {
+  0%,
+  22%,
+  62%,
+  100% {
+    transform: perspective(700px) rotateX(0) skewX(0);
+  }
+  30% {
+    transform: perspective(700px) rotateX(-9deg) skewX(-1.4deg);
+  }
+  35% {
+    transform: perspective(700px) rotateX(7deg) skewX(1deg);
+  }
+  40% {
+    transform: perspective(700px) rotateX(-4deg) skewX(-0.5deg);
+  }
+  46% {
+    transform: perspective(700px) rotateX(2deg);
+  }
+  84% {
+    transform: perspective(700px) rotateX(-3deg) skewX(-0.4deg);
+  }
+  90% {
+    transform: perspective(700px) rotateX(1.5deg);
+  }
+}
+/* O folheto que a pessoa aponta ou foca para de balançar: fica na mão dela, e o balanço do mouse do mockup vale inteiro. */
+.m-fio .m-pendurado:is(:hover, :focus-within) {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-fio .m-pendurado {
+    animation: none;
+  }
+}
+@media (min-width: 768px) {
+  .m-fio .m-varal {
+    gap: 30px;
+  }
+  .m-fio .m-varal-linha {
+    grid-template-columns: repeat(2, 188px);
+    justify-content: center;
+    column-gap: 64px;
+  }
+  .m-fio .m-varal-linha .m-folheto {
+    min-height: 178px;
+    padding: 16px 14px 18px;
+    gap: 7px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-xilo {
+    height: 66px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-xilo svg {
+    width: 44px;
+    height: 44px;
+  }
+  .m-fio .m-varal-linha .m-folheto strong {
+    font-size: 15px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-estado {
+    font-size: 12px;
+  }
+}
+@media (min-width: 1100px) {
+  .m-fio .m-varal-linha {
+    grid-template-columns: repeat(2, 200px);
+    column-gap: 84px;
+  }
 }

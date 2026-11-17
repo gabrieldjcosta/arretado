@@ -29,6 +29,21 @@ function gravarPreferencia(p: Preferencia) {
   }
 }
 
+let fimDaMudanca: number | undefined;
+
+/**
+ * Marca na raiz, por meio segundo, que o menu está abrindo ou recolhendo: só então o conteúdo desliza junto (`data-menu-mudando`
+ * no CSS). Ao carregar a tela e ao entrar no modo foco o conteúdo nasce no lugar, sem deslizar.
+ */
+function marcarMudanca() {
+  const raiz = document.documentElement;
+  raiz.dataset.menuMudando = '';
+  window.clearTimeout(fimDaMudanca);
+  fimDaMudanca = window.setTimeout(() => {
+    delete raiz.dataset.menuMudando;
+  }, 500);
+}
+
 export interface MenuLateral {
   /** O menu lateral existe nesta largura (do tablet em pé para cima). */
   lateral: boolean;
@@ -56,6 +71,7 @@ export function useMenuLateral(caminho: string): MenuLateral {
   const sobreposto = lateral && !fixo;
   const aberto = lateral && (daVez ?? (!sobreposto && !naNorma && preferencia === 'aberto'));
   const alternar = useCallback(() => {
+    marcarMudanca();
     if (sobreposto || naNorma) {
       setPassagem({ caminho, aberto: !aberto });
       return;

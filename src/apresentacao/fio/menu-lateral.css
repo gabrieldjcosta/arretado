@@ -5,24 +5,32 @@
    aparelho deitado (o menu cresce para dentro da área segura em vez de ficar debaixo dela). */
 :root {
   --menu: 0px;
+  --menu-do-mais: 0px;
 }
 
 @media (min-width: 768px) {
   :root[data-menu-lateral] {
     --menu: calc(76px + env(safe-area-inset-left, 0px));
+    --menu-do-mais: calc(76px + env(safe-area-inset-left, 0px));
   }
 }
 
 @media (min-width: 1100px) {
   :root[data-menu-lateral='aberto'] {
     --menu: calc(240px + env(safe-area-inset-left, 0px));
+    --menu-do-mais: calc(240px + env(safe-area-inset-left, 0px));
   }
 }
 
-/* O modo foco e o "Só estudo" da Sessão tiram tudo da frente, o menu também (o "Só estudo" já tirava a pílula). */
-:root[data-modo-foco],
+/* O modo foco e o "Só estudo" da Sessão tiram tudo da frente, o menu também (o "Só estudo" já tirava a pílula). No foco o
+   "+" fica onde estava na leitura (`--menu-do-mais` não zera), como sempre ficou: ele não pula ao entrar nem ao sair. */
+:root[data-modo-foco] {
+  --menu: 0px;
+}
+
 body[data-so-estudo] {
   --menu: 0px;
+  --menu-do-mais: 0px;
 }
 
 :root[data-modo-foco] :is(.menu-lateral, .ml-veu),
@@ -262,7 +270,7 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
 }
 
 .menu-lateral[data-aberto='sim'] .ml-rotulo {
-  animation: ml-rotulo 0.3s var(--ml-curva) both;
+  animation: ml-rotulo 0.3s var(--ml-curva) backwards;
 }
 
 @keyframes ml-rotulo {
@@ -309,6 +317,9 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
 @media (min-width: 768px) {
   :root[data-menu-lateral] .shell-fio {
     padding-left: var(--menu);
+  }
+  /* Só desliza quando a pessoa abre ou recolhe o menu: ao carregar e ao entrar no foco o conteúdo já nasce no lugar. */
+  :root[data-menu-mudando] .shell-fio {
     transition: padding-left 0.45s var(--f-sair);
   }
 }
@@ -318,7 +329,7 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
   :root[data-menu-lateral] {
     --mais-direita: calc(
       max(var(--gutter), env(safe-area-inset-right, 0px)) +
-        max(0px, (100% - var(--menu) - var(--largura-casca)) / 2)
+        max(0px, (100% - var(--menu-do-mais) - var(--largura-casca)) / 2)
     );
   }
 }
@@ -327,7 +338,7 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
   :root[data-menu-lateral] .shell-fio:has(.pc-colunas) {
     --mais-direita: calc(
       max(var(--gutter), env(safe-area-inset-right, 0px)) +
-        max(0px, (100% - var(--menu) - var(--largura-casca)) / 2)
+        max(0px, (100% - var(--menu-do-mais) - var(--largura-casca)) / 2)
     );
   }
 }
