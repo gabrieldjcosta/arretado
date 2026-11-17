@@ -26,16 +26,10 @@
   }
 }
 
-/* 2. O quadro usa a altura que sobra. Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
+/* 2. O quadro usa a altura toda (desvio 49, layout B). Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
       Noite/Dia, Recomeçar) e a nota de rodapé, 64 px (52 no celular); o app não tem nenhuma das duas. */
 .m-fio .m-app {
-  height: min(830px, 100%);
-}
-
-@media (max-width: 440px) {
-  .m-fio .m-app {
-    height: 100%;
-  }
+  height: 100%;
 }
 
 /* 3. As fontes do mockup, com os nomes próprios de fontes.css. Motivo: o protótipo as pedia ao Google
@@ -1148,14 +1142,58 @@ html[data-texto-fio] .m-fio .m-proximo {
   outline-offset: 2px;
 }
 
-/* 49. No monitor o quadro do Fio é mais largo que o do celular. Motivo: o app abria no PC com o quadro de
-       400 px (visualização de celular, Gabriel 08/11/2026). A partir de 900 px o quadro vai a 720 px e usa a
-       altura toda; o Destino mantém o próprio quadro largo (desvio do mockup, acima). */
-@media (min-width: 900px) {
-  .m-fio .m-app:not(.m-largo) {
-    max-width: min(720px, calc(100vw - 64px));
-    height: 100%;
+/* 49 (substituído no layout B, 17/11/2026). Sem moldura: o quadro do mockup era o palco do protótipo (um celular
+       desenhado na página), não parte do app. Motivo: no PC o app abria como um cartão vertical separado do fundo por uma
+       borda, e no celular sobrava a borda arredondada em volta da tela (Gabriel, 08 e 17/11/2026; a moldura veio de
+       carona no porte literal de 04/11, ninguém a pediu). O quadro passa a ser a tela inteira, sem borda, raio nem
+       sombra; a raiz só guarda a área segura e, do tablet em pé para cima, o lugar do menu lateral (--menu,
+       menu-lateral.css). O conteúdo fica numa coluna de até 760 px no meio da área (o Destino, na largura dele, 1180 px),
+       e o "+" acompanha o canto de cima dessa coluna, com o mesmo botão, a mesma cor e o mesmo movimento. */
+.m-fio {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) max(var(--menu, 0px), env(safe-area-inset-left, 0px));
+  gap: 0;
+  align-items: stretch;
+  background: var(--m-app-c);
+}
+
+@media (min-width: 768px) {
+  .m-fio {
+    transition: padding-left 0.45s var(--m-sair);
   }
+}
+
+.m-fio .m-app,
+.m-fio .m-app.m-largo {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.m-fio.m-fio[data-mundo='dia'] .m-app {
+  border: 0;
+  box-shadow: none;
+}
+
+.m-fio .m-app {
+  --coluna: 760px;
+}
+
+.m-fio .m-app.m-largo {
+  --coluna: 1180px;
+}
+
+.m-fio .m-tela {
+  padding-left: max(22px, (100% - var(--coluna)) / 2);
+  padding-right: max(22px, (100% - var(--coluna)) / 2);
+}
+
+.m-fio .m-app > .m-mais {
+  right: max(22px, (100% - var(--coluna)) / 2);
 }
 
 /* 50. O fio pendurado nasce logo abaixo do cabeçalho, não por trás dele. Motivo: com o nome e o "0% da prova

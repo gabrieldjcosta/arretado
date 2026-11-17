@@ -676,9 +676,14 @@ test('o Caderno de Frases sobe como folha, cabe em 360 e em 1280, passa no axe e
       w,
     );
     await semRolagemLateral(page);
-    // O corpo da folha cabe na tela, embaixo.
-    const corpo = await caderno.locator('.m-corpo').boundingBox();
-    expect((corpo?.y ?? -1) + (corpo?.height ?? 0)).toBeLessThanOrEqual(h + 1);
+    // O corpo da folha cabe na tela, embaixo. Sem a moldura (layout B, 17/11) o quadro encosta no fim da tela: espera a
+    // subida da folha assentar, que no fim ainda está a 1 px do lugar.
+    await expect
+      .poll(async () => {
+        const corpo = await caderno.locator('.m-corpo').boundingBox();
+        return (corpo?.y ?? -1) + (corpo?.height ?? 0);
+      })
+      .toBeLessThanOrEqual(h + 1);
     await semViolacoesNoFio(page);
   }
 
