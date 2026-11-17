@@ -197,3 +197,47 @@ export function estadoDoBloco(
   if (lidoAte === undefined || lidoAte < bloco) return 'falta';
   return lidoAte >= (indice.ultimo[bloco] ?? bloco) ? 'feito' : 'atual';
 }
+
+/** Uma linha da árvore do painel: o bloco, o recuo e se ele está no caminho até a leitura. */
+export interface LinhaDaArvore {
+  bloco: number;
+  nivel: number;
+  /** É o bloco mais fundo da leitura. */
+  aqui: boolean;
+  /** Está no caminho da raiz até a leitura (a leitura incluída): os blocos de dentro dele aparecem. */
+  noCaminho: boolean;
+}
+
+/**
+ * A árvore do painel do PC (Livro, Título, Capítulo): todos os blocos de cima, e os de dentro só dos blocos que
+ * levam à leitura (ela incluída). Os outros livros ficam fechados, como linhas de um índice. Sem leitura em bloco
+ * (`RAIZ`), só os de cima.
+ */
+export function arvoreDaEstrutura(indice: IndiceDaEstrutura, aqui: number): LinhaDaArvore[] {
+  const caminho = new Set(caminhoAte(indice, aqui));
+  const linhas: LinhaDaArvore[] = [];
+  const descer = (pai: number, nivel: number) => {
+    for (const bloco of indice.filhos.get(pai) ?? []) {
+      const dentro = caminho.has(bloco);
+      linhas.push({ bloco, nivel, aqui: bloco === aqui, noCaminho: dentro });
+      if (dentro) descer(bloco, nivel + 1);
+    }
+  };
+  descer(RAIZ, 0);
+  return linhas;
+}
+
+/** Os artigos da norma e quantos o "lido até" já alcançou (índice de nó); `lidoAte` vazio vale zero. */
+export function contagemDeArtigos(
+  nos: readonly NoDaLeitura[],
+  lidoAte: number | undefined,
+): { lidos: number; total: number } {
+  let lidos = 0;
+  let total = 0;
+  nos.forEach((no, i) => {
+    if (no.dispositivo.tipo !== 'artigo') return;
+    total += 1;
+    if (lidoAte !== undefined && i <= lidoAte) lidos += 1;
+  });
+  return { lidos, total };
+}

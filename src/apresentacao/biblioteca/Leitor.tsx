@@ -70,7 +70,7 @@ import { BuscaNaNorma, type TextosDaBusca } from './BuscaNaNorma';
 import { criarCartaoDoTrecho } from './cartao-do-trecho';
 import { BotaoDaEstrela } from './Estrela';
 import { MaisDoLeitor } from './MaisDoLeitor';
-import { EstruturaDaNorma } from './EstruturaDaNorma';
+import { EstruturaDaNorma, TrilhaDaNorma } from './EstruturaDaNorma';
 import { SumarioDaNorma } from './SumarioDaNorma';
 import { dispositivosComErro } from './errosVinculados';
 import { ehBloco, indiceDaEstrutura, temEstrutura } from './estrutura';
@@ -412,10 +412,15 @@ function useTextos(
   return { textos, pedir, emVoo, falhou, tentarDeNovo, tentativa };
 }
 
-/** Onde termina o cabeçalho preso da casca (`.fio-topo`, sticky): o que fica abaixo dele é o alto da tela. */
+/**
+ * Onde termina o que fica preso no alto da tela: o cabeçalho da casca (`.fio-topo`, sticky) e, sem o painel ao lado
+ * do texto, a trilha da norma logo abaixo dele (também sticky). O que fica abaixo disso é o alto da tela.
+ */
 function fimDaBarraFixa(): number {
   const barra = document.querySelector('.fio-topo');
-  return barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
+  const fim = barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
+  const trilha = document.querySelector<HTMLElement>('.trilha-da-norma');
+  return fim + (trilha?.offsetHeight ?? 0);
 }
 
 function LeitorAberto({
@@ -2040,6 +2045,14 @@ function LeitorAberto({
             }}
           />
         </>
+      )}
+      {!modoFoco && abrirSumario && (
+        <TrilhaDaNorma
+          nos={nos}
+          estrutura={estrutura}
+          noDaLeitura={noDaLeitura}
+          abrirSumario={abrirSumario}
+        />
       )}
       {!modoFoco && (
         <p className="procedencia">{procedenciaDaVersao(norma, aberta.versao).join(' · ')}</p>

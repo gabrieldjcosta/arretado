@@ -1942,10 +1942,9 @@ test('Ponto de luz no Leitor: o lido sobre a faixa da folha com o ponto de luz n
     await expect(cabecalho).toBeVisible();
     await rolagemAssentada(page);
     await expect.poll(async () => Math.abs(await distanciaDoAlto(cabecalho))).toBeLessThan(2);
-    // No título, ele é o de agora e os capítulos dele ficam logo abaixo (subir um nível é tocar no caminho).
+    // No título, ele é o de agora e os capítulos dele ficam logo abaixo, na árvore.
     await expect(estrutura.locator('[aria-current="location"]')).toContainText('TÍTULO II');
-    const dentro = estrutura.getByRole('list', { name: 'Dentro de TÍTULO II' });
-    await expect(dentro.getByRole('listitem').first()).toContainText('CAPÍTULO I');
+    await expect(estrutura.getByRole('button', { name: /^CAPÍTULO I\b/ }).first()).toBeVisible();
     const sobra = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
