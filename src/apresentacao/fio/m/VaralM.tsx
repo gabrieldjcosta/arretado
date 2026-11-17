@@ -2,9 +2,12 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEve
 import { useNavigate } from 'react-router';
 import { useRepositorio } from '../../dados/contexto';
 import { DialogoDoLembrete } from '../../componentes/lembrete/DialogoDoLembrete';
+import { useLarguraMinima } from '../../componentes/largura';
 import { useDadosDoFio } from '../dados/sem-vazio';
+import { LARGURA_DO_MENU } from '../menu-lateral';
 import { animar, espera, modoAgora, MOLA, useSinal } from './anima';
 import { CadernoM } from './CadernoM';
+import { useMovimentoDoFio } from './movimento';
 import { useOrganizacao, type Organizacao } from './organizar';
 import { TelaM } from './TelaM';
 import { avisar } from './toast';
@@ -13,7 +16,7 @@ import { carregarDadosDoVaral, type DadosDoVaral } from './varal-dados';
 import { contar } from './varal-lista';
 
 /**
- * O Varal, a tela `varal` do mockup aprovado: o que a pessoa guardou, pendurado em dois fios, seis folhetos com um número
+ * O Varal, a tela `varal` do mockup aprovado: o que a pessoa guardou, pendurado em dois fios (três do tablet em pé para cima), seis folhetos com um número
  * miúdo e uma linha de estado, e uma busca única no alto. Cada folheto abre o seu (`/varal/normas`, `/varal/sumulas`); as Frases
  * abrem o Caderno, uma folha que sobe; os que ainda não têm folheto novo abrem a tela de antes, e o Lembrete abre a nota.
  */
@@ -29,52 +32,65 @@ interface Folheto {
   para?: string;
 }
 
-const LINHAS: readonly { rotulo: string; folhetos: readonly Folheto[] }[] = [
+/** Os seis folhetos, na ordem em que ficam pendurados (a mesma no celular e no PC). */
+const FOLHETOS: readonly Folheto[] = [
   {
-    rotulo: 'O que você estuda',
-    folhetos: [
-      {
-        id: 'normas',
-        nome: 'Normas',
-        desenho: 'M8 44 V12 h32 v32 M14 20 h20 M14 28 h20 M14 36 h12',
-        para: '/varal/normas',
-      },
-      {
-        id: 'sumulas',
-        nome: 'Súmulas e teses',
-        desenho: 'M24 8 l5 10 11 2 -8 8 2 11 -10 -5 -10 5 2 -11 -8 -8 11 -2 z',
-        para: '/varal/sumulas',
-      },
-      {
-        id: 'textos',
-        nome: 'Meus textos',
-        desenho: 'M12 8 h18 l8 8 v24 h-26 z M30 8 v8 h8',
-        para: '/biblioteca/resumos',
-      },
-    ],
+    id: 'normas',
+    nome: 'Normas',
+    desenho: 'M8 44 V12 h32 v32 M14 20 h20 M14 28 h20 M14 36 h12',
+    para: '/varal/normas',
   },
   {
-    rotulo: 'O que você guarda',
-    folhetos: [
-      {
-        id: 'frases',
-        nome: 'Frases',
-        desenho: 'M10 14 h28 M10 24 h28 M10 34 h18 M34 34 l4 4',
-      },
-      {
-        id: 'cartoes',
-        nome: 'Cartões',
-        desenho: 'M8 14 h26 v22 h-26 z M14 8 h26 v22',
-        para: '/recall/cartoes',
-      },
-      {
-        id: 'lembretes',
-        nome: 'Lembretes',
-        desenho: 'M24 8 a12 12 0 1 0 0.1 0 M24 14 v10 l6 4',
-      },
-    ],
+    id: 'sumulas',
+    nome: 'Súmulas e teses',
+    desenho: 'M24 8 l5 10 11 2 -8 8 2 11 -10 -5 -10 5 2 -11 -8 -8 11 -2 z',
+    para: '/varal/sumulas',
+  },
+  {
+    id: 'textos',
+    nome: 'Meus textos',
+    desenho: 'M12 8 h18 l8 8 v24 h-26 z M30 8 v8 h8',
+    para: '/biblioteca/resumos',
+  },
+  {
+    id: 'frases',
+    nome: 'Frases',
+    desenho: 'M10 14 h28 M10 24 h28 M10 34 h18 M34 34 l4 4',
+  },
+  {
+    id: 'cartoes',
+    nome: 'Cartões',
+    desenho: 'M8 14 h26 v22 h-26 z M14 8 h26 v22',
+    para: '/recall/cartoes',
+  },
+  {
+    id: 'lembretes',
+    nome: 'Lembretes',
+    desenho: 'M24 8 a12 12 0 1 0 0.1 0 M24 14 v10 l6 4',
   },
 ];
+
+/**
+ * Como os folhetos se dividem nos fios. No celular, dois fios de três, como no mockup aprovado. Do tablet em pé para cima
+ * (layout B, Gabriel 17/11/2026), três fios de dois: alargar os folhetos deixava o Varal feio, então cada fio leva dois
+ * folhetos estreitos com um vão entre eles.
+ */
+const LINHAS_DO_CELULAR = [
+  { rotulo: 'O que você estuda', ids: ['normas', 'sumulas', 'textos'] },
+  { rotulo: 'O que você guarda', ids: ['frases', 'cartoes', 'lembretes'] },
+] as const;
+const LINHAS_LARGAS = [
+  { rotulo: 'O que você estuda', ids: ['normas', 'sumulas'] },
+  { rotulo: 'O que você escreve', ids: ['textos', 'frases'] },
+  { rotulo: 'O que você revisa', ids: ['cartoes', 'lembretes'] },
+] as const;
+
+function linhasDoVaral(largo: boolean): { rotulo: string; folhetos: Folheto[] }[] {
+  return (largo ? LINHAS_LARGAS : LINHAS_DO_CELULAR).map((l) => ({
+    rotulo: l.rotulo,
+    folhetos: l.ids.map((id) => FOLHETOS.find((f) => f.id === id)).filter((f) => f !== undefined),
+  }));
+}
 
 /** A inclinação de cada folheto no fio (a `ROT` do mockup): nenhum é reto, e nenhum se repete ao lado do outro. */
 const INCLINACAO = [-1.5, 1.2, -0.8, 1.4, -1.2, 0.9] as const;
@@ -125,11 +141,32 @@ function resumoDoFolheto(
   }
 }
 
-/** O fio de uma linha (o `.varal-fio` do mockup): a curva e o brilho dela. */
-function FioDaLinha() {
+/** O balanço da corda ao vento: a barriga do fio desce, anda para o lado e volta (layout B, 17/11/2026). */
+const BALANCO =
+  'M0 6 Q450 34 900 6;M0 6 Q420 38 900 6;M0 6 Q470 32 900 6;M0 6 Q430 37 900 6;M0 6 Q450 34 900 6';
+
+/** Uma corda que balança, cada uma no seu tempo; só no Vivo (no Calmo o fio fica parado, como no mockup). */
+function Balanco({ n }: { n: number }) {
+  return (
+    <animate
+      attributeName="d"
+      dur={`${String(7 + n)}s`}
+      repeatCount="indefinite"
+      calcMode="spline"
+      keyTimes="0;.3;.55;.8;1"
+      keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1"
+      values={BALANCO}
+    />
+  );
+}
+
+/** O fio de uma linha (o `.varal-fio` do mockup): a curva e o brilho dela, que balançam juntos ao vento no Vivo. */
+function FioDaLinha({ n, vivo }: { n: number; vivo: boolean }) {
   return (
     <svg className="m-varal-fio" viewBox="0 0 900 40" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 6 Q450 34 900 6" fill="none" stroke="#c9d4ea" strokeWidth="1.6" />
+      <path d="M0 6 Q450 34 900 6" fill="none" stroke="#c9d4ea" strokeWidth="1.6">
+        {vivo && <Balanco n={n} />}
+      </path>
       <path
         className="m-brilho"
         d="M0 6 Q450 34 900 6"
@@ -137,7 +174,9 @@ function FioDaLinha() {
         stroke="#39caef"
         strokeWidth="5"
         opacity=".25"
-      />
+      >
+        {vivo && <Balanco n={n} />}
+      </path>
     </svg>
   );
 }
@@ -253,6 +292,8 @@ export function VaralM() {
   const { dados } = useDadosDoFio('varal', carregarDadosDoVaral);
   const sinal = useSinal();
   const varal = useRef<HTMLDivElement>(null);
+  const largo = useLarguraMinima(LARGURA_DO_MENU);
+  const vivo = useMovimentoDoFio() === 'vivo';
   const [lembrando, setLembrando] = useState(false);
   const [buscando, setBuscando] = useState(false);
   /** O Caderno de Frases aberto; `foco` é a Frase que a busca achou. */
@@ -324,36 +365,49 @@ export function VaralM() {
         aoBuscar={setBuscando}
       />
       <div className="m-varal" ref={varal} hidden={buscando}>
-        {LINHAS.map((linha) => (
+        {linhasDoVaral(largo).map((linha, n) => (
           <div className="m-varal-linha" key={linha.rotulo} role="group" aria-label={linha.rotulo}>
-            <FioDaLinha />
+            <FioDaLinha n={n} vivo={vivo} />
             <span className="m-varal-rotulo">{linha.rotulo}</span>
             {linha.folhetos.map((f) => {
-              const graus = INCLINACAO[posicao++] ?? 0;
+              const graus = INCLINACAO[posicao] ?? 0;
+              const coluna = posicao++;
               const { quantos, estado } = resumoDoFolheto(f.id, dados, org);
               return (
-                <button
+                // O pendurado leva o vento (gira no pregador e o papel tremula); o folheto dentro dele guarda a inclinação,
+                // o balanço do toque e o do mouse, que são do mockup. A rajada corre da esquerda para a direita e de cima
+                // para baixo (`--c` e `--r`).
+                <span
                   key={f.id}
-                  type="button"
-                  className="m-folheto"
-                  style={{ transform: `rotate(${String(graus)}deg)` }}
-                  onClick={(e) => {
-                    void abrir(f, e.currentTarget, graus);
+                  className="m-pendurado"
+                  style={{
+                    ['--c' as string]: coluna % linha.folhetos.length,
+                    ['--r' as string]: n,
                   }}
                 >
-                  {/* Sem `aria-label`: o nome vem do texto visível ("2 Normas as leis do seu estudo"), como pede o WCAG 2.5.3
+                  <button
+                    type="button"
+                    className="m-folheto"
+                    data-volta-foco={f.id}
+                    style={{ transform: `rotate(${String(graus)}deg)` }}
+                    onClick={(e) => {
+                      void abrir(f, e.currentTarget, graus);
+                    }}
+                  >
+                    {/* Sem `aria-label`: o nome vem do texto visível ("2 Normas as leis do seu estudo"), como pede o WCAG 2.5.3
                       (o `aria-label` do mockup, "Normas: 2 · …", não contém o texto que se vê; desvio 38). */}
-                  {quantos > 0 && (
-                    <span className="m-conta-f">{quantos > 99 ? '99+' : quantos}</span>
-                  )}
-                  <span className="m-xilo">
-                    <svg viewBox="0 0 48 48" aria-hidden="true">
-                      <path d={f.desenho} />
-                    </svg>
-                  </span>
-                  <strong>{f.nome}</strong>
-                  <span className="m-estado">{estado}</span>
-                </button>
+                    {quantos > 0 && (
+                      <span className="m-conta-f">{quantos > 99 ? '99+' : quantos}</span>
+                    )}
+                    <span className="m-xilo">
+                      <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <path d={f.desenho} />
+                      </svg>
+                    </span>
+                    <strong>{f.nome}</strong>
+                    <span className="m-estado">{estado}</span>
+                  </button>
+                </span>
               );
             })}
           </div>

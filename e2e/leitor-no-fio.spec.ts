@@ -8,6 +8,15 @@ import { expect, importarEPublicar, semViolacoes, test } from './apoio';
 // medem no `leitor.spec.ts` (`distanciaDoAlto`); a barra de baixo do celular, no `leitor-celular.spec.ts`.
 
 const pilula = (page: Page) => page.getByRole('navigation', { name: 'Lugares' });
+
+/** Na norma os lugares saem da frente. Do tablet deitado para cima (768 px) a nav mora no menu lateral (layout B, 17/11):
+ * ali ela fica recolhida, só os ícones, sem lugar aceso. Abaixo disso a pílula sai de cena. */
+async function lugaresForaDaFrente(page: Page) {
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    await expect(page.locator('.menu-lateral')).toHaveAttribute('data-aberto', 'nao');
+    await expect(pilula(page).locator('[aria-current="page"]')).toHaveCount(0);
+  } else await expect(pilula(page)).toHaveCount(0);
+}
 const voltar = (page: Page) => page.getByRole('link', { name: 'Voltar', exact: true });
 const tituloDaLep = (page: Page) => page.getByRole('heading', { level: 1, name: 'LEP' });
 
@@ -44,7 +53,7 @@ const medir = (page: Page) =>
     };
   });
 
-test('dentro da norma a pílula dos lugares fica de fora, em qualquer largura, e volta ao sair dela', async ({
+test('dentro da norma os lugares ficam de fora, em qualquer largura, e volta ao sair dela', async ({
   page,
 }) => {
   test.setTimeout(120_000);
@@ -53,7 +62,7 @@ test('dentro da norma a pílula dos lugares fica de fora, em qualquer largura, e
   await expect(pilula(page)).toBeVisible();
   await page.getByRole('region', { name: 'Normas' }).getByRole('link', { name: /LEP/ }).click();
   await expect(tituloDaLep(page)).toBeVisible();
-  await expect(pilula(page)).toHaveCount(0);
+  await lugaresForaDaFrente(page);
   await expect(page.locator('.fio-topo')).toBeVisible();
 
   // Nem rolando para baixo e de volta para cima (era quando ela reaparecia, por cima do texto e da barra do Leitor).
@@ -63,7 +72,7 @@ test('dentro da norma a pílula dos lugares fica de fora, em qualquer largura, e
   await page.evaluate(() => {
     window.scrollBy(0, -120);
   });
-  await expect(pilula(page)).toHaveCount(0);
+  await lugaresForaDaFrente(page);
   expect((await medir(page)).sobraDeLado).toBeLessThanOrEqual(0);
   await semViolacoes(page);
 
@@ -71,7 +80,7 @@ test('dentro da norma a pílula dos lugares fica de fora, em qualquer largura, e
   await page.keyboard.press('f');
   await expect(page).toHaveURL(/[?&]foco=/);
   await expect(page.locator('.fio-topo')).toBeHidden();
-  await expect(pilula(page)).toHaveCount(0);
+  await expect(pilula(page)).toBeHidden();
   await page.keyboard.press('Escape');
   await expect(page).not.toHaveURL(/foco=/);
   await expect(page.locator('.fio-topo')).toBeVisible();

@@ -1,0 +1,363 @@
+/* O menu lateral do PC e do tablet (layout B, Gabriel 17/11/2026; mockups em /mnt/project-files/fio-moldura-17-11/v2).
+   Do tablet em pé (768 px) para cima a nav dos lugares sai da pílula de baixo e fica de pé à esquerda: recolhido mostra só
+   os ícones (76 px), aberto mostra os nomes (240 px). No monitor (1100 px ou mais) o aberto empurra o conteúdo; no tablet ele
+   abre por cima, com véu. --menu é a largura que o conteúdo e o "+" deixam livre à esquerda, já com o entalhe do
+   aparelho deitado (o menu cresce para dentro da área segura em vez de ficar debaixo dela). */
+:root {
+  --menu: 0px;
+  --menu-do-mais: 0px;
+}
+
+@media (min-width: 768px) {
+  :root[data-menu-lateral] {
+    --menu: calc(76px + env(safe-area-inset-left, 0px));
+    --menu-do-mais: calc(76px + env(safe-area-inset-left, 0px));
+  }
+}
+
+@media (min-width: 1100px) {
+  :root[data-menu-lateral='aberto'] {
+    --menu: calc(240px + env(safe-area-inset-left, 0px));
+    --menu-do-mais: calc(240px + env(safe-area-inset-left, 0px));
+  }
+}
+
+/* O modo foco e o "Só estudo" da Sessão tiram tudo da frente, o menu também (o "Só estudo" já tirava a pílula). No foco o
+   "+" fica onde estava na leitura (`--menu-do-mais` não zera), como sempre ficou: ele não pula ao entrar nem ao sair. */
+:root[data-modo-foco] {
+  --menu: 0px;
+}
+
+body[data-so-estudo] {
+  --menu: 0px;
+  --menu-do-mais: 0px;
+}
+
+:root[data-modo-foco] :is(.menu-lateral, .ml-veu),
+body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
+  display: none;
+}
+
+/* As cores de cada casca, as mesmas da pílula que o menu substitui. */
+.m-fio .menu-lateral {
+  --ml-fundo: var(--m-vidro);
+  --ml-borda: var(--m-borda-2);
+  --ml-texto: var(--m-texto-2);
+  --ml-texto-forte: var(--m-texto);
+  --ml-ativo: var(--m-luz);
+  --ml-ativo-texto: var(--m-noite);
+  --ml-realce: var(--m-sup-2);
+  --ml-foco: var(--m-neon);
+  --ml-sombra: var(--m-sombra);
+  --ml-veu: var(--m-veu);
+  --ml-curva: var(--m-sair);
+  --ml-mola: var(--m-mola);
+}
+
+.shell-fio .menu-lateral {
+  --ml-fundo: var(--f-vidro);
+  --ml-borda: var(--f-cartao-borda);
+  --ml-texto: var(--texto-atenuado);
+  --ml-texto-forte: var(--texto);
+  --ml-ativo: var(--luz);
+  --ml-ativo-texto: var(--fundo);
+  --ml-realce: var(--f-fantasma);
+  --ml-foco: var(--foco, currentColor);
+  --ml-sombra: rgb(15 28 58 / 35%);
+  --ml-veu: rgb(15 28 58 / 30%);
+  --ml-curva: var(--f-sair);
+  --ml-mola: var(--f-mola);
+}
+
+.menu-lateral {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  width: calc(var(--ml-largura, 76px) + env(safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 10px
+    calc(14px + env(safe-area-inset-bottom, 0px)) calc(10px + env(safe-area-inset-left, 0px));
+  overflow: hidden auto;
+  background: var(--ml-fundo);
+  border-right: 1px solid var(--ml-borda);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: width 0.45s var(--ml-curva);
+}
+
+.menu-lateral[data-aberto='sim'] {
+  --ml-largura: 240px;
+}
+
+/* No tablet o aberto passa por cima do conteúdo: a sombra o separa e o véu fecha ao toque. */
+@media (max-width: 1099px) {
+  .menu-lateral[data-aberto='sim'] {
+    z-index: 8;
+    box-shadow: 24px 0 48px -24px var(--ml-sombra);
+  }
+}
+
+.ml-veu {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  background: var(--ml-veu);
+  animation: ml-veu 0.3s var(--ml-curva, ease-out) both;
+}
+
+@keyframes ml-veu {
+  from {
+    opacity: 0;
+  }
+}
+
+.m-fio .ml-veu {
+  --ml-veu: var(--m-veu);
+}
+
+.shell-fio .ml-veu {
+  --ml-veu: rgb(15 28 58 / 30%);
+}
+
+/* O botão que abre e recolhe: um quadrado de 44 px, a seta aponta para onde o menu vai. */
+.menu-lateral .ml-alternar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 0 10px 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ml-texto);
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    scale 0.3s var(--ml-mola);
+}
+
+.menu-lateral .ml-alternar svg,
+.menu-lateral .ml-icone {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A nav dos lugares deixa de ser pílula: coluna, sem vidro próprio (o vidro é o do menu). */
+.m-fio .menu-lateral .m-nav,
+.shell-fio .menu-lateral .fio-nav {
+  position: relative;
+  inset: auto;
+  transform: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.m-fio .menu-lateral .m-nav button,
+.shell-fio .menu-lateral .fio-nav a,
+.menu-lateral .ml-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: var(--ml-texto);
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.m-fio .menu-lateral .m-nav button[aria-current='page'],
+.shell-fio .menu-lateral .fio-nav a[aria-current='page'] {
+  color: var(--ml-ativo-texto);
+}
+
+.menu-lateral .ml-item[aria-current='page'] {
+  background: var(--ml-ativo);
+  color: var(--ml-ativo-texto);
+}
+
+/* O indicador desliza na vertical (o JS da nav põe --ind-y e --ind-h; a pílula usa left e width). */
+.m-fio .menu-lateral .m-nav .m-indicador,
+.shell-fio .menu-lateral .fio-nav .fio-indicador {
+  top: var(--ind-y, 0px);
+  bottom: auto;
+  left: 0 !important;
+  width: 100% !important;
+  height: var(--ind-h, 0px);
+  border-radius: 14px;
+  background: var(--ml-ativo);
+  transition:
+    top 0.35s var(--ml-mola),
+    height 0.35s var(--ml-mola);
+}
+
+@media (hover: hover) {
+  .m-fio .menu-lateral .m-nav button:not([aria-current='page']):hover,
+  .shell-fio .menu-lateral .fio-nav a:not([aria-current='page']):hover,
+  .menu-lateral .ml-item:not([aria-current='page']):hover,
+  .menu-lateral .ml-alternar:hover {
+    background: var(--ml-realce);
+    color: var(--ml-texto-forte);
+  }
+}
+
+.menu-lateral .ml-alternar:active,
+.menu-lateral .ml-item:active {
+  scale: 0.94;
+}
+
+.menu-lateral :is(button, a):focus-visible {
+  outline: 2px solid var(--ml-foco);
+  outline-offset: 2px;
+}
+
+.menu-lateral .ml-pe {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+/* Recolhido: só os ícones, centrados; o nome some da vista e continua sendo o nome acessível do botão. */
+.menu-lateral[data-aberto='nao'] .m-nav button,
+.menu-lateral[data-aberto='nao'] .fio-nav a,
+.menu-lateral[data-aberto='nao'] .ml-item {
+  justify-content: center;
+  padding: 0;
+}
+
+.menu-lateral[data-aberto='nao'] .ml-rotulo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.menu-lateral[data-aberto='sim'] .ml-rotulo {
+  animation: ml-rotulo 0.3s var(--ml-curva) backwards;
+}
+
+@keyframes ml-rotulo {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Na pílula de baixo (celular) o ícone não aparece: ela continua só com os nomes. */
+.m-nav .ml-icone,
+.fio-nav .ml-icone {
+  display: none;
+}
+
+.menu-lateral .m-nav .ml-icone,
+.menu-lateral .fio-nav .ml-icone {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-lateral,
+  .m-fio .menu-lateral .m-nav .m-indicador,
+  .shell-fio .menu-lateral .fio-nav .fio-indicador {
+    transition-duration: 0.01s;
+  }
+
+  .menu-lateral[data-aberto='sim'] .ml-rotulo,
+  .ml-veu {
+    animation-duration: 0.15s;
+  }
+}
+
+@media (forced-colors: active) {
+  .menu-lateral {
+    border-right-color: CanvasText;
+  }
+
+  .menu-lateral .ml-item[aria-current='page'] {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* ---------- A casca de antes com o menu: o conteúdo começa depois dele ---------- */
+@media (min-width: 768px) {
+  :root[data-menu-lateral] .shell-fio {
+    padding-left: var(--menu);
+  }
+  /* Só desliza quando a pessoa abre ou recolhe o menu: ao carregar e ao entrar no foco o conteúdo já nasce no lugar. */
+  :root[data-menu-mudando] .shell-fio {
+    transition: padding-left 0.45s var(--f-sair);
+  }
+}
+
+/* O "+" fixo (D-D23) segue o canto da coluna de conteúdo, que agora começa depois do menu. */
+@media (min-width: 900px) {
+  :root[data-menu-lateral] {
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) +
+        max(0px, (100% - var(--menu-do-mais) - var(--largura-casca)) / 2)
+    );
+  }
+}
+
+@media (min-width: 1000px) {
+  :root[data-menu-lateral] .shell-fio:has(.pc-colunas) {
+    --mais-direita: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) +
+        max(0px, (100% - var(--menu-do-mais) - var(--largura-casca)) / 2)
+    );
+  }
+}
+
+/* O cabeçalho da casca de antes mede pela largura dele (a tela menos o menu), não pela tela: a reserva do "+" volta a ser
+   a conta do conteúdo. */
+@media (min-width: 900px) {
+  :root[data-menu-lateral] .shell-fio .fio-topo {
+    padding-right: calc(
+      max(var(--gutter), env(safe-area-inset-right, 0px)) +
+        max(0px, (100% - var(--largura-casca)) / 2) + var(--mais-lado) + 0.25rem
+    );
+  }
+}
+
+/* O trilho do Leitor (P7, a partir de 1200 px) mede pela metade da tela; com o menu a coluna de lei anda meio menu para a
+   direita, e o trilho vai junto, senão cobriria o "Aa". */
+@media (min-width: 75em) {
+  :root[data-menu-lateral] .leitor:not(.em-foco) .acoes-leitor {
+    left: calc(50% + var(--menu) / 2 + var(--largura-texto) / 2 + 1.5rem);
+  }
+}
