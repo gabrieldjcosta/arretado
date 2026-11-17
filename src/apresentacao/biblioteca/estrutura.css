@@ -292,7 +292,7 @@ dialog.dialogo-sumario[open] {
 }
 
 /* No monitor e no tablet o foco por artigo não leva a coluna branca do Leitor: o chão é o da penumbra, e o cartão, de
-   papel e com sombra macia, é a única coisa acesa (mockup `foco`). */
+   papel, é a única coisa acesa (mockup `foco`). */
 @media (min-width: 768px) {
   :root[data-modo-foco='artigo'] .leitor.em-foco {
     background: transparent;
@@ -305,6 +305,5 @@ dialog.dialogo-sumario[open] {
 
   :root[data-modo-foco='artigo'] .cartao-artigo {
     padding: 1.75rem 2rem;
-    box-shadow: 0 18px 50px -22px rgb(11 19 34 / 35%);
   }
 }
