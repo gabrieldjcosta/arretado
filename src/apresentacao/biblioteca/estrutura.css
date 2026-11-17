@@ -269,3 +269,42 @@ dialog.dialogo-sumario[open] {
 .sumario-da-norma .estrutura-item[data-nivel='4'] {
   padding-inline-start: calc(0.625rem + min(4rem, 64px));
 }
+
+/* No modo foco, artigo por artigo (layout B, 17/11/2026): a trilha vira um rótulo apagado no alto, no meio da tela, que não
+   prende nada. Toque ainda abre o sumário. O alto da tela e o "+" seguem onde estavam. */
+.em-foco .trilha-da-norma {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 3;
+  width: auto;
+  max-width: calc(100% - 9rem);
+  justify-content: center;
+  background: transparent;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transform: translateX(-50%);
+}
+
+.em-foco .trilha-da-norma:hover,
+.em-foco .trilha-da-norma:focus-visible {
+  opacity: 1;
+}
+
+/* No monitor e no tablet o foco por artigo não leva a coluna branca do Leitor: o chão é o da penumbra, e o cartão, de
+   papel e com sombra macia, é a única coisa acesa (mockup `foco`). */
+@media (min-width: 768px) {
+  :root[data-modo-foco='artigo'] .leitor.em-foco {
+    background: transparent;
+  }
+
+  /* O cartão e o halo da evidência partem do mesmo raio (`--raio-cartao`): os dois ficam concêntricos. */
+  :root[data-modo-foco='artigo'] .area-artigo {
+    --raio-cartao: 24px;
+  }
+
+  :root[data-modo-foco='artigo'] .cartao-artigo {
+    padding: 1.75rem 2rem;
+    box-shadow: 0 18px 50px -22px rgb(11 19 34 / 35%);
+  }
+}

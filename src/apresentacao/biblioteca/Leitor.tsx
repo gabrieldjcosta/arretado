@@ -419,7 +419,8 @@ function useTextos(
 function fimDaBarraFixa(): number {
   const barra = document.querySelector('.fio-topo');
   const fim = barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
-  const trilha = document.querySelector<HTMLElement>('.trilha-da-norma');
+  // A trilha do modo foco é só um rótulo no alto da tela e não prende a leitura.
+  const trilha = document.querySelector<HTMLElement>('.leitor:not(.em-foco) .trilha-da-norma');
   return fim + (trilha?.getBoundingClientRect().height ?? 0);
 }
 
@@ -2046,7 +2047,7 @@ function LeitorAberto({
           />
         </>
       )}
-      {!modoFoco && abrirSumario && (
+      {(!modoFoco || porArtigo) && abrirSumario && (
         <TrilhaDaNorma
           nos={nos}
           estrutura={estrutura}
