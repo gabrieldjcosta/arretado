@@ -387,7 +387,9 @@ test('ler o CP compilado: a rubrica fica acima do artigo (9.6)', async ({ page }
 function distanciaDoAlto(alvo: Locator) {
   return alvo.first().evaluate((el) => {
     const linha = el.closest('.linha-leitor') ?? el;
-    const barra = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
+    const barra =
+      (document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0) +
+      (document.querySelector('.trilha-da-norma')?.getBoundingClientRect().height ?? 0);
     return linha.getBoundingClientRect().top - barra;
   });
 }
@@ -703,7 +705,9 @@ test('régua de leitura: desligada não realça; ligada em Conta realça a linha
 /** O dispositivo da linha no alto da tela (logo abaixo da barra fixa) e quanto dela ficou acima. */
 function linhaDoAlto(page: Page) {
   return page.evaluate(() => {
-    const barra = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
+    const barra =
+      (document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0) +
+      (document.querySelector('.trilha-da-norma')?.getBoundingClientRect().height ?? 0);
     const linhas = [...document.querySelectorAll('.linha-leitor')];
     const linha = linhas.find((l) => {
       const { top, bottom } = l.getBoundingClientRect();
@@ -2096,7 +2100,9 @@ test('ajustes de leitura: o "Aa" abre a folha embaixo, com a lei à vista; taman
     if (!dialogo) return undefined;
     const caixa = dialogo.getBoundingClientRect();
     const raiz = document.documentElement;
-    const topo = document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0;
+    const topo =
+      (document.querySelector('.fio-topo')?.getBoundingClientRect().bottom ?? 0) +
+      (document.querySelector('.trilha-da-norma')?.getBoundingClientRect().height ?? 0);
     const linhasAVista = [...document.querySelectorAll('.linha-leitor')].filter((linha) => {
       const c = linha.getBoundingClientRect();
       const naTela = c.top >= topo && c.bottom <= window.innerHeight;

@@ -420,7 +420,7 @@ function fimDaBarraFixa(): number {
   const barra = document.querySelector('.fio-topo');
   const fim = barra ? Math.max(0, barra.getBoundingClientRect().bottom) : 0;
   const trilha = document.querySelector<HTMLElement>('.trilha-da-norma');
-  return fim + (trilha?.offsetHeight ?? 0);
+  return fim + (trilha?.getBoundingClientRect().height ?? 0);
 }
 
 function LeitorAberto({
