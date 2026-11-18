@@ -6,8 +6,8 @@ import { noLeitor } from './lugares';
 export const CHAVE_DO_MENU = 'arretado:menu-lateral';
 
 /** Do tablet em pé para cima o menu dos lugares vira o menu lateral; abaixo disso é a pílula de baixo. */
-export const LARGURA_DO_MENU = 768;
-/** Daqui para cima o menu aberto empurra o conteúdo; entre 768 e 1099 ele abre por cima, com véu. */
+export const LARGURA_DO_MENU = 700;
+/** Daqui para cima o menu aberto empurra o conteúdo; entre 700 e 1099 ele abre por cima, com véu. */
 export const LARGURA_DO_MENU_FIXO = 1100;
 
 type Preferencia = 'aberto' | 'recolhido';

@@ -152,7 +152,7 @@ function FolhaAberta({
       const antes = focoAntes.current;
       if (antes instanceof HTMLElement && antes.isConnected) antes.focus({ preventScroll: true });
       // Quem abriu pode ter sido montado de novo enquanto a folha estava aberta (o Varal troca de dois para três fios quando
-      // a janela cruza os 768 px): volta ao novo, achado pelo mesmo `data-volta-foco`.
+      // a janela cruza os 700 px): volta ao novo, achado pelo mesmo `data-volta-foco`.
       else if (antes instanceof HTMLElement && antes.dataset.voltaFoco) {
         document
           .querySelector<HTMLElement>(
