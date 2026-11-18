@@ -25,13 +25,16 @@ import {
 } from '../destino/jornada';
 import dadosBrutos from '../destino/nordeste.json';
 import type { DadosDoNordeste, LugarDoMapa } from '../destino/nordeste';
-import { caminhoDoTrecho, posicaoDoLugar } from '../destino/trilha';
+import { caminhoDoTrecho, posicaoDoLugar, suavizarOrdem } from '../destino/trilha';
 import { animar, animarEDeixar, modoAgora, MOLA, SAIR } from './anima';
 import { esconderOQueSeCobre } from './mapa-cobertura';
 import { avisar } from './toast';
 import { useCameraM } from './useCameraM';
 
-const dados = dadosBrutos as unknown as DadosDoNordeste;
+const bruto = dadosBrutos as unknown as DadosDoNordeste;
+
+/** O caminho passa solto pelos lugares, sem copiar cada vaivém (desvio do PR do traço do Destino). */
+const dados: DadosDoNordeste = { ...bruto, ordem: suavizarOrdem(bruto.ordem, 2) };
 
 /**
  * As fichas dos lugares vêm da pesquisa da Marca e ainda esperam a conferência do Gabriel. Enquanto isto for `false`, a

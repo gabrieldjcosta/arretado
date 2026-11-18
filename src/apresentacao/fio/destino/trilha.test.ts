@@ -7,6 +7,7 @@ import {
   pontoDaCurva,
   portasDaTrilha,
   posicaoDoLugar,
+  suavizarOrdem,
 } from './trilha';
 
 const dados = dadosBrutos as unknown as DadosDoNordeste;
@@ -101,5 +102,32 @@ describe('os estados no caminho', () => {
     }
     const ordemDoCaminho = passos.map((p) => p.seg + p.t);
     expect([...ordemDoCaminho].sort((a, b) => a - b)).toEqual(ordemDoCaminho);
+  });
+});
+
+describe('suavizarOrdem', () => {
+  const zigue = [
+    { x: 0, y: 0 },
+    { x: 100, y: 80 },
+    { x: 0, y: 160 },
+    { x: 100, y: 240 },
+    { x: 0, y: 320 },
+  ];
+  it('mantém as pontas e a quantidade, e tira o vaivém do meio', () => {
+    const s = suavizarOrdem(zigue, 1.5);
+    expect(s).toHaveLength(5);
+    expect(s[0]).toEqual(zigue[0]);
+    expect(s[4]).toEqual(zigue[4]);
+    const largura = Math.max(...s.map((p) => p.x)) - Math.min(...s.map((p) => p.x));
+    expect(largura).toBeLessThan(100);
+  });
+  it('mantém o estado de cada lugar e não muda nada com sigma zero', () => {
+    const comUf = [
+      { x: 0, y: 0, uf: 'MA' },
+      { x: 50, y: 50, uf: 'PI' },
+      { x: 100, y: 0, uf: 'CE' },
+    ];
+    expect(suavizarOrdem(comUf, 2).map((p) => p.uf)).toEqual(['MA', 'PI', 'CE']);
+    expect(suavizarOrdem(comUf, 0)).toEqual(comUf);
   });
 });

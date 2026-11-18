@@ -128,3 +128,30 @@ export function passosDoEstado(ordem: readonly PontoDeEstado[], uf: string): Pas
   }
   return passos;
 }
+
+/**
+ * Os lugares do caminho "soltos": cada ponto vira a média dos vizinhos (peso gaussiano pela posição na ordem, `sigma` em
+ * lugares), menos o primeiro e o último. O caminho continua passando pelos estados na ordem da jornada, mas sem copiar
+ * cada vaivém dentro de um estado nem apontar para o município exato (o Gabriel achou o traço "duro" e "angular").
+ * Os estados, a ordem e a quantidade de lugares não mudam, então as porteiras, os pontos de artigo e as fichas seguem
+ * os mesmos índices.
+ */
+export function suavizarOrdem<T extends Ponto>(ordem: readonly T[], sigma: number): T[] {
+  if (sigma <= 0) return [...ordem];
+  const alcance = Math.ceil(sigma * 3);
+  return ordem.map((p, i) => {
+    if (i === 0 || i === ordem.length - 1) return p;
+    let sx = 0;
+    let sy = 0;
+    let sw = 0;
+    for (let j = -alcance; j <= alcance; j += 1) {
+      const q = ordem[i + j];
+      if (!q) continue;
+      const w = Math.exp(-(j * j) / (2 * sigma * sigma));
+      sx += q.x * w;
+      sy += q.y * w;
+      sw += w;
+    }
+    return { ...p, x: sx / sw, y: sy / sw };
+  });
+}

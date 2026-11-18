@@ -1214,3 +1214,36 @@ html[data-texto-fio] .m-fio .m-proximo {
   min-height: 44px;
   text-align: center;
 }
+
+/* NNN. O traço do Destino é um pontilhado fino que passa solto pelos lugares, e a bolinha de cada lugar fica um pouco
+      maior. Motivo: o traço do mockup (tracejado de 8 por 6 em reta por pedaços) passava exatamente por cada município e
+      copiava cada vaivém dentro do estado, o que o Gabriel achou duro e angular (pedido de 17/11/2026, escolha entre
+      quatro propostas). Os pontos agora são redondos (traço de comprimento zero com ponta redonda), o halo é mais fino e a
+      bolinha do lugar passa de 14 para 18 px. O trecho andado continua linha cheia âmbar. */
+.m-fio.m-fio .m-destino.m-ne .m-trilha-halo {
+  stroke-width: 7;
+}
+
+.m-fio.m-fio .m-destino.m-ne .m-tracejado {
+  stroke-width: 3.4;
+  stroke-dasharray: 0 9;
+  stroke-linecap: round;
+}
+
+.m-fio.m-fio .m-destino.m-ne .m-tracejado.m-longe {
+  stroke-width: 2.2;
+  stroke-dasharray: 0 10;
+}
+
+.m-fio.m-fio .m-ne-lugar {
+  transform: translate(-9px, -50%);
+}
+
+.m-fio.m-fio .m-ne-lugar.m-esq {
+  transform: translate(calc(-100% + 9px), -50%);
+}
+
+.m-fio.m-fio .m-ne-lugar i {
+  width: 18px;
+  height: 18px;
+}
