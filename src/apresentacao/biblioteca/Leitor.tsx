@@ -614,7 +614,7 @@ function LeitorAberto({
     [linhas, unidades, artigoAtual],
   );
   const noMapa = porArtigo && busca.get(PARAMETRO_DO_MAPA) === '1';
-  const roteiro = useRoteiroDoMapa(norma.id, noMapa);
+  const roteiro = useRoteiroDoMapa(norma.id, porArtigo);
   const cartao = useRef<HTMLElement | null>(null);
   // O dispositivo do artigo mostrado: o "alto da tela" do cartão.
   const artigoNoAlto = useRef<string | undefined>(undefined);
@@ -1241,9 +1241,28 @@ function LeitorAberto({
     const ate = linhas[fimDaUnidade(linhas, unidades, ordem) - 1]?.indice ?? -1;
     return roteiro.quadrados.findIndex((q) => q.indice >= de && q.indice <= ate);
   })();
-  const vezNoMapa =
-    roteiro?.trechos.findIndex((t) => posicaoNoMapa >= t.de && posicaoNoMapa <= t.ate) ?? -1;
+  const vezNoMapa = noMapa
+    ? (roteiro?.trechos.findIndex((t) => posicaoNoMapa >= t.de && posicaoNoMapa <= t.ate) ?? -1)
+    : -1;
   const fimDoTrecho = vezNoMapa >= 0 && posicaoNoMapa === roteiro?.trechos[vezNoMapa]?.ate;
+  function seguirOMapaAgora() {
+    setBusca(
+      { [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO, [PARAMETRO_DO_MAPA]: '1' },
+      { replace: true, state: estadoDaRota },
+    );
+    setAnuncio('Seguindo o mapa.');
+  }
+  // Voltar no roteiro: dentro do trecho é o artigo de antes; no começo do trecho, o último do trecho anterior
+  // (e não o artigo anterior da norma, que sai da ordem do mapa).
+  function anteriorNoMapa(): number | undefined {
+    const trecho = roteiro?.trechos[vezNoMapa];
+    if (!roteiro || !trecho || ordem === undefined) return undefined;
+    if (posicaoNoMapa > trecho.de) return ordem > 0 ? ordem - 1 : undefined;
+    const antes = roteiro.trechos[vezNoMapa - 1];
+    const no = antes && roteiro.quadrados[antes.ate]?.indice;
+    if (no === undefined) return undefined;
+    return unidadeDaLinha(linhas, unidades, linhaDoNo(linhas, no) ?? 0);
+  }
   function pararDeSeguirOMapa() {
     setBusca({ [PARAMETRO_DO_FOCO]: VALOR_DO_ARTIGO }, { replace: true, state: estadoDaRota });
   }
@@ -1300,7 +1319,10 @@ function LeitorAberto({
       else if (ordem !== undefined && ordem + 1 < unidades.length) irParaUnidade(ordem + 1);
     };
     irAoAnterior.current = () => {
-      if (ordem !== undefined && ordem > 0) irParaUnidade(ordem - 1);
+      if (noMapa && roteiro && vezNoMapa >= 0) {
+        const o = anteriorNoMapa();
+        if (o !== undefined) irParaUnidade(o);
+      } else if (ordem !== undefined && ordem > 0) irParaUnidade(ordem - 1);
     };
   });
   // Cada artigo novo abre no alto: o cartão e a página voltam ao começo.
@@ -2209,12 +2231,22 @@ function LeitorAberto({
                   proximo={() => {
                     irAoProximo.current();
                   }}
-                  noPrimeiro={ordem <= 0}
+                  noPrimeiro={
+                    noMapa && vezNoMapa >= 0 ? anteriorNoMapa() === undefined : ordem <= 0
+                  }
                   noUltimo={ordem + 1 >= unidades.length && !fimDoTrecho}
                 >
                   <BarraFina valor={ordem + 1} max={unidades.length} rotulo={rotuloDoCartao} />
                 </SetasDoCartao>
-                {roteiro && (
+                {roteiro && !noMapa && (
+                  <p className="seguindo-mapa">
+                    <span>Esta norma tem mapa.</span>
+                    <button type="button" className="discreto" onClick={seguirOMapaAgora}>
+                      Seguir o mapa
+                    </button>
+                  </p>
+                )}
+                {roteiro && noMapa && (
                   <p className="seguindo-mapa">
                     <span>
                       {vezNoMapa >= 0 && roteiro.trechos[vezNoMapa]
