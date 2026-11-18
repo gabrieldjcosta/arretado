@@ -27,6 +27,13 @@
 :root[data-modo-foco] {
   --menu: 0px;
 }
+/* Abaixo de 1100 px a coluna do texto é mais estreita que o espaço livre e acompanha a largura: sem menu ela alargaria e o
+   texto se refaria ao entrar no foco, perdendo o ponto da leitura. Ali a faixa do menu fica reservada (vazia) no foco em texto corrido; o cartão (um artigo por vez) é centrado na tela. */
+@media (min-width: 700px) and (max-width: 1099px) {
+  :root[data-menu-lateral] .shell-fio:has(.leitor.em-foco:not(.por-artigo)) {
+    padding-left: calc(76px + env(safe-area-inset-left, 0px));
+  }
+}
 
 body[data-so-estudo] {
   --menu: 0px;

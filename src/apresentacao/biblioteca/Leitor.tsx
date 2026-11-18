@@ -2045,7 +2045,7 @@ function LeitorAberto({
   return (
     <div
       ref={caixaDoLeitor}
-      className={modoFoco ? 'leitor em-foco' : 'leitor'}
+      className={`${modoFoco ? 'leitor em-foco' : 'leitor'}${porArtigo ? ' por-artigo' : ''}`}
       data-regua-foco={reguaDeFoco === 'desligada' ? undefined : reguaDeFoco}
       // A estrutura da norma e o trilho de ferramentas se alinham pelo fim do cabeçalho preso.
       style={{ '--barra-fixa': `${String(barraFixa)}px` } as CSSProperties}
