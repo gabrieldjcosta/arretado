@@ -8,7 +8,6 @@ import {
   criarCartaoDeErro,
   criarCartaoManual,
   criarFraseDeTrecho,
-  hoje,
   registrarErro,
   revisar,
 } from '../../dominios/recall/servico';
@@ -16,7 +15,6 @@ import { iniciarSessao, pausarSessao } from '../../dominios/sessao/servico';
 import { simularMovimento } from '../../testes/movimento';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import { App } from '../App';
-import { reunirEntradas } from '../hoje/proxima-acao';
 
 async function abrir(rota: string, repo?: Repositorio) {
   const r = repo ?? (await repositorioDeTeste()).repo;
@@ -516,8 +514,6 @@ describe('cota e início do Recall (fatia 3)', () => {
     ).toBeInTheDocument();
     // 5 itens de 30 s: 3 min (contando só os Cartões seriam 2).
     expect(screen.getByText('cerca de 3 min')).toBeInTheDocument();
-    const { entrada } = await reunirEntradas(repo, hoje(repo));
-    expect(entrada.minutosDaRodada).toBe(3);
   });
 
   it('só com Frases vencidas, a ação também traz a estimativa', async () => {

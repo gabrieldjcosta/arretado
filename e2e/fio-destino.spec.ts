@@ -191,7 +191,8 @@ test('rolado, o Destino esmaece no alto, onde fica o "+", e não deixa o texto p
   test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await prepararAPrevia(page, false);
-  await page.setViewportSize({ width: 360, height: 640 });
+  await page.setViewportSize({ width: 360, height: 560 });
+  // Sem a moldura (layout B, 17/11) o quadro ganha a altura toda: 560 garante mais de 40 px para rolar.
   await nav(page).getByRole('button', { name: 'Destino' }).click();
   await expect(mapa(page)).toBeVisible();
   const tela = page.locator('[data-tela="mapa"]');

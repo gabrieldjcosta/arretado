@@ -3,7 +3,7 @@
 Data: 20/10/2026 · Nível de risco: **A** em todos os pacotes · Autor: B0 (só documento; nenhum código, migração ou toque no Supabase real).
 Pedido do Gabriel (20/10, 20:23Z): quem loga tem as mudanças salvas na conta e acha tudo igual em outro aparelho, sem ficar presa a um só.
 **Decidido pelo Gabriel (20/10, 20:43Z):** dados de estudo ficam **legíveis só pelo dono, sob RLS, sem frase**. O A6 (cópia cifrada manual) segue como cópia extra opcional. **D17 não se reabre.**
-Leitura de base: `f4a-contas.md` §8–§9, `f4a-fila-2026-10-18.md` §7, `especificacao-parte1.md` §19 (D1, D17, D18, D21), `decisoes-tecnicas.md` (T7, T8, T26–T28), `supabase/migrations/20260923000000_esquema_inicial.sql`, `src/core/persistencia/{banco,log,colecao}.ts`, `src/core/ids/index.ts`.
+Leitura de base: `f4a-contas.md` §8–§9, `arquivo/f4a-fila-2026-10-18.md` §7, `especificacao-parte1.md` §19 (D1, D17, D18, D21), `decisoes-tecnicas.md` (T7, T8, T26–T28), `supabase/migrations/20260923000000_esquema_inicial.sql`, `src/core/persistencia/{banco,log,colecao}.ts`, `src/core/ids/index.ts`.
 
 ## 0. Resumo (o que muda e o que a pessoa vê)
 

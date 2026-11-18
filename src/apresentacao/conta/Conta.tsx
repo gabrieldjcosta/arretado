@@ -4,8 +4,6 @@ import { contasHabilitadas } from '../../integracoes/conta';
 import { LinhaLista } from '../componentes/LinhaLista';
 import { useDados } from '../dados/contexto';
 import { LinhaDeSincronizacao } from './LinhaDeSincronizacao';
-import { LinhaDeInstalacao } from './LinhaDeInstalacao';
-import { LinhaDoPasseio } from './LinhaDoPasseio';
 import { RegistrarAceite } from './entrar/RegistrarAceite';
 import { ContaDoAparelhoSecao } from './sair/ContaDoAparelho';
 import './estilos-conta.css';
@@ -43,10 +41,6 @@ export function Conta() {
             <LinhaLista para={item.caminho} titulo={item.titulo} apoio={item.dica} />
           </li>
         ))}
-        <li>
-          <LinhaDoPasseio />
-        </li>
-        <LinhaDeInstalacao />
         {contasHabilitadas() && (
           <li>
             <LinhaDeSincronizacao />

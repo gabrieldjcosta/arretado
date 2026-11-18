@@ -197,6 +197,18 @@
   }
 }
 
+/* A 320 px o menu, o nome (a 1,25 rem) e a Ajuda somam 20 px mais que a linha deixa (a tela menos o recuo e a reserva do
+   "+"), e a Ajuda caía para a 2ª linha. O nome encolhe para 1,0625 rem só aqui; de 360 px para cima cabe como era
+   (medido a 320, 340 e 360 px em `e2e/fio-topo-estreito.spec.ts`). */
+@media (max-width: 22.5rem) {
+  .shell-fio .fio-topo .fio-marca {
+    font-size: min(
+      1.0625rem,
+      (100vw - var(--gutter) - var(--mais-direita) - var(--mais-lado) - 0.25rem) / 7
+    );
+  }
+}
+
 .fio-menu {
   display: inline-grid;
   place-items: center;

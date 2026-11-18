@@ -23,6 +23,8 @@ import { NavDosLugares } from './NavDosLugares';
 import { LinkDoFio } from './LinkDoFio';
 import { useLuzDaHora } from './luz-da-hora';
 import { lembrarDeOndeVeio } from './volta-do-leitor';
+import { MenuLateral } from './MenuLateral';
+import { useMenuLateral, type MenuLateral as EstadoDoMenu } from './menu-lateral';
 import './fio-base.css';
 
 /**
@@ -32,7 +34,7 @@ import './fio-base.css';
  * embaixo é da tela). Sem rodapé: o backup e os dados moram na Conta. Os
  * provedores (Abertura, itens do "+") vêm do `Shell`. Some quando as fatias seguintes derem casa nova a cada tela.
  */
-function CascaLegada() {
+function CascaLegada({ menu }: { menu: EstadoDoMenu }) {
   const { pathname } = useLocation();
   const [relatando, setRelatando] = useState(false);
   const [boasVindas, setBoasVindas] = useState(false);
@@ -100,7 +102,15 @@ function CascaLegada() {
         <main id="conteudo" className="conteudo fio-conteudo" tabIndex={-1}>
           <Outlet />
         </main>
-        {!semPilula && <NavDosLugares />}
+        {/* Do tablet em pé para cima a nav vai para o menu lateral, também dentro da norma (recolhido); no celular é a
+            pílula de baixo, que a norma e o pouso não levam. */}
+        {menu.lateral ? (
+          <MenuLateral menu={menu}>
+            <NavDosLugares noMenuLateral />
+          </MenuLateral>
+        ) : (
+          !semPilula && <NavDosLugares />
+        )}
         <CantoDaSessao />
         {boasVindas && (
           <Chegada
@@ -135,5 +145,7 @@ export function CascaDoFio() {
   // O "Voltar" do Leitor leva ao endereço de onde a pessoa entrou na norma. Anotado ao desenhar, e não num efeito:
   // o Leitor lê a origem neste mesmo desenho, antes de qualquer efeito da casca. Repetir a rota não muda nada.
   lembrarDeOndeVeio(pathname, search, useNavigationType() === NavigationType.Pop);
-  return noQuadroDoFio(pathname) ? <CascaM /> : <CascaLegada />;
+  // O menu lateral (PC e tablet) vive aqui, acima das duas cascas: aberto ou recolhido não muda ao passar de uma à outra.
+  const menu = useMenuLateral(pathname);
+  return noQuadroDoFio(pathname) ? <CascaM menu={menu} /> : <CascaLegada menu={menu} />;
 }
