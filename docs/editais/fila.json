@@ -134,5 +134,21 @@
     "tipo": "novo",
     "url": "https://www.concursosfcc.com.br/concursos/unasp126/index.html",
     "detectadoEm": "2026-11-14"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/abgfg126/index.html",
+    "detectadoEm": "2026-11-19"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/fdsbc126/index.html",
+    "detectadoEm": "2026-11-19"
   }
 ]
