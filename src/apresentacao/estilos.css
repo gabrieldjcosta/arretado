@@ -4453,3 +4453,19 @@ html[data-perfil='calmo'] .seletor-mundo-dia .seletor-mundo-halo {
     transition: none !important;
   }
 }
+
+/* No toque, as ações do trecho marcado flutuam junto da seleção (o Leitor põe o `top`): a aba de pesquisa
+   do Google sobe da base e cobriria a barra de baixo. Classe dobrada para vencer a barra do celular, do
+   modo foco e do trilho, que mexem nas mesmas bordas. */
+.leitor .acoes-leitor.sobre-selecao.sobre-selecao {
+  right: max(8px, env(safe-area-inset-right, 0px));
+  bottom: auto;
+  left: max(8px, env(safe-area-inset-left, 0px));
+  justify-content: center;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  box-shadow: var(--sombra-botao);
+  max-width: none;
+}

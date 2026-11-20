@@ -92,6 +92,7 @@ import {
   ATRIBUTO_FORA_DO_TEXTO,
   CLASSE_DO_TEXTO,
   lerSelecao,
+  ondeFicamAsAcoes,
   type SelecaoNoTexto,
 } from './selecao';
 import { useEstrelas } from './usarEstrelas';
@@ -1479,6 +1480,43 @@ function LeitorAberto({
     setSelecao(undefined);
     document.getSelection()?.removeAllRanges();
   }, []);
+  // No toque (celular e tablet sem trilho) as ações do trecho saem da base, onde a aba de pesquisa do
+  // Google as cobre, e seguem a seleção (ondeFicamAsAcoes).
+  const [yDasAcoes, setYDasAcoes] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    if (!selecao) return;
+    if (
+      !window.matchMedia('(pointer: coarse)').matches ||
+      window.matchMedia('(min-width: 75em)').matches
+    )
+      return;
+    let quadro = 0;
+    const medir = () => {
+      quadro = 0;
+      const sel = document.getSelection();
+      const barra = barraDoLeitor.current;
+      if (!sel || sel.rangeCount === 0 || !barra) return;
+      const retangulos = sel.getRangeAt(0).getClientRects();
+      const ultimo = retangulos[retangulos.length - 1];
+      if (!ultimo) return;
+      const janela = window.visualViewport?.height ?? window.innerHeight;
+      const y = ondeFicamAsAcoes(ultimo.bottom, barra.offsetHeight || 56, janela, barraFixa + 8);
+      setYDasAcoes((antes) => (antes !== undefined && Math.abs(antes - y) < 1 ? antes : y));
+    };
+    const agendar = () => {
+      if (quadro === 0) quadro = requestAnimationFrame(medir);
+    };
+    medir();
+    document.addEventListener('selectionchange', agendar);
+    window.addEventListener('scroll', agendar, { passive: true });
+    window.addEventListener('resize', agendar);
+    return () => {
+      if (quadro) cancelAnimationFrame(quadro);
+      document.removeEventListener('selectionchange', agendar);
+      window.removeEventListener('scroll', agendar);
+      window.removeEventListener('resize', agendar);
+    };
+  }, [selecao, barraFixa]);
   const referenciaDoDispositivo = (dispositivoId: string) => {
     const indice = aberta.indiceDe.get(dispositivoId);
     if (indice === undefined) return '';
@@ -2273,7 +2311,14 @@ function LeitorAberto({
           modo foco, semitransparente. O mesmo botão entra e sai (o foco do teclado fica nele). */}
       <div
         ref={barraDoLeitor}
-        className="acoes-leitor"
+        className={
+          selecao && yDasAcoes !== undefined ? 'acoes-leitor sobre-selecao' : 'acoes-leitor'
+        }
+        style={
+          selecao && yDasAcoes !== undefined
+            ? { top: `${String(yDasAcoes)}px`, bottom: 'auto' }
+            : undefined
+        }
         onPointerDownCapture={() => {
           tocouNasAcoes.current = performance.now();
         }}
