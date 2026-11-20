@@ -87,8 +87,8 @@ test.describe('"+" da casca', () => {
     const topo = page.getByRole('banner');
     const caixaTopo = await caixaDe(topo, 'cabeçalho');
     const m = await caixaDe(mais(page), '+');
-    // Com o menu lateral (a partir de 768 px) o ☰ do cabeçalho não existe.
-    const comLateral = (await larguraDaTela(page)) >= 768;
+    // Com o menu lateral (a partir de 700 px) o ☰ do cabeçalho não existe.
+    const comLateral = (await larguraDaTela(page)) >= 700;
     const menu = comLateral
       ? { x: 0, y: 0, width: 0, height: 0 }
       : await caixaDe(topo.getByRole('link', { name: 'Menu: sua conta e ajustes' }), 'Menu');
