@@ -89,7 +89,8 @@ test('mapa: "ler seguindo o mapa" diz para onde o Próximo vai no fim do trecho,
   const parar = linha.getByRole('button', { name: 'Parar' });
   expect((await parar.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await parar.click();
-  await expect(linha).toHaveCount(0);
+  await expect(linha).not.toContainText('Seguindo o mapa');
+  await expect(linha.getByRole('button', { name: 'Seguir o mapa' })).toBeVisible();
   await expect(page.getByRole('region', { name: /^Art\. 5º,/ })).toBeFocused();
 });
 

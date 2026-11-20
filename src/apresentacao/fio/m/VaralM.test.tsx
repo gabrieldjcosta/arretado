@@ -118,6 +118,56 @@ describe('o Varal no quadro do mockup', () => {
     expect(document.querySelectorAll('.m-xilo svg path')).toHaveLength(6);
   });
 
+  it('do tablet em pé para cima, três fios de dois (layout B), e a corda só balança no Vivo', async () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    const antes = window.matchMedia.bind(window);
+    window.matchMedia = (consulta: string) => {
+      const resposta = antes(consulta);
+      return Object.assign(Object.create(resposta) as MediaQueryList, {
+        matches: consulta.includes('min-width: 700px') || resposta.matches,
+      });
+    };
+    // O Vivo pede um navegador que anime (o jsdom não anima; o `afterEach` tira o `animate`).
+    (Element.prototype as ComAnimate).animate = vi.fn(() => ({
+      finished: new Promise<void>(() => undefined),
+      cancel: () => undefined,
+    }));
+    try {
+      simularMovimento('normal');
+      await abrir({ vazio: true });
+      const nomes = (rotulo: string) =>
+        [...screen.getByRole('group', { name: rotulo }).querySelectorAll('strong')].map(
+          (n) => n.textContent,
+        );
+      expect(nomes('O que você estuda')).toEqual(['Normas', 'Súmulas e teses']);
+      expect(nomes('O que você escreve')).toEqual(['Meus textos', 'Frases']);
+      expect(nomes('O que você revisa')).toEqual(['Cartões', 'Lembretes']);
+      expect(document.querySelectorAll('.m-varal-fio')).toHaveLength(3);
+      // O vento corre da esquerda para a direita e de cima para baixo: cada pendurado sabe a coluna e o fio.
+      const pendurados = [...document.querySelectorAll<HTMLElement>('.m-pendurado')];
+      expect(
+        pendurados.map((p) => [p.style.getPropertyValue('--c'), p.style.getPropertyValue('--r')]),
+      ).toEqual([
+        ['0', '0'],
+        ['1', '0'],
+        ['0', '1'],
+        ['1', '1'],
+        ['0', '2'],
+        ['1', '2'],
+      ]);
+      expect(document.querySelectorAll('.m-varal-fio animate')).toHaveLength(6);
+    } finally {
+      if (original) Object.defineProperty(window, 'matchMedia', original);
+    }
+  });
+
+  it('no Calmo a corda fica parada', async () => {
+    simularMovimento('calmo');
+    await abrir({ vazio: true });
+    expect(document.querySelectorAll('.m-varal-fio')).toHaveLength(2);
+    expect(document.querySelectorAll('.m-varal-fio animate')).toHaveLength(0);
+  });
+
   it('um app vazio: nenhum número, e cada folheto diz o que fazer', async () => {
     await abrir({ vazio: true });
     expect(await screen.findByText('puxe uma do acervo')).toBeInTheDocument();

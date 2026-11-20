@@ -1,7 +1,8 @@
 import { dataCivil } from '../../core/datas';
 import type { Repositorio } from '../../core/persistencia';
 import { repositorioDeTeste } from '../../testes/repositorio';
-import { diaDeHoje, fecharDia, reabrirDia, resumoDoDia } from './fechar';
+import { fecharDia, reabrirDia } from '../../testes/dia';
+import { diaDeHoje, resumoDoDia } from './fechar';
 import { situacaoDeRetorno } from './retorno';
 
 type Estado = 'ativa' | 'encerrada';

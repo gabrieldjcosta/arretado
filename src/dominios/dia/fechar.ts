@@ -53,23 +53,3 @@ export async function resumoDoDia(repo: Repositorio): Promise<ResumoDoDia> {
     ...(dia ? { dia } : {}),
   };
 }
-
-/** Fecha o Dia de hoje (cria o registro se preciso). Fechar um Dia já fechado não muda nada. */
-export async function fecharDia(repo: Repositorio): Promise<Dia> {
-  const existente = await diaDeHoje(repo);
-  if (existente?.fechadoEm) return existente;
-  const fechadoEm = repo.ctx.agora().toISOString();
-  const dia = existente
-    ? await repo.colecao('dias').atualizar(existente.id, { fechadoEm })
-    : await repo.colecao('dias').criar({ data: dataCivil(repo.ctx.agora()), fechadoEm });
-  repo.eventos.emitir('dia.fechado', { diaId: dia.id });
-  return dia;
-}
-
-/** Reabre o Dia de hoje (a pessoa voltou a estudar). Sem Dia fechado, não faz nada. */
-export async function reabrirDia(repo: Repositorio): Promise<void> {
-  const existente = await diaDeHoje(repo);
-  if (!existente?.fechadoEm) return;
-  await repo.colecao('dias').atualizar(existente.id, { fechadoEm: undefined });
-  repo.eventos.emitir('dia.reaberto', { diaId: existente.id });
-}

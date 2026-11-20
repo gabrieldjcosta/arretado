@@ -1,4 +1,4 @@
-import { fecharDia } from '../../dominios/dia/fechar';
+import { fecharDia } from '../../testes/dia';
 import { alterarPreferencias } from '../../core/preferencias';
 import { encerrarSessao, iniciarSessao } from '../../dominios/sessao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';

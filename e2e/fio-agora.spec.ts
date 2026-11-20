@@ -281,8 +281,12 @@ test('o teclado também puxa o fio, e Destino e Varal passam no axe', async ({ p
     .click();
   await expect(page.getByRole('heading', { level: 1, name: 'Varal' })).toBeAttached();
   await expect(page.getByRole('heading', { level: 2, name: /pendurado no fio/ })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'O que você estuda' })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'O que você guarda' })).toBeVisible();
+  // No celular, dois fios de três; do tablet em pé (700 px) para cima, três fios de dois (layout B, 17/11).
+  const fios =
+    (page.viewportSize()?.width ?? 0) >= 700
+      ? ['O que você estuda', 'O que você escreve', 'O que você revisa']
+      : ['O que você estuda', 'O que você guarda'];
+  for (const nome of fios) await expect(page.getByRole('group', { name: nome })).toBeVisible();
   await semViolacoesNoFio(page);
 });
 

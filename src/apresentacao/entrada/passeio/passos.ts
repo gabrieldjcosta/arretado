@@ -126,10 +126,3 @@ export const CONTROLES = {
 /** "Passo 2 de 4": o texto do topo de cada passo e o aviso para o leitor de tela. */
 export const progressoDoPasso = (indice: number): string =>
   `Passo ${String(indice + 1)} de ${String(PASSOS.length)}`;
-
-/** A linha do passeio em Conta (a fonte do que ela diz, e do botão que abre os três passos). */
-export const PASSEIO_NA_CONTA = {
-  titulo: 'Passeio pelos menus',
-  apoio: 'Os três lugares, um por vez, quando você quiser.',
-  acao: 'Fazer o passeio',
-} as const;

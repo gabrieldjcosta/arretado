@@ -15,7 +15,7 @@ Não alterar: `src/`, `e2e/`, `supabase/`, `.github/`, `CLAUDE.md`, `AGENTS.md`,
 - [ ] Cada critério do portão aparece com teste citado (caminho que existe; conferir com `git grep`) ou "não medido" + quem mede.
 - [ ] Toda afirmação de "feito" cita PR e SHA conferidos com `git log origin/integracao`.
 - [ ] Nenhum `[A DEFINIR PELO GABRIEL]` preenchido; nenhuma decisão do Gabriel tomada no texto.
-- [ ] Fila e decisões batem com [`../f4a-fila-2026-10-18.md`](../f4a-fila-2026-10-18.md) (ou registram a divergência).
+- [ ] Fila e decisões batem com [`../arquivo/f4a-fila-2026-10-18.md`](../arquivo/f4a-fila-2026-10-18.md) (ou registram a divergência).
 
 ## Verificação
 `npm run format:check` e `npm run lint`. Evidência: lista dos testes citados com `git grep -l` de cada um.
