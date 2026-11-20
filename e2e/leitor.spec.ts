@@ -1101,8 +1101,8 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
     // faixa de baixo (30%), junto da seleção ou no alto.
     const caixa = await acoes.locator('xpath=..').boundingBox();
     const janela = page.viewportSize()?.height ?? 0;
-    expect(caixa).not.toBeNull();
-    expect(caixa!.y + caixa!.height).toBeLessThanOrEqual(janela * 0.7 + 1);
+    if (!caixa) throw new Error('as ações do trecho não têm caixa');
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(janela * 0.7 + 1);
   }
   await semViolacoes(page);
   await apertar(acoes.getByRole('button', { name: 'Grifar com a cor 1' }), toque);
