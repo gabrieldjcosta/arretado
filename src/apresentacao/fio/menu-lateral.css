@@ -1,5 +1,5 @@
 /* O menu lateral do PC e do tablet (layout B, Gabriel 17/11/2026; mockups em /mnt/project-files/fio-moldura-17-11/v2).
-   Do tablet em pé (768 px) para cima a nav dos lugares sai da pílula de baixo e fica de pé à esquerda: recolhido mostra só
+   Do tablet em pé (700 px) para cima a nav dos lugares sai da pílula de baixo e fica de pé à esquerda: recolhido mostra só
    os ícones (76 px), aberto mostra os nomes (240 px). No monitor (1100 px ou mais) o aberto empurra o conteúdo; no tablet ele
    abre por cima, com véu. --menu é a largura que o conteúdo e o "+" deixam livre à esquerda, já com o entalhe do
    aparelho deitado (o menu cresce para dentro da área segura em vez de ficar debaixo dela). */
@@ -8,7 +8,7 @@
   --menu-do-mais: 0px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 700px) {
   :root[data-menu-lateral] {
     --menu: calc(76px + env(safe-area-inset-left, 0px));
     --menu-do-mais: calc(76px + env(safe-area-inset-left, 0px));
@@ -26,6 +26,13 @@
    "+" fica onde estava na leitura (`--menu-do-mais` não zera), como sempre ficou: ele não pula ao entrar nem ao sair. */
 :root[data-modo-foco] {
   --menu: 0px;
+}
+/* Abaixo de 1100 px a coluna do texto é mais estreita que o espaço livre e acompanha a largura: sem menu ela alargaria e o
+   texto se refaria ao entrar no foco, perdendo o ponto da leitura. Ali a faixa do menu fica reservada (vazia) no foco em texto corrido; o cartão (um artigo por vez) é centrado na tela. */
+@media (min-width: 700px) and (max-width: 1099px) {
+  :root[data-menu-lateral] .shell-fio:has(.leitor.em-foco:not(.por-artigo)) {
+    padding-left: calc(76px + env(safe-area-inset-left, 0px));
+  }
 }
 
 body[data-so-estudo] {
@@ -314,7 +321,7 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
 }
 
 /* ---------- A casca de antes com o menu: o conteúdo começa depois dele ---------- */
-@media (min-width: 768px) {
+@media (min-width: 700px) {
   :root[data-menu-lateral] .shell-fio {
     padding-left: var(--menu);
   }

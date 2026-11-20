@@ -9,10 +9,10 @@ import { expect, importarEPublicar, semViolacoes, test } from './apoio';
 
 const pilula = (page: Page) => page.getByRole('navigation', { name: 'Lugares' });
 
-/** Na norma os lugares saem da frente. Do tablet deitado para cima (768 px) a nav mora no menu lateral (layout B, 17/11):
+/** Na norma os lugares saem da frente. Do tablet deitado para cima (700 px) a nav mora no menu lateral (layout B, 17/11):
  * ali ela fica recolhida, só os ícones, sem lugar aceso. Abaixo disso a pílula sai de cena. */
 async function lugaresForaDaFrente(page: Page) {
-  if ((page.viewportSize()?.width ?? 0) >= 768) {
+  if ((page.viewportSize()?.width ?? 0) >= 700) {
     await expect(page.locator('.menu-lateral')).toHaveAttribute('data-aberto', 'nao');
     await expect(pilula(page).locator('[aria-current="page"]')).toHaveCount(0);
   } else await expect(pilula(page)).toHaveCount(0);

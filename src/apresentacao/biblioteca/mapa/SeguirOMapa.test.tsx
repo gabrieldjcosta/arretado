@@ -124,4 +124,24 @@ describe('Ler seguindo o mapa', () => {
     // A linha sai com o botão que tinha o foco: o foco vai ao cartão, não ao começo da página.
     expect(screen.getByLabelText(/^Art\. 3º,/)).toHaveFocus();
   });
+
+  it('"Anterior" no começo de um trecho volta ao fim do trecho anterior do mapa, e "Seguir o mapa" liga o modo', async () => {
+    const { repo } = await repositorioDeTeste();
+    const normaId = await publicar(repo);
+    window.location.hash = `#/biblioteca/normas/${normaId}?ir=art1&foco=artigo&mapa=1`;
+    const usuario = userEvent.setup();
+    render(
+      <ContextoFonteIncidencia.Provider value={fonte()}>
+        <App abrir={() => Promise.resolve(repo)} />
+      </ContextoFonteIncidencia.Provider>,
+    );
+    expect(await screen.findByText(/trecho 2 de 2/)).toBeVisible();
+    await usuario.click(screen.getByRole('button', { name: 'Artigo anterior' }));
+    expect(screen.getByLabelText(/^Art\. 4º,/)).toBeInTheDocument();
+    expect(screen.getByText(/trecho 1 de 2/)).toBeVisible();
+
+    await usuario.click(screen.getByRole('button', { name: 'Parar' }));
+    await usuario.click(await screen.findByRole('button', { name: 'Seguir o mapa' }));
+    expect(await screen.findByText(/Seguindo o mapa: /)).toBeVisible();
+  });
 });

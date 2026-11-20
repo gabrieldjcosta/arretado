@@ -124,7 +124,7 @@ describe('o Varal no quadro do mockup', () => {
     window.matchMedia = (consulta: string) => {
       const resposta = antes(consulta);
       return Object.assign(Object.create(resposta) as MediaQueryList, {
-        matches: consulta.includes('min-width: 768px') || resposta.matches,
+        matches: consulta.includes('min-width: 700px') || resposta.matches,
       });
     };
     // O Vivo pede um navegador que anime (o jsdom não anima; o `afterEach` tira o `animate`).

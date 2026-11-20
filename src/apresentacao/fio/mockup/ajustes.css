@@ -1157,7 +1157,7 @@ html[data-texto-fio] .m-fio .m-proximo {
   background: var(--m-app-c);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 700px) {
   :root[data-menu-mudando] .m-fio {
     transition: padding-left 0.45s var(--m-sair);
   }
@@ -1346,7 +1346,7 @@ html[data-texto-fio] .m-fio .m-proximo {
     animation: none;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 700px) {
   .m-fio .m-varal {
     gap: 30px;
   }
