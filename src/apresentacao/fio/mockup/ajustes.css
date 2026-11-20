@@ -26,16 +26,10 @@
   }
 }
 
-/* 2. O quadro usa a altura que sobra. Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
+/* 2. O quadro usa a altura toda (desvio 49, layout B). Motivo: o protótipo descontava a barra de controles (Normal/Calmo,
       Noite/Dia, Recomeçar) e a nota de rodapé, 64 px (52 no celular); o app não tem nenhuma das duas. */
 .m-fio .m-app {
-  height: min(830px, 100%);
-}
-
-@media (max-width: 440px) {
-  .m-fio .m-app {
-    height: 100%;
-  }
+  height: 100%;
 }
 
 /* 3. As fontes do mockup, com os nomes próprios de fontes.css. Motivo: o protótipo as pedia ao Google
@@ -1148,14 +1142,58 @@ html[data-texto-fio] .m-fio .m-proximo {
   outline-offset: 2px;
 }
 
-/* 49. No monitor o quadro do Fio é mais largo que o do celular. Motivo: o app abria no PC com o quadro de
-       400 px (visualização de celular, Gabriel 08/11/2026). A partir de 900 px o quadro vai a 720 px e usa a
-       altura toda; o Destino mantém o próprio quadro largo (desvio do mockup, acima). */
-@media (min-width: 900px) {
-  .m-fio .m-app:not(.m-largo) {
-    max-width: min(720px, calc(100vw - 64px));
-    height: 100%;
+/* 49 (substituído no layout B, 17/11/2026). Sem moldura: o quadro do mockup era o palco do protótipo (um celular
+       desenhado na página), não parte do app. Motivo: no PC o app abria como um cartão vertical separado do fundo por uma
+       borda, e no celular sobrava a borda arredondada em volta da tela (Gabriel, 08 e 17/11/2026; a moldura veio de
+       carona no porte literal de 04/11, ninguém a pediu). O quadro passa a ser a tela inteira, sem borda, raio nem
+       sombra; a raiz só guarda a área segura e, do tablet em pé para cima, o lugar do menu lateral (--menu,
+       menu-lateral.css). O conteúdo fica numa coluna de até 760 px no meio da área (o Destino, na largura dele, 1180 px),
+       e o "+" acompanha o canto de cima dessa coluna, com o mesmo botão, a mesma cor e o mesmo movimento. */
+.m-fio {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) max(var(--menu, 0px), env(safe-area-inset-left, 0px));
+  gap: 0;
+  align-items: stretch;
+  background: var(--m-app-c);
+}
+
+@media (min-width: 700px) {
+  :root[data-menu-mudando] .m-fio {
+    transition: padding-left 0.45s var(--m-sair);
   }
+}
+
+.m-fio .m-app,
+.m-fio .m-app.m-largo {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.m-fio.m-fio[data-mundo='dia'] .m-app {
+  border: 0;
+  box-shadow: none;
+}
+
+.m-fio .m-app {
+  --coluna: 760px;
+}
+
+.m-fio .m-app.m-largo {
+  --coluna: 1180px;
+}
+
+.m-fio .m-tela {
+  padding-left: max(22px, (100% - var(--coluna)) / 2);
+  padding-right: max(22px, (100% - var(--coluna)) / 2);
+}
+
+.m-fio .m-app > .m-mais {
+  right: max(22px, (100% - var(--coluna)) / 2);
 }
 
 /* 50. O fio pendurado nasce logo abaixo do cabeçalho, não por trás dele. Motivo: com o nome e o "0% da prova
@@ -1232,4 +1270,131 @@ html[data-texto-fio] .m-fio .m-proximo {
   outline: none;
   border-color: var(--m-neon);
   box-shadow: 0 0 0 3px rgba(57, 202, 239, 0.18);
+
+/* 487 (b). O Varal ao vento, e em três fios de dois do tablet em pé para cima (layout B, Gabriel 17/11/2026; mockups em
+      /mnt/project-files/fio-moldura-17-11/v2). Motivo: no quadro largo os seis folhetos esticados ficavam feios; cada fio leva
+      dois folhetos estreitos (188 px no tablet, 200 no PC) com um vão entre eles (64 e 84 px). No celular continuam os dois fios
+      de três do mockup. No Vivo, os folhetos parecem pendurados ao vento: cada um gira no pregador (`rotate`) com uma rajada
+      irregular que corre da esquerda para a direita e de cima para baixo, e o papel tremula na rajada (`transform`); a corda
+      balança junto (o `<animate>` do VaralM). O vento fica num invólucro (`.m-pendurado`), para não brigar com a inclinação,
+      o toque e o mouse do folheto, que seguem os do mockup. No Calmo, e com o sistema pedindo menos movimento, nada balança. */
+.m-fio .m-pendurado {
+  display: flex;
+  min-width: 0;
+  transform-origin: 50% -18px;
+}
+.m-fio .m-pendurado > .m-folheto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.m-fio:not([data-movimento='calmo']) .m-pendurado {
+  --vento: calc(7.4s + var(--r, 0) * 0.9s);
+  animation:
+    m-vento var(--vento) ease-in-out infinite,
+    m-tremula var(--vento) ease-in-out infinite;
+  animation-delay: calc(-2.6s + var(--c, 0) * 0.42s + var(--r, 0) * 0.7s);
+}
+@keyframes m-vento {
+  0% {
+    rotate: -0.7deg;
+  }
+  12% {
+    rotate: 0.5deg;
+  }
+  22% {
+    rotate: -0.3deg;
+  }
+  33% {
+    rotate: 3.4deg;
+  }
+  41% {
+    rotate: -1.8deg;
+  }
+  49% {
+    rotate: 1.5deg;
+  }
+  57% {
+    rotate: -0.7deg;
+  }
+  66% {
+    rotate: 0.8deg;
+  }
+  76% {
+    rotate: -0.2deg;
+  }
+  86% {
+    rotate: 1.1deg;
+  }
+  100% {
+    rotate: -0.7deg;
+  }
+}
+@keyframes m-tremula {
+  0%,
+  22%,
+  62%,
+  100% {
+    transform: perspective(700px) rotateX(0) skewX(0);
+  }
+  30% {
+    transform: perspective(700px) rotateX(-9deg) skewX(-1.4deg);
+  }
+  35% {
+    transform: perspective(700px) rotateX(7deg) skewX(1deg);
+  }
+  40% {
+    transform: perspective(700px) rotateX(-4deg) skewX(-0.5deg);
+  }
+  46% {
+    transform: perspective(700px) rotateX(2deg);
+  }
+  84% {
+    transform: perspective(700px) rotateX(-3deg) skewX(-0.4deg);
+  }
+  90% {
+    transform: perspective(700px) rotateX(1.5deg);
+  }
+}
+/* O folheto que a pessoa aponta ou foca para de balançar: fica na mão dela, e o balanço do mouse do mockup vale inteiro. */
+.m-fio .m-pendurado:is(:hover, :focus-within) {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-fio .m-pendurado {
+    animation: none;
+  }
+}
+@media (min-width: 700px) {
+  .m-fio .m-varal {
+    gap: 30px;
+  }
+  .m-fio .m-varal-linha {
+    grid-template-columns: repeat(2, 188px);
+    justify-content: center;
+    column-gap: 64px;
+  }
+  .m-fio .m-varal-linha .m-folheto {
+    min-height: 178px;
+    padding: 16px 14px 18px;
+    gap: 7px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-xilo {
+    height: 66px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-xilo svg {
+    width: 44px;
+    height: 44px;
+  }
+  .m-fio .m-varal-linha .m-folheto strong {
+    font-size: 15px;
+  }
+  .m-fio .m-varal-linha .m-folheto .m-estado {
+    font-size: 12px;
+  }
+}
+@media (min-width: 1100px) {
+  .m-fio .m-varal-linha {
+    grid-template-columns: repeat(2, 200px);
+    column-gap: 84px;
+  }
 }
