@@ -111,7 +111,14 @@ test('nada do Leitor fica debaixo do cabeçalho da casca: o fio da rolagem encos
   expect(m.cabecalho.topo).toBe(0);
   expect(fimDoCabecalho).toBeGreaterThan(40);
 
-  expect(Math.abs(m.fioDaRolagem.topo - fimDoCabecalho), 'o fio da rolagem').toBeLessThanOrEqual(1);
+  // Sem o painel ao lado do texto, a trilha da norma fica presa logo abaixo do cabeçalho e o fio passa por baixo dela.
+  const trilha = await page.evaluate(
+    () => document.querySelector('.trilha-da-norma')?.getBoundingClientRect().height ?? 0,
+  );
+  expect(
+    Math.abs(m.fioDaRolagem.topo - fimDoCabecalho - trilha),
+    'o fio da rolagem',
+  ).toBeLessThanOrEqual(1);
   if (m.largura >= 700) {
     if (!m.estrutura) throw new Error('sem o sumário');
     expect(m.estrutura.posicao).toBe('sticky');

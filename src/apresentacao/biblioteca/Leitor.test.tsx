@@ -2403,21 +2403,22 @@ describe('Ponto de luz no Leitor (P4)', () => {
       );
       expect(await bloco(/^TÍTULO II DO FIM, ainda não lida$/)).toBeInTheDocument();
       expect(within(estrutura).queryByRole('button', { name: /CAPÍTULO/ })).toBeNull();
+      expect(within(estrutura).getByText(/artigos · nada lido ainda/)).toBeInTheDocument();
 
-      // A leitura entra no capítulo I (sem seções): a lista passa a ser a dos capítulos do título,
-      // com o título acima, como caminho, e o capítulo I como o de agora.
+      // A leitura entra no capítulo I (sem seções): a árvore abre o título dele, e o capítulo I é o de agora.
       rolarPara(linhaDoDispositivo('art1') * 60);
       const capitulo1 = await bloco(/^CAPÍTULO I DA EXECUÇÃO, ainda não lida$/);
       expect(capitulo1).toHaveAttribute('aria-current', 'location');
       expect(await bloco(/^CAPÍTULO II DO CONDENADO, ainda não lida$/)).not.toHaveAttribute(
         'aria-current',
       );
-      expect(
-        within(estrutura).getByRole('button', { name: /^TÍTULO I, DO OBJETO$/ }),
-      ).toBeVisible();
+      expect(within(estrutura).getByRole('button', { name: /^TÍTULO I DO OBJETO/ })).toBeVisible();
 
       // "Lido até aqui" no art. 1º: o capítulo I está em leitura (atual); o II, não lido.
       await usuario.click(screen.getByRole('button', { name: 'Lido até aqui' }));
+      expect(
+        await within(estrutura).findByText(/^Art\. 1 de \d+ · \d+% lido$/),
+      ).toBeInTheDocument();
       expect(await bloco(/^CAPÍTULO I DA EXECUÇÃO, em leitura$/)).toBeInTheDocument();
       expect(await bloco(/^CAPÍTULO II DO CONDENADO, ainda não lida$/)).toBeInTheDocument();
 
@@ -2464,16 +2465,14 @@ describe('Ponto de luz no Leitor (P4)', () => {
           }),
         ).toHaveAttribute('aria-current', 'location');
       });
-      const dentro = await within(estrutura).findByRole('list', { name: 'Dentro de CAPÍTULO I' });
       expect(
-        await within(dentro).findByRole('button', { name: /^Seção I Disposições Gerais/ }),
+        await within(estrutura).findByRole('button', { name: /^Seção I Disposições Gerais/ }),
       ).not.toHaveAttribute('aria-current');
-      expect(within(dentro).getAllByRole('listitem')).toHaveLength(2);
-      // O outro capítulo é irmão, sem nada dentro dele.
+      expect(within(estrutura).getByRole('button', { name: /^Seção II/ })).toBeInTheDocument();
+      // O outro capítulo é irmão, sem nada dentro dele (fechado, como as seções do outro capítulo).
       expect(
         within(estrutura).getByRole('button', { name: /^CAPÍTULO II DO CONDENADO/ }),
       ).not.toHaveAttribute('aria-current');
-      expect(within(estrutura).queryByRole('list', { name: 'Dentro de CAPÍTULO II' })).toBeNull();
 
       // Lido até o art. 1º, o único artigo da seção I: ela está lida.
       rolarPara(linhaDoDispositivo('art1') * 60);
@@ -2489,12 +2488,11 @@ describe('Ponto de luz no Leitor (P4)', () => {
           within(estrutura).getByRole('button', { name: /^Seção I Disposições Gerais, lida$/ }),
         ).toHaveAttribute('aria-current', 'location');
       });
-      expect(within(estrutura).queryByRole('list', { name: /^Dentro de/ })).toBeNull();
       expect(
         within(estrutura).getByRole('button', { name: /^Seção II Dos Regimes, ainda não lida$/ }),
       ).toBeInTheDocument();
       expect(
-        within(estrutura).getByRole('button', { name: /^CAPÍTULO I, DA EXECUÇÃO$/ }),
+        within(estrutura).getByRole('button', { name: /^CAPÍTULO I DA EXECUÇÃO/ }),
       ).toBeVisible();
     });
 
@@ -2563,9 +2561,8 @@ describe('Ponto de luz no Leitor (P4)', () => {
       await usuario.click(within(dialogo).getByRole('button', { name: 'Mostrar' }));
       expect(document.querySelector('[data-endereco="tit1.cap1"]')).toBeNull();
 
-      // Com o filtro, o alto da tela é outro e a estrutura segue: o título que abre a lista é o de
+      // Com o filtro, o alto da tela é outro e a estrutura segue: o título que abre a árvore é o de
       // agora, com os capítulos dele logo abaixo. O capítulo I é o que o filtro escondeu.
-      await within(estrutura).findByRole('list', { name: 'Dentro de TÍTULO I' });
       await usuario.click(
         await within(estrutura).findByRole('button', { name: /^CAPÍTULO I DA EXECUÇÃO/ }),
       );

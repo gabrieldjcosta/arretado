@@ -51,26 +51,6 @@
   list-style: none;
 }
 
-.estrutura-da-norma .estrutura-acima {
-  margin-bottom: 0.5rem;
-}
-
-/* O caminho até a lista (título, capítulo): texto atenuado, que leva ao começo do bloco. */
-.estrutura-da-norma .estrutura-acima button {
-  width: 100%;
-  justify-content: flex-start;
-  padding: 0.25rem 0.625rem;
-  border: 0;
-  border-radius: var(--raio-botao);
-  background: var(--botao-fundo, transparent);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-align: left;
-  color: var(--texto-atenuado);
-  overflow-wrap: anywhere;
-}
-
 /* Uma seção: o ponto de luz do estado, o rótulo em negrito e o nome por baixo. A de agora vai na
    folha com o contorno do controle, como a aba de página atual: o estado dela não é só a cor (negrito
    e aria-current). */
@@ -101,8 +81,7 @@
   }
 }
 
-:is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item:focus-visible,
-.estrutura-da-norma .estrutura-acima button:focus-visible {
+:is(.estrutura-da-norma, .sumario-da-norma) .estrutura-item:focus-visible {
   outline-offset: -2px;
 }
 
@@ -133,12 +112,105 @@
   overflow-wrap: anywhere;
 }
 
-/* Os blocos de dentro do bloco de agora (as seções do capítulo), um degrau à direita, ligados por
-   um filete ao bloco que os contém. */
-.estrutura-da-norma .estrutura-dentro {
-  margin: 2px 0 6px 1.25rem;
-  padding-inline-start: 0.375rem;
+/* A árvore (Livro, Título, Capítulo): um degrau por nível, ligado por um filete; o livro e o título em negrito, e o que
+   está fora do caminho da leitura mais apagado. Os mesmos degraus do sumário em folha, em px com teto. */
+.estrutura-da-norma .estrutura-itens > li[data-nivel='1'] {
+  margin-inline-start: 0.5rem;
+  padding-inline-start: 0.25rem;
   border-inline-start: 1px solid var(--borda);
+}
+
+.estrutura-da-norma .estrutura-itens > li[data-nivel='2'] {
+  margin-inline-start: 1rem;
+  padding-inline-start: 0.25rem;
+  border-inline-start: 1px solid var(--borda);
+}
+
+.estrutura-da-norma .estrutura-itens > li[data-nivel='3'] {
+  margin-inline-start: 1.5rem;
+  padding-inline-start: 0.25rem;
+  border-inline-start: 1px solid var(--borda);
+}
+
+.estrutura-da-norma .estrutura-itens > li[data-nivel='0'] .estrutura-titulo {
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.estrutura-da-norma .estrutura-itens > li:not([data-no-caminho]) .estrutura-titulo {
+  display: none;
+}
+
+/* O topo da árvore: quantos artigos a pessoa já leu (o "lido até"). A barra é só desenho, o texto diz o número. */
+.estrutura-progresso {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  padding-inline: 0.625rem;
+}
+
+.estrutura-progresso progress {
+  width: 100%;
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  appearance: none;
+  background: color-mix(in srgb, var(--texto) 16%, transparent);
+  color: var(--ponto-halo, #b87b00);
+}
+
+.estrutura-progresso progress::-webkit-progress-bar {
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--texto) 16%, transparent);
+}
+
+.estrutura-progresso progress::-webkit-progress-value {
+  border-radius: 2px;
+  background: var(--ponto-halo, #b87b00);
+}
+
+.estrutura-progresso progress::-moz-progress-bar {
+  border-radius: 2px;
+  background: var(--ponto-halo, #b87b00);
+}
+
+.estrutura-progresso p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--texto-atenuado);
+}
+
+/* A trilha do alto (abaixo de 700 px, sem o painel): o caminho até a leitura, que abre o sumário ao toque. Alvo de
+   toque de 44 px, os degraus separados por um "›" que o CSS desenha (o leitor de tela ouve o nome do botão). */
+.trilha-da-norma {
+  position: sticky;
+  top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  z-index: 4;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 0;
+  background: linear-gradient(var(--f-vidro), var(--f-vidro)), var(--fundo);
+  font-family: var(--fonte-interface);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--texto-atenuado);
+}
+
+.trilha-da-norma span:not(.visualmente-oculto) + span::before {
+  content: '›';
+  margin-inline-end: 0.25rem;
+}
+
+.trilha-da-norma span[data-aqui] {
+  font-weight: 700;
+  color: var(--texto);
 }
 
 /* O sumário da norma numa folha de baixo (celular e modo foco, onde o painel não está na tela): a lista
@@ -196,4 +268,42 @@ dialog.dialogo-sumario[open] {
 
 .sumario-da-norma .estrutura-item[data-nivel='4'] {
   padding-inline-start: calc(0.625rem + min(4rem, 64px));
+}
+
+/* No modo foco, artigo por artigo (layout B, 17/11/2026): a trilha vira um rótulo apagado no alto, no meio da tela, que não
+   prende nada. Toque ainda abre o sumário. O alto da tela e o "+" seguem onde estavam. */
+.em-foco .trilha-da-norma {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 3;
+  width: auto;
+  max-width: calc(100% - 9rem);
+  justify-content: center;
+  background: transparent;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transform: translateX(-50%);
+}
+
+.em-foco .trilha-da-norma:hover,
+.em-foco .trilha-da-norma:focus-visible {
+  opacity: 1;
+}
+
+/* No monitor e no tablet o foco por artigo não leva a coluna branca do Leitor: o chão é o da penumbra, e o cartão, de
+   papel, é a única coisa acesa (mockup `foco`). */
+@media (min-width: 768px) {
+  :root[data-modo-foco='artigo'] .leitor.em-foco {
+    background: transparent;
+  }
+
+  /* O cartão e o halo da evidência partem do mesmo raio (`--raio-cartao`): os dois ficam concêntricos. */
+  :root[data-modo-foco='artigo'] .area-artigo {
+    --raio-cartao: 24px;
+  }
+
+  :root[data-modo-foco='artigo'] .cartao-artigo {
+    padding: 1.75rem 2rem;
+  }
 }

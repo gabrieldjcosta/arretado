@@ -25,6 +25,9 @@ export interface DadosDoVaral {
   colecaoIds: readonly string[];
   /** "LEP, art. 112": a norma lida por último e o ponto dela; `undefined` se nenhuma foi aberta. */
   retomar: string | undefined;
+  /** Para onde o "Continuar" do painel leva (a norma lida por último) e há quanto tempo ela foi lida. */
+  retomarPara: string | undefined;
+  retomarQuando: string | undefined;
   textos: number;
   frases: number;
   frasesVencidas: number;
@@ -62,6 +65,7 @@ export async function carregarDadosDoVaral(repo: Repositorio): Promise<DadosDoVa
   ]);
   const normas = publicadas.filter((n) => !ehColecao(n));
   const ultima = ultimaLida(normas, leituras);
+  const ultimaLeitura = ultima && leituras.get(ultima.id);
   const ponto = ultima && (await pontoDaLeitura(repo, ultima.id, leituras));
   return {
     normaIds: normas.map((n) => n.id),
@@ -71,6 +75,8 @@ export async function carregarDadosDoVaral(repo: Repositorio): Promise<DadosDoVa
         ? `${ultima.tituloCurto}, ${comoSeCita(ponto.referencia)}`
         : ultima.tituloCurto
       : undefined,
+    retomarPara: ultima ? `/biblioteca/normas/${ultima.id}` : undefined,
+    retomarQuando: ultimaLeitura ? haQuantoTempo(lidaEm(ultimaLeitura), new Date()) : undefined,
     textos: resumos.length + precedentes,
     frases,
     frasesVencidas,

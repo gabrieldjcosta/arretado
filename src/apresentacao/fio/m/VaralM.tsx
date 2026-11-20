@@ -5,6 +5,7 @@ import { DialogoDoLembrete } from '../../componentes/lembrete/DialogoDoLembrete'
 import { useLarguraMinima } from '../../componentes/largura';
 import { useDadosDoFio } from '../dados/sem-vazio';
 import { LARGURA_DO_MENU } from '../menu-lateral';
+import { ContextoDoVaral } from './ContextoDoVaral';
 import { animar, espera, modoAgora, MOLA, useSinal } from './anima';
 import { CadernoM } from './CadernoM';
 import { useMovimentoDoFio } from './movimento';
@@ -20,6 +21,9 @@ import { contar } from './varal-lista';
  * miúdo e uma linha de estado, e uma busca única no alto. Cada folheto abre o seu (`/varal/normas`, `/varal/sumulas`); as Frases
  * abrem o Caderno, uma folha que sobe; os que ainda não têm folheto novo abrem a tela de antes, e o Lembrete abre a nota.
  */
+
+/** Daqui para cima o painel de contexto entra ao lado dos fios (a mesma largura em que o menu lateral passa a empurrar o conteúdo). */
+const LARGURA_DO_PAINEL = 1100;
 
 type IdDoFolheto = 'normas' | 'sumulas' | 'textos' | 'frases' | 'cartoes' | 'lembretes';
 
@@ -293,6 +297,8 @@ export function VaralM() {
   const sinal = useSinal();
   const varal = useRef<HTMLDivElement>(null);
   const largo = useLarguraMinima(LARGURA_DO_MENU);
+  // Do monitor para cima o painel de contexto fica ao lado do Varal (layout B, 17/11/2026).
+  const comPainel = useLarguraMinima(LARGURA_DO_PAINEL);
   const vivo = useMovimentoDoFio() === 'vivo';
   const [lembrando, setLembrando] = useState(false);
   const [buscando, setBuscando] = useState(false);
@@ -413,6 +419,7 @@ export function VaralM() {
           </div>
         ))}
       </div>
+      {comPainel && <ContextoDoVaral dados={dados} />}
       {caderno && (
         <CadernoM
           foco={caderno.foco}

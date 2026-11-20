@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { ItemDaJanela, NoDaLeitura } from '../../dominios/legislacao/leitor';
 import { PontoDeLuz, type EstadoDoPonto } from '../componentes/PontoDeLuz';
 import {
+  arvoreDaEstrutura,
+  contagemDeArtigos,
   ESTADO_POR_EXTENSO,
   estadoDoBloco,
   noDoNome,
   nomeDoTexto,
   RAIZ,
-  vistaDaEstrutura,
   type IndiceDaEstrutura,
 } from './estrutura';
+import { useBlocoDeAgora } from './useBlocoDeAgora';
 import './estrutura.css';
 
 /** O nome do bloco (ver `noDoNome`). Vazio enquanto o texto não chegou. */
@@ -61,13 +63,45 @@ export function ItemDaEstrutura({
 }
 
 /**
- * A estrutura da norma ao lado do texto (Ponto de luz, P4; tablet e desktop): o bloco de agora e os
- * irmãos dele (as seções do capítulo), cada um com o ponto de luz do que já foi lido (feita, em
- * leitura, ainda não lida) e o de agora na folha, com os blocos de dentro dele logo abaixo; acima, o
- * caminho até a lista (título, capítulo). Tocar leva o bloco ao alto da tela, e tocar no caminho
- * sobe um nível. O estado vem do "lido até" (uma ação da pessoa); o bloco de agora segue a rolagem,
- * por salto, assim que o cabeçalho dele passa da linha de leitura (um quarto da tela abaixo do alto),
- * e só a lista que muda de bloco faz a tela se redesenhar.
+ * A trilha do alto (tablet em pé e celular, onde o painel não está ao lado do texto): o caminho até a leitura
+ * ("Livro I › Título I › Capítulo I"), só com os rótulos, e a pessoa toca nela para abrir o sumário. Some antes
+ * do primeiro bloco.
+ */
+export function TrilhaDaNorma({
+  nos,
+  estrutura,
+  noDaLeitura,
+  abrirSumario,
+}: {
+  nos: readonly NoDaLeitura[];
+  estrutura: IndiceDaEstrutura;
+  noDaLeitura: () => number | undefined;
+  abrirSumario: () => void;
+}) {
+  const aqui = useBlocoDeAgora(noDaLeitura, estrutura);
+  const caminho: string[] = [];
+  for (let b = aqui; b !== RAIZ; b = estrutura.pai[b] ?? RAIZ) {
+    caminho.unshift(nos[b]?.dispositivo.rotulo ?? '');
+  }
+  if (caminho.length === 0) return null;
+  return (
+    <button type="button" className="trilha-da-norma" aria-haspopup="dialog" onClick={abrirSumario}>
+      <span className="visualmente-oculto">Abrir o sumário, você está em</span>
+      {caminho.map((rotulo, i) => (
+        <span key={i} data-aqui={i === caminho.length - 1 ? '' : undefined}>
+          {rotulo}
+        </span>
+      ))}
+    </button>
+  );
+}
+
+/**
+ * A estrutura da norma ao lado do texto (tablet e desktop), em árvore: Livro, Título, Capítulo. Os blocos de cima
+ * ficam sempre à vista; os de dentro, só dos que levam à leitura. O bloco de agora fica marcado, cada um traz o
+ * ponto de luz do que já foi lido, e o topo diz quantos artigos já foram lidos. Tocar leva o bloco ao alto da tela.
+ * O estado vem do "lido até" (uma ação da pessoa); o bloco de agora segue a rolagem, por salto, assim que o
+ * cabeçalho dele passa da linha de leitura (um quarto da tela abaixo do alto).
  */
 export function EstruturaDaNorma({
   nos,
@@ -92,42 +126,18 @@ export function EstruturaDaNorma({
   voltando: boolean;
   ir: (indice: number) => void;
 }) {
-  // O bloco mais fundo da leitura: muda quando ela passa de um bloco a outro, não a cada nó.
-  const blocoDoAlto = () => {
-    const no = noDaLeitura();
-    return no === undefined ? RAIZ : (estrutura.dentroDe[no] ?? RAIZ);
-  };
-  const [dentro, setDentro] = useState(blocoDoAlto);
-  useEffect(() => {
-    let quadro = 0;
-    const conferir = () => {
-      quadro = 0;
-      const no = noDaLeitura();
-      setDentro(no === undefined ? RAIZ : (estrutura.dentroDe[no] ?? RAIZ));
-    };
-    const aoRolar = () => {
-      if (quadro === 0) quadro = requestAnimationFrame(conferir);
-    };
-    quadro = requestAnimationFrame(conferir);
-    window.addEventListener('scroll', aoRolar, { passive: true });
-    window.addEventListener('resize', aoRolar);
-    return () => {
-      cancelAnimationFrame(quadro);
-      window.removeEventListener('scroll', aoRolar);
-      window.removeEventListener('resize', aoRolar);
-    };
-  }, [noDaLeitura, estrutura]);
-
-  const vista = useMemo(() => vistaDaEstrutura(estrutura, dentro), [estrutura, dentro]);
+  const dentro = useBlocoDeAgora(noDaLeitura, estrutura);
+  const linhas = useMemo(() => arvoreDaEstrutura(estrutura, dentro), [estrutura, dentro]);
   useEffect(() => {
     if (voltando) return;
-    const blocos = [...vista.acima, ...vista.itens.flatMap((item) => [item.bloco, ...item.dentro])];
-    for (const bloco of blocos) pedir(bloco, bloco + 1);
-  }, [vista, pedir, voltando]);
+    for (const { bloco } of linhas) pedir(bloco, bloco + 1);
+  }, [linhas, pedir, voltando]);
 
-  // O bloco de agora fica à vista dentro do painel (que rola sozinho quando a lista é grande). Rola
-  // só o painel, por salto: nunca a página, que é a leitura. Refaz quando os nomes chegam, que
-  // mudam a altura das linhas.
+  const { lidos, total } = useMemo(() => contagemDeArtigos(nos, lidoAte), [nos, lidoAte]);
+  const porcento = total === 0 ? 0 : Math.round((lidos / total) * 100);
+
+  // O bloco de agora fica à vista dentro do painel (que rola sozinho quando a árvore é grande). Rola só o
+  // painel, por salto: nunca a página, que é a leitura. Refaz quando os nomes chegam, que mudam a altura das linhas.
   const painel = useRef<HTMLElement>(null);
   useEffect(() => {
     const quadro = painel.current;
@@ -138,56 +148,41 @@ export function EstruturaDaNorma({
     else if (atual.offsetTop + atual.offsetHeight > quadro.scrollTop + quadro.clientHeight) {
       quadro.scrollTop = atual.offsetTop + atual.offsetHeight - quadro.clientHeight + folga;
     }
-  }, [vista, textos]);
-
-  const item = (bloco: number, aqui: boolean) => (
-    <ItemDaEstrutura
-      rotulo={nos[bloco]?.dispositivo.rotulo}
-      nome={nomeDoBloco(nos, textos, bloco)}
-      estado={estadoDoBloco(estrutura, bloco, lidoAte)}
-      aqui={aqui}
-      aoIr={() => {
-        ir(bloco);
-      }}
-    />
-  );
+  }, [linhas, textos]);
 
   return (
     <nav ref={painel} className="estrutura-da-norma" aria-label="Estrutura da norma">
-      {vista.acima.length > 0 && (
-        <ol className="estrutura-acima">
-          {vista.acima.map((bloco) => {
-            const nome = nomeDoBloco(nos, textos, bloco);
-            return (
-              <li key={bloco}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    ir(bloco);
-                  }}
-                >
-                  {nos[bloco]?.dispositivo.rotulo}
-                  {nome && `, ${nome}`}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+      {total > 0 && (
+        <div className="estrutura-progresso">
+          <progress
+            max={total}
+            value={lidos}
+            aria-label="Artigos lidos"
+            aria-valuetext={`${String(lidos)} de ${String(total)} artigos, ${String(porcento)}% lido`}
+          />
+          <p>
+            {lidos > 0
+              ? `Art. ${lidos.toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')} · ${String(porcento)}% lido`
+              : `${total.toLocaleString('pt-BR')} artigos · nada lido ainda`}
+          </p>
+        </div>
       )}
       <ol className="estrutura-itens">
-        {vista.itens.map(({ bloco, dentro: blocosDeDentro }) => (
-          <li key={bloco}>
-            {item(bloco, bloco === vista.aqui)}
-            {blocosDeDentro.length > 0 && (
-              <ol
-                className="estrutura-dentro"
-                aria-label={`Dentro de ${nos[bloco]?.dispositivo.rotulo ?? ''}`}
-              >
-                {blocosDeDentro.map((filho) => (
-                  <li key={filho}>{item(filho, false)}</li>
-                ))}
-              </ol>
-            )}
+        {linhas.map(({ bloco, nivel, aqui, noCaminho }) => (
+          <li
+            key={bloco}
+            data-nivel={Math.min(nivel, 3)}
+            data-no-caminho={noCaminho ? '' : undefined}
+          >
+            <ItemDaEstrutura
+              rotulo={nos[bloco]?.dispositivo.rotulo}
+              nome={nomeDoBloco(nos, textos, bloco)}
+              estado={estadoDoBloco(estrutura, bloco, lidoAte)}
+              aqui={aqui}
+              aoIr={() => {
+                ir(bloco);
+              }}
+            />
           </li>
         ))}
       </ol>

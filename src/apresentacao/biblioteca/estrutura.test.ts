@@ -3,7 +3,9 @@ import { abrirNorma, type NormaAberta } from '../../dominios/legislacao/leitor';
 import { criarRascunho, publicarVersao } from '../../dominios/legislacao/servico';
 import { repositorioDeTeste } from '../../testes/repositorio';
 import {
+  arvoreDaEstrutura,
   blocosEmOrdem,
+  contagemDeArtigos,
   ehBloco,
   estadoDoBloco,
   indiceDaEstrutura,
@@ -238,5 +240,39 @@ describe('estrutura da norma (P4 do Ponto de luz)', () => {
     // No fim da norma, a última rubrica é do último artigo, e o último capítulo também fecha.
     expect(e.ultimo[ix('CAPÍTULO II')]).toBe(ix('Art. 3º'));
     expect(estados(ix('Art. 3º'))).toEqual(['feito', 'feito']);
+  });
+
+  it('a árvore do painel abre só o caminho da leitura e deixa os outros blocos fechados', async () => {
+    const aberta = await abrir(LEI);
+    const ix = (rotulo: string) => aberta.nos.findIndex((n) => n.dispositivo.rotulo === rotulo);
+    const e = indiceDaEstrutura(aberta.nos);
+    const rotulos = (aqui: number) =>
+      arvoreDaEstrutura(e, aqui).map((l) => [
+        l.nivel,
+        aberta.nos[l.bloco]?.dispositivo.rotulo,
+        l.aqui,
+      ]);
+    expect(rotulos(ix('CAPÍTULO I'))).toEqual([
+      [0, 'TÍTULO I', false],
+      [1, 'CAPÍTULO I', true],
+      [2, 'Seção I', false],
+      [2, 'Seção II', false],
+      [1, 'CAPÍTULO II', false],
+      [0, 'TÍTULO II', false],
+    ]);
+    // Dentro de uma seção, o capítulo e o título dela seguem abertos.
+    expect(rotulos(ix('Seção II')).filter(([, , aqui]) => aqui)).toEqual([[2, 'Seção II', true]]);
+    // Antes do primeiro bloco, só os de cima.
+    expect(rotulos(RAIZ)).toEqual([
+      [0, 'TÍTULO I', false],
+      [0, 'TÍTULO II', false],
+    ]);
+  });
+
+  it('conta os artigos e quantos o lido até alcança', async () => {
+    const aberta = await abrir(LEI);
+    const ix = (rotulo: string) => aberta.nos.findIndex((n) => n.dispositivo.rotulo === rotulo);
+    expect(contagemDeArtigos(aberta.nos, undefined)).toEqual({ lidos: 0, total: 5 });
+    expect(contagemDeArtigos(aberta.nos, ix('Art. 3º'))).toEqual({ lidos: 3, total: 5 });
   });
 });

@@ -163,13 +163,18 @@ test('casca do Fio: pílula dos lugares por teclado, "+" no canto do cabeçalho,
   const topo = page.getByRole('banner');
   const mais = page.getByRole('button', { name: 'Novo registro' });
   await expect(mais).toBeVisible();
+  // Com o menu lateral (a partir de 700 px) o ☰ do cabeçalho não existe: o Menu mora na lateral.
   const menu = topo.getByRole('link', { name: 'Menu: sua conta e ajustes' });
-  await expect(menu).toBeVisible();
+  const comLateral = (page.viewportSize()?.width ?? 0) >= 700;
+  await (comLateral ? expect(menu).toBeHidden() : expect(menu).toBeVisible());
   await expect(topo.getByRole('button', { name: 'Ajuda', exact: true })).toBeVisible();
-  const c = await menu.boundingBox();
   const m = await mais.boundingBox();
-  if (!c || !m) throw new Error('sem caixa do Menu ou do +');
-  expect(m.x).toBeGreaterThanOrEqual(c.x + c.width);
+  if (!m) throw new Error('sem caixa do +');
+  if (!comLateral) {
+    const c = await menu.boundingBox();
+    if (!c) throw new Error('sem caixa do Menu');
+    expect(m.x).toBeGreaterThanOrEqual(c.x + c.width);
+  }
   await expect(topo.getByRole('link', { name: 'Registrar erro' })).toHaveCount(0);
 
   // Foco visível nos lugares.

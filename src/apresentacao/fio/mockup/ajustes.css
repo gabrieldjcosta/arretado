@@ -1399,3 +1399,66 @@ html[data-texto-fio] .m-fio .m-proximo {
     column-gap: 84px;
   }
 }
+
+/* Desvio 488: o painel de contexto ao lado do Varal (layout B, 17/11/2026; não existe no mockup aprovado do celular). De 1100 px
+   para cima o quadro do Varal vira duas colunas: os fios à esquerda e, à direita, Retomar, Na ponta do fio e Sua prova. Só
+   usa o que o mockup já tem: o cartão `.m-proximo`, o olho `.m-olho` e o botão `.m-acao`. A coluna cresce para 1120 px e a da direita
+   (300 px mais o vão de 32) sai da conta dos fios; com o menu aberto, a 1100 px, os fios ainda têm os 484 px que os dois folhetos pedem. */
+.m-fio .m-app:has(.m-contexto) {
+  --coluna: 1120px;
+}
+
+.m-fio .m-tela[data-tela='varal']:has(.m-contexto) {
+  padding-right: calc(max(22px, (100% - var(--coluna)) / 2) + 332px);
+}
+
+.m-fio .m-contexto {
+  position: absolute;
+  top: 84px;
+  right: max(22px, (100% - var(--coluna)) / 2);
+  display: grid;
+  gap: 14px;
+  width: 300px;
+}
+
+.m-fio .m-contexto .m-contexto-cartao {
+  grid-template-columns: minmax(0, 1fr) auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.m-fio .m-contexto .m-contexto-cartao strong {
+  font-size: 16px;
+}
+
+.m-fio .m-contexto .m-contexto-acao {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+}
+
+.m-fio .m-contexto .m-contexto-barra {
+  grid-column: 1 / -1;
+  height: 6px;
+  margin: 6px 0 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--m-linha);
+}
+
+.m-fio .m-contexto .m-contexto-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--m-ponto);
+}
+
+@media (hover: hover) {
+  .m-fio .m-contexto a.m-contexto-cartao:hover {
+    border-color: var(--m-ponto);
+  }
+}
+
+.m-fio .m-contexto a.m-contexto-cartao:focus-visible {
+  outline: 2px solid var(--m-ponto);
+  outline-offset: 2px;
+}

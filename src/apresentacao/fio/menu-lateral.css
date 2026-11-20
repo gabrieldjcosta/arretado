@@ -368,3 +368,8 @@ body[data-so-estudo] :is(.menu-lateral, .ml-veu) {
     left: calc(50% + var(--menu) / 2 + var(--largura-texto) / 2 + 1.5rem);
   }
 }
+
+/* Com o menu lateral a Conta mora nele: o ☰ do cabeçalho da casca de antes repetiria o mesmo destino. */
+:root[data-menu-lateral] .shell-fio .fio-menu {
+  display: none;
+}
