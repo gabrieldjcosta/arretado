@@ -172,7 +172,7 @@ export async function trocarDeAba(para: string, navegar: () => void): Promise<vo
       brilho.setAttribute('d', d);
       if (tracejar && k > 0.55) {
         const q = (k - 0.55) / 0.45;
-        linha.style.strokeDasharray = `${(300 * (1 - q) + 7 * q).toFixed(1)} ${(8 * q).toFixed(1)}`;
+        linha.style.strokeDasharray = `${(300 * (1 - q) + 0.1 * q).toFixed(1)} ${(9 * q).toFixed(1)}`;
         brilho.style.opacity = String(OPACIDADE_DA_FAIXA * (1 - q));
       }
       if (k < 1) requestAnimationFrame(passo);
