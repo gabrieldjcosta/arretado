@@ -1270,6 +1270,7 @@ html[data-texto-fio] .m-fio .m-proximo {
   outline: none;
   border-color: var(--m-neon);
   box-shadow: 0 0 0 3px rgba(57, 202, 239, 0.18);
+}
 
 /* 487 (b). O Varal ao vento, e em três fios de dois do tablet em pé para cima (layout B, Gabriel 17/11/2026; mockups em
       /mnt/project-files/fio-moldura-17-11/v2). Motivo: no quadro largo os seis folhetos esticados ficavam feios; cada fio leva
