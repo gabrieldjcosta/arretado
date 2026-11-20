@@ -1,6 +1,6 @@
 # Política de privacidade — versão 3
 
-Versão que vale quando há conta (login). Escrita em 18/10/2026, com as contas da F4-A, antes de qualquer convidado entrar. Para quem usa sem conta, nada muda: continua valendo a versão 2, que fica como histórico ao lado ([`politica-de-privacidade-v2.md`](politica-de-privacidade-v2.md)).
+Versão que vale quando há conta (login). Escrita em 18/10/2026, com as contas da F4-A, antes de qualquer convidado entrar. Para quem usa sem conta, nada muda: continua valendo a versão 2, que fica como histórico ao lado ([`arquivo/politica-de-privacidade-v2.md`](arquivo/politica-de-privacidade-v2.md)).
 
 Revisão por pessoa habilitada é recomendada antes de convidar quem não seja conhecido. Enquanto não houver revisão, o Arretado só convida pessoas conhecidas, com o aviso de versão de teste ([`termos-de-teste-v1.md`](termos-de-teste-v1.md)).
 

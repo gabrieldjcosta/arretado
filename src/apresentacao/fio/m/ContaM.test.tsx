@@ -64,6 +64,18 @@ async function abrir(preparar?: (teste: Teste) => Promise<void>) {
   return { repo, usuario, folha };
 }
 
+// O estado da instalação vem do navegador (beforeinstallprompt, userAgent); aqui cada teste o escolhe.
+const estadoDaInstalacao = vi.hoisted(() => ({
+  valor: 'indisponivel',
+  instalar: vi.fn(() => Promise.resolve()),
+}));
+vi.mock('../../../suporte/instalacao', () => ({
+  useInstalacao: () => ({
+    estado: estadoDaInstalacao.valor,
+    instalar: estadoDaInstalacao.instalar,
+  }),
+}));
+
 describe('Conta em folha', () => {
   it('sem conta, diz onde o fio mora e não oferece o login (a chave de contas está desligada)', async () => {
     const { folha } = await abrir();
@@ -180,5 +192,30 @@ describe('Conta em folha', () => {
     const { usuario, folha } = await abrir();
     await usuario.click(within(folha).getByRole('button', { name: /^Atualizar o Arretado/ }));
     expect(versao.aplicar).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Conta em folha › instalar no aparelho', () => {
+  it('sem convite e fora do iOS, a linha não aparece', async () => {
+    estadoDaInstalacao.valor = 'indisponivel';
+    const { folha } = await abrir();
+    expect(within(folha).queryByText('Instalar no aparelho')).toBeNull();
+  });
+
+  it('com o convite do navegador, instala e devolve o foco ao título da folha', async () => {
+    estadoDaInstalacao.valor = 'convite';
+    const { folha, usuario } = await abrir();
+    await usuario.click(within(folha).getByRole('button', { name: /Instalar no aparelho/ }));
+    expect(estadoDaInstalacao.instalar).toHaveBeenCalledOnce();
+    await waitFor(() => {
+      expect(within(folha).getByRole('heading', { level: 2 })).toHaveFocus();
+    });
+  });
+
+  it('no iOS, mostra o passo a passo e nenhum botão de instalar', async () => {
+    estadoDaInstalacao.valor = 'passo-a-passo-ios';
+    const { folha } = await abrir();
+    expect(within(folha).getByText(/Adicionar à Tela de Início/)).toBeInTheDocument();
+    expect(within(folha).queryByRole('button', { name: /Instalar no aparelho/ })).toBeNull();
   });
 });

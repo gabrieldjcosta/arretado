@@ -15,6 +15,8 @@ import { FiltrosM } from './FiltrosM';
 import { aparelhoLeve } from './leve';
 import { MaisM } from './MaisM';
 import { NavM } from './NavM';
+import { MenuLateral } from '../MenuLateral';
+import type { MenuLateral as EstadoDoMenu } from '../menu-lateral';
 import { ToastM } from './ToastM';
 import { useMovimentoDoFio } from './movimento';
 import { useMundo } from './mundo';
@@ -31,7 +33,7 @@ import '../mockup/ajustes.css';
  * (`.m-fio`) faz o papel da página do protótipo e carrega o mundo (noite ou dia). O que muda de tela é o
  * `Outlet`; o quadro fica.
  */
-export function CascaM() {
+export function CascaM({ menu }: { menu: EstadoDoMenu }) {
   const { pathname } = useLocation();
   const mundo = useMundo();
   // Vivo ou Calmo: dele depende a cara do botão de ação (o Sol ou o Só contorno; desvio 17 em `ajustes.css`).
@@ -52,6 +54,7 @@ export function CascaM() {
     if (saiuQuieta) aoSairDaCamada?.('fim');
   }, [saiuQuieta, aoSairDaCamada]);
   useEffect(() => esquecerTelas, []);
+  const comNav = comNavDoFio(pathname) && !naAbertura;
   // A onda de luz em todo botão de ação, como no mockup (um ouvinte do documento, ligado enquanto o quadro vive).
   useEffect(() => ligarOndaDeLuz(), []);
   // A alvorada do botão de ação e a onda do botão redondo (desvio 49 em `ajustes.css`).
@@ -78,6 +81,12 @@ export function CascaM() {
         Pular para o conteúdo
       </a>
       <FiltrosM mundo={mundo} />
+      {/* Do tablet em pé para cima a nav dos lugares fica no menu lateral, fora do quadro; no celular, na pílula de baixo. */}
+      {comNav && menu.lateral && (
+        <MenuLateral menu={menu}>
+          <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />
+        </MenuLateral>
+      )}
       {/* No monitor o Destino alarga o quadro (`m-largo`, do mockup): o texto à esquerda e o mapa à direita. */}
       <main
         id="conteudo"
@@ -104,9 +113,7 @@ export function CascaM() {
             }}
           />
         )}
-        {comNavDoFio(pathname) && !naAbertura && (
-          <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />
-        )}
+        {comNav && !menu.lateral && <NavM ativo={lugarDaRota(pathname)} caminho={pathname} />}
         {!naAbertura && pathname !== ROTA_DA_PROVA && <MaisM />}
         <ToastM />
       </main>

@@ -2,6 +2,9 @@ import { useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { LUGARES, noQuadroDoFio, type IdDoLugar } from '../lugares';
 import { trocarDeAba } from './aba';
+import { medirIndicador } from '../indicador';
+import { IconeDoMenu } from '../MenuLateral';
+import { ICONE_DO_LUGAR } from '../menu-lateral';
 
 /** A tela do quadro que cada lugar da nav abre (o `data-tela` do mockup). */
 const TELA_DO_LUGAR: Readonly<Record<IdDoLugar, string>> = {
@@ -19,19 +22,12 @@ export function NavM({ ativo, caminho }: { ativo: IdDoLugar | undefined; caminho
   const nav = useRef<HTMLElement>(null);
   const indicador = useRef<HTMLSpanElement>(null);
 
-  // O indicador fica no botão aceso; ao mudar de lugar, desliza (a transição é do CSS do mockup).
-  useLayoutEffect(() => {
-    const botao = nav.current?.querySelector<HTMLElement>('button[aria-current="page"]');
-    const marca = indicador.current;
-    if (!botao || !marca) return;
-    const id = window.requestAnimationFrame(() => {
-      marca.style.left = `${String(botao.offsetLeft)}px`;
-      marca.style.width = `${String(botao.offsetWidth)}px`;
-    });
-    return () => {
-      window.cancelAnimationFrame(id);
-    };
-  }, [ativo]);
+  // O indicador fica no botão aceso; ao mudar de lugar, desliza (a transição é do CSS do mockup). No menu lateral ele
+  // desliza na vertical e acompanha o menu abrindo e recolhendo (`medirIndicador`).
+  useLayoutEffect(
+    () => medirIndicador(nav.current, indicador.current, 'button[aria-current="page"]'),
+    [ativo],
+  );
 
   return (
     <nav ref={nav} className="m-nav" aria-label="Lugares">
@@ -54,7 +50,8 @@ export function NavM({ ativo, caminho }: { ativo: IdDoLugar | undefined; caminho
             else ir();
           }}
         >
-          {l.nome}
+          <IconeDoMenu traco={ICONE_DO_LUGAR[l.id]} />
+          <span className="ml-rotulo">{l.nome}</span>
         </button>
       ))}
     </nav>
