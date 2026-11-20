@@ -306,4 +306,55 @@ dialog.dialogo-sumario[open] {
   :root[data-modo-foco='artigo'] .cartao-artigo {
     padding: 1.75rem 2rem;
   }
+
+  /* O pé do cartão (layout B, mockup `foco`): as setas e o ⋯ numa fileira só, no meio, perto do pé da tela; o fio de progresso
+     vai para a borda de baixo, fino e sem número na vista (o leitor de tela segue ouvindo "N de M"). O ⋯ é o mesmo botão da
+     bandeja, só que no meio e não no canto. */
+  :root[data-modo-foco='artigo'] .pe-do-cartao {
+    position: fixed;
+    inset: auto 0 max(1.5rem, env(safe-area-inset-bottom, 0px));
+    z-index: 4;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 0 5rem;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  :root[data-modo-foco='artigo'] .pe-do-cartao button {
+    pointer-events: auto;
+  }
+
+  :root[data-modo-foco='artigo'] .pe-do-cartao .barra-fina {
+    position: fixed;
+    inset: auto 0 0;
+  }
+
+  :root[data-modo-foco='artigo'] .pe-do-cartao .barra-fina-trilho {
+    height: 3px;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  :root[data-modo-foco='artigo'] .pe-do-cartao .barra-fina-cheia {
+    background: var(--ponto-halo);
+  }
+
+  :root[data-modo-foco='artigo'] .pe-do-cartao .barra-fina-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :root[data-modo-foco='artigo'] .em-foco .acoes-leitor {
+    right: auto;
+    bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    flex-wrap: nowrap;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
 }

@@ -2075,6 +2075,7 @@ function LeitorAberto({
           estrutura={estrutura}
           noDaLeitura={noDaLeitura}
           abrirSumario={abrirSumario}
+          chave={porArtigo ? ordem : undefined}
         />
       )}
       {!modoFoco && (

@@ -81,8 +81,9 @@ test('modo foco por artigo: o cartão toma a altura que sobra, o curto não esti
     // Celular e tablet em pé: o pé fica no fim da tela, onde está o ⋯, e não anda com o artigo.
     expect(curto.vh - curto.pe.base).toBeLessThanOrEqual(24);
   } else {
-    // Computador: o pé acompanha o cartão (a pilha fica no meio da tela).
-    expect(curto.pe.y - curto.cartao.base).toBeLessThanOrEqual(24);
+    // Do tablet deitado para cima (layout B, 17/11): as setas e o ⋯ ficam numa fileira no meio, a 1,5 rem do fim da
+    // tela, e não acompanham o cartão.
+    expect(curto.vh - curto.pe.base).toBeLessThanOrEqual(32);
   }
 
   // Trocar de artigo mantém a conta: o seguinte também cabe, sem a página rolar.

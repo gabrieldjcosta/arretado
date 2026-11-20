@@ -8,6 +8,8 @@ import { RAIZ, type IndiceDaEstrutura } from './estrutura';
 export function useBlocoDeAgora(
   noDaLeitura: () => number | undefined,
   estrutura: IndiceDaEstrutura,
+  /** O que muda quando a leitura anda sem rolar a página (o artigo do cartão no modo foco): refaz a conta. */
+  chave?: number,
 ): number {
   const blocoDoAlto = () => {
     const no = noDaLeitura();
@@ -32,6 +34,6 @@ export function useBlocoDeAgora(
       window.removeEventListener('resize', aoRolar);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `blocoDoAlto` só lê as duas entradas abaixo.
-  }, [noDaLeitura, estrutura]);
+  }, [noDaLeitura, estrutura, chave]);
   return dentro;
 }

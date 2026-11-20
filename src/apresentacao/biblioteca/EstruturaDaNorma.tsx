@@ -72,13 +72,16 @@ export function TrilhaDaNorma({
   estrutura,
   noDaLeitura,
   abrirSumario,
+  chave,
 }: {
   nos: readonly NoDaLeitura[];
   estrutura: IndiceDaEstrutura;
   noDaLeitura: () => number | undefined;
   abrirSumario: () => void;
+  /** O artigo do cartão (modo foco), que anda sem a página rolar. */
+  chave?: number | undefined;
 }) {
-  const aqui = useBlocoDeAgora(noDaLeitura, estrutura);
+  const aqui = useBlocoDeAgora(noDaLeitura, estrutura, chave);
   const caminho: string[] = [];
   for (let b = aqui; b !== RAIZ; b = estrutura.pai[b] ?? RAIZ) {
     caminho.unshift(nos[b]?.dispositivo.rotulo ?? '');
