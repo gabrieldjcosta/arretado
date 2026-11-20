@@ -6,6 +6,12 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { alterarPreferencias, obterPreferencias } from '../../../core/preferencias';
 import { estadoDaSincronizacao, ROTULO_DO_ESTADO } from '../../../core/sincronizacao/estado';
+import {
+  desligarLembrete,
+  lerLembrete,
+  ligarLembrete,
+  naCasca,
+} from '../../../integracoes/casca/lembrete';
 import { lembreteDeBackup } from '../../../dominios/dados/lembrete-de-backup';
 import { contasHabilitadas } from '../../../integracoes/conta';
 import { aplicarAtualizacao, useAtualizacaoPronta } from '../../../offline/registro';
@@ -85,6 +91,59 @@ function LinhaDeInstalacao({ idDoTitulo }: { idDoTitulo: string }) {
     >
       Instalar no aparelho
     </Linha>
+  );
+}
+
+/** Lembrete diário de estudo: só no app instalado (a notificação é local, agendada pelo aparelho). */
+function LinhaDoLembrete() {
+  const [estado, setEstado] = useState(lerLembrete);
+  const [negado, setNegado] = useState(false);
+  if (!naCasca()) return null;
+  const ligar = (hora: string) => {
+    ligarLembrete(hora)
+      .then((ok) => {
+        setNegado(!ok);
+      })
+      .catch(() => {
+        setNegado(true);
+      })
+      .finally(() => {
+        setEstado(lerLembrete());
+      });
+  };
+  return (
+    <>
+      <Linha
+        pequeno={
+          negado
+            ? 'A permissão de notificação está desligada nas configurações do aparelho.'
+            : estado.ligado
+              ? `Todo dia às ${estado.hora}. Toque para desligar.`
+              : 'Uma notificação por dia, no horário que você escolher.'
+        }
+        aoToque={() => {
+          if (estado.ligado)
+            void desligarLembrete().then(() => {
+              setEstado(lerLembrete());
+            });
+          else ligar(estado.hora);
+        }}
+      >
+        Lembrete diário
+      </Linha>
+      {estado.ligado && (
+        <label className="m-linha-conta">
+          <span>Horário do lembrete</span>
+          <input
+            type="time"
+            value={estado.hora}
+            onChange={(e) => {
+              if (e.target.value) ligar(e.target.value);
+            }}
+          />
+        </label>
+      )}
+    </>
   );
 }
 
@@ -327,6 +386,7 @@ function Conteudo({
       <div className="m-grupo-conta">
         <h3>O resto</h3>
         <LinhaDeInstalacao idDoTitulo={idDoTitulo} />
+        <LinhaDoLembrete />
         {versaoNova && (
           <Linha pequeno="uma versão nova está pronta" aoToque={aplicarAtualizacao}>
             Atualizar o Arretado

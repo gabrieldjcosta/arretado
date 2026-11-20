@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Arretado</string>
+    <string name="title_activity_main">Arretado</string>
+    <string name="package_name">cc.arretado.app</string>
+    <string name="custom_url_scheme">cc.arretado.app</string>
+</resources>

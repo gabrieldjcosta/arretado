@@ -10,6 +10,7 @@ import {
   type Session,
   type SupabaseClient,
 } from '@supabase/supabase-js';
+import { abrirNoNavegador, naCasca } from './casca';
 import {
   FalhaDeSincronizacao,
   type ChaveDeRegistro,
@@ -26,7 +27,7 @@ import {
   type ServicoDeConta,
   type SessaoDeConta,
 } from './interface';
-import { CHAVE_PUBLICAVEL, URL_SUPABASE, enderecoDeRetorno } from './projeto';
+import { CHAVE_PUBLICAVEL, RETORNO_PRODUCAO, URL_SUPABASE, enderecoDeRetorno } from './projeto';
 
 /** Provedores com conta criada no painel. Apple entra aqui só na Fase 3 do plano de apps (conta paga). */
 const PROVEDORES_LIGADOS: readonly ProvedorDeLogin[] = ['google'];
@@ -170,11 +171,18 @@ export class ServicoDeContaSupabase implements ServicoDeConta {
     if (!PROVEDORES_LIGADOS.includes(provedor)) {
       throw new FalhaDeConta('indisponivel', 'Este método de entrada ainda não está disponível.');
     }
-    const { error } = await this.cliente.auth.signInWithOAuth({
+    const nativo = naCasca();
+    const { data, error } = await this.cliente.auth.signInWithOAuth({
       provider: provedor,
-      options: { redirectTo: enderecoDeRetorno(window.location.hostname) },
+      // Na casca o login abre no navegador do sistema; a volta chega por link verificado (conta/casca.ts).
+      options: {
+        // O WebView da casca roda em https://localhost, que `enderecoDeRetorno` trataria como desenvolvimento.
+        redirectTo: nativo ? RETORNO_PRODUCAO : enderecoDeRetorno(window.location.hostname),
+        skipBrowserRedirect: nativo,
+      },
     });
     if (error) throw traduzirErro(error);
+    if (nativo && data.url) await abrirNoNavegador(data.url);
   }
 
   async pedirCodigoPorEmail(email: string): Promise<void> {

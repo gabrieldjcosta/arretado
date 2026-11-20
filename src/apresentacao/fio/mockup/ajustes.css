@@ -1253,6 +1253,25 @@ html[data-texto-fio] .m-fio .m-proximo {
   text-align: center;
 }
 
+/* Desvio 484: o "Horário do lembrete" da folha da Conta (só no app instalado). O mockup não tem campo de hora dentro de
+   `.m-linha-conta`; o campo segue o do Fio (fonte da linha, borda e fundo do mockup) e tem 44 px de alvo. */
+.m-fio .m-linha-conta input {
+  font: inherit;
+  color: var(--m-texto);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--m-borda);
+  background: var(--m-sup);
+  flex: none;
+}
+.m-fio .m-linha-conta input:focus-visible {
+  outline: none;
+  border-color: var(--m-neon);
+  box-shadow: 0 0 0 3px rgba(57, 202, 239, 0.18);
+}
+
 /* 487 (b). O Varal ao vento, e em três fios de dois do tablet em pé para cima (layout B, Gabriel 17/11/2026; mockups em
       /mnt/project-files/fio-moldura-17-11/v2). Motivo: no quadro largo os seis folhetos esticados ficavam feios; cada fio leva
       dois folhetos estreitos (188 px no tablet, 200 no PC) com um vão entre eles (64 e 84 px). No celular continuam os dois fios

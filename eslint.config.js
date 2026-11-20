@@ -9,6 +9,8 @@ export default tseslint.config(
   {
     ignores: [
       'dist',
+      'android',
+      'capacitor.config.ts',
       'mods',
       '.claude/skills/**',
       '.claude/skills/**',

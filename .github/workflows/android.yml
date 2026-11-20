@@ -1,0 +1,106 @@
+name: Android
+
+# APK instalável do Arretado (Fase 1 do plano de apps). Manual: Actions › Android › Run workflow.
+# A chave de assinatura vive só nos segredos do repositório (o repo é público); sem eles, o APK sai com a chave de
+# depuração do runner, que serve para testar uma vez mas não atualiza por cima de outro APK.
+# Dois jobs: o que compila (npm ci, Gradle) só lê o repositório; só o que publica pode escrever.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      VITE_CONTA: '1'
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 0.1.${{ github.run_number }}
+    outputs:
+      assinado: ${{ steps.chave.outputs.assinado }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      # O runner já traz o JDK 21 e o SDK do Android; nenhuma ação de terceiros entra no build.
+      - run: echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Chave de assinatura
+        id: chave
+        env:
+          KS_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_SENHA: ${{ secrets.ANDROID_KEYSTORE_SENHA }}
+          CH_ALIAS: ${{ secrets.ANDROID_CHAVE_ALIAS }}
+          CH_SENHA: ${{ secrets.ANDROID_CHAVE_SENHA }}
+        run: |
+          if [ -n "$KS_BASE64" ]; then
+            # Chave real: os quatro segredos precisam existir juntos, senão falha aqui, com a causa à vista.
+            for v in KS_SENHA CH_ALIAS CH_SENHA; do
+              if [ -z "${!v}" ]; then echo "::error::Segredo ausente para a chave de assinatura ($v). Veja docs/planos/apps-android.md."; exit 1; fi
+            done
+            echo "$KS_BASE64" | base64 -d > "$RUNNER_TEMP/arretado.jks"
+            {
+              echo "ARRETADO_KEYSTORE=$RUNNER_TEMP/arretado.jks"
+              echo "ARRETADO_KEYSTORE_SENHA=$KS_SENHA"
+              echo "ARRETADO_CHAVE_ALIAS=$CH_ALIAS"
+              echo "ARRETADO_CHAVE_SENHA=$CH_SENHA"
+            } >> "$GITHUB_ENV"
+            echo "assinado=sim" >> "$GITHUB_OUTPUT"
+          else
+            keytool -genkeypair -keystore "$RUNNER_TEMP/arretado.jks" -storepass depuracao -keypass depuracao \
+              -alias arretado -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Arretado depuracao"
+            {
+              echo "ARRETADO_KEYSTORE=$RUNNER_TEMP/arretado.jks"
+              echo "ARRETADO_KEYSTORE_SENHA=depuracao"
+              echo "ARRETADO_CHAVE_ALIAS=arretado"
+              echo "ARRETADO_CHAVE_SENHA=depuracao"
+            } >> "$GITHUB_ENV"
+            echo "assinado=nao" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Compilar
+        working-directory: android
+        run: ./gradlew --no-daemon assembleRelease
+      - name: Impressão digital da chave (vai no assetlinks.json)
+        run: |
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" arretado-android.apk
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)
+          "$BT/apksigner" verify --print-certs arretado-android.apk | tee "$RUNNER_TEMP/cert.txt"
+          { echo '### APK pronto'; echo; echo "Assinado com a chave do repositório: ${{ steps.chave.outputs.assinado }}"; echo '```'; grep "SHA-256" "$RUNNER_TEMP/cert.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: arretado-android
+          path: arretado-android.apk
+          retention-days: 1
+
+  publicar:
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: arretado-android
+      - name: Publicar em pré-lançamento
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete android-previa --yes --cleanup-tag 2>/dev/null || true
+          gh release create android-previa arretado-android.apk --target "$GITHUB_SHA" --prerelease \
+            --title "Android (prévia)" \
+            --notes "APK de teste, compilação ${{ github.run_number }}, commit ${GITHUB_SHA::7}. Assinado com a chave do repositório: ${{ needs.apk.outputs.assinado }}."

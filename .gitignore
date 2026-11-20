@@ -12,3 +12,12 @@ test-results/
 .wrangler/
 .claude/tmp/
 acervo/.cache/
+
+# Casca Android: o que o Gradle gera fica fora.
+android/app/src/main/assets/public
+android/app/src/main/assets/capacitor*.json
+android/capacitor-cordova-android-plugins
+android/.gradle
+android/local.properties
+android/app/build
+android/build

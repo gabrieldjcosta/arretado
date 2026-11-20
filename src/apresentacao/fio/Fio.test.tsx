@@ -46,7 +46,10 @@ describe('o Fio', () => {
     await waitFor(() => {
       expect(window.location.hash).toBe('#/');
     });
-    expect(await screen.findByRole('navigation', { name: 'Lugares' })).toBeInTheDocument();
+    // A primeira tela da suíte baixa a casca lazy: na suíte cheia do CI passa de 1 s (o padrão do findBy).
+    expect(
+      await screen.findByRole('navigation', { name: 'Lugares' }, { timeout: 5000 }),
+    ).toBeInTheDocument();
   });
 
   it('a tela de carregamento do index.html só sai com a casca na tela (ela baixa à parte)', async () => {
