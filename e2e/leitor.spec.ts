@@ -1096,6 +1096,14 @@ test('grifos e notas: selecionar por toque ou mouse, 3 cores com o destaque, not
   const acoes = page.getByRole('group', { name: 'Marcar o trecho selecionado' });
   await expect(acoes).toBeVisible();
   await expect(page.getByRole('button', { name: 'Buscar', exact: true })).toBeHidden();
+  if (toque) {
+    // A aba de pesquisa do Google cobre a base da tela: no toque as ações saem de lá e ficam acima da
+    // faixa de baixo (30%), junto da seleção ou no alto.
+    const caixa = await acoes.locator('xpath=..').boundingBox();
+    const janela = page.viewportSize()?.height ?? 0;
+    if (!caixa) throw new Error('as ações do trecho não têm caixa');
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(janela * 0.7 + 1);
+  }
   await semViolacoes(page);
   await apertar(acoes.getByRole('button', { name: 'Grifar com a cor 1' }), toque);
   const grifo = texto.locator('mark.grifo');

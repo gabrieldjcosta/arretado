@@ -74,3 +74,21 @@ export function lerSelecao(
   const [primeiro] = achados;
   return primeiro && { ...primeiro, cortada: achados.length > 1 };
 }
+
+/**
+ * Onde (em y, na janela) ficam as ações do trecho marcado no toque. No Android a aba de pesquisa do
+ * Google ("Touch to Search") sobe da base e cobre a barra de baixo, então a barra sai de lá: logo
+ * abaixo da seleção (deixando a folga das alças) se isso ainda cabe acima da faixa de baixo; senão,
+ * presa no alto, abaixo do cabeçalho. O menu nativo do sistema fica junto da seleção, não no alto.
+ */
+export function ondeFicamAsAcoes(
+  baseDaSelecao: number,
+  altura: number,
+  janela: number,
+  topoSeguro: number,
+): number {
+  const FOLGA_DAS_ALCAS = 44;
+  const FAIXA_DE_BAIXO = 0.3;
+  const abaixo = baseDaSelecao + FOLGA_DAS_ALCAS;
+  return abaixo + altura <= janela * (1 - FAIXA_DE_BAIXO) ? abaixo : topoSeguro;
+}

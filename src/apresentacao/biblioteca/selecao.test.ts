@@ -1,4 +1,4 @@
-import { lerSelecao } from './selecao';
+import { lerSelecao, ondeFicamAsAcoes } from './selecao';
 
 /** Dois dispositivos como o leitor desenha: rótulo fora do texto vigente, pedaços e o marcador. */
 function montar() {
@@ -79,5 +79,14 @@ describe('a seleção em offsets do texto gravado (11.4)', () => {
     selecao = selecionar(noDe(d1, ' tem'), 4, noDe(d1, ' por '), 1);
     expect(lerSelecao(selecao, lista)).toBeUndefined();
     expect(lerSelecao(null, lista)).toBeUndefined();
+  });
+});
+
+describe('ondeFicamAsAcoes', () => {
+  it('fica logo abaixo da seleção quando cabe acima da faixa de baixo', () => {
+    expect(ondeFicamAsAcoes(200, 56, 800, 72)).toBe(244);
+  });
+  it('vai para o alto, abaixo do cabeçalho, quando a seleção está embaixo', () => {
+    expect(ondeFicamAsAcoes(600, 56, 800, 72)).toBe(72);
   });
 });
