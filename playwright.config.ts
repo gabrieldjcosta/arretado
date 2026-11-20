@@ -14,6 +14,13 @@ const APARELHOS = [
   ['tablet', devices['Galaxy Tab S4']],
 ] as const;
 
+// Safari: o WebKit do Playwright em desktop e em iPhone. Só o job `e2e-webkit` do CI os roda (um subconjunto, ver
+// `.github/workflows/ci.yml`); os projetos acima seguem sendo a suíte inteira.
+const SAFARI = [
+  ['safari', devices['Desktop Safari']],
+  ['iphone', devices['iPhone 13']],
+] as const;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -31,6 +38,14 @@ export default defineConfig({
   },
   projects: [
     ...APARELHOS.map(([name, aparelho]) => ({
+      name,
+      testIgnore: SPECS_DA_CONTA,
+      use: {
+        ...aparelho,
+        baseURL: `http://localhost:${String(PORTA)}`,
+      },
+    })),
+    ...SAFARI.map(([name, aparelho]) => ({
       name,
       testIgnore: SPECS_DA_CONTA,
       use: {
