@@ -134,5 +134,29 @@
     "tipo": "novo",
     "url": "https://www.concursosfcc.com.br/concursos/unasp126/index.html",
     "detectadoEm": "2026-11-14"
+  },
+  {
+    "fonte": "fcc-dpeba-125",
+    "orgao": "DPE-BA",
+    "banca": "FCC",
+    "tipo": "retificado",
+    "url": "https://www.concursosfcc.com.br/rybena/web/index.html?file=https://www.concursosfcc.com.br/concursos/dpeba125/edital_48_de_convocacao_oral_e_titulos_sub_judice.pdf",
+    "detectadoEm": "2026-11-23"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/abgfg126/index.html",
+    "detectadoEm": "2026-11-23"
+  },
+  {
+    "fonte": "fcc-lista",
+    "orgao": "várias",
+    "banca": "FCC",
+    "tipo": "novo",
+    "url": "https://www.concursosfcc.com.br/concursos/fdsbc126/index.html",
+    "detectadoEm": "2026-11-23"
   }
 ]
